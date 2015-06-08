@@ -150,11 +150,11 @@ void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, 
 	
 	if (typeA == 'T')
 	{
-	 A.transpose();		
+		A.transpose();		
 	}
 	if (typeB == 'T')
 	{
-	 B.transpose();		
+		B.transpose();		
 	}
 	
 	

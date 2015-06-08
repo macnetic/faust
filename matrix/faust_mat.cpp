@@ -7,9 +7,11 @@ using namespace std;
 
 /// CONSTRUCTEUR ///
   faust_mat::faust_mat(const Eigen::Matrix<faust_real,Eigen::Dynamic,Eigen::Dynamic> & mat_) : mat(mat_), dim1(mat_.rows()), dim2(mat_.cols())
-  {}
+  {
+	  
+  }
   
-  faust_mat::faust_mat(const faust_real  *mat_,const int & nbRow, const int & nbCol )
+  faust_mat::faust_mat(const faust_real  *mat_,const int nbRow, const int nbCol )
   {
 	  int i,j;
 	  if ((nbRow < 0) || (nbCol < 0))
@@ -33,7 +35,7 @@ using namespace std;
 		mat = m;
 	  }
   }
-  faust_mat::faust_mat(const int & nbRow, const int & nbCol) : mat(nbRow,nbCol),dim1(nbRow),dim2(nbCol)
+  faust_mat::faust_mat(const int nbRow, const int nbCol) : mat(nbRow,nbCol),dim1(nbRow),dim2(nbCol)
   {}
   
   
@@ -43,44 +45,33 @@ using namespace std;
   
  
 /// GETTEUR SETTEUR ///
-  int faust_mat::getNbRow() const
-  {
-	  return dim1; 
-  }
 
-  int faust_mat::getNbCol() const
-  {
-	  return dim2;
-  }
+
  
- 
- void faust_mat::resize(const int & nbRow,const int & nbCol)
+ void faust_mat::resize(const int nbRow,const int nbCol)
 {	
-	if ( ((&dim1) == (&nbCol)) || ((&dim2) == (&nbRow)) )
-    {
-		cerr << "ERREUR resize : fail probleme pointeur" << endl;
-        exit( EXIT_FAILURE);
-	}else
-	{
-		if ((dim1 != nbRow) || (dim2 != nbCol))
-		{	
-			dim1 = nbRow;
-			dim2 = nbCol;
-			mat.resize(nbRow,nbCol);
+		if ( (nbRow <0) || (nbCol <0) )
+		{
+			cerr << "ERREUR resize : les nouvelles dimensions doivent etre strictement positive" << endl;
+			exit( EXIT_FAILURE);
 		}
-	}
+		else
+		{
+			if ((dim1 != nbRow) || (dim2 != nbCol))
+			{	
+				dim1 = nbRow;
+				dim2 = nbCol;
+				mat.resize(nbRow,nbCol);
+			}
+		}
+	
 }
 
 
-void faust_mat::setZeros()
-{
-	mat.setZero();
-}
 
-void faust_mat::setEyes()
-{
-	mat.setIdentity();
-}
+
+
+
 
  
  
@@ -90,11 +81,7 @@ void faust_mat::setEyes()
  
  
  /// EGALITE ///
- bool faust_mat::isZeros() const
- {
-	return mat.isZero(FAUST_PRECISION);
 
- }
  
  
  bool faust_mat::isEqual(const faust_mat & B) const 
@@ -124,25 +111,13 @@ void faust_mat::setEyes()
 		
  }
 
-bool faust_mat::isEyes() const
-{
-	return mat.isIdentity(FAUST_PRECISION);
-}
+
 
  
  /// OPERATION BASIQUE ///
  
  // frobenius norm
- faust_real faust_mat::norm() const
- {
-	 return mat.norm();
- }
- 
- 
- faust_real faust_mat::trace() const
- {
-	 return mat.trace();
- }
+
  
  
  
@@ -186,7 +161,7 @@ bool faust_mat::isEyes() const
 	}
  }
  
- void faust_mat::scalarMultiply(faust_real const & lambda)
+ void faust_mat::scalarMultiply(faust_real const lambda)
  {
 	 mat = lambda * mat;
  }

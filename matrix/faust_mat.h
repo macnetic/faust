@@ -12,24 +12,25 @@ public:
   /// Constructeurs ///
 
     faust_mat(const Eigen::Matrix<faust_real, Eigen::Dynamic,Eigen::Dynamic> & mat_);	
-	faust_mat(const faust_real  *mat_,const int & nbRow, const int & nbCol );
+	faust_mat(const faust_real  *mat_,const int nbRow, const int nbCol );
 	
 	
-    faust_mat(const int & nbRow, const int & nbCol);
+    faust_mat(const int nbRow, const int nbCol);
 	
 	
   /// GETTEUR SETTEUR ///
   int getNbRow() const;
   int getNbCol() const;
   
-  void resize(const int & nbRow,const int & nbCol);
+  void resize(const int nbRow,const int nbCol);
   
   // (*this) = la matrice nulle
   void setZeros();
   
-  // (*this) = identite 
+  // (*this) = identite, pas forcement carree
   void setEyes();
 
+  
 
   
   /// EGALITE ///
@@ -45,6 +46,10 @@ public:
   // frobenius norm
   faust_real norm() const;
   
+  
+  // spectral norm, "norm2", equal to the largest singular value  
+  faust_real spectralNorm() const;
+  
   // trace
   faust_real trace() const;
   
@@ -56,7 +61,7 @@ public:
   void multiplyRight(faust_mat const& A);
   
   // scalarMultiply (*this) = (*this) * lambda
-  void scalarMultiply(faust_real const& lambda);
+  void scalarMultiply(faust_real const lambda);
   
   // (*this) = (*this) + A
   void add(faust_mat const& A);
@@ -92,5 +97,67 @@ public:
 
  bool operator==(faust_mat const& A, faust_mat const& B);
 
+ 
+ 
+ 
+ ///////////////////// fonction INLINE ///////////////////////////
+ 
+ 
+//setteur 
+inline int faust_mat::getNbRow() const
+  {
+	  return dim1; 
+  }
+ 
+inline int faust_mat::getNbCol() const
+  {
+	  return dim2;
+  }
+
+inline void faust_mat::setEyes()
+{
+	mat.setIdentity();
+}
+
+inline void faust_mat::setZeros()
+{
+	mat.setZero();
+}  
+ 
+ 
+ // egalite
+inline bool faust_mat::isZeros() const
+ {
+	return mat.isZero(FAUST_PRECISION);
+
+ }
+ 
+inline bool faust_mat::isEyes() const
+{
+	return mat.isIdentity(FAUST_PRECISION);
+}
+
+ /// OPERATION BASIQUE ///
+ 
+// frobenius norm 
+inline faust_real faust_mat::norm() const
+ {
+	 return mat.norm();
+ }
+
+// spectral norm, "norm2", equal to the largest singular value  
+inline faust_real faust_mat::spectralNorm() const
+{
+	return mat.operatorNorm();
+}
+ 
+ 
+ 
+inline faust_real faust_mat::trace() const
+ {
+	 return mat.trace();
+ }
+
+ 
 
 #endif
