@@ -24,12 +24,12 @@ class faust_params
          const faust_mat& data_,
          const int nb_fact_,
          const vector<vector<faust_constraint> >& cons_,
-         const int niter1_ /* = 500 */,
-         const int niter2_ /* = 500 */,
-         const bool isVerbose_ /* = false */,
-         const bool isUpdateWayR2L_ /* = false */,
-         const bool isFactSideLeft_ /* = false */,
-         const faust_real init_lambda_ /* = 1.0 */,
+         const stopping_criterion& stop_crit_2facts = stopping_criterion() ,
+         const stopping_criterion& stop_crit_global = stopping_criterion() ,
+         const bool isVerbose_ = false ,
+         const bool isUpdateWayR2L_ = false ,
+         const bool isFactSideLeft_ = false ,
+         const faust_real init_lambda_ = 1.0 ,
          const vector<faust_spmat>& init_fact_,) :
             faust_params(data_, nb_fact_, cons_, '\0'),
             niter1(niter1_),
@@ -47,11 +47,9 @@ class faust_params
       // Required members
       faust_mat data;
       int nb_fact; // number of factors
-      vector<faust_constraint> cons; // vector of constraints
+      vector<vector<faust_constraint> > cons; // vector of constraints
 
       // Optional members (set to default values if not defined)
-      int niter1;
-      int niter2;
       bool isFactSideLeft;
       bool isVerbose;
       bool isUpdateWayR2L;
@@ -61,13 +59,14 @@ class faust_params
       const int nb_rows; // number of rows of the first factor
       const int nb_cols; // number of columns of the last factor
      
-      stopping_criterion stop_crit;
-      const int nb_it;   // number of iterations
+      stopping_criterion stop_crit_2facts;
+      stopping_criterion stop_crit_global;
+      /*const int nb_it;   // number of iterations
       // if isStoppingCriterionError then criterion is error else criterion is number of iteration
       bool  isStoppingCriterionError;
       const faust_real errorThreshold;
       // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than 
-      int maxIteration;
+      int maxIteration;*/
 }
 
 #endif
