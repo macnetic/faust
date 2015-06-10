@@ -37,6 +37,7 @@ public:
   void setEyes() {mat.setIdentity();}
 
   faust_real* getData(){return mat.data();}
+  const faust_real* getData()const{return mat.data();}
   
 
   
@@ -83,6 +84,9 @@ public:
   
   // (*this) = (*this) + A
   void add(faust_mat const& A);
+  // (*this) = (*this) - A
+  void sub(faust_mat const& A);
+
   
   
   // Affichage
@@ -92,6 +96,14 @@ public:
   /// SURCHARGE OPERATEUR ///
   // affectation
   void operator=(faust_mat const& A);
+  void operator-=(faust_mat const& A){sub(A);}
+  void operator+=(faust_mat const& A){add(A);}
+
+  void operator*=(faust_mat const& A){multiplyRight(A);}
+
+  void operator*=(faust_real lambda){scalarMultiply(lambda);}
+  void operator/=(faust_real lambda){scalarMultiply(1.0/lambda);}
+
 
   
   

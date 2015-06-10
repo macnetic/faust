@@ -5,41 +5,45 @@
 
 using namespace std;
 
+void print(const faust_mat&, const char*);
+
+
 
 int main()
 {
-   faust_mat A;
-   faust_real B,E,G;
-   int C;
-   bool D,F;
+   faust_mat A,B,C;
+
 
    init_faust_mat_from_matio_mat(A, "test.mat", "A");
-   B = init_faust_mat_from_matio_double("test.mat", "B");
-   C = init_faust_mat_from_matio_int("test.mat", "C");
-   D = init_faust_mat_from_matio_bool("test.mat", "D");
-   F = init_faust_mat_from_matio_bool("test.mat", "F");
-   //G = init_faust_mat_from_matio_double("test.mat", "G");
+   init_faust_mat_from_matio_mat(B, "test.mat", "B");
+   init_faust_mat_from_matio_mat(C, "test.mat", "C");
 
+   print(A, "A");
+   print(B, "B");
 
-  cout<<"A="<<endl;
-  for (int i=0 ; i<A.getNbRow() ; i++)
-  { 
-    for (int j=0 ; j<A.getNbCol() ;j++)
-     {
-        cout << A.getData()[j*A.getNbRow()+i]<<" ";
-     }
-     cout<<endl;
-  }
+   A += B;
+   print(A, "A+=B");
 
-  cout << endl << "B="<<B<<endl;
-  cout << endl << "C="<<C<<endl;
-  cout << endl << "D="<<D<<endl;
-  cout << endl << "F="<<F<<endl;
-   
+   C.transpose();
+   print(C, "C'");
    
 
 
 return 0;
 }
 
+
+void print(const faust_mat& A, const char* varName)
+{
+  cout<<varName<<"="<<endl;
+  for (int i=0 ; i<A.getNbRow() ; i++)
+  { 
+    for (int j=0 ; j<A.getNbCol() ;j++)
+     {
+        cout << A.getData()[j*A.getNbRow()+i]<<"\t";
+     }
+     cout<<endl;
+  }
+  cout<<endl;
+}
 

@@ -323,6 +323,20 @@ faust_real faust_mat::max(std::vector<int> & id_row,std::vector<int> & id_col) c
 	}
  }
 
+ 
+ void faust_mat::sub(faust_mat const& A)
+ {  
+	if ((getNbCol() != A.getNbCol()) || (getNbRow() != A.getNbRow()))
+	{
+		std::cerr << "ERREUR sub : matrix dimension not equal" << std::endl; 
+        exit( EXIT_FAILURE);
+		 
+	}else
+	{ 
+		mat = mat - A.mat;
+
+	}
+ }
 
 
  
