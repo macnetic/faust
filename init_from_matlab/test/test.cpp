@@ -21,8 +21,8 @@ int main()
    print(A, "A");
    print(B, "B");
 
-   A += B;
-   print(A, "A+=B");
+   (A*=C);
+   print(A, " A *=C");
 
    C.transpose();
    print(C, "C'");

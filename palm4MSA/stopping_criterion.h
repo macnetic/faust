@@ -1,7 +1,7 @@
 #ifndef __FAUST_STOPPING_CRITERION__
 #define __FAUST_STOPPING_CRITERION__
 
-class faust_real;
+#include "faust_constant.h"
 
 class stopping_criterion
 {
@@ -32,7 +32,7 @@ class stopping_criterion
       faust_real errorThreshold;
       // only used as stopping criterion, if isCriterionError, when error is still greater than 
       int maxIteration;
-}
+};
 
 
 #endif

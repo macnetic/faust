@@ -1,12 +1,12 @@
 #ifndef __FAUST_PALM4MSA_H__
 #define __FAUST_PALM4MSA_H__
 
+#include "faust_constant.h"
+#include <vector>
 #include "faust_mat.h"
-#include "faust_constraint.h"
-
+#include "stopping_criterion.h"
+class faust_constraint_generic;
 class faust_params;
-class faust_real;
-class stopping_criterion;
 
 class palm4MSA
 {
@@ -25,7 +25,7 @@ class palm4MSA
       void set_lambda(faust_real lambda_){lambda = lambda_;}
       void update_lambda_from_palm(const palm4MSA& palm){lambda *= palm.lambda;}
       faust_real get_lambda()const{return lambda;}
-      faust_real get_RMSE()const{return error.norm()/data.getDim1()/data.getDim2();}
+      faust_real get_RMSE()const{return error.norm()/data.getNbRow()/data.getNbCol();}
       const faust_mat& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
       const faust_mat& get_data()const{return data;}
 
@@ -62,6 +62,6 @@ class palm4MSA
       int nb_fact; // number of factors
       std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
 
-}
+};
 
 #endif

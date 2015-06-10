@@ -1,15 +1,17 @@
 #include "palm4MSA.h"
 
 #include "faust_params.h"
-#include "faust_constraint.h"
+#include "faust_constraint_generic.h"
+#include "faust_constraint_mat.h"
+#include "faust_constraint_real.h"
+#include "faust_constraint_int.h"
 #include "faust_mat.h"
 
 palm4MSA::palm4MSA(const faust_params& params_) :
    data(params_.data),
    isUpdateWayR2L(params_.isUpdateWayR2L),
-   lamda(params_.init_lambda),
-   verbose(params_.verbose),
-   const_vec(const_vec_),
+   lambda(params_.init_lambda),
+   verbose(params_.isVerbose),
    ind_fact(0),
    lipschitz_multiplicator(1.001){}
 
@@ -19,32 +21,32 @@ void palm4MSA::compute_projection()
    switch (const_vec[ind_fact]->getConstraintType())
    {
       case CONSTRAINT_NAME_SP:
-         faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_sp(S[ind_fact], const_int->getParameter(), (1/c)*grad);
+         const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
+         prox_sp(S[ind_fact], const_int->getParameter(), grad/c);
          break;
       case CONSTRAINT_NAME_SPCOL:
          faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_spcol(S[ind_fact], const_int->getParameter(), (1/c)*grad);
+         prox_spcol(S[ind_fact], const_int->getParameter(), grad/c);
          break;
       case CONSTRAINT_NAME_SPLIN:
          faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_splin(S[ind_fact], const_int->getParameter(), (1/c)*grad);
+         prox_splin(S[ind_fact], const_int->getParameter(), grad/c);
          break;
       case CONSTRAINT_NAME_NORMCOL:
          faust_constraint_real* const_real = dynamic_cast<faust_constraint_real*>(const_vec[ind_fact]);
-         prox_normcol(S[ind_fact], const_real->getParameter(), (1/c)*grad);
+         prox_normcol(S[ind_fact], const_real->getParameter(), grad/c);
          break;
       case CONSTRAINT_NAME_SPLINCOL:
          faust_constraint_real* const_real = dynamic_cast<faust_constraint_real*>(const_vec[ind_fact]);
-         prox_splincol(S[ind_fact], const_real->getParameter(), (1/c)*grad);
+         prox_splincol(S[ind_fact], const_real->getParameter(), grad/c);
          break;
       case CONSTRAINT_NAME_L0PEN:
          faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_l0pen(S[ind_fact], sqrt(2*const_int->getParameter()/c), (1/c)*grad);
+         prox_l0pen(S[ind_fact], sqrt(2*const_int->getParameter()/c), grad/c);
          break;
       case CONSTRAINT_NAME_L1PEN:
          faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_l1pen(S[ind_fact], const_int->getParameter()/c, (1/c)*grad);
+         prox_l1pen(S[ind_fact], const_int->getParameter()/c, grad/c);
          break;
       case CONSTRAINT_NAME_CONST:
          faust_constraint_mat* const_mat = dynamic_cast<faust_constraint_mat*>(const_vec[ind_fact]);
@@ -52,31 +54,31 @@ void palm4MSA::compute_projection()
          break;
       case CONSTRAINT_NAME_WAV:
          faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_wav(S[ind_fact], const_int->getParameter(), (1/c)*grad);
+         prox_wav(S[ind_fact], const_int->getParameter(), grad/c);
          break;
       case CONSTRAINT_NAME_SP_POS:
          faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_sp_pos(S[ind_fact], const_int->getParameter(), (1/c)*grad);
+         prox_sp_pos(S[ind_fact], const_int->getParameter(), grad/c);
          break;
       case CONSTRAINT_NAME_BLKDIAG:
          faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_sp(S[ind_fact], const_int->getParameter(), (1/c)*grad);
+         prox_sp(S[ind_fact], const_int->getParameter(), grad/c);
          break;
       case CONSTRAINT_TYPE_SPLIN_TEST:
          faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_sp(S[ind_fact], const_int->getParameter(), (1/c)*grad);
+         prox_sp(S[ind_fact], const_int->getParameter(), grad/c);
          break;
       case CONSTRAINT_TYPE_SUPP:
          faust_constraint_mat* const_mat = dynamic_cast<faust_constraint_mat*>(const_vec[ind_fact]);
-         prox_sp(S[ind_fact], const_mat->getParameter(), (1/c)*grad);
+         prox_sp(S[ind_fact], const_mat->getParameter(), grad/c);
          break;
       case CONSTRAINT_TYPE_NORMLIN:
          faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_sp(S[ind_fact], const_int->getParameter(), (1/c)*grad);
+         prox_sp(S[ind_fact], const_int->getParameter(), grad/c);
          break;
       case CONSTRAINT_TYPE_TOEPLITZ:
          faust_constraint_int* const_int = dynamic_cast<faust_constraint_int*>(const_vec[ind_fact]);
-         prox_sp(S[ind_fact], const_int->getParameter(), (1/c)*grad);
+         prox_sp(S[ind_fact], const_int->getParameter(), grad/c);
          break;
       default:
          cerr << "error in palm4MSA::compute_projection : unknown name of constraint" <<endl;

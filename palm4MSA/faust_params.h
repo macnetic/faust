@@ -1,6 +1,9 @@
 #ifndef __FAUST_PARAMS_H__
 #define __FAUST_PARAMS_H__
 
+#include "faust_constant.h"
+#include <vector>
+
 class faust_mat;
 class stopping_criterion;
 
@@ -8,37 +11,19 @@ class stopping_criterion;
 
 class faust_params
 {
-   private:
-      // constructeur prive de base. Ajout d'un argument inutile (unused)
-      // pour eviter la confusion avec le constructeur qui contient les
-      // memes trois premiers parametres plus des parametres par defauts 
-      faust_params::faust_params(
-         const faust_mat& data_,
-         const int nb_fact_,
-         const vector<vector<const faust_constraint_generic*> >& cons_,
-         const char unused);
-
    public:
 
       faust_params(
          const faust_mat& data_,
          const int nb_fact_,
-         const vector<vector<const faust_constraint_generic*> >& cons_,
-         const stopping_criterion& stop_crit_2facts = stopping_criterion() ,
-         const stopping_criterion& stop_crit_global = stopping_criterion() ,
+         const std::vector<std::vector<const faust_constraint_generic*> >& cons_,
+         const std::vector<faust_mat>& init_fact_,
+         const stopping_criterion& stop_crit_2facts_ = stopping_criterion(),
+         const stopping_criterion& stop_crit_global_  = stopping_criterion(),
          const bool isVerbose_ = false ,
          const bool isUpdateWayR2L_ = false ,
          const bool isFactSideLeft_ = false ,
-         const faust_real init_lambda_ = 1.0 ,
-         const vector<faust_spmat>& init_fact_,) :
-            faust_params(data_, nb_fact_, cons_, '\0'),
-            niter1(niter1_),
-            niter2(niter2),
-            isVerbose(isVerbose_),
-            isUpdateWayR2L(isUpdateWayR2L_),
-            isFactSideLeft(isFactSideLeft_),
-            init_lambda(init_lambda_),
-            init_fact(init_fact_) {}
+         const faust_real init_lambda_ = 1.0 );
 
       ~faust_params(){}
 
@@ -47,13 +32,13 @@ class faust_params
       // Required members
       faust_mat data;
       int nb_fact; // number of factors
-      vector<vector<const faust_constraint_generic*> > cons; // vector of constraints
+      std::vector<std::vector<const faust_constraint_generic*> > cons; // vector of constraints
 
       // Optional members (set to default values if not defined)
       bool isFactSideLeft;
       bool isVerbose;
       bool isUpdateWayR2L;
-      vector<faust_spmat> init_fact;
+      std::vector<faust_mat> init_fact;
       faust_real init_lambda;
 
       const int nb_rows; // number of rows of the first factor
@@ -67,6 +52,6 @@ class faust_params
       const faust_real errorThreshold;
       // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than 
       int maxIteration;*/
-}
+};
 
 #endif
