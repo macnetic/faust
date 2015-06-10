@@ -47,6 +47,120 @@ using namespace std;
 /// GETTEUR SETTEUR ///
 
 
+
+faust_real faust_mat::getCoeff(const int i,const int j) const
+{
+	if  ( (i<0) || (i>=dim1) )
+	{
+		cerr << "ERROR getCoeff : index out of range : 0>i  or i>=nb_row" << endl;
+		exit( EXIT_FAILURE);		
+	}
+	
+	if  ( (j<0) || (j>=dim2) )
+	{
+		cerr << "ERROR getCoeff : index out of range : 0>j  or j>=nb_col" << endl;
+		exit( EXIT_FAILURE);		
+	}
+	
+	
+	return mat(i,j);
+		
+}
+
+
+
+
+
+
+void faust_mat::getCoeffs(std::vector<faust_real> & valueS,const std::vector<int> & id_row, const std::vector<int>  & id_col) const
+{
+	if ( (id_row.size()!= id_col.size()) || (id_col.size() != valueS.size()) )
+	{
+		cerr << "ERROR getCoeffs : id_row, id_col, valueS don't have the same length" << endl;
+		exit( EXIT_FAILURE);
+	}else
+	{
+		int n=id_col.size();
+		int current_id_row,current_id_col;
+
+		for (int i=0;i<n;i++)
+		{
+
+			current_id_row =  id_row[i];
+			current_id_col =  id_col[i];
+			valueS[i]=getCoeff(current_id_row,current_id_col);
+			
+			
+			
+		}
+	}
+}
+
+void faust_mat::setCoeff(const faust_real & value,const int id_row, const int id_col)
+{
+	if ( (id_row < 0) || (id_row >= dim1) )
+	{
+		cerr << "ERROR setCoeff : index out of range : 0>id_row  or id_row>=nb_row" << endl;
+		exit( EXIT_FAILURE);	
+	}
+			
+	if ( (id_col < 0) || (id_col >= dim2) )
+	{
+		cerr << "ERROR setCoeff : index out of range : (0>id_col)  or (id_col >= nb_col)" << endl;
+		exit( EXIT_FAILURE);	
+	}
+			
+	mat(id_row,id_col) = value;
+}
+
+
+
+void faust_mat::setCoeffs(const faust_real value,const std::vector<int> & id_row,const std::vector<int>  & id_col)
+{
+	if (id_row.size()!= id_col.size())
+	{
+		cerr << "ERREUR setCoeffs : id_row and id_col don't have the same length" << endl;
+		exit( EXIT_FAILURE);
+	}else
+	{
+		int n = id_row.size();
+		for (int i=0;i<n;i++)
+		{
+
+			setCoeff(value,id_row[i],id_col[i]);
+			
+			
+		}
+	}
+}
+
+
+
+
+void faust_mat::setCoeffs(const std::vector<faust_real> & valueS,const std::vector<int> & id_row,const std::vector<int>  & id_col)
+{
+	if ( (id_row.size()!= id_col.size()) || (id_row.size()!= valueS.size()) )
+	{
+		cerr << "ERREUR setCoeffs : id_row,id_col,valueS don't have the same length" << endl;
+		exit( EXIT_FAILURE);
+	}else
+	{
+		int n = id_row.size();
+		for (int i=0;i<n;i++)
+		{
+
+			setCoeff(valueS[i],id_row[i],id_col[i]);
+			
+			
+		}
+	}
+}
+	
+
+
+
+
+
  
  void faust_mat::resize(const int nbRow,const int nbCol)
 {	
@@ -116,8 +230,32 @@ using namespace std;
  
  /// OPERATION BASIQUE ///
  
- // frobenius norm
-
+//arithmetique
+faust_real faust_mat::max(std::vector<int> & id_row,std::vector<int> & id_col) const
+{
+	faust_real maxi = max();
+	int i,j,k;
+	if ( (id_row.size() != 0) || (id_col.size() != 0) )
+	{
+		cerr << "ERREUR max : sizes of id_row and id_col must be equal to zero" << endl;
+		exit( EXIT_FAILURE);	
+	}else
+	{
+		for (j=0;j<getNbCol();j++)
+		{
+			for (i=0;i<getNbRow();i++)
+			{
+				if (mat(i,j) == maxi)
+				{
+					id_row.push_back(i);
+					id_col.push_back(j);
+				}
+			}
+		}
+			
+	}
+	return maxi;
+}
  
  
  

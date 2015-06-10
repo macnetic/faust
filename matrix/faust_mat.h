@@ -3,6 +3,7 @@
  
 #include <Eigen/Dense>
 #include "faust_constant.h"
+#include <vector>
 
 
 class faust_vec;//forward declaration of faust_vec class
@@ -13,6 +14,7 @@ public:
 
     faust_mat(const Eigen::Matrix<faust_real, Eigen::Dynamic,Eigen::Dynamic> & mat_);	
 	faust_mat(const faust_real  *mat_,const int nbRow, const int nbCol );
+	faust_mat(string filename);
 	
 	
     faust_mat(const int nbRow, const int nbCol);
@@ -21,6 +23,11 @@ public:
   /// GETTEUR SETTEUR ///
   int getNbRow() const;
   int getNbCol() const;
+  faust_real getCoeff(const int i,const int j) const;
+  void getCoeffs(std::vector<faust_real> & valueS,const std::vector<int> & id_row, const std::vector<int>  & id_col) const;
+  void setCoeff(const faust_real & value,const int id_row, const int id_col);
+  void setCoeffs(const faust_real value,const std::vector<int> & id_row,const std::vector<int>  & id_col);
+  void setCoeffs(const std::vector<faust_real> & valueS,const std::vector<int> & id_row,const std::vector<int>  & id_col);
   
   void resize(const int nbRow,const int nbCol);
   
@@ -43,12 +50,23 @@ public:
   
   /// OPERATION BASIQUE ///
   
+  //arithmetique
+  
+  faust_real max() const;
+  void abs();
+  
+  // return the maximum of all coefficients of this and puts in row_id and col_id its location
+  faust_real max(std::vector<int> & id_row,std::vector<int> & id_col) const;
+  
+  
   // frobenius norm
   faust_real norm() const;
   
   
   // spectral norm, "norm2", equal to the largest singular value  
   faust_real spectralNorm() const;
+  
+  
   
   // trace
   faust_real trace() const;
@@ -114,6 +132,9 @@ inline int faust_mat::getNbCol() const
 	  return dim2;
   }
 
+
+  
+  
 inline void faust_mat::setEyes()
 {
 	mat.setIdentity();
@@ -123,6 +144,10 @@ inline void faust_mat::setZeros()
 {
 	mat.setZero();
 }  
+
+
+
+
  
  
  // egalite
@@ -138,6 +163,21 @@ inline bool faust_mat::isEyes() const
 }
 
  /// OPERATION BASIQUE ///
+ 
+
+//arithmetique
+
+inline void faust_mat::abs()
+{
+	mat=mat.cwiseAbs();
+}
+
+
+inline faust_real faust_mat::max() const
+{
+	return mat.maxCoeff();
+} 
+ 
  
 // frobenius norm 
 inline faust_real faust_mat::norm() const
