@@ -13,21 +13,21 @@ faust_params::faust_params(
          data(data_), nb_fact(nb_fact_), cons(cons_)
 {
    
-   bool verifSize  =    data.getDim1()   == cons[0][0].getRows
-                   && cons[0][0].getCols == cons[1][0].getRows
-                   &&   data.getDim2()   == cons[1][0].getCols;
+   bool verifSize  =    data->getDim1()   == cons[0][0]->getRows
+                   && cons[0][0]->getCols == cons[1][0]->getRows
+                   &&   data->getDim2()   == cons[1][0]->getCols;
 
    for (int i=1 ; i<nb_fact-1 ; i++) 
       if (isFactSideLeft)
          verifSize  =  verifSize 
-                    && cons[1][i-1].getRows == cons[1][i].getCols
-                    && cons[0][i].getCols   == cons[1][i].getRows
-                    &&    data.getDim1()    == cons[0][i].getRows;
+                    && cons[1][i-1]->getRows == cons[1][i]->getCols
+                    && cons[0][i]->getCols   == cons[1][i]->getRows
+                    &&    data->getDim1()    == cons[0][i]->getRows;
       else
          verifSize  =  verifSize 
-                    && cons[0][i-1].getCols == cons[0][i].getRows
-                    && cons[0][i].getCols   == cons[1][i].getRows
-                    &&    data.getDim2()    == cons[1][i].getCols;
+                    && cons[0][i-1]->getCols == cons[0][i]->getRows
+                    && cons[0][i]->getCols   == cons[1][i]->getRows
+                    &&    data->getDim2()    == cons[1][i]->getCols;
 
 
    if (!verifSize)

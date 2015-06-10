@@ -1,13 +1,12 @@
 #ifndef __FAUST_PALM4MSA_H__
 #define __FAUST_PALM4MSA_H__
 
-#include "faust_params.h"
+#include "faust_mat.h"
+#include "faust_constraint.h"
 
-class faust_vector;
-class faust_matrix;
-class faust_spmatrix;
+class faust_params;
+class faust_real;
 class stopping_criterion;
-
 
 class palm4MSA
 {
@@ -20,15 +19,17 @@ class palm4MSA
       void compute_projection();
       void update_R();
       inline void update_L(){L *= S[ind_fact];}
-      inline void set_constraint(const vector<faust_constraint>& const_vec_){const_vec=const_vec_;}
+      inline void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;}
       inline void set_data(const faust_mat& data_){data=data_;}
-      inline void set_nfacts(int nfact_){nb_fact=nfact_;}
+      inline void set_nfacts(const int nfact_){nb_fact=nfact_;}
       inline void set_lambda(faust_real lambda_){lambda = lambda_;}
+      inline void update_lambda_from_palm(const palm4MSA& palm){lambda *= palm.lambda;}
       inline faust_real get_lambda()const{return lambda;}
       inline faust_real get_RMSE()const{return error.norm()/data.getDim1()/data.getDim2();}
       inline const faust_mat& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
       inline const faust_mat& get_data()const{return data;}
-      
+
+      void init_fact();      
       void next_step();
       
 
@@ -36,13 +37,14 @@ class palm4MSA
 
    private:
       void check_constraint_validity();
+      void init_fact_from_palm(const palm4MSA& palm, bool isFactSideLeft);
 
 
    private:
       // R : vector containing all posible 
-      vecteur<faust_mat> R; 
+      std::vector<faust_mat> R; 
       faust_mat L;
-      vector<faust_mat> S; // contains S_0^i, S_1^i, ...
+      std::vector<faust_mat> S; // contains S_0^i, S_1^i, ...
 
       faust_mat grad;
       faust_real lipschitz_multiplicator;
@@ -55,9 +57,10 @@ class palm4MSA
       faust_mat error; // error = lambda*L*S*R - data
       
       const stopping_criterion stop_crit;
+     
       
       int nb_fact; // number of factors
-      vector<faust_constraint> const_vec; // vector of constraints of size nfact
+      std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
 
 }
 

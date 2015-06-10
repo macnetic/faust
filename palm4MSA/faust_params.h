@@ -15,7 +15,7 @@ class faust_params
       faust_params::faust_params(
          const faust_mat& data_,
          const int nb_fact_,
-         const vector<vector<faust_constraint> >& cons_,
+         const vector<vector<const faust_constraint_generic*> >& cons_,
          const char unused);
 
    public:
@@ -23,7 +23,7 @@ class faust_params
       faust_params(
          const faust_mat& data_,
          const int nb_fact_,
-         const vector<vector<faust_constraint> >& cons_,
+         const vector<vector<const faust_constraint_generic*> >& cons_,
          const stopping_criterion& stop_crit_2facts = stopping_criterion() ,
          const stopping_criterion& stop_crit_global = stopping_criterion() ,
          const bool isVerbose_ = false ,
@@ -47,7 +47,7 @@ class faust_params
       // Required members
       faust_mat data;
       int nb_fact; // number of factors
-      vector<vector<faust_constraint> > cons; // vector of constraints
+      vector<vector<const faust_constraint_generic*> > cons; // vector of constraints
 
       // Optional members (set to default values if not defined)
       bool isFactSideLeft;

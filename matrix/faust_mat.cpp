@@ -267,10 +267,12 @@ faust_real faust_mat::max(std::vector<int> & id_row,std::vector<int> & id_col) c
 	resize(dim2_copy,dim1_copy);
 	 
 	 mat = mat_copy.transpose();*/
-	mat.transpose();
+	mat = mat.transpose().eval();
 	int dim1_copy = dim1;
-	int dim2_copy = dim2;
-	resize(dim2_copy,dim1_copy);
+	dim1 = dim2;
+        dim2 = dim1_copy; 
+        
+	//resize(dim2_copy,dim1_copy);
  }
  
  void faust_mat::multiplyRight(faust_mat const& A)

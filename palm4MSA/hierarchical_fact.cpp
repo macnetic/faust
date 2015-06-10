@@ -3,6 +3,7 @@
 hierarchical_fact::hierarchical_fact(){} // voir avec Luc les parametres par defaut
 
 hierarchical_fact::hierarchical_fact(const faust_params& params_):
+   ind_fact(0);
    cons(params_.cons),
    isUpdateWayR2L(params_.isUpdateWayR2L),
    isFactSideLeft(params_.isFactSideLeft),
@@ -13,11 +14,11 @@ hierarchical_fact::hierarchical_fact(const faust_params& params_):
 
 void hierarchical_fact::init()
 {
-   vector<faust_constraint> cons_tmp_2(2,faust_constraint());
+   vector<const faust_constraint_generic*> cons_tmp_2(2,faust_constraint_generic*);
    cons_tmp_2.set_data(cons_tmp_global.get_data());
 
 
-   vector<faust_constraint> cons_tmp_global;
+   vector<const faust_constraint_generic*> cons_tmp_global;
    if(isFactSideLeft)
       cons_tmp_global.push_back(cons[0][ind_fact]);
    else
@@ -35,38 +36,46 @@ void hierarchical_fact::next_step()
    
    palm_2.set_constraint(cons_tmp_2);
    palm_2.set_data(palm_global.get_res(isFactSideLeft),ind_fact);
-
+   palm_2.init_fact();
    palm_2.set_lambda(1.0);
+   
 
-   palm_2.next_step();
+   while(palm_2.stop_crit.do_continue())
+      palm_2.next_step();
 
 
    
    
    
+
+   palm_global.init_fact_from_palm(palm_2, isFactSideLeft);
+
+   palm_global.set_lambda(palm_2);
 
    if (isFactSideLeft)
    {
       cons_tmp_global[0]=cons[0][ind_fact];
-      vector<faust_constraint>::iterator it;
+      vector<const faust_constraint_generic*>::iterator it;
       it = cons_tmp_global.begin();
       cons_tmp_global.insert(it+1,cons[1][ind_fact]);
    }
    else
    {
       cons_tmp_global[0]=cons[1][ind_fact];
-      vector<faust_constraint>::iterator it;
+      vector<const faust_constraint_generic*>::iterator it;
       it = cons_tmp_global.begin();
       cons_tmp_global.insert(it+k,cons[0][ind_fact]);      
    }
 
    palm_global.set_constraint(cons_tmp_global);
 
+   
 
 
 
-   palm_global.next_step();
-
+   while(palm_global.stop_crit.do_continue())
+      palm_global.next_step();
+   
 
 
 

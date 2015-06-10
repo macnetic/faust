@@ -1,6 +1,11 @@
 #ifndef __FAUST_HIERARCHICAL_FACT_H__
 #define __FAUST_HIERARCHICAL_FACT_H__
 
+class faust_params;
+class faust_constraint;
+class palm4MSA;
+class faust_real;
+
 
 class hierarchical_fact
 {
@@ -13,7 +18,7 @@ class hierarchical_fact
 
 
    private:
-      const vector<vector<faust_constraint> > cons;
+      const std::vector<const std::vector<const faust_constraint_generic*> > cons;
       bool isUpdateWayR2L;
       bool isFactSideLeft; 
       bool isVerbose;
@@ -21,8 +26,8 @@ class hierarchical_fact
       palm4MSA palm_2;
       palm4MsA palm_global;
       faust_real lambda;
-      vector<faust_mat> S;
+      std::vector<faust_mat> S;
       
-}
+};
 
 #endif

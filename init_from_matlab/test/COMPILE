@@ -1,0 +1,1 @@
+g++ test.cpp ../faust_init_from_matio.cpp ../../matrix/faust_mat.cpp -I ../ -I ../../matrix/ -I ../../palm4MSA/ -I$EIGENDIR -I$MATIODIR/include -L$MATIODIR/lib  -lmatio -lhdf5
