@@ -8,7 +8,7 @@ using namespace std;
 
 int main()
 {
-   faust_mat A(10,10);
+   faust_mat A;
    faust_real B,E,G;
    int C;
    bool D,F;

@@ -20,8 +20,8 @@ public:
 	
 	
   /// GETTEUR SETTEUR ///
-  int getNbRow() const;
-  int getNbCol() const;
+  int getNbRow() const {return dim1;}
+  int getNbCol() const {return dim2;}
   faust_real getCoeff(const int i,const int j) const;
   void getCoeffs(std::vector<faust_real> & valueS,const std::vector<int> & id_row, const std::vector<int>  & id_col) const;
   void setCoeff(const faust_real & value,const int id_row, const int id_col);
@@ -31,22 +31,20 @@ public:
   void resize(const int nbRow,const int nbCol);
   
   // (*this) = la matrice nulle
-  void setZeros();
+  void setZeros() {mat.setZero();}
   
   // (*this) = identite, pas forcement carree
-  void setEyes();
+  void setEyes() {mat.setIdentity();}
 
-  inline faust_real* getData(){return mat.data();}
-  
-
+  faust_real* getData(){return mat.data();}
   
 
   
   /// EGALITE ///
   
-  bool isZeros() const;
+  bool isZeros() const {return mat.isZero(FAUST_PRECISION);}
   bool isEqual(const faust_mat & B) const;
-  bool isEyes() const;
+  bool isEyes() const {return mat.isIdentity(FAUST_PRECISION);}
   
   
   
@@ -54,24 +52,24 @@ public:
   
   //arithmetique
   
-  faust_real max() const;
-  void abs();
+  faust_real max() const {return mat.maxCoeff();}
+  void abs() {mat=mat.cwiseAbs();}
   
   // return the maximum of all coefficients of this and puts in row_id and col_id its location
   faust_real max(std::vector<int> & id_row,std::vector<int> & id_col) const;
   
   
   // frobenius norm
-  faust_real norm() const;
+  faust_real norm() const {return mat.norm();}
   
   
   // spectral norm, "norm2", equal to the largest singular value  
-  faust_real spectralNorm() const;
+  faust_real spectralNorm() const {return mat.operatorNorm();}
   
   
   
   // trace
-  faust_real trace() const;
+  faust_real trace() const {return mat.trace();}
   
   
   //transposition
@@ -117,89 +115,5 @@ public:
 
  bool operator==(faust_mat const& A, faust_mat const& B);
 
- 
- 
- 
- ///////////////////// fonction INLINE ///////////////////////////
- 
- 
-//setteur 
-inline int faust_mat::getNbRow() const
-  {
-	  return dim1; 
-  }
- 
-inline int faust_mat::getNbCol() const
-  {
-	  return dim2;
-  }
-
-
-  
-  
-inline void faust_mat::setEyes()
-{
-	mat.setIdentity();
-}
-
-inline void faust_mat::setZeros()
-{
-	mat.setZero();
-}  
-
-
-
-
- 
- 
- // egalite
-inline bool faust_mat::isZeros() const
- {
-	return mat.isZero(FAUST_PRECISION);
-
- }
- 
-inline bool faust_mat::isEyes() const
-{
-	return mat.isIdentity(FAUST_PRECISION);
-}
-
- /// OPERATION BASIQUE ///
- 
-
-//arithmetique
-
-inline void faust_mat::abs()
-{
-	mat=mat.cwiseAbs();
-}
-
-
-inline faust_real faust_mat::max() const
-{
-	return mat.maxCoeff();
-} 
- 
- 
-// frobenius norm 
-inline faust_real faust_mat::norm() const
- {
-	 return mat.norm();
- }
-
-// spectral norm, "norm2", equal to the largest singular value  
-inline faust_real faust_mat::spectralNorm() const
-{
-	return mat.operatorNorm();
-}
- 
- 
- 
-inline faust_real faust_mat::trace() const
- {
-	 return mat.trace();
- }
-
- 
 
 #endif
