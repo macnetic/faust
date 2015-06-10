@@ -39,7 +39,8 @@ using namespace std;
   {}
   
   
-  
+  faust_mat::faust_mat() : mat(0,0) , dim1(0) , dim2(0)
+  {}
   
 
   
