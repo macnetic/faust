@@ -166,9 +166,7 @@ void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, 
 
 void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB)
 {
-
 	int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
-
 
 	if ( ((&(C.mat)) == (&(A.mat))) || ((&(C.mat)) == (&(B.mat))) )
 	{
@@ -176,14 +174,10 @@ void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, 
 		exit( EXIT_FAILURE);	
 	}
 
-
-
 	if (typeA == 'T')
 	{
 		nbRowOpA = A.getNbCol();
 		nbColOpA = A.getNbRow();
-
-		
 	}else
 	{
 		nbRowOpA = A.getNbRow();
@@ -195,7 +189,6 @@ void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, 
 	{
 		nbRowOpB = B.getNbCol();
 		nbColOpB = B.getNbRow();
-
 	}else
 	{
 		nbRowOpB = B.getNbRow();
@@ -226,21 +219,15 @@ void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, 
 		if (typeA == 'N')
 		{
 			if (typeB == 'N')
-			{
 				C.mat.noalias() = alpha * A.mat * B.mat;			
-			}else
-			{
+			else
 				C.mat.noalias() = alpha * A.mat * B.mat.transpose();
-			}
 		}else
 		{
 			if (typeB == 'N')
-			{
 				C.mat.noalias() = alpha * A.mat.transpose() * B.mat;			
-			}else
-			{
+			else
 				C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose();
-			}
 		}
 
 	}else
@@ -248,28 +235,17 @@ void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, 
 		if (typeA == 'N')
 		{
 			if (typeB == 'N')
-			{
 				C.mat = alpha * A.mat * B.mat + beta * C.mat;			
-			}else
-			{
+			else
 				C.mat = alpha * A.mat * B.mat.transpose() + beta * C.mat;
-			}
 		}else
 		{
 			if (typeB == 'N')
-			{
 				C.mat = alpha * A.mat.transpose() * B.mat + beta * C.mat ;			
-			}else
-			{
+			else
 				C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
-			}
 		}
 	}
-	
-		
-		
-		
-	
 }
 
 

@@ -1,6 +1,7 @@
 #ifndef __FAUST_PALM4MSA_H__
 #define __FAUST_PALM4MSA_H__
 
+#include <iostream>
 #include "faust_constant.h"
 #include <vector>
 #include "faust_mat.h"
@@ -13,12 +14,12 @@ class palm4MSA
    public:
       palm4MSA(const faust_params& params_);
 
-      void compute_grad();
+      void compute_grad_over_c();
       void compute_lambda();
-      void compute_c(){ faust_real nL=L.norm(),nR=R[ind_fact].norm();c=lipschitz_multiplicator*nR*nR*nL*nL;}
+      void compute_c();
       void compute_projection();
       void update_R();
-      void update_L(){L *= S[ind_fact];}
+      void update_L();
       void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;}
       void set_data(const faust_mat& data_){data=data_;}
       void set_nfacts(const int nfact_){nb_fact=nfact_;}
@@ -46,7 +47,8 @@ class palm4MSA
       faust_mat L;
       std::vector<faust_mat> S; // contains S_0^i, S_1^i, ...
 
-      faust_mat grad;
+      
+      faust_mat grad_over_c;
       faust_real lipschitz_multiplicator;
       faust_real c; 
       faust_real lambda;
@@ -55,13 +57,35 @@ class palm4MSA
       const bool verbose;
       faust_mat data;
       faust_mat error; // error = lambda*L*S*R - data
+      faust_mat X_hat;
       
       const stopping_criterion stop_crit;
+
+      bool isCComputed;
+      bool isGradComputed;
+      bool isProjectionComputed;
      
       
       int nb_fact; // number of factors
       std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
-
 };
+
+inline void palm4MSA::update_L()
+{
+   if(!isProjectionComputed){
+      std::cerr << "Projection must be computed before updating L" << std::endl;
+      exit(EXIT_FAILURE);
+   }
+   L *= S[ind_fact];
+}
+
+inline void palm4MSA::compute_c()
+{ 
+   faust_real nL=L.norm();
+   faust_real nR=R[ind_fact].norm();
+   c=lipschitz_multiplicator*nR*nR*nL*nL;
+   isCComputed = true;   
+}
+
 
 #endif
