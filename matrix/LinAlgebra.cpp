@@ -164,7 +164,7 @@ void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, 
 }*/
 
 
-void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB)
+void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB)
 {
 	int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
 

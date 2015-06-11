@@ -42,6 +42,12 @@ void init_faust_mat_from_matio_mat(faust_mat& M, const char* fileName, const cha
    Mat_VarFree(matvar);
 }
 
+
+
+
+
+
+
 double init_faust_mat_from_matio_double(const char* fileName, const char* variableName)
 {
    matvar_t* matvar = faust_matio_read_variable(fileName, variableName);
@@ -110,6 +116,54 @@ bool init_faust_mat_from_matio_bool(const char* fileName, const char* variableNa
       cerr<<"error in init_faust_mat_from_matio_bool : "<< variableName << " seems not to be a boolean." <<endl;
       exit(EXIT_FAILURE);
    }
+}
+
+
+
+void write_faust_mat_into_matfile(const faust_mat& M, const char* fileName, const char* variableName)
+{
+   mat_t* matfp = Mat_Open(fileName,MAT_ACC_RDWR);
+   matvar_t *matvar;
+   int dim1 = M.getNbRow();
+   int dim2 = M.getNbCol();
+   double *mat = (double*) malloc(sizeof(double)*dim1*dim2);
+   
+
+   if(matfp == NULL)
+   {
+		matfp = Mat_CreateVer(fileName,NULL,MAT_FT_DEFAULT);
+		if ( NULL == matfp ) {
+			cerr << "error in write_faust_mat_into_matfile : unable to create "<< fileName << endl;
+			 exit(EXIT_FAILURE);
+		}
+	}
+   
+   
+	while ( (matvar = Mat_VarReadNextInfo(matfp)) != NULL ) {
+
+        Mat_VarDelete(matfp,matvar->name);
+        matvar = NULL;
+    }
+   
+
+  
+	size_t dims[2]={dim1,dim2};
+	for (int i = 0 ; i < dim1*dim2; i++) mat[i]=(double)(M.getData())[i];
+	
+	matvar = Mat_VarCreate(variableName,MAT_C_DOUBLE,MAT_T_DOUBLE,2,dims,mat,0);
+    if ( NULL == matvar ) {
+        cerr<<"error in write_faust_mat_into_matfile : "<< variableName << " unable to create matiovar" <<endl;
+		 exit(EXIT_FAILURE);
+    } else {
+        Mat_VarWrite(matfp,matvar,MAT_COMPRESSION_NONE);
+        Mat_VarFree(matvar);
+		
+    }
+	Mat_Close(matfp);
+
+
+	
+	
 }
 
 

@@ -24,6 +24,6 @@
  // op(A) = A si typeA='N', op(A) = transpose(A) si typeA='T'
  // op(B) = B si typeB='N', op(B) = transpose(B) si typeB='T'
  // l'objet C doit etre different de A et B
- void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB);
+ void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB);
 
 

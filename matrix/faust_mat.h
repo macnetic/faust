@@ -104,7 +104,7 @@ public:
   friend void multiply(const faust_mat & A, const faust_mat & B, faust_mat & C);
   friend void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta);
   friend void add(const faust_mat & A, const faust_mat & B, faust_mat & C);
-  friend void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB);
+  friend void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB);
   
   
   private: 
