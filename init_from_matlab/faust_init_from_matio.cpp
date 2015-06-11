@@ -2,6 +2,7 @@
 #include "faust_mat.h"
 #include "faust_constant.h"
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -162,6 +163,52 @@ void write_faust_mat_into_matfile(const faust_mat& M, const char* fileName, cons
 	Mat_Close(matfp);
 
 
+	
+	
+}
+
+
+
+
+void init_faust_mat_vector_from_matiofile( vector<faust_mat> & vec_M, const char* fileName, const char* variableName)
+{
+	
+
+	matvar_t* facts_var = faust_matio_read_variable(fileName,"facts");
+	cout<<"lecture facts"<<endl;
+	matvar_t*   current_fact_var;
+	faust_mat current_fact;
+	vec_M.resize(0);
+
+	
+	if (facts_var->class_type != MAT_C_CELL)
+	{
+		cerr << "error in init_faust_mat_vector_from_matiofile : facts is'nt a cell_array" << endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	int nbr_facts=facts_var->dims[1];
+	cout<<"nbr de  facts ="<< nbr_facts<<endl;
+	for (int j=0;j<nbr_facts;j++)
+	{	
+
+		current_fact_var = Mat_VarGetCell(facts_var,j);
+		current_fact.resize(current_fact_var->dims[0],current_fact_var->dims[1]);
+		
+		for (size_t i = 0 ; i < current_fact_var->dims[0] * current_fact_var->dims[1] ; i++)
+      	{
+			(((current_fact.getData()))[i]) = (faust_real) (((double*)(current_fact_var->data))[i]);
+			
+		}
+	
+		vec_M.push_back(current_fact);	
+	}
+	
+   Mat_VarFree(current_fact_var);
+   Mat_VarFree(facts_var);
+
+	
+	
 	
 	
 }
