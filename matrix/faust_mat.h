@@ -13,7 +13,10 @@ public:
 
     faust_mat(const Eigen::Matrix<faust_real, Eigen::Dynamic,Eigen::Dynamic> & mat_);	
 	faust_mat(const faust_real  *mat_,const int nbRow, const int nbCol );
+
+	
 	faust_mat();
+	faust_mat(const faust_mat & A);
 	
 	
     faust_mat(const int nbRow, const int nbCol);
@@ -113,7 +116,7 @@ public:
   friend void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta);
   friend void add(const faust_mat & A, const faust_mat & B, faust_mat & C);
   friend void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB);
-
+  
  
   
   private: 

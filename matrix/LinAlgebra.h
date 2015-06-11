@@ -17,7 +17,7 @@
  
  // C = alpha * A*B + beta * C;
  // l'objet C doit etre different de A et B
- void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta);
+ //void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta);
  
  
  // C = alpha *op(A)*op(B) + beta * C;
@@ -25,6 +25,5 @@
  // op(B) = B si typeB='N', op(B) = transpose(B) si typeB='T'
  // l'objet C doit etre different de A et B
  void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB);
-
 
 

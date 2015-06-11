@@ -28,6 +28,19 @@ using namespace std;
 	mat = m;
 	  
   }
+  
+  
+//faust_mat::faust_mat(const faust_mat & A):dim1(A.getNbRow()),dim2(A.getNbCol()),mat(A.getNbRow(),A.getNbCol())
+faust_mat::faust_mat(const faust_mat & A):dim1(A.dim1),dim2(A.dim2),mat(A.mat)
+{
+	
+}
+
+  
+
+  
+  
+  
   faust_mat::faust_mat(const int nbRow, const int nbCol) : mat(nbRow,nbCol),dim1(nbRow),dim2(nbCol)
   {}
   
