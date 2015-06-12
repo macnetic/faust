@@ -81,6 +81,7 @@ int init_faust_mat_from_matio_int(const char* fileName, const char* variableName
    
 }
 
+
 bool init_faust_mat_from_matio_bool(const char* fileName, const char* variableName)
 {
 
@@ -163,8 +164,6 @@ void write_faust_mat_into_matfile(const faust_mat& M, const char* fileName, cons
 	Mat_Close(matfp);
 
 
-	
-	
 }
 
 

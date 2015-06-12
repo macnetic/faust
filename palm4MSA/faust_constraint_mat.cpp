@@ -57,9 +57,9 @@ void faust_constraint_mat::check_constraint_name()const
 {
    switch (constraint_name)
    {
-      case CONSTRAINT_TYPE_CONST:
+      case CONSTRAINT_NAME_CONST:
          break;
-      case CONSTRAINT_TYPE_SUPP:
+      case CONSTRAINT_NAME_SUPP:
          break;
       default:
          std::cerr << "Error in faust_constraint_mat::check_constraint_name : cannot create faust_constraint_mat objet from an faust_constraint object with constraint_name= "<< constraint_name << std::endl;
@@ -72,11 +72,11 @@ void faust_constraint_mat::set_default_parameter()
 {
    switch (constraint_name)
    {
-      case CONSTRAINT_TYPE_CONST:
-         parameter = 0.0;
+      case CONSTRAINT_NAME_CONST:
+         parameter.setZeros();
          break;
-      case CONSTRAINT_TYPE_SUPP:
-         parameter = 0.0;
+      case CONSTRAINT_NAME_SUPP:
+         parameter.setZeros();
          break;
       default:
          std::cerr << "Error in faust_constraint_mat::set_default_parameter : cannot create faust_constraint_mat objet from an faust_constraint object with constraint_name= "<< constraint_name << std::endl;

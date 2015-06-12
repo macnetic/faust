@@ -3,10 +3,9 @@
 
 #include "faust_constant.h"
 #include <vector>
-
-class faust_mat;
-class stopping_criterion;
-
+#include "faust_mat.h"
+#include "stopping_criterion.h"
+#include "faust_constraint_generic.h"
 
 
 class faust_params
@@ -24,6 +23,8 @@ class faust_params
          const bool isUpdateWayR2L_ = false ,
          const bool isFactSideLeft_ = false ,
          const faust_real init_lambda_ = 1.0 );
+
+      void check_constraint_validity();
 
       ~faust_params(){}
 

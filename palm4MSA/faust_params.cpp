@@ -1,37 +1,37 @@
-#define "faust_params.h"
-
+#include "faust_params.h"
 #include "stopping_criterion.h"
+#include <iostream>
 
 void faust_params::check_constraint_validity()
 {
    
-   bool verifSize  =    data->getNbRow()   == cons[0][0]->getRows
-                   && cons[0][0]->getCols == cons[1][0]->getRows
-                   &&   data->getNbCol()   == cons[1][0]->getCols;
+   bool verifSize  =    data.getNbRow()     == cons[0][0]->getRows()
+                   && cons[0][0]->getCols() == cons[1][0]->getRows()
+                   &&   data.getNbCol()     == cons[1][0]->getCols();
 
    for (int i=1 ; i<nb_fact-1 ; i++) 
       if (isFactSideLeft)
          verifSize  =  verifSize 
-                    && cons[1][i-1]->getRows == cons[1][i]->getCols
-                    && cons[0][i]->getCols   == cons[1][i]->getRows
-                    &&    data->getNbRow()    == cons[0][i]->getRows;
+                    && cons[1][i-1]->getRows() == cons[1][i]->getCols()
+                    && cons[0][i]->getCols()   == cons[1][i]->getRows()
+                    &&    data.getNbRow()      == cons[0][i]->getRows();
       else
          verifSize  =  verifSize 
-                    && cons[0][i-1]->getCols == cons[0][i]->getRows
-                    && cons[0][i]->getCols   == cons[1][i]->getRows
-                    &&    data->getNbCol()    == cons[1][i]->getCols;
+                    && cons[0][i-1]->getCols() == cons[0][i]->getRows()
+                    && cons[0][i]->getCols()   == cons[1][i]->getRows()
+                    &&    data.getNbCol()      == cons[1][i]->getCols();
 
 
    if (!verifSize)
    {
-      cerr << "Error in faust_params::check_constraint_validity : Size incompatibility in the constraints" << endl;
+      std::cerr << "Error in faust_params::check_constraint_validity : Size incompatibility in the constraints" << std::endl;
       exit(EXIT_FAILURE);
    }
    
    for (int i=0 ; i<cons.size() ; i++)  
       if (cons[i].size() != nb_fact-1) 
       {
-         cerr << "The number of constraints is in conflict with the number of factors" << endl;
+         std::cerr << "The number of constraints is in conflict with the number of factors" << std::endl;
          exit(EXIT_FAILURE);
       }
  
@@ -40,8 +40,8 @@ void faust_params::check_constraint_validity()
 faust_params::faust_params(
          const faust_mat& data_,
          const int nb_fact_,
-         const vector<vector<faust_constraint> >& cons_,
-         const vector<faust_spmat>& init_fact_,
+         const std::vector<std::vector<const faust_constraint_generic*> >& cons_,
+         const std::vector<faust_mat>& init_fact_,
          const stopping_criterion& stop_crit_2facts_ /* = stopping_criterion() */,
          const stopping_criterion& stop_crit_global_ /* = stopping_criterion() */,
          const bool isVerbose_ /* = false */,
@@ -57,7 +57,9 @@ faust_params::faust_params(
             isVerbose(isVerbose_),
             isUpdateWayR2L(isUpdateWayR2L_),
             isFactSideLeft(isFactSideLeft_),
-            init_lambda(init_lambda_)
+            init_lambda(init_lambda_),
+            nb_rows(data_.getNbRow()),
+            nb_cols(data_.getNbCol())
 {
  check_constraint_validity(); 
 }

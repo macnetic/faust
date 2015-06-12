@@ -56,9 +56,9 @@ void faust_constraint_real::check_constraint_name()const
 {
    switch (constraint_name)
    {
-      case CONSTRAINT_TYPE_NORMCOL:
+      case CONSTRAINT_NAME_NORMCOL:
          break;
-      case CONSTRAINT_TYPE_SPLINCOL:
+      case CONSTRAINT_NAME_SPLINCOL:
          break;
       default:
          std::cerr << "Error in faust_constraint_real::check_constraint_name : cannot create faust_constraint_real objet from an faust_constraint object with constraint_name= "<< constraint_name << std::endl;
@@ -71,10 +71,10 @@ void faust_constraint_real::set_default_parameter()
 {
    switch (constraint_name)
    {
-      case CONSTRAINT_TYPE_NORMCOL:
+      case CONSTRAINT_NAME_NORMCOL:
          parameter = 0.0;
          break;
-      case CONSTRAINT_TYPE_SPLINCOL:
+      case CONSTRAINT_NAME_SPLINCOL:
          parameter = 0.0;
          break;
       default:
