@@ -16,6 +16,8 @@ palm4MSA::palm4MSA(const faust_params& params_) :
    isUpdateWayR2L(params_.isUpdateWayR2L),
    lambda(params_.init_lambda),
    verbose(params_.isVerbose),
+   nb_fact(params_.nb_fact),
+   S(params_.init_fact),
    ind_fact(0),
    lipschitz_multiplicator(1.001),
    isCComputed(false),
@@ -25,6 +27,20 @@ palm4MSA::palm4MSA(const faust_params& params_) :
    check_constraint_validity();
 }
 
+palm4MSA::palm4MSA(const faust_params& params_palm_) :
+   data(params_palm_.data),
+   isUpdateWayR2L(params_palm_.isUpdateWayR2L),
+   lambda(params_palm_.init_lambda),
+   verbose(params_palm_.isVerbose),
+   stop_crit(params_palm_.stop_crit),
+   ind_fact(0),
+   lipschitz_multiplicator(1.001),
+   isCComputed(false),
+   isGradComputed(false),
+   isProjectionComputed(false)
+{
+   check_constraint_validity();
+}
 
 void palm4MSA::compute_projection()
 {
@@ -56,14 +72,14 @@ void palm4MSA::compute_projection()
          case CONSTRAINT_NAME_SPLIN:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_splin(matrix2project, const_int->getParameter());
+            prox_splin(matrix2project, const_int->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_NORMCOL:
          {
             const faust_constraint_real* const_real = dynamic_cast<const faust_constraint_real*>(const_vec[ind_fact]);
-            //prox_normcol(matrix2project, const_real->getParameter());
+            prox_normcol(matrix2project, const_real->getParameter());
          }
          break;
 
@@ -250,24 +266,28 @@ void palm4MSA::init_fact()
 
 void palm4MSA::next_step()
 {
-   isCComputed = false;
-   isGradComputed = false;
-   isProjectionComputed = false;
 
    update_R();
    L.setEyes(/* DIMENSION */);
 
    for (int j=0 ; j<nb_fact ; j++)
    {
+      ind_fact = 0;
+      isCComputed = false;
+      isGradComputed = false;
+      isProjectionComputed = false;
+      
       compute_c();
+      // X_hat is computed updated by compute_grad_over_c only when j=ind_fact-1
       compute_grad_over_c();
       compute_projection();
       update_L();
+
+      ind_fact++;
    }
-   
+   compute_lambda();
 
 
-   ind_fact++;
 }
 
 void palm4MSA::init_fact_from_palm(const palm4MSA& palm2, bool isFactSideLeft)

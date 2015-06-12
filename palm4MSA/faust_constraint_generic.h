@@ -22,6 +22,10 @@ enum faust_constraint_name
    CONSTRAINT_NAME_TOEPLITZ
 };
 
+
+const char* get_constraint_name(faust_constraint_name);
+
+
 //template<typename parameter_type>
 class faust_constraint_generic
 {

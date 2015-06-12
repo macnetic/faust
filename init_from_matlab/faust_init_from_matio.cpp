@@ -53,7 +53,6 @@ double init_faust_mat_from_matio_double(const char* fileName, const char* variab
 {
    matvar_t* matvar = faust_matio_read_variable(fileName, variableName);
 
-cout<<variableName<<".class_type="<<matvar->class_type<<endl;
 
    if( matvar->class_type != MAT_C_DOUBLE
        || matvar->rank != 2

@@ -8,22 +8,19 @@
 #include "stopping_criterion.h"
 class faust_constraint_generic;
 class faust_params;
+class faust_params_palm;
 
 class palm4MSA
 {
    public:
       palm4MSA(const faust_params& params_);
+      palm4MSA(const faust_params_palm& params_palm_);
 
-      void compute_grad_over_c();
-      void compute_lambda();
-      void compute_c();
-      void compute_projection();
-      void update_R();
-      void update_L();
       void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;}
       void set_data(const faust_mat& data_){data=data_;}
       void set_nfacts(const int nfact_){nb_fact=nfact_;}
       void set_lambda(faust_real lambda_){lambda = lambda_;}
+      void set_lambda(const palm4MSA& palm_){lambda = palm_.lambda;}
       void update_lambda_from_palm(const palm4MSA& palm){lambda *= palm.lambda;}
       faust_real get_lambda()const{return lambda;}
       faust_real get_RMSE()const{return error.norm()/data.getNbRow()/data.getNbCol();}
@@ -39,6 +36,12 @@ class palm4MSA
    private:
       void check_constraint_validity();
       void init_fact_from_palm(const palm4MSA& palm, bool isFactSideLeft);
+      void compute_c();
+      void compute_grad_over_c();
+      void compute_projection();
+      void update_L();
+      void update_R();
+      void compute_lambda();
 
 
    private:
