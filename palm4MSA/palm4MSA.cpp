@@ -11,6 +11,11 @@
 #include "LinAlgebra.h"
 #include "prox.h"
 
+#include <fstream>
+#include <iomanip>
+#define __SP setprecision(20)<<
+
+
 
 palm4MSA::palm4MSA(const faust_params& params_) :
    data(params_.data),
@@ -19,6 +24,7 @@ palm4MSA::palm4MSA(const faust_params& params_) :
    verbose(params_.isVerbose),
    nb_fact(params_.nb_fact),
    S(params_.init_fact),
+   R(std::vector<faust_mat>(2)),
    ind_fact(0),
    lipschitz_multiplicator(1.001),
    isCComputed(false),
@@ -35,6 +41,8 @@ palm4MSA::palm4MSA(const faust_params_palm& params_palm_) :
    verbose(params_palm_.isVerbose),
    nb_fact(params_palm_.nb_fact),
    S(params_palm_.init_fact),
+   R(std::vector<faust_mat>(2)),
+   L(faust_mat(params_palm_.init_fact[0].getNbRow())),
    stop_crit(params_palm_.stop_crit),
    const_vec(params_palm_.cons),
    ind_fact(0),
@@ -227,16 +235,44 @@ void palm4MSA::compute_lambda()
 void palm4MSA::update_R()
 {
    // R[nb_fact-1] est initialise a l'identite lors de la creation de l'objet palm4MSA et n'est pas cense changer
-   R[nb_fact-1].setEyes(/*DIMENSION*/);
+
+      
+
+   R[nb_fact-1].resize(const_vec[nb_fact-1]->getCols());
+   R[nb_fact-1].setEyes();
    for (int i=nb_fact-2 ; i>-1 ; i--)
       //  R[i] = S[i+1] * R[i+1]
       multiply(S[i+1], R[i+1], R[i]);
+
+/*using namespace std;
+ofstream fichier;
+fichier.open("R0.dat",ios::out);
+for (int i=0 ; i<R[0].getNbCol() ; i++)
+{
+   for (int j=0 ; j<R[0].getNbRow() ; j++)
+   {
+      fichier << __SP R[0](i,j)<<" ";
+   }
+   fichier<<endl;
+}
+fichier.close();
+fichier.open("R1.dat",ios::out);
+for (int i=0 ; i<R[1].getNbCol() ; i++)
+{
+   for (int j=0 ; j<R[1].getNbRow() ; j++)
+   {
+      fichier << __SP R[1](i,j)<<" ";
+   }
+   fichier<<endl;
+}
+fichier.close();*/
+
+  
 }
 
 
 void palm4MSA::check_constraint_validity()
 {
-std::cout << nb_fact<< " "<<S.size()<<std::endl;
    if (nb_fact != S.size())
    {
       std::cerr << "Error in palm4MSA::check_constraint_validity : Wrong initialization: params.nfacts and params.init_facts are in conflict" << std::endl;
@@ -271,9 +307,11 @@ void palm4MSA::init_fact()
 
 void palm4MSA::next_step()
 {
-
+std::cout<<"OK1"<<std::endl;
    update_R();
-   L.setEyes(/* DIMENSION */);
+std::cout<<"OK2"<<std::endl;
+   L.setEyes();
+std::cout<<"OK3"<<std::endl;
 
    for (int j=0 ; j<nb_fact ; j++)
    {
@@ -282,16 +320,23 @@ void palm4MSA::next_step()
       isGradComputed = false;
       isProjectionComputed = false;
       
+std::cout<<"OK4"<<std::endl;
       compute_c();
       // X_hat is computed updated by compute_grad_over_c only when j=ind_fact-1
+std::cout<<"OK5"<<std::endl;
       compute_grad_over_c();
+std::cout<<"OK6"<<std::endl;
       compute_projection();
+std::cout<<"OK7"<<std::endl;
       update_L();
+std::cout<<"OK8"<<std::endl;
 
       ind_fact++;
    }
+std::cout<<"OK9"<<std::endl;
    compute_lambda();
 
+std::cout<<"OK10"<<std::endl;
 
 }
 

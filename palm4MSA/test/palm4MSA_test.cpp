@@ -68,6 +68,12 @@ int main()
 
   palm4MSA palm2(params);
 
+palm2.next_step();
+
+
+
+
+
 
 return 0;
 }
