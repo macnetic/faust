@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "faust_params.h"
+#include "faust_params_palm.h"
 #include "faust_constraint_generic.h"
 #include "faust_constraint_mat.h"
 #include "faust_constraint_real.h"
@@ -27,12 +28,15 @@ palm4MSA::palm4MSA(const faust_params& params_) :
    check_constraint_validity();
 }
 
-palm4MSA::palm4MSA(const faust_params& params_palm_) :
+palm4MSA::palm4MSA(const faust_params_palm& params_palm_) :
    data(params_palm_.data),
    isUpdateWayR2L(params_palm_.isUpdateWayR2L),
    lambda(params_palm_.init_lambda),
    verbose(params_palm_.isVerbose),
+   nb_fact(params_palm_.nb_fact),
+   S(params_palm_.init_fact),
    stop_crit(params_palm_.stop_crit),
+   const_vec(params_palm_.cons),
    ind_fact(0),
    lipschitz_multiplicator(1.001),
    isCComputed(false),
@@ -232,6 +236,7 @@ void palm4MSA::update_R()
 
 void palm4MSA::check_constraint_validity()
 {
+std::cout << nb_fact<< " "<<S.size()<<std::endl;
    if (nb_fact != S.size())
    {
       std::cerr << "Error in palm4MSA::check_constraint_validity : Wrong initialization: params.nfacts and params.init_facts are in conflict" << std::endl;

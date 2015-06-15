@@ -25,10 +25,10 @@ faust_constraint_mat::faust_constraint_mat(
 
 
 faust_constraint_mat::faust_constraint_mat(
-   const faust_constraint_name& constraint_name_, 
+   const faust_constraint_name& constraint_name_,  
+   const faust_mat default_parameter_,
    const int nb_rows_, 
-   const int nb_cols_,
-   const faust_mat default_parameter_) : 
+   const int nb_cols_) : 
       faust_constraint_generic(
          constraint_name_,
          nb_rows_,

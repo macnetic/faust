@@ -19,15 +19,17 @@ faust_constraint_int::faust_constraint_int(
          nb_rows_,
          nb_cols_)
 {
+   std::cout<<nb_rows_<<std::endl;
+   std::cout<<nb_cols_<<std::endl;
    set_default_parameter();
 }
 
 
 faust_constraint_int::faust_constraint_int(
-   const faust_constraint_name& constraint_name_, 
+   const faust_constraint_name& constraint_name_,  
+   const int default_parameter_,
    const int nb_rows_, 
-   const int nb_cols_,
-   const int default_parameter_) : 
+   const int nb_cols_) : 
       faust_constraint_generic(
          constraint_name_,
          nb_rows_,

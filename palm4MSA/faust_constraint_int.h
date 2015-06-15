@@ -17,9 +17,9 @@ class faust_constraint_int : public faust_constraint_generic
 
       faust_constraint_int(
          const faust_constraint_name& constraint_name_, 
+         const int parameter_,
          const int nb_rows_, 
-         const int nb_cols_,
-         const int parameter_);
+         const int nb_cols_);
 
       faust_constraint_int(const faust_constraint_int& constraint_);
 

@@ -24,10 +24,10 @@ faust_constraint_real::faust_constraint_real(
 
 
 faust_constraint_real::faust_constraint_real(
-   const faust_constraint_name& constraint_name_, 
+   const faust_constraint_name& constraint_name_,  
+   const faust_real default_parameter_,
    const int nb_rows_, 
-   const int nb_cols_,
-   const faust_real default_parameter_) : 
+   const int nb_cols_) : 
       faust_constraint_generic(
          constraint_name_,
          nb_rows_,

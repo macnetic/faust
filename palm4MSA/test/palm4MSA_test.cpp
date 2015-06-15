@@ -3,6 +3,7 @@
 #include "faust_constraint_int.h"
 #include "faust_constraint_real.h"
 #include "faust_params.h"
+#include "faust_params_palm.h"
 #include "stopping_criterion.h"
 #include "faust_init_from_matio.h"
 #include "palm4MSA.h"
@@ -21,7 +22,8 @@ int main()
   init_faust_mat_from_matio_mat(init_facts2, "config_compared_palm2.mat", "init_facts2");
 
   int cons1_name, cons1_parameter, cons1_row, cons1_col;
-  int cons2_name, cons2_parameter, cons2_row, cons2_col;
+  int cons2_name, cons2_row, cons2_col;
+  faust_real cons2_parameter;
   int nfacts, niter;
   bool update_way, verbose;
   double init_lambda;
@@ -32,7 +34,7 @@ int main()
   cons1_col = init_faust_mat_from_matio_int("config_compared_palm2.mat", "cons1_col");
 
   cons2_name = init_faust_mat_from_matio_int("config_compared_palm2.mat", "cons2_name");
-  cons2_parameter = init_faust_mat_from_matio_int("config_compared_palm2.mat", "cons2_parameter");
+  cons2_parameter = (faust_real) init_faust_mat_from_matio_double("config_compared_palm2.mat", "cons2_parameter");
   cons2_row = init_faust_mat_from_matio_int("config_compared_palm2.mat", "cons2_row");
   cons2_col = init_faust_mat_from_matio_int("config_compared_palm2.mat", "cons2_col");
 
@@ -48,13 +50,11 @@ int main()
   const faust_constraint_int cons1(static_cast<faust_constraint_name>(cons1_name), cons1_parameter, cons1_row, cons1_col);
   const faust_constraint_real cons2(static_cast<faust_constraint_name>(cons2_name), cons2_parameter, cons2_row, cons2_col);
 
-  vector<const faust_constraint_generic*> cons_tmp;
-  cons_tmp.push_back(&cons1);
-  cons_tmp.push_back(&cons2);
+  vector<const faust_constraint_generic*> cons;
+  cons.push_back(&cons1);
+  cons.push_back(&cons2);
 
-  vector<vector<const faust_constraint_generic*> >cons;
-  cons.push_back(cons_tmp);
-  cons.push_back(cons_tmp);
+
 
   // Creation du vecteur de matrice init_fact;
   vector<faust_mat> init_fact;
@@ -64,9 +64,9 @@ int main()
   // Creation du critere d'arret
   stopping_criterion crit(niter);
 
-  faust_params params(data, nfacts, cons, init_fact, crit, crit, verbose, update_way, false, init_lambda);
+  faust_params_palm params(data, nfacts, cons, init_fact, crit, verbose, update_way, init_lambda);
 
-  palm4MSA palm2();
+  palm4MSA palm2(params);
 
 
 return 0;

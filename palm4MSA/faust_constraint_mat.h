@@ -18,10 +18,10 @@ class faust_constraint_mat : public faust_constraint_generic
          const int nb_cols_);
 
       faust_constraint_mat(
-         const faust_constraint_name& constraint_name_, 
+         const faust_constraint_name& constraint_name_,  
+         const faust_mat parameter_,
          const int nb_rows_, 
-         const int nb_cols_,
-         const faust_mat parameter_);
+         const int nb_cols_);
 
       faust_constraint_mat(const faust_constraint_mat& constraint_);
 

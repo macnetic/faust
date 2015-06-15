@@ -16,10 +16,10 @@ class faust_constraint_real : public faust_constraint_generic
          const int nb_cols_);
 
       faust_constraint_real(
-         const faust_constraint_name& constraint_name_, 
+         const faust_constraint_name& constraint_name_,  
+         const faust_real parameter_,
          const int nb_rows_, 
-         const int nb_cols_,
-         const faust_real parameter_);
+         const int nb_cols_);
 
       faust_constraint_real(const faust_constraint_real& constraint_);
 
