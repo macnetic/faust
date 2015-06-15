@@ -84,9 +84,10 @@ inline void palm4MSA::update_L()
 
 inline void palm4MSA::compute_c()
 { 
-   faust_real nL=L.norm();
-   faust_real nR=R[ind_fact].norm();
+   faust_real nL=L.spectralNorm();
+   faust_real nR=R[ind_fact].spectralNorm();
    c=lipschitz_multiplicator*nR*nR*nL*nL;
+   std::cout<<"c="<<c<<std::endl;
    isCComputed = true;   
 }
 
