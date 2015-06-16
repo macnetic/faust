@@ -6,10 +6,13 @@ void faust_params_palm::check_constraint_validity()
 {
    
    bool verifSize  =    data.getNbRow()     == cons[0]->getRows()
-                   && cons[0]->getCols() == cons[1]->getRows()
-                   &&   data.getNbCol()     == cons[1]->getCols();
+                   &&   data.getNbCol()     == cons[nb_fact-1]->getCols();
 
-
+	for (int i=0 ; i<nb_fact-1; i++)
+	{
+		verifSize =  verifSize
+		&& cons[i]->getCols() == cons[i+1]->getRows();
+	}
    if (!verifSize)
    {
       std::cerr << "Error in faust_params_palm::check_constraint_validity : Size incompatibility in the constraints" << std::endl;
@@ -34,9 +37,8 @@ faust_params_palm::faust_params_palm(
             stop_crit(stop_crit_),
             isVerbose(isVerbose_),
             isUpdateWayR2L(isUpdateWayR2L_),
-            init_lambda(init_lambda_),
-            nb_rows(data_.getNbRow()),
-            nb_cols(data_.getNbCol())
+            init_lambda(init_lambda_)
+
 {
  check_constraint_validity(); 
 }

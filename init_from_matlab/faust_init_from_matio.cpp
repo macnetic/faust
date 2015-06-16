@@ -3,9 +3,13 @@
 #include "faust_constant.h"
 #include <iostream>
 #include <vector>
+#include "stopping_criterion.h"
+#include "faust_constraint_int.h"
+#include "faust_constraint_generic.h"
+#include "faust_constraint_real.h"
 
 using namespace std;
-
+void init_mat_from_matvar(faust_mat & M,matvar_t* var);
 matvar_t* faust_matio_read_variable(const char* fileName, const char* variableName)
 {
    mat_t* matfp = Mat_Open(fileName,MAT_ACC_RDONLY);
@@ -210,6 +214,244 @@ void init_faust_mat_vector_from_matiofile( vector<faust_mat> & vec_M, const char
 	
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void init_params_palm_from_matiofile(faust_params_palm& params,const char* fileName, const char* variableName)
+{
+	/*Mat_VarGetNumberOfFields(matvar_t *matvar);
+	EXTERN int        Mat_VarAddStructField(matvar_t *matvar,const char *fieldname);
+	EXTERN char * const *Mat_VarGetStructFieldnames(const matvar_t *matvar);
+	Mat_VarGetStructField(matvar_t *matvar,void *name_or_index,
+                      int opt,int index);
+	*/
+	
+	matvar_t* params_var = faust_matio_read_variable(fileName,"params");
+   
+	matvar_t*   current_var;
+	matvar_t* current_fact_var;
+	matvar_t* current_cons_var;
+	matvar_t* current_cons_name_var;
+	matvar_t* current_cons_field_var;
+	
+	int nbr_params = Mat_VarGetNumberOfFields(params_var);
+	char*const* fieldNames;
+	fieldNames = Mat_VarGetStructFieldnames(params_var);
+	
+	cout<<"nbr de parametre ="<<nbr_params<<endl;
+	
+	cout<<"***FIELDNAMES*** ="<<endl;
+	for (int i=0;i<nbr_params;i++)
+	{
+		cout<<fieldNames[i]<<endl;
+	}
+	cout <<endl;
+	
+	
+	char* current_fieldName;
+	
+	int niter,nfacts,verbose,updateway,dim1,dim2,cons_parameter,cons_dim1,cons_dim2;
+	faust_mat data_mat,current_fact;
+	vector<faust_mat> init_facts;
+	faust_real init_lambda;	
+	
+	
+	
+	
+	
+	
+	for (int i=0;i<nbr_params;i++)
+	{
+		current_fieldName = fieldNames[i];	
+		int id_champ = -1;
+
+		
+
+		
+	
+	    
+		current_var=Mat_VarGetStructFieldByName(params_var,current_fieldName,0);
+		if (current_var == NULL)
+		{
+			cerr<<"error cannot access to the field : "<<current_fieldName<<endl;
+			
+		}
+		if (strcmp(current_fieldName,"niter")==0)
+		{
+			cout<<"niter="<<endl;
+			niter=(int)((double*)(current_var->data))[0];
+			stopping_criterion stop_cri(niter);
+			params.stop_crit=stop_cri;
+			cout<<niter<<endl;
+		}
+		if (strcmp(current_fieldName,"nfacts")==0)
+		{
+		
+			cout<<"nfacts"<<endl;
+			nfacts=(int)((double*)(current_var->data))[0];
+			cout<<nfacts<<endl;
+			params.nb_fact = nfacts;
+		}
+				
+		if (strcmp(current_fieldName,"data")==0)
+		{
+			cout<<"data"<<endl;
+			init_mat_from_matvar(data_mat,current_var);
+
+			data_mat.Display();	
+			params.data=data_mat;
+
+		}
+		
+		if (strcmp(current_fieldName,"verbose")==0)
+		{
+			cout<<"verbose"<<endl;
+			verbose=(bool)((double*)(current_var->data))[0];
+			cout<<verbose<<endl;
+			params.isVerbose = verbose;
+		}
+		
+		if (strcmp(current_fieldName,"updateway")==0)
+		{
+			cout<<"updateway"<<endl;
+			updateway=(int)((double*)(current_var->data))[0];
+			cout<<updateway<<endl;
+			params.isUpdateWayR2L=updateway;
+		}
+		
+		if (strcmp(current_fieldName,"init_lambda")==0)
+		{
+			cout<<"init_lambda"<<endl;
+			init_lambda=(faust_real)((double*)(current_var->data))[0];
+			cout<<init_lambda<<endl;
+			params.init_lambda = init_lambda;
+		}
+		if (strcmp(current_fieldName,"init_facts")==0)
+		{
+			cout<<"init_facts"<<endl;
+			init_facts.resize(0);
+			
+			for (int j=0;j<(current_var->dims[1]);j++)
+			{	
+
+				current_fact_var = Mat_VarGetCell(current_var,j);
+				
+				init_mat_from_matvar(current_fact,current_fact_var);	
+				current_fact.Display();
+				init_facts.push_back(current_fact);	
+			}
+			params.init_fact=init_facts;	
+		}
+		if (strcmp(current_fieldName,"cons")==0)
+		{
+			vector<const faust_constraint_generic*> consS;
+			string name_cons;
+			faust_constraint_name cons_name;
+			for (int j=0;j<(current_var->dims[1]);j++)
+			{	
+				current_cons_var = Mat_VarGetCell(current_var,j);
+				current_cons_name_var = Mat_VarGetCell(current_cons_var,0);
+				name_cons.resize(0);
+				for(int k=0;k<current_cons_name_var->dims[1];k++)
+				{
+					name_cons+= (char) (((char*)(current_cons_name_var->data))[k]);
+				}
+				cout<<name_cons<<endl;
+				cout<<name_cons<<endl;
+				bool is_const_int =((strcmp(name_cons.c_str(),"sp") == 0)|| (strcmp(name_cons.c_str(),"sppos")==0));
+				is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"spcol") == 0)));
+				is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"splin") == 0)));
+					
+
+				if (is_const_int)
+				{	
+					int nbr_field = (current_var->dims[1]);
+					if (nbr_field != 4)
+					{
+						cerr<<"Error init_params_from_matiofile : "<<"params.cons{i} must have 4 fields"<<endl;
+						exit(EXIT_FAILURE); 
+					}
+					
+					current_cons_field_var=Mat_VarGetCell(current_cons_var,1);
+					cons_parameter =(int) (((double*)current_cons_field_var->data))[0];
+					current_cons_field_var=Mat_VarGetCell(current_cons_var,2);
+					cons_dim1 =(int) (((double*)current_cons_field_var->data))[0];
+					current_cons_field_var=Mat_VarGetCell(current_cons_var,3);
+					cons_dim2 =(int) (((double*)current_cons_field_var->data))[0];
+					
+					
+					if (strcmp(name_cons.c_str(),"sp") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_SP;
+					}
+
+					if (strcmp(name_cons.c_str(),"sppos") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_SP_POS;
+					}
+
+					if (strcmp(name_cons.c_str(),"spcol") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_SPCOL;
+					}			
+					
+					if (strcmp(name_cons.c_str(),"splin") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_SPLIN;
+					}	
+					
+
+					
+					
+					
+					consS.push_back(new faust_constraint_int(cons_name,cons_parameter,cons_dim1,cons_dim2));	
+				}
+				params.cons=consS;
+			}
+			
+			
+				
+				
+		}
+	}
+			
+	
+	
+
+	
+
+	
+	
+		
+}
+	
+	
+void init_mat_from_matvar(faust_mat & M,matvar_t* var)
+{
+	M.resize(var->dims[0],var->dims[1]);
+					
+	for (size_t k = 0 ; k < var->dims[0] * var->dims[1] ; k++)
+	{
+		(((M.getData()))[k]) = (faust_real) (((double*)(var->data))[k]);
+			
+	}
+}
+
+
+
+
 
 
 

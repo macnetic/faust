@@ -3,6 +3,7 @@
 
 #include "matio.h"
 #include <vector>
+#include "faust_params_palm.h"
 
 class faust_mat;
 
@@ -12,7 +13,8 @@ double init_faust_mat_from_matio_double(const char* fileName, const char* variab
 int init_faust_mat_from_matio_int(const char* fileName, const char* variableName);
 bool init_faust_mat_from_matio_bool(const char* fileName, const char* variableName);
 void init_faust_mat_vector_from_matiofile( std::vector<faust_mat> & vec_M, const char* fileName, const char* variableName);
+void init_params_palm_from_matiofile(faust_params_palm& params, const char* fileName, const char* variableName);
 
-void write_faust_mat_into_matfile(faust_mat& M, const char* fileName, const char* variableName);
+void write_faust_mat_into_matfile( faust_mat& M, const char* fileName, const char* variableName);
 
 #endif
