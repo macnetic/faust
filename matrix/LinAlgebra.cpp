@@ -209,10 +209,9 @@ void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_rea
 		std::cerr << "ERREUR gemm : nbRow of op(A) = "<< A.getNbRow() << " while nbRow of C = " << C.getNbRow() << std::endl;
 		std::cerr << "or nbCol of op(B) = "<< B.getNbCol() << " while nbCol of C = " << C.getNbCol() << std::endl;
 	exit( EXIT_FAILURE);
-	}else
-	{
-		C.resize(A.getNbRow(),B.getNbCol());
 	}
+		
+        C.resize(nbRowOpA,nbColOpB);
 
 	if (beta == 0)
 	{

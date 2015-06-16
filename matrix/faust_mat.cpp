@@ -218,7 +218,6 @@ faust_real faust_mat::max(std::vector<int> & id_row,std::vector<int> & id_col) c
 	{
 		mat = mat_copy * A.mat;
 	}*/
-		
 	mat = mat * A.mat;
 	resize(dim1, A.dim2);
  }

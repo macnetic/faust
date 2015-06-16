@@ -52,6 +52,7 @@ palm4MSA::palm4MSA(const faust_params_palm& params_palm_) :
    isProjectionComputed(false)
 {
    check_constraint_validity();
+
 }
 
 void palm4MSA::compute_projection()
@@ -185,7 +186,6 @@ void palm4MSA::compute_grad_over_c()
    }
 
 
-
    faust_mat tmp1, tmp2, tmp3, tmp4;
    // tmp1 = L*S
    if (!isUpdateWayR2L)
@@ -219,6 +219,7 @@ void palm4MSA::compute_grad_over_c()
       else
          gemm(tmp1, LorR, error, lambda, -1.0, 'N', 'N');
    }
+
    // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
    // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
    if (!isUpdateWayR2L)
@@ -231,6 +232,11 @@ void palm4MSA::compute_grad_over_c()
       gemm(RorL[ind_fact], error, tmp3, lambda, 0.0, 'T', 'N');
       gemm(tmp3, LorR, grad_over_c,1.0/c, 0.0,'N','T');
    }
+
+//char filename[100];
+//sprintf(filename,"grad_over_c%d.dat",ind_fact);
+//grad_over_c.print_file(filename);
+
 
    isGradComputed = true;
 }
@@ -284,14 +290,7 @@ void palm4MSA::update_L()
       exit(EXIT_FAILURE);
    }
    if(!isUpdateWayR2L)
-   {
- cout <<"dim1="<<LorR.getNbRow()<<endl;
- cout <<"dim2="<<LorR.getNbCol()<<endl;
- cout <<"dim1="<<S[ind_fact].getNbRow()<<endl;
- cout <<"dim2="<<S[ind_fact].getNbCol()<<endl;
-
       LorR *= S[ind_fact];
-   }
    else
    {
       RorL[0].resize(const_vec[0]->getRows());
@@ -353,9 +352,9 @@ void palm4MSA::next_step()
    }
       
 
+   ind_fact = 0;
    for (int j=0 ; j<nb_fact ; j++)
    {
-      ind_fact = 0;
       isCComputed = false;
       isGradComputed = false;
       isProjectionComputed = false;
