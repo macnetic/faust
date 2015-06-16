@@ -45,9 +45,13 @@ class palm4MSA
 
 
    private:
-      // R : vector containing all posible 
-      std::vector<faust_mat> R; 
-      faust_mat L;
+      // RorL_vec matches R if (!isUpdateWayR2L)
+      // RorL_vec matches L if (isUpdateWayR2L)
+      std::vector<faust_mat> RorL; 
+
+      // LorR_mat matches L if (!isUpdateWayR2L)
+      // LorR_mat matches R if (isUpdateWayR2L)
+      faust_mat LorR;
       std::vector<faust_mat> S; // contains S_0^i, S_1^i, ...
 
       
@@ -73,19 +77,10 @@ class palm4MSA
       std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
 };
 
-inline void palm4MSA::update_L()
-{
-   if(!isProjectionComputed){
-      std::cerr << "Projection must be computed before updating L" << std::endl;
-      exit(EXIT_FAILURE);
-   }
-   L *= S[ind_fact];
-}
-
 inline void palm4MSA::compute_c()
 { 
-   faust_real nL=L.spectralNorm();
-   faust_real nR=R[ind_fact].spectralNorm();
+   faust_real nL=LorR.spectralNorm();
+   faust_real nR=RorL[ind_fact].spectralNorm();
    c=lipschitz_multiplicator*nR*nR*nL*nL;
    std::cout<<"c="<<c<<std::endl;
    isCComputed = true;   

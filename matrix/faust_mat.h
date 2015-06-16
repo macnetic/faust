@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include "faust_constant.h"
 #include <vector>
+#include <iterator>
 
 class faust_vec;//forward declaration of faust_vec class
 class faust_mat
@@ -48,6 +49,7 @@ public:
   bool isEqual(const faust_mat & B) const;
   bool isEyes() const {return mat.isIdentity(FAUST_PRECISION);}
   
+void init_from_file(const char* filename);
   
   
   /// OPERATION BASIQUE ///
@@ -75,6 +77,8 @@ public:
   
   // multiply (*this) = (*this) * A
   void multiplyRight(faust_mat const& A);
+  // multiply (*this) =  A * (*this)
+  void multiplyLeft(faust_mat const& A);
   
   // scalarMultiply (*this) = (*this) * lambda
   void scalarMultiply(faust_real const lambda);
@@ -88,6 +92,7 @@ public:
   
   // Affichage
   void Display() const;
+  void print_file(const char* filename)const;
 
   
   /// SURCHARGE OPERATEUR ///
@@ -107,9 +112,9 @@ public:
   ////////////////// friends //////////////////////
   // intra classe//
   friend void multiply(const faust_mat & A, const faust_mat & B, faust_mat & C);
-  friend void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta);
+  //friend void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta);
   friend void add(const faust_mat & A, const faust_mat & B, faust_mat & C);
-  friend void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB);
+  friend void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real& alpha, const faust_real& beta, char  typeA, char  typeB);
   
   
   private: 

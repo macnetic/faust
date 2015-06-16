@@ -1,6 +1,9 @@
 #include "faust_mat.h"
 //#include <cmath>
 #include <iostream>
+#include <iomanip>
+#include <fstream>
+
 using namespace std;
 
 
@@ -220,6 +223,30 @@ faust_real faust_mat::max(std::vector<int> & id_row,std::vector<int> & id_col) c
 	resize(dim1, A.dim2);
  }
  
+ void faust_mat::multiplyLeft(faust_mat const& A)
+ {  
+	if (dim1 != A.dim2)
+	{
+		std::cerr << "ERREUR multiply : nbRow of this = " << getNbRow(); 
+       		std::cerr <<" while nbCol of A = " << A.getNbCol() << std::endl;
+        	exit( EXIT_FAILURE);	
+	}
+	
+	/*int dim1_copy = dim1;
+	Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat_copy = mat; 
+	resize(dim1_copy,A.dim2);
+	if (&(A.mat) != &(mat))
+	{	
+		mat.noalias() = mat_copy * A.mat;
+	}else
+	{
+		mat = mat_copy * A.mat;
+	}*/
+		
+	mat = A.mat * mat;
+	resize(A.dim1, dim2);
+ }
+ 
  void faust_mat::scalarMultiply(faust_real const lambda)
  {
 	 mat = lambda * mat;
@@ -256,6 +283,19 @@ faust_real faust_mat::max(std::vector<int> & id_row,std::vector<int> & id_col) c
         std::cout << "nb_col=" << getNbCol()   <<endl;  
 	std::cout << mat <<endl; 
   }
+  
+  void faust_mat::print_file(const char* filename)const
+  {
+	ofstream fichier;
+	fichier.open(filename);
+	for (int i=0 ; i<getNbRow() ;i++)
+	{
+		for (int j=0 ; j<getNbCol() ; j++)
+			fichier << setprecision(20) <<mat(i,j) << " ";
+		fichier << endl;
+	}
+	fichier.close();
+  }
 
   
     /// SURCHARGE OPERATEUR ///
@@ -267,6 +307,26 @@ faust_real faust_mat::max(std::vector<int> & id_row,std::vector<int> & id_col) c
 	  dim2 = A.dim2;
   }
   
+
+void faust_mat::init_from_file(const char* filename)
+{
+  // la premiere ligne contient 2 entiers : dim1 et dim2
+  // chacune des autres lignes contient une valeur par ligne
+  // suivant la premiere dimension puis la deuxieme 
+
+  ifstream* vec_stream;
+  vec_stream = new ifstream(filename);
+  istream_iterator<faust_real> start(*vec_stream), eos;
+  vector<faust_real> vec(start, eos); 
+
+  if((vec[0]*vec[1]+2) != vec.size())
+  {
+	  cerr << "Error in faust_mat::init_from_file : impossible to read matrix from file " << filename << endl;
+	  exit(EXIT_FAILURE);
+  }
+  resize(vec[0],vec[1]);
+  memcpy(getData(), &vec[2], sizeof(faust_real) * dim1 * dim2); 
+}
 
 
 bool operator==(faust_mat const& A, faust_mat const& B)

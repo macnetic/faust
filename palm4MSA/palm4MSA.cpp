@@ -15,7 +15,7 @@
 #include <iomanip>
 #define __SP setprecision(20)<<
 
-
+using namespace std;
 
 palm4MSA::palm4MSA(const faust_params& params_) :
    data(params_.data),
@@ -24,7 +24,7 @@ palm4MSA::palm4MSA(const faust_params& params_) :
    verbose(params_.isVerbose),
    nb_fact(params_.nb_fact),
    S(params_.init_fact),
-   R(std::vector<faust_mat>(2)),
+   RorL(std::vector<faust_mat>(2)),
    ind_fact(0),
    lipschitz_multiplicator(1.001),
    isCComputed(false),
@@ -41,8 +41,8 @@ palm4MSA::palm4MSA(const faust_params_palm& params_palm_) :
    verbose(params_palm_.isVerbose),
    nb_fact(params_palm_.nb_fact),
    S(params_palm_.init_fact),
-   R(std::vector<faust_mat>(2)),
-   L(faust_mat(params_palm_.init_fact[0].getNbRow())),
+   RorL(std::vector<faust_mat>(2)),
+   LorR(faust_mat(params_palm_.init_fact[0].getNbRow())),
    stop_crit(params_palm_.stop_crit),
    const_vec(params_palm_.cons),
    ind_fact(0),
@@ -63,105 +63,105 @@ void palm4MSA::compute_projection()
    }
    else
    {
-      faust_mat matrix2project(S[ind_fact]);
-      matrix2project -= grad_over_c;
+      //faust_mat matrix2project(S[ind_fact]);
+      S[ind_fact] -= grad_over_c;
       switch (const_vec[ind_fact]->getConstraintType())
       {
          case CONSTRAINT_NAME_SP:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            prox_sp(matrix2project, const_int->getParameter());
+            prox_sp(S[ind_fact], const_int->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_SPCOL:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_spcol(matrix2project, const_int->getParameter());
+            //prox_spcol(S[ind_fact], const_int->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_SPLIN:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            prox_splin(matrix2project, const_int->getParameter());
+            prox_splin(S[ind_fact], const_int->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_NORMCOL:
          {
             const faust_constraint_real* const_real = dynamic_cast<const faust_constraint_real*>(const_vec[ind_fact]);
-            prox_normcol(matrix2project, const_real->getParameter());
+            prox_normcol(S[ind_fact], const_real->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_SPLINCOL:
          {
             const faust_constraint_real* const_real = dynamic_cast<const faust_constraint_real*>(const_vec[ind_fact]);
-            //prox_splincol(matrix2project, const_real->getParameter());
+            //prox_splincol(S[ind_fact], const_real->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_L0PEN:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_l0pen(matrix2project, sqrt(2*const_int->getParameter()/c));
+            //prox_l0pen(S[ind_fact], sqrt(2*const_int->getParameter()/c));
          }
          break;
 
          case CONSTRAINT_NAME_L1PEN:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_l1pen(matrix2project, const_int->getParameter()/c);
+            //prox_l1pen(S[ind_fact], const_int->getParameter()/c);
          }
          break;
 
          case CONSTRAINT_NAME_WAV:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_wav(matrix2project, const_int->getParameter());
+            //prox_wav(S[ind_fact], const_int->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_SP_POS:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_sp_pos(matrix2project, const_int->getParameter());
+            //prox_sp_pos(S[ind_fact], const_int->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_BLKDIAG:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_sp(matrix2project, const_int->getParameter());
+            //prox_sp(S[ind_fact], const_int->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_SPLIN_TEST:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_sp(matrix2project, const_int->getParameter());
+            //prox_sp(S[ind_fact], const_int->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_SUPP:
          {
             const faust_constraint_mat* const_mat = dynamic_cast<const faust_constraint_mat*>(const_vec[ind_fact]);
-            //prox_sp(matrix2project, const_mat->getParameter());
+            //prox_sp(S[ind_fact], const_mat->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_NORMLIN:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_sp(matrix2project, const_int->getParameter());
+            //prox_sp(S[ind_fact], const_int->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_TOEPLITZ:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_sp(matrix2project, const_int->getParameter());
+            //prox_sp(S[ind_fact], const_int->getParameter());
          }
          break;
 
@@ -171,6 +171,7 @@ void palm4MSA::compute_projection()
          break;       
       }
    }
+    
    isProjectionComputed = true;
 }
 
@@ -183,15 +184,26 @@ void palm4MSA::compute_grad_over_c()
       exit(EXIT_FAILURE);
    }
 
+
+
    faust_mat tmp1, tmp2, tmp3, tmp4;
    // tmp1 = L*S
-   multiply(L, S[ind_fact], tmp1);
+   if (!isUpdateWayR2L)
+      multiply(LorR, S[ind_fact], tmp1);
+   else
+      multiply(RorL[ind_fact], S[ind_fact], tmp1);
+   
+
 
    if (ind_fact == nb_fact-1)
    {
       
       // X_hat = tmp1*R  (= L*S*R )
-      multiply(tmp1, R[ind_fact], X_hat);
+      if (!isUpdateWayR2L)
+         multiply(tmp1, RorL[ind_fact], X_hat);
+      else
+         multiply(tmp1, LorR, X_hat);
+         
        
       // error = (X_hat*lambda)-data  (= lambda*L*S*R - data )
       error = X_hat;
@@ -202,12 +214,23 @@ void palm4MSA::compute_grad_over_c()
    {
       error = data;
       // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
-      gemm(tmp1, R[ind_fact], error, lambda, -1.0, 'N', 'N');
+      if (!isUpdateWayR2L)
+         gemm(tmp1, RorL[ind_fact], error, lambda, -1.0, 'N', 'N');
+      else
+         gemm(tmp1, LorR, error, lambda, -1.0, 'N', 'N');
    }
    // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
-   gemm(L, error, tmp3, lambda, 0.0, 'T', 'N');
    // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
-   gemm(tmp3, R[ind_fact], grad_over_c,1.0/c, 0.0,'N','T');
+   if (!isUpdateWayR2L)
+   {
+      gemm(LorR, error, tmp3, lambda, 0.0, 'T', 'N');
+      gemm(tmp3, RorL[ind_fact], grad_over_c,1.0/c, 0.0,'N','T');
+   }
+   else
+   {
+      gemm(RorL[ind_fact], error, tmp3, lambda, 0.0, 'T', 'N');
+      gemm(tmp3, LorR, grad_over_c,1.0/c, 0.0,'N','T');
+   }
 
    isGradComputed = true;
 }
@@ -229,6 +252,8 @@ void palm4MSA::compute_lambda()
    gemm(X_hat, X_hat, Xhatt_Xhat, 1.0, 0.0, 'T','N');
 
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
+
+   std::cout<<"lambda="<<lambda<<std::endl;
 }
 
 
@@ -238,38 +263,44 @@ void palm4MSA::update_R()
 
       
 
-   R[nb_fact-1].resize(const_vec[nb_fact-1]->getCols());
-   R[nb_fact-1].setEyes();
-   for (int i=nb_fact-2 ; i>-1 ; i--)
-      //  R[i] = S[i+1] * R[i+1]
-      multiply(S[i+1], R[i+1], R[i]);
-
-/*using namespace std;
-ofstream fichier;
-fichier.open("R0.dat",ios::out);
-for (int i=0 ; i<R[0].getNbCol() ; i++)
-{
-   for (int j=0 ; j<R[0].getNbRow() ; j++)
+   if (!isUpdateWayR2L)
    {
-      fichier << __SP R[0](i,j)<<" ";
+      RorL[nb_fact-1].resize(const_vec[nb_fact-1]->getCols());
+      RorL[nb_fact-1].setEyes();
+      for (int i=nb_fact-2 ; i>-1 ; i--)
+         //  R[i] = S[i+1] * R[i+1]
+         multiply(S[i+1], RorL[i+1], RorL[i]);
    }
-   fichier<<endl;
+   else
+      LorR.multiplyLeft(S[ind_fact]);
+
 }
-fichier.close();
-fichier.open("R1.dat",ios::out);
-for (int i=0 ; i<R[1].getNbCol() ; i++)
+
+
+void palm4MSA::update_L()
 {
-   for (int j=0 ; j<R[1].getNbRow() ; j++)
-   {
-      fichier << __SP R[1](i,j)<<" ";
+   if(!isProjectionComputed){
+      std::cerr << "Projection must be computed before updating L" << std::endl;
+      exit(EXIT_FAILURE);
    }
-   fichier<<endl;
-}
-fichier.close();*/
+   if(!isUpdateWayR2L)
+   {
+ cout <<"dim1="<<LorR.getNbRow()<<endl;
+ cout <<"dim2="<<LorR.getNbCol()<<endl;
+ cout <<"dim1="<<S[ind_fact].getNbRow()<<endl;
+ cout <<"dim2="<<S[ind_fact].getNbCol()<<endl;
 
-  
+      LorR *= S[ind_fact];
+   }
+   else
+   {
+      RorL[0].resize(const_vec[0]->getRows());
+      RorL[0].setEyes();
+      for (int i=0 ; i>nb_fact-2 ; i++)
+         //  R[i] = S[i+1] * R[i+1]
+         multiply(RorL[i] , S[i], RorL[i+1]);
+   }
 }
-
 
 void palm4MSA::check_constraint_validity()
 {
@@ -307,11 +338,20 @@ void palm4MSA::init_fact()
 
 void palm4MSA::next_step()
 {
-std::cout<<"OK1"<<std::endl;
    update_R();
-std::cout<<"OK2"<<std::endl;
-   L.setEyes();
-std::cout<<"OK3"<<std::endl;
+  
+   // resizing L or R 
+   if(!isUpdateWayR2L)
+   {
+      LorR.resize(const_vec[0]->getRows());
+      LorR.setEyes();
+   }
+   else
+   {
+      LorR.resize(const_vec[nb_fact-1]->getCols());
+      LorR.setEyes();
+   }
+      
 
    for (int j=0 ; j<nb_fact ; j++)
    {
@@ -319,24 +359,21 @@ std::cout<<"OK3"<<std::endl;
       isCComputed = false;
       isGradComputed = false;
       isProjectionComputed = false;
-      
-std::cout<<"OK4"<<std::endl;
+     cout<<"OK1"<<endl; 
       compute_c();
-      // X_hat is computed updated by compute_grad_over_c only when j=ind_fact-1
-std::cout<<"OK5"<<std::endl;
+     cout<<"OK2"<<endl; 
+      // X_hat is computed by compute_grad_over_c only when j=ind_fact-1
       compute_grad_over_c();
-std::cout<<"OK6"<<std::endl;
+     cout<<"OK3"<<endl; 
       compute_projection();
-std::cout<<"OK7"<<std::endl;
+     cout<<"OK4"<<endl; 
       update_L();
-std::cout<<"OK8"<<std::endl;
-
-      ind_fact++;
+     cout<<"OK5"<<endl; 
+    
+      ind_fact++; 
    }
-std::cout<<"OK9"<<std::endl;
    compute_lambda();
 
-std::cout<<"OK10"<<std::endl;
 
 }
 

@@ -235,7 +235,7 @@ void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_rea
 		if (typeA == 'N')
 		{
 			if (typeB == 'N')
-				C.mat = alpha * A.mat * B.mat + beta * C.mat;			
+					C.mat = alpha * A.mat * B.mat + beta * C.mat;
 			else
 				C.mat = alpha * A.mat * B.mat.transpose() + beta * C.mat;
 		}else

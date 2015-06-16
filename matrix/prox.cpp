@@ -154,8 +154,8 @@ void prox_spcol(faust_mat & M,int k)
 
 
 
-void prox_splin(faust_mat & M,int k){}
-void prox_normcol(faust_mat & M, faust_real k){}
+void prox_splin(faust_mat & M,int k){M.init_from_file("facts0.txt");}
+void prox_normcol(faust_mat & M, faust_real k){M.init_from_file("facts1.txt");}
 
 
 
