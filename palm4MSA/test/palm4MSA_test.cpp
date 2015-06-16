@@ -68,7 +68,7 @@ int main()
 
   palm4MSA palm2(params);
 
-palm2.next_step();
+  palm2.next_step();
 
 
 
