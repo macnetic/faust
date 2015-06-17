@@ -154,8 +154,99 @@ void prox_spcol(faust_mat & M,int k)
 
 
 
-void prox_splin(faust_mat & M,int k){M.init_from_file("facts0.txt");}
-void prox_normcol(faust_mat & M, faust_real k){M.init_from_file("facts1.txt");}
+void prox_splin(faust_mat & M,int k)
+{
+	M.transpose();
+	prox_spcol(M,k);
+	M.transpose();
+}
+
+//  normcol of the zero matrix equal to the matrix with all elements equal to s,
+//  in order to have the same behaviour as matlab prox
+void prox_normcol(faust_mat & M,faust_real s)
+{
+
+	int dim1 = M.getNbRow();
+	int dim2 = M.getNbCol();
+	if (s<0)
+	{
+		std::cerr << "ERROR prox_normcol : s < 0" << std::endl;
+		exit( EXIT_FAILURE);	
+	}
+	
+	
+	faust_mat current_col(dim1,1);
+	std::vector<int> id_row,id_col_mat,id_col;
+	std::vector<faust_real> values_per_Col;
+	id_row.resize(dim1);
+	id_col.assign(dim1,0);
+	values_per_Col.resize(dim1);
+	faust_real norm_col;
+	
+	if (s == 0)
+	{
+		M.setZeros();
+	}else
+	{
+		
+		for (int i=0;i<dim1;i++)id_row[i]=i;
+	
+		for (int j=0;j<dim2;j++)
+		{	
+			id_col_mat.assign(dim1,j);
+			M.getCoeffs(values_per_Col,id_row,id_col_mat);
+			current_col.setCoeffs(values_per_Col,id_row,id_col);//copie des coefficents de la matrice dans une matrice column
+			norm_col = current_col.norm();
+			
+			if (norm_col == 0)
+			{
+				M.setCoeffs(s,id_row,id_col_mat);
+			}else
+			{
+				for (int k=0;k<values_per_Col.size();k++)
+				{
+					values_per_Col[k]=values_per_Col[k]/norm_col*s;
+				}
+				M.setCoeffs(values_per_Col,id_row,id_col_mat);
+			}
+				
+		}
+	
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void prox_sp_pos(faust_mat & M,int k)
+{
+	//treshold de la matrice
+	for (int i=0;i<(M.getNbRow() * M.getNbCol());i++)
+	{
+		if ((((M.getData()))[i]) < 0)
+		{
+			(((M.getData()))[i])=0;
+		}
+		
+	}
+	
+	prox_sp(M,k);
+	
+}
+
+//void prox_splin(faust_mat & M,int k){M.init_from_file("facts0.txt");}
+//void prox_normcol(faust_mat & M, faust_real k){M.init_from_file("facts1.txt");}
 
 
 

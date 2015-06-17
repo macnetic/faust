@@ -136,7 +136,16 @@ void faust_mat::setCoeffs(const std::vector<faust_real> & valueS,const std::vect
 			mat.resize(nbRow,nbCol);
 		}
 }
- 
+ void faust_mat::check_dim_validity()
+ {
+	bool verifSize = (getNbCol() == mat.cols()) &&  (getNbRow() == mat.rows());
+	
+	if (!verifSize)
+	{
+		std::cerr << "Error in faust_mat::check_dim_validity : Size incompatibility in the faust_mat" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+ }
  
  /// EGALITE ///
 
@@ -218,6 +227,7 @@ faust_real faust_mat::max(std::vector<int> & id_row,std::vector<int> & id_col) c
 	{
 		mat = mat_copy * A.mat;
 	}*/
+		
 	mat = mat * A.mat;
 	resize(dim1, A.dim2);
  }

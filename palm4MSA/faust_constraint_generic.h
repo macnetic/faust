@@ -1,6 +1,6 @@
 #ifndef __FAUST_CONSTRAINT_GENERIC_H__
 #define __FAUST_CONSTRAINT_GENERIC_H__
-
+#include <string>
 
 
 enum faust_constraint_name
@@ -24,6 +24,7 @@ enum faust_constraint_name
 
 
 const char* get_constraint_name(faust_constraint_name);
+std::string getConstraintType(faust_constraint_name);	
 
 
 //template<typename parameter_type>
@@ -53,6 +54,7 @@ class faust_constraint_generic
       const int getRows() const {return nb_rows;}
       const int getCols() const {return nb_cols;}
 
+	
       virtual void set_default_parameter()=0;
       virtual void check_constraint_name()const=0;
  

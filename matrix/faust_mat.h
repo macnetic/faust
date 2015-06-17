@@ -34,6 +34,8 @@ public:
   void resize(const int nbRow,const int nbCol);
   void resize(const int nbRow){resize(nbRow,nbRow);}
   
+  void check_dim_validity();
+  
   // (*this) = la matrice nulle
   void setZeros() {mat.setZero();}
   

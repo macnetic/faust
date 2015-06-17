@@ -58,7 +58,7 @@ void faust_constraint_real::check_constraint_name()const
    {
       case CONSTRAINT_NAME_NORMCOL:
          break;
-      case CONSTRAINT_NAME_SPLINCOL:
+      case CONSTRAINT_NAME_NORMLIN:
          break;
       default:
          std::cerr << "Error in faust_constraint_real::check_constraint_name : cannot create faust_constraint_real objet from an faust_constraint object with constraint_name= "<< constraint_name << std::endl;

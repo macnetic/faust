@@ -1,5 +1,47 @@
 #include "faust_constraint_generic.h"
 
+
+std::string getConstraintType(faust_constraint_name cons_name)  
+{
+   switch(cons_name)
+   {
+      case CONSTRAINT_NAME_SP:
+         return "INT";
+      case CONSTRAINT_NAME_SPCOL:
+         return "INT";
+      case CONSTRAINT_NAME_SPLIN:
+         return "INT";
+      case CONSTRAINT_NAME_NORMCOL:
+         return "FAUST_REAL";
+      case CONSTRAINT_NAME_SPLINCOL:
+         return "INT";
+      case CONSTRAINT_NAME_L0PEN:
+         return "INT";
+      case CONSTRAINT_NAME_L1PEN:
+         return "INT";
+      case CONSTRAINT_NAME_CONST:
+         return "FAUST_MAT";
+      case CONSTRAINT_NAME_WAV:
+         return "INT";
+      case CONSTRAINT_NAME_SP_POS:
+         return "INT";
+      case CONSTRAINT_NAME_BLKDIAG:
+         return "INT";
+      case CONSTRAINT_NAME_SPLIN_TEST:
+         return "INT";
+      case CONSTRAINT_NAME_SUPP:
+         return "FAUST_MAT";
+      case CONSTRAINT_NAME_NORMLIN:
+         return "FAUST_REAL";
+      case CONSTRAINT_NAME_TOEPLITZ:
+         return "INT";
+      default:
+         return "unknown constraint type";
+   }
+}
+
+
+
 const char* get_constraint_name(faust_constraint_name cons_name)
 {
    switch(cons_name)
