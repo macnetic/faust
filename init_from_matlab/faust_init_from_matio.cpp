@@ -318,7 +318,7 @@ void init_params_palm_from_matiofile(faust_params_palm& params,const char* fileN
 		if (strcmp(current_fieldName,"verbose")==0)
 		{
 			cout<<"verbose"<<endl;
-			verbose=(bool)((double*)(current_var->data))[0];
+			verbose=(int)((double*)(current_var->data))[0];
 			cout<<verbose<<endl;
 			params.isVerbose = (bool) verbose;
 		}
@@ -328,7 +328,7 @@ void init_params_palm_from_matiofile(faust_params_palm& params,const char* fileN
 			cout<<"updateway"<<endl;
 			updateway=(int)((double*)(current_var->data))[0];
 			cout<<updateway<<endl;
-			params.isUpdateWayR2L=updateway;
+			params.isUpdateWayR2L=(bool) updateway;
 		}
 		
 		if (strcmp(current_fieldName,"init_lambda")==0)
@@ -495,7 +495,7 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 			cout<<params.init_lambda<<endl;
 		}
 		
-		if(strcmp(current_fieldName,"fact_side"))
+		if(strcmp(current_fieldName,"fact_side")==0)
 		{
 			cout<<"fact_side"<<endl;
 			fact_side=(int)((double*)(current_var->data))[0];
