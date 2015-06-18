@@ -22,17 +22,17 @@ palm4MSA::palm4MSA(const faust_params& params_) :
    isUpdateWayR2L(params_.isUpdateWayR2L),
    lambda(params_.init_lambda),
    verbose(params_.isVerbose),
-   nb_fact(params_.nb_fact),
+   nb_fact(0),
    S(params_.init_fact),
-   RorL(std::vector<faust_mat>(2)),
+   RorL(vector<faust_mat>(2)),
    ind_fact(0),
+   ind_ite(0),
    lipschitz_multiplicator(1.001),
    isCComputed(false),
    isGradComputed(false),
-   isProjectionComputed(false)
-{
-   check_constraint_validity();
-}
+   isProjectionComputed(false),
+   isLastFact(false),
+   isConstraintSet(false){}
 
 palm4MSA::palm4MSA(const faust_params_palm& params_palm_) :
    data(params_palm_.data),
@@ -41,15 +41,18 @@ palm4MSA::palm4MSA(const faust_params_palm& params_palm_) :
    verbose(params_palm_.isVerbose),
    nb_fact(params_palm_.nb_fact),
    S(params_palm_.init_fact),
-   RorL(std::vector<faust_mat>(2)),
+   RorL(vector<faust_mat>(2)),
    LorR(faust_mat(params_palm_.init_fact[0].getNbRow())),
    stop_crit(params_palm_.stop_crit),
    const_vec(params_palm_.cons),
    ind_fact(0),
+   ind_ite(0),
    lipschitz_multiplicator(1.001),
    isCComputed(false),
    isGradComputed(false),
-   isProjectionComputed(false)
+   isProjectionComputed(false),
+   isLastFact(false),
+   isConstraintSet(false)
 {
    check_constraint_validity();
 
@@ -167,9 +170,9 @@ void palm4MSA::compute_projection()
          break;
 
          default:
-            std::cerr << "error in palm4MSA::compute_projection : unknown name of constraint" << std::endl;
+            cerr << "error in palm4MSA::compute_projection : unknown name of constraint" << endl;
             exit(EXIT_FAILURE);
-         break;       
+
       }
    }
     
@@ -181,7 +184,7 @@ void palm4MSA::compute_grad_over_c()
 
    if(!isCComputed) 
    {
-      std::cerr << "c must be set before computing grad/c" << std::endl;
+      cerr << "c must be set before computing grad/c" << endl;
       exit(EXIT_FAILURE);
    }
 
@@ -193,32 +196,12 @@ void palm4MSA::compute_grad_over_c()
    else
       multiply(RorL[ind_fact], S[ind_fact], tmp1);
    
-
-
-   if (ind_fact == nb_fact-1)
-   {
-      
-      // X_hat = tmp1*R  (= L*S*R )
-      if (!isUpdateWayR2L)
-         multiply(tmp1, RorL[ind_fact], X_hat);
-      else
-         multiply(tmp1, LorR, X_hat);
-         
-       
-      // error = (X_hat*lambda)-data  (= lambda*L*S*R - data )
-      error = X_hat;
-      error *= lambda;
-      error -= data;
-   }
+   error = data;
+   // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
+   if (!isUpdateWayR2L)
+      gemm(tmp1, RorL[ind_fact], error, lambda, -1.0, 'N', 'N');
    else
-   {
-      error = data;
-      // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
-      if (!isUpdateWayR2L)
-         gemm(tmp1, RorL[ind_fact], error, lambda, -1.0, 'N', 'N');
-      else
-         gemm(tmp1, LorR, error, lambda, -1.0, 'N', 'N');
-   }
+      gemm(tmp1, LorR, error, lambda, -1.0, 'N', 'N');
 
    // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
    // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
@@ -233,41 +216,35 @@ void palm4MSA::compute_grad_over_c()
       gemm(tmp3, LorR, grad_over_c,1.0/c, 0.0,'N','T');
    }
 
-//char filename[100];
-//sprintf(filename,"grad_over_c%d.dat",ind_fact);
-//grad_over_c.print_file(filename);
-
-
    isGradComputed = true;
 }
 
 void palm4MSA::compute_lambda()
 {
-   if (ind_fact != nb_fact-1)
+   if (!isLastFact)
    {
-      std::cerr << "error in palm4MSA::compute_lambda : computation of lamda must be done at the end of the iteration through the number of factors" << std::endl;
+      cerr << "error in palm4MSA::compute_lambda : computation of lamda must be done at the end of the iteration through the number of factors" << endl;
       exit(EXIT_FAILURE);
    }
 
+   // As LorR has also been updated at the end of the last iteration over the facts, LorR matches X_hat, which the product of all factors, including the last one.
    // Xt_Xhat = data'*X_hat
    faust_mat Xt_Xhat;
-   gemm(data, X_hat,Xt_Xhat, 1.0, 0.0, 'T','N');
+   gemm(data, LorR, Xt_Xhat, 1.0, 0.0, 'T','N');
    
    // Xhatt_Xhat = X_hat'*X_hat
    faust_mat Xhatt_Xhat;
-   gemm(X_hat, X_hat, Xhatt_Xhat, 1.0, 0.0, 'T','N');
+   gemm(LorR, LorR, Xhatt_Xhat, 1.0, 0.0, 'T','N');
 
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
-   std::cout<<"lambda="<<lambda<<std::endl;
+   cout<<"lambda="<<lambda<<endl;
 }
 
 
 void palm4MSA::update_R()
 {
    // R[nb_fact-1] est initialise a l'identite lors de la creation de l'objet palm4MSA et n'est pas cense changer
-
-      
 
    if (!isUpdateWayR2L)
    {
@@ -286,7 +263,7 @@ void palm4MSA::update_R()
 void palm4MSA::update_L()
 {
    if(!isProjectionComputed){
-      std::cerr << "Projection must be computed before updating L" << std::endl;
+      cerr << "Projection must be computed before updating L" << endl;
       exit(EXIT_FAILURE);
    }
    if(!isUpdateWayR2L)
@@ -303,16 +280,25 @@ void palm4MSA::update_L()
 
 void palm4MSA::check_constraint_validity()
 {
+
    if (nb_fact != S.size())
    {
-      std::cerr << "Error in palm4MSA::check_constraint_validity : Wrong initialization: params.nfacts and params.init_facts are in conflict" << std::endl;
+      cerr << "Error in palm4MSA::check_constraint_validity : Wrong initialization: params.nfacts and params.init_facts are in conflict" << endl;
       exit(EXIT_FAILURE);
    }
 }
 
-void palm4MSA::init_fact()
+void palm4MSA::init_fact(int nb_facts_)
 {
-   
+ 
+  if(!isConstraintSet)
+  {
+     cerr << "Error in palm4MSA::init_fact : constrainst must be set before calling init_fact" << endl;
+     exit(EXIT_FAILURE);
+  }
+
+   nb_fact = nb_facts_;
+   S.resize(nb_fact);
    if (isUpdateWayR2L)
    {
       S[0].resize(const_vec[0]->getRows(), const_vec[0]->getCols());
@@ -332,47 +318,65 @@ void palm4MSA::init_fact()
       } 
       S[nb_fact-1].resize(const_vec[nb_fact-1]->getRows(), const_vec[nb_fact-1]->getCols());
       S[nb_fact-1].setZeros();   
-   }  
+   } 
+
+    
 }
 
 void palm4MSA::next_step()
 {
-   update_R();
+   check_constraint_validity();
   
    // resizing L or R 
    if(!isUpdateWayR2L)
    {
       LorR.resize(const_vec[0]->getRows());
       LorR.setEyes();
+      update_R();
    }
    else
    {
       LorR.resize(const_vec[nb_fact-1]->getCols());
       LorR.setEyes();
+      update_L();
    }
       
-
-   ind_fact = 0;
+   
+   int* ind_ptr = new int[nb_fact];
+   for (int j=0 ; j<nb_fact ; j++)
+      if (!isUpdateWayR2L)
+         ind_ptr[j] = j;
+      else
+         ind_ptr[j] = nb_fact-1-j;
+     
    for (int j=0 ; j<nb_fact ; j++)
    {
+      if (j == nb_fact-1)
+         isLastFact = true;
+      else
+         isLastFact = false;
+      ind_fact = ind_ptr[j];
+
+
       isCComputed = false;
       isGradComputed = false;
       isProjectionComputed = false;
-     cout<<"OK1"<<endl; 
       compute_c();
-     cout<<"OK2"<<endl; 
       // X_hat is computed by compute_grad_over_c only when j=ind_fact-1
       compute_grad_over_c();
-     cout<<"OK3"<<endl; 
       compute_projection();
-     cout<<"OK4"<<endl; 
-      update_L();
-     cout<<"OK5"<<endl; 
+   
+      if(!isUpdateWayR2L)
+         update_L();
+      else
+         update_R();
     
-      ind_fact++; 
+      if (isLastFact)
+         compute_lambda();
    }
-   compute_lambda();
 
+   delete[] ind_ptr;
+   ind_ptr = NULL;
 
 }
 
@@ -380,9 +384,15 @@ void palm4MSA::init_fact_from_palm(const palm4MSA& palm2, bool isFactSideLeft)
 {
    if (palm2.nb_fact != 2)
    {
-      std::cerr << "argument palm2 must contain 2 factors." << std::endl;
+      cerr << "argument palm2 must contain 2 factors." << endl;
       exit(EXIT_FAILURE);
    }
+
+  if(!isConstraintSet)
+  {
+     cerr << "Error in palm4MSA::init_fact_from_palm : constrainst must be set before calling init_fact_from_palm" << endl;
+     exit(EXIT_FAILURE);
+  }
 
    if(isFactSideLeft) 
    {
@@ -395,5 +405,7 @@ void palm4MSA::init_fact_from_palm(const palm4MSA& palm2, bool isFactSideLeft)
       S.push_back(palm2.S[1]);
    }
    nb_fact++;
+
+   check_constraint_validity();
 }
 

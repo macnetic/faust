@@ -13,7 +13,7 @@ stopping_criterion::stopping_criterion(bool isCriterionError_) : isCriterionErro
       nb_it = 500;
 }
 
-void stopping_criterion::check_validity()
+void stopping_criterion::check_validity()const
 {
    if (isCriterionError)
       if (errorThreshold>1 || maxIteration < 0)
@@ -29,7 +29,7 @@ void stopping_criterion::check_validity()
 }
 
 // current_ite in zero-based indexing
-bool stopping_criterion::do_continue(int current_ite, faust_real current_error /* = -2.0 */)
+bool stopping_criterion::do_continue(int current_ite, faust_real current_error /* = -2.0 */)const
 {
    if (!isCriterionError) // if criterion is number of iteration, current_error does not matter
       return current_ite<nb_it ? true : false;

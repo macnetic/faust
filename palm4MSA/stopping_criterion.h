@@ -20,10 +20,10 @@ class stopping_criterion
 
       ~stopping_criterion(){}
 
-      bool do_continue(int current_ite, faust_real error=-2.0);
+      bool do_continue(int current_ite, faust_real error=-2.0)const;
 
    private:
-      void check_validity();
+      void check_validity()const;
 
    private:
       int nb_it;   // number of iterations if !isCriterionError
