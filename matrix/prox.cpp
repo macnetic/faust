@@ -148,6 +148,11 @@ void prox_spcol(faust_mat & M,int k)
 		}
 		
 	}
+	faust_real normM = new_M.norm();
+	if (normM != 0)
+	{
+		new_M.scalarMultiply(1/normM);
+	}
 	M=new_M;
 	
 }
@@ -159,6 +164,7 @@ void prox_splin(faust_mat & M,int k)
 	M.transpose();
 	prox_spcol(M,k);
 	M.transpose();
+
 }
 
 //  normcol of the zero matrix equal to the matrix with all elements equal to s,
