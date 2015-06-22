@@ -4,14 +4,14 @@ MATRIX_DIR = ../../matrix
 PALM_DIR = ..
 INIT_MATLAB = ../../init_from_matlab
 
-SRC_CPP = hierarchical_fact_test.cpp #palm4MSA_test.cpp 
-SRC_CPP += $(wildcard $(PALM_DIR)/*.cpp) #$(filter-out $(PALM_DIR)/hierarchical_fact.cpp,$(wildcard $(PALM_DIR)/*.cpp))
+SRC_CPP = hierarchical_fact_test.cpp    #palm4MSA_test.cpp 
+SRC_CPP += $(wildcard $(PALM_DIR)/*.cpp)  #$(filter-out $(PALM_DIR)/hierarchical_fact.cpp,$(wildcard $(PALM_DIR)/*.cpp))    #$(wildcard $(PALM_DIR)/*.cpp)
 SRC_CPP += $(wildcard $(INIT_MATLAB)/*.cpp)
 SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
 
-CXXFLAGS =  -O3 -I$(MATRIX_DIR) -I$(EIGENDIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIODIR)/include -Winline
+CXXFLAGS = -O3  -I$(MATRIX_DIR) -I$(EIGENDIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIODIR)/include #-Winline
 
 LDFLAGS = -L$(MATIODIR)/lib -lmatio -lhdf5
 

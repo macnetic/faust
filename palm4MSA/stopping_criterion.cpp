@@ -31,6 +31,7 @@ void stopping_criterion::check_validity()const
 // current_ite in zero-based indexing
 bool stopping_criterion::do_continue(int current_ite, faust_real current_error /* = -2.0 */)const
 {
+
    if (!isCriterionError) // if criterion is number of iteration, current_error does not matter
       return current_ite<nb_it ? true : false;
    else if (isCriterionError && current_error != -2.0) 

@@ -17,7 +17,7 @@
 
 using namespace std;
 
-palm4MSA::palm4MSA(const faust_params& params_) :
+palm4MSA::palm4MSA(const faust_params& params_, const bool isGlobal_) :
    data(params_.data),
    isUpdateWayR2L(params_.isUpdateWayR2L),
    lambda(params_.init_lambda),
@@ -32,9 +32,17 @@ palm4MSA::palm4MSA(const faust_params& params_) :
    isGradComputed(false),
    isProjectionComputed(false),
    isLastFact(false),
-   isConstraintSet(false){}
+   isConstraintSet(false),
+   isGlobal(isGlobal_),
+   isInit(false)
+{
+   if(isGlobal)
+      stop_crit = stopping_criterion(params_.stop_crit_global);
+   else
+      stop_crit = stopping_criterion(params_.stop_crit_2facts);
+}
 
-palm4MSA::palm4MSA(const faust_params_palm& params_palm_) :
+palm4MSA::palm4MSA(const faust_params_palm& params_palm_, const bool isGlobal_) :
    data(params_palm_.data),
    isUpdateWayR2L(params_palm_.isUpdateWayR2L),
    lambda(params_palm_.init_lambda),
@@ -52,7 +60,8 @@ palm4MSA::palm4MSA(const faust_params_palm& params_palm_) :
    isGradComputed(false),
    isProjectionComputed(false),
    isLastFact(false),
-   isConstraintSet(false)
+   isConstraintSet(false),
+   isGlobal(isGlobal_)
 {
    check_constraint_validity();
 
@@ -81,7 +90,7 @@ void palm4MSA::compute_projection()
          case CONSTRAINT_NAME_SPCOL:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_spcol(S[ind_fact], const_int->getParameter());
+            prox_spcol(S[ind_fact], const_int->getParameter());
          }
          break;
 
@@ -175,7 +184,6 @@ void palm4MSA::compute_projection()
 
       }
    }
-    
    isProjectionComputed = true;
 }
 
@@ -188,11 +196,15 @@ void palm4MSA::compute_grad_over_c()
       exit(EXIT_FAILURE);
    }
 
-
    faust_mat tmp1, tmp2, tmp3, tmp4;
    // tmp1 = L*S
    if (!isUpdateWayR2L)
+{
+//LorR.print_file("L.dat");
+//S[ind_fact].print_file("S.dat");
+//tmp1.print_file("tmp1.dat");
       multiply(LorR, S[ind_fact], tmp1);
+}
    else
       multiply(RorL[ind_fact], S[ind_fact], tmp1);
    
@@ -231,21 +243,21 @@ void palm4MSA::compute_lambda()
    // Xt_Xhat = data'*X_hat
    faust_mat Xt_Xhat;
    gemm(data, LorR, Xt_Xhat, 1.0, 0.0, 'T','N');
-   
+
    // Xhatt_Xhat = X_hat'*X_hat
    faust_mat Xhatt_Xhat;
    gemm(LorR, LorR, Xhatt_Xhat, 1.0, 0.0, 'T','N');
 
+
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
-   cout<<"lambda="<<lambda<<endl;
+   cout<<__SP lambda<<endl;
 }
 
 
 void palm4MSA::update_R()
 {
    // R[nb_fact-1] est initialise a l'identite lors de la creation de l'objet palm4MSA et n'est pas cense changer
-
    if (!isUpdateWayR2L)
    {
       RorL[nb_fact-1].resize(const_vec[nb_fact-1]->getCols());
@@ -290,7 +302,23 @@ void palm4MSA::check_constraint_validity()
 
 void palm4MSA::init_fact(int nb_facts_)
 {
- 
+  /*if(isInit && isGlobal)
+  {
+     cerr << "Error in palm4MSA::init_fact : global factorization has already been initialized" <<endl;
+     exit(EXIT_FAILURE);
+  }
+  else if (isGlobal)
+  {
+     nb_fact = 1;
+     S.resize(nb_fact);
+     isInit = true;
+     return;
+  }*/
+
+
+
+// if !isGlobal
+
   if(!isConstraintSet)
   {
      cerr << "Error in palm4MSA::init_fact : constrainst must be set before calling init_fact" << endl;
@@ -299,7 +327,7 @@ void palm4MSA::init_fact(int nb_facts_)
 
    nb_fact = nb_facts_;
    S.resize(nb_fact);
-   if (isUpdateWayR2L)
+   if (!isUpdateWayR2L)
    {
       S[0].resize(const_vec[0]->getRows(), const_vec[0]->getCols());
       S[0].setZeros();
@@ -326,7 +354,6 @@ void palm4MSA::init_fact(int nb_facts_)
 void palm4MSA::next_step()
 {
    check_constraint_validity();
-  
    // resizing L or R 
    if(!isUpdateWayR2L)
    {
@@ -340,8 +367,7 @@ void palm4MSA::next_step()
       LorR.setEyes();
       update_L();
    }
-      
-   
+
    int* ind_ptr = new int[nb_fact];
    for (int j=0 ; j<nb_fact ; j++)
       if (!isUpdateWayR2L)
@@ -356,7 +382,6 @@ void palm4MSA::next_step()
       else
          isLastFact = false;
       ind_fact = ind_ptr[j];
-
 
       isCComputed = false;
       isGradComputed = false;

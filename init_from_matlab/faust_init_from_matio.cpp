@@ -506,7 +506,7 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 		if (strcmp(current_fieldName,"cons")==0)
 		{
 			vector<const faust_constraint_generic*> consS;
-			vector<vector<const faust_constraint_generic*>> consSS;
+			vector<vector<const faust_constraint_generic*> > consSS;
 			cout<<"size_tab cont :dim1 "<<current_var->dims[0]<<endl;
 			cout<<"size_tab cont :dim2 "<<current_var->dims[1]<<endl;
 			int shift = 0;
@@ -527,7 +527,7 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 
 				for (int L=0;L<consS.size();L++)
 				{
-					cout<<get_constraint_name((*consS[L]).getConstraintType())<<endl;
+					cout<<consS[L]->get_constraint_name()<<endl;
 					//cout<<"params :"<<(*params.cons[L]).getParameter()<<endl;
 					cout<<"nb_row :"<<(*consS[L]).getRows()<<endl;
 					cout<<"nb_col :"<<(*consS[L]).getCols()<<endl;

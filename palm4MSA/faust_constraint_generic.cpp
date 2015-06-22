@@ -42,9 +42,9 @@ std::string getConstraintType(faust_constraint_name cons_name)
 
 
 
-const char* get_constraint_name(faust_constraint_name cons_name)
+const char* faust_constraint_generic::get_constraint_name()const
 {
-   switch(cons_name)
+   switch(constraint_name)
    {
       case CONSTRAINT_NAME_SP:
          return "CONSTRAINT_NAME_SP";

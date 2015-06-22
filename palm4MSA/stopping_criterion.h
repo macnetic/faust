@@ -2,6 +2,7 @@
 #define __FAUST_STOPPING_CRITERION__
 
 #include "faust_constant.h"
+#include <iostream>
 
 class stopping_criterion
 {

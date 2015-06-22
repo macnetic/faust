@@ -112,7 +112,7 @@ void prox_spcol(faust_mat & M,int k)
 		id_col_mat.assign(dim1,j);
 		M_abs.getCoeffs(values_per_Col,id_row,id_col_mat);
 		current_col.setCoeffs(values_per_Col,id_row,id_col);//copie des coefficents de la matrice dans une matrice column
-		std::cout<<"avant boucle while"<<std::endl;
+		//std::cout<<"avant boucle while"<<std::endl;
 		while (nb_elt_found < k)
 		{
 			id_row_max.resize(0);
