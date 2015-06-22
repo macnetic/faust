@@ -18,18 +18,6 @@ void prox_sp(faust_mat & M,int k)
 	M_abs.abs();
 	new_M.setZeros();
 	
-	/*
-	std::cout<<"*** M ****"<<std::endl;
-	M.Display();
-	
-	
-	std::cout<<"*** M_abs ****"<<std::endl;
-	M_abs.Display();
-	
-	
-	std::cout<<"*** new_M ****"<<std::endl;
-	new_M.Display();
-	*/
 	
 	int nb_elt_found = 0;
 
@@ -223,6 +211,43 @@ void prox_normcol(faust_mat & M,faust_real s)
 }
 
 
+void prox_normlin(faust_mat & M,faust_real s)
+{
+	M.transpose();
+	prox_normcol(M,s);
+	M.transpose();
+	
+}
+
+
+
+void prox_supp(faust_mat & M, const faust_mat & supp)
+{
+	if ( (supp.getNbRow() != M.getNbRow()) || (supp.getNbCol() != M.getNbCol()) )
+	{
+		std::cerr << "ERROR prox_supp : dimensions of the matrix mismatch " << std::endl;
+		exit( EXIT_FAILURE);	
+	}
+	faust_real value;
+	for (int i=0;i<M.getNbRow();i++)
+	{
+		for (int j=0;j<M.getNbCol();j++)
+		{
+			value=supp.getCoeff(i,j);
+			if (value == 0)
+			{
+				M.setCoeff(0,i,j);
+			}
+		}
+	}
+	
+	faust_real normM = M.norm();
+	if (normM != 0)
+	{
+		M.scalarMultiply(1/normM);
+	}
+	
+}
 
 
 
@@ -251,8 +276,204 @@ void prox_sp_pos(faust_mat & M,int k)
 	
 }
 
-//void prox_splin(faust_mat & M,int k){M.init_from_file("facts0.txt");}
-//void prox_normcol(faust_mat & M, faust_real k){M.init_from_file("facts1.txt");}
+
+
+// M needs to be square and k must divide dimension of M
+void prox_blkdiag(faust_mat & M,int k)
+{   
+	int i,j;
+	int Msize = M.getNbRow();
+	if (Msize != M.getNbCol())
+	{
+		std::cerr << "ERROR prox_blkdiag : input matrix must be square " << std::endl;
+		exit( EXIT_FAILURE);	
+	}
+	
+	int sizeblock = Msize/k;
+	faust_mat new_M(Msize,Msize);
+	new_M.setZeros();
+	std::cout<<"sizeblock : "<<sizeblock<<std::endl;
+	
+	for (int ii=0;ii<k;ii++)
+	{
+		for (i=sizeblock*ii;i<sizeblock*(ii+1);i++)
+		{
+			for (j=sizeblock*ii;j<sizeblock*(ii+1);j++)
+			{	
+				//std::cout<<M.getCoeff(i,j)<<std::endl;
+				new_M.setCoeff(M.getCoeff(i,j),i,j);	
+			}
+		
+		}
+		
+	}
+
+	M = new_M;
+
+	faust_real normM = M.norm();
+	if (normM != 0)
+	{
+		M.scalarMultiply(1/normM);
+	}	
+		
+	
+}
+
+
+
+void prox_toeplitz(faust_mat & M, int k)
+{	
+	int nl = M.getNbRow();
+	int nc = M.getNbCol();
+	faust_mat crit(nl+nc-1,1);
+	faust_mat new_M(nl,nc);
+	new_M.setZeros();
+	std::vector<faust_real> diag_meanS;
+	std::vector<int> num_elt_diagS;
+	int num_elt_diag;
+	int min_dim = std::min(nl,nc);
+	int shift_dim = nc-nl;
+	faust_real current_mean;
+	int id_col,id_row;
+	
+	diag_meanS.resize(nl+nc-1);
+	num_elt_diagS.resize(nl+nc+1);
+	
+	if (k>nl+nc-1)
+	{
+		std::cerr << "ERROR prox_toeplitz : k > (nb_Row+nbCol-1) of M " << std::endl;
+		exit( EXIT_FAILURE);	
+	}
+	
+	std::cout<<"boucle critere :"<<std::endl;
+	for (int i=-nl+1;i<nc;i++)
+	{	
+		/*
+		if ( ((i>=shift_dim) && (i<=0)) || ((i<=(shift_dim)) && (i>=0)) )
+		{	std::cout<<"min_dim"<<std::endl;
+			num_elt_diag = min_dim; 
+		}else
+		{	
+			std::cout<<"soustraction"<<std::endl;
+			num_elt_diag = min_dim - (abs(shift_dim) - abs(i));
+		}
+		*/
+		if (shift_dim < 0)
+		{
+			if (i<=0)
+			{
+				if (i<shift_dim)
+				{	std::cout<<"cas1"<<std::endl;
+					num_elt_diag = min_dim-abs(i+abs(shift_dim));
+				}else
+				{	
+					std::cout<<"cas2"<<std::endl;
+					num_elt_diag = min_dim;
+				}
+			}else
+			{
+				std::cout<<"cas3"<<std::endl;
+				num_elt_diag = min_dim-i;
+			}
+		}else
+		{
+			if (i>=0)
+			{
+				if (i>shift_dim)
+				{	std::cout<<"cas4"<<std::endl;
+					num_elt_diag = min_dim-abs(i-abs(shift_dim));
+				}else
+				{	
+					std::cout<<"cas5"<<std::endl;
+					num_elt_diag = min_dim;
+				}
+			}else
+			{
+				std::cout<<"cas6"<<std::endl;
+				num_elt_diag = min_dim-abs(i);
+			}
+		}
+		
+		
+		num_elt_diagS[i+nl-1]=num_elt_diag;
+		
+		if (i < 0)
+		{
+			id_row = -i;
+			id_col = 0;
+		}else
+		{
+			id_row = 0;
+			id_col = i;
+		}
+		std::cout<<"id_row : "<<id_row<<std::endl;
+		std::cout<<"id_col : "<<id_col<<std::endl;
+		std::cout<<"nombre diagonal : "<<num_elt_diag<<std::endl;
+		
+		current_mean = 0;
+		std::cout<<"coeff diag"<<std::endl;
+		for (int l=0;l<num_elt_diag;l++)
+		{	
+			std::cout<<M.getCoeff(id_row+l,id_col+l)<<std::endl;
+			current_mean = current_mean + M.getCoeff(id_row+l,id_col+l);
+		}
+		
+		current_mean = current_mean/((faust_real) num_elt_diag);
+		std::cout<<"mean : "<<current_mean<<std::endl;
+		
+		diag_meanS[i+nl-1]=current_mean;
+		crit.setCoeff(current_mean*current_mean*((faust_real)num_elt_diag),i+nl-1,0);
+		
+	}
+	
+	std::cout<<" crit : "<<std::endl;
+	crit.Display();
+	prox_sp(crit,k);
+	int ll;
+	std::cout<<"boucle sparse"<<std::endl;
+	for (int i=0;i<nl+nc-1;i++)
+	{
+		if (crit.getCoeff(i,0) != 0)
+		{
+			ll = i-nl+1;
+			if (ll < 0)
+			{
+				id_row = -ll;
+				id_col = 0;
+			}else
+			{
+				id_row = 0;
+				id_col = ll;
+			}
+			current_mean = diag_meanS[i];
+			for (int l=0;l<num_elt_diagS[i];l++)
+			{
+				new_M.setCoeff(current_mean,id_row+l,id_col+l);
+			}
+		}
+		
+	}
+	
+	M = new_M;
+
+	faust_real normM = M.norm();
+	if (normM != 0)
+	{
+		M.scalarMultiply(1/normM);
+	}	
+	
+	
+	
+	
+}
+	
+	
+	
+	
+	
+	
+
+
 
 
 
