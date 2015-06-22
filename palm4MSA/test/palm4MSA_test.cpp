@@ -66,7 +66,7 @@ int main()
 
   faust_params_palm params(data, nfacts, cons, init_fact, crit, verbose, update_way, init_lambda);
 
-  palm4MSA palm2(params);
+  palm4MSA palm2(params, true);
 
   palm2.next_step();
 

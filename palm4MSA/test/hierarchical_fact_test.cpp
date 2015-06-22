@@ -110,9 +110,9 @@ faust_real cons21_parameter;
   hierarchical_fact hier_fact(params);
 
   hier_fact.init();
-  for (int i=0 ; i<nfacts-2 ; i++)
+  for (int i=0 ; i<=nfacts-2 ; i++)
   {
-     cout<<"i="<<i<<endl;
+     //cout<<"i="<<i<<endl;
      hier_fact.next_step();
   }
 

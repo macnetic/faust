@@ -260,15 +260,16 @@ void palm4MSA::update_R()
    // R[nb_fact-1] est initialise a l'identite lors de la creation de l'objet palm4MSA et n'est pas cense changer
    if (!isUpdateWayR2L)
    {
+      RorL.resize(nb_fact);
       RorL[nb_fact-1].resize(const_vec[nb_fact-1]->getCols());
       RorL[nb_fact-1].setEyes();
+
       for (int i=nb_fact-2 ; i>-1 ; i--)
          //  R[i] = S[i+1] * R[i+1]
          multiply(S[i+1], RorL[i+1], RorL[i]);
    }
    else
       LorR.multiplyLeft(S[ind_fact]);
-
 }
 
 
@@ -282,6 +283,7 @@ void palm4MSA::update_L()
       LorR *= S[ind_fact];
    else
    {
+      RorL.resize(nb_fact);
       RorL[0].resize(const_vec[0]->getRows());
       RorL[0].setEyes();
       for (int i=0 ; i>nb_fact-2 ; i++)

@@ -73,6 +73,7 @@ void hierarchical_fact::next_step()
 
 
    palm_global.init_fact_from_palm(palm_2, isFactSideLeft);
+
    while(palm_global.do_continue())
       palm_global.next_step();
    
