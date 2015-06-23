@@ -23,6 +23,8 @@ class faust_params
          const bool isUpdateWayR2L_ = false ,
          const bool isFactSideLeft_ = false ,
          const faust_real init_lambda_ = 1.0 );
+		 
+	  faust_params();
 
       void check_constraint_validity();
 

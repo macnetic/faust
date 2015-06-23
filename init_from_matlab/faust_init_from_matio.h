@@ -19,5 +19,5 @@ void init_params_palm_from_matiofile(faust_params_palm& params, const char* file
 void init_params_from_matiofile(faust_params& params, const char* fileName, const char* variableName);
 
 void write_faust_mat_into_matfile( faust_mat& M, const char* fileName, const char* variableName);
-
+void Display_params(faust_params & params);
 #endif

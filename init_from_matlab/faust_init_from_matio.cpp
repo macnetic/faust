@@ -181,7 +181,7 @@ void init_faust_mat_vector_from_matiofile( vector<faust_mat> & vec_M, const char
 	
 
 	matvar_t* facts_var = faust_matio_read_variable(fileName,"facts");
-	cout<<"lecture facts"<<endl;
+	//cout<<"lecture facts"<<endl;
 	matvar_t*   current_fact_var;
 	faust_mat current_fact;
 	vec_M.resize(0);
@@ -194,7 +194,7 @@ void init_faust_mat_vector_from_matiofile( vector<faust_mat> & vec_M, const char
 	}
 	
 	int nbr_facts=facts_var->dims[1];
-	cout<<"nbr de  facts ="<< nbr_facts<<endl;
+	//cout<<"nbr de  facts ="<< nbr_facts<<endl;
 	for (int j=0;j<nbr_facts;j++)
 	{	
 
@@ -249,14 +249,14 @@ void init_params_palm_from_matiofile(faust_params_palm& params,const char* fileN
 	char*const* fieldNames;
 	fieldNames = Mat_VarGetStructFieldnames(params_var);
 	
-	cout<<"nbr de parametre ="<<nbr_params<<endl;
+	//cout<<"nbr de parametre ="<<nbr_params<<endl;
 	
-	cout<<"***FIELDNAMES*** ="<<endl;
+	//cout<<"***FIELDNAMES*** ="<<endl;
 	for (int i=0;i<nbr_params;i++)
 	{
-		cout<<fieldNames[i]<<endl;
+		//cout<<fieldNames[i]<<endl;
 	}
-	cout <<endl;
+	//cout <<endl;
 	
 	
 	char* current_fieldName;
@@ -290,24 +290,24 @@ void init_params_palm_from_matiofile(faust_params_palm& params,const char* fileN
 		}
 		if (strcmp(current_fieldName,"niter")==0)
 		{
-			cout<<"niter="<<endl;
+			//cout<<"niter="<<endl;
 			niter=(int)((double*)(current_var->data))[0];
 			stopping_criterion stop_cri(niter);
 			params.stop_crit=stop_cri;
-			cout<<niter<<endl;
+			//cout<<niter<<endl;
 		}
 		if (strcmp(current_fieldName,"nfacts")==0)
 		{
 		
-			cout<<"nfacts"<<endl;
+			//cout<<"nfacts"<<endl;
 			nfacts=(int)((double*)(current_var->data))[0];
-			cout<<nfacts<<endl;
+			//cout<<nfacts<<endl;
 			params.nb_fact = nfacts;
 		}
 				
 		if (strcmp(current_fieldName,"data")==0)
 		{
-			cout<<"data"<<endl;
+			//cout<<"data"<<endl;
 			init_mat_from_matvar(data_mat,current_var);
 			data_mat.check_dim_validity();
 			data_mat.Display();	
@@ -317,30 +317,30 @@ void init_params_palm_from_matiofile(faust_params_palm& params,const char* fileN
 		
 		if (strcmp(current_fieldName,"verbose")==0)
 		{
-			cout<<"verbose"<<endl;
+			//cout<<"verbose"<<endl;
 			verbose=(int)((double*)(current_var->data))[0];
-			cout<<verbose<<endl;
+			//cout<<verbose<<endl;
 			params.isVerbose = (bool) verbose;
 		}
 		
 		if (strcmp(current_fieldName,"updateway")==0)
 		{
-			cout<<"updateway"<<endl;
+			//cout<<"updateway"<<endl;
 			updateway=(int)((double*)(current_var->data))[0];
-			cout<<updateway<<endl;
+			//cout<<updateway<<endl;
 			params.isUpdateWayR2L=(bool) updateway;
 		}
 		
 		if (strcmp(current_fieldName,"init_lambda")==0)
 		{
-			cout<<"init_lambda"<<endl;
+			//cout<<"init_lambda"<<endl;
 			init_lambda=(double)((double*)(current_var->data))[0];
-			cout<<init_lambda<<endl;
+			//cout<<init_lambda<<endl;
 			params.init_lambda = (faust_real)init_lambda;
 		}
 		if (strcmp(current_fieldName,"init_facts")==0)
 		{
-			cout<<"init_facts"<<endl;
+			//cout<<"init_facts"<<endl;
 			init_facts.resize(0);
 			
 			for (int j=0;j<(current_var->dims[1]);j++)
@@ -392,14 +392,14 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 	char*const* fieldNames;
 	fieldNames = Mat_VarGetStructFieldnames(params_var);
 	
-	cout<<"nbr de parametre ="<<nbr_params<<endl;
+	//cout<<"nbr de parametre ="<<nbr_params<<endl;
 	
-	cout<<"***FIELDNAMES*** ="<<endl;
+	//cout<<"***FIELDNAMES*** ="<<endl;
 	for (int i=0;i<nbr_params;i++)
 	{
-		cout<<fieldNames[i]<<endl;
+		//cout<<fieldNames[i]<<endl;
 	}
-	cout <<endl;
+	//cout <<endl;
 	
 	
 	char* current_fieldName;
@@ -432,35 +432,35 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 		}
 		if (strcmp(current_fieldName,"niter1")==0)
 		{
-			cout<<"niter1="<<endl;
+			//cout<<"niter1="<<endl;
 			niter=(int)((double*)(current_var->data))[0];
 			stopping_criterion stop_cri(niter);
 			params.stop_crit_2facts=stop_cri;
-			cout<<niter<<endl;
+			//cout<<niter<<endl;
 		}
 		if (strcmp(current_fieldName,"niter2")==0)
 		{
-			cout<<"niter2="<<endl;
+			//cout<<"niter2="<<endl;
 			niter=(int)((double*)(current_var->data))[0];
 			stopping_criterion stop_cri(niter);
 			params.stop_crit_global=stop_cri;
-			cout<<niter<<endl;
+			//cout<<niter<<endl;
 		}
 		if (strcmp(current_fieldName,"nfacts")==0)
 		{
 		
-			cout<<"nfacts"<<endl;
+			//cout<<"nfacts"<<endl;
 			nfacts=(int)((double*)(current_var->data))[0];
-			cout<<nfacts<<endl;
+			//cout<<nfacts<<endl;
 			params.nb_fact = nfacts;
 		}
 				
 		if (strcmp(current_fieldName,"data")==0)
 		{
-			cout<<"data"<<endl;
+			//cout<<"data"<<endl;
 			init_mat_from_matvar(data_mat,current_var);
 
-			data_mat.Display();
+			//data_mat.Display();
 			data_mat.check_dim_validity();		
 			params.data=data_mat;
 
@@ -468,17 +468,17 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 		
 		if (strcmp(current_fieldName,"verbose")==0)
 		{
-			cout<<"verbose"<<endl;
+			//cout<<"verbose"<<endl;
 			verbose=(int)((double*)(current_var->data))[0];
-			cout<<verbose<<endl;
+			//cout<<verbose<<endl;
 			params.isVerbose = (bool) verbose;
 		}
 		
 		if (strcmp(current_fieldName,"updateway")==0)
 		{
-			cout<<"updateway"<<endl;
+			//cout<<"updateway"<<endl;
 			updateway=(int)((double*)(current_var->data))[0];
-			cout<<updateway<<endl;
+			//cout<<updateway<<endl;
 			if (updateway != (bool) updateway)
 			{     cerr<<"updateway isn't well define"<<endl;
 				exit(EXIT_FAILURE);	
@@ -488,18 +488,18 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 		
 		if (strcmp(current_fieldName,"init_lambda")==0)
 		{
-			cout<<"init_lambda"<<endl;
+			//cout<<"init_lambda"<<endl;
 			init_lambda=(double)((double*)(current_var->data))[0];
-			cout<<init_lambda<<endl;
+			//cout<<init_lambda<<endl;
 			params.init_lambda = (faust_real) init_lambda;
-			cout<<params.init_lambda<<endl;
+			//cout<<params.init_lambda<<endl;
 		}
 		
 		if(strcmp(current_fieldName,"fact_side")==0)
 		{
-			cout<<"fact_side"<<endl;
+			////cout<<"fact_side"<<endl;
 			fact_side=(int)((double*)(current_var->data))[0];
-			cout<<fact_side<<endl;
+			////cout<<fact_side<<endl;
 			params.isFactSideLeft=(bool) fact_side;
 		}
 		
@@ -507,8 +507,8 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 		{
 			vector<const faust_constraint_generic*> consS;
 			vector<vector<const faust_constraint_generic*> > consSS;
-			cout<<"size_tab cont :dim1 "<<current_var->dims[0]<<endl;
-			cout<<"size_tab cont :dim2 "<<current_var->dims[1]<<endl;
+			////cout<<"size_tab cont :dim1 "<<current_var->dims[0]<<endl;
+			////cout<<"size_tab cont :dim2 "<<current_var->dims[1]<<endl;
 			int shift = 0;
 			if ((current_var->dims[0]) != 2)
 			{
@@ -519,7 +519,7 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 			for (int ll=0;ll<(current_var->dims[0]);ll++)
 			{	
 				for (int j=0;j<(current_var->dims[1]);j++)
-				{	cout<<"j"<<j<<endl;
+				{	////cout<<"j"<<j<<endl;
 					current_cons_var = Mat_VarGetCell(current_var,2*j+shift);
 					add_constraint(consS,current_cons_var);				
 				}
@@ -527,14 +527,14 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 
 				for (int L=0;L<consS.size();L++)
 				{
-					cout<<consS[L]->get_constraint_name()<<endl;
-					//cout<<"params :"<<(*params.cons[L]).getParameter()<<endl;
-					cout<<"nb_row :"<<(*consS[L]).getRows()<<endl;
-					cout<<"nb_col :"<<(*consS[L]).getCols()<<endl;
+					////cout<<consS[L]->get_constraint_name()<<endl;
+					////cout<<"params :"<<(*params.cons[L]).getParameter()<<endl;
+					////cout<<"nb_row :"<<(*consS[L]).getRows()<<endl;
+					////cout<<"nb_col :"<<(*consS[L]).getCols()<<endl;
 					//faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[L]);
-					//cout<<"parameter :"<<(*const_int).getParameter()<<endl<<endl;					}
+					////cout<<"parameter :"<<(*const_int).getParameter()<<endl<<endl;					}
 				}
-				cout<<endl<<endl;
+				//cout<<endl<<endl;
 				
 				consSS.push_back(consS);
 				consS.resize(0);				
@@ -548,6 +548,7 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 		}
 		
 	}
+	params.check_constraint_validity();
 	
 			
 }
@@ -577,7 +578,7 @@ void add_constraint(std::vector<const faust_constraint_generic*> & consS,matvar_
 	{
 		name_cons+= (char) (((char*)(cons_name_var->data))[k]);
 	}
-	cout<<name_cons<<endl;
+	//cout<<name_cons<<endl;
 	bool is_const_int =((strcmp(name_cons.c_str(),"sp") == 0) || (strcmp(name_cons.c_str(),"sppos")==0));
 	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"spcol") == 0)));
 	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"splin") == 0)));
@@ -628,7 +629,7 @@ void add_constraint(std::vector<const faust_constraint_generic*> & consS,matvar_
 
 			int int_parameter;		
 			cons_field_var=Mat_VarGetCell(cons_var,1);
-			int_parameter =(int) (((double*) cons_field_var->data))[0];
+			int_parameter =(int) round((((double*) cons_field_var->data))[0]);
 
 
 					
@@ -721,7 +722,68 @@ void init_mat_from_matvar(faust_mat & M,matvar_t* var)
 	}
 }
 
+void Display_params(faust_params & params)
+{
 
+	cout<<"NFACTS : "<<params.nb_fact<<endl;
+	int nbr_iter_2_fact = 0;
+	while(params.stop_crit_2facts.do_continue(nbr_iter_2_fact))
+	{
+		nbr_iter_2_fact++;
+	}
+	int nbr_iter_global = 0;
+	while(params.stop_crit_global.do_continue(nbr_iter_global))
+	{
+		nbr_iter_global++;
+	}
+	cout<<"NBR_ITER_2_FACT : "<<nbr_iter_2_fact << endl;
+	cout<<"NBR_ITER_GLOBAL : "<<nbr_iter_global << endl;
+	cout<<"VERBOSE : "<<params.isVerbose<<endl;
+	cout<<"UPDATEWAY : "<<params.isUpdateWayR2L<<endl;
+	cout<<"INIT_LAMBDA : "<<params.init_lambda<<endl;
+	cout<<"ISFACTSIDELEFT : "<<params.isFactSideLeft<<endl;
+	cout<<"DATA : "<<endl;
+	params.data.Display();
+	cout<<"INIT_FACTS :"<<endl;
+	for (int L=0;L<params.init_fact.size();L++)params.init_fact[L].Display();
+
+	cout<<"CONS : nbr "<< params.cons[0].size()<<endl;
+
+	for (int L=0;L<params.cons[0].size();L++)
+	{
+		for (int jl=0;jl<params.cons.size();jl++)
+		{	string type_cons;
+			type_cons.resize(0);
+			type_cons=getConstraintType((*params.cons[jl][L]).getConstraintType());
+			cout<<"type_cont : "<<type_cons<<" ";
+			cout<<(*params.cons[jl][L]).get_constraint_name();
+			cout<<" nb_row :"<<(*params.cons[jl][L]).getRows();
+			cout<<" nb_col :"<<(*params.cons[jl][L]).getCols();
+			
+			
+			if (strcmp(type_cons.c_str(),"INT") == 0)
+			{	
+				faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[jl][L]);
+				cout<<" parameter :"<<(*const_int).getParameter()<<endl;
+			}
+			
+			if (strcmp(type_cons.c_str(),"FAUST_REAL") == 0)
+			{	
+				faust_constraint_real* const_real = (faust_constraint_real*)(params.cons[jl][L]);
+				cout<<" parameter :"<<(*const_real).getParameter()<<endl;
+			}
+			
+			if (strcmp(type_cons.c_str(),"FAUST_MAT") == 0)
+			{	
+				faust_constraint_mat* const_mat = (faust_constraint_mat*)(params.cons[jl][L]);
+				cout<<" parameter :"<<endl;
+				(*const_mat).getParameter().Display();
+			}
+			
+		}
+		cout<<endl<<endl;
+	}
+}
 
 
 

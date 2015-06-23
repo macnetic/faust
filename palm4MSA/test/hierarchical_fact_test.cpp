@@ -106,18 +106,32 @@ faust_real cons21_parameter;
   stopping_criterion crit_global(niter2);
 
   faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global, verbose, update_way, fact_side);
-
+  	 
   hierarchical_fact hier_fact(params);
 
+  faust_params params2;
+  //init_params_from_matiofile(faust_params& params, const char* fileName, const char* variableName);
+  init_params_from_matiofile(params2,"false_config_compared_hierarchical_fact.mat","params");	
+  
+    hierarchical_fact hier_fact2(params2);
+  
   hier_fact.init();
+  hier_fact2.init();
   faust_timer t1;
   t1.start();
   for (int i=0 ; i<=nfacts-2 ; i++)
   {
-     //cout<<"i="<<i<<endl;
-     hier_fact.next_step();
+     cout<<"i="<<i<<endl;
+	 hier_fact2.next_step();
   }
+  /*for (int i=0 ; i<=nfacts-2 ; i++)
+  {
+     cout<<"i="<<i<<endl;
+     hier_fact.next_step();
 
+  }*/
+  //cout<<"lambda"<<hier_fact.lambda<<endl;
+  //cout<<"lambda 1 : "<<hier_fact2.lambda<<endl;	  
   t1.stop();
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 return 0;
