@@ -16,6 +16,8 @@ class hierarchical_fact
 
       void init();
       void next_step();
+      const std::vector<faust_mat>& get_facts()const {return palm_global.get_facts();}
+      faust_real get_lambda()const{return palm_global.get_lambda();}
 
 
    private:

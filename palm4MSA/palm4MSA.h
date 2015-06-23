@@ -36,6 +36,7 @@ class palm4MSA
       //bool do_continue()const{return stop_crit.do_continue(ind_ite++, error);};
       
       void init_fact_from_palm(const palm4MSA& palm, bool isFactSideLeft);
+      const std::vector<faust_mat>& get_facts()const {return S;}
 
       ~palm4MSA(){}
 

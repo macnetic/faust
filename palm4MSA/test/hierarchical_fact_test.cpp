@@ -134,5 +134,17 @@ faust_real cons21_parameter;
   //cout<<"lambda 1 : "<<hier_fact2.lambda<<endl;	  
   t1.stop();
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
+
+
+  const vector<faust_mat>& facts = hier_fact.get_facts();
+  
+  /*char nomFichier[100];
+  for (int i=0 ; i<facts.size() ; i++)
+  {
+     sprintf(nomFichier, "facts%d_cpp.dat",i);
+     facts[i].print_file(nomFichier);
+  }
+  cout<<"lambda="<<hier_fact.get_lambda()<<endl;*/
+
 return 0;
 }
