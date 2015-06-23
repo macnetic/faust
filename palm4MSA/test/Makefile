@@ -38,12 +38,19 @@ CYAN    =36m
 RESET_FONT =\033[0m
 
 
-all:hier_fact palm meg
+all:hier_fact hier_fact2 palm meg
 
 hier_fact: hierarchical_fact_test.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+
+hier_fact2: hierarchical_fact_test2.o $(OBJS)
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+
+
 
 palm:$(OBJS) palm4MSA_test.o
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
