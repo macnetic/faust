@@ -11,7 +11,7 @@ SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
 
-CXXFLAGS = -O3  -I$(MATRIX_DIR) -I$(EIGENDIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIODIR)/include #-Winline
+CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGENDIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIODIR)/include #-Winline
 
 LDFLAGS = -L$(MATIODIR)/lib -lmatio -lhdf5
 

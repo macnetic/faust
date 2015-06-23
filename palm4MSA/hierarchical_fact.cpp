@@ -1,5 +1,5 @@
 #include "hierarchical_fact.h"
-
+#include "faust_timer.h"
 using namespace std;
 
 //hierarchical_fact::hierarchical_fact(){} // voir avec Luc les parametres par defaut
@@ -45,9 +45,12 @@ void hierarchical_fact::next_step()
 
    palm_2.set_lambda(default_lambda);
    
-
+   //faust_timer t1;
+   //t1.start();
    while(palm_2.do_continue())
       palm_2.next_step();
+   //t1.stop();
+   //cout << "palm2 "<< ind_fact << " = " << t1.get_time()<<endl;
 
    
 
@@ -74,9 +77,12 @@ void hierarchical_fact::next_step()
 
    palm_global.init_fact_from_palm(palm_2, isFactSideLeft);
 
+   //faust_timer t2;
+   //t2.start();
    while(palm_global.do_continue())
       palm_global.next_step();
-   
+   //t2.stop();
+   //cout << "palm_global "<< ind_fact << " = " << t2.get_time()<<endl;
 
    palm_2.set_data(palm_global.get_res(isFactSideLeft, ind_fact));
 

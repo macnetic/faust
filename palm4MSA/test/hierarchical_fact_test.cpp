@@ -8,7 +8,7 @@
 #include "faust_init_from_matio.h"
 #include "palm4MSA.h"
 #include "hierarchical_fact.h"
-
+#include "faust_timer.h"
 #include <iostream>
 
 using namespace std;
@@ -110,12 +110,15 @@ faust_real cons21_parameter;
   hierarchical_fact hier_fact(params);
 
   hier_fact.init();
+  faust_timer t1;
+  t1.start();
   for (int i=0 ; i<=nfacts-2 ; i++)
   {
      //cout<<"i="<<i<<endl;
      hier_fact.next_step();
   }
 
-
+  t1.stop();
+  cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 return 0;
 }

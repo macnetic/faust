@@ -297,7 +297,7 @@ faust_real faust_mat::max(std::vector<int> & id_row,std::vector<int> & id_col) c
   {
 	ofstream fichier;
 	fichier.open(filename);
-	for (int i=0 ; i<getNbRow() ;i++)
+	for (int i=0 ; i<getNbRow() ; i++)
 	{
 		for (int j=0 ; j<getNbCol() ; j++)
 			fichier << setprecision(20) <<mat(i,j) << " ";

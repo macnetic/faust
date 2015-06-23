@@ -93,10 +93,11 @@ class palm4MSA
 
 inline void palm4MSA::compute_c()
 {
-   faust_real nL=LorR.spectralNorm();
+  /* faust_real nL=LorR.spectralNorm();
    faust_real nR=RorL[ind_fact].spectralNorm();
-   c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;
-   isCComputed = true;   
+   c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;*/
+   c=100000; 
+   isCComputed = true;  
 }
 
 
