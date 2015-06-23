@@ -1,19 +1,20 @@
 CXX=g++
 
-MATRIX_DIR = ../../matrix
-PALM_DIR = ..
-INIT_MATLAB = ../../init_from_matlab
+MATRIX_DIR  = $(FAUST_ROOT_DIR)/trunk/devcpp/matrix
+PALM_DIR    = $(FAUST_ROOT_DIR)/trunk/devcpp/palm4MSA
+INIT_MATLAB = $(FAUST_ROOT_DIR)/trunk/devcpp/init_from_matlab
 
-SRC_CPP = hierarchical_fact_test.cpp    #palm4MSA_test.cpp 
-SRC_CPP += $(wildcard $(PALM_DIR)/*.cpp)  #$(filter-out $(PALM_DIR)/hierarchical_fact.cpp,$(wildcard $(PALM_DIR)/*.cpp))    #$(wildcard $(PALM_DIR)/*.cpp)
+
+
+SRC_CPP = $(wildcard $(PALM_DIR)/*.cpp)  #$(filter-out $(PALM_DIR)/hierarchical_fact.cpp,$(wildcard $(PALM_DIR)/*.cpp))    #$(wildcard $(PALM_DIR)/*.cpp)
 SRC_CPP += $(wildcard $(INIT_MATLAB)/*.cpp)
 SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
 
-CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGENDIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIODIR)/include #-Winline
+CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include #-Winline
 
-LDFLAGS = -L$(MATIODIR)/lib -lmatio -lhdf5
+LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio -lhdf5
 
 FONT =\033[
 
@@ -32,14 +33,24 @@ CYAN    =36m
 RESET_FONT =\033[0m
 
 
+all:hier_fact palm meg
 
-
-all:test
-
-test:$(OBJS)
+hier_fact: hierarchical_fact_test.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+
+palm:$(OBJS) palm4MSA_test.o
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+
+meg:$(OBJS) MEG_fact.o
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+
+
 
 %.o:%.cpp
 	@printf '$(FONT)$(CYAN)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n' 'Compiling' '     ' "$@"
@@ -47,4 +58,4 @@ test:$(OBJS)
 
 clean:
 	@printf '$(FONT)$(CYAN)Removing all object files and executable$(RESET_FONT)\n'
-	@rm -f test $(MATRIX_DIR)/*.o $(PALM_DIR)/*.o $(INIT_MATLAB)/*.o ./*.o
+	@rm -f hier_fact palm meg $(MATRIX_DIR)/*.o $(PALM_DIR)/*.o $(INIT_MATLAB)/*.o ./*.o
