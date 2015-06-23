@@ -14,7 +14,10 @@ OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP))
 
 CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include #-Winline
 
-LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio -lhdf5
+LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio 
+ifneq ($(COMPILATION_THOMAS),)
+   LDFLAGS += -lhdf5
+endif
 
 FONT =\033[
 
