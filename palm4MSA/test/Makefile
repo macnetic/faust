@@ -17,6 +17,8 @@ CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLA
 LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio 
 ifneq ($(COMPILATION_THOMAS),)
    LDFLAGS += -lhdf5
+else
+    LDFLAGS += -lrt
 endif
 
 FONT =\033[
