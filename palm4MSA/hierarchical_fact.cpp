@@ -11,8 +11,8 @@ hierarchical_fact::hierarchical_fact(const faust_params& params_):
    isFactSideLeft(params_.isFactSideLeft),
    isVerbose(params_.isVerbose),
    nb_fact(params_.nb_fact-1),
-   palm_2(palm4MSA(params_, '2')),
-   palm_global(palm4MSA(params_, 'G')),
+   palm_2(palm4MSA(params_, false)),
+   palm_global(palm4MSA(params_, true)),
    cons_tmp_global(vector<const faust_constraint_generic*>()),
    default_lambda(params_.init_lambda){}
 
