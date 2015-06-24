@@ -2,9 +2,18 @@
 #include "LinAlgebra.h"
 //////////FONCTION faust_mat - faust_mat ////////////////////
 
+#ifdef __COMPILE_TIMERS__
+  #include "faust_timer.h"
+#endif
+
+
 
  void multiply(const faust_mat & A, const faust_mat & B, faust_mat & C)
 {   
+#ifdef __COMPILE_TIMERS__
+A.t_multiply.start();
+#endif
+
 	if (A.getNbCol() != B.getNbRow())
 	{
 		std::cerr << "ERREUR multiply : nbCol of A = " << A.getNbCol(); 
@@ -23,6 +32,9 @@
 		}
 
 	}
+#ifdef __COMPILE_TIMERS__
+A.t_multiply.stop();
+#endif
 }
 
 
@@ -166,6 +178,9 @@ void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, 
 
 void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB)
 {
+#ifdef __COMPILE_TIMERS__
+A.t_gemm.start();
+#endif
 	int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
 
 	if ( ((&(C.mat)) == (&(A.mat))) || ((&(C.mat)) == (&(B.mat))) )
@@ -245,6 +260,9 @@ void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_rea
 				C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
 		}
 	}
+#ifdef __COMPILE_TIMERS__
+A.t_gemm.stop();
+#endif
 }
 
 
@@ -252,6 +270,9 @@ void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_rea
 
 void add(const faust_mat & A, const faust_mat & B, faust_mat & C)
 {   
+#ifdef __COMPILE_TIMERS__
+A.t_add_ext.start();
+#endif
 	if ((A.getNbCol() != B.getNbCol()) || (A.getNbRow() != B.getNbRow()) || (A.getNbRow() != C.getNbRow()) || (A.getNbCol() != C.getNbCol()))
 	{
 		std::cerr << "ERREUR add : matrix dimension not equal" << std::endl; 
@@ -262,6 +283,9 @@ void add(const faust_mat & A, const faust_mat & B, faust_mat & C)
 			C.mat = A.mat + B.mat;
 
 	}
+#ifdef __COMPILE_TIMERS__
+A.t_add_ext.stop();
+#endif
 }
 
 

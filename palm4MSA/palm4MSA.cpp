@@ -69,6 +69,10 @@ palm4MSA::palm4MSA(const faust_params_palm& params_palm_, const bool isGlobal_) 
 
 void palm4MSA::compute_projection()
 {
+#ifdef __COMPILE_TIMERS__
+t_compute_projection.start();
+#endif
+
    if (const_vec[ind_fact]->getConstraintType() == CONSTRAINT_NAME_CONST)
    {
          const faust_constraint_mat* const_mat = dynamic_cast<const faust_constraint_mat*>(const_vec[ind_fact]);
@@ -185,11 +189,17 @@ void palm4MSA::compute_projection()
       }
    }
    isProjectionComputed = true;
+#ifdef __COMPILE_TIMERS__
+t_compute_projection.stop();
+#endif
 }
 
 void palm4MSA::compute_grad_over_c()
 {
 
+#ifdef __COMPILE_TIMERS__
+t_compute_grad_over_c.start();
+#endif
    if(!isCComputed) 
    {
       cerr << "c must be set before computing grad/c" << endl;
@@ -229,10 +239,17 @@ void palm4MSA::compute_grad_over_c()
    }
 
    isGradComputed = true;
+#ifdef __COMPILE_TIMERS__
+t_compute_grad_over_c.stop();
+#endif
 }
 
 void palm4MSA::compute_lambda()
 {
+#ifdef __COMPILE_TIMERS__
+t_compute_lambda.start();
+#endif
+
    if (!isLastFact)
    {
       cerr << "error in palm4MSA::compute_lambda : computation of lamda must be done at the end of the iteration through the number of factors" << endl;
@@ -252,12 +269,20 @@ void palm4MSA::compute_lambda()
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
    //cout<<lambda<<endl;
-   cout<<__SP lambda<<endl;
+   //cout<<__SP lambda<<endl;
+
+#ifdef __COMPILE_TIMERS__
+t_compute_lambda.stop();
+#endif
 }
 
 
 void palm4MSA::update_R()
 {
+#ifdef __COMPILE_TIMERS__
+t_update_R.start();
+#endif
+
    // R[nb_fact-1] est initialise a l'identite lors de la creation de l'objet palm4MSA et n'est pas cense changer
    if (!isUpdateWayR2L)
    {
@@ -271,11 +296,18 @@ void palm4MSA::update_R()
    }
    else
       LorR.multiplyLeft(S[ind_fact]);
+#ifdef __COMPILE_TIMERS__
+t_update_R.stop();
+#endif
 }
 
 
 void palm4MSA::update_L()
 {
+#ifdef __COMPILE_TIMERS__
+t_update_L.start();
+#endif
+
    if(!isProjectionComputed){
       cerr << "Projection must be computed before updating L" << endl;
       exit(EXIT_FAILURE);
@@ -291,20 +323,33 @@ void palm4MSA::update_L()
          //  R[i] = S[i+1] * R[i+1]
          multiply(RorL[i] , S[i], RorL[i+1]);
    }
+#ifdef __COMPILE_TIMERS__
+t_update_L.stop();
+#endif
 }
 
 void palm4MSA::check_constraint_validity()
 {
+#ifdef __COMPILE_TIMERS__
+t_check.start();
+#endif
 
    if (nb_fact != S.size())
    {
       cerr << "Error in palm4MSA::check_constraint_validity : Wrong initialization: params.nfacts and params.init_facts are in conflict" << endl;
       exit(EXIT_FAILURE);
    }
+#ifdef __COMPILE_TIMERS__
+t_check.stop();
+#endif
 }
 
 void palm4MSA::init_fact(int nb_facts_)
 {
+#ifdef __COMPILE_TIMERS__
+t_init_fact.start();
+#endif
+
   /*if(isInit && isGlobal)
   {
      cerr << "Error in palm4MSA::init_fact : global factorization has already been initialized" <<endl;
@@ -352,10 +397,18 @@ void palm4MSA::init_fact(int nb_facts_)
    } 
 
     
+#ifdef __COMPILE_TIMERS__
+t_init_fact.stop();
+#endif
 }
 
 void palm4MSA::next_step()
 {
+#ifdef __COMPILE_TIMERS__
+t_next_step.start();
+#endif
+
+
    check_constraint_validity();
    // resizing L or R 
    if(!isUpdateWayR2L)
@@ -406,10 +459,18 @@ void palm4MSA::next_step()
    delete[] ind_ptr;
    ind_ptr = NULL;
 
+#ifdef __COMPILE_TIMERS__
+t_next_step.stop();
+#endif
 }
 
 void palm4MSA::init_fact_from_palm(const palm4MSA& palm2, bool isFactSideLeft)
 {
+#ifdef __COMPILE_TIMERS__
+t_init_fact_from_palm.start();
+#endif
+
+
    if (palm2.nb_fact != 2)
    {
       cerr << "argument palm2 must contain 2 factors." << endl;
@@ -435,5 +496,37 @@ void palm4MSA::init_fact_from_palm(const palm4MSA& palm2, bool isFactSideLeft)
    nb_fact++;
 
    check_constraint_validity();
+
+#ifdef __COMPILE_TIMERS__
+t_init_fact_from_palm.stop();
+#endif
 }
 
+
+#ifdef __COMPILE_TIMERS__
+
+faust_timer palm4MSA::t_compute_projection;
+faust_timer palm4MSA::t_compute_grad_over_c;
+faust_timer palm4MSA::t_compute_lambda;
+faust_timer palm4MSA::t_update_R;
+faust_timer palm4MSA::t_update_L;
+faust_timer palm4MSA::t_check;
+faust_timer palm4MSA::t_init_fact;
+faust_timer palm4MSA::t_next_step;
+faust_timer palm4MSA::t_init_fact_from_palm;
+
+
+void palm4MSA::print_timers()const
+{
+   cout << "timers in palm4MSA : " << endl;
+   cout << "t_compute_projection  = " << t_compute_projection.get_time()  << " s for "<< t_compute_projection.get_nb_call()  << " calls" << endl;
+   cout << "t_compute_grad_over_c = " << t_compute_grad_over_c.get_time() << " s for "<< t_compute_grad_over_c.get_nb_call() << " calls" << endl;
+   cout << "t_compute_lambda      = " << t_compute_lambda.get_time()      << " s for "<< t_compute_lambda.get_nb_call()      << " calls" << endl;
+   cout << "t_update_R            = " << t_update_R.get_time()            << " s for "<< t_update_R.get_nb_call()            << " calls" << endl;
+   cout << "t_update_L            = " << t_update_L.get_time()            << " s for "<< t_update_L.get_nb_call()            << " calls" << endl;
+   cout << "t_check_              = " << t_check.get_time()               << " s for "<< t_check.get_nb_call()               << " calls" << endl;
+   cout << "t_init_fact           = " << t_init_fact.get_time()           << " s for "<< t_init_fact.get_nb_call()           << " calls" << endl;
+   cout << "t_next_step           = " << t_next_step.get_time()           << " s for "<< t_next_step.get_nb_call()           << " calls" << endl;
+   cout << "t_init_fact_from_palm = " << t_init_fact_from_palm.get_time() << " s for "<< t_init_fact_from_palm.get_nb_call() << " calls" << endl<<endl;
+}
+#endif

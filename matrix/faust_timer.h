@@ -11,11 +11,14 @@ class faust_timer
       void stop();
       void reset();
       float get_time();
+      long int get_nb_call();
+
 
    private:
       bool isRunning;
       float result;
       struct timespec debut;
+      long int nbCall;
      
 };
 

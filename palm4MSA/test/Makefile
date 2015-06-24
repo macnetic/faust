@@ -14,11 +14,15 @@ OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP))
 
 CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include #-Winline
 
+ifneq ($(COMPILATION_THOMAS),)
+   CXXFLAGS += -D__COMPILE_TIMERS__
+endif
+
 LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio 
 ifneq ($(COMPILATION_THOMAS),)
-   LDFLAGS += -lhdf5
+   LDFLAGS += -lhdf5 
 else
-    LDFLAGS += -lrt
+   LDFLAGS += -lrt
 endif
 
 FONT =\033[
@@ -26,11 +30,11 @@ FONT =\033[
 BOLD      =1;
 ITALIC    =3;
 UNDERLINE =4;
-BLINK     = 5;
+BLINK     =5;
 
 RED     =31m
 GREEN   =32m
-YELLOW  =33m#orange in non-bold or yellow in bold
+YELLOW  =33m #orange in non-bold or yellow in bold
 BLUE    =34m
 MAGENTA =35m
 CYAN    =36m

@@ -18,6 +18,9 @@ hierarchical_fact::hierarchical_fact(const faust_params& params_):
 
 void hierarchical_fact::init()
 {
+#ifdef __COMPILE_TIMERS__
+t_init.start();
+#endif
 
    cons_tmp_global.clear();
    if(isFactSideLeft)
@@ -30,11 +33,17 @@ void hierarchical_fact::init()
    palm_global.init_fact(1);
    
 
+#ifdef __COMPILE_TIMERS__
+t_init.stop();
+#endif
 
 }
 
 void hierarchical_fact::next_step()
 {
+#ifdef __COMPILE_TIMERS__
+t_next_step.start();
+#endif
    vector<const faust_constraint_generic*> cons_tmp_2(2);
    cons_tmp_2[0]=cons[0][ind_fact];
    cons_tmp_2[1]=cons[1][ind_fact];
@@ -52,7 +61,12 @@ void hierarchical_fact::next_step()
    //t1.stop();
    //cout << "palm2 "<< ind_fact << " = " << t1.get_time()<<endl;
 
-   
+#ifdef __COMPILE_TIMERS__
+const vector<faust_mat>& facts = palm_2.get_facts();
+facts[0].print_timers();
+palm_2.print_timers();
+exit(EXIT_FAILURE); 
+#endif
 
    palm_global.update_lambda_from_palm(palm_2);
    
@@ -89,5 +103,21 @@ void hierarchical_fact::next_step()
 
    ind_fact++;   
 
+#ifdef __COMPILE_TIMERS__
+t_next_step.stop();
+#endif
 }
 
+
+
+#ifdef __COMPILE_TIMERS__
+faust_timer hierarchical_fact::t_init;
+faust_timer hierarchical_fact::t_next_step;
+
+void hierarchical_fact::print_timers()const
+{
+   cout << "timers in hierarchical_fact :" << endl;
+   cout << "t_init      = " << t_init.get_time()      << " s for "<< t_init.get_nb_call()      << " calls" << endl;
+   cout << "t_next_step = " << t_next_step.get_time() << " s for "<< t_next_step.get_nb_call() << " calls" << endl<<endl;
+}
+#endif

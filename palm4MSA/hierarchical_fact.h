@@ -5,6 +5,11 @@
 #include <vector>
 #include "palm4MSA.h"
 #include "faust_params.h"
+
+#ifdef __COMPILE_TIMERS__
+  #include "faust_timer.h"
+#endif
+
 class faust_constraint_generic;
 
 
@@ -32,7 +37,17 @@ class hierarchical_fact
       const faust_real default_lambda; // initial value of lambda for factorization into two factors
       std::vector<faust_mat> S;
       std::vector<const faust_constraint_generic*> cons_tmp_global;
-      
+     
+#ifdef __COMPILE_TIMERS__
+   public:
+      static faust_timer t_init;
+      static faust_timer t_next_step;
+
+    void print_timers()const;
+#endif
+
+
+ 
 };
 
 #endif

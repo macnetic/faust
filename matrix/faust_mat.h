@@ -6,7 +6,12 @@
 #include <vector>
 #include <iterator>
 
+#ifdef __COMPILE_TIMERS__
+  #include "faust_timer.h"
+#endif
+
 class faust_vec;//forward declaration of faust_vec class
+
 class faust_mat
 {
 public:
@@ -123,7 +128,33 @@ void init_from_file(const char* filename);
   Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat;
        int dim1;
        int dim2;
-  
+
+#ifdef __COMPILE_TIMERS__
+  public: 
+  //temporary members
+      static faust_timer t_constr;
+      static faust_timer t_get_coeff;
+      static faust_timer t_get_coeffs;
+      static faust_timer t_set_coeff;
+      static faust_timer t_set_coeffs;
+      static faust_timer t_set_coeffs2;
+      static faust_timer t_resize;
+      static faust_timer t_check_dim;
+      static faust_timer t_max;
+      static faust_timer t_transpose;
+      static faust_timer t_mult_right;
+      static faust_timer t_mult_left;
+      static faust_timer t_scalar_multiply;
+      static faust_timer t_add;
+      static faust_timer t_sub;
+      static faust_timer t_print_file;
+
+      static faust_timer t_multiply;
+      static faust_timer t_gemm;
+      static faust_timer t_add_ext;
+
+  void print_timers()const;
+#endif
 };
 
 

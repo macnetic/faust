@@ -6,6 +6,12 @@
 #include <vector>
 #include "faust_mat.h"
 #include "stopping_criterion.h"
+
+
+#ifdef __COMPILE_TIMERS__
+  #include "faust_timer.h"
+#endif
+
 class faust_constraint_generic;
 class faust_params;
 class faust_params_palm;
@@ -90,14 +96,34 @@ class palm4MSA
       int nb_fact; // number of factors
 
       std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
+
+
+#ifdef __COMPILE_TIMERS__
+   public:
+      static faust_timer t_compute_projection;
+      static faust_timer t_compute_grad_over_c;
+      static faust_timer t_compute_lambda;
+      static faust_timer t_update_R;
+      static faust_timer t_update_L;
+      static faust_timer t_check;
+      static faust_timer t_init_fact;
+      static faust_timer t_next_step;
+      static faust_timer t_init_fact_from_palm;
+
+   void print_timers()const;
+#endif
+
 };
 
 inline void palm4MSA::compute_c()
 {
-   /*faust_real nL=LorR.spectralNorm();
-   faust_real nR=RorL[ind_fact].spectralNorm();
-   c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;*/
+#ifdef __PAS_FIXE__
    c=10000*1.001; 
+#else
+   faust_real nL=LorR.spectralNorm();
+   faust_real nR=RorL[ind_fact].spectralNorm();
+   c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;
+#endif
    isCComputed = true;  
 }
 

@@ -3,7 +3,7 @@
 #include <cstdlib>
 using namespace std;
 
-faust_timer::faust_timer() : isRunning(false), result(0.0f){}
+faust_timer::faust_timer() : isRunning(false), result(0.0f), nbCall(0){}
 
 void faust_timer::start()
 { 
@@ -14,6 +14,7 @@ void faust_timer::start()
    }
    clock_gettime(CLOCK_MONOTONIC, &debut);
    isRunning = true;
+   nbCall ++;
 }
 
 void faust_timer::stop()
@@ -33,6 +34,7 @@ void faust_timer::stop()
 void faust_timer::reset()
 {
    result=0.0f;
+   nbCall = 0;
    if(isRunning)
    {
       cerr << "Warning in faust_timer::reset : timer has been reset while it was running" << endl;
@@ -51,3 +53,18 @@ float faust_timer::get_time()
    }
    return result;
 }
+
+long int faust_timer::get_nb_call()
+{
+   if(isRunning)
+   {
+      struct timespec fin;
+      clock_gettime(CLOCK_MONOTONIC, &fin);
+      result += (fin.tv_sec -debut.tv_sec) + (fin.tv_nsec-debut.tv_nsec)/1000000000.0;
+      cerr << "Warning in faust_timer::get_nb_call : timer has not been stopped" << endl;
+   }
+   return nbCall;
+}
+
+
+
