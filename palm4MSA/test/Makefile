@@ -15,7 +15,7 @@ OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP))
 CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include #-Winline
 
 ifneq ($(COMPILATION_THOMAS),)
-   CXXFLAGS += -D__COMPILE_TIMERS__
+   CXXFLAGS += -D__COMPILE_TIMERS__ -D__PAS_FIXE__
 endif
 
 LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio 

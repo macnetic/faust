@@ -13,6 +13,8 @@
 
 #include <fstream>
 #include <iomanip>
+#include <algorithm>
+#include <vector>
 #define __SP setprecision(20)<<
 
 using namespace std;
@@ -194,9 +196,9 @@ t_compute_projection.stop();
 #endif
 }
 
+
 void palm4MSA::compute_grad_over_c()
 {
-
 #ifdef __COMPILE_TIMERS__
 t_compute_grad_over_c.start();
 #endif
@@ -206,39 +208,117 @@ t_compute_grad_over_c.start();
       exit(EXIT_FAILURE);
    }
 
-   faust_mat tmp1, tmp2, tmp3, tmp4;
-   // tmp1 = L*S
-   if (!isUpdateWayR2L)
-{
-//LorR.print_file("L.dat");
-//S[ind_fact].print_file("S.dat");
-//tmp1.print_file("tmp1.dat");
-      multiply(LorR, S[ind_fact], tmp1);
-}
-   else
-      multiply(RorL[ind_fact], S[ind_fact], tmp1);
-   
-   error = data;
-   // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
-   if (!isUpdateWayR2L)
-      gemm(tmp1, RorL[ind_fact], error, lambda, -1.0, 'N', 'N');
-   else
-      gemm(tmp1, LorR, error, lambda, -1.0, 'N', 'N');
+// There are 4 ways to compute gradient :
+// (0) : lambda*(L'*(lambda*(L*S)*R - X))*R' : complexity = L1*L2*S2 + L1*S2*R2 + L2*L1*R2 + L2*R2*R2;
+// (1) : lambda*L'*((lambda*(L*S)*R - X)*R') : complexity = L1*L2*S2 + L1*S2*R2 + L1*R2*S2 + L2*L1*S2;
+// (2) : lambda*(L'*(lambda*L*(S*R) - X))*R' : complexity = L2*S2*R2 + L1*L2*R2 + L2*L1*R2 + L2*R2*S2;
+// (3) : lambda*L'*((lambda*L*(S*R) - X)*R') : complexity = L2*S2*R2 + L1*L2*R2 + L1*R2*S2 + L2*L1*S2;
+//  with L of size L1xL2
+//       S of size L2xS2
+//       R of size S2xR2
 
-   // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
-   // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
+   unsigned long long int L1, L2, R2, S2;
    if (!isUpdateWayR2L)
    {
-      gemm(LorR, error, tmp3, lambda, 0.0, 'T', 'N');
-      gemm(tmp3, RorL[ind_fact], grad_over_c,1.0/c, 0.0,'N','T');
+      L1 = (unsigned long long int) LorR.getNbRow();
+      L2 = (unsigned long long int) LorR.getNbCol();
+      R2 = (unsigned long long int) RorL[ind_fact].getNbCol();
    }
    else
    {
-      gemm(RorL[ind_fact], error, tmp3, lambda, 0.0, 'T', 'N');
-      gemm(tmp3, LorR, grad_over_c,1.0/c, 0.0,'N','T');
+      L1 = (unsigned long long int) RorL[ind_fact].getNbRow();
+      L2 = (unsigned long long int) RorL[ind_fact].getNbCol(); 
+      R2 = (unsigned long long int) LorR.getNbCol();
    }
+   S2 = (unsigned long long int) S[ind_fact].getNbCol();
+   vector<unsigned long long int > complexity(4,0);
+   complexity[0] = L1*L2*S2 + L1*S2*R2 + L2*L1*R2 + L2*R2*R2;
+   complexity[1] = L1*L2*S2 + L1*S2*R2 + L1*R2*S2 + L2*L1*S2;
+   complexity[2] = L2*S2*R2 + L1*L2*R2 + L2*L1*R2 + L2*R2*S2;
+   complexity[3] = L2*S2*R2 + L1*L2*R2 + L1*R2*S2 + L2*L1*S2;
+
+   int idx = distance(complexity.begin(), min_element(complexity.begin(), complexity.end()));
+
+
+   error = data;
+   faust_mat tmp1, tmp2, tmp3, tmp4;
+
+   if (idx==0 || idx==1) // computing L*S first, then (L*S)*R
+   {
+      if (!isUpdateWayR2L)
+      {
+         // tmp1 = L*S
+         multiply(LorR, S[ind_fact], tmp1);
+         // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
+         gemm(tmp1, RorL[ind_fact], error, lambda, -1.0, 'N', 'N');
+      }
+      else
+      {
+         // tmp1 = L*S
+         multiply(RorL[ind_fact], S[ind_fact], tmp1);
+         // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
+         gemm(tmp1, LorR, error, lambda, -1.0, 'N', 'N');
+      }
+   }
+   else // computing S*R first, then L*(S*R)
+   {
+      if (!isUpdateWayR2L)
+      {
+         // tmp1 = S*R
+         multiply(S[ind_fact], RorL[ind_fact], tmp1);
+         // error = lambda*L*tmp1 - error (= lambda*L*S*R - data )
+         gemm(LorR, tmp1, error, lambda, -1.0, 'N', 'N');
+      }
+      else
+      {
+         // tmp1 = S*R
+         multiply(S[ind_fact], LorR, tmp1);
+         // error = lambda*L*tmp1 - error (= lambda*L*S*R - data )
+         gemm(RorL[ind_fact], tmp1, error, lambda, -1.0, 'N', 'N');
+      }
+   }
+
+
+
+   if (idx==0 || idx==2) // computing L'*error first, then (L'*error)*R'
+   {
+      if (!isUpdateWayR2L)
+      {
+         // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
+         gemm(LorR, error, tmp3, lambda, 0.0, 'T', 'N');
+         // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
+         gemm(tmp3, RorL[ind_fact], grad_over_c, 1.0/c, 0.0,'N','T');
+      }
+      else
+      {
+         // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
+         gemm(RorL[ind_fact], error, tmp3, lambda, 0.0, 'T', 'N');
+         // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
+         gemm(tmp3, LorR, grad_over_c, 1.0/c, 0.0,'N','T');
+      }
+   }
+   else // computing error*R' first, then L'*(error*R')
+   {
+      if (!isUpdateWayR2L)
+      {
+         // tmp3 = lambda*error*R' (= lambda*(lambda*L*S*R - data) * R' )
+         gemm(error, RorL[ind_fact], tmp3, lambda, 0.0, 'N', 'T');
+         // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * lambda*(lambda*L*S*R - data) * R' )
+         gemm(LorR, tmp3, grad_over_c,1.0/c, 0.0,'T','N');
+      }
+      else
+      {
+         // tmp3 = lambda*error*R' (= lambda * (lambda*L*S*R - data) * R' )
+         gemm(error, LorR, tmp3, lambda, 0.0, 'N', 'T');
+         // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * lambda*(lambda*L*S*R - data) * R' )
+         gemm(RorL[ind_fact], tmp3, grad_over_c, 1.0/c, 0.0,'T','N');
+      }
+
+   }
+
 
    isGradComputed = true;
+
 #ifdef __COMPILE_TIMERS__
 t_compute_grad_over_c.stop();
 #endif
@@ -269,7 +349,7 @@ t_compute_lambda.start();
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
    //cout<<lambda<<endl;
-   //cout<<__SP lambda<<endl;
+   cout<<__SP lambda<<endl;
 
 #ifdef __COMPILE_TIMERS__
 t_compute_lambda.stop();
