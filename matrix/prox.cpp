@@ -2,71 +2,169 @@
 #include <vector>
 #include "faust_constant.h"
 #include <iostream>
+#include "algorithm"
+
 
 void prox_sp(faust_mat & M,int k)
+{
+	int dim1 = M.getNbRow();
+	int dim2 = M.getNbCol();
+
+	int nb_elt_mat = dim1*dim2;
+
+	if (k<=0)
+	{
+		M.setZeros();
+	}else{
+	if (k<nb_elt_mat)
+	{	
+
+		faust_real current_value;
+		faust_mat M_abs=M;
+		faust_mat new_M(dim1,dim2);
+		M_abs.abs();
+		int id_2_insert;
+		std::vector<faust_real>::iterator it_2_insert;
+		
+		
+		std::vector<faust_real> copyM_abs;
+		std::vector<faust_real> sorted_elements;
+		std::vector<int> id_sorted_elements;
+		std::vector<faust_real> signed_sorted_elements;
+		sorted_elements.assign(k,-1);
+		id_sorted_elements.assign(k,-1);
+		
+		copyM_abs.resize(nb_elt_mat);
+		memcpy(&(copyM_abs[0]),&((M_abs.getData())[0]),nb_elt_mat*sizeof(faust_real));
+
+		for(int i=0;i<nb_elt_mat;i++)
+		{		
+			current_value = copyM_abs[i];
+			if (current_value > sorted_elements[k-1])
+			{	
+				it_2_insert=(std::upper_bound(sorted_elements.begin(),sorted_elements.end(),current_value,std::greater_equal<faust_real>()));
+				id_2_insert = std::distance(sorted_elements.begin(),it_2_insert);
+				for (int ii=k-2;ii>=(id_2_insert);ii--)
+				{
+
+					id_sorted_elements[ii+1] = id_sorted_elements[ii];
+				}
+				
+				sorted_elements.insert(it_2_insert,current_value);
+				sorted_elements.pop_back();
+				id_sorted_elements[id_2_insert]=i;
+
+
+
+			}
+		}
+		
+			new_M.setZeros();
+
+
+			for (int i=0;i<k;i++)
+			{	
+				(((new_M.getData()))[id_sorted_elements[i]]) =  (((M.getData()))[id_sorted_elements[i]]);
+			}
+		
+		
+			M = new_M;
+		
+		
+		
+	}
+	M.normalize();	
+	}
+	
+	
+	
+	
+}
+
+
+
+
+void prox_sp_old(faust_mat & M,int k)
 {	
 	int dim1 = M.getNbRow();
 	int dim2 = M.getNbCol();
-	if (k<dim1*dim2)
-	{	
+	int nb_elt_mat = dim1*dim2;
+
+			
+	if (k<nb_elt_mat)
+	{
+		std::cout<<"pas bons"<<std::endl;
+		int nbr_new_elt;
 		faust_mat new_M(dim1,dim2);
 		faust_mat M_abs(dim1,dim2);
 		M_abs = M;
 		M_abs.abs();
-		new_M.setZeros();
-	
-	
 		int nb_elt_found = 0;
+		int i, nbr_elt_to_add;
 
 
 
 		std::vector<int> current_id_row;
 		std::vector<int> current_id_col;
-		std::vector<faust_real> current_signed_values;
 		faust_real current_value;
-		int nbr_new_elt = 0;
-		int i, nbr_elt_to_add;
-	
-		while (nb_elt_found < k)
+		
+		if (k<=nb_elt_mat/2)
 		{
-			current_id_row.resize(0);
-			current_id_col.resize(0);
-		
-			current_value=M_abs.max(current_id_row,current_id_col);
-			nbr_new_elt = current_id_row.size();
-		
-			nbr_elt_to_add=std::min(k-nb_elt_found,nbr_new_elt);
-		
-			current_id_row.resize(nbr_elt_to_add);
-			current_id_col.resize(nbr_elt_to_add);
-			current_signed_values.resize(nbr_elt_to_add);
-			M.getCoeffs(current_signed_values,current_id_row,current_id_col);
-		
-			new_M.setCoeffs(current_signed_values,current_id_row,current_id_col);
-			nb_elt_found += nbr_elt_to_add;
-			M_abs.setCoeffs(0,current_id_row,current_id_col);
-	
-	/*
-	std::cout<<std::endl<<std::endl;	
-	std::cout<<"*** ITER *********************** : "<< nb_elt_found <<std::endl;	
-	std::cout<<"*** M ****"<<std::endl;
-	M.Display();
+			new_M.setZeros();
 	
 	
-	std::cout<<"*** M_abs ****"<<std::endl;
-	M_abs.Display();
+
+			std::vector<faust_real> current_signed_values;
+			
+			
 	
-	
-	std::cout<<"*** new_M ****"<<std::endl;
-	new_M.Display();
-	*/
+			while (nb_elt_found < k)
+			{
+				current_id_row.resize(0);
+				current_id_col.resize(0);
 		
+				current_value=M_abs.max(current_id_row,current_id_col);
+				nbr_new_elt = current_id_row.size();
 		
-	
-		}
+				nbr_elt_to_add=std::min(k-nb_elt_found,nbr_new_elt);
+		
+				current_id_row.resize(nbr_elt_to_add);
+				current_id_col.resize(nbr_elt_to_add);
+				current_signed_values.resize(nbr_elt_to_add);
+				M.getCoeffs(current_signed_values,current_id_row,current_id_col);
+		
+				new_M.setCoeffs(current_signed_values,current_id_row,current_id_col);
+				nb_elt_found += nbr_elt_to_add;
+				M_abs.setCoeffs(0,current_id_row,current_id_col);
+			}
+		}else
+		{	
+			new_M=M;
+			faust_real unreach_value=M_abs.max()+3;
+			k=nb_elt_mat - k;
+			while (nb_elt_found < k)
+			{
+				current_id_row.resize(0);
+				current_id_col.resize(0);
+		
+				current_value=M_abs.min(current_id_row,current_id_col);
+				nbr_new_elt = current_id_row.size();
+		
+				nbr_elt_to_add=std::min(k-nb_elt_found,nbr_new_elt);
+		
+				current_id_row.resize(nbr_elt_to_add);
+				current_id_col.resize(nbr_elt_to_add);
+		
+				new_M.setCoeffs(0,current_id_row,current_id_col);
+				nb_elt_found += nbr_elt_to_add;
+				M_abs.setCoeffs(unreach_value,current_id_row,current_id_col);
+			}
+			
+			
+		}			
 		M = new_M;
 	}
-	M.scalarMultiply(1/M.norm());
+		M.normalize();
 	
 
 	
@@ -93,25 +191,23 @@ void prox_spcol(faust_mat & M,int k)
 		new_M.setZeros();
 	
 		faust_mat current_col(dim1,1);
-		std::vector<int> id_row,id_col_mat,id_col,id_row_max,id_col_max;
+		std::vector<int> id_col_mat,id_col,id_row_max,id_col_max;
 		std::vector<faust_real> signed_values,values_per_Col;
-		id_row.resize(dim1);
-		id_col.assign(dim1,0);
 		values_per_Col.resize(dim1);
 	
 	
 		int nb_elt_found,nbr_new_elt,nbr_elt_to_add;
 	
-		for (int i=0;i<dim1;i++)id_row[i]=i;
+		
 	
 		for (int j=0;j<dim2;j++)
 		{	
 			nb_elt_found = 0;
-			id_col_mat.assign(dim1,j);
-			M_abs.getCoeffs(values_per_Col,id_row,id_col_mat);
-			current_col.setCoeffs(values_per_Col,id_row,id_col);//copie des coefficents de la matrice dans une matrice column
-		
-		//memcpy(&((M.getData())[j*dim1]),&(current_col),dim1*sizeof(faust_real));
+		memcpy(&((current_col.getData())[0]),&((M_abs.getData())[j*dim1]),dim1*sizeof(faust_real));
+
+		/*std::cout<<"current col : " <<j<<std::endl;
+		current_col.Display();
+		std::cout<<std::endl;*/
 		//std::cout<<"avant boucle while"<<std::endl;
 			while (nb_elt_found < k)
 			{
@@ -120,8 +216,9 @@ void prox_spcol(faust_mat & M,int k)
 			
 				// calculus of the max of the current column and its index
 				current_max=current_col.max(id_row_max,id_col_max);
+				std::cout<<" max : "<<current_max<<std::endl;
 				nbr_new_elt = id_row_max.size();
-		
+				//M.Display();
 				nbr_elt_to_add=std::min(k-nb_elt_found,nbr_new_elt);
 				id_col_mat.assign(nbr_elt_to_add,j);
 				id_row_max.resize(nbr_elt_to_add);
@@ -473,18 +570,152 @@ void prox_toeplitz(faust_mat & M, int k)
 	
 	
 	
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+//////////////////     OLD          ///////////////////////////////////
+
+
+
+
+
+void prox_spcol_old(faust_mat & M,int k)
+{
+	int dim1 = M.getNbRow();
+	int dim2 = M.getNbCol();
+	if (k<dim1)
+	{
+		faust_mat new_M(dim1,dim2);
+		faust_mat M_abs(dim1,dim2);
+		faust_real current_max;
+		M_abs = M;
+		M_abs.abs();
+		new_M.setZeros();
+	
+		faust_mat current_col(dim1,1);
+		std::vector<int> id_row,id_col_mat,id_col,id_row_max,id_col_max;
+		std::vector<faust_real> signed_values,values_per_Col;
+		id_row.resize(dim1);
+		id_col.assign(dim1,0);
+		values_per_Col.resize(dim1);
+	
+	
+		int nb_elt_found,nbr_new_elt,nbr_elt_to_add;
+	
+		for (int i=0;i<dim1;i++)id_row[i]=i;
+	
+		for (int j=0;j<dim2;j++)
+		{	
+			nb_elt_found = 0;
+			id_col_mat.assign(dim1,j);
+			M_abs.getCoeffs(values_per_Col,id_row,id_col_mat);
+			current_col.setCoeffs(values_per_Col,id_row,id_col);//copie des coefficents de la matrice dans une matrice column
+
+			while (nb_elt_found < k)
+			{
+				id_row_max.resize(0);
+				id_col_max.resize(0);
+			
+				// calculus of the max of the current column and its index
+				current_max=current_col.max(id_row_max,id_col_max);
+				std::cout<<" max : "<<current_max<<std::endl;
+				nbr_new_elt = id_row_max.size();
+				//M.Display();
+				nbr_elt_to_add=std::min(k-nb_elt_found,nbr_new_elt);
+				id_col_mat.assign(nbr_elt_to_add,j);
+				id_row_max.resize(nbr_elt_to_add);
+				signed_values.resize(nbr_elt_to_add);
+			
+				M.getCoeffs(signed_values,id_row_max,id_col_mat);
+				new_M.setCoeffs(signed_values,id_row_max,id_col_mat);
+				id_col_max.resize(nbr_elt_to_add);
+				current_col.setCoeffs(0,id_row_max,id_col_max);
+		
+				nb_elt_found += nbr_elt_to_add;
+			}
+		
+		}
+		M=new_M;
+
+		
+	}
+	faust_real normM = M.norm();
+	if (normM != 0)
+	{
+		M.scalarMultiply(1/normM);
+	}
+}
+
+
+
+
+void prox_sp_old_old(faust_mat & M,int k)
+{	
+	int dim1 = M.getNbRow();
+	int dim2 = M.getNbCol();
+	if (k<dim1*dim2)
+	{	
+		faust_mat new_M(dim1,dim2);
+		faust_mat M_abs(dim1,dim2);
+		M_abs = M;
+		M_abs.abs();
+		new_M.setZeros();
+	
+	
+		int nb_elt_found = 0;
+
+
+
+		std::vector<int> current_id_row;
+		std::vector<int> current_id_col;
+		std::vector<faust_real> current_signed_values;
+		faust_real current_value;
+		int nbr_new_elt = 0;
+		int i, nbr_elt_to_add;
+	
+		while (nb_elt_found < k)
+		{
+			current_id_row.resize(0);
+			current_id_col.resize(0);
+		
+			current_value=M_abs.max(current_id_row,current_id_col);
+			nbr_new_elt = current_id_row.size();
+		
+			nbr_elt_to_add=std::min(k-nb_elt_found,nbr_new_elt);
+		
+			current_id_row.resize(nbr_elt_to_add);
+			current_id_col.resize(nbr_elt_to_add);
+			current_signed_values.resize(nbr_elt_to_add);
+			M.getCoeffs(current_signed_values,current_id_row,current_id_col);
+		
+			new_M.setCoeffs(current_signed_values,current_id_row,current_id_col);
+			nb_elt_found += nbr_elt_to_add;
+			M_abs.setCoeffs(0,current_id_row,current_id_col);
+	
+	/*
+	std::cout<<std::endl<<std::endl;	
+	std::cout<<"*** ITER *********************** : "<< nb_elt_found <<std::endl;	
+	std::cout<<"*** M ****"<<std::endl;
+	M.Display();
+	
+	
+	std::cout<<"*** M_abs ****"<<std::endl;
+	M_abs.Display();
+	
+	
+	std::cout<<"*** new_M ****"<<std::endl;
+	new_M.Display();
+	*/
+		
+		
+	
+		}
+		M = new_M;
+	}
+	M.scalarMultiply(1/M.norm());
 	
 
-
-
-
-
-
-
-
-
-
-
+	
+}
 
 
 

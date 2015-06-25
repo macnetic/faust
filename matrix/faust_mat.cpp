@@ -266,6 +266,30 @@ t_max.stop();
 
 	return maxi;
 }
+
+faust_real faust_mat::min(std::vector<int> & id_row,std::vector<int> & id_col) const
+{
+	faust_real mini = min();
+	int i,j,k;
+	if ( (id_row.size() != 0) || (id_col.size() != 0) )
+	{
+		cerr << "ERREUR max : sizes of id_row and id_col must be equal to zero" << endl;
+		exit( EXIT_FAILURE);	
+	}
+	
+	for (j=0;j<getNbCol();j++)
+		for (i=0;i<getNbRow();i++)
+			if (mat(i,j) == mini)
+			{
+				id_row.push_back(i);
+				id_col.push_back(j);
+			}
+	return mini;
+}
+
+
+
+
  
  
  

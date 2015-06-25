@@ -64,15 +64,17 @@ void init_from_file(const char* filename);
   //arithmetique
   
   faust_real max() const {return mat.maxCoeff();}
+  faust_real min() const {return mat.minCoeff();}
   void abs() {mat=mat.cwiseAbs();}
   
   // return the maximum of all coefficients of this and puts in row_id and col_id its location
   faust_real max(std::vector<int> & id_row,std::vector<int> & id_col) const;
+  faust_real min(std::vector<int> & id_row,std::vector<int> & id_col) const;
   
   
   // frobenius norm
   faust_real norm() const {return mat.norm();}
-  
+  void normalize() {scalarMultiply(1/norm());}
   // spectral norm, "norm2", equal to the largest singular value  
   faust_real spectralNorm() const {return mat.operatorNorm();}
   
