@@ -349,7 +349,7 @@ t_compute_lambda.start();
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
    //cout<<lambda<<endl;
-   cout<<__SP lambda<<endl;
+   //cout<<__SP lambda<<endl;
 
 #ifdef __COMPILE_TIMERS__
 t_compute_lambda.stop();
