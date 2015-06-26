@@ -12,15 +12,15 @@ SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
 
-CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include #-Winline
+CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include -D__PAS_FIXE__ #-Winline
 
 ifneq ($(COMPILATION_THOMAS),)
-   CXXFLAGS += -D__COMPILE_TIMERS__ -D__PAS_FIXE__
+   CXXFLAGS += -D__COMPILE_TIMERS__ -DFAUST_SINGLE -D__GEMM_WITH_OPENBLAS__ -I$(OPENBLASDIR)
 endif
 
-LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio 
+LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio  
 ifneq ($(COMPILATION_THOMAS),)
-   LDFLAGS += -lhdf5 
+   LDFLAGS += -lhdf5  -L$(OPENBLASDIR) -lopenblas
 else
    LDFLAGS += -lrt
 endif

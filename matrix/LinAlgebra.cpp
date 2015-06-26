@@ -3,9 +3,12 @@
 //////////FONCTION faust_mat - faust_mat ////////////////////
 
 #ifdef __COMPILE_TIMERS__
-  #include "faust_timer.h"
+	#include "faust_timer.h"
 #endif
 
+#ifdef __GEMM_WITH_OPENBLAS__
+	#include "cblas.h"
+#endif
 
 
  void multiply(const faust_mat & A, const faust_mat & B, faust_mat & C)
@@ -266,7 +269,22 @@ A.t_gemm.start();
 		
         C.resize(nbRowOpA,nbColOpB);
 
-	if (beta == 0)
+
+	#ifdef __GEMM_WITH_OPENBLAS__
+		CBLAS_TRANSPOSE transA,transB;
+		if (typeA=='T')
+			transA = CblasTrans;
+		else 
+			transA = CblasNoTrans;
+		if (typeB=='T')
+			transB = CblasTrans;
+		else 
+			transB = CblasNoTrans;
+	#endif
+
+
+
+	if (beta == 0.0)
 	{
 
 		if(A.isZeros || B.isZeros)
@@ -311,19 +329,29 @@ A.t_gemm.start();
 			return;
 		}
 
-		if (typeA == 'N')
-		{
-			if (typeB == 'N')
-				C.mat.noalias() = alpha * A.mat * B.mat;			
-			else
-				C.mat.noalias() = alpha * A.mat * B.mat.transpose();
-		}else
-		{
-			if (typeB == 'N')
-				C.mat.noalias() = alpha * A.mat.transpose() * B.mat;			
-			else
-				C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose();
-		}
+
+		#ifndef __GEMM_WITH_OPENBLAS__
+			if (typeA == 'N')
+			{
+				if (typeB == 'N')
+					C.mat.noalias() = alpha * A.mat * B.mat;			
+				else
+					C.mat.noalias() = alpha * A.mat * B.mat.transpose();
+			}else
+			{
+				if (typeB == 'N')
+					C.mat.noalias() = alpha * A.mat.transpose() * B.mat;			
+				else
+					C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose();
+			}
+		#else
+			#ifdef FAUST_SINGLE
+				cblas_sgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1, 0.0f, C.getData(), C.dim1);
+			#else
+				cblas_dgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1, 0.0, C.getData(), C.dim1);
+			#endif
+		#endif
+
 
 	}else
 	{
@@ -391,19 +419,29 @@ A.t_gemm.start();
 		}
 
 
-		if (typeA == 'N')
-		{
-			if (typeB == 'N')
-					C.mat = alpha * A.mat * B.mat + beta * C.mat;
-			else
-				C.mat = alpha * A.mat * B.mat.transpose() + beta * C.mat;
-		}else
-		{
-			if (typeB == 'N')
-				C.mat = alpha * A.mat.transpose() * B.mat + beta * C.mat ;			
-			else
-				C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
-		}
+		#ifndef __GEMM_WITH_OPENBLAS__
+			if (typeA == 'N')
+			{
+				if (typeB == 'N')
+						C.mat = alpha * A.mat * B.mat + beta * C.mat;
+				else
+					C.mat = alpha * A.mat * B.mat.transpose() + beta * C.mat;
+			}else
+			{
+				if (typeB == 'N')
+					C.mat = alpha * A.mat.transpose() * B.mat + beta * C.mat ;			
+				else
+					C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
+			}
+		#else
+                
+			#ifdef FAUST_SINGLE
+				cblas_sgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1, beta, C.getData(), C.dim1);
+			#else
+				cblas_dgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1, beta, C.getData(), C.dim1);
+			#endif
+		#endif
+
 	}
 	C.isZeros = false;
 	C.isIdentity = false;

@@ -4,6 +4,11 @@
 #include <iomanip>
 #include <fstream>
 
+#ifdef __GEMM_WITH_OPENBLAS__
+	#include "cblas.h"
+#endif
+	
+
 using namespace std;
 
 
@@ -417,8 +422,23 @@ t_mult_right.start();
 		mat = mat_copy * A.mat;
 	}*/
 		
-	mat = mat * A.mat;
-	resize(dim1, A.dim2);
+	#ifndef __GEMM_WITH_OPENBLAS__
+		mat = mat * A.mat;
+		resize(dim1, A.dim2);
+	#else
+		int C1_old = dim1;	
+		int C2_old = dim2;	
+		faust_real* C_old = new faust_real[C1_old*C2_old];
+		memcpy(C_old, getData(), C1_old*C2_old*sizeof(faust_real));
+		resize(C1_old, A.dim2);
+		#ifdef FAUST_SINGLE
+			cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0f, C_old, C1_old, A.getData(), A.dim1, 0.0f, getData(), dim1);
+		#else
+			cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0, C_old, C1_old, A.getData(), A.dim1, 0.0, getData(), dim1);
+		#endif
+		delete[] C_old ; C_old=NULL;
+		
+	#endif
 
 #ifdef __COMPILE_TIMERS__
 t_mult_right.stop();
