@@ -204,6 +204,14 @@ void prox_splin(faust_mat & M,int k)
 
 }
 
+void prox_splin_old(faust_mat & M,int k)
+{
+	M.transpose();
+	prox_spcol_old(M,k);
+	M.transpose();
+
+}
+
 //  normcol of the zero matrix equal to the matrix with all elements equal to s,
 //  in order to have the same behaviour as matlab prox
 void prox_normcol(faust_mat & M,faust_real s)

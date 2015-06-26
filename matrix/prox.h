@@ -17,6 +17,7 @@ void prox_toeplitz(faust_mat & M, int k);
 
 
 void prox_spcol_old(faust_mat & M,int k);
+void prox_splin_old(faust_mat & M,int k);
 void prox_sp_old(faust_mat & M,int k);
 void prox_sp_old_old(faust_mat & M,int k);
 
