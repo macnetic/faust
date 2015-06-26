@@ -349,7 +349,7 @@ t_compute_lambda.start();
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
    //cout<<lambda<<endl;
-   //cout<<__SP lambda<<endl;
+   cout<<__SP lambda<<endl;
 
 #ifdef __COMPILE_TIMERS__
 t_compute_lambda.stop();
@@ -452,7 +452,6 @@ t_init_fact.start();
      cerr << "Error in palm4MSA::init_fact : constrainst must be set before calling init_fact" << endl;
      exit(EXIT_FAILURE);
   }
-
    nb_fact = nb_facts_;
    S.resize(nb_fact);
    if (!isUpdateWayR2L)

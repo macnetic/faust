@@ -74,4 +74,4 @@ meg:$(OBJS) MEG_fact.o
 
 clean:
 	@printf '$(FONT)$(CYAN)Removing all object files and executable$(RESET_FONT)\n'
-	@rm -f hier_fact palm meg $(MATRIX_DIR)/*.o $(PALM_DIR)/*.o $(INIT_MATLAB)/*.o ./*.o
+	@rm -f hier_fact hier_fact2 palm meg $(MATRIX_DIR)/*.o $(PALM_DIR)/*.o $(INIT_MATLAB)/*.o ./*.o

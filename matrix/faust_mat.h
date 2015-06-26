@@ -19,10 +19,10 @@ public:
   /// Constructeurs ///
   faust_mat(const Eigen::Matrix<faust_real, Eigen::Dynamic,Eigen::Dynamic> & mat_);	
   faust_mat(const faust_real  *mat_,const int nbRow, const int nbCol );	
-  faust_mat() : mat(0,0) , dim1(0) , dim2(0) {}
-  faust_mat(const faust_mat & A) : dim1(A.dim1),dim2(A.dim2),mat(A.mat) {}
-  faust_mat(const int nbRow, const int nbCol) : mat(nbRow,nbCol),dim1(nbRow),dim2(nbCol){}
-  faust_mat(const int nbRow) : mat(nbRow,nbRow),dim1(nbRow),dim2(nbRow){}
+  faust_mat() : mat(0,0) , dim1(0) , dim2(0), isIdentity(false),isZeros(false) {}
+  faust_mat(const faust_mat & A) : dim1(A.dim1),dim2(A.dim2),mat(A.mat),isIdentity(A.isIdentity),isZeros(A.isZeros) {}
+  faust_mat(const int nbRow, const int nbCol) : mat(nbRow,nbCol),dim1(nbRow),dim2(nbCol),isIdentity(false),isZeros(false){}
+  faust_mat(const int nbRow) : mat(nbRow,nbRow),dim1(nbRow),dim2(nbRow),isIdentity(false),isZeros(false){}
 
 	
 	
@@ -42,19 +42,21 @@ public:
   void check_dim_validity();
   
   // (*this) = la matrice nulle
-  void setZeros() {mat.setZero();}
+  //void setZeros() {mat.setZero();isZeros=true;}
+  void setZeros();
   
   // (*this) = identite, pas forcement carree
-  void setEyes() {mat.setIdentity();}
+  //void setEyes() {mat.setIdentity();if(dim1==dim2)isIdentity=true;}
+  void setEyes();
 
   faust_real* getData(){return mat.data();}
   const faust_real* getData()const{return mat.data();}  
 
   
   /// EGALITE ///
-  bool isZeros() const {return mat.isZero(FAUST_PRECISION);}
-  bool isEqual(const faust_mat & B) const;
-  bool isEyes() const {return mat.isIdentity(FAUST_PRECISION);}
+  //bool isZeros() const {return mat.isZero(FAUST_PRECISION);}
+  //bool isEqual(const faust_mat & B) const;
+  //bool isEyes() const {return mat.isIdentity(FAUST_PRECISION);}
   
 void init_from_file(const char* filename);
   
@@ -130,6 +132,8 @@ void init_from_file(const char* filename);
   Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat;
        int dim1;
        int dim2;
+       bool isIdentity;
+       bool isZeros;
 
 #ifdef __COMPILE_TIMERS__
   public: 
@@ -160,7 +164,7 @@ void init_from_file(const char* filename);
 };
 
 
- bool operator==(faust_mat const& A, faust_mat const& B);
+ //bool operator==(faust_mat const& A, faust_mat const& B);
 
 
 #endif

@@ -10,9 +10,9 @@ using namespace std;
 
 /// CONSTRUCTEUR ///
   faust_mat::faust_mat(const Eigen::Matrix<faust_real,Eigen::Dynamic,Eigen::Dynamic> & mat_) : 
-     mat(mat_), dim1(mat_.rows()), dim2(mat_.cols()){}
+     mat(mat_), dim1(mat_.rows()), dim2(mat_.cols()),isIdentity(false),isZeros(false){}
   
-  faust_mat::faust_mat(const faust_real  *mat_,const int nbRow, const int nbCol )
+  faust_mat::faust_mat(const faust_real  *mat_,const int nbRow, const int nbCol ) : isIdentity(false),isZeros(false)
   {
 
 #ifdef __COMPILE_TIMERS__
@@ -124,6 +124,9 @@ t_set_coeff.start();
 			
 	mat(id_row,id_col) = value;
 
+        isZeros = false;
+        isIdentity = false;
+
 #ifdef __COMPILE_TIMERS__
 t_set_coeff.stop();
 #endif
@@ -145,6 +148,9 @@ t_set_coeffs.start();
 	int n = id_row.size();
 	for (int i=0;i<n;i++)
 		setCoeff(value,id_row[i],id_col[i]);
+
+        isZeros = false;
+        isIdentity = false;
 #ifdef __COMPILE_TIMERS__
 t_set_coeffs.stop();
 #endif
@@ -166,6 +172,9 @@ t_set_coeffs2.start();
 	for (int i=0;i<n;i++)
 		setCoeff(valueS[i],id_row[i],id_col[i]);
 	
+        isZeros = false;
+        isIdentity = false;
+
 #ifdef __COMPILE_TIMERS__
 t_set_coeffs2.stop();
 #endif
@@ -189,6 +198,10 @@ t_resize.start();
 			dim2 = nbCol;
 			mat.resize(nbRow,nbCol);
 		}
+
+        isZeros = false;
+        isIdentity = false;
+
 #ifdef __COMPILE_TIMERS__
 t_resize.stop();
 #endif
@@ -213,10 +226,29 @@ t_check_dim.stop();
 #endif
 
  }
- 
+
+
+void faust_mat::setZeros()
+{
+	memset(getData(), 0, sizeof(faust_real) * dim1*dim2);
+	isZeros = true;
+	isIdentity = false;
+}
+
+void faust_mat::setEyes()
+{
+	setZeros();
+	for (int i=0 ; i<fmin(dim1,dim2); i++)
+		getData()[i*dim1+i] = 1.0;
+	if (dim1 == dim2)
+		isIdentity = true;
+	isZeros = false;
+	
+}
+
  /// EGALITE ///
 
- bool faust_mat::isEqual(const faust_mat & B) const 
+ /*bool faust_mat::isEqual(const faust_mat & B) const 
  {
 	if ((getNbCol() != B.getNbCol()) || (getNbRow() != B.getNbRow()))
 	{
@@ -230,7 +262,7 @@ t_check_dim.stop();
 		return isZeros();
 	else
 		return mat.isApprox(B.mat,FAUST_PRECISION);
- }
+ }*/
 
 
  
@@ -300,6 +332,15 @@ faust_real faust_mat::min(std::vector<int> & id_row,std::vector<int> & id_col) c
 t_transpose.start();
 #endif
 
+	if(isZeros || isIdentity)
+	{
+		resize(dim2,dim1);
+		#ifdef __COMPILE_TIMERS__
+			t_transpose.stop();
+		#endif
+		return;
+	}
+
 	/*Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat_copy = mat; 
 	int dim1_copy = dim1;
 	int dim2_copy = dim2;
@@ -320,11 +361,12 @@ t_transpose.stop();
  }
  
  void faust_mat::multiplyRight(faust_mat const& A)
- {  
+ { 
 
 #ifdef __COMPILE_TIMERS__
 t_mult_right.start();
 #endif
+
 
 	if (dim2 != A.dim1)
 	{
@@ -332,7 +374,38 @@ t_mult_right.start();
        		std::cerr <<" while nbRow of A = " << A.getNbRow() << std::endl;
         	exit( EXIT_FAILURE);	
 	}
-	
+
+	if(A.isIdentity)
+	{
+		#ifdef __COMPILE_TIMERS__
+			t_mult_right.stop();
+		#endif
+		return;
+	}
+
+	if(isZeros || A.isZeros)
+	{
+		resize(dim1,A.dim2);
+		faust_real *const ptr_data_dst = getData();
+		memset(ptr_data_dst, 0, sizeof(faust_real) * dim1*dim2);
+		isZeros = true;
+		isIdentity = false;
+		#ifdef __COMPILE_TIMERS__
+			t_mult_right.stop();
+		#endif
+		return;
+	}
+
+	if(isIdentity)
+	{
+		this->operator=(A);
+		#ifdef __COMPILE_TIMERS__
+			t_mult_right.stop();
+		#endif
+		return;
+	}
+
+
 	/*int dim1_copy = dim1;
 	Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat_copy = mat; 
 	resize(dim1_copy,A.dim2);
@@ -367,7 +440,38 @@ t_mult_right.stop();
        		std::cerr <<" while nbCol of A = " << A.getNbCol() << std::endl;
         	exit( EXIT_FAILURE);	
 	}
+
+	if(A.isIdentity)
+	{
+		#ifdef __COMPILE_TIMERS__
+			t_mult_left.stop();
+		#endif
+		return;
+	}
+
+	if(isZeros || A.isZeros)
+	{
+		resize(A.dim1,dim2);
+		faust_real *const ptr_data_dst = getData();
+		memset(ptr_data_dst, 0, sizeof(faust_real) * dim1*dim2);
+		isZeros = true;
+		isIdentity = false;
+		#ifdef __COMPILE_TIMERS__
+			t_mult_left.stop();
+		#endif
+		return;
+	}
 	
+	if(isIdentity)
+	{
+		this->operator=(A);
+		#ifdef __COMPILE_TIMERS__
+			t_mult_left.stop();
+		#endif
+		return;
+	}
+
+
 	/*int dim1_copy = dim1;
 	Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat_copy = mat; 
 	resize(dim1_copy,A.dim2);
@@ -412,6 +516,8 @@ t_add.start();
         	exit( EXIT_FAILURE);
 	}
 	mat = mat + A.mat;
+        isZeros = false;
+        isIdentity = false;
 #ifdef __COMPILE_TIMERS__
 t_add.stop();
 #endif
@@ -429,6 +535,10 @@ t_sub.start();
         	exit( EXIT_FAILURE);
 	}
 	mat = mat - A.mat;
+
+        isZeros = false;
+        isIdentity = false;
+
 #ifdef __COMPILE_TIMERS__
 t_sub.stop();
 #endif
@@ -464,6 +574,8 @@ t_sub.stop();
 	  mat = A.mat;
 	  dim1 = A.dim1;
 	  dim2 = A.dim2;
+          isZeros = A.isZeros;
+          isIdentity = A.isIdentity;
   }
   
 
@@ -488,16 +600,20 @@ t_print_file.start();
   }
   resize(vec[0],vec[1]);
   memcpy(getData(), &vec[2], sizeof(faust_real) * dim1 * dim2); 
+  
+  isZeros = false;
+  isIdentity = false;
+
 #ifdef __COMPILE_TIMERS__
 t_print_file.stop();
 #endif
 }
 
 
-bool operator==(faust_mat const& A, faust_mat const& B)
+/*bool operator==(faust_mat const& A, faust_mat const& B)
 {
 	return A.isEqual(B);
-}
+}*/
 
 
 #ifdef __COMPILE_TIMERS__
