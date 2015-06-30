@@ -150,8 +150,9 @@ int main()
   //t1.start();
   for (int i=0 ; i<=nfacts-2 ; i++)
   {
-     //cout<<"i="<<i<<endl;
+     cout<<"i="<<i<<endl;
      hier_fact.next_step();
+	 hier_fact.get_lambda();
   }
 
   //t1.stop();

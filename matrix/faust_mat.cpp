@@ -253,7 +253,7 @@ void faust_mat::setEyes()
 
  /// EGALITE ///
 
- /*bool faust_mat::isEqual(const faust_mat & B) const 
+ bool faust_mat::isEqual(const faust_mat & B) const 
  {
 	if ((getNbCol() != B.getNbCol()) || (getNbRow() != B.getNbRow()))
 	{
@@ -261,15 +261,48 @@ void faust_mat::setEyes()
         	exit( EXIT_FAILURE);	
 	}
 
-	if (isZeros())
-		return B.isZeros();
-	else if (B.isZeros())
-		return isZeros();
+	if (isZeros)
+		return B.isZeros;
+	else if (B.isZeros)
+		return isZeros;
 	else
 		return mat.isApprox(B.mat,FAUST_PRECISION);
- }*/
+ }
 
-
+bool faust_mat::isEqual(const faust_mat & B, faust_real threshold) const
+{
+	if ((getNbCol() != B.getNbCol()) || (getNbRow() != B.getNbRow()))
+	{
+		cerr << "ERREUR isEqual : dimension of the matrix are not the same" << endl; 
+        	exit( EXIT_FAILURE);	
+	}
+	bool egalite =true;
+	for (int i=0;i<getNbRow();i++)
+	{
+		for (int j=0;j<getNbCol();j++)
+		{
+			if (std::abs(mat(i,j)==0))
+			{
+			
+				if (	(std::abs(mat(i,j)-B.mat(i,j))) > threshold )
+				{
+					egalite = false;
+					std::cout<<" i : "<<i<<" j : "<<j<<std::endl;
+				}
+			}else
+			{
+				if (	(std::abs(mat(i,j)-B.mat(i,j))/std::abs(mat(i,j))) > threshold )
+				{
+					egalite = false;
+					std::cout<<" i : "<<i<<" j : "<<j<<std::endl;
+				}
+			}
+		}
+	}
+	
+	return egalite;
+	
+}
  
  /// OPERATION BASIQUE ///
  
@@ -627,6 +660,27 @@ t_print_file.start();
 #ifdef __COMPILE_TIMERS__
 t_print_file.stop();
 #endif
+}
+
+
+void faust_mat::write_into_file(const char* filename)
+{
+	stringstream name_file;
+	ofstream file;
+	int i,j;
+	
+	name_file<<filename;
+	file.open(name_file.str().c_str(),ios::out);
+	for (i=0;i<getNbRow();i++)
+	{
+		for (j=0;j<getNbCol();j++)
+		{
+			file << getCoeff(i,j)<<" ";
+		}
+		file << std::endl;
+	}
+	
+	
 }
 
 

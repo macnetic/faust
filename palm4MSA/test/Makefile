@@ -12,7 +12,7 @@ SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
 
-CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include -D__PAS_FIXE__ #-Winline
+CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include -D__PAS_FIXE__ -DPROX=2#-Winline 
 
 ifneq ($(COMPILATION_THOMAS),)
    CXXFLAGS += -D__COMPILE_TIMERS__ -DFAUST_SINGLE -D__GEMM_WITH_OPENBLAS__ -I$(OPENBLASDIR)
@@ -42,7 +42,7 @@ CYAN    =36m
 RESET_FONT =\033[0m
 
 
-all:hier_fact hier_fact2 palm meg
+all:hier_fact hier_fact2 palm meg meg_new meg_old
 
 hier_fact: hierarchical_fact_test.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
@@ -65,6 +65,16 @@ meg:$(OBJS) MEG_fact.o
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+	
+meg_new:$(OBJS) MEG_fact.o
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'	
+	
+meg_old:$(OBJS) MEG_fact.o
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'		
 
 
 

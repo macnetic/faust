@@ -55,10 +55,12 @@ public:
   
   /// EGALITE ///
   //bool isZeros() const {return mat.isZero(FAUST_PRECISION);}
-  //bool isEqual(const faust_mat & B) const;
+  bool isEqual(const faust_mat & B) const;
+  bool isEqual(const faust_mat & B, faust_real threshold) const;
   //bool isEyes() const {return mat.isIdentity(FAUST_PRECISION);}
   
 void init_from_file(const char* filename);
+void write_into_file(const char* filename);
   
   
   /// OPERATION BASIQUE ///

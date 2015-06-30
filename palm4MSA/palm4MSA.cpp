@@ -11,6 +11,9 @@
 #include "LinAlgebra.h"
 #include "prox.h"
 
+
+#include"faust_init_from_matio_mat.h"
+
 #include <fstream>
 #include <iomanip>
 #include <algorithm>
@@ -87,9 +90,37 @@ t_compute_projection.start();
       switch (const_vec[ind_fact]->getConstraintType())
       {
          case CONSTRAINT_NAME_SP:
-         {
+         {	
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            prox_sp(S[ind_fact], const_int->getParameter());
+            #if (PROX == 0)
+			faust_mat S_back_up=S[ind_fact];
+			faust_mat S1,S2;
+			prox_sp(S[ind_fact], const_int->getParameter());
+			S1=S[ind_fact];
+			S[ind_fact]=S_back_up;
+			prox_sp_old_old(S[ind_fact], const_int->getParameter());
+			S2=S[ind_fact];
+			faust_real seuil = 0.000001;
+			if (!S1.isEqual(S2,seuil))
+			{	
+				S_back_up.write_into_file("fail_prox_sp.dat");
+				//write_faust_mat_into_matfile(S_back_up,"fail_prox_sp.dat","C");
+				cerr<<"erreur prox_sp k= :"<< const_int->getParameter()<<endl;
+				exit( EXIT_FAILURE); 
+			}
+			#endif
+			
+			
+			#if (PROX == 1)
+			cout<<"new"<<endl;
+			prox_sp_old_old(S[ind_fact], const_int->getParameter());
+			#endif
+			
+			#if (PROX == 2)
+			prox_sp(S[ind_fact], const_int->getParameter());
+			#endif
+			
+			
          }
          break;
 
@@ -103,7 +134,34 @@ t_compute_projection.start();
          case CONSTRAINT_NAME_SPLIN:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            prox_splin(S[ind_fact], const_int->getParameter());
+			#if (PROX == 0)
+				//cout<<"comp"<<endl;		
+			faust_mat S_back_up=S[ind_fact];
+			faust_mat S1,S2;
+			prox_splin(S[ind_fact], const_int->getParameter());
+			S1=S[ind_fact];
+			S[ind_fact]=S_back_up;
+			old_splin(S[ind_fact], const_int->getParameter());
+			S2=S[ind_fact];
+			faust_real seuil=0.000001;
+			if (!S1.isEqual(S2,seuil))
+			{	
+				S_back_up.write_into_file("fail_prox_splin.dat");
+				//write_faust_mat_into_matfile(S_back_up,"fail_prox_splin.mat","C");
+				cerr<<"erreur prox_splin k = :"<<const_int->getParameter()<<endl;
+				exit( EXIT_FAILURE); 
+			}
+			#endif
+			#if (PROX == 1)
+				//cout<<"old"<<endl;
+				old_splin(S[ind_fact], const_int->getParameter());
+			#endif
+			
+			#if (PROX == 2)
+				//cout<<"new"<<endl;
+				prox_splin(S[ind_fact], const_int->getParameter());
+			#endif
+			
          }
          break;
 

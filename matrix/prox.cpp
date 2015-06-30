@@ -4,14 +4,14 @@
 #include <iostream>
 #include "algorithm"
 
-#if 0
+
 void partial_sort_k_max(std::vector<faust_real> & sorted_elements, std::vector<int> & id_sorted_elements,std::vector<faust_real> & M_elements, int k);
 void partial_sort_k_min(std::vector<faust_real> & sorted_elements, std::vector<int> & id_sorted_elements,std::vector<faust_real> & M_elements, int k);
 
 
 
 void prox_sp(faust_mat & M,int k)
-{
+{	
 	int dim1 = M.getNbRow();
 	int dim2 = M.getNbCol();
 
@@ -51,9 +51,17 @@ void prox_sp(faust_mat & M,int k)
 				new_M.setZeros();
 
 
-				for (int i=0;i<k;i++)
+				/*for (int i=0;i<k;i++)
 				{	
 					(((new_M.getData()))[id_sorted_elements[i]]) =  (((M.getData()))[id_sorted_elements[i]]);
+				}*/
+				int id_row,id_col;
+				
+				for (int i=0;i<k;i++)
+				{
+					id_row = id_sorted_elements[i]%dim1;
+					id_col = (id_sorted_elements[i]-id_row)/dim1;
+					new_M.setCoeff(M.getCoeff(id_row,id_col),id_row,id_col);
 				}
 			
 				M = new_M;
@@ -90,40 +98,9 @@ void prox_sp(faust_mat & M,int k)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void prox_spcol(faust_mat & M,int k)
 {
+	
 	int dim1 = M.getNbRow();
 	int dim2 = M.getNbCol();
 	
@@ -152,12 +129,20 @@ void prox_spcol(faust_mat & M,int k)
 					sorted_elements.assign(k,-1);
 					id_sorted_elements.assign(k,-1);
 					memcpy(&(copy_col_abs[0]),&((M_abs.getData())[i*dim1]),dim1*sizeof(faust_real));
+					/*for (int ll=0;ll<dim1;ll++)
+					{
+						copy_col_abs[ll]=M_abs.getCoeff(ll,i);
+					}*/	
 					partial_sort_k_max(sorted_elements,id_sorted_elements,copy_col_abs,k);
 				
 				// update new_M		
-					for (int j=0;j<k;j++)
+					/*for (int j=0;j<k;j++)
 					{	
 						(((new_M.getData()))[id_sorted_elements[j]+i*dim1]) =  (((M.getData()))[id_sorted_elements[j]+i*dim1]);
+					}*/
+					for (int ll=0;ll<k;ll++)
+					{
+						new_M.setCoeff(M.getCoeff(id_sorted_elements[ll],i),id_sorted_elements[ll],i);
 					}
 					
 					
@@ -194,7 +179,14 @@ void prox_spcol(faust_mat & M,int k)
 
 
 
+void old_splin(faust_mat & M,int k)
+{
+	M.transpose();
+	prox_spcol_old(M,k);
+	M.transpose();
+	
 
+}
 
 
 void prox_splin(faust_mat & M,int k)
@@ -205,13 +197,7 @@ void prox_splin(faust_mat & M,int k)
 
 }
 
-void prox_splin_old(faust_mat & M,int k)
-{
-	M.transpose();
-	prox_spcol_old(M,k);
-	M.transpose();
 
-}
 
 //  normcol of the zero matrix equal to the matrix with all elements equal to s,
 //  in order to have the same behaviour as matlab prox
@@ -574,6 +560,7 @@ void prox_spcol_old(faust_mat & M,int k)
 			
 				// calculus of the max of the current column and its index
 				current_max=current_col.max(id_row_max,id_col_max);
+				//std::cout<<" max : "<<current_max<<std::endl;
 				nbr_new_elt = id_row_max.size();
 				//M.Display();
 				nbr_elt_to_add=std::min(k-nb_elt_found,nbr_new_elt);
@@ -780,13 +767,20 @@ void partial_sort_k_max(std::vector<faust_real> & sorted_elements, std::vector<i
 			it_2_insert=(std::upper_bound(sorted_elements.begin(),sorted_elements.end(),current_value,std::greater_equal<faust_real>()));
 			id_2_insert = std::distance(sorted_elements.begin(),it_2_insert);
 			for (int ii=k-2;ii>=(id_2_insert);ii--)
-			{
+			{	
 				id_sorted_elements[ii+1] = id_sorted_elements[ii];
 			}
 				
 			sorted_elements.insert(it_2_insert,current_value);
 			sorted_elements.pop_back();
 			id_sorted_elements[id_2_insert]=i;
+			
+			/*for (int j=0;j<k;k++)
+			{
+					std::cout<<sorted_elements[j]<<" ";
+			}
+			std::cout<<std::endl;*/
+			
 
 
 
@@ -828,7 +822,7 @@ void partial_sort_k_min(std::vector<faust_real> & sorted_elements,std::vector<in
 	}
 }
 
-#endif
+#if 0
 
 
 
@@ -1548,7 +1542,7 @@ void prox_sp_old_old(faust_mat & M,int k)
 
 
 
-
+#endif
 
 
 
