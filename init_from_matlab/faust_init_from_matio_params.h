@@ -1,6 +1,7 @@
 #ifndef __FAUST_INIT_FROM_MATIO_PARAMS_H__
 #define __FAUST_INIT_FROM_MATIO_PARAMS_H__
 
+#include "faust_init_from_matio.h"
 #include "matio.h"
 #include <vector>
 

@@ -146,16 +146,18 @@ int main()
   hierarchical_fact hier_fact(params);
 
   hier_fact.init();
-  //faust_timer t1;
-  //t1.start();
+  faust_timer t1;
+  t1.start();
   for (int i=0 ; i<=nfacts-2 ; i++)
   {
      cout<<"i="<<i<<endl;
      hier_fact.next_step();
-	 hier_fact.get_lambda();
   }
 
-  //t1.stop();
-  //cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
+  t1.stop();
+#ifdef __COMPILE_TIMERS__
+  hier_fact.print_timers();
+#endif
+  cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 return 0;
 }

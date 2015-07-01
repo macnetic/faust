@@ -24,9 +24,9 @@ class palm4MSA
 
       void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
       void set_data(const faust_mat& data_){data=data_;}
-      void set_nfacts(const int nfact_){nb_fact=nfact_;}
+      //void set_nfacts(const int nfact_){nb_fact=nfact_;}
       void set_lambda(const faust_real lambda_){lambda = lambda_;}
-      void set_lambda(const palm4MSA& palm_){lambda = palm_.lambda;}
+      //void set_lambda(const palm4MSA& palm_){lambda = palm_.lambda;}
       void update_lambda_from_palm(const palm4MSA& palm){lambda *= palm.lambda;}
 
       
@@ -34,7 +34,7 @@ class palm4MSA
       faust_real get_lambda()const{return lambda;}
       faust_real get_RMSE()const{return error.norm()/data.getNbRow()/data.getNbCol();}
       const faust_mat& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
-      const faust_mat& get_data()const{return data;}
+      //const faust_mat& get_data()const{return data;}
 
       void init_fact(int nb_facts_);      
       void next_step();
@@ -98,19 +98,33 @@ class palm4MSA
       std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
 
 
-#ifdef __COMPILE_TIMERS__
-   public:
-      static faust_timer t_compute_projection;
-      static faust_timer t_compute_grad_over_c;
-      static faust_timer t_compute_lambda;
-      static faust_timer t_update_R;
-      static faust_timer t_update_L;
-      static faust_timer t_check;
-      static faust_timer t_init_fact;
-      static faust_timer t_next_step;
-      static faust_timer t_init_fact_from_palm;
 
-   void print_timers()const;
+#ifdef __COMPILE_TIMERS__
+   public: 
+      faust_timer t_local_compute_projection;
+      faust_timer t_local_compute_grad_over_c;
+      faust_timer t_local_compute_lambda;
+      faust_timer t_local_update_R;
+      faust_timer t_local_update_L;
+      faust_timer t_local_check;
+      faust_timer t_local_init_fact;
+      faust_timer t_local_next_step;
+      faust_timer t_local_init_fact_from_palm;
+
+      static faust_timer t_global_compute_projection;
+      static faust_timer t_global_compute_grad_over_c;
+      static faust_timer t_global_compute_lambda;
+      static faust_timer t_global_update_R;
+      static faust_timer t_global_update_L;
+      static faust_timer t_global_check;
+      static faust_timer t_global_init_fact;
+      static faust_timer t_global_next_step;
+      static faust_timer t_global_init_fact_from_palm;
+ 
+   void init_local_timers();
+
+   void print_global_timers()const;
+   void print_local_timers()const;
 #endif
 
 };

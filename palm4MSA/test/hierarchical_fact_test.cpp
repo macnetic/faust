@@ -9,7 +9,6 @@
 #include "hierarchical_fact.h"
 #include "faust_timer.h"
 #include <iostream>
-#include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
 
 using namespace std;
@@ -115,12 +114,17 @@ faust_real cons21_parameter;
   t1.start();
   for (int i=0 ; i<=nfacts-2 ; i++)
   {
-     //cout<<"i="<<i<<endl;
+     cout<<"i="<<i<<endl;
      hier_fact.next_step();
   }
 
   t1.stop();
+#ifdef __COMPILE_TIMERS__
+  hier_fact.print_timers();
+#endif
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
+
+  
 
 
   const vector<faust_mat>& facts = hier_fact.get_facts();

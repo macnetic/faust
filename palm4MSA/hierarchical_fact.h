@@ -35,7 +35,7 @@ class hierarchical_fact
       palm4MSA palm_2;
       palm4MSA palm_global;
       const faust_real default_lambda; // initial value of lambda for factorization into two factors
-      std::vector<faust_mat> S;
+      //std::vector<faust_mat> S;
       std::vector<const faust_constraint_generic*> cons_tmp_global;
      
 #ifdef __COMPILE_TIMERS__

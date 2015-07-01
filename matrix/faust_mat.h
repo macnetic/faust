@@ -78,7 +78,7 @@ void write_into_file(const char* filename);
   
   // frobenius norm
   faust_real norm() const {return mat.norm();}
-  void normalize() {scalarMultiply(1/norm());}
+  void normalize() {scalarMultiply(1.0/norm());}
   // spectral norm, "norm2", equal to the largest singular value  
   faust_real spectralNorm() const {return mat.operatorNorm();}
   

@@ -10,7 +10,9 @@ class faust_timer
       void start();
       void stop();
       void reset();
+      float get_time()const;
       float get_time();
+      long int get_nb_call()const;
       long int get_nb_call();
 
 

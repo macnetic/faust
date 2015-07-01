@@ -11,6 +11,10 @@
 #include "LinAlgebra.h"
 #include "prox.h"
 
+#ifdef __COMPILE_TIMERS__
+#include "faust_timer.h"
+#endif
+
 
 #include"faust_init_from_matio_mat.h"
 
@@ -75,7 +79,8 @@ palm4MSA::palm4MSA(const faust_params_palm& params_palm_, const bool isGlobal_) 
 void palm4MSA::compute_projection()
 {
 #ifdef __COMPILE_TIMERS__
-t_compute_projection.start();
+t_global_compute_projection.start();
+t_local_compute_projection.start();
 #endif
 
    if (const_vec[ind_fact]->getConstraintType() == CONSTRAINT_NAME_CONST)
@@ -250,7 +255,8 @@ t_compute_projection.start();
    }
    isProjectionComputed = true;
 #ifdef __COMPILE_TIMERS__
-t_compute_projection.stop();
+t_global_compute_projection.stop();
+t_local_compute_projection.stop();
 #endif
 }
 
@@ -258,7 +264,8 @@ t_compute_projection.stop();
 void palm4MSA::compute_grad_over_c()
 {
 #ifdef __COMPILE_TIMERS__
-t_compute_grad_over_c.start();
+t_global_compute_grad_over_c.start();
+t_local_compute_grad_over_c.start();
 #endif
    if(!isCComputed) 
    {
@@ -378,14 +385,16 @@ t_compute_grad_over_c.start();
    isGradComputed = true;
 
 #ifdef __COMPILE_TIMERS__
-t_compute_grad_over_c.stop();
+t_global_compute_grad_over_c.stop();
+t_local_compute_grad_over_c.stop();
 #endif
 }
 
 void palm4MSA::compute_lambda()
 {
 #ifdef __COMPILE_TIMERS__
-t_compute_lambda.start();
+t_global_compute_lambda.start();
+t_local_compute_lambda.start();
 #endif
 
    if (!isLastFact)
@@ -407,10 +416,11 @@ t_compute_lambda.start();
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
    //cout<<lambda<<endl;
-   cout<<__SP lambda<<endl;
+   //cout<<__SP lambda<<endl;
 
 #ifdef __COMPILE_TIMERS__
-t_compute_lambda.stop();
+t_global_compute_lambda.stop();
+t_local_compute_lambda.stop();
 #endif
 }
 
@@ -418,7 +428,8 @@ t_compute_lambda.stop();
 void palm4MSA::update_R()
 {
 #ifdef __COMPILE_TIMERS__
-t_update_R.start();
+t_global_update_R.start();
+t_local_update_R.start();
 #endif
 
    // R[nb_fact-1] est initialise a l'identite lors de la creation de l'objet palm4MSA et n'est pas cense changer
@@ -435,7 +446,8 @@ t_update_R.start();
    else
       LorR.multiplyLeft(S[ind_fact]);
 #ifdef __COMPILE_TIMERS__
-t_update_R.stop();
+t_global_update_R.stop();
+t_local_update_R.stop();
 #endif
 }
 
@@ -443,7 +455,8 @@ t_update_R.stop();
 void palm4MSA::update_L()
 {
 #ifdef __COMPILE_TIMERS__
-t_update_L.start();
+t_global_update_L.start();
+t_local_update_L.start();
 #endif
 
    if(!isProjectionComputed){
@@ -462,14 +475,16 @@ t_update_L.start();
          multiply(RorL[i] , S[i], RorL[i+1]);
    }
 #ifdef __COMPILE_TIMERS__
-t_update_L.stop();
+t_global_update_L.stop();
+t_local_update_L.stop();
 #endif
 }
 
 void palm4MSA::check_constraint_validity()
 {
 #ifdef __COMPILE_TIMERS__
-t_check.start();
+t_global_check.start();
+t_local_check.start();
 #endif
 
    if (nb_fact != S.size())
@@ -478,14 +493,16 @@ t_check.start();
       exit(EXIT_FAILURE);
    }
 #ifdef __COMPILE_TIMERS__
-t_check.stop();
+t_global_check.stop();
+t_local_check.stop();
 #endif
 }
 
 void palm4MSA::init_fact(int nb_facts_)
 {
 #ifdef __COMPILE_TIMERS__
-t_init_fact.start();
+t_global_init_fact.start();
+t_local_init_fact.start();
 #endif
 
   /*if(isInit && isGlobal)
@@ -535,14 +552,16 @@ t_init_fact.start();
 
     
 #ifdef __COMPILE_TIMERS__
-t_init_fact.stop();
+t_global_init_fact.stop();
+t_local_init_fact.stop();
 #endif
 }
 
 void palm4MSA::next_step()
 {
 #ifdef __COMPILE_TIMERS__
-t_next_step.start();
+t_global_next_step.start();
+t_local_next_step.start();
 #endif
 
 
@@ -579,15 +598,20 @@ t_next_step.start();
       isCComputed = false;
       isGradComputed = false;
       isProjectionComputed = false;
+      
       compute_c();
       // X_hat is computed by compute_grad_over_c only when j=ind_fact-1
       compute_grad_over_c();
+
+
       compute_projection();
-   
+  
+ 
       if(!isUpdateWayR2L)
          update_L();
       else
          update_R();
+
     
       if (isLastFact)
          compute_lambda();
@@ -597,14 +621,16 @@ t_next_step.start();
    ind_ptr = NULL;
 
 #ifdef __COMPILE_TIMERS__
-t_next_step.stop();
+t_global_next_step.stop();
+t_local_next_step.stop();
 #endif
 }
 
 void palm4MSA::init_fact_from_palm(const palm4MSA& palm2, bool isFactSideLeft)
 {
 #ifdef __COMPILE_TIMERS__
-t_init_fact_from_palm.start();
+t_global_init_fact_from_palm.start();
+t_local_init_fact_from_palm.start();
 #endif
 
 
@@ -635,35 +661,67 @@ t_init_fact_from_palm.start();
    check_constraint_validity();
 
 #ifdef __COMPILE_TIMERS__
-t_init_fact_from_palm.stop();
+t_global_init_fact_from_palm.stop();
+t_local_init_fact_from_palm.stop();
 #endif
 }
 
 
 #ifdef __COMPILE_TIMERS__
 
-faust_timer palm4MSA::t_compute_projection;
-faust_timer palm4MSA::t_compute_grad_over_c;
-faust_timer palm4MSA::t_compute_lambda;
-faust_timer palm4MSA::t_update_R;
-faust_timer palm4MSA::t_update_L;
-faust_timer palm4MSA::t_check;
-faust_timer palm4MSA::t_init_fact;
-faust_timer palm4MSA::t_next_step;
-faust_timer palm4MSA::t_init_fact_from_palm;
+faust_timer palm4MSA::t_global_compute_projection;
+faust_timer palm4MSA::t_global_compute_grad_over_c;
+faust_timer palm4MSA::t_global_compute_lambda;
+faust_timer palm4MSA::t_global_update_R;
+faust_timer palm4MSA::t_global_update_L;
+faust_timer palm4MSA::t_global_check;
+faust_timer palm4MSA::t_global_init_fact;
+faust_timer palm4MSA::t_global_next_step;
+faust_timer palm4MSA::t_global_init_fact_from_palm;
 
+void palm4MSA::init_local_timers()
+{
+t_local_compute_projection.reset();
+t_local_compute_grad_over_c.reset();
+t_local_compute_lambda.reset();
+t_local_update_R.reset();
+t_local_update_L.reset();
+t_local_check.reset();
+t_local_init_fact.reset();
+t_local_next_step.reset();
+t_local_init_fact_from_palm.reset();
+}
 
-void palm4MSA::print_timers()const
+void palm4MSA::print_global_timers()const
 {
    cout << "timers in palm4MSA : " << endl;
-   cout << "t_compute_projection  = " << t_compute_projection.get_time()  << " s for "<< t_compute_projection.get_nb_call()  << " calls" << endl;
-   cout << "t_compute_grad_over_c = " << t_compute_grad_over_c.get_time() << " s for "<< t_compute_grad_over_c.get_nb_call() << " calls" << endl;
-   cout << "t_compute_lambda      = " << t_compute_lambda.get_time()      << " s for "<< t_compute_lambda.get_nb_call()      << " calls" << endl;
-   cout << "t_update_R            = " << t_update_R.get_time()            << " s for "<< t_update_R.get_nb_call()            << " calls" << endl;
-   cout << "t_update_L            = " << t_update_L.get_time()            << " s for "<< t_update_L.get_nb_call()            << " calls" << endl;
-   cout << "t_check_              = " << t_check.get_time()               << " s for "<< t_check.get_nb_call()               << " calls" << endl;
-   cout << "t_init_fact           = " << t_init_fact.get_time()           << " s for "<< t_init_fact.get_nb_call()           << " calls" << endl;
-   cout << "t_next_step           = " << t_next_step.get_time()           << " s for "<< t_next_step.get_nb_call()           << " calls" << endl;
-   cout << "t_init_fact_from_palm = " << t_init_fact_from_palm.get_time() << " s for "<< t_init_fact_from_palm.get_nb_call() << " calls" << endl<<endl;
+   cout << "t_global_compute_projection  = " << t_global_compute_projection.get_time()  << " s for "<< t_global_compute_projection.get_nb_call()  << " calls" << endl;
+   cout << "t_global_compute_grad_over_c = " << t_global_compute_grad_over_c.get_time() << " s for "<< t_global_compute_grad_over_c.get_nb_call() << " calls" << endl;
+   cout << "t_global_compute_lambda      = " << t_global_compute_lambda.get_time()      << " s for "<< t_global_compute_lambda.get_nb_call()      << " calls" << endl;
+   cout << "t_global_update_R            = " << t_global_update_R.get_time()            << " s for "<< t_global_update_R.get_nb_call()            << " calls" << endl;
+   cout << "t_global_update_L            = " << t_global_update_L.get_time()            << " s for "<< t_global_update_L.get_nb_call()            << " calls" << endl;
+   cout << "t_check_              = " << t_global_check.get_time()               << " s for "<< t_global_check.get_nb_call()               << " calls" << endl;
+   cout << "t_global_init_fact           = " << t_global_init_fact.get_time()           << " s for "<< t_global_init_fact.get_nb_call()           << " calls" << endl;
+   cout << "t_global_next_step           = " << t_global_next_step.get_time()           << " s for "<< t_global_next_step.get_nb_call()           << " calls" << endl;
+   cout << "t_global_init_fact_from_palm = " << t_global_init_fact_from_palm.get_time() << " s for "<< t_global_init_fact_from_palm.get_nb_call() << " calls" << endl<<endl;
 }
+
+
+void palm4MSA::print_local_timers()const
+{
+   cout << "timers in palm4MSA : " << endl;
+   cout << "t_local_compute_projection  = " << t_local_compute_projection.get_time()  << " s for "<< t_local_compute_projection.get_nb_call()  << " calls" << endl;
+   cout << "t_local_compute_grad_over_c = " << t_local_compute_grad_over_c.get_time() << " s for "<< t_local_compute_grad_over_c.get_nb_call() << " calls" << endl;
+   cout << "t_local_compute_lambda      = " << t_local_compute_lambda.get_time()      << " s for "<< t_local_compute_lambda.get_nb_call()      << " calls" << endl;
+   cout << "t_local_update_R            = " << t_local_update_R.get_time()            << " s for "<< t_local_update_R.get_nb_call()            << " calls" << endl;
+   cout << "t_local_update_L            = " << t_local_update_L.get_time()            << " s for "<< t_local_update_L.get_nb_call()            << " calls" << endl;
+   cout << "t grad + updateL + updateR  = " << t_local_update_L.get_time()+t_local_update_R.get_time()+t_local_compute_grad_over_c.get_time()            << " s for "<< t_local_update_L.get_nb_call()            << " calls of grad" << endl;
+   cout << "t_check_                    = " << t_local_check.get_time()               << " s for "<< t_local_check.get_nb_call()               << " calls" << endl;
+   cout << "t_local_init_fact           = " << t_local_init_fact.get_time()           << " s for "<< t_local_init_fact.get_nb_call()           << " calls" << endl;
+   cout << "t_local_next_step           = " << t_local_next_step.get_time()           << " s for "<< t_local_next_step.get_nb_call()           << " calls" << endl;
+   cout << "t_local_init_fact_from_palm = " << t_local_init_fact_from_palm.get_time() << " s for "<< t_local_init_fact_from_palm.get_nb_call() << " calls" << endl<<endl;
+}
+
+
+
 #endif
