@@ -84,9 +84,17 @@ t_local_compute_projection.start();
 #endif
 
    if (const_vec[ind_fact]->getConstraintType() == CONSTRAINT_NAME_CONST)
-   {
+   {	
+		#ifdef __COMPILE_TIMERS__
+			nb_call_prox_const++;
+			t_prox_const.start();
+			
+		#endif
          const faust_constraint_mat* const_mat = dynamic_cast<const faust_constraint_mat*>(const_vec[ind_fact]);
          S[ind_fact] = const_mat->getParameter();
+		 #ifdef __COMPILE_TIMERS__
+			t_prox_const.stop();
+		#endif
    }
    else
    {
@@ -96,7 +104,12 @@ t_local_compute_projection.start();
       {
          case CONSTRAINT_NAME_SP:
          {	
+			#ifdef __COMPILE_TIMERS__
+				nb_call_prox_sp++;
+				t_prox_sp.start();
+			#endif
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
+			
             #if (PROX == 0)
 			faust_mat S_back_up=S[ind_fact];
 			faust_mat S1,S2;
@@ -125,19 +138,34 @@ t_local_compute_projection.start();
 			prox_sp(S[ind_fact], const_int->getParameter());
 			#endif
 			
+			#ifdef __COMPILE_TIMERS__
+			t_prox_sp.stop();
+			#endif
 			
          }
          break;
 
          case CONSTRAINT_NAME_SPCOL:
-         {
+         {	
+			#ifdef __COMPILE_TIMERS__
+				nb_call_prox_spcol++;
+				t_prox_spcol.start();
+				
+			#endif
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
             prox_spcol(S[ind_fact], const_int->getParameter());
+			#ifdef __COMPILE_TIMERS__
+				t_prox_spcol.stop();
+			#endif
          }
          break;
 
          case CONSTRAINT_NAME_SPLIN:
-         {
+         {	
+			#ifdef __COMPILE_TIMERS__
+			nb_call_prox_splin++;
+			t_prox_splin.start();
+			#endif
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
 			#if (PROX == 0)
 				//cout<<"comp"<<endl;		
@@ -167,34 +195,51 @@ t_local_compute_projection.start();
 				prox_splin(S[ind_fact], const_int->getParameter());
 			#endif
 			
+			#ifdef __COMPILE_TIMERS__
+				t_prox_splin.stop();
+			#endif
+			
          }
          break;
 
          case CONSTRAINT_NAME_NORMCOL:
-         {
+         {	
+			#ifdef __COMPILE_TIMERS__
+				nb_call_prox_normcol++;
+				t_prox_normcol.start();
+			#endif
             const faust_constraint_real* const_real = dynamic_cast<const faust_constraint_real*>(const_vec[ind_fact]);
             prox_normcol(S[ind_fact], const_real->getParameter());
+			#ifdef __COMPILE_TIMERS__
+				t_prox_normcol.stop();
+			#endif
          }
          break;
 
          case CONSTRAINT_NAME_SPLINCOL:
-         {
+         {	
+
             const faust_constraint_real* const_real = dynamic_cast<const faust_constraint_real*>(const_vec[ind_fact]);
             //prox_splincol(S[ind_fact], const_real->getParameter());
+
          }
          break;
 
          case CONSTRAINT_NAME_L0PEN:
-         {
+         {	
+
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
             //prox_l0pen(S[ind_fact], sqrt(2*const_int->getParameter()/c));
+
          }
          break;
 
          case CONSTRAINT_NAME_L1PEN:
-         {
+         {	
+
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
             //prox_l1pen(S[ind_fact], const_int->getParameter()/c);
+
          }
          break;
 
@@ -679,6 +724,23 @@ faust_timer palm4MSA::t_global_init_fact;
 faust_timer palm4MSA::t_global_next_step;
 faust_timer palm4MSA::t_global_init_fact_from_palm;
 
+
+faust_timer palm4MSA::t_prox_const;
+faust_timer palm4MSA::t_prox_sp;
+faust_timer palm4MSA::t_prox_spcol;
+faust_timer palm4MSA::t_prox_splin;
+faust_timer palm4MSA::t_prox_normcol;
+
+int palm4MSA::nb_call_prox_const;
+int palm4MSA::nb_call_prox_sp;
+int palm4MSA::nb_call_prox_spcol;
+int palm4MSA::nb_call_prox_splin;
+int palm4MSA::nb_call_prox_normcol;
+
+
+
+
+
 void palm4MSA::init_local_timers()
 {
 t_local_compute_projection.reset();
@@ -706,6 +768,16 @@ void palm4MSA::print_global_timers()const
    cout << "t_global_init_fact_from_palm = " << t_global_init_fact_from_palm.get_time() << " s for "<< t_global_init_fact_from_palm.get_nb_call() << " calls" << endl<<endl;
 }
 
+void palm4MSA::print_prox_timers() const
+{
+	cout << "prox timers in palm4MSA : " << endl;
+   cout << "total t_prox_const  =  " << t_prox_const.get_time()  << " s for "<< nb_call_prox_const  << " calls" << endl;
+   cout << "total t_prox_sp  =  " << t_prox_sp.get_time()  << " s for "<< nb_call_prox_sp  << " calls" << endl;
+   cout << "total t_prox_spcol  =  " << t_prox_spcol.get_time()  << " s for "<< nb_call_prox_spcol  << " calls" << endl;
+   cout << "total t_prox_splin  =  " << t_prox_splin.get_time()  << " s for "<< nb_call_prox_splin  << " calls" << endl;
+   cout << "total t_prox_normcol  =  " << t_prox_normcol.get_time()  << " s for "<< nb_call_prox_normcol  << " calls" << endl;	
+}
+
 
 void palm4MSA::print_local_timers()const
 {
@@ -721,6 +793,10 @@ void palm4MSA::print_local_timers()const
    cout << "t_local_next_step           = " << t_local_next_step.get_time()           << " s for "<< t_local_next_step.get_nb_call()           << " calls" << endl;
    cout << "t_local_init_fact_from_palm = " << t_local_init_fact_from_palm.get_time() << " s for "<< t_local_init_fact_from_palm.get_nb_call() << " calls" << endl<<endl;
 }
+
+
+
+
 
 
 

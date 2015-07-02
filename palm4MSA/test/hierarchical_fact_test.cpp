@@ -121,6 +121,7 @@ faust_real cons21_parameter;
   t1.stop();
 #ifdef __COMPILE_TIMERS__
   hier_fact.print_timers();
+  //hier_fact.print_prox_timers();
 #endif
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 

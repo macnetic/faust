@@ -43,6 +43,7 @@ void prox_sp(faust_mat & M,int k)
 		
 			if (k< nb_elt_mat/2)
 			{	
+				//std::cout<<"k<1/2"<<std::endl;	
 				faust_mat new_M(dim1,dim2);
 				sorted_elements.assign(k,-1);
 				id_sorted_elements.assign(k,-1);
@@ -68,7 +69,7 @@ void prox_sp(faust_mat & M,int k)
 			
 			}else
 			{
-				
+				//std::cout<<"k>1/2"<<std::endl;	
 				k=nb_elt_mat-k;
 				faust_real unreached_value = M_abs.max();
 				sorted_elements.assign(k,unreached_value);

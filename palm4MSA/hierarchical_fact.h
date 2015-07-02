@@ -44,6 +44,7 @@ class hierarchical_fact
       static faust_timer t_next_step;
 
     void print_timers()const;
+	//void print_prox_timers()const;
 #endif
 
 

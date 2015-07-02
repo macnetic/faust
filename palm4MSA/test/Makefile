@@ -16,13 +16,15 @@ CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLA
 
 ifneq ($(COMPILATION_THOMAS),)
    CXXFLAGS += -DFAUST_SINGLE -D__GEMM_WITH_OPENBLAS__ -I$(OPENBLASDIR) -D__COMPILE_TIMERS__
+   else
+   CXXFLAGS += -DFAUST_SINGLE -D__GEMM_WITH_OPENBLAS__ -I$(OPENBLASDIR)/include -D__COMPILE_TIMERS__
 endif
 
 LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio 
 ifneq ($(COMPILATION_THOMAS),)
    LDFLAGS += -lhdf5  -L$(OPENBLASDIR) -lopenblas
 else
-   LDFLAGS += -lrt
+   LDFLAGS += -lrt -L$(OPENBLASDIR)/lib   -lopenblas
 endif
 
 FONT =\033[
@@ -46,7 +48,7 @@ all:hier_fact hier_fact2 palm meg meg_new meg_old
 
 hier_fact: hierarchical_fact_test.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
-	@$(CXX) $(LDFLAGS) $^ -o $@
+	$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 
 hier_fact2: hierarchical_fact_test2.o $(OBJS)

@@ -101,6 +101,7 @@ palm_global.print_local_timers();
 
 #ifdef __COMPILE_TIMERS__
 t_next_step.stop();
+palm_2.print_prox_timers();
 #endif
 }
 

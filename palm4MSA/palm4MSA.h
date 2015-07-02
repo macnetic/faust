@@ -110,6 +110,7 @@ class palm4MSA
       faust_timer t_local_init_fact;
       faust_timer t_local_next_step;
       faust_timer t_local_init_fact_from_palm;
+	 
 
       static faust_timer t_global_compute_projection;
       static faust_timer t_global_compute_grad_over_c;
@@ -120,11 +121,30 @@ class palm4MSA
       static faust_timer t_global_init_fact;
       static faust_timer t_global_next_step;
       static faust_timer t_global_init_fact_from_palm;
+	  
+	  static faust_timer t_prox_const;
+	  static faust_timer t_prox_sp;
+	  static faust_timer t_prox_spcol;
+	  static faust_timer t_prox_splin;
+	  static faust_timer t_prox_normcol;
+	  
+	  static int nb_call_prox_const;
+	  static int nb_call_prox_sp;
+	  static int nb_call_prox_spcol;
+	  static int nb_call_prox_splin;
+	  static int nb_call_prox_normcol;
+	  
+
+
+
+
+	  
  
    void init_local_timers();
 
    void print_global_timers()const;
    void print_local_timers()const;
+   void print_prox_timers() const;
 #endif
 
 };
