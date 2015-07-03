@@ -162,6 +162,9 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_SPLIN:
          {	
+
+			
+
 			#ifdef __COMPILE_TIMERS__
 			nb_call_prox_splin++;
 			t_prox_splin.start();
@@ -461,7 +464,7 @@ t_local_compute_lambda.start();
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
    //cout<<lambda<<endl;
-   //cout<<__SP lambda<<endl;
+   cout<<__SP lambda<<endl;
 
 #ifdef __COMPILE_TIMERS__
 t_global_compute_lambda.stop();
@@ -651,6 +654,8 @@ t_local_next_step.start();
 
       compute_projection();
   
+
+
  
       if(!isUpdateWayR2L)
          update_L();

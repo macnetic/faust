@@ -12,10 +12,10 @@ SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
 
-CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include -D__PAS_FIXE__ -DPROX=2  #-Winline 
+CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include -D__PAS_FIXE__ -DPROX=2 -std=c++11  #-Winline 
 
 ifneq ($(COMPILATION_THOMAS),)
-   CXXFLAGS += -DFAUST_SINGLE -D__GEMM_WITH_OPENBLAS__ -I$(OPENBLASDIR) -D__COMPILE_TIMERS__
+   CXXFLAGS += -DFAUST_SINGLE -D__GEMM_WITH_OPENBLAS__ -I$(OPENBLASDIR)   -D__COMPILE_TIMERS__
    else
    CXXFLAGS += -DFAUST_SINGLE -D__GEMM_WITH_OPENBLAS__ -I$(OPENBLASDIR)/include -D__COMPILE_TIMERS__
 endif
@@ -48,7 +48,7 @@ all:hier_fact hier_fact2 palm meg meg_new meg_old
 
 hier_fact: hierarchical_fact_test.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
-	$(CXX) $(LDFLAGS) $^ -o $@
+	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 
 hier_fact2: hierarchical_fact_test2.o $(OBJS)

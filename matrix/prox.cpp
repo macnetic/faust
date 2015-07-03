@@ -9,7 +9,19 @@ void partial_sort_k_max(std::vector<faust_real> & sorted_elements, std::vector<i
 void partial_sort_k_min(std::vector<faust_real> & sorted_elements, std::vector<int> & id_sorted_elements,std::vector<faust_real> & M_elements, int k);
 
 
+void sort_idx(const std::vector<faust_real> &v, std::vector<int>& idx, int s); 
 
+
+void sort_idx(const std::vector<faust_real> &v, std::vector<int>& idx, int s) 
+{
+  idx.resize(v.size());
+  for (int i=0 ; i<idx.size(); i++) idx[i] = i;
+  std::partial_sort(idx.begin(), idx.begin()+s, idx.end(),
+       [&v](int i1, int i2) {return fabs(v[i1]) > fabs(v[i2]);});
+}
+
+
+#if 0
 void prox_sp(faust_mat & M,int k)
 {	
 	int dim1 = M.getNbRow();
@@ -97,8 +109,37 @@ void prox_sp(faust_mat & M,int k)
 		
 	
 }
+#endif
+
+//#if 0
+void prox_sp(faust_mat & M,int k)
+{
+	const int dim1 = M.getNbRow();
+	const int dim2 = M.getNbCol();
+	const int nb_elt_mat = dim1*dim2;
+
+	if (k<=0)
+		M.setZeros();
+	else
+	{
+		if (k<nb_elt_mat)
+		{
+		const std::vector<faust_real> vec(M.getData(), M.getData()+nb_elt_mat);
+		std::vector<int> index;
+		sort_idx(vec, index, k);
+		index.erase(index.begin()+k, index.end());
+		
+		M.setZeros();
+		for (int i=0 ; i<index.size() ; i++)
+			M.getData()[index[i]] = vec[index[i]];
+		}
+		M.normalize();	
+	}
+}
+//#endif
 
 
+#if 0
 void prox_spcol(faust_mat & M,int k)
 {
 	
@@ -174,6 +215,41 @@ void prox_spcol(faust_mat & M,int k)
 	}
 	
 }
+#endif
+
+//#if 0
+void prox_spcol(faust_mat & M,int k)
+{
+//M.print_file("M1.dat");
+	const int dim1 = M.getNbRow();
+	const int dim2 = M.getNbCol();
+	const int nb_elt_mat = dim1*dim2;
+	
+	if (k<=0)
+		M.setZeros();
+	else
+	{
+		if (k<dim1)
+		{
+			std::vector<std::vector<faust_real> > mat(dim2,std::vector<faust_real>(dim1));
+			std::vector<std::vector<int> > index(dim2,std::vector<int>(dim1));
+			for (int j=0 ; j < dim2 ; j++)
+			{
+				mat[j].assign(M.getData()+j*dim1, M.getData()+(j+1)*dim1);
+				sort_idx(mat[j], index[j], k); 
+				index[j].erase(index[j].begin()+k, index[j].end());
+			}
+			M.setZeros();
+			for (int j=0 ; j<index.size() ; j++)
+				for (int i=0 ; i< index[j].size() ; i++)
+				{
+					M.getData()[j*dim1+index[j][i]] = mat[j][index[j][i]];
+				}
+		}	
+		M.normalize();	
+	}
+}
+//#endif
 	
 
 
@@ -189,7 +265,7 @@ void old_splin(faust_mat & M,int k)
 
 }
 
-
+#if 0
 void prox_splin(faust_mat & M,int k)
 {
 	M.transpose();
@@ -197,6 +273,42 @@ void prox_splin(faust_mat & M,int k)
 	M.transpose();
 
 }
+#endif
+
+//#if 0
+void prox_splin(faust_mat & M,int k)
+{
+	const int dim1 = M.getNbRow();
+	const int dim2 = M.getNbCol();
+	const int nb_elt_mat = dim1*dim2;
+	if (k<=0)
+		M.setZeros();
+	else
+	{
+		if (k<dim2)
+		{
+			std::vector<std::vector<faust_real> > mat(dim1,std::vector<faust_real>(dim2));
+			std::vector<std::vector<int> > index(dim1,std::vector<int>(dim2));
+			for (int i=0 ; i < dim1 ; i++)
+			{
+				for (int j=0 ; j<dim2 ; j++)
+					mat[i][j] = M.getData()[j*dim1+i];
+				sort_idx(mat[i], index[i], k); 
+				index[i].erase(index[i].begin()+k, index[i].end());
+			}
+			M.setZeros();
+			for (int i=0 ; i<index.size() ; i++)
+				for (int j=0 ; j< index[i].size() ; j++)
+					M.getData()[(index[i][j])*dim1+i] = mat[i][index[i][j]];
+		}	
+		M.normalize();	
+	}
+
+}
+//#endif
+
+
+
 
 
 
@@ -873,7 +985,7 @@ void prox_sp(faust_mat & M,int k)
 					id_sorted_elements[ii+1] = id_sorted_elements[ii];
 				}
 				
-				sorted_elements.insert(it_2_insert,current_value);
+		sorted_elements.insert(it_2_insert,current_value);
 				sorted_elements.pop_back();
 				id_sorted_elements[id_2_insert]=i;
 

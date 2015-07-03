@@ -467,7 +467,7 @@ t_mult_right.start();
 		#ifdef FAUST_SINGLE
 			cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0f, C_old, C1_old, A.getData(), A.dim1, 0.0f, getData(), dim1);
 		#else
-			cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0, C_old, C1_old, A.getData(), A.dim1, 0.0, getData(), dim1);
+			cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0, C_old, C1_old, A.getData(), A.dim1, 0.0, getData(), dim1);
 		#endif
 		delete[] C_old ; C_old=NULL;
 		

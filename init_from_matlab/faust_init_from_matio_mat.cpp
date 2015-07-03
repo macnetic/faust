@@ -20,7 +20,7 @@ void init_faust_mat_from_matio(faust_mat& M, const char* fileName, const char* v
    }
    M.resize(matvar->dims[0], matvar->dims[1]);
    for (size_t i = 0 ; i < matvar->dims[0] * matvar->dims[1] ; i++)
-      (M.getData())[i] = (faust_real) (((double*)(matvar->data))[i]);
+      M[i] = (faust_real) (((double*)(matvar->data))[i]);
    Mat_VarFree(matvar);
 }
 
@@ -52,7 +52,7 @@ void write_faust_mat_into_matfile(const faust_mat& M, const char* fileName, cons
 
   
 	size_t dims[2]={dim1,dim2};
-	for (int i = 0 ; i < dim1*dim2; i++) mat[i]=(double)(M.getData())[i];
+	for (int i = 0 ; i < dim1*dim2; i++) mat[i]=(double)(M(i));
 	
 	matvar = Mat_VarCreate(variableName,MAT_C_DOUBLE,MAT_T_DOUBLE,2,dims,mat,0);
     if ( NULL == matvar ) {

@@ -49,8 +49,20 @@ public:
   //void setEyes() {mat.setIdentity();if(dim1==dim2)isIdentity=true;}
   void setEyes();
 
-  faust_real* getData(){return mat.data();}
-  const faust_real* getData()const{return mat.data();}  
+  //faust_real& operator[](int i, int j){isZeros=false; isIdentity=false;return mat.data()[j*dim1+i];}
+  faust_real& operator[](int i){isZeros=false; isIdentity=false;return mat.data()[i];}
+
+  const faust_real& operator[](int i)const{return mat.data()[i];}
+  //const faust_real& operator[](int i, int j)const{return mat.data()[j*dim1+i];}
+
+  const faust_real& operator()(int i)const{return mat.data()[i];}
+  const faust_real& operator()(int i, int j){return mat.data()[j*dim1+i];}
+
+
+  faust_real* getData(){isZeros=false; isIdentity=false;return mat.data();} 
+  const faust_real* getData()const{return mat.data();} 
+
+ 
 
   
   /// EGALITE ///
@@ -131,6 +143,7 @@ void write_into_file(const char* filename);
   
   
   private: 
+  public: 
   Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat;
        int dim1;
        int dim2;
