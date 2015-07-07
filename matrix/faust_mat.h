@@ -92,7 +92,8 @@ void write_into_file(const char* filename);
   faust_real norm() const {return mat.norm();}
   void normalize() {scalarMultiply(1.0/norm());}
   // spectral norm, "norm2", equal to the largest singular value  
-  faust_real spectralNorm() const {return mat.operatorNorm();}
+  faust_real spectralNorm() const;
+  faust_real spectralNorm(const int nbr_iter_max,faust_real threshold, int & flag) const;
   
   // trace
   faust_real trace() const {return mat.trace();}
@@ -140,7 +141,9 @@ void write_into_file(const char* filename);
   //friend void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta);
   friend void add(const faust_mat & A, const faust_mat & B, faust_mat & C);
   friend void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real& alpha, const faust_real& beta, char  typeA, char  typeB);
-  
+  friend void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA);
+  bool estIdentite(){return isIdentity;}
+  bool estNulle(){return isZeros;}
   
   private: 
   public: 
@@ -169,8 +172,11 @@ void write_into_file(const char* filename);
       static faust_timer t_add;
       static faust_timer t_sub;
       static faust_timer t_print_file;
+	  static faust_timer t_spectral_norm;
+	  static faust_timer t_spectral_norm2;
 
-      static faust_timer t_multiply;
+      static faust_timer t_power_iteration;
+	  static faust_timer t_multiply;
       static faust_timer t_gemm;
       static faust_timer t_add_ext;
 

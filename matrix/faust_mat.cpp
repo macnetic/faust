@@ -7,7 +7,8 @@
 #ifdef __GEMM_WITH_OPENBLAS__
 	#include "cblas.h"
 #endif
-	
+
+#include "LinAlgebra.h"	
 
 using namespace std;
 
@@ -414,7 +415,7 @@ t_mult_right.start();
 	}
 
 	if(A.isIdentity)
-	{
+	{	std::cout<<"identityA"<<std::endl;
 		#ifdef __COMPILE_TIMERS__
 			t_mult_right.stop();
 		#endif
@@ -422,7 +423,8 @@ t_mult_right.start();
 	}
 
 	if(isZeros || A.isZeros)
-	{
+	{	
+		std::cout<<"zero"<<std::endl;
 		resize(dim1,A.dim2);
 		faust_real *const ptr_data_dst = getData();
 		memset(ptr_data_dst, 0, sizeof(faust_real) * dim1*dim2);
@@ -435,13 +437,16 @@ t_mult_right.start();
 	}
 
 	if(isIdentity)
-	{
+	{	std::cout<<"identity"<<std::endl;
 		this->operator=(A);
 		#ifdef __COMPILE_TIMERS__
 			t_mult_right.stop();
 		#endif
 		return;
 	}
+	
+	
+	
 
 
 	/*int dim1_copy = dim1;
@@ -456,9 +461,11 @@ t_mult_right.start();
 	}*/
 		
 	#ifndef __GEMM_WITH_OPENBLAS__
+		std::cout<<"else"<<std::endl;
 		mat = mat * A.mat;
 		resize(dim1, A.dim2);
 	#else
+		std::cout<<"else"<<std::endl;
 		int C1_old = dim1;	
 		int C2_old = dim2;	
 		faust_real* C_old = new faust_real[C1_old*C2_old];
@@ -544,6 +551,98 @@ t_mult_right.stop();
 #endif
 
  }
+ 
+ faust_real faust_mat::spectralNorm() const 
+ {	
+	#ifdef __COMPILE_TIMERS__
+			t_spectral_norm.start();
+	#endif
+	
+	 faust_real res=mat.operatorNorm();
+	 
+	#ifdef __COMPILE_TIMERS__
+		t_spectral_norm.stop();
+	#endif
+	return res;
+ }
+ 
+ 
+ faust_real faust_mat::spectralNorm(const int nbr_iter_max,faust_real threshold, int & flag) const
+{	
+	#ifdef __COMPILE_TIMERS__
+		t_spectral_norm2.start();
+	#endif
+	if(isZeros)
+	{
+		flag = -2;
+		#ifdef __COMPILE_TIMERS__
+		t_spectral_norm2.start();
+		#endif
+		return 0;
+	}
+		
+	if(isIdentity)
+	{
+		flag = -3;
+		#ifdef __COMPILE_TIMERS__
+		t_spectral_norm2.start();
+		#endif
+		return 1;
+	}
+		
+	int nb_row = getNbRow();
+	int nb_col = getNbCol();
+		
+	if (nb_row == nb_col)
+	{	
+		#ifdef NEW
+			faust_real res=power_iteration2((*this),nbr_iter_max,threshold,flag);
+		#else
+			faust_real res=power_iteration((*this),nbr_iter_max,threshold,flag);
+		#endif	
+		
+		#ifdef __COMPILE_TIMERS__
+			t_spectral_norm2.stop();
+		#endif
+		return res;
+	}		
+	else 
+	{	
+		faust_mat AtA;
+		if (nb_row < nb_col)
+		{	
+			gemm((*this),(*this),AtA,1.,0,'N','T');
+		}else
+		{
+			gemm((*this),(*this),AtA,1.,0,'T','N');
+		}
+
+
+		#ifdef NEW
+		
+			faust_real  res=std::sqrt(power_iteration2(AtA,nbr_iter_max,threshold,flag));
+		#else
+			faust_real  res=std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag));
+		#endif
+
+		
+		#ifdef __COMPILE_TIMERS__
+		t_spectral_norm2.stop();
+		#endif
+		return res;
+			
+	}
+	
+		
+		
+	}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
  
  void faust_mat::scalarMultiply(faust_real const lambda)
  {
@@ -711,6 +810,10 @@ faust_timer faust_mat::t_multiply;
 faust_timer faust_mat::t_gemm;
 faust_timer faust_mat::t_add_ext;
 
+faust_timer faust_mat::t_spectral_norm;
+faust_timer faust_mat::t_spectral_norm2;
+faust_timer faust_mat::t_power_iteration;
+
 void faust_mat::print_timers()const
 {
    cout << "timers in faust_mat :" << endl;
@@ -730,6 +833,7 @@ void faust_mat::print_timers()const
    cout << "t_add             = " << t_add.get_time()             << " s for "<< t_add.get_nb_call()             << " calls" << endl;
    cout << "t_sub             = " << t_sub.get_time()             << " s for "<< t_sub.get_nb_call()             << " calls" << endl;
 cout << "t_print_file      = " << t_print_file.get_time()      << " s for "<< t_print_file.get_nb_call()      << " calls" << endl<<endl;
+
                                                       
    cout << "timers in faust_mat / LinearAlgebra :" << endl;
    cout << "t_multiply        = " << t_multiply.get_time()        << " s for "<< t_multiply.get_nb_call()        << " calls" << endl;

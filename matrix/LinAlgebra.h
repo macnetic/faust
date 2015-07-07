@@ -1,6 +1,7 @@
 #ifndef LINALGEBRA_H
 #define LINALGEBRA_H
 #include "faust_mat.h"
+#include "faust_vec.h"
 
 
 #endif
@@ -20,10 +21,17 @@
  //void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta);
  
  
+
+
+ 
+ 
  // C = alpha *op(A)*op(B) + beta * C;
  // op(A) = A si typeA='N', op(A) = transpose(A) si typeA='T'
  // op(B) = B si typeB='N', op(B) = transpose(B) si typeB='T'
  // l'objet C doit etre different de A et B
  void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB);
+ void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA);
+ 
+ faust_real power_iteration(const faust_mat & A, const int nbr_iter_max,faust_real threshold,int & flag);
 
 

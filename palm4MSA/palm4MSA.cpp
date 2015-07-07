@@ -109,7 +109,7 @@ t_local_compute_projection.start();
 				t_prox_sp.start();
 			#endif
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-			
+			/*
             #if (PROX == 0)
 			faust_mat S_back_up=S[ind_fact];
 			faust_mat S1,S2;
@@ -137,10 +137,13 @@ t_local_compute_projection.start();
 			#if (PROX == 2)
 			prox_sp(S[ind_fact], const_int->getParameter());
 			#endif
+			*/
+			prox_sp(S[ind_fact], const_int->getParameter());
 			
 			#ifdef __COMPILE_TIMERS__
 			t_prox_sp.stop();
 			#endif
+			
 			
          }
          break;
@@ -170,7 +173,7 @@ t_local_compute_projection.start();
 			t_prox_splin.start();
 			#endif
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-			#if (PROX == 0)
+			/*#if (PROX == 0)
 				//cout<<"comp"<<endl;		
 			faust_mat S_back_up=S[ind_fact];
 			faust_mat S1,S2;
@@ -196,8 +199,8 @@ t_local_compute_projection.start();
 			#if (PROX == 2)
 				//cout<<"new"<<endl;
 				prox_splin(S[ind_fact], const_int->getParameter());
-			#endif
-			
+			#endif*/
+			prox_splin(S[ind_fact], const_int->getParameter());
 			#ifdef __COMPILE_TIMERS__
 				t_prox_splin.stop();
 			#endif
@@ -670,6 +673,7 @@ t_local_next_step.start();
    delete[] ind_ptr;
    ind_ptr = NULL;
 
+cout<<"lambda : "<< lambda<< endl;   
 #ifdef __COMPILE_TIMERS__
 t_global_next_step.stop();
 t_local_next_step.stop();

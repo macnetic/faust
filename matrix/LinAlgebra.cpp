@@ -74,144 +74,85 @@ A.t_multiply.stop();
 }
 
 
-/*
-void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta)
+
+
+void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA)
 {
-	if (A.getNbCol() != B.getNbRow())
+	int nbRowOpA,nbColOpA;
+	if  ((&x) == (&y))
 	{
-		std::cerr << "ERREUR gemm : nbCol of A = " << A.getNbCol(); 
-       	std::cerr <<" while nbRow of B = " << B.getNbRow() << std::endl;
-        exit( EXIT_FAILURE);
-	}
-	if ( (C.getNbRow() != A.getNbRow())	|| (C.getNbCol() != B.getNbCol()) )
-	{
-		std::cerr << "ERREUR gemm : nbRow of A = "<< A.getNbRow() << " while nbRow of C = " << C.getNbRow() << std::endl;
-		std::cerr << "or nbCol of B = "<< B.getNbCol() << " while nbCol of C = " << C.getNbCol() << std::endl;
-		exit( EXIT_FAILURE);
-	}
-	 
-	if ( ((&(C.mat)) == (&(A.mat))) || ((&(C.mat)) == (&(B.mat))) )
-	{
-		std::cerr << "ERREUR multiply : C pointe vers A ou B" << std::endl; 
+		std::cerr << "ERROR gemv : y pointe vers x" << std::endl; 
 		exit( EXIT_FAILURE);	
 	}
-		
-	if ((alpha == 0) && (beta == 0))
-	{
-		C.setZeros();
-	}else
-				{
-					
-					if (beta == 0)
-					{
-						C.mat.noalias() = alpha * A.mat * B.mat;
-					}else
-					{
-						if (alpha == 0)
-						{
-							C.mat = beta * C.mat;
-						}else
-						{
-							C.mat = alpha * A.mat * B.mat + beta * C.mat;
-						}
-					}
-				}	
-			}
-		}
-
-	}
-}
-*/
-
-
-
-
-
-
-/*
-void gemm(faust_mat & A, faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA,char  typeB)
-{	
-	if ( (typeA != 'N') && (typeA != 'T') )
-	{
-		std::cerr << "ERREUR gemm : typeA different de 'N' et 'T' " << std::endl; 
-        exit( EXIT_FAILURE);	
-	}
 	
-	if  ( (typeB != 'N') && (typeB != 'T') )
-	{
-		std::cerr << "ERREUR gemm : typeB different de 'N' et 'T' " << std::endl; 
-        exit( EXIT_FAILURE);
-	}
-
 	if (typeA == 'T')
 	{
-		A.transpose();		
-	}
-	if (typeB == 'T')
-	{
-		B.transpose();		
-	}
-	
-	
-	if (A.getNbCol() != B.getNbRow())
-	{
-		std::cerr << "ERREUR gemm : nbCol of op(A) = " << A.getNbCol(); 
-       	std::cerr <<" while nbRow of op(B) = " << B.getNbRow() << std::endl;
-        exit( EXIT_FAILURE);
+		nbRowOpA = A.getNbCol();
+		nbColOpA = A.getNbRow();
+	}else
+	{	
+		nbRowOpA = A.getNbRow();
+		nbColOpA = A.getNbCol();
 	}
 	
-	
-	if ( (beta!=0)  && ( (C.getNbRow() != A.getNbRow())	|| (C.getNbCol() != B.getNbCol()) ) )
+	if   (nbColOpA != x.getDim() )
 	{
-		std::cerr << "ERREUR gemm : nbRow of op(A) = "<< A.getNbRow() << " while nbRow of C = " << C.getNbRow() << std::endl;
-		std::cerr << "or nbCol of op(B) = "<< B.getNbCol() << " while nbCol of C = " << C.getNbCol() << std::endl;
+		std::cerr << "ERROR gemv : nbCol of op(A) = "<< A.getNbRow() << " while dim of x = " << x.getDim() << std::endl;
 		exit( EXIT_FAILURE);
-	
-	}else
-	{
-		C.resize(A.getNbRow(),B.getNbCol());
 	}
 	
-	if ( ((&(C.mat)) == (&(A.mat))) || ((&(C.mat)) == (&(B.mat))) )
+	if ( (beta!=0)  &&  (y.getDim() != nbRowOpA))
 	{
-		std::cerr << "ERREUR gemm : C pointe vers A ou B" << std::endl; 
-		exit( EXIT_FAILURE);	
+		std::cerr << "ERROR gemv : nbRow of op(A) = "<< A.getNbRow() << " while dim of y = " << y.getDim() << std::endl;
+		exit( EXIT_FAILURE);
 	}
-		
-	if ((alpha == 0) && (beta == 0))
-	{
-		C.setZeros();
-	}else
-	{
-					
-		if (beta == 0)
+	
+	y.resize(nbRowOpA);
+	
+	
+	
+	#ifdef __GEMM_WITH_OPENBLAS__
+		CBLAS_TRANSPOSE transA,transB;
+		if (typeA=='T')
+			transA = CblasTrans;
+		else 
+			transA = CblasNoTrans;	
+	#endif
+	
+	#ifndef __GEMM_WITH_OPENBLAS__
+	if (beta == 0.0)
+	{	
+		if (typeA == 'N')
 		{
-			C.mat.noalias() = alpha * A.mat * B.mat;
+			y.vec.noalias() = alpha * A.mat * x.vec;			
 		}else
 		{
-			if (alpha == 0)
-			{
-				C.mat = beta * C.mat;
-			}else
-			{
-				C.mat = alpha * A.mat * B.mat + beta * C.mat;
-			}
+		
+			y.vec.noalias() = alpha * A.mat.transpose() * x.vec;
 		}
-	}	
-
-	
-	if (typeA == 'T')
-	{
-		A.transpose();		
+	}else
+	{	
+		if (typeA == 'N')
+		{
+			y.vec = alpha * A.mat * x.vec + beta * y.vec;			
+		}else
+		{
+			y.vec = alpha * A.mat.transpose() * x.vec + beta * y.vec;
+		}
 	}
-	if (typeB == 'T')
-	{
-		B.transpose();		
-	}
+	#else
+		#ifdef FAUST_SINGLE	
+				cblas_sgemv(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),x.getData(),1,beta,y.getData(),1);
+		#else
+			cblas_dgemv(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),x.getData(),1,beta,y.getData(),1);
+		#endif
+	#endif
+							
 	
-}*/
-
-
+}
+	
+	
+	
 void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char  typeA, char  typeB)
 {
 #ifdef __COMPILE_TIMERS__
@@ -476,4 +417,91 @@ A.t_add_ext.stop();
 }
 
 
+	
+	
+	
+faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_real threshold, int & flag)
+{	 std::cout<<"NEW"<<std::endl;
+	#ifdef __COMPILE_TIMERS__
+		A.t_power_iteration.start();
+	#endif 	
+	 int nb_col = A.getNbCol();
+	 int nb_row = A.getNbRow();
+	 int i = 0;
+	 int k;
+	 bool do_continue=true;
+	 faust_real abs_eigen_value;
+	 
+	 bool stop_crit;
+	 flag = 0;
+
+	 
+	 if (nbr_iter_max <= 0)
+	 {
+		std::cerr << "ERROR LinAlgebra.h  power_iteration : nbr_iter_max <= 0" << std::endl; 
+        exit( EXIT_FAILURE);
+	 }
+	 if (nb_col != nb_row)
+	 {
+		std::cerr << "ERROR LinAlgebra.h  power_iteration : A must be square" << std::endl; 
+        exit( EXIT_FAILURE);
+	 }
+	 
+	  if (threshold <= 0)
+	 {
+		std::cerr << "ERROR LinAlgebra.h  power_iteration : threshold < 0" << std::endl; 
+        exit( EXIT_FAILURE);
+	 }
+	 
+	 faust_vec xk(nb_col);
+	 faust_vec xk_pp(nb_col);
+	 xk.setOnes();
+	 xk.normalize();
+	 
+	 while(do_continue)
+	 {
+		gemv(A,xk,xk_pp,1.,0,'N');
+		abs_eigen_value = xk_pp.norm();
+		//std::cout<<"current_norm : "<< abs_eigen_value<<std::endl;
+		xk_pp.scalarMultiply(1/abs_eigen_value);
+		
+		stop_crit =true;
+		k=0;
+		while ((stop_crit) && (k<nb_col))
+		{
+			if (fabs(fabs(xk_pp(k) - fabs(xk(k)))>threshold))
+			{
+				stop_crit = false;
+			}
+			k++;
+		}
+		
+		if (stop_crit)
+		{
+			do_continue = false;
+			flag = i;
+			std::cout<<"flag inside power_it : "<< i <<std::endl;
+		}
+		
+		if (i == nbr_iter_max)
+		{	//std::cout<<"divergence"<<std::endl;
+			do_continue = false;
+			flag = -1;
+		}
+		i++;
+		//std::cout<<i<<std::endl;
+		xk = xk_pp;
+	 }
+	 #ifdef __COMPILE_TIMERS__
+		A.t_power_iteration.stop();
+	#endif
+	std::cout<<"flag inside power_it : "<<flag<<std::endl;
+	std::cout<<"threshold inside power_it : "<<threshold<<std::endl;
+	std::cout<<"max_it inside power_it : "<<nbr_iter_max<<std::endl;		
+	 return abs_eigen_value;
+	 
+}
+	
+	
+	
 

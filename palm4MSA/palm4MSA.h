@@ -154,8 +154,11 @@ inline void palm4MSA::compute_c()
 #ifdef __PAS_FIXE__
    c=10000*1.001; 
 #else
+	//std::cout<<"calcul pas : "<<std::endl;
    faust_real nL=LorR.spectralNorm();
    faust_real nR=RorL[ind_fact].spectralNorm();
+   //faust_real nL=LorR.spectralNorm(100,0.001,0);
+   //faust_real nR=RorL[ind_fact].spectralNorm(100,0.001,0);
    c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;
 #endif
    isCComputed = true;  
