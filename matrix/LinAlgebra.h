@@ -1,8 +1,12 @@
 #ifndef LINALGEBRA_H
 #define LINALGEBRA_H
-#include "faust_mat.h"
-#include "faust_vec.h"
 
+#include "faust_constant.h"
+
+class faust_mat;
+class faust_vec;
+class faust_spmat;
+class faust_core;
 
 #endif
 
@@ -35,3 +39,5 @@
  faust_real power_iteration(const faust_mat & A, const int nbr_iter_max,faust_real threshold,int & flag);
 
 
+// non-member operators declarations
+  faust_vec operator*(const faust_core& f, const faust_vec& v);

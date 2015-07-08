@@ -240,11 +240,10 @@ void prox_spcol(faust_mat & M,int k)
 				index[j].erase(index[j].begin()+k, index[j].end());
 			}
 			M.setZeros();
+			faust_real*const ptr_data = M.getData();
 			for (int j=0 ; j<index.size() ; j++)
 				for (int i=0 ; i< index[j].size() ; i++)
-				{
-					M.getData()[j*dim1+index[j][i]] = mat[j][index[j][i]];
-				}
+					ptr_data[j*dim1+index[j][i]] = mat[j][index[j][i]];
 		}	
 		M.normalize();	
 	}
@@ -297,9 +296,10 @@ void prox_splin(faust_mat & M,int k)
 				index[i].erase(index[i].begin()+k, index[i].end());
 			}
 			M.setZeros();
+			faust_real*const ptr_data = M.getData();
 			for (int i=0 ; i<index.size() ; i++)
 				for (int j=0 ; j< index[i].size() ; j++)
-					M.getData()[(index[i][j])*dim1+i] = mat[i][index[i][j]];
+					ptr_data[(index[i][j])*dim1+i] = mat[i][index[i][j]];
 		}	
 		M.normalize();	
 	}
@@ -419,16 +419,12 @@ void prox_supp(faust_mat & M, const faust_mat & supp)
 
 void prox_sp_pos(faust_mat & M,int k)
 {
+	faust_real*const ptr_data = M.getData();
 	//treshold de la matrice
 	for (int i=0;i<(M.getNbRow() * M.getNbCol());i++)
-	{
-		if ((((M.getData()))[i]) < 0)
-		{
-			(((M.getData()))[i])=0;
-		}
+		if (ptr_data[i] < 0)
+			ptr_data[i]=0;
 		
-	}
-	
 	prox_sp(M,k);
 	
 }
@@ -660,7 +656,7 @@ void prox_spcol_old(faust_mat & M,int k)
 		for (int j=0;j<dim2;j++)
 		{	
 			nb_elt_found = 0;
-		memcpy(&((current_col.getData())[0]),&((M_abs.getData())[j*dim1]),dim1*sizeof(faust_real));
+		memcpy(current_col.getData(), M_abs.getData()+j*dim1, dim1*sizeof(faust_real));
 
 		/*std::cout<<"current col : " <<j<<std::endl;
 		current_col.Display();
@@ -970,7 +966,7 @@ void prox_sp(faust_mat & M,int k)
 		id_sorted_elements.assign(k,-1);
 		
 		copyM_abs.resize(nb_elt_mat);
-		memcpy(&(copyM_abs[0]),&((M_abs.getData())[0]),nb_elt_mat*sizeof(faust_real));
+		memcpy(&(copyM_abs[0]), M_abs.getData(), nb_elt_mat*sizeof(faust_real));
 
 		for(int i=0;i<nb_elt_mat;i++)
 		{		
@@ -997,11 +993,11 @@ void prox_sp(faust_mat & M,int k)
 			new_M.setZeros();
 
 
+			faust_real*const new_M_data = new_M.getData();
+			faust_real*const M_data = M.getData();
+
 			for (int i=0;i<k;i++)
-			{	
-				(((new_M.getData()))[id_sorted_elements[i]]) =  (((M.getData()))[id_sorted_elements[i]]);
-			}
-		
+				new_M_data[id_sorted_elements[i]] =  M_data[id_sorted_elements[i]];
 		
 			M = new_M;
 		
@@ -1138,7 +1134,7 @@ void prox_spcol(faust_mat & M,int k)
 		for (int j=0;j<dim2;j++)
 		{	
 			nb_elt_found = 0;
-		memcpy(&((current_col.getData())[0]),&((M_abs.getData())[j*dim1]),dim1*sizeof(faust_real));
+		memcpy(current_col.getData(), M_abs.getData()+j*dim1, dim1*sizeof(faust_real));
 
 		/*std::cout<<"current col : " <<j<<std::endl;
 		current_col.Display();

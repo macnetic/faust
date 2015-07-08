@@ -3,6 +3,10 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include "faust_mat.h"
+#include "faust_spmat.h"
+
+using namespace std;
 
 void faust_vec::setOnes()
 {
@@ -12,8 +16,8 @@ void faust_vec::setOnes()
 
 void faust_vec::Display() const
 {
-	 std::cout << "dim = " << getDim() << std::endl;
-	 std::cout << vec << std::endl;
+	 cout << "dim = " << getDim() << endl;
+	 cout << vec << endl;
 }
 
 
@@ -22,7 +26,7 @@ void faust_vec::resize(const int new_dim)
 	
 		if (new_dim <0)
 		{
-			std::cerr << "ERROR FAUST_VEC resize : les nouvelles dimensions doivent etre strictement positive" << std::endl;
+			cerr << "ERROR FAUST_VEC resize : les nouvelles dimensions doivent etre strictement positive" << endl;
 			exit( EXIT_FAILURE);
 		}
 		else if (dim != new_dim)
@@ -39,4 +43,17 @@ void faust_vec::operator=(faust_vec const& y)
 	  dim = y.dim;
 
 }
+
+
+void  faust_vec::multiplyLeft(faust_spmat const& A)
+{
+	if(A.getNbCol() != vec.size())
+	{
+		cerr << "Error in faust_vec::multiplyLeft : incorrect dimensions" << endl;
+		exit(EXIT_FAILURE);
+	}
+	vec = A.mat * vec;
+	dim = A.dim1;
+}
+
 

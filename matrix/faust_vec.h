@@ -11,6 +11,7 @@
 #endif
 
 class faust_mat;
+class faust_spmat;
 
 class faust_vec
 {
@@ -23,14 +24,22 @@ class faust_vec
  void setOnes();
  void Display() const;
  int getDim() const {return dim;}
+ int size() const {return dim;}
  void resize(const int new_dim);
 faust_real norm(){return vec.norm();}
 faust_real scalarMultiply(faust_real const scalar){vec = scalar * vec;}
 void normalize(){scalarMultiply(1/norm());} 
 
+
+// multiply (*this) =  A * (*this)
+void  multiplyLeft(faust_mat const& A){gemv(A, *this, *this, 1.0, 0.0, 'N');}
+void  multiplyLeft(faust_spmat const& A);
+
 void operator=(faust_vec const& y);
 faust_real operator()(int i)const{return vec(i);}
+
 friend void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA);
+
 private:
   int dim;
   Eigen::Matrix<faust_real, Eigen::Dynamic,1> vec; 

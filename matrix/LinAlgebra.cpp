@@ -1,5 +1,9 @@
 #include <iostream>
 #include "LinAlgebra.h"
+#include "faust_mat.h"
+#include "faust_vec.h"
+#include "faust_spmat.h"
+#include "faust_core.h"
 //////////FONCTION faust_mat - faust_mat ////////////////////
 
 #ifdef __COMPILE_TIMERS__
@@ -79,11 +83,12 @@ A.t_multiply.stop();
 void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA)
 {
 	int nbRowOpA,nbColOpA;
+	const faust_vec* px;
 	if  ((&x) == (&y))
-	{
-		std::cerr << "ERROR gemv : y pointe vers x" << std::endl; 
-		exit( EXIT_FAILURE);	
-	}
+		px = new faust_vec(x);
+	else
+		px = &x;
+		
 	
 	if (typeA == 'T')
 	{
@@ -95,9 +100,9 @@ void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real
 		nbColOpA = A.getNbCol();
 	}
 	
-	if   (nbColOpA != x.getDim() )
+	if   (nbColOpA != px->getDim() )
 	{
-		std::cerr << "ERROR gemv : nbCol of op(A) = "<< A.getNbRow() << " while dim of x = " << x.getDim() << std::endl;
+		std::cerr << "ERROR gemv : nbCol of op(A) = "<< A.getNbRow() << " while dim of x = " << px->getDim() << std::endl;
 		exit( EXIT_FAILURE);
 	}
 	
@@ -124,30 +129,33 @@ void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real
 	{	
 		if (typeA == 'N')
 		{
-			y.vec.noalias() = alpha * A.mat * x.vec;			
+			y.vec.noalias() = alpha * A.mat * px->vec;			
 		}else
 		{
 		
-			y.vec.noalias() = alpha * A.mat.transpose() * x.vec;
+			y.vec.noalias() = alpha * A.mat.transpose() * px->vec;
 		}
 	}else
 	{	
 		if (typeA == 'N')
 		{
-			y.vec = alpha * A.mat * x.vec + beta * y.vec;			
+			y.vec = alpha * A.mat * px->vec + beta * y.vec;			
 		}else
 		{
-			y.vec = alpha * A.mat.transpose() * x.vec + beta * y.vec;
+			y.vec = alpha * A.mat.transpose() * px->vec + beta * y.vec;
 		}
 	}
 	#else
 		#ifdef FAUST_SINGLE	
-				cblas_sgemv(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),x.getData(),1,beta,y.getData(),1);
+				cblas_sgemv(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
 		#else
-			cblas_dgemv(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),x.getData(),1,beta,y.getData(),1);
+			cblas_dgemv(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
 		#endif
 	#endif
 							
+	if  ((&x) == (&y))
+		delete px; 
+	px=NULL;
 	
 }
 	
@@ -502,6 +510,22 @@ faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_re
 	 
 }
 	
-	
+
+
+
+
+
+
+// non-member operators definitions
+
+faust_vec operator*(const faust_core& f, const faust_vec& v)
+{
+	faust_vec vec(v);
+	for (int i=f.data.size()-1 ; i >= 0 ; i--)
+		vec.multiplyLeft(f.data[i]);
+	return vec;
+}
+
+
 	
 

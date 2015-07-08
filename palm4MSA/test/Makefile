@@ -3,6 +3,7 @@ CXX=g++
 MATRIX_DIR  = $(FAUST_ROOT_DIR)/trunk/devcpp/matrix
 PALM_DIR    = $(FAUST_ROOT_DIR)/trunk/devcpp/palm4MSA
 INIT_MATLAB = $(FAUST_ROOT_DIR)/trunk/devcpp/init_from_matlab
+FAUST_CORE = $(FAUST_ROOT_DIR)/trunk/devcpp/faust_core
 
 
 
@@ -12,11 +13,11 @@ SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
 
-CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(MATIO_ROOT_DIR)/include  -DPROX=2   #-Winline 
+CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB) -I$(FAUST_CORE) -I$(MATIO_ROOT_DIR)/include  -DPROX=2   #-Winline 
 
 ifneq ($(COMPILATION_THOMAS),)
    CXXFLAGS += -DFAUST_SINGLE -D__GEMM_WITH_OPENBLAS__ -I$(OPENBLASDIR)   -D__COMPILE_TIMERS__ -std=c++11 -D__PAS_FIXE__
-   else
+else
    CXXFLAGS += -DFAUST_SINGLE  -I$(OPENBLASDIR)/include -std=c++0x -DDEBUG_PROX -D__COMPILE_TIMERS__ -D__GEMM_WITH_OPENBLAS__
 endif
 
@@ -86,4 +87,4 @@ meg_old:$(OBJS) MEG_fact.o
 
 clean:
 	@printf '$(FONT)$(CYAN)Removing all object files and executable$(RESET_FONT)\n'
-	@rm -f hier_fact hier_fact2 palm meg $(MATRIX_DIR)/*.o $(PALM_DIR)/*.o $(INIT_MATLAB)/*.o ./*.o
+	@rm -f hier_fact hier_fact2 palm meg $(MATRIX_DIR)/*.o $(PALM_DIR)/*.o $(INIT_MATLAB)/*.o $(FAUST_CORE)/*.o ./*.o

@@ -51,7 +51,7 @@ void write_faust_mat_into_matfile(const faust_mat& M, const char* fileName, cons
    
 
   
-	size_t dims[2]={dim1,dim2};
+	size_t dims[2]={(size_t)dim1,(size_t)dim2};
 	for (int i = 0 ; i < dim1*dim2; i++) mat[i]=(double)(M(i));
 	
 	matvar = Mat_VarCreate(variableName,MAT_C_DOUBLE,MAT_T_DOUBLE,2,dims,mat,0);

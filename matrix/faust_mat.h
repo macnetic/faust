@@ -11,6 +11,7 @@
 #endif
 
 class faust_vec;//forward declaration of faust_vec class
+class faust_spmat;
 
 class faust_mat
 {
@@ -21,6 +22,8 @@ public:
   faust_mat(const faust_real  *mat_,const int nbRow, const int nbCol );	
   faust_mat() : mat(0,0) , dim1(0) , dim2(0), isIdentity(false),isZeros(false) {}
   faust_mat(const faust_mat & A) : dim1(A.dim1),dim2(A.dim2),mat(A.mat),isIdentity(A.isIdentity),isZeros(A.isZeros) {}
+  faust_mat(const faust_spmat & A){this->operator=(A);}
+
   faust_mat(const int nbRow, const int nbCol) : mat(nbRow,nbCol),dim1(nbRow),dim2(nbCol),isIdentity(false),isZeros(false){}
   faust_mat(const int nbRow) : mat(nbRow,nbRow),dim1(nbRow),dim2(nbRow),isIdentity(false),isZeros(false){}
 
@@ -49,14 +52,19 @@ public:
   //void setEyes() {mat.setIdentity();if(dim1==dim2)isIdentity=true;}
   void setEyes();
 
-  //faust_real& operator[](int i, int j){isZeros=false; isIdentity=false;return mat.data()[j*dim1+i];}
   faust_real& operator[](int i){isZeros=false; isIdentity=false;return mat.data()[i];}
 
   const faust_real& operator[](int i)const{return mat.data()[i];}
-  //const faust_real& operator[](int i, int j)const{return mat.data()[j*dim1+i];}
 
   const faust_real& operator()(int i)const{return mat.data()[i];}
-  const faust_real& operator()(int i, int j){return mat.data()[j*dim1+i];}
+  const faust_real& operator()(int i, int j)const{return mat.data()[j*dim1+i];}
+
+
+   void operator*=(const faust_spmat& M);
+   void operator+=(const faust_spmat& M);
+   void operator-=(const faust_spmat& M);
+
+   void multiplyLeft(const faust_spmat& M);
 
 
   faust_real* getData(){isZeros=false; isIdentity=false;return mat.data();} 
@@ -124,6 +132,9 @@ void write_into_file(const char* filename);
   /// SURCHARGE OPERATEUR ///
   // affectation
   void operator=(faust_mat const& A);
+  void operator=(faust_spmat const& A);
+
+
   void operator-=(faust_mat const& A){sub(A);}
   void operator+=(faust_mat const& A){add(A);}
 
@@ -132,7 +143,6 @@ void write_into_file(const char* filename);
   void operator*=(faust_real lambda){scalarMultiply(lambda);}
   void operator/=(faust_real lambda){scalarMultiply(1.0/lambda);}
 
-  faust_real operator()(int i, int j)const{return mat(i,j);}
 
   
   ////////////////// friends //////////////////////
@@ -146,8 +156,8 @@ void write_into_file(const char* filename);
   bool estNulle(){return isZeros;}
   
   private: 
-  public: 
   Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat;
+  //Eigen::Matrix<faust_real,0,0> mat;
        int dim1;
        int dim2;
        bool isIdentity;
