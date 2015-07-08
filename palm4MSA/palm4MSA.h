@@ -114,6 +114,7 @@ class palm4MSA
 
       static faust_timer t_global_compute_projection;
       static faust_timer t_global_compute_grad_over_c;
+	  static faust_timer t_global_compute_c;
       static faust_timer t_global_compute_lambda;
       static faust_timer t_global_update_R;
       static faust_timer t_global_update_L;
@@ -148,21 +149,16 @@ class palm4MSA
 #endif
 
 };
-
+#ifdef __PAS_FIXE__
 inline void palm4MSA::compute_c()
 {
-#ifdef __PAS_FIXE__
-   c=10000*1.001; 
-#else
-	//std::cout<<"calcul pas : "<<std::endl;
-   faust_real nL=LorR.spectralNorm();
-   faust_real nR=RorL[ind_fact].spectralNorm();
-   //faust_real nL=LorR.spectralNorm(100,0.001,0);
-   //faust_real nR=RorL[ind_fact].spectralNorm(100,0.001,0);
-   c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;
-#endif
+   c=10000*1.001;
    isCComputed = true;  
 }
+#endif   
+
+
+
 
 
 #endif

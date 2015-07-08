@@ -427,9 +427,9 @@ A.t_add_ext.stop();
 
 	
 	
-	
+// compute the biggest eigenvalue of A, A must be semi-definite positive 	
 faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_real threshold, int & flag)
-{	 std::cout<<"NEW"<<std::endl;
+{	
 	#ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.start();
 	#endif 	
@@ -467,7 +467,8 @@ faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_re
 	 xk.normalize();
 	 
 	 while(do_continue)
-	 {
+	 {	
+		i++;
 		gemv(A,xk,xk_pp,1.,0,'N');
 		abs_eigen_value = xk_pp.norm();
 		//std::cout<<"current_norm : "<< abs_eigen_value<<std::endl;
@@ -477,7 +478,7 @@ faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_re
 		k=0;
 		while ((stop_crit) && (k<nb_col))
 		{
-			if (fabs(fabs(xk_pp(k) - fabs(xk(k)))>threshold))
+			if (fabs(xk_pp(k) - xk(k))>threshold)
 			{
 				stop_crit = false;
 			}
@@ -488,24 +489,26 @@ faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_re
 		{
 			do_continue = false;
 			flag = i;
-			std::cout<<"flag inside power_it : "<< i <<std::endl;
+			//std::cout<<"convergence : "<< i <<std::endl;
+
 		}
 		
-		if (i == nbr_iter_max)
+		if (i >= nbr_iter_max)
 		{	//std::cout<<"divergence"<<std::endl;
 			do_continue = false;
 			flag = -1;
 		}
-		i++;
-		//std::cout<<i<<std::endl;
+		
+		
 		xk = xk_pp;
 	 }
+	 //std::cout<<" flag :"<<flag<<std::endl;
 	 #ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.stop();
 	#endif
-	std::cout<<"flag inside power_it : "<<flag<<std::endl;
+	/*std::cout<<"flag inside power_it : "<<flag<<std::endl;
 	std::cout<<"threshold inside power_it : "<<threshold<<std::endl;
-	std::cout<<"max_it inside power_it : "<<nbr_iter_max<<std::endl;		
+	std::cout<<"max_it inside power_it : "<<nbr_iter_max<<std::endl;*/		
 	 return abs_eigen_value;
 	 
 }

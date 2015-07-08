@@ -467,7 +467,7 @@ t_local_compute_lambda.start();
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
    //cout<<lambda<<endl;
-   cout<<__SP lambda<<endl;
+   //cout<<__SP lambda<<endl;
 
 #ifdef __COMPILE_TIMERS__
 t_global_compute_lambda.stop();
@@ -548,6 +548,41 @@ t_global_check.stop();
 t_local_check.stop();
 #endif
 }
+
+
+#ifdef __PAS_FIXE__
+#else
+void palm4MSA::compute_c()
+{
+#ifdef __COMPILE_TIMERS__
+	t_global_compute_c.start();
+#endif
+		//std::cout<<"calcul pas : "<<std::endl;
+   //faust_real nL=LorR.spectralNorm();
+   //faust_real nR=RorL[ind_fact].spectralNorm();
+   int flag1,flag2;
+   
+   int nbr_iter = 100;
+   faust_real threshold = 1e-13;
+   faust_real nL1=LorR.spectralNorm(nbr_iter,threshold,flag1);
+   faust_real nR1=RorL[ind_fact].spectralNorm(nbr_iter,threshold,flag2);
+    //c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;
+    c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*lambda*lambda;
+	c=c*1.001;
+   //std::cout<<" nL : "<<nL <<" nL1 : "<<nL1<<" flag : "<<flag1<<std::endl;
+   //std::cout<<" nR : "<<nR <<" nR1 : "<<nR1<<" flag : "<<flag2<<std::endl;
+   //std::cout<<" c : "<< c <<" c1 : "<<c1<<std::endl<<std::endl;
+   //std::cout<<" c : "<< c <<std::endl;
+
+
+   isCComputed = true;
+   
+   #ifdef __COMPILE_TIMERS__
+	t_global_compute_c.stop();
+	#endif	
+}
+#endif
+
 
 void palm4MSA::init_fact(int nb_facts_)
 {
@@ -725,6 +760,7 @@ t_local_init_fact_from_palm.stop();
 
 faust_timer palm4MSA::t_global_compute_projection;
 faust_timer palm4MSA::t_global_compute_grad_over_c;
+faust_timer palm4MSA::t_global_compute_c;
 faust_timer palm4MSA::t_global_compute_lambda;
 faust_timer palm4MSA::t_global_update_R;
 faust_timer palm4MSA::t_global_update_L;
@@ -768,6 +804,7 @@ void palm4MSA::print_global_timers()const
    cout << "timers in palm4MSA : " << endl;
    cout << "t_global_next_step           = " << t_global_next_step.get_time()           << " s for "<< t_global_next_step.get_nb_call()           << " calls" << endl;
    cout << "t grad + updateL + updateR  = " << t_global_compute_grad_over_c.get_time() + t_global_update_L.get_time() + t_global_update_R.get_time()  << " s for "<< t_global_compute_grad_over_c.get_nb_call()            << " calls of grad" << endl;
+     cout << "t_global_compute_c = " << t_global_compute_c.get_time() << " s for "<< t_global_compute_c.get_nb_call() << " calls" << endl;
    cout << "t_global_compute_lambda      = " << t_global_compute_lambda.get_time()      << " s for "<< t_global_compute_lambda.get_nb_call()      << " calls" << endl;
    cout << "t_global_compute_projection  = " << t_global_compute_projection.get_time()  << " s for "<< t_global_compute_projection.get_nb_call()  << " calls" << endl<<endl;
    //cout << "t_global_compute_grad_over_c = " << t_global_compute_grad_over_c.get_time() << " s for "<< t_global_compute_grad_over_c.get_nb_call() << " calls" << endl;
