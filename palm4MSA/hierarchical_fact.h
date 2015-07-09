@@ -19,9 +19,13 @@ class hierarchical_fact
       //hierarchical_fact(); // voir avec Luc les parametres par defaut
       hierarchical_fact(const faust_params& params_);
 
+      void get_facts(std::vector<faust_spmat>&)const;
+      void compute_facts();
+
+
+private:
       void init();
       void next_step();
-      void get_facts(std::vector<faust_spmat>&)const;
       faust_real get_lambda()const{return palm_global.get_lambda();}
 
 

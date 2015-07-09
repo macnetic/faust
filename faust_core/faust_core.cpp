@@ -1,5 +1,7 @@
 #include "faust_core.h"
 #include "faust_vec.h"
+#include "hierarchical_fact.h"
+#include "faust_params.h"
 
 using namespace std;
 
@@ -7,20 +9,35 @@ using namespace std;
 
 faust_core::faust_core() :
 	data(std::vector<faust_spmat>()),
-	factsMultiplied(false),
-	factProduct(faust_mat()){}
+	isDataInit(false)/*,
+	factProduct(faust_mat())*/
+{}
 
 faust_core::faust_core(const std::vector<faust_spmat>& facts) :
-	data(facts),
-	factsMultiplied(false),
-	factProduct(faust_mat()){}
+   data(facts),
+   isDataInit(true)/*,
+   factProduct(faust_mat())*/
+{}
 
-faust_core::faust_core(const faust_mat& facts) :
-	data(std::vector<faust_spmat>()),
-	factsMultiplied(false),
-	factProduct(faust_mat())
+faust_core::faust_core(const faust_params& params) :
+   data(std::vector<faust_spmat>()),
+   isDataInit(false)/*,
+   factProduct(faust_mat())*/
 {
+   hierarchical_fact hier_fact(params);
+   hier_fact.compute_facts();
+   hier_fact.get_facts(data);
+   isDataInit = true;
+}
 
+void faust_core::get_facts(std::vector<faust_spmat>& sparse_facts)const 
+{
+   if(!isDataInit)
+   {
+      cerr << "Error in faust_core::get_facts : factors are not available" << endl;
+      exit(EXIT_FAILURE);
+   }
+   sparse_facts = data;
 }
 
 
@@ -69,7 +86,7 @@ void faust_core::operator*=(const faust_core&  f)
 		tmp.erase(tmp.begin()+(tmp.size()-(tmp.size%2))/2, tmp.begin()+tmp.size()-(tmp.size%2));
 	}
 	// factProduct = *(tmp[0]);
-	// factsMultiplied = true;
+	// isDataInit = true;
 }
 #endif
 

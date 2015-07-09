@@ -44,8 +44,8 @@ class faust_params
       std::vector<faust_mat> init_fact;
       faust_real init_lambda;
 
-      const int nb_rows; // number of rows of the first factor
-      const int nb_cols; // number of columns of the last factor
+      //const int nb_rows; // number of rows of the first factor
+      //const int nb_cols; // number of columns of the last factor
      
       stopping_criterion stop_crit_2facts;
       stopping_criterion stop_crit_global;

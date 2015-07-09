@@ -23,6 +23,7 @@ class faust_vec
  const faust_real* getData() const {return vec.data();}
  void setOnes();
  void Display() const;
+void print_file(const char* filename)const;
  int getDim() const {return dim;}
  int size() const {return dim;}
  void resize(const int new_dim);
@@ -34,9 +35,14 @@ void normalize(){scalarMultiply(1/norm());}
 // multiply (*this) =  A * (*this)
 void  multiplyLeft(faust_mat const& A){gemv(A, *this, *this, 1.0, 0.0, 'N');}
 void  multiplyLeft(faust_spmat const& A);
+  
 
 void operator=(faust_vec const& y);
-faust_real operator()(int i)const{return vec(i);}
+
+faust_real& operator[](int i){return vec(i);}
+const faust_real& operator[](int i)const{return vec(i);}
+
+const faust_real& operator()(int i)const{return vec(i);}
 
 friend void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA);
 

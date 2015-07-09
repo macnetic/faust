@@ -1,0 +1,38 @@
+Resultats pour l'execution du premier palm (factorisation en 2 facteur) dans MEG_fact.m :
+Modifs de compute_projection et ordre de calcul du gradient
+
+
+timers in faust_mat :
+t_constr          = 0 s for 0 calls
+t_get_coeff       = 0.640684 s for 358853400 calls
+t_get_coeffs      = 16.7937 s for 26217600 calls
+t_set_coeff       = 0.675184 s for 383432400 calls
+t_set_coeffs      = 1.96801 s for 24579000 calls
+t_set_coeffs2     = 16.5085 s for 26217600 calls
+t_resize          = 0.328041 s for 3004 calls
+t_check_dim       = 0 s for 0 calls
+t_max             = 14.509 s for 24579000 calls
+t_transpose       = 5.10977 s for 400 calls
+t_mult_right      = 471.795 s for 400 calls
+t_mult_left       = 0 s for 0 calls
+t_scalar_multiply = 0.238386 s for 400 calls
+t_add             = 0 s for 0 calls
+t_sub             = 0.414986 s for 400 calls
+t_print_file      = 0 s for 0 calls
+
+timers in faust_mat / LinearAlgebra :
+t_multiply        = 453.046 s for 600 calls
+t_gemm            = 501.321 s for 1600 calls
+t_add_ext         = 0 s for 0 calls
+
+
+timers in palm4MSA : 
+t_compute_projection  = 61.1308 s for 400 calls
+t_compute_grad_over_c = 932.983 s for 400 calls
+t_compute_lambda      = 21.9237 s for 200 calls
+t_update_R            = 0.309374 s for 200 calls
+t_update_L            = 471.795 s for 400 calls
+t_check_              = 1.6918e-05 s for 200 calls
+t_init_fact           = 0.00321819 s for 2 calls
+t_next_step           = 1516.82 s for 200 calls
+t_init_fact_from_palm = 0 s for 0 calls

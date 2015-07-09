@@ -708,7 +708,7 @@ t_local_next_step.start();
    delete[] ind_ptr;
    ind_ptr = NULL;
 
-cout<<"lambda : "<< lambda<< endl;   
+//cout<<"lambda : "<< lambda<< endl;   
 #ifdef __COMPILE_TIMERS__
 t_global_next_step.stop();
 t_local_next_step.stop();

@@ -1,0 +1,39 @@
+Resultats pour l'execution du premier palm (factorisation en 2 facteur) dans MEG_fact.m :
+modifs de prox en utilisant std::partial_sort
+
+
+timers in faust_mat :
+t_constr          = 0 s for 0 calls
+t_get_coeff       = 0 s for 0 calls
+t_get_coeffs      = 0 s for 0 calls
+t_set_coeff       = 0 s for 0 calls
+t_set_coeffs      = 0 s for 0 calls
+t_set_coeffs2     = 0 s for 0 calls
+t_resize          = 0.0049760197289288043976 s for 2205 calls
+t_check_dim       = 0 s for 0 calls
+t_max             = 0 s for 0 calls
+t_transpose       = 0 s for 0 calls
+t_mult_right      = 4.1060366630554199219 s for 400 calls
+t_mult_left       = 0 s for 0 calls
+t_scalar_multiply = 0.2140118032693862915 s for 802 calls
+t_add             = 0.00095752702327445149422 s for 1 calls
+t_sub             = 0.21098467707633972168 s for 400 calls
+t_print_file      = 0 s for 0 calls
+
+timers in faust_mat / LinearAlgebra :
+t_multiply        = 0.217432364821434021 s for 600 calls
+t_gemm            = 10.42858123779296875 s for 1600 calls
+t_add_ext         = 0 s for 0 calls
+
+
+timers in palm4MSA : 
+t_local_next_step           = 35.636302947998046875 s for 200 calls
+t_local_compute_lambda      = 3.5996079444885253906 s for 200 calls
+t_local_compute_projection  = 8.0524387359619140625 s for 400 calls
+t_local_compute_grad_over_c = 7.4735393524169921875 s for 400 calls
+t_local_update_R            = 0.010047262534499168396 s for 200 calls
+t_local_update_L            = 4.1063351631164550781 s for 400 calls
+t_check_                    = 2.1378999008447863162e-05 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+

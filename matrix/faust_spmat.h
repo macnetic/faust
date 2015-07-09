@@ -8,6 +8,7 @@
 #include <vector>
 
 class faust_vec;
+//class faust_mat;
 
 class faust_spmat
 {
@@ -30,6 +31,8 @@ class faust_spmat
 		int getNbRow()const{return dim1;}
 		int getNbCol()const{return dim2;}
 
+		void print_file(const char* filename)const;
+		void init_from_txt_file(char* filename);
 
 		~faust_spmat(){}
 

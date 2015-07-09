@@ -19,6 +19,15 @@ void faust_vec::Display() const
 	 cout << "dim = " << getDim() << endl;
 	 cout << vec << endl;
 }
+ 
+void faust_vec::print_file(const char* filename)const
+{
+	ofstream fichier;
+	fichier.open(filename);
+	for (int i=0 ; i<size() ; i++)
+		fichier << setprecision(20) << vec (i) << endl;
+	fichier.close();
+}
 
 
 void faust_vec::resize(const int new_dim)

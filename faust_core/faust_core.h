@@ -2,19 +2,23 @@
 #define __FAUST_CORE_H__
 
 #include <vector>
+#include "faust_spmat.h"
 
 class faust_mat;
-class faust_spmat;
+//class faust_spmat;
 class faust_vec;
+class faust_params;
 
 class faust_core
 {
 	public:
 		faust_core();
 		faust_core(const std::vector<faust_spmat>& facts);
-		faust_core(const faust_mat& facts);
+		faust_core(const faust_params& params);
 		
-		~faust_core();
+		void get_facts(std::vector<faust_spmat>& sparse_facts)const; 
+
+		~faust_core(){}
 
 
 	public:
@@ -25,10 +29,10 @@ class faust_core
 
 
 	private:
-		const std::vector<faust_spmat> data;
+		std::vector<faust_spmat> data;
 		// true if all facts have been multiplied to obtain the product matrix factProduct;
-		bool factsMultiplied;
-		faust_mat originalProduct;
+		bool isDataInit;
+		//faust_mat factProduct;
 
 	friend faust_vec operator*(const faust_core& f, const faust_vec& v);
 		

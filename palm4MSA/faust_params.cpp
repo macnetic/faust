@@ -57,14 +57,14 @@ faust_params::faust_params(
             isVerbose(isVerbose_),
             isUpdateWayR2L(isUpdateWayR2L_),
             isFactSideLeft(isFactSideLeft_),
-            init_lambda(init_lambda_),
+            init_lambda(init_lambda_)/*,
             nb_rows(data_.getNbRow()),
-            nb_cols(data_.getNbCol())
+            nb_cols(data_.getNbCol())*/
 {
  check_constraint_validity(); 
 }
 
-faust_params::faust_params() : data(0,0),nb_fact(0),cons(std::vector<std::vector<const faust_constraint_generic*> >()),isFactSideLeft(false),isVerbose(false),isUpdateWayR2L(false),init_fact(std::vector<faust_mat>()),init_lambda(1.0),nb_rows(0),nb_cols(0) 
+faust_params::faust_params() : data(0,0),nb_fact(0),cons(std::vector<std::vector<const faust_constraint_generic*> >()),isFactSideLeft(false),isVerbose(false),isUpdateWayR2L(false),init_fact(std::vector<faust_mat>()),init_lambda(1.0)/*,nb_rows(0),nb_cols(0) */
 {}
 
 

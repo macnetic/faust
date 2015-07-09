@@ -107,9 +107,6 @@ palm_global.print_local_timers();
 
 
    ind_fact++;  
-
-   if(ind_fact == nb_fact)
-      isFactorizationComputed = true;
     
 
 #ifdef __COMPILE_TIMERS__
@@ -130,6 +127,23 @@ void hierarchical_fact::get_facts(std::vector<faust_spmat>& sparse_facts)const
    sparse_facts.resize(full_facts.size());
    for (int i=0 ; i<sparse_facts.size() ; i++)
       sparse_facts[i] = full_facts[i];
+}
+
+
+void hierarchical_fact::compute_facts() 
+{
+   if(isFactorizationComputed)
+   {
+      cerr << "Error in hierarchical_fact::compute_facts : factorization has already been computed" << endl;
+      exit(EXIT_FAILURE);
+   }
+
+  init();
+  for (int i=0 ; i<=nb_fact-1 ; i++)
+     next_step();
+
+  isFactorizationComputed = true;
+   
 }
 
 

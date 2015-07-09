@@ -1,9 +1,13 @@
-#include <iostream>
 #include "faust_spmat.h"
 #include "faust_mat.h"
 #include "faust_vec.h"
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+
+using namespace std;
 
 faust_spmat::faust_spmat() : 
 	mat(Eigen::SparseMatrix<faust_real>(0,0)),
@@ -47,7 +51,7 @@ faust_spmat::faust_spmat(const faust_mat& M) :
 	    nnz++; 
          }
 
-   std::vector<Eigen::Triplet<faust_real> > tripletList;
+   vector<Eigen::Triplet<faust_real> > tripletList;
    tripletList.reserve(nnz);
    for(int i=0 ; i<nnz ; i++)
       tripletList.push_back(Eigen::Triplet<faust_real>(rowind[i], colind[i], values[i]));
@@ -58,11 +62,11 @@ faust_spmat::faust_spmat(const faust_mat& M) :
    delete[] values ; values=NULL;
 }
 
-faust_spmat::faust_spmat(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<faust_real>& values, const int dim1_, const int dim2_)
+faust_spmat::faust_spmat(const vector<int>& rowidx, const vector<int>& colidx, const vector<faust_real>& values, const int dim1_, const int dim2_)
 {
 	if(rowidx.size()!=colidx.size() || rowidx.size()!=values.size())
 	{
-		std::cerr << "vectors rowidx, colidx and values have not the same size" << std::endl;
+		cerr << "vectors rowidx, colidx and values have not the same size" << endl;
 		exit(EXIT_FAILURE);
 	}
 	resize(rowidx.size(), dim1_, dim2_);
@@ -125,7 +129,7 @@ void faust_spmat::operator/=(const faust_real alpha)
 
 	if(fabs(alpha) == 0.0)
 	{
-		std::cerr << "Error in faust_spmat::operator/= : dividing by 0" << std::endl;
+		cerr << "Error in faust_spmat::operator/= : dividing by 0" << endl;
 		exit(EXIT_FAILURE);
 	}
 	mat /= alpha;
@@ -133,6 +137,63 @@ void faust_spmat::operator/=(const faust_real alpha)
 }
 
 
+ 
+void faust_spmat::print_file(const char* filename)const
+{
+	ofstream fichier;
+	fichier.open(filename);
+	
+	for(int i=0 ; i< mat.outerSize() ; i++)
+		for(Eigen::SparseMatrix<faust_real>::InnerIterator it(mat,i); it; ++it)
+			fichier << it.row()+1 << " " << it.col()+1 << " " << setprecision(20) << it.value() << endl;
+	fichier << dim1 << " " << dim2 << " 0.0" << endl;
+	fichier.close();
+}
 
 
+
+void faust_spmat::init_from_txt_file(char* filename)
+{
+	// la premiere ligne contient le nombre de lignes et de colonnes de la matrice
+	// chacune des autres lignes contient trois valeur par ligne : rowind colind value
+	// avec rowind et colind des indices commencant a 1. 
+	vector<int> row;
+	vector<int> col;
+	vector<faust_real> val;
+	
+	int row_tmp;
+	int col_tmp;
+	double val_tmp;
+	
+	int dim1_tmp,dim2_tmp;
+	
+	FILE* fp=fopen(filename,"r");
+	
+	fscanf(fp,"%d %d\n", &dim1_tmp,&dim2_tmp);
+	while(fscanf(fp,"%d %d %lf\n", &row_tmp,&col_tmp,&val_tmp)!=EOF)
+	{
+		row.push_back(row_tmp - 1);
+		col.push_back(col_tmp - 1);
+		val.push_back((faust_real)val_tmp);
+	}
+	fclose(fp);
+	
+	if(col.size()!=row.size() || col.size()!=val.size()
+		|| dim1_tmp<0 || dim2_tmp<0
+		|| *min_element(&row[0],&row[row.size()-1]) <0
+		|| *min_element(&col[0],&col[col.size()-1]) <0
+		|| *max_element(&row[0],&row[row.size()-1]) > dim1_tmp-1
+		|| *max_element(&col[0],&col[col.size()-1]) > dim2_tmp-1)
+	{
+		cerr << "Error in faust_spmat::init_from_txt_file : Unable to initialize sparse matrix from file "<<filename << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	resize(row.size(), dim1_tmp, dim2_tmp);
+	vector<Eigen::Triplet<faust_real> > tripletList;
+	tripletList.reserve(row.size());
+	for(int i=0 ; i<row.size() ; i++)
+		tripletList.push_back(Eigen::Triplet<faust_real>(row[i], col[i], val[i]));
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+}
 
