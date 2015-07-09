@@ -145,14 +145,10 @@ int main()
 
   hierarchical_fact hier_fact(params);
 
-  hier_fact.init();
   faust_timer t1;
   t1.start();
-  for (int i=0 ; i<=nfacts-2 ; i++)
-  {
-     cout<<"i="<<i<<endl;
-     hier_fact.next_step();
-  }
+     
+   hier_fact.compute_facts();
 
   t1.stop();
 #ifdef __COMPILE_TIMERS__

@@ -10,6 +10,7 @@ FAUST_CORE = $(FAUST_ROOT_DIR)/trunk/devcpp/faust_core
 SRC_CPP = $(wildcard $(PALM_DIR)/*.cpp)  #$(filter-out $(PALM_DIR)/hierarchical_fact.cpp,$(wildcard $(PALM_DIR)/*.cpp))    #$(wildcard $(PALM_DIR)/*.cpp)
 SRC_CPP += $(wildcard $(INIT_MATLAB)/*.cpp)
 SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
+SRC_CPP += $(wildcard $(FAUST_CORE)/*.cpp)
 
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
 
@@ -45,7 +46,7 @@ CYAN    =36m
 RESET_FONT =\033[0m
 
 
-all:hier_fact hier_fact2 palm meg meg_new meg_old
+all:hier_fact hier_fact2 palm meg meg_new meg_old faust
 
 hier_fact: hierarchical_fact_test.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
@@ -78,6 +79,11 @@ meg_old:$(OBJS) MEG_fact.o
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'		
+
+faust:$(OBJS) faust_test.o 
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 
 
 

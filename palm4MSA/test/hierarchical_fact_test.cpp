@@ -4,13 +4,11 @@
 #include "faust_constraint_int.h"
 #include "faust_constraint_real.h"
 #include "faust_params.h"
-#include "faust_params_palm.h"
 #include "stopping_criterion.h"
-#include "palm4MSA.h"
 #include "hierarchical_fact.h"
 #include "faust_timer.h"
-#include <iostream>
 #include "faust_init_from_matio_mat.h"
+#include <iostream>
 
 using namespace std;
 
@@ -110,14 +108,10 @@ faust_real cons21_parameter;
 
   hierarchical_fact hier_fact(params);
 
-  hier_fact.init();
   faust_timer t1;
   t1.start();
-  for (int i=0 ; i<=nfacts-2 ; i++)
-  {
-     cout<<"i="<<i<<endl;
-     hier_fact.next_step();
-  }
+
+  hier_fact.compute_facts();
 
   t1.stop();
 #ifdef __COMPILE_TIMERS__
@@ -125,9 +119,6 @@ faust_real cons21_parameter;
   //hier_fact.print_prox_timers();
 #endif
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
-
-  
-
 
   vector<faust_spmat> facts;
   hier_fact.get_facts(facts);

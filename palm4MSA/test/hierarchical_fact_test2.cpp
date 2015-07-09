@@ -116,23 +116,14 @@ faust_real cons21_parameter;
   //init_params_from_matiofile(faust_params& params, const char* fileName, const char* variableName);
   init_params_from_matiofile(params2,"false_config_compared_hierarchical_fact.mat","params");	
   
-    hierarchical_fact hier_fact2(params2);
+  hierarchical_fact hier_fact2(params2);
   
-  hier_fact.init();
-  hier_fact2.init();
   faust_timer t1;
   t1.start();
-  for (int i=0 ; i<=nfacts-2 ; i++)
-  {
-     cout<<"i="<<i<<endl;
-	 hier_fact2.next_step();
-  }
-  /*for (int i=0 ; i<=nfacts-2 ; i++)
-  {
-     cout<<"i="<<i<<endl;
-     hier_fact.next_step();
+	 
+   hier_fact2.compute_facts();
+   //hier_fact.compute_facts();
 
-  }*/
   //cout<<"lambda"<<hier_fact.lambda<<endl;
   //cout<<"lambda 1 : "<<hier_fact2.lambda<<endl;	  
   t1.stop();
