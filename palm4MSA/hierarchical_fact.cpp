@@ -46,6 +46,13 @@ void hierarchical_fact::next_step()
 #ifdef __COMPILE_TIMERS__
 t_next_step.start();
 #endif
+      
+   if(isFactorizationComputed)
+   {
+      cerr << "factorization has already been computed" << endl;
+      exit(EXIT_FAILURE);
+   }
+
    vector<const faust_constraint_generic*> cons_tmp_2(2);
    cons_tmp_2[0]=cons[0][ind_fact];
    cons_tmp_2[1]=cons[1][ind_fact];
@@ -99,7 +106,11 @@ palm_global.print_local_timers();
    palm_2.set_data(palm_global.get_res(isFactSideLeft, ind_fact));
 
 
-   ind_fact++;   
+   ind_fact++;  
+
+   if(ind_fact == nb_fact)
+      isFactorizationComputed = true;
+    
 
 #ifdef __COMPILE_TIMERS__
 t_next_step.stop();

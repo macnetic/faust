@@ -64,7 +64,7 @@ faust_params::faust_params(
  check_constraint_validity(); 
 }
 
-faust_params::faust_params() : data(0,0),nb_fact(0),cons(),isFactSideLeft(false),isVerbose(false),isUpdateWayR2L(false),init_fact(),init_lambda(1.0),nb_rows(0),nb_cols(0) 
+faust_params::faust_params() : data(0,0),nb_fact(0),cons(std::vector<std::vector<const faust_constraint_generic*> >()),isFactSideLeft(false),isVerbose(false),isUpdateWayR2L(false),init_fact(std::vector<faust_mat>()),init_lambda(1.0),nb_rows(0),nb_cols(0) 
 {}
 
 
