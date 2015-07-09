@@ -12,6 +12,7 @@ class faust_core
 	public:
 		faust_core();
 		faust_core(const std::vector<faust_spmat>& facts);
+		faust_core(const faust_mat& facts);
 		
 		~faust_core();
 
@@ -27,7 +28,7 @@ class faust_core
 		const std::vector<faust_spmat> data;
 		// true if all facts have been multiplied to obtain the product matrix factProduct;
 		bool factsMultiplied;
-		faust_mat factProduct;
+		faust_mat originalProduct;
 
 	friend faust_vec operator*(const faust_core& f, const faust_vec& v);
 		

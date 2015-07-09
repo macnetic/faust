@@ -10,10 +10,18 @@ faust_core::faust_core() :
 	factsMultiplied(false),
 	factProduct(faust_mat()){}
 
-faust_core(const std::vector<faust_spmat>& facts) :
+faust_core::faust_core(const std::vector<faust_spmat>& facts) :
 	data(facts),
 	factsMultiplied(false),
 	factProduct(faust_mat()){}
+
+faust_core::faust_core(const faust_mat& facts) :
+	data(std::vector<faust_spmat>()),
+	factsMultiplied(false),
+	factProduct(faust_mat())
+{
+
+}
 
 
 #if 0

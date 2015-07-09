@@ -21,7 +21,7 @@ class hierarchical_fact
 
       void init();
       void next_step();
-      const std::vector<faust_mat>& get_facts()const {return palm_global.get_facts();}
+      void get_facts(std::vector<faust_spmat>&)const;
       faust_real get_lambda()const{return palm_global.get_lambda();}
 
 
@@ -37,6 +37,7 @@ class hierarchical_fact
       const faust_real default_lambda; // initial value of lambda for factorization into two factors
       //std::vector<faust_mat> S;
       std::vector<const faust_constraint_generic*> cons_tmp_global;
+      bool isFactorizationComputed;
      
 #ifdef __COMPILE_TIMERS__
    public:

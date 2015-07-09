@@ -1,5 +1,6 @@
 #include "palm4MSA_test.h"
 #include "faust_mat.h"
+#include "faust_spmat.h"
 #include "faust_constraint_int.h"
 #include "faust_constraint_real.h"
 #include "faust_params.h"
@@ -138,7 +139,8 @@ faust_real cons21_parameter;
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 
 
-  const vector<faust_mat>& facts = hier_fact.get_facts();
+  vector<faust_spmat> facts;
+  hier_fact.get_facts(facts);
   
   /*char nomFichier[100];
   for (int i=0 ; i<facts.size() ; i++)

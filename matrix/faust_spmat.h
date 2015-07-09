@@ -2,12 +2,11 @@
 #define __FAUST_SPMAT_H__
 
 #include "faust_constant.h"
+#include "faust_mat.h"
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
 #include <vector>
 
-#include "faust_mat.h"
-//class faust_mat;
 class faust_vec;
 
 class faust_spmat
@@ -15,6 +14,7 @@ class faust_spmat
 	public:
 		faust_spmat();
 		faust_spmat(const faust_spmat& M);
+		faust_spmat(const faust_mat& M);
 		faust_spmat(const int dim1_, const int dim2_);
 		faust_spmat(const int nnz_, const int dim1_, const int dim2_);
 		faust_spmat(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<faust_real>& values, const int dim1_, const int dim2_);

@@ -1,5 +1,6 @@
 #include "hierarchical_fact.h"
 #include "faust_timer.h"
+#include "faust_spmat.h"
 using namespace std;
 
 //hierarchical_fact::hierarchical_fact(){} // voir avec Luc les parametres par defaut
@@ -14,7 +15,8 @@ hierarchical_fact::hierarchical_fact(const faust_params& params_):
    palm_2(palm4MSA(params_, false)),
    palm_global(palm4MSA(params_, true)),
    cons_tmp_global(vector<const faust_constraint_generic*>()),
-   default_lambda(params_.init_lambda){}
+   default_lambda(params_.init_lambda),
+   isFactorizationComputed(false){}
 
 void hierarchical_fact::init()
 {
@@ -103,6 +105,20 @@ palm_global.print_local_timers();
 t_next_step.stop();
 palm_2.print_prox_timers();
 #endif
+}
+
+
+void hierarchical_fact::get_facts(std::vector<faust_spmat>& sparse_facts)const 
+{
+   if(!isFactorizationComputed)
+   {
+      cerr << "Error in hierarchical_fact::get_facts : factorization has not been computed" << endl;
+      exit(EXIT_FAILURE);
+   }
+   const std::vector<faust_mat>& full_facts = palm_global.get_facts();
+   sparse_facts.resize(full_facts.size());
+   for (int i=0 ; i<sparse_facts.size() ; i++)
+      sparse_facts[i] = full_facts[i];
 }
 
 

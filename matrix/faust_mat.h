@@ -1,6 +1,7 @@
 #ifndef FAUST_MAT_H
 #define FAUST_MAT_H
  
+//#include "faust_spmat.h"
 #include <Eigen/Dense>
 #include "faust_constant.h"
 #include <vector>

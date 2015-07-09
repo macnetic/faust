@@ -27,6 +27,37 @@ faust_spmat::faust_spmat(const int dim1_, const int dim2_) :
 	resize(nnz, dim1, dim2);
 }
 
+faust_spmat::faust_spmat(const faust_mat& M) : 
+	mat(Eigen::SparseMatrix<faust_real>(M.getNbRow(),M.getNbCol())),
+	dim1(M.getNbRow()),
+	dim2(M.getNbCol()),
+	nnz(0)
+{
+   int* rowind = new int[dim1*dim2];
+   int* colind = new int[dim1*dim2];
+   faust_real* values = new faust_real[dim1*dim2];
+
+   for (int j=0 ; j<dim2 ; j++)
+      for (int i=0; i<dim1 ; i++)
+         if(M(i,j)!=0.0)
+         {
+            rowind[nnz] = i;
+            colind[nnz] = j;
+            values[nnz] = M(i,j);;
+	    nnz++; 
+         }
+
+   std::vector<Eigen::Triplet<faust_real> > tripletList;
+   tripletList.reserve(nnz);
+   for(int i=0 ; i<nnz ; i++)
+      tripletList.push_back(Eigen::Triplet<faust_real>(rowind[i], colind[i], values[i]));
+   mat.setFromTriplets(tripletList.begin(), tripletList.end());
+
+   delete[] rowind ; rowind=NULL;
+   delete[] colind ; colind=NULL;
+   delete[] values ; values=NULL;
+}
+
 faust_spmat::faust_spmat(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<faust_real>& values, const int dim1_, const int dim2_)
 {
 	if(rowidx.size()!=colidx.size() || rowidx.size()!=values.size())
