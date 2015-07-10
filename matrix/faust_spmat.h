@@ -30,6 +30,8 @@ class faust_spmat
 		
 		int getNbRow()const{return dim1;}
 		int getNbCol()const{return dim2;}
+		void init_from_file(const char* filename);
+		void Display() const; 
 
 		void print_file(const char* filename)const;
 		void init_from_txt_file(char* filename);
@@ -51,7 +53,7 @@ class faust_spmat
 	friend void faust_mat::operator*=(const faust_spmat& M);
 	friend void faust_mat::operator+=(const faust_spmat& M);
 	friend void faust_mat::operator-=(const faust_spmat& M);
-	
+	friend void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
 	friend void faust_mat::multiplyLeft(const faust_spmat& M);
 
 	

@@ -2,9 +2,15 @@
 #include "LinAlgebra.h"
 #include "faust_mat.h"
 #include "faust_vec.h"
-#include "faust_spmat.h"
-#include "faust_core.h"
-//////////FONCTION faust_mat - faust_mat ////////////////////
+#include <Eigen/QR>
+#include <Eigen/Sparse>
+#include <Eigen/SparseQR>
+
+#ifdef FREE_FAUST
+	#include "faust_spmat.h"
+	#include "faust_core.h"
+#endif
+	//////////FONCTION faust_mat - faust_mat ////////////////////
 
 #ifdef __COMPILE_TIMERS__
 	#include "faust_timer.h"
@@ -77,6 +83,35 @@ A.t_multiply.stop();
 #endif
 }
 
+
+faust_vec solve(const faust_mat & A, const faust_vec & v)
+{
+	if (A.getNbRow() != v.getDim())
+	{
+		std::cerr << "ERROR LinAlgebra  faust_vec solve(const faust_mat & A, const faust_vec & v) : " << std::endl;
+		std::cerr << "number of Row of A different from dim of v"<<std::endl;	
+		exit( EXIT_FAILURE);	
+	}
+	faust_vec sol(A.getNbCol());
+	sol.Display();
+	v.Display();
+	A.Display();
+	sol.vec=A.mat.colPivHouseholderQr().solve(v.vec);	
+	return sol;
+}
+
+void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y)
+{
+	if (A.getNbRow() != y.getDim())
+	{
+		std::cerr << "ERROR LinAlgebra  void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y) : " << std::endl;
+		std::cerr << "number of Row of A different from dim of y"<<std::endl;	
+		exit( EXIT_FAILURE);	
+	}
+	x.resize(A.getNbCol());
+	Eigen::SparseQR<Eigen::SparseMatrix<faust_real>, Eigen::COLAMDOrdering<int>>   solver(A.mat);
+	x.vec=solver.solve(y.vec);
+}
 
 
 
@@ -520,7 +555,7 @@ faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_re
 
 
 // non-member operators definitions
-
+#ifdef FREE_FAUST
 faust_vec operator*(const faust_core& f, const faust_vec& v)
 {
 	faust_vec vec(v);
@@ -528,6 +563,7 @@ faust_vec operator*(const faust_core& f, const faust_vec& v)
 		vec.multiplyLeft(f.data[i]);
 	return vec;
 }
+#endif
 
 
 	

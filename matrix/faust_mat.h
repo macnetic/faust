@@ -3,6 +3,7 @@
  
 //#include "faust_spmat.h"
 #include <Eigen/Dense>
+
 #include "faust_constant.h"
 #include <vector>
 #include <iterator>
@@ -153,6 +154,7 @@ void write_into_file(const char* filename);
   friend void add(const faust_mat & A, const faust_mat & B, faust_mat & C);
   friend void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real& alpha, const faust_real& beta, char  typeA, char  typeB);
   friend void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA);
+  friend faust_vec solve(const faust_mat & A, const faust_vec & v);
   bool estIdentite(){return isIdentity;}
   bool estNulle(){return isZeros;}
   

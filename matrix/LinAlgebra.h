@@ -25,8 +25,8 @@ class faust_core;
  //void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta);
  
  
-
-
+faust_vec solve(const faust_mat & A, const faust_vec & v);
+void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
  
  
  // C = alpha *op(A)*op(B) + beta * C;
@@ -40,4 +40,6 @@ class faust_core;
 
 
 // non-member operators declarations
+  #if 0
   faust_vec operator*(const faust_core& f, const faust_vec& v);
+  #endif

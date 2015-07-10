@@ -77,6 +77,34 @@ faust_spmat::faust_spmat(const vector<int>& rowidx, const vector<int>& colidx, c
 }
 
 
+
+void faust_spmat::init_from_file(const char* filename)
+{
+	FILE* fp=fopen(filename,"r");
+	int nb_row,nb_col,_nnz,id_row,id_col;
+	faust_real value;
+	fscanf(fp, "%d %d %d\n",&nb_row,&nb_col,&_nnz);
+	std::cout<<"INSIDE nb_row : "<<nb_row<<" nb_col : "<<nb_col<<" nnz : "<<_nnz<<std::endl;
+	resize(_nnz,nb_row,nb_col);
+	typedef Eigen::Triplet<double> T;
+	std::vector<T> tripletList;
+	while (fscanf(fp,"%d %d %lf\n",&id_row,&id_col,&value)!=EOF)
+	{
+		tripletList.push_back(T(id_row-1,id_col-1,value));
+	}
+	mat.setFromTriplets(tripletList.begin(),tripletList.end());
+}
+
+
+
+void faust_spmat::Display() const
+{
+	std::cout<<" nb_row : "<<dim1<<" nb_col : "<<dim2<<" nnz : "<<nnz<<std::endl;
+	std::cout<< mat <<std::endl;
+	
+}
+
+
 faust_spmat::faust_spmat(const int nnz_, const int dim1_, const int dim2_) : 
 	mat(Eigen::SparseMatrix<faust_real>(dim1_,dim2_)),
 	dim1(dim1_),
@@ -97,6 +125,7 @@ void faust_spmat::resize(const int nnz_, const int dim1_, const int dim2_)
 	mat.resize(dim1_, dim2_);
 	mat.reserve(nnz_);
 	update_dim();
+	nnz = nnz_;
 }
 
 void faust_spmat::transpose()

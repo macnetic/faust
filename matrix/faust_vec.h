@@ -45,6 +45,8 @@ const faust_real& operator[](int i)const{return vec(i);}
 const faust_real& operator()(int i)const{return vec(i);}
 
 friend void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA);
+friend faust_vec solve(const faust_mat & A, const faust_vec & v);
+friend void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
 
 private:
   int dim;

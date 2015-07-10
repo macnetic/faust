@@ -568,7 +568,7 @@ void palm4MSA::compute_c()
    faust_real nR1=RorL[ind_fact].spectralNorm(nbr_iter,threshold,flag2);
     //c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;
     c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*lambda*lambda;
-	c=c*1.001;
+	//c=c*1.001;
    //std::cout<<" nL : "<<nL <<" nL1 : "<<nL1<<" flag : "<<flag1<<std::endl;
    //std::cout<<" nR : "<<nR <<" nR1 : "<<nR1<<" flag : "<<flag2<<std::endl;
    //std::cout<<" c : "<< c <<" c1 : "<<c1<<std::endl<<std::endl;
