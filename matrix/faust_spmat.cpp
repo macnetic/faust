@@ -181,7 +181,7 @@ void faust_spmat::print_file(const char* filename)const
 
 
 
-void faust_spmat::init_from_txt_file(char* filename)
+void faust_spmat::init_from_file(char* filename)
 {
 	// la premiere ligne contient le nombre de lignes et de colonnes de la matrice
 	// chacune des autres lignes contient trois valeur par ligne : rowind colind value
@@ -197,6 +197,11 @@ void faust_spmat::init_from_txt_file(char* filename)
 	int dim1_tmp,dim2_tmp;
 	
 	FILE* fp=fopen(filename,"r");
+	if (fp == NULL)
+	{
+		cerr << "Error in faust_spmat::init_from_file : unable to open \"" << filename << "\"" << endl;
+		exit(EXIT_FAILURE);
+	}
 	
 	fscanf(fp,"%d %d\n", &dim1_tmp,&dim2_tmp);
 	while(fscanf(fp,"%d %d %lf\n", &row_tmp,&col_tmp,&val_tmp)!=EOF)
@@ -214,7 +219,7 @@ void faust_spmat::init_from_txt_file(char* filename)
 		|| *max_element(&row[0],&row[row.size()-1]) > dim1_tmp-1
 		|| *max_element(&col[0],&col[col.size()-1]) > dim2_tmp-1)
 	{
-		cerr << "Error in faust_spmat::init_from_txt_file : Unable to initialize sparse matrix from file "<<filename << endl;
+		cerr << "Error in faust_spmat::init_from_file : Unable to initialize sparse matrix from file "<<filename << endl;
 		exit(EXIT_FAILURE);
 	}
 

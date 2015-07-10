@@ -13,20 +13,24 @@ faust_core::faust_core() :
 	factProduct(faust_mat())*/
 {}
 
-faust_core::faust_core(const std::vector<faust_spmat>& facts) :
+faust_core::faust_core(const std::vector<faust_spmat>& facts, const faust_real lambda_) :
    data(facts),
+   lambda(lambda_),
    isDataInit(true)/*,
    factProduct(faust_mat())*/
 {}
 
 faust_core::faust_core(const faust_params& params) :
    data(std::vector<faust_spmat>()),
+   lambda(0.0),
    isDataInit(false)/*,
    factProduct(faust_mat())*/
 {
    hierarchical_fact hier_fact(params);
    hier_fact.compute_facts();
    hier_fact.get_facts(data);
+   lambda = hier_fact.get_lambda();
+
    isDataInit = true;
 }
 
@@ -38,6 +42,16 @@ void faust_core::get_facts(std::vector<faust_spmat>& sparse_facts)const
       exit(EXIT_FAILURE);
    }
    sparse_facts = data;
+}
+
+faust_real faust_core::get_lambda()const
+{
+   if(!isDataInit)
+   {
+      cerr << "Error in faust_core::get_facts : factors are not available" << endl;
+      exit(EXIT_FAILURE);
+   }
+   return lambda;
 }
 
 

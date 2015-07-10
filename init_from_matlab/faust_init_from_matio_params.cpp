@@ -43,7 +43,7 @@ void init_params_palm_from_matiofile(faust_params_palm& params,const char* fileN
 	
 	char* current_fieldName;
 	
-	int niter,nfacts,verbose,updateway,dim1,dim2,cons_parameter,cons_dim1,cons_dim2;
+	int niter,nfacts,verbose,update_way,dim1,dim2,cons_parameter,cons_dim1,cons_dim2;
 	faust_mat data_mat,current_fact;
 	vector<faust_mat> init_facts;
 	faust_real init_lambda;	
@@ -105,12 +105,12 @@ void init_params_palm_from_matiofile(faust_params_palm& params,const char* fileN
 			params.isVerbose = (bool) verbose;
 		}
 		
-		if (strcmp(current_fieldName,"updateway")==0)
+		if (strcmp(current_fieldName,"update_way")==0)
 		{
-			//cout<<"updateway"<<endl;
-			updateway=(int)((double*)(current_var->data))[0];
-			//cout<<updateway<<endl;
-			params.isUpdateWayR2L=(bool) updateway;
+			//cout<<"update_way"<<endl;
+			update_way=(int)((double*)(current_var->data))[0];
+			//cout<<update_way<<endl;
+			params.isUpdateWayR2L=(bool) update_way;
 		}
 		
 		if (strcmp(current_fieldName,"init_lambda")==0)
@@ -178,7 +178,7 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 	
 	char* current_fieldName;
 	
-	int niter,nfacts,dim1,dim2,cons_parameter,cons_dim1,cons_dim2,fact_side,updateway,verbose;
+	int niter,nfacts,dim1,dim2,cons_parameter,cons_dim1,cons_dim2,fact_side,update_way,verbose;
 	faust_mat data_mat,current_fact;
 	double init_lambda;	
 	
@@ -248,16 +248,16 @@ void init_params_from_matiofile(faust_params& params, const char* fileName, cons
 			params.isVerbose = (bool) verbose;
 		}
 		
-		if (strcmp(current_fieldName,"updateway")==0)
+		if (strcmp(current_fieldName,"update_way")==0)
 		{
-			//cout<<"updateway"<<endl;
-			updateway=(int)((double*)(current_var->data))[0];
-			//cout<<updateway<<endl;
-			if (updateway != (bool) updateway)
-			{     cerr<<"updateway isn't well define"<<endl;
+			//cout<<"update_way"<<endl;
+			update_way=(int)((double*)(current_var->data))[0];
+			//cout<<update_way<<endl;
+			if (update_way != (bool) update_way)
+			{     cerr<<"update_way isn't well define"<<endl;
 				exit(EXIT_FAILURE);	
 			}
-			params.isUpdateWayR2L=(bool)updateway;
+			params.isUpdateWayR2L=(bool)update_way;
 		}
 		
 		if (strcmp(current_fieldName,"init_lambda")==0)

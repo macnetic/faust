@@ -39,6 +39,15 @@ void  multiplyLeft(faust_spmat const& A);
 
 void operator=(faust_vec const& y);
 
+void operator*=(const faust_real alpha);
+void operator+=(const faust_real alpha);
+void operator-=(const faust_real alpha);
+
+void operator+=(const faust_vec& v);
+void operator-=(const faust_vec& v);
+
+
+
 faust_real& operator[](int i){return vec(i);}
 const faust_real& operator[](int i)const{return vec(i);}
 

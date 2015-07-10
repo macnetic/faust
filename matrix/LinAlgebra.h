@@ -2,10 +2,11 @@
 #define LINALGEBRA_H
 
 #include "faust_constant.h"
+#include "faust_spmat.h"
 
 class faust_mat;
 class faust_vec;
-class faust_spmat;
+//class faust_spmat;
 class faust_core;
 
 #endif

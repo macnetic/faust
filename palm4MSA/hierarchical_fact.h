@@ -21,12 +21,12 @@ class hierarchical_fact
 
       void get_facts(std::vector<faust_spmat>&)const;
       void compute_facts();
+      faust_real get_lambda()const{return palm_global.get_lambda();}
 
 
 private:
       void init();
       void next_step();
-      faust_real get_lambda()const{return palm_global.get_lambda();}
 
 
    private:

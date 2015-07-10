@@ -34,7 +34,7 @@ class faust_spmat
 		void Display() const; 
 
 		void print_file(const char* filename)const;
-		void init_from_txt_file(char* filename);
+		void init_from_file(char* filename);
 
 		~faust_spmat(){}
 

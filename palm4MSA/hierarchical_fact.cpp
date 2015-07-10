@@ -139,8 +139,11 @@ void hierarchical_fact::compute_facts()
    }
 
   init();
-  for (int i=0 ; i<=nb_fact-1 ; i++)
+  for (int i=0 ; i<=nb_fact-1 ; i++)\
+  {
+     cout << "hierarchical_fact::compute_facts : iteration "<<i<<"/"<<nb_fact-1 <<endl;
      next_step();
+  }
 
   isFactorizationComputed = true;
    

@@ -13,10 +13,11 @@ class faust_core
 {
 	public:
 		faust_core();
-		faust_core(const std::vector<faust_spmat>& facts);
+		faust_core(const std::vector<faust_spmat>& facts, const faust_real lambda_);
 		faust_core(const faust_params& params);
 		
 		void get_facts(std::vector<faust_spmat>& sparse_facts)const; 
+		faust_real get_lambda()const;
 
 		~faust_core(){}
 
@@ -30,6 +31,7 @@ class faust_core
 
 	private:
 		std::vector<faust_spmat> data;
+		faust_real lambda;
 		// true if all facts have been multiplied to obtain the product matrix factProduct;
 		bool isDataInit;
 		//faust_mat factProduct;

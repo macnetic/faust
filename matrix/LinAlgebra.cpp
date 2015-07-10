@@ -6,10 +6,9 @@
 #include <Eigen/Sparse>
 #include <Eigen/SparseQR>
 
-#ifdef FREE_FAUST
-	#include "faust_spmat.h"
-	#include "faust_core.h"
-#endif
+#include "faust_spmat.h"
+#include "faust_core.h"
+
 	//////////FONCTION faust_mat - faust_mat ////////////////////
 
 #ifdef __COMPILE_TIMERS__
@@ -555,15 +554,14 @@ faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_re
 
 
 // non-member operators definitions
-#ifdef FREE_FAUST
 faust_vec operator*(const faust_core& f, const faust_vec& v)
 {
 	faust_vec vec(v);
 	for (int i=f.data.size()-1 ; i >= 0 ; i--)
 		vec.multiplyLeft(f.data[i]);
+	vec *= f.get_lambda();
 	return vec;
 }
-#endif
 
 
 	

@@ -32,14 +32,14 @@ class palm4MSA
       
 
       faust_real get_lambda()const{return lambda;}
-      faust_real get_RMSE()const{return error.norm()/data.getNbRow()/data.getNbCol();}
+      faust_real get_RMSE()const{return error.norm()/sqrt(data.getNbRow()*data.getNbCol());}
       const faust_mat& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
       //const faust_mat& get_data()const{return data;}
 
       void init_fact(int nb_facts_);      
       void next_step();
-      bool do_continue(){bool cont=stop_crit.do_continue(ind_ite++); if(!cont){ind_ite=0;isConstraintSet=false;}return cont;} // CAUTION! post-increment of ind_ite: the value in stop_crit.do_continue is ind_ite, not ind_ite+1
-      //bool do_continue()const{return stop_crit.do_continue(ind_ite++, error);};
+      bool do_continue(){bool cont=stop_crit.do_continue(++ind_ite); if(!cont){ind_ite=-1;isConstraintSet=false;}return cont;} // CAUTION! pre-increment of ind_ite: the value in stop_crit.do_continue is ind_ite+1, not ind_ite
+      //bool do_continue()const{return stop_crit.do_continue(++ind_ite, error);};
       
       void init_fact_from_palm(const palm4MSA& palm, bool isFactSideLeft);
       const std::vector<faust_mat>& get_facts()const {return S;}
@@ -78,7 +78,6 @@ class palm4MSA
       const bool verbose;
       faust_mat data;
       faust_mat error; // error = lambda*L*S*R - data
-      faust_mat X_hat;
       
 
       bool isCComputed;
@@ -152,7 +151,7 @@ class palm4MSA
 #ifdef __PAS_FIXE__
 inline void palm4MSA::compute_c()
 {
-   c=10000*1.001;
+   c=10000*lipschitz_multiplicator;
    isCComputed = true;  
 }
 #endif   

@@ -46,6 +46,55 @@ void faust_vec::resize(const int new_dim)
 		}
 }
 
+void faust_vec::operator*=(const faust_real alpha)
+{
+   faust_real*const ptr_data = getData();
+   for (int i=0 ; i<size() ; i++)
+      ptr_data[i] *= alpha; 
+}
+void faust_vec::operator+=(const faust_real alpha)
+{
+   faust_real*const ptr_data = getData();
+   for (int i=0 ; i<size() ; i++)
+      ptr_data[i] += alpha; 
+}
+void faust_vec::operator-=(const faust_real alpha)
+{
+   faust_real*const ptr_data = getData();
+   for (int i=0 ; i<size() ; i++)
+      ptr_data[i] += alpha; 
+}
+
+
+void faust_vec::operator+=(const faust_vec& v)
+{
+   if(v.size()!=size())
+   {
+      cerr << "Error in faust_vec::operator+= : sizes are different" << endl;
+      exit(EXIT_FAILURE);
+   }
+   faust_real*const ptr_data = getData();
+   faust_real*const v_ptr_data = getData();
+   for (int i=0 ; i<size() ; i++)
+      ptr_data[i] += v_ptr_data[i]; 
+}
+
+void faust_vec::operator-=(const faust_vec& v)
+{
+   if(v.size()!=size())
+   {
+      cerr << "Error in faust_vec::operator-= : sizes are different" << endl;
+      exit(EXIT_FAILURE);
+   }
+   faust_real*const ptr_data = getData();
+   faust_real*const v_ptr_data = getData();
+   for (int i=0 ; i<size() ; i++)
+      ptr_data[i] -= v_ptr_data[i]; 
+}
+
+
+
+
 void faust_vec::operator=(faust_vec const& y)
 {
 	  vec = y.vec;

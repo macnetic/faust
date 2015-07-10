@@ -35,7 +35,7 @@ palm4MSA::palm4MSA(const faust_params& params_, const bool isGlobal_) :
    S(params_.init_fact),
    RorL(vector<faust_mat>(2)),
    ind_fact(0),
-   ind_ite(0),
+   ind_ite(-1),
    lipschitz_multiplicator(1.001),
    isCComputed(false),
    isGradComputed(false),
@@ -63,7 +63,7 @@ palm4MSA::palm4MSA(const faust_params_palm& params_palm_, const bool isGlobal_) 
    stop_crit(params_palm_.stop_crit),
    const_vec(params_palm_.cons),
    ind_fact(0),
-   ind_ite(0),
+   ind_ite(-1),
    lipschitz_multiplicator(1.001),
    isCComputed(false),
    isGradComputed(false),
@@ -495,7 +495,14 @@ t_local_update_R.start();
          multiply(S[i+1], RorL[i+1], RorL[i]);
    }
    else
+   {
+      if(!isProjectionComputed)
+      {
+         cerr << "Projection must be computed before updating L" << endl;
+         exit(EXIT_FAILURE);
+      }
       LorR.multiplyLeft(S[ind_fact]);
+   }
 #ifdef __COMPILE_TIMERS__
 t_global_update_R.stop();
 t_local_update_R.stop();
@@ -510,18 +517,21 @@ t_global_update_L.start();
 t_local_update_L.start();
 #endif
 
-   if(!isProjectionComputed){
-      cerr << "Projection must be computed before updating L" << endl;
-      exit(EXIT_FAILURE);
-   }
    if(!isUpdateWayR2L)
+   {
+      if(!isProjectionComputed)
+      {
+         cerr << "Projection must be computed before updating L" << endl;
+         exit(EXIT_FAILURE);
+      }
       LorR *= S[ind_fact];
+   }
    else
    {
       RorL.resize(nb_fact);
       RorL[0].resize(const_vec[0]->getRows());
       RorL[0].setEyes();
-      for (int i=0 ; i>nb_fact-2 ; i++)
+      for (int i=0 ; i<nb_fact-1 ; i++)
          //  R[i] = S[i+1] * R[i+1]
          multiply(RorL[i] , S[i], RorL[i+1]);
    }
@@ -551,24 +561,28 @@ t_local_check.stop();
 
 
 #ifdef __PAS_FIXE__
+// palm4MSA::compute_c() has been defined as an inline method in palm4MSA.h
 #else
 void palm4MSA::compute_c()
 {
 #ifdef __COMPILE_TIMERS__
 	t_global_compute_c.start();
 #endif
-		//std::cout<<"calcul pas : "<<std::endl;
-   //faust_real nL=LorR.spectralNorm();
+
+   //std::cout<<"calcul pas : "<<std::endl;
+   // faust_real nL=LorR.spectralNorm();
    //faust_real nR=RorL[ind_fact].spectralNorm();
+   //c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;
+
+
    int flag1,flag2;
    
    int nbr_iter = 100;
    faust_real threshold = 1e-13;
    faust_real nL1=LorR.spectralNorm(nbr_iter,threshold,flag1);
    faust_real nR1=RorL[ind_fact].spectralNorm(nbr_iter,threshold,flag2);
-    //c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;
     c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*lambda*lambda;
-	//c=c*1.001;
+
    //std::cout<<" nL : "<<nL <<" nL1 : "<<nL1<<" flag : "<<flag1<<std::endl;
    //std::cout<<" nR : "<<nR <<" nR1 : "<<nR1<<" flag : "<<flag2<<std::endl;
    //std::cout<<" c : "<< c <<" c1 : "<<c1<<std::endl<<std::endl;
@@ -679,6 +693,7 @@ t_local_next_step.start();
          isLastFact = true;
       else
          isLastFact = false;
+
       ind_fact = ind_ptr[j];
 
       isCComputed = false;
@@ -686,24 +701,22 @@ t_local_next_step.start();
       isProjectionComputed = false;
       
       compute_c();
-      // X_hat is computed by compute_grad_over_c only when j=ind_fact-1
       compute_grad_over_c();
-
-
       compute_projection();
   
-
-
  
       if(!isUpdateWayR2L)
          update_L();
       else
          update_R();
 
-    
-      if (isLastFact)
-         compute_lambda();
    }
+
+   compute_lambda();
+
+   if (verbose)
+      cout << "Iter " << ind_ite << ", RMSE=" << get_RMSE() << endl;
+
 
    delete[] ind_ptr;
    ind_ptr = NULL;
