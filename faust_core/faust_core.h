@@ -17,9 +17,14 @@ class faust_core
 		faust_core(const faust_params& params);
 		
 		void get_facts(std::vector<faust_spmat>& sparse_facts)const; 
+		const faust_mat& get_estimate();
+
 		faust_real get_lambda()const;
+		long long int get_total_nnz()const;
 
 		~faust_core(){}
+	private:
+                void compute_estimate();
 
 
 	public:
@@ -32,9 +37,11 @@ class faust_core
 	private:
 		std::vector<faust_spmat> data;
 		faust_real lambda;
-		// true if all facts have been multiplied to obtain the product matrix factProduct;
+		// true if all facts have been multiplied to obtain the product matrix estimate;
 		bool isDataInit;
-		//faust_mat factProduct;
+		bool isEstimateComputed;
+		faust_mat estimate;
+		long long int totalNonZeros;
 
 	friend faust_vec operator*(const faust_core& f, const faust_vec& v);
 		

@@ -22,11 +22,13 @@ class hierarchical_fact
       void get_facts(std::vector<faust_spmat>&)const;
       void compute_facts();
       faust_real get_lambda()const{return palm_global.get_lambda();}
+      const std::vector<std::vector< faust_real> >& get_errors()const;
 
 
 private:
       void init();
       void next_step();
+      void compute_errors();
 
 
    private:
@@ -42,6 +44,8 @@ private:
       //std::vector<faust_mat> S;
       std::vector<const faust_constraint_generic*> cons_tmp_global;
       bool isFactorizationComputed;
+      std::vector<std::vector<faust_real> > errors;
+      
      
 #ifdef __COMPILE_TIMERS__
    public:

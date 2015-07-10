@@ -34,7 +34,7 @@ class palm4MSA
       faust_real get_lambda()const{return lambda;}
       faust_real get_RMSE()const{return error.norm()/sqrt(data.getNbRow()*data.getNbCol());}
       const faust_mat& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
-      //const faust_mat& get_data()const{return data;}
+      const faust_mat& get_data()const{return data;}
 
       void init_fact(int nb_facts_);      
       void next_step();

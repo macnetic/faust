@@ -1,6 +1,7 @@
 #include "hierarchical_fact.h"
 #include "faust_timer.h"
 #include "faust_spmat.h"
+#include "faust_core.h"
 using namespace std;
 
 //hierarchical_fact::hierarchical_fact(){} // voir avec Luc les parametres par defaut
@@ -16,7 +17,8 @@ hierarchical_fact::hierarchical_fact(const faust_params& params_):
    palm_global(palm4MSA(params_, true)),
    cons_tmp_global(vector<const faust_constraint_generic*>()),
    default_lambda(params_.init_lambda),
-   isFactorizationComputed(false){}
+   isFactorizationComputed(false),
+   errors(std::vector<std::vector<faust_real> >(2,std::vector<faust_real >(params_.nb_fact-1,0.0))){}
 
 void hierarchical_fact::init()
 {
@@ -106,6 +108,9 @@ palm_global.print_local_timers();
    palm_2.set_data(palm_global.get_res(isFactSideLeft, ind_fact));
 
 
+   compute_errors();
+
+
    ind_fact++;  
     
 
@@ -139,7 +144,7 @@ void hierarchical_fact::compute_facts()
    }
 
   init();
-  for (int i=0 ; i<=nb_fact-1 ; i++)\
+  for (int i=0 ; i<=nb_fact-1 ; i++)
   {
      cout << "hierarchical_fact::compute_facts : iteration "<<i<<"/"<<nb_fact-1 <<endl;
      next_step();
@@ -149,6 +154,31 @@ void hierarchical_fact::compute_facts()
    
 }
 
+const std::vector<std::vector< faust_real> >& hierarchical_fact::get_errors()const
+{
+    if(!isFactorizationComputed)
+    {
+        cerr << "Error in hierarchical_fact::get_errors() : Factorization has not been computed" << endl;
+        exit(EXIT_FAILURE);
+    }
+    return errors;
+}
+
+void hierarchical_fact::compute_errors()
+{
+   vector<faust_spmat> sp_facts;
+   get_facts(sp_facts);
+   faust_core faust_core_tmp(sp_facts, get_lambda());
+   const faust_mat& estimate_mat = faust_core_tmp.get_estimate();
+
+   faust_mat data(palm_global.get_data());
+
+   faust_real data_norm = data.norm();
+   data -= estimate_mat;
+   errors[0][ind_fact] =  estimate_mat.norm()/data_norm;
+   errors[1][ind_fact] =  faust_core_tmp.get_total_nnz()/data.getNbRow()/data.getNbCol();
+
+}
 
 
 #ifdef __COMPILE_TIMERS__

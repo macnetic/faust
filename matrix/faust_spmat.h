@@ -30,6 +30,7 @@ class faust_spmat
 		
 		int getNbRow()const{return dim1;}
 		int getNbCol()const{return dim2;}
+		int getNonZeros()const{return nnz;}
 		void init_from_file(const char* filename);
 		void Display() const; 
 

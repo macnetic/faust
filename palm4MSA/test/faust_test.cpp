@@ -31,7 +31,7 @@ bool testMEG  = false;
   faust.get_facts(facts);
   faust_real lambda = faust.get_lambda(); 
 
-//cout << "lambda=" << lambda << endl;
+cout << "lambda=" << lambda << endl;
 
   char filename[100];
   for (int i=0 ; i<facts.size() ; i++)
