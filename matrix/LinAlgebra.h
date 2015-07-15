@@ -41,6 +41,5 @@ void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
 
 
 // non-member operators declarations
-  #if 0
-  faust_vec operator*(const faust_core& f, const faust_vec& v);
-  #endif
+faust_vec operator*(const faust_core& f, const faust_vec& v);
+faust_mat operator*(const faust_core& f, const faust_mat& M);

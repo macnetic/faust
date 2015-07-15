@@ -50,12 +50,16 @@ class faust_spmat
 		int dim2;
 		int nnz;
 
-
-	friend void faust_mat::operator*=(const faust_spmat& M);
-	friend void faust_mat::operator+=(const faust_spmat& M);
-	friend void faust_mat::operator-=(const faust_spmat& M);
+	// *this = (*this) * S
+	friend void faust_mat::operator*=(const faust_spmat& S);
+	// *this = (*this) + S
+	friend void faust_mat::operator+=(const faust_spmat& S);
+	// *this = (*this) - S
+	friend void faust_mat::operator-=(const faust_spmat& S);
 	friend void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
-	friend void faust_mat::multiplyLeft(const faust_spmat& M);
+
+	// *this = S * (*this) 
+	friend void faust_mat::multiplyLeft(const faust_spmat& S);
 
 	
 

@@ -175,7 +175,7 @@ void hierarchical_fact::compute_errors()
 
 
    faust_core faust_core_tmp(sp_facts, get_lambda());
-   const faust_mat& estimate_mat = faust_core_tmp.get_estimate();
+   const faust_mat estimate_mat = faust_core_tmp.get_product();
 
    faust_mat data(palm_global.get_data());
 

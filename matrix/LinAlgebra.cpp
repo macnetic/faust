@@ -557,11 +557,19 @@ faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_re
 faust_vec operator*(const faust_core& f, const faust_vec& v)
 {
 	faust_vec vec(v);
-	for (int i=f.data.size()-1 ; i >= 0 ; i--)
+	for (int i=f.size()-1 ; i >= 0 ; i--)
 		vec.multiplyLeft(f.data[i]);
-	vec *= f.get_lambda();
 	return vec;
 }
+
+faust_mat operator*(const faust_core& f, const faust_mat& M)
+{
+	faust_mat A(M);
+	for (int i=f.size()-1 ; i >= 0 ; i--)
+		A.multiplyLeft(f.data[i]);
+	return A;
+}
+
 
 
 	

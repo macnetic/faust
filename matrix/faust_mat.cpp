@@ -722,22 +722,22 @@ t_sub.stop();
           isZeros = A.isZeros;
           isIdentity = A.isIdentity;
   }
-  void faust_mat::operator=(faust_spmat const& A)
+  void faust_mat::operator=(faust_spmat const& S)
   {
-          resize(A.dim1,A.dim2);
+          resize(S.dim1,S.dim2);
 	  setZeros();
           faust_real*const ptr_data = getData();
-          for(int i=0 ; i< A.mat.outerSize() ; i++)
-             for(Eigen::SparseMatrix<faust_real>::InnerIterator it(A.mat,i); it; ++it)
+          for(int i=0 ; i< S.mat.outerSize() ; i++)
+             for(Eigen::SparseMatrix<faust_real>::InnerIterator it(S.mat,i); it; ++it)
                 ptr_data[it.col() * dim1 + it.row()] = it.value();
           isZeros = false;
           isIdentity = false;
   }
  
 
-void faust_mat::operator*=(const faust_spmat& M)
+void faust_mat::operator*=(const faust_spmat& S)
 {
-	if(dim2 != M.dim1)
+	if(dim2 != S.dim1)
 	{
 		std::cerr << "Error in faust_mat::operator*= : incorrect matrix dimensions" << std::endl;
 		exit(EXIT_FAILURE);
@@ -745,49 +745,49 @@ void faust_mat::operator*=(const faust_spmat& M)
 
 	if (isIdentity)
 	{
-		this->operator=(M);
+		this->operator=(S);
 		isIdentity = false;
 		isZeros = false;
 	}
 	else if (isZeros)
 	{
-		resize(dim1, M.dim2);
+		resize(dim1, S.dim2);
 		setZeros();
 	}
 	else
 	{
-		mat = mat * M.mat;
-		dim2 = M.dim2;
+		mat = mat * S.mat;
+		dim2 = S.dim2;
 	}
 	
 }
-void faust_mat::operator+=(const faust_spmat& M)
+void faust_mat::operator+=(const faust_spmat& S)
 {
-	if(dim1!=M.dim1 || dim2!=M.dim2)
+	if(dim1!=S.dim1 || dim2!=S.dim2)
 	{
 		std::cerr << "Error in faust_mat::operator+= : incorrect matrix dimensions" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	mat += M.mat;
+	mat += S.mat;
 	isIdentity = false;
 	isZeros = false;
 }
-void faust_mat::operator-=(const faust_spmat& M)
+void faust_mat::operator-=(const faust_spmat& S)
 {
-	if(dim1!=M.dim1 || dim2!=M.dim2)
+	if(dim1!=S.dim1 || dim2!=S.dim2)
 	{
 		std::cerr << "Error in faust_mat::operator-= : incorrect matrix dimensions" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	mat -= M.mat;
+	mat -= S.mat;
 	isIdentity = false;
 	isZeros = false;
 }
 
 
-void faust_mat::multiplyLeft(const faust_spmat& M)
+void faust_mat::multiplyLeft(const faust_spmat& S)
 {
-	if(M.dim2 != dim1)
+	if(S.dim2 != dim1)
 	{
 		std::cerr << "Error in faust_mat::operator*= : incorrect matrix dimensions" << std::endl;
 		exit(EXIT_FAILURE);
@@ -795,19 +795,19 @@ void faust_mat::multiplyLeft(const faust_spmat& M)
 
 	if (isIdentity)
 	{
-		this->operator=(M);
+		this->operator=(S);
 		isIdentity = false;
 		isZeros = false;
 	}
 	else if (isZeros)
 	{
-		resize(M.dim1, dim2);
+		resize(S.dim1, dim2);
 		setZeros();
 	}
 	else
 	{
-		mat = M.mat * mat;
-		dim1 = M.dim1;
+		mat = S.mat * mat;
+		dim1 = S.dim1;
 	}
 	
 }

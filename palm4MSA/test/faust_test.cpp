@@ -31,9 +31,7 @@ bool testMEG  = false;
   vector<faust_spmat> facts;
   faust_core faust(params);
   faust.get_facts(facts);
-  faust_real lambda = faust.get_lambda(); 
 
-cout << "lambda=" << lambda << endl;
 
   char filename[100];
   for (int i=0 ; i<facts.size() ; i++)
@@ -57,7 +55,7 @@ cout << "lambda=" << lambda << endl;
         sprintf(filename, "facts_hier_fact%d.txt", i);
      facts[i].init_from_file(filename);
   }
-  faust_core faust(facts, lambda);*/
+  faust_core faust(facts, 1.0);*/
 
 
 
