@@ -129,6 +129,7 @@ void hierarchical_fact::get_facts(std::vector<faust_spmat>& sparse_facts)const
       cerr << "Error in hierarchical_fact::get_facts : factorization has not been computed" << endl;
       exit(EXIT_FAILURE);
    }*/
+
    const std::vector<faust_mat>& full_facts = palm_global.get_facts();
    sparse_facts.resize(full_facts.size());
    for (int i=0 ; i<sparse_facts.size() ; i++)
