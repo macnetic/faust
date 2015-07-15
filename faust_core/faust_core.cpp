@@ -67,7 +67,7 @@ void faust_core::compute_estimate()
 {
    estimate.resize(data[0].getNbRow()); 
    estimate.setEyes();
-   for(int i=1 ; i<data.size() ; i++)
+   for(int i=0 ; i<data.size() ; i++)
       estimate *= data[i];
 
    estimate *= lambda;

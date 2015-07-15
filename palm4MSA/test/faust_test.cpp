@@ -13,6 +13,8 @@ using namespace std;
 int main()
 {
 
+// si true : MEG_fact
+// si false : demo_dico_learning_compared
 bool testMEG  = false;
 
 

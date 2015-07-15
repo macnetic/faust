@@ -48,6 +48,7 @@ void hierarchical_fact::next_step()
 #ifdef __COMPILE_TIMERS__
 t_next_step.start();
 #endif
+
       
    if(isFactorizationComputed)
    {
@@ -123,11 +124,11 @@ palm_2.print_prox_timers();
 
 void hierarchical_fact::get_facts(std::vector<faust_spmat>& sparse_facts)const 
 {
-   if(!isFactorizationComputed)
+   /*if(!isFactorizationComputed)
    {
       cerr << "Error in hierarchical_fact::get_facts : factorization has not been computed" << endl;
       exit(EXIT_FAILURE);
-   }
+   }*/
    const std::vector<faust_mat>& full_facts = palm_global.get_facts();
    sparse_facts.resize(full_facts.size());
    for (int i=0 ; i<sparse_facts.size() ; i++)
@@ -168,6 +169,10 @@ void hierarchical_fact::compute_errors()
 {
    vector<faust_spmat> sp_facts;
    get_facts(sp_facts);
+
+
+
+
    faust_core faust_core_tmp(sp_facts, get_lambda());
    const faust_mat& estimate_mat = faust_core_tmp.get_estimate();
 
