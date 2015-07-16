@@ -15,7 +15,7 @@ int main()
 
 // si true : MEG_fact
 // si false : demo_dico_learning_compared
-bool testMEG  = false;
+bool testMEG  = true;
 
 
   // init from params
@@ -28,10 +28,10 @@ bool testMEG  = false;
     
 //cout << "update_way=" << params.isUpdateWayR2L << endl;
  
-  vector<faust_spmat> facts;
+  /*vector<faust_spmat> facts;
   faust_core faust(params);
   faust.get_facts(facts);
-
+  (facts[0]) *= 
 
   char filename[100];
   for (int i=0 ; i<facts.size() ; i++)
@@ -41,21 +41,25 @@ bool testMEG  = false;
      else
         sprintf(filename, "facts_hier_fact%d.dat", i+1);
      facts[i].print_file(filename);
-  }
+  }*/
 
   // init from vector of faust_spmat
 
-  /*vector<faust_spmat> facts(6);
+  vector<faust_spmat> facts;
+  if (testMEG)
+      facts.resize(6);
+  else
+     facts.resize(4);
   char filename[100];
   for (int i=0 ; i<facts.size() ; i++)
   {
      if (testMEG)
         sprintf(filename, "facts_MEG%d.txt", i);
      else
-        sprintf(filename, "facts_hier_fact%d.txt", i);
+        sprintf(filename, "learning_compared_fact%d.txt", i);
      facts[i].init_from_file(filename);
   }
-  faust_core faust(facts, 1.0);*/
+  faust_core faust(facts, 1.0);
 
 
 

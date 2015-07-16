@@ -122,14 +122,14 @@ faust_real cons21_parameter;
 
   vector<faust_spmat> facts;
   hier_fact.get_facts(facts);
-  
-  /*char nomFichier[100];
+  (facts[0]) *= hier_fact.get_lambda();
+  char nomFichier[100];
   for (int i=0 ; i<facts.size() ; i++)
   {
      sprintf(nomFichier, "facts%d_cpp.dat",i);
      facts[i].print_file(nomFichier);
   }
-  cout<<"lambda="<<hier_fact.get_lambda()<<endl;*/
+  cout<<"lambda="<<hier_fact.get_lambda()<<endl;
 
 return 0;
 }
