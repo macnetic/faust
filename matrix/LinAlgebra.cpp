@@ -108,7 +108,7 @@ void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y)
 		exit( EXIT_FAILURE);	
 	}
 	x.resize(A.getNbCol());
-	Eigen::SparseQR<Eigen::SparseMatrix<faust_real>, Eigen::COLAMDOrdering<int>>   solver(A.mat);
+	Eigen::SparseQR<Eigen::SparseMatrix<faust_real>, Eigen::COLAMDOrdering<int> >   solver(A.mat);
 	x.vec=solver.solve(y.vec);
 }
 

@@ -7,7 +7,8 @@
 #include <Eigen/Dense>
 #include <vector>
 
-class faust_vec;
+#include "faust_vec.h"
+//class faust_vec;
 //class faust_mat;
 
 class faust_spmat
@@ -44,11 +45,13 @@ class faust_spmat
 
 		
 
-	public:
+	private:
 		Eigen::SparseMatrix<faust_real> mat;	
 		int dim1;
 		int dim2;
 		int nnz;
+
+	friend void faust_mat::operator=(faust_spmat const& S);
 
 	// *this = (*this) * S
 	friend void faust_mat::operator*=(const faust_spmat& S);
@@ -60,6 +63,9 @@ class faust_spmat
 
 	// *this = S * (*this) 
 	friend void faust_mat::multiplyLeft(const faust_spmat& S);
+
+	// *this = S * (*this) 
+	friend void  faust_vec::multiplyLeft(faust_spmat const& A);
 
 	
 

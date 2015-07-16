@@ -1,6 +1,7 @@
 #include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
 #include "faust_mat.h"
+#include "faust_spmat.h"
 #include "faust_constant.h"
 #include <iostream>
 #include <vector>
@@ -23,6 +24,58 @@ void init_faust_mat_from_matio(faust_mat& M, const char* fileName, const char* v
       M[i] = (faust_real) (((double*)(matvar->data))[i]);
    Mat_VarFree(matvar);
 }
+
+void init_faust_spmat_from_matio(faust_spmat& S, const char* fileName, const char* variableName)
+{
+
+  matvar_t* matvar = faust_matio_read_variable(fileName, variableName);
+   mat_sparse_t* mat_sparse = (mat_sparse_t*)matvar->data;
+
+   if( matvar->class_type != MAT_C_SPARSE
+       || matvar->rank != 2)
+   {
+      cerr << "error in init_faust_mat_from_matio : "<< variableName << " seems not to be a matrix." << endl;
+      exit(EXIT_FAILURE);
+   }
+   
+   if( matvar->dims[1] + 1 != mat_sparse->njc 
+       || mat_sparse->nir < mat_sparse->ndata 
+       || mat_sparse->jc[matvar->dims[1]] != mat_sparse->ndata)
+   {
+      cerr<<"Error in init_faust_spmat_from_matio : incorrect dimensions"<<endl;
+      exit(EXIT_FAILURE);
+   }
+  
+   vector<int> rowind(mat_sparse->ndata);
+   vector<int> colind(mat_sparse->ndata);
+   vector<faust_real> values(mat_sparse->ndata);
+
+
+   for (size_t i = 0 ; i < mat_sparse->ndata ; i++)
+      values[i] = (faust_real) (((double*)(mat_sparse->data))[i]);
+
+   int cmpt=0;
+   for (int i=0 ; i<matvar->dims[1] ; i++)
+      for (int j = mat_sparse->jc[i] ; j < mat_sparse->jc[i + 1] ; j++)
+      {
+         rowind[cmpt] = mat_sparse->ir[cmpt] ;
+         colind[cmpt] = i ;
+         cmpt++;
+      }
+   S = faust_spmat(rowind, colind, values, matvar->dims[0], matvar->dims[1]);
+
+   if (cmpt != S.getNonZeros())
+   {
+      cerr<<"Error in init_faust_spmat_from_matio : cmpt != nnz : cmpt="<<cmpt<<" ; nnz="<<S.getNonZeros()<<endl;
+      exit(EXIT_FAILURE);
+   }   
+   
+
+
+   Mat_VarFree(matvar);
+
+}
+
 
 void write_faust_mat_into_matfile(const faust_mat& M, const char* fileName, const char* variableName)
 {
@@ -120,4 +173,52 @@ void init_mat_from_matvar(faust_mat & M,matvar_t* var)
 			
 	}
 }
+	
+void init_spmat_from_matvar(faust_spmat& S, matvar_t* var)
+{
+
+   mat_sparse_t* mat_sparse = (mat_sparse_t*)var->data;
+
+   if( var->class_type != MAT_C_SPARSE
+       || var->rank != 2)
+   {
+      cerr << "error in init_faust_mat_from_matio : "<< "the variable seems not to be a matrix." << endl;
+      exit(EXIT_FAILURE);
+   }
+   
+   if( var->dims[1] + 1 != mat_sparse->njc 
+       || mat_sparse->nir < mat_sparse->ndata 
+       || mat_sparse->jc[var->dims[1]] != mat_sparse->ndata)
+   {
+      cerr<<"Error in init_faust_spmat_from_matio : incorrect dimensions"<<endl;
+      exit(EXIT_FAILURE);
+   }
+  
+   vector<int> rowind(mat_sparse->ndata);
+   vector<int> colind(mat_sparse->ndata);
+   vector<faust_real> values(mat_sparse->ndata);
+
+
+   for (size_t i = 0 ; i < mat_sparse->ndata ; i++)
+      values[i] = (faust_real) (((double*)(mat_sparse->data))[i]);
+
+   int cmpt=0;
+   for (int i=0 ; i<var->dims[1] ; i++)
+      for (int j = mat_sparse->jc[i] ; j < mat_sparse->jc[i + 1] ; j++)
+      {
+         rowind[cmpt] = mat_sparse->ir[cmpt] ;
+         colind[cmpt] = i ;
+         cmpt++;
+      }
+   S = faust_spmat(rowind, colind, values, var->dims[0], var->dims[1]);
+
+   if (cmpt != S.getNonZeros())
+   {
+      cerr<<"Error in init_faust_spmat_from_matio : cmpt != nnz : cmpt="<<cmpt<<" ; nnz="<<S.getNonZeros()<<endl;
+      exit(EXIT_FAILURE);
+   }   
+
+}
+
+
 

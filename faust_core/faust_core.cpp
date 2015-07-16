@@ -9,13 +9,11 @@ using namespace std;
 
 faust_core::faust_core() :
    data(std::vector<faust_spmat>()),
-   isDataInit(false),
    totalNonZeros(0)
 {}
 
 faust_core::faust_core(const std::vector<faust_spmat>& facts, const faust_real lambda_ /* =1.0 */) :
    data(facts),
-   isDataInit(true),
    totalNonZeros(0)
 {
    for (int i=0 ; i<data.size() ; i++)
@@ -27,7 +25,6 @@ faust_core::faust_core(const std::vector<faust_spmat>& facts, const faust_real l
 
 faust_core::faust_core(const faust_params& params) :
    data(std::vector<faust_spmat>()),
-   isDataInit(false),
    totalNonZeros(0)
 {
    hierarchical_fact hier_fact(params);
@@ -37,26 +34,10 @@ faust_core::faust_core(const faust_params& params) :
       totalNonZeros += data[i].getNonZeros();
    (data[0]) *= hier_fact.get_lambda();
 
-   isDataInit = true;
-}
-
-void faust_core::get_facts(std::vector<faust_spmat>& sparse_facts)const 
-{
-   if(!isDataInit)
-   {
-      cerr << "Error in faust_core::get_facts : factors are not available" << endl;
-      exit(EXIT_FAILURE);
-   }
-   sparse_facts = data;
 }
 
 faust_mat faust_core::get_product()
 {
-   if (!isDataInit)
-   {
-      cerr << "Error in faust_mat faust_core::get_product : data has not been initialized" << endl;
-      exit(EXIT_FAILURE);
-   }
 
    faust_mat prod(data[0].getNbRow()); 
    prod.setEyes();
@@ -66,35 +47,20 @@ faust_mat faust_core::get_product()
    return prod;
 }
 
-long long int faust_core::get_total_nnz()const
+void faust_core::push_back(const faust_spmat& S)
 {
-   if(!isDataInit)
+   if(data[size()-1].getNbCol()!=S.getNbRow() || S.getNbRow()<1)
    {
-      cerr << "Error in faust_core::get_total_nnz : factors are not available" << endl;
-      exit(EXIT_FAILURE);
-   }
-
-   return totalNonZeros;
-}
-
-
-void faust_core::operator*=(const faust_core&  f)
-{
-   for (int i=0 ; i<f.size() ; i++)
-   {
-      data.push_back(f.data[i]);
-      totalNonZeros += f.data[i].getNonZeros();
-   }
-}
-
-void faust_core::operator*=(const faust_spmat& S)
-{
-   if(S.getNbRow()*S.getNbCol() < 1)
-   {
-      cerr << "Error in faust_core::operator*= : empty sparse matrix" << endl;
+      cerr << "Error in faust_core::push_back : incorrect dimensions" << endl;
       exit(EXIT_FAILURE);
    }
    data.push_back(S);
    totalNonZeros += S.getNonZeros();
+	
 }
 
+void faust_core::operator*=(const faust_core&  f)
+{
+   for (int i=0 ; i<f.size() ; i++)
+      push_back(f.data[i]);
+}

@@ -724,7 +724,7 @@ t_sub.stop();
   }
   void faust_mat::operator=(faust_spmat const& S)
   {
-          resize(S.dim1,S.dim2);
+          resize(S.getNbRow(),S.getNbCol());
 	  setZeros();
           faust_real*const ptr_data = getData();
           for(int i=0 ; i< S.mat.outerSize() ; i++)
