@@ -111,8 +111,8 @@ void prox_sp(faust_mat & M,int k)
 }
 #endif
 
-//#if 0
-void prox_sp(faust_mat & M,int k)
+
+void prox_sp_normfree(faust_mat & M,int k)
 {
 	const int dim1 = M.getNbRow();
 	const int dim2 = M.getNbCol();
@@ -133,94 +133,24 @@ void prox_sp(faust_mat & M,int k)
 		for (int i=0 ; i<index.size() ; i++)
 			M.getData()[index[i]] = vec[index[i]];
 		}
-		M.normalize();	
+		
 	}
 }
-//#endif
 
 
-#if 0
-void prox_spcol(faust_mat & M,int k)
+void prox_sp(faust_mat & M, int k)
 {
-	
-	int dim1 = M.getNbRow();
-	int dim2 = M.getNbCol();
-	
-	if (k<=0)
-	{
-		M.setZeros();
-	}else{
-		if (k<dim1)
-		{	
-			faust_mat M_abs(dim1,dim2);
-			M_abs = M;
-			M_abs.abs();
-			std::vector<faust_real> copy_col_abs;
-			copy_col_abs.resize(dim1);
-			std::vector<faust_real> sorted_elements;
-			std::vector<int> id_sorted_elements;
-			
-			
-			
-			if (k<dim1/2)
-			{	
-				faust_mat new_M(dim1,dim2);
-				new_M.setZeros();
-				for (int i=0;i<dim2;i++)
-				{	
-					sorted_elements.assign(k,-1);
-					id_sorted_elements.assign(k,-1);
-					memcpy(&(copy_col_abs[0]),&((M_abs.getData())[i*dim1]),dim1*sizeof(faust_real));
-					/*for (int ll=0;ll<dim1;ll++)
-					{
-						copy_col_abs[ll]=M_abs.getCoeff(ll,i);
-					}*/	
-					partial_sort_k_max(sorted_elements,id_sorted_elements,copy_col_abs,k);
-				
-				// update new_M		
-					/*for (int j=0;j<k;j++)
-					{	
-						(((new_M.getData()))[id_sorted_elements[j]+i*dim1]) =  (((M.getData()))[id_sorted_elements[j]+i*dim1]);
-					}*/
-					for (int ll=0;ll<k;ll++)
-					{
-						new_M.setCoeff(M.getCoeff(id_sorted_elements[ll],i),id_sorted_elements[ll],i);
-					}
-					
-					
-							
-				}
-						
-				M = new_M;
-			}else
-			{	
-				k = dim1 - k;
-				faust_real unreachable_value = M_abs.max()+1;
-				for (int i=0;i<dim2;i++)
-				{	
-					sorted_elements.assign(k,unreachable_value);
-					id_sorted_elements.assign(k,unreachable_value);
-					memcpy(&(copy_col_abs[0]),&((M_abs.getData())[i*dim1]),dim1*sizeof(faust_real));
-					partial_sort_k_min(sorted_elements,id_sorted_elements,copy_col_abs,k);
-				
-					// update new_M		
-					for (int j=0;j<k;j++)
-					{	
-						(((M.getData()))[id_sorted_elements[j]+i*dim1]) =  0;
-					}
-				}
-			}		
-		}	
-		M.normalize();	
-	}
-	
+	prox_sp_normfree(M,k);
+	M.normalize();	
 }
-#endif
 
-//#if 0
-void prox_spcol(faust_mat & M,int k)
+
+
+
+
+
+void prox_spcol_normfree(faust_mat & M,int k)
 {
-//M.print_file("M1.dat");
 	const int dim1 = M.getNbRow();
 	const int dim2 = M.getNbCol();
 	const int nb_elt_mat = dim1*dim2;
@@ -245,14 +175,16 @@ void prox_spcol(faust_mat & M,int k)
 				for (int i=0 ; i< index[j].size() ; i++)
 					ptr_data[j*dim1+index[j][i]] = mat[j][index[j][i]];
 		}	
-		M.normalize();	
+			
 	}
 }
-//#endif
+
 	
-
-
-
+void prox_spcol(faust_mat & M,int k)
+{
+	prox_spcol_normfree(M,k);
+	M.normalize();		
+}
 
 
 void old_splin(faust_mat & M,int k)
@@ -264,7 +196,7 @@ void old_splin(faust_mat & M,int k)
 
 }
 
-#if 0
+/*#if 0
 void prox_splin(faust_mat & M,int k)
 {
 	M.transpose();
@@ -272,10 +204,10 @@ void prox_splin(faust_mat & M,int k)
 	M.transpose();
 
 }
-#endif
+#endif*/
 
-//#if 0
-void prox_splin(faust_mat & M,int k)
+
+void prox_splin_normfree(faust_mat & M,int k)
 {
 	const int dim1 = M.getNbRow();
 	const int dim2 = M.getNbCol();
@@ -301,11 +233,19 @@ void prox_splin(faust_mat & M,int k)
 				for (int j=0 ; j< index[i].size() ; j++)
 					ptr_data[(index[i][j])*dim1+i] = mat[i][index[i][j]];
 		}	
-		M.normalize();	
+		
 	}
 
 }
-//#endif
+
+
+
+void prox_splin(faust_mat & M,int k)
+{	
+	prox_splin_normfree(M,k);
+	M.normalize();	
+}
+
 
 
 

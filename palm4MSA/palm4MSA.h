@@ -28,8 +28,8 @@ class palm4MSA
       void set_lambda(const faust_real lambda_){lambda = lambda_;}
       //void set_lambda(const palm4MSA& palm_){lambda = palm_.lambda;}
       void update_lambda_from_palm(const palm4MSA& palm){lambda *= palm.lambda;}
-
-      
+	  void compute_last_update();
+      void compute_facts();
 
       faust_real get_lambda()const{return lambda;}
       faust_real get_RMSE()const{return error.norm()/sqrt(data.getNbRow()*data.getNbCol());}
@@ -76,6 +76,7 @@ class palm4MSA
       faust_real lambda;
       const bool isUpdateWayR2L;
       const bool verbose;
+	  const bool isLambdaComputed;
       faust_mat data;
       faust_mat error; // error = lambda*L*S*R - data
       

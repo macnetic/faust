@@ -20,7 +20,8 @@ class faust_params_palm
          const stopping_criterion& stop_crit_ = stopping_criterion(),
          const bool isVerbose_ = false ,
          const bool isUpdateWayR2L_ = false ,
-         const faust_real init_lambda_ = 1.0 );
+         const faust_real init_lambda_ = 1.0 ,
+		 const bool isLambdaComputed_ = true);
 
       void check_constraint_validity();
 
@@ -36,6 +37,7 @@ class faust_params_palm
       // Optional members (set to default values if not defined)
       bool isVerbose;
       bool isUpdateWayR2L;
+	  bool isLambdaComputed;
       std::vector<faust_mat> init_fact;
       faust_real init_lambda;
 

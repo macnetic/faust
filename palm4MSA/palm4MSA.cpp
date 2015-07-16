@@ -33,6 +33,7 @@ palm4MSA::palm4MSA(const faust_params& params_, const bool isGlobal_) :
    verbose(params_.isVerbose),
    nb_fact(0),
    S(params_.init_fact),
+   isLambdaComputed(params_.isLambdaComputed),
    RorL(vector<faust_mat>(2)),
    ind_fact(0),
    ind_ite(-1),
@@ -62,6 +63,7 @@ palm4MSA::palm4MSA(const faust_params_palm& params_palm_, const bool isGlobal_) 
    LorR(faust_mat(params_palm_.init_fact[0].getNbRow())),
    stop_crit(params_palm_.stop_crit),
    const_vec(params_palm_.cons),
+   isLambdaComputed(params_palm_.isLambdaComputed),
    ind_fact(0),
    ind_ite(-1),
    lipschitz_multiplicator(1.001),
@@ -74,6 +76,24 @@ palm4MSA::palm4MSA(const faust_params_palm& params_palm_, const bool isGlobal_) 
 {
    check_constraint_validity();
 
+}
+
+void palm4MSA::compute_facts()
+{
+	while (do_continue())
+	{	
+		next_step();
+		//cout<<"lambda : "<<lambda<<endl;
+	}
+	cout<<"lambda_computed : "<<isLambdaComputed<<endl;
+	if (!isLambdaComputed)
+	{	
+		isLastFact=true;
+		cout<<"lambda before : "<<lambda<<endl;
+		compute_last_update();
+		cout<<"final lambda : "<<lambda<<endl;
+		
+	}
 }
 
 void palm4MSA::compute_projection()
@@ -138,8 +158,14 @@ t_local_compute_projection.start();
 			prox_sp(S[ind_fact], const_int->getParameter());
 			#endif
 			*/
-			prox_sp(S[ind_fact], const_int->getParameter());
-			
+			if (isLambdaComputed)
+			{
+				prox_sp(S[ind_fact], const_int->getParameter());
+			}
+			else
+			{	
+				prox_sp_normfree(S[ind_fact], const_int->getParameter());
+			}
 			#ifdef __COMPILE_TIMERS__
 			t_prox_sp.stop();
 			#endif
@@ -156,7 +182,13 @@ t_local_compute_projection.start();
 				
 			#endif
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
+			if (isLambdaComputed)
+			{
             prox_spcol(S[ind_fact], const_int->getParameter());
+			}else
+			{
+				prox_spcol_normfree(S[ind_fact], const_int->getParameter());	
+			}
 			#ifdef __COMPILE_TIMERS__
 				t_prox_spcol.stop();
 			#endif
@@ -200,7 +232,13 @@ t_local_compute_projection.start();
 				//cout<<"new"<<endl;
 				prox_splin(S[ind_fact], const_int->getParameter());
 			#endif*/
-			prox_splin(S[ind_fact], const_int->getParameter());
+			if (isLambdaComputed)
+			{
+				prox_splin(S[ind_fact], const_int->getParameter());
+			}else
+			{
+				prox_splin_normfree(S[ind_fact], const_int->getParameter());
+			}
 			#ifdef __COMPILE_TIMERS__
 				t_prox_splin.stop();
 			#endif
@@ -440,6 +478,48 @@ t_global_compute_grad_over_c.stop();
 t_local_compute_grad_over_c.stop();
 #endif
 }
+void palm4MSA::compute_last_update()
+{
+	/*if (do_continue())
+	{
+		cerr << "error in palm4MSA::compute_last_update : computation of lambda must be done at the end of the main iteration " << endl;
+		exit(EXIT_FAILURE);
+	}*/
+	
+	if (isLambdaComputed)
+	{
+		cerr << "error in palm4MSA::compute_last_update : computation of lambda at the end whereas isLambdaComputed means it must be computed at each step" << endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	faust_real scaling = 1;
+	for (int i=0;i<nb_fact;i++)
+	{
+		
+		faust_real current_norm;
+		switch (const_vec[i]->getConstraintType())
+		{
+			case CONSTRAINT_NAME_NORMCOL:
+			{}
+			break;
+			case CONSTRAINT_NAME_NORMLIN: 
+			{}
+			default:
+			{
+				current_norm=1/(S[i].norm());
+				scaling = scaling*current_norm;
+				S[i].scalarMultiply(current_norm);
+			}
+			
+		}
+	}
+	LorR.scalarMultiply(scaling);
+	//LorR = S[0];
+	//for (int i=1;i<nb_fact;i++)LorR*=S[i];		
+	//cout<<" scaling : "<<scaling<<endl; 
+	compute_lambda();
+	
+}
 
 void palm4MSA::compute_lambda()
 {
@@ -450,7 +530,7 @@ t_local_compute_lambda.start();
 
    if (!isLastFact)
    {
-      cerr << "error in palm4MSA::compute_lambda : computation of lamda must be done at the end of the iteration through the number of factors" << endl;
+      cerr << "error in palm4MSA::compute_lambda : computation of lambda must be done at the end of the iteration through the number of factors" << endl;
       exit(EXIT_FAILURE);
    }
 
@@ -466,7 +546,7 @@ t_local_compute_lambda.start();
 
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
-   //cout<<lambda<<endl;
+   cout<<"lambda : "<<lambda<<endl;
    //cout<<__SP lambda<<endl;
 
 #ifdef __COMPILE_TIMERS__
@@ -577,8 +657,8 @@ void palm4MSA::compute_c()
 
    int flag1,flag2;
    
-   int nbr_iter = 100;
-   faust_real threshold = 1e-13;
+   int nbr_iter = 10000;
+   faust_real threshold = 1e-16;
    faust_real nL1=LorR.spectralNorm(nbr_iter,threshold,flag1);
    faust_real nR1=RorL[ind_fact].spectralNorm(nbr_iter,threshold,flag2);
     c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*lambda*lambda;
@@ -711,9 +791,11 @@ t_local_next_step.start();
          update_R();
 
    }
+	if (isLambdaComputed)
+	{	
+		compute_lambda();
 
-   compute_lambda();
-
+	}
    if (verbose)
       cout << "Iter " << ind_ite << ", RMSE=" << get_RMSE() << endl;
 

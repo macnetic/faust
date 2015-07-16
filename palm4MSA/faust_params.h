@@ -22,7 +22,8 @@ class faust_params
          const bool isVerbose_ = false ,
          const bool isUpdateWayR2L_ = false ,
          const bool isFactSideLeft_ = false ,
-         const faust_real init_lambda_ = 1.0 );
+         const faust_real init_lambda_ = 1.0 ,
+		 const bool isLambdaComputed_ = true);
 		 
 	  faust_params();
 
@@ -40,7 +41,9 @@ class faust_params
       // Optional members (set to default values if not defined)
       bool isFactSideLeft;
       bool isVerbose;
+	  bool isLambdaComputed;
       bool isUpdateWayR2L;
+	  void Display() const;
       std::vector<faust_mat> init_fact;
       faust_real init_lambda;
 

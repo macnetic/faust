@@ -29,7 +29,8 @@ faust_params_palm::faust_params_palm(
          const stopping_criterion& stop_crit_ /* = stopping_criterion() */,
          const bool isVerbose_ /* = false */,
          const bool isUpdateWayR2L_ /* = false */,
-         const faust_real init_lambda_ /* = 1.0 */) :
+         const faust_real init_lambda_ /* = 1.0 */,
+		 const bool isLambdaComputed_ /* true */) :
             data(data_), 
             nb_fact(nb_fact_), 
             cons(cons_),
@@ -37,7 +38,8 @@ faust_params_palm::faust_params_palm(
             stop_crit(stop_crit_),
             isVerbose(isVerbose_),
             isUpdateWayR2L(isUpdateWayR2L_),
-            init_lambda(init_lambda_)
+            init_lambda(init_lambda_),
+			isLambdaComputed(isLambdaComputed_)
 
 {
  check_constraint_validity(); 

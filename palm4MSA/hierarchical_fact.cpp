@@ -69,8 +69,11 @@ t_next_step.start();
 #ifdef __COMPILE_TIMERS__
 palm_2.init_local_timers();
 #endif
-   while(palm_2.do_continue())
-      palm_2.next_step();
+   //while(palm_2.do_continue())
+    //  palm_2.next_step();
+	palm_2.compute_facts();
+	
+	
 #ifdef __COMPILE_TIMERS__
 palm_2.print_local_timers();
 #endif
@@ -100,8 +103,9 @@ palm_2.print_local_timers();
 #ifdef __COMPILE_TIMERS__
 palm_global.init_local_timers();
 #endif
-   while(palm_global.do_continue())
-      palm_global.next_step();
+   //while(palm_global.do_continue())
+    //  palm_global.next_step();
+	palm_global.compute_facts();
 #ifdef __COMPILE_TIMERS__
 palm_global.print_local_timers();
 #endif
@@ -167,7 +171,7 @@ const std::vector<std::vector< faust_real> >& hierarchical_fact::get_errors()con
 }
 
 void hierarchical_fact::compute_errors()
-{
+{  /*	
    vector<faust_spmat> sp_facts;
    get_facts(sp_facts);
 
@@ -183,7 +187,7 @@ void hierarchical_fact::compute_errors()
    data -= estimate_mat;
    errors[0][ind_fact] =  estimate_mat.norm()/data_norm;
    errors[1][ind_fact] =  faust_core_tmp.get_total_nnz()/data.getNbRow()/data.getNbCol();
-
+ 	*/
 }
 
 

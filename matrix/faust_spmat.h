@@ -33,7 +33,8 @@ class faust_spmat
 		int getNbCol()const{return dim2;}
 		int getNonZeros()const{return nnz;}
 		void init_from_file(const char* filename);
-		void Display() const; 
+		void Display() const;
+		faust_real norm(){return mat.norm();}	
 
 		void print_file(const char* filename)const;
 		void init_from_file(char* filename);
