@@ -92,6 +92,21 @@ void faust_vec::operator-=(const faust_vec& v)
       ptr_data[i] -= v_ptr_data[i]; 
 }
 
+faust_real faust_vec::mean_relative_error(const faust_vec& v_ref)
+{
+   if(v_ref.size() != size())
+   {
+      cerr << "Error in faust_vec::relative_error : sizes are different" << endl;
+      exit(EXIT_FAILURE);
+   }
+
+   faust_vec tmp(size());
+   for(int i=0 ; i<size() ; i++)
+      tmp[i] = fabs((vec[i]-v_ref.vec[i])/v_ref.vec[i]);
+
+   return tmp.mean();
+}
+
 
 
 

@@ -693,8 +693,8 @@ t_sub.stop();
  
   // Affichage
   void faust_mat::Display() const
-  {     std::cout << "nb_row=" << getNbRow() << endl;
-        std::cout << "nb_col=" << getNbCol()   <<endl;  
+  {     //std::cout << "nb_row=" << getNbRow() << endl;
+        //std::cout << "nb_col=" << getNbCol()   <<endl;  
 	std::cout << mat <<endl; 
   }
   

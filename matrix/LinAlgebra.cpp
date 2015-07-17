@@ -570,7 +570,12 @@ faust_mat operator*(const faust_core& f, const faust_mat& M)
 	return A;
 }
 
-
+faust_vec operator*(const faust_mat& M, const faust_vec& v)
+{
+	faust_vec vec(v);
+	vec.multiplyLeft(M);
+	return vec;
+}
 
 	
 

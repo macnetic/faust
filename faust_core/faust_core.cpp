@@ -49,11 +49,12 @@ faust_mat faust_core::get_product()
 
 void faust_core::push_back(const faust_spmat& S)
 {
-   if(data[size()-1].getNbCol()!=S.getNbRow() || S.getNbRow()<1)
-   {
-      cerr << "Error in faust_core::push_back : incorrect dimensions" << endl;
-      exit(EXIT_FAILURE);
-   }
+   if (size()>0)
+      if(data[size()-1].getNbCol()!=S.getNbRow() || S.getNbRow()<1)
+      {
+         cerr << "Error in faust_core::push_back : incorrect dimensions" << endl;
+         exit(EXIT_FAILURE);
+      }
    data.push_back(S);
    totalNonZeros += S.getNonZeros();
 	
@@ -63,4 +64,24 @@ void faust_core::operator*=(const faust_core&  f)
 {
    for (int i=0 ; i<f.size() ; i++)
       push_back(f.data[i]);
+}
+
+
+void faust_core::Display()const
+{
+   
+
+   for (int i=0 ; i<size() ; i++)
+   {
+      if(data[i].getNbCol()>20)
+         cout << "data["<<i<<"] = "<< data[i].getNbRow() <<"x"<< data[i].getNbCol()<<" sparse matrix with "<<data[i].getNonZeros()<<" non-zero values"<<endl;
+      else
+      {
+         cout << "data["<<i<<"] = "<<endl;
+         data[i].Display();
+         cout<<endl;
+      }
+   }	
+   cout<<endl;
+   
 }

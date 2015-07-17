@@ -57,7 +57,7 @@ CYAN    =36m
 RESET_FONT =\033[0m
 
 
-all:hier_fact hier_fact2 palm meg meg_new meg_old faust
+all:hier_fact hier_fact2 palm meg meg_new meg_old faust comptime
 
 hier_fact: hierarchical_fact_test.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
@@ -96,6 +96,10 @@ faust:$(OBJS) faust_test.o
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 
+comptime:$(OBJS) comp_time.o 
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 
 
 %.o:%.cpp
@@ -104,4 +108,4 @@ faust:$(OBJS) faust_test.o
 
 clean:
 	@printf '$(FONT)$(CYAN)Removing all object files and executable$(RESET_FONT)\n'
-	@rm -f hier_fact hier_fact2 palm meg meg_new meg_old faust  $(MATRIX_DIR)/*.o $(PALM_DIR)/*.o $(INIT_MATLAB)/*.o $(FAUST_CORE)/*.o ./*.o
+	@rm -f hier_fact hier_fact2 palm meg meg_new meg_old faust comptime  $(MATRIX_DIR)/*.o $(PALM_DIR)/*.o $(INIT_MATLAB)/*.o $(FAUST_CORE)/*.o ./*.o

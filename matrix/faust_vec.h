@@ -17,7 +17,8 @@ class faust_vec
 {
  public :
  faust_vec() : vec(), dim(0) {}
- faust_vec(int _dim) : vec(_dim),dim(_dim){} 
+ faust_vec(int _dim) : vec(_dim),dim(_dim){}
+ faust_vec(const faust_vec& v) : vec(v.vec), dim(v.dim){}
 	
  faust_real* getData(){return vec.data();}
  const faust_real* getData() const {return vec.data();}
@@ -36,6 +37,9 @@ void normalize(){scalarMultiply(1/norm());}
 void  multiplyLeft(faust_mat const& A){gemv(A, *this, *this, 1.0, 0.0, 'N');}
 void  multiplyLeft(faust_spmat const& A);
   
+faust_real sum()const{return vec.sum();}
+faust_real mean()const{return vec.mean();}
+
 
 void operator=(faust_vec const& y);
 
@@ -47,6 +51,7 @@ void operator+=(const faust_vec& v);
 void operator-=(const faust_vec& v);
 
 
+faust_real mean_relative_error(const faust_vec& v);
 
 faust_real& operator[](int i){return vec(i);}
 const faust_real& operator[](int i)const{return vec(i);}

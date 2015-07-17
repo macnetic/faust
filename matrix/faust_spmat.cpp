@@ -99,8 +99,8 @@ void faust_spmat::init_from_file(const char* filename)
 
 void faust_spmat::Display() const
 {
-	std::cout<<" nb_row : "<<dim1<<" nb_col : "<<dim2<<" nnz : "<<nnz<<std::endl;
-	std::cout<< mat <<std::endl;
+	faust_mat mat_tmp(*this);
+	mat_tmp.Display();
 	
 }
 

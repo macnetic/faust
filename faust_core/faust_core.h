@@ -23,6 +23,7 @@ class faust_core
 		long long int get_total_nnz()const{return totalNonZeros;}
 		void clear(){data.resize(0);totalNonZeros=0;}
 		void push_back(const faust_spmat& S);
+		void Display()const;
 
 		~faust_core(){}
 
