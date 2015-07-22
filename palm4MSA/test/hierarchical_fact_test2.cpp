@@ -4,14 +4,10 @@
 #include "faust_constraint_int.h"
 #include "faust_constraint_real.h"
 #include "faust_params.h"
-#include "faust_params_palm.h"
 #include "stopping_criterion.h"
-#include "faust_init_from_matio.h"
-#include "faust_init_from_matio_mat.h"
-#include "faust_init_from_matio_params.h"
-#include "palm4MSA.h"
-#include "hierarchical_fact.h"
+#include "sparse_hierarchical_fact.h"
 #include "faust_timer.h"
+#include "faust_init_from_matio_mat.h"
 #include <iostream>
 
 using namespace std;
@@ -108,38 +104,19 @@ faust_real cons21_parameter;
   stopping_criterion crit_2(niter1);
   stopping_criterion crit_global(niter2);
 
-  faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global, verbose, update_way, fact_side);
-  	 
-  hierarchical_fact hier_fact(params);
-
-  faust_params params2;
-  //init_params_from_matiofile(faust_params& params, const char* fileName, const char* variableName);
-  init_params_from_matiofile(params2,"false_config_compared_hierarchical_fact.mat","params");	
-  
-  hierarchical_fact hier_fact2(params2);
-  
-  faust_timer t1;
-  t1.start();
-	 
-   hier_fact2.compute_facts();
-   //hier_fact.compute_facts();
-
-  //cout<<"lambda"<<hier_fact.lambda<<endl;
-  //cout<<"lambda 1 : "<<hier_fact2.lambda<<endl;	  
-  t1.stop();
-  cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
+  faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global, verbose, update_way, fact_side,1,false);
+  params.Display();	
+  sparse_hierarchical_fact hier_fact(params);
 
 
-  vector<faust_spmat> facts;
-  hier_fact.get_facts(facts);
-  
-  /*char nomFichier[100];
-  for (int i=0 ; i<facts.size() ; i++)
-  {
-     sprintf(nomFichier, "facts%d_cpp.dat",i);
-     facts[i].print_file(nomFichier);
-  }
-  cout<<"lambda="<<hier_fact.get_lambda()<<endl;*/
+  cout <<"DEBUT FACTORISATION"<<endl;	 
+  hier_fact.compute_facts();
+  cout<<"FIN HIERARCHICAL_FACT"<<endl;	
+
+
+
+
 
 return 0;
 }
+

@@ -171,7 +171,7 @@ const std::vector<std::vector< faust_real> >& hierarchical_fact::get_errors()con
 }
 
 void hierarchical_fact::compute_errors()
-{  /*	
+{  	
    vector<faust_spmat> sp_facts;
    get_facts(sp_facts);
 
@@ -187,7 +187,7 @@ void hierarchical_fact::compute_errors()
    data -= estimate_mat;
    errors[0][ind_fact] =  estimate_mat.norm()/data_norm;
    errors[1][ind_fact] =  faust_core_tmp.get_total_nnz()/data.getNbRow()/data.getNbCol();
- 	*/
+ 	
 }
 
 

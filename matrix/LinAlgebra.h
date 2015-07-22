@@ -38,7 +38,11 @@ void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
  void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA);
  
  faust_real power_iteration(const faust_mat & A, const int nbr_iter_max,faust_real threshold,int & flag);
-
+ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_real threshold, int & flag);
+ // C = op(A) * B if typeMult = 'R'
+ // C = B * op(A) sinon
+ // op(A) = A si typeA='N', op(A) = transpose(A) si typeA='T'
+ void multiply(const faust_core & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char typeA, char typeMult);
 
 // non-member operators declarations
 faust_vec operator*(const faust_core& f, const faust_vec& v);

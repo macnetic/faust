@@ -14,6 +14,7 @@
 
 class faust_vec;//forward declaration of faust_vec class
 class faust_spmat;
+class faust_core;
 
 class faust_mat
 {
@@ -153,8 +154,10 @@ void write_into_file(const char* filename);
   //friend void gemm(const faust_mat & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta);
   friend void add(const faust_mat & A, const faust_mat & B, faust_mat & C);
   friend void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_real& alpha, const faust_real& beta, char  typeA, char  typeB);
+  friend void multiply(const faust_core & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, char typeA, char typeMult);
   friend void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA);
   friend faust_vec solve(const faust_mat & A, const faust_vec & v);
+  ///////////friend faust_spmat::operator=(faust_mat const& S);
   bool estIdentite(){return isIdentity;}
   bool estNulle(){return isZeros;}
   

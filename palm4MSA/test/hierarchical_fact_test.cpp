@@ -104,8 +104,8 @@ faust_real cons21_parameter;
   stopping_criterion crit_2(niter1);
   stopping_criterion crit_global(niter2);
 
-  faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global, verbose, update_way, fact_side);
-
+  faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global, verbose, update_way, fact_side,1,false);
+  params.Display();	
   hierarchical_fact hier_fact(params);
 
   faust_timer t1;
@@ -129,6 +129,7 @@ faust_real cons21_parameter;
      sprintf(nomFichier, "facts%d_cpp.dat",i);
      facts[i].print_file(nomFichier);
   }
+  cout<<"lambda="<<hier_fact.get_lambda()<<endl;
   cout<<"lambda="<<hier_fact.get_lambda()<<endl;
 
 return 0;

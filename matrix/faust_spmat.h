@@ -9,7 +9,7 @@
 
 #include "faust_vec.h"
 //class faust_vec;
-//class faust_mat;
+class faust_mat;
 
 class faust_spmat
 {
@@ -23,9 +23,13 @@ class faust_spmat
 		faust_spmat(const Eigen::SparseMatrix<faust_real>& mat_);
 
 		void resize(const int nnz_, const int dim1_, const int dim2_);
+		void resize(const int dim1_, const int dim2_){mat.resize(dim1_,dim2_);update_dim();}
+		void setZeros(){mat.setZero();nnz=0;}
+		void setEyes(){mat.setIdentity();update_dim();}
 		void transpose();
 
 		void operator= (const faust_spmat& M);
+		void operator= (const faust_mat& Mdense);
 		void operator*=(const faust_real alpha);
 		void operator/=(const faust_real alpha);
 		
@@ -52,6 +56,7 @@ class faust_spmat
 		int dim2;
 		int nnz;
 
+
 	friend void faust_mat::operator=(faust_spmat const& S);
 
 	// *this = (*this) * S
@@ -67,6 +72,7 @@ class faust_spmat
 
 	// *this = S * (*this) 
 	friend void  faust_vec::multiplyLeft(faust_spmat const& A);
+	friend void multiply(const faust_core & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, char typeA, char typeMult);
 
 	
 

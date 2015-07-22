@@ -10,9 +10,9 @@ FAUST_CORE = $(FAUST_ROOT_DIR)/trunk/devcpp/faust_core
 SRC_CPP = $(wildcard $(PALM_DIR)/*.cpp)  #$(filter-out $(PALM_DIR)/hierarchical_fact.cpp,$(wildcard $(PALM_DIR)/*.cpp))    #$(wildcard $(PALM_DIR)/*.cpp)
 SRC_CPP += $(wildcard $(INIT_MATLAB)/*.cpp)
 SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
-ifneq ($(COMPILATION_THOMAS),)
+#ifneq ($(COMPILATION_THOMAS),)
 SRC_CPP += $(wildcard $(FAUST_CORE)/*.cpp)
-endif
+#endif
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
 
 CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB)  -I$(MATIO_ROOT_DIR)/include  -DPROX=2   -I$(FAUST_CORE) #-Winline 
@@ -30,7 +30,7 @@ else
    #CXXFLAGS +=-D__COMPILE_TIMERS__ 
    CXXFLAGS +=-D__GEMM_WITH_OPENBLAS__
    CXXFLAGS +=-D__NICO__
-   CXXFLAGS += -D__PAS_FIXE__
+   #CXXFLAGS += -D__PAS_FIXE__
 endif
 
 LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio 

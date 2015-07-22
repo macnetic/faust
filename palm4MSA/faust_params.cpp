@@ -68,26 +68,26 @@ faust_params::faust_params(
 }
 
 
-/*void faust_params::Display() const
+void faust_params::Display() const
 {
 	std::cout<<"data :  nbRow "<<data.getNbRow()<<" NbCol : "<< data.getNbCol()<<std::endl;
 	std::cout<<"nb_facts : "<<nb_fact<<std::endl;
 	std::cout<<"Constraints :"<<std::endl;
 	std::cout<<"Constraints size:"<<cons.size()<<" "<<cons[0].size()<<std::endl;
-	for (int j=0;j<cons.size();j++)
+	for (int j=0;j<2;j++)
 	{	
 		std::vector<const faust_constraint_generic*> current_line(cons[j]);
 		for (int i=0;i<current_line.size();i++)
 		{	std::cout<<j<<" "<<i<<std::endl;
 			
 			std::cout<<"type : "<<(current_line[i]->get_constraint_name());
-			const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(current_line[i]);
-			std::cout<<" parameter : "<<const_int->getParameter();
-			std::cout<<" DIM1 : "<<cons[j][i]->getRows()<<" DIM2 : "<<cons[j][i]->getCols()<<std::endl;
+			//const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(current_line[i]);
+			//std::cout<<" parameter : "<<const_int->getParameter();
+			std::cout<<" DIM1 : "<<current_line[i]->getRows()<<" DIM2 : "<<current_line[i]->getCols()<<std::endl;
 		}
 	}	
 	
-}*/
+}
 
 
 faust_params::faust_params() : data(0,0),nb_fact(0),cons(std::vector<std::vector<const faust_constraint_generic*> >()),isFactSideLeft(false),isVerbose(false),isUpdateWayR2L(false),init_fact(std::vector<faust_mat>()),init_lambda(1.0)/*,nb_rows(0),nb_cols(0) */
