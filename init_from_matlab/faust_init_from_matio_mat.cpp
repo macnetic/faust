@@ -30,7 +30,7 @@ void init_faust_spmat_from_matio(faust_spmat& S, const char* fileName, const cha
 }
 
 
-void write_faust_mat_into_matfile(const faust_mat& M, const char* fileName, const char* variableName)
+void write_faust_mat_into_matfile(faust_mat& M, const char* fileName, const char* variableName)
 {
    mat_t* matfp = Mat_Open(fileName,MAT_ACC_RDWR);
    matvar_t *matvar;
