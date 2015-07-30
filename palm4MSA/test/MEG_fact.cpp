@@ -141,9 +141,12 @@ int main()
   // Creation du critere d'arret
   stopping_criterion crit_2(niter1);
   stopping_criterion crit_global(niter2);
-
-  faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global);
-
+  //faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global,false,false,false,1.0,false);	
+	cons_tmp1.push_back(&cons25);
+    faust_params params(data,nfacts,cons_tmp1,vector<faust_mat>(),crit_2,crit_global,1.25,1.4,false,false,false,1.0,false);
+  //faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global,false,false,1.0,false);
+  params.Display();
+  cout<<"launch"<<endl;	
   hierarchical_fact hier_fact(params);
 
   faust_timer t1;

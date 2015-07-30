@@ -42,7 +42,7 @@ class faust_spmat
 
 		void print_file(const char* filename)const;
 		void init_from_file(char* filename);
-
+		void init(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<faust_real>& values, const int dim1_, const int dim2_);
 		~faust_spmat(){}
 
 	private:

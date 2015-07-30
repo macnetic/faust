@@ -50,8 +50,11 @@ void write_faust_mat_into_matfile(faust_mat& M, const char* fileName, const char
    
    
 	while ( (matvar = Mat_VarReadNextInfo(matfp)) != NULL ) {
-
-        Mat_VarDelete(matfp,matvar->name);
+		std::cout<<matvar->name<<std::endl;
+		if (strcmp(matvar->name,variableName) == 0)
+		{		
+			Mat_VarDelete(matfp,matvar->name);
+		}
         matvar = NULL;
     }
    

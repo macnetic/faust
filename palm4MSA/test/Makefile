@@ -25,10 +25,10 @@ ifneq ($(COMPILATION_THOMAS),)
   # CXXFLAGS += -D__COMPILE_TIMERS__
 else
    CXXFLAGS += -DFAUST_SINGLE  
-   CXXFLAGS += -I$(OPENBLASDIR)/include 
+   #CXXFLAGS += -I$(OPENBLASDIR)/include 
    CXXFLAGS +=-std=c++0x  
-   #CXXFLAGS +=-D__COMPILE_TIMERS__ 
-   CXXFLAGS +=-D__GEMM_WITH_OPENBLAS__
+   CXXFLAGS +=-D__COMPILE_TIMERS__ 
+   #CXXFLAGS +=-D__GEMM_WITH_OPENBLAS__
    CXXFLAGS +=-D__NICO__
    #CXXFLAGS += -D__PAS_FIXE__
 endif
@@ -37,7 +37,7 @@ LDFLAGS = -L$(MATIO_ROOT_DIR)/lib -lmatio
 ifneq ($(COMPILATION_THOMAS),)
    LDFLAGS += -lhdf5  -L$(OPENBLASDIR) -lopenblas
 else
-   LDFLAGS += -lrt -L$(OPENBLASDIR)/lib   -lopenblas
+   LDFLAGS += -lhdf5 -L$(HDF5_ROOT_DIR)/lib -lrt -L$(OPENBLASDIR)/lib   -lopenblas
 endif
 
 FONT =\033[
@@ -57,7 +57,7 @@ CYAN    =36m
 RESET_FONT =\033[0m
 
 
-all:hier_fact hier_fact2 palm meg meg_new meg_old faust comptime
+all:hier_fact hier_fact2 palm meg meg_new meg_old faust comptime comptime2 
 
 hier_fact: hierarchical_fact_test.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
@@ -100,6 +100,13 @@ comptime:$(OBJS) comp_time.o
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+	
+comptime2:$(OBJS) comp_time2.o 
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+
+
 
 
 %.o:%.cpp

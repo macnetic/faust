@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iomanip>
 
+
 using namespace std;
 
 faust_spmat::faust_spmat() : 
@@ -30,6 +31,13 @@ faust_spmat::faust_spmat(const int dim1_, const int dim2_) :
 {
 	resize(nnz, dim1, dim2);
 }
+
+
+
+
+
+
+
 
 faust_spmat::faust_spmat(const faust_mat& M) : 
 	mat(Eigen::SparseMatrix<faust_real>(M.getNbRow(),M.getNbCol())),
@@ -69,6 +77,22 @@ faust_spmat::faust_spmat(const vector<int>& rowidx, const vector<int>& colidx, c
 		cerr << "vectors rowidx, colidx and values have not the same size" << endl;
 		exit(EXIT_FAILURE);
 	}
+	
+	resize(rowidx.size(), dim1_, dim2_);
+	for (int i=0 ; i<rowidx.size() ; i++)
+		mat.coeffRef(rowidx[i], colidx[i]) = values[i];
+	mat.makeCompressed();
+	nnz = mat.nonZeros();
+}
+
+void faust_spmat::init(const vector<int>& rowidx, const vector<int>& colidx, const vector<faust_real>& values, const int dim1_, const int dim2_)
+{
+	if(rowidx.size()!=colidx.size() || rowidx.size()!=values.size())
+	{
+		cerr << "vectors rowidx, colidx and values have not the same size" << endl;
+		exit(EXIT_FAILURE);
+	}
+	setZeros();
 	resize(rowidx.size(), dim1_, dim2_);
 	for (int i=0 ; i<rowidx.size() ; i++)
 		mat.coeffRef(rowidx[i], colidx[i]) = values[i];

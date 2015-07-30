@@ -96,37 +96,28 @@ class sparsePalm4MSA
       int nb_fact; // number of factors
 
       std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
-};
-#ifdef __PAS_FIXE__
-inline void sparsePalm4MSA::compute_c()
-{
-   c=10000*lipschitz_multiplicator;
-   isCComputed = true;  
-}
-#endif 
-		
-#endif
-
-/*
-#ifdef __COMPILE_TIMERS__
+	
+	
+	#ifdef __COMPILE_TIMERS__
    public: 
       faust_timer t_local_compute_projection;
       faust_timer t_local_compute_grad_over_c;
+	  faust_timer t_local_compute_c;
       faust_timer t_local_compute_lambda;
-      faust_timer t_local_update_R;
-      faust_timer t_local_update_L;
+      faust_timer t_local_update_LSR;
       faust_timer t_local_check;
       faust_timer t_local_init_fact;
       faust_timer t_local_next_step;
       faust_timer t_local_init_fact_from_palm;
+	  faust_timer t_local_last_update;
 	 
 
       static faust_timer t_global_compute_projection;
       static faust_timer t_global_compute_grad_over_c;
 	  static faust_timer t_global_compute_c;
       static faust_timer t_global_compute_lambda;
-      static faust_timer t_global_update_R;
-      static faust_timer t_global_update_L;
+      static faust_timer t_global_update_LSR;
+	  static faust_timer t_global_last_update;
       static faust_timer t_global_check;
       static faust_timer t_global_init_fact;
       static faust_timer t_global_next_step;
@@ -159,16 +150,22 @@ inline void sparsePalm4MSA::compute_c()
 
 };
 #ifdef __PAS_FIXE__
-inline void palm4MSA::compute_c()
+inline void sparsePalm4MSA::compute_c()
 {
    c=10000*lipschitz_multiplicator;
    isCComputed = true;  
 }
-#endif   
+#endif
 
 
-
-
+		
 
 #endif
-*/
+
+   
+
+
+
+
+
+

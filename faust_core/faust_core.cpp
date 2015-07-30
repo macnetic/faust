@@ -46,11 +46,39 @@ faust_core::faust_core(const faust_params& params) :
 
 faust_mat faust_core::get_product()
 {
-
-   faust_mat prod(data[0].getNbRow()); 
-   prod.setEyes();
-   for(int i=0 ; i<data.size() ; i++)
-      prod *= data[i];
+	//complexity of evaluating a faust_core 
+	// from left to right is (dim1*total_nnz)
+	// from right to left is (dim2*total_nnz)	
+	
+	faust_mat prod(data[0].getNbRow()); 
+	
+	if(getNbRow()<getNbCol())
+	{
+		prod.resize(getNbRow());
+		prod.setEyes();
+		for(int i=0 ; i<data.size() ; i++)
+		prod *= data[i];		
+	}else
+	{
+		prod.resize(getNbCol());
+		prod.setEyes();
+		for(int i=data.size()-1 ; i>=0 ; i--)
+		prod.multiplyLeft(data[i]);		
+	}
+	/*faust_mat prod;
+	if ( (data[0].getNonZeros()+getNbRow()*(totalNonZeros-data[0].getNonZeros())) < (data[size()-1].getNonZeros()+getNbCol()*(totalNonZeros-data[size()-1].getNonZeros())) )
+	{
+		prod = data[0];	
+		for(int i=1 ; i<data.size() ; i++)
+		prod *= data[i];	
+	}else
+	{	
+		prod = data[size()-1];	
+		for(int i=data.size()-2 ; i>=0 ; i--)
+		prod.multiplyLeft(data[i]);	
+	}	*/
+   
+   
 
    return prod;
 }
@@ -92,9 +120,16 @@ faust_real faust_core::spectralNorm(const int nbr_iter_max, faust_real threshold
 	}else
 	{
 		faust_core AtA((*this));
-		
 		AtA.transpose();
-		AtA.multiply((*this));
+		if (getNbCol() < getNbRow())
+		{
+			
+			AtA.multiply((*this));
+			
+		}else
+		{
+			AtA.multiplyLeft((*this));	
+		}		
 		return std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag));
 		
 		
@@ -135,6 +170,30 @@ void faust_core::multiply(const faust_core & A)
 				exit(EXIT_FAILURE);
 			}
 			data.insert(data.end(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;	
+		}
+	}	
+	}
+	
+	
+void faust_core::multiplyLeft(const faust_core & A)
+{
+	if (A.size() == 0)
+	{
+		
+	}else
+	{
+		if (size() == 0)
+		{
+			(*this)=A;
+		}
+		else
+		{
+			if (getNbRow() != A.getNbCol())
+			{
+				cerr << "Error in faust_core::multiplyLeft : dimensions of the 2 faustcore are in conflict" << endl;
+				exit(EXIT_FAILURE);
+			}
+			data.insert(data.begin(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;	
 		}
 	}	
 	}

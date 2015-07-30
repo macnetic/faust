@@ -11,7 +11,25 @@
 class faust_params
 {
    public:
+	  
+	  faust_params(
+	  const faust_mat& data_,
+	  const int nb_fact_,
+	  const std::vector<const faust_constraint_generic*> & cons_,
+	  const std::vector<faust_mat>& init_fact_,
+	  const stopping_criterion& stop_crit_2facts_ = stopping_criterion(),
+      const stopping_criterion& stop_crit_global_  = stopping_criterion(),
+	  const double residuum_decrease_speed = 1.25,
+	  const double residuum_prcent = 1.4,
+	  const bool isVerbose_ = false ,
+      const bool isUpdateWayR2L_ = false ,
+      const bool isFactSideLeft_ = false ,
+      const faust_real init_lambda_ = 1.0 ,
+      const bool isLambdaComputed_ = true);
+	  
+	  	
 
+		
       faust_params(
          const faust_mat& data_,
          const int nb_fact_,
@@ -26,6 +44,8 @@ class faust_params
 		 const bool isLambdaComputed_ = true);
 		 
 	  faust_params();
+		
+		
 
       void check_constraint_validity();
 

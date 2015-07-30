@@ -84,6 +84,7 @@ public:
   
 void init_from_file(const char* filename);
 void write_into_file(const char* filename);
+
   
   
   /// OPERATION BASIQUE ///

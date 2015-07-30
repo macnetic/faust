@@ -32,7 +32,9 @@ class faust_core
 		void Display()const;
 		void transpose();
 		//(*this) = (*this) * A
-		void multiply(const faust_core & A);		
+		void multiply(const faust_core & A);
+		//(*this) = A * (*this)
+		void multiplyLeft(const faust_core & A);	
 		void scalarMultiply(const faust_real scalar){data[0]*=scalar;}
 		faust_real spectralNorm(const int nbr_iter_max, faust_real threshold, int &flag) const;
 		~faust_core(){}

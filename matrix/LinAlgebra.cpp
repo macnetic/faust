@@ -549,9 +549,7 @@ faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_re
 
 faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_real threshold, int & flag)
 {	
-	#ifdef __COMPILE_TIMERS__
-		A.t_power_iteration.start();
-	#endif 	
+	
 	 int nb_col = A.getNbCol();
 	 int nb_row = A.getNbRow();
 	 int i = 0;
@@ -623,9 +621,7 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 		xk = xk_pp;
 	 }
 	 //std::cout<<" flag :"<<flag<<std::endl;
-	 #ifdef __COMPILE_TIMERS__
-		A.t_power_iteration.stop();
-	#endif
+
 	/*std::cout<<"flag inside power_it : "<<flag<<std::endl;
 	std::cout<<"threshold inside power_it : "<<threshold<<std::endl;
 	std::cout<<"max_it inside power_it : "<<nbr_iter_max<<std::endl;*/		

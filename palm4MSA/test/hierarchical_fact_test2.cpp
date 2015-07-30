@@ -111,8 +111,12 @@ faust_real cons21_parameter;
 
   cout <<"DEBUT FACTORISATION"<<endl;	 
   hier_fact.compute_facts();
-  cout<<"FIN HIERARCHICAL_FACT"<<endl;	
+  cout<<"FIN HIERARCHICAL_FACT"<<endl;
+  cout<<"final lambda ="<<hier_fact.get_lambda()<<endl;
 
+  #ifdef __COMPILE_TIMERS__
+  hier_fact.print_timers();
+  #endif
 
 
 

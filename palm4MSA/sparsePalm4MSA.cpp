@@ -147,6 +147,7 @@ void sparsePalm4MSA::compute_c()
 {
 #ifdef __COMPILE_TIMERS__
 	t_global_compute_c.start();
+	t_local_compute_c.start();
 #endif
 
    //std::cout<<"calcul pas : "<<std::endl;
@@ -173,6 +174,7 @@ void sparsePalm4MSA::compute_c()
    
    #ifdef __COMPILE_TIMERS__
 	t_global_compute_c.stop();
+	t_local_compute_c.stop();
 	#endif	
 }
 #endif
@@ -205,10 +207,14 @@ void sparsePalm4MSA::compute_c()
 
 void sparsePalm4MSA::next_step()
 {	
-	cout<<"debut sppalm4MSA next_step"<<endl;
+	#ifdef __COMPILE_TIMERS__
+		t_global_next_step.start();
+		t_local_next_step.start();
+	#endif
+	//cout<<"debut sppalm4MSA next_step"<<endl;
 	for (int i=0;i<nb_fact;i++)
 	{	
-		cout<<"iter i:"<<i<<endl;
+		//cout<<"iter i:"<<i<<endl;
 		isCComputed = false;
 		isGradComputed = false;
 		isProjectionComputed = false;
@@ -226,6 +232,10 @@ void sparsePalm4MSA::next_step()
 	}
 		compute_lambda();
 		last_update();
+	#ifdef __COMPILE_TIMERS__
+		t_global_next_step.stop();
+		t_local_next_step.stop();
+	#endif
 }
 
 faust_spmat sparsePalm4MSA::get_fact(const int id_fact) const
@@ -257,6 +267,10 @@ faust_spmat sparsePalm4MSA::get_fact(const int id_fact) const
 
 void sparsePalm4MSA::compute_grad_over_c()
 {
+	#ifdef __COMPILE_TIMERS__
+		t_global_compute_grad_over_c.start();
+		t_local_compute_grad_over_c.start();
+	#endif
 	if(!isCComputed) 
    {
       cerr << "c must be set before computing grad/c" << endl;
@@ -282,6 +296,10 @@ void sparsePalm4MSA::compute_grad_over_c()
 	
 	
 	isGradComputed = true;
+	#ifdef __COMPILE_TIMERS__
+		t_global_compute_grad_over_c.stop();
+		t_local_compute_grad_over_c.stop();
+	#endif
 }
 
 
@@ -540,6 +558,10 @@ t_local_compute_projection.stop();
 
 void sparsePalm4MSA::update_LSR()
 {
+	#ifdef __COMPILE_TIMERS__
+		t_global_update_LSR.start();
+		t_local_update_LSR.start();
+	#endif
 	if(isUpdateWayR2L)
 	{
 		R.push_first(sparse_S);
@@ -551,12 +573,19 @@ void sparsePalm4MSA::update_LSR()
 		R.pop_first(sparse_S);
 		ind_fact++;
 	}
-	
+	#ifdef __COMPILE_TIMERS__
+		t_global_update_LSR.stop();
+		t_local_update_LSR.stop();
+	#endif
 }
 
 
 void sparsePalm4MSA::compute_lambda()
 {
+	#ifdef __COMPILE_TIMERS__
+		t_global_compute_lambda.start();
+		t_local_compute_lambda.start();
+	#endif
 	faust_mat Xhat_t_X,Xhat_t_Xhat_product;
 	faust_core Xhat_t_Xhat;
 	
@@ -586,15 +615,22 @@ void sparsePalm4MSA::compute_lambda()
 	Xhat_t_Xhat_product=Xhat_t_Xhat.get_product();
 	
 	lambda = Xhat_t_X.trace()/Xhat_t_Xhat_product.trace();
-	cout<<"lambda :"<<lambda<<endl;
+	//cout<<"lambda :"<<lambda<<endl;
 	
-	
+	#ifdef __COMPILE_TIMERS__
+		t_global_compute_lambda.stop();
+		t_local_compute_lambda.stop();
+	#endif	
 	
 	
 }
 
 void sparsePalm4MSA::last_update()
 {
+	#ifdef __COMPILE_TIMERS__
+		t_global_last_update.start();
+		t_local_last_update.start();
+	#endif
 	if (isUpdateWayR2L)
 	{
 		R.pop_back(sparse_S);
@@ -607,7 +643,11 @@ void sparsePalm4MSA::last_update()
 		R=L;
 		L.clear();
 		ind_fact = 0;
-	}		
+	}
+	#ifdef __COMPILE_TIMERS__
+		t_global_last_update.stop();
+		t_local_last_update.stop();
+	#endif	
 }
 
 
@@ -640,7 +680,14 @@ t_local_check.stop();
 
 
 void sparsePalm4MSA::init_fact()
-{	
+{
+	#ifdef __COMPILE_TIMERS__
+		t_global_init_fact.start();
+		t_local_init_fact.start();
+	#endif
+	
+	
+
 	L.clear();
 	R.clear();
 	if (isUpdateWayR2L)
@@ -666,24 +713,34 @@ void sparsePalm4MSA::init_fact()
 			sparse_S.setEyes();
 			R.push_back(sparse_S);
 		}
-		std::cout<<"init theorical sparse_S size : "<<const_vec[ind_fact]->getRows()<<" "<<const_vec[ind_fact]->getCols()<<std::endl;
+		//std::cout<<"init theorical sparse_S size : "<<const_vec[ind_fact]->getRows()<<" "<<const_vec[ind_fact]->getCols()<<std::endl;
 		sparse_S.resize(const_vec[ind_fact]->getRows(),const_vec[ind_fact]->getCols());
 		sparse_S.setZeros();
 		L.clear();
 	}
-	std::cout<<"init sparse_S size : "<<sparse_S.getNbRow()<<" "<<sparse_S.getNbCol()<<std::endl;
+	//std::cout<<"init sparse_S size : "<<sparse_S.getNbRow()<<" "<<sparse_S.getNbCol()<<std::endl;
+	#ifdef __COMPILE_TIMERS__
+		t_global_init_fact.stop();
+		t_local_init_fact.stop();
+	#endif
 }
 
 
 void sparsePalm4MSA::init_fact_from_palm(const sparsePalm4MSA& palm2, bool isFactSideLeft)
 {	
+#ifdef __COMPILE_TIMERS__
+t_global_init_fact_from_palm.start();
+t_local_init_fact_from_palm.start();
+#endif
+	#ifdef PRINT
 	cout<<"INIT_FACT_FROM_PALM : "<<endl;
 	cout<<"isFactSideLeft : "<<isFactSideLeft<<endl;
 	cout<<"palm2.updatewayR2L : "<<palm2.isUpdateWayR2L<<endl;
 	cout<<"palm_global.updatewayR2L : "<<isUpdateWayR2L<<endl;
+	Display();
+	#endif
 	
-	
-   Display();
+   
 	if (palm2.nb_fact != 2)
 	{
 		cerr<<"sparsePalm4MSA::init_fact_from_palm : argument palm2 must contain 2 factors"<<endl;
@@ -749,8 +806,103 @@ void sparsePalm4MSA::init_fact_from_palm(const sparsePalm4MSA& palm2, bool isFac
 			
 		}
 	}
+	#ifdef __COMPILE_TIMERS__
+		t_global_init_fact_from_palm.stop();
+		t_local_init_fact_from_palm.stop();
+	#endif
+	
+	
+}
+
+#ifdef __COMPILE_TIMERS__
+
+faust_timer sparsePalm4MSA::t_global_compute_projection;
+faust_timer sparsePalm4MSA::t_global_compute_grad_over_c;
+faust_timer sparsePalm4MSA::t_global_compute_c;
+faust_timer sparsePalm4MSA::t_global_compute_lambda;
+faust_timer sparsePalm4MSA::t_global_update_LSR;
+faust_timer sparsePalm4MSA::t_global_last_update;
+faust_timer sparsePalm4MSA::t_global_check;
+faust_timer sparsePalm4MSA::t_global_init_fact;
+faust_timer sparsePalm4MSA::t_global_next_step;
+faust_timer sparsePalm4MSA::t_global_init_fact_from_palm;
+
+
+
+faust_timer sparsePalm4MSA::t_prox_const;
+faust_timer sparsePalm4MSA::t_prox_sp;
+faust_timer sparsePalm4MSA::t_prox_spcol;
+faust_timer sparsePalm4MSA::t_prox_splin;
+faust_timer sparsePalm4MSA::t_prox_normcol;
+
+int sparsePalm4MSA::nb_call_prox_const;
+int sparsePalm4MSA::nb_call_prox_sp;
+int sparsePalm4MSA::nb_call_prox_spcol;
+int sparsePalm4MSA::nb_call_prox_splin;
+int sparsePalm4MSA::nb_call_prox_normcol;
+
+
+
+
+
+
+void sparsePalm4MSA::init_local_timers()
+{
+t_local_compute_projection.reset();
+t_local_compute_grad_over_c.reset();
+t_local_compute_lambda.reset();
+t_local_update_LSR.reset();
+t_local_last_update.reset();
+t_local_check.reset();
+t_local_init_fact.reset();
+t_local_next_step.reset();
+t_local_init_fact_from_palm.reset();
 }
 
 
 
 
+
+
+
+void sparsePalm4MSA::print_global_timers()const
+{
+   cout << "timers in palm4MSA : " << endl;
+   cout << "t_global_next_step           = " << t_global_next_step.get_time()           << " s for "<< t_global_next_step.get_nb_call()           << " calls" << endl;
+   cout << "t_compute_grad_over_c = " << t_global_compute_grad_over_c.get_time() << " s for "<< t_global_compute_grad_over_c.get_nb_call()            << " calls of grad" << endl;
+     cout << "t_global_compute_c = " << t_global_compute_c.get_time() << " s for "<< t_global_compute_c.get_nb_call() << " calls" << endl;
+   cout << "t_global_compute_lambda      = " << t_global_compute_lambda.get_time()      << " s for "<< t_global_compute_lambda.get_nb_call()      << " calls" << endl;
+   cout << "t_global_compute_projection  = " << t_global_compute_projection.get_time()  << " s for "<< t_global_compute_projection.get_nb_call()  << " calls" << endl<<endl;
+    cout << "t_global_update_LSR  = " << t_global_update_LSR.get_time()  << " s for "<< t_global_update_LSR.get_nb_call()  << " calls" << endl<<endl;
+	cout << "t_global_last_update  = " << t_global_last_update.get_time()  << " s for "<< t_global_last_update.get_nb_call()  << " calls" << endl<<endl;
+
+}
+
+
+void sparsePalm4MSA::print_local_timers()const
+{
+   cout << "timers in palm4MSA : " << endl;
+   cout << "t_local_next_step           = " << t_local_next_step.get_time()           << " s for "<< t_local_next_step.get_nb_call()           << " calls" << endl;
+   cout << "t_compute_grad_over_c = " << t_local_compute_grad_over_c.get_time() << " s for "<< t_local_compute_grad_over_c.get_nb_call()            << " calls of grad" << endl;
+     cout << "t_local_compute_c = " << t_local_compute_c.get_time() << " s for "<< t_local_compute_c.get_nb_call() << " calls" << endl;
+   cout << "t_local_compute_lambda      = " << t_local_compute_lambda.get_time()      << " s for "<< t_local_compute_lambda.get_nb_call()      << " calls" << endl;
+   cout << "t_local_compute_projection  = " << t_local_compute_projection.get_time()  << " s for "<< t_local_compute_projection.get_nb_call()  << " calls" << endl<<endl;
+    cout << "t_local_update_LSR  = " << t_local_update_LSR.get_time()  << " s for "<< t_local_update_LSR.get_nb_call()  << " calls" << endl<<endl;
+	cout << "t_local_last_update  = " << t_local_last_update.get_time()  << " s for "<< t_local_last_update.get_nb_call()  << " calls" << endl<<endl;
+
+}
+
+void sparsePalm4MSA::print_prox_timers() const
+{
+/*	cout << "prox timers in palm4MSA : " << endl;
+   cout << "total t_prox_const  =  " << t_prox_const.get_time()  << " s for "<< nb_call_prox_const  << " calls" << endl;
+   cout << "total t_prox_sp  =  " << t_prox_sp.get_time()  << " s for "<< nb_call_prox_sp  << " calls" << endl;
+   cout << "total t_prox_spcol  =  " << t_prox_spcol.get_time()  << " s for "<< nb_call_prox_spcol  << " calls" << endl;
+   cout << "total t_prox_splin  =  " << t_prox_splin.get_time()  << " s for "<< nb_call_prox_splin  << " calls" << endl;
+   cout << "total t_prox_normcol  =  " << t_prox_normcol.get_time()  << " s for "<< nb_call_prox_normcol  << " calls" << endl;	
+*/}
+
+
+
+
+#endif

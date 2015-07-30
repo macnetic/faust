@@ -34,11 +34,11 @@ t_init.start();
    
 
    palm_global.set_constraint(cons_tmp_global);
-    cout<<"**************** PALM_GLOBAL ********************"<<endl;
-   palm_global.Display();
+    //cout<<"**************** PALM_GLOBAL ********************"<<endl;
+   //palm_global.Display();
    palm_global.init_fact();
-    cout<<"**************** PALM_GLOBAL ********************"<<endl;
-   palm_global.Display();
+    //cout<<"**************** PALM_GLOBAL ********************"<<endl;
+   //palm_global.Display();
 
 #ifdef __COMPILE_TIMERS__
 t_init.stop();
@@ -52,7 +52,7 @@ void sparse_hierarchical_fact::next_step()
 t_next_step.start();
 #endif
 
-    cout<<"DEBUT NEXT_STEP"<<endl;  
+    //cout<<"DEBUT NEXT_STEP"<<endl;  
    if(isFactorizationComputed)
    {
       cerr << "factorization has already been computed" << endl;
@@ -69,8 +69,8 @@ t_next_step.start();
 
    palm_2.set_lambda(default_lambda);
    
-   cout<<"**************** PALM2 ********************"<<endl;
-   palm_2.Display();
+   //cout<<"**************** PALM2 ********************"<<endl;
+   //palm_2.Display();
    
 #ifdef __COMPILE_TIMERS__
 palm_2.init_local_timers();
@@ -79,7 +79,7 @@ palm_2.init_local_timers();
     //  palm_2.next_step();
  
 	palm_2.compute_facts();
-cout<<endl<<endl<<endl; 	
+//cout<<endl<<endl<<endl; 	
 	
 #ifdef __COMPILE_TIMERS__
 palm_2.print_local_timers();
@@ -103,12 +103,12 @@ palm_2.print_local_timers();
    }
  			
    palm_global.set_constraint(cons_tmp_global);
- cout<<"**************** PALM_GLOBAL before init_fact ********************"<<endl;
-   palm_global.Display();	
+	//cout<<"**************** PALM_GLOBAL before init_fact ********************"<<endl;
+   //palm_global.Display();	
 
    palm_global.init_fact_from_palm(palm_2, isFactSideLeft);
-   cout<<"**************** PALM_GLOBAL ********************"<<endl;
-   palm_global.Display();	
+   //cout<<"**************** PALM_GLOBAL ********************"<<endl;
+   //palm_global.Display();	
 #ifdef __COMPILE_TIMERS__
 palm_global.init_local_timers();
 #endif
@@ -147,7 +147,7 @@ void sparse_hierarchical_fact::compute_facts()
       cerr << "Error in sparse_hierarchical_fact::compute_facts : factorization has already been computed" << endl;
       exit(EXIT_FAILURE);
    }
-
+  cout<<"compute_fact"<<endl;	
   init();
   for (int i=0 ; i<=nb_fact-1 ; i++)
   {
@@ -165,10 +165,10 @@ void sparse_hierarchical_fact::compute_facts()
 
 
 #ifdef __COMPILE_TIMERS__
-faust_timer hierarchical_fact::t_init;
-faust_timer hierarchical_fact::t_next_step;
+faust_timer sparse_hierarchical_fact::t_init;
+faust_timer sparse_hierarchical_fact::t_next_step;
 
-void hierarchical_fact::print_timers()const
+void sparse_hierarchical_fact::print_timers()const
 {
    palm_global.print_global_timers();
    cout << "timers in hierarchical_fact :" << endl;
