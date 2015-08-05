@@ -202,7 +202,7 @@ int main(int argc, char* argv[])
 
 	char filename_dense[150];
 	char filename_faust[150];
-	char* path = "runtime_comp/output/";
+	const char* path = "runtime_comp/output/";
 
 
 	stringstream ss_outputfile;

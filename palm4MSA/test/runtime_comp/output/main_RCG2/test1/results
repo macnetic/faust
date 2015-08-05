@@ -1,0 +1,17 @@
+On rappelle la configuration de ce test :
+   - les facteurs creux ont une structure particuliere : pour chacun d'eux, on cree une matrice anticirculante contenant uniquement des 0 et 1 (dont le nombre depend du nnz par col/ligne) puis on effectue une multiplication element par element entre cette matrice et une matrice aleatoire contenant des valeurs uniformement reparties entre 0 et 1.
+   - tous les facteurs creux ont la meme taille que la matrice pleine
+   - nbre de facteurs creux = log2(dimension de la matrice)
+   - si le nnz par ligne/col > dimension ou < 1 alors ce cas n'est pas effectue (mais les autres le sont)
+   - pour chaque configuration (taille de matrice, nnz par ligne/col), on a effectue N_run=1000 tests avec des matrices creuses generes a chaque test. Pour chaque test on obtient le temps de calcul en matrice creuse et dense sous Matlab et C++ en ayant les memes facteurs creux entre Matlab et C++ (et donc aussi la meme matrice pleine)
+   - valeurs de nnz par ligne/col testees : 2,4,6,8,10,12,14,16,20
+   - dimensions testees : 2,4,8,16,32,64,128,256,512,1024
+
+Premieres interpretations :
+   - Le RCG C++ est toujours significativement plus important que le RCG Matlab (rapport de 1.5 a 6)
+   - Pour une dimension fixee, plus le nnz par ligne/col augmente, plus le rapport RCG_C++/RCG_matlab diminue
+
+   - Pour des petites matrices (dimension <= 16), lorsque les facteurs "creux" sont pleins ou presque pleins (dimension ~= nnz par col/ligne), le RCG obtenu en C++ est superieur au RCG theorique (ce qui n'est pas le cas en Matlab, ni en C++ lorsque les facteurs sont tres creux)
+
+
+
