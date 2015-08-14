@@ -65,13 +65,58 @@ int main(int argc, char* argv[])
 
 // fin gestion arguement (nom de fichier)	
 
+	if(argc < 4)
+	{
+		cerr << "Le nom du fichier est incorrect" << endl;
+		exit(EXIT_FAILURE);
+	}
 
 	int nb_run_tmp;
-	if(argc<3)
-		nb_run_tmp = 1000;
-	else
-		nb_run_tmp = atoi(argv[2]);
+	nb_run_tmp = atoi(argv[2]);
 	const int NB_RUN = nb_run_tmp;
+
+	int cmpt=0;
+	while(argv[3][cmpt] != '\0')
+		cmpt++;
+
+	int* status_tmp=NULL;
+
+	
+	char status_str[100000];
+	while(argv[3][cmpt] != '\0')
+		cmpt++;
+
+	status_tmp = new int[cmpt/2+1];
+
+	char val_str[10];
+	cmpt=0;
+	int cmpt2=0;
+	int cmpt3=0;
+	
+	while(argv[3][cmpt] != '\0')
+	{
+		if(argv[3][cmpt] != '_')
+		{
+			val_str[cmpt2]=argv[3][cmpt];
+			cmpt2++;
+		}
+		else
+		{
+			val_str[cmpt2]='\0';
+			cmpt2=0;
+			status_tmp[cmpt3]=atoi(val_str);
+			cmpt3++;
+		}
+		cmpt++;
+	}
+	int status[cmpt3];
+	for (int i=0 ; i<cmpt3 ; i++)
+		status[i]=status_tmp[i];
+
+	delete[] status_tmp;
+	status_tmp = NULL;
+		
+		
 
 	vector<faust_core>* vec_core = new vector<faust_core>();
 	vector<faust_mat>* vec_dense_mat = new vector<faust_mat>();
@@ -126,6 +171,15 @@ int main(int argc, char* argv[])
 	faust_timer timer_dense_tmp;
 	faust_timer timer_faust_tmp;
 
+
+
+	faust_vec x_tmp(dense_mat[0].getNbCol());
+	for (int j=0 ; j<x_tmp.size() ;j++)
+		x_tmp[j] = std::rand()*2.0/RAND_MAX-1.0;
+	faust_vec y_dense_tmp(dense_mat[0].getNbRow());
+	y_dense_tmp = dense_mat[0] * x_tmp;
+
+
 	for (int run=0 ; run < NB_RUN ; run++)
 	{
 		faust_timer t_run;
@@ -133,26 +187,34 @@ int main(int argc, char* argv[])
 		t_run.start();
 		for (int i=core.size()-1 ; i>=0 ; i--)
 		{
-			faust_vec x(dense_mat[i].getNbCol());
-			for (int j=0 ; j<x.size() ;j++)
-				x[j] = std::rand()*2.0/RAND_MAX-1.0;
-			faust_vec y_dense(dense_mat[i].getNbRow());
-			faust_vec y_faust(dense_mat[i].getNbRow());
-			
-			timer_dense_tmp.reset();
-			timer_dense_tmp.start();
-			y_dense = dense_mat[i] * x;
-			timer_dense_tmp.stop();
-			t_dense[run][i] = timer_dense_tmp.get_time();
-
-			timer_faust_tmp.reset();
-			timer_faust_tmp.start();
-			y_faust = core[i] * x;
-			timer_faust_tmp.stop();
-			t_faust[run][i] = timer_faust_tmp.get_time();
-
-			faust_real err_rel = y_faust.mean_relative_error(y_dense);
-			//cout<<"err relative = " << err_rel << endl;
+			if (status[i]==0)
+			{
+				faust_vec x(dense_mat[i].getNbCol());
+				for (int j=0 ; j<x.size() ;j++)
+					x[j] = std::rand()*2.0/RAND_MAX-1.0;
+				faust_vec y_dense(dense_mat[i].getNbRow());
+				faust_vec y_faust(dense_mat[i].getNbRow());
+				
+				timer_dense_tmp.reset();
+				timer_dense_tmp.start();
+				y_dense = dense_mat[i] * x;
+				timer_dense_tmp.stop();
+				t_dense[run][i] = timer_dense_tmp.get_time();
+	
+				timer_faust_tmp.reset();
+				timer_faust_tmp.start();
+				y_faust = core[i] * x;
+				timer_faust_tmp.stop();
+				t_faust[run][i] = timer_faust_tmp.get_time();
+	
+				faust_real err_rel = y_faust.mean_relative_error(y_dense);
+				//cout<<"err relative = " << err_rel << endl;
+			}
+			else
+			{
+				t_dense[run][i] = nan("");
+				t_faust[run][i] = nan("");
+			}
 		}
 		t_run.stop();
 		//cout << "temps run = " << t_run.get_time() << " s" <<endl;
