@@ -27,6 +27,7 @@ class faust_constraint_int : public faust_constraint_generic
       
       virtual void set_default_parameter();
       virtual void check_constraint_name()const;
+
  
       ~faust_constraint_int(){};
 

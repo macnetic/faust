@@ -27,7 +27,7 @@ class faust_spmat
 		void setZeros(){mat.setZero();nnz=0;}
 		void setEyes(){mat.setIdentity();update_dim();}
 		void transpose();
-
+		faust_real norm() const {return mat.norm();}
 		void operator= (const faust_spmat& M);
 		void operator= (const faust_mat& Mdense);
 		void operator*=(const faust_real alpha);

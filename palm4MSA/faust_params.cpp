@@ -66,11 +66,18 @@ void faust_params::check_constraint_validity()
             nb_rows(data_.getNbRow()),
             nb_cols(data_.getNbCol())*/
 {
+  if (nb_fact_ <= 2)
+  {
+	 std::cerr << "the number of factor is smaller than 2, use another constructor " << std::endl;
+         exit(EXIT_FAILURE);  
+  }	  
+  
   if  (residuum_decrease_speed<=1)
     {
          std::cerr << "residuum_decrease_speed must be strictly greater than  1" << std::endl;
          exit(EXIT_FAILURE);
     }
+  	 
    
    if ((residuum_prcent<0))
    {
@@ -89,7 +96,7 @@ void faust_params::check_constraint_validity()
 	double cons_res_parameter = residuum_prcent; 
 	if(isFactSideLeft)
 	{	
-		for (int i=1;i<nb_fact-2;i++)
+		for (int i=1;i<nb_fact-1;i++)
 		{	
 			if (i==1)
 			{
@@ -144,7 +151,8 @@ void faust_params::check_constraint_validity()
 		cons.push_back(factorS_cons);
 		cons.push_back(residuumS_cons);
 			
-	}	
+	}
+	check_constraint_validity();	
 
 }
 

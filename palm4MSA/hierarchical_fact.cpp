@@ -60,6 +60,12 @@ t_next_step.start();
    cons_tmp_2[0]=cons[0][ind_fact];
    cons_tmp_2[1]=cons[1][ind_fact];
    
+   std::cout<<"PALM 2 FACT"<<std::endl;
+   std::cout<<"LEFT FACT"<<std::endl;
+   (*cons_tmp_2[0]).Display();
+   std::cout<<"RIGHT FACT"<<std::endl;
+   (*cons_tmp_2[1]).Display();
+   
    palm_2.set_constraint(cons_tmp_2);
    
    palm_2.init_fact(2);

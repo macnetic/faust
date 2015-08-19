@@ -143,7 +143,13 @@ int main()
   stopping_criterion crit_global(niter2);
   //faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global,false,false,false,1.0,false);	
 	cons_tmp1.push_back(&cons25);
-    faust_params params(data,nfacts,cons_tmp1,vector<faust_mat>(),crit_2,crit_global,1.25,1.4,false,false,false,1.0,false);
+	bool isVerbose = false;
+	bool isUpdateR2L = false;
+	bool isFactSideLeft = true;
+	faust_real init_lambda_value = 1.0;
+	bool isLambdaComputed = true;
+    //faust_params params(data,nfacts,cons_tmp1,vector<faust_mat>(),crit_2,crit_global,1.25,1.4,false,false,false,1.0,false);
+	faust_params params(data,nfacts,cons_tmp1,vector<faust_mat>(),crit_2,crit_global,1.25,1.4,isVerbose,isUpdateR2L,isFactSideLeft,init_lambda_value,isLambdaComputed);
   //faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global,false,false,1.0,false);
   params.Display();
   cout<<"launch"<<endl;	

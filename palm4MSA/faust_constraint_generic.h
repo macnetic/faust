@@ -1,6 +1,7 @@
 #ifndef __FAUST_CONSTRAINT_GENERIC_H__
 #define __FAUST_CONSTRAINT_GENERIC_H__
 #include <string>
+#include <iostream>
 
 
 enum faust_constraint_name
@@ -53,7 +54,7 @@ class faust_constraint_generic
       //const parameter_type getParameter() const {return parameter;};
       const int getRows() const {return nb_rows;}
       const int getCols() const {return nb_cols;}
-
+	  void Display() const {std::cout<<get_constraint_name()<<" DIM : "<<nb_rows<<" "<<nb_cols<<std::endl;}	
 	
       virtual void set_default_parameter()=0;
       virtual void check_constraint_name()const=0;
