@@ -1,7 +1,9 @@
 #include "sparse_hierarchical_fact.h"
-#include "faust_timer.h"
 #include "faust_spmat.h"
 #include "faust_core.h"
+#ifdef __COMPILE_TIMERS__
+#include "faust_timer.h"
+#endif
 using namespace std;
 
 //hierarchical_fact::hierarchical_fact(){} // voir avec Luc les parametres par defaut

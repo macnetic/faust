@@ -1,5 +1,8 @@
 #include "hierarchical_fact.h"
+#ifdef __COMPILE_TIMERS__
 #include "faust_timer.h"
+#endif
+
 #include "faust_spmat.h"
 #include "faust_core.h"
 using namespace std;
