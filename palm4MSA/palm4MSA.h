@@ -32,7 +32,7 @@ class palm4MSA
       void compute_facts();
 
       faust_real get_lambda()const{return lambda;}
-      faust_real get_RMSE()const{return error.norm()/sqrt(data.getNbRow()*data.getNbCol());}
+      faust_real get_RMSE()const{return error.norm()/sqrt((double)(data.getNbRow()*data.getNbCol()));}
       const faust_mat& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
       const faust_mat& get_data()const{return data;}
 

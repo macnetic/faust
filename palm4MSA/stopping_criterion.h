@@ -22,7 +22,7 @@ class stopping_criterion
       ~stopping_criterion(){}
 
       bool do_continue(int current_ite, faust_real error=-2.0)const;
-
+	  int get_crit() const{return nb_it;}	
    private:
       void check_validity()const;
 

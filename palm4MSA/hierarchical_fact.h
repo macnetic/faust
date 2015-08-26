@@ -20,6 +20,7 @@ class hierarchical_fact
       hierarchical_fact(const faust_params& params_);
 
       void get_facts(std::vector<faust_spmat>&)const;
+	  void get_facts(std::vector<faust_mat>& fact)const{fact = palm_global.get_facts();}
       void compute_facts();
       faust_real get_lambda()const{return palm_global.get_lambda();}
       const std::vector<std::vector< faust_real> >& get_errors()const;

@@ -4,6 +4,7 @@
 #include "faust_constraint_int.h"
 #include "faust_constraint_real.h"
 #include "faust_constraint_mat.h"
+#include <cmath>
 
 void faust_params::check_constraint_validity()
 {
@@ -106,7 +107,7 @@ void faust_params::check_constraint_validity()
 			}else
 			{	
 				std::cout<<nb_fact-i<<std::endl;
-				residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,std::round(cons_res_parameter*data.getNbRow()*cons_[nb_fact-i]->getRows()),data.getNbRow(),cons_[nb_fact-i]->getRows()));
+				residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*data.getNbRow()*cons_[nb_fact-i]->getRows()+0.5),data.getNbRow(),cons_[nb_fact-i]->getRows()));
 				std::cout<<nb_fact-i<<std::endl;
 				factorS_cons.push_back(cons_[nb_fact-i]);	
 				std::cout<<nb_fact-i<<std::endl;	
@@ -138,7 +139,7 @@ void faust_params::check_constraint_validity()
 					
 			}else
 			{	
-				residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,std::round(cons_res_parameter*cons_[i]->getCols()*data.getNbCol()),cons_[i]->getCols(),data.getNbCol()));
+				residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*cons_[i]->getCols()*data.getNbCol()+0.5),cons_[i]->getCols(),data.getNbCol()));
 				factorS_cons.push_back(cons_[i]);
 			}
 				cons_res_parameter=cons_res_parameter/residuum_decrease_speed;

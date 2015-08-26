@@ -246,7 +246,7 @@ void faust_mat::setEyes()
 {
 	setZeros();
 	faust_real* ptr_data = getData();
-	for (int i=0 ; i<fmin(dim1,dim2); i++)
+	for (int i=0 ; i<std::min(dim1,dim2); i++)
 		ptr_data[i*dim1+i] = 1.0;
 	if (dim1 == dim2)
 		isIdentity = true;
