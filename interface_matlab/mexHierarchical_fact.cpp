@@ -12,7 +12,8 @@
 #include <faust_params.h>
 #include <faust_constant.h>
 
-faust_mat getFaustMat(mxArray* Mat_array);
+#include <mexFaustMat.h>
+
 void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray* mxCons);
 void setCellFacts(mxArray ** cellFacts,std::vector<faust_mat> facts);
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
@@ -351,20 +352,7 @@ void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat> facts)
     
 }
 
-faust_mat getFaustMat(mxArray* Mat_array)
-{
-    int  nbRow,nbCol;
-    double* MatPtr;
-    const mwSize *dimsMat;
-    dimsMat = mxGetDimensions(Mat_array);
-	nbRow = (int) dimsMat[0];
-	nbCol = (int) dimsMat[1];
-    MatPtr = mxGetPr(Mat_array);
-    
-    faust_mat Mat(nbRow,nbCol);
-    memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(double));
-    return Mat;
-}
+
 
 
 
