@@ -10,6 +10,7 @@
 
 #include <mexFaustMat.h>
 
+#include "class_handle.hpp"
 
 
 
@@ -40,6 +41,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexPrintf("Col_ptr: %d\n",jc[i]);
     }
     faust_spmat S(nnzMax,nbRow,nbCol,(double *)pr,(int *)ir,(int *)jc); */
+
+	if(nlhs!=1)
+		mexErrMsgTxt("mexLoadFaust must have 1 output.");
+	if(nrhs!=1)
+		mexErrMsgTxt("mexLoadFaust must have 1 input.");
+
+
 	int nbRow,nbCol;
 	
 	if(!mxIsCell(prhs[0]))
@@ -75,10 +83,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		vec_spmat.push_back(spM);	
 	}
 	
-	faust_core F(vec_spmat); 
-	faust_mat prod=F.get_product();
-	mxArray* mxProd=FaustMat2mxArray(prod);
-	plhs[0]=mxProd;
+	faust_core* F = new faust_core(vec_spmat); 
+	plhs[0]=convertPtr2Mat<faust_core>(F);
     
     
     

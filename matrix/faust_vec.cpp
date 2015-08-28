@@ -8,6 +8,12 @@
 
 using namespace std;
 
+
+faust_vec::faust_vec(int dim_, const faust_real* data_) : dim(dim_), vec(dim_)
+{
+		memcpy(getData(), data_, dim*sizeof(faust_real));	
+}
+
 void faust_vec::setOnes()
 {
 	vec.setOnes();

@@ -5,6 +5,7 @@ PALM_DIR    = $(FAUST_ROOT_DIR)/trunk/devcpp/palm4MSA
 INIT_MATLAB = $(FAUST_ROOT_DIR)/trunk/devcpp/init_from_matlab
 FAUST_CORE = $(FAUST_ROOT_DIR)/trunk/devcpp/faust_core
 MATLAB_INTERFACE_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/interface_matlab
+MATLAB_INTERFACE_TOOL_DIR = $(MATLAB_INTERFACE_DIR)/tools
 
 
 
@@ -15,12 +16,12 @@ SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 SRC_CPP += $(wildcard $(FAUST_CORE)/*.cpp)
 #endif
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
-OBJS_MEX := $(filter-out $(MATRIX_DIR)/faust_timer.cpp,$(patsubst %.cpp,%.o.mex,$(SRC_CPP))) $(MATLAB_INTERFACE_DIR)/mexHierarchical_fact.o.mex
+OBJS_MEX_COMMON := $(filter-out $(MATRIX_DIR)/faust_timer.cpp,$(patsubst %.cpp,%.o.mex,$(SRC_CPP))) $(MATLAB_INTERFACE_TOOL_DIR)/mexFaustMat.o.mex 
 
 
 CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB)  -I$(MATIO_ROOT_DIR)/include  -DPROX=2   -I$(FAUST_CORE) #-Winline 
 
-CXXFLAGS_MEX = $(CXXFLAGS) -DMX_COMPAT_32 -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include
+CXXFLAGS_MEX = $(CXXFLAGS) -DMX_COMPAT_32 -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_TOOL_DIR)
 
 ifneq ($(COMPILATION_THOMAS),)
   # CXXFLAGS += -DFAUST_SINGLE _
@@ -64,11 +65,14 @@ CYAN    =36m
 RESET_FONT =\033[0m
 
 
-EXECUTABLE=hier_fact hier_fact2 palm meg meg_new meg_old faust comptime0 comptime comptime2 mex 
+MEX_EXE = $(MATLAB_INTERFACE_DIR)/mexHierarchical_fact.mexa64 $(MATLAB_INTERFACE_DIR)/mexLoadFaust.mexa64 $(MATLAB_INTERFACE_DIR)/faust_mex.mexa64
+
+EXECUTABLE=hier_fact hier_fact2 palm meg meg_new meg_old faust comptime0 comptime comptime2 $(MEX_EXE) 
 
 all: $(EXECUTABLE)
 
-mex: $(MATLAB_INTERFACE_DIR)/mexHierarchical_fact.mexa64
+
+mex: $(MEX_EXE)
 
 hier_fact: hierarchical_fact_test.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
@@ -122,7 +126,7 @@ comptime2:$(OBJS) comp_time2.o
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 
-$(MATLAB_INTERFACE_DIR)/mexHierarchical_fact.mexa64:$(OBJS_MEX) 
+%.mexa64: %.o.mex $(OBJS_MEX_COMMON) 
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS_MEX) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Mex executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
@@ -141,4 +145,4 @@ $(MATLAB_INTERFACE_DIR)/mexHierarchical_fact.mexa64:$(OBJS_MEX)
 
 clean:
 	@printf '$(FONT)$(CYAN)Removing all object files and executable$(RESET_FONT)\n'
-	@rm -f $(EXECUTABLE)  $(OBJS) $(OBJS_MEX)
+	@rm -f $(EXECUTABLE)  $(OBJS) $(OBJS_MEX_COMMON)
