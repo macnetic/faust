@@ -69,8 +69,10 @@ MEX_EXE = $(MATLAB_INTERFACE_DIR)/mexHierarchical_fact.mexa64 $(MATLAB_INTERFACE
 
 EXECUTABLE=hier_fact hier_fact2 palm meg meg_new meg_old faust comptime0 comptime comptime2 $(MEX_EXE) 
 
-all: $(EXECUTABLE)
+# instruction pour que les fichiers .o.mex ne soient pas automatiquement detruits lors apres les appels aux cibles all ou mex
+.PRECIOUS: %.o.mex
 
+all: $(EXECUTABLE)
 
 mex: $(MEX_EXE)
 

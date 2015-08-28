@@ -49,6 +49,12 @@ t_constr.stop();
 
   }
 
+faust_mat::faust_mat(const int nbRow, const int nbCol, const faust_real* data_) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol) 
+{
+		memcpy(getData(), data_, nbRow*nbCol*sizeof(faust_real));	
+}
+
+
 /// GETTEUR SETTEUR ///
 
 

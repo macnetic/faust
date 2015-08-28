@@ -30,6 +30,8 @@ public:
   faust_mat(const int nbRow, const int nbCol) : mat(nbRow,nbCol),dim1(nbRow),dim2(nbCol),isIdentity(false),isZeros(false){}
   faust_mat(const int nbRow) : mat(nbRow,nbRow),dim1(nbRow),dim2(nbRow),isIdentity(false),isZeros(false){}
 
+  faust_mat(const int nbRow, const int nbCol, const faust_real* data_);
+
 	
 	
   /// GETTEUR SETTEUR ///

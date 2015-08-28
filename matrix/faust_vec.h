@@ -17,9 +17,9 @@ class faust_vec
 {
  public :
  faust_vec() : vec(), dim(0) {}
- faust_vec(int _dim) : vec(_dim),dim(_dim){}
+ faust_vec(const int _dim) : vec(_dim),dim(_dim){}
  faust_vec(const faust_vec& v) : vec(v.vec), dim(v.dim){}
- faust_vec(int dim_, const faust_real* data_);
+ faust_vec(const int dim_, const faust_real* data_);
 	
  faust_real* getData(){return vec.data();}
  const faust_real* getData() const {return vec.data();}
