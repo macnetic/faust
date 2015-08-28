@@ -1,9 +1,9 @@
 % Si k>1,            DIMS(k) correspond au nombre de colonnes de facts{k-1}
 % Si k<length(DIMS), DIMS(k) correspond au nombre de  lignes  de facts{k}
-DIMS    = [300 50 500 50];
+DIMS    = [1000 5000 5000 500];
 
 % DENSITY(k) correspond a la densite de facts{k}
-DENSITY = [0.1 0.4 0.2];
+DENSITY = [0.001 0.001 0.001];
 
 addpath('./tools');
 

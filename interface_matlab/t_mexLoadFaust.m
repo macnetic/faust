@@ -21,3 +21,11 @@ S{3}=randint(7,7);
 % S=Sparrow;
 % S=sparse(S);
 mexLoadFaust(S);
+PROD=S{1};
+
+for i=2:length(S)
+	PROD=PROD*S{i};
+end
+
+PROD
+
