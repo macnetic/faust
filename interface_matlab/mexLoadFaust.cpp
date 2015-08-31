@@ -41,7 +41,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexPrintf("Col_ptr: %d\n",jc[i]);
     }
     faust_spmat S(nnzMax,nbRow,nbCol,(double *)pr,(int *)ir,(int *)jc); */
-	mexPrintf("abc\n");
+	//mexPrintf("abc\n");
 	if(nlhs!=1)
 		mexErrMsgTxt("mexLoadFaust must have 1 output.");
 	if(nrhs!=1)
@@ -56,18 +56,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	std::vector<faust_spmat> vec_spmat;
 	mwSize nb_element = mxGetNumberOfElements(prhs[0]);
 	if (nb_element == 0)
+		mexWarnMsgTxt("Empty cell array.");
+        else if (!mxIsSparse(mxGetCell(prhs[0],0)))
 	{
-		
+		mexPrintf("Dense\n");	
+		loadDenseFaust(prhs[0],vec_spmat);
 	}else
-		if (!mxIsSparse(mxGetCell(prhs[0],0)))
-		{
-			 mexPrintf("Dense\n");	
-			loadDenseFaust(prhs[0],vec_spmat);
-		}else
-		{	
-			mexPrintf("Sparse\n");
-			loadSpFaust(prhs[0],vec_spmat);
-		}
+	{	
+		mexPrintf("Sparse\n");
+		loadSpFaust(prhs[0],vec_spmat);
+	}
 			
 	
 	faust_core* F = new faust_core(vec_spmat); 

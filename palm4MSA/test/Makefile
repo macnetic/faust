@@ -21,7 +21,7 @@ OBJS_MEX_COMMON := $(filter-out $(MATRIX_DIR)/faust_timer.cpp,$(patsubst %.cpp,%
 
 CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB)  -I$(MATIO_ROOT_DIR)/include  -DPROX=2   -I$(FAUST_CORE) #-Winline 
 
-CXXFLAGS_MEX = $(CXXFLAGS) -DMX_COMPAT_32 -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_TOOL_DIR)
+CXXFLAGS_MEX = $(CXXFLAGS) -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_TOOL_DIR)
 
 ifneq ($(COMPILATION_THOMAS),)
    CXXFLAGS += -DFAUST_SINGLE 
@@ -69,7 +69,7 @@ MEX_EXE = $(MATLAB_INTERFACE_DIR)/mexHierarchical_fact.mexa64 $(MATLAB_INTERFACE
 
 EXECUTABLE=hier_fact hier_fact2 palm meg meg_new meg_old faust comptime0 comptime comptime2 $(MEX_EXE) 
 
-# instruction pour que les fichiers .o.mex ne soient pas automatiquement detruits lors apres les appels aux cibles all ou mex
+# instruction pour que les fichiers .o.mex ne soient pas automatiquement detruits apres les appels aux cibles all ou mex
 .PRECIOUS: %.o.mex
 
 all: $(EXECUTABLE)

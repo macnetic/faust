@@ -1,6 +1,7 @@
 #include "mex.h"
 #include "class_handle.hpp"
 #include "faust_core.h"
+#include "mexFaustMat.h"
 
 
 // prhs[0] : name of command : 
@@ -26,8 +27,35 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// New
 	if (!strcmp("new", cmd)) 
 	{
+		if(nlhs!=1)
+			mexErrMsgTxt("1 output is expected.");
+		if(nrhs!=2)
+			mexErrMsgTxt("2 inputs are expected.");
 
-	// inserer code pour creer un objet faust_core a partir d'un tableau de cellules de matrices creuses ou pleines	
+
+		int nbRow,nbCol;
+		if(!mxIsCell(prhs[1]))
+			mexErrMsgTxt("input must be a cell-array");
+
+		std::vector<faust_spmat> vec_spmat;
+		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
+		if (nb_element == 0)
+			mexWarnMsgTxt("Empty cell array.");
+	        else if (!mxIsSparse(mxGetCell(prhs[1],0)))
+		{
+			mexPrintf("Dense\n");	
+			loadDenseFaust(prhs[1],vec_spmat);
+		}
+		else
+		{	
+			mexPrintf("Sparse\n");
+			loadSpFaust(prhs[1],vec_spmat);
+		}
+	
+	
+		faust_core* F = new faust_core(vec_spmat); 
+		plhs[0]=convertPtr2Mat<faust_core>(F);
+    
 		return;
 	}
     

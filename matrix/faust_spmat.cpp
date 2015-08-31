@@ -75,7 +75,7 @@ void faust_spmat::set(const int nnz_, const int dim1_, const int dim2_, const do
 	for (int j=0;j<dim2_;j++)
 	{	
 		nb_elt_colj = col_ptr[j+1]-col_ptr[j];
-		std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
+		//std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
 		for (int i = 0;i<nb_elt_colj;i++)
 		{	
 			//std::cout<<"i : "<<id_row[i+nbEltIns]<<" j :"<<j<<" value : "<<value[i+nbEltIns]<<std::endl;
@@ -162,7 +162,7 @@ void faust_spmat::init_from_file(const char* filename)
 	int nb_row,nb_col,_nnz,id_row,id_col;
 	faust_real value;
 	fscanf(fp, "%d %d %d\n",&nb_row,&nb_col,&_nnz);
-	std::cout<<"INSIDE nb_row : "<<nb_row<<" nb_col : "<<nb_col<<" nnz : "<<_nnz<<std::endl;
+	//std::cout<<"INSIDE nb_row : "<<nb_row<<" nb_col : "<<nb_col<<" nnz : "<<_nnz<<std::endl;
 	resize(_nnz,nb_row,nb_col);
 	typedef Eigen::Triplet<double> T;
 	std::vector<T> tripletList;

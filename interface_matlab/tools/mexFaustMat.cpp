@@ -290,7 +290,7 @@ void loadSpFaust(const mxArray * Cells,std::vector<faust_spmat> &vec_spmat)
 	vec_spmat.resize(0);
 	for (int i = 0 ;i<nbCol;i++)
 	{	
-		mexPrintf("A");
+		//mexPrintf("A");
 		mxMat=mxGetCell(Cells,i);
 		getFaustspMat(mxMat,spM);
 		
