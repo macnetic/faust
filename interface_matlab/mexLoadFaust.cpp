@@ -42,7 +42,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexPrintf("Col_ptr: %d\n",jc[i]);
     }
     faust_spmat S(nnzMax,nbRow,nbCol,(double *)pr,(int *)ir,(int *)jc); */
-
+	mexPrintf("abc\n");
 	if(nlhs!=1)
 		mexErrMsgTxt("mexLoadFaust must have 1 output.");
 	if(nrhs!=1)
@@ -102,7 +102,7 @@ void loadDenseFaust(const mxArray * Cells,std::vector<faust_spmat> &vec_spmat)
 	for (int i = 0 ;i<nbCol;i++)
 	{	
 		mxMat=mxGetCell(Cells,i);
-		M = getFaustMat(mxMat);
+		getFaustMat(mxMat,M);
 		
 		if (i != 0)
 		{
@@ -139,7 +139,7 @@ void loadSpFaust(const mxArray * Cells,std::vector<faust_spmat> &vec_spmat)
 	{	
 		mexPrintf("A");
 		mxMat=mxGetCell(Cells,i);
-		spM = getFaustspMat(mxMat);
+		getFaustspMat(mxMat,spM);
 		
 		if (i != 0)
 		{

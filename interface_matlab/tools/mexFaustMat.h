@@ -5,8 +5,8 @@
 #include <faust_constraint_generic.h>
 
 
-faust_mat getFaustMat(mxArray* Mat_array);
-faust_spmat getFaustspMat(mxArray* spMat_array);
+void getFaustMat(const mxArray* Mat_array,faust_mat & Mat);
+void getFaustspMat(const mxArray* spMat_array,faust_spmat & S);
 mxArray*  FaustMat2mxArray(faust_mat M);
 void setCellFacts(mxArray ** cellFacts,std::vector<faust_mat> facts);
 void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray* mxCons);

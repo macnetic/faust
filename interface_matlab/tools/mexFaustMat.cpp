@@ -2,7 +2,7 @@
 #include <faust_constraint_real.h>
 #include <faust_constraint_mat.h>
 #include <faust_constraint_int.h>
-faust_mat getFaustMat(mxArray* Mat_array)
+void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
 {
     int  nbRow,nbCol;
     double* MatPtr;
@@ -19,18 +19,18 @@ faust_mat getFaustMat(mxArray* Mat_array)
     }
     MatPtr = mxGetPr(Mat_array);
     
-    faust_mat Mat(nbRow,nbCol);
+     Mat.resize(nbRow,nbCol);
     if (sizeof(double) == sizeof(faust_real))
         memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(double));
     else
         for (int i=0 ; i<nbRow*nbCol ; i++)
             Mat.getData()[i] = (faust_real)MatPtr[i];
 
-    return Mat;
+    
 }
 
 
-faust_spmat getFaustspMat(mxArray* spMat_array)
+void getFaustspMat(const mxArray* spMat_array,faust_spmat & S)
 {	
 	if (!mxIsSparse(spMat_array))
 	{
@@ -53,14 +53,15 @@ faust_spmat getFaustspMat(mxArray* spMat_array)
     pr = (double *) mxGetPr(spMat_array);
 
 
-    faust_spmat S(nnzMax,nbRow,nbCol,pr,ir,jc); 
+    S.set(nnzMax,nbRow,nbCol,pr,ir,jc); 
+	//mxFree(jc);
+	//mxFree(ir);
+	//mxFree(pr);
 
     /*faust_mat A=S;
     mxArray*   mxA=FaustMat2mxArray(A);
     mexPrintf("INSIDE\n");
     mexCallMATLAB(0,NULL,1,&mxA,"disp");*/
-    
-    return S;
 }
 
 
@@ -147,7 +148,7 @@ void setVectorFaustMat(std::vector<faust_mat> &vecMat,mxArray *Cells)
 	for (int i=0;i<nb_fact;i++)
 	{
 		mxMat=mxGetCell(Cells,i);
-		mat=getFaustMat(mxMat);
+		getFaustMat(mxMat,mat);
 		vecMat.push_back(mat);	
 	}
 }

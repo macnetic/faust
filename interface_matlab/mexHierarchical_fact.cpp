@@ -61,7 +61,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {    
         mxCurrentField = mxGetField(prhs[0],0,"data");  
         
-        data = getFaustMat(  mxCurrentField ) ;   
+        getFaustMat(  mxCurrentField,data ) ;   
         mexPrintf("DATA");
         for (int i = 0;i<data.getNbRow();i++)
         {
