@@ -34,6 +34,60 @@ faust_spmat::faust_spmat(const int dim1_, const int dim2_) :
 
 
 
+faust_spmat::faust_spmat(const int nnz_, const int dim1_, const int dim2_,double* value,size_t* id_row,size_t* col_ptr) :
+	mat(Eigen::SparseMatrix<faust_real>(dim1_,dim2_)),
+	dim1(dim1_),
+	dim2(dim2_),
+	nnz(nnz_)
+{	
+	vector<Eigen::Triplet<faust_real> > tripletList;
+   tripletList.reserve(nnz);
+   int nbEltIns = 0;
+   int nb_elt_colj;
+   //std::cout<<"SPMAT CONSTRUCTOR"<<std::endl;
+   //std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
+	for (int j=0;j<dim2_;j++)
+	{	
+		nb_elt_colj = col_ptr[j+1]-col_ptr[j];
+		//std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
+		for (int i = 0;i<nb_elt_colj;i++)
+		{	
+			//std::cout<<"i : "<<id_row[i+nbEltIns]<<" j :"<<j<<" value : "<<value[i+nbEltIns]<<std::endl;
+			tripletList.push_back(Eigen::Triplet<faust_real>((int) id_row[i+nbEltIns],j, (faust_real) value[i+nbEltIns]));
+		}
+		nbEltIns += nb_elt_colj;
+			
+	}
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+}
+
+
+
+void faust_spmat::set(const int nnz_, const int dim1_, const int dim2_,double* value,size_t* id_row,size_t* col_ptr) 
+{	resize(0,0,0);
+	resize(nnz_,dim1_,dim2_);
+	vector<Eigen::Triplet<faust_real> > tripletList;
+   tripletList.reserve(nnz_);
+   int nbEltIns = 0;
+   int nb_elt_colj;
+   //std::cout<<"SPMAT SET"<<std::endl;
+   //std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
+	for (int j=0;j<dim2_;j++)
+	{	
+		nb_elt_colj = col_ptr[j+1]-col_ptr[j];
+		std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
+		for (int i = 0;i<nb_elt_colj;i++)
+		{	
+			//std::cout<<"i : "<<id_row[i+nbEltIns]<<" j :"<<j<<" value : "<<value[i+nbEltIns]<<std::endl;
+			//mat.insert((int)id_row[i+nbEltIns],j)=value[i+nbEltIns];
+			tripletList.push_back(Eigen::Triplet<faust_real>((int) id_row[i+nbEltIns],j,(faust_real) value[i+nbEltIns]));
+		}
+		nbEltIns += nb_elt_colj;
+			
+	}
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	nnz = nnz_;
+}
 
 
 

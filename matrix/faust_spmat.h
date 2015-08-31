@@ -21,7 +21,8 @@ class faust_spmat
 		faust_spmat(const int nnz_, const int dim1_, const int dim2_);
 		faust_spmat(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<faust_real>& values, const int dim1_, const int dim2_);
 		faust_spmat(const Eigen::SparseMatrix<faust_real>& mat_);
-
+		faust_spmat(const int nnz_, const int dim1_, const int dim2_,double* value,size_t* id_row,size_t* col_ptr);
+		void set(const int nnz_, const int dim1_, const int dim2_,double* value,size_t* id_row,size_t* col_ptr);
 		void resize(const int nnz_, const int dim1_, const int dim2_);
 		void resize(const int dim1_, const int dim2_){mat.resize(dim1_,dim2_);update_dim();}
 		void setZeros(){mat.setZero();nnz=0;}

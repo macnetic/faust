@@ -23,8 +23,19 @@ faust_mat getFaustMat(mxArray* Mat_array)
     MatPtr = mxGetPr(Mat_array);
     
     faust_mat Mat(nbRow,nbCol);
-    memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(double));
-    return Mat;
+	if (sizeof(double) == sizeof(faust_real))
+	{	
+		memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(double));
+    }else
+	{
+		faust_real* MatPtrBis = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
+		for (int i=0;i<nbRow*nbCol;i++)
+		{
+			MatPtrBis[i]=(faust_real)MatPtr[i];
+		}
+		memcpy(Mat.getData(),MatPtrBis,nbRow*nbCol*sizeof(faust_real));
+	}	
+	return Mat;
 }
 
 
@@ -38,7 +49,7 @@ faust_spmat getFaustspMat(mxArray* spMat_array)
 	int nnzMax = mxGetNzmax(spMat_array);
     int nbCol = mxGetN(spMat_array);
     int nbRow = mxGetM(spMat_array);
-    mexPrintf("DIM (%d,%d) NNZMAX : %d\n",nbRow,nbCol,nnzMax);
+    //mexPrintf("DIM (%d,%d) NNZMAX : %d\n",nbRow,nbCol,nnzMax);
     
     size_t* jc,*ir;
     double* pr;
@@ -50,17 +61,9 @@ faust_spmat getFaustspMat(mxArray* spMat_array)
     pr = (double *) mxCalloc(nnzMax,sizeof(double));
     pr = (double *) mxGetPr(spMat_array);
     
-    for (int i=0;i<nnzMax;i++)
-    {
-        mexPrintf("Id_row : %d Value %f\n",ir[i],pr[i]);
-    }
-    
-    for (int i=0;i<(nbCol+1);i++)
-    {
-        mexPrintf("Col_ptr: %d\n",jc[i]);
-    }
+	
+		faust_spmat S(nnzMax,nbRow,nbCol,pr,ir,jc); 
 
-    faust_spmat S(nnzMax,nbRow,nbCol,pr,ir,jc); 
 	/*faust_mat A=S;
 	mxArray*   mxA=FaustMat2mxArray(A);
 	mexPrintf("INSIDE\n");
@@ -85,16 +88,28 @@ faust_spmat getFaustspMat(mxArray* spMat_array)
 mxArray*  FaustMat2mxArray(faust_mat M)
 {		
 		mxArray * mxMat;
-		double * mat_ptr;
+		faust_real * mat_ptr;
 		int row,col;
 		row = M.getNbRow();
         col = M.getNbCol();
         mxMat = mxCreateDoubleMatrix(row,col,mxREAL);
-        mat_ptr = (double *) mxCalloc(row*col,sizeof(double));
+        mat_ptr = (faust_real *) mxCalloc(row*col,sizeof(faust_real));
         memcpy(mat_ptr,M.getData(),row*col*sizeof(double));
         mxSetM(mxMat, row);
         mxSetN(mxMat, col);
-        mxSetPr(mxMat, mat_ptr);
+		if (sizeof(double) == sizeof(faust_real))
+		{
+			mxSetPr(mxMat, (double *)mat_ptr);
+		}else
+		{
+			double*	 mat_ptr_bis = (double *) mxCalloc(row*col,sizeof(double));
+			for (int i=0;i<row*col;i++)
+			{
+				mat_ptr_bis[i] = (double) mat_ptr[i];
+			}
+			mxSetPr(mxMat, mat_ptr_bis);
+		}		
+        
 		mxArray * rhs[1];
 		//rhs[0]=mxMat;
         //mexCallMATLAB(0,NULL,1,rhs, "disp");
@@ -110,7 +125,6 @@ void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat> facts)
     int rowFact,colFact;
     int nb_fact = facts.size();
     faust_mat mat;
-    //mexPrintf("size CellFacts nb fact %d ",nb_fact);
     (*cellFacts) = mxCreateCellMatrix(1,nb_fact);
     mxArray * mxMat;
     double* mat_ptr;
@@ -123,37 +137,12 @@ void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat> facts)
         colFact = mat.getNbCol();
         
         mat_ptr = (double *) mxCalloc(rowFact*colFact,sizeof(double));
-        //mat_ptr = mxGetPr(mxMat);
         memcpy(mat_ptr,mat.getData(),rowFact*colFact*sizeof(double));
         mxSetM(mxMat, rowFact);
         mxSetN(mxMat, colFact);
         mxSetPr(mxMat, mat_ptr);
-        
-//          mexPrintf("DIM : %d %d\n",rowFact,colFact);
-//         for (int i=1;i<rowFact;i++)
-//         {
-//             for (int j=1;j<colFact;j++)
-//             {
-//                 mexPrintf("%f ",mat_ptr[i+j*rowFact]);
-//             }
-//             mexPrintf("\n");
-//         }
-//          mexPrintf("\n");
-//          mexPrintf("\n");
-         //rhs[0]=mxMat;
-         //mexCallMATLAB(0,NULL,1,rhs, "disp");
         mxSetCell((*cellFacts),k,mxDuplicateArray(mxMat));
-    }
-    
-//     mexPrintf("Display Cell \n");
-//     for (size_t l = 0; l < mxGetNumberOfElements((*cellFacts)); l++)
-//     {    
-//         mexPrintf("facts %d \n",l);
-//          mexPrintf("\n");
-//          mxArray * rhs[1]; 
-//          rhs[0]=mxGetCell((*cellFacts),l);
-//          mexCallMATLAB(0,NULL,1,rhs, "disp");
-//     }
+    } 
     
 }
 

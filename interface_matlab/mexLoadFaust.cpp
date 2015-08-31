@@ -11,7 +11,8 @@
 #include <mexFaustMat.h>
 
 #include "class_handle.hpp"
-
+void loadDenseFaust( const mxArray * Cells,std::vector<faust_spmat> &vec_spmat);
+void loadSpFaust(const mxArray * Cells,std::vector<faust_spmat> &vec_spmat);
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -49,13 +50,45 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
 	int nbRow,nbCol;
-	
 	if(!mxIsCell(prhs[0]))
+    {
+        mexErrMsgTxt("input must be a cell-array");
+    }
+	std::vector<faust_spmat> vec_spmat;
+	mwSize nb_element = mxGetNumberOfElements(prhs[0]);
+	if (nb_element == 0)
+	{
+		
+	}else
+		if (!mxIsSparse(mxGetCell(prhs[0],0)))
+		{
+			 mexPrintf("Dense\n");	
+			loadDenseFaust(prhs[0],vec_spmat);
+		}else
+		{	
+			mexPrintf("Sparse\n");
+			loadSpFaust(prhs[0],vec_spmat);
+		}
+			
+	
+	faust_core* F = new faust_core(vec_spmat); 
+	plhs[0]=convertPtr2Mat<faust_core>(F);
+    
+    
+    
+}
+
+
+
+
+void loadDenseFaust(const mxArray * Cells,std::vector<faust_spmat> &vec_spmat) 
+{
+	if(!mxIsCell(Cells))
     {
         mexErrMsgTxt("cons must be a cell-array");
     }
-    nbRow = mxGetM(prhs[0]);
-    nbCol = mxGetN(prhs[0]);
+    mwSize nbRow = mxGetM(Cells);
+    mwSize nbCol = mxGetN(Cells);
 	
 	if (nbRow !=1)
 	{
@@ -65,10 +98,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	faust_mat M;
 	int former_size = 0;
 	faust_spmat spM;
-	std::vector<faust_spmat> vec_spmat;
+	vec_spmat.resize(0);
 	for (int i = 0 ;i<nbCol;i++)
 	{	
-		mxMat=mxGetCell(prhs[0],i);
+		mxMat=mxGetCell(Cells,i);
 		M = getFaustMat(mxMat);
 		
 		if (i != 0)
@@ -82,10 +115,51 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		spM = M;
 		vec_spmat.push_back(spM);	
 	}
+}
+
+
+void loadSpFaust(const mxArray * Cells,std::vector<faust_spmat> &vec_spmat)
+{
+	if(!mxIsCell(Cells))
+    {
+        mexErrMsgTxt("Cells must be a cell-array");
+    }
+    mwSize nbRow = mxGetM(Cells);
+    mwSize nbCol = mxGetN(Cells);
 	
-	faust_core* F = new faust_core(vec_spmat); 
-	plhs[0]=convertPtr2Mat<faust_core>(F);
-    
-    
-    
+	if (nbRow !=1)
+	{
+		mexErrMsgTxt("input arg must have one row");
+	}
+	mxArray * mxMat;
+	int former_size = 0;
+	faust_spmat spM;
+	vec_spmat.resize(0);
+	for (int i = 0 ;i<nbCol;i++)
+	{	
+		mexPrintf("A");
+		mxMat=mxGetCell(Cells,i);
+		spM = getFaustspMat(mxMat);
+		
+		if (i != 0)
+		{
+			if (spM.getNbRow() != former_size)
+			{
+				mexErrMsgTxt("invalid dimensions of the matrix");
+			}	
+		}
+		former_size = spM.getNbCol();
+		vec_spmat.push_back(spM);	
+	}
+	
+	/*faust_mat fact;
+	mxArray* mxfact;
+	for (int i=0;i<nbCol;i++)
+	{	
+		mexPrintf("i : %d\n",i);
+		fact=vec_spmat[i];
+		mxfact=FaustMat2mxArray(fact);
+		 mexCallMATLAB(0,NULL,1,&mxfact,"disp");
+		
+	}*/
 }
