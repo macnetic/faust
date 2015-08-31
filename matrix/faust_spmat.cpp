@@ -34,7 +34,7 @@ faust_spmat::faust_spmat(const int dim1_, const int dim2_) :
 
 
 
-faust_spmat::faust_spmat(const int nnz_, const int dim1_, const int dim2_,double* value,size_t* id_row,size_t* col_ptr) :
+faust_spmat::faust_spmat(const int nnz_, const int dim1_, const int dim2_, const double* value, const size_t* id_row, const size_t* col_ptr) :
 	mat(Eigen::SparseMatrix<faust_real>(dim1_,dim2_)),
 	dim1(dim1_),
 	dim2(dim2_),
@@ -63,7 +63,7 @@ faust_spmat::faust_spmat(const int nnz_, const int dim1_, const int dim2_,double
 
 
 
-void faust_spmat::set(const int nnz_, const int dim1_, const int dim2_,double* value,size_t* id_row,size_t* col_ptr) 
+void faust_spmat::set(const int nnz_, const int dim1_, const int dim2_, const double* value, const size_t* id_row, const size_t* col_ptr) 
 {	resize(0,0,0);
 	resize(nnz_,dim1_,dim2_);
 	vector<Eigen::Triplet<faust_real> > tripletList;

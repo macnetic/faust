@@ -20,13 +20,13 @@ using namespace std;
   faust_mat::faust_mat(const Eigen::Matrix<faust_real,Eigen::Dynamic,Eigen::Dynamic> & mat_) : 
      mat(mat_), dim1(mat_.rows()), dim2(mat_.cols()),isIdentity(false),isZeros(false){}
   
-  faust_mat::faust_mat(const faust_real  *mat_,const int nbRow, const int nbCol ) : isIdentity(false),isZeros(false)
+  faust_mat::faust_mat(const faust_real  *data_,const int nbRow, const int nbCol ) : isIdentity(false),isZeros(false), dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol)
   {
 
 #ifdef __COMPILE_TIMERS__
 t_constr.start();
 #endif
-
+          /*
 	  int i,j;
 	  if ((nbRow < 0) || (nbCol < 0))
 	  {
@@ -41,19 +41,16 @@ t_constr.start();
 	for (int j=0;j<nbCol;j++)
 		for (int i=0;i<nbRow;i++)
 			m(i,j) = mat_[i+(j*nbRow)];
-	mat = m;
+	mat = m;*/
+
+	memcpy(getData(), data_, nbRow*nbCol*sizeof(faust_real));	
+
 	  
 #ifdef __COMPILE_TIMERS__
 t_constr.stop();
 #endif
 
   }
-
-faust_mat::faust_mat(const int nbRow, const int nbCol, const faust_real* data_) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol) 
-{
-		memcpy(getData(), data_, nbRow*nbCol*sizeof(faust_real));	
-}
-
 
 /// GETTEUR SETTEUR ///
 

@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 				{
 					id_row[j]=global_id[j]%DIM;
 					id_col[j]=(int) (global_id[j]/DIM);
-					values[j] = std::rand()%MAX_RAND;			
+					values[j] = (faust_real)(std::rand()%MAX_RAND);			
 				}
 			//void init(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<faust_real>& values, const int dim1_, const int dim2_);
 				spmat.init(id_row,id_col,values,DIM,DIM);

@@ -59,7 +59,7 @@ bool testMEG  = true;
         sprintf(filename, "learning_compared_fact%d.txt", i);
      facts[i].init_from_file(filename);
   }
-  faust_core faust(facts, 1.0);
+  faust_core faust(facts, (faust_real)1.0);
 
 
 

@@ -51,7 +51,7 @@ faust_real cons21_parameter;
   cons13_col       = init_int_from_matio("config_compared_hierarchical_fact.mat", "cons13_col");
 
   cons21_name      = init_int_from_matio("config_compared_hierarchical_fact.mat", "cons21_name");
-  cons21_parameter = init_double_from_matio("config_compared_hierarchical_fact.mat", "cons21_parameter");
+  cons21_parameter = (faust_real) init_double_from_matio("config_compared_hierarchical_fact.mat", "cons21_parameter");
   cons21_row       = init_int_from_matio("config_compared_hierarchical_fact.mat", "cons21_row");
   cons21_col       = init_int_from_matio("config_compared_hierarchical_fact.mat", "cons21_col");
 

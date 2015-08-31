@@ -15,27 +15,39 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {	
-    // Get the command string
-    char cmd[256];
+	// Get the command string
+	char cmd[256];
 	if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
 		mexErrMsgTxt("First input should be a command string less than 256 characters long.");
-    
-    // Check there is a second input, which should be the class instance handle
-    if (nrhs < 2)
+	// Check there is a second input, which should be the class instance handle
+	if (nrhs < 2)
 		mexErrMsgTxt("Second input should be a class instance handle.");
+ 
+	// New
+	if (!strcmp("new", cmd)) 
+	{
+
+	// inserer code pour creer un objet faust_core a partir d'un tableau de cellules de matrices creuses ou pleines	
+		return;
+	}
     
-    // Delete
-    if (!strcmp("delete", cmd)) {
-        // Destroy the C++ object
-        destroyObject<faust_core>(prhs[1]);
-        // Warn if other commands were ignored
-        if (nlhs != 0 || nrhs != 2)
-            mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
-        return;
-    }
+
+
     
-    // Get the class instance pointer from the second input
-    faust_core* core_ptr = convertMat2Ptr<faust_core>(prhs[1]);
+	// Delete
+	if (!strcmp("delete", cmd))
+	{
+		// Destroy the C++ object
+		destroyObject<faust_core>(prhs[1]);
+		// Warn if other commands were ignored
+		if (nlhs != 0 || nrhs != 2)
+			mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
+		return;
+	}
+    
+
+	// Get the class instance pointer from the second input
+	faust_core* core_ptr = convertMat2Ptr<faust_core>(prhs[1]);
     
     
         

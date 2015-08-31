@@ -8,34 +8,25 @@ faust_mat getFaustMat(mxArray* Mat_array)
     double* MatPtr;
     const mwSize *dimsMat;
     dimsMat = mxGetDimensions(Mat_array);
-	nbRow = (int) dimsMat[0];
-	nbCol = (int) dimsMat[1];
-	if ((nbRow == 0) || (nbCol == 0))
-	{
-		mexErrMsgIdAndTxt("mexFaustMat.h:getFaustMat",
-           "empty matrix");
-	}
-	if (mxIsSparse(Mat_array))
-	{	
-		//mexErrMsgTxt("sparse matrix entry instead of dense matrix");
-		mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
-	}
+    nbRow = (int) dimsMat[0];
+    nbCol = (int) dimsMat[1];
+    if ((nbRow == 0) || (nbCol == 0))
+        mexErrMsgIdAndTxt("mexFaustMat.h:getFaustMat", "empty matrix");
+    if (mxIsSparse(Mat_array))
+    {	
+        //mexErrMsgTxt("sparse matrix entry instead of dense matrix");
+        mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
+    }
     MatPtr = mxGetPr(Mat_array);
     
     faust_mat Mat(nbRow,nbCol);
-	if (sizeof(double) == sizeof(faust_real))
-	{	
-		memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(double));
-    }else
-	{
-		faust_real* MatPtrBis = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
-		for (int i=0;i<nbRow*nbCol;i++)
-		{
-			MatPtrBis[i]=(faust_real)MatPtr[i];
-		}
-		memcpy(Mat.getData(),MatPtrBis,nbRow*nbCol*sizeof(faust_real));
-	}	
-	return Mat;
+    if (sizeof(double) == sizeof(faust_real))
+        memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(double));
+    else
+        for (int i=0 ; i<nbRow*nbCol ; i++)
+            Mat.getData()[i] = (faust_real)MatPtr[i];
+
+    return Mat;
 }
 
 
@@ -60,15 +51,16 @@ faust_spmat getFaustspMat(mxArray* spMat_array)
     ir = (size_t *) mxGetIr(spMat_array);
     pr = (double *) mxCalloc(nnzMax,sizeof(double));
     pr = (double *) mxGetPr(spMat_array);
-    
-	
-		faust_spmat S(nnzMax,nbRow,nbCol,pr,ir,jc); 
 
-	/*faust_mat A=S;
-	mxArray*   mxA=FaustMat2mxArray(A);
-	mexPrintf("INSIDE\n");
-	 mexCallMATLAB(0,NULL,1,&mxA,"disp");*/
-	return S;
+
+    faust_spmat S(nnzMax,nbRow,nbCol,pr,ir,jc); 
+
+    /*faust_mat A=S;
+    mxArray*   mxA=FaustMat2mxArray(A);
+    mexPrintf("INSIDE\n");
+    mexCallMATLAB(0,NULL,1,&mxA,"disp");*/
+    
+    return S;
 }
 
 

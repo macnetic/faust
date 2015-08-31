@@ -40,7 +40,7 @@ int main()
   cons2_col = init_int_from_matio("config_compared_palm2.mat", "cons2_col");
 
 
-  init_lambda = init_double_from_matio("config_compared_palm2.mat", "init_lambda");
+  init_lambda = (faust_real) init_double_from_matio("config_compared_palm2.mat", "init_lambda");
   nfacts = init_int_from_matio("config_compared_palm2.mat", "nfacts");
   niter = init_int_from_matio("config_compared_palm2.mat", "niter");
 

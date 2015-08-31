@@ -122,14 +122,14 @@ int main(int argc, char* argv[])
 			y_dense = dense_mat[i] * x;
 			timer_dense_tmp.stop();
 			//t_dense[run][i] = timer_dense_tmp.get_time();
-			t_dense.setCoeff(timer_dense_tmp.get_time(),run,i);
+			t_dense.setCoeff((faust_real)timer_dense_tmp.get_time(),run,i);
 
 			timer_faust_tmp.reset();
 			timer_faust_tmp.start();
 			y_faust = core[i] * x;
 			timer_faust_tmp.stop();
 			//t_faust[run][i] = timer_faust_tmp.get_time();
-			t_faust.setCoeff(timer_faust_tmp.get_time(),run,i);
+			t_faust.setCoeff((faust_real)timer_faust_tmp.get_time(),run,i);
 
 			faust_real err_rel = y_faust.mean_relative_error(y_dense);
 			cout<<"err relative = " << err_rel << endl;

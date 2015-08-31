@@ -185,7 +185,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
    
    //init_lambda 
-   faust_real init_lambda = 1.0;
+   faust_real init_lambda = (faust_real) 1.0;
    if (presentFields[8])
    {
        mxCurrentField = mxGetField(prhs[0],0,"init_lambda");

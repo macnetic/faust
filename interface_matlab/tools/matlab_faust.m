@@ -6,7 +6,7 @@ classdef matlab_faust < handle
     methods
         %% Constructor - Create a new C++ class instance 
         function this = matlab_faust(varargin)
-            this.objectHandle = mexLoadFaust(varargin{:});
+            this.objectHandle = faust_mex('new',varargin{:});
         end
         
         %% Destructor - Destroy the C++ class instance
