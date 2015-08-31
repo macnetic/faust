@@ -11,3 +11,5 @@ mxArray*  FaustMat2mxArray(faust_mat M);
 void setCellFacts(mxArray ** cellFacts,std::vector<faust_mat> facts);
 void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray* mxCons);
 void setVectorFaustMat(std::vector<faust_mat> &vecMat, mxArray *Cells);
+void loadDenseFaust( const mxArray * Cells,std::vector<faust_spmat> &vec_spmat);
+void loadSpFaust(const mxArray * Cells,std::vector<faust_spmat> &vec_spmat);
