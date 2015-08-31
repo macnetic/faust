@@ -147,4 +147,4 @@ comptime2:$(OBJS) comp_time2.o
 
 clean:
 	@printf '$(FONT)$(CYAN)Removing all object files and executable$(RESET_FONT)\n'
-	@rm -f $(EXECUTABLE)  $(OBJS) $(OBJS_MEX_COMMON)
+	@rm -f $(EXECUTABLE)  $(OBJS) $(OBJS_MEX_COMMON) *.o $(MATLAB_INTERFACE_DIR)/*.o.mex

@@ -168,7 +168,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Si prhs[2] est une matrice
 	else
 	{
-        	faust_mat A(SIZE_A1, SIZE_A2, ptr_data);
+        	faust_mat A(ptr_data, SIZE_A1, SIZE_A2);
 		faust_mat B(SIZE_B1, SIZE_A2);
 		B = (*core_ptr)*A;
 		
