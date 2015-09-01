@@ -18,29 +18,41 @@ void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
         mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
     }
 	const mxClassID V_CLASS_ID = mxGetClassID(Mat_array);
-	 faust_real* MatPtr = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
-	if (V_CLASS_ID == mxDOUBLE_CLASS) 
-	{	
-		double* MatPtrDouble =(double*) mxGetPr(Mat_array);
-		for (int i=0;i<nbRow*nbCol;i++)
-			MatPtr[i] = (faust_real) MatPtrDouble[i];
-    }
-	else if (V_CLASS_ID == mxSINGLE_CLASS)
+	 faust_real* MatPtr; 
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(faust_real))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(faust_real))))
 	{
-		float* MatPtrSingle= (float*) (mxGetData(Mat_array));
-		for (int i=0;i<nbRow*nbCol;i++)
-			MatPtr[i] = (faust_real) MatPtrSingle[i];
-		
-		
+		MatPtr = (faust_real*) mxGetPr(Mat_array);
 	}else
-	{
+	{	
+		if (V_CLASS_ID == mxDOUBLE_CLASS) 
+		{	
+			MatPtr = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
+			double* MatPtrDouble =(double*) mxGetPr(Mat_array);
+			for (int i=0;i<nbRow*nbCol;i++)
+				MatPtr[i] = (faust_real) MatPtrDouble[i];
+		}
+		else if (V_CLASS_ID == mxSINGLE_CLASS)
+		{		
+			MatPtr = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
+			float* MatPtrSingle= (float*) (mxGetData(Mat_array));
+			for (int i=0;i<nbRow*nbCol;i++)
+				MatPtr[i] = (faust_real) MatPtrSingle[i];
+		
+		
+		}else
+		{
 		 mexErrMsgTxt("getFaustMat :input matrix format must be single or double");
+		}
 	}
 	
      Mat.resize(nbRow,nbCol);
 	
     memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(faust_real));
-	mxFree(MatPtr);
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(faust_real))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(faust_real))))
+	{
+		mxFree(MatPtr);
+	}	
+	
 
     
 }
