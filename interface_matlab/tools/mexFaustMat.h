@@ -13,3 +13,4 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
 void setVectorFaustMat(std::vector<faust_mat> &vecMat, mxArray *Cells);
 void loadDenseFaust( const mxArray * Cells,std::vector<faust_spmat> &vec_spmat);
 void loadSpFaust(const mxArray * Cells,std::vector<faust_spmat> &vec_spmat);
+void addSpmat(const mxArray * mxMat,std::vector<faust_spmat> &vec_spmat);

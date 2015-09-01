@@ -5,7 +5,7 @@
 void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
 {
     int  nbRow,nbCol;
-    double* MatPtr;
+   
     const mwSize *dimsMat;
     dimsMat = mxGetDimensions(Mat_array);
     nbRow = (int) dimsMat[0];
@@ -17,14 +17,30 @@ void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
         //mexErrMsgTxt("sparse matrix entry instead of dense matrix");
         mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
     }
-    MatPtr = mxGetPr(Mat_array);
-    
+	const mxClassID V_CLASS_ID = mxGetClassID(Mat_array);
+	 faust_real* MatPtr = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
+	if (V_CLASS_ID == mxDOUBLE_CLASS) 
+	{	
+		double* MatPtrDouble =(double*) mxGetPr(Mat_array);
+		for (int i=0;i<nbRow*nbCol;i++)
+			MatPtr[i] = (faust_real) MatPtrDouble[i];
+    }
+	else if (V_CLASS_ID == mxSINGLE_CLASS)
+	{
+		float* MatPtrSingle= (float*) (mxGetData(Mat_array));
+		for (int i=0;i<nbRow*nbCol;i++)
+			MatPtr[i] = (faust_real) MatPtrSingle[i];
+		
+		
+	}else
+	{
+		 mexErrMsgTxt("getFaustMat :input matrix format must be single or double");
+	}
+	
      Mat.resize(nbRow,nbCol);
-    if (sizeof(double) == sizeof(faust_real))
-        memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(double));
-    else
-        for (int i=0 ; i<nbRow*nbCol ; i++)
-            Mat.getData()[i] = (faust_real)MatPtr[i];
+	
+    memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(faust_real));
+	mxFree(MatPtr);
 
     
 }
@@ -45,11 +61,11 @@ void getFaustspMat(const mxArray* spMat_array,faust_spmat & S)
     size_t* jc,*ir;
     double* pr;
     
-    jc = (size_t *) mxCalloc(nbCol+1,sizeof(size_t));
+    //jc = (size_t *) mxCalloc(nbCol+1,sizeof(size_t));
     jc = (size_t *)mxGetJc(spMat_array);
-    ir = (size_t *) mxCalloc(nnzMax,sizeof(size_t));
+    //ir = (size_t *) mxCalloc(nnzMax,sizeof(size_t));
     ir = (size_t *) mxGetIr(spMat_array);
-    pr = (double *) mxCalloc(nnzMax,sizeof(double));
+    //pr = (double *) mxCalloc(nnzMax,sizeof(double));
     pr = (double *) mxGetPr(spMat_array);
 
 
@@ -108,7 +124,6 @@ mxArray*  FaustMat2mxArray(faust_mat M)
         //mexCallMATLAB(0,NULL,1,rhs, "disp");
 		return mxMat;
 }
-
 
 
 
@@ -233,6 +248,32 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
    
     
 }
+void addSpmat(const mxArray * mxMat,std::vector<faust_spmat> &vec_spmat)
+{
+	
+	faust_spmat spM;
+	
+	if (!mxIsSparse(mxMat))
+	{
+		faust_mat M;
+		getFaustMat(mxMat,M);
+		spM = M;
+	}else
+	{
+		getFaustspMat(mxMat,spM);
+	}
+	
+	int former_size = 0;
+	if (vec_spmat.size() != 0)
+	{
+		if (vec_spmat[vec_spmat.size()-1].getNbCol() != spM.getNbRow())
+		{
+			mexErrMsgTxt("addSpmat : matrix dimensions mismatch");
+		}	
+	}
+		vec_spmat.push_back(spM);	
+}
+
 
 void loadDenseFaust(const mxArray * Cells,std::vector<faust_spmat> &vec_spmat) 
 {
