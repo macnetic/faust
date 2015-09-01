@@ -39,7 +39,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		std::vector<faust_spmat> vec_spmat;
 		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
-		if (nb_element == 0)
+		/*if (nb_element == 0)
 			mexWarnMsgTxt("Empty cell array.");
 	        else if (!mxIsSparse(mxGetCell(prhs[1],0)))
 		{
@@ -50,7 +50,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{	
 			mexPrintf("Sparse\n");
 			loadSpFaust(prhs[1],vec_spmat);
-		}
+		}*/
+	if (nb_element == 0)
+		mexWarnMsgTxt("Empty cell array.");
+    else 
+	{
+			mxArray * mxMat;	
+			for (int i=0;i<nb_element;i++)
+			{	
+				mxMat=mxGetCell(prhs[1],i);
+				addSpmat(mxMat,vec_spmat);
+			}
+	}
 	
 	
 		faust_core* F = new faust_core(vec_spmat); 
