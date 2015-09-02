@@ -44,12 +44,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexWarnMsgTxt("Empty cell array.");
 	        else if (!mxIsSparse(mxGetCell(prhs[1],0)))
 		{
-			mexPrintf("Dense\n");	
+			//mexPrintf("Dense\n");	
 			loadDenseFaust(prhs[1],vec_spmat);
 		}
 		else
 		{	
-			mexPrintf("Sparse\n");
+			//mexPrintf("Sparse\n");
 			loadSpFaust(prhs[1],vec_spmat);
 		}*/
 	if (nb_element == 0)

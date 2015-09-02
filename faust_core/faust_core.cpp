@@ -44,7 +44,7 @@ faust_core::faust_core(const faust_params& params) :
 
 }
 
-faust_mat faust_core::get_product()
+faust_mat faust_core::get_product()const
 {
 	//complexity of evaluating a faust_core 
 	// from left to right is (dim1*total_nnz)

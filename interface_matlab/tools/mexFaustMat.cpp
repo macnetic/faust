@@ -232,7 +232,7 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
         case 0:
             mxConsParams=mxGetCell(mxCons,1);
              intParameter = (int) std::floor(mxGetScalar(mxConsParams)+0.5);
-             mexPrintf("NAME  %s PARAMS %d DIMS : (%d,%d)\n",consName,intParameter,nbRowCons,nbColCons);
+             //mexPrintf("NAME  %s PARAMS %d DIMS : (%d,%d)\n",consName,intParameter,nbRowCons,nbColCons);
             faust_constraint_name consNameType;
             if (strcmp(consName,"sp") == 0)
             {
