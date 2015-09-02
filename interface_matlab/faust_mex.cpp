@@ -2,6 +2,7 @@
 #include "class_handle.hpp"
 #include "faust_core.h"
 #include "mexFaustMat.h"
+#include "faust_mat.h"
 
 
 // prhs[0] : name of command : 
@@ -88,7 +89,33 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Get the class instance pointer from the second input
 	faust_core* core_ptr = convertMat2Ptr<faust_core>(prhs[1]);
     
-    
+    if (!strcmp("get_product",cmd))
+	{	
+		if (nlhs != 1 || nrhs != 2)
+			mexWarnMsgTxt("get_product: Unexpected arguments ignored.");
+		if(core_ptr->size() == 0)
+			mexErrMsgTxt("get_product : empty faust core");
+		const size_t SIZE_B1 = core_ptr->getNbRow(); 
+        const size_t SIZE_B2 = core_ptr->getNbCol(); 
+		faust_mat prod=core_ptr->get_product();
+		
+		const mwSize dims[2]={SIZE_B1,SIZE_B2};
+		if(sizeof(faust_real)==sizeof(float))
+			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
+		else if(sizeof(faust_real)==sizeof(double))
+			plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
+		else
+			mexErrMsgTxt("faust_real type is neither double nor float");
+        
+		faust_real* ptr_out = static_cast<faust_real*> (mxGetData(plhs[0]));
+		memcpy(ptr_out, prod.getData(), SIZE_B1*SIZE_B2*sizeof(faust_real));
+		
+		return;
+		
+		
+		
+		
+	}
         
    
     if (!strcmp("multiply", cmd)) {

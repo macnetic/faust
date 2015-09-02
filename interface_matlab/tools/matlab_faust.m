@@ -19,7 +19,11 @@ classdef matlab_faust < handle
         function varargout = mtimes(this, varargin)
              [varargout{1:nargout}] = faust_mex('multiply', this.objectHandle, varargin{:});
          end
-        
+		 
+		 %% Evaluate the product of a faust_core
+		 function varargout = get_product(this)
+				[varargout{1:nargout}]=faust_mex('get_product',this.objectHandle);
+	     end
         
 %         %% Train - an example class method call
 %         function varargout = train(this, varargin)

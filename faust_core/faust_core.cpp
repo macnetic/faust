@@ -49,7 +49,11 @@ faust_mat faust_core::get_product()
 	//complexity of evaluating a faust_core 
 	// from left to right is (dim1*total_nnz)
 	// from right to left is (dim2*total_nnz)	
-	
+	if (size() == 0)
+	{
+		cerr << "Error in faust_core::get_product : empty_faust_core" << endl;
+				exit(EXIT_FAILURE);
+	}	
 	faust_mat prod(data[0].getNbRow()); 
 	
 	if(getNbRow()<getNbCol())
