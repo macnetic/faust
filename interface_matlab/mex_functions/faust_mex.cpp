@@ -125,7 +125,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			(*core_ptr).transpose();
 		else
 		{	
-			faust_core* F = new faust_core((*core_ptr)); 
+			faust_core* F = new faust_core((*core_ptr));
+			(*F).transpose();	
 			plhs[0]=convertPtr2Mat<faust_core>(F);
 		}
 		return;
