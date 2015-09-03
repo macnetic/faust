@@ -4,26 +4,26 @@ MATRIX_DIR  = $(FAUST_ROOT_DIR)/trunk/devcpp/matrix
 PALM_DIR    = $(FAUST_ROOT_DIR)/trunk/devcpp/palm4MSA
 INIT_MATLAB = $(FAUST_ROOT_DIR)/trunk/devcpp/init_from_matlab
 FAUST_CORE = $(FAUST_ROOT_DIR)/trunk/devcpp/faust_core
-MATLAB_INTERFACE_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/interface_matlab
+MATLAB_INTERFACE_TOOLS_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/interface_matlab/tools
+MATLAB_INTERFACE_MEX_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/interface_matlab/mex_functions
 
 
 
 SRC_CPP = $(wildcard $(PALM_DIR)/*.cpp)  
 SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 SRC_CPP += $(wildcard $(FAUST_CORE)/*.cpp)
-SRC_CPP += $(wildcard $(MATLAB_INTERFACE_DIR)/tools/*.cpp)
+SRC_CPP += $(wildcard $(MATLAB_INTERFACE_TOOLS_DIR)/*.cpp)
 
 OBJS_MEX_BASE := $(filter-out $(MATRIX_DIR)/faust_timer.o.mex,$(patsubst %.cpp,%.o.mex,$(SRC_CPP)))
 OBJS_MEX_BASE := $(filter-out $(PALM_DIR)/sparse_hierarchical_fact.o.mex,$(OBJS_MEX_BASE))
 OBJS_MEX_BASE := $(filter-out $(PALM_DIR)/sparsePalm4MSA.o.mex,$(OBJS_MEX_BASE))    
-OBJS_MEX := $(OBJS_MEX_BASE) mexHierarchical_fact.o.mex
-OBJS_MEX1 := $(OBJS_MEX_BASE) mexLoadFaust.o.mex
-OBJS_MEX2 := $(OBJS_MEX_BASE) mexLoadFaustBis.o.mex
-OBJS_MEX3 := $(OBJS_MEX_BASE) mexPalm4MSA.o.mex
-OBJS_MEX4 := $(OBJS_MEX_BASE) faust_mex.o.mex
+OBJS_MEX := $(OBJS_MEX_BASE) $(MATLAB_INTERFACE_MEX_DIR)/mexHierarchical_fact.o.mex
+OBJS_MEX1 := $(OBJS_MEX_BASE) $(MATLAB_INTERFACE_MEX_DIR)/mexLoadFaust.o.mex
+OBJS_MEX3 := $(OBJS_MEX_BASE) $(MATLAB_INTERFACE_MEX_DIR)/mexPalm4MSA.o.mex
+OBJS_MEX4 := $(OBJS_MEX_BASE) $(MATLAB_INTERFACE_MEX_DIR)/faust_mex.o.mex
 
 
-CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR)  -DPROX=2   -I$(FAUST_CORE)  -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_DIR)/tools #-DMX_COMPAT_32
+CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR)  -DPROX=2   -I$(FAUST_CORE)  -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_TOOLS_DIR) -I$(MATLAB_INTERFACE_MEX_DIR) #-DMX_COMPAT_32
 
 
 
@@ -119,4 +119,4 @@ mexHierarchical_fact.mexa64:$(OBJS_MEX)
 
 clean:
 	@printf '$(FONT)$(CYAN)Removing all object files and executable$(RESET_FONT)\n'
-	rm -f $(EXECUTABLE)   $(OBJS_MEX) $(OBJS_MEX1)  $(OBJS_MEX2) $(OBJS_MEX3) $(OBJS_MEX4) $(MATLAB_INTERFACE_DIR)/*.o.mex
+	rm -f $(EXECUTABLE)   $(OBJS_MEX) $(OBJS_MEX1)  $(OBJS_MEX3) $(OBJS_MEX4) $(MATLAB_INTERFACE_MEX_DIR)/*.o.mex

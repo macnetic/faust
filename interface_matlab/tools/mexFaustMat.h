@@ -1,8 +1,9 @@
-#include <mex.h>
-#include <faust_mat.h>
-#include <faust_spmat.h>
+#include "mex.h"
+#include "faust_mat.h"
+#include "faust_spmat.h"
 #include <vector>
-#include <faust_constraint_generic.h>
+#include "faust_constraint_generic.h"
+#include "faust_params.h"
 
 
 void getFaustMat(const mxArray* Mat_array,faust_mat & Mat);
@@ -12,3 +13,5 @@ void setCellFacts(mxArray ** cellFacts,std::vector<faust_mat> facts);
 void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray* mxCons);
 void setVectorFaustMat(std::vector<faust_mat> &vecMat, mxArray *Cells);
 void addSpmat(const mxArray * mxMat,std::vector<faust_spmat> &vec_spmat);
+void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
+void DisplayParams(const faust_params & params);

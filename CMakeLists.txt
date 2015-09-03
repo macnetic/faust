@@ -3,11 +3,23 @@
 #  - CMakeLists.txt files in the sub-directories
 #  - CMake/* files, which define some tools to search for libraries, etc.
 
-project(FAUST)
 cmake_minimum_required(VERSION 2.6)
-
+project(FAUST CXX)
 set(FAUST_VERSION_MAJOR 1)
 set(FAUST_VERSION_MINOR 0)
+
+#Add the c++11 flag, whatever it is
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG(-std=c++11 COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG(-std=c++0x COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+else()
+	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has neither C++11 nor c++0x support.")
+endif()
+
 
 INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
 

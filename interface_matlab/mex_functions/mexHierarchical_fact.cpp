@@ -12,14 +12,7 @@
 #include <algorithm>
 #include <faust_params.h>
 #include <faust_constant.h>
-
 #include <mexFaustMat.h>
-
-
-
-void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
-void DisplayParams(const faust_params & params);
-
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -51,10 +44,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //     }
 //     
     
-    
-    
     mxArray    *mxCurrentField,*mxCurrentCons;
-    
     
     // data initialisation
     faust_mat data;
@@ -91,7 +81,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    {
         mexErrMsgTxt("params.nfacts must be specified");
    }
-   
    
 
     //constraints
@@ -227,129 +216,5 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
      plhs[1]=cellFacts;
 
-     
-   
-   
-   
-   
-   
-
 }
 
-
-void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
-{
-  int nbr_field=mxGetNumberOfFields(params);
-  presentFields.resize(8);
-  presentFields.assign(8,false); 
-  if(nbr_field < 3)
-  {
-      mexErrMsgTxt("The number of field of params must be at least 3 "); 
-  }
-  
-  
-  for (int i=0;i<nbr_field;i++)
-  {     
-        const char * fieldName;
-        fieldName = mxGetFieldNameByNumber(params,i);
-        mexPrintf("fieldname %d : %s\n",i,fieldName);
-        
-        if (strcmp(fieldName,"data") == 0)
-        {
-            presentFields[0] = true;
-        }
-        
-        if (strcmp(fieldName,"nfacts") == 0)
-        {
-            presentFields[1] = true;
-        }
-        if (strcmp(fieldName,"cons") == 0)
-        {
-            presentFields[2] = true;
-        }
-        if (strcmp(fieldName,"niter1") == 0)
-        {
-            presentFields[3] = true;
-        }
-        if (strcmp(fieldName,"niter2") == 0)
-        {
-            presentFields[4] = true;
-        }
-        if (strcmp(fieldName,"verbose") == 0)
-        {
-            presentFields[5] = true;
-        }
-        if (strcmp(fieldName,"fact_side") == 0)
-        {
-            presentFields[6] = true;
-        }
-        if (strcmp(fieldName,"update_way") == 0)
-        {
-            presentFields[7] = true;
-        }
-        if (strcmp(fieldName,"init_lambda") == 0)
-        {
-            presentFields[8] = true;
-        }
-        if (strcmp(fieldName,"compute_lambda") == 0)
-        {
-            presentFields[9] = true;
-        }
-  }
-  
-}
-
-
-
-
-void DisplayParams(const faust_params & params)
-{   
-    mexPrintf("/////// PARAMS //////\n");
-    faust_mat data = params.data; 
-   
-    int nbRow = data.getNbRow();
-    int nbCol = data.getNbCol();
-    mexPrintf("DATA DIM : %d %d\n",nbRow,nbCol);
-    if (nbRow*nbCol < 1000)
-    {
-        for (int i = 0;i<data.getNbRow();i++)
-        {
-            for (int j = 0;j<data.getNbCol();j++)
-            {
-                mexPrintf("%f ",data(i,j));
-            }
-            mexPrintf("\n");
-        }
-    }
-    mexPrintf("\n\n");
-    
-    mexPrintf("NB_FACTS : %d\n",params.nb_fact);
-    mexPrintf("CONSTRAINTS : nbr %d\n",params.cons[0].size());
-    for (int L=0;L<params.cons[0].size();L++)
-	{
-		for (int jl=0;jl<params.cons.size();jl++)
-		{	
-			//char * type_cons =  getType((*params.cons[jl][L]).get_constraint_name());
-            char * type_cons =  (*params.cons[jl][L]).getType();
-			mexPrintf(" %s ",(*params.cons[jl][L]).get_constraint_name());
-			mexPrintf(" DIMS (%d,%d) : ",(*params.cons[jl][L]).getRows(),(*params.cons[jl][L]).getCols());
-			
-			
-			if (strcmp(type_cons,"INT") == 0)
-			{	
-				faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[jl][L]);
-				mexPrintf(" parameter : %d",(*const_int).getParameter());
-			}
-			
-			if (strcmp(type_cons,"FAUST_REAL") == 0)
-			{	
-				faust_constraint_real* const_real = (faust_constraint_real*)(params.cons[jl][L]);
-				mexPrintf(" parameter : %f",(*const_real).getParameter());
-			}
-			mexPrintf("\n"); 
-
-			
-		}
-		
-	}
-}

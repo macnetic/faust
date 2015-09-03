@@ -6,6 +6,7 @@ INIT_MATLAB = $(FAUST_ROOT_DIR)/trunk/devcpp/init_from_matlab
 FAUST_CORE = $(FAUST_ROOT_DIR)/trunk/devcpp/faust_core
 MATLAB_INTERFACE_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/interface_matlab
 MATLAB_INTERFACE_TOOL_DIR = $(MATLAB_INTERFACE_DIR)/tools
+MATLAB_INTERFACE_MEX_DIR = $(MATLAB_INTERFACE_DIR)/mex_functions
 
 
 
@@ -21,7 +22,7 @@ OBJS_MEX_COMMON := $(filter-out $(MATRIX_DIR)/faust_timer.cpp,$(patsubst %.cpp,%
 
 CXXFLAGS = -O2 -Wall -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB)  -I$(MATIO_ROOT_DIR)/include  -DPROX=2   -I$(FAUST_CORE) #-Winline 
 
-CXXFLAGS_MEX = $(CXXFLAGS) -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_TOOL_DIR)
+CXXFLAGS_MEX = $(CXXFLAGS) -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_MEX_DIR) -I$(MATLAB_INTERFACE_TOOL_DIR)
 
 ifneq ($(COMPILATION_THOMAS),)
    CXXFLAGS += -DFAUST_SINGLE 
@@ -65,7 +66,7 @@ CYAN    =36m
 RESET_FONT =\033[0m
 
 
-MEX_EXE = $(MATLAB_INTERFACE_DIR)/mexHierarchical_fact.mexa64 $(MATLAB_INTERFACE_DIR)/mexLoadFaust.mexa64 $(MATLAB_INTERFACE_DIR)/faust_mex.mexa64
+MEX_EXE = $(MATLAB_INTERFACE_MEX_DIR)/mexHierarchical_fact.mexa64 $(MATLAB_INTERFACE_MEX_DIR)/mexLoadFaust.mexa64 $(MATLAB_INTERFACE_MEX_DIR)/faust_mex.mexa64
 
 EXECUTABLE=hier_fact hier_fact2 palm meg meg_new meg_old faust comptime0 comptime comptime2 $(MEX_EXE) 
 
@@ -147,4 +148,4 @@ comptime2:$(OBJS) comp_time2.o
 
 clean:
 	@printf '$(FONT)$(CYAN)Removing all object files and executable$(RESET_FONT)\n'
-	@rm -f $(EXECUTABLE)  $(OBJS) $(OBJS_MEX_COMMON) *.o $(MATLAB_INTERFACE_DIR)/*.o.mex
+	@rm -f $(EXECUTABLE)  $(OBJS) $(OBJS_MEX_COMMON) *.o $(MATLAB_INTERFACE_MEX_DIR)/*.o.mex $(MATLAB_INTERFACE_TOOL_DIR)/*.o.mex

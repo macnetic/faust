@@ -3,7 +3,7 @@ set(SRC_FILES "")
 file(GLOB CPP_FILES "*.cpp")
 
 
-include_directories(${FAUST_MATRIX_SRC_DIR} $ENV{EIGEN_DIR})
+include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} $ENV{EIGEN_DIR})
 add_library(${FAUST_PALM4MSA_TARGET} ${CPP_FILES})
-target_link_libraries(${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
+target_link_libraries(${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET} ${FAUST_FAUSTCORE_TARGET})
 
