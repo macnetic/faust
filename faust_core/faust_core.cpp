@@ -1,9 +1,10 @@
 #include "faust_core.h"
 #include "faust_vec.h"
-#include "hierarchical_fact.h"
-#include "faust_params.h"
+//#include "hierarchical_fact.h"
+//#include "faust_params.h"
 #include "LinAlgebra.h"
 #include "faust_core_algebra.h"
+#include <iostream>
 
 using namespace std;
 
@@ -31,7 +32,7 @@ faust_core::faust_core(const std::vector<faust_spmat>& facts, const faust_real l
       (data[0]) *= lambda_;
 }
 
-faust_core::faust_core(const faust_params& params) :
+/*faust_core::faust_core(const faust_params& params) :
    data(std::vector<faust_spmat>()),
    totalNonZeros(0)
 
@@ -43,7 +44,7 @@ faust_core::faust_core(const faust_params& params) :
       totalNonZeros += data[i].getNonZeros();
    (data[0]) *= hier_fact.get_lambda();
 
-}
+}*/
 
 faust_mat faust_core::get_product()const
 {
@@ -213,7 +214,7 @@ faust_spmat faust_core::get_fact(int id)const
 {
 	if(id>=size())
 	{
-		cerr << "Error in faust_core::get_fact : id exceed faust_core size" << endl;
+		std::cerr << "Error in faust_core::get_fact : id exceed faust_core size" << std::endl;
          exit(EXIT_FAILURE);
 	}
 	return data[id];

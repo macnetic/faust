@@ -116,6 +116,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		
 		
 	}
+	
+	if (!strcmp("transpose",cmd))
+	{
+		
+		
+		if (nlhs != 1)
+			(*core_ptr).transpose();
+		else
+		{	
+			faust_core* F = new faust_core((*core_ptr)); 
+			plhs[0]=convertPtr2Mat<faust_core>(F);
+		}
+		return;
+	}
         
    
     if (!strcmp("multiply", cmd)) {
