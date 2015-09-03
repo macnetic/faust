@@ -26,14 +26,23 @@ classdef matlab_faust < handle
 	     end
 		 
 		 function trans=transpose(this)
-			%if (nargout	 == 0)
-			%	faust_mex('transpose',this.objectHandle);
-			%else
+			if (nargout	 == 0)
+				faust_mex('transpose',this.objectHandle);
+			else
+				trans = matlab_faust({});
 				trans.objectHandle = faust_mex('transpose',this.objectHandle);
 				
-			%end
+			end
 				
 		 end
+		 
+		function Size=size(this,varargin);
+			if (nargin == 1)
+				Size=faust_mex('size',this.objectHandle);
+			else (nargin == 2)
+				Size=faust_mex('size',this.objectHandle,varargin);
+			end
+		end
         
 %         %% Train - an example class method call
 %         function varargout = train(this, varargin)

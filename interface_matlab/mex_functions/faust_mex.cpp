@@ -89,6 +89,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Get the class instance pointer from the second input
 	faust_core* core_ptr = convertMat2Ptr<faust_core>(prhs[1]);
     
+	if (!strcmp("size",cmd))
+	{	
+		const size_t SIZE_B1 = core_ptr->getNbRow(); 
+        const size_t SIZE_B2 = core_ptr->getNbCol(); 
+		const mwSize dims[2]={1,2};
+		plhs[0]=mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL);
+		double* ptr_out = (double*) mxGetData(plhs[0]);
+		ptr_out[0]=(double) SIZE_B1;
+		ptr_out[1]=(double) SIZE_B2;
+		return;		
+	}
+	
     if (!strcmp("get_product",cmd))
 	{	
 		if (nlhs != 1 || nrhs != 2)
