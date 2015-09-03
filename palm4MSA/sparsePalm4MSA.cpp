@@ -9,6 +9,7 @@
 #include "faust_constraint_int.h"
 //#include "faust_mat.h"
 #include "LinAlgebra.h"
+#include "faust_core_algebra.h"
 #include "prox.h"
 
 #ifdef __COMPILE_TIMERS__

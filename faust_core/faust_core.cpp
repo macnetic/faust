@@ -3,6 +3,7 @@
 #include "hierarchical_fact.h"
 #include "faust_params.h"
 #include "LinAlgebra.h"
+#include "faust_core_algebra.h"
 
 using namespace std;
 

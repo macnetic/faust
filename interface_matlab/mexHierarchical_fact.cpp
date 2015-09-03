@@ -2,6 +2,7 @@
 //#include <mexutils.h>
 #include <hierarchical_fact.h>
 #include <faust_mat.h>
+#include <faust_core.h>
 #include <faust_constraint_int.h>
 #include <faust_constraint_real.h>
 #include <faust_constraint_mat.h>
