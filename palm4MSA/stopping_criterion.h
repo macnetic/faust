@@ -27,12 +27,12 @@ class stopping_criterion
       void check_validity()const;
 
    private:
-      int nb_it;   // number of iterations if !isCriterionError
       // if isCriterionError then criterion is error else criterion is number of iteration
       bool  isCriterionError;
+      int nb_it;   // number of iterations if !isCriterionError
       faust_real errorThreshold;
-      // only used as stopping criterion, if isCriterionError, when error is still greater than 
       int maxIteration;
+      // only used as stopping criterion, if isCriterionError, when error is still greater than 
 };
 
 

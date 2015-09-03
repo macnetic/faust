@@ -1,4 +1,3 @@
-#include "palm4MSA_test.h"
 #include "faust_mat.h"
 #include "faust_spmat.h"
 #include "faust_constraint_int.h"
@@ -30,10 +29,8 @@ faust_real cons21_parameter;
   int cons22_name, cons22_parameter, cons22_row, cons22_col;
   int cons23_name, cons23_parameter, cons23_row, cons23_col;
 
-  faust_real cons2_parameter;
   int nfacts, niter1, niter2;
   bool update_way, verbose, fact_side;
-  double init_lambda;
 
   cons11_name      = init_int_from_matio("config_compared_hierarchical_fact.mat", "cons11_name");
   cons11_parameter = init_int_from_matio("config_compared_hierarchical_fact.mat", "cons11_parameter");
@@ -124,7 +121,7 @@ faust_real cons21_parameter;
   hier_fact.get_facts(facts);
   (facts[0]) *= hier_fact.get_lambda();
   char nomFichier[100];
-  for (int i=0 ; i<facts.size() ; i++)
+  for (unsigned int i=0 ; i<facts.size() ; i++)
   {
      sprintf(nomFichier, "facts%d_cpp.dat",i);
      facts[i].print_file(nomFichier);

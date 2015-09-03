@@ -1,8 +1,10 @@
-INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
+#INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
 set(SRC_FILES "")
 file(GLOB CPP_FILES "*.cpp")
+
 
 include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} $ENV{EIGEN_DIR})
 add_library(${FAUST_FAUSTCORE_TARGET} ${CPP_FILES})
 target_link_libraries(${FAUST_FAUSTCORE_TARGET} ${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
+
 

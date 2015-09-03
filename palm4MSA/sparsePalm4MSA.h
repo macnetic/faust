@@ -64,38 +64,34 @@ class sparsePalm4MSA
    public :
       stopping_criterion stop_crit;
 
+
    private:
      
-      faust_core L;
-	  faust_core R;
-	  faust_spmat sparse_S;
-	  faust_mat dense_S;
-	  
-
-
-      
-      faust_mat grad_over_c;
-      faust_real lipschitz_multiplicator;
-      faust_real c; 
-      faust_real lambda;
-      const bool isUpdateWayR2L;
-      const bool verbose;
-	  //const bool isLambdaComputed;
       faust_mat data;
-      
-      
-
+      faust_real lambda;
+      int nb_fact; // number of factors
+      faust_spmat sparse_S;
+      faust_mat dense_S;
+      faust_core L;
+      faust_core R;
+      std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
+      int ind_ite;
+      faust_real lipschitz_multiplicator;
+      const bool verbose;
+      const bool isUpdateWayR2L;
+      //const bool isLambdaComputed;
       bool isCComputed;
       bool isGradComputed;
       bool isProjectionComputed;
       bool isLastFact;    
       bool isConstraintSet;
+      
+      faust_mat grad_over_c;
+      faust_real c; 
 
-      int ind_ite;
+
       int ind_fact; //indice de facteur (!= hierarchical_fact::ind_fact : indice de factorisation)
-      int nb_fact; // number of factors
 
-      std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
 	
 	
 	#ifdef __COMPILE_TIMERS__

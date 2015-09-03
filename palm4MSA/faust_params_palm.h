@@ -35,15 +35,15 @@ class faust_params_palm
       std::vector<const faust_constraint_generic*> cons; // vector of constraints
 
       // Optional members (set to default values if not defined)
+      std::vector<faust_mat> init_fact;
+      stopping_criterion stop_crit;
       bool isVerbose;
       bool isUpdateWayR2L;
-	  bool isLambdaComputed;
-      std::vector<faust_mat> init_fact;
       faust_real init_lambda;
+	  bool isLambdaComputed;
 
 
      
-      stopping_criterion stop_crit;
       /*const int nb_it;   // number of iterations
       // if isStoppingCriterionError then criterion is error else criterion is number of iteration
       bool  isStoppingCriterionError;

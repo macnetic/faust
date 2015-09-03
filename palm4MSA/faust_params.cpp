@@ -32,7 +32,7 @@ void faust_params::check_constraint_validity()
       exit(EXIT_FAILURE);
    }
    
-   for (int i=0 ; i<cons.size() ; i++)  
+   for (unsigned int i=0 ; i<cons.size() ; i++)  
       if (cons[i].size() != nb_fact-1) 
       {
          std::cerr << "The number of constraints is in conflict with the number of factors" << std::endl;
@@ -47,13 +47,13 @@ void faust_params::check_constraint_validity()
 	  const std::vector<faust_mat>& init_fact_,
 	  const stopping_criterion& stop_crit_2facts_,
       const stopping_criterion& stop_crit_global_,
-	   const double residuum_decrease_speed,
-	  const double residuum_prcent,
-	  const bool isVerbose_ , /*false*/
-      const bool isUpdateWayR2L_  , /*false */
-      const bool isFactSideLeft_ , /*false*/
-      const faust_real init_lambda_ ,//1
-      const bool isLambdaComputed_ )://true
+	   const double residuum_decrease_speed /* = 1.25 */,
+	  const double residuum_prcent /* = 1.4 */,
+	  const bool isVerbose_ , /* = false */
+      const bool isUpdateWayR2L_  , /* = false */
+      const bool isFactSideLeft_ , /* = false */
+      const faust_real init_lambda_ , /* = 1.0 */
+      const bool isLambdaComputed_ /* = true */): 
             data(data_), 
             nb_fact(nb_fact_), 
             init_fact(init_fact_),
@@ -232,7 +232,7 @@ void faust_params::Display() const
 
 	std::cout<<"CONSTRAINT  : "<< cons[0].size()<<std::endl;
 	
-	for (int jl=0;jl<cons.size();jl++)
+	for (unsigned int jl=0;jl<cons.size();jl++)
 	{
 		
 		if (jl == 0)
@@ -256,7 +256,7 @@ void faust_params::Display() const
 			}		
 			
 		}		
-		for (int L=0;L<cons[0].size();L++)
+		for (unsigned int L=0;L<cons[0].size();L++)
 		{
 		
 			std::string type_cons;

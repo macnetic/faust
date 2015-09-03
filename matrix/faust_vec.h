@@ -16,9 +16,9 @@ class faust_spmat;
 class faust_vec
 {
  public :
- faust_vec() : vec(), dim(0) {}
- faust_vec(const int _dim) : vec(_dim),dim(_dim){}
- faust_vec(const faust_vec& v) : vec(v.vec), dim(v.dim){}
+ faust_vec() : dim(0), vec() {}
+ faust_vec(const int _dim) : dim(_dim), vec(_dim){}
+ faust_vec(const faust_vec& v) : dim(v.dim), vec(v.vec){}
  faust_vec(const int dim_, const faust_real* data_);
 	
  faust_real* getData(){return vec.data();}
@@ -30,7 +30,7 @@ void print_file(const char* filename)const;
  int size() const {return dim;}
  void resize(const int new_dim);
 faust_real norm(){return vec.norm();}
-faust_real scalarMultiply(faust_real const scalar){vec = scalar * vec;}
+void scalarMultiply(faust_real const scalar){vec *= scalar;}
 void normalize(){scalarMultiply(1/norm());} 
 
 

@@ -1,4 +1,4 @@
-INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
+#INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
 set(SRC_FILES "")
 file(GLOB CPP_FILES "*.cpp")
 

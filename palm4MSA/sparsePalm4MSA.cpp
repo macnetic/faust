@@ -28,14 +28,13 @@ using namespace std;
 
 sparsePalm4MSA::sparsePalm4MSA(const faust_params& params_, const bool isGlobal_) :
    data(params_.data),
-   isUpdateWayR2L(params_.isUpdateWayR2L),
    lambda(params_.init_lambda),
-   verbose(params_.isVerbose),
    nb_fact(0),
    ind_ite(-1),
-   //isLambdaComputed(params_.isLambdaComputed),
-   
    lipschitz_multiplicator(1.001),
+   verbose(params_.isVerbose),
+   isUpdateWayR2L(params_.isUpdateWayR2L),
+   //isLambdaComputed(params_.isLambdaComputed),
    isCComputed(false),
    isGradComputed(false),
    isProjectionComputed(false),
@@ -51,17 +50,17 @@ sparsePalm4MSA::sparsePalm4MSA(const faust_params& params_, const bool isGlobal_
 
 sparsePalm4MSA::sparsePalm4MSA(const faust_params_palm& params_palm_) :
    data(params_palm_.data),
-   isUpdateWayR2L(params_palm_.isUpdateWayR2L),
    lambda(params_palm_.init_lambda),
-   verbose(params_palm_.isVerbose),
    nb_fact(params_palm_.nb_fact),
    sparse_S(),
    dense_S(),
    stop_crit(params_palm_.stop_crit),
    const_vec(params_palm_.cons),
    ind_ite(-1),
-   //isLambdaComputed(params_palm_.isLambdaComputed),
    lipschitz_multiplicator(1.001),
+   verbose(params_palm_.isVerbose),
+   isUpdateWayR2L(params_palm_.isUpdateWayR2L),
+   //isLambdaComputed(params_palm_.isLambdaComputed),
    isCComputed(false),
    isGradComputed(false),
    isProjectionComputed(false),

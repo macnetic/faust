@@ -1,4 +1,4 @@
-## Main CMakeLists.txt of the MPTK project
+## Main CMakeLists.txt of the FAUST project
 ## Other important files for CMake are
 #  - CMakeLists.txt files in the sub-directories
 #  - CMake/* files, which define some tools to search for libraries, etc.
@@ -10,6 +10,7 @@ set(FAUST_VERSION_MAJOR 1)
 set(FAUST_VERSION_MINOR 0)
 
 INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
+
 
 add_subdirectory(${FAUST_MATRIX_SRC_DIR} ${FAUST_MATRIX_BIN_DIR})
 add_subdirectory(${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_FAUSTCORE_BIN_DIR})

@@ -19,7 +19,7 @@ OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP))
 OBJS_MEX_COMMON := $(filter-out $(MATRIX_DIR)/faust_timer.cpp,$(patsubst %.cpp,%.o.mex,$(SRC_CPP))) $(MATLAB_INTERFACE_TOOL_DIR)/mexFaustMat.o.mex 
 
 
-CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB)  -I$(MATIO_ROOT_DIR)/include  -DPROX=2   -I$(FAUST_CORE) #-Winline 
+CXXFLAGS = -O2 -Wall -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB)  -I$(MATIO_ROOT_DIR)/include  -DPROX=2   -I$(FAUST_CORE) #-Winline 
 
 CXXFLAGS_MEX = $(CXXFLAGS) -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_TOOL_DIR)
 

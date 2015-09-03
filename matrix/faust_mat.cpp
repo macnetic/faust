@@ -18,9 +18,9 @@ using namespace std;
 
 /// CONSTRUCTEUR ///
   faust_mat::faust_mat(const Eigen::Matrix<faust_real,Eigen::Dynamic,Eigen::Dynamic> & mat_) : 
-     mat(mat_), dim1(mat_.rows()), dim2(mat_.cols()),isIdentity(false),isZeros(false){}
+     dim1(mat_.rows()), dim2(mat_.cols()),mat(mat_),isIdentity(false),isZeros(false){}
   
-  faust_mat::faust_mat(const faust_real  *data_,const int nbRow, const int nbCol ) : isIdentity(false),isZeros(false), dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol)
+  faust_mat::faust_mat(const faust_real  *data_,const int nbRow, const int nbCol ) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol), isIdentity(false),isZeros(false)
   {
 
 #ifdef __COMPILE_TIMERS__

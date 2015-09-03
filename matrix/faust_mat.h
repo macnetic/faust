@@ -23,12 +23,12 @@ public:
   /// Constructeurs ///
   faust_mat(const Eigen::Matrix<faust_real, Eigen::Dynamic,Eigen::Dynamic> & mat_);	
   faust_mat(const faust_real  *data_,const int nbRow, const int nbCol );	
-  faust_mat() : mat(0,0) , dim1(0) , dim2(0), isIdentity(false),isZeros(false) {}
-  faust_mat(const faust_mat & A) : dim1(A.dim1),dim2(A.dim2),mat(A.mat),isIdentity(A.isIdentity),isZeros(A.isZeros) {}
+  faust_mat() : dim1(0), dim2(0), mat(0,0), isIdentity(false), isZeros(false) {}
+  faust_mat(const faust_mat & A) : dim1(A.dim1), dim2(A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
   faust_mat(const faust_spmat & A){this->operator=(A);}
 
-  faust_mat(const int nbRow, const int nbCol) : mat(nbRow,nbCol),dim1(nbRow),dim2(nbCol),isIdentity(false),isZeros(false){}
-  faust_mat(const int nbRow) : mat(nbRow,nbRow),dim1(nbRow),dim2(nbRow),isIdentity(false),isZeros(false){}
+  faust_mat(const int nbRow, const int nbCol) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
+  faust_mat(const int nbRow) : dim1(nbRow), dim2(nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}
 
 
 	
@@ -164,10 +164,10 @@ void write_into_file(const char* filename);
   bool estNulle(){return isZeros;}
   
   private: 
-  Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat;
-  //Eigen::Matrix<faust_real,0,0> mat;
        int dim1;
        int dim2;
+  Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat;
+  //Eigen::Matrix<faust_real,0,0> mat;
        bool isIdentity;
        bool isZeros;
 

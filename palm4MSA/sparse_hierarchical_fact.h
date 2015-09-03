@@ -32,17 +32,17 @@ private:
 
 
    private:
+      int ind_fact ; //indice de factorisation (!= palm4MSA::ind_fact : indice de facteur)
       const std::vector< std::vector<const faust_constraint_generic*> > cons;
       bool isUpdateWayR2L;
       bool isFactSideLeft; 
       bool isVerbose;
-      int ind_fact ; //indice de factorisation (!= palm4MSA::ind_fact : indice de facteur)
       int nb_fact; // nombre de factorisations (!= palm4MSA::nb_fact : nombre de facteurs)
       sparsePalm4MSA palm_2;
       sparsePalm4MSA palm_global;
+      std::vector<const faust_constraint_generic*> cons_tmp_global;
       const faust_real default_lambda; // initial value of lambda for factorization into two factors
       //std::vector<faust_mat> S;
-      std::vector<const faust_constraint_generic*> cons_tmp_global;
       bool isFactorizationComputed;
       std::vector<std::vector<faust_real> > errors;
       

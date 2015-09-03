@@ -56,31 +56,31 @@ class palm4MSA
       void compute_lambda();
 
 
-   public :
+   public:
       stopping_criterion stop_crit;
+   
 
    private:
+      faust_mat data;
+      faust_real lambda;
+      int nb_fact; // number of factors
+      std::vector<faust_mat> S; // contains S_0^i, S_1^i, ...
+
       // RorL_vec matches R if (!isUpdateWayR2L)
       // RorL_vec matches L if (isUpdateWayR2L)
       std::vector<faust_mat> RorL; 
-
       // LorR_mat matches L if (!isUpdateWayR2L)
       // LorR_mat matches R if (isUpdateWayR2L)
       faust_mat LorR;
-      std::vector<faust_mat> S; // contains S_0^i, S_1^i, ...
-
       
-      faust_mat grad_over_c;
+
+      std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
+      int ind_fact; //indice de facteur (!= hierarchical_fact::ind_fact : indice de factorisation)
+      int ind_ite;
       faust_real lipschitz_multiplicator;
-      faust_real c; 
-      faust_real lambda;
-      const bool isUpdateWayR2L;
       const bool verbose;
-	  const bool isLambdaComputed;
-      faust_mat data;
-      faust_mat error; // error = lambda*L*S*R - data
-      
-
+      const bool isUpdateWayR2L;
+      const bool isLambdaComputed;
       bool isCComputed;
       bool isGradComputed;
       bool isProjectionComputed;
@@ -88,14 +88,12 @@ class palm4MSA
       bool isConstraintSet;
       const bool isGlobal;
       bool isInit; // only used for global factorization (if isGlobal)
-      
-       
-      
-      int ind_ite;
-      int ind_fact; //indice de facteur (!= hierarchical_fact::ind_fact : indice de factorisation)
-      int nb_fact; // number of factors
+      faust_mat grad_over_c;
+      faust_real c; 
+      faust_mat error; // error = lambda*L*S*R - data
 
-      std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
+      
+
 
 
 

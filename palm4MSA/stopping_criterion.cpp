@@ -16,11 +16,13 @@ stopping_criterion::stopping_criterion(bool isCriterionError_) : isCriterionErro
 void stopping_criterion::check_validity()const
 {
    if (isCriterionError)
+   {
       if (errorThreshold>1 || maxIteration < 0)
       {
          std::cerr << "error in stopping_criterion::check_validity" << std::endl;
          exit(EXIT_FAILURE);
       }
+   }
    else if (nb_it < 0) 
    {
       std::cerr << "error in stopping_criterion::check_validity" << std::endl;
