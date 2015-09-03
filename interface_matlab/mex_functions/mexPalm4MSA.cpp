@@ -1,0 +1,356 @@
+#include <mex.h>
+//#include <mexutils.h>
+#include <hierarchical_fact.h>
+#include <faust_mat.h>
+#include <faust_constraint_int.h>
+#include <faust_constraint_generic.h>
+#include <faust_constraint_real.h>
+#include <faust_constraint_mat.h>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <faust_params_palm.h>
+#include <faust_constant.h>
+
+#include <mexFaustMat.h>
+
+
+void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFields);
+
+
+
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	if (nrhs != 1)
+	{
+		mexErrMsgTxt("Bad Number of inputs arguments");
+	}
+    
+    if(!mxIsStruct(prhs[0]))
+    {
+        mexErrMsgTxt("Input must be a structure.");
+    }
+    
+    std::vector<bool> presentFields;
+    testCoherencePalm4MSA(prhs[0],presentFields);
+     mexPrintf(" NUMBER FIELDS %d\n",presentFields.size());
+//     for (int i=0;i<presentFields.size();i++)
+//     {   
+//         
+//         mexPrintf(" FIELDS n %d present : ",i);
+//         if (presentFields[i])
+//         {
+//             mexPrintf(" true\n");
+//         }else
+//         {
+//             mexPrintf(" false\n");
+//         }
+//     }
+//     
+    
+    
+    
+    mxArray    *mxCurrentField,*mxCurrentCons;
+    
+    
+    // data initialisation
+    faust_mat data;
+    if (presentFields[0])
+    {    
+        mxCurrentField = mxGetField(prhs[0],0,"data");  
+        
+        getFaustMat(  mxCurrentField,data ) ;   
+        mexPrintf("DATA");
+        for (int i = 0;i<data.getNbRow();i++)
+        {
+            for (int j = 0;j<data.getNbCol();j++)
+            {
+                //bidon = std::snprintf(coeff,10,"%d",A(i,j));	
+                mexPrintf("%f ",data(i,j));
+            }
+            mexPrintf("\n");
+        }
+    }else
+    {
+         mexErrMsgTxt("params.data must be specified");
+    }
+    
+   //nb_fact initialisation
+   int nb_fact; 
+   if (presentFields[1])
+   {    
+        
+        mxCurrentField = mxGetField(prhs[0],0,"nfacts");
+        mexPrintf("a\n");
+        nb_fact =(int)  mxGetScalar(mxCurrentField);
+        mexPrintf("NB FACT : %d",nb_fact);
+   }else
+   {
+        mexErrMsgTxt("params.nfacts must be specified");
+   }
+   
+   
+
+    //constraints
+    std::vector<const faust_constraint_generic*> consS;
+    if (presentFields[2])
+    {
+        mwSize nbRowCons,nbColCons;
+        mxCurrentField = mxGetField(prhs[0],0,"cons");
+        
+        if(!mxIsCell(mxCurrentField))
+        {
+            mexErrMsgTxt("cons must be a cell-array");
+        }
+        nbRowCons = mxGetM(mxCurrentField);
+        nbColCons = mxGetN(mxCurrentField);
+        
+        if(nbRowCons !=1)
+        {
+            mexPrintf("\n cons has %d rows \n",nbRowCons);
+            mexErrMsgTxt("cons must have 1 rows");
+        }
+        if(nbColCons != (nb_fact))
+        {
+            mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
+            mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
+        }
+        mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
+        faust_constraint_generic * consToAdd;
+        
+        
+        
+            for (int j=0;j<nbColCons;j++)
+            {
+                mexPrintf("cons(%d)\n",j);
+                mxCurrentCons=mxGetCell(mxCurrentField,j);
+                getConstraint(consS,mxCurrentCons);
+                //consS.push_back(consToAdd);
+            }
+
+    }else
+    {
+        mexErrMsgTxt("params.cons must be specified");
+    } 
+    
+    //niter1
+    stopping_criterion crit1;
+    if (presentFields[3])
+    {   
+         mxCurrentField = mxGetField(prhs[0],0,"niter");
+        int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
+        stopping_criterion newCrit1(nb_iter1);
+        crit1 = newCrit1;
+    }
+    mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
+    
+    //init_facts
+    std::vector<faust_mat> init_facts;
+    if (presentFields[4])
+    {   
+         mxCurrentField = mxGetField(prhs[0],0,"init_facts");
+		setVectorFaustMat(init_facts,mxCurrentField);
+		if (init_facts.size() != nb_fact)
+		{
+			mexErrMsgTxt("conflicts between init_facts and nb_facts");
+		}
+    }else
+	{
+		mexErrMsgTxt("init_facts must be must be specified");
+	}
+
+
+    
+    //verbosity
+    bool isVerbose = false;
+    if (presentFields[5])
+    {
+       mxCurrentField = mxGetField(prhs[0],0,"verbose");
+        isVerbose =(bool)  mxGetScalar(mxCurrentField); 
+    }
+    //update_way
+    bool updateway = false;
+    if (presentFields[7])
+    {
+        mxCurrentField = mxGetField(prhs[0],0,"update_way");
+        updateway =(bool)  mxGetScalar(mxCurrentField); 
+    }
+
+   
+   //init_lambda 
+   faust_real init_lambda = 1.0;
+   if (presentFields[6])
+   {
+       mxCurrentField = mxGetField(prhs[0],0,"init_lambda");
+       init_lambda = (faust_real) mxGetScalar(mxCurrentField);
+   }
+   
+   //compute_lambda
+   bool compute_lambda = true;
+   if (presentFields[8])
+   {
+       mxCurrentField = mxGetField(prhs[0],0,"compute_lambda");
+       compute_lambda = (bool) mxGetScalar(mxCurrentField);
+   }
+    
+    
+      ///////////// HIERARCHICAL LAUNCH ///////////////  
+     // creation des parametres   
+     faust_params_palm params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda,compute_lambda); 
+	 palm4MSA palm(params,false);
+	 palm.compute_facts();
+	 faust_real lambda = palm.get_lambda();
+	 mexPrintf("LAMBDA : %f",lambda);
+	 plhs[0]=mxCreateDoubleScalar((double) lambda);
+	 
+}	 
+     /*DisplayParams(params);
+     //creation de hierarchical fact
+     hierarchical_fact hier_fact(params);
+     hier_fact.compute_facts();	
+     
+     
+     //extraction des resultats
+     faust_real lambda = hier_fact.get_lambda();
+     
+     plhs[0]=mxCreateDoubleScalar((double) lambda);
+     
+     std::vector<faust_mat> facts;
+     hier_fact.get_facts(facts);
+
+     
+     faust_mat current_fact = facts[0];
+     mxArray * cellFacts;
+     setCellFacts(&cellFacts,facts);
+     
+
+     plhs[1]=cellFacts;
+
+     
+   
+   
+   
+   
+   
+
+}
+*/
+
+void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFields)
+{
+  int nbr_field=mxGetNumberOfFields(params);
+  presentFields.resize(8);
+  presentFields.assign(8,false); 
+  if(nbr_field < 3)
+  {
+      mexErrMsgTxt("The number of field of params must be at least 3 "); 
+  }
+  
+  
+  for (int i=0;i<nbr_field;i++)
+  {     
+        const char * fieldName;
+        fieldName = mxGetFieldNameByNumber(params,i);
+        mexPrintf("fieldname %d : %s\n",i,fieldName);
+        
+        if (strcmp(fieldName,"data") == 0)
+        {
+            presentFields[0] = true;
+        }
+        
+        if (strcmp(fieldName,"nfacts") == 0)
+        {
+            presentFields[1] = true;
+        }
+        if (strcmp(fieldName,"cons") == 0)
+        {
+            presentFields[2] = true;
+        }
+        if (strcmp(fieldName,"niter") == 0)
+        {
+            presentFields[3] = true;
+        }
+        if (strcmp(fieldName,"init_facts") == 0)
+        {
+            presentFields[4] = true;
+        }
+        if (strcmp(fieldName,"verbose") == 0)
+        {
+            presentFields[5] = true;
+        }
+        if (strcmp(fieldName,"init_lambda") == 0)
+        {
+            presentFields[6] = true;
+        }
+        if (strcmp(fieldName,"update_way") == 0)
+        {
+            presentFields[7] = true;
+        }
+        if (strcmp(fieldName,"compute_lambda") == 0)
+        {
+            presentFields[8] = true;
+        }
+  }
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/*void DisplayParams(const faust_params & params)
+{   
+    mexPrintf("/////// PARAMS //////\n");
+    faust_mat data = params.data; 
+   
+    int nbRow = data.getNbRow();
+    int nbCol = data.getNbCol();
+    mexPrintf("DATA DIM : %d %d\n",nbRow,nbCol);
+    if (nbRow*nbCol < 1000)
+    {
+        for (int i = 0;i<data.getNbRow();i++)
+        {
+            for (int j = 0;j<data.getNbCol();j++)
+            {
+                mexPrintf("%f ",data(i,j));
+            }
+            mexPrintf("\n");
+        }
+    }
+    mexPrintf("\n\n");
+    
+    mexPrintf("NB_FACTS : %d\n",params.nb_fact);
+    mexPrintf("CONSTRAINTS : nbr %d\n",params.cons[0].size());
+		for (int jl=0;jl<params.cons.size();jl++)
+		{	
+			//char * type_cons =  getType((*params.cons[jl][L]).get_constraint_name());
+            char * type_cons =  (*params.cons[jl]).getType();
+			mexPrintf(" %s ",(*params.cons[jl]).get_constraint_name());
+			mexPrintf(" DIMS (%d,%d) : ",(*params.cons[jl]).getRows(),(*params.cons[jl][L]).getCols());
+			
+			
+			if (strcmp(type_cons,"INT") == 0)
+			{	
+				faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[jl][L]);
+				mexPrintf(" parameter : %d",(*const_int).getParameter());
+			}
+			
+			if (strcmp(type_cons,"FAUST_REAL") == 0)
+			{	
+				faust_constraint_real* const_real = (faust_constraint_real*)(params.cons[jl][L]);
+				mexPrintf(" parameter : %f",(*const_real).getParameter());
+			}
+			mexPrintf("\n"); 
+
+			
+		}
+		
+	}
+}*/

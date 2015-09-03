@@ -24,6 +24,16 @@ classdef matlab_faust < handle
 		 function varargout = get_product(this)
 				[varargout{1:nargout}]=faust_mex('get_product',this.objectHandle);
 	     end
+		 
+		 function trans=transpose(this)
+			%if (nargout	 == 0)
+			%	faust_mex('transpose',this.objectHandle);
+			%else
+				trans.objectHandle = faust_mex('transpose',this.objectHandle);
+				
+			%end
+				
+		 end
         
 %         %% Train - an example class method call
 %         function varargout = train(this, varargin)
