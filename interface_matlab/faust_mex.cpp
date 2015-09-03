@@ -210,7 +210,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             for (int i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
-           
+	else
+            mexErrMsgTxt("Unknown matlab type.");
 		
  
 	// Si prhs[2] est un vecteur
@@ -249,7 +250,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		faust_real* ptr_out = static_cast<faust_real*> (mxGetData(plhs[0]));
 		memcpy(ptr_out, B.getData(), SIZE_B1*SIZE_B2*sizeof(faust_real));
 	}
-        	delete [] ptr_data ; ptr_data = NULL;
+        
+	delete [] ptr_data ; ptr_data = NULL;
         
        
         return;
