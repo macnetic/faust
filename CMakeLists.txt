@@ -20,8 +20,69 @@ else()
 	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has neither C++11 nor c++0x support.")
 endif()
 
+# SOURCE DIRECTORIES
+set(FAUST_MATRIX_SRC_DIR ${PROJECT_SOURCE_DIR}/matrix CACHE INTERNAL "")
+set(FAUST_FAUSTCORE_SRC_DIR ${PROJECT_SOURCE_DIR}/faust_core CACHE INTERNAL "")
+set(FAUST_MATIO_SRC_DIR ${PROJECT_SOURCE_DIR}/init_from_matlab CACHE INTERNAL "")
+set(FAUST_PALM4MSA_SRC_DIR ${PROJECT_SOURCE_DIR}/palm4MSA CACHE INTERNAL "")
+set(FAUST_PALM4MSATEST_SRC_DIR ${PROJECT_SOURCE_DIR}/palm4MSA/test CACHE INTERNAL "")
+set(FAUST_MEXINTERFACE_SRC_DIR ${PROJECT_SOURCE_DIR}/interface_matlab CACHE INTERNAL "")
+set(FAUST_MEXINTERFACETOOLS_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/tools CACHE INTERNAL "")
+set(FAUST_MEXINTERFACEMEX_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/mex_functions CACHE INTERNAL "")
 
-INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
+# BINARY DIRECTORIES
+set(FAUST_MATRIX_BIN_DIR ${PROJECT_BINARY_DIR}/matrix CACHE INTERNAL "")
+set(FAUST_FAUSTCORE_BIN_DIR ${PROJECT_BINARY_DIR}/faust_core CACHE INTERNAL "")
+set(FAUST_MATIO_BIN_DIR ${PROJECT_BINARY_DIR}/testing/init_from_matlab CACHE INTERNAL "")
+set(FAUST_PALM4MSA_BIN_DIR ${PROJECT_BINARY_DIR}/palm4MSA CACHE INTERNAL "")
+set(FAUST_PALM4MSATEST_BIN_DIR ${PROJECT_BINARY_DIR}/testing CACHE INTERNAL "")
+set(FAUST_MEXINTERFACE_BIN_DIR ${PROJECT_BINARY_DIR}/interface_matlab CACHE INTERNAL "")
+set(FAUST_MEXINTERFACETOOLS_BIN_DIR ${FAUST_MEXINTERFACE_BIN_DIR}/tools CACHE INTERNAL "")
+set(FAUST_MEXINTERFACEMEX_BIN_DIR ${FAUST_MEXINTERFACE_BIN_DIR}/mex_functions CACHE INTERNAL "")
+
+# TARGETS
+set(FAUST_MATRIX_TARGET matrix CACHE INTERNAL "")
+set(FAUST_PALM4MSA_TARGET palm4MSA CACHE INTERNAL "")
+set(FAUST_FAUSTCORE_TARGET faust_core CACHE INTERNAL "")
+set(FAUST_MEX_TARGET faust_mex CACHE INTERNAL "")
+
+# OTHER VARIABLES
+set(FAUST_COMPILE_DEFINITIONS "-D_GNU_SOURCE;-DMATLAB_MEX_FILE;-DNDEBUG")
+
+
+if(UNIX)
+	exec_program("matlab_dir_tmp=`which matlab`; if echo \"$matlab_dir_tmp\" | grep -q \"/bin/\"; then echo '1'; else echo '0'; fi" OUTPUT_VARIABLE IS_MATLAB_DIR_FOUND)
+	if(IS_MATLAB_DIR_FOUND EQUAL 1)
+		exec_program("MATLAB_ROOT_TMP=`which matlab |xargs dirname`; while echo \"$MATLAB_ROOT_TMP\" | grep -q \"/bin\"; do MATLAB_ROOT_TMP=`dirname $MATLAB_ROOT_TMP`; done; echo $MATLAB_ROOT_TMP;" OUTPUT_VARIABLE MATLAB_ROOT)
+		set(MATLAB_ROOT ${MATLAB_ROOT} CACHE INTERNAL "Matlab root directory")
+	else()
+		set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
+	endif()
+
+	exec_program("openblas_dir_tmp=`locate libopenblas.so | head -n 1`; if echo \"$openblas_dir_tmp\" | grep -q \"libopenblas\"; then echo '1'; else echo '0'; fi" OUTPUT_VARIABLE IS_OPENBLAS_DIR_FOUND)
+	if(IS_OPENBLAS_DIR_FOUND EQUAL 1)
+		exec_program("OPENBLAS_LIB_TMP=`locate libopenblas.so | head -n 1 |xargs dirname`; echo $OPENBLAS_LIB_TMP;" OUTPUT_VARIABLE OPENBLAS_LIB)
+		set(OPENBLAS_LIB ${OPENBLAS_LIB} CACHE INTERNAL "Openblas library directory")
+	else()
+		set(MATLAB_ROOT "" CACHE PATH "Openblas library directory")
+	endif()
+else()
+	set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
+	set(OPENBLAS_LIB "" CACHE PATH "Openblas library directory")
+endif()
+
+set(MATLAB_INCLUDE_DIR "${MATLAB_ROOT}/extern/include" CACHE INTERNAL "Matlab include directory")
+
+
+
+add_definitions(${FAUST_COMPILE_DEFINITIONS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -fexceptions -fPIC -fno-omit-frame-pointer -pthread")
+
+get_directory_property( DirDefs COMPILE_DEFINITIONS )
+MESSAGE(STATUS "oooooooooooooooooooooooooooooooo1 COMPILE_DEFINITIONS=${DirDefs}")
+
+
+#INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
 
 
 add_subdirectory(${FAUST_MATRIX_SRC_DIR} ${FAUST_MATRIX_BIN_DIR})
@@ -35,6 +96,7 @@ add_subdirectory(${FAUST_MEXINTERFACETOOLS_SRC_DIR} ${FAUST_MEXINTERFACETOOLS_BI
 
 #add_dependencies(${FAUST_FAUSTCORE_TARGET} ${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
 #add_dependencies(${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
+
 
 
 
