@@ -19,6 +19,7 @@ void prox_sp_normfree(faust_mat & M,int k);
 void prox_sp_pos_normfree(faust_mat & M,int k);
 void prox_spcol_normfree(faust_mat & M,int k);
 void prox_splin_normfree(faust_mat & M,int k);
+void prox_supp_normfree(faust_mat & M,const faust_mat & supp);
 
 
 

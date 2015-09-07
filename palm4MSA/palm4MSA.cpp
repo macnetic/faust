@@ -85,13 +85,13 @@ void palm4MSA::compute_facts()
 		next_step();
 		//cout<<"lambda : "<<lambda<<endl;
 	}
-	cout<<"lambda_computed : "<<isLambdaComputed<<endl;
+	//cout<<"lambda_computed : "<<isLambdaComputed<<endl;
 	if (!isLambdaComputed)
 	{	
 		isLastFact=true;
-		cout<<"lambda before : "<<lambda<<endl;
+		//cout<<"lambda before : "<<lambda<<endl;
 		compute_last_update();
-		cout<<"final lambda : "<<lambda<<endl;
+		//cout<<"final lambda : "<<lambda<<endl;
 		
 	}
 }
@@ -129,35 +129,6 @@ t_local_compute_projection.start();
 				t_prox_sp.start();
 			#endif
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-			/*
-            #if (PROX == 0)
-			faust_mat S_back_up=S[ind_fact];
-			faust_mat S1,S2;
-			prox_sp(S[ind_fact], const_int->getParameter());
-			S1=S[ind_fact];
-			S[ind_fact]=S_back_up;
-			prox_sp_old_old(S[ind_fact], const_int->getParameter());
-			S2=S[ind_fact];
-			faust_real seuil = 0.000001;
-			if (!S1.isEqual(S2,seuil))
-			{	
-				S_back_up.write_into_file("fail_prox_sp.dat");
-				//write_faust_mat_into_matfile(S_back_up,"fail_prox_sp.dat","C");
-				cerr<<"erreur prox_sp k= :"<< const_int->getParameter()<<endl;
-				exit( EXIT_FAILURE); 
-			}
-			#endif
-			
-			
-			#if (PROX == 1)
-			cout<<"new"<<endl;
-			prox_sp_old_old(S[ind_fact], const_int->getParameter());
-			#endif
-			
-			#if (PROX == 2)
-			prox_sp(S[ind_fact], const_int->getParameter());
-			#endif
-			*/
 			if (isLambdaComputed)
 			{
 				prox_sp(S[ind_fact], const_int->getParameter());
@@ -205,33 +176,7 @@ t_local_compute_projection.start();
 			t_prox_splin.start();
 			#endif
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-			/*#if (PROX == 0)
-				//cout<<"comp"<<endl;		
-			faust_mat S_back_up=S[ind_fact];
-			faust_mat S1,S2;
-			prox_splin(S[ind_fact], const_int->getParameter());
-			S1=S[ind_fact];
-			S[ind_fact]=S_back_up;
-			old_splin(S[ind_fact], const_int->getParameter());
-			S2=S[ind_fact];
-			faust_real seuil=0.000001;
-			if (!S1.isEqual(S2,seuil))
-			{	
-				S_back_up.write_into_file("fail_prox_splin.dat");
-				//write_faust_mat_into_matfile(S_back_up,"fail_prox_splin.mat","C");
-				cerr<<"erreur prox_splin k = :"<<const_int->getParameter()<<endl;
-				exit( EXIT_FAILURE); 
-			}
-			#endif
-			#if (PROX == 1)
-				//cout<<"old"<<endl;
-				old_splin(S[ind_fact], const_int->getParameter());
-			#endif
-			
-			#if (PROX == 2)
-				//cout<<"new"<<endl;
-				prox_splin(S[ind_fact], const_int->getParameter());
-			#endif*/
+
 			if (isLambdaComputed)
 			{
 				prox_splin(S[ind_fact], const_int->getParameter());
@@ -297,7 +242,14 @@ t_local_compute_projection.start();
          case CONSTRAINT_NAME_SP_POS:
          {
             const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_sp_pos(S[ind_fact], const_int->getParameter());
+			if (isLambdaComputed)
+			{
+				prox_sp_pos(S[ind_fact], const_int->getParameter());
+			}
+			else
+			{	
+				prox_sp_pos_normfree(S[ind_fact], const_int->getParameter());
+			}
          }
          break;
 
@@ -324,8 +276,8 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_NORMLIN:
          {
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_sp(S[ind_fact], const_int->getParameter());
+            const faust_constraint_real* const_real = dynamic_cast<const faust_constraint_real*>(const_vec[ind_fact]);
+            prox_normlin(S[ind_fact], const_real->getParameter());
          }
          break;
 
@@ -546,7 +498,7 @@ t_local_compute_lambda.start();
 
    lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
 
-   cout<<"lambda : "<<lambda<<endl;
+   //cout<<"lambda : "<<lambda<<endl;
    //cout<<__SP lambda<<endl;
 
 #ifdef __COMPILE_TIMERS__

@@ -369,6 +369,18 @@ void prox_sp_pos(faust_mat & M,int k)
 	
 }
 
+void prox_sp_pos_normfree(faust_mat & M,int k)
+{
+	faust_real*const ptr_data = M.getData();
+	//treshold de la matrice
+	for (int i=0;i<(M.getNbRow() * M.getNbCol());i++)
+		if (ptr_data[i] < 0)
+			ptr_data[i]=0;
+		
+	prox_sp_normfree(M,k);
+	
+}
+
 
 
 // M needs to be square and k must divide dimension of M
@@ -1152,8 +1164,16 @@ void prox_normcol(faust_mat & M,faust_real s)
 		M.setZeros();
 	}else
 	{
-		
-		for (int i=0;i<dim1;i++)id_row[i]=i;
+		faust_vec current_col(dim1);
+		faust_real scalarmultiply;
+		for (int j=0;j<dim2)
+		{
+			memcpy(current_col.getData(),&(M.getData()[j*dim1]),dim1*sizeof(faust_real));
+			scalarMultiply = s/current_col.norm();
+			current_col*= scalarMultiply;
+			memcpy(&(M.getData()[j*dim1]),current_col.getData(),dim1*sizeof(faust_real));
+		}
+		/*for (int i=0;i<dim1;i++)id_row[i]=i;
 	
 		for (int j=0;j<dim2;j++)
 		{	
@@ -1174,7 +1194,7 @@ void prox_normcol(faust_mat & M,faust_real s)
 				M.setCoeffs(values_per_Col,id_row,id_col_mat);
 			}
 				
-		}
+		}*/
 	
 	}
 	
@@ -1193,6 +1213,19 @@ void prox_normlin(faust_mat & M,faust_real s)
 
 void prox_supp(faust_mat & M, const faust_mat & supp)
 {
+	
+	prox_supp(M,supp);
+	faust_real normM = M.norm();
+	if (normM != 0)
+	{
+		M.scalarMultiply(1/normM);
+	}
+	
+}
+
+
+void prox_supp_normfree(faust_mat & M,const faust_mat & supp)
+{
 	if ( (supp.getNbRow() != M.getNbRow()) || (supp.getNbCol() != M.getNbCol()) )
 	{
 		std::cerr << "ERROR prox_supp : dimensions of the matrix mismatch " << std::endl;
@@ -1210,17 +1243,7 @@ void prox_supp(faust_mat & M, const faust_mat & supp)
 			}
 		}
 	}
-	
-	faust_real normM = M.norm();
-	if (normM != 0)
-	{
-		M.scalarMultiply(1/normM);
-	}
-	
 }
-
-
-
 
 
 

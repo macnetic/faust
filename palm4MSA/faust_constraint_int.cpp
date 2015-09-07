@@ -75,8 +75,6 @@ void faust_constraint_int::check_constraint_name()const
          break;
       case CONSTRAINT_NAME_SPLIN_TEST:
          break;
-      case CONSTRAINT_NAME_NORMLIN:
-         break;
       case CONSTRAINT_NAME_TOEPLITZ:
          break;
       default:

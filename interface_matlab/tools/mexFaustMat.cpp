@@ -148,20 +148,33 @@ void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat> facts)
     faust_mat mat;
     (*cellFacts) = mxCreateCellMatrix(1,nb_fact);
     mxArray * mxMat;
-    double* mat_ptr;
-    mxMat = mxCreateDoubleMatrix(0,0,mxREAL);
+    faust_real* mat_ptr;
+	mwSize dims[2]={0,0};
+	if (sizeof(faust_real) == sizeof(double))
+	{	
+		mxMat = mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL);
+	}else if (sizeof(faust_real) == sizeof(float))
+	{
+		mxMat = mxCreateNumericArray(2,dims,mxSINGLE_CLASS,mxREAL);
+	}else
+	{
+		mexErrMsgTxt("mexFaustMat : setCellFacts : faust_real type must be equal to double or float");
+	}
     
     for (size_t k = 0; k < nb_fact; k++)
-    {
+    {	
         mat = facts[k];
         rowFact = mat.getNbRow();
         colFact = mat.getNbCol();
-        
-        mat_ptr = (double *) mxCalloc(rowFact*colFact,sizeof(double));
-        memcpy(mat_ptr,mat.getData(),rowFact*colFact*sizeof(double));
         mxSetM(mxMat, rowFact);
         mxSetN(mxMat, colFact);
-        mxSetPr(mxMat, mat_ptr);
+		
+        mat_ptr = (faust_real *) mxCalloc(rowFact*colFact,sizeof(faust_real));
+		
+		memcpy(mat_ptr,mat.getData(),rowFact*colFact*sizeof(faust_real));
+
+        
+        mxSetData(mxMat, mat_ptr);
         mxSetCell((*cellFacts),k,mxDuplicateArray(mxMat));
     } 
     
@@ -184,13 +197,21 @@ void setVectorFaustMat(std::vector<faust_mat> &vecMat,mxArray *Cells)
 
 void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray* mxCons)
 {     
-    mwSize bufCharLen,nbRowCons,nbColCons;
+    mwSize bufCharLen,nbRowCons,nbColCons,nb_params;
     int status;        
     char * consName;
     double paramCons;
     mxArray * mxConsParams; 
-    
+	
+    nb_params = mxGetNumberOfElements(mxCons);
+	if (!mxIsCell(mxCons))
+		mexErrMsgTxt("mexFaustMat.h : getConstraint : constraint must be a cell-array. ");
+	if (nb_params != 4)
+		mexErrMsgTxt("mexFaustMat.h : getConstraint : size of constraint must be equal to 4. ");
+	
     mxConsParams=mxGetCell(mxCons,0);
+	if (!mxIsChar(mxConsParams))
+		mexErrMsgTxt("mexFaustMat.h : getConstraint : constraint first cell of the constraint must be a character  ");
     bufCharLen = mxGetNumberOfElements(mxConsParams)+1;
     consName = (char *) mxCalloc(bufCharLen,sizeof(char));
     status = mxGetString(mxConsParams,consName,bufCharLen);
@@ -210,15 +231,19 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
 	is_const_int = ((is_const_int) || ((strcmp(consName,"wav") == 0)));
 	is_const_int = ((is_const_int) || ((strcmp(consName,"blkdiag") == 0)));
 	is_const_int = ((is_const_int) || ((strcmp(consName,"splin_test") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"supp") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"normlin") == 0)));
+
+
     
+	bool is_const_real = ((strcmp(consName,"normcol") == 0) || (strcmp(consName,"normlin")==0));
+	
+	bool is_const_mat =  ((strcmp(consName,"supp") == 0) || (strcmp(consName,"const")==0));
+	
     int const_type = -1;
 	if (is_const_int)
 	{
 		const_type = 0;
 	}
-	/*if (is_const_real)
+	if (is_const_real)
 	{
 		const_type = 1;
 	}
@@ -226,35 +251,61 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
 	{
 		const_type = 2;
 	}
-     */
-    int intParameter;
+    
+    
+	faust_constraint_name consNameType;
     switch(const_type)
 	{
         case 0:
+		{
+			
             mxConsParams=mxGetCell(mxCons,1);
-             intParameter = (int) std::floor(mxGetScalar(mxConsParams)+0.5);
+            int  intParameter = (int) std::floor(mxGetScalar(mxConsParams)+0.5);
              //mexPrintf("NAME  %s PARAMS %d DIMS : (%d,%d)\n",consName,intParameter,nbRowCons,nbColCons);
-            faust_constraint_name consNameType;
-            if (strcmp(consName,"sp") == 0)
-            {
-                consNameType = CONSTRAINT_NAME_SP;
-            }
-            if (strcmp(consName,"spcol") == 0)
-            {
-                consNameType = CONSTRAINT_NAME_SPCOL;
-            }
-            if (strcmp(consName,"splin") == 0)
-            {
-                consNameType = CONSTRAINT_NAME_SPLIN;
-            }
             
+            if (strcmp(consName,"sp") == 0)
+                consNameType = CONSTRAINT_NAME_SP;
+            else if (strcmp(consName,"spcol") == 0)
+                consNameType = CONSTRAINT_NAME_SPCOL;
+            else if (strcmp(consName,"splin") == 0)
+                consNameType = CONSTRAINT_NAME_SPLIN;
+			else if (strcmp(consName,"splincol") == 0)
+                consNameType = CONSTRAINT_NAME_SPLINCOL;
+			else if (strcmp(consName,"sppos") == 0)
+                consNameType = CONSTRAINT_NAME_SPLIN;
+           
             consS.push_back((new faust_constraint_int(consNameType,intParameter,nbRowCons,nbColCons)));
             break;
-            
-            
-            default :
-                mexErrMsgTxt("Unknown constraint name ");
-			break;
+		}	
+		case 1:
+		{
+            mxConsParams=mxGetCell(mxCons,1);
+			faust_real realParameter = (faust_real) mxGetScalar(mxConsParams);
+			if (strcmp(consName,"normcol") == 0)
+				consNameType = CONSTRAINT_NAME_NORMCOL;
+			else if (strcmp(consName,"normlin") == 0)
+				consNameType = CONSTRAINT_NAME_NORMLIN;
+			
+			consS.push_back((new faust_constraint_real(consNameType,realParameter,nbRowCons,nbColCons)));
+
+			break; 
+		}	
+		case 2 :
+		{	
+			mxConsParams=mxGetCell(mxCons,1);
+			faust_mat matParameter;
+			getFaustMat(mxConsParams,matParameter);
+			if (strcmp(consName,"const") == 0)
+				consNameType = CONSTRAINT_NAME_CONST;
+			if (strcmp(consName,"supp") == 0)
+				consNameType = CONSTRAINT_NAME_SUPP;
+			
+			consS.push_back((new faust_constraint_mat(consNameType,matParameter,nbRowCons,nbColCons)));
+			break; 
+		}	
+		default :
+            mexErrMsgTxt("Unknown constraint name ");
+		break;
     }
 
    
