@@ -1,14 +1,14 @@
-#include <mex.h>
+#include "mex.h"
 #include <vector>
 #include <string>
 #include <algorithm>
 
-#include <faust_mat.h>
-#include <faust_spmat.h>
-#include <faust_core.h>
-#include <faust_constant.h>
+#include "faust_mat.h"
+#include "faust_spmat.h"
+#include "faust_core.h"
+#include "faust_constant.h"
 
-#include <mexFaustMat.h>
+#include "mexFaustMat.h"
 
 #include "class_handle.hpp"
 

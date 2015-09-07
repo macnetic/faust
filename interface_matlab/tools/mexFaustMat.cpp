@@ -1,7 +1,7 @@
-#include <mexFaustMat.h>
-#include <faust_constraint_real.h>
-#include <faust_constraint_mat.h>
-#include <faust_constraint_int.h>
+#include "mexFaustMat.h"
+#include "faust_constraint_real.h"
+#include "faust_constraint_mat.h"
+#include "faust_constraint_int.h"
 
 void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
 {

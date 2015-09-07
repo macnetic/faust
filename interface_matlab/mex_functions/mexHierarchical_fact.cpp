@@ -1,18 +1,18 @@
-#include <mex.h>
+#include "mex.h"
 //#include <mexutils.h>
-#include <hierarchical_fact.h>
-#include <faust_mat.h>
-#include <faust_core.h>
-#include <faust_constraint_int.h>
-#include <faust_constraint_real.h>
-#include <faust_constraint_mat.h>
-#include <faust_constraint_generic.h>
+#include "hierarchical_fact.h"
+#include "faust_mat.h"
+#include "faust_core.h"
+#include "faust_constraint_int.h"
+#include "faust_constraint_real.h"
+#include "faust_constraint_mat.h"
+#include "faust_constraint_generic.h"
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <faust_params.h>
-#include <faust_constant.h>
-#include <mexFaustMat.h>
+#include "faust_params.h"
+#include "faust_constant.h"
+#include "mexFaustMat.h"
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
