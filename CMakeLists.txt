@@ -10,8 +10,8 @@ set(FAUST_VERSION_MINOR 0)
 
 #Add the c++11 flag, whatever it is
 include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG(-std=c++11 COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG(-std=c++0x COMPILER_SUPPORTS_CXX0X)
+check_cxx_compiler_flag(-std=c++11 COMPILER_SUPPORTS_CXX11)
+check_cxx_compiler_flag(-std=c++0x COMPILER_SUPPORTS_CXX0X)
 if(COMPILER_SUPPORTS_CXX11)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 elseif(COMPILER_SUPPORTS_CXX0X)
@@ -46,6 +46,16 @@ set(FAUST_PALM4MSA_TARGET faust_palm4MSA CACHE INTERNAL "")
 set(FAUST_FAUSTCORE_TARGET faust_core CACHE INTERNAL "")
 set(FAUST_MEX_TARGET faust_mex CACHE INTERNAL "")
 set(FAUST_MEXTOOLS_TARGET faust_mextools CACHE INTERNAL "")
+
+find_library(MATIO_LIB_NAME "matio" "$ENV{MATIODIR}/lib")
+find_library(HDF5_LIB_NAME "hdf5")
+
+#MEX_EXT
+if(UNIX)
+	set(MEX_EXT "mexa64")
+else()
+	set(MEX_EXT "mexw64")
+endif()
 
 
 if(UNIX)
