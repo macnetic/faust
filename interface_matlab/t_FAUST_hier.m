@@ -1,6 +1,7 @@
 clear all;
 close all;
-
+addpath('../build/interface_matlab')
+addpath('')
 DIM1 = 5;
 DIM2 = 2;
 data = zeros(DIM1,DIM2);

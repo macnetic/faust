@@ -76,21 +76,32 @@ if(UNIX)
 
 	exec_program("openblas_dir_tmp=`locate libopenblas.so | head -n 1`; if echo \"$openblas_dir_tmp\" | grep -q \"libopenblas\"; then echo '1'; else echo '0'; fi" OUTPUT_VARIABLE IS_OPENBLAS_DIR_FOUND)
 	if(IS_OPENBLAS_DIR_FOUND EQUAL 1)
-		exec_program("OPENBLAS_LIB_TMP=`locate libopenblas.so | head -n 1 |xargs dirname`; echo $OPENBLAS_LIB_TMP;" OUTPUT_VARIABLE OPENBLAS_LIB)
-		set(OPENBLAS_LIB ${OPENBLAS_LIB} CACHE INTERNAL "Openblas library directory")
+		exec_program("OPENBLAS_LIB_TMP=`locate libopenblas.so | head -n 1 |xargs dirname`; echo $OPENBLAS_LIB_TMP;" OUTPUT_VARIABLE OPENBLAS_LIB_PATH)
+		set(OPENBLAS_LIB_PATH ${OPENBLAS_LIB_PATH} CACHE INTERNAL "Openblas library directory")
 	else()
 		set(MATLAB_ROOT "" CACHE PATH "Openblas library directory")
 	endif()
 else()
 	set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
-	set(OPENBLAS_LIB "" CACHE PATH "Openblas library directory")
+	set(OPENBLAS_LIB_PATH "" CACHE PATH "Openblas library directory")
 endif()
 
 set(MATLAB_INCLUDE_DIR "${MATLAB_ROOT}/extern/include" CACHE INTERNAL "Matlab include directory")
 
+set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
+set(FAUST_USE_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
+
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -fexceptions -fPIC -fno-omit-frame-pointer -pthread")
+if(FAUST_USE_SINGLEPRECISION)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFAUST_SINGLE")
+	set(FAUST_COMPILE_SINGLE_FLAG "-DFAUST_SINGLE")
+endif()
+if(FAUST_USE_OPENBLAS)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GEMM_WITH_OPENBLAS__")
+endif()
+
 
 
 #INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
