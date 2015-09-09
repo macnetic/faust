@@ -47,14 +47,21 @@ set(FAUST_FAUSTCORE_TARGET faust_core CACHE INTERNAL "")
 set(FAUST_MEX_TARGET faust_mex CACHE INTERNAL "")
 set(FAUST_MEXTOOLS_TARGET faust_mextools CACHE INTERNAL "")
 
-find_library(MATIO_LIB_NAME "matio" "$ENV{MATIODIR}/lib")
-find_library(HDF5_LIB_NAME "hdf5")
+
+
+# find external libraries
+include(CMake/add_library_path.cmake)
+add_library_path(LIBRARY_PATH_LIST_TMP "/usr" "/usr/local" "opt" "opt/local" "$ENV{MATIODIR}")
+set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
+include(CMake/check_external_libraries.cmake)
+check_external_libraries(hdf5 HDF5_LIB_FILE 0)
+check_external_libraries(matio MATIO_LIB_FILE 0)
 
 #MEX_EXT
 if(UNIX)
-	set(MEX_EXT "mexa64")
+	set(MEX_EXT "mexa64" CACHE INTERNAL "mex extension")
 else()
-	set(MEX_EXT "mexw64")
+	set(MEX_EXT "mexw64" CACHE INTERNAL "mex extension")
 endif()
 
 

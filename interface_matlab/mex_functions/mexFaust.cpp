@@ -1,7 +1,7 @@
 #include "mex.h"
 #include "class_handle.hpp"
 #include "faust_core.h"
-#include "mexFaustMat.h"
+#include "tools_mex.h"
 #include "faust_mat.h"
 
 

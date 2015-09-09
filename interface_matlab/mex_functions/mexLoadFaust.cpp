@@ -8,7 +8,7 @@
 #include "faust_core.h"
 #include "faust_constant.h"
 
-#include "mexFaustMat.h"
+#include "tools_mex.h"
 
 #include "class_handle.hpp"
 

@@ -1,4 +1,4 @@
-#include "mexFaustMat.h"
+#include "tools_mex.h"
 #include "faust_constraint_real.h"
 #include "faust_constraint_mat.h"
 #include "faust_constraint_int.h"
@@ -12,7 +12,7 @@ void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
     nbRow = (int) dimsMat[0];
     nbCol = (int) dimsMat[1];
     if ((nbRow == 0) || (nbCol == 0))
-        mexErrMsgIdAndTxt("mexFaustMat.h:getFaustMat", "empty matrix");
+        mexErrMsgIdAndTxt("tools_mex.h:getFaustMat", "empty matrix");
     if (mxIsSparse(Mat_array))
     {	
         //mexErrMsgTxt("sparse matrix entry instead of dense matrix");
@@ -63,7 +63,7 @@ void getFaustspMat(const mxArray* spMat_array,faust_spmat & S)
 {	
 	if (!mxIsSparse(spMat_array))
 	{
-		mexErrMsgIdAndTxt("mexFaustMat.h:getFaustspMat",
+		mexErrMsgIdAndTxt("tools_mex.h:getFaustspMat",
            "input array must be sparse");
 	}		
 	int nnzMax = mxGetNzmax(spMat_array);
@@ -205,13 +205,13 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
 	
     nb_params = mxGetNumberOfElements(mxCons);
 	if (!mxIsCell(mxCons))
-		mexErrMsgTxt("mexFaustMat.h : getConstraint : constraint must be a cell-array. ");
+		mexErrMsgTxt("tools_mex.h : getConstraint : constraint must be a cell-array. ");
 	if (nb_params != 4)
-		mexErrMsgTxt("mexFaustMat.h : getConstraint : size of constraint must be equal to 4. ");
+		mexErrMsgTxt("tools_mex.h : getConstraint : size of constraint must be equal to 4. ");
 	
     mxConsParams=mxGetCell(mxCons,0);
 	if (!mxIsChar(mxConsParams))
-		mexErrMsgTxt("mexFaustMat.h : getConstraint : constraint first cell of the constraint must be a character  ");
+		mexErrMsgTxt("tools_mex.h : getConstraint : constraint first cell of the constraint must be a character  ");
     bufCharLen = mxGetNumberOfElements(mxConsParams)+1;
     consName = (char *) mxCalloc(bufCharLen,sizeof(char));
     status = mxGetString(mxConsParams,consName,bufCharLen);

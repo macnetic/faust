@@ -1,18 +1,18 @@
-#include <mex.h>
-//#include <mexutils.h>
-#include <hierarchical_fact.h>
-#include <faust_mat.h>
-#include <faust_constraint_int.h>
-#include <faust_constraint_generic.h>
-#include <faust_constraint_real.h>
-#include <faust_constraint_mat.h>
+#include "mex.h"
+//#include "mexutils.h"
+#include "hierarchical_fact.h"
+#include "faust_mat.h"
+#include "faust_constraint_int.h"
+#include "faust_constraint_generic.h"
+#include "faust_constraint_real.h"
+#include "faust_constraint_mat.h"
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <faust_params_palm.h>
-#include <faust_constant.h>
+#include "faust_params_palm.h"
+#include "faust_constant.h"
 
-#include <mexFaustMat.h>
+#include "tools_mex.h"
 
 
 void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFields);
