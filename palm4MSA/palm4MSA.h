@@ -38,7 +38,7 @@ class palm4MSA
 
       void init_fact(int nb_facts_);      
       void next_step();
-      bool do_continue(){bool cont=stop_crit.do_continue(++ind_ite); if(!cont){ind_ite=-1;isConstraintSet=false;}return cont;} // CAUTION! pre-increment of ind_ite: the value in stop_crit.do_continue is ind_ite+1, not ind_ite
+      bool do_continue(){bool cont=stop_crit.do_continue(++ind_ite); if(!cont){ind_ite=-1;isConstraintSet=false;}return cont;} // CAUTION !!! pre-increment of ind_ite: the value in stop_crit.do_continue is ind_ite+1, not ind_ite
       //bool do_continue()const{return stop_crit.do_continue(++ind_ite, error);};
       
       void init_fact_from_palm(const palm4MSA& palm, bool isFactSideLeft);

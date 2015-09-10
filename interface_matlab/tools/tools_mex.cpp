@@ -161,7 +161,7 @@ void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat> facts)
 		mexErrMsgTxt("mexFaustMat : setCellFacts : faust_real type must be equal to double or float");
 	}
     
-    for (size_t k = 0; k < (unsigned int)nb_fact; k++)
+    for (size_t k = 0; k < nb_fact; k++)
     {	
         mat = facts[k];
         rowFact = mat.getNbRow();

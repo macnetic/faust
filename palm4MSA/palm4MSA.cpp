@@ -10,6 +10,7 @@
 #include "faust_mat.h"
 #include "LinAlgebra.h"
 #include "prox.h"
+#include "faust_constraint_type.h"
 
 #ifdef __COMPILE_TIMERS__
 #include "faust_timer.h"
@@ -93,7 +94,6 @@ void palm4MSA::compute_facts()
 		//cout<<"lambda before : "<<lambda<<endl;
 		compute_last_update();
 		//cout<<"final lambda : "<<lambda<<endl;
-		
 	}
 }
 
@@ -109,11 +109,10 @@ t_local_compute_projection.start();
 		#ifdef __COMPILE_TIMERS__
 			nb_call_prox_const++;
 			t_prox_const.start();
-			
 		#endif
-         const faust_constraint_mat* const_mat = dynamic_cast<const faust_constraint_mat*>(const_vec[ind_fact]);
+         constraint_type_const* const_mat = dynamic_cast<constraint_type_const*>(const_vec[ind_fact]);
          S[ind_fact] = const_mat->getParameter();
-		 #ifdef __COMPILE_TIMERS__
+		#ifdef __COMPILE_TIMERS__
 			t_prox_const.stop();
 		#endif
    }
@@ -125,24 +124,18 @@ t_local_compute_projection.start();
       {
          case CONSTRAINT_NAME_SP:
          {	
-			#ifdef __COMPILE_TIMERS__
-				nb_call_prox_sp++;
-				t_prox_sp.start();
-			#endif
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-			if (isLambdaComputed)
-			{
-				prox_sp(S[ind_fact], const_int->getParameter());
-			}
-			else
-			{	
-				prox_sp_normfree(S[ind_fact], const_int->getParameter());
-			}
-			#ifdef __COMPILE_TIMERS__
-			t_prox_sp.stop();
-			#endif
-			
-			
+		#ifdef __COMPILE_TIMERS__
+			nb_call_prox_sp++;
+			t_prox_sp.start();
+		#endif
+		constraint_type_sp* constr_cast = dynamic_cast<constraint_type_sp*>(const_vec[ind_fact]);
+		if (isLambdaComputed)
+			prox_sp(S[ind_fact], constr_cast->getParameter());
+		else
+			prox_sp_normfree(S[ind_fact], constr_cast->getParameter());
+		#ifdef __COMPILE_TIMERS__
+		t_prox_sp.stop();
+		#endif
          }
          break;
 
@@ -151,16 +144,12 @@ t_local_compute_projection.start();
 			#ifdef __COMPILE_TIMERS__
 				nb_call_prox_spcol++;
 				t_prox_spcol.start();
-				
 			#endif
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
+			constraint_type_spcol* constr_cast = dynamic_cast<constraint_type_spcol*>(const_vec[ind_fact]);
 			if (isLambdaComputed)
-			{
-            prox_spcol(S[ind_fact], const_int->getParameter());
-			}else
-			{
-				prox_spcol_normfree(S[ind_fact], const_int->getParameter());	
-			}
+			prox_spcol(S[ind_fact], constr_cast->getParameter());
+			else
+				prox_spcol_normfree(S[ind_fact], constr_cast->getParameter());	
 			#ifdef __COMPILE_TIMERS__
 				t_prox_spcol.stop();
 			#endif
@@ -169,26 +158,19 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_SPLIN:
          {	
-
-			
-
 			#ifdef __COMPILE_TIMERS__
 			nb_call_prox_splin++;
 			t_prox_splin.start();
 			#endif
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
+			constraint_type_splin* constr_cast = dynamic_cast<constraint_type_splin*>(const_vec[ind_fact]);
 
 			if (isLambdaComputed)
-			{
-				prox_splin(S[ind_fact], const_int->getParameter());
-			}else
-			{
-				prox_splin_normfree(S[ind_fact], const_int->getParameter());
-			}
+				prox_splin(S[ind_fact], constr_cast->getParameter());
+			else
+				prox_splin_normfree(S[ind_fact], constr_cast->getParameter());
 			#ifdef __COMPILE_TIMERS__
 				t_prox_splin.stop();
 			#endif
-			
          }
          break;
 
@@ -198,8 +180,8 @@ t_local_compute_projection.start();
 				nb_call_prox_normcol++;
 				t_prox_normcol.start();
 			#endif
-            const faust_constraint_real* const_real = dynamic_cast<const faust_constraint_real*>(const_vec[ind_fact]);
-            prox_normcol(S[ind_fact], const_real->getParameter());
+			constraint_type_normcol* constr_cast = dynamic_cast<constraint_type_normcol*>(const_vec[ind_fact]);
+			prox_normcol(S[ind_fact], constr_cast->getParameter());
 			#ifdef __COMPILE_TIMERS__
 				t_prox_normcol.stop();
 			#endif
@@ -208,63 +190,66 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_SPLINCOL:
          {	
-
-            const faust_constraint_real* const_real = dynamic_cast<const faust_constraint_real*>(const_vec[ind_fact]);
-            //prox_splincol(S[ind_fact], const_real->getParameter());
-
+		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
+		exit(EXIT_FAILURE);
+		//constraint_type_splincol* constr_cast = dynamic_cast<constraint_type_splincol*>(const_vec[ind_fact]);
+		//prox_splincol(S[ind_fact], constr_cast->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_L0PEN:
          {	
-
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_l0pen(S[ind_fact], sqrt(2*const_int->getParameter()/c));
-
+		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
+		exit(EXIT_FAILURE);
+		//constraint_type_l0pen* constr_cast = dynamic_cast<constraint_type_l0pen*>(const_vec[ind_fact]);
+		//prox_l0pen(S[ind_fact], sqrt(2*constr_cast->getParameter()/c));
          }
          break;
 
          case CONSTRAINT_NAME_L1PEN:
          {	
-
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_l1pen(S[ind_fact], const_int->getParameter()/c);
+		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
+		exit(EXIT_FAILURE);
+            //constraint_type_l1pen* constr_cast = dynamic_cast<constraint_type_l1pen*>(const_vec[ind_fact]);
+            //prox_l1pen(S[ind_fact], constr_cast->getParameter()/c);
 
          }
          break;
 
          case CONSTRAINT_NAME_WAV:
          {
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_wav(S[ind_fact], const_int->getParameter());
+		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
+		exit(EXIT_FAILURE);
+		//constraint_type_wav* constr_cast = dynamic_cast<constraint_type_wav*>(const_vec[ind_fact]);
+		//prox_wav(S[ind_fact], constr_cast->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_SP_POS:
          {
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-			if (isLambdaComputed)
-			{
-				prox_sp_pos(S[ind_fact], const_int->getParameter());
-			}
-			else
-			{	
-				prox_sp_pos_normfree(S[ind_fact], const_int->getParameter());
-			}
+		constraint_type_sp_pos* constr_cast = dynamic_cast<constraint_type_sp_pos*>(const_vec[ind_fact]);
+		if (isLambdaComputed)
+			prox_sp_pos(S[ind_fact], constr_cast->getParameter());
+		else
+			prox_sp_pos_normfree(S[ind_fact], constr_cast->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_BLKDIAG:
          {
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_sp(S[ind_fact], const_int->getParameter());
+		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
+		exit(EXIT_FAILURE);
+            //constraint_type_blkdiag* constr_cast = dynamic_cast<constraint_type_blkdiag*>(const_vec[ind_fact]);
+            //prox_sp(S[ind_fact], constr_cast->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_SPLIN_TEST:
          {
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_sp(S[ind_fact], const_int->getParameter());
+		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
+		exit(EXIT_FAILURE);
+            //constraint_type_splin_test* constr_cast = dynamic_cast<constraint_type_splin_test*>(const_vec[ind_fact]);
+            //prox_sp(S[ind_fact], constr_cast->getParameter());
          }
          break;
 
@@ -274,27 +259,28 @@ t_local_compute_projection.start();
 			S[ind_fact].Display();
 			cout<<"NAME SUPP PROX"<<endl;*/
 			
-            const faust_constraint_mat* const_mat = dynamic_cast<const faust_constraint_mat*>(const_vec[ind_fact]);
-			faust_mat A=const_mat->getParameter();
+            constraint_type_supp* constr_cast = dynamic_cast<constraint_type_supp*>(const_vec[ind_fact]);
+			faust_mat A(constr_cast->getParameter());
 			A.Display();
-            prox_supp(S[ind_fact],(faust_mat)  const_mat->getParameter());
+            prox_supp(S[ind_fact],(faust_mat)  constr_cast->getParameter());
 			/*cout<<"S[ind_fact]"<<endl;
 			S[ind_fact].Display();*/
-
          }
          break;
 
          case CONSTRAINT_NAME_NORMLIN:
          {
-            const faust_constraint_real* const_real = dynamic_cast<const faust_constraint_real*>(const_vec[ind_fact]);
-            prox_normlin(S[ind_fact], const_real->getParameter());
+            constraint_type_normlin* constr_cast = dynamic_cast<constraint_type_normlin*>(const_vec[ind_fact]);
+            prox_normlin(S[ind_fact], constr_cast->getParameter());
          }
          break;
 
          case CONSTRAINT_NAME_TOEPLITZ:
          {
-            const faust_constraint_int* const_int = dynamic_cast<const faust_constraint_int*>(const_vec[ind_fact]);
-            //prox_sp(S[ind_fact], const_int->getParameter());
+		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
+		exit(EXIT_FAILURE);
+            //constraint_type_toeplitz* constr_cast = dynamic_cast<constraint_type_toeplitz*>(const_vec[ind_fact]);
+            //prox_sp(S[ind_fact], 	const_int->getParameter());
          }
          break;
 

@@ -34,7 +34,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("2 inputs are expected.");
 
 
-		int nbRow,nbCol;
 		if(!mxIsCell(prhs[1]))
 			mexErrMsgTxt("input must be a cell-array");
 
@@ -162,8 +161,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexErrMsgTxt("Multiply: Wrong number of dimensions for the input vector or matrix (third argument).");
         
              
-        void* ptr_data_void = mxGetData(prhs[2]);
-        faust_real* ptr_data;
+        faust_real* ptr_data = NULL;
        
 	const mxClassID V_CLASS_ID = mxGetClassID(prhs[2]);
 	const size_t NB_ELEMENTS = mxGetNumberOfElements(prhs[2]);
@@ -171,70 +169,70 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         {
             double* ptr_data_tmp = static_cast<double*> (mxGetData(prhs[2]));
             ptr_data = new faust_real[NB_ELEMENTS];
-            for (int i =0 ; i<NB_ELEMENTS ; i++)
+            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
         else if(V_CLASS_ID == mxSINGLE_CLASS)
 	{
             float* ptr_data_tmp = static_cast<float*> (mxGetData(prhs[2]));
             ptr_data = new faust_real[NB_ELEMENTS];
-            for (int i =0 ; i<NB_ELEMENTS ; i++)
+            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
         else if(V_CLASS_ID == mxINT8_CLASS)
 	{
             char* ptr_data_tmp = static_cast<char*> (mxGetData(prhs[2]));
             ptr_data = new faust_real[NB_ELEMENTS];
-            for (int i =0 ; i<NB_ELEMENTS ; i++)
+            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
         else if(V_CLASS_ID == mxUINT8_CLASS)
 	{
             unsigned char* ptr_data_tmp = static_cast<unsigned char*> (mxGetData(prhs[2]));
             ptr_data = new faust_real[NB_ELEMENTS];
-            for (int i =0 ; i<NB_ELEMENTS ; i++)
+            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
         else if(V_CLASS_ID == mxINT16_CLASS)
 	{
             short* ptr_data_tmp = static_cast<short*> (mxGetData(prhs[2]));
             ptr_data = new faust_real[NB_ELEMENTS];
-            for (int i =0 ; i<NB_ELEMENTS ; i++)
+            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
         else if (V_CLASS_ID == mxUINT16_CLASS)
 	{
             unsigned short* ptr_data_tmp = static_cast<unsigned short*> (mxGetData(prhs[2]));
             ptr_data = new faust_real[NB_ELEMENTS];
-            for (int i =0 ; i<NB_ELEMENTS ; i++)
+            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
         else if (V_CLASS_ID == mxINT32_CLASS)
 	{
             int* ptr_data_tmp = static_cast<int*> (mxGetData(prhs[2]));
             ptr_data = new faust_real[NB_ELEMENTS];
-            for (int i =0 ; i<NB_ELEMENTS ; i++)
+            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
         else if (V_CLASS_ID == mxUINT32_CLASS)
 	{
             unsigned int* ptr_data_tmp = static_cast<unsigned int*> (mxGetData(prhs[2]));
             ptr_data = new faust_real[NB_ELEMENTS];
-            for (int i =0 ; i<NB_ELEMENTS ; i++)
+            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
         else if (V_CLASS_ID == mxINT64_CLASS)
 	{
             long long* ptr_data_tmp = static_cast<long long*> (mxGetData(prhs[2]));
             ptr_data = new faust_real[NB_ELEMENTS];
-            for (int i =0 ; i<NB_ELEMENTS ; i++)
+            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
         else if (V_CLASS_ID == mxUINT64_CLASS)
 	{
             unsigned long long* ptr_data_tmp = static_cast<unsigned long long*> (mxGetData(prhs[2]));
             ptr_data = new faust_real[NB_ELEMENTS];
-            for (int i =0 ; i<NB_ELEMENTS ; i++)
+            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
                 ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
 	}
 	else
@@ -277,8 +275,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		faust_real* ptr_out = static_cast<faust_real*> (mxGetData(plhs[0]));
 		memcpy(ptr_out, B.getData(), SIZE_B1*SIZE_B2*sizeof(faust_real));
 	}
-        
-	delete [] ptr_data ; ptr_data = NULL;
+	if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
         
        
         return;

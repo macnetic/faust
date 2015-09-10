@@ -1,20 +1,25 @@
 #ifndef __FAUST_CONSTRAINT_TYPE__
 #define __FAUST_CONSTRAINT_TYPE__
 
-typedef const    int     CONSTRAINT_TYPE_SP;
-typedef const    int     CONSTRAINT_TYPE_SPCOL;
-typedef const    int     CONSTRAINT_TYPE_SPLIN;
-typedef const faust_real CONSTRAINT_TYPE_NORMCOL;
-typedef const    int CONSTRAINT_TYPE_SPLINCOL;
-typedef const    int     CONSTRAINT_TYPE_L0PEN;
-typedef const    int     CONSTRAINT_TYPE_L1PEN;
-typedef const faust_mat  CONSTRAINT_TYPE_CONST;
-typedef const    int     CONSTRAINT_TYPE_WAV;
-typedef const    int     CONSTRAINT_TYPE_SP_POS;
-typedef const    int     CONSTRAINT_TYPE_BLKDIAG;
-typedef const    int     CONSTRAINT_TYPE_SPLIN_TEST;
-typedef const faust_mat  CONSTRAINT_TYPE_SUPP;
-typedef const faust_real CONSTRAINT_TYPE_NORMLIN;
-typedef const    int     CONSTRAINT_TYPE_TOEPLITZ;
+class faust_constraint_int;
+class faust_constraint_real;
+class faust_constraint_mat;
+
+
+typedef const  faust_constraint_int   constraint_type_sp;
+typedef const  faust_constraint_int   constraint_type_spcol;
+typedef const  faust_constraint_int   constraint_type_splin;
+typedef const  faust_constraint_real  constraint_type_normcol;
+typedef const  faust_constraint_int   constraint_type_splincol;
+typedef const  faust_constraint_int   constraint_type_l0pen;
+typedef const  faust_constraint_int   constraint_type_l1pen;
+typedef const  faust_constraint_mat   constraint_type_const;
+typedef const  faust_constraint_int   constraint_type_wav;
+typedef const  faust_constraint_int   constraint_type_sp_pos;
+typedef const  faust_constraint_int   constraint_type_blkdiag;
+typedef const  faust_constraint_int   constraint_type_splin_test;
+typedef const  faust_constraint_mat   constraint_type_supp;
+typedef const  faust_constraint_real  constraint_type_normlin;
+typedef const  faust_constraint_int   constraint_type_toeplitz;
 
 #endif

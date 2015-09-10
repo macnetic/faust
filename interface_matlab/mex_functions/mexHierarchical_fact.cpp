@@ -102,7 +102,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexPrintf("\n cons has %d rows \n",nbRowCons);
             mexErrMsgTxt("cons must have 2 rows");
         }
-        if(nbColCons != (mwSize)(nb_fact-1))
+        if(nbColCons != (nb_fact-1))
         {
             mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
             mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");

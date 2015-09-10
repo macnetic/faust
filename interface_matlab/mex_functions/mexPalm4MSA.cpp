@@ -110,7 +110,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexPrintf("\n cons has %d rows \n",nbRowCons);
             mexErrMsgTxt("cons must have 1 rows");
         }
-        if(nbColCons != (mwSize)(nb_fact))
+        if(nbColCons != (nb_fact))
         {
             mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
             mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
@@ -150,7 +150,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {   
          mxCurrentField = mxGetField(prhs[0],0,"init_facts");
 		setVectorFaustMat(init_facts,mxCurrentField);
-		if (init_facts.size() != (unsigned int) nb_fact)
+		if (init_facts.size() != nb_fact)
 		{
 			mexErrMsgTxt("conflicts between init_facts and nb_facts");
 		}
