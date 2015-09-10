@@ -69,7 +69,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     
    //nb_fact initialisation
-   int nb_fact; 
+   int nb_fact = -1; 
    if (presentFields[1])
    {    
         
@@ -102,19 +102,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexPrintf("\n cons has %d rows \n",nbRowCons);
             mexErrMsgTxt("cons must have 2 rows");
         }
-        if(nbColCons != (nb_fact-1))
+        if(nbColCons != (mwSize)(nb_fact-1))
         {
             mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
             mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
         }
         mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
-        faust_constraint_generic * consToAdd;
+        //faust_constraint_generic * consToAdd;
         std::vector<const faust_constraint_generic*> consS;
         
-        for (int i=0;i<nbRowCons;i++)
+        for (mwSize i=0;i<nbRowCons;i++)
         {
             mexPrintf("%d / %d\n",i,nbRowCons);
-            for (int j=0;j<nbColCons;j++)
+            for (mwSize j=0;j<nbColCons;j++)
             {
                 mexPrintf("cons(%d , %d)\n",i,j);
                 mxCurrentCons=mxGetCell(mxCurrentField,i+(j*nbRowCons));

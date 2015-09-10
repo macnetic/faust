@@ -19,6 +19,26 @@ macro(add_library_path LIB_TMP_PATH)
 endmacro()
 
 
+macro(add_include_path INC_TMP_PATH)
+	if(${ARGC} LESS 2)
+		message(FATAL_ERROR "ARGC=${ARGC} : Wrong number of arguments in add_include_path macro")
+	endif()
+	set(list_var "${ARGN}")
+	foreach(loop_var IN LISTS list_var)
+		if(EXISTS "${loop_var}")
+			if(EXISTS "${loop_var}/include")
+				set(${INC_TMP_PATH} ${${INC_TMP_PATH}} "${loop_var}/include" )
+			elseif(EXISTS "${loop_var}/inc")
+				set(${INC_TMP_PATH} ${${INC_TMP_PATH}} "${loop_var}/inc" )
+			else()
+				set(${INC_TMP_PATH} ${${INC_TMP_PATH}} ${loop_var} )
+			endif()
+		else()
+			message(STATUS "${loop_var} directory has been ignored, as it does not exist")
+		endif()
+	endforeach()
+endmacro()
+
 
 
 

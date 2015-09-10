@@ -132,7 +132,7 @@ mxArray*  FaustMat2mxArray(faust_mat M)
 			mxSetPr(mxMat, mat_ptr_bis);
 		}		
         
-		mxArray * rhs[1];
+		//mxArray * rhs[1];
 		//rhs[0]=mxMat;
         //mexCallMATLAB(0,NULL,1,rhs, "disp");
 		return mxMat;
@@ -161,7 +161,7 @@ void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat> facts)
 		mexErrMsgTxt("mexFaustMat : setCellFacts : faust_real type must be equal to double or float");
 	}
     
-    for (size_t k = 0; k < nb_fact; k++)
+    for (size_t k = 0; k < (unsigned int)nb_fact; k++)
     {	
         mat = facts[k];
         rowFact = mat.getNbRow();
@@ -186,7 +186,7 @@ void setVectorFaustMat(std::vector<faust_mat> &vecMat,mxArray *Cells)
 	mwSize nb_fact = mxGetNumberOfElements (Cells);
 	faust_mat mat;
 	vecMat.resize(0);
-	for (int i=0;i<nb_fact;i++)
+	for (mwSize i=0;i<nb_fact;i++)
 	{
 		mxMat=mxGetCell(Cells,i);
 		getFaustMat(mxMat,mat);
@@ -215,6 +215,8 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
     bufCharLen = mxGetNumberOfElements(mxConsParams)+1;
     consName = (char *) mxCalloc(bufCharLen,sizeof(char));
     status = mxGetString(mxConsParams,consName,bufCharLen);
+    if(status)
+        mexErrMsgTxt("tools_mex.h : getConstraint : problem in mxGetString");
     paramCons = mxGetScalar(mxConsParams);
     mxConsParams=mxGetCell(mxCons,2);
     nbRowCons   = (int) mxGetScalar(mxConsParams);
@@ -428,9 +430,9 @@ void DisplayParams(const faust_params & params)
     
     mexPrintf("NB_FACTS : %d\n",params.nb_fact);
     mexPrintf("CONSTRAINTS : nbr %d\n",params.cons[0].size());
-    for (int L=0;L<params.cons[0].size();L++)
+    for (unsigned int L=0;L<params.cons[0].size();L++)
 	{
-		for (int jl=0;jl<params.cons.size();jl++)
+		for (unsigned int jl=0;jl<params.cons.size();jl++)
 		{	
 			//char * type_cons =  getType((*params.cons[jl][L]).get_constraint_name());
             char * type_cons =  (*params.cons[jl][L]).getType();

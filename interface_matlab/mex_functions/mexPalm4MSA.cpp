@@ -76,7 +76,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     
    //nb_fact initialisation
-   int nb_fact; 
+   int nb_fact=0; 
    if (presentFields[1])
    {    
         
@@ -110,17 +110,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexPrintf("\n cons has %d rows \n",nbRowCons);
             mexErrMsgTxt("cons must have 1 rows");
         }
-        if(nbColCons != (nb_fact))
+        if(nbColCons != (mwSize)(nb_fact))
         {
             mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
             mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
         }
         mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
-        faust_constraint_generic * consToAdd;
+        //faust_constraint_generic * consToAdd;
         
         
         
-            for (int j=0;j<nbColCons;j++)
+            for (mwSize j=0;j<nbColCons;j++)
             {
                 mexPrintf("cons(%d)\n",j);
                 mxCurrentCons=mxGetCell(mxCurrentField,j);
@@ -150,7 +150,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {   
          mxCurrentField = mxGetField(prhs[0],0,"init_facts");
 		setVectorFaustMat(init_facts,mxCurrentField);
-		if (init_facts.size() != nb_fact)
+		if (init_facts.size() != (unsigned int) nb_fact)
 		{
 			mexErrMsgTxt("conflicts between init_facts and nb_facts");
 		}

@@ -48,7 +48,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mexErrMsgTxt("mexLoadFaust must have 1 input.");
 
 
-	int nbRow,nbCol;
+	//int nbRow,nbCol;
 	if(!mxIsCell(prhs[0]))
     {
         mexErrMsgTxt("input must be a cell-array");
@@ -61,7 +61,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     else 
 	{
 			mxArray * mxMat;	
-			for (int i=0;i<nb_element;i++)
+			for (mwSize i=0;i<nb_element;i++)
 			{	
 				mxMat=mxGetCell(prhs[0],i);
 				addSpmat(mxMat,vec_spmat);

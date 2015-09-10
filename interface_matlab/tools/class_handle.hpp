@@ -16,9 +16,9 @@ public:
     base *ptr() { return ptr_m; }
 
 private:
-    uint32_t signature_m;
-    std::string name_m;
     base *ptr_m;
+    std::string name_m;
+    uint32_t signature_m;
 };
 
 template<class base> inline mxArray *convertPtr2Mat(base *ptr)

@@ -1,5 +1,0 @@
-file(GLOB CPP_FILES "*.cpp")
-include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${MATLAB_INCLUDE_DIR})
-add_library(${FAUST_MEXTOOLS_TARGET} SHARED ${CPP_FILES})
-
-
