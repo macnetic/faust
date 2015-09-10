@@ -121,7 +121,8 @@ void write_into_file(const char* filename);
   
   // scalarMultiply (*this) = (*this) * lambda
   void scalarMultiply(faust_real const lambda);
-  
+  // (*this)(i,j)=((*this)(i,j)) * A(i,j)	
+  void scalarMultiply(faust_mat const& A);
   // (*this) = (*this) + A
   void add(faust_mat const& A);
 
@@ -144,6 +145,7 @@ void write_into_file(const char* filename);
   void operator+=(faust_mat const& A){add(A);}
 
   void operator*=(faust_mat const& A){multiplyRight(A);}
+  
 
   void operator*=(faust_real lambda){scalarMultiply(lambda);}
   void operator/=(faust_real lambda){scalarMultiply(1.0/lambda);}

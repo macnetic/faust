@@ -6,6 +6,7 @@ INIT_MATLAB = $(FAUST_ROOT_DIR)/trunk/devcpp/init_from_matlab
 FAUST_CORE = $(FAUST_ROOT_DIR)/trunk/devcpp/faust_core
 MATLAB_INTERFACE_TOOLS_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/interface_matlab/tools
 MATLAB_INTERFACE_MEX_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/interface_matlab/mex_functions
+ERROR_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/exception
 
 
 
@@ -13,6 +14,7 @@ SRC_CPP = $(wildcard $(PALM_DIR)/*.cpp)
 SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 SRC_CPP += $(wildcard $(FAUST_CORE)/*.cpp)
 SRC_CPP += $(wildcard $(MATLAB_INTERFACE_TOOLS_DIR)/*.cpp)
+SRC_CPP += $(wildcard $(ERROR_DIR)/*.cpp)
 
 OBJS_MEX_BASE := $(filter-out $(MATRIX_DIR)/faust_timer.o.mex,$(patsubst %.cpp,%.o.mex,$(SRC_CPP)))
 OBJS_MEX_BASE := $(filter-out $(PALM_DIR)/sparse_hierarchical_fact.o.mex,$(OBJS_MEX_BASE))
@@ -23,7 +25,7 @@ OBJS_MEX3 := $(OBJS_MEX_BASE) $(MATLAB_INTERFACE_MEX_DIR)/mexPalm4MSA.o.mex
 OBJS_MEX4 := $(OBJS_MEX_BASE) $(MATLAB_INTERFACE_MEX_DIR)/faust_mex.o.mex
 
 
-CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR)  -DPROX=2   -I$(FAUST_CORE)  -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_TOOLS_DIR) -I$(MATLAB_INTERFACE_MEX_DIR) #-DMX_COMPAT_32
+CXXFLAGS = -O2  -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR)  -DPROX=2   -I$(FAUST_CORE)  -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_TOOLS_DIR) -I$(MATLAB_INTERFACE_MEX_DIR) -I$(ERROR_DIR) -DCOMPILE_MEX #-DMX_COMPAT_32
 
 
 
@@ -34,7 +36,7 @@ ifneq ($(COMPILATION_THOMAS),)
   # CXXFLAGS += -D__PAS_FIXE__ 
   # CXXFLAGS += -D__COMPILE_TIMERS__
 else
-   CXXFLAGS += -DFAUST_SINGLE  
+   #CXXFLAGS += -DFAUST_SINGLE  
    CXXFLAGS += -I$(OPENBLASDIR)/include 
    CXXFLAGS += -D__GEMM_WITH_OPENBLAS__ -I$(OPENBLASDIR) 
    CXXFLAGS +=-std=c++0x  

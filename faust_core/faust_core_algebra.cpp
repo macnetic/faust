@@ -8,6 +8,7 @@
 
 #include "faust_spmat.h"
 #include "faust_core.h"
+#include "faust_exception.h"
 
 	//////////FONCTION faust_mat - faust_mat ////////////////////
 
@@ -35,20 +36,13 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 	 
 	 if (nbr_iter_max <= 0)
 	 {
-		std::cerr << "ERROR LinAlgebra.h  power_iteration : nbr_iter_max <= 0" << std::endl; 
-        exit( EXIT_FAILURE);
+		ErrorDisplay(" Faust_core_algebra : power_iteration :  nbr_iter_max <= 0");
 	 }
 	 if (nb_col != nb_row)
 	 {
-		std::cerr << "ERROR LinAlgebra.h  power_iteration : A must be square" << std::endl; 
-        exit( EXIT_FAILURE);
+		ErrorDisplay(" Faust_core_algebra : power_iteration : faust_core 1 must be a squared matrix"); 	
 	 }
 	 
-	  if (threshold <= 0)
-	 {
-		std::cerr << "ERROR LinAlgebra.h  power_iteration : threshold < 0" << std::endl; 
-        exit( EXIT_FAILURE);
-	 }
 	 
 	 faust_vec xk(nb_col);
 	 faust_vec xk_pp(nb_col);
@@ -107,8 +101,7 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 
 	if  ((&(C.mat)) == (&(B.mat))) 
 	{
-		std::cerr << "ERROR multiply : C pointe vers B" << std::endl; 
-		exit( EXIT_FAILURE);	
+		ErrorDisplay(" Faust_core_algebra : multiply : C is the same object as B"); 		
 	}
 	
 	nb_fact = A.size();
@@ -135,8 +128,7 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 		{	
 			if (nbColOpA != nbRowOpB)
 			{
-				std::cerr << "ERROR multiply :  dimension of faust_core A and faust_spmat B  mismatch"<<std::endl; 
-				exit( EXIT_FAILURE); 
+				ErrorDisplay(" Faust_core_algebra : multiply :  dimension of faust_core 1 and faust_spmat mismatch");	
 			}
 		}else
 		{
@@ -144,10 +136,13 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 		
 			if (nbColOpB != nbRowOpA)
 			{
-				std::cerr << "ERROR multiply :  dimension of faust_core A and faust_spmat B  mismatch"<<std::endl; 
-				exit( EXIT_FAILURE); 
+
+				ErrorDisplay(" Faust_core_algebra : multiply : dimension of faust_core A and faust_spmat B mismatch");		
 			}
 		}
+	}else
+	{
+		WarningDisplay(" Faust_core_algebra : multiply : empty faust_core");
 	}
 	
 	// if the faust_core A is empty, it's considere as the identity, so C = equal B, it is useful into the algorithm palm4MSA, where the faust_cores L and R can be empty	
@@ -206,6 +201,9 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 faust_vec operator*(const faust_core& f, const faust_vec& v)
 {
 	faust_vec vec(v);
+	if (f.size() == 0)
+		WarningDisplay("faust_core algebra : operator* : empty faust_core");
+	
 	for (int i=f.size()-1 ; i >= 0 ; i--)
 		vec.multiplyLeft(f.data[i]);
 	return vec;
@@ -214,6 +212,9 @@ faust_vec operator*(const faust_core& f, const faust_vec& v)
 faust_mat operator*(const faust_core& f, const faust_mat& M)
 {
 	faust_mat A(M);
+	if (f.size() == 0)
+		WarningDisplay("faust_core algebra : operator * : empty faust_core");
+	
 	for (int i=f.size()-1 ; i >= 0 ; i--)
 		A.multiplyLeft(f.data[i]);
 	return A;

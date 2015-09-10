@@ -24,6 +24,7 @@
 #include <vector>
 #define __SP setprecision(20)<<
 
+
 using namespace std;
 
 palm4MSA::palm4MSA(const faust_params& params_, const bool isGlobal_) :
@@ -268,9 +269,18 @@ t_local_compute_projection.start();
          break;
 
          case CONSTRAINT_NAME_SUPP:
-         {
+         {	
+			/*cout<<"S[ind_fact]"<<endl;
+			S[ind_fact].Display();
+			cout<<"NAME SUPP PROX"<<endl;*/
+			
             const faust_constraint_mat* const_mat = dynamic_cast<const faust_constraint_mat*>(const_vec[ind_fact]);
-            //prox_sp(S[ind_fact], const_mat->getParameter());
+			faust_mat A=const_mat->getParameter();
+			A.Display();
+            prox_supp(S[ind_fact],(faust_mat)  const_mat->getParameter());
+			/*cout<<"S[ind_fact]"<<endl;
+			S[ind_fact].Display();*/
+
          }
          break;
 

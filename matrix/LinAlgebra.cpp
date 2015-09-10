@@ -7,7 +7,7 @@
 #include <Eigen/SparseQR>
 
 #include "faust_spmat.h"
-
+#include "faust_exception.h"
 
 	//////////FONCTION faust_mat - faust_mat ////////////////////
 
@@ -28,9 +28,7 @@ A.t_multiply.start();
 
 	if (A.getNbCol() != B.getNbRow())
 	{
-		std::cerr << "ERREUR multiply : nbCol of A = " << A.getNbCol(); 
-       		std::cerr <<" while nbRow of B = " << B.getNbRow() << std::endl;
-        	exit( EXIT_FAILURE);		
+		ErrorDisplay("Linalgebra : multiply :  nbCol of A = %d while nbRow of B = %d",A.getNbCol(),B.getNbRow());		
 	}
 	 
 	if(A.isZeros || B.isZeros)
@@ -67,8 +65,7 @@ A.t_multiply.start();
 
 	if (((&(C.mat)) == (&(A.mat))) || ((&(C.mat)) == (&(B.mat))))
 	{
-		std::cerr << "ERREUR multiply : C pointe vers A ou B" << std::endl; 
-		exit( EXIT_FAILURE);	
+		ErrorDisplay("Linalgebra : multiply : C is the same object as A or B");		
 	}else
 	{
 		C.resize(A.getNbRow(),B.getNbCol());
@@ -87,9 +84,7 @@ faust_vec solve(const faust_mat & A, const faust_vec & v)
 {
 	if (A.getNbRow() != v.getDim())
 	{
-		std::cerr << "ERROR LinAlgebra  faust_vec solve(const faust_mat & A, const faust_vec & v) : " << std::endl;
-		std::cerr << "number of Row of A different from dim of v"<<std::endl;	
-		exit( EXIT_FAILURE);	
+		ErrorDisplay("Linalgebra : solve : number of row of the  dense matrix A is different from dimension of the vector v");	
 	}
 	faust_vec sol(A.getNbCol());
 	sol.Display();
@@ -103,9 +98,7 @@ void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y)
 {
 	if (A.getNbRow() != y.getDim())
 	{
-		std::cerr << "ERROR LinAlgebra  void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y) : " << std::endl;
-		std::cerr << "number of Row of A different from dim of y"<<std::endl;	
-		exit( EXIT_FAILURE);	
+		ErrorDisplay("Linalgebra : solve : number of row of the sparse matrix A is different from dimension of the vector y");	
 	}
 	x.resize(A.getNbCol());
 	Eigen::SparseQR<Eigen::SparseMatrix<faust_real>, Eigen::COLAMDOrdering<int> >   solver(A.mat);
@@ -136,14 +129,12 @@ void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real
 	
 	if   (nbColOpA != px->getDim() )
 	{
-		std::cerr << "ERROR gemv : nbCol of op(A) = "<< A.getNbRow() << " while dim of x = " << px->getDim() << std::endl;
-		exit( EXIT_FAILURE);
+		ErrorDisplay("Linalgebra : gemv : nbCol of op(A) = %d while dim of x = %d",nbColOpA,px->getDim());
 	}
 	
 	if ( (beta!=0)  &&  (y.getDim() != nbRowOpA))
 	{
-		std::cerr << "ERROR gemv : nbRow of op(A) = "<< A.getNbRow() << " while dim of y = " << y.getDim() << std::endl;
-		exit( EXIT_FAILURE);
+		ErrorDisplay("Linalgebra : gemv : nbRow of op(A) = %d while dim of y = %d",nbRowOpA,y.getDim());
 	}
 	
 	y.resize(nbRowOpA);
@@ -204,8 +195,7 @@ A.t_gemm.start();
 
 	if ( ((&(C.mat)) == (&(A.mat))) || ((&(C.mat)) == (&(B.mat))) )
 	{
-		std::cerr << "ERREUR newgemm : C pointe vers A ou B" << std::endl; 
-		exit( EXIT_FAILURE);	
+		ErrorDisplay("Linalgebra : gemm : C is the same object as A or B");	
 	}
 
 	if (typeA == 'T')
@@ -232,9 +222,7 @@ A.t_gemm.start();
 
 	if (nbColOpA != nbRowOpB)
 	{
-		std::cerr << "ERREUR gemm : nbCol of op(A) = " << nbColOpA; 
-		std::cerr <<" while nbRow of op(B) = " << nbColOpB << std::endl;
-		exit( EXIT_FAILURE);
+		ErrorDisplay("Linalgebra : gemm : nbCol of op(A) = %d while nbRow of op(B) = %d",nbColOpA,nbColOpB);
 	}
 
 
@@ -245,9 +233,9 @@ A.t_gemm.start();
 
 	if ( (beta!=0)  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
 	{
-		std::cerr << "ERREUR gemm : nbRow of op(A) = "<< A.getNbRow() << " while nbRow of C = " << C.getNbRow() << std::endl;
-		std::cerr << "or nbCol of op(B) = "<< B.getNbCol() << " while nbCol of C = " << C.getNbCol() << std::endl;
-	exit( EXIT_FAILURE);
+
+		ErrorDisplay("Linalgebra : gemm : nbRow of op(A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
+	
 	}
 		
         C.resize(nbRowOpA,nbColOpB);
@@ -443,8 +431,8 @@ A.t_add_ext.start();
 #endif
 	if ((A.getNbCol() != B.getNbCol()) || (A.getNbRow() != B.getNbRow()) || (A.getNbRow() != C.getNbRow()) || (A.getNbCol() != C.getNbCol()))
 	{
-		std::cerr << "ERREUR add : matrix dimension not equal" << std::endl; 
-        exit( EXIT_FAILURE);		
+		ErrorDisplay("Linalgebra : add : matrix dimension not equal");
+		
 	}else
 	{
 
@@ -480,20 +468,15 @@ faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_re
 	 
 	 if (nbr_iter_max <= 0)
 	 {
-		std::cerr << "ERROR LinAlgebra.h  power_iteration : nbr_iter_max <= 0" << std::endl; 
-        exit( EXIT_FAILURE);
+		ErrorDisplay("Linalgebra : power_iteration : nbr_iter_max <= 0");
 	 }
 	 if (nb_col != nb_row)
 	 {
-		std::cerr << "ERROR LinAlgebra.h  power_iteration : A must be square" << std::endl; 
-        exit( EXIT_FAILURE);
+		ErrorDisplay("Linalgebra : power_iteration : A must be square");
+        
 	 }
 	 
-	  if (threshold <= 0)
-	 {
-		std::cerr << "ERROR LinAlgebra.h  power_iteration : threshold < 0" << std::endl; 
-        exit( EXIT_FAILURE);
-	 }
+
 	 
 	 faust_vec xk(nb_col);
 	 faust_vec xk_pp(nb_col);

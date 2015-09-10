@@ -7,7 +7,7 @@ FAUST_CORE = $(FAUST_ROOT_DIR)/trunk/devcpp/faust_core
 MATLAB_INTERFACE_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/interface_matlab
 MATLAB_INTERFACE_TOOL_DIR = $(MATLAB_INTERFACE_DIR)/tools
 MATLAB_INTERFACE_MEX_DIR = $(MATLAB_INTERFACE_DIR)/mex_functions
-
+ERROR_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/exception
 
 
 SRC_CPP = $(wildcard $(PALM_DIR)/*.cpp)  #$(filter-out $(PALM_DIR)/hierarchical_fact.cpp,$(wildcard $(PALM_DIR)/*.cpp))    #$(wildcard $(PALM_DIR)/*.cpp)
@@ -16,13 +16,14 @@ SRC_CPP += $(wildcard $(MATRIX_DIR)/*.cpp)
 #ifneq ($(COMPILATION_THOMAS),)
 SRC_CPP += $(wildcard $(FAUST_CORE)/*.cpp)
 #endif
+SRC_CPP += $(wildcard $(ERROR_DIR)/*.cpp)
 OBJS := $(patsubst %.cpp,%.o,$(SRC_CPP)) 
 OBJS_MEX_COMMON := $(filter-out $(MATRIX_DIR)/faust_timer.cpp,$(patsubst %.cpp,%.o.mex,$(SRC_CPP))) $(MATLAB_INTERFACE_TOOL_DIR)/mexFaustMat.o.mex 
 
 
-CXXFLAGS = -O2 -Wall -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB)  -I$(MATIO_ROOT_DIR)/include  -DPROX=2   -I$(FAUST_CORE) #-Winline 
+CXXFLAGS = -O2 -Wall -I$(MATRIX_DIR) -I$(EIGEN_ROOT_DIR) -I$(PALM_DIR) -I$(INIT_MATLAB)  -I$(MATIO_ROOT_DIR)/include  -DPROX=2   -I$(FAUST_CORE) -I$(ERROR_DIR) #-Winline  
 
-CXXFLAGS_MEX = $(CXXFLAGS) -D_GNU_SOURCE -DMATLAB_MEX_FILE -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_MEX_DIR) -I$(MATLAB_INTERFACE_TOOL_DIR)
+CXXFLAGS_MEX = $(CXXFLAGS) -D_GNU_SOURCE -DMATLAB_MEX_FILE -DCOMPILE_MEX -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG  -I$(MATLAB_ROOT_DIR)/extern/include -I$(MATLAB_INTERFACE_MEX_DIR) -I$(MATLAB_INTERFACE_TOOL_DIR) -I$(ERROR_DIR)
 
 ifneq ($(COMPILATION_THOMAS),)
    CXXFLAGS += -DFAUST_SINGLE 
@@ -46,7 +47,7 @@ LDFLAGS_MEX = $(LDFLAGS) -pthread -Wl,--no-undefined -shared -O2 -Wl,--version-s
 ifneq ($(COMPILATION_THOMAS),)
    LDFLAGS += -lhdf5  -L$(OPENBLASDIR) -lopenblas
 else
-   LDFLAGS += -lhdf5 -L$(HDF5_ROOT_DIR)/lib -lrt -L$(OPENBLASDIR)/lib   -lopenblas
+   LDFLAGS += -L$(HDF5_ROOT_DIR)/lib -lrt -L$(OPENBLASDIR)/lib   -lopenblas  -lhdf5
 endif
 
 FONT =\033[
@@ -68,7 +69,7 @@ RESET_FONT =\033[0m
 
 MEX_EXE = $(MATLAB_INTERFACE_MEX_DIR)/mexHierarchical_fact.mexa64 $(MATLAB_INTERFACE_MEX_DIR)/mexLoadFaust.mexa64 $(MATLAB_INTERFACE_MEX_DIR)/faust_mex.mexa64
 
-EXECUTABLE=hier_fact hier_fact2 palm meg meg_new meg_old faust comptime0 comptime comptime2 $(MEX_EXE) 
+EXECUTABLE=hier_fact hier_fact2 hier_fact3 palm meg meg_new meg_old faust comptime0 comptime comptime2 $(MEX_EXE) 
 
 # instruction pour que les fichiers .o.mex ne soient pas automatiquement detruits apres les appels aux cibles all ou mex
 .PRECIOUS: %.o.mex
@@ -83,6 +84,11 @@ hier_fact: hierarchical_fact_test.o $(OBJS)
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 
 hier_fact2: hierarchical_fact_test2.o $(OBJS)
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+	
+hier_fact3: hierarchical_fact_test3.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
@@ -138,6 +144,7 @@ comptime2:$(OBJS) comp_time2.o
 
 
 %.o:%.cpp
+	@printf 'CXXFLAGS $(CXXFLAGS)'
 	@printf '$(FONT)$(CYAN)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n' 'Compiling' '     ' "$@"
 	@$(CXX) -c $(CXXFLAGS) $^ -o $@
 
@@ -148,4 +155,4 @@ comptime2:$(OBJS) comp_time2.o
 
 clean:
 	@printf '$(FONT)$(CYAN)Removing all object files and executable$(RESET_FONT)\n'
-	@rm -f $(EXECUTABLE)  $(OBJS) $(OBJS_MEX_COMMON) *.o $(MATLAB_INTERFACE_MEX_DIR)/*.o.mex $(MATLAB_INTERFACE_TOOL_DIR)/*.o.mex
+	@rm -f $(EXECUTABLE)  $(OBJS) $(OBJS_MEX_COMMON) *.o $(MATLAB_INTERFACE_MEX_DIR)/*.o.mex $(MATLAB_INTERFACE_TOOL_DIR)/*.o.mex $(ERROR_DIR)/*.o.mex

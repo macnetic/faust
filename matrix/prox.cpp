@@ -1169,7 +1169,11 @@ void prox_normcol(faust_mat & M,faust_real s)
 		for (int j=0;j<dim2)
 		{
 			memcpy(current_col.getData(),&(M.getData()[j*dim1]),dim1*sizeof(faust_real));
-			scalarMultiply = s/current_col.norm();
+			scalarMultiply = current_col.norm();
+			if (scalarMultiply ~= 0)
+			{	
+				scalarMultiply = s/scalarMultiply;
+			}
 			current_col*= scalarMultiply;
 			memcpy(&(M.getData()[j*dim1]),current_col.getData(),dim1*sizeof(faust_real));
 		}
@@ -1231,18 +1235,17 @@ void prox_supp_normfree(faust_mat & M,const faust_mat & supp)
 		std::cerr << "ERROR prox_supp : dimensions of the matrix mismatch " << std::endl;
 		exit( EXIT_FAILURE);	
 	}
-	faust_real value;
-	for (int i=0;i<M.getNbRow();i++)
+	M.scalarMultiply(supp);
+	/*for (int i=0;i<M.getNbRow();i++)
 	{
 		for (int j=0;j<M.getNbCol();j++)
 		{
-			value=supp.getCoeff(i,j);
-			if (value == 0)
+			if (supp(i,j) == 0)
 			{
 				M.setCoeff(0,i,j);
 			}
 		}
-	}
+	}*/
 }
 
 

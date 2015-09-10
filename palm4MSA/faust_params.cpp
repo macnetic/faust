@@ -5,6 +5,7 @@
 #include "faust_constraint_real.h"
 #include "faust_constraint_mat.h"
 #include <cmath>
+#include "faust_exception.h"
 
 void faust_params::check_constraint_validity()
 {
@@ -28,15 +29,17 @@ void faust_params::check_constraint_validity()
 
    if (!verifSize)
    {
-      std::cerr << "Error in faust_params::check_constraint_validity : Size incompatibility in the constraints" << std::endl;
-      exit(EXIT_FAILURE);
+      //std::cerr << "Error in faust_params::check_constraint_validity : Size incompatibility in the constraints" << std::endl;
+      //exit(EXIT_FAILURE);
+	  ErrorDisplay(" faust_params::check_constraint_validity : Size incompatibility in the constraints\n");
    }
    
    for (unsigned int i=0 ; i<cons.size() ; i++)  
       if (cons[i].size() != nb_fact-1) 
       {
-         std::cerr << "The number of constraints is in conflict with the number of factors" << std::endl;
-         exit(EXIT_FAILURE);
+         //std::cerr << "The number of constraints is in conflict with the number of factors" << std::endl;
+         //exit(EXIT_FAILURE);
+		 ErrorDisplay("faust_params::check_constraint_validity : The number of constraints is in conflict with the number of factors\n");
       }
  
 }
@@ -69,27 +72,31 @@ void faust_params::check_constraint_validity()
 {
   if (nb_fact_ <= 2)
   {
-	 std::cerr << "the number of factor is smaller than 2, use another constructor " << std::endl;
-         exit(EXIT_FAILURE);  
+	// std::cerr << "the number of factor is smaller than 2, use another constructor " << std::endl;
+    //     exit(EXIT_FAILURE); 
+	ErrorDisplay("faust_params::constructor : 	the number of factor is smaller than 2, use another constructor\n");	
   }	  
   
   if  (residuum_decrease_speed<=1)
     {
-         std::cerr << "residuum_decrease_speed must be strictly greater than  1" << std::endl;
-         exit(EXIT_FAILURE);
+         //std::cerr << "residuum_decrease_speed must be strictly greater than  1" << std::endl;
+         //exit(EXIT_FAILURE);
+		 ErrorDisplay("faust_params::constructor : residuum_decrease_speed must be strictly greater than  1\n");
     }
   	 
    
    if ((residuum_prcent<0))
    {
-        std::cerr << "residuum_percent must strictly positive" << std::endl;
-        exit(EXIT_FAILURE);
+        //std::cerr << "residuum_percent must strictly positive" << std::endl;
+        //exit(EXIT_FAILURE);
+		ErrorDisplay("faust_params::constructor : residuum_percent must strictly positive\n");
     }
 	
 	if (nb_fact != cons_.size())
    {
-        std::cerr << "nb_fact and cons_.size() are in conflict" << std::endl;
-        exit(EXIT_FAILURE);
+        //std::cerr << "nb_fact and cons_.size() are in conflict" << std::endl;
+        //exit(EXIT_FAILURE);
+		ErrorDisplay("faust_params::constructor : nb_fact and cons_.size() are in conflict\n");
     }
 	
 	std::vector<const faust_constraint_generic*> residuumS_cons;
