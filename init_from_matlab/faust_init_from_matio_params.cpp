@@ -504,28 +504,29 @@ void Display_params(faust_params & params)
 	for (int L=0;L<params.cons[0].size();L++)
 	{
 		for (int jl=0;jl<params.cons.size();jl++)
-		{	string type_cons;
-			type_cons.resize(0);
-			type_cons=getConstraintType((*params.cons[jl][L]).getConstraintType());
-			cout<<"type_cont : "<<type_cons<<" ";
+		{	//string type_cons;
+			//type_cons.resize(0);
+			//type_cons=getConstraintType((*params.cons[jl][L]).getConstraintType());
+			cout<<"type_cont : "<<params.cons[jl][L]->getType()<<" ";
 			cout<<(*params.cons[jl][L]).get_constraint_name();
 			cout<<" nb_row :"<<(*params.cons[jl][L]).getRows();
 			cout<<" nb_col :"<<(*params.cons[jl][L]).getCols();
 			
-			
-			if (strcmp(type_cons.c_str(),"INT") == 0)
+
+
+			if (params.cons[jl][L]->isConstraintParameterInt())
 			{	
 				faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[jl][L]);
 				cout<<" parameter :"<<(*const_int).getParameter()<<endl;
 			}
 			
-			if (strcmp(type_cons.c_str(),"FAUST_REAL") == 0)
+			else if (params.cons[jl][L]->isConstraintParameterReal())
 			{	
 				faust_constraint_real* const_real = (faust_constraint_real*)(params.cons[jl][L]);
 				cout<<" parameter :"<<(*const_real).getParameter()<<endl;
 			}
 			
-			if (strcmp(type_cons.c_str(),"FAUST_MAT") == 0)
+			else if (params.cons[jl][L]->isConstraintParameterMat())
 			{	
 				faust_constraint_mat* const_mat = (faust_constraint_mat*)(params.cons[jl][L]);
 				cout<<" parameter :"<<endl;

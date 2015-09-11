@@ -1,84 +1,342 @@
 #include "faust_constraint_generic.h"
+#include "faust_constraint_int.h"
+#include "faust_constraint_real.h"
+#include "faust_constraint_mat.h"
+#include "faust_constraint_type.h"
+#include <typeinfo>
 
 
-std::string getConstraintType(faust_constraint_name cons_name)  
-{
-   switch(cons_name)
-   {
-      case CONSTRAINT_NAME_SP:
-         return "INT";
-      case CONSTRAINT_NAME_SPCOL:
-         return "INT";
-      case CONSTRAINT_NAME_SPLIN:
-         return "INT";
-      case CONSTRAINT_NAME_NORMCOL:
-         return "FAUST_REAL";
-      case CONSTRAINT_NAME_SPLINCOL:
-         return "INT";
-      case CONSTRAINT_NAME_L0PEN:
-         return "INT";
-      case CONSTRAINT_NAME_L1PEN:
-         return "INT";
-      case CONSTRAINT_NAME_CONST:
-         return "FAUST_MAT";
-      case CONSTRAINT_NAME_WAV:
-         return "INT";
-      case CONSTRAINT_NAME_SP_POS:
-         return "INT";
-      case CONSTRAINT_NAME_BLKDIAG:
-         return "INT";
-      case CONSTRAINT_NAME_SPLIN_TEST:
-         return "INT";
-      case CONSTRAINT_NAME_SUPP:
-         return "FAUST_MAT";
-      case CONSTRAINT_NAME_NORMLIN:
-         return "FAUST_REAL";
-      case CONSTRAINT_NAME_TOEPLITZ:
-         return "INT";
-      default:
-         return "unknown constraint type";
-   }
-}
-
-char*  faust_constraint_generic::getType() const
+const char*  faust_constraint_generic::getType() const
 {	
-	
    switch(constraint_name)
    {
       case CONSTRAINT_NAME_SP:
-         return "INT";
+         if(typeid(constraint_type_sp)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_sp)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_sp)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_SPCOL:
-         return "INT";
+         if(typeid(constraint_type_spcol)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_spcol)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_spcol)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_SPLIN:
-         return "INT";
+         if(typeid(constraint_type_splin)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_splin)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_splin)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_NORMCOL:
-         return "FAUST_REAL";
+         if(typeid(constraint_type_normcol)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_normcol)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_normcol)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_SPLINCOL:
-         return "INT";
+         if(typeid(constraint_type_splincol)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_splincol)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_splincol)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_L0PEN:
-         return "INT";
+         if(typeid(constraint_type_l0pen)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_l0pen)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_l0pen)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_L1PEN:
-         return "INT";
+         if(typeid(constraint_type_l1pen)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_l1pen)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_l1pen)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_CONST:
-         return "FAUST_MAT";
+         if(typeid(constraint_type_const)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_const)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_const)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_WAV:
-         return "INT";
+         if(typeid(constraint_type_wav)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_wav)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_wav)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_SP_POS:
-         return "INT";
+         if(typeid(constraint_type_sp_pos)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_sp_pos)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_sp_pos)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_BLKDIAG:
-         return "INT";
+         if(typeid(constraint_type_blkdiag)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_blkdiag)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_blkdiag)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_SPLIN_TEST:
-         return "INT";
+         if(typeid(constraint_type_splin_test)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_splin_test)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_splin_test)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_SUPP:
-         return "FAUST_MAT";
+         if(typeid(constraint_type_supp)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_supp)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_supp)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_NORMLIN:
-         return "FAUST_REAL";
+         if(typeid(constraint_type_normlin)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_normlin)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_normlin)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       case CONSTRAINT_NAME_TOEPLITZ:
-         return "INT";
+         if(typeid(constraint_type_toeplitz)==typeid(faust_constraint_int))
+            return "INT";
+         else if(typeid(constraint_type_toeplitz)==typeid(faust_constraint_real))
+            return "FAUST_REAL";
+         else if(typeid(constraint_type_toeplitz)==typeid(faust_constraint_mat))
+            return "FAUST_MAT";
+         else{
+            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
+            exit(EXIT_FAILURE);}
       default:
-         return "unknown constraint type";
+         std::cerr << "Error in faust_constraint_generic::getType : unknown constraint type" << std::endl;
+         exit(EXIT_FAILURE);
    }
 }
+
+bool faust_constraint_generic::isConstraintParameterInt()const
+{
+	switch(constraint_name)
+	{
+		case CONSTRAINT_NAME_SP:
+			return (typeid(constraint_type_sp)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPCOL:
+			return (typeid(constraint_type_spcol)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPLIN:
+			return (typeid(constraint_type_splin)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_NORMCOL:
+			return (typeid(constraint_type_normcol)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPLINCOL:
+			return (typeid(constraint_type_splincol)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_L0PEN:
+			return (typeid(constraint_type_l0pen)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_L1PEN:
+			return (typeid(constraint_type_l1pen)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_CONST:
+			return (typeid(constraint_type_const)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_WAV:
+			return (typeid(constraint_type_wav)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_SP_POS:
+			return (typeid(constraint_type_sp_pos)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_BLKDIAG:
+			return (typeid(constraint_type_blkdiag)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPLIN_TEST:
+			return (typeid(constraint_type_splin_test)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_SUPP:
+			return (typeid(constraint_type_supp)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_NORMLIN:
+			return (typeid(constraint_type_normlin)==typeid(faust_constraint_int)?true:false);
+		break;
+		case CONSTRAINT_NAME_TOEPLITZ:
+			return (typeid(constraint_type_toeplitz)==typeid(faust_constraint_int)?true:false);
+		break;
+		default:
+			std::cerr << "Unknown type of constraint" << std::endl;
+			exit(EXIT_FAILURE);
+		break;
+	}
+        return false;
+}
+
+bool faust_constraint_generic::isConstraintParameterReal()const
+{
+	switch(constraint_name)
+	{
+		case CONSTRAINT_NAME_SP:
+			return (typeid(constraint_type_sp)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPCOL:
+			return (typeid(constraint_type_spcol)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPLIN:
+			return (typeid(constraint_type_splin)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_NORMCOL:
+			return (typeid(constraint_type_normcol)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPLINCOL:
+			return (typeid(constraint_type_splincol)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_L0PEN:
+			return (typeid(constraint_type_l0pen)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_L1PEN:
+			return (typeid(constraint_type_l1pen)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_CONST:
+			return (typeid(constraint_type_const)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_WAV:
+			return (typeid(constraint_type_wav)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_SP_POS:
+			return (typeid(constraint_type_sp_pos)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_BLKDIAG:
+			return (typeid(constraint_type_blkdiag)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPLIN_TEST:
+			return (typeid(constraint_type_splin_test)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_SUPP:
+			return (typeid(constraint_type_supp)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_NORMLIN:
+			return (typeid(constraint_type_normlin)==typeid(faust_constraint_real)?true:false);
+		break;
+		case CONSTRAINT_NAME_TOEPLITZ:
+			return (typeid(constraint_type_toeplitz)==typeid(faust_constraint_real)?true:false);
+		break;
+		default:
+			std::cerr << "Unknown type of constraint" << std::endl;
+			exit(EXIT_FAILURE);
+		break;
+	}
+        return false;
+}
+
+bool faust_constraint_generic::isConstraintParameterMat()const
+{
+	switch(constraint_name)
+	{
+		case CONSTRAINT_NAME_SP:
+			return (typeid(constraint_type_sp)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPCOL:
+			return (typeid(constraint_type_spcol)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPLIN:
+			return (typeid(constraint_type_splin)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_NORMCOL:
+			return (typeid(constraint_type_normcol)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPLINCOL:
+			return (typeid(constraint_type_splincol)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_L0PEN:
+			return (typeid(constraint_type_l0pen)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_L1PEN:
+			return (typeid(constraint_type_l1pen)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_CONST:
+			return (typeid(constraint_type_const)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_WAV:
+			return (typeid(constraint_type_wav)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_SP_POS:
+			return (typeid(constraint_type_sp_pos)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_BLKDIAG:
+			return (typeid(constraint_type_blkdiag)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_SPLIN_TEST:
+			return (typeid(constraint_type_splin_test)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_SUPP:
+			return (typeid(constraint_type_supp)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_NORMLIN:
+			return (typeid(constraint_type_normlin)==typeid(faust_constraint_mat)?true:false);
+		break;
+		case CONSTRAINT_NAME_TOEPLITZ:
+			return (typeid(constraint_type_toeplitz)==typeid(faust_constraint_mat)?true:false);
+		break;
+		default:
+			std::cerr << "Unknown type of constraint" << std::endl;
+			exit(EXIT_FAILURE);
+		break;
+	}
+        return false;
+}
+
 
 
 

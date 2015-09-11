@@ -243,51 +243,41 @@ void faust_params::Display() const
 	{
 		
 		if (jl == 0)
-		{
 			if (isFactSideLeft)
-			{
 				std::cout<<"  RESIDUUMS : "<<std::endl; 
-			}else
-			{
+			else
 				std::cout<<"  FACTORS : "<<std::endl; 
-			}		
-		}else
-		{
+		else
 			if (isFactSideLeft)
-			{	
 				std::cout<<"  FACTORS : "<<std::endl; 
-				
-			}else
-			{
+			else
 				std::cout<<"  RESIDUUMS : "<<std::endl; 
-			}		
 			
-		}		
 		for (unsigned int L=0;L<cons[0].size();L++)
 		{
 		
-			std::string type_cons;
-			type_cons.resize(0);
-			type_cons=getConstraintType((*cons[jl][L]).getConstraintType());
-			std::cout<<"type_cont : "<<type_cons<<" ";
+			//std::string type_cons;
+			//type_cons.resize(0);
+			//type_cons=getConstraintType((*cons[jl][L]).getConstraintType());
+			std::cout<<"type_cont : "<<cons[jl][L]->getType()<<" ";
 			std::cout<<(*cons[jl][L]).get_constraint_name();
 			std::cout<<" nb_row :"<<(*cons[jl][L]).getRows();
 			std::cout<<" nb_col :"<<(*cons[jl][L]).getCols();
 			
 			
-			if (strcmp(type_cons.c_str(),"INT") == 0)
+			if (cons[jl][L]->isConstraintParameterInt())
 			{	
 				faust_constraint_int* const_int = (faust_constraint_int*)(cons[jl][L]);
 				std::cout<<" parameter :"<<(*const_int).getParameter()<<std::endl;
 			}
 			
-			if (strcmp(type_cons.c_str(),"FAUST_REAL") == 0)
+			else if (cons[jl][L]->isConstraintParameterReal())
 			{	
 				faust_constraint_real* const_real = (faust_constraint_real*)(cons[jl][L]);
 				std::cout<<" parameter :"<<(*const_real).getParameter()<<std::endl;
 			}
 			
-			if (strcmp(type_cons.c_str(),"FAUST_MAT") == 0)
+			else if (cons[jl][L]->isConstraintParameterMat())
 			{	
 				faust_constraint_mat* const_mat = (faust_constraint_mat*)(cons[jl][L]);
 				std::cout<<" parameter :"<<std::endl;

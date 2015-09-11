@@ -434,19 +434,17 @@ void DisplayParams(const faust_params & params)
 	{
 		for (unsigned int jl=0;jl<params.cons.size();jl++)
 		{	
-			//char * type_cons =  getType((*params.cons[jl][L]).get_constraint_name());
-            char * type_cons =  (*params.cons[jl][L]).getType();
 			mexPrintf(" %s ",(*params.cons[jl][L]).get_constraint_name());
 			mexPrintf(" DIMS (%d,%d) : ",(*params.cons[jl][L]).getRows(),(*params.cons[jl][L]).getCols());
 			
 			
-			if (strcmp(type_cons,"INT") == 0)
+			if (params.cons[jl][L]->isConstraintParameterInt())
 			{	
 				faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[jl][L]);
 				mexPrintf(" parameter : %d",(*const_int).getParameter());
 			}
 			
-			if (strcmp(type_cons,"FAUST_REAL") == 0)
+			if (params.cons[jl][L]->isConstraintParameterReal())
 			{	
 				faust_constraint_real* const_real = (faust_constraint_real*)(params.cons[jl][L]);
 				mexPrintf(" parameter : %f",(*const_real).getParameter());

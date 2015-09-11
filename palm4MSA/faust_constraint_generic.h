@@ -24,7 +24,6 @@ enum faust_constraint_name
 };
 
 
-std::string getConstraintType(faust_constraint_name);
 
 
 
@@ -49,9 +48,13 @@ class faust_constraint_generic
          //parameter(constraint.parameter),
          nb_rows(constraint.nb_rows),
          nb_cols(constraint.nb_cols){}
-		char*  getType() const;
+	const char*  getType() const;
       const char* get_constraint_name()const;
       const faust_constraint_name getConstraintType() const {return constraint_name;}
+      bool isConstraintParameterInt()const;
+      bool isConstraintParameterReal()const;
+      bool isConstraintParameterMat()const;
+
       //const parameter_type getParameter() const {return parameter;};
       const int getRows() const {return nb_rows;}
       const int getCols() const {return nb_cols;}
