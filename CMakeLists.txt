@@ -116,7 +116,7 @@ if(UNIX)
 	#	set(OPENBLAS_LIB_PATH "" CACHE PATH "Openblas library directory")
 	#endif()
 else()
-	exec_program("echo off & for /f \"delims=\" %i in ('where matlab.exe') do set MATLAB_DIR_TMP=%i & echo %MATLAB_DIR_TMP% | findstr /C:\"\\bin\" >nul 2>&1 && echo|set /p=1 || echo|set /p=0 & echo on" OUTPUT_VARIABLE IS_MATLAB_DIR_FOUND)
+	exec_program("${PROJECT_SOURCE_DIR}/CMake/is_matlab_present.bat" OUTPUT_VARIABLE IS_MATLAB_DIR_FOUND)
 	if(IS_MATLAB_DIR_FOUND EQUAL 1)
 		exec_program("${PROJECT_SOURCE_DIR}/CMake/find_matlab_root.bat" OUTPUT_VARIABLE MATLAB_ROOT)
 		set(MATLAB_ROOT ${MATLAB_ROOT} CACHE INTERNAL "Matlab root directory")
@@ -129,15 +129,14 @@ endif()
 
 set(MATLAB_INCLUDE_DIR "${MATLAB_ROOT}/extern/include" CACHE INTERNAL "Matlab include directory")
 
-
 #INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
 
 
 add_subdirectory(${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EXCEPTION_BIN_DIR})
 add_subdirectory(${FAUST_MATRIX_SRC_DIR} ${FAUST_MATRIX_BIN_DIR})
 add_subdirectory(${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_FAUSTCORE_BIN_DIR})
-add_subdirectory(${FAUST_MATIO_SRC_DIR} ${FAUST_MATIO_BIN_DIR})
 add_subdirectory(${FAUST_PALM4MSA_SRC_DIR} ${FAUST_PALM4MSA_BIN_DIR})
+add_subdirectory(${FAUST_MATIO_SRC_DIR} ${FAUST_MATIO_BIN_DIR})
 add_subdirectory(${FAUST_PALM4MSATEST_SRC_DIR} ${FAUST_PALM4MSATEST_BIN_DIR})
 add_subdirectory(${FAUST_MEXINTERFACE_SRC_DIR} ${FAUST_MEXINTERFACE_BIN_DIR})
 
