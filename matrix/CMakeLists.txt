@@ -1,7 +1,7 @@
 #INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
 file(GLOB CPP_FILES "*.cpp")
 
-include_directories( ${FAUST_EXCEPTION_SRC_DIR} ${EIGEN_INC_DIR})
+include_directories( ${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
 if(FAUST_USE_OPENBLAS)
 	include_directories( ${OPENBLAS_INC_DIR})
 endif()

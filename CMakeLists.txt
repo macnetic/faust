@@ -30,6 +30,7 @@ set(FAUST_PALM4MSATEST_SRC_DIR ${PROJECT_SOURCE_DIR}/palm4MSA/test CACHE INTERNA
 set(FAUST_MEXINTERFACE_SRC_DIR ${PROJECT_SOURCE_DIR}/interface_matlab CACHE INTERNAL "")
 set(FAUST_MEXINTERFACETOOLS_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/tools CACHE INTERNAL "")
 set(FAUST_MEXINTERFACEMEX_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/mex_functions CACHE INTERNAL "")
+set(FAUST_EIGEN_SRC_DIR ${PROJECT_SOURCE_DIR}/eigen CACHE INTERNAL "")
 
 # BINARY DIRECTORIES
 set(FAUST_EXCEPTION_BIN_DIR ${PROJECT_BINARY_DIR}/exception CACHE INTERNAL "")
@@ -69,7 +70,7 @@ endif()
 # find external libraries
 include(CMake/add_library_path.cmake)
 add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "opt" "opt/local")
-add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{EIGENDIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "opt" "opt/local")
+add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "opt" "opt/local")
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP} CACHE PATH "List of include paths used as PATH parameter in find_path")
 
@@ -80,7 +81,7 @@ if(FAUST_USE_OPENBLAS)
 	check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
 	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
 endif()
-check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
+#check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
 check_external_includes("matio.h" MATIO_INC_DIR 0)
 
 #find_path(OPENBLAS_LIB_DIR ${OPENBLAS_LIB_FILE})
