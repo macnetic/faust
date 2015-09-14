@@ -242,7 +242,7 @@ void faust_core::push_first(const faust_spmat& S)
       {	
 		ErrorDisplay("faust_core::push_first : incorrect dimensions"); 
       }
-   data.emplace(data.begin(),S);
+   data.insert(data.begin(),S);
    totalNonZeros += S.getNonZeros();
 
 	

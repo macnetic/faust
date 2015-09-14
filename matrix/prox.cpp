@@ -5,19 +5,18 @@
 #include "algorithm"
 
 
-void partial_sort_k_max(std::vector<faust_real> & sorted_elements, std::vector<int> & id_sorted_elements,std::vector<faust_real> & M_elements, int k);
-void partial_sort_k_min(std::vector<faust_real> & sorted_elements, std::vector<int> & id_sorted_elements,std::vector<faust_real> & M_elements, int k);
-
-
-void sort_idx(const std::vector<faust_real> &v, std::vector<int>& idx, int s); 
 
 
 void sort_idx(const std::vector<faust_real> &v, std::vector<int>& idx, int s) 
 {
-  idx.resize(v.size());
-  for (int i=0 ; i<idx.size(); i++) idx[i] = i;
-  std::partial_sort(idx.begin(), idx.begin()+s, idx.end(),
-       [&v](int i1, int i2) {return fabs(v[i1]) > fabs(v[i2]);});
+      std::vector<std::pair<int, faust_real> > vec_pair(v.size());
+      for (int i=0 ; i<v.size() ; i++)
+          vec_pair[i] = std::make_pair(i,v[i]);
+     
+      std::partial_sort(vec_pair.begin(), vec_pair.begin()+s, vec_pair.end(),partial_sort_comp);
+      idx.resize(s);
+      for (int i=0 ; i<s ; i++)
+          idx[i]=vec_pair[i].first;
 }
 
 

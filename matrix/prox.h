@@ -4,6 +4,11 @@
 
 //void new_prox_sp(faust_mat & M,int k);
 
+void partial_sort_k_max(std::vector<faust_real> & sorted_elements, std::vector<int> & id_sorted_elements,std::vector<faust_real> & M_elements, int k);
+void partial_sort_k_min(std::vector<faust_real> & sorted_elements, std::vector<int> & id_sorted_elements,std::vector<faust_real> & M_elements, int k);
+bool partial_sort_comp (const std::pair<int, faust_real>& pair1, const std::pair<int, faust_real>& pair2) { return fabs(pair1.second) > fabs(pair2.second); }
+
+void sort_idx(const std::vector<faust_real> &v, std::vector<int>& idx, int s); 
 
 void prox_sp(faust_mat & M,int k);
 void prox_sp_pos(faust_mat & M,int k);
