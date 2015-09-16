@@ -32,6 +32,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 
 		COMMAND ${CMAKE_CXX_COMPILER} 
 		ARGS "-c" ${CMAKE_CXX_FLAGS_LIST} "-DNDEBUG -DMATLAB_MEX_FILE" 
+		"${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp"
 		"-I${MATLAB_INCLUDE_DIR}" 
 		"-I${FAUST_EIGEN_SRC_DIR}" 
 		"-I${FAUST_MATRIX_SRC_DIR}" 
@@ -40,9 +41,10 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		"-I${FAUST_MEXINTERFACEMEX_SRC_DIR}" 
 		"-I${FAUST_MEXINTERFACE_SRC_DIR}" 
 		"-I${FAUST_MEXINTERFACETOOLS_SRC_DIR}"
-		"${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" "-o" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.o"
+		"-o" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.o"
         	COMMAND ${CMAKE_CXX_COMPILER} 
 		ARGS "-pthread" "-Wl,--no-undefined" "-fPIC" "-shared" "-O3" "-Wl,--version-script,${MATLAB_ROOT}/extern/lib/glnxa64/mexFunction.map" 
+		"${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.o"
 		"-lstdc++" "-lm"
 		"-L${FAUST_FAUSTCORE_BIN_DIR}" "-l${FAUST_FAUSTCORE_TARGET}"
 		"-L${FAUST_MATRIX_BIN_DIR}" "-l${FAUST_MATRIX_TARGET}"
@@ -50,7 +52,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		"-L${FAUST_MEXINTERFACE_BIN_DIR}" "-l${FAUST_MEXTOOLS_TARGET}"
 		"-L${MATLAB_ROOT}/bin/glnxa64" "-lmx" "-lmex" "-lmat"	
 		"-Wl,-rpath=${FAUST_FAUSTCORE_BIN_DIR}:${FAUST_MATRIX_BIN_DIR}:${FAUST_PALM4MSA_BIN_DIR}:${FAUST_MEXINTERFACE_BIN_DIR}"
-		"${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.o" "-o" "${mex_target}.${MEX_EXT}"
+		"-o" "${mex_target}.${MEX_EXT}"
 		COMMAND rm
 		ARGS -f ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.o
 		COMMENT "Creating mex function ${mex_target}.${MEX_EXT}"
