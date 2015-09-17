@@ -47,7 +47,7 @@ void faust_timer::stop()
    #elif defined(_WIN32)
       LARGE_INTEGER fin;
       QueryPerformanceCounter(&fin);
-      result += (fin.QuadPart - t1.QuadPart)*1000.0/frequency.QuadPart;
+      result += (fin.QuadPart - debut.QuadPart)*1000.0/frequency.QuadPart;
    #endif
    isRunning = false;
 }
@@ -81,7 +81,7 @@ float faust_timer::get_time()
       #elif defined(_WIN32) 
          LARGE_INTEGER fin;
          QueryPerformanceCounter(&fin);
-         result += (fin.QuadPart - t1.QuadPart)*1000.0/frequency.QuadPart;
+         result += (fin.QuadPart - debut.QuadPart)*1000.0/frequency.QuadPart;
       #endif
           
 
