@@ -3,6 +3,10 @@
 
 #include <ctime>
 
+#if defined(_WIN32)  
+   #include <windows.h>
+#endif
+
 class faust_timer
 {
    public:
@@ -19,7 +23,12 @@ class faust_timer
    private:
       bool isRunning;
       float result;
-      struct timespec debut;
+      #if defined(__linux__) 
+         struct timespec debut;
+      #elif defined(_WIN32)  
+         LARGE_INTEGER debut;
+         LARGE_INTEGER frequency;  
+      #endif
       long int nbCall;
      
 };
