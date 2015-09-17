@@ -6,6 +6,11 @@
 #include <typeinfo>
 
 
+const faust_constraint_name faust_constraint_generic::getConstraintType() const 
+{
+   return constraint_name;
+}
+
 const char*  faust_constraint_generic::getType() const
 {	
    switch(constraint_name)

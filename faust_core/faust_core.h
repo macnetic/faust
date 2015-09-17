@@ -16,7 +16,7 @@ class faust_core
 		faust_core(const std::vector<faust_spmat>& facts, const faust_real lambda_ = (faust_real)1.0);
 		//faust_core(const faust_params& params);
 		faust_core(const faust_core & A);
-		void get_facts(std::vector<faust_spmat>& sparse_facts)const{sparse_facts = data;}; 
+		void get_facts(std::vector<faust_spmat>& sparse_facts)const{sparse_facts = data;} 
 		int size()const{return data.size();} 
                 faust_mat get_product()const;
 		faust_spmat get_fact(int id) const;		

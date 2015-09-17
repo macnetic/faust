@@ -1,3 +1,6 @@
+#ifndef __FAUST_TOOLS_MEX_H__
+#define __FAUST_TOOLS_MEX_H__
+
 #include "mex.h"
 #include "faust_mat.h"
 #include "faust_spmat.h"
@@ -15,3 +18,4 @@ void setVectorFaustMat(std::vector<faust_mat> &vecMat, mxArray *Cells);
 void addSpmat(const mxArray * mxMat,std::vector<faust_spmat> &vec_spmat);
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
 void DisplayParams(const faust_params & params);
+#endif

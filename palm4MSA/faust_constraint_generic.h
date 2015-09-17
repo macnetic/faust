@@ -50,7 +50,7 @@ class faust_constraint_generic
          nb_cols(constraint.nb_cols){}
 	const char*  getType() const;
       const char* get_constraint_name()const;
-      const faust_constraint_name getConstraintType() const {return constraint_name;}
+      const faust_constraint_name getConstraintType() const;// {return constraint_name;}
       bool isConstraintParameterInt()const;
       bool isConstraintParameterReal()const;
       bool isConstraintParameterMat()const;

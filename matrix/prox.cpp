@@ -5,6 +5,10 @@
 #include "algorithm"
 
 
+inline bool partial_sort_comp (const std::pair<int, faust_real>& pair1, const std::pair<int, faust_real>& pair2) 
+{ 
+   return fabs(pair1.second) > fabs(pair2.second); 
+}
 
 
 void sort_idx(const std::vector<faust_real> &v, std::vector<int>& idx, int s) 
