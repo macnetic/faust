@@ -105,10 +105,17 @@ long int faust_timer::get_nb_call()
 {
    if(isRunning)
    {
-      struct timespec fin;
-      clock_gettime(CLOCK_MONOTONIC, &fin);
-      result += (fin.tv_sec -debut.tv_sec) + (fin.tv_nsec-debut.tv_nsec)/1000000000.0;
-	  WarningDisplay("faust_timer::get_nb_call : timer has not been stopped\n");
+
+      #if defined(__linux__) 
+         struct timespec fin;
+         clock_gettime(CLOCK_MONOTONIC, &fin);
+         result += (fin.tv_sec -debut.tv_sec) + (fin.tv_nsec-debut.tv_nsec)/1000000000.0;
+      #elif defined(_WIN32) 
+         LARGE_INTEGER fin;
+         QueryPerformanceCounter(&fin);
+         result += (fin.QuadPart - debut.QuadPart)*1000.0/frequency.QuadPart;
+      #endif
+         WarningDisplay("faust_timer::get_nb_call : timer has not been stopped\n");
    }
    return nbCall;
 }
