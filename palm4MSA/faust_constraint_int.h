@@ -34,6 +34,7 @@ class faust_constraint_int : public faust_constraint_generic
    private:
       // parameter of constraint
       faust_unsigned_int parameter;
+	  static const char * class_name;
     
 };
 

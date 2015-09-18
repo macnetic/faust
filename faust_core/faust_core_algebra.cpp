@@ -20,7 +20,7 @@
 	#include "cblas.h"
 #endif
 
-
+const char * core_algebra_name="Faust_core_algebra : ";
 
 faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_real threshold, int & flag)
 {	
@@ -38,11 +38,11 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 	 
 	 if (nbr_iter_max <= 0)
 	 {
-		handleError(" Faust_core_algebra : power_iteration :  nbr_iter_max <= 0");
+		handleError(core_algebra_name," power_iteration :  nbr_iter_max <= 0");
 	 }
 	 if (nb_col != nb_row)
 	 {
-		handleError(" Faust_core_algebra : power_iteration : faust_core 1 must be a squared matrix"); 	
+		handleError(core_algebra_name," power_iteration : faust_core 1 must be a squared matrix"); 	
 	 }
 	 
 	 
@@ -103,7 +103,7 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 
 	if  ((&(C.mat)) == (&(B.mat))) 
 	{
-		handleError(" Faust_core_algebra : multiply : C is the same object as B"); 		
+		handleError(core_algebra_name," multiply : C is the same object as B"); 		
 	}
 	
 	nb_fact = A.size();
@@ -130,7 +130,7 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 		{	
 			if (nbColOpA != nbRowOpB)
 			{
-				handleError(" Faust_core_algebra : multiply :  dimension of faust_core 1 and faust_spmat mismatch");	
+				handleError(core_algebra_name," multiply :  dimension of faust_core 1 and faust_spmat mismatch");	
 			}
 		}else
 		{
@@ -139,7 +139,7 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 			if (nbColOpB != nbRowOpA)
 			{
 
-				handleError(" Faust_core_algebra : multiply : dimension of faust_core A and faust_spmat B mismatch");		
+				handleError(core_algebra_name," multiply : dimension of faust_core A and faust_spmat B mismatch");		
 			}
 		}
 	}else

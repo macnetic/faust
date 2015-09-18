@@ -1,7 +1,7 @@
 #ifndef __FAUST_CONSTRAINT_GENERIC_H__
 #define __FAUST_CONSTRAINT_GENERIC_H__
 #include <string>
-#include <iostream>
+//#include <iostream>
 #include "faust_constant.h"
 
 
@@ -59,7 +59,7 @@ class faust_constraint_generic
       //const parameter_type getParameter() const {return parameter;};
       const faust_unsigned_int getRows() const {return nb_rows;}
       const faust_unsigned_int getCols() const {return nb_cols;}
-	  void Display() const {std::cout<<get_constraint_name()<<" DIM : "<<nb_rows<<" "<<nb_cols<<std::endl;}	
+	  //void Display() const {std::cout<<get_constraint_name()<<" DIM : "<<nb_rows<<" "<<nb_cols<<std::endl;}	
 	
       virtual void set_default_parameter()=0;
       virtual void check_constraint_name()const=0;
@@ -75,6 +75,10 @@ class faust_constraint_generic
 
       const faust_unsigned_int nb_rows;
       const faust_unsigned_int nb_cols;
+	  
+	  
+	  private :
+	  static const char * class_name;
 
 
       

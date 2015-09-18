@@ -11,7 +11,7 @@
 #include "LinAlgebra.h"
 #include "prox.h"
 #include "faust_constraint_type.h"
-#include <stdexcept>
+#include "faust_exception.h"
 
 #ifdef __COMPILE_TIMERS__
 #include "faust_timer.h"
@@ -28,6 +28,8 @@
 
 
 using namespace std;
+
+const char * palm4MSA::class_name="palm4MSA";
 
 palm4MSA::palm4MSA(const faust_params& params_, const bool isGlobal_) :
    data(params_.data),
@@ -191,7 +193,7 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_SPLINCOL:
          {	
-		  throw std::logic_error("Error in palm4MSA::compute_projection : projection not implemented");
+		 handleError(class_name,"compute_projection : projection not implemented");
 		//constraint_type_splincol* constr_cast = dynamic_cast<constraint_type_splincol*>(const_vec[ind_fact]);
 		//prox_splincol(S[ind_fact], constr_cast->getParameter());
          }
@@ -281,7 +283,7 @@ t_local_compute_projection.start();
          break;
 
          default:
-            throw std::logic_error("error in palm4MSA::compute_projection : unknown name of constraint");
+           handleError(class_name,"compute_projection : unknown name of constraint");
             
 
       }
@@ -472,7 +474,7 @@ t_local_compute_lambda.start();
 
    if (!isLastFact)
    {
-      throw std::logic_error("error in palm4MSA::compute_lambda : computation of lambda must be done at the end of the iteration through the number of factors");
+     handleError(class_name,"compute_lambda : computation of lambda must be done at the end of the iteration through the number of factors");
    }
 
    // As LorR has also been updated at the end of the last iteration over the facts, LorR matches X_hat, which the product of all factors, including the last one.
@@ -569,8 +571,7 @@ t_local_check.start();
 
    if (nb_fact != S.size())
    {
-      cerr << "Error in palm4MSA::check_constraint_validity : Wrong initialization: params.nfacts and params.init_facts are in conflict" << endl;
-      exit(EXIT_FAILURE);
+      handleError(class_name," Wrong initialization: params.nfacts and params.init_facts are in conflict");
    }
 #ifdef __COMPILE_TIMERS__
 t_global_check.stop();
@@ -643,8 +644,7 @@ t_local_init_fact.start();
 
   if(!isConstraintSet)
   {
-     cerr << "Error in palm4MSA::init_fact : constrainst must be set before calling init_fact" << endl;
-     exit(EXIT_FAILURE);
+     handleError(class_name,"init_fact : constrainst must be set before calling init_fact");
   }
    nb_fact = nb_facts_;
    S.resize(nb_fact);
@@ -759,14 +759,12 @@ t_local_init_fact_from_palm.start();
 
    if (palm2.nb_fact != 2)
    {
-      cerr << "argument palm2 must contain 2 factors." << endl;
-      exit(EXIT_FAILURE);
+      handleError(class_name,"init_fact_from_palm : argument palm2 must contain 2 factors.");
    }
 
   if(!isConstraintSet)
   {
-     cerr << "Error in palm4MSA::init_fact_from_palm : constrainst must be set before calling init_fact_from_palm" << endl;
-     exit(EXIT_FAILURE);
+     handleError(class_name,"init_fact_from_palm : constrainst must be set before calling init_fact_from_palm");
   }
 
    if(isFactSideLeft) 

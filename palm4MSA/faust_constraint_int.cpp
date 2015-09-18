@@ -2,9 +2,9 @@
 #include <iostream>
 #include <cstdlib>
 #include "faust_mat.h"
-//#include "faust_exception.h"
-#include <stdexcept>
+#include "faust_exception.h"
 
+const char * faust_constraint_int::class_name="faust_constraint_int";
 
 faust_constraint_int::faust_constraint_int() : 
    faust_constraint_generic()
@@ -81,7 +81,7 @@ void faust_constraint_int::check_constraint_name()const
       case CONSTRAINT_NAME_TOEPLITZ:
          break;
       default:
-		 throw std::logic_error(" faust_constraint_int::faust_constraint_int : cannot create faust_constraint_int objet from an faust_constraint object with constraint with constraint_name");
+		handleError(class_name," cannot create faust_constraint_int objet from an faust_constraint object with constraint with constraint_name");
          break;
    }
 }
@@ -124,7 +124,7 @@ void faust_constraint_int::set_default_parameter()
          parameter = 0;
          break;
       default:
-		 throw std::logic_error(" faust_constraint_int::faust_constraint_int : cannot create faust_constraint_int objet from an faust_constraint object with constraint with this constraint_name");	
+		handleError(class_name,"set_default_parameter : cannot create faust_constraint_int objet from an faust_constraint object with constraint with this constraint_name");	
          break;
    }
 }

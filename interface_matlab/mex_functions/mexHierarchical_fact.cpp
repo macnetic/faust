@@ -98,26 +98,26 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         nbRowCons = mxGetM(mxCurrentField);
         nbColCons = mxGetN(mxCurrentField);
         
-        if(nbRowCons !=2)
+        /*if(nbRowCons !=2)
         {
             mexPrintf("\n cons has %d rows \n",nbRowCons);
             mexErrMsgTxt("cons must have 2 rows");
-        }
+        }*/
         /*if(nbColCons != (nb_fact-1))
         {
             mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
             mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
         }*/
-        mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
+        //mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
         //faust_constraint_generic * consToAdd;
         std::vector<const faust_constraint_generic*> consS;
         
         for (mwSize i=0;i<nbRowCons;i++)
         {
-            mexPrintf("%d / %d\n",i,nbRowCons);
+            //mexPrintf("%d / %d\n",i,nbRowCons);
             for (mwSize j=0;j<nbColCons;j++)
             {
-                mexPrintf("cons(%d , %d)\n",i,j);
+                //mexPrintf("cons(%d , %d)\n",i,j);
                 mxCurrentCons=mxGetCell(mxCurrentField,i+(j*nbRowCons));
                 getConstraint(consS,mxCurrentCons);
                 //consS.push_back(consToAdd);
@@ -140,7 +140,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         stopping_criterion newCrit1(nb_iter1);
         crit1 = newCrit1;
     }
-    mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
+    //mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
     
     //niter2
     stopping_criterion crit2;
@@ -151,7 +151,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         stopping_criterion newCrit2(nb_iter2);
         crit2 = newCrit2;
     }
-    mexPrintf("\n crit2 nb_it = %d\n",crit2.get_crit());
+    //mexPrintf("\n crit2 nb_it = %d\n",crit2.get_crit());
     
     //verbosity
     bool isVerbose = false;
@@ -195,6 +195,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       ///////////// HIERARCHICAL LAUNCH ///////////////  
      // creation des parametres   
 	 try{
+		std::cout<<"avant "<<std::endl; 
 		faust_params params(data,nb_fact,consSS,std::vector<faust_mat>(),crit1,crit2,isVerbose,updateway,factside,init_lambda,compute_lambda);   
      
 	 //DisplayParams(params);
@@ -220,11 +221,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
      plhs[1]=cellFacts;
 	 
-	 }
-	 catch (const std::exception& e){
-		 std::cerr<<e.what()<<std::endl;
-		 plhs[1]=1;
-		 return;}
+	}
+	 catch (const std::exception& e)
+	{
+		 mexErrMsgTxt(e.what());
+	}
 
 }
 

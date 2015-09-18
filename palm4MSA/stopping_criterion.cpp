@@ -1,8 +1,9 @@
 #include "stopping_criterion.h"
 #include <iostream>
 #include <cstdlib>
-#include <stdexcept>
+#include "faust_exception.h"
 
+const char * stopping_criterion::class_name="stopping_criterion::";
 stopping_criterion::stopping_criterion(bool isCriterionError_) : isCriterionError(isCriterionError_)
 {
    if (isCriterionError_)
@@ -20,12 +21,12 @@ void stopping_criterion::check_validity()const
    {
       if (errorThreshold>1 || maxIteration < 0)
       {
-         throw std::logic_error("error in stopping_criterion::check_validity"); 
+        handleError(class_name,"check_validity : errorThreshold must be strictly greater than 1 and maxIteration must be strictly positive"); 
       }
    }
    else if (nb_it < 0) 
    {
-      throw std::logic_error("error in stopping_criterion::check_validity"); 
+     handleError(class_name,"::check_validity : nb_it must be positive"); 
    }
 }
 
@@ -47,7 +48,7 @@ bool stopping_criterion::do_continue(int current_ite, faust_real current_error /
       }
    else // if criterion is error and current_error has not been initialized
    {
-      throw std::logic_error("error in stopping_criterion::check_validity : when stopping criterion is error, the current error needs to be given as second parameter");
+     handleError(class_name,"check_validity : when stopping criterion is error, the current error needs to be given as second parameter");
    }
 }
 

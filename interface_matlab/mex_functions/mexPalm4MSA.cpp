@@ -1,6 +1,5 @@
 #include "mex.h"
 //#include "mexutils.h"
-#include "hierarchical_fact.h"
 #include "faust_mat.h"
 #include "faust_constraint_int.h"
 #include "faust_constraint_generic.h"
@@ -11,7 +10,8 @@
 #include <algorithm>
 #include "faust_params_palm.h"
 #include "faust_constant.h"
-
+#include "palm4MSA.h"
+#include <stdexcept>
 #include "tools_mex.h"
 
 
@@ -195,28 +195,29 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     
       ///////////// HIERARCHICAL LAUNCH ///////////////  
-     // creation des parametres   
-     faust_params_palm params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda,compute_lambda); 
-	 palm4MSA palm(params,false);
-	 palm.compute_facts();
-	 faust_real lambda = palm.get_lambda();
-	 mexPrintf("LAMBDA : %f",lambda);
-	 plhs[0]=mxCreateDoubleScalar((double) lambda);
+     // creation des parametres  
+	try{		
+		faust_params_palm params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda,compute_lambda); 
+		palm4MSA palm(params,false);
+		palm.compute_facts();
+		faust_real lambda = palm.get_lambda();
+		mexPrintf("LAMBDA : %f",lambda);
+		plhs[0]=mxCreateDoubleScalar((double) lambda);
 	 
-}	 
-     /*DisplayParams(params);
+	 
+     
      //creation de hierarchical fact
-     hierarchical_fact hier_fact(params);
+     palm4MSA palm(params,false);
      hier_fact.compute_facts();	
      
      
      //extraction des resultats
-     faust_real lambda = hier_fact.get_lambda();
+     faust_real lambda = palm.get_lambda();
      
      plhs[0]=mxCreateDoubleScalar((double) lambda);
      
      std::vector<faust_mat> facts;
-     hier_fact.get_facts(facts);
+     palm.get_facts(facts);
 
      
      faust_mat current_fact = facts[0];
@@ -225,8 +226,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
      
 
      plhs[1]=cellFacts;
+	}
+	catch (const std::exception& e)
+	{
+		 mexErrMsgTxt(e.what());
+	}
 
-     
+}
    
    
    
@@ -234,7 +240,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    
 
 }
-*/
+
 
 void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFields)
 {

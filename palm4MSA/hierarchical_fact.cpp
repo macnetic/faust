@@ -5,9 +5,12 @@
 
 #include "faust_spmat.h"
 #include "faust_core.h"
+#include "faust_exception.h"
 using namespace std;
 
 //hierarchical_fact::hierarchical_fact(){} // voir avec Luc les parametres par defaut
+
+const char * hierarchical_fact::class_name="hierarchical_fact";
 
 hierarchical_fact::hierarchical_fact(const faust_params& params_):
    ind_fact(0),
@@ -55,19 +58,13 @@ t_next_step.start();
       
    if(isFactorizationComputed)
    {
-      cerr << "factorization has already been computed" << endl;
-      exit(EXIT_FAILURE);
+      handleError(class_name,"next_step : factorization has already been computed");
    }
 
    vector<const faust_constraint_generic*> cons_tmp_2(2);
    cons_tmp_2[0]=cons[0][ind_fact];
    cons_tmp_2[1]=cons[1][ind_fact];
    
-   std::cout<<"PALM 2 FACT"<<std::endl;
-   std::cout<<"LEFT FACT"<<std::endl;
-   (*cons_tmp_2[0]).Display();
-   std::cout<<"RIGHT FACT"<<std::endl;
-   (*cons_tmp_2[1]).Display();
    
    palm_2.set_constraint(cons_tmp_2);
    
@@ -154,8 +151,7 @@ void hierarchical_fact::compute_facts()
 {
    if(isFactorizationComputed)
    {
-      cerr << "Error in hierarchical_fact::compute_facts : factorization has already been computed" << endl;
-      exit(EXIT_FAILURE);
+      handleError(class_name,"compute_facts : factorization has already been computed");
    }
 
   init();
@@ -173,8 +169,7 @@ const std::vector<std::vector< faust_real> >& hierarchical_fact::get_errors()con
 {
     if(!isFactorizationComputed)
     {
-        cerr << "Error in hierarchical_fact::get_errors() : Factorization has not been computed" << endl;
-        exit(EXIT_FAILURE);
+        handleError(class_name,"get_errors() : Factorization has not been computed");
     }
     return errors;
 }

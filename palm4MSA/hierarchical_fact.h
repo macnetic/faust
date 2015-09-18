@@ -46,6 +46,7 @@ private:
       std::vector<const faust_constraint_generic*> cons_tmp_global;
       bool isFactorizationComputed;
       std::vector<std::vector<faust_real> > errors;
+	  static const char * class_name;
       
      
 #ifdef __COMPILE_TIMERS__

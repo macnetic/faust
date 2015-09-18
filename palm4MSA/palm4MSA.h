@@ -54,7 +54,7 @@ class palm4MSA
       void update_L();
       void update_R();
       void compute_lambda();
-
+	  static const char * class_name;	
 
    public:
       stopping_criterion stop_crit;

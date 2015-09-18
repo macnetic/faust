@@ -7,7 +7,7 @@
 #include <cmath>
 #include "faust_exception.h"
 
-const char * faust_params::class_name = "faust_params";
+const char * faust_params::class_name = "faust_params::";
 
 void faust_params::check_constraint_validity()
 {	
@@ -19,7 +19,7 @@ void faust_params::check_constraint_validity()
       if (cons[i].size() != nb_fact-1) 
       {
 		 //handleError("faust_params::check_constraint_validity :\n The number of constraints equal to %d is in conflict with the number of factors which is %d\n, number of columns of constraints must be equal to nb_fact - 1",cons[i].size(),nb_fact);
-		 handleError(class_name,"check_constraint_validity :\n The number of constraints equal to %d is in conflict with the number of factors which is %d\n, number of columns of constraints must be equal to nb_fact - 1");
+		 handleError(class_name,"check_constraint_validity :\n The number of constraints equal is in conflict with the number of factors,\n number of columns of constraints must be equal to nb_fact - 1");
       }
 	  
    bool verifSize  =    data.getNbRow()     == cons[0][0]->getRows()
@@ -40,7 +40,7 @@ void faust_params::check_constraint_validity()
 
 
    if (!verifSize)
-	  //handleError(" faust_params::check_constraint_validity :\n Size incompatibility in the constraints\n");
+	
 	  handleError(class_name,"faust_params::check_constraint_validity :\n Size incompatibility in the constraints");
    
    

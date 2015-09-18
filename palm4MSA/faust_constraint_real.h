@@ -33,6 +33,7 @@ class faust_constraint_real : public faust_constraint_generic
    private:
       // parameter of constraint
       faust_real parameter;
+	  static const char * class_name;
 
 
       
