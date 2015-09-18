@@ -109,7 +109,7 @@ void getFaustspMat(const mxArray* spMat_array,faust_spmat & S)
 
 
 
-mxArray*  FaustMat2mxArray(faust_mat M)
+mxArray*  FaustMat2mxArray(const faust_mat& M)
 {		
 		mxArray * mxMat;
 		faust_real * mat_ptr;

@@ -12,7 +12,7 @@ class faust_params;
 
 void getFaustMat(const mxArray* Mat_array,faust_mat & Mat);
 void getFaustspMat(const mxArray* spMat_array,faust_spmat & S);
-mxArray*  FaustMat2mxArray(faust_mat M);
+mxArray*  FaustMat2mxArray(const faust_mat& M);
 void setCellFacts(mxArray ** cellFacts,std::vector<faust_mat> facts);
 void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray* mxCons);
 void setVectorFaustMat(std::vector<faust_mat> &vecMat, mxArray *Cells);
