@@ -2,6 +2,7 @@
 #define __FAUST_TIMER_H__
 
 #include <ctime>
+#include "faust_constant.h"
 
 #if defined(_WIN32)  
    #include <windows.h>
@@ -16,8 +17,9 @@ class faust_timer
       void reset();
       float get_time()const;
       float get_time();
-      long int get_nb_call()const;
-      long int get_nb_call();
+      faust_unsigned_int get_nb_call()const;
+      faust_unsigned_int get_nb_call();
+	  static const char * class_name; 
 
 
    private:
@@ -29,7 +31,7 @@ class faust_timer
          LARGE_INTEGER debut;
          LARGE_INTEGER frequency;  
       #endif
-      long int nbCall;
+      faust_unsigned_int nbCall;
      
 };
 

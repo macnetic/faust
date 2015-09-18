@@ -5,7 +5,6 @@
 #include "faust_spmat.h"
 
 class faust_mat;
-//class faust_spmat;
 class faust_vec;
 class faust_params;
 
@@ -14,7 +13,6 @@ class faust_core
 	public:
 		faust_core();
 		faust_core(const std::vector<faust_spmat>& facts, const faust_real lambda_ = (faust_real)1.0);
-		//faust_core(const faust_params& params);
 		faust_core(const faust_core & A);
 		void get_facts(std::vector<faust_spmat>& sparse_facts)const{sparse_facts = data;} 
 		int size()const{return data.size();} 

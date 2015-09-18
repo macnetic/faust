@@ -2,6 +2,9 @@
 #include <iostream>
 #include <cstdlib>
 #include "faust_mat.h"
+//#include "faust_exception.h"
+#include <stdexcept>
+
 
 faust_constraint_int::faust_constraint_int() : 
    faust_constraint_generic()
@@ -12,8 +15,8 @@ faust_constraint_int::faust_constraint_int() :
 
 faust_constraint_int::faust_constraint_int(
    const faust_constraint_name& constraint_name_, 
-   const int nb_rows_, 
-   const int nb_cols_) : 
+   const faust_unsigned_int nb_rows_, 
+   const faust_unsigned_int nb_cols_) : 
       faust_constraint_generic(
          constraint_name_,
          nb_rows_,
@@ -27,9 +30,9 @@ faust_constraint_int::faust_constraint_int(
 
 faust_constraint_int::faust_constraint_int(
    const faust_constraint_name& constraint_name_,  
-   const int default_parameter_,
-   const int nb_rows_, 
-   const int nb_cols_) : 
+   const faust_unsigned_int default_parameter_,
+   const faust_unsigned_int nb_rows_, 
+   const faust_unsigned_int nb_cols_) : 
       faust_constraint_generic(
          constraint_name_,
          nb_rows_,
@@ -78,8 +81,7 @@ void faust_constraint_int::check_constraint_name()const
       case CONSTRAINT_NAME_TOEPLITZ:
          break;
       default:
-         std::cerr << "Error in faust_constraint_int::faust_constraint_int : cannot create faust_constraint_int objet from an faust_constraint object with constraint_name= "<< constraint_name << std::endl;
-         exit(EXIT_FAILURE);
+		 throw std::logic_error(" faust_constraint_int::faust_constraint_int : cannot create faust_constraint_int objet from an faust_constraint object with constraint with constraint_name");
          break;
    }
 }
@@ -122,8 +124,7 @@ void faust_constraint_int::set_default_parameter()
          parameter = 0;
          break;
       default:
-         std::cerr << "Error in faust_constraint_int::faust_constraint_int : cannot create faust_constraint_int objet from an faust_constraint object with constraint_name= "<< constraint_name << std::endl;
-         exit(EXIT_FAILURE);
+		 throw std::logic_error(" faust_constraint_int::faust_constraint_int : cannot create faust_constraint_int objet from an faust_constraint object with constraint with this constraint_name");	
          break;
    }
 }

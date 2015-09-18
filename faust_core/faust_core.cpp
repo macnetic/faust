@@ -54,7 +54,7 @@ faust_mat faust_core::get_product()const
 	// from right to left is (dim2*total_nnz)	
 	if (size() == 0)
 	{
-		ErrorDisplay("faust_core::get_product : empty faust_core");						
+		handleError("faust_core::get_product : empty faust_core");						
 	}	
 	faust_mat prod(data[0].getNbRow()); 
 	
@@ -172,7 +172,7 @@ void faust_core::multiply(const faust_core & A)
 		{
 			if (getNbCol() != A.getNbRow())
 			{
-				ErrorDisplay("faust_core::multiply : dimensions of the 2 faustcore are in conflict");
+				handleError("faust_core::multiply : dimensions of the 2 faustcore are in conflict");
 			}
 			data.insert(data.end(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;	
 		}
@@ -195,7 +195,7 @@ void faust_core::multiplyLeft(const faust_core & A)
 		{
 			if (getNbRow() != A.getNbCol())
 			{
-				ErrorDisplay("faust_core::multiplyLeft : dimensions of the 2 faustcore are in conflict");
+				handleError("faust_core::multiplyLeft : dimensions of the 2 faustcore are in conflict");
 			}
 			data.insert(data.begin(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;	
 		}
@@ -212,7 +212,7 @@ faust_spmat faust_core::get_fact(int id)const
 {
 	if((id>=size())||(id<0))
 	{
-		ErrorDisplay("faust_core::get_fact : id exceed faust_core size or id < 0"); 
+		handleError("faust_core::get_fact : id exceed faust_core size or id < 0"); 
 	}
 	return data[id];
 }
@@ -224,7 +224,7 @@ void faust_core::push_back(const faust_spmat& S)
    {   
       if(data[size()-1].getNbCol()!=S.getNbRow() || S.getNbRow()<1)
       {
-		 ErrorDisplay("faust_core::push_back : incorrect dimensions"); 
+		 handleError("faust_core::push_back : incorrect dimensions"); 
       }
    }
    data.push_back(S);
@@ -240,7 +240,7 @@ void faust_core::push_first(const faust_spmat& S)
    if (size()>0)
       if(data[0].getNbRow()!=S.getNbCol() || S.getNbRow()<1)
       {	
-		ErrorDisplay("faust_core::push_first : incorrect dimensions"); 
+		handleError("faust_core::push_first : incorrect dimensions"); 
       }
    data.insert(data.begin(),S);
    totalNonZeros += S.getNonZeros();
@@ -259,7 +259,7 @@ void faust_core::pop_back(faust_spmat& S)
 		data.pop_back();
 		totalNonZeros -= S.getNonZeros();
 	}
-	WarningDisplay("faust_core::pop_back : empty faust_core");	
+	handleWarning("faust_core::pop_back : empty faust_core");	
 }
 
 
@@ -271,7 +271,7 @@ void faust_core::pop_first(faust_spmat& S)
 		data.erase(data.begin());
 		totalNonZeros -= S.getNonZeros();
 	}
-	WarningDisplay("faust_core::pop_back : empty faust_core");		
+	handleWarning("faust_core::pop_back : empty faust_core");		
 }
 
 

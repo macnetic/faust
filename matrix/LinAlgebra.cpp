@@ -20,6 +20,8 @@
 #endif
 
 
+const char * interface_name="LinAlgebra";
+
  void multiply(const faust_mat & A, const faust_mat & B, faust_mat & C)
 {   
 #ifdef __COMPILE_TIMERS__
@@ -28,7 +30,8 @@ A.t_multiply.start();
 
 	if (A.getNbCol() != B.getNbRow())
 	{
-		ErrorDisplay("Linalgebra : multiply :  nbCol of A = %d while nbRow of B = %d",A.getNbCol(),B.getNbRow());		
+		//handleError("Linalgebra : multiply :  nbCol of A = %d while nbRow of B = %d",A.getNbCol(),B.getNbRow());
+		handleError(interface_name,"multiply : invalid matrix dimensions");	
 	}
 	 
 	if(A.isZeros || B.isZeros)
@@ -65,7 +68,7 @@ A.t_multiply.start();
 
 	if (((&(C.mat)) == (&(A.mat))) || ((&(C.mat)) == (&(B.mat))))
 	{
-		ErrorDisplay("Linalgebra : multiply : C is the same object as A or B");		
+		handleError(interface_name," multiply : C is the same object as A or B");		
 	}else
 	{
 		C.resize(A.getNbRow(),B.getNbCol());
@@ -84,7 +87,7 @@ faust_vec solve(const faust_mat & A, const faust_vec & v)
 {
 	if (A.getNbRow() != v.getDim())
 	{
-		ErrorDisplay("Linalgebra : solve : number of row of the  dense matrix A is different from dimension of the vector v");	
+		handleError(interface_name," : solve : number of row of the  dense matrix A is different from dimension of the vector v");	
 	}
 	faust_vec sol(A.getNbCol());
 	sol.Display();
@@ -98,8 +101,9 @@ void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y)
 {
 	if (A.getNbRow() != y.getDim())
 	{
-		ErrorDisplay("Linalgebra : solve : number of row of the sparse matrix A is different from dimension of the vector y");	
+		handleError(interface_name,"solve : number of row of the sparse matrix A is different from dimension of the vector y");	
 	}
+	x.resize(A.getNbCol());
 	x.resize(A.getNbCol());
 	Eigen::SparseQR<Eigen::SparseMatrix<faust_real>, Eigen::COLAMDOrdering<int> >   solver(A.mat);
 	x.vec=solver.solve(y.vec);
@@ -109,7 +113,7 @@ void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y)
 
 void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA)
 {
-	int nbRowOpA,nbColOpA;
+	faust_unsigned_int nbRowOpA,nbColOpA;
 	const faust_vec* px;
 	if  ((&x) == (&y))
 		px = new faust_vec(x);
@@ -129,12 +133,13 @@ void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real
 	
 	if   (nbColOpA != px->getDim() )
 	{
-		ErrorDisplay("Linalgebra : gemv : nbCol of op(A) = %d while dim of x = %d",nbColOpA,px->getDim());
+		//handleError("Linalgebra : gemv : nbCol of op(A) = %d while dim of x = %d",nbColOpA,px->getDim());
+		handleError(interface_name, "gemv : dimension conflict  between matrix op(A) and input vector x");
 	}
 	
 	if ( (beta!=0)  &&  (y.getDim() != nbRowOpA))
 	{
-		ErrorDisplay("Linalgebra : gemv : nbRow of op(A) = %d while dim of y = %d",nbRowOpA,y.getDim());
+		handleError(interface_name, "gemv : dimension conflict  between matrix op(A) and output vector y");
 	}
 	
 	y.resize(nbRowOpA);
@@ -191,11 +196,11 @@ void gemm(const faust_mat & A,const faust_mat & B, faust_mat & C,const faust_rea
 #ifdef __COMPILE_TIMERS__
 A.t_gemm.start();
 #endif
-	int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
+	faust_unsigned_int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
 
 	if ( ((&(C.mat)) == (&(A.mat))) || ((&(C.mat)) == (&(B.mat))) )
 	{
-		ErrorDisplay("Linalgebra : gemm : C is the same object as A or B");	
+		handleError(interface_name, "gemv : gemm : C is the same object as A or B");		
 	}
 
 	if (typeA == 'T')
@@ -222,7 +227,8 @@ A.t_gemm.start();
 
 	if (nbColOpA != nbRowOpB)
 	{
-		ErrorDisplay("Linalgebra : gemm : nbCol of op(A) = %d while nbRow of op(B) = %d",nbColOpA,nbColOpB);
+		handleError(interface_name, "gemm : dimension conflict  between matrix op(A) and matrix op(B)");
+		
 	}
 
 
@@ -234,7 +240,8 @@ A.t_gemm.start();
 	if ( (beta!=0)  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
 	{
 
-		ErrorDisplay("Linalgebra : gemm : nbRow of op(A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
+		//handleError("Linalgebra : gemm : nbRow of op(A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
+		handleError(interface_name, "gemm : invalid dimension for output matrix C");
 	
 	}
 		
@@ -431,7 +438,7 @@ A.t_add_ext.start();
 #endif
 	if ((A.getNbCol() != B.getNbCol()) || (A.getNbRow() != B.getNbRow()) || (A.getNbRow() != C.getNbRow()) || (A.getNbCol() != C.getNbCol()))
 	{
-		ErrorDisplay("Linalgebra : add : matrix dimension not equal");
+		handleError(interface_name," add : matrix dimension not equal");
 		
 	}else
 	{
@@ -450,15 +457,15 @@ A.t_add_ext.stop();
 	
 	
 // compute the biggest eigenvalue of A, A must be semi-definite positive 	
-faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_real threshold, int & flag)
+faust_real power_iteration(const  faust_mat & A, const faust_unsigned_int nbr_iter_max,faust_real threshold, faust_int & flag)
 {	
 	#ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.start();
 	#endif 	
-	 int nb_col = A.getNbCol();
-	 int nb_row = A.getNbRow();
-	 int i = 0;
-	 int k;
+	 faust_unsigned_int nb_col = A.getNbCol();
+	 faust_unsigned_int nb_row = A.getNbRow();
+	 faust_unsigned_int i = 0;
+	 faust_unsigned_int k;
 	 bool do_continue=true;
 	 faust_real abs_eigen_value;
 	 
@@ -468,11 +475,11 @@ faust_real power_iteration(const  faust_mat & A, const int nbr_iter_max,faust_re
 	 
 	 if (nbr_iter_max <= 0)
 	 {
-		ErrorDisplay("Linalgebra : power_iteration : nbr_iter_max <= 0");
+		handleError(interface_name,"power_iteration : nbr_iter_max <= 0");
 	 }
 	 if (nb_col != nb_row)
 	 {
-		ErrorDisplay("Linalgebra : power_iteration : A must be square");
+		handleError(interface_name,"power_iteration : A must be square");
         
 	 }
 	 

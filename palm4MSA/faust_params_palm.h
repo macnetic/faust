@@ -41,6 +41,9 @@ class faust_params_palm
       bool isUpdateWayR2L;
       faust_real init_lambda;
 	  bool isLambdaComputed;
+	  
+	  private :
+	  static const char *  class_name;
 
 
      

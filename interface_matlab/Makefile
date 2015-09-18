@@ -121,4 +121,4 @@ mexHierarchical_fact.mexa64:$(OBJS_MEX)
 
 clean:
 	@printf '$(FONT)$(CYAN)Removing all object files and executable$(RESET_FONT)\n'
-	rm -f $(EXECUTABLE)   $(OBJS_MEX) $(OBJS_MEX1)  $(OBJS_MEX3) $(OBJS_MEX4) $(MATLAB_INTERFACE_MEX_DIR)/*.o.mex
+	rm -f $(EXECUTABLE)   $(OBJS_MEX) $(OBJS_MEX1)  $(OBJS_MEX3) $(OBJS_MEX4) $(MATLAB_INTERFACE_MEX_DIR)/*.o.mex $(MATLAB_INTERFACE_TOOLS_DIR)/*.o.mex

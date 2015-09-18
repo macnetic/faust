@@ -4,6 +4,7 @@
 #include "faust_constraint_mat.h"
 #include "faust_constraint_type.h"
 #include <typeinfo>
+#include "faust_exception.h"
 
 
 const faust_constraint_name faust_constraint_generic::getConstraintType() const 
@@ -23,8 +24,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_sp)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+				handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_SPCOL:
          if(typeid(constraint_type_spcol)==typeid(faust_constraint_int))
             return "INT";
@@ -33,8 +34,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_spcol)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+				handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_SPLIN:
          if(typeid(constraint_type_splin)==typeid(faust_constraint_int))
             return "INT";
@@ -43,8 +44,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_splin)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+            handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_NORMCOL:
          if(typeid(constraint_type_normcol)==typeid(faust_constraint_int))
             return "INT";
@@ -53,8 +54,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_normcol)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+           handleError(" faust_constraint_generic::getType : unknown type parameter");
+		   }
       case CONSTRAINT_NAME_SPLINCOL:
          if(typeid(constraint_type_splincol)==typeid(faust_constraint_int))
             return "INT";
@@ -63,8 +64,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_splincol)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+				handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_L0PEN:
          if(typeid(constraint_type_l0pen)==typeid(faust_constraint_int))
             return "INT";
@@ -73,8 +74,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_l0pen)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+            handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_L1PEN:
          if(typeid(constraint_type_l1pen)==typeid(faust_constraint_int))
             return "INT";
@@ -83,8 +84,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_l1pen)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+           handleError(" faust_constraint_generic::getType : unknown type parameter");
+		   }
       case CONSTRAINT_NAME_CONST:
          if(typeid(constraint_type_const)==typeid(faust_constraint_int))
             return "INT";
@@ -93,8 +94,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_const)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+            handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_WAV:
          if(typeid(constraint_type_wav)==typeid(faust_constraint_int))
             return "INT";
@@ -103,8 +104,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_wav)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+				handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_SP_POS:
          if(typeid(constraint_type_sp_pos)==typeid(faust_constraint_int))
             return "INT";
@@ -113,8 +114,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_sp_pos)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+				handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_BLKDIAG:
          if(typeid(constraint_type_blkdiag)==typeid(faust_constraint_int))
             return "INT";
@@ -123,8 +124,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_blkdiag)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+				handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_SPLIN_TEST:
          if(typeid(constraint_type_splin_test)==typeid(faust_constraint_int))
             return "INT";
@@ -133,8 +134,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_splin_test)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+				handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_SUPP:
          if(typeid(constraint_type_supp)==typeid(faust_constraint_int))
             return "INT";
@@ -143,8 +144,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_supp)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+				handleError(" faust_constraint_generic::getType : unknown type parameter");
+			}
       case CONSTRAINT_NAME_NORMLIN:
          if(typeid(constraint_type_normlin)==typeid(faust_constraint_int))
             return "INT";
@@ -153,8 +154,8 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_normlin)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+			handleError(" faust_constraint_generic::getType : unknown type parameter");
+		   }
       case CONSTRAINT_NAME_TOEPLITZ:
          if(typeid(constraint_type_toeplitz)==typeid(faust_constraint_int))
             return "INT";
@@ -163,11 +164,10 @@ const char*  faust_constraint_generic::getType() const
          else if(typeid(constraint_type_toeplitz)==typeid(faust_constraint_mat))
             return "FAUST_MAT";
          else{
-            std::cerr << "Error in faust_constraint_generic::getType : unknown type parameter" << std::endl;
-            exit(EXIT_FAILURE);}
+			handleError(" faust_constraint_generic::getType : unknown type parameter");
+		   }
       default:
-         std::cerr << "Error in faust_constraint_generic::getType : unknown constraint type" << std::endl;
-         exit(EXIT_FAILURE);
+			handleError(" faust_constraint_generic::getType : unknown constraint type ");
    }
 }
 
@@ -221,8 +221,7 @@ bool faust_constraint_generic::isConstraintParameterInt()const
 			return (typeid(constraint_type_toeplitz)==typeid(faust_constraint_int)?true:false);
 		break;
 		default:
-			std::cerr << "Unknown type of constraint" << std::endl;
-			exit(EXIT_FAILURE);
+			handleError(" faust_constraint_generic::isConstraintParameterInt : Unknown type of constraint");
 		break;
 	}
         return false;
@@ -278,8 +277,7 @@ bool faust_constraint_generic::isConstraintParameterReal()const
 			return (typeid(constraint_type_toeplitz)==typeid(faust_constraint_real)?true:false);
 		break;
 		default:
-			std::cerr << "Unknown type of constraint" << std::endl;
-			exit(EXIT_FAILURE);
+			handleError(" faust_constraint_generic::isConstraintParameterReal : Unknown type of constraint");
 		break;
 	}
         return false;
@@ -335,8 +333,7 @@ bool faust_constraint_generic::isConstraintParameterMat()const
 			return (typeid(constraint_type_toeplitz)==typeid(faust_constraint_mat)?true:false);
 		break;
 		default:
-			std::cerr << "Unknown type of constraint" << std::endl;
-			exit(EXIT_FAILURE);
+			handleError(" faust_constraint_generic::isConstraintParameterMat : Unknown type of constraint");
 		break;
 	}
         return false;

@@ -3,6 +3,10 @@
 #include <iostream>
 #include <cstdlib>
 #include "faust_mat.h"
+#include "faust_exception.h"
+
+
+const char * faust_constraint_mat::class_name="faust_constraint_mat::";
 
 faust_constraint_mat::faust_constraint_mat() : 
    faust_constraint_generic()
@@ -13,8 +17,8 @@ faust_constraint_mat::faust_constraint_mat() :
 
 faust_constraint_mat::faust_constraint_mat(
    const faust_constraint_name& constraint_name_, 
-   const int nb_rows_, 
-   const int nb_cols_) : 
+   const faust_unsigned_int nb_rows_, 
+   const faust_unsigned_int nb_cols_) : 
       faust_constraint_generic(
          constraint_name_,
          nb_rows_,
@@ -27,8 +31,8 @@ faust_constraint_mat::faust_constraint_mat(
 faust_constraint_mat::faust_constraint_mat(
    const faust_constraint_name& constraint_name_,  
    const faust_mat default_parameter_,
-   const int nb_rows_, 
-   const int nb_cols_) : 
+   const faust_unsigned_int nb_rows_, 
+   const faust_unsigned_int nb_cols_) : 
       faust_constraint_generic(
          constraint_name_,
          nb_rows_,
@@ -62,8 +66,7 @@ void faust_constraint_mat::check_constraint_name()const
       case CONSTRAINT_NAME_SUPP:
          break;
       default:
-         std::cerr << "Error in faust_constraint_mat::check_constraint_name : cannot create faust_constraint_mat objet from an faust_constraint object with constraint_name= "<< constraint_name << std::endl;
-         exit(EXIT_FAILURE);
+         handleError(class_name," cannot create faust_constraint_mat objet from an faust_constraint object with this constraint_name");
          break;
    }
 }
@@ -79,8 +82,7 @@ void faust_constraint_mat::set_default_parameter()
          parameter.setZeros();
          break;
       default:
-         std::cerr << "Error in faust_constraint_mat::set_default_parameter : cannot create faust_constraint_mat objet from an faust_constraint object with constraint_name= "<< constraint_name << std::endl;
-         exit(EXIT_FAILURE);
+         handleError(class_name,"set_default_parameter : cannot create faust_constraint_mat objet from an faust_constraint object with this constraint_name");
          break;
    }
 }

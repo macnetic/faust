@@ -8,13 +8,14 @@
 #include "faust_constraint_generic.h"
 
 
+
 class faust_params
 {
    public:
 	  
 	  faust_params(
 	  const faust_mat& data_,
-	  const int nb_fact_,
+	  const unsigned int nb_fact_,
 	  const std::vector<const faust_constraint_generic*> & cons_,
 	  const std::vector<faust_mat>& init_fact_,
 	  const stopping_criterion& stop_crit_2facts_ = stopping_criterion(),
@@ -32,7 +33,7 @@ class faust_params
 		
       faust_params(
 	const faust_mat& data_,
-	const int nb_fact_,
+	const unsigned int nb_fact_,
 	const std::vector<std::vector<const faust_constraint_generic*> >& cons_,
 	const std::vector<faust_mat>& init_fact_,
 	const stopping_criterion& stop_crit_2facts_ = stopping_criterion(),
@@ -55,7 +56,7 @@ class faust_params
    public:
       // Required members
       faust_mat data;
-      int nb_fact; // number of factors
+      faust_unsigned_int nb_fact; // number of factors
       std::vector<std::vector<const faust_constraint_generic*> > cons; // vector of constraints
       std::vector<faust_mat> init_fact;
 
@@ -78,6 +79,8 @@ class faust_params
       const faust_real errorThreshold;
       // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than 
       int maxIteration;*/
+	  private :
+	  static const char * class_name;
 };
 
 #endif

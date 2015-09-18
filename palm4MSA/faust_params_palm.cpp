@@ -1,7 +1,10 @@
 #include "faust_params_palm.h"
 #include "stopping_criterion.h"
 #include <iostream>
+#include <stdexcept>
+#include "faust_exception.h"
 
+const char * faust_params_palm::class_name = "faust_params_palm::";
 void faust_params_palm::check_constraint_validity()
 {
    
@@ -15,8 +18,7 @@ void faust_params_palm::check_constraint_validity()
 	}
    if (!verifSize)
    {
-      std::cerr << "Error in faust_params_palm::check_constraint_validity : Size incompatibility in the constraints" << std::endl;
-      exit(EXIT_FAILURE);
+	   handleError(class_name,"check_constraint_validity : Size incompatibility in the constraints");
    }
  
 }

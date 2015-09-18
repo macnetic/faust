@@ -2,6 +2,7 @@
 #define __FAUST_CONSTRAINT_GENERIC_H__
 #include <string>
 #include <iostream>
+#include "faust_constant.h"
 
 
 enum faust_constraint_name
@@ -36,8 +37,8 @@ class faust_constraint_generic
       faust_constraint_generic(
          const faust_constraint_name& constraint_name_, 
          //const parameter_type& parameter_, 
-         const int nb_rows_, 
-         const int nb_cols_) :
+         const faust_unsigned_int nb_rows_, 
+         const faust_unsigned_int nb_cols_) :
             constraint_name(constraint_name_),
             //parameter(parameter_),
             nb_rows(nb_rows_),
@@ -56,8 +57,8 @@ class faust_constraint_generic
       bool isConstraintParameterMat()const;
 
       //const parameter_type getParameter() const {return parameter;};
-      const int getRows() const {return nb_rows;}
-      const int getCols() const {return nb_cols;}
+      const faust_unsigned_int getRows() const {return nb_rows;}
+      const faust_unsigned_int getCols() const {return nb_cols;}
 	  void Display() const {std::cout<<get_constraint_name()<<" DIM : "<<nb_rows<<" "<<nb_cols<<std::endl;}	
 	
       virtual void set_default_parameter()=0;
@@ -72,8 +73,8 @@ class faust_constraint_generic
       // parameter of constraint
       //const parameter_type parameter;
 
-      const int nb_rows;
-      const int nb_cols;
+      const faust_unsigned_int nb_rows;
+      const faust_unsigned_int nb_cols;
 
 
       

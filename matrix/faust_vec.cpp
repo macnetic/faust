@@ -5,6 +5,7 @@
 #include <fstream>
 #include "faust_mat.h"
 #include "faust_spmat.h"
+#include "faust_exception.h"
 
 using namespace std;
 
@@ -41,8 +42,7 @@ void faust_vec::resize(const int new_dim)
 	
 		if (new_dim <0)
 		{
-			cerr << "ERROR FAUST_VEC resize : les nouvelles dimensions doivent etre strictement positive" << endl;
-			exit( EXIT_FAILURE);
+			handleError("faust_vec::resize : new dimensions must be positive");
 		}
 		else if (dim != new_dim)
 		{
@@ -76,8 +76,8 @@ void faust_vec::operator+=(const faust_vec& v)
 {
    if(v.size()!=size())
    {
-      cerr << "Error in faust_vec::operator+= : sizes are different" << endl;
-      exit(EXIT_FAILURE);
+
+	  handleError("faust_vec::operator+= : dimensions are in conflict");
    }
    faust_real*const ptr_data = getData();
    faust_real*const v_ptr_data = getData();

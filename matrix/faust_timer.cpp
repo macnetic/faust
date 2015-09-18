@@ -12,8 +12,9 @@ faust_timer::faust_timer() : isRunning(false), result(0.0f), nbCall(0)
 #if defined(_WIN32)  
    QueryPerformanceFrequency(&frequency); 
 #elif !defined(__linux__)
-   cerr << "Error in faust_timer::faust_timer : OS not supported" <<endl;
-   exit(EXIT_FAILURE);
+
+   handleError("Error in faust_timer::faust_timer : OS not supported");
+   
 #endif
 
 }
@@ -22,7 +23,7 @@ void faust_timer::start()
 { 
    if(isRunning)
    {
-	  ErrorDisplay("faust_timer::start : timer is already started.\n");
+	  handleError("faust_timer::start : timer is already started.\n");
    }
    #if defined(__linux__)
       clock_gettime(CLOCK_MONOTONIC, &debut);
@@ -38,7 +39,7 @@ void faust_timer::stop()
 {
    if(!isRunning)
    {
-	  ErrorDisplay("faust_timer::stop : timer must be started before stopping it\n");
+	  handleError(class_name,"stop : timer must be started before stopping it\n");
    }
    #if defined(__linux__) 
       struct timespec fin;
@@ -64,7 +65,7 @@ void faust_timer::reset()
       #elif defined(_WIN32)
          QueryPerformanceCounter(&debut);
       #endif
-      WarningDisplay("faust_timer::reset : timer has been reset while it was running\n");
+      cerr<<class_name<<"reset : timer has been reset while it was running"<<endl;
          
    }
 }
@@ -85,7 +86,7 @@ float faust_timer::get_time()
       #endif
           
 
-         WarningDisplay("faust_timer::get_time : timer has not been stopped\n");
+         handleError(class_name,"get_time : timer has not been stopped");
    }
    return result;
 }
@@ -94,14 +95,14 @@ float faust_timer::get_time()const
 {
    if(isRunning)
    {
-	  ErrorDisplay("faust_timer::get_time : timer has not been stopped\n");		
+	  handleError(class_name,"get_time : timer has not been stopped");		
 
    }
    return result;
 }
 
 
-long int faust_timer::get_nb_call()
+faust_unsigned_int faust_timer::get_nb_call()
 {
    if(isRunning)
    {
@@ -115,20 +116,20 @@ long int faust_timer::get_nb_call()
          QueryPerformanceCounter(&fin);
          result += (fin.QuadPart - debut.QuadPart)*1000.0/frequency.QuadPart;
       #endif
-         WarningDisplay("faust_timer::get_nb_call : timer has not been stopped\n");
+         handleError(class_name,"get_nb_call : timer has not been stopped\n");
    }
    return nbCall;
 }
 
 
-long int faust_timer::get_nb_call()const
+faust_unsigned_int faust_timer::get_nb_call()const
 {
    if(isRunning)
    {
-	  ErrorDisplay("faust_timer::get_nb_call : timer has not been stopped\n");
+	  handleError(class_name,"get_nb_call : timer has not been stopped\n");
    }
    return nbCall;
 }
 
-
+const char * faust_timer::class_name="faust_timer::"; 
 

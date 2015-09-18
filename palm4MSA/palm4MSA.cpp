@@ -11,6 +11,7 @@
 #include "LinAlgebra.h"
 #include "prox.h"
 #include "faust_constraint_type.h"
+#include <stdexcept>
 
 #ifdef __COMPILE_TIMERS__
 #include "faust_timer.h"
@@ -190,8 +191,7 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_SPLINCOL:
          {	
-		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
-		exit(EXIT_FAILURE);
+		  throw std::logic_error("Error in palm4MSA::compute_projection : projection not implemented");
 		//constraint_type_splincol* constr_cast = dynamic_cast<constraint_type_splincol*>(const_vec[ind_fact]);
 		//prox_splincol(S[ind_fact], constr_cast->getParameter());
          }
@@ -199,8 +199,7 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_L0PEN:
          {	
-		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
-		exit(EXIT_FAILURE);
+			throw std::logic_error("Error in palm4MSA::compute_projection : projection not implemented");
 		//constraint_type_l0pen* constr_cast = dynamic_cast<constraint_type_l0pen*>(const_vec[ind_fact]);
 		//prox_l0pen(S[ind_fact], sqrt(2*constr_cast->getParameter()/c));
          }
@@ -208,8 +207,8 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_L1PEN:
          {	
-		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
-		exit(EXIT_FAILURE);
+			throw std::logic_error("Error in palm4MSA::compute_projection : projection not implemented");
+		
             //constraint_type_l1pen* constr_cast = dynamic_cast<constraint_type_l1pen*>(const_vec[ind_fact]);
             //prox_l1pen(S[ind_fact], constr_cast->getParameter()/c);
 
@@ -218,8 +217,8 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_WAV:
          {
-		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
-		exit(EXIT_FAILURE);
+			throw std::logic_error("Error in palm4MSA::compute_projection : projection not implemented");
+		
 		//constraint_type_wav* constr_cast = dynamic_cast<constraint_type_wav*>(const_vec[ind_fact]);
 		//prox_wav(S[ind_fact], constr_cast->getParameter());
          }
@@ -237,8 +236,7 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_BLKDIAG:
          {
-		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
-		exit(EXIT_FAILURE);
+			throw std::logic_error("Error in palm4MSA::compute_projection : projection not implemented");
             //constraint_type_blkdiag* constr_cast = dynamic_cast<constraint_type_blkdiag*>(const_vec[ind_fact]);
             //prox_sp(S[ind_fact], constr_cast->getParameter());
          }
@@ -246,8 +244,7 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_SPLIN_TEST:
          {
-		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
-		exit(EXIT_FAILURE);
+			throw std::logic_error("Error in palm4MSA::compute_projection : projection not implemented");
             //constraint_type_splin_test* constr_cast = dynamic_cast<constraint_type_splin_test*>(const_vec[ind_fact]);
             //prox_sp(S[ind_fact], constr_cast->getParameter());
          }
@@ -277,16 +274,15 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_TOEPLITZ:
          {
-		cerr << "Error in palm4MSA::compute_projection : projection not implemented" << endl;
-		exit(EXIT_FAILURE);
+			throw std::logic_error("Error in palm4MSA::compute_projection : projection not implemented");
             //constraint_type_toeplitz* constr_cast = dynamic_cast<constraint_type_toeplitz*>(const_vec[ind_fact]);
             //prox_sp(S[ind_fact], 	const_int->getParameter());
          }
          break;
 
          default:
-            cerr << "error in palm4MSA::compute_projection : unknown name of constraint" << endl;
-            exit(EXIT_FAILURE);
+            throw std::logic_error("error in palm4MSA::compute_projection : unknown name of constraint");
+            
 
       }
    }
@@ -306,8 +302,7 @@ t_local_compute_grad_over_c.start();
 #endif
    if(!isCComputed) 
    {
-      cerr << "c must be set before computing grad/c" << endl;
-      exit(EXIT_FAILURE);
+      throw std::logic_error("c must be set before computing grad/c");
    }
 
 // There are 4 ways to compute gradient :
@@ -436,8 +431,7 @@ void palm4MSA::compute_last_update()
 	
 	if (isLambdaComputed)
 	{
-		cerr << "error in palm4MSA::compute_last_update : computation of lambda at the end whereas isLambdaComputed means it must be computed at each step" << endl;
-		exit(EXIT_FAILURE);
+		throw std::logic_error("error in palm4MSA::compute_last_update : computation of lambda at the end whereas isLambdaComputed means it must be computed at each step");
 	}
 	
 	faust_real scaling = 1;
@@ -478,8 +472,7 @@ t_local_compute_lambda.start();
 
    if (!isLastFact)
    {
-      cerr << "error in palm4MSA::compute_lambda : computation of lambda must be done at the end of the iteration through the number of factors" << endl;
-      exit(EXIT_FAILURE);
+      throw std::logic_error("error in palm4MSA::compute_lambda : computation of lambda must be done at the end of the iteration through the number of factors");
    }
 
    // As LorR has also been updated at the end of the last iteration over the facts, LorR matches X_hat, which the product of all factors, including the last one.
@@ -526,8 +519,7 @@ t_local_update_R.start();
    {
       if(!isProjectionComputed)
       {
-         cerr << "Projection must be computed before updating L" << endl;
-         exit(EXIT_FAILURE);
+         throw std::logic_error("Projection must be computed before updating L");
       }
       LorR.multiplyLeft(S[ind_fact]);
    }
@@ -549,8 +541,7 @@ t_local_update_L.start();
    {
       if(!isProjectionComputed)
       {
-         cerr << "Projection must be computed before updating L" << endl;
-         exit(EXIT_FAILURE);
+         throw std::logic_error("Projection must be computed before updating L");
       }
       LorR *= S[ind_fact];
    }
@@ -603,7 +594,7 @@ void palm4MSA::compute_c()
    //c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;
 
 
-   int flag1,flag2;
+   faust_int flag1,flag2;
    
    int nbr_iter = 10000;
    faust_real threshold = 1e-16;

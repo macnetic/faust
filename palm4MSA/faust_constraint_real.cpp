@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "faust_mat.h"
+#include <stdexcept>
 
 faust_constraint_real::faust_constraint_real() : 
    faust_constraint_generic()
@@ -61,8 +62,7 @@ void faust_constraint_real::check_constraint_name()const
       case CONSTRAINT_NAME_NORMLIN:
          break;
       default:
-         std::cerr << "Error in faust_constraint_real::check_constraint_name : cannot create faust_constraint_real objet from an faust_constraint object with constraint_name= "<< constraint_name << std::endl;
-         exit(EXIT_FAILURE);
+         throw std::logic_error("Error in faust_constraint_real::check_constraint_name : cannot create faust_constraint_real objet from an faust_constraint object with this constraint_name");
          break;
    }
 }
@@ -78,8 +78,7 @@ void faust_constraint_real::set_default_parameter()
          parameter = 0.0;
          break;
       default:
-         std::cerr << "Error in faust_constraint_real::set_default_parameter : cannot create faust_constraint_real objet from an faust_constraint object with constraint_name= "<< constraint_name << std::endl;
-         exit(EXIT_FAILURE);
+         throw std::logic_error("Error in faust_constraint_real::set_default_parameter : cannot create faust_constraint_real objet from an faust_constraint object with constraint_name");
          break;
    }
 }

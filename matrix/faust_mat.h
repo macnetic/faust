@@ -19,32 +19,33 @@ class faust_core;
 class faust_mat
 {
 public:
+	static const char * name;  
 
   /// Constructeurs ///
   faust_mat(const Eigen::Matrix<faust_real, Eigen::Dynamic,Eigen::Dynamic> & mat_);	
-  faust_mat(const faust_real  *data_,const int nbRow, const int nbCol );	
+  faust_mat(const faust_real  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol );	
   faust_mat() : dim1(0), dim2(0), mat(0,0), isIdentity(false), isZeros(false) {}
   faust_mat(const faust_mat & A) : dim1(A.dim1), dim2(A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
   faust_mat(const faust_spmat & A){this->operator=(A);}
 
-  faust_mat(const int nbRow, const int nbCol) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
-  faust_mat(const int nbRow) : dim1(nbRow), dim2(nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}
+  faust_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
+  faust_mat(const faust_unsigned_int nbRow) : dim1(nbRow), dim2(nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}
 
 
 	
 	
   /// GETTEUR SETTEUR ///
-  int getNbRow() const {return dim1;}
-  int getNbCol() const {return dim2;}
-  faust_real getCoeff(const int i,const int j) const;
+  faust_unsigned_int getNbRow() const {return dim1;}
+  faust_unsigned_int getNbCol() const {return dim2;}
+  /*faust_real getCoeff(const faust_unsigned_int i,const faust_unsigned_int j) const;
   void getCoeffs(std::vector<faust_real> & valueS,const std::vector<int> & id_row, const std::vector<int>  & id_col) const;
   void setCoeff(const faust_real & value,const int id_row, const int id_col);
   void setCoeffs(const faust_real value,const std::vector<int> & id_row,const std::vector<int>  & id_col);
-  void setCoeffs(const std::vector<faust_real> & valueS,const std::vector<int> & id_row,const std::vector<int>  & id_col);
+  void setCoeffs(const std::vector<faust_real> & valueS,const std::vector<int> & id_row,const std::vector<int>  & id_col);*/
   
 
-  void resize(const int nbRow,const int nbCol);
-  void resize(const int nbRow){resize(nbRow,nbRow);}
+  void resize(const faust_unsigned_int nbRow,const faust_unsigned_int nbCol);
+  void resize(const faust_unsigned_int nbRow){resize(nbRow,nbRow);}
   
   void check_dim_validity();
   
@@ -56,12 +57,12 @@ public:
   //void setEyes() {mat.setIdentity();if(dim1==dim2)isIdentity=true;}
   void setEyes();
 
-  faust_real& operator[](int i){isZeros=false; isIdentity=false;return mat.data()[i];}
+  faust_real& operator[](faust_unsigned_int i){isZeros=false; isIdentity=false;return mat.data()[i];}
 
-  const faust_real& operator[](int i)const{return mat.data()[i];}
+  const faust_real& operator[](faust_unsigned_int i)const{return mat.data()[i];}
 
-  const faust_real& operator()(int i)const{return mat.data()[i];}
-  const faust_real& operator()(int i, int j)const{return mat.data()[j*dim1+i];}
+  const faust_real& operator()(faust_unsigned_int i)const{return mat.data()[i];}
+  const faust_real& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return mat.data()[j*dim1+i];}
 
 
    void operator*=(const faust_spmat& M);
@@ -84,7 +85,7 @@ public:
   //bool isEyes() const {return mat.isIdentity(FAUST_PRECISION);}
   
 void init_from_file(const char* filename);
-void write_into_file(const char* filename);
+
 
   
   
@@ -97,8 +98,8 @@ void write_into_file(const char* filename);
   void abs() {mat=mat.cwiseAbs();}
   
   // return the maximum of all coefficients of this and puts in row_id and col_id its location
-  faust_real max(std::vector<int> & id_row,std::vector<int> & id_col) const;
-  faust_real min(std::vector<int> & id_row,std::vector<int> & id_col) const;
+  faust_real max(std::vector<faust_unsigned_int> & id_row,std::vector<faust_unsigned_int> & id_col) const;
+  faust_real min(std::vector<faust_unsigned_int> & id_row,std::vector<faust_unsigned_int> & id_col) const;
   
   
   // frobenius norm
@@ -106,7 +107,7 @@ void write_into_file(const char* filename);
   void normalize() {scalarMultiply(1.0/norm());}
   // spectral norm, "norm2", equal to the largest singular value  
   faust_real spectralNorm() const;
-  faust_real spectralNorm(const int nbr_iter_max,faust_real threshold, int & flag) const;
+  faust_real spectralNorm(const faust_unsigned_int nbr_iter_max,faust_real threshold, faust_int & flag) const;
   
   // trace
   faust_real trace() const {return mat.trace();}
@@ -166,12 +167,15 @@ void write_into_file(const char* filename);
   bool estNulle(){return isZeros;}
   
   private: 
-       int dim1;
-       int dim2;
+       faust_unsigned_int dim1;
+       faust_unsigned_int dim2;
   Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat;
   //Eigen::Matrix<faust_real,0,0> mat;
        bool isIdentity;
        bool isZeros;
+	   static const char * class_name;
+	   
+	   	   
 
 #ifdef __COMPILE_TIMERS__
   public: 

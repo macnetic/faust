@@ -14,14 +14,14 @@ class faust_constraint_mat : public faust_constraint_generic
 
       faust_constraint_mat(
          const faust_constraint_name& constraint_name_, 
-         const int nb_rows_, 
-         const int nb_cols_);
+         const faust_unsigned_int nb_rows_, 
+         const faust_unsigned_int nb_cols_);
 
       faust_constraint_mat(
          const faust_constraint_name& constraint_name_,  
          const faust_mat parameter_,
-         const int nb_rows_, 
-         const int nb_cols_);
+         const faust_unsigned_int nb_rows_, 
+         const faust_unsigned_int nb_cols_);
 
       faust_constraint_mat(const faust_constraint_mat& constraint_);
 
@@ -35,6 +35,7 @@ class faust_constraint_mat : public faust_constraint_generic
    private:
       // parameter of constraint
       faust_mat parameter;
+	  static const char * class_name;
     
 };
 

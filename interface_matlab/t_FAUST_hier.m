@@ -11,7 +11,7 @@ DIM2 = 2;
 data = zeros(DIM1,DIM2);
 data(:)=1:DIM1*DIM2;
 params.data=data;
-params.nfacts = 3;
+params.nfacts = 5;
 params.cons{1,1} = {'sp',3,DIM1,DIM1};%;%{'splin',P_REP_tab(i),N_SAMP,DIM};%params.cons{1,1} = %
 params.cons{2,1} = {'splin',1,DIM1,DIM2};
 params.cons{1,2} = {'spcol',3,DIM1,DIM2};%;%{'splin',P_REP_tab(i),N_SAMP,DIM};%params.cons{1,1} = %

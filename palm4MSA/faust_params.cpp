@@ -7,9 +7,21 @@
 #include <cmath>
 #include "faust_exception.h"
 
+const char * class_name = "faust_params";
+
 void faust_params::check_constraint_validity()
-{
-   
+{	
+	if (cons.size() != 2)
+		//handleError("faust_params::check_constraint_validity :\n cons must have 2 rows instead of %d",cons.size());
+		handleError(class_name,"check_constraint_validity :\n cons must have 2 rows");
+	
+   for (unsigned int i=0 ; i<cons.size() ; i++)  
+      if (cons[i].size() != nb_fact-1) 
+      {
+		 //handleError("faust_params::check_constraint_validity :\n The number of constraints equal to %d is in conflict with the number of factors which is %d\n, number of columns of constraints must be equal to nb_fact - 1",cons[i].size(),nb_fact);
+		 handleError(class_name,"check_constraint_validity :\n The number of constraints equal to %d is in conflict with the number of factors which is %d\n, number of columns of constraints must be equal to nb_fact - 1");
+      }
+	  
    bool verifSize  =    data.getNbRow()     == cons[0][0]->getRows()
                    && cons[0][0]->getCols() == cons[1][0]->getRows()
                    &&   data.getNbCol()     == cons[1][0]->getCols();
@@ -28,24 +40,15 @@ void faust_params::check_constraint_validity()
 
 
    if (!verifSize)
-   {
-      //std::cerr << "Error in faust_params::check_constraint_validity : Size incompatibility in the constraints" << std::endl;
-      //exit(EXIT_FAILURE);
-	  ErrorDisplay(" faust_params::check_constraint_validity : Size incompatibility in the constraints\n");
-   }
+	  //handleError(" faust_params::check_constraint_validity :\n Size incompatibility in the constraints\n");
+	  handleError(class_name,"faust_params::check_constraint_validity :\n Size incompatibility in the constraints");
    
-   for (unsigned int i=0 ; i<cons.size() ; i++)  
-      if (cons[i].size() != nb_fact-1) 
-      {
-         //std::cerr << "The number of constraints is in conflict with the number of factors" << std::endl;
-         //exit(EXIT_FAILURE);
-		 ErrorDisplay("faust_params::check_constraint_validity : The number of constraints is in conflict with the number of factors\n");
-      }
+   
  
 }
 	faust_params::faust_params(
 	  const faust_mat& data_,
-	  const int nb_fact_,
+	  const unsigned int nb_fact_,
 	  const std::vector<const faust_constraint_generic*> & cons_,
 	  const std::vector<faust_mat>& init_fact_,
 	  const stopping_criterion& stop_crit_2facts_,
@@ -66,37 +69,28 @@ void faust_params::check_constraint_validity()
             isUpdateWayR2L(isUpdateWayR2L_),
             isFactSideLeft(isFactSideLeft_),
             init_lambda(init_lambda_),
-			isLambdaComputed(isLambdaComputed_)/*,
-            nb_rows(data_.getNbRow()),
-            nb_cols(data_.getNbCol())*/
+			isLambdaComputed(isLambdaComputed_)
 {
   if (nb_fact_ <= 2)
   {
-	// std::cerr << "the number of factor is smaller than 2, use another constructor " << std::endl;
-    //     exit(EXIT_FAILURE); 
-	ErrorDisplay("faust_params::constructor : 	the number of factor is smaller than 2, use another constructor\n");	
+	//handleError("faust_params::constructor : 	the number of factor is smaller than 2, use another constructor\n");
+	handleError(class_name,"check_constraint_validity : Size incompatibility in the constraints");	
   }	  
   
   if  (residuum_decrease_speed<=1)
     {
-         //std::cerr << "residuum_decrease_speed must be strictly greater than  1" << std::endl;
-         //exit(EXIT_FAILURE);
-		 ErrorDisplay("faust_params::constructor : residuum_decrease_speed must be strictly greater than  1\n");
+		 handleError(class_name,"constructor : residuum_decrease_speed must be strictly greater than  1");
     }
   	 
    
    if ((residuum_prcent<0))
    {
-        //std::cerr << "residuum_percent must strictly positive" << std::endl;
-        //exit(EXIT_FAILURE);
-		ErrorDisplay("faust_params::constructor : residuum_percent must strictly positive\n");
+		handleError(class_name,"constructor : residuum_percent must strictly positive");
     }
 	
 	if (nb_fact != cons_.size())
-   {
-        //std::cerr << "nb_fact and cons_.size() are in conflict" << std::endl;
-        //exit(EXIT_FAILURE);
-		ErrorDisplay("faust_params::constructor : nb_fact and cons_.size() are in conflict\n");
+	{
+		handleError(class_name,"constructor : nb_fact and cons_.size() are in conflict\n");
     }
 	
 	std::vector<const faust_constraint_generic*> residuumS_cons;
@@ -130,8 +124,6 @@ void faust_params::check_constraint_validity()
 		
 		cons.push_back(factorS_cons);
 		 
-	//std::cout<<"res size"<< residuumS_cons.size()<<std::endl;
-	//std::cout<<"factor size"<< factorS_cons.size()<<std::endl;
 	
 		
 	}else
@@ -174,7 +166,7 @@ void faust_params::check_constraint_validity()
 
 faust_params::faust_params(
          const faust_mat& data_,
-         const int nb_fact_,
+         const unsigned int nb_fact_,
          const std::vector<std::vector<const faust_constraint_generic*> >& cons_,
          const std::vector<faust_mat>& init_fact_,
          const stopping_criterion& stop_crit_2facts_ /* = stopping_criterion() */,
@@ -194,9 +186,8 @@ faust_params::faust_params(
             isUpdateWayR2L(isUpdateWayR2L_),
             isFactSideLeft(isFactSideLeft_),
             init_lambda(init_lambda_),
-			isLambdaComputed(isLambdaComputed_)/*,
-            nb_rows(data_.getNbRow()),
-            nb_cols(data_.getNbCol())*/
+			isLambdaComputed(isLambdaComputed_)
+
 {
  check_constraint_validity(); 
 }

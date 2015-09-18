@@ -15,13 +15,14 @@
 
 using namespace std;
 
+const char * faust_mat::class_name = "faust_mat::";
 
 
 /// CONSTRUCTEUR ///
   faust_mat::faust_mat(const Eigen::Matrix<faust_real,Eigen::Dynamic,Eigen::Dynamic> & mat_) : 
      dim1(mat_.rows()), dim2(mat_.cols()),mat(mat_),isIdentity(false),isZeros(false){}
   
-  faust_mat::faust_mat(const faust_real  *data_,const int nbRow, const int nbCol ) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol), isIdentity(false),isZeros(false)
+  faust_mat::faust_mat(const faust_real  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol ) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol), isIdentity(false),isZeros(false)
   {
 
 #ifdef __COMPILE_TIMERS__
@@ -56,152 +57,10 @@ t_constr.stop();
 /// GETTEUR SETTEUR ///
 
 
-faust_real faust_mat::getCoeff(const int i,const int j) const
-{
-
-#ifdef __COMPILE_TIMERS__
-t_get_coeff.start();
-#endif
-
-	if  ( (i<0) || (i>=dim1) )
-	{
-		//cerr << "ERROR getCoeff : index out of range : 0>i  or i>=nb_row" << endl;
-		//exit( EXIT_FAILURE);
-		 ErrorDisplay("faust_mat : getCoeff : index out of range : 0>i  or i>=nb_row\n");	
-	}
-	
-	if  ( (j<0) || (j>=dim2) )
-	{
-		//cerr << "ERROR getCoeff : index out of range : 0>j  or j>=nb_col" << endl;
-		//exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat : getCoeff : index out of range : 0>j  or j>=nb_col\n");		
-	}
-	
-
-#ifdef __COMPILE_TIMERS__
-t_get_coeff.stop();
-#endif
-
-	return mat(i,j);
-}
-
-
-
-void faust_mat::getCoeffs(std::vector<faust_real> & valueS,const std::vector<int> & id_row, const std::vector<int>  & id_col) const
-{
-
-#ifdef __COMPILE_TIMERS__
-t_get_coeffs.start();
-#endif
-
-	if ( (id_row.size()!= id_col.size()) || (id_col.size() != valueS.size()) )
-	{
-		//cerr << "ERROR getCoeffs : id_row, id_col, valueS don't have the same length" << endl;
-		//exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat : getCoeffs : id_row, id_col, valueS don't have the same length\n");	
-	}
-	
-	int n=id_col.size();
-	int current_id_row,current_id_col;
-
-	for (int i=0;i<n;i++)
-	{
-		current_id_row =  id_row[i];
-		current_id_col =  id_col[i];
-		valueS[i]=getCoeff(current_id_row,current_id_col);
-	}
-
-#ifdef __COMPILE_TIMERS__
-t_get_coeffs.stop();
-#endif
-
-}
-
-void faust_mat::setCoeff(const faust_real & value,const int id_row, const int id_col)
-{
-
-#ifdef __COMPILE_TIMERS__
-t_set_coeff.start();
-#endif
-
-	if ( (id_row < 0) || (id_row >= dim1) )
-	{
-		//cerr << "ERROR setCoeff : index out of range : 0>id_row  or id_row>=nb_row" << endl;
-		//exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat : setCoeff : index out of range : 0>id_row  or id_row>=nb_row\n");	
-	}
-			
-	if ( (id_col < 0) || (id_col >= dim2) )
-	{
-		//cerr << "ERROR setCoeff : index out of range : (0>id_col)  or (id_col >= nb_col)" << endl;
-		//exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat : setCoeff : index out of range : (0>id_col)  or (id_col >= nb_col)\n");		
-	}
-			
-	mat(id_row,id_col) = value;
-
-        isZeros = false;
-        isIdentity = false;
-
-#ifdef __COMPILE_TIMERS__
-t_set_coeff.stop();
-#endif
-
-}
-
-
-void faust_mat::setCoeffs(const faust_real value,const std::vector<int> & id_row,const std::vector<int>  & id_col)
-{
-#ifdef __COMPILE_TIMERS__
-t_set_coeffs.start();
-#endif
-	if (id_row.size()!= id_col.size())
-	{
-		//cerr << "ERREUR setCoeffs : id_row and id_col don't have the same length" << endl;
-		//exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat : setCoeffs : id_row and id_col don't have the same length\n");
-	}
-	
-	int n = id_row.size();
-	for (int i=0;i<n;i++)
-		setCoeff(value,id_row[i],id_col[i]);
-
-        isZeros = false;
-        isIdentity = false;
-#ifdef __COMPILE_TIMERS__
-t_set_coeffs.stop();
-#endif
-}
-
-
-void faust_mat::setCoeffs(const std::vector<faust_real> & valueS,const std::vector<int> & id_row,const std::vector<int>  & id_col)
-{
-#ifdef __COMPILE_TIMERS__
-t_set_coeffs2.start();
-#endif
-	if ( (id_row.size()!= id_col.size()) || (id_row.size()!= valueS.size()) )
-	{
-		//cerr << "ERREUR setCoeffs : id_row,id_col,valueS don't have the same length" << endl;
-		//exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat : setCoeffs : id_row,id_col,valueS don't have the same length\n");
-		
-	}
-	
-	int n = id_row.size();
-	for (int i=0;i<n;i++)
-		setCoeff(valueS[i],id_row[i],id_col[i]);
-	
-        isZeros = false;
-        isIdentity = false;
-
-#ifdef __COMPILE_TIMERS__
-t_set_coeffs2.stop();
-#endif
-}
 	
 
  
- void faust_mat::resize(const int nbRow,const int nbCol)
+ void faust_mat::resize(const faust_unsigned_int nbRow,const faust_unsigned_int nbCol)
 {	
 #ifdef __COMPILE_TIMERS__
 t_resize.start();
@@ -210,7 +69,7 @@ t_resize.start();
 		{
 			//cerr << "ERREUR resize : les nouvelles dimensions doivent etre strictement positive" << endl;
 			//exit( EXIT_FAILURE);
-			ErrorDisplay("faust_mat : resize : les nouvelles dimensions doivent etre positives");
+			handleError(class_name, "resize : new dimensions must be positive");
 		}
 		else if ((dim1 != nbRow) || (dim2 != nbCol))
 		{
@@ -238,9 +97,7 @@ t_check_dim.start();
 	
 	if (!verifSize)
 	{
-		std::cerr << "Error in faust_mat::check_dim_validity : Size incompatibility in the faust_mat" << std::endl;
-		exit(EXIT_FAILURE);
-		ErrorDisplay("Error in faust_mat::check_dim_validity : Size incompatibility in the faust_mat");
+		handleError(class_name, "check_dim_validity : Size incompatibility in the faust_mat");
 	}
 #ifdef __COMPILE_TIMERS__
 t_check_dim.stop();
@@ -272,12 +129,9 @@ void faust_mat::setEyes()
 
  bool faust_mat::isEqual(const faust_mat & B) const 
  {
-	if ((getNbCol() != B.getNbCol()) || (getNbRow() != B.getNbRow()))
-	{
-		//cerr << "ERREUR isEqual : dimension of the matrix are not the same" << endl; 
-        //	exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat::isEqual : dimension of the 2 matrix are not the same\n");	
-	}
+	if ((getNbCol() != B.getNbCol()) || (getNbRow() != B.getNbRow()))	
+		handleError(class_name, "isEqual : dimension of the 2 matrix are not the same\n");	
+	
 
 	if (isZeros)
 		return B.isZeros;
@@ -291,9 +145,7 @@ bool faust_mat::isEqual(const faust_mat & B, faust_real threshold) const
 {
 	if ((getNbCol() != B.getNbCol()) || (getNbRow() != B.getNbRow()))
 	{
-		//cerr << "ERREUR isEqual : dimension of the matrix are not the same" << endl; 
-        //	exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat::isEqual : dimension of the 2 matrix are not the same\n");	
+		handleError(class_name, "isEqual : dimension of the 2 matrix are not the same\n");	
 	}
 	bool egalite =true;
 	for (int i=0;i<getNbRow();i++)
@@ -325,56 +177,6 @@ bool faust_mat::isEqual(const faust_mat & B, faust_real threshold) const
  
  /// OPERATION BASIQUE ///
  
-//arithmetique
-faust_real faust_mat::max(std::vector<int> & id_row,std::vector<int> & id_col) const
-{
-
-#ifdef __COMPILE_TIMERS__
-t_max.start();
-#endif
-
-	faust_real maxi = max();
-	int i,j,k;
-	if ( (id_row.size() != 0) || (id_col.size() != 0) )
-	{
-		cerr << "ERREUR max : sizes of id_row and id_col must be equal to zero" << endl;
-		exit( EXIT_FAILURE);	
-	}
-	
-	for (j=0;j<getNbCol();j++)
-		for (i=0;i<getNbRow();i++)
-			if (mat(i,j) == maxi)
-			{
-				id_row.push_back(i);
-				id_col.push_back(j);
-			}
-
-#ifdef __COMPILE_TIMERS__
-t_max.stop();
-#endif
-
-	return maxi;
-}
-
-faust_real faust_mat::min(std::vector<int> & id_row,std::vector<int> & id_col) const
-{
-	faust_real mini = min();
-	int i,j,k;
-	if ( (id_row.size() != 0) || (id_col.size() != 0) )
-	{
-		cerr << "ERREUR max : sizes of id_row and id_col must be equal to zero" << endl;
-		exit( EXIT_FAILURE);	
-	}
-	
-	for (j=0;j<getNbCol();j++)
-		for (i=0;i<getNbRow();i++)
-			if (mat(i,j) == mini)
-			{
-				id_row.push_back(i);
-				id_col.push_back(j);
-			}
-	return mini;
-}
 
 
 
@@ -398,18 +200,12 @@ t_transpose.start();
 		return;
 	}
 
-	/*Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat_copy = mat; 
-	int dim1_copy = dim1;
-	int dim2_copy = dim2;
-	resize(dim2_copy,dim1_copy);
-	 
-	 mat = mat_copy.transpose();*/
 	mat = mat.transpose().eval();
-	int dim1_copy = dim1;
+	faust_unsigned_int dim1_copy = dim1;
 	dim1 = dim2;
         dim2 = dim1_copy; 
         
-	//resize(dim2_copy,dim1_copy);
+	
 
 #ifdef __COMPILE_TIMERS__
 t_transpose.stop();
@@ -427,15 +223,11 @@ t_mult_right.start();
 
 	if (dim2 != A.dim1)
 	{
-		//std::cerr << "ERREUR multiply : nbCol of this = " << getNbCol(); 
-       	//	std::cerr <<" while nbRow of A = " << A.getNbRow() << std::endl;
-        //	exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat::multiplyRight : nbCol of this = %d while nbRow of A =%d\n",getNbCol(),A.getNbRow());		
+		handleError(class_name, "multiplyRight : dimension conflict between matrix");		
 	}
 
 	if(A.isIdentity)
 	{	
-		//std::cout<<"identityA"<<std::endl;
 		#ifdef __COMPILE_TIMERS__
 			t_mult_right.stop();
 		#endif
@@ -466,26 +258,14 @@ t_mult_right.start();
 	}
 	
 	
-	
 
-
-	/*int dim1_copy = dim1;
-	Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat_copy = mat; 
-	resize(dim1_copy,A.dim2);
-	if (&(A.mat) != &(mat))
-	{	
-		mat.noalias() = mat_copy * A.mat;
-	}else
-	{
-		mat = mat_copy * A.mat;
-	}*/
 		
 	#ifndef __GEMM_WITH_OPENBLAS__
 		mat = mat * A.mat;
 		resize(dim1, A.dim2);
 	#else
-		int C1_old = dim1;	
-		int C2_old = dim2;	
+		faust_unsigned_int C1_old = dim1;	
+		faust_unsigned_int C2_old = dim2;	
 		faust_real* C_old = new faust_real[C1_old*C2_old];
 		memcpy(C_old, getData(), C1_old*C2_old*sizeof(faust_real));
 		resize(C1_old, A.dim2);
@@ -514,10 +294,7 @@ t_mult_right.stop();
 
 	if (dim1 != A.dim2)
 	{
-		//std::cerr << "ERREUR multiply : nbRow of this = " << getNbRow(); 
-       	//	std::cerr <<" while nbCol of A = " << A.getNbCol() << std::endl;
-        //	exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat::multiplyLeft : nbRow of this = %d while nbCol of A =%d\n",getNbRow(),A.getNbCol());		
+		handleError(class_name, "multiplyLeft : dimension conflict between matrix");		
 	}
 
 	if(A.isIdentity)
@@ -550,17 +327,6 @@ t_mult_right.stop();
 		return;
 	}
 
-
-	/*int dim1_copy = dim1;
-	Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat_copy = mat; 
-	resize(dim1_copy,A.dim2);
-	if (&(A.mat) != &(mat))
-	{	
-		mat.noalias() = mat_copy * A.mat;
-	}else
-	{
-		mat = mat_copy * A.mat;
-	}*/
 		
 	mat = A.mat * mat;
 	resize(A.dim1, dim2);
@@ -586,7 +352,7 @@ t_mult_right.stop();
  }
  
  
- faust_real faust_mat::spectralNorm(const int nbr_iter_max,faust_real threshold, int & flag) const
+ faust_real faust_mat::spectralNorm(const faust_unsigned_int nbr_iter_max,faust_real threshold, faust_int & flag) const
 {	
 	#ifdef __COMPILE_TIMERS__
 		t_spectral_norm2.start();
@@ -609,8 +375,8 @@ t_mult_right.stop();
 		return 1;
 	}
 		
-	int nb_row = getNbRow();
-	int nb_col = getNbCol();
+	faust_unsigned_int nb_row = getNbRow();
+	faust_unsigned_int nb_col = getNbCol();
 		
 	
 		faust_mat AtA;
@@ -625,7 +391,7 @@ t_mult_right.stop();
 
 
 			faust_real  res=std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag));
-			//std::cout<<"flag : "<<flag<<std::endl;
+			
 
 		
 		#ifdef __COMPILE_TIMERS__
@@ -666,9 +432,7 @@ t_add.start();
 #endif
 	if ((getNbCol() != A.getNbCol()) || (getNbRow() != A.getNbRow()))
 	{
-			//std::cerr << "ERREUR add : matrix dimension not equal" << std::endl; 
-        	//exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat::add : matrix dimension not equal\n");	
+		handleError(class_name, "add : matrix dimension not equal");	
 	}
 	mat = mat + A.mat;
         isZeros = false;
@@ -686,9 +450,7 @@ t_sub.start();
 #endif
 	if ((getNbCol() != A.getNbCol()) || (getNbRow() != A.getNbRow()))
 	{
-		//  std::cerr << "ERREUR sub : matrix dimension not equal" << std::endl; 
-        //	exit( EXIT_FAILURE);
-		ErrorDisplay("faust_mat::sub : matrix dimension not equal\n");	
+		handleError(class_name, "sub : matrix dimension not equal");	
 	}
 	mat = mat - A.mat;
 
@@ -760,9 +522,7 @@ void faust_mat::operator*=(const faust_spmat& S)
 {
 	if(dim2 != S.dim1)
 	{
-		//std::cerr << "Error in faust_mat::operator*= : incorrect matrix dimensions" << std::endl;
-		//exit(EXIT_FAILURE);
-		ErrorDisplay("faust_mat::operator*= : incorrect matrix dimensions\n");
+		handleError(class_name, "operator*= : incorrect matrix dimensions");
 	}
 
 	if (isIdentity)
@@ -787,9 +547,7 @@ void faust_mat::operator+=(const faust_spmat& S)
 {
 	if(dim1!=S.dim1 || dim2!=S.dim2)
 	{
-		//std::cerr << "Error in faust_mat::operator+= : incorrect matrix dimensions" << std::endl;
-		//exit(EXIT_FAILURE);
-		ErrorDisplay("faust_mat::operator+= : incorrect matrix dimensions\n");
+		handleError(class_name,"operator+= : incorrect matrix dimensions");
 	}
 	mat += S.mat;
 	isIdentity = false;
@@ -799,9 +557,7 @@ void faust_mat::operator-=(const faust_spmat& S)
 {
 	if(dim1!=S.dim1 || dim2!=S.dim2)
 	{
-		//std::cerr << "Error in faust_mat::operator-= : incorrect matrix dimensions" << std::endl;
-		//exit(EXIT_FAILURE);
-		ErrorDisplay("faust_mat::operator-= : incorrect matrix dimensions\n");
+		handleError(class_name,"operator-= : incorrect matrix dimensions");
 	}
 	mat -= S.mat;
 	isIdentity = false;
@@ -812,9 +568,7 @@ void faust_mat::scalarMultiply(faust_mat const& A)
 {
 	if(dim1!=A.dim1 || dim2!=A.dim2)
 	{
-		//std::cerr << "Error in faust_mat::operator.*= : incorrect matrix dimensions" << std::endl;
-		//exit(EXIT_FAILURE);
-		ErrorDisplay("faust_mat::scalarMultiply : incorrect matrix dimensions\n");
+		handleError(class_name,"scalarMultiply : incorrect matrix dimensions\n");
 	}
 	mat = (mat.array() * A.mat.array()).matrix();
 	isIdentity = false;
@@ -828,7 +582,7 @@ void faust_mat::multiplyLeft(const faust_spmat& S)
 	{
 		//std::cerr << "Error in faust_mat::operator*= : incorrect matrix dimensions" << std::endl;
 		//exit(EXIT_FAILURE);
-		ErrorDisplay("faust_mat::multiplyLeft : incorrect matrix dimensions\n");
+		handleError(class_name,"multiplyLeft : incorrect matrix dimensions\n");
 	}
 
 	if (isIdentity)
@@ -867,9 +621,7 @@ t_print_file.start();
 
   if((vec[0]*vec[1]+2) != vec.size())
   {
-	  //cerr << "Error in faust_mat::init_from_file : impossible to read matrix from file " << filename << endl;
-	  //exit(EXIT_FAILURE);
-	  ErrorDisplay("faust_mat::init_from_file : %s\n",filename);
+	  handleError(class_name, "init_from_file : problem with the file");
   }
   resize(vec[0],vec[1]);
   memcpy(getData(), &vec[2], sizeof(faust_real) * dim1 * dim2); 
@@ -882,32 +634,6 @@ t_print_file.stop();
 #endif
 }
 
-
-void faust_mat::write_into_file(const char* filename)
-{
-	stringstream name_file;
-	ofstream file;
-	int i,j;
-	
-	name_file<<filename;
-	file.open(name_file.str().c_str(),ios::out);
-	for (i=0;i<getNbRow();i++)
-	{
-		for (j=0;j<getNbCol();j++)
-		{
-			file << getCoeff(i,j)<<" ";
-		}
-		file << std::endl;
-	}
-	
-	
-}
-
-
-/*bool operator==(faust_mat const& A, faust_mat const& B)
-{
-	return A.isEqual(B);
-}*/
 
 
 #ifdef __COMPILE_TIMERS__

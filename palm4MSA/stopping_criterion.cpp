@@ -1,6 +1,7 @@
 #include "stopping_criterion.h"
 #include <iostream>
 #include <cstdlib>
+#include <stdexcept>
 
 stopping_criterion::stopping_criterion(bool isCriterionError_) : isCriterionError(isCriterionError_)
 {
@@ -19,14 +20,12 @@ void stopping_criterion::check_validity()const
    {
       if (errorThreshold>1 || maxIteration < 0)
       {
-         std::cerr << "error in stopping_criterion::check_validity" << std::endl;
-         exit(EXIT_FAILURE);
+         throw std::logic_error("error in stopping_criterion::check_validity"); 
       }
    }
    else if (nb_it < 0) 
    {
-      std::cerr << "error in stopping_criterion::check_validity" << std::endl;
-      exit(EXIT_FAILURE);
+      throw std::logic_error("error in stopping_criterion::check_validity"); 
    }
 }
 
@@ -48,8 +47,7 @@ bool stopping_criterion::do_continue(int current_ite, faust_real current_error /
       }
    else // if criterion is error and current_error has not been initialized
    {
-      std::cerr << "error in stopping_criterion::check_validity : when stopping criterion is error, the current error needs to be given as second parameter" << std::endl;
-      exit(EXIT_FAILURE);
+      throw std::logic_error("error in stopping_criterion::check_validity : when stopping criterion is error, the current error needs to be given as second parameter");
    }
 }
 

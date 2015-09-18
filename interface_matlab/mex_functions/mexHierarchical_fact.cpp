@@ -13,6 +13,7 @@
 #include "faust_params.h"
 #include "faust_constant.h"
 #include "tools_mex.h"
+#include <stdexcept>
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -102,11 +103,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexPrintf("\n cons has %d rows \n",nbRowCons);
             mexErrMsgTxt("cons must have 2 rows");
         }
-        if(nbColCons != (nb_fact-1))
+        /*if(nbColCons != (nb_fact-1))
         {
             mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
             mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
-        }
+        }*/
         mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
         //faust_constraint_generic * consToAdd;
         std::vector<const faust_constraint_generic*> consS;
@@ -193,10 +194,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
       ///////////// HIERARCHICAL LAUNCH ///////////////  
      // creation des parametres   
-     faust_params params(data,nb_fact,consSS,std::vector<faust_mat>(),crit1,crit2,isVerbose,updateway,factside,init_lambda,compute_lambda);   
-     DisplayParams(params);
+	 try{
+		faust_params params(data,nb_fact,consSS,std::vector<faust_mat>(),crit1,crit2,isVerbose,updateway,factside,init_lambda,compute_lambda);   
+     
+	 //DisplayParams(params);
      //creation de hierarchical fact
-     hierarchical_fact hier_fact(params);
+     std::cout<<"youpi"<<std::endl;
+	 hierarchical_fact hier_fact(params);
      hier_fact.compute_facts();	
      
      
@@ -215,6 +219,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
      
 
      plhs[1]=cellFacts;
+	 
+	 }
+	 catch (const std::exception& e){std::cerr<<e.what()<<std::endl;return;}
 
 }
 
