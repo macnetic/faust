@@ -1,7 +1,9 @@
 #include "tools_mex.h"
+#include "faust_constraint_generic.h"
 #include "faust_constraint_real.h"
 #include "faust_constraint_mat.h"
 #include "faust_constraint_int.h"
+#include "faust_params.h"
 
 void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
 {
@@ -262,7 +264,7 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
 		{
 			
             mxConsParams=mxGetCell(mxCons,1);
-            int  intParameter = (int) std::floor(mxGetScalar(mxConsParams)+0.5);
+            int  intParameter = (int) (mxGetScalar(mxConsParams)+0.5);
              //mexPrintf("NAME  %s PARAMS %d DIMS : (%d,%d)\n",consName,intParameter,nbRowCons,nbColCons);
             
             if (strcmp(consName,"sp") == 0)
@@ -271,12 +273,12 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
                 consNameType = CONSTRAINT_NAME_SPCOL;
             else if (strcmp(consName,"splin") == 0)
                 consNameType = CONSTRAINT_NAME_SPLIN;
-			else if (strcmp(consName,"splincol") == 0)
+            else if (strcmp(consName,"splincol") == 0)
                 consNameType = CONSTRAINT_NAME_SPLINCOL;
-			else if (strcmp(consName,"sppos") == 0)
+            else if (strcmp(consName,"sppos") == 0)
                 consNameType = CONSTRAINT_NAME_SPLIN;
            
-            consS.push_back((new faust_constraint_int(consNameType,intParameter,nbRowCons,nbColCons)));
+            consS.push_back(new faust_constraint_int(consNameType,intParameter,nbRowCons,nbColCons));
             break;
 		}	
 		case 1:
@@ -434,7 +436,7 @@ void DisplayParams(const faust_params & params)
 	{
 		for (unsigned int jl=0;jl<params.cons.size();jl++)
 		{	
-			mexPrintf(" %s ",(*params.cons[jl][L]).get_constraint_name());
+			mexPrintf(" %s ", params.cons[jl][L]->get_constraint_name());
 			mexPrintf(" DIMS (%d,%d) : ",(*params.cons[jl][L]).getRows(),(*params.cons[jl][L]).getCols());
 			
 			
