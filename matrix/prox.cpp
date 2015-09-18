@@ -5,6 +5,7 @@
 #include "faust_exception.h"
 #include "faust_vec.h"
 
+const char * interface_prox_name="prox : ";
 
 inline bool partial_sort_comp (const std::pair<int, faust_real>& pair1, const std::pair<int, faust_real>& pair2) 
 { 
@@ -138,7 +139,7 @@ void prox_normcol(faust_mat & M,faust_real s)
 	faust_unsigned_int dim2 = M.getNbCol();
 	if (s<0)
 	{
-		handleError("prox : prox_normcol : s < 0 ");	
+		handleError(interface_prox_name,"prox_normcol : s < 0 ");	
 	}
 	
 	
@@ -211,7 +212,7 @@ void prox_blkdiag(faust_mat & M,int k)
 	faust_unsigned_int Msize = M.getNbRow();
 	if (Msize != M.getNbCol())
 	{
-		handleError(" prox : prox_blkdiag : input matrix must be square");	
+		handleError(interface_prox_name,"prox_blkdiag : input matrix must be square");	
 	}
 	
 	int sizeblock = Msize/k;
@@ -264,7 +265,7 @@ void prox_supp_normfree(faust_mat & M,const faust_mat & supp)
 {
 	if ( (supp.getNbRow() != M.getNbRow()) || (supp.getNbCol() != M.getNbCol()) )
 	{
-		handleError("prox : prox_supp : dimensions of the matrix are not equal");	
+		handleError(interface_prox_name,"prox_supp : dimensions of the matrix are not equal");	
 	}
 	M.scalarMultiply(supp);
 }

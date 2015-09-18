@@ -79,8 +79,9 @@ class faust_params
       const faust_real errorThreshold;
       // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than 
       int maxIteration;*/
+	   static const char* class_name;
 	  private :
-	  static const char * class_name;
+	 
 };
 
 #endif

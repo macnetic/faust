@@ -23,7 +23,7 @@ void faust_timer::start()
 { 
    if(isRunning)
    {
-	  handleError("faust_timer::start : timer is already started.\n");
+	  handleError(class_name,"faust_timer::start : timer is already started.\n");
    }
    #if defined(__linux__)
       clock_gettime(CLOCK_MONOTONIC, &debut);

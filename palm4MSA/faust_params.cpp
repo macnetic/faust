@@ -7,7 +7,7 @@
 #include <cmath>
 #include "faust_exception.h"
 
-const char * class_name = "faust_params";
+const char * faust_params::class_name = "faust_params";
 
 void faust_params::check_constraint_validity()
 {	

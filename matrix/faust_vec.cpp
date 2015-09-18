@@ -9,8 +9,9 @@
 
 using namespace std;
 
+const char * faust_vec::class_name = "faust_vec::";
 
-faust_vec::faust_vec(const int dim_, const faust_real* data_) : dim(dim_), vec(dim_)
+faust_vec::faust_vec(const faust_unsigned_int dim_, const faust_real* data_) : dim(dim_), vec(dim_)
 {
 		memcpy(getData(), data_, dim*sizeof(faust_real));	
 }
@@ -23,7 +24,7 @@ void faust_vec::setOnes()
 
 void faust_vec::Display() const
 {
-	 cout << "dim = " << getDim() << endl;
+	 cout << "dim = " << size() << endl;
 	 cout << vec << endl;
 }
  
@@ -42,7 +43,7 @@ void faust_vec::resize(const int new_dim)
 	
 		if (new_dim <0)
 		{
-			handleError("faust_vec::resize : new dimensions must be positive");
+			handleError(class_name,"resize : new dimensions must be positive");
 		}
 		else if (dim != new_dim)
 		{
@@ -77,7 +78,7 @@ void faust_vec::operator+=(const faust_vec& v)
    if(v.size()!=size())
    {
 
-	  handleError("faust_vec::operator+= : dimensions are in conflict");
+	  handleError(class_name,"operator+= : dimensions are in conflict");
    }
    faust_real*const ptr_data = getData();
    faust_real*const v_ptr_data = getData();
@@ -89,8 +90,7 @@ void faust_vec::operator-=(const faust_vec& v)
 {
    if(v.size()!=size())
    {
-      cerr << "Error in faust_vec::operator-= : sizes are different" << endl;
-      exit(EXIT_FAILURE);
+	   handleError(class_name,"operator-= : dimensions are in conflict");
    }
    faust_real*const ptr_data = getData();
    faust_real*const v_ptr_data = getData();
@@ -102,8 +102,8 @@ faust_real faust_vec::mean_relative_error(const faust_vec& v_ref)
 {
    if(v_ref.size() != size())
    {
-      cerr << "Error in faust_vec::relative_error : sizes are different" << endl;
-      exit(EXIT_FAILURE);
+     handleError(class_name,"relative_error : sizes are different");
+
    }
 
    faust_vec tmp(size());
@@ -128,8 +128,8 @@ void  faust_vec::multiplyLeft(faust_spmat const& A)
 {
 	if(A.getNbCol() != vec.size())
 	{
-		cerr << "Error in faust_vec::multiplyLeft : incorrect dimensions" << endl;
-		exit(EXIT_FAILURE);
+		 handleError(class_name,"multiplyLeft : incorrect dimensions");
+		
 	}
 	vec = A.mat * vec;
 	dim = A.dim1;

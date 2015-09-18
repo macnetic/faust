@@ -221,7 +221,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
      plhs[1]=cellFacts;
 	 
 	 }
-	 catch (const std::exception& e){std::cerr<<e.what()<<std::endl;return;}
+	 catch (const std::exception& e){
+		 std::cerr<<e.what()<<std::endl;
+		 plhs[1]=1;
+		 return;}
 
 }
 

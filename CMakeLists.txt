@@ -57,7 +57,7 @@ set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of d
 set(FAUST_USE_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
 
 # adding compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -fexceptions -fPIC -fno-omit-frame-pointer -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fexceptions -fPIC -fno-omit-frame-pointer -pthread")
 if(FAUST_USE_SINGLEPRECISION)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFAUST_SINGLE")
 	set(FAUST_COMPILE_SINGLE_FLAG "-DFAUST_SINGLE")

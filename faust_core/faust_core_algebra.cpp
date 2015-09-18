@@ -20,6 +20,8 @@
 	#include "cblas.h"
 #endif
 
+
+
 faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_real threshold, int & flag)
 {	
 	

@@ -3,13 +3,15 @@
 #include "faust_vec.h"
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
-#include <iostream>
+//#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include "faust_exception.h"
 
 
 using namespace std;
+
+const char * faust_spmat::class_name="faust_spmat::";
 
 faust_spmat::faust_spmat() : 
 	mat(Eigen::SparseMatrix<faust_real>(0,0)),
@@ -131,7 +133,7 @@ faust_spmat::faust_spmat(const vector<int>& rowidx, const vector<int>& colidx, c
 	{
 		//cerr << "vectors rowidx, colidx and values have not the same size" << endl;
 		//exit(EXIT_FAILURE);
-		handleError("faust_spmat::constructor : vectors rowidx, colidx and values have not the same size\n");
+		handleError(class_name,"::constructor : vectors rowidx, colidx and values have not the same size\n");
 	}
 	
 	resize(rowidx.size(), dim1_, dim2_);
@@ -145,9 +147,8 @@ void faust_spmat::init(const vector<int>& rowidx, const vector<int>& colidx, con
 {
 	if(rowidx.size()!=colidx.size() || rowidx.size()!=values.size())
 	{
-		//cerr << "vectors rowidx, colidx and values have not the same size" << endl;
-		//exit(EXIT_FAILURE);
-		handleError("faust_spmat::init : vectors rowidx, colidx and values have not the same size\n");
+
+		handleError(class_name,"init : vectors rowidx, colidx and values have not the same size\n");
 	}
 	setZeros();
 	resize(rowidx.size(), dim1_, dim2_);
@@ -263,9 +264,7 @@ void faust_spmat::operator/=(const faust_real alpha)
 
 	if(fabs(alpha) == 0.0)
 	{
-		//cerr << "Error in faust_spmat::operator/= : dividing by 0" << endl;
-		//exit(EXIT_FAILURE);
-		handleError("faust_spmat::operator/= : dividing by 0\n");
+		handleError(class_name,"operator/= : dividing by 0");
 	}
 	mat /= alpha;
 	update_dim();	
@@ -305,10 +304,7 @@ void faust_spmat::init_from_file(char* filename)
 	FILE* fp=fopen(filename,"r");
 	if (fp == NULL)
 	{
-		//cerr << "Error in faust_spmat::init_from_file : unable to open \"" << filename << "\"" << endl;
-		//exit(EXIT_FAILURE);
-		handleError("faust_spmat::init_from_file : unable to open %s",filename);
-		
+		handleError(class_name,"init_from_file : unable to open file");	
 	}
 	
 	fscanf(fp,"%d %d\n", &dim1_tmp,&dim2_tmp);
@@ -327,7 +323,7 @@ void faust_spmat::init_from_file(char* filename)
 		|| *max_element(&row[0],&row[row.size()-1]) > dim1_tmp-1
 		|| *max_element(&col[0],&col[col.size()-1]) > dim2_tmp-1)
 	{
-		handleError("faust_spmat::init_from_file : Unable to initialize sparse matrix from file %s",filename);
+		handleError(class_name,"init_from_file : Unable to initialize sparse matrix from this file");
 	}
 
 	resize(row.size(), dim1_tmp, dim2_tmp);

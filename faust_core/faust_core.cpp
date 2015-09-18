@@ -9,7 +9,7 @@
 
 using namespace std;
 
-
+const char * faust_core::class_name="faust_core";
 
 faust_core::faust_core() :
    data(std::vector<faust_spmat>()),
@@ -54,7 +54,7 @@ faust_mat faust_core::get_product()const
 	// from right to left is (dim2*total_nnz)	
 	if (size() == 0)
 	{
-		handleError("faust_core::get_product : empty faust_core");						
+		handleError(class_name,"get_product : empty faust_core");						
 	}	
 	faust_mat prod(data[0].getNbRow()); 
 	
@@ -172,7 +172,7 @@ void faust_core::multiply(const faust_core & A)
 		{
 			if (getNbCol() != A.getNbRow())
 			{
-				handleError("faust_core::multiply : dimensions of the 2 faustcore are in conflict");
+				handleError(class_name,"multiply : dimensions of the 2 faustcore are in conflict");
 			}
 			data.insert(data.end(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;	
 		}
@@ -195,7 +195,7 @@ void faust_core::multiplyLeft(const faust_core & A)
 		{
 			if (getNbRow() != A.getNbCol())
 			{
-				handleError("faust_core::multiplyLeft : dimensions of the 2 faustcore are in conflict");
+				handleError(class_name,"multiplyLeft : dimensions of the 2 faustcore are in conflict");
 			}
 			data.insert(data.begin(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;	
 		}
@@ -212,7 +212,7 @@ faust_spmat faust_core::get_fact(int id)const
 {
 	if((id>=size())||(id<0))
 	{
-		handleError("faust_core::get_fact : id exceed faust_core size or id < 0"); 
+		handleError(class_name,"get_fact : id exceed faust_core size or id < 0"); 
 	}
 	return data[id];
 }
@@ -224,7 +224,7 @@ void faust_core::push_back(const faust_spmat& S)
    {   
       if(data[size()-1].getNbCol()!=S.getNbRow() || S.getNbRow()<1)
       {
-		 handleError("faust_core::push_back : incorrect dimensions"); 
+		 handleError(class_name,"push_back : incorrect dimensions"); 
       }
    }
    data.push_back(S);
@@ -240,7 +240,7 @@ void faust_core::push_first(const faust_spmat& S)
    if (size()>0)
       if(data[0].getNbRow()!=S.getNbCol() || S.getNbRow()<1)
       {	
-		handleError("faust_core::push_first : incorrect dimensions"); 
+		handleError(class_name,"push_first : incorrect dimensions"); 
       }
    data.insert(data.begin(),S);
    totalNonZeros += S.getNonZeros();

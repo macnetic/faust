@@ -48,6 +48,7 @@ class faust_spmat
 
 	private:
 		void update_dim(){dim1=mat.rows();dim2=mat.cols();nnz=mat.nonZeros();}
+		static const char * class_name;
 
 		
 

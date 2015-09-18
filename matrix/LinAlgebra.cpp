@@ -85,7 +85,7 @@ A.t_multiply.stop();
 
 faust_vec solve(const faust_mat & A, const faust_vec & v)
 {
-	if (A.getNbRow() != v.getDim())
+	if (A.getNbRow() != v.size())
 	{
 		handleError(interface_name," : solve : number of row of the  dense matrix A is different from dimension of the vector v");	
 	}
@@ -99,7 +99,7 @@ faust_vec solve(const faust_mat & A, const faust_vec & v)
 
 void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y)
 {
-	if (A.getNbRow() != y.getDim())
+	if (A.getNbRow() != y.size())
 	{
 		handleError(interface_name,"solve : number of row of the sparse matrix A is different from dimension of the vector y");	
 	}
@@ -131,13 +131,13 @@ void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real
 		nbColOpA = A.getNbCol();
 	}
 	
-	if   (nbColOpA != px->getDim() )
+	if   (nbColOpA != px->size() )
 	{
 		//handleError("Linalgebra : gemv : nbCol of op(A) = %d while dim of x = %d",nbColOpA,px->getDim());
 		handleError(interface_name, "gemv : dimension conflict  between matrix op(A) and input vector x");
 	}
 	
-	if ( (beta!=0)  &&  (y.getDim() != nbRowOpA))
+	if ( (beta!=0)  &&  (y.size() != nbRowOpA))
 	{
 		handleError(interface_name, "gemv : dimension conflict  between matrix op(A) and output vector y");
 	}

@@ -19,15 +19,14 @@ class faust_vec
  faust_vec() : dim(0), vec() {}
  faust_vec(const int _dim) : dim(_dim), vec(_dim){}
  faust_vec(const faust_vec& v) : dim(v.dim), vec(v.vec){}
- faust_vec(const int dim_, const faust_real* data_);
+ faust_vec(const faust_unsigned_int dim_, const faust_real* data_);
 	
  faust_real* getData(){return vec.data();}
  const faust_real* getData() const {return vec.data();}
  void setOnes();
  void Display() const;
 void print_file(const char* filename)const;
- int getDim() const {return dim;}
- int size() const {return dim;}
+ faust_unsigned_int size() const {return dim;}
  void resize(const int new_dim);
 faust_real norm(){return vec.norm();}
 void scalarMultiply(faust_real const scalar){vec *= scalar;}
@@ -54,17 +53,18 @@ void operator-=(const faust_vec& v);
 
 faust_real mean_relative_error(const faust_vec& v);
 
-faust_real& operator[](int i){return vec(i);}
-const faust_real& operator[](int i)const{return vec(i);}
+faust_real& operator[](faust_unsigned_int i){return vec(i);}
+const faust_real& operator[](faust_unsigned_int i)const{return vec(i);}
 
-const faust_real& operator()(int i)const{return vec(i);}
+const faust_real& operator()(faust_unsigned_int i)const{return vec(i);}
 
 friend void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA);
 friend faust_vec solve(const faust_mat & A, const faust_vec & v);
 friend void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
 
 private:
-  int dim;
+  faust_unsigned_int dim;
+  static const char * class_name;
   Eigen::Matrix<faust_real, Eigen::Dynamic,1> vec; 
 };
 #endif

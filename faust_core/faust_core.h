@@ -52,7 +52,7 @@ class faust_core
 	private:
 		std::vector<faust_spmat> data;
 		long long int totalNonZeros;
-
+		static const char * class_name;
 		
 
 	friend faust_vec operator*(const faust_core& f, const faust_vec& v);
