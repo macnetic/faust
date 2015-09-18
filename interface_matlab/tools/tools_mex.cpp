@@ -96,19 +96,6 @@ void getFaustspMat(const mxArray* spMat_array,faust_spmat & S)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 mxArray*  FaustMat2mxArray(const faust_mat& M)
 {		
 		mxArray * mxMat;
@@ -143,7 +130,7 @@ mxArray*  FaustMat2mxArray(const faust_mat& M)
 
 
 
-void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat> facts)
+void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat>& facts)
 {   
     int rowFact,colFact;
     int nb_fact = facts.size();
