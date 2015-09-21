@@ -60,7 +60,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mxCurrentField = mxGetField(prhs[0],0,"data");  
         
         getFaustMat(  mxCurrentField,data ) ;   
-        mexPrintf("DATA");
+        /*mexPrintf("DATA");
         for (int i = 0;i<data.getNbRow();i++)
         {
             for (int j = 0;j<data.getNbCol();j++)
@@ -68,8 +68,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                 //bidon = std::snprintf(coeff,10,"%d",A(i,j));	
                 mexPrintf("%f ",data(i,j));
             }
-            mexPrintf("\n");
-        }
+            mexPrintf("\n")
+        };*/
     }else
     {
          mexErrMsgTxt("params.data must be specified");
@@ -83,7 +83,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mxCurrentField = mxGetField(prhs[0],0,"nfacts");
         mexPrintf("a\n");
         nb_fact =(int)  mxGetScalar(mxCurrentField);
-        mexPrintf("NB FACT : %d",nb_fact);
+        mexPrintf("NB FACT : %d\n",nb_fact);
    }else
    {
         mexErrMsgTxt("params.nfacts must be specified");
@@ -107,15 +107,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         
         if(nbRowCons !=1)
         {
-            mexPrintf("\n cons has %d rows \n",nbRowCons);
+
             mexErrMsgTxt("cons must have 1 rows");
         }
         if(nbColCons != (nb_fact))
         {
-            mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
-            mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
+            //mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
+            //mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
         }
-        mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
+        //mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
         //faust_constraint_generic * consToAdd;
         
         
@@ -132,7 +132,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
         mexErrMsgTxt("params.cons must be specified");
     } 
-    
+    std::cout<<"FINI_CONS"<<std::endl;
     //niter1
     stopping_criterion crit1;
     if (presentFields[3])
@@ -149,18 +149,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (presentFields[4])
     {   
          mxCurrentField = mxGetField(prhs[0],0,"init_facts");
+		 std::cout<<"PASSERbeforeInitFact"<<std::endl;
 		setVectorFaustMat(init_facts,mxCurrentField);
-		if (init_facts.size() != nb_fact)
-		{
-			mexErrMsgTxt("conflicts between init_facts and nb_facts");
-		}
+		 std::cout<<"PASSERafterInitFact"<<std::endl;
+		
     }else
 	{
 		mexErrMsgTxt("init_facts must be must be specified");
 	}
 
-
-    
+	std::cout<<"PASSER1"<<std::endl;
     //verbosity
     bool isVerbose = false;
     if (presentFields[5])
@@ -193,22 +191,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
        compute_lambda = (bool) mxGetScalar(mxCurrentField);
    }
     
-    
+    std::cout<<"PASSER2"<<std::endl;
       ///////////// HIERARCHICAL LAUNCH ///////////////  
      // creation des parametres  
 	try{		
-		faust_params_palm params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda,compute_lambda); 
-		palm4MSA palm(params,false);
-		palm.compute_facts();
-		faust_real lambda = palm.get_lambda();
-		mexPrintf("LAMBDA : %f",lambda);
-		plhs[0]=mxCreateDoubleScalar((double) lambda);
-	 
+	
+		
+
+		
 	 
      
      //creation de hierarchical fact
-     palm4MSA palm(params,false);
-     hier_fact.compute_facts();	
+    faust_params_palm params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda,compute_lambda); 
+	std::cout<<"PASSER3"<<std::endl;
+	palm4MSA palm(params,false);	
+	palm.compute_facts();	
      
      
      //extraction des resultats
@@ -217,7 +214,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
      plhs[0]=mxCreateDoubleScalar((double) lambda);
      
      std::vector<faust_mat> facts;
-     palm.get_facts(facts);
+     facts=palm.get_facts();
 
      
      faust_mat current_fact = facts[0];
@@ -239,7 +236,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    
    
 
-}
+
 
 
 void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFields)

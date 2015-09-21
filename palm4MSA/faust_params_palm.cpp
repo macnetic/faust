@@ -20,7 +20,11 @@ void faust_params_palm::check_constraint_validity()
    {
 	   handleError(class_name,"check_constraint_validity : Size incompatibility in the constraints");
    }
- 
+	
+	if (init_fact.size() != nb_fact)
+	{
+		handleError(class_name,"check_constraint_validity : conflict between the number of initial factors and nb_fact ");
+	}
 }
 
 faust_params_palm::faust_params_palm(

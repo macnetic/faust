@@ -8,11 +8,17 @@
 void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
 {
     int  nbRow,nbCol;
-   
+	mwSize nb_dim=mxGetNumberOfDimensions(Mat_array);
+	if (nb_dim != 2)
+	{
+		mexErrMsgTxt("tools_mex.h:getFaustMat :input matrix must be a 2D array.");
+	}
     const mwSize *dimsMat;
     dimsMat = mxGetDimensions(Mat_array);
-    nbRow = (int) dimsMat[0];
+    
+	nbRow = (int) dimsMat[0];
     nbCol = (int) dimsMat[1];
+	mexPrintf("OK inside getFaustMat");
     if ((nbRow == 0) || (nbCol == 0))
         mexErrMsgIdAndTxt("tools_mex.h:getFaustMat", "empty matrix");
     if (mxIsSparse(Mat_array))
@@ -172,15 +178,20 @@ void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat>& facts)
 void setVectorFaustMat(std::vector<faust_mat> &vecMat,mxArray *Cells)
 {	
 	mxArray* mxMat;
-	mwSize nb_fact = mxGetNumberOfElements (Cells);
+	mwSize nb_fact = mxGetNumberOfElements(Cells);
 	faust_mat mat;
 	vecMat.resize(0);
+	mexPrintf("cells_size : %d\n",nb_fact);
 	for (mwSize i=0;i<nb_fact;i++)
-	{
+	{	
+		mexPrintf("i : %d\n",i);
 		mxMat=mxGetCell(Cells,i);
+		mexPrintf("mxMat set\n",i);
 		getFaustMat(mxMat,mat);
+		mexPrintf("mat set\n",i);
 		vecMat.push_back(mat);	
 	}
+	mexPrintf("fin SetVectorFaustMat\n");
 }
 
 
