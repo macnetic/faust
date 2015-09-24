@@ -3,7 +3,7 @@
 #  - CMakeLists.txt files in the sub-directories
 #  - CMake/* files, which define some tools to search for libraries, etc.
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
 set(FAUST_VERSION_MAJOR 1)
 set(FAUST_VERSION_MINOR 0)
@@ -51,10 +51,12 @@ set(FAUST_PALM4MSA_TARGET faust_palm4MSA CACHE INTERNAL "")
 set(FAUST_MEX_TARGET faust_mex CACHE INTERNAL "")
 set(FAUST_MEXTOOLS_TARGET faust_mextools CACHE INTERNAL "")
 set(FAUST_MATIO_TARGET faust_matio CACHE INTERNAL "")
+set(FAUST_TARGET faust CACHE INTERNAL "")
+
 
 # Default values for FAUST_USE_SINGLEPRECISION and FAUST_USE_OPENBLAS
 set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
-set(FAUST_USE_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
+set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
 
 # adding compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fexceptions -fPIC -fno-omit-frame-pointer -pthread")
@@ -142,6 +144,14 @@ add_subdirectory(${FAUST_PALM4MSA_SRC_DIR} ${FAUST_PALM4MSA_BIN_DIR})
 add_subdirectory(${FAUST_MATIO_SRC_DIR} ${FAUST_MATIO_BIN_DIR})
 add_subdirectory(${FAUST_PALM4MSATEST_SRC_DIR} ${FAUST_PALM4MSATEST_BIN_DIR})
 add_subdirectory(${FAUST_MEXINTERFACE_SRC_DIR} ${FAUST_MEXINTERFACE_BIN_DIR})
+
+add_library(${FAUST_TARGET} SHARED $<TARGET_OBJECTS:${FAUST_EXCEPTION_TARGET}> $<TARGET_OBJECTS:${FAUST_MATRIX_TARGET}> $<TARGET_OBJECTS:${FAUST_FAUSTCORE_TARGET}> $<TARGET_OBJECTS:${FAUST_PALM4MSA_TARGET}> )
+
+if(FAUST_USE_OPENBLAS)
+   target_link_libraries(${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
+else()
+   target_link_libraries(${FAUST_TARGET} )
+endif()
 
 
 #add_dependencies(${FAUST_FAUSTCORE_TARGET} ${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
