@@ -1,10 +1,12 @@
 #ifndef __CLASS_HANDLE_HPP__
 #define __CLASS_HANDLE_HPP__
 #include "mex.h"
-#include <stdint.h>
 #include <string>
 #include <cstring>
 #include <typeinfo>
+//#include <stdint.h>
+typedef unsigned long int uint32_t;
+typedef unsigned long long int uint64_t;
 
 #define CLASS_HANDLE_SIGNATURE 0xFF00F0A5
 template<class base> class class_handle
