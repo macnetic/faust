@@ -19,61 +19,55 @@ string(REGEX REPLACE "([ \n\r\t]+)" ";" CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS}
 
 set(CXX_MEX_FLAGS "-I${MATLAB_INCLUDE_DIR}" "-I${FAUST_EIGEN_SRC_DIR}" "-I${FAUST_MATRIX_SRC_DIR}" "-I${FAUST_PALM4MSA_SRC_DIR}" "-I${FAUST_FAUSTCORE_SRC_DIR}" "-I${FAUST_MEXINTERFACEMEX_SRC_DIR}" "-I${FAUST_MEXINTERFACE_SRC_DIR}" "-I${FAUST_MEXINTERFACETOOLS_SRC_DIR}")
 
-
-set(LDD_MEX_FLAGS "-L${FAUST_LIB_DIR}"  "-L${MATLAB_ROOT}/bin/glnxa64" "-l${FAUST_TARGET}"  "-lmx" "-lmex" "-lmat")
-if(FAUST_USE_OPENBLAS)
-   set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}" "${OPENBLAS_LIB_FILE}")
+if(UNIX)
+	set(LDD_MEX_FLAGS "-L${FAUST_LIB_DIR}"  "-L${MATLAB_ROOT}/bin/glnxa64" "-l${FAUST_TARGET}"  "-lmx" "-lmex" "-lmat")
+	if(FAUST_USE_OPENBLAS)
+	   set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}" "${OPENBLAS_LIB_FILE}")
+	endif()
+elseif(WIN32)
+	set(LDD_MEX_FLAGS "/LIBPATH:${FAUST_LIB_DIR}" "/LIBPATH:${MATLAB_ROOT}/extern/lib/win32/microsoft" "${FAUST_TARGET}.lib" "libmx.lib" "libmex.lib" "libmat.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib")
 endif()
+
 
 foreach(mex_target ${MEXFILE_TARGET_LIST})
 
-	add_custom_target(${mex_target} ALL DEPENDS ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} ${FAUST_MEXTOOLS_TARGET} )
+	add_custom_target(${mex_target} ALL DEPENDS ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} ${FAUST_MEXTOOLS_TARGET} ${FAUST_TARGET})
 
-	add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
-	COMMAND   ${MATLAB_ROOT}/bin/mex 
-	ARGS "-v" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" "LDFLAGS=$$LDFLAGS -Wl,-rpath=${MATLAB_ROOT}/bin/glnxa64:${FAUST_MEXINTERFACE_LIB_DIR}" "-O" "${FAUST_COMPILE_SINGLE_FLAG}"
-	${CXX_MEX_FLAGS} ${LDD_MEX_FLAGS}
-   COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
+	if(UNIX)
+		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
+		COMMAND   ${MATLAB_ROOT}/bin/mex 
+		ARGS "-v" "-largeArrayDims" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" 
+		"LDFLAGS=$$LDFLAGS -Wl,-rpath=${MATLAB_ROOT}/bin/glnxa64:${FAUST_MEXINTERFACE_LIB_DIR}" 
+		"-O" "${FAUST_COMPILE_SINGLE_FLAG}"
+		${CXX_MEX_FLAGS} 
+		${LDD_MEX_FLAGS}
+		COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
+	elseif(WIN32)
+		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
+		COMMAND cl 
+		ARGS "/c"  "/GR" "/W3" "/EHs" "/nologo" "/MD" "/O2" "/Oy-"
+		"/DFAUST_SINGLE" "/D_CRT_SECURE_NO_DEPRECATE" "/D_SCL_SECURE_NO_DEPRECATE" "/D_SECURE_SCL=0" "/DMATLAB_MEX_FILE" "/DNDEBUG"
+		${CXX_MEX_FLAGS}	
+		"${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp"
+		"/Fo${FAUST_MEXINTERFACEMEX_BIN_DIR}/${mex_target}.obj"
+	
+		COMMAND link  
+		ARGS "/nologo" "/manifest" "/incremental:NO" "/DLL" "/EXPORT:mexFunction" 
+		"${FAUST_MEXINTERFACEMEX_BIN_DIR}/${mex_target}.obj"
+		${LDD_MEX_FLAGS}
+		"/out:${mex_target}.${MEX_EXT}"
+	
+		COMMAND mt 
+		ARGS "-outputresource:${mex_target}.${MEX_EXT};2" "-manifest" "${mex_target}.${MEX_EXT}.manifest"
+		
+		COMMAND del 
+		ARGS "${mex_target}.exp" "${mex_target}.lib" "${mex_target}.${MEX_EXT}.manifest"
+	
+		COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
+	else()
+		message(FATAL_ERROR "Unable to compile mex functions")
+	endif()
 
-	#COMMAND   ${MATLAB_ROOT}/bin/mex 
-	#ARGS  "LDFLAGS=$$LDFLAGS -Wl,-rpath=${PROJECT_BINARY_DIR}:${MATLAB_ROOT}/bin/glnxa64" "-O" "${FAUST_COMPILE_SINGLE_FLAG}"
-	#${CXX_MEX_FLAGS}
-	#"-I${MATLAB_INCLUDE_DIR}" "-I${FAUST_EIGEN_SRC_DIR}" "-I${FAUST_MATRIX_SRC_DIR}" "-I${FAUST_PALM4MSA_SRC_DIR}" "-I${FAUST_FAUSTCORE_SRC_DIR}" "-I${FAUST_MEXINTERFACEMEX_SRC_DIR}" "-I${FAUST_MEXINTERFACE_SRC_DIR}" "-I${FAUST_MEXINTERFACETOOLS_SRC_DIR}" 
-	#"${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp"  
-	#"-L${PROJECT_BINARY_DIR}" "-L${FAUST_MEXINTERFACE_BIN_DIR}" "-L${MATLAB_ROOT}/bin/glnxa64"
-	#"-l${FAUST_TARGET}" "-l${FAUST_MEXTOOLS_TARGET}" "-lmx" "-lmex" "-lmat" "${OPENBLAS_LIB_FILE}"
-	#${LDD_MEX_FLAGS}
-   #COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
-
-
-#		COMMAND ${CMAKE_CXX_COMPILER} 
-#		ARGS "-c" ${CMAKE_CXX_FLAGS_LIST} "-DNDEBUG -DMATLAB_MEX_FILE" 
-#		"${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp"
-#		"-I${MATLAB_INCLUDE_DIR}" 
-#		"-I${FAUST_EIGEN_SRC_DIR}" 
-#		"-I${FAUST_MATRIX_SRC_DIR}" 
-#		"-I${FAUST_PALM4MSA_SRC_DIR}" 
-#		"-I${FAUST_FAUSTCORE_SRC_DIR}" 
-#		"-I${FAUST_MEXINTERFACEMEX_SRC_DIR}" 
-#		"-I${FAUST_MEXINTERFACE_SRC_DIR}" 
-#		"-I${FAUST_MEXINTERFACETOOLS_SRC_DIR}"
-#		"-o" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.o"
-#        	COMMAND ${CMAKE_CXX_COMPILER} 
-#		ARGS "-pthread" "-Wl,--no-undefined" "-fPIC" "-shared" "-O3" "-Wl,--version-script,${MATLAB_ROOT}/extern/lib/glnxa64/mexFunction.map" 
-#		"${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.o"
-#		"-lstdc++" "-lm"
-#		"-L${FAUST_FAUSTCORE_BIN_DIR}" "-l${FAUST_FAUSTCORE_TARGET}"
-#		"-L${FAUST_MATRIX_BIN_DIR}" "-l${FAUST_MATRIX_TARGET}"
-#		"-L${FAUST_PALM4MSA_BIN_DIR}" "-l${FAUST_PALM4MSA_TARGET}"
-#		"-L${FAUST_EXCEPTION_BIN_DIR}" "-l${FAUST_EXCEPTION_TARGET}"
-#		"-L${FAUST_MEXINTERFACE_BIN_DIR}" "-l${FAUST_MEXTOOLS_TARGET}"
-#		"-L${MATLAB_ROOT}/bin/glnxa64" "-lmx" "-lmex" "-lmat"	
-#		"-Wl,-rpath=${FAUST_FAUSTCORE_BIN_DIR}:${FAUST_MATRIX_BIN_DIR}:${FAUST_PALM4MSA_BIN_DIR}:${FAUST_MEXINTERFACE_BIN_DIR}:${FAUST_EXCEPTION_BIN_DIR}"
-#		"-o" "${mex_target}.${MEX_EXT}"
-#		COMMAND rm
-#		ARGS -f ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.o
-#		COMMENT "Creating mex function ${mex_target}.${MEX_EXT}"
-#		VERBATIM)
 
 endforeach()
 

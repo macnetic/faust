@@ -56,7 +56,7 @@ set(FAUST_TARGET faust CACHE INTERNAL "")
 
 
 if(WIN32)
-	if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+	if(CMAKE_BUILD_TYPE MATCHES "Debug")
 		set(FAUST_DEBUG_RELEASE "debug")
 		set(FAUST_LIB_DIR ${PROJECT_BINARY_DIR}/Debug)
 		set(FAUST_MEXINTERFACE_LIB_DIR ${FAUST_MEXINTERFACE_BIN_DIR}/Debug)
@@ -77,7 +77,7 @@ set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of d
 set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
 
 # adding compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fexceptions -fPIC -fno-omit-frame-pointer -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -fno-omit-frame-pointer -pthread -fPIC")
 if(FAUST_USE_SINGLEPRECISION)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFAUST_SINGLE")
 	set(FAUST_COMPILE_SINGLE_FLAG "-DFAUST_SINGLE")
