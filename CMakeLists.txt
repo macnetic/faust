@@ -111,50 +111,78 @@ check_external_includes("matio.h" MATIO_INC_DIR 0)
 #find_path(EIGEN_LIB_DIR ${EIGEN_LIB_FILE})
 
 
-
-
-
-#MEX_EXT
+# test if executable matlab is in the path
 if(UNIX)
-	set(MEX_EXT "mexa64" CACHE INTERNAL "mex extension")
+	exec_program("which matlab" OUTPUT_VARIABLE MATLAB_DIR_TMP)
+elseif(WIN32)
+	exec_program("where matlab" OUTPUT_VARIABLE MATLAB_DIR_TMP)
+endif()
+#message(STATUS "ooooooooooooooooooooooooo MATLAB_DIR_TMP=${MATLAB_DIR_TMP}")
+if( ${MATLAB_DIR_TMP} MATCHES "matlab")
+	set(IS_MATLAB_IN_PATH 1)
 else()
-	set(MEX_EXT "mexw64" CACHE INTERNAL "mex extension")
+	set(IS_MATLAB_IN_PATH 0)
+endif()
+#message(STATUS "ooooooooooooooooooooooooo IS_MATLAB_IN_PATH=${IS_MATLAB_IN_PATH}")
+
+if(IS_MATLAB_IN_PATH)
+	if(UNIX)
+	
+		exec_program("matlab_dir_tmp=`which matlab`; if echo \"$matlab_dir_tmp\" | grep -q \"/bin/\"; then echo '1'; else echo '0'; fi" OUTPUT_VARIABLE IS_MATLAB_DIR_FOUND)
+		if(IS_MATLAB_DIR_FOUND EQUAL 1)
+			exec_program("MATLAB_ROOT_TMP=`which matlab |xargs dirname`; while echo \"$MATLAB_ROOT_TMP\" | grep -q \"/bin\"; do MATLAB_ROOT_TMP=`dirname $MATLAB_ROOT_TMP`; done; echo $MATLAB_ROOT_TMP;" OUTPUT_VARIABLE MATLAB_ROOT)
+			set(MATLAB_ROOT ${MATLAB_ROOT} CACHE INTERNAL "Matlab root directory")
+		else()
+			set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
+		endif()
+	
+		#exec_program("openblas_dir_tmp=`locate libopenblas.so | head -n 1`; if echo \"$openblas_dir_tmp\" | grep -q \"libopenblas\"; then echo '1'; else echo '0'; fi" OUTPUT_VARIABLE IS_OPENBLAS_DIR_FOUND)
+		#if(IS_OPENBLAS_DIR_FOUND EQUAL 1)
+		#	exec_program("OPENBLAS_LIB_TMP=`locate libopenblas.so | head -n 1 |xargs dirname`; echo $OPENBLAS_LIB_TMP;" OUTPUT_VARIABLE OPENBLAS_LIB_PATH)
+		#	set(OPENBLAS_LIB_PATH ${OPENBLAS_LIB_PATH} CACHE INTERNAL "Openblas library directory")
+		#else()
+		#	set(OPENBLAS_LIB_PATH "" CACHE PATH "Openblas library directory")
+		#endif()
+	else()
+		exec_program("${PROJECT_SOURCE_DIR}/CMake/is_matlab_present.bat" OUTPUT_VARIABLE IS_MATLAB_DIR_FOUND)
+		if(IS_MATLAB_DIR_FOUND EQUAL 1)
+			exec_program("${PROJECT_SOURCE_DIR}/CMake/find_matlab_root.bat" OUTPUT_VARIABLE MATLAB_ROOT)
+			set(MATLAB_ROOT ${MATLAB_ROOT} CACHE INTERNAL "Matlab root directory")
+		else()
+			set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
+		endif()
+		#set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
+		#set(OPENBLAS_LIB_PATH "" CACHE PATH "Openblas library directory")
+	endif()
+	
+	set(MATLAB_INCLUDE_DIR "${MATLAB_ROOT}/extern/include" CACHE INTERNAL "Matlab include directory")
+
+
+	# replacing these lines by command computer('arch') in matlab
+	if(UNIX)
+		set(MEX_EXT "mexa64")
+	elseif(WIN32)
+		set(MEX_EXT "mexw32")
+	else()
+		message(FATAL_ERROR "Unknown type of plateform")
+	endif()
+	
+	#MEX_EXT
+	if(${MEX_EXT} STREQUAL "mexa64")
+		set(MEX_SUBDIR_LIB "glnxa64")
+	elseif(${MEX_EXT} STREQUAL "mexglx")
+		set(MEX_SUBDIR_LIB "glnx86")
+	elseif(${MEX_EXT} STREQUAL "mexw64")
+		set(MEX_SUBDIR_LIB  "win64")
+	elseif(${MEX_EXT} STREQUAL "mexw32")
+		set(MEX_SUBDIR_LIB  "win32")
+	endif()
+else()
+	message(WARNING "Matlab executable seems not to be in the path. So \"MATLAB_ROOT\" and \"MATLAB_INCLUDE_DIR\" wont'be defined and mex files won't be compiled. if matlab is installed on your computer, please add matlabroot/bin tu the PATH and try again.")	
 endif()
 
-
-if(UNIX)
-
-	exec_program("matlab_dir_tmp=`which matlab`; if echo \"$matlab_dir_tmp\" | grep -q \"/bin/\"; then echo '1'; else echo '0'; fi" OUTPUT_VARIABLE IS_MATLAB_DIR_FOUND)
-	if(IS_MATLAB_DIR_FOUND EQUAL 1)
-		exec_program("MATLAB_ROOT_TMP=`which matlab |xargs dirname`; while echo \"$MATLAB_ROOT_TMP\" | grep -q \"/bin\"; do MATLAB_ROOT_TMP=`dirname $MATLAB_ROOT_TMP`; done; echo $MATLAB_ROOT_TMP;" OUTPUT_VARIABLE MATLAB_ROOT)
-		set(MATLAB_ROOT ${MATLAB_ROOT} CACHE INTERNAL "Matlab root directory")
-	else()
-		set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
-	endif()
-
-	#exec_program("openblas_dir_tmp=`locate libopenblas.so | head -n 1`; if echo \"$openblas_dir_tmp\" | grep -q \"libopenblas\"; then echo '1'; else echo '0'; fi" OUTPUT_VARIABLE IS_OPENBLAS_DIR_FOUND)
-	#if(IS_OPENBLAS_DIR_FOUND EQUAL 1)
-	#	exec_program("OPENBLAS_LIB_TMP=`locate libopenblas.so | head -n 1 |xargs dirname`; echo $OPENBLAS_LIB_TMP;" OUTPUT_VARIABLE OPENBLAS_LIB_PATH)
-	#	set(OPENBLAS_LIB_PATH ${OPENBLAS_LIB_PATH} CACHE INTERNAL "Openblas library directory")
-	#else()
-	#	set(OPENBLAS_LIB_PATH "" CACHE PATH "Openblas library directory")
-	#endif()
-else()
-	exec_program("${PROJECT_SOURCE_DIR}/CMake/is_matlab_present.bat" OUTPUT_VARIABLE IS_MATLAB_DIR_FOUND)
-	if(IS_MATLAB_DIR_FOUND EQUAL 1)
-		exec_program("${PROJECT_SOURCE_DIR}/CMake/find_matlab_root.bat" OUTPUT_VARIABLE MATLAB_ROOT)
-		set(MATLAB_ROOT ${MATLAB_ROOT} CACHE INTERNAL "Matlab root directory")
-	else()
-		set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
-	endif()
-	#set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
-	#set(OPENBLAS_LIB_PATH "" CACHE PATH "Openblas library directory")
-endif()
-
-set(MATLAB_INCLUDE_DIR "${MATLAB_ROOT}/extern/include" CACHE INTERNAL "Matlab include directory")
 
 #INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
-
 
 add_subdirectory(${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EXCEPTION_BIN_DIR})
 add_subdirectory(${FAUST_MATRIX_SRC_DIR} ${FAUST_MATRIX_BIN_DIR})
