@@ -20,12 +20,12 @@ string(REGEX REPLACE "([ \n\r\t]+)" ";" CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS}
 set(CXX_MEX_FLAGS "-I${MATLAB_INCLUDE_DIR}" "-I${FAUST_EIGEN_SRC_DIR}" "-I${FAUST_MATRIX_SRC_DIR}" "-I${FAUST_PALM4MSA_SRC_DIR}" "-I${FAUST_FAUSTCORE_SRC_DIR}" "-I${FAUST_MEXINTERFACEMEX_SRC_DIR}" "-I${FAUST_MEXINTERFACE_SRC_DIR}" "-I${FAUST_MEXINTERFACETOOLS_SRC_DIR}")
 
 if(UNIX)
-	set(LDD_MEX_FLAGS "-L${FAUST_LIB_DIR}"  "-L${MATLAB_ROOT}/bin/glnxa64" "-l${FAUST_TARGET}"  "-lmx" "-lmex" "-lmat")
+	set(LDD_MEX_FLAGS "-L${FAUST_LIB_DIR}"  "-L${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}" "-l${FAUST_TARGET}"  "-lmx" "-lmex" "-lmat")
 	if(FAUST_USE_OPENBLAS)
 	   set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}" "${OPENBLAS_LIB_FILE}")
 	endif()
 elseif(WIN32)
-	set(LDD_MEX_FLAGS "/LIBPATH:${FAUST_LIB_DIR}" "/LIBPATH:${MATLAB_ROOT}/extern/lib/win32/microsoft" "${FAUST_TARGET}.lib" "libmx.lib" "libmex.lib" "libmat.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib")
+	set(LDD_MEX_FLAGS "/LIBPATH:${FAUST_LIB_DIR}" "/LIBPATH:${MATLAB_ROOT}/extern/lib/${MEX_SUBDIR_LIB}/microsoft" "${FAUST_TARGET}.lib" "libmx.lib" "libmex.lib" "libmat.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib")
 endif()
 
 
@@ -37,7 +37,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 		COMMAND   ${MATLAB_ROOT}/bin/mex 
 		ARGS "-v" "-largeArrayDims" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" 
-		"LDFLAGS=$$LDFLAGS -Wl,-rpath=${MATLAB_ROOT}/bin/glnxa64:${FAUST_MEXINTERFACE_LIB_DIR}" 
+		"LDFLAGS=$$LDFLAGS -Wl,-rpath=${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}:${FAUST_MEXINTERFACE_LIB_DIR}" 
 		"-O" "${FAUST_COMPILE_SINGLE_FLAG}"
 		${CXX_MEX_FLAGS} 
 		${LDD_MEX_FLAGS}
