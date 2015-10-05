@@ -9,6 +9,11 @@
 
 using namespace std;
 
+
+#ifdef __GEMM_WITH_MKL__
+	#include "mkl_spblas.h"
+#endif
+
 const char * faust_vec::class_name = "faust_vec::";
 
 faust_vec::faust_vec(const faust_unsigned_int dim_, const faust_real* data_) : dim(dim_), vec(dim_)
@@ -125,13 +130,41 @@ void faust_vec::operator=(faust_vec const& y)
 
 
 void  faust_vec::multiplyLeft(faust_spmat const& A)
-{
-	if(A.getNbCol() != vec.size())
+{	
+	int nbColA = A.getNbCol();
+	
+	if(nbColA != vec.size())
 	{
 		 handleError(class_name,"multiplyLeft : incorrect dimensions");
 		
 	}
-	vec = A.mat * vec;
+	#ifdef __GEMM_WITH_MKL__
+		int nbRowA = A.getNbRow();
+		faust_real alpha = 1.0,beta = 0.0;
+		char matdescrA[8];
+		matdescrA[0]='G';
+		for (int i=1 ; i<=6 ;i++)
+		matdescrA[i] = 'C';
+		matdescrA[7] = '\0';
+		faust_vec y(nbRowA);
+		faust_spmat Acopy(A);
+		if (!Acopy.isCompressedMode())
+		{
+			Acopy.makeCompression();
+			std::cout<<class_name<<"multiplyLeft : sparse matrix A is not compressed (possible lack of time)"<<std::endl;
+		}
+		std::cout<<" MKL multiplyLeft avant mult"<<std::endl;		
+		#ifdef FAUST_SINGLE	
+			mkl_scsrmv("T",&nbColA,&nbRowA,&alpha,matdescrA,Acopy.getValuePtr(),Acopy.getInnerIndexPtr(),Acopy.getOuterIndexPtr(),&(Acopy.getOuterIndexPtr()[1]),getData(),&beta,y.getData());
+		#else
+			mkl_dcsrmv("T",&nbColA,&nbRowA,&alpha,matdescrA,Acopy.getValuePtr(),Acopy.getInnerIndexPtr(),Acopy.getOuterIndexPtr(),&(Acopy.getOuterIndexPtr()[1]),getData(),&beta,y.getData());
+		#endif
+		(*this) = y;	
+	#else
+		vec = A.mat * vec;	
+	#endif
+	std::cout<<"multiplyLeft apres mult"<<std::endl;
+	
 	dim = A.dim1;
 }
 

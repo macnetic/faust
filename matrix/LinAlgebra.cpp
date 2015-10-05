@@ -20,6 +20,8 @@
 #endif
 
 
+
+
 const char * interface_name="LinAlgebra";
 
  void multiply(const faust_mat & A, const faust_mat & B, faust_mat & C)
@@ -97,7 +99,7 @@ faust_vec solve(const faust_mat & A, const faust_vec & v)
 	return sol;
 }
 
-void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y)
+void sp_solve(const faust_spmat & A,faust_vec & x, const faust_vec & y)
 {
 	if (A.getNbRow() != y.size())
 	{
@@ -182,6 +184,8 @@ void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real
 			cblas_dgemv(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
 		#endif
 	#endif
+	
+	
 							
 	if  ((&x) == (&y))
 		delete px; 

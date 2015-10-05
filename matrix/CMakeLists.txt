@@ -6,6 +6,11 @@ if(FAUST_USE_OPENBLAS)
 	include_directories( ${OPENBLAS_INC_DIR})
 endif()
 
+if(FAUST_USE_MKL)
+	include_directories( ${MKL_INC_DIR})
+	message(STATUS " matrix MKL_INC_DIR ${MKL_INC_DIR}")
+endif()
+message(STATUS "AAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 add_library(${FAUST_MATRIX_TARGET} OBJECT ${CPP_FILES})
 
 if(FAUST_USE_OPENBLAS)

@@ -5,9 +5,95 @@
 #include "faust_constraint_int.h"
 #include "faust_params.h"
 
-void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
+
+
+
+
+
+
+
+void getFaustVec(const mxArray * vec_array,faust_vec & vec)
 {
+	    int  nbRow,nbCol;
+	
+	if (mxIsEmpty(vec_array))
+	{
+		mexErrMsgTxt("tools_mex.h:getFaustVec :input matrix is empty.");
+	}
+	mwSize nb_dim=mxGetNumberOfDimensions(vec_array);
+	if (nb_dim != 2)
+	{
+		mexErrMsgTxt("tools_mex.h:getFaustVec :input vector must be a 2D array.");
+	}
+    const mwSize *dimsMat;
+    dimsMat = mxGetDimensions(vec_array);
+    
+	nbRow = (int) dimsMat[0];
+    nbCol = (int) dimsMat[1];
+    if ((nbRow == 0) || (nbCol == 0))
+        mexErrMsgIdAndTxt("tools_mex.h:getFaustVec", "empty vector");
+	if ((nbCol) > 1)
+	{
+		mexErrMsgTxt("getFaustVec : input must be a column-vector");
+	}
+    if (mxIsSparse(vec_array))
+    {	
+        //mexErrMsgTxt("sparse matrix entry instead of dense matrix");
+        mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense vector");
+    }
+	const mxClassID V_CLASS_ID = mxGetClassID(vec_array);
+	 faust_real* MatPtr; 
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(faust_real))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(faust_real))))
+	{
+		MatPtr = (faust_real*) mxGetPr(vec_array);
+	}else
+	{	
+		if (V_CLASS_ID == mxDOUBLE_CLASS) 
+		{	
+			MatPtr = (faust_real*) mxCalloc(nbRow,sizeof(faust_real));
+			double* MatPtrDouble =(double*) mxGetPr(vec_array);
+			for (int i=0;i<nbRow*nbCol;i++)
+				MatPtr[i] = (faust_real) MatPtrDouble[i];
+		}
+		else if (V_CLASS_ID == mxSINGLE_CLASS)
+		{		
+			MatPtr = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
+			float* MatPtrSingle= (float*) (mxGetData(vec_array));
+			for (int i=0;i<nbRow*nbCol;i++)
+				MatPtr[i] = (faust_real) MatPtrSingle[i];
+		
+		
+		}else
+		{
+		 mexErrMsgTxt("getFaustVec :input vector format must be single or double");
+		}
+	}
+	
+     vec.resize(nbRow);
+	
+    memcpy(vec.getData(),MatPtr,nbRow*sizeof(faust_real));
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(faust_real))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(faust_real))))
+	{
+		mxFree(MatPtr);
+	}
+
+}
+
+
+
+
+
+
+
+void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
+{	
+	
     int  nbRow,nbCol;
+	
+	if (mxIsEmpty(Mat_array))
+	{
+		mexErrMsgTxt("tools_mex.h:getFaustMat :input matrix is empty.");
+	}
 	mwSize nb_dim=mxGetNumberOfDimensions(Mat_array);
 	if (nb_dim != 2)
 	{
@@ -18,7 +104,6 @@ void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
     
 	nbRow = (int) dimsMat[0];
     nbCol = (int) dimsMat[1];
-	mexPrintf("OK inside getFaustMat");
     if ((nbRow == 0) || (nbCol == 0))
         mexErrMsgIdAndTxt("tools_mex.h:getFaustMat", "empty matrix");
     if (mxIsSparse(Mat_array))
@@ -187,6 +272,11 @@ void setVectorFaustMat(std::vector<faust_mat> &vecMat,mxArray *Cells)
 		mexPrintf("i : %d\n",i);
 		mxMat=mxGetCell(Cells,i);
 		mexPrintf("mxMat set\n",i);
+		if (mxMat == NULL)
+		{
+			mexErrMsgTxt("tools_mex.h:setVectorFaustMat :input matrix is empty.");
+		}
+		mexPrintf("mxMat test_empty\n",i);
 		getFaustMat(mxMat,mat);
 		mexPrintf("mat set\n",i);
 		vecMat.push_back(mat);	

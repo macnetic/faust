@@ -1,8 +1,8 @@
 clear all;
 close all;
 addpath('../build/interface_matlab')
-addpath('')
-cd '../../Code_Luc'
+addpath(''),
+cd '../../Code_Luc';
 set_path;
 cd '../devcpp/interface_matlab/';
 

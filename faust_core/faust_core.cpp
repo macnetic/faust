@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const char * faust_core::class_name="faust_core";
+const char * faust_core::class_name="faust_core::";
 
 faust_core::faust_core() :
    data(std::vector<faust_spmat>()),
@@ -212,8 +212,12 @@ faust_spmat faust_core::get_fact(int id)const
 {
 	if((id>=size())||(id<0))
 	{
+		cout<<"id_fact error : "<<id<<endl;	
 		handleError(class_name,"get_fact : id exceed faust_core size or id < 0"); 
 	}
+	cout<<"size_fact"<<size()<<endl;
+	cout<<"id_fact"<<id<<endl;
+	
 	return data[id];
 }
 

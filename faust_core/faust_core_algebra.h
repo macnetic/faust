@@ -15,6 +15,7 @@ faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_r
 
 
  void multiply(const faust_core & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char typeA, char typeMult);
+ void faust_solve(const faust_core & A,faust_vec & x, const faust_vec & y);
 
 
 

@@ -332,5 +332,7 @@ void faust_spmat::init_from_file(char* filename)
 	for(int i=0 ; i<row.size() ; i++)
 		tripletList.push_back(Eigen::Triplet<faust_real>(row[i], col[i], val[i]));
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	
+	mat.makeCompressed();
 }
 

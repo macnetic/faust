@@ -3,7 +3,7 @@
 #include "faust_core.h"
 #include "tools_mex.h"
 #include "faust_mat.h"
-
+#include <stdexcept>
 
 // prhs[0] : name of command : 
 //    "delete" to delete the faust_core object dynamically allocated previously
@@ -17,6 +17,7 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {	
+	try{
 	// Get the command string
 	char cmd[256];
 	if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
@@ -304,4 +305,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     // Got here, so command not recognized
     mexErrMsgTxt("Command not recognized.");
+	}catch (const std::exception& e)
+	{
+		 mexErrMsgTxt(e.what());
+	}
 }

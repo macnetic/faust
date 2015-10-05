@@ -27,7 +27,7 @@ class faust_vec;
  
  
 faust_vec solve(const faust_mat & A, const faust_vec & v);
-void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
+void sp_solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
  
  
  // C = alpha *op(A)*op(B) + beta * C;

@@ -5,11 +5,12 @@
 #include "faust_mat.h"
 #include "faust_spmat.h"
 #include <vector>
+#include "faust_vec.h"
 
 class faust_constraint_generic;
 class faust_params;
 
-
+void getFaustVec(const mxArray * vec_array,faust_vec & vec);
 void getFaustMat(const mxArray* Mat_array,faust_mat & Mat);
 void getFaustspMat(const mxArray* spMat_array,faust_spmat & S);
 mxArray*  FaustMat2mxArray(const faust_mat& M);

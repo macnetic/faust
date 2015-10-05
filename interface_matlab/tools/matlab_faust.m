@@ -35,6 +35,9 @@ classdef matlab_faust < handle
 			end
 				
 		 end
+		function res=solve(this,varargin)
+			[varargout{1:nargout}] = mexFaust('solve', this.objectHandle, varargin{:});
+		end
 		 
 		function Size=size(this,varargin);
 			if (nargin == 1)

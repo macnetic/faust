@@ -60,7 +60,7 @@ const faust_real& operator()(faust_unsigned_int i)const{return vec(i);}
 
 friend void gemv(const faust_mat & A,const faust_vec & x,faust_vec & y,const faust_real & alpha, const faust_real & beta, char typeA);
 friend faust_vec solve(const faust_mat & A, const faust_vec & v);
-friend void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
+friend void sp_solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
 
 private:
   faust_unsigned_int dim;

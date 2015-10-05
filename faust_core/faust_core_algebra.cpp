@@ -221,3 +221,28 @@ faust_mat operator*(const faust_core& f, const faust_mat& M)
 		A.multiplyLeft(f.data[i]);
 	return A;
 }
+
+
+
+
+void faust_solve(const faust_core & A,faust_vec & x, const faust_vec & y)
+{
+	if (A.size() == 0)
+	{
+		handleError(core_algebra_name," solve :  empty faust_core");		
+	}
+	if (A.getNbRow() != y.size())
+	{
+		handleError(core_algebra_name," solve :  dimension of the faust_core A and size of y mismatch.");
+	}
+	faust_vec ybis = y;
+	
+	for (int i=A.size()-1;i>=0;i--)
+	{
+		sp_solve(A.get_fact(i),x,ybis);
+		ybis = x;
+	}
+	
+	
+	
+}

@@ -37,6 +37,15 @@ class faust_spmat
 		int getNbRow()const{return dim1;}
 		int getNbCol()const{return dim2;}
 		int getNonZeros()const{return nnz;}
+		bool isCompressedMode()const{return mat.isCompressed();}
+		void makeCompression(){mat.makeCompressed();}
+		////// Eigen sparse matrix format : CSC (Compressed Sparse Column) /////
+		faust_real* getValuePtr(){return mat.valuePtr();}// return pointer value of length nnz
+		int* getOuterIndexPtr(){return mat.outerIndexPtr();}//return column-index value of length equal to the number of column+1
+		 int* getInnerIndexPtr(){return mat.innerIndexPtr();}//return row index of length nnz
+		
+		
+		
 		void init_from_file(const char* filename);
 		void Display() const;
 		faust_real norm(){return mat.norm();}	
@@ -67,7 +76,7 @@ class faust_spmat
 	friend void faust_mat::operator+=(const faust_spmat& S);
 	// *this = (*this) - S
 	friend void faust_mat::operator-=(const faust_spmat& S);
-	friend void solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
+	friend void sp_solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
 
 	// *this = S * (*this) 
 	friend void faust_mat::multiplyLeft(const faust_spmat& S);
