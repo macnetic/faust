@@ -14,8 +14,8 @@ addpath([getenv('MKL_COMPILER_DIR') '/lib/intel64']);
 getenv('LD_LIBRARY_PATH')
 %setenv('LD_LIBRARY_PATH',[getenv('')])
 S{1}=2*eye(3,5);
-% S{2}=3*eye(5,7);
-% S{3}=randint(7,7);
+S{2}=3*eye(5,7);
+S{3}=randint(7,7);
 
 % Sparrow = zeros(7,3);
 % Sparrow(2,1) = 1;
