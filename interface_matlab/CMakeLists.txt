@@ -71,7 +71,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 		COMMAND   ${MATLAB_ROOT}/bin/mex 
-		ARGS "-v" "-largeArrayDims" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" "${FAUST_TMPMEX_DIR}/*.obj" 
+		ARGS "-v" "-largeArrayDims" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" "${FAUST_TMPMEX_DIR}/*.${MEXOBJ_EXT}" 
 		${CXX_MEX_FLAGS}
 		DEPENDS ${MEXOBJ_FILES}
 		COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
