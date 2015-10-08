@@ -36,10 +36,10 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR)
 else()	
 
 	#test mkl faust_core multiply
-message(STATUS "MMMMMMMMMMMMMMMMMMMMMMMMMMM : MKL TEST")	
-   include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
-	add_executable(fcore_test faust_core_test.cpp)	
-	target_link_libraries(fcore_test ${FAUST_TARGET})
+	#message(STATUS "MMMMMMMMMMMMMMMMMMMMMMMMMMM : MKL TEST")	
+	# include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
+	#add_executable(fcore_test faust_core_test.cpp)	
+	#target_link_libraries(fcore_test ${FAUST_TARGET})
    
    
    
