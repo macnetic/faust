@@ -11,7 +11,6 @@ add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 file(GLOB CPP_MEX_FILES "${FAUST_MEXINTERFACEMEX_SRC_DIR}/*.cpp")
 string(REGEX REPLACE "[a-zA-Z0-9_/:]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
 
-add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS ${MEXFILE_TARGET_LIST} ${FAUST_TARGET} ${FAUST_MEXTOOLS_TARGET} )
 
 string(STRIP ${CMAKE_CXX_FLAGS} CMAKE_CXX_FLAGS)
 string(REGEX REPLACE "([ \n\r\t]+)" ";" CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS}")
@@ -28,13 +27,35 @@ if(UNIX)
 		set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}"  "${MKL_LIB_CORE}" "${MKL_LIB_LP64}" "${MKL_LIB_M}" "${MKL_LIB_IOMP5}" "${MKL_LIB_INTEL_THREAD}")
 	endif()
 elseif(WIN32)
-	set(LDD_MEX_FLAGS "/LIBPATH:${FAUST_LIB_DIR}" "/LIBPATH:${MATLAB_ROOT}/extern/lib/${MEX_SUBDIR_LIB}/microsoft" "${FAUST_TARGET}.lib" "libmx.lib" "libmex.lib" "libmat.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib")
+
+	#set(LDD_MEX_FLAGS "/LIBPATH:${FAUST_LIB_DIR}" "/LIBPATH:${MATLAB_ROOT}/extern/lib/${MEX_SUBDIR_LIB}/microsoft" "${FAUST_TARGET}.lib" "libmx.lib" "libmex.lib" "libmat.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib")
+		
+endif()
+
+
+if(UNIX)
+	add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS ${MEXFILE_TARGET_LIST} ${FAUST_TARGET} ${FAUST_MEXTOOLS_TARGET} )
+elseif(WIN32)
+	file(GLOB CPP_SRC_FILES "${FAUST_EXCEPTION_SRC_DIR}/*.cpp" "${FAUST_MATRIX_SRC_DIR}/*.cpp" "${FAUST_FAUSTCORE_SRC_DIR}/*.cpp" "${FAUST_PALM4MSA_SRC_DIR}/*.cpp"  "${FAUST_MEXINTERFACETOOLS_SRC_DIR}/*.cpp")
+	string(REGEX REPLACE "([a-zA-Z0-9_/:]+)\\.cpp(;|$)" "\\1\\2" MEXSRC_FULL "${CPP_SRC_FILES}")
+	string(REGEX REPLACE "[a-zA-Z0-9_/:]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "${FAUST_TMPMEX_DIR}/\\1.${MEXOBJ_EXT}\\2" MEXOBJ_FILES "${CPP_SRC_FILES}")
+
+	add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS MEXFILE_TARGET_LIST_TARGET ) 
+	add_custom_target(MEXFILE_TARGET_LIST_TARGET DEPENDS  ${MEXFILE_TARGET_LIST})
+	add_custom_target(MEXOBJ_FILES_TARGET DEPENDS ${MEXOBJ_FILES})
+	add_dependencies(MEXFILE_TARGET_LIST_TARGET MEXOBJ_FILES_TARGET)
+
 endif()
 
 
 foreach(mex_target ${MEXFILE_TARGET_LIST})
+	if(WIN32)
+		add_custom_target(${mex_target} DEPENDS ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} MEXOBJ_FILES_TARGET )
 
-	add_custom_target(${mex_target} ALL DEPENDS ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} ${FAUST_MEXTOOLS_TARGET} ${FAUST_TARGET})
+	elseif(UNIX)
+		add_custom_target(${mex_target} ALL DEPENDS ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} ${FAUST_MEXTOOLS_TARGET} ${FAUST_TARGET})
+	endif()
+
 
 	if(UNIX)
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
@@ -44,29 +65,18 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		"-O" "${FAUST_COMPILE_SINGLE_FLAG}"
 		${CXX_MEX_FLAGS} 
 		${LDD_MEX_FLAGS}
+		DEPENDS ${MEXOBJ_FILES}
 		COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
 	elseif(WIN32)
+
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
-		COMMAND cl 
-		ARGS "/c"  "/GR" "/W3" "/EHs" "/nologo" "/MD" "/O2" "/Oy-"
-		"/DFAUST_SINGLE" "/D_CRT_SECURE_NO_DEPRECATE" "/D_SCL_SECURE_NO_DEPRECATE" "/D_SECURE_SCL=0" "/DMATLAB_MEX_FILE" "/DNDEBUG"
-		${CXX_MEX_FLAGS}	
-		"${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp"
-		"/Fo${FAUST_MEXINTERFACEMEX_BIN_DIR}/${mex_target}.obj"
-	
-		COMMAND link  
-		ARGS "/nologo" "/manifest" "/incremental:NO" "/DLL" "/EXPORT:mexFunction" 
-		"${FAUST_MEXINTERFACEMEX_BIN_DIR}/${mex_target}.obj"
-		${LDD_MEX_FLAGS}
-		"/out:${mex_target}.${MEX_EXT}"
-	
-		COMMAND mt 
-		ARGS "-outputresource:${mex_target}.${MEX_EXT};2" "-manifest" "${mex_target}.${MEX_EXT}.manifest"
-		
-		COMMAND del 
-		ARGS "${mex_target}.exp" "${mex_target}.lib" "${mex_target}.${MEX_EXT}.manifest"
-	
+		COMMAND   ${MATLAB_ROOT}/bin/mex 
+		ARGS "-v" "-largeArrayDims" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" "${FAUST_TMPMEX_DIR}/*.obj" 
+		${CXX_MEX_FLAGS}
+		DEPENDS ${MEXOBJ_FILES}
 		COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
+
+
 	else()
 		message(FATAL_ERROR "Unable to compile mex functions")
 	endif()
