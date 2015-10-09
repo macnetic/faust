@@ -88,22 +88,15 @@ endif()
 set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
 set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
 
-# adding compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -fno-omit-frame-pointer -pthread -fPIC")
-if(FAUST_USE_SINGLEPRECISION)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFAUST_SINGLE")
-	set(FAUST_COMPILE_SINGLE_FLAG "-DFAUST_SINGLE")
-endif()
-if(FAUST_USE_OPENBLAS)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GEMM_WITH_OPENBLAS__")
-endif()
+
+
+# find external libraries
 
 if(WIN32)
 	set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "lib" )
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a")
 endif()
 
-# find external libraries
 include(CMake/add_library_path.cmake)
 add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "$ENV{MKLROOT}" "/usr" "/usr/local" "opt" "opt/local")
 add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "$ENV{MKLROOT}" "/usr" "/usr/local" "opt" "opt/local")
@@ -123,6 +116,21 @@ check_external_includes("matio.h" MATIO_INC_DIR 0)
 #find_path(OPENBLAS_LIB_DIR ${OPENBLAS_LIB_FILE})
 #find_path(EIGEN_LIB_DIR ${EIGEN_LIB_FILE})
 
+# adding compiler flags
+if(UNIX)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -fno-omit-frame-pointer -pthread -fPIC -fopenmp")
+elseif(WIN32)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /EHs /openmp /MD")
+endif()
+
+if(FAUST_USE_SINGLEPRECISION)
+	set(CXX_MEX_FLAGS "${CXX_MEX_FLAGS} -DFAUST_SINGLE")
+	if(UNIX)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFAUST_SINGLE -I")
+	elseif(WIN32)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DFAUST_SINGLE")
+	endif()
+endif()
 
 # test if executable matlab is in the path
 if(UNIX)

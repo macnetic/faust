@@ -2,5 +2,9 @@
 file(GLOB CPP_FILES "*.cpp")
 include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
 add_library(${FAUST_FAUSTCORE_TARGET} OBJECT ${CPP_FILES})
+if(FAUST_USE_OPENBLAS)
+	include_directories( ${OPENBLAS_INC_DIR})
+	add_definitions(-D__GEMM_WITH_OPENBLAS__)
+endif()
 #target_link_libraries(${FAUST_FAUSTCORE_TARGET}  ${FAUST_MATRIX_TARGET} ${FAUST_EXCEPTION_TARGET} )
 
