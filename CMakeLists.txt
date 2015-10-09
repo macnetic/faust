@@ -86,7 +86,7 @@ endif()
 
 # Default values for FAUST_USE_SINGLEPRECISION and FAUST_USE_OPENBLAS
 set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
-set(FAUST_USE_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
+set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
 
 # adding compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -fno-omit-frame-pointer -pthread -fPIC")
@@ -98,14 +98,15 @@ if(FAUST_USE_OPENBLAS)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GEMM_WITH_OPENBLAS__")
 endif()
 
-
+if(WIN32)
+	set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "lib" )
+	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a")
+endif()
 
 # find external libraries
 include(CMake/add_library_path.cmake)
-if (UNIX)
-	add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "opt" "opt/local")
-	add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "opt" "opt/local")
-endif()
+add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "$ENV{MKLROOT}" "/usr" "/usr/local" "opt" "opt/local")
+add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "$ENV{MKLROOT}" "/usr" "/usr/local" "opt" "opt/local")
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP} CACHE PATH "List of include paths used as PATH parameter in find_path")
 
@@ -113,7 +114,7 @@ include(CMake/check_external_libraries.cmake)
 check_external_libraries(hdf5 HDF5_LIB_FILE 0)
 check_external_libraries(matio MATIO_LIB_FILE 0)
 if(FAUST_USE_OPENBLAS)
-	check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
+	check_external_libraries(openblas OPENBLAS_LIB_FILE 1)
 	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
 endif()
 #check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
