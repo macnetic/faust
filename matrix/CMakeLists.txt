@@ -1,10 +1,15 @@
 #INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
 file(GLOB CPP_FILES "*.cpp")
 
+if(UNIX AND FAUST_USE_MKL)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+elseif(WIN32 AND FAUST_USE_MKL)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+endif()
 include_directories( ${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
 if(FAUST_USE_OPENBLAS)
 	include_directories( ${OPENBLAS_INC_DIR})
-	add_definitions(-D__GEMM_WITH_OPENBLAS__)
+	add_definitions(-D__GEMM_WITH_OPENBLAS__ )
 endif()
 
 if(FAUST_USE_MKL)

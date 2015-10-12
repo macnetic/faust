@@ -25,7 +25,7 @@ endif()
 
 
 if(UNIX)
-	set(LDD_MEX_FLAGS "-L${FAUST_LIB_DIR}" "-l${FAUST_TARGET}")
+	set(LDD_MEX_FLAGS "-L${FAUST_BIN_DIR}" "-l${FAUST_TARGET}")
 	if(FAUST_USE_OPENBLAS)
 	   set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}" "${OPENBLAS_LIB_FILE}")
 	endif()
@@ -63,7 +63,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 		COMMAND   ${MATLAB_ROOT}/bin/mex 
 		ARGS "-v" "-largeArrayDims" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" 
-		"LDFLAGS=$$LDFLAGS -Wl,-rpath=${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}:${FAUST_MEXINTERFACE_LIB_DIR}" 
+		"LDFLAGS=$$LDFLAGS -Wl,-rpath=${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}:${FAUST_MEXINTERFACE_BIN_DIR}" 
 		"-O" 
 		${CMAKE_CXX_FLAGS_LIST} 
 		${LDD_MEX_FLAGS}
@@ -80,6 +80,8 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 	else()
 		message(FATAL_ERROR "Unable to compile mex functions")
 	endif()
+	install(FILES ${FAUST_MEXINTERFACE_BIN_DIR}/${mex_target}.${MEX_EXT} DESTINATION ${FAUST_INSTALL_MEX})
+
 
 endforeach()
 
