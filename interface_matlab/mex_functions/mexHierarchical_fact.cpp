@@ -55,7 +55,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         
         getFaustMat(  mxCurrentField,data ) ;   
         mexPrintf("DATA (%d,%d)",data.getNbRow(),data.getNbCol());
-		if ((data.getNbRow() < 10) && (data.getNbCol())
+		if ((data.getNbRow() < 10) && (data.getNbCol()))
 		{	
 			for (int i = 0;i<data.getNbRow();i++)
 			{
