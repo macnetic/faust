@@ -13,6 +13,12 @@
 #include "LinAlgebra.h"	
 #include "faust_exception.h"
 
+
+#ifdef __GEMM_WITH_MKL__
+	#include "mkl_spblas.h"
+#endif
+
+
 using namespace std;
 
 const char * faust_mat::class_name = "faust_mat::";
@@ -597,9 +603,48 @@ void faust_mat::multiplyLeft(const faust_spmat& S)
 		setZeros();
 	}
 	else
-	{
-		mat = S.mat * mat;
-		dim1 = S.dim1;
+	{	
+		#ifdef __GEMM_WITH_MKL__
+			int dim1S = S.getNbRow();
+			int dim2S = S.getNbCol();
+			int dim1this = dim1;
+			int dim2this = dim2;
+			int dim1C = dim1S;
+			int dim2C = dim2this;
+			faust_real alpha = 1.0,beta = 0.0;
+			char matdescrS[8];
+			matdescrS[0]='G';
+			for (int i=1 ; i<=6 ;i++)
+			matdescrS[i] = 'C';
+			matdescrS[7] = '\0';
+			
+			faust_spmat Scopy(S);
+			faust_mat C(dim1C,dim2C);
+			if (!Scopy.isCompressedMode())
+			{
+				Scopy.makeCompression();
+				std::cout<<class_name<<"multiplyLeft : sparse matrix S is not compressed (possible lack of time)"<<std::endl;
+			}
+			#ifdef __COMPILE_TIMERS__
+			t_local_multiplyLeft.start();
+			#endif
+			#ifdef FAUST_SINGLE	
+				mkl_scscmm("N",&dim1S,&dim2C,&dim2S,&alpha,matdescrS,Scopy.getValuePtr(),Scopy.getInnerIndexPtr(),Scopy.getOuterIndexPtr(),&(Scopy.getOuterIndexPtr()[1]),getData(),&dim1this,&beta,C.getData(),&dim1C);
+			#else
+				mkl_dcscmm("N",&dim1S,&dim2C,&dim2S,&alpha,matdescrS,Scopy.getValuePtr(),Scopy.getInnerIndexPtr(),Scopy.getOuterIndexPtr(),&(Scopy.getOuterIndexPtr()[1]),getData(),&dim1this,&beta,C.getData(),&dim1C);
+			#endif	
+			(*this) = C;
+			
+			#ifdef __COMPILE_TIMERS__
+			t_local_multiplyLeft.stop();
+			cout << "1 "<<setprecision(10)<<t_local_multiplyLeft.get_time()<<endl;
+			t_local_multiplyLeft.reset();
+			#endif	
+		#else
+			
+			mat = S.mat * mat;
+			dim1 = S.dim1;
+		#endif
 	}
 	
 }

@@ -178,7 +178,8 @@ void init_from_file(const char* filename);
 	   	   
 
 #ifdef __COMPILE_TIMERS__
-  public: 
+  public:
+	  faust_timer t_local_muliplyLeft;
   //temporary members
       static faust_timer t_constr;
       static faust_timer t_get_coeff;

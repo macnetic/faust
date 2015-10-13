@@ -97,7 +97,8 @@ endif()
 
 # Default values for FAUST_USE_SINGLEPRECISION and FAUST_USE_OPENBLAS
 set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
-set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
+set(FAUST_USE_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
+set(FAUST_USE_MKL ON CACHE BOOL "Using MKL for sparse matrix and vector computations")
 
 
 
@@ -109,8 +110,8 @@ if(WIN32)
 endif()
 
 include(CMake/add_library_path.cmake)
-add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "$ENV{MKLROOT}" "/usr" "/usr/local" "/opt" "/opt/local")
-add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "$ENV{MKLROOT}" "/usr" "/usr/local" "/opt" "/opt/local")
+add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "$ENV{MKLDIR}/lib/intel64" "$ENV{MKL_COMPILER_DIR}/lib/intel64" "/usr" "/usr/local" "/opt" "/opt/local")
+add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "$ENV{MKLDIR}/include" "/usr" "/usr/local" "/opt" "/opt/local")
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP} CACHE PATH "List of include paths used as PATH parameter in find_path")
 message(STATUS "LIBRARY_PATH_LIST=${LIBRARY_PATH_LIST}")
@@ -123,6 +124,17 @@ if(FAUST_USE_OPENBLAS)
 	check_external_libraries(openblas OPENBLAS_LIB_FILE 1)
 	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
 endif()
+if(FAUST_USE_MKL)
+	check_external_libraries(mkl_core MKL_LIB_CORE 1)
+	check_external_libraries(mkl_intel_thread MKL_LIB_INTEL_THREAD 1)
+	check_external_libraries(iomp5 MKL_LIB_IOMP5 1)
+	check_external_libraries(mkl_intel_lp64 MKL_LIB_LP64 1)
+	check_external_libraries(m MKL_LIB_M 1)
+	check_external_includes("mkl_spblas.h" MKL_INC_DIR 0)
+endif()
+
+
+
 #check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
 check_external_includes("matio.h" MATIO_INC_DIR 0)
 
@@ -202,9 +214,17 @@ add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_EXCEPTION_TARGET}> $
 
 
 if(FAUST_USE_OPENBLAS)
-   target_link_libraries(${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
+	if(FAUST_USE_MKL)
+		target_link_libraries(${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
+	else()
+		target_link_libraries(${FAUST_TARGET} ${OPENBLAS_LIB_FILE} ${MKL_LIB_CORE} ${MKL_LIB_INTEL_THREAD} ${MKL_LIB_IOMP5} ${MKL_LIB_LP64} ${MKL_LIB_M})
+	endif()	
 else()
-   target_link_libraries(${FAUST_TARGET} )
+	if(FAUST_USE_MKL)
+		target_link_libraries(${FAUST_TARGET} ${MKL_LIB_CORE} ${MKL_LIB_INTEL_THREAD} ${MKL_LIB_IOMP5} ${MKL_LIB_LP64} ${MKL_LIB_M})
+	else()
+		target_link_libraries(${FAUST_TARGET} )
+	endif()	
 endif()
 
 install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})

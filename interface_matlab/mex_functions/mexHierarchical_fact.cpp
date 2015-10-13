@@ -54,20 +54,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mxCurrentField = mxGetField(prhs[0],0,"data");  
         
         getFaustMat(  mxCurrentField,data ) ;   
-        mexPrintf("DATA");
-        for (int i = 0;i<data.getNbRow();i++)
-        {
-            for (int j = 0;j<data.getNbCol();j++)
-            {
+        mexPrintf("DATA (%d,%d)",data.getNbRow(),data.getNbCol());
+		if ((data.getNbRow() < 10) && (data.getNbCol())
+		{	
+			for (int i = 0;i<data.getNbRow();i++)
+			{
+				for (int j = 0;j<data.getNbCol();j++)
+				{
                 //bidon = std::snprintf(coeff,10,"%d",A(i,j));	
-                mexPrintf("%f ",data(i,j));
-            }
-            mexPrintf("\n");
-        }
-    }else
-    {
-         mexErrMsgTxt("params.data must be specified");
-    }
+					mexPrintf("%f ",data(i,j));
+				}
+				mexPrintf("\n");
+			}
+		}
+	}else
+	{
+		mexErrMsgTxt("params.data must be specified");
+	}
     
    //nb_fact initialisation
    int nb_fact = -1; 

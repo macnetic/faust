@@ -153,17 +153,33 @@ void  faust_vec::multiplyLeft(faust_spmat const& A)
 			Acopy.makeCompression();
 			std::cout<<class_name<<"multiplyLeft : sparse matrix A is not compressed (possible lack of time)"<<std::endl;
 		}
-		std::cout<<" MKL multiplyLeft avant mult"<<std::endl;		
+		#ifdef __COMPILE_TIMERS__
+			t_local_multiplyLeft.start();
+		#endif	
 		#ifdef FAUST_SINGLE	
 			mkl_scsrmv("T",&nbColA,&nbRowA,&alpha,matdescrA,Acopy.getValuePtr(),Acopy.getInnerIndexPtr(),Acopy.getOuterIndexPtr(),&(Acopy.getOuterIndexPtr()[1]),getData(),&beta,y.getData());
 		#else
+			//cout << "MKL debut" << endl;
 			mkl_dcsrmv("T",&nbColA,&nbRowA,&alpha,matdescrA,Acopy.getValuePtr(),Acopy.getInnerIndexPtr(),Acopy.getOuterIndexPtr(),&(Acopy.getOuterIndexPtr()[1]),getData(),&beta,y.getData());
+			//cout << "MKL fin" << endl;
 		#endif
+		#ifdef __COMPILE_TIMERS__
+			t_local_multiplyLeft.stop();
+			cout << "1 "<<setprecision(10)<<t_local_multiplyLeft.get_time()<<endl;
+			t_local_multiplyLeft.reset();
+		#endif	
 		(*this) = y;	
 	#else
-		vec = A.mat * vec;	
+		#ifdef __COMPILE_TIMERS__
+			t_local_multiplyLeft.start();
+		#endif	
+		vec = A.mat * vec;
+		#ifdef __COMPILE_TIMERS__
+			t_local_multiplyLeft.stop();
+			cout <<"0 "<<setprecision(10)<<t_local_multiplyLeft.get_time()<<endl;
+			t_local_multiplyLeft.reset();
+		#endif		
 	#endif
-	std::cout<<"multiplyLeft apres mult"<<std::endl;
 	
 	dim = A.dim1;
 }

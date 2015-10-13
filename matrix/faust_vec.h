@@ -65,6 +65,12 @@ friend void sp_solve(const faust_spmat & A,faust_vec & x, const faust_vec & y);
 private:
   faust_unsigned_int dim;
   static const char * class_name;
-  Eigen::Matrix<faust_real, Eigen::Dynamic,1> vec; 
+  Eigen::Matrix<faust_real, Eigen::Dynamic,1> vec;
+
+	#ifdef __COMPILE_TIMERS__
+		public: 
+			faust_timer t_local_multiplyLeft;
+	#endif
+  
 };
 #endif
