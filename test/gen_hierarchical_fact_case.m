@@ -19,16 +19,12 @@ M(:)=1:DIM1*DIM2;
 params.data=M;
 
 
-
-
 %% Constraints
 if (params.fact_side == 0)
     
     for i=2:N_FACTS-1
-
         params.cons{1,i} = {'sp',5,DIMS_INTER(i-1),DIMS_INTER(i)};
         params.cons{2,i} = {'sp',(N_FACTS-i)/N_FACTS*DIM1*DIM2,DIMS_INTER(i),DIM2};
-
     end
 
     params.cons{1,1} = {'sp',3,DIM1,DIMS_INTER(1)};
@@ -37,37 +33,18 @@ if (params.fact_side == 0)
 else
     
     for i=N_FACTS-1:-1:2
-        
         params.cons{1,N_FACTS-i+1} = {'sp',i*i,DIM1,DIMS_INTER(i-1)};
         params.cons{2,N_FACTS-i+1} = {'sp',i,DIMS_INTER(i-1),DIMS_INTER(i)};
-        
-
     end
 
-    
     params.cons{1,1} = {'sp',3,DIM1,DIMS_INTER(N_FACTS-1)};
     params.cons{2,1} = {'sp',3,DIMS_INTER(N_FACTS-1),DIM2};
 end
 
-
-
-
-
-
-    
-
  [lambda, facts, errors] = hierarchical_fact(params);
-
-    
-   
-    
-    
-
-
 
 %%profile viewer
 %%p = profile('info');
 %%profsave(p,['comp_normR_profiler FACT' int2str(N_FACTS) 'DIM : ' int2str(DIMS(1)) ' ' int2str(DIMS(end))]) ;
-
 
 save(filename);

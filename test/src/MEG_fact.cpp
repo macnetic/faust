@@ -1,4 +1,3 @@
-#include "palm4MSA_test.h"
 #include "faust_mat.h"
 #include "faust_spmat.h"
 #include "faust_constraint_int.h"
@@ -20,9 +19,11 @@ int main()
 {
   faust_mat data, init_facts1, init_facts2;
 
-  init_faust_mat_from_matio(data, "config_MEG.mat", "data");
-  //init_faust_mat_from_matio(init_facts1, "config_MEG.mat", "init_facts1");
-  //init_faust_mat_from_matio(init_facts2, "config_MEG.mat", "init_facts2");
+  char config_MEG_filename[] = "../data/config_MEG.mat";
+
+  init_faust_mat_from_matio(data, config_MEG_filename, "data");
+  //init_faust_mat_from_matio(init_facts1, config_MEG_filename, "init_facts1");
+  //init_faust_mat_from_matio(init_facts2, config_MEG_filename, "init_facts2");
 
   int cons11_name, cons11_parameter, cons11_row, cons11_col;
   int cons12_name, cons12_parameter, cons12_row, cons12_col;
@@ -41,67 +42,67 @@ int main()
   bool update_way, verbose, fact_side;
   double init_lambda;
 
-  cons11_name      = init_int_from_matio("config_MEG.mat", "cons11_name");
-  cons11_parameter = init_int_from_matio("config_MEG.mat", "cons11_parameter");
-  cons11_row       = init_int_from_matio("config_MEG.mat", "cons11_row");
-  cons11_col       = init_int_from_matio("config_MEG.mat", "cons11_col");
+  cons11_name      = init_int_from_matio(config_MEG_filename, "cons11_name");
+  cons11_parameter = init_int_from_matio(config_MEG_filename, "cons11_parameter");
+  cons11_row       = init_int_from_matio(config_MEG_filename, "cons11_row");
+  cons11_col       = init_int_from_matio(config_MEG_filename, "cons11_col");
 
-  cons12_name      = init_int_from_matio("config_MEG.mat", "cons12_name");
-  cons12_parameter = init_int_from_matio("config_MEG.mat", "cons12_parameter");
-  cons12_row       = init_int_from_matio("config_MEG.mat", "cons12_row");
-  cons12_col       = init_int_from_matio("config_MEG.mat", "cons12_col");
+  cons12_name      = init_int_from_matio(config_MEG_filename, "cons12_name");
+  cons12_parameter = init_int_from_matio(config_MEG_filename, "cons12_parameter");
+  cons12_row       = init_int_from_matio(config_MEG_filename, "cons12_row");
+  cons12_col       = init_int_from_matio(config_MEG_filename, "cons12_col");
 
-  cons13_name      = init_int_from_matio("config_MEG.mat", "cons13_name");
-  cons13_parameter = init_int_from_matio("config_MEG.mat", "cons13_parameter");
-  cons13_row       = init_int_from_matio("config_MEG.mat", "cons13_row");
-  cons13_col       = init_int_from_matio("config_MEG.mat", "cons13_col");
+  cons13_name      = init_int_from_matio(config_MEG_filename, "cons13_name");
+  cons13_parameter = init_int_from_matio(config_MEG_filename, "cons13_parameter");
+  cons13_row       = init_int_from_matio(config_MEG_filename, "cons13_row");
+  cons13_col       = init_int_from_matio(config_MEG_filename, "cons13_col");
 
-  cons14_name      = init_int_from_matio("config_MEG.mat", "cons14_name");
-  cons14_parameter = init_int_from_matio("config_MEG.mat", "cons14_parameter");
-  cons14_row       = init_int_from_matio("config_MEG.mat", "cons14_row");
-  cons14_col       = init_int_from_matio("config_MEG.mat", "cons14_col");
+  cons14_name      = init_int_from_matio(config_MEG_filename, "cons14_name");
+  cons14_parameter = init_int_from_matio(config_MEG_filename, "cons14_parameter");
+  cons14_row       = init_int_from_matio(config_MEG_filename, "cons14_row");
+  cons14_col       = init_int_from_matio(config_MEG_filename, "cons14_col");
 
-  cons15_name      = init_int_from_matio("config_MEG.mat", "cons15_name");
-  cons15_parameter = init_int_from_matio("config_MEG.mat", "cons15_parameter");
-  cons15_row       = init_int_from_matio("config_MEG.mat", "cons15_row");
-  cons15_col       = init_int_from_matio("config_MEG.mat", "cons15_col");
-
-
-  cons21_name      = init_int_from_matio("config_MEG.mat", "cons21_name");
-  cons21_parameter = (faust_real) init_double_from_matio("config_MEG.mat", "cons21_parameter");
-  cons21_row       = init_int_from_matio("config_MEG.mat", "cons21_row");
-  cons21_col       = init_int_from_matio("config_MEG.mat", "cons21_col");
-
-  cons22_name      = init_int_from_matio("config_MEG.mat", "cons22_name");
-  cons22_parameter = init_int_from_matio("config_MEG.mat", "cons22_parameter");
-  cons22_row       = init_int_from_matio("config_MEG.mat", "cons22_row");
-  cons22_col       = init_int_from_matio("config_MEG.mat", "cons22_col");
-
-  cons23_name      = init_int_from_matio("config_MEG.mat", "cons23_name");
-  cons23_parameter = init_int_from_matio("config_MEG.mat", "cons23_parameter");
-  cons23_row       = init_int_from_matio("config_MEG.mat", "cons23_row");
-  cons23_col       = init_int_from_matio("config_MEG.mat", "cons23_col");
-
-  cons24_name      = init_int_from_matio("config_MEG.mat", "cons24_name");
-  cons24_parameter = init_int_from_matio("config_MEG.mat", "cons24_parameter");
-  cons24_row       = init_int_from_matio("config_MEG.mat", "cons24_row");
-  cons24_col       = init_int_from_matio("config_MEG.mat", "cons24_col");
-
-  cons25_name      = init_int_from_matio("config_MEG.mat", "cons25_name");
-  cons25_parameter = init_int_from_matio("config_MEG.mat", "cons25_parameter");
-  cons25_row       = init_int_from_matio("config_MEG.mat", "cons25_row");
-  cons25_col       = init_int_from_matio("config_MEG.mat", "cons25_col");
+  cons15_name      = init_int_from_matio(config_MEG_filename, "cons15_name");
+  cons15_parameter = init_int_from_matio(config_MEG_filename, "cons15_parameter");
+  cons15_row       = init_int_from_matio(config_MEG_filename, "cons15_row");
+  cons15_col       = init_int_from_matio(config_MEG_filename, "cons15_col");
 
 
+  cons21_name      = init_int_from_matio(config_MEG_filename, "cons21_name");
+  cons21_parameter = (faust_real) init_double_from_matio(config_MEG_filename, "cons21_parameter");
+  cons21_row       = init_int_from_matio(config_MEG_filename, "cons21_row");
+  cons21_col       = init_int_from_matio(config_MEG_filename, "cons21_col");
 
-  nfacts = init_int_from_matio("config_MEG.mat", "nfacts");
-  niter1 = init_int_from_matio("config_MEG.mat", "niter1");
-  niter2 = init_int_from_matio("config_MEG.mat", "niter2");
+  cons22_name      = init_int_from_matio(config_MEG_filename, "cons22_name");
+  cons22_parameter = init_int_from_matio(config_MEG_filename, "cons22_parameter");
+  cons22_row       = init_int_from_matio(config_MEG_filename, "cons22_row");
+  cons22_col       = init_int_from_matio(config_MEG_filename, "cons22_col");
+
+  cons23_name      = init_int_from_matio(config_MEG_filename, "cons23_name");
+  cons23_parameter = init_int_from_matio(config_MEG_filename, "cons23_parameter");
+  cons23_row       = init_int_from_matio(config_MEG_filename, "cons23_row");
+  cons23_col       = init_int_from_matio(config_MEG_filename, "cons23_col");
+
+  cons24_name      = init_int_from_matio(config_MEG_filename, "cons24_name");
+  cons24_parameter = init_int_from_matio(config_MEG_filename, "cons24_parameter");
+  cons24_row       = init_int_from_matio(config_MEG_filename, "cons24_row");
+  cons24_col       = init_int_from_matio(config_MEG_filename, "cons24_col");
+
+  cons25_name      = init_int_from_matio(config_MEG_filename, "cons25_name");
+  cons25_parameter = init_int_from_matio(config_MEG_filename, "cons25_parameter");
+  cons25_row       = init_int_from_matio(config_MEG_filename, "cons25_row");
+  cons25_col       = init_int_from_matio(config_MEG_filename, "cons25_col");
 
 
-  //update_way = init_bool_from_matio("config_MEG.mat", "update_way");
-  //verbose = init_bool_from_matio("config_MEG.mat", "verbose");
-  //fact_side = init_bool_from_matio("config_MEG.mat", "fact_side");
+
+  nfacts = init_int_from_matio(config_MEG_filename, "nfacts");
+  niter1 = init_int_from_matio(config_MEG_filename, "niter1");
+  niter2 = init_int_from_matio(config_MEG_filename, "niter2");
+
+
+  //update_way = init_bool_from_matio(config_MEG_filename, "update_way");
+  //verbose = init_bool_from_matio(config_MEG_filename, "verbose");
+  //fact_side = init_bool_from_matio(config_MEG_filename, "fact_side");
  
   // Creation du vecteur de contrainte
   const faust_constraint_int  cons11(static_cast<faust_constraint_name>(cons11_name), cons11_parameter, cons11_row, cons11_col);
@@ -172,7 +173,7 @@ int main()
   char nomFichier[100];
   for (int i=0 ; i<facts.size() ; i++)
   {
-     sprintf(nomFichier, "facts%d_cpp.dat",i);
+     sprintf(nomFichier, "../output/facts%d_cpp.dat",i);
      facts[i].print_file(nomFichier);
   }
   cout<<"lambda="<<hier_fact.get_lambda()<<endl;

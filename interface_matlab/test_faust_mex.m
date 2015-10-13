@@ -1,19 +1,18 @@
 % Si k>1,            DIMS(k) correspond au nombre de colonnes de facts{k-1}
 % Si k<length(DIMS), DIMS(k) correspond au nombre de  lignes  de facts{k}
-DIMS    = [300000 300 300 300 300 300 300 300 30000 ];
+DIMS    = [30000 300 300 300 300 300 300 300 300 ];
 
 % DENSITY(k) correspond a la densite de facts{k}
-DENSITY = [0.0001 0.01 0.01 0.01 0.01  0.01 0.01 0.01 ];
-addpath('../build/interface_matlab')
+DENSITY = [0.1 0.2 0.2 0.2 0.2  0.2 0.2 0.2 ];
+addpath('/home/tgautrai/faust/trunk/devcpp/output/mex')
 addpath('./tools');
-
 if(length(DENSITY) ~= length(DIMS)-1)
     error('Lengths of array DIMS or DENSITY don''t match');
 end
 
 %cd ([getenv('FAUST_ROOT_DIR') '/trunk/Code_Luc']);
 %set_path;
-cd ([getenv('FAUST_ROOT_DIR') '/trunk/devcpp/interface_matlab'] );
+%cd ([getenv('FAUST_ROOT_DIR') '/trunk/devcpp/interface_matlab'] );
 
 %fid=fopen('temps_mult_mat.dat','w');
 for l=1:10
@@ -27,7 +26,7 @@ for l=1:10
     
     %for k=1:length(facts),facts{k}=single(facts{k});end
     
-    v=rand(size(facts{end},2),5);
+    v=rand(size(facts{end},2),2);
     
     tic;
     %objectHandle = mexLoadFaust(facts);

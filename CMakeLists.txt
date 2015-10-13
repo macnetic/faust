@@ -13,9 +13,9 @@ set(FAUST_VERSION_MINOR 0)
 #check_cxx_compiler_flag(-std=c++11 COMPILER_SUPPORTS_CXX11)
 #check_cxx_compiler_flag(-std=c++0x COMPILER_SUPPORTS_CXX0X)
 #if(COMPILER_SUPPORTS_CXX11)
-#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" CACHE STRING "compile flags" FORCE)
 #elseif(COMPILER_SUPPORTS_CXX0X)
-#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "compile flags" FORCE)
 #else()
 #	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has neither C++11 nor c++0x support.")
 #endif()
@@ -25,7 +25,6 @@ set(FAUST_VERSION_MINOR 0)
 IF (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/output" CACHE STRING "default install path" FORCE )
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-
 
 
 # tmp directory where temporary objects will be located
@@ -40,13 +39,20 @@ elseif(WIN32)
 	set(MEXOBJ_EXT ".obj")
 endif()
 
+
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE STRING "" FORCE)
+
 # SOURCE DIRECTORIES
 set(FAUST_EXCEPTION_SRC_DIR ${PROJECT_SOURCE_DIR}/exception CACHE INTERNAL "")
 set(FAUST_MATRIX_SRC_DIR ${PROJECT_SOURCE_DIR}/matrix CACHE INTERNAL "")
 set(FAUST_FAUSTCORE_SRC_DIR ${PROJECT_SOURCE_DIR}/faust_core CACHE INTERNAL "")
 set(FAUST_MATIO_SRC_DIR ${PROJECT_SOURCE_DIR}/init_from_matlab CACHE INTERNAL "")
 set(FAUST_PALM4MSA_SRC_DIR ${PROJECT_SOURCE_DIR}/palm4MSA CACHE INTERNAL "")
-set(FAUST_PALM4MSATEST_SRC_DIR ${PROJECT_SOURCE_DIR}/palm4MSA/test CACHE INTERNAL "")
+set(FAUST_PALM4MSATEST_SRC_DIR ${PROJECT_SOURCE_DIR}/test CACHE INTERNAL "")
+set(FAUST_PALM4MSATESTSRC_SRC_DIR ${PROJECT_SOURCE_DIR}/test/src CACHE INTERNAL "")
+set(FAUST_PALM4MSATESTDATA_SRC_DIR ${PROJECT_SOURCE_DIR}/test/data CACHE INTERNAL "")
 set(FAUST_MEXINTERFACE_SRC_DIR ${PROJECT_SOURCE_DIR}/interface_matlab CACHE INTERNAL "")
 set(FAUST_MEXINTERFACETOOLS_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/tools CACHE INTERNAL "")
 set(FAUST_MEXINTERFACEMEX_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/mex_functions CACHE INTERNAL "")
@@ -58,14 +64,17 @@ set(FAUST_MATRIX_BIN_DIR ${PROJECT_BINARY_DIR}/matrix CACHE INTERNAL "")
 set(FAUST_FAUSTCORE_BIN_DIR ${PROJECT_BINARY_DIR}/faust_core CACHE INTERNAL "")
 set(FAUST_MATIO_BIN_DIR ${PROJECT_BINARY_DIR}/testing/init_from_matlab CACHE INTERNAL "")
 set(FAUST_PALM4MSA_BIN_DIR ${PROJECT_BINARY_DIR}/palm4MSA CACHE INTERNAL "")
-set(FAUST_PALM4MSATEST_BIN_DIR ${PROJECT_BINARY_DIR}/testing CACHE INTERNAL "")
-set(FAUST_MEXINTERFACE_BIN_DIR ${PROJECT_BINARY_DIR}/interface_matlab CACHE INTERNAL "")
+set(FAUST_PALM4MSATEST_BIN_DIR ${PROJECT_BINARY_DIR}/testing/bin CACHE INTERNAL "")
+set(FAUST_PALM4MSATESTDATA_BIN_DIR ${PROJECT_BINARY_DIR}/testing/data CACHE INTERNAL "")
+set(FAUST_MEXINTERFACE_BIN_DIR ${PROJECT_BINARY_DIR}/mex CACHE INTERNAL "")
 set(FAUST_MEXINTERFACETOOLS_BIN_DIR ${FAUST_MEXINTERFACE_BIN_DIR} CACHE INTERNAL "")
 set(FAUST_MEXINTERFACEMEX_BIN_DIR ${FAUST_MEXINTERFACE_BIN_DIR} CACHE INTERNAL "")
 
 # INSTALL DIRECTORIES (RELATIVES PATHS FROM CMAKE_INSTALL_PREFIX)
-set(FAUST_INSTALL_MEX ${CMAKE_INSTALL_PREFIX}/matlab)
+set(FAUST_INSTALL_MEX ${CMAKE_INSTALL_PREFIX}/mex)
 set(FAUST_INSTALL_LIB ${CMAKE_INSTALL_PREFIX}/lib)
+set(FAUST_INSTALL_TESTING_BIN ${CMAKE_INSTALL_PREFIX}/testing/bin)
+set(FAUST_INSTALL_TESTING_DATA ${CMAKE_INSTALL_PREFIX}/testing/data)
 
 # TARGETS
 set(FAUST_EXCEPTION_TARGET faust_exception CACHE INTERNAL "")
@@ -143,17 +152,17 @@ check_external_includes("matio.h" MATIO_INC_DIR 0)
 
 # adding compiler flags
 if(UNIX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -fno-omit-frame-pointer -pthread -fPIC ")#-fopenmp")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -fno-omit-frame-pointer -pthread -fPIC " CACHE STRING "compile flags" FORCE)
 elseif(WIN32)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /EHs /openmp /MD")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /EHs /openmp /MD" CACHE STRING "compile flags" FORCE)
 endif()
 
 if(FAUST_USE_SINGLEPRECISION)
 	set(CXX_MEX_FLAGS "${CXX_MEX_FLAGS} -DFAUST_SINGLE")
 	if(UNIX)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFAUST_SINGLE")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFAUST_SINGLE" CACHE STRING "compile flags" FORCE)
 	elseif(WIN32)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DFAUST_SINGLE")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DFAUST_SINGLE" CACHE STRING "compile flags" FORCE)
 	endif()
 endif()
 
@@ -175,12 +184,22 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 	set(MATLAB_INCLUDE_DIR "${MATLAB_ROOT}/extern/include" CACHE INTERNAL "Matlab include directory")
 
 	set(MATLAB_ARCH_FILE "${FAUST_TMP_BUILD_DIR}/matlab_arch.txt")
-	if(UNIX)
-		exec_program("matlab -wait -nodesktop -nojvm -nodisplay -r \"fid=fopen('${MATLAB_ARCH_FILE}','w');fprintf(fid,'%s\\n%s\\n',computer('arch'),mexext);fclose(fid);exit\" > ${FAUST_TMP_BUILD_DIR}/matlab_output.log")
-		exec_program("cat ${MATLAB_ARCH_FILE} | head -n 1" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
-		exec_program("cat ${MATLAB_ARCH_FILE} | head -n 2 | tail -n 1" OUTPUT_VARIABLE MEX_EXT)
+	if(UNIX) 
+		# METHODE 1 (without using matlab)
+		exec_program("ls ${MATLAB_ROOT}/extern/lib | grep -i glnx" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
+		if("${MEX_SUBDIR_LIB}" STREQUAL "glnxa64")
+			set(MEX_EXT  "mexa64")
+		elseif("${MEX_SUBDIR_LIB}" STREQUAL "glnx86")
+			set(MEX_EXT  "mexa32")
+		endif()	
+
+		# METHODE 2 (using matlab)
+		#exec_program("matlab -wait -nodesktop -nojvm -nodisplay -r \"fid=fopen('${MATLAB_ARCH_FILE}','w');fprintf(fid,'%s\\n%s\\n',computer('arch'),mexext);fclose(fid);exit\" > ${FAUST_TMP_BUILD_DIR}/matlab_output.log")
+		#exec_program("cat ${MATLAB_ARCH_FILE} | head -n 1" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
+		#exec_program("cat ${MATLAB_ARCH_FILE} | head -n 2 | tail -n 1" OUTPUT_VARIABLE MEX_EXT)
+
 	elseif(WIN32)
-		# METHODE 1
+		# METHODE 1 (without using matlab)
 		execute_process(COMMAND ${PROJECT_SOURCE_DIR}/CMake/matlab_arch.bat "2" "${MATLAB_ROOT}" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
 		string(REGEX REPLACE "\n" "" MEX_SUBDIR_LIB ${MEX_SUBDIR_LIB})
 		if("${MEX_SUBDIR_LIB}" STREQUAL "win64")
@@ -189,7 +208,7 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 			set(MEX_EXT  "mexw32")
 		endif()	
 
-		# METHODE 2
+		# METHODE 2 (using matlab)
 		#exec_program("${PROJECT_SOURCE_DIR}/CMake/matlab_arch.bat 0 \"${MATLAB_ARCH_FILE}\"" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
 		#exec_program("${PROJECT_SOURCE_DIR}/CMake/matlab_arch.bat 1 \"${MATLAB_ARCH_FILE}\"" OUTPUT_VARIABLE MEX_EXT)
 	else()
@@ -201,6 +220,8 @@ else()
 endif()
 
 #INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
+
+
 
 # Methode 1
 add_subdirectory(${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EXCEPTION_BIN_DIR})

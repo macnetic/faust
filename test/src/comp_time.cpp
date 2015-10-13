@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
 // debut ecriture des resultats dans fichier
 	char filename_dense[150];
 	char filename_faust[150];
-	const char* path = "runtime_comp/output/";
+	const char* path = "../output/";
 
 
 	stringstream ss;

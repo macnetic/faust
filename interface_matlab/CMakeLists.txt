@@ -55,7 +55,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		add_custom_target(${mex_target} DEPENDS ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} MEXOBJ_FILES_TARGET )
 
 	elseif(UNIX)
-		add_custom_target(${mex_target} ALL DEPENDS ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} ${FAUST_MEXTOOLS_TARGET} ${FAUST_TARGET})
+		add_custom_target(${mex_target} DEPENDS ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} ${FAUST_MEXTOOLS_TARGET} ${FAUST_TARGET})
 	endif()
 
 
@@ -67,7 +67,6 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		"-O" 
 		${CMAKE_CXX_FLAGS_LIST} 
 		${LDD_MEX_FLAGS}
-		DEPENDS ${MEXOBJ_FILES}
 		COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
 	elseif(WIN32)
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
