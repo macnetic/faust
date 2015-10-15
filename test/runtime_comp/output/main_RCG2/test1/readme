@@ -1,7 +1,0 @@
-teste avec:
-
-M=1:10;
-N_run = 1000;
-n = 2.^M;
-densite_or_nnzperroworcol = [2 4 6 8 10 12 14 16 20];
-

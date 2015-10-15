@@ -1,10 +1,11 @@
 % Si k>1,            DIMS(k) correspond au nombre de colonnes de facts{k-1}
 % Si k<length(DIMS), DIMS(k) correspond au nombre de  lignes  de facts{k}
-DIMS    = [30000 300 300 300 300 300 300 300 300 ];
+DIMS    = [8193 204 204 204 204 204 204 ];
 
 % DENSITY(k) correspond a la densite de facts{k}
-DENSITY = [0.1 0.2 0.2 0.2 0.2  0.2 0.2 0.2 ];
-addpath('/home/tgautrai/faust/trunk/devcpp/output/mex')
+DENSITY = [0.0735 0.0392 0.0392  0.0392 0.0392 0.5734];
+%addpath('/home/tgautrai/faust/trunk/devcpp/output/mex')
+addpath('../build/mex')
 addpath('./tools');
 if(length(DENSITY) ~= length(DIMS)-1)
     error('Lengths of array DIMS or DENSITY don''t match');
@@ -15,7 +16,7 @@ end
 %cd ([getenv('FAUST_ROOT_DIR') '/trunk/devcpp/interface_matlab'] );
 
 %fid=fopen('temps_mult_mat.dat','w');
-for l=1:10
+for l=1:1000
     
     facts_sparse = cell(1,(length(DENSITY)));
     facts = cell(size(facts_sparse));
@@ -40,7 +41,7 @@ for l=1:10
     %w_faust_mex=faust_mex('multiply', objectHandle, v);
     w_faust_mex = fc*v; % surcharge de l'operateur *  de la class matlab_faust
     t_faust_mex = toc;
-    fprintf('temps multiplication avec faust mex : %g s\n',t_faust_mex);
+    %fprintf('temps multiplication avec faust mex : %g s\n',t_faust_mex);
     %fprintf(fid,'%e ',t_faust_mex);
     
     
@@ -49,7 +50,7 @@ for l=1:10
     tic;
     for k=length(facts):-1:1, w_faust_matlab=facts_sparse{k}*w_faust_matlab;end
     t_faust_matlab = toc;
-    fprintf('temps multiplication avec faust matlab : %g s\n',t_faust_matlab);
+    %fprintf('temps multiplication avec faust matlab : %g s\n',t_faust_matlab);
     %fprintf(fid,'%e\n',t_faust_matlab);
     
     
@@ -63,11 +64,14 @@ for l=1:10
     delete(fc);
     
     
-    fprintf('erreur relative max faust_mex - faust_matlab : %g \n',max(max(abs((w_faust_matlab-w_faust_mex)./w_faust_matlab))));
+    %fprintf('erreur relative max faust_mex - faust_matlab : %g \n',max(max(abs((w_faust_matlab-w_faust_mex)./w_faust_matlab))));
     %fprintf('erreur relative max faust_mex - dense_matlab : %g \n\n',max(max(abs((w_dense_matlab-w_faust_mex)./w_dense_matlab))));
     
-    fprintf('rapport temps faust matlab / temps faust mex : %g \n\n',t_faust_matlab/t_faust_mex);
+    %fprintf('rapport temps faust matlab / temps faust mex : %g \n\n',t_faust_matlab/t_faust_mex);
     %fprintf('rapport temps dense matlab / temps faust mex : %g \n',t_dense_matlab/t_faust_mex);
+    t(l)=t_faust_matlab/t_faust_mex;
     
 end
 %fclose(fid);
+
+e=1;

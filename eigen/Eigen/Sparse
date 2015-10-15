@@ -18,10 +18,10 @@
 
 #include "SparseCore"
 #include "OrderingMethods"
-#include "SparseCholesky"
+//#include "SparseCholesky"
 #include "SparseLU"
 #include "SparseQR"
-#include "IterativeLinearSolvers"
+//#include "IterativeLinearSolvers"
 
 #endif // EIGEN_SPARSE_MODULE_H
 

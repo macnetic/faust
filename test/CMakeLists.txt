@@ -5,41 +5,58 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR)
    # palm
    add_executable(palm ${FAUST_PALM4MSATESTSRC_SRC_DIR}/palm4MSA_test.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
    if(FAUST_USE_OPENBLAS)
-      target_link_libraries(palm ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+      target_link_libraries(palm ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
    else()
-      target_link_libraries(palm ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(palm ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
+
 
    # hier_fact
    add_executable(faust_hier ${FAUST_PALM4MSATESTSRC_SRC_DIR}/hierarchical_fact_test.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
    if(FAUST_USE_OPENBLAS)
-      target_link_libraries(faust_hier ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+      target_link_libraries(faust_hier ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
    else()
-      target_link_libraries(faust_hier ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(faust_hier ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
 
    # meg
    add_executable(meg ${FAUST_PALM4MSATESTSRC_SRC_DIR}/MEG_fact.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
    if(FAUST_USE_OPENBLAS)
-      target_link_libraries(meg ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+      target_link_libraries(meg ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
    else()
-      target_link_libraries(meg ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(meg ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
 
    # faust
    add_executable(faust_test ${FAUST_PALM4MSATESTSRC_SRC_DIR}/faust_test.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_params.cpp)
    if(FAUST_USE_OPENBLAS)
-      target_link_libraries(faust_test ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
+      target_link_libraries(faust_test ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
    else()
-      target_link_libraries(faust_test ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(faust_test ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
+
+   # comptime0
+   add_executable(comptime0 ${FAUST_PALM4MSATESTSRC_SRC_DIR}/comp_time0.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_core.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
+   if(FAUST_USE_OPENBLAS)
+      target_link_libraries(comptime0 ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+   else()
+      target_link_libraries(comptime0 ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+   endif()
+
+   CONFIGURE_FILE(${FAUST_PALM4MSATESTRUNCOMP_SRC_DIR}/main_RCG.m.in ${FAUST_PALM4MSATESTRUNCOMP_BIN_DIR}/main_RCG.m @ONLY)
+   INSTALL(FILES ${FAUST_PALM4MSATESTRUNCOMP_BIN_DIR}/main_RCG.m DESTINATION ${FAUST_INSTALL_PALM4MSATESTRUNCOMP})
+   FOREACH(matlabscript demo_compTime.m demo_compTime_matrix_draw.m dvp.m figures_compTime.m)
+      CONFIGURE_FILE(${FAUST_PALM4MSATESTRUNCOMP_SRC_DIR}/${matlabscript} ${FAUST_PALM4MSATESTRUNCOMP_BIN_DIR}/${matlabscript} COPYONLY)
+      INSTALL(FILES ${FAUST_PALM4MSATESTRUNCOMP_BIN_DIR}/${matlabscript} DESTINATION ${FAUST_INSTALL_PALM4MSATESTRUNCOMP})
+   ENDFOREACH()
+
 
    CONFIGURE_FILE(${FAUST_PALM4MSATESTDATA_SRC_DIR}/config_compared_palm2.mat ${FAUST_PALM4MSATESTDATA_BIN_DIR}/config_compared_palm2.mat COPYONLY)
    CONFIGURE_FILE(${FAUST_PALM4MSATESTDATA_SRC_DIR}/config_MEG.mat ${FAUST_PALM4MSATESTDATA_BIN_DIR}/config_MEG.mat COPYONLY)
    CONFIGURE_FILE(${FAUST_PALM4MSATESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat ${FAUST_PALM4MSATESTDATA_BIN_DIR}/config_compared_hierarchical_fact.mat COPYONLY)
 
    #install(TARGETS palm faust_hier meg faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
-   install(TARGETS faust_hier meg faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
+   install(TARGETS faust_hier meg faust_test comptime0 DESTINATION ${FAUST_INSTALL_TESTING_BIN})
    install(FILES ${FAUST_PALM4MSATESTDATA_SRC_DIR}/config_compared_palm2.mat 
                  ${FAUST_PALM4MSATESTDATA_SRC_DIR}/config_MEG.mat 
                  ${FAUST_PALM4MSATESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 
