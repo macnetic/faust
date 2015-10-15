@@ -16,8 +16,8 @@ int main()
 {
   faust_mat data, init_facts1, init_facts2;
 
-  char config_palm2_filename[] = "../data/config_compared_palm2.mat";
-  char config_hierfact_filename[] = "../data/config_compared_hierarchical_fact.mat";
+  char config_palm2_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_compared_palm2.mat";
+  char config_hierfact_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat";
 
   init_faust_mat_from_matio(data, config_palm2_filename, "data");
   init_faust_mat_from_matio(init_facts1, config_palm2_filename, "init_facts1");
@@ -126,7 +126,7 @@ faust_real cons21_parameter;
   char nomFichier[100];
   for (unsigned int i=0 ; i<facts.size() ; i++)
   {
-     sprintf(nomFichier, "../output/facts%d_cpp.dat",i);
+     sprintf(nomFichier, "@FAUST_TESTOUTPUT_BIN_DIR@/facts%d_cpp.dat",i);
      facts[i].print_file(nomFichier);
   }
   cout<<"lambda="<<hier_fact.get_lambda()<<endl;

@@ -19,7 +19,7 @@ int main()
 {
   faust_mat data, init_facts1, init_facts2;
 
-  char config_MEG_filename[] = "../data/config_MEG.mat";
+  char config_MEG_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat";
 
   init_faust_mat_from_matio(data, config_MEG_filename, "data");
   //init_faust_mat_from_matio(init_facts1, config_MEG_filename, "init_facts1");
@@ -173,7 +173,7 @@ int main()
   char nomFichier[100];
   for (int i=0 ; i<facts.size() ; i++)
   {
-     sprintf(nomFichier, "../output/facts%d_cpp.dat",i);
+     sprintf(nomFichier, "@FAUST_TESTOUTPUT_BIN_DIR@/facts%d_cpp.dat",i);
      facts[i].print_file(nomFichier);
   }
   cout<<"lambda="<<hier_fact.get_lambda()<<endl;

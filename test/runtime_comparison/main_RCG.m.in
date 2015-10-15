@@ -23,7 +23,7 @@ N_run_inside = 100;
 matlab_only = 0;
 
 if ~matlab_only
-    tmp_test_path = ['@FAUST_PALM4MSATESTRUNCOMP_BIN_DIR@' filesep 'tmp'];
+    tmp_test_path = ['@FAUST_TESTRUNCOMP_BIN_DIR@' filesep 'tmp'];
     if(~exist(tmp_test_path,'dir'))
         mkdir(tmp_test_path)
     end
@@ -125,7 +125,7 @@ for ind_nz=1:length(densite_or_nnzrowcol)
         [matCells,status] = demo_compTime_matrix_draw(M, n, densite_or_nnzrowcol{ind_nz}, matrix_filename);
         [t_faust_matlab(r,:), t_dense_matlab(r,:)]=demo_compTime(M, N_run_inside, n, matrix_filename, matCells, status);
         if ~matlab_only
-            [a,b]=system(['cd @FAUST_PALM4MSATEST_BIN_DIR@ && ./comptime0 ' matrix_filename ' ' num2str(N_run_inside) ' ' sprintf('%d_',status)]);
+            [a,b]=system(['cd @FAUST_TEST_BIN_DIR@ && ./comptime0 ' matrix_filename ' ' num2str(N_run_inside) ' ' sprintf('%d_',status)]);
         end
         delete(matrix_filename);
         if ~matlab_only

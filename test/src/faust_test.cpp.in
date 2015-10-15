@@ -22,9 +22,9 @@ bool testMEG  = true;
 
   faust_params params;
   if (testMEG)
-     init_params_from_matiofile(params, "../data/config_MEG.mat", "params");
+     init_params_from_matiofile(params, "@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat", "params");
   else
-     init_params_from_matiofile(params, "../data/config_compared_hierarchical_fact.mat", "params");
+     init_params_from_matiofile(params, "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat", "params");
     
 //cout << "update_way=" << params.isUpdateWayR2L << endl;
  
@@ -54,9 +54,9 @@ bool testMEG  = true;
   for (int i=0 ; i<facts.size() ; i++)
   {
      if (testMEG)
-        sprintf(filename, "../data/facts_MEG%d.txt", i);
+        sprintf(filename, "@FAUST_TESTDATA_SRC_DIR@/facts_MEG%d.txt", i);
      else
-        sprintf(filename, "../data/learning_compared_fact%d.txt", i);
+        sprintf(filename, "@FAUST_TESTDATA_SRC_DIR@/learning_compared_fact%d.txt", i);
      facts[i].init_from_file(filename);
   }
   faust_core faust(facts, (faust_real)1.0);
@@ -87,13 +87,13 @@ bool testMEG  = true;
 
   if (testMEG)
   {
-     vec_out_faust.print_file("../output/vec_out_MEG_faust.dat");
-     vec_out_mat.print_file("../output/vec_out_MEG_mat.dat");
+     vec_out_faust.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_MEG_faust.dat");
+     vec_out_mat.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_MEG_mat.dat");
   }
   else
   {
-     vec_out_faust.print_file("../output/vec_out_hier_fact_faust.dat");
-     vec_out_mat.print_file("../output/vec_out_hier_fact_mat.dat");
+     vec_out_faust.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_hier_fact_faust.dat");
+     vec_out_mat.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_hier_fact_mat.dat");
   }
 
    
