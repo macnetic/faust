@@ -63,10 +63,10 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR)
 
    install(TARGETS palm faust_hier meg faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
    #install(TARGETS faust_hier meg faust_test comptime0 DESTINATION ${FAUST_INSTALL_TESTING_BIN})
-   install(FILES ${FAUST_TESTDATA_SRC_DIR}/config_compared_palm2.mat 
-                 ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 
-                 ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 
-           DESTINATION ${FAUST_INSTALL_TESTING_DATA})
+   #install(FILES ${FAUST_TESTDATA_SRC_DIR}/config_compared_palm2.mat 
+   #              ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 
+   #              ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 
+   #        DESTINATION ${FAUST_INSTALL_TESTING_DATA})
    
 
    

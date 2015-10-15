@@ -155,6 +155,7 @@ for ind_nz=1:length(densite_or_nnzrowcol)
     pathstr = [pathstr filesep '..' filesep 'figures'];
     if ~exist(pathstr,'dir'), mkdir(pathstr);end
     saveas(gcf,[pathstr filesep name '.fig']);
+    saveas(gcf,[pathstr filesep name '.jpg']);
     close(f1);
     toc(t1)
     fprintf('\n');

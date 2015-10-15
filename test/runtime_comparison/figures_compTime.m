@@ -12,7 +12,11 @@ for k=1:numel(M)
     end
 end
 
-f1=figure('color',[1,1,1],'Visible','off');
+pos = get(0,'ScreenSize');
+
+
+f1=figure('color',[1,1,1],'Visible','off', ...
+    'Position',[0.15*pos(3) 0.075*pos(4) 0.7*pos(3) 0.85*pos(4)]);
 
 %Marker Size
 MS1 = 10;
@@ -142,6 +146,7 @@ ylabel(ax2,'Computational gain','fontsize',14);%\frac{\text{Time gain}}{\text{RC
 grid
 
 set(ax2,'ButtonDownFcn',@ax_callback);
+set(f1,'PaperPositionMode','auto')
 
 function push_callback(hObj, eventData)
 pl = getappdata(get(get(hObj,'Parent'),'Parent'),'pl');
