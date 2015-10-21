@@ -6,12 +6,11 @@ close all;
 % 
 % S=sprand(nbRow,nbCol,density);
 %
-addpath('../build/interface_matlab');
+addpath('../build/mex');
 addpath('tools/');
-addpath([getenv('MKLDIR') '/lib/intel64']);
-addpath([getenv('MKL_COMPILER_DIR') '/lib/intel64']);
 
-getenv('LD_LIBRARY_PATH')
+
+% getenv('LD_LIBRARY_PATH')
 %setenv('LD_LIBRARY_PATH',[getenv('')])
 S{1}=2*eye(3,5);
 S{2}=3*eye(5,7);
