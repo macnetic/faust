@@ -1,12 +1,12 @@
 
 
-CONFIGURE_FILE(${FAUST_MEXINTERFACETOOLS_SRC_DIR}/matlab_faust.m.in ${FAUST_TESTMATLABSCRIPT_BIN_DIR}/matlab_faust.m COPYONLY)
+configure_file(${FAUST_MEXINTERFACETOOLS_SRC_DIR}/matlab_faust.m.in ${FAUST_TESTMATLABSCRIPT_BIN_DIR}/matlab_faust.m COPYONLY)
 
 if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR)
 
-   FOREACH(cppin faust_test hierarchical_fact_test MEG_fact palm4MSA_test)
-      CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/${cppin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${cppin}.cpp @ONLY)
-   ENDFOREACH()
+   foreach(cppin faust_test hierarchical_fact_test MEG_fact palm4MSA_test)
+      configure_file(${FAUST_TESTSRC_SRC_DIR}/${cppin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${cppin}.cpp @ONLY)
+   endforeach()
    #CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp COPYONLY)
    #CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/comp_time1.cpp ${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp COPYONLY)
    add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp" "${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp")
@@ -73,9 +73,6 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR)
    ENDFOREACH()
 
 
-   CONFIGURE_FILE(${FAUST_TESTDATA_SRC_DIR}/config_compared_palm2.mat ${FAUST_TESTDATA_BIN_DIR}/config_compared_palm2.mat COPYONLY)
-   CONFIGURE_FILE(${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat ${FAUST_TESTDATA_BIN_DIR}/config_MEG.mat COPYONLY)
-   CONFIGURE_FILE(${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat ${FAUST_TESTDATA_BIN_DIR}/config_compared_hierarchical_fact.mat COPYONLY)
 
    install(TARGETS palm faust_hier meg faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
    #install(TARGETS faust_hier meg faust_test comptime0 DESTINATION ${FAUST_INSTALL_TESTING_BIN})
