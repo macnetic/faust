@@ -23,7 +23,7 @@ N_run_inside = 100;
 matlab_only = 0;
 
 if ~matlab_only
-    tmp_test_path = ['@FAUST_TESTRUNCOMP_BIN_DIR@' filesep 'tmp'];
+    tmp_test_path = '@FAUST_TESTTMP_BIN_DIR@';
     if(~exist(tmp_test_path,'dir'))
         mkdir(tmp_test_path)
     end

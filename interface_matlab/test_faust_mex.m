@@ -1,12 +1,15 @@
 % Si k>1,            DIMS(k) correspond au nombre de colonnes de facts{k-1}
 % Si k<length(DIMS), DIMS(k) correspond au nombre de  lignes  de facts{k}
-DIMS    = [8193 204 204 204 204 204 204 ];
+%DIMS    = [8193 204 204 204 204 204 204 ]; % param MEG
+DIMS    = [500 32 32 32 32 ];
 
 % DENSITY(k) correspond a la densite de facts{k}
-DENSITY = [0.0735 0.0392 0.0392  0.0392 0.0392 0.5734];
+%DENSITY = [0.0735 0.0392 0.0392  0.0392 0.0392 0.5734]; % param MEG
+DENSITY = [0.1562 0.0938 0.0938 0.3552];
+
 %addpath('/home/tgautrai/faust/trunk/devcpp/output/mex')
 addpath('../build/mex')
-addpath('./tools');
+addpath('../build/testing/matlab_scripts');
 if(length(DENSITY) ~= length(DIMS)-1)
     error('Lengths of array DIMS or DENSITY don''t match');
 end
@@ -16,7 +19,12 @@ end
 %cd ([getenv('FAUST_ROOT_DIR') '/trunk/devcpp/interface_matlab'] );
 
 %fid=fopen('temps_mult_mat.dat','w');
-for l=1:1000
+
+NB_RUN = 500;
+
+t=zeros(NB_RUN,1);
+
+for l=1:NB_RUN
     
     facts_sparse = cell(1,(length(DENSITY)));
     facts = cell(size(facts_sparse));
@@ -27,7 +35,7 @@ for l=1:1000
     
     %for k=1:length(facts),facts{k}=single(facts{k});end
     
-    v=rand(size(facts{end},2),2);
+    v=rand(size(facts{end},2),1);
     
     tic;
     %objectHandle = mexLoadFaust(facts);
@@ -39,7 +47,7 @@ for l=1:1000
     
     tic;
     %w_faust_mex=faust_mex('multiply', objectHandle, v);
-    w_faust_mex = fc*v; % surcharge de l'operateur *  de la class matlab_faust
+    w_faust_mex = fc*v; % surcharge de l'operateur *  de la cltopass matlab_faust
     t_faust_mex = toc;
     %fprintf('temps multiplication avec faust mex : %g s\n',t_faust_mex);
     %fprintf(fid,'%e ',t_faust_mex);
@@ -74,4 +82,4 @@ for l=1:1000
 end
 %fclose(fid);
 
-e=1;
+hise=1;

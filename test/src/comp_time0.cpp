@@ -15,6 +15,8 @@ using namespace std;
 int main(int argc, char* argv[])
 {
 
+
+
 // debut gestion arguement (nom de fichier)	
 	if(argc < 2 )
 	{
