@@ -234,16 +234,16 @@ void faust_spmat::operator= (const faust_mat& Mdense)
 	//mat = Mdense.mat.sparseView();
 	typedef Eigen::Triplet<double> T;
 	std::vector<T> tripletList;
-	const faust_real* matlist=new faust_real[nbRow*nbCol];
-	matlist=Mdense.getData();
+
 	
 	for (int i=0;i<nbRow*nbCol;i++)
 	{
-		if (matlist[i] != 0)
+		if (Mdense[i] != 0)
 		{	
-			tripletList.push_back( T(i%nbRow,((int) (i/nbRow)),matlist[i]) );
+			tripletList.push_back( T(i%nbRow,((int) (i/nbRow)),Mdense[i]) );
 		}
 	}
+
 	mat.setFromTriplets(tripletList.begin(),tripletList.end());
 	mat.makeCompressed();
 	update_dim();

@@ -33,9 +33,11 @@ int main(int argc, char* argv[])
 
 	
 
-	if(argc != 3 )
+	if(argc < 2 )
 	{
-		cerr << "nombre d'arguments incorrect. 2 arguments doivent etre renseigne (nom du fichier (terminant par \".mat\") contenant les Faust et les matrices dense (fichier genere par test/gen_artificial_faust.m)) ainsi que le nombre de RUN" << endl;
+		cerr << "nombre d'arguments incorrect. 1 argument doit etre renseigne (nom du fichier (terminant par \".mat\") contenant les Faust et les matrices dense (fichier genere par test/gen_artificial_faust.m))"<<endl;
+		
+		cerr<<"second argument optionnel le nombre de RUN" << endl;
 		
 		exit(EXIT_FAILURE);
 	}
@@ -78,9 +80,10 @@ int main(int argc, char* argv[])
 		mat_file_body_file = string(mat_file_body_tmp, ind+1);
 	}
 	
-	int nb_run_tmp;
-	nb_run_tmp = atoi(argv[2]);
-	const int NB_RUN = 10;
+	int nb_run_tmp = 10;
+	if (argc >= 3) nb_run_tmp = atoi(argv[2]);
+	
+	const int NB_RUN = nb_run_tmp;
 	
 	int nb_fact = 2;
 	int RCG = 2;

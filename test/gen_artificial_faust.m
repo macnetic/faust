@@ -2,7 +2,7 @@
 % lancer l'executable comptime1 ensuite pour effectuer les tests de performances 
 % puis drawComptime1 pour afficher les resultats
 RCGs = [2 4 6 8 10];
-Dims = [128 256 512 1024 2048];
+Dims = [128 256 512];
 nb_facts = [2,4,6];
 nb_test = 50;
 

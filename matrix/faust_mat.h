@@ -31,7 +31,7 @@ public:
   faust_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
   faust_mat(const faust_unsigned_int nbRow) : dim1(nbRow), dim2(nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}
 
-
+ ~faust_mat(){resize(0,0);}
 	
 	
   /// GETTEUR SETTEUR ///

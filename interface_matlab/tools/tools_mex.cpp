@@ -99,35 +99,29 @@ void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
 	{
 		mexErrMsgTxt("tools_mex.h:getFaustMat :input matrix must be a 2D array.");
 	}
-    const mwSize *dimsMat;
-    dimsMat = mxGetDimensions(Mat_array);
-    
-	nbRow = (int) dimsMat[0];
-    nbCol = (int) dimsMat[1];
+
+	nbCol = mxGetN(Mat_array);
+    nbRow = mxGetM(Mat_array);
     if ((nbRow == 0) || (nbCol == 0))
         mexErrMsgIdAndTxt("tools_mex.h:getFaustMat", "empty matrix");
     if (mxIsSparse(Mat_array))
     {	
-        //mexErrMsgTxt("sparse matrix entry instead of dense matrix");
+
         mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
     }
 	const mxClassID V_CLASS_ID = mxGetClassID(Mat_array);
-	 faust_real* MatPtr; 
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(faust_real))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(faust_real))))
-	{
-		MatPtr = (faust_real*) mxGetPr(Mat_array);
-	}else
-	{	
+	 faust_real* MatPtr = NULL; 
+	
 		if (V_CLASS_ID == mxDOUBLE_CLASS) 
 		{	
-			MatPtr = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
+			MatPtr = new faust_real[nbRow*nbCol];
 			double* MatPtrDouble =(double*) mxGetPr(Mat_array);
 			for (int i=0;i<nbRow*nbCol;i++)
 				MatPtr[i] = (faust_real) MatPtrDouble[i];
 		}
 		else if (V_CLASS_ID == mxSINGLE_CLASS)
 		{		
-			MatPtr = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
+			MatPtr = new faust_real[nbRow*nbCol];
 			float* MatPtrSingle= (float*) (mxGetData(Mat_array));
 			for (int i=0;i<nbRow*nbCol;i++)
 				MatPtr[i] = (faust_real) MatPtrSingle[i];
@@ -137,16 +131,13 @@ void getFaustMat(const mxArray* Mat_array,faust_mat & Mat)
 		{
 		 mexErrMsgTxt("getFaustMat :input matrix format must be single or double");
 		}
-	}
+	
 	
      Mat.resize(nbRow,nbCol);
 	
     memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(faust_real));
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(faust_real))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(faust_real))))
-	{
-		mxFree(MatPtr);
-	}	
 	
+	if(MatPtr) {delete [] MatPtr ; MatPtr = NULL;}
 
     
 }
@@ -410,10 +401,13 @@ void addSpmat(const mxArray * mxMat,std::vector<faust_spmat> &vec_spmat)
 	faust_spmat spM;
 	
 	if (!mxIsSparse(mxMat))
-	{
+	{	
+		
+
 		faust_mat M;
-		getFaustMat(mxMat,M);
+		 getFaustMat(mxMat,M);
 		spM = M;
+
 	}else
 	{
 		getFaustspMat(mxMat,spM);
