@@ -22,6 +22,10 @@ N_run_inside = 100;
 % si matlab_only=0, le test est fait  a la fois avec matlab et en C++
 matlab_only = 0;
 
+% si visibility=1, affichage des courbes,
+% si visibility=0, courbes non affichees mais crees puis enregistrees puis supprimees,
+visibility = 1;
+
 if ~matlab_only
     tmp_test_path = '@FAUST_TESTTMP_BIN_DIR@';
     if(~exist(tmp_test_path,'dir'))
@@ -37,7 +41,7 @@ end
 % densite_or_nnzrowcol : densite(si <=1) ou nnz(si >1) par ligne/colonne
 % densite_or_nnzrowcol doit etre une matrice (ou un vecteur) avec le meme nmbre de
 % colonne que M ou un vecteur colonne ou un scalaire
-densite_or_nnzrowcol = 2;
+densite_or_nnzrowcol = [2;3];
 %densite_or_nnzrowcol = [2 ;3; 4 ;6 ;8 ;12];
 
 if(length(M)==1 && size(densite_or_nnzrowcol,2)>1), M=repmat(M,1,size(densite_or_nnzrowcol,2)); end
@@ -78,6 +82,7 @@ end
 
 
 for ind_nz=1:length(densite_or_nnzrowcol)
+    f1=zeros(length(densite_or_nnzrowcol),1);
     t1=tic;
     disp(['ind_nz = ' num2str(ind_nz) ' sur ' num2str(length(densite_or_nnzrowcol))])
     for k = numel(M):-1:1
@@ -144,19 +149,23 @@ for ind_nz=1:length(densite_or_nnzrowcol)
     if ~isempty(cppOutputFile2),delete(cppOutputFile2);end
     fprintf('\n');
     
-    f1=figures_compTime(M, n, densite_or_nnzrowcol{ind_nz}, N_run_inside, t_dense_matlab, t_faust_matlab, t_dense_cpp, t_faust_cpp);
+    f1(ind_nz)=figures_compTime(M, n, densite_or_nnzrowcol{ind_nz}, N_run_inside, t_dense_matlab, t_faust_matlab, t_dense_cpp, t_faust_cpp);
     param.M = M;
     param.n = n;
     param.N_run = N_run;
     param.N_run_inside = N_run_inside;
     param.densite_or_nnzrowcol = densite_or_nnzrowcol{ind_nz};
-    setappdata(f1,'param',param);
+    setappdata(f1(ind_nz),'param',param);
     [pathstr,name,ext] = fileparts(matrix_filename);
     pathstr = [pathstr filesep '..' filesep 'figures'];
     if ~exist(pathstr,'dir'), mkdir(pathstr);end
     saveas(gcf,[pathstr filesep name '.fig']);
     saveas(gcf,[pathstr filesep name '.jpg']);
-    close(f1);
+    if(visibility)
+        set(f1(ind_nz),'Visible','on');
+    else
+        close(f1(ind_nz));
+    end
     toc(t1)
     fprintf('\n');
 end

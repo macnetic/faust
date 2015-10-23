@@ -5,7 +5,8 @@ DIMS    = [500 32 32 32 32 ];
 
 % DENSITY(k) correspond a la densite de facts{k}
 %DENSITY = [0.0735 0.0392 0.0392  0.0392 0.0392 0.5734]; % param MEG
-DENSITY = [0.1562 0.0938 0.0938 0.3552];
+%DENSITY = [0.1562 0.0938 0.0938 0.3552];
+DENSITY = [0.5 0.5 0.5 0.5];
 
 %addpath('/home/tgautrai/faust/trunk/devcpp/output/mex')
 addpath('../build/mex')
@@ -20,7 +21,7 @@ end
 
 %fid=fopen('temps_mult_mat.dat','w');
 
-NB_RUN = 500;
+NB_RUN = 500000;
 
 t=zeros(NB_RUN,1);
 
@@ -39,7 +40,7 @@ for l=1:NB_RUN
     
     tic;
     %objectHandle = mexLoadFaust(facts);
-    fc = matlab_faust(facts);
+    fc = matlab_faust(facts_sparse);
     temps_creation_faust = toc;
     %fprintf('temps creation objet faust : %g s\n\n',temps_creation_faust);
     
@@ -70,6 +71,7 @@ for l=1:NB_RUN
     % fprintf('temps multiplication avec dense matlab : %g s\n\n',t_dense_matlab);
     
     delete(fc);
+    clear v;
     
     
     %fprintf('erreur relative max faust_mex - faust_matlab : %g \n',max(max(abs((w_faust_matlab-w_faust_mex)./w_faust_matlab))));
@@ -81,5 +83,6 @@ for l=1:NB_RUN
     
 end
 %fclose(fid);
+
 
 hise=1;
