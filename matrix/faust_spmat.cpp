@@ -3,7 +3,7 @@
 #include "faust_vec.h"
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
-//#include <iostream>
+#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include "faust_exception.h"
@@ -14,22 +14,19 @@ using namespace std;
 const char * faust_spmat::class_name="faust_spmat::";
 
 faust_spmat::faust_spmat() : 
+	faust_mat_generic(),
 	mat(Eigen::SparseMatrix<faust_real>(0,0)),
-	dim1(0),
-	dim2(0),
 	nnz(0){}
 
 faust_spmat::faust_spmat(const faust_spmat& M) :
+	faust_mat_generic(M.getNbRow(),M.getNbCol()),
 	mat(M.mat),
-	dim1(M.mat.rows()),
-	dim2(M.mat.cols()),
 	nnz(M.mat.nonZeros()){}
 
 
-faust_spmat::faust_spmat(const int dim1_, const int dim2_) : 
+faust_spmat::faust_spmat(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) :
+	faust_mat_generic(dim1_,dim2_),
 	mat(Eigen::SparseMatrix<faust_real>(dim1_,dim2_)),
-	dim1(dim1_),
-	dim2(dim2_),
 	nnz(0)
 {
 	resize(nnz, dim1, dim2);
@@ -37,10 +34,9 @@ faust_spmat::faust_spmat(const int dim1_, const int dim2_) :
 
 
 
-faust_spmat::faust_spmat(const int nnz_, const int dim1_, const int dim2_, const double* value, const size_t* id_row, const size_t* col_ptr) :
+faust_spmat::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const faust_real* value, const size_t* id_row, const size_t* col_ptr) :
+	faust_mat_generic(dim1_,dim2_),
 	mat(Eigen::SparseMatrix<faust_real>(dim1_,dim2_)),
-	dim1(dim1_),
-	dim2(dim2_),
 	nnz(nnz_)
 {	
 	vector<Eigen::Triplet<faust_real> > tripletList;
@@ -66,40 +62,11 @@ faust_spmat::faust_spmat(const int nnz_, const int dim1_, const int dim2_, const
 
 
 
-void faust_spmat::set(const int nnz_, const int dim1_, const int dim2_, const double* value, const size_t* id_row, const size_t* col_ptr) 
-{	resize(0,0,0);
-	resize(nnz_,dim1_,dim2_);
-	vector<Eigen::Triplet<faust_real> > tripletList;
-   tripletList.reserve(nnz_);
-   int nbEltIns = 0;
-   int nb_elt_colj;
-   //std::cout<<"SPMAT SET"<<std::endl;
-   //std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
-	for (int j=0;j<dim2_;j++)
-	{	
-		nb_elt_colj = col_ptr[j+1]-col_ptr[j];
-		//std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
-		for (int i = 0;i<nb_elt_colj;i++)
-		{	
-			//std::cout<<"i : "<<id_row[i+nbEltIns]<<" j :"<<j<<" value : "<<value[i+nbEltIns]<<std::endl;
-			//mat.insert((int)id_row[i+nbEltIns],j)=value[i+nbEltIns];
-			tripletList.push_back(Eigen::Triplet<faust_real>((int) id_row[i+nbEltIns],j,(faust_real) value[i+nbEltIns]));
-		}
-		nbEltIns += nb_elt_colj;
-			
-	}
-	mat.setFromTriplets(tripletList.begin(), tripletList.end());
-	nnz = nnz_;
-}
-
-
-
-
-
 faust_spmat::faust_spmat(const faust_mat& M) : 
+	faust_mat_generic(M.getNbRow(),M.getNbCol()),
 	mat(Eigen::SparseMatrix<faust_real>(M.getNbRow(),M.getNbCol())),
-	dim1(M.getNbRow()),
-	dim2(M.getNbCol()),
+	// dim1(M.getNbRow()),
+	// dim2(M.getNbCol()),
 	nnz(0)
 {
    int* rowind = new int[dim1*dim2];
@@ -127,7 +94,44 @@ faust_spmat::faust_spmat(const faust_mat& M) :
    delete[] values ; values=NULL;
 }
 
-faust_spmat::faust_spmat(const vector<int>& rowidx, const vector<int>& colidx, const vector<faust_real>& values, const int dim1_, const int dim2_)
+
+
+
+
+
+void faust_spmat::set(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const double* value, const size_t* id_row, const size_t* col_ptr) 
+{	resize(0,0,0);
+	resize(nnz_,dim1_,dim2_);
+	vector<Eigen::Triplet<faust_real> > tripletList;
+   tripletList.reserve(nnz_);
+   int nbEltIns = 0;
+   int nb_elt_colj;
+   std::cout<<"SPMAT SET"<<std::endl;
+   std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
+	for (int j=0;j<dim2_;j++)
+	{	
+		nb_elt_colj = col_ptr[j+1]-col_ptr[j];
+		//std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
+		for (int i = 0;i<nb_elt_colj;i++)
+		{	
+			//std::cout<<"i : "<<id_row[i+nbEltIns]<<" j :"<<j<<" value : "<<value[i+nbEltIns]<<std::endl;
+			//mat.insert((int)id_row[i+nbEltIns],j)=value[i+nbEltIns];
+			tripletList.push_back(Eigen::Triplet<faust_real>((int) id_row[i+nbEltIns],j,(faust_real) value[i+nbEltIns]));
+		}
+		nbEltIns += nb_elt_colj;
+			
+	}
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	nnz = nnz_;
+}
+
+
+
+
+
+
+
+faust_spmat::faust_spmat(const vector<int>& rowidx, const vector<int>& colidx, const vector<faust_real>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)
 {
 	if(rowidx.size()!=colidx.size() || rowidx.size()!=values.size())
 	{
@@ -143,7 +147,27 @@ faust_spmat::faust_spmat(const vector<int>& rowidx, const vector<int>& colidx, c
 	nnz = mat.nonZeros();
 }
 
-void faust_spmat::init(const vector<int>& rowidx, const vector<int>& colidx, const vector<faust_real>& values, const int dim1_, const int dim2_)
+
+
+faust_spmat::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) : 
+	faust_mat_generic(dim1_,dim2_),
+	mat(Eigen::SparseMatrix<faust_real>(dim1_,dim2_)),
+	nnz(nnz_)
+{
+	resize(nnz, dim1, dim2);
+}
+
+faust_spmat::faust_spmat(const Eigen::SparseMatrix<faust_real>& mat_) : 
+	faust_mat_generic(mat_.rows(),mat_.cols()),
+	mat(mat_),
+	nnz(mat_.nonZeros()){}
+
+
+
+
+
+
+void faust_spmat::init(const vector<int>& rowidx, const vector<int>& colidx, const vector<faust_real>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)
 {
 	if(rowidx.size()!=colidx.size() || rowidx.size()!=values.size())
 	{
@@ -187,22 +211,9 @@ void faust_spmat::Display() const
 }
 
 
-faust_spmat::faust_spmat(const int nnz_, const int dim1_, const int dim2_) : 
-	mat(Eigen::SparseMatrix<faust_real>(dim1_,dim2_)),
-	dim1(dim1_),
-	dim2(dim2_),
-	nnz(nnz_)
-{
-	resize(nnz, dim1, dim2);
-}
 
-faust_spmat::faust_spmat(const Eigen::SparseMatrix<faust_real>& mat_) : 
-	mat(mat_),
-	dim1(mat_.rows()),
-	dim2(mat_.cols()),
-	nnz(mat_.nonZeros()){}
 
-void faust_spmat::resize(const int nnz_, const int dim1_, const int dim2_)
+void faust_spmat::resize(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)
 {
 	mat.resize(dim1_, dim2_);
 	mat.reserve(nnz_);
@@ -259,6 +270,7 @@ void faust_spmat::operator*=(const faust_real alpha)
 		update_dim();
 	}	
 }
+
 void faust_spmat::operator/=(const faust_real alpha)
 {
 

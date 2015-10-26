@@ -80,8 +80,7 @@ t_resize.start();
 		}
 		else if ((dim1 != nbRow) || (dim2 != nbCol))
 		{
-			dim1 = nbRow;
-			dim2 = nbCol;
+			faust_mat_generic::resize(nbRow,nbCol);
 			mat.resize(nbRow,nbCol);
 		}
 

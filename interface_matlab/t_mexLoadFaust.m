@@ -29,6 +29,11 @@ S{3}=randint(7,7);
 fc=matlab_faust(S);
 PROD=S{1};
 
+
+for i=1:length(S)
+	S{i}=sparse(S{i});
+end
+
 for i=2:length(S)
 	PROD=PROD*S{i};
 end
@@ -37,3 +42,7 @@ PROD
 x=ones(size(S{end},2),1);
 y=fc*x;
 y
+
+
+ybis=PROD*x;
+ybis

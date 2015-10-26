@@ -6,25 +6,29 @@
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
 #include <vector>
+#include "faust_mat_generic.h"
+
+
 
 #include "faust_vec.h"
 //class faust_vec;
 class faust_mat;
 
-class faust_spmat
+class faust_spmat : public faust_mat_generic
 {
 	public:
 		faust_spmat();
 		faust_spmat(const faust_spmat& M);
 		faust_spmat(const faust_mat& M);
-		faust_spmat(const int dim1_, const int dim2_);
-		faust_spmat(const int nnz_, const int dim1_, const int dim2_);
-		faust_spmat(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<faust_real>& values, const int dim1_, const int dim2_);
+		// faust_spmat(const int dim1_, const int dim2_);
+		faust_spmat(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
+		faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
+		faust_spmat(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<faust_real>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
 		faust_spmat(const Eigen::SparseMatrix<faust_real>& mat_);
-		faust_spmat(const int nnz_, const int dim1_, const int dim2_, const double* value, const size_t* id_row, const size_t* col_ptr);
-		void set(const int nnz_, const int dim1_, const int dim2_, const double* value, const size_t* id_row, const size_t* col_ptr);
-		void resize(const int nnz_, const int dim1_, const int dim2_);
-		void resize(const int dim1_, const int dim2_){mat.resize(dim1_,dim2_);update_dim();}
+		faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const faust_real* value, const size_t* id_row, const size_t* col_ptr);
+		void set(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const double* value, const size_t* id_row, const size_t* col_ptr);
+		void resize(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
+		void resize(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_){mat.resize(dim1_,dim2_);update_dim();}
 		void setZeros(){mat.setZero();nnz=0;}
 		void setEyes(){mat.setIdentity();update_dim();}
 		void transpose();
@@ -34,9 +38,9 @@ class faust_spmat
 		void operator*=(const faust_real alpha);
 		void operator/=(const faust_real alpha);
 		
-		int getNbRow()const{return dim1;}
-		int getNbCol()const{return dim2;}
-		int getNonZeros()const{return nnz;}
+		// int getNbRow()const{return dim1;}
+		// int getNbCol()const{return dim2;}
+		faust_unsigned_int getNonZeros()const{return nnz;}
 		bool isCompressedMode()const{return mat.isCompressed();}
 		void makeCompression(){mat.makeCompressed();}
 		////// Eigen sparse matrix format : CSC (Compressed Sparse Column) /////
@@ -52,7 +56,7 @@ class faust_spmat
 
 		void print_file(const char* filename)const;
 		void init_from_file(char* filename);
-		void init(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<faust_real>& values, const int dim1_, const int dim2_);
+		void init(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<faust_real>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
 		~faust_spmat(){}
 
 	private:
@@ -63,9 +67,7 @@ class faust_spmat
 
 	private:
 		Eigen::SparseMatrix<faust_real> mat;	
-		int dim1;
-		int dim2;
-		int nnz;
+		faust_unsigned_int nnz;
 
 
 	friend void faust_mat::operator=(faust_spmat const& S);

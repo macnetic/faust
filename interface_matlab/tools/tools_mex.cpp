@@ -150,9 +150,9 @@ void getFaustspMat(const mxArray* spMat_array,faust_spmat & S)
 		mexErrMsgIdAndTxt("tools_mex.h:getFaustspMat",
            "input array must be sparse");
 	}		
-	int nnzMax = mxGetNzmax(spMat_array);
-    int nbCol = mxGetN(spMat_array);
-    int nbRow = mxGetM(spMat_array);
+	faust_unsigned_int nnzMax = mxGetNzmax(spMat_array);
+    faust_unsigned_int nbCol = mxGetN(spMat_array);
+    faust_unsigned_int nbRow = mxGetM(spMat_array);
     //mexPrintf("DIM (%d,%d) NNZMAX : %d\n",nbRow,nbCol,nnzMax);
     
     size_t* jc,*ir;
