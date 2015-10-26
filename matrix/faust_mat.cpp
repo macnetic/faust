@@ -26,9 +26,10 @@ const char * faust_mat::class_name = "faust_mat::";
 
 /// CONSTRUCTEUR ///
   faust_mat::faust_mat(const Eigen::Matrix<faust_real,Eigen::Dynamic,Eigen::Dynamic> & mat_) : 
-     dim1(mat_.rows()), dim2(mat_.cols()),mat(mat_),isIdentity(false),isZeros(false){}
+     // dim1(mat_.rows()), dim2(mat_.cols()),mat(mat_),isIdentity(false),isZeros(false){}
+     faust_mat_generic(mat_.rows(),mat_.cols()),mat(mat_),isIdentity(false),isZeros(false){}
   
-  faust_mat::faust_mat(const faust_real  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol ) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol), isIdentity(false),isZeros(false)
+  faust_mat::faust_mat(const faust_real  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol ) : faust_mat_generic(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false),isZeros(false)
   {
 
 #ifdef __COMPILE_TIMERS__

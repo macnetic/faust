@@ -7,6 +7,8 @@
 #include "faust_constant.h"
 #include <vector>
 #include <iterator>
+#include "faust_mat_generic.h"
+
 
 #ifdef __COMPILE_TIMERS__
   #include "faust_timer.h"
@@ -16,7 +18,7 @@ class faust_vec;//forward declaration of faust_vec class
 class faust_spmat;
 class faust_core;
 
-class faust_mat
+class faust_mat : public faust_mat_generic
 {
 public:
 	static const char * name;  
@@ -24,19 +26,19 @@ public:
   /// Constructeurs ///
   faust_mat(const Eigen::Matrix<faust_real, Eigen::Dynamic,Eigen::Dynamic> & mat_);	
   faust_mat(const faust_real  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol );	
-  faust_mat() : dim1(0), dim2(0), mat(0,0), isIdentity(false), isZeros(false) {}
-  faust_mat(const faust_mat & A) : dim1(A.dim1), dim2(A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
+  faust_mat() : faust_mat_generic(), mat(0,0), isIdentity(false), isZeros(false) {}
+  faust_mat(const faust_mat & A) : faust_mat_generic(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
   faust_mat(const faust_spmat & A){this->operator=(A);}
 
-  faust_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : dim1(nbRow), dim2(nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
-  faust_mat(const faust_unsigned_int nbRow) : dim1(nbRow), dim2(nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}
+  faust_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : faust_mat_generic(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
+  faust_mat(const faust_unsigned_int nbRow) : faust_mat_generic(nbRow,nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}
 
  ~faust_mat(){resize(0,0);}
 	
 	
   /// GETTEUR SETTEUR ///
-  faust_unsigned_int getNbRow() const {return dim1;}
-  faust_unsigned_int getNbCol() const {return dim2;}
+  // faust_unsigned_int getNbRow() const {return dim1;}
+  // faust_unsigned_int getNbCol() const {return dim2;}
   /*faust_real getCoeff(const faust_unsigned_int i,const faust_unsigned_int j) const;
   void getCoeffs(std::vector<faust_real> & valueS,const std::vector<int> & id_row, const std::vector<int>  & id_col) const;
   void setCoeff(const faust_real & value,const int id_row, const int id_col);
@@ -167,9 +169,7 @@ void init_from_file(const char* filename);
   bool estNulle(){return isZeros;}
   
   private: 
-       faust_unsigned_int dim1;
-       faust_unsigned_int dim2;
-  Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat;
+	Eigen::Matrix<faust_real, Eigen::Dynamic, Eigen::Dynamic> mat;
   //Eigen::Matrix<faust_real,0,0> mat;
        bool isIdentity;
        bool isZeros;
