@@ -25,6 +25,7 @@
 // - FACTORS.dat
  
 using namespace std;
+typedef double T; 
 
 int main(int argc, char* argv[])
 {
@@ -89,11 +90,11 @@ int main(int argc, char* argv[])
 	int RCG = 2;
 	int DIM = 512;
 	
-	faust_mat DIMS;
-	faust_mat RCGS;
-	faust_mat NB_FACTS;
-	faust_mat Dense_mat;
-	faust_core fc;
+	faust_mat<T> DIMS;
+	faust_mat<T> RCGS;
+	faust_mat<T> NB_FACTS;
+	faust_mat<T> Dense_mat;
+	faust_core<T> fc;
 
 	
 	//void init_faust_mat_from_matio(faust_mat& M, const char* fileName, const char* variableName);
@@ -112,9 +113,9 @@ int main(int argc, char* argv[])
 	int nRCGS=RCGS.getNbRow()*RCGS.getNbCol();
 	int nNB_FACTS=NB_FACTS.getNbRow()*NB_FACTS.getNbCol();
 	
-	vector<faust_mat> Dense_matS(nDIMS);
-	//vector<vector<faust_core>> FcoreS(nRCGS,vector<faust_core>(nDIMS));
-	faust_core FcoreS[nNB_FACTS][nRCGS][nDIMS];
+	vector<faust_mat<T> > Dense_matS(nDIMS);
+	//vector<vector<faust_core> > FcoreS(nRCGS,vector<faust_core>(nDIMS));
+	faust_core<T> FcoreS[nNB_FACTS][nRCGS][nDIMS];
 	
 	stringstream ssInputVarFaust;
 	stringstream ssInputVarDense;
@@ -169,10 +170,10 @@ int main(int argc, char* argv[])
 
 
 	cout << "calculus computing" << endl;
-	faust_vec x_tmp(Dense_matS[0].getNbCol());
+	faust_vec<T> x_tmp(Dense_matS[0].getNbCol());
 	for (int j=0 ; j<x_tmp.size() ;j++)
 		x_tmp[j] = std::rand()*2.0/RAND_MAX-1.0;
-	faust_vec y_dense_tmp(Dense_matS[0].getNbRow());
+	faust_vec<T> y_dense_tmp(Dense_matS[0].getNbRow());
 	y_dense_tmp = Dense_matS[0] * x_tmp;
 	for (int k=0;k<NB_RUN;k++)
 	{
@@ -186,12 +187,12 @@ int main(int argc, char* argv[])
 				for (int j=0;j<nDIMS;j++)
 				{
 					DIM = DIMS[j];
-					faust_vec x(DIM);
+					faust_vec<T> x(DIM);
 					Dense_mat = Dense_matS[j];
-					faust_core fc1(FcoreS[n][i][j]);
+					faust_core<T> fc1(FcoreS[n][i][j]);
 					for (int ii=0;ii<DIM;ii++)x[ii]=std::rand()*2.0/RAND_MAX-1;
-					faust_vec y_dense(DIM);
-					faust_vec y_faust(DIM);
+					faust_vec<T> y_dense(DIM);
+					faust_vec<T> y_faust(DIM);
 
 					timer_dense.reset();
 					timer_dense.start();

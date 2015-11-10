@@ -31,19 +31,20 @@ double init_double_from_matio(const char* fileName, const char* variableName)
 {
    matvar_t* matvar = faust_matio_read_variable(fileName, variableName);
 
-
+				
    if( matvar->class_type != MAT_C_DOUBLE
        || matvar->rank != 2
        || matvar->dims[0] != 1
        || matvar->dims[1] != 1)
    {
-      cerr << "error in init_double_from_matio : "<< variableName << " seems not to be a scalar." << endl;
+      cerr << "error in init_T_from_matio : "<< variableName << " seems not to be a scalar." << endl;
       exit(EXIT_FAILURE);
    }
    double val = ((double*)(matvar->data))[0];
    Mat_VarFree(matvar);
    return val;
 }
+
 
 int init_int_from_matio(const char* fileName, const char* variableName)
 {

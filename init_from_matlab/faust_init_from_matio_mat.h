@@ -5,6 +5,8 @@
 #include "matio.h"
 #include "faust_constant.h"
 #include <vector>
+#include "faust_mat.h"
+#include "faust_spmat.h" 
 
 template<typename T> class faust_spmat;
 template<typename T> class faust_mat;
@@ -14,11 +16,11 @@ void init_faust_mat_from_matio(faust_mat<T>& M, const char* fileName, const char
 template<typename T>
 void init_faust_spmat_from_matio(faust_spmat<T>& S, const char* fileName, const char* variableName);
 template<typename T>
-void write_faust_mat_into_matfile( faust_mat& M<T>, const char* fileName, const char* variableName);
+void write_faust_mat_into_matfile( faust_mat<T>& M, const char* fileName, const char* variableName);
 template<typename T>
 void init_faust_mat_vector_from_matiofile( std::vector<faust_mat<T> > & vec_M, const char* fileName, const char* variableName);
 template<typename T>
-void init_mat_from_matvar(faust_mat & M<T>,matvar_t* var);
+void init_mat_from_matvar(faust_mat<T> & M,matvar_t* var);
 template<typename T>
 void init_spmat_from_matvar(faust_spmat<T> & M,matvar_t* var);
 

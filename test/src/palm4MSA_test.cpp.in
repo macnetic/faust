@@ -11,11 +11,11 @@
 #include <iostream>
 
 using namespace std;
-
+typedef double T;
 
 int main()
 {
-  faust_mat data, init_facts1, init_facts2;
+  faust_mat<T> data, init_facts1, init_facts2;
 
   char config_palm2_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_compared_palm2.mat";
 
@@ -25,7 +25,7 @@ int main()
 
   int cons1_name, cons1_parameter, cons1_row, cons1_col;
   int cons2_name, cons2_row, cons2_col;
-  faust_real cons2_parameter;
+  T cons2_parameter;
   int nfacts, niter;
   bool update_way, verbose;
   double init_lambda;
@@ -36,12 +36,12 @@ int main()
   cons1_col = init_int_from_matio(config_palm2_filename, "cons1_col");
 
   cons2_name = init_int_from_matio(config_palm2_filename, "cons2_name");
-  cons2_parameter = (faust_real) init_double_from_matio(config_palm2_filename, "cons2_parameter");
+  cons2_parameter = (T) init_double_from_matio(config_palm2_filename, "cons2_parameter");
   cons2_row = init_int_from_matio(config_palm2_filename, "cons2_row");
   cons2_col = init_int_from_matio(config_palm2_filename, "cons2_col");
 
 
-  init_lambda = (faust_real) init_double_from_matio(config_palm2_filename, "init_lambda");
+  init_lambda = (T) init_double_from_matio(config_palm2_filename, "init_lambda");
   nfacts = init_int_from_matio(config_palm2_filename, "nfacts");
   niter = init_int_from_matio(config_palm2_filename, "niter");
 
@@ -50,7 +50,7 @@ int main()
  
   // Creation du vecteur de contrainte
   const faust_constraint_int cons1(static_cast<faust_constraint_name>(cons1_name), cons1_parameter, cons1_row, cons1_col);
-  const faust_constraint_real cons2(static_cast<faust_constraint_name>(cons2_name), cons2_parameter, cons2_row, cons2_col);
+  const faust_constraint_real<T> cons2(static_cast<faust_constraint_name>(cons2_name), cons2_parameter, cons2_row, cons2_col);
 
   vector<const faust_constraint_generic*> cons;
   cons.push_back(&cons1);
@@ -59,16 +59,16 @@ int main()
 
 
   // Creation du vecteur de matrice init_fact;
-  vector<faust_mat> init_fact;
+  vector<faust_mat<T> > init_fact;
   init_fact.push_back(init_facts1);
   init_fact.push_back(init_facts2);
 
   // Creation du critere d'arret
-  stopping_criterion crit(niter);
+  stopping_criterion<T> crit(niter);
 
-  faust_params_palm params(data, nfacts, cons, init_fact, crit, verbose, update_way, init_lambda);
+  faust_params_palm<T> params(data, nfacts, cons, init_fact, crit, verbose, update_way, init_lambda);
 
-  palm4MSA palm2(params, true);
+  palm4MSA<T> palm2(params, true);
 
   palm2.next_step();
 

@@ -9,4 +9,6 @@ double init_double_from_matio(const char* fileName, const char* variableName);
 int init_int_from_matio(const char* fileName, const char* variableName);
 bool init_bool_from_matio(const char* fileName, const char* variableName);
 
+#include "faust_init_from_matio.hpp"
+
 #endif

@@ -13,11 +13,11 @@
 #include <iostream>
 
 using namespace std;
-
+typedef double T;
 
 int main()
 {
-  faust_mat data, init_facts1, init_facts2;
+  faust_mat<T> data, init_facts1, init_facts2;
 
   char config_MEG_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat";
 
@@ -69,7 +69,7 @@ int main()
 
 
   cons21_name      = init_int_from_matio(config_MEG_filename, "cons21_name");
-  cons21_parameter = (faust_real) init_double_from_matio(config_MEG_filename, "cons21_parameter");
+  cons21_parameter = init_int_from_matio(config_MEG_filename, "cons21_parameter");
   cons21_row       = init_int_from_matio(config_MEG_filename, "cons21_row");
   cons21_col       = init_int_from_matio(config_MEG_filename, "cons21_col");
 
@@ -140,21 +140,21 @@ int main()
 
 
   // Creation du critere d'arret
-  stopping_criterion crit_2(niter1);
-  stopping_criterion crit_global(niter2);
-  //faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global,false,false,false,1.0,false);	
+  stopping_criterion<T> crit_2(niter1);
+  stopping_criterion<T> crit_global(niter2);
+  //faust_params params(data, nfacts, cons, vector<faust_mat<T> >(), crit_2, crit_global,false,false,false,1.0,false);	
 	cons_tmp1.push_back(&cons25);
 	bool isVerbose = false;
 	bool isUpdateR2L = false;
 	bool isFactSideLeft = true;
-	faust_real init_lambda_value = 1.0;
+	T init_lambda_value = 1.0;
 	bool isLambdaComputed = true;
-    //faust_params params(data,nfacts,cons_tmp1,vector<faust_mat>(),crit_2,crit_global,1.25,1.4,false,false,false,1.0,false);
-	faust_params params(data,nfacts,cons_tmp1,vector<faust_mat>(),crit_2,crit_global,1.25,1.4,isVerbose,isUpdateR2L,isFactSideLeft,init_lambda_value,isLambdaComputed);
-  //faust_params params(data, nfacts, cons, vector<faust_mat>(), crit_2, crit_global,false,false,1.0,false);
+    //faust_params params(data,nfacts,cons_tmp1,vector<faust_mat<T> >(),crit_2,crit_global,1.25,1.4,false,false,false,1.0,false);
+	faust_params<T> params(data,nfacts,cons_tmp1,vector<faust_mat<T> >(),crit_2,crit_global,1.25,1.4,isVerbose,isUpdateR2L,isFactSideLeft,init_lambda_value,isLambdaComputed);
+  //faust_params params(data, nfacts, cons, vector<faust_mat<T> >(), crit_2, crit_global,false,false,1.0,false);
   params.Display();
   cout<<"launch"<<endl;	
-  hierarchical_fact hier_fact(params);
+  hierarchical_fact<T> hier_fact(params);
 
   faust_timer t1;
   t1.start();
@@ -167,7 +167,7 @@ int main()
 #endif
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 
-  vector<faust_spmat> facts;
+  vector<faust_spmat<T> > facts;
   hier_fact.get_facts(facts);
   (facts[0]) *= hier_fact.get_lambda();
   char nomFichier[100];
