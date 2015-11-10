@@ -474,69 +474,69 @@ void add_constraint(std::vector<const faust_constraint_generic*> & consS,matvar_
 
 	
 	
-void Display_params(faust_params & params)
-{
+// void Display_params(faust_params & params)
+// {
 
-	cout<<"NFACTS : "<<params.nb_fact<<endl;
-	int nbr_iter_2_fact = 0;
-	while(params.stop_crit_2facts.do_continue(nbr_iter_2_fact))
-	{
-		nbr_iter_2_fact++;
-	}
-	int nbr_iter_global = 0;
-	while(params.stop_crit_global.do_continue(nbr_iter_global))
-	{
-		nbr_iter_global++;
-	}
-	cout<<"NBR_ITER_2_FACT : "<<nbr_iter_2_fact << endl;
-	cout<<"NBR_ITER_GLOBAL : "<<nbr_iter_global << endl;
-	cout<<"VERBOSE : "<<params.isVerbose<<endl;
-	cout<<"UPDATEWAY : "<<params.isUpdateWayR2L<<endl;
-	cout<<"INIT_LAMBDA : "<<params.init_lambda<<endl;
-	cout<<"ISFACTSIDELEFT : "<<params.isFactSideLeft<<endl;
-	cout<<"DATA : "<<endl;
-	params.data.Display();
-	cout<<"INIT_FACTS :"<<endl;
-	for (int L=0;L<params.init_fact.size();L++)params.init_fact[L].Display();
+	// cout<<"NFACTS : "<<params.nb_fact<<endl;
+	// int nbr_iter_2_fact = 0;
+	// while(params.stop_crit_2facts.do_continue(nbr_iter_2_fact))
+	// {
+		// nbr_iter_2_fact++;
+	// }
+	// int nbr_iter_global = 0;
+	// while(params.stop_crit_global.do_continue(nbr_iter_global))
+	// {
+		// nbr_iter_global++;
+	// }
+	// cout<<"NBR_ITER_2_FACT : "<<nbr_iter_2_fact << endl;
+	// cout<<"NBR_ITER_GLOBAL : "<<nbr_iter_global << endl;
+	// cout<<"VERBOSE : "<<params.isVerbose<<endl;
+	// cout<<"UPDATEWAY : "<<params.isUpdateWayR2L<<endl;
+	// cout<<"INIT_LAMBDA : "<<params.init_lambda<<endl;
+	// cout<<"ISFACTSIDELEFT : "<<params.isFactSideLeft<<endl;
+	// cout<<"DATA : "<<endl;
+	// params.data.Display();
+	// cout<<"INIT_FACTS :"<<endl;
+	// for (int L=0;L<params.init_fact.size();L++)params.init_fact[L].Display();
 
-	cout<<"CONS : nbr "<< params.cons[0].size()<<endl;
+	// cout<<"CONS : nbr "<< params.cons[0].size()<<endl;
 
-	for (int L=0;L<params.cons[0].size();L++)
-	{
-		for (int jl=0;jl<params.cons.size();jl++)
-		{	//string type_cons;
-			//type_cons.resize(0);
-			//type_cons=getConstraintType((*params.cons[jl][L]).getConstraintType());
-			cout<<"type_cont : "<<params.cons[jl][L]->getType()<<" ";
-			cout<<(*params.cons[jl][L]).get_constraint_name();
-			cout<<" nb_row :"<<(*params.cons[jl][L]).getRows();
-			cout<<" nb_col :"<<(*params.cons[jl][L]).getCols();
+	// for (int L=0;L<params.cons[0].size();L++)
+	// {
+		// for (int jl=0;jl<params.cons.size();jl++)
+		// {	//string type_cons;
+			type_cons.resize(0);
+			type_cons=getConstraintType((*params.cons[jl][L]).getConstraintType());
+			// cout<<"type_cont : "<<params.cons[jl][L]->getType()<<" ";
+			// cout<<(*params.cons[jl][L]).get_constraint_name();
+			// cout<<" nb_row :"<<(*params.cons[jl][L]).getRows();
+			// cout<<" nb_col :"<<(*params.cons[jl][L]).getCols();
 			
 
 
-			if (params.cons[jl][L]->isConstraintParameterInt())
-			{	
-				faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[jl][L]);
-				cout<<" parameter :"<<(*const_int).getParameter()<<endl;
-			}
+			// if (params.cons[jl][L]->isConstraintParameterInt())
+			// {	
+				// faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[jl][L]);
+				// cout<<" parameter :"<<(*const_int).getParameter()<<endl;
+			// }
 			
-			else if (params.cons[jl][L]->isConstraintParameterReal())
-			{	
-				faust_constraint_real* const_real = (faust_constraint_real*)(params.cons[jl][L]);
-				cout<<" parameter :"<<(*const_real).getParameter()<<endl;
-			}
+			// else if (params.cons[jl][L]->isConstraintParameterReal())
+			// {	
+				// faust_constraint_real* const_real = (faust_constraint_real*)(params.cons[jl][L]);
+				// cout<<" parameter :"<<(*const_real).getParameter()<<endl;
+			// }
 			
-			else if (params.cons[jl][L]->isConstraintParameterMat())
-			{	
-				faust_constraint_mat* const_mat = (faust_constraint_mat*)(params.cons[jl][L]);
-				cout<<" parameter :"<<endl;
-				(*const_mat).getParameter().Display();
-			}
+			// else if (params.cons[jl][L]->isConstraintParameterMat())
+			// {	
+				// faust_constraint_mat* const_mat = (faust_constraint_mat*)(params.cons[jl][L]);
+				// cout<<" parameter :"<<endl;
+				// (*const_mat).getParameter().Display();
+			// }
 			
-		}
-		cout<<endl<<endl;
-	}
-}
+		// }
+		// cout<<endl<<endl;
+	// }
+// }
 
 
 

@@ -7,20 +7,22 @@
 #include "stopping_criterion.h"
 #include "faust_constraint_generic.h"
 
+template<typename T> class faust_mat;
 
+template<typename T>
 class faust_params_palm
 {
    public:
 
       faust_params_palm(
-         const faust_mat& data_,
+         const faust_mat<T>& data_,
          const int nb_fact_,
          const std::vector<const faust_constraint_generic*>& cons_,
-         const std::vector<faust_mat>& init_fact_,
-         const stopping_criterion& stop_crit_ = stopping_criterion(),
+         const std::vector<faust_mat<T> >& init_fact_,
+         const stopping_criterion<T> & stop_crit_ = stopping_criterion<T>(),
          const bool isVerbose_ = false ,
          const bool isUpdateWayR2L_ = false ,
-         const faust_real init_lambda_ = 1.0 ,
+         const T init_lambda_ = 1.0 ,
 		 const bool isLambdaComputed_ = true);
 
       void check_constraint_validity();
@@ -30,16 +32,16 @@ class faust_params_palm
 
    public:
       // Required members
-      faust_mat data;
+      faust_mat<T> data;
       int nb_fact; // number of factors
       std::vector<const faust_constraint_generic*> cons; // vector of constraints
 
       // Optional members (set to default values if not defined)
-      std::vector<faust_mat> init_fact;
-      stopping_criterion stop_crit;
+      std::vector<faust_mat<T> > init_fact;
+      stopping_criterion<T> stop_crit;
       bool isVerbose;
       bool isUpdateWayR2L;
-      faust_real init_lambda;
+      T init_lambda;
 	  bool isLambdaComputed;
 	  
 	  private :
@@ -50,9 +52,12 @@ class faust_params_palm
       /*const int nb_it;   // number of iterations
       // if isStoppingCriterionError then criterion is error else criterion is number of iteration
       bool  isStoppingCriterionError;
-      const faust_real errorThreshold;
+      const T errorThreshold;
       // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than 
       int maxIteration;*/
 };
+
+#include "faust_params_palm.hpp"
+
 
 #endif

@@ -49,12 +49,16 @@ class faust_constraint_generic
          //parameter(constraint.parameter),
          nb_rows(constraint.nb_rows),
          nb_cols(constraint.nb_cols){}
+	template<typename T>
 	const char*  getType() const;
       const char* get_constraint_name()const;
       const faust_constraint_name getConstraintType() const;// {return constraint_name;}
-      bool isConstraintParameterInt()const;
-      bool isConstraintParameterReal()const;
-      bool isConstraintParameterMat()const;
+      template<typename T>
+	  bool isConstraintParameterInt()const;
+      template<typename T>
+	  bool isConstraintParameterReal()const;
+      template<typename T>
+	  bool isConstraintParameterMat()const;
 
       //const parameter_type getParameter() const {return parameter;};
       const faust_unsigned_int getRows() const {return nb_rows;}
@@ -83,5 +87,9 @@ class faust_constraint_generic
 
       
 };
+
+#include "faust_constraint_generic.hpp"
+
+
 
 #endif

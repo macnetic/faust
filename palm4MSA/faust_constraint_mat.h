@@ -6,7 +6,10 @@
 #include "faust_mat.h"
 
 
+template<typename T> class faust_mat;
+
 //template<typename parameter_type>
+template<typename T>
 class faust_constraint_mat : public faust_constraint_generic
 {
    public:
@@ -19,13 +22,13 @@ class faust_constraint_mat : public faust_constraint_generic
 
       faust_constraint_mat(
          const faust_constraint_name& constraint_name_,  
-         const faust_mat parameter_,
+         const faust_mat<T> parameter_,
          const faust_unsigned_int nb_rows_, 
          const faust_unsigned_int nb_cols_);
 
       faust_constraint_mat(const faust_constraint_mat& constraint_);
 
-      faust_mat getParameter() const {return parameter;};
+      faust_mat<T> getParameter() const {return parameter;};
       
       virtual void set_default_parameter();
       virtual void check_constraint_name()const;
@@ -34,9 +37,11 @@ class faust_constraint_mat : public faust_constraint_generic
 
    private:
       // parameter of constraint
-      faust_mat parameter;
+      faust_mat<T> parameter;
 	  static const char * class_name;
     
 };
+
+#include "faust_constraint_mat.hpp"
 
 #endif

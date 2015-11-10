@@ -4,20 +4,28 @@
 #include "faust_constant.h"
 #include "faust_spmat.h"
 
-class faust_mat;
-class faust_vec;
+template<typename T> class faust_mat;
+template<typename T> class faust_vec;
 //class faust_spmat;
-class faust_core;
+template<typename T> class faust_core;
+
+
+template<typename T> 
+T power_iteration(const faust_core<T> & A, const int nbr_iter_max,T threshold, int & flag);
+
+// template<typename T> 
+// void multiply(const faust_core<T> & A, const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, char typeA, char typeMult);
+
+ template<typename T> 
+ void faust_solve(const faust_core<T> & A, faust_vec<T> & x, const faust_vec<T> & y);
+
+
+template<typename T> 
+faust_vec<T> operator*(const faust_core<T>& f, const faust_vec<T> & v);
+
+template<typename T> 
+faust_mat<T> operator*(const faust_core<T>& f, const faust_mat<T> & M);
+
+#include "faust_core_algebra.hpp"
 
 #endif
-
-faust_real power_iteration(const  faust_core & A, const int nbr_iter_max,faust_real threshold, int & flag);
-
-
- void multiply(const faust_core & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, const faust_real & beta, char typeA, char typeMult);
- void faust_solve(const faust_core & A,faust_vec & x, const faust_vec & y);
-
-
-
-faust_vec operator*(const faust_core& f, const faust_vec& v);
-faust_mat operator*(const faust_core& f, const faust_mat& M);

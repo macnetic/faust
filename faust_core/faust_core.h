@@ -4,63 +4,79 @@
 #include <vector>
 #include "faust_spmat.h"
 
-class faust_mat;
-class faust_vec;
-class faust_params;
+// class faust_mat<T>;
+// class faust_vec;
 
+
+template<typename T> class faust_mat;
+template<typename T> class faust_spmat;
+template<typename T> class faust_vec;
+template<typename T> class faust_core;
+
+template<typename T>
+faust_vec<T> operator*(const faust_core<T>& f, const faust_vec<T>& v);
+template<typename T>
+faust_mat<T> operator*(const faust_core<T>& f, const faust_mat<T>& M);
+// template<typename T>
+// void multiply(const faust_core<T> & A, const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, char typeA, char typeMult);
+
+
+template<typename T>
 class faust_core
 {
 	public:
 		faust_core();
-		faust_core(const std::vector<faust_spmat>& facts, const faust_real lambda_ = (faust_real)1.0);
-		faust_core(const faust_core & A);
-		void get_facts(std::vector<faust_spmat>& sparse_facts)const{sparse_facts = data;} 
+		faust_core(const std::vector<faust_spmat<T> >& facts, const T lambda_ = (T)1.0);
+		faust_core(const faust_core<T> & A);
+		faust_core(const std::vector<faust_mat<T> >&facts);
+		void get_facts(std::vector<faust_spmat<T> >& sparse_facts)const{sparse_facts = data;} 
 		int size()const{return data.size();} 
-                faust_mat get_product()const;
-		faust_spmat get_fact(int id) const;		
+                faust_mat<T> get_product()const;
+		faust_spmat<T> get_fact(int id) const;		
 		int getNbRow() const;
 		int getNbCol() const;
 		long long int get_total_nnz()const{return totalNonZeros;}
 		void clear(){data.resize(0);totalNonZeros=0;}
-		void push_back(const faust_spmat& S);
-		void push_first(const faust_spmat& S);
-		void pop_back(faust_spmat& S);
-		void pop_first(faust_spmat& S);
-		void pop_first(faust_spmat& S) const;
+		void push_back(const faust_spmat<T>& S);
+		void push_first(const faust_spmat<T>& S);
+		void pop_back(faust_spmat<T>& S);
+		void pop_first(faust_spmat<T>& S);
+		void pop_first(faust_spmat<T>& S) const;
 		void Display()const;
 		void transpose();
 		//(*this) = (*this) * A
-		void multiply(const faust_core & A);
+		void multiply(const faust_core<T> & A);
 		//(*this) = A * (*this)
-		void multiplyLeft(const faust_core & A);	
-		void scalarMultiply(const faust_real scalar){data[0]*=scalar;}
-		faust_real spectralNorm(const int nbr_iter_max, faust_real threshold, int &flag) const;
+		void multiplyLeft(const faust_core<T> & A);	
+		void scalarMultiply(const T scalar){data[0]*=scalar;}
+		T spectralNorm(const int nbr_iter_max, T threshold, int &flag) const;
 		~faust_core(){}
 
 
 	public:
-		void operator=(const faust_core&  f){data=f.data;totalNonZeros=f.totalNonZeros;}
+		void operator=(const faust_core<T>&  f){data=f.data;totalNonZeros=f.totalNonZeros;}
 		// add all of the sparse matrices from f.data to this->data
-		void operator*=(const faust_real  scalar){scalarMultiply(scalar);};
-		void operator*=(const faust_core&  f){multiply(f);};
+		void operator*=(const T  scalar){scalarMultiply(scalar);};
+		void operator*=(const faust_core<T>&  f){multiply(f);};
 		// add the sparse matrix S to this->data
-		void operator*=(const faust_spmat&  S){push_back(S);totalNonZeros+=S.getNonZeros();}
+		void operator*=(const faust_spmat<T>&  S){push_back(S);totalNonZeros+=S.getNonZeros();}
 
 
 
 
 	private:
-		std::vector<faust_spmat> data;
+		std::vector<faust_spmat<T> > data;
 		long long int totalNonZeros;
 		static const char * class_name;
 		
 
-	friend faust_vec operator*(const faust_core& f, const faust_vec& v);
-	friend faust_mat operator*(const faust_core& f, const faust_mat& M);
-	friend void multiply(const faust_core & A, const faust_mat & B, faust_mat & C,const faust_real & alpha, char typeA, char typeMult);
+	friend faust_vec<T> operator*<>(const faust_core<T>& f, const faust_vec<T>& v);
+	friend faust_mat<T> operator*<>(const faust_core<T>& f, const faust_mat<T>& M);
+	// friend void multiply<>(const faust_core<T> & A, const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, char typeA, char typeMult);
+
 		
 };
 
-
+#include "faust_core.hpp"
 
 #endif

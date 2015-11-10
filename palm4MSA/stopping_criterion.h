@@ -4,6 +4,7 @@
 #include "faust_constant.h"
 #include <iostream>
 
+template<typename T>
 class stopping_criterion
 {
    public:
@@ -21,7 +22,7 @@ class stopping_criterion
 
       ~stopping_criterion(){}
 
-      bool do_continue(int current_ite, faust_real error=-2.0)const;
+      bool do_continue(int current_ite, T error=-2.0)const;
 	  int get_crit() const{return nb_it;}	
    private:
       void check_validity()const;
@@ -30,11 +31,12 @@ class stopping_criterion
       // if isCriterionError then criterion is error else criterion is number of iteration
       bool  isCriterionError;
       int nb_it;   // number of iterations if !isCriterionError
-      faust_real errorThreshold;
+      T errorThreshold;
       int maxIteration;
       // only used as stopping criterion, if isCriterionError, when error is still greater than 
 	  static const char * class_name;
 };
 
+#include "stopping_criterion.hpp"
 
 #endif

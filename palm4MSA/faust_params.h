@@ -7,41 +7,42 @@
 #include "stopping_criterion.h"
 #include "faust_constraint_generic.h"
 
+template<typename T> class faust_mat;
 
-
+template<typename T>
 class faust_params
 {
    public:
 	  
 	  faust_params(
-	  const faust_mat& data_,
+	  const faust_mat<T>& data_,
 	  const unsigned int nb_fact_,
 	  const std::vector<const faust_constraint_generic*> & cons_,
-	  const std::vector<faust_mat>& init_fact_,
-	  const stopping_criterion& stop_crit_2facts_ = stopping_criterion(),
-	  const stopping_criterion& stop_crit_global_  = stopping_criterion(),
+	  const std::vector<faust_mat<T> >& init_fact_,
+	  const stopping_criterion<T>& stop_crit_2facts_ = stopping_criterion<T>(),
+	  const stopping_criterion<T>& stop_crit_global_  = stopping_criterion<T>(),
 	  const double residuum_decrease_speed = 1.25,
 	  const double residuum_prcent = 1.4,
 	  const bool isVerbose_ = false ,
 	  const bool isUpdateWayR2L_ = false ,
 	  const bool isFactSideLeft_ = false ,
-	  const faust_real init_lambda_ = 1.0 ,
+	  const T init_lambda_ = 1.0 ,
 	  const bool isLambdaComputed_ = true);
 	  
 	  	
 
 		
       faust_params(
-	const faust_mat& data_,
+	const faust_mat<T>& data_,
 	const unsigned int nb_fact_,
 	const std::vector<std::vector<const faust_constraint_generic*> >& cons_,
-	const std::vector<faust_mat>& init_fact_,
-	const stopping_criterion& stop_crit_2facts_ = stopping_criterion(),
-	const stopping_criterion& stop_crit_global_  = stopping_criterion(),
+	const std::vector<faust_mat<T> >& init_fact_,
+	const stopping_criterion<T>& stop_crit_2facts_ = stopping_criterion<T>(),
+	const stopping_criterion<T>& stop_crit_global_  = stopping_criterion<T>(),
 	const bool isVerbose_ = false ,
 	const bool isUpdateWayR2L_ = false ,
 	const bool isFactSideLeft_ = false ,
-	const faust_real init_lambda_ = 1.0 ,
+	const T init_lambda_ = 1.0 ,
 	const bool isLambdaComputed_ = true);
 		 
 	  faust_params();
@@ -55,18 +56,18 @@ class faust_params
 
    public:
       // Required members
-      faust_mat data;
+      faust_mat<T> data;
       faust_unsigned_int nb_fact; // number of factors
       std::vector<std::vector<const faust_constraint_generic*> > cons; // vector of constraints
-      std::vector<faust_mat> init_fact;
+      std::vector<faust_mat<T> > init_fact;
 
       // Optional members (set to default values if not defined)
-      stopping_criterion stop_crit_2facts;
-      stopping_criterion stop_crit_global;
+      stopping_criterion<T> stop_crit_2facts;
+      stopping_criterion<T> stop_crit_global;
       bool isVerbose;
       bool isUpdateWayR2L;
       bool isFactSideLeft;
-      faust_real init_lambda;
+      T init_lambda;
 	  bool isLambdaComputed;
 	  void Display() const;
 
@@ -83,5 +84,7 @@ class faust_params
 	  private :
 	 
 };
+
+#include "faust_params.hpp"
 
 #endif
