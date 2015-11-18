@@ -1,7 +1,6 @@
 clear all;
 close all;
-addpath('../build/interface_matlab')
-addpath('')
+addpath('../build/mex')
 cd '../../Code_Luc'
 set_path;
 cd '../devcpp/interface_matlab/';
@@ -18,7 +17,7 @@ params.cons{1,3} = {'sp',5,DIM2,DIM2};
 
 params.niter = 400;
 init_facts=cell(1,params.nfacts);
-for i=1:params.nfacts-1
+for i=1:params.nfacts
 init_facts{i}=eye(params.cons{i}{3},params.cons{i}{4});
 end
 params.init_facts=init_facts

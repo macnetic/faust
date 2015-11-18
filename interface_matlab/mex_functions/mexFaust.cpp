@@ -6,12 +6,12 @@
 #include <stdexcept>
 
 // prhs[0] : name of command : 
-//    "delete" to delete the faust_core object dynamically allocated previously
-//    "multiply" to multiply the faust_core object by a vector or a matrix
+//    "delete" to delete the faust_core<faust_real> object dynamically allocated previously
+//    "multiply" to multiply the faust_core<faust_real> object by a vector or a matrix
 
-// prhs[1] : address of the faust_core object dynamically allocated previously
+// prhs[1] : address of the faust_core<faust_real> object dynamically allocated previously
 
-// prhs[2] (only necessary if prhs[0] matches "multiply") : vector or matrix A to multiply by the faust_core object
+// prhs[2] (only necessary if prhs[0] matches "multiply") : vector or matrix A to multiply by the faust_core<faust_real> object
 
 
 
@@ -38,7 +38,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(!mxIsCell(prhs[1]))
 			mexErrMsgTxt("input must be a cell-array");
 
-		std::vector<faust_spmat> vec_spmat;
+		std::vector<faust_spmat<faust_real> > vec_spmat;
 		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
 		/*if (nb_element == 0)
 			mexWarnMsgTxt("Empty cell array.");
@@ -60,13 +60,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			for (int i=0;i<nb_element;i++)
 			{	
 				mxMat=mxGetCell(prhs[1],i);
-				addSpmat(mxMat,vec_spmat);
+				addSpmat<faust_real>(mxMat,vec_spmat);
 			}
 	}
 	
 	
-		faust_core* F = new faust_core(vec_spmat); 
-		plhs[0]=convertPtr2Mat<faust_core>(F);
+		faust_core<faust_real>* F = new faust_core<faust_real>(vec_spmat); 
+		plhs[0]=convertPtr2Mat<faust_core<faust_real> >(F);
     
 		return;
 	}
@@ -78,7 +78,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (!strcmp("delete", cmd))
 	{
 		// Destroy the C++ object
-		destroyObject<faust_core>(prhs[1]);
+		destroyObject<faust_core<faust_real> >(prhs[1]);
 		// Warn if other commands were ignored
 		if (nlhs != 0 || nrhs != 2)
 			mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
@@ -87,7 +87,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
 
 	// Get the class instance pointer from the second input
-	faust_core* core_ptr = convertMat2Ptr<faust_core>(prhs[1]);
+	faust_core<faust_real>* core_ptr = convertMat2Ptr<faust_core<faust_real> >(prhs[1]);
     
 	if (!strcmp("size",cmd))
 	{	
@@ -109,7 +109,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("get_product : empty faust core");
 		const size_t SIZE_B1 = core_ptr->getNbRow(); 
         const size_t SIZE_B2 = core_ptr->getNbCol(); 
-		faust_mat prod=core_ptr->get_product();
+		faust_mat<faust_real> prod=core_ptr->get_product();
 		
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
 		if(sizeof(faust_real)==sizeof(float))
@@ -239,8 +239,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Si prhs[2] est un vecteur
 	if(SIZE_A2 == 1) 
 	{
-        	faust_vec A(SIZE_A1, ptr_data);
-        	faust_vec B(SIZE_B1);
+        	faust_vec<faust_real> A(SIZE_A1, ptr_data);
+        	faust_vec<faust_real> B(SIZE_B1);
 		B = (*core_ptr)*A;
 		
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
@@ -257,8 +257,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Si prhs[2] est une matrice
 	else
 	{
-        	faust_mat A(ptr_data, SIZE_A1, SIZE_A2);
-		faust_mat B(SIZE_B1, SIZE_A2);
+        	faust_mat<faust_real> A(ptr_data, SIZE_A1, SIZE_A2);
+		faust_mat<faust_real> B(SIZE_B1, SIZE_A2);
 		B = (*core_ptr)*A;
 		
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};

@@ -11,7 +11,7 @@
 #include <iomanip>
 
 using namespace std;
-typedef double T;
+typedef faust_real T;
 int main(int argc, char* argv[])
 {
 

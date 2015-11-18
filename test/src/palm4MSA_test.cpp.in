@@ -11,7 +11,7 @@
 #include <iostream>
 
 using namespace std;
-typedef double T;
+typedef faust_real T;
 
 int main()
 {

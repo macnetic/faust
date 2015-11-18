@@ -112,11 +112,11 @@ else()
 endif()
 	
 		
-	add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp" "${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp")
+	# add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp" "${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp")
 	
-	 add_executable(faust_hier_basic ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp)
-   if(FAUST_USE_OPENBLAS)
-      target_link_libraries(faust_hier_basic  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
-   else()
-      target_link_libraries(faust_hier_basic ${FAUST_TARGET})
-   endif()
+	 # add_executable(faust_hier_basic ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp)
+   # if(FAUST_USE_OPENBLAS)
+      # target_link_libraries(faust_hier_basic  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
+   # else()
+      # target_link_libraries(faust_hier_basic ${FAUST_TARGET})
+   # endif()

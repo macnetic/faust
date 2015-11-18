@@ -58,6 +58,11 @@ T power_iteration(const faust_mat<T> & A, const faust_unsigned_int nbr_iter_max,
 template<typename T>
 faust_vec<T> operator*(const faust_mat<T>& M, const faust_vec<T>& v);
 
+#ifdef __GEMM_WITH_OPENBLAS__
+//cblas_sgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1, beta, C.getData(), C.dim1);
+
+#endif
+
 #include "LinAlgebra.hpp"
 
 #endif

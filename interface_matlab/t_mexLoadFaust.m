@@ -38,7 +38,7 @@ for i=2:length(S)
 	PROD=PROD*S{i};
 end
 
-PROD
+disp('test vectoriel');
 x=ones(size(S{end},2),1);
 y=fc*x;
 y
@@ -46,3 +46,20 @@ y
 
 ybis=PROD*x;
 ybis
+
+
+disp('test matriciel');
+x=ones(size(S{end},2),5);
+y=fc*x;
+y
+
+
+ybis=PROD*x;
+ybis
+
+
+
+
+
+
+

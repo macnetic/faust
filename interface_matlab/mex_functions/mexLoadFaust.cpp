@@ -53,7 +53,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
         mexErrMsgTxt("input must be a cell-array");
     }
-	std::vector<faust_spmat> vec_spmat;
+	std::vector<faust_spmat<faust_real> > vec_spmat;
 	mwSize nb_element = mxGetNumberOfElements(prhs[0]);
 
 	if (nb_element == 0)
@@ -64,13 +64,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			for (mwSize i=0;i<nb_element;i++)
 			{	
 				mxMat=mxGetCell(prhs[0],i);
-				addSpmat(mxMat,vec_spmat);
+				addSpmat<faust_real>(mxMat,vec_spmat);
 			}
 	}
 			
 	
-	faust_core* F = new faust_core(vec_spmat); 
-	plhs[0]=convertPtr2Mat<faust_core>(F);
+	faust_core<faust_real>* F = new faust_core<faust_real>(vec_spmat); 
+	plhs[0]=convertPtr2Mat<faust_core<faust_real> >(F);
     
     
     

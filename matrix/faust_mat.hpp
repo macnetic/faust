@@ -7,7 +7,7 @@
 
 
 #ifdef __GEMM_WITH_OPENBLAS__
-	#include "cblas.h"
+	#include "cblas_algebra.h"
 #endif
 
 
@@ -282,20 +282,21 @@ t_mult_right.start();
 		T* C_old = new T[C1_old*C2_old];
 		memcpy(C_old, getData(), C1_old*C2_old*sizeof(T));
 		resize(C1_old, A.dim2);
-		if (sizeof(T) == sizeof(float))
-		{	
-			cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0f, C_old, C1_old, A.getData(), A.dim1, 0.0f, getData(), dim1);
-		} else
-		{
+		// if (sizeof(T) == sizeof(float))
+		// {	
+			// cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0f, C_old, C1_old, A.getData(), A.dim1, 0.0f, getData(), dim1);
+		// } else
+		// {
 			
-			if (sizeof(T) == sizeof(double))
-			{	
-				cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0, C_old, C1_old, A.getData(), A.dim1, 0.0, getData(), dim1);
-			}else
-			{
-				handleError(class_name, "multiplyRight : OPENBLAS only support instanciated template float or double");
-			}
-		}
+			// if (sizeof(T) == sizeof(double))
+			// {	
+				// cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0, C_old, C1_old, A.getData(), A.dim1, 0.0, getData(), dim1);
+			// }else
+			// {
+				// handleError(class_name, "multiplyRight : OPENBLAS only support instanciated template float or double");
+			// }
+			cblas_gemm<T>(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0, C_old, C1_old, A.getData(), A.dim1, 0.0, getData(), dim1);
+		//}
 		
 		delete[] C_old ; C_old=NULL;
 		

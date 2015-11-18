@@ -17,7 +17,19 @@
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{
+{	
+	cout<<"single defined : "<<IS_SINGLE_DEFINED<<endl; 	
+	if (typeid(faust_real) == typeid(float))
+	{
+		std::cout<<"faust_real == float"<<std::endl;
+	}
+	
+	if (typeid(faust_real) == typeid(double))
+	{
+		std::cout<<"faust_real == double"<<std::endl;
+	}
+	system("sleep 7");
+	
 	if (nrhs != 1)
 	{
 		mexErrMsgTxt("Bad Number of inputs arguments");
@@ -48,7 +60,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mxArray    *mxCurrentField,*mxCurrentCons;
     
     // data initialisation
-    faust_mat data;
+    faust_mat<faust_real> data;
     if (presentFields[0])
     {    
         mxCurrentField = mxGetField(prhs[0],0,"data");  
@@ -122,7 +134,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             {
                 //mexPrintf("cons(%d , %d)\n",i,j);
                 mxCurrentCons=mxGetCell(mxCurrentField,i+(j*nbRowCons));
-                getConstraint(consS,mxCurrentCons);
+                getConstraint<faust_real>(consS,mxCurrentCons);
                 //consS.push_back(consToAdd);
             }
             consSS.push_back(consS);
@@ -135,23 +147,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     } 
     
     //niter1
-    stopping_criterion crit1;
+    stopping_criterion<faust_real> crit1;
     if (presentFields[3])
     {   
          mxCurrentField = mxGetField(prhs[0],0,"niter1");
         int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
-        stopping_criterion newCrit1(nb_iter1);
+        stopping_criterion<faust_real> newCrit1(nb_iter1);
         crit1 = newCrit1;
     }
     //mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
     
     //niter2
-    stopping_criterion crit2;
+    stopping_criterion<faust_real> crit2;
     if (presentFields[4])
     {   
          mxCurrentField = mxGetField(prhs[0],0,"niter2");
         int nb_iter2 =(int)  mxGetScalar(mxCurrentField);
-        stopping_criterion newCrit2(nb_iter2);
+        stopping_criterion<faust_real> newCrit2(nb_iter2);
         crit2 = newCrit2;
     }
     //mexPrintf("\n crit2 nb_it = %d\n",crit2.get_crit());
@@ -199,12 +211,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
      // creation des parametres   
 	 try{
 		std::cout<<"avant "<<std::endl; 
-		faust_params params(data,nb_fact,consSS,std::vector<faust_mat>(),crit1,crit2,isVerbose,updateway,factside,init_lambda,compute_lambda);   
+		faust_params<faust_real> params(data,nb_fact,consSS,std::vector<faust_mat<faust_real> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda,compute_lambda);   
      
 	 //DisplayParams(params);
      //creation de hierarchical fact
      std::cout<<"youpi"<<std::endl;
-	 hierarchical_fact hier_fact(params);
+	 hierarchical_fact<faust_real> hier_fact(params);
      hier_fact.compute_facts();	
      
      
@@ -213,11 +225,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
      
      plhs[0]=mxCreateDoubleScalar((double) lambda);
      
-     std::vector<faust_mat> facts;
+     std::vector<faust_mat<faust_real> > facts;
      hier_fact.get_facts(facts);
 
      
-     faust_mat current_fact = facts[0];
+     faust_mat<faust_real> current_fact = facts[0];
      mxArray * cellFacts;
      setCellFacts(&cellFacts,facts);
      

@@ -8,12 +8,25 @@
 #include "faust_timer.h"
 #include "faust_init_from_matio_mat.h"
 #include <iostream>
+#include "faust_constant.h"
 
 using namespace std;
-typedef double T;
+typedef faust_real T;
 
 int main()
 {
+  cout<<"single defined : "<<IS_SINGLE_DEFINED<<endl; 	
+  if (typeid(T) == typeid(double))
+  {
+	cout<<"faust_real == double"<<endl;
+  }
+  
+  if (typeid(T) == typeid(float))
+  {
+	cout<<"faust_real == float"<<endl;
+  }
+  system("sleep 6");		
+  
   faust_mat<T> data, init_facts1, init_facts2;
 	
      char config_palm2_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_compared_palm2.mat";

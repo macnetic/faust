@@ -49,7 +49,7 @@ void normalize(){scalarMultiply(1/norm());}
 
 
 // multiply (*this) =  A * (*this)
-void  multiplyLeft(faust_mat<T> const& A){gemv(A, *this, *this, 1.0, 0.0, 'N');}
+void  multiplyLeft(faust_mat<T> const& A){gemv<T>(A, *this, *this, 1.0, 0.0, 'N');}
 void  multiplyLeft(faust_spmat<T> const& A);
   
 T sum()const{return vec.sum();}
