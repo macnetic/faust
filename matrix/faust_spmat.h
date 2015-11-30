@@ -22,6 +22,8 @@ class faust_spmat : public faust_mat_generic
 {
 	public:
 		faust_spmat();
+		template<typename U>
+		faust_spmat(const faust_spmat<U>& M);
 		faust_spmat(const faust_spmat<T>& M);
 		faust_spmat(const faust_mat<T>& M);
 		// faust_spmat(const int dim1_, const int dim2_);
@@ -51,6 +53,9 @@ class faust_spmat : public faust_mat_generic
 		T* getValuePtr(){return mat.valuePtr();}// return pointer value of length nnz
 		int* getOuterIndexPtr(){return mat.outerIndexPtr();}//return column-index value of length equal to the number of column+1
 		 int* getInnerIndexPtr(){return mat.innerIndexPtr();}//return row index of length nnz
+		 const T* getValuePtr()const{return mat.valuePtr();}// return pointer value of length nnz
+		const int* getOuterIndexPtr()const{return mat.outerIndexPtr();}//return column-index value of length equal to the number of column+1
+		const int* getInnerIndexPtr()const{return mat.innerIndexPtr();}//return row index of length nnz
 		
 		
 		

@@ -47,6 +47,8 @@ template<typename T>
 template<typename T>
 class faust_mat : public faust_mat_generic
 {
+	// declarer comme friend toutes les classes derivant de la template class faust_mat
+	template<class> friend class faust_mat;
 public:
 	static const char * name;  
 
@@ -55,6 +57,8 @@ public:
   faust_mat(const T  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol );	
   faust_mat() : faust_mat_generic(), mat(0,0), isIdentity(false), isZeros(false) {}
   faust_mat(const faust_mat<T> & A) : faust_mat_generic(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
+	template<typename U>
+   faust_mat(const faust_mat<U> & A); //: faust_mat_generic(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
   faust_mat(const faust_spmat<T> & A){this->operator=(A);}
 
   faust_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : faust_mat_generic(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
@@ -168,6 +172,10 @@ void init_from_file(const char* filename);
   /// SURCHARGE OPERATEUR ///
   // affectation
   void operator=(faust_mat<T> const& A);
+  
+  template<typename U>
+  void operator=(faust_mat<U> const& A);
+  
   void operator=(faust_spmat<T> const& A);
 
 

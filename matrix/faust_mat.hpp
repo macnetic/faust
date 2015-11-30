@@ -17,7 +17,7 @@
 	#include "mkl_spblas.h"
 #endif
 
-
+template<typename U> class faust_mat;
 using namespace std;
 template<typename T>
 const char * faust_mat<T>::class_name = "faust_mat<T>::";
@@ -29,6 +29,23 @@ faust_mat<T>::faust_mat(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> & m
      // dim1(mat_.rows()), dim2(mat_.cols()),mat(mat_),isIdentity(false),isZeros(false){}
      faust_mat_generic(mat_.rows(),mat_.cols()),mat(mat_),isIdentity(false),isZeros(false){}
 
+	 
+//	 !!!!WARNING A MODIFIER
+template<typename T>	 
+template<typename U>
+faust_mat<T>::faust_mat(const faust_mat<U> & A) : faust_mat_generic(A.dim1,A.dim2), mat(A.dim1,A.dim2), isIdentity(A.isIdentity), isZeros(A.isZeros) 
+{
+	for (int i=0;i<dim1*dim2;i++)
+	{
+		(*this)[i]=(T) A(i);
+	}
+	isIdentity = A.isIdentity;
+	isZeros = A.isZeros;
+}
+	 
+	 
+	 
+	 
 template<typename T>	 
 faust_mat<T>::faust_mat(const T  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol ) : faust_mat_generic(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false),isZeros(false)
   {
@@ -507,7 +524,10 @@ t_sub.stop();
   void faust_mat<T>::Display() const
   {     //std::cout << "nb_row=" << getNbRow() << endl;
         //std::cout << "nb_col=" << getNbCol()   <<endl;  
+	std::cout<<"DIM1 : "<<dim1<<" DIM2 : "<<dim2<<std::endl;
+	std::cout<<"iszeros : "<<isZeros<<" isidentity : "<<isIdentity<<std::endl;
 	std::cout << mat <<endl; 
+	
   }
   
   template<typename T>
@@ -535,6 +555,18 @@ t_sub.stop();
 	  dim2 = A.dim2;
           isZeros = A.isZeros;
           isIdentity = A.isIdentity;
+  }
+  
+  template<typename T>
+  template<typename U>
+  void faust_mat<T>::operator=(faust_mat<U> const& A)
+  {	
+	resize(A.dim1,A.dim2);
+	// mat = A.mat.cast<T>();
+	for (int i=0;i<dim1*dim2;i++)
+			(*this)[i]=(T) A(i);
+    isZeros = A.isZeros;
+    isIdentity = A.isIdentity;	
   }
   
   template<typename T>

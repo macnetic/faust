@@ -13,6 +13,14 @@ template<typename T>
 const char * faust_vec<T>::class_name = "faust_vec<T>::";
 
 template<typename T>
+template<typename U>
+faust_vec<T>::faust_vec(const faust_vec<U>& v) : dim(v.dim), vec(v.dim)
+{
+for (int i=0;i<dim;i++)
+	vec[i]=v(i);	
+}
+
+template<typename T>
 faust_vec<T>::faust_vec(const faust_unsigned_int dim_, const T* data_) : dim(dim_), vec(dim_)
 {
 		memcpy(getData(), data_, dim*sizeof(T));	
@@ -129,6 +137,17 @@ T faust_vec<T>::mean_relative_error(const faust_vec<T>& v_ref)
 }
 
 
+template<typename T>
+template<typename U>
+void faust_vec<T>::operator=(faust_vec<U> const& y)
+{	
+	  
+	resize(y.dim);
+	for (int i=0;i<dim;i++)
+		vec[i]=y(i);
+
+}
+
 
 template<typename T>
 void faust_vec<T>::operator=(faust_vec<T> const& y)
@@ -148,38 +167,38 @@ void  faust_vec<T>::multiplyLeft(faust_spmat<T> const& A)
 		 handleError(class_name,"multiplyLeft : incorrect dimensions");
 		
 	}
-	#ifdef __GEMM_WITH_MKL__
-		int nbRowA = A.getNbRow();
-		T alpha = 1.0,beta = 0.0;
-		char matdescrA[8];
-		matdescrA[0]='G';
-		for (int i=1 ; i<=6 ;i++)
-		matdescrA[i] = 'C';
-		matdescrA[7] = '\0';
-		faust_vec<T> y(nbRowA);
-		faust_spmat<T> Acopy(A);
-		if (!Acopy.isCompressedMode())
-		{
-			Acopy.makeCompression();
-			std::cout<<class_name<<"multiplyLeft : sparse matrix A is not compressed (possible lack of time)"<<std::endl;
-		}
-		#ifdef __COMPILE_TIMERS__
-			t_local_multiplyLeft.start();
-		#endif	
-		#ifdef FAUST_SINGLE	
-			mkl_scsrmv("T",&nbColA,&nbRowA,&alpha,matdescrA,Acopy.getValuePtr(),Acopy.getInnerIndexPtr(),Acopy.getOuterIndexPtr(),&(Acopy.getOuterIndexPtr()[1]),getData(),&beta,y.getData());
-		#else
-			//cout << "MKL debut" << endl;
-			mkl_dcsrmv("T",&nbColA,&nbRowA,&alpha,matdescrA,Acopy.getValuePtr(),Acopy.getInnerIndexPtr(),Acopy.getOuterIndexPtr(),&(Acopy.getOuterIndexPtr()[1]),getData(),&beta,y.getData());
-			//cout << "MKL fin" << endl;
-		#endif
-		#ifdef __COMPILE_TIMERS__
-			t_local_multiplyLeft.stop();
-			cout << "1 "<<setprecision(10)<<t_local_multiplyLeft.get_time()<<endl;
-			t_local_multiplyLeft.reset();
-		#endif	
-		(*this) = y;	
-	#else
+	// #ifdef __GEMM_WITH_MKL__
+		// int nbRowA = A.getNbRow();
+		// T alpha = 1.0,beta = 0.0;
+		// char matdescrA[8];
+		// matdescrA[0]='G';
+		// for (int i=1 ; i<=6 ;i++)
+		// matdescrA[i] = 'C';
+		// matdescrA[7] = '\0';
+		// faust_vec<T> y(nbRowA);
+		// faust_spmat<T> Acopy(A);
+		// if (!Acopy.isCompressedMode())
+		// {
+			// Acopy.makeCompression();
+			// std::cout<<class_name<<"multiplyLeft : sparse matrix A is not compressed (possible lack of time)"<<std::endl;
+		// }
+		// #ifdef __COMPILE_TIMERS__
+			// t_local_multiplyLeft.start();
+		// #endif	
+		// #ifdef FAUST_SINGLE	
+			// mkl_scsrmv("T",&nbColA,&nbRowA,&alpha,matdescrA,Acopy.getValuePtr(),Acopy.getInnerIndexPtr(),Acopy.getOuterIndexPtr(),&(Acopy.getOuterIndexPtr()[1]),getData(),&beta,y.getData());
+		// #else
+			// cout << "MKL debut" << endl;
+			// mkl_dcsrmv("T",&nbColA,&nbRowA,&alpha,matdescrA,Acopy.getValuePtr(),Acopy.getInnerIndexPtr(),Acopy.getOuterIndexPtr(),&(Acopy.getOuterIndexPtr()[1]),getData(),&beta,y.getData());
+			// cout << "MKL fin" << endl;
+		// #endif
+		// #ifdef __COMPILE_TIMERS__
+			// t_local_multiplyLeft.stop();
+			// cout << "1 "<<setprecision(10)<<t_local_multiplyLeft.get_time()<<endl;
+			// t_local_multiplyLeft.reset();
+		// #endif	
+		// (*this) = y;	
+	// #else
 		#ifdef __COMPILE_TIMERS__
 			t_local_multiplyLeft.start();
 		#endif	
@@ -189,7 +208,7 @@ void  faust_vec<T>::multiplyLeft(faust_spmat<T> const& A)
 			cout <<"0 "<<setprecision(10)<<t_local_multiplyLeft.get_time()<<endl;
 			t_local_multiplyLeft.reset();
 		#endif		
-	#endif
+	// #endif
 	
 	dim = A.dim1;
 }

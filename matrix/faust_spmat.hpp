@@ -27,7 +27,23 @@ faust_spmat<T>::faust_spmat(const faust_unsigned_int dim1_, const faust_unsigned
 {
 	resize(nnz, dim1, dim2);
 }
-
+template<typename T>
+template<typename U>
+faust_spmat<T>::faust_spmat(const faust_spmat<U>& M) : faust_mat_generic(M.getNbRow(),M.getNbCol()),
+mat(Eigen::SparseMatrix<T>(dim1,dim2)),
+nnz(M.getNonZeros())
+{
+mat.reserve(nnz);
+for (int i = 0;i<nnz;i++)
+{
+	getValuePtr()[i]= (T) M.getValuePtr()[i];
+	getInnerIndexPtr()[i]=  M.getInnerIndexPtr()[i];
+}
+for (int j = 0;j<dim2+1;j++)	
+{
+	getOuterIndexPtr()[j]=  M.getOuterIndexPtr()[j];
+}
+}
 
 template<typename T>
 faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const T* value, const size_t* id_row, const size_t* col_ptr) :
@@ -203,8 +219,10 @@ void faust_spmat<T>::init_from_file(const char* filename)
 template<typename T>
 void faust_spmat<T>::Display() const
 {
-	faust_mat<T> mat_tmp(*this);
-	mat_tmp.Display();
+	std::cout<<"dim1 : "<<dim1<<" dim2 : "<<dim2<<" nnz : "<<nnz<<std::endl;
+	std::cout<<mat<<std::endl;
+	// faust_mat<T> mat_tmp(*this);
+	// mat_tmp.Display();
 	
 }
 

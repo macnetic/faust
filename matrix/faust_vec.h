@@ -5,6 +5,7 @@
 #include "faust_constant.h"
 #include <vector>
 #include <iterator>
+#include "faust_exception.h"
 
 #ifdef __COMPILE_TIMERS__
   #include "faust_timer.h"
@@ -30,9 +31,15 @@ void sp_solve(const faust_mat<T> & A,faust_vec<T> & x, const faust_vec<T> & y);
 template<typename T>
 class faust_vec
 {
+	
+	template<class> friend class faust_vec;
  public :
  faust_vec() : dim(0), vec() {}
  faust_vec(const int _dim) : dim(_dim), vec(_dim){}
+ // template<typename U>
+ // faust_vec(const faust_vec<U>& v) : dim(v.dim), vec(v.vec){}
+  template<typename U>
+ faust_vec(const faust_vec<U>& v);
  faust_vec(const faust_vec<T>& v) : dim(v.dim), vec(v.vec){}
  faust_vec(const faust_unsigned_int dim_, const T* data_);
 	
@@ -54,8 +61,8 @@ void  multiplyLeft(faust_spmat<T> const& A);
   
 T sum()const{return vec.sum();}
 T mean()const{return vec.mean();}
-
-
+template<typename U>
+void operator=(faust_vec<U> const& y);
 void operator=(faust_vec<T> const& y);
 
 void operator*=(const T alpha);
