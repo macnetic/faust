@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
 	
 	//string mat_file ="/udd/nbellot/Devel/Faust/trunk/devcpp/interface_matlab/Faust_example.mat";
 	string mat_file(argv[1]);
+	string prefix_output(argv[2]);
 	size_t ind = mat_file.find_last_of(".");
 	
 	if(ind<=0 || ind>= mat_file.size())
@@ -82,13 +83,15 @@ int main(int argc, char* argv[])
 	}
 	
 	int nb_run_tmp = 10;
-	if (argc >= 3) nb_run_tmp = atoi(argv[2]);
+	int id_file = 0;
+	if (argc >= 4) nb_run_tmp = atoi(argv[3]);
+	if (argc >= 5) id_file = atoi(argv[4]);
 	
 	const int NB_RUN = nb_run_tmp;
 	
-	int nb_fact = 2;
-	int RCG = 2;
-	int DIM = 512;
+	int nb_fact;
+	int RCG;
+	int DIM;
 	
 	faust_mat<T> DIMS;
 	faust_mat<T> RCGS;
@@ -120,6 +123,7 @@ int main(int argc, char* argv[])
 	stringstream ssInputVarFaust;
 	stringstream ssInputVarDense;
 	string OuputDir="../output/";
+	
 	
 	cout << "loading of dense matrix en faust" << endl;
 	
@@ -216,7 +220,7 @@ int main(int argc, char* argv[])
 	stringstream ss;
 	
 	ss.str("");
-	ss <<OuputDir<<"temps_dense.dat";
+	ss <<OuputDir<<prefix_output<<"temps_dense"<<id_file<<".dat";
 	cout << "fichier output 1 : "<<ss.str().c_str() <<endl;
 	fichier.open(ss.str().c_str());
 	for (int k=0 ; k <NB_RUN;k++)
@@ -237,7 +241,7 @@ int main(int argc, char* argv[])
 	fichier.close();
 
 	ss.str("");
-	ss <<OuputDir<<"temps_faust.dat";
+	ss <<OuputDir<<prefix_output<<"temps_faust"<<id_file<<".dat";
 	cout <<"fichier ouput2  : "<<ss.str().c_str() <<endl;
 	fichier.open(ss.str().c_str());
 	for (int k=0 ; k <NB_RUN;k++)
@@ -259,7 +263,7 @@ int main(int argc, char* argv[])
 	
 	//ecriture des headers
 	ss.str("");
-	ss <<OuputDir<<"DIMS.dat";
+	ss <<OuputDir<<prefix_output<<"DIMS"<<id_file<<".dat";
 	cout <<"fichier header DIMS  : "<<ss.str().c_str() <<endl;
 	fichier.open(ss.str().c_str());
 	for (int j=0 ; j<nDIMS; j++)fichier << setprecision(20) << DIMS[j] << " ";
@@ -267,7 +271,7 @@ int main(int argc, char* argv[])
 	
 	
 	ss.str("");
-	ss <<OuputDir<<"RCGS.dat";
+	ss <<OuputDir<<prefix_output<<"RCGS"<<id_file<<".dat";
 	cout <<"fichier header RCGS  : "<<ss.str().c_str() <<endl;
 	fichier.open(ss.str().c_str());
 	for (int j=0 ; j<nRCGS; j++)fichier << setprecision(20) << RCGS[j] << " ";
@@ -275,7 +279,7 @@ int main(int argc, char* argv[])
 
 	
 	ss.str("");
-	ss <<OuputDir<<"NB_FACTS.dat";
+	ss <<OuputDir<<prefix_output<<"NB_FACTS"<<id_file<<".dat";
 	cout <<"fichier header NB_FACTS  : "<<ss.str().c_str() <<endl;
 	fichier.open(ss.str().c_str());
 	for (int j=0 ; j<nNB_FACTS; j++)

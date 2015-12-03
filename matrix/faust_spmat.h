@@ -75,7 +75,8 @@ class faust_spmat : public faust_mat_generic
 		
 
 	private:
-		Eigen::SparseMatrix<T> mat;	
+		// Eigen::SparseMatrix<T> mat;
+		Eigen::SparseMatrix<T,Eigen::RowMajor> mat;		
 		faust_unsigned_int nnz;
 
 
