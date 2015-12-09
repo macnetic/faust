@@ -133,11 +133,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 		
 		
+		// if (nlhs != 1)
+		// {
+			// (*core_ptr).transpose();
+		// }
+		// return;
 		if (nlhs != 1)
-		{
 			(*core_ptr).transpose();
+		else
+		{	
+			faust_core<faust_real>* F = new faust_core<faust_real>((*core_ptr));
+			(*F).transpose();	
+			plhs[0]=convertPtr2Mat<faust_core<faust_real> >(F);
 		}
 		return;
+		
 	}
         
    
@@ -151,7 +161,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
         
         // Check parameters
-        if (nlhs != 1 || nrhs != 3)
+        // if (nlhs != 1 || nrhs != 3)
+		if (nlhs > 1 ||  nrhs != 3)
             mexErrMsgTxt("Multiply: Unexpected arguments.");
         if (mxGetNumberOfDimensions(prhs[2]) != 2 
                 || SIZE_A1 != core_ptr->getNbCol() )
