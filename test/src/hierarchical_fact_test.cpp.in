@@ -9,39 +9,40 @@
 #include "faust_init_from_matio_mat.h"
 #include <iostream>
 #include "faust_constant.h"
+#include <iomanip>
 
 using namespace std;
-typedef faust_real T;
+typedef double FPP;
 
 int main()
 {
-  cout<<"single defined : "<<IS_SINGLE_DEFINED<<endl; 	
-  if (typeid(T) == typeid(double))
+
+  if (typeid(FPP) == typeid(double))
   {
 	cout<<"faust_real == double"<<endl;
   }
   
-  if (typeid(T) == typeid(float))
+  if (typeid(FPP) == typeid(float))
   {
 	cout<<"faust_real == float"<<endl;
   }
   system("sleep 6");		
   
-  faust_mat<T> data, init_facts1, init_facts2;
+  faust_mat<FPP> data, init_facts1, init_facts2;
 	
      char config_palm2_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_compared_palm2.mat";
      char config_hierfact_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat"; 	
 
 
-  init_faust_mat_from_matio<T>(data, config_palm2_filename, "data");
-  init_faust_mat_from_matio<T>(init_facts1, config_palm2_filename, "init_facts1");
-  init_faust_mat_from_matio<T>(init_facts2, config_palm2_filename, "init_facts2");
+  init_faust_mat_from_matio<FPP>(data, config_palm2_filename, "data");
+  init_faust_mat_from_matio<FPP>(init_facts1, config_palm2_filename, "init_facts1");
+  init_faust_mat_from_matio<FPP>(init_facts2, config_palm2_filename, "init_facts2");
 
   int cons11_name, cons11_parameter, cons11_row, cons11_col;
   int cons12_name, cons12_parameter, cons12_row, cons12_col;
   int cons13_name, cons13_parameter, cons13_row, cons13_col;
 
-T cons21_parameter;
+FPP cons21_parameter;
   int cons21_name,                   cons21_row, cons21_col; 
   int cons22_name, cons22_parameter, cons22_row, cons22_col;
   int cons23_name, cons23_parameter, cons23_row, cons23_col;
@@ -65,7 +66,7 @@ T cons21_parameter;
   cons13_col       = init_int_from_matio(config_hierfact_filename, "cons13_col");
 
   cons21_name      = init_int_from_matio(config_hierfact_filename, "cons21_name");
-  cons21_parameter = (T) init_double_from_matio(config_hierfact_filename, "cons21_parameter");
+  cons21_parameter = (FPP) init_double_from_matio(config_hierfact_filename, "cons21_parameter");
   cons21_row       = init_int_from_matio(config_hierfact_filename, "cons21_row");
   cons21_col       = init_int_from_matio(config_hierfact_filename, "cons21_col");
 
@@ -94,7 +95,7 @@ T cons21_parameter;
   const faust_constraint_int  cons11(static_cast<faust_constraint_name>(cons11_name), cons11_parameter, cons11_row, cons11_col);
   const faust_constraint_int  cons12(static_cast<faust_constraint_name>(cons12_name), cons12_parameter, cons12_row, cons12_col);
   const faust_constraint_int  cons13(static_cast<faust_constraint_name>(cons13_name), cons13_parameter, cons13_row, cons13_col);
-  const faust_constraint_real<T> cons21(static_cast<faust_constraint_name>(cons21_name), cons21_parameter, cons21_row, cons21_col);
+  const faust_constraint_real<FPP> cons21(static_cast<faust_constraint_name>(cons21_name), cons21_parameter, cons21_row, cons21_col);
   const faust_constraint_int  cons22(static_cast<faust_constraint_name>(cons22_name), cons22_parameter, cons22_row, cons22_col);
   const faust_constraint_int  cons23(static_cast<faust_constraint_name>(cons23_name), cons23_parameter, cons23_row, cons23_col);
 
@@ -115,12 +116,12 @@ T cons21_parameter;
 
 
   // Creation du critere d'arret
-  stopping_criterion<T> crit_2(niter1);
-  stopping_criterion<T> crit_global(niter2);
+  stopping_criterion<FPP> crit_2(niter1);
+  stopping_criterion<FPP> crit_global(niter2);
 
-  faust_params<T> params(data, nfacts, cons, vector<faust_mat<T> >(), crit_2, crit_global, verbose, update_way, fact_side,1,false);
+  faust_params<FPP> params(data, nfacts, cons, vector<faust_mat<FPP> >(), crit_2, crit_global, verbose, update_way, fact_side,1,false);
   params.Display();	
-  hierarchical_fact<T> hier_fact(params);
+  hierarchical_fact<FPP> hier_fact(params);
 
   faust_timer t1;
   t1.start();
@@ -134,7 +135,7 @@ T cons21_parameter;
 #endif
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 
-  vector<faust_spmat<T> > facts;
+  vector<faust_spmat<FPP> > facts;
   hier_fact.get_facts(facts);
   (facts[0]) *= hier_fact.get_lambda();
   char nomFichier[100];
@@ -143,8 +144,8 @@ T cons21_parameter;
      sprintf(nomFichier, "@FAUST_TESTOUTPUT_BIN_DIR@/facts%d_cpp.dat",i);
      facts[i].print_file(nomFichier);
   }
-  cout<<"lambda="<<hier_fact.get_lambda()<<endl;
-  cout<<"lambda="<<hier_fact.get_lambda()<<endl;
+  cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
+
 
 return 0;
 }

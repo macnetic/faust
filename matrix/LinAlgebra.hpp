@@ -329,7 +329,7 @@ A.t_gemm.start();
 
 
 		#ifndef __GEMM_WITH_OPENBLAS__
-		std::cout<<" A normal gemm"<<std::endl;
+		// std::cout<<" A normal gemm"<<std::endl;
 			if (typeA == 'N')
 			{
 				if (typeB == 'N')

@@ -59,7 +59,8 @@ class palm4MSA
       void update_L();
       void update_R();
       void compute_lambda();
-	  static const char * class_name;	
+	  static const char * class_name;
+	  static const T lipschitz_multiplicator;	
 
    public:
       stopping_criterion<T> stop_crit;
@@ -82,7 +83,7 @@ class palm4MSA
       std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
       int ind_fact; //indice de facteur (!= hierarchical_fact::ind_fact : indice de factorisation)
       int ind_ite;
-      T lipschitz_multiplicator;
+      // T lipschitz_multiplicator;
       const bool verbose;
       const bool isUpdateWayR2L;
       const bool isLambdaComputed;

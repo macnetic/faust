@@ -1,4 +1,9 @@
-clear
+%% This is an example of a little experience of source localization in magnetoencephalography (MEG) using faust factorisation for speed-up the calculus,
+%% the sparse algorithm used is greed_omp_chol from the toolbox smallbox2.0/Sparsify/GreedLab under GNU GPL 2.0 License
+%% to show the different performance figure run figure_localisze_src after this script
+
+
+clear all
 close all
 clc
 
@@ -25,6 +30,8 @@ X_norm = X./repmat(sqrt(sum(X.^2,1)),size(X,1),1);
 MEG_faustS=cell(1,nb_approx_MEG);
 faustS_mult=cell(1,nb_approx_MEG);
 trans_faustS_mult=cell(1,nb_approx_MEG);
+matlab_faustS_mult=cell(1,nb_approx_MEG);
+matlab_trans_faustS_mult=cell(1,nb_approx_MEG);
 for i=1:nb_approx_MEG
     
 
@@ -41,9 +48,13 @@ for i=1:nb_approx_MEG
     
     %% structure faust
     facts{1}=facts{1}./repmat(sqrt(sum(X_approx.^2,1)),size(X_approx,1),1)';% normalisation of the row dvp(facts)
+    sp_facts_trans = make_sparse(facts);
+    sp_facts = faust_transpose(sp_facts_trans);
     trans_fc=matlab_faust(facts);
     fc=transpose(trans_fc);
 %     f=@(x) x/2;
+    matlab_trans_faustS_mult{i}=@(x) f_mult(sp_facts_trans,x);
+    matlab_faustS_mult{i}=@(x) f_mult(sp_facts,x);
     trans_faustS_mult{i}=@(x) trans_fc*x;
     faustS_mult{i}=@(x) fc*x;
     MEG_faustS{i}=trans_fc;
@@ -60,6 +71,8 @@ dist_paliers = [0.01,0.05,0.08]; dist_paliers = [dist_paliers, 0.5];
 
 resDist = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,méthode,dist_sources,src_nb,run);
 compute_Times = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Ntraining);
+resDist_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,méthode,dist_sources,src_nb,run);
+compute_Times_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Ntraining);
 for k=1:numel(dist_paliers)-1
     disp(['k=' num2str(k) '/' num2str(numel(dist_paliers)-1)])
     %Parameters settings
@@ -131,6 +144,9 @@ for k=1:numel(dist_paliers)-1
             resDist(1,k,1,i) = min(norm(points(idx(1)) - points(idx_omp(1))),norm(points(idx(1)) - points(idx_omp(2))));
             resDist(1,k,2,i) = min(norm(points(idx(2)) - points(idx_omp(1))),norm(points(idx(2)) - points(idx_omp(2))));
             compute_Times(1,k,i)=t1;
+            resDist_matlab(1,k,1,i) = min(norm(points(idx(1)) - points(idx_omp(1))),norm(points(idx(1)) - points(idx_omp(2))));
+            resDist_matlab(1,k,2,i) = min(norm(points(idx(2)) - points(idx_omp(1))),norm(points(idx(2)) - points(idx_omp(2))));
+            compute_Times_matlab(1,k,i)=t1;
             
        for ll=1:nb_approx_MEG
               X_approx_norm = MEG_approxS_norm{ll};
@@ -144,6 +160,15 @@ for k=1:numel(dist_paliers)-1
             resDist(ll+1,k,1,i) = min(norm(points(idx(1)) - points(idx_omp(1))),norm(points(idx(1)) - points(idx_omp(2))));
             resDist(ll+1,k,2,i) = min(norm(points(idx(2)) - points(idx_omp(1))),norm(points(idx(2)) - points(idx_omp(2))));
             compute_Times(ll+1,k,i)=t1;
+               tic  
+              [sol_omp_hat(:,i), err_mse_omp_hat, iter_time_omp_hat]=greed_omp_chol(Data(:,i),matlab_faustS_mult{ll},size(X_approx_norm,2),'stopTol',1*Sparsity,'P_trans',matlab_trans_faustS_mult{ll});
+              t2=toc;
+              err_omp_hat(1,i) = norm(X_norm*Gamma(:,i)-X_approx_norm*sol_omp_hat(:,i))/norm(X_norm*Gamma(:,i));
+            err_omp_hat(2,i) = isequal(find(Gamma(:,i)),find(sol_omp_hat(:,i)>1e-4));
+            idx_omp = find(sol_omp_hat(:,i));
+            resDist_matlab(ll+1,k,1,i) = min(norm(points(idx(1)) - points(idx_omp(1))),norm(points(idx(1)) - points(idx_omp(2))));
+            resDist_matlab(ll+1,k,2,i) = min(norm(points(idx(2)) - points(idx_omp(1))),norm(points(idx(2)) - points(idx_omp(2))));
+            compute_Times_matlab(ll+1,k,i)=t2;
 %             % faust 
 %             [sol_omp_hat(:,i), err_mse_omp_hat, iter_time_omp_hat]=greed_omp_chol(Data(:,i),faustS_mult{ll},size(X_approx_norm,2),'stopTol',1*Sparsity,'P_trans',trans_faustS_mult{ll});
         end
@@ -154,7 +179,7 @@ end
 toc
 heure = clock ;
 % save(['results_BSL_JOURNAL_6approx' date '-' num2str(heure(4)) '-' num2str(heure(5))  ],'resDist','RCG_approxS_MEG','nb_approx_MEG','compute_Times','RCG_approxS_MEG');
-save('results_localise_src','resDist','RCG_approxS_MEG','nb_approx_MEG','compute_Times','RCG_approxS_MEG');
+save('results_localise_src','resDist','resDist_matlab','RCG_approxS_MEG','nb_approx_MEG','compute_Times','compute_Times_matlab', 'RCG_approxS_MEG');
 
 
 

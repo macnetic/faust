@@ -33,6 +33,9 @@ template<typename T>
 const char * palm4MSA<T>::class_name="palm4MSA";
 
 template<typename T>
+const T palm4MSA<T>::lipschitz_multiplicator=1.001;
+
+template<typename T>
 palm4MSA<T>::palm4MSA(const faust_params<T> & params_, const bool isGlobal_) :
    data(params_.data),
    lambda(params_.init_lambda),
@@ -41,7 +44,6 @@ palm4MSA<T>::palm4MSA(const faust_params<T> & params_, const bool isGlobal_) :
    RorL(vector<faust_mat<T> >(2)),
    ind_fact(0),
    ind_ite(-1),
-   lipschitz_multiplicator(1.001),
    verbose(params_.isVerbose),
    isUpdateWayR2L(params_.isUpdateWayR2L),
    isLambdaComputed(params_.isLambdaComputed),
@@ -71,7 +73,6 @@ palm4MSA<T>::palm4MSA(const faust_params_palm<T>& params_palm_, const bool isGlo
    const_vec(params_palm_.cons),
    ind_fact(0),
    ind_ite(-1),
-   lipschitz_multiplicator(1.001),
    verbose(params_palm_.isVerbose),
    isUpdateWayR2L(params_palm_.isUpdateWayR2L),
    isLambdaComputed(params_palm_.isLambdaComputed),

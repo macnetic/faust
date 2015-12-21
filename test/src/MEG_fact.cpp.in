@@ -11,13 +11,23 @@
 #include "hierarchical_fact.h"
 #include "faust_timer.h"
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
-typedef faust_real T;
+typedef float FPP;//floating point precision
 
 int main()
-{
-  faust_mat<T> data, init_facts1, init_facts2;
+{	
+  if (typeid(FPP) == typeid(double))
+  {
+	cout<<"floating point precision == double"<<endl;
+  }
+
+  if (typeid(FPP) == typeid(float))
+  {
+	cout<<"floating point precision == float"<<endl;
+  }
+  faust_mat<FPP> data, init_facts1, init_facts2;
 
   char config_MEG_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat";
 
@@ -140,21 +150,21 @@ int main()
 
 
   // Creation du critere d'arret
-  stopping_criterion<T> crit_2(niter1);
-  stopping_criterion<T> crit_global(niter2);
-  //faust_params params(data, nfacts, cons, vector<faust_mat<T> >(), crit_2, crit_global,false,false,false,1.0,false);	
+  stopping_criterion<FPP> crit_2(niter1);
+  stopping_criterion<FPP> crit_global(niter2);
+  //faust_params params(data, nfacts, cons, vector<faust_mat<FPP> >(), crit_2, crit_global,false,false,false,1.0,false);	
 	cons_tmp1.push_back(&cons25);
 	bool isVerbose = false;
 	bool isUpdateR2L = false;
 	bool isFactSideLeft = true;
-	T init_lambda_value = 1.0;
+	FPP init_lambda_value = 1.0;
 	bool isLambdaComputed = true;
-    //faust_params params(data,nfacts,cons_tmp1,vector<faust_mat<T> >(),crit_2,crit_global,1.25,1.4,false,false,false,1.0,false);
-	faust_params<T> params(data,nfacts,cons_tmp1,vector<faust_mat<T> >(),crit_2,crit_global,1.25,1.4,isVerbose,isUpdateR2L,isFactSideLeft,init_lambda_value,isLambdaComputed);
-  //faust_params params(data, nfacts, cons, vector<faust_mat<T> >(), crit_2, crit_global,false,false,1.0,false);
+    //faust_params params(data,nfacts,cons_tmp1,vector<faust_mat<FPP> >(),crit_2,crit_global,1.25,1.4,false,false,false,1.0,false);
+	faust_params<FPP> params(data,nfacts,cons_tmp1,vector<faust_mat<FPP> >(),crit_2,crit_global,1.25,1.4,isVerbose,isUpdateR2L,isFactSideLeft,init_lambda_value,isLambdaComputed);
+  //faust_params params(data, nfacts, cons, vector<faust_mat<FPP> >(), crit_2, crit_global,false,false,1.0,false);
   params.Display();
   cout<<"launch"<<endl;	
-  hierarchical_fact<T> hier_fact(params);
+  hierarchical_fact<FPP> hier_fact(params);
 
   faust_timer t1;
   t1.start();
@@ -167,7 +177,7 @@ int main()
 #endif
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 
-  vector<faust_spmat<T> > facts;
+  vector<faust_spmat<FPP> > facts;
   hier_fact.get_facts(facts);
   (facts[0]) *= hier_fact.get_lambda();
   char nomFichier[100];
@@ -176,7 +186,7 @@ int main()
      sprintf(nomFichier, "@FAUST_TESTOUTPUT_BIN_DIR@/facts%d_cpp.dat",i);
      facts[i].print_file(nomFichier);
   }
-  cout<<"lambda="<<hier_fact.get_lambda()<<endl;
+  cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
 
 return 0;
 }
