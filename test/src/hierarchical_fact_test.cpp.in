@@ -12,19 +12,19 @@
 #include <iomanip>
 
 using namespace std;
-typedef double FPP;
+typedef double FPP;// floating point precision
 
 int main()
 {
 
   if (typeid(FPP) == typeid(double))
   {
-	cout<<"faust_real == double"<<endl;
+	cout<<"floating point precision == double"<<endl;
   }
   
   if (typeid(FPP) == typeid(float))
   {
-	cout<<"faust_real == float"<<endl;
+	cout<<"floating point precision == float"<<endl;
   }
   system("sleep 6");		
   

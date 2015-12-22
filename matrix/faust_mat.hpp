@@ -30,18 +30,7 @@ faust_mat<T>::faust_mat(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> & m
      faust_mat_generic(mat_.rows(),mat_.cols()),mat(mat_),isIdentity(false),isZeros(false){}
 
 	 
-//	 !!!!WARNING A MODIFIER
-template<typename T>	 
-template<typename U>
-faust_mat<T>::faust_mat(const faust_mat<U> & A) : faust_mat_generic(A.dim1,A.dim2), mat(A.dim1,A.dim2), isIdentity(A.isIdentity), isZeros(A.isZeros) 
-{
-	for (int i=0;i<dim1*dim2;i++)
-	{
-		(*this)[i]=(T) A(i);
-	}
-	isIdentity = A.isIdentity;
-	isZeros = A.isZeros;
-}
+
 	 
 	 
 	 
@@ -576,7 +565,7 @@ t_sub.stop();
 	  setZeros();
           T*const ptr_data = getData();
           for(int i=0 ; i< S.mat.outerSize() ; i++)
-             for(typename Eigen::SparseMatrix<T>::InnerIterator it(S.mat,i); it; ++it)
+             for(typename Eigen::SparseMatrix<T,Eigen::RowMajor>::InnerIterator it(S.mat,i); it; ++it)
                 ptr_data[it.col() * dim1 + it.row()] = it.value();
           isZeros = false;
           isIdentity = false;

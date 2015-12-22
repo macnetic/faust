@@ -9,6 +9,7 @@
 #include <iterator>
 #include "faust_mat_generic.h"
 #include "faust_exception.h"
+#include <iostream>
 
 #ifdef __COMPILE_TIMERS__
   #include "faust_timer.h"
@@ -58,7 +59,9 @@ public:
   faust_mat() : faust_mat_generic(), mat(0,0), isIdentity(false), isZeros(false) {}
   faust_mat(const faust_mat<T> & A) : faust_mat_generic(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
 	template<typename U>
-   faust_mat(const faust_mat<U> & A); //: faust_mat_generic(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
+   faust_mat(const faust_mat<U> & A){this->operator=(A);}
+   template<typename U>
+   faust_mat(const faust_spmat<U> & A){this->operator=(A);}
   faust_mat(const faust_spmat<T> & A){this->operator=(A);}
 
   faust_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : faust_mat_generic(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
@@ -175,6 +178,8 @@ void init_from_file(const char* filename);
   
   template<typename U>
   void operator=(faust_mat<U> const& A);
+  template<typename U>
+  void operator=(faust_spmat<U> const& A){std::cout<<"bla1";faust_spmat<T> AT(A);std::cout<<"bla2";this->operator=(AT);};
   
   void operator=(faust_spmat<T> const& A);
 

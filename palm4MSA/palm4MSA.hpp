@@ -757,9 +757,10 @@ t_local_next_step.start();
 
 	}
    if (verbose)
+   {   
       cout << "Iter " << ind_ite << ", RMSE=" << get_RMSE() << endl;
-
-
+	  cout << "Lambda " <<setprecision(20)<< lambda << endl;
+   }
    delete[] ind_ptr;
    ind_ptr = NULL;
 

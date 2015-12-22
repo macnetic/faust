@@ -23,7 +23,9 @@ class faust_spmat : public faust_mat_generic
 	public:
 		faust_spmat();
 		template<typename U>
-		faust_spmat(const faust_spmat<U>& M);
+		faust_spmat(const faust_spmat<U>& M){(this)->operator=(M);}
+		template<typename U>
+		faust_spmat(const faust_mat<U>& M){(this)->operator=(M);}
 		faust_spmat(const faust_spmat<T>& M);
 		faust_spmat(const faust_mat<T>& M);
 		// faust_spmat(const int dim1_, const int dim2_);
@@ -43,19 +45,22 @@ class faust_spmat : public faust_mat_generic
 		void operator= (const faust_mat<T>& Mdense);
 		void operator*=(const T alpha);
 		void operator/=(const T alpha);
-		
+		template <typename U>
+		void operator=(const faust_spmat<U> &M);
+		template <typename U>
+		void operator=(const faust_mat<U> &M){faust_spmat<U> spM(M);(this)->operator=(spM);}
 		// int getNbRow()const{return dim1;}
 		// int getNbCol()const{return dim2;}
 		faust_unsigned_int getNonZeros()const{return nnz;}
 		bool isCompressedMode()const{return mat.isCompressed();}
 		void makeCompression(){mat.makeCompressed();}
-		////// Eigen sparse matrix format : CSC (Compressed Sparse Column) /////
+		////// Eigen sparse matrix format : CRS (Compressed Row Storage) /////
 		T* getValuePtr(){return mat.valuePtr();}// return pointer value of length nnz
-		int* getOuterIndexPtr(){return mat.outerIndexPtr();}//return column-index value of length equal to the number of column+1
-		 int* getInnerIndexPtr(){return mat.innerIndexPtr();}//return row index of length nnz
+		int* getOuterIndexPtr(){return mat.outerIndexPtr();}//return row-index value of length equal to the number of row+1
+		 int* getInnerIndexPtr(){return mat.innerIndexPtr();}//return col index of length nnz
 		 const T* getValuePtr()const{return mat.valuePtr();}// return pointer value of length nnz
-		const int* getOuterIndexPtr()const{return mat.outerIndexPtr();}//return column-index value of length equal to the number of column+1
-		const int* getInnerIndexPtr()const{return mat.innerIndexPtr();}//return row index of length nnz
+		const int* getOuterIndexPtr()const{return mat.outerIndexPtr();}
+		const int* getInnerIndexPtr()const{return mat.innerIndexPtr();}
 		
 		
 		
@@ -75,7 +80,7 @@ class faust_spmat : public faust_mat_generic
 		
 
 	private:
-		Eigen::SparseMatrix<T> mat;	
+		Eigen::SparseMatrix<T,Eigen::RowMajor> mat;	
 		faust_unsigned_int nnz;
 
 

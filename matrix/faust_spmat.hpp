@@ -27,23 +27,36 @@ faust_spmat<T>::faust_spmat(const faust_unsigned_int dim1_, const faust_unsigned
 {
 	resize(nnz, dim1, dim2);
 }
+
+
+
 template<typename T>
 template<typename U>
-faust_spmat<T>::faust_spmat(const faust_spmat<U>& M) : faust_mat_generic(M.getNbRow(),M.getNbCol()),
-mat(Eigen::SparseMatrix<T>(dim1,dim2)),
-nnz(M.getNonZeros())
+void faust_spmat<T>::operator=(const faust_spmat<U>& M)
 {
-mat.reserve(nnz);
-for (int i = 0;i<nnz;i++)
-{
-	getValuePtr()[i]= (T) M.getValuePtr()[i];
-	getInnerIndexPtr()[i]=  M.getInnerIndexPtr()[i];
+resize(M.getNonZeros(),M.getNbRow(),M.getNbCol());	
+
+vector<Eigen::Triplet<T> > tripletList;
+   tripletList.reserve(nnz);
+   int nbEltIns = 0;
+   int nb_elt_rowi;
+
+	for (int i=0;i<M.getNbRow();i++)
+	{	
+		nb_elt_rowi = M.getOuterIndexPtr()[i+1]-M.getOuterIndexPtr()[i];
+
+		for (int j = 0;j<nb_elt_rowi;j++)
+		{	
+			tripletList.push_back(Eigen::Triplet<T>((int) i,M.getInnerIndexPtr()[j+nbEltIns], (T) M.getValuePtr()[j+nbEltIns]));
+		}
+		nbEltIns += nb_elt_rowi;
+			
+	}
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	makeCompression();
 }
-for (int j = 0;j<dim2+1;j++)	
-{
-	getOuterIndexPtr()[j]=  M.getOuterIndexPtr()[j];
-}
-}
+
+
 
 template<typename T>
 faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const T* value, const size_t* id_row, const size_t* col_ptr) :
@@ -310,8 +323,9 @@ void faust_spmat<T>::print_file(const char* filename)const
 	ofstream fichier;
 	fichier.open(filename);
 	
+	
 	for(int i=0 ; i< mat.outerSize() ; i++)
-		for(typename Eigen::SparseMatrix<T>::InnerIterator it(mat,i); it; ++it)
+		for(typename Eigen::SparseMatrix<T,Eigen::RowMajor>::InnerIterator it(mat,i); it; ++it)
 			fichier << it.row()+1 << " " << it.col()+1 << " " << setprecision(20) << it.value() << endl;
 	fichier << dim1 << " " << dim2 << " 0.0" << endl;
 	fichier.close();

@@ -152,16 +152,16 @@ int main()
   // Creation du critere d'arret
   stopping_criterion<FPP> crit_2(niter1);
   stopping_criterion<FPP> crit_global(niter2);
-  //faust_params params(data, nfacts, cons, vector<faust_mat<FPP> >(), crit_2, crit_global,false,false,false,1.0,false);	
+  
 	cons_tmp1.push_back(&cons25);
-	bool isVerbose = false;
+	bool isVerbose = true;
 	bool isUpdateR2L = false;
 	bool isFactSideLeft = true;
 	FPP init_lambda_value = 1.0;
 	bool isLambdaComputed = true;
-    //faust_params params(data,nfacts,cons_tmp1,vector<faust_mat<FPP> >(),crit_2,crit_global,1.25,1.4,false,false,false,1.0,false);
-	faust_params<FPP> params(data,nfacts,cons_tmp1,vector<faust_mat<FPP> >(),crit_2,crit_global,1.25,1.4,isVerbose,isUpdateR2L,isFactSideLeft,init_lambda_value,isLambdaComputed);
-  //faust_params params(data, nfacts, cons, vector<faust_mat<FPP> >(), crit_2, crit_global,false,false,1.0,false);
+	// // config with exponential decay of the residual
+	//faust_params<FPP> params(data,nfacts,cons_tmp1,vector<faust_mat<FPP> >(),crit_2,crit_global,1.25,1.4,isVerbose,isUpdateR2L,isFactSideLeft,init_lambda_value,isLambdaComputed);
+  faust_params<FPP> params(data, nfacts, cons, vector<faust_mat<FPP> >(), crit_2, crit_global,isVerbose,false,false,1.0,isLambdaComputed);	
   params.Display();
   cout<<"launch"<<endl;	
   hierarchical_fact<FPP> hier_fact(params);
