@@ -119,7 +119,7 @@ FPP cons21_parameter;
   stopping_criterion<FPP> crit_2(niter1);
   stopping_criterion<FPP> crit_global(niter2);
 
-  faust_params<FPP> params(data, nfacts, cons, vector<faust_mat<FPP> >(), crit_2, crit_global, verbose, update_way, fact_side,1,false);
+  faust_params<FPP> params(data, nfacts, cons, vector<faust_mat<FPP> >(), crit_2, crit_global, verbose, update_way, fact_side,1);
   params.Display();	
   hierarchical_fact<FPP> hier_fact(params);
 

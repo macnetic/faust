@@ -26,8 +26,7 @@ class faust_params
 	  const bool isVerbose_ = false ,
 	  const bool isUpdateWayR2L_ = false ,
 	  const bool isFactSideLeft_ = false ,
-	  const T init_lambda_ = 1.0 ,
-	  const bool isLambdaComputed_ = true);
+	  const T init_lambda_ = 1.0 );
 	  
 	  	
 
@@ -42,8 +41,7 @@ class faust_params
 	const bool isVerbose_ = false ,
 	const bool isUpdateWayR2L_ = false ,
 	const bool isFactSideLeft_ = false ,
-	const T init_lambda_ = 1.0 ,
-	const bool isLambdaComputed_ = true);
+	const T init_lambda_ = 1.0 );
 		 
 	  faust_params();
 		
@@ -68,7 +66,6 @@ class faust_params
       bool isUpdateWayR2L;
       bool isFactSideLeft;
       T init_lambda;
-	  bool isLambdaComputed;
 	  void Display() const;
 
       //const int nb_rows; // number of rows of the first factor

@@ -46,7 +46,6 @@ palm4MSA<T>::palm4MSA(const faust_params<T> & params_, const bool isGlobal_) :
    ind_ite(-1),
    verbose(params_.isVerbose),
    isUpdateWayR2L(params_.isUpdateWayR2L),
-   isLambdaComputed(params_.isLambdaComputed),
    isCComputed(false),
    isGradComputed(false),
    isProjectionComputed(false),
@@ -75,7 +74,6 @@ palm4MSA<T>::palm4MSA(const faust_params_palm<T>& params_palm_, const bool isGlo
    ind_ite(-1),
    verbose(params_palm_.isVerbose),
    isUpdateWayR2L(params_palm_.isUpdateWayR2L),
-   isLambdaComputed(params_palm_.isLambdaComputed),
    isCComputed(false),
    isGradComputed(false),
    isProjectionComputed(false),
@@ -93,16 +91,8 @@ void palm4MSA<T>::compute_facts()
 	while (do_continue())
 	{	
 		next_step();
-		//cout<<"lambda : "<<lambda<<endl;
 	}
-	//cout<<"lambda_computed : "<<isLambdaComputed<<endl;
-	if (!isLambdaComputed)
-	{	
-		isLastFact=true;
-		//cout<<"lambda before : "<<lambda<<endl;
-		compute_last_update();
-		//cout<<"final lambda : "<<lambda<<endl;
-	}
+
 }
 
 template<typename T>
@@ -144,10 +134,8 @@ t_local_compute_projection.start();
 		// type<T>::constraint_type_norm_col* constr_cast = dynamic_cast<type<T>::constraint_tyep_norm_col*>(const_vec[ind_fact]);
 		typename constraint_type<T>::constraint_type_sp* constr_cast = static_cast<typename constraint_type<T>::constraint_type_sp*>(const_vec[ind_fact]);
 		// constraint_type_sp* constr_cast = dynamic_cast<constraint_type_sp*>(const_vec[ind_fact]);
-		if (isLambdaComputed)
 			prox_sp(S[ind_fact], constr_cast->getParameter());
-		else
-			prox_sp_normfree(S[ind_fact], constr_cast->getParameter());
+		
 		#ifdef __COMPILE_TIMERS__
 		t_prox_sp.stop();
 		#endif
@@ -161,10 +149,8 @@ t_local_compute_projection.start();
 				t_prox_spcol.start();
 			#endif
 			typename constraint_type<T>::constraint_type_spcol* constr_cast = dynamic_cast<typename constraint_type<T>::constraint_type_spcol*>(const_vec[ind_fact]);
-			if (isLambdaComputed)
 			prox_spcol(S[ind_fact], constr_cast->getParameter());
-			else
-				prox_spcol_normfree(S[ind_fact], constr_cast->getParameter());	
+			
 			#ifdef __COMPILE_TIMERS__
 				t_prox_spcol.stop();
 			#endif
@@ -178,11 +164,8 @@ t_local_compute_projection.start();
 			t_prox_splin.start();
 			#endif
 			typename constraint_type<T>::constraint_type_splin* constr_cast = dynamic_cast<typename constraint_type<T>::constraint_type_splin*>(const_vec[ind_fact]);
+			prox_splin(S[ind_fact], constr_cast->getParameter());
 
-			if (isLambdaComputed)
-				prox_splin(S[ind_fact], constr_cast->getParameter());
-			else
-				prox_splin_normfree(S[ind_fact], constr_cast->getParameter());
 			#ifdef __COMPILE_TIMERS__
 				t_prox_splin.stop();
 			#endif
@@ -241,10 +224,9 @@ t_local_compute_projection.start();
          case CONSTRAINT_NAME_SP_POS:
          {
 		typename constraint_type<T>::constraint_type_sp_pos* constr_cast = dynamic_cast<typename constraint_type<T>::constraint_type_sp_pos*>(const_vec[ind_fact]);
-		if (isLambdaComputed)
-			prox_sp_pos(S[ind_fact], constr_cast->getParameter());
-		else
-			prox_sp_pos_normfree(S[ind_fact], constr_cast->getParameter());
+
+		prox_sp_pos(S[ind_fact], constr_cast->getParameter());
+
          }
          break;
 
@@ -437,48 +419,7 @@ t_local_compute_grad_over_c.stop();
 #endif
 }
 
-template<typename T>
-void palm4MSA<T>::compute_last_update()
-{
-	/*if (do_continue())
-	{
-		cerr << "error in palm4MSA<T>::compute_last_update : computation of lambda must be done at the end of the main iteration " << endl;
-		exit(EXIT_FAILURE);
-	}*/
-	
-	if (isLambdaComputed)
-	{
-		throw std::logic_error("error in palm4MSA<T>::compute_last_update : computation of lambda at the end whereas isLambdaComputed means it must be computed at each step");
-	}
-	
-	T scaling = 1;
-	for (int i=0;i<nb_fact;i++)
-	{
-		
-		T current_norm;
-		switch (const_vec[i]->getConstraintType())
-		{
-			case CONSTRAINT_NAME_NORMCOL:
-			{}
-			break;
-			case CONSTRAINT_NAME_NORMLIN: 
-			{}
-			default:
-			{
-				current_norm=1/(S[i].norm());
-				scaling = scaling*current_norm;
-				S[i].scalarMultiply(current_norm);
-			}
-			
-		}
-	}
-	LorR.scalarMultiply(scaling);
-	//LorR = S[0];
-	//for (int i=1;i<nb_fact;i++)LorR*=S[i];		
-	//cout<<" scaling : "<<scaling<<endl; 
-	compute_lambda();
-	
-}
+
 
 template<typename T>
 void palm4MSA<T>::compute_lambda()
@@ -751,11 +692,8 @@ t_local_next_step.start();
          update_R();
 
    }
-	if (isLambdaComputed)
-	{	
-		compute_lambda();
-
-	}
+	
+	compute_lambda();
    if (verbose)
    {   
       cout << "Iter " << ind_ite << ", RMSE=" << get_RMSE() << endl;

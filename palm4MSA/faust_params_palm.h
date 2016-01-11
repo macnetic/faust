@@ -22,8 +22,7 @@ class faust_params_palm
          const stopping_criterion<T> & stop_crit_ = stopping_criterion<T>(),
          const bool isVerbose_ = false ,
          const bool isUpdateWayR2L_ = false ,
-         const T init_lambda_ = 1.0 ,
-		 const bool isLambdaComputed_ = true);
+         const T init_lambda_ = 1.0);
 
       void check_constraint_validity();
 
@@ -42,7 +41,6 @@ class faust_params_palm
       bool isVerbose;
       bool isUpdateWayR2L;
       T init_lambda;
-	  bool isLambdaComputed;
 	  
 	  private :
 	  static const char *  class_name;

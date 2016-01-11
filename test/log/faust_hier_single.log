@@ -21,5 +21,5 @@ type_cont : INT CONSTRAINT_NAME_SP nb_row :32 nb_col :32 parameter :333
 hierarchical_fact<T>::compute_facts : factorisation 1/3
 hierarchical_fact<T>::compute_facts : factorisation 2/3
 hierarchical_fact<T>::compute_facts : factorisation 3/3
-total hierarchical fact = 9.06784
-lambda=8957.47265625
+total hierarchical fact = 8.12254
+lambda=9401.5771484375

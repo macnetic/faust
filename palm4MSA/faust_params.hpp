@@ -66,8 +66,7 @@ faust_params<T>::faust_params(
 	  const bool isVerbose_ , /* = false */
       const bool isUpdateWayR2L_  , /* = false */
       const bool isFactSideLeft_ , /* = false */
-      const T init_lambda_ , /* = 1.0 */
-      const bool isLambdaComputed_ /* = true */): 
+      const T init_lambda_  /* = 1.0 */): 
             data(data_), 
             nb_fact(nb_fact_), 
             init_fact(init_fact_),
@@ -76,8 +75,7 @@ faust_params<T>::faust_params(
             isVerbose(isVerbose_),
             isUpdateWayR2L(isUpdateWayR2L_),
             isFactSideLeft(isFactSideLeft_),
-            init_lambda(init_lambda_),
-			isLambdaComputed(isLambdaComputed_)
+            init_lambda(init_lambda_)
 {
   if (nb_fact_ <= 2)
   {
@@ -182,8 +180,7 @@ faust_params<T>::faust_params(
          const bool isVerbose_ /* = false */,
          const bool isUpdateWayR2L_ /* = false */,
          const bool isFactSideLeft_ /* = false */,
-         const T init_lambda_ /* = 1.0 */,
-		 const bool isLambdaComputed_ /* = true */) :
+         const T init_lambda_ /* = 1.0 */) :
             data(data_), 
             nb_fact(nb_fact_), 
             cons(cons_),
@@ -193,8 +190,7 @@ faust_params<T>::faust_params(
             isVerbose(isVerbose_),
             isUpdateWayR2L(isUpdateWayR2L_),
             isFactSideLeft(isFactSideLeft_),
-            init_lambda(init_lambda_),
-			isLambdaComputed(isLambdaComputed_)
+            init_lambda(init_lambda_)
 
 {
  check_constraint_validity(); 

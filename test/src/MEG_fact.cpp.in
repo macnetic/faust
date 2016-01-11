@@ -158,10 +158,9 @@ int main()
 	bool isUpdateR2L = false;
 	bool isFactSideLeft = true;
 	FPP init_lambda_value = 1.0;
-	bool isLambdaComputed = true;
 	// // config with exponential decay of the residual
 	//faust_params<FPP> params(data,nfacts,cons_tmp1,vector<faust_mat<FPP> >(),crit_2,crit_global,1.25,1.4,isVerbose,isUpdateR2L,isFactSideLeft,init_lambda_value,isLambdaComputed);
-  faust_params<FPP> params(data, nfacts, cons, vector<faust_mat<FPP> >(), crit_2, crit_global,isVerbose,false,false,1.0,isLambdaComputed);	
+  faust_params<FPP> params(data, nfacts, cons, vector<faust_mat<FPP> >(), crit_2, crit_global,isVerbose,false,false,1.0);	
   params.Display();
   cout<<"launch"<<endl;	
   hierarchical_fact<FPP> hier_fact(params);

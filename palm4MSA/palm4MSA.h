@@ -33,7 +33,6 @@ class palm4MSA
       void set_lambda(const faust_real lambda_){lambda = lambda_;}
       //void set_lambda(const palm4MSA& palm_){lambda = palm_.lambda;}
       void update_lambda_from_palm(const palm4MSA& palm){lambda *= palm.lambda;}
-	  void compute_last_update();
       void compute_facts();
 
       T get_lambda()const{return lambda;}
@@ -86,7 +85,6 @@ class palm4MSA
       // T lipschitz_multiplicator;
       const bool verbose;
       const bool isUpdateWayR2L;
-      const bool isLambdaComputed;
       bool isCComputed;
       bool isGradComputed;
       bool isProjectionComputed;
