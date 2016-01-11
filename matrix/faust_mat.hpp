@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <fstream>
 #include <Eigen/Sparse>
-
+#include "faust_exception.h"
 
 #ifdef __GEMM_WITH_OPENBLAS__
 	#include "cblas_algebra.h"
@@ -276,37 +276,9 @@ t_mult_right.start();
 		return;
 	}
 	
-	
+	faust_mat this_copy((*this));	
+	gemm<T>(this_copy,A,(*this),1.0,0.0,'N','N');
 
-		
-	#ifndef __GEMM_WITH_OPENBLAS__
-		mat = mat * A.mat;
-		resize(dim1, A.dim2);
-	#else
-		faust_unsigned_int C1_old = dim1;	
-		faust_unsigned_int C2_old = dim2;	
-		T* C_old = new T[C1_old*C2_old];
-		memcpy(C_old, getData(), C1_old*C2_old*sizeof(T));
-		resize(C1_old, A.dim2);
-		// if (sizeof(T) == sizeof(float))
-		// {	
-			// cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0f, C_old, C1_old, A.getData(), A.dim1, 0.0f, getData(), dim1);
-		// } else
-		// {
-			
-			// if (sizeof(T) == sizeof(double))
-			// {	
-				// cblas_dgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0, C_old, C1_old, A.getData(), A.dim1, 0.0, getData(), dim1);
-			// }else
-			// {
-				// handleError(class_name, "multiplyRight : OPENBLAS only support instanciated template float or double");
-			// }
-			cblas_gemm<T>(CblasColMajor, CblasNoTrans, CblasNoTrans, dim1, dim2, C2_old, 1.0, C_old, C1_old, A.getData(), A.dim1, 0.0, getData(), dim1);
-		//}
-		
-		delete[] C_old ; C_old=NULL;
-		
-	#endif
 
 #ifdef __COMPILE_TIMERS__
 t_mult_right.stop();
@@ -360,8 +332,8 @@ template<typename T>
 	}
 
 		
-	mat = A.mat * mat;
-	resize(A.dim1, dim2);
+	faust_mat this_copy((*this));	
+	gemm<T>(A,this_copy,(*this),1.0,0.0,'N','N');
 
 #ifdef __COMPILE_TIMERS__
  t_mult_left.stop();
