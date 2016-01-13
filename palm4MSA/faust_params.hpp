@@ -229,6 +229,8 @@ void faust_params<T>::Display() const
 	std::cout<<"INIT_LAMBDA : "<<init_lambda<<std::endl;
 	std::cout<<"ISFACTSIDELEFT : "<<isFactSideLeft<<std::endl;
 	std::cout<<"data :  nbRow "<<data.getNbRow()<<" NbCol : "<< data.getNbCol()<<std::endl;
+	std::cout<<"stop_crit_2facts : "<<stop_crit_2facts.get_crit()<<std::endl;
+	std::cout<<"stop_crit_global : "<<stop_crit_global.get_crit()<<std::endl;
 	/*cout<<"INIT_FACTS :"<<endl;
 	for (int L=0;L<init_fact.size();L++)init_fact[L].Display();*/
 
@@ -282,5 +284,232 @@ void faust_params<T>::Display() const
 		}
 		std::cout<<std::endl<<std::endl;
 	}
+	
 }
 
+template<typename T>
+void faust_params<T>::init_from_file(const char* filename)
+{	
+	char data_filename[100];
+	int niter1,niter2;
+
+	FILE* fp=fopen(filename,"r");
+	if (fp == NULL)
+	{
+		handleError(class_name,"init_from_file : unable to open file");	
+	}
+	if (feof(fp))
+	{	
+		handleError(class_name,"init_from_file : premature end of file");
+	}
+	fscanf(fp,"%s\n",data_filename);
+	std::cout<<"data_filename : "<<data_filename<<std::endl;
+	data.init_from_file(data_filename);
+	std::cout<<"data"<<std::endl;
+	// if ((data.getNbCol() > 10) || (data.getNbRow())> 10)
+		// data.Display();
+	// else
+		cout<<"data : nbRow "<<data.getNbRow()<<" nbCol "<<data.getNbCol()<<endl;
+	
+	if (feof(fp))
+		handleError(class_name,"init_from_file : premature end of file");
+	fscanf(fp,"%d\n", &nb_fact);
+	std::cout<<"nb_fact : "<<nb_fact<<std::endl;
+	if (feof(fp))
+	{	
+		handleError(class_name,"init_from_file : premature end of file");
+	}
+	fscanf(fp,"%d\n", &isVerbose);
+
+	std::cout<<"VERBOSE : "<<isVerbose<<std::endl;
+	if (feof(fp))
+		handleError(class_name,"init_from_file : premature end of file");
+	fscanf(fp,"%d\n", &isUpdateWayR2L);
+	std::cout<<"UPDATEWAY : "<<isUpdateWayR2L<<std::endl;
+	if (feof(fp))
+		handleError(class_name,"init_from_file : premature end of file");
+	if (typeid(T)==typeid(double))
+	{	
+		fscanf(fp,"%lf\n", &init_lambda);
+	}else
+	{
+		if (typeid(float)==typeid(float))
+		{
+			fscanf(fp,"%f\n",&init_lambda);
+		}
+	}
+	
+	std::cout<<"INIT_LAMBDA : "<<init_lambda<<std::endl;
+	if (feof(fp))
+		handleError(class_name,"init_from_file : premature end of file");
+	fscanf(fp,"%d\n",&isFactSideLeft);
+	std::cout<<"ISFACTSIDELEFT : "<<isFactSideLeft<<std::endl;
+	if (feof(fp))
+		handleError(class_name,"init_from_file : premature end of file");
+	fscanf(fp,"%d\n",&niter1);
+	std::cout<<"niter1 : "<<niter1<<std::endl;
+	stopping_criterion<T> stopcrit2facts(niter1);
+	stop_crit_2facts = stopcrit2facts;
+	if (feof(fp))
+		handleError(class_name,"init_from_file : premature end of file");
+	fscanf(fp,"%d\n",&niter2);
+	std::cout<<"niter2 : "<<niter2<<std::endl;
+	stopping_criterion<T> stopcritglobal(niter2);
+	stop_crit_global = stopcritglobal;
+	
+	vector<const faust_constraint_generic*> consS;
+	vector<vector<const faust_constraint_generic*> > consSS;
+	for (int i=0;i<2;i++)
+	{
+		
+		for (int j=0;j<nb_fact-1;j++)
+		{	
+			if (feof(fp))
+				handleError(class_name,"init_from_file : premature end of file");
+			char name_cons[100];
+			int cons_dim1,cons_dim2;
+			char cons_parameter[100];
+			fscanf(fp,"%s %d %d %s",name_cons,&cons_dim1,&cons_dim2,&cons_parameter);
+			fscanf(fp,"\n");
+			std::cout<<name_cons<<" "<<cons_dim1<<" "<<cons_dim2<<" "<<cons_parameter<<std::endl;
+			bool is_const_int =((strcmp(name_cons,"sp") == 0) || (strcmp(name_cons,"sppos")==0));
+			is_const_int = ((is_const_int) || ((strcmp(name_cons,"spcol") == 0)));
+			is_const_int = ((is_const_int) || ((strcmp(name_cons,"splin") == 0)));
+			is_const_int = ((is_const_int) || ((strcmp(name_cons,"splincol") == 0)));
+			is_const_int = ((is_const_int) || ((strcmp(name_cons,"lOpen") == 0)));
+			is_const_int = ((is_const_int) || ((strcmp(name_cons,"l1pen") == 0)));
+			is_const_int = ((is_const_int) || ((strcmp(name_cons,"splin") == 0)));
+			is_const_int = ((is_const_int) || ((strcmp(name_cons,"wav") == 0)));
+			is_const_int = ((is_const_int) || ((strcmp(name_cons,"blkdiag") == 0)));
+			is_const_int = ((is_const_int) || ((strcmp(name_cons,"splin_test") == 0)));
+			is_const_int = ((is_const_int) || ((strcmp(name_cons,"normlin") == 0)));
+			bool is_const_real = ((strcmp(name_cons,"normcol") == 0) || (strcmp(name_cons,"normlin")==0));
+			bool is_const_mat =  ((strcmp(name_cons,"supp") == 0) || (strcmp(name_cons,"const")==0));
+			int const_type = -1;
+			if (is_const_int)
+			{
+				const_type = 0;
+			}
+			if (is_const_real)
+			{
+				const_type = 1;
+			}
+			if (is_const_mat)
+			{
+				const_type = 2;
+			}
+			faust_constraint_name cons_name;
+
+			switch(const_type)
+			{	
+				// INT CONSTRAINT
+				case 0:
+				{
+					int int_parameter;		
+					int_parameter =atoi(cons_parameter);
+
+
+							
+				
+					if (strcmp(name_cons,"sp") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_SP;
+					}
+
+					if (strcmp(name_cons,"sppos") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_SP_POS;
+					}
+
+					if (strcmp(name_cons,"spcol") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_SPCOL;
+					}			
+							
+					if (strcmp(name_cons,"splin") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_SPLIN;
+					}	
+							
+					consS.push_back(new faust_constraint_int(cons_name,int_parameter,cons_dim1,cons_dim2));
+					break;
+				}
+				
+				
+				// CASE REAL
+				case 1 :
+				{	
+				T real_parameter;		
+						real_parameter=(T) atof(cons_parameter);
+					
+					if (strcmp(name_cons,"normcol") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_NORMCOL;
+					}
+
+					if (strcmp(name_cons,"normlin") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_NORMLIN;
+					}
+					consS.push_back(new faust_constraint_real<T>(cons_name,real_parameter,cons_dim1,cons_dim2));
+					break;
+				}	
+				case 2 :
+				{	
+					faust_mat<T> mat_parameter;
+					mat_parameter.init_from_file(cons_parameter);
+					
+					if ( (cons_dim1 != mat_parameter.getNbCol()) || (cons_dim2 != mat_parameter.getNbRow()) )
+					{
+						handleError(class_name, "init_from_file : invalide dimension of constraint mat_parameter");	
+					}
+					
+
+					
+					if (strcmp(name_cons,"const") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_CONST;
+					}
+
+					if (strcmp(name_cons,"supp") == 0)
+					{
+						cons_name = CONSTRAINT_NAME_SUPP;
+					}
+					consS.push_back(new faust_constraint_mat<T>(cons_name,mat_parameter,cons_dim1,cons_dim2));
+					break;
+				}	
+				default :
+				{
+					handleError(class_name, "init_from_file : invalid constraint name");		
+				}
+			}	
+		}
+		consSS.push_back(consS);
+		consS.resize(0);
+		cons = consSS;
+		
+	}
+	check_bool_validity();
+	check_constraint_validity();
+	
+
+}
+		
+		
+		
+template<typename T>	
+void faust_params<T>::check_bool_validity()
+{
+	if (nb_fact < 1)
+		handleError(class_name, "check_bool_validity : nb_fact must be strcitly greater than 0");
+	if ((isVerbose!=0) && (isVerbose!=1))
+		handleError(class_name, "check_bool_validity : boolean isVerbose must be equal to 0 or 1");
+	if ((isUpdateWayR2L!=0) && (isUpdateWayR2L!=1))
+		handleError(class_name, "check_bool_validity : boolean isUpdateWayR2L must be equal to 0 or 1");
+	if ((isFactSideLeft!=0) && (isFactSideLeft!=1))
+		handleError(class_name, "check_bool_validity : boolean isFactSideLeft must be equal to 0 or 1");
+}		
+		
+		
+			
+	

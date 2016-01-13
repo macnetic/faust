@@ -1,0 +1,49 @@
+#include "faust_mat.h"
+#include "faust_spmat.h"
+#include "faust_params.h"
+#include "hierarchical_fact.h"
+#include "faust_timer.h"
+#include <string>
+
+
+
+#include <iostream>
+#include <iomanip>
+
+typedef double FPP;
+
+int main()
+{	
+	string params_file="@FAUST_TESTDATA_SRC_DIR@/MEG_config.txt";
+	faust_params<FPP> parameter;
+	parameter.init_from_file(params_file.c_str());
+	parameter.Display();
+	hierarchical_fact<FPP> hier_fact(parameter);
+
+	faust_timer t1;
+	t1.start();
+
+	hier_fact.compute_facts();
+
+	t1.stop();
+	#ifdef __COMPILE_TIMERS__
+		hier_fact.print_timers();
+		//hier_fact.print_prox_timers();
+	#endif
+	cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
+
+	vector<faust_spmat<FPP> > facts;
+	hier_fact.get_facts(facts);
+	(facts[0]) *= hier_fact.get_lambda();
+	char nomFichier[100];
+	for (unsigned int i=0 ; i<facts.size() ; i++)
+	{
+		sprintf(nomFichier, "@FAUST_TESTOUTPUT_BIN_DIR@/facts%d_cpp.dat",i);
+		facts[i].print_file(nomFichier);
+	}
+	cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
+
+
+	return 0;
+	
+}

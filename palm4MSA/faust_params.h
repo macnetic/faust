@@ -42,12 +42,14 @@ class faust_params
 	const bool isUpdateWayR2L_ = false ,
 	const bool isFactSideLeft_ = false ,
 	const T init_lambda_ = 1.0 );
-		 
+	
+	void init_from_file(const char* filename);	
 	  faust_params();
 		
 		
 
       void check_constraint_validity();
+	  void check_bool_validity();
 
       ~faust_params(){}
 

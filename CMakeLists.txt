@@ -122,12 +122,12 @@ endif()
 
 
 
-# Default values for FAUST_USE_SINGLEPRECISION and FAUST_USE_OPENBLAS
+# Default values for FAUST_USE_SINGLEPRECISION and FAUST_USE_OPENBLAS and USE_MATIO
 set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
 set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
 set(FAUST_USE_MKL OFF CACHE BOOL "Using MKL for sparse matrix and vector computations")
 set(FAUST_USE_MEX OFF CACHE BOOL "Generate Mexfiles")
-
+set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read matfile")
 
 # find external libraries
 

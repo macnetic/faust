@@ -6,7 +6,7 @@ configure_file(${FAUST_MEXINTERFACETOOLS_SRC_DIR}/matlab_faust.m.in ${FAUST_TEST
 include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_MATIO_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${MATIO_INC_DIR})
 
 
-if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR)
+if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    
 
    foreach(cppin faust_test hierarchical_fact_test MEG_fact palm4MSA_test)
@@ -100,12 +100,28 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR)
 	#target_link_libraries(time_comp_mat ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
 	
 else()	
-
-	#test mkl faust_core multiply
-	#message(STATUS "MMMMMMMMMMMMMMMMMMMMMMMMMMM : MKL TEST")	
-	# include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
-	#add_executable(fcore_test faust_core_test.cpp)	
-	#target_link_libraries(fcore_test ${FAUST_TARGET})
+	### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST
+	foreach(cppinbis hierarchical_fact_test MEG_fact)
+      configure_file(${FAUST_TESTSRC_SRC_DIR}/${cppinbis}.cpp.inbis ${FAUST_TESTSRC_BIN_DIR}/${cppinbis}.cpp @ONLY)
+	endforeach()
+	foreach(datafile hier_fact_config MEG_config)
+		configure_file(${FAUST_TESTDATA_SRC_DIR}/${datafile}.txt.in ${FAUST_TESTDATA_SRC_DIR}/${datafile}.txt @ONLY)
+	endforeach()
+	
+	
+	add_executable(faust_hier ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_test.cpp)
+   if(FAUST_USE_OPENBLAS)
+      target_link_libraries(faust_hier  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
+   else()
+      target_link_libraries(faust_hier ${FAUST_TARGET} )
+   endif()
+   
+   add_executable(meg ${FAUST_TESTSRC_BIN_DIR}/MEG_fact.cpp)
+   if(FAUST_USE_OPENBLAS)
+      target_link_libraries(meg  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
+   else()
+      target_link_libraries(meg  ${FAUST_TARGET})
+   endif()
    
    
    
