@@ -199,19 +199,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    }
    
    //compute_lambda
-   bool compute_lambda = true;
-   if (presentFields[9])
-   {
-       mxCurrentField = mxGetField(prhs[0],0,"compute_lambda");
-       compute_lambda = (bool) mxGetScalar(mxCurrentField);
-   }
+   // bool compute_lambda = true;
+   // if (presentFields[9])
+   // {
+       // mxCurrentField = mxGetField(prhs[0],0,"compute_lambda");
+       // compute_lambda = (bool) mxGetScalar(mxCurrentField);
+   // }
     
     
       ///////////// HIERARCHICAL LAUNCH ///////////////  
      // creation des parametres   
 	 try{
 		std::cout<<"avant "<<std::endl; 
-		faust_params<faust_real> params(data,nb_fact,consSS,std::vector<faust_mat<faust_real> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda,compute_lambda);   
+		faust_params<faust_real> params(data,nb_fact,consSS,std::vector<faust_mat<faust_real> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda);   
      
 	 //DisplayParams(params);
      //creation de hierarchical fact

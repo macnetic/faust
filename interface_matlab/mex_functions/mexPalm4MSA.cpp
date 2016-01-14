@@ -184,12 +184,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    }
    
    //compute_lambda
-   bool compute_lambda = true;
-   if (presentFields[8])
-   {
-       mxCurrentField = mxGetField(prhs[0],0,"compute_lambda");
-       compute_lambda = (bool) mxGetScalar(mxCurrentField);
-   }
+   // bool compute_lambda = true;
+   // if (presentFields[8])
+   // {
+       // mxCurrentField = mxGetField(prhs[0],0,"compute_lambda");
+       // compute_lambda = (bool) mxGetScalar(mxCurrentField);
+   // }
     
     std::cout<<"PASSER2"<<std::endl;
       ///////////// HIERARCHICAL LAUNCH ///////////////  
@@ -202,7 +202,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	 std::cout<<"PASSER2"<<std::endl;
      
      //creation de hierarchical fact
-    faust_params_palm<faust_real> params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda,compute_lambda); 
+    faust_params_palm<faust_real> params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda); 
 	std::cout<<"PASSER3"<<std::endl;
 	palm4MSA<faust_real> palm(params,false);	
 	palm.compute_facts();	
@@ -289,10 +289,10 @@ void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFiel
         {
             presentFields[7] = true;
         }
-        if (strcmp(fieldName,"compute_lambda") == 0)
-        {
-            presentFields[8] = true;
-        }
+        // if (strcmp(fieldName,"compute_lambda") == 0)
+        // {
+            // presentFields[8] = true;
+        // }
   }
   
 }

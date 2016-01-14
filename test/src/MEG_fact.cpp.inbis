@@ -35,12 +35,9 @@ int main()
 	vector<faust_spmat<FPP> > facts;
 	hier_fact.get_facts(facts);
 	(facts[0]) *= hier_fact.get_lambda();
-	char nomFichier[100];
-	for (unsigned int i=0 ; i<facts.size() ; i++)
-	{
-		sprintf(nomFichier, "@FAUST_TESTOUTPUT_BIN_DIR@/facts%d_cpp.dat",i);
-		facts[i].print_file(nomFichier);
-	}
+	faust_core<FPP> hier_fact_core(facts);
+	string output_file="@FAUST_TESTOUTPUT_BIN_DIR@/meg_factorisation.dat";
+	hier_fact_core.print_file(output_file.c_str());
 	cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
 
 

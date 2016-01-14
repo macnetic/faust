@@ -228,25 +228,4 @@ faust_mat<T> operator*(const faust_core<T>& f, const faust_mat<T>& M)
 
 
 
-template<typename T>
-void faust_solve(const faust_core<T> & A,faust_vec<T> & x, const faust_vec<T> & y)
-{
-	if (A.size() == 0)
-	{
-		handleError("faust_core algebra "," solve :  empty faust_core<T>");		
-	}
-	if (A.getNbRow() != y.size())
-	{
-		handleError("faust_core algebra "," solve :  dimension of the faust_core<T> A and size of y mismatch.");
-	}
-	faust_vec<T> ybis = y;
-	
-	for (int i=A.size()-1;i>=0;i--)
-	{
-		sp_solve(A.get_fact(i),x,ybis);
-		ybis = x;
-	}
-	
-	
-	
-}
+

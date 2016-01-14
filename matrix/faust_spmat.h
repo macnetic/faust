@@ -64,12 +64,14 @@ class faust_spmat : public faust_mat_generic
 		
 		
 		
-		void init_from_file(const char* filename);
+
 		void Display() const;
 		T norm(){return mat.norm();}	
 
 		void print_file(const char* filename)const;
-		void init_from_file(char* filename);
+		void print_file(const char* filename, std::ios_base::openmode mode)const;
+		void init_from_file(FILE* fp);
+		void init_from_file(const char* filename);
 		void init(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<T>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
 		~faust_spmat(){}
 

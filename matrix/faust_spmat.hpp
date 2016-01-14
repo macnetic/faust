@@ -210,23 +210,7 @@ void faust_spmat<T>::init(const vector<int>& rowidx, const vector<int>& colidx, 
 }
 
 
-template<typename T>
-void faust_spmat<T>::init_from_file(const char* filename)
-{
-	FILE* fp=fopen(filename,"r");
-	int nb_row,nb_col,_nnz,id_row,id_col;
-	T value;
-	fscanf(fp, "%d %d %d\n",&nb_row,&nb_col,&_nnz);
-	//std::cout<<"INSIDE nb_row : "<<nb_row<<" nb_col : "<<nb_col<<" nnz : "<<_nnz<<std::endl;
-	resize(_nnz,nb_row,nb_col);
-	typedef Eigen::Triplet<T> Tip;
-	std::vector<Tip> tripletList;
-	while (fscanf(fp,"%d %d %lf\n",&id_row,&id_col,&value)!=EOF)
-	{
-		tripletList.push_back(Tip(id_row-1,id_col-1,value));
-	}
-	mat.setFromTriplets(tripletList.begin(),tripletList.end());
-}
+
 
 
 template<typename T>
@@ -320,24 +304,30 @@ void faust_spmat<T>::operator/=(const T alpha)
 template<typename T> 
 void faust_spmat<T>::print_file(const char* filename)const
 {
+print_file(filename,std::fstream::out);
+}
+
+template<typename T> 
+void faust_spmat<T>::print_file(const char* filename,std::ios_base::openmode mode)const
+{
 	ofstream fichier;
-	fichier.open(filename);
+	fichier.open(filename,mode);
 	
-	
+	fichier << dim1 << " " << dim2 <<" "<<getNonZeros() << endl;
 	for(int i=0 ; i< mat.outerSize() ; i++)
 		for(typename Eigen::SparseMatrix<T,Eigen::RowMajor>::InnerIterator it(mat,i); it; ++it)
 			fichier << it.row()+1 << " " << it.col()+1 << " " << setprecision(20) << it.value() << endl;
-	fichier << dim1 << " " << dim2 << " 0.0" << endl;
+
+		fichier << endl;
+
 	fichier.close();
 }
 
 
+
 template<typename T>
-void faust_spmat<T>::init_from_file(char* filename)
+void faust_spmat<T>::init_from_file(FILE* fp)
 {
-	// la premiere ligne contient le nombre de lignes et de colonnes de la matrice
-	// chacune des autres lignes contient trois valeur par ligne : rowind colind value
-	// avec rowind et colind des indices commencant a 1. 
 	vector<int> row;
 	vector<int> col;
 	vector<T> val;
@@ -346,23 +336,22 @@ void faust_spmat<T>::init_from_file(char* filename)
 	int col_tmp;
 	double val_tmp;
 	
-	int dim1_tmp,dim2_tmp;
+	int dim1_tmp,dim2_tmp,nnz_tmp;
 	
-	FILE* fp=fopen(filename,"r");
-	if (fp == NULL)
+	fscanf(fp,"%d %d %d\n", &dim1_tmp,&dim2_tmp,&nnz_tmp);
+	for (int i=0;i<nnz_tmp;i++)
 	{
-		handleError(class_name,"init_from_file : unable to open file");	
+		if (fscanf(fp,"%d %d %lf\n", &row_tmp,&col_tmp,&val_tmp)!=EOF)
+		{	
+			row.push_back(row_tmp - 1);
+			col.push_back(col_tmp - 1);
+			val.push_back((T)val_tmp);
+		}else
+		{
+			handleError(class_name,"init_from_file : premature end of file");
+		}
 	}
-	
-	fscanf(fp,"%d %d\n", &dim1_tmp,&dim2_tmp);
-	while(fscanf(fp,"%d %d %lf\n", &row_tmp,&col_tmp,&val_tmp)!=EOF)
-	{
-		row.push_back(row_tmp - 1);
-		col.push_back(col_tmp - 1);
-		val.push_back((T)val_tmp);
-	}
-	fclose(fp);
-	
+
 	if(col.size()!=row.size() || col.size()!=val.size()
 		|| dim1_tmp<0 || dim2_tmp<0
 		|| *min_element(&row[0],&row[row.size()-1]) <0
@@ -373,13 +362,36 @@ void faust_spmat<T>::init_from_file(char* filename)
 		handleError(class_name,"init_from_file : Unable to initialize sparse matrix from this file");
 	}
 
-	resize(row.size(), dim1_tmp, dim2_tmp);
+	resize(nnz_tmp, dim1_tmp, dim2_tmp);
 	vector<Eigen::Triplet<T> > tripletList;
 	tripletList.reserve(row.size());
 	for(int i=0 ; i<row.size() ; i++)
 		tripletList.push_back(Eigen::Triplet<T>(row[i], col[i], val[i]));
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	
-	mat.makeCompressed();
+	mat.makeCompressed();	
+}
+
+template<typename T>
+void faust_spmat<T>::init_from_file(const char* filename)
+{
+	// la premiere ligne contient le nombre de lignes et de colonnes de la matrice
+	// ainsi que le nombre de nonzeros
+	// chacune des autres lignes contient trois valeur par ligne : rowind colind value
+	// avec rowind et colind des indices commencant a 1. 
+
+		
+
+	
+	FILE* fp=fopen(filename,"r");
+	if (fp == NULL)
+	{
+		handleError(class_name,"init_from_file : unable to open file");	
+	}
+	init_from_file(fp);
+	
+	fclose(fp);
+	
+	
 }
 

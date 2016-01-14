@@ -12,9 +12,6 @@
 
 #ifdef __GEMM_WITH_OPENBLAS__
 	#include "cblas_algebra.h"
-	#define IS_OPENBLAS_DEFINED 1
-#else
-	#define IS_OPENBLAS_DEFINED 0
 #endif
 
 
@@ -84,35 +81,6 @@ A.t_multiply.stop();
 #endif
 }
 
-template<typename T>
-faust_vec<T> solve(const faust_mat<T> & A, const faust_vec<T> & v)
-{
-	if (A.getNbRow() != v.size())
-	{
-		handleError("LinAlgebra"," : solve : number of row of the  dense matrix A is different from dimension of the vector v");	
-	}
-	faust_vec<T> sol(A.getNbCol());
-	sol.Display();
-	v.Display();
-	A.Display();
-	sol.vec=A.mat.colPivHouseholderQr().solve(v.vec);	
-	return sol;
-}
-
-
-
-// template<typename T>
-// void sp_solve(const faust_spmat<T> & A,faust_vec<T> & x, const faust_vec<T> & y)
-// {
-	// if (A.getNbRow() != y.size())
-	// {
-		// handleError("LinAlgebra","solve : number of row of the sparse matrix A is different from dimension of the vector y");	
-	// }
-	// x.resize(A.getNbCol());
-	// x.resize(A.getNbCol());
-	// Eigen::SparseQR<Eigen::SparseMatrix<T>, Eigen::COLAMDOrdering<int> >   solver(A.mat);
-	// x.vec=solver.solve(y.vec);
-// }
 
 
 template<typename T>
@@ -181,19 +149,7 @@ void gemv(const faust_mat<T> & A,const faust_vec<T> & x,faust_vec<T> & y,const T
 		}
 	}
 	#else
-		// if ( sizeof(T) == sizeof(float))
-		// {	
-				// cblas_sgemv(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
-		// }else
-		// {	
-			// if (sizeof(T) == sizeof(double))
-			// {	
-				// cblas_dgemv(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
-			// }else
-			// {
-				// handleError("LinAlgebra", "gemv : openblas only supports instanciated template such as <float> or <double>");	
-			// }
-		// }
+
 		cblas_gemv<T>(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
 	#endif
 	
@@ -210,9 +166,7 @@ void gemv(const faust_mat<T> & A,const faust_vec<T> & x,faust_vec<T> & y,const T
 template<typename T>	
 void gemm(const faust_mat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB)
 {
-	// std::cout<<"gemm "<<std::endl;
-	// std::cout<<"gemm openblas defined"<<IS_OPENBLAS_DEFINED<<std::endl;
-	// std::cout<<"gemm single defined"<<IS_SINGLE_DEFINED<<std::endl;
+
 #ifdef __COMPILE_TIMERS__
 A.t_gemm.start();
 #endif
@@ -345,25 +299,6 @@ A.t_gemm.start();
 			}
 		#else
 			 T beta = 0.0;	
-			 // if (sizeof(T) == sizeof(float))
-			 // {	 
-				//cblas_sgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1, 0.0f, C.getData(), C.dim1);
-				// cblas_sgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1, beta, C.getData(), C.dim1);	
-			 // }else
-			 // {
-				// if (sizeof(T) == sizeof(double))
-				// {	
-				//	cblas_dgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1, 0.0, C.getData(), C.dim1);
-					// cblas_dgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1,beta, C.getData(), C.dim1);
-					
-				// }else
-				// {
-					// handleError("LinAlgebra", "gemm : OPENBLAS only support instanciated template such as <float> or <double>");
-				// }
-			 //}
-			 
-
-
 			 cblas_gemm<T>(CblasColMajor, transA, transB, (int) C.dim1, (int)  C.dim2, (int) nbColOpA, (T) alpha, (T*) A.getData(), (int) A.dim1, (T*) B.getData(), (int) B.dim1,(T) beta, (T*) C.getData(),(int) C.dim1);
 
 		#endif
@@ -450,21 +385,7 @@ A.t_gemm.start();
 					C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
 			}
 		#else
-                
-			// if (sizeof(T) == sizeof(float))
-			// {	
-				// cblas_sgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1, beta, C.getData(), C.dim1);
-			// }else
-			// {
-				// if (sizeof(T) == sizeof(double))
-				// {		
-					// cblas_dgemm(CblasColMajor, transA, transB, C.dim1, C.dim2, nbColOpA, alpha, A.getData(), A.dim1, B.getData(), B.dim1, beta, C.getData(), C.dim1);
-				// }else
-					
-
-					
-
-				cblas_gemm<T>(CblasColMajor, transA, transB, (int) C.dim1,(int)  C.dim2,(int)  nbColOpA,(T) alpha,(T*)  A.getData(), (int) A.dim1,(T*) B.getData(),(int) B.dim1, (T) beta, (T*) C.getData(), (int)C.dim1);
+			cblas_gemm<T>(CblasColMajor, transA, transB, (int) C.dim1,(int)  C.dim2,(int)  nbColOpA,(T) alpha,(T*)  A.getData(), (int) A.dim1,(T*) B.getData(),(int) B.dim1, (T) beta, (T*) C.getData(), (int)C.dim1);
 			
 			
 			

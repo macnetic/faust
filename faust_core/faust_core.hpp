@@ -6,6 +6,7 @@
 #include "faust_core_algebra.h"
 #include <iostream>
 #include "faust_exception.h"
+#include <fstream>
 
 using namespace std;
 template<typename T>
@@ -34,6 +35,51 @@ faust_core<T>::faust_core(const std::vector<faust_spmat<T> > & facts, const T la
    if(lambda_ != 1.0 && data.size()>0)
       (data[0]) *= lambda_;
 }
+
+template<typename T>
+void faust_core<T>::print_file(const char* filename) const
+{
+	if (size() > 0)
+	{
+		ofstream fichier;
+		fichier.open(filename);	
+		fichier<<size()<<endl<<endl;
+		fichier.close();
+		
+		for (int i=0;i<size();i++)
+		{
+			data[i].print_file(filename,std::fstream::app);
+		}
+	}	
+}
+
+template<typename T>
+void faust_core<T>::init_from_file(const char* filename) 
+{
+	clear();
+	FILE* fp=fopen(filename,"r");
+	int size_tmp;
+	fscanf(fp,"%d\n", &size_tmp);
+	fscanf(fp,"\n");
+	faust_spmat<T> spmat;
+	std::cout<<"size_tmp"<<size_tmp<<std::endl;
+	for (int i=0;i<size_tmp;i++)
+	{
+		spmat.init_from_file(fp);
+		data.push_back(spmat);
+	}
+	fscanf(fp,"\n");
+	updateNonZeros();
+}
+
+template<typename T>
+void faust_core<T>::updateNonZeros()
+{
+	int totalNonZeros_tmp=0;
+	for (int i=0;i<size();i++)
+		totalNonZeros+=data[i].getNonZeros();
+}
+
 
 template<typename T>
 faust_core<T>::faust_core(const std::vector<faust_mat<T> >&facts) :
@@ -309,17 +355,13 @@ void faust_core<T>::transpose()
 
 
 
-/*void faust_core<T>::operator*=(const faust_core&  f)
-{
-   for (int i=0 ; i<f.size() ; i++)
-      push_back(f.data[i]);
-}*/
+
 
 template<typename T>
 void faust_core<T>::Display()const
 {
    
-
+	cout << "SIZE" << size() <<endl;
    for (int i=0 ; i<size() ; i++)
    {
       if(data[i].getNbCol()>20)

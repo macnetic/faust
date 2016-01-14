@@ -17,8 +17,8 @@
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
 {
   int nbr_field=mxGetNumberOfFields(params);
-  presentFields.resize(8);
-  presentFields.assign(8,false); 
+  presentFields.resize(9);
+  presentFields.assign(9,false); 
   if(nbr_field < 3)
   {
       mexErrMsgTxt("The number of field of params must be at least 3 "); 
@@ -68,10 +68,10 @@ void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
         {
             presentFields[8] = true;
         }
-        if (strcmp(fieldName,"compute_lambda") == 0)
-        {
-            presentFields[9] = true;
-        }
+        // if (strcmp(fieldName,"compute_lambda") == 0)
+        // {
+            // presentFields[9] = true;
+        // }
   }
   
 }
