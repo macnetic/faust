@@ -314,39 +314,9 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
     mxConsParams=mxGetCell(mxCons,3);
     nbColCons = (int) mxGetScalar(mxConsParams);
     
-    bool is_const_int =((strcmp(consName,"sp") == 0) || (strcmp(consName,"sppos")==0));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"spcol") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"splin") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"splincol") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"lOpen") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"l1pen") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"splin") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"wav") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"blkdiag") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(consName,"splin_test") == 0)));
-
-
+	int const_type = getTypeConstraint(consName);
+	faust_constraint_name consNameType=getEquivalentConstraint(consName);
     
-	bool is_const_real = ((strcmp(consName,"normcol") == 0) || (strcmp(consName,"normlin")==0));
-	
-	bool is_const_mat =  ((strcmp(consName,"supp") == 0) || (strcmp(consName,"const")==0));
-	
-    int const_type = -1;
-	if (is_const_int)
-	{
-		const_type = 0;
-	}
-	if (is_const_real)
-	{
-		const_type = 1;
-	}
-	if (is_const_mat)
-	{
-		const_type = 2;
-	}
-    
-    
-	faust_constraint_name consNameType;
     switch(const_type)
 	{
         case 0:
@@ -355,18 +325,6 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
             mxConsParams=mxGetCell(mxCons,1);
             int  intParameter = (int) (mxGetScalar(mxConsParams)+0.5);
              //mexPrintf("NAME  %s PARAMS %d DIMS : (%d,%d)\n",consName,intParameter,nbRowCons,nbColCons);
-            
-            if (strcmp(consName,"sp") == 0)
-                consNameType = CONSTRAINT_NAME_SP;
-            else if (strcmp(consName,"spcol") == 0)
-                consNameType = CONSTRAINT_NAME_SPCOL;
-            else if (strcmp(consName,"splin") == 0)
-                consNameType = CONSTRAINT_NAME_SPLIN;
-            else if (strcmp(consName,"splincol") == 0)
-                consNameType = CONSTRAINT_NAME_SPLINCOL;
-            else if (strcmp(consName,"sppos") == 0)
-                consNameType = CONSTRAINT_NAME_SPLIN;
-           
             consS.push_back(new faust_constraint_int(consNameType,intParameter,nbRowCons,nbColCons));
             break;
 		}	
@@ -374,11 +332,6 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
 		{
             mxConsParams=mxGetCell(mxCons,1);
 			faust_real realParameter = (faust_real) mxGetScalar(mxConsParams);
-			if (strcmp(consName,"normcol") == 0)
-				consNameType = CONSTRAINT_NAME_NORMCOL;
-			else if (strcmp(consName,"normlin") == 0)
-				consNameType = CONSTRAINT_NAME_NORMLIN;
-			
 			consS.push_back((new faust_constraint_real<T>(consNameType,realParameter,nbRowCons,nbColCons)));
 
 			break; 
@@ -387,12 +340,7 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
 		{	
 			mxConsParams=mxGetCell(mxCons,1);
 			faust_mat<T> matParameter;
-			getFaustMat(mxConsParams,matParameter);
-			if (strcmp(consName,"const") == 0)
-				consNameType = CONSTRAINT_NAME_CONST;
-			if (strcmp(consName,"supp") == 0)
-				consNameType = CONSTRAINT_NAME_SUPP;
-			
+			getFaustMat(mxConsParams,matParameter);	
 			consS.push_back((new faust_constraint_mat<T>(consNameType,matParameter,nbRowCons,nbColCons)));
 			break; 
 		}	

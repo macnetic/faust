@@ -20,7 +20,7 @@ template<typename T>
 void init_params_palm_from_matiofile(faust_params_palm<T>& params,const char* fileName, const char* variableName)
 {
 	
-	matvar_t* params_var = faust_matio_read_variable(fileName,"params");
+	matvar_t* params_var = faust_matio_read_variable(fileName,variableName);
    
 	matvar_t*   current_var;
 	matvar_t* current_fact_var;
@@ -157,7 +157,7 @@ void init_params_palm_from_matiofile(faust_params_palm<T>& params,const char* fi
 template<typename T>
 void init_params_from_matiofile(faust_params<T>& params, const char* fileName, const char* variableName)
 {
-	matvar_t* params_var = faust_matio_read_variable(fileName,"params");
+	matvar_t* params_var = faust_matio_read_variable(fileName,variableName);
    
 	matvar_t*   current_var;
 	matvar_t* current_cons_var;
@@ -342,36 +342,9 @@ void add_constraint(std::vector<const faust_constraint_generic*> & consS,matvar_
 	{
 		name_cons+= (char) (((char*)(cons_name_var->data))[k]);
 	}
-	//cout<<name_cons<<endl;
-	bool is_const_int =((strcmp(name_cons.c_str(),"sp") == 0) || (strcmp(name_cons.c_str(),"sppos")==0));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"spcol") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"splin") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"splincol") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"lOpen") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"l1pen") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"splin") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"wav") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"blkdiag") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"splin_test") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"supp") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(name_cons.c_str(),"normlin") == 0)));
 	
-	bool is_const_real = ((strcmp(name_cons.c_str(),"normcol") == 0) || (strcmp(name_cons.c_str(),"normlin")==0));
-	bool is_const_mat =  ((strcmp(name_cons.c_str(),"supp") == 0) || (strcmp(name_cons.c_str(),"const")==0));
-					
-	int const_type = -1;
-	if (is_const_int)
-	{
-		const_type = 0;
-	}
-	if (is_const_real)
-	{
-		const_type = 1;
-	}
-	if (is_const_mat)
-	{
-		const_type = 2;
-	}
+	int const_type = getTypeConstraint(name_cons.c_str());
+	faust_constraint_name cons_name=getEquivalentConstraint(name_cons.c_str());
 					int nbr_field = (cons_var->dims[1]);
 				
 
@@ -393,31 +366,7 @@ void add_constraint(std::vector<const faust_constraint_generic*> & consS,matvar_
 
 			int int_parameter;		
 			cons_field_var=Mat_VarGetCell(cons_var,1);
-			int_parameter =(int) round((((double*) cons_field_var->data))[0]);
-
-
-					
-			faust_constraint_name cons_name;			
-			if (strcmp(name_cons.c_str(),"sp") == 0)
-			{
-				cons_name = CONSTRAINT_NAME_SP;
-			}
-
-			if (strcmp(name_cons.c_str(),"sppos") == 0)
-			{
-				cons_name = CONSTRAINT_NAME_SP_POS;
-			}
-
-			if (strcmp(name_cons.c_str(),"spcol") == 0)
-			{
-				cons_name = CONSTRAINT_NAME_SPCOL;
-			}			
-					
-			if (strcmp(name_cons.c_str(),"splin") == 0)
-			{
-				cons_name = CONSTRAINT_NAME_SPLIN;
-			}	
-					
+			int_parameter =(int) round((((double*) cons_field_var->data))[0]);		
 			consS.push_back(new faust_constraint_int(cons_name,int_parameter,cons_dim1,cons_dim2));
 			break;
 		
@@ -428,16 +377,6 @@ void add_constraint(std::vector<const faust_constraint_generic*> & consS,matvar_
 		T real_parameter;		
 			cons_field_var=Mat_VarGetCell(cons_var,1);
 			real_parameter =(T) (((double*) cons_field_var->data))[0];
-			
-			if (strcmp(name_cons.c_str(),"normcol") == 0)
-			{
-				cons_name = CONSTRAINT_NAME_NORMCOL;
-			}
-
-			if (strcmp(name_cons.c_str(),"normlin") == 0)
-			{
-				cons_name = CONSTRAINT_NAME_NORMLIN;
-			}
 			consS.push_back(new faust_constraint_real<T>(cons_name,real_parameter,cons_dim1,cons_dim2));
 			break;
 			
@@ -451,23 +390,8 @@ void add_constraint(std::vector<const faust_constraint_generic*> & consS,matvar_
 			}
 			
 			init_mat_from_matvar(mat_parameter,cons_field_var);
-			
-			if (strcmp(name_cons.c_str(),"const") == 0)
-			{
-				cons_name = CONSTRAINT_NAME_CONST;
-			}
-
-			if (strcmp(name_cons.c_str(),"supp") == 0)
-			{
-				cons_name = CONSTRAINT_NAME_SUPP;
-			}
 			consS.push_back(new faust_constraint_mat<T>(cons_name,mat_parameter,cons_dim1,cons_dim2));
-			break;
-			
-		/*default :
-			cerr<<"Error faust_init_from_matio::add_constraint : "<<"constraint's name "<<name_cons<<" is invalid "<<endl;
-			exit(EXIT_FAILURE);
-		*/		
+			break;	
 	}
 	
 }

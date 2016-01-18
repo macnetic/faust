@@ -90,6 +90,23 @@ class faust_constraint_generic
 
 #include "faust_constraint_generic.hpp"
 
+/////// functions useful for parsing config_file (xml,matio,txt_file) //////
+
+bool isConstraintNameInt(const char * type);
+
+bool isConstraintNameReal(const char * type);
+
+bool isConstraintNameMat(const char * type);
+
+faust_constraint_name getEquivalentConstraint(const char * type);
+
+
+// return 0 if type correspond to an int constraint
+// return 1 if type correspond to a real constraint
+// return 2 if type corespond to a real constraint
+// else throw an error
+int getTypeConstraint(const char * type);
+
 
 
 #endif

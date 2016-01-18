@@ -372,33 +372,8 @@ void faust_params<T>::init_from_file(const char* filename)
 			fscanf(fp,"%s %d %d %s",name_cons,&cons_dim1,&cons_dim2,&cons_parameter);
 			fscanf(fp,"\n");
 			std::cout<<name_cons<<" "<<cons_dim1<<" "<<cons_dim2<<" "<<cons_parameter<<std::endl;
-			bool is_const_int =((strcmp(name_cons,"sp") == 0) || (strcmp(name_cons,"sppos")==0));
-			is_const_int = ((is_const_int) || ((strcmp(name_cons,"spcol") == 0)));
-			is_const_int = ((is_const_int) || ((strcmp(name_cons,"splin") == 0)));
-			is_const_int = ((is_const_int) || ((strcmp(name_cons,"splincol") == 0)));
-			is_const_int = ((is_const_int) || ((strcmp(name_cons,"lOpen") == 0)));
-			is_const_int = ((is_const_int) || ((strcmp(name_cons,"l1pen") == 0)));
-			is_const_int = ((is_const_int) || ((strcmp(name_cons,"splin") == 0)));
-			is_const_int = ((is_const_int) || ((strcmp(name_cons,"wav") == 0)));
-			is_const_int = ((is_const_int) || ((strcmp(name_cons,"blkdiag") == 0)));
-			is_const_int = ((is_const_int) || ((strcmp(name_cons,"splin_test") == 0)));
-			is_const_int = ((is_const_int) || ((strcmp(name_cons,"normlin") == 0)));
-			bool is_const_real = ((strcmp(name_cons,"normcol") == 0) || (strcmp(name_cons,"normlin")==0));
-			bool is_const_mat =  ((strcmp(name_cons,"supp") == 0) || (strcmp(name_cons,"const")==0));
-			int const_type = -1;
-			if (is_const_int)
-			{
-				const_type = 0;
-			}
-			if (is_const_real)
-			{
-				const_type = 1;
-			}
-			if (is_const_mat)
-			{
-				const_type = 2;
-			}
-			faust_constraint_name cons_name;
+			int const_type = getTypeConstraint(name_cons);
+			faust_constraint_name cons_name=getEquivalentConstraint(name_cons);
 
 			switch(const_type)
 			{	
@@ -406,31 +381,7 @@ void faust_params<T>::init_from_file(const char* filename)
 				case 0:
 				{
 					int int_parameter;		
-					int_parameter =atoi(cons_parameter);
-
-
-							
-				
-					if (strcmp(name_cons,"sp") == 0)
-					{
-						cons_name = CONSTRAINT_NAME_SP;
-					}
-
-					if (strcmp(name_cons,"sppos") == 0)
-					{
-						cons_name = CONSTRAINT_NAME_SP_POS;
-					}
-
-					if (strcmp(name_cons,"spcol") == 0)
-					{
-						cons_name = CONSTRAINT_NAME_SPCOL;
-					}			
-							
-					if (strcmp(name_cons,"splin") == 0)
-					{
-						cons_name = CONSTRAINT_NAME_SPLIN;
-					}	
-							
+					int_parameter =atoi(cons_parameter);		
 					consS.push_back(new faust_constraint_int(cons_name,int_parameter,cons_dim1,cons_dim2));
 					break;
 				}
@@ -439,18 +390,8 @@ void faust_params<T>::init_from_file(const char* filename)
 				// CASE REAL
 				case 1 :
 				{	
-				T real_parameter;		
-						real_parameter=(T) atof(cons_parameter);
-					
-					if (strcmp(name_cons,"normcol") == 0)
-					{
-						cons_name = CONSTRAINT_NAME_NORMCOL;
-					}
-
-					if (strcmp(name_cons,"normlin") == 0)
-					{
-						cons_name = CONSTRAINT_NAME_NORMLIN;
-					}
+					T real_parameter;		
+					real_parameter=(T) atof(cons_parameter);
 					consS.push_back(new faust_constraint_real<T>(cons_name,real_parameter,cons_dim1,cons_dim2));
 					break;
 				}	
@@ -462,18 +403,6 @@ void faust_params<T>::init_from_file(const char* filename)
 					if ( (cons_dim1 != mat_parameter.getNbCol()) || (cons_dim2 != mat_parameter.getNbRow()) )
 					{
 						handleError(class_name, "init_from_file : invalide dimension of constraint mat_parameter");	
-					}
-					
-
-					
-					if (strcmp(name_cons,"const") == 0)
-					{
-						cons_name = CONSTRAINT_NAME_CONST;
-					}
-
-					if (strcmp(name_cons,"supp") == 0)
-					{
-						cons_name = CONSTRAINT_NAME_SUPP;
 					}
 					consS.push_back(new faust_constraint_mat<T>(cons_name,mat_parameter,cons_dim1,cons_dim2));
 					break;

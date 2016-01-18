@@ -690,6 +690,8 @@ t_print_file.start();
 
   ifstream* vec_stream;
   vec_stream = new ifstream(filename);
+  if (!vec_stream->is_open())
+	  handleError(class_name, "init_from_file : unable to open file");
   istream_iterator<T> start(*vec_stream), eos;
   vector<T> vec(start, eos); 
 

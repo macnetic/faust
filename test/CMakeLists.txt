@@ -3,8 +3,20 @@
 configure_file(${FAUST_MEXINTERFACETOOLS_SRC_DIR}/matlab_faust.m.in ${FAUST_TESTMATLABSCRIPT_BIN_DIR}/matlab_faust.m COPYONLY)
 
 
-include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_MATIO_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${MATIO_INC_DIR} )
+if(FAUST_USE_MATIO)
 
+	if(FAUST_USE_XML)
+		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_MATIO_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${MATIO_INC_DIR} ${FAUST_XML_SRC_DIR} ${XML_INC_DIR})
+	else()
+		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_MATIO_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${MATIO_INC_DIR})
+	endif()
+else()
+	if(FAUST_USE_XML)
+		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${FAUST_XML_SRC_DIR} ${XML_INC_DIR})
+	else()
+		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR})
+	endif()
+endif()
 
 if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    
@@ -82,7 +94,7 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 
 
 
-   install(TARGETS palm faust_hier meg faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
+   install(TARGETS  palm faust_hier meg faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
    #install(TARGETS faust_hier meg faust_test comptime0 DESTINATION ${FAUST_INSTALL_TESTING_BIN})
    #install(FILES ${FAUST_TESTDATA_SRC_DIR}/config_compared_palm2.mat 
    #              ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 
@@ -126,8 +138,27 @@ else()
    
    
 endif()
+
+if (XML_INC_DIR AND XML2_LIB_FILE AND FAUST_USE_XML)	
+	foreach(xmldatafile hier_fact_config MEG_config)
+		configure_file(${FAUST_TESTDATA_SRC_DIR}/${xmldatafile}.xml.in ${FAUST_TESTDATA_SRC_DIR}/${xmldatafile}.xml @ONLY)
+	endforeach()
 	
-		
+	
+	configure_file(${FAUST_TESTSRC_SRC_DIR}/launch_hierarchical_fact.cpp ${FAUST_TESTSRC_BIN_DIR}/launch_hierarchical_fact.cpp COPYONLY)
+
+# add_executable(launch_hier_fact ${FAUST_TESTSRC_BIN_DIR}/launch_hierarchical_fact.cpp ${FAUST_XML_SRC_DIR}/xml_utils.cpp)
+add_executable(launch_hier_fact ${FAUST_TESTSRC_BIN_DIR}/launch_hierarchical_fact.cpp ${FAUST_XML_SRC_DIR}/xml_utils.cpp)
+   if(FAUST_USE_OPENBLAS)
+      target_link_libraries(launch_hier_fact  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE} ${XML2_LIB_FILE})
+   else()
+      target_link_libraries(launch_hier_fact  ${FAUST_TARGET} ${XML2_LIB_FILE})
+   endif()
+endif()   
+   
+
+
+	
 	# add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp" "${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp")
 	
 	 # add_executable(faust_hier_basic ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp)
