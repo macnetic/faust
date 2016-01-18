@@ -132,6 +132,7 @@ set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of d
 set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
 set(FAUST_USE_MEX OFF CACHE BOOL "Generate Mexfiles")
 set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read matfile")
+set(FAUST_USE_XML ON CACHE BOOL "using xml configuration file")
 
 # find external libraries
 
