@@ -194,33 +194,6 @@ t_local_compute_projection.start();
          }
          break;
 
-         case CONSTRAINT_NAME_L0PEN:
-         {	
-			throw std::logic_error("Error in palm4MSA<T>::compute_projection : projection not implemented");
-		//constraint_type_l0pen* constr_cast = dynamic_cast<constraint_type_l0pen*>(const_vec[ind_fact]);
-		//prox_l0pen(S[ind_fact], sqrt(2*constr_cast->getParameter()/c));
-         }
-         break;
-
-         case CONSTRAINT_NAME_L1PEN:
-         {	
-			throw std::logic_error("Error in palm4MSA<T>::compute_projection : projection not implemented");
-		
-            //constraint_type_l1pen* constr_cast = dynamic_cast<constraint_type_l1pen*>(const_vec[ind_fact]);
-            //prox_l1pen(S[ind_fact], constr_cast->getParameter()/c);
-
-         }
-         break;
-
-         case CONSTRAINT_NAME_WAV:
-         {
-			throw std::logic_error("Error in palm4MSA<T>::compute_projection : projection not implemented");
-		
-		//constraint_type_wav* constr_cast = dynamic_cast<constraint_type_wav*>(const_vec[ind_fact]);
-		//prox_wav(S[ind_fact], constr_cast->getParameter());
-         }
-         break;
-
          case CONSTRAINT_NAME_SP_POS:
          {
 		typename constraint_type<T>::constraint_type_sp_pos* constr_cast = dynamic_cast<typename constraint_type<T>::constraint_type_sp_pos*>(const_vec[ind_fact]);
@@ -238,13 +211,6 @@ t_local_compute_projection.start();
          }
          break;
 
-         case CONSTRAINT_NAME_SPLIN_TEST:
-         {
-			throw std::logic_error("Error in palm4MSA<T>::compute_projection : projection not implemented");
-            //constraint_type_splin_test* constr_cast = dynamic_cast<constraint_type_splin_test*>(const_vec[ind_fact]);
-            //prox_sp(S[ind_fact], constr_cast->getParameter());
-         }
-         break;
 
          case CONSTRAINT_NAME_SUPP:
          {	
@@ -265,14 +231,6 @@ t_local_compute_projection.start();
          {
             typename constraint_type<T>::constraint_type_normlin* constr_cast = static_cast<typename constraint_type<T>::constraint_type_normlin*>(const_vec[ind_fact]);
             prox_normlin(S[ind_fact], constr_cast->getParameter());
-         }
-         break;
-
-         case CONSTRAINT_NAME_TOEPLITZ:
-         {
-			throw std::logic_error("Error in palm4MSA<T>::compute_projection : projection not implemented");
-            //constraint_type_toeplitz* constr_cast = static_cast<constraint_type_toeplitz*>(const_vec[ind_fact]);
-            //prox_sp(S[ind_fact], 	const_int->getParameter());
          }
          break;
 

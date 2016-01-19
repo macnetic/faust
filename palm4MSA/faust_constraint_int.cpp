@@ -66,19 +66,9 @@ void faust_constraint_int::check_constraint_name()const
          break;
       case CONSTRAINT_NAME_SPLIN:
          break;
-      case CONSTRAINT_NAME_L0PEN:
-         break;
-      case CONSTRAINT_NAME_L1PEN:
-         break;
-      case CONSTRAINT_NAME_WAV:
-         break;
       case CONSTRAINT_NAME_SP_POS:
          break;
       case CONSTRAINT_NAME_BLKDIAG:
-         break;
-      case CONSTRAINT_NAME_SPLIN_TEST:
-         break;
-      case CONSTRAINT_NAME_TOEPLITZ:
          break;
       default:
 		handleError(class_name," cannot create faust_constraint_int objet from an faust_constraint object with constraint with constraint_name");
@@ -99,28 +89,13 @@ void faust_constraint_int::set_default_parameter()
       case CONSTRAINT_NAME_SPLIN:
          parameter = 0;
          break;
-      case CONSTRAINT_NAME_L0PEN:
-         parameter = 0;
-         break;
-      case CONSTRAINT_NAME_L1PEN:
-         parameter = 0;
-         break;
-      case CONSTRAINT_NAME_WAV:
-         parameter = 0;
-         break;
       case CONSTRAINT_NAME_SP_POS:
          parameter = 0;
          break;
       case CONSTRAINT_NAME_BLKDIAG:
          parameter = 0;
          break;
-      case CONSTRAINT_NAME_SPLIN_TEST:
-         parameter = 0;
-         break;
       case CONSTRAINT_NAME_NORMLIN:
-         parameter = 0;
-         break;
-      case CONSTRAINT_NAME_TOEPLITZ:
          parameter = 0;
          break;
       default:

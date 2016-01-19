@@ -34,26 +34,16 @@ const char* faust_constraint_generic::get_constraint_name()const
          return "CONSTRAINT_NAME_NORMCOL";
       case CONSTRAINT_NAME_SPLINCOL:
          return "CONSTRAINT_NAME_SPLINCOL";
-      case CONSTRAINT_NAME_L0PEN:
-         return "CONSTRAINT_NAME_L0PEN";
-      case CONSTRAINT_NAME_L1PEN:
-         return "CONSTRAINT_NAME_L1PEN";
       case CONSTRAINT_NAME_CONST:
          return "CONSTRAINT_NAME_CONST";
-      case CONSTRAINT_NAME_WAV:
-         return "CONSTRAINT_NAME_WAV";
       case CONSTRAINT_NAME_SP_POS:
          return "CONSTRAINT_NAME_SP_POS";
       case CONSTRAINT_NAME_BLKDIAG:
          return "CONSTRAINT_NAME_BLKDIAG";
-      case CONSTRAINT_NAME_SPLIN_TEST:
-         return "CONSTRAINT_NAME_SPLIN_TEST";
       case CONSTRAINT_NAME_SUPP:
          return "CONSTRAINT_NAME_SUPP";
       case CONSTRAINT_NAME_NORMLIN:
          return "CONSTRAINT_NAME_NORMLIN";
-      case CONSTRAINT_NAME_TOEPLITZ:
-         return "CONSTRAINT_NAME_TOEPLITZ";
       default:
          return "unknown constraint name";
    }
@@ -75,12 +65,9 @@ bool isConstraintNameInt(const char * type)
 	is_const_int = ((is_const_int) || ((strcmp(type,"spcol") == 0)));
 	is_const_int = ((is_const_int) || ((strcmp(type,"splin") == 0)));
 	is_const_int = ((is_const_int) || ((strcmp(type,"splincol") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(type,"lOpen") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(type,"l1pen") == 0)));
 	is_const_int = ((is_const_int) || ((strcmp(type,"splin") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(type,"wav") == 0)));
 	is_const_int = ((is_const_int) || ((strcmp(type,"blkdiag") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(type,"splin_test") == 0)));
+
 	
 	return is_const_int;
 }
@@ -109,26 +96,16 @@ faust_constraint_name getEquivalentConstraint(const char * type)
 		return CONSTRAINT_NAME_NORMCOL;
 	if  (!strcmp(type,"splincol"))	
 		return CONSTRAINT_NAME_SPLINCOL;
-	if  (!strcmp(type,"l0pen"))	
-		return CONSTRAINT_NAME_L0PEN;
-	if  (!strcmp(type,"l1pen"))	
-		return CONSTRAINT_NAME_L1PEN;
 	if  (!strcmp(type,"const"))	
 		return CONSTRAINT_NAME_CONST;
-	if  (!strcmp(type,"wav"))	
-		return CONSTRAINT_NAME_WAV;
 	if  (!strcmp(type,"sppos"))	
 		return CONSTRAINT_NAME_SP_POS;
 	if  (!strcmp(type,"blkdiag"))	
 		return CONSTRAINT_NAME_BLKDIAG;
-	if  (!strcmp(type,"splin_test"))	
-		return CONSTRAINT_NAME_SPLIN_TEST;
 	if  (!strcmp(type,"supp"))	
 		return CONSTRAINT_NAME_SUPP;
 	if  (!strcmp(type,"normlin"))	
 		return CONSTRAINT_NAME_NORMLIN;
-	if  (!strcmp(type,"toeplitz"))	
-		return CONSTRAINT_NAME_TOEPLITZ;
 
 	
 	handleError("faust_constraint_generic","getEquivalentConstraint : Unknown type of constraint");
