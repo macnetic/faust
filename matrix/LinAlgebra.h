@@ -34,6 +34,19 @@ void gemm(const faust_mat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const 
 template<typename T>
 void gemv(const faust_mat<T> & A,const faust_vec<T> & x,faust_vec<T> & y,const T & alpha, const T & beta, char typeA);
 
+
+/*!
+ *  \brief 
+ * compute the biggest eigenvalue of A using power_iteration algorithm	
+ *
+ *  \param[input] A : input matrix must be semidefinite
+	\param[input] nbr_iter_max : maximum number of iteration
+	\param[input] threshold : threshold until convergence
+	\param[input/output] : convergence flag
+*		   
+	\return	the the biggest eigenvalue of A   
+    *
+*/	
 // compute the biggest eigenvalue of A, A must be semi-definite positive 
 template<typename T> 
 T power_iteration(const faust_mat<T> & A, const faust_unsigned_int nbr_iter_max,T threshold,faust_int & flag);

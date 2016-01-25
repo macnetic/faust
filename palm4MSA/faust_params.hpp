@@ -14,6 +14,19 @@ template<typename T> class faust_constraint_mat;
 template<typename T>	
 const char * faust_params<T>::class_name = "faust_params<T>::";
 
+
+//default Values
+template<typename T> const bool faust_params<T>::defaultVerbosity = false;
+template<typename T> const int faust_params<T>::defaultNiter1 = 500;
+template<typename T> const int faust_params<T>::defaultNiter2 = 500;
+template<typename T> const bool faust_params<T>::defaultFactSideLeft = false;
+template<typename T> const bool faust_params<T>::defaultUpdateWayR2L = false;
+template<typename T> const T faust_params<T>::defaultLambda = 1.0;
+
+template<typename T> const T faust_params<T>::defaultDecreaseSpeed = 1.25;
+template<typename T> const T faust_params<T>::defaultResiduumPercent = 1.4;
+
+
 template<typename T>	
 void faust_params<T>::check_constraint_validity()
 {	
@@ -61,8 +74,8 @@ faust_params<T>::faust_params(
 	  const std::vector<faust_mat<T> >& init_fact_,
 	  const stopping_criterion<T>& stop_crit_2facts_,
       const stopping_criterion<T>& stop_crit_global_,
-	   const double residuum_decrease_speed /* = 1.25 */,
-	  const double residuum_prcent /* = 1.4 */,
+	   const T residuum_decrease_speed /* = 1.25 */,
+	  const T residuum_prcent /* = 1.4 */,
 	  const bool isVerbose_ , /* = false */
       const bool isUpdateWayR2L_  , /* = false */
       const bool isFactSideLeft_ , /* = false */
@@ -204,7 +217,7 @@ faust_params<T>::faust_params(
 
 
 template<typename T>	
-faust_params<T>::faust_params() : data(0,0),nb_fact(0),cons(std::vector<std::vector<const faust_constraint_generic*> >()),isFactSideLeft(false),isVerbose(false),isUpdateWayR2L(false),init_fact(std::vector<faust_mat<T> >()),init_lambda(1.0)/*,nb_rows(0),nb_cols(0) */
+faust_params<T>::faust_params() : data(0,0),nb_fact(0),cons(std::vector<std::vector<const faust_constraint_generic*> >()),isFactSideLeft(defaultFactSideLeft),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_mat<T> >()),init_lambda(defaultLambda)/*,nb_rows(0),nb_cols(0) */
 {}
 
 

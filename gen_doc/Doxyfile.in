@@ -1,0 +1,37 @@
+PROJECT_NAME           = "FAµST (Flexible Approximate MUlti-layer Sparse Transforms)"
+GENERATE_HTML          = YES
+HTML_OUTPUT            = @PROJECT_BINARY_DIR@/html
+GENERATE_LATEX         = NO
+PROJECT_LOGO           = /udd/nbellot/Devel/Faust/trunk/devcpp/gen_doc/faust.png
+PROJECT_NUMBER         = @FAUST_VERSION_MAJOR@.@FAUST_VERSION_MINOR@
+INPUT =  @PROJECT_SOURCE_DIR@
+#INPUT += mainpage.md
+# If the value of the INPUT tag contains directories, you can use the
+# FILE_PATTERNS tag to specify one or more wildcard patterns (like *.cpp and
+# *.h) to filter out the source-files in the directories. If left blank the
+# following patterns are tested:*.c, *.cc, *.cxx, *.cpp, *.c++, *.java, *.ii,
+# *.ixx, *.ipp, *.i++, *.inl, *.idl, *.ddl, *.odl, *.h, *.hh, *.hxx, *.hpp,
+# *.h++, *.cs, *.d, *.php, *.php4, *.php5, *.phtml, *.inc, *.m, *.markdown,
+# *.md, *.mm, *.dox, *.py, *.f90, *.f, *.for, *.tcl, *.vhd, *.vhdl, *.ucf,
+# *.qsf, *.as and *.js.
+FILE_PATTERNS          =
+
+# The RECURSIVE tag can be used to specify whether or not subdirectories should
+# be searched for input files as well.
+# The default value is: NO.
+RECURSIVE              = YES
+
+# The EXCLUDE tag can be used to specify files and/or directories that should be
+# excluded from the INPUT source files. This way you can easily exclude a
+# subdirectory from a directory tree whose root is specified with the INPUT tag.
+#
+# Note that relative paths are relative to the directory from which doxygen is
+# run.
+
+EXCLUDE_PATTERNS                = *@PROJECT_SOURCE_DIR@/eigen/*
+EXCLUDE_PATTERNS                += *@PROJECT_SOURCE_DIR@/build/*
+EXCLUDE_PATTERNS                += *@PROJECT_SOURCE_DIR@/CMake/*
+EXCLUDE_PATTERNS                += *@PROJECT_SOURCE_DIR@/output/*
+
+
+

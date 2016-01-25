@@ -7,8 +7,8 @@
 
 enum faust_constraint_name
 {
-   CONSTRAINT_NAME_SP,
-   CONSTRAINT_NAME_SPCOL,
+   CONSTRAINT_NAME_SP, /*!< CONSTRAINT_NAME_SP : fixed number of non zero elements (frobenius norm 1) */
+   CONSTRAINT_NAME_SPCOL, /*!< CONSTRAINT_NAME_SPCOL : fixed number of non zero elements per column (frobenius norm 1) */
    CONSTRAINT_NAME_SPLIN,
    CONSTRAINT_NAME_NORMCOL,
    CONSTRAINT_NAME_SPLINCOL,

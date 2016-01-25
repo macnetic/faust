@@ -26,7 +26,7 @@ void sort_idx(const std::vector<T> &v, std::vector<int>& idx, int s)
 }
 
 template<typename T>
-void prox_sp_normfree(faust_mat<T> & M,faust_unsigned_int k)
+void prox_sp(faust_mat<T> & M,faust_unsigned_int k)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
@@ -49,18 +49,14 @@ void prox_sp_normfree(faust_mat<T> & M,faust_unsigned_int k)
 		}
 		
 	}
-}
-
-template<typename T>
-void prox_sp(faust_mat<T> & M, faust_unsigned_int k)
-{
-	prox_sp_normfree(M,k);
-	M.normalize();	
+	M.normalize();
 }
 
 
+
+
 template<typename T>
-void prox_spcol_normfree(faust_mat<T> & M,faust_unsigned_int k)
+void prox_spcol(faust_mat<T> & M,faust_unsigned_int k)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
@@ -88,17 +84,13 @@ void prox_spcol_normfree(faust_mat<T> & M,faust_unsigned_int k)
 		}	
 			
 	}
+	M.normalize();
 }
 
-template<typename T>	
-void prox_spcol(faust_mat<T> & M,faust_unsigned_int k)
-{
-	prox_spcol_normfree(M,k);
-	M.normalize();		
-}
+
 
 template<typename T>
-void prox_splin_normfree(faust_mat<T> & M,faust_unsigned_int k)
+void prox_splin(faust_mat<T> & M,faust_unsigned_int k)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
@@ -126,15 +118,11 @@ void prox_splin_normfree(faust_mat<T> & M,faust_unsigned_int k)
 		}	
 		
 	}
+	M.normalize();
 
 }
 
-template<typename T>
-void prox_splin(faust_mat<T> & M,faust_unsigned_int k)
-{	
-	prox_splin_normfree(M,k);
-	M.normalize();	
-}
+
 
 template<typename T>
 void prox_normcol(faust_mat<T> & M,T s)
@@ -200,18 +188,7 @@ void prox_sp_pos(faust_mat<T> & M,faust_unsigned_int k)
 	
 }
 
-template<typename T>
-void prox_sp_pos_normfree(faust_mat<T> & M,faust_unsigned_int k)
-{
-	T*const ptr_data = M.getData();
-	//treshold de la matrice
-	for (int i=0;i<(M.getNbRow() * M.getNbCol());i++)
-		if (ptr_data[i] < 0)
-			ptr_data[i]=0;
-		
-	prox_sp_normfree(M,k);
-	
-}
+
 
 // M needs to be square and k must divide dimension of M
 template<typename T>
@@ -252,170 +229,23 @@ void prox_blkdiag(faust_mat<T> & M,int k)
 		
 	
 }
-// M needs to be square and k must divide dimension of M
+
+
+
 
 
 
 template<typename T>
-void prox_supp(faust_mat<T> & M, const faust_mat<T> & supp)
-{
-	
-	prox_supp(M,supp);
-	T normM = M.norm();
-	if (normM != 0)
-	{
-		M.scalarMultiply(1/normM);
-	}
-	
-}
-
-template<typename T>
-void prox_supp_normfree(faust_mat<T> & M,const faust_mat<T> & supp)
+void prox_supp(faust_mat<T> & M,const faust_mat<T> & supp)
 {
 	if ( (supp.getNbRow() != M.getNbRow()) || (supp.getNbCol() != M.getNbCol()) )
 	{
 		handleError("prox : ","prox_supp : dimensions of the matrix are not equal");	
 	}
 	M.scalarMultiply(supp);
+	M.normalize();
 }
 
-/*
-void prox_toeplitz(faust_mat<T> & M, int k)
-{	
-	int nl = M.getNbRow();
-	int nc = M.getNbCol();
-	faust_mat<T> crit(nl+nc-1,1);
-	faust_mat<T> new_M(nl,nc);
-	new_M.setZeros();
-	std::vector<T> diag_meanS;
-	std::vector<int> num_elt_diagS;
-	int num_elt_diag;
-	int min_dim = std::min(nl,nc);
-	int shift_dim = nc-nl;
-	T current_mean;
-	int id_col,id_row;
-	
-	diag_meanS.resize(nl+nc-1);
-	num_elt_diagS.resize(nl+nc+1);
-	
-	if (k>nl+nc-1)
-	{
-		std::cerr << "ERROR prox_toeplitz : k > (nb_Row+nbCol-1) of M " << std::endl;
-		exit( EXIT_FAILURE);	
-	}
-	
-	std::cout<<"boucle critere :"<<std::endl;
-	for (int i=-nl+1;i<nc;i++)
-	{	
-
-		if (shift_dim < 0)
-		{
-			if (i<=0)
-			{
-				if (i<shift_dim)
-				{	std::cout<<"cas1"<<std::endl;
-					num_elt_diag = min_dim-abs(i+abs(shift_dim));
-				}else
-				{	
-					std::cout<<"cas2"<<std::endl;
-					num_elt_diag = min_dim;
-				}
-			}else
-			{
-				std::cout<<"cas3"<<std::endl;
-				num_elt_diag = min_dim-i;
-			}
-		}else
-		{
-			if (i>=0)
-			{
-				if (i>shift_dim)
-				{	std::cout<<"cas4"<<std::endl;
-					num_elt_diag = min_dim-abs(i-abs(shift_dim));
-				}else
-				{	
-					std::cout<<"cas5"<<std::endl;
-					num_elt_diag = min_dim;
-				}
-			}else
-			{
-				std::cout<<"cas6"<<std::endl;
-				num_elt_diag = min_dim-abs(i);
-			}
-		}
-		
-		
-		num_elt_diagS[i+nl-1]=num_elt_diag;
-		
-		if (i < 0)
-		{
-			id_row = -i;
-			id_col = 0;
-		}else
-		{
-			id_row = 0;
-			id_col = i;
-		}
-		std::cout<<"id_row : "<<id_row<<std::endl;
-		std::cout<<"id_col : "<<id_col<<std::endl;
-		std::cout<<"nombre diagonal : "<<num_elt_diag<<std::endl;
-		
-		current_mean = 0;
-		std::cout<<"coeff diag"<<std::endl;
-		for (int l=0;l<num_elt_diag;l++)
-		{	
-			std::cout<<M.getCoeff(id_row+l,id_col+l)<<std::endl;
-			current_mean = current_mean + M.getCoeff(id_row+l,id_col+l);
-		}
-		
-		current_mean = current_mean/((T) num_elt_diag);
-		std::cout<<"mean : "<<current_mean<<std::endl;
-		
-		diag_meanS[i+nl-1]=current_mean;
-		crit.setCoeff(current_mean*current_mean*((T)num_elt_diag),i+nl-1,0);
-		
-	}
-	
-	std::cout<<" crit : "<<std::endl;
-	crit.Display();
-	prox_sp(crit,k);
-	int ll;
-	std::cout<<"boucle sparse"<<std::endl;
-	for (int i=0;i<nl+nc-1;i++)
-	{
-		if (crit.getCoeff(i,0) != 0)
-		{
-			ll = i-nl+1;
-			if (ll < 0)
-			{
-				id_row = -ll;
-				id_col = 0;
-			}else
-			{
-				id_row = 0;
-				id_col = ll;
-			}
-			current_mean = diag_meanS[i];
-			for (int l=0;l<num_elt_diagS[i];l++)
-			{
-				new_M.setCoeff(current_mean,id_row+l,id_col+l);
-			}
-		}
-		
-	}
-	
-	M = new_M;
-
-	T normM = M.norm();
-	if (normM != 0)
-	{
-		M.scalarMultiply(1/normM);
-	}	
-	
-	
-	
-	
-}*/
 	
 	
 

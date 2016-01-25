@@ -19,13 +19,13 @@ class faust_params_palm
          const int nb_fact_,
          const std::vector<const faust_constraint_generic*>& cons_,
          const std::vector<faust_mat<T> >& init_fact_,
-         const stopping_criterion<T> & stop_crit_ = stopping_criterion<T>(),
-         const bool isVerbose_ = false ,
-         const bool isUpdateWayR2L_ = false ,
-         const T init_lambda_ = 1.0);
+         const stopping_criterion<T> & stop_crit_ = stopping_criterion<T>(defaultNiter),
+         const bool isVerbose_ = defaultVerbosity ,
+         const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
+         const T init_lambda_ = defaultLambda);
 
       void check_constraint_validity();
-
+	   faust_params_palm();	
       ~faust_params_palm(){}
 
 
@@ -41,10 +41,16 @@ class faust_params_palm
       bool isVerbose;
       bool isUpdateWayR2L;
       T init_lambda;
+		
+	  void Display() const;
+	  void init_factors();	
+	  static const int defaultNiter;
+	  static const bool defaultVerbosity;	
+	  static const bool defaultUpdateWayR2L;
+	  static const T defaultLambda;
 	  
 	  private :
 	  static const char *  class_name;
-
 
      
       /*const int nb_it;   // number of iterations

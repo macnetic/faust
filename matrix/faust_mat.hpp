@@ -23,11 +23,7 @@ template<typename T>
 const char * faust_mat<T>::class_name = "faust_mat<T>::";
 
 
-/// CONSTRUCTEUR ///
-template<typename T>
-faust_mat<T>::faust_mat(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> & mat_) : 
-     // dim1(mat_.rows()), dim2(mat_.cols()),mat(mat_),isIdentity(false),isZeros(false){}
-     faust_mat_generic(mat_.rows(),mat_.cols()),mat(mat_),isIdentity(false),isZeros(false){}
+
 
 	 
 
@@ -42,22 +38,6 @@ faust_mat<T>::faust_mat(const T  *data_,const faust_unsigned_int nbRow, const fa
 #ifdef __COMPILE_TIMERS__
 t_constr.start();
 #endif
-          /*
-	  int i,j;
-	  if ((nbRow < 0) || (nbCol < 0))
-	  {
-		cerr << "ERREUR une dimension ne peut etre negative" << endl;; 
-        	exit( EXIT_FAILURE);  
-	  }
-	  
-	dim1 = nbRow;
-	dim2 = nbCol;
-	Eigen::Matrix<T, Eigen::Dynamic,Eigen::Dynamic> m(nbRow,nbCol);
-		
-	for (int j=0;j<nbCol;j++)
-		for (int i=0;i<nbRow;i++)
-			m(i,j) = mat_[i+(j*nbRow)];
-	mat = m;*/
 
 	memcpy(getData(), data_, nbRow*nbCol*sizeof(T));	
 
@@ -68,7 +48,7 @@ t_constr.stop();
 
   }
 
-/// GETTEUR SETTEUR ///
+
 
 
 	
@@ -81,8 +61,6 @@ t_resize.start();
 #endif
 		if ( (nbRow <0) || (nbCol <0) )
 		{
-			//cerr << "ERREUR resize : les nouvelles dimensions doivent etre strictement positive" << endl;
-			//exit( EXIT_FAILURE);
 			handleError(class_name, "resize : new dimensions must be positive");
 		}
 		else if ((dim1 != nbRow) || (dim2 != nbCol))

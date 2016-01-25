@@ -183,11 +183,6 @@ faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_
 }
 
 
-template<typename T>
-faust_spmat<T>::faust_spmat(const Eigen::SparseMatrix<T>& mat_) : 
-	faust_mat_generic(mat_.rows(),mat_.cols()),
-	mat(mat_),
-	nnz(mat_.nonZeros()){}
 
 
 

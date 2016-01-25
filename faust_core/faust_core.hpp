@@ -37,6 +37,18 @@ faust_core<T>::faust_core(const std::vector<faust_spmat<T> > & facts, const T la
 }
 
 template<typename T>
+void faust_core<T>::get_facts(std::vector<faust_mat<T> >& facts)const
+{
+	facts.resize(size());
+	for (int i=0;i<size();i++)
+		facts[i] = data[i];
+	
+}
+
+
+
+
+template<typename T>
 void faust_core<T>::print_file(const char* filename) const
 {
 	if (size() > 0)
@@ -51,6 +63,15 @@ void faust_core<T>::print_file(const char* filename) const
 			data[i].print_file(filename,std::fstream::app);
 		}
 	}	
+}
+
+template<typename T>
+void faust_core<T>::scalarMultiply(const T scalar)
+{
+	if (size() > 0)	
+		data[0]*=scalar;
+	else
+		handleError(class_name,"scalarMultiply : empty faust can't be multiplied ");
 }
 
 template<typename T>

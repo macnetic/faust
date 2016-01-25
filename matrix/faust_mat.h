@@ -15,6 +15,18 @@
   #include "faust_timer.h"
 #endif
 
+/*! \class faust_mat
+   * \brief template class representing dense matrix
+   *
+   *  This class implements basic linear algebra operation (addition, multiplication, frobenius and spectral norm...)
+   *
+   * The matrix format is ColMajor.
+   *
+   *\tparam T scalar numeric type, e.g float or double
+   */
+
+
+
 template<typename T> class faust_mat;
 template<typename T> class faust_spmat;
 template<typename T> class faust_vec;
@@ -36,8 +48,7 @@ void multiply(const faust_core<T> & A, const faust_mat<T> & B, faust_mat<T> & C,
 template<typename T>  
  void gemv(const faust_mat<T> & A,const faust_vec<T> & x,faust_vec<T> & y,const T & alpha, const T & beta, char typeA);
 
-template<typename T>
- faust_vec<T> solve(const faust_mat<T> & A, const faust_vec<T> & v);
+
 
 
 
@@ -53,10 +64,24 @@ class faust_mat : public faust_mat_generic
 public:
 	static const char * name;  
 
-  /// Constructeurs ///
-  faust_mat(const Eigen::Matrix<T, Eigen::Dynamic,Eigen::Dynamic> & mat_);	
-  faust_mat(const T  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol );	
+      /*!
+     *  \brief Constructor
+     *
+     *  faust_mat constructor
+     *
+     *  \tparam data : pointer to the data array of the matrix
+		\tparam	   nbRow : number of row of the matrix
+		\tparam	   nbCol : number of column of the matrix
+     */	
+  faust_mat(const T  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol );
   faust_mat() : faust_mat_generic(), mat(0,0), isIdentity(false), isZeros(false) {}
+  /*!
+     *  \brief Constructor
+     *
+     *  faust_mat copy constructor
+     *
+     *  \tparam A : another faust_mat
+     */	
   faust_mat(const faust_mat<T> & A) : faust_mat_generic(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
 	template<typename U>
    faust_mat(const faust_mat<U> & A){this->operator=(A);}
@@ -69,35 +94,74 @@ public:
 
  ~faust_mat(){resize(0,0);}
 	
-	
-  /// GETTEUR SETTEUR ///
-  // faust_unsigned_int getNbRow() const {return dim1;}
-  // faust_unsigned_int getNbCol() const {return dim2;}
-  /*T getCoeff(const faust_unsigned_int i,const faust_unsigned_int j) const;
-  void getCoeffs(std::vector<T> & valueS,const std::vector<int> & id_row, const std::vector<int>  & id_col) const;
-  void setCoeff(const T & value,const int id_row, const int id_col);
-  void setCoeffs(const T value,const std::vector<int> & id_row,const std::vector<int>  & id_col);
-  void setCoeffs(const std::vector<T> & valueS,const std::vector<int> & id_row,const std::vector<int>  & id_col);*/
   
-
+  /*!
+     *  \brief 
+	 * resize the faust_mat
+		\tparam	   nbRow : new number of row of the matrix
+		\tparam	   nbCol : new number of column of the matrix
+		\warning nbRow and nbCol must be greater or equal to 0
+     */		
   void resize(const faust_unsigned_int nbRow,const faust_unsigned_int nbCol);
+  
+  /*!
+     *  \brief 
+	 * resize the faust_mat
+		\tparam	   nbRow : new number of row and column of the matrix
+	 \warning nbRow must be greater or equal to 0 	
+     */
   void resize(const faust_unsigned_int nbRow){resize(nbRow,nbRow);}
   
+  /*!
+     *  \brief 
+	 * check if the dimension of the matrix are consistent,
+	 * if not throws an error
+     */
   void check_dim_validity();
   
-  // (*this) = la matrice nulle
-  //void setZeros() {mat.setZero();isZeros=true;}
+  /*!
+     *  \brief 
+	 * set the matrix to the zero matrix
+     */
   void setZeros();
   
-  // (*this) = identite, pas forcement carree
-  //void setEyes() {mat.setIdentity();if(dim1==dim2)isIdentity=true;}
+    /*!
+     *  \brief 
+	 * set the matrix to the one diagonal matrix
+     */
   void setEyes();
-
+  
+  /*!
+     *  \brief 
+	 * access to the ith coefficient of the matrix pointer, Colmajor format and zero indexing
+	 *\tparam i : position
+	 *\return : ith coefficient of the matrix
+     */	
   T& operator[](faust_unsigned_int i){isZeros=false; isIdentity=false;return mat.data()[i];}
-
+  
+  /*!
+     *  \brief 
+	 * access to the ith coefficient of the matrix pointer, Colmajor format and zero indexing
+	 *\tparam i : position
+	 *\return : read-only ith coefficient of the matrix
+     */	
   const T& operator[](faust_unsigned_int i)const{return mat.data()[i];}
 
+   /*!
+     *  \brief 
+	 * access to the ith coefficient of the matrix pointer, Colmajor format and zero indexing
+	 *\tparam i : position
+	 *\return : read-only ith coefficient of the matrix
+     */	
   const T& operator()(faust_unsigned_int i)const{return mat.data()[i];}
+  
+  /*!
+     *  \brief 
+	 * access to (i,j) coefficient of the matrix pointer in zero indexing
+	 *\tparam i : row position
+	 *\tparam j : col position
+	 *\return : read-only (i,j) coefficient of the matrix
+     */	
   const T& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return mat.data()[j*dim1+i];}
 
 
@@ -114,72 +178,150 @@ public:
  
 
   
-  /// EGALITE ///
-  //bool isZeros() const {return mat.isZero(FAUST_PRECISION);}
+
   bool isEqual(const faust_mat<T> & B) const;
   bool isEqual(const faust_mat<T> & B, T threshold) const;
-  //bool isEyes() const {return mat.isIdentity(FAUST_PRECISION);}
-  
+
+
+
+  /*!
+     *  \brief 
+	 * initialize faust_mat from text file 
+	 *\tparam filename : name of the file
+	 * 
+	 * the first line of the file contains 2 integer : the number of row and the number of column <br>
+	 * all the other line contains one coefficient
+	 * in ColMajor access
+     */	  
 void init_from_file(const char* filename);
 
 
   
   
-  /// OPERATION BASIQUE ///
+
   
-  //arithmetique
-  
-  T max() const {return mat.maxCoeff();}
-  T min() const {return mat.minCoeff();}
+
   void abs() {mat=mat.cwiseAbs();}
   
-  // return the maximum of all coefficients of this and puts in row_id and col_id its location
-  T max(std::vector<faust_unsigned_int> & id_row,std::vector<faust_unsigned_int> & id_col) const;
-  T min(std::vector<faust_unsigned_int> & id_row,std::vector<faust_unsigned_int> & id_col) const;
+
   
   
-  // frobenius norm
+ /*!
+     *  \brief 
+	 * compute the Frobenius norm of the faust_mat
+	 *\return  the Frobenius norm
+     */	
   T norm() const {return mat.norm();}
+  
+  /*!
+     *  \brief 
+	 * normalize the matrix according to its Frobenius norm
+     */
   void normalize() {scalarMultiply(1.0/norm());}
-  // spectral norm, "norm2", equal to the largest singular value  
+   
+   /*!
+     *  \brief 
+     *
+     *  return the spectral norm (maximum singular value in absolute value) using Eigen library, very slow	
+	*
+	*		   
+		\return	the estimated spectral norm   
+     */
   T spectralNorm() const;
+
+     /*!
+     *  \brief 
+     *  return the estimated spectral norm (maximum singular value in absolute value) using power iteration algorithm	
+     *
+     *  \param nbr_iter_max : maximum number of iteration for the power algo
+		\param threshold : threshold until convergence
+		\param flag : convergence flag
+	*		   
+		\return	the estimated spectral norm   
+    *
+	* See also, template<typename T> 
+T power_iteration(const faust_mat<T> & A, const faust_unsigned_int nbr_iter_max,T threshold,faust_int & flag);
+	*/	  
   T spectralNorm(const faust_unsigned_int nbr_iter_max,T threshold, faust_int & flag) const;
   
-  // trace
+  /*!
+     *  \brief 
+	 * compute the trace of the faust_mat
+	 *\return  the trace
+     */
   T trace() const {return mat.trace();}
   
-  //transposition
+  /*!
+     *  \brief 
+	 * transpose the faust_mat
+     */
   void transpose();
   
-  // multiply (*this) = (*this) * A
+  /*!
+     *  \brief 
+	 * replace this by (this) * A  
+     */
   void multiplyRight(faust_mat<T> const& A);
-  // multiply (*this) =  A * (*this)
+  
+
+  /*!
+     *  \brief 
+	 * replace this by A * (*this)  
+     */
   void multiplyLeft(faust_mat<T> const& A);
   
-  // scalarMultiply (*this) = (*this) * lambda
+  /*!
+     *  \brief 
+	 * replace this by lambda * (*this)  
+     */	
   void scalarMultiply(T const lambda);
-  // (*this)(i,j)=((*this)(i,j)) * A(i,j)	
+  
+  /*!
+     *  \brief 
+	 * replace this by lambda * (*this) using element by element multiplication  
+     */
   void scalarMultiply(faust_mat<T> const& A);
-  // (*this) = (*this) + A
+  
+  /*!
+     *  \brief 
+	 * (*this) = (*this) + A   
+     */
   void add(faust_mat<T> const& A);
 
-  // (*this) = (*this) - A
+  /*!
+     *  \brief 
+	 * (*this) = (*this) - A   
+     */	
   void sub(faust_mat<T> const& A);
 
   
-  // Affichage
+
+  /*!
+     *  \brief 
+	 * displays the faust_mat  
+     */
   void Display() const;
+  
+  /*!
+     *  \brief 
+	 * write faust_mat into text file 
+	 *\tparam filename : name of the file
+	 * 
+	 * the first line of the file contains 2 integer : the number of row and the number of column
+	 * all the other line contains one coefficient
+	 * in ColMajor access of the faust_mat
+     */	
   void print_file(const char* filename)const;
 
   
-  /// SURCHARGE OPERATEUR ///
-  // affectation
+
+
   void operator=(faust_mat<T> const& A);
   
   template<typename U>
   void operator=(faust_mat<U> const& A);
   template<typename U>
-  void operator=(faust_spmat<U> const& A){std::cout<<"bla1";faust_spmat<T> AT(A);std::cout<<"bla2";this->operator=(AT);};
+  void operator=(faust_spmat<U> const& A){faust_spmat<T> AT(A);this->operator=(AT);};
   
   void operator=(faust_spmat<T> const& A);
 
@@ -195,9 +337,7 @@ void init_from_file(const char* filename);
 
 
   
-  ////////////////// friends //////////////////////
-  // intra classe//
-  // friend void add<>(const faust_mat<T> & A, const faust_mat<T> & B, faust_mat<T> & C);
+
   friend void multiply<>(const faust_mat<T> & A, const faust_mat<T> & B, faust_mat<T> & C);
 	
 
@@ -206,14 +346,13 @@ void init_from_file(const char* filename);
   friend void gemm<>(const faust_mat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const T& alpha, const T& beta, char  typeA, char  typeB);
   friend void multiply<>(const faust_core<T> & A, const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, char typeA, char typeMult);
   friend void gemv<>(const faust_mat<T> & A,const faust_vec<T> & x,faust_vec<T> & y,const T & alpha, const T & beta, char typeA);
-  friend faust_vec<T> solve<>(const faust_mat<T> & A, const faust_vec<T> & v);
-  ///////////friend faust_spmat<T>::operator=(faust_mat<T> const& S);
+  
+
   bool estIdentite(){return isIdentity;}
   bool estNulle(){return isZeros;}
   
   private: 
 	Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat;
-  //Eigen::Matrix<T,0,0> mat;
        bool isIdentity;
        bool isZeros;
 	   static const char * class_name;
@@ -255,7 +394,7 @@ void init_from_file(const char* filename);
 
 #include "faust_mat.hpp"
 
- //bool operator==(faust_mat const& A, faust_mat const& B);
+
 
 
 #endif

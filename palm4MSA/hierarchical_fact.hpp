@@ -136,6 +136,14 @@ palm_2.print_prox_timers();
 #endif
 }
 
+template<typename T>
+void hierarchical_fact<T>::get_facts(faust_core<T> & fact)const
+{
+	std::vector<faust_spmat<T> > spfacts;
+	get_facts(spfacts);
+	faust_core<T> res(spfacts);
+	fact = res;
+}
 
 template<typename T>
 void hierarchical_fact<T>::get_facts(std::vector<faust_spmat<T> >& sparse_facts)const 

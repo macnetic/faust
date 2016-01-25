@@ -13,38 +13,76 @@
 #endif
 
 template<typename T> class faust_mat;
+template<typename T> class faust_core;
 class faust_constraint_generic;
 template<typename T> class faust_params;
 template<typename T> class faust_params_palm;
 template<typename T> class stopping_criterion;
 
-
+/*! \class palm4MSA
+   * \brief template class implementing palm4MSA (PALM for Multi-layer Sparse Approximation) factorisation algorithm
+    : <br> 
+	factorization of a data matrix into multiple factors using PALM
+   *
+   *
+   *\tparam T scalar numeric type, e.g float or double
+   */
 
 template<typename T>
 class palm4MSA
 {
    public:
+	    /*!
+     *  \brief 
+	 * initialize palm4MSA from faust_params (hierarchical_fact parameter)
+	 *\tparam isGlobal_ : if true, the palm4MSA stopping_criterion stop_crit attribute is initialize from params_.stop_crit_global <br> and if false, it is initialize from stop_crit_2facts
+     */		
       palm4MSA(const faust_params<T>& params_, const bool isGlobal_);
-      palm4MSA(const faust_params_palm<T>& params_palm_, const bool isGlobal_);
+      palm4MSA(const faust_params_palm<T>& params_palm_, const bool isGlobal_=false);
 
       void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
       void set_data(const faust_mat<T>& data_){data=data_;}
-      //void set_nfacts(const int nfact_){nb_fact=nfact_;}
       void set_lambda(const faust_real lambda_){lambda = lambda_;}
-      //void set_lambda(const palm4MSA& palm_){lambda = palm_.lambda;}
+	  
+	  /*!
+     *  \brief 
+	 * useful in hierarchical_fact, update lambda of palm_global from palm_2
+     */	
       void update_lambda_from_palm(const palm4MSA& palm){lambda *= palm.lambda;}
+	  
+	  /*!
+     *  \brief 
+	 * compute the factorisation
+     */	
       void compute_facts();
-
+	  
+	  /*!
+     *  \brief 
+	 * return the multiplicative scalar lambda
+     */	
       T get_lambda()const{return lambda;}
+	  
       T get_RMSE()const{return error.norm()/sqrt((double)(data.getNbRow()*data.getNbCol()));}
       const faust_mat<T>& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
       const faust_mat<T>& get_data()const{return data;}
+	  void get_facts(faust_core<T> & faust_fact) const;
+	  
 
+	  	  /*!
+     *  \brief 
+	 * initialize the factors to the default value,
+	 * the first factor to be factorised is set to zero matrix
+	 * whereas all the other are set to identity
+     */		
       void init_fact(int nb_facts_);      
       void next_step();
       bool do_continue(){bool cont=stop_crit.do_continue(++ind_ite); if(!cont){ind_ite=-1;isConstraintSet=false;}return cont;} // CAUTION !!! pre-increment of ind_ite: the value in stop_crit.do_continue is ind_ite+1, not ind_ite
       //bool do_continue()const{return stop_crit.do_continue(++ind_ite, error);};
       
+	  /*!
+     *  \brief 
+	 * useful in hierarchical_fact, update the factors of palm_global from palm_2
+     */	
       void init_fact_from_palm(const palm4MSA& palm, bool isFactSideLeft);
       const std::vector<faust_mat<T> >& get_facts()const {return S;}
 

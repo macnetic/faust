@@ -17,14 +17,21 @@ template<typename T> class faust_spmat;
 template<typename T> class faust_core;
 template<typename T> class stopping_criterion;
 
+/*! \class hierarchical_fact
+   * \brief template class implementing hierarchical factorisation algorithm
+    : <br>  factorization of a data matrix into multiple factors using palm4MSA algorithm mixed with a hierarchical approach.
+   *
+   *
+   *\tparam T scalar numeric type, e.g float or double
+   */
 
 template<typename T>
 class hierarchical_fact
 {
    public:
-      //hierarchical_fact(); // voir avec Luc les parametres par defaut
+      
       hierarchical_fact(const faust_params<T>& params_);
-
+	  void get_facts(faust_core<T> &)const;	
       void get_facts(std::vector<faust_spmat<T> >&)const;
 	  void get_facts(std::vector<faust_mat<T> >& fact)const{fact = palm_global.get_facts();}
       void compute_facts();

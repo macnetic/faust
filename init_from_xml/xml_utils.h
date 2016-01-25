@@ -5,4 +5,6 @@
 #include <vector>
 
 
+
 std::vector<xmlChar*> get_content(xmlChar * expression, xmlXPathContextPtr ctxt);
+xmlXPathContextPtr get_context(const char * filename);

@@ -1,10 +1,10 @@
 #include <stdlib.h>
-#include "faust_params.h"
+#include "faust_params_palm.h"
 #include <iostream>
 #include <vector>
 #include<string>
 #include "faust_init_params_from_xml.h"
-#include "hierarchical_fact.h"
+#include "palm4MSA.h"
 #include "faust_core.h"
 
 
@@ -14,8 +14,8 @@ using namespace std;
 int main(int argc, char* argv[]) 
 {
 	
-	faust_params<FPP> params;
-	string config_filename(argv[1]); // filename of xml config hierarchial_fact file
+	faust_params_palm<FPP> params;
+	string config_filename(argv[1]);
 	size_t ind = config_filename.find_last_of(".");
 	if(ind<=0 || ind>= config_filename.size())
 	{
@@ -33,21 +33,21 @@ int main(int argc, char* argv[])
 	string outputfilename = config_filename_body + "_FACT.txt";
 	
 	
+	init_palm_params_from_xml(config_filename.c_str(),params);
+	cout<<"params initialisé"<<endl;
+	params.Display();
+	palm4MSA<FPP> palm(params);
 	
-	init_params_from_xml(config_filename.c_str(),params);
-	hierarchical_fact<FPP> hier_fact(params);
-	hier_fact.compute_facts();
 	
-	
-	cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
-	
+	palm.compute_facts();
+	cout<<"RMSE : "<<palm.get_RMSE()<<endl;
+	cout<<"lambda="<<std::setprecision(20)<<palm.get_lambda()<<endl;
 	
 	faust_core<FPP> faust_facts;
-	hier_fact.get_facts(faust_facts);
-	faust_facts.scalarMultiply(hier_fact.get_lambda());
+	palm.get_facts(faust_facts);
+	std::cout<<"faust_fact size : "<<faust_facts.size()<<endl;
+	faust_facts.scalarMultiply(palm.get_lambda());
 	std::cout<<"writing factorization into "<< outputfilename <<endl;
 	faust_facts.print_file(outputfilename.c_str());
-	
-	
 	
 }

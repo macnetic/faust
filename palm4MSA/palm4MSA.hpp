@@ -35,6 +35,11 @@ const char * palm4MSA<T>::class_name="palm4MSA";
 template<typename T>
 const T palm4MSA<T>::lipschitz_multiplicator=1.001;
 
+
+
+
+
+
 template<typename T>
 palm4MSA<T>::palm4MSA(const faust_params<T> & params_, const bool isGlobal_) :
    data(params_.data),
@@ -61,7 +66,8 @@ palm4MSA<T>::palm4MSA(const faust_params<T> & params_, const bool isGlobal_) :
 }
 
 template<typename T>
-palm4MSA<T>::palm4MSA(const faust_params_palm<T>& params_palm_, const bool isGlobal_) :
+palm4MSA<T>::palm4MSA(const faust_params_palm<T>& params_palm_,
+const bool isGlobal_/*=false*/) :
    stop_crit(params_palm_.stop_crit),
    data(params_palm_.data),
    lambda(params_palm_.init_lambda),
@@ -94,6 +100,17 @@ void palm4MSA<T>::compute_facts()
 	}
 
 }
+
+template<typename T>
+void palm4MSA<T>::get_facts(faust_core<T> & faust_fact) const
+{
+	faust_core<T> f(S);
+	faust_fact = f;
+	
+
+}
+
+
 
 template<typename T>
 void palm4MSA<T>::compute_projection()

@@ -28,7 +28,8 @@ class faust_core
 		faust_core(const std::vector<faust_spmat<T> >& facts, const T lambda_ = (T)1.0);
 		faust_core(const faust_core<T> & A);
 		faust_core(const std::vector<faust_mat<T> >&facts);
-		void get_facts(std::vector<faust_spmat<T> >& sparse_facts)const{sparse_facts = data;} 
+		void get_facts(std::vector<faust_spmat<T> >& sparse_facts)const{sparse_facts = data;}
+		void get_facts(std::vector<faust_mat<T> >& facts)const;	
 		int size()const{return data.size();} 
                 faust_mat<T> get_product()const;
 		faust_spmat<T> get_fact(int id) const;		
@@ -50,7 +51,7 @@ class faust_core
 		void multiply(const faust_core<T> & A);
 		//(*this) = A * (*this)
 		void multiplyLeft(const faust_core<T> & A);	
-		void scalarMultiply(const T scalar){data[0]*=scalar;}
+		void scalarMultiply(const T scalar);
 		T spectralNorm(const int nbr_iter_max, T threshold, int &flag) const;
 		~faust_core(){}
 

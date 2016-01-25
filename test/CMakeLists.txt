@@ -140,20 +140,23 @@ else()
 endif()
 
 if (XML_INC_DIR AND XML2_LIB_FILE AND FAUST_USE_XML)	
-	foreach(xmldatafile hier_fact_config MEG_config)
+	foreach(xmldatafile hier_fact_config MEG_config palm4MSA_config)
 		configure_file(${FAUST_TESTDATA_SRC_DIR}/${xmldatafile}.xml.in ${FAUST_TESTDATA_SRC_DIR}/${xmldatafile}.xml @ONLY)
 	endforeach()
 	
-	
-	configure_file(${FAUST_TESTSRC_SRC_DIR}/launch_hierarchical_fact.cpp ${FAUST_TESTSRC_BIN_DIR}/launch_hierarchical_fact.cpp COPYONLY)
+	foreach(algofile launch_hierarchical_fact launch_palm4MSA)
+		configure_file(${FAUST_TESTSRC_SRC_DIR}/${algofile}.cpp ${FAUST_TESTSRC_BIN_DIR}/${algofile}.cpp COPYONLY)
+		add_executable(${algofile} ${FAUST_TESTSRC_BIN_DIR}/${algofile}.cpp ${FAUST_XML_SRC_DIR}/xml_utils.cpp)
+		if(FAUST_USE_OPENBLAS)
+			target_link_libraries(${algofile}  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE} ${XML2_LIB_FILE})
+		else()
+			target_link_libraries(${algofile}  ${FAUST_TARGET} ${XML2_LIB_FILE})
+		endif()
+	endforeach()
 
-# add_executable(launch_hier_fact ${FAUST_TESTSRC_BIN_DIR}/launch_hierarchical_fact.cpp ${FAUST_XML_SRC_DIR}/xml_utils.cpp)
-add_executable(launch_hier_fact ${FAUST_TESTSRC_BIN_DIR}/launch_hierarchical_fact.cpp ${FAUST_XML_SRC_DIR}/xml_utils.cpp)
-   if(FAUST_USE_OPENBLAS)
-      target_link_libraries(launch_hier_fact  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE} ${XML2_LIB_FILE})
-   else()
-      target_link_libraries(launch_hier_fact  ${FAUST_TARGET} ${XML2_LIB_FILE})
-   endif()
+
+
+   
 endif()   
    
 

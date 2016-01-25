@@ -5,7 +5,7 @@
 #include "faust_exception.h"
 #include "faust_vec.h"
 
-//void new_prox_sp(faust_mat<T> & M,int k);
+
 
 
 template<typename T>
@@ -32,16 +32,6 @@ template<typename T>
 void prox_blkdiag(faust_mat<T> & M,faust_unsigned_int k);
 
 
-template<typename T>
-void prox_sp_normfree(faust_mat<T> & M,faust_unsigned_int k);
-template<typename T>
-void prox_sp_pos_normfree(faust_mat<T> & M,faust_unsigned_int k);
-template<typename T>
-void prox_spcol_normfree(faust_mat<T> & M,faust_unsigned_int k);
-template<typename T>
-void prox_splin_normfree(faust_mat<T> & M,faust_unsigned_int k);
-template<typename T>
-void prox_supp_normfree(faust_mat<T> & M,const faust_mat<T> & supp);
 
 #include "prox.hpp"
 
