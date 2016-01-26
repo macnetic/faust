@@ -22,7 +22,9 @@ class faust_params_palm
          const stopping_criterion<T> & stop_crit_ = stopping_criterion<T>(defaultNiter),
          const bool isVerbose_ = defaultVerbosity ,
          const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
-         const T init_lambda_ = defaultLambda);
+         const T init_lambda_ = defaultLambda,
+		 const bool constant_step_size_ = defaultConstantStepSize,
+		 const T step_size_ = defaultStepSize);
 
       void check_constraint_validity();
 	   faust_params_palm();	
@@ -40,6 +42,8 @@ class faust_params_palm
       stopping_criterion<T> stop_crit;
       bool isVerbose;
       bool isUpdateWayR2L;
+	  bool isConstantStepSize;
+	  T step_size;
       T init_lambda;
 		
 	  void Display() const;
@@ -48,7 +52,8 @@ class faust_params_palm
 	  static const bool defaultVerbosity;	
 	  static const bool defaultUpdateWayR2L;
 	  static const T defaultLambda;
-	  
+	  static const bool defaultConstantStepSize;
+	  static const T defaultStepSize;
 	  private :
 	  static const char *  class_name;
 

@@ -123,6 +123,7 @@ class palm4MSA
       // T lipschitz_multiplicator;
       const bool verbose;
       const bool isUpdateWayR2L;
+	  const bool isConstantStepSize; 
       bool isCComputed;
       bool isGradComputed;
       bool isProjectionComputed;
@@ -189,13 +190,7 @@ class palm4MSA
 #endif
 
 };
-#ifdef __PAS_FIXE__
-inline void palm4MSA::compute_c()
-{
-   c=10000*lipschitz_multiplicator;
-   isCComputed = true;  
-}
-#endif   
+ 
 
 
 #include "palm4MSA.hpp"

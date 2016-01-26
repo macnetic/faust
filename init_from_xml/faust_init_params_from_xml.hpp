@@ -117,6 +117,28 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 		params.init_lambda = params.defaultLambda;
 	// std::cout<<"init_lambda : "<<params.init_lambda<<std::endl;	
 	
+	//isConstantStepSize (optionnal)
+	contentS = get_content(BAD_CAST "/hierarchical_fact/constantstepsize/text()",ctxt);
+	if ((contentS.size() > 1))
+			handleError("faust_init_params_from_xml",
+			"init_params_from_xml : invalid file, optionnal constantstepsize tag must be specified at most one time");
+	if (contentS.size() == 1)		
+		params.isConstantStepSize = (bool) xmlXPathCastStringToNumber(contentS[0]);
+	else
+		params.isConstantStepSize = params.defaultConstantStepSize;
+	
+	
+	//stepsize
+	contentS = get_content(BAD_CAST "/hierarchical_fact/stepsize/text()",ctxt);
+	if ((contentS.size() > 1))
+			handleError("faust_init_params_from_xml",
+			"init_params_from_xml : invalid file, optionnal step_size tag must be specified at most one time");
+	if (contentS.size() == 1)		
+		params.step_size = (T) xmlXPathCastStringToNumber(contentS[0]);
+	else
+		params.step_size = params.defaultStepSize;
+
+	
 	//constraints
 	std::vector<xmlChar*> contentS_dim1;
 	std::vector<xmlChar*> contentS_dim2;
@@ -244,7 +266,26 @@ void init_palm_params_from_xml(const char * filename,faust_params_palm<T> & para
 		params.init_lambda = (T) xmlXPathCastStringToNumber(contentS[0]);
 	else
 		params.init_lambda = params.defaultLambda;
+		//isConstantStepSize (optionnal)
+	contentS = get_content(BAD_CAST "/palm4MSA/constantstepsize/text()",ctxt);
+	if ((contentS.size() > 1))
+			handleError("faust_init_params_from_xml",
+			"init_params_from_xml : invalid file, optionnal constantstepsize tag must be specified at most one time");
+	if (contentS.size() == 1)		
+		params.isConstantStepSize = (bool) xmlXPathCastStringToNumber(contentS[0]);
+	else
+		params.isConstantStepSize = params.defaultConstantStepSize;
 	
+	
+	//stepsize
+	contentS = get_content(BAD_CAST "/palm4MSA/stepsize/text()",ctxt);
+	if ((contentS.size() > 1))
+			handleError("faust_init_params_from_xml",
+			"init_params_from_xml : invalid file, optionnal step_size tag must be specified at most one time");
+	if (contentS.size() == 1)		
+		params.step_size = (T) xmlXPathCastStringToNumber(contentS[0]);
+	else
+		params.step_size = params.defaultStepSize;
 	
 	//constraints
 	std::vector<xmlChar*> contentS_dim1;

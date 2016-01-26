@@ -8,6 +8,9 @@
    <verbose>0</verbose>
    <updatewayR2L>0</updatewayR2L>
    <factsideleft>0</factsideleft>
+   <constantstepsize>1</constantstepsize>
+   <stepsize>0.0001</stepsize>
+   
    <init_lambda>1</init_lambda>
    <constraints>
 		<row1>

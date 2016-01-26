@@ -9,7 +9,8 @@ template<typename T> const int faust_params_palm<T>::defaultNiter = 300;
 template<typename T> const bool faust_params_palm<T>::defaultVerbosity = false;	
 template<typename T> const bool faust_params_palm<T>::defaultUpdateWayR2L = false;
 template<typename T> const T faust_params_palm<T>::defaultLambda = 1.0;
-
+template<typename T> const bool faust_params_palm<T>::defaultConstantStepSize = false;
+template<typename T> const T faust_params_palm<T>::defaultStepSize = 1e-16; 
 
 template<typename T>
 const char * faust_params_palm<T>::class_name = "faust_params_palm<T>::";
@@ -46,7 +47,9 @@ faust_params_palm<T>::faust_params_palm(
          const stopping_criterion<T> & stop_crit_ /* = stopping_criterion() */,
          const bool isVerbose_ /* = false */,
          const bool isUpdateWayR2L_ /* = false */,
-         const T init_lambda_ /* = 1.0 */) :
+         const T init_lambda_ /* = 1.0 */,
+		 const bool constant_step_size_,
+		 const T step_size_) :
             data(data_), 
             nb_fact(nb_fact_), 
             cons(cons_),
@@ -54,15 +57,15 @@ faust_params_palm<T>::faust_params_palm(
             stop_crit(stop_crit_),
             isVerbose(isVerbose_),
             isUpdateWayR2L(isUpdateWayR2L_),
-            init_lambda(init_lambda_)			
-			
+            init_lambda(init_lambda_),			
+			isConstantStepSize(constant_step_size_),
+			step_size(step_size_)
 {
  check_constraint_validity(); 
 }
 
 template<typename T>	
-faust_params_palm<T>::faust_params_palm() : data(0,0),nb_fact(0),cons(std::vector<const faust_constraint_generic*>()),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_mat<T> >()),init_lambda(defaultLambda)/*,nb_rows(0),nb_cols(0) */
-{}
+faust_params_palm<T>::faust_params_palm() : data(0,0),nb_fact(0),cons(std::vector<const faust_constraint_generic*>()),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_mat<T> >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize){}
 
 template<typename T>
 void faust_params_palm<T>::init_factors()
@@ -110,6 +113,8 @@ void faust_params_palm<T>::Display() const
 	std::cout<<"VERBOSE : "<<isVerbose<<std::endl;
 	std::cout<<"UPDATEWAY : "<<isUpdateWayR2L<<std::endl;
 	std::cout<<"INIT_LAMBDA : "<<init_lambda<<std::endl;
+	std::cout<<"ISCONSTANTSTEPSIZE : "<<isConstantStepSize<<std::endl;
+	std::cout<<"step_size : "<<step_size<<std::endl;
 	std::cout<<"data :  nbRow "<<data.getNbRow()<<" NbCol : "<< data.getNbCol()<<std::endl;
 	std::cout<<"stop_crit : "<<stop_crit.get_crit()<<std::endl;
 	/*cout<<"INIT_FACTS :"<<endl;

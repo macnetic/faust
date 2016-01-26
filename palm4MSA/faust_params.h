@@ -35,7 +35,9 @@ class faust_params
 	  const bool isVerbose_ = defaultVerbosity ,
 	  const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
 	  const bool isFactSideLeft_ = defaultFactSideLeft ,
-	  const T init_lambda_ = defaultLambda );
+	  const T init_lambda_ = defaultLambda ,
+	  const bool constant_step_size_ = defaultConstantStepSize,
+	  const T step_size_ = defaultStepSize);
 	  
 	  	
 
@@ -79,6 +81,10 @@ class faust_params
 	*	
 		\tparam init_lambda_ : (optionnal) specifies a starting point for the algorithm.<br> The default value is 1.0 <br>
 		
+		\tparam constant_step_size : (optionnal) specifies if the stepsize of the gradient descent  is constant.<br> The default value is false. In this case, the stepsize is controlled by the lipschitz modulus of the gradient <br>
+		
+		\tparam step_size : (optionnal) specifies the step size of the gradient descent, USELESS if constant_step_size is false. default value : 1e-16
+		
 		
      */		
       faust_params(
@@ -91,7 +97,9 @@ class faust_params
 	const bool isVerbose_ = defaultVerbosity ,
 	const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
 	const bool isFactSideLeft_ = defaultFactSideLeft ,
-	const T init_lambda_ = defaultLambda );
+	const T init_lambda_ = defaultLambda ,
+	const bool constant_step_size_ = defaultConstantStepSize,
+	const T step_size_ = defaultStepSize);
 	
 	void init_from_file(const char* filename);	
 	  faust_params();
@@ -118,6 +126,8 @@ class faust_params
       bool isUpdateWayR2L;
       bool isFactSideLeft;
       T init_lambda;
+	  bool isConstantStepSize;
+	  T step_size;
 	  
 	  //default value
 	static const int defaultNiter1;
@@ -126,7 +136,8 @@ class faust_params
 	static const bool defaultFactSideLeft;
 	static const bool defaultUpdateWayR2L;
 	static const T defaultLambda;
-	
+	static const bool defaultConstantStepSize;
+	static const T defaultStepSize;
 	static const T defaultDecreaseSpeed;
 	static const T defaultResiduumPercent;
 		

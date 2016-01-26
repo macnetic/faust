@@ -34,7 +34,8 @@
 			</constraint>
 	</constraints>
 	<init_fact>@FAUST_TESTDATA_SRC_DIR@/hier_fact_config_FACT.txt</init_fact>	
-			
+	<constantstepsize>1</constantstepsize>
+	<stepsize>0.0001</stepsize>	
 		
    
 </palm4MSA>

@@ -51,18 +51,25 @@ palm4MSA<T>::palm4MSA(const faust_params<T> & params_, const bool isGlobal_) :
    ind_ite(-1),
    verbose(params_.isVerbose),
    isUpdateWayR2L(params_.isUpdateWayR2L),
-   isCComputed(false),
+   isConstantStepSize(params_.isConstantStepSize),
    isGradComputed(false),
    isProjectionComputed(false),
    isLastFact(false),
    isConstraintSet(false),
    isGlobal(isGlobal_),
-   isInit(false)
+   isInit(false),
+   c(1/params_.step_size)
 {
    if(isGlobal)
       stop_crit = stopping_criterion<T>(params_.stop_crit_global);
    else
       stop_crit = stopping_criterion<T>(params_.stop_crit_2facts);
+  
+	if (isConstantStepSize)
+		isCComputed = true;
+	else
+		isCComputed = false;
+	
 }
 
 template<typename T>
@@ -80,13 +87,18 @@ const bool isGlobal_/*=false*/) :
    ind_ite(-1),
    verbose(params_palm_.isVerbose),
    isUpdateWayR2L(params_palm_.isUpdateWayR2L),
-   isCComputed(false),
+   isConstantStepSize(params_palm_.isConstantStepSize),
    isGradComputed(false),
    isProjectionComputed(false),
    isLastFact(false),
    isConstraintSet(false),
    isGlobal(isGlobal_)
 {
+   	if (isConstantStepSize)
+		isCComputed = true;
+	else
+		isCComputed = false;
+   
    check_constraint_validity();
 
 }
@@ -525,27 +537,22 @@ void palm4MSA<T>::compute_c()
 	t_global_compute_c.start();
 #endif
 
-   //std::cout<<"calcul pas : "<<std::endl;
-   // T nL=LorR.spectralNorm();
-   //T nR=RorL[ind_fact].spectralNorm();
-   //c=lipschitz_multiplicator*nR*nR*nL*nL*lambda*lambda;
 
 
-   faust_int flag1,flag2;
+   if (!isConstantStepSize)
+   {	
+		faust_int flag1,flag2;
+	   
+	   int nbr_iter = 10000;
+	   T threshold = 1e-16;
+	   T nL1=LorR.spectralNorm(nbr_iter,threshold,flag1);
+	   T nR1=RorL[ind_fact].spectralNorm(nbr_iter,threshold,flag2);
+		c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*lambda*lambda;
+
+   }
    
-   int nbr_iter = 10000;
-   T threshold = 1e-16;
-   T nL1=LorR.spectralNorm(nbr_iter,threshold,flag1);
-   T nR1=RorL[ind_fact].spectralNorm(nbr_iter,threshold,flag2);
-    c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*lambda*lambda;
+   isCComputed = true;  
 
-   //std::cout<<" nL : "<<nL <<" nL1 : "<<nL1<<" flag : "<<flag1<<std::endl;
-   //std::cout<<" nR : "<<nR <<" nR1 : "<<nR1<<" flag : "<<flag2<<std::endl;
-   //std::cout<<" c : "<< c <<" c1 : "<<c1<<std::endl<<std::endl;
-   //std::cout<<" c : "<< c <<std::endl;
-
-
-   isCComputed = true;
    
    #ifdef __COMPILE_TIMERS__
 	t_global_compute_c.stop();
@@ -651,12 +658,15 @@ t_local_next_step.start();
          isLastFact = false;
 
       ind_fact = ind_ptr[j];
-
-      isCComputed = false;
+	  if (!isConstantStepSize)	
+			isCComputed = false;
+		
       isGradComputed = false;
       isProjectionComputed = false;
-      
-      compute_c();
+	
+	  if (!isConstantStepSize)	
+		compute_c();
+	
       compute_grad_over_c();
       compute_projection();
   

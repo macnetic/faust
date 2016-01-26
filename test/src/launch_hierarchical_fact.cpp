@@ -8,7 +8,7 @@
 #include "faust_core.h"
 
 
-typedef float FPP;
+typedef double FPP;
 using namespace std;
 
 int main(int argc, char* argv[]) 
