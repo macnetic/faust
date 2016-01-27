@@ -93,6 +93,7 @@ const bool isGlobal_/*=false*/) :
    isLastFact(false),
    isConstraintSet(false),
    isGlobal(isGlobal_)
+   c(1/params_.step_size)
 {
    	if (isConstantStepSize)
 		isCComputed = true;
