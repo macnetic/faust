@@ -5,17 +5,13 @@ configure_file(${FAUST_MEXINTERFACETOOLS_SRC_DIR}/matlab_faust.m.in ${FAUST_TEST
 
 if(FAUST_USE_MATIO)
 
-	if(FAUST_USE_XML)
-		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_MATIO_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${MATIO_INC_DIR} ${FAUST_XML_SRC_DIR} ${XML_INC_DIR})
-	else()
-		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_MATIO_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${MATIO_INC_DIR})
-	endif()
+	
+	include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_MATIO_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${MATIO_INC_DIR})
+
 else()
-	if(FAUST_USE_XML)
-		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${FAUST_XML_SRC_DIR} ${XML_INC_DIR})
-	else()
-		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR})
-	endif()
+	
+	include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR})
+
 endif()
 
 if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
@@ -52,9 +48,9 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    # meg
    add_executable(meg ${FAUST_TESTSRC_BIN_DIR}/MEG_fact.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
    if(FAUST_USE_OPENBLAS)
-      target_link_libraries(meg ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+      target_link_libraries(meg ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
    else()
-      target_link_libraries(meg ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(meg ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
 
    # faust
@@ -139,25 +135,7 @@ else()
    
 endif()
 
-if (XML_INC_DIR AND XML2_LIB_FILE AND FAUST_USE_XML)	
-	foreach(xmldatafile hier_fact_config MEG_config palm4MSA_config)
-		configure_file(${FAUST_TESTDATA_SRC_DIR}/${xmldatafile}.xml.in ${FAUST_TESTDATA_SRC_DIR}/${xmldatafile}.xml @ONLY)
-	endforeach()
-	
-	foreach(algofile launch_hierarchical_fact launch_palm4MSA)
-		configure_file(${FAUST_TESTSRC_SRC_DIR}/${algofile}.cpp ${FAUST_TESTSRC_BIN_DIR}/${algofile}.cpp COPYONLY)
-		add_executable(${algofile} ${FAUST_TESTSRC_BIN_DIR}/${algofile}.cpp ${FAUST_XML_SRC_DIR}/xml_utils.cpp)
-		if(FAUST_USE_OPENBLAS)
-			target_link_libraries(${algofile}  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE} ${XML2_LIB_FILE})
-		else()
-			target_link_libraries(${algofile}  ${FAUST_TARGET} ${XML2_LIB_FILE})
-		endif()
-	endforeach()
-
-
-
-   
-endif()   
+ 
    
 
 
