@@ -25,6 +25,7 @@ void handleError(const char* classe_name , const  char* txt)
 	throw std::logic_error((s0+s1+s2));
 }
 
+
 void handleError(const  char* txt)
 {
 
