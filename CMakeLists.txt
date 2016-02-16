@@ -208,7 +208,17 @@ endif()
 
 # test if executable matlab is in the path
 if(UNIX)
+message(STATUS "MATLAB_DIR_TMP 1 = ${MATLAB_DIR_TMP}")
 	exec_program("which matlab | xargs echo" OUTPUT_VARIABLE MATLAB_DIR_TMP)
+message(STATUS "MATLAB_DIR_TMP 2 = ${MATLAB_DIR_TMP}")
+   exec_program("readlink ${MATLAB_DIR_TMP}" OUTPUT_VARIABLE READLINK_TMP)
+message(STATUS "READLINK_TMP = ${READLINK_TMP}")
+   if(${READLINK_TMP} MATCHES matlab)
+      set(MATLAB_DIR_TMP ${READLINK_TMP})
+      message(STATUS "MATLAB_DIR_TMP 3 = ${MATLAB_DIR_TMP}")
+   endif()
+   message(STATUS "MATLAB_DIR_TMP 4 = ${MATLAB_DIR_TMP}")
+
 elseif(WIN32)
 	exec_program("where matlab.exe" OUTPUT_VARIABLE MATLAB_DIR_TMP)
 endif()
