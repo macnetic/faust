@@ -38,7 +38,7 @@ public:
   faust_cu_mat(const faust_mat<faust_real>& M, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0 );
 
 #ifdef __COMPILE_SPMAT__
-  faust_cu_mat(const faust_cu_spmat& cu_S, cusparseHandle_t cusparseHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
+  faust_cu_mat(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
   faust_cu_mat(const faust_spmat<faust_real>& S, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
 #endif
   faust_cu_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE);
@@ -82,7 +82,7 @@ public:
   void transpose(cublasHandle_t);
   void init_from_transpose(const faust_cu_mat<faust_real>& cu_M, cublasHandle_t);
 #ifdef __COMPILE_SPMAT__
-  void init_from_transpose(const faust_cu_spmat& cu_S, cusparseHandle_t);
+  void init_from_transpose(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t);
 #endif
 
   // multiply (*this) = (*this) * A
@@ -107,15 +107,15 @@ public:
   void operator=(const faust_mat<faust_real>& A);
 #ifdef __COMPILE_SPMAT__
   void operator=(const faust_spmat<faust_real>& S);
-  void operator=(const faust_cu_spmat& cu_S);
-  void init_from_cu_spmat(const faust_cu_spmat& cu_S, cusparseHandle_t, const faust_real coeff=1.0);
+  void operator=(const faust_cu_spmat<faust_real>& cu_S);
+  void init_from_cu_spmat(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t, const faust_real coeff=1.0);
  
-  // operator+=(const faust_cu_spmat&) is not defined. Use add(const faust_cu_spmat&, cusparseHandle_t)
-  void operator+=(const faust_cu_spmat& cu_S);
-  void add(const faust_cu_spmat& S, cusparseHandle_t);
-  // operator-=(const faust_cu_spmat&) is not defined. Use sub(const faust_cu_spmat&, cusparseHandle_t)
-  void operator-=(const faust_cu_spmat& cu_S);
-  void sub(const faust_cu_spmat& S, cusparseHandle_t);
+  // operator+=(const faust_cu_spmat<faust_real>&) is not defined. Use add(const faust_cu_spmat<faust_real>&, cusparseHandle_t)
+  void operator+=(const faust_cu_spmat<faust_real>& cu_S);
+  void add(const faust_cu_spmat<faust_real>& S, cusparseHandle_t);
+  // operator-=(const faust_cu_spmat<faust_real>&) is not defined. Use sub(const faust_cu_spmat<faust_real>&, cusparseHandle_t)
+  void operator-=(const faust_cu_spmat<faust_real>& cu_S);
+  void sub(const faust_cu_spmat<faust_real>& S, cusparseHandle_t);
 #endif
 
   void add(const faust_cu_mat<faust_real>& cu_A);
@@ -127,8 +127,8 @@ public:
   // (*this)(i,j)=((*this)(i,j)) * A(i,j)
   void scalarMultiply(const faust_cu_mat<faust_real>& cu_A);
 #ifdef __COMPILE_SPMAT__
-  void multiplyRight(const faust_cu_spmat& cu_S, cublasHandle_t, cusparseHandle_t);
-  void multiplyLeft(const faust_cu_spmat& cu_S, cusparseHandle_t);
+  void multiplyRight(const faust_cu_spmat<faust_real>& cu_S, cublasHandle_t, cusparseHandle_t);
+  void multiplyLeft(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t);
 #endif
 
    void Display()const;
@@ -229,11 +229,11 @@ inline void faust_cu_mat<faust_real>::multiplyLeft(const faust_cu_mat<faust_real
 
 #ifdef __COMPILE_SPMAT__
 template <typename faust_real>
-   inline void faust_cu_mat<faust_real>::multiplyRight(const faust_cu_spmat& cu_S, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle)
+   inline void faust_cu_mat<faust_real>::multiplyRight(const faust_cu_spmat<faust_real>& cu_S, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle)
    {gemm(*this, cu_S, *this, 1.0, 0.0, 'N', 'N', cublasHandle, cusparseHandle);}
 
 template <typename faust_real>
-   inline void faust_cu_mat<faust_real>::multiplyLeft(const faust_cu_spmat& cu_S, cusparseHandle_t cusparseHandle)
+   inline void faust_cu_mat<faust_real>::multiplyLeft(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
    {gemm(cu_S, *this, *this, 1.0, 0.0, 'N', 'N', cusparseHandle);}
 #endif
 

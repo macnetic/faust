@@ -58,6 +58,36 @@ cu_A.t_add_ext.stop();
 }
 
 
+template <typename faust_real>
+faust_real dot(const faust_cu_vec<faust_real>& cu_v1, const faust_cu_vec<faust_real>& cu_v2, cublasHandle_t cublasHandle)
+{
+   if(cu_v1.size() != cu_v2.size())
+      handleError("LinAlgebra_cu","dot : the two vectors don't have the same size");
+   if(cu_v1.size() > 0)
+   {
+      int currentGPU;
+      faust_cudaGetDevice(&currentGPU);
+      faust_cudaSetDevice(cu_v1.getDevice());
+      const faust_cu_vec<faust_real>* cu_v2_ptr = &cu_v2;
+      if(cu_v2.getDevice() != cu_v1.getDevice())
+         cu_v2_ptr = new faust_cu_vec<faust_real>(cu_v2, cu_v1.getDevice());
+
+      faust_real result=0.0;
+
+      faust_cu_dot(cublasHandle, cu_v1.size(), cu_v1.getData(), 1, cu_v2_ptr->getData(), 1, &result);
+
+      if(cu_v2.getDevice() != cu_v1.getDevice())
+         delete cu_v2_ptr;
+      faust_cudaSetDevice(currentGPU);
+      return result;
+   }
+   else
+   {
+      // display warning as vector is empty
+      return (faust_real)0.0;
+   }
+
+}
 
 template <typename faust_real>
 void gemv(const faust_cu_mat<faust_real>& cu_A, const faust_cu_vec<faust_real>& cu_x, faust_cu_vec<faust_real>& cu_y,const faust_real alpha, const faust_real beta, char typeA, cublasHandle_t cublasHandle)

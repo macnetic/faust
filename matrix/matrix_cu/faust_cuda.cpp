@@ -1,6 +1,17 @@
 #include "faust_cuda.h"
 
 template<>
+void faust_cu_dot<float>(cublasHandle_t handle, int n,
+   const float* x, int incx, const float* y, int incy, float* result)
+{faust_cublasSdot(handle,n,x,incx,y,incy,result);}
+
+template<>
+void faust_cu_dot<double>(cublasHandle_t handle, int n,
+   const double* x, int incx, const double* y, int incy, double* result)
+{faust_cublasDdot(handle,n,x,incx,y,incy,result);}
+
+
+template<>
 void faust_cu_gemv<float>(cublasHandle_t handle, cublasOperation_t trans,
    int m, int n, const float* alpha, const float* A, int lda,
    const float* x, int incx, const float* beta, float* y, int incy)

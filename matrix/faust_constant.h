@@ -19,11 +19,14 @@
 #endif
 
 
+
 typedef unsigned long int faust_unsigned_int;
 typedef long int faust_int;
 
 const double FAUST_PRECISION = 0.0001;
 const faust_unsigned_int nbr_iter_norm = 100; 
 
+#define FAUST_GPU_ALREADY_SET -3
+#define FAUST_DEFAULT_CUDA_DEVICE 0
 
 #endif

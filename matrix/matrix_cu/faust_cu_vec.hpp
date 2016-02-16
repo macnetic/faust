@@ -299,6 +299,10 @@ faust_real faust_cu_vec<faust_real>::norm() const
 }
 
 template <typename faust_real>
+faust_real faust_cu_vec<faust_real>::dot(const faust_cu_vec<faust_real>& cu_v, cublasHandle_t cublasHandle) const
+{return dot(*this, cu_v, cublasHandle);}
+
+template <typename faust_real>
 bool faust_cu_vec<faust_real>::operator==(const faust_cu_vec<faust_real>& cu_v)const
 {
    if(data!=NULL && data==cu_v.data && device== cu_v.device)

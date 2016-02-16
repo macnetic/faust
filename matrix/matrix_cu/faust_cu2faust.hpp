@@ -10,7 +10,7 @@
    #include "faust_spmat.h"
    #include "faust_cu_spmat.h"
 #endif
-
+#include <typeinfo>
 
 const char * class_name="faust_cu2faust";
 

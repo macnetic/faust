@@ -1,5 +1,5 @@
-#ifndef LINALGEBRA_H
-#define LINALGEBRA_H
+#ifndef __LINALGEBRA_CU_H
+#define __LINALGEBRA_CU_H
 
 #include "faust_constant.h"
 #ifdef __COMPILE_SPMAT__
@@ -27,6 +27,10 @@ void setOp(const faust_cu_mat<faust_real>& cu_A, const char opA, faust_unsigned_
 // C = A + B;
 template <typename faust_real>
 void add(const faust_cu_mat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C);
+
+// dot product : sum_i(v1[i]*v2[i])
+template <typename faust_real>
+faust_real dot(const faust_cu_vec<faust_real>& cu_v1, const faust_cu_vec<faust_real>& cu_v2, cublasHandle_t cublasHandle);
 
 // y = alpha*op(A)*x + beta*y
 template <typename faust_real>
@@ -86,7 +90,7 @@ template <typename faust_real>
 void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const  faust_real alpha, const faust_real beta, const char opA, const char opB, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle);
 // C = op(A)*op(B) ; with A sparse
 template <typename faust_real>
-void gemm(const faust_cu_spmat& cu_A, const faust_cu_mat& cu_B, faust_cu_mat& cu_C, const char opA, const char opB, cusparseHandle_t cusparseHandle);
+void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const char opA, const char opB, cusparseHandle_t cusparseHandle);
 // C = op(A)*op(B) ; with B sparse
 template <typename faust_real>
 void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const char opA, const char opB, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle);

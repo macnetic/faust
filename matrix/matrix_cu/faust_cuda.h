@@ -13,6 +13,11 @@ inline void faust_cu_csr2coo(cusparseHandle_t handle, const int *csrRowPtr,
    int nnz, int m, int *cooRowInd, cusparseIndexBase_t idxBase);
 
 template <typename faust_real>
+void faust_cu_dot(cublasHandle_t handle, int n,
+   const faust_real* x, int incx, const faust_real* y, int incy, faust_real* result);
+
+
+template <typename faust_real>
 void faust_cu_gemv(cublasHandle_t handle, cublasOperation_t trans,
    int m, int n, const faust_real* alpha, const faust_real* A, int lda,
    const faust_real* x, int incx, const faust_real* beta, faust_real* y, int incy);
@@ -205,6 +210,13 @@ inline const char* cusparseGetErrorString(cusparseStatus_t cusparseStat)
 
 #define faust_cublasDestroy(handle) do {                   \
  faust_cublasSafe(cublasDestroy(handle),"cublasDestroy");  \
+     } while (0)
+
+#define faust_cublasSdot(handle,n,x,incx,y,incy,result) do {                   \
+ faust_cublasSafe(cublasSdot(handle,n,x,incx,y,incy,result),"cublasSdot");  \
+     } while (0)
+#define faust_cublasDdot(handle,n,x,incx,y,incy,result) do {                   \
+ faust_cublasSafe(cublasDdot(handle,n,x,incx,y,incy,result),"cublasDdot");  \
      } while (0)
 
 #define faust_cublasSgemv(handle,opA,m,n,alpha,A_data,lda,x_data,incx,beta,y_data,incy) do {                   \

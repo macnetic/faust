@@ -1,8 +1,13 @@
 #include "faust_constraint_int.h"
 #include <iostream>
 #include <cstdlib>
-#include "faust_mat.h"
 #include "faust_exception.h"
+
+#ifdef __COMPILE_GPU__
+   #include "faust_cu_mat.h"
+#else
+   #include "faust_mat.h"
+#endif
 
 const char * faust_constraint_int::class_name="faust_constraint_int";
 

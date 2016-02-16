@@ -14,7 +14,7 @@ template<typename faust_real> class faust_cu_spmat;
 template<typename T, typename U>
 void faust_cu2faust(faust_vec<T>& v, const faust_cu_vec<U>& cu_v, cudaStream_t stream=0);
 template<typename T, typename U>
-void faust_cu2faust(faust_mat& M, const faust_cu_mat<U>& cu_M, cudaStream_t stream=0);
+void faust_cu2faust(faust_mat<T>& M, const faust_cu_mat<U>& cu_M, cudaStream_t stream=0);
 #ifdef __COMPILE_SPMAT__
 template<typename T, typename U>
 void faust_cu2faust(faust_spmat<T>& S, const faust_cu_spmat<U>& cu_S, cudaStream_t stream=0);

@@ -1,10 +1,15 @@
 #include "faust_constraint_generic.h"
 #include "faust_constraint_int.h"
 #include "faust_constraint_real.h"
-#include "faust_constraint_mat.h"
-#include "faust_constraint_type.h"
 #include <typeinfo>
 #include "faust_exception.h"
+
+#include "faust_constraint_type.h"
+#ifdef __COMPILE_GPU__
+   #include "faust_constraint_mat_cu.h"
+#else
+   #include "faust_constraint_mat.h"
+#endif
 
 template<typename T> class faust_constraint_real;
 template<typename T> class faust_constraint_mat;

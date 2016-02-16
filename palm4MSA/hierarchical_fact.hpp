@@ -3,8 +3,14 @@
 #include "faust_timer.h"
 #endif
 
-#include "faust_spmat.h"
+#ifdef __COMPILE_GPU
+   #include "faust_cu_spmat.h"
+#else
+   #include "faust_spmat.h"
+#endif
+
 #include "faust_core.h"
+
 #include "faust_exception.h"
 using namespace std;
 
@@ -139,14 +145,14 @@ palm_2.print_prox_timers();
 template<typename T>
 void hierarchical_fact<T>::get_facts(faust_core<T> & fact)const
 {
-	std::vector<faust_spmat<T> > spfacts;
+	std::vector<faust_spmatrix > spfacts;
 	get_facts(spfacts);
 	faust_core<T> res(spfacts);
 	fact = res;
 }
 
 template<typename T>
-void hierarchical_fact<T>::get_facts(std::vector<faust_spmat<T> >& sparse_facts)const 
+void hierarchical_fact<T>::get_facts(std::vector<faust_spmatrix >& sparse_facts)const 
 {
    /*if(!isFactorizationComputed)
    {
@@ -154,7 +160,7 @@ void hierarchical_fact<T>::get_facts(std::vector<faust_spmat<T> >& sparse_facts)
       exit(EXIT_FAILURE);
    }*/
 
-   const std::vector<faust_mat<T> >& full_facts = palm_global.get_facts();
+   const std::vector<faust_matrix >& full_facts = palm_global.get_facts();
    sparse_facts.resize(full_facts.size());
    for (int i=0 ; i<sparse_facts.size() ; i++)
       sparse_facts[i] = full_facts[i];
@@ -195,16 +201,16 @@ const std::vector<std::vector< T> >& hierarchical_fact<T>::get_errors()const
 template<typename T>
 void hierarchical_fact<T>::compute_errors()
 {  	
-   vector<faust_spmat<T> > sp_facts;
+   vector<faust_spmatrix > sp_facts;
    get_facts(sp_facts);
 
 
 
 
    faust_core<T> faust_core_tmp(sp_facts, get_lambda());
-   const faust_mat<T> estimate_mat = faust_core_tmp.get_product();
+   const faust_matrix estimate_mat = faust_core_tmp.get_product();
 
-   faust_mat<T> data(palm_global.get_data());
+   faust_matrix data(palm_global.get_data());
 
    T data_norm = data.norm();
    data -= estimate_mat;

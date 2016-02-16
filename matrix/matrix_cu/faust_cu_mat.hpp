@@ -26,7 +26,7 @@ template <typename faust_real>
 const char * faust_cu_mat<faust_real>::class_name = "faust_cu_mat<faust_real>::";
 
 template <typename faust_real>
-faust_cu_mat::faust_cu_mat(const faust_real *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, bool dataFromGPU, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
+faust_cu_mat<faust_real>::faust_cu_mat(const faust_real *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, bool dataFromGPU, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
 {
     if(nbRow*nbCol == 0)
     {
@@ -45,7 +45,7 @@ faust_cu_mat::faust_cu_mat(const faust_real *data_,const faust_unsigned_int nbRo
 
 
 template <typename faust_real>
-faust_cu_mat::faust_cu_mat(const faust_cu_mat<faust_real>& cu_M, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
+faust_cu_mat<faust_real>::faust_cu_mat(const faust_cu_mat<faust_real>& cu_M, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
 {
     if(cu_M.isIdentity || cu_M.isZeros || cu_M.dim1*cu_M.dim2==0)
     {
@@ -60,7 +60,7 @@ faust_cu_mat::faust_cu_mat(const faust_cu_mat<faust_real>& cu_M, int dstDevice/*
 }
 
 template <typename faust_real>
-faust_cu_mat::faust_cu_mat(const faust_mat<faust_real>& M, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL),device(FAUST_DEFAULT_CUDA_DEVICE)
+faust_cu_mat<faust_real>::faust_cu_mat(const faust_mat<faust_real>& M, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL),device(FAUST_DEFAULT_CUDA_DEVICE)
 {
     if(M.estIdentite() || M.estNulle() || M.getNbRow()*M.getNbCol()==0)
     {
@@ -78,7 +78,7 @@ faust_cu_mat::faust_cu_mat(const faust_mat<faust_real>& M, int dstDevice/*=FAUST
 
 #ifdef __COMPILE_SPMAT__
 template <typename faust_real>
-faust_cu_mat::faust_cu_mat(const faust_cu_spmat<faust_real>& cu_S,cusparseHandle_t cusparseHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
+faust_cu_mat<faust_real>::faust_cu_mat(const faust_cu_spmat<faust_real>& cu_S,cusparseHandle_t cusparseHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
 {
     if(cu_S.getNonZeros() == 0)
     {
@@ -97,7 +97,7 @@ faust_cu_mat::faust_cu_mat(const faust_cu_spmat<faust_real>& cu_S,cusparseHandle
 
     const faust_cu_spmat<faust_real>* cu_S_dst = &cu_S;
     if(dstDevice != cu_S.getDevice())
-        cu_S_dst = new faust_cu_spmat(cu_S, dstDevice);
+        cu_S_dst = new faust_cu_spmat<faust_real>(cu_S, dstDevice);
 
     faust_cu_csr2dense(cusparseHandle,
             dim1,dim2,
@@ -115,7 +115,7 @@ faust_cu_mat::faust_cu_mat(const faust_cu_spmat<faust_real>& cu_S,cusparseHandle
 #endif
 
 template <typename faust_real>
-faust_cu_mat::faust_cu_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
+faust_cu_mat<faust_real>::faust_cu_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
 {
     resize(nbRow, nbCol, dstDevice);
 }
@@ -125,7 +125,7 @@ faust_cu_mat::faust_cu_mat(const faust_unsigned_int nbRow, const faust_unsigned_
 /// GETTEUR SETTEUR ///
 
 template <typename faust_real>
-void faust_cu_mat::_create(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int device_)
+void faust_cu_mat<faust_real>::_create(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int device_)
 {
    if(nbRow<0 || nbCol<0)
        handleError(class_name, "_create : incorrect dimensions");
@@ -157,7 +157,7 @@ void faust_cu_mat::_create(const faust_unsigned_int nbRow, const faust_unsigned_
 }
 
 template <typename faust_real>
-void faust_cu_mat::_clear()
+void faust_cu_mat<faust_real>::_clear()
 {
    if(dim1*dim2>0 && !isZeros && !isIdentity)    
    {
@@ -183,9 +183,9 @@ void faust_cu_mat::_clear()
 
 
 template <typename faust_real>
-void faust_cu_mat::resize(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int device_)
+void faust_cu_mat<faust_real>::resize(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int device_)
 {
-   if(nbRow*nbCol!=dim1*dim2 || (device_!=device) || isIdentity || isZeros))
+   if(nbRow*nbCol!=dim1*dim2 || (device_!=device) || isIdentity || isZeros)
    {
       _clear();
       _create(nbRow, nbCol, device_);
@@ -201,7 +201,7 @@ void faust_cu_mat::resize(const faust_unsigned_int nbRow, const faust_unsigned_i
 }
 
 template <typename faust_real>
-void faust_cu_mat::copyFromHost(const faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
+void faust_cu_mat<faust_real>::copyFromHost(const faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
     resize(nbRow, nbCol, dstDevice);
     int currentGPU;
@@ -213,14 +213,14 @@ void faust_cu_mat::copyFromHost(const faust_real *data_, const faust_unsigned_in
 }
 
 template <typename faust_real>
-void faust_cu_mat::copyFromDevice(const faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
+void faust_cu_mat<faust_real>::copyFromDevice(const faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
     resize(nbRow, nbCol, dstDevice);
     faust_cudaMemcpyPeerAsync(data, dstDevice, data_, srcDevice, nbRow*nbCol*sizeof(faust_real), stream);
 }
 
 template <typename faust_real>
-void faust_cu_mat::copyToHost(faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, cudaStream_t stream/*=0*/)const
+void faust_cu_mat<faust_real>::copyToHost(faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, cudaStream_t stream/*=0*/)const
 {
     int currentGPU;
     faust_cudaGetDevice(&currentGPU);
@@ -231,13 +231,13 @@ void faust_cu_mat::copyToHost(faust_real *data_, const faust_unsigned_int nbRow,
 }
 
 template <typename faust_real>
-void faust_cu_mat::copyToDevice(faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)const
+void faust_cu_mat<faust_real>::copyToDevice(faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)const
 {
        faust_cudaMemcpyPeerAsync(data_, dstDevice, data, device, nbRow*nbCol*sizeof(faust_real), stream);
 }
 
 template <typename faust_real>
-void faust_cu_mat::init(const faust_cu_mat<faust_real>& cu_M, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
+void faust_cu_mat<faust_real>::init(const faust_cu_mat<faust_real>& cu_M, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
     if(cu_M.isIdentity || cu_M.isZeros || data==NULL )
     {
@@ -255,7 +255,7 @@ void faust_cu_mat::init(const faust_cu_mat<faust_real>& cu_M, int dstDevice/*=FA
 }
 
 template <typename faust_real>
-void faust_cu_mat::moveToDevice(int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
+void faust_cu_mat<faust_real>::moveToDevice(int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
    if(device == dstDevice)
       return;
@@ -280,7 +280,7 @@ void faust_cu_mat::moveToDevice(int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cud
 }
 
 template <typename faust_real>
-void faust_cu_mat::setZeros(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const int device_)
+void faust_cu_mat<faust_real>::setZeros(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const int device_)
 {
     resize(0,0,device_);
     dim1 = nbRow;
@@ -290,7 +290,7 @@ void faust_cu_mat::setZeros(const faust_unsigned_int nbRow, const faust_unsigned
 }
 
 template <typename faust_real>
-void faust_cu_mat::setEyes(const faust_unsigned_int nbRow, const int device_)
+void faust_cu_mat<faust_real>::setEyes(const faust_unsigned_int nbRow, const int device_)
 {
     if(nbRow==device_)
         cerr << __FILE__ << ":" << __LINE__ << " : Warning - prototype is setEyes(const faust_unsigned_int nbRow, const int device_) and not setEyes(const int nbRow, const int nbCol). Please check whether syntax is correct" << endl;
@@ -302,7 +302,7 @@ void faust_cu_mat::setEyes(const faust_unsigned_int nbRow, const int device_)
  /// OPERATION BASIQUE ///
 
 template <typename faust_real>
-void faust_cu_mat::transpose(cublasHandle_t cublasHandle)
+void faust_cu_mat<faust_real>::transpose(cublasHandle_t cublasHandle)
 {
 
 #ifdef __COMPILE_TIMERS__
@@ -368,14 +368,14 @@ t_transpose.stop();
 }
 
 template <typename faust_real>
-void faust_cu_mat::init_from_transpose(const faust_cu_mat<faust_real>& cu_A, cublasHandle_t cublasHandle)
+void faust_cu_mat<faust_real>::init_from_transpose(const faust_cu_mat<faust_real>& cu_A, cublasHandle_t cublasHandle)
 {
 #ifdef __COMPILE_TIMERS__
 t_transpose.start();
 #endif
 
 if(cu_A == (*this))
-            handleError(class_name, "init_from_transpose(const faust_cu_mat<faust_real>&) : input GPU data is the same that the current GPU data. Try using faust_cu_mat::transpose instead, in this particular case.");
+            handleError(class_name, "init_from_transpose(const faust_cu_mat<faust_real>&) : input GPU data is the same that the current GPU data. Try using faust_cu_mat<faust_real>::transpose instead, in this particular case.");
 
    if(cu_A.isZeros)
    {
@@ -439,7 +439,7 @@ t_transpose.stop();
 
 #ifdef __COMPILE_SPMAT__
 template <typename faust_real>
-void faust_cu_mat::init_from_transpose(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
+void faust_cu_mat<faust_real>::init_from_transpose(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
 {
 #ifdef __COMPILE_TIMERS__
 t_transpose.start();
@@ -510,7 +510,7 @@ t_transpose.stop();
 /*
  // former definition before multiply become an inline member
 template <typename faust_real>
-void faust_cu_mat::multiplyRight(const faust_cu_mat<faust_real>& cu_B, cublasHandle_t cublasHandle)
+void faust_cu_mat<faust_real>::multiplyRight(const faust_cu_mat<faust_real>& cu_B, cublasHandle_t cublasHandle)
 {
 
 #ifdef __COMPILE_TIMERS__
@@ -587,7 +587,7 @@ t_mult_right.stop();
 /*
  // former definition before multiply become an inline member
 template <typename faust_real>
-void faust_cu_mat::multiplyLeft(faust_cu_mat<faust_real>& cu_A, cublasHandle_t cublasHandle)
+void faust_cu_mat<faust_real>::multiplyLeft(faust_cu_mat<faust_real>& cu_A, cublasHandle_t cublasHandle)
 {
 
 #ifdef __COMPILE_TIMERS__
@@ -660,7 +660,7 @@ void faust_cu_mat::multiplyLeft(faust_cu_mat<faust_real>& cu_A, cublasHandle_t c
 */
 
 template <typename faust_real>
-faust_real faust_cu_mat::max() const
+faust_real faust_cu_mat<faust_real>::max() const
 {
    if(isZeros)
       return (faust_real)0.0;
@@ -683,7 +683,7 @@ faust_real faust_cu_mat::max() const
 }
 
 template <typename faust_real>
-faust_real faust_cu_mat::min() const
+faust_real faust_cu_mat<faust_real>::min() const
 {
    if(isZeros || isIdentity)
       return (faust_real)0.0;
@@ -704,7 +704,7 @@ faust_real faust_cu_mat::min() const
 }
 
 template <typename faust_real>
-void faust_cu_mat::abs()
+void faust_cu_mat<faust_real>::abs()
 {
    if(isZeros || isIdentity)
       return ;
@@ -725,7 +725,7 @@ void faust_cu_mat::abs()
 }
 
 template <typename faust_real>
-faust_real faust_cu_mat::norm() const
+faust_real faust_cu_mat<faust_real>::norm() const
 {
    if(isZeros)
       return (faust_real)0.0;
@@ -748,7 +748,7 @@ faust_real faust_cu_mat::norm() const
 }
 
 template <typename faust_real>
-faust_real faust_cu_mat::trace() const
+faust_real faust_cu_mat<faust_real>::trace() const
 {
    if(dim1 != dim2)
       handleError(class_name, "norm : matrix must be square");
@@ -763,7 +763,7 @@ faust_real faust_cu_mat::trace() const
       faust_cudaGetDevice(&currentGPU);
       faust_cudaSetDevice(device);
 
-      faust_cu_vec cu_diag(dim1);
+      faust_cu_vec<faust_real> cu_diag(dim1);
       kernel_get_diag(cu_diag.getData(), data, dim1);
       faust_cudaSetDevice(currentGPU);
 
@@ -778,7 +778,7 @@ faust_real faust_cu_mat::trace() const
 
 
 /*template <typename faust_real>
- faust_real faust_cu_mat::spectralNorm() const
+ faust_real faust_cu_mat<faust_real>::spectralNorm() const
  {
    #ifdef __COMPILE_TIMERS__
          t_spectral_norm.start();
@@ -794,7 +794,7 @@ faust_real faust_cu_mat::trace() const
 
 /*
 template <typename faust_real>
- faust_real faust_cu_mat::spectralNorm(const faust_unsigned_int nbr_iter_max,faust_real threshold, faust_int & flag) const
+ faust_real faust_cu_mat<faust_real>::spectralNorm(const faust_unsigned_int nbr_iter_max,faust_real threshold, faust_int & flag) const
 {
    #ifdef __COMPILE_TIMERS__
       t_spectral_norm2.start();
@@ -842,7 +842,7 @@ template <typename faust_real>
 
 
 template <typename faust_real>
-void faust_cu_mat::scalarMultiply(const faust_real lambda)
+void faust_cu_mat<faust_real>::scalarMultiply(const faust_real lambda)
 {
 #ifdef __COMPILE_TIMERS__
 t_scalar_multiply.start();
@@ -880,7 +880,7 @@ t_scalar_multiply.stop();
 }
 
 template <typename faust_real>
-bool faust_cu_mat::operator==(const faust_cu_mat<faust_real>& cu_M)const
+bool faust_cu_mat<faust_real>::operator==(const faust_cu_mat<faust_real>& cu_M)const
 {
    if(data!=NULL && data==cu_M.data && device==cu_M.device)
    {
@@ -895,7 +895,7 @@ bool faust_cu_mat::operator==(const faust_cu_mat<faust_real>& cu_M)const
     /// SURCHARGE OPERATEUR ///
   // affectation
 template <typename faust_real>
-void faust_cu_mat::operator=(const faust_cu_mat<faust_real>& cu_M)
+void faust_cu_mat<faust_real>::operator=(const faust_cu_mat<faust_real>& cu_M)
 {
 
     if(cu_M.dim1*cu_M.dim2 == 0)
@@ -921,7 +921,7 @@ void faust_cu_mat::operator=(const faust_cu_mat<faust_real>& cu_M)
 }
 
 template <typename faust_real>
-void faust_cu_mat::operator=(const faust_mat<faust_real>& M)
+void faust_cu_mat<faust_real>::operator=(const faust_mat<faust_real>& M)
 {
 
     if(M.getNbRow()*M.getNbCol() == 0)
@@ -946,7 +946,7 @@ void faust_cu_mat::operator=(const faust_mat<faust_real>& M)
 
 #ifdef __COMPILE_SPMAT__
 template <typename faust_real>
-void faust_cu_mat::operator=(const faust_spmat<faust_real>& S)
+void faust_cu_mat<faust_real>::operator=(const faust_spmat<faust_real>& S)
 {
     if(S.getNbRow()*S.getNbCol() == 0)
     {
@@ -977,11 +977,11 @@ void faust_cu_mat::operator=(const faust_spmat<faust_real>& S)
 }
 
 template <typename faust_real>
-void faust_cu_mat::operator=(const faust_cu_spmat<faust_real>& S)
-{handleError(class_name, "faust_cu_mat::operator=(const faust_cu_spmat&) is not defined. Use faust_cu_mat::init_from_cu_spmat(const faust_cu_spmat&, cusparseHandle_t) instead");}
+void faust_cu_mat<faust_real>::operator=(const faust_cu_spmat<faust_real>& S)
+{handleError(class_name, "faust_cu_mat<faust_real>::operator=(const faust_cu_spmat&) is not defined. Use faust_cu_mat<faust_real>::init_from_cu_spmat(const faust_cu_spmat&, cusparseHandle_t) instead");}
 
 template <typename faust_real>
-void faust_cu_mat::init_from_cu_spmat(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle, const faust_real coeff /*=1.0*/)
+void faust_cu_mat<faust_real>::init_from_cu_spmat(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle, const faust_real coeff /*=1.0*/)
 {
     if(cu_S.getNbRow()*cu_S.getNbCol() == 0)
     {
@@ -1099,11 +1099,11 @@ void faust_cu_mat::init_from_cu_spmat(const faust_cu_spmat<faust_real>& cu_S, cu
 }
 
 template <typename faust_real>
-void faust_cu_mat::operator+=(const faust_cu_spmat<faust_real>& cu_S)
-{handleError(class_name, "faust_cu_mat::operator+=(const faust_cu_spmat&) is not defined. Use faust_cu_mat::add(const faust_cu_spmat&, cusparseHandle_t) instead");}
+void faust_cu_mat<faust_real>::operator+=(const faust_cu_spmat<faust_real>& cu_S)
+{handleError(class_name, "faust_cu_mat<faust_real>::operator+=(const faust_cu_spmat&) is not defined. Use faust_cu_mat<faust_real>::add(const faust_cu_spmat&, cusparseHandle_t) instead");}
 
 template <typename faust_real>
-void faust_cu_mat::add(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
+void faust_cu_mat<faust_real>::add(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
 {
    if(!(isZeros || isIdentity || data))
       handleError(class_name,"add : uninitialized matrix");
@@ -1170,11 +1170,11 @@ void faust_cu_mat::add(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t 
 
 
 template <typename faust_real>
-void faust_cu_mat::operator-=(const faust_cu_spmat<faust_real>& cu_S)
-{handleError(class_name, "faust_cu_mat::operator-=(const faust_cu_spmat&) is not defined. Use faust_cu_mat::sub(const faust_cu_spmat&, cusparseHandle_t) instead");}
+void faust_cu_mat<faust_real>::operator-=(const faust_cu_spmat<faust_real>& cu_S)
+{handleError(class_name, "faust_cu_mat<faust_real>::operator-=(const faust_cu_spmat&) is not defined. Use faust_cu_mat<faust_real>::sub(const faust_cu_spmat&, cusparseHandle_t) instead");}
 
 template <typename faust_real>
-void faust_cu_mat::sub(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
+void faust_cu_mat<faust_real>::sub(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
 {
    if(!(isZeros || isIdentity || data))
       handleError(class_name,"sub : uninitialized matrix");
@@ -1243,7 +1243,7 @@ void faust_cu_mat::sub(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t 
 
 
 template <typename faust_real>
-void faust_cu_mat::add(const faust_cu_mat<faust_real>& cu_M)
+void faust_cu_mat<faust_real>::add(const faust_cu_mat<faust_real>& cu_M)
 {
    if(!((isZeros || isIdentity || data) && (cu_M.isZeros || cu_M.isIdentity || cu_M.data)))
       handleError(class_name,"operator+= : uninitialized matrix");
@@ -1297,7 +1297,7 @@ void faust_cu_mat::add(const faust_cu_mat<faust_real>& cu_M)
 
 
 template <typename faust_real>
-void faust_cu_mat::operator-=(const faust_cu_mat<faust_real>& cu_M)
+void faust_cu_mat<faust_real>::operator-=(const faust_cu_mat<faust_real>& cu_M)
 {
    if(!isZeros && !isIdentity && data==NULL)
       handleError(class_name,"operator-= : uninitialized matrix");
@@ -1366,7 +1366,7 @@ void faust_cu_mat::operator-=(const faust_cu_mat<faust_real>& cu_M)
 
 
 template <typename faust_real>
-void faust_cu_mat::scalarMultiply(const faust_cu_mat<faust_real>& cu_M)
+void faust_cu_mat<faust_real>::scalarMultiply(const faust_cu_mat<faust_real>& cu_M)
 {
    if(!isZeros && !isIdentity && data==NULL)
       handleError(class_name,"scalarMultiply : uninitialized matrix");
@@ -1421,9 +1421,9 @@ void faust_cu_mat::scalarMultiply(const faust_cu_mat<faust_real>& cu_M)
 }
 
 template <typename faust_real>
-void faust_cu_mat::Display()const
+void faust_cu_mat<faust_real>::Display()const
 {
-   faust_mat M;
+   faust_mat<faust_real> M;
    faust_cu2faust(M,*this);
    M.Display();
 }
@@ -1432,32 +1432,32 @@ void faust_cu_mat::Display()const
 
 
 #ifdef __COMPILE_TIMERS__
-faust_timer faust_cu_mat::t_constr;
-faust_timer faust_cu_mat::t_get_coeff;
-faust_timer faust_cu_mat::t_get_coeffs;
-faust_timer faust_cu_mat::t_set_coeff;
-faust_timer faust_cu_mat::t_set_coeffs;
-faust_timer faust_cu_mat::t_set_coeffs2;
-faust_timer faust_cu_mat::t_resize;
-faust_timer faust_cu_mat::t_check_dim;
-faust_timer faust_cu_mat::t_max;
-faust_timer faust_cu_mat::t_transpose;
-faust_timer faust_cu_mat::t_mult_right;
-faust_timer faust_cu_mat::t_mult_left;
-faust_timer faust_cu_mat::t_scalar_multiply;
-faust_timer faust_cu_mat::t_add;
-faust_timer faust_cu_mat::t_sub;
-faust_timer faust_cu_mat::t_print_file;
-faust_timer faust_cu_mat::t_multiply;
-faust_timer faust_cu_mat::t_gemm;
-faust_timer faust_cu_mat::t_add_ext;
+faust_timer faust_cu_mat<faust_real>::t_constr;
+faust_timer faust_cu_mat<faust_real>::t_get_coeff;
+faust_timer faust_cu_mat<faust_real>::t_get_coeffs;
+faust_timer faust_cu_mat<faust_real>::t_set_coeff;
+faust_timer faust_cu_mat<faust_real>::t_set_coeffs;
+faust_timer faust_cu_mat<faust_real>::t_set_coeffs2;
+faust_timer faust_cu_mat<faust_real>::t_resize;
+faust_timer faust_cu_mat<faust_real>::t_check_dim;
+faust_timer faust_cu_mat<faust_real>::t_max;
+faust_timer faust_cu_mat<faust_real>::t_transpose;
+faust_timer faust_cu_mat<faust_real>::t_mult_right;
+faust_timer faust_cu_mat<faust_real>::t_mult_left;
+faust_timer faust_cu_mat<faust_real>::t_scalar_multiply;
+faust_timer faust_cu_mat<faust_real>::t_add;
+faust_timer faust_cu_mat<faust_real>::t_sub;
+faust_timer faust_cu_mat<faust_real>::t_print_file;
+faust_timer faust_cu_mat<faust_real>::t_multiply;
+faust_timer faust_cu_mat<faust_real>::t_gemm;
+faust_timer faust_cu_mat<faust_real>::t_add_ext;
 
-faust_timer faust_cu_mat::t_spectral_norm;
-faust_timer faust_cu_mat::t_spectral_norm2;
-faust_timer faust_cu_mat::t_power_iteration;
+faust_timer faust_cu_mat<faust_real>::t_spectral_norm;
+faust_timer faust_cu_mat<faust_real>::t_spectral_norm2;
+faust_timer faust_cu_mat<faust_real>::t_power_iteration;
 
 template <typename faust_real>
-void faust_cu_mat::print_timers()const
+void faust_cu_mat<faust_real>::print_timers()const
 {
    cout << "timers in faust_cu_mat :" << endl;
    cout << "t_constr          = " << t_constr.get_time()          << " s for "<< t_constr.get_nb_call()          << " calls" << endl;

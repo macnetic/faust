@@ -49,6 +49,7 @@ faust_real min() const;
 faust_real sum()const;
 faust_real norm() const;
 faust_real mean()const{return sum()/dim;}
+faust_real dot(const faust_cu_vec<faust_real>& cu_v, cublasHandle_t cublasHandle)const;
 
 bool operator==(const faust_cu_vec<faust_real>& cu_v)const;
 bool operator!=(const faust_cu_vec<faust_real>& cu_v)const{return !((*this)==cu_v);}
