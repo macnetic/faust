@@ -2,12 +2,10 @@
 #define LINALGEBRA_H
 
 #include "faust_constant.h"
-#include "faust_spmat.h"
 
 
 template<typename T> class faust_vec;
 template<typename T> class faust_mat;
-template<typename T> class faust_spmat;
 
 
 
@@ -20,9 +18,10 @@ template<typename T> class faust_spmat;
 template<typename T>
  void multiply(const faust_mat<T> & A, const faust_mat<T> & B, faust_mat<T> & C);
  
-
+// dot product : sum_i(v1[i]*v2[i])
+/*template <typename T>
+T dot(const faust_vec<T>& v1, const faust_vec<T>& v2);*/
  
-
  
  // C = alpha *op(A)*op(B) + beta * C;
  // op(A) = A si typeA='N', op(A) = transpose(A) si typeA='T'

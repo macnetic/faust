@@ -26,7 +26,43 @@ template<typename T>
 T power_iteration(const  faust_core<T> & A, const int nbr_iter_max,T threshold, int & flag)
 {	
 	
-	 int nb_col = A.getNbCol();
+
+ const int nb_col = A.getNbCol();
+   int i = 0;
+   flag = 0;
+	 
+   if (nbr_iter_max <= 0)
+      handleError("faust_core_algebra "," power_iteration :  nbr_iter_max <= 0");
+   if (nb_col != A.getNbRow())
+      handleError("faust_core_algebra "," power_iteration : faust_core_cu<T> 1 must be a squared matrix"); 	
+	 
+   faust_vec<T> xk(nb_col);
+   xk.setOnes();
+   faust_vec<T> xk_norm(nb_col);
+   T lambda_old=1.0;
+   T lambda = 0.0;
+      std::cout<< "ooooooooooooooooooooooooooo i="<<i<<" ; xk="<<xk<<std::endl;
+   while(fabs(lambda_old-lambda)>threshold && i<nbr_iter_max)
+   {
+      i++;
+      lambda_old = lambda;
+      xk_norm = xk;
+      xk_norm.normalize();
+      xk = A*xk_norm;
+      lambda = xk_norm.dot(xk);
+      std::cout<< "oooooooooooooooooooooooooooo i="<<i<<" ; xk="<<xk<<std::endl;
+   }
+   flag = (i<nbr_iter_max)?i:-1;
+   return lambda;
+
+
+
+
+
+
+
+
+	 /*int nb_col = A.getNbCol();
 	 int nb_row = A.getNbRow();
 	 int i = 0;
 	 int k;
@@ -91,10 +127,10 @@ T power_iteration(const  faust_core<T> & A, const int nbr_iter_max,T threshold, 
 	 }
 	 //std::cout<<" flag :"<<flag<<std::endl;
 
-	/*std::cout<<"flag inside power_it : "<<flag<<std::endl;
-	std::cout<<"threshold inside power_it : "<<threshold<<std::endl;
-	std::cout<<"max_it inside power_it : "<<nbr_iter_max<<std::endl;*/		
-	 return abs_eigen_value;
+	//std::cout<<"flag inside power_it : "<<flag<<std::endl;
+	//std::cout<<"threshold inside power_it : "<<threshold<<std::endl;
+	//std::cout<<"max_it inside power_it : "<<nbr_iter_max<<std::endl;	
+	 return abs_eigen_value;*/
 	 
 }
 

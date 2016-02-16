@@ -58,7 +58,7 @@ cu_A.t_add_ext.stop();
 }
 
 
-template <typename faust_real>
+/*template <typename faust_real>
 faust_real dot(const faust_cu_vec<faust_real>& cu_v1, const faust_cu_vec<faust_real>& cu_v2, cublasHandle_t cublasHandle)
 {
    if(cu_v1.size() != cu_v2.size())
@@ -87,7 +87,7 @@ faust_real dot(const faust_cu_vec<faust_real>& cu_v1, const faust_cu_vec<faust_r
       return (faust_real)0.0;
    }
 
-}
+}*/
 
 template <typename faust_real>
 void gemv(const faust_cu_mat<faust_real>& cu_A, const faust_cu_vec<faust_real>& cu_x, faust_cu_vec<faust_real>& cu_y,const faust_real alpha, const faust_real beta, char typeA, cublasHandle_t cublasHandle)

@@ -300,7 +300,36 @@ faust_real faust_cu_vec<faust_real>::norm() const
 
 template <typename faust_real>
 faust_real faust_cu_vec<faust_real>::dot(const faust_cu_vec<faust_real>& cu_v, cublasHandle_t cublasHandle) const
-{return dot(*this, cu_v, cublasHandle);}
+{
+//return dot(*this, cu_v, cublasHandle);
+   if(size() != cu_v.size())
+      handleError("LinAlgebra_cu","dot : the two vectors don't have the same size");
+   if(size() > 0)
+   {
+      int currentGPU;
+      faust_cudaGetDevice(&currentGPU);
+      faust_cudaSetDevice(device);
+      const faust_cu_vec<faust_real>* cu_v_ptr = &cu_v;
+      if(cu_v.getDevice() != device)
+         cu_v_ptr = new faust_cu_vec<faust_real>(cu_v, device);
+
+      faust_real result=0.0;
+
+      faust_cu_dot(cublasHandle, size(), getData(), 1, cu_v_ptr->getData(), 1, &result);
+
+      if(cu_v.getDevice() != device)
+         delete cu_v_ptr;
+      faust_cudaSetDevice(currentGPU);
+      return result;
+   }
+   else
+   {
+      // display warning as vector is empty
+      return (faust_real)0.0;
+   }
+
+
+}
 
 template <typename faust_real>
 bool faust_cu_vec<faust_real>::operator==(const faust_cu_vec<faust_real>& cu_v)const

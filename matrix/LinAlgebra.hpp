@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "faust_vec.h"
+#include "faust_mat.h"
 
 
 
@@ -15,6 +17,14 @@
 #endif
 
 
+/*template <typename T>
+T dot(const faust_vec<T>& v1, const faust_vec<T>& v2)
+{
+   if(v1.size() != v2.size())
+      handleError("LinAlgebra","dot : the two vectors don't have the same size");
+      T result = v1.vec.dot(v2.vec);
+      return result;
+}*/
 
 
 
@@ -433,8 +443,40 @@ T power_iteration(const  faust_mat<T> & A, const faust_unsigned_int nbr_iter_max
 {	
 	#ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.start();
-	#endif 	
-	 faust_unsigned_int nb_col = A.getNbCol();
+	#endif
+
+
+   const int nb_col = A.getNbCol();
+   int i = 0;
+   flag = 0;
+	 
+   if (nbr_iter_max <= 0)
+      handleError("LinAlgebra "," power_iteration :  nbr_iter_max <= 0");
+   if (nb_col != A.getNbRow())
+      handleError("LinAlgebra "," power_iteration : faust_core<T> 1 must be a squared matrix"); 	
+	 
+   faust_vec<T> xk(nb_col);
+   xk.setOnes();
+   faust_vec<T> xk_norm(nb_col);
+   T lambda_old=1.0;
+   T lambda = 0.0;
+   while(fabs(lambda_old-lambda)>threshold && i<nbr_iter_max)
+   {
+      i++;
+      lambda_old = lambda;
+      xk_norm = xk;
+      xk_norm.normalize();
+      xk = A*xk_norm;
+      lambda = xk_norm.dot(xk);
+      //std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
+   }
+   flag = (i<nbr_iter_max)?i:-1;
+   return lambda;
+
+
+
+ 	
+	 /*faust_unsigned_int nb_col = A.getNbCol();
 	 faust_unsigned_int nb_row = A.getNbRow();
 	 faust_unsigned_int i = 0;
 	 faust_unsigned_int k;
@@ -444,18 +486,10 @@ T power_iteration(const  faust_mat<T> & A, const faust_unsigned_int nbr_iter_max
 	 bool stop_crit;
 	 flag = 0;
 
-	 
 	 if (nbr_iter_max <= 0)
-	 {
 		handleError("LinAlgebra","power_iteration : nbr_iter_max <= 0");
-	 }
 	 if (nb_col != nb_row)
-	 {
 		handleError("LinAlgebra","power_iteration : A must be square");
-        
-	 }
-	 
-
 	 
 	 faust_vec<T> xk(nb_col);
 	 faust_vec<T> xk_pp(nb_col);
@@ -497,15 +531,16 @@ T power_iteration(const  faust_mat<T> & A, const faust_unsigned_int nbr_iter_max
 		
 		
 		xk = xk_pp;
+      //std::cout << "i = " << i << " ; lambda=" << abs_eigen_value << std::endl;
 	 }
 	 //std::cout<<" flag :"<<flag<<std::endl;
 	 #ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.stop();
 	#endif
-	/*std::cout<<"flag inside power_it : "<<flag<<std::endl;
-	std::cout<<"threshold inside power_it : "<<threshold<<std::endl;
-	std::cout<<"max_it inside power_it : "<<nbr_iter_max<<std::endl;*/		
-	 return abs_eigen_value;
+	//std::cout<<"flag inside power_it : "<<flag<<std::endl;
+	//std::cout<<"threshold inside power_it : "<<threshold<<std::endl;
+	//std::cout<<"max_it inside power_it : "<<nbr_iter_max<<std::endl;	
+	 return abs_eigen_value;*/
 	 
 }
 

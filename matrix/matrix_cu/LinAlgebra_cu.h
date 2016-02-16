@@ -29,8 +29,8 @@ template <typename faust_real>
 void add(const faust_cu_mat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C);
 
 // dot product : sum_i(v1[i]*v2[i])
-template <typename faust_real>
-faust_real dot(const faust_cu_vec<faust_real>& cu_v1, const faust_cu_vec<faust_real>& cu_v2, cublasHandle_t cublasHandle);
+/*template <typename faust_real>
+faust_real dot(const faust_cu_vec<faust_real>& cu_v1, const faust_cu_vec<faust_real>& cu_v2, cublasHandle_t cublasHandle);*/
 
 // y = alpha*op(A)*x + beta*y
 template <typename faust_real>

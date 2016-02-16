@@ -1,8 +1,6 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-
-
 using namespace std;
 
 
@@ -154,6 +152,17 @@ void faust_vec<T>::operator=(faust_vec<T> const& y)
 {
 	  vec = y.vec;
 	  dim = y.dim;
+}
+
+
+template <typename T>
+T faust_vec<T>::dot(const faust_vec<T>& v) const
+{
+//return dot(*this, v);
+   if(size() != v.size())
+      handleError("LinAlgebra","dot : the two vectors don't have the same size");
+   T result = vec.dot(v.vec);
+   return result;
 
 }
 

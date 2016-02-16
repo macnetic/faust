@@ -61,6 +61,9 @@ void  multiplyLeft(faust_spmat<T> const& A);
   
 T sum()const{return vec.sum();}
 T mean()const{return vec.mean();}
+T dot(const faust_vec<T>& v)const;
+
+
 template<typename U>
 void operator=(faust_vec<U> const& y);
 void operator=(faust_vec<T> const& y);
