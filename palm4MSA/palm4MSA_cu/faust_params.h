@@ -3,11 +3,16 @@
 
 #include "faust_constant.h"
 #include <vector>
-#include "faust_mat.h"
 #include "stopping_criterion.h"
 #include "faust_constraint_generic.h"
 
-template<typename T> class faust_mat;
+#ifdef __COMPILE_GPU__
+   #include "faust_cu_mat.h"
+   template<typename T> class faust_cu_mat;
+#else
+   #include "faust_mat.h"
+   template<typename T> class faust_mat;
+#endif
 
 
 /*! \class faust_params
@@ -21,13 +26,19 @@ template<typename T> class faust_mat;
 template<typename T>
 class faust_params
 {
-   public:
-	  
+   private:
+#ifdef __COMPILE_GPU__
+      typedef faust_cu_mat<T> faust_matrix ;
+#else
+      typedef faust_mat<T> faust_matrix ;
+#endif
+
+   public:	  
 	  faust_params(
-	  const faust_mat<T>& data_,
+	  const faust_matrix& data_,
 	  const unsigned int nb_fact_,
 	  const std::vector<const faust_constraint_generic*> & cons_,
-	  const std::vector<faust_mat<T> >& init_fact_,
+	  const std::vector<faust_matrix >& init_fact_,
 	  const stopping_criterion<T>& stop_crit_2facts_ = stopping_criterion<T>(defaultNiter1),
 	  const stopping_criterion<T>& stop_crit_global_  = stopping_criterion<T>(defaultNiter2),
 	  const T residuum_decrease_speed = defaultDecreaseSpeed,
@@ -46,7 +57,7 @@ class faust_params
      *
      *  faust_params constructor
      *
-     *  \tparam data : faust_mat to hierarchically factorize
+     *  \tparam data : faust_matrix to hierarchically factorize
 	*	
 	*  \tparam nb_fact_ : number of factor used for the decomposition 
 	 *
@@ -88,10 +99,10 @@ class faust_params
 		
      */		
       faust_params(
-	const faust_mat<T>& data_,
+	const faust_matrix& data_,
 	const unsigned int nb_fact_,
 	const std::vector<std::vector<const faust_constraint_generic*> >& cons_,
-	const std::vector<faust_mat<T> >& init_fact_,
+	const std::vector<faust_matrix >& init_fact_,
 	const stopping_criterion<T>& stop_crit_2facts_ = stopping_criterion<T>(defaultNiter1),
 	const stopping_criterion<T>& stop_crit_global_  = stopping_criterion<T>(defaultNiter2),
 	const bool isVerbose_ = defaultVerbosity ,
@@ -114,10 +125,10 @@ class faust_params
 
    public:
       // Required members
-      faust_mat<T> data;
+      faust_matrix data;
       faust_unsigned_int nb_fact; // number of factors
       std::vector<std::vector<const faust_constraint_generic*> > cons; // vector of constraints
-      std::vector<faust_mat<T> > init_fact;
+      std::vector<faust_matrix > init_fact;
 
       // Optional members (set to default values if not defined)
       stopping_criterion<T> stop_crit_2facts;

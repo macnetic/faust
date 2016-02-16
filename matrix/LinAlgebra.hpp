@@ -3,7 +3,7 @@
 #include "faust_vec.h"
 #include "faust_mat.h"
 
-
+#include "faust_timer.h"
 
 	//////////FONCTION faust_mat<T> - faust_mat<T> ////////////////////
 
@@ -460,6 +460,10 @@ T power_iteration(const  faust_mat<T> & A, const faust_unsigned_int nbr_iter_max
    faust_vec<T> xk_norm(nb_col);
    T lambda_old=1.0;
    T lambda = 0.0;
+   T alpha = 1.0;
+   T beta = 0.0;
+   faust_timer t1;
+   t1.start(); 
    while(fabs(lambda_old-lambda)>threshold && i<nbr_iter_max)
    {
       i++;
@@ -470,6 +474,8 @@ T power_iteration(const  faust_mat<T> & A, const faust_unsigned_int nbr_iter_max
       lambda = xk_norm.dot(xk);
       //std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
    }
+   t1.stop();
+   std::cout<<"temps boucle="<<t1.get_time()<<std::endl;
    flag = (i<nbr_iter_max)?i:-1;
    return lambda;
 

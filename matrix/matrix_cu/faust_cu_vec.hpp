@@ -533,35 +533,41 @@ void faust_cu_vec<faust_real>::operator/=(const faust_real alpha)
 
 
 template <typename faust_real>
-void faust_cu_vec<faust_real>::setZeros()
+void faust_cu_vec<faust_real>::setValues(const faust_real val)
 {
    if (dim>0)
    {
       int currentGPU;
       faust_cudaGetDevice(&currentGPU);
       faust_cudaSetDevice(device);
-
-      kernel_memset(data, (faust_real)0.0, dim);
-
+      kernel_memset(data, val, dim);
       faust_cudaSetDevice(currentGPU);
    }
 }
 
 template <typename faust_real>
-void faust_cu_vec<faust_real>::setZeros(faust_unsigned_int length)
+void faust_cu_vec<faust_real>::setValues(const faust_real val, const faust_unsigned_int length)
 {
    resize(length);
-   if (length>0)
-   {
-      int currentGPU;
-      faust_cudaGetDevice(&currentGPU);
-      faust_cudaSetDevice(device);
-
-      kernel_memset(data, (faust_real)0.0, dim);
-
-      faust_cudaSetDevice(currentGPU);
-   }
+   setValues(val);
 }
+
+template <typename faust_real>
+void faust_cu_vec<faust_real>::setZeros()
+{setValues(0.0);}
+
+template <typename faust_real>
+void faust_cu_vec<faust_real>::setZeros(const faust_unsigned_int length)
+{setValues(0.0, length);}
+
+template <typename faust_real>
+void faust_cu_vec<faust_real>::setOnes()
+{setValues(1.0);}
+
+template <typename faust_real>
+void faust_cu_vec<faust_real>::setOnes(const faust_unsigned_int length)
+{setValues(1.0, length);}
+
 
 template <typename faust_real>
 faust_real faust_cu_vec<faust_real>::mean_relative_error(const faust_cu_vec<faust_real>& v_ref)const

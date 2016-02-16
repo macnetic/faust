@@ -14,6 +14,11 @@ SRC_CU  := $(wildcard ./*.cu)
 SRC_HPP := $(wildcard ./*.hpp)
 SRC_HU  := $(wildcard ./*.hu)
 
+ifneq ($(COMPILE_GPU),)
+  CUFLAGS += -D__COMPILE_GPU__
+  CFLAGS  += -D__COMPILE_GPU__
+endif
+
 ifneq ($(COMPILE_SPMAT),)
   CUFLAGS += -D__COMPILE_SPMAT__
   CFLAGS  += -D__COMPILE_SPMAT__

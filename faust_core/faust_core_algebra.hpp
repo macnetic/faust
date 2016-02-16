@@ -41,7 +41,6 @@ T power_iteration(const  faust_core<T> & A, const int nbr_iter_max,T threshold, 
    faust_vec<T> xk_norm(nb_col);
    T lambda_old=1.0;
    T lambda = 0.0;
-      std::cout<< "ooooooooooooooooooooooooooo i="<<i<<" ; xk="<<xk<<std::endl;
    while(fabs(lambda_old-lambda)>threshold && i<nbr_iter_max)
    {
       i++;
@@ -50,7 +49,6 @@ T power_iteration(const  faust_core<T> & A, const int nbr_iter_max,T threshold, 
       xk_norm.normalize();
       xk = A*xk_norm;
       lambda = xk_norm.dot(xk);
-      std::cout<< "oooooooooooooooooooooooooooo i="<<i<<" ; xk="<<xk<<std::endl;
    }
    flag = (i<nbr_iter_max)?i:-1;
    return lambda;

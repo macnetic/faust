@@ -4,12 +4,13 @@
 #include "faust_params.h"
 #include "faust_params_palm.h"
 #include "faust_constraint_generic.h"
-#include "faust_constraint_mat.h"
 #include "faust_constraint_real.h"
 #include "faust_constraint_int.h"
 #ifdef __COMPILE_GPU__
+   #include "faust_constraint_mat_cu.h"
    #include "faust_cu_mat.h"
 #else
+   #include "faust_constraint_mat.h"
    #include "faust_mat.h"
 #endif
 

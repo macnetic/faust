@@ -40,10 +40,10 @@ void faust_params_palm<T>::check_constraint_validity()
 
 template<typename T>
 faust_params_palm<T>::faust_params_palm(
-         const faust_mat<T>& data_,
+         const faust_matrix& data_,
          const int nb_fact_,
          const std::vector<const faust_constraint_generic*>& cons_,
-         const std::vector<faust_mat<T> > & init_fact_,
+         const std::vector<faust_matrix > & init_fact_,
          const stopping_criterion<T> & stop_crit_ /* = stopping_criterion() */,
          const bool isVerbose_ /* = false */,
          const bool isUpdateWayR2L_ /* = false */,
@@ -65,7 +65,7 @@ faust_params_palm<T>::faust_params_palm(
 }
 
 template<typename T>	
-faust_params_palm<T>::faust_params_palm() : data(0,0),nb_fact(0),cons(std::vector<const faust_constraint_generic*>()),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_mat<T> >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize){}
+faust_params_palm<T>::faust_params_palm() : data(0,0),nb_fact(0),cons(std::vector<const faust_constraint_generic*>()),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_matrix >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize){}
 
 template<typename T>
 void faust_params_palm<T>::init_factors()

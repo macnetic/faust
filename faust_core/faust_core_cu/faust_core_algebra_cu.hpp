@@ -19,22 +19,20 @@
 	#include "faust_timer.h"
 #endif
 
-#ifdef __GEMM_WITH_OPENBLAS__
-	#include "cblas.h"
-#endif
+#include "cublas_v2.h"
 
 // const char * core_algebra_name="faust_core_cu<T>_algebra : ";
 
 template<typename T>
-T power_iteration(const  faust_core_cu<T> & A, const int nbr_iter_max, const T threshold, int & flag)
+T power_iteration(const  faust_core_cu<T> & cu_A, const int nbr_iter_max, const T threshold, int & flag, cublasHandle_t cublasHandle)
 {	
-   const int nb_col = A.getNbCol();
+   const int nb_col = cu_A.getNbCol();
    int i = 0;
    flag = 0;
 	 
    if (nbr_iter_max <= 0)
       handleError("faust_core_cu algebra "," power_iteration :  nbr_iter_max <= 0");
-   if (nb_col != A.getNbRow())
+   if (nb_col != cu_A.getNbRow())
       handleError("faust_core_cu algebra "," power_iteration : faust_core_cu<T> 1 must be a squared matrix"); 	
 	 
    faust_cu_vec<T> cu_xk(nb_col);
@@ -48,7 +46,7 @@ T power_iteration(const  faust_core_cu<T> & A, const int nbr_iter_max, const T t
       lambda_old = lambda;
       cu_xk_norm = cu_xk;
       cu_xk_norm.normalize();
-      cu_xk = A*cu_xk_norm;
+      gemv(cu_A, cu_xk_norm, cu_xk, cublasHandle);
       lambda = cu_xk_norm.dot(cu_xk);
    }
    flag = (i<nbr_iter_max)?i:-1;

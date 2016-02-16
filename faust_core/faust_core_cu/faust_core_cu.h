@@ -80,6 +80,6 @@ class faust_core
 		
 };
 
-#include "faust_core.hpp"
+#include "faust_core_cu.hpp"
 
 #endif

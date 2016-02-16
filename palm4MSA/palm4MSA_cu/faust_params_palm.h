@@ -3,22 +3,32 @@
 
 #include "faust_constant.h"
 #include <vector>
-#include "faust_mat.h"
 #include "stopping_criterion.h"
 #include "faust_constraint_generic.h"
 
-template<typename T> class faust_mat;
+#ifdef __COMPILE_GPU__
+   #include "faust_mat.h"
+#else
+   #include "faust_cu_mat.h"
+#endif
 
 template<typename T>
 class faust_params_palm
 {
-   public:
+   private:
+#ifdef __COMPILE_GPU__
+   typedef faust_cu_mat<T> faust_matrix ;
+#else
+   typedef faust_mat<T> faust_matrix ;
+#endif
+      
 
+   public:
       faust_params_palm(
-         const faust_mat<T>& data_,
+         const faust_matrix& data_,
          const int nb_fact_,
          const std::vector<const faust_constraint_generic*>& cons_,
-         const std::vector<faust_mat<T> >& init_fact_,
+         const std::vector<faust_matrix >& init_fact_,
          const stopping_criterion<T> & stop_crit_ = stopping_criterion<T>(defaultNiter),
          const bool isVerbose_ = defaultVerbosity ,
          const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
@@ -33,12 +43,12 @@ class faust_params_palm
 
    public:
       // Required members
-      faust_mat<T> data;
+      faust_matrix data;
       int nb_fact; // number of factors
       std::vector<const faust_constraint_generic*> cons; // vector of constraints
 
       // Optional members (set to default values if not defined)
-      std::vector<faust_mat<T> > init_fact;
+      std::vector<faust_matrix > init_fact;
       stopping_criterion<T> stop_crit;
       bool isVerbose;
       bool isUpdateWayR2L;

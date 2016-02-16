@@ -66,8 +66,16 @@ void operator/=(const faust_real alpha);
 void scalarMultiply(const faust_real alpha){this->operator*=(alpha);}
 void normalize(){scalarMultiply(1/norm());} 
 
+void setValues(const faust_real);
+void setValues(const faust_real, const faust_unsigned_int);
+
 void setZeros();
-void setZeros(faust_unsigned_int);
+void setZeros(const faust_unsigned_int);
+
+void setOnes();
+void setOnes(const faust_unsigned_int);
+
+
 faust_real mean_relative_error(const faust_cu_vec<faust_real>& v)const;
 // multiply (*this) =  A * (*this)
 inline void  multiplyLeft(const faust_cu_mat<faust_real>& cu_A, cublasHandle_t cublasHandle);
