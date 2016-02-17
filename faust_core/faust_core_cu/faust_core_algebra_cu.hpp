@@ -10,7 +10,7 @@
 #include <Eigen/SparseQR>
 
 #include "faust_cu_spmat.h"
-#include "faust_cu_core.h"
+#include "faust_core_cu.h"
 #include "faust_exception.h"
 
 	//////////FONCTION faust_cu_mat<T> - faust_cu_mat<T> ////////////////////

@@ -3,11 +3,7 @@
 
 class faust_constraint_int;
 template<typename T> class faust_constraint_real;
-#ifdef __COMPILE_GPU
-   template<typename T> class faust_constraint_mat_cu;
-#else
-   template<typename T> class faust_constraint_mat;
-#endif
+template<typename T> class faust_constraint_mat;
 
 
 
@@ -18,13 +14,8 @@ struct constraint_type
 {
 	typedef const faust_constraint_real<T> constraint_type_normcol;
 	typedef const  faust_constraint_real<T>  constraint_type_normlin;
-#ifdef __COMPILE_GPU
-	typedef const  faust_constraint_mat_cu<T>   constraint_type_supp;
-	typedef const  faust_constraint_mat_cu<T>   constraint_type_const;
-#else
 	typedef const  faust_constraint_mat<T>   constraint_type_supp;
 	typedef const  faust_constraint_mat<T>   constraint_type_const;
-#endif
 	typedef const  faust_constraint_int   constraint_type_sp;
 	typedef const  faust_constraint_int   constraint_type_spcol;
 	typedef const  faust_constraint_int   constraint_type_splin;

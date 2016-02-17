@@ -14,12 +14,13 @@
 #ifdef __COMPILE_GPU__
    #include "faust_cu_mat.h"
    template<typename T> class faust_cu_mat;
+   template<typename T> class faust_core_cu;
 #else
    #include "faust_mat.h"
    template<typename T> class faust_mat;
+   template<typename T> class faust_core;
 #endif
 
-template<typename T> class faust_core;
 class faust_constraint_generic;
 template<typename T> class faust_params;
 template<typename T> class faust_params_palm;
@@ -40,8 +41,10 @@ class palm4MSA
    private:
 #ifdef __COMPILE_GPU__
    typedef faust_cu_mat<T> faust_matrix;
+   typedef faust_core_cu<T> faust_coregen;
 #else
    typedef faust_mat<T> faust_matrix;
+   typedef faust_core<T> faust_coregen;
 #endif
 
    public:
@@ -78,7 +81,7 @@ class palm4MSA
       T get_RMSE()const{return error.norm()/sqrt((double)(data.getNbRow()*data.getNbCol()));}
       const faust_matrix& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
       const faust_matrix& get_data()const{return data;}
-	  void get_facts(faust_core<T> & faust_fact) const;
+	  void get_facts(faust_coregen & faust_fact) const;
 	  
 
 	  	  /*!

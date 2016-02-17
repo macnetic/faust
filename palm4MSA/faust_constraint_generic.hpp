@@ -5,11 +5,7 @@
 #include "faust_exception.h"
 
 #include "faust_constraint_type.h"
-#ifdef __COMPILE_GPU__
-   #include "faust_constraint_mat_cu.h"
-#else
-   #include "faust_constraint_mat.h"
-#endif
+#include "faust_constraint_mat.h"
 
 template<typename T> class faust_constraint_real;
 template<typename T> class faust_constraint_mat;

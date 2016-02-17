@@ -3,13 +3,14 @@
 #include "faust_timer.h"
 #endif
 
-#ifdef __COMPILE_GPU
+#ifdef __COMPILE_GPU__
    #include "faust_cu_spmat.h"
+   #include "faust_core_cu.h"
 #else
    #include "faust_spmat.h"
+   #include "faust_core.h"
 #endif
 
-#include "faust_core.h"
 
 #include "faust_exception.h"
 using namespace std;
@@ -143,11 +144,11 @@ palm_2.print_prox_timers();
 }
 
 template<typename T>
-void hierarchical_fact<T>::get_facts(faust_core<T> & fact)const
+void hierarchical_fact<T>::get_facts(faust_coregen & fact)const
 {
 	std::vector<faust_spmatrix > spfacts;
 	get_facts(spfacts);
-	faust_core<T> res(spfacts);
+	faust_coregen res(spfacts);
 	fact = res;
 }
 
@@ -207,7 +208,7 @@ void hierarchical_fact<T>::compute_errors()
 
 
 
-   faust_core<T> faust_core_tmp(sp_facts, get_lambda());
+   faust_coregen faust_core_tmp(sp_facts, get_lambda());
    const faust_matrix estimate_mat = faust_core_tmp.get_product();
 
    faust_matrix data(palm_global.get_data());

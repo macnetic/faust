@@ -298,9 +298,7 @@ void faust_spmat<T>::operator/=(const T alpha)
 
 template<typename T> 
 void faust_spmat<T>::print_file(const char* filename)const
-{
-print_file(filename,std::fstream::out);
-}
+{print_file(filename,std::fstream::out);}
 
 template<typename T> 
 void faust_spmat<T>::print_file(const char* filename,std::ios_base::openmode mode)const

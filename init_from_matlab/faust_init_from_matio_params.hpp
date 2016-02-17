@@ -20,6 +20,11 @@ template<typename T>
 void init_params_palm_from_matiofile(faust_params_palm<T>& params,const char* fileName, const char* variableName)
 {
 	
+#ifdef __COMPILE_GPU__
+   typedef faust_cu_mat<T> faust_matrix ;
+#else
+   typedef faust_mat<T> faust_matrix ;
+#endif
 	matvar_t* params_var = faust_matio_read_variable(fileName,variableName);
    
 	matvar_t*   current_var;
@@ -46,7 +51,7 @@ void init_params_palm_from_matiofile(faust_params_palm<T>& params,const char* fi
 	
 	int niter,nfacts,verbose,update_way,dim1,dim2,cons_parameter,cons_dim1,cons_dim2;
 	faust_mat<T> data_mat,current_fact;
-	vector<faust_mat<T> > init_facts;
+	vector<faust_matrix > init_facts;
 	T init_lambda;	
 	
 	
@@ -134,7 +139,7 @@ void init_params_palm_from_matiofile(faust_params_palm<T>& params,const char* fi
 				init_mat_from_matvar(current_fact,current_fact_var);
 				current_fact.check_dim_validity();		
 				current_fact.Display();
-				init_facts.push_back(current_fact);	
+				init_facts.push_back(faust_cu_mat(current_fact));	
 			}
 			params.init_fact=init_facts;	
 		}

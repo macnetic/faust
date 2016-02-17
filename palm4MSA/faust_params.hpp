@@ -7,7 +7,11 @@
 #include <cmath>
 #include "faust_exception.h"
 
-template<typename T> class faust_mat;
+#ifdef __COMPILE_GPU__
+   template<typename T> class faust_cu_mat;
+#else
+   template<typename T> class faust_mat;
+#endif
 template<typename T> class faust_constraint_real;
 template<typename T> class faust_constraint_mat;
 
@@ -70,10 +74,10 @@ void faust_params<T>::check_constraint_validity()
 
 template<typename T>		
 faust_params<T>::faust_params(
-	  const faust_mat<T>& data_,
+	  const faust_matrix& data_,
 	  const unsigned int nb_fact_,
 	  const std::vector<const faust_constraint_generic*> & cons_,
-	  const std::vector<faust_mat<T> >& init_fact_,
+	  const std::vector<faust_matrix >& init_fact_,
 	  const stopping_criterion<T>& stop_crit_2facts_,
       const stopping_criterion<T>& stop_crit_global_,
 	   const T residuum_decrease_speed /* = 1.25 */,
@@ -191,10 +195,10 @@ faust_params<T>::faust_params(
 
 template<typename T>	
 faust_params<T>::faust_params(
-         const faust_mat<T>& data_,
+         const faust_matrix& data_,
          const unsigned int nb_fact_,
          const std::vector<std::vector<const faust_constraint_generic*> >& cons_,
-         const std::vector<faust_mat<T> >& init_fact_,
+         const std::vector<faust_matrix >& init_fact_,
          const stopping_criterion<T>& stop_crit_2facts_ /* = stopping_criterion<T>() */,
          const stopping_criterion<T>& stop_crit_global_ /* = stopping_criterion<T>() */,
          const bool isVerbose_ /* = false */,
@@ -228,7 +232,7 @@ faust_params<T>::faust_params(
 
 
 template<typename T>	
-faust_params<T>::faust_params() : data(0,0),nb_fact(0),cons(std::vector<std::vector<const faust_constraint_generic*> >()),isFactSideLeft(defaultFactSideLeft),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_mat<T> >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize)
+faust_params<T>::faust_params() : data(0,0),nb_fact(0),cons(std::vector<std::vector<const faust_constraint_generic*> >()),isFactSideLeft(defaultFactSideLeft),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_matrix >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize)
 {}
 
 
@@ -424,7 +428,7 @@ void faust_params<T>::init_from_file(const char* filename)
 				}	
 				case 2 :
 				{	
-					faust_mat<T> mat_parameter;
+					faust_matrix mat_parameter;
 					mat_parameter.init_from_file(cons_parameter);
 					
 					if ( (cons_dim1 != mat_parameter.getNbCol()) || (cons_dim2 != mat_parameter.getNbRow()) )

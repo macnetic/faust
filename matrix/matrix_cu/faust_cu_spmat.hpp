@@ -532,3 +532,15 @@ void faust_cu_spmat<faust_real>::Display()const
    S.Display();
 }
 
+template<typename faust_real> 
+void faust_cu_spmat<faust_real>::print_file(const char* filename)const
+{print_file(filename,std::fstream::out);}
+
+template<typename faust_real> 
+void faust_spmat<faust_real>::print_file(const char* filename,std::ios_base::openmode mode)const
+{
+   faust_spmat tmp;
+   faust_cu2faust(tmp, *this);
+   tmp.print_file(filename, mode);
+}
+

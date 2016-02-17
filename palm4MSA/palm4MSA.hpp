@@ -6,11 +6,10 @@
 #include "faust_constraint_generic.h"
 #include "faust_constraint_real.h"
 #include "faust_constraint_int.h"
+#include "faust_constraint_mat.h"
 #ifdef __COMPILE_GPU__
-   #include "faust_constraint_mat_cu.h"
    #include "faust_cu_mat.h"
 #else
-   #include "faust_constraint_mat.h"
    #include "faust_mat.h"
 #endif
 
@@ -121,9 +120,9 @@ void palm4MSA<T>::compute_facts()
 }
 
 template<typename T>
-void palm4MSA<T>::get_facts(faust_core<T> & faust_fact) const
+void palm4MSA<T>::get_facts(faust_coregen & faust_fact) const
 {
-	faust_core<T> f(S);
+	faust_coregen f(S);
 	faust_fact = f;
 	
 

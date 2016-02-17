@@ -15,7 +15,7 @@ template<typename T> class palm4MSA;
 #ifdef __COMPILE_GPU__
    template<typename T> class faust_cu_mat;
    template<typename T> class faust_cu_spmat;
-   template<typename T> class faust_cu_core;
+   template<typename T> class faust_core_cu;
 #else
    template<typename T> class faust_mat;
    template<typename T> class faust_spmat;
@@ -38,16 +38,18 @@ class hierarchical_fact
 #ifdef __COMPILE_GPU__
    typedef faust_cu_mat<T>    faust_matrix;
    typedef faust_cu_spmat<T>  faust_spmatrix;
+   typedef faust_core_cu<T>   faust_coregen;
 #else
    typedef faust_mat<T>    faust_matrix;
    typedef faust_spmat<T>  faust_spmatrix;
+   typedef faust_core<T>   faust_coregen;
 #endif
 
 
    public:
       
       hierarchical_fact(const faust_params<T>& params_);
-	  void get_facts(faust_core<T> &)const;	
+	  void get_facts(faust_coregen &)const;	
       void get_facts(std::vector<faust_spmatrix >&)const;
 	  void get_facts(std::vector<faust_matrix >& fact)const{fact = palm_global.get_facts();}
       void compute_facts();

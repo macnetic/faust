@@ -31,7 +31,7 @@ faust_constraint_mat<T>::faust_constraint_mat(
 template<typename T>
 faust_constraint_mat<T>::faust_constraint_mat(
    const faust_constraint_name& constraint_name_,  
-   const faust_mat<T> default_parameter_,
+   const faust_matrix default_parameter_,
    const faust_unsigned_int nb_rows_, 
    const faust_unsigned_int nb_cols_) : 
       faust_constraint_generic(

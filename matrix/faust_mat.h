@@ -348,8 +348,8 @@ T power_iteration(const faust_mat<T> & A, const faust_unsigned_int nbr_iter_max,
   friend void gemv<>(const faust_mat<T> & A,const faust_vec<T> & x,faust_vec<T> & y,const T & alpha, const T & beta, char typeA);
   
 
-  bool estIdentite(){return isIdentity;}
-  bool estNulle(){return isZeros;}
+  bool estIdentite()const{return isIdentity;}
+  bool estNulle()const{return isZeros;}
   
   private: 
 	Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat;

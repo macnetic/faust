@@ -5,7 +5,7 @@
 
 template<typename T> class faust_cu_mat;
 template<typename T> class faust_cu_vec;
-template<typename T> class faust_cu_core;
+template<typename T> class faust_core_cu;
 
 
 template<typename T> 

@@ -77,6 +77,9 @@ template <typename faust_real> class faust_cu_spmat
 		int getDevice()const{return device;}
 		
       void Display()const;
+   	void print_file(const char* filename)const;
+		void print_file(const char* filename, std::ios_base::openmode mode)const;
+
 
 		~faust_cu_spmat(){resize(0,0,0);}
 
