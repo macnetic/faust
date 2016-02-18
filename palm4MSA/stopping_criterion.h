@@ -15,7 +15,7 @@ class stopping_criterion
       stopping_criterion(int nb_it_):
          isCriterionError(false),nb_it(nb_it_){check_validity();}
          
-      stopping_criterion(faust_real errorThreshold_, int maxIteration_=10000):
+      stopping_criterion(T errorThreshold_, int maxIteration_=10000):
          isCriterionError(true),errorThreshold(errorThreshold_),maxIteration(maxIteration_){check_validity();}
 
       stopping_criterion(bool isCriterionError_);

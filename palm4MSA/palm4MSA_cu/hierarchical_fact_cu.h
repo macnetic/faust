@@ -3,7 +3,7 @@
 
 #include "faust_constant.h"
 #include <vector>
-#include "palm4MSA.h"
+#include "palm4MSA_cu.h"
 #include "faust_params.h"
 
 #ifdef __COMPILE_TIMERS__
@@ -11,19 +11,13 @@
 #endif
 
 class faust_constraint_generic;
-template<typename T> class palm4MSA;
-#ifdef __COMPILE_GPU__
-   template<typename T> class faust_cu_mat;
-   template<typename T> class faust_cu_spmat;
-   template<typename T> class faust_core_cu;
-#else
-   template<typename T> class faust_mat;
-   template<typename T> class faust_spmat;
-   template<typename T> class faust_core;
-#endif
+template<typename T> class palm4MSA_cu;
+template<typename T> class faust_cu_mat;
+template<typename T> class faust_cu_spmat;
+template<typename T> class faust_core_cu;
 template<typename T> class stopping_criterion;
 
-/*! \class hierarchical_fact
+/*! \class hierarchical_fact_cu
    * \brief template class implementing hierarchical factorisation algorithm
     : <br>  factorization of a data matrix into multiple factors using palm4MSA algorithm mixed with a hierarchical approach.
    *
@@ -32,23 +26,17 @@ template<typename T> class stopping_criterion;
    */
 
 template<typename T>
-class hierarchical_fact
+class hierarchical_fact_cu
 {
    private:
-#ifdef __COMPILE_GPU__
-   typedef faust_cu_mat<T>    faust_matrix;
-   typedef faust_cu_spmat<T>  faust_spmatrix;
-   typedef faust_core_cu<T>   faust_coregen;
-#else
-   typedef faust_mat<T>    faust_matrix;
-   typedef faust_spmat<T>  faust_spmatrix;
-   typedef faust_core<T>   faust_coregen;
-#endif
+      typedef faust_cu_mat<T>    faust_matrix;
+      typedef faust_cu_spmat<T>  faust_spmatrix;
+      typedef faust_core_cu<T>   faust_coregen;
 
 
    public:
       
-      hierarchical_fact(const faust_params<T>& params_);
+      hierarchical_fact_cu(const faust_params<T>& params_, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle);
 	  void get_facts(faust_coregen &)const;	
       void get_facts(std::vector<faust_spmatrix >&)const;
 	  void get_facts(std::vector<faust_matrix >& fact)const{fact = palm_global.get_facts();}
@@ -70,14 +58,16 @@ private:
       bool isVerbose;
       int ind_fact ; //indice de factorisation (!= palm4MSA::ind_fact : indice de facteur)
       int nb_fact; // nombre de factorisations (!= palm4MSA::nb_fact : nombre de facteurs)
-      palm4MSA<T> palm_2;
-      palm4MSA<T> palm_global;
+      palm4MSA_cu<T> palm_2;
+      palm4MSA_cu<T> palm_global;
       const T default_lambda; // initial value of lambda for factorization into two factors
       //std::vector<faust_matrix > S;
       std::vector<const faust_constraint_generic*> cons_tmp_global;
       bool isFactorizationComputed;
       std::vector<std::vector<T> > errors;
 	  static const char * class_name;
+      cublasHandle_t cublas_handle;
+      cusparseHandle_t cusparse_handle;
       
      
 #ifdef __COMPILE_TIMERS__
@@ -94,6 +84,6 @@ private:
 };
 
 
-#include "hierarchical_fact.hpp"
+#include "hierarchical_fact_cu.hpp"
 
 #endif

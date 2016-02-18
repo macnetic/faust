@@ -146,7 +146,7 @@ public:
 
   // spectral norm, "norm2", equal to the largest singular value
   //faust_real spectralNorm() const;
-  //faust_real spectralNorm(const faust_unsigned_int nbr_iter_max,faust_real threshold, faust_int & flag) const;
+  faust_real spectralNorm(const faust_unsigned_int nbr_iter_max,faust_real threshold, faust_int & flag, cublasHandle_t cublasHandle) const;
 
   // trace
   faust_real trace() const;

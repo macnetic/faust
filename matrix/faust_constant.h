@@ -6,11 +6,12 @@
 // #else
    // typedef double faust_real;
 // #endif
-#ifdef __FAUST_SINGLE
-   typedef float faust_real;
-#else
-   typedef double faust_real;
-#endif
+
+//#ifdef __FAUST_SINGLE
+//   typedef float faust_real;
+//#else
+//   typedef double faust_real;
+//#endif
 
 #ifdef __FAUST_SINGLE__
 	#define IS_SINGLE_DEFINED 1

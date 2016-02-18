@@ -95,16 +95,16 @@ void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>
 // C = op(A)*op(B) ; with B sparse
 template <typename faust_real>
 void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const char opA, const char opB, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle);
-// C = op(A)*op(B) ; with A sparse
+// C = A*B ; with A sparse
 template <typename faust_real>
 void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, cusparseHandle_t cusparseHandle);
-// C = op(A)*op(B) ; with B sparse
+// C = A*B ; with B sparse
 template <typename faust_real>
 void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle);
-// C = op(A)*op(B) ; with A sparse
+// C = A*B ; with A sparse
 template <typename faust_real>
 void multiply(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, cusparseHandle_t cusparseHandle); 
-// C = op(A)*op(B) ; with B sparse
+// C = A*B ; with B sparse
 template <typename faust_real>
 void multiply(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle); 
 

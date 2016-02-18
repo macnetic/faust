@@ -304,7 +304,7 @@ void faust_cu_mat<faust_real>::setEyes()
 {
    if(dim1==dim2)
       handleError(class_name,"check_constraint_validity :\n cons must have 2 rows");
-   setEyes(dim1, device)
+   setEyes(dim1, device);
 }
  /// OPERATION BASIQUE ///
 
@@ -799,9 +799,9 @@ faust_real faust_cu_mat<faust_real>::trace() const
    return res;
  }*/
 
-/*
+
 template <typename faust_real>
- faust_real faust_cu_mat<faust_real>::spectralNorm(const faust_unsigned_int nbr_iter_max,faust_real threshold, faust_int & flag) const
+ faust_real faust_cu_mat<faust_real>::spectralNorm(const faust_unsigned_int nbr_iter_max,faust_real threshold, faust_int & flag, cublasHandle_t cublasHandle) const
 {
    #ifdef __COMPILE_TIMERS__
       t_spectral_norm2.start();
@@ -830,13 +830,13 @@ template <typename faust_real>
 
    faust_cu_mat<faust_real> AtA;
    if (nb_row <= nb_col)
-      gemm((*this),(*this),AtA,1.,0,'N','T');
+      gemm((*this),(*this),AtA,1.,0,'N','T',cublasHandle);
    else
-      gemm((*this),(*this),AtA,1.,0,'T','N');
+      gemm((*this),(*this),AtA,1.,0,'T','N', cublasHandle);
 
 
 
-   faust_real  res=std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag));
+   faust_real  res=std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag,cublasHandle));
 
 
 
@@ -845,7 +845,7 @@ template <typename faust_real>
    #endif
    return res;
 
-}*/
+}
 
 
 template <typename faust_real>
@@ -872,7 +872,7 @@ t_scalar_multiply.start();
          // display warning as it could be better to create an instance of faust_cu_spmat class instead
 
          resize(dim1,dim2);
-         kernel_memset(data, 0.0, dim1*dim2);
+         kernel_memset(data, (faust_real)0.0, dim1*dim2);
          kernel_add_diag_const(data, lambda, dim1);
       }
       else
@@ -1130,7 +1130,7 @@ void faust_cu_mat<faust_real>::add(const faust_cu_spmat<faust_real>& cu_S, cuspa
    else if(isIdentity)
    {
       init_from_cu_spmat(cu_S, cusparseHandle);
-      kernel_add_diag_const(data, 1.0, dim1);
+      kernel_add_diag_const(data, (faust_real)1.0, dim1);
    }
    else
    {
@@ -1201,7 +1201,7 @@ void faust_cu_mat<faust_real>::sub(const faust_cu_spmat<faust_real>& cu_S, cuspa
    else if(isIdentity)
    {
       init_from_cu_spmat(cu_S, cusparseHandle, -1.0);
-      kernel_add_diag_const(data, 1.0, dim1);
+      kernel_add_diag_const(data, (faust_real)1.0, dim1);
    }
    else
    {
@@ -1271,16 +1271,16 @@ void faust_cu_mat<faust_real>::add(const faust_cu_mat<faust_real>& cu_M)
    else if(isIdentity && cu_M.isIdentity)
    {
       resize(dim1, dim2);
-      kernel_memset(data, 0.0, dim1*dim2);
-      kernel_add_diag_const(data, 2.0, dim1);
+      kernel_memset(data, (faust_real)0.0, dim1*dim2);
+      kernel_add_diag_const(data, (faust_real)2.0, dim1);
    }
    else if(isIdentity)
    {
       this->operator=(cu_M);
-      kernel_add_diag_const(data, 1.0, dim1);
+      kernel_add_diag_const(data, (faust_real)1.0, dim1);
    }
    else if(cu_M.isIdentity)
-      kernel_add_diag_const(data, 1.0, dim1);
+      kernel_add_diag_const(data, (faust_real)1.0, dim1);
 
    else
    {
@@ -1324,7 +1324,7 @@ void faust_cu_mat<faust_real>::operator-=(const faust_cu_mat<faust_real>& cu_M)
    else if(isIdentity && cu_M.isIdentity)
       setZeros(dim1,dim2);
    else if(cu_M.isIdentity)
-      kernel_add_diag_const(data, -1.0, dim1);
+      kernel_add_diag_const(data, (faust_real)-1.0, dim1);
    else
    {
       faust_real* data_tmp = NULL;
@@ -1339,15 +1339,15 @@ void faust_cu_mat<faust_real>::operator-=(const faust_cu_mat<faust_real>& cu_M)
       if (isZeros)
       {
          resize(dim1, dim2);
-         kernel_memset(data, 0.0, dim1*dim2);
+         kernel_memset(data, (faust_real)0.0, dim1*dim2);
          kernel_sub(data, data_tmp, dim1*dim2);
       }
       else if(isIdentity)
       {
          resize(dim1, dim2);
-         kernel_memset(data, 0.0, dim1*dim2);
+         kernel_memset(data, (faust_real)0.0, dim1*dim2);
          kernel_sub(data, data_tmp, dim1*dim2);
-         kernel_add_diag_const(data, 1.0, dim1);
+         kernel_add_diag_const(data, (faust_real)1.0, dim1);
       }
       else if(device==cu_M.device && data==cu_M.data)
       {
@@ -1393,7 +1393,7 @@ void faust_cu_mat<faust_real>::scalarMultiply(const faust_cu_mat<faust_real>& cu
    else if(cu_M.isIdentity)
    {
       faust_cu_mat<faust_real> cu_A_tmp(*this);
-      kernel_memset(data, 0.0, dim1*dim2);
+      kernel_memset(data, (faust_real)0.0, dim1*dim2);
       kernel_copy_diag(data, cu_A_tmp.data, dim1);
    }
    else
@@ -1409,7 +1409,7 @@ void faust_cu_mat<faust_real>::scalarMultiply(const faust_cu_mat<faust_real>& cu
 
       if(isIdentity)
       {
-         kernel_memset(data, 0.0, dim1*dim2);
+         kernel_memset(data, (faust_real)0.0, dim1*dim2);
          kernel_copy_diag(data, data_tmp, dim1);
       }
       else

@@ -25,6 +25,7 @@ ifneq ($(COMPILE_SPMAT),)
 else
   SRC_CPP := $(filter-out ./faust_spmat.cpp ./faust_cu_spmat.cpp,$(SRC_CPP))
 endif
+SRC_CPP := $(filter-out ./cblas_algebra.cpp,$(SRC_CPP))
 
 OBJ_CU  := $(patsubst ./%.cu, ./%.cuo, $(SRC_CU))
 OBJ_CPP := $(patsubst ./%.cpp, ./%.o, $(SRC_CPP))

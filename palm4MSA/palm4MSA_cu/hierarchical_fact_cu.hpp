@@ -1,43 +1,40 @@
-#include "hierarchical_fact.h"
+//#include "hierarchical_fact_cu.h"
 #ifdef __COMPILE_TIMERS__
 #include "faust_timer.h"
 #endif
 
-#ifdef __COMPILE_GPU__
-   #include "faust_cu_spmat.h"
-   #include "faust_core_cu.h"
-#else
-   #include "faust_spmat.h"
-   #include "faust_core.h"
-#endif
+#include "faust_cu_spmat.h"
+#include "faust_core_cu.h"
 
 
 #include "faust_exception.h"
 using namespace std;
 
-//hierarchical_fact::hierarchical_fact(){} // voir avec Luc les parametres par defaut
+//hierarchical_fact_cu::hierarchical_fact_cu(){} // voir avec Luc les parametres par defaut
 
 template<typename T>
-const char * hierarchical_fact<T>::class_name="hierarchical_fact";
+const char * hierarchical_fact_cu<T>::class_name="hierarchical_fact_cu";
 
 template<typename T>
-hierarchical_fact<T>::hierarchical_fact(const faust_params<T>& params_):
+hierarchical_fact_cu<T>::hierarchical_fact_cu(const faust_params<T>& params_, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle):
    ind_fact(0),
    cons(params_.cons),
    isUpdateWayR2L(params_.isUpdateWayR2L),
    isFactSideLeft(params_.isFactSideLeft),
    isVerbose(params_.isVerbose),
    nb_fact(params_.nb_fact-1),
-   palm_2(palm4MSA<T>(params_, false)),
-   palm_global(palm4MSA<T>(params_, true)),
+   palm_2(palm4MSA_cu<T>(params_, cublasHandle, false)),
+   palm_global(palm4MSA_cu<T>(params_, cublasHandle, true)),
    cons_tmp_global(vector<const faust_constraint_generic*>()),
    default_lambda(params_.init_lambda),
    isFactorizationComputed(false),
-   errors(std::vector<std::vector<T> >(2,std::vector<T >(params_.nb_fact-1,0.0))){}
+   errors(std::vector<std::vector<T> >(2,std::vector<T >(params_.nb_fact-1,0.0))),
+   cublas_handle(cublasHandle),
+   cusparse_handle(cusparseHandle){}
 
    
 template<typename T>   
-void hierarchical_fact<T>::init()
+void hierarchical_fact_cu<T>::init()
 {
 #ifdef __COMPILE_TIMERS__
 t_init.start();
@@ -61,7 +58,7 @@ t_init.stop();
 }
 
 template<typename T>
-void hierarchical_fact<T>::next_step()
+void hierarchical_fact_cu<T>::next_step()
 {
 #ifdef __COMPILE_TIMERS__
 t_next_step.start();
@@ -144,7 +141,7 @@ palm_2.print_prox_timers();
 }
 
 template<typename T>
-void hierarchical_fact<T>::get_facts(faust_coregen & fact)const
+void hierarchical_fact_cu<T>::get_facts(faust_coregen & fact)const
 {
 	std::vector<faust_spmatrix > spfacts;
 	get_facts(spfacts);
@@ -153,11 +150,11 @@ void hierarchical_fact<T>::get_facts(faust_coregen & fact)const
 }
 
 template<typename T>
-void hierarchical_fact<T>::get_facts(std::vector<faust_spmatrix >& sparse_facts)const 
+void hierarchical_fact_cu<T>::get_facts(std::vector<faust_spmatrix >& sparse_facts)const 
 {
    /*if(!isFactorizationComputed)
    {
-      cerr << "Error in hierarchical_fact<T>::get_facts : factorization has not been computed" << endl;
+      cerr << "Error in hierarchical_fact_cu<T>::get_facts : factorization has not been computed" << endl;
       exit(EXIT_FAILURE);
    }*/
 
@@ -170,7 +167,7 @@ void hierarchical_fact<T>::get_facts(std::vector<faust_spmatrix >& sparse_facts)
 
 
 template<typename T>
-void hierarchical_fact<T>::compute_facts() 
+void hierarchical_fact_cu<T>::compute_facts() 
 {
    if(isFactorizationComputed)
    {
@@ -180,7 +177,7 @@ void hierarchical_fact<T>::compute_facts()
   init();
   for (int i=0 ; i<=nb_fact-1 ; i++)
   {
-     cout << "hierarchical_fact<T>::compute_facts : factorisation "<<i+1<<"/"<<nb_fact <<endl;
+     cout << "hierarchical_fact_cu<T>::compute_facts : factorisation "<<i+1<<"/"<<nb_fact <<endl;
      next_step();
   }
 
@@ -190,7 +187,7 @@ void hierarchical_fact<T>::compute_facts()
 
 
 template<typename T>
-const std::vector<std::vector< T> >& hierarchical_fact<T>::get_errors()const
+const std::vector<std::vector< T> >& hierarchical_fact_cu<T>::get_errors()const
 {
     if(!isFactorizationComputed)
     {
@@ -200,7 +197,7 @@ const std::vector<std::vector< T> >& hierarchical_fact<T>::get_errors()const
 }
 
 template<typename T>
-void hierarchical_fact<T>::compute_errors()
+void hierarchical_fact_cu<T>::compute_errors()
 {  	
    vector<faust_spmatrix > sp_facts;
    get_facts(sp_facts);
@@ -209,7 +206,7 @@ void hierarchical_fact<T>::compute_errors()
 
 
    faust_coregen faust_core_tmp(sp_facts, get_lambda());
-   const faust_matrix estimate_mat = faust_core_tmp.get_product();
+   const faust_matrix estimate_mat = faust_core_tmp.get_product(cublas_handle, cusparse_handle);
 
    faust_matrix data(palm_global.get_data());
 
@@ -222,14 +219,14 @@ void hierarchical_fact<T>::compute_errors()
 
 
 #ifdef __COMPILE_TIMERS__
-template<typename T> faust_timer hierarchical_fact<T>::t_init;
-template<typename T> faust_timer hierarchical_fact<T>::t_next_step;
+template<typename T> faust_timer hierarchical_fact_cu<T>::t_init;
+template<typename T> faust_timer hierarchical_fact_cu<T>::t_next_step;
 
 template<typename T>
-void hierarchical_fact<T>::print_timers()const
+void hierarchical_fact_cu<T>::print_timers()const
 {
    palm_global.print_global_timers();
-   cout << "timers in hierarchical_fact :" << endl;
+   cout << "timers in hierarchical_fact_cu :" << endl;
    cout << "t_init      = " << t_init.get_time()      << " s for "<< t_init.get_nb_call()      << " calls" << endl;
    cout << "t_next_step = " << t_next_step.get_time() << " s for "<< t_next_step.get_nb_call() << " calls" << endl<<endl;
 }
