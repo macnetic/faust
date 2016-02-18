@@ -302,10 +302,10 @@ void faust_cu_spmat<faust_real>::init(const faust_cu_mat<faust_real>& cu_A, cusp
     faust_cudaGetDevice(&currentGPU);
     faust_cudaSetDevice(dstDevice);
 
-    const faust_cu_mat* cu_A_ptr;
+    const faust_cu_mat<faust_real>* cu_A_ptr;
 
     if(device != dstDevice)
-       cu_A_ptr = new faust_cu_mat(cu_A, dstDevice);
+       cu_A_ptr = new faust_cu_mat<faust_real>(cu_A, dstDevice);
     else
        cu_A_ptr = &cu_A;
 
@@ -370,7 +370,7 @@ void faust_cu_spmat<faust_real>::init(const faust_cu_mat<faust_real>& cu_A, cusp
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::init(const faust_mat<faust_real>& M, cusparseHandle_t cusparseHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ )
 {
-    const faust_cu_mat cu_M(M.getNbRow(), M.getNbCol(), dstDevice);
+    const faust_cu_mat<faust_real> cu_M(M.getNbRow(), M.getNbCol(), dstDevice);
     init(cu_M, cusparseHandle, dstDevice, stream);
 }
 
@@ -448,8 +448,8 @@ void faust_cu_spmat<faust_real>::init_from_transpose(const faust_cu_spmat<faust_
 
       faust_cu_csr2csc(cusparseHandle,
          dim1, dim2, nnz,
-         NULL, rowPtrOld, colIndOld, 
-         NULL, csrColInd, csrRowPtr, 
+         (faust_real*)NULL, rowPtrOld, colIndOld, 
+         (faust_real*)NULL, csrColInd, csrRowPtr, 
          CUSPARSE_ACTION_SYMBOLIC, 
          CUSPARSE_INDEX_BASE_ZERO);
 
@@ -461,8 +461,8 @@ void faust_cu_spmat<faust_real>::init_from_transpose(const faust_cu_spmat<faust_
    {
       faust_cu_csr2csc(cusparseHandle,
          dim1, dim2, nnz,
-         NULL, cu_S.getRowPtr(), cu_S.getColInd(), 
-         NULL, csrColInd, csrRowPtr, 
+         (faust_real*)NULL, cu_S.getRowPtr(), cu_S.getColInd(), 
+         (faust_real*)NULL, csrColInd, csrRowPtr, 
          CUSPARSE_ACTION_SYMBOLIC, 
          CUSPARSE_INDEX_BASE_ZERO);
       
@@ -494,8 +494,8 @@ void faust_cu_spmat<faust_real>::transpose(cusparseHandle_t cusparseHandle)
 
    faust_cu_csr2csc(cusparseHandle,
          dim1, dim2, nnz,
-         NULL, rowPtrOld, colIndOld, 
-         NULL, csrColInd, csrrowPtr, 
+         (faust_real*)NULL, rowPtrOld, colIndOld, 
+         (faust_real*)NULL, csrColInd, csrRowPtr, 
          CUSPARSE_ACTION_SYMBOLIC, 
          CUSPARSE_INDEX_BASE_ZERO);
    
@@ -527,7 +527,7 @@ faust_real faust_cu_spmat<faust_real>::norm() const
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::Display()const
 {
-   faust_spmat S;
+   faust_spmat<faust_real> S;
    faust_cu2faust(S,*this);
    S.Display();
 }
@@ -537,9 +537,9 @@ void faust_cu_spmat<faust_real>::print_file(const char* filename)const
 {print_file(filename,std::fstream::out);}
 
 template<typename faust_real> 
-void faust_spmat<faust_real>::print_file(const char* filename,std::ios_base::openmode mode)const
+void faust_cu_spmat<faust_real>::print_file(const char* filename,std::ios_base::openmode mode)const
 {
-   faust_spmat tmp;
+   faust_spmat<faust_real> tmp;
    faust_cu2faust(tmp, *this);
    tmp.print_file(filename, mode);
 }

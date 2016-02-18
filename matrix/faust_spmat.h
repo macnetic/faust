@@ -58,16 +58,34 @@ class faust_spmat : public faust_mat_generic
 		void operator=(const faust_spmat<U> &M);
 		template <typename U>
 		void operator=(const faust_mat<U> &M){faust_spmat<U> spM(M);(this)->operator=(spM);}
+
+      int getNbRow()const{return dim1;}
+		int getNbCol()const{return dim2;}
 		faust_unsigned_int getNonZeros()const{return nnz;}
 		bool isCompressedMode()const{return mat.isCompressed();}
 		void makeCompression(){mat.makeCompressed();}
+
+
 		T* getValuePtr(){return mat.valuePtr();}// return pointer value of length nnz
+		const T* getValuePtr()const{return mat.valuePtr();}// return const pointer value of length nnz
+
+
+
+      // if rowMajor : getOuterIndexPtr()[0]=0 ; for n=1 to dim1,  getOuterIndexPtr()[n] = getOuterIndexPtr()[n-1]+ number of non-zeros elements in the row (n-1)
+      // if colMajor : getOuterIndexPtr()[0]=0 ; for n=1 to dim2,  getOuterIndexPtr()[n] = getOuterIndexPtr()[n-1]+ number of non-zeros elements in the col (n-1)
 		int* getOuterIndexPtr(){return mat.outerIndexPtr();}//return row-index value of length equal to the number of row+1
-		 int* getInnerIndexPtr(){return mat.innerIndexPtr();}//return col index of length nnz
-		 const T* getValuePtr()const{return mat.valuePtr();}// return pointer value of length nnz
 		const int* getOuterIndexPtr()const{return mat.outerIndexPtr();}
+
+      // if rowMajor : for n=0 to (dim1-1), getInnerIndexPtr()[n] = column index matching the element getValuePtr()[n];
+      // if colMajor : for n=0 to (dim1-1), getInnerIndexPtr()[n] =   row  index matching the element getValuePtr()[n];
+		int* getInnerIndexPtr(){return mat.innerIndexPtr();}//return col index of length nnz
 		const int* getInnerIndexPtr()const{return mat.innerIndexPtr();}
 		
+      const int* getRowPtr()const{if(mat.IsRowMajor) return mat.outerIndexPtr(); else{handleError(class_name,"getRowPtr : matrix is not in rowMajor");}}
+      const int* getColInd()const{if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(class_name,"getColInd : matrix is not in rowMajor");}}
+      int* getRowPtr(){if(mat.IsRowMajor) return mat.outerIndexPtr(); else{handleError(class_name,"getRowPtr : matrix is not in rowMajor");}}
+      int* getColInd(){if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(class_name,"getColInd : matrix is not in rowMajor");}}
+
 		
 		
 

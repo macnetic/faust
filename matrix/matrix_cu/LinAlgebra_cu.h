@@ -122,7 +122,9 @@ void multiply(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_r
 //------------- INLINE DEFINITIONS -------------//
 //----------------------------------------------//
 
-// because of header include issues, the definition of inline functions have been moved to the end LinAlgebra_cu.cpp and are not inline anymore
+// because of header include issues, the definition of inline functions have been moved to the end LinAlgebra_cu.cpp
+//
 
+#include "LinAlgebra_cu.hpp"
 
 #endif

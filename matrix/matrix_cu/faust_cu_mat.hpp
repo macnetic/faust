@@ -830,9 +830,9 @@ template <typename faust_real>
 
    faust_cu_mat<faust_real> AtA;
    if (nb_row <= nb_col)
-      gemm((*this),(*this),AtA,1.,0,'N','T',cublasHandle);
+      gemm<faust_real>((*this),(*this),AtA,1.,0,'N','T',cublasHandle);
    else
-      gemm((*this),(*this),AtA,1.,0,'T','N', cublasHandle);
+      gemm<faust_real>((*this),(*this),AtA,1.,0,'T','N', cublasHandle);
 
 
 

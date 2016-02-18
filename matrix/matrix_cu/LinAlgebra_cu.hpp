@@ -2,7 +2,6 @@
 #define __LINALGEBRA_CU_HPP__
 
 #include <iostream>
-#include "LinAlgebra_cu.h"
 #include "faust_cu_mat.h"
 #include "faust_cu_vec.h"
 #include "faust_cuda.h"
@@ -88,7 +87,7 @@ T power_iteration(const  faust_cu_mat<T> & cu_A, const faust_unsigned_int nbr_it
       cu_xk_norm = cu_xk;
       cu_xk_norm.normalize();
       gemv(cu_A, cu_xk_norm, cu_xk, cublasHandle);
-      lambda = cu_xk_norm.dot(cu_xk);
+      lambda = cu_xk_norm.dot(cu_xk, cublasHandle);
       //std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
    }
    flag = (i<nbr_iter_max)?i:-1;
@@ -567,7 +566,7 @@ void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>
 
 
 
-   faust_cu_csrmm2(cusparseHandle,cusparseOpA,cusparseOpB,
+   faust_cu_csrmm(cusparseHandle,cusparseOpA,cusparseOpB,
          cu_A_ptr->getNbRow(), cu_C_ptr->getNbCol(), cu_A_ptr->getNbCol(),
          cu_A_ptr->getNonZeros(),
          &alpha, cu_A_ptr->getDescr(), cu_A_ptr->getValues(),

@@ -152,4 +152,7 @@ template <typename faust_real>
 inline void faust_cu_spmat<faust_real>::_create(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)
 {_create(nnz_, dim1_, dim2_, device);}	
 
+
+#include "faust_cu_spmat.hpp"
+
 #endif
