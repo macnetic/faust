@@ -299,6 +299,13 @@ void faust_cu_mat<faust_real>::setEyes(const faust_unsigned_int nbRow, const int
     isZeros = false;
 }
 
+template <typename faust_real>
+void faust_cu_mat<faust_real>::setEyes()
+{
+   if(dim1==dim2)
+      handleError(class_name,"check_constraint_validity :\n cons must have 2 rows");
+   setEyes(dim1, device)
+}
  /// OPERATION BASIQUE ///
 
 template <typename faust_real>

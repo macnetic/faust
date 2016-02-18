@@ -130,7 +130,7 @@ faust_core_cu<T>::faust_core_cu(const std::vector<faust_cu_mat<T> >&facts) :
 
 }*/
 template<typename T>
-faust_cu_mat<T> faust_core_cu<T>::get_product()const
+faust_cu_mat<T> faust_core_cu<T>::get_product(cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle)const
 {
 	//complexity of evaluating a faust_core_cu 
 	// from left to right is (dim1*total_nnz)
@@ -144,13 +144,15 @@ faust_cu_mat<T> faust_core_cu<T>::get_product()const
 		prod.resize(getNbRow());
 		prod.setEyes();
 		for(int i=0 ; i<data.size() ; i++)
-		prod *= data[i];		
+		   //prod *= data[i];		
+         gemm(prod, data[i], prod, cublasHandle, cusparseHandle);
 	}else
 	{
 		prod.resize(getNbCol());
 		prod.setEyes();
 		for(int i=data.size()-1 ; i>=0 ; i--)
-		prod.multiplyLeft(data[i]);		
+		   //prod.multiplyLeft(data[i]);		
+         gemm(data[i], prod, prod, cusparseHandle);
 	}
 	/*faust_cu_mat<T> prod;
 	if ( (data[0].getNonZeros()+getNbRow()*(totalNonZeros-data[0].getNonZeros())) < (data[size()-1].getNonZeros()+getNbCol()*(totalNonZeros-data[size()-1].getNonZeros())) )

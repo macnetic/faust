@@ -65,10 +65,12 @@ public:
   // (*this) = la matrice nulle
   void setZeros(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const  int device_);
   void setZeros(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol){setZeros(nbRow,nbCol,device);}
+  void setZeros(){setZeros(dim1,dim2,device);}
 
   // (*this) = identite, pas forcement carree
   void setEyes(const faust_unsigned_int nbRow, const int device_);
   void setEyes(const faust_unsigned_int nbRow){setEyes(nbRow,device);}
+  void setEyes();
 
   //faust_real& operator[](faust_unsigned_int i){isZeros=false; isIdentity=false;return mat.data()[i];}
 

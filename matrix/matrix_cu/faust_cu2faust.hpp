@@ -29,7 +29,7 @@ void faust_cu2faust(faust_vec<T>& v, const faust_cu_vec<U>& cu_v, cudaStream_t s
          U* data_tmp = new U[cu_v.size()];
          faust_cudaMemcpyAsync(data_tmp, cu_v.getData(), cu_v.size()*sizeof(U), cudaMemcpyDeviceToHost, stream);
 	      for (int i=0 ; i<v.size() ;i++)
-            *(v.getData(i)) = (T) data_tmp[i];
+            v[i] = (T) data_tmp[i];
 	      delete [] data_tmp ; data_tmp=NULL;	
       }
       else
@@ -72,7 +72,7 @@ void faust_cu2faust(faust_mat<T>& M, const faust_cu_mat<U>& cu_M, cudaStream_t s
    	   U* data_tmp = new U[dim1*dim2];
          faust_cudaMemcpyAsync(data_tmp, cu_M.getData(), dim1*dim2*sizeof(U), cudaMemcpyDeviceToHost, stream);      
 	      for (int i=0 ; i<dim1*dim2 ;i++)
-            *(M.getData(i)) = (T) data_tmp[i];
+            M[i] = (T) data_tmp[i];
 	      delete [] data_tmp ; data_tmp=NULL;
       }
       else

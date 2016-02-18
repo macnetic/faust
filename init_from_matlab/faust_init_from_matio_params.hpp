@@ -139,7 +139,7 @@ void init_params_palm_from_matiofile(faust_params_palm<T>& params,const char* fi
 				init_mat_from_matvar(current_fact,current_fact_var);
 				current_fact.check_dim_validity();		
 				current_fact.Display();
-				init_facts.push_back(faust_cu_mat(current_fact));	
+				init_facts.push_back(faust_matrix(current_fact));	
 			}
 			params.init_fact=init_facts;	
 		}

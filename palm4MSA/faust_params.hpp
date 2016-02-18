@@ -1,4 +1,4 @@
-#include "faust_params.h"
+//#include "faust_params.h"
 #include "stopping_criterion.h"
 #include <iostream>
 #include "faust_constraint_int.h"

@@ -3,6 +3,8 @@
 
 #include <vector>
 #include "faust_cu_spmat.h"
+#include "cusparse.h"
+#include "cublas_v2.h"
 
 // class faust_cu_mat<T>;
 // class faust_cu_vec;
@@ -31,7 +33,7 @@ class faust_core_cu
 		void get_facts(std::vector<faust_cu_spmat<T> >& sparse_facts)const{sparse_facts = data;}
 		void get_facts(std::vector<faust_cu_mat<T> >& facts)const;	
 		int size()const{return data.size();} 
-                faust_cu_mat<T> get_product()const;
+      faust_cu_mat<T> get_product(cublasHandle_t, cusparseHandle_t)const;
 		faust_cu_spmat<T> get_fact(int id) const;		
 		int getNbRow() const;
 		int getNbCol() const;
