@@ -34,24 +34,13 @@ template<typename T> class stopping_criterion;
 template<typename T>
 class hierarchical_fact
 {
-   private:
-#ifdef __COMPILE_GPU__
-   typedef faust_cu_mat<T>    faust_matrix;
-   typedef faust_cu_spmat<T>  faust_spmatrix;
-   typedef faust_core_cu<T>   faust_coregen;
-#else
-   typedef faust_mat<T>    faust_matrix;
-   typedef faust_spmat<T>  faust_spmatrix;
-   typedef faust_core<T>   faust_coregen;
-#endif
-
 
    public:
       
       hierarchical_fact(const faust_params<T>& params_);
-	  void get_facts(faust_coregen &)const;	
-      void get_facts(std::vector<faust_spmatrix >&)const;
-	  void get_facts(std::vector<faust_matrix >& fact)const{fact = palm_global.get_facts();}
+	  void get_facts(faust_core<T> &)const;	
+      void get_facts(std::vector<faust_spmat<T> >&)const;
+	  void get_facts(std::vector<faust_mat<T> >& fact)const{fact = palm_global.get_facts();}
       void compute_facts();
       T get_lambda()const{return palm_global.get_lambda();}
       const std::vector<std::vector< T> >& get_errors()const;
@@ -73,7 +62,7 @@ private:
       palm4MSA<T> palm_2;
       palm4MSA<T> palm_global;
       const T default_lambda; // initial value of lambda for factorization into two factors
-      //std::vector<faust_matrix > S;
+      //std::vector<faust_mat<T> > S;
       std::vector<const faust_constraint_generic*> cons_tmp_global;
       bool isFactorizationComputed;
       std::vector<std::vector<T> > errors;

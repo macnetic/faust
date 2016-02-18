@@ -7,11 +7,7 @@
 #include "faust_constraint_real.h"
 #include "faust_constraint_int.h"
 #include "faust_constraint_mat.h"
-#ifdef __COMPILE_GPU__
-   #include "faust_cu_mat.h"
-#else
-   #include "faust_mat.h"
-#endif
+#include "faust_mat.h"
 
 #include "LinAlgebra.h"
 #include "prox.h"
@@ -51,7 +47,7 @@ palm4MSA<T>::palm4MSA(const faust_params<T> & params_, const bool isGlobal_) :
    lambda(params_.init_lambda),
    nb_fact(0),
    S(params_.init_fact),
-   RorL(vector<faust_matrix >(2)),
+   RorL(vector<faust_mat<T> >(2)),
    ind_fact(0),
    ind_ite(-1),
    verbose(params_.isVerbose),
@@ -85,8 +81,8 @@ const bool isGlobal_/*=false*/) :
    lambda(params_palm_.init_lambda),
    nb_fact(params_palm_.nb_fact),
    S(params_palm_.init_fact),
-   RorL(vector<faust_matrix >(2)),
-   LorR(faust_matrix(params_palm_.init_fact[0].getNbRow())),
+   RorL(vector<faust_mat<T> >(2)),
+   LorR(faust_mat<T>(params_palm_.init_fact[0].getNbRow())),
    const_vec(params_palm_.cons),
    ind_fact(0),
    ind_ite(-1),
@@ -120,9 +116,9 @@ void palm4MSA<T>::compute_facts()
 }
 
 template<typename T>
-void palm4MSA<T>::get_facts(faust_coregen & faust_fact) const
+void palm4MSA<T>::get_facts(faust_core<T> & faust_fact) const
 {
-	faust_coregen f(S);
+	faust_core<T> f(S);
 	faust_fact = f;
 	
 
@@ -156,7 +152,7 @@ t_local_compute_projection.start();
    }
    else
    {
-      //faust_matrix matrix2project(S[ind_fact]);
+      //faust_mat<T> matrix2project(S[ind_fact]);
       S[ind_fact] -= grad_over_c;
       switch (const_vec[ind_fact]->getConstraintType())
       {
@@ -254,9 +250,9 @@ t_local_compute_projection.start();
 			cout<<"NAME SUPP PROX"<<endl;*/
 			
             typename constraint_type<T>::constraint_type_supp* constr_cast = static_cast<typename constraint_type<T>::constraint_type_supp*>(const_vec[ind_fact]);
-			faust_matrix A(constr_cast->getParameter());
+			faust_mat<T> A(constr_cast->getParameter());
 			A.Display();
-            prox_supp(S[ind_fact],(faust_matrix)  constr_cast->getParameter());
+            prox_supp(S[ind_fact],(faust_mat<T>)  constr_cast->getParameter());
 			/*cout<<"S[ind_fact]"<<endl;
 			S[ind_fact].Display();*/
          }
@@ -328,7 +324,7 @@ t_local_compute_grad_over_c.start();
 
 
    error = data;
-   faust_matrix tmp1, tmp2, tmp3, tmp4;
+   faust_mat<T> tmp1, tmp2, tmp3, tmp4;
 
    if (idx==0 || idx==1) // computing L*S first, then (L*S)*R
    {
@@ -429,11 +425,11 @@ t_local_compute_lambda.start();
 
    // As LorR has also been updated at the end of the last iteration over the facts, LorR matches X_hat, which the product of all factors, including the last one.
    // Xt_Xhat = data'*X_hat
-   faust_matrix Xt_Xhat;
+   faust_mat<T> Xt_Xhat;
    gemm<T>(data, LorR, Xt_Xhat, 1.0, 0.0, 'T','N');
 
    // Xhatt_Xhat = X_hat'*X_hat
-   faust_matrix Xhatt_Xhat;
+   faust_mat<T> Xhatt_Xhat;
    gemm<T>(LorR, LorR, Xhatt_Xhat, 1.0, 0.0, 'T','N');
 
 

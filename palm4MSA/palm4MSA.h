@@ -11,15 +11,9 @@
   #include "faust_timer.h"
 #endif
 
-#ifdef __COMPILE_GPU__
-   #include "faust_cu_mat.h"
-   template<typename T> class faust_cu_mat;
-   template<typename T> class faust_core_cu;
-#else
-   #include "faust_mat.h"
-   template<typename T> class faust_mat;
-   template<typename T> class faust_core;
-#endif
+#include "faust_mat.h"
+template<typename T> class faust_mat;
+template<typename T> class faust_core;
 
 class faust_constraint_generic;
 template<typename T> class faust_params;
@@ -38,14 +32,6 @@ template<typename T> class stopping_criterion;
 template<typename T>
 class palm4MSA
 {
-   private:
-#ifdef __COMPILE_GPU__
-   typedef faust_cu_mat<T> faust_matrix;
-   typedef faust_core_cu<T> faust_coregen;
-#else
-   typedef faust_mat<T> faust_matrix;
-   typedef faust_core<T> faust_coregen;
-#endif
 
    public:
 	    /*!
@@ -57,7 +43,7 @@ class palm4MSA
       palm4MSA(const faust_params_palm<T>& params_palm_, const bool isGlobal_=false);
 
       void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
-      void set_data(const faust_matrix& data_){data=data_;}
+      void set_data(const faust_mat<T>& data_){data=data_;}
       void set_lambda(const faust_real lambda_){lambda = lambda_;}
 	  
 	  /*!
@@ -79,9 +65,9 @@ class palm4MSA
       T get_lambda()const{return lambda;}
 	  
       T get_RMSE()const{return error.norm()/sqrt((double)(data.getNbRow()*data.getNbCol()));}
-      const faust_matrix& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
-      const faust_matrix& get_data()const{return data;}
-	  void get_facts(faust_coregen & faust_fact) const;
+      const faust_mat<T>& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
+      const faust_mat<T>& get_data()const{return data;}
+	  void get_facts(faust_core<T> & faust_fact) const;
 	  
 
 	  	  /*!
@@ -100,7 +86,7 @@ class palm4MSA
 	 * useful in hierarchical_fact, update the factors of palm_global from palm_2
      */	
       void init_fact_from_palm(const palm4MSA& palm, bool isFactSideLeft);
-      const std::vector<faust_matrix >& get_facts()const {return S;}
+      const std::vector<faust_mat<T> >& get_facts()const {return S;}
 
       ~palm4MSA(){}
 
@@ -120,17 +106,17 @@ class palm4MSA
    
 
    private:
-      faust_matrix data;
+      faust_mat<T> data;
       T lambda;
       int nb_fact; // number of factors
-      std::vector<faust_matrix > S; // contains S_0^i, S_1^i, ...
+      std::vector<faust_mat<T> > S; // contains S_0^i, S_1^i, ...
 
       // RorL_vec matches R if (!isUpdateWayR2L)
       // RorL_vec matches L if (isUpdateWayR2L)
-      std::vector<faust_matrix > RorL; 
+      std::vector<faust_mat<T> > RorL; 
       // LorR_mat matches L if (!isUpdateWayR2L)
       // LorR_mat matches R if (isUpdateWayR2L)
-      faust_matrix LorR;
+      faust_mat<T> LorR;
       
 
       std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
@@ -147,9 +133,9 @@ class palm4MSA
       bool isConstraintSet;
       const bool isGlobal;
       bool isInit; // only used for global factorization (if isGlobal)
-      faust_matrix grad_over_c;
+      faust_mat<T> grad_over_c;
       T c; 
-      faust_matrix error; // error = lambda*L*S*R - data
+      faust_mat<T> error; // error = lambda*L*S*R - data
 
       
 

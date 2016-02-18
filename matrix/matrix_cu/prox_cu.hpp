@@ -4,6 +4,7 @@
 #include "algorithm"
 #include "faust_cu2faust.h"
 #include "faust_mat.h"
+#include "prox.h"
 
 // const char * interface_prox_name="prox : ";
 

@@ -43,7 +43,7 @@ class palm4MSA_cu
       palm4MSA_cu(const faust_params_palm<T>& params_palm_, const cublasHandle_t cublasHandle, const bool isGlobal_=false);
 
       void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
-      void set_data(const faust_cu_mat<T><T>& data_){data=data_;}
+      void set_data(const faust_cu_mat<T>& data_){data=data_;}
       void set_lambda(const T lambda_){lambda = lambda_;}
 	  
 	  /*!
@@ -65,8 +65,8 @@ class palm4MSA_cu
       T get_lambda()const{return lambda;}
 	  
       T get_RMSE()const{return error.norm()/sqrt((double)(data.getNbRow()*data.getNbCol()));}
-      const faust_cu_mat<T><T>& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
-      const faust_cu_mat<T><T>& get_data()const{return data;}
+      const faust_cu_mat<T>& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
+      const faust_cu_mat<T>& get_data()const{return data;}
 	  void get_facts(faust_core_cu<T> & faust_fact) const;
 	  
 
@@ -86,7 +86,7 @@ class palm4MSA_cu
 	 * useful in hierarchical_fact, update the factors of palm_global from palm_2
      */	
       void init_fact_from_palm(const palm4MSA_cu& palm, bool isFactSideLeft);
-      const std::vector<faust_cu_mat<T><T> >& get_facts()const {return S;}
+      const std::vector<faust_cu_mat<T> >& get_facts()const {return S;}
 
       ~palm4MSA_cu(){}
 
@@ -106,17 +106,17 @@ class palm4MSA_cu
    
 
    private:
-      faust_cu_mat<T><T> data;
+      faust_cu_mat<T> data;
       T lambda;
       int nb_fact; // number of factors
-      std::vector<faust_cu_mat<T><T> > S; // contains S_0^i, S_1^i, ...
+      std::vector<faust_cu_mat<T> > S; // contains S_0^i, S_1^i, ...
 
       // RorL_vec matches R if (!isUpdateWayR2L)
       // RorL_vec matches L if (isUpdateWayR2L)
-      std::vector<faust_cu_mat<T><T> > RorL; 
+      std::vector<faust_cu_mat<T> > RorL; 
       // LorR_mat matches L if (!isUpdateWayR2L)
       // LorR_mat matches R if (isUpdateWayR2L)
-      faust_cu_mat<T><T> LorR;
+      faust_cu_mat<T> LorR;
       
 
       std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
@@ -133,9 +133,9 @@ class palm4MSA_cu
       bool isConstraintSet;
       const bool isGlobal;
       bool isInit; // only used for global factorization (if isGlobal)
-      faust_cu_mat<T><T> grad_over_c;
+      faust_cu_mat<T> grad_over_c;
       T c; 
-      faust_cu_mat<T><T> error; // error = lambda*L*S*R - data
+      faust_cu_mat<T> error; // error = lambda*L*S*R - data
       cublasHandle_t cublas_handle;
 
       
