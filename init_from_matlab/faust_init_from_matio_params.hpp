@@ -1,6 +1,9 @@
+#ifndef __FAUST_INIT_FROM_MATIO_PARAMS_HPP__
+#define __FAUST_INIT_FROM_MATIO_PARAMS_HPP__
+
 #include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
-#include "faust_init_from_matio_params.h"
+//#include "faust_init_from_matio_params.h"
 #include "faust_mat.h"
 
 #include <iostream>
@@ -469,7 +472,4 @@ void Display_params(faust_params<T> & params)
 }
 
 
-
-
-
-
+#endif

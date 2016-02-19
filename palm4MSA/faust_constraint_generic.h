@@ -83,7 +83,6 @@ class faust_constraint_generic
       
 };
 
-#include "faust_constraint_generic.hpp"
 
 /////// functions useful for parsing config_file (xml,matio,txt_file) //////
 
@@ -103,5 +102,6 @@ faust_constraint_name getEquivalentConstraint(const char * type);
 int getTypeConstraint(const char * type);
 
 
+#include "faust_constraint_generic.hpp"
 
 #endif

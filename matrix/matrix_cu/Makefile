@@ -2,7 +2,6 @@ CC = gcc
 NVCC = nvcc
 
 CFLAGS = -O3 -fopenmp -I$(EIGENDIR)  -m64 -DHAVE_CUBLAS -fPIC -I$(CUDADIR)/include -fopenmp
-
 CUFLAGS = -O3 -m64 -Xcompiler -fPIC -use_fast_math -arch=compute_20 -code=sm_21 -I$(CUDADIR)/include -DHAVE_CUBLAS
 
 LIB_FAUST_CLASSES = libfaust_classes.a
