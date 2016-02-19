@@ -1,5 +1,5 @@
-#ifndef FAUST_CU_MAT_H
-#define FAUST_CU_MAT_H
+#ifndef __FAUST_CU_MAT_H__
+#define __FAUST_CU_MAT_H__
 
 
 #include "faust_constant.h"

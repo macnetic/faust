@@ -1,3 +1,5 @@
+#ifndef __FAUST_MAT_HPP__
+#define __FAUST_MAT_HPP__
 
 //#include <cmath>
 #include <iostream>
@@ -764,4 +766,6 @@ cout << "t_print_file      = " << t_print_file.get_time()      << " s for "<< t_
    cout << "t_gemm            = " << t_gemm.get_time()            << " s for "<< t_gemm.get_nb_call()            << " calls" << endl;
    cout << "t_add_ext         = " << t_add_ext.get_time()         << " s for "<< t_add_ext.get_nb_call()         << " calls" << endl<<endl<<endl;
 }
+#endif
+
 #endif

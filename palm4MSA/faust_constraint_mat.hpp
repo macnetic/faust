@@ -1,5 +1,8 @@
-#include "faust_constraint_mat.h"
-#include "faust_constraint_mat.h"
+#ifndef __FAUST_CONSTRAINT_MAT_HPP__
+#define __FAUST_CONSTRAINT_MAT_HPP__
+
+//#include "faust_constraint_mat.h"
+//#include "faust_constraint_mat.h"
 #include <iostream>
 #include <cstdlib>
 #include "faust_mat.h"
@@ -88,3 +91,5 @@ void faust_constraint_mat<T>::set_default_parameter()
          break;
    }
 }
+
+#endif

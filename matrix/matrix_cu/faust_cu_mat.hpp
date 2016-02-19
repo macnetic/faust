@@ -1,7 +1,7 @@
 #ifndef __FAUST_CU_MAT_HPP__
 #define __FAUST_CU_MAT_HPP__
 
-#include "faust_cu_mat.h"
+//#include "faust_cu_mat.h"
 #include "faust_cu_vec.h"
 #include "faust_mat.h"
 //#include <cmath>
@@ -17,7 +17,7 @@
 #include "faust_cuda.h"
 #include "faust_cu2faust.h"
 
-//#include "LinAlgebra.h"
+#include "LinAlgebra_cu.h"
 
 
 using namespace std;

@@ -1,3 +1,6 @@
+#ifndef __FAUST_LINALGEBRA_HPP
+#define __FAUST_LINALGEBRA_HPP
+
 #include <iostream>
 
 #include "faust_vec.h"
@@ -557,7 +560,4 @@ faust_vec<T> operator*(const faust_mat<T>& M, const faust_vec<T>& v)
 	return vec;
 }
 
-
-
-	
-
+#endif

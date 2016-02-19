@@ -1,5 +1,3 @@
-#ifndef __FAUST_EXCEPTION_H__
-#define __FAUST_EXCEPTION_H__
 
 #include <cstring>
 #include <stdio.h>
@@ -136,6 +134,5 @@ void handleWarning(const char texte [], ...)
 }*/
 
 
-#endif
 
 

@@ -1,4 +1,8 @@
-#include "faust_cu_vec.h"
+#ifndef __FAUST_CU_VEC_HPP__
+#define __FAUST_CU_VEC_HPP__
+
+
+//#include "faust_cu_vec.h"
 #include "faust_vec.h"
 //#include <cmath>
 #include <iostream>
@@ -46,6 +50,7 @@ faust_cu_vec<faust_real>::faust_cu_vec(const faust_unsigned_int dim_, int dstDev
 
 
 
+template <typename faust_real>
 const char * faust_cu_vec<faust_real>::class_name = "faust_cu_vec<faust_real>::";
 
 template <typename faust_real>
@@ -594,8 +599,8 @@ faust_real faust_cu_vec<faust_real>::mean_relative_error(const faust_cu_vec<faus
 template <typename faust_real>
 void faust_cu_vec<faust_real>::Display()const
 {
-   faust_vec v;
+   faust_vec<faust_real> v;
    faust_cu2faust(v,*this);
    v.Display();
 }
-
+#endif

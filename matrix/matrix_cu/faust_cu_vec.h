@@ -1,5 +1,5 @@
-#ifndef FAUST_CU_VEC_H
-#define FAUST_CU_VEC_H
+#ifndef __FAUST_CU_VEC_H__
+#define __FAUST_CU_VEC_H__
  
 #include "faust_constant.h"
 #include <vector>
@@ -126,5 +126,7 @@ inline void faust_cu_vec<faust_real>::multiplyLeft(const faust_cu_mat<faust_real
     gemv(cu_A, *this, cu_y_copy, 1.0, 0.0, 'N', cublasHandle);
     this->operator=(cu_y_copy);
 }
+
+#include "faust_cu_vec.hpp"
 
 #endif

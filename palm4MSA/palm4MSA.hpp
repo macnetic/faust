@@ -1,4 +1,7 @@
-#include "palm4MSA.h"
+#ifndef __PALM4MSA_HPP__
+#define __PALM4MSA_HPP__
+
+//#include "palm4MSA.h"
 
 #include <iostream>
 #include "faust_params.h"
@@ -826,9 +829,7 @@ void palm4MSA<T>::print_local_timers()const
 }
 
 
-
-
-
+#endif
 
 
 #endif

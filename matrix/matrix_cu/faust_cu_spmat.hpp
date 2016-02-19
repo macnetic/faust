@@ -1,4 +1,6 @@
-#include "faust_cu_spmat.h"
+#ifndef __FAUST_CU_SPMAT_HPP__
+#define __FAUST_CU_SPMAT_HPP__
+
 #include "faust_mat.h"
 #include "faust_cu_mat.h"
 #include "faust_spmat.h"
@@ -544,3 +546,4 @@ void faust_cu_spmat<faust_real>::print_file(const char* filename,std::ios_base::
    tmp.print_file(filename, mode);
 }
 
+#endif

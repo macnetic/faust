@@ -1,3 +1,5 @@
+#ifndef __FAUST_PROX_HPP__
+#define __FAUST_PROX_HPP__
 
 #include <vector>
 #include <iostream>
@@ -232,9 +234,6 @@ void prox_blkdiag(faust_mat<T> & M,int k)
 
 
 
-
-
-
 template<typename T>
 void prox_supp(faust_mat<T> & M,const faust_mat<T> & supp)
 {
@@ -248,19 +247,4 @@ void prox_supp(faust_mat<T> & M,const faust_mat<T> & supp)
 
 	
 	
-
-
-
-
-
-
-
-
-	
-	
-	
-
-
-
-
-
+#endif

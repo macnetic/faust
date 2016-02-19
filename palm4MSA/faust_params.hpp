@@ -1,3 +1,6 @@
+#ifndef __FAUST_PARAMS_HPP__
+#define __FAUST_PARAMS_HPP__
+
 //#include "faust_params.h"
 #include "stopping_criterion.h"
 #include <iostream>
@@ -472,4 +475,4 @@ void faust_params<T>::check_bool_validity()
 		
 		
 			
-	
+#endif	

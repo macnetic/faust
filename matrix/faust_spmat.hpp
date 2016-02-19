@@ -1,3 +1,6 @@
+#ifndef __FAUST_SP_MAT_HPP
+#define __FAUST_SP_MAT_HPP
+
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -388,3 +391,5 @@ void faust_spmat<T>::init_from_file(const char* filename)
 	
 }
 
+
+#endif

@@ -1,4 +1,7 @@
-#include "stopping_criterion.h"
+#ifndef __STOPPING_CRITERION_HPP__
+#define __STOPPING_CRITERION_HPP__
+
+//#include "stopping_criterion.h"
 #include <iostream>
 #include <cstdlib>
 #include "faust_exception.h"
@@ -57,3 +60,4 @@ bool stopping_criterion<T>::do_continue(int current_ite, T current_error /* = -2
    }
 }
 
+#endif

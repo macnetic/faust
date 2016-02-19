@@ -1,3 +1,6 @@
+#ifndef __HIERARCHICAL_FACT_CU_HPP__
+#define __HIERARCHICAL_FACT_CU_HPP__
+
 //#include "hierarchical_fact_cu.h"
 #ifdef __COMPILE_TIMERS__
 #include "faust_timer.h"
@@ -161,7 +164,7 @@ void hierarchical_fact_cu<T>::get_facts(std::vector<faust_spmatrix >& sparse_fac
    const std::vector<faust_matrix >& full_facts = palm_global.get_facts();
    sparse_facts.resize(full_facts.size());
    for (int i=0 ; i<sparse_facts.size() ; i++)
-      sparse_facts[i] = full_facts[i];
+      sparse_facts[i].init(full_facts[i],cusparse_handle);
 }
 
 
@@ -230,4 +233,6 @@ void hierarchical_fact_cu<T>::print_timers()const
    cout << "t_init      = " << t_init.get_time()      << " s for "<< t_init.get_nb_call()      << " calls" << endl;
    cout << "t_next_step = " << t_next_step.get_time() << " s for "<< t_next_step.get_nb_call() << " calls" << endl<<endl;
 }
+#endif
+
 #endif

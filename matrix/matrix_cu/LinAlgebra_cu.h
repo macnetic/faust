@@ -1,5 +1,5 @@
-#ifndef __LINALGEBRA_CU_H
-#define __LINALGEBRA_CU_H
+#ifndef __LINALGEBRA_CU_H__
+#define __LINALGEBRA_CU_H__
 
 #include "faust_constant.h"
 #ifdef __COMPILE_SPMAT__
@@ -122,7 +122,7 @@ void multiply(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_r
 //------------- INLINE DEFINITIONS -------------//
 //----------------------------------------------//
 
-// because of header include issues, the definition of inline functions have been moved to the end LinAlgebra_cu.cpp
+// because of header include issues, the definition of inline functions have been moved to the end LinAlgebra_cu.hpp
 //
 
 #include "LinAlgebra_cu.hpp"

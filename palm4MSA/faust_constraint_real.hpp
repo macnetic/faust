@@ -1,4 +1,7 @@
-#include "faust_constraint_real.h"
+#ifndef __FAUST_CONSTRAINT_REAL_HPP__
+#define __FAUST_CONSTRAINT_REAL_HPP__
+
+//#include "faust_constraint_real.h"
 #include <cstdlib>
 #include "faust_exception.h"
 
@@ -85,3 +88,5 @@ void faust_constraint_real<T>::set_default_parameter()
          break;
    }
 }
+
+#endif

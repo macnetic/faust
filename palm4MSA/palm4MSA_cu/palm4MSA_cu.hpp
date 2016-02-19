@@ -1,3 +1,6 @@
+#ifndef __PALM4MSA_CU_HPP__
+#define __PALM4MSA_CU_HPP__
+
 //#include "palm4MSA_cu.h"
 
 #include <iostream>
@@ -831,9 +834,7 @@ void palm4MSA_cu<T>::print_local_timers()const
 }
 
 
-
-
-
+#endif
 
 
 #endif

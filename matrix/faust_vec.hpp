@@ -1,3 +1,6 @@
+#ifndef __FAUST_VEC_HPP__
+#define __FAUST_VEC_HPP__
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -222,4 +225,4 @@ void  faust_vec<T>::multiplyLeft(faust_spmat<T> const& A)
 	dim = A.dim1;
 }
 
-
+#endif

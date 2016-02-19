@@ -1,4 +1,7 @@
-#include "hierarchical_fact.h"
+#ifndef __FAUST_HIERARCHICAL_FACT_HPP__
+#define __FAUST_HIERARCHICAL_FACT_HPP__
+
+//#include "hierarchical_fact.h"
 #ifdef __COMPILE_TIMERS__
 #include "faust_timer.h"
 #endif
@@ -233,4 +236,6 @@ void hierarchical_fact<T>::print_timers()const
    cout << "t_init      = " << t_init.get_time()      << " s for "<< t_init.get_nb_call()      << " calls" << endl;
    cout << "t_next_step = " << t_next_step.get_time() << " s for "<< t_next_step.get_nb_call() << " calls" << endl<<endl;
 }
+#endif
+
 #endif

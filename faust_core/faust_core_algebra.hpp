@@ -1,3 +1,6 @@
+#ifndef __FAUST_CORE_ALGEBRA_HPP__
+#define __FAUST_CORE_ALGEBRA_HPP__
+
 #include <iostream>
 #include "LinAlgebra.h"
 #include "faust_mat.h"
@@ -260,6 +263,4 @@ faust_mat<T> operator*(const faust_core<T>& f, const faust_mat<T>& M)
 	return A;
 }
 
-
-
-
+#endif

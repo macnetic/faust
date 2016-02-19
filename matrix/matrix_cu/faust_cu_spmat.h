@@ -62,7 +62,7 @@ template <typename faust_real> class faust_cu_spmat
 		void init_from_transpose(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle);
 		faust_real norm() const;
 		void operator= (const faust_cu_spmat<faust_real>& M);
-		void operator= (const faust_cu_mat<faust_real>& Mdense);
+		//void operator= (const faust_cu_mat<faust_real>& Mdense);
 		
 		faust_unsigned_int getNbRow()const{return dim1;}
 		faust_unsigned_int getNbCol()const{return dim2;}

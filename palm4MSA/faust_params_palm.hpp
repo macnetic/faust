@@ -1,4 +1,7 @@
-#include "faust_params_palm.h"
+#ifndef __FAUST_PARAMS_PALM_HPP__
+#define __FAUST_PARAMS_PALM_HPP__
+
+//#include "faust_params_palm.h"
 #include "stopping_criterion.h"
 #include <iostream>
 #include <stdexcept>
@@ -158,4 +161,4 @@ void faust_params_palm<T>::Display() const
 		std::cout<<std::endl<<std::endl;
 }
 
-
+#endif

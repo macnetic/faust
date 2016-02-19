@@ -1,4 +1,6 @@
-#include "faust_constraint_generic.h"
+#ifndef __FAUST_CONSTRAINT_GENERIC_HPP__
+#define __FAUST_CONSTRAINT_GENERIC_HPP__
+
 #include "faust_constraint_int.h"
 #include "faust_constraint_real.h"
 #include <typeinfo>
@@ -252,4 +254,4 @@ bool faust_constraint_generic::isConstraintParameterMat()const
 }
 
 
-
+#endif
