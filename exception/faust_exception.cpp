@@ -21,6 +21,7 @@ void handleError(const char* classe_name , const  char* txt)
 	std::string s1(classe_name);
 	std::string s2(txt);
 	throw std::logic_error((s0+s1+s2));
+	//exit(EXIT_FAILURE);
 }
 
 
