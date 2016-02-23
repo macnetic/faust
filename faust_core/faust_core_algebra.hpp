@@ -19,9 +19,7 @@
 	#include "faust_timer.h"
 #endif
 
-#ifdef __GEMM_WITH_OPENBLAS__
-	#include "cblas.h"
-#endif
+
 
 // const char * core_algebra_name="faust_core<T>_algebra : ";
 

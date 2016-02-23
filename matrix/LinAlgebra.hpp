@@ -5,6 +5,7 @@
 
 #include "faust_vec.h"
 #include "faust_mat.h"
+#include "faust_constant.h"
 
 
 	//////////FONCTION faust_mat<T> - faust_mat<T> ////////////////////

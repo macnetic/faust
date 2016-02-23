@@ -7,6 +7,7 @@
 #include <fstream>
 #include <Eigen/Sparse>
 #include "faust_exception.h"
+#include "faust_constant.h"
 
 #ifdef __GEMM_WITH_OPENBLAS__
 	#include "cblas_algebra.h"

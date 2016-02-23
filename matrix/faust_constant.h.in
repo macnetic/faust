@@ -19,7 +19,7 @@
 //	#define IS_SINGLE_DEFINED 0
 //#endif
 
-
+#cmakedefine __GEMM_WITH_OPENBLAS__  
 
 typedef unsigned long int faust_unsigned_int;
 typedef long int faust_int;

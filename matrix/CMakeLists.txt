@@ -7,14 +7,21 @@ if(UNIX AND FAUST_USE_MKL)
 elseif(WIN32 AND FAUST_USE_MKL)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
 endif()
+
+
 add_definitions(-DEIGEN_MPL2_ONLY)
+
 include_directories( ${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
 if(FAUST_USE_OPENBLAS)
 	include_directories( ${OPENBLAS_INC_DIR})
-	#add_definitions(-D__GEMM_WITH_OPENBLAS__ )
-	# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GEMM_WITH_OPENBLAS__ ")
+	set(__GEMM_WITH_OPENBLAS__ "1")
 	message(STATUS "!!!!!!! openblas actif !!!!!!!")
 endif()
+
+# permet de definir ou non la variable de compilation __GEMM_WITH_OPENBLAS__ 
+configure_file(${FAUST_MATRIX_SRC_DIR}/faust_constant.h.in ${FAUST_MATRIX_SRC_DIR}/faust_constant.h @ONLY)
+
+
 
 if(FAUST_USE_MKL)
 	include_directories( ${MKL_INC_DIR})

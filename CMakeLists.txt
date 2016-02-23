@@ -176,8 +176,6 @@ check_external_includes("libxml/parser.h" XML_INC_DIR 0)
 if(FAUST_USE_OPENBLAS)
 	check_external_libraries(openblas OPENBLAS_LIB_FILE 1)
 	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
-	add_definitions(-D__GEMM_WITH_OPENBLAS__ )
-	 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__GEMM_WITH_OPENBLAS__" CACHE STRING "compile flags" FORCE)
 endif()
 
 
