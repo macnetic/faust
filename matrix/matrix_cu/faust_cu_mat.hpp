@@ -1138,7 +1138,7 @@ void faust_cu_mat<faust_real>::add(const faust_cu_spmat<faust_real>& cu_S, cuspa
       faust_cudaSetDevice(cu_S.getDevice());
 
       int* rowind_tmp_src;
-      cudaMalloc((void**)&rowind_tmp_src, cu_S.getNonZeros()*sizeof(int));
+      faust_cudaMalloc((void**)&rowind_tmp_src, cu_S.getNonZeros()*sizeof(int));
       faust_cu_csr2coo(cusparseHandle, cu_S.getRowPtr(),
          cu_S.getNonZeros(), dim1, rowind_tmp_src, CUSPARSE_INDEX_BASE_ZERO);
 
