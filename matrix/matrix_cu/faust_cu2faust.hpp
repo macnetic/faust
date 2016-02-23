@@ -12,7 +12,6 @@
 #endif
 #include <typeinfo>
 
-const char * class_name="faust_cu2faust";
 
 template<typename T, typename U>
 void faust_cu2faust(faust_vec<T>& v, const faust_cu_vec<U>& cu_v, cudaStream_t stream/*=0*/ )
@@ -44,7 +43,7 @@ void faust_cu2faust(faust_vec<T>& v, const faust_cu_vec<U>& cu_v, cudaStream_t s
    else if (cu_v.size()==0)
       v.resize(0);   
    else
-      handleError(class_name,"NULL pointer for non-empty vector");	
+      handleError("faust_cu2faust","NULL pointer for non-empty vector");	
       
 }
 
@@ -81,7 +80,7 @@ void faust_cu2faust(faust_mat<T>& M, const faust_cu_mat<U>& cu_M, cudaStream_t s
       faust_cudaSetDevice(currentGPU);
    }
    else if(dim1*dim2 != 0)
-      handleError(class_name,"NULL pointer for non-empty matrix");	
+      handleError("faust_cu2faust","NULL pointer for non-empty matrix");	
 }
 
 #ifdef __COMPILE_SPMAT__
@@ -100,7 +99,7 @@ void faust_cu2faust(faust_spmat<T>& S, const faust_cu_spmat<U>& cu_S, cudaStream
          if(cu_S.getColInd()==NULL || cu_S.getRowPtr()==NULL || cu_S.getValues()==NULL
             || S.getColInd()==NULL || S.getRowPtr()==NULL || S.getValuePtr()==NULL)
             
-            handleError(class_name,"NULL pointer for non-empty matrix");
+            handleError("faust_cu2faust","NULL pointer for non-empty matrix");
 
          else
          {
@@ -109,7 +108,7 @@ void faust_cu2faust(faust_spmat<T>& S, const faust_cu_spmat<U>& cu_S, cudaStream
             faust_cudaSetDevice(cu_S.getDevice());
             
             //if eigen sparse matrix S.mat is not in rowMajor
-               //handleError(class_name,"Eigen sparse matrix must be in RowMajor");
+               //handleError("faust_cu2faust","Eigen sparse matrix must be in RowMajor");
 
 
             faust_cudaMemcpyAsync(S.getRowPtr(), cu_S.getRowPtr(), (dim1+1)*sizeof(int), cudaMemcpyDeviceToHost, stream);      

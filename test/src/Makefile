@@ -37,7 +37,7 @@ CFLAGS_PALM      := $(CFLAGS) -I$(MATRIX_DIR) -I$(CUDADIR)/include -I$(EIGENDIR)
 CFLAGS_FAUSTCORE := $(CFLAGS) 
 CFLAGS_MATIO     := $(CFLAGS) -I$(MATIODIR)/include -I$(PALM_DIR) -I$(MATRIX_DIR) -I$(CUDADIR)/include -I$(EIGENDIR) -I$(EXCEPTION_DIR)
 CFLAGS_EXCEPTION := $(CFLAGS) 
-CFLAGS_TEST      := $(CFLAGS) -I$(MATRIX_DIR) -I$(CUDADIR)/include -I$(EIGENDIR) -I$(PALM_DIR) -I$(FAUSTCORE_DIR) -I$(MATIO_DIR) -I$(MATIODIR)/include 
+CFLAGS_TEST      := $(CFLAGS) -I$(MATRIX_DIR) -I$(CUDADIR)/include -I$(EIGENDIR) -I$(PALM_DIR) -I$(FAUSTCORE_DIR) -I$(MATIO_DIR) -I$(MATIODIR)/include -I$(EXCEPTION_DIR) 
 
 SRC_CPP_MATRIX := $(wildcard $(MATRIX_DIR)/*.cpp)
 SRC_CU_MATRIX  := $(wildcard $(MATRIX_DIR)/*.cu)
@@ -86,8 +86,8 @@ $(TEST_HIERFACT_OBJ) : $(TEST_HIERFACT_SRC)
 
 
 %.out: %.o $(LIB_MATRIX) $(LIB_PALM) $(LIB_FAUSTCORE) $(LIB_MATIO) $(LIB_EXCEPTION)
-	@printf '\033[36m%s\033[31m%s\033[m\n' "Compiling     " $@
-	@$(CC) $< $(CFLAGS) $(LDFLAGS) -o $@ 
+	@printf '\033[36m%s\033[31m%s\033[m\n' "Linking       " $@
+	@$(CC) $<  $(LDFLAGS) -o $@ 
 
 
 $(MATRIX_DIR)/%.cuo:  $(MATRIX_DIR)/%.cu $(SRC_HU_MATRIX)
@@ -130,7 +130,7 @@ $(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
 
 
 cleanall:
-	@rm -rf  $(LIB_MATRIX) $(LIB_PALM) $(LIB_FAUSTCORE) $(LIB_MATIO) $(LIB_EXCEPTION) $(MATRIX_DIR)/*.o $(MATRIX_DIR)/*.cuo $(PALM_DIR)/*.o $(FAUSTCORE_DIR)/*.o $(MATIO_DIR)/*.o $(EXCEPTION_DIR)/*.o
+	@rm -rf  $(LIB_MATRIX) $(LIB_PALM) $(LIB_FAUSTCORE) $(LIB_MATIO) $(LIB_EXCEPTION) $(MATRIX_DIR)/*.o $(MATRIX_DIR)/*.cuo $(PALM_DIR)/*.o $(FAUSTCORE_DIR)/*.o $(MATIO_DIR)/*.o $(EXCEPTION_DIR)/*.o $(TEST_HIERFACT_EXE) $(TEST_HIERFACT_OBJ)
 
 clean:
 	@rm -rf $(TEST_HIERFACT_EXE) $(TEST_HIERFACT_OBJ) 

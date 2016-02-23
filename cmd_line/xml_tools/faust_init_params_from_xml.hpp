@@ -1,3 +1,7 @@
+#ifndef __FAUST_INIT_PARAMS_FROM_XML_HPP__
+#define __FAUST_INIT_PARAMS_FROM_XML_HPP__
+
+
 #include <stdlib.h>
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
@@ -376,3 +380,5 @@ void add_constraint(std::vector<const faust_constraint_generic*> & consS,char* t
 	
 	
 }
+
+#endif

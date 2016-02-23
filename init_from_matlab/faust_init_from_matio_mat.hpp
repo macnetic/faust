@@ -1,5 +1,8 @@
+#ifndef __FAUST_INIT_FROM_MATIO_MAT_HPP__
+#define __FAUST_INIT_FROM_MATIO_MAT_HPP__
+
 #include "faust_init_from_matio.h"
-#include "faust_init_from_matio_mat.h"
+//#include "faust_init_from_matio_mat.h"
 #include "faust_mat.h"
 #include "faust_spmat.h"
 
@@ -185,4 +188,4 @@ void init_spmat_from_matvar(faust_spmat<T>& S, matvar_t* var)
 }
 
 
-
+#endif

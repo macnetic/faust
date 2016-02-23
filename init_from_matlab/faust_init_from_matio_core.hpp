@@ -1,4 +1,7 @@
-#include "faust_init_from_matio_core.h"
+#ifndef __FAUST_INIT_FROM_MATIO_CORE_HPP__
+#define __FAUST_INIT_FROM_MATIO_CORE_HPP__
+
+//#include "faust_init_from_matio_core.h"
 #include "faust_init_from_matio_mat.h"
 #include "faust_mat.h"
 #include "faust_spmat.h"
@@ -112,3 +115,4 @@ void init_faust_data_from_matiofile(vector<faust_mat<T> >& full_mat, vector<faus
 	
 }
 
+#endif

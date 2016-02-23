@@ -1,7 +1,7 @@
 #ifndef __FAUST_CORE_CU_HPP__
 #define __FAUST_CORE_CU_HPP__
 
-#include "faust_core_cu.h"
+//#include "faust_core_cu.h"
 #include "faust_cu_vec.h"
 //#include "hierarchical_fact.h"
 //#include "faust_params.h"

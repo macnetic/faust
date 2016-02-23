@@ -1,4 +1,8 @@
-#include "tools_mex.h"
+#ifndef __FAUST_TOOLS_MEX_HPP__
+#define __FAUST_TOOLS_MEX_HPP__
+
+
+//#include "tools_mex.h"
 #include "faust_constraint_generic.h"
 #include "faust_constraint_real.h"
 #include "faust_constraint_mat.h"
@@ -498,4 +502,4 @@ void DisplayParams(const faust_params<T> & params)
 	}
 }
 
-
+#endif

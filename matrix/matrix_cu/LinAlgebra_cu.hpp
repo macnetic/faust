@@ -653,6 +653,7 @@ void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>
 template <typename faust_real>
 void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, cusparseHandle_t cusparseHandle)
 {gemm(cu_A, cu_B, cu_C, faust_real(1.0), faust_real(0.0), 'N', 'N', cusparseHandle);}
+template <typename faust_real>
 void multiply(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, cusparseHandle_t cusparseHandle)
 { gemm(cu_A, cu_B, cu_C, faust_real(1.0), faust_real(0.0), 'N', 'N', cusparseHandle);}
 
