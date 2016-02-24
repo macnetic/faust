@@ -21,6 +21,20 @@ void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFiel
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+	#ifdef FAUST_VERBOSE
+		if (typeid(faust_real) == typeid(float))
+		{
+			std::cout<<"faust_real == float"<<std::endl;
+		}
+	
+		if (typeid(faust_real) == typeid(double))
+		{
+			std::cout<<"faust_real == double"<<std::endl;
+		}
+		system("sleep 7");
+	#endif
+	
+	
 	if (nrhs != 1)
 	{
 		mexErrMsgTxt("Bad Number of inputs arguments");
@@ -34,19 +48,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     std::vector<bool> presentFields;
     testCoherencePalm4MSA(prhs[0],presentFields);
      mexPrintf(" NUMBER FIELDS %d\n",presentFields.size());
-//     for (int i=0;i<presentFields.size();i++)
-//     {   
-//         
-//         mexPrintf(" FIELDS n %d present : ",i);
-//         if (presentFields[i])
-//         {
-//             mexPrintf(" true\n");
-//         }else
-//         {
-//             mexPrintf(" false\n");
-//         }
-//     }
-//     
+    
     
     
     
@@ -191,7 +193,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
        // compute_lambda = (bool) mxGetScalar(mxCurrentField);
    // }
     
-    std::cout<<"PASSER2"<<std::endl;
+
       ///////////// HIERARCHICAL LAUNCH ///////////////  
      // creation des parametres  
 	try{		
@@ -199,7 +201,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		
 
 		
-	 std::cout<<"PASSER2"<<std::endl;
+
      
      //creation de hierarchical fact
     faust_params_palm<faust_real> params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda); 
@@ -289,10 +291,7 @@ void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFiel
         {
             presentFields[7] = true;
         }
-        // if (strcmp(fieldName,"compute_lambda") == 0)
-        // {
-            // presentFields[8] = true;
-        // }
+
   }
   
 }
@@ -308,52 +307,4 @@ void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFiel
 
 
 
-/*void DisplayParams(const faust_params & params)
-{   
-    mexPrintf("/////// PARAMS //////\n");
-    faust_mat<faust_real> data = params.data; 
-   
-    int nbRow = data.getNbRow();
-    int nbCol = data.getNbCol();
-    mexPrintf("DATA DIM : %d %d\n",nbRow,nbCol);
-    if (nbRow*nbCol < 1000)
-    {
-        for (int i = 0;i<data.getNbRow();i++)
-        {
-            for (int j = 0;j<data.getNbCol();j++)
-            {
-                mexPrintf("%f ",data(i,j));
-            }
-            mexPrintf("\n");
-        }
-    }
-    mexPrintf("\n\n");
-    
-    mexPrintf("NB_FACTS : %d\n",params.nb_fact);
-    mexPrintf("CONSTRAINTS : nbr %d\n",params.cons[0].size());
-		for (int jl=0;jl<params.cons.size();jl++)
-		{	
-			//char * type_cons =  getType((*params.cons[jl][L]).get_constraint_name());
-            char * type_cons =  (*params.cons[jl]).getType();
-			mexPrintf(" %s ",(*params.cons[jl]).get_constraint_name());
-			mexPrintf(" DIMS (%d,%d) : ",(*params.cons[jl]).getRows(),(*params.cons[jl][L]).getCols());
-			
-			
-			if (strcmp(type_cons,"INT") == 0)
-			{	
-				faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[jl][L]);
-				mexPrintf(" parameter : %d",(*const_int).getParameter());
-			}
-			
-			if (strcmp(type_cons,"FAUST_REAL") == 0)
-			{	
-				faust_constraint_real* const_real = (faust_constraint_real*)(params.cons[jl][L]);
-				mexPrintf(" parameter : %f",(*const_real).getParameter());
-			}
-			mexPrintf("\n"); 
 
-			
-		}
-		
-	}
-}*/

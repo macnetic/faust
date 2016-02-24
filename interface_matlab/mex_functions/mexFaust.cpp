@@ -4,6 +4,7 @@
 #include "tools_mex.h"
 #include "faust_mat.h"
 #include <stdexcept>
+#include "faust_constant.h"
 
 // prhs[0] : name of command : 
 //    "delete" to delete the faust_core<faust_real> object dynamically allocated previously
@@ -17,6 +18,17 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {	
+	#ifdef FAUST_VERBOSE
+		if (typeid(faust_real) == typeid(float))
+		{
+			std::cout<<"faust_real == float"<<std::endl;
+		}
+	
+		if (typeid(faust_real) == typeid(double))
+		{
+			std::cout<<"faust_real == double"<<std::endl;
+		}
+	#endif
 	try{
 	// Get the command string
 	char cmd[256];

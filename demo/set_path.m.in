@@ -1,0 +1,4 @@
+addpath('@FAUST_MEXINTERFACEMEX_BIN_DIR@');%% access to the mexfunction
+addpath('@FAUST_DEMOTOOLS_SRC_DIR@');%% access to the tools.m function (sparsify toolbox, figure toolbox ...)
+addpath('@FAUST_DEMODATA_SRC_DIR@');%% access to the data
+addpath('@FAUST_MEXINTERFACETOOLS_BIN_DIR@');%% access to matlab_faust.m (interface betwwen faust_core C++ class and matlab class)

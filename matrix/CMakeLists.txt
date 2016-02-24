@@ -15,19 +15,25 @@ include_directories( ${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
 if(FAUST_USE_OPENBLAS)
 	include_directories( ${OPENBLAS_INC_DIR})
 	set(__GEMM_WITH_OPENBLAS__ "1")
-	message(STATUS "!!!!!!! openblas actif !!!!!!!")
+	message(STATUS "**** OPENBLAS USE *****")
 endif()
 
-# permet de definir ou non la variable de compilation __GEMM_WITH_OPENBLAS__ 
+
+if (FAUST_USE_SINGLEPRECISION)
+	set(FAUST_SINGLE "1")
+	message(STATUS "**** SINGLE PRECISION USE *****")	
+endif()
+
+if (FAUST_ISVERBOSE)
+	set(FAUST_VERBOSE "1")
+endif()
+	
+# permet de definir ou non les variable de compilation __GEMM_WITH_OPENBLAS__ et FAUST_SINGLE
 configure_file(${FAUST_MATRIX_SRC_DIR}/faust_constant.h.in ${FAUST_MATRIX_SRC_DIR}/faust_constant.h @ONLY)
 
 
 
-if(FAUST_USE_MKL)
-	include_directories( ${MKL_INC_DIR})
-	message(STATUS " matrix MKL_INC_DIR ${MKL_INC_DIR}")
-	add_definitions(-D__GEMM_WITH_MKL__)
-endif()
+
 #message(STATUS "AAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 add_library(${FAUST_MATRIX_TARGET} OBJECT ${CPP_FILES})
 

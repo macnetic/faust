@@ -1,8 +1,3 @@
-
-
-configure_file(${FAUST_MEXINTERFACETOOLS_SRC_DIR}/matlab_faust.m.in ${FAUST_TESTMATLABSCRIPT_BIN_DIR}/matlab_faust.m COPYONLY)
-
-
 if(FAUST_USE_MATIO)
 
 	
@@ -134,6 +129,18 @@ else()
    
    
 endif()
+
+if (FAUST_USE_MEX)
+configure_file(${FAUST_TEST_SRC_TOOL_DIR}/set_path.m.in ${FAUST_TESTTOOLS_BIN_DIR}/set_path.m @ONLY)
+configure_file(${FAUST_TEST_SRC_TOOL_DIR}/launch_hierarchical_fact.m ${FAUST_TESTTOOLS_BIN_DIR}/launch_hierarchical_fact.m COPYONLY)
+	
+ FOREACH(matlabtest hier_fact.m MEG_fact.m)
+      CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/${matlabtest} ${FAUST_TEST_BIN_DIR}/${matlabtest} COPYONLY)
+ ENDFOREACH()
+	
+	
+
+endif(FAUST_USE_MEX)
 
  
    

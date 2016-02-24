@@ -17,8 +17,8 @@
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{	
-	cout<<"single defined : "<<IS_SINGLE_DEFINED<<endl; 	
+{		
+	#ifdef FAUST_VERBOSE
 	if (typeid(faust_real) == typeid(float))
 	{
 		std::cout<<"faust_real == float"<<std::endl;
@@ -29,6 +29,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		std::cout<<"faust_real == double"<<std::endl;
 	}
 	system("sleep 7");
+	#endif
 	
 	if (nrhs != 1)
 	{
@@ -42,7 +43,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     std::vector<bool> presentFields;
     testCoherence(prhs[0],presentFields);
-     mexPrintf(" NUMBER FIELDS %d\n",presentFields.size());
+     // mexPrintf(" NUMBER FIELDS %d\n",presentFields.size());
 //     for (int i=0;i<presentFields.size();i++)
 //     {   
 //         

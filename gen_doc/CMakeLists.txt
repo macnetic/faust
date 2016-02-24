@@ -1,4 +1,5 @@
 # add a target to generate API documentation with Doxygen
+if(FAUST_GEN_DOC)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 configure_file(${FAUST_DOC_SRC_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
@@ -11,4 +12,4 @@ install(DIRECTORY ${PROJECT_BINARY_DIR}/html DESTINATION share/doc)
 
 endif(DOXYGEN_FOUND)
 
- 
+endif(FAUST_GEN_DOC) 
