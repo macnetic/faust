@@ -173,7 +173,9 @@ void faust_cu_mat<faust_real>::_clear()
       faust_cudaSetDevice(currentGPU);
    }  
    else if(data!=NULL)
+{
       handleError(class_name, "_clear : data of empty matrix, identity matrix or zeros matrix should be NULL");
+}
    dim1 = 0;
    dim2 = 0;
    isIdentity = false;
@@ -904,7 +906,6 @@ bool faust_cu_mat<faust_real>::operator==(const faust_cu_mat<faust_real>& cu_M)c
 template <typename faust_real>
 void faust_cu_mat<faust_real>::operator=(const faust_cu_mat<faust_real>& cu_M)
 {
-
     if(cu_M.dim1*cu_M.dim2 == 0)
     {
        // display warning as matrix is empty
@@ -924,7 +925,9 @@ void faust_cu_mat<faust_real>::operator=(const faust_cu_mat<faust_real>& cu_M)
        device = cu_M.device;
     }
     else
+{
        copyFromDevice(cu_M.data, cu_M.dim1, cu_M.dim2, cu_M.device, cu_M.device);
+}
 }
 
 template <typename faust_real>

@@ -98,14 +98,12 @@ void faust_cu_csrmm<double>(cusparseHandle_t handle,
 {faust_cusparseDcsrmm2(handle,transA,transB,m,n,k,nnz,alpha,descrA,csrValA,csrRowPtrA,csrColIndA,B,ldb,beta,C,ldc);}
 
 
-template<>
-void faust_cu_nnz<float>(cusparseHandle_t handle, cusparseDirection_t dirA, 
+template<> void faust_cu_nnz<float>(cusparseHandle_t handle, cusparseDirection_t dirA, 
    int m, int n, const cusparseMatDescr_t descrA, const float* A, 
    int lda, int* nnzPerRowColumn, int* nnzTotalDevHostPtr)
 {faust_cusparseSnnz(handle, dirA, m, n, descrA, A, lda, nnzPerRowColumn, nnzTotalDevHostPtr);}
 
-template<>
-void faust_cu_nnz<double>(cusparseHandle_t handle, cusparseDirection_t dirA, 
+template<> void faust_cu_nnz<double>(cusparseHandle_t handle, cusparseDirection_t dirA, 
    int m, int n, const cusparseMatDescr_t descrA, const double* A, 
    int lda, int* nnzPerRowColumn, int* nnzTotalDevHostPtr)
 {faust_cusparseDnnz(handle, dirA, m, n, descrA, A, lda, nnzPerRowColumn, nnzTotalDevHostPtr);}

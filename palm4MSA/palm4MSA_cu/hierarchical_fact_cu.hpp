@@ -66,7 +66,6 @@ void hierarchical_fact_cu<T>::next_step()
 #ifdef __COMPILE_TIMERS__
 t_next_step.start();
 #endif
-
       
    if(isFactorizationComputed)
    {
@@ -164,7 +163,9 @@ void hierarchical_fact_cu<T>::get_facts(std::vector<faust_spmatrix >& sparse_fac
    const std::vector<faust_matrix >& full_facts = palm_global.get_facts();
    sparse_facts.resize(full_facts.size());
    for (int i=0 ; i<sparse_facts.size() ; i++)
+{
       sparse_facts[i].init(full_facts[i],cusparse_handle);
+}
 }
 
 

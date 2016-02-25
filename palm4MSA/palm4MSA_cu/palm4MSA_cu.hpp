@@ -65,6 +65,8 @@ palm4MSA_cu<T>::palm4MSA_cu(const faust_params<T> & params_, const cublasHandle_
    c(1/params_.step_size),
    cublas_handle(cublasHandle)
 {
+   RorL.reserve(params_.nb_fact);
+
    if(isGlobal)
       stop_crit = stopping_criterion<T>(params_.stop_crit_global);
    else
@@ -101,6 +103,8 @@ const cublasHandle_t cublasHandle, const bool isGlobal_/*=false*/) :
    c(1/params_palm_.step_size),
    cublas_handle(cublasHandle)
 {
+   RorL.reserve(const_vec.size()+1);
+
    	if (isConstantStepSize)
 		isCComputed = true;
 	else

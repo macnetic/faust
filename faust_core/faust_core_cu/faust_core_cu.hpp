@@ -137,11 +137,12 @@ faust_cu_mat<T> faust_core_cu<T>::get_product(cublasHandle_t cublasHandle, cuspa
 	// from right to left is (dim2*total_nnz)	
 	if (size() == 0)
 		handleError(class_name,"get_product : empty faust_core_cu");						
-	faust_cu_mat<T> prod(data[0].getNbRow()); 
-	
+	/*faust_cu_mat<T> prod(data[0].getNbRow());
+
 	if(getNbRow()<getNbCol())
 	{
 		prod.resize(getNbRow());
+      cout<<"dim1="<<prod.getNbRow()<<" ; dim2="<<prod.getNbCol()<<endl;
 		prod.setEyes();
 		for(int i=0 ; i<data.size() ; i++)
 		   //prod *= data[i];		
@@ -149,23 +150,27 @@ faust_cu_mat<T> faust_core_cu<T>::get_product(cublasHandle_t cublasHandle, cuspa
 	}else
 	{
 		prod.resize(getNbCol());
+      cout<<"dim1="<<prod.getNbRow()<<" ; dim2="<<prod.getNbCol()<<endl;
 		prod.setEyes();
 		for(int i=data.size()-1 ; i>=0 ; i--)
 		   //prod.multiplyLeft(data[i]);		
          gemm(data[i], prod, prod, cusparseHandle);
-	}
-	/*faust_cu_mat<T> prod;
+	}*/
+
+	faust_cu_mat<T> prod;
 	if ( (data[0].getNonZeros()+getNbRow()*(totalNonZeros-data[0].getNonZeros())) < (data[size()-1].getNonZeros()+getNbCol()*(totalNonZeros-data[size()-1].getNonZeros())) )
 	{
-		prod = data[0];	
+		prod.init_from_cu_spmat(data[0], cusparseHandle);	
 		for(int i=1 ; i<data.size() ; i++)
-		prod *= data[i];	
+		   //prod *= data[i];	
+         gemm(prod, data[i], prod, cublasHandle, cusparseHandle);
 	}else
 	{	
-		prod = data[size()-1];	
+		prod.init_from_cu_spmat(data[size()-1], cusparseHandle);	
 		for(int i=data.size()-2 ; i>=0 ; i--)
-		prod.multiplyLeft(data[i]);	
-	}	*/
+		   //prod.multiplyLeft(data[i]);	
+         gemm(data[i], prod, prod, cusparseHandle);
+	}	
    
    
 

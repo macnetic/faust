@@ -62,8 +62,7 @@ void faust_cu_csrmm(cusparseHandle_t handle,
    const faust_real* csrValA, const int* csrRowPtrA, const int* csrColIndA,
    const faust_real* B, int ldb, const faust_real* beta, faust_real* C, int ldc);
 
-template <typename faust_real>
-void faust_cu_nnz(cusparseHandle_t handle, cusparseDirection_t dirA, 
+template <typename faust_real> void faust_cu_nnz(cusparseHandle_t handle, cusparseDirection_t dirA, 
    int m, int n, const cusparseMatDescr_t descrA, const faust_real* A, 
    int lda, int* nnzPerRowColumn, int* nnzTotalDevHostPtr);
 
@@ -163,7 +162,7 @@ inline const char* cusparseGetErrorString(cusparseStatus_t cusparseStat)
     cudaError_t err = cudaGetLastError();                                                    \
     if( err != cudaSuccess) {                                                \
         std::cerr << __FILE__<<":"<<__LINE__<< " : Error : kernel failed : " << cudaGetErrorString(cudaSuccess) << std::endl ;              \
-        exit(cudaSuccess);                                                  \
+        exit(err);                                                  \
     } } while (0)
 
 

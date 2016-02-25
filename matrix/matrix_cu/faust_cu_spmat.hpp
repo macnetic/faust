@@ -11,6 +11,7 @@
 #include "kernels.h"
 #include "faust_cu_reduce.h"
 #include "faust_cu2faust.h"
+#include "faust_cuda.h"
 
 using namespace std;
 
@@ -311,16 +312,22 @@ void faust_cu_spmat<faust_real>::init(const faust_cu_mat<faust_real>& cu_A, cusp
     else
        cu_A_ptr = &cu_A;
 
-    const int dim1_= (int)cu_A_ptr->getNbRow();
-    const int dim2_= (int)cu_A_ptr->getNbCol();
-    int nnz_;
+    int dim1_= (int)cu_A_ptr->getNbRow();
+    int dim2_= (int)cu_A_ptr->getNbCol();
+    int nnz_=0;
+
+
 
     if(cu_A_ptr->getData())
     {
        int* nnzPerRow;
        faust_cudaMalloc((void**)&nnzPerRow, dim1_*sizeof(int));
+
+       cusparseMatDescr_t descr_tmp;
+       faust_cusparseCreateMatDescr(&descr_tmp);
+
        faust_cu_nnz(cusparseHandle, CUSPARSE_DIRECTION_ROW,
-             dim1_, dim2_, *descr,
+             dim1_, dim2_, descr_tmp,
              cu_A_ptr->getData(),
              dim1_, nnzPerRow, &nnz_);
 
