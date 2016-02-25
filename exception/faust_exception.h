@@ -4,12 +4,17 @@
 #include <stdarg.h>
 #include <cstdlib>
 #include <stdexcept>
+#include <sstream>
 
 
-void handleError(const char* classe_name , const  char* txt);
-//void handleError(const  char* txt);
+
 void handleWarning(const char texte [], ...);
-//void faust_exception_throw(const char* texte);
 
+
+// macro pour la gestion des errors (__LINE__ et __FILE__)
+#define handleError(class_name,message) do {                                \
+		std::stringstream complete_message;		\
+        complete_message<<"Error in file " <<__FILE__<<std::endl<<" line "<<__LINE__<< " , class  " <<class_name<<" : "<<std::endl<<message; \
+	    throw std::logic_error(complete_message.str());} while (0) 
 
 #endif

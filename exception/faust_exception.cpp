@@ -14,22 +14,7 @@
 void handleTxt(const char texte [],std::stringstream & ss, va_list ap);
 
 
-//void handleError(const char* texte){throw std::logic_error(texte);}	
-void handleError(const char* classe_name , const  char* txt)
-{
-	std::string s0("Error in ");
-	std::string s1(classe_name);
-	std::string s2(txt);
-	throw std::logic_error((s0+s1+s2));
-	//exit(EXIT_FAILURE);
-}
 
-
-void handleError(const  char* txt)
-{
-
-	throw std::logic_error(txt);
-}
 
 
 void handleTxt(const char texte [],std::stringstream & ss, va_list ap)
