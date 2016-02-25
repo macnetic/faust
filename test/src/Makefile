@@ -1,4 +1,4 @@
-CC = gcc
+GCC = gcc
 NVCC = nvcc
 
 
@@ -11,14 +11,17 @@ TEST_DIR = .
 
 LIB_MATRIX = $(MATRIX_DIR)/libfaustmat.a
 LIB_PALM = $(PALM_DIR)/libfaustpalm.a
-LIB_FAUSTCORE = $(FAUSTCORE_DIR)/libfaustcore.a
 LIB_MATIO = $(MATIO_DIR)/libfaustmatio.a
 LIB_EXCEPTION = $(EXCEPTION_DIR)/libfaustexeption.a
 
-LIBS = $(LIB_MATRIX) $(LIB_PALM) $(LIB_FAUSTCORE) $(LIB_MATIO) $(LIB_EXCEPTION)
+LIBS = $(LIB_MATRIX) $(LIB_PALM)  $(LIB_MATIO) $(LIB_EXCEPTION)
 
 CFLAGS = -O3 -fopenmp -m64 -DHAVE_CUBLAS -fPIC
-CUFLAGS = -O3 -m64 -Xcompiler -fPIC -use_fast_math -arch=compute_20 -code=sm_21
+CUFLAGS = -O3 -m64 -Xcompiler -fPIC -use_fast_math  -gencode arch=compute_20,code=sm_20 \
+-gencode arch=compute_20,code=sm_21 \
+-gencode arch=compute_30,code=sm_30 \
+-gencode arch=compute_35,code=sm_35 \
+-gencode arch=compute_50,code=sm_50
 
 ifneq ($(COMPILE_GPU),)
   CUFLAGS += -D__COMPILE_GPU__
@@ -34,7 +37,6 @@ CUFLAGS_MATRIX   := $(CUFLAGS)
 
 CFLAGS_MATRIX    := $(CFLAGS) -I$(CUDADIR)/include -I$(EXCEPTION_DIR) 
 CFLAGS_PALM      := $(CFLAGS) -I$(MATRIX_DIR) -I$(CUDADIR)/include -I$(EIGENDIR) -I$(EXCEPTION_DIR)
-CFLAGS_FAUSTCORE := $(CFLAGS) 
 CFLAGS_MATIO     := $(CFLAGS) -I$(MATIODIR)/include -I$(PALM_DIR) -I$(MATRIX_DIR) -I$(CUDADIR)/include -I$(EIGENDIR) -I$(EXCEPTION_DIR)
 CFLAGS_EXCEPTION := $(CFLAGS) 
 CFLAGS_TEST      := $(CFLAGS) -I$(MATRIX_DIR) -I$(CUDADIR)/include -I$(EIGENDIR) -I$(PALM_DIR) -I$(FAUSTCORE_DIR) -I$(MATIO_DIR) -I$(MATIODIR)/include -I$(EXCEPTION_DIR) 
@@ -46,9 +48,6 @@ SRC_HU_MATRIX  := $(wildcard $(MATRIX_DIR)/*.hu)
 
 SRC_CPP_PALM := $(wildcard $(PALM_DIR)/*.cpp)
 SRC_HPP_PALM := $(wildcard $(PALM_DIR)/*.hpp)
-
-SRC_CPP_FAUSTCORE := $(wildcard $(LIB_FAUSTCORE)/*.cpp)
-SRC_HPP_FAUSTCORE := $(wildcard $(LIB_FAUSTCORE)/*.hpp)
 
 SRC_CPP_MATIO := $(wildcard $(MATIO_DIR)/*.cpp)
 SRC_HPP_MATIO := $(wildcard $(MATIO_DIR)/*.hpp)
@@ -67,7 +66,6 @@ OBJ_CU_MATRIX     := $(patsubst %.cu,  %.cuo, $(SRC_CU_MATRIX))
 
 OBJ_CPP_MATRIX    := $(patsubst %.cpp, %.o, $(SRC_CPP_MATRIX))
 OBJ_CPP_PALM      := $(patsubst %.cpp, %.o, $(SRC_CPP_PALM))
-OBJ_CPP_FAUSTCORE := $(patsubst %.cpp, %.o, $(SRC_CPP_FAUSTCORE))
 OBJ_CPP_MATIO     := $(patsubst %.cpp, %.o, $(SRC_CPP_MATIO))
 OBJ_CPP_EXCEPTION := $(patsubst %.cpp, %.o, $(SRC_CPP_EXCEPTION))
 
@@ -85,7 +83,7 @@ $(TEST_HIERFACT_OBJ) : $(TEST_HIERFACT_SRC)
 
 
 
-%.out: %.o $(LIB_MATRIX) $(LIB_PALM) $(LIB_FAUSTCORE) $(LIB_MATIO) $(LIB_EXCEPTION)
+%.out: %.o $(LIB_MATRIX) $(LIB_PALM) $(LIB_MATIO) $(LIB_EXCEPTION)
 	@printf '\033[36m%s\033[31m%s\033[m\n' "Linking       " $@
 	@$(CC) $<  $(LDFLAGS) -o $@ 
 
@@ -107,12 +105,6 @@ $(PALM_DIR)/%.o: $(PALM_DIR)/%.cpp $(SRC_HPP_PALM)
 $(LIB_PALM): $(OBJ_CPP_PALM) $(SRC_HPP_PALM) 
 	@ar -rcsv $@ $(OBJ_CPP_PALM)
 
-$(FAUSTCORE_DIR)/%.o: $(FAUSTCORE_DIR)/%.cpp $(SRC_HPP_FAUSTCORE)
-	@printf '\033[36m%s\033[31m%s\033[m\n' "Compiling     " $@
-	@$(CC) -c $(CFLAGS_FAUSTCORE) $< -o $@
-$(LIB_FAUSTCORE): $(OBJ_CPP_FAUSTCORE) $(SRC_HPP_FAUSTCORE)
-	@ar -rcsv $@ $(OBJ_CPP_FAUSTCORE)
-
 $(MATIO_DIR)/%.o: $(MATIO_DIR)/%.cpp $(SRC_HPP_MATIO)
 	@printf '\033[36m%s\033[31m%s\033[m\n' "Compiling     " $@
 	@$(CC) -c $(CFLAGS_MATIO) $< -o $@
@@ -132,7 +124,7 @@ $(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
 
 
 cleanall:
-	@rm -rf  $(LIB_MATRIX) $(LIB_PALM) $(LIB_FAUSTCORE) $(LIB_MATIO) $(LIB_EXCEPTION) $(MATRIX_DIR)/*.o $(MATRIX_DIR)/*.cuo $(PALM_DIR)/*.o $(FAUSTCORE_DIR)/*.o $(MATIO_DIR)/*.o $(EXCEPTION_DIR)/*.o $(TEST_HIERFACT_EXE) $(TEST_HIERFACT_OBJ)
+	@rm -rf  $(LIB_MATRIX) $(LIB_PALM)  $(LIB_MATIO) $(LIB_EXCEPTION) $(MATRIX_DIR)/*.o $(MATRIX_DIR)/*.cuo $(PALM_DIR)/*.o $(MATIO_DIR)/*.o $(EXCEPTION_DIR)/*.o $(TEST_HIERFACT_EXE) $(TEST_HIERFACT_OBJ)
 
 clean:
 	@rm -rf $(TEST_HIERFACT_EXE) $(TEST_HIERFACT_OBJ) 
