@@ -335,10 +335,16 @@ t_local_compute_grad_over_c.start();
       {
          // tmp1 = L*S
          multiply(LorR, S[ind_fact], tmp1);
-tmp1.print_file("tmp1_host.tmp");
+//LorR.print_file("LorR_0_host.tmp");
+//S[ind_fact].print_file("S_0_host.tmp");
+//tmp1.print_file("tmp1_0_host.tmp");
          // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
          gemm<T>(tmp1, RorL[ind_fact], error, lambda, -1.0, 'N', 'N');
-error.print_file("error_host.tmp");
+//LorR.print_file("LorR_1_host.tmp");
+//S[ind_fact].print_file("S_1_host.tmp");
+//tmp1.print_file("tmp1_1_host.tmp");
+//RorL[ind_fact].print_file("RorL_1_host.tmp");
+//error.print_file("error_1_host.tmp");
       }
       else
       {
@@ -354,10 +360,8 @@ error.print_file("error_host.tmp");
       {
          // tmp1 = S*R
          multiply(S[ind_fact], RorL[ind_fact], tmp1);
-tmp1.print_file("tmp1_host.tmp");
          // error = lambda*L*tmp1 - error (= lambda*L*S*R - data )
          gemm<T>(LorR, tmp1, error, lambda, -1.0, 'N', 'N');
-error.print_file("error_host.tmp");
       }
       else
       {
@@ -375,11 +379,27 @@ error.print_file("error_host.tmp");
       if (!isUpdateWayR2L)
       {
          // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
+//LorR.print_file("LorR_2_host.tmp");
+//S[ind_fact].print_file("S_2_host.tmp");
+//tmp1.print_file("tmp1_2_host.tmp");
+//RorL[ind_fact].print_file("RorL_2_host.tmp");
+//error.print_file("error_2_host.tmp");
          gemm<T>(LorR, error, tmp3, lambda, 0.0, 'T', 'N');
-tmp3.print_file("tmp3_host.tmp");
+//LorR.print_file("LorR_3_host.tmp");
+//S[ind_fact].print_file("S_3_host.tmp");
+//tmp1.print_file("tmp1_3_host.tmp");
+//RorL[ind_fact].print_file("RorL_3_host.tmp");
+//error.print_file("error_3_host.tmp");
+//tmp3.print_file("tmp3_3_host.tmp");
          // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
          gemm<T>(tmp3, RorL[ind_fact], grad_over_c, 1.0/c, 0.0,'N','T');
-grad_over_c.print_file("grad_over_c1_host.tmp");
+//LorR.print_file("LorR_4_host.tmp");
+//S[ind_fact].print_file("S_4_host.tmp");
+//tmp1.print_file("tmp1_4_host.tmp");
+//RorL[ind_fact].print_file("RorL_4_host.tmp");
+//error.print_file("error_4_host.tmp");
+//tmp3.print_file("tmp3_4_host.tmp");
+//grad_over_c.print_file("grad_over_c_4_host.tmp");
       }
       else
       {
@@ -395,10 +415,8 @@ grad_over_c.print_file("grad_over_c1_host.tmp");
       {
          // tmp3 = lambda*error*R' (= lambda*(lambda*L*S*R - data) * R' )
          gemm<T>(error, RorL[ind_fact], tmp3, lambda, 0.0, 'N', 'T');
-tmp3.print_file("tmp3_host.tmp");
          // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * lambda*(lambda*L*S*R - data) * R' )
          gemm<T>(LorR, tmp3, grad_over_c,1.0/c, 0.0,'T','N');
-grad_over_c.print_file("grad_over_c1_host.tmp");
       }
       else
       {
@@ -410,7 +428,6 @@ grad_over_c.print_file("grad_over_c1_host.tmp");
 
    }
 
-grad_over_c.print_file("grad_over_c2_host.tmp");
 exit(-1);
 
    isGradComputed = true;
