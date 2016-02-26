@@ -2,7 +2,7 @@ PROJECT_NAME           = "FAµST (Flexible Approximate MUlti-layer Sparse Transf
 GENERATE_HTML          = YES
 HTML_OUTPUT            = @PROJECT_BINARY_DIR@/html
 GENERATE_LATEX         = NO
-PROJECT_LOGO           = /udd/nbellot/Devel/Faust/trunk/devcpp/gen_doc/faust.png
+PROJECT_LOGO           =  @FAUST_DOC_SRC_DIR@/images/logo.png
 PROJECT_NUMBER         = @FAUST_VERSION_MAJOR@.@FAUST_VERSION_MINOR@
 INPUT =  @PROJECT_SOURCE_DIR@
 #INPUT += mainpage.md
@@ -20,6 +20,8 @@ FILE_PATTERNS          =
 # be searched for input files as well.
 # The default value is: NO.
 RECURSIVE              = YES
+
+IMAGE_PATH = @FAUST_DOC_SRC_DIR@/images
 
 # The EXCLUDE tag can be used to specify files and/or directories that should be
 # excluded from the INPUT source files. This way you can easily exclude a
