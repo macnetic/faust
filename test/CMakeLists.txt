@@ -142,7 +142,16 @@ configure_file(${FAUST_TEST_SRC_TOOL_DIR}/launch_hierarchical_fact.m ${FAUST_TES
 
 endif(FAUST_USE_MEX)
 
- 
+
+
+##############################################################################
+#Testing with CTest
+##############################################################################
+#CTest is a testing tool distributed as a part of CMake.
+INCLUDE(CTest)
+enable_testing()
+add_test(FAUST_HIER, ${FAUST_TESTSRC_BIN_DIR}/faust_hier)
+add_test(MEG_FACT, ${FAUST_TESTSRC_BIN_DIR}/meg) 
    
 
 
