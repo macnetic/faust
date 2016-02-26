@@ -149,7 +149,7 @@ endif()
 # Default values for FAUST_USE_SINGLEPRECISION and FAUST_USE_OPENBLAS and USE_MATIO
 set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
 set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
-set(FAUST_USE_MEX OFF CACHE BOOL "Generate Mexfiles")
+set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
 set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read matfile")
 set(FAUST_USE_XML ON CACHE BOOL "Using xml configuration file")
 set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
@@ -163,7 +163,7 @@ if(WIN32)
 endif()
 
 include(CMake/add_library_path.cmake)
-add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/opt" "/opt/local")
+add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local")
 add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/opt" "/opt/local" "/usr/include/libxml2")
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP} CACHE PATH "List of include paths used as PATH parameter in find_path")
@@ -191,11 +191,22 @@ check_external_includes("matio.h" MATIO_INC_DIR 0)
 #find_path(EIGEN_LIB_DIR ${EIGEN_LIB_FILE})
 
 # adding compiler flags
+
+set(CMAKE_CXX_FLAGS "")
+if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") )
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_DEBUG}")
+	message(STATUS "mode DEBUG")
+else()
+	message(STATUS "mode RELEASE")
+endif()
+
 if(UNIX)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -fno-omit-frame-pointer -pthread -fPIC " CACHE STRING "compile flags" FORCE)
 elseif(WIN32)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /EHs /openmp /MD" CACHE STRING "compile flags" FORCE)
 endif()
+	message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
+###
 
 # if(FAUST_USE_SINGLEPRECISION)
 	# set(CXX_MEX_FLAGS "${CXX_MEX_FLAGS} -DFAUST_SINGLE")
