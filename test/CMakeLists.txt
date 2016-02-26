@@ -148,10 +148,10 @@ endif(FAUST_USE_MEX)
 #Testing with CTest
 ##############################################################################
 #CTest is a testing tool distributed as a part of CMake.
-INCLUDE(CTest)
-enable_testing()
-add_test(FAUST_HIER, ${FAUST_TESTSRC_BIN_DIR}/faust_hier)
-add_test(MEG_FACT, ${FAUST_TESTSRC_BIN_DIR}/meg) 
+
+
+add_test(FAUST_HIER, ${FAUST_TEST_BIN_DIR}/faust_hier)
+add_test(MEG_FACT, ${FAUST_TEST_BIN_DIR}/meg) 
    
 
 

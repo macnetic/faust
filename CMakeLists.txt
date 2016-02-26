@@ -45,8 +45,10 @@ endif()
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE STRING "" FORCE)
 
 
-
-
+# Enable testing:
+OPTION(BUILD_TESTING "Build Tests" ON) 
+include(CTest)
+enable_testing()
 
 # SOURCE DIRECTORIES
 set(FAUST_EXCEPTION_SRC_DIR ${PROJECT_SOURCE_DIR}/exception CACHE INTERNAL "")
