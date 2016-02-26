@@ -1438,6 +1438,13 @@ void faust_cu_mat<faust_real>::Display()const
    M.Display();
 }
 
+template <typename faust_real>
+void faust_cu_mat<faust_real>::print_file(const char* filename)const
+{
+   faust_mat<faust_real> M;
+   faust_cu2faust(M,*this);
+   M.print_file(filename);
+}
 
 
 

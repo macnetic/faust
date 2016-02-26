@@ -93,6 +93,7 @@ faust_real* getData(){return data;}
 const faust_real* getData()const {return data;}
 
    void Display()const;
+   void print_file(const char* filename)const;
 
 
 //friend void gemv(const faust_cu_mat<faust_real>& A,const faust_cu_vec<faust_real>& x, faust_cu_vec<faust_real>& y,const faust_real alpha, const faust_real beta, char typeA, cublasHandle_t cublasHandle);

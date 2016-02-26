@@ -341,8 +341,10 @@ t_local_compute_grad_over_c.start();
       {
          // tmp1 = L*S
          multiply(LorR, S[ind_fact], tmp1, cublas_handle);
+tmp1.print_file("tmp1_device.tmp");
          // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
          gemm<T>(tmp1, RorL[ind_fact], error, lambda, -1.0, 'N', 'N', cublas_handle);
+error.print_file("error_device.tmp");
       }
       else
       {
@@ -358,8 +360,10 @@ t_local_compute_grad_over_c.start();
       {
          // tmp1 = S*R
          multiply(S[ind_fact], RorL[ind_fact], tmp1, cublas_handle);
+tmp1.print_file("tmp1_device.tmp");
          // error = lambda*L*tmp1 - error (= lambda*L*S*R - data )
          gemm<T>(LorR, tmp1, error, lambda, -1.0, 'N', 'N', cublas_handle);
+error.print_file("error_device.tmp");
       }
       else
       {
@@ -378,8 +382,10 @@ t_local_compute_grad_over_c.start();
       {
          // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
          gemm<T>(LorR, error, tmp3, lambda, 0.0, 'T', 'N', cublas_handle);
+tmp3.print_file("tmp3_device.tmp");
          // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
          gemm<T>(tmp3, RorL[ind_fact], grad_over_c, 1.0/c, 0.0,'N','T', cublas_handle);
+grad_over_c.print_file("grad_over_c1_device.tmp");
       }
       else
       {
@@ -395,8 +401,10 @@ t_local_compute_grad_over_c.start();
       {
          // tmp3 = lambda*error*R' (= lambda*(lambda*L*S*R - data) * R' )
          gemm<T>(error, RorL[ind_fact], tmp3, lambda, 0.0, 'N', 'T', cublas_handle);
+tmp3.print_file("tmp3_device.tmp");
          // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * lambda*(lambda*L*S*R - data) * R' )
          gemm<T>(LorR, tmp3, grad_over_c,1.0/c, 0.0,'T','N', cublas_handle);
+grad_over_c.print_file("grad_over_c1_device.tmp");
       }
       else
       {
@@ -408,6 +416,8 @@ t_local_compute_grad_over_c.start();
 
    }
 
+grad_over_c.print_file("grad_over_c2_device.tmp");
+exit(-1);
 
    isGradComputed = true;
 
@@ -462,6 +472,13 @@ t_global_update_R.start();
 t_local_update_R.start();
 #endif
 
+   // DEBUG
+   //char nomFichier[100];
+   //sprintf(nomFichier,"/home/tgautrai/faust2/debug/RorL_%d_device.tmp",cmpt);
+   //RorL[i].print_file(nomFichier);
+   //RorL[i].Display();
+
+
    // R[nb_fact-1] est initialise a l'identite lors de la creation de l'objet palm4MSA_cu et n'est pas cense changer
    if (!isUpdateWayR2L)
    {
@@ -482,6 +499,8 @@ t_local_update_R.start();
       gemm(S[ind_fact], LorR, LorR, cublas_handle);
       //LorR.multiplyLeft(S[ind_fact]);
    }
+
+
 #ifdef __COMPILE_TIMERS__
 t_global_update_R.stop();
 t_local_update_R.stop();
@@ -562,7 +581,6 @@ void palm4MSA_cu<T>::compute_c()
 	   T nL1=LorR.spectralNorm(nbr_iter,threshold,flag1,cublas_handle);
 	   T nR1=RorL[ind_fact].spectralNorm(nbr_iter,threshold,flag2,cublas_handle);
 		c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*lambda*lambda;
-
    }
    
    isCComputed = true;  
@@ -682,6 +700,7 @@ t_local_next_step.start();
 		compute_c();
 	
       compute_grad_over_c();
+
       compute_projection();
   
  

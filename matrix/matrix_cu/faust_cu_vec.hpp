@@ -603,4 +603,13 @@ void faust_cu_vec<faust_real>::Display()const
    faust_cu2faust(v,*this);
    v.Display();
 }
+
+template <typename faust_real>
+void faust_cu_vec<faust_real>::print_file(const char* filename)const
+{
+   faust_vec<faust_real> v;
+   faust_cu2faust(v,*this);
+   v.print_file(filename);
+}
+
 #endif

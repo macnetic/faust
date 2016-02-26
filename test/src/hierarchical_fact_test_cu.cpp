@@ -15,7 +15,7 @@
 
 
 using namespace std;
-typedef float FPP;// floating point precision
+typedef double FPP;// floating point precision
 
 int main()
 {
@@ -41,7 +41,7 @@ int main()
   
 	
     // char config_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat";
-	 char config_filename[] = "../data/config_compared_hierarchical_fact.mat";
+	 char config_filename[] = "/home/tgautrai/faust2/test/data/config_compared_hierarchical_fact.mat";
 
   faust_params<FPP> params;
   init_params_from_matiofile(params,config_filename,"params");

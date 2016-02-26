@@ -466,10 +466,22 @@ t_sub.stop();
   void faust_mat<T>::Display() const
   {     //std::cout << "nb_row=" << getNbRow() << endl;
         //std::cout << "nb_col=" << getNbCol()   <<endl;  
-	std::cout<<"DIM1 : "<<dim1<<" DIM2 : "<<dim2<<std::endl;
-	std::cout<<"iszeros : "<<isZeros<<" isidentity : "<<isIdentity<<std::endl;
-	std::cout << mat <<endl; 
-	
+	   if(isZeros)
+         cout << dim1 << " by " << dim2 << " matrix of zeros" << endl;
+      else if (isIdentity)
+         cout << dim1 << " by " << dim2 << " identity matrix" << endl;
+      else if (dim1*dim2==0)
+         cout << dim1 << " by " << dim2 << " empty matrix" << endl;
+      else
+      {
+         for (int i=0 ; i<dim1 ; i++)
+         {
+            for(int j=0 ; j<dim2 ; j++)
+               cout << (*this)(i,j) << " " ;
+            cout << endl;
+         }
+      }
+      cout<<endl;
   }
   
   template<typename T>

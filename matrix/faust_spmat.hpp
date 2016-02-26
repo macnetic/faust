@@ -214,11 +214,20 @@ void faust_spmat<T>::init(const vector<int>& rowidx, const vector<int>& colidx, 
 template<typename T>
 void faust_spmat<T>::Display() const
 {
-	std::cout<<"dim1 : "<<dim1<<" dim2 : "<<dim2<<" nnz : "<<nnz<<std::endl;
-	std::cout<<mat<<std::endl;
-	// faust_mat<T> mat_tmp(*this);
-	// mat_tmp.Display();
-	
+	std::cout<<"dim1="<<dim1<<" ; dim2="<<dim2<<" ; nnz="<<nnz<<std::endl;
+   
+	cout << "rowPtr = " << getRowPtr() << " -> [ " ;
+	for (int i=0 ; i<dim1+1 ; i++)
+      cout <<  getRowPtr()[i] << " ";
+   cout << " ]"<<endl;
+	cout << "colInd = " << getColInd() << " -> [ " ;
+	for (int i=0 ; i<nnz ; i++)
+      cout <<  getColInd()[i] << " ";
+   cout << " ]"<<endl;
+	cout << "values = " << getValuePtr() << " -> [ " ;
+	for (int i=0 ; i<nnz ; i++)
+      cout <<  getValuePtr()[i] << " ";
+   cout << " ]"<<endl<<endl;
 }
 
 

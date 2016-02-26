@@ -36,8 +36,11 @@ void faust_vec<T>::setOnes()
 template<typename T>
 void faust_vec<T>::Display() const
 {
-	 cout << "dim = " << size() << endl;
-	 cout << vec << endl;
+    if(size()==0)
+       cout << "empty vector";
+    for (int i=0 ; i<size() ; i++)
+	    cout << getData()[i] << " " ;
+    cout<<endl<<endl;
 }
  
 template<typename T> 

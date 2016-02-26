@@ -134,6 +134,7 @@ public:
 #endif
 
    void Display()const;
+   void print_file(const char* filename)const;
 
   ~faust_cu_mat(){resize(0);}
 
