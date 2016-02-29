@@ -340,16 +340,18 @@ t_local_compute_grad_over_c.start();
       {
          // tmp1 = L*S
          multiply(LorR, S[ind_fact], tmp1, cublas_handle);
-//LorR.print_file("LorR_0_device.tmp");
-//S[ind_fact].print_file("S_0_device.tmp");
-//tmp1.print_file("tmp1_0_device.tmp");
+/*LorR.print_file("LorR_0_device.tmp");
+S[ind_fact].print_file("S_0_device.tmp");
+tmp1.print_file("tmp1_0_device.tmp");
+error.print_file("error_0_device.tmp");*/
          // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
          gemm<T>(tmp1, RorL[ind_fact], error, lambda, -1.0, 'N', 'N', cublas_handle);
-//LorR.print_file("LorR_1_device.tmp");
-//S[ind_fact].print_file("S_1_device.tmp");
-//tmp1.print_file("tmp1_1_device.tmp");
-//RorL[ind_fact].print_file("RorL_1_device.tmp");
-//error.print_file("error_1_device.tmp");
+/*cout << "oooooooo lambda1="<< lambda<<endl;
+LorR.print_file("LorR_1_device.tmp");
+S[ind_fact].print_file("S_1_device.tmp");
+tmp1.print_file("tmp1_1_device.tmp");
+RorL[ind_fact].print_file("RorL_1_device.tmp");
+error.print_file("error_1_device.tmp");*/
       }
       else
       {
@@ -384,27 +386,28 @@ t_local_compute_grad_over_c.start();
       if (!isUpdateWayR2L)
       {
          // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
-//LorR.print_file("LorR_2_device.tmp");
-//S[ind_fact].print_file("S_2_device.tmp");
-//tmp1.print_file("tmp1_2_device.tmp");
-//RorL[ind_fact].print_file("RorL_2_device.tmp");
-//error.print_file("error_2_device.tmp");
+/*LorR.print_file("LorR_2_device.tmp");
+S[ind_fact].print_file("S_2_device.tmp");
+tmp1.print_file("tmp1_2_device.tmp");
+RorL[ind_fact].print_file("RorL_2_device.tmp");
+error.print_file("error_2_device.tmp");*/
          gemm<T>(LorR, error, tmp3, lambda, 0.0, 'T', 'N', cublas_handle);
-//LorR.print_file("LorR_3_device.tmp");
-//S[ind_fact].print_file("S_3_device.tmp");
-//tmp1.print_file("tmp1_3_device.tmp");
-//RorL[ind_fact].print_file("RorL_3_device.tmp");
-//error.print_file("error_3_device.tmp");
-//tmp3.print_file("tmp3_3_device.tmp");
+/*cout << "oooooooo lambda2="<< lambda<<endl;
+LorR.print_file("LorR_3_device.tmp");
+S[ind_fact].print_file("S_3_device.tmp");
+tmp1.print_file("tmp1_3_device.tmp");
+RorL[ind_fact].print_file("RorL_3_device.tmp");
+error.print_file("error_3_device.tmp");
+tmp3.print_file("tmp3_3_device.tmp");*/
          // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
          gemm<T>(tmp3, RorL[ind_fact], grad_over_c, 1.0/c, 0.0,'N','T', cublas_handle);
-//LorR.print_file("LorR_4_device.tmp");
-//S[ind_fact].print_file("S_4_device.tmp");
-//tmp1.print_file("tmp1_4_device.tmp");
-//RorL[ind_fact].print_file("RorL_4_device.tmp");
-//error.print_file("error_4_device.tmp");
-//tmp3.print_file("tmp3_4_device.tmp");
-//grad_over_c.print_file("grad_over_c_4_device.tmp");
+/*LorR.print_file("LorR_4_device.tmp");
+S[ind_fact].print_file("S_4_device.tmp");
+tmp1.print_file("tmp1_4_device.tmp");
+RorL[ind_fact].print_file("RorL_4_device.tmp");
+error.print_file("error_4_device.tmp");
+tmp3.print_file("tmp3_4_device.tmp");
+grad_over_c.print_file("grad_over_c_4_device.tmp");*/
       }
       else
       {
@@ -433,7 +436,7 @@ t_local_compute_grad_over_c.start();
 
    }
 
-exit(-1);
+//exit(-1);
 
    isGradComputed = true;
 
