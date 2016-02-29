@@ -7,7 +7,7 @@
    <verbose>0</verbose>
    <updatewayR2L>1</updatewayR2L>
    <factsideleft>1</factsideleft>
-   <constantstepsize>1</constantstepsize>
+   <constantstepsize>0</constantstepsize>
    <stepsize>0.0001</stepsize>
    
    <init_lambda>1</init_lambda>

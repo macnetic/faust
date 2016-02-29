@@ -151,8 +151,18 @@ endif(FAUST_USE_MEX)
 
 
 add_test(FAUST_HIER, ${FAUST_TEST_BIN_DIR}/faust_hier)
-add_test(MEG_FACT, ${FAUST_TEST_BIN_DIR}/meg) 
-   
+if (FAUST_USE_XML)
+	add_test(FAUST_HIER_CMDLINE, ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt )
+	add_test(FAUST_HIER_TRANSPOSE_CMDLINE, ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/trans_hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt  T)
+endif(FAUST_USE_XML)
+# if(FAUST_USE_MEX)
+	# add_test(FAUST_HIER_MEX, matlab  ${FAUST_TEST_BIN_DIR}/hier_fact.m)
+
+
+# endif() 
+
+
+add_test(MEG_FACT, ${FAUST_TEST_BIN_DIR}/meg)   
 
 
 	

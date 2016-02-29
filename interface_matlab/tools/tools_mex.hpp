@@ -46,25 +46,25 @@ void getFaustVec(const mxArray * vec_array,faust_vec<T> & vec)
         mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense vector");
     }
 	const mxClassID V_CLASS_ID = mxGetClassID(vec_array);
-	 faust_real* MatPtr; 
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(faust_real))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(faust_real))))
+	 T* MatPtr; 
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(T))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(T))))
 	{
-		MatPtr = (faust_real*) mxGetPr(vec_array);
+		MatPtr = (T*) mxGetPr(vec_array);
 	}else
 	{	
 		if (V_CLASS_ID == mxDOUBLE_CLASS) 
 		{	
-			MatPtr = (faust_real*) mxCalloc(nbRow,sizeof(faust_real));
+			MatPtr = (T*) mxCalloc(nbRow,sizeof(T));
 			double* MatPtrDouble =(double*) mxGetPr(vec_array);
 			for (int i=0;i<nbRow*nbCol;i++)
-				MatPtr[i] = (faust_real) MatPtrDouble[i];
+				MatPtr[i] = (T) MatPtrDouble[i];
 		}
 		else if (V_CLASS_ID == mxSINGLE_CLASS)
 		{		
-			MatPtr = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
+			MatPtr = (T*) mxCalloc(nbRow*nbCol,sizeof(T));
 			float* MatPtrSingle= (float*) (mxGetData(vec_array));
 			for (int i=0;i<nbRow*nbCol;i++)
-				MatPtr[i] = (faust_real) MatPtrSingle[i];
+				MatPtr[i] = (T) MatPtrSingle[i];
 		
 		
 		}else
@@ -75,8 +75,8 @@ void getFaustVec(const mxArray * vec_array,faust_vec<T> & vec)
 	
      vec.resize(nbRow);
 	
-    memcpy(vec.getData(),MatPtr,nbRow*sizeof(faust_real));
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(faust_real))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(faust_real))))
+    memcpy(vec.getData(),MatPtr,nbRow*sizeof(T));
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(T))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(T))))
 	{
 		mxFree(MatPtr);
 	}
@@ -116,25 +116,25 @@ void getFaustMat(const mxArray* Mat_array,faust_mat<T> & Mat)
         mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
     }
 	const mxClassID V_CLASS_ID = mxGetClassID(Mat_array);
-	 faust_real* MatPtr; 
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(faust_real))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(faust_real))))
+	 T* MatPtr; 
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(T))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(T))))
 	{
-		MatPtr = (faust_real*) mxGetPr(Mat_array);
+		MatPtr = (T*) mxGetPr(Mat_array);
 	}else
 	{	
 		if (V_CLASS_ID == mxDOUBLE_CLASS) 
 		{	
-			MatPtr = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
+			MatPtr = (T*) mxCalloc(nbRow*nbCol,sizeof(T));
 			double* MatPtrDouble =(double*) mxGetPr(Mat_array);
 			for (int i=0;i<nbRow*nbCol;i++)
-				MatPtr[i] = (faust_real) MatPtrDouble[i];
+				MatPtr[i] = (T) MatPtrDouble[i];
 		}
 		else if (V_CLASS_ID == mxSINGLE_CLASS)
 		{		
-			MatPtr = (faust_real*) mxCalloc(nbRow*nbCol,sizeof(faust_real));
+			MatPtr = (T*) mxCalloc(nbRow*nbCol,sizeof(T));
 			float* MatPtrSingle= (float*) (mxGetData(Mat_array));
 			for (int i=0;i<nbRow*nbCol;i++)
-				MatPtr[i] = (faust_real) MatPtrSingle[i];
+				MatPtr[i] = (T) MatPtrSingle[i];
 		
 		
 		}else
@@ -145,8 +145,8 @@ void getFaustMat(const mxArray* Mat_array,faust_mat<T> & Mat)
 	
      Mat.resize(nbRow,nbCol);
 	
-    memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(faust_real));
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(faust_real))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(faust_real))))
+    memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(T));
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(T))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(T))))
 	{
 		mxFree(MatPtr);
 	}	
@@ -194,16 +194,16 @@ template<typename T>
 mxArray*  FaustMat2mxArray(const faust_mat<T>& M)
 {		
 		mxArray * mxMat;
-		faust_real * mat_ptr;
+		T * mat_ptr;
 		int row,col;
 		row = M.getNbRow();
         col = M.getNbCol();
         mxMat = mxCreateDoubleMatrix(row,col,mxREAL);
-        mat_ptr = (faust_real *) mxCalloc(row*col,sizeof(faust_real));
+        mat_ptr = (T *) mxCalloc(row*col,sizeof(T));
         memcpy(mat_ptr,M.getData(),row*col*sizeof(double));
         mxSetM(mxMat, row);
         mxSetN(mxMat, col);
-		if (sizeof(double) == sizeof(faust_real))
+		if (sizeof(double) == sizeof(T))
 		{
 			mxSetPr(mxMat, (double *)mat_ptr);
 		}else
@@ -232,17 +232,17 @@ void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat<T> >& facts)
     faust_mat<T> mat;
     (*cellFacts) = mxCreateCellMatrix(1,nb_fact);
     mxArray * mxMat;
-    faust_real* mat_ptr;
+    T* mat_ptr;
 	mwSize dims[2]={0,0};
-	if (sizeof(faust_real) == sizeof(double))
+	if (sizeof(T) == sizeof(double))
 	{	
 		mxMat = mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL);
-	}else if (sizeof(faust_real) == sizeof(float))
+	}else if (sizeof(T) == sizeof(float))
 	{
 		mxMat = mxCreateNumericArray(2,dims,mxSINGLE_CLASS,mxREAL);
 	}else
 	{
-		mexErrMsgTxt("mexFaustMat : setCellFacts : faust_real type must be equal to double or float");
+		mexErrMsgTxt("mexFaustMat : setCellFacts : T type must be equal to double or float");
 	}
     
     for (size_t k = 0; k < nb_fact; k++)
@@ -253,9 +253,9 @@ void setCellFacts(mxArray **  cellFacts,std::vector<faust_mat<T> >& facts)
         mxSetM(mxMat, rowFact);
         mxSetN(mxMat, colFact);
 		
-        mat_ptr = (faust_real *) mxCalloc(rowFact*colFact,sizeof(faust_real));
+        mat_ptr = (T *) mxCalloc(rowFact*colFact,sizeof(T));
 		
-		memcpy(mat_ptr,mat.getData(),rowFact*colFact*sizeof(faust_real));
+		memcpy(mat_ptr,mat.getData(),rowFact*colFact*sizeof(T));
 
         
         mxSetData(mxMat, mat_ptr);
@@ -335,7 +335,7 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
 		case 1:
 		{
             mxConsParams=mxGetCell(mxCons,1);
-			faust_real realParameter = (faust_real) mxGetScalar(mxConsParams);
+			T realParameter = (T) mxGetScalar(mxConsParams);
 			consS.push_back((new faust_constraint_real<T>(consNameType,realParameter,nbRowCons,nbColCons)));
 
 			break; 

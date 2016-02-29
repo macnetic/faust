@@ -464,9 +464,11 @@ t_local_compute_lambda.start();
    // Xhatt_Xhat = X_hat'*X_hat
    faust_mat<T> Xhatt_Xhat;
    gemm<T>(LorR, LorR, Xhatt_Xhat, 1.0, 0.0, 'T','N');
-
-
-   lambda = Xt_Xhat.trace()/Xhatt_Xhat.trace();
+   T Xhatt_Xhat_tr = Xhatt_Xhat.trace();
+   if (Xhatt_Xhat_tr != 0)	
+		lambda = Xt_Xhat.trace()/Xhatt_Xhat_tr;
+	else
+		handleError(class_name,"compute_lambda : Xhatt_Xhat_tr equal 0 so lambda is infinite");
 
    //cout<<"lambda : "<<lambda<<endl;
    //cout<<__SP lambda<<endl;

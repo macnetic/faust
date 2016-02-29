@@ -40,4 +40,5 @@ xmlXPathContextPtr get_context(const char * filename)
 		handleError("xml_utils",
 			"get_context :Error while the creation of the xpath context ");
 	}
+	return ctxt;
 }

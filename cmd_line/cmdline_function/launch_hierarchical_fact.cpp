@@ -11,6 +11,16 @@
 typedef double FPP;
 using namespace std;
 
+// compute the hierarchical factorization of a given data matrix A in cmdline mode
+// inputs : -an xml configuration file specifying the different parameters of the hierarchical_fact algorithm
+//          -a text file where the matrix that will be factorized is stored 
+//					(the first line of the file contains 2 integer : the number of row and the number of column
+//					all the other line contains one coefficient in ColMajor access of the matrix)
+//		    - (optionnal) a character specifying if the matrix  stored correspond to the data matrix or its transposed
+//				'N' (default value) , the two matrix are the same
+//              'T'  the data matrix is the transposed of the matrix stored in the text file
+
+
 int main(int argc, char* argv[]) 
 {
 	
@@ -21,8 +31,10 @@ int main(int argc, char* argv[])
 		cerr << "incorrect number of argument (at least to argument must be specified) : 1st argument is the data filename\n second is the configuration filename  " << endl;
 		exit(EXIT_FAILURE);
 	}
-	string data_filename(argv[2]); // filename of the data (matrix) filename
+
 	string config_filename(argv[1]); // filename of xml config hierarchial_fact file
+	string data_filename(argv[2]); // filename of the data (matrix) filename
+
 	char operator_data='N';
 	if (argc >= 4)
 	{	
