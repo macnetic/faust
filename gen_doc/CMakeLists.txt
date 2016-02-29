@@ -2,12 +2,12 @@
 if(FAUST_GEN_DOC)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-configure_file(${FAUST_DOC_SRC_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
+configure_file(${FAUST_DOC_SRC_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY)
 add_custom_target(doc ALL
-${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
-WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doc/Doxyfile
+WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/doc
 COMMENT "Generating API documentation with Doxygen" VERBATIM)
-install(DIRECTORY ${PROJECT_BINARY_DIR}/html DESTINATION share/doc)
+install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/html DESTINATION doc/share/doc)
 
 
 endif(DOXYGEN_FOUND)

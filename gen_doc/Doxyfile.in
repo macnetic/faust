@@ -1,6 +1,6 @@
 PROJECT_NAME           = "FAµST (Flexible Approximate MUlti-layer Sparse Transforms)"
 GENERATE_HTML          = YES
-HTML_OUTPUT            = @PROJECT_BINARY_DIR@/html
+HTML_OUTPUT            = @PROJECT_BINARY_DIR@/doc/html
 GENERATE_LATEX         = NO
 PROJECT_LOGO           =  @FAUST_DOC_SRC_DIR@/images/logo.png
 PROJECT_NUMBER         = @FAUST_VERSION_MAJOR@.@FAUST_VERSION_MINOR@
