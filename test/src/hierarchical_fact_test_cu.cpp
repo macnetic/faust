@@ -15,17 +15,17 @@
 
 
 using namespace std;
-typedef double FPP;// floating point precision
+typedef double faust_real;// floating point precision
 
 int main()
 {
 
-  if (typeid(FPP) == typeid(double))
+  if (typeid(faust_real) == typeid(double))
   {
 	cout<<"floating point precision == double"<<endl;
   }
   
-  if (typeid(FPP) == typeid(float))
+  if (typeid(faust_real) == typeid(float))
   {
 	cout<<"floating point precision == float"<<endl;
   }
@@ -43,10 +43,10 @@ int main()
     // char config_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat";
 	 char config_filename[] = "/home/tgautrai/faust2/test/data/config_compared_hierarchical_fact.mat";
 
-  faust_params<FPP> params;
+  faust_params<faust_real> params;
   init_params_from_matiofile(params,config_filename,"params");
   params.Display();	
-  hierarchical_fact_cu<FPP> hier_fact(params, cublasHandle, cusparseHandle);
+  hierarchical_fact_cu<faust_real> hier_fact(params, cublasHandle, cusparseHandle);
 
   faust_timer t1;
   t1.start();
@@ -60,7 +60,7 @@ int main()
 #endif
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 
-  vector<faust_cu_spmat<FPP> > facts;
+  vector<faust_cu_spmat<faust_real> > facts;
   hier_fact.get_facts(facts);
   (facts[0]) *= hier_fact.get_lambda();
   char nomFichier[100];

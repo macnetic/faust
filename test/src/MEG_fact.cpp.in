@@ -13,28 +13,28 @@
 #include <iomanip>
 
 using namespace std;
-typedef float FPP;//floating point precision
+typedef FFPP faust_real;//faust floating point precision
 
 int main()
 {	
-  if (typeid(FPP) == typeid(double))
+  if (typeid(faust_real) == typeid(double))
   {
 	cout<<"floating point precision == double"<<endl;
   }
 
-  if (typeid(FPP) == typeid(float))
+  if (typeid(faust_real) == typeid(float))
   {
 	cout<<"floating point precision == float"<<endl;
   }
-  faust_mat<FPP> data, init_facts1, init_facts2;
+  faust_mat<faust_real> data, init_facts1, init_facts2;
 
   char config_MEG_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat";
 
   
-  faust_params<FPP> params; init_params_from_matiofile(params,config_MEG_filename,"params");
+  faust_params<faust_real> params; init_params_from_matiofile(params,config_MEG_filename,"params");
   params.Display();
   cout<<"launch"<<endl;	
-  hierarchical_fact<FPP> hier_fact(params);
+  hierarchical_fact<faust_real> hier_fact(params);
 
   faust_timer t1;
   t1.start();
@@ -47,7 +47,7 @@ int main()
 #endif
   cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 
-  vector<faust_spmat<FPP> > facts;
+  vector<faust_spmat<faust_real> > facts;
   hier_fact.get_facts(facts);
   (facts[0]) *= hier_fact.get_lambda();
   char nomFichier[100];

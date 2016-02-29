@@ -12,10 +12,11 @@
 #cmakedefine FAUST_VERBOSE  
 
 
+// value of FFPP (faust floating point precision)
 #ifdef FAUST_SINGLE
-   typedef float faust_real; //single precision
+   typedef float FFPP; //single precision
 #else
-	typedef double faust_real; //double precision 
+	typedef double FFPP; //double precision 
 #endif
 
 

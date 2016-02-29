@@ -22,14 +22,14 @@ void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFiel
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	#ifdef FAUST_VERBOSE
-		if (typeid(faust_real) == typeid(float))
+		if (typeid(FFPP) == typeid(float))
 		{
-			std::cout<<"faust_real == float"<<std::endl;
+			std::cout<<"FFPP == float"<<std::endl;
 		}
 	
-		if (typeid(faust_real) == typeid(double))
+		if (typeid(FFPP) == typeid(double))
 		{
-			std::cout<<"faust_real == double"<<std::endl;
+			std::cout<<"FFPP == double"<<std::endl;
 		}
 		system("sleep 7");
 	#endif
@@ -56,7 +56,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     
     // data initialisation
-    faust_mat<faust_real> data;
+    faust_mat<FFPP> data;
     if (presentFields[0])
     {    
         mxCurrentField = mxGetField(prhs[0],0,"data");  
@@ -126,7 +126,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             {
                 mexPrintf("cons(%d)\n",j);
                 mxCurrentCons=mxGetCell(mxCurrentField,j);
-                getConstraint<faust_real>(consS,mxCurrentCons);
+                getConstraint<FFPP>(consS,mxCurrentCons);
                 //consS.push_back(consToAdd);
             }
 
@@ -136,18 +136,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     } 
     std::cout<<"FINI_CONS"<<std::endl;
     //niter1
-    stopping_criterion<faust_real> crit1;
+    stopping_criterion<FFPP> crit1;
     if (presentFields[3])
     {   
          mxCurrentField = mxGetField(prhs[0],0,"niter");
         int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
-        stopping_criterion<faust_real> newCrit1(nb_iter1);
+        stopping_criterion<FFPP> newCrit1(nb_iter1);
         crit1 = newCrit1;
     }
     mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
     
     //init_facts
-    std::vector<faust_mat<faust_real> > init_facts;
+    std::vector<faust_mat<FFPP> > init_facts;
     if (presentFields[4])
     {   
          mxCurrentField = mxGetField(prhs[0],0,"init_facts");
@@ -178,11 +178,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
    
    //init_lambda 
-   faust_real init_lambda = 1.0;
+   FFPP init_lambda = 1.0;
    if (presentFields[6])
    {
        mxCurrentField = mxGetField(prhs[0],0,"init_lambda");
-       init_lambda = (faust_real) mxGetScalar(mxCurrentField);
+       init_lambda = (FFPP) mxGetScalar(mxCurrentField);
    }
    
    //compute_lambda
@@ -204,22 +204,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
      
      //creation de hierarchical fact
-    faust_params_palm<faust_real> params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda); 
+    faust_params_palm<FFPP> params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda); 
 	std::cout<<"PASSER3"<<std::endl;
-	palm4MSA<faust_real> palm(params,false);	
+	palm4MSA<FFPP> palm(params,false);	
 	palm.compute_facts();	
      
      
      //extraction des resultats
-     faust_real lambda = palm.get_lambda();
+     FFPP lambda = palm.get_lambda();
      
      plhs[0]=mxCreateDoubleScalar((double) lambda);
      
-     std::vector<faust_mat<faust_real> > facts;
+     std::vector<faust_mat<FFPP> > facts;
      facts=palm.get_facts();
 
      
-     faust_mat<faust_real> current_fact = facts[0];
+     faust_mat<FFPP> current_fact = facts[0];
      mxArray * cellFacts;
      setCellFacts(&cellFacts,facts);
      

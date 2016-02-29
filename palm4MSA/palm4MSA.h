@@ -44,7 +44,7 @@ class palm4MSA
 
       void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
       void set_data(const faust_mat<T>& data_){data=data_;}
-      void set_lambda(const faust_real lambda_){lambda = lambda_;}
+      void set_lambda(const FFPP lambda_){lambda = lambda_;}
 	  
 	  /*!
      *  \brief 

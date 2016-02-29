@@ -8,13 +8,13 @@
 #include "faust_core.h"
 
 
-typedef float FPP;
+typedef float faust_real;
 using namespace std;
 
 int main(int argc, char* argv[]) 
 {
 	
-	faust_params_palm<FPP> params;
+	faust_params_palm<faust_real> params;
 	string config_filename(argv[1]);
 	size_t ind = config_filename.find_last_of(".");
 	if(ind<=0 || ind>= config_filename.size())
@@ -36,14 +36,14 @@ int main(int argc, char* argv[])
 	init_palm_params_from_xml(config_filename.c_str(),params);
 	cout<<"params initialisé"<<endl;
 	params.Display();
-	palm4MSA<FPP> palm(params);
+	palm4MSA<faust_real> palm(params);
 	
 	
 	palm.compute_facts();
 	cout<<"RMSE : "<<palm.get_RMSE()<<endl;
 	cout<<"lambda="<<std::setprecision(20)<<palm.get_lambda()<<endl;
 	
-	faust_core<FPP> faust_facts;
+	faust_core<faust_real> faust_facts;
 	palm.get_facts(faust_facts);
 	std::cout<<"faust_fact size : "<<faust_facts.size()<<endl;
 	faust_facts.scalarMultiply(palm.get_lambda());

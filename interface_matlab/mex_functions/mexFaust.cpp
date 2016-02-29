@@ -7,26 +7,26 @@
 #include "faust_constant.h"
 
 // prhs[0] : name of command : 
-//    "delete" to delete the faust_core<faust_real> object dynamically allocated previously
-//    "multiply" to multiply the faust_core<faust_real> object by a vector or a matrix
+//    "delete" to delete the faust_core<FFPP> object dynamically allocated previously
+//    "multiply" to multiply the faust_core<FFPP> object by a vector or a matrix
 
-// prhs[1] : address of the faust_core<faust_real> object dynamically allocated previously
+// prhs[1] : address of the faust_core<FFPP> object dynamically allocated previously
 
-// prhs[2] (only necessary if prhs[0] matches "multiply") : vector or matrix A to multiply by the faust_core<faust_real> object
+// prhs[2] (only necessary if prhs[0] matches "multiply") : vector or matrix A to multiply by the faust_core<FFPP> object
 
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {	
 	#ifdef FAUST_VERBOSE
-		if (typeid(faust_real) == typeid(float))
+		if (typeid(FFPP) == typeid(float))
 		{
-			std::cout<<"faust_real == float"<<std::endl;
+			std::cout<<"FFPP == float"<<std::endl;
 		}
 	
-		if (typeid(faust_real) == typeid(double))
+		if (typeid(FFPP) == typeid(double))
 		{
-			std::cout<<"faust_real == double"<<std::endl;
+			std::cout<<"FFPP == double"<<std::endl;
 		}
 	#endif
 	try{
@@ -50,7 +50,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(!mxIsCell(prhs[1]))
 			mexErrMsgTxt("input must be a cell-array");
 
-		std::vector<faust_spmat<faust_real> > vec_spmat;
+		std::vector<faust_spmat<FFPP> > vec_spmat;
 		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
 		/*if (nb_element == 0)
 			mexWarnMsgTxt("Empty cell array.");
@@ -72,13 +72,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			for (int i=0;i<nb_element;i++)
 			{	
 				mxMat=mxGetCell(prhs[1],i);
-				addSpmat<faust_real>(mxMat,vec_spmat);
+				addSpmat<FFPP>(mxMat,vec_spmat);
 			}
 	}
 	
 	
-		faust_core<faust_real>* F = new faust_core<faust_real>(vec_spmat); 
-		plhs[0]=convertPtr2Mat<faust_core<faust_real> >(F);
+		faust_core<FFPP>* F = new faust_core<FFPP>(vec_spmat); 
+		plhs[0]=convertPtr2Mat<faust_core<FFPP> >(F);
     
 		return;
 	}
@@ -90,7 +90,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (!strcmp("delete", cmd))
 	{
 		// Destroy the C++ object
-		destroyObject<faust_core<faust_real> >(prhs[1]);
+		destroyObject<faust_core<FFPP> >(prhs[1]);
 		// Warn if other commands were ignored
 		if (nlhs != 0 || nrhs != 2)
 			mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
@@ -99,7 +99,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
 
 	// Get the class instance pointer from the second input
-	faust_core<faust_real>* core_ptr = convertMat2Ptr<faust_core<faust_real> >(prhs[1]);
+	faust_core<FFPP>* core_ptr = convertMat2Ptr<faust_core<FFPP> >(prhs[1]);
     
 	if (!strcmp("size",cmd))
 	{	
@@ -121,18 +121,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("get_product : empty faust core");
 		const size_t SIZE_B1 = core_ptr->getNbRow(); 
         const size_t SIZE_B2 = core_ptr->getNbCol(); 
-		faust_mat<faust_real> prod=core_ptr->get_product();
+		faust_mat<FFPP> prod=core_ptr->get_product();
 		
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
-		if(sizeof(faust_real)==sizeof(float))
+		if(sizeof(FFPP)==sizeof(float))
 			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
-		else if(sizeof(faust_real)==sizeof(double))
+		else if(sizeof(FFPP)==sizeof(double))
 			plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
 		else
-			mexErrMsgTxt("faust_real type is neither double nor float");
+			mexErrMsgTxt("FFPP type is neither double nor float");
         
-		faust_real* ptr_out = static_cast<faust_real*> (mxGetData(plhs[0]));
-		memcpy(ptr_out, prod.getData(), SIZE_B1*SIZE_B2*sizeof(faust_real));
+		FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
+		memcpy(ptr_out, prod.getData(), SIZE_B1*SIZE_B2*sizeof(FFPP));
 		
 		return;
 		
@@ -154,9 +154,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			(*core_ptr).transpose();
 		else
 		{	
-			faust_core<faust_real>* F = new faust_core<faust_real>((*core_ptr));
+			faust_core<FFPP>* F = new faust_core<FFPP>((*core_ptr));
 			(*F).transpose();	
-			plhs[0]=convertPtr2Mat<faust_core<faust_real> >(F);
+			plhs[0]=convertPtr2Mat<faust_core<FFPP> >(F);
 		}
 		return;
 		
@@ -181,79 +181,79 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexErrMsgTxt("Multiply: Wrong number of dimensions for the input vector or matrix (third argument).");
         
              
-        faust_real* ptr_data = NULL;
+        FFPP* ptr_data = NULL;
        
 	const mxClassID V_CLASS_ID = mxGetClassID(prhs[2]);
 	const size_t NB_ELEMENTS = mxGetNumberOfElements(prhs[2]);
         if(V_CLASS_ID == mxDOUBLE_CLASS) 
         {
             double* ptr_data_tmp = static_cast<double*> (mxGetData(prhs[2]));
-            ptr_data = new faust_real[NB_ELEMENTS];
+            ptr_data = new FFPP[NB_ELEMENTS];
             for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
+                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
 	}
         else if(V_CLASS_ID == mxSINGLE_CLASS)
 	{
             float* ptr_data_tmp = static_cast<float*> (mxGetData(prhs[2]));
-            ptr_data = new faust_real[NB_ELEMENTS];
+            ptr_data = new FFPP[NB_ELEMENTS];
             for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
+                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
 	}
         else if(V_CLASS_ID == mxINT8_CLASS)
 	{
             char* ptr_data_tmp = static_cast<char*> (mxGetData(prhs[2]));
-            ptr_data = new faust_real[NB_ELEMENTS];
+            ptr_data = new FFPP[NB_ELEMENTS];
             for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
+                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
 	}
         else if(V_CLASS_ID == mxUINT8_CLASS)
 	{
             unsigned char* ptr_data_tmp = static_cast<unsigned char*> (mxGetData(prhs[2]));
-            ptr_data = new faust_real[NB_ELEMENTS];
+            ptr_data = new FFPP[NB_ELEMENTS];
             for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
+                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
 	}
         else if(V_CLASS_ID == mxINT16_CLASS)
 	{
             short* ptr_data_tmp = static_cast<short*> (mxGetData(prhs[2]));
-            ptr_data = new faust_real[NB_ELEMENTS];
+            ptr_data = new FFPP[NB_ELEMENTS];
             for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
+                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
 	}
         else if (V_CLASS_ID == mxUINT16_CLASS)
 	{
             unsigned short* ptr_data_tmp = static_cast<unsigned short*> (mxGetData(prhs[2]));
-            ptr_data = new faust_real[NB_ELEMENTS];
+            ptr_data = new FFPP[NB_ELEMENTS];
             for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
+                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
 	}
         else if (V_CLASS_ID == mxINT32_CLASS)
 	{
             int* ptr_data_tmp = static_cast<int*> (mxGetData(prhs[2]));
-            ptr_data = new faust_real[NB_ELEMENTS];
+            ptr_data = new FFPP[NB_ELEMENTS];
             for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
+                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
 	}
         else if (V_CLASS_ID == mxUINT32_CLASS)
 	{
             unsigned int* ptr_data_tmp = static_cast<unsigned int*> (mxGetData(prhs[2]));
-            ptr_data = new faust_real[NB_ELEMENTS];
+            ptr_data = new FFPP[NB_ELEMENTS];
             for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
+                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
 	}
         else if (V_CLASS_ID == mxINT64_CLASS)
 	{
             long long* ptr_data_tmp = static_cast<long long*> (mxGetData(prhs[2]));
-            ptr_data = new faust_real[NB_ELEMENTS];
+            ptr_data = new FFPP[NB_ELEMENTS];
             for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
+                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
 	}
         else if (V_CLASS_ID == mxUINT64_CLASS)
 	{
             unsigned long long* ptr_data_tmp = static_cast<unsigned long long*> (mxGetData(prhs[2]));
-            ptr_data = new faust_real[NB_ELEMENTS];
+            ptr_data = new FFPP[NB_ELEMENTS];
             for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<faust_real> (ptr_data_tmp[i]);
+                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
 	}
 	else
             mexErrMsgTxt("Unknown matlab type.");
@@ -262,38 +262,38 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Si prhs[2] est un vecteur
 	if(SIZE_A2 == 1) 
 	{
-        	faust_vec<faust_real> A(SIZE_A1, ptr_data);
-        	faust_vec<faust_real> B(SIZE_B1);
+        	faust_vec<FFPP> A(SIZE_A1, ptr_data);
+        	faust_vec<FFPP> B(SIZE_B1);
 		B = (*core_ptr)*A;
 		
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
-		if(sizeof(faust_real)==sizeof(float))
+		if(sizeof(FFPP)==sizeof(float))
 			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
-		else if(sizeof(faust_real)==sizeof(double))
+		else if(sizeof(FFPP)==sizeof(double))
 			plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
 		else
-			mexErrMsgTxt("faust_real type is neither double nor float");
+			mexErrMsgTxt("FFPP type is neither double nor float");
         
-		faust_real* ptr_out = static_cast<faust_real*> (mxGetData(plhs[0]));
-		memcpy(ptr_out, B.getData(), SIZE_B1*SIZE_B2*sizeof(faust_real));
+		FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
+		memcpy(ptr_out, B.getData(), SIZE_B1*SIZE_B2*sizeof(FFPP));
 	}
 	// Si prhs[2] est une matrice
 	else
 	{
-        	faust_mat<faust_real> A(ptr_data, SIZE_A1, SIZE_A2);
-		faust_mat<faust_real> B(SIZE_B1, SIZE_A2);
+        	faust_mat<FFPP> A(ptr_data, SIZE_A1, SIZE_A2);
+		faust_mat<FFPP> B(SIZE_B1, SIZE_A2);
 		B = (*core_ptr)*A;
 		
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
-		if(sizeof(faust_real)==sizeof(float))
+		if(sizeof(FFPP)==sizeof(float))
 			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
-		else if(sizeof(faust_real)==sizeof(double))
+		else if(sizeof(FFPP)==sizeof(double))
 			plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
 		else
-			mexErrMsgTxt("faust_real type is neither double nor float");
+			mexErrMsgTxt("FFPP type is neither double nor float");
         
-		faust_real* ptr_out = static_cast<faust_real*> (mxGetData(plhs[0]));
-		memcpy(ptr_out, B.getData(), SIZE_B1*SIZE_B2*sizeof(faust_real));
+		FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
+		memcpy(ptr_out, B.getData(), SIZE_B1*SIZE_B2*sizeof(FFPP));
 	}
 	if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
         

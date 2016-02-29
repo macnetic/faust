@@ -8,7 +8,7 @@
 #include <iostream>
 
 using namespace std;
-typedef faust_real T;
+typedef FFPP faust_real;
 
 int main()
 {
@@ -20,7 +20,7 @@ bool testMEG  = true;
 
   // init from params
 
-  faust_params<T> params;
+  faust_params<faust_real> params;
   if (testMEG)
      init_params_from_matiofile(params, "@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat", "params");
   else
@@ -28,8 +28,8 @@ bool testMEG  = true;
     
 //cout << "update_way=" << params.isUpdateWayR2L << endl;
  
-  /*vector<faust_spmat<T> > facts;
-  faust_core<T> faust(params);
+  /*vector<faust_spmat<faust_real> > facts;
+  faust_core<faust_real> faust(params);
   faust.get_facts(facts);
   (facts[0]) *= 
 
@@ -45,7 +45,7 @@ bool testMEG  = true;
 
   // init from vector of faust_spmat
 
-  vector<faust_spmat<T> > facts;
+  vector<faust_spmat<faust_real> > facts;
   if (testMEG)
       facts.resize(6);
   else
@@ -59,17 +59,17 @@ bool testMEG  = true;
         sprintf(filename, "@FAUST_TESTDATA_SRC_DIR@/learning_compared_fact%d.txt", i);
      facts[i].init_from_file(filename);
   }
-  faust_core<T> faust(facts, (faust_real)1.0);
+  faust_core<faust_real> faust(facts, (FFPP)1.0);
 
 
 
 
-  faust_vec<T> vec_in(facts[facts.size()-1].getNbCol());
+  faust_vec<faust_real> vec_in(facts[facts.size()-1].getNbCol());
   for (int i=0 ; i<vec_in.size() ; i++ )
      vec_in[i] = i*0.015 ;
      
-  faust_vec<T> vec_out_faust, vec_out_mat;
-  faust_mat<T> full(params.data);
+  faust_vec<faust_real> vec_out_faust, vec_out_mat;
+  faust_mat<faust_real> full(params.data);
 
   faust_timer t1;
   t1.start();

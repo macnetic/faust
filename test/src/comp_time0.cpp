@@ -11,7 +11,7 @@
 #include <iomanip>
 
 using namespace std;
-typedef faust_real T;
+typedef FFPP faust_real;
 int main(int argc, char* argv[])
 {
 
@@ -120,12 +120,12 @@ int main(int argc, char* argv[])
 		
 		
 
-	vector<faust_core<T> >* vec_core = new vector<faust_core<T> >();
-	vector<faust_mat<T> >* vec_dense_mat = new vector<faust_mat<T> >();
+	vector<faust_core<faust_real> >* vec_core = new vector<faust_core<faust_real> >();
+	vector<faust_mat<faust_real> >* vec_dense_mat = new vector<faust_mat<faust_real> >();
 	init_faust_data_from_matiofile(*vec_dense_mat, *vec_core, argv[1], "mat_cells");
 
-	const vector<faust_core<T> > core(*vec_core);
-	const vector<faust_mat<T> > dense_mat(*vec_dense_mat);
+	const vector<faust_core<faust_real> > core(*vec_core);
+	const vector<faust_mat<faust_real> > dense_mat(*vec_dense_mat);
 
 	delete vec_core; vec_core=NULL;
 	delete vec_dense_mat; vec_dense_mat=NULL;
@@ -175,10 +175,10 @@ int main(int argc, char* argv[])
 
 
 
-	faust_vec<T> x_tmp(dense_mat[0].getNbCol());
+	faust_vec<faust_real> x_tmp(dense_mat[0].getNbCol());
 	for (int j=0 ; j<x_tmp.size() ;j++)
 		x_tmp[j] = std::rand()*2.0/RAND_MAX-1.0;
-	faust_vec<T> y_dense_tmp(dense_mat[0].getNbRow());
+	faust_vec<faust_real> y_dense_tmp(dense_mat[0].getNbRow());
 	y_dense_tmp = dense_mat[0] * x_tmp;
 
 
@@ -191,11 +191,11 @@ int main(int argc, char* argv[])
 		{
 			if (status[i]==0)
 			{
-				faust_vec<T> x(dense_mat[i].getNbCol());
+				faust_vec<faust_real> x(dense_mat[i].getNbCol());
 				for (int j=0 ; j<x.size() ;j++)
 					x[j] = std::rand()*2.0/RAND_MAX-1.0;
-				faust_vec<T> y_dense(dense_mat[i].getNbRow());
-				faust_vec<T> y_faust(dense_mat[i].getNbRow());
+				faust_vec<faust_real> y_dense(dense_mat[i].getNbRow());
+				faust_vec<faust_real> y_faust(dense_mat[i].getNbRow());
 				
 				timer_dense_tmp.reset();
 				timer_dense_tmp.start();
