@@ -157,7 +157,7 @@ public:
   ////////////////// friends //////////////////////
   // intra classe//
   //friend void multiply(const faust_cu_mat<faust_real> & cu_A, const faust_cu_mat<faust_real> & cu_B, faust_cu_mat<faust_real> & cu_C, cublasHandle_t cublasHandle);
-  //friend void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const faust_real alpha, const faust_real beta);
+  template <typename T> friend void gemm(const faust_cu_mat<T>& cu_A, const faust_cu_mat<T>& cu_B, faust_cu_mat<T>& cu_C, const T alpha, const T beta, char  typeA, char  typeB, cublasHandle_t cublasHandle);
   //friend void add(const faust_cu_mat<faust_real> & cu_A, const faust_cu_mat<faust_real> & cu_B, faust_cu_mat<faust_real> & cu_C);
   //friend void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const faust_real alpha, const faust_real beta, char  typeA, char  typeB, cublasHandle_t cublasHandle);
   //friend void multiply(const faust_cu_core& A, const faust_cu_mat& cu_B, faust_cu_mat& cu_C,const faust_real alpha, char typeA, char typeMult);

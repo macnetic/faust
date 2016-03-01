@@ -862,7 +862,9 @@ t_scalar_multiply.start();
       return;
    }
 
-   if(isZeros){}
+   if(isZeros){
+
+}
    else
    {
       int currentGPU;
@@ -878,7 +880,9 @@ t_scalar_multiply.start();
          kernel_add_diag_const(data, lambda, dim1);
       }
       else
-         kernel_mult_const(data, lambda, dim1);
+{
+         kernel_mult_const(data, lambda, dim1*dim2);
+}
 
       faust_cudaSetDevice(currentGPU);
    }

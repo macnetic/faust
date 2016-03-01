@@ -61,6 +61,7 @@ cu_A.t_add_ext.stop();
 template<typename T>	
 T power_iteration(const  faust_cu_mat<T> & cu_A, const faust_unsigned_int nbr_iter_max,T threshold, faust_int & flag, cublasHandle_t cublasHandle)
 {	
+
 	#ifdef __COMPILE_TIMERS__
 		cu_A.t_power_iteration.start();
 	#endif
@@ -204,6 +205,7 @@ void gemv(const faust_cu_mat<faust_real>& cu_A, const faust_cu_vec<faust_real>& 
 template <typename faust_real>
 void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const faust_real alpha, const faust_real beta, char  typeA, char  typeB, cublasHandle_t cublasHandle)
 {
+
 #ifdef __COMPILE_TIMERS__
 cu_A.t_gemm.start();
 #endif

@@ -291,6 +291,10 @@ t_local_compute_projection.stop();
 template<typename T>
 void palm4MSA_cu<T>::compute_grad_over_c()
 {
+//static int cmpt = -1;
+//cmpt++;
+//char nomFichier[100];
+
 #ifdef __COMPILE_TIMERS__
 t_global_compute_grad_over_c.start();
 t_local_compute_grad_over_c.start();
@@ -340,18 +344,29 @@ t_local_compute_grad_over_c.start();
       {
          // tmp1 = L*S
          multiply(LorR, S[ind_fact], tmp1, cublas_handle);
-/*LorR.print_file("LorR_0_device.tmp");
-S[ind_fact].print_file("S_0_device.tmp");
-tmp1.print_file("tmp1_0_device.tmp");
-error.print_file("error_0_device.tmp");*/
+/*sprintf(nomFichier,"LorR_%d_0_device.tmp",cmpt);
+LorR.print_file(nomFichier);
+sprintf(nomFichier,"RorL%d_%d_0_device.tmp",ind_fact,cmpt);
+RorL[ind_fact].print_file(nomFichier);
+sprintf(nomFichier,"S%d_%d_0_device.tmp",ind_fact,cmpt);
+S[ind_fact].print_file(nomFichier);
+sprintf(nomFichier,"tmp1_%d_0_device.tmp",cmpt);
+tmp1.print_file(nomFichier);
+sprintf(nomFichier,"error_%d_0_device.tmp",cmpt);
+error.print_file(nomFichier);
+cout << "appel " << cmpt<<" : lambda0 = "<< lambda<<endl;*/
          // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
          gemm<T>(tmp1, RorL[ind_fact], error, lambda, -1.0, 'N', 'N', cublas_handle);
-/*cout << "oooooooo lambda1="<< lambda<<endl;
-LorR.print_file("LorR_1_device.tmp");
-S[ind_fact].print_file("S_1_device.tmp");
-tmp1.print_file("tmp1_1_device.tmp");
-RorL[ind_fact].print_file("RorL_1_device.tmp");
-error.print_file("error_1_device.tmp");*/
+/*sprintf(nomFichier,"LorR_%d_1_device.tmp",cmpt);
+LorR.print_file(nomFichier);
+sprintf(nomFichier,"S_%d_%d_1_device.tmp",ind_fact,cmpt);
+S[ind_fact].print_file(nomFichier);
+sprintf(nomFichier,"tmp1_%d_1_device.tmp",cmpt);
+tmp1.print_file(nomFichier);
+sprintf(nomFichier,"RorL_%d_%d_1_device.tmp",ind_fact,cmpt);
+RorL[ind_fact].print_file(nomFichier);
+sprintf(nomFichier,"error_%d_1_device.tmp",cmpt);
+error.print_file(nomFichier);*/
       }
       else
       {

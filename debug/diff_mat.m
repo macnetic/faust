@@ -10,15 +10,17 @@ for k=1:length(fileList)
     end
 end
 
-dev=cell(length(file),1);
-host=cell(length(file),1);
+%dev=cell(length(file),1);
+%host=cell(length(file),1);
 for k=1:length(file)
-    dev{k}=load(file{k});
-    host{k}=load(strrep(file{k},'_device','_host'));
-    err_abs = max(max(abs(dev{k}-host{k})));
-    err_rel = max(max(abs(dev{k}-host{k})./host{k}));
-    fprintf('err rel %s : %f\n',file{k},err_rel);
-    fprintf('err abs %s : %f\n\n',file{k},err_abs);
+    dev=load(file{k});
+    host=load(strrep(file{k},'_device','_host'));
+    err_abs = max(max(abs(dev-host)));
+    err_rel = max(max(abs(dev-host)./host));
+    if (~isnan(err_rel) && abs(err_rel)>0.01) && (err_abs>1e-6)
+      fprintf('err rel %s : %f%%\n',file{k},err_rel*100);
+      fprintf('err abs %s : %e\n\n',file{k},err_abs);
+   end
 end
 
 a=0;
