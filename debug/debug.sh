@@ -4,11 +4,17 @@ DEBUG_DIR='/home/tgautrai/faust2/debug'
 BUILD_DIR_GPU='/home/tgautrai/faust2/test/src'
 BUILD_DIR_CPU='/home/tgautrai/faust2/build'
 
-LOG_GPU_FILE="$DEBUG_DIR/log_compil_gpu"
-LOG_CPU_FILE="$DEBUG_DIR/log_compil_cpu"
-LOG_GPU_OUTPUT="$DEBUG_DIR/log_output_gpu"
-LOG_CPU_OUTPUT="$DEBUG_DIR/log_output_cpu"
+DATE_DEBUT_SCRIPT=`date '+%Y-%m-%d_%H-%M-%S'`
+LOG_GPU_FILE="$DEBUG_DIR/log/compilation_${DATE_DEBUT_SCRIPT}_GPU.log"
+LOG_CPU_FILE="$DEBUG_DIR/log/compilation_${DATE_DEBUT_SCRIPT}_CPU.log"
+LOG_GPU_OUTPUT="$DEBUG_DIR/log/execution_${DATE_DEBUT_SCRIPT}_GPU.log"
+LOG_CPU_OUTPUT="$DEBUG_DIR/log/execution_${DATE_DEBUT_SCRIPT}_CPU.log"
 
+NOM_FICHIER="$VAR/`date '+%Y-%m-%d_%H-%M-%S_CPU.log'`"
+
+export COMPILE_SPMAT=1
+export COMPILE_GPU=1
+export OPENBLAS_NUM_THREADS=`cat /proc/cpuinfo |grep processor |wc -l`
 
 cd $DEBUG_DIR
 
