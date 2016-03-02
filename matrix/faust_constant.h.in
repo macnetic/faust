@@ -1,24 +1,25 @@
 #ifndef FAUST_CONSTANT_H
 #define FAUST_CONSTANT_H
 
-//if defined, compilation with openblas for dense algebra
+///if defined, compilation with openblas for dense algebra
 #cmakedefine __GEMM_WITH_OPENBLAS__
 
-//if defined, faust uses single precision for the the algebra (faust_mat, faust_spmat, faust_ faust_core), if not, double precision 
-// (only useful for the mexfunction (MATLAB wrapper) since the faust_mat ... classes are template)
+/*! \brief If defined, faust uses single precision for the the algebra (faust_mat, faust_spmat, faust_core). <br> 
+* If not, it's used double precision. 
+*\warning Only useful for the mexfunction (MATLAB wrapper) since the faust_mat ... classes are template
+*/
 #cmakedefine FAUST_SINGLE
 
 //if defined, print debug message (useful for debugging)
 #cmakedefine FAUST_VERBOSE  
 
 
-// value of FFPP (faust floating point precision)
+/// Value of FFPP (faust floating point precision)
 #ifdef FAUST_SINGLE
-   typedef float FFPP; //single precision
+	typedef float FFPP; ///single precision
 #else
-	typedef double FFPP; //double precision 
+	typedef double FFPP; ///double precision 
 #endif
-
 
 
 typedef unsigned long int faust_unsigned_int;
