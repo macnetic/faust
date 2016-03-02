@@ -37,17 +37,16 @@ template<typename T>
 template<typename U>
 void faust_spmat<T>::operator=(const faust_spmat<U>& M)
 {
-resize(M.getNonZeros(),M.getNbRow(),M.getNbCol());	
+	resize(M.getNonZeros(),M.getNbRow(),M.getNbCol());	
 
-vector<Eigen::Triplet<T> > tripletList;
-   tripletList.reserve(nnz);
-   int nbEltIns = 0;
-   int nb_elt_rowi;
+	vector<Eigen::Triplet<T> > tripletList;
+   	tripletList.reserve(nnz);
+   	int nbEltIns = 0;
+   	int nb_elt_rowi;
 
 	for (int i=0;i<M.getNbRow();i++)
 	{	
 		nb_elt_rowi = M.getOuterIndexPtr()[i+1]-M.getOuterIndexPtr()[i];
-
 		for (int j = 0;j<nb_elt_rowi;j++)
 		{	
 			tripletList.push_back(Eigen::Triplet<T>((int) i,M.getInnerIndexPtr()[j+nbEltIns], (T) M.getValuePtr()[j+nbEltIns]));
@@ -60,7 +59,6 @@ vector<Eigen::Triplet<T> > tripletList;
 }
 
 
-
 template<typename T>
 faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const T* value, const size_t* id_row, const size_t* col_ptr) :
 	faust_mat_generic(dim1_,dim2_),
@@ -68,11 +66,11 @@ faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_
 	nnz(nnz_)
 {	
 	vector<Eigen::Triplet<T> > tripletList;
-   tripletList.reserve(nnz);
-   int nbEltIns = 0;
-   int nb_elt_colj;
-   //std::cout<<"SPMAT CONSTRUCTOR"<<std::endl;
-   //std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
+	tripletList.reserve(nnz);
+	int nbEltIns = 0;
+	int nb_elt_colj;
+	//std::cout<<"SPMAT CONSTRUCTOR"<<std::endl;
+	//std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
 	for (int j=0;j<dim2_;j++)
 	{	
 		nb_elt_colj = col_ptr[j+1]-col_ptr[j];
@@ -82,8 +80,7 @@ faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_
 			//std::cout<<"i : "<<id_row[i+nbEltIns]<<" j :"<<j<<" value : "<<value[i+nbEltIns]<<std::endl;
 			tripletList.push_back(Eigen::Triplet<T>((int) id_row[i+nbEltIns],j, (T) value[i+nbEltIns]));
 		}
-		nbEltIns += nb_elt_colj;
-			
+		nbEltIns += nb_elt_colj;		
 	}
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 }
@@ -97,45 +94,43 @@ faust_spmat<T>::faust_spmat(const faust_mat<T>& M) :
 	// dim2(M.getNbCol()),
 	nnz(0)
 {
-   int* rowind = new int[dim1*dim2];
-   int* colind = new int[dim1*dim2];
-   T* values = new T[dim1*dim2];
+	int* rowind = new int[dim1*dim2];
+	int* colind = new int[dim1*dim2];
+	T* values = new T[dim1*dim2];
 
-   for (int j=0 ; j<dim2 ; j++)
-      for (int i=0; i<dim1 ; i++)
-         if(M(i,j)!=0.0)
-         {
-            rowind[nnz] = i;
-            colind[nnz] = j;
-            values[nnz] = M(i,j);;
-	    nnz++; 
-         }
+	for (int j=0 ; j<dim2 ; j++)
+		for (int i=0; i<dim1 ; i++)
+         		if(M(i,j)!=0.0)
+         		{
+            			rowind[nnz] = i;
+            			colind[nnz] = j;
+            			values[nnz] = M(i,j);;
+	    			nnz++; 
+         		}
 
-   vector<Eigen::Triplet<T> > tripletList;
-   tripletList.reserve(nnz);
-   for(int i=0 ; i<nnz ; i++)
-      tripletList.push_back(Eigen::Triplet<T>(rowind[i], colind[i], values[i]));
-   mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	vector<Eigen::Triplet<T> > tripletList;
+	tripletList.reserve(nnz);
+	for(int i=0 ; i<nnz ; i++)
+		tripletList.push_back(Eigen::Triplet<T>(rowind[i], colind[i], values[i]));
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 
-   delete[] rowind ; rowind=NULL;
-   delete[] colind ; colind=NULL;
-   delete[] values ; values=NULL;
+	delete[] rowind ; rowind=NULL;
+	delete[] colind ; colind=NULL;
+	delete[] values ; values=NULL;
 }
-
-
-
 
 
 template<typename T>
 void faust_spmat<T>::set(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const double* value, const size_t* id_row, const size_t* col_ptr) 
-{	resize(0,0,0);
+{	
+	resize(0,0,0);
 	resize(nnz_,dim1_,dim2_);
 	vector<Eigen::Triplet<T> > tripletList;
-   tripletList.reserve(nnz_);
-   int nbEltIns = 0;
-   int nb_elt_colj;
-   std::cout<<"SPMAT SET"<<std::endl;
-   std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
+	tripletList.reserve(nnz_);
+	int nbEltIns = 0;
+	int nb_elt_colj;
+	std::cout<<"SPMAT SET"<<std::endl;
+	std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
 	for (int j=0;j<dim2_;j++)
 	{	
 		nb_elt_colj = col_ptr[j+1]-col_ptr[j];
@@ -146,15 +141,11 @@ void faust_spmat<T>::set(const faust_unsigned_int nnz_, const faust_unsigned_int
 			//mat.insert((int)id_row[i+nbEltIns],j)=value[i+nbEltIns];
 			tripletList.push_back(Eigen::Triplet<T>((int) id_row[i+nbEltIns],j,(T) value[i+nbEltIns]));
 		}
-		nbEltIns += nb_elt_colj;
-			
+		nbEltIns += nb_elt_colj;		
 	}
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	nnz = nnz_;
 }
-
-
-
 
 
 
@@ -189,8 +180,6 @@ faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_
 
 
 
-
-
 template<typename T>
 void faust_spmat<T>::init(const vector<int>& rowidx, const vector<int>& colidx, const vector<T>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)
 {
@@ -215,19 +204,19 @@ template<typename T>
 void faust_spmat<T>::Display() const
 {
 	std::cout<<"dim1="<<dim1<<" ; dim2="<<dim2<<" ; nnz="<<nnz<<std::endl;
-   
+
 	cout << "rowPtr = " << getRowPtr() << " -> [ " ;
 	for (int i=0 ; i<dim1+1 ; i++)
-      cout <<  getRowPtr()[i] << " ";
-   cout << " ]"<<endl;
+		cout <<  getRowPtr()[i] << " ";
+	cout << " ]"<<endl;
 	cout << "colInd = " << getColInd() << " -> [ " ;
 	for (int i=0 ; i<nnz ; i++)
-      cout <<  getColInd()[i] << " ";
-   cout << " ]"<<endl;
+		cout <<  getColInd()[i] << " ";
+	cout << " ]"<<endl;
 	cout << "values = " << getValuePtr() << " -> [ " ;
 	for (int i=0 ; i<nnz ; i++)
-      cout <<  getValuePtr()[i] << " ";
-   cout << " ]"<<endl<<endl;
+		cout <<  getValuePtr()[i] << " ";
+	cout << " ]"<<endl<<endl;
 }
 
 
@@ -269,7 +258,6 @@ void faust_spmat<T>::operator= (const faust_mat<T>& Mdense)
 	typedef Eigen::Triplet<T> Tip;
 	std::vector<Tip> tripletList;
 
-	
 	for (int i=0;i<nbRow*nbCol;i++)
 	{
 		if (Mdense[i] != 0)
@@ -383,21 +371,14 @@ void faust_spmat<T>::init_from_file(const char* filename)
 	// la premiere ligne contient le nombre de lignes et de colonnes de la matrice
 	// ainsi que le nombre de nonzeros
 	// chacune des autres lignes contient trois valeur par ligne : rowind colind value
-	// avec rowind et colind des indices commencant a 1. 
-
-		
-
-	
+	// avec rowind et colind des indices commencant a 1. 	
 	FILE* fp=fopen(filename,"r");
 	if (fp == NULL)
 	{
 		handleError(class_name,"init_from_file : unable to open file");	
 	}
 	init_from_file(fp);
-	
 	fclose(fp);
-	
-	
 }
 
 
