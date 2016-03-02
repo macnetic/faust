@@ -11,7 +11,13 @@ endif()
 
 if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    
-
+	#TEST VERSION GPU
+	foreach(gpucppin hierarchical_fact_test_cu)
+      configure_file(${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp.in ${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp @ONLY)
+	endforeach()
+	
+	
+	
    foreach(cppin faust_test hierarchical_fact_test MEG_fact palm4MSA_test)
       configure_file(${FAUST_TESTSRC_SRC_DIR}/${cppin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${cppin}.cpp @ONLY)
    endforeach()
