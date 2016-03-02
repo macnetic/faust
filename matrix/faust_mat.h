@@ -158,7 +158,7 @@ class faust_mat : public faust_mat_generic
 	*/	  
 	void init_from_file(const char* filename);
 
-
+	/// Absolute value calculated from the library eigen.
 	void abs() {mat=mat.cwiseAbs();}
    
   
