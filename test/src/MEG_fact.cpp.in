@@ -13,7 +13,7 @@
 #include <iomanip>
 
 using namespace std;
-typedef FFPP faust_real;//faust floating point precision
+typedef double faust_real;//faust floating point precision
 
 int main()
 {	

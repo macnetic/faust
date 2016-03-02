@@ -78,13 +78,20 @@ TEST_HIERFACT_SRC = hierarchical_fact_test_cu.cpp
 TEST_HIERFACT_OBJ = $(patsubst %.cpp, %.o, $(TEST_HIERFACT_SRC))
 TEST_HIERFACT_EXE = $(patsubst %.o, %.out, $(TEST_HIERFACT_OBJ))
 
+TEST_MEG_SRC = MEG_fact_cu.cpp
+TEST_MEG_OBJ = $(patsubst %.cpp, %.o, $(TEST_MEG_SRC))
+TEST_MEG_EXE = $(patsubst %.o, %.out, $(TEST_MEG_OBJ))
+
 LDFLAGS = $(LIBS) -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5
 
 
-all: $(TEST_HIERFACT_EXE)
+all: $(TEST_HIERFACT_EXE) $(TEST_MEG_EXE)
+
 $(TEST_HIERFACT_EXE) : $(TEST_HIERFACT_OBJ)
 $(TEST_HIERFACT_OBJ) : $(TEST_HIERFACT_SRC)
 
+$(TEST_MEG_EXE) : $(TEST_MEG_OBJ)
+$(TEST_MEG_OBJ) : $(TEST_MEG_SRC)
 
 
 %.out: %.o $(LIB_MATRIX) $(LIB_PALM) $(LIB_MATIO) $(LIB_EXCEPTION)
@@ -128,7 +135,7 @@ $(TEST_DIR)/%.o: $(TEST_DIR)/%.cpp
 
 
 cleanall:
-	@rm -rf  $(LIB_MATRIX) $(LIB_PALM)  $(LIB_MATIO) $(LIB_EXCEPTION) $(MATRIX_DIR)/*.o $(MATRIX_DIR)/*.cuo $(PALM_DIR)/*.o $(MATIO_DIR)/*.o $(EXCEPTION_DIR)/*.o $(TEST_HIERFACT_EXE) $(TEST_HIERFACT_OBJ)
+	@rm -rf  $(LIB_MATRIX) $(LIB_PALM)  $(LIB_MATIO) $(LIB_EXCEPTION) $(MATRIX_DIR)/*.o $(MATRIX_DIR)/*.cuo $(PALM_DIR)/*.o $(MATIO_DIR)/*.o $(EXCEPTION_DIR)/*.o $(TEST_HIERFACT_EXE) $(TEST_HIERFACT_OBJ) $(TEST_MEG_EXE) $(TEST_MEG_OBJ)
 
 clean:
-	@rm -rf $(TEST_HIERFACT_EXE) $(TEST_HIERFACT_OBJ) 
+	@rm -rf $(TEST_HIERFACT_EXE) $(TEST_HIERFACT_OBJ) $(TEST_MEG_EXE) $(TEST_MEG_OBJ) 

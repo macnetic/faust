@@ -1840,10 +1840,10 @@ void faust_cu_mat<faust_real>::print_timers()const
    cout << "t_gemm                       = " << t_gemm.get_time()          << " s for "<< t_gemm.get_nb_call()          << " calls" << endl;
    cout << "t_gemv                       = " << t_gemv.get_time()          << " s for "<< t_gemv.get_nb_call()          << " calls" << endl;
    cout << "t_add_ext                    = " << t_add_ext.get_time()          << " s for "<< t_add_ext.get_nb_call()          << " calls" << endl;
-   cout << "t_power_iteration            = " << t_power_iteration.get_time()          << " s for "<< t_power_iteration.get_nb_call()          << " calls" << endl << endl <<endl;
-   cout << "       t_power_iteration_operator_equal = " << t_power_iteration_operator_equal.get_time()          << " s for "<< t_power_iteration_operator_equal.get_nb_call()          << " calls" << endl << endl <<endl;
-   cout << "       t_power_iteration_normalize      = " << t_power_iteration_normalize.get_time()          << " s for "<< t_power_iteration_normalize.get_nb_call()          << " calls" << endl << endl <<endl;
-   cout << "       t_power_iteration_gemv           = " << t_power_iteration_gemv.get_time()          << " s for "<< t_power_iteration_gemv.get_nb_call()          << " calls" << endl << endl <<endl;
+   cout << "t_power_iteration            = " << t_power_iteration.get_time()          << " s for "<< t_power_iteration.get_nb_call()          << " calls" << endl ;
+   cout << "       t_power_iteration_operator_equal = " << t_power_iteration_operator_equal.get_time()          << " s for "<< t_power_iteration_operator_equal.get_nb_call()          << " calls" << endl;
+   cout << "       t_power_iteration_normalize      = " << t_power_iteration_normalize.get_time()          << " s for "<< t_power_iteration_normalize.get_nb_call()          << " calls" << endl;
+   cout << "       t_power_iteration_gemv           = " << t_power_iteration_gemv.get_time()          << " s for "<< t_power_iteration_gemv.get_nb_call()          << " calls" << endl ;
    cout << "       t_power_iteration_dot            = " << t_power_iteration_dot.get_time()          << " s for "<< t_power_iteration_dot.get_nb_call()          << " calls" << endl << endl <<endl;
 }
 #endif
