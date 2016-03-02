@@ -592,6 +592,7 @@ void palm4MSA<T>::compute_c()
 {
 #ifdef __COMPILE_TIMERS__
 	t_global_compute_c.start();
+	t_local_compute_c.start();
 #endif
 
 
@@ -612,6 +613,7 @@ void palm4MSA<T>::compute_c()
    
    #ifdef __COMPILE_TIMERS__
 	t_global_compute_c.stop();
+	t_local_compute_c.stop();
 	#endif	
 }
 #endif
@@ -824,6 +826,7 @@ void palm4MSA<T>::init_local_timers()
 {
 t_local_compute_projection.reset();
 t_local_compute_grad_over_c.reset();
+t_local_compute_c.reset();
 t_local_compute_lambda.reset();
 t_local_update_R.reset();
 t_local_update_L.reset();
@@ -869,6 +872,7 @@ void palm4MSA<T>::print_local_timers()const
    cout << "timers in palm4MSA : " << endl;
    cout << "t_local_next_step           = " << t_local_next_step.get_time()           << " s for "<< t_local_next_step.get_nb_call()           << " calls" << endl;
    cout << "t grad + updateL + updateR  = " << t_local_update_L.get_time()+t_local_update_R.get_time()+t_local_compute_grad_over_c.get_time()            << " s for "<< t_local_update_L.get_nb_call()            << " calls of grad" << endl;
+   cout << "t local_compute_c  = " << t_local_compute_c.get_time()            << " s for "<< t_local_compute_c.get_nb_call()            << " calls of grad" << endl;
    cout << "t_local_compute_lambda      = " << t_local_compute_lambda.get_time()      << " s for "<< t_local_compute_lambda.get_nb_call()      << " calls" << endl;
    cout << "t_local_compute_projection  = " << t_local_compute_projection.get_time()  << " s for "<< t_local_compute_projection.get_nb_call()  << " calls" << endl<<endl;
    //cout << "t_local_compute_grad_over_c = " << t_local_compute_grad_over_c.get_time() << " s for "<< t_local_compute_grad_over_c.get_nb_call() << " calls" << endl;

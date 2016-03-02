@@ -146,6 +146,7 @@ class palm4MSA
    public: 
       faust_timer t_local_compute_projection;
       faust_timer t_local_compute_grad_over_c;
+      faust_timer t_local_compute_c;
       faust_timer t_local_compute_lambda;
       faust_timer t_local_update_R;
       faust_timer t_local_update_L;

@@ -85,13 +85,35 @@ T power_iteration(const  faust_cu_mat<T> & cu_A, const faust_unsigned_int nbr_it
    {
       i++;
       lambda_old = lambda;
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_power_iteration_operator_equal.start();
+	#endif
       cu_xk_norm = cu_xk;
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_power_iteration_operator_equal.stop();
+      cu_A.t_power_iteration_normalize.start();
+	#endif
       cu_xk_norm.normalize();
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_power_iteration_normalize.stop();
+      cu_A.t_power_iteration_gemv.start();
+	#endif
       gemv(cu_A, cu_xk_norm, cu_xk, cublasHandle);
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_power_iteration_gemv.stop();
+      cu_A.t_power_iteration_dot.start();
+	#endif
       lambda = cu_xk_norm.dot(cu_xk, cublasHandle);
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_power_iteration_dot.stop();
+	#endif
       //std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
    }
    flag = (i<nbr_iter_max)?i:-1;
+
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_power_iteration.stop();
+	#endif
    return lambda;
 }
 
@@ -99,6 +121,9 @@ T power_iteration(const  faust_cu_mat<T> & cu_A, const faust_unsigned_int nbr_it
 template <typename faust_real>
 void gemv(const faust_cu_mat<faust_real>& cu_A, const faust_cu_vec<faust_real>& cu_x, faust_cu_vec<faust_real>& cu_y,const faust_real alpha, const faust_real beta, char typeA, cublasHandle_t cublasHandle)
 {
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_gemv.start();
+	#endif
 	faust_unsigned_int opA1,opA2;
 	int currentGPU;
 	faust_cudaGetDevice(&currentGPU);
@@ -116,6 +141,9 @@ void gemv(const faust_cu_mat<faust_real>& cu_A, const faust_cu_vec<faust_real>& 
 	if (opA1==0)
 	{
 	   cu_y.resize(0);
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_gemv.stop();
+	#endif
 		return;
 	}
 
@@ -125,6 +153,9 @@ void gemv(const faust_cu_mat<faust_real>& cu_A, const faust_cu_vec<faust_real>& 
 			cu_y.setZeros(opA1);
 		else if (beta != 1.0)
 			cu_y *= beta;
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_gemv.stop();
+	#endif
 		return;
 	}
 
@@ -146,6 +177,9 @@ void gemv(const faust_cu_mat<faust_real>& cu_A, const faust_cu_vec<faust_real>& 
 			   cu_y *= beta;
 			cu_y += cu_tmp;
 		}
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_gemv.stop();
+	#endif
 		return;
 	}
 	
@@ -196,6 +230,9 @@ void gemv(const faust_cu_mat<faust_real>& cu_A, const faust_cu_vec<faust_real>& 
 	}
 		
 	faust_cudaSetDevice(currentGPU);
+	#ifdef __COMPILE_TIMERS__
+		cu_A.t_gemv.stop();
+	#endif
 }
 
 
@@ -390,6 +427,9 @@ void setOp(const faust_cu_spmat<faust_real>& cu_S, const char opA, faust_unsigne
 template <typename faust_real>
 void gemv(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_vec<faust_real>& cu_x, faust_cu_vec<faust_real>& cu_y, const  faust_real alpha, const faust_real beta, const char opA, cusparseHandle_t cusparseHandle)
 {
+#ifdef __COMPILE_TIMERS__
+cu_A.t_csrmv.start();
+#endif
    faust_unsigned_int opA1,opA2;
 
    setOp(cu_A,opA,opA1,opA2);
@@ -405,6 +445,9 @@ void gemv(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_vec<faust_real>
    if (opA1==0)
    {
       cu_y.resize(0);
+#ifdef __COMPILE_TIMERS__
+cu_A.t_csrmv.stop();
+#endif
       return;
          
    }
@@ -414,6 +457,9 @@ void gemv(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_vec<faust_real>
 			cu_y.setZeros(opA1);
 		else if (beta !=1.0)
 			cu_y *= beta;
+#ifdef __COMPILE_TIMERS__
+cu_A.t_csrmv.stop();
+#endif
 		return;
    }
          
@@ -470,6 +516,9 @@ void gemv(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_vec<faust_real>
 	   if (currentGPU != FAUST_GPU_ALREADY_SET)
 		   faust_cudaSetDevice(currentGPU);
    }
+#ifdef __COMPILE_TIMERS__
+cu_A.t_csrmv.stop();
+#endif
 
 }
 
@@ -477,6 +526,9 @@ template <typename faust_real>
 void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const  faust_real alpha, const faust_real beta, const char opA, const char opB, cusparseHandle_t cusparseHandle)
 {
 
+#ifdef __COMPILE_TIMERS__
+cu_A.t_csrmm.start();
+#endif
     faust_unsigned_int opA1,opA2,opB1,opB2;
 
 
@@ -502,6 +554,9 @@ void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>
    if (opA1*opB2 == 0)
    {
 	   cu_C.resize(opA1,opB2);
+#ifdef __COMPILE_TIMERS__
+cu_A.t_csrmm.stop();
+#endif
       return;
    }
 
@@ -511,6 +566,9 @@ void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>
          cu_C.setZeros(opA1,opB2,cu_C.getDevice());
       else if(beta != 1.0)
          cu_C *= beta;
+#ifdef __COMPILE_TIMERS__
+cu_A.t_csrmm.stop();
+#endif
       return;
    }
 
@@ -536,6 +594,9 @@ void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>
          cu_C *= beta;
          cu_C += cu_S;
       }   
+#ifdef __COMPILE_TIMERS__
+cu_A.t_csrmm.stop();
+#endif
       return;
    }
    else if (cu_B.getData()==NULL)
@@ -591,6 +652,9 @@ void gemm(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_real>
 
    faust_cudaSetDevice(currentGPU);
     
+#ifdef __COMPILE_TIMERS__
+cu_A.t_csrmm.stop();
+#endif
 }
 #endif
 

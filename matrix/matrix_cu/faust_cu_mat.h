@@ -10,7 +10,7 @@
 #include "cuda_runtime.h"
 #include "cublas_v2.h"
 #ifdef __COMPILE_TIMERS__
-  #include "faust_timer.h"
+  #include "faust_cu_timer.h"
 #endif
 #include "LinAlgebra_cu.h"
 
@@ -120,8 +120,8 @@ public:
   void sub(const faust_cu_spmat<faust_real>& S, cusparseHandle_t);
 #endif
 
-  void add(const faust_cu_mat<faust_real>& cu_A);
-  void operator+=(const faust_cu_mat<faust_real>& cu_A){add(cu_A);}
+  void operator+=(const faust_cu_mat<faust_real>& cu_A);
+  void add(const faust_cu_mat<faust_real>& cu_A){this->operator+=(cu_A);}
 
   void operator-=(const faust_cu_mat<faust_real>& cu_A);
   void sub(const faust_cu_mat<faust_real>& cu_A){this->operator-=(cu_A);}
@@ -190,32 +190,48 @@ private :
 
 #ifdef __COMPILE_TIMERS__
   public:
-     faust_timer t_local_muliplyLeft;
 
       //temporary members
-      static faust_timer t_constr;
-      static faust_timer t_get_coeff;
-      static faust_timer t_get_coeffs;
-      static faust_timer t_set_coeff;
-      static faust_timer t_set_coeffs;
-      static faust_timer t_set_coeffs2;
-      static faust_timer t_resize;
-      static faust_timer t_check_dim;
-      static faust_timer t_max;
-      static faust_timer t_transpose;
-      static faust_timer t_mult_right;
-      static faust_timer t_mult_left;
-      static faust_timer t_scalar_multiply;
-      static faust_timer t_add;
-      static faust_timer t_sub;
-      static faust_timer t_print_file;
-      static faust_timer t_spectral_norm;
-      static faust_timer t_spectral_norm2;
+      static faust_cu_timer t_constructor_from_device;
+      static faust_cu_timer t_constructor_from_host;
+      static faust_cu_timer t_constructor_from_size;
+      static faust_cu_timer t_create;
+      static faust_cu_timer t_clear;
+      static faust_cu_timer t_copy_from_host;
+      static faust_cu_timer t_copy_from_device;
+      static faust_cu_timer t_copy_to_host;
+      static faust_cu_timer t_copy_to_device;
+      static faust_cu_timer t_init;
+      static faust_cu_timer t_move_to_device;
+      static faust_cu_timer t_set_zeros;
+      static faust_cu_timer t_set_eyes;
+      static faust_cu_timer t_transpose;
+      static faust_cu_timer t_init_from_transpose;
+      static faust_cu_timer t_max;
+      static faust_cu_timer t_min;
+      static faust_cu_timer t_abs;
+      static faust_cu_timer t_norm;
+      static faust_cu_timer t_trace;
+      static faust_cu_timer t_spectral_norm2;
+      static faust_cu_timer t_scalar_multiply;
+      static faust_cu_timer t_operator_equal_from_device;
+      static faust_cu_timer t_operator_equal_from_host;
+      static faust_cu_timer t_operator_plus_equal;
+      static faust_cu_timer t_operator_less_equal;
+      static faust_cu_timer t_add_cuspmat;
+      static faust_cu_timer t_sub;
+      static faust_cu_timer t_hadamard_product;
+      static faust_cu_timer t_display;
+      static faust_cu_timer t_print_file;
 
-      static faust_timer t_power_iteration;
-      static faust_timer t_multiply;
-      static faust_timer t_gemm;
-      static faust_timer t_add_ext;
+      static faust_cu_timer t_gemm;
+      static faust_cu_timer t_gemv;
+      static faust_cu_timer t_add_ext;
+      static faust_cu_timer t_power_iteration;
+      static faust_cu_timer t_power_iteration_operator_equal;
+      static faust_cu_timer t_power_iteration_normalize;
+      static faust_cu_timer t_power_iteration_gemv;
+      static faust_cu_timer t_power_iteration_dot;
 
       void print_timers()const;
 #endif

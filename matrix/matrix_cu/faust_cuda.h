@@ -196,9 +196,26 @@ inline const char* cusparseGetErrorString(cusparseStatus_t cusparseStat)
  faust_cudaSafe(cudaMemcpyAsync(data_dst, data_src, byte_size, direction, stream),"cudaMemcpyAsync");  \
      } while (0)
 
-#define faust_cudaMemcpyPeerAsync(data_dst, dev_dst, data_src, dev_src, byte_size, stream) do {                                \
+#define faust_cudaMemcpyPeerAsync(data_dst, dev_dst, data_src, dev_src, byte_size, stream) do {  \
  faust_cudaSafe(cudaMemcpyPeerAsync(data_dst, dev_dst, data_src, dev_src, byte_size, stream),"cudaMemcpyPeerAsync");  \
      } while (0)
+
+#define faust_cudaEventRecord(event, stream) do {  \
+ faust_cudaSafe(cudaEventRecord(event, stream),"cudaEventRecord");  \
+     } while (0)
+
+#define faust_cudaEventSynchronize(event) do {  \
+ faust_cudaSafe(cudaEventSynchronize(event),"cudaEventSynchronize");  \
+     } while (0)
+
+#define faust_cudaEventElapsedTime(ms, start, end) do {  \
+ faust_cudaSafe(cudaEventElapsedTime(ms, start, end),"cudaEventElapsedTime");  \
+     } while (0)
+
+#define faust_cudaEventCreate(event) do {  \
+ faust_cudaSafe(cudaEventCreate(event),"cudaEventCreate");  \
+     } while (0)
+
 
 
 

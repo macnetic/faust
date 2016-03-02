@@ -8,6 +8,9 @@
 template <typename faust_real> class faust_cu_vec;
 template <typename faust_real> class faust_cu_mat;
 #include "faust_cuda.h"
+#ifdef __COMPILE_TIMERS__
+  #include "faust_cu_timer.h"
+#endif
 
 #include "cusparse.h"
 
@@ -111,6 +114,36 @@ template <typename faust_real> class faust_cu_spmat
 	//friend void  faust_cu_vec::multiplyLeft(const faust_cu_spmat<faust_real>& A, cusparseHandle_t);
 	//friend void multiply(const faust_core<faust_real>& A, const faust_cu_mat<faust_real>& B, faust_cu_mat<faust_real>& C,const faust_real & alpha, char typeA, char typeMult);
 
+#ifdef __COMPILE_TIMERS__
+  public:
+
+      //temporary members
+      static faust_cu_timer t_constructor_from_device;
+      static faust_cu_timer t_constructor_from_host;
+      static faust_cu_timer t_create;
+      static faust_cu_timer t_clear;
+      static faust_cu_timer t_copy_from_host;
+      static faust_cu_timer t_copy_from_device;
+      static faust_cu_timer t_copy_to_host;
+      static faust_cu_timer t_copy_to_device;
+      static faust_cu_timer t_move_to_device;
+      static faust_cu_timer t_init_from_cuspmat;
+      static faust_cu_timer t_init_from_spmat;
+      static faust_cu_timer t_init_from_cumat;
+      static faust_cu_timer t_init_from_mat;
+      static faust_cu_timer t_scalar_multiply;
+      static faust_cu_timer t_operator_plus_equal_real;
+      static faust_cu_timer t_transpose;
+      static faust_cu_timer t_init_from_transpose;
+      static faust_cu_timer t_norm;
+      static faust_cu_timer t_display;
+      static faust_cu_timer t_print_file;
+
+      static faust_cu_timer t_csrmv;
+      static faust_cu_timer t_csrmm;
+
+      void print_timers()const;
+#endif
 	
 };
 

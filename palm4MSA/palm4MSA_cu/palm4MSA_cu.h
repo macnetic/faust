@@ -8,7 +8,7 @@
 
 
 #ifdef __COMPILE_TIMERS__
-  #include "faust_timer.h"
+  #include "faust_cu_timer.h"
 #endif
 
 #include "faust_cu_mat.h"
@@ -145,33 +145,34 @@ class palm4MSA_cu
 
 #ifdef __COMPILE_TIMERS__
    public: 
-      faust_timer t_local_compute_projection;
-      faust_timer t_local_compute_grad_over_c;
-      faust_timer t_local_compute_lambda;
-      faust_timer t_local_update_R;
-      faust_timer t_local_update_L;
-      faust_timer t_local_check;
-      faust_timer t_local_init_fact;
-      faust_timer t_local_next_step;
-      faust_timer t_local_init_fact_from_palm;
+      faust_cu_timer t_local_compute_projection;
+      faust_cu_timer t_local_compute_grad_over_c;
+      faust_cu_timer t_local_compute_c;
+      faust_cu_timer t_local_compute_lambda;
+      faust_cu_timer t_local_update_R;
+      faust_cu_timer t_local_update_L;
+      faust_cu_timer t_local_check;
+      faust_cu_timer t_local_init_fact;
+      faust_cu_timer t_local_next_step;
+      faust_cu_timer t_local_init_fact_from_palm;
 	 
 
-      static faust_timer t_global_compute_projection;
-      static faust_timer t_global_compute_grad_over_c;
-	  static faust_timer t_global_compute_c;
-      static faust_timer t_global_compute_lambda;
-      static faust_timer t_global_update_R;
-      static faust_timer t_global_update_L;
-      static faust_timer t_global_check;
-      static faust_timer t_global_init_fact;
-      static faust_timer t_global_next_step;
-      static faust_timer t_global_init_fact_from_palm;
+      static faust_cu_timer t_global_compute_projection;
+      static faust_cu_timer t_global_compute_grad_over_c;
+	  static faust_cu_timer t_global_compute_c;
+      static faust_cu_timer t_global_compute_lambda;
+      static faust_cu_timer t_global_update_R;
+      static faust_cu_timer t_global_update_L;
+      static faust_cu_timer t_global_check;
+      static faust_cu_timer t_global_init_fact;
+      static faust_cu_timer t_global_next_step;
+      static faust_cu_timer t_global_init_fact_from_palm;
 	  
-	  static faust_timer t_prox_const;
-	  static faust_timer t_prox_sp;
-	  static faust_timer t_prox_spcol;
-	  static faust_timer t_prox_splin;
-	  static faust_timer t_prox_normcol;
+	  static faust_cu_timer t_prox_const;
+	  static faust_cu_timer t_prox_sp;
+	  static faust_cu_timer t_prox_spcol;
+	  static faust_cu_timer t_prox_splin;
+	  static faust_cu_timer t_prox_normcol;
 	  
 	  static int nb_call_prox_const;
 	  static int nb_call_prox_sp;

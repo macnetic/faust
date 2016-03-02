@@ -28,9 +28,22 @@ faust_cu_spmat<faust_real>::faust_cu_spmat() :
 template <typename faust_real>
 faust_cu_spmat<faust_real>::faust_cu_spmat(const int* csrRowPtr_, const int* csrColInd_, const faust_real* csrValues_, const faust_unsigned_int nnz_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, bool dataFromGPU, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL),device(FAUST_DEFAULT_CUDA_DEVICE), descr(NULL)
 {
+#ifdef __COMPILE_TIMERS__
+   if(dataFromGPU)
+      t_constructor_from_device.start();
+   else
+      t_constructor_from_host.start();
+#endif
+
     if(nnz_ == 0)
     {
         _create(nnz_, nbRow, nbCol, dstDevice);
+#ifdef __COMPILE_TIMERS__
+   if(dataFromGPU)
+      t_constructor_from_device.stop();
+   else
+      t_constructor_from_host.stop();
+#endif
         return;
     }
     if(csrRowPtr_==NULL || csrColInd_==NULL || csrValues_==NULL )
@@ -42,39 +55,72 @@ faust_cu_spmat<faust_real>::faust_cu_spmat(const int* csrRowPtr_, const int* csr
     }
    else
         copyFromHost(csrRowPtr_, csrColInd_, csrValues_, nnz, nbRow, nbCol, dstDevice, stream);
+#ifdef __COMPILE_TIMERS__
+   if(dataFromGPU)
+      t_constructor_from_device.stop();
+   else
+      t_constructor_from_host.stop();
+#endif
 }
 
 template <typename faust_real>
 faust_cu_spmat<faust_real>::faust_cu_spmat(const faust_cu_spmat<faust_real>& cu_S, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL), device(FAUST_DEFAULT_CUDA_DEVICE), descr(NULL)
 {
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_device.start();
+#endif
     _create(0,0,0);
     init(cu_S, dstDevice, stream);
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_device.stop();
+#endif
 }
 
 template <typename faust_real>
 faust_cu_spmat<faust_real>::faust_cu_spmat(const faust_spmat<faust_real>& S, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL), device(FAUST_DEFAULT_CUDA_DEVICE), descr(NULL)
 {
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_host.start();
+#endif
     _create(0,0,0);
     init(S, dstDevice, stream);
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_host.stop();
+#endif
 }
 
 template <typename faust_real>
 faust_cu_spmat<faust_real>::faust_cu_spmat(const faust_cu_mat<faust_real>& cu_A, cusparseHandle_t cusparseHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL), device(FAUST_DEFAULT_CUDA_DEVICE), descr(NULL)
 {
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_device.start();
+#endif
     _create(0,0,0);
     init(cu_A, cusparseHandle, dstDevice, stream);
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_device.stop();
+#endif
 }
 
 template <typename faust_real>
 faust_cu_spmat<faust_real>::faust_cu_spmat(const faust_mat<faust_real>& A, cusparseHandle_t cusparseHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL), device(FAUST_DEFAULT_CUDA_DEVICE), descr(NULL)
 {
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_host.start();
+#endif
     _create(0,0,0);
     init(A, cusparseHandle, dstDevice, stream);
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_host.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::_create(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const int device_)
 {
+#ifdef __COMPILE_TIMERS__
+t_create.start();
+#endif
     if (nnz_<0 || dim1_<0 || dim2_<0 || nnz_>dim1_*dim2_ )
        handleError(class_name, "_create : incorrect dimensions");
 
@@ -121,12 +167,18 @@ void faust_cu_spmat<faust_real>::_create(const faust_unsigned_int nnz_, const fa
     dim1 = dim1_;
     dim2 = dim2_;
     device = device_;
+#ifdef __COMPILE_TIMERS__
+t_create.stop();
+#endif
 }
 
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::_clear()
 {
+#ifdef __COMPILE_TIMERS__
+t_clear.start();
+#endif
     if(dim1*dim2 > 0)
     {
         int currentGPU;
@@ -164,15 +216,15 @@ void faust_cu_spmat<faust_real>::_clear()
     csrValues = NULL;
     descr = NULL;
 
+#ifdef __COMPILE_TIMERS__
+t_clear.stop();
+#endif
 
 }
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::resize(const faust_unsigned_int nnz_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const int device_)
 {
-#ifdef __COMPILE_TIMERS__
-t_resize.start();
-#endif
    if (nnz_!=nnz || dim1!=nbRow || device!=device_ )
    {
       _clear();
@@ -186,14 +238,14 @@ t_resize.start();
       device = device_;
    }
 
-#ifdef __COMPILE_TIMERS__
-t_resize.stop();
-#endif
 }
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::copyFromHost(const int* csrRowPtr_, const int*  csrColInd_, const faust_real* csrValues_, const faust_unsigned_int nnz_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
+#ifdef __COMPILE_TIMERS__
+t_copy_from_host.start();
+#endif
     resize(nnz_, nbRow, nbCol, dstDevice);
     int currentGPU;
     faust_cudaGetDevice(&currentGPU);
@@ -203,21 +255,33 @@ void faust_cu_spmat<faust_real>::copyFromHost(const int* csrRowPtr_, const int* 
     faust_cudaMemcpyAsync(csrColInd, csrColInd_, nnz_*sizeof(int), cudaMemcpyHostToDevice, stream);
     faust_cudaMemcpyAsync(csrValues, csrValues_, nnz_*sizeof(faust_real), cudaMemcpyHostToDevice, stream);
     faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_copy_from_host.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::copyFromDevice(const int* csrRowPtr_, const int* csrColInd_, const faust_real* csrValues_, const faust_unsigned_int nnz_,  const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
+#ifdef __COMPILE_TIMERS__
+t_copy_from_device.start();
+#endif
     resize(nnz_, nbRow, nbCol, dstDevice);
     faust_cudaMemcpyPeerAsync(csrRowPtr, dstDevice, csrRowPtr_, srcDevice, (nbRow+1)*sizeof(int), stream);
     faust_cudaMemcpyPeerAsync(csrColInd, dstDevice, csrColInd_, srcDevice, nnz_*sizeof(int), stream);
     faust_cudaMemcpyPeerAsync(csrValues, dstDevice, csrValues_, srcDevice, nnz_*sizeof(faust_real), stream);
+#ifdef __COMPILE_TIMERS__
+t_copy_from_device.stop();
+#endif
 }
 
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::copyToHost(int* csrRowPtr_, int* csrColInd_, faust_real* csrValues_, const faust_unsigned_int nnz_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, cudaStream_t stream/*=0*/)const
 {
+#ifdef __COMPILE_TIMERS__
+t_copy_to_host.start();
+#endif
     int currentGPU;
     faust_cudaGetDevice(&currentGPU);
     faust_cudaSetDevice(device);
@@ -226,14 +290,23 @@ void faust_cu_spmat<faust_real>::copyToHost(int* csrRowPtr_, int* csrColInd_, fa
     faust_cudaMemcpyAsync(csrColInd_, csrColInd, nnz_*sizeof(int), cudaMemcpyDeviceToHost, stream);
     faust_cudaMemcpyAsync(csrValues_, csrValues, nnz_*sizeof(faust_real), cudaMemcpyDeviceToHost, stream);
     faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_copy_to_host.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::copyToDevice(int* csrRowPtr_, int* csrColInd_, faust_real* csrValues_, const faust_unsigned_int nnz_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)const
 {
+#ifdef __COMPILE_TIMERS__
+t_copy_to_device.start();
+#endif
        faust_cudaMemcpyPeerAsync(csrRowPtr_, dstDevice, csrRowPtr, device, (nbRow+1)*sizeof(int), stream);
        faust_cudaMemcpyPeerAsync(csrColInd_, dstDevice, csrColInd, device, nnz_*sizeof(int), stream);
        faust_cudaMemcpyPeerAsync(csrValues_, dstDevice, csrValues, device, nnz_*sizeof(faust_real), stream);
+#ifdef __COMPILE_TIMERS__
+t_copy_to_device.stop();
+#endif
 }
 
 
@@ -241,11 +314,22 @@ void faust_cu_spmat<faust_real>::copyToDevice(int* csrRowPtr_, int* csrColInd_, 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::moveToDevice(int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
+#ifdef __COMPILE_TIMERS__
+t_move_to_device.start();
+#endif
    if(device == dstDevice)
+   {
+#ifdef __COMPILE_TIMERS__
+t_move_to_device.stop();
+#endif
       return;
+   }
    if (nnz == 0)
    {
       device = dstDevice;
+#ifdef __COMPILE_TIMERS__
+t_move_to_device.stop();
+#endif
       return;
    }
 
@@ -271,36 +355,57 @@ void faust_cu_spmat<faust_real>::moveToDevice(int dstDevice/*=FAUST_DEFAULT_CUDA
    device = dstDevice;
 
    faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_move_to_device.stop();
+#endif
 }
 
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::init(const faust_cu_spmat<faust_real>& cu_S, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ )
 {
+#ifdef __COMPILE_TIMERS__
+t_init_from_cuspmat.start();
+#endif
 
     if(cu_S.nnz == 0)
     {
        // display warning as matrix is empty
        resize(cu_S.nnz, cu_S.dim1, cu_S.dim2);
        device = cu_S.device;
+#ifdef __COMPILE_TIMERS__
+t_init_from_cuspmat.stop();
+#endif
        return;
     }
     else
        copyFromDevice(cu_S.csrRowPtr, cu_S.csrColInd, cu_S.csrValues, cu_S.nnz, cu_S.getNbRow(), cu_S.getNbCol(), cu_S.device, cu_S.device);
+#ifdef __COMPILE_TIMERS__
+t_init_from_cuspmat.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::init(const faust_spmat<faust_real>& S, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ )
 {
+#ifdef __COMPILE_TIMERS__
+t_init_from_spmat.start();
+#endif
     if(S.getNonZeros() == 0)
         resize(S.getNonZeros(), S.getNbRow(), S.getNbCol(), dstDevice);
     else
         copyFromHost(S.getRowPtr(), S.getColInd(), S.getValuePtr(), S.getNonZeros(), S.getNbRow(), S.getNbCol(), dstDevice, stream);
+#ifdef __COMPILE_TIMERS__
+t_init_from_spmat.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::init(const faust_cu_mat<faust_real>& cu_A, cusparseHandle_t cusparseHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ )
 {
+#ifdef __COMPILE_TIMERS__
+t_init_from_cumat.start();
+#endif
     int currentGPU;
     faust_cudaGetDevice(&currentGPU);
     faust_cudaSetDevice(dstDevice);
@@ -374,13 +479,22 @@ void faust_cu_spmat<faust_real>::init(const faust_cu_mat<faust_real>& cu_A, cusp
     cu_A_ptr = NULL;
 
     faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_init_from_cumat.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::init(const faust_mat<faust_real>& M, cusparseHandle_t cusparseHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ )
 {
+#ifdef __COMPILE_TIMERS__
+t_init_from_mat.start();
+#endif
     const faust_cu_mat<faust_real> cu_M(M.getNbRow(), M.getNbCol(), dstDevice);
     init(cu_M, cusparseHandle, dstDevice, stream);
+#ifdef __COMPILE_TIMERS__
+t_init_from_mat.stop();
+#endif
 }
 
 
@@ -388,8 +502,16 @@ void faust_cu_spmat<faust_real>::init(const faust_mat<faust_real>& M, cusparseHa
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::operator*=(const faust_real alpha)
 {
+#ifdef __COMPILE_TIMERS__
+t_scalar_multiply.start();
+#endif
    if (alpha == 1.0 || nnz == 0)
+   {
+#ifdef __COMPILE_TIMERS__
+t_scalar_multiply.stop();
+#endif
       return;
+   }
    if (alpha == 0.0)
       resize(0, dim1, dim2);
    else
@@ -402,6 +524,9 @@ void faust_cu_spmat<faust_real>::operator*=(const faust_real alpha)
 
       faust_cudaSetDevice(currentGPU);
    }
+#ifdef __COMPILE_TIMERS__
+t_scalar_multiply.stop();
+#endif
 }
 
 template <typename faust_real>
@@ -419,8 +544,16 @@ bool faust_cu_spmat<faust_real>::operator==(const faust_cu_spmat<faust_real>& cu
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::operator+=(const faust_real alpha)
 {
+#ifdef __COMPILE_TIMERS__
+t_operator_plus_equal_real.start();
+#endif
    if (alpha == 0.0 || nnz == 0)
+   {
+#ifdef __COMPILE_TIMERS__
+t_operator_plus_equal_real.stop();
+#endif
       return;
+   }
    else
    {
       int currentGPU;
@@ -431,15 +564,26 @@ void faust_cu_spmat<faust_real>::operator+=(const faust_real alpha)
 
       faust_cudaSetDevice(currentGPU);
    }
+#ifdef __COMPILE_TIMERS__
+t_operator_plus_equal_real.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::init_from_transpose(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
 {
+#ifdef __COMPILE_TIMERS__
+t_init_from_transpose.start();
+#endif
    resize(cu_S.nnz, cu_S.dim2, cu_S.dim1);
 
    if(cu_S.dim1*cu_S.dim2==0 || cu_S.nnz==0)
+   {
+#ifdef __COMPILE_TIMERS__
+t_init_from_transpose.stop();
+#endif
       return;
+   }
    
 
    int currentGPU;
@@ -479,10 +623,16 @@ void faust_cu_spmat<faust_real>::init_from_transpose(const faust_cu_spmat<faust_
 
 
    faust_cudaSetDevice(currentGPU); 
+#ifdef __COMPILE_TIMERS__
+t_init_from_transpose.stop();
+#endif
 }
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::transpose(cusparseHandle_t cusparseHandle)
 {
+#ifdef __COMPILE_TIMERS__
+t_transpose.start();
+#endif
    if(dim1*dim2==0 || nnz==0)
    {
       resize(nnz,dim2,dim1);
@@ -512,11 +662,17 @@ void faust_cu_spmat<faust_real>::transpose(cusparseHandle_t cusparseHandle)
    faust_cudaFree(colIndOld);
 
    faust_cudaSetDevice(currentGPU); 
+#ifdef __COMPILE_TIMERS__
+t_transpose.stop();
+#endif
 }
 
 template <typename faust_real>
 faust_real faust_cu_spmat<faust_real>::norm() const 
 {
+#ifdef __COMPILE_TIMERS__
+t_norm.start();
+#endif
    if (nnz>0)
    {
       int currentGPU;
@@ -524,11 +680,17 @@ faust_real faust_cu_spmat<faust_real>::norm() const
       faust_cudaSetDevice(device);
       faust_real val =  faust_cu_norm(csrValues, nnz);
       faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_norm.stop();
+#endif
       return val;
    }
    else
    {
       // display warning as matrix is empty
+#ifdef __COMPILE_TIMERS__
+t_norm.stop();
+#endif
       return (faust_real)0.0;
    }
 }
@@ -536,9 +698,15 @@ faust_real faust_cu_spmat<faust_real>::norm() const
 template <typename faust_real>
 void faust_cu_spmat<faust_real>::Display()const
 {
+#ifdef __COMPILE_TIMERS__
+t_display.start();
+#endif
    faust_spmat<faust_real> S;
    faust_cu2faust(S,*this);
    S.Display();
+#ifdef __COMPILE_TIMERS__
+t_display.stop();
+#endif
 }
 
 template<typename faust_real> 
@@ -548,9 +716,74 @@ void faust_cu_spmat<faust_real>::print_file(const char* filename)const
 template<typename faust_real> 
 void faust_cu_spmat<faust_real>::print_file(const char* filename,std::ios_base::openmode mode)const
 {
+#ifdef __COMPILE_TIMERS__
+t_print_file.start();
+#endif
    faust_spmat<faust_real> tmp;
    faust_cu2faust(tmp, *this);
    tmp.print_file(filename, mode);
+#ifdef __COMPILE_TIMERS__
+t_print_file.stop();
+#endif
 }
+
+#ifdef __COMPILE_TIMERS__
+
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_constructor_from_device;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_constructor_from_host;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_create;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_clear;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_copy_from_host;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_copy_from_device;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_copy_to_host;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_copy_to_device;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_move_to_device;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_init_from_cuspmat;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_init_from_spmat;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_init_from_cumat;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_init_from_mat;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_scalar_multiply;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_operator_plus_equal_real;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_transpose;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_init_from_transpose;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_norm;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_display;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_print_file;
+
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_csrmv;
+template <typename faust_real> faust_cu_timer faust_cu_spmat<faust_real>::t_csrmm;
+
+
+template <typename faust_real>
+void faust_cu_spmat<faust_real>::print_timers()const
+{
+
+   cout << "timers in faust_cu_spmat :" << endl;
+   cout << "t_constructor_from_device   = " << t_constructor_from_device.get_time()          << " s for "<< t_constructor_from_device.get_nb_call()          << " calls" << endl;
+   cout << "t_constructor_from_host     = " << t_constructor_from_host.get_time()          << " s for "<< t_constructor_from_host.get_nb_call()          << " calls" << endl;
+   cout << "t_create                    = " << t_create.get_time()          << " s for "<< t_create.get_nb_call()          << " calls" << endl;
+   cout << "t_clear                     = " << t_clear.get_time()          << " s for "<< t_clear.get_nb_call()          << " calls" << endl;
+   cout << "t_copy_from_host            = " << t_copy_from_host.get_time()          << " s for "<< t_copy_from_host.get_nb_call()          << " calls" << endl;
+   cout << "t_copy_from_device          = " << t_copy_from_device.get_time()          << " s for "<< t_copy_from_device.get_nb_call()          << " calls" << endl;
+   cout << "t_copy_to_host              = " << t_copy_to_host.get_time()          << " s for "<< t_copy_to_host.get_nb_call()          << " calls" << endl;
+   cout << "t_copy_to_device            = " << t_copy_to_device.get_time()          << " s for "<< t_copy_to_device.get_nb_call()          << " calls" << endl;
+   cout << "t_move_to_device            = " << t_move_to_device.get_time()          << " s for "<< t_move_to_device.get_nb_call()          << " calls" << endl;
+   cout << "t_init_from_cuspmat         = " << t_init_from_cuspmat.get_time()          << " s for "<< t_init_from_cuspmat.get_nb_call()          << " calls" << endl;
+   cout << "t_init_from_spmat           = " << t_init_from_spmat.get_time()          << " s for "<< t_init_from_spmat.get_nb_call()          << " calls" << endl;
+   cout << "t_init_from_cumat           = " << t_init_from_cumat.get_time()          << " s for "<< t_init_from_cumat.get_nb_call()          << " calls" << endl;
+   cout << "t_init_from_mat             = " << t_init_from_mat.get_time()          << " s for "<< t_init_from_mat.get_nb_call()          << " calls" << endl;
+   cout << "t_scalar_multiply           = " << t_scalar_multiply.get_time()          << " s for "<< t_scalar_multiply.get_nb_call()          << " calls" << endl;
+   cout << "t_operator_plus_equal_real  = " << t_operator_plus_equal_real.get_time()          << " s for "<< t_operator_plus_equal_real.get_nb_call()          << " calls" << endl;
+   cout << "t_transpose                 = " << t_transpose.get_time()          << " s for "<< t_transpose.get_nb_call()          << " calls" << endl;
+   cout << "t_init_from_transpose       = " << t_init_from_transpose.get_time()          << " s for "<< t_init_from_transpose.get_nb_call()          << " calls" << endl;
+   cout << "t_norm                      = " << t_norm.get_time()          << " s for "<< t_norm.get_nb_call()          << " calls" << endl;
+   cout << "t_display                   = " << t_display.get_time()          << " s for "<< t_display.get_nb_call()          << " calls" << endl;
+   cout << "t_print_file                = " << t_print_file.get_time()          << " s for "<< t_print_file.get_nb_call()          << " calls" << endl;
+   cout << "t_csrmv                     = " << t_csrmv.get_time()          << " s for "<< t_csrmv.get_nb_call()          << " calls" << endl;
+   cout << "t_csrmm                     = " << t_csrmm.get_time()          << " s for "<< t_csrmm.get_nb_call()          << " calls" << endl << endl << endl;
+
+}
+
+#endif
 
 #endif

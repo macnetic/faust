@@ -233,6 +233,12 @@ void hierarchical_fact_cu<T>::print_timers()const
    cout << "timers in hierarchical_fact_cu :" << endl;
    cout << "t_init      = " << t_init.get_time()      << " s for "<< t_init.get_nb_call()      << " calls" << endl;
    cout << "t_next_step = " << t_next_step.get_time() << " s for "<< t_next_step.get_nb_call() << " calls" << endl<<endl;
+
+faust_cu_mat<T> M_tmp;
+faust_cu_spmat<T> S_tmp;
+M_tmp.print_timers();
+S_tmp.print_timers();
+
 }
 #endif
 

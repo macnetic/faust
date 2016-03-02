@@ -28,10 +28,23 @@ const char * faust_cu_mat<faust_real>::class_name = "faust_cu_mat<faust_real>::"
 template <typename faust_real>
 faust_cu_mat<faust_real>::faust_cu_mat(const faust_real *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, bool dataFromGPU, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
 {
-    if(nbRow*nbCol == 0)
-    {
-        resize(nbRow, nbCol, dstDevice);
-        return;
+#ifdef __COMPILE_TIMERS__
+   if(dataFromGPU)
+      t_constructor_from_device.start();
+   else
+      t_constructor_from_host.start();
+#endif
+
+   if(nbRow*nbCol == 0)
+   {
+      resize(nbRow, nbCol, dstDevice);
+#ifdef __COMPILE_TIMERS__
+   if(dataFromGPU)
+      t_constructor_from_device.stop();
+   else
+      t_constructor_from_host.stop();
+#endif
+      return;
     }
     if(data_ == NULL)
             handleError(class_name, "faust_cu_mat(const faust_real*,const faust_unsigned_int, const faust_unsigned_int, bool, int=FAUST_DEFAULT_CUDA_DEVICE, int=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t=0) : data pointer argument is NULL");
@@ -40,6 +53,12 @@ faust_cu_mat<faust_real>::faust_cu_mat(const faust_real *data_,const faust_unsig
         copyFromDevice(data_, nbRow, nbCol, dstDevice, srcDevice, stream);
     else
         copyFromHost(data_, nbRow, nbCol, dstDevice, stream);
+#ifdef __COMPILE_TIMERS__
+   if(dataFromGPU)
+      t_constructor_from_device.stop();
+   else
+      t_constructor_from_host.stop();
+#endif
 }
 
 
@@ -47,6 +66,9 @@ faust_cu_mat<faust_real>::faust_cu_mat(const faust_real *data_,const faust_unsig
 template <typename faust_real>
 faust_cu_mat<faust_real>::faust_cu_mat(const faust_cu_mat<faust_real>& cu_M, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
 {
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_device.start();
+#endif
     if(cu_M.isIdentity || cu_M.isZeros || cu_M.dim1*cu_M.dim2==0)
     {
         resize(cu_M.dim1, cu_M.dim2, dstDevice);
@@ -57,11 +79,17 @@ faust_cu_mat<faust_real>::faust_cu_mat(const faust_cu_mat<faust_real>& cu_M, int
     }
     else
         copyFromDevice(cu_M.data, cu_M.dim1, cu_M.dim2, dstDevice, cu_M.device, stream);
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_device.stop();
+#endif
 }
 
 template <typename faust_real>
 faust_cu_mat<faust_real>::faust_cu_mat(const faust_mat<faust_real>& M, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL),device(FAUST_DEFAULT_CUDA_DEVICE)
 {
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_host.start();
+#endif
     if(M.estIdentite() || M.estNulle() || M.getNbRow()*M.getNbCol()==0)
     {
         resize(M.getNbRow(), M.getNbCol(), dstDevice);
@@ -74,18 +102,27 @@ faust_cu_mat<faust_real>::faust_cu_mat(const faust_mat<faust_real>& M, int dstDe
     }
     else
         copyFromHost(M.getData(), M.getNbRow(), M.getNbCol(), dstDevice, stream);
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_host.stop();
+#endif
 }
 
 #ifdef __COMPILE_SPMAT__
 template <typename faust_real>
 faust_cu_mat<faust_real>::faust_cu_mat(const faust_cu_spmat<faust_real>& cu_S,cusparseHandle_t cusparseHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
 {
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_device.start();
+#endif
     if(cu_S.getNonZeros() == 0)
     {
         if(cu_S.getRowPtr()!=NULL || cu_S.getColInd()!=NULL || cu_S.getValues()!=NULL)
             handleError(class_name, "faust_cu_mat(const faust_cu_spmat&, ...) : rowPtr,  colInd or values pointer is not NULL");
 
         setZeros(cu_S.getNbRow(), cu_S.getNbCol(), dstDevice);
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_device.stop();
+#endif
         return;
     }
 
@@ -111,13 +148,22 @@ faust_cu_mat<faust_real>::faust_cu_mat(const faust_cu_spmat<faust_real>& cu_S,cu
     cu_S_dst = NULL;
 
    faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_device.stop();
+#endif
 }
 #endif
 
 template <typename faust_real>
 faust_cu_mat<faust_real>::faust_cu_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
 {
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_size.start();
+#endif
     resize(nbRow, nbCol, dstDevice);
+#ifdef __COMPILE_TIMERS__
+t_constructor_from_size.stop();
+#endif
 }
 
 
@@ -127,6 +173,9 @@ faust_cu_mat<faust_real>::faust_cu_mat(const faust_unsigned_int nbRow, const fau
 template <typename faust_real>
 void faust_cu_mat<faust_real>::_create(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int device_)
 {
+#ifdef __COMPILE_TIMERS__
+t_create.start();
+#endif
    if(nbRow<0 || nbCol<0)
        handleError(class_name, "_create : incorrect dimensions");
 
@@ -154,11 +203,17 @@ void faust_cu_mat<faust_real>::_create(const faust_unsigned_int nbRow, const fau
    isZeros = false;
    isIdentity = false;
 
+#ifdef __COMPILE_TIMERS__
+t_create.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::_clear()
 {
+#ifdef __COMPILE_TIMERS__
+t_clear.start();
+#endif
    if(dim1*dim2>0 && !isZeros && !isIdentity)    
    {
       int currentGPU;
@@ -173,14 +228,17 @@ void faust_cu_mat<faust_real>::_clear()
       faust_cudaSetDevice(currentGPU);
    }  
    else if(data!=NULL)
-{
       handleError(class_name, "_clear : data of empty matrix, identity matrix or zeros matrix should be NULL");
-}
+
    dim1 = 0;
    dim2 = 0;
    isIdentity = false;
    isZeros = false;
    data = NULL;
+
+#ifdef __COMPILE_TIMERS__
+t_clear.stop();
+#endif
 }
 
 
@@ -205,6 +263,9 @@ void faust_cu_mat<faust_real>::resize(const faust_unsigned_int nbRow, const faus
 template <typename faust_real>
 void faust_cu_mat<faust_real>::copyFromHost(const faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
+#ifdef __COMPILE_TIMERS__
+t_copy_from_host.start();
+#endif
     resize(nbRow, nbCol, dstDevice);
     int currentGPU;
     faust_cudaGetDevice(&currentGPU);
@@ -212,35 +273,59 @@ void faust_cu_mat<faust_real>::copyFromHost(const faust_real *data_, const faust
 
     faust_cudaMemcpyAsync(data, data_, nbRow*nbCol*sizeof(faust_real), cudaMemcpyHostToDevice, stream);
     faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_copy_from_host.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::copyFromDevice(const faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
+#ifdef __COMPILE_TIMERS__
+t_copy_from_device.start();
+#endif
     resize(nbRow, nbCol, dstDevice);
     faust_cudaMemcpyPeerAsync(data, dstDevice, data_, srcDevice, nbRow*nbCol*sizeof(faust_real), stream);
+#ifdef __COMPILE_TIMERS__
+t_copy_from_device.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::copyToHost(faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, cudaStream_t stream/*=0*/)const
 {
+#ifdef __COMPILE_TIMERS__
+t_copy_to_host.start();
+#endif
     int currentGPU;
     faust_cudaGetDevice(&currentGPU);
     faust_cudaSetDevice(device);
 
     faust_cudaMemcpyAsync(data_, data, nbRow*nbCol*sizeof(faust_real), cudaMemcpyDeviceToHost, stream);
     faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_copy_to_host.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::copyToDevice(faust_real *data_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)const
 {
+#ifdef __COMPILE_TIMERS__
+t_copy_to_device.start();
+#endif
        faust_cudaMemcpyPeerAsync(data_, dstDevice, data, device, nbRow*nbCol*sizeof(faust_real), stream);
+#ifdef __COMPILE_TIMERS__
+t_copy_to_device.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::init(const faust_cu_mat<faust_real>& cu_M, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
+#ifdef __COMPILE_TIMERS__
+t_init.start();
+#endif
     if(cu_M.isIdentity || cu_M.isZeros || data==NULL )
     {
         resize(0,0);
@@ -253,17 +338,32 @@ void faust_cu_mat<faust_real>::init(const faust_cu_mat<faust_real>& cu_M, int ds
     }
     else
         copyFromDevice(cu_M.data, cu_M.dim1, cu_M.dim2, dstDevice, cu_M.device, stream);
+#ifdef __COMPILE_TIMERS__
+t_init.stop();
+#endif
 
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::moveToDevice(int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
+#ifdef __COMPILE_TIMERS__
+t_move_to_device.start();
+#endif
    if(device == dstDevice)
+   {
+
+#ifdef __COMPILE_TIMERS__
+t_move_to_device.stop();
+#endif
       return;
+   }
    if (data == NULL)
    {
       device = dstDevice;
+#ifdef __COMPILE_TIMERS__
+t_move_to_device.stop();
+#endif
       return;
    }
 
@@ -279,26 +379,41 @@ void faust_cu_mat<faust_real>::moveToDevice(int dstDevice/*=FAUST_DEFAULT_CUDA_D
    device = dstDevice;
 
    faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_move_to_device.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::setZeros(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const int device_)
 {
+#ifdef __COMPILE_TIMERS__
+t_set_zeros.start();
+#endif
     resize(0,0,device_);
     dim1 = nbRow;
     dim2 = nbCol;
     isZeros = true;
     isIdentity = false;
+#ifdef __COMPILE_TIMERS__
+t_set_zeros.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::setEyes(const faust_unsigned_int nbRow, const int device_)
 {
+#ifdef __COMPILE_TIMERS__
+t_set_eyes.start();
+#endif
     if(nbRow==device_)
         cerr << __FILE__ << ":" << __LINE__ << " : Warning - prototype is setEyes(const faust_unsigned_int nbRow, const int device_) and not setEyes(const int nbRow, const int nbCol). Please check whether syntax is correct" << endl;
     setZeros(nbRow, nbRow, device_);
     isIdentity = true;
     isZeros = false;
+#ifdef __COMPILE_TIMERS__
+t_set_eyes.stop();
+#endif
 }
 
 template <typename faust_real>
@@ -380,7 +495,7 @@ template <typename faust_real>
 void faust_cu_mat<faust_real>::init_from_transpose(const faust_cu_mat<faust_real>& cu_A, cublasHandle_t cublasHandle)
 {
 #ifdef __COMPILE_TIMERS__
-t_transpose.start();
+t_init_from_transpose.start();
 #endif
 
 if(cu_A == (*this))
@@ -390,7 +505,7 @@ if(cu_A == (*this))
    {
       setZeros(cu_A.dim2, cu_A.dim1);
       #ifdef __COMPILE_TIMERS__
-         t_transpose.stop();
+         t_init_from_transpose.stop();
       #endif
       return;
    }
@@ -398,7 +513,7 @@ if(cu_A == (*this))
    {
       setEyes(cu_A.dim1);
       #ifdef __COMPILE_TIMERS__
-         t_transpose.stop();
+         t_init_from_transpose.stop();
       #endif
       return;
    }
@@ -441,7 +556,7 @@ if(cu_A == (*this))
    }
 
 #ifdef __COMPILE_TIMERS__
-t_transpose.stop();
+t_init_from_transpose.stop();
 #endif
 
 }
@@ -451,13 +566,16 @@ template <typename faust_real>
 void faust_cu_mat<faust_real>::init_from_transpose(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
 {
 #ifdef __COMPILE_TIMERS__
-t_transpose.start();
+t_init_from_transpose.start();
 #endif
 
     if(cu_S.getNbRow()*cu_S.getNbCol() == 0)
     {
        // display warning as matrix is empty
        resize(cu_S.getNbRow(), cu_S.getNbCol());
+#ifdef __COMPILE_TIMERS__
+t_init_from_transpose.stop();
+#endif
        return;
     }
 
@@ -465,6 +583,9 @@ t_transpose.start();
     {
        // display warning as matrix is zeros
        setZeros(cu_S.getNbRow(), cu_S.getNbCol());
+#ifdef __COMPILE_TIMERS__
+t_init_from_transpose.stop();
+#endif
        return;
     }
 
@@ -508,7 +629,7 @@ t_transpose.start();
       }
    }
 #ifdef __COMPILE_TIMERS__
-t_transpose.stop();
+t_init_from_transpose.stop();
 #endif
 
 }
@@ -671,10 +792,23 @@ void faust_cu_mat<faust_real>::multiplyLeft(faust_cu_mat<faust_real>& cu_A, cubl
 template <typename faust_real>
 faust_real faust_cu_mat<faust_real>::max() const
 {
+#ifdef __COMPILE_TIMERS__
+t_max.start();
+#endif
    if(isZeros)
+   {
+#ifdef __COMPILE_TIMERS__
+t_max.stop();
+#endif
       return (faust_real)0.0;
+   }
    else if (isIdentity)
+   {
+#ifdef __COMPILE_TIMERS__
+t_max.stop();
+#endif
       return (faust_real)1.0;
+   }
    else if (dim1*dim2>0)
    {
       int currentGPU;
@@ -682,20 +816,37 @@ faust_real faust_cu_mat<faust_real>::max() const
       faust_cudaSetDevice(device);
       faust_real val =  faust_cu_max(data, dim1*dim2);
       faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_max.stop();
+#endif
       return val;
    }
    else
    {
       // display warning as matrix is empty
+#ifdef __COMPILE_TIMERS__
+t_max.stop();
+#endif
       return (faust_real)0.0;
    }
+#ifdef __COMPILE_TIMERS__
+t_max.stop();
+#endif
 }
 
 template <typename faust_real>
 faust_real faust_cu_mat<faust_real>::min() const
 {
+#ifdef __COMPILE_TIMERS__
+t_min.start();
+#endif
    if(isZeros || isIdentity)
+   {
+#ifdef __COMPILE_TIMERS__
+t_min.stop();
+#endif
       return (faust_real)0.0;
+   }
    else if (dim1*dim2>0)
    {
       int currentGPU;
@@ -703,11 +854,17 @@ faust_real faust_cu_mat<faust_real>::min() const
       faust_cudaSetDevice(device);
       faust_real val =  faust_cu_min(data, dim1*dim2);
       faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_min.stop();
+#endif
       return val;
    }
    else
    {
       // display warning as matrix is empty
+#ifdef __COMPILE_TIMERS__
+t_min.stop();
+#endif
       return (faust_real)0.0;
    }
 }
@@ -715,8 +872,16 @@ faust_real faust_cu_mat<faust_real>::min() const
 template <typename faust_real>
 void faust_cu_mat<faust_real>::abs()
 {
+#ifdef __COMPILE_TIMERS__
+t_abs.start();
+#endif
    if(isZeros || isIdentity)
+   {
+#ifdef __COMPILE_TIMERS__
+t_abs.stop();
+#endif
       return ;
+   }
    else if (dim1*dim2>0)
    {
       int currentGPU;
@@ -724,22 +889,44 @@ void faust_cu_mat<faust_real>::abs()
       faust_cudaSetDevice(device);
       kernel_abs(data, dim1*dim2);
       faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_abs.stop();
+#endif
       return;
    }
    else
    {
+#ifdef __COMPILE_TIMERS__
+t_abs.stop();
+#endif
       // display warning as matrix is empty
       return;
    }
+#ifdef __COMPILE_TIMERS__
+t_abs.stop();
+#endif
 }
 
 template <typename faust_real>
 faust_real faust_cu_mat<faust_real>::norm() const
 {
+#ifdef __COMPILE_TIMERS__
+t_norm.start();
+#endif
    if(isZeros)
+   {
+#ifdef __COMPILE_TIMERS__
+t_norm.stop();
+#endif
       return (faust_real)0.0;
+   }
    else if(isIdentity)
+   {
+#ifdef __COMPILE_TIMERS__
+t_norm.stop();
+#endif
       return (faust_real)sqrt(dim1);
+   }
    else if (dim1*dim2>0)
    {
       int currentGPU;
@@ -747,25 +934,47 @@ faust_real faust_cu_mat<faust_real>::norm() const
       faust_cudaSetDevice(device);
       faust_real val =  faust_cu_norm(data, dim1*dim2);
       faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_norm.stop();
+#endif
       return val;
    }
    else
    {
       // display warning as matrix is empty
+#ifdef __COMPILE_TIMERS__
+t_norm.stop();
+#endif
       return (faust_real)0.0;
    }
+#ifdef __COMPILE_TIMERS__
+t_norm.stop();
+#endif
 }
 
 template <typename faust_real>
 faust_real faust_cu_mat<faust_real>::trace() const
 {
+#ifdef __COMPILE_TIMERS__
+t_trace.start();
+#endif
    if(dim1 != dim2)
       handleError(class_name, "norm : matrix must be square");
 
    if (isZeros)
+   {
+#ifdef __COMPILE_TIMERS__
+t_trace.stop();
+#endif
       return (faust_real)0.0;
+   }
    else if (isIdentity)
+   {
+#ifdef __COMPILE_TIMERS__
+t_trace.stop();
+#endif
       return (faust_real)dim1;
+   }
    else if (dim1*dim2>0)
    {
       int currentGPU;
@@ -776,13 +985,22 @@ faust_real faust_cu_mat<faust_real>::trace() const
       kernel_get_diag(cu_diag.getData(), data, dim1);
       faust_cudaSetDevice(currentGPU);
 
+#ifdef __COMPILE_TIMERS__
+t_trace.stop();
+#endif
       return faust_cu_sum(cu_diag.getData(), dim1);
    }
    else
    {
       // display warning as matrix is empty
+#ifdef __COMPILE_TIMERS__
+t_trace.stop();
+#endif
       return (faust_real)0.0;
    }
+#ifdef __COMPILE_TIMERS__
+t_trace.stop();
+#endif
 }
 
 
@@ -859,12 +1077,15 @@ t_scalar_multiply.start();
    if(dim1*dim2 == 0)
    {
       // display warning as matrix is empty
+#ifdef __COMPILE_TIMERS__
+t_scalar_multiply.stop();
+#endif
       return;
    }
 
-   if(isZeros){
-
-}
+   if(isZeros)
+   {
+   }
    else
    {
       int currentGPU;
@@ -880,9 +1101,9 @@ t_scalar_multiply.start();
          kernel_add_diag_const(data, lambda, dim1);
       }
       else
-{
+      {
          kernel_mult_const(data, lambda, dim1*dim2);
-}
+      }
 
       faust_cudaSetDevice(currentGPU);
    }
@@ -910,39 +1131,54 @@ bool faust_cu_mat<faust_real>::operator==(const faust_cu_mat<faust_real>& cu_M)c
 template <typename faust_real>
 void faust_cu_mat<faust_real>::operator=(const faust_cu_mat<faust_real>& cu_M)
 {
-    if(cu_M.dim1*cu_M.dim2 == 0)
-    {
-       // display warning as matrix is empty
-       resize(cu_M.dim1, cu_M.dim2);
-       data = NULL ;
-       device = cu_M.device;
-       return;
-    }
-    if(cu_M.isIdentity || cu_M.isZeros)
-    {
-       resize(0,0);
-       dim1 = cu_M.dim1;
-       dim2 = cu_M.dim2;
-       isIdentity = cu_M.isIdentity;
-       isZeros = cu_M.isZeros;
-       data = NULL ;
-       device = cu_M.device;
-    }
-    else
-{
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_device.start();
+#endif
+   if(cu_M.dim1*cu_M.dim2 == 0)
+   {
+      // display warning as matrix is empty
+      resize(cu_M.dim1, cu_M.dim2);
+      data = NULL ;
+      device = cu_M.device;
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_device.stop();
+#endif
+      return;
+   }
+   if(cu_M.isIdentity || cu_M.isZeros)
+   {
+      resize(0,0);
+      dim1 = cu_M.dim1;
+      dim2 = cu_M.dim2;
+      isIdentity = cu_M.isIdentity;
+      isZeros = cu_M.isZeros;
+      data = NULL ;
+      device = cu_M.device;
+   }
+   else
+   {
        copyFromDevice(cu_M.data, cu_M.dim1, cu_M.dim2, cu_M.device, cu_M.device);
-}
+   }
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_device.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::operator=(const faust_mat<faust_real>& M)
 {
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_host.start();
+#endif
 
     if(M.getNbRow()*M.getNbCol() == 0)
     {
        // display warning as matrix is empty
        resize(M.getNbRow(), M.getNbCol());
        data = NULL ;
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_host.stop();
+#endif
        return;
     }
     else if(M.estIdentite() || M.estNulle())
@@ -956,22 +1192,34 @@ void faust_cu_mat<faust_real>::operator=(const faust_mat<faust_real>& M)
     }
     else
         copyFromHost(M.getData(), M.getNbRow(), M.getNbCol(), device);
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_host.stop();
+#endif
 }
 
 #ifdef __COMPILE_SPMAT__
 template <typename faust_real>
 void faust_cu_mat<faust_real>::operator=(const faust_spmat<faust_real>& S)
 {
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_host.start();
+#endif
     if(S.getNbRow()*S.getNbCol() == 0)
     {
        // display warning as matrix is empty
        resize(S.getNbRow(), S.getNbCol());
        data = NULL ;
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_host.stop();
+#endif
        return;
     }
     if(S.getNonZeros()==0)
     {
         setZeros(S.getNbRow(), S.getNbCol());
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_host.stop();
+#endif
         return;
     }
 
@@ -988,6 +1236,9 @@ void faust_cu_mat<faust_real>::operator=(const faust_spmat<faust_real>& S)
 
     isZeros = false;
     isIdentity = false;
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_host.stop();
+#endif
 }
 
 template <typename faust_real>
@@ -997,10 +1248,16 @@ void faust_cu_mat<faust_real>::operator=(const faust_cu_spmat<faust_real>& S)
 template <typename faust_real>
 void faust_cu_mat<faust_real>::init_from_cu_spmat(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle, const faust_real coeff /*=1.0*/)
 {
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_device.start();
+#endif
     if(cu_S.getNbRow()*cu_S.getNbCol() == 0)
     {
        // display warning as matrix is empty
        resize(cu_S.getNbRow(), cu_S.getNbCol());
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_device.stop();
+#endif
        return;
     }
 
@@ -1008,6 +1265,9 @@ void faust_cu_mat<faust_real>::init_from_cu_spmat(const faust_cu_spmat<faust_rea
     {
        // display warning as matrix is zeros
        setZeros(cu_S.getNbRow(), cu_S.getNbCol());
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_device.stop();
+#endif
        return;
     }
 
@@ -1110,6 +1370,9 @@ void faust_cu_mat<faust_real>::init_from_cu_spmat(const faust_cu_spmat<faust_rea
     delete[] values ; values=NULL;
     delete[] ptr_data ; ptr_data=NULL;
 ------------------------------------------------------------------------------------------------*/
+#ifdef __COMPILE_TIMERS__
+t_operator_equal_from_device.stop();
+#endif
 }
 
 template <typename faust_real>
@@ -1119,6 +1382,9 @@ void faust_cu_mat<faust_real>::operator+=(const faust_cu_spmat<faust_real>& cu_S
 template <typename faust_real>
 void faust_cu_mat<faust_real>::add(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
 {
+#ifdef __COMPILE_TIMERS__
+t_add_cuspmat.start();
+#endif
    if(!(isZeros || isIdentity || data))
       handleError(class_name,"add : uninitialized matrix");
 
@@ -1180,16 +1446,24 @@ void faust_cu_mat<faust_real>::add(const faust_cu_spmat<faust_real>& cu_S, cuspa
    }
 
    faust_cudaSetDevice(currentGPU);  
+#ifdef __COMPILE_TIMERS__
+t_add_cuspmat.stop();
+#endif
 }
 
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::operator-=(const faust_cu_spmat<faust_real>& cu_S)
-{handleError(class_name, "faust_cu_mat<faust_real>::operator-=(const faust_cu_spmat&) is not defined. Use faust_cu_mat<faust_real>::sub(const faust_cu_spmat&, cusparseHandle_t) instead");}
+{
+   handleError(class_name, "faust_cu_mat<faust_real>::operator-=(const faust_cu_spmat&) is not defined. Use faust_cu_mat<faust_real>::sub(const faust_cu_spmat&, cusparseHandle_t) instead");
+}
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::sub(const faust_cu_spmat<faust_real>& cu_S, cusparseHandle_t cusparseHandle)
 {
+#ifdef __COMPILE_TIMERS__
+t_sub.start();
+#endif
    if(!(isZeros || isIdentity || data))
       handleError(class_name,"sub : uninitialized matrix");
 
@@ -1252,13 +1526,19 @@ void faust_cu_mat<faust_real>::sub(const faust_cu_spmat<faust_real>& cu_S, cuspa
    }
 
    faust_cudaSetDevice(currentGPU);  
+#ifdef __COMPILE_TIMERS__
+t_sub.stop();
+#endif
 }
 #endif //#ifdef __COMPILE_SPMAT__
 
 
 template <typename faust_real>
-void faust_cu_mat<faust_real>::add(const faust_cu_mat<faust_real>& cu_M)
+void faust_cu_mat<faust_real>::operator+=(const faust_cu_mat<faust_real>& cu_M)
 {
+#ifdef __COMPILE_TIMERS__
+t_operator_plus_equal.start();
+#endif
    if(!((isZeros || isIdentity || data) && (cu_M.isZeros || cu_M.isIdentity || cu_M.data)))
       handleError(class_name,"operator+= : uninitialized matrix");
 
@@ -1306,6 +1586,9 @@ void faust_cu_mat<faust_real>::add(const faust_cu_mat<faust_real>& cu_M)
 
    faust_cudaSetDevice(currentGPU);
 
+#ifdef __COMPILE_TIMERS__
+t_operator_plus_equal.stop();
+#endif
 }
 
 
@@ -1313,6 +1596,9 @@ void faust_cu_mat<faust_real>::add(const faust_cu_mat<faust_real>& cu_M)
 template <typename faust_real>
 void faust_cu_mat<faust_real>::operator-=(const faust_cu_mat<faust_real>& cu_M)
 {
+#ifdef __COMPILE_TIMERS__
+t_operator_less_equal.start();
+#endif
    if(!isZeros && !isIdentity && data==NULL)
       handleError(class_name,"operator-= : uninitialized matrix");
 
@@ -1375,6 +1661,9 @@ void faust_cu_mat<faust_real>::operator-=(const faust_cu_mat<faust_real>& cu_M)
    
    faust_cudaSetDevice(currentGPU);
 
+#ifdef __COMPILE_TIMERS__
+t_operator_less_equal.stop();
+#endif
 }
 
 
@@ -1382,6 +1671,9 @@ void faust_cu_mat<faust_real>::operator-=(const faust_cu_mat<faust_real>& cu_M)
 template <typename faust_real>
 void faust_cu_mat<faust_real>::scalarMultiply(const faust_cu_mat<faust_real>& cu_M)
 {
+#ifdef __COMPILE_TIMERS__
+t_hadamard_product.start();
+#endif
    if(!isZeros && !isIdentity && data==NULL)
       handleError(class_name,"scalarMultiply : uninitialized matrix");
 
@@ -1432,77 +1724,127 @@ void faust_cu_mat<faust_real>::scalarMultiply(const faust_cu_mat<faust_real>& cu
    }
 
    faust_cudaSetDevice(currentGPU);
+#ifdef __COMPILE_TIMERS__
+t_hadamard_product.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::Display()const
 {
+#ifdef __COMPILE_TIMERS__
+t_display.start();
+#endif
    faust_mat<faust_real> M;
    faust_cu2faust(M,*this);
    M.Display();
+#ifdef __COMPILE_TIMERS__
+t_display.stop();
+#endif
 }
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::print_file(const char* filename)const
 {
+#ifdef __COMPILE_TIMERS__
+t_print_file.start();
+#endif
    faust_mat<faust_real> M;
    faust_cu2faust(M,*this);
    M.print_file(filename);
+#ifdef __COMPILE_TIMERS__
+t_print_file.stop();
+#endif
 }
 
 
 
 #ifdef __COMPILE_TIMERS__
-faust_timer faust_cu_mat<faust_real>::t_constr;
-faust_timer faust_cu_mat<faust_real>::t_get_coeff;
-faust_timer faust_cu_mat<faust_real>::t_get_coeffs;
-faust_timer faust_cu_mat<faust_real>::t_set_coeff;
-faust_timer faust_cu_mat<faust_real>::t_set_coeffs;
-faust_timer faust_cu_mat<faust_real>::t_set_coeffs2;
-faust_timer faust_cu_mat<faust_real>::t_resize;
-faust_timer faust_cu_mat<faust_real>::t_check_dim;
-faust_timer faust_cu_mat<faust_real>::t_max;
-faust_timer faust_cu_mat<faust_real>::t_transpose;
-faust_timer faust_cu_mat<faust_real>::t_mult_right;
-faust_timer faust_cu_mat<faust_real>::t_mult_left;
-faust_timer faust_cu_mat<faust_real>::t_scalar_multiply;
-faust_timer faust_cu_mat<faust_real>::t_add;
-faust_timer faust_cu_mat<faust_real>::t_sub;
-faust_timer faust_cu_mat<faust_real>::t_print_file;
-faust_timer faust_cu_mat<faust_real>::t_multiply;
-faust_timer faust_cu_mat<faust_real>::t_gemm;
-faust_timer faust_cu_mat<faust_real>::t_add_ext;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_constructor_from_device;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_constructor_from_host;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_constructor_from_size;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_create;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_clear;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_copy_from_host;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_copy_from_device;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_copy_to_host;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_copy_to_device;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_init;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_move_to_device;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_set_zeros;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_set_eyes;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_transpose;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_init_from_transpose;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_max;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_min;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_abs;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_norm;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_trace;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_spectral_norm2;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_scalar_multiply;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_operator_equal_from_device;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_operator_equal_from_host;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_operator_plus_equal;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_operator_less_equal;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_add_cuspmat;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_sub;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_hadamard_product;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_display;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_print_file;
 
-faust_timer faust_cu_mat<faust_real>::t_spectral_norm;
-faust_timer faust_cu_mat<faust_real>::t_spectral_norm2;
-faust_timer faust_cu_mat<faust_real>::t_power_iteration;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_gemm;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_gemv;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_add_ext;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_power_iteration;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_power_iteration_operator_equal;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_power_iteration_normalize;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_power_iteration_gemv;
+template <typename faust_real> faust_cu_timer faust_cu_mat<faust_real>::t_power_iteration_dot;
+
 
 template <typename faust_real>
 void faust_cu_mat<faust_real>::print_timers()const
 {
    cout << "timers in faust_cu_mat :" << endl;
-   cout << "t_constr          = " << t_constr.get_time()          << " s for "<< t_constr.get_nb_call()          << " calls" << endl;
-   cout << "t_get_coeff       = " << t_get_coeff.get_time()       << " s for "<< t_get_coeff.get_nb_call()       << " calls" << endl;
-   cout << "t_get_coeffs      = " << t_get_coeffs.get_time()      << " s for "<< t_get_coeffs.get_nb_call()      << " calls" << endl;
-   cout << "t_set_coeff       = " << t_set_coeff.get_time()       << " s for "<< t_set_coeff.get_nb_call()       << " calls" << endl;
-   cout << "t_set_coeffs      = " << t_set_coeffs.get_time()      << " s for "<< t_set_coeffs.get_nb_call()      << " calls" << endl;
-   cout << "t_set_coeffs2     = " << t_set_coeffs2.get_time()     << " s for "<< t_set_coeffs2.get_nb_call()     << " calls" << endl;
-   cout << "t_resize          = " << t_resize.get_time()          << " s for "<< t_resize.get_nb_call()          << " calls" << endl;
-   cout << "t_check_dim       = " << t_check_dim.get_time()       << " s for "<< t_check_dim.get_nb_call()       << " calls" << endl;
-   cout << "t_max             = " << t_max.get_time()             << " s for "<< t_max.get_nb_call()             << " calls" << endl;
-   cout << "t_transpose       = " << t_transpose.get_time()       << " s for "<< t_transpose.get_nb_call()       << " calls" << endl;
-   cout << "t_mult_right      = " << t_mult_right.get_time()      << " s for "<< t_mult_right.get_nb_call()      << " calls" << endl;
-   cout << "t_mult_left       = " << t_mult_left.get_time()       << " s for "<< t_mult_left.get_nb_call()       << " calls" << endl;
-  cout << "t_scalar_multiply = " << t_scalar_multiply.get_time() << " s for "<< t_scalar_multiply.get_nb_call() << " calls" << endl;
-   cout << "t_add             = " << t_add.get_time()             << " s for "<< t_add.get_nb_call()             << " calls" << endl;
-   cout << "t_sub             = " << t_sub.get_time()             << " s for "<< t_sub.get_nb_call()             << " calls" << endl;
-cout << "t_print_file      = " << t_print_file.get_time()      << " s for "<< t_print_file.get_nb_call()      << " calls" << endl<<endl;
-
-
-   cout << "timers in faust_cu_mat / LinearAlgebra :" << endl;
-   cout << "t_multiply        = " << t_multiply.get_time()        << " s for "<< t_multiply.get_nb_call()        << " calls" << endl;
-   cout << "t_gemm            = " << t_gemm.get_time()            << " s for "<< t_gemm.get_nb_call()            << " calls" << endl;
-   cout << "t_add_ext         = " << t_add_ext.get_time()         << " s for "<< t_add_ext.get_nb_call()         << " calls" << endl<<endl<<endl;
+   cout << "t_constructor_from_device    = " << t_constructor_from_device.get_time()          << " s for "<< t_constructor_from_device.get_nb_call()          << " calls" << endl;
+   cout << "t_constructor_from_host      = " << t_constructor_from_host.get_time()          << " s for "<< t_constructor_from_host.get_nb_call()          << " calls" << endl;
+   cout << "t_constructor_from_size      = " << t_constructor_from_size.get_time()          << " s for "<< t_constructor_from_size.get_nb_call()          << " calls" << endl;
+   cout << "t_create                     = " << t_create.get_time()          << " s for "<< t_create.get_nb_call()          << " calls" << endl;
+   cout << "t_clear                      = " << t_clear.get_time()          << " s for "<< t_clear.get_nb_call()          << " calls" << endl;
+   cout << "t_copy_from_host             = " << t_copy_from_host.get_time()          << " s for "<< t_copy_from_host.get_nb_call()          << " calls" << endl;
+   cout << "t_copy_from_device           = " << t_copy_from_device.get_time()          << " s for "<< t_copy_from_device.get_nb_call()          << " calls" << endl;
+   cout << "t_copy_to_host               = " << t_copy_to_host.get_time()          << " s for "<< t_copy_to_host.get_nb_call()          << " calls" << endl;
+   cout << "t_copy_to_device             = " << t_copy_to_device.get_time()          << " s for "<< t_copy_to_device.get_nb_call()          << " calls" << endl;
+   cout << "t_init                       = " << t_init.get_time()          << " s for "<< t_init.get_nb_call()          << " t_init" << endl;
+   cout << "t_move_to_device             = " << t_move_to_device.get_time()          << " s for "<< t_move_to_device.get_nb_call()          << " calls" << endl;
+   cout << "t_set_zeros                  = " << t_set_zeros.get_time()          << " s for "<< t_set_zeros.get_nb_call()          << " calls" << endl;
+   cout << "t_set_eyes                   = " << t_set_eyes.get_time()          << " s for "<< t_set_eyes.get_nb_call()          << " calls" << endl;
+   cout << "t_transpose                  = " << t_transpose.get_time()          << " s for "<< t_transpose.get_nb_call()          << " calls" << endl;
+   cout << "t_init_from_transpose        = " << t_init_from_transpose.get_time()          << " s for "<< t_init_from_transpose.get_nb_call()          << " calls" << endl;
+   cout << "t_max                        = " << t_max.get_time()          << " s for "<< t_max.get_nb_call()          << " calls" << endl;
+   cout << "t_min                        = " << t_min.get_time()          << " s for "<< t_min.get_nb_call()          << " calls" << endl;
+   cout << "t_abs                        = " << t_abs.get_time()          << " s for "<< t_abs.get_nb_call()          << " calls" << endl;
+   cout << "t_norm                       = " << t_norm.get_time()          << " s for "<< t_norm.get_nb_call()          << " calls" << endl;
+   cout << "t_trace                      = " << t_trace.get_time()          << " s for "<< t_trace.get_nb_call()          << " calls" << endl;
+   cout << "t_spectral_norm2             = " << t_spectral_norm2.get_time()          << " s for "<< t_spectral_norm2.get_nb_call()          << " calls" << endl;
+   cout << "t_scalar_multiply            = " << t_scalar_multiply.get_time()          << " s for "<< t_scalar_multiply.get_nb_call()          << " calls" << endl;
+   cout << "t_operator_equal_from_device = " << t_operator_equal_from_device.get_time()          << " s for "<< t_operator_equal_from_device.get_nb_call()          << " calls" << endl;
+   cout << "t_operator_equal_from_host   = " << t_operator_equal_from_host.get_time()          << " s for "<< t_operator_equal_from_host.get_nb_call()          << " calls" << endl;
+   cout << "t_operator_plus_equal        = " << t_operator_plus_equal.get_time()          << " s for "<< t_operator_plus_equal.get_nb_call()          << " calls" << endl;
+   cout << "t_operator_less_equal        = " << t_operator_less_equal.get_time()          << " s for "<< t_operator_less_equal.get_nb_call()          << " calls" << endl;
+   cout << "t_add_cuspmat                = " << t_add_cuspmat.get_time()          << " s for "<< t_add_cuspmat.get_nb_call()          << " calls" << endl;
+   cout << "t_sub                        = " << t_sub.get_time()          << " s for "<< t_sub.get_nb_call()          << " calls" << endl;
+   cout << "t_hadamard_product           = " << t_hadamard_product.get_time()          << " s for "<< t_hadamard_product.get_nb_call()          << " calls" << endl;
+   cout << "t_display                    = " << t_display.get_time()          << " s for "<< t_display.get_nb_call()          << " calls" << endl;
+   cout << "t_print_file                 = " << t_print_file.get_time()          << " s for "<< t_print_file.get_nb_call()          << " calls" << endl;
+   cout << "t_gemm                       = " << t_gemm.get_time()          << " s for "<< t_gemm.get_nb_call()          << " calls" << endl;
+   cout << "t_gemv                       = " << t_gemv.get_time()          << " s for "<< t_gemv.get_nb_call()          << " calls" << endl;
+   cout << "t_add_ext                    = " << t_add_ext.get_time()          << " s for "<< t_add_ext.get_nb_call()          << " calls" << endl;
+   cout << "t_power_iteration            = " << t_power_iteration.get_time()          << " s for "<< t_power_iteration.get_nb_call()          << " calls" << endl << endl <<endl;
+   cout << "       t_power_iteration_operator_equal = " << t_power_iteration_operator_equal.get_time()          << " s for "<< t_power_iteration_operator_equal.get_nb_call()          << " calls" << endl << endl <<endl;
+   cout << "       t_power_iteration_normalize      = " << t_power_iteration_normalize.get_time()          << " s for "<< t_power_iteration_normalize.get_nb_call()          << " calls" << endl << endl <<endl;
+   cout << "       t_power_iteration_gemv           = " << t_power_iteration_gemv.get_time()          << " s for "<< t_power_iteration_gemv.get_nb_call()          << " calls" << endl << endl <<endl;
+   cout << "       t_power_iteration_dot            = " << t_power_iteration_dot.get_time()          << " s for "<< t_power_iteration_dot.get_nb_call()          << " calls" << endl << endl <<endl;
 }
 #endif
 
