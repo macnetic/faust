@@ -7,10 +7,16 @@
 #include "palm4MSA.h"
 #include "faust_core.h"
 
-
+/// Definition of Floating Point Precision
 typedef float FPP;
 using namespace std;
 
+/*! \brief PALM4MSA consists of "Proximal Alternating Linearized Minimization for Multi-layer Sparse Approximation". <br>
+* This command-line PALM4MSA factorizes an input matrix corresponding to an operator of interest into J sparse factors and converges to a stationary point. <br>
+* Projet name is "launch_palm4MSA". It is available in the /wrapper/cmd_line/src/*.cpp <br> 
+* \param fileName1 : An xml configuration file specifying the different parameters of the PALM4MSA algorithm <br>
+  \param fileName2 : The data text file where the matrix A that will be factorized is stored. <br> 
+*/
 int main(int argc, char* argv[]) 
 {
 	
@@ -21,7 +27,6 @@ int main(int argc, char* argv[])
 	}
 	
 	faust_params_palm<FPP> params;
-	
 	
 	
 	string config_filename(argv[1]);

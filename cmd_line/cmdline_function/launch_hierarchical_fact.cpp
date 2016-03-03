@@ -2,28 +2,27 @@
 #include "faust_params.h"
 #include <iostream>
 #include <vector>
-#include<string>
+#include <string>
 #include "faust_init_params_from_xml.h"
 #include "hierarchical_fact.h"
 #include "faust_core.h"
 
-
-typedef double FPP;
+/// Definition of Floating Point Precision
+typedef double FPP; 
 using namespace std;
 
-// compute the hierarchical factorization of a given data matrix A in cmdline mode
-// inputs : -an xml configuration file specifying the different parameters of the hierarchical_fact algorithm
-//          -a text file where the matrix that will be factorized is stored 
-//					(the first line of the file contains 2 integer : the number of row and the number of column
-//					all the other line contains one coefficient in ColMajor access of the matrix)
-//		    - (optionnal) a character specifying if the matrix  stored correspond to the data matrix or its transposed
-//				'N' (default value) , the two matrix are the same
-//              'T'  the data matrix is the transposed of the matrix stored in the text file
-
-
+/*! \brief Compute the hierarchical factorization of a given data matrix A in cmdline mode.<br>
+* Projet name is "launch_hierarchical_fact". It is available in the /wrapper/cmd_line/src/*.cpp <br> 
+* \param fileName1 : An xml configuration file specifying the different parameters of the hierarchical_fact algorithm <br>
+  \param fileName2 : The data text file where the matrix A that will be factorized is stored. <br> 
+*		The first line of the file contains 2 integer : the number of row and the number of column.<br>
+*		All the other line contains one coefficient in ColMajor access of the matrix).<br>
+* \param character : (Optionnal) Character specifying if the matrix stored correspond to the data matrix or its transposed <br>
+*	'N' (default value) --> the two matrix are the same <br>
+*       'T'                 --> the data matrix is the transposed of the matrix stored in the text file.
+*/
 int main(int argc, char* argv[]) 
 {
-	
 	faust_params<FPP> params;
 	cout<<"argc : "<<argc<<endl; 
 	if (argc < 3)
@@ -65,7 +64,7 @@ int main(int argc, char* argv[])
 	string outputfilename = config_filename_body + "_FAUST.txt";
 	
 	
-	// initialisation
+	// initialization 
 	init_params_from_xml(config_filename.c_str(),params);
 	params.data.init_from_file(data_filename.c_str());
 	if (operator_data=='T')
@@ -75,9 +74,7 @@ int main(int argc, char* argv[])
 	params.Display();
 	hierarchical_fact<FPP> hier_fact(params);
 	
-	
 	hier_fact.compute_facts();
-	
 	
 	cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
 	
@@ -87,7 +84,6 @@ int main(int argc, char* argv[])
 	faust_facts.scalarMultiply(hier_fact.get_lambda());
 	std::cout<<"writing factorization into "<< outputfilename <<endl;
 	faust_facts.print_file(outputfilename.c_str());
-	
-	
+		
 	
 }
