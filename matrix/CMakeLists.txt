@@ -24,6 +24,10 @@ if (FAUST_USE_SINGLEPRECISION)
 	message(STATUS "**** SINGLE PRECISION USE *****")	
 endif()
 
+if (FAUST_USE_PROFILING)
+	set(__COMPILE_TIMERS__ "1")
+endif()
+
 if (FAUST_ISVERBOSE)
 	set(FAUST_VERBOSE "1")
 endif()

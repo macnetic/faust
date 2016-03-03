@@ -13,6 +13,9 @@
 //if defined, print debug message (useful for debugging)
 #cmakedefine FAUST_VERBOSE  
 
+//if defined, print timers (profile the code)
+#cmakedefine __COMPILE_TIMERS__
+
 
 /// Value of FFPP (faust floating point precision)
 #ifdef FAUST_SINGLE

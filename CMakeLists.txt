@@ -66,6 +66,7 @@ set(FAUST_MEXINTERFACETOOLS_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/tools CACHE IN
 set(FAUST_MEXINTERFACEMEX_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/mex_functions CACHE INTERNAL "")
 set(FAUST_EIGEN_SRC_DIR ${PROJECT_SOURCE_DIR}/eigen CACHE INTERNAL "")
 
+
 # BINARY DIRECTORIES
 set(FAUST_WRAPPER_BIN_DIR ${PROJECT_BINARY_DIR}/wrapper)
 set(FAUST_EXCEPTION_BIN_DIR ${PROJECT_BINARY_DIR}/exception CACHE INTERNAL "")
@@ -154,6 +155,7 @@ endif()
 set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
 set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
 set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
+set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
 set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read matfile")
 set(FAUST_USE_XML ON CACHE BOOL "Using xml configuration file")
 set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
