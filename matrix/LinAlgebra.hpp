@@ -8,7 +8,7 @@
 #include "faust_constant.h"
 
 
-	//////////FONCTION faust_mat<T> - faust_mat<T> ////////////////////
+//////////FONCTION faust_mat<T> - faust_mat<T> ////////////////////
 
 #ifdef __COMPILE_TIMERS__
 	#include "faust_timer.h"
@@ -31,13 +31,11 @@ T dot(const faust_vec<T>& v1, const faust_vec<T>& v2)
 
 
 
-
-
 template<typename T>
  void multiply(const faust_mat<T> & A, const faust_mat<T> & B, faust_mat<T> & C)
 {   
 #ifdef __COMPILE_TIMERS__
-A.t_multiply.start();
+	A.t_multiply.start();
 #endif
 
 	if (A.getNbCol() != B.getNbRow())
@@ -131,7 +129,6 @@ void gemv(const faust_mat<T> & A,const faust_vec<T> & x,faust_vec<T> & y,const T
 	y.resize(nbRowOpA);
 	
 	
-	
 	#ifdef __GEMM_WITH_OPENBLAS__
 		CBLAS_TRANSPOSE transA,transB;
 		if (typeA=='T')
@@ -181,7 +178,7 @@ void gemm(const faust_mat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const 
 {
 
 #ifdef __COMPILE_TIMERS__
-A.t_gemm.start();
+	A.t_gemm.start();
 #endif
 	faust_unsigned_int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
 
@@ -219,17 +216,10 @@ A.t_gemm.start();
 	}
 
 
-
-
-
-
-
 	if ( (beta!=0)  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
 	{
-
 		//handleError("Linalgebra : gemm : nbRow of op(A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
 		handleError("LinAlgebra", "gemm : invalid dimension for output matrix C");
-	
 	}
 		
         C.resize(nbRowOpA,nbColOpB);
@@ -422,13 +412,10 @@ A.t_add_ext.start();
 #endif
 	if ((A.getNbCol() != B.getNbCol()) || (A.getNbRow() != B.getNbRow()) || (A.getNbRow() != C.getNbRow()) || (A.getNbCol() != C.getNbCol()))
 	{
-		handleError("LinAlgebra"," add : matrix dimension not equal");
-		
+		handleError("LinAlgebra"," add : matrix dimension not equal");	
 	}else
 	{
-
-			C.mat = A.mat + B.mat;
-
+		C.mat = A.mat + B.mat;
 	}
 	C.isZeros = false;
 	C.isIdentity = false;
@@ -436,7 +423,6 @@ A.t_add_ext.start();
 A.t_add_ext.stop();
 #endif
 }
-
 
 	
 	
@@ -449,38 +435,35 @@ T power_iteration(const  faust_mat<T> & A, const faust_unsigned_int nbr_iter_max
 	#endif
 
 
-   const int nb_col = A.getNbCol();
-   int i = 0;
-   flag = 0;
+	const int nb_col = A.getNbCol();
+	int i = 0;
+	flag = 0;
 	 
-   if (nbr_iter_max <= 0)
-      handleError("LinAlgebra "," power_iteration :  nbr_iter_max <= 0");
-   if (nb_col != A.getNbRow())
-      handleError("LinAlgebra "," power_iteration : faust_core<T> 1 must be a squared matrix"); 	
+	if (nbr_iter_max <= 0)
+		handleError("LinAlgebra "," power_iteration :  nbr_iter_max <= 0");
+	if (nb_col != A.getNbRow())
+		handleError("LinAlgebra "," power_iteration : faust_core<T> 1 must be a squared matrix"); 	
 	 
-   faust_vec<T> xk(nb_col);
-   xk.setOnes();
-   faust_vec<T> xk_norm(nb_col);
-   T lambda_old=1.0;
-   T lambda = 0.0;
-   T alpha = 1.0;
-   T beta = 0.0;
-   while(fabs(lambda_old-lambda)>threshold && i<nbr_iter_max)
-   {
-      i++;
-      lambda_old = lambda;
-      xk_norm = xk;
-      xk_norm.normalize();
-      xk = A*xk_norm;
-      lambda = xk_norm.dot(xk);
-      //std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
-   }
-   flag = (i<nbr_iter_max)?i:-1;
-   return lambda;
+	faust_vec<T> xk(nb_col);
+	xk.setOnes();
+	faust_vec<T> xk_norm(nb_col);
+	T lambda_old=1.0;
+   	T lambda = 0.0;
+   	T alpha = 1.0;
+	T beta = 0.0;
+	while(fabs(lambda_old-lambda)>threshold && i<nbr_iter_max)
+	{
+		i++;
+      		lambda_old = lambda;
+      		xk_norm = xk;
+      		xk_norm.normalize();
+      		xk = A*xk_norm;
+      		lambda = xk_norm.dot(xk);
+     		//std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
+   	}
+   	flag = (i<nbr_iter_max)?i:-1;
+   	return lambda;
 
-
-
- 	
 	 /*faust_unsigned_int nb_col = A.getNbCol();
 	 faust_unsigned_int nb_row = A.getNbRow();
 	 faust_unsigned_int i = 0;
@@ -548,7 +531,6 @@ T power_iteration(const  faust_mat<T> & A, const faust_unsigned_int nbr_iter_max
 	 return abs_eigen_value;*/
 	 
 }
-
 
 
 
