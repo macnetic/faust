@@ -12,7 +12,7 @@ endif()
 if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    
 	#TEST VERSION GPU
-	foreach(gpucppin hierarchical_fact_test_cu)
+	foreach(gpucppin hierarchical_fact_test_cu MEG_fact_cu)
       configure_file(${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp.in ${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp @ONLY)
 	endforeach()
 	

@@ -41,7 +41,6 @@ int main()
   
 	
     char config_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat";
-	// char config_filename[] = "/home/tgautrai/faust2/test/data/config_compared_hierarchical_fact.mat";
 
   faust_params<faust_real> params;
   init_params_from_matiofile(params,config_filename,"params");

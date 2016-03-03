@@ -38,7 +38,7 @@ int main()
 
   faust_mat<faust_real> data, init_facts1, init_facts2;
 
-  char config_MEG_filename[] = "/home/tgautrai/faust2/test/data/config_MEG.mat";
+  char config_MEG_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat";
 
   
   faust_params<faust_real> params; init_params_from_matiofile(params,config_MEG_filename,"params");
