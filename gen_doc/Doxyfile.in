@@ -47,6 +47,7 @@ TYPEDEF_HIDES_STRUCT   = NO
 #---------------------------------------------------------------------------
 # Build related configuration options
 #---------------------------------------------------------------------------
+# extrait toutes les fonctions / classes même si elles ne sont pas documentées. 
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = YES
@@ -152,6 +153,7 @@ FILTER_SOURCE_PATTERNS =
 #---------------------------------------------------------------------------
 # configuration options related to source browsing
 #---------------------------------------------------------------------------
+# permet de visualiser la ligne et le nom du fichier de la doc
 SOURCE_BROWSER         = NO
 INLINE_SOURCES         = NO
 STRIP_CODE_COMMENTS    = YES
@@ -299,8 +301,8 @@ DOT_FONTNAME           = Helvetica
 DOT_FONTSIZE           = 10
 DOT_FONTPATH           =
 CLASS_GRAPH            = YES
-COLLABORATION_GRAPH    = NO
-GROUP_GRAPHS           = NO
+COLLABORATION_GRAPH    = YES
+GROUP_GRAPHS           = YES
 UML_LOOK               = YES
 UML_LIMIT_NUM_FIELDS   = 4
 TEMPLATE_RELATIONS     = NO
@@ -308,8 +310,8 @@ INCLUDE_GRAPH          = YES
 INCLUDED_BY_GRAPH      = YES
 CALL_GRAPH             = YES
 CALLER_GRAPH           = YES
-GRAPHICAL_HIERARCHY    = NO
-DIRECTORY_GRAPH        = NO
+GRAPHICAL_HIERARCHY    = YES
+DIRECTORY_GRAPH        = YES
 DOT_IMAGE_FORMAT       = png
 DOT_PATH               =
 DOTFILE_DIRS           =
