@@ -14,9 +14,6 @@
 void handleTxt(const char texte [],std::stringstream & ss, va_list ap);
 
 
-
-
-
 void handleTxt(const char texte [],std::stringstream & ss, va_list ap)
 {
 	int tailleChaine = 0, i = 0;
