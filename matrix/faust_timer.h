@@ -8,7 +8,8 @@
    #include <windows.h>
 #endif
 
-/*! \brief Propose tools to evaluate time processing of running.
+/*! \class faust_timer
+* \brief The class faust_timer propose various tools to evaluate time processing.
 */
 class faust_timer
 {
@@ -23,7 +24,11 @@ class faust_timer
     faust_unsigned_int get_nb_call();
 	static const char * class_name;
 
+
     private:
+    /*! \brief TRUE value indicate that a time is running. <br>
+    FALSE value indicates no-time running. <br>
+    */
     bool isRunning;
     float result;
     #if defined(__linux__)
