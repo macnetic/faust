@@ -11,7 +11,7 @@
 void handleWarning(const char texte [], ...);
 
 
-// macro pour la gestion des errors (__LINE__ et __FILE__)
+/// macro pour la gestion des errors (__LINE__ et __FILE__)
 #define handleError(class_name,message) do {                                \
 		std::stringstream complete_message;		\
         complete_message<<"Error in file " <<__FILE__<<std::endl<<" line "<<__LINE__<< " , class  " <<class_name<<" : "<<std::endl<<message; \
