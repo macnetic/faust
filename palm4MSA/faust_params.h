@@ -36,7 +36,7 @@ class faust_params
 #endif
 
    public:
-	  
+
 	  faust_params(
 	  const faust_matrix& data_,
 	  const unsigned int nb_fact_,
@@ -52,8 +52,8 @@ class faust_params
 	  const T init_lambda_ = defaultLambda ,
 	  const bool constant_step_size_ = defaultConstantStepSize,
 	  const T step_size_ = defaultStepSize);
-	  
-	  	
+
+
 
 	/*!
      *  \brief Constructor
@@ -61,8 +61,8 @@ class faust_params
      *  faust_params constructor
      *
      *  \tparam data : faust_matrix to hierarchically factorize
-	*	
-	*  \tparam nb_fact_ : number of factor used for the decomposition 
+	 *
+	 *  \tparam nb_fact_ : number of factor used for the decomposition
 	 *
 		\tparam	 cons_ :  Specifies the constraint sets in which each factor should lie.<br> It
       should be a std::vector<std::vector> of constraint_generic size 2*(nb_fact-1),<br> where the jth columns
@@ -70,37 +70,37 @@ class faust_params
       cons_[1][j] specifies the constraints for the left factor and<br>
       cons[2][j] for the right factor.<br>
 	 *
-	 *	
+	 *
 		\tparam	   init_fact_ : specifying the initial factors, could be an empty std::vector (not specifying the factors) <br>
 	*
 	*
 		\tparam stop_crit_2facts : (optionnal) stopping_criterion for each 2 factors factorisation step <br>
 	*
-	*	
+	*
 		\tparam stop_crit_global: (optionnal) stopping_criterion for the factorisation each global factorisation step <br>
 	*
-	*	
-		\tparam  isVerbose : (optionnal) if true the function outputs the error at each iteration <br> 
-		if false, hierarchical_fact run silent mode<br> 
+	*
+		\tparam  isVerbose : (optionnal) if true the function outputs the error at each iteration <br>
+		if false, hierarchical_fact run silent mode<br>
 		default value is false <br>
 	*
-	*	
-		\tparam isUpdateWayR2L_ : (optionnal) if true, the factors are updated from right to left, <br> 
+	*
+		\tparam isUpdateWayR2L_ : (optionnal) if true, the factors are updated from right to left, <br>
 		and if false, the factors are updated from left to right.<br>
 		the default value is false <br>
 	*
-	*	
+	*
 		\tparam isFactSideLeft_ : (optionnal) Side to be factorized iteratively: true-the left false-the right  <br>
 	*
-	*	
+	*
 		\tparam init_lambda_ : (optionnal) specifies a starting point for the algorithm.<br> The default value is 1.0 <br>
-		
+
 		\tparam constant_step_size : (optionnal) specifies if the stepsize of the gradient descent  is constant.<br> The default value is false. In this case, the stepsize is controlled by the lipschitz modulus of the gradient <br>
-		
+
 		\tparam step_size : (optionnal) specifies the step size of the gradient descent, USELESS if constant_step_size is false. default value : 1e-16
-		
-		
-     */		
+
+
+     */
       faust_params(
 	const faust_matrix& data_,
 	const unsigned int nb_fact_,
@@ -114,11 +114,11 @@ class faust_params
 	const T init_lambda_ = defaultLambda ,
 	const bool constant_step_size_ = defaultConstantStepSize,
 	const T step_size_ = defaultStepSize);
-	
-	void init_from_file(const char* filename);	
+
+	void init_from_file(const char* filename);
 	  faust_params();
-		
-		
+
+
 
       void check_constraint_validity();
 	  void check_bool_validity();
@@ -142,7 +142,7 @@ class faust_params
       T init_lambda;
 	  bool isConstantStepSize;
 	  T step_size;
-	  
+
 	  //default value
 	static const int defaultNiter1;
 	static const int defaultNiter2;
@@ -154,21 +154,21 @@ class faust_params
 	static const T defaultStepSize;
 	static const T defaultDecreaseSpeed;
 	static const T defaultResiduumPercent;
-		
+
 	  void Display() const;
 
       //const int nb_rows; // number of rows of the first factor
       //const int nb_cols; // number of columns of the last factor
-     
+
       /*const int nb_it;   // number of iterations
       // if isStoppingCriterionError then criterion is error else criterion is number of iteration
       bool  isStoppingCriterionError;
       const faust_real errorThreshold;
-      // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than 
+      // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than
       int maxIteration;*/
 	   static const char* class_name;
 	  private :
-	 
+
 };
 
 #include "faust_params.hpp"

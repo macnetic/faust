@@ -14,7 +14,6 @@
    #include "faust_core.h"
 #endif
 
-
 #include "faust_exception.h"
 using namespace std;
 
@@ -38,24 +37,24 @@ hierarchical_fact<T>::hierarchical_fact(const faust_params<T>& params_):
    isFactorizationComputed(false),
    errors(std::vector<std::vector<T> >(2,std::vector<T >(params_.nb_fact-1,0.0))){}
 
-   
-template<typename T>   
+
+template<typename T>
 void hierarchical_fact<T>::init()
 {
 #ifdef __COMPILE_TIMERS__
 t_init.start();
 #endif
 
-   cons_tmp_global.clear();
-   if(isFactSideLeft)
-      cons_tmp_global.push_back(cons[0][ind_fact]);
-   else
-      cons_tmp_global.push_back(cons[1][ind_fact]);
-   
+    cons_tmp_global.clear();
+    if(isFactSideLeft)
+        cons_tmp_global.push_back(cons[0][ind_fact]);
+    else
+    cons_tmp_global.push_back(cons[1][ind_fact]);
 
-   palm_global.set_constraint(cons_tmp_global);
-   palm_global.init_fact(1);
-   
+
+    palm_global.set_constraint(cons_tmp_global);
+    palm_global.init_fact(1);
+
 
 #ifdef __COMPILE_TIMERS__
 t_init.stop();
@@ -70,75 +69,69 @@ void hierarchical_fact<T>::next_step()
 t_next_step.start();
 #endif
 
-      
-   if(isFactorizationComputed)
-   {
-      handleError(class_name,"next_step : factorization has already been computed");
-   }
 
-   vector<const faust_constraint_generic*> cons_tmp_2(2);
-   cons_tmp_2[0]=cons[0][ind_fact];
-   cons_tmp_2[1]=cons[1][ind_fact];
-   
-   
-   palm_2.set_constraint(cons_tmp_2);
-   
-   palm_2.init_fact(2);
+    if(isFactorizationComputed)
+    {
+        handleError(class_name,"next_step : factorization has already been computed");
+    }
 
-   palm_2.set_lambda(default_lambda);
-   
+    vector<const faust_constraint_generic*> cons_tmp_2(2);
+    cons_tmp_2[0]=cons[0][ind_fact];
+    cons_tmp_2[1]=cons[1][ind_fact];
+
+
+    palm_2.set_constraint(cons_tmp_2); /**< setting the constraint parameters*/
+
+    palm_2.init_fact(2);
+    palm_2.set_lambda(default_lambda);
+
 #ifdef __COMPILE_TIMERS__
 palm_2.init_local_timers();
 #endif
    //while(palm_2.do_continue())
     //  palm_2.next_step();
-	palm_2.compute_facts();
-	
-	
+	palm_2.compute_facts(); /**< Compute the hierarchical factorization of dense matrix. */
+
+
 #ifdef __COMPILE_TIMERS__
 palm_2.print_local_timers();
 #endif
-   palm_global.update_lambda_from_palm(palm_2);
-   
-
-   if (isFactSideLeft)
-   {
-      cons_tmp_global[0]=cons[0][ind_fact];
-      vector<const faust_constraint_generic*>::iterator it;
-      it = cons_tmp_global.begin();
-      cons_tmp_global.insert(it+1,cons[1][ind_fact]);
-   }
-   else
-   {
-      vector<const faust_constraint_generic*>::iterator it;
-      it = cons_tmp_global.begin();
-      cons_tmp_global.insert(it+ind_fact,cons[0][ind_fact]);      
-      cons_tmp_global[ind_fact+1]=cons[1][ind_fact];
-   }
-
-   palm_global.set_constraint(cons_tmp_global);
+    palm_global.update_lambda_from_palm(palm_2);
 
 
-   palm_global.init_fact_from_palm(palm_2, isFactSideLeft);
+    if (isFactSideLeft)
+    {
+        cons_tmp_global[0]=cons[0][ind_fact];
+        vector<const faust_constraint_generic*>::iterator it;
+        it = cons_tmp_global.begin();
+        cons_tmp_global.insert(it+1,cons[1][ind_fact]);
+    }
+    else
+    {
+        vector<const faust_constraint_generic*>::iterator it;
+        it = cons_tmp_global.begin();
+        cons_tmp_global.insert(it+ind_fact,cons[0][ind_fact]);
+        cons_tmp_global[ind_fact+1]=cons[1][ind_fact];
+    }
+
+    palm_global.set_constraint(cons_tmp_global);
+
+    palm_global.init_fact_from_palm(palm_2, isFactSideLeft);
 
 #ifdef __COMPILE_TIMERS__
 palm_global.init_local_timers();
 #endif
    //while(palm_global.do_continue())
     //  palm_global.next_step();
-	palm_global.compute_facts();
+    palm_global.compute_facts();
 #ifdef __COMPILE_TIMERS__
 palm_global.print_local_timers();
 #endif
 
-   palm_2.set_data(palm_global.get_res(isFactSideLeft, ind_fact));
+    palm_2.set_data(palm_global.get_res(isFactSideLeft, ind_fact));
+    compute_errors();
 
-
-   compute_errors();
-
-
-   ind_fact++;  
-    
+    ind_fact++;
 
 #ifdef __COMPILE_TIMERS__
 t_next_step.stop();
@@ -156,7 +149,7 @@ void hierarchical_fact<T>::get_facts(faust_core<T> & fact)const
 }
 
 template<typename T>
-void hierarchical_fact<T>::get_facts(std::vector<faust_spmat<T> >& sparse_facts)const 
+void hierarchical_fact<T>::get_facts(std::vector<faust_spmat<T> >& sparse_facts)const
 {
    /*if(!isFactorizationComputed)
    {
@@ -173,7 +166,7 @@ void hierarchical_fact<T>::get_facts(std::vector<faust_spmat<T> >& sparse_facts)
 
 
 template<typename T>
-void hierarchical_fact<T>::compute_facts() 
+void hierarchical_fact<T>::compute_facts()
 {
    if(isFactorizationComputed)
    {
@@ -188,7 +181,7 @@ void hierarchical_fact<T>::compute_facts()
   }
 
   isFactorizationComputed = true;
-   
+
 }
 
 
@@ -204,23 +197,21 @@ const std::vector<std::vector< T> >& hierarchical_fact<T>::get_errors()const
 
 template<typename T>
 void hierarchical_fact<T>::compute_errors()
-{  	
-   vector<faust_spmat<T> > sp_facts;
-   get_facts(sp_facts);
+{
+    vector<faust_spmat<T> > sp_facts;
+    get_facts(sp_facts);
 
 
+    faust_core<T> faust_core_tmp(sp_facts, get_lambda());
+    const faust_mat<T> estimate_mat = faust_core_tmp.get_product();
 
+    faust_mat<T> data(palm_global.get_data());
 
-   faust_core<T> faust_core_tmp(sp_facts, get_lambda());
-   const faust_mat<T> estimate_mat = faust_core_tmp.get_product();
+    T data_norm = data.norm();
+    data -= estimate_mat;
+    errors[0][ind_fact] =  estimate_mat.norm()/data_norm;
+    errors[1][ind_fact] =  faust_core_tmp.get_total_nnz()/data.getNbRow()/data.getNbCol();
 
-   faust_mat<T> data(palm_global.get_data());
-
-   T data_norm = data.norm();
-   data -= estimate_mat;
-   errors[0][ind_fact] =  estimate_mat.norm()/data_norm;
-   errors[1][ind_fact] =  faust_core_tmp.get_total_nnz()/data.getNbRow()/data.getNbCol();
- 	
 }
 
 
