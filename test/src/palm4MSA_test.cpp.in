@@ -12,7 +12,8 @@
 
 using namespace std;
 typedef FFPP faust_real;
-
+/** \brief Run a test of palm4MSA
+ */
 int main()
 {
   faust_mat<faust_real> data, init_facts1, init_facts2;

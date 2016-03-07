@@ -9,7 +9,11 @@
 
 using namespace std;
 typedef double faust_real;
-
+/** \brief Compute the multiplication between an faust-matrix and a vector. <br>
+*          Evaluation of the time difference using faust-matrix and classical dense matrix. <br>
+ * \param[in] Entry Matrix is contained in a file .mat
+ * \param[out] Output data is placed in a file .dat
+ */
 int main()
 {
 
