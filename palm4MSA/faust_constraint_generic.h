@@ -7,24 +7,22 @@
 
 enum faust_constraint_name
 {
-   CONSTRAINT_NAME_SP, /*!< CONSTRAINT_NAME_SP : fixed number of non zero elements (frobenius norm 1) */
-   CONSTRAINT_NAME_SPCOL, /*!< CONSTRAINT_NAME_SPCOL : fixed number of non zero elements per column (frobenius norm 1) */
-   CONSTRAINT_NAME_SPLIN, /*!< CONSTRAINT_NAME_SPLIN : fixed number of non zero elements per line (frobenius norm 1) */
-   CONSTRAINT_NAME_NORMCOL,
+   CONSTRAINT_NAME_SP, /*!< CONSTRAINT_NAME_SP : fixed number of non zero elements, INT (frobenius norm 1) */
+   CONSTRAINT_NAME_SPCOL, /*!< CONSTRAINT_NAME_SPCOL : fixed number of non zero elements per column INT (frobenius norm 1) */
+   CONSTRAINT_NAME_SPLIN, /*!< CONSTRAINT_NAME_SPLIN : fixed number of non zero elements per line INT (frobenius norm 1) */
+   CONSTRAINT_NAME_NORMCOL,/*!< CONSTRAINT_NAME_NORMCOL : 2nd norm of the colons of A REAL */
    CONSTRAINT_NAME_SPLINCOL,
-   CONSTRAINT_NAME_CONST,
-   CONSTRAINT_NAME_SP_POS,
+   CONSTRAINT_NAME_CONST, /**< CONSTRAINT_NAME_CONST : Matrix equal to A ; MAT */
+   CONSTRAINT_NAME_SP_POS,/**< CONSTRAINT_NAME_SP_POS : fixed number of non zeros coefficients, INT (frobenius norm 1) */
    CONSTRAINT_NAME_BLKDIAG,
-   CONSTRAINT_NAME_SUPP,
-   CONSTRAINT_NAME_NORMLIN,
+   CONSTRAINT_NAME_SUPP, /**< CONSTRAINT_NAME_SUPP : Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
+   CONSTRAINT_NAME_NORMLIN,/**< CONSTRAINT_NAME_SUPP : 2nd norm of the lines of matrix A ; REAL  */
 };
-
-
 
 
 /*!
 \brief Contains the generic constraint parameters for the hierarchical factorization. See following table for more precision about the type of constraint. <br>
- <img src="/home/aleman/WORK/FAUST/faust/trunk/devcpp/gen_doc/images/constraint.png" alt="constraint parameters" width=800px />
+ <img src="../../doc/html/constraint.png" alt="constraint parameters" width=800px />
 */
 //template<typename parameter_type>
 class faust_constraint_generic
