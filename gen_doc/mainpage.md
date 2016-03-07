@@ -1,3 +1,6 @@
+Here is the main page of the project FAUST. 
+
+
 \mainpage FAµST
 
 \section intro_sec Introduction
@@ -34,7 +37,8 @@ The goal of this demo is to enhancement a noisy image.<br>
 in progress...<br>
 
 \section Documentation
-\image html constraint.png "config parameters" width=10cm<br>
+
+
 in progress...<br>
 
 
