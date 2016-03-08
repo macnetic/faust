@@ -64,17 +64,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			//mexPrintf("Sparse\n");
 			loadSpFaust(prhs[1],vec_spmat);
 		}*/
-	if (nb_element == 0)
-		mexWarnMsgTxt("Empty cell array.");
-    else 
-	{
+		if (nb_element == 0)
+			mexWarnMsgTxt("Empty cell array.");
+    		else 
+		{
 			mxArray * mxMat;	
 			for (int i=0;i<nb_element;i++)
 			{	
 				mxMat=mxGetCell(prhs[1],i);
 				addSpmat<FFPP>(mxMat,vec_spmat);
 			}
-	}
+		}
 	
 	
 		faust_core<FFPP>* F = new faust_core<FFPP>(vec_spmat); 
@@ -104,7 +104,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (!strcmp("size",cmd))
 	{	
 		const size_t SIZE_B1 = core_ptr->getNbRow(); 
-        const size_t SIZE_B2 = core_ptr->getNbCol(); 
+        	const size_t SIZE_B2 = core_ptr->getNbCol(); 
 		const mwSize dims[2]={1,2};
 		plhs[0]=mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL);
 		double* ptr_out = (double*) mxGetData(plhs[0]);
@@ -113,14 +113,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		return;		
 	}
 	
-    if (!strcmp("get_product",cmd))
+    	if (!strcmp("get_product",cmd))
 	{	
 		if (nlhs != 1 || nrhs != 2)
 			mexWarnMsgTxt("get_product: Unexpected arguments ignored.");
 		if(core_ptr->size() == 0)
 			mexErrMsgTxt("get_product : empty faust core");
 		const size_t SIZE_B1 = core_ptr->getNbRow(); 
-        const size_t SIZE_B2 = core_ptr->getNbCol(); 
+        	const size_t SIZE_B2 = core_ptr->getNbCol(); 
 		faust_mat<FFPP> prod=core_ptr->get_product();
 		
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
@@ -135,10 +135,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		memcpy(ptr_out, prod.getData(), SIZE_B1*SIZE_B2*sizeof(FFPP));
 		
 		return;
-		
-		
-		
-		
 	}
 	
 	if (!strcmp("transpose",cmd))
@@ -174,7 +170,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         
         // Check parameters
         // if (nlhs != 1 || nrhs != 3)
-		if (nlhs > 1 ||  nrhs != 3)
+	if (nlhs > 1 ||  nrhs != 3)
             mexErrMsgTxt("Multiply: Unexpected arguments.");
         if (mxGetNumberOfDimensions(prhs[2]) != 2 
                 || SIZE_A1 != core_ptr->getNbCol() )
