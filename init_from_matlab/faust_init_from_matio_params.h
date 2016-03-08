@@ -15,6 +15,11 @@ class faust_constraint_generic;
 template<typename T>
 void init_params_palm_from_matiofile(faust_params_palm<T>& params, const char* fileName, const char* variableName);
 
+/** \brief load data matrix from ".mat file"
+ * \param params
+ * \param fileName
+ * \param variableName
+ */
 template<typename T>
 void init_params_from_matiofile(faust_params<T>& params, const char* fileName, const char* variableName);
 
