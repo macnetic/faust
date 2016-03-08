@@ -176,7 +176,7 @@ void hierarchical_fact<T>::compute_facts()
   init();
   for (int i=0 ; i<=nb_fact-1 ; i++)
   {
-     cout << "hierarchical_fact<T>::compute_facts : factorisation "<<i+1<<"/"<<nb_fact <<endl;
+     cout << "hierarchical_fact<T>::compute_facts : factorization "<<i+1<<"/"<<nb_fact <<endl;
      next_step();
   }
 

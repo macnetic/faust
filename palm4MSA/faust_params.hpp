@@ -22,7 +22,7 @@ template<typename T>
 const char * faust_params<T>::class_name = "faust_params<T>::";
 
 
-//default Values
+/// default Values of faust_params
 template<typename T> const bool faust_params<T>::defaultVerbosity = false;
 template<typename T> const int faust_params<T>::defaultNiter1 = 500;
 template<typename T> const int faust_params<T>::defaultNiter2 = 500;
@@ -35,98 +35,89 @@ template<typename T> const T faust_params<T>::defaultStepSize = 1e-16;
 template<typename T> const T faust_params<T>::defaultDecreaseSpeed = 1.25;
 template<typename T> const T faust_params<T>::defaultResiduumPercent = 1.4;
 
-
 template<typename T>
 void faust_params<T>::check_constraint_validity()
 {
-	if (cons.size() != 2)
+    if (cons.size() != 2)
 		//handleError("faust_params<T>::check_constraint_validity :\n cons must have 2 rows instead of %d",cons.size());
-		handleError(class_name,"check_constraint_validity :\n cons must have 2 rows");
+        handleError(class_name,"check_constraint_validity :\n cons must have 2 rows");
 
-   for (unsigned int i=0 ; i<cons.size() ; i++)
-      if (cons[i].size() != nb_fact-1)
-      {
-		 //handleError("faust_params<T>::check_constraint_validity :\n The number of constraints equal to %d is in conflict with the number of factors which is %d\n, number of columns of constraints must be equal to nb_fact - 1",cons[i].size(),nb_fact);
-		 handleError(class_name,"check_constraint_validity :\n The number of constraints equal is in conflict with the number of factors,\n number of columns of constraints must be equal to nb_fact - 1");
-      }
+    for (unsigned int i=0 ; i<cons.size() ; i++)
+        if (cons[i].size() != nb_fact-1)
+        {
+            //handleError("faust_params<T>::check_constraint_validity :\n The number of constraints equal to %d is in conflict with the number of factors which is %d\n, number of columns of constraints must be equal to nb_fact - 1",cons[i].size(),nb_fact);
+            handleError(class_name,"check_constraint_validity :\n The number of constraints equal is in conflict with the number of factors,\n number of columns of constraints must be equal to nb_fact - 1");
+        }
 
-   bool verifSize  =    data.getNbRow()     == cons[0][0]->getRows()
-                   && cons[0][0]->getCols() == cons[1][0]->getRows()
-                   &&   data.getNbCol()     == cons[1][0]->getCols();
+    bool verifSize  =    data.getNbRow()     == cons[0][0]->getRows()
+                    && cons[0][0]->getCols() == cons[1][0]->getRows()
+                    &&   data.getNbCol()     == cons[1][0]->getCols();
 
-   for (int i=1 ; i<nb_fact-1 ; i++)
-      if (isFactSideLeft)
-         verifSize  =  verifSize
-                    && cons[1][i-1]->getRows() == cons[1][i]->getCols()
-                    && cons[0][i]->getCols()   == cons[1][i]->getRows()
-                    &&    data.getNbRow()      == cons[0][i]->getRows();
-      else
-         verifSize  =  verifSize
-                    && cons[0][i-1]->getCols() == cons[0][i]->getRows()
-                    && cons[0][i]->getCols()   == cons[1][i]->getRows()
-                    &&    data.getNbCol()      == cons[1][i]->getCols();
-
-
-   if (!verifSize)
-
-	  handleError(class_name,"faust_params<T>::check_constraint_validity :\n Size incompatibility in the constraints");
+    for (int i=1 ; i<nb_fact-1 ; i++)
+        if (isFactSideLeft)
+            verifSize  =  verifSize
+            && cons[1][i-1]->getRows() == cons[1][i]->getCols()
+            && cons[0][i]->getCols()   == cons[1][i]->getRows()
+            &&    data.getNbRow()      == cons[0][i]->getRows();
+        else
+            verifSize  =  verifSize
+            && cons[0][i-1]->getCols() == cons[0][i]->getRows()
+            && cons[0][i]->getCols()   == cons[1][i]->getRows()
+            &&    data.getNbCol()      == cons[1][i]->getCols();
 
 
+    if (!verifSize)
+        handleError(class_name,"faust_params<T>::check_constraint_validity :\n Size incompatibility in the constraints");
 
 }
 
 template<typename T>
 faust_params<T>::faust_params(
-	  const faust_matrix& data_,
-	  const unsigned int nb_fact_,
-	  const std::vector<const faust_constraint_generic*> & cons_,
-	  const std::vector<faust_matrix >& init_fact_,
-	  const stopping_criterion<T>& stop_crit_2facts_,
-      const stopping_criterion<T>& stop_crit_global_,
-	   const T residuum_decrease_speed /* = 1.25 */,
-	  const T residuum_prcent /* = 1.4 */,
-	  const bool isVerbose_ , /* = false */
-      const bool isUpdateWayR2L_  , /* = false */
-      const bool isFactSideLeft_ , /* = false */
-      const T init_lambda_  /* = 1.0 */,
-	  const bool constant_step_size_,
-	  const T step_size_):
-            data(data_),
-            nb_fact(nb_fact_),
-            init_fact(init_fact_),
-            stop_crit_2facts(stop_crit_2facts_),
-            stop_crit_global(stop_crit_global_),
-            isVerbose(isVerbose_),
-            isUpdateWayR2L(isUpdateWayR2L_),
-            isFactSideLeft(isFactSideLeft_),
-            init_lambda(init_lambda_),
-			isConstantStepSize(constant_step_size_),
-			step_size(step_size_)
-
+	const faust_matrix& data_,
+	const unsigned int nb_fact_,
+	const std::vector<const faust_constraint_generic*> & cons_,
+	const std::vector<faust_matrix >& init_fact_,
+	const stopping_criterion<T>& stop_crit_2facts_,
+    const stopping_criterion<T>& stop_crit_global_,
+	const T residuum_decrease_speed /* = 1.25 */,
+	const T residuum_prcent /* = 1.4 */,
+	const bool isVerbose_ , /* = false */
+    const bool isUpdateWayR2L_  , /* = false */
+    const bool isFactSideLeft_ , /* = false */
+    const T init_lambda_  /* = 1.0 */,
+	const bool constant_step_size_,
+	const T step_size_):
+        data(data_),
+        nb_fact(nb_fact_),
+        init_fact(init_fact_),
+        stop_crit_2facts(stop_crit_2facts_),
+        stop_crit_global(stop_crit_global_),
+        isVerbose(isVerbose_),
+        isUpdateWayR2L(isUpdateWayR2L_),
+        isFactSideLeft(isFactSideLeft_),
+        init_lambda(init_lambda_),
+        isConstantStepSize(constant_step_size_),
+		step_size(step_size_)
 {
-  if (nb_fact_ <= 2)
-  {
-	//handleError("faust_params<T>::constructor : 	the number of factor is smaller than 2, use another constructor\n");
-	handleError(class_name,"check_constraint_validity : Size incompatibility in the constraints");
-  }
-
-  if  (residuum_decrease_speed<=1)
+    if (nb_fact_ <= 2)
     {
-		 handleError(class_name,"constructor : residuum_decrease_speed must be strictly greater than  1");
+        //handleError("faust_params<T>::constructor : 	the number of factor is smaller than 2, use another constructor\n");
+        handleError(class_name,"check_constraint_validity : Size incompatibility in the constraints");
+    }
+    if  (residuum_decrease_speed<=1)
+    {
+        handleError(class_name,"constructor : residuum_decrease_speed must be strictly greater than  1");
+    }
+    if ((residuum_prcent<0))
+    {
+        handleError(class_name,"constructor : residuum_percent must strictly positive");
+    }
+    if (nb_fact != cons_.size())
+    {
+        handleError(class_name,"constructor : nb_fact and cons_.size() are in conflict\n");
     }
 
-
-   if ((residuum_prcent<0))
-   {
-		handleError(class_name,"constructor : residuum_percent must strictly positive");
-    }
-
-	if (nb_fact != cons_.size())
-	{
-		handleError(class_name,"constructor : nb_fact and cons_.size() are in conflict\n");
-    }
-
-	std::vector<const faust_constraint_generic*> residuumS_cons;
+    std::vector<const faust_constraint_generic*> residuumS_cons;
 	std::vector<const faust_constraint_generic*> factorS_cons;
 	double cons_res_parameter = residuum_prcent;
 	if(isFactSideLeft)
@@ -135,9 +126,8 @@ faust_params<T>::faust_params(
 		{
 			if (i==1)
 			{
-					residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,data.getNbRow()*cons_[nb_fact-i]->getRows(),data.getNbRow(),cons_[nb_fact-i]->getRows()));
-					factorS_cons.push_back(cons_[nb_fact-i]);
-
+                residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,data.getNbRow()*cons_[nb_fact-i]->getRows(),data.getNbRow(),cons_[nb_fact-i]->getRows()));
+				factorS_cons.push_back(cons_[nb_fact-i]);
 			}else
 			{
 				std::cout<<nb_fact-i<<std::endl;
@@ -166,9 +156,8 @@ faust_params<T>::faust_params(
 			std::cout<<i<<std::endl;
 			if (i==0)
 			{
-					residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,cons_[i]->getCols()*data.getNbCol(),cons_[i]->getCols(),data.getNbCol()));
-					factorS_cons.push_back(cons_[0]);
-
+				residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,cons_[i]->getCols()*data.getNbCol(),cons_[i]->getCols(),data.getNbCol()));
+				factorS_cons.push_back(cons_[0]);
 			}else
 			{
 				residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*cons_[i]->getCols()*data.getNbCol()+0.5),cons_[i]->getCols(),data.getNbCol()));
@@ -176,7 +165,7 @@ faust_params<T>::faust_params(
 			}
 				cons_res_parameter=cons_res_parameter/residuum_decrease_speed;
 
-		}
+        }
 
 		residuumS_cons.push_back(cons_[nb_fact-1]);
 		factorS_cons.push_back(cons_[nb_fact-2]);
@@ -188,10 +177,6 @@ faust_params<T>::faust_params(
 	check_constraint_validity();
 
 }
-
-
-
-
 
 
 
