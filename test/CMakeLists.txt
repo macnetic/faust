@@ -32,18 +32,18 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    # palm
    add_executable(palm ${FAUST_TESTSRC_BIN_DIR}/palm4MSA_test.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
    if(FAUST_USE_OPENBLAS)
-      target_link_libraries(palm ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+      target_link_libraries(palm  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
    else()
-      target_link_libraries(palm ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(palm  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
 
 
    # hier_fact
    add_executable(faust_hier ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_test.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
    if(FAUST_USE_OPENBLAS)
-      target_link_libraries(faust_hier ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+      target_link_libraries(faust_hier  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
    else()
-      target_link_libraries(faust_hier ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(faust_hier  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
 
    # meg
@@ -57,9 +57,9 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    # faust
    add_executable(faust_test ${FAUST_TESTSRC_BIN_DIR}/faust_test.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_params.cpp)
    if(FAUST_USE_OPENBLAS)
-      target_link_libraries(faust_test ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
+      target_link_libraries(faust_test  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
    else()
-      target_link_libraries(faust_test ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(faust_test o ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
     
 	#comptime1
@@ -67,9 +67,9 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 	add_executable(comptime1 ${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_core.cpp)
 	add_dependencies(comptime1 drawComp)
    if(FAUST_USE_OPENBLAS)
-      target_link_libraries(comptime1 ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
+      target_link_libraries(comptime1  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
    else()
-      target_link_libraries(comptime1 ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(comptime1  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
 	
 	
@@ -77,9 +77,9 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    # comptime0
    add_executable(comptime0 ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_core.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
    if(FAUST_USE_OPENBLAS)
-      target_link_libraries(comptime0 ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+      target_link_libraries(comptime0  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
    else()
-      target_link_libraries(comptime0 ${MATLAB_ROOT}/bin/glnxa64/libmex.so ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(comptime0  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
 
    CONFIGURE_FILE(${FAUST_TESTRUNCOMP_SRC_DIR}/main_RCG.m.in ${FAUST_TESTRUNCOMP_BIN_DIR}/main_RCG.m @ONLY)
