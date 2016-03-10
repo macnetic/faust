@@ -59,7 +59,7 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    if(FAUST_USE_OPENBLAS)
       target_link_libraries(faust_test  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
    else()
-      target_link_libraries(faust_test o ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+      target_link_libraries(faust_test ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
     
 	#comptime1
