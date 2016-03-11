@@ -13,6 +13,8 @@ add_definitions(-DEIGEN_MPL2_ONLY)
 
 include_directories( ${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
 if(FAUST_USE_OPENBLAS)
+	message(STATUS "**********OPENBLAS ACTIF************")
+	message(STATUS "OPENBLAS_INC_DIR ${OPENBLAS_INC_DIR}")
 	include_directories( ${OPENBLAS_INC_DIR})
 	set(__GEMM_WITH_OPENBLAS__ "1")
 	message(STATUS "**** OPENBLAS USE *****")
