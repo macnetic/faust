@@ -278,9 +278,9 @@ t_local_compute_projection.stop();
 template<typename T>
 void palm4MSA<T>::compute_grad_over_c()
 {
-//static int cmpt = -1;
-//cmpt++;
-//char nomFichier[100];
+/*static int cmpt = -1;
+cmpt++;
+char nomFichier[100];*/
 
 #ifdef __COMPILE_TIMERS__
 t_global_compute_grad_over_c.start();
@@ -333,29 +333,29 @@ t_local_compute_grad_over_c.start();
             // tmp1 = L*S
             multiply(LorR, S[ind_fact], tmp1);
 
-/*sprintf(nomFichier,"LorR_%d_0_host.tmp",cmpt);
+/*sprintf(nomFichier,"LorR_0_%d_host.tmp",cmpt);
 LorR.print_file(nomFichier);
-sprintf(nomFichier,"RorL%d_%d_0_host.tmp",ind_fact,cmpt);
+sprintf(nomFichier,"RorL%d_0_%d_host.tmp",ind_fact,cmpt);
 RorL[ind_fact].print_file(nomFichier);
-sprintf(nomFichier,"S%d_%d_0_host.tmp",ind_fact,cmpt);
+sprintf(nomFichier,"S%d_0_%d_host.tmp",ind_fact,cmpt);
 S[ind_fact].print_file(nomFichier);
-sprintf(nomFichier,"tmp1_%d_0_host.tmp",cmpt);
+sprintf(nomFichier,"tmp1_0_%d_host.tmp",cmpt);
 tmp1.print_file(nomFichier);
-sprintf(nomFichier,"error_%d_0_host.tmp",cmpt);
+sprintf(nomFichier,"error_0_%d_host.tmp",cmpt);
 error.print_file(nomFichier);
 cout << "appel " << cmpt<<" : lambda0 = "<< lambda<<endl;*/
             // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
             gemm<T>(tmp1, RorL[ind_fact], error, lambda, -1.0, 'N', 'N');
 
-/*sprintf(nomFichier,"LorR_%d_1_host.tmp",cmpt);
+/*sprintf(nomFichier,"LorR_1_%d_host.tmp",cmpt);
 LorR.print_file(nomFichier);
-sprintf(nomFichier,"S_%d_%d_1_host.tmp",ind_fact,cmpt);
+sprintf(nomFichier,"S%d_1_%d_host.tmp",ind_fact,cmpt);
 S[ind_fact].print_file(nomFichier);
-sprintf(nomFichier,"tmp1_%d_1_host.tmp",cmpt);
+sprintf(nomFichier,"tmp1_1_%d_host.tmp",cmpt);
 tmp1.print_file(nomFichier);
-sprintf(nomFichier,"RorL_%d_%d_1_host.tmp",ind_fact,cmpt);
+sprintf(nomFichier,"RorL%d_1_%d_host.tmp",ind_fact,cmpt);
 RorL[ind_fact].print_file(nomFichier);
-sprintf(nomFichier,"error_%d_1_host.tmp",cmpt);
+sprintf(nomFichier,"error_1_%d_host.tmp",cmpt);
 error.print_file(nomFichier);*/
         }
         else
@@ -372,8 +372,10 @@ error.print_file(nomFichier);*/
         {
             // tmp1 = S*R
             multiply(S[ind_fact], RorL[ind_fact], tmp1);
+
             // error = lambda*L*tmp1 - error (= lambda*L*S*R - data )
             gemm<T>(LorR, tmp1, error, lambda, -1.0, 'N', 'N');
+
         }
         else
         {
@@ -390,30 +392,11 @@ error.print_file(nomFichier);*/
         {
             // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
 
-/*LorR.print_file("LorR_2_host.tmp");
-S[ind_fact].print_file("S_2_host.tmp");
-tmp1.print_file("tmp1_2_host.tmp");
-RorL[ind_fact].print_file("RorL_2_host.tmp");
-error.print_file("error_2_host.tmp");*/
             gemm<T>(LorR, error, tmp3, lambda, 0.0, 'T', 'N');
 
-/*cout << "oooooooo lambda2="<< lambda<<endl;
-LorR.print_file("LorR_3_host.tmp");
-S[ind_fact].print_file("S_3_host.tmp");
-tmp1.print_file("tmp1_3_host.tmp");
-RorL[ind_fact].print_file("RorL_3_host.tmp");
-error.print_file("error_3_host.tmp");
-tmp3.print_file("tmp3_3_host.tmp");*/
             // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
             gemm<T>(tmp3, RorL[ind_fact], grad_over_c, 1.0/c, 0.0,'N','T');
 
-/*LorR.print_file("LorR_4_host.tmp");
-S[ind_fact].print_file("S_4_host.tmp");
-tmp1.print_file("tmp1_4_host.tmp");
-RorL[ind_fact].print_file("RorL_4_host.tmp");
-error.print_file("error_4_host.tmp");
-tmp3.print_file("tmp3_4_host.tmp");
-grad_over_c.print_file("grad_over_c_4_host.tmp");*/
         }
         else
         {
@@ -441,8 +424,6 @@ grad_over_c.print_file("grad_over_c_4_host.tmp");*/
         }
 
     }
-
-//exit(-1);
 
     isGradComputed = true;
 
@@ -533,6 +514,8 @@ t_local_update_R.stop();
 template<typename T>
 void palm4MSA<T>::update_L()
 {
+
+
 #ifdef __COMPILE_TIMERS__
 t_global_update_L.start();
 t_local_update_L.start();
@@ -544,8 +527,10 @@ t_local_update_L.start();
       {
          throw std::logic_error("Projection must be computed before updating L");
       }
+
       LorR *= S[ind_fact];
-   }
+
+	}
    else
    {
       RorL.resize(nb_fact);
@@ -590,7 +575,6 @@ void palm4MSA<T>::compute_c()
 	t_global_compute_c.start();
 	t_local_compute_c.start();
 #endif
-
 
 
    if (!isConstantStepSize)
@@ -701,6 +685,7 @@ t_local_next_step.start();
         update_L();
     }
 
+
     int* ind_ptr = new int[nb_fact];
     for (int j=0 ; j<nb_fact ; j++)
     if (!isUpdateWayR2L)
@@ -728,7 +713,6 @@ t_local_next_step.start();
         compute_grad_over_c();
         compute_projection();
 
-
         if(!isUpdateWayR2L)
             update_L();
         else
@@ -737,13 +721,16 @@ t_local_next_step.start();
     }
 
     compute_lambda();
-    if (verbose)
+
+
+	if (verbose)
     {
         cout << "Iter " << ind_ite << ", RMSE=" << get_RMSE() << endl;
         cout << "Lambda " <<setprecision(20)<< lambda << endl;
     }
     delete[] ind_ptr;
     ind_ptr = NULL;
+
 
 //cout<<"lambda : "<< lambda<< endl;
 #ifdef __COMPILE_TIMERS__
@@ -875,12 +862,12 @@ void palm4MSA<T>::print_local_timers()const
     cout << "t local_compute_c  = " << t_local_compute_c.get_time()            << " s for "<< t_local_compute_c.get_nb_call()            << " calls of grad" << endl;
     cout << "t_local_compute_lambda      = " << t_local_compute_lambda.get_time()      << " s for "<< t_local_compute_lambda.get_nb_call()      << " calls" << endl;
     cout << "t_local_compute_projection  = " << t_local_compute_projection.get_time()  << " s for "<< t_local_compute_projection.get_nb_call()  << " calls" << endl<<endl;
-    //cout << "t_local_compute_grad_over_c = " << t_local_compute_grad_over_c.get_time() << " s for "<< t_local_compute_grad_over_c.get_nb_call() << " calls" << endl;
-    //cout << "t_local_update_R            = " << t_local_update_R.get_time()            << " s for "<< t_local_update_R.get_nb_call()            << " calls" << endl;
-    //cout << "t_local_update_L            = " << t_local_update_L.get_time()            << " s for "<< t_local_update_L.get_nb_call()            << " calls" << endl;
-    //cout << "t_check_                    = " << t_local_check.get_time()               << " s for "<< t_local_check.get_nb_call()               << " calls" << endl;
-    //cout << "t_local_init_fact           = " << t_local_init_fact.get_time()           << " s for "<< t_local_init_fact.get_nb_call()           << " calls" << endl;
-    //cout << "t_local_init_fact_from_palm = " << t_local_init_fact_from_palm.get_time() << " s for "<< t_local_init_fact_from_palm.get_nb_call() << " calls" << endl<<endl;
+    cout << "t_local_compute_grad_over_c = " << t_local_compute_grad_over_c.get_time() << " s for "<< t_local_compute_grad_over_c.get_nb_call() << " calls" << endl;
+    cout << "t_local_update_R            = " << t_local_update_R.get_time()            << " s for "<< t_local_update_R.get_nb_call()            << " calls" << endl;
+    cout << "t_local_update_L            = " << t_local_update_L.get_time()            << " s for "<< t_local_update_L.get_nb_call()            << " calls" << endl;
+    cout << "t_check_                    = " << t_local_check.get_time()               << " s for "<< t_local_check.get_nb_call()               << " calls" << endl;
+    cout << "t_local_init_fact           = " << t_local_init_fact.get_time()           << " s for "<< t_local_init_fact.get_nb_call()           << " calls" << endl;
+    cout << "t_local_init_fact_from_palm = " << t_local_init_fact_from_palm.get_time() << " s for "<< t_local_init_fact_from_palm.get_nb_call() << " calls" << endl<<endl;
 }
 
 

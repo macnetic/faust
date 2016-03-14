@@ -17,11 +17,11 @@ LIB_EXCEPTION = $(EXCEPTION_DIR)/libfaustexeption.a
 LIBS = $(LIB_MATRIX) $(LIB_PALM)  $(LIB_MATIO) $(LIB_EXCEPTION)
 
 CFLAGS = -O3 -fopenmp -m64 -DHAVE_CUBLAS -fPIC
-CUFLAGS = -O3 -m64 -Xcompiler -fPIC -use_fast_math  -gencode arch=compute_20,code=sm_20 \
--gencode arch=compute_20,code=sm_21 \
--gencode arch=compute_30,code=sm_30 \
--gencode arch=compute_35,code=sm_35 \
--gencode arch=compute_50,code=sm_50
+CUFLAGS = -O3 -m64 -Xcompiler -fPIC -use_fast_math  \
+-gencode arch=compute_13,code=compute_13 \
+    -gencode arch=compute_20,code=compute_20 \
+    -gencode arch=compute_30,code=compute_30 \
+    -gencode arch=compute_35,code=compute_35
 
 ifneq ($(COMPILE_GPU),)
   CUFLAGS += -D__COMPILE_GPU__

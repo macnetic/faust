@@ -16,7 +16,7 @@ using namespace std;
 /** 
 * \brief Definition of the type FFPP (FAUST Floating Point Precision).
 */
-typedef FFPP faust_real;
+typedef double faust_real;
 
 /** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
 * An dense matrix is loaded from "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat".

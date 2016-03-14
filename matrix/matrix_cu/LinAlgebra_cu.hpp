@@ -243,6 +243,7 @@ template <typename faust_real>
 void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_mat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const faust_real alpha, const faust_real beta, char  typeA, char  typeB, cublasHandle_t cublasHandle)
 {
 
+
 #ifdef __COMPILE_TIMERS__
 cu_A.t_gemm.start();
 #endif
@@ -377,10 +378,9 @@ cu_A.t_gemm.start();
 	if(cu_A_ptr->getData()==NULL || cu_B_ptr->getData()==NULL || cu_C_ptr->getData()==NULL)
 		handleError("LinAlgebra_cu", "gemm : A, B or C is not allocated");
 
-
    faust_cu_gemm(cublasHandle,
        opA, opB, opA1, opB2, opA2,
-       &alpha, cu_A.getData(), cu_A.getNbRow(),
+       &alpha, cu_A_ptr->getData(), cu_A_ptr->getNbRow(),
        cu_B_ptr->getData(), cu_B_ptr->getNbRow(),
        &beta, cu_C_ptr->getData(), cu_C_ptr->getNbRow());
 

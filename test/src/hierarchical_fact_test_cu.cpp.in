@@ -15,7 +15,7 @@
 
 
 using namespace std;
-typedef FFPP faust_real;// floating point precision
+typedef double faust_real;// floating point precision
 
 int main()
 {
