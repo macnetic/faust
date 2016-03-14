@@ -1,8 +1,5 @@
 #! /bin/bash
 
-DEBUG_DIR='/home/tgautrai/faust2/debug'
-BUILD_DIR_GPU='/home/tgautrai/faust2/test/src'
-BUILD_DIR_CPU='/home/tgautrai/faust2/build'
 
 LOG_DIR="$DEBUG_DIR/log"
 
@@ -17,14 +14,14 @@ rm -f *.tmp
 
 cd $BUILD_DIR_GPU
 make cleanall 
-make -j8  >> "$LOG_DIR/compilation_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_GPU.log" 2>&1
+make -j$OPENBLAS_NUM_THREADS  >> "$LOG_DIR/compilation_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_GPU.log" 2>&1
 cd $DEBUG_DIR
 #$BUILD_DIR_GPU/hierarchical_fact_test_cu.out | tee -a "$LOG_DIR/faust_hier_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_GPU.log"
 $BUILD_DIR_GPU/MEG_fact_cu.out | tee -a "$LOG_DIR/meg_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_GPU.log"
 
 cd $BUILD_DIR_CPU 
 make clean
-make -j8  >> "$LOG_DIR/compilation_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_CPU.log" 2>&1
+make -j$OPENBLAS_NUM_THREADS  >> "$LOG_DIR/compilation_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_CPU.log" 2>&1
 cd $DEBUG_DIR
 #$BUILD_DIR_CPU/testing/bin/faust_hier | tee -a "$LOG_DIR/faust_hier_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_CPU.log"
 $BUILD_DIR_CPU/testing/bin/meg | tee -a "$LOG_DIR/meg_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_CPU.log"
