@@ -95,9 +95,20 @@ int main(int argc, char* argv[])
 	faust_core<FPP> faust_facts;
 	hier_fact.get_facts(faust_facts);
 	faust_facts.scalarMultiply(hier_fact.get_lambda());
+	
 
-	std::cout<<"writing factorization into "<< outputfilename <<endl;
+	std::cout<<"writing faust (factorisation) into  "<< outputfilename <<endl;
 	faust_facts.print_file(outputfilename.c_str());
+	std::cout<<std::endl;	
+		std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+	
+	//relative_error
+	faust_mat<FPP> faust_product;
+	faust_product=faust_facts.get_product();
+	faust_product-=data_matrix;
+	FPP relative_error = faust_product.norm()/data_matrix.norm();
+
+	std::cout<<"		"<<relative_error<<std::endl<<std::endl;	
 
 	//time comparison between matrix vector product and faust-vector product
 	if (niter_time_comp > 0)
@@ -126,6 +137,8 @@ int main(int argc, char* argv[])
 
 	 	}
 		std::cout<<std::endl;
+	
+
 		std::cout<<"**************** TIME COMPARISON MATRIX VECTOR PRODUCT **************** "<<std::endl;
 		std::cout<<"	TIME  SPEED-UP : "<<tdense.get_time()/tfaust.get_time()<<std::endl;
 		std::cout<<"	MEAN TIME dense : "<<tdense.get_time()/((float) niter_time_comp)<<std::endl;
