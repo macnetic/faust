@@ -168,7 +168,6 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 	params.cons = consSS;
 	
 	// Libération de la mémoire
-	params.Display();
 	xmlXPathFreeContext(ctxt);
 	// params.check_constraint_validity();
 }
