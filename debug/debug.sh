@@ -17,7 +17,7 @@ declare -a real_type=("float" "double")
 
 for i in "${real_type[@]}"
 do
-	sed -i "s/typedef [[:alpha:]]* faust_real/typedef ${real_type[$i]} faust_real/" $BUILD_DIR_GPU/hierarchical_fact_test_cu.cpp $BUILD_DIR_GPU/MEG_fact_cu.cpp $BUILD_DIR_CPU/testing/src/hierarchical_fact_test.cpp $BUILD_DIR_CPU/testing/src/MEG_fact.cpp 
+	sed -i "s/typedef[[:space:]][[:alpha:]]\+[[:space:]]\([[:alpha:]]\+\)/typedef ${real_type[$i]} \1/g"  $BUILD_DIR_GPU/hierarchical_fact_test_cu.cpp $BUILD_DIR_GPU/MEG_fact_cu.cpp $BUILD_DIR_CPU/testing/src/hierarchical_fact_test.cpp $BUILD_DIR_CPU/testing/src/MEG_fact.cpp 
 
 	cd $BUILD_DIR_GPU
 	make cleanall 
