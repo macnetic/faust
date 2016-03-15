@@ -1,0 +1,254 @@
+floating point precision == double
+NFACTS : 6
+VERBOSE : 0
+UPDATEWAY : 0
+INIT_LAMBDA : 1
+ISFACTSIDELEFT : 0
+ISCONSTANTSTEPSIZE : 0
+step_size : 1e-16
+data :  nbRow 8193 NbCol : 204
+stop_crit_2facts : 200
+stop_crit_global : 200
+CONSTRAINT  : 5
+  FACTORS : 
+type_cont : INT CONSTRAINT_NAME_SPLIN nb_row :8193 nb_col :204 parameter :15
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :1632
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :1632
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :1632
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :1632
+
+
+  RESIDUUMS : 
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :41616
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :46610
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :37288
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :29830
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :23864
+
+
+launch
+hierarchical_fact_cu<T>::compute_facts : factorisation 1/5
+timers in palm4MSA_cu : 
+t_local_next_step           = 56.6039 s for 200 calls
+t grad + updateL + updateR  = 20.7239 s for 400 calls of grad
+t local_compute_c  = 15.1815 s for 400 calls of grad
+t_local_compute_lambda      = 8.34494 s for 200 calls
+t_local_compute_projection  = 12.0863 s for 400 calls
+
+t_local_compute_grad_over_c = 16.5001 s for 400 calls
+t_local_update_R            = 0.0244405 s for 200 calls
+t_local_update_L            = 4.19936 s for 400 calls
+t_check_                    = 0.00152096 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+
+timers in palm4MSA_cu : 
+t_local_next_step           = 55.2511 s for 200 calls
+t grad + updateL + updateR  = 20.8334 s for 400 calls of grad
+t local_compute_c  = 13.8536 s for 400 calls of grad
+t_local_compute_lambda      = 8.33394 s for 200 calls
+t_local_compute_projection  = 11.9587 s for 400 calls
+
+t_local_compute_grad_over_c = 16.6029 s for 400 calls
+t_local_update_R            = 0.0238826 s for 200 calls
+t_local_update_L            = 4.20666 s for 400 calls
+t_check_                    = 0.00158506 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+
+hierarchical_fact_cu<T>::compute_facts : factorisation 2/5
+timers in palm4MSA_cu : 
+t_local_next_step           = 50.818 s for 200 calls
+t grad + updateL + updateR  = 0.749693 s for 400 calls of grad
+t local_compute_c  = 49.3578 s for 400 calls of grad
+t_local_compute_lambda      = 0.339126 s for 200 calls
+t_local_compute_projection  = 0.279282 s for 400 calls
+
+t_local_compute_grad_over_c = 0.525317 s for 400 calls
+t_local_update_R            = 0.0647282 s for 200 calls
+t_local_update_L            = 0.159648 s for 400 calls
+t_check_                    = 0.00149632 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+
+timers in palm4MSA_cu : 
+t_local_next_step           = 73.8583 s for 200 calls
+t grad + updateL + updateR  = 33.7241 s for 600 calls of grad
+t local_compute_c  = 19.0059 s for 600 calls of grad
+t_local_compute_lambda      = 8.44075 s for 200 calls
+t_local_compute_projection  = 12.3842 s for 600 calls
+
+t_local_compute_grad_over_c = 25.1975 s for 600 calls
+t_local_update_R            = 0.129668 s for 200 calls
+t_local_update_L            = 8.39691 s for 600 calls
+t_check_                    = 0.00177434 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+
+hierarchical_fact_cu<T>::compute_facts : factorisation 3/5
+timers in palm4MSA_cu : 
+t_local_next_step           = 9.29747 s for 200 calls
+t grad + updateL + updateR  = 0.817997 s for 400 calls of grad
+t local_compute_c  = 6.40646 s for 400 calls of grad
+t_local_compute_lambda      = 0.387202 s for 200 calls
+t_local_compute_projection  = 1.57206 s for 400 calls
+
+t_local_compute_grad_over_c = 0.585218 s for 400 calls
+t_local_update_R            = 0.0223596 s for 200 calls
+t_local_update_L            = 0.210419 s for 400 calls
+t_check_                    = 0.00151706 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+
+timers in palm4MSA_cu : 
+t_local_next_step           = 92.2774 s for 200 calls
+t grad + updateL + updateR  = 45.8092 s for 800 calls of grad
+t local_compute_c  = 24.1397 s for 800 calls of grad
+t_local_compute_lambda      = 8.36872 s for 200 calls
+t_local_compute_projection  = 13.6529 s for 800 calls
+
+t_local_compute_grad_over_c = 33.2597 s for 800 calls
+t_local_update_R            = 0.225226 s for 200 calls
+t_local_update_L            = 12.3243 s for 800 calls
+t_check_                    = 0.00156944 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+
+hierarchical_fact_cu<T>::compute_facts : factorisation 4/5
+timers in palm4MSA_cu : 
+t_local_next_step           = 8.06777 s for 200 calls
+t grad + updateL + updateR  = 0.750522 s for 400 calls of grad
+t local_compute_c  = 5.37007 s for 400 calls of grad
+t_local_compute_lambda      = 0.381113 s for 200 calls
+t_local_compute_projection  = 1.47114 s for 400 calls
+
+t_local_compute_grad_over_c = 0.590745 s for 400 calls
+t_local_update_R            = 0.0219179 s for 200 calls
+t_local_update_L            = 0.137859 s for 400 calls
+t_check_                    = 0.00151427 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+
+timers in palm4MSA_cu : 
+t_local_next_step           = 109.965 s for 200 calls
+t grad + updateL + updateR  = 58.1764 s for 1000 calls of grad
+t local_compute_c  = 29.393 s for 1000 calls of grad
+t_local_compute_lambda      = 8.27709 s for 200 calls
+t_local_compute_projection  = 13.7881 s for 1000 calls
+
+t_local_compute_grad_over_c = 41.4945 s for 1000 calls
+t_local_update_R            = 0.324893 s for 200 calls
+t_local_update_L            = 16.3569 s for 1000 calls
+t_check_                    = 0.00157187 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+
+hierarchical_fact_cu<T>::compute_facts : factorisation 5/5
+timers in palm4MSA_cu : 
+t_local_next_step           = 20.1393 s for 200 calls
+t grad + updateL + updateR  = 0.795533 s for 400 calls of grad
+t local_compute_c  = 17.5135 s for 400 calls of grad
+t_local_compute_lambda      = 0.362196 s for 200 calls
+t_local_compute_projection  = 1.37179 s for 400 calls
+
+t_local_compute_grad_over_c = 0.558647 s for 400 calls
+t_local_update_R            = 0.066856 s for 200 calls
+t_local_update_L            = 0.17003 s for 400 calls
+t_check_                    = 0.00152058 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+
+timers in palm4MSA_cu : 
+t_local_next_step           = 129.598 s for 200 calls
+t grad + updateL + updateR  = 71.2295 s for 1200 calls of grad
+t local_compute_c  = 35.6259 s for 1200 calls of grad
+t_local_compute_lambda      = 8.37498 s for 200 calls
+t_local_compute_projection  = 13.9926 s for 1200 calls
+
+t_local_compute_grad_over_c = 50.2165 s for 1200 calls
+t_local_update_R            = 0.431483 s for 200 calls
+t_local_update_L            = 20.5815 s for 1200 calls
+t_check_                    = 0.00185011 s for 200 calls
+t_local_init_fact           = 0 s for 0 calls
+t_local_init_fact_from_palm = 0 s for 0 calls
+
+timers in palm4MSA_cu : 
+t_global_next_step           = 605.866 s for 2000 calls
+t grad + updateL + updateR  = 253.538 s for 6000 calls of grad
+t_global_compute_c = 215.821 s for 6000 calls
+t_global_compute_lambda      = 51.5993 s for 2000 calls
+t_global_compute_projection  = 82.5293 s for 6000 calls
+
+timers in hierarchical_fact_cu :
+t_init      = 0.000324831 s for 1 calls
+t_next_step = 605.958 s for 5 calls
+
+timers in faust_cu_mat :
+t_constructor_from_device    = 2.16839 s for 4854 calls
+t_constructor_from_host      = 0 s for 0 calls
+t_constructor_from_size      = 5.024e-06 s for 1 calls
+t_create                     = 3.10291 s for 69308 calls
+t_clear                      = 1.96578 s for 69308 calls
+t_copy_from_host             = 3.32496 s for 6001 calls
+t_copy_from_device           = 6.73713 s for 22043 calls
+t_copy_to_host               = 0 s for 0 calls
+t_copy_to_device             = 0 s for 0 calls
+t_init                       = 0 s for 0 t_init
+t_move_to_device             = 0 s for 0 calls
+t_set_zeros                  = 0.436149 s for 4016 calls
+t_set_eyes                   = 0.467091 s for 4005 calls
+t_transpose                  = 0 s for 0 calls
+t_init_from_transpose        = 0 s for 0 calls
+t_max                        = 0 s for 0 calls
+t_min                        = 0 s for 0 calls
+t_abs                        = 0 s for 0 calls
+t_norm                       = 0.00287194 s for 10 calls
+t_trace                      = 0.665364 s for 4000 calls
+t_spectral_norm2             = 215.457 s for 12000 calls
+t_scalar_multiply            = 0.557533 s for 5602 calls
+t_operator_equal_from_device = 4.78175 s for 17219 calls
+t_operator_equal_from_host   = 3.38301 s for 6001 calls
+t_operator_plus_equal        = 0.0099543 s for 801 calls
+t_operator_less_equal        = 0.806543 s for 6005 calls
+t_add_cuspmat                = 0 s for 0 calls
+t_sub                        = 0 s for 0 calls
+t_hadamard_product           = 0 s for 0 calls
+t_display                    = 0 s for 0 calls
+t_print_file                 = 0 s for 0 calls
+t_gemm                       = 369.268 s for 45995 calls
+t_gemv                       = 21.0845 s for 1101401 calls
+t_add_ext                    = 0 s for 0 calls
+t_power_iteration            = 146.254 s for 7995 calls
+       t_power_iteration_operator_equal = 9.23487 s for 1101401 calls
+       t_power_iteration_normalize      = 52.6741 s for 1101401 calls
+       t_power_iteration_gemv           = 29.7135 s for 1101401 calls
+       t_power_iteration_dot            = 25.8946 s for 1101401 calls
+
+
+timers in faust_cu_spmat :
+t_constructor_from_device   = 0.00333731 s for 40 calls
+t_constructor_from_host     = 0 s for 0 calls
+t_create                    = 0.00489158 s for 120 calls
+t_clear                     = 0.00331248 s for 80 calls
+t_copy_from_host            = 0 s for 0 calls
+t_copy_from_device          = 0.00253664 s for 20 calls
+t_copy_to_host              = 0 s for 0 calls
+t_copy_to_device            = 0 s for 0 calls
+t_move_to_device            = 0 s for 0 calls
+t_init_from_cuspmat         = 0.00272074 s for 40 calls
+t_init_from_spmat           = 0 s for 0 calls
+t_init_from_cumat           = 0.00902224 s for 20 calls
+t_init_from_mat             = 0 s for 0 calls
+t_scalar_multiply           = 0.000114208 s for 5 calls
+t_operator_plus_equal_real  = 0 s for 0 calls
+t_transpose                 = 0 s for 0 calls
+t_init_from_transpose       = 0 s for 0 calls
+t_norm                      = 0 s for 0 calls
+t_display                   = 0 s for 0 calls
+t_print_file                = 0 s for 0 calls
+t_csrmv                     = 0 s for 0 calls
+t_csrmm                     = 0.0177375 s for 15 calls
+
+
+total hierarchical fact = 605.944
+lambda=22480.338342747945717
