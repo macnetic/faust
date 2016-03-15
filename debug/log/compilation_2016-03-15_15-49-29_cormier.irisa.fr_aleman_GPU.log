@@ -1,0 +1,28 @@
+[36mCompiling     [31mhierarchical_fact_test_cu.o[m
+[36mCompiling     [31m../../matrix/matrix_cu/faust_cu_timer.o[m
+[36mCompiling     [31m../../matrix/matrix_cu/faust_cuda.o[m
+[36mCompiling     [31m../../matrix/matrix_cu/faust_timer.o[m
+[36mCompiling     [31m../../matrix/matrix_cu/kernels.cuo[m
+[36mCompiling     [31m../../matrix/matrix_cu/faust_cu_reduce.cuo[m
+[36mCompiling     [31m../../palm4MSA/palm4MSA_cu/faust_constraint_generic.o[m
+[36mCompiling     [31m../../palm4MSA/palm4MSA_cu/faust_constraint_int.o[m
+[36mCompiling     [31m../../init_from_matlab/faust_init_from_matio_params.o[m
+[36mCompiling     [31m../../init_from_matlab/faust_init_from_matio.o[m
+[36mCompiling     [31m../../init_from_matlab/faust_init_from_matio_core.o[m
+[36mCompiling     [31m../../init_from_matlab/faust_init_from_matio_mat.o[m
+[36mCompiling     [31m../../exception/faust_exception.o[m
+[36mCompiling     [31mMEG_fact_cu.o[m
+a - ../../palm4MSA/palm4MSA_cu/faust_constraint_generic.o
+a - ../../palm4MSA/palm4MSA_cu/faust_constraint_int.o
+a - ../../init_from_matlab/faust_init_from_matio_params.o
+a - ../../init_from_matlab/faust_init_from_matio.o
+a - ../../init_from_matlab/faust_init_from_matio_core.o
+a - ../../init_from_matlab/faust_init_from_matio_mat.o
+a - ../../exception/faust_exception.o
+a - ../../matrix/matrix_cu/faust_cu_timer.o
+a - ../../matrix/matrix_cu/faust_timer.o
+a - ../../matrix/matrix_cu/faust_cuda.o
+a - ../../matrix/matrix_cu/faust_cu_reduce.cuo
+a - ../../matrix/matrix_cu/kernels.cuo
+[36mLinking       [31mhierarchical_fact_test_cu.out[m
+[36mLinking       [31mMEG_fact_cu.out[m

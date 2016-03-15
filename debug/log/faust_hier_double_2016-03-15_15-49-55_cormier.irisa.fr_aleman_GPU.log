@@ -1,0 +1,29 @@
+floating point precision == double
+NFACTS : 4
+VERBOSE : 0
+UPDATEWAY : 0
+INIT_LAMBDA : 1
+ISFACTSIDELEFT : 0
+ISCONSTANTSTEPSIZE : 0
+step_size : 1e-16
+data :  nbRow 500 NbCol : 32
+stop_crit_2facts : 200
+stop_crit_global : 200
+CONSTRAINT  : 3
+  FACTORS : 
+type_cont : INT CONSTRAINT_NAME_SPLIN nb_row :500 nb_col :32 parameter :5
+type_cont : INT CONSTRAINT_NAME_SP nb_row :32 nb_col :32 parameter :96
+type_cont : INT CONSTRAINT_NAME_SP nb_row :32 nb_col :32 parameter :96
+
+
+  RESIDUUMS : 
+type_cont : FAUST_REAL CONSTRAINT_NAME_NORMCOL nb_row :32 nb_col :32 parameter :1
+type_cont : INT CONSTRAINT_NAME_SP nb_row :32 nb_col :32 parameter :666
+type_cont : INT CONSTRAINT_NAME_SP nb_row :32 nb_col :32 parameter :333
+
+
+hierarchical_fact_cu<T>::compute_facts : factorisation 1/3
+hierarchical_fact_cu<T>::compute_facts : factorisation 2/3
+hierarchical_fact_cu<T>::compute_facts : factorisation 3/3
+total hierarchical fact = 24.7694
+lambda=9401.5624586471858493
