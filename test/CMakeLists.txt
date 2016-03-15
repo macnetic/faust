@@ -1,3 +1,9 @@
+#TEST VERSION GPU
+foreach(gpucppin hierarchical_fact_test_cu MEG_fact_cu)
+      configure_file(${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp.in ${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp @ONLY)
+endforeach()
+
+
 if(FAUST_USE_MATIO)
 	#rajout OPENBLAS_INC_DIR pour la compatibilite UBUNTU
 	if(FAUST_USE_OPENBLAS)
@@ -15,10 +21,7 @@ endif()
 
 if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    
-	#TEST VERSION GPU
-	foreach(gpucppin hierarchical_fact_test_cu MEG_fact_cu)
-      configure_file(${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp.in ${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp @ONLY)
-	endforeach()
+
 	
 	
 	
@@ -172,7 +175,7 @@ endif(FAUST_USE_XML)
 # endif() 
 
 
-add_test(MEG_FACT, ${FAUST_TEST_BIN_DIR}/meg)   
+#add_test(MEG_FACT, ${FAUST_TEST_BIN_DIR}/meg)   
 
 
 	
