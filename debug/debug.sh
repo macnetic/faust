@@ -5,7 +5,7 @@ LOG_DIR="$DEBUG_DIR/log"
 
 export COMPILE_SPMAT=1
 export COMPILE_GPU=1
-export COMPILE_TIMERS=1
+#export COMPILE_TIMERS=1
 export OPENBLAS_NUM_THREADS=`cat /proc/cpuinfo |grep processor |wc -l`
 
 cd $DEBUG_DIR
