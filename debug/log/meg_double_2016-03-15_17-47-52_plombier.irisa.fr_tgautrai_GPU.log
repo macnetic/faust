@@ -1,0 +1,36 @@
+floating point precision == double
+NFACTS : 6
+VERBOSE : 0
+UPDATEWAY : 0
+INIT_LAMBDA : 1
+ISFACTSIDELEFT : 0
+ISCONSTANTSTEPSIZE : 0
+step_size : 1e-16
+data :  nbRow 8193 NbCol : 204
+stop_crit_2facts : 200
+stop_crit_global : 200
+CONSTRAINT  : 5
+  FACTORS : 
+type_cont : INT CONSTRAINT_NAME_SPLIN nb_row :8193 nb_col :204 parameter :15
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :1632
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :1632
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :1632
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :1632
+
+
+  RESIDUUMS : 
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :41616
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :46610
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :37288
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :29830
+type_cont : INT CONSTRAINT_NAME_SP nb_row :204 nb_col :204 parameter :23864
+
+
+launch
+hierarchical_fact_cu<T>::compute_facts : factorisation 1/5
+hierarchical_fact_cu<T>::compute_facts : factorisation 2/5
+hierarchical_fact_cu<T>::compute_facts : factorisation 3/5
+hierarchical_fact_cu<T>::compute_facts : factorisation 4/5
+hierarchical_fact_cu<T>::compute_facts : factorisation 5/5
+total hierarchical fact = 1097.79
+lambda=22480.338342747960269

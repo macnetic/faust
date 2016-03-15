@@ -1,0 +1,285 @@
+[  0%] [  2%] [  5%] Built target faust_core
+[  7%] [ 12%] [ 12%] Building CXX object exception/CMakeFiles/faust_exception.dir/faust_exception.cpp.o
+Generating API documentation with Doxygen
+[ 15%] Generating ../runtime_comparison/drawComptime1.m
+Building CXX object matrix/CMakeFiles/faust_matrix.dir/faust_timer.cpp.o
+[ 17%] Building CXX object matrix/CMakeFiles/faust_matrix.dir/cblas_algebra.cpp.o
+[ 20%] Building CXX object wrapper/mex/CMakeFiles/faust_mextools.dir/tools/tools_mex.cpp.o
+Building CXX object palm4MSA/CMakeFiles/faust_palm4MSA.dir/faust_constraint_generic.cpp.o
+Building CXX object palm4MSA/CMakeFiles/faust_palm4MSA.dir/faust_constraint_int.cpp.o
+[ 20%] [ 20%] Built target drawComp
+Built target faust_exception
+[ 20%] Built target faust_matrix
+[ 20%] Built target faust_mextools
+[ 20%] Built target faust_palm4MSA
+Linking CXX static library libfaust.a
+[ 20%] Built target faust
+[ 23%] [ 25%] Generating ../src/comp_time1.cpp
+Generating ../src/comp_time0.cpp
+Scanning dependencies of target meg
+Scanning dependencies of target faust_hier
+[ 30%] [ 30%] [ 33%] Building CXX object testing/bin/CMakeFiles/faust_test.dir/__/src/faust_test.cpp.o
+Building CXX object testing/bin/CMakeFiles/palm.dir/__/src/palm4MSA_test.cpp.o
+Building CXX object wrapper/cmd_line/bin/CMakeFiles/launch_hierarchical_fact.dir/__/src/launch_hierarchical_fact.cpp.o
+[ 38%] [ 38%] Building CXX object testing/bin/CMakeFiles/faust_hier.dir/__/src/hierarchical_fact_test.cpp.o
+Building CXX object testing/bin/CMakeFiles/meg.dir/__/src/MEG_fact.cpp.o
+Scanning dependencies of target comptime1
+Scanning dependencies of target comptime0
+[ 41%] [ 43%] [ 46%] [ 48%] Building CXX object testing/bin/CMakeFiles/comptime0.dir/__/src/comp_time0.cpp.o
+Building CXX object testing/bin/CMakeFiles/faust_test.dir/__/init_from_matlab/faust_init_from_matio.cpp.o
+Building CXX object testing/bin/CMakeFiles/comptime1.dir/__/src/comp_time1.cpp.o
+[ 51%] Building CXX object testing/bin/CMakeFiles/palm.dir/__/init_from_matlab/faust_init_from_matio.cpp.o
+[ 53%] [ 56%] Building CXX object wrapper/cmd_line/bin/CMakeFiles/launch_hierarchical_fact.dir/xml_tools/xml_utils.cpp.o
+Building CXX object testing/bin/CMakeFiles/faust_hier.dir/__/init_from_matlab/faust_init_from_matio.cpp.o
+[ 58%] Building CXX object testing/bin/CMakeFiles/faust_test.dir/__/init_from_matlab/faust_init_from_matio_mat.cpp.o
+Building CXX object testing/bin/CMakeFiles/meg.dir/__/init_from_matlab/faust_init_from_matio.cpp.o
+Linking CXX executable launch_hierarchical_fact
+[ 61%] [ 64%] [ 66%] [ 69%] Building CXX object testing/bin/CMakeFiles/faust_test.dir/__/init_from_matlab/faust_init_from_matio_params.cpp.o
+[ 71%] Building CXX object testing/bin/CMakeFiles/palm.dir/__/init_from_matlab/faust_init_from_matio_mat.cpp.o
+Building CXX object testing/bin/CMakeFiles/faust_hier.dir/__/init_from_matlab/faust_init_from_matio_mat.cpp.o
+Building CXX object testing/bin/CMakeFiles/comptime0.dir/__/init_from_matlab/faust_init_from_matio.cpp.o
+Building CXX object testing/bin/CMakeFiles/comptime1.dir/__/init_from_matlab/faust_init_from_matio.cpp.o
+Linking CXX executable palm
+Linking CXX executable faust_hier
+[ 74%] [ 76%] Building CXX object testing/bin/CMakeFiles/comptime0.dir/__/init_from_matlab/faust_init_from_matio_core.cpp.o
+[ 79%] Building CXX object testing/bin/CMakeFiles/meg.dir/__/init_from_matlab/faust_init_from_matio_mat.cpp.o
+[ 82%] Linking CXX executable faust_test
+Building CXX object testing/bin/CMakeFiles/comptime0.dir/__/init_from_matlab/faust_init_from_matio_mat.cpp.o
+Building CXX object testing/bin/CMakeFiles/comptime1.dir/__/init_from_matlab/faust_init_from_matio_mat.cpp.o
+Linking CXX executable meg
+[ 84%] Building CXX object testing/bin/CMakeFiles/comptime1.dir/__/init_from_matlab/faust_init_from_matio_core.cpp.o
+Linking CXX executable comptime0
+Linking CXX executable comptime1
+[ 84%] [ 84%] Built target palm
+[ 84%] Built target faust_hier
+Built target launch_hierarchical_fact
+[ 87%] Creating mex function mexLoadFaust.mexa64
+[ 87%] Built target faust_test
+[ 89%] [ 89%] [ 92%] Built target meg
+Building CXX object wrapper/cmd_line/bin/CMakeFiles/launch_palm4MSA.dir/__/src/launch_palm4MSA.cpp.o
+[ 94%] Building CXX object wrapper/cmd_line/bin/CMakeFiles/launch_palm4MSA.dir/xml_tools/xml_utils.cpp.o
+Creating mex function mexHierarchical_fact.mexa64
+[ 94%] [ 97%] Built target comptime0
+[ 97%] Creating mex function mexFaust.mexa64
+Built target comptime1
+[100%] Linking CXX executable launch_palm4MSA
+Creating mex function mexPalm4MSA.mexa64
+[100%] Built target launch_palm4MSA
+Verbose mode is on.
+... Looking for compiler 'g++' ...
+... Executing command 'which g++' ...Yes ('/usr/lib64/ccache/g++').
+... Executing command 'g++ -print-file-name=libstdc++.so' ...Yes ('/home/tgautrai/local/gcc/gcc.4.7.4/lib64/libstdc++.so').
+Found installed compiler 'g++'.
+Options file details
+-------------------------------------------------------------------
+	Compiler location: $GCC_DIR
+	Options file: /home/tgautrai/.matlab/R2015a/mex_C++_glnxa64.xml
+	CMDLINE1 : /usr/lib64/ccache/g++ -c -D_GNU_SOURCE -DMATLAB_MEX_FILE  -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include" -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG /home/tgautrai/faust2/interface_matlab/mex_functions/mexLoadFaust.cpp -o /tmp/mex_17712878149806_14365/mexLoadFaust.o
+	CMDLINE2 : /usr/lib64/ccache/g++  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build -shared -O3 -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map" /tmp/mex_17712878149806_14365/mexLoadFaust.o   /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++ -o mexLoadFaust.mexa64
+	CMDLINE3 : rm -f /tmp/mex_17712878149806_14365/mexLoadFaust.o
+	CXX : /usr/lib64/ccache/g++
+	DEFINES : -D_GNU_SOURCE -DMATLAB_MEX_FILE 
+	MATLABMEX : -DMATLAB_MEX_FILE 
+	CXXFLAGS : -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread
+	INCLUDE : -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include"
+	CXXOPTIMFLAGS : -O3 -DNDEBUG
+	CXXDEBUGFLAGS : -g
+	LDXX : /usr/lib64/ccache/g++
+	LDFLAGS :  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build
+	LDTYPE : -shared
+	LINKEXPORT : -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map"
+	LINKLIBS : /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++
+	LDOPTIMFLAGS : -O3
+	LDDEBUGFLAGS : -g
+	OBJEXT : .o
+	LDEXT : .mexa64
+	GCC : /usr/lib64/ccache/g++
+	CPPLIB_DIR : /home/tgautrai/local/gcc/gcc.4.7.4/lib64/libstdc++.so
+	MATLABROOT : /usr/local/MATLAB/R2015aSP1
+	ARCH : glnxa64
+	SRC : /home/tgautrai/faust2/interface_matlab/mex_functions/mexLoadFaust.cpp
+	OBJ : /tmp/mex_17712878149806_14365/mexLoadFaust.o
+	OBJS : /tmp/mex_17712878149806_14365/mexLoadFaust.o 
+	SRCROOT : /home/tgautrai/faust2/interface_matlab/mex_functions/mexLoadFaust
+	DEF : /tmp/mex_17712878149806_14365/mexLoadFaust.def
+	EXP : mexLoadFaust.exp
+	LIB : mexLoadFaust.lib
+	EXE : mexLoadFaust.mexa64
+	ILK : mexLoadFaust.ilk
+	MANIFEST : mexLoadFaust.mexa64.manifest
+	TEMPNAME : mexLoadFaust
+	EXEDIR : 
+	EXENAME : mexLoadFaust
+	OPTIM : -O3 -DNDEBUG
+	LINKOPTIM : -O3
+-------------------------------------------------------------------
+Building with 'g++'.
+/usr/lib64/ccache/g++ -c -D_GNU_SOURCE -DMATLAB_MEX_FILE  -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2Verbose mode is on.
+... Looking for compiler 'g++' ...
+... Executing command 'which g++' ...Yes ('/usr/lib64/ccache/g++').
+... Executing command 'g++ -print-file-name=libstdc++.so' ...Yes ('/home/tgautrai/local/gcc/gcc.4.7.4/lib64/libstdc++.so').
+Found installed compiler 'g++'.
+Options file details
+-------------------------------------------------------------------
+	Compiler location: $GCC_DIR
+	Options file: /home/tgautrai/.matlab/R2015a/mex_C++_glnxa64.xml
+	CMDLINE1 : /usr/lib64/ccache/g++ -c -D_GNU_SOURCE -DMATLAB_MEX_FILE  -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include" -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG /home/tgautrai/faust2/interface_matlab/mex_functions/mexHierarchical_fact.cpp -o /tmp/mex_17713211055577_14420/mexHierarchical_fact.o
+	CMDLINE2 : /usr/lib64/ccache/g++  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build -shared -O3 -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map" /tmp/mex_17713211055577_14420/mexHierarchical_fact.o   /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++ -o mexHierarchical_fact.mexa64
+	CMDLINE3 : rm -f /tmp/mex_17713211055577_14420/mexHierarchical_fact.o
+	CXX : /usr/lib64/ccache/g++
+	DEFINES : -D_GNU_SOURCE -DMATLAB_MEX_FILE 
+	MATLABMEX : -DMATLAB_MEX_FILE 
+	CXXFLAGS : -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread
+	INCLUDE : -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include"
+	CXXOPTIMFLAGS : -O3 -DNDEBUG
+	CXXDEBUGFLAGS : -g
+	LDXX : /usr/lib64/ccache/g++
+	LDFLAGS :  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build
+	LDTYPE : -shared
+	LINKEXPORT : -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map"
+	LINKLIBS : /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++
+	LDOPTIMFLAGS : -O3
+	LDDEBUGFLAGS : -g
+	OBJEXT : .o
+	LDEXT : .mexa64
+	GCC : /usr/lib64/ccache/g++
+	CPPLIB_DIR : /home/tgautrai/local/gcc/gcc.4.7.4/lib64/libstdc++.so
+	MATLABROOT : /usr/local/MATLAB/R2015aSP1
+	ARCH : glnxa64
+	SRC : /home/tgautrai/faust2/interface_matlab/mex_functions/mexHierarchical_fact.cpp
+	OBJ : /tmp/mex_17713211055577_14420/mexHierarchical_fact.o
+	OBJS : /tmp/mex_17713211055577_14420/mexHierarchical_fact.o 
+	SRCROOT : /home/tgautrai/faust2/interface_matlab/mex_functions/mexHierarchical_fact
+	DEF : /tmp/mex_17713211055577_14420/mexHierarchical_fact.def
+	EXP : mexHierarchical_fact.exp
+	LIB : mexHierarchical_fact.lib
+	EXE : mexHierarchical_fact.mexa64
+	ILK : mexHierarchical_fact.ilk
+	MANIFEST : mexHierarchical_fact.mexa64.manifest
+	TEMPNAME : mexHierarchical_fact
+	EXEDIR : 
+	EXENAME : mexHierarchical_fact
+	OPTIM : -O3 -DNDEBUG
+	LINKOPTIM : -O3
+-------------------------------------------------------------------
+Building with 'g++'.
+/usr/lib64/ccache/g++ -c -D_GNU_SOURCE -DMATLAB_MEXVerbose mode is on.
+... Looking for compiler 'g++' ...
+... Executing command 'which g++' ...Yes ('/usr/lib64/ccache/g++').
+... Executing command 'g++ -print-file-name=libstdc++.so' ...Yes ('/home/tgautrai/local/gcc/gcc.4.7.4/lib64/libstdc++.so').
+Found installed compiler 'g++'.
+Options file details
+-------------------------------------------------------------------
+	Compiler location: $GCC_DIR
+	Options file: /home/tgautrai/.matlab/R2015a/mex_C++_glnxa64.xml
+	CMDLINE1 : /usr/lib64/ccache/g++ -c -D_GNU_SOURCE -DMATLAB_MEX_FILE  -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include" -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG /home/tgautrai/faust2/interface_matlab/mex_functions/mexFaust.cpp -o /tmp/mex_17713251962817_14453/mexFaust.o
+	CMDLINE2 : /usr/lib64/ccache/g++  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build -shared -O3 -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map" /tmp/mex_17713251962817_14453/mexFaust.o   /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++ -o mexFaust.mexa64
+	CMDLINE3 : rm -f /tmp/mex_17713251962817_14453/mexFaust.o
+	CXX : /usr/lib64/ccache/g++
+	DEFINES : -D_GNU_SOURCE -DMATLAB_MEX_FILE 
+	MATLABMEX : -DMATLAB_MEX_FILE 
+	CXXFLAGS : -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread
+	INCLUDE : -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include"
+	CXXOPTIMFLAGS : -O3 -DNDEBUG
+	CXXDEBUGFLAGS : -g
+	LDXX : /usr/lib64/ccache/g++
+	LDFLAGS :  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build
+	LDTYPE : -shared
+	LINKEXPORT : -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map"
+	LINKLIBS : /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++
+	LDOPTIMFLAGS : -O3
+	LDDEBUGFLAGS : -g
+	OBJEXT : .o
+	LDEXT : .mexa64
+	GCC : /usr/lib64/ccache/g++
+	CPPLIB_DIR : /home/tgautrai/local/gcc/gcc.4.7.4/lib64/libstdc++.so
+	MATLABROOT : /usr/local/MATLAB/R2015aSP1
+	ARCH : glnxa64
+	SRC : /home/tgautrai/faust2/interface_matlab/mex_functions/mexFaust.cpp
+	OBJ : /tmp/mex_17713251962817_14453/mexFaust.o
+	OBJS : /tmp/mex_17713251962817_14453/mexFaust.o 
+	SRCROOT : /home/tgautrai/faust2/interface_matlab/mex_functions/mexFaust
+	DEF : /tmp/mex_17713251962817_14453/mexFaust.def
+	EXP : mexFaust.exp
+	LIB : mexFaust.lib
+	EXE : mexFaust.mexa64
+	ILK : mexFaust.ilk
+	MANIFEST : mexFaust.mexa64.manifest
+	TEMPNAME : mexFaust
+	EXEDIR : 
+	EXENAME : mexFaust
+	OPTIM : -O3 -DNDEBUG
+	LINKOPTIM : -O3
+-------------------------------------------------------------------
+Building with 'g++'.
+/usr/lib64/ccache/g++ -c -D_GNU_SOURCE -DMATLAB_MEX_FILE  -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2Verbose mode is on.
+... Looking for compiler 'g++' ...
+... Executing command 'which g++' ...Yes ('/usr/lib64/ccache/g++').
+... Executing command 'g++ -print-file-name=libstdc++.so' ...Yes ('/home/tgautrai/local/gcc/gcc.4.7.4/lib64/libstdc++.so').
+Found installed compiler 'g++'.
+Options file details
+-------------------------------------------------------------------
+	Compiler location: $GCC_DIR
+	Options file: /home/tgautrai/.matlab/R2015a/mex_C++_glnxa64.xml
+	CMDLINE1 : /usr/lib64/ccache/g++ -c -D_GNU_SOURCE -DMATLAB_MEX_FILE  -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include" -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG /home/tgautrai/faust2/interface_matlab/mex_functions/mexPalm4MSA.cpp -o /tmp/mex_17713369880955_14478/mexPalm4MSA.o
+	CMDLINE2 : /usr/lib64/ccache/g++  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build -shared -O3 -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map" /tmp/mex_17713369880955_14478/mexPalm4MSA.o   /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++ -o mexPalm4MSA.mexa64
+	CMDLINE3 : rm -f /tmp/mex_17713369880955_14478/mexPalm4MSA.o
+	CXX : /usr/lib64/ccache/g++
+	DEFINES : -D_GNU_SOURCE -DMATLAB_MEX_FILE 
+	MATLABMEX : -DMATLAB_MEX_FILE 
+	CXXFLAGS : -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread
+	INCLUDE : -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include"
+	CXXOPTIMFLAGS : -O3 -DNDEBUG
+	CXXDEBUGFLAGS : -g
+	LDXX : /usr/lib64/ccache/g++
+	LDFLAGS :  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build
+	LDTYPE : -shared
+	LINKEXPORT : -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map"
+	LINKLIBS : /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++
+	LDOPTIMFLAGS : -O3
+	LDDEBUGFLAGS : -g
+	OBJEXT : .o
+	LDEXT : .mexa64
+	GCC : /usr/lib64/ccache/g++
+	CPPLIB_DIR : /home/tgautrai/local/gcc/gcc.4.7.4/lib64/libstdc++.so
+	MATLABROOT : /usr/local/MATLAB/R2015aSP1
+	ARCH : glnxa64
+	SRC : /home/tgautrai/faust2/interface_matlab/mex_functions/mexPalm4MSA.cpp
+	OBJ : /tmp/mex_17713369880955_14478/mexPalm4MSA.o
+	OBJS : /tmp/mex_17713369880955_14478/mexPalm4MSA.o 
+	SRCROOT : /home/tgautrai/faust2/interface_matlab/mex_functions/mexPalm4MSA
+	DEF : /tmp/mex_17713369880955_14478/mexPalm4MSA.def
+	EXP : mexPalm4MSA.exp
+	LIB : mexPalm4MSA.lib
+	EXE : mexPalm4MSA.mexa64
+	ILK : mexPalm4MSA.ilk
+	MANIFEST : mexPalm4MSA.mexa64.manifest
+	TEMPNAME : mexPalm4MSA
+	EXEDIR : 
+	EXENAME : mexPalm4MSA
+	OPTIM : -O3 -DNDEBUG
+	LINKOPTIM : -O3
+-------------------------------------------------------------------
+Building with 'g++'.
+/usr/lib64/ccache/g++ -c -D_GNU_SOURCE -DMATLAB_MEX_FILE  -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home[100%] Built target doc
+/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include" -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG /home/tgautrai/faust2/interface_matlab/mex_functions/mexLoadFaust.cpp -o /tmp/mex_17712878149806_14365/mexLoadFaust.o
+/usr/lib64/ccache/g++  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build -shared -O3 -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map" /tmp/mex_17712878149806_14365/mexLoadFaust.o   /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++ -o mexLoadFaust.mexa64
+rm -f /tmp/mex_17712878149806_14365/mexLoadFaust.o
+MEX completed successfully.
+[100%] Built target mexLoadFaust
+/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include" -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG /home/tgautrai/faust2/interface_matlab/mex_functions/mexPalm4MSA.cpp -o /tmp/mex_17713369880955_14478/mexPalm4MSA.o
+/usr/lib64/ccache/g++  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build -shared -O3 -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map" /tmp/mex_17713369880955_14478/mexPalm4MSA.o   /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++ -o mexPalm4MSA.mexa64
+rm -f /tmp/mex_17713369880955_14478/mexPalm4MSA.o
+MEX completed successfully.
+[100%] Built target mexPalm4MSA
+/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include" -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG /home/tgautrai/faust2/interface_matlab/mex_functions/mexFaust.cpp -o /tmp/mex_17713251962817_14453/mexFaust.o
+/usr/lib64/ccache/g++  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build -shared -O3 -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map" /tmp/mex_17713251962817_14453/mexFaust.o   /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++ -o mexFaust.mexa64
+rm -f /tmp/mex_17713251962817_14453/mexFaust.o
+MEX completed successfully.
+[100%] Built target mexFaust
+_FILE  -I/usr/local/MATLAB/R2015aSP1/extern/include -I/home/tgautrai/faust2/eigen -I/home/tgautrai/faust2/matrix -I/home/tgautrai/faust2/palm4MSA -I/home/tgautrai/faust2/faust_core -I/home/tgautrai/faust2/interface_matlab/mex_functions -I/home/tgautrai/faust2/exception -I/home/tgautrai/faust2/interface_matlab -I/home/tgautrai/faust2/interface_matlab/tools -I/home/tgautrai/local/OpenBLAS-0.2.14  -I"/usr/local/MATLAB/R2015aSP1/extern/include" -I"/usr/local/MATLAB/R2015aSP1/simulink/include" -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -O3 -DNDEBUG /home/tgautrai/faust2/interface_matlab/mex_functions/mexHierarchical_fact.cpp -o /tmp/mex_17713211055577_14420/mexHierarchical_fact.o
+/usr/lib64/ccache/g++  -Wl,-rpath=/usr/local/MATLAB/R2015aSP1/bin/glnxa64:/home/tgautrai/faust2/output/lib:/home/tgautrai/faust2/build -shared -O3 -Wl,--version-script,"/usr/local/MATLAB/R2015aSP1/extern/lib/glnxa64/mexFunction.map" /tmp/mex_17713211055577_14420/mexHierarchical_fact.o   /home/tgautrai/local/OpenBLAS-0.2.14/libopenblas.so  -lfaust   -L/home/tgautrai/faust2/build   -Wl,-rpath-link,/usr/local/MATLAB/R2015aSP1/bin/glnxa64 -L"/usr/local/MATLAB/R2015aSP1/bin/glnxa64" -lmx -lmex -lmat -lm -lstdc++ -o mexHierarchical_fact.mexa64
+rm -f /tmp/mex_17713211055577_14420/mexHierarchical_fact.o
+MEX completed successfully.
+[100%] Built target mexHierarchical_fact
+[100%] Built target faust_mex

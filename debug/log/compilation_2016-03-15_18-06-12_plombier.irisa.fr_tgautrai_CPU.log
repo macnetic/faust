@@ -1,0 +1,29 @@
+[  8%] [  8%] [ 25%] [ 25%] [ 33%] Built target faust_core
+Generating API documentation with Doxygen
+Building CXX object exception/CMakeFiles/faust_exception.dir/faust_exception.cpp.o
+Building CXX object matrix/CMakeFiles/faust_matrix.dir/faust_timer.cpp.o
+Building CXX object matrix/CMakeFiles/faust_matrix.dir/cblas_algebra.cpp.o
+[ 41%] [ 50%] Building CXX object palm4MSA/CMakeFiles/faust_palm4MSA.dir/faust_constraint_generic.cpp.o
+[ 50%] Built target faust_exception
+Building CXX object palm4MSA/CMakeFiles/faust_palm4MSA.dir/faust_constraint_int.cpp.o
+[ 50%] Built target faust_matrix
+[ 50%] Built target faust_palm4MSA
+Linking CXX static library libfaust.a
+[ 50%] Built target faust
+[ 58%] [ 66%] Scanning dependencies of target meg
+Scanning dependencies of target faust_hier
+[ 75%] Building CXX object wrapper/cmd_line/bin/CMakeFiles/launch_palm4MSA.dir/__/src/launch_palm4MSA.cpp.o
+[ 83%] Building CXX object wrapper/cmd_line/bin/CMakeFiles/launch_palm4MSA.dir/xml_tools/xml_utils.cpp.o
+Building CXX object wrapper/cmd_line/bin/CMakeFiles/launch_hierarchical_fact.dir/xml_tools/xml_utils.cpp.o
+Building CXX object wrapper/cmd_line/bin/CMakeFiles/launch_hierarchical_fact.dir/__/src/launch_hierarchical_fact.cpp.o
+[ 91%] [100%] Building CXX object testing/bin/CMakeFiles/faust_hier.dir/__/src/hierarchical_fact_test.cpp.o
+Linking CXX executable launch_palm4MSA
+Building CXX object testing/bin/CMakeFiles/meg.dir/__/src/MEG_fact.cpp.o
+Linking CXX executable faust_hier
+Linking CXX executable launch_hierarchical_fact
+Linking CXX executable meg
+[100%] Built target launch_hierarchical_fact
+[100%] [100%] Built target launch_palm4MSA
+Built target faust_hier
+[100%] Built target meg
+[100%] Built target doc
