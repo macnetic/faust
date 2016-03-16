@@ -1,0 +1,35 @@
+INSTALLATION README :
+
+
+
+OS : Ubuntu 14.04 (Virtual Machine)
+
+	installation librarie en ligne de commande
+		I-OPENBLAS
+		II-MATIO
+		III-LIBXML
+
+
+		I-OPENBLAS
+			page web : http://www.openblas.net/
+			téléchargement en ligne de commande : 'wget http://github.com/xianyi/OpenBLAS/archive/v0.2.15.tar.gz' 	
+			décompresser l'archive : 'tar xvf v0.2.15.tar.gz'
+			aller dans le repertoire creer : 'cd OpenBLAS-0.2.15'
+			compilation installation : make TARGET=NEHALEM 
+
+
+		II-MATIO
+			page web : 	
+			téléchargement : WARNING 'wget http://vorboss.dl.sourceforge.net/matio-1.5.6.7.Zz' donne une archive corrompu
+				  	 éviter les direct link avec wget
+			pour télécharger en ligne de commande : https://github.com/telehan/cantools-trunk
+			regarder fichier README : et faire 'wget 'http://downloads.sourceforge.net/matio/matio-1.5.2.tar.gz?use_mirror='
+
+			décompresser : unzip ou untar ou 7z suivant le format de l'archive
+			comp
+		III-LIBXML
+			apt-get install libxml2
+			apt-get install libxml2-dev
+
+			INCLUDE_DIR=/usr/include/libxml2/libxml/
+			LIB_FILE=/usr/lib/x86_64-linux-gnu/libxml2.so
