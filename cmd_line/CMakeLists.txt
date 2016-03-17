@@ -28,7 +28,7 @@ endif(FAUST_USE_OPENBLAS)
 		endif()
 	
 	endforeach()
-	install(TARGETS launch_hierarchical_fact launch_palm4MSA DESTINATION ${FAUST_CMDLINE_BIN_DIR})
+	#install(TARGETS launch_hierarchical_fact launch_palm4MSA DESTINATION ${FAUST_CMDLINE_BIN_DIR})
 	
 
    
