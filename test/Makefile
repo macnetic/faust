@@ -1,14 +1,14 @@
 CXX=g++
 
-MATRIX_DIR  = $(FAUST_ROOT_DIR)/trunk/devcpp/matrix
-PALM_DIR    = $(FAUST_ROOT_DIR)/trunk/devcpp/palm4MSA
-INIT_MATLAB = $(FAUST_ROOT_DIR)/trunk/devcpp/init_from_matlab
-FAUST_CORE = $(FAUST_ROOT_DIR)/trunk/devcpp/faust_core
-MATLAB_INTERFACE_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/interface_matlab
+MATRIX_DIR  = /home/tgautrai/faust2/matrix
+PALM_DIR    = /home/tgautrai/faust2/palm4MSA
+INIT_MATLAB = /home/tgautrai/faust2/init_from_matlab
+FAUST_CORE = /home/tgautrai/faust2/faust_core
+ERROR_DIR = /home/tgautrai/faust2/exception
+TESTS_DIR = /home/tgautrai/faust2/test/src
+MATLAB_INTERFACE_DIR = /home/tgautrai/faust2/interface_matlab
 MATLAB_INTERFACE_TOOL_DIR = $(MATLAB_INTERFACE_DIR)/tools
 MATLAB_INTERFACE_MEX_DIR = $(MATLAB_INTERFACE_DIR)/mex_functions
-ERROR_DIR = $(FAUST_ROOT_DIR)/trunk/devcpp/exception
-
 
 SRC_CPP = $(wildcard $(PALM_DIR)/*.cpp)  #$(filter-out $(PALM_DIR)/hierarchical_fact.cpp,$(wildcard $(PALM_DIR)/*.cpp))    #$(wildcard $(PALM_DIR)/*.cpp)
 SRC_CPP += $(wildcard $(INIT_MATLAB)/*.cpp)
@@ -69,7 +69,8 @@ RESET_FONT =\033[0m
 
 MEX_EXE = $(MATLAB_INTERFACE_MEX_DIR)/mexHierarchical_fact.mexa64 $(MATLAB_INTERFACE_MEX_DIR)/mexLoadFaust.mexa64 $(MATLAB_INTERFACE_MEX_DIR)/faust_mex.mexa64
 
-EXECUTABLE=hier_fact hier_fact2 hier_fact3 palm meg meg_new meg_old faust comptime0 comptime comptime2 $(MEX_EXE) 
+#EXECUTABLE=$(TESTS_DIR)/hier_fact $(TESTS_DIR)/hier_fact2 $(TESTS_DIR)/hier_fact3 $(TESTS_DIR)/palm $(TESTS_DIR)/meg $(TESTS_DIR)/meg_new $(TESTS_DIR)/meg_old $(TESTS_DIR)/faust $(TESTS_DIR)/comptime0 $(TESTS_DIR)/comptime $(TESTS_DIR)/comptime2 $(MEX_EXE) 
+EXECUTABLE=$(TESTS_DIR)/comptime0 $(TESTS_DIR)/comptime $(TESTS_DIR)/comptime2 
 
 # instruction pour que les fichiers .o.mex ne soient pas automatiquement detruits apres les appels aux cibles all ou mex
 .PRECIOUS: %.o.mex
@@ -78,59 +79,59 @@ all: $(EXECUTABLE)
 
 mex: $(MEX_EXE)
 
-hier_fact: hierarchical_fact_test.o $(OBJS)
+$(TESTS_DIR)/hier_fact: $(TESTS_DIR)/hierarchical_fact_test.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 
-hier_fact2: hierarchical_fact_test2.o $(OBJS)
-	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
-	@$(CXX) $(LDFLAGS) $^ -o $@
-	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
-	
-hier_fact3: hierarchical_fact_test3.o $(OBJS)
-	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
-	@$(CXX) $(LDFLAGS) $^ -o $@
-	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
-
-
-
-palm:$(OBJS) palm4MSA_test.o
-	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
-	@$(CXX) $(LDFLAGS) $^ -o $@
-	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
-
-meg:$(OBJS) MEG_fact.o
+$(TESTS_DIR)/hier_fact2: $(TESTS_DIR)/hierarchical_fact_test2.o $(OBJS)
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 	
-meg_new:$(OBJS) MEG_fact.o
+$(TESTS_DIR)/hier_fact3: $(TESTS_DIR)/hierarchical_fact_test3.o $(OBJS)
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+
+
+
+$(TESTS_DIR)/palm:$(OBJS) $(TESTS_DIR)/palm4MSA_test.o
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+
+$(TESTS_DIR)/meg:$(OBJS) $(TESTS_DIR)/MEG_fact.o
+	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
+	@$(CXX) $(LDFLAGS) $^ -o $@
+	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
+	
+$(TESTS_DIR)/meg_new:$(OBJS) $(TESTS_DIR)/MEG_fact.o
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'	
 	
-meg_old:$(OBJS) MEG_fact.o
+$(TESTS_DIR)/meg_old:$(OBJS) $(TESTS_DIR)/MEG_fact.o
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'		
 
-faust:$(OBJS) faust_test.o 
+$(TESTS_DIR)/faust:$(OBJS) $(TESTS_DIR)/faust_test.o 
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 
-comptime0:$(OBJS) comp_time0.o 
+$(TESTS_DIR)/comptime0:$(OBJS) $(TESTS_DIR)/comp_time0.o 
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 	
-comptime:$(OBJS) comp_time.o 
+$(TESTS_DIR)/comptime:$(OBJS) $(TESTS_DIR)/comp_time.o 
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'
 	
-comptime2:$(OBJS) comp_time2.o 
+$(TESTS_DIR)/comptime2:$(OBJS) $(TESTS_DIR)/comp_time2.o 
 	@printf "$(FONT)$(YELLOW)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n" 'Linking' '       ' "$@"
 	@$(CXX) $(LDFLAGS) $^ -o $@
 	@printf '\n$(FONT)$(BOLD)$(GREEN)Executable has been correctly generated$(FONT)$(BOLD)$(BLINK)$(YELLOW) :)$(RESET_FONT)\n\n\n'

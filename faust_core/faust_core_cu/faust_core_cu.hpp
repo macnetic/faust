@@ -162,14 +162,18 @@ faust_cu_mat<T> faust_core_cu<T>::get_product(cublasHandle_t cublasHandle, cuspa
 	{
 		prod.init_from_cu_spmat(data[0], cusparseHandle);	
 		for(int i=1 ; i<data.size() ; i++)
+		{
 		   //prod *= data[i];	
          gemm(prod, data[i], prod, cublasHandle, cusparseHandle);
+		}
 	}else
 	{	
 		prod.init_from_cu_spmat(data[size()-1], cusparseHandle);	
 		for(int i=data.size()-2 ; i>=0 ; i--)
+		{
 		   //prod.multiplyLeft(data[i]);	
          gemm(data[i], prod, prod, cusparseHandle);
+		}
 	}	
    
    

@@ -726,19 +726,32 @@ void multiply(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_mat<faust_r
 // C = alpha*op(A)*op(B) + beta*C (with B sparse)
 template <typename faust_real>
 void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const faust_real alpha, const faust_real beta, const char opA, const char opB, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle)
-{char opAt=(opA=='N')?'T':'N';char opBt=(opB=='N')?'T':'N';gemm(cu_B, cu_A, cu_C, alpha, beta, opBt, opAt, cusparseHandle);cu_C.transpose(cublasHandle);}
+{
+	char opAt=(opA=='N')?'T':'N';
+	char opBt=(opB=='N')?'T':'N';
+	if(opAt=='T' && opBt=='T')
+	{
+		faust_cu_mat<faust_real> cu_B_full(cu_B, cusparseHandle);
+		gemm(cu_A, cu_B_full, cu_C, alpha, beta, 'N', 'N', cublasHandle);
+	}
+	else
+	{
+		gemm(cu_B, cu_A, cu_C, alpha, beta, opBt, opAt, cusparseHandle);
+		cu_C.transpose(cublasHandle);
+	}
+}
 // C = op(A) * op(B) (with B sparse)
 template <typename faust_real>
 void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, const char opA, const char opB, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle)
-{char opAt=(opA=='N')?'T':'N';char opBt=(opB=='N')?'T':'N';gemm(cu_B, cu_A, cu_C, faust_real(1.0), faust_real(0.0), opBt, opAt, cusparseHandle);cu_C.transpose(cublasHandle);}
+{gemm(cu_A, cu_B, cu_C, faust_real(1.0), faust_real(0.0), opA, opB, cublasHandle, cusparseHandle);}
 // C = A * B (with B sparse)
 template <typename faust_real>
 void gemm(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle)
-{gemm(cu_B, cu_A, cu_C, faust_real(1.0), faust_real(0.0), 'T', 'T', cusparseHandle);cu_C.transpose(cublasHandle);}
+{gemm(cu_A, cu_B, cu_C, faust_real(1.0), faust_real(0.0), 'N', 'N', cublasHandle, cusparseHandle);}
 // C = A * B (with B sparse)
 template <typename faust_real>
 void multiply(const faust_cu_mat<faust_real>& cu_A, const faust_cu_spmat<faust_real>& cu_B, faust_cu_mat<faust_real>& cu_C, cublasHandle_t cublasHandle, cusparseHandle_t cusparseHandle)
-{ gemm(cu_B, cu_A, cu_C, faust_real(1.0), faust_real(0.0), 'T', 'T', cusparseHandle);cu_C.transpose(cublasHandle);}
+{ gemm(cu_A, cu_B, cu_C, faust_real(1.0), faust_real(0.0), 'N', 'N', cublasHandle, cusparseHandle);}
 
 //////////////////////////////////////////////////
 #endif // __COMPILE_SPMAT__

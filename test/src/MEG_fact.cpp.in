@@ -10,6 +10,7 @@
 #include "hierarchical_fact.h"
 #include "faust_timer.h"
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 
 using namespace std;
@@ -17,49 +18,58 @@ typedef double faust_real;//faust floating point precision
 
 /** \brief Run the hierarchical factorization of the MEG data.
  */
-int main()
+int main(int argc, char* argv[])
 {	
-  if (typeid(faust_real) == typeid(double))
-  {
-	cout<<"floating point precision == double"<<endl;
-  }
+	if (typeid(faust_real) == typeid(double))
+		cout<<"floating point precision == double"<<endl;
 
-  if (typeid(faust_real) == typeid(float))
-  {
-	cout<<"floating point precision == float"<<endl;
-  }
-  faust_mat<faust_real> data, init_facts1, init_facts2;
+	else if (typeid(faust_real) == typeid(float))
+		cout<<"floating point precision == float"<<endl;
 
-  char config_MEG_filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat";
+	for(int j=1 ; j<argc ; j++)
+	{
+		char config_MEG_filename[200];
+		if (argc<2)
+			strcpy(config_MEG_filename,"@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat");
+		else
+			strcpy(config_MEG_filename,argv[j]);
 
-  
-  faust_params<faust_real> params; 
-  init_params_from_matiofile(params,config_MEG_filename,"params");
-  params.Display();
-  cout<<"launch"<<endl;	
-  hierarchical_fact<faust_real> hier_fact(params);
+		ifstream myFile(config_MEG_filename);
+		if(myFile.fail())
+			continue;
 
-  faust_timer t1;
-  t1.start();
+
+		faust_mat<faust_real> data, init_facts1, init_facts2;
+ 
+		faust_params<faust_real> params; 
+		init_params_from_matiofile(params,config_MEG_filename,"params");
+		params.Display();
+		cout<<"launch"<<endl;	
+		hierarchical_fact<faust_real> hier_fact(params);
+
+		faust_timer t1;
+		t1.start();
      
-   hier_fact.compute_facts();
+		hier_fact.compute_facts();
 
-  t1.stop();
-#ifdef __COMPILE_TIMERS__
-  hier_fact.print_timers();
-#endif
-  cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
+		t1.stop();
+		#ifdef __COMPILE_TIMERS__
+		hier_fact.print_timers();
+		#endif
+		cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 
-  vector<faust_spmat<faust_real> > facts;
-  hier_fact.get_facts(facts);
-  (facts[0]) *= hier_fact.get_lambda();
-  char nomFichier[100];
-  for (int i=0 ; i<facts.size() ; i++)
-  {
-     sprintf(nomFichier, "@FAUST_TESTOUTPUT_BIN_DIR@/facts%d_cpp.dat",i);
-     facts[i].print_file(nomFichier);
-  }
-  cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
+		vector<faust_spmat<faust_real> > facts;
+		hier_fact.get_facts(facts);
+		(facts[0]) *= hier_fact.get_lambda();
+		char nomFichier[100];
+		for (int i=0 ; i<facts.size() ; i++)
+		{
+			sprintf(nomFichier, "@FAUST_TESTOUTPUT_BIN_DIR@/facts%d_cpp.dat",i);
+			facts[i].print_file(nomFichier);
+		}
+		cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl<<endl;
 
-return 0;
+	}
+
+	return 0;
 }
