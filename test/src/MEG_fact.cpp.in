@@ -36,8 +36,10 @@ int main(int argc, char* argv[])
 
 		ifstream myFile(config_MEG_filename);
 		if(myFile.fail())
+		{
+			cerr << "Warning : in file " << __FILE__ <<", line " << __LINE__<< " : file " << config_MEG_filename << " doesn't exist. " << endl;
 			continue;
-
+		}
 
 		faust_mat<faust_real> data, init_facts1, init_facts2;
  
