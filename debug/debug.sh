@@ -23,13 +23,15 @@ do
 	make cleanall 
 	make  >> "$LOG_DIR/compilation_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_GPU.log" 2>&1
 	cd $DEBUG_DIR
-	#$BUILD_DIR_GPU/hierarchical_fact_test_cu.out | tee -a "$LOG_DIR/faust_hier_${precision}_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_GPU.log"
-	find $FAUST_DATA_TEST -name "config_*rows*cols*.mat" -exec $BUILD_DIR_GPU/MEG_fact_cu.out {} \;  | tee -a "$LOG_DIR/meg_${precision}_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_GPU.log"
+	$BUILD_DIR_GPU/hierarchical_fact_test_cu.out | tee -a "$LOG_DIR/faust_hier_${precision}_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_GPU.log"
+	#find $FAUST_DATA_TEST -name "config_*rows*cols*.mat" -exec $BUILD_DIR_GPU/MEG_fact_cu.out {} \;  | tee -a "$LOG_DIR/meg_${precision}_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_GPU.log"
+	$BUILD_DIR_GPU/MEG_fact_cu.out | tee -a "$LOG_DIR/meg_${precision}_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_GPU.log"
 
 	cd $BUILD_DIR_CPU 
 	make clean
 	make  meg faust_hier >> "$LOG_DIR/compilation_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_CPU.log" 2>&1
 	cd $DEBUG_DIR
-	#$BUILD_DIR_CPU/testing/bin/faust_hier | tee -a "$LOG_DIR/faust_hier_${precision}_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_CPU.log"
-	find $FAUST_DATA_TEST -name "config_*rows*cols*.mat" -exec $BUILD_DIR_CPU/testing/bin/meg {} \;   | tee -a "$LOG_DIR/meg_${precision}_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_CPU.log"
+	$BUILD_DIR_CPU/testing/bin/faust_hier | tee -a "$LOG_DIR/faust_hier_${precision}_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_CPU.log"
+	#find $FAUST_DATA_TEST -name "config_*rows*cols*.mat" -exec $BUILD_DIR_CPU/testing/bin/meg {} \;   | tee -a "$LOG_DIR/meg_${precision}_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_CPU.log"
+	$BUILD_DIR_CPU/testing/bin/meg | tee -a "$LOG_DIR/meg_${precision}_`date '+%Y-%m-%d_%H-%M-%S'`_`hostname`_`whoami`_CPU.log"
 done
