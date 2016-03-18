@@ -26,7 +26,13 @@ int main(int argc, char* argv[])
 	else if (typeid(faust_real) == typeid(float))
 		cout<<"floating point precision == float"<<endl;
 
-	for(int j=1 ; j<argc ; j++)
+	int nb_run;
+	if (argc<2)
+		nb_run = 1;
+	else
+		nb_run = argc-1;
+
+	for(int j=1 ; j<=nb_run ; j++)
 	{
 		char config_MEG_filename[200];
 		if (argc<2)
