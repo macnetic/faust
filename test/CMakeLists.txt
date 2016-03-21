@@ -20,12 +20,26 @@ else()
 endif()
 
 if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
-   
 
-	
-	
-	
-   foreach(cppin faust_test hierarchical_fact_test MEG_fact palm4MSA_test)
+# effectuer les test en simple et double precision  
+foreach(TEST_FPP float double)	
+   foreach(testin hierarchical_fact)
+	#change the configuration
+	configure_file(${FAUST_TESTSRC_SRC_DIR}/${testin}.in ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
+
+	add_executable(${testin}_${TEST_FPP} ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp ${FAUST_TESTSRC_BIN_DIR}/ ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
+   	
+	if(FAUST_USE_OPENBLAS)
+      		target_link_libraries(${testin}_${TEST_FPP}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+   	else(FAUST_USE_OPENBLAS)
+      		target_link_libraries(${testin}_${TEST_FPP}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+
+   	endif(FAUST_USE_OPENBLAS)	
+   endforeach()
+endforeach()
+
+
+   foreach(cppin faust_test palm4MSA_test)
       configure_file(${FAUST_TESTSRC_SRC_DIR}/${cppin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${cppin}.cpp @ONLY)
    endforeach()
    #CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp COPYONLY)
@@ -44,22 +58,6 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
       target_link_libraries(palm  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
    endif()
 
-
-   # hier_fact
-   add_executable(faust_hier ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_test.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
-   if(FAUST_USE_OPENBLAS)
-      target_link_libraries(faust_hier  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
-   else()
-      target_link_libraries(faust_hier  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
-   endif()
-
-   # meg
-   add_executable(meg ${FAUST_TESTSRC_BIN_DIR}/MEG_fact.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
-   if(FAUST_USE_OPENBLAS)
-      target_link_libraries(meg ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
-   else()
-      target_link_libraries(meg ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
-   endif()
 
    # faust
    add_executable(faust_test ${FAUST_TESTSRC_BIN_DIR}/faust_test.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_params.cpp)
@@ -96,9 +94,11 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
       INSTALL(FILES ${FAUST_TESTRUNCOMP_BIN_DIR}/${matlabscript} DESTINATION ${FAUST_INSTALL_TESTRUNCOMP})
    ENDFOREACH()
 
-
-
-   install(TARGETS  palm faust_hier meg faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
+if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
+   install(TARGETS  palm hierarchical_fact_double hierarchical_fact_float faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
+else()
+   install(TARGETS  palm faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
+endif()
    #install(TARGETS faust_hier meg faust_test comptime0 DESTINATION ${FAUST_INSTALL_TESTING_BIN})
    #install(FILES ${FAUST_TESTDATA_SRC_DIR}/config_compared_palm2.mat 
    #              ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 
@@ -115,7 +115,7 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 	#add_executable(time_comp_mat time_comp_spmat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp)	
 	#target_link_libraries(time_comp_mat ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
 	
-else()	
+else(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)	
 	### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST
 	foreach(cppinbis hierarchical_fact_test MEG_fact)
       configure_file(${FAUST_TESTSRC_SRC_DIR}/${cppinbis}.cpp.inbis ${FAUST_TESTSRC_BIN_DIR}/${cppinbis}.cpp @ONLY)
@@ -164,9 +164,18 @@ endif(FAUST_USE_MEX)
 
 
 add_test(FAUST_HIER, ${FAUST_TEST_BIN_DIR}/faust_hier)
+if (FAUST_USE_MATIO)
+	add_test(FAUST_HIER_DOUBLE, ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double 	${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+	add_test(FAUST_HIER_FLOAT, ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+	add_test(MEG_FACT_FLOAT, ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22480 100)
+	add_test(MEG_FACT_DOUBLE, ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22480 100)
+	  
+endif (FAUST_USE_MATIO)
+
 if (FAUST_USE_XML)
 	add_test(FAUST_HIER_CMDLINE, ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt )
 	add_test(FAUST_HIER_TRANSPOSE_CMDLINE, ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/trans_hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt  T)
+	add_test(MEG_CMDLINE, ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/MEG_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/MEG_data.txt )
 endif(FAUST_USE_XML)
 # if(FAUST_USE_MEX)
 	# add_test(FAUST_HIER_MEX, matlab  ${FAUST_TEST_BIN_DIR}/hier_fact.m)
@@ -175,7 +184,7 @@ endif(FAUST_USE_XML)
 # endif() 
 
 
-#add_test(MEG_FACT, ${FAUST_TEST_BIN_DIR}/meg)   
+ 
 
 
 	
