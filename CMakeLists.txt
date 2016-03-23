@@ -45,6 +45,19 @@ endif()
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE STRING "" FORCE)
 
 
+
+# different option of configuration
+set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
+set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
+set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
+set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
+set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read matfile")
+set(FAUST_USE_XML ON CACHE BOOL "Using xml configuration file")
+set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
+set(FAUST_GEN_DOC OFF CACHE BOOL "Generate html documentation with doxygen")
+
+
+
 # Enable testing:
 OPTION(BUILD_TESTING "Build Tests" ON) 
 include(CTest)
@@ -151,15 +164,6 @@ endif()
 
 
 
-# Default values for FAUST_USE_SINGLEPRECISION and FAUST_USE_OPENBLAS and USE_MATIO
-set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
-set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
-set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
-set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
-set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read matfile")
-set(FAUST_USE_XML ON CACHE BOOL "Using xml configuration file")
-set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
-set(FAUST_GEN_DOC OFF CACHE BOOL "Generate html documentation with doxygen")
 
 # find external libraries
 
@@ -199,17 +203,28 @@ check_external_includes("matio.h" MATIO_INC_DIR 0)
 # adding compiler flags
 
 set(CMAKE_CXX_FLAGS "")
+
 if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") )
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_DEBUG}")
+	if (UNIX)	
+		set(CMAKE_CXX_FLAGS " -O0 ${CMAKE_CXX_FLAGS_DEBUG}")
+	elseif(WIN32)
+		set(CMAKE_CXX_FLAGS " /O0 ${CMAKE_CXX_FLAGS_DEBUG}")
+	endif() 
 	message(STATUS "mode DEBUG")
 else()
+	if (UNIX)	
+		set(CMAKE_CXX_FLAGS " -O2 ${CMAKE_CXX_FLAGS_DEBUG}")
+	elseif(WIN32)
+		set(CMAKE_CXX_FLAGS " /O2 ${CMAKE_CXX_FLAGS_DEBUG}")
+	endif()
 	message(STATUS "mode RELEASE")
 endif()
 
+
 if(UNIX)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -fexceptions -fno-omit-frame-pointer -pthread -fPIC " CACHE STRING "compile flags" FORCE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fexceptions -fno-omit-frame-pointer -pthread -fPIC " CACHE STRING "compile flags" FORCE)
 elseif(WIN32)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O2 /EHs /openmp /MD" CACHE STRING "compile flags" FORCE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  /EHs /openmp /MD" CACHE STRING "compile flags" FORCE)
 endif()
 	message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 ###
