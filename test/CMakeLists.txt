@@ -162,24 +162,28 @@ endif(FAUST_USE_MEX)
 
 set(TIMEOUT_MEG 7200)
 
+
+
+
 if (FAUST_USE_MATIO)
-	add_test(FAUST_HIER_DOUBLE, ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double 	${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
-	add_test(FAUST_HIER_FLOAT, ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+	add_test(NAME HADAMARD_FACT_DOUBLE COMMAND  ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double 	${FAUST_TESTDATA_SRC_DIR}/config_HADAMARD.mat)
+	add_test(NAME FAUST_HIER_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double 	${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+	add_test(NAME FAUST_HIER_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
 	add_test(NAME MEG_FACT_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22332 1)
 	add_test(NAME MEG_FACT_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22480 1)
 	set_tests_properties(MEG_FACT_FLOAT MEG_FACT_DOUBLE PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 endif (FAUST_USE_MATIO)
 
-
 if (FAUST_USE_XML)
-	add_test(FAUST_HIER_CMDLINE, ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt )
+	add_test(NAME FAUST_HIER_CMDLINE COMMAND ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt )
 
-	add_test(FAUST_HIER_TRANSPOSE_CMDLINE, ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/trans_hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt  T)
+	add_test(NAME FAUST_HIER_TRANSPOSE_CMDLINE COMMAND ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/trans_hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt  T)
 
 	add_test(NAME MEG_FACT_CMDLINE COMMAND ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/MEG_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/MEG_data.txt )
 
 	set_tests_properties(MEG_FACT_CMDLINE PROPERTIES TIMEOUT ${TIMEOUT_MEG})	 
 endif(FAUST_USE_XML)
+
 
 #if(FAUST_USE_MEX)
 #	add_test(NAME FAUST_HIER_MEX COMMAND matlab  -nojvm -nodisplay -r #${FAUST_TEST_BIN_DIR}/hier_fact.m;exit)

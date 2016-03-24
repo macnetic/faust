@@ -71,6 +71,8 @@ void faust_constraint_int::check_constraint_name()const
          break;
       case CONSTRAINT_NAME_SPLIN:
          break;
+      case CONSTRAINT_NAME_SPLINCOL:
+         break;
       case CONSTRAINT_NAME_SP_POS:
          break;
       case CONSTRAINT_NAME_BLKDIAG:
@@ -92,6 +94,9 @@ void faust_constraint_int::set_default_parameter()
          parameter = 0;
          break;
       case CONSTRAINT_NAME_SPLIN:
+         parameter = 0;
+         break;
+      case CONSTRAINT_NAME_SPLINCOL:
          parameter = 0;
          break;
       case CONSTRAINT_NAME_SP_POS:

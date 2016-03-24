@@ -16,11 +16,17 @@ void init_faust_mat_from_matio(faust_mat<T>& M, const char* fileName, const char
 template<typename T>
 void init_faust_spmat_from_matio(faust_spmat<T>& S, const char* fileName, const char* variableName);
 template<typename T>
-void write_faust_mat_into_matfile( faust_mat<T>& M, const char* fileName, const char* variableName);
+void write_faust_mat_list_into_matfile(const std::vector< faust_mat<T> >& M, const char* fileName, const char* variableName);
+template<typename T>
+void write_faust_mat_list_into_matvar(const std::vector<faust_mat<T> >& M,matvar_t** matvar, const char* variableName);
+template<typename T>
+void write_faust_mat_into_matvar(const faust_mat<T>& M,matvar_t** matvar, const char* variableName);
+template<typename T>
+void write_faust_mat_into_matfile(const faust_mat<T>& M, const char* fileName, const char* variableName);
 template<typename T>
 void init_faust_mat_vector_from_matiofile( std::vector<faust_mat<T> > & vec_M, const char* fileName, const char* variableName);
 template<typename T>
-void init_mat_from_matvar(faust_mat<T> & M,matvar_t* var);
+void init_mat_from_matvar(faust_mat<T> & M,matvar_t** var);
 template<typename T>
 void init_spmat_from_matvar(faust_spmat<T> & M,matvar_t* var);
 

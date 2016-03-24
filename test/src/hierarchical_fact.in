@@ -5,7 +5,9 @@
 #include "faust_timer.h"
 #include "faust_core.h"
 #include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_mat.h"
 #include <string>
+#include <sstream>
 
 
 
@@ -80,16 +82,73 @@ int main(int argc, char* argv[])
 			std::cerr<<"current value is "<<std::setprecision(20)<<lambda<<std::endl;
 			exit(EXIT_FAILURE); 
 		}
-		(facts[0]) *= hier_fact.get_lambda();
+		
+	}
+	(facts[0]) *= hier_fact.get_lambda();
 		faust_core<faust_real> hier_fact_core(facts);
 		char nomFichier[100];
 		string output_file="@FAUST_TESTOUTPUT_BIN_DIR@/hier_fact_factorisation.dat";
 		hier_fact_core.print_file(output_file.c_str());
 		
-	}
+		//write the given factorisation into a mat file
+		string name_matfile="hierarchical_fact_res.mat";
+		for (int i=0;i<facts.size();i++)
+		{
+			stringstream namefactor;
+			namefactor<<"facts_"<<i;
+			
+			faust_mat<faust_real> densefact(facts[i]);
+			write_faust_mat_into_matfile(densefact,name_matfile.c_str(),namefactor.str().c_str());
+		}
+		
+	//relative_error
+	faust_mat<faust_real> data_matrix = params.data;
+	faust_mat<faust_real> faust_product;
+	faust_product=hier_fact_core.get_product();
+	faust_product-=data_matrix;
+	faust_real relative_error = faust_product.norm()/data_matrix.norm();
 	
-	cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
+	std::cout<<std::endl;	
+		std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+		std::cout<<"		"<<relative_error<<std::endl<<std::endl;
+		
 
+	//time comparison between matrix vector product and faust-vector product
+	int niter_time_comp = 10;
+	if (niter_time_comp > 0)
+	{
+
+		faust_timer tdense;
+		faust_timer tfaust;
+		faust_vec<faust_real> x(data_matrix.getNbCol());
+		faust_vec<faust_real> ydense(data_matrix.getNbRow());
+		faust_vec<faust_real> yfaust(hier_fact_core.getNbRow());
+		for (int i=0;i<niter_time_comp;i++)
+		{
+			//random initilisation of vector x
+	 		for (int j=0;j<x.size();j++)
+			{
+				x[j]=std::rand()*2.0/RAND_MAX-1.0;		
+			}
+		
+			tdense.start();
+				ydense = data_matrix * x;	
+			tdense.stop();
+
+	 		tfaust.start();
+				yfaust = hier_fact_core * x;
+			tfaust.stop();
+
+	 	}
+		std::cout<<std::endl;
+	
+
+		std::cout<<"**************** TIME COMPARISON MATRIX VECTOR PRODUCT **************** "<<std::endl;
+		std::cout<<"	TIME  SPEED-UP : "<<tdense.get_time()/tfaust.get_time()<<std::endl;
+		std::cout<<"	MEAN TIME dense : "<<tdense.get_time()/((float) niter_time_comp)<<std::endl;
+		std::cout<<"	MEAN TIME faust : "<<tfaust.get_time()/((float) niter_time_comp)<<std::endl;	
+	cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
+	}
 
 	return 0;
 	

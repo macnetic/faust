@@ -33,14 +33,16 @@ void init_faust_spmat_from_matio(faust_spmat<T>& S, const char* fileName, const 
 
 }
 
+
+
 template<typename T>
-void write_faust_mat_into_matfile(faust_mat<T>& M, const char* fileName, const char* variableName)
-{
+void write_faust_mat_list_into_matfile(const std::vector< faust_mat<T> >& M, const char* fileName, const char* variableName)
+{	
+   std::cout<<fileName<<std::endl;	
    mat_t* matfp = Mat_Open(fileName,MAT_ACC_RDWR);
    matvar_t *matvar;
-   int dim1 = M.getNbRow();
-   int dim2 = M.getNbCol();
-   double *mat = (double*) malloc(sizeof(double)*dim1*dim2);
+
+   
    
 
    if(matfp == NULL)
@@ -54,7 +56,89 @@ void write_faust_mat_into_matfile(faust_mat<T>& M, const char* fileName, const c
    
    
 	while ( (matvar = Mat_VarReadNextInfo(matfp)) != NULL ) {
-		std::cout<<matvar->name<<std::endl;
+		if (strcmp(matvar->name,variableName) == 0)
+		{		
+			Mat_VarDelete(matfp,matvar->name);
+		}
+        matvar = NULL;
+    }
+    
+    write_faust_mat_list_into_matvar(M,&matvar,variableName);
+		Mat_VarWrite(matfp,matvar,MAT_COMPRESSION_NONE);
+	
+        Mat_VarFree(matvar);
+		
+    
+	Mat_Close(matfp);
+
+}
+
+
+template<typename T>
+void write_faust_mat_list_into_matvar(const std::vector<faust_mat<T> >& M,matvar_t** matvar, const char* variableName)
+{
+	int nbr_mat=M.size();
+	size_t dims[2]={(size_t)1,(size_t)nbr_mat};	
+	(*matvar) = Mat_VarCreate(variableName,MAT_C_CELL,MAT_T_CELL,2,dims,NULL,0);
+	if ( NULL == matvar ) {
+        cerr<<"error in write_faust_mat_list_into_matfile : "<< variableName << " unable to create matiovar" <<endl;
+		 exit(EXIT_FAILURE);
+    }
+    matvar_t** cell_element;
+    for (int i=0;i< nbr_mat;i++)
+    {
+		write_faust_mat_into_matvar(M[i],cell_element,"a");
+		Mat_VarSetCell((*matvar),i,(*cell_element));
+	}
+	
+	
+}
+
+
+
+
+template<typename T>
+void write_faust_mat_into_matvar(const faust_mat<T>& M,matvar_t** matvar, const char* variableName)
+{	
+   int dim1 = M.getNbRow();
+   int dim2 = M.getNbCol();
+	double *mat = (double*) malloc(sizeof(double)*dim1*dim2);
+	size_t dims[2]={(size_t)dim1,(size_t)dim2};
+	for (int i = 0 ; i < dim1*dim2; i++) mat[i]=(double)(M(i));
+	
+	(*matvar) = Mat_VarCreate(variableName,MAT_C_DOUBLE,MAT_T_DOUBLE,2,dims,mat,0);
+    if ( NULL == matvar ) {
+        cerr<<"error in write_faust_mat_into_matvar : "<< variableName << " unable to create matiovar" <<endl;
+		 exit(EXIT_FAILURE);
+    } 
+   delete[] mat ;mat=NULL;
+        
+	
+}
+
+
+
+template<typename T>
+void write_faust_mat_into_matfile(const faust_mat<T>& M, const char* fileName, const char* variableName)
+{	
+
+   mat_t* matfp = Mat_Open(fileName,MAT_ACC_RDWR);
+   matvar_t *matvar;
+
+   
+   
+
+   if(matfp == NULL)
+   {
+		matfp = Mat_CreateVer(fileName,NULL,MAT_FT_DEFAULT);
+		if ( NULL == matfp ) {
+			cerr << "error in write_faust_mat<T>_into_matfile : unable to create "<< fileName << endl;
+			 exit(EXIT_FAILURE);
+		}
+	}
+   
+   
+	while ( (matvar = Mat_VarReadNextInfo(matfp)) != NULL ) {
 		if (strcmp(matvar->name,variableName) == 0)
 		{		
 			Mat_VarDelete(matfp,matvar->name);
@@ -62,20 +146,12 @@ void write_faust_mat_into_matfile(faust_mat<T>& M, const char* fileName, const c
         matvar = NULL;
     }
    
-
-  
-	size_t dims[2]={(size_t)dim1,(size_t)dim2};
-	for (int i = 0 ; i < dim1*dim2; i++) mat[i]=(double)(M(i));
+		write_faust_mat_into_matvar(M,&matvar,variableName);
+		Mat_VarWrite(matfp,matvar,MAT_COMPRESSION_NONE);
 	
-	matvar = Mat_VarCreate(variableName,MAT_C_DOUBLE,MAT_T_DOUBLE,2,dims,mat,0);
-    if ( NULL == matvar ) {
-        cerr<<"error in write_faust_mat<T>_into_matfile : "<< variableName << " unable to create matiovar" <<endl;
-		 exit(EXIT_FAILURE);
-    } else {
-        Mat_VarWrite(matfp,matvar,MAT_COMPRESSION_NONE);
         Mat_VarFree(matvar);
 		
-    }
+    
 	Mat_Close(matfp);
 
 }
