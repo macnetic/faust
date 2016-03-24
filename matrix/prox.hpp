@@ -54,11 +54,17 @@ void prox_sp(faust_mat<T> & M,faust_unsigned_int k)
 	M.normalize();
 }
 
+template<typename T>
+void prox_spcol(faust_mat<T> & M,faust_unsigned_int k)
+{
+	prox_spcol_normfree(M,k);
+	M.normalize();
 
+}
 
 
 template<typename T>
-void prox_spcol(faust_mat<T> & M,faust_unsigned_int k)
+void prox_spcol_normfree(faust_mat<T> & M,faust_unsigned_int k)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
@@ -86,15 +92,13 @@ void prox_spcol(faust_mat<T> & M,faust_unsigned_int k)
 		}	
 			
 	}
-	M.normalize();
+
 }
 
-
-
 template<typename T>
-void prox_splin(faust_mat<T> & M,faust_unsigned_int k)
+void prox_splin_normfree(faust_mat<T> & M,faust_unsigned_int k)
 {
-	const faust_unsigned_int dim1 = M.getNbRow();
+		const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
 	const faust_unsigned_int nb_elt_mat = dim1*dim2;
 	if (k<=0)
@@ -120,10 +124,41 @@ void prox_splin(faust_mat<T> & M,faust_unsigned_int k)
 		}	
 		
 	}
+}
+
+template<typename T>
+void prox_splin(faust_mat<T> & M,faust_unsigned_int k)
+{
+	prox_splin_normfree(M,k);
 	M.normalize();
 
 }
 
+
+template<typename T>
+void prox_splincol(faust_mat<T> &M,faust_unsigned_int k)
+{
+	faust_mat<T> Mspcol = M;
+	faust_mat<T> Msplin = M;
+	
+	
+	prox_spcol_normfree(Mspcol,k);
+	prox_splin_normfree(Msplin,k);
+	
+	//Msplin.transpose();
+	//prox_spcol_normfree(Msplin,k);
+	//Msplin.transpose();
+	
+	for (int i=0;i<M.getNbCol()*M.getNbRow();i++)
+	{
+		if (Mspcol(i)!=0)
+			Msplin.getData()[i]=0;
+	}
+	Mspcol+=Msplin;
+	Mspcol.normalize();
+	M=Mspcol;
+	
+}
 
 
 template<typename T>

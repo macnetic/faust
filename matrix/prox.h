@@ -24,6 +24,12 @@ void prox_spcol(faust_mat<T> & M,faust_unsigned_int k);
 template<typename T>
 void prox_splin(faust_mat<T> & M,faust_unsigned_int k);
 template<typename T>
+void prox_spcol_normfree(faust_mat<T> & M,faust_unsigned_int k);
+template<typename T>
+void prox_splin_normfree(faust_mat<T> & M,faust_unsigned_int k);
+template<typename T>
+void prox_splincol(faust_mat<T> &M,faust_unsigned_int k);
+template<typename T>
 void prox_normcol(faust_mat<T> & M,T s);
 template<typename T>
 void prox_normlin(faust_mat<T> & M,T s);
