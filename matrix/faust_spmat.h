@@ -31,11 +31,10 @@ void multiply(const faust_core<T> & A, const faust_mat<T> & B, faust_mat<T> & C,
 
 
 template<typename T>
-class faust_spmat : public faust_mat_generic
+class faust_spmat : public faust_mat_generic<T>
 {
 	public:
-	
-	faust_spmat();
+	void mult(faust_mat<T> Y,const  faust_mat<T> X)const{};	faust_spmat();
 
 	/*!
 	*  \brief Constructor<br>
@@ -98,8 +97,8 @@ class faust_spmat : public faust_mat_generic
 	template <typename U>
 	void operator=(const faust_mat<U> &M){faust_spmat<U> spM(M);(this)->operator=(spM);}
 
-	int getNbRow()const{return dim1;}
-	int getNbCol()const{return dim2;}
+	//int getNbRow()const{return this->dim1;}
+	//int getNbCol()const{return this->dim2;}
 	faust_unsigned_int getNonZeros()const{return nnz;}
 	bool isCompressedMode()const{return mat.isCompressed();}
 	void makeCompression(){mat.makeCompressed();}
@@ -156,7 +155,7 @@ class faust_spmat : public faust_mat_generic
 	~faust_spmat(){}
 
 	private:
-	void update_dim(){dim1=mat.rows();dim2=mat.cols();nnz=mat.nonZeros();}
+	void update_dim(){this->dim1=mat.rows();this->dim2=mat.cols();nnz=mat.nonZeros();}
 	static const char * class_name;
 
 	private:

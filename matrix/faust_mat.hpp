@@ -29,7 +29,7 @@ const char * faust_mat<T>::class_name = "faust_mat<T>::";
 
 
 template<typename T>
-faust_mat<T>::faust_mat(const T  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol ) : faust_mat_generic(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false),isZeros(false)
+faust_mat<T>::faust_mat(const T  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol ) : faust_mat_generic<T>(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false),isZeros(false)
 {
 
 #ifdef __COMPILE_TIMERS__
@@ -57,9 +57,9 @@ t_resize.start();
 	{
 		handleError(class_name, "resize : new dimensions must be positive");
 	}
-	else if ((dim1 != nbRow) || (dim2 != nbCol))
+	else if ((this->dim1 != nbRow) || (this->dim2 != nbCol))
 	{
-		faust_mat_generic::resize(nbRow,nbCol);
+		faust_mat_generic<T>::resize(nbRow,nbCol);
 		mat.resize(nbRow,nbCol);
 	}
 
@@ -80,7 +80,7 @@ void faust_mat<T>::check_dim_validity()
 t_check_dim.start();
 #endif
 
-	bool verifSize = (getNbCol() == mat.cols()) &&  (getNbRow() == mat.rows());
+	bool verifSize = (this->getNbCol() == mat.cols()) &&  (this->getNbRow() == mat.rows());
 
 	if (!verifSize)
 	{
@@ -95,7 +95,7 @@ t_check_dim.stop();
 template<typename T>
 void faust_mat<T>::setZeros()
 {
-	memset(getData(), 0, sizeof(T) * dim1*dim2);
+	memset(getData(), 0, sizeof(T) * this->dim1*this->dim2);
 	isZeros = true;
 	isIdentity = false;
 }
@@ -105,9 +105,9 @@ void faust_mat<T>::setEyes()
 {
 	setZeros();
 	T* ptr_data = getData();
-	for (int i=0 ; i<std::min(dim1,dim2); i++)
-		ptr_data[i*dim1+i] = 1.0;
-	if (dim1 == dim2)
+	for (int i=0 ; i<std::min(this->dim1,this->dim2); i++)
+		ptr_data[i*this->dim1+i] = 1.0;
+	if (this->dim1 == this->dim2)
 		isIdentity = true;
 	isZeros = false;
 }
@@ -116,7 +116,7 @@ void faust_mat<T>::setEyes()
 template<typename T>
 bool faust_mat<T>::isEqual(const faust_mat<T> & B) const
 {
-	if ((getNbCol() != B.getNbCol()) || (getNbRow() != B.getNbRow()))
+	if ((this->getNbCol() != B.getNbCol()) || (this->getNbRow() != B.getNbRow()))
         handleError(class_name, "isEqual : dimension of the 2 matrix are not the same\n");
 
 	if (isZeros)
@@ -131,14 +131,14 @@ bool faust_mat<T>::isEqual(const faust_mat<T> & B) const
 template<typename T>
 bool faust_mat<T>::isEqual(const faust_mat<T> & B, T threshold) const
 {
-	if ((getNbCol() != B.getNbCol()) || (getNbRow() != B.getNbRow()))
+	if ((this->getNbCol() != B.getNbCol()) || (this->getNbRow() != B.getNbRow()))
 	{
 		handleError(class_name, "isEqual : dimension of the 2 matrix are not the same\n");
 	}
 	bool egalite =true;
-	for (int i=0;i<getNbRow();i++)
+	for (int i=0;i<this->getNbRow();i++)
 	{
-		for (int j=0;j<getNbCol();j++)
+		for (int j=0;j<this->getNbCol();j++)
 		{
 			if (std::abs(mat(i,j)==0))
 			{
@@ -173,7 +173,7 @@ t_transpose.start();
 
 	if(isZeros || isIdentity)
 	{
-		resize(dim2,dim1);
+		resize(this->dim2,this->dim1);
 		#ifdef __COMPILE_TIMERS__
 			t_transpose.stop();
 		#endif
@@ -181,9 +181,9 @@ t_transpose.start();
 	}
 
 	mat = mat.transpose().eval();
-	faust_unsigned_int dim1_copy = dim1;
-	dim1 = dim2;
-    dim2 = dim1_copy;
+	faust_unsigned_int dim1_copy = this->dim1;
+	this->dim1 = this->dim2;
+    this->dim2 = dim1_copy;
 
 #ifdef __COMPILE_TIMERS__
 t_transpose.stop();
@@ -199,7 +199,7 @@ void faust_mat<T>::multiplyRight(faust_mat<T> const& A)
 t_mult_right.start();
 #endif
 
-	if (dim2 != A.dim1)
+	if (this->dim2 != A.dim1)
 	{
 		handleError(class_name, "multiplyRight : dimension conflict between matrix");
 	}
@@ -215,9 +215,9 @@ t_mult_right.start();
 	if(isZeros || A.isZeros)
 	{
 		//std::cout<<"zero"<<std::endl;
-		resize(dim1,A.dim2);
+		resize(this->dim1,A.dim2);
 		T *const ptr_data_dst = getData();
-		memset(ptr_data_dst, 0, sizeof(T) * dim1*dim2);
+		memset(ptr_data_dst, 0, sizeof(T) * this->dim1*this->dim2);
 		isZeros = true;
 		isIdentity = false;
 		#ifdef __COMPILE_TIMERS__
@@ -254,7 +254,7 @@ template<typename T>
  t_mult_left.start();
 #endif
 
-	if (dim1 != A.dim2)
+	if (this->dim1 != A.dim2)
 	{
 		handleError(class_name, "multiplyLeft : dimension conflict between matrix");
 	}
@@ -269,9 +269,9 @@ template<typename T>
 
 	if(isZeros || A.isZeros)
 	{
-		resize(A.dim1,dim2);
+		resize(A.dim1,this->dim2);
 		T *const ptr_data_dst = getData();
-		memset(ptr_data_dst, 0, sizeof(T) * dim1*dim2);
+		memset(ptr_data_dst, 0, sizeof(T) * this->dim1*this->dim2);
 		isZeros = true;
 		isIdentity = false;
 		#ifdef __COMPILE_TIMERS__
@@ -339,8 +339,8 @@ T faust_mat<T>::spectralNorm(const faust_unsigned_int nbr_iter_max,T threshold, 
 		return 1;
 	}
 
-	faust_unsigned_int nb_row = getNbRow();
-	faust_unsigned_int nb_col = getNbCol();
+	faust_unsigned_int nb_row = this->getNbRow();
+	faust_unsigned_int nb_col = this->getNbCol();
 
 
 	faust_mat<T> AtA;
@@ -387,7 +387,7 @@ void faust_mat<T>::add(faust_mat<T> const& A)
 #ifdef __COMPILE_TIMERS__
 t_add.start();
 #endif
-	if ((getNbCol() != A.getNbCol()) || (getNbRow() != A.getNbRow()))
+	if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
 	{
 		handleError(class_name, "add : matrix dimension not equal");
 	}
@@ -405,7 +405,7 @@ void faust_mat<T>::sub(faust_mat<T> const& A)
 #ifdef __COMPILE_TIMERS__
 t_sub.start();
 #endif
-	if ((getNbCol() != A.getNbCol()) || (getNbRow() != A.getNbRow()))
+	if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
 	{
 		handleError(class_name, "sub : matrix dimension not equal");
 	}
@@ -425,19 +425,20 @@ t_sub.stop();
 // Affichage
 template<typename T>
 void faust_mat<T>::Display() const
-{   //std::cout << "nb_row=" << getNbRow() << endl;
-    //std::cout << "nb_col=" << getNbCol()   <<endl;
+{
+    std::cout << "nb_row=" << this->getNbRow() << endl;
+    std::cout << "nb_col=" << this->getNbCol()   <<endl;
     if(isZeros)
-        cout << dim1 << " by " << dim2 << " matrix of zeros" << endl;
+        cout << this->dim1 << " by " << this->dim2 << " matrix of zeros" << endl;
     else if (isIdentity)
-        cout << dim1 << " by " << dim2 << " identity matrix" << endl;
-    else if (dim1*dim2==0)
-        cout << dim1 << " by " << dim2 << " empty matrix" << endl;
+        cout << this->dim1 << " by " << this->dim2 << " identity matrix" << endl;
+    else if (this->dim1*this->dim2==0)
+        cout << this->dim1 << " by " << this->dim2 << " empty matrix" << endl;
     else
     {
-        for (int i=0 ; i<dim1 ; i++)
+        for (int i=0 ; i<this->dim1 ; i++)
         {
-            for(int j=0 ; j<dim2 ; j++)
+            for(int j=0 ; j<this->dim2 ; j++)
                 cout << (*this)(i,j) << " " ;
             cout << endl;
         }
@@ -450,9 +451,9 @@ void faust_mat<T>::print_file(const char* filename)const
 {
     ofstream fichier;
 	fichier.open(filename);
-	for (int i=0 ; i<getNbRow() ; i++)
+	for (int i=0 ; i<this->getNbRow() ; i++)
 	{
-		for (int j=0 ; j<getNbCol() ; j++)
+		for (int j=0 ; j<this->getNbCol() ; j++)
 			fichier << setprecision(20) <<mat(i,j) << " ";
 		fichier << endl;
 	}
@@ -466,8 +467,8 @@ template<typename T>
 void faust_mat<T>::operator=(faust_mat<T> const& A)
 {
     mat = A.mat;
-	dim1 = A.dim1;
-	dim2 = A.dim2;
+	this->dim1 = A.dim1;
+	this->dim2 = A.dim2;
     isZeros = A.isZeros;
     isIdentity = A.isIdentity;
 }
@@ -478,7 +479,7 @@ void faust_mat<T>::operator=(faust_mat<U> const& A)
 {
     resize(A.dim1,A.dim2);
 	// mat = A.mat.cast<T>();
-	for (int i=0;i<dim1*dim2;i++)
+	for (int i=0;i<this->dim1*this->dim2;i++)
         (*this)[i]=(T) A(i);
     isZeros = A.isZeros;
     isIdentity = A.isIdentity;
@@ -492,7 +493,7 @@ void faust_mat<T>::operator=(faust_spmat<T> const& S)
     T*const ptr_data = getData();
     for(int i=0 ; i< S.mat.outerSize() ; i++)
         for(typename Eigen::SparseMatrix<T,Eigen::RowMajor>::InnerIterator it(S.mat,i); it; ++it)
-            ptr_data[it.col() * dim1 + it.row()] = it.value();
+            ptr_data[it.col() * this->dim1 + it.row()] = it.value();
         isZeros = false;
     isIdentity = false;
 }
@@ -501,7 +502,7 @@ void faust_mat<T>::operator=(faust_spmat<T> const& S)
 template<typename T>
 void faust_mat<T>::operator*=(const faust_spmat<T>& S)
 {
-	if(dim2 != S.dim1)
+	if(this->dim2 != S.dim1)
 	{
 		handleError(class_name, "operator*= : incorrect matrix dimensions");
 	}
@@ -514,13 +515,13 @@ void faust_mat<T>::operator*=(const faust_spmat<T>& S)
 	}
 	else if (isZeros)
 	{
-		resize(dim1, S.dim2);
+		resize(this->dim1, S.dim2);
 		setZeros();
 	}
 	else
 	{
 		mat = mat * S.mat;
-		dim2 = S.dim2;
+		this->dim2 = S.dim2;
 	}
 
 }
@@ -529,7 +530,7 @@ void faust_mat<T>::operator*=(const faust_spmat<T>& S)
 template<typename T>
 void faust_mat<T>::operator+=(const faust_spmat<T>& S)
 {
-	if(dim1!=S.dim1 || dim2!=S.dim2)
+	if(this->dim1!=S.dim1 || this->dim2!=S.dim2)
 	{
 		handleError(class_name,"operator+= : incorrect matrix dimensions");
 	}
@@ -541,7 +542,7 @@ void faust_mat<T>::operator+=(const faust_spmat<T>& S)
 template<typename T>
 void faust_mat<T>::operator-=(const faust_spmat<T>& S)
 {
-	if(dim1!=S.dim1 || dim2!=S.dim2)
+	if(this->dim1!=S.dim1 || this->dim2!=S.dim2)
 	{
 		handleError(class_name,"operator-= : incorrect matrix dimensions");
 	}
@@ -554,7 +555,7 @@ void faust_mat<T>::operator-=(const faust_spmat<T>& S)
 template<typename T>
 void faust_mat<T>::scalarMultiply(faust_mat<T> const& A)
 {
-	if(dim1!=A.dim1 || dim2!=A.dim2)
+	if(this->dim1!=A.dim1 || this->dim2!=A.dim2)
 	{
 		handleError(class_name,"scalarMultiply : incorrect matrix dimensions\n");
 	}
@@ -567,7 +568,7 @@ void faust_mat<T>::scalarMultiply(faust_mat<T> const& A)
 template<typename T>
 void faust_mat<T>::multiplyLeft(const faust_spmat<T>& S)
 {
-	if(S.dim2 != dim1)
+	if(S.dim2 != this->dim1)
 	{
 		//std::cerr << "Error in faust_mat<T>::operator*= : incorrect matrix dimensions" << std::endl;
 		//exit(EXIT_FAILURE);
@@ -582,7 +583,7 @@ void faust_mat<T>::multiplyLeft(const faust_spmat<T>& S)
 	}
 	else if (isZeros)
 	{
-		resize(S.dim1, dim2);
+		resize(S.dim1, this->dim2);
 		setZeros();
 	}
 	else
@@ -590,8 +591,8 @@ void faust_mat<T>::multiplyLeft(const faust_spmat<T>& S)
 		#ifdef __GEMM_WITH_MKL__
 			int dim1S = S.getNbRow();
 			int dim2S = S.getNbCol();
-			int dim1this = dim1;
-			int dim2this = dim2;
+			int dim1this = this->dim1;
+			int dim2this = this->dim2;
 			int dim1C = dim1S;
 			int dim2C = dim2this;
 			T alpha = 1.0,beta = 0.0;
@@ -626,7 +627,7 @@ void faust_mat<T>::multiplyLeft(const faust_spmat<T>& S)
 		#else
 
 			mat = S.mat * mat;
-			dim1 = S.dim1;
+			this->dim1 = S.dim1;
 		#endif
 	}
 
@@ -654,7 +655,7 @@ t_print_file.start();
         handleError(class_name, "init_from_file : problem with the file");
     }
     resize(vec[0],vec[1]);
-    memcpy(getData(), &vec[2], sizeof(T) * dim1 * dim2);
+    memcpy(getData(), &vec[2], sizeof(T) * this->dim1 * this->dim2);
 
     isZeros = false;
     isIdentity = false;

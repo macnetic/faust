@@ -2,14 +2,16 @@
 #define __FAUST_MAT_GENERIC_H__
 
 #include "faust_constant.h"
-
+#include "faust_linear_operator.h"
 /**
  * \class faust_mat_generic faust_mat_generic.h
  * \brief This faust_mat_generic class serves as a base class for the derived class faust_mat and faust_spmat .
  * 	Member variable dim1 and dim2 correspond to the dimension of the matrix
  *
 */
-class faust_mat_generic
+
+template<typename FPP>
+class faust_mat_generic : public faust_linear_operator<FPP>
 {
 	public:	
 	faust_mat_generic() : dim1(0), dim2(0) {}

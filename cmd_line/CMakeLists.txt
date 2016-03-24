@@ -8,15 +8,7 @@ else(FAUST_USE_OPENBLAS)
 
 endif(FAUST_USE_OPENBLAS)
 
-	# foreach(algofile launch_hierarchical_fact launch_palm4MSA)
-		# configure_file(${FAUST_TESTSRC_SRC_DIR}/${algofile}.cpp ${FAUST_TESTSRC_BIN_DIR}/${algofile}.cpp COPYONLY)
-		# add_executable(${algofile} ${FAUST_TESTSRC_BIN_DIR}/${algofile}.cpp ${FAUST_XML_SRC_DIR}/xml_utils.cpp)
-		# if(FAUST_USE_OPENBLAS)
-			# target_link_libraries(${algofile}  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE} ${XML2_LIB_FILE})
-		# else()
-			# target_link_libraries(${algofile}  ${FAUST_TARGET} ${XML2_LIB_FILE})
-		# endif()
-	# endforeach()
+
 
 	foreach(algofile launch_hierarchical_fact launch_palm4MSA)
 		configure_file(${FAUST_CMDLINE_FUNC_SRC_DIR}/${algofile}.cpp ${FAUST_CMDLINE_BIN_SRC_DIR}/${algofile}.cpp COPYONLY)

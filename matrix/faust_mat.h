@@ -44,35 +44,34 @@ template<typename T>
 
 
 template<typename T>
-class faust_mat : public faust_mat_generic
+class faust_mat : public faust_mat_generic<T>
 {
 	/// All derived class template of faust_mat are considered as friends
 	template<class> friend class faust_mat;
 	
 	public:
 	static const char * name;  
-
-	/*!
+	void mult(faust_mat<T> Y,const  faust_mat<T> X)const{}	/*!
 	*  \brief Constructor faust_mat
 	*	\tparam data : pointer to the data array of the matrix
 		\tparam nbRow : number of row of the matrix
 		\tparam nbCol : number of column of the matrix
 	*/	
 	faust_mat(const T  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol );
-	faust_mat() : faust_mat_generic(), mat(0,0), isIdentity(false), isZeros(false) {}
+	faust_mat() : faust_mat_generic<T>(), mat(0,0), isIdentity(false), isZeros(false) {}
 	/*!
 	*  \brief Copy Constructor of faust_mat
 	*  \tparam A : another faust_mat
 	*/	
-	faust_mat(const faust_mat<T> & A) : faust_mat_generic(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
+	faust_mat(const faust_mat<T> & A) : faust_mat_generic<T>(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
 	template<typename U>
 	faust_mat(const faust_mat<U> & A){this->operator=(A);}
 	template<typename U>
 	faust_mat(const faust_spmat<U> & A){this->operator=(A);}
 	faust_mat(const faust_spmat<T> & A){this->operator=(A);}
 
-	faust_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : faust_mat_generic(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
-	faust_mat(const faust_unsigned_int nbRow) : faust_mat_generic(nbRow,nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}
+	faust_mat(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : faust_mat_generic<T>(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
+	faust_mat(const faust_unsigned_int nbRow) : faust_mat_generic<T>(nbRow,nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}
 	/// Destructor of faust_mat	
 	~faust_mat(){resize(0,0);}
 	
@@ -135,7 +134,7 @@ class faust_mat : public faust_mat_generic
 	*\tparam j : col position
 	*\return : read-only (i,j) coefficient of the matrix
 	*/	
-	const T& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return mat.data()[j*dim1+i];}
+	const T& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return mat.data()[j*this->dim1+i];}
 
 	void operator*=(const faust_spmat<T>& M);
 	void operator+=(const faust_spmat<T>& M);

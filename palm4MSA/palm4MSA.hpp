@@ -3,6 +3,8 @@
 
 //#include "palm4MSA.h"
 
+#include <sstream>
+
 #include <iostream>
 #include "faust_params.h"
 #include "faust_params_palm.h"
@@ -324,7 +326,7 @@ t_local_compute_grad_over_c.start();
 
 
     error = data;
-    faust_mat<T> tmp1, tmp2, tmp3, tmp4;
+    faust_mat<T> tmp1,tmp3;
 
     if (idx==0 || idx==1) // computing L*S first, then (L*S)*R
     {
@@ -455,13 +457,22 @@ t_local_compute_lambda.start();
 
    // Xhatt_Xhat = X_hat'*X_hat
    faust_mat<T> Xhatt_Xhat;
+   
    gemm<T>(LorR, LorR, Xhatt_Xhat, 1.0, 0.0, 'T','N');
-   T Xhatt_Xhat_tr = Xhatt_Xhat.trace();
+   
+   T Xhatt_Xhat_tr = (T) Xhatt_Xhat.trace();
+   
    if (Xhatt_Xhat_tr != 0)
+   {
 		lambda = Xt_Xhat.trace()/Xhatt_Xhat_tr;
-	else
+		if (isnan(lambda))
+		{
+			handleError(class_name,"compute_lambda : Xhatt_Xhat_tr is too small or Xt_Xhat.trace is too big so lambda is infinite");
+		}
+	}else
+	{
 		handleError(class_name,"compute_lambda : Xhatt_Xhat_tr equal 0 so lambda is infinite");
-
+	}
    //cout<<"lambda : "<<lambda<<endl;
    //cout<<__SP lambda<<endl;
 
@@ -720,6 +731,7 @@ t_local_next_step.start();
 
     }
 
+	
     compute_lambda();
 
 

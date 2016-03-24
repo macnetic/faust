@@ -12,23 +12,23 @@ const char * faust_spmat<T>::class_name="faust_spmat<T>::";
 
 template<typename T>
 faust_spmat<T>::faust_spmat() : 
-	faust_mat_generic(),
+	faust_mat_generic<T>(),
 	mat(Eigen::SparseMatrix<T>(0,0)),
 	nnz(0){}
 
 template<typename T>	
 faust_spmat<T>::faust_spmat(const faust_spmat<T>& M) :
-	faust_mat_generic(M.getNbRow(),M.getNbCol()),
+	faust_mat_generic<T>(M.getNbRow(),M.getNbCol()),
 	mat(M.mat),
 	nnz(M.mat.nonZeros()){}
 
 template<typename T>
 faust_spmat<T>::faust_spmat(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) :
-	faust_mat_generic(dim1_,dim2_),
+	faust_mat_generic<T>(dim1_,dim2_),
 	mat(Eigen::SparseMatrix<T>(dim1_,dim2_)),
 	nnz(0)
 {
-	resize(nnz, dim1, dim2);
+	resize(nnz, this->dim1, this->dim2);
 }
 
 
@@ -61,7 +61,7 @@ void faust_spmat<T>::operator=(const faust_spmat<U>& M)
 
 template<typename T>
 faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const T* value, const size_t* id_row, const size_t* col_ptr) :
-	faust_mat_generic(dim1_,dim2_),
+	faust_mat_generic<T>(dim1_,dim2_),
 	mat(Eigen::SparseMatrix<T>(dim1_,dim2_)),
 	nnz(nnz_)
 {	
@@ -88,18 +88,18 @@ faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_
 
 template<typename T>
 faust_spmat<T>::faust_spmat(const faust_mat<T>& M) : 
-	faust_mat_generic(M.getNbRow(),M.getNbCol()),
+	faust_mat_generic<T>(M.getNbRow(),M.getNbCol()),
 	mat(Eigen::SparseMatrix<T>(M.getNbRow(),M.getNbCol())),
 	// dim1(M.getNbRow()),
 	// dim2(M.getNbCol()),
 	nnz(0)
 {
-	int* rowind = new int[dim1*dim2];
-	int* colind = new int[dim1*dim2];
-	T* values = new T[dim1*dim2];
+	int* rowind = new int[this->dim1*this->dim2];
+	int* colind = new int[this->dim1*this->dim2];
+	T* values = new T[this->dim1*this->dim2];
 
-	for (int j=0 ; j<dim2 ; j++)
-		for (int i=0; i<dim1 ; i++)
+	for (int j=0 ; j<this->dim2 ; j++)
+		for (int i=0; i<this->dim1 ; i++)
          		if(M(i,j)!=0.0)
          		{
             			rowind[nnz] = i;
@@ -169,11 +169,11 @@ faust_spmat<T>::faust_spmat(const vector<int>& rowidx, const vector<int>& colidx
 
 template<typename T>
 faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) : 
-	faust_mat_generic(dim1_,dim2_),
+	faust_mat_generic<T>(dim1_,dim2_),
 	mat(Eigen::SparseMatrix<T>(dim1_,dim2_)),
 	nnz(nnz_)
 {
-	resize(nnz, dim1, dim2);
+	resize(nnz,this->dim1, this->dim2);
 }
 
 
@@ -203,10 +203,10 @@ void faust_spmat<T>::init(const vector<int>& rowidx, const vector<int>& colidx, 
 template<typename T>
 void faust_spmat<T>::Display() const
 {
-	std::cout<<"dim1="<<dim1<<" ; dim2="<<dim2<<" ; nnz="<<nnz<<std::endl;
+	std::cout<<"dim1="<<this->dim1<<" ; dim2="<<this->dim2<<" ; nnz="<<nnz<<std::endl;
 
 	cout << "rowPtr = " << getRowPtr() << " -> [ " ;
-	for (int i=0 ; i<dim1+1 ; i++)
+	for (int i=0 ; i<this->dim1+1 ; i++)
 		cout <<  getRowPtr()[i] << " ";
 	cout << " ]"<<endl;
 	cout << "colInd = " << getColInd() << " -> [ " ;
@@ -306,7 +306,7 @@ void faust_spmat<T>::print_file(const char* filename,std::ios_base::openmode mod
 	ofstream fichier;
 	fichier.open(filename,mode);
 	
-	fichier << dim1 << " " << dim2 <<" "<<getNonZeros() << endl;
+	fichier << this->dim1 << " " << this->dim2 <<" "<<getNonZeros() << endl;
 	for(int i=0 ; i< mat.outerSize() ; i++)
 		for(typename Eigen::SparseMatrix<T,Eigen::RowMajor>::InnerIterator it(mat,i); it; ++it)
 			fichier << it.row()+1 << " " << it.col()+1 << " " << setprecision(20) << it.value() << endl;
