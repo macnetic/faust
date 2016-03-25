@@ -1,4 +1,4 @@
-\mainpage FAµST
+\mainpage FAµST Home
 
 \section intro_sec Introduction
 FAµST is a C++ library that implements a way to decompose a given matrix into a product of sparse matrix in order to reduce multiplication costs by the matrix. <br>
@@ -9,6 +9,7 @@ The description of Faust's project is available in articles written by Luc Le Ma
 FAµST is developped at <a href="http://www.inria.fr/en/centre/rennes"> Rennes INRIA</a> by <a href="https://team.inria.fr/panama/fr/">Panama team </a>. <br>
 For more information on the FAµST Project, please visit the <a href="http://faust.gforge.inria.fr"> website</a>. <br> 
 
+<HR>
 \section install_sec Installation
 
 \subsection step1 Step 1: Download FAµST
@@ -37,6 +38,7 @@ FAµST Project is available on subversion repository.
 	- make -j4 		--> 	build with 4 threads <br>
  	- build from codeBlock 	--> 	In debug mode for example <br>
 
+<HR>
 \section Example_sec Target & Example
 
 Here is some examples of algorithm of the project FAUST. <br>
@@ -46,37 +48,36 @@ hierarchical_fact_test.cpp <br>
 Run the hierarchical factorization from a dense matrix contained in a file. <br>
 target name : testing/bin/faust_hier <br>
 
-\subsection Target2 Target 2 : launch_hierarchical_fact
-configuration file : cmd_line/cmdline_function/launch_hierarchical_fact.cpp <br>
-wrapper/cmd_line/src/launch_hierarchical_fact.cpp <br>
-Compute the hierarchical factorization of a given data matrix A in cmdline mode. <br>
-target name : wrapper/cmd_line/bin/launch_hierarchical_fact <br>
-
-\subsection Target3 Target 3 : launch_palm4MSA
-configuration file : cmd_line/cmdline_function/launch_palm4MSA.cpp <br>
-wrapper/cmd_line/src/launch_palm4MSA.cpp <br>
-Launch_palm4MSA command-line factorizes an input matrix corresponding to an operator of interest into J sparse factors and converges to a stationary point. <br>
-target name : wrapper/cmd_line/bin/launch_palm4MSA <br>
-
-\subsection Target4 Target 4 : faust_test
+\subsection Target2 Target 2 : faust_test
 faust_test.cpp <br>
 	 - Compute the multiplication between an faust-matrix and a vector.  <br>
 	 - Evaluation of the time difference using faust-matrix and classical matrix (apply on MEG experiment or dictionnary learning).  <br>
 
 target name : testing/bin/faust_test <br>
 
-\subsection Target5 Target 5 : meg
+\subsection Target3 Target 3 : meg
 MEG_fact.cpp <br>
 Run the hierarchical factorization of the MEG data <br>
 target name : meg <br>
 
-\subsection Target6 Target 6 : palm
+\subsection Target4 Target 4 : palm
 palm4MSA_test.cpp <br>
 Run a test of palm4MSA <br>
 target name : testing/bin/palm <br>
 
+\subsection Target5 Target 5 : launch_hierarchical_fact
+configuration file : cmd_line/cmdline_function/launch_hierarchical_fact.cpp <br>
+wrapper/cmd_line/src/launch_hierarchical_fact.cpp <br>
+Compute the hierarchical factorization of a given data matrix A in cmdline mode. <br>
+target name : wrapper/cmd_line/bin/launch_hierarchical_fact <br>
 
+\subsection Target6 Target 6 : launch_palm4MSA
+configuration file : cmd_line/cmdline_function/launch_palm4MSA.cpp <br>
+wrapper/cmd_line/src/launch_palm4MSA.cpp <br>
+Launch_palm4MSA command-line factorizes an input matrix corresponding to an operator of interest into J sparse factors and converges to a stationary point. <br>
+target name : wrapper/cmd_line/bin/launch_palm4MSA <br>
 
+<HR>
 
 \section Demo Demonstration
 \subsection Demo1 Demo 1 : Source localization in the context of functional brain imaging :
@@ -93,9 +94,8 @@ in progress...<br>
 The goal of this demo is to enhancement a noisy image.<br>
 in progress...<br>
 
-
-\authors Nicolas Bellot, Thomas Gautrais, Adrien Leman
+<HR>
+\authors Adrien Leman, Nicolas Bellot, Thomas Gautrais
 \date 03/2016
 
-
-
+<HR>

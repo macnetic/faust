@@ -99,7 +99,7 @@ INPUT = "@PROJECT_SOURCE_DIR@/cmd_line" \
 	"@PROJECT_SOURCE_DIR@/demo" \
 	"@PROJECT_SOURCE_DIR@/exception" \
 	"@PROJECT_SOURCE_DIR@/faust_core" \
-	"@PROJECT_SOURCE_DIR@/gen_doc" \
+	"@PROJECT_SOURCE_DIR@/gen_doc/mainpage.md" \
 	"@PROJECT_SOURCE_DIR@/init_from_matlab" \
 	"@PROJECT_SOURCE_DIR@/interface_matlab" \
 	"@PROJECT_SOURCE_DIR@/matrix" \
@@ -107,6 +107,7 @@ INPUT = "@PROJECT_SOURCE_DIR@/cmd_line" \
 	"@PROJECT_SOURCE_DIR@/test" \
 	"@PROJECT_BINARY_DIR@/testing/src" \
 	"@PROJECT_BINARY_DIR@/wrapper/cmd_line/src" \
+
 	
 #	"../../../cmd_line/xml_tools/xml_utils.cpp" \
 #	"../../../init_from_matlab/faust_init_from_matio_params.h" 
@@ -121,16 +122,19 @@ INPUT_ENCODING         = UTF-8
 # *.h++, *.cs, *.d, *.php, *.php4, *.php5, *.phtml, *.inc, *.m, *.markdown,
 # *.md, *.mm, *.dox, *.py, *.f90, *.f, *.for, *.tcl, *.vhd, *.vhdl, *.ucf,
 # *.qsf, *.as and *.js.
-FILE_PATTERNS          = *.md 
-FILE_PATTERNS	      += *.cpp 
+FILE_PATTERNS	      = *.cpp 
 FILE_PATTERNS	      += *.hpp
-FILE_PATTERNS	      += *.h	
+FILE_PATTERNS	      += *.h
+#FILE_PATTERNS         += *.md 
+# on inclut les fichiers cuda pour GPU	
+FILE_PATTERNS	      += *.cu
+FILE_PATTERNS	      += *.hu
 #FILE_PATTERNS	      += *.m
-
+USE_MDFILE_AS_MAINPAGE = mainpage
 # The RECURSIVE tag can be used to specify whether or not subdirectories should be searched for input files as well. The default value is: NO.      
 RECURSIVE              = YES
-EXCLUDE                =
-EXCLUDE_SYMLINKS       = NO
+EXCLUDE                = 
+EXCLUDE_SYMLINKS       = YES
 # The EXCLUDE tag can be used to specify files and/or directories that should be
 # excluded from the INPUT source files. This way you can easily exclude a
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
@@ -138,10 +142,10 @@ EXCLUDE_SYMLINKS       = NO
 #EXCLUDE_PATTERNS                += *@PROJECT_SOURCE_DIR@/build/*
 #EXCLUDE_PATTERNS                += *@PROJECT_SOURCE_DIR@/CMake/*
 #EXCLUDE_PATTERNS                += *@PROJECT_SOURCE_DIR@/output/*
-EXCLUDE_PATTERNS                += *@PROJECT_SOURCE_DIR@/matrix/matrix_cu/*
+#EXCLUDE_PATTERNS                += *@PROJECT_SOURCE_DIR@/matrix/matrix_cu/*
 #on exclut le dossier matrix_cu car il correspond à des links vers les mêmes fonctions. On obtient les classes en doublon.
 
-EXCLUDE_SYMBOLS        =
+EXCLUDE_SYMBOLS        = 
 EXAMPLE_PATH           =
 EXAMPLE_PATTERNS       =
 EXAMPLE_RECURSIVE      = NO
