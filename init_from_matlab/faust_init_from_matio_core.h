@@ -17,6 +17,19 @@ void init_faust_core_from_matvar(faust_core<T>& core, matvar_t* cell_var );
 template<typename T>
 void init_faust_data_from_matiofile(std::vector<faust_mat<T> >& full_mat, std::vector<faust_core<T> >& core, const char* fileName, const char* variableName);
 
+//template<typename T>
+//void write_faust_spmat_list_into_matfile(const faust_spmat<T>& M, const char* fileName, const char* variableName);
+
+template<typename T>
+void write_faust_core_into_matfile(const faust_core<T> core, const char* fileName, const char* variableName);
+
+template<typename T>
+void write_faust_core_into_matvar(const faust_core<T> core, matvar_t** matvar, const char* variableName);
+
+
+
+
+
 #include "faust_init_from_matio_core.hpp"
 
 #endif

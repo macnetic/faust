@@ -115,4 +115,58 @@ void init_faust_data_from_matiofile(vector<faust_mat<T> >& full_mat, vector<faus
 	
 }
 
+
+
+template<typename T>
+void write_faust_core_into_matfile(const faust_core<T> core, const char* fileName, const char* variableName)
+{
+	mat_t* matfp = Mat_Open(fileName,MAT_ACC_RDWR);
+   matvar_t *matvar;
+
+   
+   
+
+   if(matfp == NULL)
+   {
+		matfp = Mat_CreateVer(fileName,NULL,MAT_FT_DEFAULT);
+		if ( NULL == matfp ) {
+			cerr << "error in write_faust_mat<T>_into_matfile : unable to create "<< fileName << endl;
+			 exit(EXIT_FAILURE);
+		}
+	}
+   
+   
+	while ( (matvar = Mat_VarReadNextInfo(matfp)) != NULL ) {
+		if (strcmp(matvar->name,variableName) == 0)
+		{		
+			Mat_VarDelete(matfp,matvar->name);
+		}
+        matvar = NULL;
+    }
+    
+    write_faust_core_into_matvar(core,&matvar,variableName);
+		Mat_VarWrite(matfp,matvar,MAT_COMPRESSION_NONE);
+	
+        Mat_VarFree(matvar);
+		
+    
+	Mat_Close(matfp);
+
+}
+
+
+template<typename T>
+void write_faust_core_into_matvar(const faust_core<T> core, matvar_t** matvar, const char* variableName)
+{
+	
+	std::vector<faust_spmat<T> > sparse_facts;
+	core.get_facts(sparse_facts);
+	std::cout<<"write_faust_core_into_matvar"<<std::endl;
+	write_faust_spmat_list_into_matvar(sparse_facts,matvar,variableName);
+	
+}
+
+
+
+
 #endif
