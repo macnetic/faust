@@ -161,7 +161,6 @@ void write_faust_core_into_matvar(const faust_core<T> core, matvar_t** matvar, c
 	
 	std::vector<faust_spmat<T> > sparse_facts;
 	core.get_facts(sparse_facts);
-	std::cout<<"write_faust_core_into_matvar"<<std::endl;
 	write_faust_spmat_list_into_matvar(sparse_facts,matvar,variableName);
 	
 }

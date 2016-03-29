@@ -1,5 +1,9 @@
 #TEST VERSION GPU
 
+
+#copy an extra configuration file for the test in the build tree
+configure_file(${PROJECT_SOURCE_DIR}/CTestCustom.cmake ${PROJECT_BINARY_DIR}/CTestCustom.cmake COPYONLY)
+
 # copy GPU files cpp.in to the user's ./src/ directory
 foreach(gpucppin hierarchical_fact_test_cu MEG_fact_cu)
       #configure_file(${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp.in ${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp @ONLY)
@@ -161,7 +165,6 @@ endif(FAUST_USE_MEX)
 #CTest is a testing tool distributed as a part of CMake.
 
 set(TIMEOUT_MEG 7200)
-
 
 
 
