@@ -29,13 +29,17 @@ template<typename T>
 void multiply(const faust_core<T> & A, const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, char typeA, char typeMult);
 
 
+template<typename T>
+void spgemm(const faust_spmat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB);
+
+
 
 template<typename T>
 class faust_spmat : public faust_mat_generic<T>
 {
-	public:
-	void mult(faust_mat<T> Y,const  faust_mat<T> X)const{};	faust_spmat();
-
+	public:	
+	faust_spmat();
+	void faust_gemm(const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB)const{spgemm((*this),B,C,alpha,beta,typeA,typeB);}
 	/*!
 	*  \brief Constructor<br>
 	* faust_spmat is a copy of an other faust_spmat
@@ -182,6 +186,8 @@ class faust_spmat : public faust_mat_generic<T>
 	friend void  faust_vec<T>::multiplyLeft(faust_spmat<T> const& A);
 		
 	friend void multiply<>(const faust_core<T> & A, const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, char typeA, char typeMult);
+	
+	friend void spgemm<>(const faust_spmat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB);
 
 };
 

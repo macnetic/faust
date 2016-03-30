@@ -5,6 +5,7 @@
 
 template<typename T> class faust_vec;
 template<typename T> class faust_mat;
+template<typename T> class faust_spmat;
 
 //////////FONCTION faust_mat<T> - faust_mat<T> ////////////////////
 // C = A * B;
@@ -15,14 +16,11 @@ template<typename T> class faust_mat;
 template<typename T>
 void multiply(const faust_mat<T> & A, const faust_mat<T> & B, faust_mat<T> & C);
 
-// dot product : sum_i(v1[i]*v2[i])
-/*template <typename T>
-T dot(const faust_vec<T>& v1, const faust_vec<T>& v2);*/
 
 /*! \brief Gemm — Performs a matrix calculation of the form a(AB) +bC, with three matrices and two real constants you supply. <br>
 * C = alpha *op(A)*op(B) + beta * C; <br>
-* op(A) = A si typeA='N', op(A) = transpose(A) si typeA='T'<br>
-* op(B) = B si typeB='N', op(B) = transpose(B) si typeB='T'<br>
+* op(A) = A if typeA='N', op(A) = transpose(A) if typeA='T'<br>
+* op(B) = B if typeB='N', op(B) = transpose(B) if typeB='T'<br>
 * The Object C must be different of A and B. <br>
 * \param A : Dense Matrix
 * \param B : Dense Matrix

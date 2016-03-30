@@ -11,7 +11,102 @@
 #include "faust_exception.h"
 #include <fstream>
 
-using namespace std;
+
+
+
+
+template<typename T>
+void faust_core<T>::faust_gemm(const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB) const
+{	
+	
+	faust_unsigned_int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
+
+	if (size() == 0)
+	{
+		handleError(class_name,"faust_gemm : empty faust_core");	
+	}
+	if (typeA == 'T')
+	{
+		nbRowOpA = this->getNbCol();
+		nbColOpA = this->getNbRow();
+	}else
+	{
+		nbRowOpA = this->getNbRow();
+		nbColOpA = this->getNbCol();
+	}
+
+
+	if (typeB == 'T')
+	{
+		nbRowOpB = B.getNbCol();
+		nbColOpB = B.getNbRow();
+	}else
+	{
+		nbRowOpB = B.getNbRow();
+		nbColOpB = B.getNbCol();
+	}
+
+
+	if (nbColOpA != nbRowOpB)
+	{
+		handleError(class_name, "faust_gemm : dimension conflict  between matrix op((*this)) and matrix op(B)");
+
+	}
+
+    int* ind_ptr = new int[size()];
+    for (int j=0 ; j<size(); j++)
+    {
+    	if (typeA == 'T')
+        	ind_ptr[j] = j;
+    	else
+        	ind_ptr[j] =size()-1-j;
+    }
+    	
+    if (beta == 0)
+    {
+	data[ind_ptr[0]].faust_gemm(B,C,alpha,beta,typeA,typeB);
+	if (size() > 1)
+	{
+		faust_mat<T> tmp1(C);
+    		for (int i=1;i<size();i++)
+    		{	
+			data[ind_ptr[i]].faust_gemm(tmp1,C,1.0,0.0,typeA,'N');
+			tmp1=C;
+		}	
+    	}
+
+    }else
+    {
+	if (( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
+	{
+		handleError(class_name, "faust_gemm : invalid dimension for output matrix C");
+	}	
+	
+	
+	if (size() ==1)
+	{
+		data[0].faust_gemm(B,C,alpha,beta,typeA,typeB);	
+	}else
+	{	
+		faust_mat<T> tmp2,tmp1;
+		data[ind_ptr[0]].faust_gemm(B,tmp1,alpha,0.0,typeA,typeB);
+
+		for (int i=1;i<(size()-1);i++)
+    		{	
+			data[ind_ptr[i]].faust_gemm(tmp1,tmp2,1.0,0.0,typeA,'N');
+			tmp1=tmp2;
+		}
+			
+    		data[ind_ptr[size()-1]].faust_gemm(tmp1,C,1.0,beta,typeA,'N');
+	}
+
+   }
+   delete[] ind_ptr;
+    ind_ptr = NULL;
+		
+}
+
+
 template<typename T>
 const char * faust_core<T>::class_name="faust_core<T>::";
 
@@ -177,7 +272,7 @@ faust_mat<T> faust_core<T>::get_product()const
 }
 
 template<typename T>
-int faust_core<T>::getNbRow() const
+faust_unsigned_int faust_core<T>::getNbRow() const
 {
 	if (size() != 0)
 	{
@@ -190,7 +285,7 @@ int faust_core<T>::getNbRow() const
 }
 
 template<typename T>
-int faust_core<T>::getNbCol() const
+faust_unsigned_int faust_core<T>::getNbCol() const
 {
 	if (size() != 0)
 	{

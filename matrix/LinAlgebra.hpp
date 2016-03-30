@@ -8,7 +8,6 @@
 #include "faust_constant.h"
 
 
-//////////FONCTION faust_mat<T> - faust_mat<T> ////////////////////
 
 #ifdef __COMPILE_TIMERS__
 	#include "faust_timer.h"
@@ -20,15 +19,168 @@
 #endif
 
 
-/*template <typename T>
-T dot(const faust_vec<T>& v1, const faust_vec<T>& v2)
+template<typename T>
+void spgemm(const faust_spmat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB)
 {
-   if(v1.size() != v2.size())
-      handleError("LinAlgebra","dot : the two vectors don't have the same size");
-      T result = v1.vec.dot(v2.vec);
-      return result;
-}*/
+//#ifdef __COMPILE_TIMERS__
+//	A.t_gemm.start();
+//#endif
+	faust_unsigned_int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
 
+	if (((&(C.mat)) == (&(B.mat))))
+	{
+		handleError("LinAlgebra", " spgemm : C is the same object as A or B");
+	}
+
+	if (typeA == 'T')
+	{
+		nbRowOpA = A.getNbCol();
+		nbColOpA = A.getNbRow();
+	}else
+	{
+		nbRowOpA = A.getNbRow();
+		nbColOpA = A.getNbCol();
+	}
+
+
+	if (typeB == 'T')
+	{
+		nbRowOpB = B.getNbCol();
+		nbColOpB = B.getNbRow();
+	}else
+	{
+		nbRowOpB = B.getNbRow();
+		nbColOpB = B.getNbCol();
+	}
+
+
+	if (nbColOpA != nbRowOpB)
+	{
+		handleError("LinAlgebra", "spgemm : dimension conflict  between matrix op(A) and matrix op(B)");
+
+	}
+
+
+	if ( (beta!=0)  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
+	{
+		//handleError("Linalgebra : gemm : nbRow of op(A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
+		handleError("LinAlgebra", "spgemm : invalid dimension for output matrix C");
+	}
+
+        C.resize(nbRowOpA,nbColOpB);
+
+
+
+
+
+	if (beta == 0.0)
+	{
+
+		if(B.isZeros)
+		{
+
+			T *const ptr_data_dst = C.getData();
+			memset(ptr_data_dst, 0, sizeof(T) * C.dim1*C.dim2);
+			C.isZeros = true;
+			C.isIdentity = false;
+			//#ifdef __COMPILE_TIMERS__
+			//	A.t_gemm.stop();
+			//#endif
+			return;
+		}
+		if(B.isIdentity)
+		{
+			C=A;
+			if(typeA == 'T')
+				C.transpose();
+			if(alpha!=1.0)
+				C*= alpha;
+			C.isZeros = false;
+			C.isIdentity = false;
+			//#ifdef __COMPILE_TIMERS__
+			//	A.t_gemm.stop();
+			//#endif
+			return;
+		}
+
+			if (typeA == 'N')
+			{
+				if (typeB == 'N')
+					C.mat.noalias() = alpha * A.mat * B.mat;
+				else
+					C.mat.noalias() = alpha * A.mat * B.mat.transpose();
+			}else
+			{
+				if (typeB == 'N')
+					C.mat.noalias() = alpha * A.mat.transpose() * B.mat;
+				else
+					C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose();
+			}
+
+
+	}else
+	{
+		if(B.isZeros)
+		{
+			C *= beta;
+			C.isZeros = false;
+			C.isIdentity = false;
+			//#ifdef __COMPILE_TIMERS__
+			//	A.t_gemm.stop();
+			//#endif
+			return;
+		}	
+		if(B.isIdentity)
+		{
+			C *= beta;
+			if(typeA == 'N' && alpha == 1.0)
+			{
+				C += A;
+				C.isZeros = false;
+				C.isIdentity = false;
+				//#ifdef __COMPILE_TIMERS__
+				//	A.t_gemm.stop();
+				//#endif
+				return;
+			}
+			faust_mat<T> A_tmp(A);
+			if(typeA == 'T')
+				A_tmp.transpose();
+			if(alpha != 1.0)
+				A_tmp *= alpha;
+			C += A_tmp;
+			C.isZeros = false;
+			C.isIdentity = false;
+
+			//#ifdef __COMPILE_TIMERS__
+			//	A.t_gemm.stop();
+			//#endif
+			return;
+		}
+
+			if (typeA == 'N')
+			{
+				if (typeB == 'N')
+				{
+						C.mat = alpha * A.mat * B.mat + beta * C.mat;
+				}else
+					C.mat = alpha * A.mat * B.mat.transpose() + beta * C.mat;
+			}else
+			{
+				if (typeB == 'N')
+					C.mat = alpha * A.mat.transpose() * B.mat + beta * C.mat ;
+				else
+					C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
+			}
+		
+
+	}
+	C.isZeros = false;
+	C.isIdentity = false;
+//#ifdef __COMPILE_TIMERS__
+//A.t_gemm.stop();
+//#endif
+}
 
 
 template<typename T>
@@ -184,7 +336,7 @@ void gemm(const faust_mat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const 
 
 	if ( ((&(C.mat)) == (&(A.mat))) || ((&(C.mat)) == (&(B.mat))) )
 	{
-		handleError("LinAlgebra", "gemv : gemm : C is the same object as A or B");
+		handleError("LinAlgebra", " gemm : C is the same object as A or B");
 	}
 
 	if (typeA == 'T')

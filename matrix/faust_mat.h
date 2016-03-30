@@ -10,6 +10,7 @@
 #include "faust_mat_generic.h"
 #include "faust_exception.h"
 #include <iostream>
+#include "LinAlgebra.h"
 
 #ifdef __COMPILE_TIMERS__
   #include "faust_timer.h"
@@ -42,6 +43,8 @@ void multiply(const faust_core<T> & A, const faust_mat<T> & B, faust_mat<T> & C,
 template<typename T>  
  void gemv(const faust_mat<T> & A,const faust_vec<T> & x,faust_vec<T> & y,const T & alpha, const T & beta, char typeA);
 
+template<typename T>
+void spgemm(const faust_spmat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB);
 
 template<typename T>
 class faust_mat : public faust_mat_generic<T>
@@ -50,8 +53,10 @@ class faust_mat : public faust_mat_generic<T>
 	template<class> friend class faust_mat;
 	
 	public:
-	static const char * name;  
-	void mult(faust_mat<T> Y,const  faust_mat<T> X)const{}	/*!
+	static const char * name;
+	//void gemm(const faust_mat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB);  
+
+	void faust_gemm(const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB)const {gemm<T>((*this),B,C,alpha,beta,typeA,typeB);}	/*!
 	*  \brief Constructor faust_mat
 	*	\tparam data : pointer to the data array of the matrix
 		\tparam nbRow : number of row of the matrix
@@ -265,6 +270,7 @@ class faust_mat : public faust_mat_generic<T>
 
 	friend void multiply<>(const faust_mat<T> & A, const faust_mat<T> & B, faust_mat<T> & C);	
 	friend void gemm<>(const faust_mat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const T& alpha, const T& beta, char  typeA, char  typeB);
+	friend void spgemm<>(const faust_spmat<T> & A,const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB);
 	friend void multiply<>(const faust_core<T> & A, const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, char typeA, char typeMult);
 	friend void gemv<>(const faust_mat<T> & A,const faust_vec<T> & x,faust_vec<T> & y,const T & alpha, const T & beta, char typeA);
   

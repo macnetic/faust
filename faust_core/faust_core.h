@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "faust_spmat.h"
+#include "faust_linear_operator.h"
 
 // class faust_mat<T>;
 // class faust_vec;
@@ -20,9 +21,10 @@ faust_mat<T> operator*(const faust_core<T>& f, const faust_mat<T>& M);
 
 /** \brief contains the data of the FAUST method (sparses matrix, lambda, number of non-zeros...) */
 template<typename T>
-class faust_core
+class faust_core : public faust_linear_operator<T>
 {
-	public:
+	public:			
+		void faust_gemm(const faust_mat<T> & B, faust_mat<T> & C,const T & alpha, const T & beta, char  typeA, char  typeB)const;	
 	/** \brief Constructor
     * \param data : Vector including sparse matrix
     * \param totalNonZeros : Number of nonzeros Value in the data (all factorized matrix) */
@@ -43,8 +45,8 @@ class faust_core
     /** \brief Perform the product of all factorized matrix. */
     faust_mat<T> get_product()const;
 	faust_spmat<T> get_fact(int id) const;
-	int getNbRow() const;
-	int getNbCol() const;
+	faust_unsigned_int getNbRow() const;
+	faust_unsigned_int getNbCol() const;
 	void print_file(const char* filename) const;
 	void init_from_file(const char* filename);
 	long long int get_total_nnz()const{return totalNonZeros;}
@@ -87,5 +89,6 @@ class faust_core
 };
 
 #include "faust_core.hpp"
+
 
 #endif
