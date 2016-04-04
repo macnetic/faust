@@ -30,7 +30,7 @@ ifneq ($(COMPILE_SPMAT),)
   CUFLAGS += -D__COMPILE_SPMAT__
   CFLAGS  += -D__COMPILE_SPMAT__
 endif
-ifneq ($(COMPILE_TIMERS),)
+ifeq ($(COMPILE_TIMERS),1)
   CUFLAGS += -D__COMPILE_TIMERS__
   CFLAGS  += -D__COMPILE_TIMERS__
 endif
@@ -81,7 +81,7 @@ TEST_MEG_SRC = MEG_fact_cu.cpp
 TEST_MEG_OBJ = $(patsubst %.cpp, %.o, $(TEST_MEG_SRC))
 TEST_MEG_EXE = $(patsubst %.o, %.out, $(TEST_MEG_OBJ))
 
-LDFLAGS = $(LIBS) -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5
+LDFLAGS = -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5 -fopenmp
 
 
 all: $(TEST_HIERFACT_EXE) $(TEST_MEG_EXE)
@@ -95,7 +95,7 @@ $(TEST_MEG_OBJ) : $(TEST_MEG_SRC)
 
 %.out: %.o $(LIB_MATRIX) $(LIB_PALM) $(LIB_MATIO) $(LIB_EXCEPTION)
 	@printf '\033[36m%s\033[31m%s\033[m\n' "Linking       " $@
-	@$(CC) $<  $(LDFLAGS) -o $@ 
+	@$(CC) $^  $(LDFLAGS) -o $@ 
 
 
 $(MATRIX_DIR)/%.cuo:  $(MATRIX_DIR)/%.cu $(SRC_HU_MATRIX)
