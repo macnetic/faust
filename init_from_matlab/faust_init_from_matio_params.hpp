@@ -4,7 +4,9 @@
 #include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
 //#include "faust_init_from_matio_params.h"
+
 #include "faust_mat.h"
+
 
 #include <iostream>
 #include <vector>
@@ -28,6 +30,8 @@ void init_params_palm_from_matiofile(faust_params_palm<T>& params,const char* fi
 #else
    typedef faust_mat<T> faust_matrix ;
 #endif
+
+
 	matvar_t* params_var = faust_matio_read_variable(fileName,variableName);
 
 	matvar_t*   current_var;
