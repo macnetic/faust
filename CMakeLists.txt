@@ -5,6 +5,7 @@
 
 cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
+
 set(FAUST_VERSION_MAJOR 1)
 set(FAUST_VERSION_MINOR 0)
 
@@ -23,7 +24,7 @@ set(FAUST_VERSION_MINOR 0)
 
 
 IF (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/output" CACHE STRING "default install path" FORCE )
+	SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/output" CACHE STRING "default install path" FORCE )
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 
@@ -47,15 +48,43 @@ endif()
 
 
 # different option of configuration
-set(FAUST_USE_SINGLEPRECISION ON CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
+set(FAUST_USE_SINGLEPRECISION OFF CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
 set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
-set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
-set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
+set(FAUST_USE_MEX OFF CACHE BOOL "Generate Mexfiles")
+set(FAUST_USE_PROFILING ON CACHE BOOL "Profiling the code")
 set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read matfile")
 set(FAUST_USE_XML ON CACHE BOOL "Using xml configuration file")
-set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
-set(FAUST_GEN_DOC OFF CACHE BOOL "Generate html documentation with doxygen")
+set(FAUST_ISVERBOSE ON CACHE BOOL "Display useful message for debugging")
+set(FAUST_USE_GPU OFF CACHE BOOL "Using Graphics Processing Unit (GPU) in combination with CPU ")
+set(FAUST_GEN_DOC ON CACHE BOOL "Generate html documentation with doxygen")
 
+if (FAUST_USE_SINGLEPRECISION)
+	message(STATUS "**********SINGLEPRECISION ACTIF************")
+endif()
+if (FAUST_USE_OPENBLAS)
+	message(STATUS "**********OPENBLAS ACTIF************")
+endif()
+if (FAUST_USE_MEX)
+	message(STATUS "**********MEX ACTIF************")
+endif()
+if (FAUST_USE_PROFILING)
+	message(STATUS "**********PROFILING ACTIF************")
+endif()
+if (FAUST_USE_MATIO)
+	message(STATUS "**********MATIO ACTIF************")
+endif()
+if (FAUST_USE_XML)
+	message(STATUS "**********XML ACTIF************")
+endif()
+if (FAUST_ISVERBOSE)
+	message(STATUS "**********VERBOSE ACTIF************")
+endif()
+if (FAUST_USE_GPU)
+	message(STATUS "**********GPU ACTIF************")
+endif()
+if (FAUST_GEN_DOC)
+	message(STATUS "**********DOC ACTIF************")
+endif()
 
 
 # Enable testing:
@@ -78,6 +107,12 @@ set(FAUST_MEXINTERFACE_SRC_DIR ${PROJECT_SOURCE_DIR}/interface_matlab CACHE INTE
 set(FAUST_MEXINTERFACETOOLS_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/tools CACHE INTERNAL "")
 set(FAUST_MEXINTERFACEMEX_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/mex_functions CACHE INTERNAL "")
 set(FAUST_EIGEN_SRC_DIR ${PROJECT_SOURCE_DIR}/eigen CACHE INTERNAL "")
+if (FAUST_USE_GPU)
+	set(FAUST_MATRIX_CU_SRC_DIR ${PROJECT_SOURCE_DIR}/matrix/matrix_cu CACHE INTERNAL "")
+	set(FAUST_FAUSTCORE_CU_SRC_DIR ${PROJECT_SOURCE_DIR}/faust_core/faust_core_cu CACHE INTERNAL "")
+	set(FAUST_PALM4MSA_CU_SRC_DIR ${PROJECT_SOURCE_DIR}/palm4MSA/palm4MSA_cu CACHE INTERNAL "")
+	set(FAUST_TEST_GPU_SRC_DIR ${PROJECT_SOURCE_DIR}/test/GPU_test CACHE INTERNAL "")
+endif(FAUST_USE_GPU)
 
 
 # BINARY DIRECTORIES
@@ -96,6 +131,13 @@ set(FAUST_TESTTOOLS_BIN_DIR ${PROJECT_BINARY_DIR}/testing/tools CACHE INTERNAL "
 set(FAUST_MEXINTERFACE_BIN_DIR ${FAUST_WRAPPER_BIN_DIR}/mex CACHE INTERNAL "")
 set(FAUST_MEXINTERFACETOOLS_BIN_DIR ${FAUST_MEXINTERFACE_BIN_DIR}/tools CACHE INTERNAL "")
 set(FAUST_MEXINTERFACEMEX_BIN_DIR ${FAUST_MEXINTERFACE_BIN_DIR} CACHE INTERNAL "") #  a MODIFIER ET METTRE LES MEXFONCTIONS.mexa DEDANS
+if (FAUST_USE_GPU)
+	set(FAUST_MATRIX_CU_BIN_DIR ${PROJECT_BINARY_DIR}/matrix/matrix_cu CACHE INTERNAL "")
+	set(FAUST_FAUSTCORE_CU_BIN_DIR ${PROJECT_BINARY_DIR}/faust_core/faust_core_cu CACHE INTERNAL "")
+	set(FAUST_PALM4MSA_CU_BIN_DIR ${PROJECT_BINARY_DIR}/palm4MSA/palm4MSA_cu CACHE INTERNAL "")
+	set(FAUST_TEST_GPU_BIN_DIR ${PROJECT_BINARY_DIR}/testing/binGPU CACHE INTERNAL "") 
+endif(FAUST_USE_GPU)
+
 
 #DEMO DIRECTORIES
 set(FAUST_DEMO_SRC_DIR ${PROJECT_SOURCE_DIR}/demo CACHE INTERNAL "")
@@ -105,10 +147,7 @@ set(FAUST_DEMO_BIN_DIR ${PROJECT_BINARY_DIR}/demo CACHE INTERNAL "")
 set(FAUST_DEMOTOOLS_BIN_DIR ${PROJECT_BINARY_DIR}/tools CACHE INTERNAL "")
 
 
-
-
 #CMDLINE DIRECTORIES
-
 set(FAUST_CMDLINE_SRC_DIR ${PROJECT_SOURCE_DIR}/cmd_line CACHE INTERNAL "")
 set(FAUST_CMDLINE_SRC_DATA_DIR ${FAUST_CMDLINE_SRC_DIR}/data CACHE INTERNAL "")
 set(FAUST_CMDLINE_SRC_CONFIGFILE_DIR ${FAUST_CMDLINE_SRC_DIR}/config_file CACHE INTERNAL "")
@@ -145,6 +184,11 @@ set(FAUST_MEXTOOLS_TARGET faust_mextools CACHE INTERNAL "")
 set(FAUST_MATIO_TARGET faust_matio CACHE INTERNAL "")
 set(FAUST_XML_TARGET faust_xml CACHE INTERNAL "")
 set(FAUST_TARGET faust CACHE INTERNAL "")
+if (FAUST_USE_GPU)
+	set(FAUST_MATRIX_CU_TARGET faust_matrix_cu CACHE INTERNAL "")
+	set(FAUST_FAUSTCORE_CU_TARGET faust_core_cu CACHE INTERNAL "")
+	set(FAUST_PALM4MSA_CU_TARGET faust_palm4MSA_cu CACHE INTERNAL "")
+endif(FAUST_USE_GPU)
 
 
 
@@ -170,13 +214,17 @@ endif()
 if(WIN32)
 	set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "lib" )
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a")
-endif()
+endif(WIN32)
 
+
+# looking for library and include files
 include(CMake/add_library_path.cmake)
-add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" )
-add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" )
+add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" )
+add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" )
+
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP} CACHE PATH "List of include paths used as PATH parameter in find_path")
+
 message(STATUS "LIBRARY_PATH_LIST=${LIBRARY_PATH_LIST}")
 message(STATUS "INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
 
@@ -184,24 +232,35 @@ include(CMake/check_external_libraries.cmake)
 check_external_libraries(hdf5 HDF5_LIB_FILE 0)
 check_external_libraries(matio MATIO_LIB_FILE 0)
 check_external_libraries(xml2 XML2_LIB_FILE 0)
+check_external_libraries(hdf5 HDF5_LIB_FILE 0)
+
+
+#LDFLAGS = -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5
 check_external_includes("libxml/parser.h" XML_INC_DIR 0)
+check_external_includes("matio.h" MATIO_INC_DIR 0)
+#check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
+
+if (FAUST_USE_GPU)
+	check_external_libraries(cublas CUBLAS_LIB_FILE 0)
+	check_external_libraries(cudart CUDART_LIB_FILE 0)
+	check_external_libraries(cusparse CUSPARSE_LIB_FILE 0)
+
+	check_external_includes("cublas_v2.h" CUBLAS_V2_INC_DIR 0)
+	check_external_includes("cusparse.h" CUSPARSE_INC_DIR 0)
+	check_external_includes("cuda.h" CUDA_INC_DIR 0)
+	check_external_includes("cuda_runtime_api.h" CUDA_RUNTIME_API_INC_DIR 0)
+endif(FAUST_USE_GPU)
 
 if(FAUST_USE_OPENBLAS)
 	check_external_libraries(openblas OPENBLAS_LIB_FILE 1)
 	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
-endif()
-
-
-
-
-#check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
-check_external_includes("matio.h" MATIO_INC_DIR 0)
+endif(FAUST_USE_OPENBLAS)
 
 #find_path(OPENBLAS_LIB_DIR ${OPENBLAS_LIB_FILE})
 #find_path(EIGEN_LIB_DIR ${EIGEN_LIB_FILE})
 
-# adding compiler flags
 
+# adding compiler flags
 set(CMAKE_CXX_FLAGS "")
 
 if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") )
@@ -213,9 +272,9 @@ if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") )
 	message(STATUS "mode DEBUG")
 else()
 	if (UNIX)	
-		set(CMAKE_CXX_FLAGS " -O2 ${CMAKE_CXX_FLAGS_DEBUG}")
+		set(CMAKE_CXX_FLAGS " -O2 ")
 	elseif(WIN32)
-		set(CMAKE_CXX_FLAGS " /O2 ${CMAKE_CXX_FLAGS_DEBUG}")
+		set(CMAKE_CXX_FLAGS " /O2 ")
 	endif()
 	message(STATUS "mode RELEASE")
 endif()
@@ -241,31 +300,34 @@ endif()
 
 # test if executable matlab is in the path
 if(UNIX)
-message(STATUS "MATLAB_DIR_TMP 1 = ${MATLAB_DIR_TMP}")
+	#message(STATUS "MATLAB_DIR_TMP 1 = ${MATLAB_DIR_TMP}")
 	exec_program("which matlab | xargs echo" OUTPUT_VARIABLE MATLAB_DIR_TMP)
-message(STATUS "MATLAB_DIR_TMP 2 = ${MATLAB_DIR_TMP}")
-   exec_program("readlink ${MATLAB_DIR_TMP}" OUTPUT_VARIABLE READLINK_TMP)
-message(STATUS "READLINK_TMP = ${READLINK_TMP}")
-   if(${READLINK_TMP} MATCHES matlab)
-      set(MATLAB_DIR_TMP ${READLINK_TMP})
-      message(STATUS "MATLAB_DIR_TMP 3 = ${MATLAB_DIR_TMP}")
-   endif()
-   message(STATUS "MATLAB_DIR_TMP 4 = ${MATLAB_DIR_TMP}")
+	#message(STATUS "MATLAB_DIR_TMP 2 = ${MATLAB_DIR_TMP}")
+   	exec_program("readlink ${MATLAB_DIR_TMP}" OUTPUT_VARIABLE READLINK_TMP)
+	#message(STATUS "READLINK_TMP = ${READLINK_TMP}")
+	if(${READLINK_TMP} MATCHES matlab)
+		set(MATLAB_DIR_TMP ${READLINK_TMP})
+		#message(STATUS "MATLAB_DIR_TMP 3 = ${MATLAB_DIR_TMP}")
+   	endif()
+	#message(STATUS "MATLAB_DIR_TMP 4 = ${MATLAB_DIR_TMP}")
 
 elseif(WIN32)
 	exec_program("where matlab.exe" OUTPUT_VARIABLE MATLAB_DIR_TMP)
+else()
+	message(WARNING "Unknown type of plateform for matlab")		
 endif()
 if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 	if(UNIX)
 		string(REGEX REPLACE "([a-zA-Z0-9_/:]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
 	elseif(WIN32)
 		string(REGEX REPLACE "([a-zA-Z0-9_\\:]+)\\\\bin\\\\matlab.exe" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
+	else()
+		message(WARNING "Unknown type of plateform for matlab")	
 	endif()
 	set(MATLAB_ROOT ${MATLAB_ROOT} CACHE PATH "Matlab root directory")
 	message(STATUS "MATLAB_ROOT has been found : ${MATLAB_ROOT}")
 
 	set(MATLAB_INCLUDE_DIR "${MATLAB_ROOT}/extern/include" CACHE INTERNAL "Matlab include directory")
-
 	set(MATLAB_ARCH_FILE "${FAUST_TMP_BUILD_DIR}/matlab_arch.txt")
 	if(UNIX) 
 		# METHODE 1 (without using matlab)
@@ -304,8 +366,6 @@ endif()
 
 #INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
 
-
-
 # Methode 1
 add_subdirectory(${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EXCEPTION_BIN_DIR})
 add_subdirectory(${FAUST_MATRIX_SRC_DIR} ${FAUST_MATRIX_BIN_DIR})
@@ -315,6 +375,13 @@ add_subdirectory(${FAUST_PALM4MSA_SRC_DIR} ${FAUST_PALM4MSA_BIN_DIR})
 add_subdirectory(${FAUST_TEST_SRC_DIR} ${FAUST_TEST_BIN_DIR})
 add_subdirectory(${FAUST_DOC_SRC_DIR} ${FAUST_DOC_BIN_DIR})
 add_subdirectory(${FAUST_CMDLINE_SRC_DIR} ${FAUST_CMDLINE_BIN_DIR})
+if (FAUST_USE_GPU)
+	add_subdirectory(${FAUST_MATRIX_CU_SRC_DIR} ${FAUST_MATRIX_CU_BIN_DIR})
+	add_subdirectory(${FAUST_FAUSTCORE_CU_SRC_DIR} ${FAUST_FAUSTCORE_CU_BIN_DIR})
+	add_subdirectory(${FAUST_PALM4MSA_CU_SRC_DIR} ${FAUST_PALM4MSA_CU_BIN_DIR})
+	add_subdirectory(${FAUST_TEST_GPU_SRC_DIR} ${FAUST_TEST_GPU_BIN_DIR})
+endif (FAUST_USE_GPU)
+
 
 if (FAUST_USE_MEX)
 	add_subdirectory(${FAUST_MEXINTERFACE_SRC_DIR} ${FAUST_MEXINTERFACE_BIN_DIR})
@@ -322,45 +389,42 @@ if (FAUST_USE_MEX)
 endif()
 
 file(GLOB MATRIX_HPP_FILES "matrix/*.hpp")
-if (FAUST_USE_MEX)
-add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_EXCEPTION_TARGET}> $<TARGET_OBJECTS:${FAUST_MATRIX_TARGET}> $<TARGET_OBJECTS:${FAUST_FAUSTCORE_TARGET}> $<TARGET_OBJECTS:${FAUST_PALM4MSA_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
-else ()
-add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_EXCEPTION_TARGET}> $<TARGET_OBJECTS:${FAUST_MATRIX_TARGET}> $<TARGET_OBJECTS:${FAUST_FAUSTCORE_TARGET}> $<TARGET_OBJECTS:${FAUST_PALM4MSA_TARGET}>)
-endif()
-#target_link_libraries(${FAUST_TARGET} ${MATLAB_ROOT}/bin/glnxa64/libmex.so )
+
+if (FAUST_USE_GPU)
+	if (FAUST_USE_MEX)
+		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_EXCEPTION_TARGET}> $<TARGET_OBJECTS:${FAUST_MATRIX_TARGET}> $<TARGET_OBJECTS:${FAUST_FAUSTCORE_TARGET}> $<TARGET_OBJECTS:${FAUST_FAUSTCORE_CU_TARGET}> $<TARGET_OBJECTS:${FAUST_PALM4MSA_TARGET}> $<TARGET_OBJECTS:${FAUST_PALM4MSA_CU_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
+	else (FAUST_USE_MEX)	
+		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_EXCEPTION_TARGET}> $<TARGET_OBJECTS:${FAUST_MATRIX_TARGET}> $<TARGET_OBJECTS:${FAUST_FAUSTCORE_TARGET}> $<TARGET_OBJECTS:${FAUST_FAUSTCORE_CU_TARGET}> $<TARGET_OBJECTS:${FAUST_PALM4MSA_TARGET}> $<TARGET_OBJECTS:${FAUST_PALM4MSA_CU_TARGET}>)
+	endif(FAUST_USE_MEX)
+else (FAUST_USE_GPU)
+	if (FAUST_USE_MEX)
+		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_EXCEPTION_TARGET}> $<TARGET_OBJECTS:${FAUST_MATRIX_TARGET}> $<TARGET_OBJECTS:${FAUST_FAUSTCORE_TARGET}> $<TARGET_OBJECTS:${FAUST_PALM4MSA_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
+	else (FAUST_USE_MEX)	
+		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_EXCEPTION_TARGET}> $<TARGET_OBJECTS:${FAUST_MATRIX_TARGET}> $<TARGET_OBJECTS:${FAUST_FAUSTCORE_TARGET}> $<TARGET_OBJECTS:${FAUST_PALM4MSA_TARGET}>)
+	endif(FAUST_USE_MEX)
+endif (FAUST_USE_GPU)
+
+target_link_libraries(${FAUST_TARGET} ${MATLAB_ROOT}/bin/glnxa64/libmex.so )
+
+
+#pour linker la librairie libfaust_matrix_cu.a pour la version GPU
+if (FAUST_USE_GPU)
+	target_link_libraries(${FAUST_TARGET} ${FAUST_MATRIX_CU_TARGET} )	
+endif(FAUST_USE_GPU)
 
 
 if(FAUST_USE_OPENBLAS)
-		target_link_libraries(${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
+	target_link_libraries(${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
 else()
-		target_link_libraries(${FAUST_TARGET} )	
-endif()
+	target_link_libraries(${FAUST_TARGET} )	
+endif(FAUST_USE_OPENBLAS)
+
+
 
 install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
 
 #add_dependencies(${FAUST_FAUSTCORE_TARGET} ${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
 #add_dependencies(${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
-
-
-
-
-#set(FAUST_INCLUDE_DIRS "")
-#file(GLOB FAUST_CPP "${PROJECT_SOURCE_DIR}/*.cpp")
-#file(GLOB FAUST_H "${PROJECT_SOURCE_DIR}/*.h")
-#foreach(header ${FAUST_H})
-#	get_filename_component(tmp_dir ${header} DIRECTORY)
-#	list(APPEND FAUST_INCLUDE_DIRS ${tmp_dir})
-#endforeach()
-#list(REMOVE_DUPLICATES FAUST_INCLUDE_DIRS)
-#include_directories(${FAUST_INCLUDE_DIRS})
-
-
-
-#include_directories (BEFORE ${FAUST_MATRIX_DIR} ${FAUST_FAUSTCORE_DIR} 
-#	${FAUST_MATIO_DIR} ${FAUST_PALM4MSA_DIR} ${FAUST_MEXINTERFACE_DIR}
-#	${FAUST_MEXINTERFACETOOLS_DIR})
-
-
 
 
 
