@@ -1,6 +1,10 @@
 GCC = gcc
 NVCC = nvcc
 
+## WARNING following environement variables must be defined in bashrc or faust_constant.h.in
+## export COMPILE_GPU=TETSTETTT
+## export COMPILE_SPMAT=TTTTT
+
 
 MATRIX_DIR = ../../matrix/matrix_cu
 PALM_DIR = ../../palm4MSA/palm4MSA_cu
