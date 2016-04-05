@@ -75,7 +75,10 @@ EXECUTABLE=$(TESTS_DIR)/comptime0 $(TESTS_DIR)/comptime $(TESTS_DIR)/comptime2
 # instruction pour que les fichiers .o.mex ne soient pas automatiquement detruits apres les appels aux cibles all ou mex
 .PRECIOUS: %.o.mex
 
-all: $(EXECUTABLE)
+all: regle_bidon $(EXECUTABLE) 
+
+regle_bidon :
+	@printf "$(SRC_CPP)"
 
 mex: $(MEX_EXE)
 
@@ -144,12 +147,12 @@ $(TESTS_DIR)/comptime2:$(OBJS) $(TESTS_DIR)/comp_time2.o
 
 
 
-%.o:%.cpp
+%.o: %.cpp
 	@printf 'CXXFLAGS $(CXXFLAGS)'
 	@printf '$(FONT)$(CYAN)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n' 'Compiling' '     ' "$@"
 	@$(CXX) -c $(CXXFLAGS) $^ -o $@
 
-%.o.mex:%.cpp
+%.o.mex: %.cpp
 	@printf '$(FONT)$(CYAN)%s$(RESET_FONT)%s$(FONT)$(ITALIC)$(RED)%s$(RESET_FONT)\n' 'Compiling' '     ' "$@"
 	@$(CXX) -c $(CXXFLAGS_MEX) $^ -o $@
 

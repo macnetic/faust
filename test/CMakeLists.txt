@@ -1,34 +1,20 @@
-#TEST VERSION GPU
+#TEST VERSION CPU
 
-
-#copy an extra configuration file for the test in the build tree
-configure_file(${PROJECT_SOURCE_DIR}/CTestCustom.cmake ${PROJECT_BINARY_DIR}/CTestCustom.cmake COPYONLY)
-
-# copy GPU files cpp.in to the user's ./src/ directory
-foreach(gpucppin hierarchical_fact_test_cu MEG_fact_cu)
-      #configure_file(${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp.in ${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp @ONLY)
-      configure_file(${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${gpucppin}.cpp @ONLY)
-endforeach()
-
+include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR})
 
 if(FAUST_USE_MATIO)
-	#rajout OPENBLAS_INC_DIR pour la compatibilite UBUNTU
-	if(FAUST_USE_OPENBLAS)
-		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_MATIO_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${MATIO_INC_DIR} ${OPENBLAS_INC_DIR})
-	else(FAUST_USE_OPENBLAS)
-		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_MATIO_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${MATIO_INC_DIR})
-	endif(FAUST_USE_OPENBLAS)
-else()
-	if(FAUST_USE_OPENBLAS)
-		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${OPENBLAS_INC_DIR})
-	else(FAUST_USE_OPENBLAS)
-		include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_FAUSTCORE_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EIGEN_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR})
-	endif(FAUST_USE_OPENBLAS)
+	include_directories(${FAUST_MATIO_SRC_DIR} ${MATIO_INC_DIR})
+endif(FAUST_USE_MATIO)
+
+#rajout OPENBLAS_INC_DIR pour la compatibilite UBUNTU
+if(FAUST_USE_OPENBLAS)
+	include_directories(${OPENBLAS_INC_DIR})
 endif()
 
 
 if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
-	# CPU --> Effectuer les tests en simple et double precision  
+########## CPU --> Effectuer les tests en simple et double precision  
+	### hierarchical_fact en version CPU 
 	foreach(TEST_FPP float double)	
 		foreach(testin hierarchical_fact)
 			# copy CPU files cpp.in to the user's ./src/ directory en float et double precision
@@ -44,16 +30,10 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 		endforeach()
 	endforeach()
 
+
 	foreach(cppin faust_test palm4MSA_test)
 		configure_file(${FAUST_TESTSRC_SRC_DIR}/${cppin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${cppin}.cpp @ONLY)
 	endforeach()
-	#CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp COPYONLY)
-	#CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/comp_time1.cpp ${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp COPYONLY)
-	add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp" "${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp")
-	add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/comp_time1.cpp" "${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/comp_time1.cpp")
-	add_custom_command(OUTPUT ${FAUST_TESTRUNCOMP_BIN_DIR}/drawComptime1.m COMMAND cmake -E copy "${FAUST_TESTRUNCOMP_SRC_DIR}/drawComptime1.m" "${FAUST_TESTRUNCOMP_BIN_DIR}/drawComptime1.m" DEPENDS "${FAUST_TESTRUNCOMP_SRC_DIR}/drawComptime1.m")
-	#CONFIGURE_FILE(${FAUST_TESTRUNCOMP_SRC_DIR}/main_RCG.m.in ${FAUST_TESTRUNCOMP_BIN_DIR}/main_RCG.m @ONLY)
-
 	# palm
 	add_executable(palm ${FAUST_TESTSRC_BIN_DIR}/palm4MSA_test.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
 	if(FAUST_USE_OPENBLAS)
@@ -62,7 +42,7 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 		target_link_libraries(palm  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
 	endif()
 
-	# faust
+	# faust_test
 	add_executable(faust_test ${FAUST_TESTSRC_BIN_DIR}/faust_test.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_params.cpp)
 	if(FAUST_USE_OPENBLAS)
 		target_link_libraries(faust_test  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
@@ -70,6 +50,14 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 		target_link_libraries(faust_test ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
 	endif()
     
+
+	#CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp COPYONLY)
+	#CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/comp_time1.cpp ${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp COPYONLY)
+	add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp" "${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp")
+	add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/comp_time1.cpp" "${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/comp_time1.cpp")
+	add_custom_command(OUTPUT ${FAUST_TESTRUNCOMP_BIN_DIR}/drawComptime1.m COMMAND cmake -E copy "${FAUST_TESTRUNCOMP_SRC_DIR}/drawComptime1.m" "${FAUST_TESTRUNCOMP_BIN_DIR}/drawComptime1.m" DEPENDS "${FAUST_TESTRUNCOMP_SRC_DIR}/drawComptime1.m")
+	#CONFIGURE_FILE(${FAUST_TESTRUNCOMP_SRC_DIR}/main_RCG.m.in ${FAUST_TESTRUNCOMP_BIN_DIR}/main_RCG.m @ONLY)
+	    
 	#comptime1
 	add_custom_target(drawComp DEPENDS ${FAUST_TESTRUNCOMP_BIN_DIR}/drawComptime1.m)
 	add_executable(comptime1 ${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_core.cpp)
@@ -78,9 +66,7 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 		target_link_libraries(comptime1  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
 	else()
 		target_link_libraries(comptime1  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
-	endif()
-	
-	
+	endif()	
 	
 	# comptime0
 	add_executable(comptime0 ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_core.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
@@ -97,19 +83,14 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 		INSTALL(FILES ${FAUST_TESTRUNCOMP_BIN_DIR}/${matlabscript} DESTINATION ${FAUST_INSTALL_TESTRUNCOMP})
 	ENDFOREACH()
 
-	if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
-		install(TARGETS  palm hierarchical_fact_double hierarchical_fact_float faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
-	else()
-		install(TARGETS  palm faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
-	endif()
+	install(TARGETS  palm hierarchical_fact_double hierarchical_fact_float faust_test DESTINATION ${FAUST_INSTALL_TESTING_BIN})
+
 	#install(TARGETS faust_hier meg faust_test comptime0 DESTINATION ${FAUST_INSTALL_TESTING_BIN})
 	#install(FILES ${FAUST_TESTDATA_SRC_DIR}/config_compared_palm2.mat 
 	#              ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 
 	#              ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 
 	#        DESTINATION ${FAUST_INSTALL_TESTING_DATA})
-   
 
-   
 	#time_comp
 	#add_executable(time_comp time_comp_spmat_vec.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp)	
 	#target_link_libraries(time_comp ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
@@ -118,7 +99,6 @@ if(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 	#add_executable(time_comp_mat time_comp_spmat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp)	
 	#target_link_libraries(time_comp_mat ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
 	
-# ??????????????????	
 else(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)	
 	### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST
 	foreach(cppinbis hierarchical_fact_test MEG_fact)
@@ -143,7 +123,7 @@ else(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
    	else()
 		target_link_libraries(meg  ${FAUST_TARGET})
 	endif()
-  
+ 
 endif(MATIO_LIB_FILE AND HDF5_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 
 
@@ -204,3 +184,7 @@ endif(FAUST_USE_XML)
    # else()
       # target_link_libraries(faust_hier_basic ${FAUST_TARGET})
    # endif()
+   
+   
+   
+   
