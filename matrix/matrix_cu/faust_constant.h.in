@@ -1,0 +1,40 @@
+#ifndef FAUST_CONSTANT_H
+#define FAUST_CONSTANT_H
+
+
+/*! \brief If defined, faust uses single precision for the the algebra (faust_mat, faust_spmat, faust_core). <br> 
+* If not, it's used double precision. 
+*\warning Only useful for the mexfunction (MATLAB wrapper) since the faust_mat ... classes are template
+*/
+#cmakedefine FAUST_SINGLE
+
+//if defined, print debug message (useful for debugging)
+#cmakedefine FAUST_VERBOSE  
+
+//if defined, print timers (profile the code)
+#cmakedefine __COMPILE_TIMERS__
+
+//if defined, compile in GPU mode 
+#cmakedefine __COMPILE_GPU__
+
+//if defined, compile with sparse matrices
+#cmakedefine __COMPILE_SPMAT__
+
+/// Value of FFPP (faust floating point precision)
+#ifdef FAUST_SINGLE
+	typedef float FFPP; ///single precision
+#else
+	typedef double FFPP; ///double precision 
+#endif
+
+
+typedef unsigned long int faust_unsigned_int;
+typedef long int faust_int;
+
+const double FAUST_PRECISION = 0.0001;
+const faust_unsigned_int nbr_iter_norm = 100; 
+
+#define FAUST_GPU_ALREADY_SET -3
+#define FAUST_DEFAULT_CUDA_DEVICE 0
+
+#endif
