@@ -71,12 +71,12 @@ palm4MSA_cu<T>::palm4MSA_cu(const faust_params<T> & params_, const cublasHandle_
       stop_crit = stopping_criterion<T>(params_.stop_crit_global);
    else
       stop_crit = stopping_criterion<T>(params_.stop_crit_2facts);
-  
+
 	if (isConstantStepSize)
 		isCComputed = true;
 	else
 		isCComputed = false;
-	
+
 }
 
 template<typename T>
@@ -109,7 +109,7 @@ const cublasHandle_t cublasHandle, const bool isGlobal_/*=false*/) :
 		isCComputed = true;
 	else
 		isCComputed = false;
-   
+
    check_constraint_validity();
 
 }
@@ -118,7 +118,7 @@ template<typename T>
 void palm4MSA_cu<T>::compute_facts()
 {
 	while (do_continue())
-	{	
+	{
 		next_step();
 	}
 
@@ -129,7 +129,7 @@ void palm4MSA_cu<T>::get_facts(faust_core_cu<T> & faust_fact) const
 {
 	faust_core_cu<T> f(S);
 	faust_fact = f;
-	
+
 
 }
 
@@ -144,7 +144,7 @@ t_local_compute_projection.start();
 #endif
 
    if (const_vec[ind_fact]->getConstraintType() == CONSTRAINT_NAME_CONST)
-   {	
+   {
 		#ifdef __COMPILE_TIMERS__
 			nb_call_prox_const++;
 			t_prox_const.start();
@@ -166,7 +166,7 @@ t_local_compute_projection.start();
       switch (const_vec[ind_fact]->getConstraintType())
       {
          case CONSTRAINT_NAME_SP:
-         {	
+         {
 		#ifdef __COMPILE_TIMERS__
 			nb_call_prox_sp++;
 			t_prox_sp.start();
@@ -175,7 +175,7 @@ t_local_compute_projection.start();
 		typename constraint_type<T>::constraint_type_sp* constr_cast = static_cast<typename constraint_type<T>::constraint_type_sp*>(const_vec[ind_fact]);
 		// constraint_type_sp* constr_cast = dynamic_cast<constraint_type_sp*>(const_vec[ind_fact]);
 			prox_sp(S[ind_fact], constr_cast->getParameter());
-		
+
 		#ifdef __COMPILE_TIMERS__
 		t_prox_sp.stop();
 		#endif
@@ -183,14 +183,14 @@ t_local_compute_projection.start();
          break;
 
          case CONSTRAINT_NAME_SPCOL:
-         {	
+         {
 			#ifdef __COMPILE_TIMERS__
 				nb_call_prox_spcol++;
 				t_prox_spcol.start();
 			#endif
 			typename constraint_type<T>::constraint_type_spcol* constr_cast = dynamic_cast<typename constraint_type<T>::constraint_type_spcol*>(const_vec[ind_fact]);
 			prox_spcol(S[ind_fact], constr_cast->getParameter());
-			
+
 			#ifdef __COMPILE_TIMERS__
 				t_prox_spcol.stop();
 			#endif
@@ -198,7 +198,7 @@ t_local_compute_projection.start();
          break;
 
          case CONSTRAINT_NAME_SPLIN:
-         {	
+         {
 			#ifdef __COMPILE_TIMERS__
 			nb_call_prox_splin++;
 			t_prox_splin.start();
@@ -213,7 +213,7 @@ t_local_compute_projection.start();
          break;
 
          case CONSTRAINT_NAME_NORMCOL:
-         {	
+         {
 			#ifdef __COMPILE_TIMERS__
 				nb_call_prox_normcol++;
 				t_prox_normcol.start();
@@ -227,7 +227,7 @@ t_local_compute_projection.start();
          break;
 
          case CONSTRAINT_NAME_SPLINCOL:
-         {	
+         {
 		 handleError(class_name,"compute_projection : projection not implemented");
 		//constraint_type_splincol* constr_cast = dynamic_cast<constraint_type_splincol*>(const_vec[ind_fact]);
 		//prox_splincol(S[ind_fact], constr_cast->getParameter());
@@ -253,11 +253,11 @@ t_local_compute_projection.start();
 
 
          case CONSTRAINT_NAME_SUPP:
-         {	
+         {
 			/*cout<<"S[ind_fact]"<<endl;
 			S[ind_fact].Display();
 			cout<<"NAME SUPP PROX"<<endl;*/
-			
+
             typename constraint_type<T>::constraint_type_supp* constr_cast = static_cast<typename constraint_type<T>::constraint_type_supp*>(const_vec[ind_fact]);
 			faust_cu_mat<T> A(constr_cast->getParameter());
 			A.Display();
@@ -276,7 +276,7 @@ t_local_compute_projection.start();
 
          default:
            handleError(class_name,"compute_projection : unknown name of constraint");
-            
+
 
       }
    }
@@ -299,7 +299,7 @@ char nomFichier[100];*/
 t_global_compute_grad_over_c.start();
 t_local_compute_grad_over_c.start();
 #endif
-   if(!isCComputed) 
+   if(!isCComputed)
    {
       throw std::logic_error("c must be set before computing grad/c");
    }
@@ -323,7 +323,7 @@ t_local_compute_grad_over_c.start();
    else
    {
       L1 = (unsigned long long int) RorL[ind_fact].getNbRow();
-      L2 = (unsigned long long int) RorL[ind_fact].getNbCol(); 
+      L2 = (unsigned long long int) RorL[ind_fact].getNbCol();
       R2 = (unsigned long long int) LorR.getNbCol();
    }
    S2 = (unsigned long long int) S[ind_fact].getNbCol();
@@ -595,7 +595,7 @@ t_local_check.stop();
 #ifdef __PAS_FIXE__
 // palm4MSA_cu<T>::compute_c() has been defined as an inline method in palm4MSA_cu.h
 #else
-template<typename T>	
+template<typename T>
 void palm4MSA_cu<T>::compute_c()
 {
 #ifdef __COMPILE_TIMERS__
@@ -606,23 +606,23 @@ void palm4MSA_cu<T>::compute_c()
 
 
    if (!isConstantStepSize)
-   {	
+   {
 		faust_int flag1,flag2;
-	   
+
 	   int nbr_iter = 10000;
 	   T threshold = 1e-16;
 	   T nL1=LorR.spectralNorm(nbr_iter,threshold,flag1,cublas_handle);
 	   T nR1=RorL[ind_fact].spectralNorm(nbr_iter,threshold,flag2,cublas_handle);
 		c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*lambda*lambda;
    }
-   
-   isCComputed = true;  
 
-   
+   isCComputed = true;
+
+
    #ifdef __COMPILE_TIMERS__
 	t_global_compute_c.stop();
 	t_local_compute_c.stop();
-	#endif	
+	#endif
 }
 #endif
 
@@ -664,21 +664,21 @@ t_local_init_fact.start();
       for (int i=1 ; i<nb_fact ; i++)
       {
          S[i].resize(const_vec[i]->getRows(), const_vec[i]->getCols());
-         S[i].setEyes();   
-      }   
+         S[i].setEyes();
+      }
    }
    else
    {
       for (int i=0 ; i<nb_fact-1 ; i++)
       {
          S[i].resize(const_vec[i]->getRows(), const_vec[i]->getCols());
-         S[i].setEyes();    
-      } 
+         S[i].setEyes();
+      }
       S[nb_fact-1].resize(const_vec[nb_fact-1]->getRows(), const_vec[nb_fact-1]->getCols());
-      S[nb_fact-1].setZeros();   
-   } 
+      S[nb_fact-1].setZeros();
+   }
 
-    
+
 #ifdef __COMPILE_TIMERS__
 t_global_init_fact.stop();
 t_local_init_fact.stop();
@@ -693,7 +693,7 @@ t_global_next_step.start();
 t_local_next_step.start();
 #endif
    check_constraint_validity();
-   // resizing L or R 
+   // resizing L or R
    if(!isUpdateWayR2L)
    {
       LorR.resize(const_vec[0]->getRows());
@@ -706,14 +706,14 @@ t_local_next_step.start();
       LorR.setEyes();
       update_L();
    }
-	
+
    int* ind_ptr = new int[nb_fact];
    for (int j=0 ; j<nb_fact ; j++)
       if (!isUpdateWayR2L)
          ind_ptr[j] = j;
       else
          ind_ptr[j] = nb_fact-1-j;
-     
+
    for (int j=0 ; j<nb_fact ; j++)
    {
       if (j == nb_fact-1)
@@ -722,13 +722,13 @@ t_local_next_step.start();
          isLastFact = false;
 
       ind_fact = ind_ptr[j];
-	  if (!isConstantStepSize)	
+	  if (!isConstantStepSize)
 			isCComputed = false;
-		
+
       isGradComputed = false;
       isProjectionComputed = false;
-	
-	  if (!isConstantStepSize)	
+
+	  if (!isConstantStepSize)
 		compute_c();
 
       compute_grad_over_c();
@@ -738,12 +738,12 @@ t_local_next_step.start();
          update_L();
       else
          update_R();
-		
+
    }
 	compute_lambda();
-	
+
    if (verbose)
-   {   
+   {
       cout << "Iter " << ind_ite << ", RMSE=" << get_RMSE() << endl;
 	  cout << "Lambda " <<setprecision(20)<< lambda << endl;
    }
@@ -751,7 +751,7 @@ t_local_next_step.start();
    ind_ptr = NULL;
 
 
-//cout<<"lambda : "<< lambda<< endl;   
+//cout<<"lambda : "<< lambda<< endl;
 #ifdef __COMPILE_TIMERS__
 t_global_next_step.stop();
 t_local_next_step.stop();
@@ -777,7 +777,7 @@ t_local_init_fact_from_palm.start();
      handleError(class_name,"init_fact_from_palm : constrainst must be set before calling init_fact_from_palm");
   }
 
-   if(isFactSideLeft) 
+   if(isFactSideLeft)
    {
       S.insert(S.begin(), palm2.S[0]);
       S[1] = palm2.S[1];
@@ -868,7 +868,7 @@ void palm4MSA_cu<T>::print_prox_timers() const
    cout << "total t_prox_sp  =  " << t_prox_sp.get_time()  << " s for "<< nb_call_prox_sp  << " calls" << endl;
    cout << "total t_prox_spcol  =  " << t_prox_spcol.get_time()  << " s for "<< nb_call_prox_spcol  << " calls" << endl;
    cout << "total t_prox_splin  =  " << t_prox_splin.get_time()  << " s for "<< nb_call_prox_splin  << " calls" << endl;
-   cout << "total t_prox_normcol  =  " << t_prox_normcol.get_time()  << " s for "<< nb_call_prox_normcol  << " calls" << endl;	
+   cout << "total t_prox_normcol  =  " << t_prox_normcol.get_time()  << " s for "<< nb_call_prox_normcol  << " calls" << endl;
 */}
 
 

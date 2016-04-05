@@ -22,7 +22,7 @@ template<typename T> class stopping_criterion;
 
 /*! \class palm4MSA_cu
    * \brief template class implementing palm4MSA_cu (PALM for Multi-layer Sparse Approximation) factorisation algorithm
-    : <br> 
+    : <br>
 	factorization of a data matrix into multiple factors using PALM
    *
    *
@@ -35,56 +35,56 @@ class palm4MSA_cu
 
    public:
 	    /*!
-     *  \brief 
+     *  \brief
 	 * initialize palm4MSA_cu from faust_params (hierarchical_fact parameter)
 	 *\tparam isGlobal_ : if true, the palm4MSA_cu stopping_criterion stop_crit attribute is initialize from params_.stop_crit_global <br> and if false, it is initialize from stop_crit_2facts
-     */		
+     */
       palm4MSA_cu(const faust_params<T>& params_, const cublasHandle_t cublasHandle, const bool isGlobal_);
       palm4MSA_cu(const faust_params_palm<T>& params_palm_, const cublasHandle_t cublasHandle, const bool isGlobal_=false);
 
       void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
       void set_data(const faust_cu_mat<T>& data_){data=data_;}
       void set_lambda(const T lambda_){lambda = lambda_;}
-	  
+
 	  /*!
-     *  \brief 
+     *  \brief
 	 * useful in hierarchical_fact, update lambda of palm_global from palm_2
-     */	
+     */
       void update_lambda_from_palm(const palm4MSA_cu& palm){lambda *= palm.lambda;}
-	  
+
 	  /*!
-     *  \brief 
+     *  \brief
 	 * compute the factorisation
-     */	
+     */
       void compute_facts();
-	  
+
 	  /*!
-     *  \brief 
+     *  \brief
 	 * return the multiplicative scalar lambda
-     */	
+     */
       T get_lambda()const{return lambda;}
-	  
+
       T get_RMSE()const{return error.norm()/sqrt((double)(data.getNbRow()*data.getNbCol()));}
       const faust_cu_mat<T>& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
       const faust_cu_mat<T>& get_data()const{return data;}
 	  void get_facts(faust_core_cu<T> & faust_fact) const;
-	  
+
 
 	  	  /*!
-     *  \brief 
+     *  \brief
 	 * initialize the factors to the default value,
 	 * the first factor to be factorised is set to zero matrix
 	 * whereas all the other are set to identity
-     */		
-      void init_fact(int nb_facts_);      
+     */
+      void init_fact(int nb_facts_);
       void next_step();
       bool do_continue(){bool cont=stop_crit.do_continue(++ind_ite); if(!cont){ind_ite=-1;isConstraintSet=false;}return cont;} // CAUTION !!! pre-increment of ind_ite: the value in stop_crit.do_continue is ind_ite+1, not ind_ite
       //bool do_continue()const{return stop_crit.do_continue(++ind_ite, error);};
-      
+
 	  /*!
-     *  \brief 
+     *  \brief
 	 * useful in hierarchical_fact, update the factors of palm_global from palm_2
-     */	
+     */
       void init_fact_from_palm(const palm4MSA_cu& palm, bool isFactSideLeft);
       const std::vector<faust_cu_mat<T> >& get_facts()const {return S;}
 
@@ -99,11 +99,11 @@ class palm4MSA_cu
       void update_R();
       void compute_lambda();
 	  static const char * class_name;
-	  static const T lipschitz_multiplicator;	
+	  static const T lipschitz_multiplicator;
 
    public:
       stopping_criterion<T> stop_crit;
-   
+
 
    private:
       faust_cu_mat<T> data;
@@ -113,11 +113,11 @@ class palm4MSA_cu
 
       // RorL_vec matches R if (!isUpdateWayR2L)
       // RorL_vec matches L if (isUpdateWayR2L)
-      std::vector<faust_cu_mat<T> > RorL; 
+      std::vector<faust_cu_mat<T> > RorL;
       // LorR_mat matches L if (!isUpdateWayR2L)
       // LorR_mat matches R if (isUpdateWayR2L)
       faust_cu_mat<T> LorR;
-      
+
 
       std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
       int ind_fact; //indice de facteur (!= hierarchical_fact::ind_fact : indice de factorisation)
@@ -125,26 +125,26 @@ class palm4MSA_cu
       // T lipschitz_multiplicator;
       const bool verbose;
       const bool isUpdateWayR2L;
-	  const bool isConstantStepSize; 
+	  const bool isConstantStepSize;
       bool isCComputed;
       bool isGradComputed;
       bool isProjectionComputed;
-      bool isLastFact;    
+      bool isLastFact;
       bool isConstraintSet;
       const bool isGlobal;
       bool isInit; // only used for global factorization (if isGlobal)
       faust_cu_mat<T> grad_over_c;
-      T c; 
+      T c;
       faust_cu_mat<T> error; // error = lambda*L*S*R - data
       cublasHandle_t cublas_handle;
 
-      
+
 
 
 
 
 #ifdef __COMPILE_TIMERS__
-   public: 
+   public:
       faust_cu_timer t_local_compute_projection;
       faust_cu_timer t_local_compute_grad_over_c;
       faust_cu_timer t_local_compute_c;
@@ -155,7 +155,7 @@ class palm4MSA_cu
       faust_cu_timer t_local_init_fact;
       faust_cu_timer t_local_next_step;
       faust_cu_timer t_local_init_fact_from_palm;
-	 
+
 
       static faust_cu_timer t_global_compute_projection;
       static faust_cu_timer t_global_compute_grad_over_c;
@@ -167,25 +167,25 @@ class palm4MSA_cu
       static faust_cu_timer t_global_init_fact;
       static faust_cu_timer t_global_next_step;
       static faust_cu_timer t_global_init_fact_from_palm;
-	  
+
 	  static faust_cu_timer t_prox_const;
 	  static faust_cu_timer t_prox_sp;
 	  static faust_cu_timer t_prox_spcol;
 	  static faust_cu_timer t_prox_splin;
 	  static faust_cu_timer t_prox_normcol;
-	  
+
 	  static int nb_call_prox_const;
 	  static int nb_call_prox_sp;
 	  static int nb_call_prox_spcol;
 	  static int nb_call_prox_splin;
 	  static int nb_call_prox_normcol;
-	  
 
 
 
 
-	  
- 
+
+
+
    void init_local_timers();
 
    void print_global_timers()const;
@@ -194,7 +194,7 @@ class palm4MSA_cu
 #endif
 
 };
- 
+
 
 
 #include "palm4MSA_cu.hpp"
