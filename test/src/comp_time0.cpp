@@ -14,9 +14,6 @@ using namespace std;
 typedef FFPP faust_real;
 int main(int argc, char* argv[])
 {
-
-
-
 // debut gestion arguement (nom de fichier)	
 	if(argc < 2 )
 	{

@@ -30,7 +30,6 @@ int main(int argc, char* argv[])
 	cusparseHandle_t cusparseHandle;
 	cusparseStatus_t cusparseStat = cusparseCreate(&cusparseHandle);
 
-
 	int nb_run;
 	if (argc<2)
 		nb_run = 1;
@@ -55,7 +54,8 @@ int main(int argc, char* argv[])
 
 		faust_mat<faust_real> data, init_facts1, init_facts2;
 
-		faust_params<faust_real> params; init_params_from_matiofile(params,config_MEG_filename,"params");
+		faust_params<faust_real> params; 
+		init_params_from_matiofile(params,config_MEG_filename,"params");
 		params.Display();
 		cout<<"launch"<<endl;	
 		hierarchical_fact_cu<faust_real> hier_fact(params, cublasHandle, cusparseHandle);
