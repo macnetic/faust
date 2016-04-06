@@ -10,5 +10,3 @@ if(FAUST_GEN_DOC)
 	endif(DOXYGEN_FOUND)
 endif(FAUST_GEN_DOC) 
 
-
-
