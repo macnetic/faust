@@ -7,25 +7,27 @@ if(FAUST_USE_MATIO)
 	include_directories(${FAUST_MATIO_SRC_DIR} ${MATIO_INC_DIR})
 endif(FAUST_USE_MATIO)
 
-#rajout OPENBLAS_INC_DIR pour la compatibilite UBUNTU
-#if(FAUST_USE_OPENBLAS)
-#	include_directories(${OPENBLAS_INC_DIR})
-#endif()
 
 
-# copy GPU files cpp.in to the user's ./src/ directory
-foreach(gpucppin hierarchical_fact_test_cu MEG_fact_cu) 
-	#configure_file(${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp.in ${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp @ONLY)
-	configure_file(${FAUST_TESTSRC_SRC_DIR}/${gpucppin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${gpucppin}.cpp @ONLY)
-	# USING GPU (cuda)
-	#add_definitions(-D__COMPILE_GPU__ -D__COMPILE_SPMAT__)
-	add_executable(${gpucppin} ${FAUST_TESTSRC_BIN_DIR}/${gpucppin}.cpp ${FAUST_TESTSRC_BIN_DIR}/ ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
+# generation des executables de algorithme hierarchical_fact en GPU en simple et double precision 
+foreach(TEST_FPP float double)	
+		foreach(testin hierarchical_fact_cu)
+			# copy CPU files cpp.in to the user's ./src/ directory en float et double precision
+			configure_file(${FAUST_TESTSRC_SRC_DIR}/${testin}.in ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
+			# Creation des executable en double et en float
+			add_executable(${testin}_${TEST_FPP} ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp ${FAUST_TESTSRC_BIN_DIR}/ ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
+			target_link_libraries(${testin}_${TEST_FPP} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${CUBLAS_LIB_FILE} ${CUDART_LIB_FILE}  ${CUSPARSE_LIB_FILE})
 
-	target_link_libraries(${gpucppin} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${CUBLAS_LIB_FILE} ${CUDART_LIB_FILE}  ${CUSPARSE_LIB_FILE})
-
+			install(TARGETS ${testin}_${TEST_FPP}  DESTINATION ${FAUST_INSTALL_TESTING_BIN})	
+	endforeach()
 endforeach()
 
-
-install(TARGETS  hierarchical_fact_test_cu MEG_fact_cu DESTINATION ${FAUST_INSTALL_TESTING_BIN})
-
+# test GPU
+add_test(NAME HADAMARD_GPU_FACT_DOUBLE COMMAND  ${FAUST_TEST_GPU_BIN_DIR}/hierarchical_fact_cu_double 	${FAUST_TESTDATA_SRC_DIR}/config_HADAMARD.mat)
+add_test(NAME FAUST_HIER_GPU_DOUBLE COMMAND ${FAUST_TEST_GPU_BIN_DIR}/hierarchical_fact_cu_double 	${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+add_test(NAME FAUST_HIER_GPU_FLOAT COMMAND ${FAUST_TEST_GPU_BIN_DIR}/hierarchical_fact_cu_float ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+add_test(NAME MEG_GPU_FACT_FLOAT COMMAND ${FAUST_TEST_GPU_BIN_DIR}/hierarchical_fact_cu_float ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22332 1)
+add_test(NAME MEG_GPU_FACT_DOUBLE COMMAND ${FAUST_TEST_GPU_BIN_DIR}/hierarchical_fact_cu_double ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22480 1)
+set(TIMEOUT_MEG 14000)
+set_tests_properties(MEG_GPU_FACT_FLOAT MEG_GPU_FACT_DOUBLE PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 
