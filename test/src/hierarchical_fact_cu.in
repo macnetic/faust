@@ -14,48 +14,84 @@
 #include <fstream>
 
 using namespace std;
-typedef double faust_real;//faust floating point precision
+typedef @TEST_FPP@ faust_real;//faust floating point precision
 
 int main(int argc, char* argv[])
 {	
 	if (typeid(faust_real) == typeid(double))
+  	{
 		cout<<"floating point precision == double"<<endl;
-	else if (typeid(faust_real) == typeid(float))
+  	}
+  
+  	if (typeid(faust_real) == typeid(float))
+  	{
 		cout<<"floating point precision == float"<<endl;
+  	}
+	
+	
+	string config_filename = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat"; 
+	
+	
+	
+	if (argc >= 2)
+		config_filename = argv[1];
+	
+	size_t ind = config_filename.find_last_of(".");
+	
+	if(ind<=0 || ind>= config_filename.size())
+	{
+		cerr << "Le nom du fichier est incorrect" << endl;
+		exit(EXIT_FAILURE);
+	}
+	string config_file_extension(config_filename, ind);
+	if(config_file_extension.compare(".mat") != 0)
+	{
+		cerr << "Le nom du fichier doit se terminer par \".mat\"" << endl;
+		exit(EXIT_FAILURE);
+	}
+	string config_file_body_tmp(config_filename, 0, ind);
 
 
+	string config_file_body_dir, config_file_body_file;
+
+	ind = config_file_body_tmp.find_last_of("/");
+	if(ind<=0 || ind>= config_file_body_tmp.size())
+	{
+		config_file_body_dir = string("");
+		config_file_body_file = config_file_body_tmp;
+	}
+	else
+	{
+		config_file_body_dir = string(config_file_body_tmp, 0, ind+1);
+		config_file_body_file = string(config_file_body_tmp, ind+1);
+	}
+	
+	
+	
+	faust_real expected_lambda = 0;	
+	if (argc >= 3)
+		expected_lambda = atof(argv[2]);
+		
+		
+	faust_real epsilon = 0.0001;
+	if (argc >= 4)
+		epsilon = atof(argv[3]);
+		
+	
+
+	// initialisation CUDA environment
 	cublasHandle_t cublasHandle;
 	cublasStatus_t cublasStat = cublasCreate(&cublasHandle);
 
 	cusparseHandle_t cusparseHandle;
 	cusparseStatus_t cusparseStat = cusparseCreate(&cusparseHandle);
 
-	int nb_run;
-	if (argc<2)
-		nb_run = 1;
-	else
-		nb_run = argc-1;
 	
-	for(int j=1 ; j<=nb_run ; j++)
-	{
-		char config_MEG_filename[200];
-		if (argc<2)
-			strcpy(config_MEG_filename,"@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat");
-		else
-			strcpy(config_MEG_filename,argv[j]);
-
-		ifstream myFile(config_MEG_filename);
-		if(myFile.fail())
-		{
-			cerr << "Warning : in file " << __FILE__ <<", line " << __LINE__<< " : file " << config_MEG_filename << " doesn't exist. " << endl;
-			continue;
-		}
 
 
-		faust_mat<faust_real> data, init_facts1, init_facts2;
 
 		faust_params<faust_real> params; 
-		init_params_from_matiofile(params,config_MEG_filename,"params");
+		init_params_from_matiofile(params,config_filename.c_str(),"params");
 		params.Display();
 		cout<<"launch"<<endl;	
 		hierarchical_fact_cu<faust_real> hier_fact(params, cublasHandle, cusparseHandle);
@@ -82,7 +118,7 @@ int main(int argc, char* argv[])
 		}
 		cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl<<endl;
 
-	}
+	
 	cusparseDestroy(cusparseHandle);
 	cublasDestroy(cublasHandle);
 

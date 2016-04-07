@@ -86,4 +86,16 @@ void prox_supp(faust_cu_mat<T>& cu_M, const faust_cu_mat<T>& cu_supp)
    cu_M = M;	
 }
 
+
+
+template<typename T>
+void prox_splincol(faust_cu_mat<T>& cu_M, const faust_unsigned_int k)
+{   
+   faust_mat<T> M,supp;
+   faust_cu2faust(M, cu_M);
+   prox_splincol(M,k);
+   cu_M = M;	
+}
 #endif
+
+	

@@ -12,10 +12,7 @@ if(UNIX) # AND FAUST_USE_MKL
 	#-D__COMPILE_GPU__ -D__COMPILE_SPMAT__
 	
 	# Pass options to NVCC (-O3)    
-	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -O3 -Xcompiler -fPIC -use_fast_math  \
-    -gencode arch=compute_20,code=compute_20 \
-    -gencode arch=compute_30,code=compute_30 \
-    -gencode arch=compute_35,code=compute_35 ")
+	set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -O3 -Xcompiler -fPIC -use_fast_math  -gencode arch=compute_20,code=compute_20 -gencode arch=compute_30,code=compute_30 -gencode arch=compute_35,code=compute_35 ")
     #-D__COMPILE_GPU__ -D__COMPILE_SPMAT__
 	
 elseif(WIN32 AND FAUST_USE_MKL)

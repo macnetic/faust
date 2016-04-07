@@ -228,9 +228,9 @@ t_local_compute_projection.start();
 
          case CONSTRAINT_NAME_SPLINCOL:
          {
-		 handleError(class_name,"compute_projection : projection not implemented");
-		//constraint_type_splincol* constr_cast = dynamic_cast<constraint_type_splincol*>(const_vec[ind_fact]);
-		//prox_splincol(S[ind_fact], constr_cast->getParameter());
+		 //handleError(class_name,"compute_projection : projection not implemented");
+		typename constraint_type<T>::constraint_type_splincol* constr_cast = dynamic_cast<typename constraint_type<T>::constraint_type_splincol*>(const_vec[ind_fact]);
+		prox_splincol(S[ind_fact], constr_cast->getParameter());
          }
          break;
 
