@@ -1,0 +1,105 @@
+#include "faust_core.h"
+#include "faust_params.h"
+#include "faust_init_from_matio_params.h"
+#include "hierarchical_fact.h"
+#include "faust_vec.h"
+#include "faust_timer.h"
+
+#include <iostream>
+
+using namespace std;
+typedef FFPP faust_real;
+/** \brief Evaluate the time difference using faust or classical-dense matrix, <br>
+	   in a context of the multiplication between an matrix and a vector <br>
+ * \param[in] Entry Matrix is contained in a file .mat
+ * \param[out] Output data is placed in a file .dat
+ */
+int main()
+{
+
+	// si true : MEG_fact
+	// si false : demo_dico_learning_compared
+	bool testMEG  = true;
+
+
+ 	// init from params
+
+	faust_params<faust_real> params;
+	if (testMEG)
+		init_params_from_matiofile(params, "@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat", "params");
+	else
+		init_params_from_matiofile(params, "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat", "params");
+
+    
+//cout << "update_way=" << params.isUpdateWayR2L << endl;
+ 
+  /*vector<faust_spmat<faust_real> > facts;
+  faust_core<faust_real> faust(params);
+  faust.get_facts(facts);
+  (facts[0]) *= 
+
+  char filename[100];
+  for (int i=0 ; i<facts.size() ; i++)
+  {
+     if (testMEG)
+        sprintf(filename, "facts_MEG%d.dat", i+1);
+     else
+        sprintf(filename, "facts_hier_fact%d.dat", i+1);
+     facts[i].print_file(filename);
+  }*/
+
+  // init from vector of faust_spmat
+
+	vector<faust_spmat<faust_real> > facts;
+	if (testMEG)
+		facts.resize(6);
+	else
+		facts.resize(4);
+	char filename[100];
+	for (int i=0 ; i<facts.size() ; i++)
+	{
+		if (testMEG)
+			sprintf(filename, "@FAUST_TESTDATA_SRC_DIR@/facts_MEG%d.txt", i);
+		else
+			sprintf(filename, "@FAUST_TESTDATA_SRC_DIR@/learning_compared_fact%d.txt", i);
+		facts[i].init_from_file(filename);
+	}
+	faust_core<faust_real> faust(facts, (FFPP)1.0);
+
+
+	faust_vec<faust_real> vec_in(facts[facts.size()-1].getNbCol());
+	for (int i=0 ; i<vec_in.size() ; i++ )
+		vec_in[i] = i*0.015 ;
+     
+	faust_vec<faust_real> vec_out_faust, vec_out_mat;
+	faust_mat<faust_real> full(params.data);
+
+	faust_timer t1;
+	t1.start();
+	vec_out_faust = faust * vec_in;
+	t1.stop();
+	cout << "temps multiplication faust-vector = " << t1.get_time() << "s." << endl;
+
+	faust_timer t2;
+
+	t2.start();
+	vec_in.multiplyLeft(full);
+	t2.stop();
+	cout << "temps multiplication matrix-vector = " << t2.get_time() << "s." << endl;
+	vec_out_mat = vec_in;
+
+	if (testMEG)
+	{
+		vec_out_faust.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_MEG_faust.dat");
+		vec_out_mat.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_MEG_mat.dat");
+	}
+	else
+	{
+	vec_out_faust.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_hier_fact_faust.dat");
+	vec_out_mat.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_hier_fact_mat.dat");
+	}
+
+ 
+}
+
+
