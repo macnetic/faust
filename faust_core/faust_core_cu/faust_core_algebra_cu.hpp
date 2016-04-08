@@ -157,29 +157,29 @@ T power_iteration(const  faust_core_cu<T> & cu_A, const int nbr_iter_max, const 
 
 
 
-template<typename T>
-faust_cu_vec<T> operator*(const faust_core_cu<T>& f, const faust_cu_vec<T>& v)
-{
-	faust_cu_vec<T> vec(v);
-	if (f.size() == 0)
-		handleWarning("faust_core_cu<T> algebra : operator* : empty faust_core_cu<T>");
-	
-	for (int i=f.size()-1 ; i >= 0 ; i--)
-		vec.multiplyLeft(f.data[i]);
-	return vec;
-}
+//template<typename T>
+//faust_cu_vec<T> operator*(const faust_core_cu<T>& f, const faust_cu_vec<T>& v)
+//{
+//	faust_cu_vec<T> vec(v);
+//	if (f.size() == 0)
+//		handleWarning("faust_core_cu<T> algebra : operator* : empty faust_core_cu<T>");
+//	
+//	for (int i=f.size()-1 ; i >= 0 ; i--)
+//		vec.multiplyLeft(f.data[i]);
+//	return vec;
+//}
 
-template<typename T>
-faust_cu_mat<T> operator*(const faust_core_cu<T>& f, const faust_cu_mat<T>& M)
-{
-	faust_cu_mat<T> A(M);
-	if (f.size() == 0)
-		handleWarning("faust_core_cu<T> algebra : operator * : empty faust_core_cu<T>");
+//template<typename T>
+//faust_cu_mat<T> operator*(const faust_core_cu<T>& f, const faust_cu_mat<T>& M)
+//{
+//	faust_cu_mat<T> A(M);
+//	if (f.size() == 0)
+//		handleWarning("faust_core_cu<T> algebra : operator * : empty faust_core_cu<T>");
 	
-	for (int i=f.size()-1 ; i >= 0 ; i--)
-		A.multiplyLeft(f.data[i]);
-	return A;
-}
+//	for (int i=f.size()-1 ; i >= 0 ; i--)
+//		A.multiplyLeft(f.data[i]);
+//	return A;
+//}
 
 
 #endif

@@ -13,12 +13,14 @@ T power_iteration(const faust_core_cu<T> & A, const int nbr_iter_max, const T th
 
 
 
+//currently operator * (multiplication) can not be overloaded because GPU multiplication implies taking extra arguments cublashandle (dense matrix)  and cusparsehandle (sparse matrix)
+//whereas operator must take either one or two arguments
 
-template<typename T> 
-faust_cu_vec<T> operator*(const faust_core_cu<T>& f, const faust_cu_vec<T> & v);
+//template<typename T> 
+//faust_cu_vec<T> operator*(const faust_core_cu<T>& f, const faust_cu_vec<T> & v);
 
-template<typename T> 
-faust_cu_mat<T> operator*(const faust_core_cu<T>& f, const faust_cu_mat<T> & M);
+//template<typename T> 
+//faust_cu_mat<T> operator*(const faust_core_cu<T>& f, const faust_cu_mat<T> & M);
 
 #include "faust_core_algebra_cu.hpp"
 

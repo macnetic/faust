@@ -1,5 +1,7 @@
 #include "faust_cu_mat.h"
+#include "faust_core_cu.h"
 #include "faust_cu_spmat.h"
+#include "faust_cu_vec.h"
 #include "faust_constraint_int.h"
 #include "faust_constraint_real.h"
 #include "faust_params.h"
@@ -9,6 +11,7 @@
 #include "palm4MSA_cu.h"
 #include "hierarchical_fact_cu.h"
 #include "faust_cu_timer.h"
+#include "LinAlgebra_cu.h"
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -109,7 +112,7 @@ int main(int argc, char* argv[])
 
 		vector<faust_cu_spmat<faust_real> > facts;
 		hier_fact.get_facts(facts);
-		(facts[0]) *= hier_fact.get_lambda();
+		//(facts[0]) *= hier_fact.get_lambda();
 		char nomFichier[100];
 		for (int i=0 ; i<facts.size() ; i++)
 		{
@@ -117,8 +120,73 @@ int main(int argc, char* argv[])
 			facts[i].print_file(nomFichier);
 		}
 		cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl<<endl;
+		
 
+		//faust_core_cu<faust_real> hier_fact_core(facts);
+		faust_core_cu<faust_real> hier_fact_core(facts,hier_fact.get_lambda());
+
+	//relative_error
+	faust_cu_mat<faust_real> data_matrix = params.data;
+	faust_cu_mat<faust_real> faust_product;
+	faust_product=hier_fact_core.get_product(cublasHandle,cusparseHandle);
+	faust_product-=data_matrix;
+	faust_real relative_error = faust_product.norm()/data_matrix.norm();
 	
+	std::cout<<std::endl;	
+		std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+		std::cout<<"		"<<relative_error<<std::endl<<std::endl;
+	
+
+
+
+	//time comparison between matrix vector product and faust-vector product
+	int niter_time_comp = 100;
+	if (niter_time_comp > 0)
+	{
+
+		faust_cu_timer tdense;
+		faust_cu_timer tfaust;
+		faust_cu_vec<faust_real> x(data_matrix.getNbCol());
+		faust_cu_vec<faust_real> ydense(data_matrix.getNbRow());
+		faust_cu_vec<faust_real> yfaust(hier_fact_core.getNbRow());
+
+		x.setOnes();
+		x.Display();
+
+		for (int i=0;i<niter_time_comp;i++)
+		{
+			
+			
+
+			tdense.start();
+				gemv(data_matrix,x,ydense,'N',cublasHandle);
+			tdense.stop();
+
+
+	 		tfaust.start();
+				hier_fact_core.mult(x,yfaust,cusparseHandle);
+			tfaust.stop();
+
+
+	 	}
+		std::cout<<"ydense"<<std::endl;
+		ydense.Display();
+		std::cout<<"yfaust"<<std::endl;
+		yfaust.Display();
+		
+		std::cout<<std::endl;
+	
+
+		std::cout<<"**************** TIME COMPARISON MATRIX VECTOR PRODUCT **************** "<<std::endl;
+		std::cout<<"	TIME  SPEED-UP : "<<tdense.get_time()/tfaust.get_time()<<std::endl;
+		std::cout<<"	MEAN TIME dense : "<<tdense.get_time()/((float) niter_time_comp)<<std::endl;
+		std::cout<<"	MEAN TIME faust : "<<tfaust.get_time()/((float) niter_time_comp)<<std::endl;
+	}	
+
+
+
+
+
 	cusparseDestroy(cusparseHandle);
 	cublasDestroy(cublasHandle);
 

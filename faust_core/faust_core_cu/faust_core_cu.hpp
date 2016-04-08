@@ -1,6 +1,5 @@
 #ifndef __FAUST_CORE_CU_HPP__
 #define __FAUST_CORE_CU_HPP__
-
 //#include "faust_core_cu.h"
 #include "faust_cu_vec.h"
 //#include "hierarchical_fact.h"
@@ -10,7 +9,7 @@
 #include <iostream>
 #include "faust_exception.h"
 #include <fstream>
-
+#include <iostream>
 using namespace std;
 template<typename T>
 const char * faust_core_cu<T>::class_name="faust_core_cu<T>::";
@@ -20,6 +19,7 @@ faust_core_cu<T>::faust_core_cu() :
    data(std::vector<faust_cu_spmat<T> >()),
    totalNonZeros(0)
 {}
+
 
 template<typename T>
 faust_core_cu<T>::faust_core_cu(const faust_core_cu<T> & A) :
@@ -37,6 +37,9 @@ faust_core_cu<T>::faust_core_cu(const std::vector<faust_cu_spmat<T> >& facts, co
 
    if(lambda_ != 1.0 && data.size()>0)
       (data[0]) *= lambda_;
+
+  
+   
 }
 
 template<typename T>
@@ -184,13 +187,21 @@ faust_cu_mat<T> faust_core_cu<T>::get_product(cublasHandle_t cublasHandle, cuspa
 template<typename T>
 int faust_core_cu<T>::getNbRow() const 
 {
-	(size()!=0)?data[0].getNbRow():-1;
+	//(size()!=0)?data[0].getNbRow():-1;
+	if (size() !=0)
+		return data[0].getNbRow();
+	else
+		return -1;
 	
 }
 template<typename T>
 int faust_core_cu<T>::getNbCol() const 
 {
-	(size()!=0)?data[size()-1].getNbCol():-1;	
+	//(size()!=0)?data[size()-1].getNbCol():-1;
+	if (size() !=0)
+		return data[size()-1].getNbCol();
+	else
+		return -1;	
 }
 
 template<typename T>
@@ -328,8 +339,30 @@ void faust_core_cu<T>::transpose()
 		data[i].transpose();
 }
 
+//void gemv(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_vec<faust_real>& cu_x, faust_cu_vec<faust_real>& cu_y, cusparseHandle_t cusparseHandle);
+template<typename T>
+void faust_core_cu<T>::mult( const faust_cu_vec<T>& cu_x, faust_cu_vec<T>& cu_y, cusparseHandle_t cusparseHandle)
+{
+	int nb_fact=size();
+	if (nb_fact == 0)
+	{	
+		cu_y=cu_x;
+		handleWarning(class_name,"mult : empty faust_core_cu");
 
+	}else
+	{
+		faust_cu_vec<T> vec_tmp(cu_x);
+		for (int i=nb_fact-1;i>=0;i--)
+		{	
+			//std::cout<<"size x : "<< vec_tmp.size() <<" data nb col "<<data[i].getNbCol()<<std::endl;
+			//std::cout<<"size y : "<< cu_y.size() <<" data nb row "<<data[i].getNbCol()<<std::endl;
 
+			gemv(data[i],vec_tmp,cu_y,cusparseHandle);
+			vec_tmp=cu_y;	
+		}
+	}
+
+}
 
 template<typename T>
 void faust_core_cu<T>::Display()const

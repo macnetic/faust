@@ -42,6 +42,7 @@ class faust_core_cu
 		long long int get_total_nnz()const{return totalNonZeros;}
 		void clear(){data.resize(0);totalNonZeros=0;}
 		void push_back(const faust_cu_spmat<T>& S);
+		void mult( const faust_cu_vec<T>& cu_x, faust_cu_vec<T>& cu_y, cusparseHandle_t cusparseHandle);
 		void push_first(const faust_cu_spmat<T>& S);
 		void pop_back(faust_cu_spmat<T>& S);
 		void pop_first(faust_cu_spmat<T>& S);
