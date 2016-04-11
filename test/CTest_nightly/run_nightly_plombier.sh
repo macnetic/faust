@@ -18,7 +18,7 @@
 
 
 # Directory of the local path of the nightly project
-export PATH_DIR_RUN_NIGHTLY=/home/aleman/WORK/FAUST/faust_nightly
+export PATH_DIR_RUN_NIGHTLY=/home/aleman/Documents/WORK/FAUST/faust_nightly
 
 if [ ! -d "$PATH_DIR_RUN_NIGHTLY" ];
 then
@@ -27,10 +27,10 @@ then
 fi
 
 # Directory of the library used in the FAUST PROJECT 
-export OPENBLASDIR=/opt/OpenBLAS
-export MATIODIR=/usr/local
-export CUDADIR=/usr/local/cuda-7.5
-export EIGENDIR=/usr/local/include/eigen3
+export OPENBLASDIR=/home/aleman/library/OpenBLAS
+export MATIODIR=/home/aleman/library/matio-1.5.3/src/.libs
+export MATIODIRINC=/home/aleman/library/matio-1.5.3/src
+#export EIGENDIR=/usr/local/include/eigen3
 
 #export HDF5_ROOT_DIR=/home/aleman/Library/hdf5-1.8.16/src/.libs
 
@@ -43,7 +43,6 @@ cd $PATH_DIR_RUN_NIGHTLY
 rm -rf faust_test
 rm -rf faust_test_build
 rm -rf faust_output
-
 mkdir faust_test
 mkdir faust_test_build
 mkdir faust_output
