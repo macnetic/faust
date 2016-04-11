@@ -22,8 +22,8 @@ export PATH_DIR_RUN_NIGHTLY=/home/aleman/WORK/FAUST/faust_nightly
 
 if [ ! -d "$PATH_DIR_RUN_NIGHTLY" ];
 then
-	echo "ERROR : $PATH_DIR_RUN_NIGHTLY directory is not defined or do no exist !!!!!! "
-	exit(1)
+	echo "ERROR : $PATH_DIR_RUN_NIGHTLY directory is not defined or do no exist !!!!!! Please select a valid PATH_DIR_RUN_NIGHTLY "
+	exit 1
 fi
 
 # Directory of the library used in the FAUST PROJECT 
