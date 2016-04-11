@@ -11,7 +11,7 @@ endif()
 
 add_definitions(-DEIGEN_MPL2_ONLY)
 
-include_directories( ${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
+include_directories( ${FAUST_EXCEPTION_SRC_DIR} ${EIGEN_INC_DIR})
 if(FAUST_USE_OPENBLAS)
 	#message(STATUS "**********OPENBLAS ACTIF************")
 	#message(STATUS "OPENBLAS_INC_DIR ${OPENBLAS_INC_DIR}")

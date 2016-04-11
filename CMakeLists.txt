@@ -101,7 +101,7 @@ set(FAUST_TESTDATA_SRC_DIR ${FAUST_TEST_SRC_DIR}/data CACHE INTERNAL "")
 set(FAUST_MEXINTERFACE_SRC_DIR ${PROJECT_SOURCE_DIR}/interface_matlab CACHE INTERNAL "")
 set(FAUST_MEXINTERFACETOOLS_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/tools CACHE INTERNAL "")
 set(FAUST_MEXINTERFACEMEX_SRC_DIR ${FAUST_MEXINTERFACE_SRC_DIR}/mex_functions CACHE INTERNAL "")
-set(FAUST_EIGEN_SRC_DIR ${PROJECT_SOURCE_DIR}/eigen CACHE INTERNAL "")
+#set(FAUST_EIGEN_SRC_DIR ${PROJECT_SOURCE_DIR}/eigen CACHE INTERNAL "")
 if (FAUST_USE_GPU)
 	set(FAUST_MATRIX_CU_SRC_DIR ${PROJECT_SOURCE_DIR}/matrix/matrix_cu CACHE INTERNAL "")
 	set(FAUST_FAUSTCORE_CU_SRC_DIR ${PROJECT_SOURCE_DIR}/faust_core/faust_core_cu CACHE INTERNAL "")
@@ -267,7 +267,7 @@ endif(WIN32)
 # looking for library and include files in the environment variables
 include(CMake/add_library_path.cmake)
 add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" )
-add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" )
+add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "$ENV{EIGENDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" )
 
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP} CACHE PATH "List of include paths used as PATH parameter in find_path")
@@ -284,7 +284,9 @@ check_external_libraries(hdf5 HDF5_LIB_FILE 0)
 #LDFLAGS = -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5
 check_external_includes("libxml/parser.h" XML_INC_DIR 0)
 check_external_includes("matio.h" MATIO_INC_DIR 0)
-#check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
+
+check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
+
 
 if (FAUST_USE_GPU)
 	check_external_libraries(cublas CUBLAS_LIB_FILE 1)
