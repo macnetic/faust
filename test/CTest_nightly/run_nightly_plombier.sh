@@ -30,7 +30,7 @@ fi
 export OPENBLASDIR=/home/aleman/library/OpenBLAS
 export MATIODIR=/home/aleman/library/matio-1.5.3/src/.libs
 export MATIODIRINC=/home/aleman/library/matio-1.5.3/src
-export EIGENDIR=/usr/include/eigen3
+export EIGENDIR=/usr/local/include/eigen3
 
 export CUDADIR=/usr/local/cuda-6.5
 
@@ -42,12 +42,12 @@ export CTEST_CONFIGURE_OPTIONS=
 
 
 cd $PATH_DIR_RUN_NIGHTLY
-#rm -rf faust_test
-#rm -rf faust_test_build
-#rm -rf faust_output
-#mkdir faust_test
-#mkdir faust_test_build
-#mkdir faust_output
+rm -rf faust_test
+rm -rf faust_test_build
+rm -rf faust_output
+mkdir faust_test
+mkdir faust_test_build
+mkdir faust_output
 
 # launch ctest file 
 ctest -VV -C Release -S faustTest.cmake 
