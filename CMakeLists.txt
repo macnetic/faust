@@ -20,13 +20,14 @@ set(FAUST_VERSION_MINOR 0)
 #else()
 #	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has neither C++11 nor c++0x support.")
 #endif()
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE STRING "" FORCE)
 ##################################################################
-
 
 IF (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/output" CACHE STRING "default install path" FORCE )
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-
 
 ###### tmp directory where temporary objects will be located ######
 set(FAUST_TMP_BUILD_DIR "${PROJECT_BINARY_DIR}/tmp")
@@ -40,23 +41,16 @@ elseif(WIN32)
 	set(MEXOBJ_EXT ".obj")
 endif()
 
-
-#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE STRING "" FORCE)
-
-
-
 ###### Different option of configuration ######
 set(FAUST_USE_SINGLEPRECISION OFF CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
 set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
-set(FAUST_USE_MEX OFF CACHE BOOL "Generate Mexfiles")
-set(FAUST_USE_PROFILING ON CACHE BOOL "Profiling the code")
+set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
+set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
 set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read matfile")
-set(FAUST_USE_XML ON CACHE BOOL "Using xml configuration file")
-set(FAUST_ISVERBOSE ON CACHE BOOL "Display useful message for debugging")
-set(FAUST_USE_GPU OFF CACHE BOOL "Using Graphics Processing Unit (GPU) in combination with CPU ")
-set(FAUST_GEN_DOC ON CACHE BOOL "Generate html documentation with doxygen")
+set(FAUST_USE_XML OFF CACHE BOOL "Using xml configuration file")
+set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
+set(FAUST_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
+set(FAUST_GEN_DOC OFF CACHE BOOL "Generate html documentation with doxygen")
 
 if (FAUST_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")
@@ -233,9 +227,9 @@ endif(WIN32)
 set(CMAKE_CXX_FLAGS "")
 if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 	if (UNIX)	
-		set(CMAKE_CXX_FLAGS " -O0 ${CMAKE_CXX_FLAGS_DEBUG}")
+		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_DEBUG} -O1")
 	elseif(WIN32)
-		set(CMAKE_CXX_FLAGS " /O0 ${CMAKE_CXX_FLAGS_DEBUG}")
+		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_DEBUG} /O0")
 	else()
 		message(WARNING "Unknown type of plateform for CMAKE_CXX_FLAGS")
 	endif() 
@@ -273,7 +267,7 @@ endif(WIN32)
 # looking for library and include files in the environment variables
 include(CMake/add_library_path.cmake)
 add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" )
-add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" )
+add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" )
 
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP} CACHE PATH "List of include paths used as PATH parameter in find_path")
@@ -293,14 +287,14 @@ check_external_includes("matio.h" MATIO_INC_DIR 0)
 #check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
 
 if (FAUST_USE_GPU)
-	check_external_libraries(cublas CUBLAS_LIB_FILE 0)
-	check_external_libraries(cudart CUDART_LIB_FILE 0)
-	check_external_libraries(cusparse CUSPARSE_LIB_FILE 0)
+	check_external_libraries(cublas CUBLAS_LIB_FILE 1)
+	check_external_libraries(cudart CUDART_LIB_FILE 1)
+	check_external_libraries(cusparse CUSPARSE_LIB_FILE 1)
 
-	check_external_includes("cublas_v2.h" CUBLAS_V2_INC_DIR 0)
-	check_external_includes("cusparse.h" CUSPARSE_INC_DIR 0)
-	check_external_includes("cuda.h" CUDA_INC_DIR 0)
-	check_external_includes("cuda_runtime_api.h" CUDA_RUNTIME_API_INC_DIR 0)
+	check_external_includes("cublas_v2.h" CUBLAS_V2_INC_DIR 1)
+	check_external_includes("cusparse.h" CUSPARSE_INC_DIR 1)
+	check_external_includes("cuda.h" CUDA_INC_DIR 1)
+	check_external_includes("cuda_runtime_api.h" CUDA_RUNTIME_API_INC_DIR 1)
 endif(FAUST_USE_GPU)
 
 if(FAUST_USE_OPENBLAS)
