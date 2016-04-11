@@ -30,7 +30,7 @@ fi
 export OPENBLASDIR=/opt/OpenBLAS
 export MATIODIR=/usr/local
 export CUDADIR=/usr/local/cuda-7.5
-export EIGENDIR=/usr/local/include/eigen3
+export EIGENDIR=/usr/include/eigen3
 
 #export HDF5_ROOT_DIR=/home/aleman/Library/hdf5-1.8.16/src/.libs
 

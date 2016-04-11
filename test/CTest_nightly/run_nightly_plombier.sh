@@ -30,7 +30,7 @@ fi
 export OPENBLASDIR=/home/aleman/library/OpenBLAS
 export MATIODIR=/home/aleman/library/matio-1.5.3/src/.libs
 export MATIODIRINC=/home/aleman/library/matio-1.5.3/src
-#export EIGENDIR=/usr/local/include/eigen3
+export EIGENDIR=/usr/include/eigen3
 
 export CUDADIR=/usr/local/cuda-6.5
 
