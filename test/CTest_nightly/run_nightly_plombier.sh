@@ -35,19 +35,16 @@ export EIGENDIR=/usr/local/include/eigen3
 # export version of gcc
 #export CC=/usr/lib64/ccache/gcc
 #export CXX=/usr/lib64/ccache/g++
+export CC=/usr/bin/gcc
+export CXX=/usr/bin/g++
 
 # /usr/local/bin/matlab in the PATH 
-export PATH=/usr/local/cuda-6.5/bin:/usr/local/bin:$PATH
-
-
-
-
-#export HDF5_ROOT_DIR=/home/aleman/Library/hdf5-1.8.16/src/.libs
+# /usr/bin/gcc
+#export PATH=/usr/local/cuda-6.5/bin:/usr/local/bin:$PATH
+export PATH=/usr/local/cuda-6.5/bin:/usr/local/bin:/usr/bin:$PATH
 
 # CTEST OPTION 
 export CTEST_CONFIGURE_OPTIONS=
-
-
 
 cd $PATH_DIR_RUN_NIGHTLY
 rm -rf faust_test
