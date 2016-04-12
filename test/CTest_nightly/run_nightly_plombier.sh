@@ -30,9 +30,17 @@ fi
 export OPENBLASDIR=/home/aleman/library/OpenBLAS
 export MATIODIR=/home/aleman/library/matio-1.5.3/src/.libs
 export MATIODIRINC=/home/aleman/library/matio-1.5.3/src
-export EIGENDIR=/usr/local/include/eigen3
-
 export CUDADIR=/usr/local/cuda-6.5
+export EIGENDIR=/usr/local/include/eigen3
+# export version of gcc
+export CC=/usr/lib64/ccache/gcc
+export CXX=/usr/lib64/ccache/g++
+
+# /usr/local/bin/matlab in the PATH 
+export PATH=/usr/local/cuda-7.5/bin:/usr/local/bin:$PATH
+
+
+
 
 #export HDF5_ROOT_DIR=/home/aleman/Library/hdf5-1.8.16/src/.libs
 
