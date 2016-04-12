@@ -170,13 +170,14 @@ if (FAUST_USE_XML)
 endif(FAUST_USE_XML)
 
 
-#if(FAUST_USE_MEX)
-#	add_test(NAME FAUST_HIER_MEX COMMAND matlab  -nojvm -nodisplay -r #${FAUST_TEST_BIN_DIR}/hier_fact.m;exit)
-#	set_tests_properties(FAUST_HIER_MEX PROPERTIES TIMEOUT 60)
-#endif() 
+if(FAUST_USE_MEX)
+	#add_test(NAME FAUST_HIER_MEX COMMAND matlab  -nojvm -nodisplay -r ${FAUST_TEST_BIN_DIR}/hier_fact.m;exit)
+	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "addpath('${FAUST_TEST_BIN_DIR}');hier_fact;exit" )	
+	set_tests_properties(FAUST_HIER_MEX PROPERTIES TIMEOUT 60)
+endif() 
 
+#matlab -nojvm -r "addpath('/home/aleman/WORK/FAUST/faust/trunk/devcpp/Build-AL/wrapper/run_test/bin/');hier_fact;exit"
 
- 
 	
 	# add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp" "${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp")
 	
