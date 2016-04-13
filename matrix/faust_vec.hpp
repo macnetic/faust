@@ -21,6 +21,26 @@ for (int i=0;i<dim;i++)
 	vec[i]=v(i);	
 }
 
+
+template<typename T>
+bool faust_vec<T>::equality(faust_vec<T> const &x, T precision) const
+{
+  if (size() != x.size())	
+	handleError(class_name," equality : different dimension");
+
+  for (int i=0;i<size();i++)
+  {
+	if (std::abs(x(i) - (*this)(i))>precision)
+	{	
+		return false;
+	}
+  }	
+
+  return true;		
+}
+
+
+
 template<typename T>
 faust_vec<T>::faust_vec(const faust_unsigned_int dim_, const T* data_) : dim(dim_), vec(dim_)
 {

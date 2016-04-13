@@ -16,10 +16,17 @@
 
 using namespace std;
 
+template <typename faust_real>
+bool faust_cu_vec<faust_real>::equality(faust_cu_vec<faust_real> const &x, faust_real precision) const
+{
+ 	faust_vec<faust_real> x1;
+	faust_vec<faust_real> this1;
+	faust_cu2faust(x1,x);
+	faust_cu2faust(this1,(*this));
+	return x1.equality(this1,precision);	
+	
 
-#ifdef __GEMM_WITH_MKL__
-   #include "mkl_spblas.h"
-#endif
+}
 
 template <typename faust_real>
  faust_cu_vec<faust_real>::faust_cu_vec(const faust_real *data_,const faust_unsigned_int dim_, bool dataFromGPU, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim(0), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)

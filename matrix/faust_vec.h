@@ -83,7 +83,7 @@ class faust_vec
 	const T& operator[](faust_unsigned_int i)const{return vec(i);}
 
 	const T& operator()(faust_unsigned_int i)const{return vec(i);}
-
+	bool equality(faust_vec<T> const &x, T precision) const;
 
 	// friend algebra
 	friend void gemv<>(const faust_mat<T> & A,const faust_vec<T> & x,faust_vec<T> & y,const T & alpha, const T & beta, char typeA);

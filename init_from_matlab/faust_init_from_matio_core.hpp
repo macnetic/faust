@@ -17,6 +17,23 @@
 #include "faust_constraint_real.h"
 #include "faust_constraint_mat.h"
 
+#ifdef COMPILE_GPU
+	#include   "faustCoreCu_2FaustCore.h"
+#endif
+
+
+
+#ifdef COMPILE_GPU
+template<typename T>
+void write_faust_core_into_matfile(const faust_core_cu<T> core, const char* fileName, const char* variableName)
+{
+	faust_core<T> fcore;
+	faust_cu2faust(fcore,core);
+	write_faust_core_into_matfile(fcore,fileName,variableName);
+
+}
+#endif
+
 using namespace std;
 
 template<typename T>

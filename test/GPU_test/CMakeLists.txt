@@ -8,7 +8,7 @@ if(FAUST_USE_MATIO)
 endif(FAUST_USE_MATIO)
 
 
-
+add_definitions(-DCOMPILE_GPU)
 # generation des executables de algorithme hierarchical_fact en GPU en simple et double precision 
 foreach(TEST_FPP float double)	
 		foreach(testin hierarchical_fact_cu)

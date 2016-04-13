@@ -87,6 +87,8 @@ void  multiplyLeft(const faust_cu_spmat<faust_real>& cu_S,cusparseHandle_t);
 
 faust_unsigned_int size() const {return dim;}
 
+bool equality(faust_cu_vec<faust_real> const &x, faust_real precision=(faust_real)0.001) const;
+
 int getDevice()const{return device;} 
 
 faust_real* getData(){return data;}

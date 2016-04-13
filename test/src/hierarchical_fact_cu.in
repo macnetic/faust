@@ -8,6 +8,7 @@
 #include "faust_params_palm.h"
 #include "stopping_criterion.h"
 #include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_core.h"
 #include "palm4MSA_cu.h"
 #include "hierarchical_fact_cu.h"
 #include "faust_cu_timer.h"
@@ -112,25 +113,43 @@ int main(int argc, char* argv[])
 
 		vector<faust_cu_spmat<faust_real> > facts;
 		hier_fact.get_facts(facts);
-		//(facts[0]) *= hier_fact.get_lambda();
-		char nomFichier[100];
-		for (int i=0 ; i<facts.size() ; i++)
-		{
-			sprintf(nomFichier, "@FAUST_TESTOUTPUT_BIN_DIR@/facts%d_cpp.dat",i);
-			facts[i].print_file(nomFichier);
+		
+		faust_real lambda=hier_fact.get_lambda();
+		cout<<"lambda="<<std::setprecision(20)<<lambda<<endl<<endl;
+		
+		/// equality test between lambda (multiplied scalar and lambda)
+		if (argc >= 3)
+		{	
+			if (std::abs(lambda - expected_lambda) > epsilon)
+			{
+				std::cerr<<"invalid lambda, must be equal to "<<std::setprecision(20)<<std::setprecision(20)<<expected_lambda<<" in the precision of "<<epsilon<<std::endl;
+				std::cerr<<"current value is "<<std::setprecision(20)<<lambda<<std::endl;
+				exit(EXIT_FAILURE); 
+			}
+		
 		}
-		cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl<<endl;
+
 		
 
 		//faust_core_cu<faust_real> hier_fact_core(facts);
-		faust_core_cu<faust_real> hier_fact_core(facts,hier_fact.get_lambda());
+		faust_core_cu<faust_real> hier_fact_core(facts,lambda);
+
+
+		//write the given factorisation into a mat file
+		stringstream outputfilename;
+		outputfilename<<"@FAUST_TESTOUTPUT_BIN_DIR@/"<<config_file_body_file<<"_gpu_factorisation.mat";
+		std::cout<<"**************** WRITING FACTORISATION INTO ****************"<<std::endl;
+		std::cout<<"output filename : "<<outputfilename.str();
+		write_faust_core_into_matfile(hier_fact_core,outputfilename.str().c_str(),"fact");
 
 	//relative_error
-	faust_cu_mat<faust_real> data_matrix = params.data;
-	faust_cu_mat<faust_real> faust_product;
-	faust_product=hier_fact_core.get_product(cublasHandle,cusparseHandle);
-	faust_product-=data_matrix;
-	faust_real relative_error = faust_product.norm()/data_matrix.norm();
+	faust_cu_mat<faust_real> const data_matrix(params.data);
+	faust_cu_mat<faust_real> tmp;
+	tmp=hier_fact_core.get_product(cublasHandle,cusparseHandle);
+	faust_cu_mat<faust_real> const faust_product(tmp);
+	faust_cu_mat<faust_real> error(faust_product);	
+	error-=data_matrix;	
+	faust_real relative_error = error.norm()/data_matrix.norm();
 	
 	std::cout<<std::endl;	
 		std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
@@ -149,9 +168,10 @@ int main(int argc, char* argv[])
 		faust_cu_vec<faust_real> x(data_matrix.getNbCol());
 		faust_cu_vec<faust_real> ydense(data_matrix.getNbRow());
 		faust_cu_vec<faust_real> yfaust(hier_fact_core.getNbRow());
+		faust_cu_vec<faust_real> ycomp(faust_product.getNbRow());
 
 		x.setOnes();
-		x.Display();
+
 
 		for (int i=0;i<niter_time_comp;i++)
 		{
@@ -162,17 +182,23 @@ int main(int argc, char* argv[])
 				gemv(data_matrix,x,ydense,'N',cublasHandle);
 			tdense.stop();
 
+				gemv(faust_product,x,ycomp,'N',cublasHandle);				
 
 	 		tfaust.start();
 				hier_fact_core.mult(x,yfaust,cusparseHandle);
 			tfaust.stop();
-
+			if(!yfaust.equality(ycomp))
+			{
+				cout<<"ycomp"<<std::endl<<std::endl;								
+				yfaust.Display();
+				cout<<std::endl<<std::endl<<"yfaust"<<std::endl;
+				ycomp.Display();
+				cerr << "vector multiplication issue : yfaust (multiplication by faust) and ycomp (multiplication by the dense matrix representing the faust)  are not equal with the given precision"<<epsilon<< endl;					
+				exit(EXIT_FAILURE);
+			}	
 
 	 	}
-		std::cout<<"ydense"<<std::endl;
-		ydense.Display();
-		std::cout<<"yfaust"<<std::endl;
-		yfaust.Display();
+		
 		
 		std::cout<<std::endl;
 	
