@@ -146,6 +146,7 @@ endif(FAUST_USE_MEX)
 ##############################################################################
 # Critical time, which fixe the limit time of the process
 set(TIMEOUT_MEG 7200)
+set(TIMEOUT_COMP 3000)
 
 
 # MATLAB input format
@@ -155,6 +156,8 @@ if (FAUST_USE_MATIO)
 	add_test(NAME FAUST_HIER_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
 	add_test(NAME MEG_FACT_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22332 1)
 	add_test(NAME MEG_FACT_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22480 1)
+	# limit the time of the process in case of bug... 
+	set_tests_properties(HADAMARD_FACT_DOUBLE FAUST_HIER_DOUBLE FAUST_HIER_FLOAT PROPERTIES TIMEOUT ${TIMEOUT_COMP})
 	set_tests_properties(MEG_FACT_FLOAT MEG_FACT_DOUBLE PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 endif (FAUST_USE_MATIO)
 
@@ -165,7 +168,8 @@ if (FAUST_USE_XML)
 	add_test(NAME FAUST_HIER_TRANSPOSE_CMDLINE COMMAND ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/trans_hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt  T)
 
 	add_test(NAME MEG_FACT_CMDLINE COMMAND ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/MEG_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/MEG_data.txt )
-
+	# limit the time of the process in case of bug... 
+	set_tests_properties(FAUST_HIER_CMDLINE FAUST_HIER_TRANSPOSE_CMDLINE PROPERTIES TIMEOUT ${TIMEOUT_COMP})
 	set_tests_properties(MEG_FACT_CMDLINE PROPERTIES TIMEOUT ${TIMEOUT_MEG})	 
 endif(FAUST_USE_XML)
 
@@ -173,11 +177,15 @@ endif(FAUST_USE_XML)
 if(FAUST_USE_MEX)
 	#add_test(NAME FAUST_HIER_MEX COMMAND matlab  -nojvm -nodisplay -r ${FAUST_TEST_BIN_DIR}/hier_fact.m;exit)
 	# on ajoute les path bin et tools qui sont utilisés pour le script matlab.
-	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "addpath('${FAUST_TEST_BIN_DIR}','${FAUST_TESTTOOLS_BIN_DIR}');hier_fact;exit" )	
-	set_tests_properties(FAUST_HIER_MEX PROPERTIES TIMEOUT 60)
+	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_TEST_BIN_DIR}','${FAUST_TESTTOOLS_BIN_DIR}');hier_fact;end;exit" )
+	
+	add_test(NAME FAUST_MEG_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_TEST_BIN_DIR}','${FAUST_TESTTOOLS_BIN_DIR}');MEG_fact;end;exit" )	
+	# limit the time of the process in case of bug... 
+	set_tests_properties(FAUST_HIER_MEX PROPERTIES TIMEOUT ${TIMEOUT_COMP})
+	set_tests_properties(FAUST_MEG_MEX PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 endif() 
 
-#matlab -nojvm -r "addpath('/home/aleman/WORK/FAUST/faust/trunk/devcpp/Build-AL/wrapper/run_test/bin/');hier_fact;exit"
+#matlab -nojvm -r "addpath('/home/aleman/WORK/FAUST/faust/trunk/devcpp/Build-AL/wrapper/run_test/bin/','/home/aleman/WORK/FAUST/faust/trunk/devcpp/Build-AL/wrapper/run_test/tools/');hier_fact;exit"
 
 	
 	# add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp" "${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp")
