@@ -81,8 +81,19 @@ class faust_spmat : public faust_mat_generic<T>
 		\tparam dim2_ : number of column of the matrix
 	*/	
 	faust_spmat(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<T>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
+	/*!
+	*  \brief Constructor : from CRS (Compressed Row Storage) format
+	*	
+	*/
 	faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const T* value, const size_t* id_row, const size_t* col_ptr);
 	
+
+	/*!
+	*  \brief Constructor : from CCS (Compressed Column Storage) format 
+	*	
+	*/
+	template<typename U>
+	faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const U* value, const int* row_ptr, const int* id_col);
 
 	void set(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const double* value, const size_t* id_row, const size_t* col_ptr);
 	void resize(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
@@ -95,6 +106,9 @@ class faust_spmat : public faust_mat_generic<T>
 	void operator= (const faust_mat<T>& Mdense);
 	void operator*=(const T alpha);
 	void operator/=(const T alpha);
+	/*!
+     	*\brief check if the dimension and number of nonzeros of the faust_spmat are coherent */
+	void check_dim_validity() const;
 	
 	template <typename U>
 	void operator=(const faust_spmat<U> &M);
@@ -129,10 +143,14 @@ class faust_spmat : public faust_mat_generic<T>
 	const int* getColInd()const{if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(class_name,"getColInd : matrix is not in rowMajor");}}
 	int* getRowPtr(){if(mat.IsRowMajor) return mat.outerIndexPtr(); else{handleError(class_name,"getRowPtr : matrix is not in rowMajor");}}
 	int* getColInd(){if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(class_name,"getColInd : matrix is not in rowMajor");}}
-
+	bool isRowMajor() const{return mat.IsRowMajor;}
 		
 	/// Display all features of faust_spmat : dim1, dim2, nnz number of nonzeros, values, etc ...
 	void Display() const;
+	/*!
+	*\brief Display the support of faust_spmat (i.e where are the non zero entries)
+	*/
+	void display_support() const;
 	
 	T norm(){return mat.norm();}	
 	

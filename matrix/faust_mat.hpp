@@ -16,9 +16,7 @@
 
 
 
-#ifdef __GEMM_WITH_MKL__
-	#include "mkl_spblas.h"
-#endif
+
 
 template<typename U> class faust_mat;
 using namespace std;
@@ -83,9 +81,7 @@ t_check_dim.start();
 	bool verifSize = (this->getNbCol() == mat.cols()) &&  (this->getNbRow() == mat.rows());
 
 	if (!verifSize)
-	{
 		handleError(class_name, "check_dim_validity : Size incompatibility in the faust_mat");
-	}
 #ifdef __COMPILE_TIMERS__
 t_check_dim.stop();
 #endif
@@ -478,7 +474,6 @@ template<typename U>
 void faust_mat<T>::operator=(faust_mat<U> const& A)
 {
     resize(A.dim1,A.dim2);
-	// mat = A.mat.cast<T>();
 	for (int i=0;i<this->dim1*this->dim2;i++)
         (*this)[i]=(T) A(i);
     isZeros = A.isZeros;
@@ -488,14 +483,22 @@ void faust_mat<T>::operator=(faust_mat<U> const& A)
 template<typename T>
 void faust_mat<T>::operator=(faust_spmat<T> const& S)
 {
-    resize(S.getNbRow(),S.getNbCol());
+    S.check_dim_validity();	
+    resize(S.getNbRow(),S.getNbCol());			
 	setZeros();
     T*const ptr_data = getData();
+    
     for(int i=0 ; i< S.mat.outerSize() ; i++)
+    {	
         for(typename Eigen::SparseMatrix<T,Eigen::RowMajor>::InnerIterator it(S.mat,i); it; ++it)
-            ptr_data[it.col() * this->dim1 + it.row()] = it.value();
-        isZeros = false;
-    isIdentity = false;
+	{           
+		ptr_data[it.col() * this->dim1 + it.row()] = it.value();
+        
+	}
+    }
+		
+	isZeros = false;
+	isIdentity = false;
 }
 
 

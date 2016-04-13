@@ -6,11 +6,14 @@
 #include "faust_cu_vec.h"
 #include "faust_cu_mat.h"
 
+
 #ifdef __COMPILE_SPMAT__
    #include "faust_spmat.h"
-   #include "faust_cu_spmat.h"
+   #include "faust_cu_spmat.h"	
 #endif
 #include <typeinfo>
+
+
 
 
 template<typename T, typename U>
@@ -84,52 +87,69 @@ void faust_cu2faust(faust_mat<T>& M, const faust_cu_mat<U>& cu_M, cudaStream_t s
 }
 
 #ifdef __COMPILE_SPMAT__
+/*!
+	* \brief copy a faust_cu_spmat cu_S into  a faust_spmat S
+	*\warning give a corrupted faust_spmat S (i.e S.nnz not equal to S.mat.nonZeros())  
+	*/
+
+///WARNING GIVE CORRUPTED FAUST_SPMAT (i.e S.nnz != S.mat.nonZeros()
 template<typename T, typename U>
 void faust_cu2faust(faust_spmat<T>& S, const faust_cu_spmat<U>& cu_S, cudaStream_t stream/*=0*/)
 {
       const int nnz = cu_S.getNonZeros();
       const int dim1 = cu_S.getNbRow();
       const int dim2 = cu_S.getNbCol();
-      S.resize(nnz,dim1,dim2);           
-      if(dim1*dim2>0 && nnz==0)
-         S.setZeros();
 
-      if(dim1*dim2>0 && nnz>0)
-      {
-         if(cu_S.getColInd()==NULL || cu_S.getRowPtr()==NULL || cu_S.getValues()==NULL
-            || S.getColInd()==NULL || S.getRowPtr()==NULL || S.getValuePtr()==NULL)
-            
-            handleError("faust_cu2faust","NULL pointer for non-empty matrix");
+	
+       if(dim1*dim2>0 && nnz==0)
+	{
+		S.resize(dim1,dim2);
+         	S.setZeros();
+	}else
+	{
+      		if(dim1*dim2>0 && nnz>0)
+      		{
+         		if(cu_S.getColInd()==NULL || cu_S.getRowPtr()==NULL || cu_S.getValues()==NULL)
+            			handleError("faust_cu2faust","NULL pointer for non-empty matrix");
+		}		
+			int currentGPU;
+            		faust_cudaGetDevice(&currentGPU);
+            		faust_cudaSetDevice(cu_S.getDevice());			
+			
+			U* data_tmp = new U[nnz];
+			int* row_ptr_tmp = new int[dim1+1];
+			int* id_col_tmp = new int[nnz];
+               		
+			faust_cudaMemcpyAsync(data_tmp, cu_S.getValues(), nnz*sizeof(U), cudaMemcpyDeviceToHost, stream);      			
+			faust_cudaMemcpyAsync(row_ptr_tmp, cu_S.getRowPtr(), (dim1+1)*sizeof(int), cudaMemcpyDeviceToHost, stream);      
+            		faust_cudaMemcpyAsync(id_col_tmp, cu_S.getColInd(), nnz*sizeof(int), cudaMemcpyDeviceToHost, stream);      			
+			
+						
 
-         else
-         {
-            int currentGPU;
-            faust_cudaGetDevice(&currentGPU);
-            faust_cudaSetDevice(cu_S.getDevice());
-            
-            //if eigen sparse matrix S.mat is not in rowMajor
-               //handleError("faust_cu2faust","Eigen sparse matrix must be in RowMajor");
 
+			faust_spmat<T> spmat_tmp(nnz,dim1,dim2,data_tmp,row_ptr_tmp,id_col_tmp);
 
-            faust_cudaMemcpyAsync(S.getRowPtr(), cu_S.getRowPtr(), (dim1+1)*sizeof(int), cudaMemcpyDeviceToHost, stream);      
-            faust_cudaMemcpyAsync(S.getColInd(), cu_S.getColInd(), nnz*sizeof(int), cudaMemcpyDeviceToHost, stream);      
+			
+			S=spmat_tmp;
+			delete [] data_tmp;
+			delete [] row_ptr_tmp;
+			delete [] id_col_tmp; 
+			
+			data_tmp=NULL;
+			row_ptr_tmp=NULL;
+			id_col_tmp=NULL;
 
-
-	         if (typeid(T) != typeid(U))
-	         {
-               U* data_tmp = new U[nnz];
-               faust_cudaMemcpyAsync(data_tmp, cu_S.getValues(), nnz*sizeof(U), cudaMemcpyDeviceToHost, stream);
-               for (int i=0 ; i<nnz ;i++)
-                  S.getValuePtr()[i] = (T) data_tmp[i];
-               delete [] data_tmp ; data_tmp=NULL;
-	         }
-	         else
-               faust_cudaMemcpyAsync(S.getValuePtr(), cu_S.getValues(), nnz*sizeof(T), cudaMemcpyDeviceToHost, stream);      
-
-            faust_cudaSetDevice(currentGPU);
-         }                  
-      }  
+      			faust_cudaSetDevice(currentGPU);
+		
+	}
+	
+	
+	
+	 	  
 }
+
+
+
 #endif
 
 #endif

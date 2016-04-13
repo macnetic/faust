@@ -62,7 +62,7 @@ void faust_spmat<T>::operator=(const faust_spmat<U>& M)
 template<typename T>
 faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const T* value, const size_t* id_row, const size_t* col_ptr) :
 	faust_mat_generic<T>(dim1_,dim2_),
-	mat(Eigen::SparseMatrix<T>(dim1_,dim2_)),
+	mat(Eigen::SparseMatrix<T,Eigen::RowMajor>(dim1_,dim2_)),
 	nnz(nnz_)
 {	
 	vector<Eigen::Triplet<T> > tripletList;
@@ -84,6 +84,45 @@ faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_
 	}
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 }
+
+
+template<typename T>
+template<typename U>
+faust_spmat<T>::faust_spmat(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const U* value, const int* row_ptr, const int* id_col) :
+	faust_mat_generic<T>(dim1_,dim2_),
+	mat(Eigen::SparseMatrix<T,Eigen::RowMajor>(dim1_,dim2_)),
+	nnz(nnz_)
+{	
+	vector<Eigen::Triplet<T> > tripletList;
+	tripletList.reserve(nnz);
+	int nbEltIns = 0;
+	int nb_elt_rowi;
+	//std::cout<<"SPMAT CONSTRUCTOR"<<std::endl;
+	//std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
+	for (int i=0;i<dim1_;i++)
+	{	
+		nb_elt_rowi = row_ptr[i+1]-row_ptr[i];
+		//std::cout<<"nb_elt "<< nb_elt_colj<<" col "<<j<<std::endl;
+		for (int j = 0;j<nb_elt_rowi;j++)
+		{	
+			//std::cout<<"i : "<<id_row[i+nbEltIns]<<" j :"<<j<<" value : "<<value[i+nbEltIns]<<std::endl;
+			tripletList.push_back(Eigen::Triplet<T>(i,(int) id_col[j+nbEltIns], (T) value[i+nbEltIns]));
+		}
+		nbEltIns += nb_elt_rowi;		
+	}
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 template<typename T>
@@ -217,9 +256,35 @@ void faust_spmat<T>::Display() const
 	for (int i=0 ; i<nnz ; i++)
 		cout <<  getValuePtr()[i] << " ";
 	cout << " ]"<<endl<<endl;
+	
+
 }
 
 
+template<typename T>
+void faust_spmat<T>::display_support() const
+{
+	for (int i=0;i<this->getNbRow();i++)
+	{
+		int ind_line_begin=getRowPtr()[i];
+		int ind_line_end=getRowPtr()[i+1];
+		
+		int nb_elt_per_row=ind_line_end-ind_line_begin;
+		int precedent = 0;		
+		for (int k=0;k<nb_elt_per_row;k++)
+		{
+			for (int l=precedent+1;l<getColInd()[ind_line_begin+k];l++)
+			{
+				std::cout<<"O";
+			}
+			precedent=getColInd()[ind_line_begin+k];
+			std::cout<<"X";
+		}
+		std::cout<<std::endl;
+		
+			
+	}
+}
 
 template<typename T>
 void faust_spmat<T>::resize(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)
@@ -228,6 +293,28 @@ void faust_spmat<T>::resize(const faust_unsigned_int nnz_, const faust_unsigned_
 	mat.reserve(nnz_);
 	update_dim();
 	nnz = nnz_;
+}
+
+template<typename T>
+void faust_spmat<T>::check_dim_validity() const
+{
+	
+	
+	if ( (this->getNbCol() != mat.cols()) ||  (this->getNbRow() != mat.rows()))
+	{
+		cout<<"nb cols attribute : "<<this->getNbCol()<<endl;
+		cout<<"nb cols from eigen : "<<mat.cols()<<endl;
+		cout<<"nb rows attribute : "<<this->getNbRow()<<endl;
+		cout<<"nb rows from eigen : "<<mat.rows()<<endl;			
+		handleError(class_name, "check_dim_validity : Size incompatibility in the faust_spmat");
+	}
+
+	if (this->nnz != mat.nonZeros())
+	{
+		cout<<"nnz attribute : "<<mat.nonZeros()<<endl;
+		cout<<"nnz from eigen : "<<this->nnz<<endl;		
+		handleError(class_name, "check_dim_validity : incompatibility in the number of non zeros");
+	}
 }
 
 
@@ -246,6 +333,10 @@ void faust_spmat<T>::operator=(const faust_spmat<T>& M)
 	mat.makeCompressed();
 	update_dim();
 }
+
+
+
+
 
 template<typename T>
 void faust_spmat<T>::operator= (const faust_mat<T>& Mdense)
