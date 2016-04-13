@@ -276,16 +276,16 @@ message(STATUS "LIBRARY_PATH_LIST=${LIBRARY_PATH_LIST}")
 message(STATUS "INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
 
 include(CMake/check_external_libraries.cmake)
-check_external_libraries(hdf5 HDF5_LIB_FILE 0)
+
 check_external_libraries(matio MATIO_LIB_FILE 0)
 check_external_libraries(xml2 XML2_LIB_FILE 0)
-check_external_libraries(hdf5 HDF5_LIB_FILE 0)
+check_external_libraries(hdf5 HDF5_LIB_FILE 1)
 
 #LDFLAGS = -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5
 check_external_includes("libxml/parser.h" XML_INC_DIR 0)
 check_external_includes("matio.h" MATIO_INC_DIR 0)
 
-check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
+check_external_includes("Eigen/Dense" EIGEN_INC_DIR 1)
 
 
 if (FAUST_USE_GPU)
