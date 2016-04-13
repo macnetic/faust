@@ -41,6 +41,7 @@ class faust_core : public faust_linear_operator<T>
 	void get_facts(std::vector<faust_spmat<T> >& sparse_facts)const{sparse_facts = data;}
 	void get_facts(std::vector<faust_mat<T> >& facts)const;
 	int size()const{return data.size();}
+	void size(int size_)const{ data.resize(size_);}
 
     /** \brief Perform the product of all factorized matrix. */
     faust_mat<T> get_product()const;
