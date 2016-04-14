@@ -18,7 +18,7 @@
 
 
 # Directory of the local path of the nightly project
-export PATH_DIR_RUN_NIGHTLY=/home/aleman/Documents/WORK/FAUST/faust_nightly
+export PATH_DIR_RUN_NIGHTLY='/home/aleman/Documents/WORK/FAUST/faust_nightly'
 
 if [ ! -d "$PATH_DIR_RUN_NIGHTLY" ];
 then
@@ -27,16 +27,16 @@ then
 fi
 
 # Directory of the library used in the FAUST PROJECT 
-export OPENBLASDIR=/home/aleman/library/OpenBLAS
-export MATIODIR=/home/aleman/library/matio-1.5.3/src/.libs
-export MATIODIRINC=/home/aleman/library/matio-1.5.3/src
-export CUDADIR=/usr/local/cuda-6.5
-export EIGENDIR=/usr/local/include/eigen3
+export OPENBLASDIR='/home/aleman/library/OpenBLAS'
+export MATIODIR='/home/aleman/library/matio-1.5.3/src/.libs'
+export MATIODIRINC='/home/aleman/library/matio-1.5.3/src'
+export CUDADIR='/usr/local/cuda-6.5'
+export EIGENDIR='/usr/local/include/eigen3'
 # export version of gcc
 #export CC=/usr/lib64/ccache/gcc
 #export CXX=/usr/lib64/ccache/g++
-export CC=/usr/bin/gcc
-export CXX=/usr/bin/g++
+export CC='/usr/bin/gcc'
+export CXX='/usr/bin/g++'
 
 # /usr/local/bin/matlab in the PATH 
 # /usr/bin/gcc
