@@ -31,7 +31,7 @@ export PATH=$PATH:/usr/local/MATLAB/R2014b/bin;
 export OPENBLASDIR='/home/ci/local/OPENBLAS'
 export HDF5_ROOT_DIR='/home/ci/local/HDF5/lib'
 export PATH=$PATH:usr/local/include
-export EIGENDIR=/home/ci/Library/eigen-eigen-07105f7124f9
+export EIGENDIR='/home/ci/Library/eigen-eigen-07105f7124f9'
 
 
 
