@@ -26,6 +26,8 @@ template<typename T>
 void prox_supp(faust_cu_mat<T> & M, const faust_cu_mat<T> & supp);
 template<typename T>
 void prox_blkdiag(faust_cu_mat<T> & M,faust_unsigned_int k);
+template<typename T>
+void prox_splincol(faust_cu_mat<T> & M,faust_unsigned_int k);
 
 
 
