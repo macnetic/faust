@@ -1,7 +1,6 @@
 #include "faust_constant.h"
 
 #ifdef __GEMM_WITH_OPENBLAS__
-
 #include "cblas_algebra.h" 
 
 
@@ -14,9 +13,6 @@ template<> void cblas_gemm<float>(const CBLAS_ORDER order,const CBLAS_TRANSPOSE 
 	#endif
 }
 
-
-
-
 template<> void cblas_gemm<double>(const CBLAS_ORDER order,const CBLAS_TRANSPOSE transa, const CBLAS_TRANSPOSE transb, const int dim1,const int dim2,const int nbColOpA, const double alpha, const double* Adata,const int lda,const double* Bdata,const int ldb, const double beta, double* Cdata, const int ldc)
 {
 	cblas_dgemm(order,transa,transb,dim1,dim2,nbColOpA,alpha,Adata,lda,Bdata,ldb,beta,Cdata,ldc);
@@ -25,8 +21,6 @@ template<> void cblas_gemm<double>(const CBLAS_ORDER order,const CBLAS_TRANSPOSE
 	#endif	
 	
 }
-
-
 
 
 template<> void cblas_gemv<float>(const CBLAS_ORDER order,const CBLAS_TRANSPOSE transa,const int dim1,const int dim2,const float alpha,const float* Adata,const int lda,const float* Xdata,const int incX,const float beta,float* Ydata,const int incY)
