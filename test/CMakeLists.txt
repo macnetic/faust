@@ -18,7 +18,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO AND HDF5_LIB_FILE)
 	foreach(TEST_FPP float double)	
 		foreach(testin hierarchical_fact)
 			# copy CPU files cpp.in to the user's ./src/ directory en float et double precision
-			configure_file(${FAUST_TESTSRC_SRC_DIR}/${testin}.in ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
+			configure_file(${FAUST_TESTSRC_SRC_DIR}/${testin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
 			# Generation of the binary files in double and float precision
 			add_executable(${testin}_${TEST_FPP} ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp ${FAUST_TESTSRC_BIN_DIR}/ ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
    	
@@ -100,29 +100,8 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO AND HDF5_LIB_FILE)
 ###### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST ######
 else(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO AND HDF5_LIB_FILE)	
 
-	message(STATUT "Library matio is not available. Please used .txt or .xml input files")
-#	foreach(cppinbis hierarchical_fact_test MEG_fact)
-#		configure_file(${FAUST_TESTSRC_SRC_DIR}/${cppinbis}.cpp.inbis ${FAUST_TESTSRC_BIN_DIR}/${cppinbis}.cpp @ONLY)
-#	endforeach()
-#	foreach(datafile hier_fact_config MEG_config)
-#		configure_file(${FAUST_TESTDATA_SRC_DIR}/${datafile}.txt.in ${FAUST_TESTDATA_SRC_DIR}/${datafile}.txt @ONLY)
-#	endforeach()
-#	
-#	add_executable(faust_hier ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_test.cpp)
-#   	
-#   	if(FAUST_USE_OPENBLAS)
-# 		target_link_libraries(faust_hier  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
-#  	else()
-#  		target_link_libraries(faust_hier ${FAUST_TARGET} )
-#  	endif()
-#   
-#  	add_executable(meg ${FAUST_TESTSRC_BIN_DIR}/MEG_fact.cpp)
-#   	
-#   	if(FAUST_USE_OPENBLAS)
-#    		target_link_libraries(meg  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
-#   	else()
-#		target_link_libraries(meg  ${FAUST_TARGET})
-#	endif()
+	message(STATUT "Library matio is not available. Please used .xml input files")
+
  
 endif(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO AND HDF5_LIB_FILE)
 
