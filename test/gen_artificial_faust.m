@@ -1,6 +1,6 @@
 %% script pour generer des Faust avec un RCG, une Dimension et un nombre de facteur fixe
-% lancer l'executable comptime1 ensuite pour effectuer les tests de performances 
-% puis drawComptime1 pour afficher les resultats
+% lancer l'executable multiply_comptime ensuite pour effectuer les tests de performances 
+% puis  display_multiply_comptime pour afficher les resultats
 function gen_artficial_faust(constraint)
 %% cas 1
 % RCGs = [2 4 6 8 10];
@@ -9,8 +9,8 @@ function gen_artficial_faust(constraint)
 
 %% cas 2
 
-RCGs = [4 8 16 32 64];
-Dims = [128 256 512 2048];
+RCGs = [2 4 8 16];
+Dims = [128 256 512 1024 2048];
 
 nb_facts = [2,4,8,16];
 
@@ -171,7 +171,7 @@ if (opt_calcul ~= 0)
     end
 end
 disp('sauvegarde des donnees');
-save(['data/Faust_example_' constraint '.mat']);                     
+save(['data/Faust_example.mat']);                     
 
 
 end

@@ -92,6 +92,8 @@ if (FAUST_USE_MATIO)
 	add_test(NAME FAUST_HIER_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
 	add_test(NAME MEG_FACT_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22332 1)
 	add_test(NAME MEG_FACT_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22480 1)
+	add_test(NAME PALM4MSA_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/test_palm4MSA_double )
+	add_test(NAME PALM4MSA_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/test_palm4MSA_float )
 	
 	# limit the time of the process in case of bug... 
 	set_tests_properties(HADAMARD_FACT_DOUBLE FAUST_HIER_DOUBLE FAUST_HIER_FLOAT PROPERTIES TIMEOUT ${TIMEOUT_COMP})
