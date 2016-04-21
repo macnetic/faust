@@ -14,10 +14,15 @@ endif()
 
 ####### IF THE MATIO LIBRARY IS AVAILABLE ELSE WE USE TXT OR XML DATA  #######
 if(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO AND HDF5_LIB_FILE)
-	########## HIERARCHICAL FACTORIZATION IN CPU MODE (simple and double precision)
+
+	### list of executable generated in double and simple precision
+	# hierarchical_fact : test the hierarchical_fact algorithm
+	# test_palm4MSA : test the palm4MSA algorithm
+	# multiply_compare_time : time comparison between Faust-vector product and Dense matrix-vector product
+ 
 	foreach(TEST_FPP float double)	
-		foreach(testin hierarchical_fact)
-			# copy CPU files cpp.in to the user's ./src/ directory en float et double precision
+		foreach(testin hierarchical_fact test_palm4MSA multiply_compare_time)
+			# copy CPU files cpp.in to the user's ./src/ directory in float et double precision
 			configure_file(${FAUST_TESTSRC_SRC_DIR}/${testin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
 			# Generation of the binary files in double and float precision
 			add_executable(${testin}_${TEST_FPP} ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp ${FAUST_TESTSRC_BIN_DIR}/ ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
@@ -30,71 +35,21 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO AND HDF5_LIB_FILE)
 		endforeach()
 	endforeach()
 
+		install(TARGETS hierarchical_fact_double hierarchical_fact_float test_palm4MSA_double test_palm4MSA_float multiply_compare_time_double multiply_compare_time_float DESTINATION ${FAUST_INSTALL_TESTING_BIN})
 
-### test_faust : Evaluate the time difference using faust or classical-dense matrix, in a context of the multiplication between an matrix and a vector
-### WARNING les donnée test/data/facts_MEG%d.txt n'existent plus... 
-### test_palm4MSA : Run a test of palm4MSA
-	foreach(cppin test_palm4MSA) #test_faust
-		configure_file(${FAUST_TESTSRC_SRC_DIR}/${cppin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${cppin}.cpp @ONLY)
-	endforeach()
 
-	# test_palm4MSA
-	add_executable(test_palm4MSA ${FAUST_TESTSRC_BIN_DIR}/test_palm4MSA.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
-	if(FAUST_USE_OPENBLAS)
-		target_link_libraries(test_palm4MSA  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
-	else()
-		target_link_libraries(test_palm4MSA  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
-	endif()
-
-	# test_faust 
-#	add_executable(test_faust ${FAUST_TESTSRC_BIN_DIR}/test_faust.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_params.cpp)
-#	if(FAUST_USE_OPENBLAS)
-#		target_link_libraries(test_faust  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
-#	else()
-#		target_link_libraries(test_faust ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
-#	endif()
-    
-
-	#CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp COPYONLY)
-	#CONFIGURE_FILE(${FAUST_TESTSRC_SRC_DIR}/comp_time1.cpp ${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp COPYONLY)
+	
+ 
 	
 	
-	#### comp_time0 ???????????	
-	#add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp" "${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/comp_time0.cpp")
-	#### comp_time1 ???????????	
-	#add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/comp_time1.cpp" "${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/comp_time1.cpp")
-	#### drawComptime1 ???????????	
-	#add_custom_command(OUTPUT ${FAUST_TESTRUNCOMP_BIN_DIR}/drawComptime1.m COMMAND cmake -E copy "${FAUST_TESTRUNCOMP_SRC_DIR}/drawComptime1.m" "${FAUST_TESTRUNCOMP_BIN_DIR}/drawComptime1.m" DEPENDS "${FAUST_TESTRUNCOMP_SRC_DIR}/drawComptime1.m")
-	
-	
-	#CONFIGURE_FILE(${FAUST_TESTRUNCOMP_SRC_DIR}/main_RCG.m.in ${FAUST_TESTRUNCOMP_BIN_DIR}/main_RCG.m @ONLY) 
-	#comptime1
-	#add_custom_target(drawComp DEPENDS ${FAUST_TESTRUNCOMP_BIN_DIR}/drawComptime1.m)
-	#add_executable(comptime1 ${FAUST_TESTSRC_BIN_DIR}/comp_time1.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_core.cpp)
-	#add_dependencies(comptime1 drawComp)
-	#if(FAUST_USE_OPENBLAS)
-	#	target_link_libraries(comptime1  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE} )
-	#else()
-	#	target_link_libraries(comptime1  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
-	#endif()	
-	
-	# comptime0
-	#add_executable(comptime0 ${FAUST_TESTSRC_BIN_DIR}/comp_time0.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_core.cpp ${FAUST_MATIO_SRC_DIR}/faust_init_from_matio_mat.cpp)
-	#if(FAUST_USE_OPENBLAS)
-	#	target_link_libraries(comptime0  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
-	#else()
-	#	target_link_libraries(comptime0  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
-	#endif()
 
-	CONFIGURE_FILE(${FAUST_TESTRUNCOMP_SRC_DIR}/main_RCG.m.in ${FAUST_TESTRUNCOMP_BIN_DIR}/main_RCG.m @ONLY)
-   	INSTALL(FILES ${FAUST_TESTRUNCOMP_BIN_DIR}/main_RCG.m DESTINATION ${FAUST_INSTALL_TESTRUNCOMP})
-	foreach(matlabscript demo_compTime.m demo_compTime_matrix_draw.m dvp.m figures_compTime.m)
-      		CONFIGURE_FILE(${FAUST_TESTRUNCOMP_SRC_DIR}/${matlabscript} ${FAUST_TESTRUNCOMP_BIN_DIR}/${matlabscript} COPYONLY)
-		INSTALL(FILES ${FAUST_TESTRUNCOMP_BIN_DIR}/${matlabscript} DESTINATION ${FAUST_INSTALL_TESTRUNCOMP})
-	endforeach()
+	# matlab script useful for displaying the result of the multiply_compare_time executable ( 
+	CONFIGURE_FILE(${FAUST_TESTRUNCOMP_SRC_DIR}/display_multiply_comptime.m.in ${FAUST_TESTRUNCOMP_BIN_DIR}/display_multiply_comptime.m @ONLY)
+   	INSTALL(FILES ${FAUST_TESTRUNCOMP_BIN_DIR}/display_multiply_comptime.m DESTINATION ${FAUST_INSTALL_TESTRUNCOMP})
 
 
-	install(TARGETS hierarchical_fact_double hierarchical_fact_float test_palm4MSA DESTINATION ${FAUST_INSTALL_TESTING_BIN})
+
+
 
 
 ###### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST ######
@@ -130,15 +85,33 @@ set(TIMEOUT_COMP 3000)
 
 # MATLAB input format
 if (FAUST_USE_MATIO)
+	
+	# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) 
 	add_test(NAME HADAMARD_FACT_DOUBLE COMMAND  ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double 	${FAUST_TESTDATA_SRC_DIR}/config_HADAMARD.mat)
 	add_test(NAME FAUST_HIER_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double 	${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
 	add_test(NAME FAUST_HIER_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
 	add_test(NAME MEG_FACT_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_float ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22332 1)
 	add_test(NAME MEG_FACT_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_double ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22480 1)
+	
 	# limit the time of the process in case of bug... 
 	set_tests_properties(HADAMARD_FACT_DOUBLE FAUST_HIER_DOUBLE FAUST_HIER_FLOAT PROPERTIES TIMEOUT ${TIMEOUT_COMP})
 	set_tests_properties(MEG_FACT_FLOAT MEG_FACT_DOUBLE PROPERTIES TIMEOUT ${TIMEOUT_MEG})
+
+	set_tests_properties(MEG_FACT_FLOAT MEG_FACT_DOUBLE PROPERTIES TIMEOUT 14000)
+	
+
+	# time comparison between Faust-vector product and Dense matrix-vector product for various configuration ( dimension, RCG , number of factor)
+	add_test(NAME MULTIPLY_COMPTIME COMMAND ${FAUST_TEST_BIN_DIR}/multiply_compare_time_double)
+	# display the result of MULTIPLY_COMPTIME and save it in folder FAUST_TESTFIG_BIN_DIR as jpeg image (WARNING must be launched after MULTIPLY_COMPTIME)
+	add_test(NAME FIG_MULTIPLY_COMPTIME COMMAND	matlab -nodesktop -r "try;addpath('${FAUST_TESTRUNCOMP_BIN_DIR}');display_multiply_comptime('${FAUST_TESTOUTPUT_BIN_DIR}/multiply_compare_time.mat','${FAUST_TESTFIG_BIN_DIR}');end;exit")
+	
+	set_tests_properties(FIG_MULTIPLY_COMPTIME PROPERTIES TIMEOUT 120)
+
 endif (FAUST_USE_MATIO)
+
+
+
+
 
 # XML input format
 if (FAUST_USE_XML)
@@ -153,11 +126,13 @@ if (FAUST_USE_XML)
 endif(FAUST_USE_XML)
 
 
+
+
+
 if(FAUST_USE_MEX)
 	#add_test(NAME FAUST_HIER_MEX COMMAND matlab  -nojvm -nodisplay -r ${FAUST_TEST_BIN_DIR}/hier_fact.m;exit)
 	# on ajoute les path bin et tools qui sont utilisés pour le script matlab.
 	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_TEST_BIN_DIR}','${FAUST_TESTTOOLS_BIN_DIR}');hier_fact;end;exit" )
-	
 	add_test(NAME FAUST_MEG_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_TEST_BIN_DIR}','${FAUST_TESTTOOLS_BIN_DIR}');MEG_fact;end;exit" )	
 	# limit the time of the process in case of bug... 
 	set_tests_properties(FAUST_HIER_MEX PROPERTIES TIMEOUT ${TIMEOUT_COMP})
@@ -167,14 +142,7 @@ endif()
 #matlab -nojvm -r "addpath('/home/aleman/WORK/FAUST/faust/trunk/devcpp/Build-AL/wrapper/run_test/bin/','/home/aleman/WORK/FAUST/faust/trunk/devcpp/Build-AL/wrapper/run_test/tools/');hier_fact;exit"
 
 	
-	# add_custom_command(OUTPUT ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp COMMAND cmake -E copy "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp" "${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp" DEPENDS "${FAUST_TESTSRC_SRC_DIR}/hierarchical_fact_basic.cpp")
-	
-	 # add_executable(faust_hier_basic ${FAUST_TESTSRC_BIN_DIR}/hierarchical_fact_basic.cpp)
-   # if(FAUST_USE_OPENBLAS)
-      # target_link_libraries(faust_hier_basic  ${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
-   # else()
-      # target_link_libraries(faust_hier_basic ${FAUST_TARGET})
-   # endif()
+
    
    
    

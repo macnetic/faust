@@ -11,7 +11,7 @@
 #include <iostream>
 
 using namespace std;
-typedef FFPP faust_real;
+typedef @TEST_FPP@ faust_real;
 /** \brief Run a test of palm4MSA
  */
 int main()
