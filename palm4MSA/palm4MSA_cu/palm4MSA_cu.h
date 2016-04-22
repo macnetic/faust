@@ -15,7 +15,7 @@
 template<typename T> class faust_cu_mat;
 template<typename T> class faust_core_cu;
 
-class faust_constraint_generic;
+template<typename T> class faust_constraint_generic;
 template<typename T> class faust_params;
 template<typename T> class faust_params_palm;
 template<typename T> class stopping_criterion;
@@ -42,7 +42,7 @@ class palm4MSA_cu
       palm4MSA_cu(const faust_params<T>& params_, const cublasHandle_t cublasHandle, const bool isGlobal_);
       palm4MSA_cu(const faust_params_palm<T>& params_palm_, const cublasHandle_t cublasHandle, const bool isGlobal_=false);
 
-      void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
+      void set_constraint(const std::vector<const faust_constraint_generic<T>*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
       void set_data(const faust_cu_mat<T>& data_){data=data_;}
       void set_lambda(const T lambda_){lambda = lambda_;}
 
@@ -119,7 +119,7 @@ class palm4MSA_cu
       faust_cu_mat<T> LorR;
 
 
-      std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
+      std::vector<const faust_constraint_generic<T>*> const_vec; // vector of constraints of size nfact
       int ind_fact; //indice de facteur (!= hierarchical_fact::ind_fact : indice de factorisation)
       int ind_ite;
       // T lipschitz_multiplicator;

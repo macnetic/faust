@@ -10,7 +10,7 @@
   #include "faust_timer.h"
 #endif
 
-class faust_constraint_generic;
+template<typename T> class faust_constraint_generic;
 template<typename T> class palm4MSA_cu;
 template<typename T> class faust_cu_mat;
 template<typename T> class faust_cu_spmat;
@@ -52,7 +52,7 @@ private:
 
 
    private:
-      const std::vector< std::vector<const faust_constraint_generic*> > cons;
+      const std::vector< std::vector<const faust_constraint_generic<T>*> > cons;
       bool isUpdateWayR2L;
       bool isFactSideLeft; 
       bool isVerbose;
@@ -62,7 +62,7 @@ private:
       palm4MSA_cu<T> palm_global;
       const T default_lambda; // initial value of lambda for factorization into two factors
       //std::vector<faust_matrix > S;
-      std::vector<const faust_constraint_generic*> cons_tmp_global;
+      std::vector<const faust_constraint_generic<T>*> cons_tmp_global;
       bool isFactorizationComputed;
       std::vector<std::vector<T> > errors;
 	  static const char * class_name;
