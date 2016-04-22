@@ -75,7 +75,7 @@ template<typename T>
 faust_params<T>::faust_params(
 	const faust_matrix& data_,
 	const unsigned int nb_fact_,
-	const std::vector<const faust_constraint_generic*> & cons_,
+	const std::vector<const faust_constraint_generic<T>*> & cons_,
 	const std::vector<faust_matrix >& init_fact_,
 	const stopping_criterion<T>& stop_crit_2facts_,
     const stopping_criterion<T>& stop_crit_global_,
@@ -117,8 +117,8 @@ faust_params<T>::faust_params(
         handleError(class_name,"constructor : nb_fact and cons_.size() are in conflict\n");
     }
 
-    std::vector<const faust_constraint_generic*> residuumS_cons;
-	std::vector<const faust_constraint_generic*> factorS_cons;
+    std::vector<const faust_constraint_generic<T>*> residuumS_cons;
+	std::vector<const faust_constraint_generic<T>*> factorS_cons;
 	double cons_res_parameter = residuum_prcent;
 	if(isFactSideLeft)
 	{
@@ -126,12 +126,12 @@ faust_params<T>::faust_params(
 		{
 			if (i==1)
 			{
-                residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,data.getNbRow()*cons_[nb_fact-i]->getRows(),data.getNbRow(),cons_[nb_fact-i]->getRows()));
+                residuumS_cons.push_back(new faust_constraint_int<T>(CONSTRAINT_NAME_SP,data.getNbRow()*cons_[nb_fact-i]->getRows(),data.getNbRow(),cons_[nb_fact-i]->getRows()));
 				factorS_cons.push_back(cons_[nb_fact-i]);
 			}else
 			{
 				std::cout<<nb_fact-i<<std::endl;
-				residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*data.getNbRow()*cons_[nb_fact-i]->getRows()+0.5),data.getNbRow(),cons_[nb_fact-i]->getRows()));
+				residuumS_cons.push_back(new faust_constraint_int<T>(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*data.getNbRow()*cons_[nb_fact-i]->getRows()+0.5),data.getNbRow(),cons_[nb_fact-i]->getRows()));
 				std::cout<<nb_fact-i<<std::endl;
 				factorS_cons.push_back(cons_[nb_fact-i]);
 				std::cout<<nb_fact-i<<std::endl;
@@ -156,11 +156,11 @@ faust_params<T>::faust_params(
 			std::cout<<i<<std::endl;
 			if (i==0)
 			{
-				residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,cons_[i]->getCols()*data.getNbCol(),cons_[i]->getCols(),data.getNbCol()));
+				residuumS_cons.push_back(new faust_constraint_int<T>(CONSTRAINT_NAME_SP,cons_[i]->getCols()*data.getNbCol(),cons_[i]->getCols(),data.getNbCol()));
 				factorS_cons.push_back(cons_[0]);
 			}else
 			{
-				residuumS_cons.push_back(new faust_constraint_int(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*cons_[i]->getCols()*data.getNbCol()+0.5),cons_[i]->getCols(),data.getNbCol()));
+				residuumS_cons.push_back(new faust_constraint_int<T>(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*cons_[i]->getCols()*data.getNbCol()+0.5),cons_[i]->getCols(),data.getNbCol()));
 				factorS_cons.push_back(cons_[i]);
 			}
 				cons_res_parameter=cons_res_parameter/residuum_decrease_speed;
@@ -185,7 +185,7 @@ template<typename T>
 faust_params<T>::faust_params(
          const faust_matrix& data_,
          const unsigned int nb_fact_,
-         const std::vector<std::vector<const faust_constraint_generic*> >& cons_,
+         const std::vector<std::vector<const faust_constraint_generic<T>*> >& cons_,
          const std::vector<faust_matrix >& init_fact_,
          const stopping_criterion<T>& stop_crit_2facts_ /* = stopping_criterion<T>() */,
          const stopping_criterion<T>& stop_crit_global_ /* = stopping_criterion<T>() */,
@@ -220,7 +220,7 @@ faust_params<T>::faust_params(
 
 
 template<typename T>
-faust_params<T>::faust_params() : data((faust_unsigned_int)0,(faust_unsigned_int)0),nb_fact(0),cons(std::vector<std::vector<const faust_constraint_generic*> >()),isFactSideLeft(defaultFactSideLeft),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_matrix >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize)
+faust_params<T>::faust_params() : data((faust_unsigned_int)0,(faust_unsigned_int)0),nb_fact(0),cons(std::vector<std::vector<const faust_constraint_generic<T>*> >()),isFactSideLeft(defaultFactSideLeft),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_matrix >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize)
 {}
 
 
@@ -275,25 +275,25 @@ void faust_params<T>::Display() const
 			//std::string type_cons;
 			//type_cons.resize(0);
 			//type_cons=getConstraintType((*cons[jl][L]).getConstraintType());
-			std::cout<<"type_cont : "<<cons[jl][L]->getType<T>()<<" ";
+			std::cout<<"type_cont : "<<cons[jl][L]->getType()<<" ";
 			std::cout<<(*cons[jl][L]).get_constraint_name();
 			std::cout<<" nb_row :"<<(*cons[jl][L]).getRows();
 			std::cout<<" nb_col :"<<(*cons[jl][L]).getCols();
 
 
-			if (cons[jl][L]->isConstraintParameterInt<T>())
+			if (cons[jl][L]->isConstraintParameterInt())
 			{
-				faust_constraint_int* const_int = (faust_constraint_int*)(cons[jl][L]);
+				faust_constraint_int<T>* const_int = (faust_constraint_int<T>*)(cons[jl][L]);
 				std::cout<<" parameter :"<<(*const_int).getParameter()<<std::endl;
 			}
 
-			else if (cons[jl][L]->isConstraintParameterReal<T>())
+			else if (cons[jl][L]->isConstraintParameterReal())
 			{
 				faust_constraint_real<T>* const_real = (faust_constraint_real<T>*)(cons[jl][L]);
 				std::cout<<" parameter :"<<(*const_real).getParameter()<<std::endl;
 			}
 
-			else if (cons[jl][L]->isConstraintParameterMat<T>())
+			else if (cons[jl][L]->isConstraintParameterMat())
 			{
 				faust_constraint_mat<T>* const_mat = (faust_constraint_mat<T>*)(cons[jl][L]);
 				std::cout<<" parameter :"<<std::endl;
@@ -376,8 +376,8 @@ void faust_params<T>::init_from_file(const char* filename)
 	stopping_criterion<T> stopcritglobal(niter2);
 	stop_crit_global = stopcritglobal;
 
-	vector<const faust_constraint_generic*> consS;
-	vector<vector<const faust_constraint_generic*> > consSS;
+	vector<const faust_constraint_generic<T> *> consS;
+	vector<vector<const faust_constraint_generic<T> *> > consSS;
 	for (int i=0;i<2;i++)
 	{
 
@@ -401,7 +401,7 @@ void faust_params<T>::init_from_file(const char* filename)
 				{
 					int int_parameter;
 					int_parameter =atoi(cons_parameter);
-					consS.push_back(new faust_constraint_int(cons_name,int_parameter,cons_dim1,cons_dim2));
+					consS.push_back(new faust_constraint_int<T>(cons_name,int_parameter,cons_dim1,cons_dim2));
 					break;
 				}
 

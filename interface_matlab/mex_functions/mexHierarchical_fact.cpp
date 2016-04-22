@@ -101,7 +101,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    
 
     //constraints
-    std::vector<std::vector<const faust_constraint_generic*> > consSS;
+    std::vector<std::vector<const faust_constraint_generic<FFPP>*> > consSS;
     if (presentFields[2])
     {
         mwSize nbRowCons,nbColCons;
@@ -126,7 +126,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         }*/
         //mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
         //faust_constraint_generic * consToAdd;
-        std::vector<const faust_constraint_generic*> consS;
+        std::vector<const faust_constraint_generic<FFPP>*> consS;
         
         for (mwSize i=0;i<nbRowCons;i++)
         {

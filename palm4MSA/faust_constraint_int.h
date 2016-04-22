@@ -4,9 +4,33 @@
 #include "faust_constraint_generic.h"
 #include "faust_constant.h"
 
-//template<typename parameter_type>
-class faust_constraint_int : public faust_constraint_generic
+
+
+#ifdef __COMPILE_GPU__
+   #include "faust_cu_mat.h"
+   #include "prox_cu.h"
+#else
+   #include "faust_mat.h"
+   #include "prox.h"
+#endif
+
+
+#ifdef __COMPILE_GPU__
+   template<typename FPP> class faust_cu_mat;
+#else
+   template<typename FPP> class faust_mat;
+#endif
+
+
+template<typename FPP>
+class faust_constraint_int : public faust_constraint_generic<FPP>
 {
+
+   	#ifdef __COMPILE_GPU__
+    		typedef faust_cu_mat<FPP> faust_matrix ;
+	#else
+    		typedef faust_mat<FPP> faust_matrix ;
+	#endif		
    public:
       faust_constraint_int(); // ajouter parametre de contrainte par defaut (a voir avec Luc)
 
@@ -27,7 +51,7 @@ class faust_constraint_int : public faust_constraint_generic
       
       virtual void set_default_parameter();
       virtual void check_constraint_name()const;
-
+      virtual void project(faust_matrix & mat)const;	
  
       ~faust_constraint_int(){};
 
@@ -37,5 +61,7 @@ class faust_constraint_int : public faust_constraint_generic
 	  static const char * class_name;
     
 };
+
+#include "faust_constraint_int.hpp"
 
 #endif

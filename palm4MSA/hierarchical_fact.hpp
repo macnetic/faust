@@ -32,7 +32,7 @@ hierarchical_fact<T>::hierarchical_fact(const faust_params<T>& params_):
    nb_fact(params_.nb_fact-1),
    palm_2(palm4MSA<T>(params_, false)),
    palm_global(palm4MSA<T>(params_, true)),
-   cons_tmp_global(vector<const faust_constraint_generic*>()),
+   cons_tmp_global(vector<const faust_constraint_generic<T>*>()),
    default_lambda(params_.init_lambda),
    isFactorizationComputed(false),
    errors(std::vector<std::vector<T> >(2,std::vector<T >(params_.nb_fact-1,0.0))){}
@@ -75,7 +75,7 @@ t_next_step.start();
         handleError(class_name,"next_step : factorization has already been computed");
     }
 
-    vector<const faust_constraint_generic*> cons_tmp_2(2);
+    vector<const faust_constraint_generic<T>*> cons_tmp_2(2);
     cons_tmp_2[0]=cons[0][ind_fact];
     cons_tmp_2[1]=cons[1][ind_fact];
 
@@ -102,13 +102,13 @@ palm_2.print_local_timers();
     if (isFactSideLeft)
     {
         cons_tmp_global[0]=cons[0][ind_fact];
-        vector<const faust_constraint_generic*>::iterator it;
+        typename vector<const faust_constraint_generic<T>*>::iterator it;
         it = cons_tmp_global.begin();
         cons_tmp_global.insert(it+1,cons[1][ind_fact]);
     }
     else
     {
-        vector<const faust_constraint_generic*>::iterator it;
+        typename vector<const faust_constraint_generic<T>*>::iterator it;
         it = cons_tmp_global.begin();
         cons_tmp_global.insert(it+ind_fact,cons[0][ind_fact]);
         cons_tmp_global[ind_fact+1]=cons[1][ind_fact];

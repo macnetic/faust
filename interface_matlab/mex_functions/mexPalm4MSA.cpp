@@ -94,7 +94,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    
 
     //constraints
-    std::vector<const faust_constraint_generic*> consS;
+    std::vector<const faust_constraint_generic<FFPP>*> consS;
     if (presentFields[2])
     {
         mwSize nbRowCons,nbColCons;

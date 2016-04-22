@@ -152,7 +152,7 @@ void init_params_palm_from_matiofile(faust_params_palm<T>& params,const char* fi
 		}
 		if (strcmp(current_fieldName,"cons")==0)
 		{
-			vector<const faust_constraint_generic*> consS;
+			vector<const faust_constraint_generic<T>*> consS;
 
 			for (int j=0;j<(current_var->dims[1]);j++)
 			{
@@ -292,8 +292,8 @@ void init_params_from_matiofile(faust_params<T>& params, const char* fileName, c
 
 		if (strcmp(current_fieldName,"cons")==0)
 		{
-			vector<const faust_constraint_generic*> consS;
-			vector<vector<const faust_constraint_generic*> > consSS;
+			vector<const faust_constraint_generic<T>*> consS;
+			vector<vector<const faust_constraint_generic<T>*> > consSS;
 			////cout<<"size_tab cont :dim1 "<<current_var->dims[0]<<endl;
 			////cout<<"size_tab cont :dim2 "<<current_var->dims[1]<<endl;
 			int shift = 0;
@@ -343,7 +343,7 @@ void init_params_from_matiofile(faust_params<T>& params, const char* fileName, c
 
 
 template<typename T>
-void add_constraint(std::vector<const faust_constraint_generic*> & consS,matvar_t* cons_var)
+void add_constraint(std::vector<const faust_constraint_generic<T>*> & consS,matvar_t* cons_var)
 {
 
 	matvar_t* cons_name_var, *cons_field_var;
@@ -379,7 +379,7 @@ void add_constraint(std::vector<const faust_constraint_generic*> & consS,matvar_
 			int int_parameter;
 			cons_field_var=Mat_VarGetCell(cons_var,1);
 			int_parameter =(int) round((((double*) cons_field_var->data))[0]);
-			consS.push_back(new faust_constraint_int(cons_name,int_parameter,cons_dim1,cons_dim2));
+			consS.push_back(new faust_constraint_int<T>(cons_name,int_parameter,cons_dim1,cons_dim2));
 			break;
 
 
@@ -453,7 +453,7 @@ void Display_params(faust_params<T> & params)
 
 			if (params.cons[jl][L]->isConstraintParameterInt())
 			{
-				faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[jl][L]);
+				faust_constraint_int<T>* const_int = (faust_constraint_int<T>*)(params.cons[jl][L]);
 				cout<<" parameter :"<<(*const_int).getParameter()<<endl;
 			}
 

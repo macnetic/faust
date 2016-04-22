@@ -50,10 +50,10 @@ int main()
   verbose = init_bool_from_matio(config_palm2_filename, "verbose");
  
   // Creation du vecteur de contrainte
-  const faust_constraint_int cons1(static_cast<faust_constraint_name>(cons1_name), cons1_parameter, cons1_row, cons1_col);
+  const faust_constraint_int<faust_real> cons1(static_cast<faust_constraint_name>(cons1_name), cons1_parameter, cons1_row, cons1_col);
   const faust_constraint_real<faust_real> cons2(static_cast<faust_constraint_name>(cons2_name), cons2_parameter, cons2_row, cons2_col);
 
-  vector<const faust_constraint_generic*> cons;
+  vector<const faust_constraint_generic<faust_real>*> cons;
   cons.push_back(&cons1);
   cons.push_back(&cons2);
 

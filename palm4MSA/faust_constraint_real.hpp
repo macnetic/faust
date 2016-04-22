@@ -10,7 +10,7 @@ const char * faust_constraint_real<T>::class_name ="faust_constraint_real<T>::";
 
 template<typename T>
 faust_constraint_real<T>::faust_constraint_real() : 
-   faust_constraint_generic()
+   faust_constraint_generic<T>()
 {
    set_default_parameter();
 }
@@ -20,7 +20,7 @@ faust_constraint_real<T>::faust_constraint_real(
    const faust_constraint_name& constraint_name_, 
    const int nb_rows_, 
    const int nb_cols_) : 
-      faust_constraint_generic(
+      faust_constraint_generic<T>(
          constraint_name_,
          nb_rows_,
          nb_cols_)
@@ -34,7 +34,7 @@ faust_constraint_real<T>::faust_constraint_real(
    const T default_parameter_,
    const int nb_rows_, 
    const int nb_cols_) : 
-      faust_constraint_generic(
+      faust_constraint_generic<T>(
          constraint_name_,
          nb_rows_,
          nb_cols_), 
@@ -46,7 +46,7 @@ faust_constraint_real<T>::faust_constraint_real(
 template<typename T>
 faust_constraint_real<T>::faust_constraint_real(
    const faust_constraint_real& constraint_) : 
-      faust_constraint_generic(
+      faust_constraint_generic<T>(
          constraint_.constraint_name,
          constraint_.nb_rows,
          constraint_.nb_cols), 
@@ -60,7 +60,7 @@ faust_constraint_real<T>::faust_constraint_real(
 template<typename T>
 void faust_constraint_real<T>::check_constraint_name()const
 {
-   switch (constraint_name)
+   switch (this->constraint_name)
    {
       case CONSTRAINT_NAME_NORMCOL:
          break;
@@ -75,18 +75,37 @@ void faust_constraint_real<T>::check_constraint_name()const
 template<typename T>
 void faust_constraint_real<T>::set_default_parameter()
 {
-   switch (constraint_name)
+
+   switch (this->constraint_name)
    {
       case CONSTRAINT_NAME_NORMCOL:
          parameter = 0.0;
          break;
-      case CONSTRAINT_NAME_SPLINCOL:
+      case CONSTRAINT_NAME_NORMLIN:
          parameter = 0.0;
          break;
       default:
-         handleError(class_name,"set_default_parameter : cannot create faust_constraint_real objet from an faust_constraint object with constraint_name");
+         handleError(class_name,"set_default_parameter : cannot create faust_constraint_real objet from an faust_constraint object with this->constraint_name");
          break;
    }
+}
+
+template<typename T>
+void faust_constraint_real<T>::project(faust_matrix & mat)const
+{
+	switch (this->constraint_name)
+   	{
+      		case CONSTRAINT_NAME_NORMCOL:
+         		prox_normcol(mat,parameter);
+         	break;
+      		case CONSTRAINT_NAME_NORMLIN:
+         		prox_normlin(mat,parameter);
+         	break;
+      		default:
+         		handleError(class_name,"project : invalid constraint name");
+         	break;
+   }
+
 }
 
 #endif

@@ -45,7 +45,7 @@ template<typename T>
 faust_params_palm<T>::faust_params_palm(
          const faust_matrix& data_,
          const int nb_fact_,
-         const std::vector<const faust_constraint_generic*>& cons_,
+         const std::vector<const faust_constraint_generic<T> *>& cons_,
          const std::vector<faust_matrix > & init_fact_,
          const stopping_criterion<T> & stop_crit_ /* = stopping_criterion() */,
          const bool isVerbose_ /* = false */,
@@ -68,7 +68,7 @@ faust_params_palm<T>::faust_params_palm(
 }
 
 template<typename T>	
-faust_params_palm<T>::faust_params_palm() : data(0,0),nb_fact(0),cons(std::vector<const faust_constraint_generic*>()),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_matrix >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize){}
+faust_params_palm<T>::faust_params_palm() : data(0,0),nb_fact(0),cons(std::vector<const faust_constraint_generic<T>*>()),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<faust_matrix >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize){}
 
 template<typename T>
 void faust_params_palm<T>::init_factors()
@@ -132,25 +132,25 @@ void faust_params_palm<T>::Display() const
 			//std::string type_cons;
 			//type_cons.resize(0);
 			//type_cons=getConstraintType((*cons[jl][L]).getConstraintType());
-			std::cout<<"type_cont : "<<cons[L]->getType<T>()<<" ";
+			std::cout<<"type_cont : "<<cons[L]->getType()<<" ";
 			std::cout<<(*cons[L]).get_constraint_name();
 			std::cout<<" nb_row :"<<(*cons[L]).getRows();
 			std::cout<<" nb_col :"<<(*cons[L]).getCols();
 			
 			
-			if (cons[L]->isConstraintParameterInt<T>())
+			if (cons[L]->isConstraintParameterInt())
 			{	
-				faust_constraint_int* const_int = (faust_constraint_int*)(cons[L]);
+				faust_constraint_int<T>* const_int = (faust_constraint_int<T>*)(cons[L]);
 				std::cout<<" parameter :"<<(*const_int).getParameter()<<std::endl;
 			}
 			
-			else if (cons[L]->isConstraintParameterReal<T>())
+			else if (cons[L]->isConstraintParameterReal())
 			{	
 				faust_constraint_real<T>* const_real = (faust_constraint_real<T>*)(cons[L]);
 				std::cout<<" parameter :"<<(*const_real).getParameter()<<std::endl;
 			}
 			
-			else if (cons[L]->isConstraintParameterMat<T>())
+			else if (cons[L]->isConstraintParameterMat())
 			{	
 				faust_constraint_mat<T>* const_mat = (faust_constraint_mat<T>*)(cons[L]);
 				std::cout<<" parameter :"<<std::endl;

@@ -6,8 +6,10 @@
 
 #ifdef __COMPILE_GPU__
    #include "faust_cu_mat.h"
+   #include "prox_cu.h"
 #else
    #include "faust_mat.h"
+   #include "prox.h"
 #endif
 
 
@@ -20,7 +22,7 @@
 
 //template<typename parameter_type>
 template<typename T>
-class faust_constraint_mat : public faust_constraint_generic
+class faust_constraint_mat : public faust_constraint_generic<T>
 {
 #ifdef __COMPILE_GPU__
    typedef faust_cu_mat<T> faust_matrix ;
@@ -48,7 +50,7 @@ class faust_constraint_mat : public faust_constraint_generic
       
       virtual void set_default_parameter();
       virtual void check_constraint_name()const;
- 
+      virtual void project(faust_matrix & mat)const;
       ~faust_constraint_mat(){};
 
    private:

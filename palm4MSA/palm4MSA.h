@@ -15,7 +15,7 @@
 template<typename T> class faust_mat;
 template<typename T> class faust_core;
 
-class faust_constraint_generic;
+template<typename T> class faust_constraint_generic;
 template<typename T> class faust_params;
 template<typename T> class faust_params_palm;
 template<typename T> class stopping_criterion;
@@ -40,7 +40,7 @@ class palm4MSA
     palm4MSA(const faust_params<T>& params_, const bool isGlobal_);
     palm4MSA(const faust_params_palm<T>& params_palm_, const bool isGlobal_=false);
 
-    void set_constraint(const std::vector<const faust_constraint_generic*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
+    void set_constraint(const std::vector<const faust_constraint_generic<T>* > const_vec_){const_vec=const_vec_;isConstraintSet=true;}
     void set_data(const faust_mat<T>& data_){data=data_;}
     void set_lambda(const FFPP lambda_){lambda = lambda_;}
 
@@ -114,7 +114,7 @@ class palm4MSA
       faust_mat<T> LorR;
 
 
-      std::vector<const faust_constraint_generic*> const_vec; // vector of constraints of size nfact
+      std::vector<const faust_constraint_generic<T>* > const_vec; // vector of constraints of size nfact
       int ind_fact; //indice de facteur (!= hierarchical_fact::ind_fact : indice de factorisation)
       int ind_ite;
       // T lipschitz_multiplicator;

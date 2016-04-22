@@ -142,7 +142,7 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 	
 	requestS_begin.push_back("/hierarchical_fact/constraints/row1/constraint/");
 	requestS_begin.push_back("/hierarchical_fact/constraints/row2/constraint/");
-	vector<vector<const faust_constraint_generic*> > consSS;
+	vector<vector<const faust_constraint_generic<T>*> > consSS;
 	for (int j=0;j<2;j++)
 	{	
 	
@@ -156,7 +156,7 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 			handleError("faust_init_params_from_xml",
 			"init_params_from_xml : invalid file constraint each row tag must have nb_fact-1 constraint with each specifying parameter , dim1, dim2,type tags");
 		
-		std::vector<const faust_constraint_generic*> constraintS;
+		std::vector<const faust_constraint_generic<T>*> constraintS;
 		for (int i=0;i<contentS.size();i++)
 		{		
 
@@ -297,7 +297,7 @@ void init_palm_params_from_xml(const char * filename,faust_params_palm<T> & para
 			handleError("faust_init_params_from_xml",
 			"init_params_from_xml : invalid file constraint each row tag must have nb_fact-1 constraint with each specifying parameter , dim1, dim2,type tags");
 		
-		std::vector<const faust_constraint_generic*> constraintS;
+		std::vector<const faust_constraint_generic<T>*> constraintS;
 		for (int i=0;i<contentS.size();i++)
 		{		
 
@@ -327,7 +327,7 @@ void init_palm_params_from_xml(const char * filename,faust_params_palm<T> & para
 
 
 template<typename T>
-void add_constraint(std::vector<const faust_constraint_generic*> & consS,char* type, char * parameter, char* dim1,char* dim2)
+void add_constraint(std::vector<const faust_constraint_generic<T>*> & consS,char* type, char * parameter, char* dim1,char* dim2)
 {
 	int const_type = getTypeConstraint(type);
 
@@ -343,7 +343,7 @@ void add_constraint(std::vector<const faust_constraint_generic*> & consS,char* t
 		{
 			int int_parameter;		
 			int_parameter =(int) atoi(parameter);		
-			consS.push_back(new faust_constraint_int(cons_name,int_parameter,cons_dim1,cons_dim2));
+			consS.push_back(new faust_constraint_int<T>(cons_name,int_parameter,cons_dim1,cons_dim2));
 			break;
 		}
 		

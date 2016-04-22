@@ -30,7 +30,7 @@ class faust_params_palm
       faust_params_palm(
          const faust_matrix& data_,
          const int nb_fact_,
-         const std::vector<const faust_constraint_generic*>& cons_,
+         const std::vector<const faust_constraint_generic<T>*>& cons_,
          const std::vector<faust_matrix >& init_fact_,
          const stopping_criterion<T> & stop_crit_ = stopping_criterion<T>(defaultNiter),
          const bool isVerbose_ = defaultVerbosity ,
@@ -48,7 +48,7 @@ class faust_params_palm
       // Required members
       faust_matrix data;
       int nb_fact; // number of factors
-      std::vector<const faust_constraint_generic*> cons; // vector of constraints
+      std::vector<const faust_constraint_generic<T> *> cons; // vector of constraints
 
       // Optional members (set to default values if not defined)
       std::vector<faust_matrix > init_fact;

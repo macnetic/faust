@@ -12,7 +12,7 @@
 
 template<typename T> class faust_params_palm;
 template<typename T> class faust_params;
-class faust_constraint_generic;
+template<typename T> class faust_constraint_generic;
 
 template<typename T>
 void init_params_palm_from_matiofile(faust_params_palm<T>& params, const char* fileName, const char* variableName);
@@ -26,7 +26,7 @@ template<typename T>
 void init_params_from_matiofile(faust_params<T>& params, const char* fileName, const char* variableName);
 
 template<typename T>
-void add_constraint(std::vector<const faust_constraint_generic*> & consS,matvar_t* cons_var);
+void add_constraint(std::vector<const faust_constraint_generic<T>*> & consS,matvar_t* cons_var);
 
 template<typename T>
 void Display_params(faust_params<T> & params);

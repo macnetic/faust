@@ -290,7 +290,7 @@ void setVectorFaustMat(std::vector<faust_mat<T> > &vecMat,mxArray *Cells)
 }
 
 template<typename T>
-void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray* mxCons)
+void getConstraint(std::vector<const faust_constraint_generic<T>*> & consS,mxArray* mxCons)
 {     
     mwSize bufCharLen,nbRowCons,nbColCons,nb_params;
     int status;        
@@ -329,7 +329,7 @@ void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray*
             mxConsParams=mxGetCell(mxCons,1);
             int  intParameter = (int) (mxGetScalar(mxConsParams)+0.5);
              //mexPrintf("NAME  %s PARAMS %d DIMS : (%d,%d)\n",consName,intParameter,nbRowCons,nbColCons);
-            consS.push_back(new faust_constraint_int(consNameType,intParameter,nbRowCons,nbColCons));
+            consS.push_back(new faust_constraint_int<T>(consNameType,intParameter,nbRowCons,nbColCons));
             break;
 		}	
 		case 1:
@@ -485,7 +485,7 @@ void DisplayParams(const faust_params<T> & params)
 			
 			if (params.cons[jl][L]->isConstraintParameterInt())
 			{	
-				faust_constraint_int* const_int = (faust_constraint_int*)(params.cons[jl][L]);
+				faust_constraint_int<T>* const_int = (faust_constraint_int<T>*)(params.cons[jl][L]);
 				mexPrintf(" parameter : %d",(*const_int).getParameter());
 			}
 			

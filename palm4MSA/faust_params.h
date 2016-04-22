@@ -36,7 +36,7 @@ class faust_params
 	faust_params(
         const faust_matrix& data_,
         const unsigned int nb_fact_,
-        const std::vector<const faust_constraint_generic*> & cons_,
+        const std::vector<const faust_constraint_generic<T>*> & cons_,
         const std::vector<faust_matrix >& init_fact_,
         const stopping_criterion<T>& stop_crit_2facts_ = stopping_criterion<T>(defaultNiter1),
         const stopping_criterion<T>& stop_crit_global_  = stopping_criterion<T>(defaultNiter2),
@@ -85,7 +85,7 @@ class faust_params
     faust_params(
         const faust_matrix& data_,
         const unsigned int nb_fact_,
-        const std::vector<std::vector<const faust_constraint_generic*> >& cons_,
+        const std::vector<std::vector<const faust_constraint_generic<T>*> >& cons_,
         const std::vector<faust_matrix >& init_fact_,
         const stopping_criterion<T>& stop_crit_2facts_ = stopping_criterion<T>(defaultNiter1),
         const stopping_criterion<T>& stop_crit_global_  = stopping_criterion<T>(defaultNiter2),
@@ -108,7 +108,7 @@ class faust_params
     // Required members
     faust_matrix data;
     faust_unsigned_int nb_fact; // number of factors
-    std::vector<std::vector<const faust_constraint_generic*> > cons; // vector of constraints
+    std::vector<std::vector<const faust_constraint_generic<T> *> > cons; // vector of constraints
     std::vector<faust_matrix > init_fact;
 
     // Optional members (set to default values if not defined)

@@ -7,7 +7,7 @@
 #include <vector>
 #include "faust_vec.h"
 
-class faust_constraint_generic;
+template<typename T> class faust_constraint_generic;
 template<typename T> class faust_vec;
 template<typename T> class faust_params;
 template<typename T> class faust_mat;
@@ -24,7 +24,7 @@ mxArray*  FaustMat2mxArray(const faust_mat<T>& M);
 template<typename T>
 void setCellFacts(mxArray ** cellFacts,std::vector<faust_mat<T> > & facts);
 template<typename T>
-void getConstraint(std::vector<const faust_constraint_generic*> & consS,mxArray* mxCons);
+void getConstraint(std::vector<const faust_constraint_generic<T>*> & consS,mxArray* mxCons);
 template<typename T>
 void setVectorFaustMat(std::vector<faust_mat<T> > &vecMat, mxArray *Cells);
 template<typename T> 

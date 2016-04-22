@@ -14,7 +14,7 @@ void init_palm_params_from_xml(const char * filename,faust_params_palm<T> & para
 
 
 template<typename T>
-void add_constraint(std::vector<const faust_constraint_generic*> & consS,char* type, char * parameter, char* dim1,char* dim2);
+void add_constraint(std::vector<const faust_constraint_generic<T> *> & consS,char* type, char * parameter, char* dim1,char* dim2);
 #include "faust_init_params_from_xml.hpp"
 
 #endif

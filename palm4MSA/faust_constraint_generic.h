@@ -19,52 +19,59 @@ enum faust_constraint_name
    CONSTRAINT_NAME_NORMLIN,/**< 2nd norm of the lines of matrix A ; REAL  */
 };
 
+#ifdef __COMPILE_GPU__
+   template<typename FPP> class faust_cu_mat;
+#else
+   template<typename FPP> class faust_mat;
+#endif
 
 /*!
 \brief Contains the generic constraint parameters for the hierarchical factorization. See following table for more precision about the type of constraint. <br>
  <img src="../../doc/html/constraint.png" alt="constraint parameters" width=800px />
 */
 //template<typename parameter_type>
+template<typename FPP> //floating point pecision
 class faust_constraint_generic
 {
+
+	#ifdef __COMPILE_GPU__
+    		typedef faust_cu_mat<FPP> faust_matrix ;
+	#else
+    		typedef faust_mat<FPP> faust_matrix ;
+	#endif	
+
     public:
     faust_constraint_generic() : constraint_name(CONSTRAINT_NAME_SP),nb_rows(32),nb_cols(32) {} // contrainte par defaut (a voir avec Luc)
 
     faust_constraint_generic(
         const faust_constraint_name& constraint_name_,
-        //const parameter_type& parameter_,
         const faust_unsigned_int nb_rows_,
         const faust_unsigned_int nb_cols_) :
             constraint_name(constraint_name_),
-            //parameter(parameter_),
             nb_rows(nb_rows_),
             nb_cols(nb_cols_){}
 
     faust_constraint_generic(const faust_constraint_generic& constraint) :
         constraint_name(constraint.constraint_name),
-        //parameter(constraint.parameter),
         nb_rows(constraint.nb_rows),
         nb_cols(constraint.nb_cols){}
 
 
-    template<typename T>
+
 	const char* getType() const;
     const char* get_constraint_name()const;
-    const faust_constraint_name getConstraintType() const;// {return constraint_name;}
-    template<typename T>
+    const faust_constraint_name getConstraintType() const;
 	bool isConstraintParameterInt()const;
-    template<typename T>
 	bool isConstraintParameterReal()const;
-    template<typename T>
 	bool isConstraintParameterMat()const;
 
-    //const parameter_type getParameter() const {return parameter;};
+
     const faust_unsigned_int getRows() const {return nb_rows;}
     const faust_unsigned_int getCols() const {return nb_cols;}
-	//void Display() const {std::cout<<get_constraint_name()<<" DIM : "<<nb_rows<<" "<<nb_cols<<std::endl;}
 
     virtual void set_default_parameter()=0;
     virtual void check_constraint_name()const=0;
+    virtual void project(faust_matrix & mat)const=0;	
 
     ~faust_constraint_generic(){};
 

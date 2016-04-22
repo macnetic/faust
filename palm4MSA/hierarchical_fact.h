@@ -10,7 +10,7 @@
   #include "faust_timer.h"
 #endif
 
-class faust_constraint_generic;
+template<typename T> class faust_constraint_generic;
 template<typename T> class palm4MSA;
 #ifdef __COMPILE_GPU__
    template<typename T> class faust_cu_mat;
@@ -50,7 +50,7 @@ private:
 
 
 private:
-    const std::vector< std::vector<const faust_constraint_generic*> > cons;
+    const std::vector< std::vector<const faust_constraint_generic<T> *> > cons;
     bool isUpdateWayR2L;
     bool isFactSideLeft;
     bool isVerbose;
@@ -60,7 +60,7 @@ private:
     palm4MSA<T> palm_global;
     const T default_lambda; // initial value of lambda for factorization into two factors
     //std::vector<faust_mat<T> > S;
-    std::vector<const faust_constraint_generic*> cons_tmp_global;
+    std::vector<const faust_constraint_generic<T> *> cons_tmp_global;
     bool isFactorizationComputed;
     std::vector<std::vector<T> > errors; /**< contains errors of the approximation of the dense matrix into factorized sparse matrix. First about approximation and second about the number of nonzeros. */
 	static const char * class_name;

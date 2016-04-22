@@ -11,18 +11,59 @@
 
 template<typename T> class faust_constraint_real;
 template<typename T> class faust_constraint_mat;
+template<typename T> class faust_constraint_type;
+
+template<typename T>
+const char * faust_constraint_generic<T>::class_name="faust_constraint_generic::"; 
+
+template<typename T>
+const faust_constraint_name faust_constraint_generic<T>::getConstraintType() const 
+{
+   return constraint_name;
+}
 
 
 
 
 
 template<typename T>
-const char*  faust_constraint_generic::getType() const
+const char* faust_constraint_generic<T>::get_constraint_name()const
+{
+   switch(constraint_name)
+   {
+      case CONSTRAINT_NAME_SP:
+         return "CONSTRAINT_NAME_SP";
+      case CONSTRAINT_NAME_SPCOL:
+         return "CONSTRAINT_NAME_SPCOL";
+      case CONSTRAINT_NAME_SPLIN:
+         return "CONSTRAINT_NAME_SPLIN";
+      case CONSTRAINT_NAME_NORMCOL:
+         return "CONSTRAINT_NAME_NORMCOL";
+      case CONSTRAINT_NAME_SPLINCOL:
+         return "CONSTRAINT_NAME_SPLINCOL";
+      case CONSTRAINT_NAME_CONST:
+         return "CONSTRAINT_NAME_CONST";
+      case CONSTRAINT_NAME_SP_POS:
+         return "CONSTRAINT_NAME_SP_POS";
+      case CONSTRAINT_NAME_BLKDIAG:
+         return "CONSTRAINT_NAME_BLKDIAG";
+      case CONSTRAINT_NAME_SUPP:
+         return "CONSTRAINT_NAME_SUPP";
+      case CONSTRAINT_NAME_NORMLIN:
+         return "CONSTRAINT_NAME_NORMLIN";
+      default:
+         return "unknown constraint name";
+   }
+}
+
+
+template<typename T>
+const char*  faust_constraint_generic<T>::getType() const
 {	
    switch(constraint_name)
    {
       case CONSTRAINT_NAME_SP:
-         if(typeid(typename  constraint_type<T>::constraint_type_sp)==typeid(faust_constraint_int))
+         if(typeid(typename  constraint_type<T>::constraint_type_sp)==typeid(faust_constraint_int<T>))
             return "INT";
          else if(typeid(typename  constraint_type<T>::constraint_type_sp)==typeid(faust_constraint_real<T>))
             return "FAUST_REAL";
@@ -32,7 +73,7 @@ const char*  faust_constraint_generic::getType() const
 				handleError(class_name,"getType : unknown type parameter");
 			}
       case CONSTRAINT_NAME_SPCOL:
-         if(typeid(typename  constraint_type<T>::constraint_type_spcol)==typeid(faust_constraint_int))
+         if(typeid(typename  constraint_type<T>::constraint_type_spcol)==typeid(faust_constraint_int<T>))
             return "INT";
          else if(typeid(typename  constraint_type<T>::constraint_type_spcol)==typeid(faust_constraint_real<T>))
             return "FAUST_REAL";
@@ -42,7 +83,7 @@ const char*  faust_constraint_generic::getType() const
 				handleError(class_name,"getType : unknown type parameter");
 			}
       case CONSTRAINT_NAME_SPLIN:
-         if(typeid(typename  constraint_type<T>::constraint_type_splin)==typeid(faust_constraint_int))
+         if(typeid(typename  constraint_type<T>::constraint_type_splin)==typeid(faust_constraint_int<T>))
             return "INT";
          else if(typeid(typename  constraint_type<T>::constraint_type_splin)==typeid(faust_constraint_real<T>))
             return "FAUST_REAL";
@@ -52,7 +93,7 @@ const char*  faust_constraint_generic::getType() const
             handleError(class_name,"getType : unknown type parameter");
 			}
       case CONSTRAINT_NAME_NORMCOL:
-         if(typeid(typename  constraint_type<T>::constraint_type_normcol)==typeid(faust_constraint_int))
+         if(typeid(typename  constraint_type<T>::constraint_type_normcol)==typeid(faust_constraint_int<T>))
             return "INT";
          else if(typeid(typename  constraint_type<T>::constraint_type_normcol)==typeid(faust_constraint_real<T>))
             return "FAUST_REAL";
@@ -62,7 +103,7 @@ const char*  faust_constraint_generic::getType() const
            handleError(class_name,"getType : unknown type parameter");
 		   }
       case CONSTRAINT_NAME_SPLINCOL:
-         if(typeid(typename  constraint_type<T>::constraint_type_splincol)==typeid(faust_constraint_int))
+         if(typeid(typename  constraint_type<T>::constraint_type_splincol)==typeid(faust_constraint_int<T>))
             return "INT";
          else if(typeid(typename  constraint_type<T>::constraint_type_splincol)==typeid(faust_constraint_real<T>))
             return "FAUST_REAL";
@@ -72,7 +113,7 @@ const char*  faust_constraint_generic::getType() const
 				handleError(class_name,"getType : unknown type parameter");
 		 }
       case CONSTRAINT_NAME_CONST:
-         if(typeid(typename  constraint_type<T>::constraint_type_const)==typeid(faust_constraint_int))
+         if(typeid(typename  constraint_type<T>::constraint_type_const)==typeid(faust_constraint_int<T>))
             return "INT";
          else if(typeid(typename  constraint_type<T>::constraint_type_const)==typeid(faust_constraint_real<T>))
             return "FAUST_REAL";
@@ -82,7 +123,7 @@ const char*  faust_constraint_generic::getType() const
             handleError(class_name,"getType : unknown type parameter");
 			}
       case CONSTRAINT_NAME_SP_POS:
-         if(typeid(typename  constraint_type<T>::constraint_type_sp_pos)==typeid(faust_constraint_int))
+         if(typeid(typename  constraint_type<T>::constraint_type_sp_pos)==typeid(faust_constraint_int<T>))
             return "INT";
          else if(typeid(typename  constraint_type<T>::constraint_type_sp_pos)==typeid(faust_constraint_real<T>))
             return "FAUST_REAL";
@@ -92,7 +133,7 @@ const char*  faust_constraint_generic::getType() const
 				handleError(class_name,"getType : unknown type parameter");
 			}
       case CONSTRAINT_NAME_BLKDIAG:
-         if(typeid(typename  constraint_type<T>::constraint_type_blkdiag)==typeid(faust_constraint_int))
+         if(typeid(typename  constraint_type<T>::constraint_type_blkdiag)==typeid(faust_constraint_int<T>))
             return "INT";
          else if(typeid(typename  constraint_type<T>::constraint_type_blkdiag)==typeid(faust_constraint_real<T>))
             return "FAUST_REAL";
@@ -102,7 +143,7 @@ const char*  faust_constraint_generic::getType() const
 				handleError(class_name,"getType : unknown type parameter");
 			}
       case CONSTRAINT_NAME_SUPP:
-         if(typeid(typename  constraint_type<T>::constraint_type_supp)==typeid(faust_constraint_int))
+         if(typeid(typename  constraint_type<T>::constraint_type_supp)==typeid(faust_constraint_int<T>))
             return "INT";
          else if(typeid(typename  constraint_type<T>::constraint_type_supp)==typeid(faust_constraint_real<T>))
             return "FAUST_REAL";
@@ -112,7 +153,7 @@ const char*  faust_constraint_generic::getType() const
 				handleError(class_name,"getType : unknown type parameter");
 			}
       case CONSTRAINT_NAME_NORMLIN:
-         if(typeid(typename  constraint_type<T>::constraint_type_normlin)==typeid(faust_constraint_int))
+         if(typeid(typename  constraint_type<T>::constraint_type_normlin)==typeid(faust_constraint_int<T>))
             return "INT";
          else if(typeid(typename  constraint_type<T>::constraint_type_normlin)==typeid(faust_constraint_real<T>))
             return "FAUST_REAL";
@@ -128,39 +169,39 @@ const char*  faust_constraint_generic::getType() const
 
 
 template<typename T>
-bool faust_constraint_generic::isConstraintParameterInt()const
+bool faust_constraint_generic<T>::isConstraintParameterInt()const
 {
 	switch(constraint_name)
 	{
 		case CONSTRAINT_NAME_SP:
-			return (typeid(typename  constraint_type<T>::constraint_type_sp)==typeid(faust_constraint_int)?true:false);
+			return (typeid(typename  constraint_type<T>::constraint_type_sp)==typeid(faust_constraint_int<T>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPCOL:
-			return (typeid(typename  constraint_type<T>::constraint_type_spcol)==typeid(faust_constraint_int)?true:false);
+			return (typeid(typename  constraint_type<T>::constraint_type_spcol)==typeid(faust_constraint_int<T>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPLIN:
-			return (typeid(typename  constraint_type<T>::constraint_type_splin)==typeid(faust_constraint_int)?true:false);
+			return (typeid(typename  constraint_type<T>::constraint_type_splin)==typeid(faust_constraint_int<T>)?true:false);
 		break;
 		case CONSTRAINT_NAME_NORMCOL:
-			return (typeid(typename  constraint_type<T>::constraint_type_normcol)==typeid(faust_constraint_int)?true:false);
+			return (typeid(typename  constraint_type<T>::constraint_type_normcol)==typeid(faust_constraint_int<T>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPLINCOL:
-			return (typeid(typename  constraint_type<T>::constraint_type_splincol)==typeid(faust_constraint_int)?true:false);
+			return (typeid(typename  constraint_type<T>::constraint_type_splincol)==typeid(faust_constraint_int<T>)?true:false);
 		break;
 		case CONSTRAINT_NAME_CONST:
-			return (typeid(typename  constraint_type<T>::constraint_type_const)==typeid(faust_constraint_int)?true:false);
+			return (typeid(typename  constraint_type<T>::constraint_type_const)==typeid(faust_constraint_int<T>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SP_POS:
-			return (typeid(typename  constraint_type<T>::constraint_type_sp_pos)==typeid(faust_constraint_int)?true:false);
+			return (typeid(typename  constraint_type<T>::constraint_type_sp_pos)==typeid(faust_constraint_int<T>)?true:false);
 		break;
 		case CONSTRAINT_NAME_BLKDIAG:
-			return (typeid(typename  constraint_type<T>::constraint_type_blkdiag)==typeid(faust_constraint_int)?true:false);
+			return (typeid(typename  constraint_type<T>::constraint_type_blkdiag)==typeid(faust_constraint_int<T>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SUPP:
-			return (typeid(typename  constraint_type<T>::constraint_type_supp)==typeid(faust_constraint_int)?true:false);
+			return (typeid(typename  constraint_type<T>::constraint_type_supp)==typeid(faust_constraint_int<T>)?true:false);
 		break;
 		case CONSTRAINT_NAME_NORMLIN:
-			return (typeid(typename  constraint_type<T>::constraint_type_normlin)==typeid(faust_constraint_int)?true:false);
+			return (typeid(typename  constraint_type<T>::constraint_type_normlin)==typeid(faust_constraint_int<T>)?true:false);
 		break;
 		default:
 			handleError(class_name,"isConstraintParameterInt : Unknown type of constraint");
@@ -170,7 +211,7 @@ bool faust_constraint_generic::isConstraintParameterInt()const
 }
 
 template<typename T>
-bool faust_constraint_generic::isConstraintParameterReal()const
+bool faust_constraint_generic<T>::isConstraintParameterReal()const
 {
 	switch(constraint_name)
 	{
@@ -212,7 +253,7 @@ bool faust_constraint_generic::isConstraintParameterReal()const
 }
 
 template<typename T>
-bool faust_constraint_generic::isConstraintParameterMat()const
+bool faust_constraint_generic<T>::isConstraintParameterMat()const
 {
 	switch(constraint_name)
 	{

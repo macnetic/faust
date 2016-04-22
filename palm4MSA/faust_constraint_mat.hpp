@@ -13,7 +13,7 @@ const char * faust_constraint_mat<T>::class_name="faust_constraint_mat<T>::";
 
 template<typename T>
 faust_constraint_mat<T>::faust_constraint_mat() : 
-   faust_constraint_generic()
+   faust_constraint_generic<T>()
 {
    set_default_parameter();
 }
@@ -23,7 +23,7 @@ faust_constraint_mat<T>::faust_constraint_mat(
    const faust_constraint_name& constraint_name_, 
    const faust_unsigned_int nb_rows_, 
    const faust_unsigned_int nb_cols_) : 
-      faust_constraint_generic(
+      faust_constraint_generic<T>(
          constraint_name_,
          nb_rows_,
          nb_cols_)
@@ -37,7 +37,7 @@ faust_constraint_mat<T>::faust_constraint_mat(
    const faust_matrix default_parameter_,
    const faust_unsigned_int nb_rows_, 
    const faust_unsigned_int nb_cols_) : 
-      faust_constraint_generic(
+      faust_constraint_generic<T>(
          constraint_name_,
          nb_rows_,
          nb_cols_), 
@@ -49,7 +49,7 @@ faust_constraint_mat<T>::faust_constraint_mat(
 template<typename T>
 faust_constraint_mat<T>::faust_constraint_mat(
    const faust_constraint_mat& constraint_) : 
-      faust_constraint_generic(
+      faust_constraint_generic<T>(
          constraint_.constraint_name,
          constraint_.nb_rows,
          constraint_.nb_cols), 
@@ -63,7 +63,7 @@ faust_constraint_mat<T>::faust_constraint_mat(
 template<typename T>
 void faust_constraint_mat<T>::check_constraint_name()const
 {
-   switch (constraint_name)
+   switch (this->constraint_name)
    {
       case CONSTRAINT_NAME_CONST:
          break;
@@ -78,7 +78,7 @@ void faust_constraint_mat<T>::check_constraint_name()const
 template<typename T>
 void faust_constraint_mat<T>::set_default_parameter()
 {
-   switch (constraint_name)
+   switch (this->constraint_name)
    {
       case CONSTRAINT_NAME_CONST:
          parameter.setZeros();
@@ -91,5 +91,25 @@ void faust_constraint_mat<T>::set_default_parameter()
          break;
    }
 }
+
+
+template<typename T>
+void faust_constraint_mat<T>::project(faust_matrix & mat) const
+{
+   switch (this->constraint_name)
+   {
+      case CONSTRAINT_NAME_CONST:
+         mat=parameter;
+         break;
+      case CONSTRAINT_NAME_SUPP:
+         prox_supp(mat,parameter);
+         break;
+      default:
+         handleError(class_name,"project : invalid constraint_name");
+         break;
+   }
+}
+
+
 
 #endif
