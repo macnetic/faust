@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<hierarchical_fact>
+   <nb_fact>6</nb_fact>
+   <data>MEG_data.txt</data>
+   <niter1>200</niter1>
+   <niter2>200</niter2>
+   <verbose>1</verbose>
+   <updatewayR2L>0</updatewayR2L>
+   <factsideleft>0</factsideleft>
+   <init_lambda>1</init_lambda>
+   <constraints>
+		<row1>
+			<constraint>
+				<type>splin</type>
+				<dim1>8193</dim1>
+				<dim2>204</dim2>
+				<parameter>15</parameter>
+			</constraint>
+			<constraint>
+				<type>sp</type>
+				<dim1>204</dim1>
+				<dim2>204</dim2>
+				<parameter>1632</parameter>
+			</constraint>
+			<constraint>
+				<type>sp</type>
+				<dim1>204</dim1>
+				<dim2>204</dim2>
+				<parameter>1632</parameter>
+			</constraint>
+			<constraint>
+				<type>sp</type>
+				<dim1>204</dim1>
+				<dim2>204</dim2>
+				<parameter>1632</parameter>
+			</constraint>
+			<constraint>
+				<type>sp</type>
+				<dim1>204</dim1>
+				<dim2>204</dim2>
+				<parameter>1632</parameter>
+			</constraint>
+		</row1>
+		
+		<row2>
+			<constraint>
+				<type>sp</type>
+				<dim1>204</dim1>
+				<dim2>204</dim2>
+				<parameter>41616</parameter>
+			</constraint>
+			<constraint>
+				<type>sp</type>
+				<dim1>204</dim1>
+				<dim2>204</dim2>
+				<parameter>46610</parameter>
+			</constraint>
+			<constraint>
+				<type>sp</type>
+				<dim1>204</dim1>
+				<dim2>204</dim2>
+				<parameter>37288</parameter>
+			</constraint>
+			<constraint>
+				<type>sp</type>
+				<dim1>204</dim1>
+				<dim2>204</dim2>
+				<parameter>29830</parameter>
+			</constraint>
+			<constraint>
+				<type>sp</type>
+				<dim1>204</dim1>
+				<dim2>204</dim2>
+				<parameter>23864</parameter>
+			</constraint>
+		</row2>
+	</constraints>		
+			
+		
+   
+</hierarchical_fact>

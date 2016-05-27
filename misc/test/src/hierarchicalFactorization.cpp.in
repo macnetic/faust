@@ -1,0 +1,188 @@
+#include "faust_MatDense.h"
+#include "faust_MatSparse.h"
+#include "faust_Params.h"
+#include "faust_ParamsPalm.h"
+#include "HierarchicalFact.h"
+#include "faust_Timer.h"
+#include "faust_Transform.h"
+#include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_core.h"
+#include <string>
+#include <sstream>
+#include "BlasHandleCPU.h"
+#include "SpBlasHandleCPU.h"
+
+
+#include <iostream>
+#include <iomanip>
+
+/** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
+* An dense matrix is loaded from "@FAUST_TESTDATA_SRC_DIR@
+* \param config_filename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hier_fact)
+* \param expected_lambda (optionnal) : compared the expected scalar of the factorisation with the computed one in the precision defined with epsilon
+*\param epsilon : precision for the test of equality (default value 0.0001)
+*/
+
+typedef @TEST_FPP@ FPP;
+
+int main(int argc, char* argv[])
+{
+	if (typeid(FPP) == typeid(double))
+  	{
+		cout<<"floating point precision == double"<<endl;
+  	}
+
+  	if (typeid(FPP) == typeid(float))
+  	{
+		cout<<"floating point precision == float"<<endl;
+  	}
+
+
+	string config_filename = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat";
+
+
+
+	if (argc >= 2)
+		config_filename = argv[1];
+
+	size_t ind = config_filename.find_last_of(".");
+
+	if(ind<=0 || ind>= config_filename.size())
+	{
+		cerr << "Le nom du fichier est incorrect" << endl;
+		exit(EXIT_FAILURE);
+	}
+	string config_file_extension(config_filename, ind);
+	if(config_file_extension.compare(".mat") != 0)
+	{
+		cerr << "Le nom du fichier doit se terminer par \".mat\"" << endl;
+		exit(EXIT_FAILURE);
+	}
+	string config_file_body_tmp(config_filename, 0, ind);
+
+
+	string config_file_body_dir, config_file_body_file;
+
+	ind = config_file_body_tmp.find_last_of("/");
+	if(ind<=0 || ind>= config_file_body_tmp.size())
+	{
+		config_file_body_dir = string("");
+		config_file_body_file = config_file_body_tmp;
+	}
+	else
+	{
+		config_file_body_dir = string(config_file_body_tmp, 0, ind+1);
+		config_file_body_file = string(config_file_body_tmp, ind+1);
+	}
+
+
+
+	FPP expected_lambda = 0;
+	if (argc >= 3)
+		expected_lambda = atof(argv[2]);
+
+
+	FPP epsilon = 0.0001;
+	if (argc >= 4)
+		epsilon = atof(argv[3]);
+
+	//useless for CPU but use for compatibility with GPU
+	BlasHandle<Cpu> blas_handle;
+	SpBlasHandle<Cpu> spblas_handle;
+
+
+	Faust::Params<FPP,Cpu> params;
+	init_params_from_matiofile(params,config_filename.c_str(),"params");
+	params.Display();
+	HierarchicalFact<FPP,Cpu> hier_fact(params,blas_handle,spblas_handle);
+
+	Faust::Timer t1;
+	t1.start();
+
+	hier_fact.compute_facts();
+
+	t1.stop();
+	#ifdef __COMPILE_TIMERS__
+		hier_fact.print_timers();
+		//hier_fact.print_prox_timers();
+	#endif
+	cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
+
+	vector<Faust::MatSparse<FPP,Cpu> > facts;
+	hier_fact.get_facts(facts);
+	FPP lambda = hier_fact.get_lambda();
+	if (argc >= 3)
+	{
+		if (std::abs(lambda - expected_lambda) > epsilon)
+		{
+			std::cerr<<"invalid lambda, must be equal to "<<std::setprecision(20)<<std::setprecision(20)<<expected_lambda<<" in the precision of "<<epsilon<<std::endl;
+			std::cerr<<"current value is "<<std::setprecision(20)<<lambda<<std::endl;
+			exit(EXIT_FAILURE);
+		}
+
+	}
+	(facts[0]) *= hier_fact.get_lambda();
+	Faust::Transform<FPP,Cpu> hier_fact_core(facts);
+	char nomFichier[100];
+	string output_file="@FAUST_TESTOUTPUT_BIN_DIR@/hier_fact_factorisation.dat";
+	hier_fact_core.print_file(output_file.c_str());
+
+	//write the given factorisation into a mat file
+	stringstream outputfilename;
+	outputfilename<<"@FAUST_TESTOUTPUT_BIN_DIR@/"<<config_file_body_file<<"_factorisation.mat";
+	std::cout<<"**************** WRITING FACTORISATION INTO ****************"<<std::endl;
+	std::cout<<"output filename : "<<outputfilename.str();
+	write_faust_core_into_matfile(hier_fact_core,outputfilename.str().c_str(),"fact");
+
+
+	//relative_error
+	Faust::MatDense<FPP,Cpu> data_matrix = params.data;
+	Faust::MatDense<FPP,Cpu> faust_product;
+	faust_product=hier_fact_core.get_product();
+	faust_product-=data_matrix;
+	FPP relative_error = faust_product.norm()/data_matrix.norm();
+
+	std::cout<<std::endl;
+	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+	std::cout<<"		"<<relative_error<<std::endl<<std::endl;
+
+
+	//time comparison between matrix vector product and faust-vector product
+	int niter_time_comp = 10;
+	if (niter_time_comp > 0)
+	{
+
+		Faust::Timer tdense;
+		Faust::Timer tfaust;
+		Faust::Vect<FPP,Cpu> x(data_matrix.getNbCol());
+		Faust::Vect<FPP,Cpu> ydense(data_matrix.getNbRow());
+		Faust::Vect<FPP,Cpu> yfaust(hier_fact_core.getNbRow());
+		for (int i=0;i<niter_time_comp;i++)
+		{
+			//random initilisation of vector x
+	 		for (int j=0;j<x.size();j++)
+			{
+				x[j]=std::rand()*2.0/RAND_MAX-1.0;
+			}
+
+			tdense.start();
+			ydense = data_matrix * x;
+			tdense.stop();
+
+	 		tfaust.start();
+			yfaust = hier_fact_core * x;
+			tfaust.stop();
+
+	 	}
+		std::cout<<std::endl;
+
+		std::cout<<"**************** TIME COMPARISON MATRIX VECTOR PRODUCT **************** "<<std::endl;
+		std::cout<<"	TIME  SPEED-UP : "<<tdense.get_time()/tfaust.get_time()<<std::endl;
+		std::cout<<"	MEAN TIME dense : "<<tdense.get_time()/((float) niter_time_comp)<<std::endl;
+		std::cout<<"	MEAN TIME faust : "<<tfaust.get_time()/((float) niter_time_comp)<<std::endl;
+		cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
+	}
+
+	return 0;
+
+}

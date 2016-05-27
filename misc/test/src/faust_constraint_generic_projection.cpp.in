@@ -1,0 +1,64 @@
+#include "faust_constraint_generic.h"
+#include "faust_constraint_int.h"
+#include "faust_constraint_real.h"
+#include "faust_constraint_mat.h"
+
+#include <string>
+#include <sstream>
+#include <vector>
+
+
+
+#include <iostream>
+#include <iomanip>
+
+/** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
+* An dense matrix is loaded from "@FAUST_TESTDATA_SRC_DIR@
+* \param config_filename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hier_fact)
+* \param expected_lambda (optionnal) : compared the expected scalar of the factorisation with the computed one in the precision defined with epsilon
+*\param epsilon : precision for the test of equality (default value 0.0001)
+*/
+
+typedef @TEST_FPP@ FPP;
+
+int main(int argc, char* argv[])
+{	
+	if (typeid(FPP) == typeid(double))
+  	{
+		cout<<"floating point precision == double"<<endl;
+  	}
+  
+  	if (typeid(FPP) == typeid(float))
+  	{
+		cout<<"floating point precision == float"<<endl;
+  	}
+	
+	std::cout<<"debut"<<std::endl;	std::vector<faust_constraint_generic<FPP>*> list_constraint;
+
+	int dim1 = 5,dim2 = 9;
+	faust_mat<FPP> mat_tmp(dim1,dim2);
+	for (int i=0;i<dim1*dim2;i++)
+		mat_tmp[i]=i;
+
+	faust_mat<FPP> const mat=mat_tmp;
+
+	faust_constraint_int<FPP> constraint_sp(CONSTRAINT_NAME_SP,6,dim1,dim2);
+	
+	std::cout<<"1"<<std::endl;
+	list_constraint.push_back((faust_constraint_generic<FPP>*) new faust_constraint_int<FPP>(CONSTRAINT_NAME_SP,6,dim1,dim2));
+	std::cout<<"2"<<std::endl;
+	
+	faust_mat<FPP> mat2project;
+	for (int i=0;i< list_constraint.size();i++)
+	{
+		mat2project=mat;
+		list_constraint[i]->project(mat2project);
+		std::cout<<"dimension mat"<<std::endl;
+		std::cout<<mat2project.getNbRow()<<" "<<mat2project.getNbCol();
+		mat2project.Display();
+	}
+	
+
+	return 0;
+	
+}

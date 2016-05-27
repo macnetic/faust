@@ -1,0 +1,3 @@
+addpath('@FAUST_MEXINTERFACE_BIN_DIR@');%% access to the mexfunction
+addpath('@FAUST_TESTDATA_SRC_DIR@');%% access to the data (meg and faust_hier configuration)
+addpath('@FAUST_MEXINTERFACETOOLS_BIN_DIR@');%% access to matlab_faust.m (interface betwwen faust_core C++ class and matlab class)
