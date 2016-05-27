@@ -6,7 +6,7 @@ This tool aims to launch automatically a shell-bash SCRIPT :
  
 1- 	First at all, please chek out only the files presents in 
 	following directory : devcpp/test/CTest_nightly 
-	svn checkout --username XXX https://scm.gforge.inria.fr/authscm/XXX/svn/faust/trunk/devcpp/test/CTest_nightly
+	svn checkout --username XXX https://scm.gforge.inria.fr/authscm/XXX/svn/faust/trunk/devcpp/misc/CTest_nightly/ ./
 
 2-	Configure your personnal run shell "run_nightly_PLATFORM.sh" with corresponding export of library and PATH used.
 
