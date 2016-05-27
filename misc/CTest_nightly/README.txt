@@ -22,3 +22,16 @@ This tool aims to launch automatically a shell-bash SCRIPT :
 CTestConfig.cmake
 
 
+5- CTest OPTION: There are three types of dashboard submissions: 
+    -Experimental means the current state of the project. An experimental submission can be performed at any time, usually interactively from the current working copy of a developer.
+
+    -Nightly is similar to experimental, except that the source tree will be set to the state it was in at a specific nightly time. This ensures that all "nightly" submissions correspond to the state of the project at the same point in time. "Nightly" builds are usually done automatically at a preset time of day.
+
+    -Continuous means that the source tree is updated to the latest revision, and a build / test cycle is performed only if any files were actually updated. Like "Nightly" builds, "Continuous" ones are usually done automatically and repeatedly in intervals.
+
+To select the ctest mode, change the files faustTest.cmake to 
+	CTEST_START("Experimental")
+	CTEST_START("Nightly")
+	CTEST_START("Continuous")
+
+

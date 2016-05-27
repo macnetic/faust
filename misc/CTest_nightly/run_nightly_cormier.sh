@@ -51,8 +51,8 @@ export CTEST_CONFIGURE_OPTIONS="-DBUILD_DEBUG:BOOL=OFF;\
 -DBUILD_COVERAGE:BOOL=ON;\
 -DFAUST_USE_OPENBLAS=ON;\
 -DFAUST_USE_MATIO=ON;\
--DFAUST_USE_XML=ON;\
--DFAUST_USE_MEX=ON;\
+-DFAUST_USE_XML=OFF;\
+-DFAUST_USE_MEX=OFF;\
 -DFAUST_USE_GPU:BOOL=ON;\
 -DFAUST_USE_PROFILING=OFF;\
 -DFAUST_ISVERBOSE=OFF;\
@@ -70,5 +70,6 @@ mkdir faust_output
 
 # launch ctest file 
 ctest -VV -C Release -S faustTest.cmake 
+#ctest -VV -C Release -S faustTestContinuous.cmake
 
 

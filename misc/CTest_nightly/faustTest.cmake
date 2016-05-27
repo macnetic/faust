@@ -33,7 +33,9 @@ set(CTEST_BUILD_NAME "${CMAKE_SYSTEM}_${CMAKE_HOST_SYSTEM_PROCESSOR}")
 SET (CTEST_START_WITH_EMPTY_BINARY_DIRECTORY TRUE)
 
 
-CTEST_START("Nightly")
+CTEST_START("Experimental")
+#CTEST_START("Nightly")
+#CTEST_START("Continuous")
 CTEST_UPDATE()
 
 # Option of the ctest build, set from run_nightly_XXX.sh 
