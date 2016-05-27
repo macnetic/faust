@@ -1,2 +1,0 @@
-file(GLOB CPP_FILES "*.cpp")
-add_library(${FAUST_EXCEPTION_TARGET} OBJECT ${CPP_FILES})
