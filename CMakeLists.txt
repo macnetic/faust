@@ -50,7 +50,7 @@ set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read mat files")
 set(FAUST_USE_XML OFF CACHE BOOL "Using xml configuration to read xml files")
 set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
 set(FAUST_USE_GPU ON CACHE BOOL "Using both CPU and GPU process")
-set(FAUST_GEN_DOC ON CACHE BOOL "Generate html documentation with doxygen")
+set(FAUST_GEN_DOC OFF CACHE BOOL "Generate html documentation with doxygen")
 
 if (FAUST_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")
