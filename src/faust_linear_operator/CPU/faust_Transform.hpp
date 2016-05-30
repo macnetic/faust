@@ -2,8 +2,8 @@
 #define __FAUSTCORE_HPP__
 
 #include "faust_Vect.h"
-//#include "HierarchicalFact.h"
-//#include "Faust::Params.h"
+//#include "faust_HierarchicalFact.h"
+//#include "faust_Params.h"
 #include "linear_algebra.h"
 #include "faust_transform_algebra.h"
 #include <iostream>
@@ -221,7 +221,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> 
    totalNonZeros(0)
 
 {
-   HierarchicalFact hier_fact(params);
+   Faust::HierarchicalFact hier_fact(params);
    hier_fact.compute_facts();
    hier_fact.get_facts(data);
    for (int i=0 ; i<data.size() ; i++)

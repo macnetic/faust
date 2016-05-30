@@ -116,7 +116,7 @@ FPP power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max
 		// handleWarning(" Faust::Transform<FPP,Cpu>_algebra : multiply : empty Faust::Transform<FPP,Cpu>");
 	// }
 
-	// if the Faust::Transform<FPP,Cpu> A is empty, it's considere as the identity, so C = equal B, it is useful into the algorithm Palm4MSA, where the Faust::Transform<FPP,Cpu>s L and R can be empty
+	// if the Faust::Transform<FPP,Cpu> A is empty, it's considere as the identity, so C = equal B, it is useful into the algorithm Faust::Palm4MSA, where the Faust::Transform<FPP,Cpu>s L and R can be empty
 	// C = B;
 	// C.scalarMultiply(alpha);
 	// C.resize(nbRowOpB,nbColOpB);
