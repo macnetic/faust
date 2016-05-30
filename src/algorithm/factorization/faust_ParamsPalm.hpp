@@ -2,7 +2,7 @@
 #define __FAUST_PARAMS_PALM_HPP__
 
 //#include "faust_ParamsPalm.h"
-#include "StoppingCriterion.h"
+#include "faust_StoppingCriterion.h"
 #include <iostream>
 #include <stdexcept>
 #include "faust_exception.h"
@@ -47,7 +47,7 @@ Faust::ParamsPalm<FPP,DEVICE>::ParamsPalm(
          const int nb_fact_,
          const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE> *>& cons_,
          const std::vector<Faust::MatDense<FPP,DEVICE> > & init_fact_,
-         const StoppingCriterion<FPP> & stop_crit_ /* = StoppingCriterion() */,
+         const Faust::StoppingCriterion<FPP> & stop_crit_ /* = Faust::StoppingCriterion() */,
          const bool isVerbose_ /* = false */,
          const bool isUpdateWayR2L_ /* = false */,
          const FPP init_lambda_ /* = 1.0 */,

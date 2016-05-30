@@ -8,7 +8,7 @@
 #else
    #include "faust_MatDense.h"
 #endif
-#include "StoppingCriterion.h"
+#include "faust_StoppingCriterion.h"
 #include "faust_ConstraintGeneric.h"
 
 /*! \class Faust::Params
@@ -36,8 +36,8 @@ namespace Faust
             const unsigned int nb_fact_,
             const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & cons_,
             const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-            const StoppingCriterion<FPP>& stop_crit_2facts_ = StoppingCriterion<FPP>(defaultNiter1),
-            const StoppingCriterion<FPP>& stop_crit_global_  = StoppingCriterion<FPP>(defaultNiter2),
+            const Faust::StoppingCriterion<FPP>& stop_crit_2facts_ = Faust::StoppingCriterion<FPP>(defaultNiter1),
+            const Faust::StoppingCriterion<FPP>& stop_crit_global_  = Faust::StoppingCriterion<FPP>(defaultNiter2),
             const FPP residuum_decrease_speed = defaultDecreaseSpeed,
             const FPP residuum_prcent = defaultResiduumPercent,
             const bool isVerbose_ = defaultVerbosity ,
@@ -58,8 +58,8 @@ namespace Faust
                                 - cons_[1][j] specifies the constraints for the left factor and<br>
                                 - cons[2][j] for the right factor.<br>
         *   \param	init_fact_ : specifying the initial factors, could be an empty std::vector (not specifying the factors) <br>
-        *	\param stop_crit_2facts : (optional) StoppingCriterion for each 2 factors factorization step <br>
-        *	\param stop_crit_global : (optional) StoppingCriterion for the factorization each global factorization step <br>
+        *	\param stop_crit_2facts : (optional) Faust::StoppingCriterion for each 2 factors factorization step <br>
+        *	\param stop_crit_global : (optional) Faust::StoppingCriterion for the factorization each global factorization step <br>
         *	\param isVerbose : (optional) - if true the function outputs the error at each iteration <br>
                                            - if false, hierarchical_fact run silent mode<br>
                                            (default value is false) <br>
@@ -85,8 +85,8 @@ namespace Faust
             const unsigned int nb_fact_,
             const std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> >& cons_,
             const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-            const StoppingCriterion<FPP>& stop_crit_2facts_ = StoppingCriterion<FPP>(defaultNiter1),
-            const StoppingCriterion<FPP>& stop_crit_global_  = StoppingCriterion<FPP>(defaultNiter2),
+            const Faust::StoppingCriterion<FPP>& stop_crit_2facts_ = Faust::StoppingCriterion<FPP>(defaultNiter1),
+            const Faust::StoppingCriterion<FPP>& stop_crit_global_  = Faust::StoppingCriterion<FPP>(defaultNiter2),
             const bool isVerbose_ = defaultVerbosity ,
             const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
             const bool isFactSideLeft_ = defaultFactSideLeft ,
@@ -113,8 +113,8 @@ namespace Faust
         std::vector<Faust::MatDense<FPP,DEVICE> > init_fact;
 
         // Optional members (set to default values if not defined)
-        StoppingCriterion<FPP> stop_crit_2facts;
-        StoppingCriterion<FPP> stop_crit_global;
+        Faust::StoppingCriterion<FPP> stop_crit_2facts;
+        Faust::StoppingCriterion<FPP> stop_crit_global;
         bool isVerbose;
         bool isUpdateWayR2L;
         bool isFactSideLeft;
@@ -140,10 +140,10 @@ namespace Faust
         //const int nb_cols; // number of columns of the last factor
 
         /*const int nb_it;   // number of iterations
-        // if isStoppingCriterionError then criterion is error else criterion is number of iteration
-        bool  isStoppingCriterionError;
+        // if isFaust::StoppingCriterionError then criterion is error else criterion is number of iteration
+        bool  isFaust::StoppingCriterionError;
         const faust_real errorThreshold;
-        // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than
+        // only used as stopping criterion, if isFaust::StoppingCriterionError, when error is still greater than
         int maxIteration;*/
         static const char* class_name;
         private :

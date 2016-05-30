@@ -2,7 +2,7 @@
 #define __FAUST_PARAMS_HPP__
 
 //#include "Faust::Params.h"
-#include "StoppingCriterion.h"
+#include "faust_StoppingCriterion.h"
 #include <iostream>
 #include "faust_ConstraintInt.h"
 #include "faust_ConstraintFPP.h"
@@ -74,8 +74,8 @@ Faust::Params<FPP,DEVICE>::Params(
 	const unsigned int nb_fact_,
 	const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & cons_,
 	const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-	const StoppingCriterion<FPP>& stop_crit_2facts_,
-    const StoppingCriterion<FPP>& stop_crit_global_,
+	const Faust::StoppingCriterion<FPP>& stop_crit_2facts_,
+    const Faust::StoppingCriterion<FPP>& stop_crit_global_,
 	const FPP residuum_decrease_speed /* = 1.25 */,
 	const FPP residuum_prcent /* = 1.4 */,
 	const bool isVerbose_ , /* = false */
@@ -184,8 +184,8 @@ Faust::Params<FPP,DEVICE>::Params(
          const unsigned int nb_fact_,
          const std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> >& cons_,
          const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-         const StoppingCriterion<FPP>& stop_crit_2facts_ /* = StoppingCriterion<FPP>() */,
-         const StoppingCriterion<FPP>& stop_crit_global_ /* = StoppingCriterion<FPP>() */,
+         const Faust::StoppingCriterion<FPP>& stop_crit_2facts_ /* = Faust::StoppingCriterion<FPP>() */,
+         const Faust::StoppingCriterion<FPP>& stop_crit_global_ /* = Faust::StoppingCriterion<FPP>() */,
          const bool isVerbose_ /* = false */,
          const bool isUpdateWayR2L_ /* = false */,
          const bool isFactSideLeft_ /* = false */,
@@ -364,13 +364,13 @@ void Faust::Params<FPP,DEVICE>::init_from_file(const char* filename)
 		handleError(class_name,"init_from_file : premature end of file");
 	fscanf(fp,"%d\n",&niter1);
 	std::cout<<"niter1 : "<<niter1<<std::endl;
-	StoppingCriterion<FPP> stopcrit2facts(niter1);
+	Faust::StoppingCriterion<FPP> stopcrit2facts(niter1);
 	stop_crit_2facts = stopcrit2facts;
 	if (feof(fp))
 		handleError(class_name,"init_from_file : premature end of file");
 	fscanf(fp,"%d\n",&niter2);
 	std::cout<<"niter2 : "<<niter2<<std::endl;
-	StoppingCriterion<FPP> stopcritglobal(niter2);
+	Faust::StoppingCriterion<FPP> stopcritglobal(niter2);
 	stop_crit_global = stopcritglobal;
 
 	vector<const Faust::ConstraintGeneric<FPP,DEVICE> *> consS;

@@ -8,7 +8,7 @@
 #else
    #include "faust_MatDense.h"
 #endif
-#include "StoppingCriterion.h"
+#include "faust_StoppingCriterion.h"
 #include "faust_ConstraintGeneric.h"
 
 
@@ -36,7 +36,7 @@ namespace Faust
              const int nb_fact_,
              const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*>& cons_,
              const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-             const StoppingCriterion<FPP> & stop_crit_ = StoppingCriterion<FPP>(defaultNiter),
+             const Faust::StoppingCriterion<FPP> & stop_crit_ = Faust::StoppingCriterion<FPP>(defaultNiter),
              const bool isVerbose_ = defaultVerbosity ,
              const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
              const FPP init_lambda_ = defaultLambda,
@@ -56,7 +56,7 @@ namespace Faust
 
           // Optional members (set to default values if not defined)
           std::vector<Faust::MatDense<FPP,DEVICE> > init_fact;
-          StoppingCriterion<FPP> stop_crit;
+          Faust::StoppingCriterion<FPP> stop_crit;
           bool isVerbose;
           bool isUpdateWayR2L;
           bool isConstantStepSize;
@@ -76,7 +76,7 @@ namespace Faust
 
 
           /*const int nb_it;   // number of iterations
-          // if isStoppingCriterionError then criterion is error else criterion is number of iteration
+          // if isFaust::StoppingCriterionError then criterion is error else criterion is number of iteration
           bool  isStoppingCriterionError;
           const FPP errorThreshold;
           // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than
