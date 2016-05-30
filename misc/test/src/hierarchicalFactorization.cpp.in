@@ -2,7 +2,7 @@
 #include "faust_MatSparse.h"
 #include "faust_Params.h"
 #include "faust_ParamsPalm.h"
-#include "HierarchicalFact.h"
+#include "faust_HierarchicalFact.h"
 #include "faust_Timer.h"
 #include "faust_Transform.h"
 #include "faust_init_from_matio_params.h"
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 	Faust::Params<FPP,Cpu> params;
 	init_params_from_matiofile(params,config_filename.c_str(),"params");
 	params.Display();
-	HierarchicalFact<FPP,Cpu> hier_fact(params,blas_handle,spblas_handle);
+	Faust::HierarchicalFact<FPP,Cpu> hier_fact(params,blas_handle,spblas_handle);
 
 	Faust::Timer t1;
 	t1.start();

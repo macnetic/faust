@@ -43,10 +43,10 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 
 	if (contentS.size() == 1)
 	{
-		StoppingCriterion<T> stop_crit1((int) xmlXPathCastStringToNumber(contentS[0]));
+		Faust::StoppingCriterion<T> stop_crit1((int) xmlXPathCastStringToNumber(contentS[0]));
 		params.stop_crit_2facts = stop_crit1;
 	}else
-		params.stop_crit_2facts = StoppingCriterion<T>(params.defaultNiter1);
+		params.stop_crit_2facts = Faust::StoppingCriterion<T>(params.defaultNiter1);
 
 	// std::cout<<"niter1 : "<<params.stop_crit_2facts.get_crit()<<std::endl;
 
@@ -57,10 +57,10 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 			"init_params_from_xml : invalid file optionnal niter2 tag must be specified at most one time");
 	if (contentS.size() == 1)
 	{
-		StoppingCriterion<T> stop_crit_global((int) xmlXPathCastStringToNumber(contentS[0]));
+		Faust::StoppingCriterion<T> stop_crit_global((int) xmlXPathCastStringToNumber(contentS[0]));
 		params.stop_crit_global = stop_crit_global;
 	}else
-		params.stop_crit_global = StoppingCriterion<T>(params.defaultNiter2);
+		params.stop_crit_global = Faust::StoppingCriterion<T>(params.defaultNiter2);
 
 	// std::cout<<"niter2 : "<<params.stop_crit_global.get_crit()<<std::endl;
 
@@ -211,10 +211,10 @@ void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<T> & para
 
 	if (contentS.size() == 1)
 	{
-		StoppingCriterion<T> stop_crit1((int) xmlXPathCastStringToNumber(contentS[0]));
+		Faust::StoppingCriterion<T> stop_crit1((int) xmlXPathCastStringToNumber(contentS[0]));
 		params.stop_crit = stop_crit1;
 	}else
-		params.stop_crit = StoppingCriterion<T>(params.defaultNiter);
+		params.stop_crit = Faust::StoppingCriterion<T>(params.defaultNiter);
 
 	// std::cout<<"niter1 : "<<params.stop_crit_2facts.get_crit()<<std::endl;
 

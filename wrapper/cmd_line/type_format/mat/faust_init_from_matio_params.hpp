@@ -11,7 +11,7 @@
 #include <iostream>
 #include <vector>
 
-#include "StoppingCriterion.h"
+#include "faust_StoppingCriterion.h"
 #include "faust_ConstraintGeneric.h"
 #include "faust_ConstraintInt.h"
 #include "faust_ConstraintFPP.h"
@@ -67,7 +67,7 @@ void init_params_palm_from_matiofile(Faust::ParamsPalm<FPP,DEVICE>& params,const
 		{
 			//cout<<"niter="<<endl;
 			niter=(int)((double*)(current_var->data))[0];
-			StoppingCriterion<FPP> stop_cri(niter);
+			Faust::StoppingCriterion<FPP> stop_cri(niter);
 			params.stop_crit=stop_cri;
 			//cout<<niter<<endl;
 		}
@@ -201,7 +201,7 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 		{
 			//cout<<"niter1="<<endl;
 			niter=(int)((double*)(current_var->data))[0];
-			StoppingCriterion<FPP> stop_cri(niter);
+			Faust::StoppingCriterion<FPP> stop_cri(niter);
 			params.stop_crit_2facts=stop_cri;
 			//cout<<niter<<endl;
 		}
@@ -209,7 +209,7 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 		{
 			//cout<<"niter2="<<endl;
 			niter=(int)((double*)(current_var->data))[0];
-			StoppingCriterion<FPP> stop_cri(niter);
+			Faust::StoppingCriterion<FPP> stop_cri(niter);
 			params.stop_crit_global=stop_cri;
 			//cout<<niter<<endl;
 		}

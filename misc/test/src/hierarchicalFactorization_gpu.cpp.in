@@ -4,11 +4,11 @@
 #include "faust_Vect_gpu.h"
 #include "faust_Params.h"
 #include "faust_ParamsPalm.h"
-#include "StoppingCriterion.h"
+#include "faust_StoppingCriterion.h"
 #include "faust_init_from_matio_params.h"
 #include "faust_init_from_matio_core.h"
-#include "Palm4MSA.h"
-#include "HierarchicalFact.h"
+#include "faust_Palm4MSA.h"
+#include "faust_HierarchicalFact.h"
 #include "faust_Timer_gpu.h"
 #include "linear_algebra_gpu.h"
 #include <iostream>
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 	std::cout<<"Display2"<<std::endl;
 	params.Display();
 	cout<<"launch"<<endl;
-	HierarchicalFact<FPP,Gpu> hier_fact(params,blas_handle,spblas_handle);
+	Faust::HierarchicalFact<FPP,Gpu> hier_fact(params,blas_handle,spblas_handle);
 
 	std::cout<<"factorisation"<<std::endl;
 	Faust::Timer_gpu t1;

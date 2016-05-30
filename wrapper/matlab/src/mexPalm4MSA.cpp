@@ -136,12 +136,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     std::cout<<"FINI_CONS"<<std::endl;
     //niter1
-    StoppingCriterion<FFPP> crit1;
+    Faust::StoppingCriterion<FFPP> crit1;
     if (presentFields[3])
     {
          mxCurrentField = mxGetField(prhs[0],0,"niter");
         int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
-        StoppingCriterion<FFPP> newCrit1(nb_iter1);
+        Faust::StoppingCriterion<FFPP> newCrit1(nb_iter1);
         crit1 = newCrit1;
     }
     mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());

@@ -8,7 +8,7 @@
 // #include <vector>
 // #include "faust_Params.h"
 // #include "faust_ParamsPalm.h"
-// #include "StoppingCriterion.h"
+// #include "faust_StoppingCriterion.h"
 // #include "faust_ConstraintInt.h"
 // #include "faust_ConstraintGeneric.h"
 // #include "faust_ConstraintFPP.h"

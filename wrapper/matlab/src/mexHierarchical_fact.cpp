@@ -148,23 +148,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
     //niter1
-    StoppingCriterion<FFPP> crit1;
+    Faust::StoppingCriterion<FFPP> crit1;
     if (presentFields[3])
     {
          mxCurrentField = mxGetField(prhs[0],0,"niter1");
         int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
-        StoppingCriterion<FFPP> newCrit1(nb_iter1);
+        Faust::StoppingCriterion<FFPP> newCrit1(nb_iter1);
         crit1 = newCrit1;
     }
     //mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
 
     //niter2
-    StoppingCriterion<FFPP> crit2;
+    Faust::StoppingCriterion<FFPP> crit2;
     if (presentFields[4])
     {
          mxCurrentField = mxGetField(prhs[0],0,"niter2");
         int nb_iter2 =(int)  mxGetScalar(mxCurrentField);
-        StoppingCriterion<FFPP> newCrit2(nb_iter2);
+        Faust::StoppingCriterion<FFPP> newCrit2(nb_iter2);
         crit2 = newCrit2;
     }
     //mexPrintf("\n crit2 nb_it = %d\n",crit2.get_crit());
