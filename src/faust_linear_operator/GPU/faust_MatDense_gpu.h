@@ -47,7 +47,7 @@ namespace Faust
         MatDense(const MatDense<FPP,Cpu>& M, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0 );
 
     #ifdef __COMPILE_SPMAT__
-        MatDense(const Faust::MatSparse<FPP,Gpu>& cu_S, SpBlasHandle<Gpu> cusparseHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
+        MatDense(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu> cusparseHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
         MatDense(const Faust::MatSparse<FPP,Gpu>& S, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
     #endif
         MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE);
@@ -89,17 +89,17 @@ namespace Faust
 
 
       //transposition
-      void transpose(BlasHandle<Gpu>);
-      void init_from_transpose(const MatDense<FPP,Gpu>& cu_M, BlasHandle<Gpu>);
+      void transpose(Faust::BlasHandle<Gpu>);
+      void init_from_transpose(const MatDense<FPP,Gpu>& cu_M, Faust::BlasHandle<Gpu>);
     #ifdef __COMPILE_SPMAT__
-      void init_from_transpose(const Faust::MatSparse<FPP,Gpu>& cu_S, SpBlasHandle<Gpu>);
+      void init_from_transpose(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu>);
     #endif
 
       // multiply (*this) = (*this) * A
-      //void multiplyRight(const Faust::MatSparse<FPP,Gpu>& cu_B, BlasHandle<Gpu>);
+      //void multiplyRight(const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::BlasHandle<Gpu>);
       //void operator*=(const MatDense<FPP>& cu_M){multiplyRight(cu_M);}
       // multiply (*this) =  A * (*this)
-      //void multiplyLeft(const Faust::MatSparse<FPP,Gpu>& cu_A, BlasHandle<Gpu>);
+      //void multiplyLeft(const Faust::MatSparse<FPP,Gpu>& cu_A, Faust::BlasHandle<Gpu>);
 
       FPP max() const;
       FPP min() const;
@@ -118,14 +118,14 @@ namespace Faust
     #ifdef __COMPILE_SPMAT__
       void operator=(const Faust::MatSparse<FPP,Cpu>& S);
       void operator=(const Faust::MatSparse<FPP,Gpu>& cu_S);
-      void init_from_cu_spmat(const Faust::MatSparse<FPP,Gpu>& cu_S, SpBlasHandle<Gpu>, const FPP coeff=1.0);
+      void init_from_cu_spmat(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu>, const FPP coeff=1.0);
 
 
       void operator+=(const Faust::MatSparse<FPP,Gpu>& cu_S);
-      void add(const Faust::MatSparse<FPP,Gpu>& S, SpBlasHandle<Gpu>);
-      // operator-=(const Faust::MatSparse<FPP,Gpu>&) is not defined. Use sub(const Faust::MatSparse<FPP,Gpu>&, SpBlasHandle<Gpu>)
+      void add(const Faust::MatSparse<FPP,Gpu>& S, Faust::SpBlasHandle<Gpu>);
+      // operator-=(const Faust::MatSparse<FPP,Gpu>&) is not defined. Use sub(const Faust::MatSparse<FPP,Gpu>&, Faust::SpBlasHandle<Gpu>)
       void operator-=(const Faust::MatSparse<FPP,Gpu>& cu_S);
-      void sub(const Faust::MatSparse<FPP,Gpu>& S, SpBlasHandle<Gpu>);
+      void sub(const Faust::MatSparse<FPP,Gpu>& S, Faust::SpBlasHandle<Gpu>);
     #endif
 
       void operator+=(const MatDense<FPP,Gpu>& cu_A);
@@ -137,8 +137,8 @@ namespace Faust
       // (*this)(i,j)=((*this)(i,j)) * A(i,j)
       void scalarMultiply(const MatDense<FPP,Gpu>& cu_A);
     #ifdef __COMPILE_SPMAT__
-      void multiplyRight(const Faust::MatSparse<FPP,Gpu>& cu_S, BlasHandle<Gpu>, SpBlasHandle<Gpu>);
-      void multiplyLeft(const Faust::MatSparse<FPP,Gpu>& cu_S, SpBlasHandle<Gpu>);
+      void multiplyRight(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::BlasHandle<Gpu>, Faust::SpBlasHandle<Gpu>);
+      void multiplyLeft(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu>);
     #endif
 
        void Display()const;
@@ -153,7 +153,7 @@ namespace Faust
 
       // spectral norm, "norm2", equal to the largest singular value
       //FPP spectralNorm() const;
-      FPP spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag, BlasHandle<Gpu> cublasHandle) const;
+      FPP spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag, Faust::BlasHandle<Gpu> cublasHandle) const;
 
       // trace
       FPP trace() const;
@@ -239,17 +239,17 @@ namespace Faust
 
 
 /*template <typename FPP>
-inline void MatDense<FPP,Gpu>::multiplyRight(const MatDense<FPP>& cu_B, BlasHandle<Gpu> cublasHandle)
+inline void MatDense<FPP,Gpu>::multiplyRight(const MatDense<FPP>& cu_B, Faust::BlasHandle<Gpu> cublasHandle)
 {gemm(*this, cu_B, *this, 1.0, 0.0, 'N', 'N', cublasHandle);}
 
 template <typename FPP,Device DEVICE>
-inline void Faust::MatSparse<FPP,Gpu>::multiplyLeft(const Faust::MatSparse<FPP,Gpu>& cu_A, BlasHandle<Gpu> cublasHandle)
+inline void Faust::MatSparse<FPP,Gpu>::multiplyLeft(const Faust::MatSparse<FPP,Gpu>& cu_A, Faust::BlasHandle<Gpu> cublasHandle)
 {gemm(cu_A, *this, *this, 1.0, 0.0, 'N', 'N', cublasHandle);}
 
 
 #ifdef __COMPILE_SPMAT__
 template <typename FPP,Device DEVICE>
-   inline void Faust::MatSparse<FPP,Gpu>::multiplyRight(const Faust::MatSparse<FPP,Gpu>& cu_S, BlasHandle<Gpu> cublasHandle, cusparseHandle_t cusparseHandle)
+   inline void Faust::MatSparse<FPP,Gpu>::multiplyRight(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::BlasHandle<Gpu> cublasHandle, cusparseHandle_t cusparseHandle)
    {gemm(*this, cu_S, *this, 1.0, 0.0, 'N', 'N', cublasHandle, cusparseHandle);}
 
 template <typename FPP,Device DEVICE>

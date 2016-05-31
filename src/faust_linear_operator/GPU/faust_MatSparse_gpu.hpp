@@ -90,7 +90,7 @@ t_constructor_from_host.stop();
 }
 
 template <typename FPP>
-Faust::MatSparse<FPP,Gpu>::MatSparse(const Faust::MatDense<FPP,Gpu>& cu_A, SpBlasHandle<Gpu> spblasHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL), device(FAUST_DEFAULT_CUDA_DEVICE), descr(NULL)
+Faust::MatSparse<FPP,Gpu>::MatSparse(const Faust::MatDense<FPP,Gpu>& cu_A, Faust::SpBlasHandle<Gpu> spblasHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL), device(FAUST_DEFAULT_CUDA_DEVICE), descr(NULL)
 {
 #ifdef __COMPILE_TIMERS__
 t_constructor_from_device.start();
@@ -103,7 +103,7 @@ t_constructor_from_device.stop();
 }
 
 template <typename FPP>
-Faust::MatSparse<FPP,Gpu>::MatSparse(const Faust::MatDense<FPP,Cpu>& A, SpBlasHandle<Gpu> spblasHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL), device(FAUST_DEFAULT_CUDA_DEVICE), descr(NULL)
+Faust::MatSparse<FPP,Gpu>::MatSparse(const Faust::MatDense<FPP,Cpu>& A, Faust::SpBlasHandle<Gpu> spblasHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL), device(FAUST_DEFAULT_CUDA_DEVICE), descr(NULL)
 {
 #ifdef __COMPILE_TIMERS__
 t_constructor_from_host.start();
@@ -401,7 +401,7 @@ t_init_from_spmat.stop();
 }
 
 template <typename FPP>
-void Faust::MatSparse<FPP,Gpu>::init(const Faust::MatDense<FPP,Gpu>& cu_A, SpBlasHandle<Gpu> spblasHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ )
+void Faust::MatSparse<FPP,Gpu>::init(const Faust::MatDense<FPP,Gpu>& cu_A, Faust::SpBlasHandle<Gpu> spblasHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ )
 {
 #ifdef __COMPILE_TIMERS__
 t_init_from_cumat.start();
@@ -485,7 +485,7 @@ t_init_from_cumat.stop();
 }
 
 template <typename FPP>
-void Faust::MatSparse<FPP,Gpu>::init(const Faust::MatDense<FPP,Cpu>& M, SpBlasHandle<Gpu> spblasHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ )
+void Faust::MatSparse<FPP,Gpu>::init(const Faust::MatDense<FPP,Cpu>& M, Faust::SpBlasHandle<Gpu> spblasHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ )
 {
 #ifdef __COMPILE_TIMERS__
 t_init_from_mat.start();
@@ -570,7 +570,7 @@ t_operator_plus_equal_real.stop();
 }
 
 template <typename FPP>
-void Faust::MatSparse<FPP,Gpu>::init_from_transpose(const Faust::MatSparse<FPP,Gpu>& cu_S, SpBlasHandle<Gpu> spblasHandle)
+void Faust::MatSparse<FPP,Gpu>::init_from_transpose(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 #ifdef __COMPILE_TIMERS__
 t_init_from_transpose.start();
@@ -628,7 +628,7 @@ t_init_from_transpose.stop();
 #endif
 }
 template <typename FPP>
-void Faust::MatSparse<FPP,Gpu>::transpose(SpBlasHandle<Gpu> spblasHandle)
+void Faust::MatSparse<FPP,Gpu>::transpose(Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 #ifdef __COMPILE_TIMERS__
 t_transpose.start();

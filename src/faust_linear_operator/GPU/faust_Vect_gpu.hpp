@@ -308,7 +308,7 @@ FPP Faust::Vect<FPP,Gpu>::norm() const
 }
 
 template <typename FPP>
-FPP Faust::Vect<FPP,Gpu>::dot(const Faust::Vect<FPP,Gpu>& cu_v, BlasHandle<Gpu> blasHandle) const
+FPP Faust::Vect<FPP,Gpu>::dot(const Faust::Vect<FPP,Gpu>& cu_v, Faust::BlasHandle<Gpu> blasHandle) const
 {
 //return dot(*this, cu_v, blasHandle);
    if(size() != cu_v.size())

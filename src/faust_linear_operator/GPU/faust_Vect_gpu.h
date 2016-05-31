@@ -60,7 +60,7 @@ namespace Faust
         FPP sum()const;
         FPP norm() const;
         FPP mean()const{return sum()/dim;}
-        FPP dot(const Vect<FPP,Gpu>& cu_v, BlasHandle<Gpu> blasHandle)const;
+        FPP dot(const Vect<FPP,Gpu>& cu_v, Faust::BlasHandle<Gpu> blasHandle)const;
 
         bool operator==(const Vect<FPP,Gpu>& cu_v)const;
         bool operator!=(const Vect<FPP,Gpu>& cu_v)const{return !((*this)==cu_v);}
@@ -89,9 +89,9 @@ namespace Faust
 
         FPP mean_relative_error(const Vect<FPP,Gpu>& v)const;
         // multiply (*this) =  A * (*this)
-        inline void  multiplyLeft(const Faust::MatDense<FPP,Gpu>& cu_A, BlasHandle<Gpu> blasHandle);
+        inline void  multiplyLeft(const Faust::MatDense<FPP,Gpu>& cu_A, Faust::BlasHandle<Gpu> blasHandle);
         #ifdef __COMPILE_SPMAT__
-        void  multiplyLeft(const Faust::MatSparse<FPP,Gpu>& cu_S,SpBlasHandle<Gpu> spblasHandle);
+        void  multiplyLeft(const Faust::MatSparse<FPP,Gpu>& cu_S,Faust::SpBlasHandle<Gpu> spblasHandle);
         #endif
 
         ~Vect(){resize(0);}
@@ -130,7 +130,7 @@ namespace Faust
 
 
 template<typename FPP>
-inline void Faust::Vect<FPP,Gpu>::multiplyLeft(const Faust::MatDense<FPP,Gpu>& cu_A, BlasHandle<Gpu> blasHandle)
+inline void Faust::Vect<FPP,Gpu>::multiplyLeft(const Faust::MatDense<FPP,Gpu>& cu_A, Faust::BlasHandle<Gpu> blasHandle)
 {
     Faust::Vect<FPP,Gpu> cu_y_copy;
     gemv(cu_A, *this, cu_y_copy, 1.0, 0.0, 'N', blasHandle);

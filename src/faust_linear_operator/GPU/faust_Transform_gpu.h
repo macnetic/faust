@@ -34,7 +34,7 @@ template<typename FPP,Device DEVICE> class Transform;
             void get_facts(std::vector<Faust::MatDense<FPP,Gpu> >& facts)const;
             int size()const{return data.size();}
 
-            Faust::MatDense<FPP,Gpu> get_product(BlasHandle<Gpu>,SpBlasHandle<Gpu>)const;
+            Faust::MatDense<FPP,Gpu> get_product(Faust::BlasHandle<Gpu>,Faust::SpBlasHandle<Gpu>)const;
             Faust::MatSparse<FPP,Gpu> get_fact(int id) const;
             int getNbRow() const;
             int getNbCol() const;
@@ -43,7 +43,7 @@ template<typename FPP,Device DEVICE> class Transform;
             long long int get_total_nnz()const{return totalNonZeros;}
             void clear(){data.resize(0);totalNonZeros=0;}
             void push_back(const Faust::MatSparse<FPP,Gpu>& S);
-            void mult( const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y,SpBlasHandle<Gpu> spblas_Handle);
+            void mult( const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y,Faust::SpBlasHandle<Gpu> spblas_Handle);
             void push_first(const Faust::MatSparse<FPP,Gpu>& S);
             void pop_back(Faust::MatSparse<FPP,Gpu>& S);
             void pop_first(Faust::MatSparse<FPP,Gpu>& S);

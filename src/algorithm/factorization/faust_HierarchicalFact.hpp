@@ -23,7 +23,7 @@ template<typename FPP,Device DEVICE>
 const char * Faust::HierarchicalFact<FPP,DEVICE>::class_name="Faust::HierarchicalFact";
 
 template<typename FPP,Device DEVICE>
-Faust::HierarchicalFact<FPP,DEVICE>::HierarchicalFact(const Faust::Params<FPP,DEVICE>& params_, BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle):
+Faust::HierarchicalFact<FPP,DEVICE>::HierarchicalFact(const Faust::Params<FPP,DEVICE>& params_, Faust::BlasHandle<DEVICE> cublasHandle, Faust::SpBlasHandle<DEVICE> cusparseHandle):
    ind_fact(0),
    cons(params_.cons),
    isUpdateWayR2L(params_.isUpdateWayR2L),

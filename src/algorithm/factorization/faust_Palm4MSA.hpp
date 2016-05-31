@@ -41,7 +41,7 @@ const FPP Faust::Palm4MSA<FPP,DEVICE>::lipschitz_multiplicator=1.001;
 
 
 template<typename FPP,Device DEVICE>
-Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::Params<FPP,DEVICE> & params_,const BlasHandle<DEVICE> blasHandle, const bool isGlobal_) :
+Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::Params<FPP,DEVICE> & params_,const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_) :
     data(params_.data),
     lambda(params_.init_lambda),
     nb_fact(0),
@@ -76,7 +76,7 @@ Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::Params<FPP,DEVICE> & params_,
 }
 
 template<typename FPP,Device DEVICE>
-Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE>& params_palm_,const BlasHandle<DEVICE> blasHandle,const bool isGlobal_/*=false*/) :
+Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE>& params_palm_,const Faust::BlasHandle<DEVICE> blasHandle,const bool isGlobal_/*=false*/) :
    stop_crit(params_palm_.stop_crit),
    data(params_palm_.data),
    lambda(params_palm_.init_lambda),

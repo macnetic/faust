@@ -13,8 +13,6 @@
 
 #include "faust_MatDense.h"
 
-template<Device DEVICE> class BlasHandle;
-
 namespace Faust
 {
 
@@ -26,7 +24,7 @@ namespace Faust
     template<typename FPP,Device DEVICE> class Params;
     template<typename FPP,Device DEVICE> class ParamsPalm;
     template<typename FPP> class StoppingCriterion;
-
+    //template<Device DEVICE> class BlasHandle;
 
     /*! \class Palm4MSA
        * \brief template class implementing Palm4MSA (PALM for Multi-layer Sparse Approximation) factorization algorithm
@@ -47,8 +45,8 @@ namespace Faust
          * initialize Palm4MSA from Faust::Params (HierarchicalFact parameter)
          *\tparam isGlobal_ : if true, the Palm4MSA StoppingCriterion stop_crit attribute is initialize from params_.stop_crit_global <br> and if false, it is initialize from stop_crit_2facts
          */
-          Palm4MSA(const Faust::Params<FPP,DEVICE>& params_, const BlasHandle<DEVICE> blasHandle, const bool isGlobal_);
-          Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE>& params_palm_, const BlasHandle<DEVICE> blasHandle, const bool isGlobal_=false);
+          Palm4MSA(const Faust::Params<FPP,DEVICE>& params_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_);
+          Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE>& params_palm_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_=false);
 
           void set_constraint(const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
           void set_data(const Faust::MatDense<FPP,DEVICE>& data_){data=data_;}
@@ -150,7 +148,7 @@ namespace Faust
           Faust::MatDense<FPP,DEVICE> grad_over_c;
           FPP c;
           Faust::MatDense<FPP,DEVICE> error; // error = lambda*L*S*R - data
-          BlasHandle<DEVICE> blas_handle;
+          Faust::BlasHandle<DEVICE> blas_handle;
 
 
 

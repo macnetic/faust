@@ -13,7 +13,7 @@ template <typename FPP,Device DEVICE> class MatDense;
 #endif
 
 
-#include "SpBlasHandleGPU.h"
+#include "Faust::SpBlasHandleGPU.h"
 
 //! \class Faust::class MatSparse<FPP,Gpu> faust_MatSparse_gpu.h
 //! \brief Class template representing sparse matrix for GPU processing <br>
@@ -41,8 +41,8 @@ namespace Faust
             MatSparse(const int* csrRowPtr_, const int* csrColInd_, const FPP* csrValues_, const faust_unsigned_int nnz_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, bool dataFromGPU, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, int srcDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
             MatSparse(const MatSparse<FPP,Gpu>& cu_S, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
             MatSparse(const MatSparse<FPP,Cpu>& S, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
-            MatSparse(const Faust::MatDense<FPP,Gpu>& cu_A, SpBlasHandle<Gpu> spblasHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
-            MatSparse(const Faust::MatDense<FPP,Cpu>& A, SpBlasHandle<Gpu> spblasHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
+            MatSparse(const Faust::MatDense<FPP,Gpu>& cu_A, Faust::SpBlasHandle<Gpu> spblasHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
+            MatSparse(const Faust::MatDense<FPP,Cpu>& A, Faust::SpBlasHandle<Gpu> spblasHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
             void resize(const faust_unsigned_int nnz_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const int device_);
             void resize(const faust_unsigned_int nnz_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol);
             void copyFromHost(const int* csrRowPtr_, const int*  csrColInd_, const FPP* csrValues_, const faust_unsigned_int nnz_, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
@@ -55,8 +55,8 @@ namespace Faust
             void operator=(const MatSparse<FPP,Cpu>& S);
             void init(const MatSparse<FPP,Gpu>& cu_S, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
             void init(const MatSparse<FPP,Cpu>& S, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
-            void init(const Faust::MatDense<FPP,Gpu>& cu_A, SpBlasHandle<Gpu> spblasHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
-            void init(const Faust::MatDense<FPP,Cpu>& M, SpBlasHandle<Gpu> spblasHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
+            void init(const Faust::MatDense<FPP,Gpu>& cu_A, Faust::SpBlasHandle<Gpu> spblasHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
+            void init(const Faust::MatDense<FPP,Cpu>& M, Faust::SpBlasHandle<Gpu> spblasHandle, int dstDevice=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t stream=0);
 
 
 
@@ -72,8 +72,8 @@ namespace Faust
 
 
         public:
-            void transpose(SpBlasHandle<Gpu> spblasHandle);
-            void init_from_transpose(const MatSparse<FPP,Gpu>& cu_S, SpBlasHandle<Gpu> spblasHandle);
+            void transpose(Faust::SpBlasHandle<Gpu> spblasHandle);
+            void init_from_transpose(const MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu> spblasHandle);
             FPP norm() const;
             void operator= (const MatSparse<FPP,Gpu>& M);
 

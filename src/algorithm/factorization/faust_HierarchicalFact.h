@@ -16,9 +16,6 @@
    *\tparam FPP scalar numeric type, e.g float or double
    */
 
-template<Device DEVICE> class BlasHandle;
-template<Device DEVICE> class SpBlasHandle;
-
 
 namespace Faust
 {
@@ -30,7 +27,8 @@ namespace Faust
     template<typename FPP,Device DEVICE> class Transform;
 
     template<typename FPP> class StoppingCriterion;
-
+//    template<Device DEVICE> class BlasHandle;
+//    template<Device DEVICE> class SpBlasHandle;
 
     template<typename FPP,Device DEVICE>
     class HierarchicalFact
@@ -38,7 +36,7 @@ namespace Faust
 
        public:
 
-          HierarchicalFact(const Faust::Params<FPP,DEVICE>& params_, BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle);
+          HierarchicalFact(const Faust::Params<FPP,DEVICE>& params_, Faust::BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle);
           void get_facts(Faust::Transform<FPP,DEVICE> &)const;
           void get_facts(std::vector<Faust::MatSparse<FPP,DEVICE> >&)const;
           void get_facts(std::vector<Faust::MatDense<FPP,DEVICE> >& fact)const{fact = palm_global.get_facts();}
@@ -68,8 +66,8 @@ namespace Faust
           bool isFactorizationComputed;
           std::vector<std::vector<FPP> > errors;
           static const char * class_name;
-          BlasHandle<DEVICE> cublas_handle;
-          SpBlasHandle<DEVICE> cusparse_handle;
+          Faust::BlasHandle<DEVICE> cublas_handle;
+          Faust::SpBlasHandle<DEVICE> cusparse_handle;
 
 
     #ifdef __COMPILE_TIMERS__

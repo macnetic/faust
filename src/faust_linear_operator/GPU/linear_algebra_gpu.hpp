@@ -61,7 +61,7 @@ cu_A.t_add_ext.stop();
 
 // compute the biggest eigenvalue of A, A must be semi-definite positive
 template<typename FPP>
-FPP power_iteration(const  Faust::MatDense<FPP,Gpu> & cu_A, const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag, BlasHandle<Gpu> blasHandle)
+FPP power_iteration(const  Faust::MatDense<FPP,Gpu> & cu_A, const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag, Faust::BlasHandle<Gpu> blasHandle)
 {
 
 	#ifdef __COMPILE_TIMERS__
@@ -121,7 +121,7 @@ FPP power_iteration(const  Faust::MatDense<FPP,Gpu> & cu_A, const faust_unsigned
 
 
 template <typename FPP>
-void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y,const FPP alpha, const FPP beta, char typeA, BlasHandle<Gpu> blasHandle)
+void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y,const FPP alpha, const FPP beta, char typeA, Faust::BlasHandle<Gpu> blasHandle)
 {
 	#ifdef __COMPILE_TIMERS__
 		cu_A.t_gemv.start();
@@ -242,7 +242,7 @@ void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x
 
 
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const FPP alpha, const FPP beta, char  typeA, char  typeB, BlasHandle<Gpu> blasHandle)
+void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const FPP alpha, const FPP beta, char  typeA, char  typeB, Faust::BlasHandle<Gpu> blasHandle)
 {
 
 
@@ -427,7 +427,7 @@ void setOp(const Faust::MatSparse<FPP,Gpu>& cu_S, const char opA, faust_unsigned
 }
 
 template <typename FPP>
-void gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, const  FPP alpha, const FPP beta, const char opA, SpBlasHandle<Gpu> spblasHandle)
+void gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, const  FPP alpha, const FPP beta, const char opA, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 #ifdef __COMPILE_TIMERS__
 cu_A.t_csrmv.start();
@@ -525,7 +525,7 @@ cu_A.t_csrmv.stop();
 }
 
 template <typename FPP>
-void gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const  FPP alpha, const FPP beta, const char opA, const char opB, SpBlasHandle<Gpu> spblasHandle)
+void gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const  FPP alpha, const FPP beta, const char opA, const char opB, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 
 #ifdef __COMPILE_TIMERS__
@@ -666,29 +666,29 @@ cu_A.t_csrmm.stop();
 
 // y = op(A) * x
 template <typename FPP>
-void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, char typeA, BlasHandle<Gpu> blasHandle)
+void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, char typeA, Faust::BlasHandle<Gpu> blasHandle)
 {gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), typeA, blasHandle);}
 // y = A * x
 template <typename FPP>
-void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, BlasHandle<Gpu> blasHandle)
+void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::BlasHandle<Gpu> blasHandle)
 {gemv(cu_A, cu_x, cu_y, (FPP)1.0, (FPP)0.0, 'N', blasHandle);}
 // y = A * x
 template <typename FPP>
-void multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, BlasHandle<Gpu> blasHandle)
+void multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::BlasHandle<Gpu> blasHandle)
 {gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), 'N', blasHandle);}
 
 
 // C = op(A) * op(B)
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, char typeA, char typeB, BlasHandle<Gpu> blasHandle)
+void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, char typeA, char typeB, Faust::BlasHandle<Gpu> blasHandle)
 {gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), typeA, typeB, blasHandle);}
 // C = A * B
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, BlasHandle<Gpu> blasHandle)
+void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle)
 {gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle);}
 // C = A * B
 template <typename FPP>
-void multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, BlasHandle<Gpu> blasHandle)
+void multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle)
 {gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle);}
 
 //////////////////////////////////////////////////
@@ -700,32 +700,32 @@ void multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gp
 
 // y = op(A) * x
 template <typename FPP>
-void gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, const char opA, SpBlasHandle<Gpu> spblasHandle)
+void gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, const char opA, Faust::SpBlasHandle<Gpu> spblasHandle)
 {gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), opA, spblasHandle);}
 // y = A * x
 template <typename FPP>
-void gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, SpBlasHandle<Gpu> spblasHandle)
+void gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::SpBlasHandle<Gpu> spblasHandle)
 {gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), 'N', spblasHandle);}
 // y = A * x
 template <typename FPP>
-void multiply(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, SpBlasHandle<Gpu> spblasHandle)
+void multiply(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::SpBlasHandle<Gpu> spblasHandle)
 {gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), 'N', spblasHandle);}
 
 // C = op(A) * op(B) (with A sparse)
 template <typename FPP>
-void gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const char opA, const char opB, SpBlasHandle<Gpu> spblasHandle)
+void gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const char opA, const char opB, Faust::SpBlasHandle<Gpu> spblasHandle)
 {gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), opA, opB, spblasHandle);}
 // C = A * B (with A sparse)
 template <typename FPP>
-void gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, SpBlasHandle<Gpu> spblasHandle)
+void gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::SpBlasHandle<Gpu> spblasHandle)
 {gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', spblasHandle);}
 template <typename FPP>
-void multiply(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, SpBlasHandle<Gpu> spblasHandle)
+void multiply(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::SpBlasHandle<Gpu> spblasHandle)
 { gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', spblasHandle);}
 
 // C = alpha*op(A)*op(B) + beta*C (with B sparse)
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const FPP alpha, const FPP beta, const char opA, const char opB, BlasHandle<Gpu> blasHandle, SpBlasHandle<Gpu> spblasHandle)
+void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const FPP alpha, const FPP beta, const char opA, const char opB, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 	char opAt=(opA=='N')?'T':'N';
 	char opBt=(opB=='N')?'T':'N';
@@ -742,15 +742,15 @@ void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>&
 }
 // C = op(A) * op(B) (with B sparse)
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const char opA, const char opB, BlasHandle<Gpu> blasHandle, SpBlasHandle<Gpu> spblasHandle)
+void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const char opA, const char opB, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
 {gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), opA, opB, blasHandle, spblasHandle);}
 // C = A * B (with B sparse)
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, BlasHandle<Gpu> blasHandle, SpBlasHandle<Gpu> spblasHandle)
+void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
 {gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle, spblasHandle);}
 // C = A * B (with B sparse)
 template <typename FPP>
-void multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, BlasHandle<Gpu> blasHandle, SpBlasHandle<Gpu> spblasHandle)
+void multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
 { gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle, spblasHandle);}
 
 //////////////////////////////////////////////////

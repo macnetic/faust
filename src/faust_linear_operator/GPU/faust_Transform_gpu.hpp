@@ -134,7 +134,7 @@ Faust::Transform<FPP,Gpu>::Transform(const std::vector<Faust::MatDense<FPP,Gpu> 
 
 }*/
 template<typename FPP>
-Faust::MatDense<FPP,Gpu> Faust::Transform<FPP,Gpu>::get_product(BlasHandle<Gpu> blasHandle, SpBlasHandle<Gpu> spblasHandle)const
+Faust::MatDense<FPP,Gpu> Faust::Transform<FPP,Gpu>::get_product(Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)const
 {
 	//complexity of evaluating a Faust::Transform<FPP,Gpu>
 	// from left to right is (dim1*total_nnz)
@@ -340,9 +340,9 @@ void Faust::Transform<FPP,Gpu>::transpose()
 		data[i].transpose();
 }
 
-//void gemv(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_vec<faust_real>& cu_x, faust_cu_vec<faust_real>& cu_y, SpBlasHandle<Gpu> spblasHandle);
+//void gemv(const faust_cu_spmat<faust_real>& cu_A, const faust_cu_vec<faust_real>& cu_x, faust_cu_vec<faust_real>& cu_y, Faust::SpBlasHandle<Gpu> spblasHandle);
 template<typename FPP>
-void Faust::Transform<FPP,Gpu>::mult( const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, SpBlasHandle<Gpu> spblasHandle)
+void Faust::Transform<FPP,Gpu>::mult( const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 	int nb_fact=size();
 	if (nb_fact == 0)

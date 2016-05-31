@@ -112,7 +112,7 @@ t_constructor_from_host.stop();
 
 #ifdef __COMPILE_SPMAT__
 template <typename FPP>
-Faust::MatDense<FPP,Gpu>::MatDense(const Faust::MatSparse<FPP,Gpu>& cu_S,SpBlasHandle<Gpu> spblasHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
+Faust::MatDense<FPP,Gpu>::MatDense(const Faust::MatSparse<FPP,Gpu>& cu_S,Faust::SpBlasHandle<Gpu> spblasHandle, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
 {
 #ifdef __COMPILE_TIMERS__
 t_constructor_from_device.start();
@@ -429,7 +429,7 @@ void Faust::MatDense<FPP,Gpu>::setEyes()
  /// OPERATION BASIQUE ///
 
 template <typename FPP>
-void Faust::MatDense<FPP,Gpu>::transpose(BlasHandle<Gpu> blasHandle)
+void Faust::MatDense<FPP,Gpu>::transpose(Faust::BlasHandle<Gpu> blasHandle)
 {
 
 #ifdef __COMPILE_TIMERS__
@@ -495,7 +495,7 @@ t_transpose.stop();
 }
 
 template <typename FPP>
-void Faust::MatDense<FPP,Gpu>::init_from_transpose(const Faust::MatDense<FPP,Gpu>& cu_A, BlasHandle<Gpu> blasHandle)
+void Faust::MatDense<FPP,Gpu>::init_from_transpose(const Faust::MatDense<FPP,Gpu>& cu_A, Faust::BlasHandle<Gpu> blasHandle)
 {
 #ifdef __COMPILE_TIMERS__
 t_init_from_transpose.start();
@@ -566,7 +566,7 @@ t_init_from_transpose.stop();
 
 #ifdef __COMPILE_SPMAT__
 template <typename FPP>
-void Faust::MatDense<FPP,Gpu>::init_from_transpose(const Faust::MatSparse<FPP,Gpu>& cu_S, SpBlasHandle<Gpu> spblasHandle)
+void Faust::MatDense<FPP,Gpu>::init_from_transpose(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 #ifdef __COMPILE_TIMERS__
 t_init_from_transpose.start();
@@ -859,7 +859,7 @@ t_trace.stop();
 
 
 template <typename FPP>
- FPP Faust::MatDense<FPP,Gpu>::spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag, BlasHandle<Gpu> blasHandle) const
+ FPP Faust::MatDense<FPP,Gpu>::spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag, Faust::BlasHandle<Gpu> blasHandle) const
 {
    #ifdef __COMPILE_TIMERS__
       t_spectral_norm2.start();
@@ -1084,7 +1084,7 @@ void Faust::MatDense<FPP,Gpu>::operator=(const Faust::MatSparse<FPP,Gpu>& S)
 {handleError(class_name, "Faust::MatDense<FPP,Gpu>::operator=(const faust_cu_spmat&) is not defined. Use Faust::MatDense<FPP,Gpu>::init_from_cu_spmat(const faust_cu_spmat&, cusparseHandle_t) instead");}
 
 template <typename FPP>
-void Faust::MatDense<FPP,Gpu>::init_from_cu_spmat(const Faust::MatSparse<FPP,Gpu>& cu_S, SpBlasHandle<Gpu> spblasHandle, const FPP coeff /*=1.0*/)
+void Faust::MatDense<FPP,Gpu>::init_from_cu_spmat(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu> spblasHandle, const FPP coeff /*=1.0*/)
 {
 #ifdef __COMPILE_TIMERS__
 t_operator_equal_from_device.start();
@@ -1215,10 +1215,10 @@ t_operator_equal_from_device.stop();
 
 template <typename FPP>
 void Faust::MatDense<FPP,Gpu>::operator+=(const Faust::MatSparse<FPP,Gpu>& cu_S)
-{handleError(class_name, "Faust::MatDense<FPP,Gpu>::operator+=(const faust_cu_spmat&) is not defined. Use Faust::MatDense<FPP,Gpu>::add(const faust_cu_spmat&, SpBlasHandle<Gpu>) instead");}
+{handleError(class_name, "Faust::MatDense<FPP,Gpu>::operator+=(const faust_cu_spmat&) is not defined. Use Faust::MatDense<FPP,Gpu>::add(const faust_cu_spmat&, Faust::SpBlasHandle<Gpu>) instead");}
 
 template <typename FPP>
-void Faust::MatDense<FPP,Gpu>::add(const Faust::MatSparse<FPP,Gpu>& cu_S, SpBlasHandle<Gpu> spblasHandle)
+void Faust::MatDense<FPP,Gpu>::add(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 #ifdef __COMPILE_TIMERS__
 t_add_cuspmat.start();
@@ -1297,7 +1297,7 @@ void Faust::MatDense<FPP,Gpu>::operator-=(const Faust::MatSparse<FPP,Gpu>& cu_S)
 }
 
 template <typename FPP>
-void Faust::MatDense<FPP,Gpu>::sub(const Faust::MatSparse<FPP,Gpu>& cu_S, SpBlasHandle<Gpu> spblasHandle)
+void Faust::MatDense<FPP,Gpu>::sub(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 #ifdef __COMPILE_TIMERS__
 t_sub.start();
