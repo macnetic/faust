@@ -15,11 +15,6 @@
 //! \brief contains the data of the FAUST method (sparses matrix, lambda, number of non-zeros...) */
 
 
-
-template<Device DEVICE> class BlasHandle;
-template<Device DEVICE> class SpBlasHandle;
-
-
 //! \namespace Faust
 //! \brief Faust namespace contains the principal class of the project.
 namespace Faust
@@ -31,6 +26,8 @@ namespace Faust
     template<typename FPP,Device DEVICE> class Vect;
     template<typename FPP,Device DEVICE> class MatDense;
     template<typename FPP,Device DEVICE> class MatSparse;
+    template<Device DEVICE> class BlasHandle;
+    template<Device DEVICE> class SpBlasHandle;
 
     template<typename FPP>
     class Transform<FPP,Cpu> : public Faust::LinearOperator<FPP,Cpu>
@@ -66,9 +63,9 @@ namespace Faust
         //template<Device DEVICE> class SpBlasHandle;
         /** \brief Perform the product of all factorized matrix. */
         Faust::MatDense<FPP,Cpu> get_product()const;
-        Faust::MatDense<FPP,Cpu> get_product(BlasHandle<Cpu> blas_handle,SpBlasHandle<Cpu> spblas_handle)const;
+        Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const;
         // modif AL AL
-        // Faust::MatDense<FPP,Cpu> get_product(BlasHandle<Cpu> blas_handle,SpBlasHandle<Cpu> spblas_handle)const
+        // Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const
         // {return (*this).get_product();}
         Faust::MatSparse<FPP,Cpu> get_fact(int id) const;
         faust_unsigned_int getNbRow() const;

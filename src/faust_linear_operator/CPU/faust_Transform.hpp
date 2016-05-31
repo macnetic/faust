@@ -9,8 +9,8 @@
 #include <iostream>
 #include "faust_exception.h"
 #include <fstream>
-#include "BlasHandleCPU.h"
-#include "SpBlasHandleCPU.h"
+#include "faust_BlasHandle.h"
+#include "faust_SpBlasHandle.h"
 
 
 
@@ -273,7 +273,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product()const
 }
 
 template<typename FPP>
-Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(BlasHandle<Cpu> blas_handle,SpBlasHandle<Cpu> spblas_handle)const
+Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(Faust::BlasHandle<Cpu> blas_handle, Faust::SpBlasHandle<Cpu> spblas_handle)const
 {
     return (*this).get_product();
 }

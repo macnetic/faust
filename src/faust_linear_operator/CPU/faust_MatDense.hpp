@@ -298,7 +298,7 @@ template<typename FPP>
 
 
 template<typename FPP>
-FPP Faust::MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag,BlasHandle<Cpu> blas_handle/*=BlasHandle<Cpu>()*/) const
+FPP Faust::MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag,Faust::BlasHandle<Cpu> blas_handle/*=Faust::BlasHandle<Cpu>()*/) const
 {
 	#ifdef __COMPILE_FPPIMERS__
 		t_spectral_norm2.start();

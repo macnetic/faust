@@ -2,7 +2,7 @@
 #define LINALGEBRA_H
 
 #include "faust_constant.h"
-#include "BlasHandleCPU.h"
+#include "faust_BlasHandle.h"
 
 
 template<typename FPP,Device DEVICE> class Vect;
@@ -31,7 +31,7 @@ void setOp(const Faust::MatDense<FPP,Cpu>& A, const char opA, faust_unsigned_int
 template<typename FPP>
 void gemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
 template<typename FPP>
-void gemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB,BlasHandle<Cpu> const blas_handle)
+void gemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB, Faust::BlasHandle<Cpu> const blas_handle)
 {gemm(A,B,C,alpha,beta,typeA,typeB);}
 
 
@@ -45,7 +45,7 @@ template<typename FPP>
 void multiply(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C)
 {gemm(A,B,C,(FPP) 1.0,(FPP)0.0,'N','N');}
 template<typename FPP>
-void multiply(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,BlasHandle<Cpu> const handle)
+void multiply(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C, Faust::BlasHandle<Cpu> const handle)
 {multiply(A,B,C);}
 
 
@@ -69,7 +69,7 @@ void gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu>
 template<typename FPP>
 void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 template<typename FPP>
-void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA,BlasHandle<Cpu> & handle)
+void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA,Faust::BlasHandle<Cpu> & handle)
 {gemv(A,x,y,alpha,beta,typeA);}
 
 
@@ -86,7 +86,7 @@ void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faus
 template<typename FPP>
 FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold,faust_int & flag);
 template<typename FPP>
-FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold,faust_int & flag,BlasHandle<Cpu> & handle)
+FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold,faust_int & flag,Faust::BlasHandle<Cpu> & handle)
 {power_iteration(A,nbr_iter_max,threshold,flag);}
 
 

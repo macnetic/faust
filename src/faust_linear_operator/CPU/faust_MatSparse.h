@@ -8,7 +8,7 @@
 #include <vector>
 #include "faust_MatGeneric.h"
 #include "faust_Vect.h"
-#include "SpBlasHandleCPU.h"
+#include "faust_SpBlasHandle.h"
 
 
 // modif AL AL
@@ -107,7 +107,7 @@ namespace Faust
         FPP norm() const {return mat.norm();}
         void operator= (const MatSparse<FPP,Cpu>& M);
         void operator= (const Faust::MatDense<FPP,Cpu>& Mdense);
-        void init (const Faust::MatDense<FPP,Cpu>& Mdense,SpBlasHandle<Cpu> spblas_handle)
+        void init (const Faust::MatDense<FPP,Cpu>& Mdense,Faust::SpBlasHandle<Cpu> spblas_handle)
         {(*this)=Mdense;}
         void operator*=(const FPP alpha);
         void operator/=(const FPP alpha);

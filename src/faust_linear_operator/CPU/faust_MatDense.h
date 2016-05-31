@@ -19,7 +19,7 @@
 #include "faust_Vect.h"
 #include "faust_Transform.h"
 
-#include "BlasHandleCPU.h"
+#include "faust_BlasHandle.h"
 
 /*! \class Faust::MatDense MatDenseDense.h
 * \brief Class template representing dense matrix <br>
@@ -32,7 +32,7 @@ template<typename FPP, Device DEVICE> class MatDense;
 template<typename FPP, Device DEVICE> class MatSparse;
 template<typename FPP, Device DEVICE> class Vect;
 template<typename FPP, Device DEVICE> class Transform;
-template<Device DEVICE> class BlasHandle;
+
 
 //! \fn add
 //! \brief (*this) = (*this) + A
@@ -80,6 +80,7 @@ namespace Faust
 
     template<typename FPP, Device DEVICE>
     class Transform;
+    //template<Device DEVICE> class BlasHandle;
 
     template<typename FPP>
     class MatDense<FPP,Cpu> : public Faust::MatGeneric<FPP,Cpu>
@@ -196,7 +197,7 @@ namespace Faust
         //! \param flag : convergence flag
         //! \return Return the estimated spectral norm (maximum singular value in absolute value) using power iteration algorithm
         //! See also, template<typename FPP> FPP power_iteration(const MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold,faust_int & flag);
-        FPP spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag,BlasHandle<Cpu>  blas_handle=BlasHandle<Cpu>()) const;
+        FPP spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag,Faust::BlasHandle<Cpu>  blas_handle=Faust::BlasHandle<Cpu>()) const;
 
         //! \brief Compute the trace of the MatDense
         //! \return  the trace
