@@ -14,8 +14,8 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include "SpBlasHandleGPU.h"
-#include "BlasHandleCPU.h"
+#include "faust_SpBlasHandle_gpu.h"
+#include "faust_BlasHandle_gpu.h"
 
 //modif AL AL
 //#include "faust_ConstraintInt.h"
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 	blas_handle.Init();
 
 	//cusparseHandle_t cusparseHandle;
-	SpBlasHandle<Gpu> spblas_handle;
+	Faust::SpBlasHandle<Gpu> spblas_handle;
 	spblas_handle.Init();
 
 
