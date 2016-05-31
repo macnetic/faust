@@ -9,8 +9,8 @@
 #include "faust_init_from_matio_core.h"
 #include <string>
 #include <sstream>
-#include "BlasHandleCPU.h"
-#include "SpBlasHandleCPU.h"
+#include "faust_BlasHandle.h"
+#include "faust_SpBlasHandle.h"
 
 
 #include <iostream>
@@ -87,8 +87,8 @@ int main(int argc, char* argv[])
 		epsilon = atof(argv[3]);
 
 	//useless for CPU but use for compatibility with GPU
-	BlasHandle<Cpu> blas_handle;
-	SpBlasHandle<Cpu> spblas_handle;
+	Faust::BlasHandle<Cpu> blas_handle;
+	Faust::SpBlasHandle<Cpu> spblas_handle;
 
 
 	Faust::Params<FPP,Cpu> params;

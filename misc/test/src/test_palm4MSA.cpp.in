@@ -5,7 +5,7 @@
 #include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
 #include "faust_Palm4MSA.h"
-#include "BlasHandleCPU.h"
+#include "faust_BlasHandle.h"
 
 #include <iostream>
 
@@ -71,7 +71,7 @@ int main()
 
   Faust::ParamsPalm<FPP,Cpu> params(data, nfacts, cons, init_fact, crit, verbose, update_way, init_lambda);
 
-  BlasHandle<Cpu> blas_handle;
+  Faust::BlasHandle<Cpu> blas_handle;
 
   Faust::Palm4MSA<FPP,Cpu> palm2(params,blas_handle,true);
 
