@@ -6,7 +6,7 @@
 #include <iterator>
 #include "cuda.h"
 #include "cuda_runtime.h"
-#include "BlasHandleGPU.h"
+#include "faust_BlasHandle_gpu.h"
 
 
 
@@ -17,7 +17,7 @@
 
 
 #ifdef __COMPILE_SPMAT__
-    #include "SpBlasHandleGPU.h"
+    #include "faust_SpBlasHandle_gpu.h"
    // template <typename FPP,Device DEVICE> class faust_spmat;
     template <typename FPP,Device DEVICE> class MatSparse;
 #endif

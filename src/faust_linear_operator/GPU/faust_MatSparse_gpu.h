@@ -13,7 +13,7 @@ template <typename FPP,Device DEVICE> class MatDense;
 #endif
 
 
-#include "Faust::SpBlasHandleGPU.h"
+#include "faust_SpBlasHandle_gpu.h"
 
 //! \class Faust::class MatSparse<FPP,Gpu> faust_MatSparse_gpu.h
 //! \brief Class template representing sparse matrix for GPU processing <br>

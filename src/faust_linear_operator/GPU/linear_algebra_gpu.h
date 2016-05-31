@@ -4,7 +4,7 @@
 #include "faust_constant.h"
 #ifdef __COMPILE_SPMAT__
    #include "cusparse.h"
-   #include "SpBlasHandleGPU.h"
+   #include "faust_SpBlasHandle_gpu.h"
    template<typename FPP,Device DEVICE> class MatSparse;
 #endif
 #include "cublas_v2.h"

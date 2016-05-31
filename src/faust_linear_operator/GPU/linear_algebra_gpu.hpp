@@ -14,7 +14,7 @@
    #include "faust_MatSparse_gpu.h"
 #endif
 #include "faust_exception.h"
-#include "BlasHandleGPU.h"
+#include "faust_BlasHandle_gpu.h"
 
 #ifdef __COMPILE_TIMERS__
     #include "faust_Timer.h"
