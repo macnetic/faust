@@ -15,7 +15,7 @@
 #include "faust_constant.h"
 
 #ifdef __GEMM_WITH_OPENBLAS__
-	#include "cblas_algebra.h"
+	#include "faust_cblas_algebra.h"
 #endif
 
 

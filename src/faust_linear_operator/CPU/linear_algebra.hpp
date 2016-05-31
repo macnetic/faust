@@ -15,7 +15,7 @@
 
 
 #ifdef __GEMM_WITH_OPENBLAS__
-	#include "cblas_algebra.h"
+	#include "faust_cblas_algebra.h"
 #endif
 
 
@@ -250,7 +250,7 @@ void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faus
 	}
 	#else
 
-		cblas_gemv<FPP>(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
+		Faust::cblas_gemv<FPP>(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
 	#endif
 
 
@@ -406,7 +406,7 @@ void gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu>
 			}
 		#else
 			 FPP beta = 0.0;
-			 cblas_gemm<FPP>(CblasColMajor, transA, transB, (int) C.dim1, (int)  C.dim2, (int) nbColOpA, (FPP) alpha, (FPP*) A.getData(), (int) A.dim1, (FPP*) B.getData(), (int) B.dim1,(FPP) beta, (FPP*) C.getData(),(int) C.dim1);
+			 Faust::cblas_gemm<FPP>(CblasColMajor, transA, transB, (int) C.dim1, (int)  C.dim2, (int) nbColOpA, (FPP) alpha, (FPP*) A.getData(), (int) A.dim1, (FPP*) B.getData(), (int) B.dim1,(FPP) beta, (FPP*) C.getData(),(int) C.dim1);
 
 		#endif
 
@@ -492,7 +492,7 @@ void gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu>
 					C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
 			}
 		#else
-			cblas_gemm<FPP>(CblasColMajor, transA, transB, (int) C.dim1,(int)  C.dim2,(int)  nbColOpA,(FPP) alpha,(FPP*)  A.getData(), (int) A.dim1,(FPP*) B.getData(),(int) B.dim1, (FPP) beta, (FPP*) C.getData(), (int)C.dim1);
+			Faust::cblas_gemm<FPP>(CblasColMajor, transA, transB, (int) C.dim1,(int)  C.dim2,(int)  nbColOpA,(FPP) alpha,(FPP*)  A.getData(), (int) A.dim1,(FPP*) B.getData(),(int) B.dim1, (FPP) beta, (FPP*) C.getData(), (int)C.dim1);
 
 
 
