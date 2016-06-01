@@ -14,7 +14,7 @@
 #include "faust_ConstraintMat.h"
 #include "faust_MatDense.h"
 
-#include "linear_algebra.h"
+#include "faust_linear_algebra.h"
 #include "prox.h"
 #include "faust_ConstraintType.h"
 #include "faust_exception.h"
