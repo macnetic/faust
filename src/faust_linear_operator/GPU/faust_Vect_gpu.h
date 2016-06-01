@@ -1,7 +1,7 @@
 #ifndef __FAUST_CU_VEC_H__
 #define __FAUST_CU_VEC_H__
 
-#include "faust_constant.h"
+#include "faust_constant_gpu.h"
 #include <vector>
 #include <iterator>
 #include "cuda.h"
@@ -18,7 +18,6 @@
 
 #ifdef __COMPILE_SPMAT__
     #include "faust_SpBlasHandle_gpu.h"
-   // template <typename FPP,Device DEVICE> class faust_spmat;
     template <typename FPP,Device DEVICE> class MatSparse;
 #endif
 

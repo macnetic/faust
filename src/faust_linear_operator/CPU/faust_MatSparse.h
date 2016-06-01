@@ -36,10 +36,10 @@ template<typename FPP,Device DEVICE> class Transform;
 template<Device DEVICE> class SpBlasHandle;
 
 template<typename FPP>
-void multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
+void Faust::multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
 
 template<typename FPP>
-void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
+void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
 
 //! \namespace Faust
 //! \brief Faust namespace contains the principal class of the project.
@@ -57,7 +57,7 @@ namespace Faust
 
 
         void faust_gemm(const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C, const FPP & alpha, const FPP & beta, char typeA, char typeB)
-        const{spgemm((*this),B,C,alpha,beta,typeA,typeB);}
+        const{Faust::spgemm((*this),B,C,alpha,beta,typeA,typeB);}
         //!  \brief Constructor<br>
         //! Faust::MatSparse is a copy of an other Faust::MatSparse
         template<typename FPP1>
@@ -180,6 +180,7 @@ namespace Faust
         void update_dim(){this->dim1=mat.rows();this->dim2=mat.cols();nnz=mat.nonZeros();}
         static const char * class_name;
 
+
         private:
         Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat;
 
@@ -203,9 +204,8 @@ namespace Faust
         //! *this = S * (*this)
         friend void  Faust::Vect<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& A);
 
-
-        friend void multiply<>(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
-        friend void spgemm<>(const MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
+        friend void Faust::multiply<>(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
+        friend void Faust::spgemm<>(const MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
 
     };
 

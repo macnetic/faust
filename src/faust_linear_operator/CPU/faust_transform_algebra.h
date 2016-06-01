@@ -10,7 +10,7 @@ template<typename FPP,Device DEVICE> class Transform;
 
 
 template<typename FPP>
-FPP power_iteration(const Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max,FPP threshold, int & flag);
+FPP Faust::power_iteration(const Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max,FPP threshold, int & flag);
 
 
 template<typename FPP>

@@ -3,8 +3,7 @@
 
 
 
-#include "linear_algebra.h"
-
+#include "faust_linear_algebra.h"
 
 //#include <cmath>
 #include <iostream>

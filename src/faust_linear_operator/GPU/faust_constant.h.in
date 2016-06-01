@@ -1,5 +1,5 @@
-#ifndef FAUST_CONSTANT_H
-#define FAUST_CONSTANT_H
+#ifndef FAUST_CONSTANT_GPU_H
+#define FAUST_CONSTANT_GPU_H
 
 
 /*! \brief If defined, faust uses single precision for the the algebra (Faust::MatDense, Faust::MatSparse, Faust::Transform). <br>

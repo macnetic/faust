@@ -2,7 +2,7 @@
 #define __FAUST_TOOLS_ALGEBRA_GPU_HPP__
 
 #include <iostream>
-#include "linear_algebra_gpu.h"
+#include "faust_linear_algebra_gpu.h"
 #include "faust_MatDense_gpu.h"
 #include "faust_Vect_gpu.h"
 #include <Eigen/QR>

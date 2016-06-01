@@ -1,30 +1,16 @@
 #ifndef __LINALGEBRA_GPU_HPP__
 #define __LINALGEBRA_GPU_HPP__
 
+#define __COMPILE_SPMAT__
+
 //modif AL
-#include "faust_constant.h"
-
-#include <iostream>
-#include "faust_MatDense_gpu.h"
-
-#include "faust_cuda.h"
-#include "kernels.h"
-
-#ifdef __COMPILE_SPMAT__
-   #include "faust_MatSparse_gpu.h"
-#endif
-#include "faust_exception.h"
-#include "faust_BlasHandle_gpu.h"
-
-#ifdef __COMPILE_TIMERS__
-    #include "faust_Timer.h"
-#endif
+//#include "faust_constant.h"
 
 using namespace std;
 
 
 template <typename FPP>
-void setOp(const Faust::MatDense<FPP,Gpu>& cu_A, const char opA, faust_unsigned_int& opA1, faust_unsigned_int& opA2)
+void Faust::setOp(const Faust::MatDense<FPP,Gpu>& cu_A, const char opA, faust_unsigned_int& opA1, faust_unsigned_int& opA2)
 {
     if(opA == 'N')
     {
@@ -37,18 +23,18 @@ void setOp(const Faust::MatDense<FPP,Gpu>& cu_A, const char opA, faust_unsigned_
         opA2=cu_A.getNbRow();
     }
     else
-        handleError("LinAlgebra_gpu","setOp : invalid character");
+        handleError("LinAlgebra_gpu","Faust::setOp : invalid character");
 }
 
 
 template <typename FPP>
-void add(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C)
+void Faust::add(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C)
 {
 #ifdef __COMPILE_TIMERS__
 cu_A.t_add_ext.start();
 #endif
 	if ((cu_A.getNbCol() != cu_B.getNbCol()) || (cu_A.getNbRow() != cu_B.getNbRow()))
-		handleError("LinAlgebra_gpu"," add : matrix dimension not equal");
+		handleError("LinAlgebra_gpu"," Faust::add : matrix dimension not equal");
 
 	cu_C = cu_A;
 	cu_C += cu_B;
@@ -61,7 +47,7 @@ cu_A.t_add_ext.stop();
 
 // compute the biggest eigenvalue of A, A must be semi-definite positive
 template<typename FPP>
-FPP power_iteration(const  Faust::MatDense<FPP,Gpu> & cu_A, const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag, Faust::BlasHandle<Gpu> blasHandle)
+FPP Faust::power_iteration(const  Faust::MatDense<FPP,Gpu> & cu_A, const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag, Faust::BlasHandle<Gpu> blasHandle)
 {
 
 	#ifdef __COMPILE_TIMERS__
@@ -74,9 +60,9 @@ FPP power_iteration(const  Faust::MatDense<FPP,Gpu> & cu_A, const faust_unsigned
    flag = 0;
 
    if (nbr_iter_max <= 0)
-      handleError("linear_algebra "," power_iteration :  nbr_iter_max <= 0");
+      handleError("linear_algebra "," Faust::power_iteration :  nbr_iter_max <= 0");
    if (nb_col != cu_A.getNbRow())
-      handleError("linear_algebra "," power_iteration : Faust::Transform<T> 1 must be a squared matrix");
+      handleError("linear_algebra "," Faust::power_iteration : Faust::Transform<T> 1 must be a squared matrix");
 
    Faust::Vect<FPP,Gpu> cu_xk(nb_col);
    cu_xk.setOnes();
@@ -100,7 +86,7 @@ FPP power_iteration(const  Faust::MatDense<FPP,Gpu> & cu_A, const faust_unsigned
 		cu_A.t_power_iteration_normalize.stop();
       cu_A.t_power_iteration_gemv.start();
 	#endif
-      gemv(cu_A, cu_xk_norm, cu_xk, blasHandle);
+      Faust::gemv(cu_A, cu_xk_norm, cu_xk, blasHandle);
 	#ifdef __COMPILE_TIMERS__
 		cu_A.t_power_iteration_gemv.stop();
       cu_A.t_power_iteration_dot.start();
@@ -121,7 +107,7 @@ FPP power_iteration(const  Faust::MatDense<FPP,Gpu> & cu_A, const faust_unsigned
 
 
 template <typename FPP>
-void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y,const FPP alpha, const FPP beta, char typeA, Faust::BlasHandle<Gpu> blasHandle)
+void Faust::gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y,const FPP alpha, const FPP beta, char typeA, Faust::BlasHandle<Gpu> blasHandle)
 {
 	#ifdef __COMPILE_TIMERS__
 		cu_A.t_gemv.start();
@@ -130,14 +116,14 @@ void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x
 	int currentGPU;
 	faust_cudaGetDevice(&currentGPU);
 
-   setOp(cu_A, typeA, opA1, opA2);
+   Faust::setOp(cu_A, typeA, opA1, opA2);
    const cublasOperation_t opA = (typeA=='T')?CUBLAS_OP_T:CUBLAS_OP_N;
 
 	if   (opA2 != cu_x.size() )
-		handleError("LinAlgebra_gpu", "gemv : dimension conflict  between matrix op(A) and input vector x");
+		handleError("LinAlgebra_gpu", "Faust::gemv : dimension conflict  between matrix op(A) and input vector x");
 
 	if ( (beta!=0)  &&  (cu_y.size() != opA1))
-		handleError("LinAlgebra_gpu", "gemv : dimension conflict  between matrix op(A) and output vector y");
+		handleError("LinAlgebra_gpu", "Faust::gemv : dimension conflict  between matrix op(A) and output vector y");
 
 
 	if (opA1==0)
@@ -210,7 +196,7 @@ void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x
 	   cu_y_ptr->resize(opA1);
 
 	if(cu_A_ptr->getData()==NULL || cu_x_ptr->getData()==NULL || cu_y_ptr->getData()==NULL)
-		handleError("LinAlgebra_gpu", "gemv : A, x or y is not allocated");
+		handleError("LinAlgebra_gpu", "Faust::gemv : A, x or y is not allocated");
 
 
 		faust_cu_gemv(blasHandle.GetHandle(), opA,
@@ -242,7 +228,7 @@ void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x
 
 
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const FPP alpha, const FPP beta, char  typeA, char  typeB, Faust::BlasHandle<Gpu> blasHandle)
+void Faust::gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const FPP alpha, const FPP beta, char  typeA, char  typeB, Faust::BlasHandle<Gpu> blasHandle)
 {
 
 
@@ -258,10 +244,10 @@ cu_A.t_gemm.start();
 
 
 	if (opA2 != opB1)
-		handleError("LinAlgebra_gpu", "gemm : dimension conflict  between matrix op(A) and matrix op(B)");
+		handleError("LinAlgebra_gpu", "Faust::gemm : dimension conflict  between matrix op(A) and matrix op(B)");
 
 	if ( (beta!=0) && (cu_C.getNbRow()!=opA1 || cu_C.getNbCol()!=opB2) )
-		handleError("LinAlgebra_gpu", "gemm : invalid dimension for output matrix C");
+		handleError("LinAlgebra_gpu", "Faust::gemm : invalid dimension for output matrix C");
 
 
 
@@ -371,14 +357,14 @@ cu_A.t_gemm.start();
    else if (cu_C_ptr->estIdentite())
    {
       if(opA1 != opB2)
-		   handleError("LinAlgebra_gpu", "gemm : cu_C has been set to identite but is not a square matrix");
+		   handleError("LinAlgebra_gpu", "Faust::gemm : cu_C has been set to identite but is not a square matrix");
       cu_C_ptr->resize(opA1,opB2);
       kernel_memset(cu_C_ptr->getData(), (FPP)0.0, cu_C_ptr->getNbRow()*cu_C_ptr->getNbCol());
       kernel_add_diag_const(cu_C_ptr->getData(), (FPP)1.0, cu_C_ptr->getNbRow());
    }
 
 	if(cu_A_ptr->getData()==NULL || cu_B_ptr->getData()==NULL || cu_C_ptr->getData()==NULL)
-		handleError("LinAlgebra_gpu", "gemm : A, B or C is not allocated");
+		handleError("LinAlgebra_gpu", "Faust::gemm : A, B or C is not allocated");
 
    faust_cu_gemm(blasHandle.GetHandle(),
        opA, opB, opA1, opB2, opA2,
@@ -410,7 +396,7 @@ cu_A.t_gemm.stop();
 ///// FUNCTIONS with faust_cu_spmat matrices /////
 
 template <typename FPP>
-void setOp(const Faust::MatSparse<FPP,Gpu>& cu_S, const char opA, faust_unsigned_int& opA1, faust_unsigned_int& opA2)
+void Faust::setOp(const Faust::MatSparse<FPP,Gpu>& cu_S, const char opA, faust_unsigned_int& opA1, faust_unsigned_int& opA2)
 {
     if(opA == 'N')
     {
@@ -423,7 +409,7 @@ void setOp(const Faust::MatSparse<FPP,Gpu>& cu_S, const char opA, faust_unsigned
         opA2=cu_S.getNbRow();
     }
     else
-        handleError("setOp","gemm(const faust_cu_mat&, faust_cu_mat&, ...) : invalid character");
+        handleError("Faust::setOp","Faust::gemm(const faust_cu_mat&, faust_cu_mat&, ...) : invalid character");
 }
 
 template <typename FPP>
@@ -434,7 +420,7 @@ cu_A.t_csrmv.start();
 #endif
    faust_unsigned_int opA1,opA2;
 
-   setOp(cu_A,opA,opA1,opA2);
+   Faust::setOp(cu_A,opA,opA1,opA2);
    const cusparseOperation_t cusparseOpA = (opA=='T')?CUSPARSE_OPERATION_TRANSPOSE:CUSPARSE_OPERATION_NON_TRANSPOSE;
 
    if(opA2 != cu_x.size())
@@ -465,7 +451,7 @@ cu_A.t_csrmv.stop();
 		return;
    }
 
-        //handleError("LinAlgebra_cu","gemv(const faust_cu_vec&, faust_cu_vec&, ...) : vector x has not been initialized");
+        //handleError("LinAlgebra_cu","Faust::gemv(const faust_cu_vec&, faust_cu_vec&, ...) : vector x has not been initialized");
    else
    {
 
@@ -525,7 +511,7 @@ cu_A.t_csrmv.stop();
 }
 
 template <typename FPP>
-void gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const  FPP alpha, const FPP beta, const char opA, const char opB, Faust::SpBlasHandle<Gpu> spblasHandle)
+void Faust::gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const  FPP alpha, const FPP beta, const char opA, const char opB, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 
 #ifdef __COMPILE_TIMERS__
@@ -535,7 +521,7 @@ cu_A.t_csrmm.start();
 
 
     if(opA=='T' && opB=='T')
-        handleError("LinAlgebra_cu","gemm(const faust_cu_spmat&, const faust_cu_mat&, faust_cu_mat&, ...) : cannot compute transpose(A)*transpose(B). Try doing transpose(B*A) after converting A into a full matrix");
+        handleError("LinAlgebra_cu","Faust::gemm(const faust_cu_spmat&, const faust_cu_mat&, faust_cu_mat&, ...) : cannot compute transpose(A)*transpose(B). Try doing transpose(B*A) after converting A into a full matrix");
 
    setOp(cu_A,opA,opA1,opA2);
    setOp(cu_B,opB,opB1,opB2);
@@ -546,10 +532,10 @@ cu_A.t_csrmm.start();
 
 
    if(opA2 != opB1)
-        handleError("LinAlgebra_cu","gemm(const faust_cu_spmat&, const faust_cu_mat&, faust_cu_mat&, ...) : incorrect dimension between A and B");
+        handleError("LinAlgebra_cu","Faust::gemm(const faust_cu_spmat&, const faust_cu_mat&, faust_cu_mat&, ...) : incorrect dimension between A and B");
 
 	if ( (beta!=0) && (cu_C.getNbRow()!=opA1 || cu_C.getNbCol()!=opB2) )
-		handleError("LinAlgebra_cu", "gemm : invalid dimension for output matrix C");
+		handleError("LinAlgebra_cu", "Faust::gemm : invalid dimension for output matrix C");
 
 
 
@@ -602,7 +588,7 @@ cu_A.t_csrmm.stop();
       return;
    }
    else if (cu_B.getData()==NULL)
-      handleError("LinAlgebra_cu","gemm(const faust_cu_spmat&, const faust_cu_mat&, faust_cu_mat&, ...) : matrix B has not been initialized");
+      handleError("LinAlgebra_cu","Faust::gemm(const faust_cu_spmat&, const faust_cu_mat&, faust_cu_mat&, ...) : matrix B has not been initialized");
 
 
    int currentGPU;
@@ -658,7 +644,8 @@ cu_A.t_csrmm.stop();
 cu_A.t_csrmm.stop();
 #endif
 }
-#endif
+
+#endif // __COMPILE_SPMAT__
 
 
 
@@ -666,92 +653,89 @@ cu_A.t_csrmm.stop();
 
 // y = op(A) * x
 template <typename FPP>
-void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, char typeA, Faust::BlasHandle<Gpu> blasHandle)
+void Faust::gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, char typeA, Faust::BlasHandle<Gpu> blasHandle)
 {gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), typeA, blasHandle);}
 // y = A * x
 template <typename FPP>
-void gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::BlasHandle<Gpu> blasHandle)
-{gemv(cu_A, cu_x, cu_y, (FPP)1.0, (FPP)0.0, 'N', blasHandle);}
+void Faust::gemv(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::BlasHandle<Gpu> blasHandle)
+{Faust::gemv(cu_A, cu_x, cu_y, (FPP)1.0, (FPP)0.0, 'N', blasHandle);}
 // y = A * x
 template <typename FPP>
-void multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::BlasHandle<Gpu> blasHandle)
-{gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), 'N', blasHandle);}
+void Faust::multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::BlasHandle<Gpu> blasHandle)
+{Faust::gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), 'N', blasHandle);}
 
 
 // C = op(A) * op(B)
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, char typeA, char typeB, Faust::BlasHandle<Gpu> blasHandle)
-{gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), typeA, typeB, blasHandle);}
+void Faust::gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, char typeA, char typeB, Faust::BlasHandle<Gpu> blasHandle)
+{Faust::gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), typeA, typeB, blasHandle);}
 // C = A * B
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle)
-{gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle);}
+void Faust::gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle)
+{Faust::gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle);}
 // C = A * B
 template <typename FPP>
-void multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle)
-{gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle);}
+void Faust::multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle)
+{Faust::gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle);}
 
 //////////////////////////////////////////////////
 
-
-
 #ifdef __COMPILE_SPMAT__
 ///// FUNCTIONS with faust_cu_spmat matrices /////
-
 // y = op(A) * x
 template <typename FPP>
-void gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, const char opA, Faust::SpBlasHandle<Gpu> spblasHandle)
-{gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), opA, spblasHandle);}
+void Faust::gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, const char opA, Faust::SpBlasHandle<Gpu> spblasHandle)
+{Faust::gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), opA, spblasHandle);}
 // y = A * x
 template <typename FPP>
-void gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::SpBlasHandle<Gpu> spblasHandle)
-{gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), 'N', spblasHandle);}
+void Faust::gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::SpBlasHandle<Gpu> spblasHandle)
+{Faust::gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), 'N', spblasHandle);}
 // y = A * x
 template <typename FPP>
-void multiply(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::SpBlasHandle<Gpu> spblasHandle)
-{gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), 'N', spblasHandle);}
+void Faust::multiply(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::SpBlasHandle<Gpu> spblasHandle)
+{Faust::gemv(cu_A, cu_x, cu_y, FPP(1.0), FPP(0.0), 'N', spblasHandle);}
 
 // C = op(A) * op(B) (with A sparse)
 template <typename FPP>
-void gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const char opA, const char opB, Faust::SpBlasHandle<Gpu> spblasHandle)
-{gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), opA, opB, spblasHandle);}
+void Faust::gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const char opA, const char opB, Faust::SpBlasHandle<Gpu> spblasHandle)
+{Faust::gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), opA, opB, spblasHandle);}
 // C = A * B (with A sparse)
 template <typename FPP>
-void gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::SpBlasHandle<Gpu> spblasHandle)
-{gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', spblasHandle);}
+void Faust::gemm(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::SpBlasHandle<Gpu> spblasHandle)
+{Faust::gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', spblasHandle);}
 template <typename FPP>
-void multiply(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::SpBlasHandle<Gpu> spblasHandle)
-{ gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', spblasHandle);}
+void Faust::multiply(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::MatDense<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::SpBlasHandle<Gpu> spblasHandle)
+{ Faust::gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', spblasHandle);}
 
 // C = alpha*op(A)*op(B) + beta*C (with B sparse)
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const FPP alpha, const FPP beta, const char opA, const char opB, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
+void Faust::gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const FPP alpha, const FPP beta, const char opA, const char opB, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 	char opAt=(opA=='N')?'T':'N';
 	char opBt=(opB=='N')?'T':'N';
 	if(opAt=='T' && opBt=='T')
 	{
 		Faust::MatDense<FPP,Gpu> cu_B_full(cu_B, spblasHandle);
-		gemm(cu_A, cu_B_full, cu_C, alpha, beta, 'N', 'N', blasHandle);
+		Faust::gemm(cu_A, cu_B_full, cu_C, alpha, beta, 'N', 'N', blasHandle);
 	}
 	else
 	{
-		gemm(cu_B, cu_A, cu_C, alpha, beta, opBt, opAt, spblasHandle);
+		Faust::gemm(cu_B, cu_A, cu_C, alpha, beta, opBt, opAt, spblasHandle);
 		cu_C.transpose(blasHandle);
 	}
 }
 // C = op(A) * op(B) (with B sparse)
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const char opA, const char opB, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
-{gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), opA, opB, blasHandle, spblasHandle);}
+void Faust::gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, const char opA, const char opB, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
+{Faust::gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), opA, opB, blasHandle, spblasHandle);}
 // C = A * B (with B sparse)
 template <typename FPP>
-void gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
-{gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle, spblasHandle);}
+void Faust::gemm(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
+{Faust::gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle, spblasHandle);}
 // C = A * B (with B sparse)
 template <typename FPP>
-void multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
-{ gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle, spblasHandle);}
+void Faust::multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatSparse<FPP,Gpu>& cu_B, Faust::MatDense<FPP,Gpu>& cu_C, Faust::BlasHandle<Gpu> blasHandle, Faust::SpBlasHandle<Gpu> spblasHandle)
+{ Faust::gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle, spblasHandle);}
 
 //////////////////////////////////////////////////
 #endif // __COMPILE_SPMAT__

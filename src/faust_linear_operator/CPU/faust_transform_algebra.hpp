@@ -2,7 +2,7 @@
 #define __FAUST_Transform_ALGEBRA_HPP__
 
 #include <iostream>
-#include "linear_algebra.h"
+#include "faust_linear_algebra.h"
 #include "faust_MatDense.h"
 #include "faust_Vect.h"
 #include <Eigen/QR>
@@ -23,7 +23,7 @@
 
 // const char * core_algebra_name="Faust::Transform<FPP,Cpu>_algebra : ";
 template<typename FPP>
-FPP power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max,FPP threshold, int & flag)
+FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max,FPP threshold, int & flag)
 {
 
 
@@ -64,107 +64,107 @@ FPP power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max
 
 }
 
+//////////// modif AL AL
+ template<typename FPP>
+ void Faust::multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult)
+  {
+	 int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB, nb_fact;
 
-// template<typename FPP>
-// void multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const T & alpha, char typeA, char typeMult)
- // {
-	// int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB, nb_fact;
+	 if  ((&(C.mat)) == (&(B.mat)))
+	 {
+		 handleError("Faust::Transform algebra "," Faust::multiply : C is the same object as B");
+	 }
 
-	// if  ((&(C.mat)) == (&(B.mat)))
-	// {
-		// handleError("Faust::Transform algebra "," multiply : C is the same object as B");
-	// }
+	 nb_fact = A.size();
+	 if (nb_fact != 0)
+	 {
+		 if (typeA == 'T')
+		 {
+			 nbRowOpA = A.getNbCol();
+			 nbColOpA = A.getNbRow();
+		 }else
+		 {
+			 nbRowOpA = A.getNbRow();
+			 nbColOpA = A.getNbCol();
+		 }
+	 }
 
-	// nb_fact = A.size();
-	// if (nb_fact != 0)
-	// {
-		// if (typeA == 'T')
-		// {
-			// nbRowOpA = A.getNbCol();
-			// nbColOpA = A.getNbRow();
-		// }else
-		// {
-			// nbRowOpA = A.getNbRow();
-			// nbColOpA = A.getNbCol();
-		// }
-	// }
-
-		// nbRowOpB = B.getNbRow();
-		// nbColOpB = B.getNbCol();
-
-
-	// if (nb_fact != 0)
-	// {
-		// if (typeMult == 'R')
-		// {
-			// if (nbColOpA != nbRowOpB)
-			// {
-				// handleError("Faust::Transform algebra "," multiply :  dimension of Faust::Transform<FPP,Cpu> 1 and Faust::MatSparse mismatch");
-			// }
-		// }else
-		// {
+		 nbRowOpB = B.getNbRow();
+		 nbColOpB = B.getNbCol();
 
 
-			// if (nbColOpB != nbRowOpA)
-			// {
-
-				// handleError("Faust::Transform algebra "," multiply : dimension of Faust::Transform<FPP,Cpu> A and Faust::MatSparse B mismatch");
-			// }
-		// }
-	// }else
-	// {
-		// handleWarning(" Faust::Transform<FPP,Cpu>_algebra : multiply : empty Faust::Transform<FPP,Cpu>");
-	// }
-
-	// if the Faust::Transform<FPP,Cpu> A is empty, it's considere as the identity, so C = equal B, it is useful into the algorithm Faust::Palm4MSA, where the Faust::Transform<FPP,Cpu>s L and R can be empty
-	// C = B;
-	// C.scalarMultiply(alpha);
-	// C.resize(nbRowOpB,nbColOpB);
-	// if (nb_fact != 0)
-	// {
-		// if (typeA == 'T')
-		// {
-			// if(typeMult == 'R')
-			// {
-				// for (int i=0 ; i<nb_fact ; i++)
-				// {
-					// C.mat = A.data[i].mat.transpose() * C.mat;
-				// }
-				// C.resize(nbRowOpA,nbColOpB);
-
-			// }else
-			// {
-				// for (int i=nb_fact-1 ; i>=0 ; i--)
-				// {
-				// C.mat = C.mat * A.data[i].mat.transpose();
-				// }
-				// C.resize(nbRowOpB,nbColOpA);
-			// }
+	 if (nb_fact != 0)
+	 {
+		 if (typeMult == 'R')
+		 {
+			 if (nbColOpA != nbRowOpB)
+			 {
+				 handleError("Faust::Transform algebra "," Faust::multiply :  dimension of Faust::Transform<FPP,Cpu> 1 and Faust::MatSparse mismatch");
+			 }
+		 }else
+		 {
 
 
-		// }else
-		// {
-			// if(typeMult == 'R')
-			// {
-				// for (int i=nb_fact-1 ; i>=0 ; i--)
-				// {
-					// C.mat = A.data[i].mat * C.mat;
-				// }
-				// C.resize(nbRowOpA,nbColOpB);
-			// }else
-			// {
-				// for (int i=0 ; i<nb_fact ; i++)
-				// {
-					// C.mat = C.mat*A.data[i].mat;
-				// }
-				// C.resize(nbRowOpB,nbColOpA);
-			// }
-		// }
-	// }
+			 if (nbColOpB != nbRowOpA)
+			 {
+
+				 handleError("Faust::Transform algebra "," Faust::multiply : dimension of Faust::Transform<FPP,Cpu> A and Faust::MatSparse B mismatch");
+			 }
+		 }
+	 }else
+	 {
+		 handleWarning(" Faust::Transform<FPP,Cpu>_algebra : Faust::multiply : empty Faust::Transform<FPP,Cpu>");
+	 }
+
+	 // if the Faust::Transform<FPP,Cpu> A is empty, it's considere as the identity, so C = equal B, it is useful into the algorithm Faust::Palm4MSA, where the Faust::Transform<FPP,Cpu>s L and R can be empty
+	 C = B;
+	 C.scalarMultiply(alpha);
+	 C.resize(nbRowOpB,nbColOpB);
+	 if (nb_fact != 0)
+	 {
+		 if (typeA == 'T')
+		 {
+			 if(typeMult == 'R')
+			 {
+				 for (int i=0 ; i<nb_fact ; i++)
+				 {
+					 C.mat = A.data[i].mat.transpose() * C.mat;
+				 }
+				 C.resize(nbRowOpA,nbColOpB);
+
+			 }else
+			 {
+				 for (int i=nb_fact-1 ; i>=0 ; i--)
+				 {
+				 C.mat = C.mat * A.data[i].mat.transpose();
+				 }
+				 C.resize(nbRowOpB,nbColOpA);
+			 }
 
 
- // }
+		 }else
+		 {
+			 if(typeMult == 'R')
+			 {
+				 for (int i=nb_fact-1 ; i>=0 ; i--)
+				 {
+					 C.mat = A.data[i].mat * C.mat;
+				 }
+				 C.resize(nbRowOpA,nbColOpB);
+			 }else
+			 {
+				 for (int i=0 ; i<nb_fact ; i++)
+				 {
+					 C.mat = C.mat*A.data[i].mat;
+				 }
+				 C.resize(nbRowOpB,nbColOpA);
+			 }
+		 }
+	 }
 
+
+  }
+//////////// modif AL AL
 
 
 

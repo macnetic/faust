@@ -1,7 +1,7 @@
 #ifndef __FAUST_CU_SPMAT_H__
 #define __FAUST_CU_SPMAT_H__
 
-#include "faust_constant.h"
+#include "faust_constant_gpu.h"
 #include "faust_exception.h"
 #include <vector>
 
@@ -22,12 +22,15 @@ template <typename FPP,Device DEVICE> class MatDense;
 //! \param FPP scalar numeric type, e.g float or double
 
 
-template <typename FPP,Device DEVICE> class MatSparse;
+
 
 //! \namespace Faust
 //! \brief Faust namespace contains the principal class of the project.
 namespace Faust
 {
+
+    template <typename FPP,Device DEVICE> class MatSparse;
+    template <typename FPP,Device DEVICE> class MatDense;
 
     template <typename FPP> class MatSparse<FPP,Gpu>
     {

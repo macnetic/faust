@@ -4,7 +4,7 @@
 #include "faust_Vect.h"
 //#include "faust_HierarchicalFact.h"
 //#include "faust_Params.h"
-#include "linear_algebra.h"
+#include "faust_linear_algebra.h"
 #include "faust_transform_algebra.h"
 #include <iostream>
 #include "faust_exception.h"

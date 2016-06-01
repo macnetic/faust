@@ -1,6 +1,8 @@
 #ifndef SPBLASHANDLE_GPU_H
 #define SPBLASHANDLE_GPU_H
-#include "faust_constant.h"
+
+#include "faust_constant_gpu.h"
+
 #include "cuda.h"
 #include "cusparse.h"
 

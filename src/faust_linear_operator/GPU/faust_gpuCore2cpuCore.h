@@ -1,7 +1,9 @@
 #ifndef __FAUST_GPUCORE_2_CPUCORE_H__
 #define __FAUST_GPUCORE_2_CPUCORE_H__
 
-
+#include "faust_Transform.h"
+#include "faust_Transform_gpu.h"
+#include "faust_gpu2cpu.h"
 
 template<typename FPP,Device DEVICE> class Transform;
 

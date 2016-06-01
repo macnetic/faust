@@ -8,7 +8,7 @@
 #include "faust_exception.h"
 
 // modif AL
-//#include "linear_algebra.h"
+//#include "faust_linear_algebra.h"
 
 #ifdef __COMPILE_TIMERS__
     #include "faust_Timer.h"
@@ -27,7 +27,7 @@
 //template<typename FPP,Device DEVICE>
 //class MatDense;
 //template<typename FPP>
-//void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
+//void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
 
 //! \namespace Faust
@@ -80,11 +80,11 @@ namespace Faust
 
         // multiply (*this) =  A * (*this)
         // modif AL AL
-        //void  multiplyLeft(Faust::MatDense<FPP,Cpu> const& A){gemv(A, *this, *this, 1.0, 0.0, 'N');}
+        //void  multiplyLeft(Faust::MatDense<FPP,Cpu> const& A){Faust::gemv(A, *this, *this, 1.0, 0.0, 'N');}
         //!  \brief
         //! \brief Vect::multiplyLeft is used to replace this by A * (*this)
         //! \param A is a matrix (dense or sparse).
-        void  multiplyLeft(Faust::MatDense<FPP,Cpu> const& A); //{gemv(A, *this, *this, 1.0, 0.0, 'N');}
+        void  multiplyLeft(Faust::MatDense<FPP,Cpu> const& A); //{Faust::gemv(A, *this, *this, 1.0, 0.0, 'N');}
         void  multiplyLeft(Faust::MatSparse<FPP,Cpu> const& A);
 
         FPP sum()const{return vec.sum();}
@@ -112,7 +112,7 @@ namespace Faust
 
         // MODIF AL AL AL
         // friend algebra
-        //friend void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
+        //friend void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
 
         private:

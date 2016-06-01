@@ -28,11 +28,54 @@
 * \tparam T scalar numeric type, e.g float or double
 */
 
+//template<typename FPP, Device DEVICE> class MatDense;
+//template<typename FPP, Device DEVICE> class MatSparse;
+//template<typename FPP, Device DEVICE> class Vect;
+//template<typename FPP, Device DEVICE> class Transform;
+//
+////! \fn add
+////! \brief (*this) = (*this) + A
+//template<typename FPP>
+//void Faust::add(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C);
+//
+////! \fn gemm_core
+////! \brief performs ??
+//template<typename FPP>
+//void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
+//
+////! \fn gemm
+////! \brief performs ??
+//template<typename FPP>
+//void Faust::gemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
+//
+////! \fn multiply
+////! \brief performs ??
+//template<typename FPP>
+//void Faust::multiply(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C);
+//template<typename FPP>
+//void Faust::multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
+//
+////! \fn Faust::gemv
+////! \brief performs ??
+//template<typename FPP>
+//void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
+//
+////! \fn Faust::spgemm
+////! \brief performs ??
+//template<typename FPP>
+//void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB);
+//
+
+//! \namespace Faust
+//! \brief Faust namespace contains the principal class of the project.
+namespace Faust
+{
+
+
 template<typename FPP, Device DEVICE> class MatDense;
 template<typename FPP, Device DEVICE> class MatSparse;
 template<typename FPP, Device DEVICE> class Vect;
 template<typename FPP, Device DEVICE> class Transform;
-
 
 //! \fn add
 //! \brief (*this) = (*this) + A
@@ -56,21 +99,21 @@ void multiply(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> 
 template<typename FPP>
 void multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
 
-//! \fn gemv
+//! \fn Faust::gemv
 //! \brief performs ??
 template<typename FPP>
 void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
-//! \fn spgemm
+//! \fn Faust::spgemm
 //! \brief performs ??
 template<typename FPP>
 void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB);
 
 
-//! \namespace Faust
-//! \brief Faust namespace contains the principal class of the project.
-namespace Faust
-{
+
+
+
+
 
     template<typename FPP, Device DEVICE>
     class MatDense;
@@ -255,13 +298,13 @@ namespace Faust
 //        friend void multiply<>(const MatDense<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C);
 //        friend void spgemm<>(const Faust::MatSparse<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
 //        friend void multiply<>(const Faust::Transform<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
-//        friend void gemv<>(const MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
+//        friend void Faust::gemv<>(const MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 // modif AL AL
-        friend void gemm_core<>(const MatDense<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
-        friend void multiply<>(const MatDense<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C);
-        friend void spgemm<>(const Faust::MatSparse<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
-        friend void multiply<>(const Faust::Transform<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
-        friend void gemv<>(const MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
+        friend void Faust::gemm_core<>(const MatDense<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
+        friend void Faust::multiply<>(const MatDense<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C);
+        friend void Faust::spgemm<>(const Faust::MatSparse<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
+        friend void Faust::multiply<>(const Faust::Transform<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
+        friend void Faust::gemv<>(const MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
 
         bool estIdentite()const{return isIdentity;}

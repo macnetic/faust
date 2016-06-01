@@ -8,7 +8,7 @@ using namespace std;
 
 //modif AL AL
 // modif AL pour ajouter la fonction gemm
-#include "linear_algebra.h"
+#include "faust_linear_algebra.h"
 
 template<typename FPP>
 const char * Faust::Vect<FPP,Cpu>::class_name = "Faust::Vect<FPP,Cpu>::";
@@ -197,7 +197,7 @@ FPP Faust::Vect<FPP,Cpu>::dot(const Faust::Vect<FPP,Cpu>& v) const
 template<typename FPP>
 void  Faust::Vect<FPP,Cpu>::multiplyLeft(Faust::MatDense<FPP,Cpu> const& A)
 {
-   gemv<FPP>(A, *this, *this, 1.0, 0.0, 'N');
+   Faust::gemv<FPP>(A, *this, *this, 1.0, 0.0, 'N');
 }
 
 template<typename FPP>

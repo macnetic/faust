@@ -6,7 +6,8 @@
 
 
 //modif AL AL
-//#include "faust_transform_algebra.h"
+#include "faust_transform_algebra.h"
+
 //#include "faust_Vect.h"
 //#include "faust_MatDense.h"
 //#include "faust_MatSparse.h"
@@ -111,12 +112,12 @@ namespace Faust
 
         // modif AL
         //friend Faust::Vect<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
-        //friend Faust::Vect<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
+        // friend Faust::Vect<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
         //friend Faust::MatDense<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
         //friend Faust::MatDense<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
 
 
-        // friend void multiply<>(const Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
+        friend void Faust::multiply<>(const Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
 
     };
 

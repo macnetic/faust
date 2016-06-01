@@ -1,10 +1,6 @@
 #ifndef __FAUST_GPU_CORE_2_CPU_CORE_HPP__
 #define __FAUST_GPU_CORE_2_CPU_CORE_HPP__
 
-#include "faust_Transform.h"
-#include "faust_Transform_gpu.h"
-#include "faust_gpu2cpu.h"
-
 
 template<typename FPP, typename FPP1>
 void faust_gpu2cpu(Faust::Transform<FPP,Cpu>& fcore, const Faust::Transform<FPP1,Gpu>& cu_fcore)

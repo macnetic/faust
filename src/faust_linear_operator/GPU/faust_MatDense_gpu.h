@@ -1,7 +1,10 @@
 #ifndef MATDENSE_GPU_H
 #define MATDENSE_GPU_H
 
-#include "faust_constant.h"
+
+#include "faust_linear_algebra_gpu.h"
+#include "faust_constant_gpu.h"
+
 #include "faust_exception.h"
 #include <vector>
 #include <iterator>
@@ -9,7 +12,23 @@
 #ifdef __COMPILE_TIMERS__
   #include "faust_Timer_gpu.h"
 #endif
-#include "linear_algebra_gpu.h"
+
+
+
+#include "faust_Vect_gpu.h"
+// #include "faust_MatDense.h"
+#ifdef __COMPILE_SPMAT__
+	#include "faust_MatSparse.h"
+	#include "faust_MatSparse_gpu.h"
+#endif
+
+
+#include "faust_reduce_gpu.h"
+#include "kernels.h"
+#include "faust_cuda.h"
+#include "faust_gpu2cpu.h"
+#include "faust_gpuCore2cpuCore.h"
+
 
 //template<typename FPP, Device DEVICE> class MatDense;
 //template <typename FPP,Device DEVICE> class Vect;

@@ -1,22 +1,26 @@
 #ifndef __MatDense_HPP__
 #define __MatDense_HPP__
 
-#include "faust_Vect_gpu.h"
-#include "faust_MatDense.h"
+
 //#include <cmath>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#ifdef __COMPILE_SPMAT__
-	#include "faust_MatSparse.h"
-	#include "faust_MatSparse_gpu.h"
-#endif
-#include "faust_reduce_gpu.h"
-#include "kernels.h"
-#include "faust_cuda.h"
-#include "faust_gpu2cpu.h"
 
-#include "linear_algebra_gpu.h"
+//#include "faust_Vect_gpu.h"
+//#include "faust_MatDense.h"
+//#ifdef __COMPILE_SPMAT__
+//	#include "faust_MatSparse.h"
+//	#include "faust_MatSparse_gpu.h"
+//#endif
+//
+//
+//#include "faust_reduce_gpu.h"
+//#include "kernels.h"
+//#include "faust_cuda.h"
+//#include "faust_gpu2cpu.h"
+//
+//#include "faust_linear_algebra_gpu.h"
 
 
 using namespace std;

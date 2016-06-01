@@ -2,7 +2,7 @@
 #define __FAUST_Transform_GPU_HPP__
 
 #include "faust_Vect_gpu.h"
-#include "linear_algebra_gpu.h"
+#include "faust_linear_algebra_gpu.h"
 #include "faust_transform_algebra_gpu.h"
 #include <iostream>
 #include "faust_exception.h"

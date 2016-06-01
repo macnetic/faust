@@ -22,7 +22,7 @@
 
 
 template<typename FPP>
-void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)
+void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)
 {
 //#ifdef __COMPILE_TIMERS__
 //	A.t_gemm.start();
@@ -31,7 +31,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
 	if (((&(C.mat)) == (&(B.mat))))
 	{
-		handleError("linear_algebra", " spgemm : C is the same object as A or B");
+		handleError("linear_algebra", " Faust::spgemm : C is the same object as A or B");
 	}
 
 	if (typeA == 'T')
@@ -58,7 +58,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
 	if (nbColOpA != nbRowOpB)
 	{
-		handleError("linear_algebra", "spgemm : dimension conflict  between matrix op(A) and matrix op(B)");
+		handleError("linear_algebra", "Faust::spgemm : dimension conflict  between matrix op(A) and matrix op(B)");
 
 	}
 
@@ -66,7 +66,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 	if ( (beta!=0)  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
 	{
 		//handleError("Linalgebra : gemm : nbRow of op(A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
-		handleError("linear_algebra", "spgemm : invalid dimension for output matrix C");
+		handleError("linear_algebra", "Faust::spgemm : invalid dimension for output matrix C");
 	}
 
         C.resize(nbRowOpA,nbColOpB);
@@ -185,7 +185,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 }
 
 template<typename FPP>
-void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA)
+void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA)
 {
 	faust_unsigned_int nbRowOpA,nbColOpA;
 	const Faust::Vect<FPP,Cpu>* px;
@@ -207,13 +207,13 @@ void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faus
 
 	if   (nbColOpA != px->size() )
 	{
-		//handleError("Linalgebra : gemv : nbCol of op(A) = %d while dim of x = %d",nbColOpA,px->getDim());
-		handleError("linear_algebra", "gemv : dimension conflict  between matrix op(A) and input vector x");
+		//handleError("Linalgebra : Faust::gemv : nbCol of op(A) = %d while dim of x = %d",nbColOpA,px->getDim());
+		handleError("linear_algebra", "Faust::gemv : dimension conflict  between matrix op(A) and input vector x");
 	}
 
 	if ( (beta!=0)  &&  (y.size() != nbRowOpA))
 	{
-		handleError("linear_algebra", "gemv : dimension conflict  between matrix op(A) and output vector y");
+		handleError("linear_algebra", "Faust::gemv : dimension conflict  between matrix op(A) and output vector y");
 	}
 
 	y.resize(nbRowOpA);
@@ -262,21 +262,21 @@ void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faus
 }
 
 template<typename FPP>
-void gemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB)
+void Faust::gemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB)
 {
 	if ( (&C == &A) || (&C == &B) )
 	{
 		Faust::MatDense<FPP,Cpu> Cbis(C);
-		gemm_core(A,B,Cbis,alpha,beta,typeA,typeB);
+		Faust::gemm_core(A,B,Cbis,alpha,beta,typeA,typeB);
 		C=Cbis;
 	}else
-	{gemm_core(A,B,C,alpha,beta,typeA,typeB);}
+	{Faust::gemm_core(A,B,C,alpha,beta,typeA,typeB);}
 }
 
 
 //WARNING matrix C must be a different object from A and B
 template<typename FPP>
-void gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB)
+void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB)
 {
 
 #ifdef __COMPILE_TIMERS__
@@ -315,15 +315,15 @@ void gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu>
 
 	if (nbColOpA != nbRowOpB)
 	{
-		handleError("linear_algebra", "gemm : dimension conflict  between matrix op(A) and matrix op(B)");
+		handleError("linear_algebra", "Faust::gemm : dimension conflict  between matrix op(A) and matrix op(B)");
 
 	}
 
 
 	if ( (beta!=0)  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
 	{
-		//handleError("Linalgebra : gemm : nbRow of op(A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
-		handleError("linear_algebra", "gemm : invalid dimension for output matrix C");
+		//handleError("Linalgebra : Faust::gemm : nbRow of op(A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
+		handleError("linear_algebra", "Faust::gemm : invalid dimension for output matrix C");
 	}
 
         C.resize(nbRowOpA,nbColOpB);
@@ -390,7 +390,7 @@ void gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu>
 
 
 		#ifndef __GEMM_WITH_OPENBLAS__
-		// std::cout<<" A normal gemm"<<std::endl;
+		// std::cout<<" A normal Faust::gemm"<<std::endl;
 			if (typeA == 'N')
 			{
 				if (typeB == 'N')
@@ -509,7 +509,7 @@ A.t_gemm.stop();
 
 
 template<typename FPP>
-void add(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C)
+void Faust::add(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C)
 {
 #ifdef __COMPILE_TIMERS__
 A.t_add_ext.start();
@@ -532,7 +532,7 @@ A.t_add_ext.stop();
 
 // compute the biggest eigenvalue of A, A must be semi-definite positive
 template<typename FPP>
-FPP power_iteration(const  Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag)
+FPP Faust::power_iteration(const  Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag)
 {
 	#ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.start();
@@ -590,7 +590,7 @@ FPP power_iteration(const  Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_in
 
 // non-member operators definitions
 template<typename FPP>
-Faust::Vect<FPP,Cpu> operator*(const Faust::MatDense<FPP,Cpu>& M, const Faust::Vect<FPP,Cpu>& v)
+Faust::Vect<FPP,Cpu> Faust::operator*(const Faust::MatDense<FPP,Cpu>& M, const Faust::Vect<FPP,Cpu>& v)
 {
 	Faust::Vect<FPP,Cpu> vec(v);
 	vec.multiplyLeft(M);

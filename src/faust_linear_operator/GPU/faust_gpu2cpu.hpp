@@ -6,7 +6,6 @@
 #include "faust_Vect_gpu.h"
 #include "faust_MatDense_gpu.h"
 
-
 #ifdef __COMPILE_SPMAT__
    #include "faust_MatSparse.h"
    #include "faust_MatSparse_gpu.h"

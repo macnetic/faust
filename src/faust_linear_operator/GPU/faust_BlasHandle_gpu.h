@@ -1,6 +1,6 @@
 #ifndef BLASHANDLE_GPU_H
 #define BLASHANDLE_GPU_H
-#include "faust_constant.h"
+#include "faust_constant_gpu.h"
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include "cublas_v2.h"

@@ -2,7 +2,7 @@
 #define __FAUST_TIMER_GPU_H__
 
 #include <ctime>
-#include "faust_constant.h"
+#include "faust_constant_gpu.h"
 #include <cuda_runtime.h>
 
 //! \namespace Faust

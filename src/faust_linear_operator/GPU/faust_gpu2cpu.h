@@ -3,9 +3,10 @@
 #include "faust_cuda.h"
 
 
+//modif AL AL
+#include "faust_constant_gpu.h"
+//#include "faust_MatDense_gpu.h"
 
-#include "faust_MatDense_gpu.h"
-#include "faust_constant.h"
 
 // modif AL AL
 template<typename FPP,Device DEVICE> class MatDense;

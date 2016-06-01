@@ -51,7 +51,7 @@ if (FAUST_USE_GPU)
 endif()
 
 # permet de definir ou non les variable de compilation __GEMM_WITH_OPENBLAS__ et FAUST_SINGLE
-configure_file(${FAUST_LINEAR_OPERATOR_GPU_SRC_DIR}/faust_constant.h.in ${FAUST_LINEAR_OPERATOR_GPU_SRC_DIR}/faust_constant.h @ONLY)
+configure_file(${FAUST_LINEAR_OPERATOR_GPU_SRC_DIR}/faust_constant_gpu.h.in ${FAUST_LINEAR_OPERATOR_GPU_SRC_DIR}/faust_constant_gpu.h @ONLY)
 
 
 

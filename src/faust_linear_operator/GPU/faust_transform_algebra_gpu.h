@@ -1,7 +1,7 @@
 #ifndef __FAUST_Transform_ALGEBRA_GPU_H__
 #define __FAUST_Transform_ALGEBRA_GPU_H__
 
-#include "faust_constant.h"
+#include "faust_constant_gpu.h"
 
 template<typename FPP,Device DEVICE> class MatDense;
 template<typename FPP,Device DEVICE> class MatSparse;
