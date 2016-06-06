@@ -22,12 +22,9 @@
 
 
 
-//template<typename FPP,Device DEVICE>
-//class Vect;
-//template<typename FPP,Device DEVICE>
-//class MatDense;
+
 //template<typename FPP>
-//void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
+//
 
 
 //! \namespace Faust
@@ -37,15 +34,18 @@ namespace Faust
 
     template<typename FPP,Device DEVICE>
     class Vect;
-    ////  modif AL AL
+
     template<typename FPP,Device DEVICE>
     class MatDense;
 
     template<typename FPP,Device DEVICE>
     class MatSparse;
+	
+   // friend function of faust_linear_algebra.h	
+   template<typename FPP>	
+   void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);	
 
-    template<typename FPP>
-    Vect<FPP,Cpu> solve(const Faust::MatDense<FPP,Cpu> & A, const Vect<FPP,Cpu> & v);
+
 
 
     template<typename FPP>
@@ -110,9 +110,9 @@ namespace Faust
         const FPP& operator()(faust_unsigned_int i)const{return vec(i);}
         bool equality(Vect<FPP,Cpu> const &x, FPP precision) const;
 
-        // MODIF AL AL AL
+
         // friend algebra
-        //friend void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
+        friend void Faust::gemv<>(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
 
         private:
@@ -130,11 +130,6 @@ namespace Faust
 
 
 
-//template<typename FPP,Device DEVICE>
-//class MatDense;
-// function sp_solve is used to ?? nothing not defined
-//template<typename FPP>
-//void sp_solve(const Faust::MatDense<FPP,Cpu> & A,Faust::Vect<FPP,Cpu> & x, const Faust::Vect<FPP,Cpu> & y);
 
 
 #include "faust_Vect.hpp"

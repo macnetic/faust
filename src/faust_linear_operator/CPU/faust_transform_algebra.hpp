@@ -169,7 +169,7 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
 
 
 template<typename FPP>
-Faust::Vect<FPP,Cpu> operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v)
+Faust::Vect<FPP,Cpu> Faust::operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v)
 {
 	Faust::Vect<FPP,Cpu> vec(v);
 	if (f.size() == 0)
@@ -181,7 +181,7 @@ Faust::Vect<FPP,Cpu> operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::
 }
 
 template<typename FPP>
-Faust::MatDense<FPP,Cpu> operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M)
+Faust::MatDense<FPP,Cpu> Faust::operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M)
 {
 	Faust::MatDense<FPP,Cpu> A(M);
 	if (f.size() == 0)

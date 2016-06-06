@@ -30,6 +30,14 @@ namespace Faust
     template<Device DEVICE> class BlasHandle;
     template<Device DEVICE> class SpBlasHandle;
 
+
+    // forward definition of friend function
+   template<typename FPP>	
+   Faust::Vect<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);	
+   template<typename FPP>
+   Faust::MatDense<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);	   
+
+
     template<typename FPP>
     class Transform<FPP,Cpu> : public Faust::LinearOperator<FPP,Cpu>
     {
@@ -102,37 +110,29 @@ namespace Faust
 
 
 
-        // WARNING
-        // MODIF AL AL data must be private...
-        std::vector<Faust::MatSparse<FPP,Cpu> > data;
+
+        
 
         private:
         long long int totalNonZeros;
         static const char * class_name;
-
-        // modif AL
-        //friend Faust::Vect<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
-        // friend Faust::Vect<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
-        //friend Faust::MatDense<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
-        //friend Faust::MatDense<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
+	std::vector<Faust::MatSparse<FPP,Cpu> > data;
+	
 
 
-        friend void Faust::multiply<>(const Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
 
+
+        
+	// friend function
+	friend Faust::Vect<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
+	friend Faust::MatDense<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
     };
 
 }
 
 
-//// modif AL en premier avt classe Transform mais déja défini dans faust_transform_algebra.h
-//template<typename FPP,Device DEVICE> class MatDense;
-//template<typename FPP,Device DEVICE> class Vect;
-//template<typename FPP,Device DEVICE> class Transform;
-//
-//template<typename FPP>
-//Faust::Vect<FPP,Cpu> operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
-//template<typename FPP>
-//Faust::MatDense<FPP,Cpu> operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
+
+
 
 
 #include "faust_Transform.hpp"
