@@ -2,7 +2,7 @@
 #include "faust_init_from_matio_core.h"
 #include "faust_init_from_matio_mat.h"
 #include "faust_Timer.h"
-#include "linear_algebra.h"
+#include "faust_linear_algebra.h"
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
