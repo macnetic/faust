@@ -1,17 +1,8 @@
 #include "mex.h"
-//#include "mexutils.h"
-#include "HierarchicalFact.h"
-#include "faust_MatDense.h"
-#include "faust_Tools.h"
-#include "faust_ConstraintInt.h"
-#include "faust_ConstraintFPP.h"
-#include "faust_ConstraintMat.h"
-#include "faust_ConstraintGeneric.h"
+#include "faust_HierarchicalFact.h"
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "faust_Params.h"
-#include "faust_constant.h"
 #include "tools_mex.h"
 #include <stdexcept>
 
@@ -22,6 +13,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (typeid(FFPP) == typeid(float))
 	{
 		std::cout<<"FFPP == float"<<std::endl;
+
 	}
 
 	if (typeid(FFPP) == typeid(double))
@@ -61,7 +53,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mxArray    *mxCurrentField,*mxCurrentCons;
 
     // data initialisation
-    Faust::MatDense<FFPP> data;
+    Faust::MatDense<FFPP,Cpu> data;
     if (presentFields[0])
     {
         mxCurrentField = mxGetField(prhs[0],0,"data");
@@ -101,7 +93,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
     //constraints
-    std::vector<std::vector<const Faust::ConstraintGeneric<FFPP>*> > consSS;
+    std::vector<std::vector<const Faust::ConstraintGeneric<FFPP,Cpu>*> > consSS;
     if (presentFields[2])
     {
         mwSize nbRowCons,nbColCons;
@@ -126,7 +118,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         }*/
         //mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
         //Faust::ConstraintGeneric * consToAdd;
-        std::vector<const Faust::ConstraintGeneric<FFPP>*> consS;
+        std::vector<const Faust::ConstraintGeneric<FFPP,Cpu>*> consS;
 
         for (mwSize i=0;i<nbRowCons;i++)
         {
@@ -212,12 +204,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
      // creation des parametres
 	 try{
 		std::cout<<"avant "<<std::endl;
-		Faust::Params<FFPP> params(data,nb_fact,consSS,std::vector<Faust::MatDense<FFPP> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda);
+		Faust::Params<FFPP,Cpu> params(data,nb_fact,consSS,std::vector<Faust::MatDense<FFPP,Cpu> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda);
 
 	 //DisplayParams(params);
      //creation de hierarchical fact
-     std::cout<<"youpi"<<std::endl;
-	 HierarchicalFact<FFPP> hier_fact(params);
+     Faust::BlasHandle<Cpu> blas_handle;
+     Faust::SpBlasHandle<Cpu> spblas_handle;
+
+     Faust::HierarchicalFact<FFPP,Cpu> hier_fact(params,blas_handle,spblas_handle);
      hier_fact.compute_facts();
 
 
@@ -226,11 +220,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
      plhs[0]=mxCreateDoubleScalar((double) lambda);
 
-     std::vector<Faust::MatDense<FFPP> > facts;
+     std::vector<Faust::MatDense<FFPP,Cpu> > facts;
      hier_fact.get_facts(facts);
 
 
-     Faust::MatDense<FFPP> current_fact = facts[0];
+     Faust::MatDense<FFPP,Cpu> current_fact = facts[0];
      mxArray * cellFacts;
      setCellFacts(&cellFacts,facts);
 

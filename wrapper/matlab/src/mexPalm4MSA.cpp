@@ -1,16 +1,11 @@
 #include "mex.h"
 //#include "mexutils.h"
 #include "faust_MatDense.h"
-#include "faust_ConstraintInt.h"
-#include "faust_ConstraintGeneric.h"
-#include "faust_ConstraintFPP.h"
-#include "faust_ConstraintMat.h"
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "faust_ParamsPalm.h"
 #include "faust_constant.h"
-#include "Palm4MSA.h"
+#include "faust_Palm4MSA.h"
 #include <stdexcept>
 #include "tools_mex.h"
 
@@ -56,7 +51,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
     // data initialisation
-    Faust::MatDense<FFPP> data;
+    Faust::MatDense<FFPP,Cpu> data;
     if (presentFields[0])
     {
         mxCurrentField = mxGetField(prhs[0],0,"data");
@@ -94,7 +89,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
     //constraints
-    std::vector<const Faust::ConstraintGeneric<FFPP>*> consS;
+    std::vector<const Faust::ConstraintGeneric<FFPP,Cpu>*> consS;
     if (presentFields[2])
     {
         mwSize nbRowCons,nbColCons;
@@ -147,7 +142,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
 
     //init_facts
-    std::vector<Faust::MatDense<FFPP> > init_facts;
+    std::vector<Faust::MatDense<FFPP,Cpu> > init_facts;
     if (presentFields[4])
     {
          mxCurrentField = mxGetField(prhs[0],0,"init_facts");
@@ -204,9 +199,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
      //creation de hierarchical fact
-    Faust::ParamsPalm<FFPP> params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda);
-	std::cout<<"PASSER3"<<std::endl;
-	Palm4MSA<FFPP> palm(params,false);
+    Faust::ParamsPalm<FFPP,Cpu> params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda);
+	Faust::BlasHandle<Cpu> blas_handle;
+	Faust::Palm4MSA<FFPP,Cpu> palm(params,blas_handle,false);
 	palm.compute_facts();
 
 
@@ -215,11 +210,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
      plhs[0]=mxCreateDoubleScalar((double) lambda);
 
-     std::vector<Faust::MatDense<FFPP> > facts;
+     std::vector<Faust::MatDense<FFPP,Cpu> > facts;
      facts=palm.get_facts();
 
 
-     Faust::MatDense<FFPP> current_fact = facts[0];
+     Faust::MatDense<FFPP,Cpu> current_fact = facts[0];
      mxArray * cellFacts;
      setCellFacts(&cellFacts,facts);
 

@@ -50,7 +50,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(!mxIsCell(prhs[1]))
 			mexErrMsgTxt("input must be a cell-array");
 
-		std::vector<Faust::MatSparse<FFPP> > vec_spmat;
+		std::vector<Faust::MatSparse<FFPP,Cpu> > vec_spmat;
 		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
 		/*if (nb_element == 0)
 			mexWarnMsgTxt("Empty cell array.");
@@ -77,8 +77,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 
 
-		Faust::Transform<FFPP>* F = new Faust::Transform<FFPP>(vec_spmat);
-		plhs[0]=convertPtr2Mat<Faust::Transform<FFPP> >(F);
+		Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>(vec_spmat);
+		plhs[0]=convertPtr2Mat<Faust::Transform<FFPP,Cpu> >(F);
 
 		return;
 	}
@@ -90,7 +90,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (!strcmp("delete", cmd))
 	{
 		// Destroy the C++ object
-		destroyObject<Faust::Transform<FFPP> >(prhs[1]);
+		destroyObject<Faust::Transform<FFPP,Cpu> >(prhs[1]);
 		// Warn if other commands were ignored
 		if (nlhs != 0 || nrhs != 2)
 			mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
@@ -99,7 +99,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
 	// Get the class instance pointer from the second input
-	Faust::Transform<FFPP>* core_ptr = convertMat2Ptr<Faust::Transform<FFPP> >(prhs[1]);
+	Faust::Transform<FFPP,Cpu>* core_ptr = convertMat2Ptr<Faust::Transform<FFPP,Cpu> >(prhs[1]);
 
 	if (!strcmp("size",cmd))
 	{
@@ -121,7 +121,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("get_product : empty faust core");
 		const size_t SIZE_B1 = core_ptr->getNbRow();
         	const size_t SIZE_B2 = core_ptr->getNbCol();
-		Faust::MatDense<FFPP> prod=core_ptr->get_product();
+		Faust::MatDense<FFPP,Cpu> prod=core_ptr->get_product();
 
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
 		if(sizeof(FFPP)==sizeof(float))
@@ -150,9 +150,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			(*core_ptr).transpose();
 		else
 		{
-			Faust::Transform<FFPP>* F = new Faust::Transform<FFPP>((*core_ptr));
+			Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>((*core_ptr));
 			(*F).transpose();
-			plhs[0]=convertPtr2Mat<Faust::Transform<FFPP> >(F);
+			plhs[0]=convertPtr2Mat<Faust::Transform<FFPP,Cpu> >(F);
 		}
 		return;
 
@@ -258,8 +258,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Si prhs[2] est un vecteur
 	if(SIZE_A2 == 1)
 	{
-        Faust::Vect<FFPP> A(SIZE_A1, ptr_data);
-        Faust::Vect<FFPP> B(SIZE_B1);
+        Faust::Vect<FFPP,Cpu> A(SIZE_A1, ptr_data);
+        Faust::Vect<FFPP,Cpu> B(SIZE_B1);
         B = (*core_ptr)*A;
 
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
@@ -276,8 +276,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Si prhs[2] est une matrice
 	else
 	{
-        	Faust::MatDense<FFPP> A(ptr_data, SIZE_A1, SIZE_A2);
-		Faust::MatDense<FFPP> B(SIZE_B1, SIZE_A2);
+        	Faust::MatDense<FFPP,Cpu> A(ptr_data, SIZE_A1, SIZE_A2);
+		Faust::MatDense<FFPP,Cpu> B(SIZE_B1, SIZE_A2);
 		B = (*core_ptr)*A;
 
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};

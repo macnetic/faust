@@ -4,8 +4,7 @@
 #include <iostream>
 #include "faust_constant.h"
 #include <vector>
-#include "faust_StoppingCriterion.h"
-
+#include "faust_ParamsPalm.h"
 
 #ifdef __COMPILE_TIMERS__
     #include "faust_Timer.h"
@@ -22,7 +21,7 @@ namespace Faust
 
     template<typename FPP,Device DEVICE> class ConstraintGeneric;
     template<typename FPP,Device DEVICE> class Params;
-    template<typename FPP,Device DEVICE> class ParamsPalm;
+    //template<typename FPP,Device DEVICE> class ParamsPalm;
     template<typename FPP> class StoppingCriterion;
     //template<Device DEVICE> class BlasHandle;
 

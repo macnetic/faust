@@ -2,36 +2,36 @@
 #define __FAUST_TOOLS_MEX_H__
 
 #include "mex.h"
-#include "faust_MatDense.h"
-#include "faust_MatSparse.h"
 #include <vector>
-#include "faust_Vect.h"
+#include "faust_constant.h"
 
-template<typename T> class ConstraintGeneric;
-template<typename T> class Vect;
-template<typename T> class Params;
-template<typename T> class MatDense;
-template<typename T> class MatSparse;
+namespace Faust {
+	template<typename FPP, Device DEVICE> class ConstraintGeneric;
+	template<typename FPP, Device DEVICE> class Vect;
+	template<typename FPP, Device DEVICE> class Params;
+	template<typename FPP, Device DEVICE> class MatDense;
+	template<typename FPP, Device DEVICE> class MatSparse;
+}
 
-template<typename T>
-void getFaustVec(const mxArray * vec_array,Faust::Vect<T> & vec);
-template<typename T>
-void getFaustMat(const mxArray* Mat_array,Faust::MatDense<T> & Mat);
-template<typename T>
-void getFaustspMat(const mxArray* spMat_array,Faust::MatSparse<T> & S);
-template<typename T>
-mxArray*  FaustMat2mxArray(const Faust::MatDense<T>& M);
-template<typename T>
-void setCellFacts(mxArray ** cellFacts,std::vector<Faust::MatDense<T> > & facts);
-template<typename T>
-void getConstraint(std::vector<const Faust::ConstraintGeneric<T>*> & consS,mxArray* mxCons);
-template<typename T>
-void setVectorFaustMat(std::vector<Faust::MatDense<T> > &vecMat, mxArray *Cells);
-template<typename T>
-void addSpmat(const mxArray * mxMat, std::vector<Faust::MatSparse<T> > &vec_spmat);
+template<typename FPP>
+void getFaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec);
+template<typename FPP>
+void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat);
+template<typename FPP>
+void getFaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S);
+template<typename FPP>
+mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M);
+template<typename FPP>
+void setCellFacts(mxArray ** cellFacts,std::vector<Faust::MatDense<FPP,Cpu> > & facts);
+template<typename FPP>
+void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS,mxArray* mxCons);
+template<typename FPP>
+void setVectorFaustMat(std::vector<Faust::MatDense<FPP,Cpu> > &vecMat, mxArray *Cells);
+template<typename FPP>
+void addSpmat(const mxArray * mxMat, std::vector<Faust::MatSparse<FPP,Cpu> > &vec_spmat);
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
-template<typename T>
-void DisplayParams(const Faust::Params<T> & params);
+template<typename FPP>
+void DisplayParams(const Faust::Params<FPP,Cpu> & params);
 
 #include "tools_mex.hpp"
 

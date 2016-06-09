@@ -8,11 +8,14 @@
 #include "faust_ConstraintMat.h"
 #include "faust_ConstraintInt.h"
 #include "faust_Params.h"
+#include "faust_MatDense.h"
+#include "faust_MatSparse.h"
+#include "faust_Vect.h"
 
 
 
-template<typename T>
-void getFaustVec(const mxArray * vec_array,Faust::Vect<T> & vec)
+template<typename FPP>
+void getFaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec)
 {
 	    int  nbRow,nbCol;
 
@@ -42,25 +45,25 @@ void getFaustVec(const mxArray * vec_array,Faust::Vect<T> & vec)
         mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense vector");
     }
 	const mxClassID V_CLASS_ID = mxGetClassID(vec_array);
-	 T* MatPtr;
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(T))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(T))))
+	 FPP* MatPtr;
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(FPP))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(FPP))))
 	{
-		MatPtr = (T*) mxGetPr(vec_array);
+		MatPtr = (FPP*) mxGetPr(vec_array);
 	}else
 	{
 		if (V_CLASS_ID == mxDOUBLE_CLASS)
 		{
-			MatPtr = (T*) mxCalloc(nbRow,sizeof(T));
+			MatPtr = (FPP*) mxCalloc(nbRow,sizeof(FPP));
 			double* MatPtrDouble =(double*) mxGetPr(vec_array);
 			for (int i=0;i<nbRow*nbCol;i++)
-				MatPtr[i] = (T) MatPtrDouble[i];
+				MatPtr[i] = (FPP) MatPtrDouble[i];
 		}
 		else if (V_CLASS_ID == mxSINGLE_CLASS)
 		{
-			MatPtr = (T*) mxCalloc(nbRow*nbCol,sizeof(T));
+			MatPtr = (FPP*) mxCalloc(nbRow*nbCol,sizeof(FPP));
 			float* MatPtrSingle= (float*) (mxGetData(vec_array));
 			for (int i=0;i<nbRow*nbCol;i++)
-				MatPtr[i] = (T) MatPtrSingle[i];
+				MatPtr[i] = (FPP) MatPtrSingle[i];
 
 
 		}else
@@ -71,8 +74,8 @@ void getFaustVec(const mxArray * vec_array,Faust::Vect<T> & vec)
 
      vec.resize(nbRow);
 
-    memcpy(vec.getData(),MatPtr,nbRow*sizeof(T));
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(T))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(T))))
+    memcpy(vec.getData(),MatPtr,nbRow*sizeof(FPP));
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(FPP))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(FPP))))
 	{
 		mxFree(MatPtr);
 	}
@@ -84,8 +87,8 @@ void getFaustVec(const mxArray * vec_array,Faust::Vect<T> & vec)
 
 
 
-template<typename T>
-void getFaustMat(const mxArray* Mat_array,Faust::MatDense<T> & Mat)
+template<typename FPP>
+void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 {
 
     int  nbRow,nbCol;
@@ -112,25 +115,25 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<T> & Mat)
         mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
     }
 	const mxClassID V_CLASS_ID = mxGetClassID(Mat_array);
-	 T* MatPtr;
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(T))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(T))))
+	 FPP* MatPtr;
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(FPP))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(FPP))))
 	{
-		MatPtr = (T*) mxGetPr(Mat_array);
+		MatPtr = (FPP*) mxGetPr(Mat_array);
 	}else
 	{
 		if (V_CLASS_ID == mxDOUBLE_CLASS)
 		{
-			MatPtr = (T*) mxCalloc(nbRow*nbCol,sizeof(T));
+			MatPtr = (FPP*) mxCalloc(nbRow*nbCol,sizeof(FPP));
 			double* MatPtrDouble =(double*) mxGetPr(Mat_array);
 			for (int i=0;i<nbRow*nbCol;i++)
-				MatPtr[i] = (T) MatPtrDouble[i];
+				MatPtr[i] = (FPP) MatPtrDouble[i];
 		}
 		else if (V_CLASS_ID == mxSINGLE_CLASS)
 		{
-			MatPtr = (T*) mxCalloc(nbRow*nbCol,sizeof(T));
+			MatPtr = (FPP*) mxCalloc(nbRow*nbCol,sizeof(FPP));
 			float* MatPtrSingle= (float*) (mxGetData(Mat_array));
 			for (int i=0;i<nbRow*nbCol;i++)
-				MatPtr[i] = (T) MatPtrSingle[i];
+				MatPtr[i] = (FPP) MatPtrSingle[i];
 
 
 		}else
@@ -141,8 +144,8 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<T> & Mat)
 
      Mat.resize(nbRow,nbCol);
 
-    memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(T));
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(T))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(T))))
+    memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(FPP));
+	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(FPP))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(FPP))))
 	{
 		mxFree(MatPtr);
 	}
@@ -151,8 +154,8 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<T> & Mat)
 
 }
 
-template<typename T>
-void getFaustspMat(const mxArray* spMat_array,Faust::MatSparse<T> & S)
+template<typename FPP>
+void getFaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S)
 {
 	if (!mxIsSparse(spMat_array))
 	{
@@ -186,20 +189,20 @@ void getFaustspMat(const mxArray* spMat_array,Faust::MatSparse<T> & S)
     mexCallMATLAB(0,NULL,1,&mxA,"disp");*/
 }
 
-template<typename T>
-mxArray*  FaustMat2mxArray(const Faust::MatDense<T>& M)
+template<typename FPP>
+mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 {
 		mxArray * mxMat;
-		T * mat_ptr;
+		FPP * mat_ptr;
 		int row,col;
 		row = M.getNbRow();
         col = M.getNbCol();
         mxMat = mxCreateDoubleMatrix(row,col,mxREAL);
-        mat_ptr = (T *) mxCalloc(row*col,sizeof(T));
+        mat_ptr = (FPP *) mxCalloc(row*col,sizeof(FPP));
         memcpy(mat_ptr,M.getData(),row*col*sizeof(double));
         mxSetM(mxMat, row);
         mxSetN(mxMat, col);
-		if (sizeof(double) == sizeof(T))
+		if (sizeof(double) == sizeof(FPP))
 		{
 			mxSetPr(mxMat, (double *)mat_ptr);
 		}else
@@ -220,25 +223,25 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<T>& M)
 
 
 
-template<typename T>
-void setCellFacts(mxArray **  cellFacts,std::vector<Faust::MatDense<T> >& facts)
+template<typename FPP>
+void setCellFacts(mxArray **  cellFacts,std::vector<Faust::MatDense<FPP,Cpu> >& facts)
 {
     int rowFact,colFact;
     int nb_fact = facts.size();
-    Faust::MatDense<T> mat;
+    Faust::MatDense<FPP,Cpu> mat;
     (*cellFacts) = mxCreateCellMatrix(1,nb_fact);
     mxArray * mxMat;
-    T* mat_ptr;
+    FPP* mat_ptr;
 	mwSize dims[2]={0,0};
-	if (sizeof(T) == sizeof(double))
+	if (sizeof(FPP) == sizeof(double))
 	{
 		mxMat = mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL);
-	}else if (sizeof(T) == sizeof(float))
+	}else if (sizeof(FPP) == sizeof(float))
 	{
 		mxMat = mxCreateNumericArray(2,dims,mxSINGLE_CLASS,mxREAL);
 	}else
 	{
-		mexErrMsgTxt("mexFaustMat : setCellFacts : T type must be equal to double or float");
+		mexErrMsgTxt("mexFaustMat : setCellFacts : FPP type must be equal to double or float");
 	}
 
     for (size_t k = 0; k < nb_fact; k++)
@@ -249,9 +252,9 @@ void setCellFacts(mxArray **  cellFacts,std::vector<Faust::MatDense<T> >& facts)
         mxSetM(mxMat, rowFact);
         mxSetN(mxMat, colFact);
 
-        mat_ptr = (T *) mxCalloc(rowFact*colFact,sizeof(T));
+        mat_ptr = (FPP *) mxCalloc(rowFact*colFact,sizeof(FPP));
 
-		memcpy(mat_ptr,mat.getData(),rowFact*colFact*sizeof(T));
+		memcpy(mat_ptr,mat.getData(),rowFact*colFact*sizeof(FPP));
 
 
         mxSetData(mxMat, mat_ptr);
@@ -260,12 +263,12 @@ void setCellFacts(mxArray **  cellFacts,std::vector<Faust::MatDense<T> >& facts)
 
 }
 
-template<typename T>
-void setVectorFaustMat(std::vector<Faust::MatDense<T> > &vecMat,mxArray *Cells)
+template<typename FPP>
+void setVectorFaustMat(std::vector<Faust::MatDense<FPP,Cpu> > &vecMat,mxArray *Cells)
 {
 	mxArray* mxMat;
 	mwSize nb_fact = mxGetNumberOfElements(Cells);
-	Faust::MatDense<T> mat;
+	Faust::MatDense<FPP,Cpu> mat;
 	vecMat.resize(0);
 	mexPrintf("cells_size : %d\n",nb_fact);
 	for (mwSize i=0;i<nb_fact;i++)
@@ -285,8 +288,8 @@ void setVectorFaustMat(std::vector<Faust::MatDense<T> > &vecMat,mxArray *Cells)
 	mexPrintf("fin SetVectorFaustMat\n");
 }
 
-template<typename T>
-void getConstraint(std::vector<const Faust::ConstraintGeneric<T>*> & consS,mxArray* mxCons)
+template<typename FPP>
+void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS,mxArray* mxCons)
 {
     mwSize bufCharLen,nbRowCons,nbColCons,nb_params;
     int status;
@@ -325,23 +328,23 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric<T>*> & consS,mxArr
             mxConsParams=mxGetCell(mxCons,1);
             int  intParameter = (int) (mxGetScalar(mxConsParams)+0.5);
              //mexPrintf("NAME  %s PARAMS %d DIMS : (%d,%d)\n",consName,intParameter,nbRowCons,nbColCons);
-            consS.push_back(new Faust::ConstraintInt<T>(consNameType,intParameter,nbRowCons,nbColCons));
+            consS.push_back(new Faust::ConstraintInt<FPP,Cpu>(consNameType,intParameter,nbRowCons,nbColCons));
             break;
 		}
 		case 1:
 		{
             mxConsParams=mxGetCell(mxCons,1);
-			T realParameter = (T) mxGetScalar(mxConsParams);
-			consS.push_back((new Faust::ConstraintFPP<T>(consNameType,realParameter,nbRowCons,nbColCons)));
+			FPP realParameter = (FPP) mxGetScalar(mxConsParams);
+			consS.push_back((new Faust::ConstraintFPP<FPP,Cpu>(consNameType,realParameter,nbRowCons,nbColCons)));
 
 			break;
 		}
 		case 2 :
 		{
 			mxConsParams=mxGetCell(mxCons,1);
-			Faust::MatDense<T> matParameter;
+			Faust::MatDense<FPP,Cpu> matParameter;
 			getFaustMat(mxConsParams,matParameter);
-			consS.push_back((new Faust::ConstraintMat<T>(consNameType,matParameter,nbRowCons,nbColCons)));
+			consS.push_back((new Faust::ConstraintMat<FPP,Cpu>(consNameType,matParameter,nbRowCons,nbColCons)));
 			break;
 		}
 		default :
@@ -354,15 +357,15 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric<T>*> & consS,mxArr
 
 }
 
-template<typename T>
-void addSpmat(const mxArray * mxMat,std::vector<Faust::MatSparse<T> > &vec_spmat)
+template<typename FPP>
+void addSpmat(const mxArray * mxMat,std::vector<Faust::MatSparse<FPP,Cpu> > &vec_spmat)
 {
 
-	Faust::MatSparse<T> spM;
+	Faust::MatSparse<FPP,Cpu> spM;
 
 	if (!mxIsSparse(mxMat))
 	{
-		Faust::MatDense<T> M;
+		Faust::MatDense<FPP,Cpu> M;
 		getFaustMat(mxMat,M);
 		spM = M;
 	}else
@@ -447,11 +450,11 @@ void addSpmat(const mxArray * mxMat,std::vector<Faust::MatSparse<T> > &vec_spmat
 
 
 
-template<typename T>
-void DisplayParams(const Faust::Params<T> & params)
+template<typename FPP>
+void DisplayParams(const Faust::Params<FPP,Cpu> & params)
 {
     mexPrintf("/////// PARAMS //////\n");
-    Faust::MatDense<T> data = params.data;
+    Faust::MatDense<FPP,Cpu> data = params.data;
 
     int nbRow = data.getNbRow();
     int nbCol = data.getNbCol();
@@ -481,13 +484,13 @@ void DisplayParams(const Faust::Params<T> & params)
 
 			if (params.cons[jl][L]->isConstraintParameterInt())
 			{
-				Faust::ConstraintInt<T>* const_int = (Faust::ConstraintInt<T>*)(params.cons[jl][L]);
+				Faust::ConstraintInt<FPP,Cpu>* const_int = (Faust::ConstraintInt<FPP,Cpu>*)(params.cons[jl][L]);
 				mexPrintf(" parameter : %d",(*const_int).getParameter());
 			}
 
 			if (params.cons[jl][L]->isConstraintParameterReal())
 			{
-				Faust::ConstraintFPP<T>* const_real = (Faust::ConstraintFPP<T>*)(params.cons[jl][L]);
+				Faust::ConstraintFPP<FPP,Cpu>* const_real = (Faust::ConstraintFPP<FPP,Cpu>*)(params.cons[jl][L]);
 				mexPrintf(" parameter : %f",(*const_real).getParameter());
 			}
 			mexPrintf("\n");
