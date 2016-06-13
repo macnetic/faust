@@ -4,7 +4,7 @@
 #include <vector>
 #include<string>
 #include "faust_init_params_from_xml.h"
-#include "Palm4MSA.h"
+#include "faust_Palm4MSA.h"
 #include "faust_Transform.h"
 
 /// Definition of Floating Point Precision
@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	Faust::ParamsPalm<FPP> params;
+	Faust::ParamsPalm<FPP,Cpu> params;
 
 
 	string config_filename(argv[1]);
@@ -54,14 +54,15 @@ int main(int argc, char* argv[])
 	params.check_constraint_validity();
 	cout<<"params initialisé"<<endl;
 	params.Display();
-	Palm4MSA<FPP> palm(params);
+	Faust::BlasHandle<Cpu> blas_handle;
+	Faust::Palm4MSA<FPP,Cpu> palm(params,blas_handle);
 
 
 	palm.compute_facts();
 	cout<<"RMSE : "<<palm.get_RMSE()<<endl;
 	cout<<"lambda="<<std::setprecision(20)<<palm.get_lambda()<<endl;
 
-	Faust::Transform<FPP> faust_facts;
+	Faust::Transform<FPP,Cpu> faust_facts;
 	palm.get_facts(faust_facts);
 	std::cout<<"faust_fact size : "<<faust_facts.size()<<endl;
 	faust_facts.scalarMultiply(palm.get_lambda());

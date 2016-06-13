@@ -9,12 +9,14 @@
 #include <vector>
 #include<string>
 #include "faust_Transform.h"
+#include "faust_MatDense.h"
 
 #include "xml_utils.h"
 
 
-template<typename T>
-void init_params_from_xml(const char * filename,faust_params<T> & params)
+template<typename FPP,Device DEVICE>
+
+void init_params_from_xml(const char * filename,Faust::Params<FPP,DEVICE> & params)
 {
 
 	xmlXPathContextPtr ctxt=get_context(filename);
@@ -43,10 +45,10 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 
 	if (contentS.size() == 1)
 	{
-		Faust::StoppingCriterion<T> stop_crit1((int) xmlXPathCastStringToNumber(contentS[0]));
+		Faust::StoppingCriterion<FPP> stop_crit1((int) xmlXPathCastStringToNumber(contentS[0]));
 		params.stop_crit_2facts = stop_crit1;
 	}else
-		params.stop_crit_2facts = Faust::StoppingCriterion<T>(params.defaultNiter1);
+		params.stop_crit_2facts = Faust::StoppingCriterion<FPP>(params.defaultNiter1);
 
 	// std::cout<<"niter1 : "<<params.stop_crit_2facts.get_crit()<<std::endl;
 
@@ -57,10 +59,10 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 			"init_params_from_xml : invalid file optionnal niter2 tag must be specified at most one time");
 	if (contentS.size() == 1)
 	{
-		Faust::StoppingCriterion<T> stop_crit_global((int) xmlXPathCastStringToNumber(contentS[0]));
+		Faust::StoppingCriterion<FPP> stop_crit_global((int) xmlXPathCastStringToNumber(contentS[0]));
 		params.stop_crit_global = stop_crit_global;
 	}else
-		params.stop_crit_global = Faust::StoppingCriterion<T>(params.defaultNiter2);
+		params.stop_crit_global = Faust::StoppingCriterion<FPP>(params.defaultNiter2);
 
 	// std::cout<<"niter2 : "<<params.stop_crit_global.get_crit()<<std::endl;
 
@@ -106,7 +108,7 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 			handleError("faust_init_params_from_xml",
 			"init_params_from_xml : invalid file, optionnal init_lambda tag must be specified at most one time");
 	if (contentS.size() == 1)
-		params.init_lambda = (T) xmlXPathCastStringToNumber(contentS[0]);
+		params.init_lambda = (FPP) xmlXPathCastStringToNumber(contentS[0]);
 	else
 		params.init_lambda = params.defaultLambda;
 	// std::cout<<"init_lambda : "<<params.init_lambda<<std::endl;
@@ -128,7 +130,7 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 			handleError("faust_init_params_from_xml",
 			"init_params_from_xml : invalid file, optionnal step_size tag must be specified at most one time");
 	if (contentS.size() == 1)
-		params.step_size = (T) xmlXPathCastStringToNumber(contentS[0]);
+		params.step_size = (FPP) xmlXPathCastStringToNumber(contentS[0]);
 	else
 		params.step_size = params.defaultStepSize;
 
@@ -142,7 +144,7 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 
 	requestS_begin.push_back("/hierarchical_fact/constraints/row1/constraint/");
 	requestS_begin.push_back("/hierarchical_fact/constraints/row2/constraint/");
-	vector<vector<const Faust::ConstraintGeneric<T>*> > consSS;
+	vector<vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> > consSS;
 	for (int j=0;j<2;j++)
 	{
 
@@ -156,12 +158,12 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 			handleError("faust_init_params_from_xml",
 			"init_params_from_xml : invalid file constraint each row tag must have nb_fact-1 constraint with each specifying parameter , dim1, dim2,type tags");
 
-		std::vector<const Faust::ConstraintGeneric<T>*> constraintS;
+		std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> constraintS;
 		for (int i=0;i<contentS.size();i++)
 		{
 
 
-			add_constraint<T>(constraintS,(char*) contentS_type[i],(char*)contentS[i],(char*)contentS_dim1[i],(char*)contentS_dim2[i]);
+			add_constraint<FPP,DEVICE>(constraintS,(char*) contentS_type[i],(char*)contentS[i],(char*)contentS_dim1[i],(char*)contentS_dim2[i]);
 		}
 		consSS.push_back(constraintS);
 	}
@@ -173,8 +175,8 @@ void init_params_from_xml(const char * filename,faust_params<T> & params)
 }
 
 
-template<typename T>
-void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<T> & params)
+template<typename FPP,Device DEVICE>
+void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<FPP,DEVICE> & params)
 {
 	xmlXPathContextPtr ctxt=get_context(filename);
 
@@ -211,10 +213,10 @@ void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<T> & para
 
 	if (contentS.size() == 1)
 	{
-		Faust::StoppingCriterion<T> stop_crit1((int) xmlXPathCastStringToNumber(contentS[0]));
+		Faust::StoppingCriterion<FPP> stop_crit1((int) xmlXPathCastStringToNumber(contentS[0]));
 		params.stop_crit = stop_crit1;
 	}else
-		params.stop_crit = Faust::StoppingCriterion<T>(params.defaultNiter);
+		params.stop_crit = Faust::StoppingCriterion<FPP>(params.defaultNiter);
 
 	// std::cout<<"niter1 : "<<params.stop_crit_2facts.get_crit()<<std::endl;
 
@@ -256,7 +258,7 @@ void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<T> & para
 			handleError("faust_init_params_from_xml",
 			"init_params_from_xml : invalid file, optionnal init_lambda tag must be specified at most one time");
 	if (contentS.size() == 1)
-		params.init_lambda = (T) xmlXPathCastStringToNumber(contentS[0]);
+		params.init_lambda = (FPP) xmlXPathCastStringToNumber(contentS[0]);
 	else
 		params.init_lambda = params.defaultLambda;
 		//isConstantStepSize (optionnal)
@@ -276,7 +278,7 @@ void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<T> & para
 			handleError("faust_init_params_from_xml",
 			"init_params_from_xml : invalid file, optionnal step_size tag must be specified at most one time");
 	if (contentS.size() == 1)
-		params.step_size = (T) xmlXPathCastStringToNumber(contentS[0]);
+		params.step_size = (FPP) xmlXPathCastStringToNumber(contentS[0]);
 	else
 		params.step_size = params.defaultStepSize;
 
@@ -297,12 +299,12 @@ void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<T> & para
 			handleError("faust_init_params_from_xml",
 			"init_params_from_xml : invalid file constraint each row tag must have nb_fact-1 constraint with each specifying parameter , dim1, dim2,type tags");
 
-		std::vector<const Faust::ConstraintGeneric<T>*> constraintS;
+		std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> constraintS;
 		for (int i=0;i<contentS.size();i++)
 		{
 
 
-			add_constraint<T>(constraintS,(char*) contentS_type[i],(char*)contentS[i],(char*)contentS_dim1[i],(char*)contentS_dim2[i]);
+			add_constraint<FPP,DEVICE>(constraintS,(char*) contentS_type[i],(char*)contentS[i],(char*)contentS_dim1[i],(char*)contentS_dim2[i]);
 		}
 		params.cons = constraintS;
 
@@ -312,7 +314,7 @@ void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<T> & para
 			"init_params_from_xml : invalid file, optionnal init_fact tag must be specified at most one time");
 	if (contentS.size() == 1)
 	{
-		Faust::Transform<T> init_fact_faust;
+		Faust::Transform<FPP,DEVICE> init_fact_faust;
 		init_fact_faust.init_from_file((char*) contentS[0]);
 		init_fact_faust.get_facts(params.init_fact);
 	}
@@ -326,8 +328,8 @@ void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<T> & para
 
 
 
-template<typename T>
-void add_constraint(std::vector<const Faust::ConstraintGeneric<T>*> & consS,char* type, char * parameter, char* dim1,char* dim2)
+template<typename FPP,Device DEVICE>
+void add_constraint(std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & consS,char* type, char * parameter, char* dim1,char* dim2)
 {
 	int const_type = getTypeConstraint(type);
 
@@ -343,7 +345,7 @@ void add_constraint(std::vector<const Faust::ConstraintGeneric<T>*> & consS,char
 		{
 			int int_parameter;
 			int_parameter =(int) atoi(parameter);
-			consS.push_back(new Faust::ConstraintInt<T>(cons_name,int_parameter,cons_dim1,cons_dim2));
+			consS.push_back(new Faust::ConstraintInt<FPP,DEVICE>(cons_name,int_parameter,cons_dim1,cons_dim2));
 			break;
 		}
 
@@ -351,14 +353,14 @@ void add_constraint(std::vector<const Faust::ConstraintGeneric<T>*> & consS,char
 		// CASE REAL
 		case 1 :
 		{
-			T real_parameter;
-			real_parameter =(T) atof(parameter);
-			consS.push_back(new Faust::ConstraintFPP<T>(cons_name,real_parameter,cons_dim1,cons_dim2));
+			FPP real_parameter;
+			real_parameter =(FPP) atof(parameter);
+			consS.push_back(new Faust::ConstraintFPP<FPP,DEVICE>(cons_name,real_parameter,cons_dim1,cons_dim2));
 			break;
 		}
 		case 2 :
 		{
-			Faust::MatDense<T> mat_parameter;
+			Faust::MatDense<FPP,DEVICE> mat_parameter;
 			mat_parameter.init_from_file(parameter);
 
 			if ( (cons_dim1 != mat_parameter.getNbRow()) || (cons_dim2 != mat_parameter.getNbCol()) )
@@ -366,7 +368,7 @@ void add_constraint(std::vector<const Faust::ConstraintGeneric<T>*> & consS,char
 				handleError("faust_init_params_from_xml","::add_constraint : mat_parameter of the constraint is invalid");
 				exit(EXIT_FAILURE);
 			}
-			consS.push_back(new Faust::ConstraintMat<T>(cons_name,mat_parameter,cons_dim1,cons_dim2));
+			consS.push_back(new Faust::ConstraintMat<FPP,DEVICE>(cons_name,mat_parameter,cons_dim1,cons_dim2));
 			break;
 		}
 		default :

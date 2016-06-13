@@ -1,16 +1,22 @@
-#include <stdlib.h>
-#include "faust_Params.h"
-#include <iostream>
-#include <vector>
-#include <string>
-#include "faust_init_params_from_xml.h"
-#include "HierarchicalFact.h"
-#include "faust_Transform.h"
+#include "faust_MatSparse.h"
+#include "faust_HierarchicalFact.h"
 #include "faust_Timer.h"
+#include "faust_Transform.h"
+//#include "faust_init_from_matio_params.h"
+//#include "faust_init_from_matio_core.h"
+#include <string>
+#include <sstream>
+#include "faust_BlasHandle.h"
+#include "faust_SpBlasHandle.h"
+#include "faust_init_params_from_xml.h"
+
+#include "faust_Timer.h"
+
 
 /// Definition of Floating Point Precision
 typedef double FPP;
 using namespace std;
+
 
 /*! \brief Compute the hierarchical factorization of a given data matrix A in cmdline mode.<br>
 * Projet name is "launch_hierarchical_fact". It is available in the /wrapper/cmd_line/src/*.cpp <br>
@@ -27,7 +33,7 @@ using namespace std;
 */
 int main(int argc, char* argv[])
 {
-	Faust::Params<FPP> params;
+	Faust::Params<FPP,Cpu> params;
 	if (argc < 3)
 	{
 		cerr << "incorrect number of argument (at least to argument must be specified) : 1st argument is the data filename\n second is the configuration filename  " << endl;
@@ -75,16 +81,18 @@ int main(int argc, char* argv[])
 
 	// initialization
 	init_params_from_xml(config_filename.c_str(),params);
-	Faust::MatDense<FPP> data_matrix;
+	Faust::MatDense<FPP,Cpu> data_matrix;
 	data_matrix.init_from_file(data_filename.c_str());
 	if (operator_data=='T')
 		data_matrix.transpose();
 	params.data=data_matrix;
 
 	params.check_constraint_validity();
+	Faust::BlasHandle<Cpu> blas_handle;
+	Faust::SpBlasHandle<Cpu> spblas_handle;
 	std::cout<<"**************** PARAMETER OF HIERARCHICAL_FACT **************** "<<std::endl;
 	params.Display();
-	HierarchicalFact<FPP> hier_fact(params);
+	Faust::HierarchicalFact<FPP,Cpu> hier_fact(params,blas_handle,spblas_handle);
 
 	std::cout<<"****************  FACTORIZATION **************** "<<std::endl;
 	hier_fact.compute_facts();
@@ -92,7 +100,7 @@ int main(int argc, char* argv[])
 	cout<<"lambda="<<std::setprecision(20)<<hier_fact.get_lambda()<<endl;
 
 
-	Faust::Transform<FPP> faust_facts;
+	Faust::Transform<FPP,Cpu> faust_facts;
 	hier_fact.get_facts(faust_facts);
 	faust_facts.scalarMultiply(hier_fact.get_lambda());
 
@@ -103,7 +111,7 @@ int main(int argc, char* argv[])
 		std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
 
 	//relative_error
-	Faust::MatDense<FPP> faust_product;
+	Faust::MatDense<FPP,Cpu> faust_product;
 	faust_product=faust_facts.get_product();
 	faust_product-=data_matrix;
 	FPP relative_error = faust_product.norm()/data_matrix.norm();
@@ -116,9 +124,9 @@ int main(int argc, char* argv[])
 
 		Faust::Timer tdense;
 		Faust::Timer tfaust;
-		Faust::Vect<FPP> x(data_matrix.getNbCol());
-		Faust::Vect<FPP> ydense(data_matrix.getNbRow());
-		Faust::Vect<FPP> yfaust(faust_facts.getNbRow());
+		Faust::Vect<FPP,Cpu> x(data_matrix.getNbCol());
+		Faust::Vect<FPP,Cpu> ydense(data_matrix.getNbRow());
+		Faust::Vect<FPP,Cpu> yfaust(faust_facts.getNbRow());
 		for (int i=0;i<niter_time_comp;i++)
 		{
 			//random initilisation of vector x
