@@ -368,6 +368,7 @@ endif(FAUST_USE_OPENBLAS)
 
 
 ###### test if executable matlab is in the path ######
+if (FAUST_USE_MEX)
 if(UNIX)
 	#message(STATUS "MATLAB_DIR_TMP 1 = ${MATLAB_DIR_TMP}")
 	exec_program("which matlab | xargs echo" OUTPUT_VARIABLE MATLAB_DIR_TMP)
@@ -432,6 +433,7 @@ else()
 	set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
 	message(WARNING "Matlab executable seems not to be in the path. So \"MATLAB_ROOT\" and \"MATLAB_INCLUDE_DIR\" wont'be defined and mex files won't be compiled. if matlab is installed on your computer, please add matlabroot/bin tu the PATH and try again.")	
 endif()
+endif(FAUST_USE_MEX)
 ##################################################################
 
 
