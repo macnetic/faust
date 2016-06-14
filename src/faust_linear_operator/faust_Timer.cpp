@@ -13,7 +13,7 @@ Faust::Timer::Timer() : isRunning(false), result(0.0f), nbCall(0)
    QueryPerformanceFrequency(&frequency);
 #elif !defined(__linux__)
 
-   handleError("Error in Faust::Timer::Timer : OS not supported");
+   handleError(class_name,"Error in Faust::Timer::Timer : OS not supported");
 
 #endif
 
