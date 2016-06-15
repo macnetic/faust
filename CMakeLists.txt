@@ -46,6 +46,7 @@ set(FAUST_USE_SINGLEPRECISION OFF CACHE BOOL "Using single precision instead of 
 set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
 set(FAUST_USE_MEX OFF CACHE BOOL "Generate Mexfiles")
 set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
+set(FAUST_USE_OPENMP ON CACHE BOOL "OpenMP Multithreading")
 set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read mat files")
 set(FAUST_USE_XML OFF CACHE BOOL "Using xml configuration to read xml files")
 set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
@@ -285,9 +286,18 @@ if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR
 	message(STATUS "**********DEBUG mode************")
 else()
 	if (UNIX)	
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -fexceptions -fno-omit-frame-pointer -pthread -fPIC -O2 " CACHE STRING "compile flags" FORCE)
+		if (FAUST_USE_OPENMP)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
+		endif(FAUST_USE_OPENMP)
+					
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -pthread -fPIC -O2 " CACHE STRING "compile flags" FORCE)
+		
+		
 	elseif(WIN32)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  /EHs /openmp /MD /O2" CACHE STRING "compile flags" FORCE)
+		if (FAUST_USE_OPENMP)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
+		endif(FAUST_USE_OPENMP)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  /EHs /MD /O2" CACHE STRING "compile flags" FORCE)
 	else()
 		message(WARNING "Unknown type of plateform for CMAKE_CXX_FLAGS")		
 	endif()
