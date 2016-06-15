@@ -11,10 +11,13 @@ Faust::Timer::Timer() : isRunning(false), result(0.0f), nbCall(0)
 
 #if defined(_WIN32)
    QueryPerformanceFrequency(&frequency);
-#elif !defined(__linux__)
-
+#elif defined(__MACH__)
+   mach_timebase_info_data_t timebase;
+   mach_timebase_info(&timebase);
+   conversion_factor = (double) timebase.numer / ((double) timebase.denom *1e9); 
+#elif defined(__linux__)
+#else
    handleError(class_name,"Error in Faust::Timer::Timer : OS not supported");
-
 #endif
 
 }
@@ -25,8 +28,10 @@ void Faust::Timer::start()
    {
 	  handleError(class_name,"Faust::Timer::start : timer is already started.\n");
    }
-   #if defined(__linux__)
+   #if defined(__linux__) 
       clock_gettime(CLOCK_MONOTONIC, &debut);
+   #elif defined(__MACH__)
+	debut=mach_absolute_time();
    #elif defined(_WIN32)
       QueryPerformanceCounter(&debut);
    #endif
@@ -45,6 +50,10 @@ void Faust::Timer::stop()
       struct timespec fin;
       clock_gettime(CLOCK_MONOTONIC, &fin);
       result += (fin.tv_sec -debut.tv_sec) + (fin.tv_nsec-debut.tv_nsec)/1000000000.0;
+   #elif defined(__MACH__)
+	uint64_t fin;
+	fin = mach_absolute_time();
+	result+=((double) (fin-debut)) * conversion_factor;
    #elif defined(_WIN32)
       LARGE_INTEGER fin;
       QueryPerformanceCounter(&fin);
@@ -62,7 +71,9 @@ void Faust::Timer::reset()
    {
       #if defined(__linux__)
          clock_gettime(CLOCK_MONOTONIC, &debut);
-      #elif defined(_WIN32)
+      #elif defined(__MACH__)
+	debut = mach_absolute_time();
+	#elif defined(_WIN32)
          QueryPerformanceCounter(&debut);
       #endif
       cerr<<class_name<<"reset : timer has been reset while it was running"<<endl;

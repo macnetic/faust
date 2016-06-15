@@ -6,7 +6,14 @@
 
 #if defined(_WIN32)
    #include <windows.h>
+#elif defined(__MACH__)
+   #include <mach/clock.h>
+   #include <mach/mach_time.h>
 #endif
+
+
+
+
 
 /*! \class Faust::Timer
 * \brief The class Faust::Timer propose various Transform to evaluate time processing.
@@ -36,6 +43,9 @@ namespace Faust
             float result;
             #if defined(__linux__)
                 struct timespec debut;
+	    #elif defined(__MACH__)
+		uint64_t debut;
+		double conversion_factor;	
             #elif defined(_WIN32)
                 LARGE_INTEGER debut;
                 LARGE_INTEGER frequency;
@@ -43,6 +53,8 @@ namespace Faust
             faust_unsigned_int nbCall;
 
     };
+
+
 
 }
 
