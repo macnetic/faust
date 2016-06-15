@@ -128,9 +128,8 @@ int main(int argc, char* argv[])
 	int nNB_FACTS=NB_FACTS.getNbRow()*NB_FACTS.getNbCol();
 
 	vector<Faust::MatDense<FPP,Cpu> > Dense_matS(nDIMS);
-	//vector<vector<Faust::Transform> > FcoreS(nRCGS,vector<Faust::Transform>(nDIMS));
-	Faust::Transform<FPP,Cpu> FcoreS[nNB_FACTS][nRCGS][nDIMS];
-
+	//Faust::Transform<FPP,Cpu> FcoreS[nNB_FACTS][nRCGS][nDIMS];
+	vector<Faust::Transform<FPP,Cpu> > FcoreS(nNB_FACTS*nRCGS*nDIMS);
 	stringstream ssInputVarFaust;
 	stringstream ssInputVarDense;
 	string OuputDir="@FAUST_TESTOUTPUT_BIN_DIR@/";
@@ -138,9 +137,9 @@ int main(int argc, char* argv[])
 
 	cout << "loading of dense matrix and faust" << endl;
 
-	for (int k=0;k<nNB_FACTS;k++)
+	for (int n=0;n<nNB_FACTS;n++)
 	{
-		nb_fact = NB_FACTS[k];
+		nb_fact = NB_FACTS[n];
 		cout<<"  NB_FACT : "<<nb_fact<<endl;
 		for (int j=0;j<nDIMS;j++)
 		{
@@ -163,7 +162,8 @@ int main(int argc, char* argv[])
 				ssInputVarFaust<<"Faust_nfact_"<<nb_fact<<"_RCG_"<<RCG<<"_Dim_"<<DIM;
 				//init_faust_core_from_matiofile(Faust::Transform& core, const char* fileName, const char* variableName)
 				init_faust_core_from_matiofile(fc,mat_file.c_str(),ssInputVarFaust.str().c_str());
-				FcoreS[k][i][j]=fc;
+				//FcoreS[k][i][j]=fc;
+				FcoreS[n+i*nNB_FACTS+j*(nNB_FACTS*nRCGS)]=fc;
 			}
 			cout<<endl;
 		}
@@ -208,7 +208,8 @@ int main(int argc, char* argv[])
 					DIM = DIMS[j];
 					Faust::Vect<FPP,Cpu> x(DIM);
 					Dense_mat = Dense_matS[j];
-					Faust::Transform<FPP,Cpu> fc1(FcoreS[n][i][j]);
+					//Faust::Transform<FPP,Cpu> fc1(FcoreS[n][i][j]);
+					Faust::Transform<FPP,Cpu> fc1(FcoreS[n+i*nNB_FACTS+j*(nNB_FACTS*nRCGS)]);					
 					for (int ii=0;ii<DIM;ii++)x[ii]=std::rand()*2.0/RAND_MAX-1;
 					Faust::Vect<FPP,Cpu> y_dense(DIM);
 					Faust::Vect<FPP,Cpu> y_faust(DIM);
