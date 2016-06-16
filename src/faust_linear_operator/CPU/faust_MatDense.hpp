@@ -49,11 +49,9 @@ void Faust::MatDense<FPP,Cpu>::resize(const faust_unsigned_int nbRow,const faust
 #ifdef __COMPILE_TIMERS__
 t_resize.start();
 #endif
-	if ( (nbRow <0) || (nbCol <0) )
-	{
-		handleError(class_name, "resize : new dimensions must be positive");
-	}
-	else if ((this->dim1 != nbRow) || (this->dim2 != nbCol))
+
+	
+	if ((this->dim1 != nbRow) || (this->dim2 != nbCol))
 	{
 		Faust::MatGeneric<FPP,Cpu>::resize(nbRow,nbCol);
 		mat.resize(nbRow,nbCol);
