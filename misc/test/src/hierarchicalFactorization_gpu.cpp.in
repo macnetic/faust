@@ -10,7 +10,7 @@
 #include "faust_Palm4MSA.h"
 #include "faust_HierarchicalFact.h"
 #include "faust_Timer_gpu.h"
-#include "linear_algebra_gpu.h"
+#include "faust_linear_algebra_gpu.h"
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -181,10 +181,10 @@ int main(int argc, char* argv[])
 		{
 
 			tdense.start();
-			gemv(data_matrix,x,ydense,'N',blas_handle);
+			Faust::gemv(data_matrix,x,ydense,'N',blas_handle);
 			tdense.stop();
 
-			gemv(faust_product,x,ycomp,'N',blas_handle);
+			Faust::gemv(faust_product,x,ycomp,'N',blas_handle);
 
 	 		tfaust.start();
 			hier_fact_core.mult(x,yfaust,spblas_handle);
