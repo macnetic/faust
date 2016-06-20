@@ -6,7 +6,10 @@
 #include "faust_exception.h"
 #include "faust_Vect.h"
 
-
+/** \brief faust_prox.h contains the projection operator: <br>
+*   PALM relies on projections onto the constraint sets for each factor at each iteration, <br>
+*   so the projection operator should be simple and easy to compute.
+*/
 namespace Faust {
 
     template<typename FPP>

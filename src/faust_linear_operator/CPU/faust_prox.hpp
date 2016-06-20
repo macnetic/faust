@@ -21,7 +21,7 @@ void Faust::sort_idx(const std::vector<FPP> &v, std::vector<int>& idx, int s)
       for (int i=0 ; i<v.size() ; i++)
           vec_pair[i] = std::make_pair(i,v[i]);
 
-      std::partial_sort(vec_pair.begin(), vec_pair.begin()+s, vec_pair.end(),partial_sort_comp<FPP>);
+      std::partial_sort(vec_pair.begin(), vec_pair.begin()+s, vec_pair.end(),Faust::partial_sort_comp<FPP>);
       idx.resize(s);
       for (int i=0 ; i<s ; i++)
           idx[i]=vec_pair[i].first;
@@ -42,7 +42,7 @@ void Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 		{
 		const std::vector<FPP> vec(M.getData(), M.getData()+nb_elt_mat);
 		std::vector<int> index;
-		sort_idx(vec, index, k);
+		Faust::sort_idx(vec, index, k);
 		index.erase(index.begin()+k, index.end());
 
 		M.setZeros();
@@ -57,7 +57,7 @@ void Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 template<typename FPP>
 void Faust::prox_spcol(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
-	prox_spcol_normfree(M,k);
+	Faust::prox_spcol_normfree(M,k);
 	M.normalize();
 
 }
@@ -81,7 +81,7 @@ void Faust::prox_spcol_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int 
 			for (int j=0 ; j < dim2 ; j++)
 			{
 				mat[j].assign(M.getData()+j*dim1, M.getData()+(j+1)*dim1);
-				sort_idx(mat[j], index[j], k);
+				Faust::sort_idx(mat[j], index[j], k);
 				index[j].erase(index[j].begin()+k, index[j].end());
 			}
 			M.setZeros();
@@ -98,7 +98,7 @@ void Faust::prox_spcol_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int 
 template<typename FPP>
 void Faust::prox_splin_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
-		const faust_unsigned_int dim1 = M.getNbRow();
+	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
 	const faust_unsigned_int nb_elt_mat = dim1*dim2;
 	if (k<=0)
@@ -113,7 +113,7 @@ void Faust::prox_splin_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int 
 			{
 				for (int j=0 ; j<dim2 ; j++)
 					mat[i][j] = M.getData()[j*dim1+i];
-				sort_idx(mat[i], index[i], k);
+				Faust::sort_idx(mat[i], index[i], k);
 				index[i].erase(index[i].begin()+k, index[i].end());
 			}
 			M.setZeros();
@@ -129,7 +129,7 @@ void Faust::prox_splin_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int 
 template<typename FPP>
 void Faust::prox_splin(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
-	prox_splin_normfree(M,k);
+	Faust::prox_splin_normfree(M,k);
 	M.normalize();
 
 }
@@ -142,8 +142,8 @@ void Faust::prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k)
 	Faust::MatDense<FPP,Cpu> Msplin = M;
 
 
-	prox_spcol_normfree(Mspcol,k);
-	prox_splin_normfree(Msplin,k);
+	Faust::prox_spcol_normfree(Mspcol,k);
+	Faust::prox_splin_normfree(Msplin,k);
 
 	//Msplin.transpose();
 	//prox_spcol_normfree(Msplin,k);
@@ -169,7 +169,7 @@ void Faust::prox_normcol(Faust::MatDense<FPP,Cpu> & M,FPP s)
 	faust_unsigned_int dim2 = M.getNbCol();
 	if (s<0)
 	{
-		handleError("prox : ","prox_normcol : s < 0 ");
+		handleError("prox : ","Faust::prox_normcol : s < 0 ");
 	}
 
 
@@ -207,7 +207,7 @@ template<typename FPP>
 void Faust::prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP s)
 {
 	M.transpose();
-	prox_normcol(M,s);
+	Faust::prox_normcol(M,s);
 	M.transpose();
 
 }
@@ -221,7 +221,7 @@ void Faust::prox_sp_pos(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 		if (ptr_data[i] < 0)
 			ptr_data[i]=0;
 
-	prox_sp(M,k);
+	Faust::prox_sp(M,k);
 
 }
 
@@ -235,7 +235,7 @@ void Faust::prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,int k)
 	faust_unsigned_int Msize = M.getNbRow();
 	if (Msize != M.getNbCol())
 	{
-		handleError("prox : ","prox_blkdiag : input matrix must be square");
+		handleError("prox : ","Faust::prox_blkdiag : input matrix must be square");
 	}
 
 	int sizeblock = Msize/k;
@@ -274,7 +274,7 @@ void Faust::prox_supp(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu
 {
 	if ( (supp.getNbRow() != M.getNbRow()) || (supp.getNbCol() != M.getNbCol()) )
 	{
-		handleError("prox : ","prox_supp : dimensions of the matrix are not equal");
+		handleError("prox : ","Faust::prox_supp : dimensions of the matrix are not equal");
 	}
 	M.scalarMultiply(supp);
 	M.normalize();
