@@ -9,13 +9,13 @@
 // const char * interface_prox_name="prox : ";
 
 template<typename FPP>
-inline bool partial_sort_comp (const std::pair<int, FPP>& pair1, const std::pair<int, FPP>& pair2)
+inline bool Faust::partial_sort_comp (const std::pair<int, FPP>& pair1, const std::pair<int, FPP>& pair2)
 {
    return fabs(pair1.second) > fabs(pair2.second);
 }
 
 template<typename FPP>
-void sort_idx(const std::vector<FPP> &v, std::vector<int>& idx, int s)
+void Faust::sort_idx(const std::vector<FPP> &v, std::vector<int>& idx, int s)
 {
       std::vector<std::pair<int, FPP> > vec_pair(v.size());
       for (int i=0 ; i<v.size() ; i++)
@@ -28,7 +28,7 @@ void sort_idx(const std::vector<FPP> &v, std::vector<int>& idx, int s)
 }
 
 template<typename FPP>
-void prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+void Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
@@ -55,7 +55,7 @@ void prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 }
 
 template<typename FPP>
-void prox_spcol(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+void Faust::prox_spcol(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
 	prox_spcol_normfree(M,k);
 	M.normalize();
@@ -64,7 +64,7 @@ void prox_spcol(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 
 
 template<typename FPP>
-void prox_spcol_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+void Faust::prox_spcol_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
@@ -96,7 +96,7 @@ void prox_spcol_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 }
 
 template<typename FPP>
-void prox_splin_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+void Faust::prox_splin_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
 		const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
@@ -127,7 +127,7 @@ void prox_splin_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 }
 
 template<typename FPP>
-void prox_splin(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+void Faust::prox_splin(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
 	prox_splin_normfree(M,k);
 	M.normalize();
@@ -136,7 +136,7 @@ void prox_splin(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 
 
 template<typename FPP>
-void prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k)
+void Faust::prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k)
 {
 	Faust::MatDense<FPP,Cpu> Mspcol = M;
 	Faust::MatDense<FPP,Cpu> Msplin = M;
@@ -162,7 +162,7 @@ void prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k)
 
 
 template<typename FPP>
-void prox_normcol(Faust::MatDense<FPP,Cpu> & M,FPP s)
+void Faust::prox_normcol(Faust::MatDense<FPP,Cpu> & M,FPP s)
 {
 
 	faust_unsigned_int dim1 = M.getNbRow();
@@ -204,7 +204,7 @@ void prox_normcol(Faust::MatDense<FPP,Cpu> & M,FPP s)
 }
 
 template<typename FPP>
-void prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP s)
+void Faust::prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP s)
 {
 	M.transpose();
 	prox_normcol(M,s);
@@ -213,7 +213,7 @@ void prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP s)
 }
 
 template<typename FPP>
-void prox_sp_pos(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+void Faust::prox_sp_pos(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
 	FPP*const ptr_data = M.getData();
 	//treshold de la matrice
@@ -229,7 +229,7 @@ void prox_sp_pos(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 
 // M needs to be square and k must divide dimension of M
 template<typename FPP>
-void prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,int k)
+void Faust::prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,int k)
 {
 	faust_unsigned_int i,j;
 	faust_unsigned_int Msize = M.getNbRow();
@@ -270,7 +270,7 @@ void prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,int k)
 
 
 template<typename FPP>
-void prox_supp(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & supp)
+void Faust::prox_supp(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & supp)
 {
 	if ( (supp.getNbRow() != M.getNbRow()) || (supp.getNbCol() != M.getNbCol()) )
 	{
