@@ -115,19 +115,19 @@ void Faust::ConstraintInt<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
    switch (this->constraint_name)
    {
       case CONSTRAINT_NAME_SP:
-         prox_sp(mat,parameter);
+         Faust::prox_sp(mat,parameter);
          break;
       case CONSTRAINT_NAME_SPCOL:
-         prox_spcol(mat,parameter);
+         Faust::prox_spcol(mat,parameter);
          break;
       case CONSTRAINT_NAME_SPLIN:
-         prox_splin(mat,parameter);
+         Faust::prox_splin(mat,parameter);
          break;
       case CONSTRAINT_NAME_SPLINCOL:
-         prox_splincol(mat,parameter);
+         Faust::prox_splincol(mat,parameter);
          break;
       case CONSTRAINT_NAME_SP_POS:
-         prox_sp_pos(mat,parameter);
+         Faust::prox_sp_pos(mat,parameter);
          break;
       default:
 		handleError(class_name,"project : cannot project with this constraint name");

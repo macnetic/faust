@@ -8,10 +8,10 @@
 
 #ifdef __COMPILE_GPU__
    #include "faust_MatDense_gpu.h"
-   #include "prox_gpu.h"
+   #include "faust_prox_gpu.h"
 #else
    #include "faust_MatDense.h"
-   #include "prox.h"
+   #include "faust_prox.h"
 #endif
 
 

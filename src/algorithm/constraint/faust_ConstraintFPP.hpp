@@ -96,10 +96,10 @@ void Faust::ConstraintFPP<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
 	switch (this->constraint_name)
    	{
       		case CONSTRAINT_NAME_NORMCOL:
-         		prox_normcol(mat,parameter);
+         		Faust::prox_normcol(mat,parameter);
          	break;
       		case CONSTRAINT_NAME_NORMLIN:
-         		prox_normlin(mat,parameter);
+         		Faust::prox_normlin(mat,parameter);
          	break;
       		default:
          		handleError(class_name,"project : invalid constraint name");
