@@ -2,14 +2,6 @@
 #define __LINALGEBRA_GPU_HPP__
 
 
-
-//modif AL
-//#define __COMPILE_SPMAT__
-//#include "faust_linear_algebra_gpu.h"
-
-//#include "faust_constant.h"
-
-
 using namespace std;
 
 
