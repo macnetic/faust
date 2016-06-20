@@ -3,9 +3,9 @@
 
 
 //modif ALAL
-#define __COMPILE_SPMAT__
-
+//#define __COMPILE_SPMAT__
 #include "faust_constant_gpu.h"
+
 
 #ifdef __COMPILE_SPMAT__
    #include "cusparse.h"
@@ -183,7 +183,7 @@ namespace Faust
 //------------- INLINE DEFINITIONS -------------//
 //----------------------------------------------//
 
-// because of header include issues, the definition of inline functions have been moved to the end LinAlgebra_cu.hpp
+// because of header include issues, the definition of inline functions have been moved to the end faust_linear_algebra_gpu.hpp
 //
 
 #include "faust_linear_algebra_gpu.hpp"

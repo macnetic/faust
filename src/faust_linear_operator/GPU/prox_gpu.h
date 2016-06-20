@@ -1,5 +1,5 @@
-#ifndef __PROX_CU_H__
-#define __PROX_CU_H__
+#ifndef __PROX_GPU_H__
+#define __PROX_GPU_H__
 
 #include "faust_MatDense_gpu.h"
 #include "faust_constant_gpu.h"

@@ -1,10 +1,14 @@
 #ifndef __LINALGEBRA_GPU_HPP__
 #define __LINALGEBRA_GPU_HPP__
 
-#define __COMPILE_SPMAT__
+
 
 //modif AL
+//#define __COMPILE_SPMAT__
+//#include "faust_linear_algebra_gpu.h"
+
 //#include "faust_constant.h"
+
 
 using namespace std;
 
@@ -413,7 +417,7 @@ void Faust::setOp(const Faust::MatSparse<FPP,Gpu>& cu_S, const char opA, faust_u
 }
 
 template <typename FPP>
-void gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, const  FPP alpha, const FPP beta, const char opA, Faust::SpBlasHandle<Gpu> spblasHandle)
+void Faust::gemv(const Faust::MatSparse<FPP,Gpu>& cu_A, const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, const  FPP alpha, const FPP beta, const char opA, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
 #ifdef __COMPILE_TIMERS__
 cu_A.t_csrmv.start();
@@ -679,7 +683,6 @@ void Faust::multiply(const Faust::MatDense<FPP,Gpu>& cu_A, const Faust::MatDense
 {Faust::gemm(cu_A, cu_B, cu_C, FPP(1.0), FPP(0.0), 'N', 'N', blasHandle);}
 
 //////////////////////////////////////////////////
-
 #ifdef __COMPILE_SPMAT__
 ///// FUNCTIONS with faust_cu_spmat matrices /////
 // y = op(A) * x

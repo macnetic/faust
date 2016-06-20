@@ -1,5 +1,5 @@
-#ifndef __FAUST_CU_SPMAT_H__
-#define __FAUST_CU_SPMAT_H__
+#ifndef __FAUST_MAT_SPARSE_GPU_H__
+#define __FAUST_MAT_SPARSE_GPU_H__
 
 #include "faust_constant_gpu.h"
 #include "faust_exception.h"
