@@ -43,9 +43,9 @@ Install:
 
 1-	Unpack the directory. 
 2-	mkdir ./build 
-3-	cmake ..
-4-	make install
-
+3-  cd build
+4-	cmake ..
+5-	make install
 ##########################################################################
 
 
@@ -84,16 +84,16 @@ See related ./misc/demo/README file for more detail.
 ##########################################################################
 
 ##########################################################################
-naming conventions in the FAuST project :
+Naming conventions in the FAuST project :
 
 	- namespace 		:	Faust::xxx
 	- class 			: 	Faust::MyClass	/	Faust::Class
 	- attributs			:	m_myAttribut	/	m_attribut
 	- methods			:	m_my_method()	/	m_method()
-	- function			:	my_function()
+
+	- function			:	Faust::my_function()
 	- variable			:	myVariable
 	- object			:	myObjet
-
 
 	- files class  		: 	faust_MyClass.x	/	faust_Class.x
 	- files function	:	faust_my_function.x
@@ -102,7 +102,6 @@ naming conventions in the FAuST project :
 	- files function gpu:	faust_my_function_gpu.x
 
  	- class template gpu	: 	Faust::MyClass<FPP,gpu>	/
-
 ##########################################################################
 
 
