@@ -4,3 +4,7 @@ set(CTEST_DROP_METHOD "http")
 set(CTEST_DROP_SITE "cdash.inria.fr")
 set(CTEST_DROP_LOCATION "/CDash/submit.php?project=faust")
 set(CTEST_DROP_SITE_CDASH TRUE)
+
+set(CTEST_FULL_OUTPUT TRUE)
+#set(CTEST_USE_LAUNCHERS 1)
+
