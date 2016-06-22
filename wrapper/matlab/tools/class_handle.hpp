@@ -5,8 +5,13 @@
 #include <cstring>
 #include <typeinfo>
 //#include <stdint.h>
-typedef unsigned long int uint32_t;
-typedef unsigned long long int uint64_t;
+
+
+#ifndef __MACH__
+	typedef unsigned long int uint32_t;
+	typedef unsigned long long int uint64_t;
+#endif
+
 
 #define CLASS_HANDLE_SIGNATURE 0xFF00F0A5
 template<class base> class class_handle
