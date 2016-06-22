@@ -68,24 +68,27 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		add_custom_target(${mex_target} DEPENDS ${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} ${FAUST_MEXTOOLS_TARGET} ${FAUST_TARGET})
 	endif()
 
-	if(LINUX)
+	if(UNIX)
 	
-		#add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
-		#COMMAND   ${MATLAB_ROOT}/bin/mex 
-		#ARGS "-v" "-largeArrayDims" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" 
-		#"LDFLAGS=$$LDFLAGS -Wl,-rpath=${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}:${FAUST_INSTALL_LIB}:${PROJECT_BINARY_DIR}" 
-		#"-O" 
-		#${CMAKE_CXX_FLAGS_LIST} 
-		#${LDD_MEX_FLAGS}
-		#COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
-	elseif(APPLE)
-		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
-                COMMAND   ${MATLAB_ROOT}/bin/mex 
-                ARGS "-v" "-largeArrayDims" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" 
-                "-O" 
-                ${CMAKE_CXX_FLAGS_LIST} 
-                ${LDD_MEX_FLAGS}
-                COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
+		
+		if(APPLE)
+			add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
+		        COMMAND   ${MATLAB_ROOT}/bin/mex 
+		        ARGS "-v" "-largeArrayDims" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" 
+		        "-O" 
+		        ${CMAKE_CXX_FLAGS_LIST} 
+		        ${LDD_MEX_FLAGS}
+		        COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
+		else(APPLE)
+			add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
+			COMMAND   ${MATLAB_ROOT}/bin/mex 
+			ARGS "-v" "-largeArrayDims" "${FAUST_MEXINTERFACEMEX_SRC_DIR}/${mex_target}.cpp" 
+			"LDFLAGS=$$LDFLAGS -Wl,-rpath=${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}:${FAUST_INSTALL_LIB}:${PROJECT_BINARY_DIR}" 
+			"-O" 
+			${CMAKE_CXX_FLAGS_LIST} 
+			${LDD_MEX_FLAGS}
+			COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
+		endif(APPLE)
 
 	elseif(WIN32)
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
