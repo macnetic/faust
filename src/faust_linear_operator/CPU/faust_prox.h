@@ -38,8 +38,8 @@ namespace Faust {
     void prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP s);
     template<typename FPP>
     void prox_supp(Faust::MatDense<FPP,Cpu> & M, const Faust::MatDense<FPP,Cpu> & supp);
-    template<typename FPP>
-    void prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
+//    template<typename FPP>
+//    void prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
 
 }
 
