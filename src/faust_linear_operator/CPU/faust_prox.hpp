@@ -226,7 +226,7 @@ void Faust::prox_sp_pos(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 }
 
 
-
+/*
 // M needs to be square and k must divide dimension of M
 template<typename FPP>
 void Faust::prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,int k)
@@ -266,7 +266,7 @@ void Faust::prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,int k)
 
 
 }
-
+*/
 
 
 template<typename FPP>
