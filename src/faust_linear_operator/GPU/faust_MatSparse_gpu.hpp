@@ -16,7 +16,7 @@
 using namespace std;
 
 template <typename FPP>
-const char * Faust::MatSparse<FPP,Gpu>::class_name="Faust::MatSparse<FPP,Gpu>::";
+const char * Faust::MatSparse<FPP,Gpu>::m_className="Faust::MatSparse<FPP,Gpu>::";
 
 template <typename FPP>
 Faust::MatSparse<FPP,Gpu>::MatSparse() :
@@ -47,7 +47,7 @@ Faust::MatSparse<FPP,Gpu>::MatSparse(const int* csrRowPtr_, const int* csrColInd
         return;
     }
     if(csrRowPtr_==NULL || csrColInd_==NULL || csrValues_==NULL )
-            handleError(class_name, "Faust::MatSparse<FPP,Gpu>::MatSparse(const faust_unsigned_int nnz_, const int* csrRowPtr_, const int* csrColInd_, const FPP* csrValues_, , const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, bool dataFromGPU, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL),device(FAUST_DEFAULT_CUDA_DEVICE)");
+            handleError(m_className, "Faust::MatSparse<FPP,Gpu>::MatSparse(const faust_unsigned_int nnz_, const int* csrRowPtr_, const int* csrColInd_, const FPP* csrValues_, , const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, bool dataFromGPU, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), nnz(0), csrRowPtr(NULL), csrColInd(NULL), csrValues(NULL),device(FAUST_DEFAULT_CUDA_DEVICE)");
 
     if(dataFromGPU)
     {
@@ -122,14 +122,14 @@ void Faust::MatSparse<FPP,Gpu>::_create(const faust_unsigned_int nnz_, const fau
 t_create.start();
 #endif
     if (nnz_<0 || dim1_<0 || dim2_<0 || nnz_>dim1_*dim2_ )
-       handleError(class_name, "_create : incorrect dimensions");
+       handleError(m_className, "_create : incorrect dimensions");
 
 
 
     if (dim1_ * dim2_ == 0)
     {
        if (nnz_ !=0 )
-          handleError(class_name, "_create : to creat an empty matrix, nnz should be equal to 0");
+          handleError(m_className, "_create : to creat an empty matrix, nnz should be equal to 0");
        csrRowPtr = NULL;
        csrColInd = NULL;
        csrValues = NULL;
@@ -144,18 +144,18 @@ t_create.start();
        if (csrRowPtr == NULL)
           faust_cudaMalloc((void**)&csrRowPtr, (dim1_+1)*sizeof(int));
        else
-          handleError(class_name, "_create : csrRowPtr has already been allocated on GPU");
+          handleError(m_className, "_create : csrRowPtr has already been allocated on GPU");
        if(nnz_ > 0)
        {
           if (csrColInd == NULL)
              faust_cudaMalloc((void**)&csrColInd, (nnz_)*sizeof(int));
           else
-             handleError(class_name, "_create : csrColInd has already been allocated on GPU");
+             handleError(m_className, "_create : csrColInd has already been allocated on GPU");
 
           if (csrValues == NULL)
              faust_cudaMalloc((void**)&csrValues, (nnz_)*sizeof(FPP));
           else
-             handleError(class_name, "_create : csrValues has already been allocated on GPU");
+             handleError(m_className, "_create : csrValues has already been allocated on GPU");
        }
        descr = &descr_content;
        faust_cusparseCreateMatDescr(descr);
@@ -188,25 +188,25 @@ t_clear.start();
         if (csrRowPtr!=NULL)
            faust_cudaFree(csrRowPtr);
         else
-           handleError(class_name, "_clear : csrRowPtr has not been allocated");
+           handleError(m_className, "_clear : csrRowPtr has not been allocated");
 
         if(nnz > 0)
         {
            if (csrColInd!=NULL)
               faust_cudaFree(csrColInd);
            else
-              handleError(class_name, "_clear : csrColInd has not been allocated");
+              handleError(m_className, "_clear : csrColInd has not been allocated");
 
            if (csrValues!=NULL)
               faust_cudaFree(csrValues);
            else
-              handleError(class_name, "_clear : csrValues has not been allocated");
+              handleError(m_className, "_clear : csrValues has not been allocated");
        }
        faust_cusparseDestroyMatDescr(*descr);
        faust_cudaSetDevice(currentGPU);
     }
     else if(descr != NULL)
-       handleError(class_name, "_clear : descr pointer for empty sparse matrix should be NULL");
+       handleError(m_className, "_clear : descr pointer for empty sparse matrix should be NULL");
 
     nnz = 0;
     dim1 = 0;
@@ -465,13 +465,13 @@ t_init_from_cumat.start();
     {
        if(device != dstDevice)
           delete cu_A_ptr;
-       handleError(class_name, "init(faust_cu_mat, ...) : zero sparse matrix is not managed. Please keep full matrix representation");
+       handleError(m_className, "init(faust_cu_mat, ...) : zero sparse matrix is not managed. Please keep full matrix representation");
     }
     else
     {
        if(device != dstDevice)
           delete cu_A_ptr;
-       handleError(class_name, "init(faust_cu_mat, ...) : impossible to create sparse matrix from uninitialized full matrix");
+       handleError(m_className, "init(faust_cu_mat, ...) : impossible to create sparse matrix from uninitialized full matrix");
     }
 
     if(device != dstDevice)
@@ -535,7 +535,7 @@ bool Faust::MatSparse<FPP,Gpu>::operator==(const Faust::MatSparse<FPP,Gpu>& cu_S
    if(csrRowPtr!=NULL && csrRowPtr==cu_S.csrRowPtr && device==cu_S.device && nnz==cu_S.nnz && csrColInd==cu_S.csrColInd && csrValues==cu_S.csrValues && dim2==cu_S.dim2)
    {
       if(dim1!=cu_S.dim1 || descr!=cu_S.descr)
-         handleError(class_name,"operator== : same data and device but different dimensions");
+         handleError(m_className,"operator== : same data and device but different dimensions");
       return true;
    }
    else

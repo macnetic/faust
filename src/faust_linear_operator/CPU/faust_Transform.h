@@ -32,10 +32,10 @@ namespace Faust
 
 
     // forward definition of friend function
-   template<typename FPP>	
-   Faust::Vect<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);	
    template<typename FPP>
-   Faust::MatDense<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);	   
+   Faust::Vect<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
+   template<typename FPP>
+   Faust::MatDense<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
 
 
     template<typename FPP>
@@ -111,18 +111,18 @@ namespace Faust
 
 
 
-        
+
 
         private:
         long long int totalNonZeros;
-        static const char * class_name;
+        static const char * m_className;
 	std::vector<Faust::MatSparse<FPP,Cpu> > data;
-	
 
 
 
 
-        
+
+
 	// friend function
 	friend Faust::Vect<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
 	friend Faust::MatDense<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);

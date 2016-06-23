@@ -34,7 +34,7 @@ namespace Faust
             float get_time();
             faust_unsigned_int get_nb_call()const;
             faust_unsigned_int get_nb_call();
-            static const char * class_name;
+            static const char * m_className;
 
         private:
             //! \brief isRunning : TRUE value indicate that a time is running. <br>
@@ -45,7 +45,7 @@ namespace Faust
                 struct timespec debut;
 	    #elif defined(__MACH__)
 		uint64_t debut;
-		double conversion_factor;	
+		double conversion_factor;
             #elif defined(_WIN32)
                 LARGE_INTEGER debut;
                 LARGE_INTEGER frequency;

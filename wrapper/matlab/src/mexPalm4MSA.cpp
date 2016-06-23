@@ -72,15 +72,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
          mexErrMsgTxt("params.data must be specified");
     }
 
-   //nb_fact initialisation
-   int nb_fact=0;
+   //nbFact initialisation
+   int nbFact=0;
    if (presentFields[1])
    {
 
         mxCurrentField = mxGetField(prhs[0],0,"nfacts");
         mexPrintf("a\n");
-        nb_fact =(int)  mxGetScalar(mxCurrentField);
-        mexPrintf("NB FACT : %d\n",nb_fact);
+        nbFact =(int)  mxGetScalar(mxCurrentField);
+        mexPrintf("NB FACT : %d\n",nbFact);
    }else
    {
         mexErrMsgTxt("params.nfacts must be specified");
@@ -107,9 +107,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
             mexErrMsgTxt("cons must have 1 rows");
         }
-        if(nbColCons != (nb_fact))
+        if(nbColCons != (nbFact))
         {
-            //mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
+            //mexPrintf("\n cons has %d cols and nbFact = %d\n",nbColCons,nbFact);
             //mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
         }
         //mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
@@ -199,7 +199,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
      //creation de hierarchical fact
-    Faust::ParamsPalm<FFPP,Cpu> params(data,nb_fact,consS,init_facts,crit1,isVerbose,updateway,init_lambda);
+    Faust::ParamsPalm<FFPP,Cpu> params(data,nbFact,consS,init_facts,crit1,isVerbose,updateway,init_lambda);
 	Faust::BlasHandle<Cpu> blas_handle;
 	Faust::Palm4MSA<FFPP,Cpu> palm(params,blas_handle,false);
 	palm.compute_facts();

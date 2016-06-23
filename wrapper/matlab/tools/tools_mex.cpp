@@ -100,26 +100,26 @@ void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
     // }
     // mexPrintf("\n\n");
 
-    // mexPrintf("NB_FACTS : %d\n",params.nb_fact);
+    // mexPrintf("NB_FACTS : %d\n",params.m_nbFact);
     // mexPrintf("CONSTRAINTS : nbr %d\n",params.cons[0].size());
     // for (unsigned int L=0;L<params.cons[0].size();L++)
 	// {
 		// for (unsigned int jl=0;jl<params.cons.size();jl++)
 		// {
 			// mexPrintf(" %s ", params.cons[jl][L]->get_constraint_name());
-			// mexPrintf(" DIMS (%d,%d) : ",(*params.cons[jl][L]).getRows(),(*params.cons[jl][L]).getCols());
+			// mexPrintf(" DIMS (%d,%d) : ",(*params.cons[jl][L]).get_rows(),(*params.cons[jl][L]).get_cols());
 
 
-			// if (params.cons[jl][L]->isConstraintParameterInt())
+			// if (params.cons[jl][L]->is_constraint_parameter_int())
 			// {
 				// Faust::ConstraintInt* const_int = (Faust::ConstraintInt*)(params.cons[jl][L]);
-				// mexPrintf(" parameter : %d",(*const_int).getParameter());
+				// mexPrintf(" parameter : %d",(*const_int).get_parameter());
 			// }
 
-			// if (params.cons[jl][L]->isConstraintParameterReal())
+			// if (params.cons[jl][L]->is_constraint_parameter_real())
 			// {
 				// Faust::ConstraintFPP* const_real = (Faust::ConstraintFPP*)(params.cons[jl][L]);
-				// mexPrintf(" parameter : %f",(*const_real).getParameter());
+				// mexPrintf(" parameter : %f",(*const_real).get_parameter());
 			// }
 			// mexPrintf("\n");
 

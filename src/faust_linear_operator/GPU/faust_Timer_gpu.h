@@ -23,7 +23,7 @@ namespace Faust
           float get_time();
           faust_unsigned_int get_nb_call()const;
           faust_unsigned_int get_nb_call();
-          static const char * class_name;
+          static const char * m_className;
 
 
        private:

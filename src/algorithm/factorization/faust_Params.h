@@ -33,7 +33,7 @@ namespace Faust
 
         Params(
             const Faust::MatDense<FPP,DEVICE>& data_,
-            const unsigned int nb_fact_,
+            const unsigned int nbFact_,
             const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & cons_,
             const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
             const Faust::StoppingCriterion<FPP>& stop_crit_2facts_ = Faust::StoppingCriterion<FPP>(defaultNiter1),
@@ -51,9 +51,9 @@ namespace Faust
         /*!
         *   \brief Faust::Params constructor
         *   \param data : Faust::MatDense<FPP,DEVICE> to hierarchically factorize
-        *   \param nb_fact_ : Number of factor used for the decomposition
+        *   \param nbFact_ : Number of factor used for the decomposition
         *	\param	cons_ : Specifies the constraint sets in which each factor should lie.<br>
-                            It should be a std::vector<std::vector> of constraint_generic size 2*(nb_fact-1),<br>
+                            It should be a std::vector<std::vector> of constraint_generic size 2*(nbFact-1),<br>
                             where the jth columns sets the constraints for the jth factorization in two factors:<br>
                                 - cons_[1][j] specifies the constraints for the left factor and<br>
                                 - cons[2][j] for the right factor.<br>
@@ -82,7 +82,7 @@ namespace Faust
         */
         Params(
             const Faust::MatDense<FPP,DEVICE>& data_,
-            const unsigned int nb_fact_,
+            const unsigned int nbFact_,
             const std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> >& cons_,
             const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
             const Faust::StoppingCriterion<FPP>& stop_crit_2facts_ = Faust::StoppingCriterion<FPP>(defaultNiter1),
@@ -100,6 +100,7 @@ namespace Faust
         void check_constraint_validity();
         void check_bool_validity();
 
+        void Display() const;
         ~Params(){}
 
 
@@ -108,7 +109,7 @@ namespace Faust
         // modif AL AL
         Faust::MatDense<FPP,DEVICE> data;
 
-        faust_unsigned_int nb_fact; // number of factors
+        faust_unsigned_int m_nbFact; // number of factors
         std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE> *> > cons; // vector of constraints
         std::vector<Faust::MatDense<FPP,DEVICE> > init_fact;
 
@@ -134,8 +135,6 @@ namespace Faust
         static const FPP defaultDecreaseSpeed;
         static const FPP defaultResiduumPercent;
 
-        void Display() const;
-
         //const int nb_rows; // number of rows of the first factor
         //const int nb_cols; // number of columns of the last factor
 
@@ -145,8 +144,11 @@ namespace Faust
         const faust_real errorThreshold;
         // only used as stopping criterion, if isFaust::StoppingCriterionError, when error is still greater than
         int maxIteration;*/
-        static const char* class_name;
+
+        // modif AL AL ???
+        //static const char* m_className;
         private :
+            static const char* m_className;
 
     };
 

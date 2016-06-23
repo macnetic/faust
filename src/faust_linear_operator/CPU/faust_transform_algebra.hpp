@@ -68,15 +68,15 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
  template<typename FPP>
  void Faust::multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult)
   {
-	 int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB, nb_fact;
+	 int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB, nbFact;
 
 	 if  ((&(C.mat)) == (&(B.mat)))
 	 {
 		 handleError("Faust::Transform algebra "," Faust::multiply : C is the same object as B");
 	 }
 
-	 nb_fact = A.size();
-	 if (nb_fact != 0)
+	 nbFact = A.size();
+	 if (nbFact != 0)
 	 {
 		 if (typeA == 'T')
 		 {
@@ -93,7 +93,7 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
 		 nbColOpB = B.getNbCol();
 
 
-	 if (nb_fact != 0)
+	 if (nbFact != 0)
 	 {
 		 if (typeMult == 'R')
 		 {
@@ -120,13 +120,13 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
 	 C = B;
 	 C.scalarMultiply(alpha);
 	 C.resize(nbRowOpB,nbColOpB);
-	 if (nb_fact != 0)
+	 if (nbFact != 0)
 	 {
 		 if (typeA == 'T')
 		 {
 			 if(typeMult == 'R')
 			 {
-				 for (int i=0 ; i<nb_fact ; i++)
+				 for (int i=0 ; i<nbFact ; i++)
 				 {
 					 C.mat = A.data[i].mat.transpose() * C.mat;
 				 }
@@ -134,7 +134,7 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
 
 			 }else
 			 {
-				 for (int i=nb_fact-1 ; i>=0 ; i--)
+				 for (int i=nbFact-1 ; i>=0 ; i--)
 				 {
 				 C.mat = C.mat * A.data[i].mat.transpose();
 				 }
@@ -146,14 +146,14 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
 		 {
 			 if(typeMult == 'R')
 			 {
-				 for (int i=nb_fact-1 ; i>=0 ; i--)
+				 for (int i=nbFact-1 ; i>=0 ; i--)
 				 {
 					 C.mat = A.data[i].mat * C.mat;
 				 }
 				 C.resize(nbRowOpA,nbColOpB);
 			 }else
 			 {
-				 for (int i=0 ; i<nb_fact ; i++)
+				 for (int i=0 ; i<nbFact ; i++)
 				 {
 					 C.mat = C.mat*A.data[i].mat;
 				 }

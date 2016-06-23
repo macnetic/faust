@@ -20,22 +20,22 @@ using namespace std;
 //Faust::HierarchicalFact::Faust::HierarchicalFact(){} // voir avec Luc les parametres par defaut
 
 template<typename FPP,Device DEVICE>
-const char * Faust::HierarchicalFact<FPP,DEVICE>::class_name="Faust::HierarchicalFact";
+const char * Faust::HierarchicalFact<FPP,DEVICE>::m_className="Faust::HierarchicalFact";
 
 template<typename FPP,Device DEVICE>
 Faust::HierarchicalFact<FPP,DEVICE>::HierarchicalFact(const Faust::Params<FPP,DEVICE>& params_, Faust::BlasHandle<DEVICE> cublasHandle, Faust::SpBlasHandle<DEVICE> cusparseHandle):
-   ind_fact(0),
+   m_indFact(0),
    cons(params_.cons),
-   isUpdateWayR2L(params_.isUpdateWayR2L),
-   isFactSideLeft(params_.isFactSideLeft),
-   isVerbose(params_.isVerbose),
-   nb_fact(params_.nb_fact-1),
+   m_isUpdateWayR2L(params_.isUpdateWayR2L),
+   m_isFactSideLeft(params_.isFactSideLeft),
+   m_isVerbose(params_.isVerbose),
+   nbFact(params_.m_nbFact-1),
    palm_2(Palm4MSA<FPP,DEVICE>(params_, cublasHandle, false)),
    palm_global(Palm4MSA<FPP,DEVICE>(params_, cublasHandle, true)),
    cons_tmp_global(vector<const Faust::ConstraintGeneric<FPP,DEVICE>*>()),
    default_lambda(params_.init_lambda),
    isFactorizationComputed(false),
-   errors(std::vector<std::vector<FPP> >(2,std::vector<FPP >(params_.nb_fact-1,0.0))),
+   errors(std::vector<std::vector<FPP> >(2,std::vector<FPP >(params_.m_nbFact-1,0.0))),
    cublas_handle(cublasHandle),
    cusparse_handle(cusparseHandle){}
 
@@ -48,10 +48,10 @@ t_init.start();
 #endif
 
    cons_tmp_global.clear();
-   if(isFactSideLeft)
-      cons_tmp_global.push_back(cons[0][ind_fact]);
+   if(m_isFactSideLeft)
+      cons_tmp_global.push_back(cons[0][m_indFact]);
    else
-      cons_tmp_global.push_back(cons[1][ind_fact]);
+      cons_tmp_global.push_back(cons[1][m_indFact]);
 
 
    palm_global.set_constraint(cons_tmp_global);
@@ -73,12 +73,12 @@ t_next_step.start();
 
    if(isFactorizationComputed)
    {
-      handleError(class_name,"next_step : factorization has already been computed");
+      handleError(m_className,"next_step : factorization has already been computed");
    }
 
    vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> cons_tmp_2(2);
-   cons_tmp_2[0]=cons[0][ind_fact];
-   cons_tmp_2[1]=cons[1][ind_fact];
+   cons_tmp_2[0]=cons[0][m_indFact];
+   cons_tmp_2[1]=cons[1][m_indFact];
 
 
    palm_2.set_constraint(cons_tmp_2);
@@ -101,25 +101,25 @@ palm_2.print_local_timers();
    palm_global.update_lambda_from_palm(palm_2);
 
 
-   if (isFactSideLeft)
+   if (m_isFactSideLeft)
    {
-      cons_tmp_global[0]=cons[0][ind_fact];
+      cons_tmp_global[0]=cons[0][m_indFact];
       typename vector<const Faust::ConstraintGeneric<FPP,DEVICE>*>::iterator it;
       it = cons_tmp_global.begin();
-      cons_tmp_global.insert(it+1,cons[1][ind_fact]);
+      cons_tmp_global.insert(it+1,cons[1][m_indFact]);
    }
    else
    {
       typename vector<const Faust::ConstraintGeneric<FPP,DEVICE>*>::iterator it;
       it = cons_tmp_global.begin();
-      cons_tmp_global.insert(it+ind_fact,cons[0][ind_fact]);
-      cons_tmp_global[ind_fact+1]=cons[1][ind_fact];
+      cons_tmp_global.insert(it+m_indFact,cons[0][m_indFact]);
+      cons_tmp_global[m_indFact+1]=cons[1][m_indFact];
    }
 
    palm_global.set_constraint(cons_tmp_global);
 
 
-   palm_global.init_fact_from_palm(palm_2, isFactSideLeft);
+   palm_global.init_fact_from_palm(palm_2, m_isFactSideLeft);
 
 #ifdef __COMPILE_TIMERS__
 palm_global.init_local_timers();
@@ -131,13 +131,13 @@ palm_global.init_local_timers();
 palm_global.print_local_timers();
 #endif
 
-   palm_2.set_data(palm_global.get_res(isFactSideLeft, ind_fact));
+   palm_2.set_data(palm_global.get_res(m_isFactSideLeft, m_indFact));
 
 
    compute_errors();
 
 
-   ind_fact++;
+   m_indFact++;
 
 
 #ifdef __COMPILE_TIMERS__
@@ -179,13 +179,13 @@ void Faust::HierarchicalFact<FPP,DEVICE>::compute_facts()
 {
    if(isFactorizationComputed)
    {
-      handleError(class_name,"compute_facts : factorization has already been computed");
+      handleError(m_className,"compute_facts : factorization has already been computed");
    }
 
   init();
-  for (int i=0 ; i<=nb_fact-1 ; i++)
+  for (int i=0 ; i<=nbFact-1 ; i++)
   {
-     cout << "Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation "<<i+1<<"/"<<nb_fact <<endl;
+     cout << "Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation "<<i+1<<"/"<<nbFact <<endl;
      next_step();
   }
 
@@ -199,7 +199,7 @@ const std::vector<std::vector< FPP> >& Faust::HierarchicalFact<FPP,DEVICE>::get_
 {
     if(!isFactorizationComputed)
     {
-        handleError(class_name,"get_errors() : Factorization has not been computed");
+        handleError(m_className,"get_errors() : Factorization has not been computed");
     }
     return errors;
 }
@@ -222,8 +222,8 @@ void Faust::HierarchicalFact<FPP,DEVICE>::compute_errors()
 
    data -= estimate_mat;
 
-   errors[0][ind_fact] =  estimate_mat.norm()/data_norm;
-   errors[1][ind_fact] =  faust_Transform_tmp.get_total_nnz()/data.getNbRow()/data.getNbCol();
+   errors[0][m_indFact] =  estimate_mat.norm()/data_norm;
+   errors[1][m_indFact] =  faust_Transform_tmp.get_total_nnz()/data.getNbRow()/data.getNbCol();
 
 }
 

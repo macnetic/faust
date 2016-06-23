@@ -5,7 +5,7 @@
 
 
 template<typename FPP,Device DEVICE>
-const char * Faust::ConstraintInt<FPP,DEVICE>::class_name="Faust::ConstraintInt";
+const char * Faust::ConstraintInt<FPP,DEVICE>::m_className="Faust::ConstraintInt";
 
 template<typename FPP,Device DEVICE>
 Faust::ConstraintInt<FPP,DEVICE>::ConstraintInt() :
@@ -16,30 +16,30 @@ Faust::ConstraintInt<FPP,DEVICE>::ConstraintInt() :
 
 template<typename FPP,Device DEVICE>
 Faust::ConstraintInt<FPP,DEVICE>::ConstraintInt(
-   const faust_constraint_name& constraint_name_,
-   const faust_unsigned_int nb_rows_,
-   const faust_unsigned_int nb_cols_) :
+   const faust_constraint_name& constraintName_,
+   const faust_unsigned_int nbRows_,
+   const faust_unsigned_int nbCols_) :
       Faust::ConstraintGeneric<FPP,DEVICE>(
-         constraint_name_,
-         nb_rows_,
-         nb_cols_)
+         constraintName_,
+         nbRows_,
+         nbCols_)
 {
-   std::cout<<nb_rows_<<std::endl;
-   std::cout<<nb_cols_<<std::endl;
+   std::cout<<nbRows_<<std::endl;
+   std::cout<<nbCols_<<std::endl;
    set_default_parameter();
 }
 
 template<typename FPP,Device DEVICE>
 Faust::ConstraintInt<FPP,DEVICE>::ConstraintInt(
-   const faust_constraint_name& constraint_name_,
-   const faust_unsigned_int default_parameter_,
-   const faust_unsigned_int nb_rows_,
-   const faust_unsigned_int nb_cols_) :
+   const faust_constraint_name& constraintName_,
+   const faust_unsigned_int defaultParameter_,
+   const faust_unsigned_int nbRows_,
+   const faust_unsigned_int nbCols_) :
       Faust::ConstraintGeneric<FPP,DEVICE>(
-         constraint_name_,
-         nb_rows_,
-         nb_cols_),
-         parameter(default_parameter_)
+         constraintName_,
+         nbRows_,
+         nbCols_),
+         m_parameter(defaultParameter_)
 {
    check_constraint_name();
 }
@@ -48,10 +48,10 @@ template<typename FPP,Device DEVICE>
 Faust::ConstraintInt<FPP,DEVICE>::ConstraintInt(
    const Faust::ConstraintInt<FPP,DEVICE>& constraint_) :
       Faust::ConstraintGeneric<FPP,DEVICE>(
-         constraint_.constraint_name,
-         constraint_.nb_rows,
-         constraint_.nb_cols),
-         parameter(constraint_.parameter)
+         constraint_.constraintName,
+         constraint_.nbRows,
+         constraint_.nbCols),
+         m_parameter(constraint_.parameter)
 {
    check_constraint_name();
 }
@@ -60,7 +60,7 @@ Faust::ConstraintInt<FPP,DEVICE>::ConstraintInt(
 template<typename FPP,Device DEVICE>
 void Faust::ConstraintInt<FPP,DEVICE>::check_constraint_name()const
 {
-   switch (this->constraint_name)
+   switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_SP:
          break;
@@ -75,7 +75,7 @@ void Faust::ConstraintInt<FPP,DEVICE>::check_constraint_name()const
       case CONSTRAINT_NAME_BLKDIAG:
          break;
       default:
-		handleError(class_name," cannot create Faust::ConstraintInt objet from an faust_constraint object with constraint with constraint_name");
+		handleError(m_className," cannot create Faust::ConstraintInt objet from an faust_constraint object with constraint with constraint_name");
          break;
    }
 }
@@ -83,28 +83,28 @@ void Faust::ConstraintInt<FPP,DEVICE>::check_constraint_name()const
 template<typename FPP,Device DEVICE>
 void Faust::ConstraintInt<FPP,DEVICE>::set_default_parameter()
 {
-   switch (this->constraint_name)
+   switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_SP:
-         parameter = 0;
+         m_parameter = 0;
          break;
       case CONSTRAINT_NAME_SPCOL:
-         parameter = 0;
+         m_parameter = 0;
          break;
       case CONSTRAINT_NAME_SPLIN:
-         parameter = 0;
+         m_parameter = 0;
          break;
       case CONSTRAINT_NAME_SPLINCOL:
-         parameter = 0;
+         m_parameter = 0;
          break;
       case CONSTRAINT_NAME_SP_POS:
-         parameter = 0;
+         m_parameter = 0;
          break;
       case CONSTRAINT_NAME_BLKDIAG:
-         parameter = 0;
+         m_parameter = 0;
          break;
       default:
-		handleError(class_name,"set_default_parameter : cannot create Faust::ConstraintInt objet from an faust_constraint object with constraint with this constraint_name");
+		handleError(m_className,"set_default_parameter : cannot create Faust::ConstraintInt objet from an faust_constraint object with constraint with this constraint_name");
          break;
    }
 }
@@ -112,25 +112,25 @@ void Faust::ConstraintInt<FPP,DEVICE>::set_default_parameter()
 template<typename FPP,Device DEVICE>
 void Faust::ConstraintInt<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat) const
 {
-   switch (this->constraint_name)
+   switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_SP:
-         Faust::prox_sp(mat,parameter);
+         Faust::prox_sp(mat,m_parameter);
          break;
       case CONSTRAINT_NAME_SPCOL:
-         Faust::prox_spcol(mat,parameter);
+         Faust::prox_spcol(mat,m_parameter);
          break;
       case CONSTRAINT_NAME_SPLIN:
-         Faust::prox_splin(mat,parameter);
+         Faust::prox_splin(mat,m_parameter);
          break;
       case CONSTRAINT_NAME_SPLINCOL:
-         Faust::prox_splincol(mat,parameter);
+         Faust::prox_splincol(mat,m_parameter);
          break;
       case CONSTRAINT_NAME_SP_POS:
-         Faust::prox_sp_pos(mat,parameter);
+         Faust::prox_sp_pos(mat,m_parameter);
          break;
       default:
-		handleError(class_name,"project : cannot project with this constraint name");
+		handleError(m_className,"project : cannot project with this constraint name");
          break;
    }
 }

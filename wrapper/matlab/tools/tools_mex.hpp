@@ -227,9 +227,9 @@ template<typename FPP>
 void setCellFacts(mxArray **  cellFacts,std::vector<Faust::MatDense<FPP,Cpu> >& facts)
 {
     int rowFact,colFact;
-    int nb_fact = facts.size();
+    int nbFact = facts.size();
     Faust::MatDense<FPP,Cpu> mat;
-    (*cellFacts) = mxCreateCellMatrix(1,nb_fact);
+    (*cellFacts) = mxCreateCellMatrix(1,nbFact);
     mxArray * mxMat;
     FPP* mat_ptr;
 	mwSize dims[2]={0,0};
@@ -244,7 +244,7 @@ void setCellFacts(mxArray **  cellFacts,std::vector<Faust::MatDense<FPP,Cpu> >& 
 		mexErrMsgTxt("mexFaustMat : setCellFacts : FPP type must be equal to double or float");
 	}
 
-    for (size_t k = 0; k < nb_fact; k++)
+    for (size_t k = 0; k < nbFact; k++)
     {
         mat = facts[k];
         rowFact = mat.getNbRow();
@@ -267,11 +267,11 @@ template<typename FPP>
 void setVectorFaustMat(std::vector<Faust::MatDense<FPP,Cpu> > &vecMat,mxArray *Cells)
 {
 	mxArray* mxMat;
-	mwSize nb_fact = mxGetNumberOfElements(Cells);
+	mwSize nbFact = mxGetNumberOfElements(Cells);
 	Faust::MatDense<FPP,Cpu> mat;
 	vecMat.resize(0);
-	mexPrintf("cells_size : %d\n",nb_fact);
-	for (mwSize i=0;i<nb_fact;i++)
+	mexPrintf("cells_size : %d\n",nbFact);
+	for (mwSize i=0;i<nbFact;i++)
 	{
 		mexPrintf("i : %d\n",i);
 		mxMat=mxGetCell(Cells,i);
@@ -317,8 +317,8 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS
     mxConsParams=mxGetCell(mxCons,3);
     nbColCons = (int) mxGetScalar(mxConsParams);
 
-	int const_type = getTypeConstraint(consName);
-	faust_constraint_name consNameType=getEquivalentConstraint(consName);
+	int const_type = get_type_constraint(consName);
+	faust_constraint_name consNameType=get_equivalent_constraint(consName);
 
     switch(const_type)
 	{
@@ -472,7 +472,7 @@ void DisplayParams(const Faust::Params<FPP,Cpu> & params)
     }
     mexPrintf("\n\n");
 
-    mexPrintf("NB_FACTS : %d\n",params.nb_fact);
+    mexPrintf("NB_FACTS : %d\n",params.m_nbFact);
     mexPrintf("CONSTRAINTS : nbr %d\n",params.cons[0].size());
     for (unsigned int L=0;L<params.cons[0].size();L++)
 	{
@@ -482,13 +482,13 @@ void DisplayParams(const Faust::Params<FPP,Cpu> & params)
 			mexPrintf(" DIMS (%d,%d) : ",(*params.cons[jl][L]).getRows(),(*params.cons[jl][L]).getCols());
 
 
-			if (params.cons[jl][L]->isConstraintParameterInt())
+			if (params.cons[jl][L]->is_constraint_parameter_int())
 			{
 				Faust::ConstraintInt<FPP,Cpu>* const_int = (Faust::ConstraintInt<FPP,Cpu>*)(params.cons[jl][L]);
 				mexPrintf(" parameter : %d",(*const_int).getParameter());
 			}
 
-			if (params.cons[jl][L]->isConstraintParameterReal())
+			if (params.cons[jl][L]->is_constraint_parameter_real())
 			{
 				Faust::ConstraintFPP<FPP,Cpu>* const_real = (Faust::ConstraintFPP<FPP,Cpu>*)(params.cons[jl][L]);
 				mexPrintf(" parameter : %f",(*const_real).getParameter());

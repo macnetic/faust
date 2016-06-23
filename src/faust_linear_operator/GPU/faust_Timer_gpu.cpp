@@ -23,7 +23,7 @@ void Faust::Timer_gpu::start()
 {
    if(isRunning)
    {
-	  handleError(class_name,"Faust::Timer_gpu::start : timer is already started.\n");
+	  handleError(m_className,"Faust::Timer_gpu::start : timer is already started.\n");
    }
    faust_cudaEventRecord(debut, stream);
    isRunning = true;
@@ -34,7 +34,7 @@ void Faust::Timer_gpu::stop()
 {
    if(!isRunning)
    {
-	  handleError(class_name,"stop : timer must be started before stopping it\n");
+	  handleError(m_className,"stop : timer must be started before stopping it\n");
    }
    faust_cudaEventRecord(fin, stream);
    faust_cudaEventSynchronize(fin);
@@ -53,7 +53,7 @@ void Faust::Timer_gpu::reset()
    if(isRunning)
    {
       faust_cudaEventRecord(debut, stream);
-      cerr<<class_name<<"reset : timer has been reset while it was running"<<endl;
+      cerr<<m_className<<"reset : timer has been reset while it was running"<<endl;
       nbCall++;
    }
 }
@@ -68,7 +68,7 @@ float Faust::Timer_gpu::get_time()
       faust_cudaEventElapsedTime(&ms, debut, fin);
       result += ms/1000.0;
 
-      handleError(class_name,"get_time : timer has not been stopped");
+      handleError(m_className,"get_time : timer has not been stopped");
    }
    return result;
 }
@@ -77,7 +77,7 @@ float Faust::Timer_gpu::get_time()const
 {
    if(isRunning)
    {
-	  handleError(class_name,"get_time : timer has not been stopped");
+	  handleError(m_className,"get_time : timer has not been stopped");
    }
    return result;
 }
@@ -93,7 +93,7 @@ faust_unsigned_int Faust::Timer_gpu::get_nb_call()
       faust_cudaEventElapsedTime(&ms, debut, fin);
       result += ms/1000.0;
 
-      handleError(class_name,"get_nb_call : timer has not been stopped\n");
+      handleError(m_className,"get_nb_call : timer has not been stopped\n");
    }
    return nbCall;
 }
@@ -103,10 +103,10 @@ faust_unsigned_int Faust::Timer_gpu::get_nb_call()const
 {
    if(isRunning)
    {
-	  handleError(class_name,"get_nb_call : timer has not been stopped\n");
+	  handleError(m_className,"get_nb_call : timer has not been stopped\n");
    }
    return nbCall;
 }
 
-const char * Faust::Timer_gpu::class_name="Faust::Timer_gpu::";
+const char * Faust::Timer_gpu::m_className="Faust::Timer_gpu::";
 

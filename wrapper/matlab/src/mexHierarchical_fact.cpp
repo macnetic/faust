@@ -77,15 +77,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mexErrMsgTxt("params.data must be specified");
 	}
 
-   //nb_fact initialisation
-   int nb_fact = -1;
+   //nbFact initialisation
+   int nbFact = -1;
    if (presentFields[1])
    {
 
         mxCurrentField = mxGetField(prhs[0],0,"nfacts");
         mexPrintf("a\n");
-        nb_fact =(int)  mxGetScalar(mxCurrentField);
-        mexPrintf("NB FACT : %d",nb_fact);
+        nbFact =(int)  mxGetScalar(mxCurrentField);
+        mexPrintf("NB FACT : %d",nbFact);
    }else
    {
         mexErrMsgTxt("params.nfacts must be specified");
@@ -111,9 +111,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexPrintf("\n cons has %d rows \n",nbRowCons);
             mexErrMsgTxt("cons must have 2 rows");
         }*/
-        /*if(nbColCons != (nb_fact-1))
+        /*if(nbColCons != (nbFact-1))
         {
-            mexPrintf("\n cons has %d cols and nb_fact = %d\n",nbColCons,nb_fact);
+            mexPrintf("\n cons has %d cols and nbFact = %d\n",nbColCons,nbFact);
             mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
         }*/
         //mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
@@ -204,7 +204,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
      // creation des parametres
 	 try{
 		std::cout<<"avant "<<std::endl;
-		Faust::Params<FFPP,Cpu> params(data,nb_fact,consSS,std::vector<Faust::MatDense<FFPP,Cpu> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda);
+		Faust::Params<FFPP,Cpu> params(data,nbFact,consSS,std::vector<Faust::MatDense<FFPP,Cpu> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda);
 
 	 //DisplayParams(params);
      //creation de hierarchical fact

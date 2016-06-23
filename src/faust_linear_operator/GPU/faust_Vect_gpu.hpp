@@ -56,13 +56,13 @@ Faust::Vect<FPP,Gpu>::Vect(const faust_unsigned_int dim_, int dstDevice/*=FAUST_
 
 
 template <typename FPP>
-const char * Faust::Vect<FPP,Gpu>::class_name = "Faust::Vect<FPP,Gpu>::";
+const char * Faust::Vect<FPP,Gpu>::m_className = "Faust::Vect<FPP,Gpu>::";
 
 template <typename FPP>
 void Faust::Vect<FPP,Gpu>::_create(const faust_unsigned_int dim_, int device_)
 {
     if(dim_<0)
-        handleError(class_name, "_create : incorrect dimensions");
+        handleError(m_className, "_create : incorrect dimensions");
 
 
     if(dim_==0)
@@ -77,7 +77,7 @@ void Faust::Vect<FPP,Gpu>::_create(const faust_unsigned_int dim_, int device_)
         if (data == NULL)
             faust_cudaMalloc((void**)&data, (dim_)*sizeof(FPP));
         else
-            handleError(class_name, "_create : data has already been allocated on GPU");
+            handleError(m_className, "_create : data has already been allocated on GPU");
 
 
         faust_cudaSetDevice(currentGPU);
@@ -99,12 +99,12 @@ void Faust::Vect<FPP,Gpu>::_clear()
         if (data != NULL)
             faust_cudaFree(data);
         else
-            handleError(class_name, "_clear : data has already been deleted on GPU");
+            handleError(m_className, "_clear : data has already been deleted on GPU");
 
         faust_cudaSetDevice(currentGPU);
     }
     else if(data!=NULL)
-        handleError(class_name, "_clear : data of vector shoould be NULL");
+        handleError(m_className, "_clear : data of vector shoould be NULL");
     dim = 0;
     data = NULL;
 }
@@ -129,7 +129,7 @@ template <typename FPP>
 void Faust::Vect<FPP,Gpu>::copyFromHost(const FPP *data_, const faust_unsigned_int dim_,  int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
     if(data_==NULL || dim_<=0)
-        handleError(class_name,"copyFromHost : NULL data pointer or incorrect value of dimension");
+        handleError(m_className,"copyFromHost : NULL data pointer or incorrect value of dimension");
     resize(dim_, dstDevice);
     int currentGPU;
     faust_cudaGetDevice(&currentGPU);
@@ -143,7 +143,7 @@ template <typename FPP>
 void Faust::Vect<FPP,Gpu>::copyFromDevice(const FPP *data_, const faust_unsigned_int dim_, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)
 {
     if(data_==NULL || dim_<=0)
-        handleError(class_name,"copyFromDevice : NULL data pointer or incorrect value of dimension");
+        handleError(m_className,"copyFromDevice : NULL data pointer or incorrect value of dimension");
     resize(dim_, dstDevice);
     faust_cudaMemcpyPeerAsync(data, dstDevice, data_, srcDevice, dim_*sizeof(FPP), stream);
 }
@@ -152,7 +152,7 @@ template <typename FPP>
 void Faust::Vect<FPP,Gpu>::copyToHost(FPP *data_, const faust_unsigned_int dim_, cudaStream_t stream/*=0*/)const
 {
     if(data==NULL || dim_<=0)
-        handleError(class_name,"copyToHost : NULL data pointer or incorrect value of dimension");
+        handleError(m_className,"copyToHost : NULL data pointer or incorrect value of dimension");
     int currentGPU;
     faust_cudaGetDevice(&currentGPU);
     faust_cudaSetDevice(device);
@@ -165,7 +165,7 @@ template <typename FPP>
 void Faust::Vect<FPP,Gpu>::copyToDevice(FPP *data_, const faust_unsigned_int dim_, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream/*=0*/)const
 {
     if(data==NULL || dim_<=0)
-        handleError(class_name,"copyToDevice : NULL data pointer or incorrect value of dimension");
+        handleError(m_className,"copyToDevice : NULL data pointer or incorrect value of dimension");
     int currentGPU;
     faust_cudaGetDevice(&currentGPU);
     faust_cudaSetDevice(device);
@@ -346,7 +346,7 @@ bool Faust::Vect<FPP,Gpu>::operator==(const Faust::Vect<FPP,Gpu>& cu_v)const
    if(data!=NULL && data==cu_v.data && device== cu_v.device)
    {
       if(dim!=cu_v.dim)
-         handleError(class_name,"operator== : same data and device but different dimensions");
+         handleError(m_className,"operator== : same data and device but different dimensions");
       return true;
    }
    else
@@ -358,7 +358,7 @@ void Faust::Vect<FPP,Gpu>::operator+=(const Faust::Vect<FPP,Gpu>& cu_v)
 {
    if(cu_v.dim != dim)
    {
-       handleError(class_name,"operator+= : vector dimensions must agree");
+       handleError(m_className,"operator+= : vector dimensions must agree");
    }
    if(dim == 0)
    {
@@ -385,7 +385,7 @@ void Faust::Vect<FPP,Gpu>::operator-=(const Faust::Vect<FPP,Gpu>& cu_v)
 {
    if(cu_v.dim != dim)
    {
-       handleError(class_name,"operator-= : vector dimensions must agree");
+       handleError(m_className,"operator-= : vector dimensions must agree");
    }
    if(dim == 0)
    {
@@ -411,7 +411,7 @@ void Faust::Vect<FPP,Gpu>::operator*=(const Faust::Vect<FPP,Gpu>& cu_v)
 {
    if(cu_v.dim != dim)
    {
-       handleError(class_name,"operator*= : vector dimensions must agree");
+       handleError(m_className,"operator*= : vector dimensions must agree");
    }
    if(dim == 0)
    {
@@ -436,7 +436,7 @@ void Faust::Vect<FPP,Gpu>::operator/=(const Faust::Vect<FPP,Gpu>& cu_v)
 {
    if(cu_v.dim != dim)
    {
-       handleError(class_name,"operator/= : vector dimensions must agree");
+       handleError(m_className,"operator/= : vector dimensions must agree");
    }
    if(dim == 0)
    {
@@ -582,7 +582,7 @@ template <typename FPP>
 FPP Faust::Vect<FPP,Gpu>::mean_relative_error(const Faust::Vect<FPP,Gpu>& v_ref)const
 {
    if(v_ref.size() != size())
-     handleError(class_name,"relative_error : sizes are different");
+     handleError(m_className,"relative_error : sizes are different");
 
    if(dim == 0)
    {

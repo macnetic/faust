@@ -11,7 +11,7 @@ using namespace std;
 #include "faust_linear_algebra.h"
 
 template<typename FPP>
-const char * Faust::Vect<FPP,Cpu>::class_name = "Faust::Vect<FPP,Cpu>::";
+const char * Faust::Vect<FPP,Cpu>::m_className = "Faust::Vect<FPP,Cpu>::";
 
 template<typename FPP>
 template<typename FPP1>
@@ -26,7 +26,7 @@ template<typename FPP>
 bool Faust::Vect<FPP,Cpu>::equality(Faust::Vect<FPP,Cpu> const &x, FPP precision) const
 {
   if (size() != x.size())
-	handleError(class_name," equality : different dimension");
+	handleError(m_className," equality : different dimension");
 
   for (int i=0;i<size();i++)
   {
@@ -79,7 +79,7 @@ void Faust::Vect<FPP,Cpu>::resize(const int new_dim)
 
 		if (new_dim <0)
 		{
-			handleError(class_name,"resize : new dimensions must be positive");
+			handleError(m_className,"resize : new dimensions must be positive");
 		}
 		else if (dim != new_dim)
 		{
@@ -120,7 +120,7 @@ void Faust::Vect<FPP,Cpu>::operator+=(const Faust::Vect<FPP,Cpu>& v)
    if(v.size()!=size())
    {
 
-	  handleError(class_name,"operator+= : dimensions are in conflict");
+	  handleError(m_className,"operator+= : dimensions are in conflict");
    }
    FPP*const ptr_data = getData();
    FPP*const v_ptr_data = getData();
@@ -134,7 +134,7 @@ void Faust::Vect<FPP,Cpu>::operator-=(const Faust::Vect<FPP,Cpu>& v)
 {
    if(v.size()!=size())
    {
-	   handleError(class_name,"operator-= : dimensions are in conflict");
+	   handleError(m_className,"operator-= : dimensions are in conflict");
    }
    FPP*const ptr_data = getData();
    FPP*const v_ptr_data = getData();
@@ -149,7 +149,7 @@ FPP Faust::Vect<FPP,Cpu>::mean_relative_error(const Faust::Vect<FPP,Cpu>& v_ref)
 {
    if(v_ref.size() != size())
    {
-     handleError(class_name,"relative_error : sizes are different");
+     handleError(m_className,"relative_error : sizes are different");
 
    }
 
@@ -207,7 +207,7 @@ void  Faust::Vect<FPP,Cpu>::multiplyLeft(Faust::MatSparse<FPP,Cpu> const& A)
 
 	if(nbColA != vec.size())
 	{
-		 handleError(class_name,"multiplyLeft : incorrect dimensions");
+		 handleError(m_className,"multiplyLeft : incorrect dimensions");
 
 	}
 

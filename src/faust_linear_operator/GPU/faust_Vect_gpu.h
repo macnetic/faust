@@ -115,7 +115,7 @@ namespace Faust
 
     private:
         faust_unsigned_int dim;
-        static const char * class_name;
+        static const char * m_className;
         FPP* data;
         int device;
 

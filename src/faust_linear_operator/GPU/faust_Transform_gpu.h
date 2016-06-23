@@ -74,7 +74,7 @@ template<typename FPP,Device DEVICE> class Transform;
         private:
             std::vector<Faust::MatSparse<FPP,Gpu> > data;
             long long int totalNonZeros;
-            static const char * class_name;
+            static const char * m_className;
 
 
 

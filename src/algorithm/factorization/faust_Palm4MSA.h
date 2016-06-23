@@ -49,13 +49,13 @@ namespace Faust
 
           void set_constraint(const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
           void set_data(const Faust::MatDense<FPP,DEVICE>& data_){data=data_;}
-          void set_lambda(const FPP lambda_){lambda = lambda_;}
+          void set_lambda(const FPP lambda_){m_lambda = lambda_;}
 
           /*!
          *  \brief
          * useful in HierarchicalFact, update lambda of palm_global from palm_2
          */
-          void update_lambda_from_palm(const Palm4MSA& palm){lambda *= palm.lambda;}
+          void update_lambda_from_palm(const Palm4MSA& palm){m_lambda *= palm.m_lambda;}
 
           /*!
          *  \brief
@@ -67,7 +67,7 @@ namespace Faust
          *  \brief
          * return the multiplicative scalar lambda
          */
-          FPP get_lambda()const{return lambda;}
+          FPP get_lambda()const{return m_lambda;}
 
           FPP get_RMSE()const{return error.norm()/sqrt((double)(data.getNbRow()*data.getNbCol()));}
           const Faust::MatDense<FPP,DEVICE>& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
@@ -83,8 +83,8 @@ namespace Faust
          */
           void init_fact(int nb_facts_);
           void next_step();
-          bool do_continue(){bool cont=stop_crit.do_continue(++ind_ite); if(!cont){ind_ite=-1;isConstraintSet=false;}return cont;} // CAUTION !!! pre-increment of ind_ite: the value in stop_crit.do_continue is ind_ite+1, not ind_ite
-          //bool do_continue()const{return stop_crit.do_continue(++ind_ite, error);};
+          bool do_continue(){bool cont=stop_crit.do_continue(++m_indIte); if(!cont){m_indIte=-1;isConstraintSet=false;}return cont;} // CAUTION !!! pre-increment of m_indIte: the value in stop_crit.do_continue is m_indIte+1, not m_indIte
+          //bool do_continue()const{return stop_crit.do_continue(++m_indIte, error);};
 
           /*!
          *  \brief
@@ -103,7 +103,7 @@ namespace Faust
           void update_L();
           void update_R();
           void compute_lambda();
-          static const char * class_name;
+          static const char * m_className;
           static const FPP lipschitz_multiplicator;
 
        public:
@@ -114,8 +114,8 @@ namespace Faust
           // modif AL AL
           Faust::MatDense<FPP,DEVICE> data;
 
-          FPP lambda;
-          int nb_fact; // number of factors
+          FPP m_lambda;
+          int m_nbFact; // number of factors
           std::vector<Faust::MatDense<FPP,DEVICE> > S; // contains S_0^i, S_1^i, ...
 
           // RorL_vec matches R if (!isUpdateWayR2L)
@@ -131,8 +131,8 @@ namespace Faust
 
 
           std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> const_vec; // vector of constraints of size nfact
-          int ind_fact; //indice de facteur (!= HierarchicalFact::ind_fact : indice de factorisation)
-          int ind_ite;
+          int m_indFact; //indice de facteur (!= HierarchicalFact::indFact : indice de factorisation)
+          int m_indIte;
           // FPP lipschitz_multiplicator;
           const bool verbose;
           const bool isUpdateWayR2L;

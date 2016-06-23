@@ -37,33 +37,33 @@ namespace Faust {
     class ConstraintGeneric
     {
         public:
-        ConstraintGeneric() : constraint_name(CONSTRAINT_NAME_SP),nb_rows(32),nb_cols(32) {} // contrainte par defaut (a voir avec Luc)
+        ConstraintGeneric() : m_constraintName(CONSTRAINT_NAME_SP),m_nbRows(32),m_nbCols(32) {} // contrainte par defaut (a voir avec Luc)
 
         ConstraintGeneric(
-            const faust_constraint_name& constraint_name_,
-            const faust_unsigned_int nb_rows_,
-            const faust_unsigned_int nb_cols_) :
-                constraint_name(constraint_name_),
-                nb_rows(nb_rows_),
-                nb_cols(nb_cols_){}
+            const faust_constraint_name& constraintName_,
+            const faust_unsigned_int nbRows_,
+            const faust_unsigned_int nbCols_) :
+                m_constraintName(constraintName_),
+                m_nbRows(nbRows_),
+                m_nbCols(nbCols_){}
 
         ConstraintGeneric(const ConstraintGeneric& constraint) :
-            constraint_name(constraint.constraint_name),
-            nb_rows(constraint.nb_rows),
-            nb_cols(constraint.nb_cols){}
+            m_constraintName(constraint.constraintName),
+            m_nbRows(constraint.nbRows),
+            m_nbCols(constraint.nbCols){}
 
 
 
-        const char* getType() const;
+        const char* get_type() const;
         const char* get_constraint_name()const;
-        const faust_constraint_name getConstraintType() const;
-        bool isConstraintParameterInt()const;
-        bool isConstraintParameterReal()const;
-        bool isConstraintParameterMat()const;
+        const faust_constraint_name get_constraint_type() const;
+        bool is_constraint_parameter_int()const;
+        bool is_constraint_parameter_real()const;
+        bool is_constraint_parameter_mat()const;
 
 
-        const faust_unsigned_int getRows() const {return nb_rows;}
-        const faust_unsigned_int getCols() const {return nb_cols;}
+        const faust_unsigned_int get_rows() const {return m_nbRows;}
+        const faust_unsigned_int get_cols() const {return m_nbCols;}
 
         virtual void set_default_parameter()=0;
         virtual void check_constraint_name()const=0;
@@ -73,14 +73,14 @@ namespace Faust {
 
         protected:
         /// type of constraint
-        const faust_constraint_name constraint_name;
+        const faust_constraint_name m_constraintName;
         // parameter of constraint
         //const parameter_type parameter;
-        const faust_unsigned_int nb_rows;
-        const faust_unsigned_int nb_cols;
+        const faust_unsigned_int m_nbRows;
+        const faust_unsigned_int m_nbCols;
 
         private :
-        static const char * class_name;
+        static const char * m_className;
 
 
     };
@@ -88,21 +88,21 @@ namespace Faust {
 }
 
 /////// functions useful for parsing config_file (xml,matio,txt_file) //////
-bool isConstraintNameInt(const char * type);
+bool is_constraint_name_int(const char * type);
 
-bool isConstraintNameReal(const char * type);
+bool is_constraint_name_real(const char * type);
 
-bool isConstraintNameMat(const char * type);
+bool is_constraint_name_mat(const char * type);
 
-faust_constraint_name getEquivalentConstraint(const char * type);
-//! \fn getTypeConstraint
+faust_constraint_name get_equivalent_constraint(const char * type);
+//! \fn get_type_constraint
 //! \brief Information about the type of the constraint
 //! \param type
 //! \return 0 if type correspond to an integer constraint
 //! \return 1 if type correspond to a FPP (Floating Point Precision) constraint
 //! \return 2 if type correspond to a Dense Matrix constraint
 //! \return else throw an error
-int getTypeConstraint(const char * type);
+int get_type_constraint(const char * type);
 
 #include "faust_ConstraintGeneric.hpp"
 

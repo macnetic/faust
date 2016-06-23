@@ -12,7 +12,7 @@
 
 
 
-bool isConstraintNameInt(const char * type)
+bool is_constraint_name_int(const char * type)
 {
 	bool is_const_int =((strcmp(type,"sp") == 0) || (strcmp(type,"sppos")==0));
 	is_const_int = ((is_const_int) || ((strcmp(type,"spcol") == 0)));
@@ -26,17 +26,17 @@ bool isConstraintNameInt(const char * type)
 }
 
 
-bool isConstraintNameReal(const char * type)
+bool is_constraint_name_real(const char * type)
 {
 	return ((strcmp(type,"normcol") == 0) || (strcmp(type,"normlin")==0));
 }
 
-bool isConstraintNameMat(const char * type)
+bool is_constraint_name_mat(const char * type)
 {
 	return ((strcmp(type,"supp") == 0) || (strcmp(type,"const")==0));
 }
 
-faust_constraint_name getEquivalentConstraint(const char * type)
+faust_constraint_name get_equivalent_constraint(const char * type)
 {
 
 	if (!strcmp(type,"sp"))
@@ -61,15 +61,15 @@ faust_constraint_name getEquivalentConstraint(const char * type)
 		return CONSTRAINT_NAME_NORMLIN;
 
 
-	handleError("Faust::ConstraintGeneric","getEquivalentConstraint : Unknown type of constraint");
+	handleError("Faust::ConstraintGeneric","get_equivalent_constraint : Unknown type of constraint");
 }
 
 
-int getTypeConstraint(const char * type)
+int get_type_constraint(const char * type)
 {
-	bool is_const_int = isConstraintNameInt(type);
-	bool is_const_real = isConstraintNameReal(type);
-	bool is_const_mat = isConstraintNameMat(type);
+	bool is_const_int = is_constraint_name_int(type);
+	bool is_const_real = is_constraint_name_real(type);
+	bool is_const_mat = is_constraint_name_mat(type);
 
 
 	if (is_const_int)

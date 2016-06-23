@@ -38,19 +38,19 @@ namespace Faust
           ConstraintInt(); // ajouter parametre de contrainte par defaut (a voir avec Luc)
 
           ConstraintInt(
-             const faust_constraint_name& constraint_name_,
-             const faust_unsigned_int nb_rows_,
-             const faust_unsigned_int nb_cols_);
+             const faust_constraint_name& constraintName_,
+             const faust_unsigned_int nbRows_,
+             const faust_unsigned_int nbCols_);
 
           ConstraintInt(
-             const faust_constraint_name& constraint_name_,
+             const faust_constraint_name& constraintName_,
              const faust_unsigned_int parameter_,
-             const faust_unsigned_int nb_rows_,
-             const faust_unsigned_int nb_cols_);
+             const faust_unsigned_int nbRows_,
+             const faust_unsigned_int nbCols_);
 
           ConstraintInt(const ConstraintInt& constraint_);
 
-          faust_unsigned_int getParameter() const {return parameter;};
+          faust_unsigned_int get_parameter() const {return m_parameter;};
 
           virtual void set_default_parameter();
           virtual void check_constraint_name()const;
@@ -60,8 +60,8 @@ namespace Faust
 
        private:
           // parameter of constraint
-          faust_unsigned_int parameter;
-          static const char * class_name;
+          faust_unsigned_int m_parameter;
+          static const char * m_className;
 
     };
 }

@@ -81,6 +81,9 @@ One demonstration is available in "./misc/demo/" directory:
 -	Source_localization using MEG data (cf. Sec.V. of [1];)
 
 See related ./misc/demo/README file for more detail. 
+
+This package contains a CTest tool to execute binary file automatically.
+(cf. CMakeLists.txt)
 ##########################################################################
 
 ##########################################################################
@@ -89,7 +92,7 @@ Naming conventions in the FAuST project :
 	- namespace 		:	Faust::xxx
 	- class 			: 	Faust::MyClass	/	Faust::Class
 	- attributs			:	m_myAttribut	/	m_attribut
-	- methods			:	m_my_method()	/	m_method()
+	- methods			:	my_method()		/	method()
 
 	- function			:	Faust::my_function()
 	- variable			:	myVariable

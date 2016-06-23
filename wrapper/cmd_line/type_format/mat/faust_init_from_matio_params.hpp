@@ -77,7 +77,7 @@ void init_params_palm_from_matiofile(Faust::ParamsPalm<FPP,DEVICE>& params,const
 			//cout<<"nfacts"<<endl;
 			nfacts=(int)((double*)(current_var->data))[0];
 			//cout<<nfacts<<endl;
-			params.nb_fact = nfacts;
+			params.m_nbFact = nfacts;
 		}
 
 		if (strcmp(current_fieldName,"data")==0)
@@ -219,7 +219,7 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 			//cout<<"nfacts"<<endl;
 			nfacts=(int)((double*)(current_var->data))[0];
 			//cout<<nfacts<<endl;
-			params.nb_fact = nfacts;
+			params.m_nbFact = nfacts;
 		}
 
 		if (strcmp(current_fieldName,"data")==0)
@@ -295,11 +295,11 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 				for (int L=0;L<consS.size();L++)
 				{
 					////cout<<consS[L]->get_constraint_name()<<endl;
-					////cout<<"params :"<<(*params.cons[L]).getParameter()<<endl;
-					////cout<<"nb_row :"<<(*consS[L]).getRows()<<endl;
-					////cout<<"nb_col :"<<(*consS[L]).getCols()<<endl;
+					////cout<<"params :"<<(*params.cons[L]).get_parameter()<<endl;
+					////cout<<"nb_row :"<<(*consS[L]).get_rows()<<endl;
+					////cout<<"nb_col :"<<(*consS[L]).get_cols()<<endl;
 					//Faust::ConstraintInt* const_int = (Faust::ConstraintInt*)(params.cons[L]);
-					////cout<<"parameter :"<<(*const_int).getParameter()<<endl<<endl;
+					////cout<<"parameter :"<<(*const_int).get_parameter()<<endl<<endl;
 				}
 				//cout<<endl<<endl;
 
@@ -335,8 +335,8 @@ void add_constraint(std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & c
 		name_cons+= (char) (((char*)(cons_name_var->data))[k]);
 	}
 
-	int const_type = getTypeConstraint(name_cons.c_str());
-	faust_constraint_name cons_name=getEquivalentConstraint(name_cons.c_str());
+	int const_type = get_type_constraint(name_cons.c_str());
+	faust_constraint_name cons_name=get_equivalent_constraint(name_cons.c_str());
 	int nbr_field = (cons_var->dims[1]);
 
 
@@ -394,7 +394,7 @@ template<typename FPP,Device DEVICE>
 void Display_params(Faust::Params<FPP,DEVICE> & params)
 {
 
-	cout<<"NFACTS : "<<params.nb_fact<<endl;
+	cout<<"NFACTS : "<<params.m_nbFact<<endl;
 	int nbr_iter_2_fact = 0;
 	while(params.stop_crit_2facts.do_continue(nbr_iter_2_fact))
 	{
@@ -423,31 +423,31 @@ void Display_params(Faust::Params<FPP,DEVICE> & params)
 		for (int jl=0;jl<params.cons.size();jl++)
 		{	//string type_cons;
 			//type_cons.resize(0);
-			//type_cons=getConstraintType((*params.cons[jl][L]).getConstraintType());
-			cout<<"type_cont : "<<params.cons[jl][L]->getType()<<" ";
+			//type_cons=get_constraint_type((*params.cons[jl][L]).get_constraint_type());
+			cout<<"type_cont : "<<params.cons[jl][L]->get_type()<<" ";
 			cout<<(*params.cons[jl][L]).get_constraint_name();
-			cout<<" nb_row :"<<(*params.cons[jl][L]).getRows();
-			cout<<" nb_col :"<<(*params.cons[jl][L]).getCols();
+			cout<<" nb_row :"<<(*params.cons[jl][L]).get_rows();
+			cout<<" nb_col :"<<(*params.cons[jl][L]).get_cols();
 
 
 
-			if (params.cons[jl][L]->isConstraintParameterInt())
+			if (params.cons[jl][L]->is_constraint_parameter_int())
 			{
 				Faust::ConstraintInt<FPP,DEVICE>* const_int = (Faust::ConstraintInt<FPP,DEVICE>*)(params.cons[jl][L]);
-				cout<<" parameter :"<<(*const_int).getParameter()<<endl;
+				cout<<" parameter :"<<(*const_int).get_parameter()<<endl;
 			}
 
-			else if (params.cons[jl][L]->isConstraintParameterReal())
+			else if (params.cons[jl][L]->is_constraint_parameter_real())
 			{
 				Faust::ConstraintFPP<FPP,DEVICE>* const_real = (Faust::ConstraintFPP<FPP,DEVICE>*)(params.cons[jl][L]);
-				cout<<" parameter :"<<(*const_real).getParameter()<<endl;
+				cout<<" parameter :"<<(*const_real).get_parameter()<<endl;
 			}
 
-			else if (params.cons[jl][L]->isConstraintParameterMat())
+			else if (params.cons[jl][L]->is_constraint_parameter_mat())
 			{
 				Faust::ConstraintMat<FPP,DEVICE>* const_mat = (Faust::ConstraintMat<FPP,DEVICE>*)(params.cons[jl][L]);
 				cout<<" parameter :"<<endl;
-				(*const_mat).getParameter().Display();
+				(*const_mat).get_parameter().Display();
 			}
 
 		}

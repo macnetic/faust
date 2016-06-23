@@ -8,7 +8,7 @@
 #include "faust_exception.h"
 
 template<typename FPP,Device DEVICE>
-const char * Faust::ConstraintMat<FPP,DEVICE>::class_name="Faust::ConstraintMat<FPP,DEVICE>::";
+const char * Faust::ConstraintMat<FPP,DEVICE>::m_className="Faust::ConstraintMat<FPP,DEVICE>::";
 
 template<typename FPP,Device DEVICE>
 Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat() :
@@ -19,28 +19,28 @@ Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat() :
 
 template<typename FPP,Device DEVICE>
 Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat(
-   const faust_constraint_name& constraint_name_,
-   const faust_unsigned_int nb_rows_,
-   const faust_unsigned_int nb_cols_) :
+   const faust_constraint_name& constraintName_,
+   const faust_unsigned_int nbRows_,
+   const faust_unsigned_int nbCols_) :
       Faust::ConstraintGeneric<FPP,DEVICE>(
-         constraint_name_,
-         nb_rows_,
-         nb_cols_)
+         constraintName_,
+         nbRows_,
+         nbCols_)
 {
    set_default_parameter();
 }
 
 template<typename FPP,Device DEVICE>
 Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat(
-   const faust_constraint_name& constraint_name_,
-   const Faust::MatDense<FPP,DEVICE> default_parameter_,
-   const faust_unsigned_int nb_rows_,
-   const faust_unsigned_int nb_cols_) :
+   const faust_constraint_name& constraintName_,
+   const Faust::MatDense<FPP,DEVICE> defaultParameter_,
+   const faust_unsigned_int nbRows_,
+   const faust_unsigned_int nbCols_) :
       Faust::ConstraintGeneric<FPP,DEVICE>(
-         constraint_name_,
-         nb_rows_,
-         nb_cols_),
-         parameter(default_parameter_)
+         constraintName_,
+         nbRows_,
+         nbCols_),
+         m_parameter(defaultParameter_)
 {
    check_constraint_name();
 }
@@ -49,10 +49,10 @@ template<typename FPP,Device DEVICE>
 Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat(
    const Faust::ConstraintMat<FPP,DEVICE>& constraint_) :
       Faust::ConstraintGeneric<FPP,DEVICE>(
-         constraint_.constraint_name,
-         constraint_.nb_rows,
-         constraint_.nb_cols),
-         parameter(constraint_.parameter)
+         constraint_.constraintName,
+         constraint_.nbRows,
+         constraint_.nbCols),
+         m_parameter(constraint_.parameter)
 {
    check_constraint_name();
 }
@@ -62,14 +62,14 @@ Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat(
 template<typename FPP,Device DEVICE>
 void Faust::ConstraintMat<FPP,DEVICE>::check_constraint_name()const
 {
-   switch (this->constraint_name)
+   switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_CONST:
          break;
       case CONSTRAINT_NAME_SUPP:
          break;
       default:
-         handleError(class_name," cannot create Faust::ConstraintMat objet from an faust_constraint object with this constraint_name");
+         handleError(m_className," cannot create Faust::ConstraintMat objet from an faust_constraint object with this constraint_name");
          break;
    }
 }
@@ -77,16 +77,16 @@ void Faust::ConstraintMat<FPP,DEVICE>::check_constraint_name()const
 template<typename FPP,Device DEVICE>
 void Faust::ConstraintMat<FPP,DEVICE>::set_default_parameter()
 {
-   switch (this->constraint_name)
+   switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_CONST:
-         parameter.setZeros();
+         m_parameter.setZeros();
          break;
       case CONSTRAINT_NAME_SUPP:
-         parameter.setZeros();
+         m_parameter.setZeros();
          break;
       default:
-         handleError(class_name,"set_default_parameter : cannot create Faust::ConstraintMat objet from an faust_constraint object with this constraint_name");
+         handleError(m_className,"set_default_parameter : cannot create Faust::ConstraintMat objet from an faust_constraint object with this constraint_name");
          break;
    }
 }
@@ -95,16 +95,16 @@ void Faust::ConstraintMat<FPP,DEVICE>::set_default_parameter()
 template<typename FPP,Device DEVICE>
 void Faust::ConstraintMat<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat) const
 {
-   switch (this->constraint_name)
+   switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_CONST:
-         mat=parameter;
+         mat=m_parameter;
          break;
       case CONSTRAINT_NAME_SUPP:
-         Faust::prox_supp(mat,parameter);
+         Faust::prox_supp(mat,m_parameter);
          break;
       default:
-         handleError(class_name,"project : invalid constraint_name");
+         handleError(m_className,"project : invalid constraint_name");
          break;
    }
 }

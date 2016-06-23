@@ -26,7 +26,7 @@
 using namespace std;
 
 template <typename FPP>
-const char * Faust::MatDense<FPP,Gpu>::class_name = "Faust::MatDense<FPP,Gpu>::";
+const char * Faust::MatDense<FPP,Gpu>::m_className = "Faust::MatDense<FPP,Gpu>::";
 
 template <typename FPP>
 Faust::MatDense<FPP,Gpu>::MatDense(const FPP *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, bool dataFromGPU, int dstDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, int srcDevice/*=FAUST_DEFAULT_CUDA_DEVICE*/, cudaStream_t stream /*=0*/ ) : dim1(0), dim2(0), isIdentity(false), isZeros(false), data(NULL), device(FAUST_DEFAULT_CUDA_DEVICE)
@@ -50,7 +50,7 @@ Faust::MatDense<FPP,Gpu>::MatDense(const FPP *data_,const faust_unsigned_int nbR
       return;
     }
     if(data_ == NULL)
-            handleError(class_name, "Faust::MatDense(const faust_real*,const faust_unsigned_int, const faust_unsigned_int, bool, int=FAUST_DEFAULT_CUDA_DEVICE, int=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t=0) : data pointer argument is NULL");
+            handleError(m_className, "Faust::MatDense(const faust_real*,const faust_unsigned_int, const faust_unsigned_int, bool, int=FAUST_DEFAULT_CUDA_DEVICE, int=FAUST_DEFAULT_CUDA_DEVICE, cudaStream_t=0) : data pointer argument is NULL");
 
     if(dataFromGPU)
         copyFromDevice(data_, nbRow, nbCol, dstDevice, srcDevice, stream);
@@ -74,7 +74,7 @@ t_constructor_from_device.start();
 #endif
     //update the flag before resizing the matrix
     if (cu_M.isIdentity || cu_M.isZeros)
-	handleError(class_name, "Faust::MatDense(const Faust::MatDense<..,Gpu>& cu_M, ...) :  cu_M is Identity, Zeros are not handle by the constructor");
+	handleError(m_className, "Faust::MatDense(const Faust::MatDense<..,Gpu>& cu_M, ...) :  cu_M is Identity, Zeros are not handle by the constructor");
     if(cu_M.isIdentity || cu_M.isZeros || cu_M.dim1*cu_M.dim2==0)
     {
 	resize(cu_M.dim1, cu_M.dim2, dstDevice);
@@ -124,7 +124,7 @@ t_constructor_from_device.start();
     if(cu_S.getNonZeros() == 0)
     {
         if(cu_S.getRowPtr()!=NULL || cu_S.getColInd()!=NULL || cu_S.getValues()!=NULL)
-            handleError(class_name, "Faust::MatDense(const faust_cu_spmat&, ...) : rowPtr,  colInd or values pointer is not NULL");
+            handleError(m_className, "Faust::MatDense(const faust_cu_spmat&, ...) : rowPtr,  colInd or values pointer is not NULL");
 
         setZeros(cu_S.getNbRow(), cu_S.getNbCol(), dstDevice);
 #ifdef __COMPILE_TIMERS__
@@ -184,7 +184,7 @@ void Faust::MatDense<FPP,Gpu>::_create(const faust_unsigned_int nbRow, const fau
 t_create.start();
 #endif
    if(nbRow<0 || nbCol<0)
-       handleError(class_name, "_create : incorrect dimensions");
+       handleError(m_className, "_create : incorrect dimensions");
 
 
    if(nbRow*nbCol==0)
@@ -199,7 +199,7 @@ t_create.start();
       if (data == NULL)
          faust_cudaMalloc((void**)&data, (nbRow*nbCol)*sizeof(FPP));
       else
-         handleError(class_name, "_create : data has already been allocated on GPU");
+         handleError(m_className, "_create : data has already been allocated on GPU");
 
 
       faust_cudaSetDevice(currentGPU);
@@ -230,12 +230,12 @@ t_clear.start();
       if (data != NULL)
          faust_cudaFree(data);
       else
-         handleError(class_name, "_clear : data has already been deleted on GPU");
+         handleError(m_className, "_clear : data has already been deleted on GPU");
 
       faust_cudaSetDevice(currentGPU);
    }
    else if(data!=NULL)
-      handleError(class_name, "_clear : data of empty matrix, identity matrix or zeros matrix should be NULL");
+      handleError(m_className, "_clear : data of empty matrix, identity matrix or zeros matrix should be NULL");
 
    dim1 = 0;
    dim2 = 0;
@@ -427,7 +427,7 @@ template <typename FPP>
 void Faust::MatDense<FPP,Gpu>::setEyes()
 {
    if(dim1!=dim2)
-      handleError(class_name,"setEyes() : GPU matrix is not square");
+      handleError(m_className,"setEyes() : GPU matrix is not square");
    setEyes(dim1, device);
 }
  /// OPERATION BASIQUE ///
@@ -506,7 +506,7 @@ t_init_from_transpose.start();
 #endif
 
 if(cu_A == (*this))
-            handleError(class_name, "init_from_transpose(const Faust::MatDense<FPP,Gpu>&) : input GPU data is the same that the current GPU data. Try using Faust::MatDense<FPP,Gpu>::transpose instead, in this particular case.");
+            handleError(m_className, "init_from_transpose(const Faust::MatDense<FPP,Gpu>&) : input GPU data is the same that the current GPU data. Try using Faust::MatDense<FPP,Gpu>::transpose instead, in this particular case.");
 
    if(cu_A.isZeros)
    {
@@ -601,7 +601,7 @@ t_init_from_transpose.stop();
    if (cu_S.getNbRow()*cu_S.getNbCol() > 0)
    {
       if (cu_S.getNonZeros()==0)
-         handleError(class_name, "init_from_transpose(faust_cu_spmat, ...) : impossible to create full matrix from uninitialized sparse matrix");
+         handleError(m_className, "init_from_transpose(faust_cu_spmat, ...) : impossible to create full matrix from uninitialized sparse matrix");
       else
       {
          int currentGPU;
@@ -814,7 +814,7 @@ FPP Faust::MatDense<FPP,Gpu>::trace() const
 t_trace.start();
 #endif
    if(dim1 != dim2)
-      handleError(class_name, "norm : matrix must be square");
+      handleError(m_className, "norm : matrix must be square");
 
    if (isZeros)
    {
@@ -961,7 +961,7 @@ bool Faust::MatDense<FPP,Gpu>::operator==(const Faust::MatDense<FPP,Gpu>& cu_M)c
    if(data!=NULL && data==cu_M.data && device==cu_M.device)
    {
       if(dim1!=cu_M.dim1 || dim2!=cu_M.dim2 && !isIdentity && !isZeros)
-         handleError(class_name,"operator== : same data and device but different dimensions or identity or zeros");
+         handleError(m_className,"operator== : same data and device but different dimensions or identity or zeros");
       return true;
    }
    else
@@ -1085,7 +1085,7 @@ t_operator_equal_from_host.stop();
 
 template <typename FPP>
 void Faust::MatDense<FPP,Gpu>::operator=(const Faust::MatSparse<FPP,Gpu>& S)
-{handleError(class_name, "Faust::MatDense<FPP,Gpu>::operator=(const faust_cu_spmat&) is not defined. Use Faust::MatDense<FPP,Gpu>::init_from_cu_spmat(const faust_cu_spmat&, cusparseHandle_t) instead");}
+{handleError(m_className, "Faust::MatDense<FPP,Gpu>::operator=(const faust_cu_spmat&) is not defined. Use Faust::MatDense<FPP,Gpu>::init_from_cu_spmat(const faust_cu_spmat&, cusparseHandle_t) instead");}
 
 template <typename FPP>
 void Faust::MatDense<FPP,Gpu>::init_from_cu_spmat(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu> spblasHandle, const FPP coeff /*=1.0*/)
@@ -1219,7 +1219,7 @@ t_operator_equal_from_device.stop();
 
 template <typename FPP>
 void Faust::MatDense<FPP,Gpu>::operator+=(const Faust::MatSparse<FPP,Gpu>& cu_S)
-{handleError(class_name, "Faust::MatDense<FPP,Gpu>::operator+=(const faust_cu_spmat&) is not defined. Use Faust::MatDense<FPP,Gpu>::add(const faust_cu_spmat&, Faust::SpBlasHandle<Gpu>) instead");}
+{handleError(m_className, "Faust::MatDense<FPP,Gpu>::operator+=(const faust_cu_spmat&) is not defined. Use Faust::MatDense<FPP,Gpu>::add(const faust_cu_spmat&, Faust::SpBlasHandle<Gpu>) instead");}
 
 template <typename FPP>
 void Faust::MatDense<FPP,Gpu>::add(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::SpBlasHandle<Gpu> spblasHandle)
@@ -1228,10 +1228,10 @@ void Faust::MatDense<FPP,Gpu>::add(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust:
 t_add_cuspmat.start();
 #endif
    if(!(isZeros || isIdentity || data))
-      handleError(class_name,"add : uninitialized matrix");
+      handleError(m_className,"add : uninitialized matrix");
 
    if(dim1!=cu_S.getNbRow() || dim2!=cu_S.getNbCol())
-      handleError(class_name,"add : incorrect matrix dimensions");
+      handleError(m_className,"add : incorrect matrix dimensions");
 
    int currentGPU;
    faust_cudaGetDevice(&currentGPU);
@@ -1297,7 +1297,7 @@ t_add_cuspmat.stop();
 template <typename FPP>
 void Faust::MatDense<FPP,Gpu>::operator-=(const Faust::MatSparse<FPP,Gpu>& cu_S)
 {
-   handleError(class_name, "Faust::MatDense<FPP,Gpu>::operator-=(const faust_cu_spmat&) is not defined. Use Faust::MatDense<FPP,Gpu>::sub(const faust_cu_spmat&, cusparseHandle_t) instead");
+   handleError(m_className, "Faust::MatDense<FPP,Gpu>::operator-=(const faust_cu_spmat&) is not defined. Use Faust::MatDense<FPP,Gpu>::sub(const faust_cu_spmat&, cusparseHandle_t) instead");
 }
 
 template <typename FPP>
@@ -1307,10 +1307,10 @@ void Faust::MatDense<FPP,Gpu>::sub(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust:
 t_sub.start();
 #endif
    if(!(isZeros || isIdentity || data))
-      handleError(class_name,"sub : uninitialized matrix");
+      handleError(m_className,"sub : uninitialized matrix");
 
    if(dim1!=cu_S.getNbRow() || dim2!=cu_S.getNbCol())
-      handleError(class_name,"sub : incorrect matrix dimensions");
+      handleError(m_className,"sub : incorrect matrix dimensions");
 
    int currentGPU;
    faust_cudaGetDevice(&currentGPU);
@@ -1382,10 +1382,10 @@ void Faust::MatDense<FPP,Gpu>::operator+=(const Faust::MatDense<FPP,Gpu>& cu_M)
 t_operator_plus_equal.start();
 #endif
    if(!((isZeros || isIdentity || data) && (cu_M.isZeros || cu_M.isIdentity || cu_M.data)))
-      handleError(class_name,"operator+= : uninitialized matrix");
+      handleError(m_className,"operator+= : uninitialized matrix");
 
    if(dim1!=cu_M.dim1 || dim2!=cu_M.dim2)
-      handleError(class_name,"operator+= : incorrect matrix dimensions");
+      handleError(m_className,"operator+= : incorrect matrix dimensions");
 
    int currentGPU;
    faust_cudaGetDevice(&currentGPU);
@@ -1442,10 +1442,10 @@ void Faust::MatDense<FPP,Gpu>::operator-=(const Faust::MatDense<FPP,Gpu>& cu_M)
 t_operator_less_equal.start();
 #endif
    if(!isZeros && !isIdentity && data==NULL)
-      handleError(class_name,"operator-= : uninitialized matrix");
+      handleError(m_className,"operator-= : uninitialized matrix");
 
    if(dim1!=cu_M.dim1 || dim2!=cu_M.dim2)
-      handleError(class_name,"operator-= : incorrect matrix dimensions");
+      handleError(m_className,"operator-= : incorrect matrix dimensions");
 
    int currentGPU;
    faust_cudaGetDevice(&currentGPU);
@@ -1517,10 +1517,10 @@ void Faust::MatDense<FPP,Gpu>::scalarMultiply(const Faust::MatDense<FPP,Gpu>& cu
 t_hadamard_product.start();
 #endif
    if(!isZeros && !isIdentity && data==NULL)
-      handleError(class_name,"scalarMultiply : uninitialized matrix");
+      handleError(m_className,"scalarMultiply : uninitialized matrix");
 
    if(dim1!=cu_M.dim1 || dim2!=cu_M.dim2)
-      handleError(class_name,"scalarMultiply : incorrect matrix dimensions");
+      handleError(m_className,"scalarMultiply : incorrect matrix dimensions");
 
    int currentGPU;
    faust_cudaGetDevice(&currentGPU);

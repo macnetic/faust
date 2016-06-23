@@ -38,7 +38,7 @@ namespace Faust
           T errorThreshold;
           int maxIteration;
           // only used as stopping criterion, if isCriterionError, when error is still greater than
-          static const char * class_name;
+          static const char * m_className;
     };
 
 }

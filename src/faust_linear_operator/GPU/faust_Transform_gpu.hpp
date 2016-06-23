@@ -13,7 +13,7 @@
 
 using namespace std;
 template<typename FPP>
-const char * Faust::Transform<FPP,Gpu>::class_name="Faust::Transform<FPP,Gpu>::";
+const char * Faust::Transform<FPP,Gpu>::m_className="Faust::Transform<FPP,Gpu>::";
 
 template<typename FPP>
 Faust::Transform<FPP,Gpu>::Transform() :
@@ -73,7 +73,7 @@ void Faust::Transform<FPP,Gpu>::scalarMultiply(const FPP scalar)
 	if (size() > 0)
 		data[0]*=scalar;
 	else
-		handleError(class_name,"scalarMultiply : empty faust can't be multiplied ");
+		handleError(m_className,"scalarMultiply : empty faust can't be multiplied ");
 }
 
 template<typename FPP>
@@ -140,7 +140,7 @@ Faust::MatDense<FPP,Gpu> Faust::Transform<FPP,Gpu>::get_product(Faust::BlasHandl
 	// from left to right is (dim1*total_nnz)
 	// from right to left is (dim2*total_nnz)
 	if (size() == 0)
-		handleError(class_name,"get_product : empty Faust::Transform<FPP,Gpu>");
+		handleError(m_className,"get_product : empty Faust::Transform<FPP,Gpu>");
 	/*Faust::MatDense<FPP,Gpu> prod(data[0].getNbRow());
 
 	if(getNbRow()<getNbCol())
@@ -235,7 +235,7 @@ void Faust::Transform<FPP,Gpu>::multiply(const Faust::Transform<FPP,Gpu> & A)
 		else
 		{
 			if (getNbCol() != A.getNbRow())
-				handleError(class_name,"multiply : dimensions of the 2 faustcore are in conflict");
+				handleError(m_className,"multiply : dimensions of the 2 faustcore are in conflict");
 			data.insert(data.end(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;
 		}
 	}
@@ -254,7 +254,7 @@ void Faust::Transform<FPP,Gpu>::multiplyLeft(const Faust::Transform<FPP,Gpu> & A
 		else
 		{
 			if (getNbRow() != A.getNbCol())
-				handleError(class_name,"multiplyLeft : dimensions of the 2 faustcore are in conflict");
+				handleError(m_className,"multiplyLeft : dimensions of the 2 faustcore are in conflict");
 			data.insert(data.begin(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;
 		}
 	}
@@ -266,7 +266,7 @@ Faust::MatSparse<FPP,Gpu> Faust::Transform<FPP,Gpu>::get_fact(int id)const
 	if((id>=size())||(id<0))
 	{
 		cout<<"id_fact error : "<<id<<endl;
-		handleError(class_name,"get_fact : id exceed Faust::Transform<FPP,Gpu> size or id < 0");
+		handleError(m_className,"get_fact : id exceed Faust::Transform<FPP,Gpu> size or id < 0");
 	}
 	cout<<"size_fact"<<size()<<endl;
 	cout<<"id_fact"<<id<<endl;
@@ -279,7 +279,7 @@ void Faust::Transform<FPP,Gpu>::push_back(const Faust::MatSparse<FPP,Gpu>& S)
 {
    if (size()>0)
       if(data[size()-1].getNbCol()!=S.getNbRow() || S.getNbRow()<1)
-      handleError(class_name,"push_back : incorrect dimensions");
+      handleError(m_className,"push_back : incorrect dimensions");
    data.push_back(S);
    totalNonZeros += S.getNonZeros();
 }
@@ -290,7 +290,7 @@ void Faust::Transform<FPP,Gpu>::push_first(const Faust::MatSparse<FPP,Gpu>& S)
 {
    if (size()>0)
       if(data[0].getNbRow()!=S.getNbCol() || S.getNbRow()<1)
-         handleError(class_name,"push_first : incorrect dimensions");
+         handleError(m_className,"push_first : incorrect dimensions");
    data.insert(data.begin(),S);
    totalNonZeros += S.getNonZeros();
 }
@@ -334,9 +334,9 @@ void Faust::Transform<FPP,Gpu>::pop_first(Faust::MatSparse<FPP,Gpu>& S) const
 template<typename FPP>
 void Faust::Transform<FPP,Gpu>::transpose()
 {
-	int nb_fact=size();
+	int nbFact=size();
 	reverse(data.begin(),data.end());
-	for (int i=0;i<nb_fact;i++)
+	for (int i=0;i<nbFact;i++)
 		data[i].transpose();
 }
 
@@ -344,16 +344,16 @@ void Faust::Transform<FPP,Gpu>::transpose()
 template<typename FPP>
 void Faust::Transform<FPP,Gpu>::mult( const Faust::Vect<FPP,Gpu>& cu_x, Faust::Vect<FPP,Gpu>& cu_y, Faust::SpBlasHandle<Gpu> spblasHandle)
 {
-	int nb_fact=size();
-	if (nb_fact == 0)
+	int nbFact=size();
+	if (nbFact == 0)
 	{
 		cu_y=cu_x;
-		handleWarning(class_name,"mult : empty Faust::Transform<FPP,Gpu>");
+		handleWarning(m_className,"mult : empty Faust::Transform<FPP,Gpu>");
 
 	}else
 	{
 		Faust::Vect<FPP,Gpu> vec_tmp(cu_x);
-		for (int i=nb_fact-1;i>=0;i--)
+		for (int i=nbFact-1;i>=0;i--)
 		{
 			//std::cout<<"size x : "<< vec_tmp.size() <<" data nb col "<<data[i].getNbCol()<<std::endl;
 			//std::cout<<"size y : "<< cu_y.size() <<" data nb row "<<data[i].getNbCol()<<std::endl;

@@ -32,19 +32,19 @@ namespace Faust
           ConstraintMat(); // ajouter parametre de contrainte par defaut (a voir avec Luc)
 
           ConstraintMat(
-             const faust_constraint_name& constraint_name_,
-             const faust_unsigned_int nb_rows_,
-             const faust_unsigned_int nb_cols_);
+             const faust_constraint_name& constraintName_,
+             const faust_unsigned_int nbRows_,
+             const faust_unsigned_int nbCols_);
 
           ConstraintMat(
-             const faust_constraint_name& constraint_name_,
+             const faust_constraint_name& constraintName_,
              const Faust::MatDense<FPP,DEVICE> parameter_,
-             const faust_unsigned_int nb_rows_,
-             const faust_unsigned_int nb_cols_);
+             const faust_unsigned_int nbRows_,
+             const faust_unsigned_int nbCols_);
 
           ConstraintMat(const ConstraintMat& constraint_);
 
-          Faust::MatDense<FPP,DEVICE> getParameter() const {return parameter;};
+          Faust::MatDense<FPP,DEVICE> get_parameter() const {return m_parameter;};
 
           virtual void set_default_parameter();
           virtual void check_constraint_name()const;
@@ -53,8 +53,8 @@ namespace Faust
 
        private:
           // parameter of constraint
-          Faust::MatDense<FPP,DEVICE> parameter;
-          static const char * class_name;
+          Faust::MatDense<FPP,DEVICE> m_parameter;
+          static const char * m_className;
 
     };
 }

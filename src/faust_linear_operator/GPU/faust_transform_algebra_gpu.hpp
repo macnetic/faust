@@ -57,15 +57,15 @@ T power_iteration(const  faust_core_cu<T> & cu_A, const int nbr_iter_max, const 
 // template<typename T>
 // void multiply(const faust_core_cu<T> & A, const faust_cu_mat<T> & B, faust_cu_mat<T> & C,const T & alpha, char typeA, char typeMult)
  // {
-	// int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB, nb_fact;
+	// int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB, nbFact;
 
 	// if  ((&(C.mat)) == (&(B.mat)))
 	// {
 		// handleError("faust_core_cu algebra "," multiply : C is the same object as B");
 	// }
 
-	// nb_fact = A.size();
-	// if (nb_fact != 0)
+	// nbFact = A.size();
+	// if (nbFact != 0)
 	// {
 		// if (typeA == 'T')
 		// {
@@ -82,7 +82,7 @@ T power_iteration(const  faust_core_cu<T> & cu_A, const int nbr_iter_max, const 
 		// nbColOpB = B.getNbCol();
 
 
-	// if (nb_fact != 0)
+	// if (nbFact != 0)
 	// {
 		// if (typeMult == 'R')
 		// {
@@ -109,13 +109,13 @@ T power_iteration(const  faust_core_cu<T> & cu_A, const int nbr_iter_max, const 
 	// C = B;
 	// C.scalarMultiply(alpha);
 	// C.resize(nbRowOpB,nbColOpB);
-	// if (nb_fact != 0)
+	// if (nbFact != 0)
 	// {
 		// if (typeA == 'T')
 		// {
 			// if(typeMult == 'R')
 			// {
-				// for (int i=0 ; i<nb_fact ; i++)
+				// for (int i=0 ; i<nbFact ; i++)
 				// {
 					// C.mat = A.data[i].mat.transpose() * C.mat;
 				// }
@@ -123,7 +123,7 @@ T power_iteration(const  faust_core_cu<T> & cu_A, const int nbr_iter_max, const 
 
 			// }else
 			// {
-				// for (int i=nb_fact-1 ; i>=0 ; i--)
+				// for (int i=nbFact-1 ; i>=0 ; i--)
 				// {
 				// C.mat = C.mat * A.data[i].mat.transpose();
 				// }
@@ -135,14 +135,14 @@ T power_iteration(const  faust_core_cu<T> & cu_A, const int nbr_iter_max, const 
 		// {
 			// if(typeMult == 'R')
 			// {
-				// for (int i=nb_fact-1 ; i>=0 ; i--)
+				// for (int i=nbFact-1 ; i>=0 ; i--)
 				// {
 					// C.mat = A.data[i].mat * C.mat;
 				// }
 				// C.resize(nbRowOpA,nbColOpB);
 			// }else
 			// {
-				// for (int i=0 ; i<nb_fact ; i++)
+				// for (int i=0 ; i<nbFact ; i++)
 				// {
 					// C.mat = C.mat*A.data[i].mat;
 				// }

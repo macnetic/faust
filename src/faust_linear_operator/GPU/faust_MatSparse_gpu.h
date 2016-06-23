@@ -84,12 +84,12 @@ namespace Faust
             faust_unsigned_int getNbRow()const{return dim1;}
             faust_unsigned_int getNbCol()const{return dim2;}
             faust_unsigned_int getNonZeros()const{return nnz;}
-            int* getRowPtr(){if(csrRowPtr==NULL) handleError(class_name, "getRowPtr : non-allocated GPU pointer");return csrRowPtr;}
-            int* getColInd(){if(csrColInd==NULL) handleError(class_name, "getColInd : non-allocated GPU pointer");return csrColInd;}
-            FPP* getValues(){if(csrValues==NULL) handleError(class_name, "getValues : non-allocated GPU pointer");return csrValues;}
-            const int* getRowPtr()const{if(csrRowPtr==NULL) handleError(class_name, "getRowPtr : non-allocated GPU pointer");return csrRowPtr;}
-            const int* getColInd()const{if(csrColInd==NULL) handleError(class_name, "getColInd : non-allocated GPU pointer");return csrColInd;}
-            const FPP* getValues()const{if(csrValues==NULL) handleError(class_name, "getRowPtr : non-allocated GPU pointer");return csrValues;}
+            int* getRowPtr(){if(csrRowPtr==NULL) handleError(m_className, "getRowPtr : non-allocated GPU pointer");return csrRowPtr;}
+            int* getColInd(){if(csrColInd==NULL) handleError(m_className, "getColInd : non-allocated GPU pointer");return csrColInd;}
+            FPP* getValues(){if(csrValues==NULL) handleError(m_className, "getValues : non-allocated GPU pointer");return csrValues;}
+            const int* getRowPtr()const{if(csrRowPtr==NULL) handleError(m_className, "getRowPtr : non-allocated GPU pointer");return csrRowPtr;}
+            const int* getColInd()const{if(csrColInd==NULL) handleError(m_className, "getColInd : non-allocated GPU pointer");return csrColInd;}
+            const FPP* getValues()const{if(csrValues==NULL) handleError(m_className, "getRowPtr : non-allocated GPU pointer");return csrValues;}
             const cusparseMatDescr_t& getDescr()const{return *descr;}
             int getDevice()const{return device;}
 
@@ -111,7 +111,7 @@ namespace Faust
             int device;
           cusparseMatDescr_t* descr;
           cusparseMatDescr_t descr_content;
-            static const char * class_name;
+            static const char * m_className;
 
 
 
@@ -166,7 +166,7 @@ template <typename FPP>
 inline void Faust::MatSparse<FPP,Gpu>::operator/=(const FPP alpha)
 {
    if(alpha==0.0)
-      handleError(class_name,"operator/= : dividing by 0");
+      handleError(m_className,"operator/= : dividing by 0");
    else
       this->operator*=(1.0/alpha);
 }
@@ -177,7 +177,7 @@ inline void Faust::MatSparse<FPP,Gpu>::setZeros(const faust_unsigned_int dim1_, 
 
 template <typename FPP>
 inline void Faust::MatSparse<FPP,Gpu>::setIdentity(const faust_unsigned_int dim1_)
-{   handleError(class_name,"setIdentity : to set a matrix to identity, use the full-matrix format");}
+{   handleError(m_className,"setIdentity : to set a matrix to identity, use the full-matrix format");}
 
 
 template <typename FPP>

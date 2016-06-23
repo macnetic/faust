@@ -314,7 +314,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;
         bool isIdentity;
         bool isZeros;
-        static const char * class_name;
+        static const char * m_className;
 
 
     #ifdef __COMPILE_TIMERS__

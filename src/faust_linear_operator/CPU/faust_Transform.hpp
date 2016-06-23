@@ -24,7 +24,7 @@ void Faust::Transform<FPP,Cpu>::faust_gemm(const Faust::MatDense<FPP,Cpu> & B, F
 
 	if (size() == 0)
 	{
-		handleError(class_name,"faust_gemm : empty Faust::Transform");
+		handleError(m_className,"faust_gemm : empty Faust::Transform");
 	}
 	if (typeA == 'T')
 	{
@@ -50,7 +50,7 @@ void Faust::Transform<FPP,Cpu>::faust_gemm(const Faust::MatDense<FPP,Cpu> & B, F
 
 	if (nbColOpA != nbRowOpB)
 	{
-		handleError(class_name, "faust_gemm : dimension conflict  between matrix op((*this)) and matrix op(B)");
+		handleError(m_className, "faust_gemm : dimension conflict  between matrix op((*this)) and matrix op(B)");
 
 	}
 
@@ -80,7 +80,7 @@ void Faust::Transform<FPP,Cpu>::faust_gemm(const Faust::MatDense<FPP,Cpu> & B, F
     {
 	if (( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
 	{
-		handleError(class_name, "faust_gemm : invalid dimension for output matrix C");
+		handleError(m_className, "faust_gemm : invalid dimension for output matrix C");
 	}
 
 
@@ -109,7 +109,7 @@ void Faust::Transform<FPP,Cpu>::faust_gemm(const Faust::MatDense<FPP,Cpu> & B, F
 
 
 template<typename FPP>
-const char * Faust::Transform<FPP,Cpu>::class_name="Faust::Transform<FPP,Cpu>::";
+const char * Faust::Transform<FPP,Cpu>::m_className="Faust::Transform<FPP,Cpu>::";
 
 
 template<typename FPP>
@@ -169,7 +169,7 @@ void Faust::Transform<FPP,Cpu>::scalarMultiply(const FPP scalar)
 	if (size() > 0)
 		data[0]*=scalar;
 	else
-		handleError(class_name,"scalarMultiply : empty faust can't be multiplied ");
+		handleError(m_className,"scalarMultiply : empty faust can't be multiplied ");
 }
 
 template<typename FPP>
@@ -237,7 +237,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product()const
 	// from right to left is (dim2*total_nnz)
 	if (size() == 0)
 	{
-		handleError(class_name,"get_product : empty Faust::Transform");
+		handleError(m_className,"get_product : empty Faust::Transform");
 	}
 	Faust::MatDense<FPP,Cpu> prod(data[0].getNbRow());
 
@@ -341,7 +341,7 @@ void Faust::Transform<FPP,Cpu>::multiply(const Faust::Transform<FPP,Cpu> & A) //
 		{
 			if (getNbCol() != A.getNbRow())
 			{
-				handleError(class_name,"multiply : dimensions of the 2 faustcore are in conflict");
+				handleError(m_className,"multiply : dimensions of the 2 faustcore are in conflict");
 			}
 			data.insert(data.end(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;
 		}
@@ -365,7 +365,7 @@ void Faust::Transform<FPP,Cpu>::multiplyLeft(const Faust::Transform<FPP,Cpu> & A
 		{
 			if (getNbRow() != A.getNbCol())
 			{
-				handleError(class_name,"multiplyLeft : dimensions of the 2 faustcore are in conflict");
+				handleError(m_className,"multiplyLeft : dimensions of the 2 faustcore are in conflict");
 			}
 			data.insert(data.begin(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;
 		}
@@ -380,7 +380,7 @@ Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_fact(int id)const
 	if((id>=size())||(id<0))
 	{
 		cout<<"id_fact error : "<<id<<endl;
-		handleError(class_name,"get_fact : id exceed Faust::Transform size or id < 0");
+		handleError(m_className,"get_fact : id exceed Faust::Transform size or id < 0");
 	}
 	cout<<"size_fact"<<size()<<endl;
 	cout<<"id_fact"<<id<<endl;
@@ -395,7 +395,7 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatSparse<FPP,Cpu>& S)
 	{
 		if(data[size()-1].getNbCol()!=S.getNbRow() || S.getNbRow()<1)
       		{
-			handleError(class_name,"push_back : incorrect dimensions");
+			handleError(m_className,"push_back : incorrect dimensions");
      		}
    	}
    	data.push_back(S);
@@ -409,7 +409,7 @@ void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatSparse<FPP,Cpu>& S)
 	if (size()>0)
 		if(data[0].getNbRow()!=S.getNbCol() || S.getNbRow()<1)
       		{
-			handleError(class_name,"push_first : incorrect dimensions");
+			handleError(m_className,"push_first : incorrect dimensions");
       		}
 	data.insert(data.begin(),S);
    	totalNonZeros += S.getNonZeros();
@@ -455,9 +455,9 @@ void Faust::Transform<FPP,Cpu>::pop_first(Faust::MatSparse<FPP,Cpu>& S) const
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::transpose()
 {
-	int nb_fact=size();
+	int nbFact=size();
 	reverse(data.begin(),data.end());
-	for (int i=0;i<nb_fact;i++)
+	for (int i=0;i<nbFact;i++)
 	{
 		data[i].transpose();
 	}

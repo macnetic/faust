@@ -33,7 +33,7 @@ namespace Faust
 
           ParamsPalm(
              const Faust::MatDense<FPP,DEVICE>& data_,
-             const int nb_fact_,
+             const int nbFact_,
              const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*>& cons_,
              const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
              const Faust::StoppingCriterion<FPP> & stop_crit_ = Faust::StoppingCriterion<FPP>(defaultNiter),
@@ -51,7 +51,7 @@ namespace Faust
        public:
           // Required members
           Faust::MatDense<FPP,DEVICE> data;
-          int nb_fact; // number of factors
+          int nbFact; // number of factors
           std::vector<const Faust::ConstraintGeneric<FPP,DEVICE> *> cons; // vector of constraints
 
           // Optional members (set to default values if not defined)
@@ -72,7 +72,7 @@ namespace Faust
           static const bool defaultConstantStepSize;
           static const FPP defaultStepSize;
           private :
-          static const char *  class_name;
+          static const char *  m_className;
 
 
           /*const int nb_it;   // number of iterations

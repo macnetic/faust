@@ -96,6 +96,7 @@ if (FAUST_USE_MATIO)
 	set_tests_properties(MEG_FACT_FLOAT MEG_FACT_DOUBLE PROPERTIES TIMEOUT 14000)
 	
 
+
 	# time comparison between Faust-vector product and Dense matrix-vector product for various configuration ( dimension, RCG , number of factor)
 	add_test(NAME MULTIPLY_COMPTIME COMMAND ${FAUST_TEST_BIN_DIR}/multiply_compare_time_double)
 	# display the result of MULTIPLY_COMPTIME and save it in folder FAUST_TESTFIG_BIN_DIR as jpeg image (WARNING must be launched after MULTIPLY_COMPTIME)
@@ -126,6 +127,9 @@ if(FAUST_USE_MEX)
 	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_TEST_BIN_DIR}','${FAUST_TESTTOOLS_BIN_DIR}');hier_fact;end;exit" )
 	add_test(NAME FAUST_MEG_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_TEST_BIN_DIR}','${FAUST_TESTTOOLS_BIN_DIR}');MEG_fact;end;exit" )	
 	# limit the time of the process in case of bug... 
+
+#CTEST_FULL_OUTPUT
+
 	set_tests_properties(FAUST_HIER_MEX PROPERTIES TIMEOUT ${TIMEOUT_COMP})
 	set_tests_properties(FAUST_MEG_MEX PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 endif() 

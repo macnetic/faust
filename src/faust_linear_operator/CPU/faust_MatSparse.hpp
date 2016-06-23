@@ -8,7 +8,7 @@
 
 using namespace std;
 template<typename FPP>
-const char * Faust::MatSparse<FPP,Cpu>::class_name="Faust::MatSparse<FPP,Cpu>::";
+const char * Faust::MatSparse<FPP,Cpu>::m_className="Faust::MatSparse<FPP,Cpu>::";
 
 template<typename FPP>
 Faust::MatSparse<FPP,Cpu>::MatSparse() :
@@ -195,7 +195,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const vector<int>& rowidx, const vector<int
 	{
 		//cerr << "vectors rowidx, colidx and values have not the same size" << endl;
 		//exit(EXIT_FAILURE);
-		handleError(class_name,"::constructor : vectors rowidx, colidx and values have not the same size\n");
+		handleError(m_className,"::constructor : vectors rowidx, colidx and values have not the same size\n");
 	}
 
 	resize(rowidx.size(), dim1_, dim2_);
@@ -225,7 +225,7 @@ void Faust::MatSparse<FPP,Cpu>::init(const vector<int>& rowidx, const vector<int
 	if(rowidx.size()!=colidx.size() || rowidx.size()!=values.size())
 	{
 
-		handleError(class_name,"init : vectors rowidx, colidx and values have not the same size\n");
+		handleError(m_className,"init : vectors rowidx, colidx and values have not the same size\n");
 	}
 	setZeros();
 	resize(rowidx.size(), dim1_, dim2_);
@@ -306,14 +306,14 @@ void Faust::MatSparse<FPP,Cpu>::check_dim_validity() const
 		cout<<"nb cols from eigen : "<<mat.cols()<<endl;
 		cout<<"nb rows attribute : "<<this->getNbRow()<<endl;
 		cout<<"nb rows from eigen : "<<mat.rows()<<endl;
-		handleError(class_name, "check_dim_validity : Size incompatibility in the Faust::MatSparse");
+		handleError(m_className, "check_dim_validity : Size incompatibility in the Faust::MatSparse");
 	}
 
 	if (this->nnz != mat.nonZeros())
 	{
 		cout<<"nnz attribute : "<<mat.nonZeros()<<endl;
 		cout<<"nnz from eigen : "<<this->nnz<<endl;
-		handleError(class_name, "check_dim_validity : incompatibility in the number of non zeros");
+		handleError(m_className, "check_dim_validity : incompatibility in the number of non zeros");
 	}
 }
 
@@ -380,7 +380,7 @@ void Faust::MatSparse<FPP,Cpu>::operator/=(const FPP alpha)
 
 	if(fabs(alpha) == 0.0)
 	{
-		handleError(class_name,"operator/= : dividing by 0");
+		handleError(m_className,"operator/= : dividing by 0");
 	}
 	mat /= alpha;
 	update_dim();
@@ -432,7 +432,7 @@ void Faust::MatSparse<FPP,Cpu>::init_from_file(FILE* fp)
 			val.push_back((FPP)val_tmp);
 		}else
 		{
-			handleError(class_name,"init_from_file : premature end of file");
+			handleError(m_className,"init_from_file : premature end of file");
 		}
 	}
 
@@ -443,7 +443,7 @@ void Faust::MatSparse<FPP,Cpu>::init_from_file(FILE* fp)
 		|| *max_element(&row[0],&row[row.size()-1]) > dim1_tmp-1
 		|| *max_element(&col[0],&col[col.size()-1]) > dim2_tmp-1)
 	{
-		handleError(class_name,"init_from_file : Unable to initialize sparse matrix from this file");
+		handleError(m_className,"init_from_file : Unable to initialize sparse matrix from this file");
 	}
 
 	resize(nnz_tmp, dim1_tmp, dim2_tmp);
@@ -466,7 +466,7 @@ void Faust::MatSparse<FPP,Cpu>::init_from_file(const char* filename)
 	FILE* fp=fopen(filename,"r");
 	if (fp == NULL)
 	{
-		handleError(class_name,"init_from_file : unable to open file");
+		handleError(m_className,"init_from_file : unable to open file");
 	}
 	init_from_file(fp);
 	fclose(fp);

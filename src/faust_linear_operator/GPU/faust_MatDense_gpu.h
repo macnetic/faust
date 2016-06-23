@@ -201,7 +201,7 @@ namespace Faust
     //Eigen::Matrix<FPP,0,0> mat;
          bool isIdentity;
          bool isZeros;
-         static const char * class_name;
+         static const char * m_className;
 
 
 

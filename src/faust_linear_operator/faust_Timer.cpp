@@ -14,10 +14,10 @@ Faust::Timer::Timer() : isRunning(false), result(0.0f), nbCall(0)
 #elif defined(__MACH__)
    mach_timebase_info_data_t timebase;
    mach_timebase_info(&timebase);
-   conversion_factor = (double) timebase.numer / ((double) timebase.denom *1e9); 
+   conversion_factor = (double) timebase.numer / ((double) timebase.denom *1e9);
 #elif defined(__linux__)
 #else
-   handleError(class_name,"Error in Faust::Timer::Timer : OS not supported");
+   handleError(m_className,"Error in Faust::Timer::Timer : OS not supported");
 #endif
 
 }
@@ -26,9 +26,9 @@ void Faust::Timer::start()
 {
    if(isRunning)
    {
-	  handleError(class_name,"Faust::Timer::start : timer is already started.\n");
+	  handleError(m_className,"Faust::Timer::start : timer is already started.\n");
    }
-   #if defined(__linux__) 
+   #if defined(__linux__)
       clock_gettime(CLOCK_MONOTONIC, &debut);
    #elif defined(__MACH__)
 	debut=mach_absolute_time();
@@ -44,7 +44,7 @@ void Faust::Timer::stop()
 {
    if(!isRunning)
    {
-	  handleError(class_name,"stop : timer must be started before stopping it\n");
+	  handleError(m_className,"stop : timer must be started before stopping it\n");
    }
    #if defined(__linux__)
       struct timespec fin;
@@ -76,7 +76,7 @@ void Faust::Timer::reset()
 	#elif defined(_WIN32)
          QueryPerformanceCounter(&debut);
       #endif
-      cerr<<class_name<<"reset : timer has been reset while it was running"<<endl;
+      cerr<<m_className<<"reset : timer has been reset while it was running"<<endl;
 
    }
 }
@@ -97,7 +97,7 @@ float Faust::Timer::get_time()
       #endif
 
 
-         handleError(class_name,"get_time : timer has not been stopped");
+         handleError(m_className,"get_time : timer has not been stopped");
    }
    return result;
 }
@@ -106,7 +106,7 @@ float Faust::Timer::get_time()const
 {
    if(isRunning)
    {
-	  handleError(class_name,"get_time : timer has not been stopped");
+	  handleError(m_className,"get_time : timer has not been stopped");
 
    }
    return result;
@@ -127,7 +127,7 @@ faust_unsigned_int Faust::Timer::get_nb_call()
          QueryPerformanceCounter(&fin);
          result += (fin.QuadPart - debut.QuadPart)*1000.0/frequency.QuadPart;
       #endif
-         handleError(class_name,"get_nb_call : timer has not been stopped\n");
+         handleError(m_className,"get_nb_call : timer has not been stopped\n");
    }
    return nbCall;
 }
@@ -137,10 +137,10 @@ faust_unsigned_int Faust::Timer::get_nb_call()const
 {
    if(isRunning)
    {
-	  handleError(class_name,"get_nb_call : timer has not been stopped\n");
+	  handleError(m_className,"get_nb_call : timer has not been stopped\n");
    }
    return nbCall;
 }
 
-const char * Faust::Timer::class_name="Faust::Timer::";
+const char * Faust::Timer::m_className="Faust::Timer::";
 

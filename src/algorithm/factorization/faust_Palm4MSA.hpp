@@ -34,7 +34,7 @@
 using namespace std;
 
 template<typename FPP,Device DEVICE>
-const char * Faust::Palm4MSA<FPP,DEVICE>::class_name="Faust::Palm4MSA";
+const char * Faust::Palm4MSA<FPP,DEVICE>::m_className="Faust::Palm4MSA";
 
 template<typename FPP,Device DEVICE>
 const FPP Faust::Palm4MSA<FPP,DEVICE>::lipschitz_multiplicator=1.001;
@@ -43,12 +43,12 @@ const FPP Faust::Palm4MSA<FPP,DEVICE>::lipschitz_multiplicator=1.001;
 template<typename FPP,Device DEVICE>
 Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::Params<FPP,DEVICE> & params_,const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_) :
     data(params_.data),
-    lambda(params_.init_lambda),
-    nb_fact(0),
+    m_lambda(params_.init_lambda),
+    m_nbFact(0),
     S(params_.init_fact),
     RorL(vector<Faust::MatDense<FPP,DEVICE> >(2)),
-    ind_fact(0),
-    ind_ite(-1),
+    m_indFact(0),
+    m_indIte(-1),
     verbose(params_.isVerbose),
     isUpdateWayR2L(params_.isUpdateWayR2L),
     isConstantStepSize(params_.isConstantStepSize),
@@ -61,7 +61,7 @@ Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::Params<FPP,DEVICE> & params_,
     c(1/params_.step_size),
     blas_handle(blasHandle)
 {
-   RorL.reserve(params_.nb_fact);
+   RorL.reserve(params_.m_nbFact);
 
    if(isGlobal)
       stop_crit = Faust::StoppingCriterion<FPP>(params_.stop_crit_global);
@@ -79,14 +79,14 @@ template<typename FPP,Device DEVICE>
 Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE>& params_palm_,const Faust::BlasHandle<DEVICE> blasHandle,const bool isGlobal_/*=false*/) :
    stop_crit(params_palm_.stop_crit),
    data(params_palm_.data),
-   lambda(params_palm_.init_lambda),
-   nb_fact(params_palm_.nb_fact),
+   m_lambda(params_palm_.init_lambda),
+   m_nbFact(params_palm_.nbFact),
    S(params_palm_.init_fact),
    RorL(vector<Faust::MatDense<FPP,DEVICE> >(2)),
    LorR(Faust::MatDense<FPP,DEVICE>(params_palm_.init_fact[0].getNbRow())),
    const_vec(params_palm_.cons),
-   ind_fact(0),
-   ind_ite(-1),
+   m_indFact(0),
+   m_indIte(-1),
    verbose(params_palm_.isVerbose),
    isUpdateWayR2L(params_palm_.isUpdateWayR2L),
    isConstantStepSize(params_palm_.isConstantStepSize),
@@ -138,9 +138,9 @@ t_local_compute_projection.start();
 #endif
 
 
-      //Faust::MatDense<FPP,DEVICE> matrix2project(S[ind_fact]);
-      S[ind_fact] -= grad_over_c;
-      const_vec[ind_fact]->project(S[ind_fact]);
+      //Faust::MatDense<FPP,DEVICE> matrix2project(S[m_indFact]);
+      S[m_indFact] -= grad_over_c;
+      const_vec[m_indFact]->project(S[m_indFact]);
 
 
     isProjectionComputed = true;
@@ -180,15 +180,15 @@ t_local_compute_grad_over_c.start();
     {
         L1 = (unsigned long long int) LorR.getNbRow();
         L2 = (unsigned long long int) LorR.getNbCol();
-        R2 = (unsigned long long int) RorL[ind_fact].getNbCol();
+        R2 = (unsigned long long int) RorL[m_indFact].getNbCol();
     }
     else
     {
-        L1 = (unsigned long long int) RorL[ind_fact].getNbRow();
-        L2 = (unsigned long long int) RorL[ind_fact].getNbCol();
+        L1 = (unsigned long long int) RorL[m_indFact].getNbRow();
+        L2 = (unsigned long long int) RorL[m_indFact].getNbCol();
         R2 = (unsigned long long int) LorR.getNbCol();
     }
-    S2 = (unsigned long long int) S[ind_fact].getNbCol();
+    S2 = (unsigned long long int) S[m_indFact].getNbCol();
     vector<unsigned long long int > complexity(4,0);
     complexity[0] = L1*L2*S2 + L1*S2*R2 + L2*L1*R2 + L2*R2*R2;
     complexity[1] = L1*L2*S2 + L1*S2*R2 + L1*R2*S2 + L2*L1*S2;
@@ -206,36 +206,36 @@ t_local_compute_grad_over_c.start();
       if (!isUpdateWayR2L)
       {
          // tmp1 = L*S
-         multiply(LorR, S[ind_fact], tmp1, blas_handle);
+         multiply(LorR, S[m_indFact], tmp1, blas_handle);
 /*sprintf(nomFichier,"LorR_0_%d_device.tmp",cmpt);
 LorR.print_file(nomFichier);
-sprintf(nomFichier,"RorL%d_0_%d_host.tmp",ind_fact,cmpt);
-RorL[ind_fact].print_file(nomFichier);
-sprintf(nomFichier,"S%d_0_%d_host.tmp",ind_fact,cmpt);
-S[ind_fact].print_file(nomFichier);
+sprintf(nomFichier,"RorL%d_0_%d_host.tmp",m_indFact,cmpt);
+RorL[m_indFact].print_file(nomFichier);
+sprintf(nomFichier,"S%d_0_%d_host.tmp",m_indFact,cmpt);
+S[m_indFact].print_file(nomFichier);
 sprintf(nomFichier,"tmp1_0_%d_host.tmp",cmpt);
 tmp1.print_file(nomFichier);
 sprintf(nomFichier,"error_0_%d_host.tmp",cmpt);
 error.print_file(nomFichier);
-cout << "appel " << cmpt<<" : lambda0 = "<< lambda<<endl;*/
-         // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
-         gemm(tmp1, RorL[ind_fact], error, lambda, (FPP)-1.0, 'N', 'N', blas_handle);
+cout << "appel " << cmpt<<" : lambda0 = "<< m_lambda<<endl;*/
+         // error = m_lambda*tmp1*R - error (= m_lambda*L*S*R - data )
+         gemm(tmp1, RorL[m_indFact], error, m_lambda, (FPP)-1.0, 'N', 'N', blas_handle);
 /*sprintf(nomFichier,"LorR_1_%d_device.tmp",cmpt);
 LorR.print_file(nomFichier);
-sprintf(nomFichier,"S%d_1_%d_host.tmp",ind_fact,cmpt);
-S[ind_fact].print_file(nomFichier);
+sprintf(nomFichier,"S%d_1_%d_host.tmp",m_indFact,cmpt);
+S[m_indFact].print_file(nomFichier);
 sprintf(nomFichier,"tmp1_1_%d_host.tmp",cmpt);
 tmp1.print_file(nomFichier);
-sprintf(nomFichier,"RorL%d_1_%d_host.tmp",ind_fact,cmpt);
-RorL[ind_fact].print_file(nomFichier);
+sprintf(nomFichier,"RorL%d_1_%d_host.tmp",m_indFact,cmpt);
+RorL[m_indFact].print_file(nomFichier);
 sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       }
       else
       {
          // tmp1 = L*S
-         multiply(RorL[ind_fact], S[ind_fact], tmp1, blas_handle);
-         // error = lambda*tmp1*R - error (= lambda*L*S*R - data )
-         gemm(tmp1, LorR, error, lambda,(FPP) -1.0, 'N', 'N', blas_handle);
+         multiply(RorL[m_indFact], S[m_indFact], tmp1, blas_handle);
+         // error = m_lambda*tmp1*R - error (= m_lambda*L*S*R - data )
+         gemm(tmp1, LorR, error, m_lambda,(FPP) -1.0, 'N', 'N', blas_handle);
       }
    }
    else // computing S*R first, then L*(S*R)
@@ -243,38 +243,38 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       if (!isUpdateWayR2L)
       {
          // tmp1 = S*R
-         multiply(S[ind_fact], RorL[ind_fact], tmp1, blas_handle);
+         multiply(S[m_indFact], RorL[m_indFact], tmp1, blas_handle);
 /*sprintf(nomFichier,"LorR_0_%d_device.tmp",cmpt);
 LorR.print_file(nomFichier);
-sprintf(nomFichier,"RorL%d_0_%d_device.tmp",ind_fact,cmpt);
-RorL[ind_fact].print_file(nomFichier);
-sprintf(nomFichier,"S%d_0_%d_device.tmp",ind_fact,cmpt);
-S[ind_fact].print_file(nomFichier);
+sprintf(nomFichier,"RorL%d_0_%d_device.tmp",m_indFact,cmpt);
+RorL[m_indFact].print_file(nomFichier);
+sprintf(nomFichier,"S%d_0_%d_device.tmp",m_indFact,cmpt);
+S[m_indFact].print_file(nomFichier);
 sprintf(nomFichier,"tmp1_0_%d_device.tmp",cmpt);
 tmp1.print_file(nomFichier);
 sprintf(nomFichier,"error_0_%d_device.tmp",cmpt);
 error.print_file(nomFichier);
-cout << "appel " << cmpt<<" : lambda0 = "<< lambda<<endl;*/
+cout << "appel " << cmpt<<" : lambda0 = "<< m_lambda<<endl;*/
 
-         // error = lambda*L*tmp1 - error (= lambda*L*S*R - data )
-         gemm(LorR, tmp1, error, lambda,(FPP) -1.0, 'N', 'N', blas_handle);
+         // error = m_lambda*L*tmp1 - error (= m_lambda*L*S*R - data )
+         gemm(LorR, tmp1, error, m_lambda,(FPP) -1.0, 'N', 'N', blas_handle);
 /*sprintf(nomFichier,"LorR_1_%d_device.tmp",cmpt);
 LorR.print_file(nomFichier);
-sprintf(nomFichier,"S%d_1_%d_device.tmp",ind_fact,cmpt);
-S[ind_fact].print_file(nomFichier);
+sprintf(nomFichier,"S%d_1_%d_device.tmp",m_indFact,cmpt);
+S[m_indFact].print_file(nomFichier);
 sprintf(nomFichier,"tmp1_1_%d_device.tmp",cmpt);
 tmp1.print_file(nomFichier);
-sprintf(nomFichier,"RorL%d_1_%d_device.tmp",ind_fact,cmpt);
-RorL[ind_fact].print_file(nomFichier);
+sprintf(nomFichier,"RorL%d_1_%d_device.tmp",m_indFact,cmpt);
+RorL[m_indFact].print_file(nomFichier);
 sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
 
       }
       else
       {
          // tmp1 = S*R
-         multiply(S[ind_fact], LorR, tmp1, blas_handle);
-         // error = lambda*L*tmp1 - error (= lambda*L*S*R - data )
-         gemm(RorL[ind_fact], tmp1, error, lambda,(FPP) -1.0, 'N', 'N', blas_handle);
+         multiply(S[m_indFact], LorR, tmp1, blas_handle);
+         // error = m_lambda*L*tmp1 - error (= m_lambda*L*S*R - data )
+         gemm(RorL[m_indFact], tmp1, error, m_lambda,(FPP) -1.0, 'N', 'N', blas_handle);
       }
    }
 
@@ -284,16 +284,16 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
    {
       if (!isUpdateWayR2L)
       {
-         // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
-         gemm(LorR, error, tmp3, lambda,(FPP) 0.0, 'T', 'N', blas_handle);
-         // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
-         gemm(tmp3, RorL[ind_fact], grad_over_c,(FPP) 1.0/c,(FPP) 0.0,'N','T', blas_handle);
+         // tmp3 = m_lambda*L'*error (= m_lambda*L' * (m_lambda*L*S*R - data) )
+         gemm(LorR, error, tmp3, m_lambda,(FPP) 0.0, 'T', 'N', blas_handle);
+         // grad_over_c = 1/c*tmp3*R' (= 1/c*m_lambda*L' * (m_lambda*L*S*R - data) * R' )
+         gemm(tmp3, RorL[m_indFact], grad_over_c,(FPP) 1.0/c,(FPP) 0.0,'N','T', blas_handle);
       }
       else
       {
-         // tmp3 = lambda*L'*error (= lambda*L' * (lambda*L*S*R - data) )
-         gemm(RorL[ind_fact], error, tmp3, lambda, (FPP) 0.0, 'T', 'N', blas_handle);
-         // grad_over_c = 1/c*tmp3*R' (= 1/c*lambda*L' * (lambda*L*S*R - data) * R' )
+         // tmp3 = m_lambda*L'*error (= m_lambda*L' * (m_lambda*L*S*R - data) )
+         gemm(RorL[m_indFact], error, tmp3, m_lambda, (FPP) 0.0, 'T', 'N', blas_handle);
+         // grad_over_c = 1/c*tmp3*R' (= 1/c*m_lambda*L' * (m_lambda*L*S*R - data) * R' )
          gemm(tmp3, LorR, grad_over_c, (FPP) 1.0/c, (FPP) (FPP) 0.0,'N','T', blas_handle);
       }
    }
@@ -301,17 +301,17 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
    {
       if (!isUpdateWayR2L)
       {
-         // tmp3 = lambda*error*R' (= lambda*(lambda*L*S*R - data) * R' )
-         gemm(error, RorL[ind_fact], tmp3, lambda, (FPP) 0.0, 'N', 'T', blas_handle);
-         // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * lambda*(lambda*L*S*R - data) * R' )
+         // tmp3 = m_lambda*error*R' (= m_lambda*(m_lambda*L*S*R - data) * R' )
+         gemm(error, RorL[m_indFact], tmp3, m_lambda, (FPP) 0.0, 'N', 'T', blas_handle);
+         // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * m_lambda*(m_lambda*L*S*R - data) * R' )
          gemm(LorR, tmp3, grad_over_c,(FPP) 1.0/c, (FPP) 0.0,'T','N', blas_handle);
       }
       else
       {
-         // tmp3 = lambda*error*R' (= lambda * (lambda*L*S*R - data) * R' )
-         gemm(error, LorR, tmp3, lambda, (FPP) 0.0, 'N', 'T', blas_handle);
-         // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * lambda*(lambda*L*S*R - data) * R' )
-         gemm(RorL[ind_fact], tmp3, grad_over_c, (FPP) 1.0/c, (FPP) 0.0,'T','N', blas_handle);
+         // tmp3 = m_lambda*error*R' (= m_lambda * (m_lambda*L*S*R - data) * R' )
+         gemm(error, LorR, tmp3, m_lambda, (FPP) 0.0, 'N', 'T', blas_handle);
+         // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * m_lambda*(m_lambda*L*S*R - data) * R' )
+         gemm(RorL[m_indFact], tmp3, grad_over_c, (FPP) 1.0/c, (FPP) 0.0,'T','N', blas_handle);
       }
 
     }
@@ -336,7 +336,7 @@ t_local_compute_lambda.start();
 
    if (!isLastFact)
    {
-     handleError(class_name,"compute_lambda : computation of lambda must be done at the end of the iteration through the number of factors");
+     handleError(m_className,"compute_lambda : computation of lambda must be done at the end of the iteration through the number of factors");
    }
 
    // As LorR has also been updated at the end of the last iteration over the facts, LorR matches X_hat, which the product of all factors, including the last one.
@@ -353,17 +353,17 @@ t_local_compute_lambda.start();
 
    if (Xhatt_Xhat_tr != 0)
    {
-		lambda = Xt_Xhat.trace()/Xhatt_Xhat_tr;
-		if (isnan(lambda))
+		m_lambda = Xt_Xhat.trace()/Xhatt_Xhat_tr;
+		if (isnan(m_lambda))
 		{
-			handleError(class_name,"compute_lambda : Xhatt_Xhat_tr is too small or Xt_Xhat.trace is too big so lambda is infinite");
+			handleError(m_className,"compute_lambda : Xhatt_Xhat_tr is too small or Xt_Xhat.trace is too big so lambda is infinite");
 		}
 	}else
 	{
-		handleError(class_name,"compute_lambda : Xhatt_Xhat_tr equal 0 so lambda is infinite");
+		handleError(m_className,"compute_lambda : Xhatt_Xhat_tr equal 0 so lambda is infinite");
 	}
-   //cout<<"lambda : "<<lambda<<endl;
-   //cout<<__SP lambda<<endl;
+   //cout<<"m_lambda : "<<m_lambda<<endl;
+   //cout<<__SP m_lambda<<endl;
 
 #ifdef __COMPILE_TIMERS__
 t_global_compute_lambda.stop();
@@ -380,15 +380,15 @@ t_global_update_R.start();
 t_local_update_R.start();
 #endif
 
-   // R[nb_fact-1] est initialise a l'identite lors de la creation de l'objet Faust::Palm4MSA et n'est pas cense changer
+   // R[nbFact-1] est initialise a l'identite lors de la creation de l'objet Faust::Palm4MSA et n'est pas cense changer
    if (!isUpdateWayR2L)
    {
-      RorL.resize(nb_fact);
-      RorL[nb_fact-1].resize(const_vec[nb_fact-1]->getCols());
-      RorL[nb_fact-1].setEyes();
+      RorL.resize(m_nbFact);
+      RorL[m_nbFact-1].resize(const_vec[m_nbFact-1]->get_cols());
+      RorL[m_nbFact-1].setEyes();
 
 
-      for (int i=nb_fact-2 ; i>-1 ; i--)
+      for (int i=m_nbFact-2 ; i>-1 ; i--)
          //  R[i] = S[i+1] * R[i+1]
          multiply(S[i+1], RorL[i+1], RorL[i],blas_handle);
 
@@ -401,11 +401,11 @@ t_local_update_R.start();
       }
 	   // FORMER VERSION //
 	   //Faust::MatDense<FPP,DEVICE> LorR_tmp(LorR);
-	   //multiply(S[ind_fact],LorR_tmp,LorR,blas_handle);
+	   //multiply(S[m_indFact],LorR_tmp,LorR,blas_handle);
 	   //END FORMER VERSION//
-	   multiply(S[ind_fact], LorR, LorR,blas_handle);
+	   multiply(S[m_indFact], LorR, LorR,blas_handle);
 
-      //LorR.multiplyLeft(S[ind_fact]);
+      //LorR.multiplyLeft(S[m_indFact]);
    }
 
 
@@ -437,16 +437,16 @@ t_local_update_L.start();
 
        // FORMER VERSION //
 	   //Faust::MatDense<FPP,DEVICE> LorR_tmp(LorR);
-	   //multiply(LorR_tmp,S[ind_fact],LorR,blas_handle);
+	   //multiply(LorR_tmp,S[m_indFact],LorR,blas_handle);
    	   // END FORMER VERSION //
-	   multiply(LorR, S[ind_fact], LorR,blas_handle);
+	   multiply(LorR, S[m_indFact], LorR,blas_handle);
 	}
    else
    {
-      RorL.resize(nb_fact);
-      RorL[0].resize(const_vec[0]->getRows());
+      RorL.resize(m_nbFact);
+      RorL[0].resize(const_vec[0]->get_rows());
       RorL[0].setEyes();
-      for (int i=0 ; i<nb_fact-1 ; i++)
+      for (int i=0 ; i<m_nbFact-1 ; i++)
          //  R[i] = S[i+1] * R[i+1]
          multiply(RorL[i] , S[i], RorL[i+1],blas_handle);
    }
@@ -464,9 +464,9 @@ t_global_check.start();
 t_local_check.start();
 #endif
 
-   if (nb_fact != S.size())
+   if (m_nbFact != S.size())
    {
-      handleError(class_name," Wrong initialization: params.nfacts and params.init_facts are in conflict");
+      handleError(m_className," Wrong initialization: params.nfacts and params.init_facts are in conflict");
    }
 #ifdef __COMPILE_TIMERS__
 t_global_check.stop();
@@ -494,8 +494,8 @@ void Faust::Palm4MSA<FPP,DEVICE>::compute_c()
 	   int nbr_iter = 10000;
 	   FPP threshold = 1e-16;
 	   FPP nL1=LorR.spectralNorm(nbr_iter,threshold,flag1,blas_handle);
-	   FPP nR1=RorL[ind_fact].spectralNorm(nbr_iter,threshold,flag2,blas_handle);
-		c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*lambda*lambda;
+	   FPP nR1=RorL[m_indFact].spectralNorm(nbr_iter,threshold,flag2,blas_handle);
+		c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*m_lambda*m_lambda;
    }
 
    isCComputed = true;
@@ -509,7 +509,7 @@ void Faust::Palm4MSA<FPP,DEVICE>::compute_c()
 #endif
 
 template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::init_fact(int nb_facts_)
+void Faust::Palm4MSA<FPP,DEVICE>::init_fact(int nbFacts_)
 {
 #ifdef __COMPILE_TIMERS__
 t_global_init_fact.start();
@@ -523,8 +523,8 @@ t_local_init_fact.start();
   }
   else if (isGlobal)
   {
-     nb_fact = 1;
-     S.resize(nb_fact);
+     m_nbFact = 1;
+     S.resize(m_nbFact);
      isInit = true;
      return;
   }*/
@@ -535,29 +535,29 @@ t_local_init_fact.start();
 
   if(!isConstraintSet)
   {
-     handleError(class_name,"init_fact : constrainst must be set before calling init_fact");
+     handleError(m_className,"init_fact : constrainst must be set before calling init_fact");
   }
-   nb_fact = nb_facts_;
-   S.resize(nb_fact);
+   m_nbFact = nbFacts_;
+   S.resize(m_nbFact);
    if (!isUpdateWayR2L)
    {
-      S[0].resize(const_vec[0]->getRows(), const_vec[0]->getCols());
+      S[0].resize(const_vec[0]->get_rows(), const_vec[0]->get_cols());
       S[0].setZeros();
-      for (int i=1 ; i<nb_fact ; i++)
+      for (int i=1 ; i<m_nbFact ; i++)
       {
-         S[i].resize(const_vec[i]->getRows(), const_vec[i]->getCols());
+         S[i].resize(const_vec[i]->get_rows(), const_vec[i]->get_cols());
          S[i].setEyes();
       }
    }
    else
    {
-      for (int i=0 ; i<nb_fact-1 ; i++)
+      for (int i=0 ; i<m_nbFact-1 ; i++)
       {
-         S[i].resize(const_vec[i]->getRows(), const_vec[i]->getCols());
+         S[i].resize(const_vec[i]->get_rows(), const_vec[i]->get_cols());
          S[i].setEyes();
       }
-      S[nb_fact-1].resize(const_vec[nb_fact-1]->getRows(), const_vec[nb_fact-1]->getCols());
-      S[nb_fact-1].setZeros();
+      S[m_nbFact-1].resize(const_vec[m_nbFact-1]->get_rows(), const_vec[m_nbFact-1]->get_cols());
+      S[m_nbFact-1].setZeros();
    }
 
 
@@ -584,33 +584,33 @@ t_local_next_step.start();
     // resizing L or R
     if(!isUpdateWayR2L)
     {
-        LorR.resize(const_vec[0]->getRows());
+        LorR.resize(const_vec[0]->get_rows());
         LorR.setEyes();
         update_R();
     }
     else
     {
-        LorR.resize(const_vec[nb_fact-1]->getCols());
+        LorR.resize(const_vec[m_nbFact-1]->get_cols());
         LorR.setEyes();
         update_L();
     }
 
 
-    int* ind_ptr = new int[nb_fact];
-    for (int j=0 ; j<nb_fact ; j++)
+    int* ind_ptr = new int[m_nbFact];
+    for (int j=0 ; j<m_nbFact ; j++)
     if (!isUpdateWayR2L)
         ind_ptr[j] = j;
     else
-        ind_ptr[j] = nb_fact-1-j;
+        ind_ptr[j] = m_nbFact-1-j;
 
-    for (int j=0 ; j<nb_fact ; j++)
+    for (int j=0 ; j<m_nbFact ; j++)
     {
-        if (j == nb_fact-1)
+        if (j == m_nbFact-1)
             isLastFact = true;
         else
             isLastFact = false;
 
-        ind_fact = ind_ptr[j];
+        m_indFact = ind_ptr[j];
         if (!isConstantStepSize)
             isCComputed = false;
 
@@ -636,14 +636,14 @@ t_local_next_step.start();
 
 	if (verbose)
     {
-        cout << "Iter " << ind_ite << ", RMSE=" << get_RMSE() << endl;
-        cout << "Lambda " <<setprecision(20)<< lambda << endl;
+        cout << "Iter " << m_indIte << ", RMSE=" << get_RMSE() << endl;
+        cout << "m_lambda " <<setprecision(20)<< m_lambda << endl;
     }
     delete[] ind_ptr;
     ind_ptr = NULL;
 
 
-//cout<<"lambda : "<< lambda<< endl;
+//cout<<"m_lambda : "<< m_lambda<< endl;
 #ifdef __COMPILE_TIMERS__
 t_global_next_step.stop();
 t_local_next_step.stop();
@@ -659,14 +659,14 @@ t_local_init_fact_from_palm.start();
 #endif
 
 
-    if (palm2.nb_fact != 2)
+    if (palm2.m_nbFact != 2)
     {
-        handleError(class_name,"init_fact_from_palm : argument palm2 must contain 2 factors.");
+        handleError(m_className,"init_fact_from_palm : argument palm2 must contain 2 factors.");
     }
 
     if(!isConstraintSet)
     {
-        handleError(class_name,"init_fact_from_palm : constrainst must be set before calling init_fact_from_palm");
+        handleError(m_className,"init_fact_from_palm : constrainst must be set before calling init_fact_from_palm");
     }
 
     if(isFactSideLeft)
@@ -679,7 +679,7 @@ t_local_init_fact_from_palm.start();
         S[S.size()-1] = palm2.S[0];
         S.push_back(palm2.S[1]);
     }
-    nb_fact++;
+    m_nbFact++;
 
     check_constraint_validity();
 

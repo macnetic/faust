@@ -144,10 +144,10 @@ namespace Faust
         int* getInnerIndexPtr(){return mat.innerIndexPtr();}
         const int* getInnerIndexPtr()const{return mat.innerIndexPtr();}
 
-        const int* getRowPtr()const{if(mat.IsRowMajor) return mat.outerIndexPtr(); else{handleError(class_name,"getRowPtr : matrix is not in rowMajor");}}
-        const int* getColInd()const{if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(class_name,"getColInd : matrix is not in rowMajor");}}
-        int* getRowPtr(){if(mat.IsRowMajor) return mat.outerIndexPtr(); else{handleError(class_name,"getRowPtr : matrix is not in rowMajor");}}
-        int* getColInd(){if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(class_name,"getColInd : matrix is not in rowMajor");}}
+        const int* getRowPtr()const{if(mat.IsRowMajor) return mat.outerIndexPtr(); else{handleError(m_className,"getRowPtr : matrix is not in rowMajor");}}
+        const int* getColInd()const{if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(m_className,"getColInd : matrix is not in rowMajor");}}
+        int* getRowPtr(){if(mat.IsRowMajor) return mat.outerIndexPtr(); else{handleError(m_className,"getRowPtr : matrix is not in rowMajor");}}
+        int* getColInd(){if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(m_className,"getColInd : matrix is not in rowMajor");}}
         bool isRowMajor() const{return mat.IsRowMajor;}
 
         //! Display all features of Faust::MatSparse : dim1, dim2, nnz number of nonzeros, values, etc ...
@@ -178,7 +178,7 @@ namespace Faust
 
         private:
         void update_dim(){this->dim1=mat.rows();this->dim2=mat.cols();nnz=mat.nonZeros();}
-        static const char * class_name;
+        static const char * m_className;
 
 
         private:

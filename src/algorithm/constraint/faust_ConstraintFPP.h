@@ -40,19 +40,19 @@ namespace Faust
           ConstraintFPP(); // ajouter parametre de contrainte par defaut (a voir avec Luc)
 
           ConstraintFPP(
-             const faust_constraint_name& constraint_name_,
-             const int nb_rows_,
-             const int nb_cols_);
+             const faust_constraint_name& constraintName_,
+             const int nbRows_,
+             const int nbCols_);
 
           ConstraintFPP(
-             const faust_constraint_name& constraint_name_,
+             const faust_constraint_name& constraintName_,
              const FPP parameter_,
-             const int nb_rows_,
-             const int nb_cols_);
+             const int nbRows_,
+             const int nbCols_);
 
           ConstraintFPP(const ConstraintFPP& constraint_);
 
-          FPP getParameter() const {return parameter;};
+          FPP get_parameter() const {return m_parameter;};
 
           virtual void set_default_parameter();
           virtual void check_constraint_name()const;
@@ -61,8 +61,8 @@ namespace Faust
 
        private:
           // parameter of constraint
-          FPP parameter;
-          static const char * class_name;
+          FPP m_parameter;
+          static const char * m_className;
 
 
 

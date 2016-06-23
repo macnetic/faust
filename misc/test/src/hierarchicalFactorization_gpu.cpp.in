@@ -17,9 +17,6 @@
 #include "faust_SpBlasHandle_gpu.h"
 #include "faust_BlasHandle_gpu.h"
 
-//modif AL AL
-//#include "faust_ConstraintInt.h"
-//#include "faust_ConstraintFPP.h"
 
 using namespace std;
 typedef @TEST_FPP@ FPP;//faust floating point precision
@@ -37,46 +34,46 @@ int main(int argc, char* argv[])
   	}
 
 
-	string config_filename = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat";
+	string configFilename = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat";
 
 	if (argc >= 2)
-		config_filename = argv[1];
+		configFilename = argv[1];
 
-	size_t ind = config_filename.find_last_of(".");
+	size_t ind = configFilename.find_last_of(".");
 
-	if(ind<=0 || ind>= config_filename.size())
+	if(ind<=0 || ind>= configFilename.size())
 	{
 		cerr << "Le nom du fichier est incorrect" << endl;
 		exit(EXIT_FAILURE);
 	}
-	string config_file_extension(config_filename, ind);
-	if(config_file_extension.compare(".mat") != 0)
+	string configFileExtension(configFilename, ind);
+	if(configFileExtension.compare(".mat") != 0)
 	{
 		cerr << "Le nom du fichier doit se terminer par \".mat\"" << endl;
 		exit(EXIT_FAILURE);
 	}
-	string config_file_body_tmp(config_filename, 0, ind);
+	string configFileBodyTmp(configFilename, 0, ind);
 
 
-	string config_file_body_dir, config_file_body_file;
+	string configFileBodyDir, configFileBodyFile;
 
-	ind = config_file_body_tmp.find_last_of("/");
-	if(ind<=0 || ind>= config_file_body_tmp.size())
+	ind = configFileBodyTmp.find_last_of("/");
+	if(ind<=0 || ind>= configFileBodyTmp.size())
 	{
-		config_file_body_dir = string("");
-		config_file_body_file = config_file_body_tmp;
+		configFileBodyDir = string("");
+		configFileBodyFile = configFileBodyTmp;
 	}
 	else
 	{
-		config_file_body_dir = string(config_file_body_tmp, 0, ind+1);
-		config_file_body_file = string(config_file_body_tmp, ind+1);
+		configFileBodyDir = string(configFileBodyTmp, 0, ind+1);
+		configFileBodyFile = string(configFileBodyTmp, ind+1);
 	}
 
 
 
-	FPP expected_lambda = 0;
+	FPP expectedLambda = 0;
 	if (argc >= 3)
-		expected_lambda = atof(argv[2]);
+		expectedLambda = atof(argv[2]);
 
 
 	FPP epsilon = 0.0001;
@@ -88,47 +85,47 @@ int main(int argc, char* argv[])
 	// initialisation CUDA environment
 	std::cout<<"initialisation of GPU environnement"<<std::endl;
 	//cublasHandle_t cublasHandle;
-	Faust::BlasHandle<Gpu> blas_handle;
-	blas_handle.Init();
+	Faust::BlasHandle<Gpu> blasHandle;
+	blasHandle.Init();
 
 	//cusparseHandle_t cusparseHandle;
-	Faust::SpBlasHandle<Gpu> spblas_handle;
-	spblas_handle.Init();
+	Faust::SpBlasHandle<Gpu> spblasHandle;
+	spblasHandle.Init();
 
 
 	std::cout<<"initialisation of HierarchicalFact parameter"<<std::endl;
 	Faust::Params<FPP,Gpu> params;
 	std::cout<<"init_params"<<std::endl;
-	init_params_from_matiofile(params,config_filename.c_str(),"params");
+	init_params_from_matiofile(params,configFilename.c_str(),"params");
 	std::cout<<"Display2"<<std::endl;
 	params.Display();
 	cout<<"launch"<<endl;
-	Faust::HierarchicalFact<FPP,Gpu> hier_fact(params,blas_handle,spblas_handle);
+	Faust::HierarchicalFact<FPP,Gpu> hierFact(params,blasHandle,spblasHandle);
 
 	std::cout<<"factorisation"<<std::endl;
 	Faust::Timer_gpu t1;
 	t1.start();
 
-	hier_fact.compute_facts();
+	hierFact.compute_facts();
 
 	t1.stop();
 	#ifdef __COMPILE_TIMERS__
-		hier_fact.print_timers();
+		hierFact.print_timers();
 	#endif
 	cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 
 	vector<Faust::MatSparse<FPP,Gpu> > facts;
-	hier_fact.get_facts(facts);
+	hierFact.get_facts(facts);
 
-	FPP lambda=hier_fact.get_lambda();
+	FPP lambda=hierFact.get_lambda();
 	cout<<"lambda="<<std::setprecision(20)<<lambda<<endl<<endl;
 
 		/// equality test between lambda (multiplied scalar and lambda)
 	if (argc >= 3)
 	{
-		if (std::abs(lambda - expected_lambda) > epsilon)
+		if (std::abs(lambda - expectedLambda) > epsilon)
 		{
-			std::cerr<<"invalid lambda, must be equal to "<<std::setprecision(20)<<std::setprecision(20)<<expected_lambda<<" in the precision of "<<epsilon<<std::endl;
+			std::cerr<<"invalid lambda, must be equal to "<<std::setprecision(20)<<std::setprecision(20)<<expectedLambda<<" in the precision of "<<epsilon<<std::endl;
 			std::cerr<<"current value is "<<std::setprecision(20)<<lambda<<std::endl;
 			exit(EXIT_FAILURE);
 		}
@@ -137,57 +134,57 @@ int main(int argc, char* argv[])
 
 
 
-	//Faust::Transform_cu<FPP> hier_fact_core(facts);
-	Faust::Transform<FPP,Gpu> hier_fact_core(facts,lambda);
+	//Faust::Transform_cu<FPP> hierFactCore(facts);
+	Faust::Transform<FPP,Gpu> hierFactCore(facts,lambda);
 
 
 	//write the given factorisation into a mat file
-	stringstream outputfilename;
-	outputfilename<<"@FAUST_TESTOUTPUT_BIN_DIR@/"<<config_file_body_file<<"_gpu_factorisation.mat";
+	stringstream outputFilename;
+	outputFilename<<"@FAUST_TESTOUTPUT_BIN_DIR@/"<<configFileBodyFile<<"_gpu_factorisation.mat";
 	std::cout<<"**************** WRITING FACTORISATION INTO ****************"<<std::endl;
-	std::cout<<"output filename : "<<outputfilename.str();
-	write_faust_core_into_matfile(hier_fact_core,outputfilename.str().c_str(),"fact");
+	std::cout<<"output filename : "<<outputFilename.str();
+	write_faust_core_into_matfile(hierFactCore,outputFilename.str().c_str(),"fact");
 
-	//relative_error
-	Faust::MatDense<FPP,Gpu> const data_matrix(params.data);
+	//relativeError
+	Faust::MatDense<FPP,Gpu> const dataMatrix(params.data);
 	Faust::MatDense<FPP,Gpu> tmp;
-	tmp=hier_fact_core.get_product(blas_handle,spblas_handle);
-	Faust::MatDense<FPP,Gpu> const faust_product(tmp);
-	Faust::MatDense<FPP,Gpu> error(faust_product);
-	error-=data_matrix;
-	FPP relative_error = error.norm()/data_matrix.norm();
+	tmp=hierFactCore.get_product(blasHandle,spblasHandle);
+	Faust::MatDense<FPP,Gpu> const faustProduct(tmp);
+	Faust::MatDense<FPP,Gpu> error(faustProduct);
+	error-=dataMatrix;
+	FPP relativeError = error.norm()/dataMatrix.norm();
 
 	std::cout<<std::endl;
 	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
-	std::cout<<"		"<<relative_error<<std::endl<<std::endl;
+	std::cout<<"		"<<relativeError<<std::endl<<std::endl;
 
 
 	//time comparison between matrix vector product and faust-vector product
-	int niter_time_comp = 100;
-	if (niter_time_comp > 0)
+	int niterTimeComp = 100;
+	if (niterTimeComp > 0)
 	{
 
 		Faust::Timer_gpu tdense;
 		Faust::Timer_gpu tfaust;
-		Faust::Vect<FPP,Gpu> x(data_matrix.getNbCol());
-		Faust::Vect<FPP,Gpu> ydense(data_matrix.getNbRow());
-		Faust::Vect<FPP,Gpu> yfaust(hier_fact_core.getNbRow());
-		Faust::Vect<FPP,Gpu> ycomp(faust_product.getNbRow());
+		Faust::Vect<FPP,Gpu> x(dataMatrix.getNbCol());
+		Faust::Vect<FPP,Gpu> ydense(dataMatrix.getNbRow());
+		Faust::Vect<FPP,Gpu> yfaust(hierFactCore.getNbRow());
+		Faust::Vect<FPP,Gpu> ycomp(faustProduct.getNbRow());
 
 		x.setOnes();
 
 
-		for (int i=0;i<niter_time_comp;i++)
+		for (int i=0;i<niterTimeComp;i++)
 		{
 
 			tdense.start();
-			Faust::gemv(data_matrix,x,ydense,'N',blas_handle);
+			Faust::gemv(dataMatrix,x,ydense,'N',blasHandle);
 			tdense.stop();
 
-			Faust::gemv(faust_product,x,ycomp,'N',blas_handle);
+			Faust::gemv(faustProduct,x,ycomp,'N',blasHandle);
 
 	 		tfaust.start();
-			hier_fact_core.mult(x,yfaust,spblas_handle);
+			hierFactCore.mult(x,yfaust,spblasHandle);
 			tfaust.stop();
 			if(!yfaust.equality(ycomp))
 			{
@@ -206,13 +203,13 @@ int main(int argc, char* argv[])
 
 		std::cout<<"**************** TIME COMPARISON MATRIX VECTOR PRODUCT **************** "<<std::endl;
 		std::cout<<"	TIME  SPEED-UP : "<<tdense.get_time()/tfaust.get_time()<<std::endl;
-		std::cout<<"	MEAN TIME dense : "<<tdense.get_time()/((float) niter_time_comp)<<std::endl;
-		std::cout<<"	MEAN TIME faust : "<<tfaust.get_time()/((float) niter_time_comp)<<std::endl;
+		std::cout<<"	MEAN TIME dense : "<<tdense.get_time()/((float) niterTimeComp)<<std::endl;
+		std::cout<<"	MEAN TIME faust : "<<tfaust.get_time()/((float) niterTimeComp)<<std::endl;
 	}
 
 
-	blas_handle.Destroy();
-	spblas_handle.Destroy();
+	blasHandle.Destroy();
+	spblasHandle.Destroy();
 
 	return 0;
 }

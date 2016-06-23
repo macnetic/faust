@@ -7,7 +7,7 @@
 #include "faust_exception.h"
 
 template<typename T>
-const char * Faust::StoppingCriterion<T>::class_name="Faust::StoppingCriterion::";
+const char * Faust::StoppingCriterion<T>::m_className="Faust::StoppingCriterion::";
 
 template<typename T>
 Faust::StoppingCriterion<T>::StoppingCriterion(bool isCriterionError_) : isCriterionError(isCriterionError_)
@@ -28,12 +28,12 @@ void Faust::StoppingCriterion<T>::check_validity()const
    {
       if (errorThreshold>1 || maxIteration < 0)
       {
-        handleError(class_name,"check_validity : errorThreshold must be strictly greater than 1 and maxIteration must be strictly positive");
+        handleError(m_className,"check_validity : errorThreshold must be strictly greater than 1 and maxIteration must be strictly positive");
       }
    }
    else if (nb_it < 0)
    {
-     handleError(class_name,"::check_validity : nb_it must be positive");
+     handleError(m_className,"::check_validity : nb_it must be positive");
    }
 }
 
@@ -56,7 +56,7 @@ bool Faust::StoppingCriterion<T>::do_continue(int current_ite, T current_error /
       }
    else // if criterion is error and current_error has not been initialized
    {
-     handleError(class_name,"check_validity : when stopping criterion is error, the current error needs to be given as second parameter");
+     handleError(m_className,"check_validity : when stopping criterion is error, the current error needs to be given as second parameter");
    }
 }
 

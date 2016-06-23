@@ -14,16 +14,16 @@ template<typename FPP,Device DEVICE>
 struct ConstraintType
 {
 
-	typedef const  Faust::ConstraintFPP<FPP,DEVICE>   constraint_type_normcol;
-	typedef const  Faust::ConstraintFPP<FPP,DEVICE>   constraint_type_normlin;
-	typedef const  Faust::ConstraintMat<FPP,DEVICE>   constraint_type_supp;
-	typedef const  Faust::ConstraintMat<FPP,DEVICE>   constraint_type_const;
-	typedef const  Faust::ConstraintInt<FPP,DEVICE>   constraint_type_sp;
-	typedef const  Faust::ConstraintInt<FPP,DEVICE>   constraint_type_spcol;
-	typedef const  Faust::ConstraintInt<FPP,DEVICE>   constraint_type_splin;
-	typedef const  Faust::ConstraintInt<FPP,DEVICE>   constraint_type_splincol;
-	typedef const  Faust::ConstraintInt<FPP,DEVICE>   constraint_type_sp_pos;
-	typedef const  Faust::ConstraintInt<FPP,DEVICE>   constraint_type_blkdiag;
+	typedef const  Faust::ConstraintFPP<FPP,DEVICE>   ConstraintTypeNormcol;
+	typedef const  Faust::ConstraintFPP<FPP,DEVICE>   ConstraintTypeNormlin;
+	typedef const  Faust::ConstraintMat<FPP,DEVICE>   ConstraintTypeSupp;
+	typedef const  Faust::ConstraintMat<FPP,DEVICE>   ConstraintTypeConst;
+	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeSp;
+	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeSpcol;
+	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeSplin;
+	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeSplincol;
+	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeSpPos;
+	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeBlkdiag;
 
 };
 

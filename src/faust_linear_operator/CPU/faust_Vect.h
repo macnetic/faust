@@ -40,10 +40,10 @@ namespace Faust
 
     template<typename FPP,Device DEVICE>
     class MatSparse;
-	
-   // friend function of faust_linear_algebra.h	
-   template<typename FPP>	
-   void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);	
+
+   // friend function of faust_linear_algebra.h
+   template<typename FPP>
+   void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
 
 
@@ -117,7 +117,7 @@ namespace Faust
 
         private:
         faust_unsigned_int dim;
-        static const char * class_name;
+        static const char * m_className;
         Eigen::Matrix<FPP, Eigen::Dynamic,1> vec;
 
         #ifdef __COMPILE_TIMERS__

@@ -53,11 +53,11 @@ namespace Faust
 
         private:
           const std::vector< std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> > cons;
-          bool isUpdateWayR2L;
-          bool isFactSideLeft;
-          bool isVerbose;
-          int ind_fact ; //indice de factorisation (!= Faust::Palm4MSA::ind_fact : indice de facteur)
-          int nb_fact; // nombre de factorisations (!= Faust::Palm4MSA::nb_fact : nombre de facteurs)
+          bool m_isUpdateWayR2L;
+          bool m_isFactSideLeft;
+          bool m_isVerbose;
+          int m_indFact ; //indice de factorisation (!= Faust::Palm4MSA::m_indFact : indice de facteur)
+          int nbFact; // nombre de factorisations (!= Faust::Palm4MSA::nbFact : nombre de facteurs)
           Faust::Palm4MSA<FPP,DEVICE> palm_2;
           Faust::Palm4MSA<FPP,DEVICE> palm_global;
           const FPP default_lambda; // initial value of lambda for factorization into two factors
@@ -65,7 +65,7 @@ namespace Faust
           std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> cons_tmp_global;
           bool isFactorizationComputed;
           std::vector<std::vector<FPP> > errors;
-          static const char * class_name;
+          static const char * m_className;
           Faust::BlasHandle<DEVICE> cublas_handle;
           Faust::SpBlasHandle<DEVICE> cusparse_handle;
 

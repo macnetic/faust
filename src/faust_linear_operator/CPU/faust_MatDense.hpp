@@ -21,7 +21,7 @@
 
 
 template<typename FPP>
-const char * Faust::MatDense<FPP,Cpu>::class_name = "Faust::MatDense<FPP,Cpu>::";
+const char * Faust::MatDense<FPP,Cpu>::m_className = "Faust::MatDense<FPP,Cpu>::";
 
 
 template<typename FPP>
@@ -50,7 +50,7 @@ void Faust::MatDense<FPP,Cpu>::resize(const faust_unsigned_int nbRow,const faust
 t_resize.start();
 #endif
 
-	
+
 	if ((this->dim1 != nbRow) || (this->dim2 != nbCol))
 	{
 		Faust::MatGeneric<FPP,Cpu>::resize(nbRow,nbCol);
@@ -77,7 +77,7 @@ t_check_dim.start();
 	bool verifSize = (this->getNbCol() == mat.cols()) &&  (this->getNbRow() == mat.rows());
 
 	if (!verifSize)
-		handleError(class_name, "check_dim_validity : Size incompatibility in the Faust::MatDense");
+		handleError(m_className, "check_dim_validity : Size incompatibility in the Faust::MatDense");
 #ifdef __COMPILE_TIMERS__
 t_check_dim.stop();
 #endif
@@ -109,7 +109,7 @@ template<typename FPP>
 bool Faust::MatDense<FPP,Cpu>::isEqual(const Faust::MatDense<FPP,Cpu> & B) const
 {
 	if ((this->getNbCol() != B.getNbCol()) || (this->getNbRow() != B.getNbRow()))
-        handleError(class_name, "isEqual : dimension of the 2 matrix are not the same\n");
+        handleError(m_className, "isEqual : dimension of the 2 matrix are not the same\n");
 
 	if (isZeros)
 		return B.isZeros;
@@ -125,7 +125,7 @@ bool Faust::MatDense<FPP,Cpu>::isEqual(const Faust::MatDense<FPP,Cpu> & B, FPP t
 {
 	if ((this->getNbCol() != B.getNbCol()) || (this->getNbRow() != B.getNbRow()))
 	{
-		handleError(class_name, "isEqual : dimension of the 2 matrix are not the same\n");
+		handleError(m_className, "isEqual : dimension of the 2 matrix are not the same\n");
 	}
 	bool egalite =true;
 	for (int i=0;i<this->getNbRow();i++)
@@ -193,7 +193,7 @@ t_mult_right.start();
 
 	if (this->dim2 != A.dim1)
 	{
-		handleError(class_name, "multiplyRight : dimension conflict between matrix");
+		handleError(m_className, "multiplyRight : dimension conflict between matrix");
 	}
 
 	if(A.isIdentity)
@@ -248,7 +248,7 @@ template<typename FPP>
 
 	if (this->dim1 != A.dim2)
 	{
-		handleError(class_name, "multiplyLeft : dimension conflict between matrix");
+		handleError(m_className, "multiplyLeft : dimension conflict between matrix");
 	}
 
 	if(A.isIdentity)
@@ -368,7 +368,7 @@ t_add.start();
 #endif
 	if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
 	{
-		handleError(class_name, "add : matrix dimension not equal");
+		handleError(m_className, "add : matrix dimension not equal");
 	}
 	mat = mat + A.mat;
     isZeros = false;
@@ -386,7 +386,7 @@ t_sub.start();
 #endif
 	if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
 	{
-		handleError(class_name, "sub : matrix dimension not equal");
+		handleError(m_className, "sub : matrix dimension not equal");
 	}
 	mat = mat - A.mat;
 
@@ -490,7 +490,7 @@ void Faust::MatDense<FPP,Cpu>::operator*=(const Faust::MatSparse<FPP,Cpu>& S)
 {
 	if(this->dim2 != S.dim1)
 	{
-		handleError(class_name, "operator*= : incorrect matrix dimensions");
+		handleError(m_className, "operator*= : incorrect matrix dimensions");
 	}
 
 	if (isIdentity)
@@ -518,7 +518,7 @@ void Faust::MatDense<FPP,Cpu>::operator+=(const Faust::MatSparse<FPP,Cpu>& S)
 {
 	if(this->dim1!=S.dim1 || this->dim2!=S.dim2)
 	{
-		handleError(class_name,"operator+= : incorrect matrix dimensions");
+		handleError(m_className,"operator+= : incorrect matrix dimensions");
 	}
 	mat += S.mat;
 	isIdentity = false;
@@ -530,7 +530,7 @@ void Faust::MatDense<FPP,Cpu>::operator-=(const Faust::MatSparse<FPP,Cpu>& S)
 {
 	if(this->dim1!=S.dim1 || this->dim2!=S.dim2)
 	{
-		handleError(class_name,"operator-= : incorrect matrix dimensions");
+		handleError(m_className,"operator-= : incorrect matrix dimensions");
 	}
 	mat -= S.mat;
 	isIdentity = false;
@@ -543,7 +543,7 @@ void Faust::MatDense<FPP,Cpu>::scalarMultiply(Faust::MatDense<FPP,Cpu> const& A)
 {
 	if(this->dim1!=A.dim1 || this->dim2!=A.dim2)
 	{
-		handleError(class_name,"scalarMultiply : incorrect matrix dimensions\n");
+		handleError(m_className,"scalarMultiply : incorrect matrix dimensions\n");
 	}
 	mat = (mat.array() * A.mat.array()).matrix();
 	isIdentity = false;
@@ -558,7 +558,7 @@ void Faust::MatDense<FPP,Cpu>::multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S)
 	{
 		//std::cerr << "Error in Faust::MatDense<FPP,Cpu>::operator*= : incorrect matrix dimensions" << std::endl;
 		//exit(EXIT_FAILURE);
-		handleError(class_name,"multiplyLeft : incorrect matrix dimensions\n");
+		handleError(m_className,"multiplyLeft : incorrect matrix dimensions\n");
 	}
 
 	if (isIdentity)
@@ -593,13 +593,13 @@ t_print_file.start();
     ifstream* vec_stream;
     vec_stream = new ifstream(filename);
     if (!vec_stream->is_open())
-        handleError(class_name, "init_from_file : unable to open file");
+        handleError(m_className, "init_from_file : unable to open file");
     istream_iterator<FPP> start(*vec_stream), eos;
     vector<FPP> vec(start, eos);
 
     if((vec[0]*vec[1]+2) != vec.size())
     {
-        handleError(class_name, "init_from_file : problem with the file");
+        handleError(m_className, "init_from_file : problem with the file");
     }
     resize(vec[0],vec[1]);
     memcpy(getData(), &vec[2], sizeof(FPP) * this->dim1 * this->dim2);

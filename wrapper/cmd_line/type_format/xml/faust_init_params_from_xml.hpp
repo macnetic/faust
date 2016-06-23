@@ -7,7 +7,7 @@
 #include <libxml/xpath.h>
 #include <iostream>
 #include <vector>
-#include<string>
+#include <string>
 #include "faust_Transform.h"
 #include "faust_MatDense.h"
 
@@ -34,8 +34,8 @@ void init_params_from_xml(const char * filename,Faust::Params<FPP,DEVICE> & para
 			"init_params_from_xml : invalid file nb_fact tag must be specified one time");
 
 	}
-	params.nb_fact=xmlXPathCastStringToNumber(contentS[0]);
-	// std::cout<<"nb_fact : "<<params.nb_fact<<std::endl;
+	params.m_nbFact=xmlXPathCastStringToNumber(contentS[0]);
+	// std::cout<<"m_nbFact : "<<params.m_nbFact<<std::endl;
 
 	//niter1 (optionnal)
 	contentS = get_content(BAD_CAST "/hierarchical_fact/niter1/text()",ctxt);
@@ -154,9 +154,9 @@ void init_params_from_xml(const char * filename,Faust::Params<FPP,DEVICE> & para
 		contentS_type = get_content(BAD_CAST (requestS_begin[j]+"type/text()").c_str(),ctxt);
 
 
-		if ((( contentS.size() != (params.nb_fact-1)) || ((contentS_dim1.size()) != (params.nb_fact-1))) ||  (( contentS_dim2.size() != (params.nb_fact-1)) || ((contentS_type.size()) != (params.nb_fact-1))))
+		if ((( contentS.size() != (params.m_nbFact-1)) || ((contentS_dim1.size()) != (params.m_nbFact-1))) ||  (( contentS_dim2.size() != (params.m_nbFact-1)) || ((contentS_type.size()) != (params.m_nbFact-1))))
 			handleError("faust_init_params_from_xml",
-			"init_params_from_xml : invalid file constraint each row tag must have nb_fact-1 constraint with each specifying parameter , dim1, dim2,type tags");
+			"init_params_from_xml : invalid file constraint each row tag must have m_nbFact-1 constraint with each specifying parameter , dim1, dim2,type tags");
 
 		std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> constraintS;
 		for (int i=0;i<contentS.size();i++)
@@ -195,15 +195,15 @@ void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<FPP,DEVIC
 	// data.init_from_file((char *) contentS[0]);
 	// params.data=data;
 
-	// nb_fact
+	// m_nbFact
 	contentS = get_content(BAD_CAST "/palm4MSA/nb_fact/text()",ctxt);
 	if ( contentS.size() != 1)
 	{
 			handleError("faust_init_params_from_xml",
-			"init_palm_params_from_xml : invalid file nb_fact tag must be specified one time");
+			"init_palm_params_from_xml : invalid file m_nbFact tag must be specified one time");
 
 	}
-	params.nb_fact=xmlXPathCastStringToNumber(contentS[0]);
+	params.nbFact=xmlXPathCastStringToNumber(contentS[0]);
 
 	//niter1 (optionnal)
 	contentS = get_content(BAD_CAST "/palm4MSA/niter/text()",ctxt);
@@ -295,9 +295,9 @@ void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<FPP,DEVIC
 		contentS_type = get_content(BAD_CAST ("/palm4MSA/constraints/constraint/type/text()"),ctxt);
 
 
-		if ((( contentS.size() != (params.nb_fact)) || ((contentS_dim1.size()) != (params.nb_fact))) ||  (( contentS_dim2.size() != (params.nb_fact)) || ((contentS_type.size()) != (params.nb_fact))))
+		if ((( contentS.size() != (params.nbFact)) || ((contentS_dim1.size()) != (params.nbFact))) ||  (( contentS_dim2.size() != (params.nbFact)) || ((contentS_type.size()) != (params.nbFact))))
 			handleError("faust_init_params_from_xml",
-			"init_params_from_xml : invalid file constraint each row tag must have nb_fact-1 constraint with each specifying parameter , dim1, dim2,type tags");
+			"init_params_from_xml : invalid file constraint each row tag must have nbFact-1 constraint with each specifying parameter , dim1, dim2,type tags");
 
 		std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> constraintS;
 		for (int i=0;i<contentS.size();i++)
@@ -331,13 +331,13 @@ void init_palm_params_from_xml(const char * filename,Faust::ParamsPalm<FPP,DEVIC
 template<typename FPP,Device DEVICE>
 void add_constraint(std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & consS,char* type, char * parameter, char* dim1,char* dim2)
 {
-	int const_type = getTypeConstraint(type);
+	int const_type = get_type_constraint(type);
 
 
 	int cons_dim1,cons_dim2;
 	cons_dim1 =(int) atoi(dim1);
 	cons_dim2 =(int) atoi(dim2);
-	faust_constraint_name cons_name=getEquivalentConstraint(type);
+	faust_constraint_name cons_name=get_equivalent_constraint(type);
 	switch(const_type)
 	{
 		// INT CONSTRAINT
