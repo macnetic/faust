@@ -43,27 +43,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 		if(nlhs!=1)
 			mexErrMsgTxt("1 output is expected.");
-		if(nrhs!=2)
-			mexErrMsgTxt("2 inputs are expected.");
-
+        if((nrhs<2) || (nrhs>3))
+			mexErrMsgTxt("1 or 2 inputs are expected.");
+        
 
 		if(!mxIsCell(prhs[1]))
-			mexErrMsgTxt("input must be a cell-array");
-
+			mexErrMsgTxt("1st arg input must be a cell-array");
+        
 		std::vector<Faust::MatSparse<FFPP,Cpu> > vec_spmat;
 		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
-		/*if (nb_element == 0)
-			mexWarnMsgTxt("Empty cell array.");
-	        else if (!mxIsSparse(mxGetCell(prhs[1],0)))
-		{
-			//mexPrintf("Dense\n");
-			loadDenseFaust(prhs[1],vec_spmat);
-		}
-		else
-		{
-			//mexPrintf("Sparse\n");
-			loadSpFaust(prhs[1],vec_spmat);
-		}*/
 		if (nb_element == 0)
 			mexWarnMsgTxt("Empty cell array.");
     		else
@@ -75,9 +63,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				addSpmat<FFPP>(mxMat,vec_spmat);
 			}
 		}
+        
+        FFPP lambda = 1.0;
+		if (nrhs > 2)			
+			lambda = (FFPP) mxGetScalar(prhs[2]);
 
-
-		Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>(vec_spmat);
+		Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>(vec_spmat,lambda);
 		plhs[0]=convertPtr2Mat<Faust::Transform<FFPP,Cpu> >(F);
 
 		return;

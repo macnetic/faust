@@ -1,10 +1,15 @@
+// file useful from wrapping an underlying C++ class into matlab  
+// file under BSD License downloaded from
+// https://www.mathworks.com/matlabcentral/fileexchange/38964-example-matlab-class-wrapper-for-a-c++-class
+
+
 #ifndef __CLASS_HANDLE_HPP__
 #define __CLASS_HANDLE_HPP__
 #include "mex.h"
 #include <string>
 #include <cstring>
 #include <typeinfo>
-//#include <stdint.h>
+
 
 
 #ifndef __MACH__

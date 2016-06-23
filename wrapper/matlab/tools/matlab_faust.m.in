@@ -1,4 +1,11 @@
-%CLASS_INTERFACE Example MATLAB class wrapper to an underlying C++ class
+%class MATLAB_FAUST 
+% representing a given dense matrix by a product of sparse matrix (i.e faust)
+% in order to speed-up multiplication by this matrix,
+% matlab wrapper class implemented in C++
+%
+% For more information on the FAuST Project, please visit the website of 
+% the project :  <http://faust.gforge.inria.fr>  
+
 classdef matlab_faust < handle
     properties (SetAccess = private, Hidden = true)
         objectHandle; % Handle to the underlying C++ class instance
@@ -6,27 +13,33 @@ classdef matlab_faust < handle
     methods
         %% Constructor - Create a new C++ class instance 
         function this = matlab_faust(varargin)
+            % Constructor - build a faust from a cell array of matrix and a scalar (optional)
+            %                1st input : 1D cell array of matrix (sparse or dense)
+            %                2nd input : (optional) multiplicative scalar  
             this.objectHandle = mexFaust('new',varargin{:});
-			%this.objectHandle = mexLoadFaust(varargin{:});
 		end
         
         %% Destructor - Destroy the C++ class instance
         function delete(this)
+            % destructor delete the faust    
             mexFaust('delete', this.objectHandle);
         end
 
         %% Multiplication faust-vector or faust-matrix
         function varargout = mtimes(this, varargin)
+             % mtimes - overloading of the matlab multiplication (*) function, compatible with matlab matrix and vector
              [varargout{1:nargout}] = mexFaust('multiply', this.objectHandle, varargin{:});
          end
 		 
 		 %% Evaluate the product of a faust_core
 		 function varargout = get_product(this)
+                % get_product - compute the dense matrix equivalent to the faust (the product of sparse matrix) 
 				[varargout{1:nargout}]=mexFaust('get_product',this.objectHandle);
 	     end
-		 
+		%% Transpose operator 
 		function trans=transpose(this)
-			if (nargout	 == 0)
+			%transpose - overloading of the matlab transpose operator (')
+            if (nargout	 == 0)
 				mexFaust('transpose',this.objectHandle);
 			else
 				trans = matlab_faust({});
@@ -44,14 +57,10 @@ classdef matlab_faust < handle
 				
 			end
 		end	
-
-		
-		function res=solve(this,varargin)
-			[varargout{1:nargout}] = mexFaust('solve', this.objectHandle, varargin{:});
-		end
-		 
+		%% Size 
 		function Size=size(this,varargin);
-			if (nargin == 1)
+			%size - overload of the matlab size function
+            if (nargin == 1)
 				Size=mexFaust('size',this.objectHandle);
 			else (nargin == 2)
 				Size=mexFaust('size',this.objectHandle,varargin);
