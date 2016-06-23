@@ -102,6 +102,8 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 	else()
 		message(FATAL_ERROR "Unable to compile mex functions")
 	endif()
+	configure_file(${FAUST_MATLABDOC_SRC_DIR}/${mex_target}.m ${FAUST_MATLABMEX_BIN_DIR}/${mex_target}.m COPYONLY)
+	install(FILES ${FAUST_MATLABMEX_BIN_DIR}/${mex_target}.m DESTINATION ${FAUST_INSTALL_MEX})	
 	install(FILES ${FAUST_MATLABMEX_BIN_DIR}/${mex_target}.${MEX_EXT} DESTINATION ${FAUST_INSTALL_MEX})
 	
 endforeach()
