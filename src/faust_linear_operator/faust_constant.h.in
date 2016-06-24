@@ -10,6 +10,8 @@
 */
 #cmakedefine FAUST_SINGLE
 
+#cmakedefine FAUST_VERSION
+
 //if defined, print debug message (useful for debugging)
 #cmakedefine FAUST_VERBOSE
 
