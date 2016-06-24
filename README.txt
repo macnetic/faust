@@ -1,14 +1,17 @@
 ##########################################################################
-####################		FAuST Toolbox			######################
+####################		FAuST Toolbox			##########
 ##########################################################################
 
 
 ##########################################################################
 General purpose:
 
-The FAuST toolbox contains code implementing a general framework designed 
-to factorize matrices of interest into multiple sparse factors. 
+The FAuST toolbox contains a C++ code implementing a general framework 
+designed to factorize matrices of interest into multiple sparse factors. 
+It contains a template CPU/GPU C++ code and a Matlab wrapper.
 The algorithms implemented here are described in details in [1]- Le Magoarou
+
+
 
 For more information on the FAuST Project, please visit the website of the 
 project: <http://faust.gforge.inria.fr>
@@ -50,6 +53,10 @@ Install:
 
 
 ##########################################################################
+
+
+
+
 Main tools :
 
 The main functions offered by the FAuST toolbox are implemented in two files
