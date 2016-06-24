@@ -1,6 +1,9 @@
 #ifndef FAUST_CONSTANT_H
 #define FAUST_CONSTANT_H
 
+
+#define FAUST_VERSION 2.0
+
 ///if defined, compilation with openblas for dense algebra
 #cmakedefine __GEMM_WITH_OPENBLAS__
 
@@ -9,8 +12,6 @@
 *\warning Only useful for the mexfunction (MATLAB wrapper) since the Faust::MatDense ... classes are template
 */
 #cmakedefine FAUST_SINGLE
-
-#cmakedefine FAUST_VERSION
 
 //if defined, print debug message (useful for debugging)
 #cmakedefine FAUST_VERBOSE
@@ -38,6 +39,8 @@ typedef long int faust_int;
 
 const double FAUST_PRECISION = 0.0001;
 const faust_unsigned_int nbr_iter_norm = 100;
+
+
 
 ///// #define FAUST_GPU_ALREADY_SET -3
 ///// #define FAUST_DEFAULT_CUDA_DEVICE 0
