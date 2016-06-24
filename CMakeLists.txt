@@ -6,8 +6,10 @@
 cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
 
-set(FAUST_VERSION_MAJOR 1)
-set(FAUST_VERSION_MINOR 0)
+#set(FAUST_VERSION_MAJOR 1)
+#set(FAUST_VERSION_MINOR 0)
+
+set(FAUST_VERSION 2.0)
 
 #Add the c++11 flag, whatever it is
 #include(CheckCXXCompilerFlag)
@@ -59,9 +61,9 @@ set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
 set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
 set(FAUST_USE_OPENMP ON CACHE BOOL "OpenMP Multithreading")
 set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read mat files")
-set(FAUST_USE_XML ON CACHE BOOL "Using xml configuration to read xml files")
+set(FAUST_USE_XML OFF CACHE BOOL "Using xml configuration to read xml files")
 set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
-set(FAUST_USE_GPU ON CACHE BOOL "Using both CPU and GPU process")
+set(FAUST_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
 set(FAUST_GEN_DOC OFF CACHE BOOL "Generate html documentation with doxygen")
 
 if (FAUST_USE_SINGLEPRECISION)
@@ -352,7 +354,7 @@ include(CMake/check_external_libraries.cmake)
 
 check_external_libraries(matio MATIO_LIB_FILE 0)
 check_external_libraries(xml2 XML2_LIB_FILE 0)
-check_external_libraries(hdf5 HDF5_LIB_FILE 1)
+check_external_libraries(hdf5 HDF5_LIB_FILE 0)
 
 #LDFLAGS = -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5
 check_external_includes("libxml/parser.h" XML_INC_DIR 0)
