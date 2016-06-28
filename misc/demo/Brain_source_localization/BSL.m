@@ -1,14 +1,69 @@
+%% Description BSL
+%  Brain source localization
+%
+%  This script performs brain source localization using several gain
+%  matrices [2], including FAuSTs, and several solvers. It reproduces the
+%  source localization experiment of [1].
+%  The results are stored in "./output/results_BSL_user.mat".
+%  DURATION: Computations should take around 10 minutes. 
+%	
+%  The MEG gain matrices used are 
+%		- those in "./output/M_user.mat" if available
+%		- or the precomputed ones in "./precomputed_results_MEG/M_X.mat"
+%
+% For more information on the FAuST Project, please visit the website of 
+% the project :  <http://faust.gforge.inria.fr>
+%
+%% License:
+% Copyright (2016):	Luc Le Magoarou, Remi Gribonval
+%			INRIA Rennes, FRANCE
+%			http://www.inria.fr/
+%
+% The FAuST Toolbox is distributed under the terms of the GNU Affero 
+% General Public License.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published 
+% by the Free Software Foundation.
+%
+% This program is distributed in the hope that it will be useful, but 
+% WITHOUT ANY WARRANTY; without even the implied warranty of 
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+% See the GNU Affero General Public License for more details.
+%
+% You should have received a copy of the GNU Affero General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+%% Contacts:	
+%   Nicolas Bellot : nicolas.bellot@inria.fr
+%   Leman Adrien   : adrien.leman@inria.fr
+%	Luc Le Magoarou: luc.le-magoarou@inria.fr
+%	Remi Gribonval : remi.gribonval@inria.fr
+%
+%% References:
+% [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse 
+%	approximations of matrices and applications", Journal of Selected 
+%	Topics in Signal Processing, 2016.
+%	<https://hal.archives-ouvertes.fr/hal-01167948v1>
+%
+% [2]   A. Gramfort, M. Luessi, E. Larson, D. Engemann, D. Strohmeier, 
+%	C. Brodbeck, L. Parkkonen, M. Hamalainen, MNE software for processing
+%	MEG and EEG data <http://www.ncbi.nlm.nih.gov/pubmed/24161808>, 
+%	NeuroImage, Volume 86, 1 February 2014, Pages 446-460, ISSN 1053-8119, 
+%	[DOI] <http://dx.doi.org/10.1016/j.neuroimage.2013.10.027>
+%%
+
+
+
 %% This is an example of a little experience of source localization in magnetoencephalography (MEG) using faust factorisation for speed-up the calculus,
 %% the sparse algorithm used is greed_omp_chol from the toolbox smallbox2.0/Sparsify/GreedLab under GNU GPL 2.0 License
 %% to show the different performance figure run figure_localisze_src after this script
 
 
-clear all
-close all
-clc
+runPath=which(mfilename);
+pathname = fileparts(runPath);
+BSL_data_pathName=strcat(pathname,'/data/');
 
 
-set_path;
 
 
 RCG_approxS_MEG=[6,8,16,25];
@@ -17,8 +72,8 @@ MEG_approxS_norm = cell(1,nb_approx_MEG);
 
 
 %Loading of the MEG matrix
-load 'X_meg.mat'
-load curv.mat
+load([BSL_data_pathName 'X_meg.mat' ]);
+load ([BSL_data_pathName 'curv.mat']);
 points2 = points;
 points = points(points_used_idx,:);
 X = X_fixed;
@@ -37,7 +92,7 @@ for i=1:nb_approx_MEG
 
     
     RCG_approxS_MEG(i);
-    load(['M_' int2str(RCG_approxS_MEG(i))]);
+    load([BSL_data_pathName 'M_' int2str(RCG_approxS_MEG(i))  ]);
     facts{1}=lambda*facts{1};
     X_approx =dvp(facts);
     %X_hat = X' + 0.05*randn(size(X'));
@@ -69,9 +124,9 @@ Ntraining = 500; % Number of training vectors
 Sparsity = 2; % Number of sources per training vector
 dist_paliers = [0.01,0.05,0.08]; dist_paliers = [dist_paliers, 0.5];
 
-resDist = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,méthode,dist_sources,src_nb,run);
+resDist = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,mï¿½thode,dist_sources,src_nb,run);
 compute_Times = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Ntraining);
-resDist_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,méthode,dist_sources,src_nb,run);
+resDist_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,mï¿½thode,dist_sources,src_nb,run);
 compute_Times_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Ntraining);
 for k=1:numel(dist_paliers)-1
     disp(['k=' num2str(k) '/' num2str(numel(dist_paliers)-1)])
@@ -90,25 +145,6 @@ for k=1:numel(dist_paliers)-1
     Data = X_norm*Gamma;
     
     
-    sol_ist = zeros(size(Gamma));
-    sol_ist_hat = zeros(size(Gamma));
-    sol_ist_hat2 = zeros(size(Gamma));
-    err_ist = zeros(2,Ntraining);
-    err_ist_hat = zeros(2,Ntraining);
-    err_ist_hat2 = zeros(2,Ntraining);
-    dist_ist = zeros(Sparsity,Ntraining);
-    dist_ist_hat = zeros(Sparsity,Ntraining);
-    dist_ist_hat2 = zeros(Sparsity,Ntraining);
-    
-    sol_iht = zeros(size(Gamma));
-    sol_iht_hat = zeros(size(Gamma));
-    sol_iht_hat2 = zeros(size(Gamma));
-    err_iht = zeros(2,Ntraining);
-    err_iht_hat = zeros(2,Ntraining);
-    err_iht_hat2 = zeros(2,Ntraining);
-    dist_iht = zeros(Sparsity,Ntraining);
-    dist_iht_hat = zeros(Sparsity,Ntraining);
-    dist_iht_hat2 = zeros(Sparsity,Ntraining);
     
     sol_omp = zeros(size(Gamma));
     sol_omp_hat = zeros(size(Gamma));
@@ -178,8 +214,9 @@ for k=1:numel(dist_paliers)-1
 end
 toc
 heure = clock ;
-% save(['results_BSL_JOURNAL_6approx' date '-' num2str(heure(4)) '-' num2str(heure(5))  ],'resDist','RCG_approxS_MEG','nb_approx_MEG','compute_Times','RCG_approxS_MEG');
-save('results_localise_src','resDist','resDist_matlab','RCG_approxS_MEG','nb_approx_MEG','compute_Times','compute_Times_matlab', 'RCG_approxS_MEG');
+
+matfile = fullfile(pathname, 'output/results_BSL_user');
+save(matfile,'resDist','resDist_matlab','RCG_approxS_MEG','nb_approx_MEG','compute_Times','compute_Times_matlab', 'RCG_approxS_MEG');
 
 
 
