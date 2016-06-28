@@ -59,7 +59,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mxCurrentField = mxGetField(prhs[0],0,"data");
 
         getFaustMat(  mxCurrentField,data ) ;
-        mexPrintf("DATA (%d,%d)",data.getNbRow(),data.getNbCol());
+        /*mexPrintf("DATA (%d,%d)",data.getNbRow(),data.getNbCol());
 		if ((data.getNbRow() < 10) && (data.getNbCol()))
 		{
 			for (int i = 0;i<data.getNbRow();i++)
@@ -71,7 +71,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				}
 				mexPrintf("\n");
 			}
-		}
+		}*/
 	}else
 	{
 		mexErrMsgTxt("params.data must be specified");
@@ -83,9 +83,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    {
 
         mxCurrentField = mxGetField(prhs[0],0,"nfacts");
-        mexPrintf("a\n");
         nbFact =(int)  mxGetScalar(mxCurrentField);
-        mexPrintf("NB FACT : %d",nbFact);
+
    }else
    {
         mexErrMsgTxt("params.nfacts must be specified");
@@ -203,7 +202,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       ///////////// HIERARCHICAL LAUNCH ///////////////
      // creation des parametres
 	 try{
-		std::cout<<"avant "<<std::endl;
+		
 		Faust::Params<FFPP,Cpu> params(data,nbFact,consSS,std::vector<Faust::MatDense<FFPP,Cpu> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda);
 
 	 //DisplayParams(params);

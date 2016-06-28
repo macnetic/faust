@@ -1,11 +1,13 @@
-%% Description: setup_FAuST.m 
-% Run script to set the useful paths in order to use the matlab wrapper of the C++ FAuST toolbox.
+%% Description hadamard_mat
+%  Computation of tha Hadamard matrix and its "native" factorization
+%  [H, Fact] = hadamard_mat(n) computes the Hadamard matrix H of size 
+%  2^n*2^n and its factorization Fact.
 %
 % For more information on the FAuST Project, please visit the website of 
 % the project :  <http://faust.gforge.inria.fr>
 %
 %% License:
-% Copyright (2016):	Bellot Nicolas, Adrien Leman, Luc Le Magoarou, Remi Gribonval
+% Copyright (2016):	Luc Le Magoarou, Remi Gribonval
 %			INRIA Rennes, FRANCE
 %			http://www.inria.fr/
 %
@@ -23,9 +25,7 @@
 % You should have received a copy of the GNU Affero General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
-%% Contacts:
-%   Nicolas Bellot : nicolas.bellot@inria.fr
-%   Adrien Leman   : adrien.leman@inria.fr
+%% Contacts:	
 %	Luc Le Magoarou: luc.le-magoarou@inria.fr
 %	Remi Gribonval : remi.gribonval@inria.fr
 %
@@ -37,35 +37,24 @@
 %%
 
 
-ROOT_DIR=[fileparts(mfilename('fullpath')),filesep];
+function [H, Fact] = hadamard_mat(n)
 
-relpathlist={'',...
-                  'mex',... %% mexfunction access (mexHierarchical_fact, mexPalm4MSA, mexFaust )        
-		  'tools',... %% matlab_faust.m		
-                  'demo',... 
-	          'demo/Brain_source_localization',...
-		  'demo/Hadamard_factorization',...
-                 };
-             
-fprintf('Welcome to wrapper matlab C++ FAuST_toolbox. FAuST root directory is %s\n',ROOT_DIR);
-for k=1:numel(relpathlist)
-
-    
-    tmp_pathname=[ROOT_DIR,relpathlist{k}];
-  fprintf('adding path %s\n',tmp_pathname);
-  addpath(genpath(tmp_pathname));
+bloc = [1 1;1 -1];
+matbase = bloc;
+for i = 1:2^(n-1)-1
+    matbase = blkdiag(matbase,bloc);
 end
-cd(ROOT_DIR)
-clear relpathlist tmp_pathname ROOT_DIR k
+matbase = (1/sqrt(2))*matbase;
 
+Perm = zeros(size(matbase));
+for l = 1:size(Perm,1)/2
+    Perm(2*l-1,l)=1;
+    Perm(2*l,l+size(Perm,1)/2)=1;
+end
 
-
-
-
-fprintf('\n FAuST is successfully installed. \n')
-fprintf(['\n To get started with the FAuST Toolbox : \n'])
-fprintf(['\n launch run_all_demo.m \n'])
-
-
-
-
+Fact = zeros(2^n,2^n,n);
+for i=1:n
+    Fact(:,:,i) = matbase*Perm;
+end
+H = Fact(:,:,1)^n;
+end

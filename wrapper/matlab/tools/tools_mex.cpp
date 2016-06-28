@@ -29,7 +29,7 @@ void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
   {
         const char * fieldName;
         fieldName = mxGetFieldNameByNumber(params,i);
-        mexPrintf("fieldname %d : %s\n",i,fieldName);
+        //mexPrintf("fieldname %d : %s\n",i,fieldName);
 
         if (strcmp(fieldName,"data") == 0)
         {

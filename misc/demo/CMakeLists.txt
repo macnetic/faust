@@ -8,6 +8,10 @@ file(GLOB MATLAB_SCRIPTS "*.m")
 
 
 if(FAUST_USE_MEX)
+
+	configure_file(${FAUST_DEMO_SRC_DIR}/run_all_demo.m ${FAUST_DEMO_BIN_DIR}/run_all_demo.m COPYONLY)
+      		install(FILES ${FAUST_DEMO_BIN_DIR}/run_all_demo.m DESTINATION ${FAUST_DEMO_INSTALL_DIR})
+
 	
 	############# Brain source localization demo ####################
 	foreach(matlab_script BSL Fig_BSL)
@@ -22,13 +26,20 @@ if(FAUST_USE_MEX)
    	endforeach()
 	
 
+	######### Hadamard factorization ###############################
+		configure_file(${FAUST_DEMO_HADAMARD_SRC_DIR}/demo_fact_hadamard.m ${FAUST_DEMO_HADAMARD_BIN_DIR}/demo_fact_hadamard.m COPYONLY)
+      		install(FILES ${FAUST_DEMO_HADAMARD_BIN_DIR}/demo_fact_hadamard.m DESTINATION ${FAUST_DEMO_HADAMARD_INSTALL_DIR})
+	
+	
+	#################### Tools directory ############################
+		foreach(tools bplot dvp faust_transpose f_mult greed_omp_chol make_sparse sparse_coeffs UpdateCholesky hadamard_mat)
+	      		configure_file(${FAUST_DEMO_TOOLS_SRC_DIR}/${tools}.m ${FAUST_DEMO_TOOLS_BIN_DIR}/${tools}.m COPYONLY)
+	      		install(FILES ${FAUST_DEMO_TOOLS_BIN_DIR}/${tools}.m DESTINATION ${FAUST_DEMO_TOOLS_INSTALL_DIR})	
+	   	endforeach()
+		
 	
 
 
 endif()
 	
-	#################### Tools directory ############################
-	foreach(tools bplot dvp faust_transpose f_mult greed_omp_chol make_sparse sparse_coeffs UpdateCholesky)
-      		configure_file(${FAUST_DEMO_TOOLS_SRC_DIR}/${tools}.m ${FAUST_DEMO_TOOLS_BIN_DIR}/${tools}.m COPYONLY)
-      		install(FILES ${FAUST_DEMO_TOOLS_BIN_DIR}/${tools}.m DESTINATION ${FAUST_DEMO_TOOLS_INSTALL_DIR})	
-   	endforeach()
+	
