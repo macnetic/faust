@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
   	}
 
 
-	string configFilename = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat";
+	string configFilename = "@FAUST_DATA_MAT_DIR@/config_compared_hierarchical_fact.mat";
 
 	if (argc >= 2)
 		configFilename = argv[1];

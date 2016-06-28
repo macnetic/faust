@@ -9,8 +9,8 @@ if (FAUST_USE_OPENBLAS)
 endif(FAUST_USE_OPENBLAS)
 
 	foreach(algofile launch_hierarchical_fact launch_palm4MSA)
-		configure_file(${FAUST_CMDLINE_FUNC_SRC_DIR}/${algofile}.cpp ${FAUST_CMDLINE_BIN_SRC_DIR}/${algofile}.cpp COPYONLY)
-		add_executable(${algofile} ${FAUST_CMDLINE_BIN_SRC_DIR}/${algofile}.cpp ${FAUST_CMDLINE_TYPE_FORMAT_XML_SRC_DIR}/xml_utils.cpp)
+		configure_file(${FAUST_CMDLINE_FUNC_SRC_DIR}/${algofile}.cpp ${FAUST_BIN_CMDLINE_SRC_DIR}/${algofile}.cpp COPYONLY)
+		add_executable(${algofile} ${FAUST_BIN_CMDLINE_SRC_DIR}/${algofile}.cpp ${FAUST_CMDLINE_TYPE_FORMAT_XML_SRC_DIR}/xml_utils.cpp)
 		if(FAUST_USE_OPENBLAS)
 			target_link_libraries(${algofile} ${FAUST_TARGET} ${OPENBLAS_LIB_FILE} ${XML2_LIB_FILE})
 		else()
@@ -18,6 +18,6 @@ endif(FAUST_USE_OPENBLAS)
 		endif()
 	
 	endforeach()
-	#install(TARGETS launch_hierarchical_fact launch_palm4MSA DESTINATION ${FAUST_CMDLINE_BIN_DIR})
+	#install(TARGETS launch_hierarchical_fact launch_palm4MSA DESTINATION ${FAUST_BIN_CMDLINE_BIN_DIR})
    
 endif()  

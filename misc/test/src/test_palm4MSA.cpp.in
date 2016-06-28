@@ -21,7 +21,7 @@ int main()
 {
   Faust::MatDense<FPP,Cpu> data, initFacts1, initFacts2;
 
-  char configPalm2Filename[] = "@FAUST_TESTDATA_SRC_DIR@/config_compared_palm2.mat";
+  char configPalm2Filename[] = "@FAUST_DATA_MAT_DIR@/config_compared_palm2.mat";
 
   init_faust_mat_from_matio(data, configPalm2Filename, "data");
   init_faust_mat_from_matio(initFacts1, configPalm2Filename, "init_facts1");

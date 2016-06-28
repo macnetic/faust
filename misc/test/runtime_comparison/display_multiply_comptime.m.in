@@ -1,7 +1,7 @@
 %% this function displays the resulting C++ computed times between the 2 different
 % multiplication (faust vs dense matrix) for different RCG, dimension and
 % matrix
-%% WARNING this script must be run after @FAUST_TEST_SRC_DIR@/gen_artificial_faust.m
+%% WARNING this script must be run after @FAUST_SRC_TEST_DIR@/gen_artificial_faust.m
 % which store some Faust::Transform example with different dimensions RCG and
 % number of factors in
 % after run the executable

@@ -14,7 +14,7 @@
 #include <iomanip>
 
 /** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
-* An dense matrix is loaded from "@FAUST_TESTDATA_SRC_DIR@
+* An dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
 * \param configFilename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hierFact)
 * \param expectedLambda (optionnal) : compared the expected scalar of the factorisation with the computed one in the precision defined with epsilon
 *\param epsilon : precision for the test of equality (default value 0.0001)
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   	}
 
 
-	string configFilename = "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat";
+	string configFilename = "@FAUST_DATA_MAT_DIR@/config_compared_hierarchical_fact.mat";
 
 
 

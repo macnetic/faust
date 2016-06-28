@@ -26,7 +26,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO AND HDF5_LIB_FILE)
 	foreach(TEST_FPP float double)	
 		foreach(testin hierarchicalFactorization test_palm4MSA multiply_compare_time)
 			# copy CPU files cpp.in to the user's ./src/ directory in float et double precision
-			configure_file(${FAUST_TESTSRC_SRC_DIR}/${testin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
+			configure_file(${FAUST_SRC_TEST_SRC_DIR}/${testin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
 			# Generation of the binary files in double and float precision
 			add_executable(${testin}_${TEST_FPP} ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp ${FAUST_TESTSRC_BIN_DIR}/ ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
    	
@@ -38,14 +38,14 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO AND HDF5_LIB_FILE)
 		endforeach()
 	endforeach()
 
-#message(STATUS "ALALALLLLLLLLLLL FAUST_INSTALL_TESTING_BIN=${FAUST_INSTALL_TESTING_BIN}")
+#message(STATUS "ALALALLLLLLLLLLL FAUST_INSTALL_BIN=${FAUST_INSTALL_BIN}")
 
-	install(TARGETS hierarchicalFactorization_double hierarchicalFactorization_float test_palm4MSA_double test_palm4MSA_float multiply_compare_time_double multiply_compare_time_float DESTINATION ${FAUST_INSTALL_TESTING_BIN})
+	install(TARGETS hierarchicalFactorization_double hierarchicalFactorization_float test_palm4MSA_double test_palm4MSA_float multiply_compare_time_double multiply_compare_time_float DESTINATION ${FAUST_INSTALL_BIN})
 
 
 	# matlab script useful for displaying the result of the multiply_compare_time executable ( 
-	configure_file(${FAUST_TESTRUNCOMP_SRC_DIR}/display_multiply_comptime.m.in ${FAUST_TESTRUNCOMP_BIN_DIR}/display_multiply_comptime.m @ONLY)
-	install(FILES ${FAUST_TESTRUNCOMP_BIN_DIR}/display_multiply_comptime.m DESTINATION ${FAUST_INSTALL_TESTRUNCOMP})
+	configure_file(${FAUST_SRC_TEST_TIME_COMP_DIR}/display_multiply_comptime.m.in ${FAUST_TESTRUNCOMP_BIN_DIR}/display_multiply_comptime.m @ONLY)
+	install(FILES ${FAUST_TESTRUNCOMP_BIN_DIR}/display_multiply_comptime.m DESTINATION ${FAUST_INSTALL_BIN_TIME_COMP})
 
 
 ###### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST ######
@@ -56,11 +56,11 @@ endif(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO AND HDF5_LIB_FILE)
 
 
 if (FAUST_USE_MEX)
-	configure_file(${FAUST_TEST_SRC_TOOL_DIR}/set_path.m.in ${FAUST_TESTTOOLS_BIN_DIR}/set_path.m @ONLY)
-	configure_file(${FAUST_TEST_SRC_TOOL_DIR}/launch_hierarchical_fact.m ${FAUST_TESTTOOLS_BIN_DIR}/launch_hierarchical_fact.m COPYONLY)
+	configure_file(${FAUST_SRC_TEST_TOOL_DIR}/set_path.m.in ${FAUST_TESTTOOLS_BIN_DIR}/set_path.m @ONLY)
+	configure_file(${FAUST_SRC_TEST_TOOL_DIR}/launch_hierarchical_fact.m ${FAUST_TESTTOOLS_BIN_DIR}/launch_hierarchical_fact.m COPYONLY)
 	
 	foreach(matlabtest hier_fact.m MEG_fact.m)
-		configure_file(${FAUST_TESTSRC_SRC_DIR}/${matlabtest} ${FAUST_TEST_BIN_DIR}/${matlabtest} COPYONLY)
+		configure_file(${FAUST_SRC_TEST_SRC_DIR}/${matlabtest} ${FAUST_TEST_BIN_DIR}/${matlabtest} COPYONLY)
 	endforeach()
 endif(FAUST_USE_MEX)
 
@@ -80,11 +80,11 @@ set(TIMEOUT_COMP 3000)
 if (FAUST_USE_MATIO)
 	
 	# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) 
-	add_test(NAME HADAMARD_FACT_DOUBLE COMMAND  ${FAUST_TEST_BIN_DIR}/hierarchicalFactorization_double 	${FAUST_TESTDATA_SRC_DIR}/config_HADAMARD.mat)
-	add_test(NAME FAUST_HIER_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchicalFactorization_double 	${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
-	add_test(NAME FAUST_HIER_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
-	add_test(NAME MEG_FACT_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22332 1)
-	add_test(NAME MEG_FACT_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22480 1)
+	add_test(NAME HADAMARD_FACT_DOUBLE COMMAND  ${FAUST_TEST_BIN_DIR}/hierarchicalFactorization_double 	${FAUST_DATA_MAT_DIR}/config_HADAMARD.mat)
+	add_test(NAME FAUST_HIER_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchicalFactorization_double 	${FAUST_DATA_MAT_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+	add_test(NAME FAUST_HIER_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+	add_test(NAME MEG_FACT_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22332 1)
+	add_test(NAME MEG_FACT_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22480 1)
 
 	add_test(NAME PALM4MSA_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/test_palm4MSA_double )
 	add_test(NAME PALM4MSA_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/test_palm4MSA_float )
@@ -109,11 +109,11 @@ endif (FAUST_USE_MATIO)
 
 # XML input format
 if (FAUST_USE_XML)
-	add_test(NAME FAUST_HIER_CMDLINE COMMAND ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt )
+	add_test(NAME FAUST_HIER_CMDLINE COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/hier_fact_config.xml ${FAUST_DATA_TXT_DIR}/hier_fact_data.txt )
 
-	add_test(NAME FAUST_HIER_TRANSPOSE_CMDLINE COMMAND ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/trans_hier_fact_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/hier_fact_data.txt  T)
+	add_test(NAME FAUST_HIER_TRANSPOSE_CMDLINE COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/trans_hier_fact_config.xml ${FAUST_DATA_TXT_DIR}/hier_fact_data.txt  T)
 
-	add_test(NAME MEG_FACT_CMDLINE COMMAND ${FAUST_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CMDLINE_SRC_CONFIGFILE_DIR}/MEG_config.xml ${FAUST_CMDLINE_SRC_DATA_DIR}/MEG_data.txt )
+	add_test(NAME MEG_FACT_CMDLINE COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/MEG_config.xml ${FAUST_DATA_TXT_DIR}/MEG_data.txt )
 	# limit the time of the process in case of bug... 
 	set_tests_properties(FAUST_HIER_CMDLINE FAUST_HIER_TRANSPOSE_CMDLINE PROPERTIES TIMEOUT ${TIMEOUT_COMP})
 	set_tests_properties(MEG_FACT_CMDLINE PROPERTIES TIMEOUT ${TIMEOUT_MEG})	 
@@ -157,21 +157,21 @@ endif()
 #	foreach(TEST_FPP float double)	
 #			foreach(testin hierarchical_fact_cu)
 #				# copy CPU files cpp.in to the user's ./src/ directory en float et double precision
-#				configure_file(${FAUST_TESTSRC_SRC_DIR}/${testin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
+#				configure_file(${FAUST_SRC_TEST_SRC_DIR}/${testin}.cpp.in ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
 #				# Creation des executable en double et en float
 #				add_executable(${testin}_${TEST_FPP} ${FAUST_TESTSRC_BIN_DIR}/${testin}_${TEST_FPP}.cpp ${FAUST_TESTSRC_BIN_DIR}/ ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
 #				target_link_libraries(${testin}_${TEST_FPP} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${CUBLAS_LIB_FILE} ${CUDART_LIB_FILE}  ${CUSPARSE_LIB_FILE})
 
-#				install(TARGETS ${testin}_${TEST_FPP}  DESTINATION ${FAUST_INSTALL_TESTING_BIN})	
+#				install(TARGETS ${testin}_${TEST_FPP}  DESTINATION ${FAUST_INSTALL_BIN})	
 #		endforeach()
 #	endforeach()
 
 #	# test GPU
-#	add_test(NAME HADAMARD_GPU_FACT_DOUBLE COMMAND  ${FAUST_TEST_BIN_DIR}/hierarchical_fact_cu_double 	${FAUST_TESTDATA_SRC_DIR}/config_HADAMARD.mat)
-#	add_test(NAME FAUST_HIER_GPU_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_cu_double 	${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
-#	add_test(NAME FAUST_HIER_GPU_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_cu_float ${FAUST_TESTDATA_SRC_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
-#	add_test(NAME MEG_GPU_FACT_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_cu_float ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22332 1)
-#	add_test(NAME MEG_GPU_FACT_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_cu_double ${FAUST_TESTDATA_SRC_DIR}/config_MEG.mat 22480 1)
+#	add_test(NAME HADAMARD_GPU_FACT_DOUBLE COMMAND  ${FAUST_TEST_BIN_DIR}/hierarchical_fact_cu_double 	${FAUST_DATA_MAT_DIR}/config_HADAMARD.mat)
+#	add_test(NAME FAUST_HIER_GPU_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_cu_double 	${FAUST_DATA_MAT_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+#	add_test(NAME FAUST_HIER_GPU_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_cu_float ${FAUST_DATA_MAT_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+#	add_test(NAME MEG_GPU_FACT_FLOAT COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_cu_float ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22332 1)
+#	add_test(NAME MEG_GPU_FACT_DOUBLE COMMAND ${FAUST_TEST_BIN_DIR}/hierarchical_fact_cu_double ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22480 1)
 #	set(TIMEOUT_MEG 14000)
 #	set_tests_properties(MEG_GPU_FACT_FLOAT MEG_GPU_FACT_DOUBLE PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 #endif(FAUST_USE_GPU)

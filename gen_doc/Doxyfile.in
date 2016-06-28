@@ -460,14 +460,14 @@ INPUT			=	"@FAUST_DOC_SRC_DIR@/mainpage.md" \
 					"@FAUST_LINEAR_OPERATOR_SRC_DIR@" \
 					"@FAUST_ALGORITHM_CONSTRAINT_SRC_DIR@" \
 					"@FAUST_ALGORITHM_FACTORIZATION_SRC_DIR@" \
-					"@FAUST_CMDLINE_BIN_SRC_DIR@" \
+					"@FAUST_BIN_CMDLINE_SRC_DIR@" \
 					"@FAUST_TESTSRC_BIN_DIR@" 
 
 USE_MDFILE_AS_MAINPAGE = mainpage
 
 INPUT_ENCODING         = UTF-8
 
-#"@FAUST_WRAPPER_BIN_DIR@" \
+#"@FAUST_BIN_WRAPPER_DIR@" \
 #					"@FAUST_PALM4MSA_SRC_DIR@" \
 #					"@FAUST_FAUSTCORE_SRC_DIR@" \
 #					"@FAUST_MATIO_SRC_DIR@" \
@@ -476,9 +476,9 @@ INPUT_ENCODING         = UTF-8
 
 #	"@FAUST_EXCEPTION_SRC_DIR@" \
 #	"@FAUST_MEXINTERFACE_SRC_DIR@" \
-#	"@FAUST_CMDLINE_SRC_DIR@" \
+#	"@FAUST_SRC_CMDLINE_DIR@" \
 #	"@FAUST_DEMO_SRC_DIR@" \
-#	"@FAUST_TEST_SRC_DIR@" \
+#	"@FAUST_SRC_TEST_DIR@" \
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -1407,7 +1407,7 @@ SEARCHENGINE           = YES
 ##	"@PROJECT_BINARY_DIR@/wrapper/cmd_line/src" 
 
 #INPUT = "@FAUST_DOC_SRC_DIR@/mainpage.md" \
-#	"@FAUST_WRAPPER_BIN_DIR@" \
+#	"@FAUST_BIN_WRAPPER_DIR@" \
 #	"@FAUST_PALM4MSA_SRC_DIR@" \
 #	"@FAUST_FAUSTCORE_SRC_DIR@" \
 #	"@FAUST_MATIO_SRC_DIR@" \
@@ -1415,9 +1415,9 @@ SEARCHENGINE           = YES
 
 ##	"@FAUST_EXCEPTION_SRC_DIR@" \
 ##	"@FAUST_MEXINTERFACE_SRC_DIR@" \
-##	"@FAUST_CMDLINE_SRC_DIR@" \
+##	"@FAUST_SRC_CMDLINE_DIR@" \
 ##	"@FAUST_DEMO_SRC_DIR@" \
-##	"@FAUST_TEST_SRC_DIR@" \
+##	"@FAUST_SRC_TEST_DIR@" \
 
 #	
 ##	"../../../cmd_line/xml_tools/xml_utils.cpp" \

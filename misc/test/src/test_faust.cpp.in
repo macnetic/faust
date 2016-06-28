@@ -26,9 +26,9 @@ int main()
 
 	faust_params<FPP> params;
 	if (testMEG)
-		init_params_from_matiofile(params, "@FAUST_TESTDATA_SRC_DIR@/config_MEG.mat", "params");
+		init_params_from_matiofile(params, "@FAUST_DATA_MAT_DIR@/config_MEG.mat", "params");
 	else
-		init_params_from_matiofile(params, "@FAUST_TESTDATA_SRC_DIR@/config_compared_hierarchical_fact.mat", "params");
+		init_params_from_matiofile(params, "@FAUST_DATA_MAT_DIR@/config_compared_hierarchical_fact.mat", "params");
 
     
 //cout << "update_way=" << params.isUpdateWayR2L << endl;
@@ -59,9 +59,9 @@ int main()
 	for (int i=0 ; i<facts.size() ; i++)
 	{
 		if (testMEG)
-			sprintf(filename, "@FAUST_TESTDATA_SRC_DIR@/facts_MEG%d.txt", i);
+			sprintf(filename, "@FAUST_DATA_MAT_DIR@/facts_MEG%d.txt", i);
 		else
-			sprintf(filename, "@FAUST_TESTDATA_SRC_DIR@/learning_compared_fact%d.txt", i);
+			sprintf(filename, "@FAUST_DATA_MAT_DIR@/learning_compared_fact%d.txt", i);
 		facts[i].init_from_file(filename);
 	}
 	faust_core<FPP> faust(facts, (FFPP)1.0);
