@@ -11,22 +11,17 @@ project(FAUST CXX)
 set(FAUST_VERSION 2.0)
 
 
-
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-	SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/build/FAuST_OUTPUT" CACHE STRING "default install path" FORCE )
-endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-
 if(UNIX)
-	message(STATUS "UNIX OPERATING SYSTEM")
+	#message(STATUS "UNIX OPERATING SYSTEM")
 	#if(LINUX) DON'T WORK SO AN UNIX OS WHICH IS NOT APPLE IS ASSUMED TO BE LINUX OS 	
 	if(APPLE)
 		message(STATUS "APPLE OPERATING SYSTEM")
 	else(APPLE)
 		message(STATUS "LINUX OPERATING SYSTEM")
 	endif(APPLE)
-
-endif()
-
+else(UNIX)
+	message(STATUS "WINDOWS OPERATING SYSTEM")
+endif(UNIX)
 
 ###### tmp directory where temporary objects will be located ######
 set(FAUST_TMP_BUILD_DIR "${PROJECT_BINARY_DIR}/tmp")
@@ -34,19 +29,30 @@ file(MAKE_DIRECTORY ${FAUST_TMP_BUILD_DIR})
 set(FAUST_TMPMEX_DIR "${FAUST_TMP_BUILD_DIR}/mex_obj")
 file(MAKE_DIRECTORY ${FAUST_TMPMEX_DIR})
 
+
 if(UNIX)
 	set(MEXOBJ_EXT "o")
 elseif(WIN32)
 	set(MEXOBJ_EXT ".obj")
 endif()
 
+
+#cmake .. -DCMAKE_INSTALL_PREFIX="/home/aleman/Faust_install" 
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+	SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/build/FAuST_OUTPUT" CACHE STRING "default install path" FORCE )
+else()
+	SET(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING "new install path" FORCE )
+	message(STATUS "********** install path : ${CMAKE_INSTALL_PREFIX} ************")
+endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
 ###### Different option of configuration ######
+option(BUILD_TESTING "Build Tests" ON) 
 set(FAUST_USE_SINGLEPRECISION OFF CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
 set(FAUST_USE_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
 set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
 set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
 set(FAUST_USE_OPENMP OFF CACHE BOOL "OpenMP Multithreading")
-set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read mat files")
+set(FAUST_USE_MATIO OFF CACHE BOOL "Using matio library to read mat files")
 set(FAUST_USE_XML OFF CACHE BOOL "Using xml configuration to read xml files")
 set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
 set(FAUST_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
@@ -85,7 +91,6 @@ endif()
 ##################################################################
 
 ###### Enable testing: ######
-OPTION(BUILD_TESTING "Build Tests" ON) 
 include(CTest)
 enable_testing()
 ##################################################################
@@ -233,7 +238,7 @@ if (FAUST_GEN_DOC)
 endif()
 ##################################################################
 
-message(STATUS "FAUST_BIN_TEST_OUTPUT_DIR : ${FAUST_BIN_TEST_OUTPUT_DIR}")
+#message(STATUS "FAUST_BIN_TEST_OUTPUT_DIR : ${FAUST_BIN_TEST_OUTPUT_DIR}")
 file(MAKE_DIRECTORY ${FAUST_BIN_TEST_OUTPUT_DIR})
 file(MAKE_DIRECTORY ${FAUST_BIN_TEST_FIG_DIR})
 file(MAKE_DIRECTORY ${FAUST_BIN_TEST_TMP_DIR})
