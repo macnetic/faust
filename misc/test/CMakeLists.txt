@@ -124,8 +124,9 @@ endif(FAUST_USE_XML)
 if(FAUST_USE_MEX)
 	#add_test(NAME FAUST_HIER_MEX COMMAND matlab  -nojvm -nodisplay -r ${FAUST_TEST_BIN_DIR}/hier_fact.m;exit)
 	# on ajoute les path bin et tools qui sont utilisés pour le script matlab.
-	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_TEST_BIN_DIR}','${FAUST_TESTTOOLS_BIN_DIR}');hier_fact;end;exit" )
+	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_TEST_BIN_DIR}','${FAUST_TESTTOOLS_BIN_DIR}');hier_fact(9400,10);end;exit" )
 	add_test(NAME FAUST_MEG_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_TEST_BIN_DIR}','${FAUST_TESTTOOLS_BIN_DIR}');MEG_fact;end;exit" )	
+
 	# limit the time of the process in case of bug... 
 
 #CTEST_FULL_OUTPUT
