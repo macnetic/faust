@@ -121,12 +121,12 @@ int main(int argc, char* argv[])
 	(facts[0]) *= hierFact.get_lambda();
 	Faust::Transform<FPP,Cpu> hierFactCore(facts);
 	char nomFichier[100];
-	string outputFile="@FAUST_TESTOUTPUT_BIN_DIR@/hier_fact_factorisation.dat";
+	string outputFile="@FAUST_BIN_TEST_OUTPUT_DIR@/hier_fact_factorisation.dat";
 	hierFactCore.print_file(outputFile.c_str());
 
 	//write the given factorisation into a mat file
 	stringstream outputFilename;
-	outputFilename<<"@FAUST_TESTOUTPUT_BIN_DIR@/"<<configFileBodyFile<<"_factorisation.mat";
+	outputFilename<<"@FAUST_BIN_TEST_OUTPUT_DIR@/"<<configFileBodyFile<<"_factorisation.mat";
 	std::cout<<"**************** WRITING FACTORISATION INTO ****************"<<std::endl;
 	std::cout<<"output filename : "<<outputFilename.str();
 	write_faust_core_into_matfile(hierFactCore,outputFilename.str().c_str(),"fact");

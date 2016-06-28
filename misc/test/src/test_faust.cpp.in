@@ -90,13 +90,13 @@ int main()
 
 	if (testMEG)
 	{
-		vec_out_faust.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_MEG_faust.dat");
-		vec_out_mat.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_MEG_mat.dat");
+		vec_out_faust.print_file("@FAUST_BIN_TEST_OUTPUT_DIR@/vec_out_MEG_faust.dat");
+		vec_out_mat.print_file("@FAUST_BIN_TEST_OUTPUT_DIR@/vec_out_MEG_mat.dat");
 	}
 	else
 	{
-	vec_out_faust.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_hier_fact_faust.dat");
-	vec_out_mat.print_file("@FAUST_TESTOUTPUT_BIN_DIR@/vec_out_hier_fact_mat.dat");
+	vec_out_faust.print_file("@FAUST_BIN_TEST_OUTPUT_DIR@/vec_out_hier_fact_faust.dat");
+	vec_out_mat.print_file("@FAUST_BIN_TEST_OUTPUT_DIR@/vec_out_hier_fact_mat.dat");
 	}
 
  

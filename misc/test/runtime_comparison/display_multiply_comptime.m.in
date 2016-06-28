@@ -5,12 +5,12 @@
 % which store some Faust::Transform example with different dimensions RCG and
 % number of factors in
 % after run the executable
-% @FAUST_TEST_BIN_DIR@/multiply_compare_time that will do some time
+% @FAUST_BIN_TEST_BIN_DIR@/multiply_compare_time that will do some time
 % comparison between dense mat-vector product and faust-vector product
 %
 % example of inputfile and outputdir
-%inputfile='@FAUST_TESTOUTPUT_BIN_DIR@/multiply_compare_time.mat';
-%outputdir='@FAUST_TESTFIG_BIN_DIR@';
+%inputfile='@FAUST_BIN_TEST_OUTPUT_DIR@/multiply_compare_time.mat';
+%outputdir='@FAUST_BIN_TEST_FIG_DIR@';
 
 function display_multiply_comptime(inputfile,outputdir)
 

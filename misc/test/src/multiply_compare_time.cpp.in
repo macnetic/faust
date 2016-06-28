@@ -18,7 +18,7 @@
 \param NB_run the number multiplication made per given configuration (dimension, number of factor, RCG) (default value 100)
 
 The different computed times are stored in a single mat file :
-\output matfile @FAUST_TESTOUTPUT_BIN_DIR@/multiply_compare_time.mat
+\output matfile @FAUST_BIN_TEST_OUTPUT_DIR@/multiply_compare_time.mat
 *		all the different computed times are stored in this single mat file into several variables
 *		tdense : 4D array where all the dense time multiplication are stored
 		tfaust : 4D array where all the faust time multiplication are stored
@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
 	vector<Faust::Transform<FPP,Cpu> > FcoreS(nNB_FACTS*nRCGS*nDIMS);
 	stringstream ssInputVarFaust;
 	stringstream ssInputVarDense;
-	string OuputDir="@FAUST_TESTOUTPUT_BIN_DIR@/";
+	string OuputDir="@FAUST_BIN_TEST_OUTPUT_DIR@/";
 
 
 	cout << "loading of dense matrix and faust" << endl;
