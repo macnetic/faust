@@ -20,10 +20,12 @@
 # Directory of the local path of the nightly project
 export PATH_DIR_RUN_NIGHTLY='/home/aleman/WORK/FAUST/faust_nightly'
 # Directory of the library used in the FAUST PROJECT 
+#export EIGENDIR='/usr/include/eigen3'
+
 export OPENBLASDIR='/opt/OpenBLAS'
 export MATIODIR='/usr/local'
 export CUDADIR='/usr/local/cuda-7.5'
-export EIGENDIR='/usr/include/eigen3'
+
 # export version of gcc
 export CC='/usr/lib64/ccache/gcc'
 export CXX='/usr/lib64/ccache/g++'

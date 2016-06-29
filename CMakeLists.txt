@@ -346,28 +346,79 @@ if(WIN32)
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a")
 endif(WIN32)
 
+
+
+#find_package(eigen)
+
+
 # looking for library and include files in the environment variables
 include(CMake/add_library_path.cmake)
-add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" )
-add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "$ENV{EIGENDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" )
+include(CMake/check_external_libraries.cmake)
+
+# /sw /opt/local
+add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/")
+add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" "${PROJECT_SOURCE_DIR}/externals/eigen")
+
+
+#add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" "${PROJECT_SOURCE_DIR}/externals" )
+#add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "$ENV{EIGENDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" "${PROJECT_SOURCE_DIR}/externals" )
 
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP} CACHE PATH "List of include paths used as PATH parameter in find_path")
-
 message(STATUS "LIBRARY_PATH_LIST=${LIBRARY_PATH_LIST}")
 message(STATUS "INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
 
-include(CMake/check_external_libraries.cmake)
 
 check_external_libraries(matio MATIO_LIB_FILE 0)
 check_external_libraries(xml2 XML2_LIB_FILE 0)
 check_external_libraries(hdf5 HDF5_LIB_FILE 0)
 
+
 #LDFLAGS = -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5
 check_external_includes("libxml/parser.h" XML_INC_DIR 0)
 check_external_includes("matio.h" MATIO_INC_DIR 0)
 
-check_external_includes("Eigen/Dense" EIGEN_INC_DIR 1)
+### find and/or install eigen lib (cf. http://eigen.tuxfamily.org/index.php?title=Main_Page)
+check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
+
+if (EIGEN_INC_DIR)
+	message(STATUS "Eigen library is available here : EIGEN_INC_DIR= ${EIGEN_INC_DIR}")
+else (EIGEN_INC_DIR)
+	if(UNIX)
+		exec_program("which hg | xargs echo" OUTPUT_VARIABLE MERCURIAL_HG_PATH_DIR)
+	   	exec_program("readlink ${MERCURIAL_HG_PATH_DIR}" OUTPUT_VARIABLE READLINK_TMP)
+		if (MERCURIAL_HG_PATH_DIR)
+			exec_program("hg clone https://bitbucket.org/eigen/eigen/ ${CMAKE_SOURCE_DIR}/externals/eigen")
+		else (MERCURIAL_HG_PATH_DIR)
+			exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/tmp https://bitbucket.org/eigen/eigen/get/3.2.8.tar.bz2")
+			exec_program("tar jxvf ${CMAKE_SOURCE_DIR}/externals/tmp/*.tar.bz2 -C ${CMAKE_SOURCE_DIR}/externals")
+			exec_program("mv ${CMAKE_SOURCE_DIR}/externals/eigen-* ${CMAKE_SOURCE_DIR}/externals/eigen")
+		endif()
+	elseif(WIN32)
+		exec_program("where hg.exe" MERCURIAL_HG_PATH_DIR)
+		if (MERCURIAL_HG_PATH_DIR)
+			exec_program("hg clone https://bitbucket.org/eigen/eigen/ ${CMAKE_SOURCE_DIR}/externals/eigen")
+		else (MERCURIAL_HG_PATH_DIR)	
+			exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/eigen https://bitbucket.org/eigen/eigen/get/3.2.8.tar.bz2")
+			exec_program("tar jxvf ${CMAKE_SOURCE_DIR}/externals/eigen/*.tar.bz2 ${CMAKE_SOURCE_DIR}/externals/eigen/")
+		endif(MERCURIAL_HG_PATH_DIR)	
+	
+	else(UNIX)
+		message(WARNING "Unknown type of plateform for library Eigen")	
+	endif(UNIX)
+
+	add_include_path(INCLUDE_PATH_LIST_TMP2 "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" "${PROJECT_SOURCE_DIR}/externals/eigen")
+
+	#add_include_path(INCLUDE_PATH_LIST_TMP2 "${PROJECT_SOURCE_DIR}/externals/eigen")
+	#set(INCLUDE_PATH_LIST2 ${INCLUDE_PATH_LIST_TMP2} CACHE PATH "List of include paths used as PATH parameter in find_path")
+	set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP2})
+	message(STATUS "INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
+	check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
+	message(STATUS "EIGEN_INC_DIR= ${EIGEN_INC_DIR}")
+endif (EIGEN_INC_DIR)
+#############################################################
+
+
 
 
 if (FAUST_USE_GPU)
