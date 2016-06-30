@@ -1,7 +1,7 @@
 %% Description hadamard_mat
 %  Computation of tha Hadamard matrix and its "native" factorization
-%  [H, Fact] = hadamard_mat(n) computes the Hadamard matrix H of size 
-%  2^n*2^n and its factorization Fact.
+%  [H, Fact] = hadamard_mat(M) computes the Hadamard matrix H of size 
+%  2^M*2^M and its factorization Fact.
 %
 % For more information on the FAuST Project, please visit the website of 
 % the project :  <http://faust.gforge.inria.fr>
@@ -25,7 +25,9 @@
 % You should have received a copy of the GNU Affero General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
-%% Contacts:	
+%% Contacts:
+%   Nicolas Bellot : nicolas.bellot@inria.fr
+%   Adrien Leman   : adrien.leman@inria.fr
 %	Luc Le Magoarou: luc.le-magoarou@inria.fr
 %	Remi Gribonval : remi.gribonval@inria.fr
 %
@@ -37,24 +39,25 @@
 %%
 
 
-function [H, Fact] = hadamard_mat(n)
+function [H,Fact] = hadamard_mat(M)
 
-bloc = [1 1;1 -1];
+bloc = (1/sqrt(2))*[1 1;1 -1];
 matbase = bloc;
-for i = 1:2^(n-1)-1
-    matbase = blkdiag(matbase,bloc);
-end
-matbase = (1/sqrt(2))*matbase;
+matbase=kron(speye(2^(M-1)),matbase);
+n=size(matbase,1);
 
-Perm = zeros(size(matbase));
-for l = 1:size(Perm,1)/2
-    Perm(2*l-1,l)=1;
-    Perm(2*l,l+size(Perm,1)/2)=1;
+L=(1:n/2);
+id_i=[2*L-1,2*L];
+id_j=[L,L+n/2];
+values=ones(n,1);
+
+Perm = sparse(id_i,id_j,values,n,n);
+same_fact=matbase*Perm;
+
+Fact = cell(1,M);
+for i=1:M
+    Fact{i} = same_fact;
+end
+    H=dvp(Fact);
 end
 
-Fact = zeros(2^n,2^n,n);
-for i=1:n
-    Fact(:,:,i) = matbase*Perm;
-end
-H = Fact(:,:,1)^n;
-end

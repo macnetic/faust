@@ -168,8 +168,6 @@ void Faust::MatSparse<FPP,Cpu>::set(const faust_unsigned_int nnz_, const faust_u
 	tripletList.reserve(nnz_);
 	int nbEltIns = 0;
 	int nb_elt_colj;
-	std::cout<<"SPMAT SET"<<std::endl;
-	std::cout<<"row "<< dim1_<<" col "<<dim2_<<std::endl;
 	for (int j=0;j<dim2_;j++)
 	{
 		nb_elt_colj = col_ptr[j+1]-col_ptr[j];
