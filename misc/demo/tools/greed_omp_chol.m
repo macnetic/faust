@@ -217,7 +217,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if          isa(A,'float')      P =@(z) A*z;  Pt =@(z) A'*z;
-elseif      isobject(A)         P =@(z) A*z;  Pt =@(z) A'*z;
+elseif      isobject(A)         P =@(z) A*z; trans_A=A'; Pt =@(z) trans_A*z;%% modification nicolas bellot
 elseif      isa(A,'function_handle') 
     try
         if          isa(Pt,'function_handle'); P=A;

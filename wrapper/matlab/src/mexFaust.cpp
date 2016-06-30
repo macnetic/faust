@@ -52,9 +52,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         
 		std::vector<Faust::MatSparse<FFPP,Cpu> > vec_spmat;
 		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
-		if (nb_element == 0)
-			mexWarnMsgTxt("Empty cell array.");
-    		else
+		if (nb_element != 0)
 		{
 			mxArray * mxMat;
 			for (int i=0;i<nb_element;i++)
@@ -132,13 +130,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 
 
-		// if (nlhs != 1)
-		// {
-			// (*core_ptr).transpose();
-		// }
-		// return;
-		if (nlhs != 1)
-			(*core_ptr).transpose();
+
+		if (nlhs > 1)
+			mexErrMsgTxt("transpose : too much output argument");
 		else
 		{
 			Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>((*core_ptr));
