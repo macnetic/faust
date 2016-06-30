@@ -42,14 +42,12 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/build/FAuST_OUTPUT" CACHE STRING "default install path" FORCE )
 else()
 	SET(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING "new install path" FORCE )
-	message(STATUS "********** install path : ${CMAKE_INSTALL_PREFIX} ************")
+	message(STATUS "Install FAuST path : ${CMAKE_INSTALL_PREFIX}")
 endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 ###### Different option of configuration ######
 option(BUILD_TESTING "Build Tests" ON) 
 set(FAUST_USE_SINGLEPRECISION OFF CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
-set(FAUST_USE_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
-set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
 set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
 set(FAUST_USE_OPENMP OFF CACHE BOOL "OpenMP Multithreading")
 set(FAUST_USE_MATIO OFF CACHE BOOL "Using matio library to read mat files")
@@ -57,6 +55,10 @@ set(FAUST_USE_XML OFF CACHE BOOL "Using xml configuration to read xml files")
 set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
 set(FAUST_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
 set(FAUST_GEN_DOC OFF CACHE BOOL "Generate html documentation with doxygen")
+
+set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
+set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
+
 
 if (FAUST_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")
@@ -96,6 +98,7 @@ enable_testing()
 ##################################################################
 
 
+
 ###### SOURCES DIRECTORIES ######
 set(FAUST_SRC_DIR ${PROJECT_SOURCE_DIR}/src CACHE INTERNAL "")
 set(FAUST_SRC_LINEAR_OPERATOR_DIR ${FAUST_SRC_DIR}/faust_linear_operator CACHE INTERNAL "")
@@ -116,7 +119,6 @@ set(FAUST_ALGORITHM_FACTORIZATION_BIN_DIR ${FAUST_ALGORITHM_BIN_DIR}/factorizati
 #set(FAUST_FAUSTCORE_SRC_DIR ${PROJECT_SOURCE_DIR}/faust_core CACHE INTERNAL "")
 
 
-
 ##############  INSTALL DIRECTORIES   #############################
 set(FAUST_INSTALL_LIB 			${CMAKE_INSTALL_PREFIX}/lib)
 set(FAUST_INSTALL_BIN 			${CMAKE_INSTALL_PREFIX}/bin)
@@ -126,7 +128,6 @@ set(FAUST_INSTALL_DOC 			${CMAKE_INSTALL_PREFIX}/doc)
 set(FAUST_INSTALL_CMDLINE 		${CMAKE_INSTALL_PREFIX}/CmdLine)
 set(FAUST_INSTALL_TESTING_DATA 	${CMAKE_INSTALL_PREFIX}/testing/data)
 ##################################################################
-
 
 
 ###### WRAPPER DIRECTORIES ######
@@ -285,7 +286,7 @@ endif(FAUST_USE_GPU)
 ##################################################################
 
 
-###### DEBUG vs RELEASE TARGETS ######
+###### FLAG for DEBUG or RELEASE TARGETS ######
 if(WIN32)
 	if(CMAKE_BUILD_TYPE MATCHES "Debug")
 		set(FAUST_DEBUG_RELEASE "debug")
@@ -343,201 +344,13 @@ message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 ##################################################################
 
 
+#########################################
+###### FIND EXTERNALS LIBRARY  ##########
+include(CMake/findExternalLibs.cmake)
+#########################################
+#########################################
 
-###### find external libraries ######
-if(WIN32)
-	set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES} "lib" )
-	set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} ".a")
-endif(WIN32)
-
-
-
-#find_package(eigen)
-
-
-# looking for library and include files in the environment variables
-include(CMake/add_library_path.cmake)
-include(CMake/check_external_libraries.cmake)
-
-# /sw /opt/local
-add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/")
-add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" "${PROJECT_SOURCE_DIR}/externals/eigen")
-
-
-#add_library_path(LIBRARY_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" "${PROJECT_SOURCE_DIR}/externals" )
-#add_include_path(INCLUDE_PATH_LIST_TMP "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "$ENV{EIGENDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" "${PROJECT_SOURCE_DIR}/externals" )
-
-set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
-set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP} CACHE PATH "List of include paths used as PATH parameter in find_path")
-message(STATUS "LIBRARY_PATH_LIST=${LIBRARY_PATH_LIST}")
-message(STATUS "INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
-
-
-check_external_libraries(matio MATIO_LIB_FILE 0)
-check_external_libraries(xml2 XML2_LIB_FILE 0)
-check_external_libraries(hdf5 HDF5_LIB_FILE 0)
-
-
-#LDFLAGS = -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5
-check_external_includes("libxml/parser.h" XML_INC_DIR 0)
-check_external_includes("matio.h" MATIO_INC_DIR 0)
-
-### find and/or install eigen lib (cf. http://eigen.tuxfamily.org/index.php?title=Main_Page)
-check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
-
-if (EIGEN_INC_DIR)
-	message(STATUS "Eigen library is available here : EIGEN_INC_DIR= ${EIGEN_INC_DIR}")
-else (EIGEN_INC_DIR)
-	if(UNIX)
-		#exec_program("which hg | xargs echo" OUTPUT_VARIABLE MERCURIAL_HG_PATH_DIR)
-	   	#exec_program("readlink ${MERCURIAL_HG_PATH_DIR}" OUTPUT_VARIABLE READLINK_TMP)
-		if (MERCURIAL_HG_PATH_DIR)
-			exec_program("hg clone https://bitbucket.org/eigen/eigen/ ${CMAKE_SOURCE_DIR}/externals/eigen")
-		else (MERCURIAL_HG_PATH_DIR)
-			exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/tmp https://bitbucket.org/eigen/eigen/get/3.2.8.tar.bz2")
-			exec_program("tar jxvf ${CMAKE_SOURCE_DIR}/externals/tmp/*.tar.bz2 -C ${CMAKE_SOURCE_DIR}/externals")
-			exec_program("mv ${CMAKE_SOURCE_DIR}/externals/eigen-* ${CMAKE_SOURCE_DIR}/externals/eigen")
-		endif()
-	elseif(WIN32)
-		exec_program("where hg.exe" MERCURIAL_HG_PATH_DIR)
-		if (MERCURIAL_HG_PATH_DIR)
-			exec_program("hg clone https://bitbucket.org/eigen/eigen/ ${CMAKE_SOURCE_DIR}/externals/eigen")
-		else (MERCURIAL_HG_PATH_DIR)	
-			exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/eigen https://bitbucket.org/eigen/eigen/get/3.2.8.tar.bz2")
-			exec_program("tar jxvf ${CMAKE_SOURCE_DIR}/externals/eigen/*.tar.bz2 ${CMAKE_SOURCE_DIR}/externals/eigen/")
-		endif(MERCURIAL_HG_PATH_DIR)	
-	
-	else(UNIX)
-		message(WARNING "Unknown type of plateform for library Eigen")	
-	endif(UNIX)
-
-	add_include_path(INCLUDE_PATH_LIST_TMP2 "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" "${PROJECT_SOURCE_DIR}/externals/eigen")
-
-	#add_include_path(INCLUDE_PATH_LIST_TMP2 "${PROJECT_SOURCE_DIR}/externals/eigen")
-	#set(INCLUDE_PATH_LIST2 ${INCLUDE_PATH_LIST_TMP2} CACHE PATH "List of include paths used as PATH parameter in find_path")
-	set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP2})
-	message(STATUS "INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
-	check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
-	message(STATUS "EIGEN_INC_DIR= ${EIGEN_INC_DIR}")
-endif (EIGEN_INC_DIR)
-#############################################################
-
-
-
-
-if (FAUST_USE_GPU)
-	check_external_libraries(cublas CUBLAS_LIB_FILE 1)
-	check_external_libraries(cudart CUDART_LIB_FILE 1)
-	check_external_libraries(cusparse CUSPARSE_LIB_FILE 1)
-
-	check_external_includes("cublas_v2.h" CUBLAS_V2_INC_DIR 1)
-	check_external_includes("cusparse.h" CUSPARSE_INC_DIR 1)
-	check_external_includes("cuda.h" CUDA_INC_DIR 1)
-	check_external_includes("cuda_runtime_api.h" CUDA_RUNTIME_API_INC_DIR 1)
-endif(FAUST_USE_GPU)
-
-if(FAUST_USE_OPENBLAS)
-	check_external_libraries(openblas OPENBLAS_LIB_FILE 1)
-	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
-endif(FAUST_USE_OPENBLAS)
-##################################################################
-
-#find_path(OPENBLAS_LIB_DIR ${OPENBLAS_LIB_FILE})
-#find_path(EIGEN_LIB_DIR ${EIGEN_LIB_FILE})
-# if(FAUST_USE_SINGLEPRECISION)
-	# set(CXX_MEX_FLAGS "${CXX_MEX_FLAGS} -DFAUST_SINGLE")
-	# if(UNIX)
-		# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFAUST_SINGLE" CACHE STRING "compile flags" FORCE)
-	# elseif(WIN32)
-		# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DFAUST_SINGLE" CACHE STRING "compile flags" FORCE)
-	# endif()
-	# message(STATUS "**** SINGLE PRECISION USE *****")
-# endif()
-
-
-###### test if executable matlab is in the path ######
-if (FAUST_USE_MEX)
-if(UNIX)
-	#message(STATUS "MATLAB_DIR_TMP 1 = ${MATLAB_DIR_TMP}")
-	exec_program("which matlab | xargs echo" OUTPUT_VARIABLE MATLAB_DIR_TMP)
-	#message(STATUS "MATLAB_DIR_TMP 2 = ${MATLAB_DIR_TMP}")
-   	exec_program("readlink ${MATLAB_DIR_TMP}" OUTPUT_VARIABLE READLINK_TMP)
-	#message(STATUS "READLINK_TMP = ${READLINK_TMP}")
-	if(${READLINK_TMP} MATCHES matlab)
-		set(MATLAB_DIR_TMP ${READLINK_TMP})
-		#message(STATUS "MATLAB_DIR_TMP 3 = ${MATLAB_DIR_TMP}")
-   	endif()
-	#message(STATUS "MATLAB_DIR_TMP 4 = ${MATLAB_DIR_TMP}")
-
-elseif(WIN32)
-	exec_program("where matlab.exe" OUTPUT_VARIABLE MATLAB_DIR_TMP)
-else()
-	message(WARNING "Unknown type of plateform for matlab")		
-endif()
-if( ${MATLAB_DIR_TMP} MATCHES "matlab")
-	if(UNIX)
-		string(REGEX REPLACE "([a-zA-Z0-9_/:]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
-	elseif(WIN32)
-		string(REGEX REPLACE "([a-zA-Z0-9_\\:]+)\\\\bin\\\\matlab.exe" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
-	else()
-		message(WARNING "Unknown type of plateform for matlab")	
-	endif()
-	set(MATLAB_ROOT ${MATLAB_ROOT} CACHE PATH "Matlab root directory")
-	message(STATUS "MATLAB_ROOT has been found : ${MATLAB_ROOT}")
-
-	set(MATLAB_INCLUDE_DIR "${MATLAB_ROOT}/extern/include" CACHE INTERNAL "Matlab include directory")
-	set(MATLAB_ARCH_FILE "${FAUST_TMP_BUILD_DIR}/matlab_arch.txt")
-	# LINUX AND APPLE METHOD ARE VERY SIMILAR, CODE COULD BE FACTORIZED
-	if(UNIX) 
-		if(APPLE)
-			exec_program("ls ${MATLAB_ROOT}/extern/lib | grep -i mac" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
-                	if("${MEX_SUBDIR_LIB}" STREQUAL "maci64")
-                        	set(MEX_EXT  "mexmaci64")
-                	elseif("${MEX_SUBDIR_LIB}" STREQUAL "maci")
-                        	set(MEX_EXT  "mexmaci")
-                	endif()		
-		# METHODE 1 (without using matlab)
-		else(APPLE)		
-			exec_program("ls ${MATLAB_ROOT}/extern/lib | grep -i glnx" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
-			if("${MEX_SUBDIR_LIB}" STREQUAL "glnxa64")
-				set(MEX_EXT  "mexa64")
-			elseif("${MEX_SUBDIR_LIB}" STREQUAL "glnx86")
-				set(MEX_EXT  "mexa32")
-			endif()
-		endif(APPLE)	
-	
-
-		# METHODE 2 (using matlab)
-		#exec_program("matlab -wait -nodesktop -nojvm -nodisplay -r \"fid=fopen('${MATLAB_ARCH_FILE}','w');fprintf(fid,'%s\\n%s\\n',computer('arch'),mexext);fclose(fid);exit\" > ${FAUST_TMP_BUILD_DIR}/matlab_output.log")
-		#exec_program("cat ${MATLAB_ARCH_FILE} | head -n 1" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
-		#exec_program("cat ${MATLAB_ARCH_FILE} | head -n 2 | tail -n 1" OUTPUT_VARIABLE MEX_EXT)
-
-	elseif(WIN32)
-		# METHODE 1 (without using matlab)
-		execute_process(COMMAND ${PROJECT_SOURCE_DIR}/CMake/matlab_arch.bat "2" "${MATLAB_ROOT}" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
-		string(REGEX REPLACE "\n" "" MEX_SUBDIR_LIB ${MEX_SUBDIR_LIB})
-		if("${MEX_SUBDIR_LIB}" STREQUAL "win64")
-			set(MEX_EXT  "mexw64")
-		elseif("${MEX_SUBDIR_LIB}" STREQUAL "win32")
-			set(MEX_EXT  "mexw32")
-		endif()	
-
-		# METHODE 2 (using matlab)
-		#exec_program("${PROJECT_SOURCE_DIR}/CMake/matlab_arch.bat 0 \"${MATLAB_ARCH_FILE}\"" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
-		#exec_program("${PROJECT_SOURCE_DIR}/CMake/matlab_arch.bat 1 \"${MATLAB_ARCH_FILE}\"" OUTPUT_VARIABLE MEX_EXT)
-	else()
-		message(WARNING "Unknown type of plateform for matlab")
-	endif()
-else()
-	set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
-	message(WARNING "Matlab executable seems not to be in the path. So \"MATLAB_ROOT\" and \"MATLAB_INCLUDE_DIR\" wont'be defined and mex files won't be compiled. if matlab is installed on your computer, please add matlabroot/bin tu the PATH and try again.")	
-endif()
-endif(FAUST_USE_MEX)
-##################################################################
-
-
-
-###### TARGET GENERATION ######
+########### add_subdirectory ###############
 add_subdirectory(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_BIN_LINEAR_OPERATOR_DIR})
 add_subdirectory(${FAUST_ALGORITHM_SRC_DIR} ${FAUST_ALGORITHM_BIN_DIR})
 add_subdirectory(${FAUST_SRC_TEST_DIR} ${FAUST_BIN_TEST_BIN_DIR})
@@ -560,7 +373,6 @@ endif()
 
 
 ###### TARGET GENERATION ######
-#$<TARGET_OBJECTS:${FAUST_FAUSTCORE_CU_TARGET}> 
 if (FAUST_USE_GPU)
 	if (FAUST_USE_MEX)
 		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_CU_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
