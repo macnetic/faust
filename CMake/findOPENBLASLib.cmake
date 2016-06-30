@@ -1,0 +1,55 @@
+###### chek and find Openblas library
+check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
+check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
+
+if ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
+	message(STATUS "OpenBlas library and include are available here : ${OPENBLAS_LIB_FILE}")
+	#message(STATUS "OpenBlas include is available here : OPENBLAS_INC_DIR= ${OPENBLAS_INC_DIR}")
+else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
+	if(UNIX)
+		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
+		set(OPENBLAS_LIB_NAME "v0.2.18.tar.gz")
+		exec_program("tar xzf ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs/${OPENBLAS_LIB_NAME} -C ${CMAKE_SOURCE_DIR}/externals/unix")
+		exec_program("mv ${CMAKE_SOURCE_DIR}/externals/unix/OpenBLAS* ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS")
+		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS && make && make install PREFIX='${CMAKE_SOURCE_DIR}/externals/unix/OpenBLAS' ")
+		#exec_program(" ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS")
+	elseif(WIN32)
+		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/win http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
+		exec_program("tar jxf ${CMAKE_SOURCE_DIR}/externals/win/zipLibs/v0.2.18.tar.bz -C ${CMAKE_SOURCE_DIR}/externals/win")
+		exec_program("mv ${CMAKE_SOURCE_DIR}/externals/win/sdk_openBlas* ${CMAKE_SOURCE_DIR}/externals/win/OpenBLAS")
+	else(UNIX)
+		message(WARNING "Unknown type of plateform for library OpenBlas")	
+	endif(UNIX)
+
+	add_include_path(INCLUDE_PATH_LIST_TMP2 "${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS")
+	add_library_path(LIBRARY_PATH_LIST_TMP2 "${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS")
+	
+	#message(STATUS "INCLUDE_PATH_LIST_TMP2=${INCLUDE_PATH_LIST_TMP2}")
+	#message(STATUS "LIBRARY_PATH_LIST_TMP2=${LIBRARY_PATH_LIST_TMP2}")
+	
+	check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
+	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)	
+	message(STATUS "OpenBlas library and include are available here : ${OPENBLAS_LIB_FILE}")
+	#message(STATUS "OPENBLAS_INC_DIR= ${OPENBLAS_INC_DIR}")	
+################################################################
+endif()
+
+
+##################################################################
+#if(FAUST_USE_OPENBLAS)
+#	check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
+#	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
+#endif(FAUST_USE_OPENBLAS)
+
+
+#find_path(OPENBLAS_LIB_DIR ${OPENBLAS_LIB_FILE})
+#find_path(EIGEN_LIB_DIR ${EIGEN_LIB_FILE})
+# if(FAUST_USE_SINGLEPRECISION)
+	# set(CXX_MEX_FLAGS "${CXX_MEX_FLAGS} -DFAUST_SINGLE")
+	# if(UNIX)
+		# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFAUST_SINGLE" CACHE STRING "compile flags" FORCE)
+	# elseif(WIN32)
+		# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DFAUST_SINGLE" CACHE STRING "compile flags" FORCE)
+	# endif()
+	# message(STATUS "**** SINGLE PRECISION USE *****")
+# endif()
