@@ -1,4 +1,6 @@
 ###### chek and find Openblas library
+set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP_DEFAULT}) # CACHE PATH "List of library paths used as PATH parameter in find_library")
+set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP_DEFAULT})# CACHE PATH "List of include paths used as PATH parameter in find_path")
 check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
 check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
 
@@ -21,12 +23,15 @@ else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 		message(WARNING "Unknown type of plateform for library OpenBlas")	
 	endif(UNIX)
 
-	add_include_path(INCLUDE_PATH_LIST_TMP2 "${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS")
-	add_library_path(LIBRARY_PATH_LIST_TMP2 "${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS")
+	add_include_path(INCLUDE_PATH_LIST_TMP_OPENBLAS "${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS")
+	add_library_path(LIBRARY_PATH_LIST_TMP_OPENBLAS "${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS")
 	
 	#message(STATUS "INCLUDE_PATH_LIST_TMP2=${INCLUDE_PATH_LIST_TMP2}")
 	#message(STATUS "LIBRARY_PATH_LIST_TMP2=${LIBRARY_PATH_LIST_TMP2}")
 	
+	set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP_OPENBLAS}) # CACHE PATH "List of include paths used as PATH parameter in find_path")
+	set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP_OPENBLAS}) # CACHE PATH "List of include paths used as PATH parameter in find_path")
+
 	check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
 	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)	
 	message(STATUS "OpenBlas library and include are available here : ${OPENBLAS_LIB_FILE}")

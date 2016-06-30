@@ -29,19 +29,19 @@ include(CMake/check_external_libraries.cmake)
 message(STATUS "******* Check externals library ***********")
 
 # Default path library (where the library is automatically install)
-add_library_path(LIBRARY_PATH_LIST_TMP 	"/opt/OpenBLAS"
-										"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
+add_library_path(LIBRARY_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
+												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
 )
 
-add_include_path(INCLUDE_PATH_LIST_TMP 	"/opt/OpenBLAS" 
-										"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
-										"/usr/include/eigen3_"
-										"${PROJECT_SOURCE_DIR}/externals/unix/eigen"
+add_include_path(INCLUDE_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS" 
+												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
+												"/usr/include/eigen3_"
+												"${PROJECT_SOURCE_DIR}/externals/unix/eigen"
 )
 
 
-set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP} CACHE PATH "List of library paths used as PATH parameter in find_library")
-set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP} CACHE PATH "List of include paths used as PATH parameter in find_path")
+set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP_DEFAULT}) # CACHE PATH "List of library paths used as PATH parameter in find_library")
+set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP_DEFAULT})# CACHE PATH "List of include paths used as PATH parameter in find_path")
 #message(STATUS "DEFAULT LIBRARY_PATH_LIST=${LIBRARY_PATH_LIST}")
 #message(STATUS "DEFAULT INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
 
@@ -136,6 +136,12 @@ endif(FAUST_USE_MEX)
 ##################################################################
 
 
+add_library_path(LIBRARY_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" "${PROJECT_SOURCE_DIR}/externals" )
+add_include_path(INCLUDE_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "$ENV{EIGENDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" "${PROJECT_SOURCE_DIR}/externals" )
+
+
+set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP3}) # CACHE PATH "List of library paths used as PATH parameter in find_library")
+set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP3}) # CACHE PATH "List of include paths used as PATH parameter in find_path")
 
 check_external_libraries(matio MATIO_LIB_FILE 0)
 check_external_libraries(xml2 XML2_LIB_FILE 0)
