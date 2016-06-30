@@ -35,7 +35,7 @@ add_library_path(LIBRARY_PATH_LIST_TMP 	"/opt/OpenBLAS"
 
 add_include_path(INCLUDE_PATH_LIST_TMP 	"/opt/OpenBLAS" 
 										"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
-										"/usr/include/eigen3"
+										"/usr/include/eigen3_"
 										"${PROJECT_SOURCE_DIR}/externals/unix/eigen"
 )
 
