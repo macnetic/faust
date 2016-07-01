@@ -50,7 +50,6 @@ option(BUILD_TESTING "Build Tests" ON)
 set(FAUST_USE_SINGLEPRECISION OFF CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
 set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
 set(FAUST_USE_OPENMP OFF CACHE BOOL "OpenMP Multithreading")
-set(FAUST_USE_MATIO FF CACHE BOOL "Using matio library to read mat files")
 set(FAUST_USE_XML OFF CACHE BOOL "Using xml configuration to read xml files")
 set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
 set(FAUST_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
@@ -58,7 +57,7 @@ set(FAUST_GEN_DOC OFF CACHE BOOL "Generate html documentation with doxygen")
 
 set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
 set(FAUST_USE_OPENBLAS ON CACHE BOOL "Using openBLAS for matrix and vector computations")
-
+set(FAUST_USE_MATIO ON CACHE BOOL "Using matio library to read mat files")
 
 if (FAUST_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")

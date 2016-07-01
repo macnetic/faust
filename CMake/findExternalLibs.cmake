@@ -31,19 +31,24 @@ message(STATUS "******* Check externals library ***********")
 # Default path library (where the library is automatically install)
 add_library_path(LIBRARY_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
+												"/usr/local" #pour matio
+												"/usr/local/lib" #pour matio
+												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src/.libs" #pour matio
 )
 
 add_include_path(INCLUDE_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS" 
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
 												"/usr/include/eigen3"
 												"${PROJECT_SOURCE_DIR}/externals/unix/eigen"
+												"/usr/local" #pour matio
+												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src" #pour matio
 )
 
+#set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP_DEFAULT}) # CACHE PATH "List of library paths used as PATH parameter in find_library")
+#set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP_DEFAULT})# CACHE PATH "List of include paths used as PATH parameter in find_path")
 
-set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP_DEFAULT}) # CACHE PATH "List of library paths used as PATH parameter in find_library")
-set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP_DEFAULT})# CACHE PATH "List of include paths used as PATH parameter in find_path")
 #message(STATUS "DEFAULT LIBRARY_PATH_LIST=${LIBRARY_PATH_LIST}")
-message(STATUS "DEFAULT INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
+#message(STATUS "DEFAULT INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
 
 ######## EIGEN ##############
 include(CMake/findEIGENLib.cmake)
@@ -55,7 +60,10 @@ endif(FAUST_USE_OPENBLAS)
 if (FAUST_USE_MEX)
 	include(CMake/findMatlab.cmake)
 endif(FAUST_USE_MEX)
-
+######## MATIO INCLUDE AND LIBRARY ##################
+if (FAUST_USE_MATIO)
+	include(CMake/findMATIOLib.cmake)
+endif(FAUST_USE_MATIO)
 
 
 add_library_path(LIBRARY_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" "${PROJECT_SOURCE_DIR}/externals" )
@@ -65,13 +73,12 @@ add_include_path(INCLUDE_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{M
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP3}) # CACHE PATH "List of library paths used as PATH parameter in find_library")
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP3}) # CACHE PATH "List of include paths used as PATH parameter in find_path")
 
-check_external_libraries(matio MATIO_LIB_FILE 0)
+
 check_external_libraries(xml2 XML2_LIB_FILE 0)
 check_external_libraries(hdf5 HDF5_LIB_FILE 0)
 
 #LDFLAGS = -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5
 check_external_includes("libxml/parser.h" XML_INC_DIR 0)
-check_external_includes("matio.h" MATIO_INC_DIR 0)
 
 
 
