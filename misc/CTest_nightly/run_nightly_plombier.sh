@@ -27,11 +27,13 @@ then
 fi
 
 # Directory of the library used in the FAUST PROJECT 
-export OPENBLASDIR='/home/aleman/library/OpenBLAS'
+#export EIGENDIR='/usr/local/include/eigen3'
+#export OPENBLASDIR='/home/aleman/library/OpenBLAS'
+
 export MATIODIR='/home/aleman/library/matio-1.5.3/src/.libs'
 export MATIODIRINC='/home/aleman/library/matio-1.5.3/src'
 export CUDADIR='/usr/local/cuda-6.5'
-export EIGENDIR='/usr/local/include/eigen3'
+
 # export version of gcc
 #export CC=/usr/lib64/ccache/gcc
 #export CXX=/usr/lib64/ccache/g++
@@ -44,9 +46,7 @@ export CXX='/usr/bin/g++'
 export PATH=/usr/local/cuda-6.5/bin:/usr/local/bin:/usr/bin:$PATH
 
 # CTEST OPTION 
-export CTEST_CONFIGURE_OPTIONS="-DBUILD_DEBUG:BOOL=OFF;\
--DDASH_TESTING:BOOL=ON;\
--DBUILD_COVERAGE:BOOL=ON;\
+export CTEST_CONFIGURE_OPTIONS="
 -DFAUST_USE_OPENBLAS=ON;\
 -DFAUST_USE_MATIO=ON;\
 -DFAUST_USE_XML=OFF;\
@@ -55,6 +55,10 @@ export CTEST_CONFIGURE_OPTIONS="-DBUILD_DEBUG:BOOL=OFF;\
 -DFAUST_USE_PROFILING=OFF;\
 -DFAUST_ISVERBOSE=OFF;\
 -DFAUST_GEN_DOC:BOOL=OFF"
+
+#-DDASH_TESTING:BOOL=ON;\
+#-DBUILD_DEBUG:BOOL=OFF;\
+#-DBUILD_COVERAGE:BOOL=ON;\
 
 
 cd $PATH_DIR_RUN_NIGHTLY

@@ -22,9 +22,12 @@ export PATH=$PATH:usr/local/include
 
 # Directory of the local path of the nightly project
 export PATH_DIR_RUN_NIGHTLY='/home/ci/faust_nightly'
-export OPENBLASDIR='/home/ci/local/OPENBLAS'
+
+#export EIGENDIR='/home/ci/Library/eigen-eigen-07105f7124f9'
+#export OPENBLASDIR='/home/ci/local/OPENBLAS'
+
 export HDF5_ROOT_DIR='/home/ci/local/HDF5/lib'
-export EIGENDIR='/home/ci/Library/eigen-eigen-07105f7124f9'
+
 
 #export MATIODIR=/usr/local
 #export CUDADIR=/usr/local/cuda-6.5
@@ -46,9 +49,7 @@ fi
 
 
 # CTEST OPTION 
-export CTEST_CONFIGURE_OPTIONS="-DBUILD_DEBUG:BOOL=OFF;\
--DDASH_TESTING:BOOL=ON;\
--DBUILD_COVERAGE:BOOL=ON;\
+export CTEST_CONFIGURE_OPTIONS="
 -DFAUST_USE_OPENBLAS=ON;\
 -DFAUST_USE_MATIO=ON;\
 -DFAUST_USE_XML=ON;\
@@ -58,6 +59,9 @@ export CTEST_CONFIGURE_OPTIONS="-DBUILD_DEBUG:BOOL=OFF;\
 -DFAUST_ISVERBOSE=OFF;\
 -DFAUST_GEN_DOC:BOOL=OFF"
 
+#-DDASH_TESTING:BOOL=ON;\
+#-DBUILD_DEBUG:BOOL=OFF;\
+#-DBUILD_COVERAGE:BOOL=ON;\
 
 cd $PATH_DIR_RUN_NIGHTLY
 

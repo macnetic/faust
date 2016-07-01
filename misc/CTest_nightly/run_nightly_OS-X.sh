@@ -22,10 +22,11 @@ export PATH=$PATH:/Applications/MATLAB_R2014b.app/bin/;
 
 # Directory of the local path of the nightly project
 export PATH_DIR_RUN_NIGHTLY='/Users/ci/CTest_nightly'
-export OPENBLASDIR='/Users/ci/local/OPENBLAS-v0.2.15'
+#export OPENBLASDIR='/Users/ci/local/OPENBLAS-v0.2.15'
+#export EIGENDIR='/Users/ci/local/eigen-3.2.8'
+
 export HDF5_ROOT_DIR='/Users/ci/local/hdf5-1.8.17/lib'
-export EIGENDIR='/Users/ci/local/eigen-3.2.8'
-export MATIODIR=/Users/ci/local/matio-1.5.2
+export MATIODIR='/Users/ci/local/matio-1.5.2'
 
 #export CUDADIR=/usr/local/cuda-6.5
 
@@ -46,9 +47,7 @@ fi
 
 
 # CTEST OPTION 
-export CTEST_CONFIGURE_OPTIONS="-DBUILD_DEBUG:BOOL=OFF;\
--DDASH_TESTING:BOOL=ON;\
--DBUILD_COVERAGE:BOOL=ON;\
+export CTEST_CONFIGURE_OPTIONS="
 -DFAUST_USE_OPENBLAS=ON;\
 -DFAUST_USE_MATIO=ON;\
 -DFAUST_USE_XML=ON;\
@@ -59,6 +58,9 @@ export CTEST_CONFIGURE_OPTIONS="-DBUILD_DEBUG:BOOL=OFF;\
 -DFAUST_ISVERBOSE=OFF;\
 -DFAUST_GEN_DOC:BOOL=OFF"
 
+#-DDASH_TESTING:BOOL=ON;\
+#-DBUILD_DEBUG:BOOL=OFF;\
+#-DBUILD_COVERAGE:BOOL=ON;\
 
 cd $PATH_DIR_RUN_NIGHTLY
 

@@ -21,8 +21,8 @@
 export PATH_DIR_RUN_NIGHTLY='/home/aleman/WORK/FAUST/faust_nightly'
 # Directory of the library used in the FAUST PROJECT 
 #export EIGENDIR='/usr/include/eigen3'
+#export OPENBLASDIR='/opt/OpenBLAS'
 
-export OPENBLASDIR='/opt/OpenBLAS'
 export MATIODIR='/usr/local'
 export CUDADIR='/usr/local/cuda-7.5'
 
@@ -48,9 +48,7 @@ fi
 #export HDF5_ROOT_DIR=/home/aleman/Library/hdf5-1.8.16/src/.libs
 
 # CTEST OPTION 
-export CTEST_CONFIGURE_OPTIONS="-DBUILD_DEBUG:BOOL=OFF;\
--DDASH_TESTING:BOOL=ON;\
--DBUILD_COVERAGE:BOOL=ON;\
+export CTEST_CONFIGURE_OPTIONS="
 -DFAUST_USE_OPENBLAS=ON;\
 -DFAUST_USE_MATIO=ON;\
 -DFAUST_USE_XML=OFF;\
@@ -59,7 +57,10 @@ export CTEST_CONFIGURE_OPTIONS="-DBUILD_DEBUG:BOOL=OFF;\
 -DFAUST_USE_PROFILING=OFF;\
 -DFAUST_ISVERBOSE=OFF;\
 -DFAUST_GEN_DOC:BOOL=OFF"
-				
+
+#-DDASH_TESTING:BOOL=ON;\
+#-DBUILD_DEBUG:BOOL=OFF;\
+#-DBUILD_COVERAGE:BOOL=ON;\				
 
 cd $PATH_DIR_RUN_NIGHTLY
 rm -rf faust_test
