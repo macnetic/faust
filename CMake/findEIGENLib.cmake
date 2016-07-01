@@ -1,5 +1,5 @@
 ### find and/or install eigen lib (cf. http://eigen.tuxfamily.org/index.php?title=Main_Page)
-set(INCLUDE_PATH_LIST ${LIBRARY_PATH_LIST_TMP_DEFAULT}) # CACHE PATH "List of include paths used as PATH parameter in find_path")
+set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP_DEFAULT}) # CACHE PATH "List of include paths used as PATH parameter in find_path")
 check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0) # on test avec INCLUDE_PATH_LIST_TMP_DEFAULT
 if (EIGEN_INC_DIR)
 	message(STATUS "Eigen library is available here: ${EIGEN_INC_DIR}")
