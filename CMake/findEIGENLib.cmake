@@ -12,6 +12,12 @@ else (EIGEN_INC_DIR)
 		
 		# Eigen library come from following link. You can modifying svn version of eigen for latest stable release version.
 		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/tmp https://bitbucket.org/eigen/eigen/get/3.2.8.tar.bz2")
+		message(STATUS "------------------------------------------------")
+		message(STATUS "------------------------------------------------")
+		message(STATUS "------------- EIGEN LIB INSTALLATION -----------")
+		message(STATUS "------------------------------------------------")
+		message(STATUS "------------------------------------------------")		
+		
 		set(EIGEN_LIB_NAME "3.2.8.tar.bz2") 
 		exec_program("tar jxf ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs/${EIGEN_LIB_NAME} -C ${CMAKE_SOURCE_DIR}/externals/unix")
 		exec_program("mv ${CMAKE_SOURCE_DIR}/externals/unix/eigen-* ${CMAKE_SOURCE_DIR}/externals/unix/eigen")
@@ -33,6 +39,8 @@ else (EIGEN_INC_DIR)
 	#message(STATUS "INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
 	check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
 	message(STATUS "Eigen library is available here: ${EIGEN_INC_DIR}")
+message(STATUS "------------------------------------------------")
+message(STATUS "------------------------------------------------")	
 endif (EIGEN_INC_DIR)
 #############################################################
 
