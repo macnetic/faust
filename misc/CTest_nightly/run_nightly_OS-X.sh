@@ -26,7 +26,7 @@ export PATH_DIR_RUN_NIGHTLY='/Users/ci/CTest_nightly'
 #export EIGENDIR='/Users/ci/local/eigen-3.2.8'
 
 export HDF5_ROOT_DIR='/Users/ci/local/hdf5-1.8.17/lib'
-export MATIODIR='/Users/ci/local/matio-1.5.2'
+#export MATIODIR='/Users/ci/local/matio-1.5.2'
 
 #export CUDADIR=/usr/local/cuda-6.5
 

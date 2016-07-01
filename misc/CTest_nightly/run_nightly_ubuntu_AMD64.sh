@@ -18,7 +18,7 @@
 
 # Directory of the library used in the FAUST PROJECT 
 export PATH=$PATH:/usr/local/MATLAB/R2014b/bin;
-export PATH=$PATH:usr/local/include
+#export PATH=$PATH:usr/local/include
 
 # Directory of the local path of the nightly project
 export PATH_DIR_RUN_NIGHTLY='/home/ci/faust_nightly'

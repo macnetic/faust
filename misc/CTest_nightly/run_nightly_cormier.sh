@@ -23,7 +23,7 @@ export PATH_DIR_RUN_NIGHTLY='/home/aleman/WORK/FAUST/faust_nightly'
 #export EIGENDIR='/usr/include/eigen3'
 #export OPENBLASDIR='/opt/OpenBLAS'
 
-export MATIODIR='/usr/local'
+#export MATIODIR='/usr/local'
 export CUDADIR='/usr/local/cuda-7.5'
 
 # export version of gcc
@@ -32,8 +32,8 @@ export CXX='/usr/lib64/ccache/g++'
 
 # /usr/local/bin/matlab in the PATH 
 #export PATH=/usr/local/cuda-7.5/bin:/usr/local/bin:$PATH
-export PATH=/usr/local/cuda-7.5/bin:/usr/local/bin:/usr/lib64/ccache/:$PATH
-
+export PATH=/usr/local/cuda-7.5/bin:/usr/lib64/ccache/:$PATH
+#/usr/local/bin:
 
 
 
