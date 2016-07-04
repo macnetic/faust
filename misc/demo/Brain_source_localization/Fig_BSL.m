@@ -154,17 +154,24 @@ title('Fig 9 : matlab faust');
 
 %% time comparison
 
-timeS = cat(3,compute_Times(:,1,:),compute_Times(:,2,:),compute_Times(:,3,:));
+timeS_Cpp = cat(3,compute_Times(:,1,:),compute_Times(:,2,:),compute_Times(:,3,:));
+timeS_matlab = cat(3,compute_Times_matlab(:,1,:),compute_Times_matlab(:,2,:),compute_Times_matlab(:,3,:));
 
 
-timeS = squeeze(1000*timeS)';
+timeS_matlab = squeeze(1000*timeS_matlab)';
+timeS_Cpp = squeeze(1000*timeS_Cpp)';
+
+timeS=reshape([timeS_Cpp;timeS_matlab],3*Ntraining,(nb_approx_MEG+1)*2);
+timeS(:,1)=[];% twice the time of the MEG matrix solver
+
+
 figure('color',[1 1 1]);
 T = bplot(timeS,'linewidth',1.5);
 legend(T)
 ylabel('Computed Time (ms)')
 box on
 ax = gca;
-x_tick=[1:nb_approx_MEG+1];
+x_tick=[1:2*nb_approx_MEG+1];
 mean_x_tick = round(mean(x_tick,2));
 set(ax,'XTick',x_tick');
 set(ax,'xticklabel', [])
@@ -182,55 +189,22 @@ text(xTicks(1), minY - verticalOffset, '$\mathbf{M}$','HorizontalAlignment','cen
 
 
 for i=1:nb_approx_MEG
-    text(xTicks(i+1), minY - verticalOffset, ['$\widehat{\mathbf{M}}_{' int2str(RCG_approxS_MEG(i)) '}$' ],'HorizontalAlignment','center','interpreter', 'latex');
-    
+    text(xTicks(2*i), minY - verticalOffset, ['$\widehat{\mathbf{M}}_{' int2str(RCG_approxS_MEG(i)) '}^{Cpp}$' ],'HorizontalAlignment','center','interpreter', 'latex');
+    text(xTicks(2*i+1), minY - verticalOffset, ['$\widehat{\mathbf{M}}_{' int2str(RCG_approxS_MEG(i)) '}^{Matlab}$' ],'HorizontalAlignment','center','interpreter', 'latex');
 end
-title(' C++ wrapper faust');
+title('solver time comparison');
 
 
 
-%% MATLAB time comparison
-
-timeS_matlab = cat(3,compute_Times_matlab(:,1,:),compute_Times_matlab(:,2,:),compute_Times_matlab(:,3,:));
 
 
-timeS_matlab = squeeze(1000*timeS_matlab)';
 
-figure('color',[1 1 1]);
-T = bplot(timeS_matlab,'linewidth',1.5);
-legend(T)
-
-ylabel('Computed Time (ms)')
-box on
-ax = gca;
-x_tick=[1:nb_approx_MEG+1];
-mean_x_tick = round(mean(x_tick,2));
-set(ax,'XTick',x_tick');
-set(ax,'xticklabel', [])
-axi = axis;
-
-
-HorizontalOffset = 10;
-verticalOffset = 0.5;
-verticalOffset2 = 1;
-yTicks = get(ax,'ytick');
-xTicks = get(ax, 'xtick');
-minY = min(yTicks);
-
-text(xTicks(1), minY - verticalOffset, '$\mathbf{M}$','HorizontalAlignment','center','interpreter', 'latex');
-
-
-for i=1:nb_approx_MEG
-    text(xTicks(i+1), minY - verticalOffset, ['$\widehat{\mathbf{M}}_{' int2str(RCG_approxS_MEG(i)) '}$' ],'HorizontalAlignment','center','interpreter', 'latex');
-    
-end
-title('MATLAB faust');
 
 
 
 
 %% speed-up
-mean_Times=mean(timeS);
+mean_Times=mean(timeS_Cpp);
 mean_Times_matlab=mean(timeS_matlab);
 dense_matrix_time=mean_Times(1);
 real_RCG=dense_matrix_time./mean_Times;
@@ -240,15 +214,19 @@ ax = gca;
 
 set(ax,'xticklabel', [])
 set(ax,'Visible','off');
-plot(1:nb_approx_MEG,RCG_approxS_MEG,'linewidth',1.5);
+semilogy(1:nb_approx_MEG,RCG_approxS_MEG,'linewidth',1.5);
 set(ax,'XTick',[]);
 hold on
-plot(1:nb_approx_MEG,real_RCG(2:end),'linewidth',1.5);
-plot(1:nb_approx_MEG,real_RCG_matlab(2:end),'linewidth',1.5);
-plot(1:nb_approx_MEG,ones(1,nb_approx_MEG),'linewidth',1.5);
-verticalOffset=1.01;
+semilogy(1:nb_approx_MEG,real_RCG(2:end),'linewidth',1.5);
+semilogy(1:nb_approx_MEG,real_RCG_matlab(2:end),'linewidth',1.5);
+semilogy(1:nb_approx_MEG,ones(1,nb_approx_MEG),'linewidth',1.5);
+verticalOffset=1.5;
+minY=min([0.9,real_RCG(2:end),real_RCG_matlab(2:end),RCG_approxS_MEG]);
+maxY=max([0.9,real_RCG(2:end),real_RCG_matlab(2:end),RCG_approxS_MEG]);
+axis([1,nb_approx_MEG,minY,maxY]);
 for i=1:nb_approx_MEG
-    text(i, minY - verticalOffset, ['$\widehat{\mathbf{M}}_{' int2str(RCG_approxS_MEG(i)) '}$' ],'HorizontalAlignment','center','interpreter', 'latex');    
+     text(i, minY -log(maxY/minY)/20, ['$\widehat{\mathbf{M}}_{' int2str(RCG_approxS_MEG(i)) '}$' ],'HorizontalAlignment','center','interpreter', 'latex');
+     
 end
 legend('theoretical RCG','speed up C++ wrapper faust','speed up MATLAB faust','neutral speed up');
 title('speed up');
