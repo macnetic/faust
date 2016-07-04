@@ -83,11 +83,6 @@ namespace Faust
         void init_from_file(const char* filename);
         long long int get_total_nnz()const{return totalNonZeros;}
         void clear(){data.resize(0);totalNonZeros=0;}
-        void push_back(const Faust::MatSparse<FPP,Cpu>& S);
-        void push_first(const Faust::MatSparse<FPP,Cpu>& S);
-        void pop_back(Faust::MatSparse<FPP,Cpu>& S);
-        void pop_first(Faust::MatSparse<FPP,Cpu>& S);
-        void pop_first(Faust::MatSparse<FPP,Cpu>& S) const;
         void Display()const;
         void transpose();
         void updateNonZeros();
