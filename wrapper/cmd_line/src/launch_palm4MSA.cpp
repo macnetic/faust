@@ -13,7 +13,7 @@ using namespace std;
 
 /*! \brief Palm4MSA consists of "Proximal Alternating Linearized Minimization for Multi-layer Sparse Approximation". <br>
 * This command-line Palm4MSA factorizes an input matrix corresponding to an operator of interest into J sparse factors and converges to a stationary point. <br>
-* Projet name is "launch_Palm4MSA". It is available in the /wrapper/cmd_line/src/*.cpp <br>
+* Projet name is launch_Palm4MSA. It is available in the ./wrapper/cmd_line/src/ <br>
 * \param fileName1 : An xml configuration file specifying the different parameters of the Palm4MSA algorithm <br>
   \param fileName2 : The data text file where the matrix A that will be factorized is stored. <br>
 */

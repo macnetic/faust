@@ -19,7 +19,7 @@ using namespace std;
 
 
 /*! \brief Compute the hierarchical factorization of a given data matrix A in cmdline mode.<br>
-* Projet name is "launch_hierarchical_fact". It is available in the /wrapper/cmd_line/src/*.cpp <br>
+* Projet name is launch_hierarchical_fact. It is available in the ./wrapper/cmd_line/src/cpp <br>
 * \param fileName1 : An xml configuration file specifying the different parameters of the HierarchicalFact algorithm <br>
   \param fileName2 : The data text file where the matrix A that will be factorized is stored. <br>
 *		The first line of the file contains 2 integer : the number of row and the number of column.<br>
