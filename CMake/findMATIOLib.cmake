@@ -12,17 +12,16 @@ else ( (MATIO_LIB_FILE) AND (MATIO_INC_DIR) )
 	if(UNIX)
 
 		message(STATUS "------------------------------------------------")
-		message(STATUS "------------------------------------------------")
 		message(STATUS "------------ MATIO LIB INSTALLATION ------------")
 		message(STATUS "------------------------------------------------")
-		message(STATUS "------------------------------------------------")	
-	
+
 		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
 		set(MATIO_LIB_NAME "matio-1.5.7.7z")
 		exec_program("7z x ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs/${MATIO_LIB_NAME} -o${CMAKE_SOURCE_DIR}/externals/unix")
+		exec_program("rm -r ${CMAKE_SOURCE_DIR}/externals/unix/matio")	
 		exec_program("mv ${CMAKE_SOURCE_DIR}/externals/unix/matio-* ${CMAKE_SOURCE_DIR}/externals/unix/matio")
 		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/matio && chmod -R 777 ./ && ./configure && make") # && make check
-		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/matio && make install") # && make check
+		#exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/sdk_matio && make install PREFIX='${CMAKE_SOURCE_DIR}/externals/unix/matio' ") # && make check
 		# NOTE WARNING : WE DON'T run make install because it is not a root user install.  We used directly the lib and include in sdk_matio package. 
 		# NOTE IF you have not 7z -->mac :  brew install p7zip
 		add_include_path(INCLUDE_PATH_LIST_TMP_MATIO "${PROJECT_SOURCE_DIR}/externals/unix/matio/src")
