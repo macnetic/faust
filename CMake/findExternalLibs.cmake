@@ -31,8 +31,8 @@ message(STATUS "******* Check externals library ***********")
 # Default path library (where the library is automatically install)
 add_library_path(LIBRARY_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
-												"/usr/local" #pour matio
-												"/usr/local/lib" #pour matio
+												#"/usr/local" #pour matio
+												#"/usr/local/lib" #pour matio
 												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src/.libs" #pour matio
 )
 
@@ -40,7 +40,7 @@ add_include_path(INCLUDE_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
 												"/usr/include/eigen3"
 												"${PROJECT_SOURCE_DIR}/externals/unix/eigen"
-												"/usr/local" #pour matio
+												#"/usr/local" #pour matio
 												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src" #pour matio
 )
 
@@ -66,8 +66,13 @@ if (FAUST_USE_MATIO)
 endif(FAUST_USE_MATIO)
 
 
-add_library_path(LIBRARY_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{HDF5_ROOT_DIR}" "$ENV{OPENBLASDIR}" "/usr" "/usr/local" "/usr/local/lib" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" "${PROJECT_SOURCE_DIR}/externals" )
-add_include_path(INCLUDE_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{MATIODIR}" "$ENV{MATIODIRINC}" "$ENV{OPENBLASDIR}" "$ENV{EIGENDIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" "${PROJECT_SOURCE_DIR}/externals" )
+
+
+#add_library_path(LIBRARY_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{HDF5_ROOT_DIR}" "/usr/lib/x86_64-linux-gnu/")
+#add_include_path(INCLUDE_PATH_LIST_TMP3 "$ENV{CUDADIR}" "/usr/include/libxml2")
+
+add_library_path(LIBRARY_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{HDF5_ROOT_DIR}" "/usr" "/usr/local" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" )
+add_include_path(INCLUDE_PATH_LIST_TMP3 "$ENV{CUDADIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" )
 
 
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP3}) # CACHE PATH "List of library paths used as PATH parameter in find_library")
