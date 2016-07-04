@@ -40,8 +40,8 @@ else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 
 	check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
 	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)	
-	message(STATUS "OpenBlas library and include are available here : ${OPENBLAS_LIB_FILE}")
-	#message(STATUS "OPENBLAS_INC_DIR= ${OPENBLAS_INC_DIR}")	
+	message(STATUS "OpenBlas library is available here : ${OPENBLAS_LIB_FILE}")
+	message(STATUS "OpenBlas include is available here : ${OPENBLAS_INC_DIR}")
 message(STATUS "------------------------------------------------")
 message(STATUS "------------------------------------------------")	
 ################################################################

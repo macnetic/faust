@@ -79,10 +79,11 @@ set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP3}) # CACHE PATH "List of library p
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP3}) # CACHE PATH "List of include paths used as PATH parameter in find_path")
 
 
-check_external_libraries(xml2 XML2_LIB_FILE 0)
-check_external_libraries(hdf5 HDF5_LIB_FILE 0)
+# trop gros (100 mb le tar...) ne sert pas à grand chose dans le projet. 
+#check_external_libraries(hdf5 HDF5_LIB_FILE 0)
 
 #LDFLAGS = -L$(CUDADIR)/lib64 -L$(MATIODIR)/lib -lpthread -lm -lcublas -lcudart -lcusparse -lstdc++ -lgfortran -lz -lmatio -lhdf5
+check_external_libraries(xml2 XML2_LIB_FILE 0)
 check_external_includes("libxml/parser.h" XML_INC_DIR 0)
 
 
