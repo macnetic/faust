@@ -31,9 +31,10 @@ export CC='/usr/lib64/ccache/gcc'
 export CXX='/usr/lib64/ccache/g++'
 
 # /usr/local/bin/matlab in the PATH 
-#export PATH=/usr/local/cuda-7.5/bin:/usr/local/bin:$PATH
+export PATH=/usr/local/bin:$PATH
+# cuda in the PATH
 export PATH=/usr/local/cuda-7.5/bin:/usr/lib64/ccache/:$PATH
-#/usr/local/bin:
+
 
 
 
