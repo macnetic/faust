@@ -23,16 +23,22 @@
 ###### test if executable matlab is in the path ######
 #if (FAUST_USE_MEX)
 if(UNIX)
-	message(STATUS "MATLAB_DIR_TMP 1 = ${MATLAB_DIR_TMP}")
+	#message(STATUS "MATLAB_DIR_TMP 1 = ${MATLAB_DIR_TMP}")
 	exec_program("which matlab | xargs echo" OUTPUT_VARIABLE MATLAB_DIR_TMP)
-	message(STATUS "MATLAB_DIR_TMP 2 = ${MATLAB_DIR_TMP}")
+	#message(STATUS "MATLAB_DIR_TMP 2 = ${MATLAB_DIR_TMP}")
+
+	if (${MATLAB_DIR_TMP} MATCHES "which: no matlab in")
+		set(MATLAB_DIR_TMP "")			
+		message(FATAL_ERROR "matlab is not present in your PATH ; Please insert in the PATH environment.")
+	endif()
+
    	exec_program("readlink ${MATLAB_DIR_TMP}" OUTPUT_VARIABLE READLINK_TMP)
-	message(STATUS "READLINK_TMP = ${READLINK_TMP}")
+	#message(STATUS "READLINK_TMP = ${READLINK_TMP}")
 	if(${READLINK_TMP} MATCHES matlab)
 		set(MATLAB_DIR_TMP ${READLINK_TMP})
-		message(STATUS "MATLAB_DIR_TMP 3 = ${MATLAB_DIR_TMP}")
+		#message(STATUS "MATLAB_DIR_TMP 3 = ${MATLAB_DIR_TMP}")
    	endif()
-	message(STATUS "MATLAB_DIR_TMP 4 = ${MATLAB_DIR_TMP}")
+	#message(STATUS "MATLAB_DIR_TMP 4 = ${MATLAB_DIR_TMP}")
 
 elseif(WIN32)
 	exec_program("where matlab.exe" OUTPUT_VARIABLE MATLAB_DIR_TMP)
@@ -51,7 +57,7 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 	endif()
 	set(MATLAB_ROOT ${MATLAB_ROOT} CACHE PATH "Matlab root directory")
 	
-	message(STATUS "MATLAB_DIR_TMP ${MATLAB_DIR_TMP}")
+	#message(STATUS "MATLAB_DIR_TMP ${MATLAB_DIR_TMP}")
 	#message(STATUS "MATLAB_ROOT has been found : ${MATLAB_ROOT}") # example : "/usr/local/MATLAB/R2014b"
 	
 	message(STATUS "MATLAB_ROOT has been found : ${MATLAB_ROOT}")
