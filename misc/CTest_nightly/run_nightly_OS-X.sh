@@ -18,7 +18,7 @@
 
 # Directory of the library used in the FAUST PROJECT 
 export PATH=$PATH:/Applications/MATLAB_R2014b.app/bin/;
-export PATH=$PATH:usr/local/include
+#export PATH=$PATH:usr/local/include
 
 # Directory of the local path of the nightly project
 export PATH_DIR_RUN_NIGHTLY='/Users/ci/CTest_nightly'
@@ -36,7 +36,7 @@ export PATH_DIR_RUN_NIGHTLY='/Users/ci/CTest_nightly'
 
 # /usr/local/bin/matlab in the PATH 
 #export PATH=/usr/local/cuda-7.5/bin:/usr/local/bin:$PATH
-export PATH=/usr/local/cuda-7.5/bin:/usr/local/bin:/usr/lib64/ccache/:$PATH
+#export PATH=/usr/local/cuda-7.5/bin:/usr/local/bin:/usr/lib64/ccache/:$PATH
 
 if [ ! -d "$PATH_DIR_RUN_NIGHTLY" ];
 then
