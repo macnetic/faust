@@ -7,6 +7,9 @@ y=x;
 for i=length(facts):-1:1
     y=facts{i}*y;
 end
+if issparse(y)
+    y=full(y);
+end
 
 
 end

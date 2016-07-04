@@ -60,11 +60,15 @@ classdef matlab_faust < handle
 		%% Size 
 		function Size=size(this,varargin);
 			%size - overload of the matlab size function
-            if (nargin == 1)
-				Size=mexFaust('size',this.objectHandle);
-			else (nargin == 2)
-				Size=mexFaust('size',this.objectHandle,varargin);
+			Size=mexFaust('size',this.objectHandle);
+			if (length(varargin)~=0)
+				if (varargin{1}==1)
+					Size=Size(1);
+				elseif (varargin{1}==2)
+					Size=Size(2);
+				end	
 			end
+			
 		end
         
     end

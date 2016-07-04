@@ -50,12 +50,17 @@ if (not(exist(matfile)))
     error('run BSL.m before Fig_BSL.m');
 end
 load(matfile);
+
+Ntraining=params.Ntraining;
+Sparsity=params.Sparsity;
+Ntest=Ntraining*Sparsity;
+
 %% convergence analysis
 
 d1 = cat(4,resDist(:,1,1,:),resDist(:,1,2,:));
 d2 = cat(4,resDist(:,2,1,:),resDist(:,2,2,:));
 d3 = cat(4,resDist(:,3,1,:),resDist(:,3,2,:));
-test2 = 100*[squeeze(d1);zeros(1,1000);squeeze(d2);zeros(1,1000);squeeze(d3)];
+test2 = 100*[squeeze(d1);zeros(1,Ntest);squeeze(d2);zeros(1,Ntest);squeeze(d3)];
 
 
 figure('color',[1 1 1]);
@@ -105,7 +110,7 @@ title('Fig 9 : C++ wrapper faust');
 d1 = cat(4,resDist_matlab(:,1,1,:),resDist_matlab(:,1,2,:));
 d2 = cat(4,resDist_matlab(:,2,1,:),resDist_matlab(:,2,2,:));
 d3 = cat(4,resDist_matlab(:,3,1,:),resDist_matlab(:,3,2,:));
-test2 = 100*[squeeze(d1);zeros(1,1000);squeeze(d2);zeros(1,1000);squeeze(d3)];
+test2 = 100*[squeeze(d1);zeros(1,Ntest);squeeze(d2);zeros(1,Ntest);squeeze(d3)];
 
 figure('color',[1 1 1]);
 title('MATLAB');
