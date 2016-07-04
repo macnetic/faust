@@ -46,6 +46,7 @@ else()
 	message(WARNING "Unknown type of plateform for matlab")		
 endif()
 
+
 if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 	if(UNIX)
 		# string(REGEX REPLACE "([a-zA-Z0-9_/:]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
