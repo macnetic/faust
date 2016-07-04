@@ -31,8 +31,8 @@ message(STATUS "******* Check externals library ***********")
 # Default path library (where the library is automatically install)
 add_library_path(LIBRARY_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
-												#"/usr/local" #pour matio
-												#"/usr/local/lib" #pour matio
+												"/usr/local" #pour matio
+												"/usr/local/lib" #pour matio
 												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src/.libs" #pour matio
 )
 
@@ -40,7 +40,7 @@ add_include_path(INCLUDE_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
 												"/usr/include/eigen3"
 												"${PROJECT_SOURCE_DIR}/externals/unix/eigen"
-												#"/usr/local" #pour matio
+												"/usr/local" #pour matio
 												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src" #pour matio
 )
 
@@ -71,8 +71,8 @@ endif(FAUST_USE_MATIO)
 #add_library_path(LIBRARY_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{HDF5_ROOT_DIR}" "/usr/lib/x86_64-linux-gnu/")
 #add_include_path(INCLUDE_PATH_LIST_TMP3 "$ENV{CUDADIR}" "/usr/include/libxml2")
 
-add_library_path(LIBRARY_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{HDF5_ROOT_DIR}" "/usr" "/usr/local" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" )
-add_include_path(INCLUDE_PATH_LIST_TMP3 "$ENV{CUDADIR}" "/usr" "/usr/local" "/usr/include/libxml2" "/opt"  "/opt/local" )
+add_library_path(LIBRARY_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{HDF5_ROOT_DIR}" "/usr" "/opt" "/opt/local" "/usr/lib/x86_64-linux-gnu/" )
+add_include_path(INCLUDE_PATH_LIST_TMP3 "$ENV{CUDADIR}" "/usr" "/usr/include/libxml2" "/opt"  "/opt/local" )
 
 
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP3}) # CACHE PATH "List of library paths used as PATH parameter in find_library")
@@ -98,5 +98,14 @@ if (FAUST_USE_GPU)
 	check_external_includes("cuda.h" CUDA_INC_DIR 1)
 	check_external_includes("cuda_runtime_api.h" CUDA_RUNTIME_API_INC_DIR 1)
 endif(FAUST_USE_GPU)
+
+
+	check_external_includes("matio.h" MATIO_INC_DIR 0)
+	check_external_libraries(matio MATIO_LIB_FILE 0)
+
+	message(STATUS "matio lib is here : ${MATIO_LIB_FILE}")
+	message(STATUS "matio include is here : ${MATIO_INC_DIR}")
+
+
 
 
