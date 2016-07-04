@@ -18,15 +18,15 @@
 
 # Directory of the library used in the FAUST PROJECT 
 export PATH=$PATH:/Applications/MATLAB_R2014b.app/bin/;
-#export PATH=$PATH:usr/local/include
+export PATH=$PATH:usr/local/include
 
 # Directory of the local path of the nightly project
 export PATH_DIR_RUN_NIGHTLY='/Users/ci/CTest_nightly'
-#export OPENBLASDIR='/Users/ci/local/OPENBLAS-v0.2.15'
-#export EIGENDIR='/Users/ci/local/eigen-3.2.8'
+export OPENBLASDIR='/Users/ci/local/OPENBLAS-v0.2.15'
+export EIGENDIR='/Users/ci/local/eigen-3.2.8'
 
 export HDF5_ROOT_DIR='/Users/ci/local/hdf5-1.8.17/lib'
-#export MATIODIR='/Users/ci/local/matio-1.5.2'
+export MATIODIR='/Users/ci/local/matio-1.5.2'
 
 #export CUDADIR=/usr/local/cuda-6.5
 
@@ -36,7 +36,7 @@ export HDF5_ROOT_DIR='/Users/ci/local/hdf5-1.8.17/lib'
 
 # /usr/local/bin/matlab in the PATH 
 #export PATH=/usr/local/cuda-7.5/bin:/usr/local/bin:$PATH
-#export PATH=/usr/local/cuda-7.5/bin:/usr/local/bin:/usr/lib64/ccache/:$PATH
+export PATH=/usr/local/cuda-7.5/bin:/usr/local/bin:/usr/lib64/ccache/:$PATH
 
 if [ ! -d "$PATH_DIR_RUN_NIGHTLY" ];
 then
@@ -55,12 +55,12 @@ export CTEST_CONFIGURE_OPTIONS="
 -DFAUST_USE_GPU:BOOL=OFF;\
 -DFAUST_USE_PROFILING=OFF;\
 -DFAUST_ISVERBOSE=OFF;\
--DFAUST_GEN_DOC:BOOL=OFF"
+-DFAUST_GEN_DOC:BOOL=OFF;\
 
-#-DFAUST_USE_OPENMP=OFF;\
-#-DDASH_TESTING:BOOL=ON;\
-#-DBUILD_DEBUG:BOOL=OFF;\
-#-DBUILD_COVERAGE:BOOL=ON;\
+-DFAUST_USE_OPENMP=OFF;\
+-DDASH_TESTING:BOOL=ON;\
+-DBUILD_DEBUG:BOOL=OFF;\
+-DBUILD_COVERAGE:BOOL=ON;"
 
 cd $PATH_DIR_RUN_NIGHTLY
 
