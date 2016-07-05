@@ -1,7 +1,7 @@
 \mainpage FAµST Home
 
 \section intro_sec Introduction
-FAµST is a C++ library that implements a way to decompose a given matrix into a product of sparse matrix in order to reduce multiplication costs by the matrix. <br>
+ FAµST is a C++ library that implements a way to decompose a given matrix into a product of sparse matrix in order to reduce multiplication costs by the matrix. <br>
 FaµST can be widely used to speed up iterative algorithm commonly used for solving high dimensional linear inverse problems. <br>
 It is delivered with Matlab wrapper. <br>
 <br>
