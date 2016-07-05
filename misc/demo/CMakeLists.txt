@@ -33,6 +33,14 @@ if(FAUST_USE_MEX)
 		configure_file(${FAUST_DEMO_HADAMARD_SRC_DIR}/${matlab_script} ${FAUST_DEMO_HADAMARD_BIN_DIR}/${matlab_script} COPYONLY)
       		install(FILES ${FAUST_DEMO_HADAMARD_BIN_DIR}/${matlab_script} DESTINATION ${FAUST_DEMO_HADAMARD_INSTALL_DIR})
 	endforeach()
+
+	####### Runtime Comparison ######################################
+	file(GLOB TIMECOMP_MATLAB_SCRIPTS  RELATIVE ${FAUST_DEMO_TIMECOMP_SRC_DIR} "${FAUST_DEMO_TIMECOMP_SRC_DIR}/*.m")
+	foreach(matlab_script ${TIMECOMP_MATLAB_SCRIPTS})		
+		configure_file(${FAUST_DEMO_TIMECOMP_SRC_DIR}/${matlab_script} ${FAUST_DEMO_TIMECOMP_BIN_DIR}/${matlab_script} COPYONLY)
+      		install(FILES ${FAUST_DEMO_TIMECOMP_BIN_DIR}/${matlab_script} DESTINATION ${FAUST_DEMO_TIMECOMP_INSTALL_DIR})
+	endforeach()
+	
 	
 	#################### Tools directory ############################
 	file(GLOB TOOLS_MATLAB_SCRIPTS RELATIVE ${FAUST_DEMO_TOOLS_SRC_DIR}  "${FAUST_DEMO_TOOLS_SRC_DIR}/*.m")

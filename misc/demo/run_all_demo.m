@@ -52,4 +52,11 @@ Fig_BSL;
 
 %% Hadamard factorization
 disp('*********** Hadamard Factorization *************');
-demo_fact_hadamard
+%demo_fact_hadamard; %!!! BROKEN DEMO !!!
+ speed_up_hadamard; 
+
+
+%% Runtime comparison
+disp('*********** Runtime Comparison *************');
+runtime_comparison;
+Fig_runtime_comparison;

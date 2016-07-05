@@ -53,6 +53,7 @@ load(matfile);
 
 Ntraining=params.Ntraining;
 Sparsity=params.Sparsity;
+solver_choice=params.solver_choice;
 Ntest=Ntraining*Sparsity;
 
 %% convergence analysis
@@ -63,7 +64,7 @@ d3 = cat(4,resDist(:,3,1,:),resDist(:,3,2,:));
 test2 = 100*[squeeze(d1);zeros(1,Ntest);squeeze(d2);zeros(1,Ntest);squeeze(d3)];
 
 
-figure('color',[1 1 1]);
+f=figure('color',[1 1 1]);
 T = bplot(test2','linewidth',1.5);
 legend(T)
 
@@ -103,7 +104,7 @@ for i=1:nb_approx_MEG
 end
 
 title('Fig 9 : C++ wrapper faust');
-
+f.Name =['Brain Source Localization : convergence with ' solver_choice 'solver (C++ wrapper)']
 
 %% MATLAB convergence analysis
 
@@ -112,7 +113,7 @@ d2 = cat(4,resDist_matlab(:,2,1,:),resDist_matlab(:,2,2,:));
 d3 = cat(4,resDist_matlab(:,3,1,:),resDist_matlab(:,3,2,:));
 test2 = 100*[squeeze(d1);zeros(1,Ntest);squeeze(d2);zeros(1,Ntest);squeeze(d3)];
 
-figure('color',[1 1 1]);
+f=figure('color',[1 1 1]);
 title('MATLAB');
 T = bplot(test2','linewidth',1.5);
 legend(T)
@@ -149,7 +150,7 @@ for i=1:nb_approx_MEG
 end
 
 title('Fig 9 : matlab faust');
-
+f.Name =['Brain Source Localization : convergence with ' solver_choice 'solver (matlab)']
 
 
 %% time comparison
@@ -165,7 +166,7 @@ timeS=reshape([timeS_Cpp;timeS_matlab],3*Ntraining,(nb_approx_MEG+1)*2);
 timeS(:,1)=[];% twice the time of the MEG matrix solver
 
 
-figure('color',[1 1 1]);
+f=figure('color',[1 1 1]);
 T = bplot(timeS,'linewidth',1.5);
 legend(T)
 ylabel('Computed Time (ms)')
@@ -193,7 +194,7 @@ for i=1:nb_approx_MEG
     text(xTicks(2*i+1), minY - verticalOffset, ['$\widehat{\mathbf{M}}_{' int2str(RCG_approxS_MEG(i)) '}^{Matlab}$' ],'HorizontalAlignment','center','interpreter', 'latex');
 end
 title('solver time comparison');
-
+f.Name =['Brain Source Localization : time comparison with ' solver_choice 'solver']
 
 
 
@@ -209,7 +210,7 @@ mean_Times_matlab=mean(timeS_matlab);
 dense_matrix_time=mean_Times(1);
 real_RCG=dense_matrix_time./mean_Times;
 real_RCG_matlab=dense_matrix_time./mean_Times_matlab;
-figure,
+f=figure,
 ax = gca;
 
 set(ax,'xticklabel', [])
@@ -230,4 +231,4 @@ for i=1:nb_approx_MEG
 end
 legend('theoretical RCG','speed up C++ wrapper faust','speed up MATLAB faust','neutral speed up');
 title('speed up');
-
+f.Name =['Brain Source Localization : speed-up Faust with ' solver_choice 'solver'];

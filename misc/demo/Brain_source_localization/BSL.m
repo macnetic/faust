@@ -125,12 +125,16 @@ M=size(X_norm,2);
 params.Ntraining = 20; % Number of training vectors
 params.Sparsity = 2; % Number of sources per training vector
 params.dist_paliers = [0.01,0.05,0.08,0.5];
+params.solver_choice='omp';
+%params.solver_choice='iht';
+
+
 Ntraining = params.Ntraining;
 Sparsity = params.Sparsity;
 dist_paliers = params.dist_paliers;
 
-solver_choice='omp';
-%solver_choice='iht';
+solver_choice=params.solver_choice;
+
 
 
 resDist = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,m�thode,dist_sources,src_nb,run);
@@ -139,9 +143,10 @@ resDist_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining)
 compute_Times_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Ntraining);
 
 
-
-for k=1:numel(dist_paliers)-1
-    disp(['k=' num2str(k) '/' num2str(numel(dist_paliers)-1)])
+h = waitbar(0,['Brain Source Localization : MEG matrix and its faust approximations with ' solver_choice ' solver']);
+nb_palier=numel(dist_paliers)-1;
+for k=1:nb_palier;
+    %disp(['k=' num2str(k) '/' num2str(numel(dist_paliers)-1)])
     %Parameters settings
     Gamma = zeros(size(X_norm,2),Ntraining);
     for ii=1:Ntraining
@@ -171,7 +176,8 @@ for k=1:numel(dist_paliers)-1
     
     
     for i=1:Ntraining
-        disp(['   i=' num2str(i) '/' num2str(Ntraining)])
+        %disp(['   i=' num2str(i) '/' num2str(Ntraining)])
+         waitbar(((k-1)*Ntraining+i)/(nb_palier*Ntraining));
         idx = find(Gamma(:,i));
         dist_sources = norm(points(idx(1)) - points(idx(2)));
         
@@ -184,7 +190,7 @@ for k=1:numel(dist_paliers)-1
             if strcmp(solver_choice,'omp')
                 %OMP
                 tic
-                [sol_solver(:,i), err_mse_solver, iter_time_solver]=greed_omp_chol(Data(:,i),X_norm,M,'stopTol',1*Sparsity);
+                [sol_solver(:,i), err_mse_solver, iter_time_solver]=greed_omp_chol(Data(:,i),X_norm,M,'stopTol',1*Sparsity,'verbose',false);
                 t1=toc;
             elseif   strcmp(solver_choice,'iht')  
                 %IHT
@@ -213,7 +219,7 @@ for k=1:numel(dist_paliers)-1
            if strcmp(solver_choice,'omp')
                 %OMP
                 tic
-                [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),MEG_faustS{ll},M,'stopTol',1*Sparsity);
+                [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),MEG_faustS{ll},M,'stopTol',1*Sparsity,'verbose',false);
                 t1=toc;
            elseif   strcmp(solver_choice,'iht')  
                 %IHT
@@ -236,12 +242,12 @@ for k=1:numel(dist_paliers)-1
            if strcmp(solver_choice,'omp')
                 % OMP
                 tic
-                [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),matlab_faustS_mult{ll},M,'stopTol',1*Sparsity,'P_trans',matlab_trans_faustS_mult{ll});
+                [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),matlab_faustS_mult{ll},M,'stopTol',1*Sparsity,'P_trans',matlab_trans_faustS_mult{ll},'verbose',false);
                 t2=toc;
            elseif strcmp(solver_choice,'iht') 
                 % IHT
                 tic
-                [sol_solver_hat(:,i), err_mse_solver, iter_time_solver]=hard_l0_Mterm(Data(:,i),matlab_faustS_mult{ll},M,1*Sparsity,'verbose',false,'maxIter',1000,'P_trans',matlab_trans_faustS_mult{ll});
+                [sol_solver_hat(:,i), err_mse_solver, iter_time_solver]=hard_l0_Mterm(Data(:,i),matlab_faustS_mult{ll},M,1*Sparsity,'verbose',false,'maxIter',1000,'P_trans',matlab_trans_faustS_mult{ll},'verbose',false);
                 t2=toc;
             else
                 error('invalid solver choice : must be omp or iht');
@@ -257,8 +263,7 @@ for k=1:numel(dist_paliers)-1
 
     end
 end
-toc
-heure = clock ;
+close(h);
 
 matfile = fullfile(pathname, 'output/results_BSL_user');
 save(matfile,'resDist','params','resDist_matlab','RCG_approxS_MEG','nb_approx_MEG','compute_Times','compute_Times_matlab', 'RCG_approxS_MEG');
