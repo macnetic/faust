@@ -83,8 +83,8 @@ if (FAUST_USE_MATIO)
 	add_test(NAME HADAMARD_FACT_DOUBLE COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double 	${FAUST_DATA_MAT_DIR}/config_HADAMARD.mat)
 	add_test(NAME FAUST_HIER_DOUBLE COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double 	${FAUST_DATA_MAT_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
 	add_test(NAME FAUST_HIER_FLOAT COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
-	add_test(NAME MEG_FACT_FLOAT COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22332 1)
-	add_test(NAME MEG_FACT_DOUBLE COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22480 1)
+	add_test(NAME MEG_FACT_FLOAT COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22450 100)
+	add_test(NAME MEG_FACT_DOUBLE COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22450 100)
 
 	add_test(NAME PALM4MSA_DOUBLE COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSA_double )
 	add_test(NAME PALM4MSA_FLOAT COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSA_float )
@@ -125,7 +125,9 @@ if(FAUST_USE_MEX)
 	#add_test(NAME FAUST_HIER_MEX COMMAND matlab  -nojvm -nodisplay -r ${FAUST_BIN_TEST_BIN_DIR}/hier_fact.m;exit)
 	# on ajoute les path bin et tools qui sont utilisés pour le script matlab.
 	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');hier_fact(9400,10); catch ME ; disp('ERROR IN TEST hier_fact.m Please chek the output to visualize the error. '); end ; exit" )
-	add_test(NAME FAUST_MEG_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');MEG_fact;end;exit" )	
+	#add_test(NAME FAUST_MEG_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');MEG_fact;end;exit" )	
+	add_test(NAME FAUST_MEG_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');MEG_fact(22450,100); catch ME ; disp('ERROR IN TEST MEG_fact.m Please chek the output to visualize the error. '); end; exit" )	
+
 
 	# limit the time of the process in case of bug... 
 
