@@ -44,6 +44,7 @@ else ( (MATIO_LIB_FILE) AND (MATIO_INC_DIR) )
 		message(STATUS "matio include is here : ${MATIO_INC_DIR}")
 	else()
 		message(STATUS "ERROR !!! matio is not installed !!!!!")
+		message(FATAL_ERROR "matio lib is not installed on your system. Please check matio install.")	
 	endif()
 
 message(STATUS "------------------------------------------------")

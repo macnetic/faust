@@ -37,7 +37,17 @@ else (EIGEN_INC_DIR)
 	set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP_EIGEN})# CACHE PATH "List of include paths used as PATH parameter in find_path")
 	#message(STATUS "INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
 	check_external_includes("Eigen/Dense" EIGEN_INC_DIR 0)
+
+if ( EIGEN_INC_DIR )
 	message(STATUS "Eigen library is available here: ${EIGEN_INC_DIR}")
+else(EIGEN_INC_DIR)	
+	message(STATUS "Eigen library is not available here: ${EIGEN_INC_DIR}")
+	message(FATAL_ERROR "Eigen library is not installed on your system. Please check Eigen install.")	
+endif(EIGEN_INC_DIR)
+
+
+
+	
 message(STATUS "------------------------------------------------")
 message(STATUS "------------------------------------------------")	
 endif (EIGEN_INC_DIR)

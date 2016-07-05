@@ -1,20 +1,19 @@
 ###### chek and find Openblas library
 set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP_DEFAULT}) # CACHE PATH "List of library paths used as PATH parameter in find_library")
 set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP_DEFAULT})# CACHE PATH "List of include paths used as PATH parameter in find_path")
+
 check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
 check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
 
 if ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
-	message(STATUS "OpenBlas library and include are available here : ${OPENBLAS_LIB_FILE}")
-	#message(STATUS "OpenBlas include is available here : OPENBLAS_INC_DIR= ${OPENBLAS_INC_DIR}")
+	message(STATUS "OpenBlas library is installed here : ${OPENBLAS_LIB_FILE}")
+	message(STATUS "OpenBlas include is installed here : ${OPENBLAS_INC_DIR}")
 else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 	if(UNIX)
 		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
 		message(STATUS "------------------------------------------------")
-		message(STATUS "------------------------------------------------")
 		message(STATUS "------------ OPENBLAS LIB INSTALLATION ---------")
 		message(STATUS "------------------------------------------------")
-		message(STATUS "------------------------------------------------")	
 
 		set(OPENBLAS_LIB_NAME "v0.2.18.tar.gz")
 		exec_program("tar xzf ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs/${OPENBLAS_LIB_NAME} -C ${CMAKE_SOURCE_DIR}/externals/unix")
@@ -41,9 +40,17 @@ else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 	set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP_OPENBLAS}) # CACHE PATH "List of include paths used as PATH parameter in find_path")
 
 	check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
-	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)	
-	message(STATUS "OpenBlas library is available here : ${OPENBLAS_LIB_FILE}")
-	message(STATUS "OpenBlas include is available here : ${OPENBLAS_INC_DIR}")
+	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
+
+if ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
+	message(STATUS "OpenBlas library is installed here : ${OPENBLAS_LIB_FILE}")
+	message(STATUS "OpenBlas include is installed here : ${OPENBLAS_INC_DIR}")
+else((OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR))	
+	message(STATUS "OpenBlas library is not available here : ${OPENBLAS_LIB_FILE}")
+	message(STATUS "OpenBlas include is not available here : ${OPENBLAS_INC_DIR}")
+	message(FATAL_ERROR "openBLAS lib is not installed on your system. Please check openBLAS install.")	
+endif((OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR))
+
 message(STATUS "------------------------------------------------")
 message(STATUS "------------------------------------------------")	
 ################################################################

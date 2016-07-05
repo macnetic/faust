@@ -44,6 +44,7 @@ else ( (XML2_LIB_FILE) AND (XML_INC_DIR) )
 		message(STATUS "libxml/parser.h is here : ${XML_INC_DIR}")
 	else()
 		message(STATUS "ERROR !!! xml2 is not installed !!!!!")
+		message(FATAL_ERROR "xml2 lib is not installed on your system. Please check xml2 install.")	
 	endif()
 
 message(STATUS "------------------------------------------------")
