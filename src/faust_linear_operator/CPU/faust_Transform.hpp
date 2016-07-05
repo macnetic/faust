@@ -1,6 +1,7 @@
 #ifndef __FAUSTCORE_HPP__
 #define __FAUSTCORE_HPP__
 
+
 #include "faust_Vect.h"
 //#include "faust_HierarchicalFact.h"
 //#include "faust_Params.h"
@@ -388,11 +389,69 @@ Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_fact(int id)const
 	return data[id];
 }
 
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatSparse<FPP,Cpu>& S)
+{
+	if (size()>0)
+	{
+		if(data[size()-1].getNbCol()!=S.getNbRow() || S.getNbRow()<1)
+      		{
+			handleError(m_className,"push_back : incorrect dimensions");
+     		}
+   	}
+   	data.push_back(S);
+   	totalNonZeros += S.getNonZeros();
+}
 
 
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatSparse<FPP,Cpu>& S)
+{
+	if (size()>0)
+		if(data[0].getNbRow()!=S.getNbCol() || S.getNbRow()<1)
+      		{
+			handleError(m_className,"push_first : incorrect dimensions");
+      		}
+	data.insert(data.begin(),S);
+   	totalNonZeros += S.getNonZeros();
+}
 
 
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::pop_back(Faust::MatSparse<FPP,Cpu>& S)
+{
+	if (size()>0)
+	{
+		S = data[size()-1];
+		data.pop_back();
+		totalNonZeros -= S.getNonZeros();
+	}
+	handleWarning("Faust::Transform<FPP,Cpu>::pop_back : empty Faust::Transform");
+}
 
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::pop_first(Faust::MatSparse<FPP,Cpu>& S)
+{
+	if (size()>0)
+	{
+		S = data[0];
+		data.erase(data.begin());
+		totalNonZeros -= S.getNonZeros();
+	}
+	handleWarning("Faust::Transform<FPP,Cpu>::pop_back : empty Faust::Transform");
+}
+
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::pop_first(Faust::MatSparse<FPP,Cpu>& S) const
+{
+	if (size()>0)
+	{
+		S = data[0];
+		//data.erase(data.begin());
+		//totalNonZeros -= S.getNonZeros();
+	}
+
+}
 
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::transpose()
