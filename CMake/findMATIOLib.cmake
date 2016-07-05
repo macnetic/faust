@@ -18,7 +18,9 @@ else ( (MATIO_LIB_FILE) AND (MATIO_INC_DIR) )
 		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
 		set(MATIO_LIB_NAME "matio-1.5.7.7z")
 		exec_program("7z x ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs/${MATIO_LIB_NAME} -o${CMAKE_SOURCE_DIR}/externals/unix")
-		exec_program("rm -r ${CMAKE_SOURCE_DIR}/externals/unix/matio")	
+		if(EXISTS ${CMAKE_SOURCE_DIR}/externals/unix/matio)				
+			exec_program("rm -r ${CMAKE_SOURCE_DIR}/externals/unix/matio")	
+		endif(EXISTS)		
 		exec_program("mv ${CMAKE_SOURCE_DIR}/externals/unix/matio-* ${CMAKE_SOURCE_DIR}/externals/unix/matio")
 		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/matio && chmod -R 777 ./ && ./configure && make") # && make check
 		#exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/sdk_matio && make install PREFIX='${CMAKE_SOURCE_DIR}/externals/unix/matio' ") # && make check
