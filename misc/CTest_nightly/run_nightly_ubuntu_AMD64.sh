@@ -26,7 +26,7 @@ export PATH_DIR_RUN_NIGHTLY='/home/ci/faust_nightly'
 #export EIGENDIR='/home/ci/Library/eigen-eigen-07105f7124f9'
 #export OPENBLASDIR='/home/ci/local/OPENBLAS'
 
-export HDF5_ROOT_DIR='/home/ci/local/HDF5/lib'
+#export HDF5_ROOT_DIR='/home/ci/local/HDF5/lib'
 
 
 #export MATIODIR=/usr/local

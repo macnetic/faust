@@ -10,11 +10,11 @@ if ( (XML2_LIB_FILE) AND (XML_INC_DIR) )
 		message(STATUS "libxml/parser.h is here : ${XML_INC_DIR}")
 else ( (XML2_LIB_FILE) AND (XML_INC_DIR) )
 	if(UNIX)
-
+		message(STATUS "------------------------------------------------")
 		message(STATUS "------------------------------------------------")
 		message(STATUS "------------ XML2 LIB INSTALLATION ------------")
 		message(STATUS "------------------------------------------------")
-
+		message(STATUS "------------------------------------------------")
 		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
 		set(XML2_LIB_NAME "libxml2-2.9.4.tar.gz")
 		exec_program("tar xzf ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs/${XML2_LIB_NAME} -C ${CMAKE_SOURCE_DIR}/externals/unix")

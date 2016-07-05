@@ -10,11 +10,11 @@ if ( (MATIO_LIB_FILE) AND (MATIO_INC_DIR) )
 		message(STATUS "matio include is here : ${MATIO_INC_DIR}")
 else ( (MATIO_LIB_FILE) AND (MATIO_INC_DIR) )
 	if(UNIX)
-
+		message(STATUS "------------------------------------------------")
 		message(STATUS "------------------------------------------------")
 		message(STATUS "------------ MATIO LIB INSTALLATION ------------")
 		message(STATUS "------------------------------------------------")
-
+		message(STATUS "------------------------------------------------")
 		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
 		set(MATIO_LIB_NAME "matio-1.5.7.7z")
 		exec_program("7z x ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs/${MATIO_LIB_NAME} -o${CMAKE_SOURCE_DIR}/externals/unix")
