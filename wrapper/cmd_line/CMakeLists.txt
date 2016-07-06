@@ -4,14 +4,14 @@ include_directories( ${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CP
 
 
 #compatibilite ubuntu avec openblas
-if (FAUST_USE_OPENBLAS)
+if (BUILD_OPENBLAS)
 	include_directories(${OPENBLAS_INC_DIR} )
-endif(FAUST_USE_OPENBLAS)
+endif(BUILD_OPENBLAS)
 
 	foreach(algofile launch_hierarchical_fact launch_palm4MSA)
 		configure_file(${FAUST_CMDLINE_FUNC_SRC_DIR}/${algofile}.cpp ${FAUST_BIN_CMDLINE_SRC_DIR}/${algofile}.cpp COPYONLY)
 		add_executable(${algofile} ${FAUST_BIN_CMDLINE_SRC_DIR}/${algofile}.cpp ${FAUST_CMDLINE_TYPE_FORMAT_XML_SRC_DIR}/xml_utils.cpp)
-		if(FAUST_USE_OPENBLAS)
+		if(BUILD_OPENBLAS)
 			target_link_libraries(${algofile} ${FAUST_TARGET} ${OPENBLAS_LIB_FILE} ${XML2_LIB_FILE})
 		else()
 			target_link_libraries(${algofile} ${FAUST_TARGET} ${XML2_LIB_FILE})
