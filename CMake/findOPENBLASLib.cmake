@@ -21,7 +21,7 @@ else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 		exec_program("rm -r ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS")
 		exec_program("rm -r ${CMAKE_SOURCE_DIR}/externals/unix/OpenBLAS")		
 		exec_program("mv ${CMAKE_SOURCE_DIR}/externals/unix/OpenBLAS* ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS")
-		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS && make TARGET=NEHALEM && make install PREFIX='${CMAKE_SOURCE_DIR}/externals/unix/OpenBLAS'")
+		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS && make --quiet TARGET=NEHALEM && make install PREFIX='${CMAKE_SOURCE_DIR}/externals/unix/OpenBLAS'")
 
 #exec_program(" ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS")
 	elseif(WIN32)

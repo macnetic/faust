@@ -52,7 +52,6 @@ endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 # Allows building executable:
 #option(BUILD_EXECUTABLE "Build executable." ON)
 # -->  matio  
-
 # Allows building of shared libraries:
 #option(BUILD_EXTERNALS_LIBS "Build externals libraries if they are not installed." ON)
 # Enable testing:
@@ -71,21 +70,20 @@ option(BUILD_USE_GPU  "Using both CPU and GPU process" OFF)
 option(BUILD_MATLAB_MEX_FILES "Enable building Matlab MEX files." ON)
 # Using openBLAS for matrix and vector computations
 option(BUILD_OPENBLAS "Using openBLAS for matrix and vector computations" OFF)
+# different type of files 
 option(BUILD_READ_XML_FILE "Using xml configuration to read xml files" OFF)
 option(BUILD_READ_MAT_FILE "Using matio library to read mat files" OFF)
-
-
 #CMAKE_DEPENDENT_OPTION
 
 ###### Different option of configuration ######
 #option(BUILD_TESTING "Build Tests" ON) 
 set(FAUST_USE_SINGLEPRECISION OFF CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
 set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
+
 #set(BUILD_MULTITHREAD OFF CACHE BOOL "OpenMP Multithreading")
 #set(BUILD_VERBOSE OFF CACHE BOOL "Display useful message for debugging")
 #set(BUILD_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
 #set(BUILD_DOCUMENTATION OFF CACHE BOOL "Generate html documentation with doxygen")
-
 #set(BUILD_READ_XML_FILE OFF CACHE BOOL "Using xml configuration to read xml files")
 #set(BUILD_MATLAB_MEX_FILES ON CACHE BOOL "Generate Mexfiles")
 #set(BUILD_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
@@ -124,13 +122,10 @@ endif()
 ##################################################################
 
 
-
-
 ###### Enable testing: ######
 include(CTest)
 enable_testing()
 ##################################################################
-
 
 
 ###### SOURCES DIRECTORIES ######

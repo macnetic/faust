@@ -48,10 +48,10 @@ Install:
 2-	mkdir ./build
 3-	cd ./build
 4-	cmake ..
-	cmake .. -DBUILD_OPENBLAS=ON 
-	cmake .. -DCMAKE_INSTALL_PREFIX="/home/username/Faust_install"
-	ccmake ..
+	OPTION :	-DBUILD_OPENBLAS=ON 
+				-DCMAKE_INSTALL_PREFIX="/home/username/Faust_install"
 
+	ccmake ..
 5-	make
 6- make install
 
