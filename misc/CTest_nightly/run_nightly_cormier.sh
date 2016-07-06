@@ -49,7 +49,7 @@ fi
 #export HDF5_ROOT_DIR=/home/aleman/Library/hdf5-1.8.16/src/.libs
 
 # CTEST OPTION 
-export CTEST_CONFIGURE_OPTIONS="
+export CTEST_CONFIGURE_OPTIONS="\
 -DBUILD_OPENBLAS=ON;\
 -DFAUST_USE_MATIO=ON;\
 -DFAUST_USE_XML=ON;\
