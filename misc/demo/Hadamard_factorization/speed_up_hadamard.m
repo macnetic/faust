@@ -115,8 +115,8 @@ subplot(1,2,1);
 semilogy(Ms,mean_faust_t,'linewidth',1.5);
 hold on
 semilogy(Ms,mean_dense_t,'r','linewidth',1.5);
-ymin=min([mean_dense_t(1),mean_faust_t(1)]);
-ymax=max([mean_dense_t(end),mean_faust_t(end)]);
+ymin=min([mean_dense_t,mean_faust_t]);
+ymax=max([mean_dense_t,mean_faust_t]);
 grid on
 axis([Ms(1) Ms(end)  ymin ymax]);
 legend('faust','dense');
