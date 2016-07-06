@@ -42,6 +42,7 @@ add_include_path(INCLUDE_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
 												"/usr/include/eigen3"
 												"${PROJECT_SOURCE_DIR}/externals/unix/eigen"
 												"/usr/local" #pour matio et xml2 
+												"/usr/include/libxml2"
 												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src" #pour matio
 												"${PROJECT_SOURCE_DIR}/externals/unix/libxml2/include" # pour libxml
 )
