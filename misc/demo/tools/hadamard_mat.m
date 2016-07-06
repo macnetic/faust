@@ -104,45 +104,69 @@ for i=1:nb_mult
 end
 close(h);
 
-mean_dense_t = mean(dense_times);
-mean_faust_t = mean(faust_times);
-speed_up = mean_dense_t ./ mean_faust_t;
+%% Description hadamard_mat
+%  Computation of tha Hadamard matrix and its "native" factorization
+%  [H, Fact] = hadamard_mat(M) computes the Hadamard matrix H of size 
+%  2^M*2^M and its factorization Fact.
+%
+% For more information on the FAuST Project, please visit the website of 
+% the project :  <http://faust.gforge.inria.fr>
+%
+%% License:
+% Copyright (2016):	Luc Le Magoarou, Remi Gribonval
+%			INRIA Rennes, FRANCE
+%			http://www.inria.fr/
+%
+% The FAuST Toolbox is distributed under the terms of the GNU Affero 
+% General Public License.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published 
+% by the Free Software Foundation.
+%
+% This program is distributed in the hope that it will be useful, but 
+% WITHOUT ANY WARRANTY; without even the implied warranty of 
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+% See the GNU Affero General Public License for more details.
+%
+% You should have received a copy of the GNU Affero General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+%% Contacts:
+%   Nicolas Bellot : nicolas.bellot@inria.fr
+%   Adrien Leman   : adrien.leman@inria.fr
+%	Luc Le Magoarou: luc.le-magoarou@inria.fr
+%	Remi Gribonval : remi.gribonval@inria.fr
+%
+%% References:
+% [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse 
+%	approximations of matrices and applications", Journal of Selected 
+%	Topics in Signal Processing, 2016.
+%	<https://hal.archives-ouvertes.fr/hal-01167948v1>
+%%
 
-%% Plot the result
 
-f=figure;
-subplot(1,2,1);
-semilogy(Ms,mean_faust_t,'linewidth',1.5);
-hold on
-semilogy(Ms,mean_dense_t,'r','linewidth',1.5);
-ymin=min([min(mean_dense_t),mean_faust_t(1)]);
-ymax=max([max(mean_dense_t),mean_faust_t(end)]);
-grid on
-axis([Ms(1) Ms(end)  ymin ymax]);
-legend('faust','dense');
-ylabel('Computed Time (sec)');
-xlabel('log(dim)');
-title('Hadamard-vector multiplication');
-set(gca,'XTick',Ms);
+function [H,Fact] = hadamard_mat(M)
 
+bloc = (1/sqrt(2))*[1 1;1 -1];
+matbase = bloc;
+matbase=kron(speye(2^(M-1)),matbase);
+n=size(matbase,1);
 
-subplot(1,2,2);
-semilogy(Ms,speed_up,'linewidth',1.5);
-hold on
-semilogy(Ms,ones(1,nb_dim),'g','linewidth',1.5);
-grid on
-axis([Ms(1) Ms(end)  min([speed_up,1]) max([speed_up,1])]);
-title('Hadamard-vector multiplication');
-xlabel('log(dim)');
-ylabel('speedup');
-legend('speed-up','neutral speed-up');
-set(gca,'XTick',Ms);
-f.Name =['Hadamard Faust-vector multiplication'];
-%% save the figure
-runPath=which(mfilename);
-pathname = fileparts(runPath);
-fig_filename = [pathname filesep 'output' filesep 'speed_up_hadamard.png'];
-print(fig_filename,'-dpng','-r300');
+L=(1:n/2);
+id_i=[2*L-1,2*L];
+id_j=[L,L+n/2];
+values=ones(n,1);
+
+Perm = sparse(id_i,id_j,values,n,n);
+same_fact=matbase*Perm;
+
+Fact = cell(1,M);
+for i=1:M
+    Fact{i} = same_fact;
+end
+    H=full(dvp(Fact));
+end
+
 
 
 
