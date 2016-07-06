@@ -33,6 +33,7 @@ add_library_path(LIBRARY_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
 												"/usr/local" #pour matio et xml2
 												"/usr/local/lib" #pour matio et xml2 
+												"/usr/local/lib64" #pour matio et xml2
 												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src/.libs" #pour matio
 												"${PROJECT_SOURCE_DIR}/externals/unix/libxml2/.libs" # pour libxml
 )
