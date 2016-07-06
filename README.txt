@@ -45,10 +45,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Install:
 
 1-	Unpack the directory. 
-2-	mkdir ./build 
-3-  cd build
+2-	mkdir ./build
+3-	cd ./build
 4-	cmake ..
-5-	make install
+	cmake .. -DBUILD_OPENBLAS=ON 
+	cmake .. -DCMAKE_INSTALL_PREFIX="/home/username/Faust_install"
+	ccmake ..
+
+5-	make
+6- make install
+
 ##########################################################################
 
 

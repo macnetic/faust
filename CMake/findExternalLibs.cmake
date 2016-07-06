@@ -65,13 +65,13 @@ if (BUILD_MATLAB_MEX_FILES)
 	include(CMake/findMatlab.cmake)
 endif(BUILD_MATLAB_MEX_FILES)
 ######## MATIO INCLUDE AND LIBRARY ##################
-if (FAUST_USE_MATIO)
+if (BUILD_READ_MAT_FILE)
 	include(CMake/findMATIOLib.cmake)
-endif(FAUST_USE_MATIO)
+endif(BUILD_READ_MAT_FILE)
 ######## XML INCLUDE AND LIBRARY ##################
-if (FAUST_USE_XML)
+if (BUILD_READ_XML_FILE)
 	include(CMake/findXML2Lib.cmake)
-endif(FAUST_USE_XML)
+endif(BUILD_READ_XML_FILE)
 
 
 

@@ -68,13 +68,11 @@ option(BUILD_DEBUG "Enable MPTK Debug mode." OFF)
 # Allows Matlab MEX files :
 option(BUILD_USE_GPU  "Using both CPU and GPU process" OFF)
 
-
 option(BUILD_MATLAB_MEX_FILES "Enable building Matlab MEX files." ON)
 # Using openBLAS for matrix and vector computations
 option(BUILD_OPENBLAS "Using openBLAS for matrix and vector computations" OFF)
-
-
-
+option(BUILD_READ_XML_FILE "Using xml configuration to read xml files" OFF)
+option(BUILD_READ_MAT_FILE "Using matio library to read mat files" OFF)
 
 
 #CMAKE_DEPENDENT_OPTION
@@ -88,10 +86,11 @@ set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
 #set(BUILD_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
 #set(BUILD_DOCUMENTATION OFF CACHE BOOL "Generate html documentation with doxygen")
 
-set(FAUST_USE_XML OFF CACHE BOOL "Using xml configuration to read xml files")
+#set(BUILD_READ_XML_FILE OFF CACHE BOOL "Using xml configuration to read xml files")
 #set(BUILD_MATLAB_MEX_FILES ON CACHE BOOL "Generate Mexfiles")
 #set(BUILD_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
-set(FAUST_USE_MATIO OFF CACHE BOOL "Using matio library to read mat files")
+#set(BUILD_READ_MAT_FILE OFF CACHE BOOL "Using matio library to read mat files")
+
 if (FAUST_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")
 endif()
@@ -104,10 +103,10 @@ endif()
 if (FAUST_USE_PROFILING)
 	message(STATUS "**********PROFILING ACTIF************")
 endif()
-if (FAUST_USE_MATIO)
+if (BUILD_READ_MAT_FILE)
 	message(STATUS "**********MATIO ACTIF************")
 endif()
-if (FAUST_USE_XML)
+if (BUILD_READ_XML_FILE)
 	message(STATUS "**********XML ACTIF************")
 endif()
 if (BUILD_VERBOSE)

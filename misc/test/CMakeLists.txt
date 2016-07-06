@@ -5,9 +5,9 @@ message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 #${FAUST_EXCEPTION_SRC_DIR}
 include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR} ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR} ${EIGEN_INC_DIR})
 
-if(FAUST_USE_MATIO)
+if(BUILD_READ_MAT_FILE)
 	include_directories(${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR} ${MATIO_INC_DIR})
-endif(FAUST_USE_MATIO)
+endif(BUILD_READ_MAT_FILE)
 
 #rajout OPENBLAS_INC_DIR pour la compatibilite UBUNTU
 if(BUILD_OPENBLAS)
@@ -16,7 +16,7 @@ endif()
 
 
 ####### IF THE MATIO LIBRARY IS AVAILABLE ELSE WE USE TXT OR XML DATA  #######
-if(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO) # AND HDF5_LIB_FILE)
+if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE)
 
 	### list of executable generated in double and simple precision
 	# hierarchical_fact : test the hierarchical_fact algorithm
@@ -49,9 +49,9 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO) # AND HDF5_LIB_FILE)
 
 
 ###### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST ######
-else(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)	
+else(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE)	
 	message(STATUS "Library matio is not available. Please used .xml input files.")
-endif(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
+endif(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE)
 
 
 
@@ -77,7 +77,7 @@ set(TIMEOUT_COMP 10)
 
 
 # MATLAB input format
-if (FAUST_USE_MATIO)
+if (BUILD_READ_MAT_FILE)
 	
 	# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) 
 	add_test(NAME HADAMARD_FACT_DOUBLE COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double 	${FAUST_DATA_MAT_DIR}/config_HADAMARD.mat)
@@ -104,11 +104,11 @@ if (FAUST_USE_MATIO)
 	
 	set_tests_properties(FIG_MULTIPLY_COMPTIME PROPERTIES TIMEOUT 120)
 
-endif (FAUST_USE_MATIO)
+endif (BUILD_READ_MAT_FILE)
 
 
 # XML input format
-if (FAUST_USE_XML)
+if (BUILD_READ_XML_FILE)
 	add_test(NAME FAUST_HIER_CMDLINE COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/hier_fact_config.xml ${FAUST_DATA_TXT_DIR}/hier_fact_data.txt )
 
 	add_test(NAME FAUST_HIER_TRANSPOSE_CMDLINE COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/trans_hier_fact_config.xml ${FAUST_DATA_TXT_DIR}/hier_fact_data.txt  T)
@@ -117,7 +117,7 @@ if (FAUST_USE_XML)
 	# limit the time of the process in case of bug... 
 	set_tests_properties(FAUST_HIER_CMDLINE FAUST_HIER_TRANSPOSE_CMDLINE PROPERTIES TIMEOUT ${TIMEOUT_COMP})
 	set_tests_properties(MEG_FACT_CMDLINE PROPERTIES TIMEOUT ${TIMEOUT_MEG})	 
-endif(FAUST_USE_XML)
+endif(BUILD_READ_XML_FILE)
 
 
 
@@ -152,9 +152,9 @@ endif()
 #	#${FAUST_EXCEPTION_SRC_DIR} 
 #	include_directories(${FAUST_MATRIX_CU_SRC_DIR} ${FAUST_FAUSTCORE_CU_SRC_DIR} ${FAUST_ALGORITHM_CU_SRC_DIR} ${CUDA_INC_DIR} ${CUDA_RUNTIME_API_INC_DIR} ${CUSPARSE_INC_DIR} ${CUBLAS_V2_INC_DIR}  ${EIGEN_INC_DIR})
 
-#	if(FAUST_USE_MATIO)
+#	if(BUILD_READ_MAT_FILE)
 #		include_directories(${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR} ${MATIO_INC_DIR})
-#	endif(FAUST_USE_MATIO)
+#	endif(BUILD_READ_MAT_FILE)
 
 
 #	add_definitions(-DCOMPILE_GPU)
