@@ -18,7 +18,7 @@
 
 
 # Directory of the local path of the nightly project
-export PATH_DIR_RUN_NIGHTLY='/home/aleman/WORK/FAUST/faust_nightlyTEST'
+export PATH_DIR_RUN_NIGHTLY='/home/aleman/WORK/FAUST/faust_nightly'
 # Directory of the library used in the FAUST PROJECT 
 #export EIGENDIR='/usr/include/eigen3'
 #export OPENBLASDIR='/opt/OpenBLAS'
