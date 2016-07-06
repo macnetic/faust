@@ -29,19 +29,19 @@ include(CMake/check_external_libraries.cmake)
 message(STATUS "******* Check externals library ***********")
 
 # Default path library (where the library is automatically install)
-add_library_path(LIBRARY_PATH_LIST_TMP_DEFAULT 	#"/opt/OpenBLAS"
+add_library_path(LIBRARY_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
-												#"/usr/local" #pour matio
-												#"/usr/local/lib" #pour matio
+												"/usr/local" #pour matio et xml2
+												"/usr/local/lib" #pour matio et xml2 
 												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src/.libs" #pour matio
 												"${PROJECT_SOURCE_DIR}/externals/unix/libxml2/.libs" # pour libxml
 )
 
-add_include_path(INCLUDE_PATH_LIST_TMP_DEFAULT 	#"/opt/OpenBLAS" 
+add_include_path(INCLUDE_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS" 
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
-												#"/usr/include/eigen3"
+												"/usr/include/eigen3"
 												"${PROJECT_SOURCE_DIR}/externals/unix/eigen"
-												#"/usr/local" #pour matio
+												"/usr/local" #pour matio et xml2 
 												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src" #pour matio
 												"${PROJECT_SOURCE_DIR}/externals/unix/libxml2/include" # pour libxml
 )
@@ -55,13 +55,13 @@ add_include_path(INCLUDE_PATH_LIST_TMP_DEFAULT 	#"/opt/OpenBLAS"
 ######## EIGEN ##############
 include(CMake/findEIGENLib.cmake)
 ######## OPENBLAS ##############
-if (FAUST_USE_OPENBLAS)
+if (BUILD_OPENBLAS)
 	include(CMake/findOPENBLASLib.cmake)
-endif(FAUST_USE_OPENBLAS)
+endif(BUILD_OPENBLAS)
 ######## MATLAB INCLUDE AND LIBRARY ##################
-if (FAUST_USE_MEX)
+if (BUILD_MATLAB_MEX_FILES)
 	include(CMake/findMatlab.cmake)
-endif(FAUST_USE_MEX)
+endif(BUILD_MATLAB_MEX_FILES)
 ######## MATIO INCLUDE AND LIBRARY ##################
 if (FAUST_USE_MATIO)
 	include(CMake/findMATIOLib.cmake)
@@ -92,7 +92,7 @@ set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP3}) # CACHE PATH "List of include p
 
 
 
-if (FAUST_USE_GPU)
+if (BUILD_USE_GPU)
 	check_external_libraries(cublas CUBLAS_LIB_FILE 1)
 	check_external_libraries(cudart CUDART_LIB_FILE 1)
 	check_external_libraries(cusparse CUSPARSE_LIB_FILE 1)
@@ -101,7 +101,7 @@ if (FAUST_USE_GPU)
 	check_external_includes("cusparse.h" CUSPARSE_INC_DIR 1)
 	check_external_includes("cuda.h" CUDA_INC_DIR 1)
 	check_external_includes("cuda_runtime_api.h" CUDA_RUNTIME_API_INC_DIR 1)
-endif(FAUST_USE_GPU)
+endif(BUILD_USE_GPU)
 
 
 

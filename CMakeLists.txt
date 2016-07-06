@@ -45,27 +45,60 @@ else()
 	message(STATUS "Install FAuST path : ${CMAKE_INSTALL_PREFIX}")
 endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
-###### Different option of configuration ######
+
+##############################################################################
+# Setting compilation option
+##############################################################################
+# Allows building executable:
+#option(BUILD_EXECUTABLE "Build executable." ON)
+# -->  matio  
+
+# Allows building of shared libraries:
+#option(BUILD_EXTERNALS_LIBS "Build externals libraries if they are not installed." ON)
+# Enable testing:
 option(BUILD_TESTING "Build Tests" ON) 
+#Allows generating the doc:
+option(BUILD_DOCUMENTATION "Generating the doxygen documentation." OFF)
+# Allows multithreading:
+option(BUILD_MULTITHREAD "Enable multithread with OpenMP Multithreading." OFF)
+# Allows verbose:
+option(BUILD_VERBOSE "Enable verbose option when compile (-v)." OFF)
+# Allows MPTK Debug:
+option(BUILD_DEBUG "Enable MPTK Debug mode." OFF)
+# Allows Matlab MEX files :
+option(BUILD_USE_GPU  "Using both CPU and GPU process" OFF)
+
+
+option(BUILD_MATLAB_MEX_FILES "Enable building Matlab MEX files." ON)
+# Using openBLAS for matrix and vector computations
+option(BUILD_OPENBLAS "Using openBLAS for matrix and vector computations" OFF)
+
+
+
+
+
+#CMAKE_DEPENDENT_OPTION
+
+###### Different option of configuration ######
+#option(BUILD_TESTING "Build Tests" ON) 
 set(FAUST_USE_SINGLEPRECISION OFF CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
 set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
-set(FAUST_USE_OPENMP OFF CACHE BOOL "OpenMP Multithreading")
-set(FAUST_ISVERBOSE OFF CACHE BOOL "Display useful message for debugging")
-set(FAUST_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
-set(FAUST_GEN_DOC OFF CACHE BOOL "Generate html documentation with doxygen")
+#set(BUILD_MULTITHREAD OFF CACHE BOOL "OpenMP Multithreading")
+#set(BUILD_VERBOSE OFF CACHE BOOL "Display useful message for debugging")
+#set(BUILD_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
+#set(BUILD_DOCUMENTATION OFF CACHE BOOL "Generate html documentation with doxygen")
 
 set(FAUST_USE_XML OFF CACHE BOOL "Using xml configuration to read xml files")
-set(FAUST_USE_MEX ON CACHE BOOL "Generate Mexfiles")
-set(FAUST_USE_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
+#set(BUILD_MATLAB_MEX_FILES ON CACHE BOOL "Generate Mexfiles")
+#set(BUILD_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
 set(FAUST_USE_MATIO OFF CACHE BOOL "Using matio library to read mat files")
-
 if (FAUST_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")
 endif()
-if (FAUST_USE_OPENBLAS)
+if (BUILD_OPENBLAS)
 	message(STATUS "**********OPENBLAS ACTIF************")
 endif()
-if (FAUST_USE_MEX)
+if (BUILD_MATLAB_MEX_FILES)
 	message(STATUS "**********MEX ACTIF************")
 endif()
 if (FAUST_USE_PROFILING)
@@ -77,19 +110,22 @@ endif()
 if (FAUST_USE_XML)
 	message(STATUS "**********XML ACTIF************")
 endif()
-if (FAUST_ISVERBOSE)
+if (BUILD_VERBOSE)
 	message(STATUS "**********VERBOSE ACTIF************")
 endif()
-if (FAUST_USE_GPU)
+if (BUILD_USE_GPU)
 	message(STATUS "**********GPU ACTIF************")
 endif()
-if(FAUST_USE_OPENMP)
+if(BUILD_MULTITHREAD)
 	message(STATUS "**********OPENMP ACTIF*********")
 endif()
-if (FAUST_GEN_DOC)
+if (BUILD_DOCUMENTATION)
 	message(STATUS "**********DOC ACTIF************")
 endif()
 ##################################################################
+
+
+
 
 ###### Enable testing: ######
 include(CTest)
@@ -165,7 +201,7 @@ set(FAUST_SRC_TEST_SRC_DIR 			${FAUST_SRC_TEST_DIR}/src CACHE INTERNAL "")
 
 
 ###### WRAPPER MATLAB DIRECTORIES ######
-if (FAUST_USE_MEX)
+if (BUILD_MATLAB_MEX_FILES)
 	###### SRC DIRECTORY #####
 	set(FAUST_MATLAB_SRC_DIR ${FAUST_SRC_WRAPPER_DIR}/matlab CACHE INTERNAL "")
 	set(FAUST_MATLAB_TOOLS_SRC_DIR 	${FAUST_MATLAB_SRC_DIR}/tools CACHE INTERNAL "")
@@ -211,7 +247,7 @@ if (FAUST_USE_MEX)
 	set(FAUST_DEMO_BSL_OUTPUT_INSTALL_DIR 	${FAUST_DEMO_BSL_INSTALL_DIR}/output CACHE INTERNAL "")
 	set(FAUST_DEMO_HADAMARD_OUTPUT_INSTALL_DIR 	${FAUST_DEMO_HADAMARD_INSTALL_DIR}/output/ CACHE INTERNAL "")
 	set(FAUST_DEMO_TIMECOMP_INSTALL_DIR ${FAUST_DEMO_INSTALL_DIR}/Runtime_comparison CACHE INTERNAL "")
-endif(FAUST_USE_MEX)
+endif(BUILD_MATLAB_MEX_FILES)
 
 
 ## examples directories including some examples of the use of the library FAuST
@@ -228,17 +264,17 @@ set(FAUST_BIN_TEST_TOOLS_DIR 	${FAUST_BIN_TEST_DIR}/tools CACHE INTERNAL "")
 
 
 ### pour le GPU 
-if (FAUST_USE_GPU)
+if (BUILD_USE_GPU)
 	set(FAUST_SRC_LINEAR_OPERATOR_GPU_DIR ${FAUST_SRC_LINEAR_OPERATOR_DIR}/GPU CACHE INTERNAL "")
 	set(FAUST_BIN_LINEAR_OPERATOR_GPU_DIR ${FAUST_BIN_LINEAR_OPERATOR_DIR}/GPU CACHE INTERNAL "")
 
 	set(FAUST_SRC_TEST_GPU_DIR ${FAUST_MISC_DIR}/test/GPU_test CACHE INTERNAL "")
 	set(FAUST_BIN_TEST_GPU_DIR ${FAUST_BIN_TEST_DIR}/binGPU CACHE INTERNAL "") 
-endif(FAUST_USE_GPU)
+endif(BUILD_USE_GPU)
 
 
 ###### DOCUMENTATION DIRECTORIES ######
-if (FAUST_GEN_DOC)
+if (BUILD_DOCUMENTATION)
 	set(FAUST_DOC_SRC_DIR ${PROJECT_SOURCE_DIR}/gen_doc CACHE INTERNAL "")
 	set(FAUST_DOC_BIN_DIR ${PROJECT_BINARY_DIR}/doc CACHE INTERNAL "")
 endif()
@@ -249,12 +285,12 @@ file(MAKE_DIRECTORY ${FAUST_BIN_TEST_OUTPUT_DIR})
 file(MAKE_DIRECTORY ${FAUST_BIN_TEST_FIG_DIR})
 file(MAKE_DIRECTORY ${FAUST_BIN_TEST_TMP_DIR})
 
-if (FAUST_USE_MEX)
+if (BUILD_MATLAB_MEX_FILES)
 	file(MAKE_DIRECTORY ${FAUST_DEMO_BSL_OUTPUT_BIN_DIR})
 	install(DIRECTORY ${FAUST_DEMO_BSL_OUTPUT_BIN_DIR} DESTINATION ${FAUST_DEMO_BSL_OUTPUT_INSTALL_DIR})
 	file(MAKE_DIRECTORY ${FAUST_DEMO_HADAMARD_OUTPUT_BIN_DIR})
 	install(DIRECTORY ${FAUST_DEMO_HADAMARD_OUTPUT_BIN_DIR} DESTINATION ${FAUST_DEMO_HADAMARD_OUTPUT_INSTALL_DIR})
-endif (FAUST_USE_MEX)
+endif (BUILD_MATLAB_MEX_FILES)
 
 # CANNOT CREATE EMPTY DIRECTORY IN INSTALL_DIR  !!!!! MODIFY !!!!!
 #INSTALL(CODE "FILE(MAKE_DIRECTORY /logs)")
@@ -280,12 +316,12 @@ set(FAUST_MEXTOOLS_TARGET faust_mextools CACHE INTERNAL "")
 set(FAUST_MATIO_TARGET faust_matio CACHE INTERNAL "")
 set(FAUST_XML_TARGET faust_xml CACHE INTERNAL "")
 set(FAUST_TARGET faust CACHE INTERNAL "")
-if (FAUST_USE_GPU)
+if (BUILD_USE_GPU)
 	set(FAUST_LINEAR_OPERATOR_GPU_TARGET faust_linear_operator_gpu CACHE INTERNAL "")
 	#set(FAUST_MATRIX_CU_TARGET faust_gpu_matrix CACHE INTERNAL "")
 	#set(FAUST_FAUSTCORE_CU_TARGET faust_gpu_core CACHE INTERNAL "")
 	set(FAUST_ALGORITHM_CU_TARGET faust_algorithm_gpu CACHE INTERNAL "")
-endif(FAUST_USE_GPU)
+endif(BUILD_USE_GPU)
 ##################################################################
 
 
@@ -317,17 +353,17 @@ if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR
 	message(STATUS "**********DEBUG mode************")
 else()
 	if (UNIX)	
-		if (FAUST_USE_OPENMP)
+		if (BUILD_MULTITHREAD)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
-		endif(FAUST_USE_OPENMP)
+		endif(BUILD_MULTITHREAD)
 					
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -pthread -fPIC -O2 " CACHE STRING "compile flags" FORCE)
 		
 		
 	elseif(WIN32)
-		if (FAUST_USE_OPENMP)
+		if (BUILD_MULTITHREAD)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
-		endif(FAUST_USE_OPENMP)
+		endif(BUILD_MULTITHREAD)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  /EHs /MD /O2" CACHE STRING "compile flags" FORCE)
 	else()
 		message(WARNING "Unknown type of plateform for CMAKE_CXX_FLAGS")		
@@ -357,18 +393,18 @@ include(CMake/findExternalLibs.cmake)
 add_subdirectory(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_BIN_LINEAR_OPERATOR_DIR})
 add_subdirectory(${FAUST_ALGORITHM_SRC_DIR} ${FAUST_ALGORITHM_BIN_DIR})
 add_subdirectory(${FAUST_SRC_TEST_DIR} ${FAUST_BIN_TEST_BIN_DIR})
-if (FAUST_GEN_DOC)
+if (BUILD_DOCUMENTATION)
 	add_subdirectory(${FAUST_DOC_SRC_DIR} ${FAUST_DOC_BIN_DIR})
 endif ()
 add_subdirectory(${FAUST_SRC_CMDLINE_DIR} ${FAUST_BIN_CMDLINE_BIN_DIR})
-if (FAUST_USE_GPU)
+if (BUILD_USE_GPU)
 	add_subdirectory(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR} ${FAUST_BIN_LINEAR_OPERATOR_GPU_DIR})
 	#add_subdirectory(${FAUST_FAUSTCORE_CU_SRC_DIR} ${FAUST_FAUSTCORE_CU_BIN_DIR})
 	#add_subdirectory(${FAUST_ALGORITHM_CU_SRC_DIR} ${FAUST_ALGORITHM_CU_BIN_DIR})
 	add_subdirectory(${FAUST_SRC_TEST_GPU_DIR} ${FAUST_BIN_TEST_GPU_DIR})
-endif (FAUST_USE_GPU)
+endif (BUILD_USE_GPU)
 
-if (FAUST_USE_MEX)
+if (BUILD_MATLAB_MEX_FILES)
 	add_subdirectory(${FAUST_MATLAB_SRC_DIR} ${FAUST_MATLAB_MEX_BIN_DIR})
 	add_subdirectory(${FAUST_DEMO_SRC_DIR} ${FAUST_DEMO_BIN_DIR})
 endif()
@@ -376,22 +412,22 @@ endif()
 
 
 ###### TARGET GENERATION ######
-if (FAUST_USE_GPU)
-	if (FAUST_USE_MEX)
+if (BUILD_USE_GPU)
+	if (BUILD_MATLAB_MEX_FILES)
 		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_CU_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
-	else (FAUST_USE_MEX)	
+	else (BUILD_MATLAB_MEX_FILES)	
 		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_CU_TARGET}>)
-	endif(FAUST_USE_MEX)
-else (FAUST_USE_GPU)
-	if (FAUST_USE_MEX)
+	endif(BUILD_MATLAB_MEX_FILES)
+else (BUILD_USE_GPU)
+	if (BUILD_MATLAB_MEX_FILES)
 		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
-	else (FAUST_USE_MEX)	
+	else (BUILD_MATLAB_MEX_FILES)	
 		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_TARGET}>)
-	endif(FAUST_USE_MEX)
-endif (FAUST_USE_GPU)
+	endif(BUILD_MATLAB_MEX_FILES)
+endif (BUILD_USE_GPU)
 
 
-if (FAUST_USE_MEX)
+if (BUILD_MATLAB_MEX_FILES)
 	if (UNIX) 
 		if(APPLE)
 			target_link_libraries(${FAUST_TARGET} ${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}/libmex.dylib)
@@ -402,20 +438,20 @@ if (FAUST_USE_MEX)
 	elseif(WIN32)
 		message(FATAL_ERROR "MEXFILE : CANNOT SEARCH LIBMEX IN WINDOWS")
 	endif()
-endif(FAUST_USE_MEX)
+endif(BUILD_MATLAB_MEX_FILES)
 
 # In case of GPU, the "CUDA" library libfaust_matrix_cu.a is linked with faust (libfaust_matrix_cu.a is not a OBJECT library) 
-if (FAUST_USE_GPU)
+if (BUILD_USE_GPU)
 	#target_link_libraries(${FAUST_TARGET} ${FAUST_MATRIX_CU_TARGET} )	
 	target_link_libraries(${FAUST_TARGET} ${FAUST_LINEAR_OPERATOR_GPU_TARGET} )	
-endif(FAUST_USE_GPU)
+endif(BUILD_USE_GPU)
 
 
-if(FAUST_USE_OPENBLAS)
+if(BUILD_OPENBLAS)
 	target_link_libraries(${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
 else()
 	target_link_libraries(${FAUST_TARGET} )	
-endif(FAUST_USE_OPENBLAS)
+endif(BUILD_OPENBLAS)
 
 install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
 ##################################################################

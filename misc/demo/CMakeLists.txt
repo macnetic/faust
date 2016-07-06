@@ -7,7 +7,7 @@ file(GLOB MATLAB_SCRIPTS "*.m")
 
 
 
-if(FAUST_USE_MEX)
+if(BUILD_MATLAB_MEX_FILES)
 
 	configure_file(${FAUST_DEMO_SRC_DIR}/run_all_demo.m ${FAUST_DEMO_BIN_DIR}/run_all_demo.m COPYONLY)
       		install(FILES ${FAUST_DEMO_BIN_DIR}/run_all_demo.m DESTINATION ${FAUST_DEMO_INSTALL_DIR})

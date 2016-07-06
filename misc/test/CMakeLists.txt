@@ -10,7 +10,7 @@ if(FAUST_USE_MATIO)
 endif(FAUST_USE_MATIO)
 
 #rajout OPENBLAS_INC_DIR pour la compatibilite UBUNTU
-if(FAUST_USE_OPENBLAS)
+if(BUILD_OPENBLAS)
 	include_directories(${OPENBLAS_INC_DIR})
 endif()
 
@@ -30,11 +30,11 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO) # AND HDF5_LIB_FILE)
 			# Generation of the binary files in double and float precision
 			add_executable(${testin}_${TEST_FPP} ${FAUST_BIN_TEST_SRC_DIR}/${testin}_${TEST_FPP}.cpp ${FAUST_BIN_TEST_SRC_DIR}/ ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
    	
-			if(FAUST_USE_OPENBLAS)
+			if(BUILD_OPENBLAS)
 		      		target_link_libraries(${testin}_${TEST_FPP}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
-			else(FAUST_USE_OPENBLAS)
+			else(BUILD_OPENBLAS)
 		      		target_link_libraries(${testin}_${TEST_FPP}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
-			endif(FAUST_USE_OPENBLAS)	
+			endif(BUILD_OPENBLAS)	
 		endforeach()
 	endforeach()
 
@@ -55,14 +55,14 @@ endif(MATIO_LIB_FILE AND MATIO_INC_DIR AND FAUST_USE_MATIO)
 
 
 
-if (FAUST_USE_MEX)
+if (BUILD_MATLAB_MEX_FILES)
 	configure_file(${FAUST_SRC_TEST_TOOL_DIR}/set_path.m.in ${FAUST_BIN_TEST_TOOLS_DIR}/set_path.m @ONLY)
 	configure_file(${FAUST_SRC_TEST_TOOL_DIR}/launch_hierarchical_fact.m ${FAUST_BIN_TEST_TOOLS_DIR}/launch_hierarchical_fact.m COPYONLY)
 	
 	foreach(matlabtest hier_fact.m MEG_fact.m)
 		configure_file(${FAUST_SRC_TEST_SRC_DIR}/${matlabtest} ${FAUST_BIN_TEST_BIN_DIR}/${matlabtest} COPYONLY)
 	endforeach()
-endif(FAUST_USE_MEX)
+endif(BUILD_MATLAB_MEX_FILES)
 
 
 
@@ -100,7 +100,7 @@ if (FAUST_USE_MATIO)
 	# time comparison between Faust-vector product and Dense matrix-vector product for various configuration ( dimension, RCG , number of factor)
 	add_test(NAME MULTIPLY_COMPTIME COMMAND ${FAUST_BIN_TEST_BIN_DIR}/multiply_compare_time_double)
 	# display the result of MULTIPLY_COMPTIME and save it in folder FAUST_BIN_TEST_FIG_DIR as jpeg image (WARNING must be launched after MULTIPLY_COMPTIME)
-	add_test(NAME FIG_MULTIPLY_COMPTIME COMMAND	matlab -nodesktop -r "try;addpath('${FAUST_BIN_TEST_TIME_COMPARE_DIR}');display_multiply_comptime('${FAUST_BIN_TEST_OUTPUT_DIR}/multiply_compare_time.mat','${FAUST_BIN_TEST_FIG_DIR}');end;exit")
+	add_test(NAME FIG_MULTIPLY_COMPTIME COMMAND	matlab -nodesktop -r "try;addpath('${FAUST_BIN_TEST_TIME_COMPARE_DIR}');display_multiply_comptime('${FAUST_BIN_TEST_OUTPUT_DIR}/multiply_compare_time.mat','${FAUST_BIN_TEST_FIG_DIR}') ; catch ME ; disp('ERROR IN TEST display_multiply_comptime.m Please chek the output to visualize the error. ') ; end ; exit")
 	
 	set_tests_properties(FIG_MULTIPLY_COMPTIME PROPERTIES TIMEOUT 120)
 
@@ -121,7 +121,7 @@ endif(FAUST_USE_XML)
 
 
 
-if(FAUST_USE_MEX)
+if(BUILD_MATLAB_MEX_FILES)
 	#add_test(NAME FAUST_HIER_MEX COMMAND matlab  -nojvm -nodisplay -r ${FAUST_BIN_TEST_BIN_DIR}/hier_fact.m;exit)
 	# on ajoute les path bin et tools qui sont utilisés pour le script matlab.
 	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');hier_fact(9400,10); catch ME ; disp('ERROR IN TEST hier_fact.m Please chek the output to visualize the error. '); end ; exit" )
@@ -145,7 +145,7 @@ endif()
 
 ########################################################################
 ##################  TEST VERSION GPU (version using CUDA)
-#if (FAUST_USE_GPU)
+#if (BUILD_USE_GPU)
 #	#${FAUST_EXCEPTION_SRC_DIR} 
 #	include_directories(${FAUST_MATRIX_CU_SRC_DIR} ${FAUST_FAUSTCORE_CU_SRC_DIR} ${FAUST_ALGORITHM_CU_SRC_DIR} ${CUDA_INC_DIR} ${CUDA_RUNTIME_API_INC_DIR} ${CUSPARSE_INC_DIR} ${CUBLAS_V2_INC_DIR}  ${EIGEN_INC_DIR})
 
@@ -176,7 +176,7 @@ endif()
 #	add_test(NAME MEG_GPU_FACT_DOUBLE COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchical_fact_cu_double ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22480 1)
 #	set(TIMEOUT_MEG 14000)
 #	set_tests_properties(MEG_GPU_FACT_FLOAT MEG_GPU_FACT_DOUBLE PROPERTIES TIMEOUT ${TIMEOUT_MEG})
-#endif(FAUST_USE_GPU)
+#endif(BUILD_USE_GPU)
 ########################################################################
 
 

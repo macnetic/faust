@@ -95,4 +95,6 @@ for nfact=1:nNB_FACTS
     saveas(fighandle,[outputdir filesep 'fig_FAUST_nbfact_' int2str(NB_FACTS(nfact)) '.jpeg']);
 end
 
+disp(strcat('The figures are generated in directory : ', outputdir));
+
 

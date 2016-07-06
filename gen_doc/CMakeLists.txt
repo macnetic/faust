@@ -1,6 +1,6 @@
 ##Generation of the documentation using doxygen
 # add a target to generate API documentation with Doxygen
-if(FAUST_GEN_DOC)
+if(BUILD_DOCUMENTATION)
 	find_package(Doxygen)
 	if(DOXYGEN_FOUND)
 		configure_file(${FAUST_DOC_SRC_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY)
@@ -14,7 +14,7 @@ if(FAUST_GEN_DOC)
 	else()
 		message(WARNING "Doxygen not found, cannot generate the documentation")
 	endif(DOXYGEN_FOUND)
-endif(FAUST_GEN_DOC) 
+endif(BUILD_DOCUMENTATION) 
 
 
 

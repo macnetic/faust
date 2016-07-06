@@ -60,10 +60,10 @@ endif()
 
 
 ##################################################################
-#if(FAUST_USE_OPENBLAS)
+#if(BUILD_OPENBLAS)
 #	check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
 #	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
-#endif(FAUST_USE_OPENBLAS)
+#endif(BUILD_OPENBLAS)
 
 
 #find_path(OPENBLAS_LIB_DIR ${OPENBLAS_LIB_FILE})
