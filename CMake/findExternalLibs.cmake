@@ -31,8 +31,8 @@ message(STATUS "******* Check externals library ***********")
 # Default path library (where the library is automatically install)
 add_library_path(LIBRARY_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
-												#"/usr/local" #pour matio et xml2
-												#"/usr/local/lib" #pour matio et xml2 
+												"/usr/local" #pour matio et xml2
+												"/usr/local/lib" #pour matio et xml2 
 												"/usr/local/lib64" #pour matio et xml2
 												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src/.libs" #pour matio
 												"${PROJECT_SOURCE_DIR}/externals/unix/libxml2/.libs" # pour libxml
@@ -42,7 +42,7 @@ add_include_path(INCLUDE_PATH_LIST_TMP_DEFAULT 	"/opt/OpenBLAS"
 												"${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS"
 												"/usr/include/eigen3"
 												"${PROJECT_SOURCE_DIR}/externals/unix/eigen"
-												#"/usr/local" #pour matio et xml2 
+												"/usr/local" #pour matio et xml2 
 												"/usr/include/libxml2"
 												"${PROJECT_SOURCE_DIR}/externals/unix/matio/src" #pour matio
 												"${PROJECT_SOURCE_DIR}/externals/unix/libxml2/include" # pour libxml

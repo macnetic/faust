@@ -21,7 +21,7 @@ else ( (XML2_LIB_FILE) AND (XML_INC_DIR) )
 		exec_program("rm -r ${CMAKE_SOURCE_DIR}/externals/unix/libxml2")
 		exec_program("mv ${CMAKE_SOURCE_DIR}/externals/unix/libxml2-* ${CMAKE_SOURCE_DIR}/externals/unix/libxml2")
 		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/libxml2 && chmod -R 777 ./ && ./configure && make ")
-		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/libxml2 && make install")
+		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/libxml2 && sudo make install")
 		#exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/libxml2 && make install PREFIX='${CMAKE_SOURCE_DIR}/externals/unix/libxml2' ")
 		# NOTE WARNING : WE DON'T run make install because it is not a root user install.  We used directly the lib and include in sdk_matio package. 
 		# NOTE libxml2 install :  brew install libxml2 / apt_get / dnf /...

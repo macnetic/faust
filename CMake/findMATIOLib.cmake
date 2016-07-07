@@ -21,7 +21,7 @@ else ( (MATIO_LIB_FILE) AND (MATIO_INC_DIR) )
 		exec_program("rm -r ${CMAKE_SOURCE_DIR}/externals/unix/matio")	
 		exec_program("mv ${CMAKE_SOURCE_DIR}/externals/unix/matio-* ${CMAKE_SOURCE_DIR}/externals/unix/matio")
 		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/matio && chmod -R 777 ./ && ./configure && make --quiet") # && make check
-		#exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/sdk_matio && make install PREFIX='${CMAKE_SOURCE_DIR}/externals/unix/matio' ") # && make check
+		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/matio && sudo make install") # && make check
 		# NOTE WARNING : WE DON'T run make install because it is not a root user install.  We used directly the lib and include in sdk_matio package. 
 		# NOTE IF you have not 7z -->mac :  brew install p7zip
 		add_include_path(INCLUDE_PATH_LIST_TMP_MATIO "${PROJECT_SOURCE_DIR}/externals/unix/matio/src")
