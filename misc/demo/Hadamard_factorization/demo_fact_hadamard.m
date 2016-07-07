@@ -47,6 +47,10 @@ M = log2(n);
 %% Generating the data
 [params.data,~] = hadamard_mat(M);
 
+
+
+
+
 %% Setting of the parameters
 params.nfacts = M;
 params.cons = cell(2,M-1);
@@ -105,9 +109,14 @@ disp(['multiplication speed-up using faust : ' num2str(speed_up) ]);
 
 %% Plotting the results
 
+% figure configuration
+runPath=which(mfilename);
+pathname = fileparts(runPath);
+figure_dir = [pathname filesep '..' filesep 'Figures'];
+format_fig='-dpng';
 
 
-figure;
+fighandle=figure;
 hold on;
 subplot(1,params.nfacts+1,1);
 imagesc(Xhat); axis square
@@ -119,8 +128,12 @@ for kk = 1:params.nfacts
     set(gca,'xtick',[],'ytick',[])
 end
 
+fighandle.Name =['Hadamard-factorisation_image'];
+figure_name = [figure_dir filesep 'Hadamard-factorisation_image'];
+print(figure_name, format_fig);
 
-figure;
+
+fighandle=figure;
 hold on;
 subplot(1,params.nfacts+1,1);
 imagesc(Xhat); axis square
@@ -132,6 +145,9 @@ for kk = 1:params.nfacts
     spy(facts{kk}); axis square
     set(gca,'xtick',[],'ytick',[])
 end
+fighandle.Name =['Hadamard-factorisation_nnz_coeff'];
+figure_name = [figure_dir filesep 'Hadamard-factorisation_nnz_coeff'];
+print(figure_name, format_fig);
 
 
 

@@ -45,10 +45,15 @@
 
 runPath=which(mfilename);
 pathname = fileparts(runPath);
-matfile = fullfile(pathname, 'output/results_BSL_user.mat');
+matfile = fullfile(pathname, ['output' filesep 'results_BSL_user.mat']);
 if (not(exist(matfile)))
     error('run BSL.m before Fig_BSL.m');
 end
+
+%% figure configuration
+figure_dir = [pathname filesep '..' filesep 'Figures'];
+format_fig='-dpng';
+
 load(matfile);
 
 Ntraining=params.Ntraining;
@@ -103,8 +108,12 @@ for i=1:nb_approx_MEG
     
 end
 
-title('Fig 9 : C++ wrapper faust');
-f.Name =['Brain Source Localization : convergence with ' solver_choice 'solver (C++ wrapper)']
+title(['BSL - convergence (C++ wrapper faust) ' solver_choice ' solver']);
+f.Name =['Brain Source Localization : convergence with ' solver_choice '_solver (C++ wrapper)'];
+figure_name=[figure_dir filesep 'BSL-convergence_Cpp_' solver_choice '_solver'];
+print(figure_name, format_fig);
+
+
 
 %% MATLAB convergence analysis
 
@@ -149,9 +158,10 @@ for i=1:nb_approx_MEG
     
 end
 
-title('Fig 9 : matlab faust');
-f.Name =['Brain Source Localization : convergence with ' solver_choice 'solver (matlab)']
-
+title(['BSL - convergence (matlab faust) ' solver_choice ' solver ']);
+f.Name =['Brain Source Localization : convergence with ' solver_choice ' solver (matlab)'];
+figure_name=[figure_dir filesep 'BSL-convergence_matlab_' solver_choice '_solver'];
+print(figure_name, format_fig);
 
 %% time comparison
 
@@ -193,9 +203,10 @@ for i=1:nb_approx_MEG
     text(xTicks(2*i), minY - verticalOffset, ['$\widehat{\mathbf{M}}_{' int2str(RCG_approxS_MEG(i)) '}^{Cpp}$' ],'HorizontalAlignment','center','interpreter', 'latex');
     text(xTicks(2*i+1), minY - verticalOffset, ['$\widehat{\mathbf{M}}_{' int2str(RCG_approxS_MEG(i)) '}^{Matlab}$' ],'HorizontalAlignment','center','interpreter', 'latex');
 end
-title('solver time comparison');
-f.Name =['Brain Source Localization : time comparison with ' solver_choice 'solver']
-
+title(['BSL - time comparison (FAUST vs dense matrix) ' solver_choice ' solver']);
+f.Name =['Brain Source Localization : time comparison with ' solver_choice 'solver'];
+figure_name=[figure_dir filesep 'BSL-time_comparison_' solver_choice '_solver'];
+print(figure_name, format_fig);
 
 
 
@@ -230,5 +241,9 @@ for i=1:nb_approx_MEG
      
 end
 legend('theoretical RCG','speed up C++ wrapper faust','speed up MATLAB faust','neutral speed up');
-title('speed up');
+title(['BSL - speed up using FAUST ' solver_choice ' solver']);
 f.Name =['Brain Source Localization : speed-up Faust with ' solver_choice 'solver'];
+figure_name = [figure_dir filesep 'BSL-speed_up_' solver_choice ' solver'];
+print(figure_name, format_fig);
+
+

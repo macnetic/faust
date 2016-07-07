@@ -50,6 +50,11 @@ faust_times=zeros(nb_mult,nb_dim);
 h = waitbar(0,'speed up hadamard : Generation of the data ...');
 Hadamard_matrices=cell(1,nb_dim);
 Hadamard_facts=cell(1,nb_dim);
+
+
+
+
+
 for k=1:nb_dim
     waitbar(k/nb_dim);
     M=Ms(k);
@@ -141,8 +146,11 @@ f.Name =['Hadamard Faust-vector multiplication'];
 %% save the figure
 runPath=which(mfilename);
 pathname = fileparts(runPath);
-fig_filename = [pathname filesep 'output' filesep 'speed_up_hadamard.png'];
-print(fig_filename,'-dpng','-r300');
+figure_dir = [pathname filesep '..' filesep 'Figures'];
+format_fig='-dpng';
+figure_name=[figure_dir filesep 'Hadamard-speed_up'];
+print(figure_name, format_fig);
+
 
 
 

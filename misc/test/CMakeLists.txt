@@ -122,13 +122,10 @@ endif(BUILD_READ_XML_FILE)
 
 
 if(BUILD_MATLAB_MEX_FILES)
-	#add_test(NAME FAUST_HIER_MEX COMMAND matlab  -nojvm -nodisplay -r ${FAUST_BIN_TEST_BIN_DIR}/hier_fact.m;exit)
-	# on ajoute les path bin et tools qui sont utilisés pour le script matlab.
-#	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "try;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');hier_fact(9400,10); catch ME ; disp('ERROR IN TEST hier_fact.m Please chek the output to visualize the error. '); end ; exit" )
 	add_test(NAME FAUST_HIER_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_compared_hierarchical_fact',9402,1); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
-	#add_test(NAME FAUST_MEG_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');MEG_fact(22450,100); catch ME ; disp('ERROR IN TEST MEG_fact.m Please chek the output to visualize the error. '); end; exit" )
 	add_test(NAME FAUST_MEG_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_MEG',22450,100);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 	add_test(NAME FAUST_HADAMARD_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_HADAMARD',5941,1);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+	add_test(NAME DEMO_MATLAB COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${FAUST_MATLAB_INSTALL_DIR}');setup_FAUST;run_all_demo;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
 
@@ -137,10 +134,11 @@ if(BUILD_MATLAB_MEX_FILES)
 #CTEST_FULL_OUTPUT
 
 	set_tests_properties(FAUST_HIER_MEX FAUST_HADAMARD_MEX PROPERTIES TIMEOUT 30)
+	set_tests_properties(DEMO_MATLAB PROPERTIES TIMEOUT 300)
 	set_tests_properties(FAUST_MEG_MEX PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 endif() 
 
-#matlab -nojvm -r "addpath('/home/aleman/WORK/FAUST/faust/trunk/devcpp/Build-AL/wrapper/run_test/bin/','/home/aleman/WORK/FAUST/faust/trunk/devcpp/Build-AL/wrapper/run_test/tools/');hier_fact;exit"
+
 
 	
 

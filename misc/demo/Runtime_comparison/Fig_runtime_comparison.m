@@ -1,14 +1,14 @@
 %% Description Fig_runtime_comparison.m
 %  Runtime comparison
 %
-%  This script displays the result of the runtime comparison between 
-%  faust multiplication and dense matrix multiplication for various 
-%  configuration of faust (dimension of the faust, number of factors, 
+%  This script displays the result of the runtime comparison between
+%  faust multiplication and dense matrix multiplication for various
+%  configuration of faust (dimension of the faust, number of factors,
 %  Relative Complexity Gain  (RCG), fix type of sparsity (sp, spcol,splin))
 %
-%	
 %
-% For more information on the FAuST Project, please visit the website of 
+%
+% For more information on the FAuST Project, please visit the website of
 % the project :  <http://faust.gforge.inria.fr>
 %
 %% License:
@@ -16,36 +16,36 @@
 %			INRIA Rennes, FRANCE
 %			http://www.inria.fr/
 %
-% The FAuST Toolbox is distributed under the terms of the GNU Affero 
+% The FAuST Toolbox is distributed under the terms of the GNU Affero
 % General Public License.
 % This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Affero General Public License as published 
+% it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation.
 %
-% This program is distributed in the hope that it will be useful, but 
-% WITHOUT ANY WARRANTY; without even the implied warranty of 
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+% This program is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 % See the GNU Affero General Public License for more details.
 %
 % You should have received a copy of the GNU Affero General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
-%% Contacts:	
+%% Contacts:
 %   Nicolas Bellot : nicolas.bellot@inria.fr
 %   Leman Adrien   : adrien.leman@inria.fr
 %	Luc Le Magoarou: luc.le-magoarou@inria.fr
 %	Remi Gribonval : remi.gribonval@inria.fr
 %
 %% References:
-% [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse 
-%	approximations of matrices and applications", Journal of Selected 
+% [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
+%	approximations of matrices and applications", Journal of Selected
 %	Topics in Signal Processing, 2016.
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %
-% [2]   A. Gramfort, M. Luessi, E. Larson, D. Engemann, D. Strohmeier, 
+% [2]   A. Gramfort, M. Luessi, E. Larson, D. Engemann, D. Strohmeier,
 %	C. Brodbeck, L. Parkkonen, M. Hamalainen, MNE software for processing
-%	MEG and EEG data <http://www.ncbi.nlm.nih.gov/pubmed/24161808>, 
-%	NeuroImage, Volume 86, 1 February 2014, Pages 446-460, ISSN 1053-8119, 
+%	MEG and EEG data <http://www.ncbi.nlm.nih.gov/pubmed/24161808>,
+%	NeuroImage, Volume 86, 1 February 2014, Pages 446-460, ISSN 1053-8119,
 %	[DOI] <http://dx.doi.org/10.1016/j.neuroimage.2013.10.027>
 
 
@@ -71,7 +71,9 @@ if (not(exist(matfile)))
 end
 load(matfile);
 
-
+% figure configuration
+figure_dir = [pathname filesep '..' filesep 'Figures'];
+format_fig='-dpng';
 
 
 
@@ -115,24 +117,24 @@ fighandle=figure;
 
 
 for nfact=1:nNB_FACTS
-subplot(1,nNB_FACTS,nfact);    
-
+    subplot(1,nNB_FACTS,nfact);
+    
     for k=1:nRCGS
         semilogy(log2(DIMS),mean_tfaust(:,k,nfact),'LineWidth',thickness_curve);
-         legend_curve{k}=['Faust RCG ' num2str(RCGS(k))];   
+        legend_curve{k}=['Faust RCG ' num2str(RCGS(k))];
         hold on;
-
+        
     end
-
+    
     %LA boucle fait remettre les compteurs a zero, que ce soit des
     %numero de courbes ou des couleurs, c'est pourquoi il faut la
     %mettre en premier et
     %forcer la couleur du dense (voire ci dessous).
-
+    
     semilogy(log2(DIMS),squeeze(mean_tdense),'-+','Color',[0 0.8 0.8],'LineWidth',thickness_curve);
     legend_curve{nRCGS+1}=['Dense '];
-
-
+    
+    
     % legend the figure,title, font ...
     grid on;
     axis([log2(DIMS(1)) log2(DIMS(end)) ymin ymax]);
@@ -143,11 +145,9 @@ subplot(1,nNB_FACTS,nfact);
         xlabel('log2(Dimension)');
         ylabel('Time');
     end
-
- fighandle.Name =['Faust-' matrix_or_vector ' multiplication (constraint : ' constraint ')'];
-    
-
-    
     
 end
- 
+fighandle.Name =['Faust-' matrix_or_vector ' multiplication (constraint : ' constraint ')'];
+figure_name = [figure_dir filesep 'RuntimeComp-' matrix_or_vector '_multiplication_constraint_' constraint];
+print(figure_name, format_fig);
+

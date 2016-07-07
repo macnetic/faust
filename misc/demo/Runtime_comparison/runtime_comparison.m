@@ -59,7 +59,7 @@ params.constraint = 'sp';
 %params.constraint = 'sp_row';
 params.matrix_or_vector='vector';
 %matrix_or_vector='matrix';
-params.Nb_mult=200;
+params.Nb_mult=500;
 [RCGs,Dims,nb_facts,constraint,Nb_mult,matrix_or_vector]=deal(params.RCGs,params.Dims,params.nb_facts,params.constraint,params.Nb_mult,params.matrix_or_vector);
 
 
