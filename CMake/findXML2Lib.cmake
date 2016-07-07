@@ -26,7 +26,7 @@ else ( (XML2_LIB_FILE) AND (XML_INC_DIR) )
 		# NOTE WARNING : WE DON'T run make install because it is not a root user install.  We used directly the lib and include in sdk_matio package. 
 		# NOTE libxml2 install :  brew install libxml2 / apt_get / dnf /...
 		add_include_path(INCLUDE_PATH_LIST_TMP_XML2 "/usr/include/libxml2" "${PROJECT_SOURCE_DIR}/externals/unix/libxml2/include")
-		add_library_path(LIBRARY_PATH_LIST_TMP_XML2 "/usr/lib" "${PROJECT_SOURCE_DIR}/externals/unix/libxml2/.libs")	
+		add_library_path(LIBRARY_PATH_LIST_TMP_XML2 "/usr/local/lib" "${PROJECT_SOURCE_DIR}/externals/unix/libxml2/.libs")	
 
 		#add_include_path(INCLUDE_PATH_LIST_TMP_XML2 "/usr/include/libxml2")
 		#add_library_path(LIBRARY_PATH_LIST_TMP_XML2 "/usr/lib")
