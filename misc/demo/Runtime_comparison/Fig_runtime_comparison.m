@@ -114,40 +114,44 @@ ymin=min([min(mean_tdense(:)),min(mean_tfaust(:))]);
 ymax=max([max(mean_tdense(:)),max(mean_tfaust(:))]);
 fighandle=figure;
 
-
-
-for nfact=1:nNB_FACTS
-    subplot(1,nNB_FACTS,nfact);
-    
-    for k=1:nRCGS
-        semilogy(log2(DIMS),mean_tfaust(:,k,nfact),'LineWidth',thickness_curve);
-        legend_curve{k}=['Faust RCG ' num2str(RCGS(k))];
-        hold on;
+legendy={'Time (A*x)','Time (A''*x)'};
+for h=1:2
+    for nfact=1:nNB_FACTS
+        subplot(2,nNB_FACTS,(h-1)*nNB_FACTS+nfact);
+        
+        for k=1:nRCGS
+            semilogy(log2(DIMS),mean_tfaust(:,k,nfact,h),'LineWidth',thickness_curve);
+            legend_curve{k}=['Faust RCG ' num2str(RCGS(k))];
+            hold on;
+            
+        end
+        
+        %LA boucle fait remettre les compteurs a zero, que ce soit des
+        %numero de courbes ou des couleurs, c'est pourquoi il faut la
+        %mettre en premier et
+        %forcer la couleur du dense (voire ci dessous).
+        
+        semilogy(log2(DIMS),squeeze(mean_tdense(:,h)),'-+','Color',[0 0.8 0.8],'LineWidth',thickness_curve);
+        legend_curve{nRCGS+1}=['Dense '];
+        
+        
+        % legend the figure,title, font ...
+        grid on;
+        axis([log2(DIMS(1)) log2(DIMS(end)) ymin ymax]);
+        
+        title (['nb factor : ' ,int2str(NB_FACTS(nfact))] );
+        if (nfact == 1)
+            legend(legend_curve{:},'Location', 'NorthWest');
+            xlabel('log2(Dimension)');
+            ylabel(legendy{h});
+        end
         
     end
     
-    %LA boucle fait remettre les compteurs a zero, que ce soit des
-    %numero de courbes ou des couleurs, c'est pourquoi il faut la
-    %mettre en premier et
-    %forcer la couleur du dense (voire ci dessous).
-    
-    semilogy(log2(DIMS),squeeze(mean_tdense),'-+','Color',[0 0.8 0.8],'LineWidth',thickness_curve);
-    legend_curve{nRCGS+1}=['Dense '];
-    
-    
-    % legend the figure,title, font ...
-    grid on;
-    axis([log2(DIMS(1)) log2(DIMS(end)) ymin ymax]);
-    
-    title (['nb factor : ' ,int2str(NB_FACTS(nfact))] );
-    if (nfact == 1)
-        legend(legend_curve{:},'Location', 'NorthWest');
-        xlabel('log2(Dimension)');
-        ylabel('Time');
-    end
-    
 end
+
 fighandle.Name =['Faust-' matrix_or_vector ' multiplication (constraint : ' constraint ')'];
 figure_name = [figure_dir filesep 'RuntimeComp-' matrix_or_vector '_multiplication_constraint_' constraint];
 print(figure_name, format_fig);
+
 

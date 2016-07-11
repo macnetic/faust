@@ -109,8 +109,8 @@ end
 
 %% time comparison
 
-t_faust=zeros(Nb_mult+1,NDims,NRCGs,Nnb_facts);
-t_dense=zeros(Nb_mult+1,NDims);
+t_faust=zeros(Nb_mult+1,NDims,NRCGs,Nnb_facts,2);
+t_dense=zeros(Nb_mult+1,NDims,2);
 
 h = waitbar(0,'runtime comparison (faust vs dense matrix) for various configuration ...');
 for i=1:Nb_mult+1
@@ -119,6 +119,13 @@ for i=1:Nb_mult+1
    for j=1:NDims
        dim=Dims(j);
        
+       if strcmp(matrix_or_vector,'matrix')
+           dim2 = dim; % multiplication by a square matrix
+       elseif strcmp(matrix_or_vector,'vector')
+           dim2 = 1; % multiplication by a column-vector
+        else
+                   error('matrix_or_vector string must be equal to matrix or vector');
+       end
        
        
        for k=1:NRCGs
@@ -128,50 +135,53 @@ for i=1:Nb_mult+1
                nfact=nb_facts(l);
                fact=gen_artificial_faust(dim,RCG,nfact,constraint);
                faust_transform=matlab_faust(fact);
-               if strcmp(matrix_or_vector,'matrix')
-                  x=rand(dim);
-                  y=zeros(dim);
-                  yfaust=zeros(dim); 
+               x=rand(dim,dim2);
+               y=zeros(dim,dim2);
+               yfaust=zeros(dim,dim2);
+               y_trans=zeros(dim,dim2);
+               yfaust_trans=zeros(dim,dim2);
                    
-               elseif strcmp(matrix_or_vector,'vector')
-                  x=rand(dim,1);
-                  y=zeros(dim,1);
-                  yfaust=zeros(dim,1); 
-                   
-                   
-               else
-                   error('matrix_or_vector string must be equal to matrix or vector');
-               end
+               
                
                taillefaust=size(faust_transform);
                if((taillefaust(1) ~= dim)+(taillefaust(2) ~= dim))
                    error('invalid faust');
                end
-               
+               %% multiplication dense
                if(k==1)&&(l==1)
                    A=list_dense{j};
                    tic;
                    y=A*x;
-                   t=toc;
-                   t_dense(i,j)=t;
+                   tdense=toc;
+                   t_dense(i,j,1)=tdense;
+                   
+                   tic
+                   y_trans=A'*x;
+                   tdense_trans=toc;
+                   t_dense(i,j,2)=tdense_trans;
                end
-               
+               %% multiplication par un faust
                faust_transform=list_faust{j,k,l};
                tic;
                yfaust=faust_transform*x;
-               t=toc;
-               t_faust(i,j,k,l)=t; 
+               tfaust=toc;
+               t_faust(i,j,k,l,1)=tfaust;
+               tic;
+               yfaust_trans=mtimes_trans(faust_transform,x,'T');
+               tfaust_trans=toc;
+               t_faust(i,j,k,l,2)=tfaust_trans;
            end
        end
    end
 end
 close(h);
 
-t_faust(1,:,:,:)=[];
-t_dense(1,:)=[];
+t_faust(1,:,:,:,:)=[];
+t_dense(1,:,:)=[];
 
 runPath=which(mfilename);
 pathname = fileparts(runPath);
 matfile = fullfile(pathname, 'runtime_comparison.mat');
 save(matfile,'t_faust','t_dense','params');
+
 
