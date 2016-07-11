@@ -1,83 +1,114 @@
-%class MATLAB_FAUST 
+%class MATLAB_FAUST
 % representing a given dense matrix by a product of sparse matrix (i.e faust)
 % in order to speed-up multiplication by this matrix,
 % matlab wrapper class implemented in C++
 %
-% For more information on the FAuST Project, please visit the website of 
-% the project :  <http://faust.gforge.inria.fr>  
+% For more information on the FAuST Project, please visit the website of
+% the project :  <http://faust.gforge.inria.fr>
 
 classdef matlab_faust < handle
     properties (SetAccess = private, Hidden = true)
         objectHandle; % Handle to the underlying C++ class instance
     end
     methods
-        %% Constructor - Create a new C++ class instance 
+        %% Constructor - Create a new C++ class instance
         function this = matlab_faust(varargin)
             % Constructor - build a faust from a cell array of matrix and a scalar (optional)
             %                1st input : 1D cell array of matrix (sparse or dense)
-            %                2nd input : (optional) multiplicative scalar  
+            %                2nd input : (optional) multiplicative scalar
             this.objectHandle = mexFaust('new',varargin{:});
-		end
+        end
         
         %% Destructor - Destroy the C++ class instance
         function delete(this)
-            % destructor delete the faust    
+            % destructor delete the faust
             mexFaust('delete', this.objectHandle);
         end
-
+        
         %% Multiplication faust-vector or faust-matrix
         function varargout = mtimes(this, varargin)
-             % mtimes - overloading of the matlab multiplication (*) function, compatible with matlab matrix and vector
-             [varargout{1:nargout}] = mexFaust('multiply', this.objectHandle, varargin{:},'N');
-         end
-
-
-	%% Multiplication by a faust or its transpose
-	% if trans = 'N' multiplication by faust
-	% if trans = 'T' multiplication the transpose of a faust
+            % mtimes - overloading of the matlab multiplication (*) function, compatible with matlab matrix and vector
+            [varargout{1:nargout}] = mexFaust('multiply', this.objectHandle, varargin{:},'N');
+        end
+        
+        
+        %% Multiplication by a faust or its transpose
+        % if trans = 'N' multiplication by faust
+        % if trans = 'T' multiplication the transpose of a faust
         function varargout = mtimes_trans(this,varargin)
-             [varargout{1:nargout}] = mexFaust('multiply', this.objectHandle,varargin{:});
-         end
-		 
-		 %% Evaluate the product of a faust_core
-		 function varargout = get_product(this)
-                % get_product - compute the dense matrix equivalent to the faust (the product of sparse matrix) 
-				[varargout{1:nargout}]=mexFaust('get_product',this.objectHandle);
-	     end
-		%% Transpose operator 
-		function trans=transpose(this)
-			%transpose - overloading of the matlab transpose operator (')
+            [varargout{1:nargout}] = mexFaust('multiply', this.objectHandle,varargin{:});
+            
+        end
+        
+        %% Evaluate the product of a faust_core
+        function varargout = get_product(this)
+            % get_product - compute the dense matrix equivalent to the faust (the product of sparse matrix)
+            [varargout{1:nargout}]=mexFaust('get_product',this.objectHandle);
+        end
+        %% Transpose operator
+        function trans=transpose(this)
+            %transpose - overloading of the matlab transpose operator (')
             if (nargout	 == 0)
-				mexFaust('transpose',this.objectHandle);
-			else
-				trans = matlab_faust({});
-				trans.objectHandle = mexFaust('transpose',this.objectHandle);
-				
-			end
-		end
-		
-		function trans=ctranspose(this)
-			if (nargout	 == 0)
-				mexFaust('transpose',this.objectHandle);
-			else
-				trans = matlab_faust({});
-				trans.objectHandle = mexFaust('transpose',this.objectHandle);
-				
-			end
-		end	
-		%% Size 
-		function Size=size(this,varargin);
-			%size - overload of the matlab size function
-			Size=mexFaust('size',this.objectHandle);
-			if (length(varargin)~=0)
-				if (varargin{1}==1)
-					Size=Size(1);
-				elseif (varargin{1}==2)
-					Size=Size(2);
-				end	
-			end
-			
-		end
+                mexFaust('transpose',this.objectHandle);
+            else
+                trans = matlab_faust({});
+                trans.objectHandle = mexFaust('transpose',this.objectHandle);
+                
+            end
+        end
+        
+        function trans=ctranspose(this)
+            if (nargout	 == 0)
+                mexFaust('transpose',this.objectHandle);
+            else
+                trans = matlab_faust({});
+                trans.objectHandle = mexFaust('transpose',this.objectHandle);
+                
+            end
+        end
+        %% Size
+        function varargout = size(this,varargin)
+            %size - overload of the matlab size function
+            Size=mexFaust('size',this.objectHandle);
+            nb_input = length(varargin);
+            
+            
+            if (nb_input > 1)
+                error('Too many input arguments');
+            end
+            
+            if ((nb_input == 1) && (nargout > 1) | (nargout > 2)) 
+                error('Too many output arguments');
+            end
+            
+            if (nb_input~=0)
+                dimension_arg=varargin{1};
+                if (floor(dimension_arg) ~= dimension_arg)
+                    error('Dimension argument must be a positive integer scalar within indexing range');
+                end
+                
+                if (varargin{1}==1)
+                    Size=Size(1);
+                elseif (varargin{1}==2)
+                    Size=Size(2);
+                else
+                    Size=1;
+                end
+                
+            end
+            
+            
+            if (nargout < 2) 
+                varargout{1}=Size;
+            else
+                varargout{1}=Size(1);
+                varargout{2}=Size(2);
+            end
+        end
+        
         
     end
+    
 end
+
+
