@@ -41,7 +41,7 @@ if(UNIX)
 	#message(STATUS "MATLAB_DIR_TMP 4 = ${MATLAB_DIR_TMP}")
 
 elseif(WIN32)
-	exec_program("where matlab.exe" OUTPUT_VARIABLE MATLAB_DIR_TMP)
+	exec_program("where \R 'C:\Program Files\MATLAB\' matlab.exe" OUTPUT_VARIABLE MATLAB_DIR_TMP)
 else()
 	message(WARNING "Unknown type of plateform for matlab")		
 endif()
