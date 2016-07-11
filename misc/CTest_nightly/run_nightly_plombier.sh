@@ -35,10 +35,10 @@ fi
 export CUDADIR='/usr/local/cuda-6.5'
 
 # export version of gcc
-#export CC=/usr/lib64/ccache/gcc
-#export CXX=/usr/lib64/ccache/g++
-export CC='/usr/bin/gcc'
-export CXX='/usr/bin/g++'
+export CC='/usr/lib64/ccache/gcc'
+export CXX='/usr/lib64/ccache/g++'
+#export CC='/usr/bin/gcc'
+#export CXX='/usr/bin/g++'
 
 # /usr/local/bin/matlab in the PATH 
 # /usr/bin/gcc
