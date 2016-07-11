@@ -30,6 +30,8 @@ export CUDADIR='/usr/local/cuda-7.5'
 export CC='/usr/lib64/ccache/gcc'
 export CXX='/usr/lib64/ccache/g++'
 
+
+
 # /usr/local/bin/matlab in the PATH 
 export PATH=/usr/local/bin:$PATH
 # cuda in the PATH

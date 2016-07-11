@@ -18,24 +18,27 @@
 
 
 # Directory of the local path of the nightly project
-export PATH_DIR_RUN_NIGHTLY='/home/aleman/WORK/FAUST/faust_nightly'
+export PATH_DIR_RUN_NIGHTLY='C:\Users\ci\FAUST\CTest_nightly'
+
+
 # Directory of the library used in the FAUST PROJECT 
 #export EIGENDIR='/usr/include/eigen3'
 #export OPENBLASDIR='/opt/OpenBLAS'
-
 #export MATIODIR='/usr/local'
-export CUDADIR='/usr/local/cuda-7.5'
+#export CUDADIR='/usr/local/cuda-7.5'
 
 # export version of gcc
-export CC='/usr/lib64/ccache/gcc'
-export CXX='/usr/lib64/ccache/g++'
+#export CC='/usr/lib64/ccache/gcc'
+#export CXX='/usr/lib64/ccache/g++'
+export CC='C:\Program Files\mingw-w64\x86_64-4.9.2-posix-seh-rt_v4-rev4\mingw64\bin\gcc'
+export CXX='C:\Program Files\mingw-w64\x86_64-4.9.2-posix-seh-rt_v4-rev4\mingw64\bin\g++'
 
 
 
 # /usr/local/bin/matlab in the PATH 
-export PATH=/usr/local/bin:$PATH
+#export PATH=/usr/local/bin:$PATH
 # cuda in the PATH
-export PATH=/usr/local/cuda-7.5/bin:/usr/lib64/ccache/:$PATH
+#export PATH=/usr/local/cuda-7.5/bin:/usr/lib64/ccache/:$PATH
 
 
 
@@ -52,11 +55,11 @@ fi
 
 # CTEST OPTION 
 export CTEST_CONFIGURE_OPTIONS="\
--DBUILD_OPENBLAS=ON;\
--DBUILD_READ_MAT_FILE=ON;\
--DBUILD_READ_XML_FILE=ON;\
+-DBUILD_OPENBLAS=OFF;\
+-DBUILD_READ_MAT_FILE=OFF;\
+-DBUILD_READ_XML_FILE=OFF;\
 -DBUILD_MATLAB_MEX_FILES=ON;\
--DBUILD_USE_GPU:BOOL=ON;\
+-DBUILD_USE_GPU:BOOL=OFF;\
 -DFAUST_USE_PROFILING=OFF;\
 -DBUILD_VERBOSE=OFF;\
 -DBUILD_DOCUMENTATION:BOOL=OFF"
