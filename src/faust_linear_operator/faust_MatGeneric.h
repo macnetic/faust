@@ -26,7 +26,8 @@ namespace Faust
         public:
         MatGeneric() : dim1(0), dim2(0) {}
         MatGeneric(faust_unsigned_int dim1_, faust_unsigned_int dim2_) : dim1(dim1_), dim2(dim2_){}
-
+    	
+	void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const; 
         faust_unsigned_int getNbRow() const {return dim1;}
         faust_unsigned_int getNbCol() const {return dim2;}
 
@@ -38,4 +39,6 @@ namespace Faust
     };
 
 }
+#include "faust_MatGeneric.hpp"
+
 #endif

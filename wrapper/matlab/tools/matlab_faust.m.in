@@ -28,7 +28,15 @@ classdef matlab_faust < handle
         %% Multiplication faust-vector or faust-matrix
         function varargout = mtimes(this, varargin)
              % mtimes - overloading of the matlab multiplication (*) function, compatible with matlab matrix and vector
-             [varargout{1:nargout}] = mexFaust('multiply', this.objectHandle, varargin{:});
+             [varargout{1:nargout}] = mexFaust('multiply', this.objectHandle, varargin{:},'N');
+         end
+
+
+	%% Multiplication by a faust or its transpose
+	% if trans = 'N' multiplication by faust
+	% if trans = 'T' multiplication the transpose of a faust
+        function varargout = mtimes_trans(this,varargin)
+             [varargout{1:nargout}] = mexFaust('multiply', this.objectHandle,varargin{:});
          end
 		 
 		 %% Evaluate the product of a faust_core

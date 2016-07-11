@@ -466,6 +466,74 @@ void Faust::Transform<FPP,Cpu>::transpose()
 
 
 template<typename FPP>
+Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis)
+{
+	int nbRowOpThis,nbColOpThis;
+	
+
+	if (size() == 0)
+		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
+	
+	Faust::Vect<FPP,Cpu> vec(x);
+ 
+	if (opThis == 'N')
+	{	
+		for (int i=size()-1 ; i >= 0 ; i--)
+			vec.multiplyLeft(data[i]);
+		
+	}else
+	{		
+		for (int i=0 ; i < size() ; i++)
+		{	
+			vec.multiplyLeft(data[i],opThis);
+		}
+		
+	}
+	return vec;
+
+		
+	
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const
+{
+	if (size() > 0)
+	{	
+		if(op == 'N')
+    		{
+        		nbRowOp=data[0].getNbRow();
+        		nbColOp=data[size()-1].getNbCol();
+    		}
+    		else if(op == 'T')
+    		{
+        		nbRowOp=data[size()-1].getNbCol();
+        		nbColOp=data[0].getNbRow();
+    		}
+    		else
+        		handleError(m_className,"setOp : invalid character");
+	}else
+	{
+	   nbRowOp = 0;
+	   nbColOp = 0;	
+	   handleWarning("Faust::Transform<FPP,Cpu>::setOp : empty Faust::Transform");
+	}
+}
+
+template<typename FPP>
 void Faust::Transform<FPP,Cpu>::Display()const
 {
 	cout << "SIZE" << size() <<endl;

@@ -83,9 +83,9 @@ X_norm = X./repmat(sqrt(sum(X.^2,1)),size(X,1),1);
 
 %% Loading of the MEG matrix approximations
  % wrapper C++ faust
-MEG_faustS=cell(1,nb_approx_MEG);
-faustS_mult=cell(1,nb_approx_MEG);
-trans_faustS_mult=cell(1,nb_approx_MEG);
+MEG_faustS=cell(1,nb_approx_MEG);% store the different wrapper faust objet
+faustS_mult=cell(1,nb_approx_MEG);% store the different function_handle that makes the multiplication by the faust
+trans_faustS_mult=cell(1,nb_approx_MEG);% % store the different function_handle that makes the multiplication by the transpose of a faust
 
 % matlab faust (no C++ Faust Toolbox code is running)
 matlab_faustS_mult=cell(1,nb_approx_MEG);
@@ -115,8 +115,8 @@ for i=1:nb_approx_MEG
     matlab_faustS_mult{i}=@(x) f_mult(sp_facts,x); % function handle
     
     % wrapper C++ faust
-    trans_faustS_mult{i}=@(x) trans_fc*x;% function handle 
-    faustS_mult{i}=@(x) fc*x; % function handle
+    trans_faustS_mult{i}=@(x) mtimes_trans(fc,x,'T');% function handle 
+    faustS_mult{i}=@(x) mtimes_trans(fc,x,'N'); % function handle
     MEG_faustS{i}=fc; % store the different faust approximations
 end
 M=size(X_norm,2);
@@ -127,7 +127,8 @@ params.Sparsity = 2; % Number of sources per training vector
 params.dist_paliers = [0.01,0.05,0.08,0.5];
 params.solver_choice='omp';
 %params.solver_choice='iht';
-
+opt_handle=1;% ==1 the faust is given to the solver by function handle
+             % ==0 the faust is given to the solver as an object
 
 Ntraining = params.Ntraining;
 Sparsity = params.Sparsity;
@@ -191,12 +192,12 @@ for k=1:nb_palier;
                 %OMP
                 tic
                 [sol_solver(:,i), err_mse_solver, iter_time_solver]=greed_omp_chol(Data(:,i),X_norm,M,'stopTol',1*Sparsity,'verbose',false);
-                t1=toc;
+                tdense=toc;
             elseif   strcmp(solver_choice,'iht')  
                 %IHT
                 tic
                 [sol_solver(:,i), err_mse_solver, iter_time_solver]= hard_l0_Mterm(Data(:,i),X_norm,M,1*Sparsity,'verbose',false,'maxIter',1000);
-                t1=toc;
+                tdense=toc;
             else
                 error('invalid solver choice: must be omp or iht');
             end
@@ -206,10 +207,10 @@ for k=1:nb_palier;
             idx_solver = find(sol_solver(:,i));
             resDist(1,k,1,i) = min(norm(points(idx(1)) - points(idx_solver(1))),norm(points(idx(1)) - points(idx_solver(2))));
             resDist(1,k,2,i) = min(norm(points(idx(2)) - points(idx_solver(1))),norm(points(idx(2)) - points(idx_solver(2))));
-            compute_Times(1,k,i)=t1;
+            compute_Times(1,k,i)=tdense;
             resDist_matlab(1,k,1,i) = min(norm(points(idx(1)) - points(idx_solver(1))),norm(points(idx(1)) - points(idx_solver(2))));
             resDist_matlab(1,k,2,i) = min(norm(points(idx(2)) - points(idx_solver(1))),norm(points(idx(2)) - points(idx_solver(2))));
-            compute_Times_matlab(1,k,i)=t1;
+            compute_Times_matlab(1,k,i)=tdense;
             
        for ll=1:nb_approx_MEG
            X_approx_norm = MEG_approxS_norm{ll};
@@ -218,24 +219,36 @@ for k=1:nb_palier;
            %% objet faust
            if strcmp(solver_choice,'omp')
                 %OMP
-                tic
-                [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),MEG_faustS{ll},M,'stopTol',1*Sparsity,'verbose',false);
-                t1=toc;
+                if (opt_handle == 1)
+                    tic
+                    [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),faustS_mult{ll},M,'stopTol',1*Sparsity,'verbose',false,'P_trans',trans_faustS_mult{ll});
+                    t_cpp=toc;
+                else
+                    tic
+                    [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),MEG_faustS{ll},M,'stopTol',1*Sparsity,'verbose',false);
+                    t_cpp=toc;
+                end
            elseif   strcmp(solver_choice,'iht')  
                 %IHT
-                tic
-                [sol_solver_hat(:,i), err_mse_solver, iter_time_solver]=hard_l0_Mterm(Data(:,i),MEG_faustS{ll},M,1*Sparsity,'verbose',false,'maxIter',1000);
-                t1=toc;
+                if (opt_handle == 1)
+                    tic
+                    [sol_solver_hat(:,i), err_mse_solver, iter_time_solver]=hard_l0_Mterm(Data(:,i),faustS_mult{ll},M,1*Sparsity,'verbose',false,'maxIter',1000,'P_trans',trans_faustS_mult{ll});
+                    t_cpp=toc;
+                else   
+                    tic
+                    [sol_solver_hat(:,i), err_mse_solver, iter_time_solver]=hard_l0_Mterm(Data(:,i),MEG_faustS{ll},M,1*Sparsity,'verbose',false,'maxIter',1000);
+                    t_cpp=toc;
+                end
            else
                 error('invalid solver choice: must be omp or iht');
            end
-           t1=toc;
+           
            err_solver_hat(1,i) = norm(X_norm*Gamma(:,i)-X_approx_norm*sol_solver_hat(:,i))/norm(X_norm*Gamma(:,i));
            err_solver_hat(2,i) = isequal(find(Gamma(:,i)),find(sol_solver_hat(:,i)>1e-4));
            idx_solver = find(sol_solver_hat(:,i));
            resDist(ll+1,k,1,i) = min(norm(points(idx(1)) - points(idx_solver(1))),norm(points(idx(1)) - points(idx_solver(2))));
            resDist(ll+1,k,2,i) = min(norm(points(idx(2)) - points(idx_solver(1))),norm(points(idx(2)) - points(idx_solver(2))));
-           compute_Times(ll+1,k,i)=t1;
+           compute_Times(ll+1,k,i)=t_cpp;
            tic
            %% matlab function
            
@@ -243,12 +256,12 @@ for k=1:nb_palier;
                 % OMP
                 tic
                 [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),matlab_faustS_mult{ll},M,'stopTol',1*Sparsity,'P_trans',matlab_trans_faustS_mult{ll},'verbose',false);
-                t2=toc;
+                tmatlab=toc;
            elseif strcmp(solver_choice,'iht') 
                 % IHT
                 tic
                 [sol_solver_hat(:,i), err_mse_solver, iter_time_solver]=hard_l0_Mterm(Data(:,i),matlab_faustS_mult{ll},M,1*Sparsity,'verbose',false,'maxIter',1000,'P_trans',matlab_trans_faustS_mult{ll},'verbose',false);
-                t2=toc;
+                tmatlab=toc;
             else
                 error('invalid solver choice : must be omp or iht');
            end
@@ -257,7 +270,7 @@ for k=1:nb_palier;
            idx_solver = find(sol_solver_hat(:,i));
            resDist_matlab(ll+1,k,1,i) = min(norm(points(idx(1)) - points(idx_solver(1))),norm(points(idx(1)) - points(idx_solver(2))));
            resDist_matlab(ll+1,k,2,i) = min(norm(points(idx(2)) - points(idx_solver(1))),norm(points(idx(2)) - points(idx_solver(2))));
-           compute_Times_matlab(ll+1,k,i)=t2;
+           compute_Times_matlab(ll+1,k,i)=tmatlab;
        end
 
 
@@ -267,6 +280,7 @@ close(h);
 
 matfile = fullfile(pathname, 'output/results_BSL_user');
 save(matfile,'resDist','params','resDist_matlab','RCG_approxS_MEG','nb_approx_MEG','compute_Times','compute_Times_matlab', 'RCG_approxS_MEG');
+
 
 
 

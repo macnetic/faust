@@ -201,11 +201,13 @@ void  Faust::Vect<FPP,Cpu>::multiplyLeft(Faust::MatDense<FPP,Cpu> const& A)
 }
 
 template<typename FPP>
-void  Faust::Vect<FPP,Cpu>::multiplyLeft(Faust::MatSparse<FPP,Cpu> const& A)
+void  Faust::Vect<FPP,Cpu>::multiplyLeft(Faust::MatSparse<FPP,Cpu> const& A,const char transA)
 {
-	int nbColA = A.getNbCol();
-
-	if(nbColA != vec.size())
+	faust_unsigned_int nbColOpA,nbRowOpA;	
+	A.setOp(transA,nbRowOpA,nbColOpA);
+		
+	   
+	if(nbColOpA != vec.size())
 	{
 		 handleError(m_className,"multiplyLeft : incorrect dimensions");
 
@@ -214,7 +216,10 @@ void  Faust::Vect<FPP,Cpu>::multiplyLeft(Faust::MatSparse<FPP,Cpu> const& A)
 		#ifdef __COMPILE_TIMERS__
 			t_local_multiplyLeft.start();
 		#endif
-		vec = A.mat * vec;
+		if (transA == 'N')
+			vec = A.mat * vec;
+		else
+		        vec = A.mat.transpose() * vec;	
 		#ifdef __COMPILE_TIMERS__
 			t_local_multiplyLeft.stop();
 			cout <<"0 "<<setprecision(10)<<t_local_multiplyLeft.get_time()<<endl;
@@ -222,7 +227,7 @@ void  Faust::Vect<FPP,Cpu>::multiplyLeft(Faust::MatSparse<FPP,Cpu> const& A)
 		#endif
 
 
-	dim = A.dim1;
+	dim = nbRowOpA;
 }
 
 #endif

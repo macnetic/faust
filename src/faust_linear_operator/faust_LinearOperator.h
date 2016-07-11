@@ -32,7 +32,7 @@ namespace Faust
 
         virtual faust_unsigned_int getNbRow() const=0;
         virtual faust_unsigned_int getNbCol() const=0;
-
+	virtual	void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const=0;
 
         /*!
         *  \brief Transpose the Faust::MatDense

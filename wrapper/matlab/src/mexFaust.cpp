@@ -145,20 +145,33 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
     if (!strcmp("multiply", cmd)) {
+	
+	if (nlhs > 1 ||  nrhs != 4)
+            mexErrMsgTxt("Multiply: Unexpected arguments.");
 
-        const size_t SIZE_A1 = mxGetM(prhs[2]);
-        const size_t SIZE_A2 = mxGetN(prhs[2]);
+	mwSize nelem = mxGetNumberOfElements(prhs[3]);
+	if (nelem != 1)
+		mexErrMsgTxt("invalid char argument.");
+	
+	mxChar * char_array=mxGetChars(prhs[3]);
+	char op=char_array[0];	
+			
+        const size_t nbRowA = mxGetM(prhs[2]);
+        const size_t nbColA = mxGetN(prhs[2]);
+	faust_unsigned_int nbRowOp_,nbColOp_;
+	(*core_ptr).setOp(op,nbRowOp_,nbColOp_);
+	const size_t nbRowOp = nbRowOp_;
+	const size_t nbColOp = nbColOp_;			
+        const size_t nbRowB = nbRowOp;
+        const size_t nbColB = nbColA;
 
-        const size_t SIZE_B1 = core_ptr->getNbRow();
-        const size_t SIZE_B2 = SIZE_A2;
-
+	
 
         // Check parameters
-        // if (nlhs != 1 || nrhs != 3)
-	if (nlhs > 1 ||  nrhs != 3)
-            mexErrMsgTxt("Multiply: Unexpected arguments.");
+        
+	
         if (mxGetNumberOfDimensions(prhs[2]) != 2
-                || SIZE_A1 != core_ptr->getNbCol() )
+                || nbRowA != nbColOp )
             mexErrMsgTxt("Multiply: Wrong number of dimensions for the input vector or matrix (third argument).");
 
 
@@ -241,13 +254,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
 	// Si prhs[2] est un vecteur
-	if(SIZE_A2 == 1)
+	if(nbColA == 1)
 	{
-        Faust::Vect<FFPP,Cpu> A(SIZE_A1, ptr_data);
-        Faust::Vect<FFPP,Cpu> B(SIZE_B1);
-        B = (*core_ptr)*A;
-
-		const mwSize dims[2]={SIZE_B1,SIZE_B2};
+        Faust::Vect<FFPP,Cpu> A(nbRowA, ptr_data);
+        Faust::Vect<FFPP,Cpu> B(nbRowB);
+	//NB        
+	//B = (*core_ptr)*A;
+	B = (*core_ptr).multiply(A,op);
+	
+		const mwSize dims[2]={nbRowB,nbColB};
 		if(sizeof(FFPP)==sizeof(float))
 			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
 		else if(sizeof(FFPP)==sizeof(double))
@@ -256,16 +271,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("FFPP type is neither double nor float");
 
 		FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
-		memcpy(ptr_out, B.getData(), SIZE_B1*SIZE_B2*sizeof(FFPP));
+		memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));
 	}
 	// Si prhs[2] est une matrice
 	else
 	{
-        	Faust::MatDense<FFPP,Cpu> A(ptr_data, SIZE_A1, SIZE_A2);
-		Faust::MatDense<FFPP,Cpu> B(SIZE_B1, SIZE_A2);
+        	Faust::MatDense<FFPP,Cpu> A(ptr_data, nbRowA, nbColA);
+		Faust::MatDense<FFPP,Cpu> B(nbRowB, nbColA);
 		B = (*core_ptr)*A;
 
-		const mwSize dims[2]={SIZE_B1,SIZE_B2};
+		const mwSize dims[2]={nbRowB,nbColB};
 		if(sizeof(FFPP)==sizeof(float))
 			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
 		else if(sizeof(FFPP)==sizeof(double))
@@ -274,7 +289,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("FFPP type is neither double nor float");
 
 		FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
-		memcpy(ptr_out, B.getData(), SIZE_B1*SIZE_B2*sizeof(FFPP));
+		memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));
 	}
 	if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
 

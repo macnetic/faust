@@ -92,6 +92,7 @@ namespace Faust
         void Display()const;
         void transpose();
         void updateNonZeros();
+	void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const;
         ///(*this) = (*this) * A
         void multiply(const Transform<FPP,Cpu> & A);
         ///(*this) = A * (*this)
@@ -99,9 +100,9 @@ namespace Faust
         void scalarMultiply(const FPP scalar);
         FPP spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
         ~Transform(){}
+	Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis); const
 
-
-        public:
+       
         void operator=(const Transform<FPP,Cpu>&  f){data=f.data;totalNonZeros=f.totalNonZeros;}
         /// add all of the sparse matrices from f.data to this->data
         void operator*=(const FPP  scalar){scalarMultiply(scalar);};
