@@ -85,7 +85,7 @@ namespace Faust
         //! \brief Vect::multiplyLeft is used to replace this by A * (*this)
         //! \param A is a matrix (dense or sparse).
         void  multiplyLeft(Faust::MatDense<FPP,Cpu> const& A); //{Faust::gemv(A, *this, *this, 1.0, 0.0, 'N');}
-        void  multiplyLeft(Faust::MatSparse<FPP,Cpu> const& A,const char TransA='N');
+        void  multiplyLeft(Faust::MatSparse<FPP,Cpu> const& S,const char TransS='N');
 
         FPP sum()const{return vec.sum();}
         FPP mean()const{return vec.mean();}

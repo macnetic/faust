@@ -466,10 +466,9 @@ void Faust::Transform<FPP,Cpu>::transpose()
 
 
 template<typename FPP>
-Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis)
+Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis) const
 {
-	int nbRowOpThis,nbColOpThis;
-	
+
 
 	if (size() == 0)
 		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
@@ -478,12 +477,12 @@ Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,C
  
 	if (opThis == 'N')
 	{	
-		for (int i=size()-1 ; i >= 0 ; i--)
+		for (int i=this->size()-1 ; i >= 0 ; i--)
 			vec.multiplyLeft(data[i]);
 		
 	}else
 	{		
-		for (int i=0 ; i < size() ; i++)
+		for (int i=0 ; i < this->size() ; i++)
 		{	
 			vec.multiplyLeft(data[i],opThis);
 		}
@@ -493,15 +492,41 @@ Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,C
 
 		
 	
-
-
-
-
-
-
-
-
 }
+
+
+
+
+template<typename FPP>
+Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis) const
+{
+
+
+	if (size() == 0)
+		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
+	
+	Faust::MatDense<FPP,Cpu> mat(A);
+ 
+	if (opThis == 'N')
+	{	
+		for (int i=this->size()-1 ; i >= 0 ; i--)
+			mat.multiplyLeft(data[i]);
+		
+	}else
+	{		
+		for (int i=0 ; i < this->size() ; i++)
+		{	
+			mat.multiplyLeft(data[i],opThis);
+		}
+		
+	}
+	return mat;
+
+		
+	
+}
+
+
 
 
 

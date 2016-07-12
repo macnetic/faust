@@ -278,7 +278,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
         	Faust::MatDense<FFPP,Cpu> A(ptr_data, nbRowA, nbColA);
 		Faust::MatDense<FFPP,Cpu> B(nbRowB, nbColA);
-		B = (*core_ptr)*A;
+		B = (*core_ptr).multiply(A,op);
 
 		const mwSize dims[2]={nbRowB,nbColB};
 		if(sizeof(FFPP)==sizeof(float))

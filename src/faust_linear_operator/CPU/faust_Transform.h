@@ -100,7 +100,8 @@ namespace Faust
         void scalarMultiply(const FPP scalar);
         FPP spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
         ~Transform(){}
-	Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis); const
+	Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N') const;
+	Faust::MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis='N') const;
 
        
         void operator=(const Transform<FPP,Cpu>&  f){data=f.data;totalNonZeros=f.totalNonZeros;}

@@ -209,7 +209,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         void operator+=(const Faust::MatSparse<FPP,Cpu>& M);
         void operator-=(const Faust::MatSparse<FPP,Cpu>& M);
 
-        void multiplyLeft(const Faust::MatSparse<FPP,Cpu>& M);
+        void multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S,const char TransS='N');
 
         FPP* getData(){isZeros=false; isIdentity=false;return mat.data();}
         const FPP* getData()const{return mat.data();}

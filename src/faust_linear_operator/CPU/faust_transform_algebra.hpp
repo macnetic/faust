@@ -65,105 +65,7 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
 }
 
 //////////// modif AL AL
- template<typename FPP>
- void Faust::multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult)
-  {
-	 int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB, nbFact;
-
-	 if  ((&(C.mat)) == (&(B.mat)))
-	 {
-		 handleError("Faust::Transform algebra "," Faust::multiply : C is the same object as B");
-	 }
-
-	 nbFact = A.size();
-	 if (nbFact != 0)
-	 {
-		 if (typeA == 'T')
-		 {
-			 nbRowOpA = A.getNbCol();
-			 nbColOpA = A.getNbRow();
-		 }else
-		 {
-			 nbRowOpA = A.getNbRow();
-			 nbColOpA = A.getNbCol();
-		 }
-	 }
-
-		 nbRowOpB = B.getNbRow();
-		 nbColOpB = B.getNbCol();
-
-
-	 if (nbFact != 0)
-	 {
-		 if (typeMult == 'R')
-		 {
-			 if (nbColOpA != nbRowOpB)
-			 {
-				 handleError("Faust::Transform algebra "," Faust::multiply :  dimension of Faust::Transform<FPP,Cpu> 1 and Faust::MatSparse mismatch");
-			 }
-		 }else
-		 {
-
-
-			 if (nbColOpB != nbRowOpA)
-			 {
-
-				 handleError("Faust::Transform algebra "," Faust::multiply : dimension of Faust::Transform<FPP,Cpu> A and Faust::MatSparse B mismatch");
-			 }
-		 }
-	 }else
-	 {
-		 handleWarning(" Faust::Transform<FPP,Cpu>_algebra : Faust::multiply : empty Faust::Transform<FPP,Cpu>");
-	 }
-
-	 // if the Faust::Transform<FPP,Cpu> A is empty, it's considere as the identity, so C = equal B, it is useful into the algorithm Faust::Palm4MSA, where the Faust::Transform<FPP,Cpu>s L and R can be empty
-	 C = B;
-	 C.scalarMultiply(alpha);
-	 C.resize(nbRowOpB,nbColOpB);
-	 if (nbFact != 0)
-	 {
-		 if (typeA == 'T')
-		 {
-			 if(typeMult == 'R')
-			 {
-				 for (int i=0 ; i<nbFact ; i++)
-				 {
-					 C.mat = A.data[i].mat.transpose() * C.mat;
-				 }
-				 C.resize(nbRowOpA,nbColOpB);
-
-			 }else
-			 {
-				 for (int i=nbFact-1 ; i>=0 ; i--)
-				 {
-				 C.mat = C.mat * A.data[i].mat.transpose();
-				 }
-				 C.resize(nbRowOpB,nbColOpA);
-			 }
-
-
-		 }else
-		 {
-			 if(typeMult == 'R')
-			 {
-				 for (int i=nbFact-1 ; i>=0 ; i--)
-				 {
-					 C.mat = A.data[i].mat * C.mat;
-				 }
-				 C.resize(nbRowOpA,nbColOpB);
-			 }else
-			 {
-				 for (int i=0 ; i<nbFact ; i++)
-				 {
-					 C.mat = C.mat*A.data[i].mat;
-				 }
-				 C.resize(nbRowOpB,nbColOpA);
-			 }
-		 }
-	 }
-
-
-  }
+ 
 //////////// modif AL AL
 
 
@@ -171,25 +73,14 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
 template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v)
 {
-	Faust::Vect<FPP,Cpu> vec(v);
-	if (f.size() == 0)
-		handleWarning("Faust::Transform<FPP,Cpu> algebra : operator* : empty Faust::Transform<FPP,Cpu>");
 
-	for (int i=f.size()-1 ; i >= 0 ; i--)
-		vec.multiplyLeft(f.data[i]);
-	return vec;
+	return f.multiply(v);
 }
 
 template<typename FPP>
 Faust::MatDense<FPP,Cpu> Faust::operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M)
 {
-	Faust::MatDense<FPP,Cpu> A(M);
-	if (f.size() == 0)
-		handleWarning("Faust::Transform<FPP,Cpu> algebra : operator * : empty Faust::Transform<FPP,Cpu>");
-
-	for (int i=f.size()-1 ; i >= 0 ; i--)
-		A.multiplyLeft(f.data[i]);
-	return A;
+	return f.multiply(M);
 }
 
 #endif

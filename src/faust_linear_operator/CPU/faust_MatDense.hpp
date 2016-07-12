@@ -552,9 +552,11 @@ void Faust::MatDense<FPP,Cpu>::scalarMultiply(Faust::MatDense<FPP,Cpu> const& A)
 
 
 template<typename FPP>
-void Faust::MatDense<FPP,Cpu>::multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S)
+void Faust::MatDense<FPP,Cpu>::multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S,const char TransS)
 {
-	if(S.dim2 != this->dim1)
+	faust_unsigned_int nbColOpS,nbRowOpS;	
+	S.setOp(TransS,nbRowOpS,nbColOpS);	
+	if(nbColOpS != this->dim1)
 	{
 		//std::cerr << "Error in Faust::MatDense<FPP,Cpu>::operator*= : incorrect matrix dimensions" << std::endl;
 		//exit(EXIT_FAILURE);
@@ -566,16 +568,24 @@ void Faust::MatDense<FPP,Cpu>::multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S)
 		this->operator=(S);
 		isIdentity = false;
 		isZeros = false;
+
+		if (TransS == 'T')
+			this->transpose();
 	}
 	else if (isZeros)
 	{
-		resize(S.dim1, this->dim2);
+		resize(nbRowOpS, this->dim2);
 		setZeros();
 	}
 	else
 	{
-			mat = S.mat * mat;
-			this->dim1 = S.dim1;
+			
+			if (TransS == 'N') 			
+				mat = S.mat * mat;
+			else
+				mat = S.mat.transpose() * mat;
+
+			this->dim1 = nbRowOpS;
 	}
 
 }
