@@ -193,32 +193,28 @@ template<typename FPP>
 mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 {
 		mxArray * mxMat;
-		FPP * mat_ptr;
 		int row,col;
 		row = M.getNbRow();
         col = M.getNbCol();
         mxMat = mxCreateDoubleMatrix(row,col,mxREAL);
-        mat_ptr = (FPP *) mxCalloc(row*col,sizeof(FPP));
-        memcpy(mat_ptr,M.getData(),row*col*sizeof(double));
-        mxSetM(mxMat, row);
-        mxSetN(mxMat, col);
-		if (sizeof(double) == sizeof(FPP))
+        double* mxMatdata = mxGetPr(mxMat);
+	
+		if (typeid(double) == typeid(FPP))
+			memcpy(mxMatdata,M.getData(),sizeof(double)*row*col);			
+			
+		else
 		{
-			mxSetPr(mxMat, (double *)mat_ptr);
-		}else
-		{
-			double*	 mat_ptr_bis = (double *) mxCalloc(row*col,sizeof(double));
+			double*	 mat_ptr = (double *) mxCalloc(row*col,sizeof(double));
 			for (int i=0;i<row*col;i++)
 			{
-				mat_ptr_bis[i] = (double) mat_ptr[i];
+				mat_ptr[i] = (double) M.getData()[i];
 			}
-			mxSetPr(mxMat, mat_ptr_bis);
-		}
-
-		//mxArray * rhs[1];
-		//rhs[0]=mxMat;
-        //mexCallMATLAB(0,NULL,1,rhs, "disp");
+			memcpy(mxMatdata,mat_ptr,sizeof(double)*row*col);
+			mxFree(mat_ptr);
+			
+		}		
 		return mxMat;
+		
 }
 
 

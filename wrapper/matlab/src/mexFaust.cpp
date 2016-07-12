@@ -90,6 +90,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Get the class instance pointer from the second input
 	Faust::Transform<FFPP,Cpu>* core_ptr = convertMat2Ptr<Faust::Transform<FFPP,Cpu> >(prhs[1]);
 
+	
 	if (!strcmp("size",cmd))
 	{
 		const size_t SIZE_B1 = core_ptr->getNbRow();
@@ -102,10 +103,46 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		return;
 	}
 
+	// get_fact : return the id factor of the faust	
+	if (!strcmp("get_fact", cmd))
+    	{
+		if (nlhs > 1 || nrhs != 3)
+		{
+			mexErrMsgTxt("get_fact : incorrect number of arguments.");
+		}
+		int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
+		Faust::MatSparse<FFPP,Cpu> const sp_factor = core_ptr->get_fact(id_fact);
+		Faust::MatDense<FFPP,Cpu> const dense_factor(sp_factor);
+		plhs[0]=FaustMat2mxArray(dense_factor);
+		return;
+		
+
+	}
+
+
+	if (!strcmp("get_nb_factor", cmd))
+    	{
+		if (nlhs != 1 || nrhs != 2)
+		{
+			mexErrMsgTxt("get_nb_factor : incorrect number of arguments.");
+		}
+		
+		faust_unsigned_int nb_fact = core_ptr->size();
+		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+		double* ptr_out = (double*) mxGetData(plhs[0]);
+		ptr_out[0]=(double) nb_fact;
+		return;
+		
+
+	}
+
+
+    
+
     	if (!strcmp("get_product",cmd))
 	{
 		if (nlhs != 1 || nrhs != 2)
-			mexWarnMsgTxt("get_product: Unexpected arguments ignored.");
+			mexErrMsgTxt("get_product: Unexpected arguments");
 		if(core_ptr->size() == 0)
 			mexErrMsgTxt("get_product : empty faust core");
 		const size_t SIZE_B1 = core_ptr->getNbRow();
@@ -296,6 +333,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
         return;
     }
+
+
+    
 
 
 //     // Call the various class methods

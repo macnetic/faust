@@ -65,7 +65,7 @@ namespace Faust
 
         void get_facts(std::vector<Faust::MatSparse<FPP,Cpu> >& sparse_facts)const{sparse_facts = data;}
         void get_facts(std::vector<Faust::MatDense<FPP,Cpu> >& facts)const;
-        int size()const{return data.size();}
+        faust_unsigned_int size()const{return data.size();}
         void size(int size_)const{ data.resize(size_);}
 
 
@@ -77,7 +77,8 @@ namespace Faust
         // modif AL AL
         // Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const
         // {return (*this).get_product();}
-        Faust::MatSparse<FPP,Cpu> get_fact(int id) const;
+        Faust::MatSparse<FPP,Cpu> get_fact(faust_unsigned_int id) const;
+	
         faust_unsigned_int getNbRow() const;
         faust_unsigned_int getNbCol() const;
         void print_file(const char* filename) const;

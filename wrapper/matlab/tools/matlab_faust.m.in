@@ -16,8 +16,23 @@ classdef matlab_faust < handle
             % Constructor - build a faust from a cell array of matrix and a scalar (optional)
             %                1st input : 1D cell array of matrix (sparse or dense)
             %                2nd input : (optional) multiplicative scalar
-            this.objectHandle = mexFaust('new',varargin{:});
-        end
+	    %              - or from a filename (mat file) where a faust is stored with save_faust
+	    if (nargin == 1) && ischar(varargin{1})
+		filename=varargin{1};
+		load(filename);
+		if (~exist('faust_factors','var'))
+			error('matlab_faust : invalid filename');
+		end
+		this=matlab_faust(faust_factors);
+	    else
+		this.objectHandle = mexFaust('new',varargin{:});
+	    end
+		
+	end
+
+ 
+            
+
         
         %% Destructor - Destroy the C++ class instance
         function delete(this)
@@ -45,6 +60,7 @@ classdef matlab_faust < handle
             % get_product - compute the dense matrix equivalent to the faust (the product of sparse matrix)
             [varargout{1:nargout}]=mexFaust('get_product',this.objectHandle);
         end
+
         %% Transpose operator
         function trans=transpose(this)
             %transpose - overloading of the matlab transpose operator (')
@@ -66,6 +82,8 @@ classdef matlab_faust < handle
                 
             end
         end
+
+
         %% Size
         function varargout = size(this,varargin)
             %size - overload of the matlab size function
@@ -105,10 +123,59 @@ classdef matlab_faust < handle
                 varargout{2}=Size(2);
             end
         end
-        
+
+
+
+	%% get_fact : return the id factor of the faust as a dense matrix
+        function factor = get_fact(this,id)
+		% get_fact : return the id factor of the faust as a dense matrix
+		if (~isa(id,'double'))
+			error('get_fact second argument (indice) must either be real positive integers or logicals.');
+		end
+
+		if (floor(id) ~= id)
+			error('get_fact second argument (indice) must either be real positive integers or logicals.');
+		end
+
+		factor = mexFaust('get_fact',this.objectHandle,id);
+	end
+
+
+	%% get_nb_factor : return the number of factor of the faust
+	function nb_factor = get_nb_factor(this)
+		% get_nb_factor : return the number of factor of the faust
+		nb_factor = mexFaust('get_nb_factor',this.objectHandle);
+	end
+
+	%% save a faust into a matfile
+	function save_faust(this,filename)
+		% save a faust into a matfile
+		if (~ischar(filename))
+			error('second argument must contains a string (a filename)');
+		end
+		
+		nb_fact=get_nb_factor(this);
+		
+		faust_factors=cell(1,nb_fact);
+
+		for i=1:nb_fact
+			faust_factors{i}=get_fact(this,i);
+		end
+		
+		save(filename,'faust_factors');
+		
+		
+	end
         
     end
     
 end
+
+
+
+
+
+
+
 
 

@@ -10,7 +10,6 @@ int_max= 100;
 threshold = 10^(-15); % equality test
 
 %% creation du faust
-
 factors=cell(1,nb_fact);
 factors{1}=double(randi(int_max,dim1,dim2));
 for i=2:nb_fact
@@ -37,6 +36,47 @@ if ((dim1_test1 ~= dim1) | (dim2_test1 ~= dim2))
 end
 
 
+%% get_nb_factor test
+nb_fact_test=get_nb_factor(F);
+if (nb_fact_test ~= nb_fact)
+	error('get_nb_factor : invalid number of factor of the faust');
+end
+
+%% get_fact test
+for i=1:nb_fact
+	A=get_fact(F,i);
+	if(A~=factors{i})
+		error('get_fact : invalid factor');
+	end
+
+end
+
+
+%% load_faust and save_faust test
+filename = 'faust.mat';
+save_faust(F,filename);
+F_loaded = matlab_faust(filename);
+[dim1_loaded,dim2_loaded]=size(F_loaded);
+
+if (dim1_loaded ~= dim1) | (dim2_loaded ~= dim2)
+	error('load and save faust : invalid dimension');
+end
+
+nb_fact_load=get_nb_factor(F);
+if (nb_fact_load ~= nb_fact)
+	error('load and save faust : invalid number of factor of the loaded faust ');
+end
+
+for i=1:nb_fact
+	A=get_fact(F_loaded,i);
+	if(A~=factors{i})
+		error('get_fact : invalid factor');
+	end
+
+end
+
+
+
 %% get_product test
 F_dense= get_product(F);
 
@@ -56,7 +96,7 @@ end
 
 F_dense_trans=get_product(F_trans);
 
-if(norm(F_dense' - F_dense_trans)>threshold)
+if (F_dense' ~= F_dense_trans)
    error(['transpose : invalid value']); 
 end
 

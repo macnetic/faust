@@ -376,18 +376,22 @@ void Faust::Transform<FPP,Cpu>::multiplyLeft(const Faust::Transform<FPP,Cpu> & A
 
 
 template<typename FPP>
-Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_fact(int id)const
+Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_int id)const
 {
-	if((id>=size())||(id<0))
+	if(id>=size())
 	{
-		cout<<"id_fact error : "<<id<<endl;
 		handleError(m_className,"get_fact : id exceed Faust::Transform size or id < 0");
 	}
-	cout<<"size_fact"<<size()<<endl;
-	cout<<"id_fact"<<id<<endl;
+
 
 	return data[id];
 }
+
+
+
+
+
+
 
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatSparse<FPP,Cpu>& S)
