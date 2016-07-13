@@ -41,7 +41,12 @@ if(UNIX)
 	#message(STATUS "MATLAB_DIR_TMP 4 = ${MATLAB_DIR_TMP}")
 
 elseif(WIN32)
-	exec_program("where \R 'C:\Program Files\MATLAB\' matlab.exe" OUTPUT_VARIABLE MATLAB_DIR_TMP)
+	message(STATUS "MATLAB_DIR_TMP = ${MATLAB_DIR_TMP}")
+	#message(STATUS "where /R \"C:\\Program Files\\MATLAB\" matlab.exe")
+	#exec_program("where /R \"C:\\Program Files\\MATLAB\" matlab.exe" OUTPUT_VARIABLE MATLAB_DIR_TMP)
+	#message(STATUS "MATLAB_DIR_TMP 2 = ${MATLAB_DIR_TMP}")
+	set(MATLAB_DIR_TMP "C:\\Program Files\\MATLAB\\R2015b\\bin\\matlab.exe")
+	message(STATUS "MATLAB_DIR_TMP 2 = ${MATLAB_DIR_TMP}")	
 else()
 	message(WARNING "Unknown type of plateform for matlab")		
 endif()
@@ -52,7 +57,7 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 		# string(REGEX REPLACE "([a-zA-Z0-9_/:]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
 		string(REGEX REPLACE "([a-zA-Z0-9_/:.-]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}") # sous mac on a un point ds le path .app
 	elseif(WIN32)
-		string(REGEX REPLACE "([a-zA-Z0-9_\\:]+)\\\\bin\\\\matlab.exe" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
+		string(REGEX REPLACE "([a-zA-Z0-9_\\:.]+)\\\\bin\\\\matlab.exe" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
 	else()
 		message(WARNING "Unknown type of plateform for matlab")	
 	endif()
@@ -110,8 +115,6 @@ else()
 	set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
 	message(WARNING "Matlab executable seems not to be in the path. So \"MATLAB_ROOT\" and \"MATLAB_INCLUDE_DIR\" wont'be defined and mex files won't be compiled. if matlab is installed on your computer, please add matlabroot/bin tu the PATH and try again.")	
 endif()
-#endif(BUILD_MATLAB_MEX_FILES)
 ##################################################################
-
 
 
