@@ -55,6 +55,10 @@ Install:
 5-	make
 6- make install
 
+Warning : 
+mex function working with specific version of gcc depend to the platform used. 
+For that, please refers to the matworks information: 
+http://fr.mathworks.com/support/compilers/R2016a/index.html
 ##########################################################################
 
 
