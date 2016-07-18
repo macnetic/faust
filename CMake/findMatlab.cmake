@@ -104,7 +104,8 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 		elseif("${MEX_SUBDIR_LIB}" STREQUAL "win32")
 			set(MEX_EXT  "mexw32")
 		endif()	
-
+		
+		#message(STATUS "TEST ALALALALALALALAL MATLAB_ROOT has been found : ${MEX_SUBDIR_LIB} ${MEX_EXT}")
 		# METHODE 2 (using matlab)
 		#exec_program("${PROJECT_SOURCE_DIR}/CMake/matlab_arch.bat 0 \"${MATLAB_ARCH_FILE}\"" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
 		#exec_program("${PROJECT_SOURCE_DIR}/CMake/matlab_arch.bat 1 \"${MATLAB_ARCH_FILE}\"" OUTPUT_VARIABLE MEX_EXT)
@@ -116,5 +117,4 @@ else()
 	message(WARNING "Matlab executable seems not to be in the path. So \"MATLAB_ROOT\" and \"MATLAB_INCLUDE_DIR\" wont'be defined and mex files won't be compiled. if matlab is installed on your computer, please add matlabroot/bin tu the PATH and try again.")	
 endif()
 ##################################################################
-
 
