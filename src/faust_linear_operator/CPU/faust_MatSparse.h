@@ -201,8 +201,8 @@ namespace Faust
 
 
         //! *this = S * (*this)
-        friend void  Faust::Vect<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS='N');
-	friend void  Faust::MatDense<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS='N');
+        friend void  Faust::Vect<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);
+	friend void  Faust::MatDense<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);
 
         friend void Faust::multiply<>(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
         friend void Faust::spgemm<>(const MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
