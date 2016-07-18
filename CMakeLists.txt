@@ -4,7 +4,7 @@
 #  - CMake/* files, which define some tools to search for libraries, etc.
 
 ## For windows platform :
-# cmake -G "MinGw Makefiles" ..
+# cmake -G "MinGW Makefiles" ..
 # message(STATUS "CXX=$ENV{CXX}")
 # sous windows on utilise MinGW pour le compilateur GCC G++ au lieu de visual studio plous lourd à installer. MinGW version 4.9.2 pour les mex functions..
 # set(CTEST_CMAKE_GENERATOR "MinGW Makefiles") 
