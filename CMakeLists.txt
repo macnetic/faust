@@ -2,8 +2,14 @@
 ## Other important files for CMake are
 #  - CMakeLists.txt files in the sub-directories
 #  - CMake/* files, which define some tools to search for libraries, etc.
-#message(STATUS "CXX=$ENV{CXX}")
 
+## For windows platform :
+# cmake -G "MinGw Makefiles" ..
+# message(STATUS "CXX=$ENV{CXX}")
+# sous windows on utilise MinGW pour le compilateur GCC G++ au lieu de visual studio plous lourd à installer. MinGW version 4.9.2 pour les mex functions..
+# set(CTEST_CMAKE_GENERATOR "MinGW Makefiles") 
+	
+	
 cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
 
