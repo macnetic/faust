@@ -41,7 +41,7 @@
 
 
 
-n = 128;
+n = 32;
 M = log2(n);
 
 %% Generating the data
