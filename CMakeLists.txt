@@ -1,7 +1,8 @@
-###### Main CMakeLists.txt of the FAUST project ######
+﻿###### Main CMakeLists.txt of the FAUST project ######
 ## Other important files for CMake are
 #  - CMakeLists.txt files in the sub-directories
 #  - CMake/* files, which define some tools to search for libraries, etc.
+#message(STATUS "CXX=$ENV{CXX}")
 
 cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
@@ -362,7 +363,8 @@ else()
 		if (BUILD_MULTITHREAD)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
 		endif(BUILD_MULTITHREAD)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  /EHs /MD /O2" CACHE STRING "compile flags" FORCE)
+		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHs /MD /O2" CACHE STRING "compile flags" FORCE)
+		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHs /MD /O2" CACHE STRING "compile flags" FORCE)
 	else()
 		message(WARNING "Unknown type of plateform for CMAKE_CXX_FLAGS")		
 	endif()
@@ -380,7 +382,6 @@ endif()
 message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 ##################################################################
 
-
 #########################################
 ###### FIND EXTERNALS LIBRARY  ##########
 include(CMake/findExternalLibs.cmake)
@@ -395,6 +396,7 @@ if (BUILD_DOCUMENTATION)
 	add_subdirectory(${FAUST_DOC_SRC_DIR} ${FAUST_DOC_BIN_DIR})
 endif ()
 add_subdirectory(${FAUST_SRC_CMDLINE_DIR} ${FAUST_BIN_CMDLINE_BIN_DIR})
+
 if (BUILD_USE_GPU)
 	add_subdirectory(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR} ${FAUST_BIN_LINEAR_OPERATOR_GPU_DIR})
 	#add_subdirectory(${FAUST_FAUSTCORE_CU_SRC_DIR} ${FAUST_FAUSTCORE_CU_BIN_DIR})
@@ -424,7 +426,6 @@ else (BUILD_USE_GPU)
 	endif(BUILD_MATLAB_MEX_FILES)
 endif (BUILD_USE_GPU)
 
-
 if (BUILD_MATLAB_MEX_FILES)
 	if (UNIX) 
 		if(APPLE)
@@ -434,7 +435,8 @@ if (BUILD_MATLAB_MEX_FILES)
 		endif(APPLE)
 		
 	elseif(WIN32)
-		message(FATAL_ERROR "MEXFILE : CANNOT SEARCH LIBMEX IN WINDOWS")
+		target_link_libraries(${FAUST_TARGET} ${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}/libmex.dll)
+		#message(FATAL_ERROR "MEXFILE : CANNOT SEARCH LIBMEX IN WINDOWS")
 	endif()
 endif(BUILD_MATLAB_MEX_FILES)
 
