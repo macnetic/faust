@@ -40,7 +40,7 @@ file(MAKE_DIRECTORY ${FAUST_TMPMEX_DIR})
 if(UNIX)
 	set(MEXOBJ_EXT "o")
 elseif(WIN32)
-	set(MEXOBJ_EXT ".obj")
+	set(MEXOBJ_EXT "obj")
 endif()
 
 
