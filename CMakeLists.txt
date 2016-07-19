@@ -8,9 +8,10 @@
 # message(STATUS "CXX=$ENV{CXX}")
 # sous windows on utilise MinGW pour le compilateur GCC G++ au lieu de visual studio plous lourd à installer. MinGW version 4.9.2 pour les mex functions..
 # set(CTEST_CMAKE_GENERATOR "MinGW Makefiles") 
-	
-	
-cmake_minimum_required(VERSION 2.8.8)
+
+# modif NB	
+cmake_minimum_required(VERSION 3.2.2) #compatibilite UTF-8 ASCII (Windows Ubunt)u)	
+#cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
 
 #set(FAUST_VERSION_MAJOR 1)
