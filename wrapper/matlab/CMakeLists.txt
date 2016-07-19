@@ -45,7 +45,7 @@ if(UNIX)
 	endif()
 elseif(WIN32)
 	# MODIF ALALAL
-	#set(LDD_MEX_FLAGS "-L${FAUST_BIN_DIR}" "-l${FAUST_TARGET}")
+	set(LDD_MEX_FLAGS "-L${FAUST_BIN_DIR}" "-l${FAUST_TARGET}")
 endif()
 
 if(UNIX)
@@ -60,10 +60,9 @@ elseif(WIN32)
 	add_custom_target(MEXFILE_TARGET_LIST_TARGET DEPENDS  ${MEXFILE_TARGET_LIST})
 	add_custom_target(MEXOBJ_FILES_TARGET DEPENDS ${MEXOBJ_FILES})
 	add_dependencies(MEXFILE_TARGET_LIST_TARGET MEXOBJ_FILES_TARGET)
-
 ######## file(GLOB CPP_SRC_FILES "${FAUST_EXCEPTION_SRC_DIR}/*.cpp" "${FAUST_MATRIX_SRC_DIR}/*.cpp" "${FAUST_FAUSTCORE_SRC_DIR}/*.cpp" "${FAUST_PALM4MSA_SRC_DIR}/*.cpp"  "${FAUST_MEXINTERFACETOOLS_SRC_DIR}/*.cpp")
-	
 endif()
+
 
 foreach(mex_target ${MEXFILE_TARGET_LIST})
 	if(WIN32)
@@ -96,15 +95,19 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		endif(APPLE)
 
 	elseif(WIN32)
+	
+		file(GLOB OBJ_MEXTOOLS_FILES "${FAUST_TMPMEX_DIR}/*.${MEXOBJ_EXT}")
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
-		COMMAND   ${MATLAB_ROOT}/bin/mex 
-		ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" "${FAUST_TMPMEX_DIR}/*.${MEXOBJ_EXT}" 
-		${CMAKE_CXX_FLAGS_LIST}
-		DEPENDS ${MEXOBJ_FILES}
-		COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
-
+			COMMAND   ${MATLAB_ROOT}/bin/mex 
+			ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${OBJ_MEXTOOLS_FILES} 
+			${CMAKE_CXX_FLAGS_LIST}
+			DEPENDS ${MEXOBJ_FILES}
+			COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}"
+		)
+		#message(STATUS "ALALALALALAAL \"${FAUST_TMPMEX_DIR}/\\*.${MEXOBJ_EXT}\" ")
 	else()
-		message(FATAL_ERROR "Unable to compile mex functions")
+	
+		message(FATAL_ERROR "Unable to compile mex functions for this platform")
 	endif()
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/${mex_target}.m ${FAUST_MATLAB_MEX_BIN_DIR}/${mex_target}.m COPYONLY)
 	install(FILES ${FAUST_MATLAB_MEX_BIN_DIR}/${mex_target}.m DESTINATION ${FAUST_MATLAB_MEX_INSTALL_DIR})	
