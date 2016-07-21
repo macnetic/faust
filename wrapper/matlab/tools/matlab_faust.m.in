@@ -63,24 +63,15 @@ classdef matlab_faust < handle
 
         %% Transpose operator
         function trans=transpose(this)
-            %transpose - overloading of the matlab transpose operator (')
-            if (nargout	 == 0)
-                mexFaust('transpose',this.objectHandle);
-            else
-                trans = matlab_faust({});
-                trans.objectHandle = mexFaust('transpose',this.objectHandle);
-                
-            end
+            %transpose - overloading of the matlab transpose operator (.')
+                trans=ctranspose(this); % currently faust is a real matrix, so the complex transposition is the same as the real one 
+
         end
         
         function trans=ctranspose(this)
-            if (nargout	 == 0)
-                mexFaust('transpose',this.objectHandle);
-            else
+	%ctranspose - overloading of the matlab transpose operator (')
                 trans = matlab_faust({});
                 trans.objectHandle = mexFaust('transpose',this.objectHandle);
-                
-            end
         end
 
 

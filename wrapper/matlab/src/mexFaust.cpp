@@ -5,7 +5,7 @@
 #include "faust_MatDense.h"
 #include <stdexcept>
 #include "faust_constant.h"
-
+#include "faust_Timer.h"
 // prhs[0] : name of command :
 //    "delete" to delete the Faust::Transform<FFPP> object dynamically allocated previously
 //    "multiply" to multiply the Faust::Transform<FFPP> object by a vector or a matrix
@@ -172,9 +172,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("transpose : too much output argument");
 		else
 		{
-			Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>((*core_ptr));
+			//Faust::Timer t1,t2,t3;
+			//t1.start();			
+			Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>((*core_ptr));			
+			//t1.stop();			
+			//t2.start();			
 			(*F).transpose();
+			//t2.stop();
+			//t3.start();
 			plhs[0]=convertPtr2Mat<Faust::Transform<FFPP,Cpu> >(F);
+			//t3.stop();
+			//std::cout<<"t1 new : "<<t1.get_time()<<std::endl;
+			//std::cout<<"t2 transpose : "<<t2.get_time()<<std::endl;
+			//std::cout<<"t3 convertPtrMat : "<<t3.get_time()<<std::endl;
+				
 		}
 		return;
 

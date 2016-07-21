@@ -4,6 +4,10 @@ INSTALLATION README :
 
 OS : Ubuntu 14.04 (Virtual Machine)
 
+	prerequi : version cmake recente au moins 3.2.2
+	           le cmake de base fournit par apt-get est seulement à la version 2.8.4 
+
+
 	installation librarie en ligne de commande
 		I-OPENBLAS
 		II-MATIO
