@@ -25,6 +25,8 @@ ENDIF(WIN32)
 
 FIND_PROGRAM(CTEST_SVN_COMMAND NAMES svn)
 message(STATUS "CTEST_SVN_COMMAND=${CTEST_SVN_COMMAND}" )
+message(STATUS "chekout in \"${CTEST_SOURCE_DIRECTORY}\" " )
+
 SET (CTEST_SVN_CHECKOUT  "${CTEST_SVN_COMMAND} checkout --username testcdash --password testcdash https://scm.gforge.inria.fr/svn/faust/trunk/devcpp \"${CTEST_SOURCE_DIRECTORY}\"")
 SET (CTEST_CHECKOUT_COMMAND "${CTEST_SVN_CHECKOUT}")
 
