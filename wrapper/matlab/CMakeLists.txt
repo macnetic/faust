@@ -1,13 +1,11 @@
 # CMakeLists used to generated ".mexa64" files. 
 # 
-  
 
 #INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
 configure_file(${FAUST_MATLAB_TOOLS_SRC_DIR}/matlab_faust.m.in ${FAUST_MATLAB_TOOLS_BIN_DIR}/matlab_faust.m COPYONLY)
 install(FILES ${FAUST_MATLAB_TOOLS_BIN_DIR}/matlab_faust.m DESTINATION ${FAUST_MATLAB_TOOLS_INSTALL_DIR})
 
 file(GLOB CPP_MEXTOOLS_FILES "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp")
-
 # include directory 
 #{${FAUST_EXCEPTION_SRC_DIR}
 include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR} ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}  ${FAUST_MATLAB_TOOLS_SRC_DIR} ${MATLAB_INCLUDE_DIR} ${EIGEN_INC_DIR} )
@@ -22,6 +20,7 @@ add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 
 file(GLOB CPP_MEX_FILES "${FAUST_MATLAB_MEX_SRC_DIR}/*.cpp")
 ## modif AL : bug pour les noms de PATH avec un point comme par exemple : ./faust_v1.10/interface_matlab/
+## On va chercher les nom des target 
 string(REGEX REPLACE "[a-zA-Z0-9_/:.]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
 #string(REGEX REPLACE "[a-zA-Z0-9_/:]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
 
@@ -51,7 +50,6 @@ endif()
 if(UNIX)
 	add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS ${MEXFILE_TARGET_LIST} ${FAUST_TARGET} ${FAUST_MEXTOOLS_TARGET} )
 elseif(WIN32)
-# MODIF ALALAL fonctionne pas
 	file(GLOB CPP_SRC_FILES "${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp" "${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp"  "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp")
 	string(REGEX REPLACE "([a-zA-Z0-9_/:]+)\\.cpp(;|$)" "\\1\\2" MEXSRC_FULL "${CPP_SRC_FILES}")
 	string(REGEX REPLACE "[a-zA-Z0-9_/:]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "${FAUST_TMPMEX_DIR}/\\1.${MEXOBJ_EXT}\\2" MEXOBJ_FILES "${CPP_SRC_FILES}")
@@ -60,21 +58,30 @@ elseif(WIN32)
 	add_custom_target(MEXFILE_TARGET_LIST_TARGET DEPENDS  ${MEXFILE_TARGET_LIST})
 	add_custom_target(MEXOBJ_FILES_TARGET DEPENDS ${MEXOBJ_FILES})
 	add_dependencies(MEXFILE_TARGET_LIST_TARGET MEXOBJ_FILES_TARGET)
-######## file(GLOB CPP_SRC_FILES "${FAUST_EXCEPTION_SRC_DIR}/*.cpp" "${FAUST_MATRIX_SRC_DIR}/*.cpp" "${FAUST_FAUSTCORE_SRC_DIR}/*.cpp" "${FAUST_PALM4MSA_SRC_DIR}/*.cpp"  "${FAUST_MEXINTERFACETOOLS_SRC_DIR}/*.cpp")
+	
+#message (STATUS "${FAUST_MEX_TARGET}")
 endif()
 
+if(WIN32)
+	foreach( mex_src ${MEXSRC_FULL})
+		string(REGEX REPLACE "[a-zA-Z0-9_/:]+/([a-zA-Z0-9_]+)" "\\1" mexsrc_short "${mex_src}")
+		add_custom_command(OUTPUT ${FAUST_TMPMEX_DIR}/${mexsrc_short}.${MEXOBJ_EXT}
+			COMMAND  ${MATLAB_ROOT}/bin/mex 
+			ARGS "-v" "-c" "-largeArrayDims" ${mex_src}.cpp  ${CMAKE_CXX_FLAGS_LIST} "-outdir" "${FAUST_TMPMEX_DIR}" "OBJEXT=.${MEXOBJ_EXT}"
+			COMMENT "Compiling ${mex_src}.cpp for mex usage")
+	#message (STATUS "${FAUST_TMPMEX_DIR}/${mexsrc_short}.${MEXOBJ_EXT}")
+	endforeach()
+endif()
 
 foreach(mex_target ${MEXFILE_TARGET_LIST})
 	if(WIN32)
 		add_custom_target(${mex_target} DEPENDS ${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} MEXOBJ_FILES_TARGET )
-
 	elseif(UNIX)
 		add_custom_target(${mex_target} DEPENDS ${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} ${FAUST_MEXTOOLS_TARGET} ${FAUST_TARGET})
 	endif()
 
+
 	if(UNIX)
-	
-		
 		if(APPLE)
 			add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 		        COMMAND   ${MATLAB_ROOT}/bin/mex 
@@ -94,19 +101,18 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 			COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
 		endif(APPLE)
 
-	elseif(WIN32)
-	
+	elseif(WIN32)		
+		#message(STATUS "${MEXOBJ_FILES} ")
 		file(GLOB OBJ_MEXTOOLS_FILES "${FAUST_TMPMEX_DIR}/*.${MEXOBJ_EXT}")
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 			COMMAND   ${MATLAB_ROOT}/bin/mex 
-			ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${OBJ_MEXTOOLS_FILES} 
+			ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${OBJ_MEXTOOLS_FILES} ${MEXOBJ_FILES}
 			${CMAKE_CXX_FLAGS_LIST}
 			DEPENDS ${MEXOBJ_FILES}
 			COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}"
 		)
-		#message(STATUS "ALALALALALAAL \"${FAUST_TMPMEX_DIR}/\\*.${MEXOBJ_EXT}\" ")
+		#message (STATUS "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp")
 	else()
-	
 		message(FATAL_ERROR "Unable to compile mex functions for this platform")
 	endif()
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/${mex_target}.m ${FAUST_MATLAB_MEX_BIN_DIR}/${mex_target}.m COPYONLY)
@@ -115,25 +121,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 	
 endforeach()
 
-if(WIN32)
-	foreach( mex_src ${MEXSRC_FULL})
-		string(REGEX REPLACE "[a-zA-Z0-9_/:]+/([a-zA-Z0-9_]+)" "\\1" mexsrc_short "${mex_src}")
-		add_custom_command(OUTPUT ${FAUST_TMPMEX_DIR}/${mexsrc_short}.${MEXOBJ_EXT}
-			COMMAND  ${MATLAB_ROOT}/bin/mex 
-			ARGS "-v" "-c" "-largeArrayDims" ${mex_src}.cpp  ${CMAKE_CXX_FLAGS_LIST} "-outdir" "${FAUST_TMPMEX_DIR}" "OBJEXT=.${MEXOBJ_EXT}"
-			COMMENT "Compiling ${mex_src}.cpp for mex usage")
-	endforeach()
-endif()
-	
 	# CONFIGURATION DES CHEMINS	
 	configure_file(${FAUST_MATLAB_SRC_DIR}/setup_FAUST.m.in ${FAUST_MATLAB_BIN_DIR}/setup_FAUST.m @ONLY)
 	install(FILES ${FAUST_MATLAB_BIN_DIR}/setup_FAUST.m DESTINATION ${FAUST_MATLAB_INSTALL_DIR})
-
-
-
-
-
-
-
-
 

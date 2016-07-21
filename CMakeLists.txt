@@ -283,8 +283,8 @@ if (BUILD_DOCUMENTATION)
 	set(FAUST_DOC_BIN_DIR ${PROJECT_BINARY_DIR}/doc CACHE INTERNAL "")
 endif()
 ##################################################################
-
 #message(STATUS "FAUST_BIN_TEST_OUTPUT_DIR : ${FAUST_BIN_TEST_OUTPUT_DIR}")
+
 file(MAKE_DIRECTORY ${FAUST_BIN_TEST_OUTPUT_DIR})
 file(MAKE_DIRECTORY ${FAUST_BIN_TEST_FIG_DIR})
 file(MAKE_DIRECTORY ${FAUST_BIN_TEST_TMP_DIR})
@@ -333,18 +333,20 @@ endif(BUILD_USE_GPU)
 
 ###### FLAG for DEBUG or RELEASE TARGETS ######
 if(WIN32)
-	if(CMAKE_BUILD_TYPE MATCHES "Debug")
-		set(FAUST_DEBUG_RELEASE "debug")
-		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Debug)
-		set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Debug)
-	else()
-		set(FAUST_DEBUG_RELEASE "release")
-		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Release)
-		set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Release)
-	endif()
+	set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR})
+	# if(CMAKE_BUILD_TYPE MATCHES "Debug")
+		# set(FAUST_DEBUG_RELEASE "debug")
+		# set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Debug)
+		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Debug)
+	# else()
+		# set(FAUST_DEBUG_RELEASE "release")
+		# set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Release)
+		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Release)
+	# endif()
 else()
 	set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR})
 endif(WIN32)
+
 
 # adding compiler flags 
 set(CMAKE_CXX_FLAGS "")
