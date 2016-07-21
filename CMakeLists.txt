@@ -10,7 +10,8 @@
 # set(CTEST_CMAKE_GENERATOR "MinGW Makefiles") 
 
 # modif NB	
-cmake_minimum_required(VERSION 3.2.2) #compatibilite UTF-8 ASCII (Windows Ubunt)u)	
+#cmake_minimum_required(VERSION 3.2.2) #compatibilite UTF-8 ASCII (Windows Ubunt)u)	
+cmake_minimum_required(VERSION 3.0.2) #compatibilite UTF-8 ASCII (Windows Ubunt)u)
 #cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
 
