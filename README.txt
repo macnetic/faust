@@ -59,6 +59,24 @@ Warning :
 mex function working with specific version of gcc depend to the platform used. 
 For that, please refers to the matworks information: 
 http://fr.mathworks.com/support/compilers/R2016a/index.html
+
+Windows install :
+Warning : 
+for Matlab installation, function where doesn't work when Path name have space caracter like "Program file". please prefers a witout space path like "programfiles"
+where gcc // where g++ // where cmake // where make must be available. 
+
+For windows platform :
+cmake -G "MinGW Makefiles" ..
+message(STATUS "CXX=$ENV{CXX}")
+sous windows on utilise MinGW pour le compilateur GCC G++ au lieu de visual studio plous lourd à installer. MinGW version 4.9.2 pour les mex functions..
+set(CTEST_CMAKE_GENERATOR "MinGW Makefiles") 
+
+To compile MEX functions with Matlab: 
+You can use the MinGW-w64 version 4.9.2 compiler from TDM-GCC to build MEX files and standalone MATLAB® engine and MAT-file applications.
+
+creer un compte mathworks et installer depuis la plateforme MinGW-w64 version 4.9.2 compiler from TDM-GCC
+(cf. http://fr.mathworks.com/help/matlab/matlab_external/install-mingw-support-package.html for more information)
+
 ##########################################################################
 
 

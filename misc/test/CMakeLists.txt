@@ -72,8 +72,8 @@ endif(BUILD_MATLAB_MEX_FILES)
 # Running the differents binary created in this project  
 ##############################################################################
 # Critical time, which fixe the limit time of the process
-set(TIMEOUT_MEG 7200)
-set(TIMEOUT_COMP 10)
+set(TIMEOUT_MEG 8000)
+set(TIMEOUT_COMP 100)
 
 
 # MATLAB input format
@@ -102,7 +102,7 @@ if (BUILD_READ_MAT_FILE)
 	# display the result of MULTIPLY_COMPTIME and save it in folder FAUST_BIN_TEST_FIG_DIR as jpeg image (WARNING must be launched after MULTIPLY_COMPTIME)
 	add_test(NAME FIG_MULTIPLY_COMPTIME COMMAND	matlab -nodesktop -r "try;addpath('${FAUST_BIN_TEST_TIME_COMPARE_DIR}');display_multiply_comptime('${FAUST_BIN_TEST_OUTPUT_DIR}/multiply_compare_time.mat','${FAUST_BIN_TEST_FIG_DIR}') ; catch ME ; disp('ERROR IN TEST display_multiply_comptime.m Please chek the output to visualize the error. ') ; end ; exit")
 	
-	set_tests_properties(FIG_MULTIPLY_COMPTIME PROPERTIES TIMEOUT 120)
+	set_tests_properties(FIG_MULTIPLY_COMPTIME PROPERTIES TIMEOUT 300)
 
 endif (BUILD_READ_MAT_FILE)
 
@@ -134,8 +134,8 @@ if(BUILD_MATLAB_MEX_FILES)
 
 #CTEST_FULL_OUTPUT
 
-	set_tests_properties(FAUST_HIER_MEX FAUST_HADAMARD_MEX PROPERTIES TIMEOUT 30)
-	set_tests_properties(DEMO_MATLAB PROPERTIES TIMEOUT 3000)
+	set_tests_properties(FAUST_HIER_MEX FAUST_HADAMARD_MEX PROPERTIES TIMEOUT 100)
+	set_tests_properties(DEMO_MATLAB PROPERTIES TIMEOUT 6000)
 	set_tests_properties(FAUST_MEG_MEX PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 endif() 
 
