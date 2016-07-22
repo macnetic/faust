@@ -26,6 +26,9 @@ export PATH_DIR_RUN_NIGHTLY='/home/ci/CTest_Nightly'
 #export EIGENDIR='/home/ci/Library/eigen-eigen-07105f7124f9'
 #export OPENBLASDIR='/home/ci/local/OPENBLAS'
 
+#modif NB
+export LD_PRELOAD='/home/ci/local/OPENBLAS/lib/libopenblas.so' #enable matlab mexfile to find openblas at runtime
+
 #export HDF5_ROOT_DIR='/home/ci/local/HDF5/lib'
 
 
@@ -50,7 +53,7 @@ fi
 
 # CTEST OPTION 
 export CTEST_CONFIGURE_OPTIONS="\
--DBUILD_OPENBLAS=OFF;\
+-DBUILD_OPENBLAS=ON;\
 -DBUILD_READ_MAT_FILE=ON;\
 -DBUILD_READ_XML_FILE=ON;\
 -DBUILD_MATLAB_MEX_FILES=ON;\
