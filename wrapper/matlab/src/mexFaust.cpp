@@ -140,15 +140,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
 
     	if (!strcmp("get_product",cmd))
-	{
-		if (nlhs != 1 || nrhs != 2)
+	{	
+		
+		if (nlhs != 1 || nrhs != 3)
 			mexErrMsgTxt("get_product: Unexpected arguments");
 		if(core_ptr->size() == 0)
 			mexErrMsgTxt("get_product : empty faust core");
-		const size_t SIZE_B1 = core_ptr->getNbRow();
-        	const size_t SIZE_B2 = core_ptr->getNbCol();
-		Faust::MatDense<FFPP,Cpu> prod=core_ptr->get_product();
-
+		
+		mxChar * char_array=mxGetChars(prhs[2]);
+		char op=char_array[0];
+		faust_unsigned_int nbRowOp,nbColOp;
+		(*core_ptr).setOp(op,nbRowOp,nbColOp);
+		const size_t SIZE_B1 = nbRowOp;
+        	const size_t SIZE_B2 = nbColOp;
+		Faust::MatDense<FFPP,Cpu> prod=core_ptr->get_product(op);
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
 		if(sizeof(FFPP)==sizeof(float))
 			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
@@ -163,7 +168,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		return;
 	}
 
-	if (!strcmp("transpose",cmd))
+	if (!strcmp("copy",cmd))
 	{
 
 
@@ -177,7 +182,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>((*core_ptr));			
 			//t1.stop();			
 			//t2.start();			
-			(*F).transpose();
+			//(*F).transpose();
 			//t2.stop();
 			//t3.start();
 			plhs[0]=convertPtr2Mat<Faust::Transform<FFPP,Cpu> >(F);

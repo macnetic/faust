@@ -8,8 +8,9 @@ dim2 = 3;
 dim3 = 10;
 int_max= 100;
 threshold = 10^(-15); % equality test
-
+disp('****** TEST MATLAB_FAUST ******* '); 
 %% creation du faust
+disp(' TEST CONSTRUCTOR : '); 
 factors=cell(1,nb_fact);
 factors{1}=double(randi(int_max,dim1,dim2));
 for i=2:nb_fact
@@ -18,11 +19,15 @@ end
 
 F = matlab_faust(factors);
 
+disp('Ok');
+
 
 
 
 
 %% size test
+disp('TEST SIZE : ');
+
 [dim1_test,dim2_test]=size(F);
 if ((dim1_test ~= dim1) | (dim2_test ~= dim2))
     error(['size : invalid output dimension']);
@@ -34,15 +39,19 @@ dim2_test1=size(F,2);
 if ((dim1_test1 ~= dim1) | (dim2_test1 ~= dim2))
     error(['size : invalid output dimension']);
 end
+disp('Ok');
 
-
+disp('TEST GET_NB_FACTOR : ');
 %% get_nb_factor test
 nb_fact_test=get_nb_factor(F);
 if (nb_fact_test ~= nb_fact)
 	error('get_nb_factor : invalid number of factor of the faust');
 end
+disp('Ok');
+
 
 %% get_fact test
+disp('TEST GET_FACT : ');
 for i=1:nb_fact
 	A=get_fact(F,i);
 	if(A~=factors{i})
@@ -50,10 +59,12 @@ for i=1:nb_fact
 	end
 
 end
-
+disp('Ok');
 
 %% load_faust and save_faust test
-filename = 'faust.mat';
+disp('TEST LOAD AND SAVE : ');
+filename = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
+disp(['save faust into the file : ' filename]); 
 save_faust(F,filename);
 F_loaded = matlab_faust(filename);
 [dim1_loaded,dim2_loaded]=size(F_loaded);
@@ -74,39 +85,72 @@ for i=1:nb_fact
 	end
 
 end
-
+disp('Ok');
 
 
 %% get_product test
+disp('TEST GET_PRODUCT : ');
 F_dense= get_product(F);
 
 [dim1_dense,dim2_dense]=size(F_dense);
 if((dim1_dense ~= dim1) | (dim2_dense ~= dim2))
     error('get_product : invalid dimension');
 end
+disp('Ok');
+
+
+
 
 %% transpose test
+disp('TEST TRANSPOSE : ');
 F_trans = F';
+F_trans_trans=F_trans';
 [dim1_trans,dim2_trans]=size(F_trans);
+[dim1_trans_trans,dim2_trans_trans]=size(F_trans_trans);
 F_dense_trans=get_product(F_trans);
+F_dense_trans_trans=get_product(F_trans_trans);
 
 if ((dim1_trans ~= dim2) | (dim2_trans ~= dim1))
     error(['transpose : invalid dimension']);
 end
 
-F_dense_trans=get_product(F_trans);
+if ((dim1_trans_trans ~= dim1) | (dim2_trans_trans ~= dim2))
+    error(['transpose : invalid dimension']);
+end
+
+if (F_dense ~= F_dense_trans_trans)
+   error(['transpose : invalid value']); 
+end
 
 if (F_dense' ~= F_dense_trans)
    error(['transpose : invalid value']); 
 end
+disp('Ok');
 
 
+%% test operator=
+disp('TEST OPERATOR=');
 
+F_eq=F;
+F_trans_eq=F_trans;
+F_trans_trans_eq=F_trans_trans;
 
-
+[dim1_eq, dim2_eq]=size(F_eq);
+[dim1_trans_eq, dim2_trans_eq]=size(F_trans_eq);
+[dim1_trans_trans_eq, dim2_trans_trans_eq]=size(F_trans_trans_eq);
+if ((dim1_eq ~= dim1) | (dim2_eq ~= dim2))
+    error(['operator = test 1 : invalid dimension']);
+end
+if ((dim1_trans_eq ~= dim2) | (dim2_trans_eq ~= dim1))
+    error(['operator = test 2 : invalid dimension']);
+end
+if ((dim1_trans_trans_eq ~= dim1) | (dim2_trans_trans_eq ~= dim2))
+    error(['operator = test 3 : invalid dimension']);
+end
+disp('Ok');
 
 %% test faust multiplication with vector
-
+disp('TEST MULTIPLICATION BY A VECTOR : ');
 x=zeros(dim2,1);
 x(:)=1:dim2;
 x_trans=zeros(dim1,1);
@@ -140,8 +184,23 @@ if (y_expected ~= y_mtimes)
 end
 
 
+y_mtimes_trans_N = mtimes_trans(F_trans,x_trans,'N');
+if (y_expected_trans ~= y_mtimes_trans_N)
+    error(['multiplication faust-vector with transposition : invalid result within the precision '  num2str(threshold)]);
+end
+
+
+y_mtimes_trans_T = mtimes_trans(F_trans,x,'T');
+if (y_expected ~= y_mtimes_trans_T)
+    error(['multiplication faust-vector : invalid result within the precision '  num2str(threshold)]);
+end
+
+
+disp('Ok');
+
 
 %% test multiplication with matrix
+disp('TEST MULTIPLICATION BY A MATRIX : ');
 X=zeros(dim2,dim3);
 X(:)=1:dim2*dim3;
 X_trans=zeros(dim1,dim3);
@@ -176,3 +235,19 @@ if (Y_expected ~= Y_mtimes)
     error(['multiplication faust-vector : invalid result within the precision '  num2str(threshold)]);
 end
 
+Y_mtimes_trans_N = mtimes_trans(F_trans,X_trans,'N');
+if (Y_expected_trans ~= Y_mtimes_trans_N)
+    error(['multiplication faust-vector with transposition : invalid result within the precision '  num2str(threshold)]);
+end
+
+
+Y_mtimes_trans_T = mtimes_trans(F_trans,X,'T');
+if (y_expected ~= y_mtimes_trans_T)
+    error(['multiplication faust-vector : invalid result within the precision '  num2str(threshold)]);
+end
+
+
+
+
+
+disp('Ok');

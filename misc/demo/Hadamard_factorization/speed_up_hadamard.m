@@ -40,7 +40,7 @@
 %%
 
 nb_mult=500;
-Ms=6:11;
+Ms=6:12;
 ns=2.^Ms;
 nb_dim=length(Ms);
 threshold=10^(-10);

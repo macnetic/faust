@@ -9,6 +9,7 @@
 classdef matlab_faust < handle
     properties (SetAccess = private, Hidden = true)
         objectHandle; % Handle to the underlying C++ class instance
+	transpose_flag; % boolean to know if the matlab_faust is transpose or not
     end
     methods
         %% Constructor - Create a new C++ class instance
@@ -20,17 +21,23 @@ classdef matlab_faust < handle
 	    if (nargin == 1) && ischar(varargin{1})
 		filename=varargin{1};
 		load(filename);
-		if (~exist('faust_factors','var'))
-			error('matlab_faust : invalid filename');
+		if (~exist('faust_factors','var') || ~exist('transpose_flag','var'))
+			error('matlab_faust : invalid file');
 		end
 		this=matlab_faust(faust_factors);
 	    else
+% 		if(length(varargin{:}) == 3)
+% 		   transpose_flag = varargin{end};
+% 		   varargin = varargin(1:end-1);
+% 		end		
 		this.objectHandle = mexFaust('new',varargin{:});
+		this.transpose_flag = 0;
 	    end
 		
 	end
+	
 
- 
+	
             
 
         
@@ -41,24 +48,44 @@ classdef matlab_faust < handle
         end
         
         %% Multiplication faust-vector or faust-matrix
-        function varargout = mtimes(this, varargin)
+        function y = mtimes(this,x)
             % mtimes - overloading of the matlab multiplication (*) function, compatible with matlab matrix and vector
-            [varargout{1:nargout}] = mexFaust('multiply', this.objectHandle, varargin{:},'N');
+	    if (this.transpose_flag)
+            trans='T';
+        else
+            trans='N';
+	    end
+	
+            y = mexFaust('multiply', this.objectHandle,x,trans);
         end
         
         
         %% Multiplication by a faust or its transpose
         % if trans = 'N' multiplication by faust
         % if trans = 'T' multiplication the transpose of a faust
-        function varargout = mtimes_trans(this,varargin)
-            [varargout{1:nargout}] = mexFaust('multiply', this.objectHandle,varargin{:});
+        function y = mtimes_trans(this,x,trans)
+	    
+	    if xor(strcmp(trans,'T'),this.transpose_flag)
+            	trans='T';
+        else
+            	trans='N';
+	    end
+	
+            y = mexFaust('multiply', this.objectHandle,x,trans);
             
         end
         
         %% Evaluate the product of a faust_core
-        function varargout = get_product(this)
+        function y = get_product(this)
             % get_product - compute the dense matrix equivalent to the faust (the product of sparse matrix)
-            [varargout{1:nargout}]=mexFaust('get_product',this.objectHandle);
+            if this.transpose_flag
+                trans='T';
+            else
+                trans='N';
+            end	
+            y=mexFaust('get_product',this.objectHandle,trans);
+	
+            
         end
 
         %% Transpose operator
@@ -71,15 +98,17 @@ classdef matlab_faust < handle
         function trans=ctranspose(this)
 	%ctranspose - overloading of the matlab transpose operator (')
                 trans = matlab_faust({});
-                trans.objectHandle = mexFaust('transpose',this.objectHandle);
+                trans.objectHandle = mexFaust('copy',this.objectHandle);
+                trans.transpose_flag = mod(this.transpose_flag+1,2);
         end
 
 
         %% Size
         function varargout = size(this,varargin)
             %size - overload of the matlab size function
-            Size=mexFaust('size',this.objectHandle);
-            nb_input = length(varargin);
+            
+            
+	   nb_input = length(varargin);
             
             
             if (nb_input > 1)
@@ -90,6 +119,14 @@ classdef matlab_faust < handle
                 error('Too many output arguments');
             end
             
+	
+	    Size=mexFaust('size',this.objectHandle);
+	    
+	    %% if the faust is tranposed, inverse the dimension		    	
+	    if(this.transpose_flag) 
+	    	Size = Size*[0,1;1,0];
+	    end	
+
             if (nb_input~=0)
                 dimension_arg=varargin{1};
                 if (floor(dimension_arg) ~= dimension_arg)
@@ -128,7 +165,15 @@ classdef matlab_faust < handle
 			error('get_fact second argument (indice) must either be real positive integers or logicals.');
 		end
 
+		if (this.transpose_flag)
+			id = get_nb_factor(this)+1-id;
+		end
+
 		factor = mexFaust('get_fact',this.objectHandle,id);
+
+		if (this.transpose_flag)
+			factor = factor';
+		end
 	end
 
 
@@ -152,8 +197,8 @@ classdef matlab_faust < handle
 		for i=1:nb_fact
 			faust_factors{i}=get_fact(this,i);
 		end
-		
-		save(filename,'faust_factors');
+		transpose_flag=this.transpose_flag;
+		save(filename,'faust_factors','transpose_flag');
 		
 		
 	end
@@ -161,6 +206,9 @@ classdef matlab_faust < handle
     end
     
 end
+
+
+
 
 
 

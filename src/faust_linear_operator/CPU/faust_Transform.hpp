@@ -231,23 +231,25 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> 
 
 }*/
 template<typename FPP>
-Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product()const
+Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThis)const
 {
 	//complexity of evaluating a Faust::Transform
 	// from left to right is (dim1*total_nnz)
 	// from right to left is (dim2*total_nnz)
+
 	if (size() == 0)
 	{
 		handleError(m_className,"get_product : empty Faust::Transform");
 	}
+	
 	Faust::MatDense<FPP,Cpu> prod(data[0].getNbRow());
-
+	
 	if(getNbRow()<getNbCol())
 	{
 		prod.resize(getNbRow());
 		prod.setEyes();
 		for(int i=0 ; i<data.size() ; i++)
-            prod *= data[i];
+            		prod *= data[i];
 	}else
 	{
 		prod.resize(getNbCol());
@@ -255,6 +257,9 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product()const
 		for(int i=data.size()-1 ; i>=0 ; i--)
 			prod.multiplyLeft(data[i]);
 	}
+	if (opThis == 'T')
+		prod.transpose();
+
 	/*Faust::MatDense<FPP,Cpu> prod;
 	if ( (data[0].getNonZeros()+getNbRow()*(totalNonZeros-data[0].getNonZeros())) < (data[size()-1].getNonZeros()+getNbCol()*(totalNonZeros-data[size()-1].getNonZeros())) )
 	{

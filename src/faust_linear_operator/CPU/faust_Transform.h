@@ -72,7 +72,7 @@ namespace Faust
         //template<Device DEVICE> class BlasHandle;
         //template<Device DEVICE> class SpBlasHandle;
         /** \brief Perform the product of all factorized matrix. */
-        Faust::MatDense<FPP,Cpu> get_product()const;
+        Faust::MatDense<FPP,Cpu> get_product(const char opThis='N')const;
         Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const;
         // modif AL AL
         // Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const
