@@ -4,9 +4,10 @@ INSTALLATION README :
 
 OS : Ubuntu 14.04 (Virtual Machine)
 
-	prerequi : version cmake recente au moins 3.2.2
-	           le cmake de base fournit par apt-get est seulement à la version 2.8.4 
-
+	config de la VM : - installation de cmake version 3.2.2
+	           		(le cmake de base fournit par apt-get est seulement à la version 2.8.4 et n'a pas de compatibilite avec l'edition de texte sous Windows)
+			  - matlab R2014b : obligation de configurer la variable d'environnement LD_PRELOAD pour permettre à matlab de trouver la librairie openblas
+					    lors de l'execution de nos mexfunctions
 
 	installation librarie en ligne de commande
 		I-OPENBLAS
