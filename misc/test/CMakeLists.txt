@@ -33,7 +33,8 @@ if(BUILD_MATLAB_MEX_FILES)
 	add_test(NAME FAUST_MEG_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_MEG',22450,100);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 	add_test(NAME FAUST_HADAMARD_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_HADAMARD',5941,1);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 	add_test(NAME DEMO_MATLAB COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${FAUST_MATLAB_INSTALL_DIR}');setup_FAUST;run_all_demo;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-	add_test(NAME MATLAB_FAUST COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+	add_test(NAME FAUST_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+	add_test(NAME SPEED_FAUST_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust_time;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
 
@@ -43,7 +44,7 @@ if(BUILD_MATLAB_MEX_FILES)
 
 	set_tests_properties(FAUST_HIER_MEX FAUST_HADAMARD_MEX PROPERTIES TIMEOUT 100)
 	set_tests_properties(DEMO_MATLAB PROPERTIES TIMEOUT 6000)
-	set_tests_properties(MATLAB_FAUST PROPERTIES TIMEOUT 15)
+	set_tests_properties(FAUST_MEX PROPERTIES TIMEOUT 30)
 	set_tests_properties(FAUST_MEG_MEX PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 endif()
 
@@ -102,7 +103,7 @@ if (BUILD_MATLAB_MEX_FILES)
 	configure_file(${FAUST_SRC_TEST_TOOL_DIR}/set_path.m.in ${FAUST_BIN_TEST_TOOLS_DIR}/set_path.m @ONLY)
 	
 	
-	foreach(matlabtest hier_fact_test.m test_matlab_faust.m)
+	foreach(matlabtest hier_fact_test.m test_matlab_faust.m test_matlab_faust_time.m)
 		configure_file(${FAUST_SRC_TEST_SRC_DIR}/${matlabtest} ${FAUST_BIN_TEST_BIN_DIR}/${matlabtest} @ONLY)
 	endforeach()
 endif(BUILD_MATLAB_MEX_FILES)
