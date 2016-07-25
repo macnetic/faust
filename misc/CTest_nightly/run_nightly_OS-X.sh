@@ -17,7 +17,7 @@
 ###################################################################
 
 # Directory of the library used in the FAUST PROJECT 
-export PATH=$PATH:/Applications/MATLAB_R2014b.app/bin/;
+export PATH=$PATH:/Applications/MATLAB_R2014b.app/bin/:/usr/local/bin/ctest;
 #export PATH=$PATH:usr/local/include
 
 # Directory of the local path of the nightly project
