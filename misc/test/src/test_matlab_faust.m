@@ -101,35 +101,85 @@ disp('Ok');
 
 
 
-%% transpose test
-disp('TEST TRANSPOSE : ');
-F_trans = F';
-F_trans_trans=F_trans';
-[dim1_trans,dim2_trans]=size(F_trans);
-[dim1_trans_trans,dim2_trans_trans]=size(F_trans_trans);
-F_dense_trans=get_product(F_trans);
-F_dense_trans_trans=get_product(F_trans_trans);
 
+
+%%% transpose test
+disp('TEST TRANSPOSE : ');
+disp('operation F_trans = F'' ');
+F_trans=F';
+[dim1_trans,dim2_trans]=size(F_trans);
 if ((dim1_trans ~= dim2) | (dim2_trans ~= dim1))
     error(['transpose : invalid dimension']);
 end
+
+F_dense_trans = get_product(F_trans);
+if (F_dense_trans ~= F_dense')
+    error(['transpose : invalid transpose matrix']);
+end
+
+%% verification de la non modification du faust
+[new_dim1,new_dim2]=size(F); 
+if ((new_dim1 ~= dim1) | (dim2 ~= new_dim2))
+    error(['transpose : modification du faust de depart']);
+end
+
+new_F_dense=get_product(F);
+if((new_F_dense ~= F_dense))
+	error('transpose : modification du faust de depart');
+end 
+
+
+disp('operation F_trans_trans = F_trans'' ');
+F_trans_trans=F_trans';
+[dim1_trans_trans,dim2_trans_trans]=size(F_trans_trans);
 
 if ((dim1_trans_trans ~= dim1) | (dim2_trans_trans ~= dim2))
     error(['transpose : invalid dimension']);
 end
 
-if (F_dense ~= F_dense_trans_trans)
-   error(['transpose : invalid value']); 
+F_dense_trans_trans = get_product(F_trans_trans);
+if (F_dense_trans_trans ~= F_dense)  
+    error(['transpose : invalid transpose matrix']);
 end
 
-if (F_dense' ~= F_dense_trans)
-   error(['transpose : invalid value']); 
+
+%% verification de la non modification du faust
+[new_dim1_trans,new_dim2_trans]=size(F_trans); 
+if ((new_dim1_trans ~= dim1_trans) | (new_dim2_trans ~= new_dim2_trans))
+    error(['transpose : modification du faust de depart']);
 end
+
+new_F_dense_trans=get_product(F_trans);
+if((new_F_dense_trans ~= F_dense_trans))
+	error('transpose : modification du faust de depart');
+end 
+
+
+
+
+
 disp('Ok');
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 %% test operator=
-disp('TEST OPERATOR=');
+disp('TEST OPERATOR= : ');
 
 F_eq=F;
 F_trans_eq=F_trans;
@@ -147,7 +197,7 @@ end
 if ((dim1_trans_trans_eq ~= dim1) | (dim2_trans_trans_eq ~= dim2))
     error(['operator = test 3 : invalid dimension']);
 end
-disp('Ok');
+
 
 %% test faust multiplication with vector
 disp('TEST MULTIPLICATION BY A VECTOR : ');
