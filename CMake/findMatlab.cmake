@@ -36,7 +36,7 @@ if(UNIX)
 	#message(STATUS "READLINK_TMP = ${READLINK_TMP}")
 	if(${READLINK_TMP} MATCHES matlab)
 		set(MATLAB_DIR_TMP ${READLINK_TMP})
-		#message(STATUS "MATLAB_DIR_TMP 3 = ${MATLAB_DIR_TMP}")
+		message(STATUS "MATLAB_DIR_TMP 3 = ${MATLAB_DIR_TMP}")
    	endif()
 	#message(STATUS "MATLAB_DIR_TMP 4 = ${MATLAB_DIR_TMP}")
 
@@ -54,6 +54,8 @@ endif()
 
 if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 	if(UNIX)
+		message(STATUS "MATLAB_DIR_TMP ${MATLAB_DIR_TMP}")
+		message(STATUS "MATLAB_ROOT TMP: ${MATLAB_ROOT}")
 		# string(REGEX REPLACE "([a-zA-Z0-9_/:]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
 		string(REGEX REPLACE "([a-zA-Z0-9_/:.]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}") # sous mac on a un point ds le path .app
 	elseif(WIN32)
@@ -63,7 +65,7 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 	endif()
 	set(MATLAB_ROOT ${MATLAB_ROOT} CACHE PATH "Matlab root directory")
 	
-	#message(STATUS "MATLAB_DIR_TMP ${MATLAB_DIR_TMP}")
+	
 	#message(STATUS "MATLAB_ROOT has been found : ${MATLAB_ROOT}") # example : "/usr/local/MATLAB/R2014b"
 	
 	message(STATUS "MATLAB_ROOT has been found : ${MATLAB_ROOT}")
