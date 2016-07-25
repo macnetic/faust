@@ -127,7 +127,7 @@ params.Sparsity = 2; % Number of sources per training vector
 params.dist_paliers = [0.01,0.05,0.08,0.5];
 params.solver_choice='omp';
 %params.solver_choice='iht';
-opt_handle=1;% ==1 the faust is given to the solver by function handle
+opt_handle=0;% ==1 the faust is given to the solver by function handle
              % ==0 the faust is given to the solver as an object
 
 Ntraining = params.Ntraining;
