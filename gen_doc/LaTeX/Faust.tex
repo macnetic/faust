@@ -1,0 +1,116 @@
+\documentclass[a4paper,10pt]{article}
+\author{Adrien Leman; Nicolas Bellot}
+\title{Documentation of the project FA$\mu$ST \smallbreak "Flexible Approximate Multi-Layer Sparse Transform"}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx, subcaption, enumerate}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+%\usepackage{amsthm}
+\usepackage[boxruled,algo2e]{algorithm2e}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\newcommand\mPAT[1]{\marginpar{\footnotesize\textcolor{blue}{PP:~#1}}}
+\newcommand\PAT[1]{\textcolor{blue}{#1}}
+\newcommand\mRG[1]{\marginpar{\footnotesize\textcolor{blue}{RG:~#1}}}
+\newcommand\RG[1]{\textcolor{blue}{#1}}
+\newcommand\todoRG[1]{\textcolor{red}{RG:~#1}}
+\newcommand\todoPP[1]{\textcolor{red}{PP:~#1}}
+%\definecolor{darkgreen}{rgb}{0,0.8,0}
+\newcommand\mNK[1]{\marginpar{\footnotesize\textcolor{blue}{NK:~#1}}}
+\newcommand\NK[1]{\textcolor{ForestGreen}{#1}}
+\newcommand\todoNK[1]{\textcolor{red}{NK:~#1}}
+\SetCommentSty{mycommfont}
+\usepackage{algorithmic}
+\usepackage{comment}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{sectsty}\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{placeins}
+\usepackage{epstopdf}
+\usepackage{hyperref}
+\usepackage{tikz}
+%\usepackage{appendix}
+\usepackage{mathtools}
+\usepackage[]{listings}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.95,0.95,1}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{ %
+  backgroundcolor=\color{mygray},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\ttfamily,        % the size of the fonts that are used for the code
+%  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+%  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+%  deletekeywords={...},            % if you want to delete keywords from the given language
+%  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+%  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+%  otherkeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{gray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+%  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+%  showstringspaces=false,          % underline spaces within strings only
+%  showtabs=false,                  % show tabs within strings adding particular underscores
+%  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+%  tabsize=2,	                   % sets default tabsize to 2 spaces
+%  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\input{notations.tex}
+
+\makeatletter
+\newcommand{\nosemic}{\renewcommand{\@endalgocfline}{\relax}}% Drop semi-colon ;
+\newcommand{\dosemic}{\renewcommand{\@endalgocfline}{\algocf@endline}}% Reinstate semi-colon ;
+\newcommand{\pushline}{\Indp}% Indent
+\newcommand{\popline}{\Indm\dosemic}% Undent
+\makeatother
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}\label{sec:intro}
+
+\paragraph{Presentation} FA$\mu$ST is a C++ toolbox, useful to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation). (see. \cite{LeMagoarou2016} ).
+FA$\mu$ST can be used to speed up iterative algorithms commonly used for solving high dimensional linear inverse problems.
+The FA$\mu$ST toolbox is delivered with a Matlab wrapper. 
+
+\paragraph{Organization} The section \ref{sec:install} present the installation of the library FA$\mu$ST, the \ref{sec:firstUse} section  show quickly how to used this library and finally an example is proposed in section \ref{sec:example}. 
+
+
+\include{chapInstall}
+\include{chapFirstUse}
+\include{chapExample}
+
+
+%\section{Examples}\label{sec:example}
+
+%\section{Other functions}\label{sec:other}
+
+\bibliographystyle{plain}
+\bibliography{paperbiblio}
+
+
+\end{document}
+
+
+

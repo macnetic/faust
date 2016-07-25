@@ -1,0 +1,45 @@
+
+\section{Installation}\label{sec:install}
+
+The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. 
+CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software (cf. website on \url{https://cmake.org/}).
+
+First subsection \ref{sec:UnixInstall} gives information about Unix installation and second subsection \ref{sec:WinInstall} corresponds to the Windows installation. 
+
+\subsection{Unix environment}\label{sec:UnixInstall}
+
+\begin{itemize}
+\item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
+\item Open a command terminal
+\item Place you in the FAUST directory, and tape the following command : 
+\begin{lstlisting}
+mkdir build
+cd build
+cmake ..
+make
+make install
+\end{lstlisting}
+\end{itemize}
+
+
+
+\subsection{Windows environment}\label{sec:WinInstall}
+
+
+\begin{itemize}
+\item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
+\item Open a command terminal
+\item Place you in the FAUST directory, and tape the following command : 
+\begin{lstlisting}
+mkdir build
+cd build
+cmake -G "MinGW Makefiles" ..
+make
+make install
+\end{lstlisting}
+\end{itemize}
+
+Warning : 
+compatibility between Matlab and MinGW :
+MinGW version 4.9.2 pour les mex functions..
+sous windows on utilise MinGW pour le compilateur GCC G++ au lieu de visual studio plous lourd à installer. MinGW version 4.9.2 pour les mex functions..

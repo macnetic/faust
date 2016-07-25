@@ -1,0 +1,148 @@
+% bold symbols
+\newcommand{\bfA}{\mathbf{A}}
+\newcommand{\bfX}{\mathbf{X}}
+\newcommand{\bfW}{\mathbf{W}}
+\newcommand{\bfD}{\mathbf{D}}
+\newcommand{\bfQ}{\mathbf{Q}}
+\newcommand{\bfR}{\mathbf{R}}
+\newcommand{\bfM}{\mathbf{M}}
+\newcommand{\bfw}{\mathbf{w}}
+\newcommand{\bfz}{\mathbf{z}}
+\newcommand{\bfx}{\mathbf{x}}
+\newcommand{\bfr}{\mathbf{r}}
+\newcommand{\bfe}{\mathbf{e}}
+\newcommand{\bfy}{\mathbf{y}}
+\newcommand{\hbfz}{\hat{\mathbf{z}}}
+\newcommand{\bfI}{\mathbf{I}}
+\newcommand{\bfU}{\mathbf{U}}
+\newcommand{\bfu}{\mathbf{u}}
+\newcommand{\bfV}{\mathbf{V}}
+\newcommand{\bfv}{\mathbf{v}}
+
+
+% sums
+\newcommand{\sump}{\sum_{p=1}^P}
+\newcommand{\summ}{\sum_{j=1}^m}
+\newcommand{\sumk}{\sum_{k=1}^K}
+\newcommand{\sumt}{\sum_{t=1}^T}
+\newcommand{\sumko}{\sum_{k_1=1}^K}
+\newcommand{\sumkt}{\sum_{k_2=1}^K}
+\newcommand{\sumn}{\sum_{i=1}^N}
+
+
+% general
+\newcommand{\dataset}{\mathcal{X}}
+\newcommand{\fhalf}{\frac{1}{2}}
+\newcommand{\neucl}[1]{\left\lVert#1\right\rVert_2}
+\newcommand{\ipeucl}[2]{\left\langle #1,#2 \right\rangle_2}
+\newcommand{\smeas}{\mathcal{M}}
+\newcommand{\pmeas}{\mathcal{P}}
+\newcommand{\gaussset}{\mathcal{G}}
+\newcommand{\gaussmix}[1]{{\mathcal{G}_{#1}}}
+\newcommand{\sph}[1]{\mathcal{S}_{#1-1}}
+\newcommand{\fracsqm}{\frac{1}{\sqrt{m}}}
+\newcommand{\sqm}{\sqrt{m}}
+\newcommand{\argmin}[1]{\underset{#1}{\text{argmin}}}
+
+
+% sketches
+\newcommand{\freqs}{\Omega} %frequencies
+\newcommand{\freq}{{\boldsymbol\omega}} %frequency
+\newcommand{\scalfreq}{\omega}
+\newcommand{\hyppar}{\Theta} %hyper parameter
+\newcommand{\chrc}{\psi} %characteristic function
+\newcommand{\skop}{\mathcal{A}} %sketching operator
+\newcommand{\malpha}{{\boldsymbol\alpha}} %weights (to rename)
+\newcommand{\mmu}{{\boldsymbol\mu}} %means
+\newcommand{\mSigma}{{\boldsymbol\Sigma}} %variances
+\newcommand{\msigma}{{\boldsymbol\sigma}} %diag variances
+\newcommand{\mrho}{{\boldsymbol\varphi}} %frequency angle
+\newcommand{\mtheta}{{\boldsymbol\theta}} %frequency radius
+\newcommand{\relsprs}{\rho} %relative sparsity (for results)
+\newcommand{\relmsrm}{\delta} %relative number of parameters (for results)
+\newcommand{\thetaset}{\mathcal{T}}
+%\newcommand{\thetaset}{\Theta}
+\newcommand{\Nsmall}{{N_{small}}}
+\newcommand{\msmall}{{m_{small}}}
+\newcommand{\gmmcover}{\Gamma}
+\newcommand{\pp}{P}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\qq}{Q}
+\newcommand{\dens}{p}
+\newcommand{\cstdom}{\mathrm{A}}
+
+% rkhs
+\newcommand{\rkhs}{\mathcal{H}}
+\newcommand{\ipH}[2]{\left\langle #1,#2 \right\rangle_\rkhs}
+\newcommand{\normH}[2]{\gamma_k\left(#1,#2\right)}
+\newcommand{\normHnota}{\gamma_k}
+\newcommand{\featm}{\phi}
+\newcommand{\freqdist}{\Lambda}
+\newcommand{\freqdistn}{\hat{\Lambda}}
+\newcommand{\model}{\Sigma}
+\newcommand{\Xspace}{X}
+\newcommand{\TIk}{\mathbf{K}}
+\newcommand{\supp}{\text{\upshape supp}}
+\newcommand{\secant}{\mathcal{S}}
+\newcommand{\decod}{\Delta}
+\newcommand{\enet}{\mathcal{N}}
+\newcommand{\kernel}{\kappa}
+\newcommand{\meas}{\nu} % to avoid mu, which is the mean of gaussian
+\newcommand{\mmap}{\varphi}
+\newcommand{\sigmaker}{\sigma_\freqdist}
+\newcommand{\sigkersmall}{S}
+
+%imaginary unit
+\newcommand{\imaginaryi}{\mathsf{i}}
+
+% misc
+\definecolor{light-gray}{gray}{0.3}
+\newcommand{\mycomment}[1]{\emph{\small \color{red} NK: #1}}
+\newcommand{\mytodo}[1]{\emph{\color{blue} #1}}
+
+% io proba
+\newcommand{\bigprbsp}{\mathbf{S}}
+\newcommand{\event}{E}
+\newcommand{\eventset}{\mathcal{F}}
+\newcommand{\prbfc}{\mathbb{P}}
+\newcommand{\measop}{\mathbf{M}}
+\newcommand{\eps}{\epsilon}
+\newcommand{\outc}{s}
+\newcommand{\decop}{\mathbf{y}'}
+\newcommand{\skopprb}{\skop^{(\outc)}}
+\newcommand{\pprb}{\hat{\pp}^{(\outc)}}
+\newcommand{\pproj}{\pp_\text{proj}}
+
+\newcommand{\distfun}[3]{\gamma_{#3}\left(#1,#2\right)}
+\newcommand{\distfunsq}[3]{\gamma^2_{#3}\left(#1,#2\right)}
+\newcommand{\distfuns}[1]{\gamma_{#1}}
+\newcommand{\normE}[2]{\distfun{#1}{#2}{E}}
+\newcommand{\normEs}{\distfuns{E}}
+\newcommand{\normF}[2]{\distfun{#1}{#2}{F}}
+\newcommand{\normFs}{\distfuns{F}}
+\newcommand{\normX}[2]{\distfun{#1}{#2}{X}}
+\newcommand{\normXs}{\distfuns{X}}
+\newcommand{\normM}[2]{\distfun{#1}{#2}{M}}
+\newcommand{\normMs}{\distfuns{M}}
+\newcommand{\normG}[2]{\distfun{#1}{#2}{G}}
+\newcommand{\normGs}{\distfuns{G}}
+\newcommand{\normmix}[2]{\distfun{#1}{#2}{mix}}
+\newcommand{\normmixs}{\distfuns{mix}}
+\newcommand{\normK}[2]{\distfun{#1}{#2}{\freqdist}}
+\newcommand{\normKs}{\distfuns{\freqdist}}
+\newcommand{\normKsq}[2]{\distfunsq{#1}{#2}{\freqdist}}
+\newcommand{\normker}[2]{\distfun{#1}{#2}{\kernel}}
+\newcommand{\normkers}{\distfuns{\kernel}}
+\newcommand{\normkersq}[2]{\distfunsq{#1}{#2}{\kernel}}
+
+\newcommand{\diam}[1]{\text{\upshape diam}\left(#1\right)}
+\newcommand{\rad}[1]{\text{\upshape radius}\left(#1\right)}
+
+%\newcommand{\LRIPsu}{\text{LRIP}}
+%\newcommand{\BPnu}{\text{BP}}
+%\newcommand{\CIOPsu}{\text{CIOP}}
+%\newcommand{\prop}{\Pi}
+%\newcommand{\nSig}[2]{\|#1\|_{\sigma_{#2}^2}}
+%\newcommand{\ipW}[2]{\left\langle #1,#2 \right\rangle_2}
+
+\newcommand{\embd}{\phi}
