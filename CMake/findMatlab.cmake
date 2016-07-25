@@ -54,11 +54,16 @@ endif()
 
 if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 	if(UNIX)
-		#message(STATUS "MATLAB_DIR_TMP ${MATLAB_DIR_TMP}")
-		#message(STATUS "MATLAB_ROOT TMP: ${MATLAB_ROOT}")
+		message(STATUS "MATLAB_DIR_TMP ${MATLAB_DIR_TMP}")
+		message(STATUS "MATLAB_ROOT TMP: ${MATLAB_ROOT}")
 		# string(REGEX REPLACE "([a-zA-Z0-9_/:]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
 		string(REGEX REPLACE "([a-zA-Z0-9_/:.]+)/bin//matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}") # ds le cas ou on a /bin//matlab
+		message(STATUS "MATLAB_DIR_TMP2 ${MATLAB_DIR_TMP}")
+		message(STATUS "MATLAB_ROOT TMP2: ${MATLAB_ROOT}")
 		string(REGEX REPLACE "([a-zA-Z0-9_/:.]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}") # sous mac on a un point ds le path .app
+		message(STATUS "MATLAB_DIR_TMP3 ${MATLAB_DIR_TMP}")
+		message(STATUS "MATLAB_ROOT TMP3: ${MATLAB_ROOT}")
+
 	elseif(WIN32)
 		string(REGEX REPLACE "([a-zA-Z0-9_\\:.]+)\\\\bin\\\\matlab.exe" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
 	else()
