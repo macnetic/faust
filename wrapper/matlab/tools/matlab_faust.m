@@ -6,9 +6,9 @@
 % For more information on the FAuST Project, please visit the website of
 % the project :  <http://faust.gforge.inria.fr>
 
-classdef matlab_faust < handle
-    properties (SetAccess = private, Hidden = true)
-        objectHandle; % Handle to the underlying C++ class instance
+classdef matlab_faust 
+    properties (SetAccess = public, Hidden = false)
+        matrix; % Handle to the underlying C++ class instance
 	transpose_flag; % boolean to know if the matlab_faust is transpose or not
     end
     methods
@@ -18,22 +18,8 @@ classdef matlab_faust < handle
             %                1st input : 1D cell array of matrix (sparse or dense)
             %                2nd input : (optional) multiplicative scalar
 	    %              - or from a filename (mat file) where a faust is stored with save_faust
-	    if (nargin == 1) && ischar(varargin{1})
-		filename=varargin{1};
-		load(filename);
-		if (~exist('faust_factors','var') || ~exist('transpose_flag','var'))
-			error('matlab_faust : invalid file');
-		end
-		this=matlab_faust(faust_factors);
-	    else
-% 		if(length(varargin{:}) == 3)
-% 		   transpose_flag = varargin{end};
-% 		   varargin = varargin(1:end-1);
-% 		end		
-		this.objectHandle = mexFaust('new',varargin{:});
-		this.transpose_flag = 0;
-	    end
-		
+	   this.matrix = matlab_faust_core(varargin{:});
+	   this.transpose_flag = 0;	
 	end
 	
 
@@ -56,7 +42,7 @@ classdef matlab_faust < handle
             trans='N';
 	    end
 	
-            y = mexFaust('multiply', this.objectHandle,x,trans);
+            y = mexFaust('multiply', this.matrix.objectHandle,x,trans);
         end
         
         
@@ -71,7 +57,7 @@ classdef matlab_faust < handle
             	trans='N';
 	    end
 	
-            y = mexFaust('multiply', this.objectHandle,x,trans);
+            y = mexFaust('multiply', this.matrix.objectHandle,x,trans);
             
         end
         
@@ -83,7 +69,7 @@ classdef matlab_faust < handle
             else
                 trans='N';
             end	
-            y=mexFaust('get_product',this.objectHandle,trans);
+            y=mexFaust('get_product',this.matrix.objectHandle,trans);
 	
             
         end
@@ -97,9 +83,8 @@ classdef matlab_faust < handle
         
         function trans=ctranspose(this)
 	%ctranspose - overloading of the matlab transpose operator (')
-                trans = matlab_faust({});
-                trans.objectHandle = mexFaust('copy',this.objectHandle);
-                trans.transpose_flag = mod(this.transpose_flag+1,2);
+                trans=this; % trans and this point share the same C++ underlying object (objectHandle)
+                trans.transpose_flag = mod(this.transpose_flag+1,2); % inverse the transpose flag
         end
 
 
@@ -120,7 +105,7 @@ classdef matlab_faust < handle
             end
             
 	
-	    Size=mexFaust('size',this.objectHandle);
+	    Size=mexFaust('size',this.matrix.objectHandle);
 	    
 	    %% if the faust is tranposed, inverse the dimension		    	
 	    if(this.transpose_flag) 
@@ -169,7 +154,7 @@ classdef matlab_faust < handle
 			id = get_nb_factor(this)+1-id;
 		end
 
-		factor = mexFaust('get_fact',this.objectHandle,id);
+		factor = mexFaust('get_fact',this.matrix.objectHandle,id);
 
 		if (this.transpose_flag)
 			factor = factor';
@@ -180,7 +165,7 @@ classdef matlab_faust < handle
 	%% get_nb_factor : return the number of factor of the faust
 	function nb_factor = get_nb_factor(this)
 		% get_nb_factor : return the number of factor of the faust
-		nb_factor = mexFaust('get_nb_factor',this.objectHandle);
+		nb_factor = mexFaust('get_nb_factor',this.matrix.objectHandle);
 	end
 
 	%% save a faust into a matfile
