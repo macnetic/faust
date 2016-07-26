@@ -1,7 +1,10 @@
-%class MATLAB_FAUST
-% representing a given dense matrix by a product of sparse matrix (i.e faust)
-% in order to speed-up multiplication by this matrix,
-% matlab wrapper class implemented in C++
+%class MATLAB_FAUST_CORE
+% this class only stored the Faust C++ object and 
+% inherit from matlab handle class which allows different
+% object to the same reference
+% 
+% WARNING : the user must not directly use this class,
+% he must use the matlab class matlab_faust
 %
 % For more information on the FAuST Project, please visit the website of
 % the project :  <http://faust.gforge.inria.fr>
