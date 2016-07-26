@@ -1,4 +1,83 @@
-\section{Launch my first FA$\mu$ST operator}\label{sec:firstUse}
+\section{QuickStart}\label{sec:firstUse}
 
-A matlab wrapper is used to launch the FAUST C++ library. 
 
+A matlab wrapper is delivered with the FAUST C++ library.
+It provides a user friendly new class of matrix \textbf{matlab{\_}faust} efficient for the multiplication with matlab built-in dense matrix class.\newline
+\newline
+As much as possible, a \textbf{matlab{\_}faust} object is handled as a normal matlab matrix, here is listing of matlab builtin function that can be applied to a faust A :
+
+
+
+\begin{lstlisting}
+>> % considering A is a Faust of size 10x3
+>>
+>> % get the size of the faust
+>> [dim1,dim2] = size(A);
+>>
+>> %  transpose a faust  
+>> A_trans = A'; 		 
+>> 
+>> % multiplication by A
+>> x1 = rand(3,3);
+>> y1 = A*x1;  
+>> 
+>> % multiplication by A'
+>> x2 = rand(10,5);
+>> y2 = A'*x2;     
+\end{lstlisting}
+
+
+
+\subsection{construct a faust}\label{sec:firstUseBuild}
+
+A \textbf{matlab{\_}faust} object can be constructed from several ways.
+\subsubsection{construct a faust from a cell-array}\label{sec:firstUseBuildFromCellArray}
+First, you can build a faust from a cell-array of matlab matrix (sparse or dense) representing its factors.
+\newline
+\newline
+The following example shows how to build a random faust of size 5x3 with 3 factors :
+\begin{lstlisting}
+>> nb_factor = 3;
+>> dim1 = 5;
+>> dim2 = 3; 
+>>
+>> % list of factors
+>> factors = cell(nb_factor);
+>>
+>> factors{1}=rand(dim1,dim2); % first factor is rectangular 
+>> for i=2:nb_factor
+>> 		factors{i}=rand(dim2,dim2);
+>> end
+>>
+>> % build the faust
+>> A=matlab_faust(factors);
+\end{lstlisting}
+\newpage
+
+An optional multiplying scalar argument can be taken into account  :
+\begin{lstlisting}
+>> % multiplicative scalar
+>> lambda = 3.5 
+>> % build the faust
+>> A=matlab_faust(factors,lambda);
+\end{lstlisting}
+
+This functionality allows you to build a faust from the factorization algorithm :
+\textbf{mexHierarchical{\_}fact} or \textbf{mexPalm4MSA} :
+\begin{lstlisting}
+>> % factorization step
+>> [lambda,factors]=mexHierarchical_fact(params);
+>> % build the faust corresponding to the factorization
+>> A=matlab_faust(factors,lambda);
+\end{lstlisting}
+
+\subsubsection{construct a faust from a saved one}\label{sec:firstUseBuildFromSave}
+
+You can also build a faust from a previously one which is saved into a mat file :
+\begin{lstlisting}
+>> %  save the faust A into the file faust.mat
+>> [lambda,factors]=save(A,'faust.mat');
+>> % create a new faust from the file faust.mat
+>> A_loaded=matlab_faust('faust.mat');
+\end{lstlisting}
+ 
