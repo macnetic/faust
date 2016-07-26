@@ -365,10 +365,16 @@ else()
 		if (BUILD_MULTITHREAD)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
 		endif(BUILD_MULTITHREAD)
+		
+		if(APPLE)
+			#message(STATUS "APPLE OPERATING SYSTEM")
+			# -pthread is not take into account with MAC platform. 
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -fPIC -O2 " CACHE STRING "compile flags" FORCE)
+		else(APPLE)
+			#message(STATUS "UNIX OPERATING SYSTEM") 
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -pthread -fPIC -O2 " CACHE STRING "compile flags" FORCE)
+		endif(APPLE)
 					
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -pthread -fPIC -O2 " CACHE STRING "compile flags" FORCE)
-		
-		
 	elseif(WIN32)
 		if (BUILD_MULTITHREAD)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
