@@ -23,7 +23,15 @@ As much as possible, a \textbf{matlab{\_}faust} object is handled as a normal ma
 >> 
 >> % multiplication by A'
 >> x2 = rand(10,5);
->> y2 = A'*x2;     
+>> y2 = A'*x2;
+>>
+>>
+>> % get the coefficient i,j and slicing for reading purpose
+>> coeff=A(i,j);
+>> col_2=A(:,2);
+>> submatrix_A=A(3:5,2:3);
+>> % Warning :  A(i,j)=3 will not modify A, writing is not allowed
+>> % Warning :  A(end,end) give the wrong result   
 \end{lstlisting}
 
 

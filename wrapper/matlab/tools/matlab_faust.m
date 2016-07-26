@@ -188,9 +188,10 @@ classdef matlab_faust
 		
 	end
 
-	%% overloading of the slicing method only for reading the value of the coeff
+	%% subsref : allows operation such as A(i,j) A(:,j)  A(3:4,2:5) but not A(end,end)
 	function submatrix=subsref(this,S)
-
+		% overloading of the slicing method only for reading the value of the coeff
+		% WARNING : operation such as this(end,end) give wrong results (operator end not supported)
 		if (~isfield(S,'type')) | (~isfield(S,'subs'))
 			error(' subsref invalid structure S missing field type or subs');
 		end
