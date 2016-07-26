@@ -169,7 +169,7 @@ classdef matlab_faust
 	end
 
 	%% save a faust into a matfile
-	function save_faust(this,filename)
+	function save(this,filename)
 		% save a faust into a matfile
 		if (~ischar(filename))
 			error('second argument must contains a string (a filename)');
@@ -186,6 +186,42 @@ classdef matlab_faust
 		save(filename,'faust_factors','transpose_flag');
 		
 		
+	end
+
+	%% overloading of the slicing method only for reading the value of the coeff
+	function submatrix=subsref(this,S)
+
+		if (~isfield(S,'type')) | (~isfield(S,'subs'))
+			error(' subsref invalid structure S missing field type or subs');
+		end
+
+		if (~ischar(S.type)) | (~iscell(S.subs))
+			error(' subsref invalid structure S, S.type must be a char, S.subs must be a cell-array');
+		end
+
+		if ~strcmp(S.type,'()')
+			error(' subsref is only overloaded for () operator');
+		end
+
+		if (length(S.subs) ~=2)
+			invalid(' subsref invalid slicing must have 2 index since this is a 2D-array');
+		end
+
+		slicing_row=S.subs{1};
+		slicing_col=S.subs{2};
+		nbcol=size(this,2);
+		identity=eye(nbcol);
+		 		
+		if ~ischar(slicing_col)
+			identity=identity(:,slicing_col);
+		end
+
+		submatrix=this*identity;
+		
+		if ~ischar(slicing_row)
+			submatrix=submatrix(slicing_row,:);
+		end
+
 	end
         
     end

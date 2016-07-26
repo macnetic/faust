@@ -4,10 +4,10 @@
 
 nb_fact = 3;
 dim1 = 5;
-dim2 = 3;
+dim2 = 4;
 dim3 = 10;
 int_max= 100;
-threshold = 10^(-15); % equality test
+
 disp('****** TEST MATLAB_FAUST ******* '); 
 %% creation du faust
 disp(' TEST CONSTRUCTOR : '); 
@@ -65,7 +65,7 @@ disp('Ok');
 disp('TEST LOAD AND SAVE : ');
 filename = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
 disp(['save faust into the file : ' filename]); 
-save_faust(F,filename);
+save(F,filename);
 F_loaded = matlab_faust(filename);
 [dim1_loaded,dim2_loaded]=size(F_loaded);
 
@@ -90,7 +90,7 @@ disp('Ok');
 
 %% get_product test
 disp('TEST GET_PRODUCT : ');
-F_dense= get_product(F);
+F_dense= get_product(F)
 
 [dim1_dense,dim2_dense]=size(F_dense);
 if((dim1_dense ~= dim1) | (dim2_dense ~= dim2))
@@ -99,8 +99,47 @@ end
 disp('Ok');
 
 
+%% slicing test
+disp('TEST SLICING : ');
+for i=1:dim1
+	for j=1:dim2
+		F_i_j=F(i,j);
+		if (size(F_i_j) ~= [1 1])
+			error('invalid size of F(i,j)');
+		end
+		if (F_i_j ~= F_dense(i,j))
+			error('F(i,j) ~= F_dense(i,j)');
+		end
+	end
+end
+
+F_slice_slice=F(:,:);
+if (size(F_slice_slice,1) ~= dim1) | (size(F_slice_slice,2) ~= dim2)
+	error('invalid dimension');
+end
+if (F_slice_slice ~= F_dense)
+	error('F(:,:) ~= F_dense');
+end
 
 
+F_slice_slice_2=F(1:dim1,1:dim2);
+if (size(F_slice_slice_2,1) ~= dim1) | (size(F_slice_slice_2,2) ~= dim2)
+	error('invalid dimension');
+end
+if (F_slice_slice_2 ~= F_dense)
+	error('F(1:dim1,1:dim2) ~= F_dense');
+end
+
+F_inv=F(dim1:-1:1,dim2:-1:1);
+if (size(F_inv,1) ~= dim1) | (size(F_inv,2) ~= dim2)
+	error('invalid dimension');
+end
+
+
+if (F_inv ~= F_dense(dim1:-1:1,dim2:-1:1))
+	error('F(1:dim1,1:dim2) ~= F_dense(dim1:-1:1,dim2:-1:1)');
+end 
+disp('Ok');
 
 
 %%% transpose test
