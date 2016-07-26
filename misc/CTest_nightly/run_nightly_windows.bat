@@ -33,6 +33,7 @@ REM # export version of gcc
 set CC=C:\mingw-w64\mingw64\bin\gcc.exe
 set CXX=C:\mingw-w64\mingw64\bin\g++.exe
 
+set matlab="C:\Program Files\MATLAB\R2015b\bin\matlab.exe"
 REM # /usr/local/bin/matlab in the PATH 
 REM #export PATH=/usr/local/bin:$PATH
 REM # cuda in the PATH
@@ -52,9 +53,9 @@ REM #-DBUILD_DEBUG:BOOL=OFF;\
 REM #-DBUILD_COVERAGE:BOOL=ON;\				
 
 cd %PATH_DIR_RUN_NIGHTLY%
-rd faust_test
-rd faust_test_build
-rd faust_output
+rmdir /s /q faust_test
+rmdir /s /q faust_test_build
+rmdir /s /q faust_output
 
 mkdir faust_test
 mkdir faust_test_build
