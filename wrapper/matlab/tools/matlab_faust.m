@@ -210,24 +210,79 @@ classdef matlab_faust
 
 		slicing_row=S.subs{1};
 		slicing_col=S.subs{2};
-		nbcol=size(this,2);
-		identity=eye(nbcol);
-		 		
+        
+        	[dim1 dim2]=size(this);
+        
+        	if ischar(slicing_row)
+			nb_row_selected = dim1;
+        	else
+            		nb_row_selected = length(slicing_row);
+		end
+		
+		if ischar(slicing_col)
+				nb_col_selected = dim2;
+		else
+		    nb_col_selected = length(slicing_col);
+		end
+		
+		% evaluate the complexity of getting the coeff by doing 
+		%  A*Identity or A'*Identity
+		transpose_evaluation =  (nb_col_selected > nb_row_selected);
+		if transpose_evaluation
+		    identity=eye(dim1);
+		    transpose_flag='T';
+		    
+		    % switch the 2 different slicing
+		    tmp=slicing_row;
+		    slicing_row=slicing_col;
+		    slicing_col=tmp;
+		    
+		else
+		    identity=eye(dim2);
+		    transpose_flag='N';
+		end
+		
+		% selects the column of the identity, if slicing_col is a char, all
+		% the column are selected
 		if ~ischar(slicing_col)
-			identity=identity(:,slicing_col);
+				identity=identity(:,slicing_col);
 		end
 
-		submatrix=this*identity;
+		% perform A*identity or A'*identity
+		submatrix=mtimes_trans(this,identity,transpose_flag);
 		
+		% selects the row of the submatrix, if slicing_row is a char, all
+		% the row are selected
 		if ~ischar(slicing_row)
-			submatrix=submatrix(slicing_row,:);
+				submatrix=submatrix(slicing_row,:);
 		end
+		
+		% transpose if needed
+		if transpose_evaluation
+		    submatrix=submatrix';
+		end
+        
+        
+		%% former way not optimized to get access to the row        
+		% 		nbcol=size(this,2);
+		% 		identity=eye(nbcol);
+		% 		 		
+		% 		if ~ischar(slicing_col)
+		% 			identity=identity(:,slicing_col);
+		% 		end
+		% 
+		% 		submatrix=this*identity;
+		% 		
+		% 		if ~ischar(slicing_row)
+		% 			submatrix=submatrix(slicing_row,:);
+		% 		end
 
 	end
         
     end
     
 end
+
 
 
 

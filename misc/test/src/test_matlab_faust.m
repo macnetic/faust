@@ -99,47 +99,26 @@ end
 disp('Ok');
 
 
-%% slicing test
-disp('TEST SLICING : ');
-for i=1:dim1
-	for j=1:dim2
-		F_i_j=F(i,j);
-		if (size(F_i_j) ~= [1 1])
-			error('invalid size of F(i,j)');
-		end
-		if (F_i_j ~= F_dense(i,j))
-			error('F(i,j) ~= F_dense(i,j)');
-		end
-	end
-end
-
-F_slice_slice=F(:,:);
-if (size(F_slice_slice,1) ~= dim1) | (size(F_slice_slice,2) ~= dim2)
-	error('invalid dimension');
-end
-if (F_slice_slice ~= F_dense)
-	error('F(:,:) ~= F_dense');
-end
 
 
-F_slice_slice_2=F(1:dim1,1:dim2);
-if (size(F_slice_slice_2,1) ~= dim1) | (size(F_slice_slice_2,2) ~= dim2)
-	error('invalid dimension');
-end
-if (F_slice_slice_2 ~= F_dense)
-	error('F(1:dim1,1:dim2) ~= F_dense');
-end
-
-F_inv=F(dim1:-1:1,dim2:-1:1);
-if (size(F_inv,1) ~= dim1) | (size(F_inv,2) ~= dim2)
-	error('invalid dimension');
-end
 
 
-if (F_inv ~= F_dense(dim1:-1:1,dim2:-1:1))
-	error('F(1:dim1,1:dim2) ~= F_dense(dim1:-1:1,dim2:-1:1)');
-end 
-disp('Ok');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 %%% transpose test
@@ -198,6 +177,79 @@ end
 
 
 disp('Ok');
+
+
+
+%% slicing test
+disp('TEST SLICING : ');
+for i=1:dim1
+	for j=1:dim2
+		F_i_j=F(i,j);
+		F_trans_j_i=F_trans(j,i);
+
+		if (size(F_i_j) ~= [1 1])
+			error('invalid size of F(i,j)');
+		end
+		if (size(F_trans_j_i) ~= [1 1])
+			error('invalid size of F_trans(j,i)');
+		end
+		if (F_i_j ~= F_dense(i,j))
+			error('F(i,j) ~= F_dense(i,j)');
+		end
+		if (F_trans_j_i ~= F_dense_trans(j,i))
+			error('F(j,i) ~= F_dense_trans(j,i)');
+		end
+	end
+end
+
+F_slice_slice=F(:,:);
+if (size(F_slice_slice,1) ~= dim1) | (size(F_slice_slice,2) ~= dim2)
+	error('invalid dimension');
+end
+if (F_slice_slice ~= F_dense)
+	error('F(:,:) ~= F_dense');
+end
+
+
+F_trans_slice_slice=F_trans(:,:);
+if (size(F_trans_slice_slice,1) ~= dim2) | (size(F_trans_slice_slice,2) ~= dim1)
+	error('invalid dimension');
+end
+if (F_trans_slice_slice ~= F_dense')
+	error('F_trans(:,:) ~= F_dense''');
+end
+
+
+F_slice_slice_2=F(1:dim1,1:dim2);
+if (size(F_slice_slice_2,1) ~= dim1) | (size(F_slice_slice_2,2) ~= dim2)
+	error('invalid dimension');
+end
+if (F_slice_slice_2 ~= F_dense)
+	error('F(1:dim1,1:dim2) ~= F_dense');
+end
+
+F_inv=F(dim1:-1:1,dim2:-1:1);
+if (size(F_inv,1) ~= dim1) | (size(F_inv,2) ~= dim2)
+	error('invalid dimension');
+end
+
+
+if (F_inv ~= F_dense(dim1:-1:1,dim2:-1:1))
+	error('F(1:dim1,1:dim2) ~= F_dense(dim1:-1:1,dim2:-1:1)');
+end 
+disp('Ok');
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -286,6 +338,17 @@ end
 
 
 disp('Ok');
+
+
+
+
+
+
+
+
+
+
+
 
 
 %% test multiplication with matrix

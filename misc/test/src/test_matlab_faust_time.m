@@ -1,14 +1,14 @@
 %% Description test_faust_transform
-% This script tests the malab_faust class, i.e the different method
-% overloaded for a faust (constructor, size, mtimes, mtimes_trans ...)
+% This script tests the malab_faust class from a time computing point of view
 
 nb_fact = 3;
-dim1 = 8000;
-dim2 = 200;
+dim1 = 1000;
+dim2 = 500;
 dim3 = 10;
 int_max= 100;
 nb_transposition = 100;
 nb_multiplication_vector = 100;
+nb_access_coeff = 100;
 
 disp('****** TEST MATLAB_FAUST ******* '); 
 %% creation du faust
@@ -27,7 +27,6 @@ disp('Ok');
 
 
 
-%
 
 
 
@@ -41,14 +40,14 @@ disp('operation F_trans = F'' ');
 t_trans=zeros(nb_transposition,1);
 
 for i=1:nb_transposition
-	disp([int2str(i) '/' int2str(nb_transposition)]);
+	%disp([int2str(i) '/' int2str(nb_transposition)]);
 	tic		
 	F_trans=F';
 	t_trans(i)=toc;	
 end
 
 
-disp(['time trans ' num2str(mean(t_trans)) ]); 
+disp(['time trans  : ' num2str(mean(t_trans)) ]); 
 
 
 
@@ -64,6 +63,54 @@ disp('Ok');
 
 
 
+%% access to coeff
+disp('TEST ACCESS ROW OR COL');
+F_dense=get_product(F);
+t_access_row=zeros(nb_transposition,1);
+t_access_col=zeros(nb_transposition,1);
+t_access_trans_row=zeros(nb_transposition,1);
+t_access_trans_col=zeros(nb_transposition,1);
+for i=1:nb_access_coeff
+	%disp([int2str(i) '/' int2str(nb_access_coeff)]);
+	tic
+	col=F(:,1);
+	t_access_col(i)=toc;
+
+	tic	
+	row=F(1,:);
+	t_access_row(i)=toc;
+
+	tic
+	col_trans=F_trans(:,1);
+	t_access_trans_col(i)=toc;
+
+	tic
+	row_trans=F_trans(1,:);
+	t_access_trans_row(i)=toc;
+
+	
+
+	if (col ~=F_dense(:,1))	
+		error('access to the col');
+	end
+
+	if (row ~=F_dense(1,:))
+		error('access to the row');
+	end
+
+	if (col_trans ~=F_dense(1,:)')	
+		error('access to the col');
+	end	
+
+	if (row_trans ~=F_dense(:,1)')	
+		error('access to the row');
+	end
+end
+
+disp(['tps F(1,:) : ' num2str(mean(t_access_row))]);
+disp(['tps F(:,1) : ' num2str(mean(t_access_col))]);
+disp(['tps F_trans(1,:) : ' num2str(mean(t_access_trans_row))]);
+disp(['tps F_trans(:,1) : ' num2str(mean(t_access_trans_col))]);
 
 
 
@@ -83,7 +130,7 @@ x(:)=1:dim2;
 x_trans=zeros(dim1,1);
 x_trans(:)=1:dim1;
 
-F_dense=get_product(F);
+
 y_expected = F_dense*x;
 y_expected_trans = F_dense'*x_trans;
 
@@ -97,7 +144,7 @@ t_trans_mult_fun=zeros(nb_multiplication_vector,1);
 
 
 for i=1:nb_multiplication_vector
-	disp([int2str(i) '/' int2str(nb_multiplication_vector)]);
+	%disp([int2str(i) '/' int2str(nb_multiplication_vector)]);
 		
 	%% F*x
 	tic
@@ -139,11 +186,34 @@ for i=1:nb_multiplication_vector
 
 
 end
-disp(['tps A=A'' ' num2str(mean(t_trans))]);
+
+disp(['tps A=A'' : ' num2str(mean(t_trans))]);
 disp(['tps  A*x  :  ' num2str(mean(t_times))]);
 disp(['tps  A''*x  :  ' num2str(mean(t_trans_times))]);
 disp(['tps  mtimes_trans(F,x,''N'')  :  ' num2str(mean(t_mtimes))]);
 disp(['tps  mtimes_trans(F,x_trans,''T'')  :  ' num2str(mean(t_mtimes_trans))]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
