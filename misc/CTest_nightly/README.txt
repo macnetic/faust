@@ -13,9 +13,12 @@ This tool aims to launch automatically a shell-bash SCRIPT :
 3- 	configure the "crontab" tool for UNIX or shulder for windows
 	crontab -e : 
 	example :
-# Run all day at 21h01 the nightly test and put results on CDASH
+# Run all day at 14h35 the nightly test and put results on CDASH
 05 14  * * * /usr/bin/svn up /home/aleman/WORK/FAUST/faust_nightly/
 35 14  * * * /home/aleman/WORK/FAUST/faust_nightly/run_nightly_XXX.sh
+
+# run all day and send a mail 
+40 11  * * * /Users/ci/CTest_nightly/run_nightly_OS-X.sh 2>&1| mail -s "Cron job execution" leman.adrien@gmail.com
 ##
 
 4- 	You have the possibility to set the time of the precedent svn in the file 
