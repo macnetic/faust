@@ -1,4 +1,4 @@
-\section{QuickStart}\label{sec:firstUse}
+\chapter{QuickStart}\label{sec:firstUse}
 
 
 A matlab wrapper is delivered with the FAUST C++ library.
@@ -36,10 +36,10 @@ As much as possible, a \textbf{matlab{\_}faust} object is handled as a normal ma
 
 
 
-\subsection{construct a faust}\label{sec:firstUseBuild}
+\section{construct a faust}\label{sec:firstUseBuild}
 
 A \textbf{matlab{\_}faust} object can be constructed from several ways.
-\subsubsection{construct a faust from a cell-array}\label{sec:firstUseBuildFromCellArray}
+\subsection{construct a faust from a cell-array}\label{sec:firstUseBuildFromCellArray}
 First, you can build a faust from a cell-array of matlab matrix (sparse or dense) representing its factors.
 \newline
 \newline
@@ -79,7 +79,7 @@ This functionality allows you to build a faust from the factorization algorithm 
 >> A=Faust(factors,lambda);
 \end{lstlisting}
 
-\subsubsection{construct a faust from a saved one}\label{sec:firstUseBuildFromSave}
+\subsection{construct a faust from a saved one}\label{sec:firstUseBuildFromSave}
 
 You can also build a faust from a previously one which is saved into a mat file :
 \begin{lstlisting}

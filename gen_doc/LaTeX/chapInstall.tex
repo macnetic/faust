@@ -1,17 +1,16 @@
 
-\section{Installation}\label{sec:install}
+\chapter{Installation}\label{sec:install}
 
-The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. 
-CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software (cf. website on \url{https://cmake.org/}).
+The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software (cf. website \url{https://cmake.org/}).
 
-First subsection \ref{sec:UnixInstall} gives information about Unix installation and second subsection \ref{sec:WinInstall} corresponds to the Windows installation. 
+First section \ref{sec:UnixInstall} gives information about Unix installation and second section \ref{sec:WinInstall} corresponds to the Windows installation. 
 
-\subsection{Unix environment}\label{sec:UnixInstall}
+\section{Unix platform}\label{sec:UnixInstall}
 
 \begin{itemize}
 \item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
 \item Open a command terminal
-\item Place you in the FAUST directory, and tape the following command : 
+\item Place you in the FA$\mu$ST directory, and type the following commands : 
 \begin{lstlisting}
 mkdir build
 cd build
@@ -22,14 +21,48 @@ make install
 \end{itemize}
 
 
+\section{Windows platform}\label{sec:WinInstall}
 
-\subsection{Windows environment}\label{sec:WinInstall}
+\subsection{Prerequisities for installation}\label{sec:WinPrerequisitiesInstall}
+The installation of the FA$\mu$ST project depend on other components to be installed in order to run properly. 
+\begin{enumerate}
+\item \textbf{Install MinGW} "Minimalist GNU for Windows" \url{http://www.mingw.org/}
+\url{https://sourceforge.net/projects/mingw/files/latest/download?source=files}
+Launch install file and choose MINGW version 4.9.2 for mexFunction compatibility 
+The directory of binary must be add to the environment PATH. 
+
+\item \textbf{Install CMake} for building the FAUST project. 
+In \url{https://cmake.org/download/} , download Binary distributions correspond to your environment (in our case  cmake-3.6.1-win64-x64.zip)
+The directory of binary must be add to the environment PATH. 
+
+Note for Cmake tool : In a terminal command, type "make". if it doesn't exist, please check if make.exe is present in cmake-3.6.0-win64-x64$\setminus$bin$\setminus$cmake.exe
+if not, you can copy and rename mingw32-make.exe to make.exe
+
+\item \textbf{Install Matlab} if not already done (MATLAB R2015b in our case).
+
+\item In Matlab, you must install MinGW version 4.9.2 from MATLAB using the ADDON menu. For more detail, please follow the instruction give in following link :  
+\url{http://fr.mathworks.com/help/matlab/matlab_external/install-mingw-support-package.html}. For that you must have a id session for Mathwork. It is easy to create. 
+Current this latest step, an environment variable called MW\_MINGW64\_LOC is automatically generated. 
+
+\item \textbf{Install 7-Zip} \url{http://www.7-zip.org/} . 7-Zip is a file archiver used for external library
+
+\item In your environment PATH, please add following components :
+
+\begin{itemize}
+\item matlab.exe (example: "C:$\setminus$Program Files$\setminus$MATLAB$\setminus$R2015b$\setminus$bin")
+\item gcc.exe (example: "C:$\setminus$mingw-w64$\setminus$mingw64$\setminus$bin") 
+\item 7z.exe (example: "C:$\setminus$prog$\setminus$7-Zip")
+\item cmake.exe (example: "C:$\setminus$Users$\setminus$ci$\setminus$Documents$\setminus$library$\setminus$cmake-3.6.0-win64-x64$\setminus$bin")
+\end{itemize}
+\end{enumerate}
 
 
+\subsection{FAUST installation}\label{sec:WinFaustInstall}
+When prerequisities listed in precedent section \ref{sec:WinPrerequisitiesInstall} are checked, the FA$\mu$ST installation can be done. 
 \begin{itemize}
 \item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
 \item Open a command terminal
-\item Place you in the FAUST directory, and tape the following command : 
+\item Place you in the FAUST directory, and type the following commands : 
 \begin{lstlisting}
 mkdir build
 cd build
@@ -39,7 +72,4 @@ make install
 \end{lstlisting}
 \end{itemize}
 
-Warning : 
-compatibility between Matlab and MinGW :
-MinGW version 4.9.2 pour les mex functions..
-sous windows on utilise MinGW pour le compilateur GCC G++ au lieu de visual studio plous lourd à installer. MinGW version 4.9.2 pour les mex functions..
+
