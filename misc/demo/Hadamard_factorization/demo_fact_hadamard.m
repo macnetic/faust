@@ -69,7 +69,7 @@ params.verbose = 0;
 
 %% speed-up and relatice error
 X = params.data;
-hadamard_faust = matlab_faust(facts,lambda);
+hadamard_faust = Faust(facts,lambda);
 Xhat = get_product(hadamard_faust);
 relative_error = norm(X - Xhat)/norm(X);
 fprintf(['\n\n relative error between hadamard matrix and its transform : ' num2str(relative_error) '\n']);

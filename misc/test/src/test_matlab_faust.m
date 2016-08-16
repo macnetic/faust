@@ -17,7 +17,7 @@ for i=2:nb_fact
     factors{i}=double(randi(int_max,dim2,dim2)); 
 end
 
-F = matlab_faust(factors);
+F = Faust(factors);
 
 disp('Ok');
 
@@ -66,7 +66,7 @@ disp('TEST LOAD AND SAVE : ');
 filename = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
 disp(['save faust into the file : ' filename]); 
 save(F,filename);
-F_loaded = matlab_faust(filename);
+F_loaded = Faust(filename);
 [dim1_loaded,dim2_loaded]=size(F_loaded);
 
 if (dim1_loaded ~= dim1) | (dim2_loaded ~= dim2)
@@ -90,7 +90,7 @@ disp('Ok');
 
 %% get_product test
 disp('TEST GET_PRODUCT : ');
-F_dense= get_product(F)
+F_dense= get_product(F);
 
 [dim1_dense,dim2_dense]=size(F_dense);
 if((dim1_dense ~= dim1) | (dim2_dense ~= dim2))

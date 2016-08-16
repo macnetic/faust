@@ -4,7 +4,7 @@
 #INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
 
 # copy and install the matlab wrapping the underlying C++ class
-foreach(MATLAB_FILE matlab_faust matlab_faust_core)
+foreach(MATLAB_FILE Faust FaustCore)
 	configure_file(${FAUST_MATLAB_TOOLS_SRC_DIR}/${MATLAB_FILE}.m ${FAUST_MATLAB_TOOLS_BIN_DIR}/${MATLAB_FILE}.m COPYONLY)
 	install(FILES ${FAUST_MATLAB_TOOLS_BIN_DIR}/${MATLAB_FILE}.m DESTINATION ${FAUST_MATLAB_TOOLS_INSTALL_DIR})
 endforeach()

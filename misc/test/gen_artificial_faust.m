@@ -104,13 +104,13 @@ for h=1:nfacts
             
             eval(['Faust_nfact_' int2str(nb_fact) '_RCG_' int2str(RCG) '_Dim_' int2str(dim1) ' = facts;']);
             if (opt_calcul ~= 0)
-                fc = matlab_faust(facts);
+                fc = Faust(facts);
                 for k=1:nb_test
                     v=rand(dim2,1);
                     
                     %% MEX
                     tic
-                    w_faust_mex = fc*v; % surcharge de l'operateur *  de la class matlab_faust
+                    w_faust_mex = fc*v; % surcharge de l'operateur *  de la class Faust
                     t_mex = toc;
                     
                     

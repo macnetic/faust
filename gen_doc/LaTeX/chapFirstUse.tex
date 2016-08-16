@@ -58,7 +58,7 @@ The following example shows how to build a random faust of size 5x3 with 3 facto
 >> end
 >>
 >> % build the faust
->> A=matlab_faust(factors);
+>> A=Faust(factors);
 \end{lstlisting}
 \newpage
 
@@ -67,7 +67,7 @@ An optional multiplying scalar argument can be taken into account  :
 >> % multiplicative scalar
 >> lambda = 3.5 
 >> % build the faust
->> A=matlab_faust(factors,lambda);
+>> A=Faust(factors,lambda);
 \end{lstlisting}
 
 This functionality allows you to build a faust from the factorization algorithm :
@@ -76,7 +76,7 @@ This functionality allows you to build a faust from the factorization algorithm 
 >> % factorization step
 >> [lambda,factors]=mexHierarchical_fact(params);
 >> % build the faust corresponding to the factorization
->> A=matlab_faust(factors,lambda);
+>> A=Faust(factors,lambda);
 \end{lstlisting}
 
 \subsubsection{construct a faust from a saved one}\label{sec:firstUseBuildFromSave}
@@ -86,6 +86,6 @@ You can also build a faust from a previously one which is saved into a mat file 
 >> %  save the faust A into the file faust.mat
 >> [lambda,factors]=save(A,'faust.mat');
 >> % create a new faust from the file faust.mat
->> A_loaded=matlab_faust('faust.mat');
+>> A_loaded=Faust('faust.mat');
 \end{lstlisting}
  

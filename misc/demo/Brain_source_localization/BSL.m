@@ -107,7 +107,7 @@ for i=1:nb_approx_MEG
     facts{1}=facts{1}./repmat(sqrt(sum(X_approx.^2,1)),size(X_approx,1),1)';% normalisation of the row dvp(facts)
     sp_facts_trans = make_sparse(facts);
     sp_facts = faust_transpose(sp_facts_trans);
-    trans_fc=matlab_faust(facts);
+    trans_fc=Faust(facts);
     fc=transpose(trans_fc);
     
     % matlab faust (no C++ Faust Toolbox code is running)
@@ -138,9 +138,9 @@ solver_choice=params.solver_choice;
 
 
 
-resDist = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,m�thode,dist_sources,src_nb,run);
+resDist = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,methode,dist_sources,src_nb,run);
 compute_Times = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Ntraining);
-resDist_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,m�thode,dist_sources,src_nb,run);
+resDist_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,methode,dist_sources,src_nb,run);
 compute_Times_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Ntraining);
 
 

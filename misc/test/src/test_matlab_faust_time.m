@@ -19,7 +19,7 @@ for i=2:nb_fact
     factors{i}=double(randi(int_max,dim2,dim2)); 
 end
 
-F = matlab_faust(factors);
+F = Faust(factors);
 
 disp('Ok');
 

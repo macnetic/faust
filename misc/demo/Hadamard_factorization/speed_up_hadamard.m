@@ -81,7 +81,7 @@ for i=1:nb_mult
     for k=1:nb_dim
         n=ns(k);
         hadamard_dense=Hadamard_matrices{k};
-        hadamard_faust=matlab_faust(Hadamard_facts{k});
+        hadamard_faust=Faust(Hadamard_facts{k});
         
         x=rand(n,1);
         ydense=zeros(n,1);

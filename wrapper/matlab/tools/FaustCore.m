@@ -1,21 +1,21 @@
-%class MATLAB_FAUST_CORE
+%class FAUSTCORE
 % this class only stored the Faust C++ object and 
 % inherit from matlab handle class which allows different
 % object to the same reference
 % 
 % WARNING : the user must not directly use this class,
-% he must use the matlab class matlab_faust
+% he must use the matlab class Faust
 %
 % For more information on the FAuST Project, please visit the website of
 % the project :  <http://faust.gforge.inria.fr>
 
-classdef matlab_faust_core < handle
+classdef FaustCore < handle
     properties (SetAccess = public, Hidden = false)
         objectHandle; % Handle to the underlying C++ class instance
     end
     methods
         %% Constructor - Create a new C++ class instance
-        function this = matlab_faust_core(varargin)
+        function this = FaustCore(varargin)
             % Constructor - build a faust from a cell array of matrix and a scalar (optional)
             %                1st input : 1D cell array of matrix (sparse or dense)
             %                2nd input : (optional) multiplicative scalar
@@ -24,9 +24,9 @@ classdef matlab_faust_core < handle
 		filename=varargin{1};
 		load(filename);
 		if (~exist('faust_factors','var') || ~exist('transpose_flag','var'))
-			error('matlab_faust : invalid file');
+			error('Faust : invalid file');
 		end
-		this=matlab_faust_core(faust_factors);
+		this=FaustCore(faust_factors);
 	    else				
 		this.objectHandle = mexFaust('new',varargin{:});
 	    end

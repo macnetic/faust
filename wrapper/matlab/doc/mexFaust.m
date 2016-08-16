@@ -1,8 +1,8 @@
 %% Description mexFaust
 % this mexfunction should not be called directly by the user,
-% all the call of this mexfunction is done by the matlab_faust.m  class
+% all the call of this mexfunction is done by the Faust.m  class
 %
-%  mexfunction handling all the method, function of the matlab_faust class
+%  mexfunction handling all the method, function of the Faust class
 %  arargout{1:nargout} = mexFaust(CMD,vargin{:}),
 % for instance, 1st input CMD  can be equal to :
 % 'new'-> create a new faust
@@ -12,8 +12,8 @@
 %'transpose' -> transpose a faust
 %'size' -> get the dimension of a faust
 %
-% for more information about the matlab_faust class, 
-%type 'doc matlab_faust'
+% for more information about the Faust class, 
+%type 'doc Faust'
 
 %% License:
 % Copyright (2016):	Nicolas Bellot, Adrien Leman, Luc Le Magoarou, Remi Gribonval

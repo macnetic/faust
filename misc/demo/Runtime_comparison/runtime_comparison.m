@@ -93,7 +93,7 @@ for j=1:NDims
            for l=1:Nnb_facts
                nfact=nb_facts(l);
                fact=gen_artificial_faust(dim,RCG,nfact,constraint);
-               faust_transform=matlab_faust(fact);
+               faust_transform=Faust(fact);
                list_faust{j,k,l}=faust_transform;
                taillefaust=size(faust_transform);
                if((taillefaust(1) ~= dim) + (taillefaust(2) ~= dim))
@@ -134,7 +134,7 @@ for i=1:Nb_mult+1
            for l=1:Nnb_facts
                nfact=nb_facts(l);
                fact=gen_artificial_faust(dim,RCG,nfact,constraint);
-               faust_transform=matlab_faust(fact);
+               faust_transform=Faust(fact);
                x=rand(dim,dim2);
                y=zeros(dim,dim2);
                yfaust=zeros(dim,dim2);
