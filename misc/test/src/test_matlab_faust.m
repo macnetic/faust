@@ -7,6 +7,7 @@ dim1 = 5;
 dim2 = 4;
 dim3 = 10;
 int_max= 100;
+threshold = 10^(-5);
 
 disp('****** TEST MATLAB_FAUST ******* '); 
 %% creation du faust
@@ -303,38 +304,38 @@ y_expected_trans = F_dense'*x_trans;
 
 y_star = F*x;
 if (y_expected ~= y_star)
-    error(['multiplication faust-vector : invalid result within the precision ' num2str(threshold)]);
+    error(['multiplication faust-vector : invalid result  ' ]);
 end
 
 
 
 y_star_trans = F'*x_trans;
 if (y_expected_trans~= y_star_trans)
-    error(['multiplication faust-vector with transposition : invalid result within the precision ' num2str(threshold)]);
+    error(['multiplication faust-vector with transposition : invalid result  ' ]);
 end
 
 
 y_mtimes_trans = mtimes_trans(F,x_trans,istransposed);
 if (y_expected_trans ~= y_mtimes_trans)
-    error(['multiplication faust-vector with transposition : invalid result within the precision '  num2str(threshold)]);
+    error(['multiplication faust-vector with transposition : invalid result  '  ]);
 end
 
 
 y_mtimes = mtimes_trans(F,x,nontransposed);
 if (y_expected ~= y_mtimes)
-    error(['multiplication faust-vector : invalid result within the precision '  num2str(threshold)]);
+    error(['multiplication faust-vector : invalid result  '  ]);
 end
 
 
 y_mtimes_trans_N = mtimes_trans(F_trans,x_trans,nontransposed);
 if (y_expected_trans ~= y_mtimes_trans_N)
-    error(['multiplication faust-vector with transposition : invalid result within the precision '  num2str(threshold)]);
+    error(['multiplication faust-vector with transposition : invalid result  '  ]);
 end
 
 
 y_mtimes_trans_T = mtimes_trans(F_trans,x,istransposed);
 if (y_expected ~= y_mtimes_trans_T)
-    error(['multiplication faust-vector : invalid result within the precision '  num2str(threshold)]);
+    error(['multiplication faust-vector : invalid result  '  ]);
 end
 
 
@@ -366,37 +367,37 @@ Y_expected_trans = F_dense'*X_trans;
 
 Y_star = F*X;
 if (Y_expected ~= Y_star)
-    error(['multiplication faust-vector : invalid result within the precision ' num2str(threshold)]);
+    error(['multiplication faust-vector : invalid result  ' ]);
 end
 
 
 
 Y_star_trans = F'*X_trans;
 if (Y_expected_trans~= Y_star_trans)
-    error(['multiplication faust-vector with transposition : invalid result within the precision ' num2str(threshold)]);
+    error(['multiplication faust-vector with transposition : invalid result  ' ]);
 end
 
 
 Y_mtimes_trans = mtimes_trans(F,X_trans,istransposed);
 if (Y_expected_trans ~= Y_mtimes_trans)
-    error(['multiplication faust-vector with transposition : invalid result within the precision '  num2str(threshold)]);
+    error(['multiplication faust-vector with transposition : invalid result  '  ]);
 end
 
 
 Y_mtimes = mtimes_trans(F,X,nontransposed);
 if (Y_expected ~= Y_mtimes)
-    error(['multiplication faust-vector : invalid result within the precision '  num2str(threshold)]);
+    error(['multiplication faust-vector : invalid result  '  ]);
 end
 
 Y_mtimes_trans_N = mtimes_trans(F_trans,X_trans,nontransposed);
 if (Y_expected_trans ~= Y_mtimes_trans_N)
-    error(['multiplication faust-vector with transposition : invalid result within the precision '  num2str(threshold)]);
+    error(['multiplication faust-vector with transposition : invalid result  '  ]);
 end
 
 
 Y_mtimes_trans_T = mtimes_trans(F_trans,X,istransposed);
 if (y_expected ~= y_mtimes_trans_T)
-    error(['multiplication faust-vector : invalid result within the precision '  num2str(threshold)]);
+    error(['multiplication faust-vector : invalid result  '  ]);
 end
 
 
@@ -404,3 +405,19 @@ end
 
 
 disp('Ok');
+
+
+disp('TEST 2-norm : ');
+real_norm=norm(F_dense);
+norm_faust=norm(F);
+
+if (abs(real_norm - norm_faust)>threshold)
+	error(['norm : invalid result, expected ' num2str(real_norm) ' get norm_faust' num2str(norm_faust)]);
+end
+
+disp('Ok');
+
+
+
+
+

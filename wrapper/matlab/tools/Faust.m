@@ -256,6 +256,29 @@ classdef Faust
         
 
 	end
+
+
+	%% norm : compute the 2-norm of a faust
+	function norm_faust=norm(this,varargin)
+
+	    nb_input = length(varargin);
+            if (nb_input > 1)
+                error('Too many input arguments');
+            end
+            
+            if nb_input == 1
+		if varargin{1} ~= 2
+                	error('only 2-norm is supported for the faust');
+		end
+            end
+	
+	    %% the transpose flag of the faust is ignored because norm(A)==norm(A')
+	    norm_faust=mexFaust('norm',this.matrix.objectHandle);
+            
+	    
+
+
+	end
         
     end
     

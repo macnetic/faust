@@ -6,9 +6,17 @@ dim1 = 1000;
 dim2 = 500;
 dim3 = 10;
 int_max= 100;
+
+
+
 nb_transposition = 100;
 nb_multiplication_vector = 100;
 nb_access_coeff = 100;
+nb_norm = 100;
+threshold = 10^(-5);
+
+
+
 
 disp('****** TEST MATLAB_FAUST ******* '); 
 %% creation du faust
@@ -196,30 +204,33 @@ disp(['tps  mtimes_trans(F,x,nontransposed)  :  ' num2str(mean(t_mtimes))]);
 disp(['tps  mtimes_trans(F,x_trans,istransposed)  :  ' num2str(mean(t_mtimes_trans))]);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 disp('Ok');
+
+
+disp('TEST 2-norm : ');
+
+t_dense_norm=zeros(nb_norm,1);
+t_faust_norm=zeros(nb_norm,1);
+
+for i=1:nb_norm
+	tic
+	norm_F=norm(F);
+	t_faust_norm(i) = toc;
+	
+	tic	
+	norm_F_dense=norm(F);
+	t_dense_norm = toc;
+
+	if (abs(norm_F-norm_F_dense) > threshold)
+		error(['norm : invalid result, expects ' num2str(norm_F_dense) ' but get ' num2str(norm_F)]);
+	end	
+end
+
+disp(['norm dense  :  ' num2str(mean(t_dense_norm))]);
+disp(['norme F  :  ' num2str(mean(t_faust_norm))]);
+
+
+
 
 
 

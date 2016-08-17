@@ -174,6 +174,28 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		return;
 	}
 
+
+	if (!strcmp("norm",cmd))
+	{	
+		
+		if (nlhs != 1 || nrhs != 2)
+			mexErrMsgTxt("norm: Unexpected arguments");
+		if(core_ptr->size() == 0)
+			mexErrMsgTxt("get_product : empty faust core");
+		
+		bool transpose_flag = (bool) mxGetScalar(prhs[2]);
+		FFPP precision =  0.001;
+		faust_unsigned_int nbr_iter_max=100;
+		int flag;
+		char op;
+		//spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
+		double norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
+		plhs[0]=mxCreateDoubleScalar(norm_faust);
+
+		return;
+	}
+
+
 	if (!strcmp("copy",cmd))
 	{
 
