@@ -72,7 +72,7 @@ option(BUILD_MULTITHREAD "Enable multithread with OpenMP Multithreading." OFF)
 # Allows verbose:
 option(BUILD_VERBOSE "Enable verbose option when compile (-v)." OFF)
 # Allows MPTK Debug:
-option(BUILD_DEBUG "Enable MPTK Debug mode." OFF)
+option(BUILD_DEBUG "Enable FAUST Debug mode." OFF)
 # Allows Matlab MEX files :
 option(BUILD_USE_GPU  "Using both CPU and GPU process" OFF)
 
