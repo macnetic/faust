@@ -36,40 +36,31 @@ classdef Faust
         %% Multiplication faust-vector or faust-matrix
         function y = mtimes(this,x)
             % mtimes - overloading of the matlab multiplication (*) function, compatible with matlab matrix and vector
-	    if (this.transpose_flag)
-            trans='T';
-        else
-            trans='N';
-	    end
-	
-            y = mexFaust('multiply', this.matrix.objectHandle,x,trans);
+            y = mexFaust('multiply', this.matrix.objectHandle,x,this.transpose_flag);
         end
         
         
         %% Multiplication by a faust or its transpose
-        % if trans = 'N' multiplication by faust
-        % if trans = 'T' multiplication the transpose of a faust
+        % if trans = 0 multiplication by faust
+        % if trans = 1 multiplication by the transpose of a faust
         function y = mtimes_trans(this,x,trans)
-	    
-	    if xor(strcmp(trans,'T'),this.transpose_flag)
-            	trans='T';
-        else
-            	trans='N';
-	    end
-	
-            y = mexFaust('multiply', this.matrix.objectHandle,x,trans);
+	if ~isreal(trans)
+		error('invalid argument trans, must be equal to 0 or 1');
+	end
+
+	if (trans ~= 1) && (trans ~= 0)
+		error('invalid argument trans, must be equal to 0 or 1');
+	end
+	   
+	isreally_trans=xor(trans,this.transpose_flag);
+	y = mexFaust('multiply', this.matrix.objectHandle,x,isreally_trans);
             
         end
         
         %% Evaluate the product of a faust_core
         function y = get_product(this)
             % get_product - compute the dense matrix equivalent to the faust (the product of sparse matrix)
-            if this.transpose_flag
-                trans='T';
-            else
-                trans='N';
-            end	
-            y=mexFaust('get_product',this.matrix.objectHandle,trans);
+            y=mexFaust('get_product',this.matrix.objectHandle,this.transpose_flag);
 	
             
         end
@@ -84,10 +75,11 @@ classdef Faust
         function trans=ctranspose(this)
 	%ctranspose - overloading of the matlab transpose operator (')
                 trans=this; % trans and this point share the same C++ underlying object (objectHandle)
-                trans.transpose_flag = mod(this.transpose_flag+1,2); % inverse the transpose flag
+                trans.transpose_flag = xor(1,this.transpose_flag); % inverse the transpose flag
         end
 
-
+	
+	
         %% Size
         function varargout = size(this,varargin)
             %size - overload of the matlab size function
@@ -230,7 +222,7 @@ classdef Faust
 		transpose_evaluation =  (nb_col_selected > nb_row_selected);
 		if transpose_evaluation
 		    identity=eye(dim1);
-		    transpose_flag='T';
+		    transpose_flag=1;
 		    
 		    % switch the 2 different slicing
 		    tmp=slicing_row;
@@ -239,7 +231,7 @@ classdef Faust
 		    
 		else
 		    identity=eye(dim2);
-		    transpose_flag='N';
+		    transpose_flag=0;
 		end
 		
 		% selects the column of the identity, if slicing_col is a char, all
@@ -262,20 +254,6 @@ classdef Faust
 		    submatrix=submatrix';
 		end
         
-        
-		%% former way not optimized to get access to the row        
-		% 		nbcol=size(this,2);
-		% 		identity=eye(nbcol);
-		% 		 		
-		% 		if ~ischar(slicing_col)
-		% 			identity=identity(:,slicing_col);
-		% 		end
-		% 
-		% 		submatrix=this*identity;
-		% 		
-		% 		if ~ischar(slicing_row)
-		% 			submatrix=submatrix(slicing_row,:);
-		% 		end
 
 	end
         

@@ -113,7 +113,7 @@ for i=1:nb_mult
         t4=toc;
 
 	tic
-	yfaust_mtimes_trans=mtimes_trans(hadamard_faust,x,'T');
+	yfaust_mtimes_trans=mtimes_trans(hadamard_faust,x,1);
 	t5=toc;
 	tic
 	

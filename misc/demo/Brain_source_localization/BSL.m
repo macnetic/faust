@@ -115,8 +115,8 @@ for i=1:nb_approx_MEG
     matlab_faustS_mult{i}=@(x) f_mult(sp_facts,x); % function handle
     
     % wrapper C++ faust
-    trans_faustS_mult{i}=@(x) mtimes_trans(fc,x,'T');% function handle 
-    faustS_mult{i}=@(x) mtimes_trans(fc,x,'N'); % function handle
+    trans_faustS_mult{i}=@(x) mtimes_trans(fc,x,1);% function handle 
+    faustS_mult{i}=@(x) mtimes_trans(fc,x,0); % function handle
     MEG_faustS{i}=fc; % store the different faust approximations
 end
 M=size(X_norm,2);

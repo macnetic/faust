@@ -167,7 +167,7 @@ for i=1:Nb_mult+1
                tfaust=toc;
                t_faust(i,j,k,l,1)=tfaust;
                tic;
-               yfaust_trans=mtimes_trans(faust_transform,x,'T');
+               yfaust_trans=mtimes_trans(faust_transform,x,1);
                tfaust_trans=toc;
                t_faust(i,j,k,l,2)=tfaust_trans;
            end

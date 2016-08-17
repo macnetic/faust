@@ -125,6 +125,8 @@ disp(['tps F_trans(:,1) : ' num2str(mean(t_access_trans_col))]);
 
 %% test faust multiplication with vector
 disp('TEST MULTIPLICATION BY A VECTOR : ');
+istransposed=1;
+nontransposed=0;
 x=zeros(dim2,1);
 x(:)=1:dim2;
 x_trans=zeros(dim1,1);
@@ -164,9 +166,9 @@ for i=1:nb_multiplication_vector
     		error(['multiplication faust-vector with transposition : invalid result within the precision ' num2str(threshold)]);
 	end
 	
-	%% mtimes_trans(F,x_trans,'T');
+	%% mtimes_trans(F,x_trans,istransposed);
 	tic
-	y_mtimes_trans = mtimes_trans(F,x_trans,'T');
+	y_mtimes_trans = mtimes_trans(F,x_trans,istransposed);
 	t_mtimes_trans(i) = toc;	
 	
 	if (y_expected_trans ~= y_mtimes_trans)
@@ -175,9 +177,9 @@ for i=1:nb_multiplication_vector
 
 	
 	
-	%% mtimes_trans(F,x,'N');
+	%% mtimes_trans(F,x,nontransposed);
 	tic
-	y_mtimes = mtimes_trans(F,x,'N');
+	y_mtimes = mtimes_trans(F,x,nontransposed);
 	t_mtimes(i) = toc;	
 	if (y_expected ~= y_mtimes)
 	    error(['multiplication faust-vector : invalid result within the precision '  num2str(threshold)]);
@@ -190,8 +192,8 @@ end
 disp(['tps A=A'' : ' num2str(mean(t_trans))]);
 disp(['tps  A*x  :  ' num2str(mean(t_times))]);
 disp(['tps  A''*x  :  ' num2str(mean(t_trans_times))]);
-disp(['tps  mtimes_trans(F,x,''N'')  :  ' num2str(mean(t_mtimes))]);
-disp(['tps  mtimes_trans(F,x_trans,''T'')  :  ' num2str(mean(t_mtimes_trans))]);
+disp(['tps  mtimes_trans(F,x,nontransposed)  :  ' num2str(mean(t_mtimes))]);
+disp(['tps  mtimes_trans(F,x_trans,istransposed)  :  ' num2str(mean(t_mtimes_trans))]);
 
 
 

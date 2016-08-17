@@ -147,8 +147,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(core_ptr->size() == 0)
 			mexErrMsgTxt("get_product : empty faust core");
 		
-		mxChar * char_array=mxGetChars(prhs[2]);
-		char op=char_array[0];
+		bool transpose_flag = (bool) mxGetScalar(prhs[2]);
+
+		char op;
+		if (transpose_flag)
+			op='T';
+		else
+			op='N';
+	
 		faust_unsigned_int nbRowOp,nbColOp;
 		(*core_ptr).setOp(op,nbRowOp,nbColOp);
 		const size_t SIZE_B1 = nbRowOp;
@@ -206,8 +212,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (nelem != 1)
 		mexErrMsgTxt("invalid char argument.");
 	
-	mxChar * char_array=mxGetChars(prhs[3]);
-	char op=char_array[0];	
+	// boolean flag to know if the faust si transposed
+	bool transpose_flag = (bool) mxGetScalar(prhs[3]);
+	char op;
+	if (transpose_flag)
+		op='T';
+	else
+		op='N';
+
+
 			
         const size_t nbRowA = mxGetM(prhs[2]);
         const size_t nbColA = mxGetN(prhs[2]);
