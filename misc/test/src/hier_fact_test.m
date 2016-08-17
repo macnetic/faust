@@ -24,7 +24,7 @@ end
 
 
 mexfact{1}=mexlambda*mexfact{1};
-fc=matlab_faust(mexfact);
+fc=Faust(mexfact);
 mex_error = norm(params.data - get_product(fc));
 
 disp(['relative error :  ' num2str(mex_error)]);
