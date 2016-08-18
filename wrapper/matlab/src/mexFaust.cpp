@@ -183,7 +183,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(core_ptr->size() == 0)
 			mexErrMsgTxt("get_product : empty faust core");
 		
-		bool transpose_flag = (bool) mxGetScalar(prhs[2]);
+		
 		FFPP precision =  0.001;
 		faust_unsigned_int nbr_iter_max=100;
 		int flag;
