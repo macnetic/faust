@@ -193,8 +193,7 @@ classdef Faust
 		for i=1:nb_fact
 			faust_factors{i}=get_fact(this,i);
 		end
-		transpose_flag=this.transpose_flag;
-		save(filename,'faust_factors','transpose_flag');
+		save(filename,'faust_factors');
 		
 		
 	end

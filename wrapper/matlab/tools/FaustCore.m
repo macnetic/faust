@@ -23,7 +23,7 @@ classdef FaustCore < handle
 	    if (nargin == 1) && ischar(varargin{1})
 		filename=varargin{1};
 		load(filename);
-		if (~exist('faust_factors','var') || ~exist('transpose_flag','var'))
+		if (~exist('faust_factors','var') )
 			error('Faust : invalid file');
 		end
 		this=FaustCore(faust_factors);

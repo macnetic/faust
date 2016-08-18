@@ -11,7 +11,8 @@ threshold = 10^(-5);
 
 disp('****** TEST MATLAB_FAUST ******* '); 
 %% creation du faust
-disp(' TEST CONSTRUCTOR : '); 
+disp(' TEST CONSTRUCTOR : ');
+disp(['generate a faust of size ' int2str(dim1)  ' by ' int2str(dim2)]); 
 factors=cell(1,nb_fact);
 factors{1}=double(randi(int_max,dim1,dim2));
 for i=2:nb_fact
@@ -62,31 +63,7 @@ for i=1:nb_fact
 end
 disp('Ok');
 
-%% load_faust and save_faust test
-disp('TEST LOAD AND SAVE : ');
-filename = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
-disp(['save faust into the file : ' filename]); 
-save(F,filename);
-F_loaded = Faust(filename);
-[dim1_loaded,dim2_loaded]=size(F_loaded);
 
-if (dim1_loaded ~= dim1) | (dim2_loaded ~= dim2)
-	error('load and save faust : invalid dimension');
-end
-
-nb_fact_load=get_nb_factor(F);
-if (nb_fact_load ~= nb_fact)
-	error('load and save faust : invalid number of factor of the loaded faust ');
-end
-
-for i=1:nb_fact
-	A=get_fact(F_loaded,i);
-	if(A~=factors{i})
-		error('get_fact : invalid factor');
-	end
-
-end
-disp('Ok');
 
 
 %% get_product test
@@ -179,7 +156,54 @@ end
 
 disp('Ok');
 
+%% load_faust and save_faust test
+disp('TEST LOAD AND SAVE : ');
+filename = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
+disp(['save faust into the file : ' filename]); 
+save(F,filename);
+F_loaded = Faust(filename)
+[dim1_loaded,dim2_loaded]=size(F_loaded);
 
+if (dim1_loaded ~= dim1) | (dim2_loaded ~= dim2)
+	error('load and save faust : invalid dimension');
+end
+
+nb_fact_load=get_nb_factor(F);
+if (nb_fact_load ~= nb_fact)
+	error('load and save faust : invalid number of factor of the loaded faust ');
+end
+
+for i=1:nb_fact
+	A=get_fact(F_loaded,i);
+	if(A~=factors{i})
+		error('get_fact : invalid factor');
+	end
+
+end
+
+
+
+filename_trans = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust_trans.mat'];
+disp(['save transposed faust into the file : ' filename_trans]); 
+save(F_trans,filename_trans);
+
+F_trans_loaded = Faust(filename_trans)
+[dim1_trans_faust_loaded,dim2_trans_faust_loaded]=size(F_trans_loaded);
+
+if (dim1_trans_faust_loaded ~= dim2) | (dim2_trans_faust_loaded ~= dim1)
+	error(['save transposed : invalid dimension to the loaded-saved faust']);
+end
+
+F_dense_trans_loaded=get_product(F_trans_loaded);
+if (F_dense_trans_loaded ~= F_dense')
+	error(['save transposed : invalid faust']);
+end
+
+
+
+
+
+disp('Ok');
 
 %% slicing test
 disp('TEST SLICING : ');
