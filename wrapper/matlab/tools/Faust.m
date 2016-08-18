@@ -130,6 +130,25 @@ classdef Faust
         end
 
 
+    	% end : 
+    	% serve as the last index in an indexing expression.  In
+    	% that context, end = SIZE(X,k) when used as part of the k-th index.
+    	% Examples of this use are, X(3:end) and X(1,1:2:end-1) 
+    	function end_dim = end(this,k,n)
+		% end - overload of the builtin function end
+	
+		if (n ~= 2)
+			error('invalid slicing : faust is a 2D array i.e matrix');
+		end
+
+		end_dim=size(this,k);
+
+
+	end
+
+
+
+	
 
 	%% get_fact : return the id factor of the faust as a dense matrix
         function factor = get_fact(this,id)
@@ -183,7 +202,7 @@ classdef Faust
 	%% subsref : allows operation such as A(i,j) A(:,j)  A(3:4,2:5) but not A(end,end)
 	function submatrix=subsref(this,S)
 		% overloading of the slicing method only for reading the value of the coeff
-		% WARNING : operation such as this(end,end) give wrong results (operator end not supported)
+		
 		if (~isfield(S,'type')) | (~isfield(S,'subs'))
 			error(' subsref invalid structure S missing field type or subs');
 		end

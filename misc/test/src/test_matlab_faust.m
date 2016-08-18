@@ -238,6 +238,20 @@ end
 if (F_inv ~= F_dense(dim1:-1:1,dim2:-1:1))
 	error('F(1:dim1,1:dim2) ~= F_dense(dim1:-1:1,dim2:-1:1)');
 end 
+
+
+%% operator end with slicing
+F_end = F(1:end,1:end);
+if (size(F_end,1) ~= dim1) | (size(F_end,2) ~= dim2)
+	error('invalid dimension');
+end 
+
+if (F_end ~= F_dense(1:end,1:end))
+	error('F(1:end,1:end) ~= F_dense(1:end,1:end)');
+end
+
+
+
 disp('Ok');
 
 
@@ -289,6 +303,8 @@ end
 if ((dim1_trans_trans_eq ~= dim1) | (dim2_trans_trans_eq ~= dim2))
     error(['operator = test 3 : invalid dimension']);
 end
+disp('Ok');
+
 
 
 %% test faust multiplication with vector
@@ -400,13 +416,13 @@ if (y_expected ~= y_mtimes_trans_T)
     error(['multiplication faust-vector : invalid result  '  ]);
 end
 
-
-
-
-
 disp('Ok');
 
 
+
+
+
+%% test 2-norm (spectral norm)
 disp('TEST 2-norm : ');
 real_norm=norm(F_dense);
 norm_faust=norm(F);
