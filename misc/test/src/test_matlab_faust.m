@@ -426,9 +426,18 @@ disp('Ok');
 disp('TEST 2-norm : ');
 real_norm=norm(F_dense);
 norm_faust=norm(F);
+norm_faust2=norm(F,2);
+norm_faust_trans=norm(F_trans);
 
 if (abs(real_norm - norm_faust)>threshold)
 	error(['norm : invalid result, expected ' num2str(real_norm) ' get norm_faust' num2str(norm_faust)]);
+end
+if (norm_faust ~= norm_faust2)
+	error(['norm : norm(F) must be equal to norm(F,2)']);
+end
+
+if (norm_faust_trans ~= norm_faust)
+	error(['norm : norm(F) must be equal to norm(F_trans)']);
 end
 
 disp('Ok');

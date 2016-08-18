@@ -26,12 +26,16 @@ As much as possible, a \textbf{matlab{\_}faust} object is handled as a normal ma
 >> y2 = A'*x2;
 >>
 >>
+>> % get the 2-norm (spectral norm) of the faust A
+>> norm_A = norm(A); % equivalent to norm(A,2);
+>>
 >> % get the coefficient i,j and slicing for reading purpose
 >> coeff=A(i,j);
 >> col_2=A(:,2);
 >> submatrix_A=A(3:5,2:3);
+>> submatrix_A=A(2:end,3:end-1);
 >> % Warning :  A(i,j)=3 will not modify A, writing is not allowed
->> % Warning :  A(end,end) give the wrong result   
+  
 \end{lstlisting}
 
 
