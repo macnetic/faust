@@ -11,6 +11,7 @@
 void handleWarning(const char texte [], ...);
 
 
+/* modification NB : manque de lisibilite de l'erreur avec __LINE__ et __FILE__
 /// macro pour la gestion des errors (__LINE__ et __FILE__)
 #define handleError(m_className,message) do {                                \
 		std::stringstream complete_message;		\
@@ -18,3 +19,13 @@ void handleWarning(const char texte [], ...);
 	    throw std::logic_error(complete_message.str());} while (0)
 
 #endif
+*/
+
+#define handleError(m_className,message) do {                                \
+		std::stringstream complete_message;		\
+        complete_message<<m_className<<" : "<<message; \
+	    throw std::logic_error(complete_message.str());} while (0)
+
+#endif
+
+

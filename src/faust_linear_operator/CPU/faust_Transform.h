@@ -57,6 +57,11 @@ namespace Faust
         Transform(const std::vector<Faust::MatSparse<FPP,Cpu> >& facts, const FPP lambda_ = (FPP)1.0);
 
         Transform(const Transform<FPP,Cpu> & A);
+	
+	/** \brief 
+        * check the factors validity of the faust, if the list of factors represents a valid matrix
+        * */		
+	void check_factors_validity() const;
 
         /** \brief Constructor
         * \param facts : Vector including dense matrix*/

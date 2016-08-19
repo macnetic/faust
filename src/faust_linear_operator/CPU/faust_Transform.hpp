@@ -110,7 +110,7 @@ void Faust::Transform<FPP,Cpu>::faust_gemm(const Faust::MatDense<FPP,Cpu> & B, F
 
 
 template<typename FPP>
-const char * Faust::Transform<FPP,Cpu>::m_className="Faust::Transform<FPP,Cpu>::";
+const char * Faust::Transform<FPP,Cpu>::m_className="Faust::Transform<FPP,Cpu>";
 
 
 template<typename FPP>
@@ -135,7 +135,30 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu>
 
 	if(lambda_ != 1.0 && data.size()>0)
 		(data[0]) *= lambda_;
+	
+	this->check_factors_validity();
 }
+
+template<typename FPP>
+
+void Faust::Transform<FPP,Cpu>::check_factors_validity() const
+{
+		
+	if (size() > 0)
+	{
+	 
+	 for (int i=0;i<=size()-2;i++)
+	 {
+	    if (data[i].getNbCol() != data[i+1].getNbRow())
+		handleError(m_className,"check_factors_validity : dimensions of the factors mismatch");
+			
+	 }	 	
+
+
+	}
+
+}
+
 
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::get_facts(std::vector<Faust::MatDense<FPP,Cpu> >& facts)const
@@ -347,7 +370,7 @@ void Faust::Transform<FPP,Cpu>::multiply(const Faust::Transform<FPP,Cpu> & A) //
 		{
 			if (getNbCol() != A.getNbRow())
 			{
-				handleError(m_className,"multiply : dimensions of the 2 faustcore are in conflict");
+				handleError(m_className,"multiply : dimensions of the 2 faust_transform are in conflict");
 			}
 			data.insert(data.end(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;
 		}

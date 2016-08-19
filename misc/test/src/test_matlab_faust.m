@@ -1,5 +1,5 @@
-%% Description test_faust_transform
-% This script tests the malab_faust class, i.e the different method
+%% Description test_matlab_faust
+% This script tests the Faust class, i.e the different method
 % overloaded for a faust (constructor, size, mtimes, mtimes_trans ...)
 
 nb_fact = 3;

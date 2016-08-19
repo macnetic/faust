@@ -57,7 +57,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mxArray * mxMat;
 			for (int i=0;i<nb_element;i++)
 			{
-				mxMat=mxGetCell(prhs[1],i);
+				mxMat=mxGetCell(prhs[1],i);	
 				addSpmat<FFPP>(mxMat,vec_spmat);
 			}
 		}
@@ -65,7 +65,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         FFPP lambda = 1.0;
 		if (nrhs > 2)			
 			lambda = (FFPP) mxGetScalar(prhs[2]);
-
 		Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>(vec_spmat,lambda);
 		plhs[0]=convertPtr2Mat<Faust::Transform<FFPP,Cpu> >(F);
 
@@ -177,7 +176,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	if (!strcmp("norm",cmd))
 	{	
-		
 		if (nlhs != 1 || nrhs != 2)
 			mexErrMsgTxt("norm: Unexpected arguments");
 		if(core_ptr->size() == 0)
@@ -191,7 +189,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		//spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
 		double norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
 		plhs[0]=mxCreateDoubleScalar(norm_faust);
-
+		
 		return;
 	}
 

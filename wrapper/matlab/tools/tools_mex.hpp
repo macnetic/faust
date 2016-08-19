@@ -356,9 +356,10 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS
 template<typename FPP>
 void addSpmat(const mxArray * mxMat,std::vector<Faust::MatSparse<FPP,Cpu> > &vec_spmat)
 {
+	if (mxMat == NULL)
+	   mexErrMsgTxt("addSpmat : empty matlab matrix"); 
 
 	Faust::MatSparse<FPP,Cpu> spM;
-
 	if (!mxIsSparse(mxMat))
 	{
 		Faust::MatDense<FPP,Cpu> M;
@@ -369,15 +370,8 @@ void addSpmat(const mxArray * mxMat,std::vector<Faust::MatSparse<FPP,Cpu> > &vec
 		getFaustspMat(mxMat,spM);
 	}
 
-	int former_size = 0;
-	if (vec_spmat.size() != 0)
-	{
-		if (vec_spmat[vec_spmat.size()-1].getNbCol() != spM.getNbRow())
-		{
-			mexErrMsgTxt("addSpmat : matrix dimensions mismatch");
-		}
-	}
 		vec_spmat.push_back(spM);
+
 }
 
 
