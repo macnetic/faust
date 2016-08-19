@@ -1,4 +1,3 @@
-
 \chapter{Installation}\label{sec:install}
 
 The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software (cf. website \url{https://cmake.org/}).
@@ -6,6 +5,30 @@ The FA$\mu$ST project is based on an C++ library available for both UNIX and Win
 First section \ref{sec:UnixInstall} gives information about Unix installation and second section \ref{sec:WinInstall} corresponds to the Windows installation. 
 
 \section{Unix platform}\label{sec:UnixInstall}
+
+\subsection{Prerequisities for installation}\label{sec:UnixPrerequisitiesInstall}
+  
+
+\paragraph{}The use of the mex function in Matlab require that you have a third-party compiler installed on your system. The latest version of Matlab (2016a in our case) only supports up to GCC 4.7 (see \url{http://fr.mathworks.com/support/compilers/R2016a/index.html?sec=glnxa64} for more detail). Please adjust your version of GCC compiler in order to run the installation properly. 
+
+\paragraph{}The use of GPU process in FAUST project required the drivers for NVIDIA and CUDA install.
+
+
+\paragraph{}In your environment PATH, please add following components :
+\begin{itemize}
+\item matlab (example: "export PATH=/usr/local/bin:\$PATH")
+\item nvcc for GPU compiler (example: "export PATH=/usr/local/cuda-X.X/bin:\$PATH"
+\end{itemize}
+
+\paragraph{}Please export following variable:
+\begin{itemize}
+\item CC with gcc (example: "export CC='/usr/lib64/ccache/gcc'") 
+\item CXX with g++ (example: "export CXX=/usr/lib64/ccache/g++
+\end{itemize}
+
+
+\subsection{FAUST installation}\label{sec:UnixFaustInstall}
+When prerequisities listed in precedent section \ref{sec:UnixPrerequisitiesInstall} are checked, the FA$\mu$ST installation can be done : 
 
 \begin{itemize}
 \item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
@@ -20,11 +43,32 @@ make install
 \end{lstlisting}
 \end{itemize}
 
+\subsection{Optional PreRequisite - Advanced Installer}\label{sec:UnixOptionalInstall}
+
+The project FAUST can be configured with optional parameters. They can be activated in the principal CMakeList.txt file, or directly by  the cmake command line
+
+$cmake\ ..\ -DBUILD\_OPTION=ON$  
+
+\begin{itemize}
+\item BUILD\_TESTING : Enable the ctest option (default value is ON)
+\item BUILD\_DOCUMENTATION : Generating the doxygen documentation (default value is OFF)  
+\item BUILD\_MULTITHREAD : Enable multithread with OpenMP Multithreading (default value is OFF)
+\item BUILD\_VERBOSE : Enable verbose option when compile (-v) (default value is OFF)
+\item BUILD\_DEBUG : Enable FAUST Debug mode (default value is OFF )
+\item BUILD\_USE\_GPU : Using both CPU and GPU process ( default value is OFF)
+\item BUILD\_MATLAB\_MEX\_FILES : Enable building Matlab MEX files (default value is ON)
+\item BUILD\_OPENBLAS : Using openBLAS for matrix and vector computations (default value is OFF )
+\item BUILD\_READ\_XML\_FILE : Using xml2 library to read xml files (default value is OFF)
+\item BUILD\_READ\_MAT\_FILE : Using matio library to read mat files (default value is OFF)
+\end{itemize}
+
+Following the selected option, the cmake installer automatically check the dependent component (OpenBlas, eigen, matio, libxml2).  
+
 
 \section{Windows platform}\label{sec:WinInstall}
 
 \subsection{Prerequisities for installation}\label{sec:WinPrerequisitiesInstall}
-The installation of the FA$\mu$ST project depend on other components to be installed in order to run properly. 
+The installation of the FA$\mu$ST project depends on other components to be installed in order to run properly. 
 \begin{enumerate}
 \item \textbf{Install MinGW} "Minimalist GNU for Windows" \url{http://www.mingw.org/}
 \url{https://sourceforge.net/projects/mingw/files/latest/download?source=files}
@@ -71,5 +115,11 @@ make
 make install
 \end{lstlisting}
 \end{itemize}
+
+
+\subsection{Optional PreRequisite - Advanced Installer}\label{sec:WinOptionalInstall}
+
+progress... 
+
 
 
