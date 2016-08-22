@@ -297,6 +297,40 @@ classdef Faust
 
 
 	end
+
+
+	%% nnz : Number of nonzero matrix elements.
+	function nz=nnz(this)
+
+	    nz=mexFaust('nnz',this.matrix.objectHandle);
+            
+	end
+
+
+	%% nnz : density of the Faust
+	function dens=density(this)
+	     prod_dim=prod(size(this));			
+	     if (prod_dim ~= 0)		
+	    	dens=nnz(this)/prod_dim;
+             else
+		dens = -1;
+	     end
+	end
+
+	%% nnz : Relative Complexity Gain (inverse of the density)
+	function speed_up=RCG(this)	
+		dens=density(this)		
+		if (dens > 0)
+		    speed_up=1/dens;
+		else
+		    if (dens == 0)
+			speed_up=Inf;
+		    else
+			speed_up = -1;
+		    end
+		end	
+	end
+	
         
     end
     

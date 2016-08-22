@@ -316,7 +316,7 @@ faust_unsigned_int Faust::Transform<FPP,Cpu>::getNbRow() const
 		return data[0].getNbRow();
 	}else
 	{
-		return -1;
+		return 0;
 	}
 
 }
@@ -329,7 +329,7 @@ faust_unsigned_int Faust::Transform<FPP,Cpu>::getNbCol() const
 		return data[size()-1].getNbCol();
 	}else
 	{
-		return -1;
+		return 0;
 	}
 }
 

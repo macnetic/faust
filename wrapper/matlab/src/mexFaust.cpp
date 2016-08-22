@@ -102,6 +102,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		return;
 	}
 
+
+	// return the number of non zeros coefficients of the matrix
+	if (!strcmp("nnz",cmd))
+	{
+		if (nlhs > 1 || nrhs != 2)
+		{
+			mexErrMsgTxt("nnz : incorrect number of arguments.");
+		}		
+		
+		long long int nnz = core_ptr->get_total_nnz(); 
+		plhs[0]=mxCreateDoubleScalar(nnz);
+		return;
+	}
+
 	// get_fact : return the id factor of the faust	
 	if (!strcmp("get_fact", cmd))
     	{
@@ -173,7 +187,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		return;
 	}
 
-
+	// compute the 2-norm of the faust
 	if (!strcmp("norm",cmd))
 	{	
 		if (nlhs != 1 || nrhs != 2)

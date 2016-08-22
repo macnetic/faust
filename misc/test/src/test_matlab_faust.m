@@ -20,9 +20,8 @@ for i=2:nb_fact
 end
 
 F = Faust(factors);
-
+empty_F = Faust({});
 disp('Ok');
-
 
 
 
@@ -41,7 +40,31 @@ dim2_test1=size(F,2);
 if ((dim1_test1 ~= dim1) | (dim2_test1 ~= dim2))
     error(['size : invalid output dimension']);
 end
+
+
+
+
+[dim1_empty,dim2_empty]=size(empty_F);
+
+if (dim1_empty ~= 0) | (dim2_empty ~= 0)
+	dim1_empty
+	dim2_empty
+	error('size : invalid dimension for an empty Faust');
+end
+
+
 disp('Ok');
+
+
+
+
+
+
+
+
+
+
+
 
 disp('TEST GET_NB_FACTOR : ');
 %% get_nb_factor test
@@ -49,6 +72,9 @@ nb_fact_test=get_nb_factor(F);
 if (nb_fact_test ~= nb_fact)
 	error('get_nb_factor : invalid number of factor of the faust');
 end
+
+
+
 disp('Ok');
 
 
@@ -71,6 +97,7 @@ disp('TEST GET_PRODUCT : ');
 F_dense= get_product(F);
 
 [dim1_dense,dim2_dense]=size(F_dense);
+
 if((dim1_dense ~= dim1) | (dim2_dense ~= dim2))
     error('get_product : invalid dimension');
 end
@@ -78,6 +105,93 @@ disp('Ok');
 
 
 
+%% get_product test
+disp('TEST NNZ : ');
+expected_nz = (nb_fact-1)*dim2^2 + dim1*dim2;
+
+nz = nnz(F);
+
+if(expected_nz ~= nz)
+    error('nnz : invalid number of nonzeros');
+end
+
+new_facts{1}=eye(dim1,dim1);
+new_facts{2}=eye(dim1,dim1);
+new_facts{1}(1,1)=0;
+expected_nz_2  = 2*dim1-1;
+
+F_nnz = Faust(new_facts);
+
+nz_F = nnz(F_nnz);
+
+if(nz_F ~= expected_nz_2)	
+    error('nnz : invalid number of nonzeros');
+end
+
+
+expected_nz_empty_F = 0;
+nz_empty_F = nnz(empty_F);
+
+if(nz_empty_F ~= expected_nz_empty_F)	
+    error('nnz : invalid number of nonzeros (empty Faust)');
+end
+ 
+
+disp('Ok');
+
+
+
+disp('TEST DENSITY : ');
+expected_density = expected_nz / (dim1*dim2);
+dens = density(F);
+if(dens ~= expected_density)
+    error('density : invalid value');
+end
+
+expected_density2 = expected_nz_2 / dim1^2;
+dens2 = density(F_nnz);
+
+if(dens2 ~= expected_density2)
+    error('density : invalid value');
+end
+
+
+expected_density_empty_F = -1;
+density_empty_F = density(empty_F);
+if(density_empty_F ~= expected_density_empty_F)
+    error('density : invalid value');
+end
+
+
+
+disp('Ok');
+
+
+disp('TEST RCG : ');
+expected_RCG = 1/expected_density;
+rcg_F = RCG(F);
+if(rcg_F ~= expected_RCG)	
+	rcg_F
+	expected_RCG
+    error('RCG : invalid value');
+end
+
+expected_RCG2 =  1/expected_density2;
+rcg2_F = RCG(F_nnz);
+
+if(rcg2_F ~= expected_RCG2)
+    rcg2_F
+    expected_RCG2	 	
+    error('RCG : invalid value');
+end
+
+expected_RCG_empty_F = -1;
+RCG_empty_F = RCG(empty_F);
+if(RCG_empty_F ~= expected_RCG_empty_F)
+    error('RCG : invalid value');
+end
+
+disp('Ok');
 
 
 
@@ -161,7 +275,7 @@ disp('TEST LOAD AND SAVE : ');
 filename = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
 disp(['save faust into the file : ' filename]); 
 save(F,filename);
-F_loaded = Faust(filename)
+F_loaded = Faust(filename);
 [dim1_loaded,dim2_loaded]=size(F_loaded);
 
 if (dim1_loaded ~= dim1) | (dim2_loaded ~= dim2)
@@ -187,7 +301,7 @@ filename_trans = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust_trans.mat'];
 disp(['save transposed faust into the file : ' filename_trans]); 
 save(F_trans,filename_trans);
 
-F_trans_loaded = Faust(filename_trans)
+F_trans_loaded = Faust(filename_trans);
 [dim1_trans_faust_loaded,dim2_trans_faust_loaded]=size(F_trans_loaded);
 
 if (dim1_trans_faust_loaded ~= dim2) | (dim2_trans_faust_loaded ~= dim1)
