@@ -27,4 +27,6 @@ else
         end
     end
 end
+    Ddvp = full(Ddvp);
+    
 end

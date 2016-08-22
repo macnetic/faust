@@ -71,7 +71,7 @@ test2 = 100*[squeeze(d1);zeros(1,Ntest);squeeze(d2);zeros(1,Ntest);squeeze(d3)];
 
 f=figure('color',[1 1 1]);
 T = bplot(test2','linewidth',1.5);
-legend(T)
+legend(T);
 
 ylabel('Distance between true and estimated sources (cm)')
 box on
@@ -125,7 +125,7 @@ test2 = 100*[squeeze(d1);zeros(1,Ntest);squeeze(d2);zeros(1,Ntest);squeeze(d3)];
 f=figure('color',[1 1 1]);
 title('MATLAB');
 T = bplot(test2','linewidth',1.5);
-legend(T)
+legend(T);
 
 ylabel('Distance between true and estimated sources (cm)')
 box on
@@ -178,7 +178,7 @@ timeS(:,1)=[];% twice the time of the MEG matrix solver
 
 f=figure('color',[1 1 1]);
 T = bplot(timeS,'linewidth',1.5);
-legend(T)
+legend(T);
 ylabel('Computed Time (ms)')
 box on
 ax = gca;
@@ -221,7 +221,7 @@ mean_Times_matlab=mean(timeS_matlab);
 dense_matrix_time=mean_Times(1);
 real_RCG=dense_matrix_time./mean_Times;
 real_RCG_matlab=dense_matrix_time./mean_Times_matlab;
-f=figure,
+f=figure;
 ax = gca;
 
 set(ax,'xticklabel', [])
@@ -245,5 +245,6 @@ title(['BSL - speed up using FAUST ' solver_choice ' solver']);
 f.Name =['Brain Source Localization : speed-up Faust with ' solver_choice 'solver'];
 figure_name = [figure_dir filesep 'BSL-speed_up_' solver_choice ' solver'];
 print(figure_name, format_fig);
+
 
 
