@@ -72,7 +72,8 @@ dense_times=zeros(nb_mult,nb_dim);
 faust_times=zeros(nb_mult,nb_dim);
 norm_dense=zeros(1,nb_dim);
 norm_faust=zeros(1,nb_dim);
-RCGs=ns./(Ms*2);
+%RCGs=ns./(Ms*2);
+RCGs=zeros(1,nb_dim);
 
 h = waitbar(0,'2-norm hadamard : multiplication time comparison ...');
 for i=1:nb_mult
@@ -81,7 +82,7 @@ for i=1:nb_mult
         n=ns(k);
         hadamard_dense=Hadamard_matrices{k};
         hadamard_faust=Faust(Hadamard_facts{k});
-        
+        RCGs(k)=RCG(hadamard_faust); 
         
 
 	%% 2-norm of the hadamard matrix
@@ -143,6 +144,7 @@ semilogy(Ms,speed_up,'linewidth',plot_tickness);
 hold on
 semilogy(Ms,ones(1,nb_dim),'k','linewidth',plot_tickness);
 semilogy(Ms,RCGs,'g','linewidth',plot_tickness);
+
 grid on
 axis([Ms(1) Ms(end)  min([speed_up,1,RCGs]) max([speed_up,1,RCGs])]);
 title('speed-up norm(A)');
@@ -150,7 +152,7 @@ xlabel('log(dim)');
 ylabel('speedup');
 legend('faust','neutral','theoretical','Location',legend_location);
 set(gca,'XTick',Ms);
-%%
+%
 
 subplot(1,3,3);
 id=find(err_norm_faust ~= 0);% semilogy is not compatible with 0
@@ -185,6 +187,7 @@ figure_dir = [pathname filesep '..' filesep 'Figures'];
 format_fig='-dpng';
 figure_name=[figure_dir filesep 'Hadamard-norm'];
 print(figure_name, format_fig);
+
 
 
 

@@ -319,7 +319,7 @@ classdef Faust
 
 	%% nnz : Relative Complexity Gain (inverse of the density)
 	function speed_up=RCG(this)	
-		dens=density(this)		
+		dens=density(this);		
 		if (dens > 0)
 		    speed_up=1/dens;
 		else
