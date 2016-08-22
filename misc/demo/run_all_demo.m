@@ -53,7 +53,8 @@ Fig_BSL;
 %% Hadamard factorization
 disp('*********** Hadamard Factorization *************');
 demo_fact_hadamard; 
- speed_up_hadamard; 
+speed_up_hadamard;
+norm_hadamard; 
 
 
 %% Runtime comparison

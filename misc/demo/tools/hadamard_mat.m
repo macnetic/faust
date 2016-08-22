@@ -41,9 +41,10 @@
 
 function [H,Fact] = hadamard_mat(M)
 
-bloc = (1/sqrt(2))*[1 1;1 -1];
-matbase = bloc;
-matbase=kron(speye(2^(M-1)),matbase);
+% bloc = (1/sqrt(2))*[1 1;1 -1]; % normalized version
+bloc = [1 1;1 -1]; % non-normalized version
+
+matbase=kron(speye(2^(M-1)),bloc);
 n=size(matbase,1);
 
 L=(1:n/2);
