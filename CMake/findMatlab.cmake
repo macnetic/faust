@@ -42,10 +42,11 @@ if(UNIX)
 
 elseif(WIN32)
 	if ($ENV{MATLAB_EXE_DIR_TMP}} MATCHES matlab)
-		message(STATUS "MATLAB_DIR_TMP ok = $ENV{MATLAB_EXE_DIR_TMP}")
+		message(STATUS "MATLAB_DIR_TMP = $ENV{MATLAB_EXE_DIR_TMP}")
 		set(MATLAB_DIR_TMP $ENV{MATLAB_EXE_DIR_TMP})
 	else()
 		message(STATUS "MATLAB_DIR_TMP = $ENV{MATLAB_EXE_DIR_TMP}")
+		message(STATUS "MATLAB_DIR_TMP is not available. It corresponds to the path of matlab.exe }")
 		message(FATAL_ERROR "Unknown path of matlab.exe. Please launch ./CMake/find_matlab_path.bat before cmake command. ")
 	endif()
 	
