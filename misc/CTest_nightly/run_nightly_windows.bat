@@ -33,7 +33,10 @@ REM # export version of gcc
 set CC=C:\mingw-w64\mingw64\bin\gcc.exe
 set CXX=C:\mingw-w64\mingw64\bin\g++.exe
 
-set matlab="C:\Program Files\MATLAB\R2015b\bin\matlab.exe"
+REM The compiler used is MinGW for windows
+set (CTEST_CMAKE_GENERATOR "MinGW Makefiles")
+
+REM set matlab="C:\Program Files\MATLAB\R2015b\bin\matlab.exe"
 REM # /usr/local/bin/matlab in the PATH 
 REM #export PATH=/usr/local/bin:$PATH
 REM # cuda in the PATH
