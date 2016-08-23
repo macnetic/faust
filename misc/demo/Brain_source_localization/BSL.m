@@ -5,13 +5,13 @@
 %  matrices [2], including FAuSTs, and OMP solver. It reproduces the
 %  source localization experiment of [1].
 %  The results are stored in "./output/results_BSL_user.mat".
-%  DURATION: Computations should take around 10 minutes. 
-%	
-%  The MEG gain matrices used are 
+%  DURATION: Computations should take around 10 minutes.
+%
+%  The MEG gain matrices used are
 %		- those in "./output/M_user.mat" if available
 %		- or the precomputed ones in "./precomputed_results_MEG/M_X.mat"
 %
-% For more information on the FAuST Project, please visit the website of 
+% For more information on the FAuST Project, please visit the website of
 % the project :  <http://faust.gforge.inria.fr>
 %
 %% License:
@@ -19,36 +19,36 @@
 %			INRIA Rennes, FRANCE
 %			http://www.inria.fr/
 %
-% The FAuST Toolbox is distributed under the terms of the GNU Affero 
+% The FAuST Toolbox is distributed under the terms of the GNU Affero
 % General Public License.
 % This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Affero General Public License as published 
+% it under the terms of the GNU Affero General Public License as published
 % by the Free Software Foundation.
 %
-% This program is distributed in the hope that it will be useful, but 
-% WITHOUT ANY WARRANTY; without even the implied warranty of 
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+% This program is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 % See the GNU Affero General Public License for more details.
 %
 % You should have received a copy of the GNU Affero General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
-%% Contacts:	
+%% Contacts:
 %   Nicolas Bellot : nicolas.bellot@inria.fr
 %   Leman Adrien   : adrien.leman@inria.fr
 %	Luc Le Magoarou: luc.le-magoarou@inria.fr
 %	Remi Gribonval : remi.gribonval@inria.fr
 %
 %% References:
-% [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse 
-%	approximations of matrices and applications", Journal of Selected 
+% [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
+%	approximations of matrices and applications", Journal of Selected
 %	Topics in Signal Processing, 2016.
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %
-% [2]   A. Gramfort, M. Luessi, E. Larson, D. Engemann, D. Strohmeier, 
+% [2]   A. Gramfort, M. Luessi, E. Larson, D. Engemann, D. Strohmeier,
 %	C. Brodbeck, L. Parkkonen, M. Hamalainen, MNE software for processing
-%	MEG and EEG data <http://www.ncbi.nlm.nih.gov/pubmed/24161808>, 
-%	NeuroImage, Volume 86, 1 February 2014, Pages 446-460, ISSN 1053-8119, 
+%	MEG and EEG data <http://www.ncbi.nlm.nih.gov/pubmed/24161808>,
+%	NeuroImage, Volume 86, 1 February 2014, Pages 446-460, ISSN 1053-8119,
 %	[DOI] <http://dx.doi.org/10.1016/j.neuroimage.2013.10.027>
 %%
 
@@ -61,216 +61,100 @@
 
 runPath=which(mfilename);
 pathname = fileparts(runPath);
-BSL_data_pathName=strcat(pathname,'/data/');
+BSL_data_pathName=[pathname filesep 'data'];
 
 
 
+% files where a precomputed FauST approximation of MEG matrix are stored
+MEG_FAuST_list_filename={'M_6.mat','M_8.mat','M_16.mat','M_25.mat'};
 
-RCG_approxS_MEG=[6,8,16,25];
-nb_approx_MEG = length(RCG_approxS_MEG);
-MEG_approxS_norm = cell(1,nb_approx_MEG);
+nb_FAuST_MEG = length(MEG_FAuST_list_filename);
 
+% list of the MEG matrices (the original one and her Faust approximations)
+MEG_list = cell(1,nb_FAuST_MEG+1);
+nb_MEG_matrix = length(MEG_list);
 
-%Loading of the MEG matrix
-load([BSL_data_pathName 'X_meg.mat' ]);
-load ([BSL_data_pathName 'curv.mat']);
+%% Loading the MEG matrix
+load([BSL_data_pathName filesep 'X_meg.mat' ]);
+load ([BSL_data_pathName filesep 'curv.mat']);
 points2 = points;
 points = points(points_used_idx,:);
-X_norm = normalizeCol(X_fixed);
-disp(['MEG size : ' int2str(size(X_norm))]);
-%% Loading of the MEG matrix approximations
- % wrapper C++ faust
-MEG_faustS=cell(1,nb_approx_MEG);% store the different wrapper faust objet
-faustS_mult=cell(1,nb_approx_MEG);% store the different function_handle that makes the multiplication by the faust
-trans_faustS_mult=cell(1,nb_approx_MEG);% % store the different function_handle that makes the multiplication by the transpose of a faust
+MEG_matrix = normalizeCol(X_fixed);% normalization of the columns of the MEG matrix
+MEG_list{1}=MEG_matrix;
 
-% matlab faust (no C++ Faust Toolbox code is running)
-matlab_faustS_mult=cell(1,nb_approx_MEG);
-matlab_trans_faustS_mult=cell(1,nb_approx_MEG);
 
-for i=1:nb_approx_MEG
-    
 
+
+
+%% Loading the precomputed FAuST representing the MEG matrix
+% RCG (Relative Complexity Gain) : the theoretical speed-up using Faust
+RCG_list=zeros(1,nb_FAuST_MEG);
+for i=1:nb_FAuST_MEG
     
-    RCG_approxS_MEG(i);
-    load([BSL_data_pathName 'M_' int2str(RCG_approxS_MEG(i))  ]);
-    disp(['fact size : ' int2str(size(facts{1},1))   ' ' int2str(size(facts{end},2))]);
-          
-    %% structure faust
-    facts = normalizeCol(facts,lambda);
-    fc=Faust(facts);
-    trans_fc=fc';
-    trans_facts=faust_transpose(facts);
-    
-    % matlab faust (no C++ Faust Toolbox code is running)
-    matlab_trans_faustS_mult{i}=@(x) f_mult(trans_facts,x); % function handle
-    matlab_faustS_mult{i}=@(x) f_mult(facts,x); % function handle
-    
-    % wrapper C++ faust
-    trans_faustS_mult{i}=@(x) mtimes_trans(fc,x,1);% function handle 
-    faustS_mult{i}=@(x) mtimes_trans(fc,x,0); % function handle
-    MEG_Faust_list{i}=fc; % store the different faust approximations
+    load([BSL_data_pathName filesep  MEG_FAuST_list_filename{i}]);
+    facts = normalizeCol(facts,lambda); % normalization of the columns of the MEG matrix
+    MEG_FAuST=Faust(facts); % construct the FAuST from its factors
+    MEG_list{i+1}=MEG_FAuST; % store the different FAuST approximations
+    RCG_list(i)=RCG(MEG_FAuST); % compute the RCG of the given FAuST
 end
-M=size(X_norm,2);
 
 
-params.Ntraining = 20; % Number of training vectors
-params.Sparsity = 2; % Number of sources per training vector
-params.dist_paliers = [0.01,0.05,0.08,0.5];
-params.solver_choice='omp';
-%params.solver_choice='iht';
-opt_handle=0;% ==1 the faust is given to the solver by function handle
-             % ==0 the faust is given to the solver as an object
-
-Ntraining = params.Ntraining;
-Sparsity = params.Sparsity;
-dist_paliers = params.dist_paliers;
-
-solver_choice=params.solver_choice;
+M=size(MEG_matrix,2);
+Ntraining = 100; % Number of training vectors
+Sparsity = 2; % Number of sources per training vector
+dist_paliers = [0.01,0.05,0.08,0.5];
 
 
 
-resDist = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,methode,dist_sources,src_nb,run);
-compute_Times = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Ntraining);
-resDist_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,methode,dist_sources,src_nb,run);
-compute_Times_matlab = zeros(nb_approx_MEG+1,numel(dist_paliers)-1,Ntraining);
+resDist = zeros(nb_MEG_matrix,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,dist_sources,src_nb,run);
+compute_Times = zeros(nb_MEG_matrix,numel(dist_paliers)-1,Ntraining);
 
 
-h = waitbar(0,['Brain Source Localization : MEG matrix and its faust approximations with ' solver_choice ' solver']);
+h = waitbar(0,['Brain Source Localization : MEG matrix and its faust approximations with omp solver']);
 nb_palier=numel(dist_paliers)-1;
 for k=1:nb_palier;
+    
     %Parameters settings
-    Gamma = zeros(size(X_norm,2),Ntraining);
+    Gamma = zeros(M,Ntraining);
     for ii=1:Ntraining
         dist_sources = -1;
         while ~((dist_paliers(k)<dist_sources)&&(dist_sources<dist_paliers(k+1)))
-            Gamma(:,ii) = sparse_coeffs(X_norm, 1, Sparsity); %
+            Gamma(:,ii) = sparse_coeffs(MEG_matrix, 1, Sparsity); %
             idx = find(Gamma(:,ii));
             dist_sources = norm(points(idx(1)) - points(idx(2)));
         end
-
+        
     end
-    Data = X_norm*Gamma;
     
-    
-    
-    sol_solver = zeros(size(Gamma));
-    sol_solver_hat = zeros(size(Gamma));
-    sol_solver_hat2 = zeros(size(Gamma));
-    err_solver = zeros(2,Ntraining);
-    err_solver_hat = zeros(2,Ntraining);
-    err_solver_hat2 = zeros(2,Ntraining);
-    diff_solver = zeros(2,Ntraining);
-    dist_solver = zeros(Sparsity,Ntraining);
-    dist_solver_hat = zeros(Sparsity,Ntraining);
-    dist_solver_hat2 = zeros(Sparsity,Ntraining);
-    
-    
+    Data = MEG_matrix*Gamma;
     
     for i=1:Ntraining
-        %disp(['   i=' num2str(i) '/' num2str(Ntraining)])
-         waitbar(((k-1)*Ntraining+i)/(nb_palier*Ntraining));
+        waitbar(((k-1)*Ntraining+i)/(nb_palier*Ntraining));
+        
         idx = find(Gamma(:,i));
         dist_sources = norm(points(idx(1)) - points(idx(2)));
         
-
-                
-
-
-        
+        for j=1:nb_MEG_matrix
             
-            if strcmp(solver_choice,'omp')
-                %OMP
-                tic
-                [sol_solver(:,i), err_mse_solver, iter_time_solver]=greed_omp_chol(Data(:,i),X_norm,M,'stopTol',1*Sparsity,'verbose',false);
-                tdense=toc;
-            elseif   strcmp(solver_choice,'iht')  
-                %IHT
-                tic
-                [sol_solver(:,i), err_mse_solver, iter_time_solver]= hard_l0_Mterm(Data(:,i),X_norm,M,1*Sparsity,'verbose',false,'maxIter',1000);
-                tdense=toc;
-            else
-                error('invalid solver choice: must be omp or iht');
-            end
+            MEG_FAuST = MEG_list{j};
             
-            err_solver(1,i) = norm(X_norm*Gamma(:,i)-X_norm*sol_solver(:,i))/norm(X_norm*Gamma(:,i));
-            err_solver(2,i) = isequal(find(Gamma(:,i)),find(sol_solver(:,i)>1e-4));
-            idx_solver = find(sol_solver(:,i));
-            resDist(1,k,1,i) = min(norm(points(idx(1)) - points(idx_solver(1))),norm(points(idx(1)) - points(idx_solver(2))));
-            resDist(1,k,2,i) = min(norm(points(idx(2)) - points(idx_solver(1))),norm(points(idx(2)) - points(idx_solver(2))));
-            compute_Times(1,k,i)=tdense;
-            resDist_matlab(1,k,1,i) = min(norm(points(idx(1)) - points(idx_solver(1))),norm(points(idx(1)) - points(idx_solver(2))));
-            resDist_matlab(1,k,2,i) = min(norm(points(idx(2)) - points(idx_solver(1))),norm(points(idx(2)) - points(idx_solver(2))));
-            compute_Times_matlab(1,k,i)=tdense;
+            %% find the active source
+            tic
+            sol_solver=greed_omp_chol(Data(:,i),MEG_FAuST,M,'stopTol',1*Sparsity,'verbose',false);
+            compute_Times(j,k,i)=toc;
             
-       for ll=1:nb_approx_MEG
-           MEG_Faust = MEG_Faust_list{ll};
-           
-           
-           %% objet faust
-           if strcmp(solver_choice,'omp')
-                %OMP
-                if (opt_handle == 1)
-                    tic
-                    [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),faustS_mult{ll},M,'stopTol',1*Sparsity,'verbose',false,'P_trans',trans_faustS_mult{ll});
-                    t_cpp=toc;
-                else
-                    tic
-                    [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),MEG_Faust,M,'stopTol',1*Sparsity,'verbose',false);
-                    t_cpp=toc;
-                end
-           elseif   strcmp(solver_choice,'iht')  
-                %IHT
-                if (opt_handle == 1)
-                    tic
-                    [sol_solver_hat(:,i), err_mse_solver, iter_time_solver]=hard_l0_Mterm(Data(:,i),faustS_mult{ll},M,1*Sparsity,'verbose',false,'maxIter',1000,'P_trans',trans_faustS_mult{ll});
-                    t_cpp=toc;
-                else   
-                    tic
-                    [sol_solver_hat(:,i), err_mse_solver, iter_time_solver]=hard_l0_Mterm(Data(:,i),MEG_Faust,M,1*Sparsity,'verbose',false,'maxIter',1000);
-                    t_cpp=toc;
-                end
-           else
-                error('invalid solver choice: must be omp or iht');
-           end
-           
-           err_solver_hat(1,i) = norm(X_norm*Gamma(:,i)-MEG_Faust*sol_solver_hat(:,i))/norm(X_norm*Gamma(:,i));
-           err_solver_hat(2,i) = isequal(find(Gamma(:,i)),find(sol_solver_hat(:,i)>1e-4));
-           idx_solver = find(sol_solver_hat(:,i));
-           resDist(ll+1,k,1,i) = min(norm(points(idx(1)) - points(idx_solver(1))),norm(points(idx(1)) - points(idx_solver(2))));
-           resDist(ll+1,k,2,i) = min(norm(points(idx(2)) - points(idx_solver(1))),norm(points(idx(2)) - points(idx_solver(2))));
-           compute_Times(ll+1,k,i)=t_cpp;
-           tic
-           %% matlab function
-           
-           if strcmp(solver_choice,'omp')
-                % OMP
-                tic
-                [sol_solver_hat(:,i), err_mse_solver_hat, iter_time_solver_hat]=greed_omp_chol(Data(:,i),matlab_faustS_mult{ll},M,'stopTol',1*Sparsity,'P_trans',matlab_trans_faustS_mult{ll},'verbose',false);
-                tmatlab=toc;
-           elseif strcmp(solver_choice,'iht') 
-                % IHT
-                tic
-                [sol_solver_hat(:,i), err_mse_solver, iter_time_solver]=hard_l0_Mterm(Data(:,i),matlab_faustS_mult{ll},M,1*Sparsity,'verbose',false,'maxIter',1000,'P_trans',matlab_trans_faustS_mult{ll},'verbose',false);
-                tmatlab=toc;
-            else
-                error('invalid solver choice : must be omp or iht');
-           end
-           err_solver_hat(1,i) = norm(X_norm*Gamma(:,i)-MEG_Faust*sol_solver_hat(:,i))/norm(X_norm*Gamma(:,i));
-           err_solver_hat(2,i) = isequal(find(Gamma(:,i)),find(sol_solver_hat(:,i)>1e-4));
-           idx_solver = find(sol_solver_hat(:,i));
-           resDist_matlab(ll+1,k,1,i) = min(norm(points(idx(1)) - points(idx_solver(1))),norm(points(idx(1)) - points(idx_solver(2))));
-           resDist_matlab(ll+1,k,2,i) = min(norm(points(idx(2)) - points(idx_solver(1))),norm(points(idx(2)) - points(idx_solver(2))));
-           compute_Times_matlab(ll+1,k,i)=tmatlab;
-       end
-
-
+            % compute the distance between the estimated source and the real one
+            idx_solver = find(sol_solver);
+            resDist(j,k,1,i) = min(norm(points(idx(1)) - points(idx_solver(1))),norm(points(idx(1)) - points(idx_solver(2))));
+            resDist(j,k,2,i) = min(norm(points(idx(2)) - points(idx_solver(1))),norm(points(idx(2)) - points(idx_solver(2))));
+        end
     end
 end
 close(h);
 
 matfile = fullfile(pathname, 'output/results_BSL_user');
-save(matfile,'resDist','params','resDist_matlab','RCG_approxS_MEG','nb_approx_MEG','compute_Times','compute_Times_matlab', 'RCG_approxS_MEG');
+save(matfile,'resDist','Sparsity','RCG_list','compute_Times','Ntraining');
+
 
 
 
