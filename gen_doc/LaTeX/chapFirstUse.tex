@@ -2,9 +2,9 @@
 
 
 A matlab wrapper is delivered with the FAUST C++ library.
-It provides a user friendly new class of matrix \textbf{matlab{\_}faust} efficient for the multiplication with matlab built-in dense matrix class.\newline
+It provides a user friendly new class of matrix \textbf{Faust} efficient for the multiplication with matlab built-in dense matrix class.\newline
 \newline
-As much as possible, a \textbf{matlab{\_}faust} object is handled as a normal matlab matrix, here is listing of matlab builtin function that can be applied to a faust A :
+As much as possible, a \textbf{Faust} object is handled as a normal matlab matrix, here is listing of matlab builtin function that can be applied to a faust A :
 
 
 
@@ -35,6 +35,9 @@ As much as possible, a \textbf{matlab{\_}faust} object is handled as a normal ma
 >> submatrix_A=A(3:5,2:3);
 >> submatrix_A=A(2:end,3:end-1);
 >> % Warning :  A(i,j)=3 will not modify A, writing is not allowed
+>>
+>> % get the number of non-zeros coefficient
+>> nz = nnz(A);
   
 \end{lstlisting}
 
@@ -48,6 +51,7 @@ First, you can build a faust from a cell-array of matlab matrix (sparse or dense
 \newline
 \newline
 The following example shows how to build a random faust of size 5x3 with 3 factors :
+
 \begin{lstlisting}
 >> nb_factor = 3;
 >> dim1 = 5;
