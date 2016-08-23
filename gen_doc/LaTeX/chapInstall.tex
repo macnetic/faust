@@ -11,7 +11,7 @@ First section \ref{sec:UnixInstall} gives information about Unix installation an
 
 \paragraph{}The use of the mex function in Matlab require that you have a third-party compiler installed on your system. The latest version of Matlab (2016a in our case) only supports up to GCC 4.7 (see \url{http://fr.mathworks.com/support/compilers/R2016a/index.html?sec=glnxa64} for more detail). Please adjust your version of GCC compiler in order to run the installation properly. 
 
-\paragraph{}The use of GPU process in FAUST project required the drivers for NVIDIA and CUDA install.
+\paragraph{}[OPTIONAL] The use of GPU process in FAUST project required the drivers for NVIDIA and CUDA install.
 
 
 \paragraph{}In your environment PATH, please add following components :
@@ -47,7 +47,7 @@ make install
 
 The project FAUST can be configured with optional parameters. They can be activated in the principal CMakeList.txt file, or directly by  the cmake command line
 
-$cmake\ ..\ -DBUILD\_OPTION=ON$  
+$cmake\ ..\ -D<BUILD_NAME>=<ON/OFF>$
 
 \begin{itemize}
 \item BUILD\_TESTING : Enable the ctest option (default value is ON)
@@ -70,7 +70,31 @@ Following the selected option, the cmake installer automatically check the depen
 \subsection{Prerequisities for installation}\label{sec:WinPrerequisitiesInstall}
 The installation of the FA$\mu$ST project depends on other components to be installed in order to run properly. 
 \begin{enumerate}
-\item \textbf{Install MinGW} "Minimalist GNU for Windows" \url{http://www.mingw.org/}
+
+\item \textbf{Install CMake} for building the FAUST project. 
+In \url{https://cmake.org/download/} , download Binary distributions correspond to your environment (in our case  cmake-3.6.1-win64-x64.zip)
+The directory of binary must be add to the environment PATH. 
+
+\item \textbf{Install 7-Zip} \url{http://www.7-zip.org/} . 7-Zip is a file archiver used for external library
+
+\item \textbf{Install Matlab} if not already done (MATLAB R2015b in our case).
+
+Note for the case of the use of compiler MinGW : In Matlab, you must install MinGW version 4.9.2 from MATLAB using the ADDON menu. For more detail, please follow the instruction give in following link :  
+\url{http://fr.mathworks.com/help/matlab/matlab_external/install-mingw-support-package.html}. For that you must have a id session for Mathwork. It is easy to create. 
+Current this latest step, an environment variable called MW\_MINGW64\_LOC is automatically generated. 
+
+
+\item \textbf{Install C++ Compiler:} Both \textbf{Microsoft visual C++} and \textbf{MinGW "Minimalist GNU for Windows"} compiler have been tested. The version of this compilers must be coherent with the version of your Matlab version. Here is the compiler installation corresponding to Matlab 2014 and 2015. If you use an others versions of matlab, please refers to the Mathworks website \url{http://fr.mathworks.com/support/compilers/<R20XXa>}.
+
+\paragraph{}In the case of \textbf{Microsoft visual C++} :
+\begin{itemize}
+\item Download and install Microsoft .NET Framework 4
+\item Download and install Microsoft SDK 7.1
+\item Download and install Microsoft Visual C++ 2013 professional
+\end{itemize}
+
+\paragraph{}In the case of \textbf{MinGW} :
+\url{http://www.mingw.org/}
 \url{https://sourceforge.net/projects/mingw/files/latest/download?source=files}
 Launch install file and choose MINGW version 4.9.2 for mexFunction compatibility 
 The directory of binary must be add to the environment PATH. 
@@ -79,25 +103,13 @@ Note for make tool : In a terminal command, type "make". if it doesn't exist, pl
 if not, you can copy and rename mingw32-make.exe to make.exe
 
 
-\item \textbf{Install CMake} for building the FAUST project. 
-In \url{https://cmake.org/download/} , download Binary distributions correspond to your environment (in our case  cmake-3.6.1-win64-x64.zip)
-The directory of binary must be add to the environment PATH. 
-
-\item \textbf{Install Matlab} if not already done (MATLAB R2015b in our case).
-
-\item In Matlab, you must install MinGW version 4.9.2 from MATLAB using the ADDON menu. For more detail, please follow the instruction give in following link :  
-\url{http://fr.mathworks.com/help/matlab/matlab_external/install-mingw-support-package.html}. For that you must have a id session for Mathwork. It is easy to create. 
-Current this latest step, an environment variable called MW\_MINGW64\_LOC is automatically generated. 
-
-\item \textbf{Install 7-Zip} \url{http://www.7-zip.org/} . 7-Zip is a file archiver used for external library
-
-\item In your environment PATH, please add following components :
+\item In your environment PATH, please verify and add following components :
 
 \begin{itemize}
 \item matlab.exe (example: "C:$\setminus$Program Files$\setminus$MATLAB$\setminus$R2015b$\setminus$bin")
-\item gcc.exe (example: "C:$\setminus$mingw-w64$\setminus$mingw64$\setminus$bin") 
 \item 7z.exe (example: "C:$\setminus$prog$\setminus$7-Zip")
 \item cmake.exe (example: "C:$\setminus$Users$\setminus$ci$\setminus$Documents$\setminus$library$\setminus$cmake-3.6.0-win64-x64$\setminus$bin")
+\item In case of the use of MinGW compiler : gcc.exe (example: "C:$\setminus$mingw-w64$\setminus$mingw64$\setminus$bin")
 \end{itemize}
 \end{enumerate}
 
@@ -108,13 +120,23 @@ When prerequisities listed in precedent section \ref{sec:WinPrerequisitiesInstal
 \item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
 \item Open a command terminal
 \item Place you in the FAUST directory, and type the following commands : 
+
+In the case of MinGW compiler :
 \begin{lstlisting}
 mkdir build
 cd build
-cmake -G "MinGW Makefiles" ..
+cmake -G "MinGW Makefiles" .. 
 make
 make install
 \end{lstlisting}
+
+In the case of Microsoft Visual Studio 2013 compiler :
+\begin{lstlisting}
+mkdir build
+cd build
+cmake -G "Visual Studio 12 2013" .. 
+\end{lstlisting}
+
 \end{itemize}
 
 
