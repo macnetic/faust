@@ -34,7 +34,10 @@ set CC=C:\mingw-w64\mingw64\bin\gcc.exe
 set CXX=C:\mingw-w64\mingw64\bin\g++.exe
 
 REM The compiler used is MinGW for windows
-set (CTEST_CMAKE_GENERATOR "MinGW Makefiles")
+set (CTEST_CMAKE_GENERATOR_TMP "MinGW Makefiles")
+REM set (CTEST_CMAKE_GENERATOR_TMP "Visual Studio 12 2013")
+
+
 
 REM set matlab="C:\Program Files\MATLAB\R2015b\bin\matlab.exe"
 REM # /usr/local/bin/matlab in the PATH 
@@ -65,7 +68,7 @@ mkdir faust_test_build
 mkdir faust_output
 
 
-
+REM # look for the path of matlab
 set "find_exe=matlab.exe"
 (where matlab.exe) > logPath.txt 
 (where /R "C:\\Program Files\\MATLAB" matlab.exe) >> logPath.txt 

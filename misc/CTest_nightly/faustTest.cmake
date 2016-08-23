@@ -6,7 +6,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
 
 IF(WIN32)
-	SET(CTEST_CMAKE_GENERATOR "Visual Studio 12 2013")
+	# Option of the ctest build, set from run_nightly_XXX.sh 
+	set (CTEST_CMAKE_GENERATOR "$ENV{CTEST_CMAKE_GENERATOR_TMP}" )
+	#SET(CTEST_CMAKE_GENERATOR "Visual Studio 12 2013")
 	#SET (CTEST_CMAKE_GENERATOR "MinGW Makefiles")
 	SET (CTEST_SOURCE_DIRECTORY "faust_test")
 	SET (CTEST_BINARY_DIRECTORY "faust_test_build")
