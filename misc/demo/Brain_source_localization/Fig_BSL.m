@@ -173,24 +173,24 @@ ax = gca;
 
 set(ax,'xticklabel', [])
 set(ax,'Visible','off');
-semilogy(1:nb_approx_MEG,RCG_list,'linewidth',1.5);
-set(ax,'XTick',[]);
+plot(1:nb_approx_MEG,real_RCG(2:end),'linewidth',1.5);
 hold on
-semilogy(1:nb_approx_MEG,real_RCG(2:end),'linewidth',1.5);
-semilogy(1:nb_approx_MEG,ones(1,nb_approx_MEG),'linewidth',1.5);
+plot(1:nb_approx_MEG,ones(1,nb_approx_MEG),'linewidth',1.5);
 verticalOffset=1.5;
-minY=min([0.9,real_RCG(2:end),RCG_list]);
-maxY=max([0.9,real_RCG(2:end),RCG_list]);
+minY=min([0.9,real_RCG(2:end)]);
+maxY=max([0.9,real_RCG(2:end)]);
 axis([1,nb_approx_MEG,minY,maxY]);
+set(ax,'XTick',[]);
 for i=1:nb_approx_MEG
-     text(i, minY -log(maxY/minY)/20, ['$\widehat{\mathbf{M}}_{' int2str(RCG_list(i)) '}$' ],'HorizontalAlignment','center','interpreter', 'latex');
+     text(i, minY -(maxY-minY)/20, ['$\widehat{\mathbf{M}}_{' int2str(RCG_list(i)) '}$' ],'HorizontalAlignment','center','interpreter', 'latex');
      
 end
-legend('theoretical speed-up','speed up FAuST','neutral speed up');
+legend('speed up FAuST','neutral speed up');
 title(['BSL - speed up using FAUST ' solver_choice ' solver']);
 f.Name =['Brain Source Localization : speed-up Faust with ' solver_choice 'solver'];
 figure_name = [figure_dir filesep 'BSL-speed_up_' solver_choice ' solver'];
 print(figure_name, format_fig);
+
 
 
 
