@@ -30,6 +30,8 @@ if(UNIX)
 	endif(APPLE)
 else(UNIX)
 	message(STATUS "WINDOWS OPERATING SYSTEM")
+	exec_program("${CMAKE_SOURCE_DIR}/CMake/find_matlab_path.bat")
+	#exec_program("which matlab | xargs echo" OUTPUT_VARIABLE MATLAB_DIR_TMP)
 endif(UNIX)
 
 ###### tmp directory where temporary objects will be located ######
