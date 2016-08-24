@@ -42,16 +42,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 ##########################################################################
-Install:
+Installation:
 
+Please refer to the document Faust.PDF, located in ./gen_doc/LaTeX/Faust.pdf
+for more detailed informations about the installation.
+
+Quick install :
 1-	Unpack the directory. 
 2-	mkdir ./build
 3-	cd ./build
 4-	cmake ..
 	OPTION :	-DBUILD_OPENBLAS=ON 
 				-DCMAKE_INSTALL_PREFIX="/home/username/Faust_install"
-
-	ccmake ..
+4bis- ccmake (with Graphical User Interface)
 5-	make
 6- make install
 
@@ -62,7 +65,8 @@ http://fr.mathworks.com/support/compilers/R2016a/index.html
 
 Windows install :
 Warning : 
-for Matlab installation, function where doesn't work when Path name have space caracter like "Program file". please prefers a witout space path like "programfiles"
+for Matlab installation, function where doesn't work when Path name have 
+space caracter like "Program file". please prefers a witout space path like "programfiles"
 where gcc // where g++ // where cmake // where make must be available. 
 
 For windows platform :
@@ -73,18 +77,12 @@ set(CTEST_CMAKE_GENERATOR "MinGW Makefiles")
 
 To compile MEX functions with Matlab: 
 You can use the MinGW-w64 version 4.9.2 compiler from TDM-GCC to build MEX files and standalone MATLAB® engine and MAT-file applications.
-
 creer un compte mathworks et installer depuis la plateforme MinGW-w64 version 4.9.2 compiler from TDM-GCC
 (cf. http://fr.mathworks.com/help/matlab/matlab_external/install-mingw-support-package.html for more information)
-
 ##########################################################################
 
 
 ##########################################################################
-
-
-
-
 Main tools :
 
 The main functions offered by the FAuST toolbox are implemented in two files
