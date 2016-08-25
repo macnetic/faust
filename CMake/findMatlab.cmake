@@ -42,9 +42,8 @@ if(UNIX)
 
 elseif(WIN32)
 
-	exec_program("${CMAKE_SOURCE_DIR}/CMake/find_matlab_path.bat" "${PROJECT_BINARY_DIR}")
-	FILE(READ "${PROJECT_BINARY_DIR}/logPath.txt" contents)
-	#message(STATUS "contents=${contents}")
+	exec_program("${CMAKE_SOURCE_DIR}/CMake/find_matlab_path.bat")
+	FILE(READ "${PROJECT_BINARY_DIR}/tmp/tmpPathMatlab.txt" contents)
 	#STRING(REGEX REPLACE "\n" "" contents "${contents}")
 
 	# On enregistre la premiére ligne du fichier logPath.txt comme chemin de matlab.
@@ -53,16 +52,19 @@ elseif(WIN32)
 	string(REGEX REPLACE "\n" "" contents1 "${contents1}")
 
 	# On garde la 2éme ligne
-	string(REGEX REPLACE "(\n)[a-zA-Z0-9_/\\:.]+(\n)" "\\1" contents2tmp "${contents}")
-	string(REGEX REPLACE "(\n)[a-zA-Z0-9_/\\:.\n]+" "\\1" contents2 "${contents2tmp}")
-	string(REGEX REPLACE "\n" "" contents2 "${contents2}")
+	#string(REGEX REPLACE "(\n)[a-zA-Z0-9_/\\:.]+(\n)" "\\1" contents2tmp "${contents}")
+	#string(REGEX REPLACE "(\n)[a-zA-Z0-9_/\\:.\n]+" "\\1" contents2 "${contents2tmp}")
+	#string(REGEX REPLACE "\n" "" contents2 "${contents2}")
+	
+	#message(STATUS "contents=${contents}")
 	#message(STATUS "contents1=${contents1}")
 	#message(STATUS "contents2tmp=${contents2tmp}")
 	#message(STATUS "contents2=${contents2}")
+	
 	set(MATLAB_EXE_DIR_TMP "${contents1}")
-	set(MATLAB_EXE_DIR_TMP2 "${contents2}")
+	#set(MATLAB_EXE_DIR_TMP2 "${contents2}")
 	message(STATUS "MATLAB_EXE_DIR_TMP=${MATLAB_EXE_DIR_TMP}")
-	message(STATUS "MATLAB_EXE_DIR_TMP2=${MATLAB_EXE_DIR_TMP2}")
+	#message(STATUS "MATLAB_EXE_DIR_TMP2=${MATLAB_EXE_DIR_TMP2}")
 	message(STATUS "If you want to choose an other version of Matlab, please add environment variable MATLAB_EXE_DIR ")
 			
 	if ($ENV{MATLAB_EXE_DIR}} MATCHES matlab)
