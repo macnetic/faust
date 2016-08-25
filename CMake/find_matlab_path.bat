@@ -1,7 +1,7 @@
 @echo off
 set "find_exe=matlab.exe"
 
-(where matlab.exe) >> logPath.txt 
+(where matlab.exe) > logPath.txt 
 (where /R "C:\\Program Files\\MATLAB" matlab.exe) >> logPath.txt 
 (where /R "C:\\Program Files (x86)\\MATLAB" matlab.exe) >> logPath.txt
 
