@@ -22,19 +22,20 @@ REM # cmake -G "MinGW Makefiles" -Wno-dev ..
 
 REM # Directory of the local path of the nightly project
 set PATH_DIR_RUN_NIGHTLY=F:\WORK\FAUST\CTest_nightly
+F:
+cd %PATH_DIR_RUN_NIGHTLY%
 
 REM # Directory of the library used in the FAUST PROJECT 
 REM #export EIGENDIR='/usr/include/eigen3'
 REM #export OPENBLASDIR='/opt/OpenBLAS'
 REM #export MATIODIR='/usr/local'
 REM #export CUDADIR='/usr/local/cuda-7.5'
-
 REM # export version of gcc
 REM set CC=C:\mingw-w64\mingw64\bin\gcc.exe
 REM set CXX=C:\mingw-w64\mingw64\bin\g++.exe
 
-REM The compiler used is MinGW for windows
-REM set CTEST_CMAKE_GENERATOR_TMP=MinGW Makefiles
+REM # The compiler used is MinGW for windows
+REM # set CTEST_CMAKE_GENERATOR_TMP=MinGW Makefiles
 set CTEST_CMAKE_GENERATOR_TMP=Visual Studio 12 2013
 
 REM set matlab="C:\Program Files\MATLAB\R2015b\bin\matlab.exe"
@@ -44,7 +45,7 @@ REM #export PATH=/usr/local/bin:$PATH
 REM # cuda in the PATH
 REM #export PATH=/usr/local/cuda-7.5/bin:/usr/lib64/ccache/:$PATH
 
-if not exist %PATH_DIR_RUN_NIGHTLY% Exit 
+if not exist %PATH_DIR_RUN_NIGHTLY% exit 
 REM # ( echo "ERROR : %PATH_DIR_RUN_NIGHTLY% directory is not defined or do no exist. Please select a valid PATH_DIR_RUN_NIGHTLY " && Exit )
 
 
@@ -74,8 +75,7 @@ set "find_exe=matlab.exe"
 (where matlab.exe) > logPath.txt 
 (where /R "C:\\Program Files\\MATLAB" matlab.exe) >> logPath.txt 
 (where /R "C:\\Program Files (x86)\\MATLAB" matlab.exe) >> logPath.txt
-set MATLAB_EXE_DIR_TMP=
-set /p MATLAB_EXE_DIR_TMP=<logPath.txt
+set /p MATLAB_EXE_DIR=<logPath.txt
 REM for /f "delims=" %%i in ('type logPath.txt') do (set MATLAB_DIR_TMP=%%i && echo %%i)
 echo environment variable is defined for matlab Path : %MATLAB_EXE_DIR_TMP%
 
