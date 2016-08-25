@@ -5,8 +5,6 @@
 #include "faust_LinearOperator.h"
 
 
-//modif AL AL
-
 #include "faust_transform_algebra.h"
 
 //#include "faust_Vect.h"
