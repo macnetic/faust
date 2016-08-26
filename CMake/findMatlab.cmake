@@ -48,7 +48,7 @@ elseif(WIN32)
 
 	# On enregistre la premiére ligne du fichier logPath.txt comme chemin de matlab.
 	# Si plusieurs versions de matlab, WARNING
-	string(REGEX REPLACE "(\n)[a-zA-Z0-9_/\\:.\n]+" "\\1" contents1 "${contents}")
+	string(REGEX REPLACE "(\n)[a-zA-Z0-9_/\\:.\n\ ]+" "\\1" contents1 "${contents}")
 	string(REGEX REPLACE "\n" "" contents1 "${contents1}")
 
 	# On garde la 2éme ligne
