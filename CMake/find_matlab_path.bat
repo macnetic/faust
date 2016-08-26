@@ -1,9 +1,12 @@
 @echo off
 set "find_exe=matlab.exe"
 
-(where matlab.exe) > .\tmp\tmpPathMatlab.txt 
-(where /R "C:\\Program Files\\MATLAB" matlab.exe) >> .\tmp\tmpPathMatlab.txt 
-(where /R "C:\\Program Files (x86)\\MATLAB" matlab.exe) >> .\tmp\tmpPathMatlab.txt
+IF NOT exist "tmp\*.*"  mkdir tmp
+
+(where matlab.exe) > tmp/tmpPathMatlab.txt 
+(where /R "C:\\Program Files\\MATLAB" matlab.exe) >> tmp\\tmpPathMatlab.txt 
+(where /R "C:\\Program Files (x86)\\MATLAB" matlab.exe) >> tmp\\tmpPathMatlab.txt
+
 
 REM set MATLAB_EXE_DIR_TMP=
 REM set /p MATLAB_EXE_DIR_TMP=<tmpPathMatlab.txt

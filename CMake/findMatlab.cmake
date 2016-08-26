@@ -20,6 +20,12 @@
 #  - C/C++ source files;
 #  - third libraries required.
 
+message(STATUS "------------------------------------------------")		
+message(STATUS "------------------------------------------------")
+message(STATUS "------------ Looking for Matlab PATH -----------")
+message(STATUS "------------------------------------------------")
+message(STATUS "------------------------------------------------")
+	
 ###### test if executable matlab is in the path ######
 #if (BUILD_MATLAB_MEX_FILES)
 if(UNIX)
@@ -36,13 +42,12 @@ if(UNIX)
 	#message(STATUS "READLINK_TMP = ${READLINK_TMP}")
 	if(${READLINK_TMP} MATCHES matlab)
 		set(MATLAB_DIR_TMP ${READLINK_TMP})
-		message(STATUS "MATLAB_DIR_TMP 3 = ${MATLAB_DIR_TMP}")
+		message(STATUS "MATLAB_DIR_TMP = ${MATLAB_DIR_TMP}")
    	endif()
 	#message(STATUS "MATLAB_DIR_TMP 4 = ${MATLAB_DIR_TMP}")
 
 elseif(WIN32)
-
-	exec_program("${CMAKE_SOURCE_DIR}/CMake/find_matlab_path.bat")
+	exec_program("${CMAKE_SOURCE_DIR}/CMake/find_matlab_path.bat" ${PROJECT_BINARY_DIR})
 	FILE(READ "${PROJECT_BINARY_DIR}/tmp/tmpPathMatlab.txt" contents)
 	#STRING(REGEX REPLACE "\n" "" contents "${contents}")
 
@@ -63,7 +68,7 @@ elseif(WIN32)
 	
 	set(MATLAB_EXE_DIR_TMP "${contents1}")
 	#set(MATLAB_EXE_DIR_TMP2 "${contents2}")
-	message(STATUS "MATLAB_EXE_DIR_TMP=${MATLAB_EXE_DIR_TMP}")
+	message(STATUS "MATLAB_EXE_DIR=${MATLAB_EXE_DIR_TMP}")
 	#message(STATUS "MATLAB_EXE_DIR_TMP2=${MATLAB_EXE_DIR_TMP2}")
 	message(STATUS "If you want to choose an other version of Matlab, please add environment variable MATLAB_EXE_DIR ")
 			
@@ -97,12 +102,12 @@ endif()
 
 if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 	if(UNIX)
-		message(STATUS "MATLAB_DIR_TMP ${MATLAB_DIR_TMP}")
-		message(STATUS "MATLAB_ROOT TMP: ${MATLAB_ROOT}")
+		#message(STATUS "MATLAB_DIR_TMP ${MATLAB_DIR_TMP}")
+		#message(STATUS "MATLAB_ROOT TMP: ${MATLAB_ROOT}")
 		# string(REGEX REPLACE "([a-zA-Z0-9_/:]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
 		string(REGEX REPLACE "([a-zA-Z0-9_/:.]+)/bin/matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}") # sous mac on a un point ds le path .app
-		message(STATUS "MATLAB_DIR_TMP2 ${MATLAB_DIR_TMP}")
-		message(STATUS "MATLAB_ROOT TMP2: ${MATLAB_ROOT}")		
+		#message(STATUS "MATLAB_DIR_TMP2 ${MATLAB_DIR_TMP}")
+		#message(STATUS "MATLAB_ROOT TMP2: ${MATLAB_ROOT}")		
 		if( ${MATLAB_ROOT} MATCHES "matlab") # Dans ce cas, le remplacment ne s'est pas fait.. on essaie avec la double separation "//"
 			string(REGEX REPLACE "([a-zA-Z0-9_/:.]+)/bin//matlab" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}") # ds le cas ou on a /bin// matlab
 			message(STATUS "MATLAB_DIR_TMP3 ${MATLAB_DIR_TMP}")
@@ -169,5 +174,7 @@ else()
 	set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
 	message(WARNING "Matlab executable seems not to be in the path. So \"MATLAB_ROOT\" and \"MATLAB_INCLUDE_DIR\" wont'be defined and mex files won't be compiled. if matlab is installed on your computer, please add matlabroot/bin tu the PATH and try again.")	
 endif()
+message(STATUS "------------------------------------------------")
+message(STATUS "------------------------------------------------")
 ##################################################################
 
