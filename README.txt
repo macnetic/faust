@@ -44,8 +44,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##########################################################################
 Installation:
 
-Please refer to the document Faust.PDF, located in ./gen_doc/LaTeX/Faust.pdf
-for more detailed informations about the installation.
+Please refer to the document Faust.PDF, for more detailed informations 
+about the installation.
 
 Quick install :
 1-	Unpack the directory. 
@@ -65,7 +65,7 @@ http://fr.mathworks.com/support/compilers/R2016a/index.html
 
 Windows install :
 Warning : 
-for Matlab installation, function where doesn't work when Path name have 
+for Matlab installation, function "where" doesn't work when Path name have 
 space caracter like "Program file". please prefers a witout space path like "programfiles"
 where gcc // where g++ // where cmake // where make must be available. 
 
