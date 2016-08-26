@@ -20,10 +20,8 @@
 #  - C/C++ source files;
 #  - third libraries required.
 
-message(STATUS "------------------------------------------------")		
 message(STATUS "------------------------------------------------")
 message(STATUS "------------ Looking for Matlab PATH -----------")
-message(STATUS "------------------------------------------------")
 message(STATUS "------------------------------------------------")
 	
 ###### test if executable matlab is in the path ######
@@ -174,7 +172,6 @@ else()
 	set(MATLAB_ROOT "" CACHE PATH "Matlab root directory")
 	message(WARNING "Matlab executable seems not to be in the path. So \"MATLAB_ROOT\" and \"MATLAB_INCLUDE_DIR\" wont'be defined and mex files won't be compiled. if matlab is installed on your computer, please add matlabroot/bin tu the PATH and try again.")	
 endif()
-message(STATUS "------------------------------------------------")
 message(STATUS "------------------------------------------------")
 ##################################################################
 
