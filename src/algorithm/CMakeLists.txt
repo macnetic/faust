@@ -4,7 +4,7 @@ set(SRC_FILES "")
 
 file(GLOB CPP_FILES "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp")
 
-message(STATUS "algorithm cpp files ${CPP_FILES}")
+#message(STATUS "algorithm cpp files ${CPP_FILES}")
 
 #${FAUST_EXCEPTION_SRC_DIR}
 include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${EIGEN_INC_DIR})
@@ -29,7 +29,7 @@ if (BUILD_USE_GPU)
 #	elseif(WIN32 AND FAUST_USE_MKL)
 #		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
 #	endif()
-message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
+#message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 	#add_definitions(-D__COMPILE_GPU__ -D__COMPILE_SPMAT__)
 	add_library(${FAUST_ALGORITHM_CU_TARGET} OBJECT ${CPP_FILES})
 endif()
