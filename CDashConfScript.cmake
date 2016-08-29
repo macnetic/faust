@@ -106,7 +106,12 @@ set(CTEST_CONFIGURE_COMMAND "${CMAKE_COMMAND} ${CONF_OPTIONS} ${CTEST_SOURCE_DIR
 message(STATUS "CONFIGURE COMMAND: ${CTEST_CONFIGURE_COMMAND}")
 CTEST_CONFIGURE() #OPTIONS ${CONF_OPTIONS} doesn't work (even with a list()) so we set the ctest_configure_command above
 # no OPTIONS (arg)
-CTEST_BUILD(TARGET install FLAGS -j4) #need to install for python tests (quickstart.py)
+
+if($ENV{BUILD_WRAPPER_MATLAB} MATCHES "ON")
+	CTEST_BUILD(TARGET install) # matlab build doesn't feel algright with parallel building (code parsing) TODO: fix
+else()
+	CTEST_BUILD(TARGET install FLAGS -j4) #need to install for python tests (quickstart.py)
+endif()
 #CTEST_BUILD()
 
 #IF(UNIX)
