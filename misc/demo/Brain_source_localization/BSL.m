@@ -100,13 +100,13 @@ end
 
 
 M=size(MEG_matrix,2);
-Ntraining = 100; % Number of training vectors
+Ntraining = 500; % Number of training vectors
 Sparsity = 2; % Number of sources per training vector
 dist_paliers = [0.01,0.05,0.08,0.5];
 
 
 
-resDist = zeros(nb_MEG_matrix,numel(dist_paliers)-1,Sparsity,Ntraining); % (Matrice,dist_sources,src_nb,run);
+resDist = zeros(nb_MEG_matrix,numel(dist_paliers)-1,Sparsity,Ntraining);% (Matrice,dist_sources,src_nb,run);
 compute_Times = zeros(nb_MEG_matrix,numel(dist_paliers)-1,Ntraining);
 
 
@@ -142,18 +142,18 @@ for k=1:nb_palier;
             tic
             sol_solver=greed_omp_chol(Data(:,i),MEG_FAuST,M,'stopTol',1*Sparsity,'verbose',false);
             compute_Times(j,k,i)=toc;
-            
+
             % compute the distance between the estimated source and the real one
             idx_solver = find(sol_solver);
-            resDist(j,k,1,i) = min(norm(points(idx(1)) - points(idx_solver(1))),norm(points(idx(1)) - points(idx_solver(2))));
-            resDist(j,k,2,i) = min(norm(points(idx(2)) - points(idx_solver(1))),norm(points(idx(2)) - points(idx_solver(2))));
+            resDist(j,k,1,i) = min(norm(points(idx(1),:) - points(idx_solver(1),:)),norm(points(idx(1),:) - points(idx_solver(2),:)));
+            resDist(j,k,2,i) = min(norm(points(idx(2),:) - points(idx_solver(1),:)),norm(points(idx(2),:) - points(idx_solver(2),:)));
         end
     end
 end
 close(h);
 
 matfile = fullfile(pathname, 'output/results_BSL_user');
-save(matfile,'resDist','Sparsity','RCG_list','compute_Times','Ntraining');
+save(matfile,'resDist','Sparsity','RCG_list','compute_Times','Ntraining','nb_MEG_matrix');
 
 
 

@@ -55,7 +55,6 @@ figure_dir = [pathname filesep '..' filesep 'Figures'];
 format_fig='-dpng';
 
 load(matfile);
-nb_MEG_matrix=length(MEG_list);
 nb_approx_MEG=nb_MEG_matrix-1;
 solver_choice='omp';
 Ntest=Ntraining*Sparsity;
@@ -63,7 +62,6 @@ Ntest=Ntraining*Sparsity;
 
 
 %% convergence analysis
-
 d1 = cat(4,resDist(:,1,1,:),resDist(:,1,2,:));
 d2 = cat(4,resDist(:,2,1,:),resDist(:,2,2,:));
 d3 = cat(4,resDist(:,3,1,:),resDist(:,3,2,:));
@@ -190,7 +188,6 @@ title(['BSL - speed up using FAUST ' solver_choice ' solver']);
 f.Name =['Brain Source Localization : speed-up Faust with ' solver_choice 'solver'];
 figure_name = [figure_dir filesep 'BSL-speed_up_' solver_choice ' solver'];
 print(figure_name, format_fig);
-
 
 
 
