@@ -1,4 +1,4 @@
-\chapter{Installation for Unix platform}\label{sec:InstallUnix}
+\chapter{Installation on Unix platform}\label{sec:InstallUnix}
 
 \paragraph{}The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
 
@@ -67,9 +67,11 @@ make install
 
 \paragraph{}The Cmake Graphical User Interface ccmake allows you to selected option input. When using the \texttt{ccmake} command in your build directory, the Cmake GUI appears in the console (see figure \ref{fig:ccmake}).
 
-\begin{figure}[!htbp]
+\begin{figure}[!h] %%[!htbp]
 \label{fig:ccmake}
+\centering
 \includegraphics[scale=0.5]{images/ccmake.jpg}
+\caption{ccmake GUI}
 \end{figure}
 
 \paragraph{}When scrolling on a value and pressing [enter], this value can be edited, the black underlaid row displays some information about the option and required path to create the build system. In the case of an option press [enter] to toggle the ON/OFF values.
