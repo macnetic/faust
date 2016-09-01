@@ -7,7 +7,7 @@
 % the project :  <http://faust.gforge.inria.fr>
 %
 %% License:
-% Copyright (2016):	Luc Le Magoarou, Remi Gribonval
+% Copyright (2016):	Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval
 %			INRIA Rennes, FRANCE
 %			http://www.inria.fr/
 %
@@ -25,17 +25,19 @@
 % You should have received a copy of the GNU Affero General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
-%% Contacts:	
-%   Nicolas Bellot : nicolas.bellot@inria.fr
-%   Leman Adrien   : adrien.leman@inria.fr
-%	Luc Le Magoarou: luc.le-magoarou@inria.fr
-%	Remi Gribonval : remi.gribonval@inria.fr
+%% Contacts:
+%   Nicolas Bellot	: nicolas.bellot@inria.fr
+%   Adrien Leman	: adrien.leman@inria.fr
+%   Thomas Gautrais	: thomas.gautrais@inria.fr
+%	Luc Le Magoarou	: luc.le-magoarou@inria.fr
+%	Remi Gribonval	: remi.gribonval@inria.fr
 %
 %% References:
 % [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse 
 %	approximations of matrices and applications", Journal of Selected 
 %	Topics in Signal Processing, 2016.
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
+%
 %%
 
 
@@ -148,6 +150,7 @@ end
 fighandle.Name =['Hadamard-factorisation_nnz_coeff'];
 figure_name = [figure_dir filesep 'Hadamard-factorisation_nnz_coeff'];
 print(figure_name, format_fig);
+
 
 
 
