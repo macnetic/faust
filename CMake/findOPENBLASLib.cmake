@@ -10,30 +10,53 @@ if ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 	message(STATUS "OpenBlas include is installed here : ${OPENBLAS_INC_DIR}")
 else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 	if(UNIX)
-		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
 		message(STATUS "------------------------------------------------")		
 		message(STATUS "------------------------------------------------")
 		message(STATUS "------------ OPENBLAS LIB INSTALLATION ---------")
 		message(STATUS "------------------------------------------------")
-		message(STATUS "------------------------------------------------")
+		message(STATUS "------------------------------------------------")	
+		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
+
 		set(OPENBLAS_LIB_NAME "v0.2.18.tar.gz")
 		exec_program("tar xzf ${CMAKE_SOURCE_DIR}/externals/unix/tarLibs/${OPENBLAS_LIB_NAME} -C ${CMAKE_SOURCE_DIR}/externals/unix")
 		exec_program("rm -r ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS")
 		exec_program("rm -r ${CMAKE_SOURCE_DIR}/externals/unix/OpenBLAS")		
 		exec_program("mv ${CMAKE_SOURCE_DIR}/externals/unix/OpenBLAS* ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS")
 		exec_program("cd ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS && make --quiet TARGET=NEHALEM && make install PREFIX='${CMAKE_SOURCE_DIR}/externals/unix/OpenBLAS'")
-
+		
+		add_include_path(INCLUDE_PATH_LIST_TMP_OPENBLAS "${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS")
+		add_library_path(LIBRARY_PATH_LIST_TMP_OPENBLAS "${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS")
+	
 #exec_program(" ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS")
 	elseif(WIN32)
+		set(OPENBLAS_LIB_NAME "OpenBLAS-0.2.19")
+		
+		message(STATUS "------------ OPENBLAS LIB INSTALLATION ---------")
+
+		set (OPENBLAS_LIB_FILE "${CMAKE_SOURCE_DIR}/externals/win/zipLibs/${OPENBLAS_LIB_NAME}/lib")
+		set (OPENBLAS_INC_DIR "${CMAKE_SOURCE_DIR}/externals/win/zipLibs/${OPENBLAS_LIB_NAME}")
+		
+		add_include_path(INCLUDE_PATH_LIST_TMP_OPENBLAS ${OPENBLAS_INC_DIR})
+		add_library_path(LIBRARY_PATH_LIST_TMP_OPENBLAS ${OPENBLAS_LIB_FILE})
+		
+		# Download openblas http://www.openblas.net/
+		# dezip
+		# https://github.com/xianyi/OpenBLAS/wiki/How-to-use-OpenBLAS-in-Microsoft-Visual-Studio 
+		# section 2. CMake and Visual Studio
+		# do this from powershell so cmake can find visual studio
+		# install perl on system: padre-on-strawberry https://code.google.com/archive/p/padre-perl-ide/downloads
+		# make sure perl is in your path "perl -v".
+		#cmake -G "Visual Studio 14 Win64" .
+		#in visual studio : generate ALL_BUILD 
+		
 		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/win http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
-		exec_program("tar jxf ${CMAKE_SOURCE_DIR}/externals/win/zipLibs/v0.2.18.tar.bz -C ${CMAKE_SOURCE_DIR}/externals/win")
-		exec_program("mv ${CMAKE_SOURCE_DIR}/externals/win/sdk_openBlas* ${CMAKE_SOURCE_DIR}/externals/win/OpenBLAS")
+		#exec_program("tar jxf ${CMAKE_SOURCE_DIR}/externals/win/zipLibs/v0.2.18.tar.bz -C ${CMAKE_SOURCE_DIR}/externals/win")
+		#exec_program("mv ${CMAKE_SOURCE_DIR}/externals/win/sdk_openBlas* ${CMAKE_SOURCE_DIR}/externals/win/OpenBLAS")
 	else(UNIX)
 		message(WARNING "Unknown type of plateform for library OpenBlas")	
 	endif(UNIX)
 
-	add_include_path(INCLUDE_PATH_LIST_TMP_OPENBLAS "${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS")
-	add_library_path(LIBRARY_PATH_LIST_TMP_OPENBLAS "${PROJECT_SOURCE_DIR}/externals/unix/OpenBLAS")
+
 	
 	#message(STATUS "INCLUDE_PATH_LIST_TMP2=${INCLUDE_PATH_LIST_TMP2}")
 	#message(STATUS "LIBRARY_PATH_LIST_TMP2=${LIBRARY_PATH_LIST_TMP2}")
@@ -41,6 +64,9 @@ else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 	set(INCLUDE_PATH_LIST ${INCLUDE_PATH_LIST_TMP_OPENBLAS}) # CACHE PATH "List of include paths used as PATH parameter in find_path")
 	set(LIBRARY_PATH_LIST ${LIBRARY_PATH_LIST_TMP_OPENBLAS}) # CACHE PATH "List of include paths used as PATH parameter in find_path")
 
+	message(STATUS "INCLUDE_PATH_LIST=${INCLUDE_PATH_LIST}")
+
+		
 	check_external_libraries(openblas OPENBLAS_LIB_FILE 0)
 	check_external_includes("cblas.h" OPENBLAS_INC_DIR 0)
 
