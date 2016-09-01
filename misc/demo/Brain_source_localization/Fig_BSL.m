@@ -6,7 +6,7 @@
 % the project :  <http://faust.gforge.inria.fr>
 %
 %% License:
-% Copyright (2016):	Luc Le Magoarou, Remi Gribonval
+% Copyright (2016):	Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval
 %			INRIA Rennes, FRANCE
 %			http://www.inria.fr/
 %
@@ -25,10 +25,11 @@
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 %% Contacts:
-%   Nicolas Bellot : nicolas.bellot@inria.fr
-%   Leman Adrien   : adrien.leman@inria.fr
-%	Luc Le Magoarou: luc.le-magoarou@inria.fr
-%	Remi Gribonval : remi.gribonval@inria.fr
+%   Nicolas Bellot	: nicolas.bellot@inria.fr
+%   Adrien Leman	: adrien.leman@inria.fr
+%   Thomas Gautrais	: thomas.gautrais@inria.fr
+%	Luc Le Magoarou	: luc.le-magoarou@inria.fr
+%	Remi Gribonval	: remi.gribonval@inria.fr
 %
 %% References:
 % [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse 
@@ -188,6 +189,7 @@ title(['BSL - speed up using FAUST ' solver_choice ' solver']);
 f.Name =['Brain Source Localization : speed-up Faust with ' solver_choice 'solver'];
 figure_name = [figure_dir filesep 'BSL-speed_up_' solver_choice ' solver'];
 print(figure_name, format_fig);
+
 
 
 
