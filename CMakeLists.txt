@@ -73,7 +73,7 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 	if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 		# default location of library is in the path  		
-		set(FAUST_INSTALL_LIB 			"${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "default install path for the library faust" FORCE )
+		set(FAUST_INSTALL_LIB 			"${CMAKE_INSTALL_PREFIX}" CACHE STRING "default install path for the library faust" FORCE )
 #		set(FAUST_INSTALL_BIN 			"$ENV{HOME}/Documents/faust/bin" CACHE STRING "default install path for the binary faust" FORCE )
 #		set(FAUST_INSTALL_BIN_TIME_COMP "$ENV{HOME}/Documents/faust/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
 #		set(FAUST_INSTALL_DOC 			"$ENV{HOME}/Documents/faust/doc" CACHE STRING "default install path for the documentation faust" FORCE )
@@ -85,7 +85,7 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 		set(FAUST_INSTALL_CMDLINE 		"${PROJECT_BINARY_DIR}/output/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
 		set(FAUST_INSTALL_TESTING_DATA 	"${PROJECT_BINARY_DIR}/output/testing/data" CACHE STRING "default install path for the test faust" FORCE )
 		# default location of install dir for matlab component
-		SET(CMAKE_INSTALL_MATLAB_PREFIX "$ENV{HOME}/Documents/MATLAB/faust" CACHE STRING "default install path for the matlab wrapper" FORCE )
+		SET(CMAKE_INSTALL_MATLAB_PREFIX "C:/Users/$ENV{USERNAME}/Documents/MATLAB/faust" CACHE STRING "default install path for the matlab wrapper" FORCE )
 		# CMAKE_INSTALL_PREFIX path is deleted for next cmake .. configure
 		SET(CMAKE_INSTALL_PREFIX "" CACHE STRING "default install path" FORCE )
 		#message (STATUS "default install") 
