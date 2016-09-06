@@ -63,7 +63,7 @@ Depending to your C++ compiler (MinGW or Visual studio), refer to the right part
 
 \begin{itemize}
 \item Open a command terminal
-\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, especially the character $\mu$)
+\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 
 \begin{lstlisting}
@@ -71,8 +71,11 @@ mkdir build
 cd build
 cmake -G "MinGW Makefiles" .. 
 make
-make install
+make install % run with administrator privilege
 \end{lstlisting}
+\paragraph{NOTE:} You can generated the CodeBlocks project with the following command : \\
+\texttt cmake -G "CodeBlocks - MinGW Makefiles" .. 
+
 
 \end{itemize}
 
@@ -88,9 +91,9 @@ make install
 \end{figure}
 
 
-\item Set the "Where is the source code:" text box with the path of the directory where the source files are located (F:/WORK/FAUST/faust) and the "Where to build the binaries:" with the path of the directory where you want to build the library and executable files (F:/WORK/FAUST/faust/build). (see \ref{fig:cmakeGUI-1}).
+\item Set the "Where is the source code:" text box with the path of the directory where the source files are located (F:/WORK/FAUST/faust) and the "Where to build the binaries:" with the path of the directory where you want to build the library and executable files (F:/WORK/FAUST/faust/build). (see fig.  \ref{fig:cmakeGUI-1}).
 
-When clicking for the first time on the [Configure] button, CMake will ask for the build tool you want to use. The build system type depends on the builder you want to use, in our case this is the Visual Studio X (X depending the version of Visual installed on the computer) chain tools. (see \ref{fig:cmakeGUI-2}).
+When clicking for the first time on the [Configure] button, CMake will ask for the build tool you want to use. The build system type depends on the builder you want to use, in our case this is the Visual Studio X (X depending the version of Visual installed on the computer) chain tools. (see fig. \ref{fig:cmakeGUI-2}).
 
 
 \begin{figure}[!h]
@@ -123,7 +126,7 @@ When clicking for the first time on the [Configure] button, CMake will ask for t
 
 \begin{itemize}
 \item Open a command terminal
-\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, especially the character $\mu$)
+\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 
 \begin{lstlisting}

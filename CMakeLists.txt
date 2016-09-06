@@ -325,7 +325,6 @@ if (BUILD_MATLAB_MEX_FILES)
 	set(FAUST_DEMO_FIG_INSTALL_DIR 				${FAUST_DEMO_INSTALL_DIR}/Figures CACHE INTERNAL "")
 endif(BUILD_MATLAB_MEX_FILES)
 
-message (STATUS "ALAAAAAAAAAAAAAAAAAAAAAA--FAUST_DEMO_INSTALL_DIR=${FAUST_DEMO_INSTALL_DIR}")
 
 ## examples directories including some examples of the use of the library FAuST
 set(FAUST_BIN_TEST_DIR ${PROJECT_BINARY_DIR}/run_test CACHE INTERNAL "")
@@ -391,20 +390,76 @@ endif(BUILD_USE_GPU)
 
 
 ###### FLAG for DEBUG or RELEASE TARGETS ######
-if(WIN32)
-	set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR})
-	# if(CMAKE_BUILD_TYPE MATCHES "Debug")
-		# set(FAUST_DEBUG_RELEASE "debug")
-		# set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Debug)
-		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Debug)
-	# else()
-		# set(FAUST_DEBUG_RELEASE "release")
-		# set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Release)
-		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Release)
-	# endif()
-else()
-	set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR})
-endif(WIN32)
+#if(WIN32)
+#	if(CMAKE_BUILD_TYPE MATCHES "Debug")
+#		# set(FAUST_DEBUG_RELEASE "debug")
+#		 set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Debug)
+#		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Debug)
+#	elseif(CMAKE_BUILD_TYPE MATCHES "Release")
+#		# set(FAUST_DEBUG_RELEASE "release")
+#		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Release)
+#		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Release)
+#	else()
+#		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR})	
+#	endif()
+#message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
+#else()
+#	if(CMAKE_BUILD_TYPE MATCHES "Debug")
+#		# set(FAUST_DEBUG_RELEASE "debug")
+#		 set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Debug)
+#		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Debug)
+#	elseif(CMAKE_BUILD_TYPE MATCHES "Release")
+#		# set(FAUST_DEBUG_RELEASE "release")
+#		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Release)
+#		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Release)
+#	else()
+#		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR})	
+#	endif()
+#message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
+#endif(WIN32)
+
+######################################"
+######################################"
+# Case of Visual Studio 
+IF(WIN32)
+    IF (BUILD_DEBUG)
+		# Case of debug mode
+		#SET(FAUST_DEBUG_RELEASE "debug")
+		SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib/debug)
+    ELSE (BUILD_DEBUG)
+    	# Case of release mode
+		#SET(FAUST_DEBUG_RELEASE "release")
+		SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib/release)
+    ENDIF (BUILD_DEBUG)
+
+ELSE(WIN32)
+	# Case of Xcode
+	IF( CMAKE_GENERATOR STREQUAL "Xcode")
+    	# We would like to select a single build mode, would we ?
+	    # or to select it dynamically there is the CMAKE_CFG_INTDIR stuff
+	    IF (BUILD_DEBUG)
+    		SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib/Debug)
+	    ELSE (BUILD_DEBUG)
+    		SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib/Release)
+	    ENDIF (BUILD_DEBUG)
+	ELSE( CMAKE_GENERATOR STREQUAL "Xcode")
+	    # Generic case
+	    SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib)
+	ENDIF(CMAKE_GENERATOR STREQUAL "Xcode") 
+    #SET(MPTK_LIB_DIR_INSTALL ${CMAKE_INSTALL_PREFIX}/mptk/plugins)
+ENDIF(WIN32)
+
+message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
+message(STATUS "CMAKE_ARCHIVE_OUTPUT_DIRECTORY : ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FAUST_BIN_DIR} CACHE STRING "" FORCE)
+message(STATUS "CMAKE_ARCHIVE_OUTPUT_DIRECTORY : ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+######################################"
+######################################"
+######################################"
+
+
+
+
 
 
 # adding compiler flags 
@@ -499,6 +554,9 @@ else (BUILD_USE_GPU)
 		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_TARGET}>)
 	endif(BUILD_MATLAB_MEX_FILES)
 endif (BUILD_USE_GPU)
+
+
+
 
 if (BUILD_MATLAB_MEX_FILES)
 	if (UNIX) 

@@ -25,12 +25,12 @@ You must too have matlab in your environment PATH. If not please add.
 
 \subsection{Required packages}\label{sec:RequiredPackages}
 
-\paragraph{}Here is a list of packages used in the FA$\mu$ST project. Normally, the installation of this packages are automatically done (see the directory "./externals").
+\paragraph{}Here is a list of packages used in the FA$\mu$ST project. The installation of this packages are automatically done. There are nothing to do. (see the directory "./externals").
 \begin{itemize}
-\item eigen
-\item openBlas
-\item xml2
-\item matio
+\item Library eigen \url{http://eigen.tuxfamily.org}
+\item Library openBlas \url{http://www.openblas.net}
+\item Library xml2 \url{http://xmlsoft.org}
+\item Library matio \url{https://sourceforge.net/projects/matio}
 \end{itemize}
 
 \subsection{Basic build and installation}\label{sec:UnixBuildInstall}
@@ -39,7 +39,7 @@ You must too have matlab in your environment PATH. If not please add.
 \begin{itemize}
 \item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
 \item Open a command terminal
-\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, especially the character $\mu$)
+\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 
 \begin{lstlisting}
@@ -47,7 +47,7 @@ mkdir build
 cd build
 cmake ..
 make
-make install
+sudo make install % run with administrator privilege
 \end{lstlisting}
 \end{itemize}
 
@@ -55,35 +55,36 @@ make install
 \texttt{... \\
 -- Configuring done \\
 -- Generating done \\
--- Build files have been written to: ./build}
+-- Build files have been written to: <./build>}
 
 \paragraph{}The command \texttt{make} will compile the build files.
 
-\paragraph{}The command \texttt{make install} will install in default directory.
-
+\paragraph{}The command \texttt{sudo make install} will install the library and others components in default directory. For that, you must have administrator privilege because the library file \texttt{libfaust.a} is copied in your root path directory. If you don't have administrator privilege, you can make a local install using the following option (see \ref{sec:UnixCustomInstall}): \\
+\texttt{cmake .. -DCMAKE\_INSTALL\_PREFIX="<Home/Local/Project/Output>"}
 
 
 \section{Custom - Advanced Installation}\label{sec:UnixCustomInstall}
 
 \paragraph{}The project FA$\mu$ST can be configured with optional parameters, for example if you want to install FA$\mu$ST in a different folder or to enable the parallel computing using multithread capacities provided by the OS. This build system can be parametrized using the Cmake Graphical User Interface, or the Cmake command line tools. 
 
-\paragraph{}The Cmake Graphical User Interface ccmake allows you to selected option input. When using the \texttt{ccmake} command in your build directory, the Cmake GUI appears in the console (see figure \ref{fig:ccmake}).
+\paragraph{}The Cmake Graphical User Interface ccmake allows you to selected option input. When using the \texttt{ccmake} command in your build directory, the Cmake GUI appears in the console (see fig. \ref{fig:ccmake}).
 
 \begin{figure}[!h] %%[!htbp]
-\label{fig:ccmake}
 \centering
 \includegraphics[scale=0.5]{images/ccmake.jpg}
 \caption{ccmake GUI}
+\label{fig:ccmake}
 \end{figure}
 
-\paragraph{}When scrolling on a value and pressing [enter], this value can be edited, the black underlaid row displays some information about the option and required path to create the build system. In the case of an option press [enter] to toggle the ON/OFF values.
+
+\paragraph{}When scrolling on a value and pressing [enter], this value can be edited, the black underlaid row displays some information about the option and required path to create the build system. In the case of an option press [enter] to toggle the ON/OFF values. You can edit option by press [enter]. For example, press [enter] to edit option \texttt{CMAKE\_INSTALL\_PREFIX} to modify the install directory. 
 \paragraph{}After choosing options for the build and setting the required fields, press [c] to configure. The configuration of the build system is checked again by Cmake, at the end of this check if the build settings are correct, you can press [g] in order to generate the build system.
-	
 
 \paragraph{} Instead the ccmake GUI, an other possibility to configure and generate the project is to use the command line cmake which can take the option input. Here is the list of available options: 
 \texttt{$cmake\ ..\ -D<BUILD\_NAME>=<ON/OFF>$}
 
 \begin{itemize}
+\item CMAKE\_INSTALL\_PREFIX : Install directory
 \item BUILD\_TESTING : Enable the ctest option (default value is ON)
 \item BUILD\_DOCUMENTATION : Generating the doxygen documentation (default value is OFF)  
 \item BUILD\_MULTITHREAD : Enable multithread with OpenMP Multithreading (default value is OFF)
@@ -103,23 +104,28 @@ progress...
 
 \section{Build FAuST using Xcode on MAC OS}\label{sec:MacInstallXcode}
 
-The Faust tools can be generated using XCode on MAC OS. In this case, the "AppleClang" compiler from Xcode.
-
-To do this, please follow this instructions :
-
+The Faust tools can be generated using XCode on MAC OS. To do this, please follow this instructions :
 \begin{itemize}
 \item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
 \item Open a command terminal
-\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, especially the character $\mu$)
+\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
 mkdir build
 cd build
 cmake .. -G "Xcode"
-xcodebuild -list -project FAUST.xcodeproj %% list all target of the project
-xcodebuild -target "ALL_BUILD" build 
-xcodebuild -target "INSTALL" build
-%% you can manually generated the target using visual studio FAUST.sln
+
+%% list all target of the project
+xcodebuild -list -project FAUST.xcodeproj 
+
+%% Build the targets
+xcodebuild -configuration "Release" -target "ALL_BUILD" build 
+
+%% performs the "make install"
+xcodebuild -configuration "Release" -target "install" build 
 \end{lstlisting}
+
+\paragraph{NOTE: }You can manually generated the target using visual studio from file \texttt{FAUST.sln}.
+
  
 \end{itemize} 
