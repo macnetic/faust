@@ -39,7 +39,9 @@ You must too have matlab in your environment PATH. If not please add.
 \begin{itemize}
 \item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
 \item Open a command terminal
-\item Place you in the FA$\mu$ST directory, and type the following commands : 
+\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, especially the character $\mu$)
+\item Type the following commands : 
+
 \begin{lstlisting}
 mkdir build
 cd build
@@ -98,3 +100,26 @@ make install
 
 \section{Build using Code Block}\label{sec:UnixInstallCodeBlock}
 progress...
+
+\section{Build FAuST using Xcode on MAC OS}\label{sec:MacInstallXcode}
+
+The Faust tools can be generated using XCode on MAC OS. In this case, the "AppleClang" compiler from Xcode.
+
+To do this, please follow this instructions :
+
+\begin{itemize}
+\item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
+\item Open a command terminal
+\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, especially the character $\mu$)
+\item Type the following commands : 
+\begin{lstlisting}
+mkdir build
+cd build
+cmake .. -G "Xcode"
+xcodebuild -list -project FAUST.xcodeproj %% list all target of the project
+xcodebuild -target "ALL_BUILD" build 
+xcodebuild -target "INSTALL" build
+%% you can manually generated the target using visual studio FAUST.sln
+\end{lstlisting}
+ 
+\end{itemize} 

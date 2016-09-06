@@ -3,13 +3,6 @@
 #  - CMakeLists.txt files in the sub-directories
 #  - CMake/* files, which define some tools to search for libraries, etc.
 
-## For windows platform :
-# cmake -G "MinGW Makefiles" ..
-# message(STATUS "CXX=$ENV{CXX}")
-# sous windows on utilise MinGW pour le compilateur GCC G++ au lieu de visual studio plous lourd à installer. MinGW version 4.9.2 pour les mex functions..
-# set(CTEST_CMAKE_GENERATOR "MinGW Makefiles") 
-
-# modif NB	
 #cmake_minimum_required(VERSION 3.2.2) #compatibilite UTF-8 ASCII (Windows Ubunt)u)	
 cmake_minimum_required(VERSION 3.0.2) #compatibilite UTF-8 ASCII (Windows Ubunt)u)
 #cmake_minimum_required(VERSION 2.8.8)
@@ -19,24 +12,120 @@ project(FAUST CXX)
 #set(FAUST_VERSION_MINOR 0)
 set(FAUST_VERSION 2.0)
 
-
+##############  INSTALL DIRECTORIES   #############################
 if(UNIX)
-	#message(STATUS "UNIX OPERATING SYSTEM")
-	#if(LINUX) DON'T WORK SO AN UNIX OS WHICH IS NOT APPLE IS ASSUMED TO BE LINUX OS 	
 	if(APPLE)
 		message(STATUS "APPLE OPERATING SYSTEM")
 	else(APPLE)
 		message(STATUS "LINUX OPERATING SYSTEM")
 	endif(APPLE)
+
+#cmake .. -DCMAKE_INSTALL_PREFIX="home/project/Faust_install" 
+#	if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+#		SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/build/FAuST_OUTPUT" CACHE STRING "default install path" FORCE )
+#	else()
+#		SET(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING "new install path" FORCE )
+#		message(STATUS "Install FAuST path : ${CMAKE_INSTALL_PREFIX}")
+#	endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
+#message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}") 
+	if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
+		# default location of library is in the path  		
+		set(FAUST_INSTALL_LIB 			"${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "default install path for the library faust" FORCE )
+#		set(FAUST_INSTALL_BIN 			"$ENV{HOME}/Documents/faust/bin" CACHE STRING "default install path for the binary faust" FORCE )
+#		set(FAUST_INSTALL_BIN_TIME_COMP "$ENV{HOME}/Documents/faust/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
+#		set(FAUST_INSTALL_DOC 			"$ENV{HOME}/Documents/faust/doc" CACHE STRING "default install path for the documentation faust" FORCE )
+#		set(FAUST_INSTALL_CMDLINE 		"$ENV{HOME}/Documents/faust/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
+#		set(FAUST_INSTALL_TESTING_DATA 	"$ENV{HOME}/Documents/faust/testing/data" CACHE STRING "default install path for the test faust" FORCE )
+		set(FAUST_INSTALL_BIN 			"${PROJECT_BINARY_DIR}/output/bin" CACHE STRING "default install path for the binary faust" FORCE )
+		set(FAUST_INSTALL_BIN_TIME_COMP "${PROJECT_BINARY_DIR}/output/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
+		set(FAUST_INSTALL_DOC 			"${PROJECT_BINARY_DIR}/output/doc" CACHE STRING "default install path for the documentation faust" FORCE )
+		set(FAUST_INSTALL_CMDLINE 		"${PROJECT_BINARY_DIR}/output/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
+		set(FAUST_INSTALL_TESTING_DATA 	"${PROJECT_BINARY_DIR}/output/testing/data" CACHE STRING "default install path for the test faust" FORCE )
+		# default location of install dir for matlab component
+		SET(CMAKE_INSTALL_MATLAB_PREFIX "$ENV{HOME}/Documents/MATLAB/faust" CACHE STRING "default install path for the matlab wrapper" FORCE )
+		# CMAKE_INSTALL_PREFIX path is deleted for next cmake .. configure
+		SET(CMAKE_INSTALL_PREFIX "" CACHE STRING "default install path" FORCE )
+		#message (STATUS "default install") 
+	elseif(CMAKE_INSTALL_PREFIX)
+		SET(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING "new install path" FORCE )
+		message(STATUS "Install FAuST path : ${CMAKE_INSTALL_PREFIX}")
+		
+		set(FAUST_INSTALL_LIB 			"${CMAKE_INSTALL_PREFIX}/lib")
+		set(FAUST_INSTALL_BIN 			"${CMAKE_INSTALL_PREFIX}/bin")
+		set(FAUST_INSTALL_BIN_TIME_COMP "${CMAKE_INSTALL_PREFIX}/bin/runtime_comparison")
+		set(FAUST_INSTALL_DOC 			"${CMAKE_INSTALL_PREFIX}/doc")
+		set(FAUST_INSTALL_CMDLINE 		"${CMAKE_INSTALL_PREFIX}/CmdLine")
+		set(FAUST_INSTALL_TESTING_DATA 	"${CMAKE_INSTALL_PREFIX}/testing/data")
+		# default location of install dir for matlab component
+		SET(CMAKE_INSTALL_MATLAB_PREFIX "${CMAKE_INSTALL_PREFIX}/matlab")
+	else()
+		message(STATUS "Install FAuST path already defined to : ${CMAKE_INSTALL_MATLAB_PREFIX}")
+
+	endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
+
 else(UNIX)
 	message(STATUS "WINDOWS OPERATING SYSTEM")
+
+message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}") 
+	if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
+		# default location of library is in the path  		
+		set(FAUST_INSTALL_LIB 			"${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "default install path for the library faust" FORCE )
+#		set(FAUST_INSTALL_BIN 			"$ENV{HOME}/Documents/faust/bin" CACHE STRING "default install path for the binary faust" FORCE )
+#		set(FAUST_INSTALL_BIN_TIME_COMP "$ENV{HOME}/Documents/faust/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
+#		set(FAUST_INSTALL_DOC 			"$ENV{HOME}/Documents/faust/doc" CACHE STRING "default install path for the documentation faust" FORCE )
+#		set(FAUST_INSTALL_CMDLINE 		"$ENV{HOME}/Documents/faust/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
+#		set(FAUST_INSTALL_TESTING_DATA 	"$ENV{HOME}/Documents/faust/testing/data" CACHE STRING "default install path for the test faust" FORCE )
+		set(FAUST_INSTALL_BIN 			"${PROJECT_BINARY_DIR}/output/bin" CACHE STRING "default install path for the binary faust" FORCE )
+		set(FAUST_INSTALL_BIN_TIME_COMP "${PROJECT_BINARY_DIR}/output/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
+		set(FAUST_INSTALL_DOC 			"${PROJECT_BINARY_DIR}/output/doc" CACHE STRING "default install path for the documentation faust" FORCE )
+		set(FAUST_INSTALL_CMDLINE 		"${PROJECT_BINARY_DIR}/output/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
+		set(FAUST_INSTALL_TESTING_DATA 	"${PROJECT_BINARY_DIR}/output/testing/data" CACHE STRING "default install path for the test faust" FORCE )
+		# default location of install dir for matlab component
+		SET(CMAKE_INSTALL_MATLAB_PREFIX "$ENV{HOME}/Documents/MATLAB/faust" CACHE STRING "default install path for the matlab wrapper" FORCE )
+		# CMAKE_INSTALL_PREFIX path is deleted for next cmake .. configure
+		SET(CMAKE_INSTALL_PREFIX "" CACHE STRING "default install path" FORCE )
+		#message (STATUS "default install") 
+	elseif(CMAKE_INSTALL_PREFIX)
+		SET(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING "new install path" FORCE )
+		message(STATUS "Install FAuST path : ${CMAKE_INSTALL_PREFIX}")
+		
+		set(FAUST_INSTALL_LIB 			"${CMAKE_INSTALL_PREFIX}/lib")
+		set(FAUST_INSTALL_BIN 			"${CMAKE_INSTALL_PREFIX}/bin")
+		set(FAUST_INSTALL_BIN_TIME_COMP "${CMAKE_INSTALL_PREFIX}/bin/runtime_comparison")
+		set(FAUST_INSTALL_DOC 			"${CMAKE_INSTALL_PREFIX}/doc")
+		set(FAUST_INSTALL_CMDLINE 		"${CMAKE_INSTALL_PREFIX}/CmdLine")
+		set(FAUST_INSTALL_TESTING_DATA 	"${CMAKE_INSTALL_PREFIX}/testing/data")
+		# default location of install dir for matlab component
+		SET(CMAKE_INSTALL_MATLAB_PREFIX "${CMAKE_INSTALL_PREFIX}/matlab")
+	else()
+		message(STATUS "Install FAuST path already defined to : ${CMAKE_INSTALL_MATLAB_PREFIX}")
+
+	endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
 endif(UNIX)
+##################################################################
+## For windows platform :
+# cmake -G "MinGW Makefiles" ..
+# message(STATUS "CXX=$ENV{CXX}")
+# sous windows on utilise MinGW pour le compilateur GCC G++ au lieu de visual studio plous lourd à installer. MinGW version 4.9.2 pour les mex functions..
+# set(CTEST_CMAKE_GENERATOR "MinGW Makefiles") 
+
 
 ###### tmp directory where temporary objects will be located ######
 set(FAUST_TMP_BUILD_DIR "${PROJECT_BINARY_DIR}/tmp")
 file(MAKE_DIRECTORY ${FAUST_TMP_BUILD_DIR})
 set(FAUST_TMPMEX_DIR "${FAUST_TMP_BUILD_DIR}/mex_obj")
 file(MAKE_DIRECTORY ${FAUST_TMPMEX_DIR})
+
+if (MATLAB_EXE_DIR)
+# nothing 
+else(MATLAB_EXE_DIR)
+	SET(MATLAB_EXE_DIR " " CACHE STRING "Force the directory of your expected matlab binary (default Value: None)" FORCE )
+endif(MATLAB_EXE_DIR)
 
 
 if(UNIX)
@@ -45,14 +134,6 @@ elseif(WIN32)
 	set(MEXOBJ_EXT "obj")
 endif()
 
-
-#cmake .. -DCMAKE_INSTALL_PREFIX="/home/aleman/Faust_install" 
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-	SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/build/FAuST_OUTPUT" CACHE STRING "default install path" FORCE )
-else()
-	SET(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING "new install path" FORCE )
-	message(STATUS "Install FAuST path : ${CMAKE_INSTALL_PREFIX}")
-endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 
 ##############################################################################
@@ -157,16 +238,6 @@ set(FAUST_ALGORITHM_FACTORIZATION_BIN_DIR ${FAUST_ALGORITHM_BIN_DIR}/factorizati
 #set(FAUST_FAUSTCORE_SRC_DIR ${PROJECT_SOURCE_DIR}/faust_core CACHE INTERNAL "")
 
 
-##############  INSTALL DIRECTORIES   #############################
-set(FAUST_INSTALL_LIB 			${CMAKE_INSTALL_PREFIX}/lib)
-set(FAUST_INSTALL_BIN 			${CMAKE_INSTALL_PREFIX}/bin)
-set(FAUST_INSTALL_BIN_TIME_COMP ${CMAKE_INSTALL_PREFIX}/bin/runtime_comparison)
-set(FAUST_INSTALL_DOC 			${CMAKE_INSTALL_PREFIX}/doc)
-
-set(FAUST_INSTALL_CMDLINE 		${CMAKE_INSTALL_PREFIX}/CmdLine)
-set(FAUST_INSTALL_TESTING_DATA 	${CMAKE_INSTALL_PREFIX}/testing/data)
-##################################################################
-
 
 ###### WRAPPER DIRECTORIES ######
 set(FAUST_SRC_WRAPPER_DIR ${PROJECT_SOURCE_DIR}/wrapper CACHE INTERNAL "")
@@ -215,9 +286,9 @@ if (BUILD_MATLAB_MEX_FILES)
 	set(FAUST_MATLAB_MEX_BIN_DIR 	${FAUST_MATLAB_BIN_DIR}/mex CACHE INTERNAL "")
 	set(FAUST_MATLAB_TOOLS_BIN_DIR 	${FAUST_MATLAB_BIN_DIR}/tools CACHE INTERNAL "")
 	####  INSTALL DIRECTORY ####
-	set(FAUST_MATLAB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/matlab)
-	set(FAUST_MATLAB_MEX_INSTALL_DIR 	${FAUST_MATLAB_INSTALL_DIR}/mex)
-	set(FAUST_MATLAB_TOOLS_INSTALL_DIR 	${FAUST_MATLAB_INSTALL_DIR}/tools CACHE INTERNAL "")	
+	#set(FAUST_MATLAB_INSTALL_DIR ${CMAKE_INSTALL_MATLAB_PREFIX})
+	set(FAUST_MATLAB_MEX_INSTALL_DIR 	${CMAKE_INSTALL_MATLAB_PREFIX}/mex)
+	set(FAUST_MATLAB_TOOLS_INSTALL_DIR 	${CMAKE_INSTALL_MATLAB_PREFIX}/tools CACHE INTERNAL "")	
 
 
 	########## DEMO DIRECTORIES #############
@@ -242,18 +313,19 @@ if (BUILD_MATLAB_MEX_FILES)
 	
 
 	####  INSTALL DIRECTORY ####
-	set(FAUST_DEMO_INSTALL_DIR ${FAUST_MATLAB_INSTALL_DIR}/demo CACHE INTERNAL "")
+	set(FAUST_DEMO_INSTALL_DIR 			${CMAKE_INSTALL_MATLAB_PREFIX}/demo CACHE INTERNAL "")
 	set(FAUST_DEMO_BSL_INSTALL_DIR 		${FAUST_DEMO_INSTALL_DIR}/Brain_source_localization CACHE INTERNAL "")
 	set(FAUST_DEMO_TOOLS_INSTALL_DIR 	${FAUST_DEMO_INSTALL_DIR}/tools CACHE INTERNAL "")
 	set(FAUST_DEMO_HADAMARD_INSTALL_DIR ${FAUST_DEMO_INSTALL_DIR}/Hadamard_factorization CACHE INTERNAL "")
-	set(FAUST_DEMO_BSL_DATA_INSTALL_DIR 	${FAUST_DEMO_BSL_INSTALL_DIR}/data CACHE INTERNAL "")
-	set(FAUST_DEMO_BSL_DATA_INSTALL_DIR 	${FAUST_DEMO_BSL_INSTALL_DIR}/data CACHE INTERNAL "")
-	set(FAUST_DEMO_BSL_OUTPUT_INSTALL_DIR 	${FAUST_DEMO_BSL_INSTALL_DIR}/output CACHE INTERNAL "")
+	set(FAUST_DEMO_BSL_DATA_INSTALL_DIR ${FAUST_DEMO_BSL_INSTALL_DIR}/data CACHE INTERNAL "")
+	set(FAUST_DEMO_BSL_DATA_INSTALL_DIR 		${FAUST_DEMO_BSL_INSTALL_DIR}/data CACHE INTERNAL "")
+	set(FAUST_DEMO_BSL_OUTPUT_INSTALL_DIR 		${FAUST_DEMO_BSL_INSTALL_DIR}/output CACHE INTERNAL "")
 	set(FAUST_DEMO_HADAMARD_OUTPUT_INSTALL_DIR 	${FAUST_DEMO_HADAMARD_INSTALL_DIR}/output/ CACHE INTERNAL "")
-	set(FAUST_DEMO_TIMECOMP_INSTALL_DIR ${FAUST_DEMO_INSTALL_DIR}/Runtime_comparison CACHE INTERNAL "")
-	set(FAUST_DEMO_FIG_INSTALL_DIR ${FAUST_DEMO_INSTALL_DIR}/Figures CACHE INTERNAL "")
+	set(FAUST_DEMO_TIMECOMP_INSTALL_DIR 		${FAUST_DEMO_INSTALL_DIR}/Runtime_comparison CACHE INTERNAL "")
+	set(FAUST_DEMO_FIG_INSTALL_DIR 				${FAUST_DEMO_INSTALL_DIR}/Figures CACHE INTERNAL "")
 endif(BUILD_MATLAB_MEX_FILES)
 
+message (STATUS "ALAAAAAAAAAAAAAAAAAAAAAA--FAUST_DEMO_INSTALL_DIR=${FAUST_DEMO_INSTALL_DIR}")
 
 ## examples directories including some examples of the use of the library FAuST
 set(FAUST_BIN_TEST_DIR ${PROJECT_BINARY_DIR}/run_test CACHE INTERNAL "")
@@ -299,20 +371,6 @@ if (BUILD_MATLAB_MEX_FILES)
 	install(DIRECTORY ${FAUST_DEMO_FIG_BIN_DIR} DESTINATION ${FAUST_DEMO_INSTALL_DIR})
 endif (BUILD_MATLAB_MEX_FILES)
 
-# CANNOT CREATE EMPTY DIRECTORY IN INSTALL_DIR  !!!!! MODIFY !!!!!
-#INSTALL(CODE "FILE(MAKE_DIRECTORY /logs)")
-
-###### INSTALL DIRECTORIES (RELATIVES PATHS FROM CMAKE_INSTALL_PREFIX) ######
-#set(FAUST_INSTALL_MEX ${CMAKE_INSTALL_PREFIX}/mex)
-#set(FAUST_INSTALL_LIB ${CMAKE_INSTALL_PREFIX}/lib)
-#set(FAUST_INSTALL_CMDLINE ${CMAKE_INSTALL_PREFIX}/CmdLine)
-#set(FAUST_INSTALL_BIN ${CMAKE_INSTALL_PREFIX}/testing/bin)
-#set(FAUST_INSTALL_TESTING_DATA ${CMAKE_INSTALL_PREFIX}/testing/data)
-#set(FAUST_INSTALL_BIN_TIME_COMP ${CMAKE_INSTALL_PREFIX}/testing/runtime_comparison CACHE INTERNAL "")
-
-#message(STATUS "ALALALLLLLLLLLLL CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
-#message(STATUS "ALALALLLLLLLLLLL FAUST_INSTALL_BIN=${FAUST_INSTALL_BIN}")
-#message(STATUS "ALALALLLLLLLLLLL FAUST_INSTALL_LIB=${FAUST_INSTALL_LIB}")
 
 
 ###### TARGETS ######

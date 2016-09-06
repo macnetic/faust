@@ -59,7 +59,13 @@ First download the FA$\mu$ST package on the website  \url{http://faust.gforge.in
 Depending to your C++ compiler (MinGW or Visual studio), refer to the right part and follow the given instructions.
 
 \paragraph{}In the case of \textbf{MinGW compiler} :
-Open a command terminal and place you in the FAUST directory. Type the following commands : 
+
+
+\begin{itemize}
+\item Open a command terminal
+\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, especially the character $\mu$)
+\item Type the following commands : 
+
 \begin{lstlisting}
 mkdir build
 cd build
@@ -68,7 +74,7 @@ make
 make install
 \end{lstlisting}
 
-
+\end{itemize}
 
 \paragraph{}In the case of \textbf{Microsoft Visual Studio 2013 compiler using the Graphical Users Interfaces}:
 \begin{enumerate}
@@ -114,7 +120,12 @@ When clicking for the first time on the [Configure] button, CMake will ask for t
 
 
 \paragraph{}In the case of \textbf{Microsoft Visual Studio 2013 compiler using the command terminal} :
-Open a command terminal and place you in the FAUST directory. Type the following commands : 
+
+\begin{itemize}
+\item Open a command terminal
+\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, especially the character $\mu$)
+\item Type the following commands : 
+
 \begin{lstlisting}
 mkdir build
 cd build
@@ -122,6 +133,7 @@ cmake ..
 cmake --build . --config "Release" --target "install"
 \end{lstlisting}
 
+\end{itemize}
 
 \section{Custom - Advanced Installation}\label{sec:WinCustomInstall}
 

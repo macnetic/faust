@@ -125,7 +125,8 @@ Naming conventions in the FAuST project :
 	- namespace 		:	Faust::xxx
 	- class 			: 	Faust::MyClass	/	Faust::Class
 	- attributs			:	m_myAttribut	/	m_attribut
-	- methods			:	my_method()		/	method()
+	#- methods			:	my_method()		/	method()
+	- methods			:	myMethod()		/	method()
 
 	- function			:	Faust::my_function()
 	- variable			:	myVariable
