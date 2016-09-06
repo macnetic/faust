@@ -104,7 +104,14 @@ namespace Faust
         void scalarMultiply(const FPP scalar);
         FPP spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
         ~Transform(){}
-	Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N') const;
+	
+	// if measure of time is down Faust::Transform<FPP,Cpu> is no longer constant during multiplication because a measure of time is an attribute to the faust::Transform
+	#ifdef __COMPILE_TIMERS__
+		Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N');
+	#else
+		Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N') const;
+	#endif
+	
 	Faust::MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis='N') const;
 
        
@@ -114,8 +121,10 @@ namespace Faust
         void operator*=(const Transform<FPP,Cpu>&  f){multiply(f);};
         /// add the sparse matrix S to this->data
         void operator*=(const Faust::MatSparse<FPP,Cpu>&  S){push_back(S);totalNonZeros+=S.getNonZeros();}
-
-
+	
+	#ifdef __COMPILE_TIMERS__
+		void print_timers() const;
+	#endif
 
 
 
@@ -124,8 +133,10 @@ namespace Faust
         long long int totalNonZeros;
         static const char * m_className;
 	std::vector<Faust::MatSparse<FPP,Cpu> > data;
-
-
+	
+	#ifdef __COMPILE_TIMERS__
+		std::vector<Faust::Timer> t_multiply_vector;
+	#endif 
 
 
 

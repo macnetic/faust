@@ -68,10 +68,12 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
  
 //////////// modif AL AL
 
-
-
 template<typename FPP>
-Faust::Vect<FPP,Cpu> Faust::operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v)
+#ifdef __COMPILE_TIMERS__
+	Faust::Vect<FPP,Cpu> Faust::operator*(Faust::Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu> & v)
+#else		
+	Faust::Vect<FPP,Cpu> Faust::operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu> & v)
+#endif
 {
 
 	return f.multiply(v);

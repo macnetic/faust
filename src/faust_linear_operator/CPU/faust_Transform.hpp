@@ -117,13 +117,25 @@ template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform() :
 	data(std::vector<Faust::MatSparse<FPP,Cpu> >()),
 	totalNonZeros(0)
-{}
+{
+
+#ifdef __COMPILE_TIMERS__
+	t_multiply_vector.resize(0);
+#endif 
+
+}
+
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 	data(A.data),
 	totalNonZeros(A.totalNonZeros)
-{}
+{
+#ifdef __COMPILE_TIMERS__
+		this.t_multiply_vector.resize(data.size());
+#endif 
+
+}
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu> > & facts, const FPP lambda_ /* =1.0 */) :
@@ -136,6 +148,9 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu>
 	if(lambda_ != 1.0 && data.size()>0)
 		(data[0]) *= lambda_;
 	
+	#ifdef __COMPILE_TIMERS__
+		this.t_multiply_vector.resize(data.size());
+	#endif
 	this->check_factors_validity();
 }
 
@@ -213,6 +228,10 @@ void Faust::Transform<FPP,Cpu>::init_from_file(const char* filename)
 	}
 	fscanf(fp,"\n");
 	updateNonZeros();
+	
+	#ifdef __COMPILE_TIMERS__
+		this.t_multiply_vector.resize(data.size());
+	#endif
 }
 
 template<typename FPP>
@@ -236,6 +255,9 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> 
 		data.push_back(spfact);
 		totalNonZeros += data[i].getNonZeros();
 	}
+	#ifdef __COMPILE_TIMERS__
+		this.t_multiply_vector.resize(data.size());
+	#endif
 }
 
 
@@ -375,6 +397,9 @@ void Faust::Transform<FPP,Cpu>::multiply(const Faust::Transform<FPP,Cpu> & A) //
 			data.insert(data.end(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;
 		}
 	}
+	#ifdef __COMPILE_TIMERS__
+		this.t_multiply_vector.resize(data.size());
+	#endif
 }
 
 
@@ -433,6 +458,10 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatSparse<FPP,Cpu>& S)
    	}
    	data.push_back(S);
    	totalNonZeros += S.getNonZeros();
+	#ifdef __COMPILE_TIMERS__
+		this->t_multiply_vector.push_back(Faust::Timer());
+	#endif
+	
 }
 
 
@@ -446,6 +475,10 @@ void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatSparse<FPP,Cpu>& S)
       		}
 	data.insert(data.begin(),S);
    	totalNonZeros += S.getNonZeros();
+	
+	#ifdef __COMPILE_TIMERS__
+		this->t_multiply_vector.insert(this->t_multiply_vector().begin(),Faust::Timer());
+	#endif
 }
 
 
@@ -457,6 +490,9 @@ void Faust::Transform<FPP,Cpu>::pop_back(Faust::MatSparse<FPP,Cpu>& S)
 		S = data[size()-1];
 		data.pop_back();
 		totalNonZeros -= S.getNonZeros();
+		#ifdef __COMPILE_TIMERS__
+			this->t_multiply_vector.pop_back();
+		#endif
 	}
 	handleWarning("Faust::Transform<FPP,Cpu>::pop_back : empty Faust::Transform");
 }
@@ -469,6 +505,9 @@ void Faust::Transform<FPP,Cpu>::pop_first(Faust::MatSparse<FPP,Cpu>& S)
 		S = data[0];
 		data.erase(data.begin());
 		totalNonZeros -= S.getNonZeros();
+		#ifdef __COMPILE_TIMERS__
+			this->t_multiply_vector.erase(this->t_multiply_vector.begin());
+		#endif
 	}
 	handleWarning("Faust::Transform<FPP,Cpu>::pop_back : empty Faust::Transform");
 }
@@ -495,12 +534,17 @@ void Faust::Transform<FPP,Cpu>::transpose()
 		data[i].transpose();
 	}
 }
-
-
 template<typename FPP>
-Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis) const
+#ifdef __COMPILE_TIMERS__
+	Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis)
+#else
+	Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis) const
+#endif
 {
-
+	#ifdef __COMPILE_TIMERS__
+			if (this->t_multiply_vector.size() != this->data.size())
+				handleError(m_className,"multiply : invalid t_multiply_vector size to measure time");
+		#endif
 
 	if (size() == 0)
 		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
@@ -510,13 +554,30 @@ Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,C
 	if (opThis == 'N')
 	{	
 		for (int i=this->size()-1 ; i >= 0 ; i--)
+		{
+			#ifdef __COMPILE_TIMERS__
+				this->t_multiply_vector[i].start();
+			#endif
+
 			vec.multiplyLeft(data[i]);
-		
+
+			#ifdef __COMPILE_TIMERS__
+				this->t_multiply_vector[i].stop();
+			#endif
+		}
 	}else
 	{		
 		for (int i=0 ; i < this->size() ; i++)
 		{	
+			#ifdef __COMPILE_TIMERS__
+				this->t_multiply_vector[i].start();
+			#endif
+
 			vec.multiplyLeft(data[i],opThis);
+
+			#ifdef __COMPILE_TIMERS__
+				this->t_multiply_vector[i].stop();
+			#endif
 		}
 		
 	}
@@ -607,6 +668,42 @@ void Faust::Transform<FPP,Cpu>::Display()const
    	}
    	cout<<endl;
 }
+
+
+
+
+
+
+
+#ifdef __COMPILE_TIMERS__
+	template<typename FPP>
+	void Faust::Transform<FPP,Cpu>::print_timers() const
+	{
+		std::cout << "timers in Faust::Transform :" << endl;
+		std::cout << "t_multiply_vector :" << endl;	
+		float sum_tps=0;
+		for (int i=0;i<t_multiply_vector.size();i++)
+			sum_tps+=t_multiply_vector[i].get_time();		
+		float current_time;		
+		for (int i=0;i<t_multiply_vector.size();i++)
+		{
+			float current_time=t_multiply_vector[i].get_time();
+			std::cout<<"	FACTOR "<<i<<", size "<<data[i].getNbRow()<<"x"<<data[i].getNbCol()<<" ,nnz "<<data[i].getNonZeros()<<std::endl;
+			std::cout<<" 	,tps "<<current_time<<" ,% "<<100*current_time/sum_tps<< " ,nb_calls  "<<t_multiply_vector[i].get_nb_call()<<std::endl;
+		}
+		std::cout<<"	total tps "<<sum_tps<<std::endl; 
+	
+
+
+	}
+#endif
+
+
+
+
+
+
+
 
 #endif
 
