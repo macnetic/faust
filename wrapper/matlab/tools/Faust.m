@@ -1,4 +1,4 @@
-%class FAUST
+%% class FAUST
 % representing a given dense matrix by a product of sparse matrix (i.e faust)
 % in order to speed-up multiplication by this matrix,
 % matlab wrapper class implemented in C++

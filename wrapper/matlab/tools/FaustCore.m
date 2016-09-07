@@ -1,4 +1,4 @@
-%class FAUSTCORE
+%% class FAUSTCORE
 % this class only stored the Faust C++ object and 
 % inherit from matlab handle class which allows different
 % object to have the same reference
