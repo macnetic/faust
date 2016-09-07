@@ -14,7 +14,7 @@ The installation of the FA$\mu$ST tools depends on other components to be instal
 \item \textbf{Install CMake} for building the FA$\mu$ST tools. 
 From \url{https://cmake.org/download/}, download Binary distributions correspond to your environment (in our case  cmake-3.6.1-win64-x64.zip). The directory of binary must be add to the environment PATH of your system if you want to use the cmake command line tool. 
 
-\item \textbf{Install 7-Zip} from \url{http://www.7-zip.org/}. 7-Zip is a file archiver used to extract external library files. Please verify that \texttt{7z.exe} is present in your environment PATH of your system.
+% \item \textbf{Install 7-Zip} from \url{http://www.7-zip.org/}. 7-Zip is a file archiver used to extract external library files. Please verify that \texttt{7z.exe} is present in your environment PATH of your system.
 
 \item \textbf{Install Matlab} if not already done (MATLAB R2015b in our case). The builder of the FA$\mu$ST tools automatically checks your Matlab root directory if your \texttt{matlab.exe} is present in your environment Path and/or if your Matlab installation has been performed in a default directory like \texttt{"C:/Program Files/MATLAB/<R2015b>/bin/matlab.exe"} or \texttt{"C:/Program Files (x86)/MATLAB/<R2015b>/bin/matlab.exe"}. In case of several versions of Matlab installed in your system, you can force the directory of your preferred version of Matlab using the following system variable : \\
 \texttt{MATLAB\_EXE\_DIR="C:/Program Files/MATLAB/<R2015b>/bin/matlab.exe"}
@@ -57,9 +57,10 @@ Current this latest step, an environment variable called MW\_MINGW64\_LOC is aut
 First download the FA$\mu$ST package on the website  \url{http://faust.gforge.inria.fr/}. 
 
 Depending to your C++ compiler (MinGW or Visual studio), refer to the right part and follow the given instructions.
+\\
 
-\paragraph{}In the case of \textbf{MinGW compiler} :
-
+\subsubsection{Using MinGW compiler:}
+\label{sec:WinMinGWBasicInstall}
 
 \begin{itemize}
 \item Open a command terminal
@@ -76,9 +77,9 @@ make install % run with administrator privilege
 \paragraph{NOTE:} You can generated the CodeBlocks project with the following command : \\
 \texttt cmake -G "CodeBlocks - MinGW Makefiles" .. 
 
-
 \end{itemize}
 
+\subsubsection{Using Visual Studio compiler:}\label{sec:WinVisualStudioBasicInstall}
 \paragraph{}In the case of \textbf{Microsoft Visual Studio 2013 compiler using the Graphical Users Interfaces}:
 \begin{enumerate}
 \item Open application \texttt{cmake-GUI.exe} from the program menu or from your cmake install binaries directory  to launch the CMake configuration application:
@@ -89,7 +90,6 @@ make install % run with administrator privilege
 \caption{cmake GUI}
 \label{fig:cmakeGUI-1}
 \end{figure}
-
 
 \item Set the "Where is the source code:" text box with the path of the directory where the source files are located (F:/WORK/FAUST/faust) and the "Where to build the binaries:" with the path of the directory where you want to build the library and executable files (F:/WORK/FAUST/faust/build). (see fig.  \ref{fig:cmakeGUI-1}).
 
