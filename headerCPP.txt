@@ -1,13 +1,12 @@
- /*Description
-
-
+/*
+ Description
  For more information on the FAuST Project, please visit the website of 
  the project :  <http://faust.gforge.inria.fr>
 
  License:
  Copyright (2016):	Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval
-			INRIA Rennes, FRANCE
-			http://www.inria.fr/
+		INRIA Rennes, FRANCE
+		http://www.inria.fr/
 
  The FAuST Toolbox is distributed under the terms of the GNU Affero 
  General Public License.
@@ -24,9 +23,9 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  Contacts:
-   Nicolas Bellot	: nicolas.bellot@inria.fr
-   Adrien Leman	: adrien.leman@inria.fr
-   Thomas Gautrais : thomas.gautrais@inria.fr
+	Nicolas Bellot	: nicolas.bellot@inria.fr
+	Adrien Leman	: adrien.leman@inria.fr
+	Thomas Gautrais : thomas.gautrais@inria.fr
 	Luc Le Magoarou	: luc.le-magoarou@inria.fr
 	Remi Gribonval	: remi.gribonval@inria.fr
 
@@ -36,4 +35,3 @@
 	Topics in Signal Processing, 2016.
 	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 */
-
