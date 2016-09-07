@@ -3,15 +3,16 @@
 #  - CMakeLists.txt files in the sub-directories
 #  - CMake/* files, which define some tools to search for libraries, etc.
 
+
 #cmake_minimum_required(VERSION 3.2.2) #compatibilite UTF-8 ASCII (Windows Ubunt)u)	
 cmake_minimum_required(VERSION 3.0.2) #compatibilite UTF-8 ASCII (Windows Ubunt)u)
 #cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
 
 set(FAUST_VERSION_MAJOR 2)
-set(FAUST_VERSION_MINOR 2)
-set(FAUST_VERSION_PATCH 1)
-set(FAUST_VERSION 2.0)
+set(FAUST_VERSION_MINOR 0)
+set(FAUST_VERSION_PATCH 0)
+#set(FAUST_VERSION 2.0)
 
 
 
@@ -452,21 +453,18 @@ ELSE(WIN32)
     #SET(MPTK_LIB_DIR_INSTALL ${CMAKE_INSTALL_PREFIX}/mptk/plugins)
 ENDIF(WIN32)
 
-message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
-message(STATUS "CMAKE_ARCHIVE_OUTPUT_DIRECTORY : ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+#message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
+#message(STATUS "CMAKE_ARCHIVE_OUTPUT_DIRECTORY : ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FAUST_BIN_DIR} CACHE STRING "" FORCE)
-message(STATUS "CMAKE_ARCHIVE_OUTPUT_DIRECTORY : ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+#message(STATUS "CMAKE_ARCHIVE_OUTPUT_DIRECTORY : ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
 
-message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
-message(STATUS "CMAKE_LIBRARY_OUTPUT_DIRECTORY : ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+#message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
+#message(STATUS "CMAKE_LIBRARY_OUTPUT_DIRECTORY : ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FAUST_BIN_DIR} CACHE STRING "" FORCE)
-message(STATUS "CMAKE_LIBRARY_OUTPUT_DIRECTORY : ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+#message(STATUS "CMAKE_LIBRARY_OUTPUT_DIRECTORY : ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 ######################################"
 ######################################"
 ######################################"
-
-
-
 
 
 
@@ -516,7 +514,7 @@ endif()
 #	message(WARNING "Unknown type of plateform for CMAKE_CXX_FLAGS")		
 #endif(UNIX)
 
-message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
+#message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 ##################################################################
 
 #########################################
@@ -596,27 +594,6 @@ endif(BUILD_OPENBLAS)
 install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
 ##################################################################
 
-#add_dependencies(${FAUST_FAUSTCORE_TARGET} ${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
-#add_dependencies(${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
-
-
-
-#Add the c++11 flag, whatever it is
-#include(CheckCXXCompilerFlag)
-#check_cxx_compiler_flag(-std=c++11 COMPILER_SUPPORTS_CXX11)
-#check_cxx_compiler_flag(-std=c++0x COMPILER_SUPPORTS_CXX0X)
-#if(COMPILER_SUPPORTS_CXX11)
-#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" CACHE STRING "compile flags" FORCE)
-#elseif(COMPILER_SUPPORTS_CXX0X)
-#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "compile flags" FORCE)
-#else()
-#	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has neither C++11 nor c++0x support.")
-#endif()
-#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE STRING "" FORCE)
-##################################################################
-
 
 
 ##############################################################################
@@ -650,40 +627,48 @@ install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
 ##############################################################################
 # CPACK RULES
 ##############################################################################
-
-INCLUDE(InstallRequiredSystemLibraries)
-SET(CPACK_SET_DESTDIR "ON")
+#INCLUDE(InstallRequiredSystemLibraries)
+SET(CPACK_SET_DESTDIR "OFF")
 SET(CPACK_PACKAGE_RELOCATABLE "FALSE")
 SET(CPACK_CMAKE_GENERATOR ${CMAKE_GENERATOR})
 SET(CPACK_PACKAGE_NAME "FAUST")
 SET(CPACK_PACKAGE_VENDOR "PANAMA Project-team INRIA")
-SET(CPACK_PACKAGE_VERSION ${FAUST_VERSION})
 SET(CPACK_PACKAGE_VERSION_MAJOR "${FAUST_VERSION_MAJOR}")
 SET(CPACK_PACKAGE_VERSION_MINOR "${FAUST_VERSION_MINOR}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${FAUST_VERSION_PATCH}")
+SET(CPACK_PACKAGE_VERSION "${FAUST_VERSION_MAJOR}.${FAUST_VERSION_MINOR}.${FAUST_VERSION_PATCH}")
 SET(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_PROCESSOR}")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "FAUST ${FAUST_VERSION_MAJOR}.${FAUST_VERSION_MINOR}")
+
+SET(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/gen_doc/images/logo.png")
 
 SET(CPACK_OUTPUT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackConfig.cmake")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.txt")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Flexible Approximate Multi-Layer Sparse Transform")
-SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/license.txt")
 SET(CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/README.txt")
-INSTALL(FILES "${PROJECT_SOURCE_DIR}/README.txt" DESTINATION ${PROJECT_BINARY_DIR})
-INSTALL(FILES "${PROJECT_SOURCE_DIR}/COPYING.txt" DESTINATION ${PROJECT_BINARY_DIR})
+#INSTALL(FILES "${PROJECT_SOURCE_DIR}/README.txt" DESTINATION ${PROJECT_BINARY_DIR})
+#INSTALL(FILES "${PROJECT_SOURCE_DIR}/license.txt" DESTINATION ${PROJECT_BINARY_DIR})
+
+
+##############################################################################
+# SOURCE DISTRIBUTION:
+##############################################################################
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "FAUST-Source-${FAUST_VERSION_MAJOR}.${FAUST_VERSION_MINOR}.${FAUST_VERSION_PATCH}")
+set(CPACK_SOURCE_IGNORE_FILES "/build/;/.bzr/;/CMakeFiles/;/_CPack_Packages/;/.svn/;/.git/;/externals/unix/eigen/;/externals/unix/OpenBLAS/;/externals/unix/sdk_OpenBLAS/;/externals/win/eigen/;")
+
+SET(CPACK_SOURCE_GENERATOR "TGZ")
 
 ##############################################################################
 # BINARY DISTRIBUTION:
 ##############################################################################
-SET(CPACK_PACKAGE_CONTACT "adrien.leman@inria.fr")
+SET(CPACK_PACKAGE_CONTACT "name@inria.fr")
 SET(CPACK_INSTALL_CMAKE_PROJECTS "${PROJECT_BINARY_DIR};FAUST;ALL;/")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Flexible Approximate Multi-Layer Sparse Transform")
-SET(CPACK_IGNORE_FILES "/CMake/;/build/;/CMakeFiles/;/_CPack_Packages/;/src/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
+#SET(CPACK_IGNORE_FILES "/CMake/;/build/;/CMakeFiles/;/_CPack_Packages/;/src/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
 SET(CPACK_STRIP_FILES "")
 
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME "FAUST-Source-${CPACK_PACKAGE_VERSION}")
-SET(CPACK_SOURCE_GENERATOR "TGZ")
-SET(CPACK_SOURCE_IGNORE_FILES "/build/;/CMakeFiles/;/_CPack_Packages/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
+#SET(CPACK_SOURCE_IGNORE_FILES "/build/;/CMakeFiles/;/_CPack_Packages/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
 
 IF(WIN32 AND NOT UNIX)
 	SET(CPACK_GENERATOR "NSIS")
@@ -731,8 +716,30 @@ ELSE(WIN32 AND NOT UNIX)
 	ENDIF(APPLE)
 ENDIF(WIN32 AND NOT UNIX)
 INCLUDE(CPack)
+##############################################################################
+##############################################################################
 
 
+#add_dependencies(${FAUST_FAUSTCORE_TARGET} ${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
+#add_dependencies(${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
+
+
+
+#Add the c++11 flag, whatever it is
+#include(CheckCXXCompilerFlag)
+#check_cxx_compiler_flag(-std=c++11 COMPILER_SUPPORTS_CXX11)
+#check_cxx_compiler_flag(-std=c++0x COMPILER_SUPPORTS_CXX0X)
+#if(COMPILER_SUPPORTS_CXX11)
+#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" CACHE STRING "compile flags" FORCE)
+#elseif(COMPILER_SUPPORTS_CXX0X)
+#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "compile flags" FORCE)
+#else()
+#	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has neither C++11 nor c++0x support.")
+#endif()
+#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE STRING "" FORCE)
+##################################################################
 
 
 
