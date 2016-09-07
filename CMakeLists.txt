@@ -8,9 +8,12 @@ cmake_minimum_required(VERSION 3.0.2) #compatibilite UTF-8 ASCII (Windows Ubunt)
 #cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
 
-#set(FAUST_VERSION_MAJOR 1)
-#set(FAUST_VERSION_MINOR 0)
+set(FAUST_VERSION_MAJOR 2)
+set(FAUST_VERSION_MINOR 2)
+set(FAUST_VERSION_PATCH 1)
 set(FAUST_VERSION 2.0)
+
+
 
 ##############  INSTALL DIRECTORIES   #############################
 if(UNIX)
@@ -392,13 +395,13 @@ endif(BUILD_USE_GPU)
 ###### FLAG for DEBUG or RELEASE TARGETS ######
 #if(WIN32)
 #	if(CMAKE_BUILD_TYPE MATCHES "Debug")
-#		# set(FAUST_DEBUG_RELEASE "debug")
-#		 set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Debug)
-#		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Debug)
+#		set(FAUST_DEBUG_RELEASE "debug")
+#		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Debug)
+#		set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Debug)
 #	elseif(CMAKE_BUILD_TYPE MATCHES "Release")
-#		# set(FAUST_DEBUG_RELEASE "release")
+#		set(FAUST_DEBUG_RELEASE "release")
 #		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Release)
-#		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Release)
+#		set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Release)
 #	else()
 #		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR})	
 #	endif()
@@ -413,7 +416,7 @@ endif(BUILD_USE_GPU)
 #		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Release)
 #		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Release)
 #	else()
-#		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR})	
+#		
 #	endif()
 #message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
 #endif(WIN32)
@@ -613,6 +616,123 @@ install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
 #set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib" CACHE STRING "" FORCE)
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin" CACHE STRING "" FORCE)
 ##################################################################
+
+
+
+##############################################################################
+# Packaging using CPack:
+##############################################################################
+# For Unix Makefiles / MinGW Makefiles: Generates standard UNIX makefiles:
+# A hierarchy of UNIX makefiles is generated into the build tree.
+# Any standard UNIX-style make program can build the project through the default make target.
+# A "install" target is provided. For example "make install" or "mingw32-make install"
+# Use "package" target for a binary distribution. For example "make package" or "mingw32-make package"
+# Use "package_source" target for a source distribution. For example "make package_source" or "mingw32-make package_source"
+
+# For Visual Studio and XCode project files
+# A hierarchy of target is generated into the build tree and displayed in the IDE 
+# Project provides "INSTALL" and "PACKAGE" target 
+
+#In order to make a release:
+#Set the release number in the file "version/buildversion.cmake"
+#Make a tag with the number of the release
+#Use Unix make to make a source release with command "make package_source"
+#Upload the archive on the INRIA GForge FAUST project using the files admin page
+#Add release in the corresponding categories FAUST with Add files page
+#Filling the various required informations and validate the release
+#Download the release and test if build correctly
+#Make a binary relesase using Visual Studio using target "PACKAGE"
+#Upload the archive on the INRIA GForge FAUST project using the files admin page
+#Add release in the corresponding categories FAUST_win with Add files page
+#Filling the various required informations and validate the release
+#Download the release and test if build correctly
+
+##############################################################################
+# CPACK RULES
+##############################################################################
+
+INCLUDE(InstallRequiredSystemLibraries)
+SET(CPACK_SET_DESTDIR "ON")
+SET(CPACK_PACKAGE_RELOCATABLE "FALSE")
+SET(CPACK_CMAKE_GENERATOR ${CMAKE_GENERATOR})
+SET(CPACK_PACKAGE_NAME "FAUST")
+SET(CPACK_PACKAGE_VENDOR "PANAMA Project-team INRIA")
+SET(CPACK_PACKAGE_VERSION ${FAUST_VERSION})
+SET(CPACK_PACKAGE_VERSION_MAJOR "${FAUST_VERSION_MAJOR}")
+SET(CPACK_PACKAGE_VERSION_MINOR "${FAUST_VERSION_MINOR}")
+SET(CPACK_PACKAGE_VERSION_PATCH "${FAUST_VERSION_PATCH}")
+SET(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_PROCESSOR}")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "FAUST ${FAUST_VERSION_MAJOR}.${FAUST_VERSION_MINOR}")
+
+SET(CPACK_OUTPUT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackConfig.cmake")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.txt")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Flexible Approximate Multi-Layer Sparse Transform")
+SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING.txt")
+SET(CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/README.txt")
+INSTALL(FILES "${PROJECT_SOURCE_DIR}/README.txt" DESTINATION ${PROJECT_BINARY_DIR})
+INSTALL(FILES "${PROJECT_SOURCE_DIR}/COPYING.txt" DESTINATION ${PROJECT_BINARY_DIR})
+
+##############################################################################
+# BINARY DISTRIBUTION:
+##############################################################################
+SET(CPACK_PACKAGE_CONTACT "adrien.leman@inria.fr")
+SET(CPACK_INSTALL_CMAKE_PROJECTS "${PROJECT_BINARY_DIR};FAUST;ALL;/")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Flexible Approximate Multi-Layer Sparse Transform")
+SET(CPACK_IGNORE_FILES "/CMake/;/build/;/CMakeFiles/;/_CPack_Packages/;/src/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
+SET(CPACK_STRIP_FILES "")
+
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "FAUST-Source-${CPACK_PACKAGE_VERSION}")
+SET(CPACK_SOURCE_GENERATOR "TGZ")
+SET(CPACK_SOURCE_IGNORE_FILES "/build/;/CMakeFiles/;/_CPack_Packages/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
+
+IF(WIN32 AND NOT UNIX)
+	SET(CPACK_GENERATOR "NSIS")
+	IF(CMAKE_CL_64)
+		SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Windows")
+    	SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Windows")
+	ELSE(CMAKE_CL_64)
+    	SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Windows")
+    	SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Windows")
+  	ENDIF(CMAKE_CL_64)
+	SET(CPACK_SET_DESTDIR "OFF")
+	# NSIS not used yet, cause of a bug with suitable ZIP programme
+	# There is a bug in NSI that does not handle full unix paths properly. Make
+	# sure there is at least one set of four (4) backlasshes.
+	# SET(CPACK_PACKAGE_ICON "${CMake_SOURCE_DIR}/Utilities/Release\\\\InstallIcon.bmp")
+	SET(CPACK_NSIS_DISPLAY_NAME "FAUST")
+#	SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.irisa.fr/metiss/home_html-fr")
+#	SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\http://www.irisa.fr/metiss/home_html-fr")
+#	SET(CPACK_NSIS_CONTACT "matchingpursuite@irisa.fr")
+	SET(CPACK_NSIS_MODIFY_PATH OFF)
+ELSE(WIN32 AND NOT UNIX)
+	IF(APPLE)
+		SET(CPACK_GENERATOR "PackageMaker")
+		IF(CMAKE_SIZEOF_VOID_P MATCHES "4")
+			SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Mac")
+			SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Mac")
+		ELSE(CMAKE_SIZEOF_VOID_P MATCHES "4")
+			SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Mac")
+			SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Mac")
+		ENDIF(CMAKE_SIZEOF_VOID_P MATCHES "4")
+	ELSE(APPLE)
+		SET(CPACK_GENERATOR "DEB;RPM")
+		#SET(CPACK_DEBIAN_PACKAGE_DEPENDS "python, python-numpy, libfftw3-3, libsndfile1")
+		#SET(CPACK_DEBIAN_PACKAGE_SECTION "math")
+		SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "FAuST is a C++ toolbox, useful to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation). ")
+		IF(CMAKE_SIZEOF_VOID_P MATCHES "4")
+			SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Linux")
+			SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Linux")
+			SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
+		ELSE(CMAKE_SIZEOF_VOID_P MATCHES "4")
+			SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Linux")
+			SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Linux")
+			SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+		ENDIF(CMAKE_SIZEOF_VOID_P MATCHES "4")
+	ENDIF(APPLE)
+ENDIF(WIN32 AND NOT UNIX)
+INCLUDE(CPack)
+
+
 
 
 
