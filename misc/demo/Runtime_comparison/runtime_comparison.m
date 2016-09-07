@@ -12,7 +12,7 @@
 % the project :  <http://faust.gforge.inria.fr>
 %
 %% License:
-% Copyright (2016):	Luc Le Magoarou, Remi Gribonval
+% Copyright (2016):	Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval
 %			INRIA Rennes, FRANCE
 %			http://www.inria.fr/
 %
