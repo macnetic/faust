@@ -76,7 +76,6 @@ nb_MEG_matrix = length(MEG_list);
 
 %% Loading the MEG matrix and the points in the brain
 load([BSL_data_pathName filesep 'X_meg.mat' ]);
-pts_used = points(points_used_idx,:); % points used in the MEG matrix
 MEG_matrix = normalizeCol(X_fixed);% normalization of the columns of the MEG matrix
 MEG_list{1}=MEG_matrix;
 
@@ -91,14 +90,14 @@ for i=1:nb_FAuST_MEG
     
     load([BSL_data_pathName filesep  MEG_FAuST_list_filename{i}]);
     facts = normalizeCol(facts,lambda); % normalization of the columns of the FAUST
-    MEG_FAuST=Faust(facts); % construct the FAuST from its factors
-    MEG_list{i+1}=MEG_FAuST; % store the different FAuST approximations
+    MEG_FAuST=Faust(facts); % construct the FAuST from its factorscons15_row
+    MEG_list{i+1}=MEG_FAuST; % store the different FAuST approximationscons21_col
     RCG_list(i)=RCG(MEG_FAuST); % compute the RCG of the given FAuST
 end
 
 
 M=size(MEG_matrix,2); % Number of points used in the MEG matrix
-Ntraining = 500; % Number of training vectors
+Ntraining = 500; % Number of training vectorscons22_row
 Sparsity = 2; % Number of sources per training vector
 dist_paliers = [0.01,0.05,0.08,0.5];
 
@@ -120,7 +119,7 @@ for k=1:nb_palier;
         while ~((dist_paliers(k)<dist_sources)&&(dist_sources<dist_paliers(k+1)))
             Gamma(:,ii) = sparse_coeffs(MEG_matrix, 1, Sparsity); %
             idx = find(Gamma(:,ii));
-            dist_sources = norm(pts_used(idx(1),:) - pts_used(idx(2),:));
+            dist_sources = norm(points(idx(1),:) - points(idx(2),:));
         end
         
     end
@@ -146,8 +145,8 @@ for k=1:nb_palier;
 
             % compute the distance between the estimated source and the real one
             idx_solver = find(sol_solver);
-            resDist(j,k,1,i) = min(norm(pts_used(idx(1),:) - pts_used(idx_solver(1),:)),norm(pts_used(idx(1),:) - pts_used(idx_solver(2),:)));
-            resDist(j,k,2,i) = min(norm(pts_used(idx(2),:) - pts_used(idx_solver(1),:)),norm(pts_used(idx(2),:) - pts_used(idx_solver(2),:)));
+            resDist(j,k,1,i) = min(norm(points(idx(1),:) - points(idx_solver(1),:)),norm(points(idx(1),:) - points(idx_solver(2),:)));
+            resDist(j,k,2,i) = min(norm(points(idx(2),:) - points(idx_solver(1),:)),norm(points(idx(2),:) - points(idx_solver(2),:)));
         end
     end
 end
@@ -155,6 +154,7 @@ close(h);
 
 matfile = fullfile(pathname, 'output/results_BSL_user');
 save(matfile,'resDist','Sparsity','RCG_list','compute_Times','Ntraining','nb_MEG_matrix');
+
 
 
 
