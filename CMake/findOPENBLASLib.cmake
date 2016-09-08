@@ -41,12 +41,9 @@ else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 		# make sure perl is in your path "perl -v".
 		# cmake -G "Visual Studio 12 Win64" .
 		# in visual studio : generate ALL_BUILD 
-		
-		set (OPENBLAS_LIB_FILE "${CMAKE_SOURCE_DIR}/externals/win/zipLibs/${OPENBLAS_LIB_NAME}/lib")
-		set (OPENBLAS_INC_DIR "${CMAKE_SOURCE_DIR}/externals/win/zipLibs/${OPENBLAS_LIB_NAME}")
-		
-		add_include_path(INCLUDE_PATH_LIST_TMP_OPENBLAS ${OPENBLAS_INC_DIR})
-		add_library_path(LIBRARY_PATH_LIST_TMP_OPENBLAS ${OPENBLAS_LIB_FILE})
+	
+		add_include_path(INCLUDE_PATH_LIST_TMP_OPENBLAS "${PROJECT_SOURCE_DIR}/externals/win/${OPENBLAS_LIB_NAME}")
+		add_library_path(LIBRARY_PATH_LIST_TMP_OPENBLAS "${PROJECT_SOURCE_DIR}/externals/win/${OPENBLAS_LIB_NAME}")
 		
 		#exec_program("wget -P ${CMAKE_SOURCE_DIR}/externals/win http://github.com/xianyi/OpenBLAS/archive/v0.2.18.tar.gz")
 		#exec_program("tar jxf ${CMAKE_SOURCE_DIR}/externals/win/zipLibs/v0.2.18.tar.bz -C ${CMAKE_SOURCE_DIR}/externals/win")

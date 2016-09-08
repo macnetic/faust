@@ -12,9 +12,9 @@ file(GLOB HPP_FILES "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.hpp" "${FAUST_LINEA
 #message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 #add_definitions(-DEIGEN_MPL2_ONLY)
 
-if(BUILD_OPENBLAS)
-	include_directories( ${OPENBLAS_INC_DIR})
-endif()
+#if(BUILD_OPENBLAS)
+#	include_directories( ${OPENBLAS_INC_DIR})
+#endif()
 #target_link_libraries(${FAUST_FAUSTCORE_TARGET}  ${FAUST_MATRIX_TARGET} ${FAUST_EXCEPTION_TARGET} )
 
 #include_directories(${FAUST_MATRIX_SRC_DIR} ${FAUST_PALM4MSA_SRC_DIR} ${FAUST_EXCEPTION_SRC_DIR} ${FAUST_EIGEN_SRC_DIR})
@@ -27,6 +27,7 @@ if(BUILD_OPENBLAS)
 	set(__GEMM_WITH_OPENBLAS__ "1")
 	#message(STATUS "**** OPENBLAS USE *****")
 endif()
+
 if (FAUST_USE_SINGLEPRECISION)
 	set(FAUST_SINGLE "1")
 endif()
