@@ -19,6 +19,9 @@ REM #####set MATLAB_ROOT_DIR="C:\Program Files\MATLAB\R2015b"
 REM # cmake -G "MinGw Makefiles" ..
 REM # cmake -G "MinGW Makefiles" -Wno-dev .. 
 
+REM # Name system of Machine for CDASH
+set CMAKE_SYSTEM=Windows-VisualStudio
+
 
 REM # Directory of the local path of the nightly project
 set PATH_DIR_RUN_NIGHTLY=F:\WORK\FAUST\CTest_nightly

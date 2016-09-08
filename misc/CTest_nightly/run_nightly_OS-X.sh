@@ -16,6 +16,9 @@
 #
 ###################################################################
 
+### name system of Machine for CDASH
+export CMAKE_SYSTEM='mac-OSX-Darwin'
+
 # Directory of the library used in the FAUST PROJECT 
 # On ajoute le path /usr/local/bin pour le ctest command. 
 export PATH=$PATH:/Applications/MATLAB_R2014b.app/bin/:/usr/local/bin;

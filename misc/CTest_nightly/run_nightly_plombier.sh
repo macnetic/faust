@@ -16,6 +16,8 @@
 #
 ###################################################################
 
+### name system of Machine for CDASH
+export CMAKE_SYSTEM='linux-fedora21'
 
 # Directory of the local path of the nightly project
 export PATH_DIR_RUN_NIGHTLY='/home/aleman/Documents/WORK/FAUST/faust_nightly'

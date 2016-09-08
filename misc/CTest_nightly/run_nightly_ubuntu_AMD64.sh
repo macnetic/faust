@@ -16,6 +16,9 @@
 #
 ###################################################################
 
+### name system of Machine for CDASH
+export CMAKE_SYSTEM='linux-ubuntu'
+
 # Directory of the library used in the FAUST PROJECT 
 # On ajoute le path /usr/local/bin pour le ctest command.
 export PATH=$PATH:/usr/local/MATLAB/R2014b/bin:/usr/local/bin;
