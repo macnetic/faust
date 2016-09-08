@@ -192,4 +192,9 @@ print(figure_name, format_fig);
 
 
 
-
+%% console display
+disp(['**** MEG with OMP solver time comparison ****']);
+disp(['M tps : ' num2str(mean(timeS(:,1))) ]);
+for i=1:nb_approx_MEG
+    disp([ 'M_' int2str(RCG_list(i)) ' tps : ' num2str(mean(timeS(:,i+1))) ', speed-up : ' num2str(real_RCG(i+1))]);
+end
