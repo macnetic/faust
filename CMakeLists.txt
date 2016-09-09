@@ -651,7 +651,14 @@ SET(CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/README.txt")
 # SOURCE DISTRIBUTION:
 ##############################################################################
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "FAUST-Source-${FAUST_VERSION_MAJOR}.${FAUST_VERSION_MINOR}.${FAUST_VERSION_PATCH}")
-set(CPACK_SOURCE_IGNORE_FILES "/build/;/.bzr/;/CMakeFiles/;/_CPack_Packages/;/.svn/;/.git/;/externals/unix/eigen/;/externals/unix/OpenBLAS/;/externals/unix/sdk_OpenBLAS/;/externals/win/eigen/;")
+set(CPACK_SOURCE_IGNORE_FILES "/build/;/.bzr/;/CMakeFiles/;/_CPack_Packages/;/.svn/;/.git/;/headerCPP.txt;/headerMatlab.txt")
+
+if(WIN32 AND NOT UNIX)
+	set(CPACK_SOURCE_IGNORE_FILES "${CPACK_SOURCE_IGNORE_FILES};/externals/unix/;/externals/win/eigen*/;/externals/win/OpenBLAS-v0.2.14-Win64-int64/;/externals/win/eigen-eigen-07105f7124f9/;")
+else()
+	set(CPACK_SOURCE_IGNORE_FILES "${CPACK_SOURCE_IGNORE_FILES};/externals/win/;/externals/unix/eigen*/;/externals/unix/OpenBLAS*/;/externals/unix/matio*/;")
+endif()
+
 
 SET(CPACK_SOURCE_GENERATOR "TGZ")
 
