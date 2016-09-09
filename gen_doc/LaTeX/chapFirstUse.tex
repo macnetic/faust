@@ -1,10 +1,10 @@
 \chapter{QuickStart}\label{sec:firstUse}
 
 
-A matlab wrapper is delivered with the FAUST C++ library.
+A Matlab wrapper is delivered with the FA$\mu$ST C++ library.
 It provides a user friendly new class of matrix \textbf{Faust} efficient for the multiplication with matlab built-in dense matrix class.\newline
 \newline
-As much as possible, a \textbf{Faust} object is handled as a normal matlab matrix, here is listing of matlab builtin function that can be applied to a faust A :
+As much as possible, a \textbf{Faust} object is handled as a normal matlab matrix, here is listing of matlab builtin function that can be applied to a Faust A :
 
 
 
@@ -45,9 +45,9 @@ As much as possible, a \textbf{Faust} object is handled as a normal matlab matri
 
 \section{construct a faust}\label{sec:firstUseBuild}
 
-A \textbf{matlab{\_}faust} object can be constructed from several ways.
+A \textbf{Faust} object can be constructed from several ways.
 \subsection{construct a faust from a cell-array}\label{sec:firstUseBuildFromCellArray}
-First, you can build a faust from a cell-array of matlab matrix (sparse or dense) representing its factors.
+First, you can build a Faust from a cell-array of matlab matrix (sparse or dense) representing its factors.
 \newline
 \newline
 The following example shows how to build a random faust of size 5x3 with 3 factors :
@@ -78,7 +78,7 @@ An optional multiplying scalar argument can be taken into account  :
 >> A=Faust(factors,lambda);
 \end{lstlisting}
 
-This functionality allows you to build a faust from the factorization algorithm :
+This functionality allows you to build a Faust from the factorization algorithm :
 \textbf{mexHierarchical{\_}fact} or \textbf{mexPalm4MSA} :
 \begin{lstlisting}
 >> % factorization step
@@ -89,7 +89,7 @@ This functionality allows you to build a faust from the factorization algorithm 
 
 \subsection{construct a faust from a saved one}\label{sec:firstUseBuildFromSave}
 
-You can also build a faust from a previously one which is saved into a mat file :
+You can also build a Faust from a previously one which is saved into a mat file :
 \begin{lstlisting}
 >> %  save the faust A into the file faust.mat
 >> [lambda,factors]=save(A,'faust.mat');
