@@ -27,8 +27,8 @@ add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 file(GLOB CPP_MEX_FILES "${FAUST_MATLAB_MEX_SRC_DIR}/*.cpp")
 ## modif AL : bug pour les noms de PATH avec un point comme par exemple : ./faust_v1.10/interface_matlab/
 ## On va chercher les nom des target 
-string(REGEX REPLACE "[a-zA-Z0-9_/:.]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
-#string(REGEX REPLACE "[a-zA-Z0-9_/:]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
+#string(REGEX REPLACE "[a-zA-Z0-9_/:.]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
+string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
 
 if(CXX_MEX_FLAGS)
 	string(STRIP ${CXX_MEX_FLAGS} CXX_MEX_FLAGS)
@@ -61,20 +61,28 @@ if(UNIX)
 	add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS ${MEXFILE_TARGET_LIST} ${FAUST_TARGET} ${FAUST_MEXTOOLS_TARGET} )
 elseif(WIN32)
 	file(GLOB CPP_SRC_FILES "${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp" "${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp"  "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp")
-	string(REGEX REPLACE "([a-zA-Z0-9_/:]+)\\.cpp(;|$)" "\\1\\2" MEXSRC_FULL "${CPP_SRC_FILES}")
-	string(REGEX REPLACE "[a-zA-Z0-9_/:]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "${FAUST_TMPMEX_DIR}/\\1.${MEXOBJ_EXT}\\2" MEXOBJ_FILES "${CPP_SRC_FILES}")
-
+	string(REGEX REPLACE "([a-zA-Z0-9_/:-]+)\\.cpp(;|$)" "\\1\\2" MEXSRC_FULL "${CPP_SRC_FILES}")
+	
+	#message (STATUS "MEXSRC_FULL ------------- ${MEXSRC_FULL}")
+	#message (STATUS "FAUST_TMPMEX_DIR ------------- ${FAUST_TMPMEX_DIR}")
+	#message (STATUS "CPP_SRC_FILES ---------${CPP_SRC_FILES}")
+	#modif AL
+	#string(REGEX REPLACE "[a-zA-Z0-9_/:-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "${FAUST_TMPMEX_DIR}/\\1.${MEXOBJ_EXT}\\2" MEXOBJ_FILES "${CPP_SRC_FILES}")
+	string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "${FAUST_TMPMEX_DIR}/\\1.${MEXOBJ_EXT}\\2" MEXOBJ_FILES "${CPP_SRC_FILES}")
+	#message (STATUS "MEXOBJ_FILES --------- ${MEXOBJ_FILES}")
+	
 	add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS MEXFILE_TARGET_LIST_TARGET ) 
 	add_custom_target(MEXFILE_TARGET_LIST_TARGET DEPENDS ${MEXFILE_TARGET_LIST})
 	add_custom_target(MEXOBJ_FILES_TARGET DEPENDS ${MEXOBJ_FILES})
 	add_dependencies(MEXFILE_TARGET_LIST_TARGET MEXOBJ_FILES_TARGET)
-	
-#message (STATUS "${FAUST_MEX_TARGET}")
 endif()
 
 if(WIN32)
 	foreach( mex_src ${MEXSRC_FULL})
-		string(REGEX REPLACE "[a-zA-Z0-9_/:]+/([a-zA-Z0-9_]+)" "\\1" mexsrc_short "${mex_src}")
+		#modif AL pour gerer les "-" dans le path
+		#string(REGEX REPLACE "[a-zA-Z0-9_/:-.]+/([a-zA-Z0-9_]+)" "\\1" mexsrc_short "${mex_src}")
+		string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)(;|$)" "\\1\\2" mexsrc_short "${mex_src}")
+		#message(STATUS "-------------------------mexsrc_short---${mexsrc_short}")
 		add_custom_command(	OUTPUT ${FAUST_TMPMEX_DIR}/${mexsrc_short}.${MEXOBJ_EXT}
 							COMMAND  ${MATLAB_ROOT}/bin/mex 
 							ARGS "-v" "-c" "-largeArrayDims" ${mex_src}.cpp 
