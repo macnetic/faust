@@ -27,10 +27,13 @@ else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 	
 #exec_program(" ${CMAKE_SOURCE_DIR}/externals/unix/sdk_OpenBLAS")
 	elseif(WIN32)
-		set(OPENBLAS_LIB_NAME "OpenBLAS-0.2.19")
-		message(STATUS "------------------------------------------------")		
-		message(STATUS "------------ Looking for OPENBLAS LIB ---------")
-		message(STATUS "------------------------------------------------")		
+		#set(OPENBLAS_LIB_NAME "OpenBLAS-0.2.19")
+		#message(STATUS "----------------------${CMAKE_SIZEOF_VOID_P}")
+		if(CMAKE_SIZEOF_VOID_P MATCHES "4") #windows 32 bit 
+			message(FATAL_ERROR "OpenBlas Library is available in externals only for windows 64 bit system. Please adjust OpenBlas version in directory externals/win/zipLibs, and set the corresponding name of library in the file findOPENBLASLib.cmake")
+		else()
+			set(OPENBLAS_LIB_NAME "OpenBLAS-v0.2.14-Win64-int64") 
+		endif()
 
 		# Download openblas http://www.openblas.net/
 		# dezip in ${CMAKE_SOURCE_DIR}/externals/win/zipLibs/${OPENBLAS_LIB_NAME}
@@ -41,7 +44,13 @@ else ( (OPENBLAS_LIB_FILE) AND (OPENBLAS_INC_DIR) )
 		# make sure perl is in your path "perl -v".
 		# cmake -G "Visual Studio 12 Win64" .
 		# in visual studio : generate ALL_BUILD 
-	
+
+		message(STATUS "------------------------------------------------")		
+		message(STATUS "------------ Looking for OPENBLAS LIB ---------")
+		message(STATUS "------------------------------------------------")
+		
+		exec_program("${CMAKE_SOURCE_DIR}/externals/win/7z/x64/7za x ${PROJECT_SOURCE_DIR}/externals/win/zipLibs/${OPENBLAS_LIB_NAME}.zip -o${PROJECT_SOURCE_DIR}/externals/win -y")
+
 		add_include_path(INCLUDE_PATH_LIST_TMP_OPENBLAS "${PROJECT_SOURCE_DIR}/externals/win/${OPENBLAS_LIB_NAME}")
 		add_library_path(LIBRARY_PATH_LIST_TMP_OPENBLAS "${PROJECT_SOURCE_DIR}/externals/win/${OPENBLAS_LIB_NAME}")
 		
