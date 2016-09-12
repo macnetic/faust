@@ -80,7 +80,6 @@ using namespace std;
 template<typename FPP,Device DEVICE>
 void init_faust_core_from_matiofile(Faust::Transform<FPP,DEVICE>& core, const char* fileName, const char* variableName)
 {
-
 	matvar_t* cell_var = faust_matio_read_variable(fileName, variableName);
 
 	init_faust_core_from_matvar(core, cell_var);
@@ -104,7 +103,6 @@ void init_faust_core_from_matvar(Faust::Transform<FPP,DEVICE>& core, matvar_t* c
 
 
 	Faust::MatSparse<FPP,DEVICE> data_spmat;
-
 	core.clear();
 	if(cell_var->dims[0] != 1 )
 	{

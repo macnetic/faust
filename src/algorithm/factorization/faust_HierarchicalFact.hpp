@@ -279,10 +279,7 @@ void Faust::HierarchicalFact<FPP,DEVICE>::print_timers()const
    cout << "t_init      = " << t_init.get_time()      << " s for "<< t_init.get_nb_call()      << " calls" << endl;
    cout << "t_next_step = " << t_next_step.get_time() << " s for "<< t_next_step.get_nb_call() << " calls" << endl<<endl;
 
-Faust::MatDense<FPP,DEVICE> M_tmp;
-Faust::MatSparse<FPP,DEVICE> S_tmp;
-M_tmp.print_timers();
-S_tmp.print_timers();
+
 
 }
 #endif

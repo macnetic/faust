@@ -71,7 +71,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
 	# multiply_compare_time : time comparison between Faust-vector product and Dense matrix-vector product
  
 	foreach(TEST_FPP float double)	
-		foreach(testin hierarchicalFactorization test_palm4MSA multiply_compare_time)
+		foreach(testin hierarchicalFactorization test_palm4MSA Faust_multiplication)
 			# copy CPU files cpp.in to the user's ./src/ directory in float et double precision
 			configure_file(${FAUST_SRC_TEST_SRC_DIR}/${testin}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
 			# Generation of the binary files in double and float precision
@@ -87,7 +87,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
 
 #message(STATUS "ALALALLLLLLLLLLL FAUST_INSTALL_BIN=${FAUST_INSTALL_BIN}")
 
-	install(TARGETS hierarchicalFactorization_double hierarchicalFactorization_float test_palm4MSA_double test_palm4MSA_float multiply_compare_time_double multiply_compare_time_float DESTINATION ${FAUST_INSTALL_BIN})
+	install(TARGETS hierarchicalFactorization_double hierarchicalFactorization_float test_palm4MSA_double test_palm4MSA_float DESTINATION ${FAUST_INSTALL_BIN})
 
 
 	# matlab script useful for displaying the result of the multiply_compare_time executable ( 
@@ -120,21 +120,29 @@ endif(BUILD_MATLAB_MEX_FILES)
 # MATLAB input format
 if (BUILD_READ_MAT_FILE)
 	
-	# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) 
-	add_test(NAME HADAMARD_FACT_DOUBLE COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double 	${FAUST_DATA_MAT_DIR}/config_HADAMARD.mat)
-	add_test(NAME FAUST_HIER_DOUBLE COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double 	${FAUST_DATA_MAT_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
-	add_test(NAME FAUST_HIER_FLOAT COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
-	add_test(NAME MEG_FACT_FLOAT COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22450 200)
-	add_test(NAME MEG_FACT_DOUBLE COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22480 1)
-
-	add_test(NAME PALM4MSA_DOUBLE COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSA_double )
-	add_test(NAME PALM4MSA_FLOAT COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSA_float )
+	# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) in simple and 	double precision
 	
-	# limit the time of the process in case of bug... 
-	set_tests_properties(HADAMARD_FACT_DOUBLE FAUST_HIER_DOUBLE FAUST_HIER_FLOAT PROPERTIES TIMEOUT ${TIMEOUT_COMP})
-	set_tests_properties(MEG_FACT_FLOAT MEG_FACT_DOUBLE PROPERTIES TIMEOUT ${TIMEOUT_MEG})
+	add_test(NAME MEG_FACT_float COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22450 200)
+	add_test(NAME MEG_FACT_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22480 1)
+	set_tests_properties(MEG_FACT_float MEG_FACT_double PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 
-	set_tests_properties(MEG_FACT_FLOAT MEG_FACT_DOUBLE PROPERTIES TIMEOUT 14000)
+	foreach(TEST_FPP float double)
+		add_test(NAME HADAMARD_FACT_${TEST_FPP} COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} 	${FAUST_DATA_MAT_DIR}/config_HADAMARD.mat)
+		add_test(NAME FAUST_HIER_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} 	${FAUST_DATA_MAT_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+	
+		add_test(NAME MEG_MULTIPLICATION_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/Faust_multiplication_${TEST_FPP} ${FAUST_DEMO_BSL_DATA_SRC_DIR}X_meg.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_6.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_8.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_16.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_25.mat)
+
+		add_test(NAME PALM4MSA_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSA_${TEST_FPP} )
+
+		# limit the time of the process in case of bug... 
+		set_tests_properties(HADAMARD_FACT_${TEST_FPP} FAUST_HIER_${TEST_FPP} PROPERTIES TIMEOUT ${TIMEOUT_COMP})
+	
+endforeach()
+
+
+	
+
+	
 	
 
 

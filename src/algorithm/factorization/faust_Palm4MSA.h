@@ -195,34 +195,34 @@ namespace Faust
 
     #ifdef __COMPILE_TIMERS__
        public:
-          Faust::Timer_gpu t_local_compute_projection;
-          Faust::Timer_gpu t_local_compute_grad_over_c;
-          Faust::Timer_gpu t_local_compute_c;
-          Faust::Timer_gpu t_local_compute_lambda;
-          Faust::Timer_gpu t_local_update_R;
-          Faust::Timer_gpu t_local_update_L;
-          Faust::Timer_gpu t_local_check;
-          Faust::Timer_gpu t_local_init_fact;
-          Faust::Timer_gpu t_local_next_step;
-          Faust::Timer_gpu t_local_init_fact_from_palm;
+          Faust::Timer t_local_compute_projection;
+          Faust::Timer t_local_compute_grad_over_c;
+          Faust::Timer t_local_compute_c;
+          Faust::Timer t_local_compute_lambda;
+          Faust::Timer t_local_update_R;
+          Faust::Timer t_local_update_L;
+          Faust::Timer t_local_check;
+          Faust::Timer t_local_init_fact;
+          Faust::Timer t_local_next_step;
+          Faust::Timer t_local_init_fact_from_palm;
 
 
-          static Faust::Timer_gpu t_global_compute_projection;
-          static Faust::Timer_gpu t_global_compute_grad_over_c;
-          static Faust::Timer_gpu t_global_compute_c;
-          static Faust::Timer_gpu t_global_compute_lambda;
-          static Faust::Timer_gpu t_global_update_R;
-          static Faust::Timer_gpu t_global_update_L;
-          static Faust::Timer_gpu t_global_check;
-          static Faust::Timer_gpu t_global_init_fact;
-          static Faust::Timer_gpu t_global_next_step;
-          static Faust::Timer_gpu t_global_init_fact_from_palm;
+          static Faust::Timer t_global_compute_projection;
+          static Faust::Timer t_global_compute_grad_over_c;
+          static Faust::Timer t_global_compute_c;
+          static Faust::Timer t_global_compute_lambda;
+          static Faust::Timer t_global_update_R;
+          static Faust::Timer t_global_update_L;
+          static Faust::Timer t_global_check;
+          static Faust::Timer t_global_init_fact;
+          static Faust::Timer t_global_next_step;
+          static Faust::Timer t_global_init_fact_from_palm;
 
-          static Faust::Timer_gpu t_prox_const;
-          static Faust::Timer_gpu t_prox_sp;
-          static Faust::Timer_gpu t_prox_spcol;
-          static Faust::Timer_gpu t_prox_splin;
-          static Faust::Timer_gpu t_prox_normcol;
+          static Faust::Timer t_prox_const;
+          static Faust::Timer t_prox_sp;
+          static Faust::Timer t_prox_spcol;
+          static Faust::Timer t_prox_splin;
+          static Faust::Timer t_prox_normcol;
 
           static int nb_call_prox_const;
           static int nb_call_prox_sp;

@@ -171,7 +171,7 @@ Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 	totalNonZeros(A.totalNonZeros)
 {
 #ifdef __COMPILE_TIMERS__
-		this.t_multiply_vector.resize(data.size());
+		this->t_multiply_vector.resize(data.size());
 #endif 
 
 }
@@ -188,7 +188,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu>
 		(data[0]) *= lambda_;
 	
 	#ifdef __COMPILE_TIMERS__
-		this.t_multiply_vector.resize(data.size());
+		this->t_multiply_vector.resize(data.size());
 	#endif
 	this->check_factors_validity();
 }
