@@ -138,12 +138,12 @@ if (BUILD_READ_MAT_FILE)
 	
 
 
-	# time comparison between Faust-vector product and Dense matrix-vector product for various configuration ( dimension, RCG , number of factor)
-	add_test(NAME MULTIPLY_COMPTIME COMMAND ${FAUST_BIN_TEST_BIN_DIR}/multiply_compare_time_double)
-	# display the result of MULTIPLY_COMPTIME and save it in folder FAUST_BIN_TEST_FIG_DIR as jpeg image (WARNING must be launched after MULTIPLY_COMPTIME)
-	add_test(NAME FIG_MULTIPLY_COMPTIME COMMAND	matlab -nodesktop -r "try;addpath('${FAUST_BIN_TEST_TIME_COMPARE_DIR}');display_multiply_comptime('${FAUST_BIN_TEST_OUTPUT_DIR}/multiply_compare_time.mat','${FAUST_BIN_TEST_FIG_DIR}') ; catch ME ; disp('ERROR IN TEST display_multiply_comptime.m Please chek the output to visualize the error. ') ; end ; exit")
+	## time comparison between Faust-vector product and Dense matrix-vector product for various configuration ( dimension, RCG , number of factor)
+	#add_test(NAME MULTIPLY_COMPTIME COMMAND ${FAUST_BIN_TEST_BIN_DIR}/multiply_compare_time_double)
+	## display the result of MULTIPLY_COMPTIME and save it in folder FAUST_BIN_TEST_FIG_DIR as jpeg image (WARNING must be launched after MULTIPLY_COMPTIME)
+	#add_test(NAME FIG_MULTIPLY_COMPTIME COMMAND	matlab -nodesktop -r "try;addpath('${FAUST_BIN_TEST_TIME_COMPARE_DIR}');display_multiply_comptime('${FAUST_BIN_TEST_OUTPUT_DIR}/multiply_compare_time.mat','${FAUST_BIN_TEST_FIG_DIR}') ; catch ME ; disp('ERROR IN TEST display_multiply_comptime.m Please chek the output to visualize the error. ') ; end ; exit")
 	
-	set_tests_properties(FIG_MULTIPLY_COMPTIME PROPERTIES TIMEOUT 300)
+	#set_tests_properties(FIG_MULTIPLY_COMPTIME PROPERTIES TIMEOUT 300)
 
 endif (BUILD_READ_MAT_FILE)
 
