@@ -107,6 +107,7 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 	endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 endif(UNIX)
+message(STATUS "CMAKE_INSTALL_MATLAB_PREFIX = ${CMAKE_INSTALL_MATLAB_PREFIX}")
 ##################################################################
 ## For windows platform :
 # cmake -G "MinGW Makefiles" ..

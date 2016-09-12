@@ -17,7 +17,7 @@
 ###################################################################
 
 ### name system of Machine for CDASH
-export CMAKE_SYSTEM='linux-ubuntu'
+export CMAKE_SYSTEM='linux-ubuntu-openblas'
 
 # Directory of the library used in the FAUST PROJECT 
 # On ajoute le path /usr/local/bin pour le ctest command.
@@ -75,6 +75,7 @@ cd $PATH_DIR_RUN_NIGHTLY
 rm -rf ./faust_test
 rm -rf ./faust_test_build
 rm -rf ./faust_output
+
 
 mkdir ./faust_test
 mkdir ./faust_test_build
