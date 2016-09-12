@@ -7,7 +7,7 @@
 # 
 # faust_test directory contains the sources of the faust project. 
 # faust_test_build directory contains the build of faust project.
-# faust_output directory contains the build of faust project.
+# faust_output directory contains the build of faust project. 
 #
 # WARNING : Please adjust your environment variables, corresponding 
 # to your computer configurations (library path) 
