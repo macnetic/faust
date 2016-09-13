@@ -1,0 +1,160 @@
+/****************************************************************************/
+/*                              Description:                                */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.gforge.inria.fr>                         */
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+/****************************************************************************/
+
+#include "faust_Timer.h"
+#include "faust_Transform.h"
+#include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_core.h"
+#include <string>
+#include <sstream>
+#include "faust_BlasHandle.h"
+#include "faust_SpBlasHandle.h"
+
+
+#include <iostream>
+#include <iomanip>
+
+/** \brief Time Measurement between a given matrix and its Faust factorization
+* A dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
+* \param configFilename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hierFact)
+* \param expectedLambda (optionnal) : compared the expected scalar of the factorisation with the computed one in the precision defined with epsilon
+*\param epsilon : precision for the test of equality (default value 0.0001)
+*/
+
+
+
+
+typedef @TEST_FPP@ FPP;
+
+int main(int argc, char* argv[])
+{
+	if (typeid(FPP) == typeid(double))
+  	{
+		cout<<"floating point precision == double"<<endl;
+  	}
+
+  	if (typeid(FPP) == typeid(float))
+  	{
+		cout<<"floating point precision == float"<<endl;
+  	}
+
+	if (argc <= 1)
+	{
+		cerr << "At least one input file (extension \".mat\") storing a dense matrix must be given" << endl;
+		exit(EXIT_FAILURE);	
+	}
+	
+	// initialisation of the dense matrix
+	std::cout<<"loading dense matrix"<<std::endl;
+	string matDenseFilename = argv[1];
+	Faust::MatDense<FPP,Cpu> M;
+	init_faust_mat_from_matio(M,matDenseFilename.c_str(),"X_fixed");
+	int nbRow=M.getNbRow();	
+	int nbCol=M.getNbCol();
+
+
+	// initialisation of the different Faust
+	std::vector<Faust::Transform<FPP,Cpu> > listFaust;
+	int nbFaust = argc - 2;
+	std::vector<string> faustFilename(nbFaust);
+	std::cout<<"loading "<<nbFaust<<" Faust"<<std::endl;
+	listFaust.resize(nbFaust);
+	for (int i=0;i<nbFaust;i++)
+	{
+		faustFilename[i]=argv[2+i];
+		std::cout<<"loading faust from "<<faustFilename[i].c_str()<<std::endl;
+		init_faust_core_from_matiofile(listFaust[i],faustFilename[i].c_str(),"facts");
+		if ((listFaust[i].getNbRow() != nbRow) || (listFaust[i].getNbCol() != nbCol))
+		{		
+			cerr << "imported Faust doesn't have the same size as the Dense matrix it represents" << endl;
+			exit(EXIT_FAILURE);
+		}			
+	}
+
+	int nbMultiplication = 10000;
+
+	
+	//multiplication
+	Faust::Timer t_dense;
+	std::cout<<std::endl<<" multiplication "<<std::endl;
+	std::vector<Faust::Timer> t_faust;
+	t_faust.resize(nbFaust);
+
+	for (int i=0;i<nbMultiplication;i++)
+	{	
+		//std::cout<<i+1<<"/"<<nbMultiplication<<std::endl;	
+	 	Faust::Vect<FPP,Cpu> x(nbCol);
+		Faust::Vect<FPP,Cpu> y;	 	
+		for (int k=0;k<nbCol;k++)
+			x[k]=k;
+		
+		
+		t_dense.start();
+	 	y=M*x;
+		t_dense.stop();
+
+		
+		for (int l=0;l<nbFaust;l++)
+		{							
+			t_faust[l].start();			
+				y=listFaust[l]*x;
+			t_faust[l].stop();
+		}
+
+	}
+
+	std::cout<<std::endl<<"DENSE tps : "<<t_dense.get_time()<<std::endl;	
+
+	
+	
+	std::cout<<" FAUST : "<<std::endl;
+
+	for (int i=0;i<listFaust.size();i++)
+	{
+		std::cout<<"Faust : "<<faustFilename[i]<<std::endl;
+		std::cout<<"total tps : "<<t_faust[i].get_time()<<" speed-up "<< t_dense.get_time()/t_faust[i].get_time()<<std::endl;
+		#ifdef __COMPILE_TIMERS__
+			listFaust[i].print_timers();
+		#endif
+		std::cout<<std::endl<<std::endl;
+	}
+	
+	
+}
