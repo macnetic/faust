@@ -1,6 +1,6 @@
 \chapter{Installation on Unix platform}\label{sec:InstallUnix}
 
-\paragraph{}The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
+\paragraph{}The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. The toolbox provides a Matlab wrapper. CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
 
 \paragraph{}This chapter presents the steps to install the FA$\mu$ST tools on the Unix platform (both Linux and Mac OS). First section \ref{sec:UnixGettingStarted} presents the basic installation of FA$\mu$ST and second section \ref{sec:UnixCustomInstall} corresponds to the advanced  installation.
 
@@ -62,6 +62,9 @@ sudo make install % run with administrator privilege
 \paragraph{}The command \texttt{sudo make install} will install the library and others components in default directory. For that, you must have administrator privilege because the library file \texttt{libfaust.a} is copied in your root path directory. If you don't have administrator privilege, you can make a local install using the following option (see \ref{sec:UnixCustomInstall}): \\
 \texttt{cmake .. -DCMAKE\_INSTALL\_PREFIX="<Home/Local/Project/Output>"}
 
+\paragraph{}Similarly, the Matlab wrapper is installed in the default Matlab Directory\newline  \texttt{/"HOMEDIR"/Documents/MATLAB/Faust}. But you can make a local install for the wrapper using the following option \ref{sec:UnixCustomInstall}) : \\
+
+\texttt{cmake .. -DCMAKE\_INSTALL\_MATLAB\_PREFIX="<Home/Local/Project/Output>"} 
 
 \section{Custom - Advanced Installation}\label{sec:UnixCustomInstall}
 
@@ -85,6 +88,7 @@ sudo make install % run with administrator privilege
 
 \begin{itemize}
 \item CMAKE\_INSTALL\_PREFIX : Install directory
+\item CMAKE\_INSTALL\_MATLAB\_PREFIX : Install directory for the Matlab wrapper (mexfunction, demo ...)
 \item BUILD\_TESTING : Enable the ctest option (default value is ON)
 \item BUILD\_DOCUMENTATION : Generating the doxygen documentation (default value is OFF)  
 \item BUILD\_MULTITHREAD : Enable multithread with OpenMP Multithreading (default value is OFF)
