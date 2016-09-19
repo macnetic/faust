@@ -5,22 +5,31 @@ function hier_fact_test(paramsfile,expectedLambda, expectedLambdaPrecision)
 
 
 % load the hierarchical_fact configuration
+disp(['*** LOADING PARAMS FILE ***']);
+disp([paramsfile]);
+disp(' ');
+disp(' ');
+ 
 load(paramsfile);
 
-
+%% factorisation (mexfile)
+disp('*** MEX FACTORISATION ***');  
+tic
 [mexlambda,mexfact]=mexHierarchical_fact(params);
-disp(['lambda value : ' num2str(mexlambda)]);
+t=toc;
+
+disp(['time factorisation (mex) : ' num2str(t)]);  
+
+
+
+%% check if the result are ok
+disp(['lambda value () : ' num2str(mexlambda)]);
 if (abs(mexlambda - expectedLambda) > expectedLambdaPrecision)
-    disp('');
+    disp(' ');
     
     disp([ 'expected lamba value : ' int2str(expectedLambda) ' in the precision of ' int2str(expectedLambdaPrecision) ]);	
     error('invalid lambda value');
 end
-
-
-
-
-
 
 
 mexfact{1}=mexlambda*mexfact{1};
@@ -31,7 +40,25 @@ disp(['relative error :  ' num2str(mex_error)]);
 
 
 
+
+%% factorisation (matlab)
+disp(' ');
+disp(' ');
+disp(['*** MATLAB FACTORISATION ***']); 
+tic
+[lambda,fact]=old_hierarchical_fact(params);
+t=toc;
+
+disp(['time factorisation (matlab) : ' num2str(t)]);  
+disp(['lambda value (MATLAB) : ' num2str(lambda)]);
+
+
+
+
+
 %% speed-up test for multiplication with a vector
+disp(' ');
+disp(' ');
 disp('*** product data matrix-vector vs product faust-vector ***');
 nbiter = 100;
 dense_mat = params.data;
