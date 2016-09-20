@@ -1,4 +1,4 @@
-function [lambda, facts] = palm4MSA(params)
+function [lambda, facts] = old_palm4MSA(params)
 %% Description: palm4MSA. 
 %  Factorization of a data matrix into multiple factors using PALM.
 %  [lambda, facts] = palm4MSA(params) runs the PALM algorithm on the

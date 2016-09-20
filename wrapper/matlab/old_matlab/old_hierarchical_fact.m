@@ -1,4 +1,4 @@
-function [lambda, facts, errors] = hierarchical_fact(params)
+function [lambda, facts, errors] = old_hierarchical_fact(params)
 %% Description hierarchical_fact 
 %  Hierarchical matrix factorization.
 %  [lambda, facts, errors] = hierarchical_fact(params) runs the hierarchical
