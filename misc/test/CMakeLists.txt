@@ -29,9 +29,12 @@ set(TIMEOUT_COMP 100)
 
 # MATLAB TEST
 if(BUILD_MATLAB_MEX_FILES)
-	add_test(NAME MATLAB_FACT_HIER COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_compared_hierarchical_fact',9402,1); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
-	add_test(NAME MATLAB_FACT_MEG COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_MEG',22480,1);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-	add_test(NAME MATLAB_FACT_HADAMARD COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_HADAMARD',5941,1);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+	add_test(NAME MATLAB_FACT_HIER_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_compared_hierarchical_fact',9402,1,'MEX'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
+	add_test(NAME MATLAB_FACT_HIER_MATLAB COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_compared_hierarchical_fact',9402,1,'MATLAB'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
+	add_test(NAME MATLAB_FACT_MEG_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_MEG',22480,1,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+	add_test(NAME MATLAB_FACT_MEG_MATLAB COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_MEG',22480,1,'MATLAB');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+	add_test(NAME MATLAB_FACT_HADAMARD_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_HADAMARD',5941,30,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+	add_test(NAME MATLAB_FACT_HADAMARD_MATLAB COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('config_HADAMARD',5941,30,'MATLAB');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 	add_test(NAME MATLAB_DEMO_INSTALL COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${CMAKE_INSTALL_MATLAB_PREFIX}');setup_FAUST;run_all_demo;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 	add_test(NAME MATLAB_DEMO_BUILD COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${FAUST_MATLAB_BIN_DIR}');setup_FAUST;run_all_demo;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 	add_test(NAME MATLAB_FAUST_1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
@@ -45,10 +48,10 @@ if(BUILD_MATLAB_MEX_FILES)
 
 #CTEST_FULL_OUTPUT
 
-	set_tests_properties(MATLAB_FACT_HIER MATLAB_FACT_MEG PROPERTIES TIMEOUT 100)
+	set_tests_properties(MATLAB_FACT_HIER_MEX MATLAB_FACT_HIER_MATLAB   PROPERTIES TIMEOUT 100)
 	set_tests_properties(MATLAB_DEMO_INSTALL MATLAB_DEMO_BUILD PROPERTIES TIMEOUT 6000)
 	set_tests_properties(MATLAB_FAUST_1 MATLAB_FAUST_2  PROPERTIES TIMEOUT 30)
-	set_tests_properties(MATLAB_FACT_MEG PROPERTIES TIMEOUT ${TIMEOUT_MEG})
+	set_tests_properties(MATLAB_FACT_MEG_MATLAB MATLAB_FACT_MEG_MEX PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 endif()
 
 

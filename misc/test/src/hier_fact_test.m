@@ -1,10 +1,61 @@
-%% test the mexhierarchical_fact function in the configuration described in 
-% the file paramsfile
-function hier_fact_test(paramsfile,expectedLambda, expectedLambdaPrecision)
+%% Description
+%  HIER_FACT_TEST.
+%  tests the hierarchical_fact algorithm,
+%  checks the factorisation and makes time measurement :
+%   
+%  INPUT : 
+% - paramsfile : filename where the params of hierarchical_fact are stored
+%
+% - expectedLambda : the expected lambda value of the factorisation
+%
+% - expectedLambdaPrecision : to succeed |expectedLambda - lambda|< expectedLambdaPrecision must be true
+%
+% - opt : if opt = 'MEX' => mexHierarchical_fact is called (mexfunction)
+%            opt = 'MATLAB' => old_hierarchical_fact is called (pure matlab version) 
+%
+%  
+%
+% For more information on the FAuST Project, please visit the website of 
+% the project :  <http://faust.gforge.inria.fr>
+%
+%% License:
+% Copyright (2016):	Nicolas Bellot, Adrien Leman, Thomas Gautrais, 
+%			Luc Le Magoarou, Remi Gribonval
+%			INRIA Rennes, FRANCE
+%			http://www.inria.fr/
+%
+% The FAuST Toolbox is distributed under the terms of the GNU Affero 
+% General Public License.
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU Affero General Public License as published 
+% by the Free Software Foundation.
+%
+% This program is distributed in the hope that it will be useful, but 
+% WITHOUT ANY WARRANTY; without even the implied warranty of 
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+% See the GNU Affero General Public License for more details.
+%
+% You should have received a copy of the GNU Affero General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+%% Contacts:
+%   Nicolas Bellot	: nicolas.bellot@inria.fr
+%   Adrien Leman	: adrien.leman@inria.fr
+%   Thomas Gautrais	: thomas.gautrais@inria.fr
+%   Luc Le Magoarou	: luc.le-magoarou@inria.fr
+%   Remi Gribonval	: remi.gribonval@inria.fr
+%
+%% References:
+% [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse 
+%	approximations of matrices and applications", Journal of Selected 
+%	Topics in Signal Processing, 2016.
+%	<https://hal.archives-ouvertes.fr/hal-01167948v1>
+%%
+function hier_fact_test(paramsfile,expectedLambda, expectedLambdaPrecision,opt)
 
 
 
-% load the hierarchical_fact configuration
+%% load the hierarchical_fact configuration
 disp(['*** LOADING PARAMS FILE ***']);
 disp([paramsfile]);
 disp(' ');
@@ -12,19 +63,39 @@ disp(' ');
  
 load(paramsfile);
 
-%% factorisation (mexfile)
-disp('*** MEX FACTORISATION ***');  
-tic
-[mexlambda,mexfact]=mexHierarchical_fact(params);
-t=toc;
 
-disp(['time factorisation (mex) : ' num2str(t)]);  
+
+
+%% factorization of the matrix 
+switch(opt)
+	case 'MEX' %% factorisation (mexfile)
+		disp('*** MEX FACTORISATION ***');  
+		tic
+			[lambda,fact]=mexHierarchical_fact(params);
+		t=toc;
+	case 'MATLAB' %% factorisation (matlab)
+		disp(['*** MATLAB FACTORISATION ***']); 
+		tic
+			[lambda,fact]=old_hierarchical_fact(params);
+		t=toc;
+     
+	otherwise
+		error('hier_fact_test : invalid opt parameter , must be equal to ''MEX'' or ''MATLAB''');
+end
+
+
+% conversion seconds into [hour,min,seconds])
+t=mod(t, [0, 3600, 60]) ./ [3600, 60, 1];
+t(1:2)=floor(t(1:2));
+
+
+disp(['time factorization : ' int2str(t(1)) ' hour ' int2str(t(2)) ' min ' num2str(t(3)) ' seconds']);  
 
 
 
 %% check if the result are ok
-disp(['lambda value () : ' num2str(mexlambda)]);
-if (abs(mexlambda - expectedLambda) > expectedLambdaPrecision)
+disp(['lambda value : ' num2str(lambda)]);
+if (abs(lambda - expectedLambda) > expectedLambdaPrecision)
     disp(' ');
     
     disp([ 'expected lamba value : ' int2str(expectedLambda) ' in the precision of ' int2str(expectedLambdaPrecision) ]);	
@@ -32,27 +103,10 @@ if (abs(mexlambda - expectedLambda) > expectedLambdaPrecision)
 end
 
 
-mexfact{1}=mexlambda*mexfact{1};
-fc=Faust(mexfact);
-mex_error = norm(params.data - get_product(fc));
+F=Faust(fact,lambda);
+relative_error = norm(params.data - get_product(F));
 
-disp(['relative error :  ' num2str(mex_error)]);
-
-
-
-
-%% factorisation (matlab)
-disp(' ');
-disp(' ');
-disp(['*** MATLAB FACTORISATION ***']); 
-tic
-[lambda,fact]=old_hierarchical_fact(params);
-t=toc;
-
-disp(['time factorisation (matlab) : ' num2str(t)]);  
-disp(['lambda value (MATLAB) : ' num2str(lambda)]);
-
-
+disp(['relative error :  ' num2str(relative_error)]);
 
 
 
@@ -72,7 +126,7 @@ for i=1:nbiter
     x=rand(nc,1);
    
     tic
-        y_faust = fc*x;
+        y_faust = F*x;
     tps_faust=toc;
     
     tic
