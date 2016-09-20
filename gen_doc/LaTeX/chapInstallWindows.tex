@@ -1,6 +1,6 @@
 \chapter{Installation on Windows platform}\label{sec:WinInstall}
 
-\paragraph{}The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
+\paragraph{}The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. The proposed toolbox provides a Matlab wrapper. CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
 
 \paragraph{}This chapter presents the steps to install the FA$\mu$ST tools on the Windows platform. First section \ref{sec:WinGettingStarted} presents the basic installation of FA$\mu$ST and second section \ref{sec:WinCustomInstall} corresponds to the advanced  installation.
 
@@ -23,7 +23,7 @@ From \url{https://cmake.org/download/}, download Binary distributions correspond
 \url{http://fr.mathworks.com/help/matlab/matlab_external/install-mingw-support-package.html}. For that, you must have a id session for Mathwork. It is easy to create. 
 Current this latest step, an environment variable called MW\_MINGW64\_LOC is automatically generated. 
 
-\item \textbf{Install C++ Compiler:} Both \textbf{Microsoft visual C++} and \textbf{MinGW "Minimalist GNU for Windows"} compiler have been tested. If you are friendly with Unix tools and command line terminal, preferd \textbf{MinGW "Minimalist GNU for Windows"} C++ compiler. Otherwise, if you are more familiar with the graphical user interface, prefer the \textbf{Microsoft visual C++} compiler. The version of the C++ compiler must be coherent with the version of your Matlab version. In this documentation, the version of our C++ compiler corresponds to Matlab 2014 and 2015. If you use an other version of Matlab, please refer to the Mathworks website \url{http://fr.mathworks.com/support/compilers/<R20XXa>}.
+\item \textbf{Install C++ Compiler:} Both \textbf{Microsoft visual C++} and \textbf{MinGW "Minimalist GNU for Windows"} compiler have been tested. If you are more familiar with the graphical user interface, prefer the \textbf{Microsoft visual C++} compiler. Otherwise, if you are friendly with Unix tools and command line terminal, preferd \textbf{MinGW "Minimalist GNU for Windows"} C++ compiler. The version of the C++ compiler must be coherent with the version of your Matlab version. In this documentation, the version of our C++ compiler corresponds to Matlab 2014 and 2015. If you use an other version of Matlab, please refer to the Mathworks website \url{http://fr.mathworks.com/support/compilers/<R20XXa>}.
 
 \paragraph{}For \textbf{Microsoft visual C++} installation :
 \begin{itemize}
@@ -45,12 +45,10 @@ Current this latest step, an environment variable called MW\_MINGW64\_LOC is aut
 
 
 \subsection{Required packages}\label{sec:WinRequiredPackages}
-\paragraph{}Here is a list of packages used in the FA$\mu$ST project.
+\paragraph{}Here is a list of packages used in the FA$\mu$ST project. Eigen and OpenBlas library are automatically installed : there are nothing to do (see the directory "./externals/win/").
 \begin{itemize}
-\item \textbf{Eigen} is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms (see \url{http://eigen.tuxfamily.org}). This library is automatically install: there are nothing to do (see the directory "./externals").
+\item \textbf{Eigen} is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms (see \url{http://eigen.tuxfamily.org}).
 \item \textbf{OpenBLAS} is an optimized BLAS library based on GotoBLAS2 1.13 BSD version. (see \url{http://www.openblas.net}). To install OpenBlas, refer to \url{https://github.com/xianyi/OpenBLAS/wiki/Installation-Guide}. You can directly download precompiled binary here \url{https://sourceforge.net/projects/openblas/files/v0.2.14/}
-
-
 
 \end{itemize}
 
@@ -124,8 +122,8 @@ When clicking for the first time on the [Configure] button, CMake will ask for t
 \end{enumerate}
 
 
-
-\paragraph{}In the case of \textbf{Microsoft Visual Studio 2013 compiler using the command terminal} :
+\bigbreak
+\paragraph{NOTE:}In the case of \textbf{Microsoft Visual Studio 2013 compiler using the command terminal} :
 
 \begin{itemize}
 \item Open a command terminal

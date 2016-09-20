@@ -1,8 +1,8 @@
 \chapter{Installation on Unix platform}\label{sec:InstallUnix}
 
-\paragraph{}The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. The toolbox provides a Matlab wrapper. CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
+\paragraph{}The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. The proposed toolbox provides a Matlab wrapper. CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
 
-\paragraph{}This chapter presents the steps to install the FA$\mu$ST tools on the Unix platform (both Linux and Mac OS). First section \ref{sec:UnixGettingStarted} presents the basic installation of FA$\mu$ST and second section \ref{sec:UnixCustomInstall} corresponds to the advanced  installation.
+\paragraph{}This chapter presents the steps to install the FA$\mu$ST tools on the Unix platform (both Linux and Mac OS). First section \ref{sec:UnixGettingStarted} presents the basic installation of FA$\mu$ST, second section \ref{sec:UnixCustomInstall} corresponds to the advanced  installation. Third \ref{sec:UnixInstallCodeBlock} and fourth \ref{sec:MacInstallXcode} sections explain how to used the common Integrated Development Environment (codeBlock and Xcode) in the build and installation process. 
 
 \section{Getting Started}\label{sec:UnixGettingStarted}
 
@@ -84,7 +84,7 @@ sudo make install % run with administrator privilege
 \paragraph{}After choosing options for the build and setting the required fields, press [c] to configure. The configuration of the build system is checked again by Cmake, at the end of this check if the build settings are correct, you can press [g] in order to generate the build system.
 
 \paragraph{} Instead the ccmake GUI, an other possibility to configure and generate the project is to use the command line cmake which can take the option input. Here is the list of available options: 
-\texttt{$cmake\ ..\ -D<BUILD\_NAME>=<ON/OFF>$}
+\texttt{$cmake\ ..\ -D<BUILD\_NAME>=<value>$}
 
 \begin{itemize}
 \item CMAKE\_INSTALL\_PREFIX : Install directory
@@ -103,10 +103,10 @@ sudo make install % run with administrator privilege
 
 \paragraph{}Following the selected option, the cmake installer automatically checks the dependent component (library OpenBlas, eigen, matio, libxml2).  
 
-\section{Build using Code Block}\label{sec:UnixInstallCodeBlock}
+\section{Build \& Install using Code Block}\label{sec:UnixInstallCodeBlock}
 progress...
 
-\section{Build FAuST using Xcode on MAC OS}\label{sec:MacInstallXcode}
+\section{Build \& Install using Xcode (for MAC OS)}\label{sec:MacInstallXcode}
 
 The Faust tools can be generated using XCode on MAC OS. To do this, please follow this instructions :
 \begin{itemize}
@@ -118,18 +118,22 @@ The Faust tools can be generated using XCode on MAC OS. To do this, please follo
 mkdir build
 cd build
 cmake .. -G "Xcode"
+\end{lstlisting}
 
+\item Then, open your project \texttt{FAUST.xcodeproj} with Xcode and build the targets.
+
+\end{itemize}
+
+\paragraph{NOTE:}You can generated the target using the terminal command \texttt{xcodebuild} :
+\begin{lstlisting}
+mkdir build
+cd build
+cmake .. -G "Xcode"
 %% list all target of the project
 xcodebuild -list -project FAUST.xcodeproj 
-
 %% Build the targets
 xcodebuild -configuration "Release" -target "ALL_BUILD" build 
-
 %% performs the "make install"
 xcodebuild -configuration "Release" -target "install" build 
 \end{lstlisting}
 
-\paragraph{NOTE:}You can manually generated the target using visual studio from file \texttt{FAUST.sln}.
-
- 
-\end{itemize} 
