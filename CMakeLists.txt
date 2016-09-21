@@ -1,6 +1,6 @@
 ##############################################################################
 ##                              Description:                                ##
-﻿##  Main CMakeLists.txt of the FAUST project                                ##
+##  Main cmakelist file for the faust project                               ##
 ##  Other important files for CMake are                                     ##
 ##      - CMakeLists.txt files in the sub-directories                       ##
 ##      - CMake/* files, which define some tools to search for libraries.   ##
@@ -45,8 +45,6 @@ set(FAUST_VERSION_MAJOR 2)
 set(FAUST_VERSION_MINOR 0)
 set(FAUST_VERSION_PATCH 0)
 #set(FAUST_VERSION 2.0)
-
-
 
 ##############  INSTALL DIRECTORIES   #############################
 if(UNIX)
