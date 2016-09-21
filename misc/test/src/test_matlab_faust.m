@@ -53,7 +53,7 @@ disp(' TEST CONSTRUCTOR : ');
 disp(['generate a faust of size ' int2str(dim1)  ' by ' int2str(dim2)]); 
 factors=cell(1,nb_fact);
 factors{1}=double(randi(int_max,dim1,dim2));
-for i=2:nb_factuntitled2.m
+for i=2:nb_fact
     factors{i}=double(randi(int_max,dim2,dim2)); 
 end
 
@@ -95,7 +95,7 @@ disp('Ok');
 
 
 
-untitled2.m
+
 
 
 
