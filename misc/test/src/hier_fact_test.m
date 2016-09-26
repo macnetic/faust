@@ -3,7 +3,9 @@
 %  tests the hierarchical_fact algorithm,
 %  checks the factorisation and makes time measurement :
 %   
-%  INPUT : 
+%  INPUT :
+% - paramsFile : filename where the matrix to be factorized is stored 
+% 
 % - paramsfile : filename where the params of hierarchical_fact are stored
 %
 % - expectedLambda : the expected lambda value of the factorisation
@@ -51,17 +53,24 @@
 %	Topics in Signal Processing, 2016.
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %%
-function hier_fact_test(paramsfile,expectedLambda, expectedLambdaPrecision,opt)
+function hier_fact_test(matrixFile,paramsFile,expectedLambda, expectedLambdaPrecision,opt)
 
 
 
 %% load the hierarchical_fact configuration
-disp(['*** LOADING PARAMS FILE ***']);
-disp([paramsfile]);
+disp(['*** LOADING MATRIX FILE ***']);
+disp([matrixFile]);
 disp(' ');
 disp(' ');
  
-load(paramsfile);
+load(matrixFile);
+
+disp(['*** LOADING PARAMS FILE ***']);
+disp([paramsFile]);
+disp(' ');
+disp(' ');
+ 
+load(paramsFile);
 
 
 
@@ -71,12 +80,12 @@ switch(opt)
 	case 'MEX' %% factorisation (mexfile)
 		disp('*** MEX FACTORISATION ***');  
 		tic
-			[lambda,fact]=mexHierarchical_fact(params);
+			[lambda,fact]=mexHierarchical_fact(matrix,params);
 		t=toc;
 	case 'MATLAB' %% factorisation (matlab)
 		disp(['*** MATLAB FACTORISATION ***']); 
 		tic
-			[lambda,fact]=old_hierarchical_fact(params);
+			[lambda,fact]=old_hierarchical_fact(matrix,params);
 		t=toc;
      
 	otherwise
@@ -104,7 +113,7 @@ end
 
 
 F=Faust(fact,lambda);
-relative_error = norm(params.data - get_product(F));
+relative_error = norm(matrix - get_product(F));
 
 disp(['relative error :  ' num2str(relative_error)]);
 
@@ -115,8 +124,7 @@ disp(' ');
 disp(' ');
 disp('*** product data matrix-vector vs product faust-vector ***');
 nbiter = 100;
-dense_mat = params.data;
-[nl,nc]=size(dense_mat);
+[nl,nc]=size(matrix);
 y_faust=zeros(nl,1);
 y_dense=zeros(nl,1);
 tps_dense=zeros(nbiter,1);
@@ -130,7 +138,7 @@ for i=1:nbiter
     tps_faust=toc;
     
     tic
-        y_dense = dense_mat*x;
+        y_dense = matrix*x;
     tps_dense=toc;    
 end
 

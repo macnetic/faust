@@ -63,18 +63,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	system("sleep 7");
 	#endif
 
-	if (nrhs != 1)
+	if (nrhs != 2)
 	{
 		mexErrMsgTxt("Bad Number of inputs arguments");
 	}
-
-    if(!mxIsStruct(prhs[0]))
+    const mxArray* matlab_matrix = prhs[0];	
+    const mxArray* matlab_params = prhs[1];  	
+    if(!mxIsStruct(matlab_params))
     {
         mexErrMsgTxt("Input must be a structure.");
     }
 
     std::vector<bool> presentFields;
-    testCoherence(prhs[0],presentFields);
+    // test if all the needed parameter are present
+    testCoherence(matlab_params,presentFields);
+
+
      // mexPrintf(" NUMBER FIELDS %d\n",presentFields.size());
 //     for (int i=0;i<presentFields.size();i++)
 //     {
@@ -91,38 +95,40 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //
 
     mxArray    *mxCurrentField,*mxCurrentCons;
-
-    // data initialisation
-    Faust::MatDense<FFPP,Cpu> data;
+	
+    // initialization of the matrix that will be factorized
+    Faust::MatDense<FFPP,Cpu> matrix;
+    getFaustMat(matlab_matrix,matrix);
+	 
+    // nrow of the matrix that will be factorized	
+    int nb_row = -1;
     if (presentFields[0])
     {
-        mxCurrentField = mxGetField(prhs[0],0,"data");
+        mxCurrentField = mxGetField(matlab_params,0,"nrow");
+        nb_row =(int)  mxGetScalar(mxCurrentField);
+    }else
+    {
+		mexErrMsgTxt("params.nrow must be specified");
+    }
 
-        getFaustMat(  mxCurrentField,data ) ;
-        /*mexPrintf("DATA (%d,%d)",data.getNbRow(),data.getNbCol());
-		if ((data.getNbRow() < 10) && (data.getNbCol()))
-		{
-			for (int i = 0;i<data.getNbRow();i++)
-			{
-				for (int j = 0;j<data.getNbCol();j++)
-				{
-                //bidon = std::snprintf(coeff,10,"%d",A(i,j));
-					mexPrintf("%f ",data(i,j));
-				}
-				mexPrintf("\n");
-			}
-		}*/
-	}else
-	{
-		mexErrMsgTxt("params.data must be specified");
-	}
+    //nb column of the matrix that will be factorized
+    int nb_col = -1;	
+    if (presentFields[1])
+    {
+        mxCurrentField = mxGetField(matlab_params,0,"ncol");
+        nb_col =(int)  mxGetScalar(mxCurrentField);
+    }else
+    {
+		mexErrMsgTxt("params.nrow must be specified");
+    }	
+
 
    //nbFact initialisation
    int nbFact = -1;
-   if (presentFields[1])
+   if (presentFields[2])
    {
 
-        mxCurrentField = mxGetField(prhs[0],0,"nfacts");
+        mxCurrentField = mxGetField(matlab_params,0,"nfacts");
         nbFact =(int)  mxGetScalar(mxCurrentField);
 
    }else
@@ -133,10 +139,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     //constraints
     std::vector<std::vector<const Faust::ConstraintGeneric<FFPP,Cpu>*> > consSS;
-    if (presentFields[2])
+    if (presentFields[3])
     {
         mwSize nbRowCons,nbColCons;
-        mxCurrentField = mxGetField(prhs[0],0,"cons");
+        mxCurrentField = mxGetField(matlab_params,0,"cons");
 
         if(!mxIsCell(mxCurrentField))
         {
@@ -180,9 +186,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     //niter1
     Faust::StoppingCriterion<FFPP> crit1;
-    if (presentFields[3])
+    if (presentFields[4])
     {
-         mxCurrentField = mxGetField(prhs[0],0,"niter1");
+         mxCurrentField = mxGetField(matlab_params,0,"niter1");
         int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
         Faust::StoppingCriterion<FFPP> newCrit1(nb_iter1);
         crit1 = newCrit1;
@@ -191,9 +197,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     //niter2
     Faust::StoppingCriterion<FFPP> crit2;
-    if (presentFields[4])
+    if (presentFields[5])
     {
-         mxCurrentField = mxGetField(prhs[0],0,"niter2");
+         mxCurrentField = mxGetField(matlab_params,0,"niter2");
         int nb_iter2 =(int)  mxGetScalar(mxCurrentField);
         Faust::StoppingCriterion<FFPP> newCrit2(nb_iter2);
         crit2 = newCrit2;
@@ -202,31 +208,34 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     //verbosity
     bool isVerbose = false;
-    if (presentFields[5])
-    {
-       mxCurrentField = mxGetField(prhs[0],0,"verbose");
-        isVerbose =(bool)  mxGetScalar(mxCurrentField);
-    }
-    //update_way
-    bool updateway = false;
-    if (presentFields[7])
-    {
-        mxCurrentField = mxGetField(prhs[0],0,"update_way");
-        updateway =(bool)  mxGetScalar(mxCurrentField);
-    }
-    //fact_side
-    bool factside = false;
     if (presentFields[6])
     {
-      mxCurrentField = mxGetField(prhs[0],0,"fact_side");
+       mxCurrentField = mxGetField(matlab_params,0,"verbose");
+        isVerbose =(bool)  mxGetScalar(mxCurrentField);
+    }
+
+    //fact_side
+    bool factside = false;
+    if (presentFields[7])
+    {
+      mxCurrentField = mxGetField(matlab_params,0,"fact_side");
       factside =(bool)  mxGetScalar(mxCurrentField);
     }
 
+    //update_way
+    bool updateway = false;
+    if (presentFields[8])
+    {
+        mxCurrentField = mxGetField(matlab_params,0,"update_way");
+        updateway =(bool)  mxGetScalar(mxCurrentField);
+    }
+
+
    //init_lambda
    FFPP init_lambda = (FFPP) 1.0;
-   if (presentFields[8])
+   if (presentFields[9])
    {
-       mxCurrentField = mxGetField(prhs[0],0,"init_lambda");
+       mxCurrentField = mxGetField(matlab_params,0,"init_lambda");
        init_lambda = (FFPP) mxGetScalar(mxCurrentField);
    }
 
@@ -234,7 +243,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    // bool compute_lambda = true;
    // if (presentFields[9])
    // {
-       // mxCurrentField = mxGetField(prhs[0],0,"compute_lambda");
+       // mxCurrentField = mxGetField(matlab_params,0,"compute_lambda");
        // compute_lambda = (bool) mxGetScalar(mxCurrentField);
    // }
 
@@ -242,15 +251,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       ///////////// HIERARCHICAL LAUNCH ///////////////
      // creation des parametres
 	 try{
-		
-		Faust::Params<FFPP,Cpu> params(data,nbFact,consSS,std::vector<Faust::MatDense<FFPP,Cpu> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda);
+		std::cout<<"nb_row : "<<nb_row<<std::endl;
+		std::cout<<"nb_col : "<<nb_col<<std::endl;
+		Faust::Params<FFPP,Cpu> params(nb_row,nb_col,nbFact,consSS,std::vector<Faust::MatDense<FFPP,Cpu> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda);
 
 	 //DisplayParams(params);
      //creation de hierarchical fact
      Faust::BlasHandle<Cpu> blas_handle;
      Faust::SpBlasHandle<Cpu> spblas_handle;
 
-     Faust::HierarchicalFact<FFPP,Cpu> hier_fact(params,blas_handle,spblas_handle);
+     Faust::HierarchicalFact<FFPP,Cpu> hier_fact(matrix,params,blas_handle,spblas_handle);
      hier_fact.compute_facts();
 
 

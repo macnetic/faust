@@ -68,8 +68,8 @@
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
 {
   int nbr_field=mxGetNumberOfFields(params);
-  presentFields.resize(9);
-  presentFields.assign(9,false);
+  presentFields.resize(10);
+  presentFields.assign(10,false);
   if(nbr_field < 3)
   {
       mexErrMsgTxt("The number of field of params must be at least 3 ");
@@ -82,42 +82,45 @@ void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
         fieldName = mxGetFieldNameByNumber(params,i);
         //mexPrintf("fieldname %d : %s\n",i,fieldName);
 
-        if (strcmp(fieldName,"data") == 0)
+        if (strcmp(fieldName,"nrow") == 0)
         {
             presentFields[0] = true;
         }
-
-        if (strcmp(fieldName,"nfacts") == 0)
+	if (strcmp(fieldName,"ncol") == 0)
         {
             presentFields[1] = true;
         }
-        if (strcmp(fieldName,"cons") == 0)
+        if (strcmp(fieldName,"nfacts") == 0)
         {
             presentFields[2] = true;
         }
-        if (strcmp(fieldName,"niter1") == 0)
+        if (strcmp(fieldName,"cons") == 0)
         {
             presentFields[3] = true;
         }
-        if (strcmp(fieldName,"niter2") == 0)
+        if (strcmp(fieldName,"niter1") == 0)
         {
             presentFields[4] = true;
         }
-        if (strcmp(fieldName,"verbose") == 0)
+        if (strcmp(fieldName,"niter2") == 0)
         {
             presentFields[5] = true;
         }
-        if (strcmp(fieldName,"fact_side") == 0)
+        if (strcmp(fieldName,"verbose") == 0)
         {
             presentFields[6] = true;
         }
-        if (strcmp(fieldName,"update_way") == 0)
+        if (strcmp(fieldName,"fact_side") == 0)
         {
             presentFields[7] = true;
         }
-        if (strcmp(fieldName,"init_lambda") == 0)
+        if (strcmp(fieldName,"update_way") == 0)
         {
             presentFields[8] = true;
+        }
+        if (strcmp(fieldName,"init_lambda") == 0)
+        {
+            presentFields[9] = true;
         }
         // if (strcmp(fieldName,"compute_lambda") == 0)
         // {

@@ -1,17 +1,18 @@
-function [lambda, facts, errors] = old_hierarchical_fact(params)
+function [lambda, facts, errors] = old_hierarchical_fact(matrix,params)
 %% Description hierarchical_fact 
 %  Hierarchical matrix factorization.
-%  [lambda, facts, errors] = hierarchical_fact(params) runs the hierarchical
+%  [lambda, facts, errors] = hierarchical_fact(matrix,params) runs the hierarchical
 %  matrix factorization algorithm (Algorithm 3 of [1])on the specified
 %  input matrix, returning the factors in "facts" (cell array of sparse matrices), 
 %  the multiplicative scalar in "lambda" and the errors in "errors".
 %
 %
+%  
+%
+%
 %  Required fields in PARAMS:
 %  --------------------------
 %
-%    'data' - Training data.
-%      A matrix to hierarchically factorize.
 %
 %    'nfacts' - Number of factors.
 %      Specifies the desired number of factors.
@@ -117,15 +118,15 @@ end
 
 
 %%%% Verifying the validity of the constraints %%%%
-verifSize = size(params.data,1) == params.cons{1,1}{3} && params.cons{1,1}{4}...
-    == params.cons{2,1}{3} && size(params.data,2) == params.cons{2,1}{4};
+verifSize = params.nrow == params.cons{1,1}{3} && params.cons{1,1}{4}...
+    == params.cons{2,1}{3} && params.ncol == params.cons{2,1}{4};
 for i = 2:params.nfacts-1
     if fact_side
         verifSize = verifSize && params.cons{2,i-1}{3} == params.cons{2,i}{4}...
-            && params.cons{1,i}{4} == params.cons{2,i}{3} && size(params.data,1) == params.cons{1,i}{3};
+            && params.cons{1,i}{4} == params.cons{2,i}{3} && params.nrow == params.cons{1,i}{3};
     else
         verifSize = verifSize && params.cons{1,i-1}{4} == params.cons{1,i}{3}...
-            && params.cons{1,i}{4} == params.cons{2,i}{3} && size(params.data,2) == params.cons{2,i}{4};
+            && params.cons{1,i}{4} == params.cons{2,i}{3} && params.ncol == params.cons{2,i}{4};
     end
 end
 
@@ -137,10 +138,17 @@ if params.nfacts-1 ~= size(params.cons,2)
     error('The number of constraints is in conflict with the number of factors')
 end
 
+
+if ((size(matrix,1) ~= params.nrow) || (size(matrix,2) ~= params.ncol))
+	error('The config doesn''t match the size of matrix to be factorized')
+end
+
+
+
 % Initialization
 lambda = 1;
 facts = cell(1,params.nfacts);
-Res = params.data;
+Res = matrix;
 errors = zeros(params.nfacts-1,2);
 
 %%%%%% Main loop %%%%%%
@@ -172,7 +180,7 @@ for k=1:params.nfacts-1
     %%%% Global optimization %%%%
     params3.niter = niter2;
     params3.nfacts = k+1;
-    params3.data = params.data;
+    params3.data = matrix;
     params3.verbose = verbose;
     params3.update_way = update_way;
     if fact_side
@@ -190,7 +198,7 @@ for k=1:params.nfacts-1
     else
         Res = facts3{k+1};
     end
-    errors(k,1) = norm(params.data - lambda*dvp(facts3))/norm(params.data);
-    errors(k,2) = nnzero_count(facts3)/numel(params.data);   
+    errors(k,1) = norm(matrix - lambda*dvp(facts3))/norm(matrix);
+    errors(k,2) = nnzero_count(facts3)/numel(matrix);   
 end
 end
