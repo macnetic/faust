@@ -83,7 +83,7 @@ namespace Faust
          * initialize Palm4MSA from Faust::Params (HierarchicalFact parameter)
          *\tparam isGlobal_ : if true, the Palm4MSA StoppingCriterion stop_crit attribute is initialize from params_.stop_crit_global <br> and if false, it is initialize from stop_crit_2facts
          */
-          Palm4MSA(const Faust::Params<FPP,DEVICE>& params_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_);
+          Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE>& params_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_);
           Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE>& params_palm_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_=false);
 
           void set_constraint(const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}

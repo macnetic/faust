@@ -62,21 +62,26 @@ template<typename FPP,Device DEVICE>
 const char * Faust::HierarchicalFact<FPP,DEVICE>::m_className="Faust::HierarchicalFact";
 
 template<typename FPP,Device DEVICE>
-Faust::HierarchicalFact<FPP,DEVICE>::HierarchicalFact(const Faust::Params<FPP,DEVICE>& params_, Faust::BlasHandle<DEVICE> cublasHandle, Faust::SpBlasHandle<DEVICE> cusparseHandle):
+Faust::HierarchicalFact<FPP,DEVICE>::HierarchicalFact(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE>& params_, Faust::BlasHandle<DEVICE> cublasHandle, Faust::SpBlasHandle<DEVICE> cusparseHandle):
    m_indFact(0),
    cons(params_.cons),
    m_isUpdateWayR2L(params_.isUpdateWayR2L),
    m_isFactSideLeft(params_.isFactSideLeft),
    m_isVerbose(params_.isVerbose),
    nbFact(params_.m_nbFact-1),
-   palm_2(Palm4MSA<FPP,DEVICE>(params_, cublasHandle, false)),
-   palm_global(Palm4MSA<FPP,DEVICE>(params_, cublasHandle, true)),
+   palm_2(Palm4MSA<FPP,DEVICE>(M,params_, cublasHandle, false)),
+   palm_global(Palm4MSA<FPP,DEVICE>(M,params_, cublasHandle, true)),
    cons_tmp_global(vector<const Faust::ConstraintGeneric<FPP,DEVICE>*>()),
    default_lambda(params_.init_lambda),
    isFactorizationComputed(false),
    errors(std::vector<std::vector<FPP> >(2,std::vector<FPP >(params_.m_nbFact-1,0.0))),
    cublas_handle(cublasHandle),
-   cusparse_handle(cusparseHandle){}
+   cusparse_handle(cusparseHandle)
+{
+	   // check if the params and M are compatible
+   if ((M.getNbRow() != params_.m_nbRow) |  (M.getNbCol() != params_.m_nbCol))
+		handleError(m_className,"constructor : params and matrix haven't compatible size"); 
+}
 
 
 template<typename FPP,Device DEVICE>
@@ -85,6 +90,8 @@ void Faust::HierarchicalFact<FPP,DEVICE>::init()
 #ifdef __COMPILE_TIMERS__
 t_init.start();
 #endif
+   
+  
 
    cons_tmp_global.clear();
    if(m_isFactSideLeft)
@@ -102,6 +109,43 @@ t_init.stop();
 #endif
 
 }
+
+
+
+
+
+void check_validity()
+{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 template<typename FPP,Device DEVICE>
 void Faust::HierarchicalFact<FPP,DEVICE>::next_step()

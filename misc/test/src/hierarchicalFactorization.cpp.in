@@ -54,9 +54,10 @@
 
 /** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
 * An dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
+* \param MatrixFilename :  a .mat (MATLAB file) where the matrix to be factorized is stored
 * \param configFilename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hierFact)
 * \param expectedLambda (optionnal) : compared the expected scalar of the factorisation with the computed one in the precision defined with epsilon
-*\param epsilon : precision for the test of equality (default value 0.0001)
+*\param epsilon (optionnal) : precision for the test of equality (default value 0.0001)
 */
 
 typedef @TEST_FPP@ FPP;
@@ -73,13 +74,16 @@ int main(int argc, char* argv[])
 		cout<<"floating point precision == float"<<endl;
   	}
 
+	
+	//default value
+	string configFilename = "@FAUST_CONFIG_MAT_DIR@/config_hierarchical_fact.mat";
+	string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_hierarchical_fact.mat";
 
-	string configFilename = "@FAUST_DATA_MAT_DIR@/config_compared_hierarchical_fact.mat";
 
 
-
-	if (argc >= 2)
-		configFilename = argv[1];
+	if (argc >= 3)
+		configFilename = argv[2];
+		MatrixFilename = argv[1];
 
 	size_t ind = configFilename.find_last_of(".");
 
@@ -114,23 +118,29 @@ int main(int argc, char* argv[])
 
 
 	FPP expectedLambda = 0;
-	if (argc >= 3)
-		expectedLambda = atof(argv[2]);
+	if (argc >= 4)
+		expectedLambda = atof(argv[3]);
 
 
 	FPP epsilon = 0.0001;
-	if (argc >= 4)
-		epsilon = atof(argv[3]);
+	if (argc >= 5)
+		epsilon = atof(argv[4]);
 
 	//useless for CPU but use for compatibility with GPU
 	Faust::BlasHandle<Cpu> blasHandle;
 	Faust::SpBlasHandle<Cpu> spblasHandle;
 
-
+	// parameter setting
 	Faust::Params<FPP,Cpu> params;
 	init_params_from_matiofile(params,configFilename.c_str(),"params");
 	params.Display();
-	Faust::HierarchicalFact<FPP,Cpu> hierFact(params,blasHandle,spblasHandle);
+
+	// matrix to be factorized
+	Faust::MatDense<FPP,Cpu> matrix;
+	init_faust_mat_from_matio(matrix,MatrixFilename.c_str(),"matrix");
+	
+	//algorithm
+	Faust::HierarchicalFact<FPP,Cpu> hierFact(matrix,params,blasHandle,spblasHandle);
 
 	Faust::Timer t1;
 	t1.start();
@@ -172,11 +182,10 @@ int main(int argc, char* argv[])
 
 
 	//relativeError
-	Faust::MatDense<FPP,Cpu> dataMatrix = params.data;
 	Faust::MatDense<FPP,Cpu> faustProduct;
 	faustProduct=hierFactCore.get_product();
-	faustProduct-=dataMatrix;
-	FPP relativeError = faustProduct.norm()/dataMatrix.norm();
+	faustProduct-=matrix;
+	FPP relativeError = faustProduct.norm()/matrix.norm();
 
 	std::cout<<std::endl;
 	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
@@ -190,8 +199,8 @@ int main(int argc, char* argv[])
 
 		Faust::Timer tdense;
 		Faust::Timer tfaust;
-		Faust::Vect<FPP,Cpu> x(dataMatrix.getNbCol());
-		Faust::Vect<FPP,Cpu> ydense(dataMatrix.getNbRow());
+		Faust::Vect<FPP,Cpu> x(matrix.getNbCol());
+		Faust::Vect<FPP,Cpu> ydense(matrix.getNbRow());
 		Faust::Vect<FPP,Cpu> yfaust(hierFactCore.getNbRow());
 		for (int i=0;i<niterTimeComp;i++)
 		{
@@ -202,7 +211,7 @@ int main(int argc, char* argv[])
 			}
 
 			tdense.start();
-			ydense = dataMatrix * x;
+			ydense = matrix * x;
 			tdense.stop();
 
 	 		tfaust.start();

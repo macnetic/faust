@@ -85,21 +85,21 @@ void Faust::Params<FPP,DEVICE>::check_constraint_validity()
             handleError(m_className,"check_constraint_validity :\n The number of constraints equal is in conflict with the number of factors,\n number of columns of constraints must be equal to m_nbFact - 1");
         }
 
-    bool verifSize  =    data.getNbRow()     == cons[0][0]->get_rows()
+    bool verifSize  =    m_nbRow     == cons[0][0]->get_rows()
                     && cons[0][0]->get_cols() == cons[1][0]->get_rows()
-                    &&   data.getNbCol()     == cons[1][0]->get_cols();
+                    &&   m_nbCol     == cons[1][0]->get_cols();
 
     for (int i=1 ; i<m_nbFact-1 ; i++)
         if (isFactSideLeft)
             verifSize  =  verifSize
             && cons[1][i-1]->get_rows() == cons[1][i]->get_cols()
             && cons[0][i]->get_cols()   == cons[1][i]->get_rows()
-            &&    data.getNbRow()      == cons[0][i]->get_rows();
+            &&    m_nbRow      == cons[0][i]->get_rows();
         else
             verifSize  =  verifSize
             && cons[0][i-1]->get_cols() == cons[0][i]->get_rows()
             && cons[0][i]->get_cols()   == cons[1][i]->get_rows()
-            &&    data.getNbCol()      == cons[1][i]->get_cols();
+            &&    m_nbCol      == cons[1][i]->get_cols();
 
 
     if (!verifSize)
@@ -109,7 +109,8 @@ void Faust::Params<FPP,DEVICE>::check_constraint_validity()
 
 template<typename FPP,Device DEVICE>
 Faust::Params<FPP,DEVICE>::Params(
-	const Faust::MatDense<FPP,DEVICE>& data_,
+	const faust_unsigned_int nbRow_,
+        const faust_unsigned_int nbCol_,
 	const unsigned int nbFact_,
 	const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & cons_,
 	const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
@@ -123,7 +124,8 @@ Faust::Params<FPP,DEVICE>::Params(
     const FPP init_lambda_  /* = 1.0 */,
 	const bool constant_step_size_,
 	const FPP step_size_):
-        data(data_),
+        m_nbRow(nbRow_),
+	m_nbCol(nbCol_),
         m_nbFact(nbFact_),
         init_fact(init_fact_),
         stop_crit_2facts(stop_crit_2facts_),
@@ -162,12 +164,12 @@ Faust::Params<FPP,DEVICE>::Params(
 		{
 			if (i==1)
 			{
-                residuumS_cons.push_back(new Faust::ConstraintInt<FPP,DEVICE>(CONSTRAINT_NAME_SP,data.getNbRow()*cons_[m_nbFact-i]->get_rows(),data.getNbRow(),cons_[m_nbFact-i]->get_rows()));
+                residuumS_cons.push_back(new Faust::ConstraintInt<FPP,DEVICE>(CONSTRAINT_NAME_SP,m_nbRow*cons_[m_nbFact-i]->get_rows(),m_nbRow,cons_[m_nbFact-i]->get_rows()));
 				factorS_cons.push_back(cons_[m_nbFact-i]);
 			}else
 			{
 				std::cout<<m_nbFact-i<<std::endl;
-				residuumS_cons.push_back(new Faust::ConstraintInt<FPP,DEVICE>(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*data.getNbRow()*cons_[m_nbFact-i]->get_rows()+0.5),data.getNbRow(),cons_[m_nbFact-i]->get_rows()));
+				residuumS_cons.push_back(new Faust::ConstraintInt<FPP,DEVICE>(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*m_nbRow*cons_[m_nbFact-i]->get_rows()+0.5),m_nbRow,cons_[m_nbFact-i]->get_rows()));
 				std::cout<<m_nbFact-i<<std::endl;
 				factorS_cons.push_back(cons_[m_nbFact-i]);
 				std::cout<<m_nbFact-i<<std::endl;
@@ -192,11 +194,11 @@ Faust::Params<FPP,DEVICE>::Params(
 			std::cout<<i<<std::endl;
 			if (i==0)
 			{
-				residuumS_cons.push_back(new Faust::ConstraintInt<FPP,DEVICE>(CONSTRAINT_NAME_SP,cons_[i]->get_cols()*data.getNbCol(),cons_[i]->get_cols(),data.getNbCol()));
+				residuumS_cons.push_back(new Faust::ConstraintInt<FPP,DEVICE>(CONSTRAINT_NAME_SP,cons_[i]->get_cols()*m_nbCol,cons_[i]->get_cols(),m_nbCol));
 				factorS_cons.push_back(cons_[0]);
 			}else
 			{
-				residuumS_cons.push_back(new Faust::ConstraintInt<FPP,DEVICE>(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*cons_[i]->get_cols()*data.getNbCol()+0.5),cons_[i]->get_cols(),data.getNbCol()));
+				residuumS_cons.push_back(new Faust::ConstraintInt<FPP,DEVICE>(CONSTRAINT_NAME_SP,std::floor(cons_res_parameter*cons_[i]->get_cols()*m_nbCol+0.5),cons_[i]->get_cols(),m_nbCol));
 				factorS_cons.push_back(cons_[i]);
 			}
 				cons_res_parameter=cons_res_parameter/residuum_decrease_speed;
@@ -219,7 +221,8 @@ Faust::Params<FPP,DEVICE>::Params(
 
 template<typename FPP,Device DEVICE>
 Faust::Params<FPP,DEVICE>::Params(
-         const Faust::MatDense<FPP,DEVICE>& data_,
+	 const faust_unsigned_int nbRow_,
+         const faust_unsigned_int nbCol_,
          const unsigned int nbFact_,
          const std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> >& cons_,
          const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
@@ -231,7 +234,8 @@ Faust::Params<FPP,DEVICE>::Params(
          const FPP init_lambda_ /* = 1.0 */,
 		 const bool constant_step_size_ ,
 		 const FPP step_size_ ) :
-            data(data_),
+            m_nbRow(nbRow_),
+	    m_nbCol(nbCol_),
             m_nbFact(nbFact_),
             cons(cons_),
             init_fact(init_fact_),
@@ -256,7 +260,17 @@ Faust::Params<FPP,DEVICE>::Params(
 
 
 template<typename FPP,Device DEVICE>
-Faust::Params<FPP,DEVICE>::Params() : data((faust_unsigned_int)0,(faust_unsigned_int)0),m_nbFact(0),cons(std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> >()),isFactSideLeft(defaultFactSideLeft),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<Faust::MatDense<FPP,DEVICE> >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize)
+Faust::Params<FPP,DEVICE>::Params() : m_nbRow(0),
+	m_nbCol(0),
+	m_nbFact(0),
+	cons(std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> >()),
+	isFactSideLeft(defaultFactSideLeft),
+	isVerbose(defaultVerbosity),
+	isUpdateWayR2L(defaultUpdateWayR2L),
+	init_fact(std::vector<Faust::MatDense<FPP,DEVICE> >()),
+	init_lambda(defaultLambda),
+	isConstantStepSize(defaultConstantStepSize),
+	step_size(defaultStepSize)
 {}
 
 
@@ -282,7 +296,7 @@ void Faust::Params<FPP,DEVICE>::Display() const
 	std::cout<<"ISFACTSIDELEFT : "<<isFactSideLeft<<std::endl;
 	std::cout<<"ISCONSTANTSTEPSIZE : "<<isConstantStepSize<<std::endl;
 	std::cout<<"step_size : "<<step_size<<std::endl;
-	std::cout<<"data :  nbRow "<<data.getNbRow()<<" NbCol : "<< data.getNbCol()<<std::endl;
+	std::cout<<"Matrix :  nbRow "<<m_nbRow<<" NbCol : "<< m_nbCol<<std::endl;
 	std::cout<<"stop_crit_2facts : "<<stop_crit_2facts.get_crit()<<std::endl;
 	std::cout<<"stop_crit_global : "<<stop_crit_global.get_crit()<<std::endl;
 
@@ -359,12 +373,12 @@ void Faust::Params<FPP,DEVICE>::init_from_file(const char* filename)
 	}
 	fscanf(fp,"%s\n",dataFilename);
 	std::cout<<"dataFilename : "<<dataFilename<<std::endl;
-	data.init_from_file(dataFilename);
+	//data.init_from_file(dataFilename);
 	std::cout<<"data"<<std::endl;
-	// if ((data.getNbCol() > 10) || (data.getNbRow())> 10)
+	// if ((m_nbCol > 10) || (m_nbRow)> 10)
 		// data.Display();
 	// else
-		cout<<"data : nbRow "<<data.getNbRow()<<" nbCol "<<data.getNbCol()<<endl;
+		cout<<"data : nbRow "<<m_nbRow<<" nbCol "<<m_nbCol<<endl;
 
 	if (feof(fp))
 		handleError(m_className,"init_from_file : premature end of file");

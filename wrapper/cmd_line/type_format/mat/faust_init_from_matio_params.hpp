@@ -201,7 +201,6 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 	fieldNames = Mat_VarGetStructFieldnames(params_var);
 
 	//cout<<"nbr de parametre ="<<nbr_params<<endl;
-
 	//cout<<"***FIELDNAMES*** ="<<endl;
 	//for (int i=0;i<nbr_params;i++)
 	//{
@@ -212,8 +211,8 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 
 	char* current_fieldName;
 
-	int niter,nfacts,dim1,dim2,cons_parameter,cons_dim1,cons_dim2,fact_side,update_way,verbose;
-	Faust::MatDense<FPP,Cpu> data_mat,current_fact;
+	int niter,nfacts,dim1,dim2,cons_parameter,cons_dim1,cons_dim2,fact_side,update_way,verbose,nb_row,nb_col;
+	Faust::MatDense<FPP,Cpu> current_fact;
 	double init_lambda;
 
 
@@ -263,7 +262,8 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 			params.m_nbFact = nfacts;
 		}
 
-		if (strcmp(current_fieldName,"data")==0)
+		// Modif NB
+		/*if (strcmp(current_fieldName,"data")==0)
 		{
 			//cout<<"data"<<endl;
 			init_mat_from_matvar(data_mat,current_var);
@@ -272,7 +272,29 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 			data_mat.check_dim_validity();
 			params.data=data_mat;
 
+		}*/
+		
+		if (strcmp(current_fieldName,"nrow")==0)
+		{
+
+			//cout<<"data"<<endl;
+			nb_row=(int)((double*)(current_var->data))[0];
+			params.m_nbRow=nb_row;
+			
+
+
 		}
+
+		if (strcmp(current_fieldName,"ncol")==0)
+		{
+			//cout<<"data"<<endl;
+			nb_col=(int)((double*)(current_var->data))[0];
+			params.m_nbCol=nb_col;
+			
+
+		}
+
+				
 
 		if (strcmp(current_fieldName,"verbose")==0)
 		{

@@ -75,7 +75,7 @@ namespace Faust
 
        public:
 
-          HierarchicalFact(const Faust::Params<FPP,DEVICE>& params_, Faust::BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle);
+          HierarchicalFact(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE>& params_, Faust::BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle);
           void get_facts(Faust::Transform<FPP,DEVICE> &)const;
           void get_facts(std::vector<Faust::MatSparse<FPP,DEVICE> >&)const;
           void get_facts(std::vector<Faust::MatDense<FPP,DEVICE> >& fact)const{fact = palm_global.get_facts();}
@@ -88,6 +88,7 @@ namespace Faust
           void init();
           void next_step();
           void compute_errors();
+
 
 
         private:

@@ -139,13 +139,13 @@ if (BUILD_READ_MAT_FILE)
 	
 	# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) in simple and 	double precision
 	
-	add_test(NAME MATFILE_FACT_MEG_float COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22450 200)
-	add_test(NAME MATFILE_FACT_MEG_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/config_MEG.mat 22480 1)
+	add_test(NAME MATFILE_FACT_MEG_float COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG.mat 22450 200)
+	add_test(NAME MATFILE_FACT_MEG_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG.mat 22480 1)
 	set_tests_properties(MATFILE_FACT_MEG_float MATFILE_FACT_MEG_double PROPERTIES TIMEOUT ${TIMEOUT_MEG})
 
 	foreach(TEST_FPP float double)
-		add_test(NAME MATFILE_FACT_HADAMARD_${TEST_FPP} COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} 	${FAUST_DATA_MAT_DIR}/config_HADAMARD.mat)
-		add_test(NAME MATFILE_FACT_HIER_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} 	${FAUST_DATA_MAT_DIR}/config_compared_hierarchical_fact.mat 9401.5 0.1)
+		add_test(NAME MATFILE_FACT_HADAMARD_${TEST_FPP} COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_HADAMARD_32.mat	${FAUST_CONFIG_MAT_DIR}/config_HADAMARD_32.mat 5930 30)
+		add_test(NAME MATFILE_FACT_HIER_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_hierarchical_fact.mat	${FAUST_CONFIG_MAT_DIR}/config_hierarchical_fact.mat 9401.5 0.1)
 	
 		add_test(NAME MATFILE_MULTIPLICATION_MEG_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/Faust_multiplication_${TEST_FPP} ${FAUST_DEMO_BSL_DATA_SRC_DIR}X_meg.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_6.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_8.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_16.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_25.mat)
 

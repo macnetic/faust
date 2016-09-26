@@ -71,7 +71,8 @@ namespace Faust
         public:
 
         Params(
-            const Faust::MatDense<FPP,DEVICE>& data_,
+            const faust_unsigned_int nbRow,
+            const faust_unsigned_int nbCol, 
             const unsigned int nbFact_,
             const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & cons_,
             const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
@@ -120,7 +121,8 @@ namespace Faust
         *   \param step_size : (optional) specifies the step size of the gradient descent, USELESS if constant_step_size is false. default value : 1e-16 <br>
         */
         Params(
-            const Faust::MatDense<FPP,DEVICE>& data_,
+            const faust_unsigned_int nbRow_,
+            const faust_unsigned_int nbCol_,  		
             const unsigned int nbFact_,
             const std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> >& cons_,
             const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
@@ -145,8 +147,11 @@ namespace Faust
 
         public:
         // Required members
-        // modif AL AL
-        Faust::MatDense<FPP,DEVICE> data;
+        
+	// data is now independant from the params class,
+        //Faust::MatDense<FPP,DEVICE> data; 
+	faust_unsigned_int m_nbRow; // number of row of the matrix to be factorized
+	faust_unsigned_int m_nbCol; // number of columns of the matrix to be factorized
 
         faust_unsigned_int m_nbFact; // number of factors
         std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE> *> > cons; // vector of constraints
