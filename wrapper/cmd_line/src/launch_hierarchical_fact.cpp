@@ -124,14 +124,14 @@ int main(int argc, char* argv[])
 	data_matrix.init_from_file(data_filename.c_str());
 	if (operator_data=='T')
 		data_matrix.transpose();
-	params.data=data_matrix;
+	
 
 	params.check_constraint_validity();
 	Faust::BlasHandle<Cpu> blas_handle;
 	Faust::SpBlasHandle<Cpu> spblas_handle;
 	std::cout<<"**************** PARAMETER OF HIERARCHICAL_FACT **************** "<<std::endl;
 	params.Display();
-	Faust::HierarchicalFact<FPP,Cpu> hier_fact(params,blas_handle,spblas_handle);
+	Faust::HierarchicalFact<FPP,Cpu> hier_fact(data_matrix,params,blas_handle,spblas_handle);
 
 	std::cout<<"****************  FACTORIZATION **************** "<<std::endl;
 	hier_fact.compute_facts();

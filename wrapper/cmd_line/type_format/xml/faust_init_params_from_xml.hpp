@@ -65,6 +65,27 @@ void init_params_from_xml(const char * filename,Faust::Params<FPP,DEVICE> & para
 	std::vector<xmlChar*> contentS;
 	// the data matrix is not specified in the xml file
 
+	// m_nbRow
+	contentS = get_content(BAD_CAST "/hierarchical_fact/nrow/text()",ctxt);
+	if (( contentS.size() == 0)||(contentS.size() > 1))
+	{
+			handleError("faust_init_params_from_xml",
+			"init_params_from_xml : invalid file nrow tag must be specified one time");
+
+	}
+	params.m_nbRow=xmlXPathCastStringToNumber(contentS[0]);
+
+
+
+	contentS = get_content(BAD_CAST "/hierarchical_fact/ncol/text()",ctxt);
+	if (( contentS.size() == 0)||(contentS.size() > 1))
+	{
+			handleError("faust_init_params_from_xml",
+			"init_params_from_xml : invalid file ncol tag must be specified one time");
+
+	}
+	params.m_nbCol=xmlXPathCastStringToNumber(contentS[0]);
+
 	// nb_fact
 	contentS = get_content(BAD_CAST "/hierarchical_fact/nb_fact/text()",ctxt);
 	if (( contentS.size() == 0)||(contentS.size() > 1))
@@ -210,7 +231,8 @@ void init_params_from_xml(const char * filename,Faust::Params<FPP,DEVICE> & para
 
 	// Libération de la mémoire
 	xmlXPathFreeContext(ctxt);
-	// params.check_constraint_validity();
+	
+        params.check_constraint_validity();
 }
 
 
