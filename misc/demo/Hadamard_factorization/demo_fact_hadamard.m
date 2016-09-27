@@ -47,13 +47,15 @@ n = 32;
 M = log2(n);
 
 %% Generating the data
-[params.data,~] = hadamard_mat(M);
+[matrix,~] = hadamard_mat(M);
 
 
 
 
 
 %% Setting of the parameters
+params.nrow=n;
+params.ncol=n;
 params.nfacts = M;
 params.cons = cell(2,M-1);
 
@@ -67,13 +69,12 @@ params.niter2 = 30;
 params.update_way = 1;
 params.verbose = 0;
 
-[lambda, facts] = mexHierarchical_fact(params);
+[lambda, facts] = mexHierarchical_fact(matrix,params);
 
 %% speed-up and relatice error
-X = params.data;
 hadamard_faust = Faust(facts,lambda);
 Xhat = get_product(hadamard_faust);
-relative_error = norm(X - Xhat)/norm(X);
+relative_error = norm(matrix - Xhat)/norm(matrix);
 fprintf(['\n\n relative error between hadamard matrix and its transform : ' num2str(relative_error) '\n']);
 
 nb_mult= 500;
@@ -86,7 +87,7 @@ for i=1:nb_mult
    y_X=rand(n,1);
    
    tic 
-   y_X=X*x;
+   y_X=matrix*x;
    t1=toc;
    
    tic 
