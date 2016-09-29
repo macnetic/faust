@@ -91,7 +91,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
 	# multiply_compare_time : time comparison between Faust-vector product and Dense matrix-vector product
  
 	foreach(TEST_FPP float double)	
-		foreach(testin hierarchicalFactorization test_palm4MSA Faust_multiplication)
+		foreach(testin hierarchicalFactorization test_palm4MSA faust_multiplication)
 			# copy CPU files cpp.in to the user's ./src/ directory in float et double precision
 			configure_file(${FAUST_SRC_TEST_SRC_DIR}/${testin}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
 			# Generation of the binary files in double and float precision
@@ -150,7 +150,7 @@ if (BUILD_READ_MAT_FILE)
 		add_test(NAME MATFILE_FACT_HADAMARD_${TEST_FPP} COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_HADAMARD_32.mat	${FAUST_CONFIG_MAT_DIR}/config_HADAMARD_32.mat 5930 30)
 		add_test(NAME MATFILE_FACT_HIER_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_hierarchical_fact.mat	${FAUST_CONFIG_MAT_DIR}/config_hierarchical_fact.mat 9401.5 0.1)
 	
-		add_test(NAME MATFILE_MULTIPLICATION_MEG_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/Faust_multiplication_${TEST_FPP} ${FAUST_DEMO_BSL_DATA_SRC_DIR}X_meg.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_6.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_8.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_16.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_25.mat)
+		add_test(NAME MATFILE_MULTIPLICATION_MEG_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DEMO_BSL_DATA_SRC_DIR}X_meg.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_6.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_8.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_16.mat ${FAUST_DEMO_BSL_DATA_SRC_DIR}M_25.mat)
 
 		add_test(NAME MATFILE_PALM4MSA_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSA_${TEST_FPP} )
 
