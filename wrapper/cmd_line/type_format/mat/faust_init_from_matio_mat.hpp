@@ -52,7 +52,8 @@
 
 using namespace std;
 
-template<typename FPP,Device DEVICE>
+////////////////////////////////////// modif AL
+/*template<typename FPP,Device DEVICE>
 void init_faust_mat_from_matio(Faust::MatDense<FPP,DEVICE>& M, const char* fileName, const char* variableName)
 {
    matvar_t* matvar = faust_matio_read_variable(fileName, variableName);
@@ -61,6 +62,51 @@ void init_faust_mat_from_matio(Faust::MatDense<FPP,DEVICE>& M, const char* fileN
 
    Mat_VarFree(matvar);
 }
+*/
+
+template<typename FPP,Device DEVICE>
+void init_faust_mat_from_matio(Faust::MatDense<FPP,DEVICE>& M, const char* fileName, const char* variableName)
+{
+    int nbr_params;
+    // Dans le cas de GPU, on passe par une matrice dense CPU pour loader une matrice dense GPU car on ne peut pas acceder au data par GPU, (seulement 1er valeur).
+    Faust::MatDense<FPP,Cpu> data_mat;
+    matvar_t* matvar = faust_matio_read_variable(fileName, variableName);
+
+    init_mat_from_matvar(data_mat, matvar);
+
+    data_mat.check_dim_validity();
+    M=data_mat;
+/*
+	if (data_mat == NULL)
+	{
+		cerr<<"error cannot access to the field : "<<variableName<<endl;
+		exit(EXIT_FAILURE);
+    }
+    nbr_params = Mat_VarGetNumberOfFields(matvar);
+    char*const* fieldNames;
+    fieldNames = Mat_VarGetStructFieldnames(matvar);
+
+
+    matvar_t* current_var;
+    current_var=Mat_VarGetStructFieldByName(matvar,variableName,0);
+	if (current_var == NULL)
+	{
+		cerr<<"error cannot access to the field : "<<variableName<<endl;
+		exit(EXIT_FAILURE);
+    }
+
+    init_mat_from_matvar(data_mat, current_var);
+	//data_mat.Display();
+
+    Mat_VarFree(matvar);
+    Mat_VarFree(current_var);
+*/
+}
+////////////////////////////////////// modif AL
+
+
+
+
 
 template<typename FPP,Device DEVICE>
 void init_faust_spmat_from_matio(Faust::MatSparse<FPP,DEVICE>& S, const char* fileName, const char* variableName)

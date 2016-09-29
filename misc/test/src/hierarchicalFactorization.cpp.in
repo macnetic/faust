@@ -79,11 +79,21 @@ int main(int argc, char* argv[])
 	string configFilename = "@FAUST_CONFIG_MAT_DIR@/config_hierarchical_fact.mat";
 	string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_hierarchical_fact.mat";
 
-
-
 	if (argc >= 3)
+	{
 		configFilename = argv[2];
 		MatrixFilename = argv[1];
+	}
+
+	FPP expectedLambda = 0;
+	if (argc >= 4)
+		expectedLambda = atof(argv[3]);
+
+
+	FPP epsilon = 0.0001;
+	if (argc >= 5)
+		epsilon = atof(argv[4]);
+
 
 	size_t ind = configFilename.find_last_of(".");
 
@@ -117,16 +127,7 @@ int main(int argc, char* argv[])
 
 
 
-	FPP expectedLambda = 0;
-	if (argc >= 4)
-		expectedLambda = atof(argv[3]);
-
-
-	FPP epsilon = 0.0001;
-	if (argc >= 5)
-		epsilon = atof(argv[4]);
-
-	//useless for CPU but use for compatibility with GPU
+	// useless for CPU but use for compatibility with GPU
 	Faust::BlasHandle<Cpu> blasHandle;
 	Faust::SpBlasHandle<Cpu> spblasHandle;
 

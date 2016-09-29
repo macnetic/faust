@@ -56,6 +56,13 @@
 #include "faust_SpBlasHandle_gpu.h"
 #include "faust_BlasHandle_gpu.h"
 
+/** \brief An example of using the hierarchical factorization of a dense matrix using GPU process. from .mat file.
+* An dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
+* \param MatrixFilename :  a .mat (MATLAB file) where the matrix to be factorized is stored
+* \param configFilename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hierFact)
+* \param expectedLambda (optionnal) : compared the expected scalar of the factorisation with the computed one in the precision defined with epsilon
+*\param epsilon (optionnal) : precision for the test of equality (default value 0.0001)
+*/
 
 using namespace std;
 typedef @TEST_FPP@ FPP;//faust floating point precision
@@ -73,10 +80,24 @@ int main(int argc, char* argv[])
   	}
 
 
-	string configFilename = "@FAUST_DATA_MAT_DIR@/config_compared_hierarchical_fact.mat";
+	string configFilename = "@FAUST_CONFIG_MAT_DIR@/config_compared_hierarchical_fact.mat";
+	string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_hierarchical_fact.mat";
 
-	if (argc >= 2)
-		configFilename = argv[1];
+	if (argc >= 3)
+	{
+		configFilename = argv[2];
+		MatrixFilename = argv[1];
+	}
+
+	FPP expectedLambda = 0;
+	if (argc >= 4)
+		expectedLambda = atof(argv[3]);
+
+
+	FPP epsilon = 0.0001;
+	if (argc >= 5)
+		epsilon = atof(argv[4]);
+
 
 	size_t ind = configFilename.find_last_of(".");
 
@@ -110,17 +131,6 @@ int main(int argc, char* argv[])
 
 
 
-	FPP expectedLambda = 0;
-	if (argc >= 3)
-		expectedLambda = atof(argv[2]);
-
-
-	FPP epsilon = 0.0001;
-	if (argc >= 4)
-		epsilon = atof(argv[3]);
-
-
-
 	// initialisation CUDA environment
 	std::cout<<"initialisation of GPU environnement"<<std::endl;
 	//cublasHandle_t cublasHandle;
@@ -133,13 +143,21 @@ int main(int argc, char* argv[])
 
 
 	std::cout<<"initialisation of HierarchicalFact parameter"<<std::endl;
+	
+	// parameter setting	
 	Faust::Params<FPP,Gpu> params;
 	std::cout<<"init_params"<<std::endl;
 	init_params_from_matiofile(params,configFilename.c_str(),"params");
 	std::cout<<"Display2"<<std::endl;
 	params.Display();
 	cout<<"launch"<<endl;
-	Faust::HierarchicalFact<FPP,Gpu> hierFact(params,blasHandle,spblasHandle);
+
+	// matrix to be factorized
+	Faust::MatDense<FPP,Gpu> matrix;
+	init_faust_mat_from_matio(matrix,MatrixFilename.c_str(),"matrix");
+
+	//algorithm
+	Faust::HierarchicalFact<FPP,Gpu> hierFact(matrix,params,blasHandle,spblasHandle);
 
 	std::cout<<"factorisation"<<std::endl;
 	Faust::Timer_gpu t1;
@@ -185,7 +203,7 @@ int main(int argc, char* argv[])
 	write_faust_core_into_matfile(hierFactCore,outputFilename.str().c_str(),"fact");
 
 	//relativeError
-	Faust::MatDense<FPP,Gpu> const dataMatrix(params.data);
+	Faust::MatDense<FPP,Gpu> const dataMatrix(matrix);
 	Faust::MatDense<FPP,Gpu> tmp;
 	tmp=hierFactCore.get_product(blasHandle,spblasHandle);
 	Faust::MatDense<FPP,Gpu> const faustProduct(tmp);
