@@ -56,6 +56,7 @@ template<typename FPP,Device DEVICE> class MatDense;
 
 template<typename FPP,Device DEVICE>
 void init_faust_mat_from_matio(Faust::MatDense<FPP,DEVICE>& M, const char* fileName, const char* variableName);
+
 template<typename FPP,Device DEVICE>
 void init_faust_spmat_from_matio(Faust::MatSparse<FPP,DEVICE>& S, const char* fileName, const char* variableName);
 template<typename FPP,Device DEVICE>

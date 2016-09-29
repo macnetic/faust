@@ -53,30 +53,29 @@
 using namespace std;
 
 ////////////////////////////////////// modif AL
-/*template<typename FPP,Device DEVICE>
-void init_faust_mat_from_matio(Faust::MatDense<FPP,DEVICE>& M, const char* fileName, const char* variableName)
+//template<typename FPP,Device DEVICE>
+template<typename FPP>
+void init_faust_mat_from_matio(Faust::MatDense<FPP,Cpu>& M, const char* fileName, const char* variableName)
 {
    matvar_t* matvar = faust_matio_read_variable(fileName, variableName);
-
    init_mat_from_matvar(M, matvar);
-
    Mat_VarFree(matvar);
 }
-*/
-
-template<typename FPP,Device DEVICE>
-void init_faust_mat_from_matio(Faust::MatDense<FPP,DEVICE>& M, const char* fileName, const char* variableName)
+// For GPU processing, on passe par une matrice dense CPU pour loader une matrice dense GPU car on ne peut pas acceder au data par GPU, (seulement 1er valeur).
+//template<typename FPP,Device DEVICE>
+#ifdef COMPILE_GPU
+template<typename FPP>
+void init_faust_mat_from_matio(Faust::MatDense<FPP,Gpu>& M, const char* fileName, const char* variableName)
 {
-    int nbr_params;
-    // Dans le cas de GPU, on passe par une matrice dense CPU pour loader une matrice dense GPU car on ne peut pas acceder au data par GPU, (seulement 1er valeur).
-    Faust::MatDense<FPP,Cpu> data_mat;
     matvar_t* matvar = faust_matio_read_variable(fileName, variableName);
-
+    Faust::MatDense<FPP,Cpu> data_mat;
     init_mat_from_matvar(data_mat, matvar);
-
     data_mat.check_dim_validity();
     M=data_mat;
+
+    Mat_VarFree(matvar);
 /*
+	int nbr_params;
 	if (data_mat == NULL)
 	{
 		cerr<<"error cannot access to the field : "<<variableName<<endl;
@@ -102,6 +101,7 @@ void init_faust_mat_from_matio(Faust::MatDense<FPP,DEVICE>& M, const char* fileN
     Mat_VarFree(current_var);
 */
 }
+#endif
 ////////////////////////////////////// modif AL
 
 
@@ -376,6 +376,8 @@ void init_spmat_from_matvar(Faust::MatSparse<FPP,DEVICE>& S, matvar_t* var)
       exit(EXIT_FAILURE);
    }
 
+// cout<<"ndata "<< mat_sparse->ndata << endl;
+
    vector<int> rowind(mat_sparse->ndata);
    vector<int> colind(mat_sparse->ndata);
    vector<FPP> values(mat_sparse->ndata);
@@ -392,13 +394,14 @@ void init_spmat_from_matvar(Faust::MatSparse<FPP,DEVICE>& S, matvar_t* var)
          colind[cmpt] = i ;
          cmpt++;
       }
-   S = Faust::MatSparse<FPP,DEVICE>(rowind, colind, values, var->dims[0], var->dims[1]);
+//MODIFAL
+    S = Faust::MatSparse<FPP,DEVICE>(rowind, colind, values, var->dims[0], var->dims[1]);
 
-   if (cmpt != S.getNonZeros())
-   {
-      cerr<<"Error in init_faust_spmat<FPP,DEVICE>_from_matio : cmpt != nnz : cmpt="<<cmpt<<" ; nnz="<<S.getNonZeros()<<endl;
-      exit(EXIT_FAILURE);
-   }
+    if (cmpt != S.getNonZeros())
+    {
+        cerr<<"Error in init_faust_spmat<FPP,DEVICE>_from_matio : cmpt != nnz : cmpt="<<cmpt<<" ; nnz="<<S.getNonZeros()<<endl;
+        exit(EXIT_FAILURE);
+    }
 
 }
 
