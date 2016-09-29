@@ -8,7 +8,7 @@
 %  DURATION: Computations should take around 3 minutes.
 %
 %  The MEG gain matrices used are
-%         the precomputed ones in "./data/M_X.mat"  
+%         the precomputed ones in "./data/faust_MEG_rcg_X.mat"  
 %
 % For more information on the FAuST Project, please visit the website of 
 % the project :  <http://faust.gforge.inria.fr>
@@ -66,7 +66,7 @@ BSL_data_pathName=[pathname filesep 'data'];
 
 
 % files where a precomputed FauST approximation of MEG matrix are stored
-MEG_FAuST_list_filename={'M_6.mat','M_8.mat','M_16.mat','M_25.mat'};
+MEG_FAuST_list_filename={'faust_MEG_rcg_6.mat','faust_MEG_rcg_8.mat','faust_MEG_rcg_16.mat','faust_MEG_rcg_25.mat'};
 
 nb_FAuST_MEG = length(MEG_FAuST_list_filename);
 
@@ -75,8 +75,8 @@ MEG_list = cell(1,nb_FAuST_MEG+1);
 nb_MEG_matrix = length(MEG_list);
 
 %% Loading the MEG matrix and the points in the brain
-load([BSL_data_pathName filesep 'X_meg.mat' ]);
-MEG_matrix = normalizeCol(X_fixed);% normalization of the columns of the MEG matrix
+load([BSL_data_pathName filesep 'matrix_MEG.mat' ]);
+MEG_matrix = normalizeCol(matrix);% normalization of the columns of the MEG matrix
 MEG_list{1}=MEG_matrix;
 
 

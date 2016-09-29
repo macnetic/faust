@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 	std::cout<<"loading dense matrix"<<std::endl;
 	string matDenseFilename = argv[1];
 	Faust::MatDense<FPP,Cpu> M;
-	init_faust_mat_from_matio(M,matDenseFilename.c_str(),"X_fixed");
+	init_faust_mat_from_matio(M,matDenseFilename.c_str(),"matrix");
 	int nbRow=M.getNbRow();	
 	int nbCol=M.getNbCol();
 
