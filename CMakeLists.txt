@@ -180,7 +180,7 @@ option(BUILD_TESTING "Build Tests" ON)
 #Allows generating the doc:
 option(BUILD_DOCUMENTATION "Generating the doxygen documentation." OFF)
 # Allows multithreading:
-option(BUILD_MULTITHREAD "Enable multithread with OpenMP Multithreading." OFF)
+option(BUILD_MULTITHREAD "Enable multithread with OpenMP Multithreading." ON)
 # Allows verbose:
 option(BUILD_VERBOSE "Enable verbose option when compile (-v)." OFF)
 # Allows MPTK Debug:
@@ -512,7 +512,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FAUST_BIN_DIR} CACHE STRING "" FORCE)
 
 # adding compiler flags 
 set(CMAKE_CXX_FLAGS "")
-if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
+#if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
+if (BUILD_DEBUG)
 	if (UNIX)	
 		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_DEBUG} -O1")
 	elseif(WIN32)
@@ -521,7 +522,7 @@ if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR
 		message(WARNING "Unknown type of plateform for CMAKE_CXX_FLAGS")
 	endif() 
 	message(STATUS "**********DEBUG mode************")
-else()
+else(BUILD_DEBUG)
 	if (UNIX)	
 		if (BUILD_MULTITHREAD)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
