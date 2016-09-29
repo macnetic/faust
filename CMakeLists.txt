@@ -468,26 +468,26 @@ endif(BUILD_USE_GPU)
 ######################################"
 # Case of Visual Studio 
 IF(WIN32)
-    IF (BUILD_DEBUG)
+    IF (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 		# Case of debug mode
 		#SET(FAUST_DEBUG_RELEASE "debug")
 		SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib/debug)
-    ELSE (BUILD_DEBUG)
+    ELSE (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
     	# Case of release mode
 		#SET(FAUST_DEBUG_RELEASE "release")
 		SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib/release)
-    ENDIF (BUILD_DEBUG)
+    ENDIF (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 
 ELSE(WIN32)
 	# Case of Xcode
 	IF( CMAKE_GENERATOR STREQUAL "Xcode")
     	# We would like to select a single build mode, would we ?
 	    # or to select it dynamically there is the CMAKE_CFG_INTDIR stuff
-	    IF (BUILD_DEBUG)
+	    IF (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
     		SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib/Debug)
-	    ELSE (BUILD_DEBUG)
+	    ELSE (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
     		SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib/Release)
-	    ENDIF (BUILD_DEBUG)
+	    ENDIF (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 	ELSE( CMAKE_GENERATOR STREQUAL "Xcode")
 	    # Generic case
 	    SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib)
@@ -505,24 +505,36 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FAUST_BIN_DIR} CACHE STRING "" FORCE)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FAUST_BIN_DIR} CACHE STRING "" FORCE)
 #message(STATUS "CMAKE_LIBRARY_OUTPUT_DIRECTORY : ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 ######################################"
-######################################"
-######################################"
 
 
 
 # adding compiler flags 
 set(CMAKE_CXX_FLAGS "")
 #if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
-if (BUILD_DEBUG)
+if (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 	if (UNIX)	
-		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_DEBUG} -O1")
+		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_DEBUG} -O0")
+		if (BUILD_MULTITHREAD)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
+		endif(BUILD_MULTITHREAD)
+		if(APPLE)
+			#message(STATUS "APPLE OPERATING SYSTEM")
+			# -pthread is not take into account with MAC platform. 
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -fPIC " CACHE STRING "compile flags" FORCE)
+		else(APPLE)
+			#message(STATUS "UNIX OPERATING SYSTEM") 
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -pthread -fPIC " CACHE STRING "compile flags" FORCE)
+		endif(APPLE)
 	elseif(WIN32)
 		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_DEBUG} /O0")
+		if (BUILD_MULTITHREAD)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
+		endif(BUILD_MULTITHREAD)
 	else()
 		message(WARNING "Unknown type of plateform for CMAKE_CXX_FLAGS")
 	endif() 
 	message(STATUS "**********DEBUG mode************")
-else(BUILD_DEBUG)
+else(BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 	if (UNIX)	
 		if (BUILD_MULTITHREAD)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
@@ -531,10 +543,10 @@ else(BUILD_DEBUG)
 		if(APPLE)
 			#message(STATUS "APPLE OPERATING SYSTEM")
 			# -pthread is not take into account with MAC platform. 
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -fPIC -O2 " CACHE STRING "compile flags" FORCE)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -fPIC -O3" CACHE STRING "compile flags" FORCE)
 		else(APPLE)
 			#message(STATUS "UNIX OPERATING SYSTEM") 
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -pthread -fPIC -O2 " CACHE STRING "compile flags" FORCE)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -pthread -fPIC -O3" CACHE STRING "compile flags" FORCE)
 		endif(APPLE)
 					
 	elseif(WIN32)
@@ -547,7 +559,7 @@ else(BUILD_DEBUG)
 		message(WARNING "Unknown type of plateform for CMAKE_CXX_FLAGS")		
 	endif()
 	message(STATUS "**********RELEASE mode************")
-endif()
+endif(BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 
 #if(UNIX)
 #	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fopenmp -fexceptions -fno-omit-frame-pointer -pthread -fPIC " CACHE STRING "compile flags" FORCE)
