@@ -193,7 +193,7 @@ option(BUILD_MATLAB_MEX_FILES "Enable building Matlab MEX files." ON)
 option(BUILD_OPENBLAS "Using openBLAS for matrix and vector computations" OFF)
 # different type of files 
 option(BUILD_READ_XML_FILE "Using xml configuration to read xml files" OFF)
-option(BUILD_READ_MAT_FILE "Using matio library to read mat files" OFF)
+option(BUILD_READ_MAT_FILE "Using matio library to read mat files" ON)
 #CMAKE_DEPENDENT_OPTION
 
 ###### Different option of configuration ######
@@ -269,7 +269,6 @@ set(FAUST_ALGORITHM_FACTORIZATION_BIN_DIR ${FAUST_ALGORITHM_BIN_DIR}/factorizati
 #set(FAUST_FAUSTCORE_SRC_DIR ${PROJECT_SOURCE_DIR}/faust_core CACHE INTERNAL "")
 
 
-
 ###### WRAPPER DIRECTORIES ######
 set(FAUST_SRC_WRAPPER_DIR ${PROJECT_SOURCE_DIR}/wrapper CACHE INTERNAL "")
 set(FAUST_BIN_WRAPPER_DIR ${PROJECT_BINARY_DIR}/wrapper CACHE INTERNAL "")
@@ -309,12 +308,6 @@ set(FAUST_SRC_TEST_SRC_DIR 			${FAUST_SRC_TEST_DIR}/src CACHE INTERNAL "")
 ###### WRAPPER MATLAB DIRECTORIES ######
 if (BUILD_MATLAB_MEX_FILES)
 	#version MATLAB du code (entierement MATLAB, pas de mexfunction)
-
-	
-	
-	
-	
-	
 	
 	###### SRC DIRECTORY #####
 	set(FAUST_MATLAB_SRC_DIR ${FAUST_SRC_WRAPPER_DIR}/matlab CACHE INTERNAL "")
@@ -370,7 +363,7 @@ if (BUILD_MATLAB_MEX_FILES)
 	set(FAUST_DEMO_TIMECOMP_INSTALL_DIR 		${FAUST_DEMO_INSTALL_DIR}/Runtime_comparison CACHE INTERNAL "")
 	set(FAUST_DEMO_FIG_INSTALL_DIR 				${FAUST_DEMO_INSTALL_DIR}/Figures CACHE INTERNAL "")
 endif(BUILD_MATLAB_MEX_FILES)
-
+##################################################################
 
 ## examples directories including some examples of the use of the library FAuST
 set(FAUST_BIN_TEST_DIR ${PROJECT_BINARY_DIR}/run_test CACHE INTERNAL "")
@@ -383,9 +376,7 @@ set(FAUST_BIN_TEST_TIME_COMPARE_DIR 	${FAUST_BIN_TEST_DIR}/runtime_comparison CA
 set(FAUST_BIN_TEST_TOOLS_DIR 	${FAUST_BIN_TEST_DIR}/tools CACHE INTERNAL "")
 ##################################################################
 
-
-
-### pour le GPU 
+### In the case of GPU preocess 
 if (BUILD_USE_GPU)
 	set(FAUST_SRC_LINEAR_OPERATOR_GPU_DIR ${FAUST_SRC_LINEAR_OPERATOR_DIR}/GPU CACHE INTERNAL "")
 	set(FAUST_BIN_LINEAR_OPERATOR_GPU_DIR ${FAUST_BIN_LINEAR_OPERATOR_DIR}/GPU CACHE INTERNAL "")
@@ -393,7 +384,7 @@ if (BUILD_USE_GPU)
 	set(FAUST_SRC_TEST_GPU_DIR ${FAUST_MISC_DIR}/test/GPU_test CACHE INTERNAL "")
 	set(FAUST_BIN_TEST_GPU_DIR ${FAUST_BIN_TEST_DIR}/binGPU CACHE INTERNAL "") 
 endif(BUILD_USE_GPU)
-
+##################################################################
 
 ###### DOCUMENTATION DIRECTORIES ######
 if (BUILD_DOCUMENTATION)
@@ -435,36 +426,6 @@ endif(BUILD_USE_GPU)
 ##################################################################
 
 
-###### FLAG for DEBUG or RELEASE TARGETS ######
-#if(WIN32)
-#	if(CMAKE_BUILD_TYPE MATCHES "Debug")
-#		set(FAUST_DEBUG_RELEASE "debug")
-#		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Debug)
-#		set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Debug)
-#	elseif(CMAKE_BUILD_TYPE MATCHES "Release")
-#		set(FAUST_DEBUG_RELEASE "release")
-#		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Release)
-#		set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Release)
-#	else()
-#		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR})	
-#	endif()
-#message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
-#else()
-#	if(CMAKE_BUILD_TYPE MATCHES "Debug")
-#		# set(FAUST_DEBUG_RELEASE "debug")
-#		 set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Debug)
-#		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Debug)
-#	elseif(CMAKE_BUILD_TYPE MATCHES "Release")
-#		# set(FAUST_DEBUG_RELEASE "release")
-#		set(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/Release)
-#		# set(FAUST_MATLAB_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/Release)
-#	else()
-#		
-#	endif()
-#message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
-#endif(WIN32)
-
-######################################"
 ######################################"
 # Case of Visual Studio 
 IF(WIN32)
@@ -500,35 +461,37 @@ ENDIF(WIN32)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FAUST_BIN_DIR} CACHE STRING "" FORCE)
 #message(STATUS "CMAKE_ARCHIVE_OUTPUT_DIRECTORY : ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
 
-#message(STATUS "FAUST_BIN_DIR : ${FAUST_BIN_DIR}")
-#message(STATUS "CMAKE_LIBRARY_OUTPUT_DIRECTORY : ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FAUST_BIN_DIR} CACHE STRING "" FORCE)
-#message(STATUS "CMAKE_LIBRARY_OUTPUT_DIRECTORY : ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-######################################"
+############################################################################
 
 
 
-# adding compiler flags 
+## adding compiler flags ###################################################
 set(CMAKE_CXX_FLAGS "")
 #if( (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 if (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 	if (UNIX)	
 		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_DEBUG} -O1")
-		if (BUILD_MULTITHREAD)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
-		endif(BUILD_MULTITHREAD)
+
 		if(APPLE)
 			#message(STATUS "APPLE OPERATING SYSTEM")
+			if (BUILD_MULTITHREAD)
+				message (WARNING "-fopen is not activated for MAC OS.")
+			endif(BUILD_MULTITHREAD)
 			# -pthread is not take into account with MAC platform. 
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -fPIC " CACHE STRING "compile flags" FORCE)
 		else(APPLE)
 			#message(STATUS "UNIX OPERATING SYSTEM") 
+			if (BUILD_MULTITHREAD)
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
+			endif(BUILD_MULTITHREAD)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -pthread -fPIC " CACHE STRING "compile flags" FORCE)
 		endif(APPLE)
 	elseif(WIN32)
 		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_DEBUG} /O0")
 		if (BUILD_MULTITHREAD)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
+			#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
+			message (WARNING "openmp is not activated for Windows platform.")
 		endif(BUILD_MULTITHREAD)
 	else()
 		message(WARNING "Unknown type of plateform for CMAKE_CXX_FLAGS")
@@ -536,22 +499,26 @@ if (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATC
 	message(STATUS "**********DEBUG mode************")
 else(BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 	if (UNIX)	
-		if (BUILD_MULTITHREAD)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
-		endif(BUILD_MULTITHREAD)
-		
+
 		if(APPLE)
 			#message(STATUS "APPLE OPERATING SYSTEM")
-			# -pthread is not take into account with MAC platform. 
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -fPIC -O3" CACHE STRING "compile flags" FORCE)
+			# -pthread is not take into account with MAC platform. 
+			if (BUILD_MULTITHREAD)
+				message (WARNING "-fopen is not activated for MAC OS.")
+			endif(BUILD_MULTITHREAD)
 		else(APPLE)
 			#message(STATUS "UNIX OPERATING SYSTEM") 
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fno-omit-frame-pointer -pthread -fPIC -O3" CACHE STRING "compile flags" FORCE)
+			if (BUILD_MULTITHREAD)
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
+			endif(BUILD_MULTITHREAD)
 		endif(APPLE)
 					
 	elseif(WIN32)
 		if (BUILD_MULTITHREAD)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
+			#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
+			message (WARNING "openmp is not activated for Windows platform.")
 		endif(BUILD_MULTITHREAD)
 		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHs /MD /O2" CACHE STRING "compile flags" FORCE)
 		#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHs /MD /O2" CACHE STRING "compile flags" FORCE)
@@ -560,6 +527,7 @@ else(BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MAT
 	endif()
 	message(STATUS "**********RELEASE mode************")
 endif(BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
+############################################################################
 
 #if(UNIX)
 #	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fopenmp -fexceptions -fno-omit-frame-pointer -pthread -fPIC " CACHE STRING "compile flags" FORCE)
@@ -568,7 +536,6 @@ endif(BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MA
 #else()
 #	message(WARNING "Unknown type of plateform for CMAKE_CXX_FLAGS")		
 #endif(UNIX)
-
 #message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 ##################################################################
 
@@ -615,8 +582,6 @@ else (BUILD_USE_GPU)
 		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_TARGET}>)
 	endif(BUILD_MATLAB_MEX_FILES)
 endif (BUILD_USE_GPU)
-
-
 
 
 if (BUILD_MATLAB_MEX_FILES)
