@@ -76,7 +76,7 @@ nb_MEG_matrix = length(MEG_list);
 
 %% Loading the MEG matrix and the points in the brain
 load([BSL_data_pathName filesep 'matrix_MEG.mat' ]);
-MEG_matrix = normalizeCol(matrix);% normalization of the columns of the MEG matrix
+MEG_matrix = normalizeCol(matrix');% normalization of the columns of the MEG matrix
 MEG_list{1}=MEG_matrix;
 
 

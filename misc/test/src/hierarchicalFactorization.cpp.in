@@ -54,10 +54,12 @@
 
 /** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
 * An dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
-* \param MatrixFilename :  a .mat (MATLAB file) where the matrix to be factorized is stored
+* \param MatrixFilename :  a .mat (MATLAB file) where the matrix to be factorized is stored (or its transposed (cf. parameter transposeMatrix))
 * \param configFilename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hierFact)
 * \param expectedLambda (optionnal) : compared the expected scalar of the factorisation with the computed one in the precision defined with epsilon
 *\param epsilon (optionnal) : precision for the test of equality (default value 0.0001)
+*\param transposeMatrix (optionnal) : -value 'N' (default value),  the  matrix stored in MatrixFilename is factorized
+				      -value 'T' , the transposed matrix is factorized									
 */
 
 typedef @TEST_FPP@ FPP;
@@ -80,9 +82,10 @@ int main(int argc, char* argv[])
 	string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_hierarchical_fact.mat";
 
 	if (argc >= 3)
-	{
-		configFilename = argv[2];
+	{	
 		MatrixFilename = argv[1];
+		configFilename = argv[2];
+		
 	}
 
 	FPP expectedLambda = 0;
@@ -93,6 +96,18 @@ int main(int argc, char* argv[])
 	FPP epsilon = 0.0001;
 	if (argc >= 5)
 		epsilon = atof(argv[4]);
+
+	char transposedMatrix='N';
+	if (argc >= 6)
+		transposedMatrix=argv[5][0];
+
+
+	if ((transposedMatrix != 'N') && (transposedMatrix != 'T'))
+	{
+		cerr << "transposedMatrix value is "<<transposedMatrix<< endl;		
+		cerr << "transposedMatrix parameter must be equal to ''N'' or ''T'' " << endl;
+		exit(EXIT_FAILURE);
+	}
 
 
 	size_t ind = configFilename.find_last_of(".");
@@ -139,6 +154,10 @@ int main(int argc, char* argv[])
 	// matrix to be factorized
 	Faust::MatDense<FPP,Cpu> matrix;
 	init_faust_mat_from_matio(matrix,MatrixFilename.c_str(),"matrix");
+	
+	// transposed the matrix if needed
+	if (transposedMatrix == 'T')
+		matrix.transpose();
 	
 	//algorithm
 	Faust::HierarchicalFact<FPP,Cpu> hierFact(matrix,params,blasHandle,spblasHandle);
