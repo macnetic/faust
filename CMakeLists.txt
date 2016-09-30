@@ -193,7 +193,7 @@ option(BUILD_MATLAB_MEX_FILES "Enable building Matlab MEX files." ON)
 option(BUILD_OPENBLAS "Using openBLAS for matrix and vector computations" OFF)
 # different type of files 
 option(BUILD_READ_XML_FILE "Using xml configuration to read xml files" OFF)
-option(BUILD_READ_MAT_FILE "Using matio library to read mat files" ON)
+option(BUILD_READ_MAT_FILE "Using matio library to read mat files" OFF)
 #CMAKE_DEPENDENT_OPTION
 
 ###### Different option of configuration ######
