@@ -55,9 +55,9 @@ Quick install :
 4-	cmake ..
 	OPTION :	-DBUILD_OPENBLAS=ON 
 				-DCMAKE_INSTALL_PREFIX="/home/username/Faust_install"
-4bis- ccmake (with Graphical User Interface)
+4bis-	ccmake .. (with Graphical User Interface)
 5-	make
-6- make install
+6-	make install
 
 Warning : 
 mex function working with specific version of gcc depend to the platform used. 
