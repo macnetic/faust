@@ -52,13 +52,15 @@
 #include <iomanip>
 
 /** \brief Time Measurement between a given matrix and its Faust factorization
-* A dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
-* \param configFilename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hierFact)
-* \param expectedLambda (optionnal) : compared the expected scalar of the factorisation with the computed one in the precision defined with epsilon
-*\param epsilon : precision for the test of equality (default value 0.0001)
-*/
+* \param MatrixFilename : a dense ma trix is loaded from this file
+* \param transposedMatrix : -value 'N' (default value),  the  matrix stored in MatrixFilename is factorized
+				      -value 'T' , the transposed matrix is factorized 							 *\param FaustFilename : a .mat (MATLAB file) where a Faust representing the dense matrix (or its transposed cf transposeMatrix) 
+		      (you can passed as many FaustFilename as you want  	
 
 
+example : faust_multiplication_@TEST_FPP@ matrix.mat N faust1.mat faust2.mat 
+
+**/
 
 
 typedef @TEST_FPP@ FPP;
@@ -75,9 +77,10 @@ int main(int argc, char* argv[])
 		cout<<"floating point precision == float"<<endl;
   	}
 
-	if (argc <= 1)
+	if (argc <= 2)
 	{
-		cerr << "At least one input file (extension \".mat\") storing a dense matrix must be given" << endl;
+		cerr << "At least 2 input must be given " << endl;
+		cerr << "a .mat file storing a matrix and a parameter (value N or T) " << endl;
 		exit(EXIT_FAILURE);	
 	}
 	
@@ -86,19 +89,38 @@ int main(int argc, char* argv[])
 	string matDenseFilename = argv[1];
 	Faust::MatDense<FPP,Cpu> M;
 	init_faust_mat_from_matio(M,matDenseFilename.c_str(),"matrix");
+	
+
+	char transposedMatrix = argv[2][0];
+	if ((transposedMatrix != 'N') && (transposedMatrix != 'T'))
+	{
+		cerr << "transposedMatrix value is "<<transposedMatrix<< endl;		
+		cerr << "transposedMatrix parameter must be equal to N or T " << endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	// transposed the matrix if needed
+	if (transposedMatrix == 'T')
+		M.transpose();
+	
+
 	int nbRow=M.getNbRow();	
 	int nbCol=M.getNbCol();
 
 
+
+	
+
+
 	// initialisation of the different Faust
 	std::vector<Faust::Transform<FPP,Cpu> > listFaust;
-	int nbFaust = argc - 2;
+	int nbFaust = argc - 3;
 	std::vector<string> faustFilename(nbFaust);
 	std::cout<<"loading "<<nbFaust<<" Faust"<<std::endl;
 	listFaust.resize(nbFaust);
 	for (int i=0;i<nbFaust;i++)
 	{
-		faustFilename[i]=argv[2+i];
+		faustFilename[i]=argv[3+i];
 		std::cout<<"loading faust from "<<faustFilename[i].c_str()<<std::endl;
 		init_faust_core_from_matiofile(listFaust[i],faustFilename[i].c_str(),"facts");
 		if ((listFaust[i].getNbRow() != nbRow) || (listFaust[i].getNbCol() != nbCol))
