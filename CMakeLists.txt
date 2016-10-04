@@ -147,8 +147,6 @@ message(STATUS "CMAKE_INSTALL_MATLAB_PREFIX = ${CMAKE_INSTALL_MATLAB_PREFIX}")
 # message(STATUS "CXX=$ENV{CXX}")
 # sous windows on utilise MinGW pour le compilateur GCC G++ au lieu de visual studio plous lourd à installer. MinGW version 4.9.2 pour les mex functions..
 # set(CTEST_CMAKE_GENERATOR "MinGW Makefiles") 
-file(MAKE_DIRECTORY ${FAUST_INSTALL_BIN})
-file(MAKE_DIRECTORY ${FAUST_INSTALL_BIN_TIME_COMP})
 
 
 ###### tmp directory where temporary objects will be located ######
@@ -644,12 +642,14 @@ install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
 ##############################################################################
 # Packaging using CPack:
 ##############################################################################
+# USAGE 
+# Use "package" target for a binary distribution. For example "make package" or "mingw32-make package"
+# Use "package_source" target for a source distribution. For example "make package_source" or "mingw32-make package_source"
+#
 # For Unix Makefiles / MinGW Makefiles: Generates standard UNIX makefiles:
 # A hierarchy of UNIX makefiles is generated into the build tree.
 # Any standard UNIX-style make program can build the project through the default make target.
 # A "install" target is provided. For example "make install" or "mingw32-make install"
-# Use "package" target for a binary distribution. For example "make package" or "mingw32-make package"
-# Use "package_source" target for a source distribution. For example "make package_source" or "mingw32-make package_source"
 
 # For Visual Studio and XCode project files
 # A hierarchy of target is generated into the build tree and displayed in the IDE 
