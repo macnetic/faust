@@ -75,13 +75,14 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 		set(FAUST_INSTALL_BIN 			"${PROJECT_BINARY_DIR}/output/bin" CACHE STRING "default install path for the binary faust" FORCE )
 		set(FAUST_INSTALL_BIN_TIME_COMP "${PROJECT_BINARY_DIR}/output/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
 		set(FAUST_INSTALL_DOC 			"${PROJECT_BINARY_DIR}/output/doc" CACHE STRING "default install path for the documentation faust" FORCE )
-		set(FAUST_INSTALL_CMDLINE 		"${PROJECT_BINARY_DIR}/output/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
-		set(FAUST_INSTALL_TESTING_DATA 	"${PROJECT_BINARY_DIR}/output/testing/data" CACHE STRING "default install path for the test faust" FORCE )
+		#set(FAUST_INSTALL_CMDLINE 		"${PROJECT_BINARY_DIR}/output/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
+		#set(FAUST_INSTALL_TESTING_DATA 	"${PROJECT_BINARY_DIR}/output/testing/data" CACHE STRING "default install path for the test faust" FORCE )
 		# default location of install dir for matlab component
 		SET(CMAKE_INSTALL_MATLAB_PREFIX "$ENV{HOME}/Documents/MATLAB/faust" CACHE STRING "default install path for the matlab wrapper" FORCE )
 		# CMAKE_INSTALL_PREFIX path is deleted for next cmake .. configure
 		SET(CMAKE_INSTALL_PREFIX "" CACHE STRING "default install path" FORCE )
 		#message (STATUS "default install") 
+	# Install in the CMAKE_INSTALL_PREFIX path defined by the user (local install) 	
 	elseif(CMAKE_INSTALL_PREFIX)
 		SET(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING "new install path" FORCE )
 		message(STATUS "Install FAuST path : ${CMAKE_INSTALL_PREFIX}")
@@ -90,8 +91,8 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 		set(FAUST_INSTALL_BIN 			"${CMAKE_INSTALL_PREFIX}/bin")
 		set(FAUST_INSTALL_BIN_TIME_COMP "${CMAKE_INSTALL_PREFIX}/bin/runtime_comparison")
 		set(FAUST_INSTALL_DOC 			"${CMAKE_INSTALL_PREFIX}/doc")
-		set(FAUST_INSTALL_CMDLINE 		"${CMAKE_INSTALL_PREFIX}/CmdLine")
-		set(FAUST_INSTALL_TESTING_DATA 	"${CMAKE_INSTALL_PREFIX}/testing/data")
+		#set(FAUST_INSTALL_CMDLINE 		"${CMAKE_INSTALL_PREFIX}/CmdLine")
+		#set(FAUST_INSTALL_TESTING_DATA 	"${CMAKE_INSTALL_PREFIX}/testing/data")
 		# default location of install dir for matlab component
 		SET(CMAKE_INSTALL_MATLAB_PREFIX "${CMAKE_INSTALL_PREFIX}/matlab")
 	else()
@@ -112,13 +113,14 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 		set(FAUST_INSTALL_BIN 			"${PROJECT_BINARY_DIR}/output/bin" CACHE STRING "default install path for the binary faust" FORCE )
 		set(FAUST_INSTALL_BIN_TIME_COMP "${PROJECT_BINARY_DIR}/output/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
 		set(FAUST_INSTALL_DOC 			"${PROJECT_BINARY_DIR}/output/doc" CACHE STRING "default install path for the documentation faust" FORCE )
-		set(FAUST_INSTALL_CMDLINE 		"${PROJECT_BINARY_DIR}/output/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
-		set(FAUST_INSTALL_TESTING_DATA 	"${PROJECT_BINARY_DIR}/output/testing/data" CACHE STRING "default install path for the test faust" FORCE )
+		#set(FAUST_INSTALL_CMDLINE 		"${PROJECT_BINARY_DIR}/output/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
+		#set(FAUST_INSTALL_TESTING_DATA 	"${PROJECT_BINARY_DIR}/output/testing/data" CACHE STRING "default install path for the test faust" FORCE )
 		# default location of install dir for matlab component
 		SET(CMAKE_INSTALL_MATLAB_PREFIX "C:/Users/$ENV{USERNAME}/Documents/MATLAB/faust" CACHE STRING "default install path for the matlab wrapper" FORCE )
 		# CMAKE_INSTALL_PREFIX path is deleted for next cmake .. configure
 		SET(CMAKE_INSTALL_PREFIX "" CACHE STRING "default install path" FORCE )
 		#message (STATUS "default install") 
+	# Install in the CMAKE_INSTALL_PREFIX path defined by the user (local install) 	
 	elseif(CMAKE_INSTALL_PREFIX)
 		SET(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING "new install path" FORCE )
 		message(STATUS "Install FAuST path : ${CMAKE_INSTALL_PREFIX}")
@@ -127,8 +129,8 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 		set(FAUST_INSTALL_BIN 			"${CMAKE_INSTALL_PREFIX}/bin")
 		set(FAUST_INSTALL_BIN_TIME_COMP "${CMAKE_INSTALL_PREFIX}/bin/runtime_comparison")
 		set(FAUST_INSTALL_DOC 			"${CMAKE_INSTALL_PREFIX}/doc")
-		set(FAUST_INSTALL_CMDLINE 		"${CMAKE_INSTALL_PREFIX}/CmdLine")
-		set(FAUST_INSTALL_TESTING_DATA 	"${CMAKE_INSTALL_PREFIX}/testing/data")
+		#set(FAUST_INSTALL_CMDLINE 		"${CMAKE_INSTALL_PREFIX}/CmdLine")
+		#set(FAUST_INSTALL_TESTING_DATA 	"${CMAKE_INSTALL_PREFIX}/testing/data")
 		# default location of install dir for matlab component
 		SET(CMAKE_INSTALL_MATLAB_PREFIX "${CMAKE_INSTALL_PREFIX}/matlab")
 	else()
@@ -138,12 +140,15 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 
 endif(UNIX)
 message(STATUS "CMAKE_INSTALL_MATLAB_PREFIX = ${CMAKE_INSTALL_MATLAB_PREFIX}")
+
 ##################################################################
 ## For windows platform :
 # cmake -G "MinGW Makefiles" ..
 # message(STATUS "CXX=$ENV{CXX}")
 # sous windows on utilise MinGW pour le compilateur GCC G++ au lieu de visual studio plous lourd à installer. MinGW version 4.9.2 pour les mex functions..
 # set(CTEST_CMAKE_GENERATOR "MinGW Makefiles") 
+file(MAKE_DIRECTORY ${FAUST_INSTALL_BIN})
+file(MAKE_DIRECTORY ${FAUST_INSTALL_BIN_TIME_COMP})
 
 
 ###### tmp directory where temporary objects will be located ######
@@ -198,8 +203,8 @@ option(BUILD_READ_MAT_FILE "Using matio library to read mat files" OFF)
 
 ###### Different option of configuration ######
 #option(BUILD_TESTING "Build Tests" ON) 
-set(FAUST_USE_SINGLEPRECISION OFF CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
-set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
+set(BUILD_USE_SINGLEPRECISION OFF) # CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
+set(BUILD_USE_PROFILING OFF) # CACHE BOOL "Profiling the code")
 
 #set(BUILD_MULTITHREAD OFF CACHE BOOL "OpenMP Multithreading")
 #set(BUILD_VERBOSE OFF CACHE BOOL "Display useful message for debugging")
@@ -210,7 +215,7 @@ set(FAUST_USE_PROFILING OFF CACHE BOOL "Profiling the code")
 #set(BUILD_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
 #set(BUILD_READ_MAT_FILE OFF CACHE BOOL "Using matio library to read mat files")
 
-if (FAUST_USE_SINGLEPRECISION)
+if (BUILD_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")
 endif()
 if (BUILD_OPENBLAS)
@@ -219,7 +224,7 @@ endif()
 if (BUILD_MATLAB_MEX_FILES)
 	message(STATUS "**********MEX ACTIF************")
 endif()
-if (FAUST_USE_PROFILING)
+if (BUILD_USE_PROFILING)
 	message(STATUS "**********PROFILING ACTIF************")
 endif()
 if (BUILD_READ_MAT_FILE)
@@ -305,10 +310,11 @@ set(FAUST_SRC_TEST_TOOL_DIR 		${FAUST_SRC_TEST_DIR}/tools CACHE INTERNAL "")
 set(FAUST_SRC_TEST_SRC_DIR 			${FAUST_SRC_TEST_DIR}/src CACHE INTERNAL "")
 
 
+
 ###### WRAPPER MATLAB DIRECTORIES ######
 if (BUILD_MATLAB_MEX_FILES)
 	#version MATLAB du code (entierement MATLAB, pas de mexfunction)
-	
+	file(MAKE_DIRECTORY ${CMAKE_INSTALL_MATLAB_PREFIX})
 	###### SRC DIRECTORY #####
 	set(FAUST_MATLAB_SRC_DIR ${FAUST_SRC_WRAPPER_DIR}/matlab CACHE INTERNAL "")
 	set(FAUST_MATLAB_TOOLS_SRC_DIR 	${FAUST_MATLAB_SRC_DIR}/tools CACHE INTERNAL "")
@@ -356,12 +362,21 @@ if (BUILD_MATLAB_MEX_FILES)
 	set(FAUST_DEMO_BSL_INSTALL_DIR 		${FAUST_DEMO_INSTALL_DIR}/Brain_source_localization CACHE INTERNAL "")
 	set(FAUST_DEMO_TOOLS_INSTALL_DIR 	${FAUST_DEMO_INSTALL_DIR}/tools CACHE INTERNAL "")
 	set(FAUST_DEMO_HADAMARD_INSTALL_DIR ${FAUST_DEMO_INSTALL_DIR}/Hadamard_factorization CACHE INTERNAL "")
-	set(FAUST_DEMO_BSL_DATA_INSTALL_DIR ${FAUST_DEMO_BSL_INSTALL_DIR}/data CACHE INTERNAL "")
 	set(FAUST_DEMO_BSL_DATA_INSTALL_DIR 		${FAUST_DEMO_BSL_INSTALL_DIR}/data CACHE INTERNAL "")
 	set(FAUST_DEMO_BSL_OUTPUT_INSTALL_DIR 		${FAUST_DEMO_BSL_INSTALL_DIR}/output CACHE INTERNAL "")
 	set(FAUST_DEMO_HADAMARD_OUTPUT_INSTALL_DIR 	${FAUST_DEMO_HADAMARD_INSTALL_DIR}/output/ CACHE INTERNAL "")
 	set(FAUST_DEMO_TIMECOMP_INSTALL_DIR 		${FAUST_DEMO_INSTALL_DIR}/Runtime_comparison CACHE INTERNAL "")
 	set(FAUST_DEMO_FIG_INSTALL_DIR 				${FAUST_DEMO_INSTALL_DIR}/Figures CACHE INTERNAL "")
+
+	file(MAKE_DIRECTORY ${FAUST_DEMO_INSTALL_DIR})
+	file(MAKE_DIRECTORY ${FAUST_DEMO_BSL_INSTALL_DIR})
+	file(MAKE_DIRECTORY ${FAUST_DEMO_TOOLS_INSTALL_DIR})
+	file(MAKE_DIRECTORY ${FAUST_DEMO_HADAMARD_INSTALL_DIR})
+	file(MAKE_DIRECTORY ${FAUST_DEMO_BSL_DATA_INSTALL_DIR})
+	file(MAKE_DIRECTORY ${FAUST_DEMO_BSL_OUTPUT_INSTALL_DIR})
+	file(MAKE_DIRECTORY ${FAUST_DEMO_HADAMARD_OUTPUT_INSTALL_DIR})
+	file(MAKE_DIRECTORY ${FAUST_DEMO_TIMECOMP_INSTALL_DIR})
+	file(MAKE_DIRECTORY ${FAUST_DEMO_FIG_INSTALL_DIR})
 endif(BUILD_MATLAB_MEX_FILES)
 ##################################################################
 
@@ -388,6 +403,7 @@ endif(BUILD_USE_GPU)
 
 ###### DOCUMENTATION DIRECTORIES ######
 if (BUILD_DOCUMENTATION)
+	file(MAKE_DIRECTORY ${FAUST_INSTALL_DOC})
 	set(FAUST_DOC_SRC_DIR ${PROJECT_SOURCE_DIR}/gen_doc CACHE INTERNAL "")
 	set(FAUST_DOC_BIN_DIR ${PROJECT_BINARY_DIR}/doc CACHE INTERNAL "")
 endif()

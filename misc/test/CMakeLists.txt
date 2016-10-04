@@ -107,13 +107,14 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
 	endforeach()
 
 #message(STATUS "ALALALLLLLLLLLLL FAUST_INSTALL_BIN=${FAUST_INSTALL_BIN}")
-
-	install(TARGETS hierarchicalFactorization_double hierarchicalFactorization_float test_palm4MSA_double test_palm4MSA_float DESTINATION ${FAUST_INSTALL_BIN})
+	file(MAKE_DIRECTORY ${FAUST_INSTALL_BIN})
+	install(TARGETS hierarchicalFactorization_double hierarchicalFactorization_float test_palm4MSA_double test_palm4MSA_float DESTINATION ${FAUST_INSTALL_BIN} PERMISSIONS WORLD_READ WORLD_WRITE WORLD_EXECUTE)
 
 
 	# matlab script useful for displaying the result of the multiply_compare_time executable ( 
 	configure_file(${FAUST_SRC_TEST_TIME_COMP_DIR}/display_multiply_comptime.m.in ${FAUST_BIN_TEST_TIME_COMPARE_DIR}/display_multiply_comptime.m @ONLY)
-	install(FILES ${FAUST_BIN_TEST_TIME_COMPARE_DIR}/display_multiply_comptime.m DESTINATION ${FAUST_INSTALL_BIN_TIME_COMP})
+	file(MAKE_DIRECTORY ${FAUST_INSTALL_BIN_TIME_COMP})	
+	install(FILES ${FAUST_BIN_TEST_TIME_COMPARE_DIR}/display_multiply_comptime.m DESTINATION ${FAUST_INSTALL_BIN_TIME_COMP} PERMISSIONS WORLD_READ WORLD_WRITE WORLD_EXECUTE)
 
 
 ###### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST ######
