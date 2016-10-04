@@ -16,6 +16,13 @@
 #
 ###################################################################
 
+
+
+
+### MULTITHREADING ###
+OMP_NUM_THREADS=$(nproc)
+echo 'MULTITHREADING : num of thread ' $OMP_NUM_THREADS
+
 ### name system of Machine for CDASH
 export CMAKE_SYSTEM='linux-ubuntu'
 
