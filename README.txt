@@ -40,19 +40,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##########################################################################
 Installation:
 
-Quick install :
+Please refer to the document "./Faust.pdf" to install the FAUST toolbox.
+The FAUST toolbox have been tested on multiplatform :
+- LINUX (fedora 20, 21, 22, 23 / Ubuntu) 
+- MAC
+- WINDOWS (windows 7)
+
+Quick install on UNIX :
 1-	Unpack the directory. 
 2-	mkdir ./build
 3-	cd ./build
-4-	cmake ..
-	OPTION :	-DBUILD_OPENBLAS=ON 
-				-DCMAKE_INSTALL_PREFIX="/home/username/Faust_install"
-4bis-	ccmake .. (with Graphical User Interface)
+4-	cmake .. OR ccmake .. (with Graphical User Interface)
 5-	make
 6-	make install
-
-Please refer to the document Faust.PDF, for more detailed informations 
-about the installation.
 
 Warning : 
 mex function working with specific version of gcc depend to the platform used. 
