@@ -140,36 +140,39 @@ endif(BUILD_MATLAB_MEX_FILES)
 # MATLAB input format
 if (BUILD_READ_MAT_FILE)
 	
-	
 	foreach(TEST_FPP float double)
 		add_test(NAME MATFILE_FACT_HADAMARD_${TEST_FPP} COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_HADAMARD_32.mat	${FAUST_CONFIG_MAT_DIR}/config_HADAMARD_32.mat 5930 30)
 		add_test(NAME MATFILE_FACT_HIER_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_hierarchical_fact.mat	${FAUST_CONFIG_MAT_DIR}/config_hierarchical_fact.mat 9401.5 0.1)
 	
 		add_test(NAME MATFILE_MULTIPLICATION_MEG_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat T ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_6.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_8.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_16.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_25.mat)
 
-		# data equipe visage test
-		add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G1_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G1.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G1_RCG_10_factor_3.mat)
+		if (EXISTS ${FAUST_DATA_MAT_DIR}/visage/)
+			# data equipe visage test
+			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G1_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G1.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G1_RCG_10_factor_3.mat)
 	
-		add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G2_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G2.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G2_RCG_10_factor_3.mat)
+			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G2_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G2.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G2_RCG_10_factor_3.mat)
 
-		add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G3_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G3.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G3_RCG_10_factor_3.mat)
+			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G3_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G3.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G3_RCG_10_factor_3.mat)
 
-		add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G4_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G4.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G4_RCG_10_factor_3.mat)
+			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G4_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G4.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G4_RCG_10_factor_3.mat)
 
-		add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G5_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G5.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G5_RCG_10_factor_3.mat)
+			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G5_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G5.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G5_RCG_10_factor_3.mat)
 
-		add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G6_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G6.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G6_RCG_10_factor_3.mat)
+			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G6_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G6.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G6_RCG_10_factor_3.mat)
 
-		add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G7_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G7.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G7_RCG_10_factor_3.mat)
+			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G7_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G7.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G7_RCG_10_factor_3.mat)
 
-		add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G8_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G8.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G8_RCG_10_factor_3.mat)
+			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G8_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G8.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G8_RCG_10_factor_3.mat)
 
+		else ()
+			message (STATUS "Warning : The data for demo Visage are not available. ")		
+		endif()
 
 		add_test(NAME MATFILE_PALM4MSA_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSA_${TEST_FPP} )
 
 		# limit the time of the process in case of bug... 
 		set_tests_properties(MATFILE_FACT_HADAMARD_${TEST_FPP} MATFILE_FACT_HIER_${TEST_FPP} PROPERTIES TIMEOUT ${TIMEOUT_COMP})
-	
+
 	endforeach()
 
 	# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) in simple and 	double precision
