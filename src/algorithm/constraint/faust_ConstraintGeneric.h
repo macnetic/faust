@@ -68,10 +68,9 @@ namespace Faust {
     template<typename FPP,Device DEVICE>
     class MatDense;
 
-/*!
-\brief Contains the generic constraint parameters for the hierarchical factorization. See following table for more precision about the type of constraint. <br>
- <img src="../../doc/html/constraint.png" alt="constraint parameters" width=800px />
-*/
+//! \class ConstraintGeneric
+//! \brief Contains the generic constraint parameters for the hierarchical factorization. See following table for more precision about the type of constraint. <br>
+//! <img src="../../doc/html/constraint.png" alt="constraint parameters" width=800px />
     template<typename FPP,Device DEVICE>
     class ConstraintGeneric
     {
