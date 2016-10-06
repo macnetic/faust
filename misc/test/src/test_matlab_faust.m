@@ -130,20 +130,20 @@ disp('Ok');
 
 
 
-%% get_product test
-disp('TEST GET_PRODUCT : ');
-F_dense= get_product(F);
+%% full test
+disp('TEST FULL : ');
+F_dense= full(F);
 
 [dim1_dense,dim2_dense]=size(F_dense);
 
 if((dim1_dense ~= dim1) | (dim2_dense ~= dim2))
-    error('get_product : invalid dimension');
+    error('full : invalid dimension');
 end
 disp('Ok');
 
 
 
-%% get_product test
+%% full test
 disp('TEST NNZ : ');
 expected_nz = (nb_fact-1)*dim2^2 + dim1*dim2;
 
@@ -260,7 +260,7 @@ if ((dim1_trans ~= dim2) | (dim2_trans ~= dim1))
     error(['transpose : invalid dimension']);
 end
 
-F_dense_trans = get_product(F_trans);
+F_dense_trans = full(F_trans);
 if (F_dense_trans ~= F_dense')
     error(['transpose : invalid transpose matrix']);
 end
@@ -271,7 +271,7 @@ if ((new_dim1 ~= dim1) | (dim2 ~= new_dim2))
     error(['transpose : modification du faust de depart']);
 end
 
-new_F_dense=get_product(F);
+new_F_dense=full(F);
 if((new_F_dense ~= F_dense))
 	error('transpose : modification du faust de depart');
 end 
@@ -285,7 +285,7 @@ if ((dim1_trans_trans ~= dim1) | (dim2_trans_trans ~= dim2))
     error(['transpose : invalid dimension']);
 end
 
-F_dense_trans_trans = get_product(F_trans_trans);
+F_dense_trans_trans = full(F_trans_trans);
 if (F_dense_trans_trans ~= F_dense)  
     error(['transpose : invalid transpose matrix']);
 end
@@ -297,7 +297,7 @@ if ((new_dim1_trans ~= dim1_trans) | (new_dim2_trans ~= new_dim2_trans))
     error(['transpose : modification du faust de depart']);
 end
 
-new_F_dense_trans=get_product(F_trans);
+new_F_dense_trans=full(F_trans);
 if((new_F_dense_trans ~= F_dense_trans))
 	error('transpose : modification du faust de depart');
 end 
@@ -346,7 +346,7 @@ if (dim1_trans_faust_loaded ~= dim2) | (dim2_trans_faust_loaded ~= dim1)
 	error(['save transposed : invalid dimension to the loaded-saved faust']);
 end
 
-F_dense_trans_loaded=get_product(F_trans_loaded);
+F_dense_trans_loaded=full(F_trans_loaded);
 if (F_dense_trans_loaded ~= F_dense')
 	error(['save transposed : invalid faust']);
 end

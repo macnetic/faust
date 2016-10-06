@@ -43,6 +43,11 @@
 %	[DOI] <http://dx.doi.org/10.1016/j.neuroimage.2013.10.027>
 %%
 
+%% Quick start
+disp('*********** Quick Start *************');
+quick_start;
+
+
 
 
 %% brain source localization

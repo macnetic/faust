@@ -92,9 +92,9 @@ classdef Faust
         end
         
         %% Evaluate the product of a faust_core
-        function y = get_product(this)
-            % get_product - compute the dense matrix equivalent to the faust (the product of sparse matrix)
-            y=mexFaust('get_product',this.matrix.objectHandle,this.transpose_flag);
+        function y = full(this)
+            % full - compute the dense matrix equivalent to the faust (the product of sparse matrix)
+            y=mexFaust('full',this.matrix.objectHandle,this.transpose_flag);
 	
             
         end

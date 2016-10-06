@@ -192,13 +192,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     
 
-    	if (!strcmp("get_product",cmd))
+    	if (!strcmp("full",cmd))
 	{	
 		
 		if (nlhs != 1 || nrhs != 3)
-			mexErrMsgTxt("get_product: Unexpected arguments");
+			mexErrMsgTxt("full: Unexpected arguments");
 		if(core_ptr->size() == 0)
-			mexErrMsgTxt("get_product : empty faust core");
+			mexErrMsgTxt("full : empty faust core");
 		
 		bool transpose_flag = (bool) mxGetScalar(prhs[2]);
 
@@ -233,7 +233,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if (nlhs != 1 || nrhs != 2)
 			mexErrMsgTxt("norm: Unexpected arguments");
 		if(core_ptr->size() == 0)
-			mexErrMsgTxt("get_product : empty faust core");
+			mexErrMsgTxt("norm : empty faust core");
 		
 		
 		FFPP precision =  0.001;

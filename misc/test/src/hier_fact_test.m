@@ -113,7 +113,7 @@ end
 
 
 F=Faust(fact,lambda);
-relative_error = norm(matrix - get_product(F));
+relative_error = norm(matrix - full(F));
 
 disp(['relative error :  ' num2str(relative_error)]);
 

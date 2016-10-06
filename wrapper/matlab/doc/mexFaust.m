@@ -8,7 +8,7 @@
 % 'new'-> create a new faust
 %'delete'-> delete a faust
 %'multiply'-> multiply a faust by a matrix
-%'get_product'-> evaluate the product of a faust
+%'full'-> evaluate the product of a faust
 %'transpose' -> transpose a faust
 %'size' -> get the dimension of a faust
 %

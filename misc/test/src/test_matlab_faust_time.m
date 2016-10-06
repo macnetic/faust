@@ -73,7 +73,7 @@ disp('Ok');
 
 %% access to coeff
 disp('TEST ACCESS ROW OR COL');
-F_dense=get_product(F);
+F_dense=full(F);
 t_access_row=zeros(nb_transposition,1);
 t_access_col=zeros(nb_transposition,1);
 t_access_trans_row=zeros(nb_transposition,1);
