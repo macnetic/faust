@@ -1,9 +1,5 @@
-addpath('@FAUST_MATLAB_MEX_BIN_DIR@');%% access to the mexfunction
 addpath('@FAUST_DATA_MAT_DIR@');%% access to the data (meg matrix hadamard matrix)
 addpath('@FAUST_CONFIG_MAT_DIR@');%% access to the configuration file (meg matrix hadamard matrix)
-addpath('@FAUST_MATLAB_TOOLS_BIN_DIR@');%% access to Faust.m (interface betwwen faust_core C++ class and matlab class)
+addpath(genpath('@FAUST_MATLAB_BIN_DIR@'));%% access to the matlab wrapper bin directory and all its subdirectories (mex,demo ...)
 
-%% access to the old matlab code (factorise a matrix) hierarchical_fact and palm4MSA)
-addpath('@FAUST_MATLAB_OLD_BIN_DIR@');
-addpath('@FAUST_MATLAB_OLD_PROX_BIN_DIR@');
-addpath('@FAUST_MATLAB_OLD_UTILS_BIN_DIR@');
+
