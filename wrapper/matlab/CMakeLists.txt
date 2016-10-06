@@ -5,7 +5,7 @@
 
 # copy and install the matlab wrapping the underlying C++ class
 
-file(MAKE_DIRECTORY ${FAUST_MATLAB_TOOLS_INSTALL_DIR})
+#file(MAKE_DIRECTORY ${FAUST_MATLAB_TOOLS_INSTALL_DIR})
 
 # matlab tools directory
 foreach(MATLAB_TOOLS FaustCore)
@@ -101,8 +101,8 @@ if(WIN32)
 	endforeach()
 endif()
 
-file(MAKE_DIRECTORY ${FAUST_MATLAB_MEX_INSTALL_DIR})
-file(MAKE_DIRECTORY ${CMAKE_INSTALL_MATLAB_PREFIX})		
+#file(MAKE_DIRECTORY ${FAUST_MATLAB_MEX_INSTALL_DIR})
+#file(MAKE_DIRECTORY ${CMAKE_INSTALL_MATLAB_PREFIX})		
 foreach(mex_target ${MEXFILE_TARGET_LIST})
 	if(WIN32)
 		add_custom_target(${mex_target} DEPENDS ${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} MEXOBJ_FILES_TARGET )
