@@ -1,47 +1,66 @@
 \chapter{Installation on Unix platform}\label{sec:InstallUnix}
 
-\paragraph{}The FA$\mu$ST project is based on an C++ library available for both UNIX and Windows environments. The proposed toolbox provides a Matlab wrapper. CMake has been choose to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
+\paragraph{}The FA$\mu$ST project is based on C++ library available for both UNIX and Windows environments. The proposed toolbox provides a Matlab wrapper. CMake has been chosen to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
 
-\paragraph{}This chapter presents the steps to install the FA$\mu$ST tools on the Unix platform (both Linux and Mac OS). First section \ref{sec:UnixGettingStarted} presents the basic installation of FA$\mu$ST, second section \ref{sec:UnixCustomInstall} corresponds to the advanced  installation. Third \ref{sec:UnixInstallCodeBlock} and fourth \ref{sec:MacInstallXcode} sections explain how to used the common Integrated Development Environment (codeBlock and Xcode) in the build and installation process. 
+\paragraph{}This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS). Section \ref{sec:UnixGettingStarted} presents the basic installation of FA$\mu$ST, then section \ref{sec:UnixCustomInstall} corresponds to advanced installation options such as modifying the install directory. Third \ref{sec:UnixInstallCodeBlock} and fourth \ref{sec:MacInstallXcode} sections explain how to used the common Integrated Development Environment (codeBlock and Xcode) in the build and installation process. 
 
-\section{Getting Started}\label{sec:UnixGettingStarted}
+%\section{Getting Started}\label{sec:UnixGettingStarted}
 
-\subsection{Required tools}\label{sec:RequiredTools}
-
+\section{Required tools}\label{sec:RequiredTools}
+This Section lists the components required for FA$\mu$ST installation. 
 \begin{itemize}
-\item CMake : (tested with version 3.4.3 cf. website \url{https://cmake.org/})
-\item Matlab : (tested with version 2014 and 2015)
-The use of the mex function in Matlab requires that you have a third-party compiler installed on your system. The latest version of Matlab (2016a in our case) only supports up to GCC 4.7 (see \url{http://fr.mathworks.com/support/compilers/R2016a/index.html?sec=glnxa64} for more detail). Please adjust your version of GCC compiler in order to run the installation properly. 
-You must too have matlab in your environment PATH. If not please add. 
+\item \textbf{Install CMake}. Visit the website \url{https://cmake.org/} to process to the installation.
+\item \textbf{Verify Cmake install} by typing in a command terminal : 
+\begin{lstlisting}
+which cmake
+\end{lstlisting}
+The command terminal returns the path of your Cmake binary file like :
+\begin{lstlisting}
+/usr/bin/cmake
+\end{lstlisting}
+If not, add Cmake binary directory in the environment path. (in your ~/.bashrc file)
 
-\item \textit{OPTIONAL} The use of GPU process in FAUST project required the drivers for NVIDIA and CUDA install. You must have nvcc in your environment PATH. If not please add.
+\item \textbf{Install Matlab} (\url{https://fr.mathworks.com/downloads/})
+
+\item \textbf{Verify Matlab install} by typing in a terminal the following command : 
+\begin{lstlisting}
+which matlab
+which mex
+\end{lstlisting}
+You must obtain the path of your matlab and mex binaries files like: 
+\begin{lstlisting}
+/usr/local/bin/matlab
+/usr/local/bin/mex
+\end{lstlisting}
+If not, add \texttt{matlab} and \texttt{mex} binaries directories in your environment path (in your ~/.bashrc file). 
+
+\item \textbf{export CC and CXX variables} corresponding to gcc and g++ binaries path :\\
+find your gcc and g++ path using \texttt{which} command in a terminal :
+\begin{lstlisting}
+which gcc
+which g++
+\end{lstlisting}
+
+Open your ~/.bashrc file and save the return-path of gcc and g++ like : \\
+\begin{lstlisting}
+# export version of gcc
+export CC=/usr/lib64/ccache/gcc
+export CXX=/usr/lib64/ccache/g++
+\end{lstlisting}
 \end{itemize}
 
-\paragraph{}Please export following variable:
-\begin{itemize}
-\item CC with gcc (example: "\texttt{export CC='/usr/lib64/ccache/gcc'}") 
-\item CXX with g++ (example: "\texttt{export CXX=/usr/lib64/ccache/g++}
-\end{itemize}
 
-\subsection{Required packages}\label{sec:RequiredPackages}
-
-\paragraph{}Here is a list of packages used in the FA$\mu$ST project. The installation of this packages are automatically done. There are nothing to do. (see the directory "./externals").
-\begin{itemize}
-\item Library eigen \url{http://eigen.tuxfamily.org}
-\item Library openBlas \url{http://www.openblas.net}
-\item Library xml2 \url{http://xmlsoft.org}
-\item Library matio \url{https://sourceforge.net/projects/matio}
-\end{itemize}
-
-\subsection{Basic build and installation}\label{sec:UnixBuildInstall}
+\section{Basic build and installation}\label{sec:UnixBuildInstall}
 \paragraph{}When prerequisities listed in precedent sections are checked, the FA$\mu$ST installation can be done : 
+if you are administrator of your machine (root access), follow instructions given in section \ref{sec:UnixBuildInstallAdmin}. Otherwise, for an local installation, refers to the section \ref{sec:UnixBuildInstallNOAdmin}. 
+
+\subsection{Install with administrator privilege}\label{sec:UnixBuildInstallAdmin}
 
 \begin{itemize}
-\item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
-\item Open a command terminal
-\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
+\item \textbf{Open} a command terminal
+\item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
-
 \begin{lstlisting}
 mkdir build
 cd build
@@ -51,26 +70,91 @@ sudo make install % run with administrator privilege
 \end{lstlisting}
 \end{itemize}
 
-\paragraph{}When using the \texttt{cmake} command to generate the build system, Cmake performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case the three last lines of the console log of cmake command should be: \\
-\texttt{... \\
+\paragraph{}When using the \textbf{cmake} command to generate the build system, \texttt{cmake} performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case, the three last lines of the console log of \texttt{cmake} command should be: \\
+\begin{lstlisting}
 -- Configuring done \\
 -- Generating done \\
--- Build files have been written to: <./build>}
+-- Build files have been written to: <./build>
+\end{lstlisting}
 
-\paragraph{}The command \texttt{make} will compile the build files.
+\paragraph{}The command \textbf{make} will compile the build files.
 
-\paragraph{}The command \texttt{sudo make install} will install the library and others components in default directory. For that, you must have administrator privilege because the library file \texttt{libfaust.a} is copied in your root path directory. If you don't have administrator privilege, you can make a local install using the following option (see \ref{sec:UnixCustomInstall}): \\
-\texttt{cmake .. -DCMAKE\_INSTALL\_PREFIX="<Home/Local/Project/Output>"}
+\paragraph{}The command \textbf{sudo make install} will install the library and others components in the default directory: \\
+\texttt{/usr/local/lib/libfaust.a} for the faust library, \\
+\texttt{~/Documents/MATLAB/faust} for the wrapper matlab.\\
 
-\paragraph{}Similarly, the Matlab wrapper is installed in the default Matlab Directory\newline  \texttt{/"HOMEDIR"/Documents/MATLAB/Faust}. But you can make a local install for the wrapper using the following option \ref{sec:UnixCustomInstall}) : \\
+You must have administrator privilege because the library file \texttt{libfaust.a} is copied in an root path directory. If you do not have administrator privilege, you can make a local install (see. section \ref{sec:UnixBuildInstallNOAdmin}).
 
-\texttt{cmake .. -DCMAKE\_INSTALL\_MATLAB\_PREFIX="<Home/Local/Project/Output>"} 
+\subsection{Install without administrator privilege}\label{sec:UnixBuildInstallNOAdmin}
+
+\begin{itemize}
+\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
+\item \textbf{Open} a command terminal
+\item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FAUST directory path, for example the character $\mu$)
+\item Type the following commands : 
+\begin{lstlisting}
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX="<Your/Local/Install/Directory>"}
+make
+make install
+\end{lstlisting}
+\end{itemize}
+
+\paragraph{}When using the \textbf{cmake} command to generate the build system, \texttt{cmake} performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case, the three last lines of the console log of \texttt{cmake} command should be: \\
+\begin{lstlisting}
+-- Configuring done \\
+-- Generating done \\
+-- Build files have been written to: <./build>
+\end{lstlisting}
+
+\paragraph{}The command \textbf{make} will compile the build files.
+
+\paragraph{}The command \textbf{make install} will install the library and others components in the defined install directory. 
+
+
+\section{Build \& Install using Code Block}\label{sec:UnixInstallCodeBlock}
+progress...
+
+\section{Build \& Install using Xcode (for MAC OS)}\label{sec:MacInstallXcode}
+
+The Faust tools can be generated using XCode on MAC OS. To do this, please follow these instructions :
+\begin{itemize}
+\item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
+\item Open a command terminal
+\item Set the current directory to your local FA$\mu$ST directory (NOTE: do not use any special character in your FAUST directory path, for example the character $\mu$)
+\item Type the following commands : 
+\begin{lstlisting}
+mkdir build
+cd build
+cmake .. -G "Xcode"
+\end{lstlisting}
+
+\item \textbf{Open Xcode project} with the file \texttt{./build/FAUST.xcodeproj} and build all the targets.
+
+\end{itemize}
+
+\paragraph{NOTE:}You can generated the target using the terminal command \texttt{xcodebuild} :
+\begin{lstlisting}
+mkdir build
+cd build
+cmake .. -G "Xcode"
+%% list all target of the project
+xcodebuild -list -project FAUST.xcodeproj 
+%% Build the targets
+xcodebuild -configuration "Release" -target "ALL_BUILD" build 
+%% performs the "make install"
+xcodebuild -configuration "Release" -target "install" build 
+\end{lstlisting}
+
+
+
 
 \section{Custom - Advanced Installation}\label{sec:UnixCustomInstall}
 
 \paragraph{}The project FA$\mu$ST can be configured with optional parameters, for example if you want to install FA$\mu$ST in a different folder or to enable the parallel computing using multithread capacities provided by the OS. This build system can be parametrized using the Cmake Graphical User Interface, or the Cmake command line tools. 
 
-\paragraph{}The Cmake Graphical User Interface ccmake allows you to selected option input. When using the \texttt{ccmake} command in your build directory, the Cmake GUI appears in the console (see fig. \ref{fig:ccmake}).
+\paragraph{}The Cmake Graphical User Interface ccmake allows you to select option input. When using the \texttt{ccmake} command in your build directory, the Cmake GUI appears in the console (see fig. \ref{fig:ccmake}).
 
 \begin{figure}[!h] %%[!htbp]
 \centering
@@ -80,7 +164,25 @@ sudo make install % run with administrator privilege
 \end{figure}
 
 
-\paragraph{}When scrolling on a value and pressing [enter], this value can be edited, the black underlaid row displays some information about the option and required path to create the build system. In the case of an option press [enter] to toggle the ON/OFF values. You can edit option by press [enter]. For example, press [enter] to edit option \texttt{CMAKE\_INSTALL\_PREFIX} to modify the install directory. 
+%\section{Optional dependent tools}\label{sec:OptionalRequiredTools}
+\paragraph{Optional Install of GPU process}
+\begin{itemize}
+\item \textbf{Install} CUDA and the drivers for NVIDIA.
+\item \textbf{Verify install} of GPU tools by typing in a terminal : 
+\begin{lstlisting}
+which nvcc
+\end{lstlisting}
+You must obtain the path of your \texttt{nvcc} compiler like 
+\begin{lstlisting}
+/usr/local/cuda-7.5/bin/nvcc
+\end{lstlisting}
+If not, add \texttt{nvcc} directory in your environment path (in your ~/.bashrc file). 
+
+\end{itemize}
+
+
+
+\paragraph{}When scrolling on a value and pressing [enter], this value can be edited, the black underlaid row displays some information about the option and required path to create the build system. In the case of an option press [enter] to toggle the ON/OFF values. You can edit option by pressing [enter]. For example, press [enter] to edit option \texttt{CMAKE\_INSTALL\_PREFIX} to modify the install directory. 
 \paragraph{}After choosing options for the build and setting the required fields, press [c] to configure. The configuration of the build system is checked again by Cmake, at the end of this check if the build settings are correct, you can press [g] in order to generate the build system.
 
 \paragraph{} Instead the ccmake GUI, an other possibility to configure and generate the project is to use the command line cmake which can take the option input. Here is the list of available options: 
@@ -103,37 +205,21 @@ sudo make install % run with administrator privilege
 
 \paragraph{}Following the selected option, the cmake installer automatically checks the dependent component (library OpenBlas, eigen, matio, libxml2).  
 
-\section{Build \& Install using Code Block}\label{sec:UnixInstallCodeBlock}
-progress...
 
-\section{Build \& Install using Xcode (for MAC OS)}\label{sec:MacInstallXcode}
 
-The Faust tools can be generated using XCode on MAC OS. To do this, please follow this instructions :
+
+
+
+
+
+\subsection{Required packages}\label{sec:RequiredPackages}
+
+\paragraph{}Here is a list of packages used in the FA$\mu$ST project. The installation of this packages are automatically done. There are nothing to do. (see the directory "./externals").
 \begin{itemize}
-\item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
-\item Open a command terminal
-\item Place you in your local FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
-\item Type the following commands : 
-\begin{lstlisting}
-mkdir build
-cd build
-cmake .. -G "Xcode"
-\end{lstlisting}
-
-\item Then, open your project \texttt{FAUST.xcodeproj} with Xcode and build the targets.
-
+\item Library eigen \url{http://eigen.tuxfamily.org}
+\item Library openBlas \url{http://www.openblas.net}
+\item Library xml2 \url{http://xmlsoft.org}
+\item Library matio \url{https://sourceforge.net/projects/matio}
 \end{itemize}
 
-\paragraph{NOTE:}You can generated the target using the terminal command \texttt{xcodebuild} :
-\begin{lstlisting}
-mkdir build
-cd build
-cmake .. -G "Xcode"
-%% list all target of the project
-xcodebuild -list -project FAUST.xcodeproj 
-%% Build the targets
-xcodebuild -configuration "Release" -target "ALL_BUILD" build 
-%% performs the "make install"
-xcodebuild -configuration "Release" -target "install" build 
-\end{lstlisting}
-
+\paragraph{Compatibility between MATLAB and compiler gcc} \textbf{Adjust your version of GCC compiler} in order to run the installation properly. The use of the mex function in Matlab requires that you have a third-party compiler installed on your system. The latest version of Matlab (2016a in our case) only supports up to GCC 4.7 (see \url{http://fr.mathworks.com/support/compilers/R2016a/index.html?sec=glnxa64} for more detail).
