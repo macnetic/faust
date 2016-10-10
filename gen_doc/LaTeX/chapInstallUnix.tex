@@ -1,12 +1,17 @@
-\chapter{Installation on Unix platform}\label{sec:InstallUnix}
+\chapter{Installation on Linux and MAC OS X platform}\label{sec:InstallUnix}
 
-\paragraph{}The FA$\mu$ST project is based on C++ library available for both UNIX and Windows environments. The proposed toolbox provides a Matlab wrapper. CMake has been chosen to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
+\paragraph{}The FA$\mu$ST project is based on C++ library available for both UNIX and Windows environments. The proposed toolbox provides a Matlab wrapper. CMake has been chosen to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS). 
 
-\paragraph{}This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS). Section \ref{sec:UnixGettingStarted} presents the basic installation of FA$\mu$ST, then section \ref{sec:UnixCustomInstall} corresponds to advanced installation options such as modifying the install directory. Third \ref{sec:UnixInstallCodeBlock} and fourth \ref{sec:MacInstallXcode} sections explain how to used the common Integrated Development Environment (codeBlock and Xcode) in the build and installation process. 
+\paragraph{}Please ensure that the \textbf{prerequisites components} listed in Section \ref{sec:RequiredTools} are installed. Then refer to the appropriate section : 
+\begin{itemize}
+\item Basic installation using \textbf{the command line terminal}, refer to Section \ref{sec:UnixBuildInstall}.
+\item Basic installation using \textbf{the IDE "Code::Blocks"} for both Linux and MAC OS X, refer to Section \ref{sec:UnixInstallCodeBlock}. 
+\item Basic installation using \textbf{the IDE "Xcode"} only on MAC OS X, refer to Section \ref{sec:MacInstallXcode}. 
+\end{itemize}
 
-%\section{Getting Started}\label{sec:UnixGettingStarted}
+Finally in Section \ref{sec:UnixCustomInstall}, the configure options available to build the FA$\mu$ST toolbox are described to propose an Custom - Advanced installation. For example, optional configuration can be activate such as modifying the install directory, or building in debug mode).  
 
-\section{Required tools}\label{sec:RequiredTools}
+\section{Required components}\label{sec:RequiredTools}
 This Section lists the components required for FA$\mu$ST installation. 
 \begin{itemize}
 \item \textbf{Install CMake}. Visit the website \url{https://cmake.org/} to process to the installation.
@@ -51,7 +56,7 @@ export CXX=/usr/lib64/ccache/g++
 
 
 \section{Basic build and installation}\label{sec:UnixBuildInstall}
-\paragraph{}When prerequisities listed in precedent sections are checked, the FA$\mu$ST installation can be done : 
+\paragraph{}When prerequisities listed in precedent section \ref{sec:RequiredTools} are checked, the FA$\mu$ST installation can be done : 
 if you are administrator of your machine (root access), follow instructions given in section \ref{sec:UnixBuildInstallAdmin}. Otherwise, for an local installation, refers to the section \ref{sec:UnixBuildInstallNOAdmin}. 
 
 \subsection{Install with administrator privilege}\label{sec:UnixBuildInstallAdmin}
@@ -70,19 +75,19 @@ sudo make install % run with administrator privilege
 \end{lstlisting}
 \end{itemize}
 
-\paragraph{}When using the \textbf{cmake} command to generate the build system, \texttt{cmake} performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case, the three last lines of the console log of \texttt{cmake} command should be: \\
+\paragraph{INFO:}When using the \textbf{cmake} command to generate the build system, \textbf{cmake} performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case, the three last lines of the console log of \textbf{cmake} command should be:
 \begin{lstlisting}
--- Configuring done \\
--- Generating done \\
--- Build files have been written to: <./build>
+-- Configuring done 
+-- Generating done 
+-- Build files have been written to: <YOUR/LOCAL/DIRECTORY/build>
 \end{lstlisting}
 
-\paragraph{}The command \textbf{make} will compile the build files.
+\paragraph{INFO:}The command \textbf{make} will compile the build files.
 
-\paragraph{}The command \textbf{sudo make install} will install the library and others components in the default directory: \\
+\paragraph{INFO:}The command \textbf{sudo make install} will install the library and others components in the default directory: \\
 \texttt{/usr/local/lib/libfaust.a} for the faust library, \\
-\texttt{~/Documents/MATLAB/faust} for the wrapper matlab.\\
-
+\texttt{\textasciitilde /Documents/MATLAB/faust/} for the wrapper matlab.
+\\
 You must have administrator privilege because the library file \texttt{libfaust.a} is copied in an root path directory. If you do not have administrator privilege, you can make a local install (see. section \ref{sec:UnixBuildInstallNOAdmin}).
 
 \subsection{Install without administrator privilege}\label{sec:UnixBuildInstallNOAdmin}
@@ -95,44 +100,84 @@ You must have administrator privilege because the library file \texttt{libfaust.
 \begin{lstlisting}
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX="<Your/Local/Install/Directory>"}
+cmake .. -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 make
 make install
 \end{lstlisting}
 \end{itemize}
 
-\paragraph{}When using the \textbf{cmake} command to generate the build system, \texttt{cmake} performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case, the three last lines of the console log of \texttt{cmake} command should be: \\
-\begin{lstlisting}
--- Configuring done \\
--- Generating done \\
--- Build files have been written to: <./build>
+\paragraph{INFO:}When using the \textbf{cmake} command to generate the build system, \textbf{cmake} performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case, the three last lines of the console log of \textbf{•}{cmake} command should be: \begin{lstlisting}
+-- Configuring done 
+-- Generating done
+-- Build files have been written to: <YOUR/LOCAL/DIRECTORY/build>
 \end{lstlisting}
 
-\paragraph{}The command \textbf{make} will compile the build files.
+\paragraph{INFO:}The command \textbf{make} will compile the build files.
 
-\paragraph{}The command \textbf{make install} will install the library and others components in the defined install directory. 
+\paragraph{INFO:}The command \textbf{make install} will install the library and others components in the defined install directory. 
 
 
+
+
+
+
+% CODEBLOCKS
 \section{Build \& Install using Code Block}\label{sec:UnixInstallCodeBlock}
-progress...
+\paragraph{}When prerequisities listed in precedent section \ref{sec:RequiredTools} are checked, the FA$\mu$ST installation can be done : 
 
-\section{Build \& Install using Xcode (for MAC OS)}\label{sec:MacInstallXcode}
-
-The Faust tools can be generated using XCode on MAC OS. To do this, please follow these instructions :
 \begin{itemize}
-\item Download the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
-\item Open a command terminal
-\item Set the current directory to your local FA$\mu$ST directory (NOTE: do not use any special character in your FAUST directory path, for example the character $\mu$)
+\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
+\item \textbf{Open} a command terminal
+\item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
 mkdir build
 cd build
-cmake .. -G "Xcode"
+cmake .. -G "CodeBlocks - Unix Makefiles" -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
 
-\item \textbf{Open Xcode project} with the file \texttt{./build/FAUST.xcodeproj} and build all the targets.
-
+\item Open the FAUST project from the file \textbf{./build/FAUST.cbp} with Code::Blocks IDE. 
+\item In Code::Blocks IDE, select \textbf{ALL} target and build the project. 
+\item In Code::Blocks IDE, select \textbf{install} target and build the project. 
 \end{itemize}
+
+\paragraph{INFO:}When using the \textbf{cmake} command to generate the build system, \texttt{cmake} performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case, the three last lines of the console log of \texttt{cmake} command should be:
+\begin{lstlisting}
+-- Configuring done 
+-- Generating done 
+-- Build files have been written to: <YOUR/LOCAL/DIRECTORY/build>
+\end{lstlisting}
+The optional parameter \texttt{$-G "CodeBlocks - Unix Makefiles"$} allows to generate the Code Blocks project and the Unix Makefiles. The optional parameter -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>" allows to install the binaries on the selected directory. If not used, the \texttt{make install} process must be realized with administrator privilege because the library file \texttt{libfaust.a} is copied in an root path directory. 
+
+
+\section{Build \& Install using Xcode (for MAC OS)}\label{sec:MacInstallXcode}
+
+The building with IDE Xcode concerns only MAC OS X environment.
+\paragraph{}When prerequisities listed in precedent section \ref{sec:RequiredTools} are checked, the FA$\mu$ST installation can be done : 
+\begin{itemize}
+\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
+\item \textbf{Open} a command terminal
+\item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FAUST directory path, for example the character $\mu$)
+\item Type the following commands : 
+\begin{lstlisting}
+mkdir build
+cd build
+cmake .. -G "Xcode" -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
+\end{lstlisting}
+
+\item Open the FAUST project from the file \textbf{./build/FAUST.xcodeproj} with Xcode IDE. 
+\item In Xcode IDE, select \textbf{ALL} target and build the project. 
+\item In Xcode IDE, select \textbf{install} target and build the project. 
+\end{itemize}
+
+\paragraph{INFO:}When using the \textbf{cmake} command to generate the build system, \texttt{cmake} performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case, the three last lines of the console log of \texttt{cmake} command should be:
+\begin{lstlisting}
+-- Configuring done 
+-- Generating done 
+-- Build files have been written to: <YOUR/LOCAL/DIRECTORY/build>
+\end{lstlisting}
+The optional parameter \texttt{$-G "Xcode"$} allows to generate the XCode project. The optional parameter -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>" allows to install the binaries on the selected directory. If not used, the \texttt{make install} process must be realized with administrator privilege because the library file \texttt{libfaust.a} is copied in an root path directory. 
+
 
 \paragraph{NOTE:}You can generated the target using the terminal command \texttt{xcodebuild} :
 \begin{lstlisting}
