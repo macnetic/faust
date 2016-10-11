@@ -1,27 +1,66 @@
 \chapter{Installation on Windows platform}\label{sec:WinInstall}
 
-\paragraph{}The FA$\mu$ST project is based on C++ library available for both UNIX and Windows environments. The proposed toolbox provides a Matlab wrapper. CMake has been chosen to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software.
 
-\paragraph{}This chapter presents the steps to install the FA$\mu$ST tools on the Windows platform. Section \ref{sec:WinGettingStarted} presents the basic installation of FA$\mu$ST and Section \ref{sec:WinCustomInstall} corresponds to the advanced  installation.
+\paragraph{}The FA$\mu$ST project is based on \textbf{C++ library} available for both UNIX and Windows environments. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Windows platform.
+
+\paragraph{}Firstly, please ensure that the \textbf{prerequisites components} listed in Section \ref{sec:WinRequired} are installed. Then refer to the appropriate section : If you are more familiar with the graphical user interface, prefer the \textbf{Microsoft visual C++} compiler using the IDE "Visual Studio". Otherwise, if you are friendly with Unix tools and command line terminal, prefer \textbf{MinGW "Minimalist GNU for Windows"} C++ compiler using the command terminal.  
 
 
-\section{Getting Started} \label{sec:WinGettingStarted}
 
-\subsection{Required tools}\label{sec:WinRequired}
+
+\begin{itemize}
+\item Basic installation using \textbf{the command terminal}, refer to Section \ref{sec:WinBasicInstall}.
+\item Basic installation using \textbf{the IDE "Visual Studio"}, refer to Section \ref{sec:WinVisualStudioBasicInstall}. 
+\end{itemize}
+
+
+Finally in Section \ref{sec:WinCustomInstall}, the configure options available to build the FA$\mu$ST toolbox are described to propose an Custom - Advanced installation. For example, the optional configuration can be used to modify the install directory path, or to build in debug mode.  
+
+
+
+\section{Required components}\label{sec:WinRequired}
 The installation of the FA$\mu$ST tools depends on other components to be installed in order to run properly. 
 \begin{enumerate}
 
-\item \textbf{Install CMake} for building the FA$\mu$ST tools. 
-From \url{https://cmake.org/download/}, download Binary distributions correspond to your environment (in our case  cmake-3.6.1-win64-x64.zip). The directory of binary must be add to the environment PATH of your system if you want to use the cmake command line tool. 
+\item \textbf{Install CMake}: Download Binary distributions correspond to your environment from \url{https://cmake.org/download/}.
+\item \textbf{Verify CMake install} : Open a terminal and type the following command:
+\begin{lstlisting}
+where cmake
+\end{lstlisting}
+You should obtain the path of your \texttt{cmake.exe} binary file. If not, please add the directory of your \texttt{cmake.exe} file in your environment variable. (to add an environment variable, follow instructions in \ref{sec:ANNEXEEnvironmentVariableWindows}). 
 
+
+
+%The directory of binary must be add to the environment PATH of your system if you want to use the cmake command line tool. 
 % \item \textbf{Install 7-Zip} from \url{http://www.7-zip.org/}. 7-Zip is a file archiver used to extract external library files. Please verify that \texttt{7z.exe} is present in your environment PATH of your system.
 
-\item \textbf{Install Matlab} if not already done (MATLAB R2015b in our case). The builder of the FA$\mu$ST tools automatically checks your Matlab root directory if your \texttt{matlab.exe} is present in your environment Path and/or if your Matlab installation has been performed in a default directory like \texttt{"C:/Program Files/MATLAB/<R2015b>/bin/matlab.exe"} or \texttt{"C:/Program Files (x86)/MATLAB/<R2015b>/bin/matlab.exe"}. In case of several versions of Matlab installed in your system, you can force the directory of your preferred version of Matlab using the following system variable : \\
+\item \textbf{Install Matlab} (\url{https://fr.mathworks.com/downloads/})
+
+\item \textbf{Verify Matlab install} by typing in a terminal the following command : 
+\begin{lstlisting}
+which matlab
+which mex
+\end{lstlisting}
+You must obtain the path of your matlab and mex binaries files like: 
+\begin{lstlisting}
+/usr/local/bin/matlab
+/usr/local/bin/mex
+\end{lstlisting}
+If not, add \texttt{matlab} and \texttt{mex} binaries directories in your environment path (in your ~/.bashrc file). 
+
+\item \textbf{Install Matlab} The builder of the FA$\mu$ST tools automatically checks your Matlab root directory if your \texttt{matlab.exe} is present in your environment Path and/or if your Matlab installation has been performed in a default directory like \texttt{"C:/Program Files/MATLAB/<R2015b>/bin/matlab.exe"} or \texttt{"C:/Program Files (x86)/MATLAB/<R2015b>/bin/matlab.exe"}. In case of several versions of Matlab installed in your system, you can force the directory of your preferred version of Matlab using the following system variable : \\
 \texttt{MATLAB\_EXE\_DIR="C:/Program Files/MATLAB/<R2015b>/bin/matlab.exe"}
+
+
 
 \textit{Note for the case of using the compiler MinGW :} In Matlab, you must install MinGW version 4.9.2 from MATLAB using the \textbf{ADDON menu}. For more detail, please follow the instruction given in following link :  
 \url{http://fr.mathworks.com/help/matlab/matlab_external/install-mingw-support-package.html}. For that, you must have a id session for Mathwork. It is easy to create. 
 Current this latest step, an environment variable called MW\_MINGW64\_LOC is automatically generated. 
+
+
+
+
+
 
 \item \textbf{Install C++ Compiler:} Both \textbf{Microsoft visual C++} and \textbf{MinGW "Minimalist GNU for Windows"} compiler have been tested. If you are more familiar with the graphical user interface, prefer the \textbf{Microsoft visual C++} compiler. Otherwise, if you are friendly with Unix tools and command line terminal, preferd \textbf{MinGW "Minimalist GNU for Windows"} C++ compiler. The version of the C++ compiler must be coherent with the version of your Matlab version. In this documentation, the version of our C++ compiler corresponds to Matlab 2014 and 2015. If you use an other version of Matlab, please refer to the Mathworks website \url{http://fr.mathworks.com/support/compilers/<R20XXa>}.
 
@@ -44,23 +83,17 @@ Current this latest step, an environment variable called MW\_MINGW64\_LOC is aut
 \end{enumerate}
 
 
-\subsection{Required packages}\label{sec:WinRequiredPackages}
-\paragraph{}Here is a list of packages used in the FA$\mu$ST project. Eigen and OpenBlas library are automatically installed : there are nothing to do (see the directory "./externals/win/").
-\begin{itemize}
-\item \textbf{Eigen} is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms (see \url{http://eigen.tuxfamily.org}).
-\item \textbf{OpenBLAS} is an optimized BLAS library based on GotoBLAS2 1.13 BSD version. (see \url{http://www.openblas.net}). To install OpenBlas, refer to \url{https://github.com/xianyi/OpenBLAS/wiki/Installation-Guide}. You can directly download precompiled binary here \url{https://sourceforge.net/projects/openblas/files/v0.2.14/}
-
-\end{itemize}
 
 
-\subsection{Basic build and Installation}\label{sec:WinBasicInstall}
+
+\section{Basic Build \& Installation}\label{sec:WinBasicInstall}
 \paragraph{}When prerequisites listed in previous section \ref{sec:WinRequired} are checked, the FA$\mu$ST installation can be done. 
 First download the FA$\mu$ST package on the website  \url{http://faust.gforge.inria.fr/}. 
 
 Depending to your C++ compiler (MinGW or Visual studio), refer to the right part and follow the given instructions.
 \\
 
-\subsubsection{Using MinGW compiler:}
+\section{Basic Build \& Install Using MinGW compiler:}
 \label{sec:WinMinGWBasicInstall}
 
 \begin{itemize}
@@ -80,7 +113,7 @@ make install % run with administrator privilege
 
 \end{itemize}
 
-\subsubsection{Using Visual Studio compiler:}\label{sec:WinVisualStudioBasicInstall}
+\section{Basic Build \& Install Using Visual Studio IDE}\label{sec:WinVisualStudioBasicInstall}
 \paragraph{}In the case of \textbf{Microsoft Visual Studio 2013 compiler using the Graphical Users Interfaces}:
 \begin{enumerate}
 \item Open application \texttt{cmake-GUI.exe} from the program menu or from your cmake install binaries directory  to launch the CMake configuration application:
@@ -142,6 +175,5 @@ cmake --build . --config "Release" --target "install"
 \section{Custom - Advanced Installation}\label{sec:WinCustomInstall}
 
 progress... 
-
 
 
