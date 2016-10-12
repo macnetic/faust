@@ -12,20 +12,22 @@
 \section{Compatibility between MATLAB and compiler gcc}\label{sec:ANNEXECompatibilityMatlabCompiler}
 \paragraph{Compatibility between MATLAB and compiler gcc} \textbf{Adjust your version of GCC compiler} in order to run the installation properly. The use of the mex function in Matlab requires that you have a third-party compiler installed on your system. The latest version of Matlab (2016a in our case) only supports up to GCC 4.7 (see \url{http://fr.mathworks.com/support/compilers/R2016a/index.html?sec=glnxa64} for more detail).
 To temporally change your version of gcc compiler, you can modify the environment variable CC an CXX: 
+\begin{itemize}
 \item \textbf{export CC and CXX variables} corresponding to gcc and g++ binaries path :\\
-find your gcc and g++ version path using \texttt{which} command in a terminal :
+\item find your gcc and g++ version path using \texttt{which} command in a terminal :
 \begin{lstlisting}
 which gcc
 which g++
 \end{lstlisting}
 
-Open your ~/.bashrc file and save the return-path of gcc and g++ like : \\
+\item Open your ~/.bashrc file and save the return-path of gcc and g++ like : \\
 \begin{lstlisting}
 # export version of gcc
 export CC=/usr/lib64/ccache/gcc
 export CXX=/usr/lib64/ccache/g++
 \end{lstlisting}
 \end{itemize}
+
 You can change the version of compiler use by mex function from matlab command: 
 \begin{lstlisting}
 mex -setup
@@ -68,7 +70,7 @@ The \texttt{cmake} optional parameter \texttt{-G "Xcode"} allows to generate the
 
 
 \section{Add environment variable on Windows platform}\label{sec:ANNEXEEnvironmentVariableWindows}
-To add an environment variable in Windows 7:
+Here is the steps to add an environment variable in Windows 7.
 \begin{enumerate}
 \item From the Desktop, right-click the Computer icon and select Properties. If you don't have a Computer icon on your desktop, click the Start button, right-click the Computer option in the Start menu, and select Properties.
 \item Click the Advanced System Settings link in the left column.
