@@ -5,18 +5,17 @@
 
 \begin{itemize}
 \item Firstly, please ensure that the \textbf{prerequisites components} listed in Section \ref{sec:WinRequired} are installed. 
-\item Secondly, choose and install your preferred compiler between GCC from MinGW (Section \ref{sec:WinInstallCompilerMinGW}) or compiler from microsoft visual studio (Section \ref{sec:WinInstallCompilerVS}).
-\item Then, process to Basic installation using \textbf{the command terminal} (refer to Section \ref{sec:WinBasicInstall}) or Basic installation using \textbf{the IDE "Visual Studio"} (refer to Section \ref{sec:WinVisualStudioBasicInstall}).
+
+\item Secondly, \textbf{choose your preferred compiler} between GCC from MinGW "Minimalist GNU for Windows"(Section \ref{sec:WinInstallMinGW}) or from microsoft visual studio (Section \ref{sec:WinInstallVS}) in view to install FA$\mu$ST tool. 
+
+\item Then, \textbf{process to Basic installation} of FA$\mu$ST tool by following instructions given in the appropriate section according to the type of compiler (MinGW or Microsoft Visual) and the use (or not) of an IDE (Integrated Development Environment). 
 \end{itemize}
 
 
 %Then refer to the appropriate section : If you are more familiar with the graphical user interface, prefer the basic installation using \textbf{"the IDE Visual Studio"}. Otherwise, if you are friendly with Unix tools and command line terminal, prefer the basic installation using \textbf{the command terminal}: 
 
 
-Section \ref{sec:WinCustomInstall} presents the configure options available to build the FA$\mu$ST toolbox are described to propose an Custom - Advanced installation. For example, the optional configuration can be used to modify the install directory path, or to build in debug mode.  
-
-%\textbf{Microsoft visual C++} compiler using the IDE 
-%\textbf{MinGW "Minimalist GNU for Windows"} C++ compiler using
+Section \ref{sec:WinCustomInstall} describes the configure options available to build the FA$\mu$ST toolbox, to propose an Custom - Advanced installation. For example, the optional configuration can be used to modify the install directory path, or to build in debug mode.  
 
 
 \section{Required components}\label{sec:WinRequired}
@@ -67,24 +66,14 @@ If not, verify that the 7-Zip install directory is without any space character. 
 \end{itemize}
 
 
-\subsection{Compiler Install}\label{sec:WinInstallCompiler}
-\paragraph{}Both \textbf{Microsoft visual C++} from visual studio and \textbf{GCC} from MinGW "Minimalist GNU for Windows" compilers have been tested. 
+\section{Install using GCC-MinGW compiler}\label{sec:WinInstallMinGW}
 
-%If you are more familiar with the graphical user interface, prefer the \textbf{Microsoft visual C++} compiler. Otherwise, if you are friendly with Unix tools and command line terminal, preferd \textbf{MinGW "Minimalist GNU for Windows"} C++ compiler. The version of the C++ compiler must be coherent with the version of your Matlab version. In this documentation, the version of our C++ compiler corresponds to Matlab 2014 and 2015. If you use an other version of Matlab, please refer to the Mathworks website \url{http://fr.mathworks.com/support/compilers/<R20XXa>}.
-
-\subsubsection{Microsoft visual C++}\label{sec:WinInstallCompilerVS} \begin{itemize}
-\item Download Microsoft Visual Studio Professional 2013 from \url{https://www.microsoft.com/en-US/download/details.aspx?id=44916}
-\item Install Microsoft Visual Studio Professional 2013
-% \item Download and install Microsoft .NET Framework 4
-% \item Download and install Microsoft SDK 7.1
-\end{itemize}
-Then, the FA$\mu$ST installation can be done with Visual Studio IDE, following instructions given in Section \ref{sec:WinVisualStudioBasicInstall}. 
+\paragraph{}When prerequisites listed in previous section \ref{sec:WinRequired} are checked, you must install \textbf{MinGW containing the C++ Compiler}. 
+Then, the FA$\mu$ST installation can be done using Command prompt, following instructions given in Section \ref{sec:WinMinGWBasicInstall} or using CodeBlocks IDE, following instructions given in Section \ref{sec:WinCodeBlocksBasicInstall}. 
 
 
-\subsubsection{GCC from MinGW}
+\subsection{Install GCC from MinGW}
 \label{sec:WinInstallCompilerMinGW}
-
-\paragraph{}When prerequisites listed in previous section \ref{sec:WinRequired} are checked, you must install \textbf{MinGW containing the C++ Compiler}
 
 \begin{itemize}
 \item \textbf{Download MinGW} in \url{https://sourceforge.net/projects/mingw/files/latest/download?source=files}
@@ -112,18 +101,14 @@ If not, verify that the MINGW install directory is without any space character. 
 \item From Matlab IDE, you must install MinGW version 4.9.2 using the \textbf{ADDON menu}. For more detail, please follow the instruction given in following link :  
 \url{http://fr.mathworks.com/help/matlab/matlab_external/install-mingw-support-package.html}. For that, you must have a id session for Mathwork (easy to create). Current this latest step, an environment variable called MW\_MINGW64\_LOC is automatically generated. 
 \end{itemize}
-Then, the FA$\mu$ST installation can be done with :
-\begin{itemize}
-\item Command prompt, following instructions given in Section \ref{sec:WinMinGWBasicInstall} 
-\item CodeBlocks IDE, following instructions given in Section \ref{sec:WinCodeBlocksBasicInstall} 
-\end{itemize}
 
 
-
-\section{Basic Build \& Install using the command prompt}
+\subsection{Basic Build \& Install using the command prompt}
 \label{sec:WinMinGWBasicInstall}
-This section concerns the GCC compiler from MinGW install.
-\subsection{Install with administrator privilege}
+
+The basic install described in this section requires the GCC compiler from MinGW (see precedent Section \ref{sec:WinInstallCompilerMinGW}).
+If you have administrator privilege, follow instructions in Section \ref{sec:WinMinGWadminBasicInstall}, otherwise follow instructions given in Section \ref{sec:WinMinGWNoAdminBasicInstall}.
+\subsubsection{Install with administrator privilege}
 \label{sec:WinMinGWadminBasicInstall}
 \begin{itemize}
 \item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
@@ -147,7 +132,7 @@ make install
 \end{lstlisting}
 \end{itemize}
 
-\subsection{Install without administrator privilege}
+\subsubsection{Install without administrator privilege}
 \label{sec:WinMinGWNoAdminBasicInstall}
 
 \begin{itemize}
@@ -161,20 +146,25 @@ make install
 mkdir build
 cd build
 cmake -G "MinGW Makefiles" .. 
-	  - DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
+	  -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
 make
 make install 
 \end{lstlisting}
 \end{itemize}
 
 
-\section{Basic build \& Install using Code::Blocks IDE}
+\subsection{Basic build \& Install using Code::Blocks IDE}
 \label{sec:WinCodeBlocksBasicInstall}
-This section concerns the GCC compiler from MinGW install.
-\paragraph{}When prerequisites listed in previous section \ref{sec:WinRequired} are checked, you must install \textbf{MinGW containing the C++ Compiler}. For MinGW install, please refer to precedent Section \ref{sec:WinBasicInstall}). 
-You must select the gcc compiler in the IDE codeBlocks in the \\ \texttt{Settings menu --> Compiler... --> Selected Compiler }  
+
+The basic install described in this section requires the GCC compiler from MinGW (see precedent Section \ref{sec:WinInstallCompilerMinGW}).
+If you have administrator privilege, follow instructions in Section \ref{sec:WinMinGWCodeBlocksAdminBasicInstall}, otherwise follow instructions given in Section \ref{sec:WinMinGWCodeBlocksNoAdminBasicInstall}.
+
+You must select the gcc compiler in the IDE code::Blocks in the \\ \texttt{Settings menu --> Compiler... --> Selected Compiler }  
 
 Then, the FA$\mu$ST installation can be done. 
+
+\subsubsection{Install with administrator privilege}
+\label{sec:WinMinGWCodeBlocksAdminBasicInstall}
 \begin{itemize}
 \item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
 \item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
@@ -189,26 +179,130 @@ cmake -G "CodeBlocks - MinGW Makefiles" ..
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.cbp} with Code::Blocks IDE.
 \item In Code::Blocks IDE, select ALL target and build the project.
+\item Re-Open the FA$\mu$ST project from the file ./build/FAUST.cbp with Code::Blocks IDE \textbf{with administrator privilege}. For that, right-click on the Code::Blocks icon and select "run as administrator". 
+\item In Code::Blocks IDE, select INSTALL target and build the project.
+For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
+\end{itemize}
+
+\subsubsection{Install without administrator privilege}
+\label{sec:WinMinGWCodeBlocksNoAdminBasicInstall}
+\begin{itemize}
+\item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
+\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
+
+\item Open a command terminal
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Type the following commands : 
+\begin{lstlisting}
+mkdir build
+cd build
+cmake -G "CodeBlocks - MinGW Makefiles" .. 
+	  -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
+\end{lstlisting}
+\item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.cbp} with Code::Blocks IDE.
+\item In Code::Blocks IDE, select ALL target and build the project.
 \item In Code::Blocks IDE, select install target and build the project.
 For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 \end{itemize}
 
 
-\section{Basic Build \& Install Using Visual Studio IDE}\label{sec:WinVisualStudioBasicInstall}
-This section concerns the use of Microsoft Visual Studio compiler.
-
-\paragraph{}In the case of \textbf{Microsoft Visual Studio 2013 compiler using the Graphical Users Interfaces}:
-
-\begin{enumerate}
-\item Once the build system configured then generated, you have to actually build FAUST, using Visual Studio.
-\item Open file "faust.sln" with visual studio 
-\item Click right on Target ALL\_BUILD and select generated 
-\item Click right on Target INSTALL and select generated 
-\item Click right on Target CTEST and select generated 
-\end{enumerate}
 
 
-\bigbreak
+
+% MICCORSOFT VISUAL STUDIO
+\section{Install using Microsoft visual compiler}\label{sec:WinInstallVS}
+
+\paragraph{}When prerequisites listed in section \ref{sec:WinRequired} are checked, you must install \textbf{Microsoft Visual studio} containing the C++ Compiler (Section \ref{sec:WinInstallCompilerVS}).
+Then, the FA$\mu$ST installation can be done using Command prompt, following instructions given in Section \ref{sec:WinMinGWBasicInstall} or using Visual Studio IDE, following instructions given in Section \ref{sec:WinCodeBlocksBasicInstall}. 
+
+
+
+%If you are more familiar with the graphical user interface, prefer the \textbf{Microsoft visual C++} compiler. Otherwise, if you are friendly with Unix tools and command line terminal, preferd \textbf{MinGW "Minimalist GNU for Windows"} C++ compiler. The version of the C++ compiler must be coherent with the version of your Matlab version. In this documentation, the version of our C++ compiler corresponds to Matlab 2014 and 2015. If you use an other version of Matlab, please refer to the Mathworks website \url{http://fr.mathworks.com/support/compilers/<R20XXa>}.
+
+\subsection{Install Microsoft visual compiler}\label{sec:WinInstallCompilerVS} 
+
+\begin{itemize}
+\item Download Microsoft Visual Studio Professional 2013 from \url{https://www.microsoft.com/en-US/download/details.aspx?id=44916}
+\item Install Microsoft Visual Studio Professional 2013
+% \item Download and install Microsoft .NET Framework 4
+% \item Download and install Microsoft SDK 7.1
+\end{itemize}
+Then, the FA$\mu$ST installation can be done with Visual Studio IDE, following instructions given in Section \ref{sec:WinVisualStudioBasicInstall} or with a terminal (Section \ref{sec:WinVisualStudioTerminalBasicInstall}. 
+
+\subsection{Basic Build \& Install Using Visual Studio IDE}\label{sec:WinVisualStudioBasicInstall}
+The basic install described in this section requires the Microsoft visual studio compiler (see precedent Section \ref{sec:WinInstallCompilerVS}).
+If you have administrator privilege, follow instructions in Section \ref{sec:AdminWinVisualStudioBasicInstall}, otherwise follow instructions given in Section \ref{sec:NoAdminWinVisualStudioBasicInstall}.
+
+\subsubsection{Install with administrator privilege}
+\label{sec:AdminWinVisualStudioBasicInstall}
+\begin{itemize}
+\item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
+\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
+
+\item Open a command terminal
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Type the following commands : 
+\begin{lstlisting}
+mkdir build
+cd build
+cmake .. 
+\end{lstlisting}
+\item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with visual studio IDE.
+\item In visual studio IDE, select ALL target and generate the project.
+\item Re-Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with visual studio IDE with \textbf{administrator privilege}.
+\item In visual studio IDE, select install target and generate the project.
+For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
+\end{itemize}
+
+ 
+\subsubsection{Install without administrator privilege}
+\label{sec:NoAdminWinVisualStudioBasicInstall}
+
+\begin{itemize}
+\item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
+\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
+
+\item Open a command terminal
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Type the following commands : 
+\begin{lstlisting}
+mkdir build
+cd build
+cmake .. -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
+\end{lstlisting}
+\item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual studio IDE.
+\item In Visual studio IDE, select ALL target and generate the project.
+\item In Visual studio IDE, select install target and generate the project.
+For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
+
+\end{itemize}
+
+\subsection{Basic Build \& Install Using terminal}\label{sec:WinVisualStudioTerminalBasicInstall}
+The basic install described in this section requires the Microsoft visual studio compiler (see precedent Section \ref{sec:WinInstallCompilerVS}).
+If you have administrator privilege, follow instructions in Section \ref{sec:AdminWinVisualStudioTerminalBasicInstall}, otherwise follow instructions given in Section \ref{sec:NoAdminWinVisualStudioTerminalBasicInstall}.
+
+\subsubsection{Install with administrator privilege}
+\label{sec:AdminWinVisualStudioTerminalBasicInstall}
+
+\begin{itemize}
+\item Open a command terminal
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Type the following commands : 
+
+\begin{lstlisting}
+mkdir build
+cd build
+cmake ..
+\end{lstlisting}
+\item Re-Open a command terminal \textbf{with administrator privilege} 
+\begin{lstlisting}
+cmake --build . --config "Release" --target "install"
+\end{lstlisting}
+\end{itemize}
+
+\subsubsection{Install without administrator privilege}
+\label{sec:NoAdminWinVisualStudioTerminalBasicInstall}
+
 \paragraph{NOTE:}In the case of \textbf{Microsoft Visual Studio 2013 compiler using the command terminal} :
 
 \begin{itemize}
@@ -219,11 +313,14 @@ This section concerns the use of Microsoft Visual Studio compiler.
 \begin{lstlisting}
 mkdir build
 cd build
-cmake .. 
+cmake .. -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>" 
 cmake --build . --config "Release" --target "install"
 \end{lstlisting}
-
 \end{itemize}
+
+
+
+
 
 
 \section{Custom - Advanced Installation}\label{sec:WinCustomInstall}
