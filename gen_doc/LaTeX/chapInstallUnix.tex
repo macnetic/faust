@@ -1,6 +1,6 @@
 \chapter{Installation on Linux and MAC OS X platform}\label{sec:InstallUnix}
 
-\paragraph{}The FA$\mu$ST project is based on \textbf{C++ library} available for both UNIX and Windows environments. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS). 
+\paragraph{}The FA$\mu$ST project is based on \textbf{C++ library} available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS). 
 
 \paragraph{}Firstly, please ensure that the \textbf{prerequisites components} listed in Section \ref{sec:RequiredTools} are installed. Then refer to the appropriate section following the use (or not) of an IDE (Integrated Development Environment): 
 \begin{itemize}
@@ -17,10 +17,10 @@ This Section lists the required components you must install before to begin the 
 \item \textbf{Install CMake}. Visit the website \url{https://cmake.org/} to process to the installation.
 \item \textbf{Verify Cmake install} by typing in a command terminal : 
 \begin{lstlisting}
-which cmake
+> which cmake
 \end{lstlisting}
 The command terminal returns the path of your Cmake binary file like
-\begin{lstlisting}
+\begin{lstlisting}[backgroundcolor=\color{white}]
 /usr/bin/cmake
 \end{lstlisting}
 If not, add Cmake binary directory in the environment path. (in your ~/.bashrc file)
@@ -29,10 +29,10 @@ If not, add Cmake binary directory in the environment path. (in your ~/.bashrc f
 
 \item \textbf{Verify Matlab install} by typing in a terminal the following command : 
 \begin{lstlisting}
-which matlab
+> which matlab
 \end{lstlisting}
 You must obtain the path of your matlab binary file like: 
-\begin{lstlisting}
+\begin{lstlisting}[backgroundcolor=\color{white}]
 /usr/local/bin/matlab
 \end{lstlisting}
 If not, add \texttt{matlab} binary directory in your environment path (in your ~/.bashrc file). 
@@ -52,11 +52,11 @@ If not, add \texttt{matlab} binary directory in your environment path (in your ~
 \item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake ..
-make
-sudo make install % run with administrator privilege
+> mkdir build
+> cd build
+> cmake ..
+> make
+> sudo make install % run with administrator privilege
 \end{lstlisting}
 \end{itemize}
 
@@ -72,11 +72,11 @@ For more detail about \texttt{cmake ; make ; make install} commands, refer to Se
 \item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
-make
-make install
+> mkdir build
+> cd build
+> cmake .. -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
+> make
+> make install
 \end{lstlisting}
 \end{itemize}
 
@@ -97,16 +97,16 @@ For more detail about \texttt{cmake ; make ; make install} commands, refer to Se
 \item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake .. -G "CodeBlocks - Unix Makefiles"
+> mkdir build
+> cd build
+> cmake .. -G "CodeBlocks - Unix Makefiles"
 \end{lstlisting}
 
 \item Open the FA$\mu$ST project from the file \textbf{./build/FAUST.cbp} with Code::Blocks IDE. 
 \item In Code::Blocks IDE, select \textbf{ALL} target and build the project. 
 \item Open the FA$\mu$ST project from the file \textbf{./build/FAUST.cbp} with Code::Blocks IDE \textbf{with administrator privilege}. For that, type in a terminal :
 \begin{lstlisting}
-sudo codeblocks
+> sudo codeblocks
 \end{lstlisting}
 \item In Code::Blocks IDE, select \textbf{install} target and build the project. 
 \end{itemize}
@@ -122,10 +122,10 @@ For more detail about \texttt{cmake} commands, refer to Section \ref{sec:ANNEXEI
 \item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake .. -G "CodeBlocks - Unix Makefiles"
-		 -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
+> mkdir build
+> cd build
+> cmake .. -G "CodeBlocks - Unix Makefiles"
+  		   -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
 
 \item Open the FA$\mu$ST project from the file \textbf{./build/FAUST.cbp} with Code::Blocks IDE. 
@@ -151,16 +151,16 @@ FA$\mu$ST install using the IDE Xcode concerns only MAC OS X environment.
 \item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake .. -G "Xcode"
+> mkdir build
+> cd build
+> cmake .. -G "Xcode"
 \end{lstlisting}
 
 \item Open the FA$\mu$ST project from the file \textbf{./build/FAUST.xcodeproj} with Xcode IDE. 
 \item In Xcode IDE, select \textbf{ALL} target and build the project. 
 \item Open the FA$\mu$ST project from the file \textbf{./build/FAUST.xcodeproj} with Xcode IDE \textbf{with administrator privilege}. For that, type in a terminal:
 \begin{lstlisting}
-sudo Xcode
+> sudo Xcode
 \end{lstlisting}
 \item In Xcode IDE, select \textbf{install} target and build the project. 
 \end{itemize}
@@ -177,10 +177,10 @@ For more detail about \texttt{cmake} command, refer to Section \ref{sec:ANNEXEIn
 \item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake .. -G "Xcode" 
-		 -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
+> mkdir build
+> cd build
+> cmake .. -G "Xcode" 
+		   -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
 
 \item Open the FA$\mu$ST project from the file \textbf{./build/FAUST.xcodeproj} with Xcode IDE. 
@@ -192,15 +192,15 @@ For more detail about \texttt{cmake} commands, refer to Section \ref{sec:ANNEXEI
 
 %\paragraph{NOTE:}You can generated the target using the terminal command \texttt{xcodebuild} :
 %\begin{lstlisting}
-%mkdir build
-%cd build
-%cmake .. -G "Xcode"
+%> mkdir build
+%> cd build
+%> cmake .. -G "Xcode"
 %%% list all target of the project
-%xcodebuild -list -project FAUST.xcodeproj 
+%> xcodebuild -list -project FAUST.xcodeproj 
 %%% Build the targets
-%xcodebuild -configuration "Release" -target "ALL_BUILD" build 
+%> xcodebuild -configuration "Release" -target "ALL_BUILD" build 
 %%% performs the "make install"
-%xcodebuild -configuration "Release" -target "install" build 
+%> xcodebuild -configuration "Release" -target "install" build 
 %\end{lstlisting}
 
 
@@ -240,20 +240,19 @@ For more detail about \texttt{cmake} commands, refer to Section \ref{sec:ANNEXEI
 \paragraph{}Following the selected option, the cmake installer automatically checks the dependent component (library OpenBlas, eigen, matio, libxml2).  
 
 %\section{Optional dependent tools}\label{sec:OptionalRequiredTools}
-\paragraph{Optional Install of GPU process}
-\begin{itemize}
-\item \textbf{Install} CUDA and the drivers for NVIDIA.
-\item \textbf{Verify install} of GPU tools by typing in a terminal : 
-\begin{lstlisting}
-which nvcc
-\end{lstlisting}
-You must obtain the path of your \texttt{nvcc} compiler like 
-\begin{lstlisting}
-/usr/local/cuda-7.5/bin/nvcc
-\end{lstlisting}
-If not, add \texttt{nvcc} directory in your environment path (in your ~/.bashrc file). 
-\end{itemize}
 
-
+%\paragraph{Optional Install of GPU process}
+%\begin{itemize}
+%\item \textbf{Install} CUDA and the drivers for NVIDIA.
+%\item \textbf{Verify install} of GPU tools by typing in a terminal : 
+%\begin{lstlisting}
+%> which nvcc
+%\end{lstlisting}
+%You must obtain the path of your \texttt{nvcc} compiler like 
+%\begin{lstlisting}[backgroundcolor=\color{white}]
+%/usr/local/cuda-7.5/bin/nvcc
+%\end{lstlisting}
+%If not, add \texttt{nvcc} directory in your environment path (in your ~/.bashrc file). 
+%\end{itemize}
 
 

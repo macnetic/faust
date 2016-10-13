@@ -1,14 +1,14 @@
 \chapter{Installation on Windows platform}\label{sec:WinInstall}
 
 
-\paragraph{}The FA$\mu$ST project is based on \textbf{C++ library} available for both UNIX and Windows environments. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Windows platform.
+\paragraph{}The FA$\mu$ST project is based on \textbf{C++ library} available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Windows platform.
 
 \begin{itemize}
 \item Firstly, please ensure that the \textbf{prerequisites components} listed in Section \ref{sec:WinRequired} are installed. 
 
-\item Secondly, \textbf{choose your preferred compiler} between GCC from MinGW "Minimalist GNU for Windows"(Section \ref{sec:WinInstallMinGW}) or from microsoft visual studio (Section \ref{sec:WinInstallVS}) in view to install FA$\mu$ST tool. 
+\item Secondly, \textbf{choose your preferred compiler} between GCC from MinGW "Minimalist GNU for Windows"(Section \ref{sec:WinInstallMinGW}) or from Microsoft Visual Studio (Section \ref{sec:WinInstallVS}. 
 
-\item Then, \textbf{process to Basic installation} of FA$\mu$ST tool by following instructions given in the appropriate section according to the type of compiler (MinGW or Microsoft Visual) and the use (or not) of an IDE (Integrated Development Environment). 
+\item Then, \textbf{process to Basic installation} of FA$\mu$ST tool by following instructions given in the appropriate section, depending to the kind of compiler (MinGW or Microsoft Visual) and the use (or not) of an IDE (Integrated Development Environment). 
 \end{itemize}
 
 
@@ -25,27 +25,28 @@ The installation of the FA$\mu$ST tool depends on other components to be install
 \item \textbf{Install CMake}: Download Binary distributions correspond to your environment from \url{https://cmake.org/download/}.
 \item \textbf{Verify CMake install} : Open a terminal and type the following command:
 \begin{lstlisting}
-where cmake
+> where cmake
 \end{lstlisting}
 You should obtain the path of your \texttt{cmake.exe} binary file. If not, verify that the CMAKE install directory is without any space character. Otherwise, please add the directory of your \texttt{cmake.exe} file in your environment variable. (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). 
 
 \item \textbf{Install Matlab} (\url{https://fr.mathworks.com/downloads/}). You must install Matlab in the default directory like:
-\begin{lstlisting} 
+%\lstset{backgroundcolor=\color{white}}
+\begin{lstlisting}[backgroundcolor=\color{white}] 
 C:\Program Files\MATLAB
 C:\Program Files (x86)\MATLAB
 \end{lstlisting}
 or install Matlab in a directory without any space character.
 
 \item \textbf{Verify Matlab install} by checking the \texttt{matlab.exe} binary file in the default directory, for example in  
-\begin{lstlisting} 
+\begin{lstlisting}[backgroundcolor=\color{white}]
 C:\Program Files\MATLAB\<R2015b>\bin\matlab.exe
 \end{lstlisting}
 In the case of an installation in a directory without any space character, type in a terminal the following command : 
 \begin{lstlisting}
-where matlab
+> where matlab
 \end{lstlisting}
 You must obtain the path of your matlab binary file like: 
-\begin{lstlisting}
+\begin{lstlisting}[backgroundcolor=\color{white}]
 C:\ProgramFiles\MATLAB\<R2015b>\bin\matlab.exe
 \end{lstlisting}
 If not, please add the directory of your \texttt{matlab.exe} file in your environment variable. (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). 
@@ -54,10 +55,10 @@ If not, please add the directory of your \texttt{matlab.exe} file in your enviro
 \item \textbf{Install 7-zip tool} from \url{http://www.7-zip.org/} in a install directory without any space character. 
 \item \textbf{Verify 7-zip install} by typing in a terminal the following command : 
 \begin{lstlisting}
-where 7z
+> where 7z
 \end{lstlisting}
 You must obtain the path of your \texttt{7z.exe} binary file: 
-\begin{lstlisting}
+\begin{lstlisting}[backgroundcolor=\color{white}]
 C:\program\7-Zip\7z.exe
 \end{lstlisting}
 If not, verify that the 7-Zip install directory is without any space character. Otherwise, add \texttt{7z.exe} directory in your environment path. 
@@ -82,10 +83,10 @@ Then, the FA$\mu$ST installation can be done using Command prompt, following ins
 (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). 
 \item \textbf{Verify MinGW install} by typing in a terminal the following command : 
 \begin{lstlisting}
-where gcc
+> where gcc
 \end{lstlisting}
 You must obtain the path of your \texttt{gcc.exe} binary file: 
-\begin{lstlisting}
+\begin{lstlisting}[backgroundcolor=\color{white}]
 C:\mingw-w64\mingw64\bin\gcc.exe
 \end{lstlisting}
 If not, add \texttt{gcc.exe} directory in your environment path. 
@@ -93,7 +94,7 @@ If not, add \texttt{gcc.exe} directory in your environment path.
 
 \item \textbf{Verify make tool:} In a terminal command, type
 \begin{lstlisting}
-where make
+> where make
 \end{lstlisting}
 You must obtain the path of your \texttt{make.exe} binary file. 
 If not, verify that the MINGW install directory is without any space character. Otherwise, please check if \texttt{make.exe} file is present in MINGW install directory. If not, you can copy and rename \texttt{mingw32-make.exe} to \texttt{make.exe}.
@@ -113,22 +114,25 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Win
 \begin{itemize}
 \item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
 \item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
+\begin{lstlisting}
+> 7z x FAUST-Source-2.0.0.zip
+\end{lstlisting}
 
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake -G "MinGW Makefiles" .. 
-make
+> mkdir build
+> cd build
+> cmake -G "MinGW Makefiles" .. 
+> make
 \end{lstlisting}
 
 \item Open a command terminal \textbf{with administrator privilege} : right click on command prompt icon and select run as administrator. 
 \item Set the current directory to your FA$\mu$ST directory
 \item Type the following commands : 
 \begin{lstlisting}
-make install 
+> make install 
 \end{lstlisting}
 \end{itemize}
 
@@ -138,17 +142,19 @@ make install
 \begin{itemize}
 \item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
 \item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-
+\begin{lstlisting}
+> 7z x FAUST-Source-2.0.0.zip
+\end{lstlisting}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake -G "MinGW Makefiles" .. 
-	  -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
-make
-make install 
+> mkdir build
+> cd build
+> cmake -G "MinGW Makefiles" .. 
+	    -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
+> make
+> make install 
 \end{lstlisting}
 \end{itemize}
 
@@ -168,14 +174,16 @@ Then, the FA$\mu$ST installation can be done.
 \begin{itemize}
 \item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
 \item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-
+\begin{lstlisting}
+> 7z x FAUST-Source-2.0.0.zip
+\end{lstlisting}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake -G "CodeBlocks - MinGW Makefiles" .. 
+> mkdir build
+> cd build
+> cmake -G "CodeBlocks - MinGW Makefiles" .. 
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.cbp} with Code::Blocks IDE.
 \item In Code::Blocks IDE, select ALL target and build the project.
@@ -189,15 +197,17 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \begin{itemize}
 \item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
 \item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-
+\begin{lstlisting}
+> 7z x FAUST-Source-2.0.0.zip
+\end{lstlisting}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake -G "CodeBlocks - MinGW Makefiles" .. 
-	  -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
+> mkdir build
+> cd build
+> cmake -G "CodeBlocks - MinGW Makefiles" .. 
+	    -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.cbp} with Code::Blocks IDE.
 \item In Code::Blocks IDE, select ALL target and build the project.
@@ -210,16 +220,16 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 
 
 % MICCORSOFT VISUAL STUDIO
-\section{Install using Microsoft visual compiler}\label{sec:WinInstallVS}
+\section{Install using Microsoft Visual compiler}\label{sec:WinInstallVS}
 
-\paragraph{}When prerequisites listed in section \ref{sec:WinRequired} are checked, you must install \textbf{Microsoft Visual studio} containing the C++ Compiler (Section \ref{sec:WinInstallCompilerVS}).
+\paragraph{}When prerequisites listed in section \ref{sec:WinRequired} are checked, you must install \textbf{Microsoft Visual Studio} containing the C++ Compiler (Section \ref{sec:WinInstallCompilerVS}).
 Then, the FA$\mu$ST installation can be done using Command prompt, following instructions given in Section \ref{sec:WinMinGWBasicInstall} or using Visual Studio IDE, following instructions given in Section \ref{sec:WinCodeBlocksBasicInstall}. 
 
 
 
-%If you are more familiar with the graphical user interface, prefer the \textbf{Microsoft visual C++} compiler. Otherwise, if you are friendly with Unix tools and command line terminal, preferd \textbf{MinGW "Minimalist GNU for Windows"} C++ compiler. The version of the C++ compiler must be coherent with the version of your Matlab version. In this documentation, the version of our C++ compiler corresponds to Matlab 2014 and 2015. If you use an other version of Matlab, please refer to the Mathworks website \url{http://fr.mathworks.com/support/compilers/<R20XXa>}.
+%If you are more familiar with the graphical user interface, prefer the \textbf{Microsoft Visual C++} compiler. Otherwise, if you are friendly with Unix tools and command line terminal, preferd \textbf{MinGW "Minimalist GNU for Windows"} C++ compiler. The version of the C++ compiler must be coherent with the version of your Matlab version. In this documentation, the version of our C++ compiler corresponds to Matlab 2014 and 2015. If you use an other version of Matlab, please refer to the Mathworks website \url{http://fr.mathworks.com/support/compilers/<R20XXa>}.
 
-\subsection{Install Microsoft visual compiler}\label{sec:WinInstallCompilerVS} 
+\subsection{Install Microsoft Visual compiler}\label{sec:WinInstallCompilerVS} 
 
 \begin{itemize}
 \item Download Microsoft Visual Studio Professional 2013 from \url{https://www.microsoft.com/en-US/download/details.aspx?id=44916}
@@ -229,8 +239,8 @@ Then, the FA$\mu$ST installation can be done using Command prompt, following ins
 \end{itemize}
 Then, the FA$\mu$ST installation can be done with Visual Studio IDE, following instructions given in Section \ref{sec:WinVisualStudioBasicInstall} or with a terminal (Section \ref{sec:WinVisualStudioTerminalBasicInstall}. 
 
-\subsection{Basic Build \& Install Using Visual Studio IDE}\label{sec:WinVisualStudioBasicInstall}
-The basic install described in this section requires the Microsoft visual studio compiler (see precedent Section \ref{sec:WinInstallCompilerVS}).
+\subsection{Basic Build \& Install using Visual Studio IDE}\label{sec:WinVisualStudioBasicInstall}
+The basic install described in this section requires Microsoft Visual Studio (see precedent Section \ref{sec:WinInstallCompilerVS}).
 If you have administrator privilege, follow instructions in Section \ref{sec:AdminWinVisualStudioBasicInstall}, otherwise follow instructions given in Section \ref{sec:NoAdminWinVisualStudioBasicInstall}.
 
 \subsubsection{Install with administrator privilege}
@@ -238,19 +248,21 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 \begin{itemize}
 \item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
 \item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-
+\begin{lstlisting}
+> 7z x FAUST-Source-2.0.0.zip
+\end{lstlisting}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake .. 
+> mkdir build
+> cd build
+> cmake .. 
 \end{lstlisting}
-\item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with visual studio IDE.
-\item In visual studio IDE, select ALL target and generate the project.
-\item Re-Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with visual studio IDE with \textbf{administrator privilege}.
-\item In visual studio IDE, select install target and generate the project.
+\item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE.
+\item In Visual Studio IDE, select ALL target and generate the project.
+\item Re-Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE with \textbf{administrator privilege}.
+\item In Visual Studio IDE, select install target and generate the project.
 For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 \end{itemize}
 
@@ -261,24 +273,26 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \begin{itemize}
 \item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
 \item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-
+\begin{lstlisting}
+> 7z x FAUST-Source-2.0.0.zip
+\end{lstlisting}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake .. -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
+> mkdir build
+> cd build
+> cmake .. -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
-\item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual studio IDE.
-\item In Visual studio IDE, select ALL target and generate the project.
-\item In Visual studio IDE, select install target and generate the project.
+\item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE.
+\item In Visual Studio IDE, select ALL target and generate the project.
+\item In Visual Studio IDE, select install target and generate the project.
 For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 
 \end{itemize}
 
-\subsection{Basic Build \& Install Using terminal}\label{sec:WinVisualStudioTerminalBasicInstall}
-The basic install described in this section requires the Microsoft visual studio compiler (see precedent Section \ref{sec:WinInstallCompilerVS}).
+\subsection{Basic Build \& Install using terminal}\label{sec:WinVisualStudioTerminalBasicInstall}
+The basic install described in this section requires the Microsoft Visual Studio compiler (see precedent Section \ref{sec:WinInstallCompilerVS}).
 If you have administrator privilege, follow instructions in Section \ref{sec:AdminWinVisualStudioTerminalBasicInstall}, otherwise follow instructions given in Section \ref{sec:NoAdminWinVisualStudioTerminalBasicInstall}.
 
 \subsubsection{Install with administrator privilege}
@@ -290,13 +304,13 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 \item Type the following commands : 
 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake ..
+> mkdir build
+> cd build
+> cmake ..
 \end{lstlisting}
 \item Re-Open a command terminal \textbf{with administrator privilege} 
 \begin{lstlisting}
-cmake --build . --config "Release" --target "install"
+> cmake --build . --config "Release" --target "install"
 \end{lstlisting}
 \end{itemize}
 
@@ -311,10 +325,10 @@ cmake --build . --config "Release" --target "install"
 \item Type the following commands : 
 
 \begin{lstlisting}
-mkdir build
-cd build
-cmake .. -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>" 
-cmake --build . --config "Release" --target "install"
+> mkdir build
+> cd build
+> cmake .. -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>" 
+> cmake --build . --config "Release" --target "install"
 \end{lstlisting}
 \end{itemize}
 
