@@ -260,7 +260,7 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 > cmake .. 
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE.
-\item In Visual Studio IDE, select ALL target and generate the project.
+\item In Visual Studio IDE, select ALL target and generate the project three times.
 \item Re-Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE with \textbf{administrator privilege}.
 \item In Visual Studio IDE, select install target and generate the project.
 For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
@@ -285,7 +285,7 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 > cmake .. -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE.
-\item In Visual Studio IDE, select ALL target and generate the project.
+\item In Visual Studio IDE, select ALL target and generate the project three times.
 \item In Visual Studio IDE, select install target and generate the project.
 For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 
@@ -310,6 +310,8 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 \end{lstlisting}
 \item Re-Open a command terminal \textbf{with administrator privilege} 
 \begin{lstlisting}
+> cmake --build . --config "Release"
+> cmake --build . --config "Release"
 > cmake --build . --config "Release" --target "install"
 \end{lstlisting}
 \end{itemize}
@@ -328,6 +330,8 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 > mkdir build
 > cd build
 > cmake .. -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>" 
+> cmake --build . --config "Release"
+> cmake --build . --config "Release"
 > cmake --build . --config "Release" --target "install"
 \end{lstlisting}
 \end{itemize}
