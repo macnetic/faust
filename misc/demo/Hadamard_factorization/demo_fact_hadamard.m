@@ -69,10 +69,8 @@ params.niter2 = 30;
 params.update_way = 1;
 params.verbose = 0;
 
-[lambda, facts] = mexHierarchical_fact(matrix,params);
 
-%% speed-up and relatice error
-hadamard_faust = Faust(facts,lambda);
+hadamard_faust = faust_decompose(matrix,params);
 Xhat = full(hadamard_faust);
 relative_error = norm(matrix - Xhat)/norm(matrix);
 fprintf(['\n\n relative error between hadamard matrix and its transform : ' num2str(relative_error) '\n']);

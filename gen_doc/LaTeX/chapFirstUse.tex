@@ -3,13 +3,17 @@
 
 \paragraph{}A Matlab wrapper is delivered with the FA$\mu$ST C++ library.
 It provides a user friendly new class of matrix \textbf{Faust} efficient for the multiplication with matlab built-in dense matrix class.\newline
+
+\section{Configure Matlab path}\label{sec:firstUseMatlabPath}
 In order to use matlab wrapper after the installation of Faust, launch Matlab.
-In the Matlab terminal, set your working directory to /"HOMEDIR"/Documents/MATLAB/Faust and set the Matlab path by typing the following commands :
+In the Matlab terminal, set your working directory to /"HOMEDIR"/Documents/MATLAB/Faust and configure the Matlab path by typing the following commands :
 
 \begin{lstlisting}
 >> cd /"HOMEDIR"/Documents/MATLAB/Faust
 >> setup_Faust
 \end{lstlisting}
+
+
 
 \section{Use a faust from a saved one}\label{sec:firstUseBuildFromSave}
 \paragraph{} Now, you can run quick\_start.m script in the Matlab terminal by typing :
@@ -18,60 +22,40 @@ In the Matlab terminal, set your working directory to /"HOMEDIR"/Documents/MATLA
 \end{lstlisting}
 \paragraph{}In this script, first of all, a Faust of size 4000x5000 is loaded from a previous one that is saved into a matfile :
 \lstinputlisting[firstline=47,lastline=48]{../../misc/demo/Quick_start/quick_start.m}
+\newpage
 \paragraph{}Secondly, a list of overloaded matlab function shows that a Faust is handled as a normal Matlab builtin matrix.
  
 \lstinputlisting[firstline=51,lastline=78]{../../misc/demo/Quick_start/quick_start.m}
 
 \paragraph{}Finally, it performs a little time comparison between multiplication by a Faust or its full matrix equivalent.
 This is in order to illustrate the speed-up induced by the Faust. This speed-up should be around 30 (depending on your machine).
-\lstinputlisting[firstline=84,lastline=100]{../../misc/demo/Quick_start/quick_start.m}
+%\lstinputlisting[firstline=84,lastline=100]{../../misc/demo/Quick_start/quick_start.m}
 
-
-A \textbf{Faust} object can be constructed from several ways.
-
-\section{Other ways to build a Faust}\label{sec:firstUseBuildFromCellArray}
-\paragraph{} A Faust can initialized from a matrix or from a cell-array storing its factors.
-
-\subsection{build a Faust from a matrix and parameters}\label{sec:firstUseBuildFromMatrix}
-First, you can build a Faust from a cell-array of matlab matrix (sparse or dense) representing its factors.
-\newline
-\newline
-The following example shows how to build a random faust of size 5x3 with 3 factors :
-
-\begin{lstlisting}
->> nb_factor = 3;
->> dim1 = 5;
->> dim2 = 3; 
->>
->> % list of factors
->> factors = cell(nb_factor);
->>
->> factors{1}=sprand(dim1,dim2,0.1); % first factor is rectangular and sparse 
->> for i=2:nb_factor
->> 		factors{i}=rand(dim2,dim2); % second is sparse
->> end
->>
->> % build the faust
->> A=Faust(factors);
-\end{lstlisting}
 \newpage
-
-An optional multiplying scalar argument can be taken into account  :
+\section{Construct a Faust from a given matrix}\label{sec:firstUseBuildFromMatrix}
+\paragraph{} To see an example of building a Faust from a matrix, you can run factorise\_matrix.m in the Matlab terminal by typing :
 \begin{lstlisting}
->> % multiplicative scalar
->> lambda = 3.5 
->> % build the faust
->> A=Faust(factors,lambda);
+>> factorise_matrix
 \end{lstlisting}
+In this script, from a given matrix A of size 100x200 :
+\lstinputlisting[firstline=42,lastline=47]{../../misc/demo/Quick_start/factorise_matrix.m}
+We generate the parameters of the factorisation from :\newline
+-the dimension of A (\textbf{dim1} and \textbf{dim2}),\newline
+-\textbf{nb\_factor} the number of factor of the Faust,\newline
+- and \textbf{rcg} the Rational Complexity Gain, which represents the theoretical memory gain and multiplication speed-up of the Faust compared to the initial matrix 
+\lstinputlisting[firstline=51,lastline=56]{../../misc/demo/Quick_start/factorise_matrix.m}
+Then we factorize the matrix \textbf{A} into a Faust \textbf{Faust\_A}
+\lstinputlisting[firstline=58,lastline=59]{../../misc/demo/Quick_start/factorise_matrix.m}
+And as for quickstart.m, we make some time comparison at the end.
 
-This functionality allows you to build a Faust from the factorization algorithm :
-\textbf{mexHierarchical{\_}fact} or \textbf{mexPalm4MSA} :
+\newpage
+\section{Construct a Faust from its factor}\label{sec:firstUseBuildFactors}
+To see an example of building a Faust from its factors, you can run construct\_Faust\_from\_factors.m in the Matlab terminal by typing :
 \begin{lstlisting}
->> % factorization step
->> [lambda,factors]=mexHierarchical_fact(params);
->> % build the faust corresponding to the factorization
->> A=Faust(factors,lambda);
+>> construct_Faust_from_factors
 \end{lstlisting}
+This following example shows how to build a faust from a cell-array representing its factors.
+\lstinputlisting[firstline=44,lastline=72]{../../misc/demo/Quick_start/construct_Faust_from_factors.m}
 
 
  
