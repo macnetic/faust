@@ -123,6 +123,12 @@ subplot(1,params.nfacts+1,1);
 imagesc(Xhat); axis square
 set(gca,'xtick',[],'ytick',[])
 
+%get the factor of the Faust
+facts=cell(1,M);
+for i=1:M
+   facts{i}=get_fact(hadamard_faust,i); 
+end
+
 for kk = 1:params.nfacts
     subplot(1,params.nfacts+1,1+kk)
     imagesc(facts{kk}); axis square
@@ -149,6 +155,7 @@ end
 fighandle.Name =['Hadamard-factorisation_nnz_coeff'];
 figure_name = [figure_dir filesep 'Hadamard-factorisation_nnz_coeff'];
 print(figure_name, format_fig);
+
 
 
 
