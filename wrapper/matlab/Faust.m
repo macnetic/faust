@@ -1,10 +1,10 @@
 %% class FAUST
-% representing a given dense matrix by a product of sparse matrix (i.e faust)
+% represents a given dense matrix by a product of sparse matrix (i.e Faust)
 % in order to speed-up multiplication by this matrix,
-% matlab wrapper class implemented in C++
+% Matlab wrapper class implemented in C++
 %
 % For more information on the FAuST Project, please visit the website of 
-% the project :  <http://faust.gforge.inria.fr>
+% the project :  <http://Faust.gforge.inria.fr>
 %
 %% License:
 % Copyright (2016):	Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval
@@ -23,7 +23,7 @@
 % See the GNU Affero General Public License for more details.
 %
 % You should have received a copy of the GNU Affero General Public License
-% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+% along with F program.  If not, see <http://www.gnu.org/licenses/>.
 %
 %% Contacts:
 %   Nicolas Bellot	: nicolas.bellot@inria.fr
@@ -46,38 +46,62 @@ classdef Faust
 	transpose_flag; % boolean to know if the Faust is transpose or not
     end
     methods
-        %% Constructor - Create a new C++ class instance
-        function this = Faust(varargin)
-            % Constructor - build a faust from a cell array of matrix and a scalar (optional)
-            %                1st input : 1D cell array of matrix (sparse or dense)
-            %                2nd input : (optional) multiplicative scalar
-	    %              - or from a filename (mat file) where a faust is stored with save_faust
-	   this.matrix = FaustCore(varargin{:});
-	   this.transpose_flag = 0;	
+
+        function F = Faust(varargin)
+        %% FAUST Constructor - build a Faust from various type of input.
+        %
+        % Example of use :
+        %
+        % F = Faust(factors,lambda) 
+        % -factor : 1D cell array of matrix (sparse or
+        % dense) representing the factor of the Faust
+        % -lambda : (optional) multiplicative scalar
+        %                 
+        % F = Faust(filename) 
+	    % filename : a filename (mat file) where a Faust is stored with save_Faust
+        
+	   F.matrix = FaustCore(varargin{:});
+	   F.transpose_flag = 0;	
 	end
 	
 
 	
             
 
-        
-        %% Destructor - Destroy the C++ class instance
-        function delete(this)
-            % destructor delete the faust
-            mexFaust('delete', this.objectHandle);
+
+        function delete(F)
+        %% DELETE Destructor delete the Faust.
+        % delete(F)
+        %
+        % See also Faust
+            
+            mexFaust('delete', F.objectHandle);
         end
         
-        %% Multiplication faust-vector or faust-matrix
-        function y = mtimes(this,x)
-            % mtimes - overloading of the matlab multiplication (*) function, compatible with matlab matrix and vector
-            y = mexFaust('multiply', this.matrix.objectHandle,x,this.transpose_flag);
+
+        function C = mtimes(F,A)
+        %% MTIMES * Faust Multiplication (overloaded Matlab built-in function).
+        %
+        % C=mtimes(F,A) is called for syntax 'C=F*A', when F is a Faust matrix and A a full
+        % storage matrix, C is also a full matrix storage.
+        % 
+        % See also mtimes_trans
+        
+            C = mexFaust('multiply', F.matrix.objectHandle,A,F.transpose_flag);
         end
         
         
-        %% Multiplication by a faust or its transpose
-        % if trans = 0 multiplication by faust
-        % if trans = 1 multiplication by the transpose of a faust
-        function y = mtimes_trans(this,x,trans)
+
+        function C = mtimes_trans(F,A,trans)
+        %% MTIMES_TRANS Multiplication by a Faust or its non-conjugate transposed.
+        %
+        % C = mtimes_trans(F,A,trans) when F is a Faust,A a full storage
+        % matrix and trans a parameter, C a full storage matrix
+        % if trans == 0, C=F*A is performed  (multiplication)
+        % if trans == 1, C=F'*A is performed (multiplication by transposed)
+        %
+        % See also mtimes.
+        
 	if ~isreal(trans)
 		error('invalid argument trans, must be equal to 0 or 1');
 	end
@@ -86,37 +110,64 @@ classdef Faust
 		error('invalid argument trans, must be equal to 0 or 1');
 	end
 	   
-	isreally_trans=xor(trans,this.transpose_flag);
-	y = mexFaust('multiply', this.matrix.objectHandle,x,isreally_trans);
+	isreally_trans=xor(trans,F.transpose_flag);
+	C = mexFaust('multiply', F.matrix.objectHandle,A,isreally_trans);
             
         end
         
-        %% Evaluate the product of a faust_core
-        function y = full(this)
-            % full - compute the dense matrix equivalent to the faust (the product of sparse matrix)
-            y=mexFaust('full',this.matrix.objectHandle,this.transpose_flag);
+
+        function A = full(F)
+        %% FULL  Convert Faust matrix to full matrix (overloaded Matlab
+        % built-in function).
+        %
+        % A=full(F) converts a Faust matrix F to full storage matrix A.
+        
+        A=mexFaust('full',F.matrix.objectHandle,F.transpose_flag);
 	
             
         end
 
-        %% Transpose operator
-        function trans=transpose(this)
-            %transpose - overloading of the matlab transpose operator (.')
-                trans=ctranspose(this); % currently faust is a real matrix, so the complex transposition is the same as the real one 
+
+        function F_trans=transpose(F)
+        %% TRANSPOSE .' Non-conjugate transposed Faust (overloaded Matlab built-in function).
+        %
+        % F_trans = transpose(F) is called for the syntax F.' when F is Faust.
+        %
+        % WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
+        %
+        % See also ctranspose.
+            
+                F_trans=ctranspose(F); 
 
         end
         
-        function trans=ctranspose(this)
-	%ctranspose - overloading of the matlab transpose operator (')
-                trans=this; % trans and this point share the same C++ underlying object (objectHandle)
-                trans.transpose_flag = xor(1,this.transpose_flag); % inverse the transpose flag
+        function F_ctrans=ctranspose(F)
+        %% CTRANSPOSE ' Complex conjugate transposed Faust (overloaded Matlab built-in function).
+        %
+        % F_trans = ctranspose(F) is called for syntax F' (complex conjugate transpose) when F is a Faust.
+        %
+        % WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
+        %
+        % See also transpose.
+        
+                F_ctrans=F; % trans and F point share the same C++ underlying object (objectHandle)
+                F_ctrans.transpose_flag = xor(1,F.transpose_flag); % inverse the transpose flag
         end
 
 	
 	
-        %% Size
-        function varargout = size(this,varargin)
-            %size - overload of the matlab size function
+
+        function varargout = size(F,varargin)
+        %% SIZE Size of a Faust (overloaded Matlab built-in function).
+        %
+        % D = size(F), for a Faust F, returns the two-element row vector
+        % D = [M,N] containing the number of rows and columns in the Faust.
+        %
+        % M = size(F,DIM) returns the length of the dimension specified
+        % by the scalar DIM.  For example, size(X,1) returns the number
+        % of rows and size(F,2) returns the number of columns in the Faust.
+        % If DIM > 2, M will be 1.
+        
             
             
 	   nb_input = length(varargin);
@@ -131,10 +182,10 @@ classdef Faust
             end
             
 	
-	    Size=mexFaust('size',this.matrix.objectHandle);
+	    Size=mexFaust('size',F.matrix.objectHandle);
 	    
-	    %% if the faust is tranposed, inverse the dimension		    	
-	    if(this.transpose_flag) 
+	    % if the Faust is tranposed, inverse the dimension		    	
+	    if(F.transpose_flag) 
 	    	Size = Size*[0,1;1,0];
 	    end	
 
@@ -164,29 +215,43 @@ classdef Faust
         end
 
 
-    	% end : 
-    	% serve as the last index in an indexing expression.  In
-    	% that context, end = SIZE(X,k) when used as part of the k-th index.
-    	% Examples of this use are, X(3:end) and X(1,1:2:end-1) 
-    	function end_dim = end(this,k,n)
-		% end - overload of the builtin function end
+    	
+
+    	function end_dim = end(F,k,n)
+	%% END (useful for slicing) serve as the last index in an indexing expression (overloaded Matlab built-in function).
+    	%
+        % Examples of use for slicing a Faust F are 
+        % F(3:end,1) : in this case, end=size(F,1) 
+        %   i.e end equals to the number of row of the Faust F.
+        % F(1,1:2:end-1) : in this case, end=size(F,2) 
+        % end equals to the number of column fo the Faust F.
+        %
+        % See also subsref, size.
 	
 		if (n ~= 2)
-			error('invalid slicing : faust is a 2D array i.e matrix');
+			error('invalid slicing : Faust is a 2D array i.e matrix');
 		end
 
-		end_dim=size(this,k);
+		end_dim=size(F,k);
 
 
-	end
+        end
 
 
 
 	
 
-	%% get_fact : return the id factor of the faust as a dense matrix
-        function factor = get_fact(this,id)
-		% get_fact : return the id factor of the faust as a dense matrix
+        function factor = get_fact(F,id)
+        %% GET_FACT Ith factor of the Faust.
+        %
+	% A=get_fact(F,id) return the id factor A of the Faust F as a full storage matrix.
+        % 
+        % Example of use :
+        % A=get_fact(F,1) returns the 1st factor of the Faust F.
+        % A=get_fact(F,4) returns the 4th factor of the Faust F.
+        %
+        % See also get_nb_factor.
+        
 		if (~isa(id,'double'))
 			error('get_fact second argument (indice) must either be real positive integers or logicals.');
 		end
@@ -195,46 +260,71 @@ classdef Faust
 			error('get_fact second argument (indice) must either be real positive integers or logicals.');
 		end
 
-		if (this.transpose_flag)
-			id = get_nb_factor(this)+1-id;
+		if (F.transpose_flag)
+			id = get_nb_factor(F)+1-id;
 		end
 
-		factor = mexFaust('get_fact',this.matrix.objectHandle,id);
+		factor = mexFaust('get_fact',F.matrix.objectHandle,id);
 
-		if (this.transpose_flag)
+		if (F.transpose_flag)
 			factor = factor';
 		end
 	end
 
 
-	%% get_nb_factor : return the number of factor of the faust
-	function nb_factor = get_nb_factor(this)
-		% get_nb_factor : return the number of factor of the faust
-		nb_factor = mexFaust('get_nb_factor',this.matrix.objectHandle);
-	end
 
-	%% save a faust into a matfile
-	function save(this,filename)
-		% save a faust into a matfile
+	function nb_factor = get_nb_factor(F)
+	%% GET_NB_FACTOR Number of factor of the Faust.
+    	%
+    	% nb_factor = get_nb_factor(F) return the number of factor of the
+    	% Faust F.
+    	%
+    	% See also get_fact.
+    
+		nb_factor = mexFaust('get_nb_factor',F.matrix.objectHandle);
+    end
+
+    
+	function save(F,filename)
+	%% SAVE Save a Faust into a matfile.
+    	%
+    	% save(F,filename) save the Faust F into the .mat file specified by
+    	% filename.
+    	
+    	
+    
 		if (~ischar(filename))
 			error('second argument must contains a string (a filename)');
 		end
 		
-		nb_fact=get_nb_factor(this);
+		nb_fact=get_nb_factor(F);
 		
-		faust_factors=cell(1,nb_fact);
+		Faust_factors=cell(1,nb_fact);
 
 		for i=1:nb_fact
-			faust_factors{i}=get_fact(this,i);
+			Faust_factors{i}=get_fact(F,i);
 		end
-		save(filename,'faust_factors');
+		save(filename,'Faust_factors');
 		
 		
 	end
 
-	%% subsref : allows operation such as A(i,j) A(:,j)  A(3:4,2:5) but not A(end,end)
-	function submatrix=subsref(this,S)
-		% overloading of the slicing method only for reading the value of the coeff
+
+	function submatrix=subsref(F,S)
+    	%% SUBSREF Subscripted reference (overloaded Matlab built-in function).
+    	%
+    	%  F(I,J) is an array formed from the elements of the rectangular
+    	% submatrix of the Faust F specified by the subscript vectors I and J.  The
+    	% resulting array has LENGTH(I) rows and LENGTH(J) columns.  A colon used
+    	% as a subscript, as in F(I,:), indicates all columns of those rows
+    	% indicated by vector I. Similarly, F(:,J) = B means all rows of columns
+    	%J.
+	%    	
+	% Example of use :
+    	%  A(i,j) A(:,j)  A(3:4,2:5) A(1:end,5:end-1)  
+    	%
+    	% See also end.
+        
 		
 		if (~isfield(S,'type')) | (~isfield(S,'subs'))
 			error(' subsref invalid structure S missing field type or subs');
@@ -249,13 +339,13 @@ classdef Faust
 		end
 
 		if (length(S.subs) ~=2)
-			invalid(' subsref invalid slicing must have 2 index since this is a 2D-array');
+			invalid(' subsref invalid slicing must have 2 index since F is a 2D-array');
 		end
 
 		slicing_row=S.subs{1};
 		slicing_col=S.subs{2};
         
-        	[dim1 dim2]=size(this);
+        	[dim1 dim2]=size(F);
         
         	if ischar(slicing_row)
 			nb_row_selected = dim1;
@@ -293,7 +383,7 @@ classdef Faust
 		end
 
 		% perform A*identity or A'*identity
-		submatrix=mtimes_trans(this,identity,transpose_flag);
+		submatrix=mtimes_trans(F,identity,transpose_flag);
 		
 		% selects the row of the submatrix, if slicing_row is a char, all
 		% the row are selected
@@ -310,9 +400,14 @@ classdef Faust
 	end
 
 
-	%% norm : compute the 2-norm of a faust
-	function norm_faust=norm(this,varargin)
-
+	function norm_Faust=norm(F,varargin)
+    	%% NORM Faust norm (overloaded Matlab built-in function).
+    	%
+    	% norm(F,2) when F is Faust returns the 2-norm of F
+    	% norm(F) is the same as norm(F)
+    	%
+    	% WARNING : norm(F,typenorm) is only supported when typenorm equals 2
+    
 	    nb_input = length(varargin);
             if (nb_input > 1)
                 error('Too many input arguments');
@@ -320,12 +415,12 @@ classdef Faust
             
             if nb_input == 1
 		if varargin{1} ~= 2
-                	error('only 2-norm is supported for the faust');
+                	error('only 2-norm is supported for the Faust');
 		end
             end
 	
-	    %% the transpose flag of the faust is ignored because norm(A)==norm(A')
-	    norm_faust=mexFaust('norm',this.matrix.objectHandle);
+	    % the transpose flag of the Faust is ignored because norm(A)==norm(A')
+	    norm_Faust=mexFaust('norm',F.matrix.objectHandle);
             
 	    
 
@@ -333,27 +428,49 @@ classdef Faust
 	end
 
 
-	%% nnz : Number of nonzero matrix elements.
-	function nz=nnz(this)
-
-	    nz=mexFaust('nnz',this.matrix.objectHandle);
+	function nz=nnz(F)
+    	%% NNZ Number of nonzero elements in a Faust (overloaded Matlab built-in function).
+    	%
+    	% nz = nnz(F) is the number of nonzero elements in the Faust F.
+    	%
+    	% See also density, RCG.
+    
+	    nz=mexFaust('nnz',F.matrix.objectHandle);
             
 	end
 
 
-	%% nnz : density of the Faust
-	function dens=density(this)
-	     prod_dim=prod(size(this));			
+	function dens=density(F)
+    	%% DENSITY Density of the Faust.
+    	%
+    	% dens = density(F) when F is a Faust returns the
+    	% percentage of nonzero elements of F,
+    	% dens is a number between 0 and 1.
+    	% In some degenerated case, dens can be greater than 1.
+	% If the Faust is empty, return -1.
+	%
+    	% See also RCG, nnz.
+    
+        prod_dim=prod(size(F));			
 	     if (prod_dim ~= 0)		
-	    	dens=nnz(this)/prod_dim;
+	    	dens=nnz(F)/prod_dim;
              else
 		dens = -1;
 	     end
 	end
 
-	%% nnz : Relative Complexity Gain (inverse of the density)
-	function speed_up=RCG(this)	
-		dens=density(this);		
+
+	function speed_up=RCG(F)
+    	%% RCG Relative Complexity Gain (inverse of the density)
+    	%
+    	% speed_up =  RCG(F) when F is Faust, returns the
+    	% inverse of density of the Faust (i.e the theoretical gain
+    	% both for storage and multiplication computation time between the Faust and its full storage
+    	% equivalent full(F)).
+    	%
+    	% See also density, nnz.
+    
+		dens=density(F);		
 		if (dens > 0)
 		    speed_up=1/dens;
 		else
@@ -369,6 +486,7 @@ classdef Faust
     end
     
 end
+
 
 
 
