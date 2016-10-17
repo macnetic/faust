@@ -2,8 +2,6 @@
 %
 %  This demo presents the method to build a Faust 
 %  from its factors
-% and ends with a little time comparison to illustrate 
-% the speed-up of using a Faust for multiplication. 
 %
 % For more information on the FAuST Project, please visit the website of 
 % the project :  <http://faust.gforge.inria.fr>
@@ -65,7 +63,7 @@ end
 A_faust=Faust(factors);
 
 
-% a multiplicative scalar can be taken into accoun to construct the Faust 
+% a multiplicative scalar can be taken into account to construct the Faust 
 lambda=2;
 
 % B_faust=lambda*A_faust
