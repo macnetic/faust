@@ -66,6 +66,17 @@ If not, verify that the 7-Zip install directory is without any space character. 
 
 \end{itemize}
 
+\section{Download Faust Package}\label{sec:WinDownload}
+When prerequisities listed in precedent section \ref{sec:WinRequired} are checked, you can get the package FA$\mu$ST.
+\begin{itemize}
+\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
+\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
+\begin{lstlisting}
+> 7z x FAUST-Source-2.0.0.zip
+\end{lstlisting}
+\end{itemize}
+
+
 
 \section{Install using GCC-MinGW compiler}\label{sec:WinInstallMinGW}
 
@@ -111,13 +122,8 @@ The basic install described in this section requires the GCC compiler from MinGW
 If you have administrator privilege, follow instructions in Section \ref{sec:WinMinGWadminBasicInstall}, otherwise follow instructions given in Section \ref{sec:WinMinGWNoAdminBasicInstall}.
 \subsubsection{Install with administrator privilege}
 \label{sec:WinMinGWadminBasicInstall}
-\begin{itemize}
-\item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-\begin{lstlisting}
-> 7z x FAUST-Source-2.0.0.zip
-\end{lstlisting}
 
+\begin{itemize}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
@@ -140,11 +146,6 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Win
 \label{sec:WinMinGWNoAdminBasicInstall}
 
 \begin{itemize}
-\item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-\begin{lstlisting}
-> 7z x FAUST-Source-2.0.0.zip
-\end{lstlisting}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
@@ -172,11 +173,6 @@ Then, the FA$\mu$ST installation can be done.
 \subsubsection{Install with administrator privilege}
 \label{sec:WinMinGWCodeBlocksAdminBasicInstall}
 \begin{itemize}
-\item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-\begin{lstlisting}
-> 7z x FAUST-Source-2.0.0.zip
-\end{lstlisting}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
@@ -195,11 +191,6 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \subsubsection{Install without administrator privilege}
 \label{sec:WinMinGWCodeBlocksNoAdminBasicInstall}
 \begin{itemize}
-\item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-\begin{lstlisting}
-> 7z x FAUST-Source-2.0.0.zip
-\end{lstlisting}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
@@ -223,8 +214,7 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \section{Install using Microsoft Visual compiler}\label{sec:WinInstallVS}
 
 \paragraph{}When prerequisites listed in section \ref{sec:WinRequired} are checked, you must install \textbf{Microsoft Visual Studio} containing the C++ Compiler (Section \ref{sec:WinInstallCompilerVS}).
-Then, the FA$\mu$ST installation can be done using Command prompt, following instructions given in Section \ref{sec:WinMinGWBasicInstall} or using Visual Studio IDE, following instructions given in Section \ref{sec:WinCodeBlocksBasicInstall}. 
-
+Then, the FA$\mu$ST installation can be done using Visual Studio IDE, following instructions given in Section \ref{sec:WinVisualStudioBasicInstall} or using Command prompt, following instructions given in Section \ref{sec:WinVisualStudioTerminalBasicInstall}. 
 
 
 %If you are more familiar with the graphical user interface, prefer the \textbf{Microsoft Visual C++} compiler. Otherwise, if you are friendly with Unix tools and command line terminal, preferd \textbf{MinGW "Minimalist GNU for Windows"} C++ compiler. The version of the C++ compiler must be coherent with the version of your Matlab version. In this documentation, the version of our C++ compiler corresponds to Matlab 2014 and 2015. If you use an other version of Matlab, please refer to the Mathworks website \url{http://fr.mathworks.com/support/compilers/<R20XXa>}.
@@ -237,7 +227,7 @@ Then, the FA$\mu$ST installation can be done using Command prompt, following ins
 % \item Download and install Microsoft .NET Framework 4
 % \item Download and install Microsoft SDK 7.1
 \end{itemize}
-Then, the FA$\mu$ST installation can be done with Visual Studio IDE, following instructions given in Section \ref{sec:WinVisualStudioBasicInstall} or with a terminal (Section \ref{sec:WinVisualStudioTerminalBasicInstall}. 
+Then, the FA$\mu$ST installation can be done using Visual Studio IDE, following instructions given in Section \ref{sec:WinVisualStudioBasicInstall} or using Command prompt, following instructions given in Section \ref{sec:WinVisualStudioTerminalBasicInstall}. 
 
 \subsection{Basic Build \& Install using Visual Studio IDE}\label{sec:WinVisualStudioBasicInstall}
 The basic install described in this section requires Microsoft Visual Studio (see precedent Section \ref{sec:WinInstallCompilerVS}).
@@ -246,11 +236,6 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 \subsubsection{Install with administrator privilege}
 \label{sec:AdminWinVisualStudioBasicInstall}
 \begin{itemize}
-\item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-\begin{lstlisting}
-> 7z x FAUST-Source-2.0.0.zip
-\end{lstlisting}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
@@ -271,11 +256,7 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \label{sec:NoAdminWinVisualStudioBasicInstall}
 
 \begin{itemize}
-\item \textbf{download the FA$\mu$ST package} on the website  \url{http://faust.gforge.inria.fr/}. 
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
-\begin{lstlisting}
-> 7z x FAUST-Source-2.0.0.zip
-\end{lstlisting}
+
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
 \item Type the following commands : 
