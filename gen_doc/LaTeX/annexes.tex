@@ -1,26 +1,25 @@
 \chapter{Annexes}\label{sec:Annexes}
 
 \section{Required packages}\label{sec:ANNEXERequiredPackages}
-\paragraph{}Here is a list of packages used in the FA$\mu$ST project. The installation of this packages are automatically done. There are nothing to do. (see the source directory "./externals").
+Here is a list of packages used in the FA$\mu$ST project. The installation of this packages are automatically done. There are nothing to do. (see the source directory "./externals").
 \begin{itemize}
-\item Library eigen \url{http://eigen.tuxfamily.org}
-\item Library openBlas \url{http://www.openblas.net}
-\item Library xml2 \url{http://xmlsoft.org}
-\item Library matio \url{https://sourceforge.net/projects/matio}
+\item Library \textbf{Eigen} \url{http://eigen.tuxfamily.org}: C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms.
+\item Library \textbf{OpenBLAS} \url{http://www.openblas.net}:  Optimized BLAS library based on GotoBLAS2 1.13 BSD version.
+\item Library \textbf{xml2} \url{http://xmlsoft.org}
+\item Library \textbf{matio} \url{https://sourceforge.net/projects/matio}
 \end{itemize}
 
 \section{Compatibility between MATLAB and compiler gcc}\label{sec:ANNEXECompatibilityMatlabCompiler}
-\paragraph{Compatibility between MATLAB and compiler gcc} \textbf{Adjust your version of GCC compiler} in order to run the installation properly. The use of the mex function in Matlab requires that you have a third-party compiler installed on your system. The latest version of Matlab (2016a in our case) only supports up to GCC 4.7 (see \url{http://fr.mathworks.com/support/compilers/R2016a/index.html?sec=glnxa64} for more detail).
-To temporally change your version of gcc compiler, you can modify the environment variable CC an CXX: 
+Adjust your version of GCC compiler in order to run the installation properly. The use of the mex function in Matlab requires that you have a third-party compiler installed on your system. The latest version of Matlab (2016a in our case) only supports up to GCC 4.7 (see \url{http://fr.mathworks.com/support/compilers/R2016a/index.html?sec=glnxa64} for more detail).
+To temporally change your version of gcc compiler, you can modify the environment variable CC an CXX. For that, export your CC and CXX variables corresponding to gcc and g++ binaries path :
 \begin{itemize}
-\item \textbf{export CC and CXX variables} corresponding to gcc and g++ binaries path :\\
 \item find your gcc and g++ version path using \texttt{which} command in a terminal :
 \begin{lstlisting}
 > which gcc
 > which g++
 \end{lstlisting}
 
-\item Open your ~/.bashrc file and save the return-path of gcc and g++ like : \\
+\item Open your ~/.bashrc file and save the return-path of gcc and g++ like:
 \begin{lstlisting}[backgroundcolor=\color{white}]
 # export version of gcc
 export CC=/usr/lib64/ccache/gcc
@@ -28,23 +27,23 @@ export CXX=/usr/lib64/ccache/g++
 \end{lstlisting}
 \end{itemize}
 
-You can change the version of compiler use by mex function from matlab command: 
+An other way to change the version of compiler use by mex function from matlab command is : 
 \begin{lstlisting}
 > mex -setup
 \end{lstlisting}
 
 
 \section{Further information about Build \& Install process}\label{sec:ANNEXEInfoBuildInstall}
-\paragraph{Further information:}When using the \textbf{cmake} command to generate the build system, \textbf{cmake} performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case, the three last lines of the console log of \textbf{cmake} command should be:
+When using the \textbf{cmake} command to generate the build system, \textbf{cmake} performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then the build system is generated and written. In this case, the three last lines of the console log of \textbf{cmake} command should be:
 \begin{lstlisting}[backgroundcolor=\color{white}]
 -- Configuring done 
 -- Generating done 
 -- Build files have been written to: <YOUR/LOCAL/DIRECTORY/build>
 \end{lstlisting}
 
-\paragraph{Further information:}The command \textbf{make} will compile the build files.
+The command \textbf{make} will compile the build files.\\
 
-\paragraph{Further information:}The command \textbf{sudo make install} will install the library and others components in the default directory: \\
+The command \textbf{sudo make install} will install the library and others components in the default directory: \\
 \texttt{/usr/local/lib/libfaust.a} for the FA$\mu$ST library, \\
 \texttt{\textasciitilde /Documents/MATLAB/faust/} for the wrapper matlab.\\
 You must have administrator privilege because the library file \texttt{libfaust.a} is copied in an root path directory. If you do not have administrator privilege, you can realize a local install using \texttt{cmake} optional parameter \texttt{-DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"}. 
@@ -57,11 +56,9 @@ The \texttt{cmake} optional parameter \texttt{-G "Xcode"} allows to generate the
 
 
 
-
-
 %for windows
 \section{Required packages on Windows platform}\label{sec:WinRequiredPackages}
-\paragraph{}Here is a list of packages used in the FA$\mu$ST project. Eigen and OpenBlas library are automatically installed : there are nothing to do (see the directory "./externals/win/").
+Here is a list of packages used in the FA$\mu$ST project. Eigen and OpenBlas library are automatically installed : there are nothing to do (see the directory "./externals/win/").
 \begin{itemize}
 \item \textbf{Eigen} is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms (see \url{http://eigen.tuxfamily.org}).
 \item \textbf{OpenBLAS} is an optimized BLAS library based on GotoBLAS2 1.13 BSD version. (see \url{http://www.openblas.net}). To install OpenBlas, refer to \url{https://github.com/xianyi/OpenBLAS/wiki/Installation-Guide}. You can directly download precompiled binary here \url{https://sourceforge.net/projects/openblas/files/v0.2.14/}
