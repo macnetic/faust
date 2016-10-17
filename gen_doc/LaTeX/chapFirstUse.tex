@@ -21,15 +21,15 @@ In the Matlab terminal, set your working directory to /"HOMEDIR"/Documents/MATLA
 >> quick_start
 \end{lstlisting}
 \paragraph{}In this script, first of all, a Faust of size 4000x5000 is loaded from a previous one that is saved into a matfile :
-\lstinputlisting[firstline=47,lastline=48]{../../misc/demo/Quick_start/quick_start.m}
+\lstinputlisting[firstline=47,lastline=48,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/quick_start.m}
 \newpage
 \paragraph{}Secondly, a list of overloaded matlab function shows that a Faust is handled as a normal Matlab builtin matrix.
  
-\lstinputlisting[firstline=51,lastline=78]{../../misc/demo/Quick_start/quick_start.m}
+\lstinputlisting[firstline=51,lastline=78,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/quick_start.m}
 
 \paragraph{}Finally, it performs a little time comparison between multiplication by a Faust or its full matrix equivalent.
 This is in order to illustrate the speed-up induced by the Faust. This speed-up should be around 30 (depending on your machine).
-%\lstinputlisting[firstline=84,lastline=100]{../../misc/demo/Quick_start/quick_start.m}
+%\lstinputlisting[firstline=84,lastline=100,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/quick_start.m}
 
 \newpage
 \section{Construct a Faust from a given matrix}\label{sec:firstUseBuildFromMatrix}
@@ -38,14 +38,14 @@ This is in order to illustrate the speed-up induced by the Faust. This speed-up 
 >> factorise_matrix
 \end{lstlisting}
 In this script, from a given matrix A of size 100x200 :
-\lstinputlisting[firstline=42,lastline=47]{../../misc/demo/Quick_start/factorise_matrix.m}
+\lstinputlisting[firstline=42,lastline=47,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/factorise_matrix.m}
 We generate the parameters of the factorisation from :\newline
 -the dimension of A (\textbf{dim1} and \textbf{dim2}),\newline
 -\textbf{nb\_factor} the number of factor of the Faust,\newline
 - and \textbf{rcg} the Rational Complexity Gain, which represents the theoretical memory gain and multiplication speed-up of the Faust compared to the initial matrix 
-\lstinputlisting[firstline=51,lastline=56]{../../misc/demo/Quick_start/factorise_matrix.m}
+\lstinputlisting[firstline=51,lastline=56,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/factorise_matrix.m}
 Then we factorize the matrix \textbf{A} into a Faust \textbf{Faust\_A}
-\lstinputlisting[firstline=58,lastline=59]{../../misc/demo/Quick_start/factorise_matrix.m}
+\lstinputlisting[firstline=58,lastline=59,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/factorise_matrix.m}
 And as for quickstart.m, we make some time comparison at the end.
 
 \newpage
@@ -55,7 +55,7 @@ To see an example of building a Faust from its factors, you can run construct\_F
 >> construct_Faust_from_factors
 \end{lstlisting}
 This following example shows how to build a faust from a cell-array representing its factors.
-\lstinputlisting[firstline=44,lastline=72]{../../misc/demo/Quick_start/construct_Faust_from_factors.m}
+\lstinputlisting[firstline=44,lastline=72,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/construct_Faust_from_factors.m}
 
 
  
