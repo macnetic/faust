@@ -1,8 +1,9 @@
 \chapter{Installation on Linux and MAC OS X platform}\label{sec:InstallUnix}
 
-\paragraph{}The FA$\mu$ST project is based on \textbf{C++ library} available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the project FA$\mu$ST because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS). 
+\paragraph{}The FA$\mu$ST project is based on \textbf{C++ library} available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the FA$\mu$ST project because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS). 
 
-\paragraph{}Firstly, please ensure that the \textbf{prerequisites components} listed in Section \ref{sec:RequiredTools} are installed. Then refer to the appropriate section following the use (or not) of an IDE (Integrated Development Environment): 
+\paragraph{}Firstly, please ensure that the \textbf{prerequisites components} listed in Section \ref{sec:RequiredTools} are installed. Secondly, refer to section 
+\ref{sec:UnixBuildDownload} to download FA$\mu$ST package and setting your terminal. Then refer to the appropriate section following the use (or not) of an IDE (Integrated Development Environment): 
 \begin{itemize}
 \item Basic installation using \textbf{the command line terminal}, refer to Section \ref{sec:UnixBuildInstall}.
 \item Basic installation using \textbf{the IDE "Code::Blocks"}, refer to Section \ref{sec:UnixInstallCodeBlock}. 
@@ -37,20 +38,28 @@ You must obtain the path of your matlab binary file like:
 \end{lstlisting}
 If not, add \texttt{matlab} binary directory in your environment path (in your ~/.bashrc file). 
 
-\end{itemize}
-
-
-
-\section{Basic Build \& Installation}\label{sec:UnixBuildInstall}
-\paragraph{}When prerequisities listed in precedent section \ref{sec:RequiredTools} are checked, the FA$\mu$ST installation can be done. If you are administrator of your machine (root access), follow instructions given in Section \ref{sec:UnixBuildInstallAdmin}. Otherwise, for local installation, refer to Section \ref{sec:UnixBuildInstallNOAdmin}. 
-
-\subsection{Install with administrator privilege}\label{sec:UnixBuildInstallAdmin}
-\begin{itemize}
+\section{Download Faust Package \& launch terminal}\label{sec:UnixBuildDownload}
+When prerequisities listed in precedent section \ref{sec:RequiredTools} are checked, you can get the package FA$\mu$ST.
 \item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
 \item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory.
 \item \textbf{Open} a command terminal
 \item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
-\item Type the following commands : 
+
+
+
+
+
+
+
+\section{Basic Build \& Installation using Makefile}\label{sec:UnixBuildInstall}
+\paragraph{} 
+When you have done the step in section  \ref{sec:UnixBuildDownload} (i.e download Faust package and launch the terminal in the right directory),  the FA$\mu$ST installation can start.
+If you are administrator of your machine (root access), follow instructions given in Section \ref{sec:UnixBuildInstallAdmin}. Otherwise, for local installation, refer to Section \ref{sec:UnixBuildInstallNOAdmin}. 
+
+\subsection{Install with administrator privilege}\label{sec:UnixBuildInstallAdmin}
+\item In the terminal opened in section 
+\ref{sec:UnixBuildDownload}, type the following commands : 
+\begin{itemize}
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -64,13 +73,8 @@ For more detail about \texttt{cmake ; make ; make install} commands, refer to Se
 
 
 \subsection{Install without administrator privilege}\label{sec:UnixBuildInstallNOAdmin}
-
-\begin{itemize}
-\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory.
-\item \textbf{Open} a command terminal
-\item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
-\item Type the following commands : 
+\item In the terminal opened in section 
+\ref{sec:UnixBuildDownload}, type the following commands :
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -87,15 +91,12 @@ For more detail about \texttt{cmake ; make ; make install} commands, refer to Se
 
 % CODEBLOCKS
 \section{Basic Build \& Install using Code Block IDE}\label{sec:UnixInstallCodeBlock}
-\paragraph{}When prerequisities listed in precedent section \ref{sec:RequiredTools} are checked, the FA$\mu$ST installation can be done. This Build \& Install section requires that you have the IDE Code::Blocks installed on your system. If you are administrator of your machine (root access), follow instructions given in Section \ref{sec:CodeBlocUnixBuildInstallAdmin}. Otherwise, for local installation, refer to Section \ref{sec:CodeBlocUnixBuildInstallNOAdmin}. 
+\paragraph{}When you have done the step in section  \ref{sec:UnixBuildDownload} (i.e download Faust package and launch the terminal in the right directory),  the FA$\mu$ST installation can start. If you are administrator of your machine (root access), follow instructions given in Section \ref{sec:CodeBlocUnixBuildInstallAdmin}. Otherwise, for local installation, refer to Section \ref{sec:CodeBlocUnixBuildInstallNOAdmin}. 
 
 \subsection{Install with administrator privilege}\label{sec:CodeBlocUnixBuildInstallAdmin}
 \begin{itemize}
-\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory.
-\item \textbf{Open} a command terminal
-\item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
-\item Type the following commands : 
+\item In the terminal opened in section 
+\ref{sec:UnixBuildDownload}, type the following commands : 
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -116,11 +117,8 @@ For more detail about \texttt{cmake} commands, refer to Section \ref{sec:ANNEXEI
 
 \subsection{Install without administrator privilege}\label{sec:CodeBlocUnixBuildInstallNOAdmin}
 \begin{itemize}
-\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory.
-\item \textbf{Open} a command terminal
-\item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
-\item Type the following commands : 
+\item In the terminal opened in section 
+\ref{sec:UnixBuildDownload}, type the following commands : 
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -140,16 +138,13 @@ For more detail about \texttt{cmake} commands, refer to Section \ref{sec:ANNEXEI
 \section{Basic Build \& Install using Xcode IDE (for MAC OS)}\label{sec:MacInstallXcode}
 
 FA$\mu$ST install using the IDE Xcode concerns only MAC OS X environment.
-\paragraph{}When prerequisities listed in precedent section \ref{sec:RequiredTools} are checked, the FA$\mu$ST installation can be done. This Build \& Install section requires that you have the IDE Xcode installed on your system. If you are administrator of your machine (root access), follow instructions given in Section \ref{sec:XcodeUnixBuildInstallAdmin}. Otherwise, for local installation, refer to Section \ref{sec:XcodeUnixBuildInstallNOAdmin}. 
+\paragraph{}When you have done the step in section  \ref{sec:UnixBuildDownload} (i.e download Faust package and launch the terminal in the right directory),  the FA$\mu$ST installation can start. This Build \& Install section requires that you have the IDE Xcode installed on your system. If you are administrator of your machine (root access), follow instructions given in Section \ref{sec:XcodeUnixBuildInstallAdmin}. Otherwise, for local installation, refer to Section \ref{sec:XcodeUnixBuildInstallNOAdmin}. 
 
 \subsection{Install with administrator privilege}\label{sec:XcodeUnixBuildInstallAdmin}
  
 \begin{itemize}
-\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory.
-\item \textbf{Open} a command terminal
-\item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
-\item Type the following commands : 
+\item In the terminal opened in section 
+\ref{sec:UnixBuildDownload}, type the following commands : 
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -171,11 +166,9 @@ For more detail about \texttt{cmake} command, refer to Section \ref{sec:ANNEXEIn
 \subsection{Install without administrator privilege}\label{sec:XcodeUnixBuildInstallNOAdmin}
  
 \begin{itemize}
-\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
-\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory.
-\item \textbf{Open} a command terminal
-\item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
-\item Type the following commands : 
+
+\item In the terminal opened in section 
+\ref{sec:UnixBuildDownload}, type the following commands : 
 \begin{lstlisting}
 > mkdir build
 > cd build
