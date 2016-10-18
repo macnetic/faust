@@ -299,12 +299,12 @@ classdef Faust
 		
 		nb_fact=get_nb_factor(F);
 		
-		Faust_factors=cell(1,nb_fact);
+		faust_factors=cell(1,nb_fact);
 
 		for i=1:nb_fact
-			Faust_factors{i}=get_fact(F,i);
+			faust_factors{i}=get_fact(F,i);
 		end
-		save(filename,'Faust_factors');
+		save(filename,'faust_factors');
 		
 		
 	end

@@ -56,10 +56,10 @@ classdef FaustCore < handle
 	    if (nargin == 1) && ischar(varargin{1})
 		filename=varargin{1};
 		load(filename);
-		if (~exist('Faust_factors','var') )
+		if (~exist('faust_factors','var') )
 			error('FaustCore : invalid file');
 		end
-		this=FaustCore(Faust_factors);
+		this=FaustCore(faust_factors);
 	    else				
 		this.objectHandle = mexFaust('new',varargin{:});
 	    end
