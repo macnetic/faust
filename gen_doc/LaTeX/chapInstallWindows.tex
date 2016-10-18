@@ -6,7 +6,7 @@
 \begin{itemize}
 \item Firstly, please ensure that the \textbf{prerequisites components} listed in Section \ref{sec:WinRequired} are installed. 
 
-\item Secondly, \textbf{choose your preferred compiler} between GCC from MinGW "Minimalist GNU for Windows"(Section \ref{sec:WinInstallMinGW}) or from Microsoft Visual Studio (Section \ref{sec:WinInstallVS}. 
+\item Secondly, \textbf{choose your preferred C++ Compiler} between GCC from MinGW "Minimalist GNU for Windows"(Section \ref{sec:WinInstallMinGW}) and the C++ Compiler from Microsoft Visual Studio (Section \ref{sec:WinInstallVS}). 
 
 \item Then, \textbf{process to Basic installation} of FA$\mu$ST tool by following instructions given in the appropriate section, depending to the kind of compiler (MinGW or Microsoft Visual) and the use (or not) of an IDE (Integrated Development Environment). 
 \end{itemize}
@@ -125,7 +125,7 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Win
 
 \begin{itemize}
 \item Open a command terminal
-\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
 > mkdir build
@@ -142,12 +142,15 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Win
 \end{lstlisting}
 \end{itemize}
 
+FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
+
+
 \subsubsection{Install without administrator privilege}
 \label{sec:WinMinGWNoAdminBasicInstall}
 
 \begin{itemize}
 \item Open a command terminal
-\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
 > mkdir build
@@ -158,7 +161,7 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Win
 > make install 
 \end{lstlisting}
 \end{itemize}
-
+FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
 
 \subsection{Basic build \& Install using Code::Blocks IDE}
 \label{sec:WinCodeBlocksBasicInstall}
@@ -174,7 +177,7 @@ Then, the FA$\mu$ST installation can be done.
 \label{sec:WinMinGWCodeBlocksAdminBasicInstall}
 \begin{itemize}
 \item Open a command terminal
-\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
 > mkdir build
@@ -185,14 +188,17 @@ Then, the FA$\mu$ST installation can be done.
 \item In Code::Blocks IDE, select ALL target and build the project.
 \item Re-Open the FA$\mu$ST project from the file ./build/FAUST.cbp with Code::Blocks IDE \textbf{with administrator privilege}. For that, right-click on the Code::Blocks icon and select "run as administrator". 
 \item In Code::Blocks IDE, select INSTALL target and build the project.
-For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 \end{itemize}
+
+FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
+
+For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 
 \subsubsection{Install without administrator privilege}
 \label{sec:WinMinGWCodeBlocksNoAdminBasicInstall}
 \begin{itemize}
 \item Open a command terminal
-\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
 > mkdir build
@@ -203,11 +209,11 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.cbp} with Code::Blocks IDE.
 \item In Code::Blocks IDE, select ALL target and build the project.
 \item In Code::Blocks IDE, select install target and build the project.
-For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 \end{itemize}
 
+FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
 
-
+For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 
 
 % MICCORSOFT VISUAL STUDIO
@@ -237,7 +243,7 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 \label{sec:AdminWinVisualStudioBasicInstall}
 \begin{itemize}
 \item Open a command terminal
-\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
 > mkdir build
@@ -248,8 +254,11 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 \item In Visual Studio IDE, select ALL target and generate the project three times.
 \item Re-Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE with \textbf{administrator privilege}.
 \item In Visual Studio IDE, select install target and generate the project.
-For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 \end{itemize}
+
+FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
+
+For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 
  
 \subsubsection{Install without administrator privilege}
@@ -258,7 +267,7 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \begin{itemize}
 
 \item Open a command terminal
-\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \begin{lstlisting}
 > mkdir build
@@ -268,9 +277,11 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE.
 \item In Visual Studio IDE, select ALL target and generate the project three times.
 \item In Visual Studio IDE, select install target and generate the project.
-For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
-
 \end{itemize}
+
+FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
+
+For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 
 \subsection{Basic Build \& Install using terminal}\label{sec:WinVisualStudioTerminalBasicInstall}
 The basic install described in this section requires the Microsoft Visual Studio compiler (see precedent Section \ref{sec:WinInstallCompilerVS}).
@@ -281,7 +292,7 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 
 \begin{itemize}
 \item Open a command terminal
-\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 
 \begin{lstlisting}
@@ -297,6 +308,10 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 \end{lstlisting}
 \end{itemize}
 
+FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
+
+For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
+
 \subsubsection{Install without administrator privilege}
 \label{sec:NoAdminWinVisualStudioTerminalBasicInstall}
 
@@ -304,7 +319,7 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 
 \begin{itemize}
 \item Open a command terminal
-\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FAUST directory path, for example the character $\mu$)
+\item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 
 \begin{lstlisting}
@@ -317,8 +332,9 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 \end{lstlisting}
 \end{itemize}
 
+FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
 
-
+For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildInstall}.
 
 
 
