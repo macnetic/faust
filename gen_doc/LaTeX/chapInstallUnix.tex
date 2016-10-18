@@ -2,7 +2,7 @@
 
 \paragraph{}The FA$\mu$ST project is based on \textbf{C++ library} available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the FA$\mu$ST project because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS). 
 
-\paragraph{}Firstly, please ensure that the \textbf{prerequisites components} listed in Section \ref{sec:RequiredTools} are installed. Secondly, refer to section 
+\paragraph{}Firstly, please ensure that the \textbf{prerequisite components} listed in Section \ref{sec:RequiredTools} are installed. Secondly, refer to section 
 \ref{sec:UnixBuildDownload} to download FA$\mu$ST package and setting your terminal. Then refer to the appropriate section following the use (or not) of an IDE (Integrated Development Environment): 
 \begin{itemize}
 \item Basic installation using \textbf{the command line terminal}, refer to Section \ref{sec:UnixBuildInstall}.
@@ -10,12 +10,13 @@
 \item Basic installation using \textbf{the IDE "Xcode"} only for MAC OS X platform, refer to Section \ref{sec:MacInstallXcode}. 
 \end{itemize}
 
-Finally in Section \ref{sec:UnixCustomInstall}, the configure options available to build the FA$\mu$ST toolbox are described to propose an Custom - Advanced installation. For example, the optional configuration can be used to modify the install directory path, or to build in debug mode.  
+Finally in Section \ref{sec:UnixCustomInstall}, the custom options available to build the FA$\mu$ST toolbox are described to propose Custom - Advanced installation. For example, the optional configuration can be used to modify the install directory path, or to build in debug mode.  
 
 \section{Required components}\label{sec:RequiredTools}
 This Section lists the required components you must install before to begin the FA$\mu$ST installation. 
 \begin{itemize}
-\item \textbf{Install CMake}. Visit the website \url{https://cmake.org/} to process to the installation.
+\item \textbf{Install CMake}. The minimum version required is Cmake version 3.0.2. Visit the website \url{https://cmake.org/} to process to the installation. 
+
 \item \textbf{Verify Cmake install} by typing in a command terminal : 
 \begin{lstlisting}
 > which cmake
@@ -26,7 +27,7 @@ The command terminal returns the path of your Cmake binary file like
 \end{lstlisting}
 If not, add Cmake binary directory in the environment path. (in your ~/.bashrc file)
 
-\item \textbf{Install Matlab} (\url{https://fr.mathworks.com/downloads/})
+\item \textbf{Install Matlab} (minimal version required is Matlab 2014a \url{https://fr.mathworks.com/downloads/})
 
 \item \textbf{Verify Matlab install} by typing in a terminal the following command : 
 \begin{lstlisting}
