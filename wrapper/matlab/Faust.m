@@ -29,8 +29,8 @@
 %   Nicolas Bellot	: nicolas.bellot@inria.fr
 %   Adrien Leman	: adrien.leman@inria.fr
 %   Thomas Gautrais : thomas.gautrais@inria.fr
-%	Luc Le Magoarou	: luc.le-magoarou@inria.fr
-%	Remi Gribonval	: remi.gribonval@inria.fr
+%   Luc Le Magoarou	: luc.le-magoarou@inria.fr
+%   Remi Gribonval	: remi.gribonval@inria.fr
 %
 %% References:
 % [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse 
@@ -48,17 +48,17 @@ classdef Faust
     methods
 
         function F = Faust(varargin)
-        %% FAUST Constructor - build a Faust from various type of input.
-        %
-        % Example of use :
-        %
-        % F = Faust(factors,lambda) 
-        % -factor : 1D cell array of matrix (sparse or
-        % dense) representing the factor of the Faust
-        % -lambda : (optional) multiplicative scalar
-        %                 
-        % F = Faust(filename) 
-	    % filename : a filename (mat file) where a Faust is stored with save_Faust
+	%% FAUST Constructor - build a Faust from various type of input.
+	%
+	% Example of use :
+	%
+	% F = Faust(factors,lambda) 
+	% -factor : 1D cell array of matrix (sparse or
+	% dense) representing the factor of the Faust
+	% -lambda : (optional) multiplicative scalar
+	%                 
+	% F = Faust(filename) 
+	% filename : a filename (mat file) where a Faust is stored with save_Faust
         
 	   F.matrix = FaustCore(varargin{:});
 	   F.transpose_flag = 0;	
@@ -70,22 +70,22 @@ classdef Faust
 
 
         function delete(F)
-        %% DELETE Destructor delete the Faust.
-        % delete(F)
-        %
-        % See also Faust
+	%% DELETE Destructor delete the Faust.
+	% delete(F)
+	%
+	% See also Faust
             
             mexFaust('delete', F.objectHandle);
         end
         
 
         function C = mtimes(F,A)
-        %% MTIMES * Faust Multiplication (overloaded Matlab built-in function).
-        %
-        % C=mtimes(F,A) is called for syntax 'C=F*A', when F is a Faust matrix and A a full
-        % storage matrix, C is also a full matrix storage.
-        % 
-        % See also mtimes_trans
+	%% MTIMES * Faust Multiplication (overloaded Matlab built-in function).
+	%
+	% C=mtimes(F,A) is called for syntax 'C=F*A', when F is a Faust matrix and A a full
+	% storage matrix, C is also a full matrix storage.
+	% 
+	% See also mtimes_trans
         
             C = mexFaust('multiply', F.matrix.objectHandle,A,F.transpose_flag);
         end
@@ -93,14 +93,14 @@ classdef Faust
         
 
         function C = mtimes_trans(F,A,trans)
-        %% MTIMES_TRANS Multiplication by a Faust or its non-conjugate transposed.
-        %
-        % C = mtimes_trans(F,A,trans) when F is a Faust,A a full storage
-        % matrix and trans a parameter, C a full storage matrix
-        % if trans == 0, C=F*A is performed  (multiplication)
-        % if trans == 1, C=F'*A is performed (multiplication by transposed)
-        %
-        % See also mtimes.
+	%% MTIMES_TRANS Multiplication by a Faust or its non-conjugate transposed.
+	%
+	% C = mtimes_trans(F,A,trans) when F is a Faust,A a full storage
+	% matrix and trans a parameter, C a full storage matrix
+	% if trans == 0, C=F*A is performed  (multiplication)
+	% if trans == 1, C=F'*A is performed (multiplication by transposed)
+	%
+	% See also mtimes.
         
 	if ~isreal(trans)
 		error('invalid argument trans, must be equal to 0 or 1');
@@ -117,10 +117,10 @@ classdef Faust
         
 
         function A = full(F)
-        %% FULL  Convert Faust matrix to full matrix (overloaded Matlab
-        % built-in function).
-        %
-        % A=full(F) converts a Faust matrix F to full storage matrix A.
+	%% FULL  Convert Faust matrix to full matrix (overloaded Matlab
+	% built-in function).
+	%
+	% A=full(F) converts a Faust matrix F to full storage matrix A.
         
         A=mexFaust('full',F.matrix.objectHandle,F.transpose_flag);
 	
@@ -129,26 +129,26 @@ classdef Faust
 
 
         function F_trans=transpose(F)
-        %% TRANSPOSE .' Non-conjugate transposed Faust (overloaded Matlab built-in function).
-        %
-        % F_trans = transpose(F) is called for the syntax F.' when F is Faust.
-        %
-        % WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
-        %
-        % See also ctranspose.
+	%% TRANSPOSE .' Non-conjugate transposed Faust (overloaded Matlab built-in function).
+	%
+	% F_trans = transpose(F) is called for the syntax F.' when F is Faust.
+	%
+	% WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
+	%
+	% See also ctranspose.
             
                 F_trans=ctranspose(F); 
 
         end
         
         function F_ctrans=ctranspose(F)
-        %% CTRANSPOSE ' Complex conjugate transposed Faust (overloaded Matlab built-in function).
-        %
-        % F_trans = ctranspose(F) is called for syntax F' (complex conjugate transpose) when F is a Faust.
-        %
-        % WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
-        %
-        % See also transpose.
+	%% CTRANSPOSE ' Complex conjugate transposed Faust (overloaded Matlab built-in function).
+	%
+	% F_trans = ctranspose(F) is called for syntax F' (complex conjugate transpose) when F is a Faust.
+	%
+	% WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
+	%
+	% See also transpose.
         
                 F_ctrans=F; % trans and F point share the same C++ underlying object (objectHandle)
                 F_ctrans.transpose_flag = xor(1,F.transpose_flag); % inverse the transpose flag
@@ -158,15 +158,15 @@ classdef Faust
 	
 
         function varargout = size(F,varargin)
-        %% SIZE Size of a Faust (overloaded Matlab built-in function).
-        %
-        % D = size(F), for a Faust F, returns the two-element row vector
-        % D = [M,N] containing the number of rows and columns in the Faust.
-        %
-        % M = size(F,DIM) returns the length of the dimension specified
-        % by the scalar DIM.  For example, size(X,1) returns the number
-        % of rows and size(F,2) returns the number of columns in the Faust.
-        % If DIM > 2, M will be 1.
+	%% SIZE Size of a Faust (overloaded Matlab built-in function).
+	%
+	% D = size(F), for a Faust F, returns the two-element row vector
+	% D = [M,N] containing the number of rows and columns in the Faust.
+	%
+	% M = size(F,DIM) returns the length of the dimension specified
+	% by the scalar DIM.  For example, size(X,1) returns the number
+	% of rows and size(F,2) returns the number of columns in the Faust.
+	% If DIM > 2, M will be 1.
         
             
             
@@ -219,14 +219,14 @@ classdef Faust
 
     	function end_dim = end(F,k,n)
 	%% END (useful for slicing) serve as the last index in an indexing expression (overloaded Matlab built-in function).
-    	%
-        % Examples of use for slicing a Faust F are 
-        % F(3:end,1) : in this case, end=size(F,1) 
-        %   i.e end equals to the number of row of the Faust F.
-        % F(1,1:2:end-1) : in this case, end=size(F,2) 
-        % end equals to the number of column fo the Faust F.
-        %
-        % See also subsref, size.
+	%
+	% Examples of use for slicing a Faust F are 
+	% F(3:end,1) : in this case, end=size(F,1) 
+	%   i.e end equals to the number of row of the Faust F.
+	% F(1,1:2:end-1) : in this case, end=size(F,2) 
+	% end equals to the number of column fo the Faust F.
+	%
+	% See also subsref, size.
 	
 		if (n ~= 2)
 			error('invalid slicing : Faust is a 2D array i.e matrix');
@@ -242,15 +242,15 @@ classdef Faust
 	
 
         function factor = get_fact(F,id)
-        %% GET_FACT Ith factor of the Faust.
-        %
+	%% GET_FACT Ith factor of the Faust.
+	%
 	% A=get_fact(F,id) return the id factor A of the Faust F as a full storage matrix.
-        % 
-        % Example of use :
-        % A=get_fact(F,1) returns the 1st factor of the Faust F.
-        % A=get_fact(F,4) returns the 4th factor of the Faust F.
-        %
-        % See also get_nb_factor.
+	% 
+	% Example of use :
+	% A=get_fact(F,1) returns the 1st factor of the Faust F.
+	% A=get_fact(F,4) returns the 4th factor of the Faust F.
+	%
+	% See also get_nb_factor.
         
 		if (~isa(id,'double'))
 			error('get_fact second argument (indice) must either be real positive integers or logicals.');
@@ -275,11 +275,11 @@ classdef Faust
 
 	function nb_factor = get_nb_factor(F)
 	%% GET_NB_FACTOR Number of factor of the Faust.
-    	%
-    	% nb_factor = get_nb_factor(F) return the number of factor of the
-    	% Faust F.
-    	%
-    	% See also get_fact.
+	%
+	% nb_factor = get_nb_factor(F) return the number of factor of the
+	% Faust F.
+	%
+	% See also get_fact.
     
 		nb_factor = mexFaust('get_nb_factor',F.matrix.objectHandle);
     end
@@ -287,9 +287,9 @@ classdef Faust
     
 	function save(F,filename)
 	%% SAVE Save a Faust into a matfile.
-    	%
-    	% save(F,filename) save the Faust F into the .mat file specified by
-    	% filename.
+	%
+	% save(F,filename) save the Faust F into the .mat file specified by
+	% filename.
     	
     	
     
@@ -311,19 +311,19 @@ classdef Faust
 
 
 	function submatrix=subsref(F,S)
-    	%% SUBSREF Subscripted reference (overloaded Matlab built-in function).
-    	%
-    	%  F(I,J) is an array formed from the elements of the rectangular
-    	% submatrix of the Faust F specified by the subscript vectors I and J.  The
-    	% resulting array has LENGTH(I) rows and LENGTH(J) columns.  A colon used
-    	% as a subscript, as in F(I,:), indicates all columns of those rows
-    	% indicated by vector I. Similarly, F(:,J) = B means all rows of columns
-    	%J.
+	%% SUBSREF Subscripted reference (overloaded Matlab built-in function).
+	%
+	%  F(I,J) is an array formed from the elements of the rectangular
+	% submatrix of the Faust F specified by the subscript vectors I and J.  The
+	% resulting array has LENGTH(I) rows and LENGTH(J) columns.  A colon used
+	% as a subscript, as in F(I,:), indicates all columns of those rows
+	% indicated by vector I. Similarly, F(:,J) = B means all rows of columns
+	%J.
 	%    	
 	% Example of use :
-    	%  A(i,j) A(:,j)  A(3:4,2:5) A(1:end,5:end-1)  
-    	%
-    	% See also end.
+	%  A(i,j) A(:,j)  A(3:4,2:5) A(1:end,5:end-1)  
+	%
+	% See also end.
         
 		
 		if (~isfield(S,'type')) | (~isfield(S,'subs'))
@@ -401,12 +401,12 @@ classdef Faust
 
 
 	function norm_Faust=norm(F,varargin)
-    	%% NORM Faust norm (overloaded Matlab built-in function).
-    	%
-    	% norm(F,2) when F is Faust returns the 2-norm of F
-    	% norm(F) is the same as norm(F)
-    	%
-    	% WARNING : norm(F,typenorm) is only supported when typenorm equals 2
+	%% NORM Faust norm (overloaded Matlab built-in function).
+	%
+	% norm(F,2) when F is Faust returns the 2-norm of F
+	% norm(F) is the same as norm(F)
+	%
+	% WARNING : norm(F,typenorm) is only supported when typenorm equals 2
     
 	    nb_input = length(varargin);
             if (nb_input > 1)
@@ -429,11 +429,11 @@ classdef Faust
 
 
 	function nz=nnz(F)
-    	%% NNZ Number of nonzero elements in a Faust (overloaded Matlab built-in function).
-    	%
-    	% nz = nnz(F) is the number of nonzero elements in the Faust F.
-    	%
-    	% See also density, RCG.
+	%% NNZ Number of nonzero elements in a Faust (overloaded Matlab built-in function).
+	%
+	% nz = nnz(F) is the number of nonzero elements in the Faust F.
+	%
+	% See also density, RCG.
     
 	    nz=mexFaust('nnz',F.matrix.objectHandle);
             
@@ -441,15 +441,15 @@ classdef Faust
 
 
 	function dens=density(F)
-    	%% DENSITY Density of the Faust.
-    	%
-    	% dens = density(F) when F is a Faust returns the
-    	% percentage of nonzero elements of F,
-    	% dens is a number between 0 and 1.
-    	% In some degenerated case, dens can be greater than 1.
+	%% DENSITY Density of the Faust.
+	%
+	% dens = density(F) when F is a Faust returns the
+	% percentage of nonzero elements of F,
+	% dens is a number between 0 and 1.
+	% In some degenerated case, dens can be greater than 1.
 	% If the Faust is empty, return -1.
 	%
-    	% See also RCG, nnz.
+	% See also RCG, nnz.
     
         prod_dim=prod(size(F));			
 	     if (prod_dim ~= 0)		
@@ -461,14 +461,14 @@ classdef Faust
 
 
 	function speed_up=RCG(F)
-    	%% RCG Relative Complexity Gain (inverse of the density)
-    	%
-    	% speed_up =  RCG(F) when F is Faust, returns the
-    	% inverse of density of the Faust (i.e the theoretical gain
-    	% both for storage and multiplication computation time between the Faust and its full storage
-    	% equivalent full(F)).
-    	%
-    	% See also density, nnz.
+	%% RCG Relative Complexity Gain (inverse of the density)
+	%
+	% speed_up =  RCG(F) when F is Faust, returns the
+	% inverse of density of the Faust (i.e the theoretical gain
+	% both for storage and multiplication computation time between the Faust and its full storage
+	% equivalent full(F)).
+	%
+	% See also density, nnz.
     
 		dens=density(F);		
 		if (dens > 0)
