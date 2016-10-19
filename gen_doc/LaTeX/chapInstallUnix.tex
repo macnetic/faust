@@ -1,9 +1,12 @@
 \chapter{Installation on Unix platform}\label{sec:InstallUnix}
 
-\paragraph{}The FA$\mu$ST project is based on \textbf{C++ library} available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the FA$\mu$ST project because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS). 
+The FA$\mu$ST project is based on \textbf{C++ library} available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the FA$\mu$ST project because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS).\\
+\\
+Firstly, please ensure that the \textbf{prerequisite components} listed in Section \ref{sec:RequiredTools} are installed.
 
-\paragraph{}Firstly, please ensure that the \textbf{prerequisite components} listed in Section \ref{sec:RequiredTools} are installed. Secondly, refer to section 
-\ref{sec:UnixBuildDownload} to download FA$\mu$ST package and setting your terminal. Then refer to the appropriate section following the use (or not) of an IDE (Integrated Development Environment): 
+Secondly, refer to section \ref{sec:UnixBuildDownload} to download FA$\mu$ST package and setting your terminal. 
+
+Then refer to the appropriate section following the use (or not) of an IDE (Integrated Development Environment): 
 \begin{itemize}
 \item Basic installation using \textbf{the command line terminal}, refer to Section \ref{sec:UnixBuildInstall}.
 \item Basic installation using \textbf{the IDE "Code::Blocks"}, refer to Section \ref{sec:UnixInstallCodeBlock}. 
@@ -57,30 +60,30 @@ No supported compiler or SDK was found. For options, visit
 Visit the webpage specified in the error message,
 in order to see the list of compiler supported by your Matlab version \texttt{R<20XXx>} on your plateform \texttt{<ARCH>}.
 
+\end{itemize}
 
 
 \section{Download Faust Package \& launch terminal}\label{sec:UnixBuildDownload}
+
 When prerequisities listed in precedent section \ref{sec:RequiredTools} are checked, you can get the package FA$\mu$ST.
+\begin{itemize}
 \item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
 \item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory.
 \item \textbf{Open} a command terminal
 \item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
-
-
-
-
+\end{itemize}
 
 
 
 \section{Basic Build \& Installation using Makefile}\label{sec:UnixBuildInstall}
 
-\paragraph{}When you have done the step in section  \ref{sec:UnixBuildDownload} (i.e download Faust package and launch the terminal in the right directory),  the FA$\mu$ST installation can start.
+When you have done the step in section \ref{sec:UnixBuildDownload} (i.e download Faust package and launch the terminal in the right directory),  the FA$\mu$ST installation can start.
 If you are administrator of your machine (root access), follow instructions given in Section \ref{sec:UnixBuildInstallAdmin}. Otherwise, for local installation, refer to Section \ref{sec:UnixBuildInstallNOAdmin}. 
 
 \subsection{Install with administrator privilege}\label{sec:UnixBuildInstallAdmin}
-\item In the terminal opened in section 
+In the terminal opened in Section 
 \ref{sec:UnixBuildDownload}, type the following commands : 
-\begin{itemize}
+
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -88,7 +91,6 @@ If you are administrator of your machine (root access), follow instructions give
 > make
 > sudo make install % run with administrator privilege
 \end{lstlisting}
-\end{itemize}
 
 FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
 
@@ -96,8 +98,7 @@ For more detail about \texttt{cmake ; make ; make install} commands, refer to Se
 
 
 \subsection{Install without administrator privilege}\label{sec:UnixBuildInstallNOAdmin}
-\item In the terminal opened in section 
-\ref{sec:UnixBuildDownload}, type the following commands :
+In the terminal opened in Section \ref{sec:UnixBuildDownload}, type the following commands :
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -105,7 +106,6 @@ For more detail about \texttt{cmake ; make ; make install} commands, refer to Se
 > make
 > make install
 \end{lstlisting}
-\end{itemize}
 
 FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
 
@@ -128,7 +128,8 @@ When you have done the step in section  \ref{sec:UnixBuildDownload} (i.e downloa
 
 \item Open the FA$\mu$ST project from the file \textbf{./build/FAUST.cbp} with Code::Blocks IDE. 
 \item In Code::Blocks IDE, select \textbf{ALL} target and build the project. 
-\item Open the FA$\mu$ST project from the file \textbf{./build/FAUST.cbp} with Code::Blocks IDE \textbf{with administrator privilege}. For that, type in a terminal :
+\item Close Code::Blocks IDE
+\item Re-Open the FA$\mu$ST project from the file \textbf{./build/FAUST.cbp} with Code::Blocks IDE \textbf{with administrator privilege}. For that, type in a terminal :
 \begin{lstlisting}
 > sudo codeblocks
 \end{lstlisting}
@@ -180,7 +181,8 @@ FA$\mu$ST install using the IDE Xcode concerns only MAC OS X environment.
 
 \item Open the FA$\mu$ST project from the file \textbf{./build/FAUST.xcodeproj} with Xcode IDE. 
 \item In Xcode IDE, select \textbf{ALL} target and build the project. 
-\item Open the FA$\mu$ST project from the file \textbf{./build/FAUST.xcodeproj} with Xcode IDE \textbf{with administrator privilege}. For that, type in a terminal:
+\item Close Xcode IDE
+\item Re-Open the FA$\mu$ST project from the file \textbf{./build/FAUST.xcodeproj} with Xcode IDE \textbf{with administrator privilege}. For that, type in a terminal:
 \begin{lstlisting}
 > sudo Xcode
 \end{lstlisting}
@@ -230,9 +232,9 @@ For more detail about \texttt{cmake} command, refer to Section \ref{sec:ANNEXEIn
 
 \section{Custom - Advanced Installation}\label{sec:UnixCustomInstall}
 
-\paragraph{}The project FA$\mu$ST can be configured with optional parameters, for example if you want to install FA$\mu$ST library in a different folder or to enable the parallel computing using multithread capacities provided by the OS. This build system can be parametrized using the Cmake Graphical User Interface, or the Cmake command line tools. 
+The project FA$\mu$ST can be configured with optional parameters, for example if you want to install FA$\mu$ST library in a different folder or to enable the parallel computing using multithread capacities provided by the OS. This build system can be parametrized using the Cmake Graphical User Interface, or the Cmake command line tools. 
 
-\paragraph{}The Cmake Graphical User Interface \texttt{ccmake} allows you to select option input. When using the \texttt{ccmake} command in your build directory, the Cmake GUI appears in the console (see fig. \ref{fig:ccmake}).
+The Cmake Graphical User Interface \texttt{ccmake} allows you to select option input. When using the \texttt{ccmake} command in your build directory, the Cmake GUI appears in the console (see fig. \ref{fig:ccmake}).
 
 \begin{figure}[!h] %%[!htbp]
 \centering
@@ -241,10 +243,11 @@ For more detail about \texttt{cmake} command, refer to Section \ref{sec:ANNEXEIn
 \label{fig:ccmake}
 \end{figure}
 
-\paragraph{}When scrolling on a value and pressing [enter], this value can be edited, the black underlaid row displays some information about the option and required path to create the build system. In the case of an option press [enter] to toggle the ON/OFF values. You can edit option by pressing [enter]. For example, press [enter] to edit option \texttt{CMAKE\_INSTALL\_PREFIX} to modify the install directory. 
-\paragraph{}After choosing options for the build and setting the required fields, press [c] to configure. The configuration of the build system is checked again by Cmake, at the end of this check if the build settings are correct, you can press [g] in order to generate the build system.
+When scrolling on a value and pressing [enter], this value can be edited, the black underlaid row displays some information about the option and required path to create the build system. In the case of an option press [enter] to toggle the ON/OFF values. You can edit option by pressing [enter]. For example, press [enter] to edit option \texttt{CMAKE\_INSTALL\_PREFIX} to modify the install directory. 
 
-\paragraph{} Instead the ccmake GUI, an other possibility to configure and generate the project is to use the command line cmake which can take the option input. Here is the list of available options: 
+After choosing options for the build and setting the required fields, press [c] to configure. The configuration of the build system is checked again by Cmake, at the end of this check if the build settings are correct, you can press [g] in order to generate the build system.
+
+Instead the ccmake GUI, an other possibility to configure and generate the project is to use the command line cmake which can take the option input. Here is the list of available options: 
 \texttt{cmake\ ..\ -D<BUILD\_NAME>=<value>}
 
 \begin{itemize}
@@ -261,7 +264,7 @@ For more detail about \texttt{cmake} command, refer to Section \ref{sec:ANNEXEIn
 \item BUILD\_READ\_MAT\_FILE : Using matio library to read mat files (default value is OFF)
 \end{itemize}
 
-\paragraph{}Following the selected option, the cmake installer automatically checks the dependent component (library OpenBlas, eigen, matio, libxml2).  
+Following the selected option, the cmake installer automatically checks the dependent component (library OpenBlas, eigen, matio, libxml2).  
 
 %\section{Optional dependent tools}\label{sec:OptionalRequiredTools}
 

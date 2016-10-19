@@ -1,7 +1,7 @@
 \chapter{Installation on Windows platform}\label{sec:WinInstall}
 
 
-\paragraph{}The FA$\mu$ST project is based on \textbf{C++ library} available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the FA$\mu$ST project because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Windows platform.
+The FA$\mu$ST project is based on \textbf{C++ library} available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the FA$\mu$ST project because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Windows platform.
 
 \begin{itemize}
 \item Firstly, please ensure that the \textbf{prerequisite components} listed in Section \ref{sec:WinRequired} are installed. 
@@ -90,7 +90,7 @@ When prerequisitie components listed in precedent section \ref{sec:WinRequired} 
 
 \section{Install using GCC-MinGW compiler}\label{sec:WinInstallMinGW}
 
-\paragraph{}When prerequisite components listed in previous section \ref{sec:WinRequired} are checked, you must install \textbf{MinGW containing the C++ Compiler}. 
+When prerequisite components listed in previous section \ref{sec:WinRequired} are checked, you must install \textbf{MinGW containing the C++ Compiler}. 
 Then, the FA$\mu$ST installation can be done using Command prompt, following instructions given in Section \ref{sec:WinMinGWBasicInstall} or using CodeBlocks IDE, following instructions given in Section \ref{sec:WinCodeBlocksBasicInstall}. 
 
 
@@ -195,9 +195,9 @@ Then, the FA$\mu$ST installation can be done.
 > cmake -G "CodeBlocks - MinGW Makefiles" .. 
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.cbp} with Code::Blocks IDE.
-\item In Code::Blocks IDE, select ALL target and build the project.
+\item In Code::Blocks IDE, select ALL BUILD, select RELEASE mode and generate the project.
 \item Re-Open the FA$\mu$ST project from the file ./build/FAUST.cbp with Code::Blocks IDE \textbf{with administrator privilege}. For that, right-click on the Code::Blocks icon and select "run as administrator". 
-\item In Code::Blocks IDE, select INSTALL target and build the project.
+\item In Code::Blocks IDE, select INSTALL target, select RELEASE mode and build.
 \end{itemize}
 
 FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
@@ -217,8 +217,8 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 	    -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.cbp} with Code::Blocks IDE.
-\item In Code::Blocks IDE, select ALL target and build the project.
-\item In Code::Blocks IDE, select install target and build the project.
+\item In Code::Blocks IDE, select ALL target, select RELEASE mode and build the project.
+\item In Code::Blocks IDE, select install target, select RELEASE mode and build the project.
 \end{itemize}
 
 FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
@@ -229,7 +229,7 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 % MICCORSOFT VISUAL STUDIO
 \section{Install using Microsoft Visual compiler}\label{sec:WinInstallVS}
 
-\paragraph{}When prerequisites listed in section \ref{sec:WinRequired} are checked, you must install \textbf{Microsoft Visual Studio} containing the C++ Compiler (Section \ref{sec:WinInstallCompilerVS}).
+When prerequisites listed in section \ref{sec:WinRequired} are checked, you must install \textbf{Microsoft Visual Studio} containing the C++ Compiler (Section \ref{sec:WinInstallCompilerVS}).
 Then, the FA$\mu$ST installation can be done using Visual Studio IDE, following instructions given in Section \ref{sec:WinVisualStudioBasicInstall} or using Command prompt, following instructions given in Section \ref{sec:WinVisualStudioTerminalBasicInstall}. 
 
 
@@ -261,9 +261,10 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 > cmake .. 
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE.
-\item In Visual Studio IDE, select ALL target and generate the project three times.
+\item In Visual Studio IDE, select ALL BUILD, select RELEASE mode, and generate the project three times.
+\item Close Visual Studio IDE
 \item Re-Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE with \textbf{administrator privilege}.
-\item In Visual Studio IDE, select install target and generate the project.
+\item In Visual Studio IDE, select INSTALL target, select RELEASE mode, and generate the project.
 \end{itemize}
 
 FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
@@ -285,8 +286,8 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 > cmake .. -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE.
-\item In Visual Studio IDE, select ALL target and generate the project three times.
-\item In Visual Studio IDE, select install target and generate the project.
+\item In Visual Studio IDE, select ALL target, select RELEASE mode and generate the project three times.
+\item In Visual Studio IDE, select install target, select RELEASE mode, and generate the project.
 \end{itemize}
 
 FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
@@ -299,7 +300,7 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 
 \subsubsection{Install with administrator privilege}
 \label{sec:AdminWinVisualStudioTerminalBasicInstall}
-
+In the case of \textbf{Microsoft Visual Studio 2013 compiler using the command terminal} :
 \begin{itemize}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
@@ -325,13 +326,11 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \subsubsection{Install without administrator privilege}
 \label{sec:NoAdminWinVisualStudioTerminalBasicInstall}
 
-\paragraph{NOTE:}In the case of \textbf{Microsoft Visual Studio 2013 compiler using the command terminal} :
-
+In the case of \textbf{Microsoft Visual Studio 2013 compiler using the command terminal} :
 \begin{itemize}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
-
 \begin{lstlisting}
 > mkdir build
 > cd build
