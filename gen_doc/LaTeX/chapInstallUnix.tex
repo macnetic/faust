@@ -39,6 +39,26 @@ You must obtain the path of your matlab binary file like:
 \end{lstlisting}
 If not, add \texttt{matlab} binary directory in your environment path (in your ~/.bashrc file). 
 
+\item \textbf{Verify Matlab} has a MEX supported compiler by typing in a Matlab Command Window :
+\begin{lstlisting}
+>> mex -setup C++
+\end{lstlisting}
+
+You must obtain this kind of message :
+\begin{lstlisting}[backgroundcolor=\color{white},keywordstyle=\color{black}]
+MEX configured to use <YOURCOMPILER>  for C++ language compilation.
+\end{lstlisting}
+
+But if you have an error message of the style :
+\begin{lstlisting}[backgroundcolor=\color{white},moredelim={**[is][\color{blue}]{@}{@}},moredelim={[is][\underbar]{_}{_}}]
+No supported compiler or SDK was found. For options, visit 
+@_http:www.matworks.com/support/compilers/R<20XXx>/<ARCH>.html_@
+\end{lstlisting}
+Visit the webpage specified in the error message,
+in order to see the list of compiler supported by your Matlab version \texttt{R<20XXx>} on your plateform \texttt{<ARCH>}.
+
+
+
 \section{Download Faust Package \& launch terminal}\label{sec:UnixBuildDownload}
 When prerequisities listed in precedent section \ref{sec:RequiredTools} are checked, you can get the package FA$\mu$ST.
 \item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
