@@ -64,6 +64,15 @@ Here is a list of packages used in the FA$\mu$ST project. Eigen and OpenBlas lib
 \item \textbf{OpenBLAS} is an optimized BLAS library based on GotoBLAS2 1.13 BSD version. (see \url{http://www.openblas.net}). To install OpenBlas, refer to \url{https://github.com/xianyi/OpenBLAS/wiki/Installation-Guide}. You can directly download precompiled binary here \url{https://sourceforge.net/projects/openblas/files/v0.2.14/}
 \end{itemize}
 
+\section{Matlab and processor architecture}\label{sec:ANNEXEMatlabArch}
+If your processor architecture is 64 bit, Matlab must be installed in 64 bit. If your processor architecture is an 32 bit, Matlab must be installed in 32 bit. You can check your environment variable called PROCESSOR\_ARCHITECTURE by typing :
+\begin{lstlisting}
+> set
+\end{lstlisting}
+Check in the list the variable PROCESSOR\_ARCHITECTURE. \\
+PROCESSOR\_ARCHITECTURE=AMD64 correspond to 64bit, 
+PROCESSOR\_ARCHITECTURE=x86 correspond to 32 bit.
+
 
 
 \section{Add environment variable on Windows platform}\label{sec:ANNEXEEnvironmentVariableWindows}

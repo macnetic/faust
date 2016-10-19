@@ -39,7 +39,8 @@ You must obtain the path of your matlab binary file like:
 \begin{lstlisting}[backgroundcolor=\color{white}]
 C:\Program Files\MATLAB\<R2015b>\bin\matlab.exe
 \end{lstlisting}
-If not, please add the directory of your \texttt{matlab.exe} file in your environment variable. (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). 
+If not, please add the directory of your \texttt{matlab.exe} file in your environment variable. (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). \\
+
 
 
 \item \textbf{Install 7-zip tool} from \url{http://www.7-zip.org/}. 
@@ -146,7 +147,7 @@ FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{se
 > mkdir build
 > cd build
 > cmake -G "MinGW Makefiles" .. 
-	    -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
+	    -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 > make
 > make install 
 \end{lstlisting}
@@ -194,7 +195,7 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 > mkdir build
 > cd build
 > cmake -G "CodeBlocks - MinGW Makefiles" .. 
-	    -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
+	    -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.cbp} with Code::Blocks IDE.
 \item In Code::Blocks IDE, select ALL target and build the project.
@@ -262,7 +263,7 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \begin{lstlisting}
 > mkdir build
 > cd build
-> cmake .. -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"
+> cmake .. -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE.
 \item In Visual Studio IDE, select ALL target and generate the project three times.
@@ -315,7 +316,7 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \begin{lstlisting}
 > mkdir build
 > cd build
-> cmake .. -DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>" 
+> cmake .. -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>" 
 > cmake --build . --config "Release"
 > cmake --build . --config "Release"
 > cmake --build . --config "Release" --target "install"
