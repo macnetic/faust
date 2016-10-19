@@ -12,6 +12,9 @@
 \end{itemize}
 
 
+
+
+
 %Then refer to the appropriate section : If you are more familiar with the graphical user interface, prefer the basic installation using \textbf{"the IDE Visual Studio"}. Otherwise, if you are friendly with Unix tools and command line terminal, prefer the basic installation using \textbf{the command terminal}: 
 
 
@@ -41,7 +44,23 @@ C:\Program Files\MATLAB\<R2015b>\bin\matlab.exe
 \end{lstlisting}
 If not, please add the directory of your \texttt{matlab.exe} file in your environment variable. (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). \\
 
+\item \textbf{Verify Matlab} has a MEX supported compiler by typing in a Matlab Command Window :
+\begin{lstlisting}
+>> mex -setup C++
+\end{lstlisting}
 
+You must obtain this kind of message :
+\begin{lstlisting}[backgroundcolor=\color{white},keywordstyle=\color{black}]
+MEX configured to use <YOURCOMPILER>  for C++ language compilation.
+\end{lstlisting}
+
+But if you have an error message of the style :
+\begin{lstlisting}[backgroundcolor=\color{white},moredelim={**[is][\color{blue}]{@}{@}},moredelim={[is][\underbar]{_}{_}}]
+No supported compiler or SDK was found. For options, visit 
+@_http:www.matworks.com/support/compilers/R<20XXx>/<ARCH>.html_@
+\end{lstlisting}
+Visit the webpage specified in the error message,
+in order to see the list of compiler supported by your Matlab version \texttt{R<20XXx>} on your plateform \texttt{<ARCH>}.
 
 \item \textbf{Install 7-zip tool} from \url{http://www.7-zip.org/}. 
 
