@@ -9,9 +9,10 @@ Here is a list of packages used in the FA$\mu$ST project. The installation of th
 \item Library \textbf{matio} \url{https://sourceforge.net/projects/matio}
 \end{itemize}
 
-\section{Compatibility between MATLAB and compiler gcc}\label{sec:ANNEXECompatibilityMatlabCompiler}
+\section{Compatibility between MATLAB and gcc compiler}\label{sec:ANNEXECompatibilityMatlabCompiler}
 Adjust your version of GCC compiler in order to run the installation properly. The use of the mex function in Matlab requires that you have a third-party compiler installed on your system. The latest version of Matlab (2016a in our case) only supports up to GCC 4.7 (see \url{http://fr.mathworks.com/support/compilers/R2016a/index.html?sec=glnxa64} for more detail).
-To temporally change your version of gcc compiler, you can modify the environment variable CC an CXX. For that, export your CC and CXX variables corresponding to gcc and g++ binaries path :
+
+To temporally change your version of cc and cxx compiler, you can modify the environment variable CC an CXX. For that, export your CC and CXX variables corresponding to gcc and g++ binaries path :
 \begin{itemize}
 \item find your gcc and g++ version path using \texttt{which} command in a terminal :
 \begin{lstlisting}
@@ -27,10 +28,6 @@ export CXX=/usr/lib64/ccache/g++
 \end{lstlisting}
 \end{itemize}
 
-An other way to change the version of compiler use by mex function from matlab command is : 
-\begin{lstlisting}
-> mex -setup
-\end{lstlisting}
 
 
 \section{Further information about Build \& Install process}\label{sec:ANNEXEInfoBuildInstall}
