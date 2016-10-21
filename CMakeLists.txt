@@ -457,6 +457,8 @@ ELSE(WIN32)
     		SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib/Debug)
 	    ELSE (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
     		SET(FAUST_BIN_DIR ${PROJECT_BINARY_DIR}/lib/Release)
+file(MAKE_DIRECTORY ${FAUST_BIN_DIR})
+
 	    ENDIF (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATCHES "debug") OR  (CMAKE_BUILD_TYPE MATCHES "DEBUG") )
 	ELSE( CMAKE_GENERATOR STREQUAL "Xcode")
 	    # Generic case
@@ -687,6 +689,7 @@ SET(CPACK_OUTPUT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackConfig.cmake")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Flexible Approximate Multi-Layer Sparse Transform")
 SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/license.txt")
 SET(CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/README.txt")
+set(CPACK_PACKAGE_URL "http://faust.gforge.inria.fr/" )
 #INSTALL(FILES "${PROJECT_SOURCE_DIR}/README.txt" DESTINATION ${PROJECT_BINARY_DIR})
 #INSTALL(FILES "${PROJECT_SOURCE_DIR}/license.txt" DESTINATION ${PROJECT_BINARY_DIR})
 
@@ -702,8 +705,6 @@ set(CPACK_SOURCE_IGNORE_FILES "/build/;/.bzr/;/CMakeFiles/;/_CPack_Packages/;/.s
 #else()
 #	set(CPACK_SOURCE_IGNORE_FILES "${CPACK_SOURCE_IGNORE_FILES};/externals/win/;/externals/unix/eigen/;/externals/unix/OpenBLAS/;/externals/unix/sdk_OpenBLAS/;/externals/unix/matio/;")
 #endif()
-
-
 SET(CPACK_SOURCE_GENERATOR "TGZ")
 
 ##############################################################################
@@ -711,7 +712,7 @@ SET(CPACK_SOURCE_GENERATOR "TGZ")
 ##############################################################################
 SET(CPACK_PACKAGE_CONTACT "name@inria.fr")
 SET(CPACK_INSTALL_CMAKE_PROJECTS "${PROJECT_BINARY_DIR};FAUST;ALL;/")
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Flexible Approximate Multi-Layer Sparse Transform")
+
 #SET(CPACK_IGNORE_FILES "/CMake/;/build/;/CMakeFiles/;/_CPack_Packages/;/src/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
 SET(CPACK_STRIP_FILES "")
 
@@ -726,7 +727,6 @@ IF(WIN32 AND NOT UNIX)
     	SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Windows")
     	SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Windows")
   	ENDIF(CMAKE_CL_64)
-	SET(CPACK_SET_DESTDIR "OFF")
 	# NSIS not used yet, cause of a bug with suitable ZIP programme
 	# There is a bug in NSI that does not handle full unix paths properly. Make
 	# sure there is at least one set of four (4) backlasshes.
@@ -734,7 +734,7 @@ IF(WIN32 AND NOT UNIX)
 	SET(CPACK_NSIS_DISPLAY_NAME "FAUST")
 #	SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.irisa.fr/metiss/home_html-fr")
 #	SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\http://www.irisa.fr/metiss/home_html-fr")
-#	SET(CPACK_NSIS_CONTACT "matchingpursuite@irisa.fr")
+#	SET(CPACK_NSIS_CONTACT "xxxxxxxxxx@irisa.fr")
 	SET(CPACK_NSIS_MODIFY_PATH OFF)
 ELSE(WIN32 AND NOT UNIX)
 	IF(APPLE)
@@ -751,20 +751,41 @@ ELSE(WIN32 AND NOT UNIX)
 		#SET(CPACK_DEBIAN_PACKAGE_DEPENDS "python, python-numpy, libfftw3-3, libsndfile1")
 		#SET(CPACK_DEBIAN_PACKAGE_SECTION "math")
 		SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "FAuST is a C++ toolbox, useful to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation). ")
+
+		
+#SET(CPACK_RPM_PACKAGE_DEPENDS "libmat, libmex, libmx ")
+#CPACK_RPM_PACKAGE_GROUP
+#SET (CPACK_RPM_PACKAGE_REQUIRES )
+#set(CPACK_RPM_COMPONENT_INSTALL ON)
+
+set(CPACK_RPM_PACKAGE_RELEASE "1")
+SET(CPACK_RPM_PACKAGE_LICENSE "GNU AFFERO GENERAL PUBLIC LICENSE")
+set(CPACK_RPM_PACKAGE_GROUP "inconnu")
+set(CPACK_RPM_PACKAGE_VENDOR ${CPACK_PACKAGE_VENDOR})
+set(CPACK_RPM_PACKAGE_URL ${CPACK_PACKAGE_URL} )
+set(CPACK_RPM_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION_SUMMARY})
+
+
 		IF(CMAKE_SIZEOF_VOID_P MATCHES "4")
 			SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Linux")
 			SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Linux")
 			SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
+			SET(CPACK_RPM_PACKAGE_ARCHITECTURE "i386")
 		ELSE(CMAKE_SIZEOF_VOID_P MATCHES "4")
 			SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Linux")
 			SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Linux")
 			SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+			SET(CPACK_RPM_PACKAGE_ARCHITECTURE "amd64")
 		ENDIF(CMAKE_SIZEOF_VOID_P MATCHES "4")
 	ENDIF(APPLE)
 ENDIF(WIN32 AND NOT UNIX)
+#include(CPackConfig.cmake)
 INCLUDE(CPack)
 ##############################################################################
 ##############################################################################
+
+
+
 
 
 #add_dependencies(${FAUST_FAUSTCORE_TARGET} ${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET})
