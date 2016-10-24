@@ -28,7 +28,14 @@ if (BUILD_OPENBLAS)
 	include_directories(${OPENBLAS_INC_DIR})
 endif(BUILD_OPENBLAS)
 
-add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
+
+if(APPLE AND ( CMAKE_GENERATOR STREQUAL "Xcode") )
+	add_library(${FAUST_MEXTOOLS_TARGET} ${CPP_MEXTOOLS_FILES})
+else ()
+	add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
+endif()
+
+
 #target_link_libraries(${FAUST_MEXTOOLS_TARGET} ${FAUST_TARGET})
 
 
