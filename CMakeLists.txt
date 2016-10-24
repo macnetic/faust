@@ -430,7 +430,7 @@ if (BUILD_USE_GPU)
 	set(FAUST_LINEAR_OPERATOR_GPU_TARGET faust_linear_operator_gpu CACHE INTERNAL "")
 	#set(FAUST_MATRIX_CU_TARGET faust_gpu_matrix CACHE INTERNAL "")
 	#set(FAUST_FAUSTCORE_CU_TARGET faust_gpu_core CACHE INTERNAL "")
-	set(FAUST_ALGORITHM_CU_TARGET faust_algorithm_gpu CACHE INTERNAL "")
+	#set(FAUST_ALGORITHM_CU_TARGET faust_algorithm_gpu CACHE INTERNAL "")
 endif(BUILD_USE_GPU)
 ##################################################################
 
@@ -567,7 +567,7 @@ include(CMake/findExternalLibs.cmake)
 
 ########### add_subdirectory ###############
 add_subdirectory(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_BIN_LINEAR_OPERATOR_DIR})
-add_subdirectory(${FAUST_ALGORITHM_SRC_DIR} ${FAUST_ALGORITHM_BIN_DIR})
+#add_subdirectory(${FAUST_ALGORITHM_SRC_DIR} ${FAUST_ALGORITHM_BIN_DIR})
 add_subdirectory(${FAUST_SRC_TEST_DIR} ${FAUST_BIN_TEST_BIN_DIR})
 if (BUILD_DOCUMENTATION)
 	add_subdirectory(${FAUST_DOC_SRC_DIR} ${FAUST_DOC_BIN_DIR})
@@ -588,31 +588,39 @@ endif()
 ##################################################################
 
 
+
+
+##### Add subdirectory ALGORITHM CPU et GPU version dans le main CmakeLists pour add library avec les cpp et pas que des lib objet 
+#####    --> bug avec ide xcode ################################################################
+#set(SRC_FILES "")
+file(GLOB CPP_FILES "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp")
+#message(STATUS "algorithm cpp files ${CPP_FILES}")
+### include directory 
+include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${EIGEN_INC_DIR})
+if (BUILD_USE_GPU)
+	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR} ${CUDA_INC_DIR} ${CUDA_RUNTIME_API_INC_DIR} ${CUSPARSE_INC_DIR} ${CUBLAS_V2_INC_DIR})
+endif()
+if(BUILD_OPENBLAS)
+	include_directories(${OPENBLAS_INC_DIR})
+endif()
+###############################################################################################################
+
+
 ###### TARGET GENERATION ######
 if (BUILD_USE_GPU)
 	if (BUILD_MATLAB_MEX_FILES)
-		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_CU_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
+		add_library(${FAUST_TARGET} STATIC ${CPP_FILES} $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
 	else (BUILD_MATLAB_MEX_FILES)	
-		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_CU_TARGET}>)
+		add_library(${FAUST_TARGET} STATIC ${CPP_FILES} $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}>)
 	endif(BUILD_MATLAB_MEX_FILES)
 else (BUILD_USE_GPU)
 	if (BUILD_MATLAB_MEX_FILES)
-		
-
-		if(APPLE AND ( CMAKE_GENERATOR STREQUAL "Xcode") )
-			message (STATUS "------------------------------------------ ")				
-			message (STATUS "APPLE AND Xcode ${FAUST_ALGORITHM_TARGET}  ${FAUST_ALGORITHM_BIN_DIR}")
-include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${EIGEN_INC_DIR})		
-file(GLOB CPP_FILES "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp")
-			add_library(${FAUST_TARGET} STATIC ${CPP_FILES} $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
-		else ()
-			add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
-		endif()		
-
+		add_library(${FAUST_TARGET} STATIC ${CPP_FILES} $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )		
 	else (BUILD_MATLAB_MEX_FILES)	
-		add_library(${FAUST_TARGET} STATIC $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_ALGORITHM_TARGET}>)
+		add_library(${FAUST_TARGET} STATIC ${CPP_FILES} $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}>)
 	endif(BUILD_MATLAB_MEX_FILES)
 endif (BUILD_USE_GPU)
+
 
 
 if (BUILD_MATLAB_MEX_FILES)

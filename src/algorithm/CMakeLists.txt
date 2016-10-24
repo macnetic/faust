@@ -1,45 +1,29 @@
-#INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
-set(SRC_FILES "")
-#file(GLOB CPP_FILES "*.cpp")
+##INCLUDE("${PROJECT_SOURCE_DIR}/CMake/define_variables.cmake")
+#set(SRC_FILES "")
+##file(GLOB CPP_FILES "*.cpp")
 
-file(GLOB CPP_FILES "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp")
+#file(GLOB CPP_FILES "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp")
+##message(STATUS "algorithm cpp files ${CPP_FILES}")
 
-#message(STATUS "algorithm cpp files ${CPP_FILES}")
-
-#${FAUST_EXCEPTION_SRC_DIR}
-include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${EIGEN_INC_DIR})
-if(BUILD_OPENBLAS)
-	include_directories(${OPENBLAS_INC_DIR})
-endif()
-
-if(APPLE AND ( CMAKE_GENERATOR STREQUAL "Xcode") )
-	# on compile les sources directement dans le cmaklist principal pour Xcode 
-	#add_library(${FAUST_ALGORITHM_TARGET} ${CPP_FILES})
-else ()
-	add_library(${FAUST_ALGORITHM_TARGET} OBJECT ${CPP_FILES})
-endif()
-#target_link_libraries(${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET} ${FAUST_EXCEPTION_TARGET})
+#### include directory 
+#include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${EIGEN_INC_DIR})
+#if (BUILD_USE_GPU)
+#	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR} ${CUDA_INC_DIR} ${CUDA_RUNTIME_API_INC_DIR} ${CUSPARSE_INC_DIR} ${CUBLAS_V2_INC_DIR})
+#endif()
+#if(BUILD_OPENBLAS)
+#	include_directories(${OPENBLAS_INC_DIR})
+#endif()
 
 
+#if(APPLE AND ( CMAKE_GENERATOR STREQUAL "Xcode") )
+#	# on compile les sources directement dans le cmaklist principal pour Xcode 
+#	#add_library(${FAUST_ALGORITHM_TARGET} ${CPP_FILES})
+#else ()
+#	add_library(${FAUST_ALGORITHM_TARGET} OBJECT ${CPP_FILES})
+#endif()
 
-### Dans le cas ou on fusionne les dossiers
-if (BUILD_USE_GPU)
-#	include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_ALGORITHM_CU_SRC_DIR} ${FAUST_MATRIX_CU_SRC_DIR} ${EIGEN_INC_DIR} ${CUDA_INC_DIR} ${CUDA_RUNTIME_API_INC_DIR} ${CUSPARSE_INC_DIR} ${CUBLAS_V2_INC_DIR})
-#${EIGEN_INC_DIR}
-	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR} ${CUDA_INC_DIR} ${CUDA_RUNTIME_API_INC_DIR} ${CUSPARSE_INC_DIR} ${CUBLAS_V2_INC_DIR})
-
-	#-D__COMPILE_TIMERS__
-#	if(UNIX) # AND FAUST_USE_MKL
-#		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-#	elseif(WIN32 AND FAUST_USE_MKL)
-#		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
-#	endif()
-#message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
-	#add_definitions(-D__COMPILE_GPU__ -D__COMPILE_SPMAT__)
-	add_library(${FAUST_ALGORITHM_CU_TARGET} OBJECT ${CPP_FILES})
-endif()
-
-#target_link_libraries(${FAUST_PALM4MSA_CU_TARGET} ${FAUST_MATRIX_CU_TARGET} ${FAUST_EXCEPTION_TARGET})
+##target_link_libraries(${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET} ${FAUST_EXCEPTION_TARGET})
+##target_link_libraries(${FAUST_PALM4MSA_CU_TARGET} ${FAUST_MATRIX_CU_TARGET} ${FAUST_EXCEPTION_TARGET})
 
 
 
