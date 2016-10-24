@@ -27,6 +27,7 @@ The installation of the FA$\mu$ST tool depends on other components to be install
 \begin{itemize}
 \item \textbf{Install CMake}. The minimum version required is Cmake version 3.0.2. Download Binary distributions correspond to your environment from \url{https://cmake.org/download/}.
 \item \textbf{Verify CMake install} : Open a terminal and type the following command:
+\lstset{style=customBash}
 \begin{lstlisting}
 > where cmake
 \end{lstlisting}
@@ -35,27 +36,29 @@ You should obtain the path of your \texttt{cmake.exe} binary file. If not, pleas
 \item \textbf{Install Matlab} (minimal version required is Matlab 2014a) (\url{https://fr.mathworks.com/downloads/}). 
 
 \item \textbf{Verify Matlab install} by checking the \texttt{matlab.exe} binary file in the default directory:  type in a terminal the following command : 
+\lstset{style=customBash}
 \begin{lstlisting}
 > where matlab
 \end{lstlisting}
 You must obtain the path of your matlab binary file like: 
-\begin{lstlisting}[backgroundcolor=\color{white}]
+\begin{lstlisting}
 C:\Program Files\MATLAB\<R2015b>\bin\matlab.exe
 \end{lstlisting}
 If not, please add the directory of your \texttt{matlab.exe} file in your environment variable. (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). \\
 
 \item \textbf{Verify Matlab} has a MEX supported compiler by typing in a Matlab Command Window :
+\lstset{style=customMatlab}
 \begin{lstlisting}
 >> mex -setup C++
 \end{lstlisting}
 
 You must obtain this kind of message :
-\begin{lstlisting}[backgroundcolor=\color{white},keywordstyle=\color{black}]
+\begin{lstlisting}
 MEX configured to use <YOURCOMPILER>  for C++ language compilation.
 \end{lstlisting}
 
 But if you have an error message of the style :
-\begin{lstlisting}[backgroundcolor=\color{white},moredelim={**[is][\color{blue}]{@}{@}},moredelim={[is][\underbar]{_}{_}}]
+\begin{lstlisting}[moredelim={**[is][\color{blue}]{@}{@}},moredelim={[is][\underbar]{_}{_}}]
 No supported compiler or SDK was found. For options, visit 
 @_http:www.matworks.com/support/compilers/R<20XXx>/<ARCH>.html_@
 \end{lstlisting}
@@ -65,11 +68,12 @@ in order to see the list of compiler supported by your Matlab version \texttt{R<
 \item \textbf{Install 7-zip tool} from \url{http://www.7-zip.org/}. 
 
 \item \textbf{Verify 7-zip install} by typing in a terminal the following command : 
+\lstset{style=customBash}
 \begin{lstlisting}
 > where 7z
 \end{lstlisting}
 You must obtain the path of your \texttt{7z.exe} binary file: 
-\begin{lstlisting}[backgroundcolor=\color{white}]
+\begin{lstlisting}
 C:\Program Files\7-Zip\7z.exe
 \end{lstlisting}
 If not, add \texttt{7z.exe} directory in your environment path. 
@@ -82,6 +86,7 @@ When prerequisitie components listed in precedent section \ref{sec:WinRequired} 
 \begin{itemize}
 \item \textbf{Download} the FA$\mu$ST package on the website : \url{http://faust.gforge.inria.fr/}
 \item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory. 
+\lstset{style=customBash}
 \begin{lstlisting}
 > 7z x FAUST-Source-2.0.0.zip
 \end{lstlisting}
@@ -103,11 +108,12 @@ Then, the FA$\mu$ST installation can be done using Command prompt, following ins
 \item Add \texttt{gcc.exe} directory in your environment path. 
 (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). 
 \item \textbf{Verify MinGW install} by typing in a terminal the following command : 
+\lstset{style=customBash}
 \begin{lstlisting}
 > where gcc
 \end{lstlisting}
 You must obtain the path of your \texttt{gcc.exe} binary file: 
-\begin{lstlisting}[backgroundcolor=\color{white}]
+\begin{lstlisting}
 C:\mingw\mingw64\bin\gcc.exe
 \end{lstlisting}
 If not, add \texttt{gcc.exe} directory in your environment path. 
@@ -137,6 +143,7 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Win
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build

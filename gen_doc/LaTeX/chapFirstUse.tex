@@ -11,6 +11,7 @@ In order to use matlab wrapper, follow the instructions :
 \item \textbf{Launch} Matlab.
 \item \textbf{Set the working directory} of the Matlab Command Window to your FA$\mu$ST install directory (default install directory is \texttt{/<HOMEDIR>/Documents/MATLAB/Faust})
 \item \textbf{Configure} the Matlab path by typing the following commands :
+\lstset{style=customMatlab}
 \begin{lstlisting}
 >> cd /<HOMEDIR>/Documents/MATLAB/Faust
 >> setup_Faust
@@ -20,6 +21,7 @@ In order to use matlab wrapper, follow the instructions :
 
 \section{Use a faust from a saved one}\label{sec:firstUseBuildFromSave}
 \paragraph{} Now, you can run \texttt{quick\_start.m} script in the Matlab Command Window by typing :
+\lstset{style=customMatlab}
 \begin{lstlisting}
 >> quick_start
 \end{lstlisting}
@@ -27,19 +29,20 @@ In order to use matlab wrapper, follow the instructions :
 \texttt{<HOMEDIR>/Documents/MATLAB/faust/demo/Quick\_start/quick\_start.m} \\
 In this script, first of all, a Faust of size 4000x5000 is loaded from a previous one that is saved into a matfile located in :\\
 \texttt{<HOMEDIR>/Documents/MATLAB/faust/demo/Quick\_start/faust\_quick\_start.mat}
-\lstinputlisting[firstline=47,lastline=48,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/quick_start.m}
+\lstinputlisting[firstline=47,lastline=48,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
 \newpage
 \paragraph{}Secondly, a list of overloaded matlab function shows that a Faust is handled as a normal Matlab builtin matrix.
  
-\lstinputlisting[firstline=51,lastline=78,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/quick_start.m}
+\lstinputlisting[firstline=51,lastline=78,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
 
 \paragraph{}Finally, it performs a little time comparison between multiplication by a Faust or its full matrix equivalent.
 This is in order to illustrate the speed-up induced by the Faust. This speed-up should be around 30 (depending on your machine).
-%\lstinputlisting[firstline=84,lastline=100,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/quick_start.m}
+%\lstinputlisting[firstline=84,lastline=100,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
 
 \newpage
 \section{Construct a Faust from a given matrix}\label{sec:firstUseBuildFromMatrix}
 \paragraph{} To see an example of building a Faust from a matrix, you can run \texttt{factorise\_matrix.m} in the Matlab Command Window by typing :
+\lstset{style=customMatlab}
 \begin{lstlisting}
 >> factorise_matrix
 \end{lstlisting}
@@ -47,7 +50,7 @@ This is in order to illustrate the speed-up induced by the Faust. This speed-up 
 \texttt{<HOMEDIR>/Documents/MATLAB/faust/demo/Quick\_start/factorise\_matrix.m} \\
 
 In this script, from a given matrix A of size 100x200 :
-\lstinputlisting[firstline=42,lastline=47,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/factorise_matrix.m}
+\lstinputlisting[firstline=42,lastline=47,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
 We generate the parameters of the factorisation from :
 \begin{itemize}
 \item The dimension of A (\textbf{dim1} and \textbf{dim2}),
@@ -55,19 +58,21 @@ We generate the parameters of the factorisation from :
 \item \textbf{rcg} the Rational Complexity Gain, which represents the theoretical memory gain and multiplication speed-up of the Faust compared to the initial matrix 
 \end{itemize}
 
-\lstinputlisting[firstline=51,lastline=56,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/factorise_matrix.m}
+\lstset{style=customBash}
+\lstinputlisting[firstline=51,lastline=56,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
 Then we factorize the matrix \textbf{A} into a Faust \textbf{Faust\_A}
-\lstinputlisting[firstline=58,lastline=59,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/factorise_matrix.m}
+\lstinputlisting[firstline=58,lastline=59,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
 And as for quickstart.m, we make some time comparison at the end.
 
 \newpage
 \section{Construct a Faust from its factor}\label{sec:firstUseBuildFactors}
 To see an example of building a Faust from its factors, you can run construct\_Faust\_from\_factors.m in the Matlab Command Window by typing :
+\lstset{style=customMatlab}
 \begin{lstlisting}
 >> construct_Faust_from_factors
 \end{lstlisting}
 This following example shows how to build a faust from a cell-array representing its factors.
-\lstinputlisting[firstline=42,lastline=70,backgroundcolor=\color{white}]{../../misc/demo/Quick_start/construct_Faust_from_factors.m}
+\lstinputlisting[firstline=42,lastline=70,style=customMatlab]{../../misc/demo/Quick_start/construct_Faust_from_factors.m}
 
 
  

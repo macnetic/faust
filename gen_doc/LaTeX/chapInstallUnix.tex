@@ -20,12 +20,15 @@ This Section lists the required components you must install before to begin the 
 \begin{itemize}
 \item \textbf{Install CMake}. The minimum version required is Cmake version 3.0.2. Visit the website \url{https://cmake.org/} to process to the installation. 
 
+
 \item \textbf{Verify Cmake install} by typing in a command terminal : 
+\lstset{style=customBash}
 \begin{lstlisting}
 > which cmake
 \end{lstlisting}
 The command terminal returns the path of your Cmake binary file like
-\begin{lstlisting}[backgroundcolor=\color{white}]
+
+\begin{lstlisting}
 /usr/bin/cmake
 \end{lstlisting}
 If not, add Cmake binary directory in the environment path. (in your ~/.bashrc file)
@@ -37,23 +40,23 @@ If not, add Cmake binary directory in the environment path. (in your ~/.bashrc f
 > which matlab
 \end{lstlisting}
 You must obtain the path of your matlab binary file like: 
-\begin{lstlisting}[backgroundcolor=\color{white}]
+\begin{lstlisting}
 /usr/local/bin/matlab
 \end{lstlisting}
 If not, add \texttt{matlab} binary directory in your environment path (in your ~/.bashrc file). 
-
 \item \textbf{Verify Matlab} has a MEX supported compiler by typing in a Matlab Command Window :
+\lstset{style=customMatlab}
 \begin{lstlisting}
 >> mex -setup C++
 \end{lstlisting}
 
 You must obtain this kind of message :
-\begin{lstlisting}[backgroundcolor=\color{white},keywordstyle=\color{black}]
+\begin{lstlisting}
 MEX configured to use <YOURCOMPILER>  for C++ language compilation.
 \end{lstlisting}
 
 But if you have an error message of the style :
-\begin{lstlisting}[backgroundcolor=\color{white},moredelim={**[is][\color{blue}]{@}{@}},moredelim={[is][\underbar]{_}{_}}]
+\begin{lstlisting}[moredelim={**[is][\color{blue}]{@}{@}},moredelim={[is][\underbar]{_}{_}}]
 No supported compiler or SDK was found. For options, visit 
 @_http:www.matworks.com/support/compilers/R<20XXx>/<ARCH>.html_@
 \end{lstlisting}
@@ -83,7 +86,7 @@ If you are administrator of your machine (root access), follow instructions give
 \subsection{Install with administrator privilege}\label{sec:UnixBuildInstallAdmin}
 In the terminal opened in Section 
 \ref{sec:UnixBuildDownload}, type the following commands : 
-
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -99,6 +102,7 @@ For more detail about \texttt{cmake ; make ; make install} commands, refer to Se
 
 \subsection{Install without administrator privilege}\label{sec:UnixBuildInstallNOAdmin}
 In the terminal opened in Section \ref{sec:UnixBuildDownload}, type the following commands :
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -120,6 +124,7 @@ When you have done the step in section  \ref{sec:UnixBuildDownload} (i.e downloa
 \begin{itemize}
 \item In the terminal opened in section 
 \ref{sec:UnixBuildDownload}, type the following commands : 
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -145,6 +150,7 @@ For more detail about \texttt{cmake} command, refer to Section \ref{sec:ANNEXEIn
 \begin{itemize}
 \item In the terminal opened in section 
 \ref{sec:UnixBuildDownload}, type the following commands : 
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -168,11 +174,14 @@ For more detail about \texttt{cmake} command, refer to Section \ref{sec:ANNEXEIn
 FA$\mu$ST install using the IDE Xcode concerns only MAC OS X environment.
 \paragraph{}When you have done the step in section  \ref{sec:UnixBuildDownload} (i.e download Faust package and launch the terminal in the right directory),  the FA$\mu$ST installation can start. This Build \& Install section requires that you have the IDE Xcode installed on your system. If you are administrator of your machine (root access), follow instructions given in Section \ref{sec:XcodeUnixBuildInstallAdmin}. Otherwise, for local installation, refer to Section \ref{sec:XcodeUnixBuildInstallNOAdmin}. 
 
+\paragraph{NOTE: }For a command line install using Xcode IDE, refer to Annex \ref{sec:ANNEXEInstallMACXcodeTerminal}.  
+
 \subsection{Install with administrator privilege}\label{sec:XcodeUnixBuildInstallAdmin}
  
 \begin{itemize}
 \item In the terminal opened in section 
 \ref{sec:UnixBuildDownload}, type the following commands : 
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -183,6 +192,7 @@ FA$\mu$ST install using the IDE Xcode concerns only MAC OS X environment.
 \item In Xcode IDE, select \textbf{ALL} target and build the project. 
 \item Close Xcode IDE
 \item Re-Open the FA$\mu$ST project from the file \textbf{./build/FAUST.xcodeproj} with Xcode IDE \textbf{with administrator privilege}. For that, type in a terminal:
+\lstset{style=customBash}
 \begin{lstlisting}
 > sudo Xcode
 \end{lstlisting}
@@ -200,6 +210,7 @@ For more detail about \texttt{cmake} command, refer to Section \ref{sec:ANNEXEIn
 
 \item In the terminal opened in section 
 \ref{sec:UnixBuildDownload}, type the following commands : 
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
