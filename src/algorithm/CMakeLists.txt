@@ -12,7 +12,11 @@ if(BUILD_OPENBLAS)
 	include_directories(${OPENBLAS_INC_DIR})
 endif()
 
-add_library(${FAUST_ALGORITHM_TARGET} OBJECT ${CPP_FILES})
+if(APPLE AND ( CMAKE_GENERATOR STREQUAL "Xcode") )
+	add_library(${FAUST_ALGORITHM_TARGET} ${CPP_FILES})
+else ()
+	add_library(${FAUST_ALGORITHM_TARGET} OBJECT ${CPP_FILES})
+endif()
 #target_link_libraries(${FAUST_PALM4MSA_TARGET} ${FAUST_MATRIX_TARGET} ${FAUST_EXCEPTION_TARGET})
 
 
