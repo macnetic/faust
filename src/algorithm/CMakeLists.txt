@@ -13,6 +13,7 @@ if(BUILD_OPENBLAS)
 endif()
 
 if(APPLE AND ( CMAKE_GENERATOR STREQUAL "Xcode") )
+	# on compile les sources directement dans le cmaklist principal pour Xcode 
 	#add_library(${FAUST_ALGORITHM_TARGET} ${CPP_FILES})
 else ()
 	add_library(${FAUST_ALGORITHM_TARGET} OBJECT ${CPP_FILES})
