@@ -13,7 +13,7 @@ if(BUILD_OPENBLAS)
 endif()
 
 if(APPLE AND ( CMAKE_GENERATOR STREQUAL "Xcode") )
-	add_library(${FAUST_ALGORITHM_TARGET} ${CPP_FILES})
+	#add_library(${FAUST_ALGORITHM_TARGET} ${CPP_FILES})
 else ()
 	add_library(${FAUST_ALGORITHM_TARGET} OBJECT ${CPP_FILES})
 endif()
