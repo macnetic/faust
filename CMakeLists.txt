@@ -640,7 +640,11 @@ else()
 	target_link_libraries(${FAUST_TARGET} )	
 endif(BUILD_OPENBLAS)
 
-install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
+if(APPLE AND ( CMAKE_GENERATOR STREQUAL "Xcode") )
+#install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
+else()
+	install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
+endif()
 ##################################################################
 
 
