@@ -45,7 +45,7 @@
 #include "faust_MatDense_gpu.h"
 #include "faust_Vect_gpu.h"
 #include <Eigen/QR>
-#include <Eigen/Sparse>
+#include <Eigen/SparseCore>
 #include <Eigen/SparseQR>
 
 #include "faust_MatSparse_gpu.h"

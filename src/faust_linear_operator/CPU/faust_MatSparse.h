@@ -42,7 +42,7 @@
 
 #include "faust_constant.h"
 #include "faust_MatDense.h"
-#include <Eigen/Sparse>
+#include <Eigen/SparseCore>
 #include <Eigen/Dense>
 #include <vector>
 #include "faust_MatGeneric.h"

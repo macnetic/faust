@@ -48,7 +48,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <Eigen/Sparse>
+#include <Eigen/SparseCore>
 #include "faust_exception.h"
 #include "faust_constant.h"
 

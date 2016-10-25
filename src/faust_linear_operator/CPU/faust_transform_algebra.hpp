@@ -45,7 +45,7 @@
 #include "faust_MatDense.h"
 #include "faust_Vect.h"
 #include <Eigen/QR>
-#include <Eigen/Sparse>
+#include <Eigen/SparseCore>
 #include <Eigen/SparseQR>
 
 #include "faust_MatSparse.h"

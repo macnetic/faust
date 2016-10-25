@@ -79,6 +79,8 @@ typedef long int faust_int;
 const double FAUST_PRECISION = 0.0001;
 const faust_unsigned_int nbr_iter_norm = 100;
 
+// Use Eigen library only under Mozilla Public License 2.0 (MPL 2.0) or less restrictive licenses
+#define EIGEN_MPL2_ONLY
 
 
 ///// #define FAUST_GPU_ALREADY_SET -3
