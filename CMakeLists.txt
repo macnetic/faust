@@ -196,7 +196,10 @@ option(BUILD_OPENBLAS "Using openBLAS for matrix and vector computations" OFF)
 # different type of files 
 option(BUILD_READ_XML_FILE "Using xml configuration to read xml files" OFF)
 option(BUILD_READ_MAT_FILE "Using matio library to read mat files" OFF)
+#set(BUILD_READ_XML_FILE OFF)
+#set(BUILD_READ_MAT_FILE OFF)
 #CMAKE_DEPENDENT_OPTION
+
 
 ###### Different option of configuration ######
 #option(BUILD_TESTING "Build Tests" ON) 
@@ -719,6 +722,7 @@ set(CPACK_PACKAGE_URL "http://faust.gforge.inria.fr/" )
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "FAUST-Source-${FAUST_VERSION_MAJOR}.${FAUST_VERSION_MINOR}.${FAUST_VERSION_PATCH}")
 set(CPACK_SOURCE_IGNORE_FILES "/build/;/.bzr/;/CMakeFiles/;/_CPack_Packages/;/.svn/;/.git/;/headerCPP.txt;/headerMatlab.txt;/headerCMakeList.txt;/gen_doc/LaTeX/images/;/gen_doc/installation_README.odt;/gen_doc/installation_Virtual_Machine.txt;/misc/data/txt/;/misc/data/mat/visage/")
 
+set(CPACK_SOURCE_IGNORE_FILES "${CPACK_SOURCE_IGNORE_FILES};/externals/unix/tarLibs/libxml2-2.9.4.tar.gz;/externals/unix/tarLibs/matio-1.5.7.7z;")
 #if(WIN32 AND NOT UNIX)
 #	set(CPACK_SOURCE_IGNORE_FILES "${CPACK_SOURCE_IGNORE_FILES};/externals/unix/;/externals/win/eigen*/;/externals/win/OpenBLAS-v0.2.14-Win64-int64/;/externals/win/eigen-eigen-07105f7124f9/;")
 #else()
