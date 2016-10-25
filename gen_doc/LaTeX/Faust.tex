@@ -44,18 +44,24 @@
 \definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
 \definecolor{mylilas}{RGB}{170,55,241}
 
-%\definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{mygray}{rgb}{0.95,0.95,1}
 \definecolor{mygrayMatlab}{rgb}{0.9,0.9,0.9}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
+\definecolor{myBlack}{rgb}{0.3,0.3,0.3}
 
 % Set your language (you can change the language for each code-block optionally)
 
 \lstdefinestyle{customBash}{
-  backgroundcolor=\color{mygray},   % choose the background color; you must add \usepackage{color} 
-  basicstyle=\ttfamily,        		% the size of the fonts that are used for the code
-  breaklines=true,                 	% sets automatic line breaking
-  commentstyle=\color{mygreen},    	% comment style
+  language=bash,%  
+  backgroundcolor=\color{myBlack},   % choose the background color; you must add 
+  stringstyle=\color{mylilas},%
+  %identifierstyle=\bfseries\color{white},%
+  keywordstyle=\color{white},%
+  basicstyle=\ttfamily\color{white},
+  commentstyle=\color{mygreen},%
+  %showstringspaces=true,%without this there will be a symbol in the places where there is a space
+  %basicstyle=\ttfamily,        		% the size of the fonts that are used for the code
+%  breaklines=true,                 	% sets automatic line breaking
 %  deletekeywords={...},            % if you want to delete keywords from the given language
   frame=single,	                   % adds a frame around the code
   keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
@@ -63,7 +69,6 @@
   numbersep=5pt,                   % how far the line-numbers are from the code
   numberstyle=\tiny\color{gray}, % the style that is used for the line-numbers
   rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-
-  stringstyle=\color{mymauve},     % string literal style
 }
 
 
@@ -85,20 +90,24 @@
 
 \lstdefinestyle{customMatlab}{
 	language=Matlab,% 
-	backgroundcolor=\color{mygrayMatlab},%
-	frame=single,	                   % adds a frame around the code
-	breaklines=true,%
+	backgroundcolor=\color{mygray},%
+	stringstyle=\color{mylilas},%
+  	%identifierstyle=\bfseries\color{white},%
+  	basicstyle=\ttfamily\color{black},
+  	commentstyle=\color{mygreen},%
     morekeywords={matlab2tikz},%
-    keywordstyle=\color{blue},%
+    keywordstyle=\color{black},%
     morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
-    identifierstyle=\color{black},%
+    %identifierstyle=\color{black},%
     stringstyle=\color{mylilas},%
     commentstyle=\color{mygreen},%
+	frame=single,	                   % adds a frame around the code
+	breaklines=true,%
     showstringspaces=false,%without this there will be a symbol in the places where there is a space
     numbers=left,%
     numberstyle={\tiny \color{black}},% size of the numbers
     numbersep=9pt, % this defines how far the numbers are from the text
-    emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+    %emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
     %emph=[2]{word1,word2}, emphstyle=[2]{style},  
 }
 
