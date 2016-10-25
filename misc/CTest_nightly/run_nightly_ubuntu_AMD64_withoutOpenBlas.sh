@@ -25,7 +25,7 @@ echo 'MULTITHREADING : num of thread ' $OMP_NUM_THREADS
 
 ### name system of Machine for CDASH
 export CMAKE_SYSTEM='linux-ubuntu'
-
+export CTEST_CMAKE_GENERATOR_TMP='Unix Makefiles'
 # Directory of the library used in the FAUST PROJECT 
 # On ajoute le path /usr/local/bin pour le ctest command.
 export PATH=$PATH:/usr/local/MATLAB/R2014b/bin:/usr/local/bin;

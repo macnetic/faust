@@ -18,7 +18,7 @@
 
 ### name system of Machine for CDASH
 export CMAKE_SYSTEM='linux-fedora23_x86_64-openblas'
-
+export CTEST_CMAKE_GENERATOR_TMP='Unix Makefiles'
 # Directory of the library used in the FAUST PROJECT 
 # On ajoute le path /usr/local/bin pour le ctest command.
 #export PATH=$PATH:/usr/local/MATLAB/R2014b/bin:/usr/local/bin;
