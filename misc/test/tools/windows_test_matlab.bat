@@ -28,7 +28,7 @@ set matlab_command=%matlab_command:$=;%
 echo MATLAB COMMAND : %matlab_command%
 
 :: launch the test in matlab an wait for matlab to finish
-matlab -nojvm -wait -r """%matlab_command%"""
+matlab -nodesktop -wait -r """%matlab_command%"""
 
 :: si le code renvoyer par la derniere cmd est sup a 2 => erreur
 IF ERRORLEVEL 2 set ERRORLEVEL=2
