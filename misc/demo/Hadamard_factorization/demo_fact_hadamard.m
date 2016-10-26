@@ -54,23 +54,23 @@ M = log2(n);
 
 
 %% Setting of the parameters
-params.nrow=n;
-params.ncol=n;
-params.nfacts = M;
-params.cons = cell(2,M-1);
+params_hadamard.nrow=n;
+params_hadamard.ncol=n;
+params_hadamard.nfacts = M;
+params_hadamard.cons = cell(2,M-1);
 
 for j=1:M-1
-    params.cons{1,j} = {'splincol',2,n,n};
-    params.cons{2,j} = {'splincol',n/2^j,n,n};
+    params_hadamard.cons{1,j} = {'splincol',2,n,n};
+    params_hadamard.cons{2,j} = {'splincol',n/2^j,n,n};
 end
 
-params.niter1 = 30;
-params.niter2 = 30;
-params.update_way = 1;
-params.verbose = 0;
+params_hadamard.niter1 = 30;
+params_hadamard.niter2 = 30;
+params_hadamard.update_way = 1;
+params_hadamard.verbose = 0;
 
 
-hadamard_faust = faust_decompose(matrix,params);
+hadamard_faust = faust_decompose(matrix,params_hadamard);
 Xhat = full(hadamard_faust);
 relative_error = norm(matrix - Xhat)/norm(matrix);
 fprintf(['\n\n relative error between hadamard matrix and its transform : ' num2str(relative_error) '\n']);
@@ -119,7 +119,7 @@ format_fig='-dpng';
 
 fighandle=figure;
 hold on;
-subplot(1,params.nfacts+1,1);
+subplot(1,params_hadamard.nfacts+1,1);
 imagesc(Xhat); axis square
 set(gca,'xtick',[],'ytick',[])
 
@@ -129,8 +129,8 @@ for i=1:M
    facts{i}=get_fact(hadamard_faust,i); 
 end
 
-for kk = 1:params.nfacts
-    subplot(1,params.nfacts+1,1+kk)
+for kk = 1:params_hadamard.nfacts
+    subplot(1,params_hadamard.nfacts+1,1+kk)
     imagesc(facts{kk}); axis square
     set(gca,'xtick',[],'ytick',[])
 end
@@ -142,19 +142,20 @@ print(figure_name, format_fig);
 
 fighandle=figure;
 hold on;
-subplot(1,params.nfacts+1,1);
+subplot(1,params_hadamard.nfacts+1,1);
 imagesc(Xhat); axis square
 set(gca,'xtick',[],'ytick',[])
 
 
-for kk = 1:params.nfacts
-    subplot(1,params.nfacts+1,1+kk)
+for kk = 1:params_hadamard.nfacts
+    subplot(1,params_hadamard.nfacts+1,1+kk)
     spy(facts{kk}); axis square
     set(gca,'xtick',[],'ytick',[])
 end
 fighandle.Name =['Hadamard-factorisation_nnz_coeff'];
 figure_name = [figure_dir filesep 'Hadamard-factorisation_nnz_coeff'];
 print(figure_name, format_fig);
+
 
 
 
