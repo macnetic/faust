@@ -59,34 +59,34 @@
 namespace Faust
 {
 
-    template<typename FPP,Device DEVICE> class LinearOperator;
+	template<typename FPP,Device DEVICE> class LinearOperator;
 
-    template<typename FPP,Device DEVICE> class Transform;
-    template<typename FPP,Device DEVICE> class Vect;
-    template<typename FPP,Device DEVICE> class MatDense;
-    template<typename FPP,Device DEVICE> class MatSparse;
-    template<Device DEVICE> class BlasHandle;
-    template<Device DEVICE> class SpBlasHandle;
-
-
-    // forward definition of friend function
-   template<typename FPP>
-   Faust::Vect<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
-   template<typename FPP>
-   Faust::MatDense<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
+	template<typename FPP,Device DEVICE> class Transform;
+	template<typename FPP,Device DEVICE> class Vect;
+	template<typename FPP,Device DEVICE> class MatDense;
+	template<typename FPP,Device DEVICE> class MatSparse;
+	template<Device DEVICE> class BlasHandle;
+	template<Device DEVICE> class SpBlasHandle;
 
 
-    template<typename FPP>
-    class Transform<FPP,Cpu> : public Faust::LinearOperator<FPP,Cpu>
-    {
+	// forward definition of friend function
+	template<typename FPP>
+	Faust::Vect<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
+	template<typename FPP>
+	Faust::MatDense<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
 
-        public:
-        void faust_gemm(const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)const;
+
+	template<typename FPP>
+	class Transform<FPP,Cpu> : public Faust::LinearOperator<FPP,Cpu>
+	{
+
+		public:
+		void faust_gemm(const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)const;
 
         /** \brief Constructor
         * \param data : Vector including sparse matrix
         * \param totalNonZeros : Number of nonzeros Value in the data (all factorized matrix) */
-        Transform();
+		Transform();
 
         /** \brief Constructor
         * \param data : Vector including sparse matrix
@@ -95,15 +95,14 @@ namespace Faust
 
         Transform(const Transform<FPP,Cpu> & A);
 	
-	/** \brief 
+		/** \brief 
         * check the factors validity of the faust, if the list of factors represents a valid matrix
         * */		
-	void check_factors_validity() const;
+		void check_factors_validity() const;
 
         /** \brief Constructor
         * \param facts : Vector including dense matrix*/
         Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts);
-
 
         void get_facts(std::vector<Faust::MatSparse<FPP,Cpu> >& sparse_facts)const{sparse_facts = data;}
         void get_facts(std::vector<Faust::MatDense<FPP,Cpu> >& facts)const;
@@ -135,7 +134,7 @@ namespace Faust
         void Display()const;
         void transpose();
         void updateNonZeros();
-	void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const;
+		void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const;
         ///(*this) = (*this) * A
         void multiply(const Transform<FPP,Cpu> & A);
         ///(*this) = A * (*this)
@@ -144,17 +143,17 @@ namespace Faust
         FPP spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
         ~Transform(){}
 	
-	// if measure of time is down Faust::Transform<FPP,Cpu> is no longer constant during multiplication because a measure of time is an attribute to the faust::Transform
-	#ifdef __COMPILE_TIMERS__
-		Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N');
-	#else
-		Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N') const;
-	#endif
+		// if measure of time is down Faust::Transform<FPP,Cpu> is no longer constant during multiplication because a measure of time is an attribute to the faust::Transform
+		#ifdef __COMPILE_TIMERS__
+			Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N');
+		#else
+			Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N') const;
+		#endif
 	
-	Faust::MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis='N') const;
+		Faust::MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis='N') const;
 
        
-        void operator=(const Transform<FPP,Cpu>&  f){data=f.data;totalNonZeros=f.totalNonZeros;}
+		void operator=(const Transform<FPP,Cpu>&  f){data=f.data;totalNonZeros=f.totalNonZeros;}
         /// add all of the sparse matrices from f.data to this->data
         void operator*=(const FPP  scalar){scalarMultiply(scalar);};
         void operator*=(const Transform<FPP,Cpu>&  f){multiply(f);};
@@ -168,16 +167,14 @@ namespace Faust
 
 
 
-        private:
-        long long int totalNonZeros;
-        static const char * m_className;
+	private:
+	long long int totalNonZeros;
+	static const char * m_className;
 	std::vector<Faust::MatSparse<FPP,Cpu> > data;
 	
 	#ifdef __COMPILE_TIMERS__
 		std::vector<Faust::Timer> t_multiply_vector;
 	#endif 
-
-
 
 
 	// friend function
@@ -186,9 +183,6 @@ namespace Faust
     };
 
 }
-
-
-
 
 
 

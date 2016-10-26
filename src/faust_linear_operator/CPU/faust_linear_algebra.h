@@ -60,7 +60,7 @@ namespace Faust
     template<typename FPP>
     void add(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C);
     //! \fn Faust::spgemm
-    //! \brief performs ??
+    //! \brief performs Sparse matrices multiplication
     template<typename FPP>
     void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB);
 
