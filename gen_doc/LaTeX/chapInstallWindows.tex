@@ -360,7 +360,7 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \begin{enumerate}
 \item Open application \texttt{cmake-GUI.exe} from the program menu or from your cmake install binaries directory  to launch the CMake configuration application:
 
-\begin{figure}[!h] %%[!htbp]
+\begin{figure}[H] %%[!htbp]
 \centering
 \includegraphics[scale=0.5]{images/cmakeGUI-1-eps-converted-to.pdf}
 \caption{cmake GUI}
@@ -372,7 +372,7 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 When clicking for the first time on the [Configure] button, CMake will ask for the build tool you want to use. The build system type depends on the builder you want to use, in our case this is the Visual Studio X (X depending the version of Visual installed on the computer) chain tools. (see fig. \ref{fig:cmakeGUI-2}).
 
 
-\begin{figure}[!h]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{images/cmakeGUI-2-eps-converted-to.pdf}
 \caption{cmake GUI}
@@ -382,7 +382,7 @@ When clicking for the first time on the [Configure] button, CMake will ask for t
 \item When pressing again the [Configure] button to configure the build system, CMake performs a list of tests to determine the system configuration and manage the build system. If the configuration is correct then no pop-up will appears during the tests and CMake finally shows the various options of the build underlaid in grey. In case of a configuration issue, a pop up window warns you about this issue indicating which test has failed, in this case the build option in the CMake application software will be underlaid in red. We will discuss in Section \ref{sec:WinCustomInstall} what to do in such a case, but let us for the moment assume that everything ran smoothly.
 (see \ref{fig:cmakeGUI-4}).
 
-\begin{figure}[!h] %%[!htbp]
+\begin{figure}[H] %%[!htbp]
 \centering
 \includegraphics[scale=0.5]{images/cmakeGUI-4-eps-converted-to.pdf}
 \caption{cmake GUI}

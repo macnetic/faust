@@ -2,7 +2,7 @@
 
 \paragraph{Presentation:}FA$\mu$ST is a C++ toolbox, useful to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation). In Figure \ref{fig:presentation}, the matrix \textbf{A} represents the dense matrix and $\mathbf{S_j}$ correspond to the sparse matrices as $\mathbf{A}=\prod_{j=1}^J\mathbf{S_j}$.
 
-\begin{figure}[!h] %%[!htbp]
+\begin{figure}[H] %%[!htbp]
 \centering
 \includegraphics[scale=0.5]{images/hadamard32_bw.pdf}
 \caption{Brief presentation of FA$\mu$ST}
@@ -20,15 +20,16 @@ For more information on the FAuST project, please visit the website of the proje
 \paragraph{License:}Copyright (2016) Luc Le Magoarou, Remi Gribonval INRIA Rennes, FRANCE \\
 The FAuST Toolbox is distributed under the terms of the GNU Affero General Public License. This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see \url{http://www.gnu.org/licenses/}.
 
-\paragraph{Checked Installation: Platforms and IDE}
-The Figure \ref{fig:recapInstall} shows the checked/valid versions of platforms and IDE in order to install the FA$\mu$ST toolbox properly.\\
-Choose among this Figure the adapted platform and IDE following your system. 
+\paragraph{Valid Installation: Platforms, Compiler and IDE}
+The Figure \ref{fig:recapInstall} summarizes the tested configurations of the installation of the FA$\mu$ST toolbox following the type of platform (Linux, Mac or Windows), compiler, version of Matlab and the type of Integrate Development Environment (IDE).\\
+Choose among this Figure \ref{fig:recapInstall} the adapted platform and IDE following your system and refer to the corresponding Install Chapter. 
 The installation using the GCC compiler directly from a command terminal on Unix platforms is suggest because it is more simple and requires fewer externals components. 
 
+The installation on Windows Platform using Visual Studio IDE has been tested but there is compilation problems depending of the version of your Windows and your Visual Studio. This install configuration is not guaranteed but you can try and report any problem and/or suggestion on install-list of FA$\mu$ST project on \url{http://lists.gforge.inria.fr/pipermail/faust-install/}. 
 
 \begin{figure}[H] %%[!htbp]
 \centering
-\includegraphics[scale=0.5]{images/recapInstall.pdf}
+\includegraphics[scale=0.4]{images/recapInstall.pdf}
 \caption{Checked Installation: Platforms and IDE}
 \label{fig:recapInstall}
 \end{figure}
