@@ -270,7 +270,13 @@ For more detail about \texttt{cmake} command, refer to Section \ref{sec:ANNEXEIn
 
 The project FA$\mu$ST can be configured with optional parameters, for example if you want to install FA$\mu$ST library in a different folder or to enable the parallel computing using multithread capacities provided by the OS. This build system can be parametrized using the Cmake Graphical User Interface, or the Cmake command line tools. 
 
-The Cmake Graphical User Interface \texttt{ccmake} allows you to select option input. When using the \texttt{ccmake} command in your build directory, the Cmake GUI appears in the console (see fig. \ref{fig:ccmake}).
+The Cmake Graphical User Interface \texttt{ccmake} allows you to select option input. Set your current directory to your build directory and type in a terminal :
+\lstset{style=customBash}
+\begin{lstlisting}
+> ccmake ..
+\end{lstlisting}
+
+The Cmake GUI appears in the console (see fig. \ref{fig:ccmake}). 
 
 \begin{figure}[H] %%[!htbp]
 \centering

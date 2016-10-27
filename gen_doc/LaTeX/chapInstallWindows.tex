@@ -375,6 +375,10 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 
 
 \section{Custom - Advanced Installation}\label{sec:WinCustomInstall}
+
+The project FA$\mu$ST can be configured with optional parameters, for example if you want to install FA$\mu$ST library in a different folder or to enable the parallel computing using multithread capacities provided by the OS. This build system can be parametrized using the Cmake Graphical User Interface, or the Cmake command line tools. 
+The Cmake Graphical User Interface allows you to select option input. 
+
 \begin{enumerate}
 \item Open application \texttt{cmake-GUI.exe} from the program menu or from your cmake install binaries directory  to launch the CMake configuration application:
 
@@ -408,6 +412,24 @@ When clicking for the first time on the [Configure] button, CMake will ask for t
 \end{figure}
 
 \end{enumerate}
+
+Here is the list of available options: 
+\begin{itemize}
+\item CMAKE\_INSTALL\_PREFIX : Install directory
+\item BUILD\_TESTING : Enable the ctest option (default value is ON)
+\item BUILD\_DOCUMENTATION : Generating the doxygen documentation (default value is OFF)  
+\item BUILD\_MULTITHREAD : Enable multithread with OpenMP Multithreading (default value is OFF)
+\item BUILD\_VERBOSE : Enable verbose option when compile (-v) (default value is OFF)
+\item BUILD\_DEBUG : Enable FA$\mu$ST Debug mode (default value is OFF )
+\item BUILD\_USE\_GPU : Using both CPU and GPU process ( default value is OFF)
+\item BUILD\_MATLAB\_MEX\_FILES : Enable building Matlab MEX files (default value is ON)
+\item BUILD\_OPENBLAS : Using openBLAS for matrix and vector computations (default value is OFF )
+\item BUILD\_READ\_XML\_FILE : Using xml2 library to read xml files (default value is OFF)
+\item BUILD\_READ\_MAT\_FILE : Using matio library to read mat files (default value is OFF)
+\end{itemize}
+
+
+
 
 %%%%AUTRESS
 

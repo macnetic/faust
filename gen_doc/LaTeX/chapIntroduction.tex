@@ -21,12 +21,12 @@ For more information on the FAuST project, please visit the website of the proje
 The FAuST Toolbox is distributed under the terms of the GNU Affero General Public License. This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see \url{http://www.gnu.org/licenses/}.
 
 \paragraph{FA$\mu$ST Structure:}
-The Figure \ref{fig:faustStructure} presents an brief structure of the FA$\mu$ST toolbox. The principal C++ library called "libfaust" includes the "Factorization algorithms" used to generate a FA$\mu$ST core, the solvers and the FA$\mu$ST matrix multiplication. It can be employ using different types of wrappers. In the second version of FA$\mu$ST package (Version 2.0), only Matlab wrapper is proposed. 
+The Figure \ref{fig:faustStructure} presents an brief structure of the FA$\mu$ST toolbox. The principal C++ library called "libfaust" includes two components: the "Factorization algorithms" is used to generate a FA$\mu$ST core from a dense matrix and the "FA$\mu$ST matrix multiplication" provides the linear operator to manipulate your data. It can be employ using different types of wrappers but in the second version of FA$\mu$ST package (Version 2.0), only Matlab wrapper is provided. 
 
 \begin{figure}[H] %%[!htbp]
 \centering
-\includegraphics[scale=0.4,trim = 0cm 5cm 0cm 4cm, clip]{images/FaustStructure.pdf}
-\caption{FAuST Structure}
+\includegraphics[scale=0.45,trim = 0cm 5cm 0cm 4cm, clip]{images/FaustStructure.pdf}
+\caption{Brief structure of FAuST version 2.0.0}
 \label{fig:faustStructure}
 \end{figure}
 
