@@ -180,7 +180,7 @@ template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu> > & facts, const FPP lambda_ /* =1.0 */) :
     data(facts),
 	totalNonZeros(0)
-{
+{	
 	for (int i=0 ; i<data.size() ; i++)
 		totalNonZeros += data[i].getNonZeros();
 
@@ -198,7 +198,7 @@ template<typename FPP>
 void Faust::Transform<FPP,Cpu>::check_factors_validity() const
 {
 		
-	if (size() > 0)
+	if (size() > 1)
 	{
 	 
 	 for (int i=0;i<=size()-2;i++)

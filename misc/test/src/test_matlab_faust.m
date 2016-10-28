@@ -1,6 +1,15 @@
 %% Description test_matlab_faust
-% This script tests the Faust class, i.e the different method
+% This functions test different method
 % overloaded for a faust (constructor, size, mtimes, mtimes_trans ...)
+% with a given Faust
+%
+% input parameter : dim1 number of row of the Faust F
+%		    dim2 number of column of the Faust F
+%		    dim3 number of column of the matrix that will be multiplied by the Faust
+%                   nb_fact number of factor of the Faust
+%
+%
+%  
 %
 % For more information on the FAuST Project, please visit the website of 
 % the project :  <http://faust.gforge.inria.fr>
@@ -40,25 +49,40 @@
 %%
 
 
-nb_fact = 3;
-dim1 = 5;
-dim2 = 4;
-dim3 = 10;
+%nb_fact = 3;
+%dim1 = 5;
+%dim2 = 4;
+%dim3 = 10;
+
+
+
+
+function test_matlab_faust(dim1,dim2,dim3,nb_fact)
 int_max= 100;
 threshold = 10^(-5);
 
 disp('****** TEST MATLAB_FAUST ******* '); 
+disp(' CONFIG OF THE FAUST ');
+disp(['number of row of the Faust : ' int2str(dim1)]); 
+disp(['number of column of the Faust : ' int2str(dim2)]);
+disp(['number of factor of the Faust : ' int2str(nb_fact)]);
+disp('');
+disp(['number of column of the matrix that will be multiplied by the Faust : ' int2str(dim3)]);
+disp('');
+
 %% creation du faust
 disp(' TEST CONSTRUCTOR : ');
 disp(['generate a faust of size ' int2str(dim1)  ' by ' int2str(dim2)]); 
 factors=cell(1,nb_fact);
-factors{1}=double(randi(int_max,dim1,dim2));
+if (nb_fact > 0)
+	factors{1}=double(randi(int_max,dim1,dim2));
+end
 for i=2:nb_fact
     factors{i}=double(randi(int_max,dim2,dim2)); 
 end
 
 F = Faust(factors);
-empty_F = Faust({});
+empty_F=Faust({});
 disp('Ok');
 
 
