@@ -35,7 +35,7 @@ In this script, first of all, a Faust of size 4000x5000 is loaded from a previou
 \newpage
 \paragraph{}Secondly, a list of overloaded matlab function shows that a Faust is handled as a normal Matlab builtin matrix.
  
-\lstinputlisting[firstline=51,lastline=78,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
+\lstinputlisting[firstline=51,lastline=80,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
 
 \paragraph{}Finally, it performs a little time comparison between multiplication by a Faust or its full matrix equivalent.
 This is in order to illustrate the speed-up induced by the Faust. This speed-up should be around 30 (depending on your machine).
@@ -57,7 +57,9 @@ We generate the parameters of the factorisation from :
 \begin{itemize}
 \item The dimension of A (\textbf{dim1} and \textbf{dim2}),
 \item \textbf{nb\_factor} the number of factor of the Faust,
-\item \textbf{rcg} the Rational Complexity Gain, which represents the theoretical memory gain and multiplication speed-up of the Faust compared to the initial matrix 
+\item \textbf{rcg} the Rational Complexity Gain, which represents the theoretical memory gain and multiplication speed-up of the Faust compared to the initial matrix .
+\\ \\\textbf{WARNING :}  A trade-off exists between the RCG/speed-up of the Faust and the data fidelity to the input matrix.
+The higher the RCG, the higher the error of the Faust relative to the input matrix
 \end{itemize}
 
 \lstset{style=customBash}
@@ -65,6 +67,7 @@ We generate the parameters of the factorisation from :
 Then we factorize the matrix \textbf{A} into a Faust \textbf{Faust\_A}
 \lstinputlisting[firstline=58,lastline=59,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
 And as for quickstart.m, we make some time comparison at the end.
+
 
 \newpage
 \section{Construct a Faust from its factor}\label{sec:firstUseBuildFactors}

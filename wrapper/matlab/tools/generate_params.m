@@ -1,6 +1,10 @@
 %% Description generate_params
-% Generates parameter of hierarchical_fact from a Matrix, the number of
-% factor of the factorization and its RCG (Relative Complexity Gain)
+% Generates standard parameter of hierarchical_fact from the dimensions of the input Matrix, 
+% the number of factor of the factorization and its RCG (Relative Complexity Gain)
+%
+% WARNING : A trade-off must be achieved between :
+% - the RCG/speed-up of Faust
+% - and the data fidelity/relative error to the input matrix to be factorized
 %
 % For more information on the FAuST Project, please visit the website of 
 % the project :  <http://faust.gforge.inria.fr>

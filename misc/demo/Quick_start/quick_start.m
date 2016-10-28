@@ -75,7 +75,9 @@ A_full=full(A);
  col_2=A(:,2);
  submatrix_A=A(3:5,2:3);
  submatrix_A=A(2:end,3:end-1);
- % Warning :  A(i,j)=3 will not modify A, writing is not allowed
+ 
+% Warning :  A(i,j)=3; will throw an error with this message :
+%            'function not implemented for Faust class'
 
  % get the number of non-zeros coefficient
  nz = nnz(A);
