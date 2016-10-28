@@ -397,8 +397,23 @@ classdef Faust
 		end
         
 
-	end
+    end
 
+    function F = subsasgn(F,S,B)
+    %% SUBSASGN (WARNING not implemented) (overloaded Matlab built-in function)
+    %
+    % This function is no available for Faust class,
+    % this function just throw an error
+    %
+    % F(i,j)=1, F(2:5,3:5)=zeros(4,3) will throw 
+    % a Matlab error with this message :
+    % 'function not implemented for Faust class'
+          error('function not implemented for Faust class');   
+        
+    end
+    
+    
+    
 
 	function norm_Faust=norm(F,varargin)
 	%% NORM Faust norm (overloaded Matlab built-in function).
@@ -486,6 +501,7 @@ classdef Faust
     end
     
 end
+
 
 
 

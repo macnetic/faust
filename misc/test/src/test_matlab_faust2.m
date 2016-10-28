@@ -124,8 +124,25 @@ end
 
 disp('Ok');
 
+disp('test 4 : ');
+test_pass = 0;
+expected_err_message='function not implemented for Faust class';
+F=Faust({ones(5,4),ones(4,7)});
 
+try
+	F(1,2)=3
+catch ME
+	if strcmp(ME.message,expected_err_message)
+		test_pass = 1;
+	else
+		error([ 'error with a wrong message : ' ME.message ' must be : ' expected_err_message ]);  	
+	end
+end
 
+if(~test_pass)
+	error('failure');
+end	 
+disp('Ok');
 
 
 
