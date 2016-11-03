@@ -34,7 +34,7 @@ current terminal.
 \lstset{style=customMatlab}
 \begin{lstlisting}
 when character ">>" is missing in the beginning of each line, 
-it signifies that the message is an return text in your current 
+it signifies that the message is a return text in your current 
 Matlab Command Window. 
 \end{lstlisting}
 
@@ -126,6 +126,7 @@ Then, the FA$\mu$ST installation can be done using Command prompt, following ins
 \item Add \texttt{gcc.exe} directory in your environment path. 
 (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). 
 \item \textbf{Verify MinGW install} by typing in a terminal the following command : 
+
 \lstset{style=customBash}
 \begin{lstlisting}
 > where gcc
@@ -134,6 +135,7 @@ You must obtain the path of your \texttt{gcc.exe} binary file:
 \begin{lstlisting}
 C:\mingw\mingw64\bin\gcc.exe
 \end{lstlisting}
+
 If not, add \texttt{gcc.exe} directory in your environment path. 
 (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). 
 
@@ -161,6 +163,7 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Win
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
+
 \lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
@@ -187,6 +190,8 @@ FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{se
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
+
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -195,6 +200,7 @@ FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{se
 > make
 > make install 
 \end{lstlisting}
+
 \end{itemize}
 FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
 
@@ -214,6 +220,8 @@ Then, the FA$\mu$ST installation can be done.
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
+
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -235,12 +243,15 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
+
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
 > cmake -G "CodeBlocks - MinGW Makefiles" .. 
 	    -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
+
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.cbp} with Code::Blocks IDE.
 \item In Code::Blocks IDE, select ALL target, select RELEASE mode and build the project.
 \item In Code::Blocks IDE, select install target, select RELEASE mode and build the project.
@@ -279,12 +290,15 @@ If you have administrator privilege, follow instructions in Section \ref{sec:Adm
 \begin{itemize}
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
-\item Type the following commands : 
+\item Type the following commands :
+
+\lstset{style=customBash} 
 \begin{lstlisting}
 > mkdir build
 > cd build
 > cmake .. 
 \end{lstlisting}
+
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE.
 \item In Visual Studio IDE, select ALL BUILD, select RELEASE mode, and generate the project three times.
 \item Close Visual Studio IDE
@@ -304,12 +318,15 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 
 \item Open a command terminal
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
-\item Type the following commands : 
+\item Type the following commands :
+
+\lstset{style=customBash} 
 \begin{lstlisting}
 > mkdir build
 > cd build
 > cmake .. -DCMAKE_INSTALL_PREFIX="<Your/Install/Dir>"
 \end{lstlisting}
+
 \item Open the FA$\mu$ST project from the file \texttt{./build/FAUST.sln} with Visual Studio IDE.
 \item In Visual Studio IDE, select ALL target, select RELEASE mode and generate the project three times.
 \item In Visual Studio IDE, select install target, select RELEASE mode, and generate the project.
@@ -331,6 +348,7 @@ In the case of \textbf{Microsoft Visual Studio 2013 compiler using the command t
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
@@ -338,7 +356,9 @@ In the case of \textbf{Microsoft Visual Studio 2013 compiler using the command t
 > cmake --build . --config "Release"
 > cmake --build . --config "Release"
 \end{lstlisting}
+
 \item Re-Open a command terminal \textbf{with administrator privilege} 
+\lstset{style=customBash}
 \begin{lstlisting}
 > cmake --build . --config "Release" --target "install"
 \end{lstlisting}
@@ -357,7 +377,7 @@ In the case of \textbf{Microsoft Visual Studio 2013 compiler using the command t
 \item Set the current directory to your FA$\mu$ST directory (NOTE: don't use any special character in your FA$\mu$ST directory path, for example the character $\mu$)
 \item Type the following commands : 
 \end{itemize}
-
+\lstset{style=customBash}
 \begin{lstlisting}
 > mkdir build
 > cd build
