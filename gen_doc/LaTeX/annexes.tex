@@ -5,8 +5,8 @@ Here is a list of packages used in the FA$\mu$ST project. The installation of th
 \begin{itemize}
 \item Library \textbf{Eigen} \url{http://eigen.tuxfamily.org}: C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms.
 \item Library \textbf{OpenBLAS} \url{http://www.openblas.net}:  Optimized BLAS library based on GotoBLAS2 1.13 BSD version.
-\item Library \textbf{xml2} \url{http://xmlsoft.org}
-\item Library \textbf{matio} \url{https://sourceforge.net/projects/matio}
+% \item Library \textbf{xml2} \url{http://xmlsoft.org}
+% \item Library \textbf{matio} \url{https://sourceforge.net/projects/matio}
 \end{itemize}
 
 \section{Compatibility between MATLAB and gcc compiler}\label{sec:ANNEXECompatibilityMatlabCompiler}
@@ -114,5 +114,25 @@ You can generated the target using the terminal command \texttt{xcodebuild} :
 # performs the "make install"
 > xcodebuild -configuration "Release" -target "install" build 
 \end{lstlisting}
+
+
+\section{Optional FAuST installation using GPU process}\label{sec:OptionalGPU}
+
+The toolbox FA$\mu$ST integrates optional Graphics Processing Unit (GPU) to improve its performances.
+\paragraph{Warning:} This optional GPU install has only be realized on an Linux machine. There is no guarantee that the installation and the use will be effective for every system.
+
+\begin{itemize}
+\item \textbf{Install} the CUDA Toolkit and the drivers for NVIDIA.
+\item \textbf{Verify install} of GPU tools by typing in a terminal :
+\lstset{style=customBash} 
+\begin{lstlisting}
+> which nvcc
+\end{lstlisting}
+You must obtain the path of your \texttt{nvcc} compiler like 
+\begin{lstlisting}
+/usr/local/cuda-7.5/bin/nvcc
+\end{lstlisting}
+If not, add \texttt{nvcc} directory in your environment path (in your ~/.bashrc file). 
+\end{itemize}
 
 

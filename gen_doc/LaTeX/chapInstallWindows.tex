@@ -265,6 +265,8 @@ For more detail about cmake commands, refer to Section \ref{sec:ANNEXEInfoBuildI
 % MICCORSOFT VISUAL STUDIO
 \section{Install using Microsoft Visual compiler}\label{sec:WinInstallVS}
 
+The installation on Windows Platform using Visual Studio IDE has been tested but there is compilation problems depending of the version of your Windows and your Visual Studio. \textbf{This install configuration is not guaranteed} but you can try and report any problem and/or suggestion on install-list of FA$\mu$ST project on \url{http://lists.gforge.inria.fr/pipermail/faust-install/}. 
+
 When prerequisites listed in section \ref{sec:WinRequired} are checked, you must install \textbf{Microsoft Visual Studio} containing the C++ Compiler (Section \ref{sec:WinInstallCompilerVS}).
 Then, the FA$\mu$ST installation can be done using Visual Studio IDE, following instructions given in Section \ref{sec:WinVisualStudioBasicInstall} or using Command prompt, following instructions given in Section \ref{sec:WinVisualStudioTerminalBasicInstall}. 
 
@@ -441,11 +443,12 @@ Here is the list of available options:
 \item BUILD\_MULTITHREAD : Enable multithread with OpenMP Multithreading (default value is OFF)
 \item BUILD\_VERBOSE : Enable verbose option when compile (-v) (default value is OFF)
 \item BUILD\_DEBUG : Enable FA$\mu$ST Debug mode (default value is OFF )
-\item BUILD\_USE\_GPU : Using both CPU and GPU process ( default value is OFF)
+\item BUILD\_USE\_GPU : Using both CPU and GPU process ( default value is OFF) (refer to Annex \ref{sec:OptionalGPU} for installation and more detail)
 \item BUILD\_MATLAB\_MEX\_FILES : Enable building Matlab MEX files (default value is ON)
 \item BUILD\_OPENBLAS : Using openBLAS for matrix and vector computations (default value is OFF )
-\item BUILD\_READ\_XML\_FILE : Using xml2 library to read xml files (default value is OFF)
-\item BUILD\_READ\_MAT\_FILE : Using matio library to read mat files (default value is OFF)
+%\item BUILD\_READ\_XML\_FILE : Using xml2 library to read xml files (default value is OFF)
+%\item BUILD\_READ\_MAT\_FILE : Using matio library to read mat files (default value is OFF)
+
 \end{itemize}
 
 
