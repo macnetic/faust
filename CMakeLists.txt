@@ -67,14 +67,17 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 
 		# default location of library is in the path  		
 		set(FAUST_INSTALL_LIB 			"${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "default install path for the library faust" FORCE )
+
 #		set(FAUST_INSTALL_BIN 			"$ENV{HOME}/Documents/faust/bin" CACHE STRING "default install path for the binary faust" FORCE )
 #		set(FAUST_INSTALL_BIN_TIME_COMP "$ENV{HOME}/Documents/faust/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
 #		set(FAUST_INSTALL_DOC 			"$ENV{HOME}/Documents/faust/doc" CACHE STRING "default install path for the documentation faust" FORCE )
 #		set(FAUST_INSTALL_CMDLINE 		"$ENV{HOME}/Documents/faust/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
 #		set(FAUST_INSTALL_TESTING_DATA 	"$ENV{HOME}/Documents/faust/testing/data" CACHE STRING "default install path for the test faust" FORCE )
-		set(FAUST_INSTALL_BIN 			"${PROJECT_BINARY_DIR}/output/bin" CACHE STRING "default install path for the binary faust" FORCE )
-		set(FAUST_INSTALL_BIN_TIME_COMP "${PROJECT_BINARY_DIR}/output/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
-		set(FAUST_INSTALL_DOC 			"${PROJECT_BINARY_DIR}/output/doc" CACHE STRING "default install path for the documentation faust" FORCE )
+
+#		set(FAUST_INSTALL_BIN 			"${PROJECT_BINARY_DIR}/output/bin" CACHE STRING "default install path for the binary faust" FORCE )
+#		set(FAUST_INSTALL_BIN_TIME_COMP "${PROJECT_BINARY_DIR}/output/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
+
+		#set(FAUST_INSTALL_DOC 			"${PROJECT_BINARY_DIR}/output/doc" CACHE STRING "default install path for the documentation faust" FORCE )
 		#set(FAUST_INSTALL_CMDLINE 		"${PROJECT_BINARY_DIR}/output/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
 		#set(FAUST_INSTALL_TESTING_DATA 	"${PROJECT_BINARY_DIR}/output/testing/data" CACHE STRING "default install path for the test faust" FORCE )
 		# default location of install dir for matlab component
@@ -86,11 +89,11 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 	elseif(CMAKE_INSTALL_PREFIX)
 		SET(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING "new install path" FORCE )
 		message(STATUS "Install FAuST path : ${CMAKE_INSTALL_PREFIX}")
-		
 		set(FAUST_INSTALL_LIB 			"${CMAKE_INSTALL_PREFIX}/lib")
-		set(FAUST_INSTALL_BIN 			"${CMAKE_INSTALL_PREFIX}/bin")
-		set(FAUST_INSTALL_BIN_TIME_COMP "${CMAKE_INSTALL_PREFIX}/bin/runtime_comparison")
-		set(FAUST_INSTALL_DOC 			"${CMAKE_INSTALL_PREFIX}/doc")
+
+#		set(FAUST_INSTALL_BIN 			"${CMAKE_INSTALL_PREFIX}/bin")
+#		set(FAUST_INSTALL_BIN_TIME_COMP "${CMAKE_INSTALL_PREFIX}/bin/runtime_comparison")
+		#set(FAUST_INSTALL_DOC 			"${CMAKE_INSTALL_PREFIX}/doc")
 		#set(FAUST_INSTALL_CMDLINE 		"${CMAKE_INSTALL_PREFIX}/CmdLine")
 		#set(FAUST_INSTALL_TESTING_DATA 	"${CMAKE_INSTALL_PREFIX}/testing/data")
 		# default location of install dir for matlab component
@@ -109,10 +112,11 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 
 		# default location of library is in the path  		
 		set(FAUST_INSTALL_LIB 			"${CMAKE_INSTALL_PREFIX}" CACHE STRING "default install path for the library faust" FORCE )
+
 #		set(FAUST_INSTALL_BIN 			"$ENV{HOME}/Documents/faust/bin" CACHE STRING "default install path for the binary faust" FORCE )
-		set(FAUST_INSTALL_BIN 			"${PROJECT_BINARY_DIR}/output/bin" CACHE STRING "default install path for the binary faust" FORCE )
-		set(FAUST_INSTALL_BIN_TIME_COMP "${PROJECT_BINARY_DIR}/output/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
-		set(FAUST_INSTALL_DOC 			"${PROJECT_BINARY_DIR}/output/doc" CACHE STRING "default install path for the documentation faust" FORCE )
+#		set(FAUST_INSTALL_BIN 			"${PROJECT_BINARY_DIR}/output/bin" CACHE STRING "default install path for the binary faust" FORCE )
+#		set(FAUST_INSTALL_BIN_TIME_COMP "${PROJECT_BINARY_DIR}/output/bin/runtime_comparison" CACHE STRING "default install path for the binary faust" FORCE )
+		#set(FAUST_INSTALL_DOC 			"${PROJECT_BINARY_DIR}/output/doc" CACHE STRING "default install path for the documentation faust" FORCE )
 		#set(FAUST_INSTALL_CMDLINE 		"${PROJECT_BINARY_DIR}/output/CmdLine" CACHE STRING "default install path for the cmd faust" FORCE )
 		#set(FAUST_INSTALL_TESTING_DATA 	"${PROJECT_BINARY_DIR}/output/testing/data" CACHE STRING "default install path for the test faust" FORCE )
 		# default location of install dir for matlab component
@@ -126,9 +130,9 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 		message(STATUS "Install FAuST path : ${CMAKE_INSTALL_PREFIX}")
 		
 		set(FAUST_INSTALL_LIB 			"${CMAKE_INSTALL_PREFIX}/lib")
-		set(FAUST_INSTALL_BIN 			"${CMAKE_INSTALL_PREFIX}/bin")
-		set(FAUST_INSTALL_BIN_TIME_COMP "${CMAKE_INSTALL_PREFIX}/bin/runtime_comparison")
-		set(FAUST_INSTALL_DOC 			"${CMAKE_INSTALL_PREFIX}/doc")
+#		set(FAUST_INSTALL_BIN 			"${CMAKE_INSTALL_PREFIX}/bin")
+#		set(FAUST_INSTALL_BIN_TIME_COMP "${CMAKE_INSTALL_PREFIX}/bin/runtime_comparison")
+		#set(FAUST_INSTALL_DOC 			"${CMAKE_INSTALL_PREFIX}/doc")
 		#set(FAUST_INSTALL_CMDLINE 		"${CMAKE_INSTALL_PREFIX}/CmdLine")
 		#set(FAUST_INSTALL_TESTING_DATA 	"${CMAKE_INSTALL_PREFIX}/testing/data")
 		# default location of install dir for matlab component
@@ -230,7 +234,7 @@ if (BUILD_USE_PROFILING)
 endif()
 if (BUILD_READ_MAT_FILE)
 	message(STATUS "**********MATIO ACTIF************")
-	message(STATUS "FAUST_INSTALL_BIN = ${FAUST_INSTALL_BIN}")
+	#message(STATUS "FAUST_INSTALL_BIN = ${FAUST_INSTALL_BIN}")
 endif()
 if (BUILD_READ_XML_FILE)
 	message(STATUS "**********XML ACTIF************")
