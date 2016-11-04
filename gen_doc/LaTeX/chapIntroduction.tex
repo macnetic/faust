@@ -42,7 +42,11 @@ The Figure \ref{fig:faustStructure} presents a brief structure of the FA$\mu$ST 
 \paragraph{Known issues}
 \begin{enumerate}
 \item The installation on Windows Platform using Visual Studio IDE has been tested but there is compilation problems depending on the version of your Windows and your Visual Studio. \textbf{This install configuration is not guaranteed} but you can try and report any problem and/or suggestion on install-list of FA$\mu$ST project on \url{http://lists.gforge.inria.fr/pipermail/faust-install/}. 
-\item The "Factorization algorithms" module represented on Figure \ref{fig:faustStructure} is actually in progress (see Section). 
+ 
+\item The use of the \textbf{mex function} from Matlab requires that you have a third-party compiler installed on your system. Warning: Following your version of Matlab (2016a in our case) mex function only supports up to GCC 4.7 (see \url{http://fr.mathworks.com/support/compilers/R2016a/index.html?sec=glnxa64} for more detail).
+
+\item The "Factorization algorithms" module represented on Figure \ref{fig:faustStructure} is actually in progress (see Section).
+
 \end{enumerate}
 
 
