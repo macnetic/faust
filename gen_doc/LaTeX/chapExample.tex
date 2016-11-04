@@ -1,29 +1,3 @@
-\chapter{Example}\label{sec:example}
-
-\section{Brain Sources Localization}\label{sec:BSL_example}
-%\lstinputlisting{../../misc/demo/Brain_source_localization/BSL.m}
 
 
-
-\paragraph{} An experience of Brain Source Localization using several gain matrices including FA$\mu$ST and several solvers is provided. After configuring the Matlab path (cf section \ref{sec:firstUseMatlabPath}), you just need to type in the Matlab Command Window:
-\lstset{style=customMatlab}
-\begin{lstlisting}
->> BSL
->> Fig_BSL
-\end{lstlisting}
-
-\texttt{BSL.m} runs the experiment (see the script file :\\
-\texttt{/<HOMEDIR>/Documents/MATLAB/Faust/demo/Brain\_source\_localization/BSL.m})\\
-\texttt{Fig\_BSL.m} displays the Figure \ref{fig:BSL}. illustrating the speed-up using a FA$\mu$ST. (see the script file:\\
-\texttt{/<HOMEDIR>/Documents/MATLAB/Faust/demo/Brain\_source\_localization/Fig\_BSL.m}) \\
-
-This figure illustrates the speed-up with a FA$\mu$ST ($\mathbf{M}$ is the gain dense matrix and $\widehat{\mathbf{M}}_{6},\widehat{\mathbf{M}}_{9},\widehat{\mathbf{M}}_{16},\widehat{\mathbf{M}}_{26}$ are different FA$\mu$ST representing  $\mathbf{M}$):
-
-
-\begin{figure}[H] %%[!htbp]
-\centering
-\includegraphics[scale=0.7]{images/BSL.png}
-\caption{Performance of FAuST tool on Brain Source Localization experiment}
-\label{fig:BSL}
-\end{figure}
 

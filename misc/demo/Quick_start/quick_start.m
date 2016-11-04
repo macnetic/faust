@@ -45,45 +45,47 @@
 
 
 % loading a Faust A from saved-one 
-A=Faust('faust_quick_start.mat');
+A=Faust('faust_quick_start.mat')
 
-
- % get the size of the faust
- [dim1,dim2] = size(A);
-
- %  transpose a faust  
- A_trans = A'; 		 
+% get the size of the faust
+[dim1,dim2] = size(A)
  
- % multiplication by A
- x1 = rand(dim2,1);
- y1 = A*x1;  
+%  transpose a faust  
+A_trans = A'		 
  
- % multiplication by A'
- x2 = rand(dim1,5);
- y2 = A'*x2;
+% multiplication by A
+x1 = rand(dim2,1);
+y1 = A*x1;
+ 
+% multiplication by A'
+x2 = rand(dim1,5);
+y2 = A'*x2;
 
 
- % get the 2-norm (spectral norm) of the faust A
- norm_A = norm(A); % equivalent to norm(A,2);
+% get the 2-norm (spectral norm) of the faust A
+norm_A = norm(A) % equivalent to norm(A,2);
  
 % convert Faust to full matrix
 A_full=full(A);
+
+% get the number of non-zeros coefficient
+nz = nnz(A) 
  
- 
- % get the coefficient i,j and slicing for reading purpose
- coeff=A(3,4);
- col_2=A(:,2);
- submatrix_A=A(3:5,2:3);
- submatrix_A=A(2:end,3:end-1);
- 
-% Warning :  A(i,j)=3; will throw an error with this message :
+% READING coefficient
+coeff=A(3,4)
+col_2=A(:,2);
+submatrix_A=A(3:5,2:3)
+submatrix_A=A(end-5:end,4980:end-1)
+
+% WARNING : WRITING coefficient NOT ALLOWED 
+% A(i,j)=3; will throw an error with this message :
 %            'function not implemented for Faust class'
 
- % get the number of non-zeros coefficient
- nz = nnz(A);
+
+
  
  
- %% speed-up multiplication
+%% speed-up multiplication
 nb_mult=100;
 time_full=0;
 time_faust=0;
@@ -100,3 +102,4 @@ end
 
 disp('multiplication SPEED-UP using Faust');
 disp(['Faust is ' num2str(time_full/time_faust) ' faster than a full matrix']);
+

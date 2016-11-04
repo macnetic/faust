@@ -3,21 +3,48 @@
 
 \paragraph{}A Matlab wrapper is delivered with the FA$\mu$ST C++ library.
 It provides a user friendly new class of matrix \textbf{Faust} efficient for the multiplication with matlab built-in dense matrix class.\newline
+This chapter presents some demos in order to get acustomed to the \textbf{Faust} class and illustrates the advantages of \textbf{Faust} class.  
+\begin{enumerate}  
+	\item refers to Section \ref{sec:firstUseMatlabPath} to configure your Matlab path.
+	\item you can run and take a look at various Matlab demos :
+	\begin{itemize}
+		\item \textbf{Use a faust from a saved one} presents the general functionnality of a Faust (go to Section \ref{sec:firstUseBuildFromSave})
+		\item \textbf{Construct a Faust from its factor}  (go to  Section \ref{sec:firstUseBuildFactors})
+		\item \textbf{Brain Sources Localization}  illustrates the speed-up induced by Faust in a medical application (go to  Section \ref{sec:BSL_example})	
+	\end{itemize}
+\end{enumerate} 
+
+
+
+
 
 \section{Configure Matlab path}\label{sec:firstUseMatlabPath}
 In order to use matlab wrapper, follow the instructions :
-\begin{itemize}
-\item \textbf{Install} FA$\mu$ST tool (see Chapter \ref{sec:InstallUnix} in case of Unix install or Chapter \ref{sec:WinInstall} in case of Windows install)
-\item \textbf{Launch} Matlab.
-\item \textbf{Set the working directory} of the Matlab Command Window to your FA$\mu$ST install directory (default install directory is \texttt{/<HOMEDIR>/Documents/MATLAB/Faust})
-\item \textbf{Configure} the Matlab path by typing the following commands :
-\end{itemize}
 
-\lstset{style=customMatlab}
-\begin{lstlisting}
->> cd /<HOMEDIR>/Documents/MATLAB/Faust
->> setup_Faust
-\end{lstlisting}
+\begin{enumerate}
+	\item \textbf{Install} FA$\mu$ST tool (see Chapter \ref{sec:InstallUnix} in case of Unix install or Chapter \ref{sec:WinInstall} in case of Windows install)
+	\item \textbf{Launch} Matlab.
+	\item \textbf{Set the working directory} of the Matlab Command Window to your FA$\mu$ST install directory FAuST\_INSTALL\_DIR by typing :
+		      	\begin{lstlisting}[style=customMatlab]
+>> cd <INSTALL_FAuST_DIR>\end{lstlisting}	
+	By default, FAuST\_INSTALL\_DIR is inside the Matlab user directory. So, depending on your OS, you must replace the FAuST\_INSTALL\_DIR by this path :
+		\begin{itemize} 
+			\item \textbf{Windows  :} \texttt{<ROOT>\textbackslash Users\textbackslash <USERNAME>\textbackslash Documents\textbackslash MATLAB\textbackslash faust}
+			\item \textbf{Linux    :}   \texttt{/home/<USERNAME>/Documents/MATLAB/faust}
+			\item \textbf{Mac OS X :}  \texttt{/Users/<USERNAME>/Documents/MATLAB/faust}
+		\end{itemize}
+	You can also configure the FAuST\_INSTALL\_DIR to whatever you like (cf CMake variable CMAKE\_INSTALL\_MATLAB\_PREFIX section 		\ref{sec:UnixCustomInstall} for Unix or section \ref{sec:WinCustomInstall} for Windows users)
+	
+
+
+
+	\item \textbf{Configure} the Matlab path by typing the following commands :
+	\lstset{style=customMatlab}
+	\begin{lstlisting}
+>> setup_Faust\end{lstlisting}
+\end{enumerate}
+
+
 
 
 
@@ -28,48 +55,22 @@ In order to use matlab wrapper, follow the instructions :
 >> quick_start
 \end{lstlisting}
 \texttt{quick\_start.m} script is located in following path :\\
-\texttt{<HOMEDIR>/Documents/MATLAB/faust/demo/Quick\_start/quick\_start.m} \\
-In this script, first of all, a Faust of size 4000x5000 is loaded from a previous one that is saved into a matfile located in :\\
-\texttt{<HOMEDIR>/Documents/MATLAB/faust/demo/Quick\_start/faust\_quick\_start.mat}
-\lstinputlisting[firstline=47,lastline=48,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
-\newpage
-\paragraph{}Secondly, a list of overloaded matlab function shows that a Faust is handled as a normal Matlab builtin matrix.
- 
-\lstinputlisting[firstline=51,lastline=80,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
+\texttt{/<INSTALL\_FAuST\_DIR>/demo/Quick\_start/quick\_start.m} \\
+In this script :
+\begin{enumerate} 
+	\item A Faust of size 4000x5000 is loaded from a previous one that is saved into a matfile located in :\\
+	\texttt{<INSTALL\_FAuST\_DIR>/demo/Quick\_start/faust\_quick\_start.mat}
+	\lstinputlisting[firstline=47,lastline=48,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
+	
+	\item  A list of overloaded matlab function shows that a Faust is handled as a normal Matlab builtin matrix.
+ 	\lstinputlisting[firstline=51,lastline=83,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
 
-\paragraph{}Finally, it performs a little time comparison between multiplication by a Faust or its full matrix equivalent.
+	\item It performs a little time comparison between multiplication by a Faust or its full matrix equivalent.
 This is in order to illustrate the speed-up induced by the Faust. This speed-up should be around 30 (depending on your machine).
-%\lstinputlisting[firstline=84,lastline=100,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
-
-\newpage
-\section{Construct a Faust from a given matrix}\label{sec:firstUseBuildFromMatrix}
-\paragraph{} To see an example of building a Faust from a matrix, you can run \texttt{factorise\_matrix.m} in the Matlab Command Window by typing :
-\lstset{style=customMatlab}
-\begin{lstlisting}
->> factorise_matrix
-\end{lstlisting}
-\texttt{factorise\_matrix.m} script is located in following path :\\
-\texttt{<HOMEDIR>/Documents/MATLAB/faust/demo/Quick\_start/factorise\_matrix.m} \\
-
-In this script, from a given matrix A of size 100x200 :
-\lstinputlisting[firstline=42,lastline=47,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
-We generate the parameters of the factorisation from :
-\begin{itemize}
-\item The dimension of A (\textbf{dim1} and \textbf{dim2}),
-\item \textbf{nb\_factor} the number of factor of the Faust,
-\item \textbf{rcg} the Rational Complexity Gain, which represents the theoretical memory gain and multiplication speed-up of the Faust compared to the initial matrix .
-\\ \\\textbf{WARNING :}  A trade-off exists between the RCG/speed-up of the Faust and the data fidelity to the input matrix.
-The higher the RCG, the higher the error of the Faust relative to the input matrix
-\end{itemize}
-
-\lstset{style=customBash}
-\lstinputlisting[firstline=51,lastline=56,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
-Then we factorize the matrix \textbf{A} into a Faust \textbf{Faust\_A}
-\lstinputlisting[firstline=58,lastline=59,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
-And as for quickstart.m, we make some time comparison at the end.
+	\lstinputlisting[firstline=88,lastline=104,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
+\end{enumerate}
 
 
-\newpage
 \section{Construct a Faust from its factor}\label{sec:firstUseBuildFactors}
 To see an example of building a Faust from its factors, you can run construct\_Faust\_from\_factors.m in the Matlab Command Window by typing :
 \lstset{style=customMatlab}
@@ -78,6 +79,40 @@ To see an example of building a Faust from its factors, you can run construct\_F
 \end{lstlisting}
 This following example shows how to build a faust from a cell-array representing its factors.
 \lstinputlisting[firstline=42,lastline=70,style=customMatlab]{../../misc/demo/Quick_start/construct_Faust_from_factors.m}
+
+If you want to build a Faust from a given matrix, you can go to the section Working Progress \ref{sec:WorkingProgressBuildFromMatrix}.
+Be aware that this not yet stable but under progress.
+
+
+
+\section{Brain Sources Localization}\label{sec:BSL_example}
+%\lstinputlisting{../../misc/demo/Brain_source_localization/BSL.m}
+\paragraph{} An experience of Brain Source Localization using several gain matrices including FA$\mu$ST and several solvers is provided. After configuring the Matlab path (cf section \ref{sec:firstUseMatlabPath}), you just need to type in the Matlab Command Window:
+
+\lstset{style=customMatlab}
+\begin{lstlisting}
+>> BSL
+>> Fig_BSL
+\end{lstlisting}
+
+\texttt{BSL.m} runs the experiment (see the script file :\\
+\texttt{/<FAuST\_INSTALL\_DIR>/demo/Brain\_source\_localization/BSL.m})\\
+\texttt{Fig\_BSL.m} displays the Figure \ref{fig:BSL}. illustrating the speed-up using a FA$\mu$ST. (see the script file:\\
+\texttt{<FAuST\_INSTALL\_DIR>/demo/Brain\_source\_localization/Fig\_BSL.m}) \\
+
+This figure illustrates the speed-up with a FA$\mu$ST ($\mathbf{M}$ is the gain dense matrix and $\widehat{\mathbf{M}}_{6},\widehat{\mathbf{M}}_{9},\widehat{\mathbf{M}}_{16},\widehat{\mathbf{M}}_{26}$ are different FA$\mu$ST representing  $\mathbf{M}$):
+
+
+\begin{figure}[H] %%[!htbp]
+\centering
+\includegraphics[scale=0.7]{images/BSL.png}
+\caption{Performance of FAuST tool on Brain Source Localization experiment}
+\label{fig:BSL}
+\end{figure}
+
+
+
+
 
 
  
