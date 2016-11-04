@@ -12,7 +12,7 @@ Here is a list of packages used in the FA$\mu$ST project. The installation of th
 \section{Compatibility between MATLAB and gcc compiler}\label{sec:ANNEXECompatibilityMatlabCompiler}
 Adjust your version of GCC compiler in order to run the installation properly. The use of the mex function in Matlab requires that you have a third-party compiler installed on your system. The latest version of Matlab (2016a in our case) only supports up to GCC 4.7 (see \url{http://fr.mathworks.com/support/compilers/R2016a/index.html?sec=glnxa64} for more detail).
 
-To temporally change your version of cc and cxx compiler, you can modify the environment variable CC an CXX. For that, export your CC and CXX variables corresponding to gcc and g++ binaries path :
+To temporally change your version of cc and cxx compiler, you can modify the environment variable CC and CXX. For that, export your CC and CXX variables corresponding to gcc and g++ binaries path :
 \begin{itemize}
 \item find your gcc and g++ version path using \texttt{which} command in a terminal :
 \lstset{style=customBash}
@@ -46,7 +46,7 @@ The command \textbf{make} will compile the build files.\\
 The command \textbf{sudo make install} will install the library and others components in the default directory: \\
 \texttt{/usr/local/lib/libfaust.a} for the FA$\mu$ST library, \\
 \texttt{\textasciitilde /Documents/MATLAB/faust/} for the wrapper matlab.\\
-You must have administrator privilege because the library file \texttt{libfaust.a} is copied in an root path directory. If you do not have administrator privilege, you can realize a local install using \texttt{cmake} optional parameter \texttt{-DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"}. 
+You must have administrator privilege because the library file \texttt{libfaust.a} is copied in a root path directory. If you do not have administrator privilege, you can realize a local install using \texttt{cmake} optional parameter \texttt{-DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"}. 
 
 The \texttt{cmake} optional parameter \texttt{-DCMAKE\_INSTALL\_PREFIX="<Your/Install/Dir>"} allows to install the binaries on the selected install directory. 
 
@@ -65,7 +65,7 @@ Here is a list of packages used in the FA$\mu$ST project. Eigen and OpenBlas lib
 \end{itemize}
 
 \section{Matlab and processor architecture}\label{sec:ANNEXEMatlabArch}
-If your processor architecture is 64 bit, Matlab must be installed in 64 bit. If your processor architecture is an 32 bit, Matlab must be installed in 32 bit. You can check your environment variable called PROCESSOR\_ARCHITECTURE by typing :
+If your processor architecture is 64 bit, Matlab must be installed in 64 bit. If your processor architecture is a 32 bit, Matlab must be installed in 32 bit. You can check your environment variable called PROCESSOR\_ARCHITECTURE by typing :
 \lstset{style=customBash}
 \begin{lstlisting}
 > set
@@ -119,7 +119,7 @@ You can generated the target using the terminal command \texttt{xcodebuild} :
 \section{Optional FAuST installation using GPU process}\label{sec:OptionalGPU}
 
 The toolbox FA$\mu$ST integrates optional Graphics Processing Unit (GPU) to improve its performances.
-\paragraph{Warning:} This optional GPU install has only be realized on an Linux machine. There is no guarantee that the installation and the use will be effective for every system.
+\paragraph{Warning:} This optional GPU install has only be realized on a Linux machine. There is no guarantee that the installation and the use will be effective for every system.
 
 \begin{itemize}
 \item \textbf{Install} the CUDA Toolkit and the drivers for NVIDIA.

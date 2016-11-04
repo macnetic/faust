@@ -1,30 +1,33 @@
 \chapter{Installation on Unix platform}\label{sec:InstallUnix}
 
-The FA$\mu$ST project is based on \textbf{C++ library} available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the FA$\mu$ST project because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS).\\
-\\
-Firstly, please ensure that the \textbf{prerequisite components} listed in Section \ref{sec:RequiredTools} are installed.
+The FA$\mu$ST project is available for Linux, MAC OS X and Windows platforms. The proposed toolbox provides a Matlab wrapper. \textbf{CMake} has been chosen to build the FA$\mu$ST project because it is an open-source, cross-platform family of tools designed to build, test and package software. This chapter presents the steps to install the FA$\mu$ST tools on Unix platform (both Linux and Mac OS).
 
-Secondly, refer to section \ref{sec:UnixBuildDownload} to download FA$\mu$ST package and setting your terminal. 
+\begin{enumerate}
+\item Ensure that the \textbf{prerequisite components} listed in Section \ref{sec:RequiredTools} are installed.
 
-Then refer to the appropriate section following the use (or not) of an IDE (Integrated Development Environment): 
+\item Refer to section \ref{sec:UnixBuildDownload} to download FA$\mu$ST package and setting your terminal. 
+
+\item Refer to the appropriate section following the use (or not) of an IDE (Integrated Development Environment): 
 \begin{itemize}
 \item Basic installation using \textbf{the command line terminal}, refer to Section \ref{sec:UnixBuildInstall}.
 \item Basic installation using \textbf{the IDE "Code::Blocks"}, refer to Section \ref{sec:UnixInstallCodeBlock}. 
 \item Basic installation using \textbf{the IDE "Xcode"} only for MAC OS X platform, refer to Section \ref{sec:MacInstallXcode}. 
 \end{itemize}
+\end{enumerate}
 
-Finally in Section \ref{sec:UnixCustomInstall}, the custom options available to build the FA$\mu$ST toolbox are described to propose Custom - Advanced installation. For example, the optional configuration can be used to modify the install directory path, or to build in debug mode.  
+Section \ref{sec:UnixCustomInstall} describes the custom options available to build the FA$\mu$ST toolbox, to propose a Custom - Advanced installation. For example, the optional configuration can be used to modify the install directory path, or to build in debug mode.  
+
 
 \lstset{style=customBash}
 \begin{lstlisting}
 > This kind of script represents the text command you must 
-> entered in an terminal command. For example : 
+> entered in a terminal command. For example : 
 > mkdir BUILD 
 \end{lstlisting}
 \lstset{style=customBash}
 \begin{lstlisting}
 when character '>' is missing in the beginning of each line,
-it signifies that the message is an return text in your
+it signifies that the message is a return text in your
 current terminal. 
 \end{lstlisting}
 \lstset{style=customMatlab}
