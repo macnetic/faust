@@ -1,0 +1,41 @@
+\chapter{Working Progress}\label{sec:WorkingProgress}
+Various features are still under development and not yet stable.
+But here is a list of features that will be improved/integrated in the next release :
+\begin{itemize}
+	\item \textbf{Factorization algorithm : } they are available in this release. You can even used them
+from user-friendly approach (cf Section \ref{sec:WorkingProgressBuildFromMatrix}) but they are not
+that stable. In the sense that they are not fitted to all types of matrices.
+	\item \textbf{GPU : } A GPU version of the code is under development, it already shows 
+some time saving compared to the CPU code but is not enought user-friendly, easy to install to be in this release.
+	\item \textbf{Python wrapper : } A Python wrapper is also planned, it will used Cython module.
+	\item \textbf{Image denoising experiment (cf \cite[chapter VI.]{LeMagoarou2016}) :} This experiment was in the previous release (Faust version 1.0) 
+	but is not in the current one because our C++ wrapper is not yet fitted to the algorithm used in this experiment.    
+\end{itemize}
+
+\section{Construct a Faust from a given matrix}\label{sec:WorkingProgressBuildFromMatrix}
+\paragraph{}
+	After checking that you have configured your Matlab environment (cf section \ref{sec:firstUseMatlabPath})  
+	To see an example of building a Faust from a matrix, you can run \texttt{factorise\_matrix.m} in the Matlab Command Window by typing :
+\lstset{style=customMatlab}
+\begin{lstlisting}
+>> factorise_matrix
+\end{lstlisting}
+\texttt{factorise\_matrix.m} script is located in following path :\\
+\texttt{<FAuST\_INSTALL\_DIR>/demo/Quick\_start/factorise\_matrix.m} \\
+
+In this script, from a given matrix A of size 100x200 :
+\lstinputlisting[firstline=42,lastline=47,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
+We generate the parameters of the factorisation from :
+\begin{itemize}
+\item The dimension of A (\textbf{dim1} and \textbf{dim2}),
+\item \textbf{nb\_factor} the number of factor of the Faust,
+\item \textbf{rcg} the Rational Complexity Gain, which represents the theoretical memory gain and multiplication speed-up of the Faust compared to the initial matrix .
+\\ \\\textbf{WARNING :}  A trade-off exists between the RCG/speed-up of the Faust and the data fidelity to the input matrix.
+The higher the RCG, the higher the error of the Faust relative to the input matrix
+\end{itemize}
+
+\lstset{style=customBash}
+\lstinputlisting[firstline=51,lastline=56,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
+Then we factorize the matrix \textbf{A} into a Faust \textbf{Faust\_A}
+\lstinputlisting[firstline=58,lastline=59,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
+
