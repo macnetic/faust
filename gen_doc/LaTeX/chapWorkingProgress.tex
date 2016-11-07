@@ -16,16 +16,16 @@ This experiment was in the previous release (FA$\mu$ST version 1.0) but is not i
 \end{itemize}
 
 \section{Construct a FAuST from a given matrix}\label{sec:WorkingProgressBuildFromMatrix}
-Please ensure that you have configured your Matlab environment (cf. Section \ref{sec:firstUseMatlabPath}). Then, to see an example of building a FA$\mu$ST from a matrix, you can run \texttt{factorise\_matrix.m} in the Matlab Command Window by typing :
+Please ensure that you have configured your Matlab environment (cf. Section \ref{sec:firstUseMatlabPath}). Then, to see an example of building a FA$\mu$ST from a matrix, you can run \texttt{factorize\_matrix.m} in the Matlab Command Window by typing :
 \lstset{style=customMatlab}
 \begin{lstlisting}
->> factorise_matrix
+>> factorize_matrix
 \end{lstlisting}
-\texttt{factorise\_matrix.m} script is located in following path :\\
-\texttt{<FAuST\_INSTALL\_DIR>/demo/Quick\_start/factorise\_matrix.m} \\
+\texttt{factorize\_matrix.m} script is located in following path :\\
+\texttt{<FAuST\_INSTALL\_DIR>/demo/Quick\_start/factorize\_matrix.m} \\
 
 In this script, from a given matrix A of size 100x200 :
-\lstinputlisting[firstline=42,lastline=47,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
+\lstinputlisting[firstline=42,lastline=47,style=customMatlab]{../../misc/demo/Quick_start/factorize_matrix.m}
 We generate the parameters of the factorization from :
 \begin{itemize}
 \item The dimension of A (\textbf{dim1} and \textbf{dim2}),
@@ -36,9 +36,9 @@ The higher the RCG, the higher the error of the FA$\mu$ST relative to the input 
 \end{itemize}
 
 \lstset{style=customBash}
-\lstinputlisting[firstline=51,lastline=56,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
+\lstinputlisting[firstline=51,lastline=56,style=customMatlab]{../../misc/demo/Quick_start/factorize_matrix.m}
 Then we factorize the matrix \textbf{A} into a FA$\mu$ST \textbf{Faust\_A}
-\lstinputlisting[firstline=58,lastline=59,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
+\lstinputlisting[firstline=58,lastline=59,style=customMatlab]{../../misc/demo/Quick_start/factorize_matrix.m}
 
 
 \section{FAuST installation using Optional GPU process}\label{sec:OptionalGPU}
