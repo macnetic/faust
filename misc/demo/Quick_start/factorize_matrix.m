@@ -1,6 +1,6 @@
-%% Description factorise_matrix
+%% Description factorize_matrix
 %
-%  This demo presents the method to factorise a given matrix into a Faust
+%  This demo presents the method to factorize a given matrix into a Faust
 %
 % For more information on the FAuST Project, please visit the website of 
 % the project :  <http://faust.gforge.inria.fr>

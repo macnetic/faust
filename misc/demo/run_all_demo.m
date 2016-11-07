@@ -46,7 +46,7 @@
 %% Quick start
 disp('*********** Quick Start Demos *************');
 quick_start;
-factorise_matrix;
+factorize_matrix;
 construct_Faust_from_factors;
 
 
