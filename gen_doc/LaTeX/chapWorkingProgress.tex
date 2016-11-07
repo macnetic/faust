@@ -1,21 +1,22 @@
 \chapter{Working Progress}\label{sec:WorkingProgress}
-Various features are still under development and not yet stable.
+	Various features are still under development and not yet stable.
 But here is a list of features that will be improved/integrated in the next release :
 \begin{itemize}
-	\item \textbf{Factorization algorithm : } They are available in this release. You can even used them
-from user-friendly approach (cf Section \ref{sec:WorkingProgressBuildFromMatrix}) but they are not
+	\item \textbf{Factorization algorithm :} (cf. Section \ref{sec:WorkingProgressBuildFromMatrix})\\ 
+They are available in this release. You can even used them
+from user-friendly approach (cf. Section \ref{sec:WorkingProgressBuildFromMatrix}) but they are not
 that stable. In the sense that they are not fitted to all types of matrices.
-	\item \textbf{GPU : } A GPU version of the code is under development, it already shows 
-some time saving compared to the CPU code but is not enought user-friendly, easy to install to be in this release.
-	\item \textbf{Python wrapper : } A Python wrapper is also planned, it will used Cython module.
-	\item \textbf{Image denoising experiment (cf \cite[chapter VI.]{LeMagoarou2016}) :} This experiment was in the previous release (FA$\mu$ST version 1.0) 
-	but is not in the current one because our C++ wrapper is not yet fitted to the algorithm used in this experiment.    
+	\item \textbf{Graphics Processing Unit (GPU) :} (cf. Section \ref{sec:OptionalGPU})\\
+A GPU version of the code is under development, it already shows 
+some time saving compared to the CPU code but is not enough user-friendly and not easy to install to be in this release. However, you can try the installation described in Section \ref{sec:OptionalGPU}, and report any problem and/or suggestion on install-list of FA$\mu$ST project on \url{http://lists.gforge.inria.fr/pipermail/faust-install/}. 
+	\item \textbf{Python wrapper :} A Python wrapper is also planned, it will used Cython module.
+	\item \textbf{Command line wrapper :} A command line wrapper is also planned. It will integrated the externals Libraries "XML" and "MATIO" to manipulate the data (configuration and matrix). 
+	\item \textbf{Image denoising experiment :} (cf. \cite[chapter VI.]{LeMagoarou2016}) \\
+This experiment was in the previous release (FA$\mu$ST version 1.0) but is not in the current one because our C++ wrapper is not yet fitted to the algorithm used in this experiment.    
 \end{itemize}
 
 \section{Construct a FAuST from a given matrix}\label{sec:WorkingProgressBuildFromMatrix}
-\paragraph{}
-	After checking that you have configured your Matlab environment (cf section \ref{sec:firstUseMatlabPath})  
-	To see an example of building a FA$\mu$ST from a matrix, you can run \texttt{factorise\_matrix.m} in the Matlab Command Window by typing :
+Please ensure that you have configured your Matlab environment (cf. Section \ref{sec:firstUseMatlabPath}). Then, to see an example of building a FA$\mu$ST from a matrix, you can run \texttt{factorise\_matrix.m} in the Matlab Command Window by typing :
 \lstset{style=customMatlab}
 \begin{lstlisting}
 >> factorise_matrix
@@ -41,13 +42,13 @@ Then we factorize the matrix \textbf{A} into a FA$\mu$ST \textbf{Faust\_A}
 
 
 \section{FAuST installation using Optional GPU process}\label{sec:OptionalGPU}
-
 The toolbox FA$\mu$ST integrates optional Graphics Processing Unit (GPU) to improve its time performances.
 \paragraph{Warning:} This optional GPU install has only be realized on a Linux machine. There is no guarantee that the installation and the use will be effective for every system.
 
 \begin{itemize}
-\item \textbf{Install} the CUDA Toolkit from NVIDIA website:  \url{https://developer.nvidia.com/cuda-downloads}).
-\item \textbf{Install} the drivers for NVIDIA from NVIDIA website: \url{http://www.nvidia.fr/Download/index.aspx}.
+\item \textbf{Install} the CUDA Toolkit from NVIDIA website:\\
+\url{https://developer.nvidia.com/cuda-downloads}).
+\item \textbf{Install} the drivers for NVIDIA from NVIDIA website:\\ \url{http://www.nvidia.fr/Download/index.aspx}.
 \item \textbf{Verify install} of GPU tools by typing in a terminal :
 \lstset{style=customBash} 
 \begin{lstlisting}
@@ -79,5 +80,5 @@ When prerequisities listed in Section \ref{sec:RequiredTools} are checked, you c
 \end{itemize}
 
 
-FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox using GPU process.
+FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox \textbf{using GPU process}.
 
