@@ -61,7 +61,7 @@ You must obtain the path of your matlab binary file like:
 \begin{lstlisting}
 C:\Program Files\MATLAB\<R2015b>\bin\matlab.exe
 \end{lstlisting}
-If not, please add the directory of your \texttt{matlab.exe} file in your environment variable. (to add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}). \\
+If not, please add the directory of your \texttt{matlab.exe} file in your environment variable. To add an environment variable, follow instructions given in \ref{sec:ANNEXEEnvironmentVariableWindows}. \\
 
 \item \textbf{Verify Matlab} has a MEX supported compiler by typing in a Matlab Command Window :
 \lstset{style=customMatlab}
@@ -436,7 +436,8 @@ When clicking for the first time on the [Configure] button, CMake will ask for t
 
 Here is the list of available options: 
 \begin{itemize}
-\item CMAKE\_INSTALL\_PREFIX : Install directory
+\item CMAKE\_INSTALL\_PREFIX : Install directory for the FA$\mu$ST library
+\item CMAKE\_INSTALL\_MATLAB\_PREFIX : Install path directory for the Matlab wrapper
 \item BUILD\_TESTING : Enable the ctest option (default value is ON)
 \item BUILD\_DOCUMENTATION : Generating the doxygen documentation (default value is OFF)  
 \item BUILD\_MULTITHREAD : Enable multithread with OpenMP Multithreading (default value is OFF)

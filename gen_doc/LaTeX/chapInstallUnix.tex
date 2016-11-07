@@ -296,13 +296,14 @@ Instead the ccmake GUI, an other possibility to configure and generate the proje
 \texttt{cmake\ ..\ -D<BUILD\_NAME>=<value>}
 
 \begin{itemize}
-\item CMAKE\_INSTALL\_PREFIX : Install directory
+\item CMAKE\_INSTALL\_PREFIX : Install directory for the FA$\mu$ST library
+\item CMAKE\_INSTALL\_MATLAB\_PREFIX : Install path directory for the Matlab wrapper
 \item BUILD\_TESTING : Enable the ctest option (default value is ON)
 \item BUILD\_DOCUMENTATION : Generating the doxygen documentation (default value is OFF)  
 \item BUILD\_MULTITHREAD : Enable multithread with OpenMP Multithreading (default value is OFF)
 \item BUILD\_VERBOSE : Enable verbose option when compile (-v) (default value is OFF)
 \item BUILD\_DEBUG : Enable FA$\mu$ST Debug mode (default value is OFF )
-\item BUILD\_USE\_GPU : Using both CPU and GPU process (default value is OFF) (refer to Annex \ref{sec:OptionalGPU} for installation and more detail)
+\item BUILD\_USE\_GPU : Using both CPU and GPU process (default value is OFF) (refer to Section \ref{sec:OptionalGPU} for installation and more detail)
 \item BUILD\_MATLAB\_MEX\_FILES : Enable building Matlab MEX files (default value is ON)
 \item BUILD\_OPENBLAS : Using openBLAS for matrix and vector computations (default value is OFF )
 %\item BUILD\_READ\_XML\_FILE : Using xml2 library to read xml files (default value is OFF)

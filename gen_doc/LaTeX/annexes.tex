@@ -116,23 +116,6 @@ You can generated the target using the terminal command \texttt{xcodebuild} :
 \end{lstlisting}
 
 
-\section{Optional FAuST installation using GPU process}\label{sec:OptionalGPU}
 
-The toolbox FA$\mu$ST integrates optional Graphics Processing Unit (GPU) to improve its performances.
-\paragraph{Warning:} This optional GPU install has only be realized on a Linux machine. There is no guarantee that the installation and the use will be effective for every system.
-
-\begin{itemize}
-\item \textbf{Install} the CUDA Toolkit and the drivers for NVIDIA.
-\item \textbf{Verify install} of GPU tools by typing in a terminal :
-\lstset{style=customBash} 
-\begin{lstlisting}
-> which nvcc
-\end{lstlisting}
-You must obtain the path of your \texttt{nvcc} compiler like 
-\begin{lstlisting}
-/usr/local/cuda-7.5/bin/nvcc
-\end{lstlisting}
-If not, add \texttt{nvcc} directory in your environment path (in your ~/.bashrc file). 
-\end{itemize}
 
 

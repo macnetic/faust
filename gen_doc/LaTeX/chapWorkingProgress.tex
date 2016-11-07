@@ -2,20 +2,20 @@
 Various features are still under development and not yet stable.
 But here is a list of features that will be improved/integrated in the next release :
 \begin{itemize}
-	\item \textbf{Factorization algorithm : } they are available in this release. You can even used them
+	\item \textbf{Factorization algorithm : } They are available in this release. You can even used them
 from user-friendly approach (cf Section \ref{sec:WorkingProgressBuildFromMatrix}) but they are not
 that stable. In the sense that they are not fitted to all types of matrices.
 	\item \textbf{GPU : } A GPU version of the code is under development, it already shows 
 some time saving compared to the CPU code but is not enought user-friendly, easy to install to be in this release.
 	\item \textbf{Python wrapper : } A Python wrapper is also planned, it will used Cython module.
-	\item \textbf{Image denoising experiment (cf \cite[chapter VI.]{LeMagoarou2016}) :} This experiment was in the previous release (Faust version 1.0) 
+	\item \textbf{Image denoising experiment (cf \cite[chapter VI.]{LeMagoarou2016}) :} This experiment was in the previous release (FA$\mu$ST version 1.0) 
 	but is not in the current one because our C++ wrapper is not yet fitted to the algorithm used in this experiment.    
 \end{itemize}
 
-\section{Construct a Faust from a given matrix}\label{sec:WorkingProgressBuildFromMatrix}
+\section{Construct a FAuST from a given matrix}\label{sec:WorkingProgressBuildFromMatrix}
 \paragraph{}
 	After checking that you have configured your Matlab environment (cf section \ref{sec:firstUseMatlabPath})  
-	To see an example of building a Faust from a matrix, you can run \texttt{factorise\_matrix.m} in the Matlab Command Window by typing :
+	To see an example of building a FA$\mu$ST from a matrix, you can run \texttt{factorise\_matrix.m} in the Matlab Command Window by typing :
 \lstset{style=customMatlab}
 \begin{lstlisting}
 >> factorise_matrix
@@ -25,17 +25,59 @@ some time saving compared to the CPU code but is not enought user-friendly, easy
 
 In this script, from a given matrix A of size 100x200 :
 \lstinputlisting[firstline=42,lastline=47,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
-We generate the parameters of the factorisation from :
+We generate the parameters of the factorization from :
 \begin{itemize}
 \item The dimension of A (\textbf{dim1} and \textbf{dim2}),
-\item \textbf{nb\_factor} the number of factor of the Faust,
-\item \textbf{rcg} the Rational Complexity Gain, which represents the theoretical memory gain and multiplication speed-up of the Faust compared to the initial matrix .
-\\ \\\textbf{WARNING :}  A trade-off exists between the RCG/speed-up of the Faust and the data fidelity to the input matrix.
-The higher the RCG, the higher the error of the Faust relative to the input matrix
+\item \textbf{nb\_factor} the number of factor of the FA$\mu$ST,
+\item \textbf{rcg} the Rational Complexity Gain, which represents the theoretical memory gain and multiplication speed-up of the FA$\mu$ST compared to the initial matrix .
+\\ \\\textbf{WARNING :}  A trade-off exists between the RCG/speed-up of the FA$\mu$ST and the data fidelity to the input matrix.
+The higher the RCG, the higher the error of the FA$\mu$ST relative to the input matrix
 \end{itemize}
 
 \lstset{style=customBash}
 \lstinputlisting[firstline=51,lastline=56,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
-Then we factorize the matrix \textbf{A} into a Faust \textbf{Faust\_A}
+Then we factorize the matrix \textbf{A} into a FA$\mu$ST \textbf{Faust\_A}
 \lstinputlisting[firstline=58,lastline=59,style=customMatlab]{../../misc/demo/Quick_start/factorise_matrix.m}
+
+
+\section{FAuST installation using Optional GPU process}\label{sec:OptionalGPU}
+
+The toolbox FA$\mu$ST integrates optional Graphics Processing Unit (GPU) to improve its time performances.
+\paragraph{Warning:} This optional GPU install has only be realized on a Linux machine. There is no guarantee that the installation and the use will be effective for every system.
+
+\begin{itemize}
+\item \textbf{Install} the CUDA Toolkit from NVIDIA website:  \url{https://developer.nvidia.com/cuda-downloads}).
+\item \textbf{Install} the drivers for NVIDIA from NVIDIA website: \url{http://www.nvidia.fr/Download/index.aspx}.
+\item \textbf{Verify install} of GPU tools by typing in a terminal :
+\lstset{style=customBash} 
+\begin{lstlisting}
+> which nvcc
+\end{lstlisting}
+You must obtain the path of your \texttt{nvcc} compiler like 
+\begin{lstlisting}
+/usr/local/cuda-7.5/bin/nvcc
+\end{lstlisting}
+If not, add \texttt{nvcc} directory in your environment path (in your ~/.bashrc file). 
+\end{itemize}
+
+When prerequisities listed in Section \ref{sec:RequiredTools} are checked, you can get the package FA$\mu$ST.
+\begin{itemize}
+\item \textbf{Download} the FA$\mu$ST package on the website :  \url{http://faust.gforge.inria.fr/}
+\item \textbf{Unzip} the FA$\mu$ST package into your FA$\mu$ST directory.
+\item \textbf{Open} a command terminal
+\item \textbf{Set the current directory} to your FA$\mu$ST directory (NOTE: do not use any special character in your FA$\mu$ST directory path, for example the character $\mu$) and type :
+
+\lstset{style=customBash}
+\begin{lstlisting}
+> mkdir build
+> cd build
+> cmake -DBUILD_USE_GPU="ON" ..
+> make
+> sudo make install # run with administrator privilege
+\end{lstlisting}
+
+\end{itemize}
+
+
+FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox using GPU process.
 
