@@ -18,7 +18,7 @@ project: <http://faust.gforge.inria.fr>
 ##########################################################################
 Installation:
 
-Please refer to the document "./getting-started-with-faust-toolbox.pdf" 
+Please refer to the document "./gettingStartedFAuST-version2_0.pdf" 
 to install the FAUST toolbox.
 The FAUST toolbox have been tested on multiplatform :
 - LINUX (fedora 20, 21, 22, 23 / Ubuntu) 

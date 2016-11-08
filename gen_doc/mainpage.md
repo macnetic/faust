@@ -12,7 +12,7 @@ For more information on the FAµST Project, please visit the <a href="http://fau
 <HR>
 
 \section install_sec Installation
-See document ./getting-started-with-faust-toolbox.pdf to install the toolbox FAµST. 
+See document ./gettingStartedFAuST-versionX_X.pdf to install the toolbox FAµST. 
 
 \section NamingConvention Naming conventions in the C++ FAuST project
 	- namespace 		:	Faust::xxx
