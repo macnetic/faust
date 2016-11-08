@@ -1,15 +1,16 @@
+%!TEX root =  gettingStartedFAuST-version2_0.tex
 \chapter{QuickStart}\label{sec:firstUse}
 
 A Matlab wrapper is delivered with the FA$\mu$ST C++ library.
-It provides a user friendly new class of matrix \textbf{FA$\mu$ST} efficient for the multiplication with Matlab built-in dense matrix class.\newline
-This chapter presents some demos in order to get a customed to the \textbf{FA$\mu$ST} class and illustrates the advantages of \textbf{FA$\mu$ST} class.  
+It provides a user friendly new class of \textbf{FA$\mu$ST} matrices for efficient multiplication with Matlab built-in dense matrix class.\newline
+This chapter presents some demos in order to get accustomed to the \textbf{FA$\mu$ST} class and illustrates the advantages of \textbf{FA$\mu$ST} class on some examples.  
 \begin{enumerate}  
 	\item \textbf{Configure your Matlab path} (refer to Section \ref{sec:firstUseMatlabPath}).
 	\item You can run and take a look at various Matlab demos :
 	\begin{itemize}
-		\item \textbf{Use a FA$\mu$ST from a saved one} presents the general functionality of a FA$\mu$ST (go to Section \ref{sec:firstUseBuildFromSave})
-		\item \textbf{Construct a FA$\mu$ST from its factor}  (go to  Section \ref{sec:firstUseBuildFactors})
-		\item \textbf{Brain Sources Localization}  illustrates the speed-up induced by FA$\mu$ST in a medical application (go to Section \ref{sec:BSL_example})	
+		\item \textbf{Use a FA$\mu$ST from a saved one  (Section \ref{sec:firstUseBuildFromSave})} presents the general functionality of a FA$\mu$ST matrix
+		\item \textbf{Construct a FA$\mu$ST from its factors (Section \ref{sec:firstUseBuildFactors})}  
+		\item \textbf{Brain Sources Localization (Section \ref{sec:BSL_example})}  illustrates the speed-up induced by FA$\mu$ST in a medical imaging application 	
 	\end{itemize}
 \end{enumerate} 
 
@@ -25,8 +26,8 @@ In order to use Matlab wrapper, follow the instructions :
 	\item \textbf{Launch} Matlab.
 	\item \textbf{Set the working directory} of the Matlab Command Window to your FA$\mu$ST install directory FAuST\_INSTALL\_DIR by typing :
 		      	\begin{lstlisting}[style=customMatlab]
->> cd <INSTALL_FAuST_DIR>\end{lstlisting}	
-	By default, FAuST\_INSTALL\_DIR is inside the Matlab user directory. So, depending on your OS, you must replace the FAuST\_INSTALL\_DIR by this path :
+>> cd <FAuST_INSTALL_DIR>\end{lstlisting}	
+	By default, FAuST\_INSTALL\_DIR is inside the Matlab user directory. So, depending on your OS and configuration, you must replace the string <FAuST\_INSTALL\_DIR> in the above Matlab command line by this path :
 		\begin{itemize} 
 			\item \textbf{Windows$\ \ \ $:} \texttt{<ROOT>\textbackslash Users\textbackslash <USERNAME>\textbackslash Documents\textbackslash MATLAB\textbackslash faust}
 			\item \textbf{Linux$\ \ \ \ \ \ \ \ $:} \texttt{/home/<USERNAME>/Documents/MATLAB/faust}
@@ -43,9 +44,9 @@ In order to use Matlab wrapper, follow the instructions :
 >> setup_Faust \end{lstlisting}
 	You must obtain the following message in your Matlab Command Window : 
 	\begin{lstlisting}
-Welcome to wrapper matlab C++ FAuST_toolbox. 
-FAuST root directory is FAuST_INSTALL_DIR
-Adding path FAuST_INSTALL_DIR and all its subdirectories 
+Welcome to the matlab wrapper of the FAuST C++ toolbox. 
+FAuST root directory is <FAuST_INSTALL_DIR>
+Adding path <FAuST_INSTALL_DIR> and all its subdirectories 
 To get started with the FAuST Toolbox : launch quick_start 
 or run_all_demo.m \end{lstlisting}
 
@@ -60,15 +61,15 @@ Now, you can run \texttt{quick\_start.m} script in the Matlab Command Window by 
 \begin{lstlisting}
 >> quick_start
 \end{lstlisting}
-\texttt{quick\_start.m} script is located in following path :\\
-\texttt{/<INSTALL\_FAuST\_DIR>/demo/Quick\_start/quick\_start.m} \\
+The \texttt{quick\_start.m} script is located in the following path :\\
+\texttt{<FAuST\_INSTALL\_DIR>/demo/Quick\_start/quick\_start.m} \\
 In this script :
 \begin{enumerate} 
-	\item A FA$\mu$ST of size 4000x5000 is loaded from a previous one that is saved into a MAT-file located in :\\
-	\texttt{<INSTALL\_FAuST\_DIR>/demo/Quick\_start/faust\_quick\_start.mat}
+	\item A FA$\mu$ST of size 4000x5000 is loaded from a MAT-file located in :\\
+	\texttt{<FAuST\_INSTALL\_DIR>/demo/Quick\_start/faust\_quick\_start.mat}
 	\lstinputlisting[firstline=47,lastline=48,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
 	
-	\item  A list of overloaded Matlab function shows that a FA$\mu$ST is handled as a normal Matlab builtin matrix.
+	\item  A list of overloaded Matlab function shows that a FA$\mu$ST is almost handled as a normal Matlab builtin matrix. The exception is that one cannot \emph{assign} a value to a given entry.
  	\lstinputlisting[firstline=51,lastline=83,style=customMatlab]{../../misc/demo/Quick_start/quick_start.m}
 
 	\item It performs a little time comparison between multiplication by a FA$\mu$ST or its full matrix equivalent.
@@ -77,17 +78,17 @@ This is in order to illustrate the speed-up induced by the FA$\mu$ST. This speed
 \end{enumerate}
 
 
-\section{Construct a FAuST from its factor}\label{sec:firstUseBuildFactors}
+\section{Construct a FAuST from its factors}\label{sec:firstUseBuildFactors}
 To see an example of building a FA$\mu$ST from its factors, you can run \texttt{construct\_Faust\_from\_factors.m} in the Matlab Command Window by typing :
 \lstset{style=customMatlab}
 \begin{lstlisting}
 >> construct_Faust_from_factors
 \end{lstlisting}
-This following example shows how to build a FA$\mu$ST from a cell-array representing its factors.
+The following example shows how to build a FA$\mu$ST from a cell-array representing its factors.
 \lstinputlisting[firstline=42,lastline=70,style=customMatlab]{../../misc/demo/Quick_start/construct_Faust_from_factors.m}
 
-If you want to build a FA$\mu$ST from a given matrix, you can go to the section Working Progress \ref{sec:WorkingProgressBuildFromMatrix}.
-Be aware that this not yet stable but under progress.
+If you want to build a FA$\mu$ST from a given matrix, you can go to the section Work in Progress \ref{sec:WorkingProgressBuildFromMatrix}.
+Be aware that this not yet stable but under development.
 
 
 
@@ -102,11 +103,11 @@ An experience of Brain Source Localization using several gain matrices including
 \end{lstlisting}
 
 \texttt{BSL.m} runs the experiment (see the script file :\\
-\texttt{/<FAuST\_INSTALL\_DIR>/demo/Brain\_source\_localization/BSL.m})\\
-\texttt{Fig\_BSL.m} displays the Figure \ref{fig:BSL}. illustrating the speed-up using a FA$\mu$ST. (see the script file:\\
+\texttt{<FAuST\_INSTALL\_DIR>/demo/Brain\_source\_localization/BSL.m})\\
+\texttt{Fig\_BSL.m} displays Figure \ref{fig:BSL}. illustrating the speed-up using a FA$\mu$ST. (see the script file:\\
 \texttt{<FAuST\_INSTALL\_DIR>/demo/Brain\_source\_localization/Fig\_BSL.m}) \\
 
-This figure illustrates the speed-up with a FA$\mu$ST ($\mathbf{M}$ is the gain dense matrix and $\widehat{\mathbf{M}}_{6},\widehat{\mathbf{M}}_{9},\widehat{\mathbf{M}}_{16},\widehat{\mathbf{M}}_{26}$ are different FA$\mu$ST representing  $\mathbf{M}$):
+This figure illustrates the speed-up with a FA$\mu$ST ($\mathbf{M}$ is the dense gain matrix and $\widehat{\mathbf{M}}_{6},\widehat{\mathbf{M}}_{9},\widehat{\mathbf{M}}_{16},\widehat{\mathbf{M}}_{26}$ are different FA$\mu$ST representing  $\mathbf{M}$):
 
 
 \begin{figure}[H] %%[!htbp]

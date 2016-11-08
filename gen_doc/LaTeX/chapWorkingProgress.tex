@@ -1,20 +1,20 @@
-\chapter{Working Progress}\label{sec:WorkingProgress}
+%!TEX root =  gettingStartedFAuST-version2_0.tex
+\chapter{Work in Progress}\label{sec:WorkingProgress}
 	Various features are still under development and not yet stable.
-But here is a list of features that will be improved/integrated in the next release :
+But here is an overview of a roadmap for features that we plan to improve/integrate in an upcoming release :
 \begin{itemize}
-	\item \textbf{Factorization algorithm :} (cf. Section \ref{sec:WorkingProgressBuildFromMatrix})\\ 
-They are available in this release. You can even used them
-from user-friendly approach (cf. Section \ref{sec:WorkingProgressBuildFromMatrix}) but they are not
-that stable. In the sense that they are not fitted to all types of matrices.
+	\item \textbf{Factorization algorithms :} (cf. Section \ref{sec:WorkingProgressBuildFromMatrix})\\ 
+A beta version is available in this release, implementing in C++ what what delivered in plain Matlab in version 1.0.0. 
+Refer to Section \ref{sec:WorkingProgressBuildFromMatrix}) for more information on how to play with these algorithms, which C++ implementation and API are not yet stabilized.
 	\item \textbf{Graphics Processing Unit (GPU) :} (cf. Section \ref{sec:OptionalGPU})\\
 A GPU version of the code is under development, it already shows 
-some time saving compared to the CPU code but is not enough user-friendly and not easy to install to be in this release. However, the Linux configuration is already in operation then you can try the installation described in Section \ref{sec:OptionalGPU}, and report any problem and/or suggestion on install-list of FA$\mu$ST project on \url{http://lists.gforge.inria.fr/pipermail/faust-install/}. 
-	\item \textbf{Python wrapper :} A Python wrapper is also planned, it will used Cython module.
-	\item \textbf{Command line wrapper :} A command line wrapper is also planned. It will integrated the externals Libraries "XML" and "MATIO" to manipulate the data (configuration and matrix). 
-	\item \textbf{A||GO wrapper :} A A||GO wrapper is also planned to propose a demonstration on website \url{https://allgo.inria.fr/}.
+some time savings compared to the CPU code for certain computations, but is not enough user-friendly and not easy to install to be in this release. The most advanced development is currently on Linux, you can play with it following the steps described in Section \ref{sec:OptionalGPU}. Report any problem and/or suggestion to the mailing list \url{http://lists.gforge.inria.fr/pipermail/faust-install/}. 
+	\item \textbf{Python wrapper :} A Python wrapper is also planned, it will used the Cython module.
+	\item \textbf{Command line wrapper :} A command line wrapper is also envisioned. It will integrated the externals Libraries "XML" and "MATIO" to manipulate the data (configuration and matrix). 
+	\item \textbf{A||GO wrapper :} A wrapper for the A||GO platform of web services is also planned to propose a demonstration on the website \url{https://allgo.inria.fr/}.
 		
-	\item \textbf{Image denoising experiment :} (cf. \cite[chapter VI.]{LeMagoarou2016}) \\
-This experiment was in the previous release (FA$\mu$ST version 1.0) but is not in the current one because our C++ wrapper is not yet fitted to the algorithm used in this experiment.    
+	\item \textbf{Image denoising experiment :} (cf \cite[chapter VI]{LeMagoarou2016}) \\
+This experiment was in the previous release (FA$\mu$ST version 1.0, pure Matlab implementation) but is not in the current one because our C++ wrapper is not yet compatible with the sparse decomposition algorithm used in this experiment. Please use version 1.0.0 to reproduce this image denoising experiment. 
 \end{itemize}
 
 \section{Construct a FAuST from a given matrix}\label{sec:WorkingProgressBuildFromMatrix}
@@ -23,18 +23,17 @@ Please ensure that you have configured your Matlab environment (cf. Section \ref
 \begin{lstlisting}
 >> factorize_matrix
 \end{lstlisting}
-\texttt{factorize\_matrix.m} script is located in following path :\\
+\texttt{factorize\_matrix.m} script is located in the following path :\\
 \texttt{<FAuST\_INSTALL\_DIR>/demo/Quick\_start/factorize\_matrix.m} \\
 
-In this script, from a given matrix A of size 100x200 :
+In this script, from a given matrix A of size 100x200 
 \lstinputlisting[firstline=42,lastline=47,style=customMatlab]{../../misc/demo/Quick_start/factorize_matrix.m}
-We generate the parameters of the factorization from :
+we generate the parameters of the factorization from :
 \begin{itemize}
 \item The dimension of A (\textbf{dim1} and \textbf{dim2}),
-\item \textbf{nb\_factor} the number of factor of the FA$\mu$ST,
-\item \textbf{rcg} the Rational Complexity Gain, which represents the theoretical memory gain and multiplication speed-up of the FA$\mu$ST compared to the initial matrix .
-\\ \\\textbf{WARNING :}  A trade-off exists between the RCG/speed-up of the FA$\mu$ST and the data fidelity to the input matrix.
-The higher the RCG, the higher the error of the FA$\mu$ST relative to the input matrix
+\item \textbf{nb\_factor:} the desired number of factors of the FA$\mu$ST,
+\item \textbf{rcg:} the targeted {\em Relative Complexity Gain}, which represents the theoretical memory gain and multiplication speed-up of the FA$\mu$ST compared to the initial matrix .
+\\ \\\textbf{WARNING :}  A trade-off exists between the targeted RCG/speed-up of the FA$\mu$ST and the achievable data fidelity to the input matrix. The higher the RCG, the higher the error of the FA$\mu$ST relative to the input matrix.
 \end{itemize}
 
 \lstset{style=customBash}
@@ -43,9 +42,9 @@ Then we factorize the matrix \textbf{A} into a FA$\mu$ST \textbf{Faust\_A}
 \lstinputlisting[firstline=58,lastline=59,style=customMatlab]{../../misc/demo/Quick_start/factorize_matrix.m}
 
 
-\section{FAuST installation using Optional GPU process}\label{sec:OptionalGPU}
-The toolbox FA$\mu$ST integrates optional Graphics Processing Unit (GPU) to improve its time performances.
-\paragraph{Warning:} This optional GPU install has only be realized on a Linux machine. There is no guarantee that the installation and the use will be effective for every system.
+\section{Installing FAuST to enable GPU acceleration}\label{sec:OptionalGPU}
+As a beta version, the FA$\mu$ST toolbox integrates optional GPU (Graphics Processing Unit) acceleration to improve its time performance.
+\paragraph{Warning:} Currently, this optional GPU install has only be implemented and tested on a Linux machine. There is no guarantee that the installation and the use will be effective for every system.
 
 \begin{itemize}
 \item \textbf{Install} the CUDA Toolkit from NVIDIA website:\\
@@ -82,5 +81,5 @@ When prerequisities listed in Section \ref{sec:RequiredTools} are checked, you c
 \end{itemize}
 
 
-FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox \textbf{using GPU process}.
+The FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox \textbf{using GPU process}.
 
