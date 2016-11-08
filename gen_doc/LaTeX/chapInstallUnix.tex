@@ -10,8 +10,8 @@ The FA$\mu$ST project is available for Linux, MAC OS X and Windows platforms. Th
 \item Refer to the appropriate section following the use (or not) of an IDE (Integrated Development Environment): 
 \begin{itemize}
 \item Basic installation using \textbf{the command line terminal}, refer to Section \ref{sec:UnixBuildInstall}.
-\item Basic installation using \textbf{the IDE "Code::Blocks"}, refer to Section \ref{sec:UnixInstallCodeBlock}. 
-\item Basic installation using \textbf{the IDE "Xcode"} only for MAC OS X platform, refer to Section \ref{sec:MacInstallXcode}. 
+\item Basic installation using \textbf{the Code::Blocks IDE}, refer to Section \ref{sec:UnixInstallCodeBlock}. 
+\item Basic installation using \textbf{the Xcode IDE } only for MAC OS X platform, refer to Section \ref{sec:MacInstallXcode}. 
 \end{itemize}
 \end{enumerate}
 
@@ -46,7 +46,7 @@ Matlab Command Window.
 \section{Required components}\label{sec:RequiredTools}
 This Section lists the required components you must install before to begin the FA$\mu$ST installation. 
 \begin{itemize}
-\item \textbf{Install CMake}. The minimum version required is Cmake version 3.0.2. Visit the website \url{https://cmake.org/} to process to the installation. 
+\item \textbf{Install CMake}. The minimum version required is Cmake version 3.0.2. Download binary distribution of CMake from their website \url{https://cmake.org/download/}.
 
 
 \item \textbf{Verify Cmake install} by typing in a command terminal : 
@@ -199,8 +199,8 @@ For more detail about \texttt{cmake} command, refer to Section \ref{sec:ANNEXEIn
 % Xcode 
 \section{Basic Build \& Install using Xcode IDE (for MAC OS)}\label{sec:MacInstallXcode}
 
-FA$\mu$ST install using the IDE Xcode concerns only MAC OS X environment.
-\paragraph{}When you have done the step in section  \ref{sec:UnixBuildDownload} (i.e download FA$\mu$ST package and launch the terminal in the right directory),  the FA$\mu$ST installation can start. This Build \& Install section requires that you have the IDE Xcode installed on your system. If you are administrator of your machine (root access), follow instructions given in Section \ref{sec:XcodeUnixBuildInstallAdmin}. Otherwise, for local installation, refer to Section \ref{sec:XcodeUnixBuildInstallNOAdmin}. 
+FA$\mu$ST install using the Xcode IDE concerns only MAC OS X environment.
+\paragraph{}When you have done the step in section  \ref{sec:UnixBuildDownload} (i.e download FA$\mu$ST package and launch the terminal in the right directory),  the FA$\mu$ST installation can start. This Build \& Install section requires that you have the Xcode IDE installed on your system. If you are administrator of your machine (root access), follow instructions given in Section \ref{sec:XcodeUnixBuildInstallAdmin}. Otherwise, for local installation, refer to Section \ref{sec:XcodeUnixBuildInstallNOAdmin}. 
 
 \paragraph{NOTE: }For a command line install using Xcode IDE, refer to Annex \ref{sec:ANNEXEInstallMACXcodeTerminal}.  
 
@@ -296,8 +296,8 @@ Instead the ccmake GUI, an other possibility to configure and generate the proje
 \texttt{cmake\ ..\ -D<BUILD\_NAME>=<value>}
 
 \begin{itemize}
-\item CMAKE\_INSTALL\_PREFIX : Install directory for the FA$\mu$ST library
-\item CMAKE\_INSTALL\_MATLAB\_PREFIX : Install path directory for the Matlab wrapper
+\item CMAKE\_INSTALL\_PREFIX : Install directory path for the FA$\mu$ST library
+\item CMAKE\_INSTALL\_MATLAB\_PREFIX : Install directory path for the Matlab wrapper
 \item BUILD\_TESTING : Enable the ctest option (default value is ON)
 \item BUILD\_DOCUMENTATION : Generating the doxygen documentation (default value is OFF)  
 \item BUILD\_MULTITHREAD : Enable multithread with OpenMP Multithreading (default value is OFF)
@@ -310,7 +310,7 @@ Instead the ccmake GUI, an other possibility to configure and generate the proje
 %\item BUILD\_READ\_MAT\_FILE : Using matio library to read mat files (default value is OFF)
 \end{itemize}
 
-Following the selected option, the cmake installer automatically checks the dependent component (library OpenBlas, eigen, matio, libxml2).  
+Following the selected option, the cmake installer automatically checks the dependent component (library OpenBlas, eigen).  
 
 %\section{Optional dependent tools}\label{sec:OptionalRequiredTools}
 

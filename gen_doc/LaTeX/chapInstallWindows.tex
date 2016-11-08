@@ -42,7 +42,7 @@ Matlab Command Window.
 The installation of the FA$\mu$ST tool depends on other components to be installed in order to run properly. 
 
 \begin{itemize}
-\item \textbf{Install CMake}. The minimum version required is Cmake version 3.0.2. Download Binary distributions correspond to your environment from \url{https://cmake.org/download/}.
+\item \textbf{Install CMake}. The minimum version required is Cmake version 3.0.2. Download binary distribution of CMake from their website \url{https://cmake.org/download/}.
 \item \textbf{Verify CMake install} : Open a terminal and type the following command:
 \lstset{style=customBash}
 \begin{lstlisting}
@@ -110,13 +110,13 @@ When prerequisitie components listed in precedent section \ref{sec:WinRequired} 
 \end{itemize}
 
 
-\section{Install using GCC-MinGW compiler}\label{sec:WinInstallMinGW}
+\section{Install using GCC compiler}\label{sec:WinInstallMinGW}
 
 When prerequisite components listed in previous section \ref{sec:WinRequired} are checked, you must install \textbf{MinGW containing the C++ Compiler}. 
 Then, the FA$\mu$ST installation can be done using Command prompt, following instructions given in Section \ref{sec:WinMinGWBasicInstall} or using CodeBlocks IDE, following instructions given in Section \ref{sec:WinCodeBlocksBasicInstall}. 
 
 
-\subsection{Install GCC from MinGW}
+\subsection{Install GCC compiler from MinGW}
 \label{sec:WinInstallCompilerMinGW}
 
 \begin{itemize}
@@ -209,7 +209,7 @@ FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{se
 The basic install described in this section requires the GCC compiler from MinGW (see precedent Section \ref{sec:WinInstallCompilerMinGW}).
 If you have administrator privilege, follow instructions in Section \ref{sec:WinMinGWCodeBlocksAdminBasicInstall}, otherwise follow instructions given in Section \ref{sec:WinMinGWCodeBlocksNoAdminBasicInstall}.
 
-You must select the gcc compiler in the IDE code::Blocks in the \\ \texttt{Settings menu --> Compiler... --> Selected Compiler }  
+You must select the gcc compiler in the code::Blocks IDE in the \\ \texttt{Settings menu --> Compiler... --> Selected Compiler }  
 
 Then, the FA$\mu$ST installation can be done. 
 
@@ -436,8 +436,8 @@ When clicking for the first time on the [Configure] button, CMake will ask for t
 
 Here is the list of available options: 
 \begin{itemize}
-\item CMAKE\_INSTALL\_PREFIX : Install directory for the FA$\mu$ST library
-\item CMAKE\_INSTALL\_MATLAB\_PREFIX : Install path directory for the Matlab wrapper
+\item CMAKE\_INSTALL\_PREFIX : Install directory path for the FA$\mu$ST library
+\item CMAKE\_INSTALL\_MATLAB\_PREFIX : Install directory path for the Matlab wrapper
 \item BUILD\_TESTING : Enable the ctest option (default value is ON)
 \item BUILD\_DOCUMENTATION : Generating the doxygen documentation (default value is OFF)  
 \item BUILD\_MULTITHREAD : Enable multithread with OpenMP Multithreading (default value is OFF)
