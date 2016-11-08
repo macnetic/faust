@@ -41,10 +41,12 @@ cmake_minimum_required(VERSION 3.0.2) #compatibilite UTF-8 ASCII (Windows Ubunt)
 #cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
 
+##############    FAUST_VERSION 2.0)  ############################
 set(FAUST_VERSION_MAJOR 2)
 set(FAUST_VERSION_MINOR 0)
+
 set(FAUST_VERSION_PATCH 0)
-#set(FAUST_VERSION 2.0)
+########################################################
 
 ##############  INSTALL DIRECTORIES   #############################
 if(UNIX)
@@ -704,7 +706,7 @@ SET(CPACK_PACKAGE_VENDOR "PANAMA Project-team INRIA")
 SET(CPACK_PACKAGE_VERSION_MAJOR "${FAUST_VERSION_MAJOR}")
 SET(CPACK_PACKAGE_VERSION_MINOR "${FAUST_VERSION_MINOR}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${FAUST_VERSION_PATCH}")
-SET(CPACK_PACKAGE_VERSION "${FAUST_VERSION_MAJOR}.${FAUST_VERSION_MINOR}.${FAUST_VERSION_PATCH}")
+SET(CPACK_PACKAGE_VERSION "${FAUST_VERSION_MAJOR}.${FAUST_VERSION_MINOR}") #.${FAUST_VERSION_PATCH}
 SET(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_PROCESSOR}")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "FAUST ${FAUST_VERSION_MAJOR}.${FAUST_VERSION_MINOR}")
 
@@ -723,7 +725,7 @@ set(CPACK_PACKAGE_URL "http://faust.gforge.inria.fr/" )
 ##############################################################################
 # SOURCE DISTRIBUTION:
 ##############################################################################
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "FAUST-Source-${FAUST_VERSION_MAJOR}.${FAUST_VERSION_MINOR}.${FAUST_VERSION_PATCH}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "FAUST-Source-${CPACK_PACKAGE_VERSION}")
 set(CPACK_SOURCE_IGNORE_FILES "/build/;/.bzr/;/CMakeFiles/;/_CPack_Packages/;/.svn/;/.git/;/headerCPP.txt;/headerMatlab.txt;/headerCMakeList.txt;/gen_doc/LaTeX/images/;/gen_doc/installation_README.odt;/gen_doc/installation_Virtual_Machine.txt;/misc/data/txt/;/misc/data/mat/visage/;/misc/CTest_nightly/;/CTestConfig.cmake;/gen_doc/LaTeX/;")
 
 set(CPACK_SOURCE_IGNORE_FILES "${CPACK_SOURCE_IGNORE_FILES};/externals/unix/tarLibs/libxml2-2.9.4.tar.gz;/externals/unix/tarLibs/matio-1.5.7.7z;")
