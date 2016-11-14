@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+# setup.py (equivalent to Makefile)
+# useful link : https://docs.python.org/2/distutils/configfile.html
+
+from distutils.core import setup, Extension
+from Cython.Build import cythonize
+
+PyFaust = Extension(
+	'PyFaust',
+	#sources = ['@FAUST_PYTHON_SRC_SRC_DIR@PyFaust.pyx'],
+	sources = ['@FAUST_PYTHON_BIN_DIR@/PyFaust.pyx'],
+	language = 'c++',
+	include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@],
+    library_dirs=[@FAUST_PYTHON_LIB_DIR@],
+    libraries=['faust'@FAUST_PYTHON_LIB@]
+)
+
+setup(
+    name = 'PyFaust',
+    ext_modules = cythonize(PyFaust),
+)

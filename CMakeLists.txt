@@ -204,6 +204,10 @@ option(BUILD_READ_XML_FILE "Using xml configuration to read xml files" OFF)
 option(BUILD_READ_MAT_FILE "Using matio library to read mat files" OFF)
 #set(BUILD_READ_XML_FILE OFF)
 #set(BUILD_READ_MAT_FILE OFF)
+
+option(BUILD_PYTHON "Enable building PyFaust (Python librairie)." OFF)
+#set(BUILD_PYTHON OFF)
+
 #CMAKE_DEPENDENT_OPTION
 
 
@@ -376,6 +380,12 @@ if (BUILD_MATLAB_MEX_FILES)
 
 endif(BUILD_MATLAB_MEX_FILES)
 ##################################################################
+
+
+
+
+
+
 
 ## examples directories including some examples of the use of the library FAuST
 set(FAUST_BIN_TEST_DIR ${PROJECT_BINARY_DIR}/run_test CACHE INTERNAL "")
@@ -660,6 +670,19 @@ else()
 endif(BUILD_OPENBLAS)
 
 install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
+
+
+
+
+
+if(BUILD_PYTHON)
+	set(FAUST_PYTHON_SRC_DIR ${FAUST_SRC_WRAPPER_DIR}/python CACHE INTERNAL "")
+	set(FAUST_PYTHON_SRC_SRC_DIR ${FAUST_PYTHON_SRC_DIR}/src/ CACHE INTERNAL "")
+	set(FAUST_PYTHON_BIN_DIR ${FAUST_BIN_WRAPPER_DIR}/python CACHE INTERNAL "")
+	set(FAUST_PYTHON_TARGET faust_python CACHE INTERNAL "")
+	add_subdirectory(${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_BIN_DIR})
+	
+endif(BUILD_PYTHON)
 ##################################################################
 
 

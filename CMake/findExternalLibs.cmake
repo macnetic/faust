@@ -10,6 +10,7 @@
 ##      -MATIO   C++ library for reading/writing MATLAB file format "mat"   ##
 ##      -LIBXML  C++ library for reading/writing XML file 	            ##
 ##      -CUDA    C++ library for numerical calculus on GPU (NVIDIA Cards)   ##
+##      -PYTHON                                                             ##
 ##									    ##      
 ##  For more information on the FAuST Project, please visit the website     ##
 ##  of the project : <http://faust.gforge.inria.fr>                         ##
@@ -117,8 +118,10 @@ endif(BUILD_READ_MAT_FILE)
 if (BUILD_READ_XML_FILE)
 	include(CMake/findXML2Lib.cmake)
 endif(BUILD_READ_XML_FILE)
-
-
+###### PYTHON EXE ######
+if(BUILD_PYTHON)
+	include(CMake/findPython.cmake)
+endif(BUILD_PYTHON)
 
 #add_library_path(LIBRARY_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{HDF5_ROOT_DIR}" "/usr/lib/x86_64-linux-gnu/")
 #add_include_path(INCLUDE_PATH_LIST_TMP3 "$ENV{CUDADIR}" "/usr/include/libxml2")

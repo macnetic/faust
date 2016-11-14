@@ -1,0 +1,73 @@
+/****************************************************************************/
+/*                              Description:                                */
+/*  C++ Header file wrapping the  Class Faust::Transform<FPP,Cpu>,          */
+/*  the methods are quite the same but this works with pointer              */
+/*  which are easier to handle from Python                                  */
+/*                                                                          */     
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.gforge.inria.fr>                         */
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+/****************************************************************************/
+
+#ifndef FAUSTCPP_H
+#define FAUSTCPP_H
+
+//#include "faust_transform.h"
+#include "faust_MatDense.h"
+
+
+template<typename FPP>
+class FaustCpp 
+{
+    
+    public :
+    
+    
+    FaustCpp(): transform(){} 
+    void Display() const { transform.Display();}
+    void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol);
+    unsigned int getNbRow() const{return transform.getNbRow();}
+    unsigned int getNbCol() const{return transform.getNbCol();}
+    void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose)const;
+    
+    
+    private :
+    Faust::Transform<FPP,Cpu> transform;
+};
+
+#include "FaustCpp.hpp"
+
+#endif
