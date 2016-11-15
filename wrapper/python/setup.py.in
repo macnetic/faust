@@ -4,6 +4,8 @@
 # useful link : https://docs.python.org/2/distutils/configfile.html
 
 from distutils.core import setup, Extension
+import sys
+sys.path.append('@CYTHON_BIN_DIR@')
 from Cython.Build import cythonize
 
 PyFaust = Extension(

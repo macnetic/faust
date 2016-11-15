@@ -40,6 +40,7 @@
 
 # This module defines: 
 #  PYTHON_EXE: Python executable
+#  CYTHON_EXE: Cython executable
 
 
 message(STATUS "------------------------------------------------")
@@ -76,8 +77,53 @@ else(UNIX)
 	message(FATAL_ERROR "Python wrapper Unsupported OS (only compatible with Unix System (Linux or Mac Os X)")		
 endif()
 
-
 message(STATUS "PYTHON_EXE has been found : ${PYTHON_EXE}")	
 message(STATUS "------------------------------------------------")
+
+
+
+
+
+
 ##################################################################
+message(STATUS "------------------------------------------------")
+message(STATUS "------------ Looking for Cython PATH -----------")
+message(STATUS "------------------------------------------------")
+	
+
+if(UNIX)
+
+
+	message(STATUS "INFO- If you want to choose an other version of Python,") 
+	message(STATUS "INFO- please add an environment variable CYTHON_PATH. ")
+	message(STATUS "INFO- Example : CYTHON_PATH=/usr/bin/cython")
+	if ($ENV{CYTHON_PATH}} MATCHES cython)
+		set(CYTHON_TMP $ENV{PYTHON_PATH})
+		message(STATUS "PYTHON_EXE=$ENV{PYTHON_PATH} defined from environment variable")
+	elseif (${CYTHON_PATH} MATCHES cython)
+		set(CYTHON_TMP ${PYTHON_PATH})
+		message(STATUS "PYTHON_EXE=${PYTHON_EXE} defined from local input variable")
+	else() # PYTHON_EXE_DIR
+
+		#message(STATUS "PYTHON_DIR_TMP 1 = ${PYTHON_DIR_TMP}")
+		exec_program("which cython | xargs echo" OUTPUT_VARIABLE CYTHON_TMP)
+		#message(STATUS "PYTHON_DIR_TMP 2 = ${PYTHON_DIR_TMP}")
+		
+		if (${CYTHON_TMP} MATCHES "which: no cython in")			
+			message(FATAL_ERROR "cython is not present in your PATH ; Please insert in the PATH environment.")
+		endif()
+
+	   	
+		
+	endif()
+	
+	string(REGEX REPLACE "([a-zA-Z0-9_/:.]+)/cython" "\\1" CYTHON_BIN_DIR "${CYTHON_TMP}")
+	 
+else(UNIX)
+	message(FATAL_ERROR "Cython wrapper Unsupported OS (only compatible with Unix System (Linux or Mac Os X)")		
+endif()
+
+message(STATUS "CYTHON_BIN_DIR has been found : ${CYTHON_BIN_DIR}")	
+message(STATUS "------------------------------------------------")
+
 
