@@ -12,10 +12,10 @@
 
 
 
-message(STATUS "PPPPFAUST_PYTHONNNNN ${EIGEN_INC_DIR}")
-message(STATUS "EIGEN DIR ${EIGEN_INC_DIR}")
-message(STATUS "WRAPPER PYTHON BIN DIR : ${FAUST_PYTHON_BIN_DIR}")
-message(STATUS "FAUST SRC DIR ${FAUST_SRC_LINEAR_OPERATOR_DIR}")
+#message(STATUS "FFFFFFAUST_PYTHONNNNN ${EIGEN_INC_DIR}")
+#message(STATUS "EIGEN DIR ${EIGEN_INC_DIR}")
+#message(STATUS "WRAPPER PYTHON BIN DIR : ${FAUST_PYTHON_BIN_DIR}")
+#message(STATUS "FAUST SRC DIR ${FAUST_SRC_LINEAR_OPERATOR_DIR}")
 set(FAUST_PYTHON_INCLUDE_DIR"'${EIGEN_INC_DIR}',
 			'${FAUST_SRC_LINEAR_OPERATOR_DIR}',
 			'${FAUST_PYTHON_SRC_DIR}',
@@ -47,7 +47,7 @@ add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
 		        ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace" 
 		        COMMENT   "Creating PyFaust")
 
-add_test(NAME PYTHON_TEST COMMAND ${PYTHON_EXE} main.py)
+
 #add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
 #		        COMMAND   python 
 #		        ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py" "build_ext" "--build-lib" "${FAUST_PYTHON_BIN_DIR}" "--build-temp"  "${FAUST_PYTHON_BIN_DIR}"  

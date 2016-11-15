@@ -56,22 +56,22 @@ cdef class Faust:
 	#### CONSTRUCTOR ####
 	#def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
 	def  __cinit__(self,list_factors):
-		print 'inside cinit'
+		#print 'inside cinit'
 		self.m_faust = CyFaust.FaustCpp[double]();
 		cdef double [:,:] data
 		cdef unsigned int nbrow
 		cdef unsigned int nbcol
-		print 'longueur list'
-		print len(list_factors)
-		print 'avant boucle'
+		#print 'longueur list'
+		#print len(list_factors)
+		#print 'avant boucle'
 		for factor in list_factors:
-			data=factor;
+			data=factor.astype(float,'F');
 			nbrow=factor.shape[0];
 			nbcol=factor.shape[1];
-			print nbrow
-			print nbcol
+		#	print nbrow
+		#	print nbcol
 			self.m_faust.push_back(&data[0,0],nbrow,nbcol);
-		print 'apres boucle'
+		#print 'apres boucle'
 		
 	
 	
@@ -103,7 +103,9 @@ cdef class Faust:
 	def multiply(self,x):
 		if not isinstance(x, (np.ndarray) ):
 			raise NameError('input x must a numpy ndarray')
-		
+		x=x.astype(float,'F')
+		if not x.dtype=='float':
+			raise NameError('input x must be double array')
 		if not x.flags['F_CONTIGUOUS']:
 			raise NameError('input x must be Fortran contiguous (Colmajor)')
 		
@@ -135,14 +137,14 @@ cdef class Faust:
 		
 		#void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose);
 		nbcol_y = nbcol_x;
+		
 		cdef y = np.zeros([nbrow_y,nbcol_y], dtype='d',order='F')
 		cdef double[:,:] yview=y
-		
 		if ndim_x == 1:
 			self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x,False);
 		else:
 			self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x,False);
-			
+		
 		return y
 		
 		

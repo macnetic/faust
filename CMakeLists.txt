@@ -257,6 +257,9 @@ endif()
 if (BUILD_DOCUMENTATION)
 	message(STATUS "**********DOC ACTIF************")
 endif()
+if(BUILD_PYTHON)
+	message(STATUS "**********PYTHON ACTIF************")
+endif(BUILD_PYTHON)
 ##################################################################
 
 
@@ -385,7 +388,12 @@ endif(BUILD_MATLAB_MEX_FILES)
 
 
 
-
+if(BUILD_PYTHON)
+	set(FAUST_PYTHON_SRC_DIR ${FAUST_SRC_WRAPPER_DIR}/python CACHE INTERNAL "")
+	set(FAUST_PYTHON_SRC_SRC_DIR ${FAUST_PYTHON_SRC_DIR}/src/ CACHE INTERNAL "")
+	set(FAUST_PYTHON_BIN_DIR ${FAUST_BIN_WRAPPER_DIR}/python CACHE INTERNAL "")
+	set(FAUST_PYTHON_TARGET faust_python CACHE INTERNAL "")
+endif(BUILD_PYTHON)
 
 ## examples directories including some examples of the use of the library FAuST
 set(FAUST_BIN_TEST_DIR ${PROJECT_BINARY_DIR}/run_test CACHE INTERNAL "")
@@ -585,6 +593,9 @@ include(CMake/findExternalLibs.cmake)
 #########################################
 
 ########### add_subdirectory ###############
+if (BUILD_PYTHON)
+	add_subdirectory(${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_BIN_DIR})
+endif(BUILD_PYTHON)
 add_subdirectory(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_BIN_LINEAR_OPERATOR_DIR})
 #add_subdirectory(${FAUST_ALGORITHM_SRC_DIR} ${FAUST_ALGORITHM_BIN_DIR})
 add_subdirectory(${FAUST_SRC_TEST_DIR} ${FAUST_BIN_TEST_BIN_DIR})
@@ -675,14 +686,7 @@ install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
 
 
 
-if(BUILD_PYTHON)
-	set(FAUST_PYTHON_SRC_DIR ${FAUST_SRC_WRAPPER_DIR}/python CACHE INTERNAL "")
-	set(FAUST_PYTHON_SRC_SRC_DIR ${FAUST_PYTHON_SRC_DIR}/src/ CACHE INTERNAL "")
-	set(FAUST_PYTHON_BIN_DIR ${FAUST_BIN_WRAPPER_DIR}/python CACHE INTERNAL "")
-	set(FAUST_PYTHON_TARGET faust_python CACHE INTERNAL "")
-	add_subdirectory(${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_BIN_DIR})
-	
-endif(BUILD_PYTHON)
+
 ##################################################################
 
 

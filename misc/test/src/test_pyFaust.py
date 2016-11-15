@@ -1,6 +1,6 @@
 ##############################################################################
 ##                              Description:                                ##
-##  cmake script to find Python executable.            			    ##
+##  Test the Python wrapper                                                 ##
 ##                                                                          ##
 ##  For more information on the FAuST Project, please visit the website     ##
 ##  of the project : <http://faust.gforge.inria.fr>                         ##
@@ -33,51 +33,119 @@
 ##      Luc Le Magoarou : luc.le-magoarou@inria.fr                          ##
 ##      Remi Gribonval  : remi.gribonval@inria.fr                           ##
 ##############################################################################
+import sys
+if len(sys.argv) != 2 :
+	raise ValueError('test_pyFaust.py : invalid number of input arguments')
+
+FaustPath=sys.argv[1]
+sys.path.append(FaustPath)
+
+import numpy as np
+import PyFaust 
+
+dim1 = 5
+dim2 = 10
+dim3 = 7
+nb_factor = 5
+int_max= 100
+
+print('**** CONFIG FAUST F ****');
+print 'dim1 : '+str(dim1) 
+print 'dim2 : '+str(dim2)
+print 'nb_factor : '+str(nb_factor)
+
+
+#initialisation de la liste des facteurs
+list_factor=[0]*nb_factor
+for i in range(nb_factor):
+	list_factor[i]=np.random.randint(int_max, size=(dim1,dim1))
+
+list_factor[nb_factor-1]=np.random.randint(int_max, size=(dim1,dim2))
+
+
+
+######################################
+print "*** CONTRUCTOR ***"
+F = PyFaust.Faust(list_factor)
+print "Ok"
 
 
 
 
+######################################
+print "*** DIMENSION ***"
+dim1F=F.getNbRow();
+dim2F=F.getNbCol();
 
-# This module defines: 
-#  PYTHON_EXE: Python executable
+print("F dim1 : ",dim1F)
+print("F dim2 : ",dim2F)
+
+if (dim1F != dim1) | (dim2F != dim2):
+	raise ValueError('invalid dimension')
+print "Ok"
 
 
-message(STATUS "------------------------------------------------")
-message(STATUS "------------ Looking for Python PATH -----------")
-message(STATUS "------------------------------------------------")
+
+
+#####################################
+print "*** MULTIPLICATION VECTOR ***"
+x=np.random.randint(int_max, size=(dim2,1))
+x_old=x.copy()
+
+expected_y=x
+for fact in reversed(list_factor):
+	#print i
+	fact_mat=np.matrix(fact);
+	#print "shape factor "+str(fact_mat.shape)
+	#print "shape y "+str(expected_Y_vec.shape)
+	expected_y=fact_mat*expected_y;
+
+y=F*x
+
+if (y.shape[0] != dim1) | (y.shape[1] != 1):
+	print 'expected size :  (' + str(dim1) + ',1)'
+	print 'got  ' + str(y.shape[0])+','+str(y.shape[1])
+	raise ValueError('multiplication : invalid size of ouput vector')
+
+if not (y==expected_y).all():
+	raise ValueError('multiplication : invalid ouput vector y')
 	
-
-if(UNIX)
-
-
-	message(STATUS "INFO- If you want to choose an other version of Python,") 
-	message(STATUS "INFO- please add an environment variable PYTHON_PATH. ")
-	message(STATUS "INFO- Example : PYTHON_PATH=/usr/bin/python")
-	if ($ENV{PYTHON_PATH}} MATCHES python)
-		set(PYTHON_EXE $ENV{PYTHON_PATH})
-		message(STATUS "PYTHON_EXE=$ENV{PYTHON_PATH} defined from environment variable")
-	elseif (${PYTHON_PATH} MATCHES python)
-		set(PYTHON_EXE ${PYTHON_PATH})
-		message(STATUS "PYTHON_EXE=${PYTHON_EXE} defined from local input variable")
-	else() # PYTHON_EXE_DIR
-
-		#message(STATUS "PYTHON_DIR_TMP 1 = ${PYTHON_DIR_TMP}")
-		exec_program("which python | xargs echo" OUTPUT_VARIABLE PYTHON_EXE)
-		#message(STATUS "PYTHON_DIR_TMP 2 = ${PYTHON_DIR_TMP}")
-		
-		if (${PYTHON_EXE} MATCHES "which: no python in")			
-			message(FATAL_ERROR "python is not present in your PATH ; Please insert in the PATH environment.")
-		endif()
-
-	   	
-		
-	endif() 
-else(UNIX)
-	message(FATAL_ERROR "Python wrapper Unsupported OS (only compatible with Unix System (Linux or Mac Os X)")		
-endif()
+if not (x_old==x).all():
+	raise ValueError('multiplication : input vector x has changed')
+print "Ok"
 
 
-message(STATUS "PYTHON_EXE has been found : ${PYTHON_EXE}")	
-message(STATUS "------------------------------------------------")
-##################################################################
+
+
+######################################
+print "*** MULTIPLICATION MATRIX ***"
+X=np.random.randint(int_max, size=(dim2,dim3))
+X_old=X.copy()
+
+expected_Y=X
+for fact in reversed(list_factor):
+	#print i
+	fact_mat=np.matrix(fact);
+	#print "shape factor "+str(fact_mat.shape)
+	#print "shape y "+str(expected_Y_vec.shape)
+	expected_Y=fact_mat*expected_Y;
+
+Y=F*X
+
+if (Y.shape[0] != dim1) | (Y.shape[1] != dim3):
+	print 'expected size :  (' + str(dim1) + ','+str(dim3)+')'
+	print 'got  ' + str(Y.shape[0])+','+str(Y.shape[1])
+	raise ValueError('multiplication : invalid size of ouput matrix')
+
+if not (Y==expected_Y).all():
+	raise ValueError('multiplication : invalid ouput matrix Y')
+
+
+if not (X_old==X).all():
+	raise ValueError('multiplication : input matrix X has changed')
+print "Ok"
+
+
+
+
 
