@@ -81,10 +81,19 @@ message(STATUS "PYTHON_EXE has been found : ${PYTHON_EXE}")
 message(STATUS "------------------------------------------------")
 
 
-
-
-
-
+message(STATUS " ")
+message(STATUS "------------------------------------------------")
+message(STATUS "--- Looking for Python module (cython,numpy) ---")
+message(STATUS "------------------------------------------------")
+exec_program("${PYTHON_EXE} ${PROJECT_SOURCE_DIR}/CMake/check_python.py" OUTPUT_VARIABLE LIST_PYTHON_MODULE  RETURN_VALUE PYTHON_MODULE_MISSING)
+message("${LIST_PYTHON_MODULE}")
+if(${PYTHON_MODULE_MISSING})
+	message(FATAL_ERROR "At least one python module is missing")
+else(${PYTHON_MODULE_MISSING})
+	message(STATUS "All the Python module are installed")
+endif(${PYTHON_MODULE_MISSING})
+message(STATUS "------------------------------------------------")
+message(STATUS " ")
 ##################################################################
 message(STATUS "------------------------------------------------")
 message(STATUS "------------ Looking for Cython PATH -----------")
