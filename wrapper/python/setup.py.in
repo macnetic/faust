@@ -7,13 +7,16 @@ from distutils.core import setup, Extension
 #import sys
 #sys.path.append('@CYTHON_BIN_DIR@')
 from Cython.Build import cythonize
+import numpy
 
 PyFaust = Extension(
 	'PyFaust',
 	#sources = ['@FAUST_PYTHON_SRC_SRC_DIR@PyFaust.pyx'],
 	sources = ['@FAUST_PYTHON_BIN_DIR@/PyFaust.pyx'],
 	language = 'c++',
-	include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@],
+	include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@
+			,numpy.get_include()],
+		     
     library_dirs=[@FAUST_PYTHON_LIB_DIR@],
     libraries=['faust'@FAUST_PYTHON_LIB@]
 )
