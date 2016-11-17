@@ -40,6 +40,8 @@ export PATH_DIR_RUN_NIGHTLY='/home/ci/CTest_Nightly'
 #modif NB
 export LD_PRELOAD='/home/ci/local/OPENBLAS/lib/libopenblas.so' #enable matlab mexfile to find openblas at runtime
 
+#modif NB (FAUST python wrapper enable to find openblas lib at runtime)
+export LD_LIBRARY_PATH='/opt/OpenBLAS/lib'
 #export HDF5_ROOT_DIR='/home/ci/local/HDF5/lib'
 
 
@@ -72,6 +74,7 @@ export CTEST_CONFIGURE_OPTIONS="\
 -DBUILD_USE_GPU:BOOL=OFF;\
 -DBUILD_USE_PROFILING=OFF;\
 -DBUILD_VERBOSE=OFF;\
+-DBUILD_PYTHON=ON;\
 -DBUILD_DOCUMENTATION:BOOL=OFF"
 
 #-DDASH_TESTING:BOOL=ON;\
