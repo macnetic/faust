@@ -27,11 +27,20 @@ set(FAUST_PYTHON_INCLUDE_DIR"'${EIGEN_INC_DIR}',
 
 set(FAUST_PYTHON_LIB_DIR "'${FAUST_BIN_DIR}'")
 
-if(FAUST_USE_OPENBLAS)
-	set(FAUST_PYTHON_INCLUDE_DIR "${FAUST_PYTHON_INCLUDE_DIR},'${OPENBLAS_INC_DIR}'")
-	set(FAUST_PYTHON_LIB_DIR "'${FAUST_PYTHON_LIB_DIR}',${OPENBLAS_LIB_FILE}")
+if(BUILD_OPENBLAS)
+	
+	# in the setup.py (Python Makefile) , we need the directory where the library openblas) is stored
+	# not the full path to the lib file
+	get_filename_component(OPENBLAS_LIB_DIR ${OPENBLAS_LIB_FILE} PATH)
+
+	set(FAUST_PYTHON_INCLUDE_DIR "${FAUST_PYTHON_INCLUDE_DIR},
+			'${OPENBLAS_INC_DIR}'")
+	set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR},
+			'${OPENBLAS_LIB_DIR}'")
 	set(FAUST_PYTHON_LIB ",'openblas'")
-endif(FAUST_USE_OPENBLAS)
+endif(BUILD_OPENBLAS)
+
+
 
 
 #configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
