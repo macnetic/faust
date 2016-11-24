@@ -29,7 +29,7 @@ set(TIMEOUT_COMP 100)
 
 
 # MATLAB TEST
-if(BUILD_MATLAB_MEX_FILES)
+if(BUILD_WRAPPER_MATLAB)
 
 	if(WIN32 AND NOT UNIX)
 		#WINDOWS :
@@ -148,22 +148,22 @@ endif(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE)
 
 
 
-if (BUILD_MATLAB_MEX_FILES)
+if (BUILD_WRAPPER_MATLAB)
 	configure_file(${FAUST_SRC_TEST_TOOL_DIR}/set_path.m.in ${FAUST_BIN_TEST_TOOLS_DIR}/set_path.m @ONLY)
 	
 	
 	foreach(matlabtest hier_fact_test.m test_matlab_faust.m test_matlab_faust2.m test_matlab_faust_time.m)
 		configure_file(${FAUST_SRC_TEST_SRC_DIR}/${matlabtest} ${FAUST_BIN_TEST_BIN_DIR}/${matlabtest} @ONLY)
 	endforeach()
-endif(BUILD_MATLAB_MEX_FILES)
+endif(BUILD_WRAPPER_MATLAB)
 
 
 
 
 #PYTHON WRAPPER
-if (BUILD_PYTHON)
+if (BUILD_WRAPPER_PYTHON)
 	add_test(NAME PYTHON_FAUST COMMAND ${PYTHON_EXE} ${FAUST_SRC_TEST_SRC_DIR}/test_pyFaust.py ${FAUST_PYTHON_BIN_DIR})
-endif(BUILD_PYTHON)
+endif(BUILD_WRAPPER_PYTHON)
 
 
 # MATLAB input format

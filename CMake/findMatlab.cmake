@@ -70,7 +70,7 @@ message(STATUS "------------ Looking for Matlab PATH -----------")
 message(STATUS "------------------------------------------------")
 	
 ###### test if executable matlab is in the path ######
-#if (BUILD_MATLAB_MEX_FILES)
+#if (BUILD_WRAPPER_MATLAB)
 if(UNIX)
 
 	#SET(MATLAB_EXE_DIR " " CACHE STRING "force the directory of your expected matlab binary" FORCE )

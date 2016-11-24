@@ -196,7 +196,7 @@ option(BUILD_DEBUG "Enable FAUST Debug mode." OFF)
 # Allows Matlab MEX files :
 option(BUILD_USE_GPU  "Using both CPU and GPU process" OFF)
 
-option(BUILD_MATLAB_MEX_FILES "Enable building Matlab MEX files." ON)
+option(BUILD_WRAPPER_MATLAB "Enable building Matlab MEX files." ON)
 # Using openBLAS for matrix and vector computations
 option(BUILD_OPENBLAS "Using openBLAS for matrix and vector computations" OFF)
 # different type of files 
@@ -205,8 +205,8 @@ option(BUILD_READ_MAT_FILE "Using matio library to read mat files" OFF)
 #set(BUILD_READ_XML_FILE OFF)
 #set(BUILD_READ_MAT_FILE OFF)
 
-option(BUILD_PYTHON "Enable building PyFaust (Python librairie)." OFF)
-#set(BUILD_PYTHON OFF)
+option(BUILD_WRAPPER_PYTHON "Enable building PyFaust (Python librairie)." OFF)
+#set(BUILD_WRAPPER_PYTHON OFF)
 
 #CMAKE_DEPENDENT_OPTION
 
@@ -221,7 +221,7 @@ set(BUILD_USE_PROFILING OFF) # CACHE BOOL "Profiling the code")
 #set(BUILD_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
 #set(BUILD_DOCUMENTATION OFF CACHE BOOL "Generate html documentation with doxygen")
 #set(BUILD_READ_XML_FILE OFF CACHE BOOL "Using xml configuration to read xml files")
-#set(BUILD_MATLAB_MEX_FILES ON CACHE BOOL "Generate Mexfiles")
+#set(BUILD_WRAPPER_MATLAB ON CACHE BOOL "Generate Mexfiles")
 #set(BUILD_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
 #set(BUILD_READ_MAT_FILE OFF CACHE BOOL "Using matio library to read mat files")
 
@@ -231,7 +231,7 @@ endif()
 if (BUILD_OPENBLAS)
 	message(STATUS "**********OPENBLAS ACTIF************")
 endif()
-if (BUILD_MATLAB_MEX_FILES)
+if (BUILD_WRAPPER_MATLAB)
 	message(STATUS "**********MEX ACTIF************")
 	message(STATUS "CMAKE_INSTALL_MATLAB_PREFIX = ${CMAKE_INSTALL_MATLAB_PREFIX}")
 endif()
@@ -257,9 +257,9 @@ endif()
 if (BUILD_DOCUMENTATION)
 	message(STATUS "**********DOC ACTIF************")
 endif()
-if(BUILD_PYTHON)
+if(BUILD_WRAPPER_PYTHON)
 	message(STATUS "**********PYTHON ACTIF************")
-endif(BUILD_PYTHON)
+endif(BUILD_WRAPPER_PYTHON)
 ##################################################################
 
 
@@ -327,7 +327,7 @@ set(FAUST_SRC_TEST_SRC_DIR 			${FAUST_SRC_TEST_DIR}/src CACHE INTERNAL "")
 
 
 ###### WRAPPER MATLAB DIRECTORIES ######
-if (BUILD_MATLAB_MEX_FILES)
+if (BUILD_WRAPPER_MATLAB)
 	#version MATLAB du code (entierement MATLAB, pas de mexfunction)
 	#file(MAKE_DIRECTORY ${CMAKE_INSTALL_MATLAB_PREFIX})
 	###### SRC DIRECTORY #####
@@ -381,19 +381,19 @@ if (BUILD_MATLAB_MEX_FILES)
 	# so FAUST_DEMO_BIN_DIR is directly installed
 
 
-endif(BUILD_MATLAB_MEX_FILES)
+endif(BUILD_WRAPPER_MATLAB)
 ##################################################################
 
 
 
 
 
-if(BUILD_PYTHON)
+if(BUILD_WRAPPER_PYTHON)
 	set(FAUST_PYTHON_SRC_DIR ${FAUST_SRC_WRAPPER_DIR}/python CACHE INTERNAL "")
 	set(FAUST_PYTHON_SRC_SRC_DIR ${FAUST_PYTHON_SRC_DIR}/src/ CACHE INTERNAL "")
 	set(FAUST_PYTHON_BIN_DIR ${FAUST_BIN_WRAPPER_DIR}/python CACHE INTERNAL "")
 	set(FAUST_PYTHON_TARGET faust_python CACHE INTERNAL "")
-endif(BUILD_PYTHON)
+endif(BUILD_WRAPPER_PYTHON)
 
 ## examples directories including some examples of the use of the library FAuST
 set(FAUST_BIN_TEST_DIR ${PROJECT_BINARY_DIR}/run_test CACHE INTERNAL "")
@@ -437,11 +437,11 @@ set(INSTALL_DIR_PERMISSION OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP
 set(INSTALL_FILE_PERMISSION OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
 
 
-if (BUILD_MATLAB_MEX_FILES)
+if (BUILD_WRAPPER_MATLAB)
 	file(MAKE_DIRECTORY ${FAUST_DEMO_BSL_OUTPUT_BIN_DIR})
 	file(MAKE_DIRECTORY ${FAUST_DEMO_HADAMARD_OUTPUT_BIN_DIR})
 	file(MAKE_DIRECTORY ${FAUST_DEMO_FIG_BIN_DIR})
-endif (BUILD_MATLAB_MEX_FILES)
+endif (BUILD_WRAPPER_MATLAB)
 
 
 
@@ -593,9 +593,9 @@ include(CMake/findExternalLibs.cmake)
 #########################################
 
 ########### add_subdirectory ###############
-if (BUILD_PYTHON)
+if (BUILD_WRAPPER_PYTHON)
 	add_subdirectory(${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_BIN_DIR})
-endif(BUILD_PYTHON)
+endif(BUILD_WRAPPER_PYTHON)
 add_subdirectory(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_BIN_LINEAR_OPERATOR_DIR})
 #add_subdirectory(${FAUST_ALGORITHM_SRC_DIR} ${FAUST_ALGORITHM_BIN_DIR})
 add_subdirectory(${FAUST_SRC_TEST_DIR} ${FAUST_BIN_TEST_BIN_DIR})
@@ -611,7 +611,7 @@ if (BUILD_USE_GPU)
 	add_subdirectory(${FAUST_SRC_TEST_GPU_DIR} ${FAUST_BIN_TEST_GPU_DIR})
 endif (BUILD_USE_GPU)
 
-if (BUILD_MATLAB_MEX_FILES)
+if (BUILD_WRAPPER_MATLAB)
 	add_subdirectory(${FAUST_MATLAB_SRC_DIR} ${FAUST_MATLAB_MEX_BIN_DIR})
 	add_subdirectory(${FAUST_DEMO_SRC_DIR} ${FAUST_DEMO_BIN_DIR})
 endif()
@@ -638,22 +638,22 @@ endif()
 
 ###### TARGET GENERATION ######
 if (BUILD_USE_GPU)
-	if (BUILD_MATLAB_MEX_FILES)
+	if (BUILD_WRAPPER_MATLAB)
 		add_library(${FAUST_TARGET} STATIC ${CPP_FILES} $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
-	else (BUILD_MATLAB_MEX_FILES)	
+	else (BUILD_WRAPPER_MATLAB)	
 		add_library(${FAUST_TARGET} STATIC ${CPP_FILES} $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}>)
-	endif(BUILD_MATLAB_MEX_FILES)
+	endif(BUILD_WRAPPER_MATLAB)
 else (BUILD_USE_GPU)
-	if (BUILD_MATLAB_MEX_FILES)
+	if (BUILD_WRAPPER_MATLAB)
 		add_library(${FAUST_TARGET} STATIC ${CPP_FILES} $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )		
-	else (BUILD_MATLAB_MEX_FILES)	
+	else (BUILD_WRAPPER_MATLAB)	
 		add_library(${FAUST_TARGET} STATIC ${CPP_FILES} $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}>)
-	endif(BUILD_MATLAB_MEX_FILES)
+	endif(BUILD_WRAPPER_MATLAB)
 endif (BUILD_USE_GPU)
 
 
 
-if (BUILD_MATLAB_MEX_FILES)
+if (BUILD_WRAPPER_MATLAB)
 	if (UNIX) 
 		if(APPLE)
 			target_link_libraries(${FAUST_TARGET} ${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}/libmex.dylib)
@@ -665,7 +665,7 @@ if (BUILD_MATLAB_MEX_FILES)
 		target_link_libraries(${FAUST_TARGET} ${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}/libmex.dll)
 		#message(FATAL_ERROR "MEXFILE : CANNOT SEARCH LIBMEX IN WINDOWS")
 	endif()
-endif(BUILD_MATLAB_MEX_FILES)
+endif(BUILD_WRAPPER_MATLAB)
 
 # In case of GPU, the "CUDA" library libfaust_matrix_cu.a is linked with faust (libfaust_matrix_cu.a is not a OBJECT library) 
 if (BUILD_USE_GPU)

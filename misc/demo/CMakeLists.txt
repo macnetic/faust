@@ -7,7 +7,7 @@ file(GLOB MATLAB_SCRIPTS "*.m")
 
 
 
-if(BUILD_MATLAB_MEX_FILES)
+if(BUILD_WRAPPER_MATLAB)
 
 	configure_file(${FAUST_DEMO_SRC_DIR}/run_all_demo.m ${FAUST_DEMO_BIN_DIR}/run_all_demo.m COPYONLY)
 

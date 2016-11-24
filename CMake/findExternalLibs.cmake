@@ -107,9 +107,9 @@ if (BUILD_OPENBLAS)
 	include(CMake/findOPENBLASLib.cmake)
 endif(BUILD_OPENBLAS)
 ######## MATLAB INCLUDE AND LIBRARY ##################
-if (BUILD_MATLAB_MEX_FILES)
+if (BUILD_WRAPPER_MATLAB)
 	include(CMake/findMatlab.cmake)
-endif(BUILD_MATLAB_MEX_FILES)
+endif(BUILD_WRAPPER_MATLAB)
 ######## MATIO INCLUDE AND LIBRARY ##################
 if (BUILD_READ_MAT_FILE)
 	include(CMake/findMATIOLib.cmake)
@@ -119,9 +119,9 @@ if (BUILD_READ_XML_FILE)
 	include(CMake/findXML2Lib.cmake)
 endif(BUILD_READ_XML_FILE)
 ###### PYTHON EXE ######
-if(BUILD_PYTHON)
+if(BUILD_WRAPPER_PYTHON)
 	include(CMake/findPython.cmake)
-endif(BUILD_PYTHON)
+endif(BUILD_WRAPPER_PYTHON)
 
 #add_library_path(LIBRARY_PATH_LIST_TMP3 "$ENV{CUDADIR}" "$ENV{HDF5_ROOT_DIR}" "/usr/lib/x86_64-linux-gnu/")
 #add_include_path(INCLUDE_PATH_LIST_TMP3 "$ENV{CUDADIR}" "/usr/include/libxml2")

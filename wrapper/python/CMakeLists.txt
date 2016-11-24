@@ -1,13 +1,13 @@
 ## CMAKELIST PRINCIPAL
-#option(BUILD_PYTHON "Enable building PyFaust (librairie) Python." ON)
-#if(BUILD_PYTHON)
+#option(BUILD_WRAPPER_PYTHON "Enable building PyFaust (librairie) Python." ON)
+#if(BUILD_WRAPPER_PYTHON)
 #	set(FAUST_PYTHON_SRC_DIR ${FAUST_SRC_WRAPPER_DIR}/python CACHE INTERNAL "")
 #	set(FAUST_PYTHON_SRC_SRC_DIR ${FAUST_PYTHON_SRC_DIR}/src/ CACHE INTERNAL "")
 #	set(FAUST_PYTHON_BIN_DIR ${FAUST_BIN_WRAPPER_DIR}/python CACHE INTERNAL "")
 #	set(FAUST_PYTHON_TARGET faust_python CACHE INTERNAL "")
 #	add_subdirectory(${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_BIN_DIR})
 	
-#endif(BUILD_PYTHON)
+#endif(BUILD_WRAPPER_PYTHON)
 
 
 
