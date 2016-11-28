@@ -753,7 +753,7 @@ set(CPACK_PACKAGE_URL "http://faust.gforge.inria.fr/" )
 # SOURCE DISTRIBUTION:
 ##############################################################################
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "FAUST-Source-${CPACK_PACKAGE_VERSION}")
-set(CPACK_SOURCE_IGNORE_FILES "/build/;/.bzr/;/CMakeFiles/;/_CPack_Packages/;/.svn/;/.git/;/headerCPP.txt;/headerMatlab.txt;/headerCMakeList.txt;/gen_doc/LaTeX/images/;/gen_doc/installation_README.odt;/gen_doc/installation_Virtual_Machine.txt;/misc/data/txt/;/misc/data/mat/visage/;/misc/CTest_nightly/;/CTestConfig.cmake;/gen_doc/LaTeX/;")
+set(CPACK_SOURCE_IGNORE_FILES "/build/;/.bzr/;/CMakeFiles/;/_CPack_Packages/;/.svn/;/.git/;/headerCPP.txt;/headerMatlab.txt;/headerCMakeList.txt;/gen_doc/LaTeX/images/;/gen_doc/installation_README.odt;/gen_doc/installation_Virtual_Machine.txt;/misc/data/txt/;/misc/data/mat/visage/;/misc/CTest_nightly/;/CTestConfig.cmake;/gen_doc/LaTeX/;/README.developer;")
 
 set(CPACK_SOURCE_IGNORE_FILES "${CPACK_SOURCE_IGNORE_FILES};/externals/unix/tarLibs/libxml2-2.9.4.tar.gz;/externals/unix/tarLibs/matio-1.5.7.7z;")
 #if(WIN32 AND NOT UNIX)
