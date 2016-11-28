@@ -7,36 +7,42 @@
 ##################################################################
 ############## CDASH 	 							##############
 ##################################################################
-The Continuous Integration for the project FAUST is based on the CDASH tool (see. http://www.cdash.org/)
+The Continuous Integration for the project FAUST is based on 
+the CDASH tool (see. http://www.cdash.org/). 
 The building and test are available on the public link: 
 http://cdash.inria.fr/CDash/index.php?project=faust
 
 CDASH is configured in the Cmakefile.txt files. 
-
  
-CDASH is deployed on the CI inria platform. For that you must have an login on ci inria. 
-Then go to the  https://ci.inria.fr/project/faust/show to manage the CI: 
+CDASH is deployed on the CI inria platform. For that you must have 
+an login on ci inria. Then go to the 
+https://ci.inria.fr/project/faust/show to manage the CI: 
 In slave, you can add/modify the virtual Machine (linux mac, windows). 
-If you want to get more actions / information on slaves (add a disk, create a template, etc.), you can access CloudStack using the same credentials as the CI portal. The Domain must be ci/faust. CloudStack 
+If you want to get more actions / information on slaves (add a disk, 
+create a template, etc.), you can access CloudStack using the same 
+credentials as the CI portal. The Domain must be ci/faust. CloudStack 
 https://sesi-cloud-ctl1.inria.fr/client/
-
 
 https://ci.inria.fr/
 
 connect to CI of inria: 
 https://ci.inria.fr/project/faust/ to manage your virtual machine. 
+##################################################################
 
 
+##################################################################
+How to create an new instance of test on CDASH which chekout / build / install and run some Test ?
+
+1- create a new virtual machine and connect 
 
 This tool aims to launch automatically a shell-bash SCRIPT on a machine (local, or virtual ...) : 
- 
-1- 	First at all, please chek out only the files presents in 
+2- 	Chek out only the files presents in 
 	following directory : devcpp/misc/CTest_nightly 
 	svn checkout --username XXX https://scm.gforge.inria.fr/authscm/XXX/svn/faust/trunk/devcpp/misc/CTest_nightly/ ./
 
-2-	Create and Configure your personnal run script (".sh" for Unix and ".bat" for Windows) "run_nightly_PLATFORM.sh" with corresponding configuration. (see existing run_nighlty_X.sh files for more informations)
+3-	Create and Configure your personnal run script (".sh" for Unix and ".bat" for Windows) "run_nightly_PLATFORM.sh" with corresponding configuration. (see existing run_nighlty_X.sh files for more informations)
 
-3- 	configure the "crontab" tool for UNIX or "shulder" tool for windows
+4- 	configure the "crontab" tool for UNIX or "shulder" tool for windows
 	crontab -e : 
 	example :
 # Run all day at 14h35 the nightly test and put results on CDASH
@@ -46,11 +52,6 @@ This tool aims to launch automatically a shell-bash SCRIPT on a machine (local, 
 # run all day and send a mail 
 40 11  * * * /Users/ci/CTest_nightly/run_nightly_OS-X.sh 2>&1| mail -s "Cron job execution" youremail@inria.fr
 ##
-
-
-4- 	You have the possibility to set the time of the precedent svn in the file 
-CTestConfig.cmake
-
 
 5- CTest OPTION: There are three types of dashboard submissions: 
     -Experimental means the current state of the project. An experimental submission can be performed at any time, usually interactively from the current working copy of a developer.
@@ -63,41 +64,45 @@ To select the ctest mode, change the files faustTest.cmake to
 	CTEST_START("Experimental")
 	CTEST_START("Nightly")
 	CTEST_START("Continuous")
-
-
+##################################################################
 
 
 ##################################################################
-##################### Acces to the virtual machine
+##################### Acces to the existing virtual machine
 ##################################################################
 cf. https://ci.inria.fr/project/faust/slaves  --> onget connect
 
 Windows : 
-- Windows MinGW Openblas:
-$ ssh <login>@ci-ssh.inria.fr -L 3380:Windows-MinGW:3389
+- Windows 7: MinGW with Openblas:
+	1 - Create an SSH tunnel
+		$ ssh <login>@ci-ssh.inria.fr -L 3380:Windows-MinGW:3389
+	2- Open graphical interface : 
+		$ rdesktop -k fr -g 90% -u ci -p ci 127.0.0.1:3380
 
-- VM windowsTWO 7: MinGW without Openblas
+
+- Windows TWO 7: MinGW without Openblas
 Password of new VM windowsTWO is  bF8brkgqs
-1 - Create an SSH tunnel
-$ ssh <login>@ci-ssh.inria.fr -L 3380:windowsTWO:3389 
-2- Open graphical interface : 
-$ rdesktop -k fr -g 90% -u ci -p ci 127.0.0.1:3380 
+	1 - Create an SSH tunnel
+		$ ssh <login>@ci-ssh.inria.fr -L 3380:windowsTWO:3389 
+	2- Open graphical interface : 
+		$ rdesktop -k fr -g 90% -u ci -p ci 127.0.0.1:3380 
 
-- Password of new VM faust-windows7VisualStudio is  yX4arrrub
-Password has been reset to xH8cteihd
-1- 
-$ ssh <login>@ci-ssh.inria.fr -L 3380:faust-windows7VisualStudio:3389
-2- 
-$ rdesktop -k fr -g 90% -u ci -p ci 127.0.0.1:3380 
+- Windows 7: Visual Studio
+	Password of new VM faust-windows7VisualStudio is  yX4arrrub
+	Password has been reset to xH8cteihd
+	1- 
+		$ ssh <login>@ci-ssh.inria.fr -L 3380:faust-windows7VisualStudio:3389
+	2- 
+		$ rdesktop -k fr -g 90% -u ci -p ci 127.0.0.1:3380 
 
 MAC: 
-1- 
+1- MAC OS
 	$ ssh ci@mac.ci
-2- 
+2- MAC OS 2
 	Password of new VM faust-mac-copy is  mD4pszrtb
 	$ ssh ci@faust-mac-copy.ci
 
-3- 
+3- MAC OS with XCode
 	$ ssh ci@MAC-Xcode.ci
 
 
@@ -111,7 +116,7 @@ password: ci
 
 
 ######################################################################################""
-Pour ajouter un data disk sur les machine virtuelles :
+Add a data disk on virtual machine :
 							1- https://sesi-cloud-ctl1.inria.fr pour ajouter un volume à l'instance
 							2- stop and restart
 							3- mount the volume
@@ -142,13 +147,6 @@ In case of Windows platform : disk managment option.
     select the SCSI controller
     install the latest viostor driver from Redhad (https://fedoraproject.org/wiki/Windows_Virtio_Drivers#Direct_download). Be careful to select the right driver (windows version & architecture) or windows will crash very badly (do not even use automatic detection, select the driver manually from the right folder).
 ##################################################################
-
-
-
-
-
-
-
 
 
 
