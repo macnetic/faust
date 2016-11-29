@@ -48,7 +48,13 @@ FigPath=sys.argv[2]
 
 from scipy import sparse as sp
 import numpy as np
-import matplotlib.pyplot as plt
+plotlib_present=1
+try:
+   import matplotlib.pyplot as plt
+except ImportError:
+    print('Python module matplotlib is not present, no figure will be made')
+    plotlib_present=0
+
 import time
 import PyFaust 
 
@@ -193,33 +199,37 @@ print "speed-up scipy : "+str(speed_up_Scipy)
 #print "size dim :"+str(dim_list.shape)
 print "t_dense :"+str(t_dense.shape)
 
-## AFFICHAGE
-print "saving figure in "+FigPath
-tickness=4
-size_font=18
-font_style='bold'
 
-plt.loglog(dim_list,t_dense, 'r', basex=2,label='dense (Numpy)',linewidth=tickness)
-plt.loglog(dim_list,t_faust, 'b', basex=2,label='Faust (PyFaust)',linewidth=tickness)
-plt.loglog(dim_list,t_scipy, 'g', basex=2,label='Faust (Scipy)',linewidth=tickness)
-plt.title('Time Comparison : Faust-Vector multiplication',fontweight=font_style)
-plt.legend(loc=2)
-plt.xlabel('dimension',fontsize=size_font,fontweight=font_style)
-plt.ylabel('time (sec)',fontsize=size_font,fontweight=font_style)
-plt.grid(linestyle="--",which="both")
-plt.grid(linestyle="-")
-plt.savefig(FigPath+'/time_comparison.png')
-plt.clf()
 
-plt.loglog(dim_list,speed_up_Faust, 'b', basex=2,label='Faust (PyFaust)',linewidth=tickness)
-plt.loglog(dim_list,speed_up_Scipy, 'g', basex=2,label='Faust (Scipy)',linewidth=tickness)
-plt.title('Speed-up : Faust-Vector multiplication',fontweight=font_style)
-plt.legend(loc=2)
-plt.xlabel('dimension',fontsize=size_font,fontweight=font_style)
-plt.ylabel('speed-up',fontsize=size_font,fontweight=font_style)
-plt.grid(linestyle="--",which="both")
-plt.grid(linestyle="-")
-plt.savefig(FigPath+'/speed-up.png')
+
+
+
+if(plotlib_present):
+	print "saving figure in "+FigPath
+	tickness=4
+	size_font=18
+	font_style='bold'
+	plt.loglog(dim_list,t_dense, 'r', basex=2,label='dense (Numpy)',linewidth=tickness)
+	plt.loglog(dim_list,t_faust, 'b', basex=2,label='Faust (PyFaust)',linewidth=tickness)
+	plt.loglog(dim_list,t_scipy, 'g', basex=2,label='Faust (Scipy)',linewidth=tickness)
+	plt.title('Time Comparison : Faust-Vector multiplication',fontweight=font_style)
+	plt.legend(loc=2)
+	plt.xlabel('dimension',fontsize=size_font,fontweight=font_style)
+	plt.ylabel('time (sec)',fontsize=size_font,fontweight=font_style)
+	plt.grid(linestyle="--",which="both")
+	plt.grid(linestyle="-")
+	plt.savefig(FigPath+'/time_comparison.png')
+	plt.clf()
+
+	plt.loglog(dim_list,speed_up_Faust, 'b', basex=2,label='Faust (PyFaust)',linewidth=tickness)
+	plt.loglog(dim_list,speed_up_Scipy, 'g', basex=2,label='Faust (Scipy)',linewidth=tickness)
+	plt.title('Speed-up : Faust-Vector multiplication',fontweight=font_style)
+	plt.legend(loc=2)
+	plt.xlabel('dimension',fontsize=size_font,fontweight=font_style)
+	plt.ylabel('speed-up',fontsize=size_font,fontweight=font_style)
+	plt.grid(linestyle="--",which="both")
+	plt.grid(linestyle="-")
+	plt.savefig(FigPath+'/speed-up.png')
 
 
 print "*********************************"
