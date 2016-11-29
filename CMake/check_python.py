@@ -41,6 +41,8 @@ import sys
 print "python version : "+str(sys.version_info.major)+'.'+str(sys.version_info.minor)
 output_value=0
 
+
+###### NECESSARY MODULE ######
 try:
     import numpy  
     print('Python module numpy is installed')
@@ -54,5 +56,14 @@ try:
 except ImportError:
     print('Python module Cython is missing !')
     output_value=1
+
+
+###### OPTIONAL MODULE ######
+try:
+    import scipy as sp  
+    print('Python module Scipy is installed')
+except ImportError:
+    print('Python module Scipy is not present, no time comparison with scipy will be made')
+    output_value=2
     
 exit(output_value)

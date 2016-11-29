@@ -86,3 +86,23 @@ void FaustCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,i
 	
 	
 }
+
+
+template<typename FPP>
+void FaustCpp<FPP>::setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const
+{
+	char trans_flag('N');
+	if (isTransposed)
+		trans_flag='T';
+	faust_unsigned_int nb_row,nb_col;
+	this->transform.setOp(trans_flag,nb_row,nb_col);
+	nbRowOp=(unsigned int) nb_row;
+	nbColOp=(unsigned int) nb_col;
+	
+
+
+
+
+}
+
+

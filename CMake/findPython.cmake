@@ -82,16 +82,22 @@ message(STATUS "------------------------------------------------")
 
 
 message(STATUS " ")
-message(STATUS "------------------------------------------------")
-message(STATUS "--- Looking for Python module (cython,numpy) ---")
-message(STATUS "------------------------------------------------")
+message(STATUS "------------------------------------------------------")
+message(STATUS "--- Looking for Python module (cython,numpy,scipy) ---")
+message(STATUS "------------------------------------------------------")
 exec_program("${PYTHON_EXE} ${PROJECT_SOURCE_DIR}/CMake/check_python.py" OUTPUT_VARIABLE LIST_PYTHON_MODULE  RETURN_VALUE PYTHON_MODULE_MISSING)
 message("${LIST_PYTHON_MODULE}")
-if(${PYTHON_MODULE_MISSING})
-	message(FATAL_ERROR "At least one python module is missing")
+
+set(PYTHON_MODULE_SCIPY ON)
+if(${PYTHON_MODULE_MISSING} EQUAL -1)
+	message(FATAL_ERROR "necessary python module (numpy or cython) are missing !!!")
+elseif(${PYTHON_MODULE_MISSING} EQUAL 1)
+	message(STATUS "optional python module scipy is missing, no time comparison with scipy will be made")
+	set(PYTHON_MODULE_SCIPY ON)
 else(${PYTHON_MODULE_MISSING})
-	message(STATUS "All the Python module are installed")
+	message(STATUS "all the python module are installed (numpy,cython and scipy)")	
 endif(${PYTHON_MODULE_MISSING})
+
 message(STATUS "------------------------------------------------")
 message(STATUS " ")
 ##################################################################

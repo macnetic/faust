@@ -52,6 +52,7 @@ cdef class Faust:
 	#### ATTRIBUTE ########
 	# classe Cython
 	cdef CyFaust.FaustCpp[double] m_faust
+	cdef bool m_transpose_flag
 	
 	#### CONSTRUCTOR ####
 	#def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
@@ -71,21 +72,33 @@ cdef class Faust:
 		#	print nbrow
 		#	print nbcol
 			self.m_faust.push_back(&data[0,0],nbrow,nbcol);
+			self.m_transpose_flag=0
 		#print 'apres boucle'
 		
 	
 	
 	#### METHOD ####
 	def getNbRow(self):
-		return self.m_faust.getNbRow();
+		#return self.m_faust.getNbRow();
+		(dim1,dim2)=self.shape();
+		return dim1
 		
 	def getNbCol(self):
-		return self.m_faust.getNbCol();
+		(dim1,dim2)=self.shape();
+		return dim2
 		
 		
 	def shape(self):
-		return (self.m_faust.getNbRow(),self.m_faust.getNbRow())
-	
+		#return (self.m_faust.getNbRow(),self.m_faust.getNbRow())
+		cdef unsigned int nbrow
+		cdef unsigned int nbcol
+		self.m_faust.setOp(self.m_transpose_flag,nbrow,nbcol)
+		return (nbrow,nbcol)
+		
+#	def transpose(self):
+#		F_trans=self;
+#		F_trans.m_tranpose_flag=1;
+#		return F_trans;
 
 
 
@@ -103,6 +116,7 @@ cdef class Faust:
 	def multiply(self,x):
 		if not isinstance(x, (np.ndarray) ):
 			raise NameError('input x must a numpy ndarray')
+		#transform into float F continous  matrix
 		x=x.astype(float,'F')
 		if not x.dtype=='float':
 			raise NameError('input x must be double array')
@@ -152,3 +166,10 @@ cdef class Faust:
 	# y = F * x ,with F a Faust
 	def __mul__(self, x):
 		return self.multiply(x)
+		
+		
+		
+	def todense(self):
+		identity=np.eye(self.getNbRow(),self.getNbCol());
+		self_dense=self*identity
+		return self_dense

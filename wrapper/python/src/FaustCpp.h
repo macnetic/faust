@@ -62,7 +62,7 @@ class FaustCpp
     unsigned int getNbRow() const{return transform.getNbRow();}
     unsigned int getNbCol() const{return transform.getNbCol();}
     void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose)const;
-    
+    void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
     
     private :
     Faust::Transform<FPP,Cpu> transform;
