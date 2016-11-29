@@ -45,7 +45,7 @@ sys.path.append(FaustPath)
 FigPath=sys.argv[2]
 
 
-
+import scipy 
 from scipy import sparse as sp
 import numpy as np
 plotlib_present=1
@@ -78,7 +78,7 @@ density_per_fact=density/nb_factor
 result_comparison=0;
 
 
-dim_2pow_list=[8,9,10,11,12,13]
+dim_2pow_list=[8,9,10,11,12]
 #dim_2pow_list=[8,9,10]
 nb_dim=len(dim_2pow_list)
 dim_list=[0]*nb_dim
@@ -111,8 +111,10 @@ for j in range(nb_dim):
 
 	#initialisation 
 	for i in range(nb_factor):
-		
-		list_factor_sp[i]=int_max*sp.random(dim,dim,density=density_per_fact,format='csr',dtype=np.float64)
+		if (scipy.__version__ < '0.18.1'):		
+			list_factor_sp[i]=int_max*sp.rand(dim,dim,density=density_per_fact,format='csr',dtype=np.float64)
+		else:
+			list_factor_sp[i]=int_max*sp.random(dim,dim,density=density_per_fact,format='csr',dtype=np.float64)
 		#transforme en entier
 		if result_comparison:
 			list_factor_sp[i]=np.floor(list_factor_sp[i])
