@@ -48,14 +48,14 @@ try:
     print('Python module numpy is installed')
 except ImportError:
     print('Python module numpy is missing !')
-    output_value=1
+    output_value=-1
     
 try:
     import Cython  
     print('Python module Cython is installed')
 except ImportError:
     print('Python module Cython is missing !')
-    output_value=1
+    output_value=-1
 
 
 ###### OPTIONAL MODULE ######
@@ -64,6 +64,6 @@ try:
     print('Python module Scipy is installed')
 except ImportError:
     print('Python module Scipy is not present, no time comparison with scipy will be made')
-    output_value=2
+    output_value=1
     
 exit(output_value)
