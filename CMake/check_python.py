@@ -44,26 +44,33 @@ output_value=0
 
 ###### NECESSARY MODULE ######
 try:
-    import numpy  
-    print('Python module numpy is installed')
+    print('NUMPY PYTHON module :') 
+    import numpy 
+    print('module installed')
+    print "version : "+numpy.__version__
 except ImportError:
-    print('Python module numpy is missing !')
+    print('module is missing !')
     output_value=-1
     
 try:
+    print('CYTHON PYTHON module : ')
     import Cython  
-    print('Python module Cython is installed')
+    print('module installed')
+    print "version : "+Cython.__version__
 except ImportError:
-    print('Python module Cython is missing !')
+    print('module is missing !')
     output_value=-1
 
 
 ###### OPTIONAL MODULE ######
 try:
-    import scipy as sp  
-    print('Python module Scipy is installed')
+    print('SCIPY PYTHON module :') 
+    import scipy as sp
+    print('module installed')
+    print "version : "+sp.__version__  
+
 except ImportError:
-    print('Python module Scipy is not present, no time comparison with scipy will be made')
+    print('module Scipy not present, no time comparison with scipy will be made')
     output_value=1
     
 exit(output_value)
