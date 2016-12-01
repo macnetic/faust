@@ -148,7 +148,9 @@ cdef class Faust:
 			nbcol_x=x.shape[1]
 			xview_2D=x;
 			
-		
+			if (nbrow_x != nbColThis):
+				raise NameError('y=F*x multiplication with Faust : invalid dimension of the input matrix x');
+
 		#void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose);
 		nbcol_y = nbcol_x;
 		
@@ -170,6 +172,6 @@ cdef class Faust:
 		
 		
 	def todense(self):
-		identity=np.eye(self.getNbRow(),self.getNbCol());
+		identity=np.eye(self.getNbCol(),self.getNbCol());
 		self_dense=self*identity
 		return self_dense

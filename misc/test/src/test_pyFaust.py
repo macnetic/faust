@@ -43,11 +43,22 @@ sys.path.append(FaustPath)
 import numpy as np
 import PyFaust 
 
-dim1 = 5
-dim2 = 10
+dim1 = 2
+dim2 = 5
 dim3 = 7
-nb_factor = 5
+nb_factor = 3
 int_max= 100
+
+
+# function : multiplication par un faust representer par une liste de facteur sous Python
+def faust_multiply(list_factor,x):
+	y=x
+	#for fact in list_factor:
+	for fact in reversed(list_factor):
+		y=fact.dot(y)
+	
+	return y
+
 
 print('**** CONFIG FAUST F ****');
 print 'dim1 : '+str(dim1) 
@@ -85,6 +96,24 @@ if (dim1F != dim1) | (dim2F != dim2):
 print "Ok"
 
 
+######################################
+print "*** CONVERSION DENSE MATRIX ***"
+F_dense_expected=faust_multiply(list_factor,np.eye(dim2))
+
+F_dense=F.todense()
+if not (F_dense.shape == (dim1, dim2)) :
+	print "expected size : "+str([dim1, dim2])
+	print "got : "+str(F_dense.shape)
+	raise ValueError('invalid  size of the dense matrix')
+if not (F_dense==F_dense_expected).all():
+	raise ValueError('invalid value')
+
+
+
+
+
+
+
 
 
 #####################################
@@ -92,13 +121,8 @@ print "*** MULTIPLICATION VECTOR ***"
 x=np.random.randint(int_max, size=(dim2,1))
 x_old=x.copy()
 
-expected_y=x
-for fact in reversed(list_factor):
-	#print i
-	fact_mat=np.matrix(fact);
-	#print "shape factor "+str(fact_mat.shape)
-	#print "shape y "+str(expected_Y_vec.shape)
-	expected_y=fact_mat*expected_y;
+expected_y=F_dense.dot(x)
+
 
 y=F*x
 
@@ -122,13 +146,8 @@ print "*** MULTIPLICATION MATRIX ***"
 X=np.random.randint(int_max, size=(dim2,dim3))
 X_old=X.copy()
 
-expected_Y=X
-for fact in reversed(list_factor):
-	#print i
-	fact_mat=np.matrix(fact);
-	#print "shape factor "+str(fact_mat.shape)
-	#print "shape y "+str(expected_Y_vec.shape)
-	expected_Y=fact_mat*expected_Y;
+expected_Y=F_dense.dot(X)
+
 
 Y=F*X
 
@@ -144,6 +163,8 @@ if not (Y==expected_Y).all():
 if not (X_old==X).all():
 	raise ValueError('multiplication : input matrix X has changed')
 print "Ok"
+
+
 
 
 
