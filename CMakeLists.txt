@@ -628,7 +628,8 @@ file(GLOB CPP_FILES "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGOR
 ### include directory 
 include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${EIGEN_INC_DIR})
 if (BUILD_USE_GPU)
-	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR} ${CUDA_INC_DIR} ${CUDA_RUNTIME_API_INC_DIR} ${CUSPARSE_INC_DIR} ${CUBLAS_V2_INC_DIR})
+	#include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR} ${CUDA_INC_DIR} ${CUDA_RUNTIME_API_INC_DIR} ${CUSPARSE_INC_DIR} ${CUBLAS_V2_INC_DIR})
+	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR})
 endif()
 if(BUILD_OPENBLAS)
 	include_directories(${OPENBLAS_INC_DIR})
@@ -636,7 +637,7 @@ endif()
 ###############################################################################################################
 
 
-###### TARGET GENERATION ######
+###### TARGET GENERATION (no difference between CPU and GPU) : Object library in case of CPU, Real library in case of GPU. #####
 if (BUILD_USE_GPU)
 	if (BUILD_WRAPPER_MATLAB)
 		add_library(${FAUST_TARGET} STATIC ${CPP_FILES} $<TARGET_OBJECTS:${FAUST_LINEAR_OPERATOR_TARGET}> $<TARGET_OBJECTS:${FAUST_MEXTOOLS_TARGET}> )
