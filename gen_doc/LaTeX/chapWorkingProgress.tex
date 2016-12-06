@@ -59,7 +59,23 @@ You must obtain the path of your \texttt{nvcc} compiler like
 \begin{lstlisting}
 /usr/local/cuda-7.5/bin/nvcc
 \end{lstlisting}
-If not, add \texttt{nvcc} directory in your environment path (in your ~/.bashrc file). 
+If not, add \texttt{nvcc} directory in your environment path (in your ~/.bashrc file).
+
+\item \textbf{Verify install of GPU library} by typing in a terminal: 
+\begin{lstlisting}
+> echo CUDADIR
+\end{lstlisting}
+You must obtain the path of your cuda directory like
+\begin{lstlisting}
+/usr/local/cuda-7.5
+\end{lstlisting}
+If not, export CUDADIR (in your .bashrc file for example).
+\begin{lstlisting}
+export CUDADIR=/usr/local/cuda-7.5
+\end{lstlisting}
+
+		
+	   
 \end{itemize}
 
 When prerequisities listed in Section \ref{sec:RequiredTools} are checked, you can get the package FA$\mu$ST.
