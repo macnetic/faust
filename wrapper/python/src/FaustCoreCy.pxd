@@ -39,9 +39,9 @@
 
 from libcpp cimport bool
 
-cdef extern from "FaustCpp.h" :
-	cdef cppclass FaustCpp[FPP] :
-		FaustCpp();
+cdef extern from "FaustCoreCpp.h" :
+	cdef cppclass FaustCoreCpp[FPP] :
+		FaustCoreCpp();
 		void Display() const;
 		void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol);
 		void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose);

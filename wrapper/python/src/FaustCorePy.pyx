@@ -38,7 +38,7 @@
 ##############################################################################
 
 # importer le module Cython faisant le lien avec la class C++
-cimport CyFaust 
+cimport FaustCoreCy
 
 import numpy as np 
 cimport numpy as np
@@ -48,18 +48,18 @@ from libc.stdlib cimport malloc, free;
 from libc.string cimport memcpy;
 from libcpp cimport bool
 
-cdef class Faust:
+cdef class FaustCore:
 	
 	#### ATTRIBUTE ########
 	# classe Cython
-	cdef CyFaust.FaustCpp[double] m_faust
+	cdef FaustCoreCy.FaustCoreCpp[double] m_faust
 
 	
 	#### CONSTRUCTOR ####
 	#def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
 	def  __cinit__(self,list_factors):
 		#print 'inside cinit'
-		self.m_faust = CyFaust.FaustCpp[double]();
+		self.m_faust = FaustCoreCy.FaustCoreCpp[double]();
 		cdef double [:,:] data
 		cdef unsigned int nbrow
 		cdef unsigned int nbcol

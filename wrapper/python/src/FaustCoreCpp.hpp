@@ -46,7 +46,7 @@
 #include <iostream>
 
 template<typename FPP>
-void FaustCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbcol)
+void FaustCoreCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbcol)
 {
 	Faust::MatDense<FPP,Cpu> dense_mat(valueMat,nbrow,nbcol);
 	Faust::MatSparse<FPP,Cpu> sparse_mat(dense_mat);
@@ -59,7 +59,7 @@ void FaustCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbc
 }
 
 template<typename FPP>
-void FaustCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose)const
+void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose)const
 {
 	
 	
@@ -104,7 +104,7 @@ void FaustCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,i
 
 
 template<typename FPP>
-void FaustCpp<FPP>::setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const
+void FaustCoreCpp<FPP>::setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const
 {
 	char trans_flag('N');
 	if (isTransposed)

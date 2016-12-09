@@ -42,21 +42,21 @@
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 /****************************************************************************/
 
-#ifndef FAUSTCPP_H
-#define FAUSTCPP_H
+#ifndef FAUSTCORECPP_H
+#define FAUSTCORECPP_H
 
 //#include "faust_transform.h"
 #include "faust_MatDense.h"
 
 
 template<typename FPP>
-class FaustCpp 
+class FaustCoreCpp 
 {
     
     public :
     
     
-    FaustCpp(): transform(){} 
+    FaustCoreCpp(): transform(){} 
     void Display() const { transform.Display();}
     void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol);
     unsigned int getNbRow() const{return transform.getNbRow();}
@@ -68,6 +68,6 @@ class FaustCpp
     Faust::Transform<FPP,Cpu> transform;
 };
 
-#include "FaustCpp.hpp"
+#include "FaustCoreCpp.hpp"
 
 #endif

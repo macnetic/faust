@@ -10,9 +10,9 @@ from Cython.Build import cythonize
 import numpy
 
 PyFaust = Extension(
-	'PyFaust',
+	'FaustCorePy',
 	#sources = ['@FAUST_PYTHON_SRC_SRC_DIR@PyFaust.pyx'],
-	sources = ['@FAUST_PYTHON_BIN_DIR@/PyFaust.pyx'],
+	sources = ['@FAUST_PYTHON_BIN_DIR@/FaustCorePy.pyx'],
 	language = 'c++',
 	include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@
 			,numpy.get_include()],
@@ -22,6 +22,6 @@ PyFaust = Extension(
 )
 
 setup(
-    name = 'PyFaust',
+    name = 'FaustCorePy',
     ext_modules = cythonize(PyFaust),
 )

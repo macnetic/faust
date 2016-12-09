@@ -4,7 +4,7 @@
 import copy
 
 import numpy as np
-import PyFaust
+import FaustCorePy
 
 
 class Faust:
@@ -12,7 +12,7 @@ class Faust:
 	#### CONSTRUCTOR ####
 	def  __init__(self,list_factors):
 		#print 'inside cinit'
-		self.m_faust = PyFaust.Faust(list_factors);
+		self.m_faust = FaustCorePy.FaustCore(list_factors);
 		self.m_transpose_flag=0;
 		self.shape=self.m_faust.shape(self.m_transpose_flag)
 
