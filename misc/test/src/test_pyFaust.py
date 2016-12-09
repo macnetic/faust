@@ -41,9 +41,9 @@ FaustPath=sys.argv[1]
 sys.path.append(FaustPath)
 
 import numpy as np
-import PyFaust 
-
-dim1 = 2
+#import PyFaust 
+import FaustPy
+dim1 = 3
 dim2 = 5
 dim3 = 7
 nb_factor = 3
@@ -77,8 +77,9 @@ list_factor[nb_factor-1]=np.random.randint(int_max, size=(dim1,dim2))
 
 ######################################
 print "*** CONTRUCTOR ***"
-F = PyFaust.Faust(list_factor)
-print "Ok"
+#F = PyFaust.Faust(list_factor)
+F = FaustPy.Faust(list_factor)
+print("lister les attribut de F")
 
 
 
@@ -96,20 +97,68 @@ if (dim1F != dim1) | (dim2F != dim2):
 print "Ok"
 
 
+
+####################################
+print "*** TRANSPOSE ***"
+F_trans=F.transpose()
+if not (F_trans.shape == (dim2, dim1)) :
+	print "expected size : "+str([dim2, dim1])
+	print "got : "+str(F_trans.shape)
+	raise ValueError('F_trans : invalid  size of the dense matrix')
+
+
+if not (F.shape == (dim1, dim2)) :
+	print "expected size : "+str([dim1, dim2])
+	print "got : "+str(F.shape)
+	raise ValueError('F_trans : modify size invalid  size of the dense matrix')
+
+
+F_trans_trans=F_trans.transpose()
+if not (F_trans_trans.shape == (dim1, dim2)) :
+	print "expected size : "+str([dim1, dim2])
+	print "got : "+str(F_trans_trans.shape)
+	raise ValueError('F_trans_trans invalid  size of the dense matrix')
+	
+if not (F_trans.shape == (dim2, dim1)) :
+	print "expected size : "+str([dim2, dim1])
+	print "got : "+str(F_trans.shape)
+	raise ValueError('F_trans_trans modify size of the dense matrix')
+
+print "Ok"
+
 ######################################
 print "*** CONVERSION DENSE MATRIX ***"
 F_dense_expected=faust_multiply(list_factor,np.eye(dim2))
 
 F_dense=F.todense()
+
 if not (F_dense.shape == (dim1, dim2)) :
 	print "expected size : "+str([dim1, dim2])
 	print "got : "+str(F_dense.shape)
 	raise ValueError('invalid  size of the dense matrix')
 if not (F_dense==F_dense_expected).all():
 	raise ValueError('invalid value')
+	
 
 
+F_trans_dense=F_trans.todense()
+if not (F_trans_dense.shape == (dim2, dim1)) :
+	print "expected size : "+str([dim2, dim1])
+	print "got : "+str(F_dense_trans.shape)
+	raise ValueError('invalid  size of the dense matrix')
+if not (np.transpose(F_dense)==F_trans_dense).all():
+	raise ValueError('invalid value')
+	
+	
+F_trans_trans_dense=F_trans_trans.todense()
 
+if not (F_trans_trans_dense.shape == (dim1, dim2)) :
+	print "expected size : "+str([dim1, dim2])
+	print "got : "+str(F_dense.shape)
+	raise ValueError('invalid  size of the dense matrix')
+if not (F_dense==F_dense_expected).all():
+	raise ValueError('invalid value')
+print "Ok"
 
 
 

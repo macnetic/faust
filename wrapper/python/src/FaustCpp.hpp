@@ -61,10 +61,25 @@ void FaustCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbc
 template<typename FPP>
 void FaustCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose)const
 {
-	if ( (nbrow_y != this->transform.getNbRow()) | (nbrow_x != this->transform.getNbCol()) | (nbcol_y != nbcol_x) )
-		handleError("FaustCpp"," invalid dimension");
-
+	
+	
 	char op = 'N';
+	if (isTranspose)
+		op = 'T';
+
+	unsigned int nbRowThis,nbColThis;
+	
+	
+	this->setOp(isTranspose,nbRowThis,nbColThis);
+
+
+	if ( (nbrow_y != nbRowThis) | (nbrow_x != nbColThis) | (nbcol_y != nbcol_x) )
+	{	
+		std::cout<<"nbRowThis "<<nbRowThis<<" must be equal to nb row y  "<<nbrow_y<<std::endl;
+		std::cout<<"nbColThis "<<nbColThis<<" must be equal to nb row x  "<<nbrow_x<<std::endl;
+		std::cout<<"nbcol_y "<<nbcol_y<<" must be equal to nbcol_x  "<<nbcol_x<<std::endl;
+		handleError("FaustCpp"," multiply : invalid dimension");
+	}
 	if (nbcol_x == 1)
 	{
 		Faust::Vect<FPP,Cpu> X(nbrow_x,value_x);
@@ -94,6 +109,7 @@ void FaustCpp<FPP>::setOp(const bool isTransposed,unsigned int& nbRowOp, unsigne
 	char trans_flag('N');
 	if (isTransposed)
 		trans_flag='T';
+
 	faust_unsigned_int nb_row,nb_col;
 	this->transform.setOp(trans_flag,nb_row,nb_col);
 	nbRowOp=(unsigned int) nb_row;

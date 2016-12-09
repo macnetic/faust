@@ -42,6 +42,7 @@ cimport CyFaust
 
 import numpy as np 
 cimport numpy as np
+import copy
 
 from libc.stdlib cimport malloc, free;
 from libc.string cimport memcpy;
@@ -52,7 +53,7 @@ cdef class Faust:
 	#### ATTRIBUTE ########
 	# classe Cython
 	cdef CyFaust.FaustCpp[double] m_faust
-	cdef bool m_transpose_flag
+
 	
 	#### CONSTRUCTOR ####
 	#def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
@@ -72,33 +73,29 @@ cdef class Faust:
 		#	print nbrow
 		#	print nbcol
 			self.m_faust.push_back(&data[0,0],nbrow,nbcol);
-			self.m_transpose_flag=0
+		#print(self.__dict__)
 		#print 'apres boucle'
 		
 	
 	
 	#### METHOD ####
-	def getNbRow(self):
-		#return self.m_faust.getNbRow();
-		(dim1,dim2)=self.shape();
-		return dim1
+#~ 	def getNbRow(self):
+#~ 		#return self.m_faust.getNbRow();
+#~ 		(dim1,dim2)=self.shape();
+#~ 		return dim1
 		
-	def getNbCol(self):
-		(dim1,dim2)=self.shape();
-		return dim2
+#~ 	def getNbCol(self):
+#~ 		(dim1,dim2)=self.shape();
+#~ 		return dim2
 		
 		
-	def shape(self):
-		#return (self.m_faust.getNbRow(),self.m_faust.getNbRow())
+	def shape(self,transpose_flag=False):
 		cdef unsigned int nbrow
 		cdef unsigned int nbcol
-		self.m_faust.setOp(self.m_transpose_flag,nbrow,nbcol)
+		self.m_faust.setOp(transpose_flag,nbrow,nbcol)
 		return (nbrow,nbcol)
 		
-#	def transpose(self):
-#		F_trans=self;
-#		F_trans.m_tranpose_flag=1;
-#		return F_trans;
+
 
 
 
@@ -113,7 +110,7 @@ cdef class Faust:
 
 	# Left-Multiplication by a Faust F
 	# y=multiply(F,x) is equivalent to y=F*x 
-	def multiply(self,x):
+	def multiply(self,x,transpose_flag):
 		if not isinstance(x, (np.ndarray) ):
 			raise NameError('input x must a numpy ndarray')
 		#transform into float F continous  matrix
@@ -131,8 +128,9 @@ cdef class Faust:
 		cdef unsigned int nbrow_x=x.shape[0]
 		cdef unsigned int nbcol_x #can't be assigned because we don't know yet if the input vector is 1D or 2D
 		
-		cdef unsigned int nbRowThis=self.getNbRow();
-		cdef unsigned int nbColThis=self.getNbCol();
+		dimThis=self.shape(transpose_flag)
+		cdef unsigned int nbRowThis=dimThis[0];
+		cdef unsigned int nbColThis=dimThis[1];
 		
 		
 		cdef unsigned int nbrow_y=nbRowThis
@@ -157,21 +155,14 @@ cdef class Faust:
 		cdef y = np.zeros([nbrow_y,nbcol_y], dtype='d',order='F')
 		cdef double[:,:] yview=y
 		if ndim_x == 1:
-			self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x,False);
+			self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x,transpose_flag);
 		else:
-			self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x,False);
+			self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x,transpose_flag);
 		
 		return y
 		
 		
-	#overloading of multiplication operator *,
-	# y = F * x ,with F a Faust
-	def __mul__(self, x):
-		return self.multiply(x)
 		
 		
 		
-	def todense(self):
-		identity=np.eye(self.getNbCol(),self.getNbCol());
-		self_dense=self*identity
-		return self_dense
+

@@ -56,7 +56,7 @@ except ImportError:
     plotlib_present=0
 
 import time
-import PyFaust 
+import FaustPy 
 
 
 # function : multiplication par un faust sous Scipy
@@ -75,11 +75,11 @@ RCG=10
 density=1/RCG
 density_per_fact=density/nb_factor
 # comparaison dans la justesse des resultats (obliger de travailler avec des entiers)
-result_comparison=0;
+result_comparison=1;
 
 
-dim_2pow_list=[8,9,10,11,12]
-#dim_2pow_list=[8,9,10]
+#dim_2pow_list=[8,9,10,11,12,13]
+dim_2pow_list=[8,9,10]
 nb_dim=len(dim_2pow_list)
 dim_list=[0]*nb_dim
 
@@ -97,9 +97,9 @@ print "*********************************\n"
 
 
 
-t_list=np.zeros((nb_mult,nb_dim,3))#dense,scipy,faust
-t_scipy=[0]*nb_mult
-t_Faust=[0]*nb_mult,
+t_list=np.zeros((nb_mult,nb_dim,5))#dense,scipy,faust,dense transposee,faust transposee
+
+
 
 print "** FAUST VECTOR MULTIPLICATON ***"
 for j in range(nb_dim):
@@ -132,7 +132,7 @@ for j in range(nb_dim):
 	#	print fact
 
 
-	F=PyFaust.Faust(list_factor_dense)
+	F=FaustPy.Faust(list_factor_dense)
 	F_dense=F.todense()
 
 	if(F.getNbRow() != dim) or (F.getNbCol() != dim):
@@ -160,6 +160,16 @@ for j in range(nb_dim):
 		t=time.time()
 		y_Faust=F*x
 		t_list[i,j,2]=time.time()-t
+		
+		
+		t=time.time()
+		y_dense_trans=np.transpose(F_dense)*x
+		t_list[i,j,3]=time.time()-t
+		
+		
+		t=time.time()
+		y_Faust_trans=F.transpose()*x
+		t_list[i,j,4]=time.time()-t
 
 
 
@@ -177,6 +187,12 @@ for j in range(nb_dim):
 				print y_Faust
 				print y_dense
 				raise ValueError('multiplication : dense_multiplication different from Faust one')
+				
+			if not (y_Faust_trans==y_dense_trans).all():
+				print "Error"
+				print y_Faust
+				print y_dense
+				raise ValueError('multiplication :transpose  dense_multiplication different from Faust one')
 			
 
 #print t_list
@@ -184,6 +200,8 @@ t_list_mean=np.mean(t_list,0)
 t_dense=t_list_mean[:,0]
 t_scipy=t_list_mean[:,1]
 t_faust=t_list_mean[:,2]
+t_dense_trans=t_list_mean[:,3]
+t_faust_trans=t_list_mean[:,4]
 
 
 print "************ RESULT *************"
@@ -191,11 +209,15 @@ print "dim "+str(dim_list)
 print "t_Faust "+str(t_faust)
 print "t_scipy "+str(t_scipy)
 print "t_dense "+str(t_dense)
+print "t_dense_trans "+str(t_dense_trans)
+print "t_faust_trans "+str(t_faust_trans)
 
 speed_up_Faust=t_dense/t_faust
 speed_up_Scipy=t_dense/t_scipy
+speed_up_Faust_trans=t_dense_trans/t_faust_trans
 print "speed-up Faust : "+str(speed_up_Faust)
 print "speed-up scipy : "+str(speed_up_Scipy)
+print "speed-up Faust (transpose) : "+str(speed_up_Faust_trans)
 
 
 #print "size dim :"+str(dim_list.shape)

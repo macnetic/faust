@@ -47,6 +47,7 @@ endif(BUILD_OPENBLAS)
 configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/PyFaust.pyx ${FAUST_PYTHON_BIN_DIR}/PyFaust.pyx COPYONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/CyFaust.pxd ${FAUST_PYTHON_BIN_DIR}/CyFaust.pxd COPYONLY)
+configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustPy.py ${FAUST_PYTHON_BIN_DIR}/FaustPy.py COPYONLY)
 #configure_file(${FAUST_PYTHON_SRC_DIR}/main.py ${FAUST_PYTHON_BIN_DIR}/main.py COPYONLY)
 
 add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET} )

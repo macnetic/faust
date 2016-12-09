@@ -196,7 +196,7 @@ option(BUILD_DEBUG "Enable FAUST Debug mode." OFF)
 # Allows Matlab MEX files :
 option(BUILD_USE_GPU  "Using both CPU and GPU process" OFF)
 
-option(BUILD_WRAPPER_MATLAB "Enable building Matlab MEX files." ON)
+option(BUILD_WRAPPER_MATLAB "Enable building Matlab MEX files." OFF)
 # Using openBLAS for matrix and vector computations
 option(BUILD_OPENBLAS "Using openBLAS for matrix and vector computations" OFF)
 # different type of files 
@@ -205,7 +205,7 @@ option(BUILD_READ_MAT_FILE "Using matio library to read mat files" OFF)
 #set(BUILD_READ_XML_FILE OFF)
 #set(BUILD_READ_MAT_FILE OFF)
 
-option(BUILD_WRAPPER_PYTHON "Enable building PyFaust (Python librairie)." OFF)
+option(BUILD_WRAPPER_PYTHON "Enable building PyFaust (Python librairie)." ON)
 #set(BUILD_WRAPPER_PYTHON OFF)
 
 #CMAKE_DEPENDENT_OPTION
