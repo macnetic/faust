@@ -2,7 +2,7 @@
 ##                              Description:                                ##
 ##                                                                          ##
 ##        Cython source file making the links between :                     ##
-##        the Cython module CyFaust and Python                              ##
+##        the Cython module FaustCoreCy and Python                          ##
 ##                                                                          ## 
 ##  For more information on the FAuST Project, please visit the website     ##
 ##  of the project : <http://faust.gforge.inria.fr>                         ##

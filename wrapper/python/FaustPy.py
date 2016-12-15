@@ -1,3 +1,41 @@
+##############################################################################
+##                              Description:                                ##
+##                                                                          ##
+##          FaustPy is class wrapping a C++ class                           ##
+##                                                                          ## 
+##  For more information on the FAuST Project, please visit the website     ##
+##  of the project : <http://faust.gforge.inria.fr>                         ##
+##                                                                          ##
+##                              License:                                    ##
+##  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      ##
+##                      Luc Le Magoarou, Remi Gribonval                     ##
+##                      INRIA Rennes, FRANCE                                ##
+##                      http://www.inria.fr/                                ##
+##                                                                          ##
+##  The FAuST Toolbox is distributed under the terms of the GNU Affero      ##
+##  General Public License.                                                 ##
+##  This program is free software: you can redistribute it and/or modify    ##
+##  it under the terms of the GNU Affero General Public License as          ##
+##  published by the Free Software Foundation.                              ##
+##                                                                          ##
+##  This program is distributed in the hope that it will be useful, but     ##
+##  WITHOUT ANY WARRANTY; without even the implied warranty of              ##
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    ##
+##  See the GNU Affero General Public License for more details.             ##
+##                                                                          ##
+##  You should have received a copy of the GNU Affero General Public        ##
+##  License along with this program.                                        ##
+##  If not, see <http://www.gnu.org/licenses/>.                             ##
+##                                                                          ##
+##                             Contacts:                                    ##
+##      Nicolas Bellot  : nicolas.bellot@inria.fr                           ##
+##      Adrien Leman    : adrien.leman@inria.fr                             ##
+##      Thomas Gautrais : thomas.gautrais@inria.fr                          ##
+##      Luc Le Magoarou : luc.le-magoarou@inria.fr                          ##
+##      Remi Gribonval  : remi.gribonval@inria.fr                           ##
+##                                                                          ##
+##############################################################################
+
 #import sys
 #FaustPath='/home/nbellot/Documents/faust_root/faust/trunk/devcpp/build/wrapper/python'
 #sys.path.append(FaustPath)
@@ -50,38 +88,24 @@ class Faust:
 		return self_dense
 
 
-
-#~ dim1 = 5
-#~ dim2 = 10
-#~ dim3 = 7
-#~ nb_factor = 2
-#~ int_max= 100
-
-#~ print('**** CONFIG FAUST F ****');
-#~ print 'dim1 : '+str(dim1) 
-#~ print 'dim2 : '+str(dim2)
-#~ print 'nb_factor : '+str(nb_factor)
-
-
-#~ #initialisation de la liste des facteurs
-#~ list_factor=[0]*nb_factor
-#~ for i in range(nb_factor):
-	#~ list_factor[i]=np.random.randint(int_max, size=(dim1,dim1))
-
-#~ list_factor[nb_factor-1]=np.random.randint(int_max, size=(dim1,dim2))
+	def __getitem__(self,list_index):
+		#check if list_index has a 2 index (row and column) 
+		if (len(list_index) != 2):
+			raise ValueError('list_index must contains 2 elements, the row index and the col index')
+		
+		#check if the index are slice or integer or Ellipsis
+		for id in list_index:
+			if (not isinstance(id, slice)) and (not isinstance(id,int) and (id !=Ellipsis)):
+				raise ValueError('list_index must contains slice (1:n) or Ellipsis (...) or int (2)')
+		
+		keyCol=list_index[1]
+		keyRow=list_index[0]
+		identity=np.eye(self.getNbCol(),self.getNbCol());
+		identity=identity[...,keyCol]
+		submatrix=self*identity
+		submatrix=submatrix[keyRow,:]
+		return submatrix
 
 
-#~ print "*** CONTRUCTOR ***"
-#~ F = FaustPy(list_factor)
-#~ print "Ok"
-#~ print("dim : "+str(F.shape))
 
 
-#~ Fbis=F.transpose()
-#~ print("**** F ****")
-#~ F.afficher()
-#~ print("**** F trans ****")
-#~ Fbis.afficher()
-#~ print("**** attributs F ****")
-#~ print(F.__dict__)
-#~ dir(Fbis)

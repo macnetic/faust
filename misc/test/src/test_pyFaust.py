@@ -43,7 +43,7 @@ sys.path.append(FaustPath)
 import numpy as np
 #import PyFaust 
 import FaustPy
-dim1 = 3
+dim1 = 4
 dim2 = 5
 dim3 = 7
 nb_factor = 3
@@ -215,7 +215,61 @@ print "Ok"
 
 
 
+######################################
+print "*** SLICING ***"
+for i in range(dim1):
+	for j in range(dim2):
+		F_i_j=F[i,j]
+		F_trans_j_i=F_trans[j,i]
+		
+		if F_i_j != F_dense[i,j]:
+			raise ValueError('invalid value')
+			
+		if F_i_j != F_trans_dense[j,i]:
+			raise ValueError('invalid value')
+		
+F_dense_slice = F[...,...]
+if not (F_dense_slice.shape == (dim1, dim2)) :
+	print "expected size : "+str([dim1, dim2])
+	print "got : "+str(F_dense_slice.shape)
+	raise ValueError('invalid  size of the dense matrix')
+if not (F_dense==F_dense_slice).all():
+	raise ValueError('invalid value')
 
+
+F_trans_dense_slice = F_trans[...,...]
+if not (F_trans_dense_slice.shape == (dim2, dim1)) :
+	print "expected size : "+str([dim2, dim1])
+	print "got : "+str(F_trans_dense_slice.shape)
+	raise ValueError('invalid  size of the dense matrix')
+if not (F_trans_dense==F_trans_dense_slice).all():
+	raise ValueError('invalid value')
+	
+
+
+F_dense_slice_1 = F[0:dim1,0:dim2]
+if not (F_dense_slice_1.shape == (dim1, dim2)) :
+	print "expected size : "+str([dim1, dim2])
+	print "got : "+str(F_dense_slice_1.shape)
+	raise ValueError('invalid  size of the dense matrix')
+if not (F_dense==F_dense_slice_1).all():
+	raise ValueError('invalid value')
+	
+	
+#~ slice_row=dim1:0:-1
+#~ slice_col=dim2:0:-1
+
+#~ F_dense_slice_2 = F[slice_row,slice_col]
+F_dense_slice_2 = F[::-1,::-1]
+if not (F_dense_slice_2.shape == (dim1, dim2)) :
+	print "expected size : "+str([dim1, dim2])
+	print "got : "+str(F_dense_slice_2.shape)
+	print F_dense_slice_2
+	print ""
+	print F_dense
+	raise ValueError('invalid  size of the dense matrix')
+if not (F_dense[::-1,::-1]==F_dense_slice_2).all():
+	raise ValueError('invalid value')
 
 
 
