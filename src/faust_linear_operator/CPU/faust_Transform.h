@@ -143,14 +143,20 @@ namespace Faust
         FPP spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
         ~Transform(){}
 	
-		// if measure of time is down Faust::Transform<FPP,Cpu> is no longer constant during multiplication because a measure of time is an attribute to the faust::Transform
-		#ifdef __COMPILE_TIMERS__
-			Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N');
-		#else
-			Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N') const;
-		#endif
+
+	/*!
+	* \brief multiplication between with vector x
+	*  x = op((*this)) * x
+	<br>
+    	* op((*this)) = (*this) if opThis='N', op((*this)= = transpose((*this)) if opThis='T'<br>
+	*! \tparam  x :  the vector to be multiplied
+	*! \tparam opThis : character 
+        */                               					
+	Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N') const;
+
+
 	
-		Faust::MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis='N') const;
+	Faust::MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis='N') const;
 
        
 		void operator=(const Transform<FPP,Cpu>&  f){data=f.data;totalNonZeros=f.totalNonZeros;}
@@ -173,7 +179,7 @@ namespace Faust
 	std::vector<Faust::MatSparse<FPP,Cpu> > data;
 	
 	#ifdef __COMPILE_TIMERS__
-		std::vector<Faust::Timer> t_multiply_vector;
+		mutable std::vector<Faust::Timer> t_multiply_vector;
 	#endif 
 
 

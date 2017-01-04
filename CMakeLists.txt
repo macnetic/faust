@@ -214,7 +214,9 @@ option(BUILD_WRAPPER_PYTHON "Enable building PyFaust (Python librairie)." ON)
 ###### Different option of configuration ######
 #option(BUILD_TESTING "Build Tests" ON) 
 set(BUILD_USE_SINGLEPRECISION OFF) # CACHE BOOL "Using single precision instead of double precision for matrix and vector computations")
-set(BUILD_USE_PROFILING OFF) # CACHE BOOL "Profiling the code")
+#set(BUILD_USE_PROFILING OFF) # CACHE BOOL "Profiling the code")
+option(BUILD_USE_PROFILING "Profiling the code" OFF) # CACHE BOOL )
+
 
 #set(BUILD_MULTITHREAD OFF CACHE BOOL "OpenMP Multithreading")
 #set(BUILD_VERBOSE OFF CACHE BOOL "Display useful message for debugging")

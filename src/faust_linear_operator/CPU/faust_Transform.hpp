@@ -301,19 +301,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> 
 
 
 
-/*Faust::Transform<FPP,Cpu>::Transform(const Faust::Params& params) :
-   data(std::vector<Faust::MatSparse<FPP,Cpu>>()),
-   totalNonZeros(0)
 
-{
-   Faust::HierarchicalFact hier_fact(params);
-   hier_fact.compute_facts();
-   hier_fact.get_facts(data);
-   for (int i=0 ; i<data.size() ; i++)
-      totalNonZeros += data[i].getNonZeros();
-   (data[0]) *= hier_fact.get_lambda();
-
-}*/
 template<typename FPP>
 Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThis)const
 {
@@ -437,7 +425,7 @@ void Faust::Transform<FPP,Cpu>::multiply(const Faust::Transform<FPP,Cpu> & A) //
 		}
 	}
 	#ifdef __COMPILE_TIMERS__
-		this.t_multiply_vector.resize(data.size());
+		this->t_multiply_vector.resize(data.size());
 	#endif
 }
 
@@ -574,12 +562,7 @@ void Faust::Transform<FPP,Cpu>::transpose()
 	}
 }
 template<typename FPP>
-#ifdef __COMPILE_TIMERS__
-	Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis)
-#else
-	Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis) const
-#endif
-{
+Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis) const{
 	#ifdef __COMPILE_TIMERS__
 			if (this->t_multiply_vector.size() != this->data.size())
 				handleError(m_className,"multiply : invalid t_multiply_vector size to measure time");
