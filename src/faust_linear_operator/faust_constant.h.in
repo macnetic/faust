@@ -82,6 +82,15 @@ const faust_unsigned_int nbr_iter_norm = 100;
 // Use Eigen library only under Mozilla Public License 2.0 (MPL 2.0) or less restrictive licenses
 #define EIGEN_MPL2_ONLY
 
+// WARNING only useful for the getType method of the class getType
+// must be deleted in future release
+enum MatType
+{
+   Dense, 
+   Sparse, 
+};
+
+
 
 ///// #define FAUST_GPU_ALREADY_SET -3
 ///// #define FAUST_DEFAULT_CUDA_DEVICE 0

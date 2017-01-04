@@ -59,7 +59,8 @@
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::faust_gemm(const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB) const
 {
-
+	handleError(m_className,"faust_gemm : not yet implemented");
+	/*
 	faust_unsigned_int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
 
 	if (size() == 0)
@@ -144,7 +145,7 @@ void Faust::Transform<FPP,Cpu>::faust_gemm(const Faust::MatDense<FPP,Cpu> & B, F
    }
    delete[] ind_ptr;
     ind_ptr = NULL;
-
+   */
 }
 
 
@@ -154,7 +155,7 @@ const char * Faust::Transform<FPP,Cpu>::m_className="Faust::Transform<FPP,Cpu>";
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform() :
-	data(std::vector<Faust::MatSparse<FPP,Cpu> >()),
+	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	totalNonZeros(0)
 {
 
@@ -213,7 +214,7 @@ void Faust::Transform<FPP,Cpu>::check_factors_validity() const
 
 }
 
-
+/*
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::get_facts(std::vector<Faust::MatDense<FPP,Cpu> >& facts)const
 {
@@ -221,7 +222,7 @@ void Faust::Transform<FPP,Cpu>::get_facts(std::vector<Faust::MatDense<FPP,Cpu> >
 	for (int i=0;i<size();i++)
 		facts[i] = data[i];
 }
-
+*/
 
 
 template<typename FPP>
@@ -362,7 +363,7 @@ faust_unsigned_int Faust::Transform<FPP,Cpu>::getNbRow() const
 {
 	if (size() != 0)
 	{
-		return data[0].getNbRow();
+		return data[0]->getNbRow();
 	}else
 	{
 		return 0;
@@ -375,7 +376,7 @@ faust_unsigned_int Faust::Transform<FPP,Cpu>::getNbCol() const
 {
 	if (size() != 0)
 	{
-		return data[size()-1].getNbCol();
+		return data[size()-1]->getNbCol();
 	}else
 	{
 		return 0;
@@ -474,17 +475,20 @@ Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_int
 
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatSparse<FPP,Cpu>& S)
+void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M)
 {
 	if (size()>0)
 	{
-		if(data[size()-1].getNbCol()!=S.getNbRow() || S.getNbRow()<1)
+		if(data[size()-1]->getNbCol()!= M->getNbRow() || M->getNbRow()<1)
       		{
 			handleError(m_className,"push_back : incorrect dimensions");
      		}
    	}
-   	data.push_back(S);
-   	totalNonZeros += S.getNonZeros();
+
+   	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone();
+   	data.push_back(M_copy);
+   	totalNonZeros += M_copy->getNonZeros();
+	
 	#ifdef __COMPILE_TIMERS__
 		this->t_multiply_vector.push_back(Faust::Timer());
 	#endif
@@ -493,15 +497,16 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatSparse<FPP,Cpu>& S)
 
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatSparse<FPP,Cpu>& S)
+void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M)
 {
 	if (size()>0)
-		if(data[0].getNbRow()!=S.getNbCol() || S.getNbRow()<1)
+		if(this->getNbRow()!=M->getNbCol() || M->getNbRow()<1)
       		{
 			handleError(m_className,"push_first : incorrect dimensions");
       		}
-	data.insert(data.begin(),S);
-   	totalNonZeros += S.getNonZeros();
+	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone();
+	data.insert(data.begin(),M_copy);
+   	totalNonZeros += M_copy->getNonZeros();
 	
 	#ifdef __COMPILE_TIMERS__
 		this->t_multiply_vector.insert(this->t_multiply_vector().begin(),Faust::Timer());
@@ -510,13 +515,13 @@ void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatSparse<FPP,Cpu>& S)
 
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::pop_back(Faust::MatSparse<FPP,Cpu>& S)
+void Faust::Transform<FPP,Cpu>::pop_back(Faust::MatGeneric<FPP,Cpu>* M)
 {
 	if (size()>0)
 	{
-		S = data[size()-1];
+		M = data[size()-1];
 		data.pop_back();
-		totalNonZeros -= S.getNonZeros();
+		totalNonZeros -= M->getNonZeros();
 		#ifdef __COMPILE_TIMERS__
 			this->t_multiply_vector.pop_back();
 		#endif
@@ -525,13 +530,15 @@ void Faust::Transform<FPP,Cpu>::pop_back(Faust::MatSparse<FPP,Cpu>& S)
 }
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::pop_first(Faust::MatSparse<FPP,Cpu>& S)
+void Faust::Transform<FPP,Cpu>::pop_first(Faust::MatGeneric<FPP,Cpu>* M)
 {
+
+	/// WARNING : not tested
 	if (size()>0)
 	{
-		S = data[0];
+		M = data[0];
 		data.erase(data.begin());
-		totalNonZeros -= S.getNonZeros();
+		totalNonZeros -= M->getNonZeros();
 		#ifdef __COMPILE_TIMERS__
 			this->t_multiply_vector.erase(this->t_multiply_vector.begin());
 		#endif
@@ -540,13 +547,12 @@ void Faust::Transform<FPP,Cpu>::pop_first(Faust::MatSparse<FPP,Cpu>& S)
 }
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::pop_first(Faust::MatSparse<FPP,Cpu>& S) const
+void Faust::Transform<FPP,Cpu>::pop_first(Faust::MatGeneric<FPP,Cpu>* M) const
 {
 	if (size()>0)
 	{
-		S = data[0];
-		//data.erase(data.begin());
-		//totalNonZeros -= S.getNonZeros();
+		M = data[0]->Clone();
+
 	}
 
 }
@@ -558,7 +564,7 @@ void Faust::Transform<FPP,Cpu>::transpose()
 	reverse(data.begin(),data.end());
 	for (int i=0;i<nbFact;i++)
 	{
-		data[i].transpose();
+		data[i]->transpose();
 	}
 }
 template<typename FPP>
@@ -581,7 +587,7 @@ Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,C
 				this->t_multiply_vector[i].start();
 			#endif
 
-			vec.multiplyLeft(data[i]);
+			data[i]->multiply(vec);
 
 			#ifdef __COMPILE_TIMERS__
 				this->t_multiply_vector[i].stop();
@@ -595,7 +601,7 @@ Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,C
 				this->t_multiply_vector[i].start();
 			#endif
 
-			vec.multiplyLeft(data[i],opThis);
+			data[i]->multiply(vec,opThis);
 
 			#ifdef __COMPILE_TIMERS__
 				this->t_multiply_vector[i].stop();
@@ -655,13 +661,13 @@ void Faust::Transform<FPP,Cpu>::setOp(const char op, faust_unsigned_int& nbRowOp
 	{	
 		if(op == 'N')
     		{
-        		nbRowOp=data[0].getNbRow();
-        		nbColOp=data[size()-1].getNbCol();
+        		nbRowOp=data[0]->getNbRow();
+        		nbColOp=data[size()-1]->getNbCol();
     		}
     		else if(op == 'T')
     		{
-        		nbRowOp=data[size()-1].getNbCol();
-        		nbColOp=data[0].getNbRow();
+        		nbRowOp=data[size()-1]->getNbCol();
+        		nbColOp=data[0]->getNbRow();
     		}
     		else
         		handleError(m_className,"setOp : invalid character");
@@ -710,7 +716,14 @@ void Faust::Transform<FPP,Cpu>::Display()const
 		for (int i=0;i<t_multiply_vector.size();i++)
 		{
 			float current_time=t_multiply_vector[i].get_time();
-			std::cout<<"	FACTOR "<<i<<", size "<<data[i].getNbRow()<<"x"<<data[i].getNbCol()<<" ,nnz "<<data[i].getNonZeros()<<std::endl;
+			std::cout<<"	FACTOR "<<i<<",type ";
+			if (data[i]->getType() == Dense)
+				cout<<"dense ";
+			else if (data[i]->getType() == Sparse)
+				cout<<"sparse ";
+			else
+				cout<<"unknown ";
+				cout<<", size "<<data[i]->getNbRow()<<"x"<<data[i]->getNbCol()<<" ,nnz "<<data[i]->getNonZeros()<<std::endl;
 			std::cout<<" 	,tps "<<current_time<<" ,% "<<100*current_time/sum_tps<< " ,nb_calls  "<<t_multiply_vector[i].get_nb_call()<<std::endl;
 		}
 		std::cout<<"	total tps "<<sum_tps<<std::endl; 

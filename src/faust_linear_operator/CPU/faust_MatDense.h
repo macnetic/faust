@@ -201,7 +201,28 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         /// Destructor of MatDense
         ~MatDense(){resize(0,0);}
 
+	
+	///**** METHOD INHERITED FROM VIRTUAL MATGENERIC ****///
+	
+		
+	MatType getType() const
+	{ return Dense;}
+	
+	// \brief compare which format is the most efficient to represent the matrix
+	// i.e the quickiest for multiplication with vector 
+	MatGeneric<FPP,Cpu>* Clone() const;
+	
+	
+	//\brief : return the number of non-zeros coefficient nnz
+	//\warning : for a dense matrix nnz is equal to the number of coefficient
+	//           due to her format
+	faust_unsigned_int getNonZeros()const{return this->dim1*this->dim2;}
 
+	void multiply(Faust::Vect<FPP,Cpu> & vec, char opThis='N') const
+	{Faust::gemv((*this),vec,vec,(FPP) 1.0, (FPP) 0.0,opThis);}
+
+	///********* FIN METHOD INHERITED FROM VIRTUAL MATGENERIC *********///
+	
 
         //! \brief resize the MatDense
         //! \param	   nbRow : new number of row of the matrix

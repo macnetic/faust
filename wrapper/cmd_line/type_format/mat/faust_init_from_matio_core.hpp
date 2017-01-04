@@ -43,6 +43,7 @@
 #define __FAUST_INIT_FROM_MATIO_CORE_HPP__
 
 //#include "faust_init_from_matio_core.h"
+#include "faust_ConstraintGeneric.h"
 #include "faust_init_from_matio_mat.h"
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
@@ -54,7 +55,6 @@
 #include "faust_ParamsPalm.h"
 #include "faust_StoppingCriterion.h"
 #include "faust_ConstraintInt.h"
-#include "faust_ConstraintGeneric.h"
 #include "faust_ConstraintFPP.h"
 #include "faust_ConstraintMat.h"
 
@@ -113,7 +113,7 @@ void init_faust_core_from_matvar(Faust::Transform<FPP,DEVICE>& core, matvar_t* c
 	{
 		current_spmat_var = Mat_VarGetCell(cell_var, j);
 		init_spmat_from_matvar(data_spmat, current_spmat_var);
-		core.push_back(data_spmat);
+		core.push_back(data_spmat.Clone());
 	}
 
 }

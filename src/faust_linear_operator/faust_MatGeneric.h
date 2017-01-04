@@ -42,6 +42,7 @@
 
 #include "faust_constant.h"
 #include "faust_LinearOperator.h"
+#include "faust_Vect.h"
 /**
  * \class MatGeneric faust_MatGeneric.h
  * \brief This MatGeneric class serves as a base class for the derived class Faust::MatDense and Faust::MatSparse .
@@ -55,7 +56,7 @@
 namespace Faust
 {
 
-    // modif AL AL
+
     template<typename FPP,Device DEVICE>
     class LinearOperator;
 
@@ -63,19 +64,79 @@ namespace Faust
     class MatGeneric : public Faust::LinearOperator<FPP,DEVICE>
     {
         public:
-        MatGeneric() : dim1(0), dim2(0) {}
+        
+	MatGeneric() : dim1(0), dim2(0) {}
+
         MatGeneric(faust_unsigned_int dim1_, faust_unsigned_int dim2_) : dim1(dim1_), dim2(dim2_){}
     	
+	//! \brief get the dimension of op((*this))
+	//! \param op : char if op=='N' op(*this)=(*this), if op=='T' op((*this))==transpose((*this))
+	//! \param nbRowOp : (in/out) faust_unsigned_int, number of rows of op(*this)
+	//! \param nbColOp : (in/out) faust_unsigned_int, number of columns of op(*this) 
 	void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const; 
+
+	//! \brief return the number of rows of (*this)
         faust_unsigned_int getNbRow() const {return dim1;}
-        faust_unsigned_int getNbCol() const {return dim2;}
-
+	
+	//! \brief return the number of column of (*this)        
+	faust_unsigned_int getNbCol() const {return dim2;}
+	
+	//! \brief resize (*this)
+	//! \param dim1_ : new number of rows
+	//! \param dim2_ : new number of columns
         void resize(const faust_unsigned_int dim1_,const faust_unsigned_int dim2_){dim1=dim1_;dim2=dim2_;}
+	
+	//purely virtual function : must be redefined in all the descendant class 	
+	
+	//!  \brief return a "copy" to the given matrix
+        //! \return  a pointer of MatGeneric
+	//  \warning the dynamic type of the copy can be different from the original object
+	virtual MatGeneric<FPP,DEVICE>* Clone() const=0;
+	
+	//! \brief compute MatGeneric-vector multiplication
+	//! \param vec : the vector
+	//! \param opThis : character	
+	//! vec = (*this) * vec if opThis='N'
+	// vec = (*this)' * vec if opThis='T' 
+	virtual void multiply(Faust::Vect<FPP,DEVICE> & vec, char opThis='N') const;
 
+
+	
+	//! \brief transpose the matrix
+	virtual void transpose()=0;
+	
+	//! \brief return the number of non-zeros element in the matrix
+	virtual faust_unsigned_int getNonZeros()const=0;
+	
+	//! \brief get the dynamic type of the matrix (SPARSE or DENSE)
+	virtual MatType getType() const=0;
+	
+	//! \brief multply a matrix by the given scalar alpha
+	// \param alpha : multplicative scalar
+	virtual void operator*=(const FPP alpha)=0;
+
+
+	
+	
         protected:
         faust_unsigned_int dim1;
         faust_unsigned_int dim2;
+
+
+		    
     };
+
+    //! 	
+    //! \brief compare which format between the sparse matrix and the dense matrix is the quickiest for multiplication with vector and return a pointer to the mother class MatGeneric, with a dynamic type equals to the most efficient format
+   //! for multiplication
+   //! \tparam M : MatDense
+   //! \tparam S : MatSparse
+   //  \return a pointer of MatGeneric
+   
+   //template <typename FPP, Device DEVICE>
+   template<typename FPP>	 
+   Faust::MatGeneric<FPP,Cpu>* optimize(Faust::MatDense<FPP,Cpu> const & M,Faust::MatSparse<FPP,Cpu> const & S);
+	
 
 }
 #include "faust_MatGeneric.hpp"

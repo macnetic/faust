@@ -80,6 +80,12 @@ t_constr.stop();
 
 }
 
+template<typename FPP>
+Faust::MatGeneric<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::Clone() const
+{
+	Faust::MatSparse<FPP,Cpu> S((*this)); 
+	return optimize((*this),S);
+}
 
 
 template<typename FPP>

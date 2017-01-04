@@ -98,15 +98,16 @@ namespace Faust
 		/** \brief 
         * check the factors validity of the faust, if the list of factors represents a valid matrix
         * */		
-		void check_factors_validity() const;
+	void check_factors_validity() const;
 
         /** \brief Constructor
         * \param facts : Vector including dense matrix*/
         Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts);
 
-        void get_facts(std::vector<Faust::MatSparse<FPP,Cpu> >& sparse_facts)const{sparse_facts = data;}
-        void get_facts(std::vector<Faust::MatDense<FPP,Cpu> >& facts)const;
-        faust_unsigned_int size()const{return data.size();}
+        //void get_facts(std::vector<Faust::MatSparse<FPP,Cpu> >& sparse_facts)const{sparse_facts = data;}
+        //void get_facts(std::vector<Faust::MatDense<FPP,Cpu> >& facts)const;
+        
+	faust_unsigned_int size()const{return data.size();}
         void size(int size_)const{ data.resize(size_);}
 
 
@@ -126,10 +127,11 @@ namespace Faust
         void init_from_file(const char* filename);
         long long int get_total_nnz()const{return totalNonZeros;}
         void clear(){data.resize(0);totalNonZeros=0;}
-        void push_back(const Faust::MatSparse<FPP,Cpu>& S);
-        void push_first(const Faust::MatSparse<FPP,Cpu>& S);
-        void pop_back(Faust::MatSparse<FPP,Cpu>& S);
-        void pop_first(Faust::MatSparse<FPP,Cpu>& S);
+	void push_back(const Faust::MatGeneric<FPP,Cpu>* M);
+        void push_first(const Faust::MatGeneric<FPP,Cpu>* M);
+        void pop_back(Faust::MatGeneric<FPP,Cpu>* M);
+        void pop_first(Faust::MatGeneric<FPP,Cpu>* M);
+        void pop_first(Faust::MatGeneric<FPP,Cpu>* M) const;
         void pop_first(Faust::MatSparse<FPP,Cpu>& S) const;
         void Display()const;
         void transpose();
@@ -176,7 +178,7 @@ namespace Faust
 	private:
 	long long int totalNonZeros;
 	static const char * m_className;
-	std::vector<Faust::MatSparse<FPP,Cpu> > data;
+	std::vector<Faust::MatGeneric<FPP,Cpu>*> data;
 	
 	#ifdef __COMPILE_TIMERS__
 		mutable std::vector<Faust::Timer> t_multiply_vector;

@@ -38,6 +38,11 @@
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 /****************************************************************************/
 #include "faust_exception.h"
+
+// useful for optimize with multiplication
+#include "faust_Timer.h"
+
+
 template<typename FPP,Device DEVICE>
 void Faust::MatGeneric<FPP,DEVICE>::setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const
 {
@@ -54,3 +59,63 @@ void Faust::MatGeneric<FPP,DEVICE>::setOp(const char op, faust_unsigned_int& nbR
     else
         handleError("Faust::MatGeneric::","setOp : invalid character");
 }
+
+
+
+//template <typename FPP, Device DEVICE>
+template<typename FPP>  
+Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,Faust::MatSparse<FPP,Cpu> const & S)
+{
+	std::cout<<"DEBUT OPTIMIZE "<<std::endl;
+	
+	if ( (M.getNbCol() != S.getNbCol()) | (M.getNbRow() != S.getNbRow()) )
+		handleError("Faust::MatGeneric::", " Faust::optimize : matrix M and S have not the same size");
+	
+	Faust::Vect<FPP,Cpu> x_dense(M.getNbCol());
+	
+	for (int i=0;i<M.getNbCol();i++)
+	{
+		x_dense[i]=i*0.005;
+	}
+
+	Faust::Vect<FPP,Cpu> const x(x_dense);
+	Faust::Vect<FPP,Cpu> x_sparse(x_dense);
+
+	int nb_mult=10;
+	Faust::Timer t_dense,t_sparse;
+	for (int i=0;i<nb_mult;i++)
+	{	
+		x_sparse=x;
+		x_dense=x;		
+
+		t_sparse.start();
+			S.multiply(x_sparse);
+		t_sparse.stop();
+		
+		t_dense.start();
+			M.multiply(x_dense);
+		t_dense.stop();
+
+		
+	}
+	float density = ((float)S.getNonZeros())/((float)(S.getNbRow()*S.getNbCol()));	
+	std::cout<<" density "<<density<<std::endl;
+	std::cout<<" tps sparse "<<t_sparse.get_time()<<std::endl;
+	std::cout<<" tps dense "<<t_dense.get_time()<<std::endl;
+
+	//if (M.getNbCol() != M.getNbRow())
+	if (t_sparse.get_time() <= t_dense.get_time())
+	{
+		std::cout<<" CHOICE SPARSE "<<t_dense.get_time()<<std::endl;
+		return new MatSparse<FPP,Cpu>(S);
+	}else
+	{
+		std::cout<<" CHOICE DENSE "<<t_dense.get_time()<<std::endl;		
+		return new MatDense<FPP,Cpu>(M);
+	}
+		
+	std::cout<<"FIN OPTIMIZE "<<t_sparse.get_time()<<std::endl;
+
+
+}
+

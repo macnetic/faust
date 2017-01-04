@@ -189,6 +189,15 @@ namespace Faust
         int* getColInd(){if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(m_className,"getColInd : matrix is not in rowMajor");}}
         bool isRowMajor() const{return mat.IsRowMajor;}
 
+	// Virtual Function (inherited method from MatGeneric)
+	MatType getType() const{ return Sparse;}
+	
+
+	// \brief compare which format is the most efficient to represent the matrix
+	// i.e the quickiest for multiplication with vector 
+	MatGeneric<FPP,Cpu>* Clone() const;
+	
+
         //! Display all features of Faust::MatSparse : dim1, dim2, nnz number of nonzeros, values, etc ...
         void Display() const;
 
@@ -211,6 +220,10 @@ namespace Faust
         //! All the other line contains 2 integers and one number : the row, the column and the value of one coefficient in ColMajor access of the Faust::MatDense
         void init_from_file(const char* filename);
         void init(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<FPP>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
+	
+
+	void multiply(Faust::Vect<FPP,Cpu> & vec, char opThis='N') const
+	{ vec.multiplyLeft((*this),opThis);}
 
         //! Destructor
         ~MatSparse(){}
