@@ -1,0 +1,24 @@
+##########################################################################
+
+########                    FAuST Toolbox                       ##########
+
+######## Flexible Approximate Multi-Layer Sparse Transform      ##########
+
+##########################################################################
+
+
+
+##########################################################################
+
+
+
+version 1100 :
+	début [trunk] merge avec branch Faust_mat_generic : les faust sont une liste de matrice generique, pas forcement des matrice creuses
+	-> wrapper matlab HS
+	-> wrapper python HS
+
+version 1096 :
+	-> wrapper matlab OK
+	-> wrapper python OK
+
+
