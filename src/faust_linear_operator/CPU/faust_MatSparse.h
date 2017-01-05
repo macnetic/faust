@@ -193,9 +193,15 @@ namespace Faust
 	MatType getType() const{ return Sparse;}
 	
 
-	// \brief compare which format is the most efficient to represent the matrix
-	// i.e the quickiest for multiplication with vector 
-	MatGeneric<FPP,Cpu>* Clone() const;
+	/*!  \brief return a "copy" to the given matrix
+	*  \param isOptimize (optionnal) : boolean which the style of copy <br>
+			       -True, the return copy is optimized for the product <br>
+	                       which means dynamic type of the copy could be different from the original one <br>
+	                      -False, the return copy is simple, the dynamic type isn't changed <br>   						(default value is False) <br>					
+        //! \return  a pointer of MatGeneric
+	//  \warning the dynamic type of the copy can be different from the original object
+	*/
+	MatGeneric<FPP,Cpu>* Clone(const bool isOptimize=false) const;
 	
 
         //! Display all features of Faust::MatSparse : dim1, dim2, nnz number of nonzeros, values, etc ...

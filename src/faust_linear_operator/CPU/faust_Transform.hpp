@@ -178,15 +178,22 @@ Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 }
 
 template<typename FPP>
-Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu> > & facts, const FPP lambda_ /* =1.0 */) :
-    data(facts),
+Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *> & facts, const FPP lambda_ /* =1.0 */) :
+    data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	totalNonZeros(0)
 {	
+	/* the copy of the factor is optimized */	
+	bool optimizedCopy = true;
+
+	data.resize(facts.size());	
 	for (int i=0 ; i<data.size() ; i++)
-		totalNonZeros += data[i].getNonZeros();
+	{
+		data[i]=facts[i]->Clone(optimizedCopy);
+		totalNonZeros += data[i]->getNonZeros();
+	}
 
 	if(lambda_ != 1.0 && data.size()>0)
-		(data[0]) *= lambda_;
+		(*data[0]) *= lambda_;
 	
 	#ifdef __COMPILE_TIMERS__
 		this->t_multiply_vector.resize(data.size());
@@ -484,8 +491,8 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M)
 			handleError(m_className,"push_back : incorrect dimensions");
      		}
    	}
-
-   	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone();
+	bool optimizedCopy = true;
+   	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone(optimizedCopy);
    	data.push_back(M_copy);
    	totalNonZeros += M_copy->getNonZeros();
 	
@@ -504,7 +511,8 @@ void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M)
       		{
 			handleError(m_className,"push_first : incorrect dimensions");
       		}
-	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone();
+	bool optimizedCopy = true;
+	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone(optimizedCopy);
 	data.insert(data.begin(),M_copy);
    	totalNonZeros += M_copy->getNonZeros();
 	
@@ -711,22 +719,31 @@ void Faust::Transform<FPP,Cpu>::Display()const
 		std::cout << "t_multiply_vector :" << endl;	
 		float sum_tps=0;
 		for (int i=0;i<t_multiply_vector.size();i++)
-			sum_tps+=t_multiply_vector[i].get_time();		
-		float current_time;		
+			sum_tps+=t_multiply_vector[i].get_time();
+		
+		float current_time;
+		float nb_call;
+		faust_unsigned_int nnz;
+		float density;	
 		for (int i=0;i<t_multiply_vector.size();i++)
 		{
-			float current_time=t_multiply_vector[i].get_time();
-			std::cout<<"	FACTOR "<<i<<",type ";
+			current_time = t_multiply_vector[i].get_time();
+			nb_call = t_multiply_vector[i].get_nb_call();
+			nnz = data[i]->getNonZeros();
+			density = 100.0 * data[i]->density(); //percentage 0 < value < 100  
+
+			std::cout<<"- FACTOR "<<i<<": TYPE ";
 			if (data[i]->getType() == Dense)
 				cout<<"dense ";
 			else if (data[i]->getType() == Sparse)
 				cout<<"sparse ";
 			else
 				cout<<"unknown ";
-				cout<<", size "<<data[i]->getNbRow()<<"x"<<data[i]->getNbCol()<<" ,nnz "<<data[i]->getNonZeros()<<std::endl;
-			std::cout<<" 	,tps "<<current_time<<" ,% "<<100*current_time/sum_tps<< " ,nb_calls  "<<t_multiply_vector[i].get_nb_call()<<std::endl;
+				cout<<", size "<<data[i]->getNbRow()<<"x"<<data[i]->getNbCol()<<" ,nnz "<<nnz<<", density % "<<density<<std::endl;
+			std::cout<<" TPS "<<current_time<<" ,% "<<100*current_time/sum_tps<< " ,nb_calls  "<<nb_call<<std::endl;
+			std::cout<<" 	, mean "<<current_time/((float) nb_call)<<std::endl; 
 		}
-		std::cout<<"	total tps "<<sum_tps<<std::endl; 
+		std::cout<<"	total tps (for all factors)"<<sum_tps<<std::endl; 
 	
 
 

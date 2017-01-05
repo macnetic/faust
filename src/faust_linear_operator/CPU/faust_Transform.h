@@ -91,7 +91,7 @@ namespace Faust
         /** \brief Constructor
         * \param data : Vector including sparse matrix
         * \param lambda : the multiplicative scalar*/
-        Transform(const std::vector<Faust::MatSparse<FPP,Cpu> >& facts, const FPP lambda_ = (FPP)1.0);
+        Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0);
 
         Transform(const Transform<FPP,Cpu> & A);
 	

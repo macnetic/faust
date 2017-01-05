@@ -81,10 +81,18 @@ t_constr.stop();
 }
 
 template<typename FPP>
-Faust::MatGeneric<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::Clone() const
+Faust::MatGeneric<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::Clone(const bool isOptimize /*default value = false*/) const
 {
-	Faust::MatSparse<FPP,Cpu> S((*this)); 
-	return optimize((*this),S);
+	
+	if (isOptimize)
+	{ 		
+		Faust::MatSparse<FPP,Cpu> S((*this));		
+		return optimize((*this),S);
+	}	
+	else
+	{
+		return new MatDense<FPP,Cpu>((*this));
+	}
 }
 
 
@@ -109,6 +117,22 @@ t_resize.start();
 t_resize.stop();
 #endif
 }
+
+
+template<typename FPP>
+faust_unsigned_int Faust::MatDense<FPP,Cpu>::getNonZeros()const
+{	
+	faust_unsigned_int nnz = 0;
+	for (int i=0; i < this->getNbRow()*this->getNbCol(); i++)
+	{
+		if ( (*this)[i] != 0 )
+			nnz++; 
+	}
+
+	return nnz;	
+
+}
+
 
 
 template<typename FPP>

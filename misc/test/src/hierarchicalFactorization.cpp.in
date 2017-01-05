@@ -188,10 +188,19 @@ int main(int argc, char* argv[])
 
 	}
 	(facts[0]) *= hierFact.get_lambda();
-	Faust::Transform<FPP,Cpu> hierFactCore(facts);
+	// transform the sparse matrix into generic one
+	std::vector<Faust::MatGeneric<FPP,Cpu> *> list_fact_generic;
+	list_fact_generic.resize(facts.size());
+	for (int i=0;i<list_fact_generic.size();i++)
+		list_fact_generic[i]=facts[i].Clone();
+
+	Faust::Transform<FPP,Cpu> hierFactCore(list_fact_generic);
+
 	char nomFichier[100];
 	string outputFile="@FAUST_BIN_TEST_OUTPUT_DIR@/hier_fact_factorisation.dat";
-	hierFactCore.print_file(outputFile.c_str());
+	
+	//WARNING no implemented	
+	// hierFactCore.print_file(outputFile.c_str());
 
 	//write the given factorisation into a mat file
 	stringstream outputFilename;

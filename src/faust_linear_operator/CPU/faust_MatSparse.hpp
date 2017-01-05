@@ -72,10 +72,16 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int dim1_, const faust
 
 
 template<typename FPP>
-Faust::MatGeneric<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::Clone() const
+Faust::MatGeneric<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::Clone(const bool isOptimize /*default value=false*/) const
 {
-	Faust::MatDense<FPP,Cpu> M((*this));
-	return optimize(M,(*this));
+	if (isOptimize)
+	{	
+		Faust::MatDense<FPP,Cpu> M((*this));
+		return optimize(M,(*this));
+	}else
+	{
+		return new Faust::MatSparse<FPP,Cpu>((*this));
+	}
 }
 
 

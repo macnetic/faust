@@ -208,15 +208,21 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 	MatType getType() const
 	{ return Dense;}
 	
-	// \brief compare which format is the most efficient to represent the matrix
-	// i.e the quickiest for multiplication with vector 
-	MatGeneric<FPP,Cpu>* Clone() const;
+
+	/*!  \brief return a "copy" to the given matrix
+	*  \param isOptimize (optionnal) : boolean which the style of copy <br>
+			       -True, the return copy is optimized for the product <br>
+	                       which means dynamic type of the copy could be different from the original one <br>
+	                      -False, the return copy is simple, the dynamic type isn't changed <br>   						(default value is False) <br>					
+        //! \return  a pointer of MatGeneric
+	//  \warning the dynamic type of the copy can be different from the original object
+	*/
+	MatGeneric<FPP,Cpu>* Clone(const bool isOptimize=false) const;
 	
 	
 	//\brief : return the number of non-zeros coefficient nnz
-	//\warning : for a dense matrix nnz is equal to the number of coefficient
-	//           due to her format
-	faust_unsigned_int getNonZeros()const{return this->dim1*this->dim2;}
+	faust_unsigned_int getNonZeros()const;
+
 
 	void multiply(Faust::Vect<FPP,Cpu> & vec, char opThis='N') const
 	{Faust::gemv((*this),vec,vec,(FPP) 1.0, (FPP) 0.0,opThis);}

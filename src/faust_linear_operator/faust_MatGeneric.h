@@ -87,11 +87,15 @@ namespace Faust
         void resize(const faust_unsigned_int dim1_,const faust_unsigned_int dim2_){dim1=dim1_;dim2=dim2_;}
 	
 	//purely virtual function : must be redefined in all the descendant class 	
-	
-	//!  \brief return a "copy" to the given matrix
+	/*!  \brief return a "copy" to the given matrix
+	*  \param isOptimize (optionnal) : boolean which the style of copy <br>
+			       -True, the return copy is optimized for the product <br>
+	                       which means dynamic type of the copy could be different from the original one <br>
+	                      -False, the return copy is simple, the dynamic type isn't changed <br>   						(default value is False) <br>					
         //! \return  a pointer of MatGeneric
 	//  \warning the dynamic type of the copy can be different from the original object
-	virtual MatGeneric<FPP,DEVICE>* Clone() const=0;
+	*/
+	virtual MatGeneric<FPP,DEVICE>* Clone(const bool isOptimize=false) const=0;
 	
 	//! \brief compute MatGeneric-vector multiplication
 	//! \param vec : the vector
@@ -107,6 +111,10 @@ namespace Faust
 	
 	//! \brief return the number of non-zeros element in the matrix
 	virtual faust_unsigned_int getNonZeros()const=0;
+
+	//!brief return the percentage of non-zeros coefficient in the matrix, 
+	//! \return value between 0 and 1
+	float density() const{return ((float) this->getNonZeros())/((float)this->getNbCol()*this->getNbRow());}
 	
 	//! \brief get the dynamic type of the matrix (SPARSE or DENSE)
 	virtual MatType getType() const=0;
@@ -114,6 +122,8 @@ namespace Faust
 	//! \brief multply a matrix by the given scalar alpha
 	// \param alpha : multplicative scalar
 	virtual void operator*=(const FPP alpha)=0;
+	
+	
 
 
 	

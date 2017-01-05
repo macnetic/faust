@@ -98,7 +98,8 @@ Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,F
 
 		
 	}
-	float density = ((float)S.getNonZeros())/((float)(S.getNbRow()*S.getNbCol()));	
+	//float density = ((float)S.getNonZeros())/((float)(S.getNbRow()*S.getNbCol()));	
+	float density = S.density();	
 	std::cout<<" density "<<density<<std::endl;
 	std::cout<<" tps sparse "<<t_sparse.get_time()<<std::endl;
 	std::cout<<" tps dense "<<t_dense.get_time()<<std::endl;
