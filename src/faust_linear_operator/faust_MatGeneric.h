@@ -43,6 +43,7 @@
 #include "faust_constant.h"
 #include "faust_LinearOperator.h"
 #include "faust_Vect.h"
+#include "faust_MatDense.h"
 /**
  * \class MatGeneric faust_MatGeneric.h
  * \brief This MatGeneric class serves as a base class for the derived class Faust::MatDense and Faust::MatSparse .
@@ -103,6 +104,14 @@ namespace Faust
 	//! vec = (*this) * vec if opThis='N'
 	// vec = (*this)' * vec if opThis='T' 
 	virtual void multiply(Faust::Vect<FPP,DEVICE> & vec, char opThis='N') const;
+
+
+	//! \brief compute MatGeneric-MatDense multiplication
+	//! \param M : the dense matrix
+	//! \param opThis : character	
+	//! M = (*this) * M if opThis='N'
+	// M = (*this)' * M if opThis='T' 
+	virtual void multiply(Faust::MatDense<FPP,DEVICE> & M, char opThis) const;
 
 
 	

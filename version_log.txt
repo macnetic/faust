@@ -10,10 +10,12 @@
 
 ##########################################################################
 
+version 1103 :
+	-> test MATFILE marche
 
 
 version 1100 :
-	début [trunk] merge avec branch Faust_mat_generic : les faust sont une liste de matrice generique, pas forcement des matrice creuses
+	début [trunk] **** merge avec branch Faust_mat_generic **** : les faust sont une liste de matrice generique, pas forcement des matrice creuses
 	-> wrapper matlab HS
 	-> wrapper python HS
 

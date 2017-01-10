@@ -211,7 +211,7 @@ void Faust::Transform<FPP,Cpu>::check_factors_validity() const
 	 
 	 for (int i=0;i<=size()-2;i++)
 	 {
-	    if (data[i].getNbCol() != data[i+1].getNbRow())
+	    if (data[i]->getNbCol() != data[i+1]->getNbRow())
 		handleError(m_className,"check_factors_validity : dimensions of the factors mismatch");
 			
 	 }	 	
@@ -313,15 +313,24 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> 
 template<typename FPP>
 Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThis)const
 {
-	//complexity of evaluating a Faust::Transform
-	// from left to right is (dim1*total_nnz)
-	// from right to left is (dim2*total_nnz)
+
 
 	if (size() == 0)
 	{
 		handleError(m_className,"get_product : empty Faust::Transform");
 	}
 	
+	// modif NB v1102 : new method compatible with factor as MatGeneric
+	Faust::MatDense<FPP,Cpu> prod(data[0]->getNbCol());
+	prod.setEyes();
+
+	return this->multiply(prod,'N');
+
+
+
+
+
+	/* modif NB v1102 : factor are no longer MatSparse, they are MatGeneric now
 	Faust::MatDense<FPP,Cpu> prod(data[0].getNbRow());
 	
 	if(getNbRow()<getNbCol())
@@ -339,6 +348,10 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThi
 	}
 	if (opThis == 'T')
 		prod.transpose();
+	*/
+	//complexity of evaluating a Faust::Transform
+	// from left to right is (dim1*total_nnz)
+	// from right to left is (dim2*total_nnz)
 
 	/*Faust::MatDense<FPP,Cpu> prod;
 	if ( (data[0].getNonZeros()+getNbRow()*(totalNonZeros-data[0].getNonZeros())) < (data[size()-1].getNonZeros()+getNbCol()*(totalNonZeros-data[size()-1].getNonZeros())) )
@@ -355,7 +368,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThi
 
 
 
-   return prod;
+   //return prod;
 }
 
 template<typename FPP>
@@ -639,16 +652,30 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDen
 	if (opThis == 'N')
 	{	
 		for (int i=this->size()-1 ; i >= 0 ; i--)
-			mat.multiplyLeft(data[i]);
-		
+		{
+			//#ifdef __COMPILE_TIMERS__
+			//	this->t_multiply_mat[i].start();
+			//#endif
+			data[i]->multiply(mat,opThis);
+			//#ifdef __COMPILE_TIMERS__
+			//	this->t_multiply_mat[i].stop();
+			//#endif
+		}
 	}else
 	{		
 		for (int i=0 ; i < this->size() ; i++)
 		{	
-			mat.multiplyLeft(data[i],opThis);
+			//#ifdef __COMPILE_TIMERS__
+			//	this->t_multiply_mat[i].start();
+			//#endif
+			data[i]->multiply(mat,opThis);
+			//#ifdef __COMPILE_TIMERS__
+			//	this->t_multiply_mat[i].start();
+			//#endif
 		}
 		
 	}
+
 	return mat;
 
 		

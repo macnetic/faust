@@ -59,11 +59,13 @@ namespace Faust
     //! \brief (*this) = (*this) + A
     template<typename FPP>
     void add(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C);
+    
+    	
     //! \fn Faust::spgemm
     //! \brief performs Sparse matrices multiplication
     template<typename FPP>
     void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB);
-
+      	
 
     /*! \fn gemm
     *   \brief Performs a matrix calculation of the form a(AB) +bC, with three matrices and two real constants you supply. <br>

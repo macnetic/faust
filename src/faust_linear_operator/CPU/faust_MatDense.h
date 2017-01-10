@@ -223,11 +223,28 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 	//\brief : return the number of non-zeros coefficient nnz
 	faust_unsigned_int getNonZeros()const;
 
-
-	void multiply(Faust::Vect<FPP,Cpu> & vec, char opThis='N') const
+	
+	//! \brief compute MatGeneric-vector multiplication
+	//! \param vec : the vector
+	//! \param opThis : character	
+	//! vec = (*this) * vec if opThis='N'
+	// vec = (*this)' * vec if opThis='T'
+	void multiply(Faust::Vect<FPP,Cpu> & vec,const char opThis) const
 	{Faust::gemv((*this),vec,vec,(FPP) 1.0, (FPP) 0.0,opThis);}
 
-	///********* FIN METHOD INHERITED FROM VIRTUAL MATGENERIC *********///
+
+
+
+	//! \brief compute MatGeneric-MatDense multiplication
+	//! \param M : the dense matrix
+	//! \param opThis : character	
+	//! M = (*this) * M if opThis='N'
+	//  M = (*this)' * M if opThis='T' 
+	void multiply(Faust::MatDense<FPP,Cpu> & M, const char opThis) const
+	{Faust::gemm<FPP>((*this),M,M,1.0,0.0,opThis,'N');}
+
+
+ 	///********* FIN METHOD INHERITED FROM VIRTUAL MATGENERIC *********///
 	
 
         //! \brief resize the MatDense
@@ -240,7 +257,11 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! \param	 nbRow : new number of row and column of the matrix
         //! \warning nbRow must be greater or equal to 0
         void resize(const faust_unsigned_int nbRow){resize(nbRow,nbRow);}
+	
 
+
+
+	
         //! \brief Check if the dimension of the matrix are consistent, if not throws an error
         void check_dim_validity();
 
@@ -272,10 +293,16 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return mat.data()[j*this->dim1+i];}
 
         void operator*=(const Faust::MatSparse<FPP,Cpu>& M);
-        void operator+=(const Faust::MatSparse<FPP,Cpu>& M);
-        void operator-=(const Faust::MatSparse<FPP,Cpu>& M);
+        
 
-        void multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S,const char TransS='N');
+	void operator+=(const Faust::MatSparse<FPP,Cpu>& M);
+
+	// modif NB : v1102 comment useless function
+	/*        
+	void operator-=(const Faust::MatSparse<FPP,Cpu>& M);
+	*/
+        
+	void multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S,const char TransS='N');
 
         FPP* getData(){isZeros=false; isIdentity=false;return mat.data();}
         const FPP* getData()const{return mat.data();}
@@ -318,8 +345,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! \brief Replace this by (this) * A
         void multiplyRight(MatDense<FPP,Cpu> const& A);
 
-        //!  \brief Replace this by A * (*this)
-        void multiplyLeft(MatDense<FPP,Cpu> const& A);
+
 
 
         //!  \brief replace this by lambda * (*this)
@@ -360,6 +386,9 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         void operator/=(FPP lambda){scalarMultiply(1.0/lambda);}
 
 
+	
+
+
 //        friend void gemm_core<>(const MatDense<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
 //        friend void multiply<>(const MatDense<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C);
 //        friend void spgemm<>(const Faust::MatSparse<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
@@ -371,7 +400,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         friend void Faust::spgemm<>(const Faust::MatSparse<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
         friend void Faust::multiply<>(const Faust::Transform<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
         friend void Faust::gemv<>(const MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
-
+	friend void  Faust::MatSparse<FPP,Cpu>::multiply(MatDense<FPP,Cpu> & M,const char opThis) const;
 
         bool estIdentite()const{return isIdentity;}
         bool estNulle()const{return isZeros;}

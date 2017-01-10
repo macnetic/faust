@@ -207,7 +207,10 @@ int main(int argc, char* argv[])
 	outputFilename<<"@FAUST_BIN_TEST_OUTPUT_DIR@/"<<configFileBodyFile<<"_factorisation.mat";
 	std::cout<<"**************** WRITING FACTORISATION INTO ****************"<<std::endl;
 	std::cout<<"output filename : "<<outputFilename.str();
-	write_faust_core_into_matfile(hierFactCore,outputFilename.str().c_str(),"fact");
+	//WARNING no implemented	
+	// hierFactCore.print_file(outputFile.c_str());	
+	// modif NB : v1102 not implemented
+	//write_faust_core_into_matfile(hierFactCore,outputFilename.str().c_str(),"fact");
 
 
 	//relativeError

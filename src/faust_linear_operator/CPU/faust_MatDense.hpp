@@ -306,7 +306,7 @@ t_mult_right.stop();
 
  }
 
-
+/*
 template<typename FPP>
  void Faust::MatDense<FPP,Cpu>::multiplyLeft(Faust::MatDense<FPP,Cpu> const& A)
  {
@@ -359,7 +359,7 @@ template<typename FPP>
 #endif
 
  }
-
+*/
 
 
 
@@ -419,53 +419,57 @@ FPP Faust::MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::scalarMultiply(FPP const lambda)
 {
-#ifdef __COMPILE_TIMERS__
-t_scalar_multiply.start();
-#endif
-	mat = lambda * mat;
-#ifdef __COMPILE_TIMERS__
-t_scalar_multiply.stop();
-#endif
+	#ifdef __COMPILE_TIMERS__
+	t_scalar_multiply.start();
+	#endif
+		mat = lambda * mat;
+	#ifdef __COMPILE_TIMERS__
+	t_scalar_multiply.stop();
+	#endif
 }
 
 
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::add(Faust::MatDense<FPP,Cpu> const& A)
 {
-#ifdef __COMPILE_TIMERS__
-t_add.start();
-#endif
-	if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
-	{
-		handleError(m_className, "add : matrix dimension not equal");
-	}
-	mat = mat + A.mat;
-    isZeros = false;
-    isIdentity = false;
-#ifdef __COMPILE_TIMERS__
-t_add.stop();
-#endif
+	#ifdef __COMPILE_TIMERS__
+	t_add.start();
+	#endif
+		if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
+		{
+			handleError(m_className, "add : matrix dimension not equal");
+		}
+		mat = mat + A.mat;
+	    isZeros = false;
+	    isIdentity = false;
+	#ifdef __COMPILE_TIMERS__
+	t_add.stop();
+	#endif
 }
 
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::sub(Faust::MatDense<FPP,Cpu> const& A)
 {
-#ifdef __COMPILE_TIMERS__
-t_sub.start();
-#endif
-	if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
-	{
-		handleError(m_className, "sub : matrix dimension not equal");
-	}
-	mat = mat - A.mat;
+	#ifdef __COMPILE_TIMERS__
+	t_sub.start();
+	#endif
+		if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
+		{
+			std::cout<<"sub"<<std::endl;			
+			std::cout<<" this dimension ("<<this->getNbRow()<<","<<this->getNbCol()<<")"<<std::endl;		
+			std::cout<<" A dimension ("<<A.getNbRow()<<","<<A.getNbCol()<<")"<<std::endl;	
+			handleError(m_className, "sub : matrix dimension not equal");
+		}
+		mat = mat - A.mat;
 
-    isZeros = false;
-    isIdentity = false;
+	    isZeros = false;
+	    isIdentity = false;
 
-#ifdef __COMPILE_TIMERS__
-t_sub.stop();
-#endif
+	#ifdef __COMPILE_TIMERS__
+	t_sub.stop();
+	#endif
 }
+
 
 
 
@@ -539,7 +543,9 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatSparse<FPP,Cpu> const& S)
     resize(S.getNbRow(),S.getNbCol());
 	setZeros();
     FPP*const ptr_data = getData();
-
+	
+	
+    
     for(int i=0 ; i< S.mat.outerSize() ; i++)
     {
         for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(S.mat,i); it; ++it)
@@ -547,8 +553,8 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatSparse<FPP,Cpu> const& S)
 		ptr_data[it.col() * this->dim1 + it.row()] = it.value();
 
 	}
-    }
-
+    }		
+	
 	isZeros = false;
 	isIdentity = false;
 }
@@ -585,7 +591,7 @@ void Faust::MatDense<FPP,Cpu>::operator*=(const Faust::MatSparse<FPP,Cpu>& S)
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::operator+=(const Faust::MatSparse<FPP,Cpu>& S)
 {
-	if(this->dim1!=S.dim1 || this->dim2!=S.dim2)
+	if(this->dim1!=S.getNbRow() || this->dim2!=S.getNbCol())
 	{
 		handleError(m_className,"operator+= : incorrect matrix dimensions");
 	}
@@ -594,17 +600,6 @@ void Faust::MatDense<FPP,Cpu>::operator+=(const Faust::MatSparse<FPP,Cpu>& S)
 	isZeros = false;
 }
 
-template<typename FPP>
-void Faust::MatDense<FPP,Cpu>::operator-=(const Faust::MatSparse<FPP,Cpu>& S)
-{
-	if(this->dim1!=S.dim1 || this->dim2!=S.dim2)
-	{
-		handleError(m_className,"operator-= : incorrect matrix dimensions");
-	}
-	mat -= S.mat;
-	isIdentity = false;
-	isZeros = false;
-}
 
 
 template<typename FPP>

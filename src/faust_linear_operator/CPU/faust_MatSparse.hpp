@@ -167,8 +167,44 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_
 }
 
 
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const
+{
+	faust_unsigned_int nbColOpS,nbRowOpS;	
+	this->setOp(opThis,nbRowOpS,nbColOpS);	
+	
+	if(nbColOpS != M.getNbRow())
+	{
+		handleError(m_className,"multiply : incorrect matrix dimensions\n");
+	}
+
+	if (M.isIdentity)
+	{
+		M = (*this);
+		M.isIdentity = false;
+		M.isZeros = false;
+
+		if (opThis == 'T')
+			M.transpose();
+	}
+	else if (M.isZeros)
+	{
+		M.resize(nbRowOpS, this->dim2);
+		M.setZeros();
+	}
+	else
+	{
+			
+			if (opThis == 'N') 			
+				M.mat = this->mat * M.mat;
+			else
+				M.mat = this->mat.transpose() * M.mat;
+
+			M.dim1 = nbRowOpS;
+	}
 
 
+}
 
 
 

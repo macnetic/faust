@@ -89,11 +89,11 @@ Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,F
 		x_dense=x;		
 
 		t_sparse.start();
-			S.multiply(x_sparse);
+			S.multiply(x_sparse,'N');
 		t_sparse.stop();
 		
 		t_dense.start();
-			M.multiply(x_dense);
+			M.multiply(x_dense,'N');
 		t_dense.stop();
 
 		

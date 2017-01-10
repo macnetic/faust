@@ -61,8 +61,7 @@
 //! \param FPP scalar numeric type, e.g float or double
 //!
 
-//! Faust::MatDense class template of dense matrix
-template<typename FPP,Device DEVICE> class MatDense;
+
 
 //! Faust::MatSparse class template of sparse matrix
 template<typename FPP,Device DEVICE> class MatSparse;
@@ -77,8 +76,12 @@ template<Device DEVICE> class SpBlasHandle;
 template<typename FPP>
 void Faust::multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
 
+//! modif NB v1102 : comment useless function
+
 template<typename FPP>
 void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
+
+
 
 //! \namespace Faust
 //! \brief Faust namespace contains the principal class of the project.
@@ -87,9 +90,18 @@ namespace Faust
 
     template<typename FPP,Device DEVICE> class MatGeneric;
 
+
+   	
+
+    //! Faust::MatDense class template of dense matrix
+    template<typename FPP,Device DEVICE> class MatDense;	
+
     template<typename FPP>
     class MatSparse<FPP,Cpu> : public Faust::MatGeneric<FPP,Cpu>
     {
+	
+	friend class MatDense<FPP,Cpu>;
+	//friend void MatDense<FPP,Cpu>::operator+=(const MatSparse<FPP,Cpu>& S);	
 
         public:
         MatSparse();
@@ -230,6 +242,14 @@ namespace Faust
 
 	void multiply(Faust::Vect<FPP,Cpu> & vec, char opThis='N') const
 	{ vec.multiplyLeft((*this),opThis);}
+	
+	
+	//! \brief compute MatSparse-MatDense multiplication
+	//! \param M : the dense matrix
+	//! \param opThis : character	
+	//! M = (*this) * M if opThis='N'
+	// M = (*this)' * M if opThis='T' 
+	void multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const;
 
         //! Destructor
         ~MatSparse(){}
@@ -244,15 +264,17 @@ namespace Faust
 
         //! number of non-zero
         faust_unsigned_int nnz;
-
-        friend void Faust::MatDense<FPP,Cpu>::operator=(MatSparse<FPP,Cpu> const& S);
+	
+	//  ** modif NB v1102 ** : comment friend function
+        //friend void Faust::MatDense<FPP,Cpu>::operator=(MatSparse<FPP,Cpu> const& S);
 
         //! *this = (*this) * S
-        friend void Faust::MatDense<FPP,Cpu>::operator*=(const MatSparse<FPP,Cpu>& S);
+        //friend void Faust::MatDense<FPP,Cpu>::operator*=(const MatSparse<FPP,Cpu>& S);
         //! *this = (*this) + S
-        friend void Faust::MatDense<FPP,Cpu>::operator+=(const MatSparse<FPP,Cpu>& S);
+        //friend void Faust::MatDense<FPP,Cpu>::operator+=(const MatSparse<FPP,Cpu>& S);
+	
         //! *this = (*this) - S
-        friend void Faust::MatDense<FPP,Cpu>::operator-=(const MatSparse<FPP,Cpu>& S);
+        //friend void Faust::MatDense<FPP,Cpu>::operator-=(const MatSparse<FPP,Cpu>& S);
 
         
 
@@ -260,12 +282,15 @@ namespace Faust
 
         //! *this = S * (*this)
 		friend void  Faust::Vect<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);
-		friend void  Faust::MatDense<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);
+		/*friend void  Faust::MatDense<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);*/
 		
 		// MODIF AL WARNING, ERROR WITH VISUAL STUDIO 2013 compiler		
 		//friend void Faust::multiply<>(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
-		friend void Faust::spgemm<>(const MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
 
+		//! modif NB v1102 : comment useless function
+		
+		friend void Faust::spgemm<>(const MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
+		
     };
 
 }

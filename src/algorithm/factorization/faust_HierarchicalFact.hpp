@@ -292,19 +292,22 @@ void Faust::HierarchicalFact<FPP,DEVICE>::compute_errors()
 {
    vector<Faust::MatSparse<FPP,DEVICE> > sp_facts;
    get_facts(sp_facts);
+   int nb_factor = sp_facts.size();	
+   vector< Faust::MatGeneric<FPP,DEVICE> *> Transform_facts;
+   Transform_facts.resize(sp_facts.size());
 
+   for (int i=0; i < nb_factor;i++)
+   	Transform_facts[i] = sp_facts[i].Clone();   	
 
-
-   Faust::Transform<FPP,DEVICE> faust_Transform_tmp(sp_facts, get_lambda());
+   Faust::Transform<FPP,DEVICE> faust_Transform_tmp(Transform_facts, get_lambda());
    const Faust::MatDense<FPP,DEVICE> estimate_mat = faust_Transform_tmp.get_product(cublas_handle, cusparse_handle);
-
    Faust::MatDense<FPP,DEVICE> data(palm_global.get_data());
-
+   	
    FPP data_norm = data.norm();
 
-
+   
    data -= estimate_mat;
-
+   	
    errors[0][m_indFact] =  estimate_mat.norm()/data_norm;
    errors[1][m_indFact] =  faust_Transform_tmp.get_total_nnz()/data.getNbRow()/data.getNbCol();
 
