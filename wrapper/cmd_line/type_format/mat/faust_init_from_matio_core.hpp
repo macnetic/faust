@@ -215,8 +215,12 @@ template<typename FPP>
 void write_faust_core_into_matvar(const Faust::Transform<FPP,Cpu> core, matvar_t** matvar, const char* variableName)
 {
 
-	std::vector<Faust::MatSparse<FPP,Cpu> > sparse_facts;
-	core.get_facts(sparse_facts);
+	
+	// TODO : not  compatible with faust mat generic 
+	cerr << "error in write_faust_core_into_matvar(...) : TODO NOT COMPATIBLE with Faust_Transform since they used MatGeneric as factor "<< endl;
+	exit(EXIT_FAILURE);
+	std::vector<Faust::MatSparse<FPP,Cpu> > sparse_facts;	
+	//core.get_facts(sparse_facts);
 	write_faust_spmat_list_into_matvar(sparse_facts,matvar,variableName);
 
 }
