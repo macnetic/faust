@@ -40,7 +40,6 @@
 
 #include "faust_Timer.h"
 #include "faust_Transform.h"
-#include "faust_init_from_matio_params.h"
 #include "faust_init_from_matio_core.h"
 #include <string>
 #include <sstream>
@@ -147,7 +146,7 @@ int main(int argc, char* argv[])
 		if (float(i)/float(nbMultiplication) > percentage)
 		{	
 			percentage+=0.1;
-			std::cout<<"% "<<percentage*100<<std::endl;
+			std::cout<<"%"<<percentage*100<<std::endl;
 		}
 		//std::cout<<i+1<<"/"<<nbMultiplication<<std::endl;	
 	 	Faust::Vect<FPP,Cpu> x(nbCol);

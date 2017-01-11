@@ -41,8 +41,6 @@
 #include "faust_HierarchicalFact.h"
 #include "faust_Timer.h"
 #include "faust_Transform.h"
-#include "faust_init_from_matio_params.h"
-#include "faust_init_from_matio_core.h"
 #include <string>
 #include <sstream>
 #include "faust_BlasHandle.h"

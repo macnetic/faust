@@ -140,16 +140,7 @@ end
 disp('Ok');
 
 
-%% get_fact test
-disp('TEST GET_FACT : ');
-for i=1:nb_fact
-	A=get_fact(F,i);
-	if(A~=factors{i})
-		error('get_fact : invalid factor');
-	end
 
-end
-disp('Ok');
 
 
 
@@ -332,127 +323,8 @@ end
 
 disp('Ok');
 
-%% load_faust and save_faust test
-disp('TEST LOAD AND SAVE : ');
-filename = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
-disp(['save faust into the file : ' filename]); 
-save(F,filename);
-F_loaded = Faust(filename);
-[dim1_loaded,dim2_loaded]=size(F_loaded);
-
-if (dim1_loaded ~= dim1) | (dim2_loaded ~= dim2)
-	error('load and save faust : invalid dimension');
-end
-
-nb_fact_load=get_nb_factor(F);
-if (nb_fact_load ~= nb_fact)
-	error('load and save faust : invalid number of factor of the loaded faust ');
-end
-
-for i=1:nb_fact
-	A=get_fact(F_loaded,i);
-	if(A~=factors{i})
-		error('get_fact : invalid factor');
-	end
-
-end
 
 
-
-filename_trans = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust_trans.mat'];
-disp(['save transposed faust into the file : ' filename_trans]); 
-save(F_trans,filename_trans);
-
-F_trans_loaded = Faust(filename_trans);
-[dim1_trans_faust_loaded,dim2_trans_faust_loaded]=size(F_trans_loaded);
-
-if (dim1_trans_faust_loaded ~= dim2) | (dim2_trans_faust_loaded ~= dim1)
-	error(['save transposed : invalid dimension to the loaded-saved faust']);
-end
-
-F_dense_trans_loaded=full(F_trans_loaded);
-if (F_dense_trans_loaded ~= F_dense')
-	error(['save transposed : invalid faust']);
-end
-
-
-
-
-
-disp('Ok');
-
-%% slicing test
-disp('TEST SLICING : ');
-for i=1:dim1
-	for j=1:dim2
-		F_i_j=F(i,j);
-		F_trans_j_i=F_trans(j,i);
-
-		if (size(F_i_j) ~= [1 1])
-			error('invalid size of F(i,j)');
-		end
-		if (size(F_trans_j_i) ~= [1 1])
-			error('invalid size of F_trans(j,i)');
-		end
-		if (F_i_j ~= F_dense(i,j))
-			error('F(i,j) ~= F_dense(i,j)');
-		end
-		if (F_trans_j_i ~= F_dense_trans(j,i))
-			error('F(j,i) ~= F_dense_trans(j,i)');
-		end
-	end
-end
-
-F_slice_slice=F(:,:);
-if (size(F_slice_slice,1) ~= dim1) | (size(F_slice_slice,2) ~= dim2)
-	error('invalid dimension');
-end
-if (F_slice_slice ~= F_dense)
-	error('F(:,:) ~= F_dense');
-end
-
-
-F_trans_slice_slice=F_trans(:,:);
-if (size(F_trans_slice_slice,1) ~= dim2) | (size(F_trans_slice_slice,2) ~= dim1)
-	error('invalid dimension');
-end
-if (F_trans_slice_slice ~= F_dense')
-	error('F_trans(:,:) ~= F_dense''');
-end
-
-
-F_slice_slice_2=F(1:dim1,1:dim2);
-if (size(F_slice_slice_2,1) ~= dim1) | (size(F_slice_slice_2,2) ~= dim2)
-	error('invalid dimension');
-end
-if (F_slice_slice_2 ~= F_dense)
-	error('F(1:dim1,1:dim2) ~= F_dense');
-end
-
-F_inv=F(dim1:-1:1,dim2:-1:1);
-if (size(F_inv,1) ~= dim1) | (size(F_inv,2) ~= dim2)
-	error('invalid dimension');
-end
-
-
-if (F_inv ~= F_dense(dim1:-1:1,dim2:-1:1))
-	error('F(1:dim1,1:dim2) ~= F_dense(dim1:-1:1,dim2:-1:1)');
-end 
-
-
-%% operator end with slicing
-F_end = F(1:end,1:end);
-if (size(F_end,1) ~= dim1) | (size(F_end,2) ~= dim2)
-	error('invalid dimension');
-end 
-
-if (F_end ~= F_dense(1:end,1:end))
-	error('F(1:end,1:end) ~= F_dense(1:end,1:end)');
-end
-
-
-
-disp('Ok');
 
 
 
@@ -641,6 +513,146 @@ if (norm_faust_trans ~= norm_faust)
 end
 
 disp('Ok');
+
+
+
+
+%% load_faust and save_faust test
+disp('TEST LOAD AND SAVE : ');
+filename = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust.mat'];
+disp(['save faust into the file : ' filename]); 
+save(F,filename);
+F_loaded = Faust(filename);
+[dim1_loaded,dim2_loaded]=size(F_loaded);
+
+if (dim1_loaded ~= dim1) | (dim2_loaded ~= dim2)
+	error('load and save faust : invalid dimension');
+end
+
+nb_fact_load=get_nb_factor(F);
+if (nb_fact_load ~= nb_fact)
+	error('load and save faust : invalid number of factor of the loaded faust ');
+end
+
+for i=1:nb_fact
+	A=get_fact(F_loaded,i);
+	if(A~=factors{i})
+		error('get_fact : invalid factor');
+	end
+
+end
+
+
+
+filename_trans = [ '@FAUST_BIN_TEST_OUTPUT_DIR@' filesep 'faust_trans.mat'];
+disp(['save transposed faust into the file : ' filename_trans]); 
+save(F_trans,filename_trans);
+
+F_trans_loaded = Faust(filename_trans);
+[dim1_trans_faust_loaded,dim2_trans_faust_loaded]=size(F_trans_loaded);
+
+if (dim1_trans_faust_loaded ~= dim2) | (dim2_trans_faust_loaded ~= dim1)
+	error(['save transposed : invalid dimension to the loaded-saved faust']);
+end
+
+F_dense_trans_loaded=full(F_trans_loaded);
+if (F_dense_trans_loaded ~= F_dense')
+	error(['save transposed : invalid faust']);
+end
+
+
+
+
+
+disp('Ok');
+
+%% get_fact test
+disp('TEST GET_FACT : ');
+for i=1:nb_fact
+	A=get_fact(F,i);
+	if(A~=factors{i})
+		error('get_fact : invalid factor');
+	end
+
+end
+disp('Ok');
+
+
+
+%% slicing test
+disp('TEST SLICING : ');
+for i=1:dim1
+	for j=1:dim2
+		F_i_j=F(i,j);
+		F_trans_j_i=F_trans(j,i);
+
+		if (size(F_i_j) ~= [1 1])
+			error('invalid size of F(i,j)');
+		end
+		if (size(F_trans_j_i) ~= [1 1])
+			error('invalid size of F_trans(j,i)');
+		end
+		if (F_i_j ~= F_dense(i,j))
+			error('F(i,j) ~= F_dense(i,j)');
+		end
+		if (F_trans_j_i ~= F_dense_trans(j,i))
+			error('F(j,i) ~= F_dense_trans(j,i)');
+		end
+	end
+end
+
+F_slice_slice=F(:,:);
+if (size(F_slice_slice,1) ~= dim1) | (size(F_slice_slice,2) ~= dim2)
+	error('invalid dimension');
+end
+if (F_slice_slice ~= F_dense)
+	error('F(:,:) ~= F_dense');
+end
+
+
+F_trans_slice_slice=F_trans(:,:);
+if (size(F_trans_slice_slice,1) ~= dim2) | (size(F_trans_slice_slice,2) ~= dim1)
+	error('invalid dimension');
+end
+if (F_trans_slice_slice ~= F_dense')
+	error('F_trans(:,:) ~= F_dense''');
+end
+
+
+F_slice_slice_2=F(1:dim1,1:dim2);
+if (size(F_slice_slice_2,1) ~= dim1) | (size(F_slice_slice_2,2) ~= dim2)
+	error('invalid dimension');
+end
+if (F_slice_slice_2 ~= F_dense)
+	error('F(1:dim1,1:dim2) ~= F_dense');
+end
+
+F_inv=F(dim1:-1:1,dim2:-1:1);
+if (size(F_inv,1) ~= dim1) | (size(F_inv,2) ~= dim2)
+	error('invalid dimension');
+end
+
+
+if (F_inv ~= F_dense(dim1:-1:1,dim2:-1:1))
+	error('F(1:dim1,1:dim2) ~= F_dense(dim1:-1:1,dim2:-1:1)');
+end 
+
+
+%% operator end with slicing
+F_end = F(1:end,1:end);
+if (size(F_end,1) ~= dim1) | (size(F_end,2) ~= dim2)
+	error('invalid dimension');
+end 
+
+if (F_end ~= F_dense(1:end,1:end))
+	error('F(1:end,1:end) ~= F_dense(1:end,1:end)');
+end
+
+
+
+disp('Ok');
+
+
 
 
 

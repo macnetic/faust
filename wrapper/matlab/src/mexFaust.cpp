@@ -90,22 +90,28 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(!mxIsCell(prhs[1]))
 			mexErrMsgTxt("1st arg input must be a cell-array");
         
-		std::vector<Faust::MatSparse<FFPP,Cpu> > vec_spmat;
+		// v1105 : Faust::Transform<FFPP,Cpu> is no longer made of Faust::MatSparse<FFPP,Cpu> but of pointer of abstract class Faust::MatGeneric<FFPP,Cpu>
+		//old version : std::vector<Faust::MatSparse<FFPP,Cpu> > vec_spmat;
+		std::vector<Faust::MatGeneric<FFPP,Cpu>*> list_factor;
 		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
+
 		if (nb_element != 0)
 		{
 			mxArray * mxMat;
-			for (int i=0;i<nb_element;i++)
+			for (int i=0; i < nb_element; i++)
 			{
 				mxMat=mxGetCell(prhs[1],i);	
-				addSpmat<FFPP>(mxMat,vec_spmat);
+				concatMatGeneric<FFPP>(mxMat,list_factor);
 			}
 		}
         
         FFPP lambda = 1.0;
 		if (nrhs > 2)			
 			lambda = (FFPP) mxGetScalar(prhs[2]);
-		Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>(vec_spmat,lambda);
+		Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>(list_factor,lambda);
+		for (int i=0;i<list_factor.size();i++)
+			delete list_factor[i];		
+	
 		plhs[0]=convertPtr2Mat<Faust::Transform<FFPP,Cpu> >(F);
 
 		return;

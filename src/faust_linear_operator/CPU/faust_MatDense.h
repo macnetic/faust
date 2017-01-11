@@ -199,7 +199,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : MatGeneric<FPP,Cpu>(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
         MatDense(const faust_unsigned_int nbRow) : MatGeneric<FPP,Cpu>(nbRow,nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}
         /// Destructor of MatDense
-        ~MatDense(){resize(0,0);}
+        ~MatDense(){resize(0,0);std::cout<<"destructor dense mat"<<std::endl;}
 
 	
 	///**** METHOD INHERITED FROM VIRTUAL MATGENERIC ****///

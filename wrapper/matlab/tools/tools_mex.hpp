@@ -44,6 +44,7 @@
 
 
 //#include "tools_mex.h"
+#include "faust_MatGeneric.h"
 #include "faust_ConstraintGeneric.h"
 #include "faust_ConstraintFPP.h"
 #include "faust_ConstraintMat.h"
@@ -395,23 +396,27 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS
 }
 
 template<typename FPP>
-void addSpmat(const mxArray * mxMat,std::vector<Faust::MatSparse<FPP,Cpu> > &vec_spmat)
+void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cpu> *> &list_mat)
 {
 	if (mxMat == NULL)
-	   mexErrMsgTxt("addSpmat : empty matlab matrix"); 
+	   mexErrMsgTxt("concatMatGeneric : empty matlab matrix"); 
 
-	Faust::MatSparse<FPP,Cpu> spM;
+	Faust::MatGeneric<FPP,Cpu> *  M;
+	
 	if (!mxIsSparse(mxMat))
 	{
-		Faust::MatDense<FPP,Cpu> M;
-		getFaustMat(mxMat,M);
-		spM = M;
+		Faust::MatDense<FPP,Cpu> denseM;
+		getFaustMat(mxMat,denseM);
+		M=denseM.Clone();
 	}else
 	{
+		Faust::MatSparse<FPP,Cpu> spM;		
 		getFaustspMat(mxMat,spM);
+		M=spM.Clone();
 	}
 
-		vec_spmat.push_back(spM);
+		list_mat.push_back(M);
+		
 
 }
 

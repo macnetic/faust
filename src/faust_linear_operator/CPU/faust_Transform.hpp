@@ -479,13 +479,16 @@ void Faust::Transform<FPP,Cpu>::multiplyLeft(const Faust::Transform<FPP,Cpu> & A
 template<typename FPP>
 Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_int id)const
 {
-	if(id>=size())
+	handleError(m_className,"get_fact : not anymore implemented");
+	// v1105 : method not anymore compatible since Faust::Transform<FPP,Cpu> is now a std::vector<Faust::MatGeneric<FPP,Cpu>*>, not std::vector<Faust::MatSparse<FPP,Cpu> >  	
+	/*if(id>=size())
 	{
 		handleError(m_className,"get_fact : id exceed Faust::Transform size or id < 0");
 	}
 
 
-	return data[id];
+	return data[id];*/
+	
 }
 
 

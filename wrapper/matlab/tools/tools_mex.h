@@ -48,6 +48,7 @@ namespace Faust {
 	template<typename FPP, Device DEVICE> class ConstraintGeneric;
 	template<typename FPP, Device DEVICE> class Vect;
 	template<typename FPP, Device DEVICE> class Params;
+	template<typename FPP, Device DEVICE> class MatGeneric;
 	template<typename FPP, Device DEVICE> class MatDense;
 	template<typename FPP, Device DEVICE> class MatSparse;
 }
@@ -117,12 +118,13 @@ void setVectorFaustMat(std::vector<Faust::MatDense<FPP,Cpu> > &vecMat, mxArray *
 
 
 /*!
-        *  \brief convert the matlab mxMat* into a Faust::MatSparse<FPP,Cpu> and push it to the end of the 			list vec_spmat
+        *  \brief convert the matlab mxMat* into a Faust::MatGeneric<FPP,Cpu>* and push it to the end of list_mat
         *  \param * mxMat : pointer to the matlab matrix format
-	*  \tparam vec_spmat : std::vector of Faust::MatSparse<FPP,Cpu>
+	*  \tparam list_mat : std::vector of pointer of Faust::MatGeneric<FPP,Cpu>
+	   \warning : dynamic allocation is made so , "delete list_mat[list_mat.size()-1]" must be done	
         */
 template<typename FPP>
-void addSpmat(const mxArray * mxMat, std::vector<Faust::MatSparse<FPP,Cpu> > &vec_spmat);
+void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cpu> *> &list_mat);
 
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
 template<typename FPP>

@@ -9,6 +9,11 @@
 
 
 ##########################################################################
+version 1105 : 
+	-> MATLAB wrapper (debut compatibility Faust::MatGeneric)
+version 1104 : 
+	-> avoid memory leak due to std::vector<Faust::MatGeneric*>, solution: create virtual destructor for abstract class Faust::MatGeneric
+
 
 version 1103 :
 	-> test MATFILE marche
