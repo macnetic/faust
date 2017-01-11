@@ -99,7 +99,25 @@ if(BUILD_WRAPPER_MATLAB)
 endif()
 
 
+####### UNIT TEST ########
+foreach(TEST_FPP float double)	
+	configure_file(${FAUST_SRC_TEST_SRC_DIR}/unit_test_faust_mult.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/unit_test_faust_mult_${TEST_FPP}.cpp @ONLY)
 
+	# Generation of the binary files in double and float precision
+	add_executable(unit_test_faust_mult_${TEST_FPP} ${FAUST_BIN_TEST_SRC_DIR}/unit_test_faust_mult_${TEST_FPP}.cpp ${FAUST_BIN_TEST_SRC_DIR}/ )
+   	
+	target_link_libraries(unit_test_faust_mult_${TEST_FPP} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+			
+	add_test(NAME UNIT_MULT_FAUST_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/unit_test_faust_mult_${TEST_FPP})
+				
+
+endforeach()
+
+	
+
+
+
+####### FIN UNIT TEST #####
 
 
 

@@ -37,108 +37,134 @@
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 /****************************************************************************/
-#include "faust_exception.h"
-
-// useful for optimize with multiplication
+#include "faust_MatSparse.h"
+#include "faust_HierarchicalFact.h"
 #include "faust_Timer.h"
+#include "faust_Transform.h"
+#include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_core.h"
+#include <string>
+#include <sstream>
+#include "faust_BlasHandle.h"
+#include "faust_SpBlasHandle.h"
 
 
-template<typename FPP,Device DEVICE>
-void Faust::MatGeneric<FPP,DEVICE>::setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const
+#include <iostream>
+#include <iomanip>
+
+/** \brief unitary test for testing multiplication by faust									
+*/
+
+typedef @TEST_FPP@ FPP;
+
+//using namespace Faust;
+
+int main(int argc, char* argv[])
 {
-    if(op == 'N')
-    {
-        nbRowOp=getNbRow();
-        nbColOp=getNbCol();
-    }
-    else if(op == 'T')
-    {
-        nbRowOp=getNbCol();
-        nbColOp=getNbRow();
-    }
-    else
-        handleError("Faust::MatGeneric::","setOp : invalid character");
-}
+	if (typeid(FPP) == typeid(double))
+  	{
+		cout<<"floating point precision == double"<<endl;
+  	}
 
+  	if (typeid(FPP) == typeid(float))
+  	{
+		cout<<"floating point precision == float"<<endl;
+  	}
 
+	int dim1 = 10;
+	int dim2 = 5;
+	int dim3 = 2;
 
-//template <typename FPP, Device DEVICE>
-template<typename FPP>  
-Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,Faust::MatSparse<FPP,Cpu> const & S)
-{
-	std::cout<<"DEBUT OPTIMIZE "<<std::endl;
-	
-	if ( (M.getNbCol() != S.getNbCol()) | (M.getNbRow() != S.getNbRow()) )
-		handleError("Faust::MatGeneric::", " Faust::optimize : matrix M and S have not the same size");
-	
-	Faust::Vect<FPP,Cpu> x_dense(M.getNbCol());
-	
-	for (int i=0;i<M.getNbCol();i++)
+	int nb_factor = 3;
+
+	Faust::MatDense<FPP,Cpu> fact1(dim1,dim2);
+	for (int j=0;j < dim2; j ++)
 	{
-		x_dense[i]=i*0.005;
+		fact1[j*dim1+j]= (FPP) 2.0;
+	};
+
+
+					      
+
+	vector<Faust::MatGeneric<FPP,Cpu> *> list_fact;
+	list_fact.resize(nb_factor);
+	Faust::MatDense<FPP,Cpu> fact2(dim2,dim2);
+	for (int i=0;i< dim2; i++)
+	{
+		for (int j=0;j< dim2; j++)
+		{
+			fact2[i*dim2+j]=(FPP) (i+1);
+		}
+		
 	}
 
-	Faust::Vect<FPP,Cpu> const x(x_dense);
-	Faust::Vect<FPP,Cpu> x_sparse(x_dense);
-
-	int nb_mult=10;
-	Faust::Timer t_dense,t_sparse;
-	for (int i=0;i<nb_mult;i++)
-	{	
-		x_sparse=x;
-		x_dense=x;		
-
-		t_sparse.start();
-			S.multiply(x_sparse,'N');
-		t_sparse.stop();
-		
-		t_dense.start();
-			M.multiply(x_dense,'N');
-		t_dense.stop();
-
+	Faust::MatDense<FPP,Cpu> fact3(dim2,dim2);
+	for (int i=0;i< dim2; i++)
+	{
+		for (int j=0;j< dim2; j++)
+		{
+			fact3[i*dim2+j]=(FPP) (i+2);
+		}
 		
 	}
-	//float density = ((float)S.getNonZeros())/((float)(S.getNbRow()*S.getNbCol()));	
-	float density = S.density();	
-	std::cout<<" density "<<density<<std::endl;
-	std::cout<<" tps sparse "<<t_sparse.get_time()<<std::endl;
-	std::cout<<" tps dense "<<t_dense.get_time()<<std::endl;
 
-	//if (M.getNbCol() != M.getNbRow())
-	if (t_sparse.get_time() <= t_dense.get_time())
-	{
-		std::cout<<" CHOICE SPARSE "<<t_dense.get_time()<<std::endl;
-		return new MatSparse<FPP,Cpu>(S);
-	}else
-	{
-		std::cout<<" CHOICE DENSE "<<t_dense.get_time()<<std::endl;		
-		return new MatDense<FPP,Cpu>(M);
-	}
-		
-	std::cout<<"FIN OPTIMIZE "<<t_sparse.get_time()<<std::endl;
-
-
-}
-
-template<typename FPP,Device DEVICE>
-Faust::MatGeneric<FPP,DEVICE>::~MatGeneric()
-{
+	std::cout<<"fact1 value"<<std::endl;
+	fact1.Display();
+	std::cout<<"fact2 value"<<std::endl;
+	fact2.Display();
+	std::cout<<"fact3 value"<<std::endl;
+	fact3.Display();
+	list_fact[0]=fact1.Clone();
+	list_fact[1]=fact2.Clone();
+	list_fact[2]=fact3.Clone();
 	
 
+
+	
+	
+	
+	Faust::Transform<FPP,Cpu> F(list_fact);
+	std::cout<<"delete list_fact"<<std::endl;	
+	for (int i=0;i<list_fact.size();i++)
+	{
+		delete list_fact[i];	
+	}
+	/*
+	std::cout<<"prod mult"<<std::endl;
+	Faust::MatDense<FPP,Cpu> F_prod=F.get_product();
+	
+	/*	
+	std::cout<<"F value "<<std::endl; 
+	F_prod.Display();
+
+	Faust::MatDense<FPP,Cpu> X(dim2,dim3);
+	for (int j=0;j < dim3; j ++)
+	{
+		for (int i=0;i<dim2;i++)
+				X[j*dim2+i]= (FPP) (j*dim2+i);
+	};
+	 std::cout<<"X value "<<std::endl; 
+	 X.Display();
+
+	Faust::MatDense<FPP,Cpu> Y;
+	
+	Y = F * X;
+
+	
+
+	Faust::MatDense<FPP,Cpu> Y_prod=X;
+	
+	F_prod.multiply(Y_prod,'N');
+	
+	std::cout<<"Y value "<<std::endl; 
+	Y.Display();
+
+	std::cout<<"Y_prod value "<<std::endl; 
+	Y_prod.Display();
+	*/
+	
+
+	
+	return 0;
+
 }
-
-template<typename FPP,Device DEVICE>
-void Faust::MatGeneric<FPP,DEVICE>::multiply(Faust::Vect<FPP,DEVICE> & vec, char opThis) const
-{
-	handleError("Faust::MatGeneric::","multiply (Vect): this function should not be called");
-
-}
-
-template<typename FPP,Device DEVICE>
-void Faust::MatGeneric<FPP,DEVICE>::multiply(Faust::MatDense<FPP,DEVICE> & vec, char opThis) const
-{
-	handleError("Faust::MatGeneric::","multiply (MatDense): this function should not be called");
-
-}
-
-

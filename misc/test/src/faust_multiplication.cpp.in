@@ -129,11 +129,14 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}			
 	}
-
-	int nbMultiplication = 10000;
-
 	
-	//multiplication
+
+	/****          MULTIPLICATION     ******/
+	//int nbMultiplication = 10000;
+	int nbMultiplication = 100;
+
+	float percentage = 0;
+	
 	Faust::Timer t_dense;
 	std::cout<<std::endl<<" multiplication "<<std::endl;
 	std::vector<Faust::Timer> t_faust;
@@ -141,6 +144,11 @@ int main(int argc, char* argv[])
 
 	for (int i=0;i<nbMultiplication;i++)
 	{	
+		if (float(i)/float(nbMultiplication) > percentage)
+		{	
+			percentage+=0.1;
+			std::cout<<"% "<<percentage*100<<std::endl;
+		}
 		//std::cout<<i+1<<"/"<<nbMultiplication<<std::endl;	
 	 	Faust::Vect<FPP,Cpu> x(nbCol);
 		Faust::Vect<FPP,Cpu> y;	 	

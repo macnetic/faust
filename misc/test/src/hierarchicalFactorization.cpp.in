@@ -196,6 +196,9 @@ int main(int argc, char* argv[])
 
 	Faust::Transform<FPP,Cpu> hierFactCore(list_fact_generic);
 
+	for (int i=0;i<list_fact_generic.size();i++)
+		delete list_fact_generic[i];
+
 	char nomFichier[100];
 	string outputFile="@FAUST_BIN_TEST_OUTPUT_DIR@/hier_fact_factorisation.dat";
 	

@@ -94,7 +94,8 @@ namespace Faust
 	                       which means dynamic type of the copy could be different from the original one <br>
 	                      -False, the return copy is simple, the dynamic type isn't changed <br>   						(default value is False) <br>					
         //! \return  a pointer of MatGeneric
-	//  \warning the dynamic type of the copy can be different from the original object
+	//  \warning the dynamic type of the copy can be different from the original object, 
+	//  \warning dynamic allocation of the return pointer, must be delete by hand
 	*/
 	virtual MatGeneric<FPP,DEVICE>* Clone(const bool isOptimize=false) const=0;
 	
@@ -128,10 +129,14 @@ namespace Faust
 	//! \brief get the dynamic type of the matrix (SPARSE or DENSE)
 	virtual MatType getType() const=0;
 	
-	//! \brief multply a matrix by the given scalar alpha
+	//! \brief multiply a matrix by the given scalar alpha
 	// \param alpha : multplicative scalar
 	virtual void operator*=(const FPP alpha)=0;
-	
+
+	//! \brief 
+	//! \warning : declare a virtual destructor is mandatory for an abstract class
+	//! in order to allow descendant class destructor to clean up in case of pointer to the abstract class 
+	virtual ~ MatGeneric()=0;
 	
 
 

@@ -143,7 +143,7 @@ namespace Faust
         void multiplyLeft(const Transform<FPP,Cpu> & A);
         void scalarMultiply(const FPP scalar);
         FPP spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
-        ~Transform(){}
+        ~Transform(){for (int i=0;i<data.size();i++) delete data[i];}
 	
 
 	/*!

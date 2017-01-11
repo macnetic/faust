@@ -113,7 +113,8 @@ void init_faust_core_from_matvar(Faust::Transform<FPP,DEVICE>& core, matvar_t* c
 	{
 		current_spmat_var = Mat_VarGetCell(cell_var, j);
 		init_spmat_from_matvar(data_spmat, current_spmat_var);
-		core.push_back(data_spmat.Clone());
+		Faust::MatGeneric<FPP,DEVICE> * ptr_data_spmat = &data_spmat;
+		core.push_back(ptr_data_spmat);
 	}
 
 }

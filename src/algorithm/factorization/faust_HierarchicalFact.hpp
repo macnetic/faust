@@ -300,6 +300,11 @@ void Faust::HierarchicalFact<FPP,DEVICE>::compute_errors()
    	Transform_facts[i] = sp_facts[i].Clone();   	
 
    Faust::Transform<FPP,DEVICE> faust_Transform_tmp(Transform_facts, get_lambda());
+   
+   // delete all the dynamic memory allocated by the Clone method
+   for (int i=0; i < nb_factor;i++)
+	delete 	Transform_facts[i];
+  
    const Faust::MatDense<FPP,DEVICE> estimate_mat = faust_Transform_tmp.get_product(cublas_handle, cusparse_handle);
    Faust::MatDense<FPP,DEVICE> data(palm_global.get_data());
    	
