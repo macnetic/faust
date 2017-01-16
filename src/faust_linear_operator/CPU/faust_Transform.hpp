@@ -158,7 +158,7 @@ Faust::Transform<FPP,Cpu>::Transform() :
 	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	totalNonZeros(0)
 {
-
+	
 #ifdef __COMPILE_TIMERS__
 	t_multiply_vector.resize(0);
 #endif 
@@ -168,9 +168,17 @@ Faust::Transform<FPP,Cpu>::Transform() :
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
-	data(A.data),
+	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	totalNonZeros(A.totalNonZeros)
 {
+	//std::cout<<"debut inside copy constructor"<<std::endl;	
+	data.resize(A.size());	
+	for (int i=0 ; i<data.size() ; i++)
+	{
+		//std::cout<<"iter "<<i<<"/"<<data.size()<<std::endl;	
+		data[i]=A.data[i]->Clone();
+	}
+	//std::cout<<"fin inside copy constructor"<<std::endl;
 #ifdef __COMPILE_TIMERS__
 		this->t_multiply_vector.resize(data.size());
 #endif 
@@ -178,13 +186,10 @@ Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 }
 
 template<typename FPP>
-Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *> & facts, const FPP lambda_ /* =1.0 */) :
+Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *> & facts, const FPP lambda_ /*default value = 1.0 */,const bool optimizedCopy /*default value = true*/) :
     data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	totalNonZeros(0)
 {	
-	/* the copy of the factor is optimized */	
-	bool optimizedCopy = true;
-
 	data.resize(facts.size());	
 	for (int i=0 ; i<data.size() ; i++)
 	{
@@ -201,8 +206,8 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 	this->check_factors_validity();
 }
 
-template<typename FPP>
 
+template<typename FPP>
 void Faust::Transform<FPP,Cpu>::check_factors_validity() const
 {
 		
@@ -221,15 +226,7 @@ void Faust::Transform<FPP,Cpu>::check_factors_validity() const
 
 }
 
-/*
-template<typename FPP>
-void Faust::Transform<FPP,Cpu>::get_facts(std::vector<Faust::MatDense<FPP,Cpu> >& facts)const
-{
-	facts.resize(size());
-	for (int i=0;i<size();i++)
-		facts[i] = data[i];
-}
-*/
+
 
 
 template<typename FPP>
@@ -291,26 +288,6 @@ void Faust::Transform<FPP,Cpu>::updateNonZeros()
 
 
 template<typename FPP>
-Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts) :
-	data(std::vector<Faust::MatSparse<FPP,Cpu> >()),
-	totalNonZeros(0)
-{
-	Faust::MatSparse<FPP,Cpu> spfact;
-	for (int i=0;i<facts.size();i++)
-	{
-		spfact = facts[i];
-		data.push_back(spfact);
-		totalNonZeros += data[i].getNonZeros();
-	}
-	#ifdef __COMPILE_TIMERS__
-		this.t_multiply_vector.resize(data.size());
-	#endif
-}
-
-
-
-
-template<typename FPP>
 Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThis)const
 {
 
@@ -321,10 +298,17 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThi
 	}
 	
 	// modif NB v1102 : new method compatible with factor as MatGeneric
-	Faust::MatDense<FPP,Cpu> prod(data[0]->getNbCol());
+	faust_unsigned_int dim;
+	if (opThis == 'T')
+		dim = data[0]->getNbRow();
+	else
+		dim = data[size()-1]->getNbCol();
+
+	Faust::MatDense<FPP,Cpu> prod(dim);
+		
 	prod.setEyes();
 
-	return this->multiply(prod,'N');
+	return this->multiply(prod,opThis);
 
 
 
@@ -411,7 +395,10 @@ FPP Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, FPP threshol
 		return 1;
 	}else
 	{
+		//std::cout<<"Faust debut spectralNorm"<<std::endl;		
+		//std::cout<<"copy constructor"<<std::endl;		
 		Faust::Transform<FPP,Cpu> AtA((*this)); // modif AL <FPP,Cpu>
+		//std::cout<<"transposition"<<std::endl;		
 		AtA.transpose();
 		if (getNbCol() < getNbRow())
 		{
@@ -420,9 +407,30 @@ FPP Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, FPP threshol
 		{
 			AtA.multiplyLeft((*this));
 		}
+		//std::cout<<"Faust fin spectralNorm"<<std::endl;
 		return std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag));
 	}
 }
+
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::operator=(const Transform<FPP,Cpu>&  f)
+{
+  	for (int i=0;i<size();i++)
+		delete data[i];
+
+  	data.resize(0);
+  	data.resize(f.size());
+
+	for (int i=0;i<f.size();i++)
+		data[i]=f.data[i]->Clone();
+
+	this->totalNonZeros=f.totalNonZeros;
+  	
+}
+
+
+
+
 
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::multiply(const Faust::Transform<FPP,Cpu> & A) // modif AL <FPP,Cpu>
@@ -442,8 +450,12 @@ void Faust::Transform<FPP,Cpu>::multiply(const Faust::Transform<FPP,Cpu> & A) //
 			{
 				handleError(m_className,"multiply : dimensions of the 2 faust_transform are in conflict");
 			}
-			data.insert(data.end(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;
-		}
+			//data.insert(data.end(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;
+			for (int i=0;i<A.size();i++)
+			{			
+				this->push_back(A.data[i]);
+			}		
+		}	
 	}
 	#ifdef __COMPILE_TIMERS__
 		this->t_multiply_vector.resize(data.size());
@@ -469,7 +481,12 @@ void Faust::Transform<FPP,Cpu>::multiplyLeft(const Faust::Transform<FPP,Cpu> & A
 			{
 				handleError(m_className,"multiplyLeft : dimensions of the 2 faustcore are in conflict");
 			}
-			data.insert(data.begin(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;
+			//data.insert(data.begin(),A.data.begin(),A.data.end());totalNonZeros+=A.totalNonZeros;
+			for (int i=A.size()-1;i>=0;i--)
+			{			
+				this->push_first(A.data[i]);
+			}
+			
 		}
 	}
 }
@@ -477,9 +494,17 @@ void Faust::Transform<FPP,Cpu>::multiplyLeft(const Faust::Transform<FPP,Cpu> & A
 
 
 template<typename FPP>
-Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_int id)const
+Faust::MatGeneric<FPP,Cpu>* Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_int id) const
 {
-	handleError(m_className,"get_fact : not anymore implemented");
+	if(id>=size())
+	{
+		handleError(m_className,"get_fact : id exceed Faust::Transform size or id < 0");
+	}
+
+
+	return data[id]->Clone();
+	 
+	//handleError(m_className,"get_fact : not anymore implemented");
 	// v1105 : method not anymore compatible since Faust::Transform<FPP,Cpu> is now a std::vector<Faust::MatGeneric<FPP,Cpu>*>, not std::vector<Faust::MatSparse<FPP,Cpu> >  	
 	/*if(id>=size())
 	{
@@ -720,19 +745,21 @@ void Faust::Transform<FPP,Cpu>::setOp(const char op, faust_unsigned_int& nbRowOp
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::Display()const
 {
-	cout << "SIZE" << size() <<endl;
-	for (int i=0 ; i<size() ; i++)
-   	{
-      		if(data[i].getNbCol()>20)
-         		cout << "data["<<i<<"] = "<< data[i].getNbRow() <<"x"<< data[i].getNbCol()<<" sparse matrix with "<<data[i].getNonZeros()<<" non-zero values"<<endl;
-      		else
-      		{
-         		cout << "data["<<i<<"] = "<<endl;
-         		data[i].Display();
-         		cout<<endl;
-      		}
-   	}
-   	cout<<endl;
+	
+	if (size() == 0)
+		std::cout<<"empty Faust"<<std::endl;
+	else
+	{
+		std::cout<<"Faust of size : "<<this->getNbRow()<<"x"<<this->getNbCol()<<", nb factor "<<size()<<", RCG "<<getRCG()<< ",nnz "<<this->get_total_nnz()<<std::endl; 		
+		for (int i=0 ; i<size() ; i++)
+		{
+			std::cout<<"- FACTOR "<<i;
+			data[i]->Display();
+
+		}
+
+
+	}	
 }
 
 

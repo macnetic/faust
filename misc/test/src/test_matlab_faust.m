@@ -85,8 +85,10 @@ F = Faust(factors);
 empty_F=Faust({});
 disp('Ok');
 
-
-
+%% size test
+disp('TEST DISP : ');
+disp(F);
+disp('Ok');
 
 %% size test
 disp('TEST SIZE : ');

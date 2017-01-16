@@ -252,7 +252,7 @@ namespace Faust
 	void multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const;
 
         //! Destructor
-        ~MatSparse(){std::cout<<"destructor MatSparse"<<std::endl;/*this->mat.resize(0,0);*/}
+        ~MatSparse(){/*std::cout<<"destructor MatSparse"<<std::endl;*//*this->mat.resize(0,0);*/}
 
         private:
         void update_dim(){this->dim1=mat.rows();this->dim2=mat.cols();nnz=mat.nonZeros();}

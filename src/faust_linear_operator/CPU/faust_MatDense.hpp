@@ -478,24 +478,27 @@ void Faust::MatDense<FPP,Cpu>::sub(Faust::MatDense<FPP,Cpu> const& A)
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::Display() const
 {
-    std::cout << "nb_row=" << this->getNbRow() << endl;
-    std::cout << "nb_col=" << this->getNbCol()   <<endl;
+    std::cout<<"type : DENSE";
+    Faust::MatGeneric<FPP,Cpu>::Display();	
     if(isZeros)
-        cout << this->dim1 << " by " << this->dim2 << " matrix of zeros" << endl;
+        cout <<"zeros matrix flag";
     else if (isIdentity)
-        cout << this->dim1 << " by " << this->dim2 << " identity matrix" << endl;
-    else if (this->dim1*this->dim2==0)
-        cout << this->dim1 << " by " << this->dim2 << " empty matrix" << endl;
+        cout <<" identity matrix flag";
+
+    		
     else
     {
-        for (int i=0 ; i<this->dim1 ; i++)
-        {
-            for(int j=0 ; j<this->dim2 ; j++)
-                cout << (*this)(i,j) << " " ;
-            cout << endl;
-        }
+	if (this->dim1*this->dim2 < 100)
+	{        
+		for (int i=0 ; i<this->dim1 ; i++)
+		{
+		    for(int j=0 ; j<this->dim2 ; j++)
+		        cout << (*this)(i,j) << " " ;
+		    cout << endl;
+		}
+	}
     }
-    cout<<endl;
+    std::cout<<std::endl; 	
 }
 
 template<typename FPP>

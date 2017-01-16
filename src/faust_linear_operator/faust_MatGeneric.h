@@ -133,6 +133,9 @@ namespace Faust
 	// \param alpha : multplicative scalar
 	virtual void operator*=(const FPP alpha)=0;
 
+
+	//! \brief Display the caracteristique of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
+	virtual void Display() const=0;
 	//! \brief 
 	//! \warning : declare a virtual destructor is mandatory for an abstract class
 	//! in order to allow descendant class destructor to clean up in case of pointer to the abstract class 

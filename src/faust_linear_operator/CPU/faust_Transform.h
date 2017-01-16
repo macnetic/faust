@@ -89,9 +89,13 @@ namespace Faust
 		Transform();
 
         /** \brief Constructor
-        * \param data : Vector including sparse matrix
-        * \param lambda : the multiplicative scalar*/
-        Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0);
+        * \tparam facts : std::Vector including MatGeneric pointer representing the factor of the Transform that will be copied in the Transform
+        * \tparam lambda (optional) : the multiplicative scalar (default value 1.0)
+	* \tparam optimizedCopy (optionnal) : boolean to control which type of copy of facts is made,
+					   if True, the copy is optimized, the dynamic type of the factor can changed
+					   if False, the dynamic type stay the same
+								(default value true)*/	
+        Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=true);
 
         Transform(const Transform<FPP,Cpu> & A);
 	
@@ -116,10 +120,11 @@ namespace Faust
         /** \brief Perform the product of all factorized matrix. */
         Faust::MatDense<FPP,Cpu> get_product(const char opThis='N')const;
         Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const;
-        // modif AL AL
-        // Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const
-        // {return (*this).get_product();}
-        Faust::MatSparse<FPP,Cpu> get_fact(faust_unsigned_int id) const;
+
+	
+	/** \brief return a copy of the factor of index id
+	//  \warning dynamic memory allocation is made for the return pointer*/
+        Faust::MatGeneric<FPP,Cpu>* get_fact(faust_unsigned_int id) const;
 	
         faust_unsigned_int getNbRow() const;
         faust_unsigned_int getNbCol() const;
@@ -132,7 +137,6 @@ namespace Faust
         void pop_back(Faust::MatGeneric<FPP,Cpu>* M);
         void pop_first(Faust::MatGeneric<FPP,Cpu>* M);
         void pop_first(Faust::MatGeneric<FPP,Cpu>* M) const;
-        void pop_first(Faust::MatSparse<FPP,Cpu>& S) const;
         void Display()const;
         void transpose();
         void updateNonZeros();
@@ -142,6 +146,7 @@ namespace Faust
         ///(*this) = A * (*this)
         void multiplyLeft(const Transform<FPP,Cpu> & A);
         void scalarMultiply(const FPP scalar);
+	float getRCG() const{return ((float)(getNbRow()*getNbCol()))/((float) get_total_nnz());}
         FPP spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
         ~Transform(){for (int i=0;i<data.size();i++) delete data[i];}
 	
@@ -157,16 +162,22 @@ namespace Faust
 	Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N') const;
 
 
-	
+	/*!
+	* \brief multiplication between with vector x
+	*  x = op((*this)) * x
+	<br>
+    	* op((*this)) = (*this) if opThis='N', op((*this)= = transpose((*this)) if opThis='T'<br>
+	*! \tparam  x :  the vector to be multiplied
+	*! \tparam opThis : character 
+        */ 
 	Faust::MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis='N') const;
 
        
-		void operator=(const Transform<FPP,Cpu>&  f){data=f.data;totalNonZeros=f.totalNonZeros;}
+		void operator=(const Transform<FPP,Cpu>&  f);//{data=f.data;totalNonZeros=f.totalNonZeros;}
         /// add all of the sparse matrices from f.data to this->data
         void operator*=(const FPP  scalar){scalarMultiply(scalar);};
         void operator*=(const Transform<FPP,Cpu>&  f){multiply(f);};
-        /// add the sparse matrix S to this->data
-        void operator*=(const Faust::MatSparse<FPP,Cpu>&  S){push_back(S);totalNonZeros+=S.getNonZeros();}
+
 	
 	#ifdef __COMPILE_TIMERS__
 		void print_timers() const;

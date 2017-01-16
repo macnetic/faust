@@ -329,7 +329,9 @@ void Faust::MatSparse<FPP,Cpu>::init(const vector<int>& rowidx, const vector<int
 template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::Display() const
 {
-	std::cout<<"dim1="<<this->dim1<<" ; dim2="<<this->dim2<<" ; nnz="<<nnz<<std::endl;
+	std::cout<<"type : SPARSE";
+    	Faust::MatGeneric<FPP,Cpu>::Display();	
+	/*std::cout<<"dim1="<<this->dim1<<" ; dim2="<<this->dim2<<" ; nnz="<<nnz<<std::endl;
 
 	cout << "rowPtr = " << getRowPtr() << " -> [ " ;
 	for (int i=0 ; i<this->dim1+1 ; i++)
@@ -342,7 +344,7 @@ void Faust::MatSparse<FPP,Cpu>::Display() const
 	cout << "values = " << getValuePtr() << " -> [ " ;
 	for (int i=0 ; i<nnz ; i++)
 		cout <<  getValuePtr()[i] << " ";
-	cout << " ]"<<endl<<endl;
+	cout << " ]"<<endl<<endl;*/
 
 
 }

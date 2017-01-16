@@ -43,6 +43,7 @@
 #include "faust_Transform.h"
 #include "tools_mex.h"
 #include "faust_MatDense.h"
+#include "faust_MatSparse.h"
 #include <stdexcept>
 #include "faust_constant.h"
 #include "faust_Timer.h"
@@ -83,8 +84,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 		if(nlhs!=1)
 			mexErrMsgTxt("1 output is expected.");
-        if((nrhs<2) || (nrhs>3))
-			mexErrMsgTxt("1 or 2 inputs are expected.");
+        if((nrhs<2) || (nrhs>4))
+			mexErrMsgTxt("between 1 and 3 inputs are expected.");
         
 
 		if(!mxIsCell(prhs[1]))
@@ -104,14 +105,30 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				concatMatGeneric<FFPP>(mxMat,list_factor);
 			}
 		}
-        
-        FFPP lambda = 1.0;
+        	
+		// 2nd input (optionnal) : multiplicative scalar
+        	FFPP lambda = 1.0;
 		if (nrhs > 2)			
 			lambda = (FFPP) mxGetScalar(prhs[2]);
-		Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>(list_factor,lambda);
+
+
+		// 3rd input (optionnal) : boolean to determine the type of copy
+		bool optimizedCopy = true;
+		if (nrhs > 3)
+		{		
+			double optimizedCopy_inter = mxGetScalar(prhs[3]);
+			if ((optimizedCopy_inter != 1.0) and (optimizedCopy_inter != 0.0))
+				mexErrMsgTxt("invalid boolean argument.");
+			
+			optimizedCopy = (bool) optimizedCopy_inter;
+								
+		}	
+
+
+		Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>(list_factor,lambda,optimizedCopy);
 		for (int i=0;i<list_factor.size();i++)
 			delete list_factor[i];		
-	
+		
 		plhs[0]=convertPtr2Mat<Faust::Transform<FFPP,Cpu> >(F);
 
 		return;
@@ -170,8 +187,37 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("get_fact : incorrect number of arguments.");
 		}
 		int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
-		Faust::MatSparse<FFPP,Cpu> const sp_factor = core_ptr->get_fact(id_fact);
-		Faust::MatDense<FFPP,Cpu> const dense_factor(sp_factor);
+		
+		Faust::MatGeneric<FFPP,Cpu>* const factor_generic = core_ptr->get_fact(id_fact);
+		Faust::MatDense<FFPP,Cpu> dense_factor;		
+
+		switch ( factor_generic->getType())
+		{
+			case Dense :
+			{
+				Faust::MatDense<FFPP,Cpu>* factor_dense_ptr = dynamic_cast<Faust::MatDense<FFPP,Cpu>* > (factor_generic);
+				dense_factor = (*factor_dense_ptr);
+			}
+			break;
+		
+			case Sparse :
+			{
+				Faust::MatSparse<FFPP,Cpu>* factor_sparse_ptr = dynamic_cast<Faust::MatSparse<FFPP,Cpu>* > (factor_generic);
+				dense_factor = (*factor_sparse_ptr);
+			}
+			break;
+
+			default:
+		   		handleError("blabla","get_fact : unknown type of the factor matrix");
+		} 
+		delete factor_generic;
+		
+		
+
+		
+
+
+		//*conversion to mxArray*/
 		plhs[0]=FaustMat2mxArray(dense_factor);
 		return;
 		
@@ -195,7 +241,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	}
 
-
+	if (!strcmp("disp",cmd))
+	{
+		if (nlhs != 0 || nrhs != 2)
+			mexErrMsgTxt("disp: Unexpected arguments");		
+		core_ptr->Display();
+		return;
+	}
     
 
     	if (!strcmp("full",cmd))
@@ -247,6 +299,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		int flag;
 		char op;
 		//spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
+		
 		double norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
 		plhs[0]=mxCreateDoubleScalar(norm_faust);
 		
@@ -284,7 +337,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
     if (!strcmp("multiply", cmd)) {
-	
 	if (nlhs > 1 ||  nrhs != 4)
             mexErrMsgTxt("Multiply: Unexpected arguments.");
 
@@ -421,11 +473,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
 	// Si prhs[2] est une matrice
 	else
-	{
-        	Faust::MatDense<FFPP,Cpu> A(ptr_data, nbRowA, nbColA);
+	{       	
+		Faust::MatDense<FFPP,Cpu> A(ptr_data, nbRowA, nbColA);
 		Faust::MatDense<FFPP,Cpu> B(nbRowB, nbColA);
 		B = (*core_ptr).multiply(A,op);
-
 		const mwSize dims[2]={nbRowB,nbColB};
 		if(sizeof(FFPP)==sizeof(float))
 			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
@@ -438,7 +489,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));
 	}
 	if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
-
 
         return;
     }

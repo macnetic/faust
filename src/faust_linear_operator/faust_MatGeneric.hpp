@@ -66,7 +66,7 @@ void Faust::MatGeneric<FPP,DEVICE>::setOp(const char op, faust_unsigned_int& nbR
 template<typename FPP>  
 Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,Faust::MatSparse<FPP,Cpu> const & S)
 {
-	std::cout<<"DEBUT OPTIMIZE "<<std::endl;
+	//std::cout<<"DEBUT OPTIMIZE "<<std::endl;
 	
 	if ( (M.getNbCol() != S.getNbCol()) | (M.getNbRow() != S.getNbRow()) )
 		handleError("Faust::MatGeneric::", " Faust::optimize : matrix M and S have not the same size");
@@ -100,22 +100,22 @@ Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,F
 	}
 	//float density = ((float)S.getNonZeros())/((float)(S.getNbRow()*S.getNbCol()));	
 	float density = S.density();	
-	std::cout<<" density "<<density<<std::endl;
-	std::cout<<" tps sparse "<<t_sparse.get_time()<<std::endl;
-	std::cout<<" tps dense "<<t_dense.get_time()<<std::endl;
+	//std::cout<<" density "<<density<<std::endl;
+	//std::cout<<" tps sparse "<<t_sparse.get_time()<<std::endl;
+	//std::cout<<" tps dense "<<t_dense.get_time()<<std::endl;
 
 	//if (M.getNbCol() != M.getNbRow())
 	if (t_sparse.get_time() <= t_dense.get_time())
 	{
-		std::cout<<" CHOICE SPARSE "<<t_dense.get_time()<<std::endl;
+		//std::cout<<" CHOICE SPARSE "<<t_dense.get_time()<<std::endl;
 		return new MatSparse<FPP,Cpu>(S);
 	}else
 	{
-		std::cout<<" CHOICE DENSE "<<t_dense.get_time()<<std::endl;		
+		//std::cout<<" CHOICE DENSE "<<t_dense.get_time()<<std::endl;		
 		return new MatDense<FPP,Cpu>(M);
 	}
 		
-	std::cout<<"FIN OPTIMIZE "<<t_sparse.get_time()<<std::endl;
+	//std::cout<<"FIN OPTIMIZE "<<t_sparse.get_time()<<std::endl;
 
 
 }
@@ -140,5 +140,12 @@ void Faust::MatGeneric<FPP,DEVICE>::multiply(Faust::MatDense<FPP,DEVICE> & vec, 
 	handleError("Faust::MatGeneric::","multiply (MatDense): this function should not be called");
 
 }
+
+template<typename FPP,Device DEVICE>
+void Faust::MatGeneric<FPP,DEVICE>::Display() const
+{
+	std::cout<<" size " <<getNbRow()<<"x"<<getNbCol()<<", density "<< this->density()<<", nnz "<<this->getNonZeros()<<endl;
+}
+
 
 
