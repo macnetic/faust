@@ -76,12 +76,33 @@ if(BUILD_WRAPPER_MATLAB)
 		
 		add_test(NAME MATLAB_DEMO_INSTALL COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${CMAKE_INSTALL_MATLAB_PREFIX}');setup_FAUST;run_all_demo;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		add_test(NAME MATLAB_DEMO_BUILD COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${FAUST_MATLAB_BIN_DIR}');setup_FAUST;run_all_demo;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-		add_test(NAME MATLAB_FAUST_CONFIG1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust(5,4,10,3);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-		add_test(NAME MATLAB_FAUST_CONFIG2 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust(2,15,1,1);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-		#add_test(NAME MATLAB_FAUST_CONFIG_EMPTY COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust(0,0,1,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+
+		
+		#test Faust with 3 factors : 
+		# 1st factor sparse size 10x3, 
+		# 2nd factor dense size 3x2, 
+		# 3rd factor sparse size 2x5		
+		add_test(NAME MATLAB_FAUST_CONFIG1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'sparse','dense','sparse'});test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")	
+		
+		#test Faust with 3 factors : 
+		# 1st factor sparse size 5x2, 
+		# 2nd factor dense size 2x3, 
+		# 3rd factor sparse size 3x10		
+		add_test(NAME MATLAB_FAUST_CONFIG2 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([5,2,3,10],{'dense','sparse','dense'});test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		#test Faust with 1 factor : 
+		# 1st factor dense size 10x3, 		
+		add_test(NAME MATLAB_FAUST_CONFIG3 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'dense'});test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")		
+		
+		#test Faust with 1 factor : 
+		# 1st factor sparse size 10x3, 		
+		add_test(NAME MATLAB_FAUST_CONFIG3 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'sparse'});test_matlab_faust(factors,prod,1000,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+
+
 
 		## test the matlab Faust class methods with incorrect parameter
 		add_test(NAME MATLAB_FAUST_2 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust2;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+
+		## make some speed-up comparison
 		add_test(NAME MATLAB_FAUST_SPEED COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust_time;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 	#FIN MODIF NB VM MAC XCode
@@ -100,18 +121,18 @@ endif()
 
 
 ####### UNIT TEST ########
-foreach(TEST_FPP float double)	
-	configure_file(${FAUST_SRC_TEST_SRC_DIR}/unit_test_faust_mult.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/unit_test_faust_mult_${TEST_FPP}.cpp @ONLY)
+#foreach(TEST_FPP float double)	
+#	configure_file(${FAUST_SRC_TEST_SRC_DIR}/unit_test_faust_mult.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/unit_test_faust_mult_${TEST_FPP}.cpp @ONLY)
 
-	# Generation of the binary files in double and float precision
-	add_executable(unit_test_faust_mult_${TEST_FPP} ${FAUST_BIN_TEST_SRC_DIR}/unit_test_faust_mult_${TEST_FPP}.cpp ${FAUST_BIN_TEST_SRC_DIR}/ )
+#	# Generation of the binary files in double and float precision
+#	add_executable(unit_test_faust_mult_${TEST_FPP} ${FAUST_BIN_TEST_SRC_DIR}/unit_test_faust_mult_${TEST_FPP}.cpp ${FAUST_BIN_TEST_SRC_DIR}/ )
    	
-	target_link_libraries(unit_test_faust_mult_${TEST_FPP} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+#	target_link_libraries(unit_test_faust_mult_${TEST_FPP} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
 			
-	add_test(NAME UNIT_MULT_FAUST_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/unit_test_faust_mult_${TEST_FPP})
+#	add_test(NAME UNIT_MULT_FAUST_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/unit_test_faust_mult_${TEST_FPP})
 				
 
-endforeach()
+#endforeach()
 
 	
 
@@ -170,7 +191,7 @@ if (BUILD_WRAPPER_MATLAB)
 	configure_file(${FAUST_SRC_TEST_TOOL_DIR}/set_path.m.in ${FAUST_BIN_TEST_TOOLS_DIR}/set_path.m @ONLY)
 	
 	
-	foreach(matlabtest hier_fact_test.m test_matlab_faust.m test_matlab_faust2.m test_matlab_faust_time.m)
+	foreach(matlabtest hier_fact_test.m generate_Faust_config.m test_matlab_faust.m test_matlab_faust2.m test_matlab_faust_time.m)
 		configure_file(${FAUST_SRC_TEST_SRC_DIR}/${matlabtest} ${FAUST_BIN_TEST_BIN_DIR}/${matlabtest} @ONLY)
 	endforeach()
 endif(BUILD_WRAPPER_MATLAB)

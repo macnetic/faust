@@ -56,10 +56,23 @@
 
 
 
-
-function test_matlab_faust(dim1,dim2,dim3,nb_fact)
+ function test_matlab_faust(factors,expected_F_dense,dim3,copyOptimized)
+%function test_matlab_faust(dim1,dim2,dim3,nb_fact)
 int_max= 100;
 threshold = 10^(-5);
+
+
+nb_fact=length(factors);
+if (nb_fact == 0)
+	error('empty faust is not taking into account');
+end
+
+dim1=size(factors{1},1);
+dim2=size(factors{nb_fact},2);
+
+if (size(expected_F_dense,1) ~= dim1) | (size(expected_F_dense,2) ~= dim2)
+	error('the factor dimension mismatch expected_F_dense');
+end
 
 disp('****** TEST MATLAB_FAUST ******* '); 
 disp(' CONFIG OF THE FAUST ');
@@ -72,16 +85,7 @@ disp('');
 
 %% creation du faust
 disp(' TEST CONSTRUCTOR : ');
-disp(['generate a faust of size ' int2str(dim1)  ' by ' int2str(dim2)]); 
-factors=cell(1,nb_fact);
-if (nb_fact > 0)
-	factors{1}=double(randi(int_max,dim1,dim2));
-end
-for i=2:nb_fact
-    factors{i}=double(randi(int_max,dim2,dim2)); 
-end
-
-F = Faust(factors);
+F = Faust(factors,1.0,copyOptimized);
 empty_F=Faust({});
 disp('Ok');
 
@@ -150,11 +154,13 @@ disp('Ok');
 %% full test
 disp('TEST FULL : ');
 F_dense= full(F);
-
 [dim1_dense,dim2_dense]=size(F_dense);
 
 if((dim1_dense ~= dim1) | (dim2_dense ~= dim2))
     error('full : invalid dimension');
+end
+if ( ~isequal(expected_F_dense,F_dense) )  
+    error(['full : invalid full-storage matrix']);
 end
 disp('Ok');
 
@@ -162,7 +168,10 @@ disp('Ok');
 
 %% full test
 disp('TEST NNZ : ');
-expected_nz = (nb_fact-1)*dim2^2 + dim1*dim2;
+expected_nz = 0;
+for i=1:nb_fact
+	expected_nz = expected_nz + nnz(factors{i});
+end
 
 nz = nnz(F);
 
@@ -278,8 +287,10 @@ if ((dim1_trans ~= dim2) | (dim2_trans ~= dim1))
 end
 
 F_dense_trans = full(F_trans);
-if (F_dense_trans ~= F_dense')
-    error(['transpose : invalid transpose matrix']);
+
+%(F_dense_trans ~= F_dense')
+if (~isequal(F_dense_trans,F_dense'))    
+	error(['transpose : invalid transpose matrix']);
 end
 
 %% verification de la non modification du faust
@@ -289,7 +300,8 @@ if ((new_dim1 ~= dim1) | (dim2 ~= new_dim2))
 end
 
 new_F_dense=full(F);
-if((new_F_dense ~= F_dense))
+%((new_F_dense ~= F_dense))
+if (~isequal(new_F_dense,F_dense))
 	error('transpose : modification du faust de depart');
 end 
 
@@ -303,7 +315,8 @@ if ((dim1_trans_trans ~= dim1) | (dim2_trans_trans ~= dim2))
 end
 
 F_dense_trans_trans = full(F_trans_trans);
-if (F_dense_trans_trans ~= F_dense)  
+%(F_dense_trans_trans ~= F_dense)  
+if (~isequal(F_dense_trans_trans,F_dense))
     error(['transpose : invalid transpose matrix']);
 end
 
@@ -315,7 +328,8 @@ if ((new_dim1_trans ~= dim1_trans) | (new_dim2_trans ~= new_dim2_trans))
 end
 
 new_F_dense_trans=full(F_trans);
-if((new_F_dense_trans ~= F_dense_trans))
+%((new_F_dense_trans ~= F_dense_trans))
+if (~isequal(new_F_dense_trans,F_dense_trans))
 	error('transpose : modification du faust de depart');
 end 
 
@@ -393,38 +407,44 @@ y_expected = F_dense*x;
 y_expected_trans = F_dense'*x_trans;
 
 y_star = F*x;
-if (y_expected ~= y_star)
+%(y_expected ~= y_star)
+if (~isequal(y_expected,y_star))
     error(['multiplication faust-vector : invalid result  ' ]);
 end
 
 
 
 y_star_trans = F'*x_trans;
-if (y_expected_trans~= y_star_trans)
+%(y_expected_trans~= y_star_trans)
+if (~isequal(y_expected_trans,y_star_trans))
     error(['multiplication faust-vector with transposition : invalid result  ' ]);
 end
 
 
 y_mtimes_trans = mtimes_trans(F,x_trans,istransposed);
-if (y_expected_trans ~= y_mtimes_trans)
+%(y_expected_trans ~= y_mtimes_trans)
+if (~isequal(y_expected_trans,y_mtimes_trans))
     error(['multiplication faust-vector with transposition : invalid result  '  ]);
 end
 
 
 y_mtimes = mtimes_trans(F,x,nontransposed);
-if (y_expected ~= y_mtimes)
+%(y_expected ~= y_mtimes)
+if (~isequal(y_expected,y_mtimes))
     error(['multiplication faust-vector : invalid result  '  ]);
 end
 
 
 y_mtimes_trans_N = mtimes_trans(F_trans,x_trans,nontransposed);
-if (y_expected_trans ~= y_mtimes_trans_N)
+%(y_expected_trans ~= y_mtimes_trans_N)
+if (~isequal(y_expected_trans,y_mtimes_trans_N))
     error(['multiplication faust-vector with transposition : invalid result  '  ]);
 end
 
 
 y_mtimes_trans_T = mtimes_trans(F_trans,x,istransposed);
-if (y_expected ~= y_mtimes_trans_T)
+%(y_expected ~= y_mtimes_trans_T)
+if (~isequal(y_expected,y_mtimes_trans_T))
     error(['multiplication faust-vector : invalid result  '  ]);
 end
 
@@ -456,37 +476,43 @@ Y_expected_trans = F_dense'*X_trans;
 
 
 Y_star = F*X;
-if (Y_expected ~= Y_star)
+%(Y_expected ~= Y_star)
+if (~isequal(Y_expected,Y_star))
     error(['multiplication faust-vector : invalid result  ' ]);
 end
 
 
 
 Y_star_trans = F'*X_trans;
-if (Y_expected_trans~= Y_star_trans)
+%(Y_expected_trans~= Y_star_trans)
+if (~isequal(Y_expected_trans,Y_star_trans))
     error(['multiplication faust-vector with transposition : invalid result  ' ]);
 end
 
 
 Y_mtimes_trans = mtimes_trans(F,X_trans,istransposed);
-if (Y_expected_trans ~= Y_mtimes_trans)
+%(Y_expected_trans ~= Y_mtimes_trans)
+if (~isequal(Y_expected_trans,Y_mtimes_trans))
     error(['multiplication faust-vector with transposition : invalid result  '  ]);
 end
 
 
 Y_mtimes = mtimes_trans(F,X,nontransposed);
-if (Y_expected ~= Y_mtimes)
+%(Y_expected ~= Y_mtimes)
+if (~isequal(Y_expected,Y_mtimes))
     error(['multiplication faust-vector : invalid result  '  ]);
 end
 
 Y_mtimes_trans_N = mtimes_trans(F_trans,X_trans,nontransposed);
-if (Y_expected_trans ~= Y_mtimes_trans_N)
+%(Y_expected_trans ~= Y_mtimes_trans_N)
+if (~isequal(Y_expected_trans,Y_mtimes_trans_N))
     error(['multiplication faust-vector with transposition : invalid result  '  ]);
 end
 
 
 Y_mtimes_trans_T = mtimes_trans(F_trans,X,istransposed);
-if (y_expected ~= y_mtimes_trans_T)
+%(y_expected ~= y_mtimes_trans_T)
+if (~isequal(y_expected,y_mtimes_trans_T))
     error(['multiplication faust-vector : invalid result  '  ]);
 end
 
@@ -538,7 +564,7 @@ end
 
 for i=1:nb_fact
 	A=get_fact(F_loaded,i);
-	if(A~=factors{i})
+	if(~isequal(A,factors{i}))
 		error('get_fact : invalid factor');
 	end
 
@@ -558,7 +584,7 @@ if (dim1_trans_faust_loaded ~= dim2) | (dim2_trans_faust_loaded ~= dim1)
 end
 
 F_dense_trans_loaded=full(F_trans_loaded);
-if (F_dense_trans_loaded ~= F_dense')
+if (~isequal(F_dense_trans_loaded,F_dense'))
 	error(['save transposed : invalid faust']);
 end
 

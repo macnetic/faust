@@ -412,7 +412,19 @@ classdef Faust
         
     end
     
-    
+    function disp(F)
+    %% DISP shows the characteristic of the Faust (overloaded Matlab built-in function)
+    %
+    % 
+    % This function shows the size of the Faust,
+    %  its number of factor, its RCG ...
+    % 
+	
+	mexFaust('disp',F.matrix.objectHandle);	
+
+
+
+    end
     
 
 	function norm_Faust=norm(F,varargin)
@@ -496,6 +508,8 @@ classdef Faust
 		    end
 		end	
 	end
+
+	
 	
         
     end
