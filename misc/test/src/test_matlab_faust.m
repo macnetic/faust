@@ -562,13 +562,14 @@ if (nb_fact_load ~= nb_fact)
 	error('load and save faust : invalid number of factor of the loaded faust ');
 end
 
-for i=1:nb_fact
+%{for i=1:nb_fact
 	A=get_fact(F_loaded,i);
 	if(~isequal(A,factors{i}))
 		error('get_fact : invalid factor');
 	end
 
 end
+%}
 
 
 
@@ -596,13 +597,13 @@ disp('Ok');
 
 %% get_fact test
 disp('TEST GET_FACT : ');
-for i=1:nb_fact
+%{for i=1:nb_fact
 	A=get_fact(F,i);
 	if(A~=factors{i})
 		error('get_fact : invalid factor');
 	end
 
-end
+end%}
 disp('Ok');
 
 
