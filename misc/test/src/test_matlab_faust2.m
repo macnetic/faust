@@ -76,7 +76,7 @@ disp('Ok');
 
 disp('test 2 : '); 
 test_pass = 0;
-expected_err_message='addSpmat : empty matlab matrix';
+expected_err_message='concatMatGeneric : empty matlab matrix';
 factors=cell(1,nb_fact); % each cell is empty, must contained a matrix
 
 

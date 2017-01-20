@@ -208,7 +208,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			break;
 
 			default:
-		   		handleError("blabla","get_fact : unknown type of the factor matrix");
+		   		mexErrMsgTxt("get_fact : unknown type of the factor matrix");
 		} 
 		delete factor_generic;
 		

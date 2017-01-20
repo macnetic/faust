@@ -95,7 +95,7 @@ if(BUILD_WRAPPER_MATLAB)
 		
 		#test Faust with 1 factor : 
 		# 1st factor sparse size 10x3, 		
-		add_test(NAME MATLAB_FAUST_CONFIG3 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'sparse'});test_matlab_faust(factors,prod,1000,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_CONFIG4 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'sparse'});test_matlab_faust(factors,prod,1000,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
 
