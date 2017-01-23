@@ -43,8 +43,8 @@ sys.path.append(FaustPath)
 import numpy as np
 #import PyFaust 
 import FaustPy
-dim1 = 4
-dim2 = 5
+dim1 = 100
+dim2 = 200
 dim3 = 7
 nb_factor = 3
 int_max= 100
@@ -81,7 +81,9 @@ print "*** CONTRUCTOR ***"
 F = FaustPy.Faust(list_factor)
 print("lister les attribut de F")
 
-
+print "*** display ***"
+F.display()
+print("Ok")
 
 
 ######################################

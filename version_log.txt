@@ -9,6 +9,11 @@
 
 
 ##########################################################################
+version 1115 : Faust with MatGeneric
+		-> wrapper matlab OK
+		-> wrapper python Ok (but not tested on VM)  
+
+
 version 1105 : 
 	-> MATLAB wrapper (debut compatibility Faust::MatGeneric)
 version 1104 : 

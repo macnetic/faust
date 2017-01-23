@@ -72,11 +72,10 @@ class Faust:
 		
 		return F_trans;
 		
-	def afficher(self):
+	def display(self):
 		print("Struct : ")
-		print(self.m_faust)
-		print(self.m_transpose_flag)
-		print(self.shape)
+		self.m_faust.display(self.m_transpose_flag);
+		
 		
 	def __mul__(self,x):
 

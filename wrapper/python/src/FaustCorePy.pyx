@@ -161,8 +161,12 @@ cdef class FaustCore:
 		
 		return y
 		
-		
-		
+	
+	
+	# print information about the faust (size, number of factor, type of factor (dense/sparse) ...)	
+	def display(self,transpose_flag):
+		print("Faust transposition " + str(transpose_flag))
+		self.m_faust.Display();
 		
 		
 

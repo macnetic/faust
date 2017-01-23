@@ -132,11 +132,29 @@ namespace Faust
         void init_from_file(const char* filename);
         long long int get_total_nnz()const{return totalNonZeros;}
         void clear(){data.resize(0);totalNonZeros=0;}
-	void push_back(const Faust::MatGeneric<FPP,Cpu>* M);
-        void push_first(const Faust::MatGeneric<FPP,Cpu>* M);
-        void pop_back(Faust::MatGeneric<FPP,Cpu>* M);
-        void pop_first(Faust::MatGeneric<FPP,Cpu>* M);
-        void pop_first(Faust::MatGeneric<FPP,Cpu>* M) const;
+	
+	/** \brief add M to the end of the Faust F, work as for std::vector::push_back 
+		F={S_0,S_1,S_2,..,S_n} becomes {S_0,S_1,S_2,..,S_n,copy(M)}
+        * \tparam M : MatGeneric pointer representing the factor that will be copied at the end of the Faust          
+
+	* \param optimizedCopy (optionnal) : boolean to control which type of copy of the fact is made,
+					   if True, the copy is optimized, the dynamic type of the factor can changed
+					   if False, the dynamic type stay the same
+								(default value true)*/
+	void push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=true);
+
+
+
+	/** \brief Constructor
+        * \tparam M : MatGeneric pointer representing the factor that will be copied
+	* \param optimizedCopy (optionnal) : boolean to control which type of copy of the fact is made,
+					   if True, the copy is optimized, the dynamic type of the factor can changed
+					   if False, the dynamic type stay the same
+								(default value true)*/
+        void push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=true);
+        //void pop_back(Faust::MatGeneric<FPP,Cpu>* M);
+        //void pop_first(Faust::MatGeneric<FPP,Cpu>* M);
+        //void pop_first(Faust::MatGeneric<FPP,Cpu>* M) const;
         void Display()const;
         void transpose();
         void updateNonZeros();

@@ -523,7 +523,7 @@ Faust::MatGeneric<FPP,Cpu>* Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_i
 
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M)
+void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,const bool optimizedCopy /*default value = true */)
 {
 	if (size()>0)
 	{
@@ -532,7 +532,6 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M)
 			handleError(m_className,"push_back : incorrect dimensions");
      		}
    	}
-	bool optimizedCopy = true;
    	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone(optimizedCopy);
    	data.push_back(M_copy);
    	totalNonZeros += M_copy->getNonZeros();
@@ -545,14 +544,14 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M)
 
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M)
+void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /*default value = true */)
 {
 	if (size()>0)
 		if(this->getNbRow()!=M->getNbCol() || M->getNbRow()<1)
       		{
 			handleError(m_className,"push_first : incorrect dimensions");
       		}
-	bool optimizedCopy = true;
+	
 	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone(optimizedCopy);
 	data.insert(data.begin(),M_copy);
    	totalNonZeros += M_copy->getNonZeros();
@@ -562,7 +561,7 @@ void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M)
 	#endif
 }
 
-
+/*
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::pop_back(Faust::MatGeneric<FPP,Cpu>* M)
 {
@@ -604,7 +603,7 @@ void Faust::Transform<FPP,Cpu>::pop_first(Faust::MatGeneric<FPP,Cpu>* M) const
 
 	}
 
-}
+}*/
 
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::transpose()
