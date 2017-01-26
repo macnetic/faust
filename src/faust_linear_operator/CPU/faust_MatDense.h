@@ -167,7 +167,10 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
     template<typename FPP>
     class MatDense<FPP,Cpu> : public Faust::MatGeneric<FPP,Cpu>
     {
-        /// All derived class template of MatDense are considered as friends
+
+	friend class MatSparse<FPP,Cpu>;
+        
+	/// All derived class template of MatDense are considered as friends
         template<class,Device> friend class MatDense;
 
         public:
@@ -400,7 +403,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         friend void Faust::spgemm<>(const Faust::MatSparse<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
         friend void Faust::multiply<>(const Faust::Transform<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
         friend void Faust::gemv<>(const MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
-	friend void  Faust::MatSparse<FPP,Cpu>::multiply(MatDense<FPP,Cpu> & M,const char opThis) const;
+//	friend void  Faust::MatSparse<FPP,Cpu>::multiply(MatDense<FPP,Cpu> & M,const char opThis) const;
 
         bool estIdentite()const{return isIdentity;}
         bool estNulle()const{return isZeros;}
@@ -439,10 +442,48 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         static Faust::Timer t_multiply;
         static Faust::Timer t_gemm;
         static Faust::Timer t_add_ext;
-
+	
         void print_timers()const;
     #endif
     };
+    
+     /// TEMPLATE SPECIALIZATION ////	
+    //template specialization member function must be done at namespace scope 
+    // advice : put the specialization in the same file as the declaration to avoid issue	
+    
+    /* this specialisation is for raising an error for incompatible Matrix operator=
+       for instance a real scalar matrix can't be assigned to a complex scalar matrix*/ 		
+    /*
+    template<>
+    template<>
+    void Faust::MatDense<double,Cpu>::operator=(Faust::MatDense<std::complex<double>,Cpu> const& A)
+    {
+    	handleError("MatDense<double,Cpu>","operator=(MatDense<std::complex<double>,Cpu> impossible to pass from complex to real");
+    }
+
+
+    template<>
+    template<>
+    void Faust::MatDense<float,Cpu>::operator=(Faust::MatDense<std::complex<float>,Cpu> const& A)
+    {
+    	handleError("MatDense<float,Cpu>","operator=(MatDense<std::complex<float>,Cpu> impossible to pass from complex to real");
+    }
+
+    template<>
+    template<>
+    void Faust::MatDense<double,Cpu>::operator=(Faust::MatDense<std::complex<float>,Cpu> const& A)
+    {
+    	handleError("MatDense<double,Cpu>","operator=(MatDense<std::complex<float>,Cpu> impossible to pass from complex to real");
+    }				
+
+    template<>
+    template<>
+    void Faust::MatDense<float,Cpu>::operator=(Faust::MatDense<std::complex<double>,Cpu> const& A)
+    {
+    	handleError("MatDense<float,Cpu>","operator=(MatDense<std::complex<double>,Cpu> impossible to pass from complex to real");
+    }		
+    */
+
 
 }
 

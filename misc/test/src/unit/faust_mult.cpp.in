@@ -1,5 +1,7 @@
 /****************************************************************************/
 /*                              Description:                                */
+/* unitary test for testing multiplication by faust with real  scalar       */
+/*                                                                          */
 /*  For more information on the FAuST Project, please visit the website     */
 /*  of the project : <http://faust.gforge.inria.fr>                         */
 /*                                                                          */
@@ -55,6 +57,7 @@
 
 typedef @TEST_FPP@ FPP;
 
+
 //using namespace Faust;
 
 int main(int argc, char* argv[])
@@ -73,113 +76,136 @@ int main(int argc, char* argv[])
 	int dim2 = 4;
 	int dim3 = 2;
 
-	int nb_factor = 1;
+	int nb_factor = 3;
 
+
+	/* initilisation of the factors of the Faust */
+
+	// factor 1
 	Faust::MatDense<FPP,Cpu> fact1(dim1,dim2);
 	for (int j=0;j < dim1*dim2; j ++)
 	{
-		fact1[j]= (FPP) j;
+		fact1[j]= FPP(j*j);
 	};
 
 
 					      
 
-	vector<Faust::MatGeneric<FPP,Cpu> *> list_fact;
-	list_fact.resize(nb_factor);
+	// factor 2
 	Faust::MatDense<FPP,Cpu> fact2(dim2,dim2);
 	for (int i=0;i< dim2; i++)
 	{
 		for (int j=0;j< dim2; j++)
 		{
-			fact2[i*dim2+j]=(FPP) (i+1);
+			fact2[i*dim2+j]= FPP(i+1);
 		}
 		
 	}
 
+	// factor 3
 	Faust::MatDense<FPP,Cpu> fact3_dense(dim2,dim2);
 	for (int i=0;i< dim2; i++)
 	{
 		for (int j=0;j< dim2; j++)
 		{
-			fact3_dense[i*dim2+j]=(FPP) (i+2);
+			fact3_dense[i*dim2+j]= FPP(i+2);
 		}
 		
 	}
 	Faust::MatSparse<FPP,Cpu> fact3_sparse(fact3_dense);
+
 	std::cout<<"fact1 value"<<std::endl;
 	fact1.Display();
 	std::cout<<"fact2 value"<<std::endl;
 	fact2.Display();
 	std::cout<<"fact3 value"<<std::endl;
 	fact3_dense.Display();
+	
+	/* initialisation of the list of factors of the Faust */
+	vector<Faust::MatGeneric<FPP,Cpu> *> list_fact;
+	list_fact.resize(nb_factor);
 	list_fact[0]=fact1.Clone();
-	//list_fact[1]=fact2.Clone();
-	//list_fact[2]=fact3_sparse.Clone();
-	
-	std::cout<<"init mat id dim1"<<std::endl;
-	Faust::MatDense<FPP,Cpu> identity_dim1(dim1,dim1);
-	for (int i = 0;i<dim1*dim1;i++) identity_dim1[i]=0.0;
-	for (int i = 0;i<dim1;i++) identity_dim1[i*dim1+i]=1.0;
-	std::cout<<"init mat id dim2 "<<std::endl;	
-	Faust::MatDense<FPP,Cpu> identity_dim2(dim2,dim2);
-	for (int i = 0;i<dim2*dim2;i++) identity_dim2[i]=0.0;
-	for (int i = 0;i<dim2;i++) identity_dim2[i*dim2+i]=1.0;	
-	
-	
-	
-	
-	
+	list_fact[1]=fact2.Clone();
+	list_fact[2]=fact3_sparse.Clone();
+
+	/* initialisation of the Faust (Transform) */
 	std::cout<<"init Faust "<<std::endl;
-	Faust::Transform<FPP,Cpu> F(list_fact,1.0,false);
+	bool ispOtimized = false;	
+	Faust::Transform<FPP,Cpu> F(list_fact,1.0,ispOtimized);
 	F.Display();
-	std::cout<<"avant multiplication identity dim1"<<std::endl;
-	identity_dim1.Display();
-	for (int i=0;i<dim1*dim1;i++)
-	std::cout<<identity_dim1[i]<<std::endl;
-	Faust::MatDense<FPP,Cpu> F_normal_dense = F.multiply(identity_dim2,'N');
-	Faust::MatDense<FPP,Cpu> F_trans_dense = F.multiply(identity_dim1,'T');
-	std::cout<<"apres multiplication"<<std::endl;
-	std::cout<<"full Faust : "<<std::endl;
-	F_normal_dense.Display();
 	
-	std::cout<<"full Faust transpose : "<<std::endl;
-	F_trans_dense.Display();
-	/*
-	std::cout<<"prod mult"<<std::endl;
-	Faust::MatDense<FPP,Cpu> F_prod=F.get_product();
+	int nbRowF = F.getNbRow();
+	int nbColF = F.getNbCol();	
 	
-	/*	
-	std::cout<<"F value "<<std::endl; 
-	F_prod.Display();
-
-	Faust::MatDense<FPP,Cpu> X(dim2,dim3);
-	for (int j=0;j < dim3; j ++)
+	if((nbRowF != dim1) || (nbColF != dim2))
 	{
-		for (int i=0;i<dim2;i++)
-				X[j*dim2+i]= (FPP) (j*dim2+i);
-	};
-	 std::cout<<"X value "<<std::endl; 
-	 X.Display();
-
-	Faust::MatDense<FPP,Cpu> Y;
-	
-	Y = F * X;
-
+		std::cerr<<"invalid dimension of F "<<std::endl;
+		exit(EXIT_FAILURE);
+	}
 	
 
-	Faust::MatDense<FPP,Cpu> Y_prod=X;
 	
-	F_prod.multiply(Y_prod,'N');
-	
-	std::cout<<"Y value "<<std::endl; 
-	Y.Display();
+	std::cout<<"init matrix/vec that will be multiplied "<<std::endl;
+	Faust::MatDense<FPP,Cpu> identity(nbColF);
+	for (int i = 0;i<nbColF;i++) identity[i]=FPP(0.0);
+	for (int i = 0;i<nbColF;i++) identity[i*nbColF+i]=FPP(1.0);
 
-	std::cout<<"Y_prod value "<<std::endl; 
-	Y_prod.Display();
-	*/
+	Faust::Vect<FPP,Cpu> vec(nbColF);
+	for (int i = 0;i<nbColF;i++) vec[i]=FPP(i*i);
 	
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+
+	// F_dense = F * identity
+       std::cout<<"F_dense = F * identity "<<std::endl;
+       Faust::MatDense<FPP,Cpu> F_dense_mult = F.multiply(identity,'N');
+
+
+	if ( (F_dense_mult.getNbRow() != nbRowF) || (F_dense_mult.getNbCol() != nbColF) )
+	{
+		std::cerr<<"F size ("<<F_dense_mult.getNbRow()<<","<<F_dense_mult.getNbCol()<<")"<<std::endl;
+		std::cerr<<"F size expected ("<<nbRowF<<","<<nbColF<<")"<<std::endl;		
+		std::cerr<<"error : invalid dimension of F_dense_mult "<<std::endl;
+		exit(EXIT_FAILURE);	
+	}
+
+	// F_prod must be equal to F_dense
+        std::cout<<"F_prod  = F.get_product"<<std::endl;
+	Faust::MatDense<FPP,Cpu> F_prod=F.get_product();
+
+
+	if ( (F_prod.getNbRow() != nbRowF) || (F_prod.getNbCol() != nbColF) )
+	{
+		std::cerr<<"error : invalid dimension of F_prod "<<std::endl;
+		exit(EXIT_FAILURE);		
+
+	}
+
+
+	for (int i=0;i<nbRowF*nbColF;i++)
+	{
+		if (F_prod[i] != F_dense_mult[i])
+		{
+			std::cerr<<"error : F_prod != F_dense_mult "<<std::endl;
+			exit(EXIT_FAILURE);
+		}
+
+	}
+	
+	
+	// F multiply with vec
+	std::cout<<"F_vec = F * vec "<<std::endl;
+	Faust::Vect<FPP,Cpu> F_vec = F.multiply(vec,'N');
 
 	
 	return 0;
-
 }

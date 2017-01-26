@@ -125,7 +125,7 @@ faust_unsigned_int Faust::MatDense<FPP,Cpu>::getNonZeros()const
 	faust_unsigned_int nnz = 0;
 	for (int i=0; i < this->getNbRow()*this->getNbCol(); i++)
 	{
-		if ( (*this)[i] != 0 )
+		if ( (*this)[i] != FPP(0.0) )
 			nnz++; 
 	}
 
@@ -167,7 +167,7 @@ void Faust::MatDense<FPP,Cpu>::setEyes()
 	setZeros();
 	FPP* ptr_data = getData();
 	for (int i=0 ; i<std::min(this->dim1,this->dim2); i++)
-		ptr_data[i*this->dim1+i] = 1.0;
+		ptr_data[i*this->dim1+i] = FPP(1.0);
 	if (this->dim1 == this->dim2)
 		isIdentity = true;
 	isZeros = false;

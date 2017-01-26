@@ -197,7 +197,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 		totalNonZeros += data[i]->getNonZeros();
 	}
 
-	if(lambda_ != 1.0 && data.size()>0)
+	if(lambda_ != FPP(1.0) && data.size()>0)
 		(*data[0]) *= lambda_;
 	
 	#ifdef __COMPILE_TIMERS__

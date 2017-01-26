@@ -102,7 +102,7 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 	}
 
 
-	if ( (beta!=0)  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
+	if ( (beta!= FPP(0.0))  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
 	{
 		//handleError("Linalgebra : gemm : nbRow of op(A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
 		handleError("linear_algebra", "Faust::spgemm : invalid dimension for output matrix C");
@@ -114,7 +114,7 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 
 
 
-	if (beta == 0.0)
+	if (beta == FPP(0.0))
 	{
 
 		if(B.isZeros)
@@ -134,7 +134,7 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 			C=A;
 			if(typeA == 'T')
 				C.transpose();
-			if(alpha!=1.0)
+			if(alpha!=FPP(1.0))
 				C*= alpha;
 			C.isZeros = false;
 			C.isIdentity = false;
@@ -174,7 +174,7 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 		if(B.isIdentity)
 		{
 			C *= beta;
-			if(typeA == 'N' && alpha == 1.0)
+			if(typeA == 'N' && alpha == FPP(1.0))
 			{
 				C += A;
 				C.isZeros = false;
@@ -187,7 +187,7 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 			Faust::MatDense<FPP,Cpu> A_tmp(A);
 			if(typeA == 'T')
 				A_tmp.transpose();
-			if(alpha != 1.0)
+			if(alpha != FPP(1.0))
 				A_tmp *= alpha;
 			C += A_tmp;
 			C.isZeros = false;
@@ -250,7 +250,7 @@ void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> &
 		handleError("linear_algebra", "Faust::gemv : dimension conflict  between matrix op(A) and input vector x");
 	}
 
-	if ( (beta!=0)  &&  (y.size() != nbRowOpA))
+	if ( (beta!=FPP(0.0))  &&  (y.size() != nbRowOpA))
 	{
 		handleError("linear_algebra", "Faust::gemv : dimension conflict  between matrix op(A) and output vector y");
 	}
@@ -267,7 +267,7 @@ void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> &
 	#endif
 
 	#ifndef __GEMM_WITH_OPENBLAS__
-	if (beta == 0.0)
+	if (beta == FPP(0.0))
 	{
 		if (typeA == 'N')
 		{
@@ -359,7 +359,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 	}
 
 
-	if ( (beta!=0)  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
+	if ( (beta!=FPP(0.0))  && ( (C.getNbRow() != nbRowOpA)	|| (C.getNbCol() != nbColOpB) ) )
 	{
 		//handleError("Linalgebra : Faust::gemm : nbRow of op(A) = %d while nbRow of op(C) = %d\n or nbCol of op(B) = %d  while nbCol of C = %d",nbRowOpA,C.getNbRow(),nbColOpB,C.getNbCol());
 		handleError("linear_algebra", "Faust::gemm : invalid dimension for output matrix C");
@@ -382,7 +382,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 
 
 
-	if (beta == 0.0)
+	if (beta == FPP(0.0))
 	{
 
 		if(A.isZeros || B.isZeros)
@@ -403,7 +403,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 			C=B;
 			if(typeB == 'T')
 				C.transpose();
-			if(alpha!=1.0)
+			if(alpha!=FPP(1.0))
 				C*= alpha;
 			C.isZeros = false;
 			C.isIdentity = false;
@@ -417,7 +417,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 			C=A;
 			if(typeA == 'T')
 				C.transpose();
-			if(alpha!=1.0)
+			if(alpha!=FPP(1.0))
 				C*= alpha;
 			C.isZeros = false;
 			C.isIdentity = false;
@@ -444,7 +444,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 					C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose();
 			}
 		#else
-			 FPP beta = 0.0;
+			 FPP beta = FPP(0.0);
 			 Faust::cblas_gemm<FPP>(CblasColMajor, transA, transB, (int) C.dim1, (int)  C.dim2, (int) nbColOpA, (FPP) alpha, (FPP*) A.getData(), (int) A.dim1, (FPP*) B.getData(), (int) B.dim1,(FPP) beta, (FPP*) C.getData(),(int) C.dim1);
 
 		#endif
@@ -466,7 +466,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 		if(A.isIdentity)
 		{
 			C *= beta;
-			if(typeB == 'N' && alpha == 1.0)
+			if(typeB == 'N' && alpha == FPP(1.0))
 			{
 				C += B;
 				#ifdef __COMPILE_TIMERS__
@@ -477,7 +477,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 			Faust::MatDense<FPP,Cpu> B_tmp(B);
 			if(typeB == 'T')
 				B_tmp.transpose();
-			if(alpha != 1.0)
+			if(alpha != FPP(1.0))
 				B_tmp *= alpha;
 			C += B_tmp;
 			C.isZeros = false;
@@ -490,7 +490,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 		if(B.isIdentity)
 		{
 			C *= beta;
-			if(typeA == 'N' && alpha == 1.0)
+			if(typeA == 'N' && alpha == FPP(1.0))
 			{
 				C += A;
 				C.isZeros = false;
@@ -503,7 +503,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 			Faust::MatDense<FPP,Cpu> A_tmp(A);
 			if(typeA == 'T')
 				A_tmp.transpose();
-			if(alpha != 1.0)
+			if(alpha != FPP(1.0))
 				A_tmp *= alpha;
 			C += A_tmp;
 			C.isZeros = false;

@@ -9,6 +9,10 @@
 
 
 ##########################################################################
+version 1116 : debut compatibility with complex
+                -> test unitaire 
+
+
 version 1115 : Faust with MatGeneric
 		-> wrapper matlab OK
 		-> wrapper python Ok (but not tested on VM)  

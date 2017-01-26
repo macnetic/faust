@@ -180,6 +180,7 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opTh
 
 	if (M.isIdentity)
 	{
+				
 		M = (*this);
 		M.isIdentity = false;
 		M.isZeros = false;
@@ -228,7 +229,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatDense<FPP,Cpu>& M) :
 
 	for (int j=0 ; j<this->dim2 ; j++)
 		for (int i=0; i<this->dim1 ; i++)
-         		if(M(i,j)!=0.0)
+         		if(M(i,j)!=FPP(0.0))
          		{
             			rowind[nnz] = i;
             			colind[nnz] = j;
@@ -330,23 +331,23 @@ template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::Display() const
 {
 	std::cout<<"type : SPARSE";
-    	Faust::MatGeneric<FPP,Cpu>::Display();	
-	/*std::cout<<"dim1="<<this->dim1<<" ; dim2="<<this->dim2<<" ; nnz="<<nnz<<std::endl;
+    	Faust::MatGeneric<FPP,Cpu>::Display();
+	if (this->dim1*this->dim2 < 100)
+	{ 
+		cout << "rowPtr = " << getRowPtr() << " -> [ " ;
+		for (int i=0 ; i<this->dim1+1 ; i++)
+			cout <<  getRowPtr()[i] << " ";
+		cout << " ]"<<endl;
+		cout << "colInd = " << getColInd() << " -> [ " ;
+		for (int i=0 ; i<nnz ; i++)
+			cout <<  getColInd()[i] << " ";
+		cout << " ]"<<endl;
+		cout << "values = " << getValuePtr() << " -> [ " ;
+		for (int i=0 ; i<nnz ; i++)
+			cout <<  getValuePtr()[i] << " ";
+		cout << " ]"<<endl<<endl;
 
-	cout << "rowPtr = " << getRowPtr() << " -> [ " ;
-	for (int i=0 ; i<this->dim1+1 ; i++)
-		cout <<  getRowPtr()[i] << " ";
-	cout << " ]"<<endl;
-	cout << "colInd = " << getColInd() << " -> [ " ;
-	for (int i=0 ; i<nnz ; i++)
-		cout <<  getColInd()[i] << " ";
-	cout << " ]"<<endl;
-	cout << "values = " << getValuePtr() << " -> [ " ;
-	for (int i=0 ; i<nnz ; i++)
-		cout <<  getValuePtr()[i] << " ";
-	cout << " ]"<<endl<<endl;*/
-
-
+	}
 }
 
 
@@ -454,7 +455,7 @@ void Faust::MatSparse<FPP,Cpu>::operator= (const Faust::MatDense<FPP,Cpu>& Mdens
 template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::operator*=(const FPP alpha)
 {
-	if (fabs(alpha) == 0.0)
+	if (alpha == FPP(0.0))
 		resize(0, 0, 0);
 	else
 	{
