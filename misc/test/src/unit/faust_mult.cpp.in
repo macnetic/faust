@@ -134,6 +134,14 @@ int main(int argc, char* argv[])
 	Faust::Transform<FPP,Cpu> F(list_fact,1.0,ispOtimized);
 	F.Display();
 	
+
+	if (!F.isReal())
+	{
+		std::cerr<<"F.isreal() invalid value, F must be made of real scalar "<<std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+
 	int nbRowF = F.getNbRow();
 	int nbColF = F.getNbCol();	
 	

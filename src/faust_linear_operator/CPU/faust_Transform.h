@@ -104,6 +104,11 @@ namespace Faust
         * */		
 	void check_factors_validity() const;
 
+	/** \brief 
+	* check if the Transform has real scalar or complex scalar 
+        * */
+	bool isReal() const;
+
         /** \brief Constructor
         * \param facts : Vector including dense matrix*/
         Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts);
