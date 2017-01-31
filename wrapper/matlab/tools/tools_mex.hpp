@@ -53,7 +53,19 @@
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
 #include "faust_Vect.h"
+#include "faust_Transform.h"
+#include "faust_LinearOperator.h"
 
+
+
+template<typename FPP>
+bool isScalarCompatible(Faust::LinearOperator<FPP,Cpu> & L, const mxArray * Matlab_Mat)
+{
+	bool isMatlabComplex = mxIsComplex(Matlab_Mat);
+	bool isTransformComplex = !(L.isReal());
+	return (isMatlabComplex == isTransformComplex);
+
+}
 
 
 template<typename FPP>
@@ -134,7 +146,11 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 {
 
     int  nbRow,nbCol;
+    
 
+
+
+	
 	if (mxIsEmpty(Mat_array))
 	{
 		mexErrMsgTxt("tools_mex.h:getFaustMat :input matrix is empty.");
@@ -156,6 +172,11 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
         //mexErrMsgTxt("sparse matrix entry instead of dense matrix");
         mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
     }
+
+    //check scalar compayibility 
+    if (!isScalarCompatible(Mat,Mat_array))		
+	mexErrMsgTxt("getFaustMat scalar type (complex/real) are not compatible");
+	
 	const mxClassID V_CLASS_ID = mxGetClassID(Mat_array);
 	 FPP* MatPtr;
 	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(FPP))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(FPP))))
@@ -204,7 +225,11 @@ void getFaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S)
 		mexErrMsgIdAndTxt("tools_mex.h:getFaustspMat",
            "input array must be sparse");
 	}
-	int nnzMax = mxGetNzmax(spMat_array);
+
+    //check scalar compayibility 
+    if (!isScalarCompatible(S,spMat_array))		
+	mexErrMsgTxt("getFaustspMat scalar type (complex/real) are not compatible");	
+    int nnzMax = mxGetNzmax(spMat_array);
     int nbCol = mxGetN(spMat_array);
     int nbRow = mxGetM(spMat_array);
     //mexPrintf("DIM (%d,%d) NNZMAX : %d\n",nbRow,nbCol,nnzMax);

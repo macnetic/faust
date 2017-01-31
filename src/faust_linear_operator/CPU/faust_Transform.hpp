@@ -52,8 +52,7 @@
 #include <fstream>
 #include "faust_BlasHandle.h"
 #include "faust_SpBlasHandle.h"
-#include <complex>
-#include <typeinfo>
+
 
 
 
@@ -289,24 +288,7 @@ void Faust::Transform<FPP,Cpu>::updateNonZeros()
 }
 
 
-template<typename FPP>
-bool Faust::Transform<FPP,Cpu>::isReal() const
-{
-	
-	bool isReal = (typeid(FPP) == typeid(double));
-	     isReal = (isReal || (typeid(FPP) == typeid(float)) );
 
-	bool isComplex = (typeid(FPP) == typeid(std::complex<double>));
-	     isComplex = (isComplex || (typeid(FPP) == typeid(std::complex<float>)) );	
-	
-	if  ( (!isComplex) && (!isReal) )
-	{
-		handleError(m_className,"isReal : unknown type of scalar");
-	}
-	
-	return isReal;
-
-}
 
 
 

@@ -334,163 +334,172 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		return;
 
 	}
-
-
-    if (!strcmp("multiply", cmd)) {
-	if (nlhs > 1 ||  nrhs != 4)
-            mexErrMsgTxt("Multiply: Unexpected arguments.");
-
-	mwSize nelem = mxGetNumberOfElements(prhs[3]);
-	if (nelem != 1)
-		mexErrMsgTxt("invalid char argument.");
+   
 	
-	// boolean flag to know if the faust si transposed
-	bool transpose_flag = (bool) mxGetScalar(prhs[3]);
-	char op;
-	if (transpose_flag)
-		op='T';
-	else
-		op='N';
+    	if (!strcmp("multiply", cmd)) {
+		if (nlhs > 1 ||  nrhs != 4)
+		    mexErrMsgTxt("Multiply: Unexpected arguments.");
 
+		mwSize nelem = mxGetNumberOfElements(prhs[3]);
+		if (nelem != 1)
+			mexErrMsgTxt("invalid char argument.");
+	
+		// boolean flag to know if the faust si transposed
+		bool transpose_flag = (bool) mxGetScalar(prhs[3]);
+		char op;
+		if (transpose_flag)
+			op='T';
+		else
+			op='N';
+	
+		// input matrix or vector from MATLAB
+		const mxArray * inMatlabMatrix = prhs[2];
+		
 
 			
-        const size_t nbRowA = mxGetM(prhs[2]);
-        const size_t nbColA = mxGetN(prhs[2]);
-	faust_unsigned_int nbRowOp_,nbColOp_;
-	(*core_ptr).setOp(op,nbRowOp_,nbColOp_);
-	const size_t nbRowOp = nbRowOp_;
-	const size_t nbColOp = nbColOp_;			
-        const size_t nbRowB = nbRowOp;
-        const size_t nbColB = nbColA;
+		const size_t nbRowA = mxGetM(inMatlabMatrix);
+		const size_t nbColA = mxGetN(inMatlabMatrix);
+		faust_unsigned_int nbRowOp_,nbColOp_;
+		(*core_ptr).setOp(op,nbRowOp_,nbColOp_);
+		const size_t nbRowOp = nbRowOp_;
+		const size_t nbColOp = nbColOp_;			
+		const size_t nbRowB = nbRowOp;
+		const size_t nbColB = nbColA;
 
 	
 
-        // Check parameters
-        
-	
-        if (mxGetNumberOfDimensions(prhs[2]) != 2
-                || nbRowA != nbColOp )
-            mexErrMsgTxt("Multiply: Wrong number of dimensions for the input vector or matrix (third argument).");
+		/** Check parameters **/
+		
+		//check dimension match
+		if (mxGetNumberOfDimensions(inMatlabMatrix) != 2
+		        || nbRowA != nbColOp )
+		    mexErrMsgTxt("Multiply : Wrong number of dimensions for the input vector or matrix (third argument).");
 
 
-        FFPP* ptr_data = NULL;
-
-	const mxClassID V_CLASS_ID = mxGetClassID(prhs[2]);
-	const size_t NB_ELEMENTS = mxGetNumberOfElements(prhs[2]);
-        if(V_CLASS_ID == mxDOUBLE_CLASS)
-        {
-            double* ptr_data_tmp = static_cast<double*> (mxGetData(prhs[2]));
-            ptr_data = new FFPP[NB_ELEMENTS];
-            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
-	}
-        else if(V_CLASS_ID == mxSINGLE_CLASS)
-	{
-            float* ptr_data_tmp = static_cast<float*> (mxGetData(prhs[2]));
-            ptr_data = new FFPP[NB_ELEMENTS];
-            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
-	}
-        else if(V_CLASS_ID == mxINT8_CLASS)
-	{
-            char* ptr_data_tmp = static_cast<char*> (mxGetData(prhs[2]));
-            ptr_data = new FFPP[NB_ELEMENTS];
-            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
-	}
-        else if(V_CLASS_ID == mxUINT8_CLASS)
-	{
-            unsigned char* ptr_data_tmp = static_cast<unsigned char*> (mxGetData(prhs[2]));
-            ptr_data = new FFPP[NB_ELEMENTS];
-            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
-	}
-        else if(V_CLASS_ID == mxINT16_CLASS)
-	{
-            short* ptr_data_tmp = static_cast<short*> (mxGetData(prhs[2]));
-            ptr_data = new FFPP[NB_ELEMENTS];
-            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
-	}
-        else if (V_CLASS_ID == mxUINT16_CLASS)
-	{
-            unsigned short* ptr_data_tmp = static_cast<unsigned short*> (mxGetData(prhs[2]));
-            ptr_data = new FFPP[NB_ELEMENTS];
-            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
-	}
-        else if (V_CLASS_ID == mxINT32_CLASS)
-	{
-            int* ptr_data_tmp = static_cast<int*> (mxGetData(prhs[2]));
-            ptr_data = new FFPP[NB_ELEMENTS];
-            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
-	}
-        else if (V_CLASS_ID == mxUINT32_CLASS)
-	{
-            unsigned int* ptr_data_tmp = static_cast<unsigned int*> (mxGetData(prhs[2]));
-            ptr_data = new FFPP[NB_ELEMENTS];
-            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
-	}
-        else if (V_CLASS_ID == mxINT64_CLASS)
-	{
-            long long* ptr_data_tmp = static_cast<long long*> (mxGetData(prhs[2]));
-            ptr_data = new FFPP[NB_ELEMENTS];
-            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
-	}
-        else if (V_CLASS_ID == mxUINT64_CLASS)
-	{
-            unsigned long long* ptr_data_tmp = static_cast<unsigned long long*> (mxGetData(prhs[2]));
-            ptr_data = new FFPP[NB_ELEMENTS];
-            for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-                ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
-	}
-	else
-            mexErrMsgTxt("Unknown matlab type.");
+		//check scalar type match (real/complex)
+		if ( !isScalarCompatible((*core_ptr),inMatlabMatrix) )
+			mexErrMsgTxt("Multiply : Wrong scalar compatibility (real/complex)");
 
 
-	// Si prhs[2] est un vecteur
-	if(nbColA == 1)
-	{
-        Faust::Vect<FFPP,Cpu> A(nbRowA, ptr_data);
-        Faust::Vect<FFPP,Cpu> B(nbRowB);
-	//NB        
-	//B = (*core_ptr)*A;
-	B = (*core_ptr).multiply(A,op);
-	
-		const mwSize dims[2]={nbRowB,nbColB};
-		if(sizeof(FFPP)==sizeof(float))
-			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
-		else if(sizeof(FFPP)==sizeof(double))
-			plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
+
+		FFPP* ptr_data = NULL;
+
+		const mxClassID V_CLASS_ID = mxGetClassID(inMatlabMatrix);
+		const size_t NB_ELEMENTS = mxGetNumberOfElements(inMatlabMatrix);
+		if(V_CLASS_ID == mxDOUBLE_CLASS)
+		{
+		    double* ptr_data_tmp = static_cast<double*> (mxGetData(inMatlabMatrix));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if(V_CLASS_ID == mxSINGLE_CLASS)
+		{
+		    float* ptr_data_tmp = static_cast<float*> (mxGetData(inMatlabMatrix));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if(V_CLASS_ID == mxINT8_CLASS)
+		{
+		    char* ptr_data_tmp = static_cast<char*> (mxGetData(inMatlabMatrix));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if(V_CLASS_ID == mxUINT8_CLASS)
+		{
+		    unsigned char* ptr_data_tmp = static_cast<unsigned char*> (mxGetData(inMatlabMatrix));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if(V_CLASS_ID == mxINT16_CLASS)
+		{
+		    short* ptr_data_tmp = static_cast<short*> (mxGetData(inMatlabMatrix));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if (V_CLASS_ID == mxUINT16_CLASS)
+		{
+		    unsigned short* ptr_data_tmp = static_cast<unsigned short*> (mxGetData(inMatlabMatrix));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if (V_CLASS_ID == mxINT32_CLASS)
+		{
+		    int* ptr_data_tmp = static_cast<int*> (mxGetData(inMatlabMatrix));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if (V_CLASS_ID == mxUINT32_CLASS)
+		{
+		    unsigned int* ptr_data_tmp = static_cast<unsigned int*> (mxGetData(inMatlabMatrix));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if (V_CLASS_ID == mxINT64_CLASS)
+		{
+		    long long* ptr_data_tmp = static_cast<long long*> (mxGetData(inMatlabMatrix));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if (V_CLASS_ID == mxUINT64_CLASS)
+		{
+		    unsigned long long* ptr_data_tmp = static_cast<unsigned long long*> (mxGetData(inMatlabMatrix));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
 		else
-			mexErrMsgTxt("FFPP type is neither double nor float");
+		    mexErrMsgTxt("Unknown matlab type.");
 
-		FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
-		memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));
-	}
-	// Si prhs[2] est une matrice
-	else
-	{       	
-		Faust::MatDense<FFPP,Cpu> A(ptr_data, nbRowA, nbColA);
-		Faust::MatDense<FFPP,Cpu> B(nbRowB, nbColA);
+
+		// Si inMatlabMatrix est un vecteur
+		if(nbColA == 1)
+		{
+		Faust::Vect<FFPP,Cpu> A(nbRowA, ptr_data);
+		Faust::Vect<FFPP,Cpu> B(nbRowB);
+		//NB        
+		//B = (*core_ptr)*A;
 		B = (*core_ptr).multiply(A,op);
-		const mwSize dims[2]={nbRowB,nbColB};
-		if(sizeof(FFPP)==sizeof(float))
-			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
-		else if(sizeof(FFPP)==sizeof(double))
-			plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
+	
+			const mwSize dims[2]={nbRowB,nbColB};
+			if(sizeof(FFPP)==sizeof(float))
+				plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
+			else if(sizeof(FFPP)==sizeof(double))
+				plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
+			else
+				mexErrMsgTxt("FFPP type is neither double nor float");
+
+			FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
+			memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));
+		}
+		// Si inMatlabMatrix est une matrice
 		else
-			mexErrMsgTxt("FFPP type is neither double nor float");
+		{       	
+			Faust::MatDense<FFPP,Cpu> A(ptr_data, nbRowA, nbColA);
+			Faust::MatDense<FFPP,Cpu> B(nbRowB, nbColA);
+			B = (*core_ptr).multiply(A,op);
+			const mwSize dims[2]={nbRowB,nbColB};
+			if(sizeof(FFPP)==sizeof(float))
+				plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
+			else if(sizeof(FFPP)==sizeof(double))
+				plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
+			else
+				mexErrMsgTxt("FFPP type is neither double nor float");
 
-		FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
-		memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));
-	}
-	if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
+			FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
+			memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));
+		}
+		if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
 
-        return;
+		return;
     }
 
 

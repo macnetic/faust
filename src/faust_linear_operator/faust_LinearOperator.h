@@ -91,7 +91,17 @@ namespace Faust
         */
         virtual void faust_gemm(const Faust::MatDense<FPP,DEVICE> & B, Faust::MatDense<FPP,DEVICE> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const=0;
 
+
+	/** \brief 
+	* check if the LinearOperator has real scalar or complex scalar 
+        * */
+	bool isReal() const;
+
+
+
     };
 }
+
+#include "faust_LinearOperator.hpp"
 
 #endif

@@ -44,6 +44,7 @@
 #include <vector>
 #include "faust_constant.h"
 
+
 namespace Faust {
 	template<typename FPP, Device DEVICE> class ConstraintGeneric;
 	template<typename FPP, Device DEVICE> class Vect;
@@ -51,7 +52,21 @@ namespace Faust {
 	template<typename FPP, Device DEVICE> class MatGeneric;
 	template<typename FPP, Device DEVICE> class MatDense;
 	template<typename FPP, Device DEVICE> class MatSparse;
+	template<typename FPP, Device DEVICE> class Transform;
+	template<typename FPP, Device DEVICE> class LinearOperator;
 }
+
+
+/*!
+*  \brief check if the Faust::Transform T has compatible scalar with MATLAB matrix Matlab_Mat (currently real is only compatible with real and complex is only compatible with complex)
+*  \param T :  Faust::Transform<FPP,Cpu>
+*  \tparam Matlab_Mat : mxArray pointer 
+        */
+template<typename FPP>
+bool isScalarCompatible(const Faust::LinearOperator<FPP,Cpu> & L,const mxArray * Matlab_Mat);
+
+
+
 
 /*!
 *  \brief convert the matlab mxArray* into a Faust::Vect<FPP,Cpu>, no shared memory
