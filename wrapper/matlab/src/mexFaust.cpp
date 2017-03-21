@@ -272,7 +272,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         	const size_t SIZE_B2 = nbColOp;
 		Faust::MatDense<FFPP,Cpu> prod=core_ptr->get_product(op);
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
-		if(sizeof(FFPP)==sizeof(float))
+		/*if(sizeof(FFPP)==sizeof(float))
 			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
 		else if(sizeof(FFPP)==sizeof(double))
 			plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
@@ -281,7 +281,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
 		memcpy(ptr_out, prod.getData(), SIZE_B1*SIZE_B2*sizeof(FFPP));
-
+		*/
+		plhs[0] = FaustMat2mxArray(prod);
 		return;
 	}
 
@@ -381,7 +382,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("Multiply : Wrong scalar compatibility (real/complex)");
 
 
-
+		/*
 		FFPP* ptr_data = NULL;
 
 		const mxClassID V_CLASS_ID = mxGetClassID(inMatlabMatrix);
@@ -458,8 +459,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 		else
 		    mexErrMsgTxt("Unknown matlab type.");
-
-
+		*/
+		FFPP* ptr_data = NULL;
+		
+		mxArray2Ptr(inMatlabMatrix, ptr_data);		
+	
 		// Si inMatlabMatrix est un vecteur
 		if(nbColA == 1)
 		{
@@ -469,7 +473,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		//B = (*core_ptr)*A;
 		B = (*core_ptr).multiply(A,op);
 	
-			const mwSize dims[2]={nbRowB,nbColB};
+			/*const mwSize dims[2]={nbRowB,nbColB};
 			if(sizeof(FFPP)==sizeof(float))
 				plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
 			else if(sizeof(FFPP)==sizeof(double))
@@ -478,7 +482,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				mexErrMsgTxt("FFPP type is neither double nor float");
 
 			FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
-			memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));
+			memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));*/
+			plhs[0]=FaustVec2mxArray(B);
 		}
 		// Si inMatlabMatrix est une matrice
 		else
@@ -486,7 +491,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			Faust::MatDense<FFPP,Cpu> A(ptr_data, nbRowA, nbColA);
 			Faust::MatDense<FFPP,Cpu> B(nbRowB, nbColA);
 			B = (*core_ptr).multiply(A,op);
-			const mwSize dims[2]={nbRowB,nbColB};
+			/*const mwSize dims[2]={nbRowB,nbColB};
 			if(sizeof(FFPP)==sizeof(float))
 				plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
 			else if(sizeof(FFPP)==sizeof(double))
@@ -496,6 +501,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 			FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
 			memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));
+			*/
+			plhs[0]=FaustMat2mxArray(B);
+			
 		}
 		if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
 

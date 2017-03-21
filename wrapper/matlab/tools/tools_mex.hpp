@@ -69,7 +69,7 @@ bool isScalarCompatible(Faust::LinearOperator<FPP,Cpu> & L, const mxArray * Matl
 
 
 template<typename FPP>
-void getFaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec)
+void mxArray2FaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec)
 {
 	    int  nbRow,nbCol;
 
@@ -142,7 +142,7 @@ void getFaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec)
 
 
 template<typename FPP>
-void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
+void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 {
 
     int  nbRow,nbCol;
@@ -153,12 +153,12 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 	
 	if (mxIsEmpty(Mat_array))
 	{
-		mexErrMsgTxt("tools_mex.h:getFaustMat :input matrix is empty.");
+		mexErrMsgTxt("tools_mex.h:mxArray2FaustMat :input matrix is empty.");
 	}
 	mwSize nb_dim=mxGetNumberOfDimensions(Mat_array);
 	if (nb_dim != 2)
 	{
-		mexErrMsgTxt("tools_mex.h:getFaustMat :input matrix must be a 2D array.");
+		mexErrMsgTxt("tools_mex.h:mxArray2FaustMat :input matrix must be a 2D array.");
 	}
     const mwSize *dimsMat;
     dimsMat = mxGetDimensions(Mat_array);
@@ -166,7 +166,7 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 	nbRow = (int) dimsMat[0];
     nbCol = (int) dimsMat[1];
     if ((nbRow == 0) || (nbCol == 0))
-        mexErrMsgIdAndTxt("tools_mex.h:getFaustMat", "empty matrix");
+        mexErrMsgIdAndTxt("tools_mex.h:mxArray2FaustMat", "empty matrix");
     if (mxIsSparse(Mat_array))
     {
         //mexErrMsgTxt("sparse matrix entry instead of dense matrix");
@@ -175,7 +175,7 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 
     //check scalar compayibility 
     if (!isScalarCompatible(Mat,Mat_array))		
-	mexErrMsgTxt("getFaustMat scalar type (complex/real) are not compatible");
+	mexErrMsgTxt("mxArray2FaustMat scalar type (complex/real) are not compatible");
 	
 	const mxClassID V_CLASS_ID = mxGetClassID(Mat_array);
 	 FPP* MatPtr;
@@ -201,7 +201,7 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 
 		}else
 		{
-		 mexErrMsgTxt("getFaustMat :input matrix format must be single or double");
+		 mexErrMsgTxt("mxArray2FaustMat :input matrix format must be single or double");
 		}
 	}
 
@@ -218,17 +218,17 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 }
 
 template<typename FPP>
-void getFaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S)
+void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S)
 {
 	if (!mxIsSparse(spMat_array))
 	{
-		mexErrMsgIdAndTxt("tools_mex.h:getFaustspMat",
+		mexErrMsgIdAndTxt("tools_mex.h:mxArray2FaustspMat",
            "input array must be sparse");
 	}
 
     //check scalar compayibility 
     if (!isScalarCompatible(S,spMat_array))		
-	mexErrMsgTxt("getFaustspMat scalar type (complex/real) are not compatible");	
+	mexErrMsgTxt("mxArray2FaustspMat scalar type (complex/real) are not compatible");	
     int nnzMax = mxGetNzmax(spMat_array);
     int nbCol = mxGetN(spMat_array);
     int nbRow = mxGetM(spMat_array);
@@ -259,11 +259,15 @@ void getFaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S)
 template<typename FPP>
 mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 {
-		mxArray * mxMat;
-		int row,col;
-		row = M.getNbRow();
+	if (!M.isReal())
+		mexErrMsgTxt("FaustMat2mxArray : Faust::MatDense must be real");
+	
+	mxArray * mxMat;
+	int row,col;
+	row = M.getNbRow();
         col = M.getNbCol();
-        mxMat = mxCreateDoubleMatrix(row,col,mxREAL);
+		
+        /*mxMat = mxCreateDoubleMatrix(row,col,mxREAL);
         double* mxMatdata = mxGetPr(mxMat);
 	
 		if (typeid(double) == typeid(FPP))
@@ -279,10 +283,67 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 			memcpy(mxMatdata,mat_ptr,sizeof(double)*row*col);
 			mxFree(mat_ptr);
 			
-		}		
+		}*/
+	const mwSize dims[2]={row,col};
+	if(typeid(FFPP)==typeid(float))
+	{
+		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
+	}else if(sizeof(FFPP)==sizeof(double))
+	{
+		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);		
+	}
+	
+	FPP*    ptr_out = static_cast<FPP*> (mxGetData(mxMat));
+		memcpy(ptr_out, M.getData(),row*col*sizeof(FPP));	
+		
+	
 		return mxMat;
 		
 }
+
+
+
+
+
+
+template<typename FPP>
+mxArray*  FaustVec2mxArray(const Faust::Vect<FPP,Cpu>& M)
+{
+	if (!M.isReal())
+		mexErrMsgTxt("FaustMat2mxArray : Faust::MatDense must be real");
+	
+	mxArray * mxMat;
+	int row,col;
+	row = M.size();
+        col = 1;
+	
+		
+	
+
+	const mwSize dims[2]={row,col};
+	if(typeid(FFPP)==typeid(float))
+	{
+		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
+	}else if(sizeof(FFPP)==sizeof(double))
+	{
+		mxMat = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);		
+	}
+	
+	FPP*    ptr_out = static_cast<FPP*> (mxGetData(mxMat));
+		memcpy(ptr_out, M.getData(),row*col*sizeof(FPP));	
+		return mxMat;
+		
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -344,7 +405,7 @@ void setVectorFaustMat(std::vector<Faust::MatDense<FPP,Cpu> > &vecMat,mxArray *C
 			mexErrMsgTxt("tools_mex.h:setVectorFaustMat :input matrix is empty.");
 		}
 		mexPrintf("mxMat test_empty\n",i);
-		getFaustMat(mxMat,mat);
+		mxArray2FaustMat(mxMat,mat);
 		mexPrintf("mat set\n",i);
 		vecMat.push_back(mat);
 	}
@@ -406,7 +467,7 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS
 		{
 			mxConsParams=mxGetCell(mxCons,1);
 			Faust::MatDense<FPP,Cpu> matParameter;
-			getFaustMat(mxConsParams,matParameter);
+			mxArray2FaustMat(mxConsParams,matParameter);
 			consS.push_back((new Faust::ConstraintMat<FPP,Cpu>(consNameType,matParameter,nbRowCons,nbColCons)));
 			break;
 		}
@@ -431,12 +492,12 @@ void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cp
 	if (!mxIsSparse(mxMat))
 	{
 		Faust::MatDense<FPP,Cpu> denseM;
-		getFaustMat(mxMat,denseM);
+		mxArray2FaustMat(mxMat,denseM);
 		M=denseM.Clone();
 	}else
 	{
 		Faust::MatSparse<FPP,Cpu> spM;		
-		getFaustspMat(mxMat,spM);
+		mxArray2FaustspMat(mxMat,spM);
 		M=spM.Clone();
 	}
 
@@ -444,6 +505,114 @@ void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cp
 		
 
 }
+
+
+
+template<typename FPP>
+void mxArray2Ptr(const mxArray* mxMat, FPP* & ptr_data)
+{
+				
+		const mxClassID V_CLASS_ID = mxGetClassID(mxMat);
+
+		const size_t NB_ELEMENTS = mxGetNumberOfElements(mxMat);
+
+		if(V_CLASS_ID == mxDOUBLE_CLASS)
+
+		{
+
+		    double* ptr_data_tmp = static_cast<double*> (mxGetData(mxMat));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+
+		}
+
+		else if(V_CLASS_ID == mxSINGLE_CLASS)
+
+		{
+
+		    float* ptr_data_tmp = static_cast<float*> (mxGetData(mxMat));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+
+		}
+
+		else if(V_CLASS_ID == mxINT8_CLASS)
+
+		{
+
+		    char* ptr_data_tmp = static_cast<char*> (mxGetData(mxMat));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+
+		}
+
+		else if(V_CLASS_ID == mxUINT8_CLASS)
+
+		{
+
+		    unsigned char* ptr_data_tmp = static_cast<unsigned char*> (mxGetData(mxMat));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+
+		}
+
+		else if(V_CLASS_ID == mxINT16_CLASS)
+
+		{
+
+		    short* ptr_data_tmp = static_cast<short*> (mxGetData(mxMat));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+
+		}
+
+		else if (V_CLASS_ID == mxUINT16_CLASS)
+
+		{
+
+		    unsigned short* ptr_data_tmp = static_cast<unsigned short*> (mxGetData(mxMat));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if (V_CLASS_ID == mxINT32_CLASS)
+		{
+		    int* ptr_data_tmp = static_cast<int*> (mxGetData(mxMat));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if (V_CLASS_ID == mxUINT32_CLASS)
+		{
+		    unsigned int* ptr_data_tmp = static_cast<unsigned int*> (mxGetData(mxMat));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if (V_CLASS_ID == mxINT64_CLASS)
+		{
+		    long long* ptr_data_tmp = static_cast<long long*> (mxGetData(mxMat));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else if (V_CLASS_ID == mxUINT64_CLASS)
+		{
+		    unsigned long long* ptr_data_tmp = static_cast<unsigned long long*> (mxGetData(mxMat));
+		    ptr_data = new FFPP[NB_ELEMENTS];
+		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
+		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		}
+		else
+		    mexErrMsgTxt("Unknown matlab type.");
+
+}
+
 
 
 

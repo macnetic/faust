@@ -98,7 +98,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	
     // initialization of the matrix that will be factorized
     Faust::MatDense<FFPP,Cpu> matrix;
-    getFaustMat(matlab_matrix,matrix);
+    mxArray2FaustMat(matlab_matrix,matrix);
 	 
     // nrow of the matrix that will be factorized	
     int nb_row = -1;

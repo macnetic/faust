@@ -74,7 +74,7 @@ bool isScalarCompatible(const Faust::LinearOperator<FPP,Cpu> & L,const mxArray *
 *  \tparam vec : Faust::Vect<FPP,Cpu>  
         */
 template<typename FPP>
-void getFaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec);
+void mxArray2FaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec);
 
 /*!
 *  \brief convert the matlab mxArray* into a Faust::MatDense<FPP,Cpu>, no shared memory
@@ -82,7 +82,7 @@ void getFaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec);
 *  \tparam Mat : Faust::MatDense<FPP,Cpu>
         */
 template<typename FPP>
-void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat);
+void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat);
 
 /*!
 *  \brief convert the matlab mxArray* into a Faust::Vect<FPP,Cpu>, no shared memory
@@ -90,15 +90,26 @@ void getFaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat);
 *  \tparam S : Faust::MatSparse<FPP,Cpu>  
         */
 template<typename FPP>
-void getFaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S);
+void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S);
 
 /*!
 *  \brief return a matlab mxArray* dense matrix from a Faust::MatDense<FPP,Cpu>, no shared memory
 *  \param[out] mxArray* : pointer to the mxArray* (matlab format) representing a dense matrix  
-*  \tparam[in] S : Faust::MatDense<FPP,Cpu>  
+*  \tparam[in] M : Faust::MatDense<FPP,Cpu>  
 */
 template<typename FPP>
 mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M);
+
+
+
+
+/*!
+*  \brief return a matlab mxArray* dense matrix from a Faust::MatVec<FPP,Cpu>, no shared memory
+*  \param[out] mxArray* : pointer to the mxArray* (matlab format) representing a dense matrix  
+*  \tparam[in] M : Faust::Vec<FPP,Cpu>  
+*/
+template<typename FPP>
+mxArray*  FaustVec2mxArray(const Faust::Vect<FPP,Cpu>& M);
 
 /*!
 *  \brief return a matlab mxArray** representing a cell-array of matlab matrix from a std::vector<Faust::MatDense<FPP,Cpu> >, no shared memory
@@ -120,6 +131,12 @@ void setCellFacts(mxArray ** cellFacts,std::vector<Faust::MatDense<FPP,Cpu> > & 
 */
 template<typename FPP>
 void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS,mxArray* mxCons);
+
+
+
+template<typename FPP>
+void mxArray2Ptr(const mxArray* mxMat, FPP* & data_ptr);
+
 
 
 
