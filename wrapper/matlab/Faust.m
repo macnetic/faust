@@ -44,6 +44,7 @@ classdef Faust
     properties (SetAccess = private, Hidden = true)
         matrix; % Handle to the underlying C++ class instance
 	transpose_flag; % boolean to know if the Faust is transpose or not
+	isReal;
     end
     methods
 
@@ -60,8 +61,35 @@ classdef Faust
 	% F = Faust(filename) 
 	% filename : a filename (mat file) where a Faust is stored with save_Faust
         
-	   F.matrix = FaustCore(varargin{:});
-	   F.transpose_flag = 0;	
+
+	    if (nargin == 1) && ischar(varargin{1})
+		filename=varargin{1};
+		load(filename);
+		if (~exist('faust_factors','var') )
+			error('FaustCore : invalid file');
+		end
+		F=Faust(faust_factors);
+	    else
+		%check if the factors are real or complex, at least one complex factor means a complex faust 
+		factors=varargin{1};
+		isRealFlag = 1;
+	
+		for i=1:length(factors)
+			if (~isreal(factors{i}))
+				isRealFlag = 0;
+			end
+		end
+
+		F.matrix = FaustCore(varargin{:});
+	   	F.transpose_flag = 0;
+	   	F.isReal = isRealFlag;
+		
+	    end
+
+	   
+	   	
+		
+	 	
 	end
 	
 
@@ -74,8 +102,10 @@ classdef Faust
 	% delete(F)
 	%
 	% See also Faust
-            
-            mexFaust('delete', F.objectHandle);
+            if (F.isReal)
+            	%mexFaustReal('delete', F.matrix.objectHandle);
+		delete(F.matrix);
+	    end
         end
         
 
@@ -86,8 +116,11 @@ classdef Faust
 	% storage matrix, C is also a full matrix storage.
 	% 
 	% See also mtimes_trans
-        
-            C = mexFaust('multiply', F.matrix.objectHandle,A,F.transpose_flag);
+            if (F.isReal)	
+            	C = mexFaustReal('multiply', F.matrix.objectHandle,A,F.transpose_flag);
+	    else
+		C = mexFaustCplx('multiply', F.matrix.objectHandle,A,F.transpose_flag);
+	    end
         end
         
         
@@ -111,7 +144,11 @@ classdef Faust
 	end
 	   
 	isreally_trans=xor(trans,F.transpose_flag);
-	C = mexFaust('multiply', F.matrix.objectHandle,A,isreally_trans);
+	if (F.isReal)
+		C = mexFaustReal('multiply', F.matrix.objectHandle,A,isreally_trans);
+	else
+		C = mexFaustCplx('multiply', F.matrix.objectHandle,A,isreally_trans);
+	end
             
         end
         
@@ -121,9 +158,11 @@ classdef Faust
 	% built-in function).
 	%
 	% A=full(F) converts a Faust matrix F to full storage matrix A.
-        
-        A=mexFaust('full',F.matrix.objectHandle,F.transpose_flag);
-	
+        if (F.isReal)
+        	A=mexFaustReal('full',F.matrix.objectHandle,F.transpose_flag);
+	else
+		A=mexFaustCplx('full',F.matrix.objectHandle,F.transpose_flag);
+	end
             
         end
 
@@ -136,10 +175,9 @@ classdef Faust
 	% WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
 	%
 	% See also ctranspose.
-            
                 F_trans=ctranspose(F); 
-
-        end
+        
+	end
         
         function F_ctrans=ctranspose(F)
 	%% CTRANSPOSE ' Complex conjugate transposed Faust (overloaded Matlab built-in function).
@@ -168,7 +206,7 @@ classdef Faust
 	% of rows and size(F,2) returns the number of columns in the Faust.
 	% If DIM > 2, M will be 1.
         
-            
+          	 
             
 	   nb_input = length(varargin);
             
@@ -180,10 +218,13 @@ classdef Faust
             if ((nb_input == 1) && (nargout > 1) | (nargout > 2)) 
                 error('Too many output arguments');
             end
-            
-	
-	    Size=mexFaust('size',F.matrix.objectHandle);
-	    
+            Size=[-1 -1];	
+	    if (F.isReal)	
+	    	Size=mexFaustReal('size',F.matrix.objectHandle);
+	    else
+		Size=mexFaustCplx('size',F.matrix.objectHandle);
+	    end
+
 	    % if the Faust is tranposed, inverse the dimension		    	
 	    if(F.transpose_flag) 
 	    	Size = Size*[0,1;1,0];
@@ -263,9 +304,11 @@ classdef Faust
 		if (F.transpose_flag)
 			id = get_nb_factor(F)+1-id;
 		end
-
-		factor = mexFaust('get_fact',F.matrix.objectHandle,id);
-
+		if (F.isReal)
+			factor = mexFaustReal('get_fact',F.matrix.objectHandle,id);
+		else
+			factor = mexFaustCplx('get_fact',F.matrix.objectHandle,id);
+		end
 		if (F.transpose_flag)
 			factor = factor';
 		end
@@ -280,8 +323,11 @@ classdef Faust
 	% Faust F.
 	%
 	% See also get_fact.
-    
-		nb_factor = mexFaust('get_nb_factor',F.matrix.objectHandle);
+    		if (F.isReal)
+			nb_factor = mexFaustReal('get_nb_factor',F.matrix.objectHandle);
+		else
+			nb_factor = mexFaustReal('get_nb_factor',F.matrix.objectHandle);
+		end
     end
 
     
@@ -419,9 +465,11 @@ classdef Faust
     % This function shows the size of the Faust,
     %  its number of factor, its RCG ...
     % 
-	
-	mexFaust('disp',F.matrix.objectHandle);	
-
+	if (F.isReal)
+		mexFaustReal('disp',F.matrix.objectHandle);
+	else
+		mexFaustCplx('disp',F.matrix.objectHandle);	
+	end
 
 
     end
@@ -447,8 +495,11 @@ classdef Faust
             end
 	
 	    % the transpose flag of the Faust is ignored because norm(A)==norm(A')
-	    norm_Faust=mexFaust('norm',F.matrix.objectHandle);
-            
+	    if (F.isReal)	
+	    	norm_Faust=mexFaustReal('norm',F.matrix.objectHandle);
+	    else
+		norm_Faust=mexFaustCplx('norm',F.matrix.objectHandle);
+            end
 	    
 
 
@@ -461,9 +512,11 @@ classdef Faust
 	% nz = nnz(F) is the number of nonzero elements in the Faust F.
 	%
 	% See also density, RCG.
-    
-	    nz=mexFaust('nnz',F.matrix.objectHandle);
-            
+    	    if (F.isReal)	
+	    	nz=mexFaustReal('nnz',F.matrix.objectHandle);
+	    else
+		nz=mexFaustCplx('nnz',F.matrix.objectHandle);
+            end
 	end
 
 

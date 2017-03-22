@@ -166,7 +166,7 @@ namespace Faust
         void multiplyLeft(const Transform<FPP,Cpu> & A);
         void scalarMultiply(const FPP scalar);
 	float getRCG() const{return ((float)(getNbRow()*getNbCol()))/((float) get_total_nnz());}
-        FPP spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
+        double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
         ~Transform(){for (int i=0;i<data.size();i++) delete data[i];}
 	
 

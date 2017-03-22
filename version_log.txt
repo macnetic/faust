@@ -9,6 +9,10 @@
 
 
 ##########################################################################
+version 1121 : debut compatibility with complex dans le wrapper Matlab
+       
+
+
 version 1116 : debut compatibility with complex
                 -> test unitaire 
 

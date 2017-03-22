@@ -45,31 +45,33 @@
 classdef FaustCore < handle
     properties (SetAccess = public, Hidden = false)
         objectHandle; % Handle to the underlying C++ class instance
+	isRealFlag;
     end
     methods
         %% Constructor - Create a new C++ class instance
         function this = FaustCore(varargin)
-            % Constructor - build a faust from a cell array of matrix and a scalar (optional)
-            %                1st input : 1D cell array of matrix (sparse or dense)
-            %                2nd input : (optional) multiplicative scalar
-	    %              - or from a filename (mat file) where a faust is stored with save_faust
-	    if (nargin == 1) && ischar(varargin{1})
-		filename=varargin{1};
-		load(filename);
-		if (~exist('faust_factors','var') )
-			error('FaustCore : invalid file');
+            	factors=varargin{1};
+		isRealFlag = 1;	
+		for i=1:length(factors)
+			if (~isreal(factors{i}))
+				isRealFlag = 0;
+			end
 		end
-		this=FaustCore(faust_factors);
-	    else				
-		this.objectHandle = mexFaust('new',varargin{:});
-	    end
-		
+
+		if (isRealFlag)						
+			this.objectHandle = mexFaustReal('new',varargin{:});
+		else
+			this.objectHandle = mexFaustCplx('new',varargin{:});
+		end
+		this.isRealFlag = isRealFlag;	
 	end
 
         %% Destructor - Destroy the C++ class instance
         function delete(this)
             % destructor delete the faust
-            mexFaust('delete', this.objectHandle);
+	    if (this.isRealFlag)	
+            	mexFaustReal('delete', this.objectHandle);
+	    end
         end
         
         

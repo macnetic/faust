@@ -51,6 +51,7 @@
 #include "faust_MatSparse.h"
 #include "faust_Transform.h"
 #include "faust_exception.h"
+#include <complex>
 
 	//////////FONCTION Faust::MatDense<FPP,Cpu> - Faust::MatDense<FPP,Cpu> ////////////////////
 
@@ -60,9 +61,10 @@
 
 
 
+
 // const char * core_algebra_name="Faust::Transform<FPP,Cpu>_algebra : ";
 template<typename FPP>
-FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max,FPP threshold, int & flag)
+FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max,double threshold, int & flag)
 {
 
 
@@ -77,10 +79,11 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
 
    Faust::Vect<FPP,Cpu> xk(nb_col);
    xk.setOnes();
-   Faust::Vect<FPP,Cpu> xk_norm(nb_col);
-   FPP lambda_old=1.0;
-   FPP lambda = 0.0;
-   while(fabs(lambda_old-lambda)>threshold && i<nbr_iter_max)
+   xk.normalize();
+   Faust::Vect<FPP,Cpu> xk_norm(xk);
+   FPP lambda_old=FPP(1.0);
+   FPP lambda = FPP(0.0);
+   while(absValue(lambda_old-lambda)>threshold && i<nbr_iter_max)
    {
       i++;
       lambda_old = lambda;
@@ -88,6 +91,8 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
       xk_norm.normalize();
       xk = A*xk_norm;
       lambda = xk_norm.dot(xk);
+
+	
    }
    flag = (i<nbr_iter_max)?i:-1;
    return lambda;
@@ -102,6 +107,14 @@ FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_i
 
 
 }
+
+
+
+
+
+
+
+
 
 //////////// modif AL AL
  

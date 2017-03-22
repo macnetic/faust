@@ -393,7 +393,7 @@ faust_unsigned_int Faust::Transform<FPP,Cpu>::getNbCol() const
 }
 
 template<typename FPP>
-FPP Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const
+double Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
 {
 	if (size() == 0)
 	{
@@ -413,7 +413,9 @@ FPP Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, FPP threshol
 			AtA.multiplyLeft((*this));
 		}
 		//std::cout<<"Faust fin spectralNorm"<<std::endl;
-		return std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag));
+		FPP maxAbsValue = std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag));
+		return absValue(maxAbsValue);
+
 	}
 }
 

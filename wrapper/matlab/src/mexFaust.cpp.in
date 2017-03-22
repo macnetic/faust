@@ -47,27 +47,30 @@
 #include <stdexcept>
 #include "faust_constant.h"
 #include "faust_Timer.h"
+#include <complex>
 // prhs[0] : name of command :
-//    "delete" to delete the Faust::Transform<FFPP> object dynamically allocated previously
-//    "multiply" to multiply the Faust::Transform<FFPP> object by a vector or a matrix
+//    "delete" to delete the Faust::Transform<SCALAR> object dynamically allocated previously
+//    "multiply" to multiply the Faust::Transform<SCALAR> object by a vector or a matrix
 
-// prhs[1] : address of the Faust::Transform<FFPP> object dynamically allocated previously
+// prhs[1] : address of the Faust::Transform<SCALAR> object dynamically allocated previously
 
-// prhs[2] (only necessary if prhs[0] matches "multiply") : vector or matrix A to multiply by the Faust::Transform<FFPP> object
+// prhs[2] (only necessary if prhs[0] matches "multiply") : vector or matrix A to multiply by the Faust::Transform<SCALAR> object
 
 
+
+typedef @FAUST_SCALAR@ SCALAR;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	#ifdef FAUST_VERBOSE
-		if (typeid(FFPP) == typeid(float))
+		if (typeid(SCALAR) == typeid(float))
 		{
-			std::cout<<"FFPP == float"<<std::endl;
+			std::cout<<"SCALAR == float"<<std::endl;
 		}
 
-		if (typeid(FFPP) == typeid(double))
+		if (typeid(SCALAR) == typeid(double))
 		{
-			std::cout<<"FFPP == double"<<std::endl;
+			std::cout<<"SCALAR == double"<<std::endl;
 		}
 	#endif
 	try{
@@ -91,9 +94,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(!mxIsCell(prhs[1]))
 			mexErrMsgTxt("1st arg input must be a cell-array");
         
-		// v1105 : Faust::Transform<FFPP,Cpu> is no longer made of Faust::MatSparse<FFPP,Cpu> but of pointer of abstract class Faust::MatGeneric<FFPP,Cpu>
-		//old version : std::vector<Faust::MatSparse<FFPP,Cpu> > vec_spmat;
-		std::vector<Faust::MatGeneric<FFPP,Cpu>*> list_factor;
+		// v1105 : Faust::Transform<SCALAR,Cpu> is no longer made of Faust::MatSparse<SCALAR,Cpu> but of pointer of abstract class Faust::MatGeneric<SCALAR,Cpu>
+		//old version : std::vector<Faust::MatSparse<SCALAR,Cpu> > vec_spmat;
+		std::vector<Faust::MatGeneric<SCALAR,Cpu>*> list_factor;
 		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
 
 		if (nb_element != 0)
@@ -102,14 +105,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			for (int i=0; i < nb_element; i++)
 			{
 				mxMat=mxGetCell(prhs[1],i);	
-				concatMatGeneric<FFPP>(mxMat,list_factor);
+				concatMatGeneric<SCALAR>(mxMat,list_factor);
 			}
 		}
         	
 		// 2nd input (optionnal) : multiplicative scalar
-        	FFPP lambda = 1.0;
+        	SCALAR lambda = 1.0;
 		if (nrhs > 2)			
-			lambda = (FFPP) mxGetScalar(prhs[2]);
+			lambda = (SCALAR) mxGetScalar(prhs[2]);
 
 
 		// 3rd input (optionnal) : boolean to determine the type of copy
@@ -125,11 +128,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}	
 
 
-		Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>(list_factor,lambda,optimizedCopy);
+		Faust::Transform<SCALAR,Cpu>* F = new Faust::Transform<SCALAR,Cpu>(list_factor,lambda,optimizedCopy);
 		for (int i=0;i<list_factor.size();i++)
 			delete list_factor[i];		
 		
-		plhs[0]=convertPtr2Mat<Faust::Transform<FFPP,Cpu> >(F);
+		plhs[0]=convertPtr2Mat<Faust::Transform<SCALAR,Cpu> >(F);
 
 		return;
 	}
@@ -141,7 +144,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if (!strcmp("delete", cmd))
 	{
 		// Destroy the C++ object
-		destroyObject<Faust::Transform<FFPP,Cpu> >(prhs[1]);
+		destroyObject<Faust::Transform<SCALAR,Cpu> >(prhs[1]);
 		// Warn if other commands were ignored
 		if (nlhs != 0 || nrhs != 2)
 			mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
@@ -150,7 +153,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
 	// Get the class instance pointer from the second input
-	Faust::Transform<FFPP,Cpu>* core_ptr = convertMat2Ptr<Faust::Transform<FFPP,Cpu> >(prhs[1]);
+	Faust::Transform<SCALAR,Cpu>* core_ptr = convertMat2Ptr<Faust::Transform<SCALAR,Cpu> >(prhs[1]);
 
 	
 	if (!strcmp("size",cmd))
@@ -165,7 +168,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		return;
 	}
 
-
+	if (!strcmp("isReal",cmd))
+	{
+			plhs[0] = mxCreateDoubleScalar((double) core_ptr->isReal());
+			return;
+	}	
 	// return the number of non zeros coefficients of the matrix
 	if (!strcmp("nnz",cmd))
 	{
@@ -188,21 +195,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		}
 		int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
 		
-		Faust::MatGeneric<FFPP,Cpu>* const factor_generic = core_ptr->get_fact(id_fact);
-		Faust::MatDense<FFPP,Cpu> dense_factor;		
+		Faust::MatGeneric<SCALAR,Cpu>* const factor_generic = core_ptr->get_fact(id_fact);
+		Faust::MatDense<SCALAR,Cpu> dense_factor;		
 
 		switch ( factor_generic->getType())
 		{
 			case Dense :
 			{
-				Faust::MatDense<FFPP,Cpu>* factor_dense_ptr = dynamic_cast<Faust::MatDense<FFPP,Cpu>* > (factor_generic);
+				Faust::MatDense<SCALAR,Cpu>* factor_dense_ptr = dynamic_cast<Faust::MatDense<SCALAR,Cpu>* > (factor_generic);
 				dense_factor = (*factor_dense_ptr);
 			}
 			break;
 		
 			case Sparse :
 			{
-				Faust::MatSparse<FFPP,Cpu>* factor_sparse_ptr = dynamic_cast<Faust::MatSparse<FFPP,Cpu>* > (factor_generic);
+				Faust::MatSparse<SCALAR,Cpu>* factor_sparse_ptr = dynamic_cast<Faust::MatSparse<SCALAR,Cpu>* > (factor_generic);
 				dense_factor = (*factor_sparse_ptr);
 			}
 			break;
@@ -270,17 +277,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		(*core_ptr).setOp(op,nbRowOp,nbColOp);
 		const size_t SIZE_B1 = nbRowOp;
         	const size_t SIZE_B2 = nbColOp;
-		Faust::MatDense<FFPP,Cpu> prod=core_ptr->get_product(op);
+		Faust::MatDense<SCALAR,Cpu> prod=core_ptr->get_product(op);
 		const mwSize dims[2]={SIZE_B1,SIZE_B2};
-		/*if(sizeof(FFPP)==sizeof(float))
+		/*if(sizeof(SCALAR)==sizeof(float))
 			plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
-		else if(sizeof(FFPP)==sizeof(double))
+		else if(sizeof(SCALAR)==sizeof(double))
 			plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
 		else
-			mexErrMsgTxt("FFPP type is neither double nor float");
+			mexErrMsgTxt("SCALAR type is neither double nor float");
 
-		FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
-		memcpy(ptr_out, prod.getData(), SIZE_B1*SIZE_B2*sizeof(FFPP));
+		SCALAR* ptr_out = static_cast<SCALAR*> (mxGetData(plhs[0]));
+		memcpy(ptr_out, prod.getData(), SIZE_B1*SIZE_B2*sizeof(SCALAR));
 		*/
 		plhs[0] = FaustMat2mxArray(prod);
 		return;
@@ -295,7 +302,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("norm : empty faust core");
 		
 		
-		FFPP precision =  0.001;
+		double precision =  0.001;
 		faust_unsigned_int nbr_iter_max=100;
 		int flag;
 		char op;
@@ -319,13 +326,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		{
 			//Faust::Timer t1,t2,t3;
 			//t1.start();			
-			Faust::Transform<FFPP,Cpu>* F = new Faust::Transform<FFPP,Cpu>((*core_ptr));			
+			Faust::Transform<SCALAR,Cpu>* F = new Faust::Transform<SCALAR,Cpu>((*core_ptr));			
 			//t1.stop();			
 			//t2.start();			
 			//(*F).transpose();
 			//t2.stop();
 			//t3.start();
-			plhs[0]=convertPtr2Mat<Faust::Transform<FFPP,Cpu> >(F);
+			plhs[0]=convertPtr2Mat<Faust::Transform<SCALAR,Cpu> >(F);
 			//t3.stop();
 			//std::cout<<"t1 new : "<<t1.get_time()<<std::endl;
 			//std::cout<<"t2 transpose : "<<t2.get_time()<<std::endl;
@@ -383,124 +390,124 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
 		/*
-		FFPP* ptr_data = NULL;
+		SCALAR* ptr_data = NULL;
 
 		const mxClassID V_CLASS_ID = mxGetClassID(inMatlabMatrix);
 		const size_t NB_ELEMENTS = mxGetNumberOfElements(inMatlabMatrix);
 		if(V_CLASS_ID == mxDOUBLE_CLASS)
 		{
 		    double* ptr_data_tmp = static_cast<double*> (mxGetData(inMatlabMatrix));
-		    ptr_data = new FFPP[NB_ELEMENTS];
+		    ptr_data = new SCALAR[NB_ELEMENTS];
 		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		        ptr_data[i] = static_cast<SCALAR> (ptr_data_tmp[i]);
 		}
 		else if(V_CLASS_ID == mxSINGLE_CLASS)
 		{
 		    float* ptr_data_tmp = static_cast<float*> (mxGetData(inMatlabMatrix));
-		    ptr_data = new FFPP[NB_ELEMENTS];
+		    ptr_data = new SCALAR[NB_ELEMENTS];
 		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		        ptr_data[i] = static_cast<SCALAR> (ptr_data_tmp[i]);
 		}
 		else if(V_CLASS_ID == mxINT8_CLASS)
 		{
 		    char* ptr_data_tmp = static_cast<char*> (mxGetData(inMatlabMatrix));
-		    ptr_data = new FFPP[NB_ELEMENTS];
+		    ptr_data = new SCALAR[NB_ELEMENTS];
 		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		        ptr_data[i] = static_cast<SCALAR> (ptr_data_tmp[i]);
 		}
 		else if(V_CLASS_ID == mxUINT8_CLASS)
 		{
 		    unsigned char* ptr_data_tmp = static_cast<unsigned char*> (mxGetData(inMatlabMatrix));
-		    ptr_data = new FFPP[NB_ELEMENTS];
+		    ptr_data = new SCALAR[NB_ELEMENTS];
 		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		        ptr_data[i] = static_cast<SCALAR> (ptr_data_tmp[i]);
 		}
 		else if(V_CLASS_ID == mxINT16_CLASS)
 		{
 		    short* ptr_data_tmp = static_cast<short*> (mxGetData(inMatlabMatrix));
-		    ptr_data = new FFPP[NB_ELEMENTS];
+		    ptr_data = new SCALAR[NB_ELEMENTS];
 		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		        ptr_data[i] = static_cast<SCALAR> (ptr_data_tmp[i]);
 		}
 		else if (V_CLASS_ID == mxUINT16_CLASS)
 		{
 		    unsigned short* ptr_data_tmp = static_cast<unsigned short*> (mxGetData(inMatlabMatrix));
-		    ptr_data = new FFPP[NB_ELEMENTS];
+		    ptr_data = new SCALAR[NB_ELEMENTS];
 		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		        ptr_data[i] = static_cast<SCALAR> (ptr_data_tmp[i]);
 		}
 		else if (V_CLASS_ID == mxINT32_CLASS)
 		{
 		    int* ptr_data_tmp = static_cast<int*> (mxGetData(inMatlabMatrix));
-		    ptr_data = new FFPP[NB_ELEMENTS];
+		    ptr_data = new SCALAR[NB_ELEMENTS];
 		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		        ptr_data[i] = static_cast<SCALAR> (ptr_data_tmp[i]);
 		}
 		else if (V_CLASS_ID == mxUINT32_CLASS)
 		{
 		    unsigned int* ptr_data_tmp = static_cast<unsigned int*> (mxGetData(inMatlabMatrix));
-		    ptr_data = new FFPP[NB_ELEMENTS];
+		    ptr_data = new SCALAR[NB_ELEMENTS];
 		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		        ptr_data[i] = static_cast<SCALAR> (ptr_data_tmp[i]);
 		}
 		else if (V_CLASS_ID == mxINT64_CLASS)
 		{
 		    long long* ptr_data_tmp = static_cast<long long*> (mxGetData(inMatlabMatrix));
-		    ptr_data = new FFPP[NB_ELEMENTS];
+		    ptr_data = new SCALAR[NB_ELEMENTS];
 		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		        ptr_data[i] = static_cast<SCALAR> (ptr_data_tmp[i]);
 		}
 		else if (V_CLASS_ID == mxUINT64_CLASS)
 		{
 		    unsigned long long* ptr_data_tmp = static_cast<unsigned long long*> (mxGetData(inMatlabMatrix));
-		    ptr_data = new FFPP[NB_ELEMENTS];
+		    ptr_data = new SCALAR[NB_ELEMENTS];
 		    for (size_t i =0 ; i<NB_ELEMENTS ; i++)
-		        ptr_data[i] = static_cast<FFPP> (ptr_data_tmp[i]);
+		        ptr_data[i] = static_cast<SCALAR> (ptr_data_tmp[i]);
 		}
 		else
 		    mexErrMsgTxt("Unknown matlab type.");
 		*/
-		FFPP* ptr_data = NULL;
+		SCALAR* ptr_data = NULL;
 		
 		mxArray2Ptr(inMatlabMatrix, ptr_data);		
 	
 		// Si inMatlabMatrix est un vecteur
 		if(nbColA == 1)
 		{
-		Faust::Vect<FFPP,Cpu> A(nbRowA, ptr_data);
-		Faust::Vect<FFPP,Cpu> B(nbRowB);
+		Faust::Vect<SCALAR,Cpu> A(nbRowA, ptr_data);
+		Faust::Vect<SCALAR,Cpu> B(nbRowB);
 		//NB        
 		//B = (*core_ptr)*A;
 		B = (*core_ptr).multiply(A,op);
 	
 			/*const mwSize dims[2]={nbRowB,nbColB};
-			if(sizeof(FFPP)==sizeof(float))
+			if(sizeof(SCALAR)==sizeof(float))
 				plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
-			else if(sizeof(FFPP)==sizeof(double))
+			else if(sizeof(SCALAR)==sizeof(double))
 				plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
 			else
-				mexErrMsgTxt("FFPP type is neither double nor float");
+				mexErrMsgTxt("SCALAR type is neither double nor float");
 
-			FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
-			memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));*/
+			SCALAR* ptr_out = static_cast<SCALAR*> (mxGetData(plhs[0]));
+			memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(SCALAR));*/
 			plhs[0]=FaustVec2mxArray(B);
 		}
 		// Si inMatlabMatrix est une matrice
 		else
 		{       	
-			Faust::MatDense<FFPP,Cpu> A(ptr_data, nbRowA, nbColA);
-			Faust::MatDense<FFPP,Cpu> B(nbRowB, nbColA);
+			Faust::MatDense<SCALAR,Cpu> A(ptr_data, nbRowA, nbColA);
+			Faust::MatDense<SCALAR,Cpu> B(nbRowB, nbColA);
 			B = (*core_ptr).multiply(A,op);
 			/*const mwSize dims[2]={nbRowB,nbColB};
-			if(sizeof(FFPP)==sizeof(float))
+			if(sizeof(SCALAR)==sizeof(float))
 				plhs[0] = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
-			else if(sizeof(FFPP)==sizeof(double))
+			else if(sizeof(SCALAR)==sizeof(double))
 				plhs[0] = mxCreateNumericArray(2, dims, mxDOUBLE_CLASS, mxREAL);
 			else
-				mexErrMsgTxt("FFPP type is neither double nor float");
+				mexErrMsgTxt("SCALAR type is neither double nor float");
 
-			FFPP* ptr_out = static_cast<FFPP*> (mxGetData(plhs[0]));
-			memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(FFPP));
+			SCALAR* ptr_out = static_cast<SCALAR*> (mxGetData(plhs[0]));
+			memcpy(ptr_out, B.getData(), nbRowB*nbColB*sizeof(SCALAR));
 			*/
 			plhs[0]=FaustMat2mxArray(B);
 			

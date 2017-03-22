@@ -74,8 +74,17 @@ if (size(expected_F_dense,1) ~= dim1) | (size(expected_F_dense,2) ~= dim2)
 	error('the factor dimension mismatch expected_F_dense');
 end
 
+
+isComplex=~isreal(expected_F_dense);
+
+if (isComplex)
+	scalarType='complex';
+else
+	scalarType='real';
+end
+
 disp('****** TEST MATLAB_FAUST ******* '); 
-disp(' CONFIG OF THE FAUST ');
+disp([' CONFIG OF THE ' scalarType ' scalar FAUST ']);
 disp(['number of row of the Faust : ' int2str(dim1)]); 
 disp(['number of column of the Faust : ' int2str(dim2)]);
 disp(['number of factor of the Faust : ' int2str(nb_fact)]);
@@ -409,7 +418,11 @@ y_expected_trans = F_dense'*x_trans;
 y_star = F*x;
 %(y_expected ~= y_star)
 if (~isequal(y_expected,y_star))
+    y_expected
+
+    y_star	
     error(['multiplication faust-vector : invalid result  ' ]);
+	
 end
 
 

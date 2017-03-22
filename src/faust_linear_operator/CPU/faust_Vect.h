@@ -105,6 +105,8 @@ namespace Faust
 
         FPP* getData(){return vec.data();}
 
+	bool isReal() const;
+
         const FPP* getData() const {return vec.data();}
         void setOnes();
         void Display() const;
@@ -112,8 +114,10 @@ namespace Faust
 
         faust_unsigned_int size() const {return dim;}
         void resize(const int new_dim);
-        FPP norm(){return vec.norm();}
+        double norm(){return vec.norm();}
         void scalarMultiply(FPP const scalar){vec *= scalar;}
+	template<typename FPP1>
+	void scalarMultiply(FPP1 const scalar){vec *= scalar;}
         void normalize(){scalarMultiply(1/norm());}
 
 

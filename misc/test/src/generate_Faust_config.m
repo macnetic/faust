@@ -81,11 +81,25 @@ int_max = 100;
 	for i=1:nb_fact
 		nb_row = list_dim(i);
 		nb_col = list_dim(i+1);
+		
 		type_current_fact =  type_factor{i};
+		celltype_current_fact = strsplit(type_current_fact,'.');
+		
+		scalarType = celltype_current_fact{1};
+		sparsityType = celltype_current_fact{2};
+		
+		switch scalarType
+			case 'real'
+				current_fact = double(randi(int_max,nb_row,nb_col));
+			case 'complex'
+				current_fact = double(randi(int_max,nb_row,nb_col)+1i*randi(int_max,nb_row,nb_col));
+			otherwise
+				error('invalid scalar type');
+		end
 
-		current_fact = double(randi(int_max,nb_row,nb_col));
-		dense = dense * current_fact;		
-		switch type_current_fact
+		dense = dense * current_fact;
+		
+		switch sparsityType
 			case 'dense'
 				current_fact=full(current_fact);
 			case 'sparse'

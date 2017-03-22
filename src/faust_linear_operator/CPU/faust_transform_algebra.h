@@ -42,6 +42,7 @@
 
 #include "faust_constant.h"
 #include "faust_MatSparse.h"
+#include <complex>
 
 
 namespace Faust
@@ -53,7 +54,15 @@ namespace Faust
 
 
 	template<typename FPP>
-	FPP power_iteration(const Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max,FPP threshold, int & flag);
+	FPP power_iteration(const Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max,double threshold, int & flag);
+
+	// compute absolute value of complex scalar
+	template<typename FPP>
+	FPP absValue(std::complex<FPP> cplxScalar){return std::abs(cplxScalar);}
+	
+	// compute absolute value of real scalar
+	template<typename FPP>
+	FPP absValue(FPP realScalar){return fabs(realScalar);}
 	
 	// if measure of time is down Faust::Transform<FPP,Cpu> is no longer constant during multiplication because a measure of time is an attribute to the faust::Transform
 	template<typename FPP>

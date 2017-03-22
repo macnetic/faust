@@ -81,6 +81,28 @@ bool Faust::Vect<FPP,Cpu>::equality(Faust::Vect<FPP,Cpu> const &x, FPP precision
 
 
 template<typename FPP>
+bool Faust::Vect<FPP,Cpu>::isReal() const
+{
+	bool isReal = (typeid(FPP) == typeid(double));
+	isReal = (isReal || (typeid(FPP) == typeid(float)) );
+
+	bool isComplex = (typeid(FPP) == typeid(std::complex<double>));
+	isComplex = (isComplex || (typeid(FPP) == typeid(std::complex<float>)) );	
+	
+	if  ( (!isComplex) && (!isReal) )
+	{
+		handleError(m_className,"isReal : unknown type of scalar");
+	}
+	
+		return isReal;
+	
+}
+
+
+
+
+
+template<typename FPP>
 Faust::Vect<FPP,Cpu>::Vect(const faust_unsigned_int dim_, const FPP* data_) : dim(dim_), vec(dim_)
 {
 		memcpy(getData(), data_, dim*sizeof(FPP));

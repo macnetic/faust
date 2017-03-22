@@ -43,6 +43,7 @@
 #include "mex.h"
 #include <vector>
 #include "faust_constant.h"
+#include <complex>
 
 
 namespace Faust {
@@ -75,6 +76,9 @@ bool isScalarCompatible(const Faust::LinearOperator<FPP,Cpu> & L,const mxArray *
         */
 template<typename FPP>
 void mxArray2FaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec);
+template<typename FPP>
+void mxArray2FaustVec(const mxArray * vec_array,Faust::Vect< std::complex<FPP> ,Cpu> & vec)
+{mexErrMsgTxt("mxArray2FaustVec (complex scalar) not yet implemented");}
 
 /*!
 *  \brief convert the matlab mxArray* into a Faust::MatDense<FPP,Cpu>, no shared memory
@@ -83,6 +87,9 @@ void mxArray2FaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec);
         */
 template<typename FPP>
 void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat);
+template<typename FPP>
+void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<std::complex<FPP>,Cpu> & Mat)
+{mexErrMsgTxt("mxArray2FaustMat (complex scalar) not yet implemented");}
 
 /*!
 *  \brief convert the matlab mxArray* into a Faust::Vect<FPP,Cpu>, no shared memory
@@ -91,6 +98,9 @@ void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat);
         */
 template<typename FPP>
 void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S);
+template<typename FPP>
+void mxArray2FaustspMat(const mxArray* Mat_array, Faust::MatSparse<std::complex<FPP>,Cpu> & Mat)
+{mexErrMsgTxt("mxArray2FaustspMat (complex scalar) not yet implemented");}
 
 /*!
 *  \brief return a matlab mxArray* dense matrix from a Faust::MatDense<FPP,Cpu>, no shared memory
@@ -99,7 +109,9 @@ void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S
 */
 template<typename FPP>
 mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M);
-
+template<typename FPP>
+mxArray*  FaustMat2mxArray(const Faust::MatDense<std::complex<FPP>,Cpu>& M)
+{mexErrMsgTxt("FaustMat2mxArray (complex scalar) not yet implemented");}
 
 
 
@@ -110,6 +122,9 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M);
 */
 template<typename FPP>
 mxArray*  FaustVec2mxArray(const Faust::Vect<FPP,Cpu>& M);
+template<typename FPP>
+mxArray*  FaustVec2mxArray(const Faust::Vect<std::complex<FPP>,Cpu>& M)
+{mexErrMsgTxt("FaustVec2mxArray (complex scalar) not yet implemented");}
 
 /*!
 *  \brief return a matlab mxArray** representing a cell-array of matlab matrix from a std::vector<Faust::MatDense<FPP,Cpu> >, no shared memory
@@ -135,7 +150,10 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS
 
 
 template<typename FPP>
-void mxArray2Ptr(const mxArray* mxMat, FPP* & data_ptr);
+void mxArray2Ptr(const mxArray* mxMat, FPP* & ptr_data);
+template<typename FPP>
+void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data)
+{ mexErrMsgTxt("mxArray2Ptr (complex scalar) not yet implemented");}
 
 
 

@@ -256,6 +256,14 @@ void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S
     mexCallMATLAB(0,NULL,1,&mxA,"disp");*/
 }
 
+
+
+
+
+
+
+
+
 template<typename FPP>
 mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 {
@@ -484,11 +492,16 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS
 template<typename FPP>
 void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cpu> *> &list_mat)
 {
+	
 	if (mxMat == NULL)
 	   mexErrMsgTxt("concatMatGeneric : empty matlab matrix"); 
 
 	Faust::MatGeneric<FPP,Cpu> *  M;
 	
+	
+
+
+
 	if (!mxIsSparse(mxMat))
 	{
 		Faust::MatDense<FPP,Cpu> denseM;
@@ -503,7 +516,7 @@ void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cp
 
 		list_mat.push_back(M);
 		
-
+	
 }
 
 
@@ -612,6 +625,13 @@ void mxArray2Ptr(const mxArray* mxMat, FPP* & ptr_data)
 		    mexErrMsgTxt("Unknown matlab type.");
 
 }
+
+
+
+
+
+
+
 
 
 

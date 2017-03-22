@@ -31,7 +31,11 @@ endif(BUILD_OPENBLAS)
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 
 #target_link_libraries(${FAUST_MEXTOOLS_TARGET} ${FAUST_TARGET})
-
+# specialisation template scalar with real
+set(FAUST_SCALAR "double")
+configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustReal.cpp @ONLY)
+set(FAUST_SCALAR "std::complex<double>")
+configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustCplx.cpp @ONLY)
 
 file(GLOB CPP_MEX_FILES "${FAUST_MATLAB_MEX_SRC_DIR}/*.cpp")
 ## modif AL : bug pour les noms de PATH avec un point comme par exemple : ./faust_v1.10/interface_matlab/
