@@ -41,7 +41,8 @@
 #include "mex.h"
 #include "class_handle.hpp"
 #include "faust_Transform.h"
-#include "tools_mex.h"
+#include "mx2Faust.h"
+#include "faust2Mx.h"
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
 #include <stdexcept>
@@ -289,6 +290,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		SCALAR* ptr_out = static_cast<SCALAR*> (mxGetData(plhs[0]));
 		memcpy(ptr_out, prod.getData(), SIZE_B1*SIZE_B2*sizeof(SCALAR));
 		*/
+		
+		
 		plhs[0] = FaustMat2mxArray(prod);
 		return;
 	}
@@ -385,8 +388,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
 		//check scalar type match (real/complex)
-		if ( !isScalarCompatible((*core_ptr),inMatlabMatrix) )
-			mexErrMsgTxt("Multiply : Wrong scalar compatibility (real/complex)");
+		/*if ( !isScalarCompatible((*core_ptr),inMatlabMatrix) )
+			mexErrMsgTxt("Multiply : Wrong scalar compatibility (real/complex)");*/
 
 
 		/*
@@ -468,7 +471,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		    mexErrMsgTxt("Unknown matlab type.");
 		*/
 		SCALAR* ptr_data = NULL;
-		
+		if ((core_ptr->isReal() ) && ( mxIsComplex(inMatlabMatrix) ) )
+			mexErrMsgTxt("impossibility to multiply real scalar Faust with complex matrix");
 		mxArray2Ptr(inMatlabMatrix, ptr_data);		
 	
 		// Si inMatlabMatrix est un vecteur

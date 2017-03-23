@@ -43,7 +43,8 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "tools_mex.h"
+#include "mx2Faust.h"
+#include "faust2Mx.h"
 #include <stdexcept>
 
 

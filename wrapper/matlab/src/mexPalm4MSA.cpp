@@ -47,7 +47,8 @@
 #include "faust_constant.h"
 #include "faust_Palm4MSA.h"
 #include <stdexcept>
-#include "tools_mex.h"
+#include "mx2Faust.h"
+#include "faust2Mx.h"
 
 
 void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFields);

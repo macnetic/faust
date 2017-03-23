@@ -59,7 +59,7 @@
  function test_matlab_faust(factors,expected_F_dense,dim3,copyOptimized)
 %function test_matlab_faust(dim1,dim2,dim3,nb_fact)
 int_max= 100;
-threshold = 10^(-5);
+threshold = 10^(-1);
 
 
 nb_fact=length(factors);
@@ -168,7 +168,9 @@ F_dense= full(F);
 if((dim1_dense ~= dim1) | (dim2_dense ~= dim2))
     error('full : invalid dimension');
 end
-if ( ~isequal(expected_F_dense,F_dense) )  
+if ( ~isequal(expected_F_dense,F_dense) ) 
+    expected_F_dense
+    F_dense	 
     error(['full : invalid full-storage matrix']);
 end
 disp('Ok');
@@ -289,7 +291,7 @@ disp('Ok');
 %%% transpose test
 disp('TEST TRANSPOSE : ');
 disp('operation F_trans = F'' ');
-F_trans=F';
+F_trans=F.';
 [dim1_trans,dim2_trans]=size(F_trans);
 if ((dim1_trans ~= dim2) | (dim2_trans ~= dim1))
     error(['transpose : invalid dimension']);
@@ -298,7 +300,7 @@ end
 F_dense_trans = full(F_trans);
 
 %(F_dense_trans ~= F_dense')
-if (~isequal(F_dense_trans,F_dense'))    
+if (~isequal(F_dense_trans,F_dense.'))    
 	error(['transpose : invalid transpose matrix']);
 end
 
@@ -316,7 +318,7 @@ end
 
 
 disp('operation F_trans_trans = F_trans'' ');
-F_trans_trans=F_trans';
+F_trans_trans=F_trans.';
 [dim1_trans_trans,dim2_trans_trans]=size(F_trans_trans);
 
 if ((dim1_trans_trans ~= dim1) | (dim2_trans_trans ~= dim2))
@@ -413,7 +415,7 @@ x_trans(:)=1:dim1;
 istransposed=1;
 nontransposed=0;
 y_expected = F_dense*x;
-y_expected_trans = F_dense'*x_trans;
+y_expected_trans = F_dense.'*x_trans;
 
 y_star = F*x;
 %(y_expected ~= y_star)
@@ -427,7 +429,7 @@ end
 
 
 
-y_star_trans = F'*x_trans;
+y_star_trans = F.'*x_trans;
 %(y_expected_trans~= y_star_trans)
 if (~isequal(y_expected_trans,y_star_trans))
     error(['multiplication faust-vector with transposition : invalid result  ' ]);
@@ -484,7 +486,7 @@ X_trans=zeros(dim1,dim3);
 X_trans(:)=1:dim1*dim3;
 
 Y_expected = F_dense*X;
-Y_expected_trans = F_dense'*X_trans;
+Y_expected_trans = F_dense.'*X_trans;
 
 
 
@@ -496,7 +498,7 @@ end
 
 
 
-Y_star_trans = F'*X_trans;
+Y_star_trans = F.'*X_trans;
 %(Y_expected_trans~= Y_star_trans)
 if (~isequal(Y_expected_trans,Y_star_trans))
     error(['multiplication faust-vector with transposition : invalid result  ' ]);
@@ -542,7 +544,7 @@ norm_faust=norm(F);
 norm_faust2=norm(F,2);
 norm_faust_trans=norm(F_trans);
 
-if (abs(real_norm - norm_faust)>threshold)
+if  ( (abs(real_norm - norm_faust)/abs(real_norm)) > threshold)
 	error(['norm : invalid result, expected ' num2str(real_norm) ' get norm_faust' num2str(norm_faust)]);
 end
 if (norm_faust ~= norm_faust2)

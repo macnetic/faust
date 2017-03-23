@@ -326,7 +326,7 @@ classdef Faust
     		if (F.isReal)
 			nb_factor = mexFaustReal('get_nb_factor',F.matrix.objectHandle);
 		else
-			nb_factor = mexFaustReal('get_nb_factor',F.matrix.objectHandle);
+			nb_factor = mexFaustCplx('get_nb_factor',F.matrix.objectHandle);
 		end
     end
 
