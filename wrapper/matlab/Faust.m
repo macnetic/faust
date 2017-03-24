@@ -166,6 +166,16 @@ classdef Faust
             
         end
 
+	function bool = isreal(F)
+	%% ISREAL True for real scalar Faust (overloaded Matlab built-in function).
+	%    	
+	% isreal(F) returns 1 if Faust F does not have an imaginary part
+    	% and 0 otherwise.
+	
+	bool=F.isReal;
+
+	end
+
 
         function F_trans=transpose(F)
 	%% TRANSPOSE .' Non-conjugate transposed Faust (overloaded Matlab built-in function).

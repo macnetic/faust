@@ -177,6 +177,17 @@ disp('Ok');
 
 
 
+%% isreal test
+disp('TEST ISREAL : ');
+expected_bool_isreal=isreal(expected_F_dense);
+bool_isreal=isreal(F);
+
+if (expected_bool_isreal ~= bool_isreal)
+	error('isreal : invalid output boolean'); 
+end
+disp('Ok');
+
+
 %% full test
 disp('TEST NNZ : ');
 expected_nz = 0;
@@ -407,131 +418,49 @@ disp('Ok');
 
 
 %% test faust multiplication with vector
-disp('TEST MULTIPLICATION BY A VECTOR : ');
+disp('TEST MULTIPLICATION BY A REAL VECTOR : ');
 x=zeros(dim2,1);
 x(:)=1:dim2;
 x_trans=zeros(dim1,1);
 x_trans(:)=1:dim1;
-istransposed=1;
-nontransposed=0;
-y_expected = F_dense*x;
-y_expected_trans = F_dense.'*x_trans;
 
-y_star = F*x;
-%(y_expected ~= y_star)
-if (~isequal(y_expected,y_star))
-    y_expected
-
-    y_star	
-    error(['multiplication faust-vector : invalid result  ' ]);
-	
-end
-
-
-
-y_star_trans = F.'*x_trans;
-%(y_expected_trans~= y_star_trans)
-if (~isequal(y_expected_trans,y_star_trans))
-    error(['multiplication faust-vector with transposition : invalid result  ' ]);
-end
-
-
-y_mtimes_trans = mtimes_trans(F,x_trans,istransposed);
-%(y_expected_trans ~= y_mtimes_trans)
-if (~isequal(y_expected_trans,y_mtimes_trans))
-    error(['multiplication faust-vector with transposition : invalid result  '  ]);
-end
-
-
-y_mtimes = mtimes_trans(F,x,nontransposed);
-%(y_expected ~= y_mtimes)
-if (~isequal(y_expected,y_mtimes))
-    error(['multiplication faust-vector : invalid result  '  ]);
-end
-
-
-y_mtimes_trans_N = mtimes_trans(F_trans,x_trans,nontransposed);
-%(y_expected_trans ~= y_mtimes_trans_N)
-if (~isequal(y_expected_trans,y_mtimes_trans_N))
-    error(['multiplication faust-vector with transposition : invalid result  '  ]);
-end
-
-
-y_mtimes_trans_T = mtimes_trans(F_trans,x,istransposed);
-%(y_expected ~= y_mtimes_trans_T)
-if (~isequal(y_expected,y_mtimes_trans_T))
-    error(['multiplication faust-vector : invalid result  '  ]);
-end
-
-
+test_matlab_faust_mult(F,F_dense,x,x_trans);
 disp('Ok');
 
 
-
-
-
-
-
-
-
-
-
-
-
 %% test multiplication with matrix
-disp('TEST MULTIPLICATION BY A MATRIX : ');
+disp('TEST MULTIPLICATION BY A REAL MATRIX : ');
 X=zeros(dim2,dim3);
 X(:)=1:dim2*dim3;
 X_trans=zeros(dim1,dim3);
 X_trans(:)=1:dim1*dim3;
 
-Y_expected = F_dense*X;
-Y_expected_trans = F_dense.'*X_trans;
 
-
-
-Y_star = F*X;
-%(Y_expected ~= Y_star)
-if (~isequal(Y_expected,Y_star))
-    error(['multiplication faust-vector : invalid result  ' ]);
-end
-
-
-
-Y_star_trans = F.'*X_trans;
-%(Y_expected_trans~= Y_star_trans)
-if (~isequal(Y_expected_trans,Y_star_trans))
-    error(['multiplication faust-vector with transposition : invalid result  ' ]);
-end
-
-
-Y_mtimes_trans = mtimes_trans(F,X_trans,istransposed);
-%(Y_expected_trans ~= Y_mtimes_trans)
-if (~isequal(Y_expected_trans,Y_mtimes_trans))
-    error(['multiplication faust-vector with transposition : invalid result  '  ]);
-end
-
-
-Y_mtimes = mtimes_trans(F,X,nontransposed);
-%(Y_expected ~= Y_mtimes)
-if (~isequal(Y_expected,Y_mtimes))
-    error(['multiplication faust-vector : invalid result  '  ]);
-end
-
-Y_mtimes_trans_N = mtimes_trans(F_trans,X_trans,nontransposed);
-%(Y_expected_trans ~= Y_mtimes_trans_N)
-if (~isequal(Y_expected_trans,Y_mtimes_trans_N))
-    error(['multiplication faust-vector with transposition : invalid result  '  ]);
-end
-
-
-Y_mtimes_trans_T = mtimes_trans(F_trans,X,istransposed);
-%(y_expected ~= y_mtimes_trans_T)
-if (~isequal(y_expected,y_mtimes_trans_T))
-    error(['multiplication faust-vector : invalid result  '  ]);
-end
-
+test_matlab_faust_mult(F,F_dense,X,X_trans);
 disp('Ok');
+
+
+
+
+
+if (isComplex)
+	disp('TEST MULTIPLICATION BY A COMPLEX VECTOR : ');
+	x_cplx = randi(100,dim2,1) + 1i * randi(100,dim2,1);
+	x_cplx_trans = randi(100,dim1,1) + 1i * randi(100,dim1,1);
+
+	test_matlab_faust_mult(F,F_dense,x_cplx,x_cplx_trans);
+	disp('Ok');
+
+
+	disp('TEST MULTIPLICATION BY A COMPLEX MATRIX : ');
+	X_cplx = randi(100,dim2,dim3) + 1i * randi(100,dim2,dim3);
+	X_cplx_trans = randi(100,dim1,dim3) + 1i * randi(100,dim1,dim3);
+
+	test_matlab_faust_mult(F,F_dense,X_cplx,X_cplx_trans);
+	disp('Ok');
+
+
+end
 
 
 
@@ -695,6 +624,9 @@ end
 
 
 disp('Ok');
+
+
+
 
 
 
