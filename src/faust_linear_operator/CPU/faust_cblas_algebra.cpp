@@ -41,6 +41,8 @@
 
 #ifdef __GEMM_WITH_OPENBLAS__
 #include "faust_cblas_algebra.h"
+#include <complex>
+#include "faust_exception.h"
 
 namespace Faust
 {
@@ -62,6 +64,20 @@ namespace Faust
         #endif
 
     }
+	
+    
+    template<> void cblas_gemm<std::complex<float> >(const CBLAS_ORDER order,const CBLAS_TRANSPOSE transa, const CBLAS_TRANSPOSE transb, const int dim1,const int dim2,const int nbColOpA, const std::complex<float> alpha, const std::complex<float>* Adata,const int lda,const std::complex<float>* Bdata,const int ldb, const std::complex<float> beta, std::complex<float>* Cdata, const int ldc)
+    {
+        handleError("cblas_gemm<std::complex<float>>","not yet implemented");
+    }
+
+
+    template<> void cblas_gemm<std::complex<double> >(const CBLAS_ORDER order,const CBLAS_TRANSPOSE transa, const CBLAS_TRANSPOSE transb, const int dim1,const int dim2,const int nbColOpA, const std::complex<double> alpha, const std::complex<double>* Adata,const int lda,const std::complex<double>* Bdata,const int ldb, const std::complex<double> beta, std::complex<double>* Cdata, const int ldc)
+    {
+        handleError("cblas_gemm<std::complex<double>>","not yet implemented");
+    }		
+
+
 
     template<> void cblas_gemv<float>(const CBLAS_ORDER order,const CBLAS_TRANSPOSE transa,const int dim1,const int dim2,const float alpha,const float* Adata,const int lda,const float* Xdata,const int incX,const float beta,float* Ydata,const int incY)
     {
@@ -78,6 +94,17 @@ namespace Faust
             std::cout<<"***inside double Faust::cblas_gemv"<<std::endl;
         #endif
     }
+
+
+       template<> void cblas_gemv<std::complex<double> >(const CBLAS_ORDER order,const CBLAS_TRANSPOSE transa,const int dim1,const int dim2,const std::complex<double> alpha,const std::complex<double>* Adata,const int lda,const std::complex<double>* Xdata,const int incX,const std::complex<double> beta,std::complex<double>* Ydata,const int incY)
+    {
+        handleError("cblas_gemv<std::complex<double>>","not yet implemented");
+    }
+
+           template<> void cblas_gemv<std::complex<float> >(const CBLAS_ORDER order,const CBLAS_TRANSPOSE transa,const int dim1,const int dim2,const std::complex<float> alpha,const std::complex<float>* Adata,const int lda,const std::complex<float>* Xdata,const int incX,const std::complex<float> beta,std::complex<float>* Ydata,const int incY)
+    {
+        handleError("cblas_gemv<std::complex<float>>","not yet implemented");
+    }		
 
 }
 
