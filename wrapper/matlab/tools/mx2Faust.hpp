@@ -271,26 +271,26 @@ void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S
            "input array must be sparse");
 	}
 
-    //check scalar compayibility 
-    if (!isScalarCompatible(S,spMat_array))		
-	mexErrMsgTxt("mxArray2FaustspMat scalar type (complex/real) are not compatible");	
+    	
     int nnzMax = mxGetNzmax(spMat_array);
     int nbCol = mxGetN(spMat_array);
     int nbRow = mxGetM(spMat_array);
     //mexPrintf("DIM (%d,%d) NNZMAX : %d\n",nbRow,nbCol,nnzMax);
 
     size_t* jc,*ir;
-    double* pr;
+    FPP* ptr_data;
 
     //jc = (size_t *) mxCalloc(nbCol+1,sizeof(size_t));
     jc = (size_t *)mxGetJc(spMat_array);
     //ir = (size_t *) mxCalloc(nnzMax,sizeof(size_t));
     ir = (size_t *) mxGetIr(spMat_array);
     //pr = (double *) mxCalloc(nnzMax,sizeof(double));
-    pr = (double *) mxGetPr(spMat_array);
+    mxArray2Ptr(spMat_array,ptr_data);
 
 
-    S.set(nnzMax,nbRow,nbCol,pr,ir,jc);
+    S.set(nnzMax,nbRow,nbCol,ptr_data,ir,jc);
+    
+    if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
 	//mxFree(jc);
 	//mxFree(ir);
 	//mxFree(pr);
@@ -414,7 +414,14 @@ void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data)
 				
 		const mxClassID V_CLASS_ID = mxGetClassID(mxMat);
 
-		const size_t NB_ELEMENTS = mxGetNumberOfElements(mxMat);
+		size_t nb_element_tmp;
+		
+		if (mxIsSparse(mxMat))
+			nb_element_tmp = mxGetNzmax(mxMat);
+		else
+			nb_element_tmp = mxGetNumberOfElements(mxMat);		
+		
+		const size_t NB_ELEMENTS = nb_element_tmp;
 		
 		// get the real part of the Matlab Matrix
 		FPP* ptr_real_part_data;
@@ -458,8 +465,18 @@ void mxArray2CplxPtrPart(const mxArray* mxMat, FPP* & ptr_data)
 {
 				
 		const mxClassID V_CLASS_ID = mxGetClassID(mxMat);
+		
 
-		const size_t NB_ELEMENTS = mxGetNumberOfElements(mxMat);
+		size_t nb_element_tmp;
+		
+		if (mxIsSparse(mxMat))
+			nb_element_tmp = mxGetNzmax(mxMat);
+		else
+			nb_element_tmp = mxGetNumberOfElements(mxMat);		
+		
+		const size_t NB_ELEMENTS = nb_element_tmp;
+
+
 		
 		if (!mxIsComplex(mxMat))
 			mexErrMsgTxt("Can't get imaginary part of a real matrix");

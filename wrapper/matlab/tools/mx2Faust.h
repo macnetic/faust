@@ -100,12 +100,10 @@ void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<std::complex<FPP>
         */
 template<typename FPP>
 void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S);
-template<typename FPP>
-void mxArray2FaustspMat(const mxArray* Mat_array, Faust::MatSparse<std::complex<FPP>,Cpu> & Mat)
-{mexErrMsgTxt("mxArray2FaustspMat (complex scalar) not yet implemented");}
 
 
 
+// ptr_data will be allocated in this function
 template<typename FPP>
 void mxArray2Ptr(const mxArray* mxMat, FPP* & ptr_data);
 template<typename FPP>
