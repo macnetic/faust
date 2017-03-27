@@ -82,20 +82,20 @@ if(BUILD_WRAPPER_MATLAB)
 		# 1st factor sparse size 10x3, 
 		# 2nd factor dense size 3x2, 
 		# 3rd factor sparse size 2x5		
-		add_test(NAME MATLAB_FAUST_CONFIG_REAL1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','real.dense','real.sparse'});test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")	
+		add_test(NAME MATLAB_FAUST_CONFIG_REAL1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','real.dense','real.sparse'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")	
 		
 		#test Faust with 3 real factors : 
 		# 1st factor sparse size 5x2, 
 		# 2nd factor dense size 2x3, 
 		# 3rd factor sparse size 3x10		
-		add_test(NAME MATLAB_FAUST_CONFIG_REAL2 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([5,2,3,10],{'real.dense','real.sparse','real.dense'});test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_CONFIG_REAL2 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([5,2,3,10],{'real.dense','real.sparse','real.dense'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		#test Faust with 1 real factor : 
 		# 1st factor dense size 10x3, 		
-		add_test(NAME MATLAB_FAUST_CONFIG_REAL3 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.dense'});test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")		
+		add_test(NAME MATLAB_FAUST_CONFIG_REAL3 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.dense'},1.0);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")		
 		
 		#test Faust with 1 real factor : 
 		# 1st factor sparse size 10x3, 		
-		add_test(NAME MATLAB_FAUST_CONFIG_REAL4 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.sparse'});test_matlab_faust(factors,prod,1000,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_CONFIG_REAL4 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([100,10],{'real.sparse'},0.1);test_matlab_faust(factors,prod,1000,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
 
@@ -103,13 +103,13 @@ if(BUILD_WRAPPER_MATLAB)
 		# 1st factor real dense size 10x3, 
 		# 2nd factor complex dense size 3x2, 
 		# 3rd factor complex dense size 2x5		
-		add_test(NAME MATLAB_FAUST_CONFIG_CPLX1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.dense','complex.dense','complex.dense'});test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_CONFIG_CPLX1 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.dense','complex.dense','complex.dense'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		
 		#test Faust with 3 factors : 
 		# 1st factor real sparse size 10x3, 
 		# 2nd factor complex dense size 3x2, 
 		# 3rd factor complex sparse size 2x5		
-		add_test(NAME MATLAB_FAUST_CONFIG_CPLX2 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','complex.dense','complex.sparse'});test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		add_test(NAME MATLAB_FAUST_CONFIG_CPLX2 COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;[factors,prod]=generate_Faust_config([10,3,2,5],{'real.sparse','complex.dense','complex.sparse'},0.5);test_matlab_faust(factors,prod,30,0);catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
 		## test the matlab Faust class methods with incorrect parameter

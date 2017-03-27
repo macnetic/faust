@@ -65,7 +65,7 @@
 %	Topics in Signal Processing, 2016.
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %%
-function [factors, dense]=generate_Faust_config(list_dim,type_factor)
+function [factors, dense]=generate_Faust_config(list_dim,type_factor,density)
 int_max = 100; 	
 	nb_fact=length(type_factor);
 	if (length(list_dim)-1) ~= nb_fact
@@ -78,27 +78,55 @@ int_max = 100;
 	factors=cell(1,nb_fact);
 	dense=eye(list_dim(1));
 
+	nbr_coeff_faust = 0;
+	for i=1:nb_fact
+		nbr_coeff_faust = nbr_coeff_faust + prod(list_dim(i:i+1));
+	end
+
+
+	nbr_coeff_dense_matrix = list_dim(1)*list_dim(end);
+
+	density_per_fact = density * nbr_coeff_dense_matrix/nbr_coeff_faust;
+
+	
+
 	for i=1:nb_fact
 		nb_row = list_dim(i);
 		nb_col = list_dim(i+1);
-		
+		nnz_fact = round(density_per_fact*nb_row*nb_col);
+		if (nnz_fact == 0)
+			error('factor with 0 non zeros coefficent ');
+		else 
+		    if(nnz_fact > nb_row*nb_col)
+			error('too much element per factor');
+		     end
+		end
+
 		type_current_fact =  type_factor{i};
 		celltype_current_fact = strsplit(type_current_fact,'.');
 		
 		scalarType = celltype_current_fact{1};
 		sparsityType = celltype_current_fact{2};
 		
+			
+		fact_values = double(randi(int_max,[1,nnz_fact]));
+
 		switch scalarType
 			case 'real'
-				current_fact = double(randi(int_max,nb_row,nb_col));
+								
 			case 'complex'
-				current_fact = double(randi(int_max,nb_row,nb_col)+1i*randi(int_max,nb_row,nb_col));
+				fact_values = fact_values + 1i*randi(int_max,[1,nnz_fact]);
 			otherwise
 				error('invalid scalar type');
 		end
 
-		dense = dense * current_fact;
+		id_1D = randperm(nb_row*nb_col,nnz_fact);
+		fact_id_row = mod(id_1D-1,nb_row)+1;
+		fact_id_col = floor((id_1D-1)/nb_row)+1;
+
 		
+		current_fact = sparse(fact_id_row,fact_id_col,fact_values,nb_row,nb_col,nnz_fact);
+
 		switch sparsityType
 			case 'dense'
 				current_fact=full(current_fact);
@@ -106,6 +134,9 @@ int_max = 100;
 				current_fact=sparse(current_fact);
 		end
 
+		dense = dense * full(current_fact);
+
+		
 		factors{i}=current_fact;
 			
 	end

@@ -59,7 +59,7 @@
  function test_matlab_faust(factors,expected_F_dense,dim3,copyOptimized)
 %function test_matlab_faust(dim1,dim2,dim3,nb_fact)
 int_max= 100;
-threshold = 10^(-1);
+threshold = 0.2;
 
 
 nb_fact=length(factors);
@@ -83,11 +83,20 @@ else
 	scalarType='real';
 end
 
+
+expected_nz = 0;
+for i=1:nb_fact
+	expected_nz = expected_nz + nnz(factors{i});
+end
+
+expected_density = expected_nz/(dim1*dim2);
+
 disp('****** TEST MATLAB_FAUST ******* '); 
 disp([' CONFIG OF THE ' scalarType ' scalar FAUST ']);
 disp(['number of row of the Faust : ' int2str(dim1)]); 
 disp(['number of column of the Faust : ' int2str(dim2)]);
 disp(['number of factor of the Faust : ' int2str(nb_fact)]);
+disp(['density of the Faust : ' num2str(expected_density)]);
 disp('');
 disp(['number of column of the matrix that will be multiplied by the Faust : ' int2str(dim3)]);
 disp('');
@@ -190,10 +199,7 @@ disp('Ok');
 
 %% full test
 disp('TEST NNZ : ');
-expected_nz = 0;
-for i=1:nb_fact
-	expected_nz = expected_nz + nnz(factors{i});
-end
+
 
 nz = nnz(F);
 
@@ -228,7 +234,6 @@ disp('Ok');
 
 
 disp('TEST DENSITY : ');
-expected_density = expected_nz / (dim1*dim2);
 dens = density(F);
 if(dens ~= expected_density)
     error('density : invalid value');
