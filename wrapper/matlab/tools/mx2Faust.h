@@ -68,16 +68,6 @@ template<typename FPP>
 bool isScalarCompatible(const Faust::LinearOperator<FPP,Cpu> & L,const mxArray * Matlab_Mat);
 
 
-/*!
-*  \brief convert the matlab mxArray* into a Faust::Vect<FPP,Cpu>, no shared memory
-*  \param vec_array : pointer to the mxArray* (matlab format) representing a dense column Vector 
-*  \tparam vec : Faust::Vect<FPP,Cpu>  
-        */
-template<typename FPP>
-void mxArray2FaustVec(const mxArray * vec_array,Faust::Vect<FPP,Cpu> & vec);
-template<typename FPP>
-void mxArray2FaustVec(const mxArray * vec_array,Faust::Vect< std::complex<FPP> ,Cpu> & vec)
-{mexErrMsgTxt("mxArray2FaustVec (complex scalar) not yet implemented");}
 
 
 
@@ -88,8 +78,8 @@ void mxArray2FaustVec(const mxArray * vec_array,Faust::Vect< std::complex<FPP> ,
         */
 template<typename FPP>
 void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat);
-template<typename FPP>
-void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<std::complex<FPP>,Cpu> & Mat);
+/*template<typename FPP>
+void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<std::complex<FPP>,Cpu> & Mat);*/
 
 
 
@@ -102,10 +92,26 @@ template<typename FPP>
 void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S);
 
 
+/* !
+  \brief convert the data (real part or imaginary part) of a mxArray* into the pointer ptr_data
+  \param mxMat : pointer to the mxArray (MATLAB matrix)
+  \tparam ptr_data : pointer of template FPP where the data of the mxArray will be stored,
+  \tparam mxGetDataFunc : functor to get the data of MATLAB matrix
+			  possible value : - mxGetData  (get the real scalar part of the data) 
+					                (cf https://fr.mathworks.com/help/matlab/apiref/mxgetdata.html)
+			                   - mxGetImagData (get the imaginary scalar part of the data)
+							(cf https://fr.mathworks.com/help/matlab/apiref/mxgetimagdata.html)  			  		
+*/
+template<typename FPP,class FUNCTOR>
+void mxArray2PtrBase(const mxArray* mxMat,FPP* & ptr_data,FUNCTOR & mxGetDataFunc);
 
-// ptr_data will be allocated in this function
+/* \brief convert the real scalar data  of a mxArray* into the pointer ptr_data 
+*/
 template<typename FPP>
 void mxArray2Ptr(const mxArray* mxMat, FPP* & ptr_data);
+
+/* \brief convert the complex scalar data  of a mxArray* into the pointer ptr_data 
+*/
 template<typename FPP>
 void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data);
 

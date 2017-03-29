@@ -71,6 +71,8 @@ classdef FaustCore < handle
             % destructor delete the faust
 	    if (this.isRealFlag)	
             	mexFaustReal('delete', this.objectHandle);
+	    else
+		mexFaustCplx('delete', this.objectHandle);
 	    end
         end
         
