@@ -117,8 +117,14 @@ classdef Faust
 	% storage matrix, C is also a full matrix storage.
 	% 
 	% See also mtimes_trans
-            if (F.isReal)	
-            	C = mexFaustReal('multiply', F.matrix.objectHandle,A,F.transpose_flag);
+            if (F.isReal)
+		if (isreal(A))	
+            		C = mexFaustReal('multiply', F.matrix.objectHandle,A,F.transpose_flag);
+		else
+			C_real = mexFaustReal('multiply', F.matrix.objectHandle,real(A),F.transpose_flag);
+			C_imag = mexFaustReal('multiply', F.matrix.objectHandle,imag(A),F.transpose_flag);
+			C = C_real + 1i * C_imag;
+		end
 	    else
 		C = mexFaustCplx('multiply', F.matrix.objectHandle,A,F.transpose_flag);
 	    end
@@ -146,7 +152,13 @@ classdef Faust
 	   
 	isreally_trans=xor(trans,F.transpose_flag);
 	if (F.isReal)
-		C = mexFaustReal('multiply', F.matrix.objectHandle,A,isreally_trans);
+		if (isreal(A))	
+            		C = mexFaustReal('multiply', F.matrix.objectHandle,A,isreally_trans);
+		else
+			C_real = mexFaustReal('multiply', F.matrix.objectHandle,real(A),isreally_trans);
+			C_imag = mexFaustReal('multiply', F.matrix.objectHandle,imag(A),isreally_trans);
+			C = C_real + 1i * C_imag;
+		end
 	else
 		C = mexFaustCplx('multiply', F.matrix.objectHandle,A,isreally_trans);
 	end

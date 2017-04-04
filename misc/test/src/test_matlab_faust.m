@@ -448,24 +448,24 @@ disp('Ok');
 
 
 
-if (isComplex)
-	disp('TEST MULTIPLICATION BY A COMPLEX VECTOR : ');
-	x_cplx = randi(100,dim2,1) + 1i * randi(100,dim2,1);
-	x_cplx_trans = randi(100,dim1,1) + 1i * randi(100,dim1,1);
 
-	test_matlab_faust_mult(F,F_dense,x_cplx,x_cplx_trans);
-	disp('Ok');
+disp('TEST MULTIPLICATION BY A COMPLEX VECTOR : ');
+x_cplx = randi(100,dim2,1) + 1i * randi(100,dim2,1);
+x_cplx_trans = randi(100,dim1,1) + 1i * randi(100,dim1,1);
 
-
-	disp('TEST MULTIPLICATION BY A COMPLEX MATRIX : ');
-	X_cplx = randi(100,dim2,dim3) + 1i * randi(100,dim2,dim3);
-	X_cplx_trans = randi(100,dim1,dim3) + 1i * randi(100,dim1,dim3);
-
-	test_matlab_faust_mult(F,F_dense,X_cplx,X_cplx_trans);
-	disp('Ok');
+test_matlab_faust_mult(F,F_dense,x_cplx,x_cplx_trans);
+disp('Ok');
 
 
-end
+disp('TEST MULTIPLICATION BY A COMPLEX MATRIX : ');
+X_cplx = randi(100,dim2,dim3) + 1i * randi(100,dim2,dim3);
+X_cplx_trans = randi(100,dim1,dim3) + 1i * randi(100,dim1,dim3);
+
+test_matlab_faust_mult(F,F_dense,X_cplx,X_cplx_trans);
+disp('Ok');
+
+
+
 
 
 
