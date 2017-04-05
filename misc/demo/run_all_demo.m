@@ -62,7 +62,13 @@ Fig_BSL;
 disp('*********** Hadamard Factorization *************');
 demo_fact_hadamard; 
 speed_up_hadamard;
-norm_hadamard; 
+norm_hadamard;
+
+
+%% Fourier speed-up
+disp('*********** Fourier speed-up *************'); 
+speed_up_fourier;
+
 
 
 %% Runtime comparison

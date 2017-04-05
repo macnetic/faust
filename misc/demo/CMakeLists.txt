@@ -30,6 +30,14 @@ if(BUILD_WRAPPER_MATLAB)
 		configure_file(${FAUST_DEMO_HADAMARD_SRC_DIR}/${matlab_script} ${FAUST_DEMO_HADAMARD_BIN_DIR}/${matlab_script} COPYONLY)
 	endforeach()
 
+
+	######### FFT (Fourier) speed-up ###############################
+	file(GLOB FFT_MATLAB_SCRIPTS  RELATIVE ${FAUST_DEMO_FFT_SRC_DIR} "${FAUST_DEMO_FFT_SRC_DIR}/*.m")
+	foreach(matlab_script ${FFT_MATLAB_SCRIPTS})		
+		configure_file(${FAUST_DEMO_FFT_SRC_DIR}/${matlab_script} ${FAUST_DEMO_FFT_BIN_DIR}/${matlab_script} COPYONLY)
+	endforeach()	
+
+
 	####### Runtime Comparison ######################################
 	file(GLOB TIMECOMP_MATLAB_SCRIPTS  RELATIVE ${FAUST_DEMO_TIMECOMP_SRC_DIR} "${FAUST_DEMO_TIMECOMP_SRC_DIR}/*.m")
 	foreach(matlab_script ${TIMECOMP_MATLAB_SCRIPTS})		
