@@ -84,6 +84,7 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 		#set(FAUST_INSTALL_TESTING_DATA 	"${PROJECT_BINARY_DIR}/output/testing/data" CACHE STRING "default install path for the test faust" FORCE )
 		# default location of install dir for matlab component
 		SET(CMAKE_INSTALL_MATLAB_PREFIX "$ENV{HOME}/Documents/MATLAB/faust" CACHE STRING "default install path for the matlab wrapper" FORCE )
+		SET(CMAKE_INSTALL_PYTHON_PREFIX "$ENV{HOME}/Documents/PYTHON/faust" CACHE STRING "default install path for the matlab wrapper" FORCE )
 		# CMAKE_INSTALL_PREFIX path is deleted for next cmake .. configure
 		SET(CMAKE_INSTALL_PREFIX "" CACHE STRING "default install path" FORCE )
 		#message (STATUS "default install") 
@@ -100,6 +101,7 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 		#set(FAUST_INSTALL_TESTING_DATA 	"${CMAKE_INSTALL_PREFIX}/testing/data")
 		# default location of install dir for matlab component
 		SET(CMAKE_INSTALL_MATLAB_PREFIX "${CMAKE_INSTALL_PREFIX}/matlab")
+		SET(CMAKE_INSTALL_PYTHON_PREFIX "$${CMAKE_INSTALL_PREFIX}/python" CACHE STRING "default install path for the matlab wrapper" FORCE )
 	else()
 		message(STATUS "Install FAuST path already defined to : ${CMAKE_INSTALL_MATLAB_PREFIX}")
 

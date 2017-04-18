@@ -58,7 +58,5 @@ add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
 		        COMMENT   "Creating PyFaust")
 
 
-#add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
-#		        COMMAND   python 
-#		        ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py" "build_ext" "--build-lib" "${FAUST_PYTHON_BIN_DIR}" "--build-temp"  "${FAUST_PYTHON_BIN_DIR}"  
-#		        COMMENT   "Creating PyFaust")
+#install the python wrapper
+install(DIRECTORY ${FAUST_PYTHON_BIN_DIR}/ DESTINATION ${CMAKE_INSTALL_PYTHON_PREFIX} FILE_PERMISSIONS  ${INSTALL_FILE_PERMISSION} DIRECTORY_PERMISSIONS ${INSTALL_DIR_PERMISSION} FILES_MATCHING PATTERN "*.${MEX_EXT}" PATTERN "*.py" PATTERN "*.so" PATTERN "build" EXCLUDE PATTERN "setup*" EXCLUDE PATTERN "CMakeFiles*" EXCLUDE)
