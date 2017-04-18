@@ -116,16 +116,11 @@ In the terminal opened in Section
 \ref{sec:UnixBuildDownload}, type the following commands : 
 \lstset{style=customBash}
 \begin{lstlisting}
-# create build directory
->mkdir build
-# go into this directory
->cd build
-# generate/configure the project (choice IDE ...)
->ccmake "Path2SrcDir" 
-# build the project (dependent of the IDE)
->make
-# install the project (dependent of the IDE)
->sudo make install # run with administrator privilege
+> mkdir build
+> cd build
+> cmake ..
+> make
+> sudo make install # run with administrator privilege
 \end{lstlisting}
 
 FA$\mu$ST Toolbox should be installed. Now, refer to Quick-Start Chapter \ref{sec:firstUse} to check the install and to try FA$\mu$ST toolbox.
