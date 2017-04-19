@@ -1,8 +1,11 @@
 ##############################################################################
 ##                              Description:                                ##
 ##                                                                          ##
-##          FaustPy is class wrapping a C++ class                           ##
-##                                                                          ## 
+##          FaustPy is a python module  which delivered                     ##
+##          a class named Faust which represents a dense matrix             ##
+##          by a product of 'sparse' factors (i.e Faust)                    ##
+##          Python wrapper class implemented in C++                         ##
+##                                                                          ##
 ##  For more information on the FAuST Project, please visit the website     ##
 ##  of the project : <http://faust.gforge.inria.fr>                         ##
 ##                                                                          ##
@@ -36,9 +39,7 @@
 ##                                                                          ##
 ##############################################################################
 
-#import sys
-#FaustPath='/home/nbellot/Documents/faust_root/faust/trunk/devcpp/build/wrapper/python'
-#sys.path.append(FaustPath)
+
 import copy
 
 import numpy as np
@@ -46,48 +47,77 @@ import FaustCorePy
 
 
 class Faust:
+	""" This class represents a dense matrix by a product of 'sparse' factors (i.e Faust) 
+		The aim of the Faust representatio is to speed-up multiplication by this matrix
+	"""
 
-	#### CONSTRUCTOR ####
-	def  __init__(self,list_factors):
-		#print 'inside cinit'
-		self.m_faust = FaustCorePy.FaustCore(list_factors);
-		self.m_transpose_flag=0;
-		self.shape=self.m_faust.shape(self.m_transpose_flag)
+	def  __init__(F,list_factors):
+		""" create a Faust from a list of factor.
+		
+		Parameter
+		---------
+		list_factors : list/tuple of numpy matrices
+		"""
+		F.m_faust = FaustCorePy.FaustCore(list_factors);
+		F.m_transpose_flag=0;
+		F.shape=F.m_faust.shape(F.m_transpose_flag)
 
-	#### METHOD ####
-	def getNbRow(self):
-		#return self.m_faust.getNbRow();
-		return self.shape[0]
+
+	def getNbRow(F):
+		""" return the number of row of the current Faust. """
+		return F.shape[0]
 		
-	def getNbCol(self):
-		return self.shape[1]
+	def getNbCol(F):
+		""" return the number of column of the current Faust. """
+		return F.shape[1]
 		
 		
-	def transpose(self):
-		F_trans=copy.copy(self)
-		#F_trans=FaustPy([]);
-		#F_trans.m_faust=self.m_faust
-		F_trans.m_transpose_flag=not (self.m_transpose_flag)
-		F_trans.shape=(self.shape[1],self.shape[0])
+	def transpose(F):
+		""" transpose the current Faust. """
+		F_trans=copy.copy(F)
+		F_trans.m_transpose_flag=not (F.m_transpose_flag)
+		F_trans.shape=(F.shape[1],F.shape[0])
 		
 		return F_trans;
 		
-	def display(self):
+	def display(F):
+		""" display information of the current Faust. """
 		print("Struct : ")
-		self.m_faust.display(self.m_transpose_flag);
+		F.m_faust.display(F.m_transpose_flag);
 		
 		
-	def __mul__(self,x):
-
-		return self.m_faust.multiply(x,self.m_transpose_flag)
+	def __mul__(F,x):
+		""" multiplication between the current Faust and a numpy matrix.
+		(overload the python operator *, return F*x)
 		
-	def todense(self):
-		identity=np.eye(self.getNbCol(),self.getNbCol());
-		self_dense=self*identity
-		return self_dense
+		Parameter
+		---------
+		x : 2D numpy ndarray of double scalar, must be FORTRAN contiguous 
+		"""
+		return F.m_faust.multiply(x,F.m_transpose_flag)
+		
+	def todense(F):
+		""" convert the current Faust into a numpy matrix. 
+			return a numpy matrix """
+		
+		
+		identity=np.eye(F.getNbCol(),F.getNbCol());
+		F_dense=F*identity
+		return F_dense
 
 
-	def __getitem__(self,list_index):
+	def __getitem__(F,list_index):
+		""" Slicing : Return the value of the current Faust at index list_index.
+		(overload of python built-in operator F(indexRow,indexCol)
+		
+		Parameter
+		---------
+		list_index : tab of length 2 with its elements must be slice, integer or Ellipsis(...) 
+		
+		Example of use :
+		F[2,3], F[0:dim1,...], F[::-1,::-1] 
+		
+		"""
 		#check if list_index has a 2 index (row and column) 
 		if (len(list_index) != 2):
 			raise ValueError('list_index must contains 2 elements, the row index and the col index')
@@ -99,9 +129,9 @@ class Faust:
 		
 		keyCol=list_index[1]
 		keyRow=list_index[0]
-		identity=np.eye(self.getNbCol(),self.getNbCol());
+		identity=np.eye(F.getNbCol(),F.getNbCol());
 		identity=identity[...,keyCol]
-		submatrix=self*identity
+		submatrix=F*identity
 		submatrix=submatrix[keyRow,:]
 		return submatrix
 

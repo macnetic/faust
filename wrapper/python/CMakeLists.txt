@@ -1,21 +1,9 @@
-## CMAKELIST PRINCIPAL
-#option(BUILD_WRAPPER_PYTHON "Enable building PyFaust (librairie) Python." ON)
-#if(BUILD_WRAPPER_PYTHON)
-#	set(FAUST_PYTHON_SRC_DIR ${FAUST_SRC_WRAPPER_DIR}/python CACHE INTERNAL "")
-#	set(FAUST_PYTHON_SRC_SRC_DIR ${FAUST_PYTHON_SRC_DIR}/src/ CACHE INTERNAL "")
-#	set(FAUST_PYTHON_BIN_DIR ${FAUST_BIN_WRAPPER_DIR}/python CACHE INTERNAL "")
-#	set(FAUST_PYTHON_TARGET faust_python CACHE INTERNAL "")
-#	add_subdirectory(${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_BIN_DIR})
-	
-#endif(BUILD_WRAPPER_PYTHON)
 
 
 
 
-#message(STATUS "FFFFFFAUST_PYTHONNNNN ${EIGEN_INC_DIR}")
-#message(STATUS "EIGEN DIR ${EIGEN_INC_DIR}")
-#message(STATUS "WRAPPER PYTHON BIN DIR : ${FAUST_PYTHON_BIN_DIR}")
-#message(STATUS "FAUST SRC DIR ${FAUST_SRC_LINEAR_OPERATOR_DIR}")
+
+
 set(FAUST_PYTHON_INCLUDE_DIR"'${EIGEN_INC_DIR}',
 			'${FAUST_SRC_LINEAR_OPERATOR_DIR}',
 			'${FAUST_PYTHON_SRC_DIR}',
@@ -43,12 +31,12 @@ endif(BUILD_OPENBLAS)
 
 
 
-#configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
+# configure the setup.py.in into setup.py (equivalent of Makefile for Python)
 configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/FaustCorePy.pyx COPYONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCy.pxd ${FAUST_PYTHON_BIN_DIR}/FaustCoreCy.pxd COPYONLY)
 configure_file(${FAUST_PYTHON_SRC_DIR}/FaustPy.py ${FAUST_PYTHON_BIN_DIR}/FaustPy.py COPYONLY)
-#configure_file(${FAUST_PYTHON_SRC_DIR}/main.py ${FAUST_PYTHON_BIN_DIR}/main.py COPYONLY)
+
 
 add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET} )
 
