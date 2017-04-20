@@ -74,6 +74,7 @@ end
 disp('Ok');
 
 
+
 disp('test 2 : invalid factor empty'); 
 test_pass = 0;
 expected_err_message='concatMatGeneric : empty matlab matrix';
@@ -102,7 +103,7 @@ disp('Ok');
 
 disp('test 3 : invalid factor type (cell)');
 test_pass = 0;
-expected_err_message='getFaustMat :input matrix format must be single or double';
+expected_err_message='Unknown matlab type.';
 factors=cell(1,1);
 factors{1}=cell(1); % contains a character and not a matrix 
 
@@ -145,72 +146,30 @@ end
 disp('Ok');
 
 
-disp('test 5 : multiplication scalar compatibility (real/complex)');
-% real scalar Faust
+
+
+disp('test 5 : ctranspose is not yet implemented for complex scalar Faust');
 test_pass = 0;
-expected_err_message='Multiply : Wrong scalar compatibility (real/complex)';
-
-nbRowF = 3;
-nbColF = 4;
-F_real = Faust({rand(nbRowF,nbColF)});
-
-% complex scalar vector
-nbColVec = 7;
-%% avoid use of the variable i for imaginary unit to avoid conflict with the i of a loop for instance
-%% prefer the expression 1i (imaginary unit)
-complex_vector = rand(nbColF,nbColVec)+ 1i * rand(nbColF,nbColVec);
+expected_err_message='ctranspose is not yet implemented for complex scalar Faust';
+F=Faust({ones(5,4),ones(4,7)+1i*ones(4,7)});
 
 try
-	y = F_real * complex_vector;	
-catch ME
-   if strcmp(ME.message,expected_err_message)
-		test_pass = 1;
-	else
-		error([ 'error with a wrong message : ' ME.message ' must be : ' expected_err_message ]);  	
-	end
-end	
-disp('Ok');
-
-
-
-disp('test 6 : invalid dense factor (scalar complex)');
-test_pass = 0;
-nbRowF = 3;
-nbColF = 4;
-expected_err_message='getFaustMat scalar type (complex/real) are not compatible';
-factor_complex = rand(nbColF,nbColVec)+ 1i * rand(nbColF,nbColVec);
-
-try
-	F_real	= Faust({factor_complex});
+	F_ctrans = F';
 catch ME
 	if strcmp(ME.message,expected_err_message)
 		test_pass = 1;
 	else
-		disp(ME.message);		
-		error([ 'error with a wrong message : ' ME.message ' must be : ' expected_err_message ]);  	
-	end
-end		
-disp('Ok');
-
-
-disp('test 7 : invalid sparse factor (scalar complex)');
-test_pass = 0;
-nbRowF = 3;
-nbColF = 4;
-expected_err_message='getFaustspMat scalar type (complex/real) are not compatible';
-factor_complex = sparse(rand(nbColF,nbColVec)+ 1i * rand(nbColF,nbColVec));
-
-try
-	F_real	= Faust({factor_complex});
-catch ME
-	if strcmp(ME.message,expected_err_message)
-		test_pass = 1;
-	else
-		disp(ME.message);		
 		error([ 'error with a wrong message : ' ME.message ' must be : ' expected_err_message ]);  	
 	end
 end
+
+if(~test_pass)
+	error('failure');
+end	 
 disp('Ok');
+
+
+
 
  
 

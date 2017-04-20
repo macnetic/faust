@@ -80,6 +80,7 @@ end
 % expected value for the different multiplication
 Y_expected_trans = F_dense.'*x_F_trans;
 Y_expected = F_dense*x;
+Y_expected_ctrans = F_dense'*x_F_trans;
 
 
 istransposed=1;
@@ -101,6 +102,13 @@ if (~isequal(Y_expected_trans,Y_star_trans))
     error(['multiplication faust with transposition : invalid result  ' ]);
 end
 
+
+if(isreal(F))
+	Y_star_ctrans = F'*x_F_trans;	
+	if (~isequal(Y_expected_ctrans,Y_star_ctrans))
+   		 error(['multiplication faust with conjugate-transposition : invalid result  ' ]);
+	end
+end
 
 Y_mtimes_trans = mtimes_trans(F,x_F_trans,istransposed);
 %(Y_expected_trans ~= Y_mtimes_trans)
@@ -127,6 +135,11 @@ Y_mtimes_trans_T = mtimes_trans(F.',x,istransposed);
 if (~isequal(Y_expected,Y_mtimes_trans_T))
     error(['multiplication faust : invalid result  '  ]);
 end
+
+
+
+
+
 
 
 

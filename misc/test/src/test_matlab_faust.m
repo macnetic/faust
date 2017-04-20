@@ -369,6 +369,69 @@ disp('Ok');
 
 
 
+%%% ctranspose test
+if (isreal(F))
+	disp('TEST CTRANSPOSE : ');
+	disp('operation F_ctrans = F'' ');
+	F_ctrans=F';
+	[dim1_ctrans,dim2_ctrans]=size(F_ctrans);
+	if ((dim1_ctrans ~= dim2) | (dim2_ctrans ~= dim1))
+	    error(['transpose : invalid dimension']);
+	end
+
+	F_dense_ctrans = full(F_ctrans);
+
+	%(F_dense_ctrans ~= F_dense')
+	if (~isequal(F_dense_ctrans,F_dense'))    
+		error(['transpose : invalid transpose matrix']);
+	end
+
+	%% verification de la non modification du faust
+	[new_dim1,new_dim2]=size(F); 
+	if ((new_dim1 ~= dim1) | (dim2 ~= new_dim2))
+	    error(['transpose : modification du faust de depart']);
+	end
+
+	new_F_dense=full(F);
+	%((new_F_dense ~= F_dense))
+	if (~isequal(new_F_dense,F_dense))
+		error('transpose : modification du faust de depart');
+	end 
+
+
+	disp('operation F_ctrans_ctrans = F_ctrans'' ');
+	F_ctrans_ctrans=F_ctrans';
+	[dim1_ctrans_ctrans,dim2_ctrans_ctrans]=size(F_ctrans_ctrans);
+
+	if ((dim1_ctrans_ctrans ~= dim1) | (dim2_ctrans_ctrans ~= dim2))
+	    error(['transpose : invalid dimension']);
+	end
+
+	F_dense_ctrans_ctrans = full(F_ctrans_ctrans);
+	%(F_dense_trans_trans ~= F_dense)  
+	if (~isequal(F_dense_ctrans_ctrans,F_dense))
+	    error(['transpose : invalid transpose matrix']);
+	end
+
+
+	%% verification de la non modification du faust
+	[new_dim1_ctrans,new_dim2_ctrans]=size(F_ctrans); 
+	if ((new_dim1_ctrans ~= dim1_ctrans) | (new_dim2_ctrans ~= new_dim2_ctrans))
+	    error(['transpose : modification du faust de depart']);
+	end
+
+	new_F_dense_ctrans=full(F_ctrans);
+	%((new_F_dense_ctrans ~= F_dense_ctrans))
+	if (~isequal(new_F_dense_ctrans,F_dense_ctrans))
+		error('transpose : modification du faust de depart');
+	end 
+
+
+
+
+
+	disp('Ok');
+end
 
 
 

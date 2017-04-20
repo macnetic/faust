@@ -198,7 +198,8 @@ classdef Faust
 	% WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
 	%
 	% See also ctranspose.
-                F_trans=ctranspose(F); 
+		F_trans=F; % trans and F point share the same C++ underlying object (objectHandle)
+                F_trans.transpose_flag = xor(1,F.transpose_flag); % inverse the transpose flag
         
 	end
         
@@ -210,9 +211,12 @@ classdef Faust
 	% WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
 	%
 	% See also transpose.
-        
-                F_ctrans=F; % trans and F point share the same C++ underlying object (objectHandle)
-                F_ctrans.transpose_flag = xor(1,F.transpose_flag); % inverse the transpose flag
+        if (isreal(F))
+		F_ctrans=transpose(F);
+	else
+		error('ctranspose is not yet implemented for complex scalar Faust');
+	end	
+               
         end
 
 	
