@@ -77,7 +77,6 @@ list_factor[nb_factor-1]=np.random.randint(int_max, size=(dim1,dim2))
 
 ######################################
 print "*** CONTRUCTOR ***"
-#F = PyFaust.Faust(list_factor)
 F = FaustPy.Faust(list_factor)
 print("lister les attribut de F")
 
@@ -272,6 +271,6 @@ if not (F_dense_slice_2.shape == (dim1, dim2)) :
 	raise ValueError('invalid  size of the dense matrix')
 if not (F_dense[::-1,::-1]==F_dense_slice_2).all():
 	raise ValueError('invalid value')
-
+print "Ok"
 
 
