@@ -148,13 +148,35 @@ disp('Ok');
 
 
 
-disp('test 5 : ctranspose is not yet implemented for complex scalar Faust');
+disp('test 5 : complex transpose is not yet implemented for complex scalar Faust');
 test_pass = 0;
 expected_err_message='ctranspose is not yet implemented for complex scalar Faust';
 F=Faust({ones(5,4),ones(4,7)+1i*ones(4,7)});
 
 try
 	F_ctrans = F';
+catch ME
+	if strcmp(ME.message,expected_err_message)
+		test_pass = 1;
+	else
+		error([ 'error with a wrong message : ' ME.message ' must be : ' expected_err_message ]);  	
+	end
+end
+
+if(~test_pass)
+	error('failure');
+end	 
+disp('Ok');
+
+
+
+disp('test 6 : conjugate is not yet implemented for Faust');
+test_pass = 0;
+expected_err_message='conjugate is not yet implemented for Faust';
+F=Faust({ones(5,4),ones(4,7)+1i*ones(4,7)});
+
+try
+	F_conj = conj(F);
 catch ME
 	if strcmp(ME.message,expected_err_message)
 		test_pass = 1;

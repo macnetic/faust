@@ -208,7 +208,7 @@ classdef Faust
 	%
 	% F_trans = ctranspose(F) is called for syntax F' (complex conjugate transpose) when F is a Faust.
 	%
-	% WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
+	% WARNING : ctranspose is not yet implementd for complex Faust, only supported for real Faust
 	%
 	% See also transpose.
         if (isreal(F))
@@ -218,6 +218,25 @@ classdef Faust
 	end	
                
         end
+
+
+	function F_conj=conj(F)
+	%% CONJ ' Complex conjugate Faust (WARNING not implemented) (overloaded Matlab built-in function).
+	%
+	% F_trans = conj(F) For a complex F, conj(X) = REAL(F) - i*IMAG(F)
+	%
+	%
+	
+	
+	error('conjugate is not yet implemented for Faust');
+		
+               
+        end
+
+
+
+
+
 
 	
 	
@@ -305,7 +324,7 @@ classdef Faust
 
         end
 
-
+	
 
 	
 
