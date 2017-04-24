@@ -41,9 +41,9 @@ cmake_minimum_required(VERSION 3.0.2) #compatibilite UTF-8 ASCII (Windows Ubunt)
 #cmake_minimum_required(VERSION 2.8.8)
 project(FAUST CXX)
 
-##############    FAUST_VERSION 2.0)  ############################
+##############    FAUST_VERSION 2.1)  ############################
 set(FAUST_VERSION_MAJOR 2)
-set(FAUST_VERSION_MINOR 0)
+set(FAUST_VERSION_MINOR 1)
 
 set(FAUST_VERSION_PATCH 0)
 ########################################################
@@ -101,7 +101,7 @@ message (STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 		#set(FAUST_INSTALL_TESTING_DATA 	"${CMAKE_INSTALL_PREFIX}/testing/data")
 		# default location of install dir for matlab component
 		SET(CMAKE_INSTALL_MATLAB_PREFIX "${CMAKE_INSTALL_PREFIX}/matlab")
-		SET(CMAKE_INSTALL_PYTHON_PREFIX "$${CMAKE_INSTALL_PREFIX}/python" CACHE STRING "default install path for the matlab wrapper" FORCE )
+		SET(CMAKE_INSTALL_PYTHON_PREFIX "${CMAKE_INSTALL_PREFIX}/python")
 	else()
 		message(STATUS "Install FAuST path already defined to : ${CMAKE_INSTALL_MATLAB_PREFIX}")
 
