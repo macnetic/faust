@@ -28,8 +28,8 @@ if(BUILD_OPENBLAS)
 	set(FAUST_PYTHON_LIB ",'openblas'")
 endif(BUILD_OPENBLAS)
 
-
-
+#move quickstart demo file
+configure_file(${FAUST_PYTHON_SRC_DIR}/quickstart.py ${FAUST_PYTHON_BIN_DIR}/quickstart.py COPYONLY)
 
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)
 configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)

@@ -17,6 +17,143 @@ some time savings compared to the CPU code for certain computations, but is not 
 This experiment was in the previous release (FA$\mu$ST version 1.0, pure Matlab implementation) but is not in the current one because our C++ wrapper is not yet compatible with the sparse decomposition algorithm used in this experiment. Please use version 1.0.0 to reproduce this image denoising experiment. 
 \end{itemize}
 
+\section{Python wrapper : beta version}\label{sec:Pythonwrapper}
+This section describes the different step to install the Python wrapper and to get acustomed to its behaviour.
+The Python wrapper has only been tested on Unix system, not Windows.
+
+Throughout this section we provide examples as follows:
+\begin{itemize}
+\item Command lines you must enter in a terminal are displayed as:
+\lstset{style=customBash}
+\begin{lstlisting}
+> mkdir BUILD; ls . 
+\end{lstlisting}
+\item Messages resulting from such command lines appear without the leading '>':
+\lstset{style=customBash}
+\begin{lstlisting}
+example of return text in your current terminal. 
+\end{lstlisting}
+\item Python code is displayed like this :
+\lstset{style=customPython}
+\begin{lstlisting}
+# this is a commentary
+y = A*x; 
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Required Components}
+This Section lists the required components you must install before to begin the FA$\mu$ST installation.
+
+\begin{itemize}
+\item \textbf{Install Python}. The wrapper has only been tested with Python version 2 (2.7.x) (\url{https://cmake.org/download/}).
+To install Python 2, type the following command :
+\lstset{style=customBash}
+\begin{lstlisting}
+> pip install python2
+\end{lstlisting}
+But Python 2 is a native package on many Unix system.
+ 
+\item \textbf{Install Numpy}
+Numpy is a Python package useful linear algebra (http://www.numpy.org/)
+It is often delivered with Python but in case you haven't it,you can install it by typing the following command :
+\lstset{style=customBash}
+\begin{lstlisting}
+> pip install numpy
+\end{lstlisting}
+
+Check the version of the Numpy package,
+by typing the following command :
+\lstset{style=customBash}
+\begin{lstlisting}
+> pip freeze | grep 'numpy'
+\end{lstlisting}
+
+\textbf{Warning} : version of Numpy older than 1.9.2 may be not compatible with the Python wrapper
+ 
+\item \textbf{Install Cython}
+Cython is a Python package, that allows to interface C/C++ with Python. (\url{http://cython.org/})
+
+It is often delivered with Python but in case you haven't it,you can install it by typing the following command :
+\lstset{style=customBash}
+\begin{lstlisting}
+> pip install cython
+\end{lstlisting}
+
+\end{itemize}
+
+
+
+\subsection{Install}
+The installation is very similar to the installation of the Matlab wrapper. 
+
+
+\begin{itemize}
+\item \textbf{Type the following commands :} 
+\lstset{style=customBash}
+\begin{lstlisting}
+> mkdir build
+> cd build
+> cmake .. -DBUILD_WRAPPER_PYTHON=ON 
+> make
+> sudo make install # run with administrator privilege
+\end{lstlisting}
+
+
+\item By default,
+The Python wrapper is installed in the directory : \texttt{<HOMEDIR>\textbackslash Documents\textbackslash PYTHON\textbackslash faust}.
+
+But you can choose your own install directory by setting the \newline
+CMAKE variable  \textbf{CMAKE\_INSTALL\_PYTHON\_PREFIX}.
+
+
+
+Type the following command :
+ \lstset{style=customBash}
+\begin{lstlisting}
+> mkdir build
+> cd build
+> cmake .. -DBUILD_WRAPPER_PYTHON=ON -DCMAKE_INTALL_PYTHON_PREFIX="YourPath" 
+> make
+> sudo make install # run with administrator privilege
+\end{lstlisting}
+
+\end{itemize}
+
+
+
+\subsection{Quickstart}
+	This subsection presents the quickstart demo to get acustomed to the Python wrapper.
+	 Now, you can go to the install directory of the Python wrapper which is \newline \texttt{<HOMEDIR>\textbackslash Documents\textbackslash PYTHON\textbackslash faust} by default.
+	\newline
+	
+	\begin{itemize}	
+	\item In a terminal, type the following command :
+	 \lstset{style=customBash}
+	\begin{lstlisting}
+	> cd ~/Documents/PYTHON/faust/
+	\end{lstlisting}
+	\item You can run the Python script \texttt{quickstart.py}
+	by typing the following command :
+	\lstset{style=customBash}
+	\begin{lstlisting}
+	> python quickstart.py
+	\end{lstlisting}
+	\end{itemize}
+	
+	In this script
+	\begin{enumerate}
+		\item We import the FaustPy package
+		\lstinputlisting[firstline=39,lastline=40,style=customPython]{../../wrapper/python/quickstart.py}
+		\item We create a Faust from a list of factors represented as Numpy matrices
+		\lstinputlisting[firstline=64,lastline=65,style=customPython]{../../wrapper/python/quickstart.py}
+		\item A list of overloaded Numpy operation shows that a Faust is handled as a normal
+			  Numpy matrix.
+		\lstinputlisting[firstline=67,lastline=83,style=customPython]{../../wrapper/python/quickstart.py}
+		\item It performs a little time comparison between multiplication by a FA$\mu$ST or its Numpy equivalent matrix.
+		\lstinputlisting[firstline=67,lastline=83,style=customPython]{../../wrapper/python/quickstart.py}	  
+	\end{enumerate}
+		
+	
 \section{Construct a FAuST from a given matrix}\label{sec:WorkingProgressBuildFromMatrix}
 Please ensure that you have configured your Matlab environment (cf. Section \ref{sec:firstUseMatlabPath}). Then, to see an example of building a FA$\mu$ST from a matrix, you can run \texttt{factorize\_matrix.m} in the Matlab Command Window by typing :
 \lstset{style=customMatlab}

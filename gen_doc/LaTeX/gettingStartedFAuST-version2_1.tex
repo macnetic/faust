@@ -1,7 +1,7 @@
 \documentclass[a4paper,11pt]{report}
 \author{Adrien Leman; Nicolas Bellot}
 \def \FAuST {FA$\mu$ST}
-\title{Getting Started with the FA$\mu$ST Toolbox \smallbreak "Flexible Approximate Multi-Layer Sparse Transforms" \bigbreak
+\title{Getting Started with the FA$\mu$ST Toolbox version 2.1 \smallbreak "Flexible Approximate Multi-Layer Sparse Transforms " \bigbreak
 \bigbreak
 \centerline{\includegraphics[scale=0.1]{images/logo.png}}
 }
@@ -56,6 +56,8 @@
 
 \definecolor{mygray}{rgb}{0.95,0.95,1}
 \definecolor{mygrayMatlab}{rgb}{0.9,0.9,0.9}
+\definecolor{pythonColor}{rgb}{0.5,0.5,0.5}
+\definecolor{pythonCommentColor}{rgb}{0.1,0.3,0.1}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
 \definecolor{myBlack}{rgb}{0.3,0.3,0.3}
 
@@ -120,6 +122,29 @@
     %emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
     %emph=[2]{word1,word2}, emphstyle=[2]{style},  
 }
+
+\lstdefinestyle{customPython}{
+	language=Python,% 
+	backgroundcolor=\color{pythonColor},%
+	stringstyle=\color{mylilas},%
+  	%identifierstyle=\bfseries\color{white},%
+  	basicstyle=\ttfamily\color{black},
+  	commentstyle=\color{pythonCommentColor},%
+    keywordstyle=\color{black},%
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},%
+    %identifierstyle=\color{black},%
+    stringstyle=\color{mylilas},%
+	frame=single,	                   % adds a frame around the code
+	breaklines=true,%
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    numbers=left,%
+    numberstyle={\tiny \color{black}},% size of the numbers
+    numbersep=9pt, % this defines how far the numbers are from the text
+    %emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+    %emph=[2]{word1,word2}, emphstyle=[2]{style},  
+}
+
+
 
 
 \input{notations.tex}
