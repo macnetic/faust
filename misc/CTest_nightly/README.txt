@@ -5,7 +5,7 @@
 
 
 ##################################################################
-############## CDASH 	 							##############
+############## CDASH 	 			    ##############
 ##################################################################
 The Continuous Integration for the project FAUST is based on 
 the CDASH tool (see. http://www.cdash.org/). 
@@ -36,22 +36,26 @@ How to create an new instance of test on CDASH which chekout / build / install a
 1- create a new virtual machine and connect 
 
 This tool aims to launch automatically a shell-bash SCRIPT on a machine (local, or virtual ...) : 
-2- 	Chek out only the files presents in 
+2- 	Checkout only the files presents in 
 	following directory : devcpp/misc/CTest_nightly 
 	svn checkout --username XXX https://scm.gforge.inria.fr/authscm/XXX/svn/faust/trunk/devcpp/misc/CTest_nightly/ ./
 
 3-	Create and Configure your personnal run script (".sh" for Unix and ".bat" for Windows) "run_nightly_PLATFORM.sh" with corresponding configuration. (see existing run_nighlty_X.sh files for more informations)
 
-4- 	configure the "crontab" tool for UNIX or "shulder" tool for windows
+4- 	configure the "crontab" tool for UNIX or "task scheduler" tool for windows
 	crontab -e : 
-	example :
-# Run all day at 14h35 the nightly test and put results on CDASH
-05 14  * * * /usr/bin/svn up /home/aleman/WORK/FAUST/faust_nightly/
-35 14  * * * /home/aleman/WORK/FAUST/faust_nightly/run_nightly_XXX.sh
+	example with crontab (UNIX):
+		# Run all day at 14h35 the nightly test and put results on CDASH
+		05 14  * * * /usr/bin/svn up /home/aleman/WORK/FAUST/faust_nightly/
+		35 14  * * * /home/aleman/WORK/FAUST/faust_nightly/run_nightly_XXX.sh
 
-# run all day and send a mail 
-40 11  * * * /Users/ci/CTest_nightly/run_nightly_OS-X.sh 2>&1| mail -s "Cron job execution" youremail@inria.fr
-##
+		# run all day and send a mail 
+		40 11  * * * /Users/ci/CTest_nightly/run_nightly_OS-X.sh 2>&1| mail -s "Cron job execution" youremail@inria.fr
+		##
+	tutorial with "task scheduler"on (Windows) :
+		see Windows-task-scheduler-tutorial.pdf
+
+
 
 5- CTest OPTION: There are three types of dashboard submissions: 
     -Experimental means the current state of the project. An experimental submission can be performed at any time, usually interactively from the current working copy of a developer.
