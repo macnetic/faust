@@ -90,8 +90,8 @@ cdef class FaustCore:
 		
 		
 	def shape(self,transpose_flag=False):
-		cdef unsigned int nbrow
-		cdef unsigned int nbcol
+		cdef unsigned int nbrow = 0
+		cdef unsigned int nbcol = 0
 		self.m_faust.setOp(transpose_flag,nbrow,nbcol)
 		return (nbrow,nbcol)
 		

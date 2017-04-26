@@ -120,7 +120,10 @@ Make sure you are in the build directory
      the following command
      $ ctest -I [9,14] 
      will do the same		
-     $ ctest -R MATLAB_FAUST_CONFIG	
+     $ ctest -R MATLAB_FAUST_CONFIG
 
 
+4 - run test in very verbose mode (useful to understand why the test didn't succeed)	
+    type the following command		
+    $ ctest -VV 	
 
