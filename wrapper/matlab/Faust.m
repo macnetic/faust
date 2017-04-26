@@ -42,7 +42,7 @@
 
 classdef Faust
     properties (SetAccess = private, Hidden = true)
-        matrix; % Handle to the underlying C++ class instance
+        matrix; % Handle to the FaustCore class instance
 	transpose_flag; % boolean to know if the Faust is transpose or not
 	isReal;
     end
@@ -214,7 +214,7 @@ classdef Faust
         if (isreal(F))
 		F_ctrans=transpose(F);
 	else
-		error('ctranspose is not yet implemented for complex scalar Faust');
+		error('TODO : ctranspose is not yet implemented for complex scalar Faust');
 	end	
                
         end
@@ -228,7 +228,7 @@ classdef Faust
 	%
 	
 	
-	error('conjugate is not yet implemented for Faust');
+	error('TODO : conjugate is not yet implemented for Faust');
 		
                
         end

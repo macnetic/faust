@@ -34,7 +34,7 @@ File's Structure :
 Main Files :
 *****************
 
-src/FaustPy.py :
+FaustPy.py :
 	--> this python module is directly utilised by the user.
 	    It allows the handling of FaustPy.Faust class representing our type of matrices
 
@@ -50,6 +50,9 @@ setup.py.in :
         In our case, it compiles the module FaustCorePy 
 	(which consists in only one class FaustCorePy.FaustCore)
 	This class is used by the FaustPy.Faust class
+
+quickstart.py :
+	--> Little demo to illustrate the behaviour of the class FaustPy.Faust
 
 
 

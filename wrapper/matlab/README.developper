@@ -1,0 +1,147 @@
+##########################################################################
+########                 README for developer                  ###########
+########                    FAuST Toolbox MATLAB wrapper        ##########
+######## Flexible Approximate Multi-Layer Sparse Transform      ##########
+##########################################################################
+
+
+##########################################################################
+General purpose :
+The Matlab wrapper intefaces the Faust C++ with Python.
+Which means that it delivered two package :
+-the factorization algorithm (mexPalm4MSA and mexHierarchical_fact)
+-the class Faust representing our new type of matrix
+
+
+##########################################################################
+Current state :
+the Faust class currently support complex scalar,
+the main built-in Matlab function are overloaded (mtimes, transposed, slicing ...)
+However, the conjugate, conjugate-transposed is not implemented.
+
+
+
+
+##########################################################################
+File's Structure :
+
+*****************
+Main Files :
+*****************
+
+Faust.m :
+	--> this class represents the main class representing our new matrix type.
+	    To have a good understanding of the different class structure,
+		see the diagram doc/diagram_class.png		 
+    
+
+setup_FAUST.m : 
+	--> file that configure the Matlab path, access to demo files...
+
+
+
+
+
+*****************
+Sources Files (mexFunction):
+*****************
+
+src/mexFaust.cpp.in :
+	--> file where the C++ class Faust::Transform is interface with Matlab
+	    WARNING : this file is configured into two files :
+		- mexFaustReal.cpp interfaces the class Faust::Transform<double> (i.e real scalar Faust)
+		- mexFaustCplx.cpp interfaces the class Faust::Transform<std::complex<double<> (i.e complex scalar Faust)
+	--> these 2 mexfunctions are directly used by FaustCore class (tools/FaustCore.m) and Faust.m	
+
+		
+src/mexHierarchical_fact.cpp and mexpalm4MSA.cpp :
+	--> the 2 mexfunctions are used to factorize/decompose a matrix into a Faust
+	
+
+*****************
+Tools directory (mexFunction):
+*****************
+tools/faust2Mx.h and faust2Mx.hpp :
+	--> C++ header files : here are all the C++ functions useful to convert 
+	    the C++ Faust objects (Matrices ...)  into a Matlab object 
+
+tools/mx2Faust.h and tools/mx2Faust.hpp :
+	--> C++ header files : here are all the C++ functions useful to convert 
+	     a Matlab object  (Matrices ...)  into C++ Faust objects
+
+tools/FaustCore.m :
+	--> this Matlab class wrap the C++ mexfunctions mexFaustReal and mexFaustReal
+	    This class should not be used directly by the user.
+	     It's only a purpose it's to inherited from Matlab built-in class handle
+	     which allows different object to have the same reference.	
+	     (https://fr.mathworks.com/help/matlab/handle-classes.html)	
+	     In particular, this means that the operator = for this class doesn't copy the memory.
+	     If we have 2 objects FaustCore A and B, A=B,
+	     A and B share the same memory, so the operation = is faster.
+	     To have a good understanding of the different class structure,
+		see the diagram doc/diagram_class.png	 
+
+
+tools/class_handle.hpp :
+	--> C++ header file : file useful from wrapping an underlying C++ class into matlab
+	    WARNING : with recent version of gcc, it can generate compile error 
+
+tools/faust_decompose.m and generate_params.m (beta version) :
+	--> 2 Matlab functions are useful to simplify the use of the factorization algorithm hierarchical_fact
+	--> in particular decompose a matrix into a Faust, the only input information needed is 
+	    the matrix to be factorized, the number of factors, the RCG (Rational Complexity Gain)		
+
+*******************
+Other directories :
+*******************
+
+The directory GUI/ is where the Matlab documentation of the factorization algorithm is (cf mexpalm4MSA.m and mexHierarchical_fact.m)
+
+The directory old_matlab/ is where all the pure Matlab factorization algorithm are stored. It's only useful to make comparison for the test with the mexfunction factorization algorithm. 
+
+
+
+##########################################################################
+License:
+
+Copyright (2016):          Luc Le Magoarou, Remi Gribonval, 
+                      Nicolas Bellot, Adrien Leman, Thomas Gautrais
+                                INRIA Rennes, FRANCE
+                                http://www.inria.fr/
+
+The FAuST Toolbox is distributed under the terms of the GNU Affero General 
+Public License.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public 
+License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##########################################################################
+
+
+##########################################################################
+Contacts:	
+
+	Luc Le Magoarou: luc.le-magoarou@inria.fr
+	Remi Gribonval : remi.gribonval@inria.fr
+	Nicolas Bellot  : nicolas.bellot@inria.fr
+	Adrien Leman    : adrien.leman@inria.fr	
+	Thomas Gautrais : thomas.gautrais@inria.fr	
+##########################################################################
+
+
+##########################################################################
+References:
+
+[1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse 
+	approximations of matrices and applications", Journal of Selected 
+	Topics in Signal Processing, 2016.
+	<https://hal.archives-ouvertes.fr/hal-01167948v1>
+##########################################################################	
+

@@ -13,6 +13,10 @@
 
 
 #ifndef __MACH__
+	// WARNING :
+	// with the recent version of gcc 
+	// this 2 definition can cause compile error of redefinition,
+	// in this case, comment the 2 following lines 
 	typedef unsigned long int uint32_t;
 	typedef unsigned long long int uint64_t;
 #endif

@@ -30,10 +30,12 @@ endif(BUILD_OPENBLAS)
 
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 
-#target_link_libraries(${FAUST_MEXTOOLS_TARGET} ${FAUST_TARGET})
-# specialisation template scalar with real
+
+# configuration de mexFaust.cpp.in 
+# specialisation of the class mexFaust template scalar with real
 set(FAUST_SCALAR "double")
 configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustReal.cpp @ONLY)
+# specialisation of the class mexFaust template scalar with complex scalar
 set(FAUST_SCALAR "std::complex<double>")
 configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustCplx.cpp @ONLY)
 
@@ -158,8 +160,8 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 
 
 		# CONFIGURATION DES CHEMINS
-	configure_file(${FAUST_MATLAB_SRC_DIR}/setup_FAUST.m.in ${FAUST_MATLAB_BIN_DIR}/setup_FAUST.m @ONLY)
-	#install(FILES ${FAUST_MATLAB_BIN_DIR}/setup_FAUST.m DESTINATION ${CMAKE_INSTALL_MATLAB_PREFIX} PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE )
+	configure_file(${FAUST_MATLAB_SRC_DIR}/setup_FAUST.m ${FAUST_MATLAB_BIN_DIR}/setup_FAUST.m COPYONLY)
+
 
 
 	### OLD MATLAB VERSION CODE TO MAKE TIME COMPARISON ########
