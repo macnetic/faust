@@ -1,4 +1,4 @@
-# WRAPPER : TESTS EXAMPLES USING THE LIBRARY FAUST WITH A CPU VERSION
+
 
 message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 
@@ -137,16 +137,15 @@ endif()
 
 
 ####### UNIT TEST ########
-set(FAUST_SRC_TEST_SRC_UNIT_DIR ${FAUST_SRC_TEST_SRC_DIR}/unit/ CACHE INTERNAL "")
-set(FAUST_BIN_TEST_SRC_UNIT_DIR ${FAUST_BIN_TEST_SRC_DIR}/unit/ CACHE INTERNAL "")
+
 
 
 foreach(TEST_FPP float double)
 	foreach(FILE faust_mult faust_mult_cplx)
-	configure_file(${FAUST_SRC_TEST_SRC_UNIT_DIR}/${FILE}.cpp.in ${FAUST_BIN_TEST_SRC_UNIT_DIR}/${FILE}_${TEST_FPP}.cpp @ONLY)
+	configure_file(${FAUST_SRC_TEST_SRC_UNIT_DIR}/${FILE}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${FILE}_${TEST_FPP}.cpp @ONLY)
 
 	# Generation of the binary files in double and float precision
-	add_executable(${FILE}_${TEST_FPP} ${FAUST_BIN_TEST_SRC_UNIT_DIR}/${FILE}_${TEST_FPP}.cpp ${FAUST_BIN_TEST_SRC_DIR}/)
+	add_executable(${FILE}_${TEST_FPP} ${FAUST_BIN_TEST_SRC_DIR}/${FILE}_${TEST_FPP}.cpp ${FAUST_BIN_TEST_SRC_DIR}/)
    	
 	target_link_libraries(${FILE}_${TEST_FPP} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
 			
@@ -172,12 +171,12 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
 	### list of executable generated in double and simple precision
 	# hierarchical_fact : test the hierarchical_fact algorithm
 	# test_palm4MSA : test the palm4MSA algorithm
-	# multiply_compare_time : time comparison between Faust-vector product and Dense matrix-vector product
+	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
  
 	foreach(TEST_FPP float double)	
 		foreach(testin hierarchicalFactorization test_palm4MSA faust_multiplication)
 			# copy CPU files cpp.in to the user's ./src/ directory in float et double precision
-			configure_file(${FAUST_SRC_TEST_SRC_DIR}/${testin}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
+			configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/${testin}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
 			# Generation of the binary files in double and float precision
 			add_executable(${testin}_${TEST_FPP} ${FAUST_BIN_TEST_SRC_DIR}/${testin}_${TEST_FPP}.cpp ${FAUST_BIN_TEST_SRC_DIR}/ ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
    	
@@ -189,15 +188,9 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
 		endforeach()
 	endforeach()
 
-#message(STATUS "ALALALLLLLLLLLLL FAUST_INSTALL_BIN=${FAUST_INSTALL_BIN}")
-	#file(MAKE_DIRECTORY ${FAUST_INSTALL_BIN})
-#	install(TARGETS hierarchicalFactorization_double hierarchicalFactorization_float test_palm4MSA_double test_palm4MSA_float DESTINATION ${FAUST_INSTALL_BIN} PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
 
 
-	# matlab script useful for displaying the result of the multiply_compare_time executable ( 
-	configure_file(${FAUST_SRC_TEST_TIME_COMP_DIR}/display_multiply_comptime.m.in ${FAUST_BIN_TEST_TIME_COMPARE_DIR}/display_multiply_comptime.m @ONLY)
-	#file(MAKE_DIRECTORY ${FAUST_INSTALL_BIN_TIME_COMP})	
-	#install(FILES ${FAUST_BIN_TEST_TIME_COMPARE_DIR}/display_multiply_comptime.m DESTINATION ${FAUST_INSTALL_BIN_TIME_COMP} PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
+
 
 
 ###### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST ######
@@ -212,7 +205,7 @@ if (BUILD_WRAPPER_MATLAB)
 	
 	
 	foreach(matlabtest hier_fact_test.m generate_Faust_config.m test_matlab_faust.m test_matlab_faust2.m test_matlab_faust_mult.m test_matlab_faust_time.m)
-		configure_file(${FAUST_SRC_TEST_SRC_DIR}/${matlabtest} ${FAUST_BIN_TEST_BIN_DIR}/${matlabtest} @ONLY)
+		configure_file(${FAUST_SRC_TEST_SRC_MATLAB_DIR}/${matlabtest} ${FAUST_BIN_TEST_BIN_DIR}/${matlabtest} @ONLY)
 	endforeach()
 endif(BUILD_WRAPPER_MATLAB)
 
@@ -282,12 +275,10 @@ if (BUILD_READ_MAT_FILE)
 	
 
 
-	## time comparison between Faust-vector product and Dense matrix-vector product for various configuration ( dimension, RCG , number of factor)
-	#add_test(NAME MULTIPLY_COMPTIME COMMAND ${FAUST_BIN_TEST_BIN_DIR}/multiply_compare_time_double)
-	## display the result of MULTIPLY_COMPTIME and save it in folder FAUST_BIN_TEST_FIG_DIR as jpeg image (WARNING must be launched after MULTIPLY_COMPTIME)
-	#add_test(NAME FIG_MULTIPLY_COMPTIME COMMAND	matlab -nodesktop -r "try;addpath('${FAUST_BIN_TEST_TIME_COMPARE_DIR}');display_multiply_comptime('${FAUST_BIN_TEST_OUTPUT_DIR}/multiply_compare_time.mat','${FAUST_BIN_TEST_FIG_DIR}') ; catch ME ; disp('ERROR IN TEST display_multiply_comptime.m Please chek the output to visualize the error. ') ; end ; exit")
+
 	
-	#set_tests_properties(FIG_MULTIPLY_COMPTIME PROPERTIES TIMEOUT 300)
+	
+
 
 endif (BUILD_READ_MAT_FILE)
 

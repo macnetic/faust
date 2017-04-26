@@ -1,0 +1,219 @@
+/****************************************************************************/
+/*                              Description:                                */
+/* unitary test for testing multiplication by faust with complex scalar     */
+/*                                                                          */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.gforge.inria.fr>                         */
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+/****************************************************************************/
+#include "faust_MatSparse.h"
+#include "faust_HierarchicalFact.h"
+#include "faust_Timer.h"
+#include "faust_Transform.h"
+#include <string>
+#include <sstream>
+#include "faust_BlasHandle.h"
+#include "faust_SpBlasHandle.h"
+
+
+#include <iostream>
+#include <iomanip>
+
+/** \brief unitary test for testing multiplication by faust									
+*/
+
+typedef @TEST_FPP@ FPP;
+typedef std::complex<FPP> CPX;
+
+//using namespace Faust;
+
+int main(int argc, char* argv[])
+{
+	if (typeid(FPP) == typeid(double))
+  	{
+		cout<<"floating point precision == double"<<endl;
+  	}
+
+  	if (typeid(FPP) == typeid(float))
+  	{
+		cout<<"floating point precision == float"<<endl;
+  	}
+
+	int dim1 = 3;
+	int dim2 = 4;
+	int dim3 = 2;
+
+	int nb_factor = 3;
+
+
+	/* initilisation of the factors of the Faust */
+
+	// factor 1
+	Faust::MatDense<CPX,Cpu> fact1(dim1,dim2);
+	for (int j=0;j < dim1*dim2; j ++)
+	{
+		fact1[j]= CPX(j,j*j);
+	};
+
+
+					      
+
+	// factor 2
+	Faust::MatDense<CPX,Cpu> fact2(dim2,dim2);
+	for (int i=0;i< dim2; i++)
+	{
+		for (int j=0;j< dim2; j++)
+		{
+			fact2[i*dim2+j]= CPX(i+1,-i+1);
+		}
+		
+	}
+
+	// factor 3
+	Faust::MatDense<CPX,Cpu> fact3_dense(dim2,dim2);
+	for (int i=0;i< dim2; i++)
+	{
+		for (int j=0;j< dim2; j++)
+		{
+			fact3_dense[i*dim2+j]= CPX(i+2,-i+2);
+		}
+		
+	}
+	Faust::MatSparse<CPX,Cpu> fact3_sparse(fact3_dense);
+
+	std::cout<<"fact1 value"<<std::endl;
+	fact1.Display();
+	std::cout<<"fact2 value"<<std::endl;
+	fact2.Display();
+	std::cout<<"fact3 value"<<std::endl;
+	fact3_dense.Display();
+	
+	/* initialisation of the list of factors of the Faust */
+	vector<Faust::MatGeneric<CPX,Cpu> *> list_fact;
+	list_fact.resize(nb_factor);
+	list_fact[0]=fact1.Clone();
+	list_fact[1]=fact2.Clone();
+	list_fact[2]=fact3_sparse.Clone();
+
+	/* initialisation of the Faust (Transform) */
+	std::cout<<"init Faust "<<std::endl;
+	bool ispOtimized = false;	
+	Faust::Transform<CPX,Cpu> F(list_fact,1.0,ispOtimized);
+	F.Display();
+
+
+	if (F.isReal())
+	{
+		std::cerr<<"F.isreal() invalid value, F must be complex "<<std::endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	int nbRowF = F.getNbRow();
+	int nbColF = F.getNbCol();	
+	
+	if((nbRowF != dim1) || (nbColF != dim2))
+	{
+		std::cerr<<"invalid dimension of F "<<std::endl;
+		exit(EXIT_FAILURE);
+	}
+	
+
+	
+	std::cout<<"init matrix/vec that will be multiplied "<<std::endl;
+	Faust::MatDense<CPX,Cpu> identity(nbColF);
+	for (int i = 0;i<nbColF;i++) identity[i]=CPX(0.0);
+	for (int i = 0;i<nbColF;i++) identity[i*nbColF+i]=CPX(1.0);
+
+	Faust::Vect<CPX,Cpu> vec(nbColF);
+	for (int i = 0;i<nbColF;i++) vec[i]=CPX(i,i*i);
+	
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+
+	// F_dense = F * identity
+       std::cout<<"F_dense = F * identity "<<std::endl;
+       Faust::MatDense<CPX,Cpu> F_dense_mult = F.multiply(identity,'N');
+
+
+	if ( (F_dense_mult.getNbRow() != nbRowF) || (F_dense_mult.getNbCol() != nbColF) )
+	{
+		std::cerr<<"F size ("<<F_dense_mult.getNbRow()<<","<<F_dense_mult.getNbCol()<<")"<<std::endl;
+		std::cerr<<"F size expected ("<<nbRowF<<","<<nbColF<<")"<<std::endl;		
+		std::cerr<<"error : invalid dimension of F_dense_mult "<<std::endl;
+		exit(EXIT_FAILURE);	
+	}
+
+	// F_prod must be equal to F_dense
+        std::cout<<"F_prod  = F.get_product"<<std::endl;
+	Faust::MatDense<CPX,Cpu> F_prod=F.get_product();
+
+
+	if ( (F_prod.getNbRow() != nbRowF) || (F_prod.getNbCol() != nbColF) )
+	{
+		std::cerr<<"error : invalid dimension of F_prod "<<std::endl;
+		exit(EXIT_FAILURE);		
+
+	}
+
+
+	for (int i=0;i<nbRowF*nbColF;i++)
+	{
+		if (F_prod[i] != F_dense_mult[i])
+		{
+			std::cerr<<"error : F_prod != F_dense_mult "<<std::endl;
+			exit(EXIT_FAILURE);
+		}
+
+	}
+	
+	
+	// F multiply with vec
+	std::cout<<"F_vec = F * vec "<<std::endl;
+	Faust::Vect<CPX,Cpu> F_vec = F.multiply(vec,'N');
+
+	
+	return 0;
+
+}

@@ -1,0 +1,126 @@
+##################################################################
+############## README : TEST  with CTest            ##############
+##############          of the FAuST project 	    ##############
+##################################################################
+
+It's here that all the different test are generated.
+Here is tested,
+1- C++ code unitary function (cf directory src/C++/unit)
+2- C++ code with input as Matlab storing file extension (.mat) (cf directory src/C++/)
+3- Matlab wrapper (cf directory src/Matlab)
+4- Python wrapper (cf directory src/Python)
+5- Cmdline wrapper  WARNING this wrapper doesn't work anymore
+
+
+##################################################################
+- I How to add a test ?
+   In the CMakelist.txt in misc/test/,
+   just write this :
+	   add_test(NAME myTest COMMAND myExe)
+   This will add a test named myTest that will execute the myExe
+
+##################################################################
+- II How to make a test ?  
+   All the executable return a value,
+   if it's 0, the test succeeds
+   else the test fails.
+
+   So, make sure you're executable return the corresponding value.	    
+
+
+##################################################################
+- III How to list the different test available ?
+
+In the build directory,
+after configuring, generated, compiled your project you can launch test.
+
+If you are in your build directory, 
+
+	to list the different test available,
+	type the following command :
+		$ ctest -N
+
+	    --> the ouput of this command should lool like this :
+			  Test  #1: MATLAB_FACT_HIER_MEX
+  			  Test  #2: MATLAB_FACT_HIER_MATLAB
+  			  Test  #3: MATLAB_FACT_MEG_MEX
+			  Test  #4: MATLAB_FACT_MEG_MATLAB
+			  Test  #5: MATLAB_FACT_HADAMARD_MEX
+			  Test  #6: MATLAB_FACT_HADAMARD_MATLAB
+			  Test  #7: MATLAB_DEMO_INSTALL
+			  Test  #8: MATLAB_DEMO_BUILD
+			  Test  #9: MATLAB_FAUST_CONFIG_REAL1
+			  Test #10: MATLAB_FAUST_CONFIG_REAL2
+			  Test #11: MATLAB_FAUST_CONFIG_REAL3
+			  Test #12: MATLAB_FAUST_CONFIG_REAL4
+			  Test #13: MATLAB_FAUST_CONFIG_CPLX1
+			  Test #14: MATLAB_FAUST_CONFIG_CPLX2
+			  Test #15: MATLAB_FAUST_2
+			  Test #16: MATLAB_FAUST_SPEED
+			  Test #17: UNIT_faust_mult_float
+			  Test #18: UNIT_faust_mult_cplx_float
+			  Test #19: UNIT_faust_mult_double
+			  Test #20: UNIT_faust_mult_cplx_double
+			  Test #21: PYTHON_FAUST
+			  ...
+			  Test #48: MATFILE_FACT_MEG_float
+			  Test #49: MATFILE_FACT_MEG_double
+			  Test #50: MATFILE_FACT_MEG_TRANSPOSED_float
+			  Test #51: MATFILE_FACT_MEG_TRANSPOSED_double
+
+		--> Commentary on the ouput :
+		    As you can see, the different test are listed by name and id
+		    These test are classified quite easily. 
+		    The test whose name begin by MATLAB test the Matlab wrapper.
+		    The test whose name begin by PYTHON test the Python wrapper.
+		    The test whose name begin by UNIT are unitary test (low-level C++ test).
+		    The test whose name begin by MATFILE are C++ test using input data stored in matfile.
+	
+		    The test whose name have the word FACT inside test factorization algorithm.
+		    The test whose name begin by MATLAB_FAUST_CONFIG test the Matlab class Faust with 			    various configuration. 		
+
+
+##################################################################
+- IV How to run the different test ?
+
+Make sure you are in the build directory
+
+1 - run all the test :
+    type the following command
+    $ ctest	  
+	
+2 - run all the test whose name begin by MATLAB_FAUST_CONFIG :
+    $ ctest -R MATLAB_FAUST_CONFIG			 	 
+	 		
+
+    --> the ouput should look like
+	Test project /home/nbellot/WORK/faust/trunk/devcpp/build
+	    Start  9: MATLAB_FAUST_CONFIG_REAL1
+	1/6 Test  #9: MATLAB_FAUST_CONFIG_REAL1 ........   Passed    2.54 sec
+	    Start 10: MATLAB_FAUST_CONFIG_REAL2
+	2/6 Test #10: MATLAB_FAUST_CONFIG_REAL2 ........   Passed    2.64 sec
+	    Start 11: MATLAB_FAUST_CONFIG_REAL3
+	3/6 Test #11: MATLAB_FAUST_CONFIG_REAL3 ........   Passed    2.96 sec
+	    Start 12: MATLAB_FAUST_CONFIG_REAL4
+	4/6 Test #12: MATLAB_FAUST_CONFIG_REAL4 ........   Passed    2.97 sec
+	    Start 13: MATLAB_FAUST_CONFIG_CPLX1
+	5/6 Test #13: MATLAB_FAUST_CONFIG_CPLX1 ........   Passed    2.69 sec
+	    Start 14: MATLAB_FAUST_CONFIG_CPLX2
+	6/6 Test #14: MATLAB_FAUST_CONFIG_CPLX2 ........   Passed    2.65 sec
+
+	100% tests passed, 0 tests failed out of 6
+
+
+3 -  run all the test by id :
+     to run the all the test between test number 1stid and test number lastid
+     type the following command	 	
+     $ ctest -I [1stid,lastid] 	
+     
+     For example, in our case,
+     the following command
+     $ ctest -I [9,14] 
+     will do the same		
+     $ ctest -R MATLAB_FAUST_CONFIG	
+
+
+
