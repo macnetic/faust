@@ -1,5 +1,15 @@
 /****************************************************************************/
-/*                              Description:                                */    
+/*                              Description:                                */
+/*    file where the C++ class Faust::Transform is interface with Matlab    */
+/*	  WARNING : this file is configured into two files :                */
+/*	- mexFaustReal.cpp interfaces the class Faust::Transform<double>    */
+/*		   (i.e real scalar Faust)                                  */  
+/*	- mexFaustCplx.cpp interfaces the class Faust::Transform<std::complex<double<> 
+/*		(i.e complex scalar Faust)                                  */
+/*	--> these 2 mexfunctions are directly used 	                    */
+/*                                                                          */ 
+/*	by FaustCore class (tools/FaustCore.m) and Faust.m                  */
+/*                                                                          */	
 /*  For more information on the FAuST Project, please visit the website     */
 /*  of the project : <http://faust.gforge.inria.fr>                         */
 /*                                                                          */
@@ -101,8 +111,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		std::vector<Faust::MatGeneric<SCALAR,Cpu>*> list_factor;
 		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
 		
-		// A MODIFIER CREER UNE FUITE //
-		//double* ptr_bidon = new double[100];
+
 
 		if (nb_element != 0)
 		{
