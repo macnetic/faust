@@ -182,7 +182,8 @@ II - Wrappers            :
 
 	 **** TODO **** :
 	 --> Make the FaustPy.faust class compatible with complex scalar.
-	--> Develop the inferface with the factoziration algorithm. 
+	 --> Develop the inferface with the factoziration algorithm.
+	 --> Implements some Python demos similar to the Matlab Demo (Brain Source localization ...)		 
 
 --> II-3) Commandline wrapper, it delivered the commandline interface to factorized a matrix 
 	  from xml configuration file and text file for storing the matrix.
