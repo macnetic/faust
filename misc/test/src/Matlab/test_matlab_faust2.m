@@ -150,7 +150,7 @@ disp('Ok');
 
 disp('test 5 : complex transpose is not yet implemented for complex scalar Faust');
 test_pass = 0;
-expected_err_message='ctranspose is not yet implemented for complex scalar Faust';
+expected_err_message='TODO : ctranspose is not yet implemented for complex scalar Faust';
 F=Faust({ones(5,4),ones(4,7)+1i*ones(4,7)});
 
 try
@@ -172,7 +172,7 @@ disp('Ok');
 
 disp('test 6 : conjugate is not yet implemented for Faust');
 test_pass = 0;
-expected_err_message='conjugate is not yet implemented for Faust';
+expected_err_message='TODO : conjugate is not yet implemented for Faust';
 F=Faust({ones(5,4),ones(4,7)+1i*ones(4,7)});
 
 try
