@@ -1,0 +1,39 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
+
+
+
+SET (CTEST_SOURCE_DIRECTORY "./")
+SET (CTEST_BINARY_DIRECTORY "build")
+
+set (CTEST_CMAKE_GENERATOR "Unix Makefiles") # using cmake for building so no need to set CTEST_CONFIGURE_COMMAND
+
+set(CTEST_BUILD_NAME "${CMAKE_SYSTEM}_${CMAKE_HOST_SYSTEM_PROCESSOR}")
+
+SET (CTEST_START_WITH_EMPTY_BINARY_DIRECTORY TRUE)
+
+CTEST_START("Experimental") # TODO: Continuous mode ?
+message(STATUS "The site name is: " ${CTEST_SITE})
+#CTEST_START("Nightly")
+#CTEST_START("Continuous")
+#CTEST_UPDATE() # no need to checkout because gitlab-runner does it
+
+CTEST_CONFIGURE()
+# no OPTIONS (arg)
+
+#CTEST_BUILD(TARGET install) #no need to install, just compiling
+CTEST_BUILD()
+
+#IF(UNIX)
+#	SET(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CTEST_INSTALL_DIR}/lib")
+#ENDIF(UNIX)
+# no shared libraries to look at
+
+
+CTEST_TEST()
+if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
+  ctest_coverage()
+endif (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
+if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
+  ctest_memcheck()
+endif (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
+CTEST_SUBMIT()

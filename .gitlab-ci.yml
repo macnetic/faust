@@ -1,0 +1,7 @@
+
+ctest_linux:
+    script:
+        - ctest -O build/ctest_linux.log -S ./CDashConfScriptLinux.cmake
+    tags:
+        - linux
+
