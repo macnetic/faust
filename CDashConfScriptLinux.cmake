@@ -11,6 +11,9 @@ set(CTEST_BUILD_NAME "${CMAKE_SYSTEM}_${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
 SET (CTEST_START_WITH_EMPTY_BINARY_DIRECTORY TRUE)
 
+set(CTEST_SITE "FaustLinux")
+
+
 CTEST_START("Experimental") # TODO: Continuous mode ?
 message(STATUS "The site name is: " ${CTEST_SITE})
 #CTEST_START("Nightly")
