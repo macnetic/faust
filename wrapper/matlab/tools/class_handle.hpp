@@ -12,11 +12,7 @@
 
 
 
-#ifndef __MACH__
-	// WARNING :
-	// with the recent version of gcc 
-	// this 2 definition can cause compile error of redefinition,
-	// in this case, comment the 2 following lines 
+#if !defined(__MACH__) && !defined(_STDINT_H) // from /usr/include/stdint.h and bits/stdint-uintn.h
 	typedef unsigned long int uint32_t;
 	typedef unsigned long long int uint64_t;
 #endif
