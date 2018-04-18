@@ -87,12 +87,12 @@ for i in range(nb_dim):
 	dim_list[i]=pow(2,dim_2pow_list[i])
 	
 
-print "******* CONFIGURATION ***********"
-print "dimension matrix : "+str(dim_list)
-print "nb factor : "+str(nb_factor)
-print "RCG : "+str(RCG)
-print "nbr multiplication : "+str(nb_mult)
-print "*********************************\n"
+print("******* CONFIGURATION ***********")
+print("dimension matrix : "+str(dim_list))
+print("nb factor : "+str(nb_factor))
+print("RCG : "+str(RCG))
+print("nbr multiplication : "+str(nb_mult))
+print("*********************************\n")
 
 
 
@@ -101,10 +101,10 @@ t_list=np.zeros((nb_mult,nb_dim,5))#dense,scipy,faust,dense transposee,faust tra
 
 
 
-print "** FAUST VECTOR MULTIPLICATON ***"
+print("** FAUST VECTOR MULTIPLICATON ***")
 for j in range(nb_dim):
 	dim=dim_list[j]
-	print "dim : "+str(dim)
+	print("dim : "+str(dim))
 	list_factor_sp=[0]*nb_factor
 	list_factor_dense=[0]*nb_factor
 	int_max=100
@@ -120,16 +120,16 @@ for j in range(nb_dim):
 			list_factor_sp[i]=np.floor(list_factor_sp[i])
 		
 		list_factor_dense[i]=list_factor_sp[i].todense()
-		#print list_factor_dense[i]
+		#print(list_factor_dense[i])
 		
 		
-		#print "factor"+str(i)+":"
-		#print list_factor_sp[i]
+		#print("factor"+str(i)+":")
+		#print(list_factor_sp[i])
 
-	#print "list_factor_dense"
+	#print("list_factor_dense")
 	#for fact in list_factor_dense:
-	#	print "factor "
-	#	print fact
+	#	print("factor ")
+	#	print(fact)
 
 
 	F=FaustPy.Faust(list_factor_dense)
@@ -144,7 +144,7 @@ for j in range(nb_dim):
 
 
 	for i in range(nb_mult):
-		#print str(i)+"/"+str(nb_mult)
+		#print(str(i)+"/"+str(nb_mult))
 		x=np.random.randint(int_max, size=(dim,1))
 		
 		t=time.time()
@@ -174,28 +174,28 @@ for j in range(nb_dim):
 
 
 
-		#print F_dense
-		#print "t_Faust "+str(t_Faust)
-		#print "t_scipy "+str(t_scipy)
-		#print "t_dense "+str(t_dense)
+		#print(F_dense)
+		#print("t_Faust "+str(t_Faust))
+		#print("t_scipy "+str(t_scipy))
+		#print("t_dense "+str(t_dense))
 		if result_comparison:
 			if not (y_Faust==y_scipy).all():
 				raise ValueError('multiplication : invalid ouput vector Y')
 			
 			if not (y_Faust==y_dense).all():
-				print "Error"
-				print y_Faust
-				print y_dense
+				print("Error")
+				print(y_Faust)
+				print(y_dense)
 				raise ValueError('multiplication : dense_multiplication different from Faust one')
 				
 			if not (y_Faust_trans==y_dense_trans).all():
-				print "Error"
-				print y_Faust
-				print y_dense
+				print("Error")
+				print(y_Faust)
+				print(y_dense)
 				raise ValueError('multiplication :transpose  dense_multiplication different from Faust one')
 			
 
-#print t_list
+#print(t_list)
 t_list_mean=np.mean(t_list,0)
 t_dense=t_list_mean[:,0]
 t_scipy=t_list_mean[:,1]
@@ -204,24 +204,24 @@ t_dense_trans=t_list_mean[:,3]
 t_faust_trans=t_list_mean[:,4]
 
 
-print "************ RESULT *************"
-print "dim "+str(dim_list)
-print "t_Faust "+str(t_faust)
-print "t_scipy "+str(t_scipy)
-print "t_dense "+str(t_dense)
-print "t_dense_trans "+str(t_dense_trans)
-print "t_faust_trans "+str(t_faust_trans)
+print("************ RESULT *************")
+print("dim "+str(dim_list))
+print("t_Faust "+str(t_faust))
+print("t_scipy "+str(t_scipy))
+print("t_dense "+str(t_dense))
+print("t_dense_trans "+str(t_dense_trans))
+print("t_faust_trans "+str(t_faust_trans))
 
 speed_up_Faust=t_dense/t_faust
 speed_up_Scipy=t_dense/t_scipy
 speed_up_Faust_trans=t_dense_trans/t_faust_trans
-print "speed-up Faust : "+str(speed_up_Faust)
-print "speed-up scipy : "+str(speed_up_Scipy)
-print "speed-up Faust (transpose) : "+str(speed_up_Faust_trans)
+print("speed-up Faust : "+str(speed_up_Faust))
+print("speed-up scipy : "+str(speed_up_Scipy))
+print("speed-up Faust (transpose) : "+str(speed_up_Faust_trans))
 
 
-#print "size dim :"+str(dim_list.shape)
-print "t_dense :"+str(t_dense.shape)
+#print("size dim :"+str(dim_list.shape))
+print("t_dense :"+str(t_dense.shape))
 
 
 
@@ -229,7 +229,7 @@ print "t_dense :"+str(t_dense.shape)
 
 
 if(plotlib_present):
-	print "saving figure in "+FigPath
+	print("saving figure in "+FigPath)
 	tickness=4
 	size_font=18
 	font_style='bold'
@@ -256,6 +256,6 @@ if(plotlib_present):
 	plt.savefig(FigPath+'/speed-up.png')
 
 
-print "*********************************"
+print("*********************************")
 
 

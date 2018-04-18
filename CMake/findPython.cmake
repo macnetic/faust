@@ -1,6 +1,6 @@
 ##############################################################################
 ##                              Description:                                ##
-##  cmake script to find Python executable.            			    ##
+##  cmake script to find Python executable.            			            ##
 ##                                                                          ##
 ##  For more information on the FAuST Project, please visit the website     ##
 ##  of the project : <http://faust.gforge.inria.fr>                         ##
@@ -46,12 +46,12 @@
 message(STATUS "------------------------------------------------")
 message(STATUS "------------ Looking for Python PATH -----------")
 message(STATUS "------------------------------------------------")
-	
+
 
 if(UNIX)
 
 
-	message(STATUS "INFO- If you want to choose an other version of Python,") 
+	message(STATUS "INFO- If you want to choose an other version of Python,")
 	message(STATUS "INFO- please add an environment variable PYTHON_PATH. ")
 	message(STATUS "INFO- Example : PYTHON_PATH=/usr/bin/python")
 	if ($ENV{PYTHON_PATH}} MATCHES python)
@@ -61,23 +61,28 @@ if(UNIX)
 		set(PYTHON_EXE ${PYTHON_PATH})
 		message(STATUS "PYTHON_EXE=${PYTHON_EXE} defined from local input variable")
 	else() # PYTHON_EXE_DIR
+        #set(Python_ADDITIONAL_VERSIONS 3)
+        find_package(PythonInterp 3)# REQUIRED)
+        find_package(PythonLibs 3)# REQUIRED)
 
-		#message(STATUS "PYTHON_DIR_TMP 1 = ${PYTHON_DIR_TMP}")
-		exec_program("which python | xargs echo" OUTPUT_VARIABLE PYTHON_EXE)
-		#message(STATUS "PYTHON_DIR_TMP 2 = ${PYTHON_DIR_TMP}")
-		
-		if (${PYTHON_EXE} MATCHES "which: no python in")			
-			message(FATAL_ERROR "python is not present in your PATH ; Please insert in the PATH environment.")
-		endif()
-
-	   	
-		
-	endif() 
+        if(NOT PYTHONINTERP_FOUND)
+            find_package(PythonInterp 2)
+            find_package(PythonInterp 2)
+            if(NOT PYTHONINTERP_FOUND)
+                message(FATAL_ERROR "python is not installed or at least not present in your PATH ; Please insert in the PATH environment.")
+            endif()
+        endif(PYTHONINTERP_FOUND)
+        set(PYTHON_EXE ${PYTHON_EXECUTABLE})
+	endif()
 else(UNIX)
-	message(FATAL_ERROR "Python wrapper Unsupported OS (only compatible with Unix System (Linux or Mac Os X)")		
+	message(FATAL_ERROR "Python wrapper Unsupported OS (only compatible with Unix System (Linux or Mac Os X)")
 endif()
 
-message(STATUS "PYTHON_EXE has been found : ${PYTHON_EXE}")	
+string(REGEX REPLACE "[a-zA-Z0-9_/:.]+/p(ython.?)" "c\\1" CYTHON_BIN_NAME "${PYTHON_EXE}")
+
+message(STATUS "------------------------------------------------")
+message(STATUS "PYTHON_EXE has been found : ${PYTHON_EXE}")
+message(STATUS "Probed cython program name: ${CYTHON_BIN_NAME}")
 message(STATUS "------------------------------------------------")
 
 
@@ -95,7 +100,7 @@ elseif(${PYTHON_MODULE_MISSING} EQUAL 1)
 	message(STATUS "optional python module scipy is missing, no time comparison with scipy will be made")
 	set(PYTHON_MODULE_SCIPY OFF)
 else(${PYTHON_MODULE_MISSING})
-	message(STATUS "all the python module are installed (numpy,cython and scipy)")	
+	message(STATUS "all the python modules are installed (numpy,cython and scipy)")
 endif()
 
 message(STATUS "------------------------------------------------")
@@ -104,41 +109,32 @@ message(STATUS " ")
 message(STATUS "------------------------------------------------")
 message(STATUS "------------ Looking for Cython PATH -----------")
 message(STATUS "------------------------------------------------")
-	
+
 
 if(UNIX)
-
-
-	message(STATUS "INFO- If you want to choose an other version of Python,") 
+    message(STATUS "INFO- If you want to choose an other version of Cython,")
 	message(STATUS "INFO- please add an environment variable CYTHON_PATH. ")
 	message(STATUS "INFO- Example : CYTHON_PATH=/usr/bin/cython")
-	if ($ENV{CYTHON_PATH}} MATCHES cython)
-		set(CYTHON_TMP $ENV{PYTHON_PATH})
-		message(STATUS "PYTHON_EXE=$ENV{PYTHON_PATH} defined from environment variable")
-	elseif (${CYTHON_PATH} MATCHES cython)
-		set(CYTHON_TMP ${PYTHON_PATH})
-		message(STATUS "PYTHON_EXE=${PYTHON_EXE} defined from local input variable")
+    if ($ENV{CYTHON_PATH}} MATCHES ${CYTHON_BIN_NAME})
+        set(CYTHON_TMP $ENV{CYTHON_PATH})
+        message(STATUS "CYTHON_PATH=$ENV{CYTHON_PATH} defined from environment variable")
+    elseif (${CYTHON_PATH} MATCHES ${CYTHON_BIN_NAME})
+        set(CYTHON_TMP ${CYTHON_PATH})
+        message(STATUS "CYTHON_PATH=${CYTHON_PATH} defined from local input variable")
 	else() # PYTHON_EXE_DIR
-
-		#message(STATUS "PYTHON_DIR_TMP 1 = ${PYTHON_DIR_TMP}")
-		exec_program("which cython | xargs echo" OUTPUT_VARIABLE CYTHON_TMP)
-		#message(STATUS "PYTHON_DIR_TMP 2 = ${PYTHON_DIR_TMP}")
-		
-		if (${CYTHON_TMP} MATCHES "which: no cython in")			
-			message(FATAL_ERROR "cython is not present in your PATH ; Please insert in the PATH environment.")
-		endif()
-
-	   	
-		
+        find_program(CYTHON_TMP ${CYTHON_BIN_NAME})
+        if(${CYTHON_TMP} MATCHES ".*-NOTFOUND")
+            message(FATAL_ERROR "Cython is not present in your PATH ; Please insert in the PATH environment.")
+        else()
+            message(STATUS "Cython path: ${CYTHON_TMP}")
+        endif()
 	endif()
-	
-	string(REGEX REPLACE "([a-zA-Z0-9_/:.]+)/cython" "\\1" CYTHON_BIN_DIR "${CYTHON_TMP}")
-	 
+    string(REGEX REPLACE "([a-zA-Z0-9_/:.]+)/${CYTHON_BIN_NAME}.?" "\\1" CYTHON_BIN_DIR "${CYTHON_TMP}")
 else(UNIX)
-	message(FATAL_ERROR "Cython wrapper Unsupported OS (only compatible with Unix System (Linux or Mac Os X)")		
+	message(FATAL_ERROR "Cython wrapper Unsupported OS (only compatible with Unix System (Linux or Mac Os X)")
 endif()
 
-message(STATUS "CYTHON_BIN_DIR has been found : ${CYTHON_BIN_DIR}")	
+message(STATUS "CYTHON_BIN_DIR has been found : ${CYTHON_BIN_DIR}")
 message(STATUS "------------------------------------------------")
 
 

@@ -65,7 +65,7 @@ list_factor[1]=list_factor_sparse[1].todense();
 A = FaustPy.Faust(list_factor)
 
 # get the size of the Faust
-print "dimension of the Faust : ", A.shape
+print("dimension of the Faust : ", A.shape)
 
 # transpose a Faust
 A_trans = A.transpose()
@@ -103,5 +103,5 @@ for i in range(nb_mult):
 	t_elapsed = time.time()-t_begin 
 	t_faust += t_elapsed
 
-print "multiplication SPEED-UP using Faust"
-print "Faust is "+str(t_dense/t_faust)+" faster than a full matrix"
+print("multiplication SPEED-UP using Faust")
+print("Faust is "+str(t_dense/t_faust)+" faster than a full matrix")

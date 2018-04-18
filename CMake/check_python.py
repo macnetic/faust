@@ -40,19 +40,19 @@ import sys
 #getting the version of python
 output_value=0
 
-print "python version : "+str(sys.version_info.major)+'.'+str(sys.version_info.minor)
+print("python version : "+str(sys.version_info.major)+'.'+str(sys.version_info.minor))
 
 
 
 ###### NECESSARY MODULE ######
-print "*** PYTHON NECESSARY MODULES ***"
+print("*** PYTHON NECESSARY MODULES ***")
 try:
-    print('NUMPY PYTHON module :') 
+    print('NUMPY PYTHON module :')
     import numpy 
     print('module installed')
-    print "version : "+numpy.__version__
+    print("version : "+numpy.__version__)
     if (numpy.__version__ < '1.9.2'):
-        print "WARNING your numpy version may be too old, only tested with 1.9.2 version"
+        print("WARNING your numpy version may be too old, only tested with 1.9.2 version")
 except ImportError:
     print('module is missing !')
     output_value=-1
@@ -61,29 +61,29 @@ try:
     print('CYTHON PYTHON module : ')
     import Cython  
     print('module installed')
-    print "version : "+Cython.__version__
+    print("version : "+Cython.__version__)
 except ImportError:
     print('module is missing !')
     output_value=-1
 
 
 ###### OPTIONAL MODULE ######
-print "*** PYTHON OPTIONAL MODULES ***"
+print("*** PYTHON OPTIONAL MODULES ***")
 try:
-    print('SCIPY PYTHON module :') 
+    print('SCIPY PYTHON module :')
     import scipy as sp
     print('module installed')
-    print "version : "+sp.__version__  
+    print("version : "+sp.__version__)
 
 except ImportError:
     print('module Scipy not present, no time comparison with scipy will be made')
     output_value=1
     
 try:
-    print('MATPLOTLIB PYTHON module :') 
+    print('MATPLOTLIB PYTHON module :')
     import matplotlib as plt
     print('module installed')
-    print "version : "+plt.__version__  
+    print("version : "+plt.__version__)
 
 except ImportError:
     print('module matplotlib not present, no display will be made')
