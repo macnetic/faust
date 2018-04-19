@@ -1,5 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
-
+cmake_minimum_required(VERSION 3.0.2)
 
 
 SET (CTEST_SOURCE_DIRECTORY "./")
@@ -13,16 +12,29 @@ SET (CTEST_START_WITH_EMPTY_BINARY_DIRECTORY TRUE)
 
 set(CTEST_SITE "FaustLinux")
 
+if($ENV{BUILD_WRAPPER_PYTHON} MATCHES "ON")
+	set(CTEST_SITE "${CTEST_SITE}Python")
+	#set(BUILD_WRAPPER_PYTHON ON CACHE BOOL "" FORCE) #ignored by configure
+	set(CONF_OPTIONS "-DBUILD_WRAPPER_PYTHON=ON")
+elseif($ENV{BUILD_WRAPPER_MATLAB} MATCHES "ON")
+	set(CTEST_SITE "${CTEST_SITE}Matlab")
+	#set(BUILD_WRAPPER_MATLAB ON CACHE BOOL "" FORCE)
+	set(CONF_OPTIONS "-DBUILD_WRAPPER_MATLAB=ON")
+endif()
+
+message(STATUS "The git branch is:" $ENV{CI_COMMIT_REF_NAME})
+message(STATUS "The git commit is:" $ENV{CI_COMMIT_SHA})
+
 
 CTEST_START("Experimental") # TODO: Continuous mode ?
 message(STATUS "The site name is: " ${CTEST_SITE})
 #CTEST_START("Nightly")
 #CTEST_START("Continuous")
 #CTEST_UPDATE() # no need to checkout because gitlab-runner does it
+set(BUILD_WRAPPER_PYTHON ON CACHE BOOL "" FORCE)
 
-CTEST_CONFIGURE()
+CTEST_CONFIGURE(OPTIONS ${CONF_OPTIONS})
 # no OPTIONS (arg)
-
 #CTEST_BUILD(TARGET install) #no need to install, just compiling
 CTEST_BUILD()
 

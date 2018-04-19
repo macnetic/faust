@@ -1,7 +1,17 @@
-
-ctest_linux:
+.ctest_linux_template: &ctest_linux_script
     script:
         - ctest -O build/ctest_linux.log -S ./CDashConfScriptLinux.cmake
     tags:
         - linux
+
+ctest_linux:
+    <<: *ctest_linux_script 
+
+ctest_linux_python:
+    variables: {BUILD_WRAPPER_PYTHON: "ON"} 
+    <<: *ctest_linux_script 
+
+ctest_linux_matlab:
+    variables: {BUILD_WRAPPER_MATLAB: "ON"} 
+    <<: *ctest_linux_script 
 
