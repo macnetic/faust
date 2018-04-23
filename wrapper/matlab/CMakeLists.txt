@@ -143,7 +143,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		file(GLOB OBJ_MEXTOOLS_FILES "${FAUST_TMPMEX_DIR}/*.${MEXOBJ_EXT}")
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 					COMMAND   ${MATLAB_ROOT}/bin/mex 
-					ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${OBJ_MEXTOOLS_FILES} ${MEXOBJ_FILES}
+					ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${OBJ_MEXTOOLS_FILES} #${MEXOBJ_FILES} # commented out because provoking double object files on cmd line
 						${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS}
 					DEPENDS ${MEXOBJ_FILES} 
 					COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}"
