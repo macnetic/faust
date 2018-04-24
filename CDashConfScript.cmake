@@ -43,7 +43,7 @@ else()
 	#TODO: nightly mode ?
 endif()
 
-ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
+#ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY}) # no need to empty build dir because gitlab-runner starts with a new one
 
 CTEST_START("Experimental") # TODO: Continuous mode ?
 message(STATUS "The site name is: " ${CTEST_SITE})
