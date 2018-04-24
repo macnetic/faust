@@ -1,39 +1,58 @@
 cmake_minimum_required(VERSION 3.0.2)
 
 
-SET (CTEST_SOURCE_DIRECTORY "./")
+SET (CTEST_SOURCE_DIRECTORY "${CTEST_SCRIPT_DIRECTORY}")
 SET (CTEST_BINARY_DIRECTORY "build")
 
-set (CTEST_CMAKE_GENERATOR "Unix Makefiles") # using cmake for building so no need to set CTEST_CONFIGURE_COMMAND
 
 set(CTEST_BUILD_NAME "${CMAKE_SYSTEM}_${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
 SET (CTEST_START_WITH_EMPTY_BINARY_DIRECTORY TRUE)
 
-set(CTEST_SITE "FaustLinux")
+if(WIN32)
+	set (CTEST_CMAKE_GENERATOR "MinGW Makefiles") # using cmake for building so no need to set CTEST_CONFIGURE_COMMAND
+	set(CTEST_SITE "FaustWin")
+elseif(APPLE AND UNIX)
+	set (CTEST_CMAKE_GENERATOR "Unix Makefiles")
+	set(CTEST_SITE "FaustMacOS")
+elseif(UNIX)
+	set (CTEST_CMAKE_GENERATOR "Unix Makefiles")
+	set(CTEST_SITE "FaustLinux")
+else()
+	message(FATAL_ERROR "Unknown system.")
+endif()
 
 if($ENV{BUILD_WRAPPER_PYTHON} MATCHES "ON")
 	set(CTEST_SITE "${CTEST_SITE}Python")
 	#set(BUILD_WRAPPER_PYTHON ON CACHE BOOL "" FORCE) #ignored by configure
-	set(CONF_OPTIONS "-DBUILD_WRAPPER_PYTHON=ON")
+	set(CONF_OPTIONS "-DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF")
 elseif($ENV{BUILD_WRAPPER_MATLAB} MATCHES "ON")
 	set(CTEST_SITE "${CTEST_SITE}Matlab")
 	#set(BUILD_WRAPPER_MATLAB ON CACHE BOOL "" FORCE)
-	set(CONF_OPTIONS "-DBUILD_WRAPPER_MATLAB=ON")
+	set(CONF_OPTIONS "-DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=OFF")
 endif()
 
+# https://docs.gitlab.com/ee/ci/variables/
 message(STATUS "The git branch is:" $ENV{CI_COMMIT_REF_NAME})
 message(STATUS "The git commit is:" $ENV{CI_COMMIT_SHA})
 
+if($ENV{SLOW_TESTS} MATCHES "OFF")
+	set(CONF_OPTIONS "${CONF_OPTIONS} -DSLOW_TESTS=OFF")
+else()
+	set(CONF_OPTIONS "${CONF_OPTIONS} -DSLOW_TESTS=ON")
+	#TODO: nightly mode ?
+endif()
+
+ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 
 CTEST_START("Experimental") # TODO: Continuous mode ?
 message(STATUS "The site name is: " ${CTEST_SITE})
 #CTEST_START("Nightly")
 #CTEST_START("Continuous")
 #CTEST_UPDATE() # no need to checkout because gitlab-runner does it
-set(BUILD_WRAPPER_PYTHON ON CACHE BOOL "" FORCE)
 
-CTEST_CONFIGURE(OPTIONS ${CONF_OPTIONS})
+set(CTEST_CONFIGURE_COMMAND "${CMAKE_COMMAND} ${CONF_OPTIONS} ${CTEST_SOURCE_DIRECTORY}") # cmake is anyway the default configure command
+CTEST_CONFIGURE() #OPTIONS ${CONF_OPTIONS} doesn't work (even with a list()) so we set the ctest_configure_command above
 # no OPTIONS (arg)
 #CTEST_BUILD(TARGET install) #no need to install, just compiling
 CTEST_BUILD()

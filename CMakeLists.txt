@@ -219,6 +219,7 @@ set(BUILD_USE_SINGLEPRECISION OFF) # CACHE BOOL "Using single precision instead 
 #set(BUILD_USE_PROFILING OFF) # CACHE BOOL "Profiling the code")
 option(BUILD_USE_PROFILING "Profiling the code" OFF) # CACHE BOOL )
 
+option(SLOW_TESTS "Enabling tests which take much time." ON)
 
 #set(BUILD_MULTITHREAD OFF CACHE BOOL "OpenMP Multithreading")
 #set(BUILD_VERBOSE OFF CACHE BOOL "Display useful message for debugging")

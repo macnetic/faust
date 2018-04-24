@@ -1,17 +1,38 @@
-.ctest_linux_template: &ctest_linux_script
+.ctest_template: &ctest_script
     script:
-        - ctest -O build/ctest_linux.log -S ./CDashConfScriptLinux.cmake
+        - ctest -O build/ctest.log -S ./CDashConfScriptLinux.cmake
     tags:
         - linux
+        - windows
+        - macos
 
-ctest_linux:
-    <<: *ctest_linux_script 
+stages:
+        - test
+        - test_wrapper
 
-ctest_linux_python:
-    variables: {BUILD_WRAPPER_PYTHON: "ON"} 
-    <<: *ctest_linux_script 
+ctest:
+    <<: *ctest_script
+    variables: {SLOW_TESTS: "OFF"}
+    except:
+        - schedules
+    stage: test
 
-ctest_linux_matlab:
-    variables: {BUILD_WRAPPER_MATLAB: "ON"} 
-    <<: *ctest_linux_script 
+ctest_python:
+    <<: *ctest_script
+    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF"}
+    except:
+        - schedules
+    stage: test_wrapper
 
+ctest_matlab:
+    <<: *ctest_script
+    variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF"}
+    except:
+        - schedules
+    stage: test_wrapper
+
+ctest_nightly:
+    <<: *ctest_script
+    variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "ON"}
+    only:
+        - schedules
