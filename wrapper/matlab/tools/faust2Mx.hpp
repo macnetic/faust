@@ -90,7 +90,7 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 			mxFree(mat_ptr);
 			
 		}*/
-	const mwSize dims[2]={row,col};
+	const mwSize dims[3]={(mwSize)row,(mwSize)col};
 	if(typeid(FPP)==typeid(float))
 	{
 		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
@@ -121,7 +121,7 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<std::complex<FPP>,Cpu>& M)
         col = M.getNbCol();
 		
   
-	const mwSize dims[2]={row,col};
+	const mwSize dims[2]={(mwSize)row,(mwSize)col};
 	if(typeid(FPP)==typeid(float))
 	{
 		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxCOMPLEX);
@@ -153,7 +153,7 @@ mxArray*  FaustVec2mxArray(const Faust::Vect<std::complex<FPP>,Cpu>& v)
         col = 1;
 		
   
-	const mwSize dims[2]={row,col};
+	const mwSize dims[2]={(mwSize)row,(mwSize)col};
 	if(typeid(FPP)==typeid(float))
 	{
 		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxCOMPLEX);
@@ -210,7 +210,7 @@ mxArray*  FaustVec2mxArray(const Faust::Vect<FPP,Cpu>& M)
 		
 	
 
-	const mwSize dims[2]={row,col};
+	const mwSize dims[2]={(mwSize)row,(mwSize)col};
 	if(typeid(FPP)==typeid(float))
 	{
 		mxMat = mxCreateNumericArray(2, dims, mxSINGLE_CLASS, mxREAL);
