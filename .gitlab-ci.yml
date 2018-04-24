@@ -1,10 +1,6 @@
 .ctest_template: &ctest_script
     script:
         - ctest -O build/ctest.log -S ./CDashConfScript.cmake
-    tags:
-        - linux
-        - windows
-        - macos
 
 stages:
         - test
