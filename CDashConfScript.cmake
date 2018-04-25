@@ -26,7 +26,8 @@ if($ENV{BUILD_WRAPPER_PYTHON} MATCHES "ON")
 	set(CTEST_SITE "${CTEST_SITE}Python")
 	#set(BUILD_WRAPPER_PYTHON ON CACHE BOOL "" FORCE) #ignored by configure
 	set(CONF_OPTIONS "-DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF")
-elseif($ENV{BUILD_WRAPPER_MATLAB} MATCHES "ON")
+endif()
+if($ENV{BUILD_WRAPPER_MATLAB} MATCHES "ON")
 	set(CTEST_SITE "${CTEST_SITE}Matlab")
 	#set(BUILD_WRAPPER_MATLAB ON CACHE BOOL "" FORCE)
 	set(CONF_OPTIONS "-DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=OFF")
@@ -45,17 +46,17 @@ endif()
 
 #ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY}) # no need to empty build dir because gitlab-runner starts with a new one
 
-CTEST_START("Experimental") # TODO: Continuous mode ?
+CTEST_START("Experimental") # because we don't update the code (gitlab-runner does it for us)
 message(STATUS "The site name is: " ${CTEST_SITE})
 #CTEST_START("Nightly")
 #CTEST_START("Continuous")
-#CTEST_UPDATE() # no need to checkout because gitlab-runner does it
+#CTEST_UPDATE() # consistently with experimental mode
 
 set(CTEST_CONFIGURE_COMMAND "${CMAKE_COMMAND} ${CONF_OPTIONS} ${CTEST_SOURCE_DIRECTORY}") # cmake is anyway the default configure command
 CTEST_CONFIGURE() #OPTIONS ${CONF_OPTIONS} doesn't work (even with a list()) so we set the ctest_configure_command above
 # no OPTIONS (arg)
-#CTEST_BUILD(TARGET install) #no need to install, just compiling
-CTEST_BUILD()
+CTEST_BUILD(TARGET install) #need to install for python tests (quickstart.py)
+#CTEST_BUILD()
 
 #IF(UNIX)
 #	SET(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CTEST_INSTALL_DIR}/lib")
