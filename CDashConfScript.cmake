@@ -44,6 +44,10 @@ else()
 	#TODO: nightly mode ?
 endif()
 
+if(UNIX)
+	set(CONF_OPTIONS "${CONF_OPTIONS} -DCMAKE_INSTALL_PREFIX=$ENV{HOME}")
+endif()
+
 #ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY}) # no need to empty build dir because gitlab-runner starts with a new one
 
 CTEST_START("Experimental") # because we don't update the code (gitlab-runner does it for us)
@@ -53,6 +57,7 @@ message(STATUS "The site name is: " ${CTEST_SITE})
 #CTEST_UPDATE() # consistently with experimental mode
 
 set(CTEST_CONFIGURE_COMMAND "${CMAKE_COMMAND} ${CONF_OPTIONS} ${CTEST_SOURCE_DIRECTORY}") # cmake is anyway the default configure command
+message(STATUS "CONFIGURE COMMAND: ${CTEST_CONFIGURE_COMMAND}")
 CTEST_CONFIGURE() #OPTIONS ${CONF_OPTIONS} doesn't work (even with a list()) so we set the ctest_configure_command above
 # no OPTIONS (arg)
 CTEST_BUILD(TARGET install) #need to install for python tests (quickstart.py)
