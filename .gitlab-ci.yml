@@ -43,3 +43,12 @@ ctest_nightly_macos:
     tags:
        - macos
 
+ctest_nightly_win7:
+    <<: *ctest_script
+    variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "OFF", SLOW_TESTS: "ON"}
+    only:
+        - schedules
+    tags:
+       - win7
+
+
