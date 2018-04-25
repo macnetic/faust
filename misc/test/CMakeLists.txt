@@ -52,8 +52,10 @@ if(BUILD_WRAPPER_MATLAB)
 		add_test(NAME MATLAB_FACT_HADAMARD_MEX COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_HADAMARD_32'@'config_HADAMARD_32'@5941@30@'MEX')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_HADAMARD_MEX")
 		add_test(NAME MATLAB_FACT_HADAMARD_MATLAB COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_HADAMARD_32'@'config_HADAMARD_32'@5941@30@'MATLAB')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_HADAMARD_MATLAB")
 
-		add_test(NAME MATLAB_DEMO_INSTALL COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${CMAKE_INSTALL_MATLAB_PREFIX}')$setup_FAUST$run_all_demo$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_DEMO_INSTALL")
-		add_test(NAME MATLAB_DEMO_BUILD COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_MATLAB_BIN_DIR}')$setup_FAUST$run_all_demo$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_DEMO_BUILD")
+		if(${SLOW_TESTS})
+			add_test(NAME MATLAB_DEMO_INSTALL COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${CMAKE_INSTALL_MATLAB_PREFIX}')$setup_FAUST$run_all_demo$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_DEMO_INSTALL")
+			add_test(NAME MATLAB_DEMO_BUILD COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_MATLAB_BIN_DIR}')$setup_FAUST$run_all_demo$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_DEMO_BUILD")
+		endif()
 		add_test(NAME MATLAB_FAUST_CONFIG1 COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$test_matlab_faust(5@4@10@3)$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FAUST_1")
 		add_test(NAME MATLAB_FAUST_CONFIG2 COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$test_matlab_faust(2@15@1@1)$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FAUST_1")
 		# test the matlab Faust class methods with incorrect parameter
@@ -77,9 +79,10 @@ if(BUILD_WRAPPER_MATLAB)
 		add_test(NAME MATLAB_FACT_HADAMARD_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_HADAMARD_32','config_HADAMARD_32',5941,30,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		add_test(NAME MATLAB_FACT_HADAMARD_MATLAB COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_HADAMARD_32','config_HADAMARD_32',5941,30,'MATLAB');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 		
-		add_test(NAME MATLAB_DEMO_INSTALL COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${CMAKE_INSTALL_MATLAB_PREFIX}');setup_FAUST;run_all_demo;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-		add_test(NAME MATLAB_DEMO_BUILD COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${FAUST_MATLAB_BIN_DIR}');setup_FAUST;run_all_demo;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
-
+		if(${SLOW_TESTS})
+			add_test(NAME MATLAB_DEMO_INSTALL COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${CMAKE_INSTALL_MATLAB_PREFIX}');setup_FAUST;run_all_demo;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+			add_test(NAME MATLAB_DEMO_BUILD COMMAND matlab -nodesktop -r "try;testpass=0;addpath('${FAUST_MATLAB_BIN_DIR}');setup_FAUST;run_all_demo;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
+		endif(${SLOW_TESTS})
 		
 		#test Faust with 3 real factors : 
 		# 1st factor sparse size 10x3, 
@@ -132,7 +135,9 @@ if(BUILD_WRAPPER_MATLAB)
 	
 	#DEBUT MODIF NB VM MAC XCode
 	set_tests_properties(MATLAB_FACT_HIER_MEX MATLAB_FACT_HIER_MATLAB   PROPERTIES TIMEOUT 100)
-	set_tests_properties(MATLAB_DEMO_INSTALL MATLAB_DEMO_BUILD PROPERTIES TIMEOUT 6000)
+	if(${SLOW_TESTS})
+		set_tests_properties(MATLAB_DEMO_INSTALL MATLAB_DEMO_BUILD PROPERTIES TIMEOUT 6000)
+	endif()
 	if(NOT WIN32)
 		set_tests_properties(MATLAB_FAUST_CONFIG_REAL1 MATLAB_FAUST_CONFIG_REAL2 MATLAB_FAUST_CONFIG_REAL3 MATLAB_FAUST_CONFIG_REAL4 MATLAB_FAUST_CONFIG_CPLX1 MATLAB_FAUST_CONFIG_CPLX2 MATLAB_FAUST_2  PROPERTIES TIMEOUT 30)
 	endif()

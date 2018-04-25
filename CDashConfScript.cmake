@@ -1,13 +1,10 @@
 cmake_minimum_required(VERSION 3.0.2)
 
 
-SET (CTEST_SOURCE_DIRECTORY "${CTEST_SCRIPT_DIRECTORY}")
-SET (CTEST_BINARY_DIRECTORY "build")
-
+set (CTEST_SOURCE_DIRECTORY "${CTEST_SCRIPT_DIRECTORY}")
 
 set(CTEST_BUILD_NAME "${CMAKE_SYSTEM}_${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
-SET (CTEST_START_WITH_EMPTY_BINARY_DIRECTORY TRUE)
 
 if(WIN32)
 	set (CTEST_CMAKE_GENERATOR "MinGW Makefiles") # using cmake for building so no need to set CTEST_CONFIGURE_COMMAND
@@ -22,6 +19,8 @@ else()
 	message(FATAL_ERROR "Unknown system.")
 endif()
 
+
+
 if($ENV{BUILD_WRAPPER_PYTHON} MATCHES "ON")
 	set(CTEST_SITE "${CTEST_SITE}Python")
 	#set(BUILD_WRAPPER_PYTHON ON CACHE BOOL "" FORCE) #ignored by configure
@@ -32,6 +31,9 @@ if($ENV{BUILD_WRAPPER_MATLAB} MATCHES "ON")
 	#set(BUILD_WRAPPER_MATLAB ON CACHE BOOL "" FORCE)
 	set(CONF_OPTIONS "-DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=OFF")
 endif()
+
+set(CTEST_BINARY_DIRECTORY "build_${CTEST_SITE}")
+set (CTEST_START_WITH_EMPTY_BINARY_DIRECTORY TRUE)
 
 # https://docs.gitlab.com/ee/ci/variables/
 message(STATUS "The git branch is:" $ENV{CI_COMMIT_REF_NAME})
@@ -48,7 +50,8 @@ if(UNIX)
 	set(CONF_OPTIONS "${CONF_OPTIONS} -DCMAKE_INSTALL_PREFIX=$ENV{HOME}")
 endif()
 
-#ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY}) # no need to empty build dir because gitlab-runner starts with a new one
+#ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY}) # no need to empty build dir. because
+# we use CTEST_START_WITH_EMPTY_BINARY_DIRECTORY above and gitlab-runner starts with a new one
 
 CTEST_START("Experimental") # because we don't update the code (gitlab-runner does it for us)
 message(STATUS "The site name is: " ${CTEST_SITE})
@@ -64,7 +67,7 @@ CTEST_BUILD(TARGET install) #need to install for python tests (quickstart.py)
 #CTEST_BUILD()
 
 #IF(UNIX)
-#	SET(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CTEST_INSTALL_DIR}/lib")
+#	set(ENV{LD_LIBRARY_PATH} "$ENV{LD_LIBRARY_PATH}:${CTEST_INSTALL_DIR}/lib")
 #ENDIF(UNIX)
 # no shared libraries to look at
 
