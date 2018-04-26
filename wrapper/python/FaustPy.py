@@ -129,8 +129,8 @@ class Faust:
 		
 		keyCol=list_index[1]
 		keyRow=list_index[0]
-		identity=np.eye(F.getNbCol(),F.getNbCol());
-		identity=identity[...,keyCol]
+		identity=np.eye(F.getNbCol(),F.getNbCol())
+		if(keyCol != Ellipsis): identity=identity[...,keyCol]
 		submatrix=F*identity
 		submatrix=submatrix[keyRow,:]
 		return submatrix
