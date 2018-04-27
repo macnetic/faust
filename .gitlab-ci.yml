@@ -15,7 +15,7 @@ ctest:
 
 ctest_python:
     <<: *ctest_script
-    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF"}
+    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", GIT_STRATEGY: none}
     except:
         - schedules
     stage: test_wrapper
@@ -29,7 +29,7 @@ ctest_matlab:
 
 .ctest_nightly: &ctest_nightly_script
     <<: *ctest_script
-    variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "ON"}
+    variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "ON", DONT_PYPLOT_FAUST_TIME: "ON"}
     only:
         - schedules
 

@@ -36,6 +36,7 @@
 # test multiplication time
 
 import sys
+import os
 if len(sys.argv) != 3 :
 	raise ValueError('test_pyFaust.py : invalid number of input arguments')
 
@@ -227,7 +228,7 @@ print("t_dense :"+str(t_dense.shape))
 
 
 
-if(plotlib_present):
+if(plotlib_present and not "DONT_PYPLOT_FAUST_TIME" in os.environ):
 	print("saving figure in "+FigPath)
 	tickness=4
 	size_font=18
@@ -257,4 +258,4 @@ if(plotlib_present):
 
 print("*********************************")
 
-
+#
