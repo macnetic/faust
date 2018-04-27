@@ -140,7 +140,6 @@ for j in range(nb_dim):
 
 
 
-	
 
 
 	for i in range(nb_mult):
@@ -151,7 +150,6 @@ for j in range(nb_dim):
 		y_dense=F_dense.dot(x)
 		t_list[i,j,0]=time.time()-t
 		
-		
 		t=time.time()
 		y_scipy=faust_multiply(list_factor_sp,x)
 		t_list[i,j,1]=time.time()-t
@@ -160,17 +158,18 @@ for j in range(nb_dim):
 		t=time.time()
 		y_Faust=F*x
 		t_list[i,j,2]=time.time()-t
+		assert((y_dense == y_Faust).all())
 		
 		
 		t=time.time()
-		y_dense_trans=np.transpose(F_dense)*x
+		y_dense_trans=np.transpose(F_dense).dot(x)
 		t_list[i,j,3]=time.time()-t
-		
+
 		
 		t=time.time()
 		y_Faust_trans=F.transpose()*x
 		t_list[i,j,4]=time.time()-t
-
+		assert((y_dense_trans == y_Faust_trans).all())
 
 
 
@@ -187,7 +186,7 @@ for j in range(nb_dim):
 				print(y_Faust)
 				print(y_dense)
 				raise ValueError('multiplication : dense_multiplication different from Faust one')
-				
+			
 			if not (y_Faust_trans==y_dense_trans).all():
 				print("Error")
 				print(y_Faust)
