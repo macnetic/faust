@@ -5,6 +5,7 @@
 stages:
         - test
         - test_wrapper
+        - package_rev
 
 ctest:
     <<: *ctest_script
@@ -51,4 +52,13 @@ ctest_nightly_win7:
     tags:
        - win7
 
-
+package_macos:
+    stage: package_rev 
+    script:
+        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_SHA  ..'
+        - 'echo $MACOS_PASS | sudo make install'
+        - 'hdiutil create -volname Faust-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_SHA -ov -format UDRW faust-$CI_COMMIT_SHA'
+        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo mv faust-$CI_COMMIT_SHA.dmg $MACOS_PKG_STORE_PATH; fi
+    tags:
+        - macos
