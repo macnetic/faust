@@ -53,14 +53,15 @@ ctest_nightly_win7:
        - win7
 
 package_macos:
-    stage: package_rev 
+    stage: package_rev
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_SHA  ..'
+        - make
         - 'echo $MACOS_PASS | sudo -S make install'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-MatlabR2016a-Py2.7-$CI_COMMIT_SHA -srcfolder /opt/local/faust-$CI_COMMIT_SHA -ov -format UDRW faust-$CI_COMMIT_SHA'
         - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$CI_COMMIT_SHA.dmg $MACOS_PKG_STORE_PATH; fi
     tags:
         - macos
     except:
-        - schedules 
+        - schedules
