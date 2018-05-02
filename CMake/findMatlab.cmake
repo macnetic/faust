@@ -180,12 +180,13 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 	message(STATUS "MATLAB_ROOT has been found : ${MATLAB_ROOT}")
 
 	# verify that if gcc compiler is used then its version matches matlab version
-	message(STATUS "Checking gcc version matches matlab version...")
 	string(REGEX REPLACE "^.*/(R[0-9]+[a-z])$" "\\1" MATLAB_VERSION ${MATLAB_ROOT})
 	if(${CMAKE_CXX_COMPILER} MATCHES "/(c[+]+|gcc|g[+]+)(.exe)?$") # cmake doesn't handle exact char counting with {n}
 		#	message(STATUS ${CMAKE_CXX_COMPILER})
 		exec_program(${CMAKE_CXX_COMPILER} ARGS "--version" OUTPUT_VARIABLE GCC_VERSION)
+		string(REGEX REPLACE "\n" "" GCC_VERSION ${GCC_VERSION})
 		if(NOT ${GCC_VERSION} MATCHES "LLVM")
+			message(STATUS "Checking gcc version matches matlab version...")
 			#message(STATUS "GCC version is: " ${GCC_VERSION})
 			string(REGEX REPLACE ".*([0-9]\\.[0-9])\\.[0-9].*" "\\1" GCC_VER_MAJOR_MINOR ${GCC_VERSION})
 			if(${MATLAB_VERSION} MATCHES "R2017a" AND NOT ${GCC_VER_MAJOR_MINOR} VERSION_EQUAL "4.9")
