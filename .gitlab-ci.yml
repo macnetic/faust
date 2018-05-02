@@ -65,3 +65,13 @@ package_macos:
         - macos
     except:
         - schedules
+
+package_linux:
+   stage: package_rev
+   script:
+        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/faust -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_SHA ..'
+        - make
+        - cpack -G RPM -C CPackConfig.cmake
+        - cpack -G DEB -C CPackConfig.cmake
+        - 'mv Faust-$CI_COMMIT_SHA* $HOME'
