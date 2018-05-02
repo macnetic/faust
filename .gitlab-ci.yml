@@ -75,3 +75,7 @@ package_linux:
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
         - 'mv Faust-$CI_COMMIT_SHA* $HOME'
+   tags:
+        - linux
+   except:
+        - schedules
