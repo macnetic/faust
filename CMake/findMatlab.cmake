@@ -179,10 +179,31 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 	
 	message(STATUS "MATLAB_ROOT has been found : ${MATLAB_ROOT}")
 
+	# verify that if gcc compiler is used then its version matches matlab version
+	message(STATUS "Checking gcc version matches matlab version...")
+	string(REGEX REPLACE "^.*/(R[0-9]+[a-z])$" "\\1" MATLAB_VERSION ${MATLAB_ROOT})
+	if(${CMAKE_CXX_COMPILER} MATCHES "/(c[+]+|gcc|g[+]+)(.exe)?$") # cmake doesn't handle exact char counting with {n}
+		#	message(STATUS ${CMAKE_CXX_COMPILER})
+		exec_program(${CMAKE_CXX_COMPILER} ARGS "--version" OUTPUT_VARIABLE GCC_VERSION)
+		#message(STATUS "GCC version is: " ${GCC_VERSION})
+		string(REGEX REPLACE ".*([0-9]\\.[0-9])\\.[0-9].*" "\\1" GCC_VER_MAJOR_MINOR ${GCC_VERSION})
+		if(${MATLAB_VERSION} MATCHES "R2017a" AND NOT ${GCC_VER_MAJOR_MINOR} VERSION_EQUAL "4.9")
+			message(FATAL_ERROR "Error: for Matlab ${MATLAB_VERSION} you must use gcc 4.9 to compile mex code.")
+			#https://fr.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/SystemRequirements-Release2017a_SupportedCompilers.pdf
+		elseif(${MATLAB_VERSION} MATCHES "R201[46]a" AND NOT ${GCC_VER_MAJOR_MINOR} VERSION_EQUAL "4.7")
+			message(FATAL_ERROR "Error: for Matlab ${MATLAB_VERSION} you must use gcc 4.7 to compile mex code.")
+			# https://fr.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/SystemRequirements-Release2014a_SupportedCompilers.pdf
+			# https://fr.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/SystemRequirements-Release2016a_SupportedCompilers.pdf
+		elseif(NOT ${MATLAB_VERSION} MATCHES "R201[467]")
+			message(WARNING "Your version of Matlab is most likely not supported by faust matlab wrapper.")
+		endif()
+		message(STATUS "GCC_VER_MAJOR_MINOR: " ${GCC_VER_MAJOR_MINOR})
+	endif()
+
 	set(MATLAB_INCLUDE_DIR "${MATLAB_ROOT}/extern/include" CACHE INTERNAL "Matlab include directory")
 	set(MATLAB_ARCH_FILE "${FAUST_TMP_BUILD_DIR}/matlab_arch.txt")
 	# LINUX AND APPLE METHOD ARE VERY SIMILAR, CODE COULD BE FACTORIZED
-	if(UNIX) 
+	if(UNIX)
 		if(APPLE)
 			exec_program("ls ${MATLAB_ROOT}/extern/lib | grep -i mac" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
                 	if("${MEX_SUBDIR_LIB}" STREQUAL "maci64")
@@ -191,19 +212,19 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
                         	set(MEX_EXT  "mexmaci")
                 	else()
 						message(WARNING "No extension for mex function is available. (see ./CMAke/findMatlab.cmake)")
-					endif()		
+					endif()
 		# METHODE 1 (without using matlab)
-		else(APPLE)		
+		else(APPLE)
 			exec_program("ls ${MATLAB_ROOT}/extern/lib | grep -i glnx" OUTPUT_VARIABLE MEX_SUBDIR_LIB)
 			if("${MEX_SUBDIR_LIB}" STREQUAL "glnxa64")
 				set(MEX_EXT  "mexa64")
 			elseif("${MEX_SUBDIR_LIB}" STREQUAL "glnx86")
 				set(MEX_EXT  "mexa32")
            	else()
-				message(WARNING "No extension for mex function is available. (see ./CMAke/findMatlab.cmake)")						
+				message(WARNING "No extension for mex function is available. (see ./CMAke/findMatlab.cmake)")
 			endif()
-		endif(APPLE)	
-	
+		endif(APPLE)
+
 
 		# METHODE 2 (using matlab)
 		#exec_program("matlab -wait -nodesktop -nojvm -nodisplay -r \"fid=fopen('${MATLAB_ARCH_FILE}','w');fprintf(fid,'%s\\n%s\\n',computer('arch'),mexext);fclose(fid);exit\" > ${FAUST_TMP_BUILD_DIR}/matlab_output.log")
