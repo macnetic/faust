@@ -189,13 +189,13 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 			message(STATUS "Checking gcc version matches matlab version...")
 			#message(STATUS "GCC version is: " ${GCC_VERSION})
 			string(REGEX REPLACE ".*([0-9]\\.[0-9])\\.[0-9].*" "\\1" GCC_VER_MAJOR_MINOR ${GCC_VERSION})
-			if(${MATLAB_VERSION} MATCHES "R2017a" AND NOT ${GCC_VER_MAJOR_MINOR} VERSION_EQUAL "4.9")
+			if(${MATLAB_VERSION} MATCHES "R201[67]a" AND NOT ${GCC_VER_MAJOR_MINOR} VERSION_EQUAL "4.9")
 				message(FATAL_ERROR "Error: for Matlab ${MATLAB_VERSION} you must use gcc 4.9 to compile mex code.")
 				#https://fr.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/SystemRequirements-Release2017a_SupportedCompilers.pdf
-			elseif(${MATLAB_VERSION} MATCHES "R201[46]a" AND NOT ${GCC_VER_MAJOR_MINOR} VERSION_EQUAL "4.7")
+				# https://fr.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/SystemRequirements-Release2016a_SupportedCompilers.pdf
+			elseif(${MATLAB_VERSION} MATCHES "R2014a" AND NOT ${GCC_VER_MAJOR_MINOR} VERSION_EQUAL "4.7")
 				message(FATAL_ERROR "Error: for Matlab ${MATLAB_VERSION} you must use gcc 4.7 to compile mex code.")
 				# https://fr.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/SystemRequirements-Release2014a_SupportedCompilers.pdf
-				# https://fr.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/SystemRequirements-Release2016a_SupportedCompilers.pdf
 			elseif(NOT ${MATLAB_VERSION} MATCHES "R201[467]")
 				message(WARNING "Your version of Matlab is most likely not supported by faust matlab wrapper.")
 			endif()
