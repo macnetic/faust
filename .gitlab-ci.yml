@@ -59,7 +59,7 @@ package_macos:
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_SHA  ..'
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
-        - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-MatlabR2016a-Py2.7-$CI_COMMIT_SHA -srcfolder /opt/local/faust-$CI_COMMIT_SHA -ov -format UDRW faust-$CI_COMMIT_SHA'
+        - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_SHA-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_SHA -ov -format UDRW faust-$CI_COMMIT_SHA'
         - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$CI_COMMIT_SHA.dmg $MACOS_PKG_STORE_PATH; fi
     tags:
         - macos
@@ -70,7 +70,7 @@ package_linux:
    stage: package_rev
    script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/faust -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_SHA ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/faust-$CI_COMMIT_SHA -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_SHA ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
@@ -79,3 +79,31 @@ package_linux:
         - linux
    except:
         - schedules
+
+# jobs triggered by git tag don't verify that CMakeLists.txt conforms to the tag name/version but it must use the same version
+
+package_macos_release:
+    script:
+        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_TAG  ..'
+        - make
+        - 'echo $MACOS_PASS | sudo -S make install'
+        - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_TAG -ov -format UDRW faust-$CI_COMMIT_TAG'
+        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$CI_COMMIT_TAG.dmg $MACOS_PKG_STORE_PATH; fi
+    tags:
+        - macos
+    only:
+        - tags
+
+package_linux_release:
+   script:
+        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_TAG ..'
+        - make
+        - cpack -G RPM -C CPackConfig.cmake
+        - cpack -G DEB -C CPackConfig.cmake
+        - 'mv Faust-*rpm Faust-*.deb $HOME'
+   tags:
+        - linux
+   only:
+        - tags
