@@ -12,6 +12,7 @@ ctest:
     variables: {SLOW_TESTS: "OFF"}
     except:
         - schedules
+        - tags
     stage: test
 
 ctest_python:
@@ -19,6 +20,7 @@ ctest_python:
     variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", GIT_STRATEGY: none}
     except:
         - schedules
+        - tags
     stage: test_wrapper
 
 ctest_matlab:
@@ -26,6 +28,7 @@ ctest_matlab:
     variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF"}
     except:
         - schedules
+        - tags
     stage: test_wrapper
 
 .ctest_nightly: &ctest_nightly_script
@@ -65,6 +68,7 @@ package_macos:
         - macos
     except:
         - schedules
+        - tags
 
 package_linux:
    stage: package_rev
@@ -79,6 +83,7 @@ package_linux:
         - linux
    except:
         - schedules
+        - tags
 
 # jobs triggered by git tag don't verify that CMakeLists.txt conforms to the tag name/version but it must use the same version
 
