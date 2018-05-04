@@ -220,6 +220,7 @@ set(BUILD_USE_SINGLEPRECISION OFF) # CACHE BOOL "Using single precision instead 
 option(BUILD_USE_PROFILING "Profiling the code" OFF) # CACHE BOOL )
 
 option(SLOW_TESTS "Enabling tests which take much time." ON)
+option(EXCLUDE_FAUST_LIB_INSTALL "Excluding faust static core library from installation files." OFF)
 
 #set(BUILD_MULTITHREAD OFF CACHE BOOL "OpenMP Multithreading")
 #set(BUILD_VERBOSE OFF CACHE BOOL "Display useful message for debugging")
@@ -692,10 +693,16 @@ else()
 	target_link_libraries(${FAUST_TARGET} )	
 endif(BUILD_OPENBLAS)
 
-install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
+if(CMAKE_BUILD_TYPE MATCHES "Release")
+	install(CODE "file(GLOB TO_STRIP_FILES lib/*.a wrapper/python/*.so wrapper/matlab/mex/*.mexa64 wrapper/matlab/mex/*.mexa32 wrapper/matlab/mex/*.maci wrapper/matlab/mex/*.maci64)
+	message(STATUS \"TO_STRIP_FILES=\${TO_STRIP_FILES}\")
+	execute_process(COMMAND ${CMAKE_STRIP} \${TO_STRIP_FILES})
+	")
+endif(CMAKE_BUILD_TYPE MATCHES "Release")
 
-
-
+if(NOT EXCLUDE_FAUST_LIB_INSTALL)
+	install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
+endif()
 
 
 
@@ -783,7 +790,6 @@ SET(CPACK_INSTALL_CMAKE_PROJECTS "${PROJECT_BINARY_DIR};FAUST;ALL;/")
 
 #SET(CPACK_IGNORE_FILES "/CMake/;/build/;/CMakeFiles/;/_CPack_Packages/;/src/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
 SET(CPACK_STRIP_FILES "")
-
 #SET(CPACK_SOURCE_IGNORE_FILES "/build/;/CMakeFiles/;/_CPack_Packages/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
 
 IF(WIN32 AND NOT UNIX)
@@ -832,7 +838,6 @@ set(CPACK_RPM_PACKAGE_GROUP "inconnu")
 set(CPACK_RPM_PACKAGE_VENDOR ${CPACK_PACKAGE_VENDOR})
 set(CPACK_RPM_PACKAGE_URL ${CPACK_PACKAGE_URL} )
 set(CPACK_RPM_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION_SUMMARY})
-
 		IF(CMAKE_SIZEOF_VOID_P MATCHES "4")
 			if(NOT DEFINED CPACK_PACKAGE_FILE_NAME)
 				SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Linux")
