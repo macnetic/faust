@@ -123,5 +123,26 @@ void FaustCoreCpp<FPP>::setOp(const bool isTransposed,unsigned int& nbRowOp, uns
 
 
 
+template<typename FPP>
+unsigned long long FaustCoreCpp<FPP>::nnz() const
+{
+    return this->transform.get_total_nnz();
+}
 
+
+template<typename FPP>
+double FaustCoreCpp<FPP>::norm() const
+{
+    double precision = 0.001;
+    faust_unsigned_int nbr_iter_max = 100;
+    int flag; // not used yet
+    return this->transform.spectralNorm(nbr_iter_max, precision, flag);
+}
+
+template<typename FPP>
+double FaustCoreCpp<FPP>::get_nb_factors() const
+{
+    double nb_fact = this->transform.size();
+    return nb_fact;
+}
 

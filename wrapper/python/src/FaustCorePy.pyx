@@ -49,124 +49,136 @@ from libc.string cimport memcpy;
 from libcpp cimport bool
 
 cdef class FaustCore:
-	
-	#### ATTRIBUTE ########
-	# classe Cython
-	cdef FaustCoreCy.FaustCoreCpp[double] m_faust
 
-	
-	#### CONSTRUCTOR ####
-	#def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
-	def  __cinit__(self,list_factors):
-		#print 'inside cinit'
-		self.m_faust = FaustCoreCy.FaustCoreCpp[double]();
-		cdef double [:,:] data
-		cdef unsigned int nbrow
-		cdef unsigned int nbcol
-		#print 'longueur list'
-		#print len(list_factors)
-		#print 'avant boucle'
-		for factor in list_factors:
-			data=factor.astype(float,'F');
-			nbrow=factor.shape[0];
-			nbcol=factor.shape[1];
-		#	print nbrow
-		#	print nbcol
-			self.m_faust.push_back(&data[0,0],nbrow,nbcol);
-		#print(self.__dict__)
-		#print 'apres boucle'
-		
-	
-	
-	#### METHOD ####
-#~ 	def getNbRow(self):
-#~ 		#return self.m_faust.getNbRow();
-#~ 		(dim1,dim2)=self.shape();
-#~ 		return dim1
-		
+    #### ATTRIBUTE ########
+    # classe Cython
+    cdef FaustCoreCy.FaustCoreCpp[double] m_faust
+
+
+    #### CONSTRUCTOR ####
+    #def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
+    def  __cinit__(self,list_factors):
+        #print 'inside cinit'
+        self.m_faust = FaustCoreCy.FaustCoreCpp[double]();
+        cdef double [:,:] data
+        cdef unsigned int nbrow
+        cdef unsigned int nbcol
+        #print 'longueur list'
+        #print len(list_factors)
+        #print 'avant boucle'
+        for factor in list_factors:
+            data=factor.astype(float,'F');
+            nbrow=factor.shape[0];
+            nbcol=factor.shape[1];
+            #	print nbrow
+            #	print nbcol
+            self.m_faust.push_back(&data[0,0],nbrow,nbcol);
+            #print(self.__dict__)
+            #print 'apres boucle'
+
+
+
+    #### METHOD ####
+    #~ 	def getNbRow(self):
+        #~ 		#return self.m_faust.getNbRow();
+        #~ 		(dim1,dim2)=self.shape();
+        #~ 		return dim1
+
 #~ 	def getNbCol(self):
-#~ 		(dim1,dim2)=self.shape();
-#~ 		return dim2
-		
-		
-	def shape(self,transpose_flag=False):
-		cdef unsigned int nbrow = 0
-		cdef unsigned int nbcol = 0
-		self.m_faust.setOp(transpose_flag,nbrow,nbcol)
-		return (nbrow,nbcol)
-		
+    #~ 		(dim1,dim2)=self.shape();
+    #~ 		return dim2
+
+
+    def shape(self,transpose_flag=False):
+        cdef unsigned int nbrow = 0
+        cdef unsigned int nbcol = 0
+        self.m_faust.setOp(transpose_flag,nbrow,nbcol)
+        return (nbrow,nbcol)
 
 
 
 
 
 
-	#avoid using np.ndarray as input type
-	#because there is no distinction between row vector and column vector
-	#WARNING : a vector is always a Column Vector
-	#
-	# numpy.matrix is always 2-dimensional but C-style (RowMajor)  stored
-	# not Fortran-style (ColMajor) as Faust lib use Fortran-style storage
 
-	# Left-Multiplication by a Faust F
-	# y=multiply(F,x) is equivalent to y=F*x 
-	def multiply(self,x,transpose_flag):
-		if not isinstance(x, (np.ndarray) ):
-			raise NameError('input x must a numpy ndarray')
-		#transform into float F continous  matrix
-		x=x.astype(float,'F')
-		if not x.dtype=='float':
-			raise NameError('input x must be double array')
-		if not x.flags['F_CONTIGUOUS']:
-			raise NameError('input x must be Fortran contiguous (Colmajor)')
-		
-		ndim_x=x.ndim;
-		
-		if (ndim_x > 2) | (ndim_x < 1):
-			raise NameError('input x invalid number of dimensions')
-			
-		cdef unsigned int nbrow_x=x.shape[0]
-		cdef unsigned int nbcol_x #can't be assigned because we don't know yet if the input vector is 1D or 2D
-		
-		dimThis=self.shape(transpose_flag)
-		cdef unsigned int nbRowThis=dimThis[0];
-		cdef unsigned int nbColThis=dimThis[1];
-		
-		
-		cdef unsigned int nbrow_y=nbRowThis
-		cdef unsigned int nbcol_y
-		
-		cdef double[:] xview_1D
-		cdef double[:,:] xview_2D
-		
-		if ndim_x == 1:
-			nbcol_x=1
-			xview_1D=x;
-		else:
-			nbcol_x=x.shape[1]
-			xview_2D=x;
-			
-			if (nbrow_x != nbColThis):
-				raise NameError('y=F*x multiplication with Faust : invalid dimension of the input matrix x');
+    #avoid using np.ndarray as input type
+    #because there is no distinction between row vector and column vector
+    #WARNING : a vector is always a Column Vector
+    #
+    # numpy.matrix is always 2-dimensional but C-style (RowMajor)  stored
+    # not Fortran-style (ColMajor) as Faust lib use Fortran-style storage
 
-		#void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose);
-		nbcol_y = nbcol_x;
-		
-		cdef y = np.zeros([nbrow_y,nbcol_y], dtype='d',order='F')
-		cdef double[:,:] yview=y
-		if ndim_x == 1:
-			self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x,transpose_flag);
-		else:
-			self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x,transpose_flag);
-		
-		return y
-		
-	
-	
-	# print information about the faust (size, number of factor, type of factor (dense/sparse) ...)	
-	def display(self,transpose_flag):
-		print("Faust transposition " + str(transpose_flag))
-		self.m_faust.Display();
-		
-		
+    # Left-Multiplication by a Faust F
+    # y=multiply(F,x) is equivalent to y=F*x 
+    def multiply(self,x,transpose_flag):
+        if not isinstance(x, (np.ndarray) ):
+            raise NameError('input x must a numpy ndarray')
+        #transform into float F continous  matrix
+        x=x.astype(float,'F')
+        if not x.dtype=='float':
+            raise NameError('input x must be double array')
+        if not x.flags['F_CONTIGUOUS']:
+            raise NameError('input x must be Fortran contiguous (Colmajor)')
 
+        ndim_x=x.ndim;
+
+        if (ndim_x > 2) | (ndim_x < 1):
+            raise NameError('input x invalid number of dimensions')
+
+        cdef unsigned int nbrow_x=x.shape[0]
+        cdef unsigned int nbcol_x #can't be assigned because we don't know yet if the input vector is 1D or 2D
+
+        dimThis=self.shape(transpose_flag)
+        cdef unsigned int nbRowThis=dimThis[0];
+        cdef unsigned int nbColThis=dimThis[1];
+
+
+        cdef unsigned int nbrow_y=nbRowThis
+        cdef unsigned int nbcol_y
+
+        cdef double[:] xview_1D
+        cdef double[:,:] xview_2D
+
+        if ndim_x == 1:
+            nbcol_x=1
+            xview_1D=x;
+        else:
+            nbcol_x=x.shape[1]
+            xview_2D=x;
+
+            if (nbrow_x != nbColThis):
+                raise NameError('y=F*x multiplication with Faust : invalid dimension of the input matrix x');
+
+        #void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose);
+        nbcol_y = nbcol_x;
+
+        cdef y = np.zeros([nbrow_y,nbcol_y], dtype='d',order='F')
+        cdef double[:,:] yview=y
+        if ndim_x == 1:
+            self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x,transpose_flag);
+        else:
+            self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x,transpose_flag);
+
+        return y
+
+
+
+    # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)	
+    def display(self,transpose_flag):
+        print("Faust transposition " + str(transpose_flag))
+        self.m_faust.Display();
+
+    def nnz(self):
+        cdef unsigned long long nnz = 0
+        nnz = self.m_faust.nnz()
+        return nnz
+
+    def norm(self):
+        cdef double norm
+        norm = self.m_faust.norm()
+        return norm
+
+    def get_nb_factors(F):
+        cdef int nb_factors
+        nb_factors = int(F.m_faust.get_nb_factors())
+        return nb_factors
