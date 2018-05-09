@@ -1,7 +1,5 @@
-# 		FAuST Toolbox
-# Flexible Approximate Multi-Layer Sparse Transform
+# FAuST Toolbox -- Flexible Approximate Multi-Layer Sparse Transform
 
----
 
 General purpose
 ===============
