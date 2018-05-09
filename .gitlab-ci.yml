@@ -78,6 +78,7 @@ package_linux:
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
+        - lftp -u $FTP_SERV_USER,$FTP_SERV_PASS -e 'set ssl:verify-certificate no;mput Faust-*.rpm Faust-*.deb;quit' $FTP_SERV_HOST
         - 'mv Faust-$CI_COMMIT_SHA* $HOME'
    tags:
         - linux
