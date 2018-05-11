@@ -1,3 +1,6 @@
+[![pipeline status](https://gitlab.inria.fr/faustgrp/faust/badges/hakim_branch/pipeline.svg)](https://gitlab.inria.fr/faustgrp/faust/commits/hakim_branch)
+![FAµST Logo](./gen_doc/images/logo.png)
+
 # FAuST Toolbox -- Flexible Approximate Multi-Layer Sparse Transform
 
 
