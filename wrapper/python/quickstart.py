@@ -59,6 +59,8 @@ list_factor_sparse[1]=int_max*sp.random(dim1,dim2,density=density_per_fact,forma
 list_factor[1]=list_factor_sparse[1].todense();
 
 
+#print(list_factor[0])
+#print(list_factor[1])
 
 
 # create a Faust named F from its factors
@@ -110,3 +112,12 @@ print("Faust density: "+str(A.density()))
 print("Faust RCG: "+str(A.RCG()))
 print("Faust norm: "+str(A.norm()))
 print("Faust nb of factors: "+str(A.get_nb_factors()))
+for i in range(0,A.get_nb_factors()):
+    print("Faust size of factor ",i,"=",A.get_factor(i).shape)
+    #print(A.get_factor(i))
+A.save("A.mat")
+As = FaustPy.Faust("A.mat")
+assert((A.get_factor(0) == As.get_factor(0)).all())
+assert((A.get_factor(1) == As.get_factor(1)).all())
+
+

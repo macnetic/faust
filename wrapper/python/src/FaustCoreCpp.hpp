@@ -44,6 +44,7 @@
 
 #include "faust_Transform.h"
 #include <iostream>
+#include <exception>
 
 template<typename FPP>
 void FaustCoreCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbcol)
@@ -145,4 +146,57 @@ double FaustCoreCpp<FPP>::get_nb_factors() const
     double nb_fact = this->transform.size();
     return nb_fact;
 }
+
+template<typename FPP>
+unsigned int FaustCoreCpp<FPP>::get_fact_nb_rows(unsigned int& i) const
+{
+    Faust::MatGeneric<FPP,Cpu>* const factor_generic = this->transform.get_fact(i);
+    unsigned int nb_rows = factor_generic->getNbRow();
+    delete factor_generic;
+    return nb_rows;
+}
+
+template<typename FPP>
+unsigned int FaustCoreCpp<FPP>::get_fact_nb_cols(unsigned int& i) const
+{
+    Faust::MatGeneric<FPP,Cpu>* const factor_generic = this->transform.get_fact(i);
+    unsigned int nb_cols = factor_generic->getNbCol();
+    delete factor_generic;
+    return nb_cols;
+}
+
+template<typename FPP>
+void FaustCoreCpp<FPP>::get_fact(unsigned int& i, FPP* fact_ptr) const
+{
+    Faust::MatGeneric<FPP,Cpu>* const factor_generic = this->transform.get_fact(i);
+    Faust::MatDense<FPP,Cpu> dense_factor;
+
+    switch (factor_generic->getType())
+    {
+        case Dense :
+            {
+                Faust::MatDense<FPP,Cpu>* factor_dense_ptr = dynamic_cast<Faust::MatDense<FPP,Cpu>* > (factor_generic);
+                dense_factor = (*factor_dense_ptr);
+            }
+            break;
+
+        case Sparse :
+            {
+                Faust::MatSparse<FPP,Cpu>* factor_sparse_ptr = dynamic_cast<Faust::MatSparse<FPP,Cpu>* > (factor_generic);
+                dense_factor = (*factor_sparse_ptr);
+            }
+            break;
+
+        default:
+            throw std::runtime_error("get_fact : unknown type of the factor matrix.");
+    }
+
+
+    memcpy(fact_ptr, dense_factor.getData(),
+            sizeof(FPP)*factor_generic->getNbCol()*factor_generic->getNbRow());
+
+    delete factor_generic;
+
+}
+
 

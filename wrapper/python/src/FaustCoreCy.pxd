@@ -51,3 +51,6 @@ cdef extern from "FaustCoreCpp.h" :
         unsigned long long nnz() const;
         double norm() const;
         double get_nb_factors() const;
+        unsigned int get_fact_nb_rows(unsigned int& i) const;
+        unsigned int get_fact_nb_cols(unsigned int& i) const;
+        double get_fact(unsigned int& i, FPP* fact_ptr) const;

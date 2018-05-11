@@ -178,7 +178,15 @@ cdef class FaustCore:
         norm = self.m_faust.norm()
         return norm
 
-    def get_nb_factors(F):
+    def get_nb_factors(self):
         cdef int nb_factors
-        nb_factors = int(F.m_faust.get_nb_factors())
+        nb_factors = int(self.m_faust.get_nb_factors())
         return nb_factors
+
+    def get_fact(self,i):
+        cdef fact = np.zeros([self.m_faust.get_fact_nb_rows(i),
+                              self.m_faust.get_fact_nb_cols(i)], dtype='d',
+                             order='F')
+        cdef double[:,:] fact_view = fact
+        self.m_faust.get_fact(i, &fact_view[0, 0])
+        return fact

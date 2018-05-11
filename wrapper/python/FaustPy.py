@@ -43,12 +43,13 @@
 import copy
 
 import numpy as np
+from scipy.io import savemat, loadmat
 import FaustCorePy
 
 
 class Faust:
     """ This class represents a dense matrix by a product of 'sparse' factors (i.e Faust) 
-    The aim of the Faust representatio is to speed-up multiplication by this matrix
+    The aim of the Faust representation is to speed-up multiplication by this matrix
     """
 
     def  __init__(F,list_factors):
@@ -56,8 +57,12 @@ class Faust:
 
         Parameter
         ---------
-        list_factors : list/tuple of numpy matrices
+        list_factors : list/tuple of numpy matrices or filepath of the Faust in
+        matlab format.
         """
+        if(isinstance(list_factors, str)):
+            contents = loadmat(list_factors)
+            list_factors = contents['faust_factors'][0] 
         F.m_faust = FaustCorePy.FaustCore(list_factors);
         F.m_transpose_flag=0;
         F.shape=F.m_faust.shape(F.m_transpose_flag)
@@ -71,6 +76,10 @@ class Faust:
         """ return the number of column of the current Faust. """
         return F.shape[1]
 
+    def size(F):
+        """ Returns the Faust size tuple: getNbRow(), getNbCol().
+        """
+        return F.shape[0], F.shape[1]
 
     def transpose(F):
         """ transpose the current Faust. """
@@ -171,3 +180,23 @@ class Faust:
         Returns the Faust's number of factors.
         """
         return F.m_faust.get_nb_factors()
+
+    def get_factor(F, i):
+        """
+        Returns the Faust's i-th factor as a numpy.ndarray.
+        """
+        if(F.m_transpose_flag):
+            i = F.get_nb_factors()-1-i
+        return F.m_faust.get_fact(i)
+
+    def save(F, filename, format="Matlab"):
+        """
+            Saves the Faust into file.
+        """
+        if(format != "Matlab"):
+            raise Exception("Only Matlab format is supported.")
+        mdict = {'faust_factors':
+                 np.ndarray(shape=(1, F.get_nb_factors()), dtype=object)}
+        for i in range(0, F.get_nb_factors()):
+            mdict['faust_factors'][0, i] = F.get_factor(i)
+        savemat(filename, mdict)
