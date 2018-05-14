@@ -187,7 +187,10 @@ class Faust:
         """
         if(F.m_transpose_flag):
             i = F.get_nb_factors()-1-i
-        return F.m_faust.get_fact(i)
+        fact = F.m_faust.get_fact(i)
+        if(F.m_transpose_flag):
+            fact = np.transpose(fact)
+        return fact
 
     def save(F, filename, format="Matlab"):
         """

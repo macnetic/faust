@@ -114,10 +114,24 @@ print("Faust norm: "+str(A.norm()))
 print("Faust nb of factors: "+str(A.get_nb_factors()))
 for i in range(0,A.get_nb_factors()):
     print("Faust size of factor ",i,"=",A.get_factor(i).shape)
+    # test Faust gets back the same sparse factors given at init
+    assert((A.get_factor(i) == list_factor_sparse[i]).all())
     #print(A.get_factor(i))
+
+# test Faust saving
 A.save("A.mat")
 As = FaustPy.Faust("A.mat")
 assert((A.get_factor(0) == As.get_factor(0)).all())
 assert((A.get_factor(1) == As.get_factor(1)).all())
+
+# test Faust transpose
+#print(A.get_factor(0))
+tA = A.transpose()
+tf1 = tA.get_factor(1)
+#print(tf1)
+f1 = np.transpose(tf1)
+assert(not (tf1 == A.get_factor(0)).all() or (tf1 == f1).all())
+assert((f1 == A.get_factor(0)).all())
+print("end quickstart.py")
 
 
