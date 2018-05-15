@@ -1,0 +1,4 @@
+#!/bin/bash
+
+@PYTHON_EXECUTABLE@ -m doxypypy.doxypypy -a -c $1
+

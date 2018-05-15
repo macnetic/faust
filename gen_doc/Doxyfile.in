@@ -461,8 +461,8 @@ INPUT			=	"@FAUST_DOC_SRC_DIR@/mainpage.md" \
 					"@FAUST_ALGORITHM_CONSTRAINT_SRC_DIR@" \
 					"@FAUST_ALGORITHM_FACTORIZATION_SRC_DIR@" \
 					"@FAUST_BIN_CMDLINE_SRC_DIR@" \
-					"@FAUST_BIN_TEST_SRC_DIR@" 
-
+					"@FAUST_BIN_TEST_SRC_DIR@" \
+					"@FAUST_PYTHON_SRC_DIR@"
 USE_MDFILE_AS_MAINPAGE = mainpage
 
 INPUT_ENCODING         = UTF-8
@@ -491,7 +491,8 @@ FILE_PATTERNS          = *.cpp \
                          *.hpp \
                          *.h \
 						 *.cu \
-						 *.hu 
+						 *.hu \
+			 FaustPy.py
 
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories 
@@ -563,7 +564,7 @@ INPUT_FILTER           =
 # info on how filters are used. If FILTER_PATTERNS is empty, INPUT_FILTER 
 # is applied to all files.
 
-FILTER_PATTERNS        = 
+FILTER_PATTERNS        = *.py=@FAUST_DOC_BIN_DIR@/py_filter
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using 
 # INPUT_FILTER) will be used to filter the input files when producing source 
@@ -1166,7 +1167,7 @@ INCLUDED_BY_GRAPH      = YES
 # So in most cases it will be better to enable call graphs for selected 
 # functions only using the \callgraph command.
 
-CALL_GRAPH             = YES
+CALL_GRAPH             = NO
 
 # If the GRAPHICAL_HIERARCHY and HAVE_DOT tags are set to YES then doxygen 
 # will graphical hierarchy of all classes instead of a textual one.
