@@ -127,19 +127,6 @@ Faust::MatGeneric<FPP,DEVICE>::~MatGeneric()
 
 }
 
-template<typename FPP,Device DEVICE>
-void Faust::MatGeneric<FPP,DEVICE>::multiply(Faust::Vect<FPP,DEVICE> & vec, char opThis) const
-{
-	handleError("Faust::MatGeneric::","multiply (Vect): this function should not be called");
-
-}
-
-template<typename FPP,Device DEVICE>
-void Faust::MatGeneric<FPP,DEVICE>::multiply(Faust::MatDense<FPP,DEVICE> & vec, char opThis) const
-{
-	handleError("Faust::MatGeneric::","multiply (MatDense): this function should not be called");
-
-}
 
 template<typename FPP,Device DEVICE>
 void Faust::MatGeneric<FPP,DEVICE>::Display() const

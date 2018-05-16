@@ -104,7 +104,7 @@ namespace Faust
 	//! \param opThis : character	
 	//! vec = (*this) * vec if opThis='N'
 	// vec = (*this)' * vec if opThis='T' 
-	virtual void multiply(Faust::Vect<FPP,DEVICE> & vec, char opThis='N') const;
+	virtual void multiply(Faust::Vect<FPP,DEVICE> & vec, char opThis='N') const=0;
 
 
 	//! \brief compute MatGeneric-MatDense multiplication
@@ -112,7 +112,7 @@ namespace Faust
 	//! \param opThis : character	
 	//! M = (*this) * M if opThis='N'
 	// M = (*this)' * M if opThis='T' 
-	virtual void multiply(Faust::MatDense<FPP,DEVICE> & M, char opThis) const;
+	virtual void multiply(Faust::MatDense<FPP,DEVICE> & M, char opThis) const=0;
 
 
 	
