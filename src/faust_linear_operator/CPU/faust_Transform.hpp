@@ -52,7 +52,7 @@
 #include <fstream>
 #include "faust_BlasHandle.h"
 #include "faust_SpBlasHandle.h"
-
+#include "matio.h"
 
 
 
@@ -245,6 +245,44 @@ void Faust::Transform<FPP,Cpu>::print_file(const char* filename) const
 			data[i].print_file(filename,std::fstream::app);
 		}
 	}
+}
+
+template<typename FPP>
+void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename) const
+{
+	// save the FAuST as a matlab cell array (respecting what is done in matlab wrapper)
+	matvar_t *faust_matvar;
+	size_t dims[2];
+	int i, ret;
+	mat_t *matfp;
+	matvar_t **faust_factor_matvars = new matvar_t*[size()];
+	for(i=0; i < size(); i++){
+		faust_factor_matvars[i] = data[i]->toMatIOVar();
+		if(faust_factor_matvars[i] == NULL)
+			handleError("Faust::Transform", "Failed to create i-th factor MatIO variable");
+	}
+	// write the faust cell array
+	dims[0] = 1;
+	dims[1] = 2;
+	faust_matvar = Mat_VarCreate("faust_factors", MAT_C_CELL, MAT_T_CELL, 2, dims,
+			faust_factor_matvars, MAT_F_DONT_COPY_DATA);
+	if(faust_matvar == NULL)
+		handleError("Faust:Transform::save_mat_file()", "Failed to create FAuST MatIO variable");
+	matfp = Mat_CreateVer(filename, NULL, MAT_FT_MAT5);
+	if(matfp == NULL)
+		handleError("Faust::Transform::save_mat_file()", "Failed creating file");
+	//	Mat_VarPrint(faust_factor_matvars[1], 1);
+	ret = Mat_VarWrite(matfp, faust_matvar, MAT_COMPRESSION_NONE); //TODO: enable compression ?
+	//	Mat_VarPrint(faust_matvar,1);
+	if(ret)
+		handleError("Faust::Transform::save_mat_file()", "Failed writing the FAuST to Matlab file.");
+	for(i=0; i < size(); i++)
+		Mat_VarFree(faust_factor_matvars[i]);
+	// if we didn't use MAT_F_DONT_COPY_DATA flag above we would get a double-free corruption error
+	// because it'd have freed also data variable (here the faust factor underlying matrices)
+	Mat_VarFree(faust_matvar);
+	Mat_Close(matfp);
+	delete[] faust_factor_matvars;
 }
 
 	template<typename FPP>

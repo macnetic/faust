@@ -44,6 +44,7 @@
 #include "faust_LinearOperator.h"
 #include "faust_Vect.h"
 #include "faust_MatDense.h"
+#include "matio.h"
 /**
  * \class MatGeneric faust_MatGeneric.h
  * \brief This MatGeneric class serves as a base class for the derived class Faust::MatDense and Faust::MatSparse .
@@ -136,12 +137,17 @@ namespace Faust
 
 	//! \brief Display the caracteristique of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
 	virtual void Display() const=0;
+	
+	//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio.
+	// \return The matio variable matvar_t if it succeeded or nullptr otherwise.
+	// \see Faust::Transform::save_mat_file()
+	virtual matvar_t* toMatIOVar() const=0;
+
 	//! \brief 
 	//! \warning : declare a virtual destructor is mandatory for an abstract class
 	//! in order to allow descendant class destructor to clean up in case of pointer to the abstract class 
 	virtual ~ MatGeneric()=0;
 	
-
 
 	
 	

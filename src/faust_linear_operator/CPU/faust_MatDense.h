@@ -59,6 +59,7 @@
 #include "faust_Transform.h"
 
 #include "faust_BlasHandle.h"
+#include "matio.h"
 
 /*! \class Faust::MatDense MatDenseDense.h
 * \brief Class template representing dense matrix <br>
@@ -372,6 +373,8 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! The first line of the file contains 2 integer : the number of row and the number of column
         //! All the other line contains one coefficient in ColMajor access of the MatDense
         void print_file(const char* filename)const;
+
+		matvar_t* toMatIOVar() const;
 
         void operator=(MatDense<FPP,Cpu> const& A);
 

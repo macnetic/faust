@@ -689,7 +689,15 @@ t_print_file.stop();
 #endif
 }
 
-
+template<typename FPP>
+matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar() const
+{
+	matvar_t *var = NULL; //TODO: should be nullptr in C++11
+	size_t dims[2] = {this->getNbRow(), this->getNbCol()};
+	//we don't copy the data again, we use it directly (row-major order organized)
+	var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat.data(), 0);
+	return var;
+}
 
 #ifdef __COMPILE_TIMERS__
 template<typename FPP>

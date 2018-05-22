@@ -51,7 +51,7 @@ PyFaust = Extension(
 			,numpy.get_include()],
 		     
     library_dirs=[@FAUST_PYTHON_LIB_DIR@],
-    libraries=['faust'@FAUST_PYTHON_LIB@]
+    libraries=['faust'@FAUST_PYTHON_LIB@,'matio'],
 )
 
 setup(

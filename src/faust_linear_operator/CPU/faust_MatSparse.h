@@ -52,7 +52,7 @@
 
 // modif AL AL
 #include "faust_Transform.h"
-
+#include "matio.h"
 
 //! \class Faust::MatSparse<FPP,Cpu> faust_MatSparse.h
 //! \brief Class template representing sparse matrix <br>
@@ -250,7 +250,7 @@ namespace Faust
 	//! M = (*this) * M if opThis='N'
 	// M = (*this)' * M if opThis='T' 
 	void multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const;
-
+	matvar_t* toMatIOVar() const;
         //! Destructor
         ~MatSparse(){/*std::cout<<"destructor MatSparse"<<std::endl;*//*this->mat.resize(0,0);*/}
 

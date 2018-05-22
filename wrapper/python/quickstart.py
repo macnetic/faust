@@ -132,6 +132,9 @@ tf1 = tA.get_factor(1)
 f1 = np.transpose(tf1)
 assert(not (tf1 == A.get_factor(0)).all() or (tf1 == f1).all())
 assert((f1 == A.get_factor(0)).all())
+A.save("A_copy.mat",format="Matlab_core")
+Asc = FaustPy.Faust("A_copy.mat")
+assert((A.get_factor(0) == Asc.get_factor(0)).all())
+assert((A.get_factor(1) == Asc.get_factor(1)).all())
+
 print("end quickstart.py")
-
-

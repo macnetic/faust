@@ -54,3 +54,4 @@ cdef extern from "FaustCoreCpp.h" :
         unsigned int get_fact_nb_rows(unsigned int& i) const;
         unsigned int get_fact_nb_cols(unsigned int& i) const;
         double get_fact(unsigned int& i, FPP* fact_ptr) const;
+        void save_mat_file(const char* filepath) const;

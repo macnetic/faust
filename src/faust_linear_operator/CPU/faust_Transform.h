@@ -131,6 +131,12 @@ namespace Faust
 				faust_unsigned_int getNbCol() const;
 				void print_file(const char* filename) const;
 				void init_from_file(const char* filename);
+				/**
+				 *	\brief Writes the FAuST into a Matlab file. The product is written as a cell array with the matrix factors as elements.
+				 *	\arg \c filename The filepath to the output file (preferably with a .mat suffix).
+				 *	\throw std::logic_error if any problem occurs.
+				 */ 
+				void save_mat_file(const char* filename) const;
 				long long int get_total_nnz()const{return totalNonZeros;}
 				void clear(){data.resize(0);totalNonZeros=0;}
 

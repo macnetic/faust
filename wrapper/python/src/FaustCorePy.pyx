@@ -47,6 +47,7 @@ import copy
 from libc.stdlib cimport malloc, free;
 from libc.string cimport memcpy;
 from libcpp cimport bool
+from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 
 cdef class FaustCore:
 
@@ -190,3 +191,13 @@ cdef class FaustCore:
         cdef double[:,:] fact_view = fact
         self.m_faust.get_fact(i, &fact_view[0, 0])
         return fact
+
+    def save_mat_file(self,filepath):
+        cdef char * cfilepath = <char*> PyMem_Malloc(sizeof(char) *
+                                                     (len(filepath)+1))
+        fparr = bytearray(filepath, "UTF-8");
+        for i in range(0,len(filepath)):
+            cfilepath[i] = fparr[i]
+        cfilepath[i+1] = 0
+        self.m_faust.save_mat_file(cfilepath)
+        PyMem_Free(cfilepath)
