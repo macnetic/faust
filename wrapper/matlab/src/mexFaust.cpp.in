@@ -1,15 +1,16 @@
 /****************************************************************************/
 /*                              Description:                                */
 /*    file where the C++ class Faust::Transform is interface with Matlab    */
-/*	  WARNING : this file is configured into two files :                */
-/*	- mexFaustReal.cpp interfaces the class Faust::Transform<double>    */
-/*		   (i.e real scalar Faust)                                  */  
-/*	- mexFaustCplx.cpp interfaces the class Faust::Transform<std::complex<double<> 
-/*		(i.e complex scalar Faust)                                  */
-/*	--> these 2 mexfunctions are directly used 	                    */
-/*                                                                          */ 
-/*	by FaustCore class (tools/FaustCore.m) and Faust.m                  */
-/*                                                                          */	
+/*   WARNING : this file is configured into two files :                     */
+/* - mexFaustReal.cpp interfaces the class Faust::Transform<double>         */
+/*     (i.e real scalar Faust)                                              */
+/* - mexFaustCplx.cpp interfaces the                                        */
+/* class Faust::Transform<std::complex<double<>                             */
+/*  (i.e complex scalar Faust)                                              */
+/* --> these 2 mexfunctions are directly used                               */
+/*                                                                          */
+/* by FaustCore class (tools/FaustCore.m) and Faust.m                       */
+/*                                                                          */
 /*  For more information on the FAuST Project, please visit the website     */
 /*  of the project : <http://faust.gforge.inria.fr>                         */
 /*                                                                          */
@@ -73,391 +74,391 @@ typedef @FAUST_SCALAR@ SCALAR;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-	#ifdef FAUST_VERBOSE
-		if (typeid(SCALAR) == typeid(float))
-		{
-			std::cout<<"SCALAR == float"<<std::endl;
-		}
+#ifdef FAUST_VERBOSE
+	if (typeid(SCALAR) == typeid(float))
+	{
+		std::cout<<"SCALAR == float"<<std::endl;
+	}
 
-		if (typeid(SCALAR) == typeid(double))
-		{
-			std::cout<<"SCALAR == double"<<std::endl;
-		}
-	#endif
+	if (typeid(SCALAR) == typeid(double))
+	{
+		std::cout<<"SCALAR == double"<<std::endl;
+	}
+#endif
 	try{
-	// Get the command string
-	char cmd[256];
-	if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
-		mexErrMsgTxt("First input should be a command string less than 256 characters long.");
-	// Check there is a second input, which should be the class instance handle
-	if (nrhs < 2)
-		mexErrMsgTxt("Second input should be a class instance handle.");
+		// Get the command string
+		char cmd[256];
+		if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
+			mexErrMsgTxt("First input should be a command string less than 256 characters long.");
+		// Check there is a second input, which should be the class instance handle
+		if (nrhs < 2)
+			mexErrMsgTxt("Second input should be a class instance handle.");
 
-	// New
-	if (!strcmp("new", cmd))
-	{
-		
-		if(nlhs!=1)
-			mexErrMsgTxt("1 output is expected.");
-        if((nrhs<2) || (nrhs>4))
-			mexErrMsgTxt("between 1 and 3 inputs are expected.");
-        
-
-		if(!mxIsCell(prhs[1]))
-			mexErrMsgTxt("1st arg input must be a cell-array");
-        
-		// v1105 : Faust::Transform<SCALAR,Cpu> is no longer made of Faust::MatSparse<SCALAR,Cpu> but of pointer of abstract class Faust::MatGeneric<SCALAR,Cpu>
-		//old version : std::vector<Faust::MatSparse<SCALAR,Cpu> > vec_spmat;
-		std::vector<Faust::MatGeneric<SCALAR,Cpu>*> list_factor;
-		mwSize nb_element = mxGetNumberOfElements(prhs[1]);
-		
-
-
-		if (nb_element != 0)
+		// New
+		if (!strcmp("new", cmd))
 		{
-			mxArray * mxMat;
-			for (int i=0; i < nb_element; i++)
+
+			if(nlhs!=1)
+				mexErrMsgTxt("1 output is expected.");
+			if((nrhs<2) || (nrhs>4))
+				mexErrMsgTxt("between 1 and 3 inputs are expected.");
+
+
+			if(!mxIsCell(prhs[1]))
+				mexErrMsgTxt("1st arg input must be a cell-array");
+
+			// v1105 : Faust::Transform<SCALAR,Cpu> is no longer made of Faust::MatSparse<SCALAR,Cpu> but of pointer of abstract class Faust::MatGeneric<SCALAR,Cpu>
+			//old version : std::vector<Faust::MatSparse<SCALAR,Cpu> > vec_spmat;
+			std::vector<Faust::MatGeneric<SCALAR,Cpu>*> list_factor;
+			mwSize nb_element = mxGetNumberOfElements(prhs[1]);
+
+
+
+			if (nb_element != 0)
 			{
-				mxMat=mxGetCell(prhs[1],i);
-					
-				concatMatGeneric<SCALAR>(mxMat,list_factor);
-				
+				mxArray * mxMat;
+				for (int i=0; i < nb_element; i++)
+				{
+					mxMat=mxGetCell(prhs[1],i);
+
+					concatMatGeneric<SCALAR>(mxMat,list_factor);
+
+				}
 			}
+
+			// 2nd input (optionnal) : multiplicative scalar
+			SCALAR lambda = 1.0;
+			if (nrhs > 2)
+				lambda = (SCALAR) mxGetScalar(prhs[2]);
+
+
+			// 3rd input (optionnal) : boolean to determine the type of copy
+			bool optimizedCopy = true;
+			if (nrhs > 3)
+			{
+				double optimizedCopy_inter = mxGetScalar(prhs[3]);
+				if ((optimizedCopy_inter != 1.0) and (optimizedCopy_inter != 0.0))
+					mexErrMsgTxt("invalid boolean argument.");
+
+				optimizedCopy = (bool) optimizedCopy_inter;
+
+			}
+
+
+			Faust::Transform<SCALAR,Cpu>* F = new Faust::Transform<SCALAR,Cpu>(list_factor,lambda,optimizedCopy);
+			for (int i=0;i<list_factor.size();i++)
+				delete list_factor[i];
+
+			plhs[0]=convertPtr2Mat<Faust::Transform<SCALAR,Cpu> >(F);
+
+			return;
 		}
-        	
-		// 2nd input (optionnal) : multiplicative scalar
-        	SCALAR lambda = 1.0;
-		if (nrhs > 2)			
-			lambda = (SCALAR) mxGetScalar(prhs[2]);
-
-
-		// 3rd input (optionnal) : boolean to determine the type of copy
-		bool optimizedCopy = true;
-		if (nrhs > 3)
-		{		
-			double optimizedCopy_inter = mxGetScalar(prhs[3]);
-			if ((optimizedCopy_inter != 1.0) and (optimizedCopy_inter != 0.0))
-				mexErrMsgTxt("invalid boolean argument.");
-			
-			optimizedCopy = (bool) optimizedCopy_inter;
-								
-		}	
-
-
-		Faust::Transform<SCALAR,Cpu>* F = new Faust::Transform<SCALAR,Cpu>(list_factor,lambda,optimizedCopy);
-		for (int i=0;i<list_factor.size();i++)
-			delete list_factor[i];		
-		
-		plhs[0]=convertPtr2Mat<Faust::Transform<SCALAR,Cpu> >(F);
-			
-		return;
-	}
 
 
 
 
-	// Delete
-	if (!strcmp("delete", cmd))
-	{
-		// Destroy the C++ object
-		destroyObject<Faust::Transform<SCALAR,Cpu> >(prhs[1]);
-		// Warn if other commands were ignored
-		if (nlhs != 0 || nrhs != 2)
-			mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
-		return;
-	}
+		// Delete
+		if (!strcmp("delete", cmd))
+		{
+			// Destroy the C++ object
+			destroyObject<Faust::Transform<SCALAR,Cpu> >(prhs[1]);
+			// Warn if other commands were ignored
+			if (nlhs != 0 || nrhs != 2)
+				mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
+			return;
+		}
 
 
-	// Get the class instance pointer from the second input
-	Faust::Transform<SCALAR,Cpu>* core_ptr = convertMat2Ptr<Faust::Transform<SCALAR,Cpu> >(prhs[1]);
+		// Get the class instance pointer from the second input
+		Faust::Transform<SCALAR,Cpu>* core_ptr = convertMat2Ptr<Faust::Transform<SCALAR,Cpu> >(prhs[1]);
 
-	
-	if (!strcmp("size",cmd))
-	{
-		const size_t SIZE_B1 = core_ptr->getNbRow();
-        	const size_t SIZE_B2 = core_ptr->getNbCol();
-		const mwSize dims[2]={1,2};
-		plhs[0]=mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL);
-		double* ptr_out = (double*) mxGetData(plhs[0]);
-		ptr_out[0]=(double) SIZE_B1;
-		ptr_out[1]=(double) SIZE_B2;
-		return;
-	}
 
-	if (!strcmp("isReal",cmd))
-	{
+		if (!strcmp("size",cmd))
+		{
+			const size_t SIZE_B1 = core_ptr->getNbRow();
+			const size_t SIZE_B2 = core_ptr->getNbCol();
+			const mwSize dims[2]={1,2};
+			plhs[0]=mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL);
+			double* ptr_out = (double*) mxGetData(plhs[0]);
+			ptr_out[0]=(double) SIZE_B1;
+			ptr_out[1]=(double) SIZE_B2;
+			return;
+		}
+
+		if (!strcmp("isReal",cmd))
+		{
 			plhs[0] = mxCreateDoubleScalar((double) core_ptr->isReal());
 			return;
-	}	
-	// return the number of non zeros coefficients of the matrix
-	if (!strcmp("nnz",cmd))
-	{
-		if (nlhs > 1 || nrhs != 2)
-		{
-			mexErrMsgTxt("nnz : incorrect number of arguments.");
-		}		
-		
-		long long int nnz = core_ptr->get_total_nnz(); 
-		plhs[0]=mxCreateDoubleScalar(nnz);
-		return;
-	}
-
-	// get_fact : return the id factor of the faust	
-	if (!strcmp("get_fact", cmd))
-    	{
-		if (nlhs > 1 || nrhs != 3)
-		{
-			mexErrMsgTxt("get_fact : incorrect number of arguments.");
 		}
-		int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
-		
-		Faust::MatGeneric<SCALAR,Cpu>* const factor_generic = core_ptr->get_fact(id_fact);
-		Faust::MatDense<SCALAR,Cpu> dense_factor;		
-
-		switch ( factor_generic->getType())
+		// return the number of non zeros coefficients of the matrix
+		if (!strcmp("nnz",cmd))
 		{
-			case Dense :
+			if (nlhs > 1 || nrhs != 2)
 			{
-				Faust::MatDense<SCALAR,Cpu>* factor_dense_ptr = dynamic_cast<Faust::MatDense<SCALAR,Cpu>* > (factor_generic);
-				dense_factor = (*factor_dense_ptr);
+				mexErrMsgTxt("nnz : incorrect number of arguments.");
 			}
-			break;
-		
-			case Sparse :
+
+			long long int nnz = core_ptr->get_total_nnz();
+			plhs[0]=mxCreateDoubleScalar(nnz);
+			return;
+		}
+
+		// get_fact : return the id factor of the faust
+		if (!strcmp("get_fact", cmd))
+		{
+			if (nlhs > 1 || nrhs != 3)
 			{
-				Faust::MatSparse<SCALAR,Cpu>* factor_sparse_ptr = dynamic_cast<Faust::MatSparse<SCALAR,Cpu>* > (factor_generic);
-				dense_factor = (*factor_sparse_ptr);
+				mexErrMsgTxt("get_fact : incorrect number of arguments.");
 			}
-			break;
+			int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
 
-			default:
-		   		mexErrMsgTxt("get_fact : unknown type of the factor matrix");
-		} 
-		delete factor_generic;
-		
-		
+			Faust::MatGeneric<SCALAR,Cpu>* const factor_generic = core_ptr->get_fact(id_fact);
+			Faust::MatDense<SCALAR,Cpu> dense_factor;
 
-		
+			switch ( factor_generic->getType())
+			{
+				case Dense :
+					{
+						Faust::MatDense<SCALAR,Cpu>* factor_dense_ptr = dynamic_cast<Faust::MatDense<SCALAR,Cpu>* > (factor_generic);
+						dense_factor = (*factor_dense_ptr);
+					}
+					break;
+
+				case Sparse :
+					{
+						Faust::MatSparse<SCALAR,Cpu>* factor_sparse_ptr = dynamic_cast<Faust::MatSparse<SCALAR,Cpu>* > (factor_generic);
+						dense_factor = (*factor_sparse_ptr);
+					}
+					break;
+
+				default:
+					mexErrMsgTxt("get_fact : unknown type of the factor matrix");
+			}
+			delete factor_generic;
 
 
-		//*conversion to mxArray*/
-		plhs[0]=FaustMat2mxArray(dense_factor);
-		return;
-		
-
-	}
 
 
-	if (!strcmp("get_nb_factor", cmd))
-    	{
-		if (nlhs != 1 || nrhs != 2)
+
+
+			//*conversion to mxArray*/
+			plhs[0]=FaustMat2mxArray(dense_factor);
+			return;
+
+
+		}
+
+
+		if (!strcmp("get_nb_factor", cmd))
 		{
-			mexErrMsgTxt("get_nb_factor : incorrect number of arguments.");
+			if (nlhs != 1 || nrhs != 2)
+			{
+				mexErrMsgTxt("get_nb_factor : incorrect number of arguments.");
+			}
+
+			faust_unsigned_int nb_fact = core_ptr->size();
+			plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+			double* ptr_out = (double*) mxGetData(plhs[0]);
+			ptr_out[0]=(double) nb_fact;
+			return;
+
+
 		}
-		
-		faust_unsigned_int nb_fact = core_ptr->size();
-		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-		double* ptr_out = (double*) mxGetData(plhs[0]);
-		ptr_out[0]=(double) nb_fact;
-		return;
-		
 
-	}
-
-	if (!strcmp("disp",cmd))
-	{
-		if (nlhs != 0 || nrhs != 2)
-			mexErrMsgTxt("disp: Unexpected arguments");		
-		core_ptr->Display();
-		return;
-	}
-    
-
-    	if (!strcmp("full",cmd))
-	{	
-		
-		if (nlhs != 1 || nrhs != 3)
-			mexErrMsgTxt("full: Unexpected arguments");
-		if(core_ptr->size() == 0)
-			mexErrMsgTxt("full : empty faust core");
-		
-		bool transpose_flag = (bool) mxGetScalar(prhs[2]);
-
-		char op;
-		if (transpose_flag)
-			op='T';
-		else
-			op='N';
-	
-		faust_unsigned_int nbRowOp,nbColOp;
-		(*core_ptr).setOp(op,nbRowOp,nbColOp);
-		const size_t SIZE_B1 = nbRowOp;
-        	const size_t SIZE_B2 = nbColOp;
-		Faust::MatDense<SCALAR,Cpu> prod=core_ptr->get_product(op);
-		const mwSize dims[2]={SIZE_B1,SIZE_B2};
-		
-		
-		plhs[0] = FaustMat2mxArray(prod);
-		return;
-	}
-
-	// compute the 2-norm of the faust
-	if (!strcmp("norm",cmd))
-	{	
-		if (nlhs != 1 || nrhs != 2)
-			mexErrMsgTxt("norm: Unexpected arguments");
-		if(core_ptr->size() == 0)
-			mexErrMsgTxt("norm : empty faust core");
-		
-		
-		double precision =  0.001;
-		faust_unsigned_int nbr_iter_max=100;
-		int flag;
-		char op;
-		//spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
-		
-		double norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
-		plhs[0]=mxCreateDoubleScalar(norm_faust);
-		
-		return;
-	}
-
-
-	if (!strcmp("copy",cmd))
-	{
-
-
-
-		if (nlhs > 1)
-			mexErrMsgTxt("transpose : too much output argument");
-		else
+		if (!strcmp("disp",cmd))
 		{
-			//Faust::Timer t1,t2,t3;
-			//t1.start();			
-			Faust::Transform<SCALAR,Cpu>* F = new Faust::Transform<SCALAR,Cpu>((*core_ptr));			
-			//t1.stop();			
-			//t2.start();			
-			//(*F).transpose();
-			//t2.stop();
-			//t3.start();
-			plhs[0]=convertPtr2Mat<Faust::Transform<SCALAR,Cpu> >(F);
-			//t3.stop();
-			//std::cout<<"t1 new : "<<t1.get_time()<<std::endl;
-			//std::cout<<"t2 transpose : "<<t2.get_time()<<std::endl;
-			//std::cout<<"t3 convertPtrMat : "<<t3.get_time()<<std::endl;
-				
+			if (nlhs != 0 || nrhs != 2)
+				mexErrMsgTxt("disp: Unexpected arguments");
+			core_ptr->Display();
+			return;
 		}
-		return;
-
-	}
-   
-	
-    	if (!strcmp("multiply", cmd)) {
-		
-		if (nlhs > 1 ||  nrhs != 4)
-		    mexErrMsgTxt("Multiply: Unexpected arguments.");
-
-		mwSize nelem = mxGetNumberOfElements(prhs[3]);
-		if (nelem != 1)
-			mexErrMsgTxt("invalid char argument.");
-	
-		// boolean flag to know if the faust si transposed
-		bool transpose_flag = (bool) mxGetScalar(prhs[3]);
-		char op;
-		if (transpose_flag)
-			op='T';
-		else
-			op='N';
-	
-		// input matrix or vector from MATLAB
-		const mxArray * inMatlabMatrix = prhs[2];
-		
-
-			
-		const size_t nbRowA = mxGetM(inMatlabMatrix);
-		const size_t nbColA = mxGetN(inMatlabMatrix);
-		faust_unsigned_int nbRowOp_,nbColOp_;
-		(*core_ptr).setOp(op,nbRowOp_,nbColOp_);
-		const size_t nbRowOp = nbRowOp_;
-		const size_t nbColOp = nbColOp_;			
-		const size_t nbRowB = nbRowOp;
-		const size_t nbColB = nbColA;
-
-	
-
-		/** Check parameters **/
-		
-		//check dimension match
-		if (mxGetNumberOfDimensions(inMatlabMatrix) != 2
-		        || nbRowA != nbColOp )
-		    mexErrMsgTxt("Multiply : Wrong number of dimensions for the input vector or matrix (third argument).");
 
 
-		SCALAR* ptr_data = NULL;
-		if ((core_ptr->isReal() ) && ( mxIsComplex(inMatlabMatrix) ) )
-			mexErrMsgTxt("impossibility to multiply real scalar Faust with complex matrix");
-		
-		mxArray2Ptr(inMatlabMatrix, ptr_data);		
-	
-		// Si inMatlabMatrix est un vecteur
-		
-		if(nbColA == 1)
+		if (!strcmp("full",cmd))
 		{
-		Faust::Vect<SCALAR,Cpu> A(nbRowA, ptr_data);
-		Faust::Vect<SCALAR,Cpu> B(nbRowB);
-		B = (*core_ptr).multiply(A,op);
-	
-			
 
-			plhs[0]=FaustVec2mxArray(B);
+			if (nlhs != 1 || nrhs != 3)
+				mexErrMsgTxt("full: Unexpected arguments");
+			if(core_ptr->size() == 0)
+				mexErrMsgTxt("full : empty faust core");
+
+			bool transpose_flag = (bool) mxGetScalar(prhs[2]);
+
+			char op;
+			if (transpose_flag)
+				op='T';
+			else
+				op='N';
+
+			faust_unsigned_int nbRowOp,nbColOp;
+			(*core_ptr).setOp(op,nbRowOp,nbColOp);
+			const size_t SIZE_B1 = nbRowOp;
+			const size_t SIZE_B2 = nbColOp;
+			Faust::MatDense<SCALAR,Cpu> prod=core_ptr->get_product(op);
+			const mwSize dims[2]={SIZE_B1,SIZE_B2};
+
+
+			plhs[0] = FaustMat2mxArray(prod);
+			return;
 		}
-		// Si inMatlabMatrix est une matrice
-		else
-		{       	
-			Faust::MatDense<SCALAR,Cpu> A(ptr_data, nbRowA, nbColA);
-			Faust::MatDense<SCALAR,Cpu> B(nbRowB, nbColA);
-			B = (*core_ptr).multiply(A,op);
-			
 
-			plhs[0]=FaustMat2mxArray(B);
-			
+		// compute the 2-norm of the faust
+		if (!strcmp("norm",cmd))
+		{
+			if (nlhs != 1 || nrhs != 2)
+				mexErrMsgTxt("norm: Unexpected arguments");
+			if(core_ptr->size() == 0)
+				mexErrMsgTxt("norm : empty faust core");
+
+
+			double precision =  0.001;
+			faust_unsigned_int nbr_iter_max=100;
+			int flag;
+			char op;
+			//spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
+
+			double norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
+			plhs[0]=mxCreateDoubleScalar(norm_faust);
+
+			return;
 		}
 
-			
 
-		if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
-		
-		return;
-    }
+		if (!strcmp("copy",cmd))
+		{
 
 
-    
+
+			if (nlhs > 1)
+				mexErrMsgTxt("transpose : too much output argument");
+			else
+			{
+				//Faust::Timer t1,t2,t3;
+				//t1.start();
+				Faust::Transform<SCALAR,Cpu>* F = new Faust::Transform<SCALAR,Cpu>((*core_ptr));
+				//t1.stop();
+				//t2.start();
+				//(*F).transpose();
+				//t2.stop();
+				//t3.start();
+				plhs[0]=convertPtr2Mat<Faust::Transform<SCALAR,Cpu> >(F);
+				//t3.stop();
+				//std::cout<<"t1 new : "<<t1.get_time()<<std::endl;
+				//std::cout<<"t2 transpose : "<<t2.get_time()<<std::endl;
+				//std::cout<<"t3 convertPtrMat : "<<t3.get_time()<<std::endl;
+
+			}
+			return;
+
+		}
 
 
-//     // Call the various class methods
-//     // Train
-//     if (!strcmp("train", cmd)) {
-//         // Check parameters
-//         if (nlhs < 0 || nrhs < 2)
-//             mexErrMsgTxt("Train: Unexpected arguments.");
-//         // Call the method
-//         dummy_instance->train();
-//         return;
-//     }
-//     // Test
-//     if (!strcmp("test", cmd)) {
-//         // Check parameters
-//         if (nlhs < 0 || nrhs < 2)
-//             mexErrMsgTxt("Test: Unexpected arguments.");
-//         // Call the method
-//         dummy_instance->test();
-//         return;
-//     }
+		if (!strcmp("multiply", cmd)) {
 
-    // Got here, so command not recognized
-    mexErrMsgTxt("Command not recognized.");
+			if (nlhs > 1 ||  nrhs != 4)
+				mexErrMsgTxt("Multiply: Unexpected arguments.");
+
+			mwSize nelem = mxGetNumberOfElements(prhs[3]);
+			if (nelem != 1)
+				mexErrMsgTxt("invalid char argument.");
+
+			// boolean flag to know if the faust si transposed
+			bool transpose_flag = (bool) mxGetScalar(prhs[3]);
+			char op;
+			if (transpose_flag)
+				op='T';
+			else
+				op='N';
+
+			// input matrix or vector from MATLAB
+			const mxArray * inMatlabMatrix = prhs[2];
+
+
+
+			const size_t nbRowA = mxGetM(inMatlabMatrix);
+			const size_t nbColA = mxGetN(inMatlabMatrix);
+			faust_unsigned_int nbRowOp_,nbColOp_;
+			(*core_ptr).setOp(op,nbRowOp_,nbColOp_);
+			const size_t nbRowOp = nbRowOp_;
+			const size_t nbColOp = nbColOp_;
+			const size_t nbRowB = nbRowOp;
+			const size_t nbColB = nbColA;
+
+
+
+			/** Check parameters **/
+
+			//check dimension match
+			if (mxGetNumberOfDimensions(inMatlabMatrix) != 2
+					|| nbRowA != nbColOp )
+				mexErrMsgTxt("Multiply : Wrong number of dimensions for the input vector or matrix (third argument).");
+
+
+			SCALAR* ptr_data = NULL;
+			if ((core_ptr->isReal() ) && ( mxIsComplex(inMatlabMatrix) ) )
+				mexErrMsgTxt("impossibility to multiply real scalar Faust with complex matrix");
+
+			mxArray2Ptr(inMatlabMatrix, ptr_data);
+
+			// Si inMatlabMatrix est un vecteur
+
+			if(nbColA == 1)
+			{
+				Faust::Vect<SCALAR,Cpu> A(nbRowA, ptr_data);
+				Faust::Vect<SCALAR,Cpu> B(nbRowB);
+				B = (*core_ptr).multiply(A,op);
+
+
+
+				plhs[0]=FaustVec2mxArray(B);
+			}
+			// Si inMatlabMatrix est une matrice
+			else
+			{
+				Faust::MatDense<SCALAR,Cpu> A(ptr_data, nbRowA, nbColA);
+				Faust::MatDense<SCALAR,Cpu> B(nbRowB, nbColA);
+				B = (*core_ptr).multiply(A,op);
+
+
+				plhs[0]=FaustMat2mxArray(B);
+
+			}
+
+
+
+			if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
+
+			return;
+		}
+
+
+
+
+
+		//     // Call the various class methods
+		//     // Train
+		//     if (!strcmp("train", cmd)) {
+		//         // Check parameters
+		//         if (nlhs < 0 || nrhs < 2)
+		//             mexErrMsgTxt("Train: Unexpected arguments.");
+		//         // Call the method
+		//         dummy_instance->train();
+		//         return;
+		//     }
+		//     // Test
+		//     if (!strcmp("test", cmd)) {
+		//         // Check parameters
+		//         if (nlhs < 0 || nrhs < 2)
+		//             mexErrMsgTxt("Test: Unexpected arguments.");
+		//         // Call the method
+		//         dummy_instance->test();
+		//         return;
+		//     }
+
+		// Got here, so command not recognized
+		mexErrMsgTxt("Command not recognized.");
 	}catch (const std::exception& e)
 	{
-		 mexErrMsgTxt(e.what());
+		mexErrMsgTxt(e.what());
 	}
 }
