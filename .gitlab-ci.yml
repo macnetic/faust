@@ -64,6 +64,11 @@ package_macos:
         - 'echo $MACOS_PASS | sudo -S make install'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_SHA-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_SHA -ov -format UDRW faust-$CI_COMMIT_SHA'
         - pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_SHA --root /opt/local/faust-$CI_COMMIT_SHA --install-location /opt/local/faust-$CI_COMMIT_SHA ./faust-$CI_COMMIT_SHA.pkg
+        - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
+        - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
+        - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_SHA.pkg ./distribution.plist
+        - productbuild --distribution ./distribution.plist --package-path . ./faust-matio-$CI_COMMIT_SHA.pkg
+        - mv ./faust-matio-$CI_COMMIT_SHA.pkg ./faust-$CI_COMMIT_SHA.pkg
         - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$CI_COMMIT_SHA.dmg faust-$CI_COMMIT_SHA.pkg $MACOS_PKG_STORE_PATH; fi
     tags:
         - macos
@@ -97,6 +102,11 @@ package_macos_release:
         - 'echo $MACOS_PASS | sudo -S make install'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_TAG -ov -format UDRW faust-$CI_COMMIT_TAG'
         - pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust-$CI_COMMIT_TAG --install-location /opt/local/faust-$CI_COMMIT_TAG ./faust-$CI_COMMIT_TAG.pkg
+        - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
+        - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
+        - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_TAG.pkg ./distribution.plist
+        - productbuild --distribution ./distribution.plist --package-path . ./faust-matio-$CI_COMMIT_TAG.pkg
+        - mv ./faust-matio-$CI_COMMIT_TAG.pkg ./faust-$CI_COMMIT_TAG.pkg
         - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$CI_COMMIT_TAG.dmg faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
     tags:
         - macos
