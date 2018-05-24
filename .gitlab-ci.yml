@@ -59,7 +59,7 @@ package_macos:
     stage: package_rev
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_SHA  ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_SHA  ..'
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_SHA-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_SHA -ov -format UDRW faust-$CI_COMMIT_SHA'
@@ -80,7 +80,7 @@ package_linux:
    stage: package_rev
    script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/faust-$CI_COMMIT_SHA -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_SHA ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/faust-$CI_COMMIT_SHA -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_SHA ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
@@ -97,7 +97,7 @@ package_linux:
 package_macos_release:
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON ..'
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_TAG -ov -format UDRW faust-$CI_COMMIT_TAG'
@@ -116,7 +116,7 @@ package_macos_release:
 package_linux_release:
    script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DCMAKE_INSTALL_PREFIX=/opt/faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON  ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON  ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake

@@ -700,14 +700,29 @@ if(CMAKE_BUILD_TYPE MATCHES "Release")
 	")
 endif(CMAKE_BUILD_TYPE MATCHES "Release")
 
-if(NOT EXCLUDE_FAUST_LIB_INSTALL)
+if(NOT ${EXCLUDE_FAUST_LIB_INSTALL})
 	install(TARGETS ${FAUST_TARGET} DESTINATION ${FAUST_INSTALL_LIB})
-	if(${BUILD_DOCUMENTATION})
-		string(REGEX REPLACE "(.*)/lib/.*" "\\1" DOC_INSTALL_PREFIX ${FAUST_INSTALL_LIB})
-		install(DIRECTORY "${PROJECT_BINARY_DIR}/doc/html" DESTINATION "${DOC_INSTALL_PREFIX}/share/faust/doc/")
-	endif()
 endif()
 
+if(${BUILD_DOCUMENTATION})
+	if(${CMAKE_INSTALL_PREFIX} MATCHES "faust")
+		set(DOC_INSTALL_PREFIX  "${CMAKE_INSTALL_PREFIX}/doc")
+	else()
+		# CMAKE_INSTALL_PREFIX is not set
+		string(REGEX REPLACE "(.*)/lib/?.*" "\\1/share/faust/doc" DOC_INSTALL_PREFIX ${FAUST_INSTALL_LIB})
+	endif()
+	if(NOT ${EXCLUDE_FAUST_LIB_INSTALL})
+		install(DIRECTORY "${PROJECT_BINARY_DIR}/doc/html" DESTINATION "${DOC_INSTALL_PREFIX}")
+	else()
+		if(${BUILD_WRAPPER_PYTHON})
+			install(DIRECTORY "${PROJECT_BINARY_DIR}/doc/html" DESTINATION
+			${DOC_INSTALL_PREFIX} FILES_MATCHING PATTERN "classFaustPy*" PATTERN "FaustPy*")
+		endif()
+		if(${BUILD_WRAPPER_MATLAB})
+		# TODO: 
+		endif()
+	endif()
+endif()
 
 
 ##################################################################
