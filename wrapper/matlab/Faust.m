@@ -385,6 +385,17 @@ classdef Faust
 
 		end
 
+		function save_core(F, filename)
+			%% save_core Saves a Faust into a matfile.
+			%
+			%  save_core(F,filename) saves the Faust F into the .mat file specified by filename.
+			%  N.B.: this function is identitical to save() but relies on Faust core library to operate.
+			if(F.isReal)
+				mexFaustReal('save_core', F.matrix.objectHandle, filename)
+			else
+				mexFaustCplx('save_core', F.matrix.objectHandle, filename)
+			end
+		end
 
 		function submatrix=subsref(F,S)
 			%% SUBSREF Subscripted reference (overloaded Matlab built-in function).
