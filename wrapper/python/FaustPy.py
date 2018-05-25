@@ -48,115 +48,181 @@ import FaustCorePy
 
 
 class Faust:
-    """ This class represents a dense matrix by a product of 'sparse' factors (i.e Faust) 
-    The aim of the Faust representation is to speed-up multiplication by this matrix
+    """ This class represents a dense matrix by a product of 'sparse' factors
+    (i.e Faust).
+    The aim of the Faust representation is to speed-up multiplication by this
+    matrix.
     """
 
     def  __init__(F,list_factors):
-        """ create a Faust from a list of factor.
+        """ Creates a Faust from a list of factors or a file.
 
-        Parameter
-        ---------
-        list_factors : list/tuple of numpy matrices or filepath of the Faust in
-        matlab format.
+        Args:
+            list_factors : list/tuple of numpy matrices or filepath of the Faust in
+        matlab binary format (.mat).
         """
         if(isinstance(list_factors, str)):
             contents = loadmat(list_factors)
-            list_factors = contents['faust_factors'][0] 
+            list_factors = contents['faust_factors'][0]
         F.m_faust = FaustCorePy.FaustCore(list_factors);
         F.m_transpose_flag=0;
         F.shape=F.m_faust.shape(F.m_transpose_flag)
 
 
-    def getNbRow(F):
-        """ return the number of row of the current Faust. """
+    def get_nb_rows(F):
+        """
+        Gives the Faust's number of rows.
+
+        Returns:
+                The Faust number of rows.
+        """
         return F.shape[0]
 
-    def getNbCol(F):
-        """ return the number of column of the current Faust. """
+    def get_nb_cols(F):
+        """
+        Gives the Faust's number of columns.
+
+        Returns:
+                The Faust number of columns.
+        """
         return F.shape[1]
 
     def size(F):
-        """ Returns the Faust size tuple: getNbRow(), getNbCol().
+        """
+        Gives the size of the Faust.
+
+        Returns:
+            The Faust size tuple: get_nb_rows(), get_nb_cols().
         """
         return F.shape[0], F.shape[1]
 
     def transpose(F):
-        """ transpose the current Faust. """
+        """
+        Transposes the current Faust.
+        """
         F_trans=copy.copy(F)
         F_trans.m_transpose_flag=not (F.m_transpose_flag)
         F_trans.shape=(F.shape[1],F.shape[0])
 
-        return F_trans;
+        return F_trans
 
     def display(F):
-        """ display information of the current Faust. """
-        print("Struct : ")
+        """
+        Displays information describing the current Faust.
+        """
         F.m_faust.display(F.m_transpose_flag);
 
-
-    def __mul__(F,x):
-        """ multiplication between the current Faust and a numpy matrix.
-        (overload the python operator *, return F*x)
-
-        Parameter
-        ---------
-        x : 2D numpy ndarray of double scalar, must be FORTRAN contiguous 
+    def __mul__(F, M):
         """
-        return F.m_faust.multiply(x,F.m_transpose_flag)
+        Multiplies the Faust by the numpy matrix M.
+
+        This method overloads the Python operator *.
+
+        Args:
+            M: 2D numpy ndarray of double scalar, must be Fortran contiguous
+            (i.e. Column-major order; `order' argument passed to
+            np.ndararray() must be equal 'F').
+
+        Returns:
+            The result of the multiplication as a numpy matrix.
+
+        Raises:
+            ValueError
+
+
+        Examples:
+            >>> import numpy as np
+            >>> x = np.random.randint(120, size=(F.get_nb_cols(), 1))
+            >>> y = F*x
+        """
+        return F.m_faust.multiply(M, F.m_transpose_flag)
 
     def todense(F):
-        """ convert the current Faust into a numpy matrix. 
-        return a numpy matrix """
+        """
+        Converts the current Faust into a numpy matrix.
 
-
-        identity=np.eye(F.getNbCol(),F.getNbCol());
-        F_dense=F*identity
+        Returns:
+            A numpy matrix.
+        """
+        identity = np.eye(F.get_nb_cols(), F.get_nb_cols())
+        F_dense = F*identity
         return F_dense
 
-
-    def __getitem__(F,list_index):
-        """ Slicing : Return the value of the current Faust at index list_index.
-        (overload of python built-in operator F(indexRow,indexCol)
-
-        Parameter
-        ---------
-        list_index : tab of length 2 with its elements must be slice, integer or Ellipsis(...) 
-
-        Example of use :
-            F[2,3], F[0:dim1,...], F[::-1,::-1] 
-
+    def __getitem__(F, indices):
         """
-        #check if list_index has a 2 index (row and column) 
-        if (len(list_index) != 2):
-            raise ValueError('list_index must contains 2 elements, the row index and the col index')
+        Returns a coefficient of the Faust by its indices.
 
-        #check if the index are slice or integer or Ellipsis
-        for id in list_index:
-            if (not isinstance(id, slice)) and (not isinstance(id,int) and (id !=Ellipsis)):
-                raise ValueError('list_index must contains slice (1:n) or Ellipsis (...) or int (2)')
+        This function overloads the Python built-in.
 
-        keyCol=list_index[1]
-        keyRow=list_index[0]
-        identity=np.eye(F.getNbCol(),F.getNbCol())
-        if(keyCol != Ellipsis): identity=identity[...,keyCol]
-        submatrix=F*identity
-        submatrix=submatrix[keyRow,:]
+        Args:
+            indices: array of length 2, its elements must be of kind: slice, integer or
+            Ellipsis (...).
+
+        Returns:
+            The float element requested.
+
+        Examples:
+            >>> F[2, 3]
+            >>> F[0:dim1, ...]
+            >>> F[::-1, ::-1]
+        """
+        # check if indices has a 2 index (row and column)
+        if (len(indices) != 2):
+            raise ValueError('indices must contains 2 elements, '
+                             'the row index and the col index')
+
+        # check if the index are slice or integer or Ellipsis
+        for id in indices:
+            if (not isinstance(id, slice) and
+                not isinstance(id, int) and
+                id != Ellipsis):
+                raise ValueError('indices must contains slice (1:n)'
+                                 ' or Ellipsis (...) or int (2)')
+
+        keyCol = indices[1]
+        keyRow = indices[0]
+        identity = np.eye(F.get_nb_cols(), F.get_nb_cols())
+        if(keyCol != Ellipsis):
+            identity = identity[..., keyCol]
+        submatrix = F*identity
+        submatrix = submatrix[keyRow, :]
         return submatrix
 
     def nnz(F):
-        """ Gives the number of non-zero elements in the Faust.
+        """
+        Gives the number of non-zero elements in the Faust.
+
+        Returns:
+            The number of non-zero elements as an integer.
+
+        Examples:
+            >>> F.nnz()
         """
         return F.m_faust.nnz()
 
     def density(F):
-        """ Returns the density of the Faust which is the normalized rate of non-zero
-        coefficients.
+        """
+        Calculates the normalized rate of non-zero coefficients.
+
+        Returns:
+            The density value as a float.
+
+        Examples:
+            >>> F.density()
         """
         return float(F.nnz())/(F.shape[0]*F.shape[1])
 
     def RCG(F):
-        """ Returns the Relative Complexity Gain (inverse of the density).
+        """
+        Computes the Relative Complexity Gain (inverse of the density).
+
+        Returns:
+            The RCG value as a float.
+            If the density is zero it will be float("inf").
+            If the density is negative it will be -1.
+
+        Examples:
+            >>> F.RCG()
         """
         d = F.density()
         if(d > 0):
@@ -164,26 +230,60 @@ class Faust:
         elif(d == 0):
             return float("inf")
         else:
-            return -1
+            return float(-1)
 
     def norm(F, typenorm=2):
         """
-        Returns the 2-norm of The Faust.
+        Computes the norm of the Faust.
+
+        Args:
+            typenorm: (Optional) The type of norm to return. For now, it's
+            limited to 2-norm only (spectral norm).
+
+        Returns:
+            The norm as a float.
+
+        Raises:
+            ValueError.
+
+
+        Examples:
+            >>> F.norm()
+            >>> F.norm(2)
         """
         if(typenorm != 2):
-            raise Exception("Only 2-norm is supported for the"
+            raise ValueError("Only 2-norm is supported for the "
                             "Faust")
         return F.m_faust.norm()
 
     def get_nb_factors(F):
         """
-        Returns the Faust's number of factors.
+        Gives the Faust's number of factors.
+
+        Returns:
+            The number of factors.
+
+        Examples:
+            >>> F.get_nb_factors()
         """
         return F.m_faust.get_nb_factors()
 
     def get_factor(F, i):
         """
         Returns the Faust's i-th factor as a numpy.ndarray.
+
+        Args:
+            i: The integer index of the factor to get back.
+
+        Returns:
+            The i-th factor as a dense matrix (of type numpy.ndarray).
+
+        Raises:
+            ValueError.
+
+
+        Examples:
+            >>> F.get_factor(0)
         """
         if(F.m_transpose_flag):
             i = F.get_nb_factors()-1-i
@@ -194,10 +294,24 @@ class Faust:
 
     def save(F, filepath, format="Matlab"):
         """
-            Saves the Faust into file.
+        Saves the Faust into file.
+
+        Args:
+            filepath: The path for saving the Faust (should ends with .mat
+            if Matlab format used). It can be either an absolute or relative path.
+            format: (Optional) It designates the format to use for
+            writing. By default, it's "Matlab" to save the Faust in a .mat
+            file (and it's currently the only format available).
+
+        Raises:
+            ValueError.
+
+
+        Examples:
+            >>> F.save("myFaust.mat")
         """
         if(format not in ["Matlab", "Matlab_core"]):
-            raise Exception("Only Matlab or Matlab_core format is supported.")
+            raise ValueError("Only Matlab or Matlab_core format is supported.")
         if(format == "Matlab"):
             mdict = {'faust_factors':
                      np.ndarray(shape=(1, F.get_nb_factors()), dtype=object)}

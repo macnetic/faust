@@ -110,23 +110,23 @@ cdef class FaustCore:
     # not Fortran-style (ColMajor) as Faust lib use Fortran-style storage
 
     # Left-Multiplication by a Faust F
-    # y=multiply(F,x) is equivalent to y=F*x 
-    def multiply(self,x,transpose_flag):
-        if not isinstance(x, (np.ndarray) ):
-            raise NameError('input x must a numpy ndarray')
+    # y=multiply(F,M) is equivalent to y=F*M
+    def multiply(self,M,transpose_flag):
+        if not isinstance(M, (np.ndarray) ):
+            raise ValueError('input M must a numpy ndarray')
         #transform into float F continous  matrix
-        x=x.astype(float,'F')
-        if not x.dtype=='float':
-            raise NameError('input x must be double array')
-        if not x.flags['F_CONTIGUOUS']:
-            raise NameError('input x must be Fortran contiguous (Colmajor)')
+        M=M.astype(float,'F')
+        if not M.dtype=='float':
+            raise ValueError('input M must be double array')
+        if not M.flags['F_CONTIGUOUS']:
+            raise ValueError('input M must be Fortran contiguous (Colmajor)')
 
-        ndim_x=x.ndim;
+        ndim_M=M.ndim;
 
-        if (ndim_x > 2) | (ndim_x < 1):
-            raise NameError('input x invalid number of dimensions')
+        if (ndim_M > 2) | (ndim_M < 1):
+            raise ValueError('input M invalid number of dimensions')
 
-        cdef unsigned int nbrow_x=x.shape[0]
+        cdef unsigned int nbrow_x=M.shape[0]
         cdef unsigned int nbcol_x #can't be assigned because we don't know yet if the input vector is 1D or 2D
 
         dimThis=self.shape(transpose_flag)
@@ -140,22 +140,22 @@ cdef class FaustCore:
         cdef double[:] xview_1D
         cdef double[:,:] xview_2D
 
-        if ndim_x == 1:
+        if ndim_M == 1:
             nbcol_x=1
-            xview_1D=x;
+            xview_1D=M;
         else:
-            nbcol_x=x.shape[1]
-            xview_2D=x;
+            nbcol_x=M.shape[1]
+            xview_2D=M;
 
             if (nbrow_x != nbColThis):
-                raise NameError('y=F*x multiplication with Faust : invalid dimension of the input matrix x');
+                raise ValueError('y=F*M multiplication with Faust: invalid dimension of the input matrix M');
 
         #void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose);
         nbcol_y = nbcol_x;
 
         cdef y = np.zeros([nbrow_y,nbcol_y], dtype='d',order='F')
         cdef double[:,:] yview=y
-        if ndim_x == 1:
+        if ndim_M == 1:
             self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x,transpose_flag);
         else:
             self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x,transpose_flag);
@@ -166,6 +166,7 @@ cdef class FaustCore:
 
     # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)	
     def display(self,transpose_flag):
+        print("Struct : ")
         print("Faust transposition " + str(transpose_flag))
         self.m_faust.Display();
 
