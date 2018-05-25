@@ -185,6 +185,9 @@ cdef class FaustCore:
         return nb_factors
 
     def get_fact(self,i):
+        if(i >=  self.get_nb_factors() or i < 0):
+            raise ValueError("factor index must be greater or equal 0 and "
+                             "lower than "+str(self.get_nb_factors())+".")
         cdef fact = np.zeros([self.m_faust.get_fact_nb_rows(i),
                               self.m_faust.get_fact_nb_cols(i)], dtype='d',
                              order='F')
