@@ -263,7 +263,7 @@ void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename) const
 	}
 	// write the faust cell array
 	dims[0] = 1;
-	dims[1] = 2;
+	dims[1] = size();
 	faust_matvar = Mat_VarCreate("faust_factors", MAT_C_CELL, MAT_T_CELL, 2, dims,
 			faust_factor_matvars, MAT_F_DONT_COPY_DATA);
 	if(faust_matvar == NULL)
