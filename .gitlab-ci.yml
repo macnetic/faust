@@ -59,7 +59,7 @@ package_macos:
     stage: package_rev
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_SHA  ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$CI_COMMIT_SHA -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_SHA  ..'
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_SHA-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_SHA -ov -format UDRW faust-$CI_COMMIT_SHA'
@@ -67,7 +67,8 @@ package_macos:
         - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
         - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
         - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_SHA.pkg ./distribution.plist
-        - productbuild --distribution ./distribution.plist --package-path . ./faust-matio-$CI_COMMIT_SHA.pkg
+        - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$CI_COMMIT_SHA'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
+        - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$CI_COMMIT_SHA.pkg
         - mv ./faust-matio-$CI_COMMIT_SHA.pkg ./faust-$CI_COMMIT_SHA.pkg
         - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$CI_COMMIT_SHA.dmg faust-$CI_COMMIT_SHA.pkg $MACOS_PKG_STORE_PATH; fi
     tags:
@@ -92,12 +93,13 @@ package_linux:
         - schedules
         - tags
 
-# jobs triggered by git tag don't verify that CMakeLists.txt conforms to the tag name/version but it must use the same version
+# jobs triggered by git tag can force cpack to use the tag name as version but it's not necessary for MacOSX (not using cpack for that sys.)
+# it's done for linux packages
 
 package_macos_release:
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON ..'
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_TAG -ov -format UDRW faust-$CI_COMMIT_TAG'
@@ -105,7 +107,8 @@ package_macos_release:
         - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
         - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
         - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_TAG.pkg ./distribution.plist
-        - productbuild --distribution ./distribution.plist --package-path . ./faust-matio-$CI_COMMIT_TAG.pkg
+        - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$CI_COMMIT_TAG'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
+        - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$CI_COMMIT_TAG.pkg
         - mv ./faust-matio-$CI_COMMIT_TAG.pkg ./faust-$CI_COMMIT_TAG.pkg
         - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$CI_COMMIT_TAG.dmg faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
     tags:

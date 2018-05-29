@@ -1,0 +1,103 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional //EN">
+<html>
+<head>
+  <meta name="GENERATOR" content="mkd2html 2.2.2">
+  <meta http-equiv="Content-Type"
+        content="text/html; charset=utf-8">  <title></title>
+</head>
+<body>
+<h1>Quick Guide to Install and Use FAuST Wrappers</h1>
+
+<h2>Installation</h2>
+
+<p>You can just double-click the .pkg file to launch the installation process.
+Maybe you&rsquo;ll need to authorize a non-appstore app installation into preferences/security parameters.</p>
+
+<p>You can also proceed with the following command in a terminal:</p>
+
+<pre><code>$ sudo installer -pkg /path/to/faust-*.pkg -target /
+</code></pre>
+
+<h2>Setup and Usage</h2>
+
+<h3>Matlab Wrapper</h3>
+
+<p>After installing the FAuST package, it&rsquo;s straight forward, in a terminal type:</p>
+
+<pre><code>    $ cd /opt/local/faust-*/matlab
+    $ matlab -nodisplay
+</code></pre>
+
+<p>Here you are in Matlab terminal. Note that you can also do it through Matlab GUI.</p>
+
+<p>The following script will add FAuST in your PATH. This is needed for Matlab to use FAuST.</p>
+
+<pre><code>    &gt;&gt; setup_FAUST
+</code></pre>
+
+<p>Now let&rsquo;s test FAuST with the quickstart script:</p>
+
+<pre><code>    &gt;&gt; quick_start
+</code></pre>
+
+<p>And then type further instructions to test a bit of FAuST API:</p>
+
+<p>Let&rsquo;s see what variables quickstart script has added.</p>
+
+<pre><code>    &gt;&gt; whos
+</code></pre>
+
+<p>Now call some functions on FAuST object A:</p>
+
+<pre><code>    &gt;&gt; RCG(A)
+    &gt;&gt; density(A)
+    &gt;&gt; get_nb_factor(A)
+</code></pre>
+
+<p>Retrieve the product factors (as full matrices):</p>
+
+<pre><code>    &gt;&gt; F1 = get_fact(A,1);
+    &gt;&gt; F2 = get_fact(A,2);
+</code></pre>
+
+<p>Check the sizes:</p>
+
+<pre><code>    &gt;&gt; size(F1)
+    &gt;&gt; size(F2)
+    &gt;&gt; size(A)
+</code></pre>
+
+<p>For more information on FAuST API, and whole function listing, consult the doc:</p>
+
+<pre><code>    &gt;&gt; doc('Faust')
+</code></pre>
+
+<p>N.B.: to access the documentation, you need to be in the graphical interface of matlab.</p>
+
+<h3>Python Wrapper</h3>
+
+<p>In the same idea, the python wrapper of FAuST is usable going into its directory.</p>
+
+<pre><code>    $ cd /opt/local/faust-*/python
+    $ python2.7 quickstart.py
+</code></pre>
+
+<p>You can also go through python terminal to build a FAuST product and call its object methods.</p>
+
+<pre><code>    $ python2.7
+    &gt;&gt;&gt; import FaustPy
+    &gt;&gt;&gt; import FaustPy
+    &gt;&gt;&gt; A = FaustPy.Faust('A.mat') # A is the FAuST created through quickstart script
+    &gt;&gt;&gt; A.RCG()
+    6.666666666666667
+    &gt;&gt;&gt; A.density()
+    0.15
+    &gt;&gt;&gt; A.get_nb_factors()
+    2
+    &gt;&gt;&gt; F1 = A.get_factor(0)
+    &gt;&gt;&gt; F2 = A.get_factor(1)
+    &gt;&gt;&gt; A.size()
+    (1000, 2000)
+</code></pre>
+</body>
+</html>
