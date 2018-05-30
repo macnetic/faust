@@ -39,7 +39,13 @@
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %%
 
-
+% ======================================================================
+%> @brief FAµST class
+%>
+%> This class represents a given dense matrix by a product of sparse matrix (i.e Faust)
+% in order to speed-up multiplication by this matrix, Matlab wrapper class implemented in C++.
+%>
+% ======================================================================
 classdef Faust
 	properties (SetAccess = private, Hidden = true)
 		matrix; % Handle to the FaustCore class instance
@@ -86,7 +92,22 @@ classdef Faust
 			end
 		end
 
-
+        %======================================================================
+        %> @brief Deletes the Faust object (destructor).
+        %>
+        %>
+		%>
+		%> @b Example
+		%> @code
+		%>   delete(F)
+		%> @endcode
+        %> @param A The matrix to multiply (full storage matrix).
+        %>
+        %> @retval C The multiplication result (full storage matrix).
+		%>
+		%> <p>@b See @b also Faust.</p>
+        %>
+        %======================================================================
 		function delete(F)
 			%% DELETE Destructor delete the Faust.
 			% delete(F)
@@ -95,13 +116,23 @@ classdef Faust
 			delete(F.matrix)
 		end
 
-
+        %======================================================================
+        %> @brief Multiplies the Faust or its transpose to the A full storage matrix.
+        %>
+        %>
+        %> @param A The matrix to multiply (full storage matrix).
+        %>
+        %> @retval C The multiplication result (full storage matrix).
+		%>
+        %> <p>@b See @b also mtimes_trans.
+        %>
+        %======================================================================
 		function C = mtimes(F,A)
 			%% MTIMES * Faust Multiplication (overloaded Matlab built-in function).
 			%
 			% C=mtimes(F,A) is called for syntax 'C=F*A', when F is a Faust matrix and A a full
 			% storage matrix, C is also a full matrix storage.
-			% 
+			%
 			% See also mtimes_trans
 			if (F.isReal)
 				if (isreal(A))	
@@ -117,7 +148,18 @@ classdef Faust
 		end
 
 
-
+		%======================================================================
+		%> @brief Multiplies the Faust or its transpose to the A full storage matrix.
+		%>
+		%> See also mtimes.
+		%>
+		%> @param A The matrix to multiply (full storage matrix).
+		%> @param trans Integer whose the value 1 means we want C=F'*A,
+		%> 				otherwise if it's value is 0 then the function computes C=F*A.
+		%>
+		%> @retval C The multiplication result (full storage matrix).
+		%>
+		%======================================================================
 		function C = mtimes_trans(F,A,trans)
 			%% MTIMES_TRANS Multiplication by a Faust or its non-conjugate transposed.
 			%
@@ -151,7 +193,14 @@ classdef Faust
 
 		end
 
-
+        %======================================================================
+        %> @brief Converts the Faust to a full matrix.
+		%>
+        %> This function overloads a Matlab built-in function.
+        %>
+        %> @retval The full storage matrix resulting from the Faust.
+        %>
+        %======================================================================
 		function A = full(F)
 			%% FULL  Convert Faust matrix to full matrix (overloaded Matlab
 			% built-in function).
@@ -165,9 +214,18 @@ classdef Faust
 
 		end
 
+        %======================================================================
+        %> @brief Indicates if the Faust is set with real or complex scalars.
+        %>
+		%> This function overloads a Matlab built-in function.
+        %>
+        %>
+        %> @retval 1 if Faust is set with real scalars, 0 for complex scalars.
+        %>
+        %======================================================================
 		function bool = isreal(F)
 			%% ISREAL True for real scalar Faust (overloaded Matlab built-in function).
-			%    	
+			%
 			% isreal(F) returns 1 if Faust F does not have an imaginary part
 			% and 0 otherwise.
 
@@ -175,7 +233,23 @@ classdef Faust
 
 		end
 
-
+        %======================================================================
+        %> @brief Gives the transpose of the Faust.
+        %>
+        %> This function overloads a Matlab built-in function.
+		%>
+		%>
+		%>
+   		%> @b Example
+		%> @code
+		%>   F.'
+		%> % is equivalent to
+		%>   transpose(F)
+		%> @endcode
+		%>
+        %> @retval F_trans The Faust transpose.
+        %> <p/>@b See @b also ctranspose
+        %======================================================================
 		function F_trans=transpose(F)
 			%% TRANSPOSE .' Non-conjugate transposed Faust (overloaded Matlab built-in function).
 			%
@@ -189,6 +263,25 @@ classdef Faust
 
 		end
 
+        %======================================================================
+        %> @brief Gives the conjugate transpose of the Faust.
+        %>
+        %> This function overloads a Matlab built-in function.
+		%>
+		%>
+		%>
+   		%> @b Example
+		%> @code
+		%>   F'
+		%> % is equivalent to
+		%>   ctranspose(F)
+		%> @endcode
+		%>
+        %> @retval The Faust conjugate transpose.
+        %> <p/>@b See @b also transpose
+		%>
+        %> <p/> @b WARNING : ctranspose is not yet implementd for complex Faust, only supported for real Faust
+		%======================================================================
 		function F_ctrans=ctranspose(F)
 			%% CTRANSPOSE ' Complex conjugate transposed Faust (overloaded Matlab built-in function).
 			%
@@ -205,7 +298,16 @@ classdef Faust
 
 		end
 
-
+        %======================================================================
+        %> @brief Gives the complex conjugate of the Faust.
+        %>
+        %> This function overloads a Matlab built-in function.
+		%>
+        %>
+        %> @retval F_trans = conj(F) For a complex F, conj(X) = REAL(F) - i*IMAG(F)
+        %>
+		%> <p/> @b WARNING : this function is not yet implemented.
+        %======================================================================
 		function F_conj=conj(F)
 			%% CONJ ' Complex conjugate Faust (WARNING not implemented) (overloaded Matlab built-in function).
 			%
@@ -220,7 +322,16 @@ classdef Faust
 		end
 
 
-
+        %======================================================================
+        %> @brief Gives the size of the Faust.
+        %>
+        %>
+        %> @param varargin can be missing or specifying the index of the dimension to get the size of.
+        %>
+        %> @retval [NROWS,NCOLS] = size(F) 
+		%> @retval N = size(F,DIM) with N being the size of Faust along its DIM-th dimension.
+        %>
+        %======================================================================
 		function varargout = size(F,varargin)
 			%% SIZE Size of a Faust (overloaded Matlab built-in function).
 			%
@@ -574,7 +685,16 @@ classdef Faust
 			end
 		end
 
-
+		%===========================================================================================
+		%> @brief RCG Relative Complexity Gain (inverse of the density)
+		%>
+		%> @retval speed_up =  RCG(F) when F is Faust, returns the
+		%> inverse of density of the Faust (i.e the theoretical gain
+		%> both for storage and multiplication computation time between the Faust and its full storage
+		%> equivalent full(F)).
+		%>
+		%> <p>@b See @b also density, nnz.
+		%===========================================================================================
 		function speed_up=RCG(F)
 			%% RCG Relative Complexity Gain (inverse of the density)
 			%
