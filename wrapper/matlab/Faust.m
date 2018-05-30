@@ -92,11 +92,7 @@ classdef Faust
 			% delete(F)
 			%
 			% See also Faust
-			if (this.isRealFlag)	
-				mexFaustReal('delete', F.matrix.objectHandle);
-			else
-				mexFaustCplx('delete', F.matrix.objectHandle);
-			end
+			delete(F.matrix)
 		end
 
 
