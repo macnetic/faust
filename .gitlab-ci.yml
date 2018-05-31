@@ -119,7 +119,7 @@ package_macos_release:
 package_linux_release:
    script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON  ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
