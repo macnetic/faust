@@ -63,7 +63,7 @@ package_macos:
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_SHA-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_SHA -ov -format UDRW faust-$CI_COMMIT_SHA'
-        - pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_SHA --root /opt/local/faust-$CI_COMMIT_SHA --install-location /opt/local/faust-$CI_COMMIT_SHA ./faust-$CI_COMMIT_SHA.pkg
+        - pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_SHA --root /opt/local/faust-$CI_COMMIT_SHA --install-location /opt/local/faust-$CI_COMMIT_SHA --scripts . ./faust-$CI_COMMIT_SHA.pkg
         - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
         - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
         - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_SHA.pkg ./distribution.plist
@@ -103,7 +103,7 @@ package_macos_release:
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_TAG -ov -format UDRW faust-$CI_COMMIT_TAG'
-        - pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust-$CI_COMMIT_TAG --install-location /opt/local/faust-$CI_COMMIT_TAG ./faust-$CI_COMMIT_TAG.pkg
+        - pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust-$CI_COMMIT_TAG --install-location /opt/local/faust-$CI_COMMIT_TAG --scripts . ./faust-$CI_COMMIT_TAG.pkg
         - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
         - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
         - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_TAG.pkg ./distribution.plist

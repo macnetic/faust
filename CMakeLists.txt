@@ -842,13 +842,19 @@ ELSE(WIN32 AND NOT UNIX)
 			SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Mac")
 			SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Mac")
 		ENDIF(CMAKE_SIZEOF_VOID_P MATCHES "4")
+		if(BUILD_WRAPPER_MATLAB)
+		    # prepare script to set matlab path for faust automatically after package installation
+		    configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/macosx/postinst_matlab.sh.in ${PROJECT_BINARY_DIR}/postinstall @ONLY)
+		endif()
 	ELSE(APPLE)
 		SET(CPACK_GENERATOR "DEB;RPM")
 		#SET(CPACK_DEBIAN_PACKAGE_DEPENDS "python, python-numpy, libfftw3-3, libsndfile1")
 		#SET(CPACK_DEBIAN_PACKAGE_SECTION "math")
 		SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "FAuST is a C++ toolbox, useful to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation). ")
-
-		
+		if(BUILD_WRAPPER_MATLAB)
+		    # prepare script to set matlab path for faust automatically after package installation
+		    configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/debrpm/postinst_matlab.sh.in ${PROJECT_BINARY_DIR}/postinst @ONLY)
+		endif()
 #SET(CPACK_RPM_PACKAGE_DEPENDS "libmat, libmex, libmx ")
 #CPACK_RPM_PACKAGE_GROUP
 #SET (CPACK_RPM_PACKAGE_REQUIRES )
@@ -878,6 +884,9 @@ set(CPACK_RPM_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION_SUMMARY})
 			SET(CPACK_RPM_PACKAGE_ARCHITECTURE "amd64")
 		ENDIF(CMAKE_SIZEOF_VOID_P MATCHES "4")
 		SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_FILE_NAME}")
+		# Set post installation scripts for RPM and DEB packages
+		SET(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${PROJECT_BINARY_DIR}/postinst")
+		SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_BINARY_DIR}/postinst")
 	ENDIF(APPLE)
 ENDIF(WIN32 AND NOT UNIX)
 #include(CPackConfig.cmake)
