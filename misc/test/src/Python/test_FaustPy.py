@@ -30,7 +30,7 @@ class TestFaustPy(unittest.TestCase):
         tmp_dir = tempfile.gettempdir()+os.sep
         # save the Faust through Faust core API
         test_file = tmp_dir+"A.mat"
-        self.F.save(test_file, format="Matlab_core")
+        self.F.save(test_file, format="Matlab")
         # save the Faust relying on numpy API
         ref_file = tmp_dir+"A_ref.mat"
         mdict = {'faust_factors':

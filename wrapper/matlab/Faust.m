@@ -468,39 +468,14 @@ classdef Faust
 		end
 
 
-		function save(F,filename)
-			%% SAVE Save a Faust into a matfile.
+		function save(F, filename)
+			%% save Saves a Faust into a matfile.
 			%
-			% save(F,filename) save the Faust F into the .mat file specified by
-			% filename.
-
-
-
-			if (~ischar(filename))
-				error('second argument must contains a string (a filename)');
-			end
-
-			nb_fact=get_nb_factor(F);
-
-			faust_factors=cell(1,nb_fact);
-
-			for i=1:nb_fact
-				faust_factors{i}=get_fact(F,i);
-			end
-			save(filename,'faust_factors');
-
-
-		end
-
-		function save_core(F, filename)
-			%% save_core Saves a Faust into a matfile.
-			%
-			%  save_core(F,filename) saves the Faust F into the .mat file specified by filename.
-			%  N.B.: this function is identitical to save() but relies on Faust core library to operate.
+			%  save(F,filename) saves the Faust F into the .mat file specified by filename.
 			if(F.isReal)
-				mexFaustReal('save_core', F.matrix.objectHandle, filename)
+				mexFaustReal('save', F.matrix.objectHandle, filename)
 			else
-				mexFaustCplx('save_core', F.matrix.objectHandle, filename)
+				mexFaustCplx('save', F.matrix.objectHandle, filename)
 			end
 		end
 

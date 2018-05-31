@@ -47,7 +47,7 @@ classdef FaustTest < matlab.unittest.TestCase
         function testSave(this)
 			rand_suffix = int2str(randi(10000))
 			filepath = [ tempdir filesep 'test_faust' rand_suffix '.mat']
-			save_core(this.test_faust, filepath)
+			save(this.test_faust, filepath)
 			F = Faust(filepath)
 			for i = 1:get_nb_factor(F)
 				this.verifyEqual(get_fact(this.test_faust,i), get_fact(F,i))
@@ -67,7 +67,7 @@ classdef FaustTest < matlab.unittest.TestCase
 				faust_factors{i}=get_fact(this.test_faust,i);
 			end
 			save(filepath_ref,'faust_factors');
-			save_core(this.test_faust,filepath_test)
+			save(this.test_faust,filepath_test)
 			ref_F = Faust(filepath_ref)
 			test_F = Faust(filepath_test)
 			this.verifyEqual(get_nb_factor(ref_F), get_nb_factor(test_F))

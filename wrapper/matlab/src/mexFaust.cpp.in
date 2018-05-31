@@ -72,19 +72,19 @@
 
 typedef @FAUST_SCALAR@ SCALAR;
 
-void save_core(Faust::Transform<SCALAR,Cpu>* core_ptr, int nargs, const mxArray *args[])
+void save(Faust::Transform<SCALAR,Cpu>* core_ptr, int nargs, const mxArray *args[])
 {
 	char filepath[512];
 	// args[0] must be the filepath
 	if(nargs != 1){
-		mexErrMsgTxt("The number of arguments for the save_core function is not valid.");
+		mexErrMsgTxt("The number of arguments for the save function is not valid.");
 		return;
 	}
 	if(mxGetString(args[0], filepath, sizeof(filepath)) && strlen(filepath) > 0){
 		mexErrMsgTxt("The filepath for saving is too long (max. is 511 characters).");
 		return;
 	}
-//	printf("save_core: filepath = %s, nargs = %d\n", filepath, nargs);
+//	printf("save: filepath = %s, nargs = %d\n", filepath, nargs);
 	core_ptr->save_mat_file(filepath);
 }
 
@@ -447,8 +447,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			return;
 		}
 
-		if(!strcmp("save_core", cmd))
-			return save_core(convertMat2Ptr<Faust::Transform<SCALAR,Cpu> >(prhs[1]), nrhs-2, &prhs[nrhs>=3?2:0]);
+		if(!strcmp("save", cmd))
+			return save(convertMat2Ptr<Faust::Transform<SCALAR,Cpu> >(prhs[1]), nrhs-2, &prhs[nrhs>=3?2:0]);
 
 
 		//     // Call the various class methods

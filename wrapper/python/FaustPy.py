@@ -310,13 +310,7 @@ class Faust:
         Examples:
             >>> F.save("myFaust.mat")
         """
-        if(format not in ["Matlab", "Matlab_core"]):
+        if(format not in ["Matlab"]):
             raise ValueError("Only Matlab or Matlab_core format is supported.")
         if(format == "Matlab"):
-            mdict = {'faust_factors':
-                     np.ndarray(shape=(1, F.get_nb_factors()), dtype=object)}
-            for i in range(0, F.get_nb_factors()):
-                mdict['faust_factors'][0, i] = F.get_factor(i)
-            savemat(filepath, mdict)
-        elif(format == "Matlab_core"):
             F.m_faust.save_mat_file(filepath)
