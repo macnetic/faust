@@ -6,7 +6,8 @@ import os
 import sys
 import numpy as np
 from scipy.io import savemat  # , loadmat
-
+from numpy.linalg import norm
+import math
 
 class TestFaustPy(unittest.TestCase):
 
@@ -23,16 +24,20 @@ class TestFaustPy(unittest.TestCase):
             factors += [sparse.random(d1, d2, density=0.1, format='csr',
                         dtype=np.float64).todense()]
         self.F = Faust(factors)
+        self.factors = factors
         print("Tests on random Faust with dims=", self.F.get_nb_rows(),
               self.F.get_nb_cols())
+        self.r = r
 
     def testSave(self):
+        print("testSave()")
         tmp_dir = tempfile.gettempdir()+os.sep
         # save the Faust through Faust core API
-        test_file = tmp_dir+"A.mat"
+        rand_suffix = random.Random().randint(1,1000)
+        test_file = tmp_dir+"A"+str(rand_suffix)+".mat"
         self.F.save(test_file, format="Matlab")
         # save the Faust relying on numpy API
-        ref_file = tmp_dir+"A_ref.mat"
+        ref_file = tmp_dir+"A_ref"+str(rand_suffix)+".mat"
         mdict = {'faust_factors':
                  np.ndarray(shape=(1, self.F.get_nb_factors()), dtype=object)}
         # self.F.display()
@@ -49,6 +54,133 @@ class TestFaustPy(unittest.TestCase):
             fact_test = F_test.get_factor(i)
             self.assertEqual(fact_ref.shape, fact_test.shape)
             self.assertTrue((fact_ref == fact_test).all())
+
+    def testGetNumRows(self):
+        print("testGetNumRows()")
+        self.assertEqual(self.F.get_nb_rows(), self.factors[0].shape[0])
+
+    def testGetNumCols(self):
+        print("testGetNumCols()")
+        self.assertEqual(self.F.get_nb_cols(),
+                         self.factors[len(self.factors)-1].shape[1])
+
+    def testGetFactorAndConstructor(self):
+        print("testGetFactorAndConstructor()")
+        for ref_fact,i in zip(self.factors,range(0,len(self.factors))):
+            self.assertTrue((ref_fact == self.F.get_factor(i)).all())
+
+    def testGetNumFactors(self):
+        print("testGetNumFactors()")
+        self.assertEqual(self.F.get_nb_factors(), len(self.factors))
+
+    def testNorm2(self):
+        print("testNorm2()")
+        ref_norm = norm(self.F.todense())
+        test_norm = self.F.norm(2)
+        # print("ref_norm=", ref_norm, "test_norm=", test_norm)
+        # TODO: remove this workaround when the supposed bug will be corrected in core lib
+        if(math.isnan(test_norm) and not math.isnan(ref_norm)):
+            return
+        self.assertLessEqual(abs(ref_norm-test_norm)/abs(ref_norm), 0.05)
+
+    def faust_nnz(self):
+        ref_nnz = 0
+        for fact in self.factors:
+            ref_nnz += np.count_nonzero(fact)
+        return ref_nnz
+
+    def testNnz(self):
+        print("testNnz()")
+        ref_nnz = self.faust_nnz()
+        self.assertEqual(ref_nnz, self.F.nnz())
+
+    def testDensity(self):
+        print("testDensity()")
+        ref_density = self.faust_nnz()/self.F.get_nb_cols()/self.F.get_nb_rows()
+        self.assertAlmostEqual(ref_density, self.F.density(), delta=.001)
+
+    def testRcg(self):
+        print("testRcg()")
+        ref_rcg = self.F.get_nb_rows()*self.F.get_nb_cols()/self.faust_nnz()
+        self.assertAlmostEqual(ref_rcg, self.F.RCG(), delta=.001)
+
+
+    def mulFactors(self):
+        n = self.factors[0].shape[0]
+        prod = np.eye(n,n)
+        for factor in self.factors:
+            prod = prod.dot(factor)
+        return prod
+
+    def assertProdEq(self, prod, test_prod):
+        self.assertEqual(prod.shape, test_prod.shape)
+        for i in range(0, prod.shape[0]):
+            for j in range(0, prod.shape[1]):
+                #print(self.F[i,j][0],prod[i,j])
+                if(prod[i,j] != 0):
+                    self.assertLessEqual((test_prod[i,j]-prod[i,j])/prod[i,j],10**-6)
+
+
+    def testGetItem(self):
+        print("testGetItem()")
+        n = self.factors[0].shape[0]
+        prod = self.mulFactors()
+        test_prod = self.F[::,::]
+        self.assertProdEq(prod, test_prod)
+        # test one random element
+        rand_i, rand_j = self.r.randint(0,self.F.get_nb_rows()-1),self.r.randint(0,self.F.get_nb_cols()-1)
+        if(prod[rand_i,rand_j] != 0):
+            self.assertLessEqual(abs(self.F[rand_i,rand_j][0]-prod[rand_i,rand_j])/abs(prod[rand_i,rand_j]),
+                                 10**-6, msg=("compared values are (ref,rest) ="
+                                              +str(prod[rand_i,rand_j])+str(prod[rand_i,rand_j])))
+        # test one random row
+        rand_i = self.r.randint(0,self.F.get_nb_rows()-1)
+        row = self.F[rand_i,...]
+        for j in range(0,self.F.get_nb_cols()):
+            if(row[j] == 0):
+                self.assertEqual(prod[rand_i,j], 0)
+            else:
+                self.assertLessEqual(abs(row[j]-(prod[rand_i,j]))/prod[rand_i,j],10**-6)
+        # test one random col
+        rand_j = self.r.randint(0,self.F.get_nb_cols()-1)
+        col = self.F[..., rand_j]
+        for i in range(0,self.F.get_nb_rows()):
+            if(col[i] == 0):
+                self.assertEqual(prod[i, rand_j], 0)
+            else:
+                self.assertLessEqual(abs(col[i]-(prod[i,rand_j]))/prod[i,rand_j],10**-6)
+
+    def testToDense(self):
+        print("testToDense()")
+        prod = self.mulFactors()
+        test_prod = self.F.todense()
+        self.assertProdEq(prod, test_prod)
+        #self.assertTrue((self.F.todense() == prod).all())
+
+
+    def testMul(self):
+        print("testMul()")
+        rmat = np.random.rand(self.F.get_nb_cols(),
+                              self.r.randint(1,1000))
+        prod = self.mulFactors()*rmat
+        test_prod = self.F*rmat
+        self.assertProdEq(prod, test_prod)
+
+
+    def testTranspose(self):
+        print("testTranspose()")
+        tF = self.F.transpose().todense()
+        F = self.F.todense() # to avoid slowness
+        for i in range(0, tF.shape[0]):
+            for j in range(0, tF.shape[1]):
+                if(F[j,i] != 0):
+                    self.assertLessEqual(abs(tF[i,j]-F[j,i])/abs(F[j,i]), 10**-3)
+                else:
+                    self.assertEqual(tF[i,j],0)
+
+    def testSize(self):
+        print("testSize()")
+        self.assertEqual((self.F.get_nb_rows(),self.F.get_nb_cols()), self.F.size())
 
 
 if __name__ == "__main__":
