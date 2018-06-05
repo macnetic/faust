@@ -200,8 +200,8 @@ void FaustCoreCpp<FPP>::get_fact(unsigned int& i, FPP* fact_ptr) const
 }
 
 template<typename FPP>
-void FaustCoreCpp<FPP>::save_mat_file(const char* filepath) const
+void FaustCoreCpp<FPP>::save_mat_file(const char* filepath, bool transpose_flag) const
 {
 //    std::cout << "FaustCoreCpp::save_mat_file()" << std::endl;
-    this->transform.save_mat_file(filepath);
+    this->transform.save_mat_file(filepath, transpose_flag);
 }

@@ -250,7 +250,7 @@ namespace Faust
 	//! M = (*this) * M if opThis='N'
 	// M = (*this)' * M if opThis='T' 
 	void multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const;
-	matvar_t* toMatIOVar() const;
+	matvar_t* toMatIOVar(bool transpose) const;
         //! Destructor
         ~MatSparse(){/*std::cout<<"destructor MatSparse"<<std::endl;*//*this->mat.resize(0,0);*/}
 

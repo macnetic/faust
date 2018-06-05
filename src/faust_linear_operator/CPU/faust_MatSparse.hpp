@@ -563,13 +563,13 @@ void Faust::MatSparse<FPP,Cpu>::init_from_file(const char* filename)
 }
 
 template<typename FPP>
-matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar() const
+matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose) const
 {
 	matvar_t *var = NULL; //TODO: should be nullptr in C++11
 	Faust::MatDense<FPP,Cpu> dense_factor;
 	//TODO: shouldn't be processed as dense factor, we lose compression of sparse matrix here
 	dense_factor = (*this); //data is copied with operator = redef.
-	var = dense_factor.toMatIOVar();
+	var = dense_factor.toMatIOVar(transpose);
 	return var;
 }
 

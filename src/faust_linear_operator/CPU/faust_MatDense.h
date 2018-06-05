@@ -374,7 +374,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! All the other line contains one coefficient in ColMajor access of the MatDense
         void print_file(const char* filename)const;
 
-		matvar_t* toMatIOVar() const;
+		matvar_t* toMatIOVar(bool transpose) const;
 
         void operator=(MatDense<FPP,Cpu> const& A);
 

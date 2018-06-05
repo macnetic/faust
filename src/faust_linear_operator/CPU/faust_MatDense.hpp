@@ -51,7 +51,7 @@
 #include <Eigen/SparseCore>
 #include "faust_exception.h"
 #include "faust_constant.h"
-
+#include <cassert>
 #ifdef __GEMM_WITH_OPENBLAS__
 	#include "faust_cblas_algebra.h"
 #endif
@@ -690,12 +690,25 @@ t_print_file.stop();
 }
 
 template<typename FPP>
-matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar() const
+matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose) const
 {
 	matvar_t *var = NULL; //TODO: should be nullptr in C++11
-	size_t dims[2] = {this->getNbRow(), this->getNbCol()};
-	//we don't copy the data again, we use it directly (row-major order organized)
-	var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat.data(), 0);
+	size_t dims[2];
+	if(transpose)
+	{
+		dims[0] = this->getNbCol();
+		dims[1] = this->getNbRow();
+		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_copy(mat.transpose().eval());
+//		mat_copy.transposeInPlace(); //undo the transposition
+		var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat_copy.data() /*mat.transpose().eval().data() //  doesn't work so we copy above */, 0);
+	}
+	else
+	{
+		dims[0] = this->getNbRow();
+		dims[1] = this->getNbCol();
+		var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat.data(), 0);
+	}
+	//we don't copy the data again, we use it directly (col-major order organized)
 	return var;
 }
 

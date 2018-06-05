@@ -192,6 +192,10 @@ class Faust:
         """
         Gives the number of non-zero elements in the Faust.
 
+        The function sums together the number of non-zeros elements of
+        each factor and returns the result. Note that in fact the sum is
+        computed at Faust creation time and kept in cache.
+
         Returns:
             The number of non-zero elements as an integer.
 
@@ -313,4 +317,4 @@ class Faust:
         if(format not in ["Matlab"]):
             raise ValueError("Only Matlab or Matlab_core format is supported.")
         if(format == "Matlab"):
-            F.m_faust.save_mat_file(filepath)
+            F.m_faust.save_mat_file(filepath, F.m_transpose_flag)

@@ -473,9 +473,9 @@ classdef Faust
 			%
 			%  save(F,filename) saves the Faust F into the .mat file specified by filename.
 			if(F.isReal)
-				mexFaustReal('save', F.matrix.objectHandle, filename)
+				mexFaustReal('save', F.matrix.objectHandle, filename, F.transpose_flag)
 			else
-				mexFaustCplx('save', F.matrix.objectHandle, filename)
+				mexFaustCplx('save', F.matrix.objectHandle, filename, F.transpose_flag)
 			end
 		end
 

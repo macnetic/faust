@@ -134,9 +134,10 @@ namespace Faust
 				/**
 				 *	\brief Writes the FAuST into a Matlab file. The product is written as a cell array with the matrix factors as elements.
 				 *	\arg \c filename The filepath to the output file (preferably with a .mat suffix).
+				 *	\arg \c transpose The boolean to set to true if you want to save the transpose Faust of this instance or false otherwise.
 				 *	\throw std::logic_error if any problem occurs.
 				 */ 
-				void save_mat_file(const char* filename) const;
+				void save_mat_file(const char* filename, bool transpose) const;
 				long long int get_total_nnz()const{return totalNonZeros;}
 				void clear(){data.resize(0);totalNonZeros=0;}
 

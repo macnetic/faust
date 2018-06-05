@@ -196,12 +196,12 @@ cdef class FaustCore:
         self.m_faust.get_fact(i, &fact_view[0, 0])
         return fact
 
-    def save_mat_file(self,filepath):
+    def save_mat_file(self,filepath, transpose_flag):
         cdef char * cfilepath = <char*> PyMem_Malloc(sizeof(char) *
                                                      (len(filepath)+1))
         fparr = bytearray(filepath, "UTF-8");
         for i in range(0,len(filepath)):
             cfilepath[i] = fparr[i]
         cfilepath[i+1] = 0
-        self.m_faust.save_mat_file(cfilepath)
+        self.m_faust.save_mat_file(cfilepath, transpose_flag)
         PyMem_Free(cfilepath)

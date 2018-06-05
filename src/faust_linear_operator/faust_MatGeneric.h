@@ -139,9 +139,10 @@ namespace Faust
 	virtual void Display() const=0;
 	
 	//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio.
+	// \param transpose : set to true to obtain the matio variable for the transpose Matrix.
 	// \return The matio variable matvar_t if it succeeded or nullptr otherwise.
 	// \see Faust::Transform::save_mat_file()
-	virtual matvar_t* toMatIOVar() const=0;
+	virtual matvar_t* toMatIOVar(bool transpose) const=0;
 
 	//! \brief 
 	//! \warning : declare a virtual destructor is mandatory for an abstract class

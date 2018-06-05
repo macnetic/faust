@@ -12,21 +12,23 @@ import math
 class TestFaustPy(unittest.TestCase):
 
     MAX_NUM_FACTORS = 64  # for the tested Faust
+    MAX_DIM_SIZE = 1000
 
     def setUp(self):
         """ Initializes the tests objects """
         r = random.Random()  # initialized from time or system
         num_factors = r.randint(1, TestFaustPy.MAX_NUM_FACTORS)
         factors = []
-        d2 = r.randint(1, 1000)
+        d2 = r.randint(1, TestFaustPy.MAX_DIM_SIZE)
         for i in range(0, num_factors):
-            d1, d2 = d2, r.randint(1, 1000)
+            d1, d2 = d2, r.randint(1, TestFaustPy.MAX_DIM_SIZE)
             factors += [sparse.random(d1, d2, density=0.1, format='csr',
                         dtype=np.float64).todense()]
         self.F = Faust(factors)
         self.factors = factors
         print("Tests on random Faust with dims=", self.F.get_nb_rows(),
               self.F.get_nb_cols())
+        print("Num. factors:", num_factors)
         self.r = r
 
     def testSave(self):
@@ -161,7 +163,7 @@ class TestFaustPy(unittest.TestCase):
     def testMul(self):
         print("testMul()")
         rmat = np.random.rand(self.F.get_nb_cols(),
-                              self.r.randint(1,1000))
+                              self.r.randint(1,TestFaustPy.MAX_DIM_SIZE))
         prod = self.mulFactors()*rmat
         test_prod = self.F*rmat
         self.assertProdEq(prod, test_prod)
@@ -177,6 +179,28 @@ class TestFaustPy(unittest.TestCase):
                     self.assertLessEqual(abs(tF[i,j]-F[j,i])/abs(F[j,i]), 10**-3)
                 else:
                     self.assertEqual(tF[i,j],0)
+        tmp_dir = tempfile.gettempdir()+os.sep
+        rand_suffix = random.Random().randint(1,1000)
+        test_file = tmp_dir+"A"+str(rand_suffix)+".mat"
+        ref_file = tmp_dir+"A"+str(rand_suffix)+"o.mat"
+        self.F.transpose().save(test_file)
+        self.F.save(ref_file)
+        #print("file=",test_file)
+        tF2 = Faust(test_file)
+        #print(tF2.get_nb_rows(), tF2.get_nb_cols())
+        #print(self.F.get_nb_rows(), self.F.get_nb_cols())
+        self.assertEqual(tF2.get_nb_cols(), tF.shape[1])
+        self.assertEqual(tF2.get_nb_rows(), tF.shape[0])
+        tF2 = tF2.todense()
+        for i in range(0, tF.shape[0]):
+            for j in range(0, tF.shape[1]):
+                if(F[j,i] != 0):
+                    self.assertLessEqual(abs(tF2[i,j]-F[j,i])/abs(F[j,i]),
+                                         10**-12)
+                else:
+                    self.assertEqual(tF2[i,j],0)
+        os.remove(test_file)
+        os.remove(ref_file)
 
     def testSize(self):
         print("testSize()")

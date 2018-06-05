@@ -248,16 +248,18 @@ void Faust::Transform<FPP,Cpu>::print_file(const char* filename) const
 }
 
 template<typename FPP>
-void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename) const
+void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename, bool transpose) const
 {
 	// save the FAuST as a matlab cell array (respecting what is done in matlab wrapper)
 	matvar_t *faust_matvar;
 	size_t dims[2];
-	int i, ret;
+	int i, i2, ret;
 	mat_t *matfp;
 	matvar_t **faust_factor_matvars = new matvar_t*[size()];
 	for(i=0; i < size(); i++){
-		faust_factor_matvars[i] = data[i]->toMatIOVar();
+		// revert factors order if we are in transpose case
+		i2 = transpose?size()-i-1:i;
+		faust_factor_matvars[i] = data[i2]->toMatIOVar(transpose);
 		if(faust_factor_matvars[i] == NULL)
 			handleError("Faust::Transform", "Failed to create i-th factor MatIO variable");
 	}

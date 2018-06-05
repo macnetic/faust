@@ -69,7 +69,7 @@ class FaustCoreCpp
     unsigned int get_fact_nb_rows(unsigned int& i) const;
     unsigned int get_fact_nb_cols(unsigned int& i) const;
     void get_fact(unsigned int& i, FPP* fact_ptr) const;
-    void save_mat_file(const char* filepath) const;
+    void save_mat_file(const char* filepath, bool transpose_flag) const;
     private :
     Faust::Transform<FPP,Cpu> transform;
 };
