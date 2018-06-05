@@ -689,26 +689,52 @@ t_print_file.stop();
 #endif
 }
 
+
 template<typename FPP>
 matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose) const
 {
 	matvar_t *var = NULL; //TODO: should be nullptr in C++11
 	size_t dims[2];
+	int opt = typeid(mat(0,0))==typeid(complex<double>(1.0,1.0))?MAT_F_COMPLEX:0;
+	mat_complex_split_t z = {NULL,NULL};
+	//
 	if(transpose)
 	{
 		dims[0] = this->getNbCol();
 		dims[1] = this->getNbRow();
-		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_copy(mat.transpose().eval());
-//		mat_copy.transposeInPlace(); //undo the transposition
-		var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat_copy.data() /*mat.transpose().eval().data() //  doesn't work so we copy above */, 0);
+		if(!opt){
+			Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_copy(mat.transpose().eval());
+			//		mat_copy.transposeInPlace(); //undoing the transposition
+			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat_copy.data() /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+		}
+		else {
+			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
+			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_im(mat.rows(), mat.cols());
+			dst_re = mat.real()/*.transpose()*/.template cast<double>();
+			dst_im = mat.imag()/*.transpose()*/.template cast<double>();
+			dst_re.transposeInPlace();
+			dst_im.transposeInPlace();
+			z.Re = dst_re.data();
+			z.Im = dst_im.data();
+			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+		}
 	}
 	else
 	{
 		dims[0] = this->getNbRow();
 		dims[1] = this->getNbCol();
-		var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat.data(), 0);
+		if(!opt) //we don't copy the data again, we use it directly (col-major order organized)  
+			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat.data(), opt);
+		else {
+			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
+			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_im(mat.rows(), mat.cols());
+			dst_re = mat.real().template cast<double>();
+			dst_im = mat.imag().template cast<double>();
+			z.Re = dst_re.data();
+			z.Im = dst_im.data();
+			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+		}
 	}
-	//we don't copy the data again, we use it directly (col-major order organized)
 	return var;
 }
 

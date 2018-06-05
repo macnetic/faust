@@ -597,8 +597,13 @@ if (dim1_trans_faust_loaded ~= dim2) | (dim2_trans_faust_loaded ~= dim1)
 end
 
 F_dense_trans_loaded=full(F_trans_loaded);
-if (~isequal(F_dense_trans_loaded,F_dense'))
-	error(['save transposed : invalid faust']);
+if (~isequal(F_dense_trans_loaded,F_dense.'))
+    disp('F_dense_trans_loaded')
+    F_dense_trans_loaded
+    disp('F_dense_trans=')
+    F_dense.'
+    disp(F_dense_trans_loaded==F_dense.')
+    error(['save transposed : invalid faust']);
 end
 
 
