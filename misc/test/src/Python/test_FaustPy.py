@@ -11,8 +11,8 @@ import math
 
 class TestFaustPy(unittest.TestCase):
 
-    MAX_NUM_FACTORS = 64  # for the tested Faust
-    MAX_DIM_SIZE = 1000
+    MAX_NUM_FACTORS = 32  # for the tested Faust
+    MAX_DIM_SIZE = 512
 
     def setUp(self):
         """ Initializes the tests objects """
@@ -77,7 +77,7 @@ class TestFaustPy(unittest.TestCase):
 
     def testNorm2(self):
         print("testNorm2()")
-        ref_norm = norm(self.F.todense())
+        ref_norm = norm(self.mulFactors())
         test_norm = self.F.norm(2)
         # print("ref_norm=", ref_norm, "test_norm=", test_norm)
         # TODO: remove this workaround when the supposed bug will be corrected in core lib
@@ -126,8 +126,11 @@ class TestFaustPy(unittest.TestCase):
     def testGetItem(self):
         print("testGetItem()")
         n = self.factors[0].shape[0]
+        # test whole array
         prod = self.mulFactors()
         test_prod = self.F[::,::]
+        self.assertProdEq(prod, test_prod)
+        test_prod = self.F[...,...]
         self.assertProdEq(prod, test_prod)
         # test one random element
         rand_i, rand_j = self.r.randint(0,self.F.get_nb_rows()-1),self.r.randint(0,self.F.get_nb_cols()-1)
