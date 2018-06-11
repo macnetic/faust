@@ -44,14 +44,16 @@ cdef extern from "FaustCoreCpp.h" :
         FaustCoreCpp();
         void Display() const;
         void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol);
-        void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose);
+        void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,
+                      int nbrow_x, int nbcol_x);#,bool isTranspose*/);
         unsigned int getNbRow() const;
         unsigned int getNbCol() const;
-        void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
+#        void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
         unsigned long long nnz() const;
         double norm() const;
         double get_nb_factors() const;
         unsigned int get_fact_nb_rows(unsigned int& i) const;
         unsigned int get_fact_nb_cols(unsigned int& i) const;
         double get_fact(unsigned int& i, FPP* fact_ptr) const;
-        void save_mat_file(const char* filepath, bool transpose_flag) const;
+        void save_mat_file(const char* filepath) const;
+        FaustCoreCpp[FPP]* transpose();

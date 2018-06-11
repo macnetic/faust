@@ -47,8 +47,8 @@ class TestFaustPy(unittest.TestCase):
             mdict['faust_factors'][0, i] = self.F.get_factor(i)
         savemat(ref_file, mdict)
         # open the two saved files and compare the fausts
-        F_test = Faust(test_file)
-        F_ref = Faust(ref_file)
+        F_test = Faust(filepath=test_file)
+        F_ref = Faust(filepath=ref_file)
         # print("self.F.get_nb_factors()=", self.F.get_nb_factors())
         self.assertEqual(F_test.get_nb_factors(), F_ref.get_nb_factors())
         for i in range(0, F_ref.get_nb_factors()):
@@ -174,7 +174,10 @@ class TestFaustPy(unittest.TestCase):
 
     def testTranspose(self):
         print("testTranspose()")
-        tF = self.F.transpose().todense()
+        tFaust = self.F.transpose()
+        tF = tFaust.todense()
+        del tFaust # just to test weak reference of underlying Faust::Transform
+        # works (otherwise it should crash with core dump later)
         F = self.F.todense() # to avoid slowness
         for i in range(0, tF.shape[0]):
             for j in range(0, tF.shape[1]):
@@ -189,7 +192,7 @@ class TestFaustPy(unittest.TestCase):
         self.F.transpose().save(test_file)
         self.F.save(ref_file)
         #print("file=",test_file)
-        tF2 = Faust(test_file)
+        tF2 = Faust(filepath=test_file)
         #print(tF2.get_nb_rows(), tF2.get_nb_cols())
         #print(self.F.get_nb_rows(), self.F.get_nb_cols())
         self.assertEqual(tF2.get_nb_cols(), tF.shape[1])

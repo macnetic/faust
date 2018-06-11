@@ -40,7 +40,7 @@
 # importer le module Cython faisant le lien avec la class C++
 cimport FaustCoreCy
 
-import numpy as np 
+import numpy as np
 cimport numpy as np
 import copy
 
@@ -53,30 +53,36 @@ cdef class FaustCore:
 
     #### ATTRIBUTE ########
     # classe Cython
-    cdef FaustCoreCy.FaustCoreCpp[double] m_faust
+    cdef FaustCoreCy.FaustCoreCpp[double]* m_faust
 
 
     #### CONSTRUCTOR ####
     #def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
-    def  __cinit__(self,list_factors):
+    def  __cinit__(self,list_factors=None, core=False):
         #print 'inside cinit'
-        self.m_faust = FaustCoreCy.FaustCoreCpp[double]();
+        #self.m_faust = FaustCoreCy.FaustCoreCpp[double]();
         cdef double [:,:] data
         cdef unsigned int nbrow
         cdef unsigned int nbcol
-        #print 'longueur list'
-        #print len(list_factors)
-        #print 'avant boucle'
-        for factor in list_factors:
-            data=factor.astype(float,'F');
-            nbrow=factor.shape[0];
-            nbcol=factor.shape[1];
-            #	print nbrow
-            #	print nbcol
-            self.m_faust.push_back(&data[0,0],nbrow,nbcol);
-            #print(self.__dict__)
-            #print 'apres boucle'
-
+        if(list_factors is not None):
+            #print 'longueur list'
+            #print len(list_factors)
+            #print 'avant boucle'
+            self.m_faust = new FaustCoreCy.FaustCoreCpp[double]()
+            for factor in list_factors:
+                data=factor.astype(float,'F');
+                nbrow=factor.shape[0];
+                nbcol=factor.shape[1];
+                #	print nbrow
+                #	print nbcol
+                self.m_faust.push_back(&data[0,0],nbrow,nbcol);
+                #print(self.__dict__)
+                #print 'apres boucle'
+        elif(core): # trick to initialize a new FaustCoreCpp from C++ (see
+        # transpose)
+            pass
+        #else:
+        #TODO: raise error for undefined object here
 
 
     #### METHOD ####
@@ -90,10 +96,11 @@ cdef class FaustCore:
     #~ 		return dim2
 
 
-    def shape(self,transpose_flag=False):
+    def shape(self):
         cdef unsigned int nbrow = 0
         cdef unsigned int nbcol = 0
-        self.m_faust.setOp(transpose_flag,nbrow,nbcol)
+        nbrow = self.m_faust.getNbRow();
+        nbcol = self.m_faust.getNbCol();
         return (nbrow,nbcol)
 
 
@@ -111,7 +118,7 @@ cdef class FaustCore:
 
     # Left-Multiplication by a Faust F
     # y=multiply(F,M) is equivalent to y=F*M
-    def multiply(self,M,transpose_flag):
+    def multiply(self,M):
         if not isinstance(M, (np.ndarray) ):
             raise ValueError('input M must a numpy ndarray')
         #transform into float F continous  matrix
@@ -129,7 +136,7 @@ cdef class FaustCore:
         cdef unsigned int nbrow_x=M.shape[0]
         cdef unsigned int nbcol_x #can't be assigned because we don't know yet if the input vector is 1D or 2D
 
-        dimThis=self.shape(transpose_flag)
+        dimThis=self.shape()
         cdef unsigned int nbRowThis=dimThis[0];
         cdef unsigned int nbColThis=dimThis[1];
 
@@ -156,18 +163,16 @@ cdef class FaustCore:
         cdef y = np.zeros([nbrow_y,nbcol_y], dtype='d',order='F')
         cdef double[:,:] yview=y
         if ndim_M == 1:
-            self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x,transpose_flag);
+            self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x)
         else:
-            self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x,transpose_flag);
+            self.m_faust.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x)
 
         return y
 
 
 
     # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)	
-    def display(self,transpose_flag):
-        print("Struct : ")
-        print("Faust transposition " + str(transpose_flag))
+    def display(self):
         self.m_faust.Display();
 
     def nnz(self):
@@ -196,12 +201,20 @@ cdef class FaustCore:
         self.m_faust.get_fact(i, &fact_view[0, 0])
         return fact
 
-    def save_mat_file(self,filepath, transpose_flag):
+    def save_mat_file(self,filepath):
         cdef char * cfilepath = <char*> PyMem_Malloc(sizeof(char) *
                                                      (len(filepath)+1))
         fparr = bytearray(filepath, "UTF-8");
         for i in range(0,len(filepath)):
             cfilepath[i] = fparr[i]
         cfilepath[i+1] = 0
-        self.m_faust.save_mat_file(cfilepath, transpose_flag)
+        self.m_faust.save_mat_file(cfilepath)
         PyMem_Free(cfilepath)
+
+    def transpose(self):
+        core = FaustCore(core=True)
+        core.m_faust = self.m_faust.transpose()
+        return core
+
+    def __dealloc__(self):
+       del self.m_faust

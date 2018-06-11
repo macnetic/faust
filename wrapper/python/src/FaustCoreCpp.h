@@ -47,31 +47,32 @@
 
 //#include "faust_transform.h"
 #include "faust_MatDense.h"
-
+#include "faust_TransformHelper.h"
 
 template<typename FPP>
-class FaustCoreCpp 
+class FaustCoreCpp
 {
-    
+
     public :
-    
-    
-    FaustCoreCpp(): transform(){} 
-    void Display() const { transform.Display();}
+
+
+    //FaustCoreCpp(): transform(){}
+    void Display() const { transform.display();}
     void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol);
-    unsigned int getNbRow() const{return transform.getNbRow();}
-    unsigned int getNbCol() const{return transform.getNbCol();}
-    void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose)const;
-    void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
+    unsigned int getNbRow() const;
+    unsigned int getNbCol() const;
+    void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x/*,bool isTranspose*/)const;
+//    void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
     unsigned long long nnz()const;
-    double norm() const; 
+    double norm() const;
     double get_nb_factors() const;
     unsigned int get_fact_nb_rows(unsigned int& i) const;
     unsigned int get_fact_nb_cols(unsigned int& i) const;
     void get_fact(unsigned int& i, FPP* fact_ptr) const;
-    void save_mat_file(const char* filepath, bool transpose_flag) const;
+    void save_mat_file(const char* filepath) const;
+    FaustCoreCpp<FPP>* transpose();
     private :
-    Faust::Transform<FPP,Cpu> transform;
+    Faust::TransformHelper<FPP,Cpu> transform;
 };
 
 #include "FaustCoreCpp.hpp"

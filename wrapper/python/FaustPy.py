@@ -54,19 +54,23 @@ class Faust:
     matrix.
     """
 
-    def  __init__(F,list_factors):
+    def  __init__(F, list_factors=None, filepath=None, core_obj=None):
         """ Creates a Faust from a list of factors or a file.
 
         Args:
             list_factors : list/tuple of numpy matrices or filepath of the Faust in
         matlab binary format (.mat).
         """
-        if(isinstance(list_factors, str)):
-            contents = loadmat(list_factors)
-            list_factors = contents['faust_factors'][0]
-        F.m_faust = FaustCorePy.FaustCore(list_factors);
-        F.m_transpose_flag=0;
-        F.shape=F.m_faust.shape(F.m_transpose_flag)
+        if(core_obj):
+            F.m_faust = core_obj
+        else:
+            if(filepath and isinstance(filepath, str)):
+                    contents = loadmat(filepath)
+                    list_factors = contents['faust_factors'][0]
+            if(list_factors is not None):
+                F.m_faust = FaustCorePy.FaustCore(list_factors);
+            #else:
+                #TODO: manage empty Faust
 
 
     def get_nb_rows(F):
@@ -76,7 +80,7 @@ class Faust:
         Returns:
                 The Faust number of rows.
         """
-        return F.shape[0]
+        return F.m_faust.shape()[0]
 
     def get_nb_cols(F):
         """
@@ -85,7 +89,7 @@ class Faust:
         Returns:
                 The Faust number of columns.
         """
-        return F.shape[1]
+        return F.m_faust.shape()[1]
 
     def size(F):
         """
@@ -94,23 +98,21 @@ class Faust:
         Returns:
             The Faust size tuple: get_nb_rows(), get_nb_cols().
         """
-        return F.shape[0], F.shape[1]
+        #return F.shape[0], F.shape[1]
+        return F.m_faust.shape()
 
     def transpose(F):
         """
         Transposes the current Faust.
         """
-        F_trans=copy.copy(F)
-        F_trans.m_transpose_flag=not (F.m_transpose_flag)
-        F_trans.shape=(F.shape[1],F.shape[0])
-
+        F_trans = Faust(core_obj=F.m_faust.transpose())
         return F_trans
 
     def display(F):
         """
         Displays information describing the current Faust.
         """
-        F.m_faust.display(F.m_transpose_flag);
+        F.m_faust.display()
 
     def __mul__(F, M):
         """
@@ -135,7 +137,7 @@ class Faust:
             >>> x = np.random.randint(120, size=(F.get_nb_cols(), 1))
             >>> y = F*x
         """
-        return F.m_faust.multiply(M, F.m_transpose_flag)
+        return F.m_faust.multiply(M)
 
     def todense(F):
         """
@@ -214,7 +216,8 @@ class Faust:
         Examples:
             >>> F.density()
         """
-        return float(F.nnz())/(F.shape[0]*F.shape[1])
+        #return float(F.nnz())/(F.shape[0]*F.shape[1])
+        return float(F.nnz()/(F.get_nb_cols()*F.get_nb_rows()))
 
     def RCG(F):
         """
@@ -289,11 +292,7 @@ class Faust:
         Examples:
             >>> F.get_factor(0)
         """
-        if(F.m_transpose_flag):
-            i = F.get_nb_factors()-1-i
         fact = F.m_faust.get_fact(i)
-        if(F.m_transpose_flag):
-            fact = np.transpose(fact)
         return fact
 
     def save(F, filepath, format="Matlab"):
@@ -317,4 +316,4 @@ class Faust:
         if(format not in ["Matlab"]):
             raise ValueError("Only Matlab or Matlab_core format is supported.")
         if(format == "Matlab"):
-            F.m_faust.save_mat_file(filepath, F.m_transpose_flag)
+            F.m_faust.save_mat_file(filepath)

@@ -174,7 +174,11 @@ namespace Faust
 				void scalarMultiply(const FPP scalar);
 				float getRCG() const{return ((float)(getNbRow()*getNbCol()))/((float) get_total_nnz());}
 				double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
-				~Transform(){for (int i=0;i<data.size();i++) delete data[i];}
+				~Transform(){ 
+#ifdef FAUST_VERBOSE
+					std::cout << "~Transform()" << std::endl;
+#endif
+					for (int i=0;i<data.size();i++) delete data[i];}
 
 
 				/*!
@@ -208,7 +212,6 @@ namespace Faust
 #ifdef __COMPILE_TIMERS__
 				void print_timers() const;
 #endif
-
 
 
 

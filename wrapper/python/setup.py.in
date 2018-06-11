@@ -52,6 +52,7 @@ PyFaust = Extension(
 		     
     library_dirs=[@FAUST_PYTHON_LIB_DIR@],
     libraries=['faust'@FAUST_PYTHON_LIB@,'matio'],
+    extra_compile_args = [ "-std=c++11"]
 )
 
 setup(

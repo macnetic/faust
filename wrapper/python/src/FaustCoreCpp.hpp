@@ -46,81 +46,79 @@
 #include <iostream>
 #include <exception>
 
-template<typename FPP>
+    template<typename FPP>
 void FaustCoreCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbcol)
 {
-	Faust::MatDense<FPP,Cpu> dense_mat(valueMat,nbrow,nbcol);
-	Faust::MatSparse<FPP,Cpu> sparse_mat(dense_mat);
-	//sparse_mat.Display();
-	this->transform.push_back(&sparse_mat);
-	
-	
-	
-	
+    Faust::MatDense<FPP,Cpu> dense_mat(valueMat,nbrow,nbcol);
+    Faust::MatSparse<FPP,Cpu> sparse_mat(dense_mat);
+    //sparse_mat.Display();
+    this->transform.push_back(&sparse_mat);
+
+
+
+
 }
 
 template<typename FPP>
-void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose)const
+void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x)const
 {
-	
-	
-	char op = 'N';
-	if (isTranspose)
-		op = 'T';
-
-	unsigned int nbRowThis,nbColThis;
-	
-	
-	this->setOp(isTranspose,nbRowThis,nbColThis);
 
 
-	if ( (nbrow_y != nbRowThis) | (nbrow_x != nbColThis) | (nbcol_y != nbcol_x) )
-	{	
-		std::cout<<"nbRowThis "<<nbRowThis<<" must be equal to nb row y  "<<nbrow_y<<std::endl;
-		std::cout<<"nbColThis "<<nbColThis<<" must be equal to nb row x  "<<nbrow_x<<std::endl;
-		std::cout<<"nbcol_y "<<nbcol_y<<" must be equal to nbcol_x  "<<nbcol_x<<std::endl;
-		handleError("FaustCpp"," multiply : invalid dimension");
-	}
-	if (nbcol_x == 1)
-	{
-		Faust::Vect<FPP,Cpu> X(nbrow_x,value_x);
-		Faust::Vect<FPP,Cpu> Y;
 
-		
-		Y = this->transform.multiply(X,op);
+    unsigned int nbRowThis,nbColThis;
 
-		memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y);
-	}else
-	{
-		Faust::MatDense<FPP,Cpu> X(value_x,nbrow_x,nbcol_x);
-		Faust::MatDense<FPP,Cpu> Y;
 
-		Y = this->transform.multiply(X,op);
+    nbRowThis = this->getNbRow();
+    nbColThis = this->getNbCol();
 
-		memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y*nbcol_y);
-	}
-	
-	
+    if ( (nbrow_y != nbRowThis) | (nbrow_x != nbColThis) | (nbcol_y != nbcol_x) )
+    {	
+        std::cout<<"nbRowThis "<<nbRowThis<<" must be equal to nb row y  "<<nbrow_y<<std::endl;
+        std::cout<<"nbColThis "<<nbColThis<<" must be equal to nb row x  "<<nbrow_x<<std::endl;
+        std::cout<<"nbcol_y "<<nbcol_y<<" must be equal to nbcol_x  "<<nbcol_x<<std::endl;
+        handleError("FaustCpp"," multiply : invalid dimension");
+    }
+    if (nbcol_x == 1)
+    {
+        Faust::Vect<FPP,Cpu> X(nbrow_x,value_x);
+        Faust::Vect<FPP,Cpu> Y;
+
+
+        Y = this->transform.multiply(X);
+
+        memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y);
+    }else
+    {
+        Faust::MatDense<FPP,Cpu> X(value_x,nbrow_x,nbcol_x);
+        Faust::MatDense<FPP,Cpu> Y;
+
+        Y = this->transform.multiply(X);
+
+
+        memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y*nbcol_y);
+    }
+
+
 }
 
 
-template<typename FPP>
-void FaustCoreCpp<FPP>::setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const
-{
-	char trans_flag('N');
-	if (isTransposed)
-		trans_flag='T';
-
-	faust_unsigned_int nb_row,nb_col;
-	this->transform.setOp(trans_flag,nb_row,nb_col);
-	nbRowOp=(unsigned int) nb_row;
-	nbColOp=(unsigned int) nb_col;
-	
-
-
-
-
-}
+//template<typename FPP>
+//void FaustCoreCpp<FPP>::setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const
+//{
+//	char trans_flag('N');
+//	if (isTransposed)
+//		trans_flag='T';
+//
+//	faust_unsigned_int nb_row,nb_col;
+//	this->transform.setOp(trans_flag,nb_row,nb_col);
+//	nbRowOp=(unsigned int) nb_row;
+//	nbColOp=(unsigned int) nb_col;
+//	
+//
+//
+//
+//
+//}
 
 
 
@@ -150,58 +148,57 @@ double FaustCoreCpp<FPP>::get_nb_factors() const
 template<typename FPP>
 unsigned int FaustCoreCpp<FPP>::get_fact_nb_rows(unsigned int& i) const
 {
-    Faust::MatGeneric<FPP,Cpu>* const factor_generic = this->transform.get_fact(i);
-    unsigned int nb_rows = factor_generic->getNbRow();
-    delete factor_generic;
+    Faust::MatDense<FPP,Cpu> factor_generic = this->transform.get_fact(i);
+    unsigned int nb_rows = factor_generic.getNbRow();
     return nb_rows;
 }
 
 template<typename FPP>
 unsigned int FaustCoreCpp<FPP>::get_fact_nb_cols(unsigned int& i) const
 {
-    Faust::MatGeneric<FPP,Cpu>* const factor_generic = this->transform.get_fact(i);
-    unsigned int nb_cols = factor_generic->getNbCol();
-    delete factor_generic;
+    Faust::MatDense<FPP,Cpu> factor_generic = this->transform.get_fact(i);
+    unsigned int nb_cols = factor_generic.getNbCol();
     return nb_cols;
 }
 
 template<typename FPP>
 void FaustCoreCpp<FPP>::get_fact(unsigned int& i, FPP* fact_ptr) const
 {
-    Faust::MatGeneric<FPP,Cpu>* const factor_generic = this->transform.get_fact(i);
-    Faust::MatDense<FPP,Cpu> dense_factor;
-
-    switch (factor_generic->getType())
-    {
-        case Dense :
-            {
-                Faust::MatDense<FPP,Cpu>* factor_dense_ptr = dynamic_cast<Faust::MatDense<FPP,Cpu>* > (factor_generic);
-                dense_factor = (*factor_dense_ptr);
-            }
-            break;
-
-        case Sparse :
-            {
-                Faust::MatSparse<FPP,Cpu>* factor_sparse_ptr = dynamic_cast<Faust::MatSparse<FPP,Cpu>* > (factor_generic);
-                dense_factor = (*factor_sparse_ptr);
-            }
-            break;
-
-        default:
-            throw std::runtime_error("get_fact : unknown type of the factor matrix.");
-    }
-
-
+    Faust::MatDense<FPP,Cpu> dense_factor = this->transform.get_fact(i);
+    //TODO: optimize here (we have two copies from C++ object to Py, the first in MatDense::Clone()
+    //the second here)
     memcpy(fact_ptr, dense_factor.getData(),
-            sizeof(FPP)*factor_generic->getNbCol()*factor_generic->getNbRow());
-
-    delete factor_generic;
+            sizeof(FPP)*dense_factor.getNbCol()*dense_factor.getNbRow());
 
 }
 
 template<typename FPP>
-void FaustCoreCpp<FPP>::save_mat_file(const char* filepath, bool transpose_flag) const
+void FaustCoreCpp<FPP>::save_mat_file(const char* filepath) const
 {
-//    std::cout << "FaustCoreCpp::save_mat_file()" << std::endl;
-    this->transform.save_mat_file(filepath, transpose_flag);
+    //    std::cout << "FaustCoreCpp::save_mat_file()" << std::endl;
+    this->transform.save_mat_file(filepath);
+}
+
+template<typename FPP>
+unsigned int FaustCoreCpp<FPP>::getNbRow() const
+{
+    return this->transform.getNbRow();
+}
+
+template<typename FPP>
+unsigned int FaustCoreCpp<FPP>::getNbCol() const
+{
+    return this->transform.getNbCol();
+}
+
+    template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::transpose()
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform.transpose();
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
+    core->transform = th;
+#ifdef FAUST_VERBOSE
+    std::cout << "FaustCoreCpp::transpose() th=" << th << "core=" << core << std::endl;
+#endif
+    return core;
 }

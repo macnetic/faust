@@ -67,7 +67,7 @@ list_factor[1]=list_factor_sparse[1].todense();
 A = FaustPy.Faust(list_factor)
 
 # get the size of the Faust
-print("dimension of the Faust : ", A.shape)
+print("dimension of the Faust : ", A.size())
 
 # transpose a Faust
 A_trans = A.transpose()
@@ -120,7 +120,7 @@ for i in range(0,A.get_nb_factors()):
 
 # test Faust saving
 A.save("A.mat")
-As = FaustPy.Faust("A.mat")
+As = FaustPy.Faust(filepath="A.mat")
 assert((A.get_factor(0) == As.get_factor(0)).all())
 assert((A.get_factor(1) == As.get_factor(1)).all())
 
