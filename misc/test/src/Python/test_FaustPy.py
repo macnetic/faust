@@ -30,6 +30,7 @@ class TestFaustPy(unittest.TestCase):
               self.F.get_nb_cols())
         print("Num. factors:", num_factors)
         self.r = r
+        self.num_factors = num_factors
 
     def testSave(self):
         print("testSave()")
@@ -211,6 +212,16 @@ class TestFaustPy(unittest.TestCase):
     def testSize(self):
         print("testSize()")
         self.assertEqual((self.F.get_nb_rows(),self.F.get_nb_cols()), self.F.size())
+
+    def testDelete(self):
+        print("Test del Faust")
+        tF = self.F.transpose()
+        F = self.F
+        del F
+        with self.assertRaises(UnboundLocalError):
+            print(F.size())
+        self.assertEqual(tF.size(), (self.factors[self.num_factors-1].shape[1],
+                                     self.factors[0].shape[0]))
 
 
 if __name__ == "__main__":

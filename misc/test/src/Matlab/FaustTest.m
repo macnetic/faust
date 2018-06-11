@@ -182,6 +182,15 @@ classdef FaustTest < matlab.unittest.TestCase
             disp('Test Faust.conj()')
             %TODO (when the funciton will be implemented)
         end
+
+        function testDelete(this)
+            disp('Test Faust.delete()')
+            tFaust = transpose(this.test_faust)
+            delete(this.test_faust)
+            this.verifyError(@() size(this.test_faust),'MATLAB:class:InvalidHandle')
+            this.verifyEqual(size(tFaust), [size(this.factors{this.num_factors},2), size(this.factors{1},1)])
+        end
+
     end
 
 	methods
