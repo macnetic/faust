@@ -577,7 +577,8 @@ end
 for i=1:nb_fact
 	A=get_fact(F_loaded,i);
 	if(~isequal(A,factors{i}))
-		error('get_fact : invalid factor');
+        get_fact(F,i)
+        error('get_fact : invalid factor');
 	end
 
 end
@@ -698,7 +699,84 @@ end
 
 disp('Ok');
 
+%% test conj
+disp('TEST CONJ : ');
+full(F)
+F_conj = conj(F)
+F_conj_full= full(F_conj)
+expected_F_conj_full = conj(full(F))
+[dim1,dim2]=size(expected_F_conj_full);
+[dim1_conj,dim2_conj]=size(F_conj_full);
 
+if((dim1_conj ~= dim1) | (dim2_conj ~= dim2))
+    dim1
+    dim2
+    dim1_conj
+    dim2_conj
+    error('full : invalid dimension');
+end
+if ( ~isequal(expected_F_conj_full,F_conj_full) )
+    expected_F_conj_full
+    F_conj_full
+    error(['conj test 1 failed.']);
+end
+% test get_fact on conj
+for i=1:nb_fact
+	A=get_fact(F_conj,i);
+	if(~isequal(A,conj(factors{i})))
+        get_fact(F_conj,i)
+		error('get_fact : invalid factor');
+	end
+end
+% test conj save
+save(conj(F),filename)
+saved_conj_F=full(Faust(filename))
+if ( ~isequal(saved_conj_F,F_conj_full))
+    saved_conj_F
+    F_conj_full
+    error(['conj test 3 failed.']);
+end
+disp('Ok');
+
+
+%% test ctranspose
+disp('TEST CTRANSPOSE : ');
+full(F)
+F_ctranspose = ctranspose(F)
+F_ctranspose_full= full(F_ctranspose)
+expected_F_ctranspose_full = ctranspose(full(F))
+[dim1,dim2]=size(expected_F_ctranspose_full);
+[dim1_ctranspose,dim2_ctranspose]=size(F_ctranspose_full);
+
+if((dim1_ctranspose ~= dim1) | (dim2_ctranspose ~= dim2))
+    dim1
+    dim2
+    dim1_ctranspose
+    dim2_ctranspose
+    error('full : invalid dimension');
+end
+if ( ~isequal(expected_F_ctranspose_full,F_ctranspose_full) )
+    expected_F_ctranspose_full
+    F_ctranspose_full
+    error(['ctranspose test 1 failed.']);
+end
+% test get_fact on ctranspose
+for i=1:nb_fact
+	A=get_fact(F_ctranspose,i)
+	if(~isequal(A,ctranspose(factors{nb_fact-i+1})))
+        get_fact(F_ctranspose,i)
+		error('get_fact : invalid factor');
+	end
+end
+% test ctranspose save
+save(ctranspose(F),filename)
+saved_ctranspose_F=full(Faust(filename))
+if ( ~isequal(saved_ctranspose_F,F_ctranspose_full))
+    saved_ctranspose_F
+    F_ctranspose_full
+    error(['ctranspose test 3 failed.']);
+end
+disp('Ok');
 
 
 

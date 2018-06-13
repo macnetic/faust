@@ -346,6 +346,9 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! \brief Transpose the MatDense
         void transpose();
 
+		//! \brief Replaces the matrix by its conjugate.
+		void conjugate();
+
         //! \brief Replace this by (this) * A
         void multiplyRight(MatDense<FPP,Cpu> const& A);
 
@@ -374,7 +377,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! All the other line contains one coefficient in ColMajor access of the MatDense
         void print_file(const char* filename)const;
 
-		matvar_t* toMatIOVar(bool transpose) const;
+		matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
 
         void operator=(MatDense<FPP,Cpu> const& A);
 

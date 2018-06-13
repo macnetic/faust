@@ -202,3 +202,27 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::transpose()
 #endif
     return core;
 }
+
+    template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::conjugate()
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform.conjugate();
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
+    core->transform = th;
+#ifdef FAUST_VERBOSE
+    std::cout << "FaustCoreCpp::conjugate() th=" << th << "core=" << core << std::endl;
+#endif
+    return core;
+}
+
+    template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::adjoint()
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform.adjoint();
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
+    core->transform = th;
+#ifdef FAUST_VERBOSE
+    std::cout << "FaustCoreCpp::adjoint() th=" << th << "core=" << core << std::endl;
+#endif
+    return core;
+}

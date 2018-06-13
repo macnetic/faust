@@ -2,14 +2,14 @@
 namespace Faust {
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_, const bool optimizedCopy) : is_transposed(false)
+		TransformHelper<FPP,Cpu>::TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_, const bool optimizedCopy) : is_transposed(false), is_conjugate(false)
 	{
 		Transform<FPP,Cpu>* transform = new Transform<FPP,Cpu>(facts, lambda_, optimizedCopy);
 		this->transform = make_shared<Transform<FPP,Cpu>>(facts, lambda_, optimizedCopy);
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false)
+		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false)
 	{
 		Transform<FPP,Cpu>* transform = new Transform<FPP,Cpu>();
 		this->transform = make_shared<Transform<FPP,Cpu>>();
@@ -34,13 +34,17 @@ namespace Faust {
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> A) const
 		{
-			return this->transform->multiply(A, isTransposed2char());
+			MatDense<FPP,Cpu> M = this->transform->multiply(A, isTransposed2char());
+			if(is_conjugate) M.conjugate();
+			return M;
 		}
 
 	template<typename FPP>
 		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> x) const
 		{
-			return this->transform->multiply(x, isTransposed2char());
+			Vect<FPP,Cpu> v = this->transform->multiply(x, isTransposed2char());
+			if(is_conjugate) v.conjugate();
+			return v;
 		}
 
 	template<typename FPP>
@@ -65,7 +69,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M)
 		{
-			this->transform->push_back(M);
+			this->transform->push_back(M, true, is_conjugate); //2nd argument is for opt. (transforming dense matrix in sparse if possible)
 		}
 
 	template<typename FPP>
@@ -131,18 +135,19 @@ namespace Faust {
 			}
 			delete factor_generic;
 			if(is_transposed) dense_factor.transpose();
+			if(is_conjugate) dense_factor.conjugate();
 			return dense_factor;
 		}
 
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product() const {
-			return this->transform->get_product(isTransposed2char());
+			return this->transform->get_product(isTransposed2char(), is_conjugate);
 		}
 
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::save_mat_file(const char* filename) const
 		{
-			this->transform->save_mat_file(filename, is_transposed);
+			this->transform->save_mat_file(filename, is_transposed, is_conjugate);
 		}
 
 	template<typename FPP>
@@ -158,9 +163,28 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::conjugate()
+		{
+			return new TransformHelper<FPP,Cpu>(this, false, true);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::adjoint()
+		{
+			return new TransformHelper<FPP,Cpu>(this, true, true);
+		}
+
+
+	template<typename FPP>
 		bool TransformHelper<FPP,Cpu>::isTransposed() const
 		{
 			return is_transposed;
+		}
+
+	template<typename FPP>
+		bool TransformHelper<FPP,Cpu>::isConjugate() const
+		{
+			return is_conjugate;
 		}
 
 	template<typename FPP>

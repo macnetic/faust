@@ -118,6 +118,7 @@ namespace Faust
         void scalarMultiply(FPP const scalar){vec *= scalar;}
 	template<typename FPP1>
 	void scalarMultiply(FPP1 const scalar){vec *= scalar;}
+		void conjugate();
         void normalize(){scalarMultiply(1/norm());}
 
 

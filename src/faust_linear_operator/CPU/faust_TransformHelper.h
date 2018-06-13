@@ -43,7 +43,10 @@ namespace Faust {
 			void save_mat_file(const char* filename) const;
 			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			TransformHelper<FPP,Cpu>* transpose();
+			TransformHelper<FPP,Cpu>* conjugate();
+			TransformHelper<FPP,Cpu>* adjoint();
 			bool isTransposed() const;
+			bool isConjugate() const;
 			const char isTransposed2char() const;
 			~TransformHelper();
 

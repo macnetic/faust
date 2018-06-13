@@ -71,6 +71,8 @@ class FaustCoreCpp
     void get_fact(unsigned int& i, FPP* fact_ptr) const;
     void save_mat_file(const char* filepath) const;
     FaustCoreCpp<FPP>* transpose();
+    FaustCoreCpp<FPP>* conjugate();
+    FaustCoreCpp<FPP>* adjoint();
     private :
     Faust::TransformHelper<FPP,Cpu> transform;
 };

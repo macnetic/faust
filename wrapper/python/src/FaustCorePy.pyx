@@ -216,5 +216,17 @@ cdef class FaustCore:
         core.m_faust = self.m_faust.transpose()
         return core
 
+    def conj(self):
+        core = FaustCore(core=True)
+        core.m_faust = self.m_faust.conjugate()
+        return core
+
+    def getH(self):
+        core = FaustCore(core=True)
+        core.m_faust = self.m_faust.adjoint()
+        return core
+
+
+
     def __dealloc__(self):
        del self.m_faust

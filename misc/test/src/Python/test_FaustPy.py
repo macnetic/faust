@@ -223,6 +223,19 @@ class TestFaustPy(unittest.TestCase):
         self.assertEqual(tF.size(), (self.factors[self.num_factors-1].shape[1],
                                      self.factors[0].shape[0]))
 
+    def testConjugate(self):
+        print("Test Faust.conj()")
+        test_Fc = self.F.conj().todense()
+        ref_Fc = self.F.todense().conj()
+        self.assertTrue((test_Fc == ref_Fc).all())
+
+    def testGetH(self):
+        print("Test Faust.getH()")
+        test_Fct = self.F.getH().todense()
+        ref_Fct = self.F.todense().conj().T
+        ref_Fct[ref_Fct==0] = 1
+        test_Fct[test_Fct==0] = 1
+        self.assertTrue(((((test_Fct-ref_Fct)/ref_Fct) < 0.01)).all())
 
 if __name__ == "__main__":
     if(len(sys.argv)> 1):

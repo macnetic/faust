@@ -90,7 +90,7 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
             mexErrMsgTxt("The filepath is not valid.");
             return;
         }
-    //	printf("save: filepath = %s, nargs = %d\n", filepath, nargs);
+        //	printf("save: filepath = %s, nargs = %d\n", filepath, nargs);
         core_ptr->save_mat_file(filepath/*, mxGetScalar(args[1])*/);
     }
 
@@ -422,6 +422,31 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 #endif
             return;
         }
+
+        if(!strcmp("conj", cmd)) { //TODO: verify no arguments passed or 
+            Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->conjugate();
+            plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+#ifdef FAUST_VERBOSE
+            printf("new ptr for Faust conjugate's TransformHelper obj=%p\n", th);
+            printf("conjugate()\n");
+            printf("isConjugate()=%d\n",th->isConjugate());
+#endif
+            return;
+        }
+
+        if(!strcmp("ctranspose", cmd)) {
+            Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->adjoint();
+            plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+#ifdef FAUST_VERBOSE
+            printf("new ptr for Faust conjugate's TransformHelper obj=%p\n", th);
+            printf("conjugate()\n");
+            printf("isConjugate()=%d\n",th->isConjugate());
+            printf("isTransposed()=%d\n", th->isTransposed());
+#endif
+            return;
+
+        }
+
 
 		//     // Call the various class methods
 		//     // Train

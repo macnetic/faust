@@ -291,4 +291,9 @@ void  Faust::Vect<FPP,Cpu>::multiplyLeft(Faust::MatSparse<FPP,Cpu> const& S,cons
 	this->dim = nbRowOpS;
 }
 
+template<typename FPP>
+void Faust::Vect<FPP,Cpu>::conjugate()
+{
+	vec = vec.conjugate().eval();
+}
 #endif

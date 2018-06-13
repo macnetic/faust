@@ -119,7 +119,7 @@ namespace Faust
 				//template<Device DEVICE> class BlasHandle;
 				//template<Device DEVICE> class SpBlasHandle;
 				/** \brief Perform the product of all factorized matrix. */
-				Faust::MatDense<FPP,Cpu> get_product(const char opThis='N')const;
+				Faust::MatDense<FPP,Cpu> get_product(const char opThis='N', const bool isConj=false)const;
 				Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const;
 
 
@@ -137,7 +137,7 @@ namespace Faust
 				 *	\arg \c transpose The boolean to set to true if you want to save the transpose Faust of this instance or false otherwise.
 				 *	\throw std::logic_error if any problem occurs.
 				 */ 
-				void save_mat_file(const char* filename, bool transpose) const;
+				void save_mat_file(const char* filename, bool transpose, bool conjugate=false) const;
 				long long int get_total_nnz()const{return totalNonZeros;}
 				void clear(){data.resize(0);totalNonZeros=0;}
 
@@ -149,7 +149,7 @@ namespace Faust
 				 if True, the copy is optimized, the dynamic type of the factor can changed
 				 if False, the dynamic type stay the same
 				 (default value true)*/
-				void push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=true);
+				void push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=true, const bool conjugate=false);
 
 
 
@@ -165,6 +165,10 @@ namespace Faust
 				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M) const;
 				void Display()const;
 				void transpose();
+				/**
+				 * \brief Replaces the Faust by its conjugate.
+				 */
+				void conjugate();
 				void updateNonZeros();
 				void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const;
 				///(*this) = (*this) * A

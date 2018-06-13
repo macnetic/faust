@@ -248,7 +248,7 @@ void Faust::Transform<FPP,Cpu>::print_file(const char* filename) const
 }
 
 template<typename FPP>
-void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename, bool transpose) const
+void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename, bool transpose, bool conjugate) const
 {
 	// save the FAuST as a matlab cell array (respecting what is done in matlab wrapper)
 	matvar_t *faust_matvar;
@@ -259,7 +259,7 @@ void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename, bool transp
 	for(i=0; i < size(); i++){
 		// revert factors order if we are in transpose case
 		i2 = transpose?size()-i-1:i;
-		faust_factor_matvars[i] = data[i2]->toMatIOVar(transpose);
+		faust_factor_matvars[i] = data[i2]->toMatIOVar(transpose, conjugate);
 		if(faust_factor_matvars[i] == NULL)
 			handleError("Faust::Transform", "Failed to create i-th factor MatIO variable");
 	}
@@ -328,12 +328,8 @@ void Faust::Transform<FPP,Cpu>::updateNonZeros()
 }
 
 
-
-
-
-
 template<typename FPP>
-Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThis)const
+Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThis, const bool isConj)const
 {
 
 
@@ -353,10 +349,11 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThi
 
 	prod.setEyes();
 
-	return this->multiply(prod,opThis);
+	Faust::MatDense<FPP,Cpu> p = this->multiply(prod,opThis);
 
+	if(isConj) p.conjugate();
 
-
+	return p;
 
 
 	/* modif NB v1102 : factor are no longer MatSparse, they are MatGeneric now
@@ -570,7 +567,7 @@ Faust::MatGeneric<FPP,Cpu>* Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_i
 
 
 	template<typename FPP>
-void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,const bool optimizedCopy /*default value = true */)
+void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,const bool optimizedCopy /*default value = true */, const bool conjugate)
 {
 	if (size()>0)
 	{
@@ -580,6 +577,7 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,co
 		}
 	}
 	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone(optimizedCopy);
+	if(conjugate) M_copy->conjugate();
 	data.push_back(M_copy);
 	totalNonZeros += M_copy->getNonZeros();
 
@@ -662,6 +660,16 @@ void Faust::Transform<FPP,Cpu>::transpose()
 		data[i]->transpose();
 	}
 }
+
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::conjugate()
+{
+	typename vector<Faust::MatGeneric<FPP,Cpu>*>::iterator it;
+	for(it = data.begin(); it != data.end(); it++){
+		it->conjugate();
+	}
+}
+
 template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,Cpu> x,const char opThis) const{
 #ifdef __COMPILE_TIMERS__

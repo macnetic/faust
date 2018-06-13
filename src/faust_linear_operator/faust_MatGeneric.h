@@ -119,6 +119,9 @@ namespace Faust
 	
 	//! \brief transpose the matrix
 	virtual void transpose()=0;
+
+	//! \brief Replaces the matrix by its conjugate.
+	virtual void conjugate()=0;
 	
 	//! \brief return the number of non-zeros element in the matrix
 	virtual faust_unsigned_int getNonZeros()const=0;
@@ -139,10 +142,11 @@ namespace Faust
 	virtual void Display() const=0;
 	
 	//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio.
-	// \param transpose : set to true to obtain the matio variable for the transpose Matrix.
+	// \param transpose: set to true to obtain the matio variable for the transpose Matrix.
+	// \param conjugate: set it to true to obtain the matio variable for the conjugate Matrix. 
 	// \return The matio variable matvar_t if it succeeded or nullptr otherwise.
 	// \see Faust::Transform::save_mat_file()
-	virtual matvar_t* toMatIOVar(bool transpose) const=0;
+	virtual matvar_t* toMatIOVar(bool transpose, bool conjugate) const=0;
 
 	//! \brief 
 	//! \warning : declare a virtual destructor is mandatory for an abstract class

@@ -251,7 +251,7 @@ classdef Faust
 			%
 			% F_trans = transpose(F) is called for the syntax F.' when F is Faust.
 			%
-			% WARNING : currently Faust is a real matrix, so the conjugate transposition is the same as the real one
+			% If Faust is a real matrix, the conjugate transposition will be the same as the real one
 			%
 			% See also ctranspose.
 			%F_trans=F; % trans and F point share the same C++ underlying object (objectHandle)
@@ -280,22 +280,19 @@ classdef Faust
         %> @retval The Faust conjugate transpose.
         %> <p/>@b See @b also transpose
 		%>
-        %> <p/> @b WARNING : ctranspose is not yet implementd for complex Faust, only supported for real Faust
 		%======================================================================
 		function F_ctrans=ctranspose(F)
 			%% CTRANSPOSE ' Complex conjugate transposed Faust (overloaded Matlab built-in function).
 			%
 			% F_trans = ctranspose(F) is called for syntax F' (complex conjugate transpose) when F is a Faust.
 			%
-			% WARNING : ctranspose is not yet implementd for complex Faust, only supported for real Faust
 			%
 			% See also transpose.
 			if (isreal(F))
 				F_ctrans=transpose(F);
 			else
-				error('TODO : ctranspose is not yet implemented for complex scalar Faust');
-			end
-
+			    F_ctrans = Faust(F, mexFaustCplx('ctranspose', F.matrix.objectHandle));
+            end
 		end
 
         %======================================================================
@@ -306,20 +303,19 @@ classdef Faust
         %>
         %> @retval F_trans = conj(F) For a complex F, conj(X) = REAL(F) - i*IMAG(F)
         %>
-		%> <p/> @b WARNING : this function is not yet implemented.
         %======================================================================
-		function F_conj=conj(F)
-			%% CONJ ' Complex conjugate Faust (WARNING not implemented) (overloaded Matlab built-in function).
-			%
-			% F_trans = conj(F) For a complex F, conj(X) = REAL(F) - i*IMAG(F)
-			%
-			%
-
-
-			error('TODO : conjugate is not yet implemented for Faust');
-
-
-		end
+        function F_conj=conj(F)
+            %% CONJ ' Complex conjugate Faust (overloaded Matlab built-in function).
+            %
+            % F_trans = conj(F) For a complex F, conj(X) = REAL(F) - i*IMAG(F)
+            %
+            %
+            if (F.isReal)
+                F_conj = Faust(F, mexFaustReal('conj', F.matrix.objectHandle));
+            else
+                F_conj = Faust(F, mexFaustCplx('conj', F.matrix.objectHandle));
+            end
+        end
 
 
         %======================================================================
@@ -434,17 +430,12 @@ classdef Faust
 				error('get_fact second argument (indice) must either be real positive integers or logicals.');
 			end
 
-%			if (F.transpose_flag)
-%				id = get_nb_factor(F)+1-id;
-%			end
 			if (F.isReal)
 				factor = mexFaustReal('get_fact',F.matrix.objectHandle,id);
 			else
 				factor = mexFaustCplx('get_fact',F.matrix.objectHandle,id);
 			end
-%			if (F.transpose_flag)
-%				factor = factor';
-%			end
+
 		end
 
 

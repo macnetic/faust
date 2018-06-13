@@ -253,6 +253,31 @@ t_transpose.stop();
 }
 
 template<typename FPP>
+void Faust::MatDense<FPP,Cpu>::conjugate()
+{
+
+#ifdef __COMPILE_TIMERS__
+//t_conjugate.start(); //TODO
+#endif
+
+	if(isZeros)
+	{
+		#ifdef __COMPILE_TIMERS__
+//			t_conjugate.stop(); //TODO
+		#endif
+		return;
+	}
+
+	mat = mat.conjugate().eval();
+
+#ifdef __COMPILE_TIMERS__
+//t_conjugate.stop(); //TODO
+#endif
+
+}
+
+
+template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::multiplyRight(Faust::MatDense<FPP,Cpu> const& A)
 {
 
@@ -691,7 +716,7 @@ t_print_file.stop();
 
 
 template<typename FPP>
-matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose) const
+matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 {
 	matvar_t *var = NULL; //TODO: should be nullptr in C++11
 	size_t dims[2];
@@ -711,7 +736,10 @@ matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose) const
 			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
 			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_im(mat.rows(), mat.cols());
 			dst_re = mat.real()/*.transpose()*/.template cast<double>();
-			dst_im = mat.imag()/*.transpose()*/.template cast<double>();
+			if(conjugate)
+				dst_im = (-(mat.imag()))/*.transpose()*/.template cast<double>();
+			else
+				dst_im = mat.imag()/*.transpose()*/.template cast<double>();
 			dst_re.transposeInPlace();
 			dst_im.transposeInPlace();
 			z.Re = dst_re.data();
@@ -729,7 +757,10 @@ matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose) const
 			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
 			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_im(mat.rows(), mat.cols());
 			dst_re = mat.real().template cast<double>();
-			dst_im = mat.imag().template cast<double>();
+			if(conjugate)
+				dst_im = (-(mat.imag())).template cast<double>();
+			else
+				dst_im = mat.imag().template cast<double>();
 			z.Re = dst_re.data();
 			z.Im = dst_im.data();
 			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);

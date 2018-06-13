@@ -108,6 +108,20 @@ class Faust:
         F_trans = Faust(core_obj=F.m_faust.transpose())
         return F_trans
 
+    def conj(F):
+        """
+        Returns the conjugate of the current Faust.
+        """
+        F_conj = Faust(core_obj=F.m_faust.conj())
+        return F_conj
+
+    def getH(F):
+        """
+        Returns the conjugate transpose of the current Faust.
+        """
+        F_ctrans = Faust(core_obj=F.m_faust.getH())
+        return F_ctrans
+
     def display(F):
         """
         Displays information describing the current Faust.
@@ -317,3 +331,4 @@ class Faust:
             raise ValueError("Only Matlab or Matlab_core format is supported.")
         if(format == "Matlab"):
             F.m_faust.save_mat_file(filepath)
+

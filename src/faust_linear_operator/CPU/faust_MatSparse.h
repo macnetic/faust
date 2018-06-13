@@ -155,8 +155,9 @@ namespace Faust
         void setZeros(){mat.setZero();nnz=0;}
         void setEyes(){mat.setIdentity();update_dim();}
         void transpose();
-        FPP norm() const {return mat.norm();}
-        void operator= (const MatSparse<FPP,Cpu>& M);
+		void conjugate();
+		FPP norm() const {return mat.norm();}
+		void operator= (const MatSparse<FPP,Cpu>& M);
         void operator= (const Faust::MatDense<FPP,Cpu>& Mdense);
         void init (const Faust::MatDense<FPP,Cpu>& Mdense,Faust::SpBlasHandle<Cpu> spblas_handle)
         {(*this)=Mdense;}
@@ -250,7 +251,7 @@ namespace Faust
 	//! M = (*this) * M if opThis='N'
 	// M = (*this)' * M if opThis='T' 
 	void multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const;
-	matvar_t* toMatIOVar(bool transpose) const;
+	matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
         //! Destructor
         ~MatSparse(){/*std::cout<<"destructor MatSparse"<<std::endl;*//*this->mat.resize(0,0);*/}
 
