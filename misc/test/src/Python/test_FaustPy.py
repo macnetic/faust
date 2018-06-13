@@ -168,7 +168,7 @@ class TestFaustPy(unittest.TestCase):
         print("testMul()")
         rmat = np.random.rand(self.F.get_nb_cols(),
                               self.r.randint(1,TestFaustPy.MAX_DIM_SIZE))
-        prod = self.mulFactors()*rmat
+        prod = self.mulFactors().dot(rmat)
         test_prod = self.F*rmat
         self.assertProdEq(prod, test_prod)
 
@@ -233,9 +233,32 @@ class TestFaustPy(unittest.TestCase):
         print("Test Faust.getH()")
         test_Fct = self.F.getH().todense()
         ref_Fct = self.F.todense().conj().T
+        print("test_Fct=", test_Fct)
+        print("ref_Fct=", ref_Fct)
         ref_Fct[ref_Fct==0] = 1
         test_Fct[test_Fct==0] = 1
         self.assertTrue(((((test_Fct-ref_Fct)/ref_Fct) < 0.01)).all())
+
+class TestFaustPyCplx(TestFaustPy):
+
+        def setUp(self):
+            """ Initializes the tests objects """
+            r = random.Random()  # initialized from time or system
+            num_factors = r.randint(1, TestFaustPy.MAX_NUM_FACTORS)
+            factors = []
+            d2 = r.randint(1, TestFaustPy.MAX_DIM_SIZE)
+            for i in range(0, num_factors):
+                d1, d2 = d2, r.randint(1, TestFaustPy.MAX_DIM_SIZE)
+                factors += [np.random.rand(d1, d2).astype(np.complex)]
+                factors[i].imag = [np.random.rand(d1, d2)]
+            self.F = Faust(factors)
+            self.factors = factors
+            print("Tests on random Faust with dims=", self.F.get_nb_rows(),
+                  self.F.get_nb_cols())
+            print("Num. factors:", num_factors)
+            self.r = r
+            self.num_factors = num_factors
+
 
 if __name__ == "__main__":
     if(len(sys.argv)> 1):

@@ -332,3 +332,8 @@ class Faust:
         if(format == "Matlab"):
             F.m_faust.save_mat_file(filepath)
 
+    def isReal(F):
+        """
+        Returns True if F is a real Faust and False if it's a complex Faust.
+        """
+        return F.m_faust.isReal()
