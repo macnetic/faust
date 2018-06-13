@@ -80,10 +80,12 @@ classdef FaustCore < handle
         %% Destructor - Destroy the C++ class instance
         function delete(this)
             % destructor delete the faust
-            if (this.isRealFlag)
-                mexFaustReal('delete', this.objectHandle);
-            else
-                mexFaustCplx('delete', this.objectHandle);
+            if(isa(this.objectHandle, 'integer'))
+                if (this.isRealFlag)
+                    mexFaustReal('delete', this.objectHandle);
+                else
+                    mexFaustCplx('delete', this.objectHandle);
+                end
             end
         end
 
