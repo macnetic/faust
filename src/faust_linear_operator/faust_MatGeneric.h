@@ -148,6 +148,21 @@ namespace Faust
 	// \see Faust::Transform::save_mat_file()
 	virtual matvar_t* toMatIOVar(bool transpose, bool conjugate) const=0;
 
+	//! \brief Computes the L1-norm of the matrix.
+	// \see Faust::normL1(faust_unsigned_int&)
+	// \see http://mathworld.wolfram.com/L1-Norm.html
+	virtual FPP normL1() const=0;
+
+	//! \brief Computes the L1-norm of the matrix.
+	// \param col_id: reference to receive the column index which the L1-norm is equal to the matrix's norm (if several exist, then the greater colummn index is kept).
+	// \return The norm (its type is the matrix scalar's).
+	// \see Faust::normL1()
+	// \see http://mathworld.wolfram.com/L1-Norm.html
+	virtual FPP normL1(faust_unsigned_int& col_id) const=0;
+	//
+	//! \brief Returns a column of the matrix as a new Faust::Vect.
+	virtual Faust::Vect<FPP,DEVICE> get_col(faust_unsigned_int id) const=0;
+
 	//! \brief 
 	//! \warning : declare a virtual destructor is mandatory for an abstract class
 	//! in order to allow descendant class destructor to clean up in case of pointer to the abstract class 

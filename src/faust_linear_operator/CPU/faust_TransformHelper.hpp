@@ -194,6 +194,11 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+		double TransformHelper<FPP,Cpu>::normL1() const {
+			return transform->normL1();
+	}
+
+	template<typename FPP>
 		TransformHelper<FPP,Cpu>::~TransformHelper() {
 			// transform is deleted auto. when no TransformHelper uses it (no more weak refs left)
 		}

@@ -291,7 +291,7 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
             // compute the 2-norm of the faust
             if (!strcmp("norm",cmd))
             {
-                if (nlhs != 1 || nrhs != 2)
+                if (nlhs != 1 || nrhs != 3)
                     mexErrMsgTxt("norm: Unexpected arguments");
                 if(core_ptr->size() == 0)
                     mexErrMsgTxt("norm : empty faust core");
@@ -300,10 +300,19 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
                 double precision =  0.001;
                 faust_unsigned_int nbr_iter_max=100;
                 int flag;
-                char op;
+                int ord = (int) mxGetScalar(prhs[2]);
+                //printf("mexFaust.cpp norm() ord=%d\n", ord);
                 //spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
 
-                double norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
+                double norm_faust;
+
+                if(ord==2)
+                    norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
+                else if(ord==1)
+                    norm_faust = (double) core_ptr->normL1();
+                else
+                    mexErrMsgTxt("norm : unvalid norm order.");
+
                 plhs[0]=mxCreateDoubleScalar(norm_faust);
 
                 return;

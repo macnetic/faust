@@ -48,8 +48,8 @@ namespace Faust {
 			bool isTransposed() const;
 			bool isConjugate() const;
 			const char isTransposed2char() const;
+			double normL1() const;
 			~TransformHelper();
-
 		};
 }
 #include "faust_TransformHelper.hpp"

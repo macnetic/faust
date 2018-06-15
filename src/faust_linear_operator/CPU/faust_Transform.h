@@ -178,6 +178,8 @@ namespace Faust
 				void scalarMultiply(const FPP scalar);
 				float getRCG() const{return ((float)(getNbRow()*getNbCol()))/((float) get_total_nnz());}
 				double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
+				double normL1() const;
+				double normL1(const char opThis, const bool isConj) const;
 				~Transform(){ 
 #ifdef FAUST_VERBOSE
 					std::cout << "~Transform()" << std::endl;

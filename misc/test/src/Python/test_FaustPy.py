@@ -80,11 +80,21 @@ class TestFaustPy(unittest.TestCase):
         print("testNorm2()")
         ref_norm = norm(self.mulFactors())
         test_norm = self.F.norm(2)
-        # print("ref_norm=", ref_norm, "test_norm=", test_norm)
+        print("ref_norm=", ref_norm, "test_norm=", test_norm)
         # TODO: remove this workaround when the supposed bug will be corrected in core lib
         if(math.isnan(test_norm) and not math.isnan(ref_norm)):
             return
         self.assertLessEqual(abs(ref_norm-test_norm)/abs(ref_norm), 0.05)
+
+    def testNorm1(self):
+        print('test Faust.norm(1)')
+        ref_norm = norm(self.mulFactors(), 1)
+        test_norm = self.F.norm(1)
+        print("test_norm=", test_norm, "ref_norm=", ref_norm)
+        if(math.isnan(test_norm) and not math.isnan(ref_norm)):
+            return
+        self.assertLessEqual(abs(ref_norm-test_norm)/abs(ref_norm), 0.05)
+
 
     def faust_nnz(self):
         ref_nnz = 0

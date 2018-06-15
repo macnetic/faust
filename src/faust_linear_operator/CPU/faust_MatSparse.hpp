@@ -579,4 +579,42 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate)
 	return var;
 }
 
+template<typename FPP>
+FPP Faust::MatSparse<FPP, Cpu>::normL1(faust_unsigned_int& col_id) const
+{
+	faust_unsigned_int i, j, max_j;
+	FPP sum, max_sum;
+	Eigen::Matrix<FPP, Eigen::Dynamic,1> vec;
+	for(j=0;j<this->getNbCol();j++)
+	{
+		vec=mat.block(0,j,this->getNbRow(),1);
+		for(i=0,sum=0;i<this->getNbRow();i++)
+			sum += std::abs(vec.data()[i]);
+		if(j==0 || std::abs(sum) > std::abs(max_sum))
+		{
+			max_sum = sum;
+			max_j = j;
+		}
+	}
+	col_id = max_j;
+	return max_sum;
+}
+
+template<typename FPP>
+FPP Faust::MatSparse<FPP, Cpu>::normL1() const
+{
+	faust_unsigned_int id;
+	return normL1(id);
+}
+
+template<typename FPP>
+Faust::Vect<FPP,Cpu> Faust::MatSparse<FPP,Cpu>::get_col(faust_unsigned_int id) const
+{
+	if(id > this->getNbCol())
+		handleError("Faust::MatSparse", "Too big column index passed to get_col().");
+	Eigen::Matrix<FPP, Eigen::Dynamic,1> vec;
+	vec = mat.col(id);
+	return Vect<FPP,Cpu>(this->getNbRow(),vec.data());
+}
+
 #endif

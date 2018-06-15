@@ -110,13 +110,22 @@ unsigned long long FaustCoreCpp<FPP>::nnz() const
 
 
 template<typename FPP>
-double FaustCoreCpp<FPP>::norm() const
+double FaustCoreCpp<FPP>::norm(int ord) const
 {
     double precision = 0.001;
     faust_unsigned_int nbr_iter_max = 100;
-    int flag; // not used yet
-    return this->transform.spectralNorm(nbr_iter_max, precision, flag);
+    int flag; //not used yet
+    switch(ord) {
+        case 2:
+            return this->transform.spectralNorm(nbr_iter_max, precision, flag);
+        case 1:
+            return this->transform.normL1();
+        default:
+            handleError("FaustCoreCpp", "norm(int ord) unvalid norm order.");
+    }
+    return -1;
 }
+
 
 template<typename FPP>
 double FaustCoreCpp<FPP>::get_nb_factors() const

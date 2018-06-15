@@ -253,13 +253,14 @@ class Faust:
         else:
             return float(-1)
 
-    def norm(F, typenorm=2):
+    def norm(F, ord=2):
         """
         Computes the norm of the Faust.
 
         Args:
-            typenorm: (Optional) The type of norm to return. For now, it's
-            limited to 2-norm only (spectral norm).
+            ord: (Optional) The type of norm to return. For now, it's
+            limited to L1 and L2 norms only. Set it to 1 for L1, 2 for L2
+            (default value).
 
         Returns:
             The norm as a float.
@@ -272,10 +273,10 @@ class Faust:
             >>> F.norm()
             >>> F.norm(2)
         """
-        if(typenorm != 2):
-            raise ValueError("Only 2-norm is supported for the "
-                            "Faust")
-        return F.m_faust.norm()
+        if(ord not in [1, 2]):
+            raise ValueError("Only L1 and L2 norms are supported (values 1 or"
+                             "2 expected.")
+        return F.m_faust.norm(int(ord))
 
     def get_nb_factors(F):
         """

@@ -296,4 +296,14 @@ void Faust::Vect<FPP,Cpu>::conjugate()
 {
 	vec = vec.conjugate().eval();
 }
+
+template<typename FPP>
+FPP Faust::Vect<FPP, Cpu>::normL1() const
+{
+	faust_unsigned_int j;
+	FPP sum = 0;
+	for(j=0;j<this->size();j++)
+		sum += std::abs(vec.data()[j]);
+	return sum;
+}
 #endif

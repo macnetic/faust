@@ -588,27 +588,31 @@ classdef Faust
 		function norm_Faust=norm(F,varargin)
 			%% NORM Faust norm (overloaded Matlab built-in function).
 			%
-			% norm(F,2) when F is Faust returns the 2-norm of F
-			% norm(F) is the same as norm(F)
+            % norm(F,1) when F is a Faust returns L1 norm of F (the largest
+            % column sum of the absolute values of F).
+			% norm(F,2) when F is a Faust returns the L2 norm of F (the largest
+            % singular value of A).
+			% norm(F) is the same as norm(F,2)
 			%
-			% WARNING : norm(F,typenorm) is only supported when typenorm equals 2
+			% WARNING : norm(F,P) is only supported when P (the order) equals 1 or 2
 
 			nb_input = length(varargin);
 			if (nb_input > 1)
 				error('Too many input arguments');
 			end
 
+            ord = 2;
 			if nb_input == 1
-				if varargin{1} ~= 2
-					error('only 2-norm is supported for the Faust');
+				if varargin{1} ~= 2 && varargin{1} ~= 1
+					error('only L1 or L2 norm are supported for the Faust');
 				end
+                ord = varargin{1};
 			end
 
-			% the transpose flag of the Faust is ignored because norm(A)==norm(A')
 			if (F.isReal)
-				norm_Faust=mexFaustReal('norm',F.matrix.objectHandle);
+				norm_Faust=mexFaustReal('norm',F.matrix.objectHandle, ord);
 			else
-				norm_Faust=mexFaustCplx('norm',F.matrix.objectHandle);
+				norm_Faust=mexFaustCplx('norm',F.matrix.objectHandle, ord);
 			end
 
 		end

@@ -84,6 +84,7 @@ namespace Faust
    template<typename FPP>
    void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
+	template<typename FPP,Device DEVICE> class Transform;
 
 
 
@@ -91,6 +92,7 @@ namespace Faust
     class Vect<FPP,Cpu>
     {
         template<class,Device> friend class Vect;
+		friend double Faust::Transform<FPP,Cpu>::normL1() const;
 
         public :
         Vect() : dim(0), vec() {}
@@ -119,7 +121,8 @@ namespace Faust
 	template<typename FPP1>
 	void scalarMultiply(FPP1 const scalar){vec *= scalar;}
 		void conjugate();
-        void normalize(){scalarMultiply(1/norm());}
+		FPP normL1() const;
+		void normalize(){scalarMultiply(1/norm());}
 
 
         // multiply (*this) =  A * (*this)

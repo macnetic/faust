@@ -252,6 +252,9 @@ namespace Faust
 			// M = (*this)' * M if opThis='T'
 			void multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const;
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
+			FPP normL1() const;
+			FPP normL1(faust_unsigned_int&) const;
+			Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 			//! Destructor
 			~MatSparse(){/*std::cout<<"destructor MatSparse"<<std::endl;*//*this->mat.resize(0,0);*/}
 
@@ -283,6 +286,7 @@ namespace Faust
 
 			//! *this = S * (*this)
 			friend void  Faust::Vect<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);
+			friend double Faust::Transform<FPP,Cpu>::normL1() const;
 			/*friend void  Faust::MatDense<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);*/
 
 			// MODIF AL WARNING, ERROR WITH VISUAL STUDIO 2013 compiler

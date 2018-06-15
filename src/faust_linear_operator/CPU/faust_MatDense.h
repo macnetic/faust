@@ -378,6 +378,9 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         void print_file(const char* filename)const;
 
 		matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
+		FPP normL1() const;
+		FPP normL1(faust_unsigned_int&) const;
+		Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 
         void operator=(MatDense<FPP,Cpu> const& A);
 
@@ -410,8 +413,8 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         friend void Faust::multiply<>(const Faust::Transform<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
         friend void Faust::gemv<>(const MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 //	friend void  Faust::MatSparse<FPP,Cpu>::multiply(MatDense<FPP,Cpu> & M,const char opThis) const;
-
-        bool estIdentite()const{return isIdentity;}
+		friend double Faust::Transform<FPP,Cpu>::normL1() const;
+		bool estIdentite()const{return isIdentity;}
         bool estNulle()const{return isZeros;}
 
         private:

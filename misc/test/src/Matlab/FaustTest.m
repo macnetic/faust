@@ -111,6 +111,12 @@ classdef FaustTest < matlab.unittest.TestCase
             this.verifyEqual(norm(ref_F,2), norm(this.test_faust, 2), 'RelTol',0.05)
         end
 
+        function testNorm1(this)
+            disp('testNorm1()')
+            ref_F = this.mulFactors()
+            this.verifyEqual(norm(ref_F,1), norm(this.test_faust, 1), 'RelTol',0.05)
+        end
+
         function testnnz(this)
             disp('testnnz()')
             this.verifyEqual(nnz(this.test_faust), nnzero_count(this.factors))
@@ -175,12 +181,12 @@ classdef FaustTest < matlab.unittest.TestCase
 
         function testCtranspose(this)
             disp('Test Faust.ctranspose()')
-            %TODO (when the function will be implemeted)
+            %TODO
         end
 
         function testConj(this)
             disp('Test Faust.conj()')
-            %TODO (when the funciton will be implemented)
+            %TODO
         end
 
         function testDelete(this)

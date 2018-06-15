@@ -233,12 +233,12 @@ cdef class FaustCore:
             nnz = self.core_faust_cplx.nnz()
         return nnz
 
-    def norm(self):
+    def norm(self, ord):
         cdef double norm
         if(self._isReal):
-            norm = self.core_faust_dbl.norm()
+            norm = self.core_faust_dbl.norm(ord)
         else:
-            norm = self.core_faust_cplx.norm()
+            norm = self.core_faust_cplx.norm(ord)
         return norm
 
     def get_nb_factors(self):
