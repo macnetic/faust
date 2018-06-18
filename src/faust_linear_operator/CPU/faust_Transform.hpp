@@ -255,13 +255,14 @@ void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename, bool transp
 	size_t dims[2];
 	int i, i2, ret;
 	mat_t *matfp;
+	if(!size()) handleError("Faust::Transform", "save_mat_file(): can't save an empty Faust.");
 	matvar_t **faust_factor_matvars = new matvar_t*[size()];
 	for(i=0; i < size(); i++){
 		// revert factors order if we are in transpose case
 		i2 = transpose?size()-i-1:i;
 		faust_factor_matvars[i] = data[i2]->toMatIOVar(transpose, conjugate);
 		if(faust_factor_matvars[i] == NULL)
-			handleError("Faust::Transform", "Failed to create i-th factor MatIO variable");
+			handleError("Faust::Transform", "save_mat_file(): failed to create i-th factor MatIO variable");
 	}
 	// write the faust cell array
 	dims[0] = 1;
