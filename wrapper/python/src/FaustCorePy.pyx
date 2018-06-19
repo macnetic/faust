@@ -248,10 +248,18 @@ cdef class FaustCore:
 
     def norm(self, ord):
         cdef double norm
+        if(str(ord).lower() not in ["1","2","fro"]):
+            raise ValueError("FaustCorePy.norm() invalid type of norm asked.")
         if(self._isReal):
-            norm = self.core_faust_dbl.norm(ord)
+            if(isinstance(ord,int)):
+                norm = self.core_faust_dbl.norm(ord)
+            else:
+                norm = self.core_faust_dbl.normFro()
         else:
-            norm = self.core_faust_cplx.norm(ord)
+            if(isinstance(ord,int)):
+                norm = self.core_faust_cplx.norm(ord)
+            else:
+                norm = self.core_faust_cplx.normFro()
         return norm
 
     def get_nb_factors(self):

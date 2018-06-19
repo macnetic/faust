@@ -64,6 +64,7 @@ class FaustCoreCpp
     void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x/*,bool isTranspose*/)const;
     unsigned long long nnz()const;
     double norm(int ord) const;
+    double normFro() const;
     double get_nb_factors() const;
     unsigned int get_fact_nb_rows(unsigned int& i) const;
     unsigned int get_fact_nb_cols(unsigned int& i) const;

@@ -476,6 +476,23 @@ double Faust::Transform<FPP,Cpu>::normL1(const char opThis, const bool isConj) c
 	return norm;
 }
 
+template<typename FPP>
+double Faust::Transform<FPP,Cpu>::normFro(const char opThis, const bool isConj) const
+{
+	double norm;
+	MatDense<FPP, Cpu> fact = get_product(opThis, isConj);
+	norm = std::abs(fact.norm());
+	return norm;
+}
+
+template<typename FPP>
+double Faust::Transform<FPP,Cpu>::normFro() const
+{
+	double norm;
+	MatDense<FPP, Cpu> fact = get_product();
+	norm = std::abs(fact.norm());
+	return norm;
+}
 
 	template<typename FPP>
 void Faust::Transform<FPP,Cpu>::operator=(const Transform<FPP,Cpu>&  f)

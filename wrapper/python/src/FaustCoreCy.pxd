@@ -51,6 +51,7 @@ cdef extern from "FaustCoreCpp.h" :
 #        void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
         unsigned long long nnz() const;
         double norm(int ord) const;
+        double normFro() const;
         double get_nb_factors() const;
         unsigned int get_fact_nb_rows(unsigned int& i) const;
         unsigned int get_fact_nb_cols(unsigned int& i) const;

@@ -97,6 +97,14 @@ class TestFaustPy(unittest.TestCase):
             return
         self.assertLessEqual(abs(ref_norm-test_norm)/abs(ref_norm), 0.05)
 
+    def testNormFro(self):
+        print('test Faust.norm("fro")')
+        ref_norm = norm(self.mulFactors(), 'fro')
+        test_norm = self.F.norm('fro')
+        print("test_norm=", test_norm, "ref_norm=", ref_norm)
+        if(math.isnan(test_norm) and not math.isnan(ref_norm)):
+            return
+        self.assertLessEqual(abs(ref_norm-test_norm)/abs(ref_norm), 0.05)
 
     def faust_nnz(self):
         ref_nnz = 0

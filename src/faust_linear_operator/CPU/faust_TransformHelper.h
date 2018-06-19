@@ -49,6 +49,7 @@ namespace Faust {
 			bool isConjugate() const;
 			const char isTransposed2char() const;
 			double normL1() const;
+			double normFro() const;
 			~TransformHelper();
 		};
 }

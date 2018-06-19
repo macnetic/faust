@@ -126,6 +126,11 @@ double FaustCoreCpp<FPP>::norm(int ord) const
     return -1;
 }
 
+template<typename FPP>
+double FaustCoreCpp<FPP>::normFro() const
+{
+    return this->transform.normFro();
+}
 
 template<typename FPP>
 double FaustCoreCpp<FPP>::get_nb_factors() const

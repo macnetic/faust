@@ -592,9 +592,11 @@ classdef Faust
             % column sum of the absolute values of F).
 			% norm(F,2) when F is a Faust returns the L2 norm of F (the largest
             % singular value of A).
+            % norm(F,'fro') when F is a Faust returns the Frobenius norm of F.
 			% norm(F) is the same as norm(F,2)
 			%
-			% WARNING : norm(F,P) is only supported when P (the order) equals 1 or 2
+			% WARNING : norm(F,P) is only supported when P equals 1, 2 or
+            % 'fro'.
 
 			nb_input = length(varargin);
 			if (nb_input > 1)
@@ -603,8 +605,16 @@ classdef Faust
 
             ord = 2;
 			if nb_input == 1
+                if(varargin{1} == 'fro')
+                    if (F.isReal)
+                        norm_Faust=mexFaustReal('normfro',F.matrix.objectHandle);
+                    else
+                        norm_Faust=mexFaustCplx('normfro',F.matrix.objectHandle);
+                    end
+                    return
+                end
 				if varargin{1} ~= 2 && varargin{1} ~= 1
-					error('only L1 or L2 norm are supported for the Faust');
+					error('only L1, L2 or Frobenius norms are supported for the Faust');
 				end
                 ord = varargin{1};
 			end

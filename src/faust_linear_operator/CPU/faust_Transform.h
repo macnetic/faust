@@ -180,7 +180,9 @@ namespace Faust
 				double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 				double normL1() const;
 				double normL1(const char opThis, const bool isConj) const;
-				~Transform(){ 
+				double normFro() const;
+				double normFro(const char opThis, const bool isConj) const;
+				~Transform(){
 #ifdef FAUST_VERBOSE
 					std::cout << "~Transform()" << std::endl;
 #endif

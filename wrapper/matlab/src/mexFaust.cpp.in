@@ -318,6 +318,23 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
                 return;
             }
 
+            if(!strcmp("normfro", cmd))
+            {
+                if (nlhs != 1 || nrhs != 2)
+                    mexErrMsgTxt("normfro: Unexpected arguments");
+                if(core_ptr->size() == 0)
+                    mexErrMsgTxt("normfro : empty faust core");
+
+
+                double norm_faust;
+
+                norm_faust = core_ptr->normFro();
+
+                plhs[0]=mxCreateDoubleScalar(norm_faust);
+
+                return;
+
+            }
 
             if (!strcmp("copy",cmd))
             {

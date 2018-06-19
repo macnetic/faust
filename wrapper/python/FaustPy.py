@@ -255,12 +255,13 @@ class Faust:
 
     def norm(F, ord=2):
         """
-        Computes the norm of the Faust.
+        Computes the norm of the Faust. Several types of norm are available:
+            L1, L2 and Frobenius.
 
         Args:
-            ord: (Optional) The type of norm to return. For now, it's
-            limited to L1 and L2 norms only. Set it to 1 for L1, 2 for L2
-            (default value).
+            ord: (Optional) Set it to 1 for L1, 2 for L2 and "fro" for
+            Frobenius norm.
+            (by default the computed norm is L2).
 
         Returns:
             The norm as a float.
@@ -272,11 +273,12 @@ class Faust:
         Examples:
             >>> F.norm()
             >>> F.norm(2)
+            >>> F.norm('fro')
         """
-        if(ord not in [1, 2]):
-            raise ValueError("Only L1 and L2 norms are supported (values 1 or"
-                             "2 expected.")
-        return F.m_faust.norm(int(ord))
+        if(ord not in [1, 2, "fro"]):
+            raise ValueError("Only L1, L2 and Frobenius  norms are supported (values 1,"
+                             "2 or 'fro' expected.")
+        return F.m_faust.norm(ord)
 
     def get_nb_factors(F):
         """
