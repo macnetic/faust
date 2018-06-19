@@ -144,7 +144,7 @@ namespace Faust
 	//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio.
 	// \param transpose: set to true to obtain the matio variable for the transpose Matrix.
 	// \param conjugate: set it to true to obtain the matio variable for the conjugate Matrix. 
-	// \return The matio variable matvar_t if it succeeded or nullptr otherwise.
+	// \return The matio variable matvar_t if it succeeded or NULL otherwise.
 	// \see Faust::Transform::save_mat_file()
 	virtual matvar_t* toMatIOVar(bool transpose, bool conjugate) const=0;
 

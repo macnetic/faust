@@ -11,19 +11,21 @@ import math
 
 class TestFaustPy(unittest.TestCase):
 
-    MAX_NUM_FACTORS = 32  # for the tested Faust
+    MAX_NUM_FACTORS = 8  # for the tested Faust
     MAX_DIM_SIZE = 512
+    MIN_DIM_SIZE = 3
 
     def setUp(self):
         """ Initializes the tests objects """
         r = random.Random()  # initialized from time or system
         num_factors = r.randint(1, TestFaustPy.MAX_NUM_FACTORS)
         factors = []
-        d2 = r.randint(1, TestFaustPy.MAX_DIM_SIZE)
+        d2 = r.randint(TestFaustPy.MIN_DIM_SIZE, TestFaustPy.MAX_DIM_SIZE)
         for i in range(0, num_factors):
             d1, d2 = d2, r.randint(1, TestFaustPy.MAX_DIM_SIZE)
             factors += [sparse.random(d1, d2, density=0.1, format='csr',
                         dtype=np.float64).todense()]
+            print("factor",i,":", factors[i])
         self.F = Faust(factors)
         self.factors = factors
         print("Tests on random Faust with dims=", self.F.get_nb_rows(),

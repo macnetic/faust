@@ -43,7 +43,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-
+#include <complex>
 
 using namespace std;
 template<typename FPP>
@@ -569,13 +569,109 @@ void Faust::MatSparse<FPP,Cpu>::init_from_file(const char* filename)
 }
 
 template<typename FPP>
-matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
+matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVarDense(bool transpose, bool conjugate) const
 {
-	matvar_t *var = NULL; //TODO: should be nullptr in C++11
+	matvar_t *var = NULL;
 	Faust::MatDense<FPP,Cpu> dense_factor;
-	//TODO: shouldn't be processed as dense factor, we lose compression of sparse matrix here
+	// shouldn't be processed as dense factor, we lose compression of sparse matrix here
+	// (see toMatIOVar())
 	dense_factor = (*this); //data is copied with operator = redef.
 	var = dense_factor.toMatIOVar(transpose, conjugate);
+	return var;
+}
+
+template<typename FPP>
+matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const {
+	//TODO: refactor this function because it is a bit too long
+	matvar_t* var = NULL;
+	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat_;
+	size_t dims[2];
+	mat_sparse_t sparse = {0,};
+	//	sparse.njc = (int) this->getNbCol()+1;
+	sparse.nzmax = (int) this->nnz;
+	sparse.ndata = (int) this->nnz;
+	int* jc;
+	int* ir = new int[sparse.nzmax];
+	double* data;
+	mat_complex_split_t z = {0,};
+	int nir = 0; //incremented later row by row
+	int i = 0;
+
+	int opt = typeid(getValuePtr()[0])==typeid(complex<double>(1.0,1.0))?MAT_F_COMPLEX:0;
+
+	if(opt) {
+		z.Re = new double[sparse.nzmax];
+		z.Im = new double[sparse.nzmax];
+	}
+	else
+		data = new double[sparse.nzmax];
+
+	if(transpose)
+	{
+		mat_ = mat.transpose();
+		dims[0]=this->getNbCol();
+		dims[1]= this->getNbRow();
+	}
+	else
+	{
+		mat_ = mat;
+		dims[0]=this->getNbRow();
+		dims[1]= this->getNbCol();
+	}
+
+	sparse.njc = dims[1]+1;
+	jc = new int[sparse.njc];
+
+	jc[sparse.njc-1] = this->nnz;
+	for(int j=0;j<sparse.njc-1;j++) jc[j] = -1;
+
+	// we use the transpose matrix because we are in row-major order but MatIO wants col-major order
+	// and the sparse matrix iterator respects the row-major order
+	Eigen::SparseMatrix<FPP,Eigen::RowMajor> st;
+	st = mat_.transpose();
+	for (int k=0; k<st.outerSize(); ++k)
+		for (typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(st,k); it; ++it)
+		{
+//			std::cout << "row:" << it.row() << " col:" << it.col() <<  " val:" << it.value() << std::endl;
+			if(it.row() > 0){
+				i=1;
+				while(it.row()>=i && jc[it.row()-i] < 0) {
+					jc[it.row()-i] = nir;
+					i++;
+				}
+			}
+			if(jc[it.row()] < 0) jc[it.row()] = nir;
+			ir[nir] = it.col();
+			if(opt) {
+				((double*)z.Re)[nir] = std::real((complex<double>)it.value());
+				if(conjugate)
+					((double*)z.Im)[nir] = -std::imag((complex<double>)it.value());
+				else
+					((double*)z.Im)[nir] = std::imag((complex<double>)it.value());
+			}
+			else
+				data[nir] = std::real(complex<double>(it.value()));
+			nir++;
+		}
+	i=1;
+	while(i<=st.rows() && jc[st.rows()-i] < 0) {
+		jc[st.rows()-i] = nir;
+		i++;
+	}
+	sparse.ir = ir;
+	sparse.jc = jc;
+	sparse.nir = nir;
+	if(opt) {
+		sparse.data = &z;
+	}
+	else
+		sparse.data = data;
+	var = Mat_VarCreate(NULL /* no-name */, MAT_C_SPARSE, MAT_T_DOUBLE, 2, dims, &sparse, opt);
+//	if(var != NULL)
+//		Mat_VarPrint(var,1);
+	delete[] jc;
+	delete[] ir;
+	delete[] data;
 	return var;
 }
 

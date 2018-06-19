@@ -252,6 +252,13 @@ namespace Faust
 			// M = (*this)' * M if opThis='T'
 			void multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const;
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
+			//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio. The variable is encoded in full matrix format (on the contrary to toMatVarIOVar() which keeps the sparse representation).
+			// \param transpose: set to true to obtain the matio variable for the transpose Matrix.
+			// \param conjugate: set it to true to obtain the matio variable for the conjugate Matrix.
+			// \return The matio variable matvar_t if it succeeded or NULL otherwise.
+			// \see Faust::Transform::save_mat_file()
+			// \see toMatIOVar()
+			matvar_t* toMatIOVarDense(bool transpose, bool conjugate) const;
 			FPP normL1() const;
 			FPP normL1(faust_unsigned_int&) const;
 			Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;

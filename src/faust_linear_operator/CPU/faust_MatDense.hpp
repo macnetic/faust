@@ -718,7 +718,7 @@ t_print_file.stop();
 template<typename FPP>
 matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 {
-	matvar_t *var = NULL; //TODO: should be nullptr in C++11
+	matvar_t *var = NULL; 
 	size_t dims[2];
 	int opt = typeid(mat(0,0))==typeid(complex<double>(1.0,1.0))?MAT_F_COMPLEX:0;
 	mat_complex_split_t z = {NULL,NULL};
@@ -751,7 +751,8 @@ matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) 
 	{
 		dims[0] = this->getNbRow();
 		dims[1] = this->getNbCol();
-		if(!opt) //we don't copy the data again, we use it directly (col-major order organized)  
+		if(!opt) // we use directly the data pointer (col-major order organized)
+				 // but without the MAT_F_DONT_COPY_DATA flag, MatIO copies the data internally
 			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat.data(), opt);
 		else {
 			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());

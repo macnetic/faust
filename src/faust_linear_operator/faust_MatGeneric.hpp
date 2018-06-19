@@ -63,16 +63,17 @@ void Faust::MatGeneric<FPP,DEVICE>::setOp(const char op, faust_unsigned_int& nbR
 
 
 //template <typename FPP, Device DEVICE>
-template<typename FPP>  
+template<typename FPP>
 Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,Faust::MatSparse<FPP,Cpu> const & S)
 {
 	//std::cout<<"DEBUT OPTIMIZE "<<std::endl;
-	
+
+
 	if ( (M.getNbCol() != S.getNbCol()) | (M.getNbRow() != S.getNbRow()) )
 		handleError("Faust::MatGeneric::", " Faust::optimize : matrix M and S have not the same size");
-	
+
 	Faust::Vect<FPP,Cpu> x_dense(M.getNbCol());
-	
+
 	for (int i=0;i<M.getNbCol();i++)
 	{
 		x_dense[i]=i*0.005;
@@ -84,22 +85,19 @@ Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,F
 	int nb_mult=10;
 	Faust::Timer t_dense,t_sparse;
 	for (int i=0;i<nb_mult;i++)
-	{	
+	{
 		x_sparse=x;
-		x_dense=x;		
-
+		x_dense=x;
 		t_sparse.start();
-			S.multiply(x_sparse,'N');
+		S.multiply(x_sparse,'N');
 		t_sparse.stop();
-		
 		t_dense.start();
-			M.multiply(x_dense,'N');
+		M.multiply(x_dense,'N');
 		t_dense.stop();
 
-		
 	}
-	//float density = ((float)S.getNonZeros())/((float)(S.getNbRow()*S.getNbCol()));	
-	float density = S.density();	
+	//float density = ((float)S.getNonZeros())/((float)(S.getNbRow()*S.getNbCol()));
+	float density = S.density();
 	//std::cout<<" density "<<density<<std::endl;
 	//std::cout<<" tps sparse "<<t_sparse.get_time()<<std::endl;
 	//std::cout<<" tps dense "<<t_dense.get_time()<<std::endl;
@@ -111,10 +109,10 @@ Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,F
 		return new MatSparse<FPP,Cpu>(S);
 	}else
 	{
-		//std::cout<<" CHOICE DENSE "<<t_dense.get_time()<<std::endl;		
+		//std::cout<<" CHOICE DENSE "<<t_dense.get_time()<<std::endl;
 		return new MatDense<FPP,Cpu>(M);
 	}
-		
+
 	//std::cout<<"FIN OPTIMIZE "<<t_sparse.get_time()<<std::endl;
 
 
@@ -123,7 +121,6 @@ Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,F
 template<typename FPP,Device DEVICE>
 Faust::MatGeneric<FPP,DEVICE>::~MatGeneric()
 {
-	
 
 }
 

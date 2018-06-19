@@ -49,6 +49,7 @@ from libc.string cimport memcpy;
 from libcpp cimport bool
 from libcpp cimport complex
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
+from scipy import sparse
 
 cdef class FaustCore:
 
@@ -70,9 +71,14 @@ cdef class FaustCore:
             #print len(list_factors)
             #print 'avant boucle'
             self._isReal = True
-            for factor in list_factors:
+            for i,factor in enumerate(list_factors):
+                if(isinstance(factor, sparse.csc.csc_matrix)):
+                    factor = list_factors[i] = factor.toarray()
+                    #print("FaustCorePy.pyx __cinit__(),toarray() factor:", factor)
                 if(not isinstance(factor, np.ndarray)):
-                    raise ValueError('Faust factors must be numpy.ndarray')
+                    #print("FaustCorePy.pyx __cinit__(), factor:",factor)
+                    raise ValueError("Faust factors must be a numpy.ndarray or "
+                                     "a scipy.sparse.csr.csr_matrix")
                 if(isinstance(factor[0,0], np.complex)):
                     # str(factor.dtype) == complex128/64/complex_
                     self._isReal = False
@@ -85,6 +91,13 @@ cdef class FaustCore:
                 if(self._isReal):
                     data=factor.astype(float,'F')
                 else:
+                    if(isinstance(factor, sparse.csc.csc_matrix)):
+                        #TODO: understand how is it possible to have a sparse
+                        # mat here and fix it (because it should have been
+                        # converted above already)
+                        factor = list_factors[i] = factor.toarray()
+                    #print('FaustCorePy.pyx type factor=',type(factor))
+                    #print("FaustCorePy.pyx factor=",factor)
                     data_cplx=factor.astype(np.complex128,'F')
                 nbrow=factor.shape[0];
                 nbcol=factor.shape[1];
