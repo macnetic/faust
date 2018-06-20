@@ -5,6 +5,7 @@
 #include <memory>
 #include "faust_exception.h"
 #include "faust_Transform.h"
+#include <random>
 
 namespace Faust {
 	using namespace std;
@@ -14,8 +15,16 @@ namespace Faust {
 	template<typename FPP,Device DEVICE> class MatDense;
 	template<typename FPP,Device DEVICE> class TransformHelper;
 
+	enum RandFaustType {
+		DENSE,
+		SPARSE,
+		MIXTE
+	};
+
 	template<typename FPP>
 		class TransformHelper<FPP,Cpu> {
+			static std::default_random_engine generator;
+			static bool seed_init;
 
 			bool is_transposed;
 			bool is_conjugate;
@@ -50,9 +59,10 @@ namespace Faust {
 			const char isTransposed2char() const;
 			double normL1() const;
 			double normFro() const;
+			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f);
 			~TransformHelper();
 		};
 }
-#include "faust_TransformHelper.hpp"
 
+#include "faust_TransformHelper.hpp"
 #endif

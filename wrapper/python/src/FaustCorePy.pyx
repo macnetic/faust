@@ -116,6 +116,23 @@ cdef class FaustCore:
         #TODO: raise error for undefined object here
 
 
+    @staticmethod
+    def randFaust(t,field,min_num_factors, max_num_factors, min_dim_size,
+                   max_dim_size, density=0.1):
+        core = FaustCore(core=True)
+        if(field == 3):
+            core.core_faust_dbl = FaustCoreCy.FaustCoreCpp[double].randFaust(t,min_num_factors, max_num_factors, min_dim_size,
+                   max_dim_size, density)
+            core._isReal = True
+        elif(field == 4):
+            core.core_faust_cplx = FaustCoreCy.FaustCoreCpp[complex].randFaust(t,min_num_factors, max_num_factors, min_dim_size,
+                   max_dim_size, density)
+            core._isReal = False
+        else:
+            raise ValueError("FaustCorePy.randFaust(): field must be 3 for real or"
+                             " 4 for complex")
+        return core
+
     #### METHOD ####
     #~ 	def getNbRow(self):
         #~ 		#return self.core_faust_dbl.getNbRow();

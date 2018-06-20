@@ -73,6 +73,36 @@ class Faust:
                 #TODO: manage empty Faust
 
 
+    def randFaust(faust_type, field, min_num_factors, max_num_factors, min_dim_size,
+                   max_dim_size, density=0.1):
+        """
+            Generates a random Faust.
+
+            Args:
+                faust_type: must be one of RandFaustType.DENSE, RandFaustType.SPARSE or RandFaustType.MIXTE.
+                field: must be one of RandFaustType.REAL or RandFaustType.COMPLEX.
+                min_num_factors: the minimal number of factors.
+                max_num_factors: the maximal number of factors.
+                min_dim_size: the minimal size of column and row dimensions.
+                max_dim_size: the maximal size of column and row dimensions.
+                density: the approximate density of factors.
+        """
+        if(not isinstance(faust_type, int) or faust_type not in [RandFaustType.SPARSE,
+                                                       RandFaustType.DENSE,
+                                                       RandFaustType.MIXTE]):
+            raise ValueError("Faust.randFaust(): first arg must be an"
+                             " integer equal to RandFaustType.SPARSE,"
+                             " RandFaustType.DENSE or RandRandFaustType.MIXTE.")
+
+        if(not isinstance(field, int) or field not in
+           [RandFaustType.REAL, RandFaustType.COMPLEX]):
+            raise ValueError("Faust.randFaust(): second arg must be an"
+                             " integer equal to RandFaustType.REAL,"
+                             " RandFaustType.COMPLEX")
+        rF = Faust(core_obj=FaustCorePy.FaustCore.randFaust(faust_type, field, min_num_factors, max_num_factors,
+                                                            min_dim_size, max_dim_size, density))
+        return rF
+
     def get_nb_rows(F):
         """
         Gives the Faust's number of rows.
@@ -340,3 +370,10 @@ class Faust:
         Returns True if F is a real Faust and False if it's a complex Faust.
         """
         return F.m_faust.isReal()
+
+class RandFaustType:
+    DENSE=0
+    SPARSE=1
+    MIXTE=2
+    REAL=3
+    COMPLEX=4

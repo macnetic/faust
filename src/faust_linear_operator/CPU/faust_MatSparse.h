@@ -53,7 +53,7 @@
 // modif AL AL
 #include "faust_Transform.h"
 #include "matio.h"
-
+#include <random>
 //! \class Faust::MatSparse<FPP,Cpu> faust_MatSparse.h
 //! \brief Class template representing sparse matrix <br>
 //! This class implements sparse matrix multiplication <br>
@@ -262,6 +262,7 @@ namespace Faust
 			FPP normL1() const;
 			FPP normL1(faust_unsigned_int&) const;
 			Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
+			static MatSparse<FPP, Cpu>* randMat(unsigned int num_rows, unsigned int num_cols, double density);
 			//! Destructor
 			~MatSparse(){/*std::cout<<"destructor MatSparse"<<std::endl;*//*this->mat.resize(0,0);*/}
 

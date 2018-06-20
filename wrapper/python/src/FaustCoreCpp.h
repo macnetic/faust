@@ -73,6 +73,10 @@ class FaustCoreCpp
     FaustCoreCpp<FPP>* transpose();
     FaustCoreCpp<FPP>* conjugate();
     FaustCoreCpp<FPP>* adjoint();
+    static FaustCoreCpp<FPP>* randFaust(unsigned int t,
+            unsigned int min_num_factors, unsigned int max_num_factors,
+            unsigned int min_dim_size,
+            unsigned int max_dim_size, float density);
     private :
     Faust::TransformHelper<FPP,Cpu> transform;
 };

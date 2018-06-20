@@ -713,4 +713,31 @@ Faust::Vect<FPP,Cpu> Faust::MatSparse<FPP,Cpu>::get_col(faust_unsigned_int id) c
 	return Vect<FPP,Cpu>(this->getNbRow(),vec.data());
 }
 
+template<typename FPP>
+Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(unsigned int num_rows, unsigned int num_cols, double density)
+{
+	std::default_random_engine generator;
+	std::uniform_real_distribution<double> distribution(0, 1);
+	typedef Eigen::Triplet<FPP> T;
+	std::vector<T> tripletList;
+	tripletList.reserve((int)(num_rows*num_cols*density));
+	MatDense<FPP,Cpu>* dense = Faust::MatDense<FPP,Cpu>::randMat(num_rows, num_cols);
+	for(int i=0;i<num_rows;i++)
+		for(int j=0;j<num_cols;j++)
+				if(distribution(generator) < density)
+				{
+					tripletList.push_back(T(i,j,(*dense)(i,j)));
+				}
+	MatSparse<FPP, Cpu>* fsmat = new MatSparse<FPP,Cpu>();
+	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat(num_rows, num_cols);
+	mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	fsmat->mat = mat;
+	fsmat->update_dim();
+//	fsmat->Display();
+//	fsmat->mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	return fsmat;
+}
+
+
+	
 #endif

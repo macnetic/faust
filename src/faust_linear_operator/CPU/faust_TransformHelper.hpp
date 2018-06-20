@@ -1,4 +1,5 @@
 
+
 namespace Faust {
 
 	template<typename FPP>
@@ -207,5 +208,49 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>::~TransformHelper() {
 			// transform is deleted auto. when no TransformHelper uses it (no more weak refs left)
 		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density) {
+			if(!TransformHelper<FPP,Cpu>::seed_init) {
+				srand(time(NULL)); //seed init needed for MatDense rand generation
+				TransformHelper<FPP,Cpu>::seed_init = true;
+
+			}
+			// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
+			std::uniform_int_distribution<int> num_fac_distr(min_num_factors, max_num_factors);
+			std::uniform_int_distribution<int> dim_distr(min_dim_size, max_dim_size);
+			std::uniform_int_distribution<int> bin_distr(0,1);
+			unsigned int num_factors = num_fac_distr(generator);
+			// create factors randomly respecting the RandFaustType asked and dims interval
+			std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) num_factors);
+			unsigned int num_rows, num_cols = dim_distr(generator);
+			for(unsigned int i=0;i<num_factors;i++) {
+				num_rows = num_cols;
+				num_cols = dim_distr(generator);
+				switch(t){
+					case DENSE:
+						factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, density);
+						break;
+					case SPARSE:
+						factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, density);
+						break;
+					case MIXTE:
+						if(bin_distr(generator))
+							factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, density);
+						else
+							factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, density);
+						break;
+					default:
+						handleError("Faust::TransformHelper", "randFaust(): Unknown RandFaustType");
+						break;
+
+				}
+			}
+			TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false);
+			return randFaust;
+		}
+
+template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
+template<typename FPP> std::default_random_engine TransformHelper<FPP,Cpu>::generator(time(NULL));
 
 }

@@ -718,7 +718,7 @@ t_print_file.stop();
 template<typename FPP>
 matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 {
-	matvar_t *var = NULL; 
+	matvar_t *var = NULL;
 	size_t dims[2];
 	int opt = typeid(mat(0,0))==typeid(complex<double>(1.0,1.0))?MAT_F_COMPLEX:0;
 	mat_complex_split_t z = {NULL,NULL};
@@ -808,6 +808,32 @@ Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::get_col(faust_unsigned_int id) co
 	return Vect<FPP,Cpu>(this->getNbRow(),vec.data());
 }
 
+template<typename FPP>
+Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(unsigned int num_rows, unsigned int num_cols)
+{
+	Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_tmp;
+	Faust::MatDense<FPP, Cpu>* mat;
+	mat_tmp = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>::Random(num_rows, num_cols);
+	mat = new Faust::MatDense<FPP, Cpu>(mat_tmp.data(), num_rows, num_cols);
+	return mat;
+}
+
+template<typename FPP>
+Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(unsigned int num_rows, unsigned int num_cols, float density)
+{
+	//TODO: refactor with above randMat()
+	Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_tmp;
+	Faust::MatDense<FPP, Cpu>* mat;
+	std::default_random_engine generator(time(NULL));
+	std::uniform_real_distribution<double> distribution(0, 1);
+	mat_tmp = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>::Random(num_rows, num_cols);
+	for(int i=0;i<num_rows;i++)
+		for(int j=0;j<num_cols;j++)
+			if(distribution(generator) > density)
+				mat_tmp(i,j) = 0;
+	mat = new Faust::MatDense<FPP, Cpu>(mat_tmp.data(), num_rows, num_cols);
+	return mat;
+}
 #ifdef __COMPILE_TIMERS__
 template<typename FPP>
 Faust::Timer Faust::MatDense<FPP,Cpu>::t_constr;

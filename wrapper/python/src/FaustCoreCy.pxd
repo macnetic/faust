@@ -41,22 +41,27 @@ from libcpp cimport bool
 
 cdef extern from "FaustCoreCpp.h" :
     cdef cppclass FaustCoreCpp[FPP] :
-        FaustCoreCpp();
-        void Display() const;
-        void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol);
+        FaustCoreCpp()
+        void Display() const
+        void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol)
         void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,
                       int nbrow_x, int nbcol_x);#,bool isTranspose*/);
-        unsigned int getNbRow() const;
-        unsigned int getNbCol() const;
+        unsigned int getNbRow() const
+        unsigned int getNbCol() const
 #        void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
-        unsigned long long nnz() const;
-        double norm(int ord) const;
-        double normFro() const;
-        double get_nb_factors() const;
-        unsigned int get_fact_nb_rows(unsigned int& i) const;
-        unsigned int get_fact_nb_cols(unsigned int& i) const;
-        double get_fact(unsigned int& i, FPP* fact_ptr) const;
-        void save_mat_file(const char* filepath) const;
+        unsigned long long nnz() const
+        double norm(int ord) const
+        double normFro() const
+        double get_nb_factors() const
+        unsigned int get_fact_nb_rows(unsigned int& i) const
+        unsigned int get_fact_nb_cols(unsigned int& i) const
+        double get_fact(unsigned int& i, FPP* fact_ptr) const
+        void save_mat_file(const char* filepath) const
         FaustCoreCpp[FPP]* transpose()
         FaustCoreCpp[FPP]* conjugate()
         FaustCoreCpp[FPP]* adjoint()
+        @staticmethod
+        FaustCoreCpp[FPP]* randFaust(unsigned int t,
+                                             unsigned int min_num_factors, unsigned int max_num_factors,
+                                             unsigned int min_dim_size,
+                                             unsigned int max_dim_size, float density)
