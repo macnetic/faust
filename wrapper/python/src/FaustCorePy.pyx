@@ -251,9 +251,12 @@ cdef class FaustCore:
 
 
 
-    # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)	
+    # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)
     def display(self):
-        self.core_faust_dbl.Display();
+        if(self._isReal):
+            self.core_faust_dbl.Display()
+        else:
+            self.core_faust_cplx.Display()
 
     def nnz(self):
         cdef unsigned long long nnz = 0
