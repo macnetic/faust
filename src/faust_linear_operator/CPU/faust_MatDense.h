@@ -60,7 +60,7 @@
 
 #include "faust_BlasHandle.h"
 #include "matio.h"
-
+#include <random>
 /*! \class Faust::MatDense MatDenseDense.h
 * \brief Class template representing dense matrix <br>
 * This class implements basic linear algebra operation (addition, multiplication, frobenius and spectral norm...) <br>

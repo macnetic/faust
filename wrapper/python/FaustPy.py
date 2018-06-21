@@ -72,7 +72,7 @@ class Faust:
             #else:
                 #TODO: manage empty Faust
 
-
+    @staticmethod
     def randFaust(faust_type, field, min_num_factors, max_num_factors, min_dim_size,
                    max_dim_size, density=0.1):
         """
