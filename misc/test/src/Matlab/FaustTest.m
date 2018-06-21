@@ -47,6 +47,16 @@ classdef FaustTest < matlab.unittest.TestCase
 		end
 	end
 
+	methods(Static)
+		function sumnnz = nnzero_count(factors)
+			sumnnz = 0
+			disp('size:');size(factors,2)
+			for i = 1:size(factors,2)
+				sumnnz = sumnnz + nnz(factors{i})
+			end
+		end
+	end
+
 	methods (Test)
         function testSave(this)
 			rand_suffix = int2str(randi(10000))
@@ -125,7 +135,7 @@ classdef FaustTest < matlab.unittest.TestCase
 
         function testnnz(this)
             disp('testnnz()')
-            this.verifyEqual(nnz(this.test_faust), nnzero_count(this.factors))
+			this.verifyEqual(nnz(this.test_faust), FaustTest.nnzero_count(this.factors))
         end
 
         function testDensity(this)
@@ -139,7 +149,7 @@ classdef FaustTest < matlab.unittest.TestCase
             disp('testrcg()')
             ref_nlines = size(this.factors{1},1)
             ref_ncols = size(this.factors{this.num_factors},2)
-            this.verifyEqual(ref_nlines*ref_ncols/nnzero_count(this.factors), RCG(this.test_faust), 'RelTol', 0.01)
+            this.verifyEqual(ref_nlines*ref_ncols/FaustTest.nnzero_count(this.factors), RCG(this.test_faust), 'RelTol', 0.01)
         end
 
         function testend(this)
