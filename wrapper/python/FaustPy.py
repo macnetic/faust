@@ -55,11 +55,24 @@ class Faust:
     """
 
     def  __init__(F, list_factors=None, filepath=None, core_obj=None):
-        """ Creates a Faust from a list of factors or a file.
+        """ Creates a Faust from a list of factors or alternatively from a file.
+
+            Another easy way to create a Faust is to call the static method Faust.randFaust().
 
         Args:
-            list_factors : list/tuple of numpy matrices or filepath of the Faust in
+            list_factors: list/tuple of numpy matrices or filepath of the Faust in
         matlab binary format (.mat).
+            filepath: the file in Matlab format (.mat) from which a Faust will
+            be created (the file must have been saved before with
+            Faust.save()).
+            core_obj: for internal purpose only. Please don't fill this argument.
+
+
+        Examples:
+            >>> from FaustPy import Faust
+            >>> F = Faust(filepath="myFaust.mat")
+            >>> import numpy as np
+            >>> G = Faust(list_factors=[np.random.rand(5,5)*10 for i in range(0,5)])
         """
         if(core_obj):
             F.m_faust = core_obj
@@ -76,7 +89,7 @@ class Faust:
     def randFaust(faust_type, field, min_num_factors, max_num_factors, min_dim_size,
                    max_dim_size, density=0.1):
         """
-            Generates a random Faust.
+        Generates a random Faust.
 
             Args:
                 faust_type: must be one of RandFaustType.DENSE, RandFaustType.SPARSE or RandFaustType.MIXTE.
@@ -86,7 +99,14 @@ class Faust:
                 min_dim_size: the minimal size of column and row dimensions.
                 max_dim_size: the maximal size of column and row dimensions.
                 density: the approximate density of factors.
-        """
+
+        Returns:
+            the random generated Faust.
+
+        Examples:
+            >>> from FaustPy import Faust, RandFaustType
+            >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX, 2, 3, 10, 20,.5)
+            """
         if(not isinstance(faust_type, int) or faust_type not in [RandFaustType.SPARSE,
                                                        RandFaustType.DENSE,
                                                        RandFaustType.MIXTE]):
@@ -108,7 +128,7 @@ class Faust:
         Gives the Faust's number of rows.
 
         Returns:
-                The Faust number of rows.
+                the number of rows.
         """
         return F.m_faust.shape()[0]
 
@@ -117,7 +137,7 @@ class Faust:
         Gives the Faust's number of columns.
 
         Returns:
-                The Faust number of columns.
+                the number of columns.
         """
         return F.m_faust.shape()[1]
 
@@ -126,7 +146,7 @@ class Faust:
         Gives the size of the Faust.
 
         Returns:
-            The Faust size tuple: get_nb_rows(), get_nb_cols().
+            the Faust size tuple: get_nb_rows(), get_nb_cols().
         """
         #return F.shape[0], F.shape[1]
         return F.m_faust.shape()
@@ -170,7 +190,7 @@ class Faust:
             np.ndararray() must be equal 'F').
 
         Returns:
-            The result of the multiplication as a numpy matrix.
+            the result of the multiplication as a numpy matrix.
 
         Raises:
             ValueError
@@ -198,14 +218,14 @@ class Faust:
         """
         Returns a coefficient of the Faust by its indices.
 
-        This function overloads the Python built-in.
+        This function is a Python built-in overload.
 
         Args:
             indices: array of length 2, its elements must be of kind: slice, integer or
             Ellipsis (...).
 
         Returns:
-            The float element requested.
+            the float element requested.
 
         Examples:
             >>> F[2, 3]
@@ -243,7 +263,7 @@ class Faust:
         computed at Faust creation time and kept in cache.
 
         Returns:
-            The number of non-zero elements as an integer.
+            the number of non-zero elements as an integer.
 
         Examples:
             >>> F.nnz()
@@ -255,12 +275,11 @@ class Faust:
         Calculates the normalized rate of non-zero coefficients.
 
         Returns:
-            The density value as a float.
+            the density value (float).
 
         Examples:
             >>> F.density()
         """
-        #return float(F.nnz())/(F.shape[0]*F.shape[1])
         return float(F.nnz()/(F.get_nb_cols()*F.get_nb_rows()))
 
     def RCG(F):
@@ -268,7 +287,7 @@ class Faust:
         Computes the Relative Complexity Gain (inverse of the density).
 
         Returns:
-            The RCG value as a float.
+            the RCG value (float).
             If the density is zero it will be float("inf").
             If the density is negative it will be -1.
 
@@ -285,16 +304,14 @@ class Faust:
 
     def norm(F, ord=2):
         """
-        Computes the norm of the Faust. Several types of norm are available:
-            L1, L2 and Frobenius.
+        Computes the norm of the Faust. Several types of norm are available: 1-norm, 2-norm and Frobenius norm.
 
         Args:
-            ord: (Optional) Set it to 1 for L1, 2 for L2 and "fro" for
-            Frobenius norm.
-            (by default the computed norm is L2).
+            ord: (Optional) the norm order (1 or 2) or "fro" for
+            Frobenius norm (by default the 2-norm is computed).
 
         Returns:
-            The norm as a float.
+            the norm (float).
 
         Raises:
             ValueError.
@@ -306,8 +323,7 @@ class Faust:
             >>> F.norm('fro')
         """
         if(ord not in [1, 2, "fro"]):
-            raise ValueError("Only L1, L2 and Frobenius  norms are supported (values 1,"
-                             "2 or 'fro' expected.")
+            raise ValueError("ord must have the value 1, 2 or 'fro'.")
         return F.m_faust.norm(ord)
 
     def get_nb_factors(F):
@@ -315,7 +331,7 @@ class Faust:
         Gives the Faust's number of factors.
 
         Returns:
-            The number of factors.
+            the number of factors.
 
         Examples:
             >>> F.get_nb_factors()
@@ -327,10 +343,10 @@ class Faust:
         Returns the Faust's i-th factor as a numpy.ndarray.
 
         Args:
-            i: The integer index of the factor to get back.
+            i: the integer index of the factor to get back.
 
         Returns:
-            The i-th factor as a dense matrix (of type numpy.ndarray).
+            the i-th factor as a dense matrix (of type numpy.ndarray).
 
         Raises:
             ValueError.
@@ -351,7 +367,7 @@ class Faust:
             if Matlab format used). It can be either an absolute or relative path.
             format: (Optional) It designates the format to use for
             writing. By default, it's "Matlab" to save the Faust in a .mat
-            file (and it's currently the only format available).
+            file (currently only that format is available).
 
         Raises:
             ValueError.
