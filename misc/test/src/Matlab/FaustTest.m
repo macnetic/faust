@@ -35,7 +35,7 @@ classdef FaustTest < matlab.unittest.TestCase
 				d2 = randi(this.MAX_DIM_SIZE);
 				factors{i} = sprand(d1, d2, density);
 			end
-			this.test_faust = Faust(factors,1.0,0)
+			this.test_faust = Faust(factors,1.0)
             this.factors = factors
             this.num_factors = num_factors
 		end
