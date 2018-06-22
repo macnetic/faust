@@ -65,6 +65,7 @@ classdef FaustCore < handle
                 for i=1:length(factors)
                     if (~isreal(factors{i}))
                         isRealFlag = 0;
+						break
                     end
                 end
 
