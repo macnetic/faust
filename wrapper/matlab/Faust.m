@@ -51,70 +51,89 @@ classdef Faust
 		matrix; % Handle to the FaustCore class instance
 		isReal;
 	end
+	properties (Constant)
+		% constants to identify field used
+		COMPLEX=3
+		REAL=4
+		% constants to identify kind of factors to generate through Faust.rand()
+		DENSE=0
+		SPARSE=1
+		MIXTE=2
+	end
 	methods
 
 		function F = Faust(varargin)
-			%% FAUST Constructor - build a Faust from various type of input.
+			%% FAUST Constructor - Creates a Faust from various types of input.
 			%
-			% Example of use :
+			% Examples :
 			%
 			% F = Faust(factors,lambda)
-			% -factor : 1D cell array of matrix (sparse or
-			% dense) representing the factor of the Faust
-			% -lambda : (optional) multiplicative scalar
+			% - factor : 1D cell array of matrix (sparse or
+			% dense) representing the factor of the Faust.
+			% - lambda : (optional) multiplicative scalar.
 			%
-			% F = Faust(filename)
-			% filename : a filename (mat file) where a Faust is stored with save_Faust
-
-
-            if (nargin == 1) && ischar(varargin{1})
-                filename=varargin{1};
-                load(filename);
-                if (~exist('faust_factors','var') )
-                    error('Faust : invalid file');
-                end
-                F=Faust(faust_factors);
-            elseif(nargin == 2 && isa(varargin{1}, 'Faust') )%&& isa(varargin{2},'handle'))
-                % we create a Faust from another one but not with the same
-                % handle to set inside the FaustCore object (matrix)
-                oF = varargin{1};
-                F.matrix = FaustCore(varargin{2}, oF.isReal);
-                F.isReal = oF.isReal;
-            elseif(nargin>=1)
-                %check if the factors are real or complex, at least one complex factor means a complex faust
-                factors=varargin{1};
-                isRealFlag = 1;
-
-                for i=1:length(factors)
-                    if (~isreal(factors{i}))
-                        isRealFlag = 0;
-                    end
-                end
-
-                F.matrix = FaustCore(varargin{:});
-                %F.transpose_flag = 0;
-                F.isReal = isRealFlag;
-            end
-            % else : we have an empty Faust object 
-            % %TODO: check this is not an issue
+			% F = Faust(filepath, lambda)
+			% - filepath: the file where a Faust was stored with Faust.save() (in matlab format version 5).
+			% - lambda: (optional) multiplicative scalar.
+			err_msg = 'Faust() error: the arguments are not valid.';
+			if(nargin < 1 || nargin > 3)
+				error([err_msg ' Number of arguments passed is zero or greater than three.'])
+			elseif(iscell(varargin{1}))
+				% init a Faust from factor list
+				% check if the factors are real or complex, one complex factor implies a complex faust
+				factors=varargin{1};
+				isRealFlag = 1;
+				for i=1:length(factors)
+					if (~isreal(factors{i}))
+						isRealFlag = 0;
+						break
+					end
+				end
+				if(nargin == 2 && (~isnumeric(varargin{2}) || ~isscalar(varargin{2})))
+					error([err_msg ' The second argument lambda must be a scalar.'])
+				end
+				F.matrix = FaustCore(varargin{:});
+				F.isReal = isRealFlag;
+			elseif(ischar(varargin{1}))
+				% init a Faust from file
+				filename=varargin{1};
+				load(filename);
+				if (~exist('faust_factors','var') )
+					error('Faust : invalid file');
+				end
+				F=Faust(faust_factors);
+			elseif(isa(varargin{1}, 'Faust'))
+				% create a Faust from another one but not with the same
+				% handle to set inside the FaustCore object (matrix)
+				oF = varargin{1};
+				F.matrix = FaustCore(varargin{2}, oF.isReal);
+				F.isReal = oF.isReal;
+			elseif(isa(varargin{1}, 'integer') && islogical(varargin{2}))
+				% create a Faust directly with the c++ object handler/pointer without any pre-existing Faust
+				F.matrix = FaustCore(varargin{1}, varargin{2});
+				F.isReal = varargin{2};
+			else
+				error(err_msg)
+			end
 		end
 
-        %======================================================================
-        %> @brief Deletes the Faust object (destructor).
-        %>
-        %>
+
+		%======================================================================
+		%> @brief Deletes the Faust object (destructor).
+		%>
+		%>
 		%>
 		%> @b Example
 		%> @code
 		%>   delete(F)
 		%> @endcode
-        %> @param A The matrix to multiply (full storage matrix).
-        %>
-        %> @retval C The multiplication result (full storage matrix).
+		%> @param A The matrix to multiply (full storage matrix).
+		%>
+		%> @retval C The multiplication result (full storage matrix).
 		%>
 		%> <p>@b See @b also Faust.</p>
-        %>
-        %======================================================================
+		%>
+		%======================================================================
 		function delete(F)
 			%% DELETE Destructor delete the Faust.
 			% delete(F)
@@ -123,17 +142,17 @@ classdef Faust
 			delete(F.matrix)
 		end
 
-        %======================================================================
-        %> @brief Multiplies the Faust or its transpose to the A full storage matrix.
-        %>
-        %>
-        %> @param A The matrix to multiply (full storage matrix).
-        %>
-        %> @retval C The multiplication result (full storage matrix).
+		%======================================================================
+		%> @brief Multiplies the Faust or its transpose to the A full storage matrix.
 		%>
-        %> <p>@b See @b also mtimes_trans.
-        %>
-        %======================================================================
+		%>
+		%> @param A The matrix to multiply (full storage matrix).
+		%>
+		%> @retval C The multiplication result (full storage matrix).
+		%>
+		%> <p>@b See @b also mtimes_trans.
+		%>
+		%======================================================================
 		function C = mtimes(F,A)
 			%% MTIMES * Faust Multiplication (overloaded Matlab built-in function).
 			%
@@ -141,7 +160,7 @@ classdef Faust
 			% storage matrix, C is also a full matrix storage.
 			%
 			% See also mtimes_trans
-            C = mtimes_trans(F, A, 0)
+			C = mtimes_trans(F, A, 0)
 		end
 
 
@@ -189,14 +208,14 @@ classdef Faust
 
 		end
 
-        %======================================================================
-        %> @brief Converts the Faust to a full matrix.
+		%======================================================================
+		%> @brief Converts the Faust to a full matrix.
 		%>
-        %> This function overloads a Matlab built-in function.
-        %>
-        %> @retval The full storage matrix resulting from the Faust.
-        %>
-        %======================================================================
+		%> This function overloads a Matlab built-in function.
+		%>
+		%> @retval The full storage matrix resulting from the Faust.
+		%>
+		%======================================================================
 		function A = full(F)
 			%% FULL  Convert Faust matrix to full matrix (overloaded Matlab
 			% built-in function).
@@ -210,15 +229,15 @@ classdef Faust
 
 		end
 
-        %======================================================================
-        %> @brief Indicates if the Faust is set with real or complex scalars.
-        %>
+		%======================================================================
+		%> @brief Indicates if the Faust is set with real or complex scalars.
+		%>
 		%> This function overloads a Matlab built-in function.
-        %>
-        %>
-        %> @retval 1 if Faust is set with real scalars, 0 for complex scalars.
-        %>
-        %======================================================================
+		%>
+		%>
+		%> @retval 1 if Faust is set with real scalars, 0 for complex scalars.
+		%>
+		%======================================================================
 		function bool = isreal(F)
 			%% ISREAL True for real scalar Faust (overloaded Matlab built-in function).
 			%
@@ -229,23 +248,23 @@ classdef Faust
 
 		end
 
-        %======================================================================
-        %> @brief Gives the transpose of the Faust.
-        %>
-        %> This function overloads a Matlab built-in function.
+		%======================================================================
+		%> @brief Gives the transpose of the Faust.
+		%>
+		%> This function overloads a Matlab built-in function.
 		%>
 		%>
 		%>
-   		%> @b Example
+		%> @b Example
 		%> @code
 		%>   F.'
 		%> % is equivalent to
 		%>   transpose(F)
 		%> @endcode
 		%>
-        %> @retval F_trans The Faust transpose.
-        %> <p/>@b See @b also ctranspose
-        %======================================================================
+		%> @retval F_trans The Faust transpose.
+		%> <p/>@b See @b also ctranspose
+		%======================================================================
 		function F_trans=transpose(F)
 			%% TRANSPOSE .' Non-conjugate transposed Faust (overloaded Matlab built-in function).
 			%
@@ -256,29 +275,29 @@ classdef Faust
 			% See also ctranspose.
 			%F_trans=F; % trans and F point share the same C++ underlying object (objectHandle)
 			%F_trans.transpose_flag = xor(1,F.transpose_flag); % inverse the transpose flag
-            if (F.isReal)
-                F_trans = Faust(F, mexFaustReal('transpose', F.matrix.objectHandle));
+			if (F.isReal)
+				F_trans = Faust(F, mexFaustReal('transpose', F.matrix.objectHandle));
 			else
 				F_trans = Faust(F, mexFaustCplx('transpose', F.matrix.objectHandle));
 			end
 		end
 
-        %======================================================================
-        %> @brief Gives the conjugate transpose of the Faust.
-        %>
-        %> This function overloads a Matlab built-in function.
+		%======================================================================
+		%> @brief Gives the conjugate transpose of the Faust.
+		%>
+		%> This function overloads a Matlab built-in function.
 		%>
 		%>
 		%>
-   		%> @b Example
+		%> @b Example
 		%> @code
 		%>   F'
 		%> % is equivalent to
 		%>   ctranspose(F)
 		%> @endcode
 		%>
-        %> @retval The Faust conjugate transpose.
-        %> <p/>@b See @b also transpose
+		%> @retval The Faust conjugate transpose.
+		%> <p/>@b See @b also transpose
 		%>
 		%======================================================================
 		function F_ctrans=ctranspose(F)
@@ -291,43 +310,43 @@ classdef Faust
 			if (isreal(F))
 				F_ctrans=transpose(F);
 			else
-			    F_ctrans = Faust(F, mexFaustCplx('ctranspose', F.matrix.objectHandle));
-            end
+				F_ctrans = Faust(F, mexFaustCplx('ctranspose', F.matrix.objectHandle));
+			end
 		end
 
-        %======================================================================
-        %> @brief Gives the complex conjugate of the Faust.
-        %>
-        %> This function overloads a Matlab built-in function.
+		%======================================================================
+		%> @brief Gives the complex conjugate of the Faust.
 		%>
-        %>
-        %> @retval F_trans = conj(F) For a complex F, conj(X) = REAL(F) - i*IMAG(F)
-        %>
-        %======================================================================
-        function F_conj=conj(F)
-            %% CONJ ' Complex conjugate Faust (overloaded Matlab built-in function).
-            %
-            % F_trans = conj(F) For a complex F, conj(X) = REAL(F) - i*IMAG(F)
-            %
-            %
-            if (F.isReal)
-                F_conj = Faust(F, mexFaustReal('conj', F.matrix.objectHandle));
-            else
-                F_conj = Faust(F, mexFaustCplx('conj', F.matrix.objectHandle));
-            end
-        end
+		%> This function overloads a Matlab built-in function.
+		%>
+		%>
+		%> @retval F_trans = conj(F) For a complex F, conj(X) = REAL(F) - i*IMAG(F)
+		%>
+		%======================================================================
+		function F_conj=conj(F)
+			%% CONJ ' Complex conjugate Faust (overloaded Matlab built-in function).
+			%
+			% F_trans = conj(F) For a complex F, conj(X) = REAL(F) - i*IMAG(F)
+			%
+			%
+			if (F.isReal)
+				F_conj = Faust(F, mexFaustReal('conj', F.matrix.objectHandle));
+			else
+				F_conj = Faust(F, mexFaustCplx('conj', F.matrix.objectHandle));
+			end
+		end
 
 
-        %======================================================================
-        %> @brief Gives the size of the Faust.
-        %>
-        %>
-        %> @param varargin can be missing or specifying the index of the dimension to get the size of.
-        %>
-        %> @retval [NROWS,NCOLS] = size(F)
+		%======================================================================
+		%> @brief Gives the size of the Faust.
+		%>
+		%>
+		%> @param varargin can be missing or specifying the index of the dimension to get the size of.
+		%>
+		%> @retval [NROWS,NCOLS] = size(F)
 		%> @retval N = size(F,DIM) with N being the size of Faust along its DIM-th dimension.
-        %>
-        %======================================================================
+		%>
+		%======================================================================
 		function varargout = size(F,varargin)
 			%% SIZE Size of a Faust (overloaded Matlab built-in function).
 			%
@@ -588,35 +607,35 @@ classdef Faust
 		function norm_Faust=norm(F,varargin)
 			%% NORM Faust norm (overloaded Matlab built-in function).
 			%
-            % norm(F,1) when F is a Faust returns L1 norm of F (the largest
-            % column sum of the absolute values of F).
+			% norm(F,1) when F is a Faust returns L1 norm of F (the largest
+			% column sum of the absolute values of F).
 			% norm(F,2) when F is a Faust returns the L2 norm of F (the largest
-            % singular value of A).
-            % norm(F,'fro') when F is a Faust returns the Frobenius norm of F.
+			% singular value of A).
+			% norm(F,'fro') when F is a Faust returns the Frobenius norm of F.
 			% norm(F) is the same as norm(F,2)
 			%
 			% WARNING : norm(F,P) is only supported when P equals 1, 2 or
-            % 'fro'.
+			% 'fro'.
 
 			nb_input = length(varargin);
 			if (nb_input > 1)
 				error('Too many input arguments');
 			end
 
-            ord = 2;
+			ord = 2;
 			if nb_input == 1
-                if(varargin{1} == 'fro')
-                    if (F.isReal)
-                        norm_Faust=mexFaustReal('normfro',F.matrix.objectHandle);
-                    else
-                        norm_Faust=mexFaustCplx('normfro',F.matrix.objectHandle);
-                    end
-                    return
-                end
+				if(varargin{1} == 'fro')
+					if (F.isReal)
+						norm_Faust=mexFaustReal('normfro',F.matrix.objectHandle);
+					else
+						norm_Faust=mexFaustCplx('normfro',F.matrix.objectHandle);
+					end
+					return
+				end
 				if varargin{1} ~= 2 && varargin{1} ~= 1
 					error('only L1, L2 or Frobenius norms are supported for the Faust');
 				end
-                ord = varargin{1};
+				ord = varargin{1};
 			end
 
 			if (F.isReal)
@@ -695,6 +714,19 @@ classdef Faust
 
 
 	end
-
+	methods(Static)
+		function F=rand(faust_type, field, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density)
+			if(faust_type ~= Faust.SPARSE && faust_type ~= Faust.DENSE && faust_type ~= Faust.MIXTE)
+				error('Faust.rand(): error: faust_type must be among Faust.SPARSE/DENSE/MIXTE.')
+			end
+			if(field == Faust.COMPLEX)
+				F = Faust(mexFaustCplx('rand', faust_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), false)
+			elseif(field == Faust.REAL)
+				F = Faust(mexFaustReal('rand', faust_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), true)
+			else
+				error('Faust.rand() error: field must be Faust.REAL or Faust.COMPLEX.')
+			end
+		end
+	end
 end
 
