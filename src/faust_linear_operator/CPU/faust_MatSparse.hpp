@@ -735,6 +735,7 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(unsigned int num
 	fsmat->update_dim();
 //	fsmat->Display();
 //	fsmat->mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	delete dense;
 	return fsmat;
 }
 
