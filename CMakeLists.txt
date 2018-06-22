@@ -844,18 +844,36 @@ ELSE(WIN32 AND NOT UNIX)
 			SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Mac")
 			SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Mac")
 		ENDIF(CMAKE_SIZEOF_VOID_P MATCHES "4")
+		file(REMOVE ${PROJECT_BINARY_DIR}/postinstall) # needed to remove possible postinstall script left here 
+							       # really needed only when BUILD_WRAPPER_MATLAB==OFF and BUILD_WRAPPER_PYTHON==ON
 		if(BUILD_WRAPPER_MATLAB)
 		    # prepare script to set matlab path for faust automatically after package installation
 		    configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/macosx/postinst_matlab.sh.in ${PROJECT_BINARY_DIR}/postinstall @ONLY)
+		endif()
+		if(BUILD_WRAPPER_PYTHON)
+		    # prepare the script allowing the user to avoid PYTHONPATH setting
+		    configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/postinst_py.sh ${PROJECT_BINARY_DIR}/postinstall2 @ONLY)
+		    file(READ ${PROJECT_BINARY_DIR}/postinstall2 POSTINST2_LINES)
+		    file(APPEND ${PROJECT_BINARY_DIR}/postinstall "${POSTINST2_LINES}")
+		    file(REMOVE ${PROJECT_BINARY_DIR}/postinstall2)
 		endif()
 	ELSE(APPLE)
 		SET(CPACK_GENERATOR "DEB;RPM")
 		#SET(CPACK_DEBIAN_PACKAGE_DEPENDS "python, python-numpy, libfftw3-3, libsndfile1")
 		#SET(CPACK_DEBIAN_PACKAGE_SECTION "math")
 		SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "FAuST is a C++ toolbox, useful to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation). ")
-		if(BUILD_WRAPPER_MATLAB)
+		file(REMOVE ${PROJECT_BINARY_DIR}/postinst) # needed to remove possible postinstall script left here 
+							       # really needed only when BUILD_WRAPPER_MATLAB==OFF and BUILD_WRAPPER_PYTHON==ON
+	        if(BUILD_WRAPPER_MATLAB)
 		    # prepare script to set matlab path for faust automatically after package installation
 		    configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/debrpm/postinst_matlab.sh.in ${PROJECT_BINARY_DIR}/postinst @ONLY)
+		endif()
+		if(BUILD_WRAPPER_PYTHON)
+		    # prepare the script allowing the user to avoid PYTHONPATH setting
+		    configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/postinst_py.sh ${PROJECT_BINARY_DIR}/postinst2 @ONLY)
+		    file(READ ${PROJECT_BINARY_DIR}/postinst2 POSTINST2_LINES)
+		    file(APPEND ${PROJECT_BINARY_DIR}/postinst "${POSTINST2_LINES}")
+		    file(REMOVE ${PROJECT_BINARY_DIR}/postinst2)
 		endif()
 #SET(CPACK_RPM_PACKAGE_DEPENDS "libmat, libmex, libmx ")
 #CPACK_RPM_PACKAGE_GROUP
