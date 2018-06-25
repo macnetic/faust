@@ -577,14 +577,13 @@ classdef Faust
 		function F = subsasgn(F,S,B)
 			%% SUBSASGN (WARNING not implemented) (overloaded Matlab built-in function)
 			%
-			% This function is no available for Faust class,
-			% this function just throw an error
+			% This function is not available for Faust class, because a Faust is immutable.
+			% This function just throws an error.
 			%
 			% F(i,j)=1, F(2:5,3:5)=zeros(4,3) will throw
 			% a Matlab error with this message :
 			% 'function not implemented for Faust class'
-			error('function not implemented for Faust class');
-
+			error('Function not implemented for Faust class');
 		end
 
 		function disp(F)
