@@ -154,6 +154,9 @@ class Faust:
     def transpose(F):
         """
         Transposes the current Faust.
+
+        Examples:
+            >>> F.transpose()
         """
         F_trans = Faust(core_obj=F.m_faust.transpose())
         return F_trans
@@ -161,6 +164,9 @@ class Faust:
     def conj(F):
         """
         Returns the conjugate of the current Faust.
+
+        Examples:
+            >>> Fc = F.conj()
         """
         F_conj = Faust(core_obj=F.m_faust.conj())
         return F_conj
@@ -185,8 +191,8 @@ class Faust:
         This method overloads the Python operator *.
 
         Args:
-            M: 2D numpy ndarray of double scalar, must be Fortran contiguous
-            (i.e. Column-major order; `order' argument passed to
+            M: is a 2D numpy ndarray of double scalar (or complex if the Faust is complex also).
+            N.B.: M must be Fortran contiguous (i.e. Column-major order; `order' argument passed to
             np.ndararray() must be equal 'F').
 
         Returns:
@@ -207,6 +213,8 @@ class Faust:
         """
         Converts the current Faust into a numpy matrix.
 
+        WARNING: this function costs F.get_nb_factors()-1 matrix multiplications.
+
         Returns:
             A numpy matrix.
         """
@@ -216,12 +224,12 @@ class Faust:
 
     def __getitem__(F, indices):
         """
-        Returns a coefficient of the Faust by its indices.
+        Returns a coefficient or a slice of the Faust based on indices.
 
         This function is a Python built-in overload.
 
         Args:
-            indices: array of length 2, its elements must be of kind: slice, integer or
+            indices: array of length 2, its elements must be slice, integer or
             Ellipsis (...).
 
         Returns:
