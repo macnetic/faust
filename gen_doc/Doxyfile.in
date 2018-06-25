@@ -462,8 +462,7 @@ INPUT			=	"@FAUST_DOC_SRC_DIR@/mainpage.md" \
 					"@FAUST_ALGORITHM_FACTORIZATION_SRC_DIR@" \
 					"@FAUST_BIN_CMDLINE_SRC_DIR@" \
 					"@FAUST_BIN_TEST_SRC_DIR@" \
-					"@FAUST_PYTHON_SRC_DIR@" \
-					"@FAUST_MATLAB_SRC_DIR@"
+					@FAUST_PYTHON_SRC_DIR@ @FAUST_MATLAB_SRC_DIR@
 USE_MDFILE_AS_MAINPAGE = mainpage
 
 INPUT_ENCODING         = UTF-8
@@ -488,14 +487,9 @@ INPUT_ENCODING         = UTF-8
 # *.c *.cc *.cxx *.cpp *.c++ *.java *.ii *.ixx *.ipp *.i++ *.inl *.h *.hh *.hxx 
 # *.hpp *.h++ *.idl *.odl *.cs *.php *.php3 *.inc *.m *.mm
 
-FILE_PATTERNS          = *.cpp \
-                         *.hpp \
-                         *.h \
-						 *.cu \
-						 *.hu \
-			 FaustPy.py \
-			 Faust.m
-
+#FILE_PATTERNS          = *.cpp *.hpp *.h *.cu *.hu FaustPy.py Faust.m
+#FILE_PATTERNS =  FaustPy.py Faust.m
+FILE_PATTERNS = @DOXYGEN_FILE_PATTERNS@
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories 
 # should be searched for input files as well. Possible values are YES and NO. 
