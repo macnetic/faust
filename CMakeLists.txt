@@ -868,6 +868,17 @@ ELSE(WIN32 AND NOT UNIX)
 #SET (CPACK_RPM_PACKAGE_REQUIRES )
 #set(CPACK_RPM_COMPONENT_INSTALL ON)
 
+set(CPACK_RPM_PACKAGE_REQUIRES "matio >= 1.5.7")
+#TODO: set(CPACK_DEBIAN_PACKAGE_DEPENDS "matio")
+if(BUILD_WRAPPER_PYTHON)
+	set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, python3 >= 3.6.5, python3-numpy >= 1.13.3, python3-scipy >= 1.0.0")
+	#TODO: set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, python3, python3-numpy, python3-scipy)
+endif()
+if(BUILD_WRAPPER_MATLAB)
+	#TODO: for debian package also ?
+	set(CPACK_RPM_SPEC_MORE_DEFINE "%define __requires_exclude ^libmex[.]so.*|libmat[.]so.*|libmx[.]so.*$ ")
+endif()
+
 set(CPACK_RPM_PACKAGE_RELEASE "1")
 SET(CPACK_RPM_PACKAGE_LICENSE "GNU AFFERO GENERAL PUBLIC LICENSE")
 set(CPACK_RPM_PACKAGE_GROUP "inconnu")
