@@ -5,7 +5,7 @@
 %  Ddvp = D{1}*D{2}*...*D{n}.
 %
 % For more information on the FAuST Project, please visit the website of 
-% the project :  <http://faust.gforge.inria.fr>
+% the project :  <http://faust.inria.fr>
 %
 %% License:
 % Copyright (2016):	Luc Le Magoarou, Remi Gribonval

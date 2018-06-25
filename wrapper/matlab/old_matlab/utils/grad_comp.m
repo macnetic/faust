@@ -4,7 +4,7 @@
 %  H(L,S,R,lambda) = || X - lambda*L*S*R || and its Lipschitz modulus LC.
 %
 % For more information on the FAuST Project, please visit the website of 
-% the project :  <http://faust.gforge.inria.fr>
+% the project :  <http://faust.inria.fr>
 %
 %% License:
 % Copyright (2016):	Luc Le Magoarou, Remi Gribonval

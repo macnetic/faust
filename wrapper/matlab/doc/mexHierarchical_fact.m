@@ -48,7 +48,7 @@
 %      the factors are updated from left to right. The default value is 0.
 %
 % For more information on the FAuST Project, please visit the website of 
-% the project :  <http://faust.gforge.inria.fr>
+% the project :  <http://faust.inria.fr>
 %
 %% License:
 % Copyright (2016):	Nicolas Bellot, Adrien Leman, Luc Le Magoarou, Remi Gribonval

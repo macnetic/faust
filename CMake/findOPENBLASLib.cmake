@@ -11,7 +11,7 @@
 ##			path/libopenblas.dll for Windows		    ##
 ##      								    ##	                  
 ##  For more information on the FAuST Project, please visit the website     ##
-##  of the project : <http://faust.gforge.inria.fr>                         ##
+##  of the project : <http://faust.inria.fr>                         ##
 ##                                                                          ##
 ##                              License:                                    ##
 ##  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      ##

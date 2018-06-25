@@ -4,7 +4,7 @@ function y = normc(x)
 %  y = normc(x) normalizes the columns of x, and puts the result in y.
 %  
 % For more information on the FAuST Project, please visit the website of 
-% the project :  <http://faust.gforge.inria.fr>
+% the project :  <http://faust.inria.fr>
 %
 %% License:
 % Copyright (2016):	Luc Le Magoarou, Remi Gribonval

@@ -2,7 +2,7 @@
 % Run script to set the useful paths in order to use the matlab wrapper of the C++ FAuST toolbox.
 %
 % For more information on the FAuST Project, please visit the website of 
-% the project :  <http://faust.gforge.inria.fr>
+% the project :  <http://faust.inria.fr>
 %
 %% License:
 % Copyright (2016):	Bellot Nicolas, Adrien Leman, Luc Le Magoarou, Remi Gribonval

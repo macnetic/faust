@@ -7,7 +7,7 @@ It is delivered with Matlab wrapper. <br>
 <br>
 The description of Faust's project is available in articles written by Luc Le Magoarou and Rémi Gribonval at : <a href="https://hal.archives-ouvertes.fr/hal-01167948v1"> link1 </a> and <a href="https://hal.archives-ouvertes.fr/hal-01156478v1"> link2 </a>. <br>
 FAµST is developped at <a href="http://www.inria.fr/en/centre/rennes"> Rennes INRIA</a> by <a href="https://team.inria.fr/panama/fr/">Panama team </a>. <br>
-For more information on the FAµST Project, please visit the <a href="http://faust.gforge.inria.fr"> website</a>. <br> 
+For more information on the FAµST Project, please visit the <a href="http://faust.inria.fr"> website</a>. <br> 
 
 <HR>
 

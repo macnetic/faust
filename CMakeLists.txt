@@ -5,7 +5,7 @@
 ##      - CMakeLists.txt files in the sub-directories                       ##
 ##      - CMake/* files, which define some tools to search for libraries.   ##
 ##  For more information on the FAuST Project, please visit the website     ##
-##  of the project : <http://faust.gforge.inria.fr>                         ##
+##  of the project : <http://faust.inria.fr>                         ##
 ##                                                                          ##
 ##                              License:                                    ##
 ##  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      ##
@@ -775,7 +775,7 @@ SET(CPACK_OUTPUT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackConfig.cmake")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Flexible Approximate Multi-Layer Sparse Transform")
 SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/license.txt")
 SET(CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/README.md")
-set(CPACK_PACKAGE_URL "http://faust.gforge.inria.fr/" )
+set(CPACK_PACKAGE_URL "http://faust.inria.fr/" )
 #INSTALL(FILES "${PROJECT_SOURCE_DIR}/README.txt" DESTINATION ${PROJECT_BINARY_DIR})
 #INSTALL(FILES "${PROJECT_SOURCE_DIR}/license.txt" DESTINATION ${PROJECT_BINARY_DIR})
 

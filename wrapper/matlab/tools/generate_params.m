@@ -7,7 +7,7 @@
 % - and the data fidelity/relative error to the input matrix to be factorized
 %
 % For more information on the FAuST Project, please visit the website of 
-% the project :  <http://faust.gforge.inria.fr>
+% the project :  <http://faust.inria.fr>
 %
 %% License:
 % Copyright (2016):	Nicolas Bellot, Adrien Leman, Thomas Gautrais, 

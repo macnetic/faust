@@ -13,7 +13,7 @@ designed to factorize matrices of interest into multiple sparse factors.
 It contains a template CPU/GPU C++ code and a Matlab wrapper.
 The algorithms implemented here are described in details in [1]- Le Magoarou
 For more information on the FAuST Project, please visit the website of the 
-project: <http://faust.gforge.inria.fr>
+project: <http://faust.inria.fr>
 ##########################################################################
 
 
