@@ -81,12 +81,12 @@ package_linux:
    stage: package_rev
    script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/faust-$CI_COMMIT_SHA -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_SHA -DCPACK_PACKAGE_VERSION=$CI_COMMIT_SHA ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_SHA -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_SHA -DCPACK_PACKAGE_VERSION=$CI_COMMIT_SHA ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
-        - lftp -u $FTP_SERV_USER,$FTP_SERV_PASS -e 'set ssl:verify-certificate no;mput Faust-*.rpm Faust-*.deb;quit' $FTP_SERV_HOST
-        - 'mv Faust-$CI_COMMIT_SHA* $HOME'
+        - lftp -u $FTP_SERV_USER,$FTP_SERV_PASS -e 'set ssl:verify-certificate no;mput faust-*.rpm faust-*.deb;quit' $FTP_SERV_HOST
+        - 'mv faust-$CI_COMMIT_SHA* $HOME'
    tags:
         - linux
    except:
@@ -119,11 +119,12 @@ package_macos_release:
 package_linux_release:
    script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_FILE_NAME=Faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
-        - 'mv Faust-*rpm Faust-*.deb $HOME'
+        - lftp -u $FTP_SERV_USER,$FTP_SERV_PASS -e 'set ssl:verify-certificate no;mput faust-*.rpm faust-*.deb;quit' $FTP_SERV_HOST
+        - 'mv faust-*rpm faust-*.deb $HOME'
    tags:
         - linux
    only:
