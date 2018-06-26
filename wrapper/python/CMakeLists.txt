@@ -37,14 +37,14 @@ configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCorePy.pyx ${FAUST_PYTHON_BIN_DI
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCy.pxd ${FAUST_PYTHON_BIN_DIR}/FaustCoreCy.pxd COPYONLY)
 configure_file(${FAUST_PYTHON_SRC_DIR}/FaustPy.py ${FAUST_PYTHON_BIN_DIR}/FaustPy.py COPYONLY)
 
+add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET})
 
-add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET} )
-
-add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
-		        COMMAND   ${PYTHON_EXE} 
-		        ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace" 
-		        COMMENT   "Creating PyFaust")
-
+foreach(PYTHON_EXE IN LISTS PYTHON_EXES)
+	add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
+		COMMAND   ${PYTHON_EXE}
+		ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace" 
+		COMMENT   "Creating PyFaust")
+endforeach()
 
 #install the python wrapper
 install(DIRECTORY ${FAUST_PYTHON_BIN_DIR}/ DESTINATION ${CMAKE_INSTALL_PYTHON_PREFIX} FILE_PERMISSIONS  ${INSTALL_FILE_PERMISSION} DIRECTORY_PERMISSIONS ${INSTALL_DIR_PERMISSION} FILES_MATCHING PATTERN "*.${MEX_EXT}" PATTERN "*.py" PATTERN "*.so" PATTERN "build" EXCLUDE PATTERN "setup*" EXCLUDE PATTERN "CMakeFiles*" EXCLUDE)
