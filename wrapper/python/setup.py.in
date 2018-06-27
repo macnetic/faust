@@ -49,7 +49,8 @@ PyFaust = Extension('FaustCorePy',
     include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],
     library_dirs=[@FAUST_PYTHON_LIB_DIR@],
     libraries=['faust'@FAUST_PYTHON_LIBS@],
-    extra_compile_args = [ "-std=c++11"]
+    extra_compile_args = [ "-std=c++11"],
+    extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
 )
 
 setup(

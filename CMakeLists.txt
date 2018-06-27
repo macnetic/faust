@@ -199,7 +199,7 @@ option(BUILD_DEBUG "Enable FAUST Debug mode." OFF)
 option(BUILD_USE_GPU  "Using both CPU and GPU process" OFF)
 
 option(BUILD_WRAPPER_MATLAB "Enable building Matlab MEX files." OFF)
-# Using openBLAS for matrix and vector computations
+
 option(BUILD_OPENBLAS "Using openBLAS for matrix and vector computations" OFF)
 # different type of files 
 option(BUILD_READ_XML_FILE "Using xml configuration to read xml files" OFF)
@@ -209,7 +209,8 @@ option(BUILD_READ_MAT_FILE "Using matio library to read mat files" ON)
 
 option(BUILD_WRAPPER_PYTHON "Enable building PyFaust (Python librairie)." OFF)
 #set(BUILD_WRAPPER_PYTHON OFF)
-
+option(PYTHON_USES_MATIO_STATIC_LIBS OFF) # if ON the script waits several variables to
+# be set: MATIO_STATIC_LIB_PATH, Z_STATIC_LIB_PATH, HDF5_STATIC_LIB_PATH
 #CMAKE_DEPENDENT_OPTION
 
 

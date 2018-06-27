@@ -93,6 +93,8 @@ package_linux:
         - schedules
         - tags
 
+
+
 # jobs triggered by git tag can force cpack to use the tag name as version but it's not necessary for MacOSX (not using cpack for that sys.)
 # it's done for linux packages
 
@@ -129,3 +131,20 @@ package_linux_release:
         - linux
    only:
         - tags
+
+
+package_linux_release_static:
+   script:
+        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DPYTHON_USES_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a ..'
+        - make
+        - cpack -G RPM -C CPackConfig.cmake
+        - cpack -G DEB -C CPackConfig.cmake
+        - lftp -u $FTP_SERV_USER,$FTP_SERV_PASS -e 'set ssl:verify-certificate no;mput faust-*.rpm faust-*.deb;quit' $FTP_SERV_HOST
+        - 'mv faust-*rpm faust-*.deb $HOME'
+   tags:
+        - linux
+   only:
+        - tags
+
+
