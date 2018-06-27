@@ -209,7 +209,7 @@ option(BUILD_READ_MAT_FILE "Using matio library to read mat files" ON)
 
 option(BUILD_WRAPPER_PYTHON "Enable building PyFaust (Python librairie)." OFF)
 #set(BUILD_WRAPPER_PYTHON OFF)
-option(PYTHON_USES_MATIO_STATIC_LIBS OFF) # if ON the script waits several variables to
+option(USE_MATIO_STATIC_LIBS OFF) # if ON the script waits several variables to
 # be set: MATIO_STATIC_LIB_PATH, Z_STATIC_LIB_PATH, HDF5_STATIC_LIB_PATH
 #CMAKE_DEPENDENT_OPTION
 
@@ -871,18 +871,18 @@ ELSE(WIN32 AND NOT UNIX)
 #SET (CPACK_RPM_PACKAGE_REQUIRES )
 #set(CPACK_RPM_COMPONENT_INSTALL ON)
 
-set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST "/opt")
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST "/opt") # to not conflict with filesystem package on fedora
 
-set(CPACK_RPM_PACKAGE_REQUIRES "matio >= 1.5.7")
-#TODO: set(CPACK_DEBIAN_PACKAGE_DEPENDS "matio")
+if(NOT ${USE_MATIO_STATIC_LIBS})
+	set(CPACK_RPM_PACKAGE_REQUIRES "matio >= 1.5.7")
+	#set(CPACK_DEBIAN_PACKAGE_DEPENDS "matio")
+endif()
 if(BUILD_WRAPPER_PYTHON)
 	#set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, python3 >= 3.6.5, python3-numpy >= 1.13.3, python3-scipy >= 1.0.0")
-	#TODO: set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, python3, python3-numpy, python3-scipy)
+	#set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, python3, python3-numpy, python3-scipy)
 endif()
-if(BUILD_WRAPPER_MATLAB)
-	#TODO: for debian package also ?
-	set(CPACK_RPM_SPEC_MORE_DEFINE "%define __requires_exclude ^libmex[.]so.*|libmat[.]so.*|libmx[.]so.*|libpython.*[.]so.*$ ")
-endif()
+#TODO: for debian package also ?
+set(CPACK_RPM_SPEC_MORE_DEFINE "%define __requires_exclude ^libmex[.]so.*|libmat[.]so.*|libmx[.]so.*|libpython.*[.]so.*$ ")
 
 set(CPACK_RPM_PACKAGE_RELEASE "1")
 SET(CPACK_RPM_PACKAGE_LICENSE "GNU AFFERO GENERAL PUBLIC LICENSE")

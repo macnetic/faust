@@ -1,17 +1,8 @@
 
 set(FAUST_PYTHON_LIB_DIR "'${FAUST_BIN_DIR}'")
 
-if(${PYTHON_USES_MATIO_STATIC_LIBS})
-	if(NOT MATIO_STATIC_LIB_PATH OR NOT Z_STATIC_LIB_PATH OR NOT HDF5_STATIC_LIB_PATH)
-		message(FATAL_ERROR "When you set PYTHON_USES_MATIO_STATIC_LIBS to ON the variables MATIO_STATIC_LIB_PATH, Z_STATIC_LIB_PATH and HDF5_STATIC_LIB_PATH must be set to the full paths of static libs (.a)")
-	endif()
-	if(NOT EXISTS ${MATIO_STATIC_LIB_PATH})
-		message(FATAL_ERROR "The filepath for matio doesn't exist: ${MATIO_STATIC_LIB_PATH}")
-	elseif(NOT EXISTS ${Z_STATIC_LIB_PATH})
-		message(FATAL_ERROR "The filepath for zlib doesn't exist: ${Z_STATIC_LIB_PATH}")
-	elseif(NOT EXISTS ${HDF5_STATIC_LIB_PATH})
-		message(FATAL_ERROR "The filepath for hdf5 lib doesn't exist: ${HDF5_STATIC_LIB_PATH}")
-	endif()
+if(${USE_MATIO_STATIC_LIBS})
+
 	set(PYTHON_EXT_EXTRA_OBJECTS "[ '${MATIO_STATIC_LIB_PATH}', '${HDF5_STATIC_LIB_PATH}', '${Z_STATIC_LIB_PATH}']") # the order matters for compilation
 else()
 	set(PYTHON_EXT_EXTRA_OBJECTS "None")
