@@ -149,4 +149,18 @@ package_linux_release_static:
    only:
         - tags
 
+pages:
+    script:
+       - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+       - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  ..'
+       - make doc
+       - mkdir ../public
+       - cp -Rf doc ../public/doc-$CI_COMMIT_TAG
+    artifacts:
+       paths:
+           - public/
+    tags:
+        - linux
+    only:
+        - tags
 
