@@ -127,7 +127,7 @@ disp('Ok');
 
 disp('test 4 : subsasgn not implemented');
 test_pass = 0;
-expected_err_message='function not implemented for Faust class';
+expected_err_message='Function not implemented for Faust class';
 F=Faust({ones(5,4),ones(4,7)});
 
 try
