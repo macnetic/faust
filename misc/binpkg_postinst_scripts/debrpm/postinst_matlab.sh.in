@@ -8,13 +8,13 @@ function dirname_noerr {
 MATLAB_ROOT=$(dirname_noerr $(dirname_noerr $(which matlab 2>/dev/null)))
 [[ ! -d "${MATLAB_ROOT}" ]] && MATLAB_ROOT=$(dirname_noerr $(dirname_noerr $(find /usr/local -maxdepth 10 -type f -name "matlab" | tail -n 1)))
 [[ ! -d "${MATLAB_ROOT}" ]] && MATLAB_ROOT=$(dirname_noerr $(dirname_noerr $(find /opt/ -maxdepth 10 -type f -name "matlab" | tail -n 1)))
-if [[ ! "$?" = 0 || ! -d "${MATLAB_ROOT}" ]]
+if [[ ! -d "${MATLAB_ROOT}" || ! -x "${MATLAB_ROOT}/bin/matlab" ]]
 then
-	echo "Can't find Matlab root dir. Add MATLAB_ROOT/bin to the PATH environment variable (of root user)." >&2
+	echo -e "\033[1mWARNING\033[0m: couldn't find Matlab root dir. You'll need to update the matlab path manually in order to use Faust matlab wrapper (or maybe you're not using matlab at all and that's not a problem)." >&2
 else
 	STARTUP_DIR="${MATLAB_ROOT}/toolbox/local/"
 	STARTUP_FILE=${STARTUP_DIR}/startup.m
-	[[ -r "$STARTUP_FILE" ]] && grep -i -v faust "$STARTUP_FILE" > "$STARTUP_FILE"
+	[[ -r "$STARTUP_FILE" ]] && grep -i -v faust "$STARTUP_FILE" > "$STARTUP_FILE" 2>/dev/null
 	FAUST_MATLAB_WRAPPER_PATH="@CMAKE_INSTALL_MATLAB_PREFIX@"
-	echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE"
+	[[ -d "${FAUST_MATLAB_WRAPPER_PATH}" ]] && echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE" && echo -e "\033[1mNOTICE\033[0m: Faust matlab setup is complete." || echo "ERROR: Faust matlab wrapper path isn't valid."
 fi
