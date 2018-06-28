@@ -58,19 +58,20 @@ ctest_nightly_macos:
 package_macos:
     stage: package_rev
     script:
+        - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$CI_COMMIT_SHA -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_SHA  ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$SHA_START -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START  ..'
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
-        - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_SHA-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_SHA -ov -format UDRW faust-$CI_COMMIT_SHA'
-        - pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_SHA --root /opt/local/faust-$CI_COMMIT_SHA --install-location /opt/local/faust-$CI_COMMIT_SHA --scripts . ./faust-$CI_COMMIT_SHA.pkg
+        - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
+        - pkgbuild --identifier fr.inria.faust --version $SHA_START --root /opt/local/faust-$SHA_START --install-location /opt/local/faust-$SHA_START --scripts . ./faust-$SHA_START.pkg
         - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
         - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
-        - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_SHA.pkg ./distribution.plist
-        - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$CI_COMMIT_SHA'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
-        - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$CI_COMMIT_SHA.pkg
-        - mv ./faust-matio-$CI_COMMIT_SHA.pkg ./faust-$CI_COMMIT_SHA.pkg
-        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$CI_COMMIT_SHA.dmg faust-$CI_COMMIT_SHA.pkg $MACOS_PKG_STORE_PATH; fi
+        - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$SHA_START.pkg ./distribution.plist
+        - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$SHA_START'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
+        - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$SHA_START.pkg
+        - mv ./faust-matio-$SHA_START.pkg ./faust-$SHA_START.pkg
+        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$SHA_START.dmg faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
     tags:
         - macos
     except:
@@ -80,13 +81,14 @@ package_macos:
 package_linux:
    stage: package_rev
    script:
+        - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_SHA -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_SHA -DCPACK_PACKAGE_VERSION=$CI_COMMIT_SHA ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
         - lftp -u $FTP_SERV_USER,$FTP_SERV_PASS -e 'set ssl:verify-certificate no;mput faust-*.rpm faust-*.deb;quit' $FTP_SERV_HOST
-        - 'mv faust-$CI_COMMIT_SHA* $HOME'
+        - 'mv faust-$SHA_START* $HOME'
    tags:
         - linux
    except:
