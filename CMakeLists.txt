@@ -865,7 +865,8 @@ ELSE(WIN32 AND NOT UNIX)
 		    file(READ ${PROJECT_BINARY_DIR}/postinst2 POSTINST2_LINES)
 		    file(APPEND ${PROJECT_BINARY_DIR}/postinst "${POSTINST2_LINES}")
 		    file(REMOVE ${PROJECT_BINARY_DIR}/postinst2)
-		endif()
+	    endif()
+
 #SET(CPACK_RPM_PACKAGE_DEPENDS "libmat, libmex, libmx ")
 #CPACK_RPM_PACKAGE_GROUP
 #SET (CPACK_RPM_PACKAGE_REQUIRES )
@@ -875,13 +876,17 @@ set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST "/opt") # to not conflict with filesyst
 
 if(NOT ${USE_MATIO_STATIC_LIBS})
 	set(CPACK_RPM_PACKAGE_REQUIRES "matio >= 1.5.7")
-	#set(CPACK_DEBIAN_PACKAGE_DEPENDS "matio")
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libmatio-dev (>= 1.5.7)")
+	# add postinst script to symlink matio lib if needed
+	file(READ ${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/debrpm/postinst_matio_symlink.sh POSTINST2_LINES)
+	file(APPEND ${PROJECT_BINARY_DIR}/postinst "${POSTINST2_LINES}")
+	file(REMOVE ${PROJECT_BINARY_DIR}/postinst2)
 endif()
 if(BUILD_WRAPPER_PYTHON)
 	#set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, python3 >= 3.6.5, python3-numpy >= 1.13.3, python3-scipy >= 1.0.0")
 	#set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, python3, python3-numpy, python3-scipy)
 endif()
-#TODO: for debian package also ?
+#no need to exclude library auto-deps for debian package/ubuntu
 set(CPACK_RPM_SPEC_MORE_DEFINE "%define __requires_exclude ^libmex[.]so.*|libmat[.]so.*|libmx[.]so.*|libpython.*[.]so.*$ ")
 
 set(CPACK_RPM_PACKAGE_RELEASE "1")

@@ -45,5 +45,4 @@ do
 	which python$V 2>&1 > /dev/null && link_py_files $V
 done
 
-exit 0
 
