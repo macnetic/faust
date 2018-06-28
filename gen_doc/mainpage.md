@@ -36,7 +36,7 @@ See document ./gettingStartedFAuST-versionX_X.pdf to install the toolbox FAµST.
 
 <HR>
 \authors Adrien Leman, Nicolas Bellot, Thomas Gautrais
-\date 03/2016
+\date @DOXYGEN_CURRENT_DATE@
 
 <HR>
 

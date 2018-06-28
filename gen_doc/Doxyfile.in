@@ -28,7 +28,7 @@ SHOW_NAMESPACES        = YES
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER         = @FAUST_VERSION_MAJOR@.@FAUST_VERSION_MINOR@
+PROJECT_NUMBER         = @CPACK_PACKAGE_VERSION@
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
@@ -456,7 +456,7 @@ WARN_LOGFILE           = "@PROJECT_BINARY_DIR@/doc/doxygen.log"
 # with spaces.
 
 
-INPUT			=	"@FAUST_DOC_SRC_DIR@/mainpage.md" \
+INPUT			=	"@PROJECT_BINARY_DIR@/doc/mainpage.md" \
 					"@FAUST_SRC_LINEAR_OPERATOR_DIR@" \
 					"@FAUST_ALGORITHM_CONSTRAINT_SRC_DIR@" \
 					"@FAUST_ALGORITHM_FACTORIZATION_SRC_DIR@" \
