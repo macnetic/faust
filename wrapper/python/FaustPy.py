@@ -60,8 +60,8 @@ class Faust:
             Another easy way to create a Faust is to call the static method Faust.randFaust().
 
         Args:
-            list_factors: list/tuple of numpy matrices or filepath of the Faust in
-        matlab binary format (.mat).
+            list_factors: list/tuple of numpy matrices (either
+            scipy.sparse.csr.csr_matrix or numpy.ndarray).
             filepath: the file in Matlab format (.mat) from which a Faust will
             be created (the file must have been saved before with
             Faust.save()).
