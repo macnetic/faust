@@ -59,6 +59,7 @@ class FaustCoreCpp
     //FaustCoreCpp(): transform(){}
     void Display() const { transform.display();}
     void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol);
+    void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols);
     unsigned int getNbRow() const;
     unsigned int getNbCol() const;
     void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x/*,bool isTranspose*/)const;

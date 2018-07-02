@@ -24,10 +24,13 @@ class TestFaustPy(unittest.TestCase):
         for i in range(0, num_factors):
             d1, d2 = d2, r.randint(1, TestFaustPy.MAX_DIM_SIZE)
             factors += [sparse.random(d1, d2, density=0.1, format='csr',
-                        dtype=np.float64).todense()]
-            print("factor",i,":", factors[i])
+                        dtype=np.float64)] #.todense() removed
+            #print("factor",i,":", factors[i])
         self.F = Faust(factors)
         self.factors = factors
+        # we keep dense matrices as reference for the tests
+        for i in range(0, num_factors):
+            self.factors[i] =  factors[i].todense()
         print("Tests on random Faust with dims=", self.F.get_nb_rows(),
               self.F.get_nb_cols())
         print("Num. factors:", num_factors)
@@ -72,6 +75,8 @@ class TestFaustPy(unittest.TestCase):
     def testGetFactorAndConstructor(self):
         print("testGetFactorAndConstructor()")
         for ref_fact,i in zip(self.factors,range(0,len(self.factors))):
+            #print("testGetFac() fac ",i, " :", self.F.get_factor(i))
+            #print("testGetFac() reffac",i, ":",ref_fact)
             self.assertTrue((ref_fact == self.F.get_factor(i)).all())
 
     def testGetNumFactors(self):
@@ -253,8 +258,8 @@ class TestFaustPy(unittest.TestCase):
         print("Test Faust.getH()")
         test_Fct = self.F.getH().todense()
         ref_Fct = self.F.todense().conj().T
-        print("test_Fct=", test_Fct)
-        print("ref_Fct=", ref_Fct)
+        #print("test_Fct=", test_Fct)
+        #print("ref_Fct=", ref_Fct)
         ref_Fct[ref_Fct==0] = 1
         test_Fct[test_Fct==0] = 1
         self.assertTrue(((((test_Fct-ref_Fct)/ref_Fct) < 0.01)).all())
@@ -266,14 +271,28 @@ class TestFaustPyCplx(TestFaustPy):
             r = random.Random()  # initialized from time or system
             num_factors = r.randint(1, TestFaustPy.MAX_NUM_FACTORS)
             factors = []
-            d2 = r.randint(1, TestFaustPy.MAX_DIM_SIZE)
+            d2 = r.randint(TestFaustPy.MIN_DIM_SIZE, TestFaustPy.MAX_DIM_SIZE)
             for i in range(0, num_factors):
-                d1, d2 = d2, r.randint(1, TestFaustPy.MAX_DIM_SIZE)
-                factors += [np.random.rand(d1, d2).astype(np.complex)]
-                factors[i].imag = [np.random.rand(d1, d2)]
+                d1, d2 = d2, r.randint(TestFaustPy.MIN_DIM_SIZE, TestFaustPy.MAX_DIM_SIZE)
+                if(r.randint(0,1) > 0): # generate a dense complex matrix
+                    factors += [np.random.rand(d1, d2).astype(np.complex)]
+                    factors[i].imag = [np.random.rand(d1, d2)]
+                else:
+                    # generate a sparse matrix
+                    # we can't use scipy.sparse.random directly because only float type is
+                    # supported for random sparse matrix generation
+                    factors += [sparse.random(d1, d2, dtype=np.float64, format='csr',
+                                       density=r.random()).astype(np.complex)]
+                    #print("setUp() i=",i, "d1=",d1, "d2=", d2, "factor.shape[0]=",
+                    #      factors[i].shape[0])
+                    factors[i] *= np.complex(r.random(), r.random())
             self.F = Faust(factors)
             self.factors = factors
-            print("Tests on random Faust with dims=", self.F.get_nb_rows(),
+            # we keep dense matrices as reference for the tests
+            for i in range(0, num_factors):
+                if(not isinstance(factors[i], np.ndarray)):
+                    self.factors[i] =  factors[i].todense()
+            print("Tests on random complex Faust with dims=", self.F.get_nb_rows(),
                   self.F.get_nb_cols())
             print("Num. factors:", num_factors)
             self.r = r

@@ -61,24 +61,28 @@ cdef class FaustCore:
     #### CONSTRUCTOR ####
     #def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
     def  __cinit__(self,list_factors=None, core=False):
-        #print 'inside cinit'
         cdef double [:,:] data
+        cdef double [:] data1d #only for csr mat factor
+        cdef int [:] indices # only for csr mat
+        cdef int [:] indptr # only for csr mat
         cdef complex [:,:] data_cplx
+        cdef complex [:] data1d_cplx #only for csr mat factor
         cdef unsigned int nbrow
         cdef unsigned int nbcol
         if(list_factors is not None):
-            #print 'longueur list'
-            #print len(list_factors)
-            #print 'avant boucle'
             self._isReal = True
             for i,factor in enumerate(list_factors):
+                # Faust uses row-major order for sparse matrices
+                # and col-major order for dense matrices
+                # but libmatio uses col-major order for sparse matrices
                 if(isinstance(factor, sparse.csc.csc_matrix)):
-                    factor = list_factors[i] = factor.toarray()
+                    factor = list_factors[i] = factor.tocsr()
                     #print("FaustCorePy.pyx __cinit__(),toarray() factor:", factor)
-                if(not isinstance(factor, np.ndarray)):
-                    #print("FaustCorePy.pyx __cinit__(), factor:",factor)
-                    raise ValueError("Faust factors must be a numpy.ndarray or "
-                                     "a scipy.sparse.csr.csr_matrix")
+                if(not isinstance(factor, np.ndarray) and
+                   not isinstance(factor, sparse.csr.csr_matrix)):
+                   #print("FaustCorePy.pyx __cinit__(), factor:",factor)
+                   raise ValueError("Faust factors must be a numpy.ndarray or "
+                                    "a scipy.sparse.csr.csr_matrix")
                 if(isinstance(factor[0,0], np.complex)):
                     # str(factor.dtype) == complex128/64/complex_
                     self._isReal = False
@@ -88,27 +92,36 @@ cdef class FaustCore:
             else:
                 self.core_faust_cplx = new FaustCoreCy.FaustCoreCpp[complex]()
             for factor in list_factors:
+                nbrow=factor.shape[0];
+                nbcol=factor.shape[1];
                 if(self._isReal):
-                    data=factor.astype(float,'F')
+                   if(isinstance(factor, np.ndarray)):
+                      data=factor.astype(float,'F')
+                      self.core_faust_dbl.push_back(&data[0,0], nbrow, nbcol)
+                   else: #csr.csr_matrix
+                      data1d=factor.data.astype(float,'F')
+                      indices=factor.indices.astype(np.int32, 'F')
+                      indptr=factor.indptr.astype(np.int32, 'F')
+                      self.core_faust_dbl.push_back(&data1d[0], &indptr[0],
+                                                    &indices[0], factor.nnz, nbrow, nbcol)
                 else:
                     if(isinstance(factor, sparse.csc.csc_matrix)):
                         #TODO: understand how is it possible to have a sparse
                         # mat here and fix it (because it should have been
                         # converted above already)
-                        factor = list_factors[i] = factor.toarray()
+                        factor = list_factors[i] = factor.tocsr()
                     #print('FaustCorePy.pyx type factor=',type(factor))
                     #print("FaustCorePy.pyx factor=",factor)
-                    data_cplx=factor.astype(np.complex128,'F')
-                nbrow=factor.shape[0];
-                nbcol=factor.shape[1];
-                #	print nbrow
-                #	print nbcol
-                if(self._isReal):
-                    self.core_faust_dbl.push_back(&data[0,0], nbrow, nbcol)
-                else:
-                    self.core_faust_cplx.push_back(&data_cplx[0,0], nbrow, nbcol)
-                #print(self.__dict__)
-                #print 'apres boucle'
+                    if(isinstance(factor, np.ndarray)):
+                        data_cplx=factor.astype(np.complex128,'F')
+                        self.core_faust_cplx.push_back(&data_cplx[0,0], nbrow, nbcol)
+                    else:
+                        #print("FaustCore, factor dims:", nbrow, nbcol)
+                        data1d_cplx = factor.data.astype(np.complex128, 'F')
+                        indices=factor.indices.astype(np.int32, 'F')
+                        indptr=factor.indptr.astype(np.int32, 'F')
+                        self.core_faust_cplx.push_back(&data1d_cplx[0], &indptr[0],
+                                                    &indices[0], factor.nnz, nbrow, nbcol)
         elif(core): # trick to initialize a new FaustCoreCpp from C++ (see
         # transpose, conj and adjoint)
             pass

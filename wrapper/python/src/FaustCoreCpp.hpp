@@ -50,6 +50,7 @@
 void FaustCoreCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbcol)
 {
     Faust::MatDense<FPP,Cpu> dense_mat(valueMat,nbrow,nbcol);
+    //TODO: why this auto-conversion in sparse mat ?
     Faust::MatSparse<FPP,Cpu> sparse_mat(dense_mat);
     //sparse_mat.Display();
     this->transform.push_back(&sparse_mat);
@@ -57,6 +58,15 @@ void FaustCoreCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int
 
 
 
+}
+
+template<typename FPP>
+void FaustCoreCpp<FPP>::push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols)
+{
+    //    Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP1* value, const int* row_ptr, const int* id_col) :
+      Faust::MatSparse<FPP, Cpu> sparse_mat(nnz, nrows, ncols, data, row_ptr, id_col);
+//      std::cout << "FaustCoreCpp::push_back()" << nrows << " " << sparse_mat.getNbRow() <<  " " << ncols << " " << sparse_mat.getNbCol() << std::endl;
+      this->transform.push_back(&sparse_mat);
 }
 
 template<typename FPP>
