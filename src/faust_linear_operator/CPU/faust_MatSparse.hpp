@@ -159,7 +159,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_
 		for (int j = 0;j<nb_elt_rowi;j++)
 		{
 			//std::cout<<"i : "<<id_row[i+nbEltIns]<<" j :"<<j<<" value : "<<value[i+nbEltIns]<<std::endl;
-			tripletList.push_back(Eigen::Triplet<FPP>(i,(int) id_col[j+nbEltIns], (FPP) value[i+nbEltIns]));
+			tripletList.push_back(Eigen::Triplet<FPP>(i,(int) id_col[j+nbEltIns], (FPP) value[j+nbEltIns]));
 		}
 		nbEltIns += nb_elt_rowi;
 	}
