@@ -291,7 +291,7 @@ class Faust:
         Examples:
             >>> F.density()
         """
-        return float(F.nnz()/(F.get_nb_cols()*F.get_nb_rows()))
+        return float(F.nnz())/(F.get_nb_cols()*F.get_nb_rows())
 
     def RCG(F):
         """
