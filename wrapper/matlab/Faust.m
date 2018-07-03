@@ -101,7 +101,7 @@ classdef Faust
 				if (~exist('faust_factors','var') )
 					error('Faust : invalid file');
 				end
-				F=Faust(faust_factors);
+				F = Faust(faust_factors, varargin{2:end});
 			elseif(isa(varargin{1}, 'Faust'))
 				% create a Faust from another one but not with the same
 				% handle to set inside the FaustCore object (matrix)
