@@ -50,6 +50,7 @@ from libcpp cimport bool
 from libcpp cimport complex
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from scipy import sparse
+from re import match
 
 cdef class FaustCore:
 
@@ -60,7 +61,7 @@ cdef class FaustCore:
     cdef bool _isReal
     #### CONSTRUCTOR ####
     #def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
-    def  __cinit__(self,list_factors=None, core=False):
+    def  __cinit__(self,list_factors=None, alpha=1.0, core=False):
         cdef double [:,:] data
         cdef double [:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -70,6 +71,9 @@ cdef class FaustCore:
         cdef unsigned int nbrow
         cdef unsigned int nbcol
         if(list_factors is not None):
+            if(match('.*int', repr(list_factors[0].dtype))):
+               list_factors[0] = list_factors[0].astype(np.float)
+            list_factors[0] *= alpha
             self._isReal = True
             for i,factor in enumerate(list_factors):
                 # Faust uses row-major order for sparse matrices

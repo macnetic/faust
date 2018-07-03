@@ -54,7 +54,7 @@ class Faust:
     matrix.
     """
 
-    def  __init__(F, list_factors=None, filepath=None, core_obj=None):
+    def  __init__(F, list_factors=None, alpha=1.0, filepath=None, core_obj=None):
         """ Creates a Faust from a list of factors or alternatively from a file.
 
             Another easy way to create a Faust is to call the static method Faust.randFaust().
@@ -62,6 +62,9 @@ class Faust:
         Args:
             list_factors: list/tuple of numpy matrices (either
             scipy.sparse.csr.csr_matrix or numpy.ndarray).
+            alpha: multiplicative scalar applied to the factor product before
+            to set the Faust with. Note that the constant is ignored if
+            list_factors argument isn't used.
             filepath: the file in Matlab format (.mat) from which a Faust will
             be created (the file must have been saved before with
             Faust.save()).
@@ -81,7 +84,7 @@ class Faust:
                     contents = loadmat(filepath)
                     list_factors = contents['faust_factors'][0]
             if(list_factors is not None):
-                F.m_faust = FaustCorePy.FaustCore(list_factors);
+                F.m_faust = FaustCorePy.FaustCore(list_factors, alpha);
             #else:
                 #TODO: manage empty Faust
 
