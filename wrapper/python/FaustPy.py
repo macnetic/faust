@@ -62,12 +62,12 @@ class Faust:
         Args:
             list_factors: list/tuple of numpy matrices (either
             scipy.sparse.csr.csr_matrix or numpy.ndarray).
-            alpha: multiplicative scalar applied to the factor product before
-            to set the Faust with. Note that the constant is ignored if
-            list_factors argument isn't used.
             filepath: the file in Matlab format (.mat) from which a Faust will
             be created (the file must have been saved before with
             Faust.save()).
+            alpha: multiplicative scalar applied to the factor product before
+            to set the Faust with. Note that the factors can come from file
+            also.
             core_obj: for internal purpose only. Please don't fill this argument.
 
 
