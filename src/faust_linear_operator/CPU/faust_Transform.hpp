@@ -325,7 +325,8 @@ void Faust::Transform<FPP,Cpu>::updateNonZeros()
 {
 	int totalNonZeros_tmp=0;
 	for (int i=0;i<size();i++)
-		totalNonZeros+=data[i].getNonZeros();
+		totalNonZeros_tmp+=data[i].getNonZeros();
+	totalNonZeros = totalNonZeros_tmp;
 }
 
 
