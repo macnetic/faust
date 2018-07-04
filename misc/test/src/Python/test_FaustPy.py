@@ -124,12 +124,14 @@ class TestFaustPy(unittest.TestCase):
 
     def testDensity(self):
         print("testDensity()")
-        ref_density = self.faust_nnz()/self.F.get_nb_cols()/self.F.get_nb_rows()
+        ref_density = \
+        float(self.faust_nnz())/float(self.F.get_nb_cols()*self.F.get_nb_rows())
         self.assertAlmostEqual(ref_density, self.F.density(), delta=.001)
 
     def testRcg(self):
         print("testRcg()")
-        ref_rcg = self.F.get_nb_rows()*self.F.get_nb_cols()/self.faust_nnz()
+        ref_rcg = \
+        float(self.F.get_nb_rows()*self.F.get_nb_cols())/float(self.faust_nnz())
         self.assertAlmostEqual(ref_rcg, self.F.RCG(), delta=.001)
 
 
