@@ -178,10 +178,6 @@ cdef class FaustCore:
 
 
 
-    #avoid using np.ndarray as input type
-    #because there is no distinction between row vector and column vector
-    #WARNING : a vector is always a Column Vector
-    #
     # numpy.matrix is always 2-dimensional but C-style (RowMajor)  stored
     # not Fortran-style (ColMajor) as Faust lib use Fortran-style storage
 
@@ -190,7 +186,6 @@ cdef class FaustCore:
     def multiply(self,M):
         if not isinstance(M, (np.ndarray) ):
             raise ValueError('input M must a numpy ndarray')
-        #transform into float F continous  matrix
         if(self._isReal):
             M=M.astype(float,'F')
             if not M.dtype=='float':
