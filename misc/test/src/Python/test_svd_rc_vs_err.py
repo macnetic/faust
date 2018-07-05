@@ -15,7 +15,7 @@ from scipy.linalg import svd
 
 class TruncSvd(Thread):
 
-    def __init__(self, offset, M, U, S, V, r, errs, rcgs):
+    def __init__(self, offset, M, U, S, V, r, errs, rcs):
         Thread.__init__(self)
         self.offset = offset
         self.M = M
@@ -24,7 +24,7 @@ class TruncSvd(Thread):
         self.S = S
         self.r = r
         self.errs = errs
-        self.rcgs = rcgs
+        self.rcs = rcs
 
     def run(s):
         S = np.zeros([s.U.shape[1], s.V.shape[0]])
@@ -33,9 +33,10 @@ class TruncSvd(Thread):
         # assert((abs(M - s.U.dot(S).dot(s.V))/abs(s.M) < .01).all())
         while(s.r <= min(s.M.shape[0], s.M.shape[1])):
             s.Mr = (s.U[:, 0:s.r].dot(S[0:s.r, 0:s.r])).dot(s.V[0:s.r, :])
+            #s.errs[0, s.r-1] = S[s.r-1,s.r-1] / S[0,0]
             s.errs[0, s.r-1] = norm(s.M-s.Mr, 'fro')/norm(s.M, 'fro')
-            s.rcgs[0, s.r-1] = s.M.shape[0] * s.M.shape[1]
-            s.rcgs[0, s.r-1] /= (s.r*(s.M.shape[0]+s.M.shape[1]))
+            s.rcs[0, s.r-1] = (s.r*(s.M.shape[0]+s.M.shape[1]))
+            s.rcs[0, s.r-1] /= s.M.shape[0] * s.M.shape[1]
             s.r += s.offset
 
 
@@ -47,26 +48,26 @@ if __name__ == '__main__':
     n = int(argv[2])
     nthreads = 8
     errs = np.zeros([1, min(m, n)])
-    rcgs = np.zeros([1, min(m, n)])
+    rcs = np.zeros([1, min(m, n)])
     M = rand(m, n)
     U, S, V = svd(M)
     ths = list()
     for i in range(1, nthreads+1):
-        th = TruncSvd(nthreads, M, U, S, V, i, errs, rcgs)
+        th = TruncSvd(nthreads, M, U, S, V, i, errs, rcs)
         ths.append(th)
         th.start()
     for th in ths:
         th.join()
-    plt.scatter(rcgs[0, :], errs[0, :], s=1)
+    plt.scatter(rcs[0, :], errs[0, :], s=1)
     # plt.gca().set_xscale('log', basex=.5)
-    plt.gca().invert_xaxis()
-    plt.xlabel('Relative Complexity Gain (RCG)')
+    #plt.gca().invert_xaxis()
+    plt.xlabel('Relative Complexity/Density')
     plt.ylabel('Relative Error')
-    plt.title('Relative Error over RCG of Truncated SVDs for a dense matrix M ('
+    plt.title('Relative Error over RC of Truncated SVDs for a dense matrix M ('
               + str(m) + 'x' + str(n)+')')
 #    f = open("svd_err_vs_rcg_output_"+str(nthreads), "w")
 #    for i in range(0,errs.shape[1]):
-#        f.write(str(errs[0,i])+" "+str(rcgs[0,i])+"\n")
+#        f.write(str(errs[0,i])+" "+str(rcs[0,i])+"\n")
 #    f.close()
-    # plt.plot(rcgs, errs)
+    #plt.plot(rcs, errs)
     plt.show()
