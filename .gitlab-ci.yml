@@ -71,7 +71,11 @@ package_macos:
         - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$SHA_START'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
         - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$SHA_START.pkg
         - mv ./faust-matio-$SHA_START.pkg ./faust-$SHA_START.pkg
-        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$SHA_START.dmg faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
+        # - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$SHA_START.dmg faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
+    artifacts:
+        paths:
+            - build/faust-${CI_COMMIT_SHA:0:8}.pkg
+            - build/faust-${CI_COMMIT_SHA:0:8}.dmg
     tags:
         - macos
     except:
@@ -88,7 +92,11 @@ package_linux:
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
         - lftp -u $FTP_SERV_USER,$FTP_SERV_PASS -e 'set ssl:verify-certificate no;mput faust-*.rpm faust-*.deb;quit' $FTP_SERV_HOST
-        - 'mv faust-$SHA_START* $HOME'
+        #- 'mv faust-$SHA_START* $HOME'
+   artifacts:
+        paths:
+            - build/faust-${CI_COMMIT_SHA:0:8}-x86_64.deb
+            - build/faust-${CI_COMMIT_SHA:0:8}-x86_64.rpm
    tags:
         - linux
    except:
@@ -114,7 +122,11 @@ package_macos_release:
         - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$CI_COMMIT_TAG'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
         - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$CI_COMMIT_TAG.pkg
         - mv ./faust-matio-$CI_COMMIT_TAG.pkg ./faust-$CI_COMMIT_TAG.pkg
-        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$CI_COMMIT_TAG.dmg faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
+        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$CI_COMMIT_TAG.dmg faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
+    artifacts:
+        paths:
+            - build/faust-${CI_COMMIT_TAG}.pkg
+            - build/faust-${CI_COMMIT_TAG}.dmg
     tags:
         - macos
     only:
@@ -128,7 +140,11 @@ package_linux_release:
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
         - lftp -u $FTP_SERV_USER,$FTP_SERV_PASS -e 'set ssl:verify-certificate no;mput faust-*.rpm faust-*.deb;quit' $FTP_SERV_HOST
-        - 'mv faust-*rpm faust-*.deb $HOME'
+        # - 'mv faust-*rpm faust-*.deb $HOME'
+   artifacts:
+        paths:
+            - build/faust-$CI_COMMIT_TAG-x86_64.deb
+            - build/faust-$CI_COMMIT_TAG-x86_64.rpm
    tags:
         - linux
    only:
@@ -143,7 +159,11 @@ package_linux_release_static:
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
         - lftp -u $FTP_SERV_USER,$FTP_SERV_PASS -e 'set ssl:verify-certificate no;mput faust-*.rpm faust-*.deb;quit' $FTP_SERV_HOST
-        - 'mv faust-*rpm faust-*.deb $HOME'
+        # - 'mv faust-*rpm faust-*.deb $HOME'
+   artifacts:
+        paths:
+            - build/faust-$CI_COMMIT_TAG-static-x86_64.deb
+            - build/faust-$CI_COMMIT_TAG-static-x86_64.rpm
    tags:
         - linux
    only:
