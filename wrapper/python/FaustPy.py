@@ -132,20 +132,27 @@ class Faust:
         Generates a random Faust.
 
             Args:
-                faust_type: must be one of RandFaustType.DENSE, RandFaustType.SPARSE or RandFaustType.MIXTE.
+                faust_type: must be one of RandFaustType.DENSE,
+                RandFaustType.SPARSE or RandFaustType.MIXTE (the latter is for
+                allowing generation of dense or sparse factors in the same
+                Faust).
                 field: must be one of RandFaustType.REAL or RandFaustType.COMPLEX.
                 min_num_factors: the minimal number of factors.
                 max_num_factors: the maximal number of factors.
-                min_dim_size: the minimal size of column and row dimensions.
-                max_dim_size: the maximal size of column and row dimensions.
+                min_dim_size: the minimal size of column and row dimensions of
+                the Faust generated.
+                max_dim_size: the maximal size of column and row dimensions of
+                the Faust generated.
                 density: the approximate density of factors.
 
         Returns:
-            the random generated Faust.
+            the random Faust.
 
         Examples:
             >>> from FaustPy import Faust, RandFaustType
             >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX, 2, 3, 10, 20,.5)
+            
+        <b/> See also Faust.__init__
             """
         if(not isinstance(faust_type, int) or faust_type not in [RandFaustType.SPARSE,
                                                        RandFaustType.DENSE,
@@ -167,36 +174,68 @@ class Faust:
         """
         Gives the Faust's number of rows.
 
+        Args:
+            F: the Faust object.
+
         Returns:
-                the number of rows.
-        """
+            the number of rows.
+
+        <b/> See also Faust.size, Faust.get_nb_cols
+       """
         return F.m_faust.shape()[0]
 
     def get_nb_cols(F):
         """
         Gives the Faust's number of columns.
 
+        Args:
+            F: the Faust object.
+
         Returns:
-                the number of columns.
+            the number of columns.
+
+        <b/> Faust.size, Faust.get_nb_rows
         """
         return F.m_faust.shape()[1]
 
     def size(F):
         """
-        Gives the size of the Faust.
+        Gives the size of the Faust F.
+
+        Args:
+            F: the Faust object.
 
         Returns:
             the Faust size tuple: get_nb_rows(), get_nb_cols().
+
+        Examples:
+            >>> from FaustPy import Faust, RandFaustType
+            >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX, 2,
+            >>>                     5, 50, 100, .5)
+            >>> nlines, ncols = F.size()
+            >>> nlines = F.size()[0]
+            >>> ncols = F.size()[1]
+            >>> nlines, ncols = F.get_nb_rows(), F.get_nb_cols()
+
+        <b/> See also Faust.get_nb_rows, Faust.get_nb_cols
+
         """
-        #return F.shape[0], F.shape[1]
         return F.m_faust.shape()
 
     def transpose(F):
         """
-        Transposes the current Faust.
+        Transposes the Faust F.
+
+        Args:
+            F: the Faust object.
+
+        Returns:
+            F transpose as a Faust object.
 
         Examples:
-            >>> F.transpose()
+            >>> tF = F.transpose()
+
+        <b/> Faust.getH
         """
         F_trans = Faust(core_obj=F.m_faust.transpose())
         return F_trans
@@ -228,7 +267,26 @@ class Faust:
 
     def getH(F):
         """
-        Returns the conjugate transpose of the current Faust.
+        Returns the conjugate transpose of F.
+
+        Args:
+            F: the Faust object.
+
+        Returns:
+            the conjugate transpose of F as a Faust object.
+
+
+        Examples:
+            >>> from FaustPy import Faust, RandFaustType
+            >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX, 2,
+            >>>                     5, 50, 100, .5)
+            >>> H1 = F.getH()
+            >>> H2 = F.transpose()
+            >>> H2 = H2.conj()
+            >>> (H1.todense() == H2.todense()).all()
+            True
+
+        <b/> See also Faust.transpose, Faust.conj
         """
         F_ctrans = Faust(core_obj=F.m_faust.getH())
         return F_ctrans
@@ -262,7 +320,7 @@ class Faust:
         """
         Multiplies F by the numpy matrix A.
 
-        This method overloads the Python operator *.
+        This method overloads a Python function/operator.
 
         Args:
             F: the Faust object.
@@ -367,17 +425,16 @@ class Faust:
 
     def nnz(F):
         """
-        Gives the number of non-zero elements in the Faust.
+        Gives the total number of non-zero elements in F's factors.
 
         The function sums together the number of non-zeros elements of
         each factor and returns the result. Note that in fact the sum is
         computed at Faust creation time and kept in cache.
 
         Returns:
-            the number of non-zero elements as an integer.
+            the number of non-zeros.
 
-        Examples:
-            >>> F.nnz()
+        <b/> See also Faust.RCG, Faust.density.
         """
         return F.m_faust.nnz()
 
@@ -400,7 +457,7 @@ class Faust:
         >>> from FaustPy import Faust, RandFaustType
         >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX, 2,
         >>>                     5, 50, 100, .5)
-        >>> F.density()
+        >>> dens = F.density()
 
         <b/> See also Faust.nnz, Faust.RCG
         """
@@ -408,7 +465,14 @@ class Faust:
 
     def RCG(F):
         """
-        Computes the Relative Complexity Gain (inverse of the density).
+        Computes the Relative Complexity Gain (inverse of Faust.density).
+
+        RCG is the theoretical gain brought by Faust representation relatively to its dense
+        matrix equivalent. That gain applies both for storage and multiplication computation
+        time.
+
+        Args:
+            F: the Faust object.
 
         Returns:
             the RCG value (float).
@@ -417,6 +481,8 @@ class Faust:
 
         Examples:
             >>> F.RCG()
+
+        <b/> See also: Faust.density, Faust.nnz.
         """
         d = F.density()
         if(d > 0):
@@ -428,10 +494,15 @@ class Faust:
 
     def norm(F, ord=2):
         """
-        Computes the norm of the Faust. Several types of norm are available: 1-norm, 2-norm and Frobenius norm.
+        Computes the norm of F. Several types of norm are available: 1-norm, 2-norm and Frobenius norm.
+
+        Note: the norm of F is equal to the norm of its dense matrix.
+
+        WARNING: this function costs at least as much as Faust.__mul__.
 
         Args:
-            ord: (Optional) the norm order (1 or 2) or "fro" for
+            F: the Faust object.
+            ord: (optional) the norm order (1 or 2) or "fro" for
             Frobenius norm (by default the 2-norm is computed).
 
         Returns:
@@ -452,22 +523,28 @@ class Faust:
 
     def get_nb_factors(F):
         """
-        Gives the Faust's number of factors.
+        Gives the number of factors of F.
 
         Returns:
             the number of factors.
 
         Examples:
-            >>> F.get_nb_factors()
+        >>> from FaustPy import Faust, RandFaustType
+        >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX, 2,
+        >>>                     5, 50, 100, .5)
+        >>> nf = F.get_nb_factors()
+
+        <b/> See also Faust.get_factor
         """
         return F.m_faust.get_nb_factors()
 
     def get_factor(F, i):
         """
-        Returns the Faust's i-th factor as a numpy.ndarray.
+        Returns the i-th factor of F.
 
         Args:
-            i: the integer index of the factor to get back.
+            F: the Faust object.
+            i: the factor index.
 
         Returns:
             the i-th factor as a dense matrix (of type numpy.ndarray).
@@ -477,19 +554,25 @@ class Faust:
 
 
         Examples:
-            >>> F.get_factor(0)
+            >>> from FaustPy import Faust, RandFaustType
+            >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX, 2,
+            >>>                     5, 50, 100, .5)
+            >>> f0 = F.get_factor(0)
+
+        <b/> See also Faust.get_nb_factors
         """
         fact = F.m_faust.get_fact(i)
         return fact
 
     def save(F, filepath, format="Matlab"):
         """
-        Saves the Faust into file.
+        Saves the Faust F into file.
 
         Args:
-            filepath: The path for saving the Faust (should ends with .mat
-            if Matlab format used). It can be either an absolute or relative path.
-            format: (Optional) It designates the format to use for
+            F: the Faust object.
+            filepath: the path for saving the Faust (should ends with .mat
+            if Matlab format is used).
+            format: (optional) it designates the format to use for
             writing. By default, it's "Matlab" to save the Faust in a .mat
             file (currently only that format is available).
 
@@ -498,7 +581,16 @@ class Faust:
 
 
         Examples:
-            >>> F.save("myFaust.mat")
+            >>> from FaustPy import Faust, RandFaustType
+            >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX,
+            >>>                     2, 3, 10, 20,.5)
+            >>> F.save("F.mat")
+            >>> G = Faust(filepath="F.mat")
+            >>> H = Faust(filepath="F.mat", alpha=2)
+            >>> (H.todense()/G.todense() != 2).any()
+            False
+
+            <b/> See also Faust.__init__.
         """
         if(format not in ["Matlab"]):
             raise ValueError("Only Matlab or Matlab_core format is supported.")
@@ -507,7 +599,10 @@ class Faust:
 
     def isReal(F):
         """
-        Returns True if F is a real Faust and False if it's a complex Faust.
+        Indicates if F is a real Faust or a complex Faust.
+
+        Returns:
+            True if F is a real Faust and False if it's a complex Faust.
         """
         return F.m_faust.isReal()
 

@@ -227,14 +227,14 @@ classdef Faust
 		%======================================================================
 		%> @brief Multiplies the Faust or its transpose to the A full storage matrix.
 		%>
-		%> See also mtimes.
 		%>
-		%> @param A The matrix to multiply (full storage matrix).
-		%> @param trans Integer whose the value 1 means we want C=F'*A,
-		%> 				otherwise if it's value is 0 then the function computes C=F*A.
+		%> @param A the matrix to multiply (full storage matrix).
+		%> @param trans equals 1 to calculate C=F'*A
+		%> 				or 0 to calculate C=F*A.
 		%>
 		%> @retval C The multiplication result (full storage matrix).
 		%>
+		%> <p> @b See @b also mtimes.
 		%======================================================================
 		function C = mtimes_trans(F,A,trans)
 			%% MTIMES_TRANS Multiplication by a Faust or its non-conjugate transposed.
@@ -273,6 +273,8 @@ classdef Faust
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
+		%> @b Warning: this function costs F.get_nb_factor()-1 matrix multiplications.
+		%>
 		%> @retval A the full storage matrix resulting from the Faust.
 		%>
 		%======================================================================
@@ -290,12 +292,11 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief Indicates if the Faust is set with real or complex scalars.
+		%> @brief Indicates if F is a real Faust or a complex Faust.
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
-		%>
-		%> @retval 1 if Faust is set with real scalars, 0 for complex scalars.
+		%> @retval bool 1 if F is a real Faust, 0 if it's a complex faust.
 		%>
 		%======================================================================
 		function bool = isreal(F)
@@ -309,21 +310,23 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief Gives the transpose of the Faust.
+		%> @brief Transposes the Faust F.
 		%>
-		%> This function overloads a Matlab built-in function.
+		%> This function overloads a Matlab built-in function/operator.
 		%>
+		%> @param F the Faust object.
+		%>
+		%> @retval F_trans F transpose as a Faust object.
 		%>
 		%>
 		%> @b Example
 		%> @code
-		%>   F.'
+		%>   F_trans = F.'
 		%> % is equivalent to
-		%>   transpose(F)
+		%>   F_trans = transpose(F)
 		%> @endcode
 		%>
-		%> @retval F_trans The Faust transpose.
-		%> <p/>@b See @b also ctranspose
+		%> <p/>@b See @b also Faust.ctranspose
 		%======================================================================
 		function F_trans=transpose(F)
 			%% TRANSPOSE .' Non-conjugate transposed Faust (overloaded Matlab built-in function).
@@ -343,13 +346,13 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief Gives the conjugate transpose of the Faust.
+		%> @brief Returns the conjugate transpose of F.
 		%>
-		%> This function overloads a Matlab built-in function.
+		%> This function overloads a Matlab built-in function/operator.
 		%>
 		%> @param F the Faust object.
 		%>
-		%> @retval F_ctrans the Faust conjugate transpose.
+		%> @retval F_ctrans the conjugate transpose of F as a Faust object.
 		%>
 		%> @b Example
 		%> @code
@@ -357,9 +360,12 @@ classdef Faust
 		%>	F_ctrans = F'
 		%>	F_ctrans2 = ctranspose(F)
 		%>	% F_ctrans == F_ctrans2
+		%>	F_ctrans2 = transpose(F)
+		%>	F_ctrans2 = conj(F_ctrans2)
+		%>	% F_ctrans == F_ctrans2
 		%> @endcode
 		%>
-		%> <p/>@b See @b also Faust.transpose
+		%> <p/>@b See @b also Faust.transpose, Faust.conj
 		%>
 		%======================================================================
 		function F_ctrans=ctranspose(F)
@@ -411,11 +417,19 @@ classdef Faust
 		%======================================================================
 		%> @brief Gives the size of the Faust.
 		%>
-		%>
+		%> @param F the Faust object.
 		%> @param varargin can be missing or specifying the index of the dimension to get the size of.
 		%>
 		%> @retval [NROWS,NCOLS] = size(F)
-		%> @retval N = size(F,DIM) with N being the size of Faust along its DIM-th dimension.
+		%> @retval N = size(F,DIM) with N being the size of DIM-th dimension of F.
+		%>
+		%> @b Example
+		%> @code
+		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
+		%>	[nlines, ncols] = size(F)
+		%>	nlines = size(F, 1)
+		%>	ncols = size(F, 2)
+		%> @endcode
 		%>
 		%======================================================================
 		function varargout = size(F,varargin)
@@ -537,7 +551,7 @@ classdef Faust
 
 
 
-		%===========================================================================================
+		%=====================================================================
 		%> @brief Returns the i-th factor of F.
 		%>
 		%> @param F the Faust object.
@@ -545,8 +559,13 @@ classdef Faust
 		%>
 		%> @retval factor the i-th factor as a full storage matrix.
 		%>
+		%> @b Example
+		%> @code
+		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
+		%>	f1 = get_fact(F,1)
+		%> @endcode
 		%> <p>@b See @b also Faust.get_nb_factor
-		%===========================================================================================
+		%=====================================================================
 		function factor = get_fact(F,i)
 			%% GET_FACT Ith factor of the Faust.
 			%
@@ -576,11 +595,17 @@ classdef Faust
 
 
 		%===========================================================================================
-		%> @brief Gives the number of factors composing the Faust.
+		%> @brief Gives the number of factors of F.
 		%>
 		%> @param F the Faust object.
 		%>
 		%> @retval num_factors the number of factors.
+		%>
+		%> @b Example
+		%> @code
+		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
+		%>	nf = get_nb_factor(F)
+		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.get_fact.
 		%===========================================================================================
@@ -599,21 +624,28 @@ classdef Faust
 		end
 
 		%===========================================================================================
-		%> @brief Saves the Faust into file respecting the Matlab format version 5 (.mat file).
+		%> @brief Saves the Faust F into file respecting the Matlab format version 5 (.mat file).
 		%>
 		%> @param F the Faust object.
-		%> @param filepath the filepath where the file will be saved (filename should ends with .mat).
+		%> @param filepath the path for saving the Faust (filename should ends with .mat).
+		%>
+		%> @b Example
+		%> @code
+		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
+		%>	save(F, 'F.mat')
+		%>	G = Faust('F.mat')
+		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.Faust.
 		%===========================================================================================
-		function save(F, filename)
+		function save(F, filepath)
 			%% save Saves a Faust into a matfile.
 			%
-			%  save(F,filename) saves the Faust F into the .mat file specified by filename.
+			%  save(F,filepath) saves the Faust F into the .mat file specified by filepath.
 			if(F.isReal)
-				mexFaustReal('save', F.matrix.objectHandle, filename)
+				mexFaustReal('save', F.matrix.objectHandle, filepath)
 			else
-				mexFaustCplx('save', F.matrix.objectHandle, filename)
+				mexFaustCplx('save', F.matrix.objectHandle, filepath)
 			end
 		end
 
@@ -802,10 +834,21 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief Computes the norm of F. That is the norm of F's full storage matrix.
+		%> @brief Computes the norm of F.
+		%>
+		%> Several types of norm are available: 1-norm, 2-norm and Frobenius norm.
+		%>
+		%> @b Note: the norm of F is equal to the norm of its dense matrix.
+		%>
+		%> @b WARNING: this function costs at least as much as Faust.mtimes.
+		%>
 		%>
 		%> @param F the Faust object.
-		%> @param ord the norm order. Respectively 1 or 2 for the 1-norm and 2-norm or 'fro' for the Froebenius norm.
+		%> @param ord (optional) the norm order. Respectively 1 or 2 for the 1-norm and 2-norm or 'fro' for the Frobenius norm (by default the 2-norm is computed).
+		%>
+		%>
+		%> @retval norm_Faust the norm (real).
+		%>
 		%>
 		%> @b Example
 		%> @code
@@ -822,6 +865,7 @@ classdef Faust
 		%>	   34.2995
 		%>
 		%> @endcode
+		%>
 		%>
 		%>
 		%======================================================================
@@ -868,7 +912,11 @@ classdef Faust
 		end
 
 		%===========================================================================================
-		%> @brief Gives the total number of non-zeros elements in F's factors.
+		%> @brief Gives the total number of non-zero elements in F's factors.
+		%>
+		%> The function sums together the number of non-zeros elements of
+		%> each factor and returns the result. Note that in fact the sum is
+		%>                        computed at Faust creation time and kept in cache.
 		%>
 		%> @param F the Faust object.
 		%>
@@ -928,12 +976,17 @@ classdef Faust
 		end
 
 		%===========================================================================================
-		%> @brief RCG Relative Complexity Gain (inverse of the density)
+		%> @brief Computes the Relative Complexity Gain (inverse of Faust.density).
 		%>
-		%> @retval speed_up =  RCG(F) when F is Faust, returns the
-		%> inverse of density of the Faust (i.e the theoretical gain
-		%> both for storage and multiplication computation time between the Faust and its full storage
-		%> equivalent full(F)).
+		%> RCG is the theoretical gain brought by Faust representation relatively to its dense
+		%> matrix equivalent. That gain applies both for storage and multiplication computation
+		%> time.
+		%>
+		%>
+		%> @param F	the Faust object.
+		%>
+		%>
+		%> @retval speed_up =  the RCG value (real). If the density is zero it will be Inf. If the density is negative it will be -1.
 		%>
 		%> <p>@b See @b also Faust.density, Faust.nnz.
 		%===========================================================================================
@@ -965,12 +1018,12 @@ classdef Faust
 		%===========================================================================================
 		%> @brief Generates a random Faust.
 		%>
-		%> @param faust_type must be one of Faust.DENSE, Faust.SPARSE or Faust.MIXTE (the latter is for authorize generation of factors dense and sparse in the same Faust).
+		%> @param faust_type must be one of Faust.DENSE, Faust.SPARSE or Faust.MIXTE (the latter is for allowing generation of dense and sparse factors in the same Faust).
 		%> @param field	must be Faust.REAL or Faust.COMPLEX.
 		%> @param min_num_factors the minimal number of factors generated.
 		%> @param max_num_factors the maximal number of factors generated.
 		%> @param min_dim_size	the minimal size of column and row dimensions of the Faust generated.
-		%> @param max_dim_size	the maximal size of column and row dimensions of the faust generated.
+		%> @param max_dim_size	the maximal size of column and row dimensions of the Faust generated.
 		%> @param density	the approximate density of factors generated.
 		%>
 		%>
