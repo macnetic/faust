@@ -1,0 +1,158 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional //EN">
+<html>
+<head>
+  <meta name="GENERATOR" content="mkd2html 2.2.2">
+  <meta http-equiv="Content-Type"
+        content="text/html; charset=utf-8">  <title></title>
+</head>
+<body>
+<h1>Quick Guide to Install and Use FAµST Wrappers</h1>
+
+<h2>Prerequisites</h2>
+
+<h3>For Python</h3>
+
+<p>FAµST supports at least Python 2.7. For macOS it&rsquo;s the only version supported for now.</p>
+
+<p>FAµST takes place in the Python ecosystem which as usual relies on numpy and scipy modules. So you have to ensures these packages are installed on your system.</p>
+
+<p>That requirement applies also to Python 3, assuming you are use the version of Python matching the version FAµST is compiled for (currently 3.6).</p>
+
+<h3>For Matlab</h3>
+
+<p>FAµST wrapper for Matlab has been tested on several Matlab versions starting from version 2017 up to version 2018. However it&rsquo;s not totally excluded that FAµST works with older versions.</p>
+
+<h2>Installation</h2>
+
+<p>@OS_SPECIFIC_INSTALL_GUIDE_INSTRUCS@</p>
+
+<h3>Installation Testing</h3>
+
+<p>Normally, after installing, nothing is left to do. The installation process should have seamlessly set up the Faust wrappers for Python and Matlab into your environment.
+Neverless, it could be useful to check that it really worked and set the environment manually manually in the contrary case like explained below.</p>
+
+<h3>Testing Python Wrapper Auto-Setup</h3>
+
+<p>Here is how to test the FaµST Python wrapper has been setup properly from a Bash terminal:</p>
+
+<pre><code>    $ python2 -c "import FaustPy" &amp;&amp; echo "It worked!"
+</code></pre>
+
+<p>Obviously, if the the wrapper is set up properly you&rsquo;ll see the message &ldquo;It worked!&rdquo; as a result from the command above.</p>
+
+<p>If you see the following error message, then it didn&rsquo;t work:</p>
+
+<pre><code>    Traceback (most recent call last):
+      File "&lt;string&gt;", line 1, in &lt;module&gt;
+    ModuleNotFoundError: No module named 'FaustPy'
+</code></pre>
+
+<p>Likewise, for python3 you can use the previous command for setup checking (currently on macOS only FAµST for Python 2 is supported).</p>
+
+<p>If the auto-setup has failed you need to add the Python wrapper manually in your Python path, here is how to proceed:</p>
+
+<pre><code>    $ export PYTHONPATH=@CMAKE_INSTALL_PREFIX@/python
+    # and test again
+    $ python2 -c "import FaustPy" &amp;&amp; echo "It worked!"
+</code></pre>
+
+<p>If it fails again you are likely on a different version of Python. Returns to the Prerequisites section and check your Python versions match FAµST requirements.</p>
+
+<h3>Testing Matlab Wrapper Auto-Setup</h3>
+
+<pre><code>    $ matlab -nodisplay -nojvm -r "F = Faust.rand(Faust.DENSE, Faust.COMPLEX, 1, 1, 10, 10, .5);exit"
+</code></pre>
+
+<p>It worked only if you see an output similar to:</p>
+
+<pre><code>    F =
+
+    - Faust of size : 10x10, nb factor 1, RCG 1.75439,nnz 57
+    - FACTOR 0type : DENSE size 10x10, density 0.57, nnz 57
+</code></pre>
+
+<p>In other case it didn&rsquo;t work. So here is how to setup the wrapper manually :</p>
+
+<p>First, you launch Matlab terminal, then you go in the FAµST directory :</p>
+
+<pre><code>    &gt;&gt; cd @CMAKE_INSTALL_PREFIX@/matlab
+</code></pre>
+
+<p>And finally you launch the script that is responsible to add FAµST path in your Matlab path.</p>
+
+<pre><code>    &gt;&gt; setup_FAUST
+</code></pre>
+
+<p>OK! You can follow the quick start usage now.</p>
+
+<h2>Usage</h2>
+
+<h3>Matlab Wrapper</h3>
+
+<p>Let&rsquo;s test FAµST with the quickstart script:</p>
+
+<pre><code>    &gt;&gt; quick_start
+</code></pre>
+
+<p>And then type further instructions to test a bit of FAµST API:</p>
+
+<p>Let&rsquo;s see what variables quickstart script has added.</p>
+
+<pre><code>    &gt;&gt; whos
+</code></pre>
+
+<p>Now call some functions on FAµST object A:</p>
+
+<pre><code>    &gt;&gt; RCG(A)
+    &gt;&gt; density(A)
+    &gt;&gt; get_nb_factor(A)
+</code></pre>
+
+<p>Retrieve the product factors (as full matrices):</p>
+
+<pre><code>    &gt;&gt; F1 = get_fact(A,1);
+    &gt;&gt; F2 = get_fact(A,2);
+</code></pre>
+
+<p>Check the sizes:</p>
+
+<pre><code>    &gt;&gt; size(F1)
+    &gt;&gt; size(F2)
+    &gt;&gt; size(A)
+</code></pre>
+
+<p>For more information on FAµST API, and whole function listing, consult the doc:</p>
+
+<pre><code>    &gt;&gt; doc('Faust')
+</code></pre>
+
+<p>N.B.: to access the documentation, you need to be in the graphical interface of matlab.</p>
+
+<p>You should rather consult the doxygen doc for the API in @CMAKE_INSTALL_PREFIX@/doc/html/index.html from your web browser.</p>
+
+<h3>Python Wrapper</h3>
+
+<p>In the same idea, you can execute the quick start script for Python.</p>
+
+<pre><code>    $ python2.7 @CMAKE_INSTALL_PREFIX@/python/quickstart.py
+</code></pre>
+
+<p>You can also go through the python terminal to build a FAµST product and call its object methods.</p>
+
+<pre><code>    $ python2.7
+    &gt;&gt;&gt; import FaustPy
+    &gt;&gt;&gt; import FaustPy
+    &gt;&gt;&gt; A = FaustPy.Faust('@CMAKE_INSTALL_PREFIX@/python/A.mat') # A is the FAµST created through quickstart script
+    &gt;&gt;&gt; A.RCG()
+    6.666666666666667
+    &gt;&gt;&gt; A.density()
+    0.15
+    &gt;&gt;&gt; A.get_nb_factors()
+    2
+    &gt;&gt;&gt; F1 = A.get_factor(0)
+    &gt;&gt;&gt; F2 = A.get_factor(1)
+    &gt;&gt;&gt; A.size()
+    (1000, 2000)
+</code></pre>
+</body>
+</html>
