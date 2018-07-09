@@ -8,21 +8,22 @@
 <body>
 <h1>Introduction</h1>
 
-<p> The FAµST library is designed to factorize matrices of interest into multiple sparse factors.</p>
-
-<p>FAµST stands for Flexible Approximate Multi-Layer Sparse Transform.</p>
+<p>The FAµST library is designed to factorize matrices of interest into multiple sparse factors. The name FAµST is an acronym and stands for Flexible Approximate Multi-Layer Sparse Transform.</p>
 
 <p>Fore more information about the FAµST project, please visit the website: faust.inria.fr</p>
 
 <h1>Use After Installing</h1>
 
-<p>After installing, please take a look to the file /opt/local/faust-@CPACK_PACKAGE_VERSION@/doc/html/README.html. You&rsquo;ll find there a quick guide for an easy first use of FAµST and other instructions.</p>
+<p>After installing, please take a look to the file /opt/local/faust-@CPACK_PACKAGE_VERSION@/doc/html/README.html. You&rsquo;ll find there a quick guide for an easy first use of FAµST and other instructions.
+Note that you can save the readme you&rsquo;re reading now with the &lsquo;save&rsquo; button of this installer.</p>
 
 <h1>Copyright and License Information</h1>
 
-<p>FAµST integrates the MATIO library which the license is available within this package in /opt/local/faust-@CPACK_PACKAGE_VERSION@/doc.</p>
+<p>The FAµST library relies on the MATIO library to read and write data in Matlab MAT format.</p>
 
-<p>The license will also be printed in the license tab just after the FAµST license.</p>
+<p>Licensing details for the MATIO library will be displayed by this installer in the &lsquo;license&rsquo; panel just after the license of the FAµST library.</p>
+
+<p>After installation, these details can also be found in the directory /opt/local/faust-@CPACK_PACKAGE_VERSION@/doc.</p>
 
 <p>MATLAB is a registered trademark of The MathWorks, Inc.</p>
 </body>
