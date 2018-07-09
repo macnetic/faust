@@ -111,11 +111,11 @@ package_linux:
 package_macos_release:
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON ..'
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
-        - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$CI_COMMIT_TAG -ov -format UDRW faust-$CI_COMMIT_TAG'
-        - pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust-$CI_COMMIT_TAG --install-location /opt/local/faust-$CI_COMMIT_TAG --scripts . ./faust-$CI_COMMIT_TAG.pkg
+        - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust -ov -format UDRW faust-$CI_COMMIT_TAG'
+        - pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust --install-location /opt/local/faust --scripts . ./faust-$CI_COMMIT_TAG.pkg
         - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
         - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
         - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_TAG.pkg ./distribution.plist
