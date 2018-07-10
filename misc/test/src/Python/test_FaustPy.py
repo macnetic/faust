@@ -132,7 +132,7 @@ class TestFaustPy(unittest.TestCase):
         print("testRcg()")
         ref_rcg = \
         float(self.F.get_nb_rows()*self.F.get_nb_cols())/float(self.faust_nnz())
-        self.assertAlmostEqual(ref_rcg, self.F.RCG(), delta=.001)
+        self.assertAlmostEqual(ref_rcg, self.F.rcg(), delta=.001)
 
 
     def mulFactors(self):

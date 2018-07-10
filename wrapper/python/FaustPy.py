@@ -48,7 +48,7 @@ import FaustCorePy
 
 
 class Faust:
-    """FAµST class.
+    """FAµST Python class.
      This class represents a given dense matrix by a product of sparse matrices
      (i.e Faust).
      The main goal of Faust representation is to speed up operations on that
@@ -310,7 +310,7 @@ class Faust:
             >>>                     1, 2, 50, 100, .5)
             >>> F.display()
 
-        <b/>See also Faust.nnz, Faust.RCG, Faust.size, Faust.get_factor,
+        <b/>See also Faust.nnz, Faust.rcg, Faust.size, Faust.get_factor,
         Faust.get_nb_factors
 
         """
@@ -434,7 +434,7 @@ class Faust:
         Returns:
             the number of non-zeros.
 
-        <b/> See also Faust.RCG, Faust.density.
+        <b/> See also Faust.rcg, Faust.density.
         """
         return F.m_faust.nnz()
 
@@ -459,11 +459,11 @@ class Faust:
         >>>                     5, 50, 100, .5)
         >>> dens = F.density()
 
-        <b/> See also Faust.nnz, Faust.RCG
+        <b/> See also Faust.nnz, Faust.rcg
         """
         return float(F.nnz())/(F.get_nb_cols()*F.get_nb_rows())
 
-    def RCG(F):
+    def rcg(F):
         """
         Computes the Relative Complexity Gain (inverse of Faust.density).
 
@@ -480,7 +480,7 @@ class Faust:
             If the density is negative it will be -1.
 
         Examples:
-            >>> F.RCG()
+            >>> F.rcg()
 
         <b/> See also: Faust.density, Faust.nnz.
         """

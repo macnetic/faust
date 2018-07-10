@@ -92,7 +92,7 @@ for i=1:nb_FAuST_MEG
     facts = normalizeCol(facts,lambda); % normalization of the columns of the FAUST
     MEG_FAuST=Faust(facts); % construct the FAuST from its factorscons15_row
     MEG_list{i+1}=MEG_FAuST; % store the different FAuST approximationscons21_col
-    RCG_list(i)=RCG(MEG_FAuST); % compute the RCG of the given FAuST
+    RCG_list(i)=rcg(MEG_FAuST); % compute the RCG of the given FAuST
 end
 
 

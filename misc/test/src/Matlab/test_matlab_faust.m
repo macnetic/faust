@@ -260,7 +260,7 @@ disp('Ok');
 
 disp('TEST RCG : ');
 expected_RCG = 1/expected_density;
-rcg_F = RCG(F);
+rcg_F = rcg(F);
 if(rcg_F ~= expected_RCG)	
 	rcg_F
 	expected_RCG
@@ -268,7 +268,7 @@ if(rcg_F ~= expected_RCG)
 end
 
 expected_RCG2 =  1/expected_density2;
-rcg2_F = RCG(F_nnz);
+rcg2_F = rcg(F_nnz);
 
 if(rcg2_F ~= expected_RCG2)
     rcg2_F
@@ -277,7 +277,7 @@ if(rcg2_F ~= expected_RCG2)
 end
 
 expected_RCG_empty_F = -1;
-RCG_empty_F = RCG(empty_F);
+RCG_empty_F = rcg(empty_F);
 if(RCG_empty_F ~= expected_RCG_empty_F)
     error('RCG : invalid value');
 end

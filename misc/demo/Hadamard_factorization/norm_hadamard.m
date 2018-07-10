@@ -83,7 +83,7 @@ for i=1:nb_mult
         n=ns(k);
         hadamard_dense=Hadamard_matrices{k};
         hadamard_faust=Faust(Hadamard_facts{k});
-        RCGs(k)=RCG(hadamard_faust); 
+        RCGs(k)=rcg(hadamard_faust); 
         
 
 	%% 2-norm of the hadamard matrix

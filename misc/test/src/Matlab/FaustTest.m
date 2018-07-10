@@ -149,7 +149,7 @@ classdef FaustTest < matlab.unittest.TestCase
             disp('testrcg()')
             ref_nlines = size(this.factors{1},1)
             ref_ncols = size(this.factors{this.num_factors},2)
-            this.verifyEqual(ref_nlines*ref_ncols/FaustTest.nnzero_count(this.factors), RCG(this.test_faust), 'RelTol', 0.01)
+            this.verifyEqual(ref_nlines*ref_ncols/FaustTest.nnzero_count(this.factors), rcg(this.test_faust), 'RelTol', 0.01)
         end
 
         function testend(this)

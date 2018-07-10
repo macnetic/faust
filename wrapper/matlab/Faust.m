@@ -40,7 +40,7 @@
 %%
 
 % ======================================================================
-%> @brief FAµST class
+%> @brief FAµST Matlab class
 %>
 %> This class represents a given dense matrix by a product of sparse matrices (i.e Faust).
 %> The main goal of Faust representation is to speed up operations on that matrix, especially the multiplication. Besides the time optimization, a Faust can reduce the memory space size needed both for storage and loading.
@@ -813,7 +813,7 @@ classdef Faust
 		%>
 		%> @endcode
 		%>
-		%> <p>@b See @b also Faust.nnz, Faust.RCG, Faust.size, Faust.get_fact
+		%> <p>@b See @b also Faust.nnz, Faust.rcg, Faust.size, Faust.get_fact
 		%>
 		%>
 		%======================================================================
@@ -922,14 +922,14 @@ classdef Faust
 		%>
 		%> @retval nz The number of non-zeros.
 		%>
-		%> <p>@b See @b also Faust.RCG, Faust.density.
+		%> <p>@b See @b also Faust.rcg, Faust.density.
 		%===========================================================================================
 		function nz=nnz(F)
 			%% NNZ Number of nonzero elements in a Faust (overloaded Matlab built-in function).
 			%
 			% nz = nnz(F) is the number of nonzero elements in the Faust F.
 			%
-			% See also density, RCG.
+			% See also density, rcg.
 			if (F.isReal)
 				nz=mexFaustReal('nnz',F.matrix.objectHandle);
 			else
@@ -954,7 +954,7 @@ classdef Faust
 		%>	dens = density(F)
 		%> @endcode
 		%>
-		%> <p/>@b See @b also Faust.nnz, Faust.RCG
+		%> <p/>@b See @b also Faust.nnz, Faust.rcg
 		%======================================================================
 		function dens=density(F)
 			%% DENSITY Density of the Faust.
@@ -965,7 +965,7 @@ classdef Faust
 			% In some degenerated case, dens can be greater than 1.
 			% If the Faust is empty, return -1.
 			%
-			% See also RCG, nnz.
+			% See also rcg, nnz.
 
 			prod_dim=prod(size(F));
 			if (prod_dim ~= 0)
@@ -990,10 +990,10 @@ classdef Faust
 		%>
 		%> <p>@b See @b also Faust.density, Faust.nnz.
 		%===========================================================================================
-		function speed_up=RCG(F)
+		function speed_up=rcg(F)
 			%% RCG Relative Complexity Gain (inverse of the density)
 			%
-			% speed_up =  RCG(F) when F is Faust, returns the
+			% speed_up =  rcg(F) when F is Faust, returns the
 			% inverse of density of the Faust (i.e the theoretical gain
 			% both for storage and multiplication computation time between the Faust and its full storage
 			% equivalent full(F)).
