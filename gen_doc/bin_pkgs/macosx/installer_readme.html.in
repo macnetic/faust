@@ -14,7 +14,7 @@
 
 <h1>Use After Installing</h1>
 
-<p>After installing, please take a look to the file <a href="file://@CMAKE_INSTALL_PREFIX@/doc/html/README.html">README.html</a>. You&rsquo;ll find there a quick guide for an easy first use of FAµST and other instructions.
+<p>After installing, please take a look to the file <a href="file://@CMAKE_INSTALL_PREFIX@/doc/html/README.html">README.html</a> (hint: copy the link for later). You&rsquo;ll find there a quick guide for an easy first use of FAµST and other instructions.
 Note that you can save the readme you&rsquo;re reading now with the &lsquo;save&rsquo; button of this installer.</p>
 
 <h1>Copyright and License Information</h1>
