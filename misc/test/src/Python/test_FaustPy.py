@@ -31,8 +31,8 @@ class TestFaustPy(unittest.TestCase):
         # we keep dense matrices as reference for the tests
         for i in range(0, num_factors):
             self.factors[i] =  factors[i].todense()
-        print("Tests on random Faust with dims=", self.F.get_nb_rows(),
-              self.F.get_nb_cols())
+        print("Tests on random Faust with dims=", self.F.shape[0],
+              self.F.shape[1])
         print("Num. factors:", num_factors)
         self.r = r
         self.num_factors = num_factors
@@ -65,11 +65,11 @@ class TestFaustPy(unittest.TestCase):
 
     def testGetNumRows(self):
         print("testGetNumRows()")
-        self.assertEqual(self.F.get_nb_rows(), self.factors[0].shape[0])
+        self.assertEqual(self.F.shape[0], self.factors[0].shape[0])
 
     def testGetNumCols(self):
         print("testGetNumCols()")
-        self.assertEqual(self.F.get_nb_cols(),
+        self.assertEqual(self.F.shape[1],
                          self.factors[len(self.factors)-1].shape[1])
 
     def testGetFactorAndConstructor(self):
@@ -125,13 +125,13 @@ class TestFaustPy(unittest.TestCase):
     def testDensity(self):
         print("testDensity()")
         ref_density = \
-        float(self.faust_nnz())/float(self.F.get_nb_cols()*self.F.get_nb_rows())
+        float(self.faust_nnz())/float(self.F.shape[1]*self.F.shape[0])
         self.assertAlmostEqual(ref_density, self.F.density(), delta=.001)
 
     def testRcg(self):
         print("testRcg()")
         ref_rcg = \
-        float(self.F.get_nb_rows()*self.F.get_nb_cols())/float(self.faust_nnz())
+        float(self.F.shape[0]*self.F.shape[1])/float(self.faust_nnz())
         self.assertAlmostEqual(ref_rcg, self.F.rcg(), delta=.001)
 
 
@@ -161,23 +161,23 @@ class TestFaustPy(unittest.TestCase):
         test_prod = self.F[...,...]
         self.assertProdEq(prod, test_prod)
         # test one random element
-        rand_i, rand_j = self.r.randint(0,self.F.get_nb_rows()-1),self.r.randint(0,self.F.get_nb_cols()-1)
+        rand_i, rand_j = self.r.randint(0,self.F.shape[0]-1),self.r.randint(0,self.F.shape[1]-1)
         if(prod[rand_i,rand_j] != 0):
             self.assertLessEqual(abs(self.F[rand_i,rand_j][0]-prod[rand_i,rand_j])/abs(prod[rand_i,rand_j]),
                                  10**-6, msg=("compared values are (ref,rest) ="
                                               +str(prod[rand_i,rand_j])+str(prod[rand_i,rand_j])))
         # test one random row
-        rand_i = self.r.randint(0,self.F.get_nb_rows()-1)
+        rand_i = self.r.randint(0,self.F.shape[0]-1)
         row = self.F[rand_i,...]
-        for j in range(0,self.F.get_nb_cols()):
+        for j in range(0,self.F.shape[1]):
             if(row[j] == 0):
                 self.assertEqual(prod[rand_i,j], 0)
             else:
                 self.assertLessEqual(abs(row[j]-(prod[rand_i,j]))/prod[rand_i,j],10**-6)
         # test one random col
-        rand_j = self.r.randint(0,self.F.get_nb_cols()-1)
+        rand_j = self.r.randint(0,self.F.shape[1]-1)
         col = self.F[..., rand_j]
-        for i in range(0,self.F.get_nb_rows()):
+        for i in range(0,self.F.shape[0]):
             if(col[i] == 0):
                 self.assertEqual(prod[i, rand_j], 0)
             else:
@@ -193,7 +193,7 @@ class TestFaustPy(unittest.TestCase):
 
     def testMul(self):
         print("testMul()")
-        rmat = np.random.rand(self.F.get_nb_cols(),
+        rmat = np.random.rand(self.F.shape[1],
                               self.r.randint(1,TestFaustPy.MAX_DIM_SIZE))
         prod = self.mulFactors().dot(rmat)
         test_prod = self.F*rmat
@@ -221,10 +221,10 @@ class TestFaustPy(unittest.TestCase):
         self.F.save(ref_file)
         #print("file=",test_file)
         tF2 = Faust(filepath=test_file)
-        #print(tF2.get_nb_rows(), tF2.get_nb_cols())
-        #print(self.F.get_nb_rows(), self.F.get_nb_cols())
-        self.assertEqual(tF2.get_nb_cols(), tF.shape[1])
-        self.assertEqual(tF2.get_nb_rows(), tF.shape[0])
+        #print(tF2.shape[0], tF2.shape[1])
+        #print(self.F.shape[0], self.F.shape[1])
+        self.assertEqual(tF2.shape[1], tF.shape[1])
+        self.assertEqual(tF2.shape[0], tF.shape[0])
         tF2 = tF2.todense()
         for i in range(0, tF.shape[0]):
             for j in range(0, tF.shape[1]):
@@ -238,7 +238,7 @@ class TestFaustPy(unittest.TestCase):
 
     def testSize(self):
         print("testSize()")
-        self.assertEqual((self.F.get_nb_rows(),self.F.get_nb_cols()), self.F.shape)
+        self.assertEqual((self.F.shape[0],self.F.shape[1]), self.F.shape)
 
     def testDelete(self):
         print("Test del Faust")
@@ -294,8 +294,8 @@ class TestFaustPyCplx(TestFaustPy):
             for i in range(0, num_factors):
                 if(not isinstance(factors[i], np.ndarray)):
                     self.factors[i] =  factors[i].todense()
-            print("Tests on random complex Faust with dims=", self.F.get_nb_rows(),
-                  self.F.get_nb_cols())
+            print("Tests on random complex Faust with dims=", self.F.shape[0],
+                  self.F.shape[1])
             print("Num. factors:", num_factors)
             self.r = r
             self.num_factors = num_factors

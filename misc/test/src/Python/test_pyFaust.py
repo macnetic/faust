@@ -87,8 +87,8 @@ print("Ok")
 
 ######################################
 print("*** DIMENSION ***")
-dim1F=F.get_nb_rows();
-dim2F=F.get_nb_cols();
+dim1F=F.shape[0];
+dim2F=F.shape[1];
 
 print("F dim1 : ",dim1F)
 print("F dim2 : ",dim2F)

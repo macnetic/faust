@@ -170,56 +170,30 @@ class Faust:
                                                             min_dim_size, max_dim_size, density))
         return rF
 
-    def get_nb_rows(F):
-        """
-        Gives the Faust's number of rows.
-
-        Args:
-            F: the Faust object.
-
-        Returns:
-            the number of rows.
-
-        <b/> See also Faust.shape, Faust.get_nb_cols
-       """
-        return F.m_faust.shape()[0]
-
-    def get_nb_cols(F):
-        """
-        Gives the Faust's number of columns.
-
-        Args:
-            F: the Faust object.
-
-        Returns:
-            the number of columns.
-
-        <b/> Faust.shape, Faust.get_nb_rows
-        """
-        return F.m_faust.shape()[1]
-
     @property
     def shape(F):
         """
         Gives the size of the Faust F.
 
+        The size is a pair of numbers: the number of rows and the number of
+        columns of the equivalent dense matrix of F.
+
         Args:
             F: the Faust object.
 
         Returns:
-            the Faust size tuple: (get_nb_rows(), get_nb_cols()).
+            the Faust shape tuple, with at first index the number of rows, and
+            at second index the number of columns.
 
         Examples:
             >>> from FaustPy import Faust, RandFaustType
             >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX, 2,
             >>>                     5, 50, 100, .5)
-            >>> nlines, ncols = F.shape
-            >>> nlines = F.shape[0]
+            >>> nrows, ncols = F.shape
+            >>> nrows = F.shape[0]
             >>> ncols = F.shape[1]
-            >>> nlines, ncols = F.get_nb_rows(), F.get_nb_cols()
 
-        <b/> See also Faust.get_nb_rows, Faust.get_nb_cols
-
+        <b/> See also Faust.display
         """
         return F.m_faust.shape()
 
@@ -359,7 +333,7 @@ class Faust:
         Returns:
             A numpy matrix.
         """
-        identity = np.eye(F.get_nb_cols(), F.get_nb_cols())
+        identity = np.eye(F.shape[1], F.shape[1])
         F_dense = F*identity
         return F_dense
 
@@ -417,7 +391,7 @@ class Faust:
 
         keyCol = indices[1]
         keyRow = indices[0]
-        identity = np.eye(F.get_nb_cols(), F.get_nb_cols())
+        identity = np.eye(F.shape[1], F.shape[1])
         if(keyCol != Ellipsis):
             identity = identity[..., keyCol]
         submatrix = F*identity
@@ -462,7 +436,7 @@ class Faust:
 
         <b/> See also Faust.nnz_sum, Faust.rcg
         """
-        return float(F.nnz_sum())/(F.get_nb_cols()*F.get_nb_rows())
+        return float(F.nnz_sum())/(F.shape[1]*F.shape[0])
 
     def rcg(F):
         """

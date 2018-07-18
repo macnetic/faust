@@ -136,7 +136,7 @@ for j in range(nb_dim):
 	F=FaustPy.Faust(list_factor_dense)
 	F_dense=F.todense()
 
-	if(F.get_nb_rows() != dim) or (F.get_nb_cols() != dim):
+	if(F.shape[0] != dim) or (F.shape[1] != dim):
 		raise ValueError('invalid Faust size')
 
 
