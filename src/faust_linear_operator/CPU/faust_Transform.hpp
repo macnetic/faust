@@ -838,25 +838,30 @@ void Faust::Transform<FPP,Cpu>::setOp(const char op, faust_unsigned_int& nbRowOp
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::Display()const
 {
-
-	if (size() == 0)
-		std::cout<<"empty Faust"<<std::endl;
-	else
-	{
-		std::cout<<"Faust of size : "<<this->getNbRow()<<"x"<<this->getNbCol()<<", nb factor "<<size()<<", RCG "<<getRCG()<< ",nnz "<<this->get_total_nnz()<<std::endl;
-		for (int i=0 ; i<size() ; i++)
-		{
-			std::cout<<"- FACTOR "<<i;
-			data[i]->Display();
-
-		}
-
-
-	}
+	std::cout << to_string();
 }
 
 
+template<typename FPP>
+std::string Faust::Transform<FPP,Cpu>::to_string()const
+{
+	std::ostringstream str;
 
+	if (size() == 0)
+		str<<"empty Faust"<<std::endl;
+	else
+	{
+		str<<"Faust of size : "<<this->getNbRow()<<"x"<<this->getNbCol()<<", nb factor "<<size()<<", RCG "<<getRCG()<< ",nnz "<<this->get_total_nnz()<<std::endl;
+		for (int i=0 ; i<size() ; i++)
+		{
+			str<<"- FACTOR "<<i;
+			str << data[i]->to_string();
+
+		}
+	}
+
+	return str.str();
+}
 
 
 

@@ -217,8 +217,11 @@ namespace Faust
 			MatGeneric<FPP,Cpu>* Clone(const bool isOptimize=false) const;
 
 
-			//! Display all features of Faust::MatSparse : dim1, dim2, nnz number of nonzeros, values, etc ...
+			//! Display all features of Faust::MatSparse : dim1, dim2, number of non-zeros, values (if not more than 100), etc.
 			void Display() const;
+
+			//! Returns a string with all features of Faust::MatSparse: dim1, dim2, number of non-zeros, values (if not more than 100), etc.
+			std::string to_string() const;
 
 			//! \brief Display the support of Faust::MatSparse (i.e where are the non zero entries)
 			void display_support() const;

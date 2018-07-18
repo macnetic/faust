@@ -370,6 +370,9 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! \brief Displays the MatDense
         void Display() const;
 
+		//! \brief Returns all the features of the MatDense.
+		std::string to_string() const;
+
         //!  \brief Write MatDense into text file
         //! \param filename : name of the file
         //!

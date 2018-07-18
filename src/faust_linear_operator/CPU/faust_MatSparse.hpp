@@ -325,29 +325,35 @@ void Faust::MatSparse<FPP,Cpu>::init(const vector<int>& rowidx, const vector<int
 
 
 
+template<typename FPP>
+std::string Faust::MatSparse<FPP,Cpu>::to_string() const
+{
+	std::ostringstream str;
+	str<<" type : SPARSE";
+	str << Faust::MatGeneric<FPP,Cpu>::to_string();
+	if (this->dim1*this->dim2 < 100)
+	{
+		str << "rowPtr = " << getRowPtr() << " -> [ " ;
+		for (int i=0 ; i<this->dim1+1 ; i++)
+			str <<  getRowPtr()[i] << " ";
+		str << " ]"<<endl;
+		str << "colInd = " << getColInd() << " -> [ " ;
+		for (int i=0 ; i<nnz ; i++)
+			str <<  getColInd()[i] << " ";
+		str << " ]"<<endl;
+		str << "values = " << getValuePtr() << " -> [ " ;
+		for (int i=0 ; i<nnz ; i++)
+			str <<  getValuePtr()[i] << " ";
+		str << " ]"<<endl<<endl;
 
+	}
+	return str.str();
+}
 
 template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::Display() const
 {
-	std::cout<<"type : SPARSE";
-    	Faust::MatGeneric<FPP,Cpu>::Display();
-	if (this->dim1*this->dim2 < 100)
-	{ 
-		cout << "rowPtr = " << getRowPtr() << " -> [ " ;
-		for (int i=0 ; i<this->dim1+1 ; i++)
-			cout <<  getRowPtr()[i] << " ";
-		cout << " ]"<<endl;
-		cout << "colInd = " << getColInd() << " -> [ " ;
-		for (int i=0 ; i<nnz ; i++)
-			cout <<  getColInd()[i] << " ";
-		cout << " ]"<<endl;
-		cout << "values = " << getValuePtr() << " -> [ " ;
-		for (int i=0 ; i<nnz ; i++)
-			cout <<  getValuePtr()[i] << " ";
-		cout << " ]"<<endl<<endl;
-
-	}
+	std::cout<<to_string();
 }
 
 

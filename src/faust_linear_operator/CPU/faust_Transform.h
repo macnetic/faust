@@ -164,6 +164,7 @@ namespace Faust
 				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M);
 				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M) const;
 				void Display()const;
+				std::string to_string()const;
 				void transpose();
 				/**
 				 * \brief Replaces the Faust by its conjugate.

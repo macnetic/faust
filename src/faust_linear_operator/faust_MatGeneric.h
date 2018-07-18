@@ -138,9 +138,12 @@ namespace Faust
 	virtual void operator*=(const FPP alpha)=0;
 
 
-	//! \brief Display the caracteristique of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
-	virtual void Display() const=0;
-	
+	//! \brief Display the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
+	virtual void Display() const;
+
+	//! \brief Returns the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
+	virtual std::string to_string() const;
+
 	//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio.
 	// \param transpose: set to true to obtain the matio variable for the transpose Matrix.
 	// \param conjugate: set it to true to obtain the matio variable for the conjugate Matrix. 

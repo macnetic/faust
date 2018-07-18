@@ -124,11 +124,18 @@ Faust::MatGeneric<FPP,DEVICE>::~MatGeneric()
 
 }
 
-
 template<typename FPP,Device DEVICE>
 void Faust::MatGeneric<FPP,DEVICE>::Display() const
 {
-	std::cout<<" size " <<getNbRow()<<"x"<<getNbCol()<<", density "<< this->density()<<", nnz "<<this->getNonZeros()<<endl;
+	cout << to_string();
+}
+
+template<typename FPP,Device DEVICE>
+std::string Faust::MatGeneric<FPP,DEVICE>::to_string() const
+{
+	std::ostringstream str;
+	str <<" size " <<getNbRow()<<"x"<<getNbCol()<<", density "<< this->density()<<", nnz "<<this->getNonZeros()<<endl;
+	return str.str();
 }
 
 

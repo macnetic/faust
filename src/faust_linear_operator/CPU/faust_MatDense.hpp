@@ -497,33 +497,43 @@ void Faust::MatDense<FPP,Cpu>::sub(Faust::MatDense<FPP,Cpu> const& A)
 
 
 
+template<typename FPP>
+std::string Faust::MatDense<FPP,Cpu>::to_string() const
+{
+	//using ostringstream because it's easier for concatenation (of complex and any number)
+	std::ostringstream  str;
+
+	str<<" type : DENSE";
+	str << Faust::MatGeneric<FPP,Cpu>::to_string();
+	if(isZeros)
+		str <<"zeros matrix flag";
+	else if (isIdentity)
+		str <<" identity matrix flag";
+
+
+	else
+	{
+		if (this->dim1*this->dim2 < 100)
+		{
+			for (int i=0 ; i<this->dim1 ; i++)
+			{
+				for(int j=0 ; j<this->dim2 ; j++)
+					str << (*this)(i,j) << " " ;
+				str << endl;
+			}
+		}
+	}
+	str<<std::endl;
+	return str.str();
+}
+
 
 
 // Affichage
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::Display() const
 {
-    std::cout<<"type : DENSE";
-    Faust::MatGeneric<FPP,Cpu>::Display();	
-    if(isZeros)
-        cout <<"zeros matrix flag";
-    else if (isIdentity)
-        cout <<" identity matrix flag";
-
-    		
-    else
-    {
-	if (this->dim1*this->dim2 < 100)
-	{        
-		for (int i=0 ; i<this->dim1 ; i++)
-		{
-		    for(int j=0 ; j<this->dim2 ; j++)
-		        cout << (*this)(i,j) << " " ;
-		    cout << endl;
-		}
-	}
-    }
-    std::cout<<std::endl; 	
+	std::cout<<this->to_string();
 }
 
 template<typename FPP>
