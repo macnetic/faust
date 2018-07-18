@@ -201,7 +201,7 @@ disp('Ok');
 disp('TEST NNZ : ');
 
 
-nz = nnz(F);
+nz = nnz_sum(F);
 
 if(expected_nz ~= nz)
     error('nnz : invalid number of nonzeros');
@@ -214,7 +214,7 @@ expected_nz_2  = 2*dim1-1;
 
 F_nnz = Faust(new_facts);
 
-nz_F = nnz(F_nnz);
+nz_F = nnz_sum(F_nnz);
 
 if(nz_F ~= expected_nz_2)	
     error('nnz : invalid number of nonzeros');
@@ -222,7 +222,7 @@ end
 
 
 expected_nz_empty_F = 0;
-nz_empty_F = nnz(empty_F);
+nz_empty_F = nnz_sum(empty_F);
 
 if(nz_empty_F ~= expected_nz_empty_F)	
     error('nnz : invalid number of nonzeros (empty Faust)');

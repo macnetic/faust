@@ -310,7 +310,7 @@ class Faust:
             >>>                     1, 2, 50, 100, .5)
             >>> F.display()
 
-        <b/>See also Faust.nnz, Faust.rcg, Faust.size, Faust.get_factor,
+        <b/>See also Faust.nnz_sum, Faust.rcg, Faust.size, Faust.get_factor,
         Faust.get_nb_factors
 
         """
@@ -423,7 +423,7 @@ class Faust:
         submatrix = submatrix[keyRow, :]
         return submatrix
 
-    def nnz(F):
+    def nnz_sum(F):
         """
         Gives the total number of non-zero elements in F's factors.
 
@@ -459,9 +459,9 @@ class Faust:
         >>>                     5, 50, 100, .5)
         >>> dens = F.density()
 
-        <b/> See also Faust.nnz, Faust.rcg
+        <b/> See also Faust.nnz_sum, Faust.rcg
         """
-        return float(F.nnz())/(F.get_nb_cols()*F.get_nb_rows())
+        return float(F.nnz_sum())/(F.get_nb_cols()*F.get_nb_rows())
 
     def rcg(F):
         """
@@ -482,7 +482,7 @@ class Faust:
         Examples:
             >>> F.rcg()
 
-        <b/> See also: Faust.density, Faust.nnz.
+        <b/> See also: Faust.density, Faust.nnz_sum.
         """
         d = F.density()
         if(d > 0):

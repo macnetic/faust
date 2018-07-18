@@ -135,7 +135,7 @@ classdef FaustTest < matlab.unittest.TestCase
 
         function testnnz(this)
             disp('testnnz()')
-			this.verifyEqual(nnz(this.test_faust), FaustTest.nnzero_count(this.factors))
+			this.verifyEqual(nnz_sum(this.test_faust), FaustTest.nnzero_count(this.factors))
         end
 
         function testDensity(this)

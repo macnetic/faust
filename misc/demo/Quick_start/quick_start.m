@@ -69,7 +69,7 @@ norm_A = norm(A) % equivalent to norm(A,2);
 A_full=full(A);
 
 % get the number of non-zeros coefficient
-nz = nnz(A) 
+nz = nnz_sum(A)
  
 % READING coefficient
 coeff=A(3,4)

@@ -813,7 +813,7 @@ classdef Faust
 		%>
 		%> @endcode
 		%>
-		%> <p>@b See @b also Faust.nnz, Faust.rcg, Faust.size, Faust.get_fact
+		%> <p>@b See @b also Faust.nnz_sum, Faust.rcg, Faust.size, Faust.get_fact
 		%>
 		%>
 		%======================================================================
@@ -924,10 +924,10 @@ classdef Faust
 		%>
 		%> <p>@b See @b also Faust.rcg, Faust.density.
 		%===========================================================================================
-		function nz=nnz(F)
+		function nz=nnz_sum(F)
 			%% NNZ Number of nonzero elements in a Faust (overloaded Matlab built-in function).
 			%
-			% nz = nnz(F) is the number of nonzero elements in the Faust F.
+			% nz = nnz_sum(F) is the number of nonzero elements in the Faust F.
 			%
 			% See also density, rcg.
 			if (F.isReal)
@@ -954,7 +954,7 @@ classdef Faust
 		%>	dens = density(F)
 		%> @endcode
 		%>
-		%> <p/>@b See @b also Faust.nnz, Faust.rcg
+		%> <p/>@b See @b also Faust.nnz_sum, Faust.rcg
 		%======================================================================
 		function dens=density(F)
 			%% DENSITY Density of the Faust.
@@ -965,11 +965,11 @@ classdef Faust
 			% In some degenerated case, dens can be greater than 1.
 			% If the Faust is empty, return -1.
 			%
-			% See also rcg, nnz.
+			% See also rcg, nnz_sum.
 
 			prod_dim=prod(size(F));
 			if (prod_dim ~= 0)
-				dens=nnz(F)/prod_dim;
+				dens=nnz_sum(F)/prod_dim;
 			else
 				dens = -1;
 			end
@@ -988,7 +988,7 @@ classdef Faust
 		%>
 		%> @retval speed_up =  the RCG value (real). If the density is zero it will be Inf. If the density is negative it will be -1.
 		%>
-		%> <p>@b See @b also Faust.density, Faust.nnz.
+		%> <p>@b See @b also Faust.density, Faust.nnz_sum.
 		%===========================================================================================
 		function speed_up=rcg(F)
 			%% RCG Relative Complexity Gain (inverse of the density)
@@ -998,7 +998,7 @@ classdef Faust
 			% both for storage and multiplication computation time between the Faust and its full storage
 			% equivalent full(F)).
 			%
-			% See also density, nnz.
+			% See also density, nnz_sum.
 
 			dens=density(F);
 			if (dens > 0)

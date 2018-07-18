@@ -120,7 +120,7 @@ class TestFaustPy(unittest.TestCase):
     def testNnz(self):
         print("testNnz()")
         ref_nnz = self.faust_nnz()
-        self.assertEqual(ref_nnz, self.F.nnz())
+        self.assertEqual(ref_nnz, self.F.nnz_sum())
 
     def testDensity(self):
         print("testDensity()")

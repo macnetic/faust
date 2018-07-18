@@ -107,7 +107,7 @@ for i in range(nb_mult):
 
 print("multiplication SPEED-UP using Faust")
 print("Faust is "+str(t_dense/t_faust)+" faster than a full matrix")
-print("Faust nnz: "+str(A.nnz()))
+print("Faust nnz: "+str(A.nnz_sum()))
 print("Faust density: "+str(A.density()))
 print("Faust RCG: "+str(A.rcg()))
 print("Faust norm: "+str(A.norm()))
