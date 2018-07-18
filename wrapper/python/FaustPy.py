@@ -180,7 +180,7 @@ class Faust:
         Returns:
             the number of rows.
 
-        <b/> See also Faust.size, Faust.get_nb_cols
+        <b/> See also Faust.shape, Faust.get_nb_cols
        """
         return F.m_faust.shape()[0]
 
@@ -194,11 +194,12 @@ class Faust:
         Returns:
             the number of columns.
 
-        <b/> Faust.size, Faust.get_nb_rows
+        <b/> Faust.shape, Faust.get_nb_rows
         """
         return F.m_faust.shape()[1]
 
-    def size(F):
+    @property
+    def shape(F):
         """
         Gives the size of the Faust F.
 
@@ -206,15 +207,15 @@ class Faust:
             F: the Faust object.
 
         Returns:
-            the Faust size tuple: get_nb_rows(), get_nb_cols().
+            the Faust size tuple: (get_nb_rows(), get_nb_cols()).
 
         Examples:
             >>> from FaustPy import Faust, RandFaustType
             >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX, 2,
             >>>                     5, 50, 100, .5)
-            >>> nlines, ncols = F.size()
-            >>> nlines = F.size()[0]
-            >>> ncols = F.size()[1]
+            >>> nlines, ncols = F.shape
+            >>> nlines = F.shape[0]
+            >>> ncols = F.shape[1]
             >>> nlines, ncols = F.get_nb_rows(), F.get_nb_cols()
 
         <b/> See also Faust.get_nb_rows, Faust.get_nb_cols
@@ -310,7 +311,7 @@ class Faust:
             >>>                     1, 2, 50, 100, .5)
             >>> F.display()
 
-        <b/>See also Faust.nnz_sum, Faust.rcg, Faust.size, Faust.get_factor,
+        <b/>See also Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.get_factor,
         Faust.get_nb_factors
 
         """
@@ -342,7 +343,7 @@ class Faust:
 
             >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.REAL, 2,
             >>>                     5, 50, 100, .5)
-            >>> A = np.random.rand(F.size()[1], 50)
+            >>> A = np.random.rand(F.shape[1], 50)
             >>> B = F*A
             >>> # is equivalent to B = F.__mul__(A)
 
@@ -385,8 +386,8 @@ class Faust:
 
             >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.REAL, 2,
             >>>                        5, 50, 100, .5)
-            >>> i1 = randint(0, min(F.size())-1)
-            >>> i2 = randint(0, min(F.size())-1)
+            >>> i1 = randint(0, min(F.shape)-1)
+            >>> i2 = randint(0, min(F.shape)-1)
 
             >>> F[i1,i2] # element at line i1, column i2
 
@@ -443,7 +444,7 @@ class Faust:
 
         The density of F is equal to the number of non-zeros in factors over
         the total number of elements in dense matrix of F (which is equal to
-        F.size()[0]*F.size()[1]).
+        F.shape[0]*F.shape[1]).
 
         NOTE: this definition of density allows the value to be greater than 1.
 

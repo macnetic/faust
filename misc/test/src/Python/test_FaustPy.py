@@ -238,7 +238,7 @@ class TestFaustPy(unittest.TestCase):
 
     def testSize(self):
         print("testSize()")
-        self.assertEqual((self.F.get_nb_rows(),self.F.get_nb_cols()), self.F.size())
+        self.assertEqual((self.F.get_nb_rows(),self.F.get_nb_cols()), self.F.shape)
 
     def testDelete(self):
         print("Test del Faust")
@@ -246,8 +246,8 @@ class TestFaustPy(unittest.TestCase):
         F = self.F
         del F
         with self.assertRaises(UnboundLocalError):
-            print(F.size())
-        self.assertEqual(tF.size(), (self.factors[self.num_factors-1].shape[1],
+            print(F.shape)
+        self.assertEqual(tF.shape, (self.factors[self.num_factors-1].shape[1],
                                      self.factors[0].shape[0]))
 
     def testConjugate(self):

@@ -67,7 +67,7 @@ list_factor[1]=list_factor_sparse[1].todense();
 A = FaustPy.Faust(list_factor)
 
 # get the size of the Faust
-print("dimension of the Faust : ", A.size())
+print("dimension of the Faust : ", A.shape)
 
 # transpose a Faust
 A_trans = A.transpose()

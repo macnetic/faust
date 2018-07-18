@@ -102,27 +102,27 @@ print("Ok")
 ####################################
 print("*** TRANSPOSE ***")
 F_trans=F.transpose()
-if not (F_trans.size() == (dim2, dim1)) :
+if not (F_trans.shape == (dim2, dim1)) :
 	print("expected size : "+str([dim2, dim1]))
-	print("got : "+str(F_trans.size()))
+	print("got : "+str(F_trans.shape))
 	raise ValueError('F_trans : invalid  size of the dense matrix')
 
 
-if not (F.size() == (dim1, dim2)) :
+if not (F.shape == (dim1, dim2)) :
 	print("expected size : "+str([dim1, dim2]))
-	print("got : "+str(F.size()))
+	print("got : "+str(F.shape))
 	raise ValueError('F_trans : modify size invalid  size of the dense matrix')
 
 
 F_trans_trans=F_trans.transpose()
-if not (F_trans_trans.size() == (dim1, dim2)) :
+if not (F_trans_trans.shape == (dim1, dim2)) :
 	print("expected size : "+str([dim1, dim2]))
-	print("got : "+str(F_trans_trans.size()))
+	print("got : "+str(F_trans_trans.shape))
 	raise ValueError('F_trans_trans invalid  size of the dense matrix')
 	
-if not (F_trans.size() == (dim2, dim1)) :
+if not (F_trans.shape == (dim2, dim1)) :
 	print("expected size : "+str([dim2, dim1]))
-	print("got : "+str(F_trans.size()))
+	print("got : "+str(F_trans.shape))
 	raise ValueError('F_trans_trans modify size of the dense matrix')
 
 print("Ok")
