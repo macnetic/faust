@@ -73,7 +73,7 @@ nb_mult=100
 nb_factor=4
 #dim=4096
 RCG=10
-density=1/RCG
+density=1./RCG
 density_per_fact=density/nb_factor
 # comparaison dans la justesse des resultats (obliger de travailler avec des entiers)
 result_comparison=1;
