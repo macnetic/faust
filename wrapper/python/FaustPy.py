@@ -288,7 +288,7 @@ class Faust:
             >>> F
 
         <b/>See also Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.get_factor,
-        <b/>Faust.get_nb_factors, Faust.display
+        <b/>Faust.get_num_factors, Faust.display
 
         """
         #_str = super(object, F).__repr__()
@@ -311,7 +311,7 @@ class Faust:
             >>> F
 
         <b/>See also Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.get_factor,
-        <b/>Faust.get_nb_factors, Faust.__repr__
+        <b/>Faust.get_num_factors, Faust.__repr__
 
         """
         print(F.__repr__())
@@ -354,7 +354,7 @@ class Faust:
         """
         Converts the current Faust into a numpy matrix.
 
-        WARNING: this function costs F.get_nb_factors()-1 matrix multiplications.
+        WARNING: this function costs F.get_num_factors()-1 matrix multiplications.
 
         Returns:
             A numpy matrix.
@@ -522,7 +522,7 @@ class Faust:
             raise ValueError("ord must have the value 1, 2 or 'fro'.")
         return F.m_faust.norm(ord)
 
-    def get_nb_factors(F):
+    def get_num_factors(F):
         """
         Gives the number of factors of F.
 
@@ -533,7 +533,7 @@ class Faust:
         >>> from FaustPy import Faust, RandFaustType
         >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.COMPLEX, 2,
         >>>                     5, 50, 100, .5)
-        >>> nf = F.get_nb_factors()
+        >>> nf = F.get_num_factors()
 
         <b/> See also Faust.get_factor
         """
@@ -560,7 +560,7 @@ class Faust:
             >>>                     5, 50, 100, .5)
             >>> f0 = F.get_factor(0)
 
-        <b/> See also Faust.get_nb_factors
+        <b/> See also Faust.get_num_factors
         """
         fact = F.m_faust.get_fact(i)
         return fact

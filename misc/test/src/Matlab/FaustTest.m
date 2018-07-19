@@ -63,7 +63,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			filepath = [ tempdir filesep 'test_faust' rand_suffix '.mat']
 			save(this.test_faust, filepath)
 			F = Faust(filepath)
-			for i = 1:get_nb_factor(F)
+			for i = 1:get_num_factors(F)
 				this.verifyEqual(get_fact(this.test_faust,i), get_fact(F,i))
 			end
 			delete(filepath)
@@ -73,7 +73,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			rand_suffix = int2str(randi(10000))
 			filepath_ref = [ tempdir filesep 'ref_faust' rand_suffix '.mat']
 			filepath_test = [ tempdir filesep 'test_faust' rand_suffix '.mat']
-			nb_fact=get_nb_factor(this.test_faust);
+			nb_fact=get_num_factors(this.test_faust);
 
 			faust_factors=cell(1,nb_fact);
 
@@ -84,8 +84,8 @@ classdef FaustTest < matlab.unittest.TestCase
 			save(this.test_faust,filepath_test)
 			ref_F = Faust(filepath_ref)
 			test_F = Faust(filepath_test)
-			this.verifyEqual(get_nb_factor(ref_F), get_nb_factor(test_F))
-			for i = 1:get_nb_factor(ref_F)
+			this.verifyEqual(get_num_factors(ref_F), get_num_factors(test_F))
+			for i = 1:get_num_factors(ref_F)
 				this.verifyEqual(get_fact(ref_F,i), get_fact(test_F,i))
 			end
 
@@ -112,7 +112,7 @@ classdef FaustTest < matlab.unittest.TestCase
 
         function testGetNumFactors(this)
             disp('testGetNumFactors()')
-            this.verifyEqual(get_nb_factor(this.test_faust), this.num_factors)
+            this.verifyEqual(get_num_factors(this.test_faust), this.num_factors)
         end
 
         function testNorm2(this)

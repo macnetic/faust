@@ -111,8 +111,8 @@ print("Faust nnz: "+str(A.nnz_sum()))
 print("Faust density: "+str(A.density()))
 print("Faust RCG: "+str(A.rcg()))
 print("Faust norm: "+str(A.norm()))
-print("Faust nb of factors: "+str(A.get_nb_factors()))
-for i in range(0,A.get_nb_factors()):
+print("Faust nb of factors: "+str(A.get_num_factors()))
+for i in range(0,A.get_num_factors()):
     print("Faust size of factor ",i,"=",A.get_factor(i).shape)
     # test Faust gets back the same sparse factors given at init
     assert((A.get_factor(i) == list_factor_sparse[i]).all())

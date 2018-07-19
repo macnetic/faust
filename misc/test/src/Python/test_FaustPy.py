@@ -47,17 +47,17 @@ class TestFaustPy(unittest.TestCase):
         # save the Faust relying on numpy API
         ref_file = tmp_dir+"A_ref"+str(rand_suffix)+".mat"
         mdict = {'faust_factors':
-                 np.ndarray(shape=(1, self.F.get_nb_factors()), dtype=object)}
+                 np.ndarray(shape=(1, self.F.get_num_factors()), dtype=object)}
         # self.F.display()
-        for i in range(0, self.F.get_nb_factors()):
+        for i in range(0, self.F.get_num_factors()):
             mdict['faust_factors'][0, i] = self.F.get_factor(i)
         savemat(ref_file, mdict)
         # open the two saved files and compare the fausts
         F_test = Faust(filepath=test_file)
         F_ref = Faust(filepath=ref_file)
-        # print("self.F.get_nb_factors()=", self.F.get_nb_factors())
-        self.assertEqual(F_test.get_nb_factors(), F_ref.get_nb_factors())
-        for i in range(0, F_ref.get_nb_factors()):
+        # print("self.F.get_num_factors()=", self.F.get_num_factors())
+        self.assertEqual(F_test.get_num_factors(), F_ref.get_num_factors())
+        for i in range(0, F_ref.get_num_factors()):
             fact_ref = F_ref.get_factor(i)
             fact_test = F_test.get_factor(i)
             self.assertEqual(fact_ref.shape, fact_test.shape)
@@ -81,7 +81,7 @@ class TestFaustPy(unittest.TestCase):
 
     def testGetNumFactors(self):
         print("testGetNumFactors()")
-        self.assertEqual(self.F.get_nb_factors(), len(self.factors))
+        self.assertEqual(self.F.get_num_factors(), len(self.factors))
 
     def testNorm2(self):
         print("testNorm2()")

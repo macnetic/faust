@@ -273,7 +273,7 @@ classdef Faust
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
-		%> @b Warning: this function costs F.get_nb_factor()-1 matrix multiplications.
+		%> @b Warning: this function costs F.get_num_factors()-1 matrix multiplications.
 		%>
 		%> @retval A the full storage matrix resulting from the Faust.
 		%>
@@ -568,7 +568,7 @@ classdef Faust
 		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
 		%>	f1 = get_fact(F,1)
 		%> @endcode
-		%> <p>@b See @b also Faust.get_nb_factor
+		%> <p>@b See @b also Faust.get_num_factors
 		%=====================================================================
 		function factor = get_fact(F,i)
 			%% GET_FACT Ith factor of the Faust.
@@ -579,7 +579,7 @@ classdef Faust
 			% A=get_fact(F,1) returns the 1st factor of the Faust F.
 			% A=get_fact(F,4) returns the 4th factor of the Faust F.
 			%
-			% See also get_nb_factor.
+			% See also get_num_factors.
 
 			if (~isa(i,'double'))
 				error('get_fact second argument (indice) must either be real positive integers or logicals.');
@@ -608,12 +608,12 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
-		%>	nf = get_nb_factor(F)
+		%>	nf = get_num_factors(F)
 		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.get_fact.
 		%===========================================================================================
-		function num_factors = get_nb_factor(F)
+		function num_factors = get_num_factors(F)
 			%% GET_NB_FACTOR Number of factor of the Faust.
 			%
 			% num_factors = get_num_factors(F) return the number of factor of the

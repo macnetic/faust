@@ -153,8 +153,8 @@ disp('Ok');
 
 
 disp('TEST GET_NB_FACTOR : ');
-%% get_nb_factor test
-nb_fact_test=get_nb_factor(F);
+%% get_num_factors test
+nb_fact_test=get_num_factors(F);
 if (nb_fact_test ~= nb_fact)
 	error('get_nb_factor : invalid number of factor of the faust');
 end
@@ -569,7 +569,7 @@ if (dim1_loaded ~= dim1) | (dim2_loaded ~= dim2)
 	error('load and save faust : invalid dimension');
 end
 
-nb_fact_load=get_nb_factor(F);
+nb_fact_load=get_num_factors(F);
 if (nb_fact_load ~= nb_fact)
 	error('load and save faust : invalid number of factor of the loaded faust ');
 end
