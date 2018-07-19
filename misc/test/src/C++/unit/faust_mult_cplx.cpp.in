@@ -154,8 +154,10 @@ int main(int argc, char* argv[])
 	
 	std::cout<<"init matrix/vec that will be multiplied "<<std::endl;
 	Faust::MatDense<CPX,Cpu> identity(nbColF);
-	for (int i = 0;i<nbColF;i++) identity[i]=CPX(0.0);
-	for (int i = 0;i<nbColF;i++) identity[i*nbColF+i]=CPX(1.0);
+//	for (int i = 0;i<nbColF;i++) identity[i]=CPX(0.0);
+//	for (int i = 0;i<nbColF;i++) identity[i*nbColF+i]=CPX(1.0);
+	identity.setZeros();
+	identity.setEyes();
 
 	Faust::Vect<CPX,Cpu> vec(nbColF);
 	for (int i = 0;i<nbColF;i++) vec[i]=CPX(i,i*i);

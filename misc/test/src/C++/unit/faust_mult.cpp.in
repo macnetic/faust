@@ -155,14 +155,16 @@ int main(int argc, char* argv[])
 	
 	std::cout<<"init matrix/vec that will be multiplied "<<std::endl;
 	Faust::MatDense<FPP,Cpu> identity(nbColF);
-	for (int i = 0;i<nbColF;i++) identity[i]=FPP(0.0);
-	for (int i = 0;i<nbColF;i++) identity[i*nbColF+i]=FPP(1.0);
-
+//	for (int i = 0;i<nbColF;i++) identity[i]=FPP(0.0);
+//	for (int i = 0;i<nbColF;i++) identity[i*nbColF+i]=FPP(1.0);
+//
+	identity.setZeros();
+	identity.setEyes();
 	Faust::Vect<FPP,Cpu> vec(nbColF);
 	for (int i = 0;i<nbColF;i++) vec[i]=FPP(i*i);
 	
 
-
+	cout << identity.to_string() << endl;
 
 	
 	
@@ -203,6 +205,7 @@ int main(int argc, char* argv[])
 	{
 		if (F_prod[i] != F_dense_mult[i])
 		{
+			std::cerr<< "i="<< i << " F_prod[i]=" << F_prod[i] << " F_dense_mult[i]=" << F_dense_mult[i] << std::endl;
 			std::cerr<<"error : F_prod != F_dense_mult "<<std::endl;
 			exit(EXIT_FAILURE);
 		}
