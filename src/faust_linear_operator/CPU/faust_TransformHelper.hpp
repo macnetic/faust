@@ -110,6 +110,12 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+		string TransformHelper<FPP,Cpu>::to_string() const
+		{
+			return this->transform->to_string();
+		}
+
+	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_fact(faust_unsigned_int id) const
 		{
 			MatGeneric<FPP,Cpu>* const factor_generic = this->transform->get_fact(is_transposed?size()-id-1:id);

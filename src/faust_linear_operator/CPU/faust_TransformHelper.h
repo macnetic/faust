@@ -47,6 +47,7 @@ namespace Faust {
 			faust_unsigned_int get_total_nnz() const;
 			faust_unsigned_int size() const;
 			void display() const;
+			string to_string() const;
 			MatDense<FPP,Cpu> get_fact(faust_unsigned_int id) const;
 			MatDense<FPP,Cpu> get_product() const;
 			void save_mat_file(const char* filename) const;

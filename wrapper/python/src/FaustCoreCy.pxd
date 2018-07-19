@@ -43,6 +43,7 @@ cdef extern from "FaustCoreCpp.h" :
     cdef cppclass FaustCoreCpp[FPP] :
         FaustCoreCpp()
         void Display() const
+        const char* to_string() const
         void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol)
         void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows,
                        int ncols)

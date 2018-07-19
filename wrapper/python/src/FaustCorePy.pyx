@@ -45,7 +45,7 @@ cimport numpy as np
 import copy
 
 from libc.stdlib cimport malloc, free;
-from libc.string cimport memcpy;
+from libc.string cimport memcpy, strlen;
 from libcpp cimport bool
 from libcpp cimport complex
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
@@ -269,6 +269,16 @@ cdef class FaustCore:
             self.core_faust_dbl.Display()
         else:
             self.core_faust_cplx.Display()
+
+    def to_string(self):
+        cdef const char* c_str
+        if(self._isReal):
+            c_str = self.core_faust_dbl.to_string()
+        else:
+            c_str = self.core_faust_cplx.to_string()
+        cdef length = strlen(c_str)
+        py_str = c_str[:length].decode('UTF-8')
+        return py_str
 
     def nnz(self):
         cdef unsigned long long nnz = 0

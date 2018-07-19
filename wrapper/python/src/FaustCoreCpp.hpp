@@ -150,6 +150,12 @@ double FaustCoreCpp<FPP>::get_nb_factors() const
 }
 
 template<typename FPP>
+const char* FaustCoreCpp<FPP>::to_string() const
+{
+    return this->transform.to_string().c_str();
+}
+
+template<typename FPP>
 unsigned int FaustCoreCpp<FPP>::get_fact_nb_rows(unsigned int& i) const
 {
     Faust::MatDense<FPP,Cpu> factor_generic = this->transform.get_fact(i);

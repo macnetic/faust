@@ -266,6 +266,35 @@ class Faust:
         F_ctrans = Faust(core_obj=F.m_faust.getH())
         return F_ctrans
 
+    def __repr__(F):
+        """
+        Returns a str object representing the Faust object.
+
+        This method overloads a Python function.
+
+        NOTE: Ideally this function is intented to return a valid Python
+        expression but here this is not the case. Only information is
+        displayed.
+
+        Args:
+            F: the Faust object.
+
+        Examples:
+            >>> from FaustPy import Faust, RandFaustType
+            >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.REAL,
+            >>>                     1, 2, 50, 100, .5)
+            >>> F.__repr__()
+            >>> # the same function is called when typing F in a terminal:
+            >>> F
+
+        <b/>See also Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.get_factor,
+        <b/>Faust.get_nb_factors, Faust.display
+
+        """
+        #_str = super(object, F).__repr__()
+        _str = str(F.m_faust.to_string())
+        return _str
+
     def display(F):
         """
         Displays information about F.
@@ -283,13 +312,16 @@ class Faust:
             >>> from FaustPy import Faust, RandFaustType
             >>> F = Faust.randFaust(RandFaustType.MIXTE, RandFaustType.REAL,
             >>>                     1, 2, 50, 100, .5)
-            >>> F.display()
+            >>> F.print()
+            >>> # equivalent to:
+            >>> F
 
         <b/>See also Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.get_factor,
-        Faust.get_nb_factors
+        <b/>Faust.get_nb_factors, Faust.__repr__
 
         """
-        F.m_faust.display()
+        print(F.__repr__())
+        #F.m_faust.display()
 
     def __mul__(F, A):
         """
