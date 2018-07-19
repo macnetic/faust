@@ -299,12 +299,6 @@ class Faust:
         """
         Displays information about F.
 
-
-        WARNING: Currently a bug is affecting this function. When the Faust is
-        transposed the dimensions are inverted in the display (like the Faust
-        hasn't been transposed).
-
-
         Args:
             F: the Faust object.
 

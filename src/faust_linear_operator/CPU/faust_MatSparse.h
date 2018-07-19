@@ -221,7 +221,7 @@ namespace Faust
 			void Display() const;
 
 			//! Returns a string with all features of Faust::MatSparse: dim1, dim2, number of non-zeros, values (if not more than 100), etc.
-			std::string to_string() const;
+			std::string to_string(const bool transpose=false) const;
 
 			//! \brief Display the support of Faust::MatSparse (i.e where are the non zero entries)
 			void display_support() const;

@@ -326,11 +326,11 @@ void Faust::MatSparse<FPP,Cpu>::init(const vector<int>& rowidx, const vector<int
 
 
 template<typename FPP>
-std::string Faust::MatSparse<FPP,Cpu>::to_string() const
+std::string Faust::MatSparse<FPP,Cpu>::to_string(const bool transpose /* set to false by default */) const
 {
 	std::ostringstream str;
 	str<<" type : SPARSE";
-	str << Faust::MatGeneric<FPP,Cpu>::to_string();
+	str << Faust::MatGeneric<FPP,Cpu>::to_string(transpose);
 	if (this->dim1*this->dim2 < 100)
 	{
 		str << "rowPtr = " << getRowPtr() << " -> [ " ;

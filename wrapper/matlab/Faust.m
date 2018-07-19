@@ -417,6 +417,10 @@ classdef Faust
 		%======================================================================
 		%> @brief Gives the size of the Faust.
 		%>
+		%> The size is a pair of numbers: the number of rows and the number of columns
+		%> of the equivalent dense matrix of F.
+		%>
+		%>
 		%> @param F the Faust object.
 		%> @param varargin can be missing or specifying the index of the dimension to get the size of.
 		%>
@@ -426,8 +430,8 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
-		%>	[nlines, ncols] = size(F)
-		%>	nlines = size(F, 1)
+		%>	[nrows, ncols] = size(F)
+		%>	nrows = size(F, 1)
 		%>	ncols = size(F, 2)
 		%> @endcode
 		%>
@@ -795,8 +799,6 @@ classdef Faust
 		%> This function overloads a Matlab built-in function.
 		%>
 		%> @param F the Faust object.
-		%>
-		%> @b WARNING: currently a bug is affecting this function. When the Faust is transposed the dimensions are inverted in the display (like the Faust hasn't been transposed).
 		%>
 		%> @b Example
 		%> @code

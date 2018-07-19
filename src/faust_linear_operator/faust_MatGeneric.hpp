@@ -131,10 +131,15 @@ void Faust::MatGeneric<FPP,DEVICE>::Display() const
 }
 
 template<typename FPP,Device DEVICE>
-std::string Faust::MatGeneric<FPP,DEVICE>::to_string() const
+std::string Faust::MatGeneric<FPP,DEVICE>::to_string(const bool transpose /* set to false by default */) const
 {
 	std::ostringstream str;
-	str <<" size " <<getNbRow()<<"x"<<getNbCol()<<", density "<< this->density()<<", nnz "<<this->getNonZeros()<<endl;
+	str <<" size ";
+	if(transpose)
+		str << getNbCol() << "x" << getNbRow();
+	else
+		str << getNbRow() << "x" << getNbCol();
+	str << ", density "<< this->density()<<", nnz "<<this->getNonZeros()<<endl;
 	return str.str();
 }
 

@@ -836,14 +836,14 @@ void Faust::Transform<FPP,Cpu>::setOp(const char op, faust_unsigned_int& nbRowOp
 }
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::Display()const
+void Faust::Transform<FPP,Cpu>::Display(const bool transpose /* default to false */)const
 {
-	std::cout << to_string();
+	std::cout << to_string(transpose);
 }
 
 
 template<typename FPP>
-std::string Faust::Transform<FPP,Cpu>::to_string()const
+std::string Faust::Transform<FPP,Cpu>::to_string(const bool transpose /* default to false */) const
 {
 	std::ostringstream str;
 
@@ -851,12 +851,21 @@ std::string Faust::Transform<FPP,Cpu>::to_string()const
 		str<<"empty Faust"<<std::endl;
 	else
 	{
-		str<<"Faust of size : "<<this->getNbRow()<<"x"<<this->getNbCol()<<", nb factor "<<size()<<", RCG "<<getRCG()<< ",nnz "<<this->get_total_nnz()<<std::endl;
+		str<<"Faust of size : ";
+		if(transpose)
+			str << this->getNbCol() << "x" << this->getNbRow();
+		else
+			str << this->getNbRow()<<"x"<<this->getNbCol();
+		str <<", nb factor "<<size()<<", RCG "<<getRCG()<< ",nnz "<<this->get_total_nnz()<<std::endl;
+		int j;
 		for (int i=0 ; i<size() ; i++)
 		{
-			str<<"- FACTOR "<<i;
-			str << data[i]->to_string();
-
+			if(transpose)
+				j = size()-1-i;
+			else
+				j = i;
+			str << "- FACTOR " << i;
+			str << data[j]->to_string(transpose);
 		}
 	}
 

@@ -106,13 +106,13 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::display() const
 		{
-			this->transform->Display();
+			this->transform->Display(is_transposed);
 		}
 
 	template<typename FPP>
 		string TransformHelper<FPP,Cpu>::to_string() const
 		{
-			return this->transform->to_string();
+			return this->transform->to_string(is_transposed);
 		}
 
 	template<typename FPP>

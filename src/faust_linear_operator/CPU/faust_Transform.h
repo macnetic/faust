@@ -163,8 +163,8 @@ namespace Faust
 				//void pop_back(Faust::MatGeneric<FPP,Cpu>* M);
 				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M);
 				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M) const;
-				void Display()const;
-				std::string to_string()const;
+				void Display(const bool transpose=false)const;
+				std::string to_string(const bool transpose=false)const;
 				void transpose();
 				/**
 				 * \brief Replaces the Faust by its conjugate.
