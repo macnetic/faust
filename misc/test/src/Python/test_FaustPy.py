@@ -24,13 +24,13 @@ class TestFaustPy(unittest.TestCase):
         for i in range(0, num_factors):
             d1, d2 = d2, r.randint(1, TestFaustPy.MAX_DIM_SIZE)
             factors += [sparse.random(d1, d2, density=0.1, format='csr',
-                        dtype=np.float64)] #.todense() removed
+                        dtype=np.float64)] #.toarray() removed
             #print("factor",i,":", factors[i])
         self.F = Faust(factors)
         self.factors = factors
         # we keep dense matrices as reference for the tests
         for i in range(0, num_factors):
-            self.factors[i] =  factors[i].todense()
+            self.factors[i] =  factors[i].toarray()
         print("Tests on random Faust with dims=", self.F.shape[0],
               self.F.shape[1])
         print("Num. factors:", num_factors)
@@ -186,9 +186,9 @@ class TestFaustPy(unittest.TestCase):
     def testToDense(self):
         print("testToDense()")
         prod = self.mulFactors()
-        test_prod = self.F.todense()
+        test_prod = self.F.toarray()
         self.assertProdEq(prod, test_prod)
-        #self.assertTrue((self.F.todense() == prod).all())
+        #self.assertTrue((self.F.toarray() == prod).all())
 
 
     def testMul(self):
@@ -203,10 +203,10 @@ class TestFaustPy(unittest.TestCase):
     def testTranspose(self):
         print("testTranspose()")
         tFaust = self.F.transpose()
-        tF = tFaust.todense()
+        tF = tFaust.toarray()
         del tFaust # just to test weak reference of underlying Faust::Transform
         # works (otherwise it should crash with core dump later)
-        F = self.F.todense() # to avoid slowness
+        F = self.F.toarray() # to avoid slowness
         for i in range(0, tF.shape[0]):
             for j in range(0, tF.shape[1]):
                 if(F[j,i] != 0):
@@ -225,7 +225,7 @@ class TestFaustPy(unittest.TestCase):
         #print(self.F.shape[0], self.F.shape[1])
         self.assertEqual(tF2.shape[1], tF.shape[1])
         self.assertEqual(tF2.shape[0], tF.shape[0])
-        tF2 = tF2.todense()
+        tF2 = tF2.toarray()
         for i in range(0, tF.shape[0]):
             for j in range(0, tF.shape[1]):
                 if(F[j,i] != 0):
@@ -252,14 +252,14 @@ class TestFaustPy(unittest.TestCase):
 
     def testConjugate(self):
         print("Test Faust.conj()")
-        test_Fc = self.F.conj().todense()
-        ref_Fc = self.F.todense().conj()
+        test_Fc = self.F.conj().toarray()
+        ref_Fc = self.F.toarray().conj()
         self.assertTrue((test_Fc == ref_Fc).all())
 
     def testGetH(self):
         print("Test Faust.getH()")
-        test_Fct = self.F.getH().todense()
-        ref_Fct = self.F.todense().conj().T
+        test_Fct = self.F.getH().toarray()
+        ref_Fct = self.F.toarray().conj().T
         #print("test_Fct=", test_Fct)
         #print("ref_Fct=", ref_Fct)
         ref_Fct[ref_Fct==0] = 1
@@ -293,7 +293,7 @@ class TestFaustPyCplx(TestFaustPy):
             # we keep dense matrices as reference for the tests
             for i in range(0, num_factors):
                 if(not isinstance(factors[i], np.ndarray)):
-                    self.factors[i] =  factors[i].todense()
+                    self.factors[i] =  factors[i].toarray()
             print("Tests on random complex Faust with dims=", self.F.shape[0],
                   self.F.shape[1])
             print("Num. factors:", num_factors)

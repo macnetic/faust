@@ -70,7 +70,7 @@ class Faust:
      note that not all are.
 
      You have the capability to retrieve the dense matrix with the
-     method Faust.todense but it will cost the multiplication of the Faust's factors.
+     method Faust.toarray but it will cost the multiplication of the Faust's factors.
      It's noteworthy that in this documentation the expression 'dense matrix'
      designates the numpy dense matrix corresponding to a Faust, that is the
      matrix obtained by the multiplication of the
@@ -286,7 +286,7 @@ class Faust:
             >>> H1 = F.getH()
             >>> H2 = F.transpose()
             >>> H2 = H2.conj()
-            >>> (H1.todense() == H2.todense()).all()
+            >>> (H1.toarray() == H2.toarray()).all()
             True
 
         <b/> See also Faust.transpose, Faust.conj
@@ -381,6 +381,19 @@ class Faust:
         """
         return F.m_faust.multiply(A)
 
+    def toarray(F):
+        """
+        Converts the current Faust into a numpy array.
+
+        WARNING: this function costs F.get_num_factors()-1 matrix multiplications.
+
+        Returns:
+            A numpy ndarray.
+        """
+        identity = np.eye(F.shape[1], F.shape[1])
+        F_dense = F*identity
+        return F_dense
+
     def todense(F):
         """
         Converts the current Faust into a numpy matrix.
@@ -390,9 +403,8 @@ class Faust:
         Returns:
             A numpy matrix.
         """
-        identity = np.eye(F.shape[1], F.shape[1])
-        F_dense = F*identity
-        return F_dense
+        return np.matrix(F.toarray())
+
 
     def __getitem__(F, indices):
         """
@@ -619,7 +631,7 @@ class Faust:
             >>> F.save("F.mat")
             >>> G = Faust(filepath="F.mat")
             >>> H = Faust(filepath="F.mat", scale=2)
-            >>> (H.todense()/G.todense() != 2).any()
+            >>> (H.toarray()/G.toarray() != 2).any()
             False
 
             <b/> See also Faust.__init__.

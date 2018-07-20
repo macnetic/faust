@@ -120,7 +120,7 @@ for j in range(nb_dim):
 		if result_comparison:
 			list_factor_sp[i]=np.floor(list_factor_sp[i])
 		
-		list_factor_dense[i]=list_factor_sp[i].todense()
+		list_factor_dense[i]=list_factor_sp[i].toarray()
 		#print(list_factor_dense[i])
 		
 		
@@ -134,7 +134,7 @@ for j in range(nb_dim):
 
 
 	F=FaustPy.Faust(list_factor_dense)
-	F_dense=F.todense()
+	F_dense=F.toarray()
 
 	if(F.shape[0] != dim) or (F.shape[1] != dim):
 		raise ValueError('invalid Faust size')

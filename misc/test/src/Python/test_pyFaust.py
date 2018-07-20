@@ -131,7 +131,7 @@ print("Ok")
 print("*** CONVERSION DENSE MATRIX ***")
 F_dense_expected=faust_multiply(list_factor,np.eye(dim2))
 
-F_dense=F.todense()
+F_dense=F.toarray()
 
 if not (F_dense.shape == (dim1, dim2)) :
 	print("expected size : "+str([dim1, dim2]))
@@ -142,7 +142,7 @@ if not (F_dense==F_dense_expected).all():
 	
 
 
-F_trans_dense=F_trans.todense()
+F_trans_dense=F_trans.toarray()
 if not (F_trans_dense.shape == (dim2, dim1)) :
 	print("expected size : "+str([dim2, dim1]))
 	print("got : "+str(F_dense_trans.shape))
@@ -151,7 +151,7 @@ if not (np.transpose(F_dense)==F_trans_dense).all():
 	raise ValueError('invalid value')
 	
 	
-F_trans_trans_dense=F_trans_trans.todense()
+F_trans_trans_dense=F_trans_trans.toarray()
 
 if not (F_trans_trans_dense.shape == (dim1, dim2)) :
 	print("expected size : "+str([dim1, dim2]))

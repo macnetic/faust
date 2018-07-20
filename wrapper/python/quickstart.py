@@ -54,9 +54,9 @@ list_factor=[0]*nb_factor
 int_max = 120
 density_per_fact=0.1;
 list_factor_sparse[0]=int_max*sp.random(dim1,dim1,density=density_per_fact,format='csr',dtype=np.float64);
-list_factor[0]=list_factor_sparse[0].todense();
+list_factor[0]=list_factor_sparse[0].toarray();
 list_factor_sparse[1]=int_max*sp.random(dim1,dim2,density=density_per_fact,format='csr',dtype=np.float64);
-list_factor[1]=list_factor_sparse[1].todense();
+list_factor[1]=list_factor_sparse[1].toarray();
 
 
 #print(list_factor[0])
@@ -77,7 +77,7 @@ x = np.random.randint(int_max, size=(dim2,1))
 y = A * x
 
 # convert a faust to numpy matrix
-A_numpy = A.todense()
+A_numpy = A.toarray()
 
 # slicing
 coeff = A[0,0]
