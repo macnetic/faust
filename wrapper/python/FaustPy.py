@@ -50,21 +50,47 @@ import FaustCorePy
 class Faust:
     """FAµST Python class.
      This class represents a given dense matrix by a product of sparse matrices
-     (i.e Faust).
+     (i.e. Faust).
      The main goal of Faust representation is to speed up operations on that
      matrix, especially the multiplication. Besides the time optimization, a Faust
      can reduce the memory space size needed both for storage and loading.
 
      Although the sparse matrices are more interesting for optimization it's not
-     forbidden to define a Faust as a product of dense matrices or a mix up of dense
+     forbidden to define a Faust as a product of dense matrices or a mix of dense
      and sparse matrices.
 
      The matrices composing the Faust product, also called the factors, are
      defined on complex or real fields. Hence a Faust can be a complex Faust or a
      real Faust.
+
+     A Faust has ideally to be seen and used as a numpy dense matrix/array, but
+     this matrix exists only virtually and is actually represented by its factors.
+     In order to use a Faust like a numpy matrix, a certain number of Python
+     built-ins available for numpy matrices are implemented in this class but take
+     note that not all are.
+
+     You have the capability to retrieve the dense matrix with the
+     method Faust.todense but it will cost the multiplication of the Faust's factors.
+     It's noteworthy that in this documentation the expression 'dense matrix'
+     designates the numpy dense matrix corresponding to a Faust, that is the
+     matrix obtained by the multiplication of the
+     previously mentioned Faust's factors.
+
+     Likewise, other Faust's methods need to calculate the factor product, and
+     they will be indicated with a warning in this documentation. You should avoid
+     to use them if it's not really necessary (for example you might limit their use
+     to test purposes).
+
+     Other important limitation is that contrary to a numpy dense matrix
+     a Faust is immutable. It means that you cannot affect elements of a Faust using
+     the affectation operator `=' like you do with a numpy matrix (e.g. `M[i,j] =
+     2').
+     That limitation is the reason why the Python built-in `__setitem__()' is not
+     implemented in this class.
+
     """
 
-    def  __init__(F, factors=None, alpha=1.0, filepath=None, core_obj=None):
+    def  __init__(F, factors=None, scale=1.0, filepath=None, core_obj=None):
         """ Creates a Faust from a list of factors or alternatively from a file.
 
             Another easy way to create a Faust is to call the static method Faust.randFaust().
@@ -79,8 +105,7 @@ class Faust:
             filepath: the file from which a Faust is created.<br/>
                       The format is Matlab version 5 (.mat extension).<br/>
                       The file must have been saved before with Faust.save().
-            alpha: multiplicative scalar applied to the factor product before
-            to set the Faust with.
+            scale: a multiplicative scalar (see examples below).
             core_obj: for internal purpose only. Please don't fill this argument.
 
         WARNING: filepath and factors arguments are multually exclusive. If you
@@ -103,13 +128,13 @@ class Faust:
             >>> # define a Faust with those factors
             >>> F = Faust(factors)
 
-            >>> alpha = 2
-            >>> G = Faust(factors, alpha) # G == alpha*F
+            >>> scale = 2
+            >>> G = Faust(factors, scale) # G == scale*F
 
             >>> F.save("F.mat")
             >>> # define a Faust from file
             >>> H = Faust(filepath="F.mat")
-            >>> I = Faust(filepath="F.mat", alpha) # I == alpha*H
+            >>> I = Faust(filepath="F.mat", scale) # I == scale*H
 
         <b/> See also Faust.save, Faust.randFaust
 
@@ -121,7 +146,7 @@ class Faust:
                     contents = loadmat(filepath)
                     factors = contents['faust_factors'][0]
             if(factors is not None):
-                F.m_faust = FaustCorePy.FaustCore(factors, alpha);
+                F.m_faust = FaustCorePy.FaustCore(factors, scale);
             #else:
                 #TODO: manage empty Faust
 
@@ -223,10 +248,12 @@ class Faust:
             F: the Faust object.
 
         Returns:
-            the conjugate as Faust object.
-            <br/> if F is a complex Faust, the value Fc returned is as
-            Fc.todense().imag == - F.todense().imag and
-            Fc.todense().real == F.todense().real.
+            the conjugate as a Faust object.
+            <br/> if F is a real Faust then F_conj == F.
+            <br/> if F is a complex Faust, the value Fc returned verifies the
+            next assertion for i in range(0,F.get_num_factors()):
+
+            <code>F.get_factor(i).conj() == Fc.get_factor(i)</code>
 
 
         Examples:
@@ -235,7 +262,8 @@ class Faust:
             >>>                     5, 50, 100, .5)
             >>> Fc = F.conj()
 
-        <b/> See also Faust.transpose
+        <b/> See also Faust.transpose, Faust.get_factor, Faust.get_num_factors,
+        Faust.getH
         """
         F_conj = Faust(core_obj=F.m_faust.conj())
         return F_conj
@@ -322,6 +350,9 @@ class Faust:
         Multiplies F by the numpy matrix A.
 
         This method overloads a Python function/operator.
+
+        WARNING: this function costs F.get_num_factors() matrix
+        multiplications. its use is discouraged except for test purpose.
 
         Args:
             F: the Faust object.
@@ -469,8 +500,8 @@ class Faust:
         Computes the Relative Complexity Gain (inverse of Faust.density).
 
         RCG is the theoretical gain brought by Faust representation relatively to its dense
-        matrix equivalent. That gain applies both for storage and multiplication computation
-        time.
+        matrix equivalent. The higher is the RCG, the more computational
+        savings will be made. That gain applies both for storage and computation time.
 
         Args:
             F: the Faust object.
@@ -497,7 +528,7 @@ class Faust:
         """
         Computes the norm of F. Several types of norm are available: 1-norm, 2-norm and Frobenius norm.
 
-        Note: the norm of F is equal to the norm of its dense matrix.
+        NOTE: The norm of F is equal to the norm of its dense matrix.
 
         WARNING: this function costs at least as much as Faust.__mul__.
 
@@ -587,7 +618,7 @@ class Faust:
             >>>                     2, 3, 10, 20,.5)
             >>> F.save("F.mat")
             >>> G = Faust(filepath="F.mat")
-            >>> H = Faust(filepath="F.mat", alpha=2)
+            >>> H = Faust(filepath="F.mat", scale=2)
             >>> (H.todense()/G.todense() != 2).any()
             False
 
