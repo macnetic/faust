@@ -416,7 +416,7 @@ classdef Faust
 		%>  <br/> If F is a real Faust then F_conj == F.
 		%>  <br/> if F is a complex Faust, the Faust object F_conj returned verifies the next assertion for all i=1:get_num_factors(F):
 		%> @code
-		%> conj(get_fact(F,i)) == get_fact(F_conj,i)
+		%> conj(get_factor(F,i)) == get_factor(F_conj,i)
 		%> @endcode
 		%>
 		%> @b Example
@@ -425,7 +425,7 @@ classdef Faust
 		%>	F_conj = conj(F)
 		%> @endcode
 		%>
-		%> <p/>@b See @b also Faust.get_fact, Faust.get_num_factors, Faust.ctranspose
+		%> <p/>@b See @b also Faust.get_factor, Faust.get_num_factors, Faust.ctranspose
 		%>
 		%======================================================================
 		function F_conj=conj(F)
@@ -594,18 +594,18 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
-		%>	f1 = get_fact(F,1)
+		%>	f1 = get_factor(F,1)
 		%> @endcode
 		%> <p>@b See @b also Faust.get_num_factors
 		%=====================================================================
-		function factor = get_fact(F,i)
+		function factor = get_factor(F,i)
 			%% GET_FACT Ith factor of the Faust.
 			%
-			% A=get_fact(F,i) return the i factor A of the Faust F as a full storage matrix.
+			% A=get_factor(F,i) return the i factor A of the Faust F as a full storage matrix.
 			%
 			% Example of use :
-			% A=get_fact(F,1) returns the 1st factor of the Faust F.
-			% A=get_fact(F,4) returns the 4th factor of the Faust F.
+			% A=get_factor(F,1) returns the 1st factor of the Faust F.
+			% A=get_factor(F,4) returns the 4th factor of the Faust F.
 			%
 			% See also get_num_factors.
 
@@ -639,7 +639,7 @@ classdef Faust
 		%>	nf = get_num_factors(F)
 		%> @endcode
 		%>
-		%> <p>@b See @b also Faust.get_fact.
+		%> <p>@b See @b also Faust.get_factor.
 		%==========================================================================================
 		function num_factors = get_num_factors(F)
 			%% GET_NB_FACTOR Number of factor of the Faust.
@@ -647,7 +647,7 @@ classdef Faust
 			% num_factors = get_num_factors(F) return the number of factor of the
 			% Faust F.
 			%
-			% See also get_fact.
+			% See also get_factor.
 			if (F.isReal)
 				num_factors = mexFaustReal('get_nb_factor', F.matrix.objectHandle);
 			else
@@ -843,7 +843,7 @@ classdef Faust
 		%>
 		%> @endcode
 		%>
-		%> <p>@b See @b also Faust.nnz_sum, Faust.rcg, Faust.size, Faust.get_fact
+		%> <p>@b See @b also Faust.nnz_sum, Faust.rcg, Faust.size, Faust.get_factor
 		%>
 		%>
 		%======================================================================

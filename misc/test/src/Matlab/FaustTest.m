@@ -64,7 +64,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			save(this.test_faust, filepath)
 			F = Faust(filepath)
 			for i = 1:get_num_factors(F)
-				this.verifyEqual(get_fact(this.test_faust,i), get_fact(F,i))
+				this.verifyEqual(get_factor(this.test_faust,i), get_factor(F,i))
 			end
 			delete(filepath)
         end
@@ -78,7 +78,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			faust_factors=cell(1,nb_fact);
 
 			for i=1:nb_fact
-				faust_factors{i}=get_fact(this.test_faust,i);
+				faust_factors{i}=get_factor(this.test_faust,i);
 			end
 			save(filepath_ref,'faust_factors');
 			save(this.test_faust,filepath_test)
@@ -86,7 +86,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			test_F = Faust(filepath_test)
 			this.verifyEqual(get_num_factors(ref_F), get_num_factors(test_F))
 			for i = 1:get_num_factors(ref_F)
-				this.verifyEqual(get_fact(ref_F,i), get_fact(test_F,i))
+				this.verifyEqual(get_factor(ref_F,i), get_factor(test_F,i))
 			end
 
 			delete(filepath_ref)
@@ -106,7 +106,7 @@ classdef FaustTest < matlab.unittest.TestCase
         function testGetFactorAndConstructor(this)
             disp('testGetFactorAndConstructor()')
             for i = 1:this.num_factors
-               this.verifyEqual(get_fact(this.test_faust, i), full(this.factors{i}))
+               this.verifyEqual(get_factor(this.test_faust, i), full(this.factors{i}))
             end
         end
 

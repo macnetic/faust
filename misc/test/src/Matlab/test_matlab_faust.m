@@ -575,9 +575,9 @@ if (nb_fact_load ~= nb_fact)
 end
 
 for i=1:nb_fact
-	A=get_fact(F_loaded,i);
+	A=get_factor(F_loaded,i);
 	if(~isequal(A,factors{i}))
-        get_fact(F,i)
+        get_factor(F,i)
         error('get_fact : invalid factor');
 	end
 
@@ -613,10 +613,10 @@ end
 
 disp('Ok');
 
-%% get_fact test
+%% get_factor test
 disp('TEST GET_FACT : ');
 for i=1:nb_fact
-	A=get_fact(F,i);
+	A=get_factor(F,i);
 	if(A~=factors{i})
 		error('get_fact : invalid factor');
 	end
@@ -720,11 +720,11 @@ if ( ~isequal(expected_F_conj_full,F_conj_full) )
     F_conj_full
     error(['conj test 1 failed.']);
 end
-% test get_fact on conj
+% test get_factor on conj
 for i=1:nb_fact
-	A=get_fact(F_conj,i);
+	A=get_factor(F_conj,i);
 	if(~isequal(A,conj(factors{i})))
-        get_fact(F_conj,i)
+        get_factor(F_conj,i)
 		error('get_fact : invalid factor');
 	end
 end
@@ -760,11 +760,11 @@ if ( ~isequal(expected_F_ctranspose_full,F_ctranspose_full) )
     F_ctranspose_full
     error(['ctranspose test 1 failed.']);
 end
-% test get_fact on ctranspose
+% test get_factor on ctranspose
 for i=1:nb_fact
-	A=get_fact(F_ctranspose,i)
+	A=get_factor(F_ctranspose,i)
 	if(~isequal(A,ctranspose(factors{nb_fact-i+1})))
-        get_fact(F_ctranspose,i)
+        get_factor(F_ctranspose,i)
 		error('get_fact : invalid factor');
 	end
 end
