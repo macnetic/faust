@@ -200,7 +200,7 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief Multiplies the Faust F by the full storage matrix A.
+		%> @brief Multiplies the Faust F by the dense matrix A.
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
@@ -208,9 +208,9 @@ classdef Faust
 		%> its use is discouraged except for test purpose.
 		%>
 		%> @param F the Faust object.
-		%> @param A The matrix to multiply (full storage matrix).
+		%> @param A The matrix to multiply (dense matrix).
 		%>
-		%> @retval B The multiplication result (full storage matrix).
+		%> @retval B The multiplication result (dense matrix).
 		%>
 		%> @b Example
 		%> @code
@@ -235,15 +235,15 @@ classdef Faust
 
 
 		%======================================================================
-		%> @brief Multiplies the Faust or its transpose by the A full storage matrix.
+		%> @brief Multiplies the Faust or its transpose by the A dense matrix.
 		%>
 		%> @b WARNING: this function costs as much as Faust.mtimes.
 		%>
-		%> @param A the matrix to multiply (full storage matrix).
+		%> @param A the matrix to multiply (dense matrix).
 		%> @param trans equals 1 to calculate C=F'*A
 		%> 				or 0 to calculate C=F*A.
 		%>
-		%> @retval C The multiplication result (full storage matrix).
+		%> @retval C The multiplication result (dense matrix).
 		%>
 		%> <p> @b See @b also mtimes.
 		%======================================================================
@@ -285,8 +285,11 @@ classdef Faust
 		%> This function overloads a Matlab built-in function.
 		%>
 		%> @b Warning: this function costs F.get_num_factors()-1 matrix multiplications.
+		%> Besides it implies the loss of space compression allowed by the Faust representation.
+		%> Using this function is discouraged except for test purpose.
 		%>
-		%> @retval A the full storage matrix resulting from the Faust.
+		%> @retval A the dense matrix resulting from the Faust. A is such that A*x == F*x
+		%> for any vector x.
 		%>
 		%======================================================================
 		function A = full(F)
@@ -321,7 +324,7 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief Transposes the Faust F.
+		%> @brief Returns the transpose of the Faust F.
 		%>
 		%> This function overloads a Matlab built-in function/operator.
 		%>
@@ -578,7 +581,7 @@ classdef Faust
 		%> @param F the Faust object.
 		%> @param i the factor index.
 		%>
-		%> @retval factor the i-th factor as a full storage matrix.
+		%> @retval factor the i-th factor as a dense matrix.
 		%>
 		%> @b Example
 		%> @code
@@ -869,10 +872,10 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; @b norm(F, 'fro') calculates the Frobenius norm of F.<br/><br>
 		%>
 		%> @param F the Faust object.
-		%> @param ord (optional) the norm order. Respectively 1 or 2 for the 1-norm and 2-norm or 'fro' for the Frobenius norm (by default the 2-norm is computed).
+		%> @param ord (optional) the norm order or type. Respectively 1 or 2 for the 1-norm and 2-norm or 'fro' for the Frobenius norm (by default the 2-norm is computed).
 		%>
 		%>
-		%> @retval norm_Faust the norm (real).
+		%> @retval norm the norm (real).
 		%>
 		%>
 		%> @b Example
@@ -890,7 +893,7 @@ classdef Faust
 		%>
 		%>
 		%======================================================================
-		function norm_Faust=norm(F,varargin)
+		function norm=norm(F,varargin)
 			%% NORM Faust norm (overloaded Matlab built-in function).
 			%
 			% norm(F,1) when F is a Faust returns L1 norm of F (the largest
@@ -912,9 +915,9 @@ classdef Faust
 			if nb_input == 1
 				if(varargin{1} == 'fro')
 					if (F.isReal)
-						norm_Faust=mexFaustReal('normfro',F.matrix.objectHandle);
+						norm=mexFaustReal('normfro',F.matrix.objectHandle);
 					else
-						norm_Faust=mexFaustCplx('normfro',F.matrix.objectHandle);
+						norm=mexFaustCplx('normfro',F.matrix.objectHandle);
 					end
 					return
 				end
@@ -925,15 +928,15 @@ classdef Faust
 			end
 
 			if (F.isReal)
-				norm_Faust=mexFaustReal('norm',F.matrix.objectHandle, ord);
+				norm=mexFaustReal('norm',F.matrix.objectHandle, ord);
 			else
-				norm_Faust=mexFaustCplx('norm',F.matrix.objectHandle, ord);
+				norm=mexFaustCplx('norm',F.matrix.objectHandle, ord);
 			end
 
 		end
 
 		%==========================================================================================
-		%> @brief Gives the total number of non-zero elements in F's factors.
+		%> @brief Gives the total number of non-zero elements in the factors of F.
 		%>
 		%> The function sums together the number of non-zeros elements of
 		%> each factor and returns the result. Note that in fact the sum is

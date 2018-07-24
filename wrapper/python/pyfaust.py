@@ -489,9 +489,12 @@ class Faust:
         Converts the current Faust into a numpy matrix.
 
         WARNING: this function costs F.get_num_factors()-1 matrix multiplications.
+        Besides it implies the loss of space compression allowed by the
+        Faust representation.
+        Using this function is discouraged except for test purpose.
 
         Returns:
-            A numpy matrix.
+            A numpy matrix M which is such that M*x == F*x for any vector x.
         """
         return np.matrix(F.toarray())
 
@@ -558,7 +561,7 @@ class Faust:
 
     def nnz_sum(F):
         """
-        Gives the total number of non-zero elements in F's factors.
+        Gives the total number of non-zero elements in the factors of F.
 
         The function sums together the number of non-zeros elements of
         each factor and returns the result. Note that in fact the sum is
