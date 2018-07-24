@@ -248,7 +248,8 @@ class Faust:
     @property
     def shape(F):
         """
-        Gives the size of the Faust F.
+        Gives the size of the Faust F. This function is intented to be used as
+        a property (F.shape).
 
         The size is a pair of numbers: the number of rows and the number of
         columns of the equivalent dense matrix of F.
@@ -273,7 +274,7 @@ class Faust:
 
     def transpose(F):
         """
-        Transposes the Faust F.
+        Returns the transpose of the Faust F.
 
         Args:
             F: the Faust object.
@@ -284,10 +285,29 @@ class Faust:
         Examples:
             >>> tF = F.transpose()
 
-        <b/> Faust.getH
+        <b/> Faust.getH, Faust.H, Faust.T
         """
         F_trans = Faust(core_obj=F.m_faust.transpose())
         return F_trans
+
+    @property
+    def T(F):
+        """
+        Returns the transpose of the Faust F. This function is intended to be
+        used as a property (F.T).
+
+        Args:
+            F: the Faust object.
+
+        Returns:
+            F transpose as a Faust object.
+
+        Examples:
+            >>> tF = F.T
+
+        <b/> Faust.getH, Faust.H, Faust.T
+        """
+        return F.transpose()
 
     def conj(F):
         """
@@ -311,7 +331,7 @@ class Faust:
             >>> Fc = F.conj()
 
         <b/> See also Faust.transpose, Faust.get_factor, Faust.get_num_factors,
-        Faust.getH
+        Faust.getH, Faust.H
         """
         F_conj = Faust(core_obj=F.m_faust.conj())
         return F_conj
@@ -336,10 +356,33 @@ class Faust:
             >>> (H1.toarray() == H2.toarray()).all()
             True
 
-        <b/> See also Faust.transpose, Faust.conj
+        <b/> See also Faust.transpose, Faust.conj, Faust.H
         """
         F_ctrans = Faust(core_obj=F.m_faust.getH())
         return F_ctrans
+
+    @property
+    def H(F):
+        """
+        Returns the conjugate transpose of F. This function is intended to be
+        used as a property (F.H).
+
+        Returns:
+            the conjugate transpose of F as a Faust object.
+
+
+        Examples:
+            >>> from FaustPy import Faust
+            >>> F = Faust.rand(5, 50, is_real=False)
+            >>> H1 = F.H
+            >>> H2 = F.transpose()
+            >>> H2 = H2.conj()
+            >>> (H1.toarray() == H2.toarray()).all()
+            True
+
+        <b/> See also Faust.transpose, Faust.conj, Faust.getH
+        """
+        return F.getH()
 
     def __repr__(F):
         """
