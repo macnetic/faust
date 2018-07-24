@@ -10,7 +10,7 @@ if(BUILD_DOCUMENTATION)
 			string(CONCAT DOXYGEN_FILE_PATTERNS ${DOXYGEN_FILE_PATTERNS} " Faust.m")
 		endif()
 		if(BUILD_WRAPPER_PYTHON)
-			string(CONCAT DOXYGEN_FILE_PATTERNS ${DOXYGEN_FILE_PATTERNS} " FaustPy.py")
+			string(CONCAT DOXYGEN_FILE_PATTERNS ${DOXYGEN_FILE_PATTERNS} " pyfaust.py")
 		endif()
 		configure_file(${FAUST_DOC_SRC_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY)
 		# ./gen_doc/images/* files is duplicated in doc/html/ to call images documentation in the source code with relative path of image's files, from build directory.     

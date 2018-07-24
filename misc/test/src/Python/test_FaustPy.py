@@ -304,8 +304,8 @@ class TestFaustPyCplx(TestFaustPy):
 if __name__ == "__main__":
     if(len(sys.argv)> 1):
         # argv[1] is for adding a directory in PYTHONPATH
-        # (to find FaustPy module)
+        # (to find pyfaust module)
         sys.path.append(sys.argv[1])
         del sys.argv[1] # deleted to avoid interfering with unittest
-    from FaustPy import Faust
+    from pyfaust import Faust
     unittest.main()

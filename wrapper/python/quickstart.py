@@ -36,8 +36,8 @@
 
 
 
-#import the FaustPy package
-import FaustPy;
+#import the pyfaust package
+import pyfaust;
 
 # import module to generate data
 import scipy
@@ -64,7 +64,7 @@ list_factor[1]=list_factor_sparse[1].toarray();
 
 
 # create a Faust named F from its factors
-A = FaustPy.Faust(list_factor)
+A = pyfaust.Faust(list_factor)
 
 # get the size of the Faust
 print("dimension of the Faust : ", A.shape)
@@ -120,7 +120,7 @@ for i in range(0,A.get_num_factors()):
 
 # test Faust saving
 A.save("A.mat")
-As = FaustPy.Faust(filepath="A.mat")
+As = pyfaust.Faust(filepath="A.mat")
 assert((A.get_factor(0) == As.get_factor(0)).all())
 assert((A.get_factor(1) == As.get_factor(1)).all())
 

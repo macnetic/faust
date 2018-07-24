@@ -43,7 +43,7 @@ Neverthless, it could be useful to check that it really worked and set the envir
 
 <p>Here is how to test the FaµST Python wrapper has been setup properly from a Bash terminal:</p>
 
-<pre><code>    $ python2 -c "import FaustPy" &amp;&amp; echo "It worked!"
+<pre><code>    $ python2 -c "import pyfaust" &amp;&amp; echo "It worked!"
 </code></pre>
 
 <p>Obviously, if the the wrapper is set up properly you&rsquo;ll see the message &ldquo;It worked!&rdquo; as a result from the command above.</p>
@@ -52,7 +52,7 @@ Neverthless, it could be useful to check that it really worked and set the envir
 
 <pre><code>    Traceback (most recent call last):
       File "&lt;string&gt;", line 1, in &lt;module&gt;
-    ModuleNotFoundError: No module named 'FaustPy'
+    ModuleNotFoundError: No module named 'pyfaust'
 </code></pre>
 
 <p>Likewise, for python3 you can use the previous command for setup checking (currently on macOS only FAµST for Python 2 is supported).</p>
@@ -61,7 +61,7 @@ Neverthless, it could be useful to check that it really worked and set the envir
 
 <pre><code>    $ export PYTHONPATH=@CMAKE_INSTALL_PREFIX@/python
     # and test again
-    $ python2 -c "import FaustPy" &amp;&amp; echo "It worked!"
+    $ python2 -c "import pyfaust" &amp;&amp; echo "It worked!"
 </code></pre>
 
 <p>If it fails again you are likely on a different version of Python. Returns to the Prerequisites section and check your Python versions match FAµST requirements.</p>
@@ -148,9 +148,9 @@ Neverthless, it could be useful to check that it really worked and set the envir
 <p>You can also go through the python terminal to build a FAµST product and call its object methods.</p>
 
 <pre><code>    $ python2.7
-    &gt;&gt;&gt; import FaustPy
-    &gt;&gt;&gt; import FaustPy
-    &gt;&gt;&gt; A = FaustPy.Faust('@CMAKE_INSTALL_PREFIX@/python/A.mat') # A is the FAµST created through quickstart script
+    &gt;&gt;&gt; import pyfaust
+    &gt;&gt;&gt; import pyfaust
+    &gt;&gt;&gt; A = pyfaust.Faust('@CMAKE_INSTALL_PREFIX@/python/A.mat') # A is the FAµST created through quickstart script
     &gt;&gt;&gt; A.rcg()
     6.666666666666667
     &gt;&gt;&gt; A.density()

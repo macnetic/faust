@@ -1,4 +1,4 @@
-from FaustPy import RandFaustType, Faust
+from pyfaust import Faust
 import numpy as np
 import os
 import matplotlib.pyplot as plt
@@ -15,9 +15,8 @@ if __name__ == '__main__':
     for i, d in zip(
                     list(range(0, ntests)),
         np.linspace(startd, endd, ntests)):
-        F = Faust.randFaust(RandFaustType.SPARSE, RandFaustType.REAL, nfactors,
-                            nfactors,
-                            min_dim_sz, max_dim_sz, d)
+        F = Faust.randFaust(nfactors,
+                            [min_dim_sz, max_dim_sz], d)
         filepath = 'test_faust_size'+str(i)+'.mat'
         F.save(filepath)
         stat = os.stat(filepath)

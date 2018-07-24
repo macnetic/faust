@@ -2,7 +2,7 @@
 ##############################################################################
 ##                              Description:                                ##
 ##                                                                          ##
-##          FaustPy is a python module  which delivered                     ##
+##          pyfaust is a python module  which delivered                     ##
 ##          a class named Faust which represents a dense matrix             ##
 ##          by a product of 'sparse' factors (i.e Faust)                    ##
 ##          Python wrapper class implemented in C++                         ##
@@ -112,7 +112,7 @@ class Faust:
         use filepath you must explicitely set argument with the keyword.
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> import numpy as np
             >>> from scipy import sparse
             >>> factors = []
@@ -183,7 +183,7 @@ class Faust:
             the random Faust.
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> F = Faust.rand(2, 10, .5, is_real=False)
             >>> G = Faust.rand([2, 5], [10, 20], .5, fac_type="dense")
             >>> F
@@ -263,7 +263,7 @@ class Faust:
             at second index the number of columns.
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> F = Faust.rand(2, 50, is_real=False)
             >>> nrows, ncols = F.shape
             >>> nrows = F.shape[0]
@@ -328,7 +328,7 @@ class Faust:
 
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> F = Faust.rand(5, 50, is_real=False)
             >>> Fc = F.conj()
 
@@ -350,7 +350,7 @@ class Faust:
 
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> F = Faust.rand(5, 50, is_real=False)
             >>> H1 = F.getH()
             >>> H2 = F.transpose()
@@ -375,7 +375,7 @@ class Faust:
 
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> F = Faust.rand(5, 50, is_real=False)
             >>> H1 = F.H
             >>> H2 = F.transpose()
@@ -401,7 +401,7 @@ class Faust:
             F: the Faust object.
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> F = Faust.rand(2, 50)
             >>> F.__repr__()
             >>> # the same function is called when typing F in a terminal:
@@ -423,7 +423,7 @@ class Faust:
             F: the Faust object.
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> F = Faust.rand([1, 2], [50, 100], .5)
             >>> F.display()
             >>> # equivalent to:
@@ -460,7 +460,7 @@ class Faust:
 
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> import numpy as np
 
             >>> F = Faust.rand(5, [50, 100])
@@ -513,7 +513,7 @@ class Faust:
             the numpy subarray requested.
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> import numpy as np
             >>> from random import randint
 
@@ -587,7 +587,7 @@ class Faust:
             the density value (float).
 
         Examples:
-        >>> from FaustPy import Faust
+        >>> from pyfaust import Faust
         >>> F = Faust.rand(5, 50, .5)
         >>> dens = F.density()
 
@@ -661,7 +661,7 @@ class Faust:
             the number of factors.
 
         Examples:
-        >>> from FaustPy import Faust
+        >>> from pyfaust import Faust
         >>> F = Faust.rand(2, 100, .5)
         >>> nf = F.get_num_factors()
 
@@ -685,7 +685,7 @@ class Faust:
 
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> F = Faust.rand(5, [50, 100], .5)
             >>> f0 = F.get_factor(0)
 
@@ -711,7 +711,7 @@ class Faust:
 
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> F = Faust.rand([2, 3], [10, 20],.5, is_real=False)
             >>> F.save("F.mat")
             >>> G = Faust(filepath="F.mat")
@@ -742,7 +742,7 @@ class Faust:
 
 
         Examples:
-            >>> from FaustPy import Faust
+            >>> from pyfaust import Faust
             >>> F = Faust.rand([2, 3], [10, 20],.5, is_real=False)
             dtype('complex128')
             >>> F = Faust.rand([2, 3], [10, 20],.5)

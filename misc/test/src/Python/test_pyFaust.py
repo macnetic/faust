@@ -42,7 +42,7 @@ sys.path.append(FaustPath)
 
 import numpy as np
 #import PyFaust 
-import FaustPy
+import pyfaust
 dim1 = 100
 dim2 = 200
 dim3 = 7
@@ -77,7 +77,7 @@ list_factor[nb_factor-1]=np.random.randint(int_max, size=(dim1,dim2))
 
 ######################################
 print("*** CONTRUCTOR ***")
-F = FaustPy.Faust(list_factor)
+F = pyfaust.Faust(list_factor)
 print("lister les attribut de F")
 
 print("*** display ***")

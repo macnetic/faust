@@ -47,7 +47,7 @@ configure_file(${FAUST_PYTHON_SRC_DIR}/quickstart.py ${FAUST_PYTHON_BIN_DIR}/qui
 configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/FaustCorePy.pyx COPYONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCy.pxd ${FAUST_PYTHON_BIN_DIR}/FaustCoreCy.pxd COPYONLY)
-configure_file(${FAUST_PYTHON_SRC_DIR}/FaustPy.py ${FAUST_PYTHON_BIN_DIR}/FaustPy.py COPYONLY)
+configure_file(${FAUST_PYTHON_SRC_DIR}/pyfaust.py ${FAUST_PYTHON_BIN_DIR}/pyfaust.py COPYONLY)
 
 add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET})
 

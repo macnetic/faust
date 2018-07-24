@@ -57,7 +57,7 @@ except ImportError:
     plotlib_present=0
 
 import time
-import FaustPy 
+import pyfaust 
 
 
 # function : multiplication par un faust sous Scipy
@@ -133,7 +133,7 @@ for j in range(nb_dim):
 	#	print(fact)
 
 
-	F=FaustPy.Faust(list_factor_dense)
+	F=pyfaust.Faust(list_factor_dense)
 	F_dense=F.toarray()
 
 	if(F.shape[0] != dim) or (F.shape[1] != dim):
@@ -233,9 +233,9 @@ if(plotlib_present and not "DONT_PYPLOT_FAUST_TIME" in os.environ):
 	tickness=4
 	size_font=18
 	font_style='bold'
-	plt.loglog(dim_list,t_dense, 'r', basex=2,label='dense (Numpy)',linewidth=tickness)
-	plt.loglog(dim_list,t_faust, 'b', basex=2,label='Faust (PyFaust)',linewidth=tickness)
-	plt.loglog(dim_list,t_scipy, 'g', basex=2,label='Faust (Scipy)',linewidth=tickness)
+	plt.loglog(dim_list,t_dense, 'r', basex=2,label='dense (numpy)',linewidth=tickness)
+	plt.loglog(dim_list,t_faust, 'b', basex=2,label='Faust (pyfaust)',linewidth=tickness)
+	plt.loglog(dim_list,t_scipy, 'g', basex=2,label='Faust (scipy)',linewidth=tickness)
 	plt.title('Time Comparison : Faust-Vector multiplication',fontweight=font_style)
 	plt.legend(loc=2)
 	plt.xlabel('dimension',fontsize=size_font,fontweight=font_style)
@@ -245,8 +245,8 @@ if(plotlib_present and not "DONT_PYPLOT_FAUST_TIME" in os.environ):
 	plt.savefig(FigPath+'/time_comparison.png')
 	plt.clf()
 
-	plt.loglog(dim_list,speed_up_Faust, 'b', basex=2,label='Faust (PyFaust)',linewidth=tickness)
-	plt.loglog(dim_list,speed_up_Scipy, 'g', basex=2,label='Faust (Scipy)',linewidth=tickness)
+	plt.loglog(dim_list,speed_up_Faust, 'b', basex=2,label='Faust (pyfaust)',linewidth=tickness)
+	plt.loglog(dim_list,speed_up_Scipy, 'g', basex=2,label='Faust (scipy)',linewidth=tickness)
 	plt.title('Speed-up : Faust-Vector multiplication',fontweight=font_style)
 	plt.legend(loc=2)
 	plt.xlabel('dimension',fontsize=size_font,fontweight=font_style)
