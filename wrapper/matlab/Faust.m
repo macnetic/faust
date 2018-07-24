@@ -66,19 +66,8 @@ classdef Faust
 		matrix; % Handle to the FaustCore class instance
 		isReal;
 	end
-	properties (Constant)
-		%> Identifies a complex Faust.
-		COMPLEX=3
-		%> Identifies a real Faust.
-		REAL=4
-		% Constants to identify kind of factors to generate through Faust.rand()
-		%> Designates a dense factor matrix
-		DENSE=0
-		%> Designates a dense factor matrix
-		SPARSE=1
-		%> Means DENSE or SPARSE
-		MIXTE=2
-	end
+%	properties (Constant)
+%	end
 	methods
 		%======================================================================
 		%> @brief Creates a Faust from a list of factors or alternatively from a file.
@@ -195,7 +184,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = Faust.rand(Faust.MIXTE, Faust.REAL, 2, 5, 50, 100, .5)
+		%>	F = Faust.rand([2, 5], [50, 100], .5)
 		%>	delete(F)
 		%> @endcode
 		%>
@@ -225,7 +214,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>   F = Faust.rand(Faust.MIXTE, Faust.REAL, 2, 5, 50, 100, .5)
+		%>   F = Faust.rand([2, 5], [50, 100], .5)
 		%>   A = rand(size(F,2), 50)
 		%>   B = F*A
 		%> % is equivalent to B = mtimes(F, A)
@@ -378,7 +367,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
+		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	F_ctrans = F'
 		%>	F_ctrans2 = ctranspose(F)
 		%>	% F_ctrans == F_ctrans2
@@ -421,7 +410,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
+		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	F_conj = conj(F)
 		%> @endcode
 		%>
@@ -457,7 +446,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
+		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	[nrows, ncols] = size(F)
 		%>	nrows = size(F, 1)
 		%>	ncols = size(F, 2)
@@ -531,7 +520,7 @@ classdef Faust
 		%> @code
 		%>	% in a matlab terminal
 		%>
-		%>	>> F = Faust.rand(Faust.MIXTE, Faust.REAL, 4, 5, 3, 3, .9);
+		%>	>> F = Faust.rand([4, 5], 3, .9);
 		%>	>> full(F)
 		%>	ans =
 		%>
@@ -593,7 +582,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
+		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	f1 = get_factor(F,1)
 		%> @endcode
 		%> <p>@b See @b also Faust.get_num_factors
@@ -635,7 +624,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
+		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	nf = get_num_factors(F)
 		%> @endcode
 		%>
@@ -663,7 +652,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = Faust.rand(Faust.MIXTE, Faust.COMPLEX, 2, 5, 50, 100, .5)
+		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	save(F, 'F.mat')
 		%>	G = Faust('F.mat')
 		%> @endcode
@@ -695,7 +684,7 @@ classdef Faust
 		%>
 		%> @b Example
         %> @code
-        %>		F = Faust.rand(Faust.MIXTE, Faust.REAL, 2, 5, 50, 100, .5)
+        %>		F = Faust.rand([2, 5], [50, 100], .5)
         %>		i = randi(min(size(F)), 1, 2)
 		%>	i1 = i(1);i2 = i(2)
 		%>
@@ -831,7 +820,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	% in a matlab terminal
-		%>	>> F = Faust.rand(Faust.MIXTE, Faust.REAL, 1, 2, 50, 100, .5)
+		%>	>> F = Faust.rand([1, 2], [50, 100], .5)
 		%>	>> disp(F)
 		%>	Faust of size : 55x73, nb factor 2, RCG 0.947157,nnz 4239
 		%>	- FACTOR 0type : SPARSE size 55x66, density 0.501377, nnz 1820
@@ -874,10 +863,10 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; norm(F, 2) calculates the 2-norm of F.<br/><br>
-		%> &nbsp;&nbsp;&nbsp; norm(F) does the same as above.<br/><br>
-		%> &nbsp;&nbsp;&nbsp; norm(F, 1) calculates the 1-norm of F.<br/><br>
-		%> &nbsp;&nbsp;&nbsp; norm(F, 'fro') calculates the Frobenius norm of F.<br/><br>
+		%> &nbsp;&nbsp;&nbsp; @b norm(F, 2) calculates the 2-norm of F.<br/><br>
+		%> &nbsp;&nbsp;&nbsp; @b norm(F) does the same as above.<br/><br>
+		%> &nbsp;&nbsp;&nbsp; @b norm(F, 1) calculates the 1-norm of F.<br/><br>
+		%> &nbsp;&nbsp;&nbsp; @b norm(F, 'fro') calculates the Frobenius norm of F.<br/><br>
 		%>
 		%> @param F the Faust object.
 		%> @param ord (optional) the norm order. Respectively 1 or 2 for the 1-norm and 2-norm or 'fro' for the Frobenius norm (by default the 2-norm is computed).
@@ -889,7 +878,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%> % in a matlab terminal
-		%> >> F = Faust.rand(Faust.MIXTE, Faust.REAL, 1, 2, 50, 100, .5)
+		%> >> F = Faust.rand([1, 2], [50, 100], .5)
 		%> >> norm(F)
 		%> ans =
 		%> 34.2995
@@ -982,7 +971,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = Faust.rand(Faust.MIXTE, Faust.REAL, 2, 5, 50, 100, .5)
+		%>	F = Faust.rand([2, 5], [50, 100], .5)
 		%>	dens = density(F)
 		%> @endcode
 		%>
@@ -1051,34 +1040,163 @@ classdef Faust
 		%==========================================================================================
 		%> @brief Generates a random Faust.
 		%>
-		%> @param faust_type must be one of Faust.DENSE, Faust.SPARSE or Faust.MIXTE (the latter is for allowing generation of dense and sparse factors in the same Faust).
-		%> @param field	must be Faust.REAL or Faust.COMPLEX.
-		%> @param min_num_factors the minimal number of factors generated.
-		%> @param max_num_factors the maximal number of factors generated.
-		%> @param min_dim_size	the minimal size of column and row dimensions of the Faust generated.
-		%> @param max_dim_size	the maximal size of column and row dimensions of the Faust generated.
-		%> @param density	the approximate density of factors generated.
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b Faust.rand(N,S) with N and S two integers, generates a Faust of N factors. All factors are square matrices of order S. The type of factors (dense or sparse) is a random choice.
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b Faust.rand([N1,N2],S) same as above except that here the number of factors is randomly chosen between N1 and N2 inclusively.
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b Faust.rand([N1,N2],[S1, S2]) or @b Faust.rand(N, [S1, S2]) same as above except that here the factor matrices have random sizes; the number of rows and columns are both randomly chosen between S1 and S2 inclusively.
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b Faust.rand(N, S, D) or @b Faust.rand([N1, N2], [S1, S2], D) same as above but specifying D the approximate density of each factor.
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b Faust\.rand(N, S, D, 'dense') or @b Faust\.rand([N1, N2], [S1, S2], D, 'dense') same as above but generating only dense matrices as factors.
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b Faust\.rand(N, S, D, 'sparse') or @b Faust\.rand([N1, N2], [S1, S2], D, 'sparse') same as above but generating only sparse matrices as factors.
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b Faust\.rand(N, S, D, 'sparse', false), @b Faust\.rand([N1, N2], [S1, S2], D, 'sparse', false), Faust\.rand(N, S, D, 'dense', false) or @b Faust\.rand([N1, N2], [S1, S2], D, 'dense', false) same as above but generating a complex Faust, that is matrices defined over a the complex field.
+		%>
+		%>
+		%>
+		%>
+		%>
+		%>
+		%>
+		%> @param num_factors (varargin{1}) If it's an integer it will be the number of random factors to set in the Faust.
+		%>                    If num_factors is a vector of 2 integers then the
+		%>                    number of factors will be set randomly between
+		%>                    num_factors(1) and num_factors(2) (inclusively).
+		%> @param dim_sizes (varargin{2}) if it's an integer it will be the order of the square
+		%> 					matrix factors (of size size_dims^2).
+		%> 					If it's a vector of 2 integers then the
+		%> 					number of rows and columns will
+		%> 					be a random number between size_dims(1) and
+		%> 					size_dims(2) (inclusively).
+		%> @param density	(varargin{3}, optional) the approximate density of factors generated. The default value is 0.1.
+		%> 					It should be a floating point number between 0 and 1.
+		%> @param fac_type	(varargin{4}, optional) the type of factors. Must be
+		%>                 	'sparse', 'dense' or 'mixed' if you want a mix of dense and
+		%>                  sparse matrices in the generated Faust (choice's done according
+		%>                  to an uniform distribution).
+		%>                  The default value is 'mixed'.
+		%> @param is_real	(varargin{5}, optional) a boolean set to true to generate a real Faust,
+		%>                  set to false to generate a complex Faust.
+		%>                  The default value is true.
+		%>
 		%>
 		%>
 		%> @retval F the random Faust.
 		%>
-		%> @b Example
+		%> @b Example @b 1
 		%> @code
-		%>	F = Faust.rand(Faust.MIXTE, Faust.REAL, 2, 5, 50, 100, .5)
+		%> % in a matlab terminal
+		%> >> F = Faust.rand(2, 10, .5, 'mixed', false)
+		%>
+		%> F =
+		%>
+		%> Faust of size : 10x10, nb factor 2, RCG 0.980392,nnz 102
+		%> - FACTOR 0 type : SPARSE size 10x10, density 0.52, nnz 52
+		%> - FACTOR 1 type : DENSE size 10x10, density 0.5, nnz 50
+		%> @endcode
+		%> @b Example @b 2
+		%> @code
+		%> >> G = Faust.rand([2, 5], [10, 20], .5, 'dense')
+		%>
+		%> G =
+		%>
+		%> Faust of size : 15x13, nb factor 5, RCG 0.474453,nnz 411
+		%> - FACTOR 0 type : DENSE size 15x12, density 0.516667, nnz 93
+		%> - FACTOR 1 type : DENSE size 12x12, density 0.527778, nnz 76
+		%> - FACTOR 2 type : DENSE size 12x15, density 0.516667, nnz 93
+		%> - FACTOR 3 type : DENSE size 15x10, density 0.526667, nnz 79
+		%> - FACTOR 4 type : DENSE size 10x13, density 0.538462, nnz 70
+		%>
 		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.Faust.
 		%==========================================================================================
-		function F=rand(faust_type, field, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density)
-			if(faust_type ~= Faust.SPARSE && faust_type ~= Faust.DENSE && faust_type ~= Faust.MIXTE)
-				error('Faust.rand(): error: faust_type must be among Faust.SPARSE/DENSE/MIXTE.')
+		function F = rand(varargin)
+			%> Identifies a complex Faust.
+			COMPLEX=3;
+			%> Identifies a real Faust.
+			REAL=4;
+			% Constants to identify kind of factors to generate
+			%> Designates a dense factor matrix
+			DENSE=0;
+			%> Designates a dense factor matrix
+			SPARSE=1;
+			%> Means DENSE or SPARSE
+			MIXED=2;
+			if(nargin < 2)
+				error('Faust.rand(): the number of arguments must be at least 2.')
 			end
-			if(field == Faust.COMPLEX)
-				F = Faust(mexFaustCplx('rand', faust_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), false)
-			elseif(field == Faust.REAL)
-				F = Faust(mexFaustReal('rand', faust_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), true)
+			% set num of factors
+			num_factors = varargin{1};
+			dim_sizes = varargin{2};
+			if(isscalar(num_factors) && mod(num_factors,1) == 0)
+				min_num_factors = num_factors;
+				max_num_factors = num_factors;
+			elseif(ismatrix(num_factors) && size(num_factors, 1) == 1 && size(num_factors, 2) == 2)
+				min_num_factors = num_factors(1);
+				max_num_factors = num_factors(2);
 			else
-				error('Faust.rand() error: field must be Faust.REAL or Faust.COMPLEX.')
+				error('Faust.rand(): the first argument (num_factors) must be an integer or a vector of two integers.')
+			end
+			% set sizes of factors
+			if(isscalar(dim_sizes) && mod(dim_sizes, 1) == 0)
+				min_dim_size = dim_sizes;
+				max_dim_size = dim_sizes;
+			elseif(ismatrix(dim_sizes) && size(dim_sizes,1) == 1 && size(dim_sizes,2) == 2)
+				min_dim_size = dim_sizes(1);
+				max_dim_size = dim_sizes(2);
+			else
+				error('Faust.rand(): the second argument (dim_sizes) must be an integer or a vector of two integers.')
+			end
+			field = REAL;
+			fac_type = MIXED;
+			if(nargin >= 3)
+				if(isnumeric(varargin{3}))
+					density = varargin{3};
+				else
+					error('Faust.rand(): the third argument (density) must be a real number in [0;1].')
+				end
+				% set density type of factors
+				if(nargin >= 4)
+					if(ischar(varargin{4}))
+						if(strcmp(varargin{4}, 'sparse'))
+							fac_type = SPARSE;
+						elseif(strcmp(varargin{4},'dense'))
+							fac_type = DENSE;
+						elseif(strcmp(varargin{4},'mixed'))
+							fac_type = MIXED;
+						end
+					else
+						error('Faust.rand(): the fourth argument (fac_type) must be among a character array among ''sparse'', ''dense'' or ''mixed''.')
+					end
+					%set the field of factors
+					if(nargin >= 5)
+						if(islogical(varargin{5}))
+							if(varargin{5})
+								field = REAL;
+							else
+								field = COMPLEX;
+							end
+						else
+							error('Faust.rand(): the fifth argument (isreal) must be a boolean.')
+						end
+					else
+						field = REAL;
+					end
+				else
+					fac_type = MIXED;
+				end
+			else
+				density = .1;
+			end
+			if(field == COMPLEX)
+				F = Faust(mexFaustCplx('rand', fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), false);
+			else %if(field == REAL)
+				F = Faust(mexFaustReal('rand', fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), true);
 			end
 		end
 	end
