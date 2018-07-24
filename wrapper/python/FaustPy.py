@@ -248,8 +248,9 @@ class Faust:
     @property
     def shape(F):
         """
-        Gives the size of the Faust F. This function is intented to be used as
-        a property (F.shape).
+        Gives the size of the Faust F.
+
+        This function is intended to be used as a property (see the examples).
 
         The size is a pair of numbers: the number of rows and the number of
         columns of the equivalent dense matrix of F.
@@ -293,8 +294,9 @@ class Faust:
     @property
     def T(F):
         """
-        Returns the transpose of the Faust F. This function is intended to be
-        used as a property (F.T).
+        Returns the transpose of the Faust F.
+
+        This function is intended to be used as a property (see the examples).
 
         Args:
             F: the Faust object.
@@ -364,8 +366,9 @@ class Faust:
     @property
     def H(F):
         """
-        Returns the conjugate transpose of F. This function is intended to be
-        used as a property (F.H).
+        Returns the conjugate transpose of F.
+
+        This function is intended to be used as a property (see the examples).
 
         Returns:
             the conjugate transpose of F as a Faust object.
@@ -390,7 +393,7 @@ class Faust:
 
         This method overloads a Python function.
 
-        NOTE: Ideally this function is intented to return a valid Python
+        NOTE: Ideally this function is intended to return a valid Python
         expression but here this is not the case. Only information is
         displayed.
 
@@ -723,11 +726,31 @@ class Faust:
         if(format == "Matlab"):
             F.m_faust.save_mat_file(filepath)
 
-    def isReal(F):
+    @property
+    def dtype(F):
         """
-        Indicates if F is a real Faust or a complex Faust.
+        Returns the dtype of the Faust.
+
+        This function is intended to be used as a property (see the examples).
+
+        Args:
+            F: the Faust object.
 
         Returns:
-            True if F is a real Faust and False if it's a complex Faust.
+            A numpy.complex128 if the Faust is complex otherwise (if it's
+            a real Faust) it returns a numpy.float64.
+
+
+        Examples:
+            >>> from FaustPy import Faust
+            >>> F = Faust.rand([2, 3], [10, 20],.5, is_real=False)
+            dtype('complex128')
+            >>> F = Faust.rand([2, 3], [10, 20],.5)
+            dtype('float64')
+
+
         """
-        return F.m_faust.isReal()
+        if(F.m_faust.isReal()):
+            return np.dtype(np.float64)
+        else:
+            return np.dtype(np.complex)
