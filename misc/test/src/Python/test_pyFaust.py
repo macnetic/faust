@@ -81,7 +81,7 @@ F = pyfaust.Faust(list_factor)
 print("lister les attribut de F")
 
 print("*** display ***")
-F.display()
+#F.display()
 print("Ok")
 
 
@@ -220,30 +220,29 @@ print("Ok")
 print("*** SLICING ***")
 for i in range(dim1):
 	for j in range(dim2):
-		F_i_j=F[i,j]
-		F_trans_j_i=F_trans[j,i]
-		
-		if F_i_j != F_dense[i,j]:
+		F_i_j=F[i,j].todense();
+		F_trans_j_i=F_trans[j,i].todense();
+		if F_i_j[0,0] != F_dense[i,j]:
 			raise ValueError('invalid value')
 			
-		if F_i_j != F_trans_dense[j,i]:
+		if F_i_j[0,0] != F_trans_dense[j,i]:
 			raise ValueError('invalid value')
 		
-F_dense_slice = F[...,...]
+F_dense_slice = F[...]
 if not (F_dense_slice.shape == (dim1, dim2)) :
 	print("expected size : "+str([dim1, dim2]))
 	print("got : "+str(F_dense_slice.shape))
 	raise ValueError('invalid  size of the dense matrix')
-if not (F_dense==F_dense_slice).all():
+if not (F_dense==F_dense_slice.todense()).all():
 	raise ValueError('invalid value')
 
 
-F_trans_dense_slice = F_trans[...,...]
+F_trans_dense_slice = F_trans[...]
 if not (F_trans_dense_slice.shape == (dim2, dim1)) :
 	print("expected size : "+str([dim2, dim1]))
 	print("got : "+str(F_trans_dense_slice.shape))
 	raise ValueError('invalid  size of the dense matrix')
-if not (F_trans_dense==F_trans_dense_slice).all():
+if not (F_trans_dense==F_trans_dense_slice.todense()).all():
 	raise ValueError('invalid value')
 	
 
@@ -253,7 +252,7 @@ if not (F_dense_slice_1.shape == (dim1, dim2)) :
 	print("expected size : "+str([dim1, dim2]))
 	print("got : "+str(F_dense_slice_1.shape))
 	raise ValueError('invalid  size of the dense matrix')
-if not (F_dense==F_dense_slice_1).all():
+if not (F_dense==F_dense_slice_1.todense()).all():
 	raise ValueError('invalid value')
 	
 	
@@ -261,7 +260,7 @@ if not (F_dense==F_dense_slice_1).all():
 #~ slice_col=dim2:0:-1
 
 #~ F_dense_slice_2 = F[slice_row,slice_col]
-F_dense_slice_2 = F[::-1,::-1]
+F_dense_slice_2 = F[::,::]
 if not (F_dense_slice_2.shape == (dim1, dim2)) :
 	print("expected size : "+str([dim1, dim2]))
 	print("got : "+str(F_dense_slice_2.shape))
@@ -269,6 +268,6 @@ if not (F_dense_slice_2.shape == (dim1, dim2)) :
 	print("")
 	print(F_dense)
 	raise ValueError('invalid  size of the dense matrix')
-if not (F_dense[::-1,::-1]==F_dense_slice_2).all():
+if not (F_dense[::,::]==F_dense_slice_2.todense()).all():
 	raise ValueError('invalid value')
 print("Ok")

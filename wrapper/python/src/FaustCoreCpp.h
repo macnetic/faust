@@ -71,6 +71,7 @@ class FaustCoreCpp
     unsigned int get_fact_nb_rows(unsigned int& i) const;
     unsigned int get_fact_nb_cols(unsigned int& i) const;
     void get_fact(unsigned int& i, FPP* fact_ptr) const;
+    FaustCoreCpp<FPP>* slice(unsigned int, unsigned int, unsigned int, unsigned int);
     void save_mat_file(const char* filepath) const;
     FaustCoreCpp<FPP>* transpose();
     FaustCoreCpp<FPP>* conjugate();

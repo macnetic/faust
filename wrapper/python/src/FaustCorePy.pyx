@@ -45,6 +45,7 @@ cimport numpy as np
 import copy
 
 from libc.stdlib cimport malloc, free;
+from libc.stdio cimport printf
 from libc.string cimport memcpy, strlen;
 from libcpp cimport bool
 from libcpp cimport complex
@@ -332,6 +333,22 @@ cdef class FaustCore:
             fact_cplx_view = fact
             self.core_faust_cplx.get_fact(i, &fact_cplx_view[0, 0])
         return fact
+
+    def slice(self, start_row_id, end_row_id, start_col_id, end_col_id):
+        core = FaustCore(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.slice(start_row_id,
+                                                                end_row_id,
+                                                                start_col_id,
+                                                                end_col_id)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.slice(start_row_id,
+                                                                end_row_id,
+                                                                start_col_id,
+                                                                end_col_id)
+        core._isReal = self._isReal
+        return core
+
 
     def save_mat_file(self,filepath):
         cdef char * cfilepath = <char*> PyMem_Malloc(sizeof(char) *

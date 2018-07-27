@@ -183,6 +183,15 @@ void FaustCoreCpp<FPP>::get_fact(unsigned int& i, FPP* fact_ptr) const
 }
 
 template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::slice(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id)
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform.slice(start_row_id, end_row_id, start_col_id, end_col_id);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
+    core->transform = th;
+    return core;
+}
+
+template<typename FPP>
 void FaustCoreCpp<FPP>::save_mat_file(const char* filepath) const
 {
     //    std::cout << "FaustCoreCpp::save_mat_file()" << std::endl;

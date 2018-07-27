@@ -156,32 +156,33 @@ class TestFaustPy(unittest.TestCase):
         n = self.factors[0].shape[0]
         # test whole array
         prod = self.mulFactors()
-        test_prod = self.F[::,::]
+        test_prod = self.F[::,::].todense()
         self.assertProdEq(prod, test_prod)
-        test_prod = self.F[...,...]
-        self.assertProdEq(prod, test_prod)
+        # test_prod = self.F[...,...].todense() # forbidden (only one index can
+        # be an ellipsis)
+        # self.assertProdEq(prod, test_prod)
         # test one random element
         rand_i, rand_j = self.r.randint(0,self.F.shape[0]-1),self.r.randint(0,self.F.shape[1]-1)
         if(prod[rand_i,rand_j] != 0):
-            self.assertLessEqual(abs(self.F[rand_i,rand_j][0]-prod[rand_i,rand_j])/abs(prod[rand_i,rand_j]),
+            self.assertLessEqual(abs(self.F[rand_i,rand_j].todense()[0]-prod[rand_i,rand_j])/abs(prod[rand_i,rand_j]),
                                  10**-6, msg=("compared values are (ref,rest) ="
                                               +str(prod[rand_i,rand_j])+str(prod[rand_i,rand_j])))
         # test one random row
         rand_i = self.r.randint(0,self.F.shape[0]-1)
-        row = self.F[rand_i,...]
+        row = self.F[rand_i,...].todense()
         for j in range(0,self.F.shape[1]):
-            if(row[j] == 0):
+            if(row[0,j] == 0):
                 self.assertEqual(prod[rand_i,j], 0)
             else:
-                self.assertLessEqual(abs(row[j]-(prod[rand_i,j]))/prod[rand_i,j],10**-6)
+                self.assertLessEqual(abs(row[0,j]-(prod[rand_i,j]))/prod[rand_i,j],10**-6)
         # test one random col
         rand_j = self.r.randint(0,self.F.shape[1]-1)
-        col = self.F[..., rand_j]
+        col = self.F[..., rand_j].todense()
         for i in range(0,self.F.shape[0]):
-            if(col[i] == 0):
+            if(col[i,0] == 0):
                 self.assertEqual(prod[i, rand_j], 0)
             else:
-                self.assertLessEqual(abs(col[i]-(prod[i,rand_j]))/prod[i,rand_j],10**-6)
+                self.assertLessEqual(abs(col[i,0]-(prod[i,rand_j]))/prod[i,rand_j],10**-6)
 
     def testToDense(self):
         print("testToDense()")

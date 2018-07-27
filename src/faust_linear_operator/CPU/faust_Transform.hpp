@@ -187,14 +187,17 @@ Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 }
 
 template<typename FPP>
-Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *> & facts, const FPP lambda_ /*default value = 1.0 */,const bool optimizedCopy /*default value = true*/) :
+Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *> & facts, const FPP lambda_ /*default value = 1.0 */,const bool optimizedCopy /*default value = true*/, const bool cloning_fact /* default to true */) :
 	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	totalNonZeros(0)
 {
 	data.resize(facts.size());
 	for (int i=0 ; i<data.size() ; i++)
 	{
-		data[i]=facts[i]->Clone(optimizedCopy);
+		if(cloning_fact)
+			data[i]=facts[i]->Clone(optimizedCopy);
+		else
+			data[i] = facts[i];
 		totalNonZeros += data[i]->getNonZeros();
 	}
 
@@ -577,15 +580,16 @@ void Faust::Transform<FPP,Cpu>::multiplyLeft(const Faust::Transform<FPP,Cpu> & A
 
 
 template<typename FPP>
-Faust::MatGeneric<FPP,Cpu>* Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_int id) const
+Faust::MatGeneric<FPP,Cpu>* Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_int id, const bool cloning_fact /* default to true */) const
 {
 	if(id>=size())
 	{
 		handleError(m_className,"get_fact : id exceed Faust::Transform size or id < 0");
 	}
 
-
-	return data[id]->Clone();
+	if(cloning_fact)
+		return data[id]->Clone();
+	return data[id];
 
 	//handleError(m_className,"get_fact : not anymore implemented");
 	// v1105 : method not anymore compatible since Faust::Transform<FPP,Cpu> is now a std::vector<Faust::MatGeneric<FPP,Cpu>*>, not std::vector<Faust::MatSparse<FPP,Cpu> >

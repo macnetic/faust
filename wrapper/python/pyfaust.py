@@ -501,19 +501,25 @@ class Faust:
 
     def __getitem__(F, indices):
         """
-        Gets a submatrix of the full matrix of F.
+        Returns a Faust representing a submatrix of F.
 
         This function is a Python built-in overload.
 
-        WARNING: this function costs as much as Faust.__mul__.
+        WARNING: this function doesn't handle a slice step not equal to 1 (e.g. F[i:j:2,:]
+        where slice step is 2.)
 
         Args:
             F: the Faust object.
-            indices: array of length 2 which elements must be slice, integer or
-            Ellipsis (...) (see examples below).
+            indices: array of length 1 or 2 which elements must be slice, integer or
+            Ellipsis (...) (see examples below). Note that using Ellipsis for
+            more than two indices is forbidden.
 
         Returns:
-            the numpy subarray requested.
+            the Faust object requested.
+
+        Raises:
+            IndexError
+
 
         Examples:
             >>> from pyfaust import Faust
@@ -524,40 +530,86 @@ class Faust:
             >>> i1 = randint(0, min(F.shape)-1)
             >>> i2 = randint(0, min(F.shape)-1)
 
-            >>> F[i1,i2] # element at line i1, column i2
+            >>> F[i1,i2] # a Faust representing a matrix with only one element
+                         # at row i1, column i2 of F's dense matrix
 
             >>> F[:, i2] # full column i2
 
-            >>> F[2:4, 1:4] # submatrix from line 2 to 3, each line containing
+            >>> F[2:4, 1:4] # from line 2 to 3, each line containing
                             # only elements from column 1 to 3
 
-            >>> F[::, 4:-1] # submatrix from line 0 to end line, each line
+            >>> F[::, 4:-1] # from line 0 to end line, each line
                             # containing only elements from column 4 to
                             # column before the last one.
 
             >>> F[0:i1, ...] # equivalent to F[0:i1, ::]
         """
-        # check if indices has a 2 index (row and column)
-        if (len(indices) != 2):
-            raise ValueError('indices must contains 2 elements, '
-                             'the row index and the col index')
-
-        # check if the index are slice or integer or Ellipsis
-        for id in indices:
-            if (not isinstance(id, slice) and
-                not isinstance(id, int) and
-                id != Ellipsis):
-                raise ValueError('indices must contains slice (1:n)'
-                                 ' or Ellipsis (...) or int (2)')
-
-        keyCol = indices[1]
-        keyRow = indices[0]
-        identity = np.eye(F.shape[1], F.shape[1])
-        if(keyCol != Ellipsis):
-            identity = identity[..., keyCol]
-        submatrix = F*identity
-        submatrix = submatrix[keyRow, :]
-        return submatrix
+        #TODO: refactor (by index when indices == tuple(2), error message,
+        #      out_indices checking on the end)
+        #TODO: check that step == 1 on slices and stop on failure if it is
+        if(indices == Ellipsis): # F[...]
+            out_indices = [slice(0,F.shape[0]), slice(0, F.shape[1])]
+        elif(isinstance(indices,int)): # F[i] # a line
+            out_indices = [slice(indices, indices+1), slice(0, F.shape[1])]
+        elif(isinstance(indices,slice)):
+            #F[i:j] a group of contiguous lines
+            out_indices = [indices, slice(0, F.shape[1])]
+        elif(isinstance(indices, tuple)):
+            if(len(indices) == 2):
+                out_indices = [0,0]
+                if(indices[0] == Ellipsis):
+                    if(indices[1] == Ellipsis):
+                        raise IndexError('an index can only have a single ellipsis '
+                                         '(\'...\')')
+                    else:
+                        # all lines
+                        out_indices[0] = slice(0, F.shape[0])
+                elif(isinstance(indices[0], int)):
+                    # line F[i]
+                    out_indices[0] = slice(indices[0], indices[0]+1)
+                elif(isinstance(indices[0], slice)):
+                    out_indices[0] = indices[0]
+                else:
+                     raise IndexError("only integers, slices (`:`), ellipsis"
+                                     " (`...`), and integer are valid indices")
+                if(indices[1] == Ellipsis):
+                    # all lines
+                    out_indices[1] = slice(0, F.shape[1])
+                elif(isinstance(indices[1], int)):
+                    # line F[i]
+                    out_indices[1] = slice(indices[1], indices[1]+1)
+                elif(isinstance(indices[1], slice)):
+                    out_indices[1] = indices[1]
+                else:
+                     raise IndexError("only integers, slices (`:`), ellipsis"
+                                    " (`...`), and integer are valid indices")
+            else:
+                raise IndexError('Too many indices.')
+        else:
+            print("type indices:", type(indices))
+            raise IndexError("only integers, slices (`:`), ellipsis"
+                             " (`...`), and integer are valid indices")
+        if(out_indices[0].start == None and out_indices[0].stop == None): #F[::] or F[::,any]
+            out_indices[0] = slice(0,F.shape[0])
+        if(out_indices[0].stop < 0):
+            out_indices[0] = slice(out_indices[0].start,
+                                   F.shape[0]+out_indices[0].stop)
+        if(out_indices[1].start == None and out_indices[1].stop == None): #F[any, ::]
+            out_indices[1] = slice(0,F.shape[1])
+        if(out_indices[1].stop < 0):
+            out_indices[1] = slice (out_indices[1].start,
+                                    F.shape[1]+out_indices[1].stop)
+        for i in range(0,2):
+            if(out_indices[i].start >= F.shape[i] or out_indices[i].stop > F.shape[i]):
+                raise IndexError("index "+
+                                 str(max(out_indices[i].start,out_indices[i].stop-1))+
+                                 " is out of bounds for axis "+str(i)+" with size "+
+                                 str(F.shape[i]))
+        slice_F = Faust(core_obj=F.m_faust.slice(out_indices[0].start,
+                                         out_indices[0].stop,
+                                         out_indices[1].start,
+                                         out_indices[1].stop))
+        return slice_F
 
     def nnz_sum(F):
         """

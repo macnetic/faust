@@ -53,7 +53,7 @@
 #include "faust_constant.h"
 #include <cassert>
 #ifdef __GEMM_WITH_OPENBLAS__
-	#include "faust_cblas_algebra.h"
+#include "faust_cblas_algebra.h"
 #endif
 
 
@@ -63,19 +63,19 @@ template<typename FPP>
 const char * Faust::MatDense<FPP,Cpu>::m_className = "Faust::MatDense<FPP,Cpu>::";
 
 
-template<typename FPP>
+	template<typename FPP>
 Faust::MatDense<FPP,Cpu>::MatDense(const FPP  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol ) : Faust::MatGeneric<FPP,Cpu>(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false),isZeros(false)
 {
 
 #ifdef __COMPILE_TIMERS__
-t_constr.start();
+	t_constr.start();
 #endif
 
-    memcpy(getData(), data_, nbRow*nbCol*sizeof(FPP));
+	memcpy(getData(), data_, nbRow*nbCol*sizeof(FPP));
 
 
 #ifdef __COMPILE_TIMERS__
-t_constr.stop();
+	t_constr.stop();
 #endif
 
 }
@@ -83,7 +83,7 @@ t_constr.stop();
 template<typename FPP>
 Faust::MatGeneric<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::Clone(const bool isOptimize /*default value = false*/) const
 {
-	
+
 	if (isOptimize)
 	{ 		
 		Faust::MatSparse<FPP,Cpu> S((*this));		
@@ -96,11 +96,11 @@ Faust::MatGeneric<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::Clone(const bool isOptimiz
 }
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::resize(const faust_unsigned_int nbRow,const faust_unsigned_int nbCol)
 {
 #ifdef __COMPILE_TIMERS__
-t_resize.start();
+	t_resize.start();
 #endif
 
 
@@ -110,11 +110,11 @@ t_resize.start();
 		mat.resize(nbRow,nbCol);
 	}
 
-    isZeros = false;
-    isIdentity = false;
+	isZeros = false;
+	isIdentity = false;
 
 #ifdef __COMPILE_TIMERS__
-t_resize.stop();
+	t_resize.stop();
 #endif
 }
 
@@ -135,12 +135,12 @@ faust_unsigned_int Faust::MatDense<FPP,Cpu>::getNonZeros()const
 
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::check_dim_validity()
 {
 
 #ifdef __COMPILE_TIMERS__
-t_check_dim.start();
+	t_check_dim.start();
 #endif
 
 	bool verifSize = (this->getNbCol() == mat.cols()) &&  (this->getNbRow() == mat.rows());
@@ -148,12 +148,12 @@ t_check_dim.start();
 	if (!verifSize)
 		handleError(m_className, "check_dim_validity : Size incompatibility in the Faust::MatDense");
 #ifdef __COMPILE_TIMERS__
-t_check_dim.stop();
+	t_check_dim.stop();
 #endif
 
- }
+}
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::setZeros()
 {
 	memset(getData(), 0, sizeof(FPP) * this->dim1*this->dim2);
@@ -161,7 +161,7 @@ void Faust::MatDense<FPP,Cpu>::setZeros()
 	isIdentity = false;
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::setEyes()
 {
 	setZeros();
@@ -178,7 +178,7 @@ template<typename FPP>
 bool Faust::MatDense<FPP,Cpu>::isEqual(const Faust::MatDense<FPP,Cpu> & B) const
 {
 	if ((this->getNbCol() != B.getNbCol()) || (this->getNbRow() != B.getNbRow()))
-        handleError(m_className, "isEqual : dimension of the 2 matrix are not the same\n");
+		handleError(m_className, "isEqual : dimension of the 2 matrix are not the same\n");
 
 	if (isZeros)
 		return B.isZeros;
@@ -186,7 +186,7 @@ bool Faust::MatDense<FPP,Cpu>::isEqual(const Faust::MatDense<FPP,Cpu> & B) const
 		return isZeros;
 	else
 		return mat.isApprox(B.mat,FAUST_PRECISION);
- }
+}
 
 
 template<typename FPP>
@@ -224,65 +224,65 @@ bool Faust::MatDense<FPP,Cpu>::isEqual(const Faust::MatDense<FPP,Cpu> & B, FPP t
 
 
 // OPERATION BASIQUE //
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::transpose()
 {
 
 #ifdef __COMPILE_TIMERS__
-t_transpose.start();
+	t_transpose.start();
 #endif
 
 	if(isZeros || isIdentity)
 	{
 		resize(this->dim2,this->dim1);
-		#ifdef __COMPILE_TIMERS__
-			t_transpose.stop();
-		#endif
+#ifdef __COMPILE_TIMERS__
+		t_transpose.stop();
+#endif
 		return;
 	}
 
 	mat = mat.transpose().eval();
 	faust_unsigned_int dim1_copy = this->dim1;
 	this->dim1 = this->dim2;
-    this->dim2 = dim1_copy;
+	this->dim2 = dim1_copy;
 
 #ifdef __COMPILE_TIMERS__
-t_transpose.stop();
+	t_transpose.stop();
 #endif
 
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::conjugate()
 {
 
 #ifdef __COMPILE_TIMERS__
-//t_conjugate.start(); //TODO
+	//t_conjugate.start(); //TODO
 #endif
 
 	if(isZeros)
 	{
-		#ifdef __COMPILE_TIMERS__
-//			t_conjugate.stop(); //TODO
-		#endif
+#ifdef __COMPILE_TIMERS__
+		//			t_conjugate.stop(); //TODO
+#endif
 		return;
 	}
 
 	mat = mat.conjugate().eval();
 
 #ifdef __COMPILE_TIMERS__
-//t_conjugate.stop(); //TODO
+	//t_conjugate.stop(); //TODO
 #endif
 
 }
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::multiplyRight(Faust::MatDense<FPP,Cpu> const& A)
 {
 
 #ifdef __COMPILE_TIMERS__
-t_mult_right.start();
+	t_mult_right.start();
 #endif
 
 	if (this->dim2 != A.dim1)
@@ -292,9 +292,9 @@ t_mult_right.start();
 
 	if(A.isIdentity)
 	{
-		#ifdef __COMPILE_TIMERS__
-			t_mult_right.stop();
-		#endif
+#ifdef __COMPILE_TIMERS__
+		t_mult_right.stop();
+#endif
 		return;
 	}
 
@@ -306,18 +306,18 @@ t_mult_right.start();
 		memset(ptr_data_dst, 0, sizeof(FPP) * this->dim1*this->dim2);
 		isZeros = true;
 		isIdentity = false;
-		#ifdef __COMPILE_TIMERS__
-			t_mult_right.stop();
-		#endif
+#ifdef __COMPILE_TIMERS__
+		t_mult_right.stop();
+#endif
 		return;
 	}
 
 	if(isIdentity)
 	{
 		this->operator=(A);
-		#ifdef __COMPILE_TIMERS__
-			t_mult_right.stop();
-		#endif
+#ifdef __COMPILE_TIMERS__
+		t_mult_right.stop();
+#endif
 		return;
 	}
 
@@ -326,64 +326,64 @@ t_mult_right.start();
 
 
 #ifdef __COMPILE_TIMERS__
-t_mult_right.stop();
+	t_mult_right.stop();
 #endif
 
- }
+}
 
 /*
-template<typename FPP>
- void Faust::MatDense<FPP,Cpu>::multiplyLeft(Faust::MatDense<FPP,Cpu> const& A)
- {
+   template<typename FPP>
+   void Faust::MatDense<FPP,Cpu>::multiplyLeft(Faust::MatDense<FPP,Cpu> const& A)
+   {
 
 #ifdef __COMPILE_TIMERS__
- t_mult_left.start();
+t_mult_left.start();
 #endif
 
-	if (this->dim1 != A.dim2)
-	{
-		handleError(m_className, "multiplyLeft : dimension conflict between matrix");
-	}
+if (this->dim1 != A.dim2)
+{
+handleError(m_className, "multiplyLeft : dimension conflict between matrix");
+}
 
-	if(A.isIdentity)
-	{
-		#ifdef __COMPILE_TIMERS__
-			t_mult_left.stop();
-		#endif
-		return;
-	}
+if(A.isIdentity)
+{
+#ifdef __COMPILE_TIMERS__
+t_mult_left.stop();
+#endif
+return;
+}
 
-	if(isZeros || A.isZeros)
-	{
-		resize(A.dim1,this->dim2);
-		FPP *const ptr_data_dst = getData();
-		memset(ptr_data_dst, 0, sizeof(FPP) * this->dim1*this->dim2);
-		isZeros = true;
-		isIdentity = false;
-		#ifdef __COMPILE_TIMERS__
-			t_mult_left.stop();
-		#endif
-		return;
-	}
+if(isZeros || A.isZeros)
+{
+resize(A.dim1,this->dim2);
+FPP *const ptr_data_dst = getData();
+memset(ptr_data_dst, 0, sizeof(FPP) * this->dim1*this->dim2);
+isZeros = true;
+isIdentity = false;
+#ifdef __COMPILE_TIMERS__
+t_mult_left.stop();
+#endif
+return;
+}
 
-	if(isIdentity)
-	{
-		this->operator=(A);
-		#ifdef __COMPILE_TIMERS__
-			t_mult_left.stop();
-		#endif
-		return;
-	}
+if(isIdentity)
+{
+this->operator=(A);
+#ifdef __COMPILE_TIMERS__
+t_mult_left.stop();
+#endif
+return;
+}
 
 
-	MatDense this_copy((*this));
-	gemm<FPP>(A,this_copy,(*this),1.0,0.0,'N','N');
+MatDense this_copy((*this));
+gemm<FPP>(A,this_copy,(*this),1.0,0.0,'N','N');
 
 #ifdef __COMPILE_TIMERS__
- t_mult_left.stop();
+t_mult_left.stop();
 #endif
 
- }
+}
 */
 
 
@@ -391,24 +391,24 @@ template<typename FPP>
 template<typename FPP>
 FPP Faust::MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag,Faust::BlasHandle<Cpu> blas_handle/*=Faust::BlasHandle<Cpu>()*/) const
 {
-	#ifdef __COMPILE_FPPIMERS__
-		t_spectral_norm2.start();
-	#endif
+#ifdef __COMPILE_FPPIMERS__
+	t_spectral_norm2.start();
+#endif
 	if(isZeros)
 	{
 		flag = -2;
-		#ifdef __COMPILE_TIMERS__
+#ifdef __COMPILE_TIMERS__
 		t_spectral_norm2.stop();
-		#endif
+#endif
 		return 0;
 	}
 
 	if(isIdentity)
 	{
 		flag = -3;
-		#ifdef __COMPILE_TIMERS__
+#ifdef __COMPILE_TIMERS__
 		t_spectral_norm2.stop();
-		#endif
+#endif
 		return 1;
 	}
 
@@ -428,9 +428,9 @@ FPP Faust::MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max
 	FPP  res=std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag));
 
 
-	#ifdef __COMPILE_TIMERS__
+#ifdef __COMPILE_TIMERS__
 	t_spectral_norm2.stop();
-	#endif
+#endif
 	return res;
 
 }
@@ -441,58 +441,58 @@ FPP Faust::MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max
 
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::scalarMultiply(FPP const lambda)
 {
-	#ifdef __COMPILE_TIMERS__
+#ifdef __COMPILE_TIMERS__
 	t_scalar_multiply.start();
-	#endif
-		mat = lambda * mat;
-	#ifdef __COMPILE_TIMERS__
+#endif
+	mat = lambda * mat;
+#ifdef __COMPILE_TIMERS__
 	t_scalar_multiply.stop();
-	#endif
+#endif
 }
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::add(Faust::MatDense<FPP,Cpu> const& A)
 {
-	#ifdef __COMPILE_TIMERS__
+#ifdef __COMPILE_TIMERS__
 	t_add.start();
-	#endif
-		if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
-		{
-			handleError(m_className, "add : matrix dimension not equal");
-		}
-		mat = mat + A.mat;
-	    isZeros = false;
-	    isIdentity = false;
-	#ifdef __COMPILE_TIMERS__
+#endif
+	if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
+	{
+		handleError(m_className, "add : matrix dimension not equal");
+	}
+	mat = mat + A.mat;
+	isZeros = false;
+	isIdentity = false;
+#ifdef __COMPILE_TIMERS__
 	t_add.stop();
-	#endif
+#endif
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::sub(Faust::MatDense<FPP,Cpu> const& A)
 {
-	#ifdef __COMPILE_TIMERS__
+#ifdef __COMPILE_TIMERS__
 	t_sub.start();
-	#endif
-		if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
-		{
-			std::cout<<"sub"<<std::endl;			
-			std::cout<<" this dimension ("<<this->getNbRow()<<","<<this->getNbCol()<<")"<<std::endl;		
-			std::cout<<" A dimension ("<<A.getNbRow()<<","<<A.getNbCol()<<")"<<std::endl;	
-			handleError(m_className, "sub : matrix dimension not equal");
-		}
-		mat = mat - A.mat;
+#endif
+	if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
+	{
+		std::cout<<"sub"<<std::endl;			
+		std::cout<<" this dimension ("<<this->getNbRow()<<","<<this->getNbCol()<<")"<<std::endl;		
+		std::cout<<" A dimension ("<<A.getNbRow()<<","<<A.getNbCol()<<")"<<std::endl;	
+		handleError(m_className, "sub : matrix dimension not equal");
+	}
+	mat = mat - A.mat;
 
-	    isZeros = false;
-	    isIdentity = false;
+	isZeros = false;
+	isIdentity = false;
 
-	#ifdef __COMPILE_TIMERS__
+#ifdef __COMPILE_TIMERS__
 	t_sub.stop();
-	#endif
+#endif
 }
 
 
@@ -536,7 +536,7 @@ void Faust::MatDense<FPP,Cpu>::Display() const
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::print_file(const char* filename)const
 {
-    ofstream fichier;
+	ofstream fichier;
 	fichier.open(filename);
 	for (int i=0 ; i<this->getNbRow() ; i++)
 	{
@@ -550,52 +550,52 @@ void Faust::MatDense<FPP,Cpu>::print_file(const char* filename)const
 
 /// SURCHARGE OPERATEUR ///
 // affectation
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatDense<FPP,Cpu> const& A)
 {
-    mat = A.mat;
+	mat = A.mat;
 	this->dim1 = A.dim1;
 	this->dim2 = A.dim2;
-    isZeros = A.isZeros;
-    isIdentity = A.isIdentity;
+	isZeros = A.isZeros;
+	isIdentity = A.isIdentity;
 }
 
 template<typename FPP>
-template<typename FPP1>
+	template<typename FPP1>
 void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatDense<FPP1,Cpu> const& A)
 {
-    resize(A.dim1,A.dim2);
+	resize(A.dim1,A.dim2);
 	for (int i=0;i<this->dim1*this->dim2;i++)
-        (*this)[i]=(FPP) A(i);
-    isZeros = A.isZeros;
-    isIdentity = A.isIdentity;
+		(*this)[i]=(FPP) A(i);
+	isZeros = A.isZeros;
+	isIdentity = A.isIdentity;
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatSparse<FPP,Cpu> const& S)
 {
-    S.check_dim_validity();
-    resize(S.getNbRow(),S.getNbCol());
+	S.check_dim_validity();
+	resize(S.getNbRow(),S.getNbCol());
 	setZeros();
-    FPP*const ptr_data = getData();
-	
-	
-    
-    for(int i=0 ; i< S.mat.outerSize() ; i++)
-    {
-        for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(S.mat,i); it; ++it)
-	{
-		ptr_data[it.col() * this->dim1 + it.row()] = it.value();
+	FPP*const ptr_data = getData();
 
-	}
-    }		
-	
+
+
+	for(int i=0 ; i< S.mat.outerSize() ; i++)
+	{
+		for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(S.mat,i); it; ++it)
+		{
+			ptr_data[it.col() * this->dim1 + it.row()] = it.value();
+
+		}
+	}		
+
 	isZeros = false;
 	isIdentity = false;
 }
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::operator*=(const Faust::MatSparse<FPP,Cpu>& S)
 {
 	if(this->dim2 != S.dim1)
@@ -623,7 +623,7 @@ void Faust::MatDense<FPP,Cpu>::operator*=(const Faust::MatSparse<FPP,Cpu>& S)
 }
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::operator+=(const Faust::MatSparse<FPP,Cpu>& S)
 {
 	if(this->dim1!=S.getNbRow() || this->dim2!=S.getNbCol())
@@ -637,7 +637,7 @@ void Faust::MatDense<FPP,Cpu>::operator+=(const Faust::MatSparse<FPP,Cpu>& S)
 
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::scalarMultiply(Faust::MatDense<FPP,Cpu> const& A)
 {
 	if(this->dim1!=A.dim1 || this->dim2!=A.dim2)
@@ -650,7 +650,7 @@ void Faust::MatDense<FPP,Cpu>::scalarMultiply(Faust::MatDense<FPP,Cpu> const& A)
 }
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S,const char TransS)
 {
 	faust_unsigned_int nbColOpS,nbRowOpS;	
@@ -678,46 +678,46 @@ void Faust::MatDense<FPP,Cpu>::multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S,c
 	}
 	else
 	{
-			
-			if (TransS == 'N') 			
-				mat = S.mat * mat;
-			else
-				mat = S.mat.transpose() * mat;
 
-			this->dim1 = nbRowOpS;
+		if (TransS == 'N') 			
+			mat = S.mat * mat;
+		else
+			mat = S.mat.transpose() * mat;
+
+		this->dim1 = nbRowOpS;
 	}
 
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::init_from_file(const char* filename)
 {
 #ifdef __COMPILE_TIMERS__
-t_print_file.start();
+	t_print_file.start();
 #endif
-  // la premiere ligne contient 2 entiers : dim1 et dim2
-  // chacune des autres lignes contient une valeur par ligne
-  // suivant la premiere dimension puis la deuxieme
+	// la premiere ligne contient 2 entiers : dim1 et dim2
+	// chacune des autres lignes contient une valeur par ligne
+	// suivant la premiere dimension puis la deuxieme
 
-    ifstream* vec_stream;
-    vec_stream = new ifstream(filename);
-    if (!vec_stream->is_open())
-        handleError(m_className, "init_from_file : unable to open file");
-    istream_iterator<FPP> start(*vec_stream), eos;
-    vector<FPP> vec(start, eos);
+	ifstream* vec_stream;
+	vec_stream = new ifstream(filename);
+	if (!vec_stream->is_open())
+		handleError(m_className, "init_from_file : unable to open file");
+	istream_iterator<FPP> start(*vec_stream), eos;
+	vector<FPP> vec(start, eos);
 
-    if((vec[0]*vec[1]+2) != vec.size())
-    {
-        handleError(m_className, "init_from_file : problem with the file");
-    }
-    resize(vec[0],vec[1]);
-    memcpy(getData(), &vec[2], sizeof(FPP) * this->dim1 * this->dim2);
+	if((vec[0]*vec[1]+2) != vec.size())
+	{
+		handleError(m_className, "init_from_file : problem with the file");
+	}
+	resize(vec[0],vec[1]);
+	memcpy(getData(), &vec[2], sizeof(FPP) * this->dim1 * this->dim2);
 
-    isZeros = false;
-    isIdentity = false;
+	isZeros = false;
+	isIdentity = false;
 
 #ifdef __COMPILE_TIMERS__
-t_print_file.stop();
+	t_print_file.stop();
 #endif
 }
 
@@ -759,7 +759,7 @@ matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) 
 		dims[0] = this->getNbRow();
 		dims[1] = this->getNbCol();
 		if(!opt) // we use directly the data pointer (col-major order organized)
-				 // but without the MAT_F_DONT_COPY_DATA flag, MatIO copies the data internally
+			// but without the MAT_F_DONT_COPY_DATA flag, MatIO copies the data internally
 			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat.data(), opt);
 		else {
 			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
@@ -816,6 +816,28 @@ Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::get_col(faust_unsigned_int id) co
 }
 
 template<typename FPP>
+Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const
+{
+	//TODO: check args
+	FPP data[this->getNbRow()*num_cols];
+	memcpy(data, getData()+start_col_id*this->getNbRow(), num_cols*this->getNbRow()*sizeof(FPP));
+	Faust::MatDense<FPP, Cpu>* cols = new Faust::MatDense<FPP, Cpu>(data, this->getNbRow(), num_cols);
+	return cols;
+}
+
+template<typename FPP>
+Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const
+{
+	//TODO: check args
+	FPP data[this->getNbCol()*num_rows];
+	for(faust_unsigned_int i = 0; i < this->getNbCol(); i++){
+		memcpy(data+i*num_rows, getData()+start_row_id+i*this->getNbRow(), num_rows*sizeof(FPP));
+	}
+	Faust::MatDense<FPP, Cpu>* rows = new Faust::MatDense<FPP, Cpu>(data, num_rows, this->getNbCol());
+	return rows;
+}
+
+	template<typename FPP>
 Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(unsigned int num_rows, unsigned int num_cols)
 {
 	Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_tmp;
@@ -825,7 +847,7 @@ Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(unsigned int num_r
 	return mat;
 }
 
-template<typename FPP>
+	template<typename FPP>
 Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(unsigned int num_rows, unsigned int num_cols, float density)
 {
 	//TODO: refactor with above randMat()
@@ -891,29 +913,29 @@ Faust::Timer Faust::MatDense<FPP,Cpu>::t_power_iteration;
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::print_timers()const
 {
-   cout << "timers in Faust::MatDense :" << endl;
-   cout << "t_constr          = " << t_constr.get_time()          << " s for "<< t_constr.get_nb_call()          << " calls" << endl;
-   cout << "t_get_coeff       = " << t_get_coeff.get_time()       << " s for "<< t_get_coeff.get_nb_call()       << " calls" << endl;
-   cout << "t_get_coeffs      = " << t_get_coeffs.get_time()      << " s for "<< t_get_coeffs.get_nb_call()      << " calls" << endl;
-   cout << "t_set_coeff       = " << t_set_coeff.get_time()       << " s for "<< t_set_coeff.get_nb_call()       << " calls" << endl;
-   cout << "t_set_coeffs      = " << t_set_coeffs.get_time()      << " s for "<< t_set_coeffs.get_nb_call()      << " calls" << endl;
-   cout << "t_set_coeffs2     = " << t_set_coeffs2.get_time()     << " s for "<< t_set_coeffs2.get_nb_call()     << " calls" << endl;
-   cout << "t_resize          = " << t_resize.get_time()          << " s for "<< t_resize.get_nb_call()          << " calls" << endl;
-   cout << "t_check_dim       = " << t_check_dim.get_time()       << " s for "<< t_check_dim.get_nb_call()       << " calls" << endl;
-   cout << "t_max             = " << t_max.get_time()             << " s for "<< t_max.get_nb_call()             << " calls" << endl;
-   cout << "t_transpose       = " << t_transpose.get_time()       << " s for "<< t_transpose.get_nb_call()       << " calls" << endl;
-   cout << "t_mult_right      = " << t_mult_right.get_time()      << " s for "<< t_mult_right.get_nb_call()      << " calls" << endl;
-   cout << "t_mult_left       = " << t_mult_left.get_time()       << " s for "<< t_mult_left.get_nb_call()       << " calls" << endl;
-  cout << "t_scalar_multiply = " << t_scalar_multiply.get_time() << " s for "<< t_scalar_multiply.get_nb_call() << " calls" << endl;
-   cout << "t_add             = " << t_add.get_time()             << " s for "<< t_add.get_nb_call()             << " calls" << endl;
-   cout << "t_sub             = " << t_sub.get_time()             << " s for "<< t_sub.get_nb_call()             << " calls" << endl;
-cout << "t_print_file      = " << t_print_file.get_time()      << " s for "<< t_print_file.get_nb_call()      << " calls" << endl<<endl;
+	cout << "timers in Faust::MatDense :" << endl;
+	cout << "t_constr          = " << t_constr.get_time()          << " s for "<< t_constr.get_nb_call()          << " calls" << endl;
+	cout << "t_get_coeff       = " << t_get_coeff.get_time()       << " s for "<< t_get_coeff.get_nb_call()       << " calls" << endl;
+	cout << "t_get_coeffs      = " << t_get_coeffs.get_time()      << " s for "<< t_get_coeffs.get_nb_call()      << " calls" << endl;
+	cout << "t_set_coeff       = " << t_set_coeff.get_time()       << " s for "<< t_set_coeff.get_nb_call()       << " calls" << endl;
+	cout << "t_set_coeffs      = " << t_set_coeffs.get_time()      << " s for "<< t_set_coeffs.get_nb_call()      << " calls" << endl;
+	cout << "t_set_coeffs2     = " << t_set_coeffs2.get_time()     << " s for "<< t_set_coeffs2.get_nb_call()     << " calls" << endl;
+	cout << "t_resize          = " << t_resize.get_time()          << " s for "<< t_resize.get_nb_call()          << " calls" << endl;
+	cout << "t_check_dim       = " << t_check_dim.get_time()       << " s for "<< t_check_dim.get_nb_call()       << " calls" << endl;
+	cout << "t_max             = " << t_max.get_time()             << " s for "<< t_max.get_nb_call()             << " calls" << endl;
+	cout << "t_transpose       = " << t_transpose.get_time()       << " s for "<< t_transpose.get_nb_call()       << " calls" << endl;
+	cout << "t_mult_right      = " << t_mult_right.get_time()      << " s for "<< t_mult_right.get_nb_call()      << " calls" << endl;
+	cout << "t_mult_left       = " << t_mult_left.get_time()       << " s for "<< t_mult_left.get_nb_call()       << " calls" << endl;
+	cout << "t_scalar_multiply = " << t_scalar_multiply.get_time() << " s for "<< t_scalar_multiply.get_nb_call() << " calls" << endl;
+	cout << "t_add             = " << t_add.get_time()             << " s for "<< t_add.get_nb_call()             << " calls" << endl;
+	cout << "t_sub             = " << t_sub.get_time()             << " s for "<< t_sub.get_nb_call()             << " calls" << endl;
+	cout << "t_print_file      = " << t_print_file.get_time()      << " s for "<< t_print_file.get_nb_call()      << " calls" << endl<<endl;
 
 
-   cout << "timers in Faust::MatDense / LinearAlgebra :" << endl;
-   cout << "t_multiply        = " << t_multiply.get_time()        << " s for "<< t_multiply.get_nb_call()        << " calls" << endl;
-   cout << "t_gemm            = " << t_gemm.get_time()            << " s for "<< t_gemm.get_nb_call()            << " calls" << endl;
-   cout << "t_add_ext         = " << t_add_ext.get_time()         << " s for "<< t_add_ext.get_nb_call()         << " calls" << endl<<endl<<endl;
+	cout << "timers in Faust::MatDense / LinearAlgebra :" << endl;
+	cout << "t_multiply        = " << t_multiply.get_time()        << " s for "<< t_multiply.get_nb_call()        << " calls" << endl;
+	cout << "t_gemm            = " << t_gemm.get_time()            << " s for "<< t_gemm.get_nb_call()            << " calls" << endl;
+	cout << "t_add_ext         = " << t_add_ext.get_time()         << " s for "<< t_add_ext.get_nb_call()         << " calls" << endl<<endl<<endl;
 }
 #endif
 

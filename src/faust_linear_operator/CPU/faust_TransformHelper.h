@@ -5,6 +5,7 @@
 #include <memory>
 #include "faust_exception.h"
 #include "faust_Transform.h"
+#include "faust_Slice.h"
 #include <random>
 
 namespace Faust {
@@ -28,14 +29,19 @@ namespace Faust {
 
 			bool is_transposed;
 			bool is_conjugate;
+			bool is_sliced;
+			Slice slices[2];
 
 			shared_ptr<Transform<FPP,Cpu>> transform;
 
+
 			public:
-			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=true);
+			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=true, const bool cloning_fact = true);
 			TransformHelper();
 			TransformHelper(TransformHelper<FPP,Cpu>* th);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate);
+			TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]);
+
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x) const;
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose);
 			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
@@ -49,6 +55,9 @@ namespace Faust {
 			void display() const;
 			string to_string() const;
 			MatDense<FPP,Cpu> get_fact(faust_unsigned_int id) const;
+			const Transform<FPP, Cpu>* eval_sliced_Transform() const;
+			TransformHelper<FPP, Cpu>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
+					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 			MatDense<FPP,Cpu> get_product() const;
 			void save_mat_file(const char* filename) const;
 			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
@@ -62,6 +71,9 @@ namespace Faust {
 			double normFro() const;
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f);
 			~TransformHelper();
+
+			private:
+			void copy_slices(TransformHelper<FPP, Cpu>* th, const bool transpose = false);
 		};
 }
 

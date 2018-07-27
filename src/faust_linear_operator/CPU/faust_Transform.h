@@ -95,7 +95,7 @@ namespace Faust
 				 if True, the copy is optimized, the dynamic type of the factor can changed
 				 if False, the dynamic type stay the same
 				 (default value true)*/
-				Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=true);
+				Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=true, const bool cloning_fact=true);
 
 				Transform(const Transform<FPP,Cpu> & A);
 
@@ -124,8 +124,8 @@ namespace Faust
 
 
 				/** \brief return a copy of the factor of index id
-				//  \warning dynamic memory allocation is made for the return pointer*/
-				Faust::MatGeneric<FPP,Cpu>* get_fact(faust_unsigned_int id) const;
+				//  \warning dynamic memory allocation is made for the return pointer if cloning_fact == true*/
+				Faust::MatGeneric<FPP,Cpu>* get_fact(faust_unsigned_int id, const bool cloning_fact = true) const;
 
 				faust_unsigned_int getNbRow() const;
 				faust_unsigned_int getNbCol() const;

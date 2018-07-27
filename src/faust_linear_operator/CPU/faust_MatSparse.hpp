@@ -55,17 +55,17 @@ Faust::MatSparse<FPP,Cpu>::MatSparse() :
 	mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(0,0)),
 	nnz(0){}
 
-template<typename FPP>
-Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatSparse<FPP,Cpu>& M) :
-	Faust::MatGeneric<FPP,Cpu>(M.getNbRow(),M.getNbCol()),
-	mat(M.mat),
-	nnz(M.mat.nonZeros()){}
+	template<typename FPP>
+	Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatSparse<FPP,Cpu>& M) :
+		Faust::MatGeneric<FPP,Cpu>(M.getNbRow(),M.getNbCol()),
+		mat(M.mat),
+		nnz(M.mat.nonZeros()){}
 
-template<typename FPP>
-Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) :
-	Faust::MatGeneric<FPP,Cpu>(dim1_,dim2_),
-	mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(dim1_,dim2_)),
-	nnz(0)
+		template<typename FPP>
+		Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) :
+			Faust::MatGeneric<FPP,Cpu>(dim1_,dim2_),
+			mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(dim1_,dim2_)),
+			nnz(0)
 {
 	resize(nnz, this->dim1, this->dim2);
 }
@@ -87,15 +87,15 @@ Faust::MatGeneric<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::Clone(const bool isOptimi
 
 
 template<typename FPP>
-template<typename FPP1>
+	template<typename FPP1>
 void Faust::MatSparse<FPP,Cpu>::operator=(const Faust::MatSparse<FPP1,Cpu>& M)
 {
 	resize(M.getNonZeros(),M.getNbRow(),M.getNbCol());
 
 	vector<Eigen::Triplet<FPP> > tripletList;
-   	tripletList.reserve(nnz);
-   	int nbEltIns = 0;
-   	int nb_elt_rowi;
+	tripletList.reserve(nnz);
+	int nbEltIns = 0;
+	int nb_elt_rowi;
 
 	for (int i=0;i<M.getNbRow();i++)
 	{
@@ -172,7 +172,7 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opTh
 {
 	faust_unsigned_int nbColOpS,nbRowOpS;	
 	this->setOp(opThis,nbRowOpS,nbColOpS);	
-	
+
 	if(nbColOpS != M.getNbRow())
 	{
 		handleError(m_className,"multiply : incorrect matrix dimensions\n");
@@ -180,7 +180,7 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opTh
 
 	if (M.isIdentity)
 	{
-				
+
 		M = (*this);
 		M.isIdentity = false;
 		M.isZeros = false;
@@ -195,13 +195,13 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opTh
 	}
 	else
 	{
-			
-			if (opThis == 'N') 			
-				M.mat = this->mat * M.mat;
-			else
-				M.mat = this->mat.transpose() * M.mat;
 
-			M.dim1 = nbRowOpS;
+		if (opThis == 'N') 			
+			M.mat = this->mat * M.mat;
+		else
+			M.mat = this->mat.transpose() * M.mat;
+
+		M.dim1 = nbRowOpS;
 	}
 
 
@@ -229,13 +229,13 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatDense<FPP,Cpu>& M) :
 
 	for (int j=0 ; j<this->dim2 ; j++)
 		for (int i=0; i<this->dim1 ; i++)
-         		if(M(i,j)!=FPP(0.0))
-         		{
-            			rowind[nnz] = i;
-            			colind[nnz] = j;
-            			values[nnz] = M(i,j);;
-	    			nnz++;
-         		}
+			if(M(i,j)!=FPP(0.0))
+			{
+				rowind[nnz] = i;
+				colind[nnz] = j;
+				values[nnz] = M(i,j);;
+				nnz++;
+			}
 
 	vector<Eigen::Triplet<FPP> > tripletList;
 	tripletList.reserve(nnz);
@@ -249,7 +249,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatDense<FPP,Cpu>& M) :
 }
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::set(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP* value, const size_t* id_row, const size_t* col_ptr)
 {
 	resize(0,0,0);
@@ -276,7 +276,7 @@ void Faust::MatSparse<FPP,Cpu>::set(const faust_unsigned_int nnz_, const faust_u
 
 
 
-template<typename FPP>
+	template<typename FPP>
 Faust::MatSparse<FPP,Cpu>::MatSparse(const vector<int>& rowidx, const vector<int>& colidx, const vector<FPP>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)
 {
 	if(rowidx.size()!=colidx.size() || rowidx.size()!=values.size())
@@ -307,7 +307,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_
 
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::init(const vector<int>& rowidx, const vector<int>& colidx, const vector<FPP>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)
 {
 	if(rowidx.size()!=colidx.size() || rowidx.size()!=values.size())
@@ -382,7 +382,7 @@ void Faust::MatSparse<FPP,Cpu>::display_support() const
 	}
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::resize(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)
 {
 	mat.resize(dim1_, dim2_);
@@ -414,7 +414,7 @@ void Faust::MatSparse<FPP,Cpu>::check_dim_validity() const
 }
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::transpose()
 {
 	Eigen::SparseMatrix<FPP> mat_tmp = mat.transpose();
@@ -422,13 +422,13 @@ void Faust::MatSparse<FPP,Cpu>::transpose()
 	update_dim();
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::conjugate()
 {
 	mat = mat.conjugate().eval();
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::operator=(const Faust::MatSparse<FPP,Cpu>& M)
 {
 	mat = M.mat;
@@ -440,7 +440,7 @@ void Faust::MatSparse<FPP,Cpu>::operator=(const Faust::MatSparse<FPP,Cpu>& M)
 
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::operator= (const Faust::MatDense<FPP,Cpu>& Mdense)
 {
 	int nbRow,nbCol,new_nnz;
@@ -464,7 +464,7 @@ void Faust::MatSparse<FPP,Cpu>::operator= (const Faust::MatDense<FPP,Cpu>& Mdens
 	update_dim();
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::operator*=(const FPP alpha)
 {
 	if (alpha == FPP(0.0))
@@ -476,7 +476,7 @@ void Faust::MatSparse<FPP,Cpu>::operator*=(const FPP alpha)
 	}
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::operator/=(const FPP alpha)
 {
 
@@ -504,14 +504,14 @@ void Faust::MatSparse<FPP,Cpu>::print_file(const char* filename,std::ios_base::o
 		for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(mat,i); it; ++it)
 			fichier << it.row()+1 << " " << it.col()+1 << " " << setprecision(20) << it.value() << endl;
 
-		fichier << endl;
+	fichier << endl;
 
 	fichier.close();
 }
 
 
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::init_from_file(FILE* fp)
 {
 	vector<int> row;
@@ -539,11 +539,11 @@ void Faust::MatSparse<FPP,Cpu>::init_from_file(FILE* fp)
 	}
 
 	if(col.size()!=row.size() || col.size()!=val.size()
-		|| dim1_tmp<0 || dim2_tmp<0
-		|| *min_element(&row[0],&row[row.size()-1]) <0
-		|| *min_element(&col[0],&col[col.size()-1]) <0
-		|| *max_element(&row[0],&row[row.size()-1]) > dim1_tmp-1
-		|| *max_element(&col[0],&col[col.size()-1]) > dim2_tmp-1)
+			|| dim1_tmp<0 || dim2_tmp<0
+			|| *min_element(&row[0],&row[row.size()-1]) <0
+			|| *min_element(&col[0],&col[col.size()-1]) <0
+			|| *max_element(&row[0],&row[row.size()-1]) > dim1_tmp-1
+			|| *max_element(&col[0],&col[col.size()-1]) > dim2_tmp-1)
 	{
 		handleError(m_className,"init_from_file : Unable to initialize sparse matrix from this file");
 	}
@@ -558,7 +558,7 @@ void Faust::MatSparse<FPP,Cpu>::init_from_file(FILE* fp)
 	mat.makeCompressed();
 }
 
-template<typename FPP>
+	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::init_from_file(const char* filename)
 {
 	// la premiere ligne contient le nombre de lignes et de colonnes de la matrice
@@ -638,7 +638,7 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate)
 	for (int k=0; k<st.outerSize(); ++k)
 		for (typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(st,k); it; ++it)
 		{
-//			std::cout << "row:" << it.row() << " col:" << it.col() <<  " val:" << it.value() << std::endl;
+			//			std::cout << "row:" << it.row() << " col:" << it.col() <<  " val:" << it.value() << std::endl;
 			if(it.row() > 0){
 				i=1;
 				while(it.row()>=i && jc[it.row()-i] < 0) {
@@ -673,8 +673,8 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate)
 	else
 		sparse.data = data;
 	var = Mat_VarCreate(NULL /* no-name */, MAT_C_SPARSE, MAT_T_DOUBLE, 2, dims, &sparse, opt);
-//	if(var != NULL)
-//		Mat_VarPrint(var,1);
+	//	if(var != NULL)
+	//		Mat_VarPrint(var,1);
 	delete[] jc;
 	delete[] ir;
 	delete[] data;
@@ -720,6 +720,45 @@ Faust::Vect<FPP,Cpu> Faust::MatSparse<FPP,Cpu>::get_col(faust_unsigned_int id) c
 }
 
 template<typename FPP>
+Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const
+{
+	//TODO: args checking
+	typedef Eigen::Triplet<FPP> T;
+	std::vector<T> tripletList;
+	//	tripletList.reserve((int)(this->getNbRow()*num_cols));
+	faust_unsigned_int count = 0;
+	for(int i=0 ; i< mat.outerSize() ; i++)
+		for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(mat,i); it; ++it)
+			if(it.col() >= start_col_id && it.col() < start_col_id + num_cols){
+				tripletList.push_back(T(it.row(), it.col()-start_col_id, it.value()));
+				count++;
+			}
+	tripletList.resize(count);
+	MatSparse<FPP, Cpu>* subMatrix = new MatSparse<FPP, Cpu>(this->getNbRow(), num_cols);
+	subMatrix->mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	return subMatrix;
+}
+
+template<typename FPP>
+Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const
+{
+	//TODO: args checking
+	typedef Eigen::Triplet<FPP> T;
+	std::vector<T> tripletList;
+	//	tripletList.reserve((int)(this->getNbCol()*num_rows));
+	faust_unsigned_int count = 0;
+	for(faust_unsigned_int i=start_row_id ; i< start_row_id+num_rows ; i++)
+		for(typename Eigen::SparseMatrix<FPP,Eigen::RowMajor>::InnerIterator it(mat,i); it; ++it){
+			tripletList.push_back(T(it.row()-start_row_id, it.col(), it.value()));
+			count++;
+		}
+	tripletList.resize(count);
+	MatSparse<FPP, Cpu>* subMatrix = new MatSparse<FPP, Cpu>(num_rows, this->getNbCol());
+	subMatrix->mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	return subMatrix;
+}
+
+	template<typename FPP>
 Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(unsigned int num_rows, unsigned int num_cols, double density)
 {
 	std::default_random_engine generator;
@@ -730,21 +769,21 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(unsigned int num
 	MatDense<FPP,Cpu>* dense = Faust::MatDense<FPP,Cpu>::randMat(num_rows, num_cols);
 	for(int i=0;i<num_rows;i++)
 		for(int j=0;j<num_cols;j++)
-				if(distribution(generator) < density)
-				{
-					tripletList.push_back(T(i,j,(*dense)(i,j)));
-				}
+			if(distribution(generator) < density)
+			{
+				tripletList.push_back(T(i,j,(*dense)(i,j)));
+			}
 	MatSparse<FPP, Cpu>* fsmat = new MatSparse<FPP,Cpu>();
 	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat(num_rows, num_cols);
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	fsmat->mat = mat;
 	fsmat->update_dim();
-//	fsmat->Display();
-//	fsmat->mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	//	fsmat->Display();
+	//	fsmat->mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	delete dense;
 	return fsmat;
 }
 
 
-	
+
 #endif
