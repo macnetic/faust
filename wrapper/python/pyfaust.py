@@ -501,11 +501,11 @@ class Faust:
 
     def __getitem__(F, indices):
         """
-        Returns a Faust representing a submatrix of F.
+        Returns a Faust representing a submatrix of the dense matrix of F.
 
         This function is a Python built-in overload.
 
-        WARNING: this function doesn't handle a slice step not equal to 1 (e.g. F[i:j:2,:]
+        WARNING: this function doesn't handle a slice step different to 1 (e.g. F[i:j:2,:]
         where slice step is 2.)
 
         Args:
@@ -535,10 +535,10 @@ class Faust:
 
             >>> F[:, i2] # full column i2
 
-            >>> F[2:4, 1:4] # from line 2 to 3, each line containing
+            >>> F[2:4, 1:4] # from row 2 to 3, each row containing
                             # only elements from column 1 to 3
 
-            >>> F[::, 4:-1] # from line 0 to end line, each line
+            >>> F[::, 4:-1] # from row 0 to end row, each row
                             # containing only elements from column 4 to
                             # column before the last one.
 
@@ -546,7 +546,8 @@ class Faust:
         """
         #TODO: refactor (by index when indices == tuple(2), error message,
         #      out_indices checking on the end)
-        #TODO: check that step == 1 on slices and stop on failure if it is
+        #TODO: check that step == 1 on slices and stop on failure if it is or
+        # implement negative steps
         if(indices == Ellipsis): # F[...]
             out_indices = [slice(0,F.shape[0]), slice(0, F.shape[1])]
         elif(isinstance(indices,int)): # F[i] # a line
