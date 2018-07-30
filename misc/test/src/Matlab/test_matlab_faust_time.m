@@ -98,19 +98,19 @@ for i=1:nb_access_coeff
 
 	
 
-	if (col ~=F_dense(:,1))	
+	if (full(col) ~=F_dense(:,1))	
 		error('access to the col');
 	end
 
-	if (row ~=F_dense(1,:))
+	if (full(row) ~=F_dense(1,:))
 		error('access to the row');
 	end
 
-	if (col_trans ~=F_dense(1,:)')	
+	if (full(col_trans) ~=F_dense(1,:)')	
 		error('access to the col');
 	end	
 
-	if (row_trans ~=F_dense(:,1)')	
+	if (full(row_trans) ~=F_dense(:,1)')	
 		error('access to the row');
 	end
 end

@@ -156,10 +156,12 @@ classdef FaustTest < matlab.unittest.TestCase
             disp('testend()')
             prod_F = this.mulFactors()
             for i=1:size(this.factors{1},1)
-                this.verifyEqual(prod_F(i,end), this.test_faust(i,end),'RelTol', 0.01)
+				end_F = full(this.test_faust(i,end));
+				this.verifyEqual(prod_F(i,end), end_F(1,1),'RelTol', 0.01)
             end
             for j=1:size(this.factors{this.num_factors},2)
-                this.verifyEqual(prod_F(end,j), this.test_faust(end,j), 'RelTol', 0.01)
+				end_F = full(this.test_faust(end,j));
+				this.verifyEqual(prod_F(end,j), end_F(1,1), 'RelTol', 0.01)
             end
         end
 
@@ -167,16 +169,20 @@ classdef FaustTest < matlab.unittest.TestCase
             disp('testsubsref()')
             % test whole faust
             ref_F =  this.mulFactors();
-            test_F = this.test_faust(1:end,1:end);
+            test_F = full(this.test_faust(1:end,1:end));
             this.verifyEqual(ref_F(1:end,1:end), test_F, 'RelTol', 0.01)
             % test a random row
-            row_i = randi(1,size(this.test_faust,1));
-            test_F = this.test_faust(row_i,:);
+            row_i = randi([1,size(this.test_faust,1)]);
+            test_F = full(this.test_faust(row_i,:));
             this.verifyEqual(test_F, ref_F(row_i,:), 'RelTol', 0.01)
             % test a random col
-            col_i = randi(1,size(this.test_faust,2));
-            test_F = this.test_faust(:,col_i);
+            col_i = randi([1,size(this.test_faust,2)]);
+            test_F = full(this.test_faust(:,col_i));
             this.verifyEqual(test_F, ref_F(:,col_i), 'RelTol', 0.01)
+			size(test_F)
+			size(ref_F(:,col_i))
+			size(ref_F)
+			col_i
         end
 
         function testFull(this)

@@ -519,7 +519,9 @@ classdef Faust
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
-		%> @b Example
+		%>
+		%>
+	 	%> @b Example
 		%> @code
 		%>	% in a matlab terminal
 		%>
@@ -674,16 +676,16 @@ classdef Faust
 		end
 
 		%==========================================================================================
-		%> @brief Gets a submatrix of the full matrix of F.
+		%> @brief Returns a Faust representing a submatrix of the dense matrix of F.
 		%>
 		%> This function is a Matlab built-in overload.
 		%>
-		%> @b WARNING: this function costs as much as Faust.mtimes.
+		%> @b WARNING: this function doesn't handle a slice step different to 1 (e.g. F(i:2:j,:) where slice step is 2.)
 		%>
 		%> @param F the Faust object.
-		%> @param S the subscript defining the submatrix (see examples below).
+		%> @param S the subscript defining the Faust to extract like a submatrix (see examples below).
 		%>
-		%> @retval submatrix the full submatrix requested.
+		%> @retval The Faust object requested.
 		%>
 		%> @b Example
         %> @code
@@ -691,13 +693,14 @@ classdef Faust
         %>		i = randi(min(size(F)), 1, 2)
 		%>	i1 = i(1);i2 = i(2)
 		%>
-		%>	F(i1,i2) % element at line i1, column i2
+		%>	F(i1,i2) % a Faust representing a matrix with only one element
+		%>			 % at row i1, column i2
 		%>
 		%>	F(:,i2) % full column i2
 		%>
-		%>	F(3:4,2:5) % submatrix from line 3 to line 4, each line containing only elements from column 2 to 5.
+		%>	F(3:4,2:5) % from row 3 to line 4, each row containing only elements from column 2 to 5.
 		%>
-		%>	F(1:end,5:end-1)  % submatrix from line 1 to end line, each line containing only elements from column 5 to column before the last one.
+		%>	F(1:end,5:end-1)  % from row 1 to end row, each one containing only elements from column 5 to column before the last one.
         %> @endcode
 		%>
 		%> <p>@b See @b also Faust.end.
@@ -717,13 +720,12 @@ classdef Faust
 			%
 			% See also end.
 
-
 			if (~isfield(S,'type')) | (~isfield(S,'subs'))
 				error(' subsref invalid structure S missing field type or subs');
 			end
 
 			if (~ischar(S.type)) | (~iscell(S.subs))
-				error(' subsref invalid structure S, S.type must be a char, S.subs must be a cell-array');
+				error(' subsref invalid structure S, S.type must be a character array, S.subs must be a cell array');
 			end
 
 			if ~strcmp(S.type,'()')
@@ -740,54 +742,26 @@ classdef Faust
 			[dim1 dim2]=size(F);
 
 			if ischar(slicing_row)
-				nb_row_selected = dim1;
+				start_row_id = 1;
+				end_row_id = dim1;
 			else
-				nb_row_selected = length(slicing_row);
+				start_row_id = slicing_row(1);
+				end_row_id = slicing_row(end);
 			end
 
 			if ischar(slicing_col)
-				nb_col_selected = dim2;
+				start_col_id = 1;
+				end_col_id = dim2;
 			else
-				nb_col_selected = length(slicing_col);
+				start_col_id = slicing_col(1);
+				end_col_id = slicing_col(end);
 			end
 
-			% evaluate the complexity of getting the coeff by doing
-			%  A*Identity or A'*Identity
-			transpose_evaluation =  (nb_col_selected > nb_row_selected);
-			if transpose_evaluation
-				identity=eye(dim1);
-				transpose_flag=1;
-
-				% switch the 2 different slicing
-				tmp=slicing_row;
-				slicing_row=slicing_col;
-				slicing_col=tmp;
-
+			if(F.isReal)
+				submatrix = Faust(F, mexFaustReal('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
 			else
-				identity=eye(dim2);
-				transpose_flag=0;
+				submatrix = Faust(F, mexFaustCplx('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
 			end
-
-			% selects the column of the identity, if slicing_col is a char, all
-			% the column are selected
-			if ~ischar(slicing_col)
-				identity=identity(:,slicing_col);
-			end
-
-			% perform A*identity or A'*identity
-			submatrix=mtimes_trans(F,identity,transpose_flag);
-
-			% selects the row of the submatrix, if slicing_row is a char, all
-			% the row are selected
-			if ~ischar(slicing_row)
-				submatrix=submatrix(slicing_row,:);
-			end
-
-			% transpose if needed
-			if transpose_evaluation
-				submatrix=submatrix';
-			end
-
 
 		end
 
