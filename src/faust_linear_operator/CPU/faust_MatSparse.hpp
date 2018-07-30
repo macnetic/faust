@@ -736,6 +736,7 @@ Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_cols(faust_unsigned_in
 	tripletList.resize(count);
 	MatSparse<FPP, Cpu>* subMatrix = new MatSparse<FPP, Cpu>(this->getNbRow(), num_cols);
 	subMatrix->mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	subMatrix->nnz = subMatrix->mat.nonZeros();
 	return subMatrix;
 }
 
@@ -755,6 +756,7 @@ Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_rows(faust_unsigned_in
 	tripletList.resize(count);
 	MatSparse<FPP, Cpu>* subMatrix = new MatSparse<FPP, Cpu>(num_rows, this->getNbCol());
 	subMatrix->mat.setFromTriplets(tripletList.begin(), tripletList.end());
+	subMatrix->nnz = subMatrix->mat.nonZeros();
 	return subMatrix;
 }
 
