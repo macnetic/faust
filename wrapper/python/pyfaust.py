@@ -438,7 +438,7 @@ class Faust:
 
     def __mul__(F, A):
         """
-        Multiplies F by the numpy matrix A.
+        Multiplies F by the numpy matrix or a Faust A.
 
         This method overloads a Python function/operator.
 
@@ -447,13 +447,15 @@ class Faust:
 
         Args:
             F: the Faust object.
-            A: is a 2D numpy matrix (ndarray).
+            A: is a Faust object or a 2D numpy matrix (ndarray).
             <br/> A must be Fortran contiguous (i.e. Column-major order;
                 `order' argument passed to np.ndararray() must be equal to str
                 'F').
 
         Returns:
-            the result of the multiplication as a numpy matrix.
+            the result of the multiplication as a numpy matrix if A is a
+            ndarray.
+            the result of the multiplication as a Faust object if A is a Faust.
 
         Raises:
             ValueError
@@ -467,9 +469,17 @@ class Faust:
             >>> A = np.random.rand(F.shape[1], 50)
             >>> B = F*A
             >>> # is equivalent to B = F.__mul__(A)
+            >>> G = Faust.rand(5, F.shape[1])
+            >>> H = F*G
 
         """
-        return F.m_faust.multiply(A)
+        if(isinstance(A, Faust)):
+            if(F.shape[1] != A.shape[0]): raise ValueError("The dimensions of "
+                                                          "the two Fausts must "
+                                                          "agree.")
+            return Faust(core_obj=F.m_faust.multiply(A.m_faust))
+        else:
+            return F.m_faust.multiply(A)
 
     def toarray(F):
         """

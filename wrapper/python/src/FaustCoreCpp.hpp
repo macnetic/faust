@@ -70,6 +70,15 @@ void FaustCoreCpp<FPP>::push_back(FPP* data, int* row_ptr, int* id_col, int nnz,
 }
 
 template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::mul_faust(FaustCoreCpp<FPP>* right)
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform.multiply(&(right->transform));
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
+    core->transform = th;
+    return core;
+}
+
+template<typename FPP>
 void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x)const
 {
 
@@ -152,7 +161,10 @@ double FaustCoreCpp<FPP>::get_nb_factors() const
 template<typename FPP>
 const char* FaustCoreCpp<FPP>::to_string() const
 {
-    return this->transform.to_string().c_str();
+    std::string str = this->transform.to_string();
+    char * c_str = (char*) malloc(str.size()+1);
+    memcpy(c_str, str.c_str(), str.size()+1);
+    return (const char*) c_str;
 }
 
 template<typename FPP>

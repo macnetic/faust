@@ -174,6 +174,19 @@ cdef class FaustCore:
         return (nbrow,nbcol)
 
 
+    cdef multiply_faust(self, F):
+        if(isinstance(F, FaustCore)):
+            core = FaustCore(core=True)
+            core2 = FaustCore(core=True)
+            if(self._isReal):
+                core.core_faust_dbl = \
+                self.core_faust_dbl.mul_faust((<FaustCore?>F).core_faust_dbl)
+            else:
+                core.core_faust_cplx = \
+                        self.core_faust_cplx.mul_faust((<FaustCore?>F).core_faust_cplx)
+            core._isReal = self._isReal
+            return core
+        raise ValueError("F must be a Faust object")
 
 
 
@@ -185,6 +198,8 @@ cdef class FaustCore:
     # Left-Multiplication by a Faust F
     # y=multiply(F,M) is equivalent to y=F*M
     def multiply(self,M):
+        if(isinstance(M, FaustCore)):
+            return self.multiply_faust(M)
         if not isinstance(M, (np.ndarray) ):
             raise ValueError('input M must a numpy ndarray')
         if(self._isReal):
@@ -278,7 +293,10 @@ cdef class FaustCore:
         else:
             c_str = self.core_faust_cplx.to_string()
         cdef length = strlen(c_str)
-        py_str = c_str[:length].decode('UTF-8')
+        #printf("%s", c_str[:length])
+        #py_str = str(c_str[:length], 'UTF-8')
+        py_str = c_str[:length].decode('UTF-8', 'ignore')
+        free(<void*>c_str)
         return py_str
 
     def nnz(self):

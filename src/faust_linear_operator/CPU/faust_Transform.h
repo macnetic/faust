@@ -99,6 +99,7 @@ namespace Faust
 
 				Transform(const Transform<FPP,Cpu> & A);
 
+				Transform(const Transform<FPP, Cpu>* A, const bool transpose_A, const bool conj_A, const Transform<FPP, Cpu>* B, const bool transpose_B, const bool conj_B);
 				/** \brief
 				 * check the factors validity of the faust, if the list of factors represents a valid matrix
 				 * */

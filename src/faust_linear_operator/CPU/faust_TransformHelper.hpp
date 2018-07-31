@@ -22,6 +22,14 @@ namespace Faust {
 	}
 
 	template<typename FPP>
+		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right)
+		: is_transposed(false), is_conjugate(false), is_sliced(false)
+		{
+			this->transform = make_shared<Transform<FPP,Cpu>>(th_left->eval_sliced_Transform(), th_left->is_transposed, th_left->is_conjugate,
+					th_right->eval_sliced_Transform(), th_right->is_transposed, th_right->is_conjugate);
+		}
+
+	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate)
 		{
 			this->transform = th->transform;
@@ -97,6 +105,12 @@ namespace Faust {
 			MatDense<FPP,Cpu> M = (this->eval_sliced_Transform())->multiply(A, isTransposed2char());
 			is_transposed ^= transpose;
 			return M;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::multiply(TransformHelper<FPP, Cpu>* th_right)
+		{
+			return new TransformHelper<FPP,Cpu>(this, th_right);
 		}
 
 	template<typename FPP>

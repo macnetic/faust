@@ -38,6 +38,7 @@ namespace Faust {
 			public:
 			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=true, const bool cloning_fact = true);
 			TransformHelper();
+			TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right);
 			TransformHelper(TransformHelper<FPP,Cpu>* th);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]);
@@ -46,6 +47,7 @@ namespace Faust {
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose);
 			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose);
+			TransformHelper<FPP, Cpu>* multiply(TransformHelper<FPP, Cpu>*);
 			void push_back(const MatGeneric<FPP,Cpu>* M);
 			faust_unsigned_int getNbRow() const;
 			faust_unsigned_int getNbCol() const;
