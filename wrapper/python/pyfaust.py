@@ -438,24 +438,27 @@ class Faust:
 
     def __mul__(F, A):
         """
-        Multiplies F by the numpy matrix or a Faust A.
+        Multiplies F by A which is a dense matrix or a Faust object.
 
         This method overloads a Python function/operator.
 
-        WARNING: this function costs F.get_num_factors() matrix
-        multiplications. its use is discouraged except for test purpose.
+        WARNING: if A is a matrix the function costs F.get_num_factors() matrix
+        multiplications. In that case its use is discouraged except for test purpose.
+        However if A is a Faust object, it costs the same that a Faust
+        initialization with a number of factors equal to
+        F.get_num_factors()+A.get_num_factors() (like you can do directly with Faust.__init__).
 
         Args:
             F: the Faust object.
-            A: is a Faust object or a 2D numpy matrix (ndarray).
-            <br/> A must be Fortran contiguous (i.e. Column-major order;
+            A: is a Faust object or a 2D dense matrix (numpy.ndarray, numpy.matrix).
+            <br/> In the latter case, A must be Fortran contiguous (i.e. Column-major order;
                 `order' argument passed to np.ndararray() must be equal to str
                 'F').
 
         Returns:
-            the result of the multiplication as a numpy matrix if A is a
-            ndarray.
-            the result of the multiplication as a Faust object if A is a Faust.
+            the result of the multiplication as a numpy.ndarray if A is a
+            ndarray.<br/>
+            The result of the multiplication as a Faust object if A is a Faust.
 
         Raises:
             ValueError
@@ -471,7 +474,9 @@ class Faust:
             >>> # is equivalent to B = F.__mul__(A)
             >>> G = Faust.rand(5, F.shape[1])
             >>> H = F*G
+            >>> # H is a Faust because F and G are
 
+        <b/>See also Faust.__init__
         """
         if(isinstance(A, Faust)):
             if(F.shape[1] != A.shape[0]): raise ValueError("The dimensions of "

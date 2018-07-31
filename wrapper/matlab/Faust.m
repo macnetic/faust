@@ -200,17 +200,19 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief Multiplies the Faust F by the dense matrix A.
+		%> @brief Multiplies the Faust F by A which is a dense matrix or a Faust object.
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
-		%> @b WARNING: this function costs get_num_factors(F) matrix multiplications.
-		%> its use is discouraged except for test purpose.
+		%> @b WARNING: if A is a matrix the function costs get_num_factors(F) matrix multiplications.
+		%> In that case its use is discouraged except for test purpose. However if A is a Faust object,
+		%> it costs the same that a Faust initialization with a number of factors equal to
+		%> F.get_num_factors()+A.get_num_factors() (like you can do directly with Faust.Faust).
 		%>
 		%> @param F the Faust object.
-		%> @param A The matrix to multiply (dense matrix).
+		%> @param A The dense matrix to multiply or a Faust object.
 		%>
-		%> @retval B The multiplication result (dense matrix).
+		%> @retval B The multiplication result (a dense matrix or a Faust object depending on what A is).
 		%>
 		%> @b Example
 		%> @code
@@ -218,9 +220,12 @@ classdef Faust
 		%>   A = rand(size(F,2), 50)
 		%>   B = F*A
 		%> % is equivalent to B = mtimes(F, A)
+		%>   G = Faust.rand(5,size(F, 2))
+		%>   H = F*G
+		%> % H is a Faust because F and G are
 		%> @endcode
 		%>
-		%> <p>@b See @b also mtimes_trans.
+		%> <p>@b See @b also Faust.Faust.
 		%>
 		%======================================================================
 		function B = mtimes(F,A)
@@ -230,7 +235,7 @@ classdef Faust
 			% storage matrix, B is also a full matrix storage.
 			%
 			% See also mtimes_trans
-			B = mtimes_trans(F, A, 0)
+			B = mtimes_trans(F, A, 0);
 		end
 
 
@@ -264,8 +269,13 @@ classdef Faust
 			if (trans ~= 1) && (trans ~= 0)
 				error('invalid argument trans, must be equal to 0 or 1');
 			end
-
-			if (F.isReal)
+			if(isa(A,'Faust'))
+				if (F.isReal)
+					C = Faust(F, mexFaustReal('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
+				else
+					C = Faust(F, mexFaustCplx('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
+				end
+			elseif (F.isReal)
 				if (isreal(A))
 					C = mexFaustReal('multiply', F.matrix.objectHandle, A, trans);
 				else
@@ -276,7 +286,6 @@ classdef Faust
 			else
 				C = mexFaustCplx('multiply', F.matrix.objectHandle,A, trans);
 			end
-
 		end
 
 		%======================================================================
