@@ -48,7 +48,7 @@ import FaustCorePy
 
 
 class Faust:
-    """FAµST Python class.
+    """FAµST Python wrapper main class.
      This class represents a given dense matrix by a product of sparse matrices
      (i.e. Faust).
      The main goal of Faust representation is to speed up operations on that
@@ -88,6 +88,7 @@ class Faust:
      That limitation is the reason why the Python built-in `__setitem__()' is not
      implemented in this class.
 
+    For more information about FAµST take a look at http://faust.inria.fr.
     """
 
     def  __init__(F, factors=None, scale=1.0, filepath=None, core_obj=None):

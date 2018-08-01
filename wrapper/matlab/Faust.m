@@ -40,7 +40,7 @@
 %%
 
 % ======================================================================
-%> @brief FAµST Matlab class
+%> @brief FAµST Matlab wrapper main class.
 %>
 %> This class represents a given dense matrix by a product of sparse matrices (i.e. Faust).
 %> The main goal of Faust representation is to speed up operations on that matrix, especially the multiplication. Besides the time optimization, a Faust can reduce the memory space size needed both for storage and loading.
@@ -59,6 +59,8 @@
 %>
 %> Other important limitation is that contrary to a Matlab native dense matrix a Faust is immutable. It means that you cannot affect elements of a Faust using the affectation operator `=' like you do with a Matlab matrix (e.g. `M(i,j) = 2').
 %> That limitation is the reason why the Matlab built-in `SUBSASGN()' is not implemented in this class.
+%>
+%> For more information about FAµST take a look at http://faust.inria.fr.
 %>
 % ======================================================================
 classdef Faust
@@ -240,15 +242,21 @@ classdef Faust
 
 
 		%======================================================================
-		%> @brief Multiplies the Faust or its transpose by the A dense matrix.
+		%> @brief Multiplies the Faust F by A.' or A which is a dense matrix or a Faust object.
 		%>
-		%> @b WARNING: this function costs as much as Faust.mtimes.
+		%> This function overloads a Matlab built-in function.
 		%>
-		%> @param A the matrix to multiply (dense matrix).
+		%> @b WARNING: if A is a matrix the function costs get_num_factors(F) matrix multiplications.
+		%> In that case its use is discouraged except for test purpose. However if A is a Faust object,
+		%> it costs the same that a Faust initialization with a number of factors equal to
+		%> F.get_num_factors()+A.get_num_factors() (like you can do directly with Faust.Faust).
+		%>
+		%> @param F the Faust object.
+		%> @param A The dense matrix to multiply or a Faust object.
 		%> @param trans equals 1 to calculate C=F'*A
 		%> 				or 0 to calculate C=F*A.
 		%>
-		%> @retval C The multiplication result (dense matrix).
+		%> @retval C The multiplication result (a dense matrix or a Faust object depending on what A is).
 		%>
 		%> <p> @b See @b also mtimes.
 		%======================================================================
@@ -391,7 +399,7 @@ classdef Faust
 		%> <p/>@b See @b also Faust.transpose, Faust.conj
 		%>
 		%======================================================================
-		function F_ctrans=ctranspose(F)
+		function F_ctrans = ctranspose(F)
 			%% CTRANSPOSE ' Complex conjugate transposed Faust (overloaded Matlab built-in function).
 			%
 			% F_trans = ctranspose(F) is called for syntax F' (complex conjugate transpose) when F is a Faust.
@@ -429,7 +437,7 @@ classdef Faust
 		%> <p/>@b See @b also Faust.get_factor, Faust.get_num_factors, Faust.ctranspose
 		%>
 		%======================================================================
-		function F_conj=conj(F)
+		function F_conj = conj(F)
 			%% CONJ ' Complex conjugate Faust (overloaded Matlab built-in function).
 			%
 			%  F_conj = conj(F) For a complex F, F_conj == REAL(F) - i*IMAG(F)
@@ -697,9 +705,9 @@ classdef Faust
 		%> @retval The Faust object requested.
 		%>
 		%> @b Example
-        %> @code
-        %>		F = Faust.rand([2, 5], [50, 100], .5)
-        %>		i = randi(min(size(F)), 1, 2)
+		%> @code
+		%>		F = Faust.rand([2, 5], [50, 100], .5)
+		%>		i = randi(min(size(F)), 1, 2)
 		%>	i1 = i(1);i2 = i(2)
 		%>
 		%>	F(i1,i2) % a Faust representing a matrix with only one element
@@ -710,11 +718,11 @@ classdef Faust
 		%>	F(3:4,2:5) % from row 3 to line 4, each row containing only elements from column 2 to 5.
 		%>
 		%>	F(1:end,5:end-1)  % from row 1 to end row, each one containing only elements from column 5 to column before the last one.
-        %> @endcode
+		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.end.
 		%==========================================================================================
-		function submatrix=subsref(F,S)
+		function submatrix = subsref(F,S)
 			%% SUBSREF Subscripted reference (overloaded Matlab built-in function).
 			%
 			%  F(I,J) is an array formed from the elements of the rectangular
@@ -784,6 +792,7 @@ classdef Faust
 		%> @param F the Faust to display information about.
 		%>
 		%>
+		%======================================================================
 		function F = subsasgn(F,S,B)
 			%% SUBSASGN (WARNING not implemented) (overloaded Matlab built-in function)
 			%
@@ -876,7 +885,7 @@ classdef Faust
 		%>
 		%>
 		%======================================================================
-		function norm=norm(F,varargin)
+		function norm = norm(F,varargin)
 			%% NORM Faust norm (overloaded Matlab built-in function).
 			%
 			% norm(F,1) when F is a Faust returns L1 norm of F (the largest
@@ -931,7 +940,7 @@ classdef Faust
 		%>
 		%> <p>@b See @b also Faust.rcg, Faust.density.
 		%==========================================================================================
-		function nz=nnz_sum(F)
+		function nz = nnz_sum(F)
 			%% NNZ Number of nonzero elements in a Faust (overloaded Matlab built-in function).
 			%
 			% nz = nnz_sum(F) is the number of nonzero elements in the Faust F.
@@ -963,7 +972,7 @@ classdef Faust
 		%>
 		%> <p/>@b See @b also Faust.nnz_sum, Faust.rcg
 		%======================================================================
-		function dens=density(F)
+		function dens = density(F)
 			%% DENSITY Density of the Faust.
 			%
 			% dens = density(F) when F is a Faust returns the
@@ -998,7 +1007,7 @@ classdef Faust
 		%>
 		%> <p>@b See @b also Faust.density, Faust.nnz_sum.
 		%==========================================================================================
-		function speed_up=rcg(F)
+		function speed_up = rcg(F)
 			%% RCG Relative Complexity Gain (inverse of the density)
 			%
 			% speed_up =  rcg(F) when F is Faust, returns the
