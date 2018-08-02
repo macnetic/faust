@@ -19,7 +19,8 @@ if(WIN32)
 	configure_file(${FAUST_MATLAB_MAIN_CLASS_FQDN_SRC_DIR}/Faust.m ${FAUST_MATLAB_MAIN_CLASS_FQDN_BIN_DIR}/Faust.m COPYONLY)
 	#install(FILES ${FAUST_MATLAB_BIN_DIR}/Faust.m DESTINATION ${CMAKE_INSTALL_MATLAB_PREFIX} PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
 else()
-	execute_process(COMMAND ${FAUST_DOC_SRC_DIR}/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_MAIN_CLASS_FQDN_SRC_DIR}/Faust.m ${FAUST_MATLAB_MAIN_CLASS_FQDN_BIN_DIR}/Faust.m ERROR_QUIET)
+	# we can't use FAUST_DOC_SRC_DIR because it's not set when BUILD_DOCUMENTATION is not set either
+	execute_process(COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_MAIN_CLASS_FQDN_SRC_DIR}/Faust.m ${FAUST_MATLAB_MAIN_CLASS_FQDN_BIN_DIR}/Faust.m ERROR_QUIET)
 	#TODO: get back error result with ERROR_VARIABLE SCRIPT_ERROR_VARIABLE and copy simply the script as a fallback solution
 endif()
 
