@@ -790,6 +790,14 @@ classdef Faust
 				end_col_id = slicing_col(end);
 			end
 
+			if(start_row_id < 0 || end_row_id < 0 || end_col_id < 0 || start_col_id < 0)
+				error(' Subscript indices must be positive integers.')
+			end
+
+			if(start_row_id > dim1 || end_row_id > dim1 || end_col_id > dim2 || start_col_id > dim2)
+				error(' Index exceeds Faust dimensions.')
+			end
+
 			if(F.isReal)
 				submatrix = matfaust.Faust(F, mexFaustReal('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
 			else
