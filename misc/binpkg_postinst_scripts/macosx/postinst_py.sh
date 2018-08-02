@@ -16,7 +16,7 @@ function link_py_files(){
 	PY_SITE_PACKAGES_PATH=$($PYTHON -c 'import os,site,re;print([path for path in site.getsitepackages() if re.match(".*"+os.path.sep+"site-packages$", path) and os.path.exists(path) ][0])')
 	[[ ! -d "${PY_SITE_PACKAGES_PATH}" ]] && return
 	[[ -n "$DEBUG" ]] && echo PY_SITE_PACKAGES_PATH=${PY_SITE_PACKAGES_PATH}
-	PYFILES=${FAUST_PY_WRAPPER_PATH}/FaustPy.py
+	PYFILES=${FAUST_PY_WRAPPER_PATH}/pyfaust.py
 	[[ "$PY_MAJOR_MINOR_VER" = 3* ]] && PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/FaustCorePy.cpython-3*so" || \
 					    PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/FaustCorePy.so"
 	for PYFILE in $PYFILES

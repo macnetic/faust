@@ -16,7 +16,7 @@ function link_py_files(){
 	# on fedora python package path are suffixed by site-packages, on ubuntu it's rather dist-packages (TODO: on centos ? on debian ?)
 	PY_SITE_PACKAGES_PATH=$(python$PY_MAJOR_VER -c 'import os,site,re;print([path for path in site.getsitepackages() if (re.match(".*"+os.path.sep+"site-packages$", path) or re.match(".*"+os.path.sep+"dist-packages$", path)) and os.path.exists(path) ][0])')
 	[[ ! -d ${PY_SITE_PACKAGES_PATH} ]] && echo -e "\033[1mWARNING\033[0m: couldn't link the Faust py wrapper for python$PY_MAJOR_VER to your system. Either python$PY_MAJOR_VER is not installed on your system and that's pretty normal or it failed for another reason and you'll have to add Faust to your PYTHONPATH manually for using it (see the documentation)." >&2 && return 1
-	PYFILES=${FAUST_PY_WRAPPER_PATH}/FaustPy.py
+	PYFILES=${FAUST_PY_WRAPPER_PATH}/pyfaust.py
 	[[ -n "$DEBUG" ]] && echo PY_MAJOR_VER=$PY_MAJOR_MINOR_VER
 	if [[ "$PY_MAJOR_VER" = 3* ]]
 	then
