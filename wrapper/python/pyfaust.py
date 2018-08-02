@@ -270,9 +270,34 @@ class Faust:
             >>> nrows = F.shape[0]
             >>> ncols = F.shape[1]
 
-        <b/> See also Faust.display
+        <b/> See also Faust.size
         """
         return F.m_faust.shape()
+
+    @property
+    def size(F):
+        """
+        Gives the number of elements in the Faust F.
+
+        It's equivalent to np.prod(F.shape)).
+
+        This function is intended to be used as a property (see the examples).
+
+        Args:
+            F: the Faust object.
+
+        Returns:
+            The number of elements in the Faust F.
+
+        Examples:
+            >>> from pyfaust import Faust
+            >>> F = Faust.rand(2, 50, is_real=False)
+            >>> size = F.size
+
+        <b/> See also Faust.shape
+
+        """
+        return np.prod(F.shape)
 
     def transpose(F):
         """
@@ -333,8 +358,7 @@ class Faust:
             >>> F = Faust.rand(5, 50, is_real=False)
             >>> Fc = F.conj()
 
-        <b/> See also Faust.transpose, Faust.get_factor, Faust.get_num_factors,
-        Faust.getH, Faust.H
+        <b/> See also Faust.transpose, Faust.get_factor, Faust.get_num_factors, Faust.getH, Faust.H
         """
         F_conj = Faust(core_obj=F.m_faust.conj())
         return F_conj
@@ -644,13 +668,15 @@ class Faust:
         return F.m_faust.nnz()
 
     def density(F):
-        """ Calculates the density of F.
+        """ Calculates the density of F such that F.nnz_sum() == F.density()/F.size.
 
-        The density of F is equal to the number of non-zeros in factors over
-        the total number of elements in dense matrix of F (which is equal to
-        F.shape[0]*F.shape[1]).
+        NOTE: This definition of density allows the value to be greater than
+        one.
 
-        NOTE: this definition of density allows the value to be greater than 1.
+        NOTE: A value of density below one indicates potential memory savings
+        compared to storing the corresponding dense matrix F.todense(), as well
+        as potentially faster matrix-vector multiplication when applying F*x
+        instead of F.todense()*x.
 
         Args:
             F: the Faust object.
@@ -663,9 +689,9 @@ class Faust:
         >>> F = Faust.rand(5, 50, .5)
         >>> dens = F.density()
 
-        <b/> See also Faust.nnz_sum, Faust.rcg
+        <b/> See also Faust.nnz_sum, Faust.rcg, Faust.size
         """
-        return float(F.nnz_sum())/(F.shape[1]*F.shape[0])
+        return float(F.nnz_sum())/F.size
 
     def rcg(F):
         """

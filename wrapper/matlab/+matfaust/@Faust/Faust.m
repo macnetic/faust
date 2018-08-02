@@ -479,6 +479,7 @@ classdef Faust
 		%>	ncols = size(F, 2)
 		%> @endcode
 		%>
+		%> <p/>@b See @b also Faust.numel
 		%======================================================================
 		function varargout = size(F,varargin)
 			%% SIZE Size of a Faust (overloaded Matlab built-in function).
@@ -536,7 +537,30 @@ classdef Faust
 			end
 		end
 
-
+		%======================================================================
+		%> @brief Gives the number of elements in the Faust (equivalent to prod(size(F)).
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b n = numel(F)
+		%>
+		%> @param F the Faust object.
+		%>
+		%> @retval n the number of elements of the Faust.
+		%>
+		%> @b Example
+		%> @code
+		%>	import matfaust.Faust
+		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
+		%>	n = numel(F)
+		%> @endcode
+		%>
+		%> <p/>@b See @b also Faust.size
+		%>
+		%======================================================================
+		function n = numel(F)
+			n = prod(size(F));
+		end
 
 		%======================================================================
 		%> @brief Serves as the last index when slicing or indexing a Faust.
@@ -981,11 +1005,19 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief Calculates the density of F, that is, the number of non-zeros
-		%> in factors over the total number of elements in dense matrix of F
-		%> (which is equal to size(F, 1)*size(F, 2)).
+		%> @brief Calculates the density of F such that nnz_sum(F) == density(F)*numel(F).
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b dens = density(F)
 		%>
 		%> @b NOTE: this definition of density allows the value to be greater than 1.
+		%>
+		%> @b NOTE: a value of density below one indicates potential memory savings compared
+		%> to storing the corresponding dense matrix full(F), as well as potentially
+		%> faster matrix-vector multiplication when applying F*x instead of full(F)*x.
+		%>
+		%>
 		%>
 		%> @param F the Faust object.
 		%>
@@ -998,7 +1030,7 @@ classdef Faust
 		%>	dens = density(F)
 		%> @endcode
 		%>
-		%> <p/>@b See @b also Faust.nnz_sum, Faust.rcg
+		%> <p/>@b See @b also Faust.nnz_sum, Faust.rcg, Faust.size, Faust.numel
 		%======================================================================
 		function dens = density(F)
 			%% DENSITY Density of the Faust.
@@ -1011,7 +1043,7 @@ classdef Faust
 			%
 			% See also rcg, nnz_sum.
 
-			prod_dim=prod(size(F));
+			prod_dim=numel(F);
 			if (prod_dim ~= 0)
 				dens=nnz_sum(F)/prod_dim;
 			else
