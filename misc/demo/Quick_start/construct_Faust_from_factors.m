@@ -39,6 +39,7 @@
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %
 %%
+import matfaust.Faust
 % number of row of the Faust
 dim1=300;
 % number of column of the Faust

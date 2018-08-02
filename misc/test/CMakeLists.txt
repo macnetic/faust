@@ -125,7 +125,7 @@ if(BUILD_WRAPPER_MATLAB)
 		add_test(NAME MATLAB_FAUST_SPEED COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;test_matlab_faust_time;catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
 
 
-		add_test(NAME MATLAB_FAUST_UNIT_TESTS COMMAND matlab -nodisplay -nojvm -r "try;testpass=0;FaustTest ${PROJECT_BINARY_DIR}/wrapper/matlab/ ${PROJECT_BINARY_DIR}/run_test/bin ${PROJECT_BINARY_DIR}/run_test/tools;cactch ME;testpass=-1;displ(getReport(ME));end;exit(testpass)")
+		add_test(NAME MATLAB_FAUST_UNIT_TESTS COMMAND matlab -nodisplay -nojvm -r "try;testpass=0;addpath('${PROJECT_BINARY_DIR}/wrapper/matlab:${PROJECT_BINARY_DIR}/run_test/tools:${PROJECT_BINARY_DIR}/run_test/bin');set_path;FaustTest ${PROJECT_BINARY_DIR}/wrapper/matlab/ ${PROJECT_BINARY_DIR}/run_test/bin ${PROJECT_BINARY_DIR}/run_test/tools;cactch ME;testpass=-1;displ(getReport(ME));end;exit(testpass)")
 
 	#FIN MODIF NB VM MAC XCode
 

@@ -55,6 +55,7 @@
 %%
 function hier_fact_test(matrixFile,paramsFile,expectedLambda, expectedLambdaPrecision,opt)
 
+import matfaust.Faust
 
 
 %% load the hierarchical_fact configuration

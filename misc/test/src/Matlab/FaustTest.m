@@ -23,9 +23,11 @@ classdef FaustTest < matlab.unittest.TestCase
         function addFaustToPath(this)
 			addpath(this.faust_paths{:})
         	set_path
+			import matfaust.Faust
 		end
 
 		function instantiateTestFaust(this)
+			import matfaust.Faust
 			num_factors = randi(this.MAX_NUM_FACTORS)
 			density = 0.1
 			d2 = randi(this.MAX_DIM_SIZE);
@@ -59,6 +61,7 @@ classdef FaustTest < matlab.unittest.TestCase
 
 	methods (Test)
         function testSave(this)
+			import matfaust.Faust
 			rand_suffix = int2str(randi(10000))
 			filepath = [ tempdir filesep 'test_faust' rand_suffix '.mat']
 			save(this.test_faust, filepath)
@@ -70,6 +73,7 @@ classdef FaustTest < matlab.unittest.TestCase
         end
 
 		function testSave2(this)
+			import matfaust.Faust
 			rand_suffix = int2str(randi(10000))
 			filepath_ref = [ tempdir filesep 'ref_faust' rand_suffix '.mat']
 			filepath_test = [ tempdir filesep 'test_faust' rand_suffix '.mat']

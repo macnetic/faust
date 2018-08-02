@@ -42,6 +42,7 @@
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %
 %%
+import matfaust.Faust
 
 
 % loading a Faust A from saved-one 

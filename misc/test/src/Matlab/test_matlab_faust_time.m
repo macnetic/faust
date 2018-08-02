@@ -1,6 +1,8 @@
 %% Description test_faust_transform
 % This script tests the malab_faust class from a time computing point of view
 
+import matfaust.Faust
+
 nb_fact = 3;
 dim1 = 1000;
 dim2 = 500;

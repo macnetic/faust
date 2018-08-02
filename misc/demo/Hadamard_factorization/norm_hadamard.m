@@ -39,7 +39,7 @@
 %	Topics in Signal Processing, 2016.
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %%
-
+import matfaust.Faust
 nb_mult=10;
 Ms=6:11;
 ns=2.^Ms;

@@ -68,7 +68,7 @@ Neverthless, it could be useful to check that it really worked and set the envir
 
 <h3>3.2 Testing Matlab Wrapper Auto-Setup</h3>
 
-<pre><code>    $ matlab -nodisplay -nojvm -r "F = Faust.rand(Faust.DENSE, Faust.COMPLEX, 1, 1, 10, 10, .5);exit"
+<pre><code>    $ matlab -nodisplay -nojvm -r "import matfaust.Faust;F = Faust.rand(Faust.DENSE, Faust.COMPLEX, 1, 1, 10, 10, .5);exit"
 </code></pre>
 
 <p>It worked only if you see an output similar to:</p>

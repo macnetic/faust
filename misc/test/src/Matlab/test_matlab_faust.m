@@ -58,6 +58,7 @@
 
  function test_matlab_faust(factors,expected_F_dense,dim3,copyOptimized)
 %function test_matlab_faust(dim1,dim2,dim3,nb_fact)
+import matfaust.Faust
 int_max= 100;
 threshold = 0.2;
 

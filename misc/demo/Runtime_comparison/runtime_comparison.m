@@ -48,6 +48,7 @@
 %	NeuroImage, Volume 86, 1 February 2014, Pages 446-460, ISSN 1053-8119, 
 %	[DOI] <http://dx.doi.org/10.1016/j.neuroimage.2013.10.027>
 %%
+import matfaust.Faust
 
 
 params.RCGs = [2 4 8];

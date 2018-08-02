@@ -63,6 +63,7 @@
 %> For more information about FAµST take a look at http://faust.inria.fr.
 %>
 % ======================================================================
+
 classdef Faust
 	properties (SetAccess = private, Hidden = true)
 		matrix; % Handle to the FaustCore class instance
@@ -78,10 +79,10 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; Faust(factors) creates a Faust from a list of factors (1D cell array).<br/><br>
-		%> &nbsp;&nbsp;&nbsp; Faust(factors, scale) same as above but multiplying the Faust factors with a scalar.<br/><br/>
-		%> &nbsp;&nbsp;&nbsp; Faust(filepath) creates a Faust from a previous saved Faust filepath (character array).<br/><br/>
-		%> &nbsp;&nbsp;&nbsp; Faust(filepath, scale) save as above but multiplying the Faust factors with a scalar.
+		%> &nbsp;&nbsp;&nbsp; matfaust.Faust(factors) creates a Faust from a list of factors (1D cell array).<br/><br>
+		%> &nbsp;&nbsp;&nbsp; matfaust.Faust(factors, scale) same as above but multiplying the Faust factors with a scalar.<br/><br/>
+		%> &nbsp;&nbsp;&nbsp; matfaust.Faust(filepath) creates a Faust from a previous saved Faust filepath (character array).<br/><br/>
+		%> &nbsp;&nbsp;&nbsp; matfaust.Faust(filepath, scale) save as above but multiplying the Faust factors with a scalar.
 		%>
 		%>
 		%> @param factors (varargin{1}) the 1D cell array of factors to initialize the Faust with.
@@ -94,6 +95,7 @@ classdef Faust
 		%>
 		%> @b Examples
 		%> @code
+		%>	import matfaust.faust
 		%>	factors = cell(1,5)
 		%>	is_sparse = false
 		%>	for i=1:5
@@ -105,15 +107,15 @@ classdef Faust
 		%>		is_sparse = ~ is_sparse
 		%>	end
 		%>	% define a Faust with those factors
-		%>	F = Faust(factors)
+		%>	F = matfaust.Faust(factors)
 		%>
 		%>	scale = 2
-		%>	G = Faust(factors, scale) % G == scale*F
+		%>	G = matfaust.Faust(factors, scale) % G == scale*F
 		%>
 		%>	save(F, 'F.mat')
 		%>	% define a Faust from file
-		%>	H = Faust('F.mat')
-		%>	I = Faust('F.mat', scale) % I == scale*H
+		%>	H = matfaust.Faust('F.mat')
+		%>	I = matfaust.Faust('F.mat', scale) % I == scale*H
 		%>
 		%> @endcode
 		%>
@@ -126,15 +128,15 @@ classdef Faust
 			%
 			% Examples :
 			%
-			% F = Faust(factors,scale)
+			% F = matfaust.Faust(factors,scale)
 			% - factor : 1D cell array of matrix (sparse or
 			% dense) representing the factor of the Faust.
 			% - scale : (optional) multiplicative scalar.
 			%
-			% F = Faust(filepath, scale)
+			% F = matfaust.Faust(filepath, scale)
 			% - filepath: the file where a Faust was stored with Faust.save() (in matlab format version 5).
 			% - scale: (optional) multiplicative scalar.
-			err_msg = 'Faust() error: the arguments are not valid.';
+			err_msg = 'matfaust.Faust() error: the arguments are not valid.';
 			if(nargin < 1 || nargin > 3)
 				error([err_msg ' Number of arguments passed is zero or greater than three.'])
 			elseif(iscell(varargin{1}))
@@ -160,8 +162,8 @@ classdef Faust
 				if (~exist('faust_factors','var') )
 					error('Faust : invalid file');
 				end
-				F = Faust(faust_factors, varargin{2:end});
-			elseif(isa(varargin{1}, 'Faust'))
+				F = matfaust.Faust(faust_factors, varargin{2:end});
+			elseif(isa(varargin{1}, 'matfaust.Faust'))
 				% create a Faust from another one but not with the same
 				% handle to set inside the FaustCore object (matrix)
 				oF = varargin{1};
@@ -186,6 +188,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
+		%>	import matfaust.Faust
 		%>	F = Faust.rand([2, 5], [50, 100], .5)
 		%>	delete(F)
 		%> @endcode
@@ -218,6 +221,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
+		%>   import matfaust.Faust
 		%>   F = Faust.rand([2, 5], [50, 100], .5)
 		%>   A = rand(size(F,2), 50)
 		%>   B = F*A
@@ -279,9 +283,9 @@ classdef Faust
 			end
 			if(isa(A,'Faust'))
 				if (F.isReal)
-					C = Faust(F, mexFaustReal('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
+					C = matfaust.Faust(F, mexFaustReal('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
 				else
-					C = Faust(F, mexFaustCplx('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
+					C = matfaust.Faust(F, mexFaustCplx('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
 				end
 			elseif (F.isReal)
 				if (isreal(A))
@@ -370,9 +374,9 @@ classdef Faust
 			%F_trans=F; % trans and F point share the same C++ underlying object (objectHandle)
 			%F_trans.transpose_flag = xor(1,F.transpose_flag); % inverse the transpose flag
 			if (F.isReal)
-				F_trans = Faust(F, mexFaustReal('transpose', F.matrix.objectHandle));
+				F_trans = matfaust.Faust(F, mexFaustReal('transpose', F.matrix.objectHandle));
 			else
-				F_trans = Faust(F, mexFaustCplx('transpose', F.matrix.objectHandle));
+				F_trans = matfaust.Faust(F, mexFaustCplx('transpose', F.matrix.objectHandle));
 			end
 		end
 
@@ -387,6 +391,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
+		%>	import matfaust.Faust
 		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	F_ctrans = F'
 		%>	F_ctrans2 = ctranspose(F)
@@ -409,7 +414,7 @@ classdef Faust
 			if (isreal(F))
 				F_ctrans=transpose(F);
 			else
-				F_ctrans = Faust(F, mexFaustCplx('ctranspose', F.matrix.objectHandle));
+				F_ctrans = matfaust.Faust(F, mexFaustCplx('ctranspose', F.matrix.objectHandle));
 			end
 		end
 
@@ -430,6 +435,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
+		%>	import matfaust.Faust
 		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	F_conj = conj(F)
 		%> @endcode
@@ -444,9 +450,9 @@ classdef Faust
 			%
 			%
 			if (F.isReal)
-				F_conj = Faust(F, mexFaustReal('conj', F.matrix.objectHandle));
+				F_conj = matfaust.Faust(F, mexFaustReal('conj', F.matrix.objectHandle));
 			else
-				F_conj = Faust(F, mexFaustCplx('conj', F.matrix.objectHandle));
+				F_conj = matfaust.Faust(F, mexFaustCplx('conj', F.matrix.objectHandle));
 			end
 		end
 
@@ -466,6 +472,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
+		%>	import matfaust.Faust
 		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	[nrows, ncols] = size(F)
 		%>	nrows = size(F, 1)
@@ -541,7 +548,8 @@ classdef Faust
 	 	%> @b Example
 		%> @code
 		%>	% in a matlab terminal
-		%>
+		%>	>> import matfaust.Faust
+		%>	>>
 		%>	>> F = Faust.rand([4, 5], 3, .9);
 		%>	>> full(F)
 		%>	ans =
@@ -604,6 +612,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
+		%>	import matfaust.Faust
 		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	f1 = get_factor(F,1)
 		%> @endcode
@@ -646,6 +655,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
+		%>	import matfaust.Faust
 		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	nf = get_num_factors(F)
 		%> @endcode
@@ -674,9 +684,10 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
+		%>	import matfaust.Faust
 		%>	F = Faust.rand(5, [50, 100], .5, 'mixed', false)
 		%>	save(F, 'F.mat')
-		%>	G = Faust('F.mat')
+		%>	G = matfaust.Faust('F.mat')
 		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.Faust.
@@ -706,8 +717,10 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>		F = Faust.rand([2, 5], [50, 100], .5)
-		%>		i = randi(min(size(F)), 1, 2)
+		%>	import matfaust.Faust
+		%>
+		%>	F = Faust.rand([2, 5], [50, 100], .5)
+		%>	i = randi(min(size(F)), 1, 2)
 		%>	i1 = i(1);i2 = i(2)
 		%>
 		%>	F(i1,i2) % a Faust representing a matrix with only one element
@@ -746,12 +759,15 @@ classdef Faust
 			end
 
 			if ~strcmp(S.type,'()')
+				%submatrix = builtin('subsref', F, S)
 				error(' subsref is only overloaded for () operator');
 			end
 
 			if (length(S.subs) ~=2)
 				invalid(' subsref invalid slicing must have 2 index since F is a 2D-array');
 			end
+
+
 
 			slicing_row=S.subs{1};
 			slicing_col=S.subs{2};
@@ -775,9 +791,9 @@ classdef Faust
 			end
 
 			if(F.isReal)
-				submatrix = Faust(F, mexFaustReal('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
+				submatrix = matfaust.Faust(F, mexFaustReal('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
 			else
-				submatrix = Faust(F, mexFaustCplx('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
+				submatrix = matfaust.Faust(F, mexFaustCplx('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
 			end
 
 		end
@@ -815,6 +831,8 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	% in a matlab terminal
+		%>	>> import matfaust.Faust
+		%>	>>
 		%>	>> F = Faust.rand([1, 2], [50, 100], .5)
 		%>	>> disp(F)
 		%>	Faust of size : 55x73, nb factor 2, RCG 0.947157,nnz 4239
@@ -873,6 +891,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%> % in a matlab terminal
+		%> >> import matfaust.Faust
 		%> >> F = Faust.rand([1, 2], [50, 100], .5)
 		%> >> norm(F)
 		%> ans =
@@ -966,6 +985,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
+		%>	import matfaust.Faust
 		%>	F = Faust.rand([2, 5], [50, 100], .5)
 		%>	dens = density(F)
 		%> @endcode
@@ -1085,6 +1105,7 @@ classdef Faust
 		%> @b Example @b 1
 		%> @code
 		%> % in a matlab terminal
+		%> >> import matfaust.Faust
 		%> >> F = Faust.rand(2, 10, .5, 'mixed', false)
 		%>
 		%> F =
@@ -1095,6 +1116,7 @@ classdef Faust
 		%> @endcode
 		%> @b Example @b 2
 		%> @code
+		%> >> import matfaust.Faust
 		%> >> G = Faust.rand([2, 5], [10, 20], .5, 'dense')
 		%>
 		%> G =
@@ -1189,9 +1211,9 @@ classdef Faust
 				density = .1;
 			end
 			if(field == COMPLEX)
-				F = Faust(mexFaustCplx('rand', fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), false);
+				F = matfaust.Faust(mexFaustCplx('rand', fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), false);
 			else %if(field == REAL)
-				F = Faust(mexFaustReal('rand', fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), true);
+				F = matfaust.Faust(mexFaustReal('rand', fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), true);
 			end
 		end
 	end
