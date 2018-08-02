@@ -281,7 +281,7 @@ classdef Faust
 			if (trans ~= 1) && (trans ~= 0)
 				error('invalid argument trans, must be equal to 0 or 1');
 			end
-			if(isa(A,'Faust'))
+			if(isa(A,'matfaust.Faust'))
 				if (F.isReal)
 					C = matfaust.Faust(F, mexFaustReal('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
 				else
