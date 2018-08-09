@@ -132,8 +132,13 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 				//printf("mexFaust.cpp rand(): faust creation\n");
 				Faust::TransformHelper<SCALAR,Cpu>* F = Faust::TransformHelper<SCALAR,Cpu>::randFaust(RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density);
 
-				plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
-
+				if(F) //not NULL
+					plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
+				else {
+					plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+					double* ptr_out = (double*) mxGetData(plhs[0]);
+					ptr_out[0]=(double) 0;
+				}
 				return;
 
 		}

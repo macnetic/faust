@@ -421,8 +421,8 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		bool estIdentite()const{return isIdentity;}
         bool estNulle()const{return isZeros;}
 
-		static Faust::MatDense<FPP,Cpu>* randMat(unsigned int num_rows, unsigned int num_cols);
-		static Faust::MatDense<FPP,Cpu>* randMat(unsigned int num_rows, unsigned int num_cols, float density);
+		static Faust::MatDense<FPP,Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols);
+		static Faust::MatDense<FPP,Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, float density);
 		private:
 		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;
 		bool isIdentity;

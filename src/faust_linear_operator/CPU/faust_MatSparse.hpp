@@ -44,6 +44,7 @@
 #include <fstream>
 #include <iomanip>
 #include <complex>
+#include <cstdlib>
 
 using namespace std;
 template<typename FPP>
@@ -761,28 +762,44 @@ Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_rows(faust_unsigned_in
 }
 
 	template<typename FPP>
-Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(unsigned int num_rows, unsigned int num_cols, double density)
+Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density)
 {
-	std::default_random_engine generator;
+	std::default_random_engine generator(rand());
 	std::uniform_real_distribution<double> distribution(0, 1);
-	typedef Eigen::Triplet<FPP> T;
+	std::uniform_int_distribution<faust_unsigned_int> int_distribution(0, num_rows*num_cols-1);
+	typedef Eigen::Triplet<FPP,faust_unsigned_int> T;
 	std::vector<T> tripletList;
-	tripletList.reserve((int)(num_rows*num_cols*density));
-	MatDense<FPP,Cpu>* dense = Faust::MatDense<FPP,Cpu>::randMat(num_rows, num_cols);
-	for(int i=0;i<num_rows;i++)
-		for(int j=0;j<num_cols;j++)
-			if(distribution(generator) < density)
-			{
-				tripletList.push_back(T(i,j,(*dense)(i,j)));
-			}
 	MatSparse<FPP, Cpu>* fsmat = new MatSparse<FPP,Cpu>();
 	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat(num_rows, num_cols);
-	mat.setFromTriplets(tripletList.begin(), tripletList.end());
-	fsmat->mat = mat;
-	fsmat->update_dim();
-	//	fsmat->Display();
-	//	fsmat->mat.setFromTriplets(tripletList.begin(), tripletList.end());
-	delete dense;
+	FPP rand_number;
+	complex<double> rs;
+	try {
+		tripletList.reserve((size_t)(num_rows*num_cols*density));
+		faust_unsigned_int num_elts = (faust_unsigned_int)(num_rows*num_cols*density);
+		faust_unsigned_int i,col_id,row_id, r, nrows_times_ncols = (num_cols-1)*(num_rows-1);
+		i = 0;
+		while(i < num_elts)
+		{
+			r = int_distribution(generator);
+			row_id = r/num_cols;
+			col_id = r - row_id * num_cols;
+			assert(col_id >= 0 && col_id < num_cols); 
+			rs = complex<double>(distribution(generator), distribution(generator));
+			memcpy(&rand_number, &rs, sizeof(FPP));
+//			cout << row_id << " " << col_id << " " << rand_number << endl;
+			tripletList.push_back(T(row_id,col_id, rand_number));
+			i++;
+		}
+		mat.setFromTriplets(tripletList.begin(), tripletList.end());
+		fsmat->mat = mat;
+		fsmat->update_dim();
+		//	fsmat->Display();
+	}
+	catch(std::exception e) {
+		delete fsmat;
+		fsmat = NULL;
+		//		std::cerr << "Out of memory." << std::endl;
+	}
 	return fsmat;
 }
 

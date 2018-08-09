@@ -575,6 +575,7 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatDense<FPP1,Cpu> const& A)
 void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatSparse<FPP,Cpu> const& S)
 {
 	S.check_dim_validity();
+	try {
 	resize(S.getNbRow(),S.getNbCol());
 	setZeros();
 	FPP*const ptr_data = getData();
@@ -589,7 +590,10 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatSparse<FPP,Cpu> const& S)
 
 		}
 	}		
-
+	}
+	catch(std::bad_alloc e){
+		std::cerr << "Out of memory." << std::endl;
+	}
 	isZeros = false;
 	isIdentity = false;
 }
@@ -838,29 +842,39 @@ Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_rows(faust_unsigned_int 
 }
 
 	template<typename FPP>
-Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(unsigned int num_rows, unsigned int num_cols)
+Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols)
 {
-	Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_tmp;
-	Faust::MatDense<FPP, Cpu>* mat;
-	mat_tmp = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>::Random(num_rows, num_cols);
-	mat = new Faust::MatDense<FPP, Cpu>(mat_tmp.data(), num_rows, num_cols);
+	Faust::MatDense<FPP, Cpu>* mat = NULL;
+	try {
+		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_tmp;
+		mat_tmp = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>::Random(num_rows, num_cols);
+		mat = new Faust::MatDense<FPP, Cpu>(mat_tmp.data(), num_rows, num_cols);
+	}
+	catch(std::bad_alloc e) {
+//		std::cerr << "Out of memory." << std::endl;
+	}
 	return mat;
 }
 
 	template<typename FPP>
-Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(unsigned int num_rows, unsigned int num_cols, float density)
+Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, float density)
 {
-	//TODO: refactor with above randMat()
-	Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_tmp;
-	Faust::MatDense<FPP, Cpu>* mat;
-	std::default_random_engine generator(time(NULL));
-	std::uniform_real_distribution<double> distribution(0, 1);
-	mat_tmp = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>::Random(num_rows, num_cols);
-	for(int i=0;i<num_rows;i++)
-		for(int j=0;j<num_cols;j++)
-			if(distribution(generator) > density)
-				mat_tmp(i,j) = 0;
-	mat = new Faust::MatDense<FPP, Cpu>(mat_tmp.data(), num_rows, num_cols);
+	Faust::MatDense<FPP, Cpu>* mat = NULL;
+	try {
+		//TODO: refactor with above randMat()
+		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_tmp;
+		std::default_random_engine generator(time(NULL));
+		std::uniform_real_distribution<double> distribution(0, 1);
+		mat_tmp = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>::Random(num_rows, num_cols);
+		for(int i=0;i<num_rows;i++)
+			for(int j=0;j<num_cols;j++)
+				if(distribution(generator) > density)
+					mat_tmp(i,j) = 0;
+		mat = new Faust::MatDense<FPP, Cpu>(mat_tmp.data(), num_rows, num_cols);
+	}
+	catch(std::bad_alloc e) {
+//		std::cerr << "Out of memory." << std::endl;
+	}
 	return mat;
 }
 #ifdef __COMPILE_TIMERS__

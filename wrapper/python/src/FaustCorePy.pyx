@@ -142,9 +142,11 @@ cdef class FaustCore:
             core.core_faust_dbl = FaustCoreCy.FaustCoreCpp[double].randFaust(t,min_num_factors, max_num_factors, min_dim_size,
                    max_dim_size, density)
             core._isReal = True
+            if(core.core_faust_dbl == NULL): raise MemoryError()
         elif(field == 4):
             core.core_faust_cplx = FaustCoreCy.FaustCoreCpp[complex].randFaust(t,min_num_factors, max_num_factors, min_dim_size,
                    max_dim_size, density)
+            if(core.core_faust_cplx == NULL): raise MemoryError()
             core._isReal = False
         else:
             raise ValueError("FaustCorePy.randFaust(): field must be 3 for real or"

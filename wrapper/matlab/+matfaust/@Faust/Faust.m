@@ -1172,7 +1172,7 @@ classdef Faust
 		%>
 		%> <p>@b See @b also Faust.Faust.
 		%==========================================================================================
-		function F = rand(varargin)
+        function F = rand(varargin)
 			%> Identifies a complex Faust.
 			COMPLEX=3;
 			%> Identifies a real Faust.
@@ -1250,11 +1250,18 @@ classdef Faust
 			else
 				density = .1;
 			end
+			e = MException('FAUST:OOM', 'Out of Memory');
 			if(field == COMPLEX)
-				F = matfaust.Faust(mexFaustCplx('rand', fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), false);
+				core_obj = mexFaustCplx('rand', fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density);
+				is_real = false;
 			else %if(field == REAL)
-				F = matfaust.Faust(mexFaustReal('rand', fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density), true);
+				core_obj = mexFaustReal('rand', fac_type, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density);
+				is_real = true;
 			end
+			if(core_obj == 0)
+				throw(e)
+			end
+			F = matfaust.Faust(core_obj, is_real);
 		end
 	end
 end

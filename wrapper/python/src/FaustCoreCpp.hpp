@@ -251,6 +251,7 @@ template<typename FPP>
             unsigned int min_num_factors, unsigned int max_num_factors,
             unsigned int min_dim_size, unsigned int max_dim_size, float density) {
       Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::randFaust(Faust::RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density);
+      if(!th) return NULL;
       FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
       core->transform = th;
       return core;

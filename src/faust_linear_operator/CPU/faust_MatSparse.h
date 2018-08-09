@@ -267,7 +267,7 @@ namespace Faust
 			Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 			Faust::MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
 			Faust::MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
-			static MatSparse<FPP, Cpu>* randMat(unsigned int num_rows, unsigned int num_cols, double density);
+			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density);
 			//! Destructor
 			~MatSparse(){/*std::cout<<"destructor MatSparse"<<std::endl;*//*this->mat.resize(0,0);*/}
 

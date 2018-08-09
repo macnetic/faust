@@ -392,6 +392,7 @@ namespace Faust {
 						break;
 
 				}
+				if(factors[i] == NULL) return NULL;
 			}
 			TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false);
 			return randFaust;
