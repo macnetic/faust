@@ -503,7 +503,8 @@ std::string Faust::MatDense<FPP,Cpu>::to_string(const bool transpose /* set to f
 	//using ostringstream because it's easier for concatenation (of complex and any number)
 	std::ostringstream  str;
 
-	str<<" type : DENSE";
+	str << " (" << (typeid(*getData()) == typeid(complex<double>) || typeid(*getData()) == typeid(complex<float>)?"complex":"real") << ")";
+	str<<" DENSE,";
 	str << Faust::MatGeneric<FPP,Cpu>::to_string(transpose);
 	if(isZeros)
 		str <<"zeros matrix flag" << endl;

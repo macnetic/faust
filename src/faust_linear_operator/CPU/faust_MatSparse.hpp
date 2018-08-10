@@ -330,7 +330,8 @@ template<typename FPP>
 std::string Faust::MatSparse<FPP,Cpu>::to_string(const bool transpose /* set to false by default */) const
 {
 	std::ostringstream str;
-	str<<" type : SPARSE";
+	str << " (" << (typeid(*getValuePtr()) == typeid(complex<double>) || typeid(*getValuePtr()) == typeid(complex<float>)?"complex":"real") << ")";
+	str<<" SPARSE,";
 	str << Faust::MatGeneric<FPP,Cpu>::to_string(transpose);
 	if (this->dim1*this->dim2 < 100)
 	{
