@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# find the more recent matlab version installed (sorted by year normally contained in folder name) 
 MATLAB_ROOT=$(find /Applications/ -iname "MATLAB*" -maxdepth 1 | tail -n 1)
 if [[ ! "$?" = 0 || ! -d "${MATLAB_ROOT}" ]]
 then

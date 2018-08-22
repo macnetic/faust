@@ -211,6 +211,19 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 }
 
 template<typename FPP>
+Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts):	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
+	totalNonZeros(0)
+{
+	data.resize(facts.size());
+	for (int i=0 ; i<data.size() ; i++)
+	{
+		data[i]=facts[i].Clone();
+		totalNonZeros += data[i]->getNonZeros();
+	}
+
+}
+
+template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool transpose_A, const bool conj_A, const Transform<FPP, Cpu>* B, const bool transpose_B, const bool conj_B):
 	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()), totalNonZeros(0)
 {
@@ -910,7 +923,7 @@ std::string Faust::Transform<FPP,Cpu>::to_string(const bool transpose /* default
 			str << this->getNbCol() << "x" << this->getNbRow();
 		else
 			str << this->getNbRow()<<"x"<<this->getNbCol();
-		str <<", density "<<1.0/getRCG()<< ", nnz_sum "<<this->get_total_nnz() << ", " << size() << " factors: "<< std::endl;
+		str <<", density "<<1.0/getRCG()<< ", nnz_sum "<<this->get_total_nnz() << ", " << size() << " factor(s): "<< std::endl;
 		int j;
 		for (int i=0 ; i<size() ; i++)
 		{

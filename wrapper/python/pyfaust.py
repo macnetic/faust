@@ -195,11 +195,11 @@ class Faust:
             >>> F = Faust.rand(2, 10, .5, is_real=False)
             >>> G = Faust.rand([2, 5], [10, 20], .5, fac_type="dense")
             >>> F
-            Faust size 10x10, density 0.99, nnz_sum 99, 2 factors:<br/>
+            Faust size 10x10, density 0.99, nnz_sum 99, 2 factor(s):<br/>
             FACTOR 0 (complex) SPARSE, size 10x10, density 0.4, nnz 40<br/>
             FACTOR 1 (complex) DENSE, size 10x10, density 0.59, nnz 59<br/>
             >>> G
-            Faust size 19x16, density 1.37171, nnz_sum 417, 4 factors:<br/>
+            Faust size 19x16, density 1.37171, nnz_sum 417, 4 factor(s):<br/>
             FACTOR 0 (real) DENSE, size 19x17, density 0.49226, nnz 159<br/>
             FACTOR 1 (real) DENSE, size 17x10, density 0.517647, nnz 88<br/>
             FACTOR 2 (real) DENSE, size 10x13, density 0.515385, nnz 67<br/>
@@ -457,12 +457,12 @@ class Faust:
             >>> from pyfaust import Faust
             >>> F = Faust.rand([1, 2], [50, 100], .5)
             >>> F.display()
-            Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factors:<br/>
+            Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factor(s):<br/>
             FACTOR 0 (real) SPARSE, size 98x78, density 0.395081, nnz 3020<br/>
             FACTOR 1 (real) SPARSE, size 78x82, density 0.390869, nnz 2500<br/>
 
             >>> F
-            Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factors:<br/>
+            Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factor(s):<br/>
             FACTOR 0 (real) SPARSE, size 98x78, density 0.395081, nnz 3020<br/>
             FACTOR 1 (real) SPARSE, size 78x82, density 0.390869, nnz 2500<br/>
             <!-- >>> -->
@@ -544,7 +544,7 @@ class Faust:
         Examples:
             >>> from pyfaust import Faust
             >>> F = Faust.rand(5, 10**6, .00001, 'sparse')
-               Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factors:<br/>
+               Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factor(s):<br/>
                 FACTOR 0 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
                 FACTOR 1 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
                 FACTOR 2 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
@@ -582,7 +582,7 @@ class Faust:
             >>> from pyfaust import Faust
             >>> F = Faust.rand(5, 10**6, .00001, 'sparse')
             >>> F
-            Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factors:<br/>
+            Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factor(s):<br/>
             FACTOR 0 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
             FACTOR 1 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
             FACTOR 2 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>

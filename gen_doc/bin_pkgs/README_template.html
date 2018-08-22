@@ -22,13 +22,13 @@
 
 <p>FAµST supports at least Python 2.7. For macOS it&rsquo;s the only version supported for now.</p>
 
-<p>FAµST takes place in the Python ecosystem which as usual relies on numpy and scipy packages. So you have to ensure these packages are installed on your system.</p>
+<p>FAµST is designed for the Python ecosystem which as usual relies on numpy and scipy packages. So you have to ensure these packages are installed on your system.</p>
 
 <p>That requirement applies also to Python 3, assuming your version of Python is matching the version FAµST is compiled for (currently 3.6).</p>
 
 <h3>1.2 For Matlab</h3>
 
-<p>FAµST wrapper for Matlab has been tested on several Matlab versions starting from version 2016 up to version 2018. However it&rsquo;s not totally excluded that FAµST works with older versions.</p>
+<p>The FAµST wrapper for Matlab has been tested on several Matlab versions starting from version 2016 up to version 2018. However it&rsquo;s not totally excluded that FAµST works with older versions.</p>
 
 <h2><a name="installation"> 2. Installation</a></h2>
 
@@ -37,7 +37,7 @@
 <h2><a name="installation_testing">3. Installation Testing<a/></h2>
 
 <p>Normally, after installing, nothing is left to do. The installation process should have seamlessly set up the Faust wrappers for Python and Matlab into your environment.
-Neverthless, it could be useful to check that it really worked and set the environment manually in the contrary case like explained below.</p>
+Neverthless, it could be useful to check that it really worked and set the environment manually if needed like explained below.</p>
 
 <h3>3.1 Testing Python Wrapper Auto-Setup</h3>
 
@@ -68,15 +68,15 @@ Neverthless, it could be useful to check that it really worked and set the envir
 
 <h3>3.2 Testing Matlab Wrapper Auto-Setup</h3>
 
-<pre><code>    $ matlab -nodisplay -nojvm -r "import matfaust.Faust;F = Faust.rand(Faust.DENSE, Faust.COMPLEX, 1, 1, 10, 10, .5);exit"
+<pre><code>    $ matlab -nodisplay -nojvm -r "import matfaust.Faust;F = Faust.rand(1, 10, .5, 'dense', false);exit"
 </code></pre>
 
 <p>It worked only if you see an output similar to:</p>
 
 <pre><code>    F =
 
-    - Faust of size : 10x10, nb factor 1, RCG 1.75439,nnz 57
-    - FACTOR 0type : DENSE size 10x10, density 0.57, nnz 57
+    Faust size 10x10, density 0.56999, nnz_sum 57, 1 factor(s):
+    - FACTOR 0 (complex) DENSE, size 10x10, density 0.57, nnz 57
 </code></pre>
 
 <p>In other case it didn&rsquo;t work. So here is how to setup the wrapper manually :</p>
@@ -136,7 +136,7 @@ Neverthless, it could be useful to check that it really worked and set the envir
 
 <p>N.B.: to access the documentation, you need to be in the graphical interface of matlab.</p>
 
-<p>You should rather consult the doxygen doc for the API in @CMAKE_INSTALL_PREFIX@/doc/html/index.html from your web browser.</p>
+<p>You should rather consult the doxygen doc for the API in <a href="file://@CMAKE_INSTALL_PREFIX@/doc/html/index.html">@CMAKE_INSTALL_PREFIX@/doc/html/index.html</a> from your web browser.</p>
 
 <h3>4.2 Python Wrapper</h3>
 
