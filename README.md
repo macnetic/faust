@@ -10,6 +10,7 @@ General purpose
 The FAuST toolbox contains a C++ code implementing a general framework
 designed to factorize matrices of interest into multiple sparse factors.
 It contains a template CPU/GPU C++ code and a Matlab wrapper.
+A Python wrapper is also available.
 The algorithms implemented here are described in details in [1]- Le Magoarou
 
 For more information on the FAuST Project, please visit the website of the
@@ -23,7 +24,7 @@ Installation
 Please refer to the document "./gettingStartedFAuST-version2_0.pdf"
 to install the FAUST toolbox.
 The FAUST toolbox has been tested on the following environments:
-- LINUX (fedora 20, 21, 22, 23 / Ubuntu)
+- LINUX (fedora 20, 21, 22, 23, 24 - 27 / Ubuntu)
 - MACOS X
 - WINDOWS (windows 7)
 
@@ -72,11 +73,19 @@ along with this program.  If not, see [licenses](http://www.gnu.org/licenses/).
 
 Contacts
 ========
-	Luc Le Magoarou: luc.le-magoarou@inria.fr
-	Remi Gribonval : remi.gribonval@inria.fr
-	Nicolas Bellot  : nicolas.bellot@inria.fr
-	Adrien Leman    : adrien.leman@inria.fr
-	Thomas Gautrais : thomas.gautrais@inria.fr
+
+	Rémi Gribonval: remi.gribonval@inria.fr
+	Hakim: hakim.hadj-djilani@inria.fr
+	
+
+Credits
+========
+	Luc Le Magoarou
+	Remi Gribonval
+	Nicolas Bellot
+	Adrien Leman
+	Thomas Gautrais
+	Hakim H.
 ---
 
 References

@@ -19,6 +19,7 @@ project: <http://faust.inria.fr>
 
 This file presents the current state of the FAuST toolbox on the svn repository
 and what could be made by future developper.
+[Across this doc you'll read in brackets some tmp remarks from Hakim, the current developer on Faust (04/2018)]
 
 
 Here are the different topics presented in this documents :
@@ -78,6 +79,10 @@ The C++ code is split in 2 part :
 		|->	-Transform : class inherits from LinearOperator and represents the Flexible Approximate Multi-layer Sparse Transform,
 		|	 it is a list of MatGeneric (std::vector<MatGeneric*>) representing its factors.Currently, a factor of a Faust can be
 		|	 sparse matrix or a dense matrix.
+
+		|[-> TransformHelper class was added to wrap Transform class and ease the use of Transform objects from wrappers, 
+			especially to enhance memory management for different Faust/Must objects relying on the same background Transform object (typically for a Faust and its tranpose, etc.). 
+			See commit c775e359 for further details (Hakim)]
 			
 		
 
@@ -96,7 +101,7 @@ The C++ code is split in 2 part :
 		     
 		     - The compatibility with complex scalar is ok.
 		       Currently, you can multiply the transposed of a Trasnform by a MatDense.
-		       But it could be interesting to multiply by the conjugate or the transconjugate of a Transform.
+		       But it could be interesting to multiply by the conjugate or the transconjugate of a Transform [Hakim: it's done for TransformHelper class used in wrappers, so it's ok].
 
 		     - WARNING :  the GPU matrices are not well tested ... and no documentation is available on the structure of the code...
 
@@ -163,7 +168,7 @@ II - Wrappers            :
 	 **** TODO **** :
 	 --> Make the Faust Matlab class operation conjugate and transconjugate are not implemented.
 	     So, it will be easy to make, this operation implementation should be very similar to 
-	     the transpose implementation. 
+	     the transpose implementation.[DONE (Hakim)] 
 	--> Make the Matlab factorization algorithm compatible with complex matrices and GPU matrices.
 
 
@@ -173,7 +178,7 @@ II - Wrappers            :
 	  It supplies : 
           --> the FaustPy Python module.
 	      This module supplies the Faust class wich is the equivalent of the C++ class Transform.	 
-	      It is only compatible with real scalar.
+	      It is only compatible with real scalar [Not anymore, now complex scalar are supported (Hakim)].
 	  
 		 
 
@@ -181,7 +186,7 @@ II - Wrappers            :
 	  
 
 	 **** TODO **** :
-	 --> Make the FaustPy.faust class compatible with complex scalar.
+	 --> Make the FaustPy.faust class compatible with complex scalar [DONE (Hakim)].
 	 --> Develop the inferface with the factoziration algorithm.
 	 --> Implements some Python demos similar to the Matlab Demo (Brain Source localization ...)		 
 
@@ -201,6 +206,9 @@ III - TEST             :
 	III-1) test with CTest
 		all the test are defined in the directory misc/test/.
 		(For more information on this, see misc/test/README.developper) 
+		[The script tests located in misc/CTest_nightly directory are not relevent anymore because since the gitlab migration
+		of the project we rely on gitlab continuous integration and use .gitlab-ci.yml script to launch tests, 
+		but cdash and ci.inria.fr are still used (Hakim)]
 	
 	III-2) test with CDash on VM
 	       Daily, all the test are launched on virtual machine
@@ -222,6 +230,7 @@ III - TEST             :
 
 			- Windows : all the test on Windows VM currently won't work...
 			  	There are problem into the step of CMake configuration.
+				[Some progress have been made to make windows version build and run (Hakim)]
 
 		    
 
