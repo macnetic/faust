@@ -45,7 +45,6 @@
 #ifndef FAUSTCORECPP_H
 #define FAUSTCORECPP_H
 
-//#include "faust_transform.h"
 #include "faust_MatDense.h"
 #include "faust_TransformHelper.h"
 
@@ -56,7 +55,8 @@ class FaustCoreCpp
     public :
 
 
-    //FaustCoreCpp(): transform(){}
+    FaustCoreCpp(): transform(){}
+    FaustCoreCpp(Faust::TransformHelper<FPP,Cpu> &th);
     void Display() const { transform.display();}
     const char* to_string() const;
     void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol);

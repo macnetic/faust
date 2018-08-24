@@ -5,7 +5,7 @@ import tempfile
 import os
 import sys
 import numpy as np
-from scipy.io import savemat  # , loadmat
+from scipy.io import savemat,loadmat
 from numpy.linalg import norm
 import math
 
@@ -301,6 +301,80 @@ class TestFaustPyCplx(TestFaustPy):
             self.r = r
             self.num_factors = num_factors
 
+class TestFaustFactory(unittest.TestCase):
+
+    def testFactPalm4MSA(self):
+        print("Test FaustFactory.fact_palm4msa()")
+        from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintScalar,\
+        ConstraintName, StoppingCriterion
+        num_facts = 2
+        is_update_way_R2L = False
+        init_lambda = 1.0
+        init_facts = list()
+        init_facts.append(np.zeros([500,32]))
+        init_facts.append(np.eye(32))
+        #M = np.random.rand(500, 32)
+        M = \
+        loadmat(sys.path[-1]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
+        # default step_size
+        cons1 = ConstraintScalar(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+        cons2 = ConstraintScalar(ConstraintName(ConstraintName.NORMCOL), 32,
+                                 32, 1.0)
+        stop_crit = StoppingCriterion(num_its=200)
+        param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
+                               init_facts, [cons1, cons2], stop_crit,
+                               is_verbose=False, constant_step_size=False)
+        F = FaustFactory.fact_palm4msa(M, param)
+        self.assertEqual(F.shape, M.shape)
+        E = F.todense()-M
+        #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"))
+        print("err: ", norm(E,"fro")/norm(M,"fro"))
+        # matrix to factorize and reference relative error come from
+        # misc/test/src/C++/test_palm4MSA.cpp
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.98162, places=4)
+
+    def testFactHierarch(self):
+        print("Test FaustFactory.fact_hierarchical()")
+        from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintScalar,\
+        ConstraintName, StoppingCriterion
+        num_facts = 4
+        is_update_way_R2L = False
+        init_lambda = 1.0
+        init_facts = list()
+        init_facts.append(np.zeros([500,32]))
+        for i in range(1,num_facts):
+            init_facts.append(np.zeros([32,32]))
+        #M = np.random.rand(500, 32)
+        M = \
+        loadmat(sys.path[-1]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
+        # default step_size
+        cons1 = ConstraintScalar(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+        cons2 = ConstraintScalar(ConstraintName(ConstraintName.SP), 32,
+                                 32, 96)
+        cons3 = ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32,
+                                 96)
+        cons4 = ConstraintScalar(ConstraintName(ConstraintName.NORMCOL), 32, 32,
+                                 1)
+        cons5 =  ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32,
+                                 666)
+        cons6 =  ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32,
+                                 333)
+        stop_crit1 = StoppingCriterion(num_its=200)
+        stop_crit2 = StoppingCriterion(num_its=200)
+        param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
+                                       init_facts, [cons1, cons2, cons3, cons4,
+                                                   cons5, cons6],
+                                       M.shape[0],M.shape[1],[stop_crit1,
+                                                              stop_crit2],
+                                       is_verbose=False)
+        F = FaustFactory.fact_hierarchical(M, param)
+        self.assertEqual(F.shape, M.shape)
+        E = F.todense()-M
+        #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"),
+        print("err: ", norm(E,"fro")/norm(M,"fro"))
+        # matrix to factorize and reference relative error come from
+        # misc/test/src/C++/hierarchicalFactorization.cpp
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"),0.268513, places=5)
 
 if __name__ == "__main__":
     if(len(sys.argv)> 1):

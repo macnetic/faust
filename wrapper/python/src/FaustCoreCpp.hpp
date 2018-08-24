@@ -46,6 +46,15 @@
 #include <iostream>
 #include <exception>
 
+
+template<typename FPP>
+FaustCoreCpp<FPP>::FaustCoreCpp(Faust::TransformHelper<FPP,Cpu> &th)
+{
+    this->transform = th;
+}
+
+
+
     template<typename FPP>
 void FaustCoreCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbcol)
 {

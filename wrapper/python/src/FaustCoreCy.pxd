@@ -73,3 +73,52 @@ cdef extern from "FaustCoreCpp.h" :
                                              unsigned int min_num_factors, unsigned int max_num_factors,
                                              unsigned int min_dim_size,
                                              unsigned int max_dim_size, float density)
+
+cdef extern from "FaustFact.h":
+    cdef cppclass PyxConstraintGeneric:
+        int name
+        unsigned long num_rows
+        unsigned long num_cols
+
+    cdef cppclass PyxConstraintInt(PyxConstraintGeneric):
+        unsigned long parameter
+
+    cdef cppclass PyxConstraintScalar[FPP](PyxConstraintGeneric):
+        FPP parameter
+
+    cdef cppclass PyxConstraintMat[FPP](PyxConstraintGeneric):
+        FPP* parameter # shape = num_rows, num_cols
+
+    cdef cppclass PyxStoppingCriterion[FPP]:
+        bool is_criterion_error
+        int num_its
+        FPP error_treshold
+        unsigned long max_num_its
+
+    cdef cppclass PyxParamsFact[FPP]:
+        int num_facts
+        bool is_update_way_R2L
+        FPP init_lambda
+        FPP** init_facts # num_facts elts
+        unsigned long* init_fact_sizes
+        FPP step_size
+        PyxConstraintGeneric** constraints # (num_facts-1)*2 elts
+        unsigned int num_constraints
+        bool is_verbose
+        bool constant_step_size
+
+    cdef cppclass PyxParamsFactPalm4MSA[FPP](PyxParamsFact[FPP]):
+        PyxStoppingCriterion stop_crit
+
+    cdef cppclass PyxParamsHierarchicalFact[FPP](PyxParamsFact[FPP]):
+        unsigned int num_rows
+        unsigned int num_cols
+        PyxStoppingCriterion* stop_crits #must be of size 2
+        bool is_fact_side_left
+
+    cdef FaustCoreCpp[FPP]* fact_palm4MSA[FPP](FPP*,unsigned int, unsigned int,
+                                             PyxParamsFactPalm4MSA[FPP]*)
+
+    cdef FaustCoreCpp[FPP]* fact_hierarchical[FPP](FPP*,unsigned int, unsigned int,
+                                             PyxParamsHierarchicalFact[FPP]*)
+

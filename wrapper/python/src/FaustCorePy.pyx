@@ -39,6 +39,8 @@
 
 # importer le module Cython faisant le lien avec la class C++
 cimport FaustCoreCy
+from FaustCoreCy cimport PyxConstraintGeneric, PyxConstraintInt, \
+PyxConstraintMat, PyxConstraintScalar, PyxStoppingCriterion, PyxParamsFactPalm4MSA
 
 import numpy as np
 cimport numpy as np
@@ -47,8 +49,7 @@ import copy
 from libc.stdlib cimport malloc, free;
 from libc.stdio cimport printf
 from libc.string cimport memcpy, strlen;
-from libcpp cimport bool
-from libcpp cimport complex
+from libcpp cimport bool, complex
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from scipy import sparse
 from re import match
@@ -205,13 +206,14 @@ cdef class FaustCore:
         if not isinstance(M, (np.ndarray) ):
             raise ValueError('input M must a numpy ndarray')
         if(self._isReal):
-            M=M.astype(float,'F')
-            if not M.dtype=='float':
-                raise ValueError('input M must be double array')
+           M=M.astype(float,'F')
+           if not M.dtype=='float':
+               raise ValueError('input M must be double array')
         else:
-            M=M.astype(complex,'F')
-            if(M.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
-                raise ValueError('input M must be complex array')
+           M=M.astype(complex,'F')
+           if(M.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
+               raise ValueError('input M must be complex array')
+        #TODO: raise exception if not real nor complex
         if not M.flags['F_CONTIGUOUS']:
             raise ValueError('input M must be Fortran contiguous (Colmajor)')
 
@@ -219,7 +221,8 @@ cdef class FaustCore:
 
         if (ndim_M > 2) | (ndim_M < 1):
             raise ValueError('input M invalid number of dimensions')
-
+        check_matrix(self._isReal, M)
+        ndim_M=M.ndim
         cdef unsigned int nbrow_x=M.shape[0]
         cdef unsigned int nbcol_x #can't be assigned because we don't know yet if the input vector is 1D or 2D
 
@@ -279,7 +282,7 @@ cdef class FaustCore:
 
         return y
 
-
+    
 
     # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)
     def display(self):
@@ -419,3 +422,319 @@ cdef class FaustCore:
             del self.core_faust_dbl
         else:
             del self.core_faust_cplx
+
+cdef check_matrix(isReal, M):
+        if not isinstance(M, (np.ndarray) ):
+            raise ValueError('input M must a numpy ndarray')
+        if(isReal):
+            M=M.astype(float,'F')
+            if not M.dtype=='float':
+                raise ValueError('input M must be double array')
+        else:
+            M=M.astype(complex,'F')
+            if(M.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
+                raise ValueError('input M must be complex array')
+        #TODO: raise exception if not real nor complex
+        if not M.flags['F_CONTIGUOUS']:
+            raise ValueError('input M must be Fortran contiguous (Colmajor)')
+
+        ndim_M=M.ndim;
+
+        if (ndim_M > 2) | (ndim_M < 1):
+            raise ValueError('input M invalid number of dimensions')
+
+
+cdef class FaustFact:
+
+    @staticmethod
+    def fact_palm4MSA(M, p):
+        isReal = M.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+        # double == float64
+        #TODO: it not float nor complex, raise exception
+        check_matrix(isReal, M)
+
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+
+        cdef double[:,:] Mview
+        cdef complex[:,:] Mview_cplx
+
+        cdef double[:,:] tmp_mat
+        cdef complex[:,:] tmp_mat_cplx
+
+        cdef FaustCoreCy.PyxParamsFactPalm4MSA[double] cpp_params
+        cdef FaustCoreCy.PyxParamsFactPalm4MSA[complex] cpp_params_cplx
+        cdef PyxStoppingCriterion[double] cpp_stop_crit
+        # template parameter is always double (never complex) because no need
+        # to have a treshold error of complex type (it wouldn't make sense)
+        cdef PyxConstraintGeneric** cpp_constraints
+
+        cpp_stop_crit.is_criterion_error = p.stop_crit.is_criterion_error
+        cpp_stop_crit.error_treshold = p.stop_crit.error_treshold
+        cpp_stop_crit.num_its = p.stop_crit.num_its
+        cpp_stop_crit.max_num_its = p.stop_crit.max_num_its
+
+        if(isReal):
+            Mview=M
+            cpp_params.num_facts = p.num_facts
+            cpp_params.is_update_way_R2L = p.is_update_way_R2L
+            cpp_params.init_lambda = p.init_lambda
+            cpp_params.step_size = p.step_size
+            cpp_params.stop_crit = cpp_stop_crit
+            cpp_params.init_facts = <double**> \
+                    PyMem_Malloc(sizeof(double*)*p.num_facts)
+            cpp_params.init_fact_sizes = <unsigned long*> \
+            PyMem_Malloc(sizeof(unsigned long)*2*p.num_facts)
+            cpp_params.is_verbose = p.is_verbose
+            cpp_params.constant_step_size = p.constant_step_size
+        else:
+            Mview_cplx=M
+            cpp_params_cplx.num_facts = p.num_facts
+            cpp_params_cplx.num_facts = p.num_facts
+            cpp_params_cplx.is_update_way_R2L = p.is_update_way_R2L
+            cpp_params_cplx.init_lambda = p.init_lambda
+            cpp_params_cplx.step_size = p.step_size
+            cpp_params_cplx.init_facts = <complex**> \
+                    PyMem_Malloc(sizeof(complex*)*p.num_facts)
+            cpp_params_cplx.init_fact_sizes = <unsigned long*> \
+            PyMem_Malloc(sizeof(unsigned long)*2*p.num_facts)
+            cpp_params_cplx.is_verbose = p.is_verbose
+            cpp_params_cplx.constant_step_size = p.constant_step_size
+
+
+        cpp_constraints = \
+        <PyxConstraintGeneric**> \
+        PyMem_Malloc(sizeof(PyxConstraintGeneric*)*len(p.constraints))
+
+        for i in range(0,len(p.constraints)):
+            cons = p.constraints[i]
+            #print("FaustFact.fact_palm4MSA() cons.name =", cons.name)
+            if(cons.is_int_constraint()):
+                #print("FaustFact.fact_palm4MSA() Int Constraint")
+                cpp_constraints[i] = <PyxConstraintInt*> PyMem_Malloc(sizeof(PyxConstraintInt))
+                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons.param
+            elif(cons.is_real_constraint()):
+                #print("FaustFact.fact_palm4MSA() Real Constraint")
+                cpp_constraints[i] = <PyxConstraintScalar[double]*> \
+                PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
+                (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
+                        cons.param
+            elif(cons.is_mat_constraint()):
+                #print("FaustFact.fact_palm4MSA() Matrix Constraint")
+                if(isReal):
+                    cpp_constraints[i] = <PyxConstraintMat[double]*> \
+                            PyMem_Malloc(sizeof(PyxConstraintMat[double]))
+                    tmp_mat = cons.param
+                    (<PyxConstraintMat[double]*>cpp_constraints[i]).parameter =\
+                            &tmp_mat[0,0]
+                else:
+                    cpp_constraints[i] = <PyxConstraintMat[complex]*> \
+                            PyMem_Malloc(sizeof(PyxConstraintMat[complex]))
+                    tmp_mat_cplx = cons.param
+                    (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter =\
+                            &tmp_mat_cplx[0,0]
+
+            else:
+                raise ValueError("Constraint type/name is not recognized.")
+            cpp_constraints[i].name = cons.name
+            cpp_constraints[i].num_rows = cons.num_rows
+            cpp_constraints[i].num_cols = cons.num_cols
+
+
+        if(isReal):
+            cpp_params.constraints = cpp_constraints
+            cpp_params.num_constraints = len(p.constraints)
+        else:
+            cpp_params_cplx.constraints = cpp_constraints
+            cpp_params_cplx.num_constraints = len(p.constraints)
+
+        for i in range(0,p.num_facts):
+            if(isReal):
+                tmp_mat = p.init_facts[i]
+                cpp_params.init_facts[i] = &tmp_mat[0,0]
+                cpp_params.init_fact_sizes[i*2+0] = p.init_facts[i].shape[0]
+                cpp_params.init_fact_sizes[i*2+1] = p.init_facts[i].shape[1]
+            else:
+                tmp_mat_cplx = p.init_facts[i]
+                cpp_params_cplx.init_facts[i] = &tmp_mat_cplx[0,0]
+                cpp_params_cplx.init_fact_sizes[i*2+0] = p.init_facts[i].shape[0]
+                cpp_params_cplx.init_fact_sizes[i*2+1] = p.init_facts[i].shape[1]
+
+        core = FaustCore(core=True)
+        if(isReal):
+            core.core_faust_dbl = FaustCoreCy.fact_palm4MSA(&Mview[0,0], M_num_rows, M_num_cols,
+ #           FaustCoreCy.fact_palm4MSA(&Mview[0,0], M_num_rows, M_num_cols,
+                                      &cpp_params)
+            core._isReal = True
+            #TODO: FPP == complex not yet supported by C++ code
+#        else:
+#            core.core_faust_cplx = FaustCoreCy.fact_palm4MSA(&Mview_cplx[0,0], M_num_rows, M_num_cols,
+#                                     &cpp_params_cplx)
+#            core._isReal = False
+        for i in range(0,len(p.constraints)):
+            PyMem_Free(cpp_constraints[i])
+        PyMem_Free(cpp_constraints)
+        if(isReal):
+            PyMem_Free(cpp_params.init_facts)
+            PyMem_Free(cpp_params.init_fact_sizes)
+        else:
+            PyMem_Free(cpp_params_cplx.init_facts)
+            PyMem_Free(cpp_params_cplx.init_fact_sizes)
+#
+        return core
+
+    @staticmethod
+    def fact_hierarchical(M, p):
+        isReal = M.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+        # double == float64
+        #TODO: it not float nor complex, raise exception
+        check_matrix(isReal, M)
+
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+
+        cdef double[:,:] Mview
+        cdef complex[:,:] Mview_cplx
+
+        cdef double[:,:] tmp_mat
+        cdef complex[:,:] tmp_mat_cplx
+
+        cdef FaustCoreCy.PyxParamsHierarchicalFact[double] cpp_params
+        cdef FaustCoreCy.PyxParamsHierarchicalFact[complex] cpp_params_cplx
+        cdef PyxStoppingCriterion[double]* cpp_stop_crits
+        # template parameter is always double (never complex) because no need
+        # to have a treshold error of complex type (it wouldn't make sense)
+        cdef PyxConstraintGeneric** cpp_constraints
+
+        cpp_stop_crits = <PyxStoppingCriterion[double]*>\
+        PyMem_Malloc(sizeof(PyxStoppingCriterion[double])*2)
+
+        cpp_stop_crits[0].is_criterion_error = p.stop_crits[0].is_criterion_error
+        cpp_stop_crits[0].error_treshold = p.stop_crits[0].error_treshold
+        cpp_stop_crits[0].num_its = p.stop_crits[0].num_its
+        cpp_stop_crits[0].max_num_its = p.stop_crits[0].max_num_its
+        cpp_stop_crits[1].is_criterion_error = p.stop_crits[1].is_criterion_error
+        cpp_stop_crits[1].error_treshold = p.stop_crits[1].error_treshold
+        cpp_stop_crits[1].num_its = p.stop_crits[1].num_its
+        cpp_stop_crits[1].max_num_its = p.stop_crits[1].max_num_its
+
+
+
+        if(isReal):
+            Mview=M
+            cpp_params.num_facts = p.num_facts
+            cpp_params.is_update_way_R2L = p.is_update_way_R2L
+            cpp_params.init_lambda = p.init_lambda
+            cpp_params.step_size = p.step_size
+            cpp_params.stop_crits = cpp_stop_crits
+            cpp_params.init_facts = <double**> \
+                    PyMem_Malloc(sizeof(double*)*p.num_facts)
+            cpp_params.init_fact_sizes = <unsigned long*> \
+            PyMem_Malloc(sizeof(unsigned long)*2*p.num_facts)
+            cpp_params.is_verbose = p.is_verbose
+            cpp_params.is_fact_side_left = p.is_fact_side_left
+            cpp_params.constant_step_size = p.constant_step_size
+        else:
+            Mview_cplx=M
+            cpp_params_cplx.num_facts = p.num_facts
+            cpp_params_cplx.num_facts = p.num_facts
+            cpp_params_cplx.is_update_way_R2L = p.is_update_way_R2L
+            cpp_params_cplx.init_lambda = p.init_lambda
+            cpp_params_cplx.step_size = p.step_size
+            cpp_params_cplx.init_facts = <complex**> \
+                    PyMem_Malloc(sizeof(complex*)*p.num_facts)
+            cpp_params_cplx.init_fact_sizes = <unsigned long*> \
+            PyMem_Malloc(sizeof(unsigned long)*2*p.num_facts)
+            cpp_params_cplx.is_verbose = p.is_verbose
+            cpp_params_cplx.is_fact_side_left = p.is_fact_side_left
+            cpp_params_cplx.constant_step_size = p.constant_step_size
+
+        cpp_constraints = \
+        <PyxConstraintGeneric**> \
+        PyMem_Malloc(sizeof(PyxConstraintGeneric*)*len(p.constraints))
+
+        for i in range(0,len(p.constraints)):
+            cons = p.constraints[i]
+            #print("FaustFact.fact_hierarchical() cons.name =", cons.name)
+            if(cons.is_int_constraint()):
+                #print("FaustFact.fact_hierarchical() Int Constraint")
+                cpp_constraints[i] = <PyxConstraintInt*> PyMem_Malloc(sizeof(PyxConstraintInt))
+                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons.param
+            elif(cons.is_real_constraint()):
+                #print("FaustFact.fact_hierarchical() Real Constraint")
+                cpp_constraints[i] = <PyxConstraintScalar[double]*> \
+                PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
+                (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
+                        cons.param
+            elif(cons.is_mat_constraint()):
+                #print("FaustFact.fact_hierarchical() Matrix Constraint")
+                if(isReal):
+                    cpp_constraints[i] = <PyxConstraintMat[double]*> \
+                            PyMem_Malloc(sizeof(PyxConstraintMat[double]))
+                    tmp_mat = cons.param
+                    (<PyxConstraintMat[double]*>cpp_constraints[i]).parameter =\
+                            &tmp_mat[0,0]
+                else:
+                    cpp_constraints[i] = <PyxConstraintMat[complex]*> \
+                            PyMem_Malloc(sizeof(PyxConstraintMat[complex]))
+                    tmp_mat_cplx = cons.param
+                    (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter =\
+                            &tmp_mat_cplx[0,0]
+
+            else:
+                raise ValueError("Constraint type/name is not recognized.")
+            cpp_constraints[i].name = cons.name
+            cpp_constraints[i].num_rows = cons.num_rows
+            cpp_constraints[i].num_cols = cons.num_cols
+
+        if(isReal):
+            cpp_params.constraints = cpp_constraints
+            cpp_params.num_rows = p.data_num_rows
+            cpp_params.num_cols = p.data_num_cols
+            cpp_params.num_constraints = len(p.constraints)
+        else:
+            cpp_params_cplx.constraints = cpp_constraints
+            cpp_params_cplx.num_rows = p.data_num_rows
+            cpp_params_cplx.num_cols = p.data_num_cols
+            cpp_params_cplx.num_constraints = len(p.constraints)
+
+        for i in range(0,p.num_facts):
+            if(isReal):
+                tmp_mat = p.init_facts[i]
+                cpp_params.init_facts[i] = &tmp_mat[0,0]
+                cpp_params.init_fact_sizes[i*2+0] = p.init_facts[i].shape[0]
+                cpp_params.init_fact_sizes[i*2+1] = p.init_facts[i].shape[1]
+            else:
+                tmp_mat_cplx = p.init_facts[i]
+                cpp_params_cplx.init_facts[i] = &tmp_mat_cplx[0,0]
+                cpp_params_cplx.init_fact_sizes[i*2+0] = p.init_facts[i].shape[0]
+                cpp_params_cplx.init_fact_sizes[i*2+1] = p.init_facts[i].shape[1]
+
+        core = FaustCore(core=True)
+        if(isReal):
+            core.core_faust_dbl = FaustCoreCy.fact_hierarchical(&Mview[0,0], M_num_rows, M_num_cols,
+ #           FaustCoreCy.fact_hierarchical(&Mview[0,0], M_num_rows, M_num_cols,
+                                      &cpp_params)
+            core._isReal = True
+            #TODO: FPP == complex not yet supported by C++ code
+#        else:
+#            core.core_faust_cplx = FaustCoreCy.fact_hierarchical(&Mview_cplx[0,0], M_num_rows, M_num_cols,
+#                                     &cpp_params_cplx)
+#            core._isReal = False
+        for i in range(0,len(p.constraints)):
+            PyMem_Free(cpp_constraints[i])
+        PyMem_Free(cpp_constraints)
+        if(isReal):
+            PyMem_Free(cpp_params.init_facts)
+            PyMem_Free(cpp_params.init_fact_sizes)
+        else:
+            PyMem_Free(cpp_params_cplx.init_facts)
+            PyMem_Free(cpp_params_cplx.init_fact_sizes)
+
+        PyMem_Free(cpp_stop_crits)
+
+        return core

@@ -116,7 +116,7 @@ class Faust:
             scale: a multiplicative scalar (see examples below).
             core_obj: for internal purpose only. Please don't fill this argument.
 
-        WARNING: filepath and factors arguments are multually exclusive. If you
+        WARNING: filepath and factors arguments are mutually exclusive. If you
         use filepath you must explicitely set argument with the keyword.
 
         Examples:
@@ -195,11 +195,11 @@ class Faust:
             >>> F = Faust.rand(2, 10, .5, is_real=False)
             >>> G = Faust.rand([2, 5], [10, 20], .5, fac_type="dense")
             >>> F
-            Faust size 10x10, density 0.99, nnz_sum 99, 2 factor(s):<br/>
+            Faust size 10x10, density 0.99, nnz_sum 99, 2 factors:<br/>
             FACTOR 0 (complex) SPARSE, size 10x10, density 0.4, nnz 40<br/>
             FACTOR 1 (complex) DENSE, size 10x10, density 0.59, nnz 59<br/>
             >>> G
-            Faust size 19x16, density 1.37171, nnz_sum 417, 4 factor(s):<br/>
+            Faust size 19x16, density 1.37171, nnz_sum 417, 4 factors:<br/>
             FACTOR 0 (real) DENSE, size 19x17, density 0.49226, nnz 159<br/>
             FACTOR 1 (real) DENSE, size 17x10, density 0.517647, nnz 88<br/>
             FACTOR 2 (real) DENSE, size 10x13, density 0.515385, nnz 67<br/>
@@ -457,12 +457,12 @@ class Faust:
             >>> from pyfaust import Faust
             >>> F = Faust.rand([1, 2], [50, 100], .5)
             >>> F.display()
-            Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factor(s):<br/>
+            Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factors:<br/>
             FACTOR 0 (real) SPARSE, size 98x78, density 0.395081, nnz 3020<br/>
             FACTOR 1 (real) SPARSE, size 78x82, density 0.390869, nnz 2500<br/>
 
             >>> F
-            Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factor(s):<br/>
+            Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factors:<br/>
             FACTOR 0 (real) SPARSE, size 98x78, density 0.395081, nnz 3020<br/>
             FACTOR 1 (real) SPARSE, size 78x82, density 0.390869, nnz 2500<br/>
             <!-- >>> -->
@@ -544,7 +544,7 @@ class Faust:
         Examples:
             >>> from pyfaust import Faust
             >>> F = Faust.rand(5, 10**6, .00001, 'sparse')
-               Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factor(s):<br/>
+               Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factors:<br/>
                 FACTOR 0 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
                 FACTOR 1 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
                 FACTOR 2 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
@@ -582,7 +582,7 @@ class Faust:
             >>> from pyfaust import Faust
             >>> F = Faust.rand(5, 10**6, .00001, 'sparse')
             >>> F
-            Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factor(s):<br/>
+            Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factors:<br/>
             FACTOR 0 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
             FACTOR 1 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
             FACTOR 2 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
@@ -926,3 +926,233 @@ class Faust:
             return np.dtype(np.float64)
         else:
             return np.dtype(np.complex)
+
+class FaustFactory:
+
+    @staticmethod
+    def fact_palm4msa(M, p):
+        """
+        Factorizes the matrix M using the parameters set in p.
+
+        Args:
+            M: the numpy matrix to factorize.
+            p: the ParamsPalm4MSA instance to define the algorithm parameters.
+
+        Returns:
+            A Faust object as the result of the factorization.
+
+        Examples:
+        >>> from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintScalar,\
+        >>> ConstraintName, StoppingCriterion
+        >>> import numpy as np
+        >>> num_facts = 2
+        >>> is_update_way_R2L = False
+        >>> init_lambda = 1.0
+        >>> init_facts = list()
+        >>> init_facts.append(np.zeros([500,32]))
+        >>> init_facts.append(np.eye(32))
+        >>> M = np.random.rand(500, 32)
+        >>> cons1 = ConstraintScalar(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+        >>> cons2 = ConstraintScalar(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0)
+        >>> stop_crit = StoppingCriterion(num_its=200)
+        >>> # default step_size is 1e-16
+        >>> param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
+        >>>                        init_facts, [cons1, cons2], stop_crit,
+        >>>                        is_verbose=False)
+        >>> F = FaustFactory.fact_palm4msa(M, param)
+        >>> F.display()
+        Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):<br/>
+        FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500<br/>
+        FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024<br/>
+        >>> # verify if NORMCOL constraint is respected by the 2nd factor
+        >>> from numpy.linalg import norm
+        >>> for i in range(0, F.get_factor(1).shape[1]):
+        >>>     if(i<F.get_factor(1).shape[1]-1):
+        >>>             end=' '
+        >>>     else:
+        >>>             end='\n'
+        >>>     print(norm(F.get_factor(1)[:,i]), end=end)
+        1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0
+        """
+        if(not isinstance(p, ParamsPalm4MSA)):
+            raise ValueError("p must be a ParamsPalm4MSA object.")
+        return Faust(core_obj=FaustCorePy.FaustFact.fact_palm4MSA(M, p))
+
+    @staticmethod
+    def fact_hierarchical(M, p):
+        """
+        Factorizes the matrix M using the parameters set in p.
+
+        Args:
+            M: the numpy matrix to factorize.
+            p: the ParamsHierarchicalFact instance to define the algorithm parameters.
+
+        Returns:
+            A Faust object as the result of the factorization.
+
+        Examples:
+		>>> from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintScalar,\
+		>>> ConstraintName, StoppingCriterion
+		>>> import numpy as np
+		>>> num_facts = 4
+		>>> is_update_way_R2L = False
+		>>> init_lambda = 1.0
+		>>> init_facts = list()
+		>>> init_facts.append(np.zeros([500,32]))
+		>>> for i in range(1,num_facts):
+		>>>     init_facts.append(np.zeros([32,32]))
+		>>> M = np.random.rand(500, 32)
+		>>> cons1 = ConstraintScalar(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+		>>> cons2 = ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32, 96)
+		>>> cons3 = ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32, 96)
+		>>> cons4 = ConstraintScalar(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1)
+		>>> cons5 =  ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32, 666)
+		>>> cons6 =  ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32, 333)
+		>>> stop_crit1 = StoppingCriterion(num_its=200)
+		>>> stop_crit2 = StoppingCriterion(num_its=200)
+		>>> param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
+		>>>                                init_facts, [cons1, cons2, cons3, cons4,
+		>>>                                            cons5, cons6],
+		>>>                                M.shape[0],M.shape[1],[stop_crit1,
+		>>>                                                       stop_crit2],
+		>>>                                is_verbose=False)
+		>>> F = FaustFactory.fact_hierarchical(M, param)
+		Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
+        1/3<br/>
+		Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
+        2/3<br/>
+		Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
+        3/3<br/>
+		>>> F.display()
+		Faust size 500x32, density 0.189063, nnz_sum 3025, 4 factor(s):
+		- FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
+		- FACTOR 1 (real) SPARSE, size 32x32, density 0.09375, nnz 96
+		- FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
+		- FACTOR 3 (real) DENSE, size 32x32, density 0.325195, nnz 333
+        """
+        if(not isinstance(p, ParamsHierarchicalFact)):
+            raise ValueError("p must be a ParamsPalm4MSA object.")
+        return Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
+
+class ParamsFact(object):
+
+    def __init__(self, num_facts, is_update_way_R2L, init_lambda, init_facts,
+                 constraints, step_size, constant_step_size = False, is_verbose = False,
+                 ):
+        self.num_facts = num_facts
+        self.is_update_way_R2L = is_update_way_R2L
+        self.init_lambda = init_lambda
+        self.init_facts = init_facts
+        self.step_size = step_size
+        self.constraints = constraints
+        self.is_verbose = is_verbose
+        self.constant_step_size = constant_step_size
+        #TODO: raise exception if num_facts != len(init_facts)
+        #TODO: likewise for constraints
+
+class ParamsPalm4MSA(ParamsFact):
+
+    def __init__(self, num_facts, is_update_way_R2L, init_lambda, init_facts,
+                 constraints, stop_crit, step_size = 10.0**-16,
+                 constant_step_size = False,
+                 is_verbose = False):
+        super(ParamsPalm4MSA, self).__init__(num_facts, is_update_way_R2L, init_lambda, init_facts,
+                                             constraints, step_size,
+                                             constant_step_size,
+                                             is_verbose)
+        self.stop_crit = stop_crit
+        # TODO: raise exception if stop_crit not a StoppingCriterion object
+
+class ParamsHierarchicalFact(ParamsFact):
+
+    def __init__(self, num_facts, is_update_way_R2L, init_lambda, init_facts,
+                 constraints, data_num_rows, data_num_cols, stop_crits,
+                 step_size = 10.0**-16, constant_step_size = False,
+                 is_verbose = False,
+                 is_fact_side_left = False):
+        super(ParamsHierarchicalFact, self).__init__(num_facts, is_update_way_R2L, init_lambda, init_facts,
+                                                     constraints, step_size,
+                                                     constant_step_size,
+                                                     is_verbose)
+        self.data_num_rows = data_num_rows
+        self.data_num_cols = data_num_cols
+        self.stop_crits = stop_crits
+        self.is_fact_side_left = is_fact_side_left
+        # TODO: raise exception if stop_crits len != 2 or not StoppingCriterion
+        # objects
+
+class StoppingCriterion(object):
+
+    def __init__(self, is_criterion_error = False , error_treshold = 0.3,
+                 num_its = 500,
+                 max_num_its = 1000):
+        self.is_criterion_error = is_criterion_error
+        self.error_treshold = error_treshold
+        self.num_its = num_its
+        self.max_num_its = max_num_its
+        #TODO: check_validity() like C++ code does
+
+class ConstraintName:
+    SP = 0 # Int Constraint
+    SPCOL = 1 # Int Constraint
+    SPLIN=2 # Int Constraint
+    NORMCOL = 3 # Real Constraint
+    SPLINCOL = 4 # Int Constraint
+    CONST = 5 # Mat Constraint
+    SP_POS = 6 # Int Constraint
+    #BLKDIAG = 7 # ?? Constraint #TODO
+    SUPP = 8 # Mat Constraint
+    NORMLIN = 9 # Real Constraint
+
+    def __init__(self, name):
+        if(name < ConstraintName.SP or name > ConstraintName.NORMLIN):
+            raise ValueError("name must be an integer among ConstraintName.SP,"
+                             "ConstraintName.SPCOL, ConstraintName.NORMCOL,"
+                             "ConstraintName.SPLINCOL, ConstraintName.CONST,"
+                             "ConstraintName.SP_POS," # ConstraintName.BLKDIAG,
+                             "ConstraintName.SUPP, ConstraintName.NORMLIN")
+        self.name = name
+
+    def is_int_constraint(self):
+        return self.name in [ ConstraintName.SP, ConstraintName.SPCOL,
+                             ConstraintName.SPLIN, ConstraintName.SPLINCOL,
+                             ConstraintName.SP_POS ]
+
+    def is_real_constraint(self):
+        return self.name in [ ConstraintName.NORMCOL, ConstraintName.NORMLIN ]
+
+    def is_mat_constraint(self):
+        return self.name in [ConstraintName.SUPP, ConstraintName.CONST ]
+
+class ConstraintGeneric(object):
+
+    def __init__(self, name , num_rows, num_cols):
+        self.value = name
+        self.num_rows = num_rows
+        self.num_cols = num_cols
+
+    @property
+    def name(self):
+        return self.value.name
+
+    def is_int_constraint(self):
+        return self.value.is_int_constraint()
+
+    def is_real_constraint(self):
+        return self.value.is_real_constraint()
+
+    def is_mat_constraint(self):
+        return self.value.is_mat_constraint()
+
+class ConstraintScalar(ConstraintGeneric):
+
+    def __init__(self, name, num_rows, num_cols, param):
+        super(ConstraintScalar, self).__init__(name, num_rows, num_cols)
+        self.param = param # raise value error if not np.number (can be complex
+        # or float/double or integer
+
+class ConstraintMat(ConstraintGeneric):
+
+    def __init__(self, name, num_rows, num_cols, param):
+        super(ConstraintMat, self).__init__(name, num_rows, num_cols)
+        self.param = param #TODO: raise ValueError if not np.ndarray
