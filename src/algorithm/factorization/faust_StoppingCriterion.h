@@ -63,6 +63,8 @@ namespace Faust
 
           StoppingCriterion(bool isCriterionError_);
 
+          StoppingCriterion(int nb_it, bool isCriterionError, T errorThreshold, int maxIteration=10000);
+
           ~StoppingCriterion(){}
 
           bool do_continue(int current_ite, T error=-2.0)const;

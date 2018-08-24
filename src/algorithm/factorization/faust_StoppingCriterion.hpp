@@ -61,6 +61,14 @@ Faust::StoppingCriterion<T>::StoppingCriterion(bool isCriterionError_) : isCrite
 }
 
 template<typename T>
+Faust::StoppingCriterion<T>::StoppingCriterion(int nb_it, bool isCriterionError, T errorThreshold, int maxIteration /* default 10000 */):
+	nb_it(nb_it), isCriterionError(isCriterionError), errorThreshold(errorThreshold), maxIteration(maxIteration)
+{
+	check_validity();
+}
+
+
+template<typename T>
 void Faust::StoppingCriterion<T>::check_validity()const
 {
    if (isCriterionError)
