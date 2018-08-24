@@ -679,7 +679,8 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate)
 	//		Mat_VarPrint(var,1);
 	delete[] jc;
 	delete[] ir;
-	delete[] data;
+	if(!opt)
+		delete[] data;
 	return var;
 }
 
