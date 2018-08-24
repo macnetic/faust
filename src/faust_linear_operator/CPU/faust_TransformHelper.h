@@ -42,6 +42,7 @@ namespace Faust {
 			TransformHelper(TransformHelper<FPP,Cpu>* th);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]);
+			TransformHelper(Transform<FPP,Cpu> &t);
 
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x) const;
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose);

@@ -22,6 +22,14 @@ namespace Faust {
 	}
 
 	template<typename FPP>
+		TransformHelper<FPP,Cpu>::TransformHelper(Transform<FPP,Cpu> &t) : is_transposed(false), is_conjugate(false), is_sliced(false)
+	{
+		//TODO: transform is useless
+		//		Transform<FPP,Cpu>* transform = new Transform<FPP,Cpu>();
+		this->transform = make_shared<Transform<FPP,Cpu>>(t);
+	}
+
+	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right)
 		: is_transposed(false), is_conjugate(false), is_sliced(false)
 		{
