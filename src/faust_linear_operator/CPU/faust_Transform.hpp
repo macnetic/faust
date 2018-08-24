@@ -211,13 +211,13 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 }
 
 template<typename FPP>
-Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts):	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
+Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts, const bool optimizedCopy /*default value = false*/ ):	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	totalNonZeros(0)
 {
 	data.resize(facts.size());
 	for (int i=0 ; i<data.size() ; i++)
 	{
-		data[i]=facts[i].Clone();
+		data[i]=facts[i].Clone(optimizedCopy);
 		totalNonZeros += data[i]->getNonZeros();
 	}
 

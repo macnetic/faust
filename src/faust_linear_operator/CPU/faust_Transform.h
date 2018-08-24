@@ -108,7 +108,7 @@ namespace Faust
 
 				/** \brief Constructor
 				 * \param facts : Vector including dense matrix*/
-				Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts);
+				Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts, const bool optimizedCopy=false);
 
 				//void get_facts(std::vector<Faust::MatSparse<FPP,Cpu> >& sparse_facts)const{sparse_facts = data;}
 				//void get_facts(std::vector<Faust::MatDense<FPP,Cpu> >& facts)const;
