@@ -58,64 +58,78 @@ typedef @TEST_FPP@ FPP;
  */
 int main()
 {
-  Faust::MatDense<FPP,Cpu> data, initFacts1, initFacts2;
+	Faust::MatDense<FPP,Cpu> data, initFacts1, initFacts2;
 
-  char configPalm2Filename[] = "@FAUST_DATA_MAT_DIR@/config_compared_palm2.mat";
+	char configPalm2Filename[] = "@FAUST_DATA_MAT_DIR@/config_compared_palm2.mat";
 
-  init_faust_mat_from_matio(data, configPalm2Filename, "data");
-  init_faust_mat_from_matio(initFacts1, configPalm2Filename, "init_facts1");
-  init_faust_mat_from_matio(initFacts2, configPalm2Filename, "init_facts2");
+	init_faust_mat_from_matio(data, configPalm2Filename, "data");
+	init_faust_mat_from_matio(initFacts1, configPalm2Filename, "init_facts1");
+	init_faust_mat_from_matio(initFacts2, configPalm2Filename, "init_facts2");
 
-  int cons1Name, cons1Parameter, cons1Row, cons1Col;
-  int cons2Name, cons2Row, cons2Col;
-  FPP cons2Parameter;
-  int nfacts, niter;
-  bool updateWay, verbose;
-  double initLambda;
+	int cons1Name, cons1Parameter, cons1Row, cons1Col;
+	int cons2Name, cons2Row, cons2Col;
+	FPP cons2Parameter;
+	int nfacts, niter;
+	bool updateWay, verbose;
+	double initLambda;
 
-  cons1Name = init_int_from_matio(configPalm2Filename, "cons1_name");
-  cons1Parameter = init_int_from_matio(configPalm2Filename, "cons1_parameter");
-  cons1Row = init_int_from_matio(configPalm2Filename, "cons1_row");
-  cons1Col = init_int_from_matio(configPalm2Filename, "cons1_col");
+	cons1Name = init_int_from_matio(configPalm2Filename, "cons1_name");
+	cons1Parameter = init_int_from_matio(configPalm2Filename, "cons1_parameter");
+	cons1Row = init_int_from_matio(configPalm2Filename, "cons1_row");
+	cons1Col = init_int_from_matio(configPalm2Filename, "cons1_col");
 
-  cons2Name = init_int_from_matio(configPalm2Filename, "cons2_name");
-  cons2Parameter = (FPP) init_double_from_matio(configPalm2Filename, "cons2_parameter");
-  cons2Row = init_int_from_matio(configPalm2Filename, "cons2_row");
-  cons2Col = init_int_from_matio(configPalm2Filename, "cons2_col");
-
-
-  initLambda = (FPP) init_double_from_matio(configPalm2Filename, "init_lambda");
-  nfacts = init_int_from_matio(configPalm2Filename, "nfacts");
-  niter = init_int_from_matio(configPalm2Filename, "niter");
-
-  updateWay = init_bool_from_matio(configPalm2Filename, "update_way");
-  verbose = init_bool_from_matio(configPalm2Filename, "verbose");
-
-  // Creation du vecteur de contrainte
-  const Faust::ConstraintInt<FPP,Cpu> cons1(static_cast<faust_constraint_name>(cons1Name), cons1Parameter, cons1Row, cons1Col);
-  const Faust::ConstraintFPP<FPP,Cpu> cons2(static_cast<faust_constraint_name>(cons2Name), cons2Parameter, cons2Row, cons2Col);
-
-  vector<const Faust::ConstraintGeneric<FPP,Cpu>*> cons;
-  cons.push_back(&cons1);
-  cons.push_back(&cons2);
+	cons2Name = init_int_from_matio(configPalm2Filename, "cons2_name");
+	cons2Parameter = (FPP) init_double_from_matio(configPalm2Filename, "cons2_parameter");
+	cons2Row = init_int_from_matio(configPalm2Filename, "cons2_row");
+	cons2Col = init_int_from_matio(configPalm2Filename, "cons2_col");
 
 
-  // Creation du vecteur de matrice initFact;
-  vector<Faust::MatDense<FPP,Cpu> > initFact;
-  initFact.push_back(initFacts1);
-  initFact.push_back(initFacts2);
+	initLambda = (FPP) init_double_from_matio(configPalm2Filename, "init_lambda");
+	nfacts = init_int_from_matio(configPalm2Filename, "nfacts");
+	niter = init_int_from_matio(configPalm2Filename, "niter");
 
-  // Creation du critere d'arret
-  Faust::StoppingCriterion<FPP> crit(niter);
+	updateWay = init_bool_from_matio(configPalm2Filename, "update_way");
+	verbose = init_bool_from_matio(configPalm2Filename, "verbose");
 
-  Faust::ParamsPalm<FPP,Cpu> params(data, nfacts, cons, initFact, crit, verbose, updateWay, initLambda);
+	// Creation du vecteur de contrainte
+	const Faust::ConstraintInt<FPP,Cpu> cons1(static_cast<faust_constraint_name>(cons1Name), cons1Parameter, cons1Row, cons1Col);
+	const Faust::ConstraintFPP<FPP,Cpu> cons2(static_cast<faust_constraint_name>(cons2Name), cons2Parameter, cons2Row, cons2Col);
 
-  Faust::BlasHandle<Cpu> blasHandle;
-
-  Faust::Palm4MSA<FPP,Cpu> palm2(params,blasHandle,true);
-
-  palm2.next_step();
+	vector<const Faust::ConstraintGeneric<FPP,Cpu>*> cons;
+	cons.push_back(&cons1);
+	cons.push_back(&cons2);
 
 
-return 0;
+	// Creation du vecteur de matrice initFact;
+	vector<Faust::MatDense<FPP,Cpu> > initFact;
+	initFact.push_back(initFacts1);
+	initFact.push_back(initFacts2);
+
+	// Creation du critere d'arret
+	Faust::StoppingCriterion<FPP> crit(niter);
+
+	Faust::ParamsPalm<FPP,Cpu> params(data, nfacts, cons, initFact, crit, verbose, updateWay, initLambda);
+
+
+	Faust::BlasHandle<Cpu> blasHandle;
+
+	Faust::Palm4MSA<FPP,Cpu> palm2(params,blasHandle,true);
+
+//	palm2.next_step();
+	palm2.compute_facts();
+	const std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = palm2.get_facts();
+
+	Faust::Transform<FPP, Cpu>* t = new Faust::Transform<FPP, Cpu>(full_facts);
+	//relativeError
+	Faust::MatDense<FPP,Cpu> faustProduct;
+	faustProduct=t->get_product();
+	faustProduct-=data;
+	FPP relativeError = faustProduct.norm()/data.norm();
+
+	std::cout<<std::endl;
+	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+	std::cout<< "\t\t" << relativeError<<std::endl<<std::endl;
+
+
+	return 0;
 }
