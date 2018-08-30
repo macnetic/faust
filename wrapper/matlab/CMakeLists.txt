@@ -33,6 +33,13 @@ if (BUILD_OPENBLAS)
 	include_directories(${OPENBLAS_INC_DIR})
 endif(BUILD_OPENBLAS)
 
+#message(FATAL_ERROR ${FAUST_MATLAB_MATFAUST_CLASS_LIST})
+foreach(MATFAUST_CLASS IN LISTS FAUST_MATLAB_MATFAUST_CLASS_LIST)
+	message(STATUS "matfaust class: " ${MATFAUST_CLASS})
+	configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_CLASS} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_CLASS} COPYONLY)
+	#TODO: use script generating inline doc (except for windows version)
+endforeach()
+
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 
 

@@ -117,7 +117,9 @@ int main()
 
 //	palm2.next_step();
 	palm2.compute_facts();
-	const std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = palm2.get_facts();
+    std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = const_cast< std::vector<Faust::MatDense<FPP,Cpu> >&>(palm2.get_facts());
+	FPP lambda = palm2.get_lambda();
+	(full_facts[0]) *= lambda;
 
 	Faust::Transform<FPP, Cpu>* t = new Faust::Transform<FPP, Cpu>(full_facts);
 	//relativeError

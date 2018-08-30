@@ -469,22 +469,22 @@ void setVectorFaustMat(std::vector<Faust::MatDense<FPP,Cpu> > &vecMat,mxArray *C
 	mwSize nbFact = mxGetNumberOfElements(Cells);
 	Faust::MatDense<FPP,Cpu> mat;
 	vecMat.resize(0);
-	mexPrintf("cells_size : %d\n",nbFact);
+//	mexPrintf("cells_size : %d\n",nbFact);
 	for (mwSize i=0;i<nbFact;i++)
 	{
-		mexPrintf("i : %d\n",i);
+//		mexPrintf("i : %d\n",i);
 		mxMat=mxGetCell(Cells,i);
-		mexPrintf("mxMat set\n",i);
+//		mexPrintf("mxMat set\n",i);
 		if (mxMat == NULL)
 		{
 			mexErrMsgTxt("tools_mex.h:setVectorFaustMat :input matrix is empty.");
 		}
-		mexPrintf("mxMat test_empty\n",i);
+//		mexPrintf("mxMat test_empty\n",i);
 		mxArray2FaustMat(mxMat,mat);
-		mexPrintf("mat set\n",i);
+//		mexPrintf("mat set\n",i);
 		vecMat.push_back(mat);
 	}
-	mexPrintf("fin SetVectorFaustMat\n");
+//	mexPrintf("fin SetVectorFaustMat\n");
 }
 
 
@@ -495,68 +495,73 @@ void setVectorFaustMat(std::vector<Faust::MatDense<FPP,Cpu> > &vecMat,mxArray *C
 template<typename FPP>
 void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS,mxArray* mxCons)
 {
-    mwSize bufCharLen,nbRowCons,nbColCons,nb_params;
-    int status;
-    char * consName;
-    double paramCons;
-    mxArray * mxConsParams;
-
-    nb_params = mxGetNumberOfElements(mxCons);
+	mwSize bufCharLen,nbRowCons,nbColCons,nb_params;
+	int status;
+	char * consName;
+	double paramCons;
+	mxArray * mxConsParams;
 	if (!mxIsCell(mxCons))
 		mexErrMsgTxt("tools_mex.h : getConstraint : constraint must be a cell-array. ");
+	nb_params = mxGetNumberOfElements(mxCons);
 	if (nb_params != 4)
 		mexErrMsgTxt("tools_mex.h : getConstraint : size of constraint must be equal to 4. ");
 
-    mxConsParams=mxGetCell(mxCons,0);
+//	mexPrintf("getConstraint() nb_params=%d\n", nb_params);
+	mxConsParams=mxGetCell(mxCons,0);
 	if (!mxIsChar(mxConsParams))
 		mexErrMsgTxt("tools_mex.h : getConstraint : constraint first cell of the constraint must be a character  ");
-    bufCharLen = mxGetNumberOfElements(mxConsParams)+1;
-    consName = (char *) mxCalloc(bufCharLen,sizeof(char));
-    status = mxGetString(mxConsParams,consName,bufCharLen);
-    if(status)
-        mexErrMsgTxt("tools_mex.h : getConstraint : problem in mxGetString");
-    paramCons = mxGetScalar(mxConsParams);
-    mxConsParams=mxGetCell(mxCons,2);
-    nbRowCons   = (int) mxGetScalar(mxConsParams);
-    mxConsParams=mxGetCell(mxCons,3);
-    nbColCons = (int) mxGetScalar(mxConsParams);
+	//    bufCharLen = mxGetNumberOfElements(mxConsParams)+1;
+	bufCharLen = mxGetN(mxConsParams)+1; //equivalent to mxGetNumberOfElements() (chars are organized in col)
+	// but mxGetString() doc. indicates to use mxGetN/M()
+	//    mexPrintf("getConstraint() bufCharLen= %d\n", bufCharLen);
+	consName = (char *) mxCalloc(bufCharLen,sizeof(char));
+	status = mxGetString(mxConsParams,consName,bufCharLen);
+	if(status)
+		mexErrMsgTxt("tools_mex.h : getConstraint : problem in mxGetString");
+	//	mexPrintf("getConstraint() consName = %s\n", consName);
+	paramCons = mxGetScalar(mxConsParams);
+	mxConsParams=mxGetCell(mxCons,2);
+	nbRowCons   = (int) mxGetScalar(mxConsParams);
+	mxConsParams=mxGetCell(mxCons,3);
+	nbColCons = (int) mxGetScalar(mxConsParams);
 
 	int const_type = get_type_constraint(consName);
 	faust_constraint_name consNameType=get_equivalent_constraint(consName);
 
-    switch(const_type)
+	switch(const_type)
 	{
-        case 0:
-		{
+		case 0:
+			{
 
-            mxConsParams=mxGetCell(mxCons,1);
-            int  intParameter = (int) (mxGetScalar(mxConsParams)+0.5);
-             //mexPrintf("NAME  %s PARAMS %d DIMS : (%d,%d)\n",consName,intParameter,nbRowCons,nbColCons);
-            consS.push_back(new Faust::ConstraintInt<FPP,Cpu>(consNameType,intParameter,nbRowCons,nbColCons));
-            break;
-		}
+				mxConsParams=mxGetCell(mxCons,1);
+				int  intParameter = (int) (mxGetScalar(mxConsParams)+0.5);
+				//mexPrintf("NAME  %s PARAMS %d DIMS : (%d,%d)\n",consName,intParameter,nbRowCons,nbColCons);
+				consS.push_back(new Faust::ConstraintInt<FPP,Cpu>(consNameType,intParameter,nbRowCons,nbColCons));
+				break;
+			}
 		case 1:
-		{
-            mxConsParams=mxGetCell(mxCons,1);
-			FPP realParameter = (FPP) mxGetScalar(mxConsParams);
-			consS.push_back((new Faust::ConstraintFPP<FPP,Cpu>(consNameType,realParameter,nbRowCons,nbColCons)));
+			{
+				mxConsParams=mxGetCell(mxCons,1);
+				FPP realParameter = (FPP) mxGetScalar(mxConsParams);
+				consS.push_back((new Faust::ConstraintFPP<FPP,Cpu>(consNameType,realParameter,nbRowCons,nbColCons)));
 
-			break;
-		}
+				break;
+			}
 		case 2 :
-		{
-			mxConsParams=mxGetCell(mxCons,1);
-			Faust::MatDense<FPP,Cpu> matParameter;
-			mxArray2FaustMat(mxConsParams,matParameter);
-			consS.push_back((new Faust::ConstraintMat<FPP,Cpu>(consNameType,matParameter,nbRowCons,nbColCons)));
-			break;
-		}
+			{
+				mxConsParams=mxGetCell(mxCons,1);
+				Faust::MatDense<FPP,Cpu> matParameter;
+				mxArray2FaustMat(mxConsParams,matParameter);
+				consS.push_back((new Faust::ConstraintMat<FPP,Cpu>(consNameType,matParameter,nbRowCons,nbColCons)));
+				break;
+			}
 		default :
-            mexErrMsgTxt("Unknown constraint name ");
-		break;
-    }
+			mexErrMsgTxt("Unknown constraint name ");
+			break;
+	}
 
-
+	mxFree(consName); // deallocate even if the buf is in matlab managed memory
+	// the documentation advise to free managed buf in an opt. goal
 
 
 }

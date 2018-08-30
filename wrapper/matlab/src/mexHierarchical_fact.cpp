@@ -168,7 +168,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
         for (mwSize i=0;i<nbRowCons;i++)
         {
-            //mexPrintf("%d / %d\n",i,nbRowCons);
+//            mexPrintf("%d / %d\n",i,nbRowCons);
             for (mwSize j=0;j<nbColCons;j++)
             {
                 //mexPrintf("cons(%d , %d)\n",i,j);
@@ -186,28 +186,86 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 
     //niter1
-    Faust::StoppingCriterion<FFPP> crit1;
-    if (presentFields[4])
-    {
-         mxCurrentField = mxGetField(matlab_params,0,"niter1");
-        int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
-        Faust::StoppingCriterion<FFPP> newCrit1(nb_iter1);
-        crit1 = newCrit1;
-    }
+//    Faust::StoppingCriterion<FFPP> crit1;
+//    if (presentFields[4])
+//    {
+//         mxCurrentField = mxGetField(matlab_params,0,"niter1");
+//        int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
+//        Faust::StoppingCriterion<FFPP> newCrit1(nb_iter1);
+//        crit1 = newCrit1;
+//    }
     //mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
-
+	//TODO: replace by default values as constants from StoppingCriterion class
+	bool is_criterion_error = false;
+	int num_its = 500;
+	FFPP error_treshold = 0.3;
+	int max_num_its = 10000;
+	if(presentFields[4])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "niter1");
+		num_its = (int) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[10]){
+		mxCurrentField = mxGetField(matlab_params, 0, "sc_is_criterion_error");
+		is_criterion_error =  (bool) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[11])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "sc_error_treshold");
+		error_treshold = (FFPP) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[12])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "sc_max_num_its");
+		max_num_its = (int) mxGetScalar(mxCurrentField);
+	}
+	Faust::StoppingCriterion<FFPP> crit1(num_its, is_criterion_error, error_treshold, max_num_its);
     //niter2
-    Faust::StoppingCriterion<FFPP> crit2;
-    if (presentFields[5])
-    {
-         mxCurrentField = mxGetField(matlab_params,0,"niter2");
-        int nb_iter2 =(int)  mxGetScalar(mxCurrentField);
-        Faust::StoppingCriterion<FFPP> newCrit2(nb_iter2);
-        crit2 = newCrit2;
-    }
+//    Faust::StoppingCriterion<FFPP> crit2;
+//    if (presentFields[5])
+//    {
+//         mxCurrentField = mxGetField(matlab_params,0,"niter2");
+//        int nb_iter2 =(int)  mxGetScalar(mxCurrentField);
+//        Faust::StoppingCriterion<FFPP> newCrit2(nb_iter2);
+//        crit2 = newCrit2;
+//    }
     //mexPrintf("\n crit2 nb_it = %d\n",crit2.get_crit());
+	//TODO: replace by default values as constants from StoppingCriterion class
+	is_criterion_error = false;
+	num_its = 500;
+	error_treshold = 0.3;
+	max_num_its = 10000;
+	if(presentFields[5])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "niter2");
+		num_its = (int) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[13]){
+		mxCurrentField = mxGetField(matlab_params, 0, "sc_is_criterion_error2");
+		is_criterion_error =  (bool) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[14])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "sc_error_treshold2");
+		error_treshold = (FFPP) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[14])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "sc_max_num_its2");
+		max_num_its = (int) mxGetScalar(mxCurrentField);
+	}
+	Faust::StoppingCriterion<FFPP> crit2(num_its, is_criterion_error, error_treshold, max_num_its);
+   //init_facts
+    std::vector<Faust::MatDense<FFPP,Cpu> > init_facts;
+    if (presentFields[16])
+    {
+         mxCurrentField = mxGetField(matlab_params,0,"init_facts");
+//		 std::cout<<"PASSERbeforeInitFact"<<std::endl;
+		 setVectorFaustMat(init_facts,mxCurrentField);
+//		 std::cout<<"PASSERafterInitFact"<<std::endl;
 
-    //verbosity
+    }
+	//verbosity
     bool isVerbose = false;
     if (presentFields[6])
     {
@@ -252,9 +310,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       ///////////// HIERARCHICAL LAUNCH ///////////////
      // creation des parametres
 	 try{
-		std::cout<<"nb_row : "<<nb_row<<std::endl;
-		std::cout<<"nb_col : "<<nb_col<<std::endl;
-		Faust::Params<FFPP,Cpu> params(nb_row,nb_col,nbFact,consSS,std::vector<Faust::MatDense<FFPP,Cpu> >(),crit1,crit2,isVerbose,updateway,factside,init_lambda);
+//		std::cout<<"nb_row : "<<nb_row<<std::endl;
+//		std::cout<<"nb_col : "<<nb_col<<std::endl;
+		Faust::Params<FFPP,Cpu> params(nb_row,nb_col,nbFact,consSS,/*std::vector<Faust::MatDense<FFPP,Cpu> >()*/ init_facts,crit1,crit2,isVerbose,updateway,factside,init_lambda);
+
+//		params.Display();
 
 	 //DisplayParams(params);
      //creation de hierarchical fact

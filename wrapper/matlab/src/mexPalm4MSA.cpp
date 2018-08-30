@@ -83,7 +83,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     std::vector<bool> presentFields;
     testCoherencePalm4MSA(prhs[0],presentFields);
-     mexPrintf(" NUMBER FIELDS %d\n",presentFields.size());
+//     mexPrintf(" NUMBER FIELDS %d\n",presentFields.size());
 
 
 
@@ -119,9 +119,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    {
 
         mxCurrentField = mxGetField(prhs[0],0,"nfacts");
-        mexPrintf("a\n");
         nbFact =(int)  mxGetScalar(mxCurrentField);
-        mexPrintf("NB FACT : %d\n",nbFact);
+//        mexPrintf("NB FACT : %d\n",nbFact);
    }else
    {
         mexErrMsgTxt("params.nfacts must be specified");
@@ -135,7 +134,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
         mwSize nbRowCons,nbColCons;
         mxCurrentField = mxGetField(prhs[0],0,"cons");
-
         if(!mxIsCell(mxCurrentField))
         {
             mexErrMsgTxt("cons must be a cell-array");
@@ -148,6 +146,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
             mexErrMsgTxt("cons must have 1 rows");
         }
+//		mexPrintf("cons nbColCons=%d\n", nbColCons);
         if(nbColCons != (nbFact))
         {
             //mexPrintf("\n cons has %d cols and nbFact = %d\n",nbColCons,nbFact);
@@ -160,7 +159,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
             for (mwSize j=0;j<nbColCons;j++)
             {
-                mexPrintf("cons(%d)\n",j);
+//                mexPrintf("cons(%d)\n",j);
                 mxCurrentCons=mxGetCell(mxCurrentField,j);
                 getConstraint<FFPP>(consS,mxCurrentCons);
                 //consS.push_back(consToAdd);
@@ -170,33 +169,59 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
         mexErrMsgTxt("params.cons must be specified");
     }
-    std::cout<<"FINI_CONS"<<std::endl;
+//    std::cout<<"FINI_CONS"<<std::endl;
     //niter1
-    Faust::StoppingCriterion<FFPP> crit1;
-    if (presentFields[3])
-    {
-         mxCurrentField = mxGetField(prhs[0],0,"niter");
-        int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
-        Faust::StoppingCriterion<FFPP> newCrit1(nb_iter1);
-        crit1 = newCrit1;
-    }
-    mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
+//    Faust::StoppingCriterion<FFPP> crit1;
+//    if (presentFields[3])
+//    {
+//         mxCurrentField = mxGetField(prhs[0],0,"niter");
+//        int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
+//        Faust::StoppingCriterion<FFPP> newCrit1(nb_iter1);
+//        crit1 = newCrit1;
+//    }
+//    mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
 
+	//TODO: replace by default values as constants from StoppingCriterion class
+	bool is_criterion_error = false;
+	int num_its = 500;
+	FFPP error_treshold = 0.3;
+	int max_num_its = 10000;
+	if(presentFields[3])
+	{
+		mxCurrentField = mxGetField(prhs[0], 0, "niter");
+		num_its = (int) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[8]){
+		mxCurrentField = mxGetField(prhs[0], 0, "sc_is_criterion_error");
+		is_criterion_error =  (bool) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[9])
+	{
+		mxCurrentField = mxGetField(prhs[0], 0, "sc_error_treshold");
+		error_treshold = (FFPP) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[10])
+	{
+		mxCurrentField = mxGetField(prhs[0], 0, "sc_max_num_its");
+		max_num_its = (int) mxGetScalar(mxCurrentField);
+	}
+	Faust::StoppingCriterion<FFPP> crit1(num_its, is_criterion_error, error_treshold, max_num_its);
+//	crit1.Display();
     //init_facts
     std::vector<Faust::MatDense<FFPP,Cpu> > init_facts;
     if (presentFields[4])
     {
          mxCurrentField = mxGetField(prhs[0],0,"init_facts");
-		 std::cout<<"PASSERbeforeInitFact"<<std::endl;
-		setVectorFaustMat(init_facts,mxCurrentField);
-		 std::cout<<"PASSERafterInitFact"<<std::endl;
+//		 std::cout<<"PASSERbeforeInitFact"<<std::endl;
+		 setVectorFaustMat(init_facts,mxCurrentField);
+//		 std::cout<<"PASSERafterInitFact"<<std::endl;
 
     }else
 	{
 		mexErrMsgTxt("init_facts must be must be specified");
 	}
 
-	std::cout<<"PASSER1"<<std::endl;
+//	std::cout<<"PASSER1"<<std::endl;
     //verbosity
     bool isVerbose = false;
     if (presentFields[5])
@@ -241,6 +266,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
      //creation de hierarchical fact
     Faust::ParamsPalm<FFPP,Cpu> params(data,nbFact,consS,init_facts,crit1,isVerbose,updateway,init_lambda);
+//	params.Display();
 	Faust::BlasHandle<Cpu> blas_handle;
 	Faust::Palm4MSA<FFPP,Cpu> palm(params,blas_handle,false);
 	palm.compute_facts();
@@ -292,38 +318,51 @@ void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFiel
   {
         const char * fieldName;
         fieldName = mxGetFieldNameByNumber(params,i);
-        mexPrintf("fieldname %d : %s\n",i,fieldName);
+//        mexPrintf("fieldname %d : %s\n",i,fieldName);
 
         if (strcmp(fieldName,"data") == 0)
         {
             presentFields[0] = true;
         }
 
-        if (strcmp(fieldName,"nfacts") == 0)
+        else if (strcmp(fieldName,"nfacts") == 0)
         {
             presentFields[1] = true;
         }
-        if (strcmp(fieldName,"cons") == 0)
+        else if (strcmp(fieldName,"cons") == 0)
         {
             presentFields[2] = true;
         }
-        if (strcmp(fieldName,"niter") == 0)
+        else if (strcmp(fieldName,"niter") == 0)
         {
             presentFields[3] = true;
         }
-        if (strcmp(fieldName,"init_facts") == 0)
+		//sc stands for StoppingCriterion
+		else if(!strcmp(fieldName, "sc_is_criterion_error"))
+		{
+			presentFields[8] = true;
+		}
+		else if(!strcmp(fieldName, "sc_error_treshold"))
+		{
+			presentFields[9] = true;
+		}
+        else if(!strcmp(fieldName, "sc_max_num_its"))
+		{
+			presentFields[10] = true;
+		}
+		else if (strcmp(fieldName,"init_facts") == 0)
         {
             presentFields[4] = true;
         }
-        if (strcmp(fieldName,"verbose") == 0)
+        else if (strcmp(fieldName,"verbose") == 0)
         {
             presentFields[5] = true;
         }
-        if (strcmp(fieldName,"init_lambda") == 0)
+        else if (strcmp(fieldName,"init_lambda") == 0)
         {
             presentFields[6] = true;
         }
-        if (strcmp(fieldName,"update_way") == 0)
+        else if (strcmp(fieldName,"update_way") == 0)
         {
             presentFields[7] = true;
         }

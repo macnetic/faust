@@ -325,13 +325,15 @@ class TestFaustFactory(unittest.TestCase):
                                init_facts, [cons1, cons2], stop_crit,
                                is_verbose=False, constant_step_size=False)
         F = FaustFactory.fact_palm4msa(M, param)
+        #F.display()
+        #print("normF", F.norm("fro"))
         self.assertEqual(F.shape, M.shape)
         E = F.todense()-M
         #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"))
         print("err: ", norm(E,"fro")/norm(M,"fro"))
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/test_palm4MSA.cpp
-        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.98162, places=4)
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.270954109668, places=4)
 
     def testFactHierarch(self):
         print("Test FaustFactory.fact_hierarchical()")
@@ -374,7 +376,7 @@ class TestFaustFactory(unittest.TestCase):
         print("err: ", norm(E,"fro")/norm(M,"fro"))
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorization.cpp
-        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"),0.268513, places=5)
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.268513, places=5)
 
 if __name__ == "__main__":
     if(len(sys.argv)> 1):

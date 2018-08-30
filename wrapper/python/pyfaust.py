@@ -939,7 +939,7 @@ class FaustFactory:
             p: the ParamsPalm4MSA instance to define the algorithm parameters.
 
         Returns:
-            A Faust object as the result of the factorization.
+            The Faust object result of the factorization.
 
         Examples:
         >>> from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintScalar,\
@@ -988,7 +988,7 @@ class FaustFactory:
             p: the ParamsHierarchicalFact instance to define the algorithm parameters.
 
         Returns:
-            A Faust object as the result of the factorization.
+            The Faust object result of the factorization.
 
         Examples:
 		>>> from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintScalar,\

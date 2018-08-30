@@ -1332,7 +1332,8 @@ SEARCHENGINE           = YES
 #OPTIMIZE_OUTPUT_JAVA   = NO
 #OPTIMIZE_FOR_FORTRAN   = NO
 #OPTIMIZE_OUTPUT_VHDL   = NO
-#EXTENSION_MAPPING      =
+EXTENSION_MAPPING      = .m=C++ #without that option-value, matlab inheritance is not properly handled by doxygen
+				# sub-classes are just ignored
 #BUILTIN_STL_SUPPORT    = NO
 #CPP_CLI_SUPPORT        = NO
 #SIP_SUPPORT            = NO

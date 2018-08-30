@@ -147,7 +147,9 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
 
 //    palm.get_facts(faust);
 //
-    const std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = palm.get_facts();
+    std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = const_cast< std::vector<Faust::MatDense<FPP,Cpu> >&>(palm.get_facts());
+    FPP lambda = palm.get_lambda();
+    (full_facts[0]) *= lambda;
     Faust::Transform<FPP, Cpu> faust(full_facts, true);
     if(p->is_verbose) faust.Display();
 

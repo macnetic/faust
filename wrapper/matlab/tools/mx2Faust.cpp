@@ -123,7 +123,35 @@ void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
         {
             presentFields[9] = true;
         }
-        // if (strcmp(fieldName,"compute_lambda") == 0)
+		//sc stands for StoppingCriterion
+		else if(!strcmp(fieldName, "sc_is_criterion_error"))
+		{
+			presentFields[10] = true;
+		}
+		else if(!strcmp(fieldName, "sc_error_treshold"))
+		{
+			presentFields[11] = true;
+		}
+        else if(!strcmp(fieldName, "sc_max_num_its"))
+		{
+			presentFields[12] = true;
+		}        
+		else if(!strcmp(fieldName, "sc_is_criterion_error2"))
+		{
+			presentFields[13] = true;
+		}
+		else if(!strcmp(fieldName, "sc_error_treshold2"))
+		{
+			presentFields[14] = true;
+		}
+        else if(!strcmp(fieldName, "sc_max_num_its2"))
+		{
+			presentFields[15] = true;
+		}
+		else if (strcmp(fieldName,"init_facts") == 0)
+        {
+            presentFields[16] = true;
+        }// if (strcmp(fieldName,"compute_lambda") == 0)
         // {
             // presentFields[9] = true;
         // }

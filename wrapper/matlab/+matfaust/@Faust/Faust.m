@@ -373,7 +373,7 @@ classdef Faust
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b A = isreal(F)
-%>
+		%>
 		%> @retval bool 1 if F is a real Faust, 0 if it's a complex faust.
 		%>
 		%======================================================================
