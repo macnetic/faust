@@ -928,11 +928,31 @@ class Faust:
             return np.dtype(np.complex)
 
 class FaustFactory:
+    """
+    This factory class provides methods for generating a Faust especially by factorization of a dense matrix.
+
+    This class gives access to the main factorization algorithms of
+    FAµST. Those algorithms can factorize a dense matrix to a sparse product
+    (i.e. a Faust object).
+
+    There are two algorithms for factorization.
+
+    The first one is Palm4MSA :
+    which stands for Proximal Alternating Linearized Minimization for
+    Multi-layer Sparse Approximation. Note that Palm4MSA is not
+    intended to be used directly. You should rather rely on the second algorithm.
+
+    The second one is the Hierarchical Factorization algorithm:
+    this is the central algorithm to factorize a dense matrix to a Faust.
+    It makes iterative use of Palm4MSA to proceed with the factorization of a given
+    dense matrix.
+
+    """
 
     @staticmethod
     def fact_palm4msa(M, p):
         """
-        Factorizes the matrix M using the parameters set in p.
+        Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
 
         Args:
             M: the numpy matrix to factorize.
@@ -981,7 +1001,7 @@ class FaustFactory:
     @staticmethod
     def fact_hierarchical(M, p):
         """
-        Factorizes the matrix M using the parameters set in p.
+        Factorizes the matrix M with Hierarchical Factorization using the parameters set in p.
 
         Args:
             M: the numpy matrix to factorize.
@@ -1033,6 +1053,15 @@ class FaustFactory:
         if(not isinstance(p, ParamsHierarchicalFact)):
             raise ValueError("p must be a ParamsPalm4MSA object.")
         return Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
+
+    @staticmethod
+    def rand(*kwargs):
+        """
+        Generates a random Faust.
+
+        <b/> See also Faust.rand
+        """
+        return Faust.rand(*kwargs)
 
 class ParamsFact(object):
 

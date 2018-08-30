@@ -1,3 +1,23 @@
+% ======================================================================
+%> @brief     This factory class provides methods for generating a Faust especially by factorization of a dense matrix.
+%>
+%>    This class gives access to the main factorization algorithms of
+%>    FAµST. Those algorithms can factorize a dense matrix to a sparse product
+%>    (i.e. a Faust object).
+%>
+%>    There are two algorithms for factorization.
+%>
+%>    The first one is Palm4MSA :
+%>    which stands for Proximal Alternating Linearized Minimization for
+%>    Multi-layer Sparse Approximation. Note that Palm4MSA is not
+%>    intended to be used directly. You should rather rely on the second algorithm.
+%>
+%>    The second one is the Hierarchical Factorization algorithm:
+%>    this is the central algorithm to factorize a dense matrix to a Faust.
+%>    It makes iterative use of Palm4MSA to proceed with the factorization of a given
+%>    dense matrix.
+%>
+% ======================================================================
 classdef FaustFactory
 	properties (SetAccess = public)
 
@@ -24,7 +44,6 @@ classdef FaustFactory
 		%>  init_facts{1} = zeros(500,32)
 		%>  init_facts{2} = eye(32)
 		%>  M = rand(500, 32)
-		%>  M = data
 		%>  cons = cell(2,1)
 		%>  cons{1} = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5);
 		%>  cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
@@ -32,6 +51,13 @@ classdef FaustFactory
 		%>  params = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda, init_facts, cons, stop_crit);
 		%>  F = FaustFactory.fact_palm4msa(M, params)
 		%> @endcode
+		%>
+		%> F =
+		%>
+		%> Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):
+		%> - FACTOR 0 (real) DENSE, size 500x32, density 0.15625, nnz 2500
+		%> - FACTOR 1 (real) DENSE, size 32x32, density 1, nnz 1024
+		%>
 		%>
 		%==========================================================================================
 		function  F = fact_palm4msa(m, p)
@@ -125,6 +151,16 @@ classdef FaustFactory
 			[lambda, cell_facts] = mexHierarchical_fact(m, mex_params);
 			cell_facts{1} = cell_facts{1}*lambda;
 			F = Faust(cell_facts);
+		end
+
+		%==========================================================================================
+		%> @brief Generates a random Faust.
+		%>
+		%> <p>@b See @b also Faust.rand.
+		%==========================================================================================
+		function F = rand(varargin)
+			import matfaust.Faust
+			F = Faust.rand(varargin{:})
 		end
 	end
 end
