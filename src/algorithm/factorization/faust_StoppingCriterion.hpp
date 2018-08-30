@@ -107,4 +107,13 @@ bool Faust::StoppingCriterion<T>::do_continue(int current_ite, T current_error /
    }
 }
 
+template<typename T>
+void Faust::StoppingCriterion<T>::Display() const
+{
+	std::cout << "StoppingCriterion obj:" << std::endl;
+	std::cout << "\tnb_it="<< nb_it << std::endl;
+	std::cout << "\tisCriterionError="<< isCriterionError << std::endl;
+	std::cout << "\terrorTreshold="<< errorThreshold << std::endl;
+	std::cout << "\tmaxIteration="<< maxIteration << std::endl;
+}
 #endif

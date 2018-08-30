@@ -69,6 +69,7 @@ namespace Faust
 
           bool do_continue(int current_ite, T error=-2.0)const;
           int get_crit() const{return nb_it;}
+		  void Display() const;
        private:
           void check_validity()const;
 
