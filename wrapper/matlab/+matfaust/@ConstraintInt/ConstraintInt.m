@@ -5,7 +5,7 @@ classdef ConstraintInt < matfaust.ConstraintGeneric
 	methods
 		function constraint = ConstraintInt(name, num_rows, num_cols, param)
 			% check param is a int
-			if(~ isreal(param) || ~ isinteger(int64(param)) || all(size(param) ~= [1, 1]))
+			if(~ isreal(param) || ~ isinteger(int64(param)) || ~ isscalar(param))
 				error('ConstraintInt must receive an integer as param argument.')
 			end
 			constraint = constraint@matfaust.ConstraintGeneric(name, num_rows, num_cols, floor(param));

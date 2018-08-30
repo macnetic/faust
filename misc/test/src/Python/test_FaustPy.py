@@ -305,8 +305,8 @@ class TestFaustFactory(unittest.TestCase):
 
     def testFactPalm4MSA(self):
         print("Test FaustFactory.fact_palm4msa()")
-        from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintScalar,\
-        ConstraintName, StoppingCriterion
+        from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintReal,\
+        ConstraintInt, ConstraintName, StoppingCriterion
         num_facts = 2
         is_update_way_R2L = False
         init_lambda = 1.0
@@ -317,8 +317,8 @@ class TestFaustFactory(unittest.TestCase):
         M = \
         loadmat(sys.path[-1]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
         # default step_size
-        cons1 = ConstraintScalar(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
-        cons2 = ConstraintScalar(ConstraintName(ConstraintName.NORMCOL), 32,
+        cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+        cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32,
                                  32, 1.0)
         stop_crit = StoppingCriterion(num_its=200)
         param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
@@ -337,8 +337,8 @@ class TestFaustFactory(unittest.TestCase):
 
     def testFactHierarch(self):
         print("Test FaustFactory.fact_hierarchical()")
-        from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintScalar,\
-        ConstraintName, StoppingCriterion
+        from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintReal,\
+        ConstraintInt, ConstraintName, StoppingCriterion
         num_facts = 4
         is_update_way_R2L = False
         init_lambda = 1.0
@@ -350,16 +350,16 @@ class TestFaustFactory(unittest.TestCase):
         M = \
         loadmat(sys.path[-1]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
         # default step_size
-        cons1 = ConstraintScalar(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
-        cons2 = ConstraintScalar(ConstraintName(ConstraintName.SP), 32,
+        cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+        cons2 = ConstraintInt(ConstraintName(ConstraintName.SP), 32,
                                  32, 96)
-        cons3 = ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32,
+        cons3 = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32,
                                  96)
-        cons4 = ConstraintScalar(ConstraintName(ConstraintName.NORMCOL), 32, 32,
+        cons4 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32,
                                  1)
-        cons5 =  ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32,
+        cons5 =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32,
                                  666)
-        cons6 =  ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32,
+        cons6 =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32,
                                  333)
         stop_crit1 = StoppingCriterion(num_its=200)
         stop_crit2 = StoppingCriterion(num_its=200)

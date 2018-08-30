@@ -50,9 +50,9 @@ classdef (Abstract) ParamsFact
 			if(~ iscell(constraints))
 				error('matfaust.ParamsFact 5th argument (constraints) must be a cell array.')
 			end
-			for i = 1:length(constraints) %TODO: check constraints length
+			for i = 1:length(constraints) %TODO: check constraints length in sub-class
 				if(~ isa(constraints{i}, 'matfaust.ConstraintGeneric'))
-					error('matfaust.ParamsFact 5th argument (constraints) must contain matfaust.ConstraintName objects.')
+					error('matfaust.ParamsFact 5th argument (constraints) must contain matfaust.ConstraintGeneric objects.')
 				end
 			end
 			if(nargin > MIN_NARGIN)

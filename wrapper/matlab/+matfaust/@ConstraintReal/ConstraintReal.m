@@ -5,7 +5,7 @@ classdef ConstraintReal < matfaust.ConstraintGeneric
 	methods
 		function constraint = ConstraintReal(name, num_rows, num_cols, param)
 			% check param is a real scalar
-			if(~ isreal(param) || all(size(param) ~= [1, 1]))
+			if(~ isreal(param) || ~ isscalar(param))
 				error('ConstraintReal must receive a real as param argument.')
 			end
 			constraint = constraint@matfaust.ConstraintGeneric(name, num_rows, num_cols, param);

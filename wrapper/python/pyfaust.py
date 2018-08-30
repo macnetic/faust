@@ -962,8 +962,8 @@ class FaustFactory:
             The Faust object result of the factorization.
 
         Examples:
-        >>> from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintScalar,\
-        >>> ConstraintName, StoppingCriterion
+        >>> from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintReal,\
+        >>> ConstraintInt, ConstraintName, StoppingCriterion
         >>> import numpy as np
         >>> num_facts = 2
         >>> is_update_way_R2L = False
@@ -972,8 +972,8 @@ class FaustFactory:
         >>> init_facts.append(np.zeros([500,32]))
         >>> init_facts.append(np.eye(32))
         >>> M = np.random.rand(500, 32)
-        >>> cons1 = ConstraintScalar(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
-        >>> cons2 = ConstraintScalar(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0)
+        >>> cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+        >>> cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0)
         >>> stop_crit = StoppingCriterion(num_its=200)
         >>> # default step_size is 1e-16
         >>> param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
@@ -1011,8 +1011,8 @@ class FaustFactory:
             The Faust object result of the factorization.
 
         Examples:
-		>>> from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintScalar,\
-		>>> ConstraintName, StoppingCriterion
+		>>> from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintReal,\
+		>>> ConstraintInt, ConstraintName, StoppingCriterion
 		>>> import numpy as np
 		>>> num_facts = 4
 		>>> is_update_way_R2L = False
@@ -1022,12 +1022,12 @@ class FaustFactory:
 		>>> for i in range(1,num_facts):
 		>>>     init_facts.append(np.zeros([32,32]))
 		>>> M = np.random.rand(500, 32)
-		>>> cons1 = ConstraintScalar(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
-		>>> cons2 = ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32, 96)
-		>>> cons3 = ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32, 96)
-		>>> cons4 = ConstraintScalar(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1)
-		>>> cons5 =  ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32, 666)
-		>>> cons6 =  ConstraintScalar(ConstraintName(ConstraintName.SP), 32, 32, 333)
+		>>> cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+		>>> cons2 = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
+		>>> cons3 = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
+		>>> cons4 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1)
+		>>> cons5 =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 666)
+		>>> cons6 =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333)
 		>>> stop_crit1 = StoppingCriterion(num_its=200)
 		>>> stop_crit2 = StoppingCriterion(num_its=200)
 		>>> param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
@@ -1076,8 +1076,11 @@ class ParamsFact(object):
         self.constraints = constraints
         self.is_verbose = is_verbose
         self.constant_step_size = constant_step_size
-        #TODO: raise exception if num_facts != len(init_facts)
-        #TODO: likewise for constraints
+        if(not isinstance(init_facts, list) and not isinstance(init_facts,
+                                                               tuple) or
+           len(init_facts) != num_facts):
+            raise ValueError('ParamsFact init_facts argument must a be '
+                             'list/tuple of '+str(num_facts)+" (num_facts) arguments.")
 
 class ParamsPalm4MSA(ParamsFact):
 
@@ -1089,8 +1092,11 @@ class ParamsPalm4MSA(ParamsFact):
                                              constraints, step_size,
                                              constant_step_size,
                                              is_verbose)
+        if(not isinstance(stop_crit,StoppingCriterion)):
+           raise TypeError('ParamsPalm4MSA stop_crit argument must be a StoppingCriterion '
+                           'object')
         self.stop_crit = stop_crit
-        # TODO: raise exception if stop_crit not a StoppingCriterion object
+        #TODO: verify number of constraints is consistent with num_facts
 
 class ParamsHierarchicalFact(ParamsFact):
 
@@ -1107,8 +1113,20 @@ class ParamsHierarchicalFact(ParamsFact):
         self.data_num_cols = data_num_cols
         self.stop_crits = stop_crits
         self.is_fact_side_left = is_fact_side_left
-        # TODO: raise exception if stop_crits len != 2 or not StoppingCriterion
-        # objects
+        #TODO: verify number of constraints is consistent with num_facts in
+        if((not isinstance(stop_crits, list) and not isinstance(stop_crits,
+                                                                tuple)) or
+           len(stop_crits) != 2 or
+           not isinstance(stop_crits[0],StoppingCriterion) or not
+           isinstance(stop_crits[1],StoppingCriterion)):
+            raise TypeError('ParamsHierarchicalFact stop_crits argument must be a list/tuple of two '
+                            'StoppingCriterion objects')
+        if((not isinstance(constraints, list) and not isinstance(constraints,
+                                                                tuple)) or
+           np.array([not isinstance(constraints[i],ConstraintGeneric) for i in
+                    range(0,len(constraints))]).any()):
+            raise TypeError('constraints argument must be a list/tuple of '
+                            'ConstraintGeneric (or subclasses) objects')
 
 class StoppingCriterion(object):
 
@@ -1134,7 +1152,7 @@ class ConstraintName:
     NORMLIN = 9 # Real Constraint
 
     def __init__(self, name):
-        if(name < ConstraintName.SP or name > ConstraintName.NORMLIN):
+        if(not isinstance(name, np.int) or name < ConstraintName.SP or name > ConstraintName.NORMLIN):
             raise ValueError("name must be an integer among ConstraintName.SP,"
                              "ConstraintName.SPCOL, ConstraintName.NORMCOL,"
                              "ConstraintName.SPLINCOL, ConstraintName.CONST,"
@@ -1155,10 +1173,11 @@ class ConstraintName:
 
 class ConstraintGeneric(object):
 
-    def __init__(self, name , num_rows, num_cols):
+    def __init__(self, name, num_rows, num_cols, param):
         self.value = name
         self.num_rows = num_rows
         self.num_cols = num_cols
+        self.param = param
 
     @property
     def name(self):
@@ -1173,15 +1192,42 @@ class ConstraintGeneric(object):
     def is_mat_constraint(self):
         return self.value.is_mat_constraint()
 
-class ConstraintScalar(ConstraintGeneric):
+class ConstraintReal(ConstraintGeneric):
 
     def __init__(self, name, num_rows, num_cols, param):
-        super(ConstraintScalar, self).__init__(name, num_rows, num_cols)
-        self.param = param # raise value error if not np.number (can be complex
-        # or float/double or integer
+        super(ConstraintReal, self).__init__(name, num_rows, num_cols, param)
+        if(not isinstance(param, np.float) and not isinstance(param, np.int)):
+            raise TypeError('ConstraintReal must receive a float as param '
+                            'argument.')
+        self.param = float(self.param)
+        if(not isinstance(name, ConstraintName) or not name.is_real_constraint()):
+            raise TypeError('ConstraintReal first argument must be a '
+                            'ConstraintName with a real type name '
+                            '(name.is_real_constraint() must return True).')
+
+class ConstraintInt(ConstraintGeneric):
+
+    def __init__(self, name, num_rows, num_cols, param):
+        super(ConstraintInt, self).__init__(name, num_rows, num_cols, param)
+        if(not isinstance(param, np.int)):
+            raise TypeError('CosntraintInt must receive a int as param '
+                            'argument.')
+        if(not isinstance(name, ConstraintName) or not name.is_int_constraint()):
+            raise TypeError('ConstraintInt first argument must be a '
+                            'ConstraintName with a int type name '
+                            '(name.is_int_constraint() must return True).')
 
 class ConstraintMat(ConstraintGeneric):
 
     def __init__(self, name, num_rows, num_cols, param):
-        super(ConstraintMat, self).__init__(name, num_rows, num_cols)
-        self.param = param #TODO: raise ValueError if not np.ndarray
+        super(ConstraintMat, self).__init__(name, num_rows, num_cols, param)
+        if(not isinstance(param, np.matrix) and not isinstance(param,
+                                                               np.ndarray)):
+            raise TypeError('ConstraintMat must receive a numpy matrix as param '
+                            'argument.')
+        self.param = float(self.param)
+        if(not isinstance(name, ConstraintName) or not name.is_mat_constraint()):
+            raise TypeError('ConstraintMat first argument must be a '
+                            'ConstraintName with a matrix type name'
+                            '(name.is_mat_constraint() must return True).')
+
