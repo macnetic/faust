@@ -40,15 +40,12 @@ classdef FaustFactory
 		%>  num_facts = 2
 		%>  is_update_way_R2L = false
 		%>  init_lambda = 1.0
-		%>  init_facts = cell(2,1)
-		%>  init_facts{1} = zeros(500,32)
-		%>  init_facts{2} = eye(32)
 		%>  M = rand(500, 32)
 		%>  cons = cell(2,1)
 		%>  cons{1} = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5);
 		%>  cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
 		%>  stop_crit = StoppingCriterion(200);
-		%>  params = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda, init_facts, cons, stop_crit);
+		%>  params = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda, cons, stop_crit);
 		%>  F = FaustFactory.fact_palm4msa(M, params)
 		%> @endcode
 		%>
@@ -93,11 +90,6 @@ classdef FaustFactory
 		%>  num_facts = 4;
 		%>  is_update_way_R2L = false;
 		%>  init_lambda = 1.0;
-		%>  init_facts = cell(num_facts,1);
-		%>  init_facts{1} = zeros(500,32);
-		%>  for i=2:num_facts
-		%>  	init_facts{i} = zeros(32);
-		%>  end
 		%>  M = rand(500, 32);
 		%>  cons = cell(4,1);
 		%>  cons{1} = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5);
@@ -147,7 +139,7 @@ classdef FaustFactory
 				%mex_residuum_constraints{i} = cur_cell;
 				mex_constraints{2,i} = cur_cell;
 			end
-			mex_params = struct('data', m, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'init_facts', {p.init_facts}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left);
+			mex_params = struct('data', m, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left);
 			[lambda, cell_facts] = mexHierarchical_fact(m, mex_params);
 			cell_facts{1} = cell_facts{1}*lambda;
 			F = Faust(cell_facts);

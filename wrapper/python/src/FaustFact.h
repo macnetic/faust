@@ -52,8 +52,6 @@ class PyxParamsFact
         int num_facts;
         bool is_update_way_R2L;
         FPP init_lambda;
-        FPP** init_facts;// num_facts elts
-        unsigned long* init_fact_sizes;
         FPP step_size;
         PyxConstraintGeneric** constraints; // size: (num_facts-1)*2
         unsigned int num_constraints;
@@ -65,6 +63,8 @@ template<typename FPP>
 class PyxParamsFactPalm4MSA : public PyxParamsFact<FPP>
 {
     public:
+        FPP** init_facts;// num_facts elts
+        unsigned long* init_fact_sizes;
         PyxStoppingCriterion<FPP> stop_crit;
 };
 

@@ -10,18 +10,17 @@ classdef ParamsHierarchicalFact < matfaust.ParamsFact
 	end
 	methods
 		function p = ParamsHierarchicalFact(varargin)
-			MIN_NARGIN = 8;
+			MIN_NARGIN = 7;
 			if(nargin < MIN_NARGIN)
-				error('matfaust.ParamsHierarchicalFact() must receive at least 8 arguments')
+				error(['matfaust.ParamsHierarchicalFact() must receive at least',int2str(MIN_NARGIN),' arguments'])
 			end
 			num_facts = varargin{1};
 			is_update_way_R2L = varargin{2};
 			init_lambda = varargin{3};
-			init_facts = varargin{4};
-			constraints = varargin{5};
-			data_num_rows = floor(varargin{6});
-			data_num_cols = floor(varargin{7});
-			stop_crits = varargin{8};
+			constraints = varargin{4};
+			data_num_rows = floor(varargin{5});
+			data_num_cols = floor(varargin{6});
+			stop_crits = varargin{7};
 			% set default values
 			is_fact_side_left = matfaust.ParamsHierarchicalFact.DEFAULT_IS_FACT_SIDE_LEFT;
 			step_size = matfaust.ParamsFact.DEFAULT_STEP_SIZE;
@@ -40,27 +39,27 @@ classdef ParamsHierarchicalFact < matfaust.ParamsFact
 				end
 			end
 			% parent constructor handles verification for its own arguments
-			p = p@matfaust.ParamsFact(num_facts, is_update_way_R2L, init_lambda, init_facts, ...
+			p = p@matfaust.ParamsFact(num_facts, is_update_way_R2L, init_lambda, ...
 				constraints, step_size, constant_step_size, is_verbose);
 			if(~ isscalar(data_num_rows) || ~ isinteger(int64(data_num_rows)))
-				error('matfaust.ParamsHierarchicalFact 6th argument (data_num_rows) must be an integer.')
+				error('matfaust.ParamsHierarchicalFact 5th argument (data_num_rows) must be an integer.')
 			end
 			if(~ isscalar(data_num_cols) || ~ isinteger(int64(data_num_cols)))
-				error('matfaust.ParamsHierarchicalFact 7th argument (data_num_cols) must be an integer.')
+				error('matfaust.ParamsHierarchicalFact 6th argument (data_num_cols) must be an integer.')
 			end
 			if(~ iscell(stop_crits))
-				error('matfaust.ParamsHierarchicalFact 8th argument (stop_crits) must be a cell array.')
+				error('matfaust.ParamsHierarchicalFact 7th argument (stop_crits) must be a cell array.')
 				if(length(stop_crits) ~= 2 )
-					error('matfaust.ParamsHierarchicalFact 8th argument (stop_crits) must be a cell array of 2 elements.')
+					error('matfaust.ParamsHierarchicalFact 7th argument (stop_crits) must be a cell array of 2 elements.')
 				end
 				for i = 1:length(stop_crits)
 					if(~ isa(stop_crits{i}, matfaust.StoppingCriterion))
-						error('matfaust.ParamsHierarchicalFact 8th argument (stop_crits) must contain matfaust.StoppingCriterion objects.')
+						error('matfaust.ParamsHierarchicalFact 7th argument (stop_crits) must contain matfaust.StoppingCriterion objects.')
 					end
 				end
 			end
 			if(~ islogical(is_fact_side_left))
-				error('matfaust.ParamsHierarchicalFact 9th argument (is_fact_side_left) must be logical.')
+				error('matfaust.ParamsHierarchicalFact 8th argument (is_fact_side_left) must be logical.')
 			end
 			p.stop_crits = stop_crits;
 			p.is_fact_side_left = is_fact_side_left;

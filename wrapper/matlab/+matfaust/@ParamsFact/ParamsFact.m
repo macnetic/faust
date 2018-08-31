@@ -3,7 +3,6 @@ classdef (Abstract) ParamsFact
 		num_facts
 		is_update_way_R2L
 		init_lambda
-		init_facts
 		step_size
 		constant_step_size
 		constraints
@@ -16,15 +15,14 @@ classdef (Abstract) ParamsFact
 	end
 	methods
 		function p = ParamsFact(varargin)
-			MIN_NARGIN = 5;
+			MIN_NARGIN = 4;
 			if(nargin < MIN_NARGIN)
 				error(['matfaust.ParamsFact() must receive at least ', int2str(MIN_NARGIN),' arguments.'])
 			end
 			num_facts = varargin{1};
 			is_update_way_R2L = varargin{2};
 			init_lambda = varargin{3};
-			init_facts = varargin{4};
-			constraints = varargin{5};
+			constraints = varargin{4};
 			% set default values
 			step_size = matfaust.ParamsFact.DEFAULT_STEP_SIZE;
 			is_verbose = matfaust.ParamsFact.DEFAULT_VERBOSITY;
@@ -38,17 +36,9 @@ classdef (Abstract) ParamsFact
 			if(~ isscalar(init_lambda))
 				error('matfaust.ParamsFact 3rd argument (init_lambda) must be a scalar.')
 			end
-			if(~ iscell(init_facts)) % TODO: check init_facts length
-				error('matfaust.ParamsFact 4th argument (init_facts) must be a cell array.')
-			end
-			for i = 1:length(init_facts)
-				if(~ ismatrix(init_facts{i}) || ~ isnumeric(init_facts{i}))
-					error('matfaust.ParamsFact 4th argument (init_facts) must contain matrices.')
-					%TODO: check matrix dimensions
-				end
-			end
+
 			if(~ iscell(constraints))
-				error('matfaust.ParamsFact 5th argument (constraints) must be a cell array.')
+				error('matfaust.ParamsFact 4th argument (constraints) must be a cell array.')
 			end
 			for i = 1:length(constraints) %TODO: check constraints length in sub-class
 				if(~ isa(constraints{i}, 'matfaust.ConstraintGeneric'))
@@ -65,7 +55,8 @@ classdef (Abstract) ParamsFact
 				end
 			end
 			if(~ isscalar(step_size))
-				error(['matfaust.ParamsHierarchicalFact ', int2str(MIN_NARGIN+1), 'th argument (step_size) must be an integer.'])
+				step_size
+				error(['matfaust.ParamsHierarchicalFact ', int2str(MIN_NARGIN+1), 'th argument (step_size) must be a real.'])
 			end
 			if(~ islogical(constant_step_size))
 				error(['matfaust.ParamsFact ', int2str(MIN_NARGIN+2), 'th argument (constant_step_size) must be logical.'])
@@ -76,7 +67,6 @@ classdef (Abstract) ParamsFact
 			p.num_facts = num_facts;
 			p.is_update_way_R2L = is_update_way_R2L;
 			p.init_lambda = init_lambda;
-			p.init_facts = init_facts;
 			p.constraints = constraints;
 			p.step_size = step_size;
 			p.is_verbose = is_verbose;

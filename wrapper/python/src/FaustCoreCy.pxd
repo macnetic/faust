@@ -99,8 +99,6 @@ cdef extern from "FaustFact.h":
         int num_facts
         bool is_update_way_R2L
         FPP init_lambda
-        FPP** init_facts # num_facts elts
-        unsigned long* init_fact_sizes
         FPP step_size
         PyxConstraintGeneric** constraints # (num_facts-1)*2 elts
         unsigned int num_constraints
@@ -108,6 +106,8 @@ cdef extern from "FaustFact.h":
         bool constant_step_size
 
     cdef cppclass PyxParamsFactPalm4MSA[FPP](PyxParamsFact[FPP]):
+        FPP** init_facts # num_facts elts
+        unsigned long* init_fact_sizes
         PyxStoppingCriterion stop_crit
 
     cdef cppclass PyxParamsHierarchicalFact[FPP](PyxParamsFact[FPP]):

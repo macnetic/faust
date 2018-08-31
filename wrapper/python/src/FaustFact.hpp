@@ -51,7 +51,7 @@ bool PyxConstraintGeneric::is_mat_constraint()
 
 template<typename FPP>
 void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned int num_cols, const PyxParamsFact<FPP>* p,
-        /* out args */vector<const Faust::ConstraintGeneric<FPP,Cpu>*>& cons, vector<Faust::MatDense<FPP,Cpu> > &initFacts)
+        /* out args */vector<const Faust::ConstraintGeneric<FPP,Cpu>*>& cons)
 {
     Faust::ConstraintGeneric<FPP, Cpu>* tmp_cons;
     if(p->is_verbose)
@@ -104,13 +104,7 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
         else
             handleError("FaustFact", "Invalid constraint.");
     }
-    for(int i=0; i < p->num_facts;i++) {
-        if(p->is_verbose)
-        {
-            cout << "init_facts[" << i << "] ele[0][0]: " << p->init_facts[i][0] << " size: " << p->init_fact_sizes[i*2] << "x"<< p->init_fact_sizes[i*2+1] << endl; 
-        }
-        initFacts.push_back(Faust::MatDense<FPP, Cpu>(p->init_facts[i], p->init_fact_sizes[i*2], p->init_fact_sizes[i*2+1]));
-    }
+    
 
 
 }
@@ -128,8 +122,14 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
         cout << "stop_crit.num_its: " << p->stop_crit.num_its << endl;
         cout << "stop_crit.max_num_its: " << p->stop_crit.max_num_its << endl;
     }
-    prepare_fact(mat, num_rows, num_cols, p, cons, initFacts);
-
+    prepare_fact(mat, num_rows, num_cols, p, cons);
+    for(int i=0; i < p->num_facts;i++) {
+        if(p->is_verbose)
+        {
+            cout << "init_facts[" << i << "] ele[0][0]: " << p->init_facts[i][0] << " size: " << p->init_fact_sizes[i*2] << "x"<< p->init_fact_sizes[i*2+1] << endl; 
+        }
+        initFacts.push_back(Faust::MatDense<FPP, Cpu>(p->init_facts[i], p->init_fact_sizes[i*2], p->init_fact_sizes[i*2+1]));
+    }
     // set all constructor arguments because they could be at non-default
     // values
     Faust::StoppingCriterion<FPP> crit(p->stop_crit.num_its, p->stop_crit.is_criterion_error, p->stop_crit.error_treshold, p->stop_crit.max_num_its);
@@ -175,7 +175,7 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
     vector<std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*>> cons_;
     vector<const Faust::ConstraintGeneric<FPP,Cpu>*> fact_cons;
     vector<const Faust::ConstraintGeneric<FPP,Cpu>*> residuum_cons;
-    vector<Faust::MatDense<FPP,Cpu> > initFacts;
+    vector<Faust::MatDense<FPP,Cpu> > initFacts_deft;
     if(p->is_verbose)
     {
         cout << "p->num_rows: " << p->num_rows << endl;
@@ -190,7 +190,7 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
         cout << "stop_crits[1].num_its: " << p->stop_crits[1].num_its << endl;
         cout << "stop_crits[1].max_num_its: " << p->stop_crits[1].max_num_its << endl;
     }
-    prepare_fact(mat, num_rows, num_cols, p, cons, initFacts);
+    prepare_fact(mat, num_rows, num_cols, p, cons);
 
     // set all constructor arguments because they could be at non-default
     // values
@@ -206,7 +206,7 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
     cons_.push_back(fact_cons);
     cons_.push_back(residuum_cons);
 
-    Faust::Params<FPP,Cpu> params(p->num_rows, p->num_cols, p->num_facts, cons_, initFacts, crit0, crit1, p->is_verbose, p->is_update_way_R2L, p->is_fact_side_left, p->init_lambda, p->constant_step_size, p->step_size);
+    Faust::Params<FPP,Cpu> params(p->num_rows, p->num_cols, p->num_facts, cons_, initFacts_deft, crit0, crit1, p->is_verbose, p->is_update_way_R2L, p->is_fact_side_left, p->init_lambda, p->constant_step_size, p->step_size);
     
     if(p->is_verbose) params.Display();
 

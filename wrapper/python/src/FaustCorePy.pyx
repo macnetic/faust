@@ -631,10 +631,6 @@ cdef class FaustFact:
             cpp_params.init_lambda = p.init_lambda
             cpp_params.step_size = p.step_size
             cpp_params.stop_crits = cpp_stop_crits
-            cpp_params.init_facts = <double**> \
-                    PyMem_Malloc(sizeof(double*)*p.num_facts)
-            cpp_params.init_fact_sizes = <unsigned long*> \
-            PyMem_Malloc(sizeof(unsigned long)*2*p.num_facts)
             cpp_params.is_verbose = p.is_verbose
             cpp_params.is_fact_side_left = p.is_fact_side_left
             cpp_params.constant_step_size = p.constant_step_size
@@ -645,10 +641,6 @@ cdef class FaustFact:
             cpp_params_cplx.is_update_way_R2L = p.is_update_way_R2L
             cpp_params_cplx.init_lambda = p.init_lambda
             cpp_params_cplx.step_size = p.step_size
-            cpp_params_cplx.init_facts = <complex**> \
-                    PyMem_Malloc(sizeof(complex*)*p.num_facts)
-            cpp_params_cplx.init_fact_sizes = <unsigned long*> \
-            PyMem_Malloc(sizeof(unsigned long)*2*p.num_facts)
             cpp_params_cplx.is_verbose = p.is_verbose
             cpp_params_cplx.is_fact_side_left = p.is_fact_side_left
             cpp_params_cplx.constant_step_size = p.constant_step_size
@@ -702,18 +694,6 @@ cdef class FaustFact:
             cpp_params_cplx.num_cols = p.data_num_cols
             cpp_params_cplx.num_constraints = len(p.constraints)
 
-        for i in range(0,p.num_facts):
-            if(isReal):
-                tmp_mat = p.init_facts[i]
-                cpp_params.init_facts[i] = &tmp_mat[0,0]
-                cpp_params.init_fact_sizes[i*2+0] = p.init_facts[i].shape[0]
-                cpp_params.init_fact_sizes[i*2+1] = p.init_facts[i].shape[1]
-            else:
-                tmp_mat_cplx = p.init_facts[i]
-                cpp_params_cplx.init_facts[i] = &tmp_mat_cplx[0,0]
-                cpp_params_cplx.init_fact_sizes[i*2+0] = p.init_facts[i].shape[0]
-                cpp_params_cplx.init_fact_sizes[i*2+1] = p.init_facts[i].shape[1]
-
         core = FaustCore(core=True)
         if(isReal):
             core.core_faust_dbl = FaustCoreCy.fact_hierarchical(&Mview[0,0], M_num_rows, M_num_cols,
@@ -728,13 +708,7 @@ cdef class FaustFact:
         for i in range(0,len(p.constraints)):
             PyMem_Free(cpp_constraints[i])
         PyMem_Free(cpp_constraints)
-        if(isReal):
-            PyMem_Free(cpp_params.init_facts)
-            PyMem_Free(cpp_params.init_fact_sizes)
-        else:
-            PyMem_Free(cpp_params_cplx.init_facts)
-            PyMem_Free(cpp_params_cplx.init_fact_sizes)
-
+        
         PyMem_Free(cpp_stop_crits)
 
         return core

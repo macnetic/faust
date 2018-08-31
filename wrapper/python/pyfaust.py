@@ -1017,10 +1017,6 @@ class FaustFactory:
 		>>> num_facts = 4
 		>>> is_update_way_R2L = False
 		>>> init_lambda = 1.0
-		>>> init_facts = list()
-		>>> init_facts.append(np.zeros([500,32]))
-		>>> for i in range(1,num_facts):
-		>>>     init_facts.append(np.zeros([32,32]))
 		>>> M = np.random.rand(500, 32)
 		>>> cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
 		>>> cons2 = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
@@ -1031,7 +1027,7 @@ class FaustFactory:
 		>>> stop_crit1 = StoppingCriterion(num_its=200)
 		>>> stop_crit2 = StoppingCriterion(num_its=200)
 		>>> param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
-		>>>                                init_facts, [cons1, cons2, cons3, cons4,
+		>>>                                [cons1, cons2, cons3, cons4,
 		>>>                                            cons5, cons6],
 		>>>                                M.shape[0],M.shape[1],[stop_crit1,
 		>>>                                                       stop_crit2],
@@ -1065,34 +1061,46 @@ class FaustFactory:
 
 class ParamsFact(object):
 
-    def __init__(self, num_facts, is_update_way_R2L, init_lambda, init_facts,
-                 constraints, step_size, constant_step_size = False, is_verbose = False,
+    def __init__(self, num_facts, is_update_way_R2L, init_lambda,
+                 constraints, step_size, constant_step_size=False, is_verbose=False,
                  ):
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
-        self.init_facts = init_facts
         self.step_size = step_size
         self.constraints = constraints
         self.is_verbose = is_verbose
         self.constant_step_size = constant_step_size
-        if(not isinstance(init_facts, list) and not isinstance(init_facts,
-                                                               tuple) or
-           len(init_facts) != num_facts):
-            raise ValueError('ParamsFact init_facts argument must a be '
-                             'list/tuple of '+str(num_facts)+" (num_facts) arguments.")
-
+    
 class ParamsPalm4MSA(ParamsFact):
 
-    def __init__(self, num_facts, is_update_way_R2L, init_lambda, init_facts,
-                 constraints, stop_crit, step_size = 10.0**-16,
-                 constant_step_size = False,
-                 is_verbose = False):
-        super(ParamsPalm4MSA, self).__init__(num_facts, is_update_way_R2L, init_lambda, init_facts,
+    def __init__(self, num_facts, is_update_way_R2L, init_lambda,
+                 constraints, stop_crit, init_facts=None, step_size=10.0**-16,
+                 constant_step_size=False,
+                 is_verbose=False):
+        super(ParamsPalm4MSA, self).__init__(num_facts, is_update_way_R2L,
+                                             init_lambda,
                                              constraints, step_size,
                                              constant_step_size,
                                              is_verbose)
-        if(not isinstance(stop_crit,StoppingCriterion)):
+        if(not init_facts):
+            if(is_update_way_R2L):
+                zeros_id = num_facts-1
+            else:
+                zeros_id = 0
+            self.init_facts = [
+                        np.zeros([constraints[zeros_id].num_rows,constraints[zeros_id].num_cols]) ]
+            for i in [i for i in range(0,num_facts) if i != zeros_id]:
+                self.init_facts += [np.eye(constraints[i].num_rows,
+                                           constraints[i].num_cols)]
+        elif(not isinstance(init_facts, list) and not isinstance(init_facts,
+                                                               tuple) or
+           len(init_facts) != num_facts):
+            raise ValueError('ParamsFact init_facts argument must be a '
+                             'list/tuple of '+str(num_facts)+" (num_facts) arguments.")
+        else:
+            self.init_facts = init_facts
+        if(not isinstance(stop_crit, StoppingCriterion)):
            raise TypeError('ParamsPalm4MSA stop_crit argument must be a StoppingCriterion '
                            'object')
         self.stop_crit = stop_crit
@@ -1100,12 +1108,14 @@ class ParamsPalm4MSA(ParamsFact):
 
 class ParamsHierarchicalFact(ParamsFact):
 
-    def __init__(self, num_facts, is_update_way_R2L, init_lambda, init_facts,
+    def __init__(self, num_facts, is_update_way_R2L, init_lambda,
                  constraints, data_num_rows, data_num_cols, stop_crits,
-                 step_size = 10.0**-16, constant_step_size = False,
-                 is_verbose = False,
+                 step_size=10.0**-16, constant_step_size=False,
+                 is_verbose=False,
                  is_fact_side_left = False):
-        super(ParamsHierarchicalFact, self).__init__(num_facts, is_update_way_R2L, init_lambda, init_facts,
+        super(ParamsHierarchicalFact, self).__init__(num_facts,
+                                                     is_update_way_R2L,
+                                                     init_lambda,
                                                      constraints, step_size,
                                                      constant_step_size,
                                                      is_verbose)

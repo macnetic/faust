@@ -310,9 +310,9 @@ class TestFaustFactory(unittest.TestCase):
         num_facts = 2
         is_update_way_R2L = False
         init_lambda = 1.0
-        init_facts = list()
-        init_facts.append(np.zeros([500,32]))
-        init_facts.append(np.eye(32))
+#        init_facts = list()
+#        init_facts.append(np.zeros([500,32]))
+#        init_facts.append(np.eye(32))
         #M = np.random.rand(500, 32)
         M = \
         loadmat(sys.path[-1]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
@@ -322,7 +322,7 @@ class TestFaustFactory(unittest.TestCase):
                                  32, 1.0)
         stop_crit = StoppingCriterion(num_its=200)
         param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
-                               init_facts, [cons1, cons2], stop_crit,
+                               [cons1, cons2], stop_crit, init_facts=None,
                                is_verbose=False, constant_step_size=False)
         F = FaustFactory.fact_palm4msa(M, param)
         #F.display()
@@ -342,10 +342,6 @@ class TestFaustFactory(unittest.TestCase):
         num_facts = 4
         is_update_way_R2L = False
         init_lambda = 1.0
-        init_facts = list()
-        init_facts.append(np.zeros([500,32]))
-        for i in range(1,num_facts):
-            init_facts.append(np.zeros([32,32]))
         #M = np.random.rand(500, 32)
         M = \
         loadmat(sys.path[-1]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
@@ -364,7 +360,7 @@ class TestFaustFactory(unittest.TestCase):
         stop_crit1 = StoppingCriterion(num_its=200)
         stop_crit2 = StoppingCriterion(num_its=200)
         param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
-                                       init_facts, [cons1, cons2, cons3, cons4,
+                                       [cons1, cons2, cons3, cons4,
                                                    cons5, cons6],
                                        M.shape[0],M.shape[1],[stop_crit1,
                                                               stop_crit2],
