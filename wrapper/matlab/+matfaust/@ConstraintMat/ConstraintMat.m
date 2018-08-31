@@ -9,7 +9,7 @@ classdef ConstraintMat < matfaust.ConstraintGeneric
 				error('ConstraintMat must receive a matrix as param argument.')
 			end
 			constraint = constraint@matfaust.ConstraintGeneric(name, size(param, 1), size(param, 2), param);
-			if(~ name.is_mat_constraint())
+			if(~ isa(name, 'matfaust.ConstraintName') || ~ name.is_mat_constraint())
 				error('ConstraintMat first argument must be a ConstraintName with a matrix type name.')
 			end
 		end

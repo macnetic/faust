@@ -41,11 +41,15 @@ classdef ParamsHierarchicalFact < matfaust.ParamsFact
 			% parent constructor handles verification for its own arguments
 			p = p@matfaust.ParamsFact(num_facts, is_update_way_R2L, init_lambda, ...
 				constraints, step_size, constant_step_size, is_verbose);
-			if(~ isscalar(data_num_rows) || ~ isinteger(int64(data_num_rows)))
+			if(~ isscalar(data_num_rows) || ~ isreal(data_num_rows))
 				error('matfaust.ParamsHierarchicalFact 5th argument (data_num_rows) must be an integer.')
+			else
+				data_num_rows = floor(data_num_rows);
 			end
-			if(~ isscalar(data_num_cols) || ~ isinteger(int64(data_num_cols)))
+			if(~ isscalar(data_num_cols) || ~ isreal(data_num_cols))
 				error('matfaust.ParamsHierarchicalFact 6th argument (data_num_cols) must be an integer.')
+			else
+				data_num_cols = floor(data_num_cols);
 			end
 			if(~ iscell(stop_crits))
 				error('matfaust.ParamsHierarchicalFact 7th argument (stop_crits) must be a cell array.')

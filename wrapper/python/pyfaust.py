@@ -101,7 +101,7 @@ class Faust:
     def  __init__(F, factors=None, scale=1.0, filepath=None, core_obj=None):
         """ Creates a Faust from a list of factors or alternatively from a file.
 
-            Another easy way to create a Faust is to call the static method Faust.rand().
+            Another easy way to create a Faust is to call the static method FaustFactory.rand().
 
         Args:
             factors: list/tuple of numpy matrices.<br/>
@@ -120,7 +120,7 @@ class Faust:
         use filepath you must explicitely set argument with the keyword.
 
         Examples:
-            >>> from pyfaust import Faust
+            >>> from pyfaust import FaustFactory
             >>> import numpy as np
             >>> from scipy import sparse
             >>> factors = []
@@ -144,7 +144,7 @@ class Faust:
             >>> H = Faust(filepath="F.mat")
             >>> I = Faust(filepath="F.mat", scale) # I == scale*H
 
-        <b/> See also Faust.save, Faust.rand
+        <b/> See also Faust.save, FaustFactory.rand
 
         """
         if(core_obj):
@@ -158,100 +158,7 @@ class Faust:
             #else:
                 #TODO: manage empty Faust
 
-    @staticmethod
-    def rand(num_factors, dim_sizes, density=0.1, fac_type="mixed",
-                  is_real=True):
-        """
-        Generates a random Faust.
-
-            Args:
-                num_factors: If it's an integer it will be the number of random factors to set in the Faust.
-                            If num_factors is a list or tuple of 2 integers then the
-                            number of factors will be set randomly between
-                            num_factors[0] and num_factors[1] (inclusively).
-                dim_sizes: if it's an integer it will be the order of the square
-                matrix factors (of size size_dims**2).
-                            If it's a list or tuple of 2 integers then the
-                            number of rows and columns will
-                            be a random number between size_dims[0] and
-                            size_dims[1] (inclusively).
-                density: (optional) the approximate density of factors. The
-                default value is 0.1. It should be a floating point number
-                between 0 and 1.
-                fac_type: (optional) the type of density of factors. Must be
-                "sparse", "dense" or "mixed" if you want a mix of dense and
-                sparse matrices in the generated Faust (choice's done according
-                to an uniform distribution).
-                            The default value is "mixed".
-                is_real: (optional) a boolean set to True to generate a real Faust,
-                        set to False to generate a complex Faust. The default value
-                        is True.
-
-        Returns:
-            the random Faust.
-
-        Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand(2, 10, .5, is_real=False)
-            >>> G = Faust.rand([2, 5], [10, 20], .5, fac_type="dense")
-            >>> F
-            Faust size 10x10, density 0.99, nnz_sum 99, 2 factors:<br/>
-            FACTOR 0 (complex) SPARSE, size 10x10, density 0.4, nnz 40<br/>
-            FACTOR 1 (complex) DENSE, size 10x10, density 0.59, nnz 59<br/>
-            >>> G
-            Faust size 19x16, density 1.37171, nnz_sum 417, 4 factors:<br/>
-            FACTOR 0 (real) DENSE, size 19x17, density 0.49226, nnz 159<br/>
-            FACTOR 1 (real) DENSE, size 17x10, density 0.517647, nnz 88<br/>
-            FACTOR 2 (real) DENSE, size 10x13, density 0.515385, nnz 67<br/>
-            FACTOR 3 (real) DENSE, size 13x16, density 0.495192, nnz 103<br/>
-
-        <b/> See also Faust.__init__
-        """
-        DENSE=0
-        SPARSE=1
-        MIXED=2
-        REAL=3
-        COMPLEX=4
-        # set density type of factors
-        if(not isinstance(fac_type, str) or fac_type not in ["sparse",
-                                                             "dense",
-                                                             "mixed"]):
-            raise ValueError('Faust.rand(): argument fac_type must be a'
-                             ' str equal to "sparse",'
-                             ' "dense" or "mixed".')
-
-        fac_type_map = {"sparse" : SPARSE, "dense" : DENSE, "mixed" : MIXED}
-        # set field of matrices/factors
-        if(not isinstance(is_real, bool)):
-            raise ValueError('Faust.rand(): argument is_real must be a'
-                             'boolean.')
-        if(is_real):
-            field = REAL
-        else:
-            field = COMPLEX
-        if((isinstance(num_factors, list) or isinstance(num_factors, tuple)) and
-        len(num_factors) == 2):
-            min_num_factors = num_factors[0]
-            max_num_factors = num_factors[1]
-        elif(isinstance(num_factors, int)):
-            min_num_factors = max_num_factors = num_factors
-        else:
-            raise ValueError("Faust.rand(): num_factors argument must be an "
-                             "integer or a list/tuple of 2 integers.")
-        if((isinstance(dim_sizes, list) or isinstance(dim_sizes, tuple)) and
-        len(dim_sizes) == 2):
-            min_dim_size = dim_sizes[0]
-            max_dim_size = dim_sizes[1]
-        elif(isinstance(dim_sizes, int)):
-            min_dim_size = max_dim_size = dim_sizes
-        else:
-            raise ValueError("Faust.rand(): dim_sizes argument must be an "
-                             "integer or a list/tuple of 2 integers.")
-        rF = Faust(core_obj=FaustCorePy.FaustCore.randFaust(
-            fac_type_map[fac_type], field, min_num_factors, max_num_factors,
-            min_dim_size, max_dim_size, density))
-        return rF
-
+    
     @property
     def shape(F):
         """
@@ -270,8 +177,8 @@ class Faust:
             at second index the number of columns.
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand(2, 50, is_real=False)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(2, 50, is_real=False)
             >>> nrows, ncols = F.shape
             >>> nrows = F.shape[0]
             >>> ncols = F.shape[1]
@@ -296,8 +203,8 @@ class Faust:
             The number of elements in the Faust F.
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand(2, 50, is_real=False)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(2, 50, is_real=False)
             >>> size = F.size
 
         <b/> See also Faust.shape
@@ -360,8 +267,8 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand(5, 50, is_real=False)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(5, 50, is_real=False)
             >>> Fc = F.conj()
 
         <b/> See also Faust.transpose, Faust.get_factor, Faust.get_num_factors, Faust.getH, Faust.H
@@ -381,8 +288,8 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand(5, 50, is_real=False)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(5, 50, is_real=False)
             >>> H1 = F.getH()
             >>> H2 = F.transpose()
             >>> H2 = H2.conj()
@@ -406,8 +313,8 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand(5, 50, is_real=False)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(5, 50, is_real=False)
             >>> H1 = F.H
             >>> H2 = F.transpose()
             >>> H2 = H2.conj()
@@ -432,8 +339,8 @@ class Faust:
             F: the Faust object.
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand(2, 50)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(2, 50)
             >>> F.__repr__()
             >>> # the same function is called when typing F in a terminal:
             >>> F
@@ -454,8 +361,8 @@ class Faust:
             F: the Faust object.
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand([1, 2], [50, 100], .5)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand([1, 2], [50, 100], .5)
             >>> F.display()
             Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factors:<br/>
             FACTOR 0 (real) SPARSE, size 98x78, density 0.395081, nnz 3020<br/>
@@ -504,14 +411,14 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
+            >>> from pyfaust import FaustFactory
             >>> import numpy as np
 
-            >>> F = Faust.rand(5, [50, 100])
+            >>> F = FaustFactory.rand(5, [50, 100])
             >>> A = np.random.rand(F.shape[1], 50)
             >>> B = F*A
             >>> # is equivalent to B = F.__mul__(A)
-            >>> G = Faust.rand(5, F.shape[1])
+            >>> G = FaustFactory.rand(5, F.shape[1])
             >>> H = F*G
             >>> # H is a Faust because F and G are
 
@@ -542,8 +449,8 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand(5, 10**6, .00001, 'sparse')
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(5, 10**6, .00001, 'sparse')
                Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factors:<br/>
                 FACTOR 0 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
                 FACTOR 1 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
@@ -579,8 +486,8 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand(5, 10**6, .00001, 'sparse')
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(5, 10**6, .00001, 'sparse')
             >>> F
             Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factors:<br/>
             FACTOR 0 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
@@ -622,11 +529,11 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
+            >>> from pyfaust import FaustFactory
             >>> import numpy as np
             >>> from random import randint
 
-            >>> F = Faust.rand(5, [50, 100])
+            >>> F = FaustFactory.rand(5, [50, 100])
             >>> i1 = randint(0, min(F.shape)-1)
             >>> i2 = randint(0, min(F.shape)-1)
 
@@ -744,8 +651,8 @@ class Faust:
             the density value (float).
 
         Examples:
-        >>> from pyfaust import Faust
-        >>> F = Faust.rand(5, 50, .5)
+        >>> from pyfaust import FaustFactory
+        >>> F = FaustFactory.rand(5, 50, .5)
         >>> dens = F.density()
 
         <b/> See also Faust.nnz_sum, Faust.rcg, Faust.size, Faust.todense
@@ -806,8 +713,8 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand([1, 2], [50, 100], .5)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand([1, 2], [50, 100], .5)
             >>> F.norm()
             80.0914231648143
             >>> F.norm(2)
@@ -827,8 +734,8 @@ class Faust:
             the number of factors.
 
         Examples:
-        >>> from pyfaust import Faust
-        >>> F = Faust.rand(2, 100, .5)
+        >>> from pyfaust import FaustFactory
+        >>> F = FaustFactory.rand(2, 100, .5)
         >>> nf = F.get_num_factors()
 
         <b/> See also Faust.get_factor
@@ -851,8 +758,8 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand(5, [50, 100], .5)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(5, [50, 100], .5)
             >>> f0 = F.get_factor(0)
 
         <b/> See also Faust.get_num_factors
@@ -880,8 +787,8 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand([2, 3], [10, 20],.5, is_real=False)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand([2, 3], [10, 20],.5, is_real=False)
             >>> F.save("F.mat")
             >>> G = Faust(filepath="F.mat")
             >>> H = Faust(filepath="F.mat", scale=2)
@@ -914,10 +821,10 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import Faust
-            >>> F = Faust.rand([2, 3], [10, 20],.5, is_real=False)
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand([2, 3], [10, 20],.5, is_real=False)
             dtype('complex128')
-            >>> F = Faust.rand([2, 3], [10, 20],.5)
+            >>> F = FaustFactory.rand([2, 3], [10, 20],.5)
             dtype('float64')
 
 
@@ -947,6 +854,9 @@ class FaustFactory:
     It makes iterative use of Palm4MSA to proceed with the factorization of a given
     dense matrix.
 
+    A more secondary functionality of this class is the pseudo-random generation of a
+    Faust with FaustFactory.rand().
+
     """
 
     @staticmethod
@@ -968,16 +878,13 @@ class FaustFactory:
         >>> num_facts = 2
         >>> is_update_way_R2L = False
         >>> init_lambda = 1.0
-        >>> init_facts = list()
-        >>> init_facts.append(np.zeros([500,32]))
-        >>> init_facts.append(np.eye(32))
         >>> M = np.random.rand(500, 32)
         >>> cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
         >>> cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0)
         >>> stop_crit = StoppingCriterion(num_its=200)
         >>> # default step_size is 1e-16
         >>> param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
-        >>>                        init_facts, [cons1, cons2], stop_crit,
+        >>>                        [cons1, cons2], stop_crit,
         >>>                        is_verbose=False)
         >>> F = FaustFactory.fact_palm4msa(M, param)
         >>> F.display()
@@ -1051,13 +958,98 @@ class FaustFactory:
         return Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
 
     @staticmethod
-    def rand(*kwargs):
+    def rand(num_factors, dim_sizes, density=0.1, fac_type="mixed",
+                  is_real=True):
         """
         Generates a random Faust.
 
-        <b/> See also Faust.rand
+            Args:
+                num_factors: If it's an integer it will be the number of random factors to set in the Faust.
+                            If num_factors is a list or tuple of 2 integers then the
+                            number of factors will be set randomly between
+                            num_factors[0] and num_factors[1] (inclusively).
+                dim_sizes: if it's an integer it will be the order of the square
+                matrix factors (of size size_dims**2).
+                            If it's a list or tuple of 2 integers then the
+                            number of rows and columns will
+                            be a random number between size_dims[0] and
+                            size_dims[1] (inclusively).
+                density: (optional) the approximate density of factors. The
+                default value is 0.1. It should be a floating point number
+                between 0 and 1.
+                fac_type: (optional) the type of density of factors. Must be
+                "sparse", "dense" or "mixed" if you want a mix of dense and
+                sparse matrices in the generated Faust (choice's done according
+                to an uniform distribution).
+                            The default value is "mixed".
+                is_real: (optional) a boolean set to True to generate a real Faust,
+                        set to False to generate a complex Faust. The default value
+                        is True.
+
+        Returns:
+            the random Faust.
+
+        Examples:
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(2, 10, .5, is_real=False)
+            >>> G = FaustFactory.rand([2, 5], [10, 20], .5, fac_type="dense")
+            >>> F
+            Faust size 10x10, density 0.99, nnz_sum 99, 2 factors:<br/>
+            FACTOR 0 (complex) SPARSE, size 10x10, density 0.4, nnz 40<br/>
+            FACTOR 1 (complex) DENSE, size 10x10, density 0.59, nnz 59<br/>
+            >>> G
+            Faust size 19x16, density 1.37171, nnz_sum 417, 4 factors:<br/>
+            FACTOR 0 (real) DENSE, size 19x17, density 0.49226, nnz 159<br/>
+            FACTOR 1 (real) DENSE, size 17x10, density 0.517647, nnz 88<br/>
+            FACTOR 2 (real) DENSE, size 10x13, density 0.515385, nnz 67<br/>
+            FACTOR 3 (real) DENSE, size 13x16, density 0.495192, nnz 103<br/>
+
+        <b/> See also Faust.__init__
         """
-        return Faust.rand(*kwargs)
+        DENSE=0
+        SPARSE=1
+        MIXED=2
+        REAL=3
+        COMPLEX=4
+        # set density type of factors
+        if(not isinstance(fac_type, str) or fac_type not in ["sparse",
+                                                             "dense",
+                                                             "mixed"]):
+            raise ValueError('FaustFactory.rand(): argument fac_type must be a'
+                             ' str equal to "sparse",'
+                             ' "dense" or "mixed".')
+
+        fac_type_map = {"sparse" : SPARSE, "dense" : DENSE, "mixed" : MIXED}
+        # set field of matrices/factors
+        if(not isinstance(is_real, bool)):
+            raise ValueError('FaustFactory.rand(): argument is_real must be a'
+                             'boolean.')
+        if(is_real):
+            field = REAL
+        else:
+            field = COMPLEX
+        if((isinstance(num_factors, list) or isinstance(num_factors, tuple)) and
+        len(num_factors) == 2):
+            min_num_factors = num_factors[0]
+            max_num_factors = num_factors[1]
+        elif(isinstance(num_factors, int)):
+            min_num_factors = max_num_factors = num_factors
+        else:
+            raise ValueError("FaustFactory.rand(): num_factors argument must be an "
+                             "integer or a list/tuple of 2 integers.")
+        if((isinstance(dim_sizes, list) or isinstance(dim_sizes, tuple)) and
+        len(dim_sizes) == 2):
+            min_dim_size = dim_sizes[0]
+            max_dim_size = dim_sizes[1]
+        elif(isinstance(dim_sizes, int)):
+            min_dim_size = max_dim_size = dim_sizes
+        else:
+            raise ValueError("FaustFactory.rand(): dim_sizes argument must be an "
+                             "integer or a list/tuple of 2 integers.")
+        rF = Faust(core_obj=FaustCorePy.FaustCore.randFaust(
+            fac_type_map[fac_type], field, min_num_factors, max_num_factors,
+            min_dim_size, max_dim_size, density))
+        return rF
 
 class ParamsFact(object):
 

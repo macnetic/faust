@@ -27,8 +27,10 @@ classdef (Abstract) ParamsFact
 			step_size = matfaust.ParamsFact.DEFAULT_STEP_SIZE;
 			is_verbose = matfaust.ParamsFact.DEFAULT_VERBOSITY;
 			constant_step_size = matfaust.ParamsFact.DEFAULT_CONSTANT_STEP_SIZE;
-			if(~ isscalar(num_facts) || ~ isinteger(int64(num_facts)))
+			if(~ isscalar(num_facts) || ~ isreal(num_facts))
 				error('matfaust.ParamsFact 1st argument (num_facts) must be an integer.')
+			else
+				num_facts = floor(num_facts);
 			end
 			if(~ islogical(is_update_way_R2L))
 				error('matfaust.ParamsFact 2nd argument (is_update_way_R2L) must be logical.')

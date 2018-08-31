@@ -32,7 +32,7 @@ classdef StoppingCriterion
 					end
 					if(nargin > 1)
 						max_num_its = varargin{2};
-						if(~ isscalar(max_num_its) || ~ isinteger(int64(max_num_its)))
+						if(~ isscalar(max_num_its) || ~ isreal(max_num_its))
 							error('matfaust.StoppingCriterion 3rd argument (max_num_its) must be an integer.')
 						end
 						max_num_its = floor(max_num_its);
