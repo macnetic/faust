@@ -95,16 +95,17 @@ classdef FaustFactory
 		%>  is_update_way_R2L = false;
 		%>  init_lambda = 1.0;
 		%>  M = rand(500, 32);
-		%>  cons = cell(4,1);
-		%>  cons{1} = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5);
-		%>  cons{2} = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96);
-		%>  cons{3} = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96);
-		%>  cons{4} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1);
-		%>  cons{5} =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 666);
-		%>  cons{6} =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333);
+		%>  fact_cons = cell(3, 1);
+		%>  res_cons = cell(3, 1);
+		%>  fact_cons{1} = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5);
+		%>  fact_cons{2} = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96);
+		%>  fact_cons{3} = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96);
+		%>  res_cons{1} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1);
+		%>  res_cons{2} =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 666);
+		%>  res_cons{3} =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333);
 		%>  stop_crit = StoppingCriterion(200);
 		%>  stop_crit2 = StoppingCriterion(200);
-		%>  params = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda, cons, size(M,1), size(M,2), {stop_crit, stop_crit2});
+		%>  params = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda, fact_cons, res_cons, size(M,1), size(M,2), {stop_crit, stop_crit2});
 		%>  F = FaustFactory.fact_hierarchical(M, params)
 		%>  @endcode
 		%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation 1/3<br/>

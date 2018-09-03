@@ -346,22 +346,17 @@ class TestFaustFactory(unittest.TestCase):
         M = \
         loadmat(sys.path[-1]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
         # default step_size
-        cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
-        cons2 = ConstraintInt(ConstraintName(ConstraintName.SP), 32,
-                                 32, 96)
-        cons3 = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32,
-                                 96)
-        cons4 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32,
-                                 1)
-        cons5 =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32,
-                                 666)
-        cons6 =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32,
-                                 333)
+        fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+        fact1_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
+        fact2_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
+        res0_cons = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1)
+        res1_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 666)
+        res2_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333)
         stop_crit1 = StoppingCriterion(num_its=200)
         stop_crit2 = StoppingCriterion(num_its=200)
         param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
-                                       [cons1, cons2, cons3, cons4,
-                                                   cons5, cons6],
+                                       [fact0_cons, fact1_cons, fact2_cons],
+                                       [res0_cons, res1_cons, res2_cons],
                                        M.shape[0],M.shape[1],[stop_crit1,
                                                               stop_crit2],
                                        is_verbose=False)

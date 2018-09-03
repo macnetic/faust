@@ -919,41 +919,41 @@ class FaustFactory:
             The Faust object result of the factorization.
 
         Examples:
-		>>> from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintReal,\
-		>>> ConstraintInt, ConstraintName, StoppingCriterion
-		>>> import numpy as np
-		>>> num_facts = 4
-		>>> is_update_way_R2L = False
-		>>> init_lambda = 1.0
-		>>> M = np.random.rand(500, 32)
-		>>> cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
-		>>> cons2 = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
-		>>> cons3 = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
-		>>> cons4 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1)
-		>>> cons5 =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 666)
-		>>> cons6 =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333)
-		>>> stop_crit1 = StoppingCriterion(num_its=200)
-		>>> stop_crit2 = StoppingCriterion(num_its=200)
-		>>> param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
-		>>>                                [cons1, cons2, cons3, cons4,
-		>>>                                            cons5, cons6],
-		>>>                                M.shape[0],M.shape[1],[stop_crit1,
-		>>>                                                       stop_crit2],
-		>>>                                is_verbose=False)
-		>>> F = FaustFactory.fact_hierarchical(M, param)
-		Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
-        1/3<br/>
-		Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
-        2/3<br/>
-		Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
-        3/3<br/>
-		>>> F.display()
-		Faust size 500x32, density 0.189063, nnz_sum 3025, 4 factor(s):
-		- FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
-		- FACTOR 1 (real) SPARSE, size 32x32, density 0.09375, nnz 96
-		- FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
-		- FACTOR 3 (real) DENSE, size 32x32, density 0.325195, nnz 333
-        """
+            >>> from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintReal,\
+            >>> ConstraintInt, ConstraintName, StoppingCriterion
+            >>> import numpy as np
+            >>> num_facts = 4
+            >>> is_update_way_R2L = False
+            >>> init_lambda = 1.0
+            >>> M = np.random.rand(500, 32)
+            >>> fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+            >>> fact1_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
+            >>> fact2_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
+            >>> res0_cons = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1)
+            >>> res1_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 666)
+            >>> res2_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333)
+            >>> stop_crit1 = StoppingCriterion(num_its=200)
+            >>> stop_crit2 = StoppingCriterion(num_its=200)
+            >>> param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
+            >>>                                [fact0_cons, fact1_cons, fact2_cons],
+            >>>                                [res0_cons, res1_cons, res2_cons],
+            >>>                                M.shape[0],M.shape[1],[stop_crit1,
+            >>>                                                       stop_crit2],
+            >>>                                is_verbose=False)
+            >>> F = FaustFactory.fact_hierarchical(M, param)
+            Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
+            1/3<br/>
+            Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
+            2/3<br/>
+            Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
+            3/3<br/>
+            >>> F.display()
+            Faust size 500x32, density 0.189063, nnz_sum 3025, 4 factor(s):
+                - FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
+                - FACTOR 1 (real) SPARSE, size 32x32, density 0.09375, nnz 96
+                - FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
+                - FACTOR 3 (real) DENSE, size 32x32, density 0.325195, nnz 333
+                """
         if(not isinstance(p, ParamsHierarchicalFact)):
             raise ValueError("p must be a ParamsPalm4MSA object.")
         FaustFactory._check_fact_mat('FaustFactory.fact_hierarchical()', M)
@@ -1104,7 +1104,7 @@ class ParamsPalm4MSA(ParamsFact):
         elif(not isinstance(init_facts, list) and not isinstance(init_facts,
                                                                tuple) or
            len(init_facts) != num_facts):
-            raise ValueError('ParamsFact init_facts argument must be a '
+            raise ValueError('ParamsPalm4MSA init_facts argument must be a '
                              'list/tuple of '+str(num_facts)+" (num_facts) arguments.")
         else:
             self.init_facts = init_facts
@@ -1117,10 +1117,12 @@ class ParamsPalm4MSA(ParamsFact):
 class ParamsHierarchicalFact(ParamsFact):
 
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
-                 constraints, data_num_rows, data_num_cols, stop_crits,
+                 fact_constraints, res_constraints, data_num_rows,
+                 data_num_cols, stop_crits,
                  step_size=10.0**-16, constant_step_size=False,
                  is_verbose=False,
                  is_fact_side_left = False):
+        constraints = fact_constraints + res_constraints
         super(ParamsHierarchicalFact, self).__init__(num_facts,
                                                      is_update_way_R2L,
                                                      init_lambda,
