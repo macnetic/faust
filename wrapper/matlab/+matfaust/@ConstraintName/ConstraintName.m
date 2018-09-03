@@ -26,44 +26,44 @@ classdef ConstraintName
 		end
 
 		function is_int = is_int_constraint(obj)
-			import matfaust.ConstraintName
-			is_int = obj.name == ConstraintName.SP || obj.name == ConstraintName.SPLIN || obj.name == ConstraintName.SPCOL ...
-				|| obj.name == ConstraintName.SP_POS || obj.name == ConstraintName.SPLINCOL;
+			%import matfaust.ConstraintName
+			% use obj instead of ConstraintName to avoid to import the class
+			% obj has access to static attributes of its class
+			% (doing the same for is_real_constraint(), is_mat_constraint(), conv2str())
+			is_int = obj.name == obj.SP || obj.name == obj.SPLIN || obj.name == obj.SPCOL ...
+				|| obj.name == obj.SP_POS || obj.name == obj.SPLINCOL;
 			% BLKDIAG is a int constraint according to what faust_ConstraintGeneric.cpp indicates
 		end
 
 		function is_real = is_real_constraint(obj)
-			import matfaust.ConstraintName
-			is_real = obj.name == ConstraintName.NORMCOL || obj.name == ConstraintName.NORMLIN;
+			is_real = obj.name == obj.NORMCOL || obj.name == obj.NORMLIN;
 		end
 
 		function is_mat = is_mat_constraint(obj)
-			import matfaust.ConstraintName
-			is_mat = obj.name == ConstraintName.SUPP || obj.name == ConstraintName.CONST;
+			is_mat = obj.name == obj.SUPP || obj.name == obj.CONST;
 		end
 
 		function str = conv2str (obj)
-			import matfaust.ConstraintName
 			switch obj.name
-				case ConstraintName.SP
+				case obj.SP
 					str = 'sp';
-				case ConstraintName.SPLIN;
+				case obj.SPLIN;
 					str = 'splin';
-				case ConstraintName.SPCOL;
+				case obj.SPCOL;
 					str = 'spcol';
-				case ConstraintName.SPLINCOL;
+				case obj.SPLINCOL;
 					str = 'splincol';
-				case ConstraintName.SP_POS;
+				case obj.SP_POS;
 					str = 'sppos';
-				case ConstraintName.NORMCOL;
+				case obj.NORMCOL;
 					str = 'normcol';
-				case ConstraintName.NORMLIN;
+				case obj.NORMLIN;
 					str = 'normlin';
-				case ConstraintName.SUPP;
+				case obj.SUPP;
 					str = 'supp';
-				case ConstraintName.CONST;
+				case obj.CONST;
 					str = 'const';
-				%case ConstraintName.BLKDIAG;
+				%case obj.BLKDIAG;
 				%	str = 'blkdiag'
 				otherwise
 					error('Unknown name')
