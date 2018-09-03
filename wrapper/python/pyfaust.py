@@ -1156,6 +1156,14 @@ class StoppingCriterion(object):
         self.num_its = num_its
         self.max_num_its = max_num_its
         #TODO: check_validity() like C++ code does
+        if(is_criterion_error and num_its != 500):
+            raise ValueError("It's forbidden to set a number of iterations as stopping"
+                             " criterion when is_criterion_error == True.")
+        elif(not is_criterion_error and (max_num_its != 1000 or error_treshold
+                                         != 0.3)):
+            raise ValueError("When is_criterion_error == True it's forbidden to use"
+                             " other arguments than num_its argument to define "
+                             "the stopping criterion.")
 
 class ConstraintName:
     SP = 0 # Int Constraint
