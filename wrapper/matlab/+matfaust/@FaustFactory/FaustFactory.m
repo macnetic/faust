@@ -63,6 +63,7 @@ classdef FaustFactory
 		function  F = fact_palm4msa(M, p)
 			import matfaust.Faust
 			mex_constraints = cell(1, length(p.constraints));
+			matfaust.FaustFactory.check_fact_mat('FaustFactory.fact_palm4msa', M)
 			for i=1:length(p.constraints)
 				cur_cell = cell(1, 4);
 				cur_cell{1} = p.constraints{i}.name.conv2str();
@@ -122,6 +123,7 @@ classdef FaustFactory
 		function F = fact_hierarchical(M, p)
 			import matfaust.Faust
 			mex_constraints = cell(2, p.num_facts-1);
+			matfaust.FaustFactory.check_fact_mat('FaustFactory.fact_hierarchical', M)
 			%mex_fact_constraints = cell(1, p.num_facts-1)
 			for i=1:p.num_facts-1
 				cur_cell = cell(1, 4);
@@ -319,5 +321,18 @@ classdef FaustFactory
 			F = matfaust.Faust(core_obj, is_real);
 		end
 
+	end
+	methods(Access = private, Static)
+		function check_fact_mat(funcname, M)
+			if(~ ismatrix(M) || isscalar(M))
+				error([funcname,'() 1st argument (M) must be a matrix.'])
+			end
+			if(~ isnumeric(M))
+				error([funcname, '() 1st argument (M) must be real or complex.'])
+			end
+			if(~ isreal(M))
+				error([funcname, '() doesn''t yet support complex matrix factorization.'])
+			end
+		end
 	end
 end

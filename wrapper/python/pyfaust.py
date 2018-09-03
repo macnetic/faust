@@ -903,6 +903,7 @@ class FaustFactory:
         """
         if(not isinstance(p, ParamsPalm4MSA)):
             raise ValueError("p must be a ParamsPalm4MSA object.")
+        FaustFactory._check_fact_mat('FaustFactory.fact_palm4msa()', M)
         return Faust(core_obj=FaustCorePy.FaustFact.fact_palm4MSA(M, p))
 
     @staticmethod
@@ -955,6 +956,7 @@ class FaustFactory:
         """
         if(not isinstance(p, ParamsHierarchicalFact)):
             raise ValueError("p must be a ParamsPalm4MSA object.")
+        FaustFactory._check_fact_mat('FaustFactory.fact_hierarchical()', M)
         return Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
 
     @staticmethod
@@ -1050,6 +1052,20 @@ class FaustFactory:
             fac_type_map[fac_type], field, min_num_factors, max_num_factors,
             min_dim_size, max_dim_size, density))
         return rF
+
+    @staticmethod
+    def _check_fact_mat(funcname, M):
+        if(not isinstance(M, np.ndarray)):
+            raise Exception(funcname+" 1st argument must be a numpy ndarray.")
+        if(not isinstance(M[0,0], np.complex) and not isinstance(M[0,0],
+                                                                np.float)):
+            raise Exception(funcname+" 1st argument must be a float or complex "
+                            "ndarray.")
+        if(isinstance(M[0,0], np.complex)):
+           raise Exception(funcname+" doesn't yet support complex matrix "
+                           "factorization.")
+
+
 
 class ParamsFact(object):
 
