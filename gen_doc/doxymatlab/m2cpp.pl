@@ -159,10 +159,11 @@ foreach $my_fic (@listeFic)
         $output = $declTypeDef.$output;
         $declTypeDef = "";
       }
-      $arguments =~ s/,/,in /g;
+      #$arguments =~ s/,/,in /g;
       $arguments =~ s/~/ignoredArg/g;
-      $arguments = "in $arguments";
-      if ($arguments =~ /^in $/)
+      #$arguments = "in $arguments";
+      # if ($arguments =~ /^in $/)
+      if($arguments =~ /^ $/)
       {
         $arguments = "";
       }
@@ -174,10 +175,11 @@ foreach $my_fic (@listeFic)
     {
       $functionName = $2;
       $arguments = $3;
-      $arguments =~ s/,/,in /g;
+      #$arguments =~ s/,/,in /g;
       $arguments =~ s/~/ignoredArg/g;
-      $arguments = "in $arguments";
-      if ($arguments =~ /^in $/)
+      #$arguments = "in $arguments";
+      if($arguments =~ /^ $/)
+      #	if ($arguments =~ /^in $/)
       {
         $arguments = "";
       }
