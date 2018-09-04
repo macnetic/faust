@@ -81,12 +81,15 @@ switch(opt)
 	case 'MEX' %% factorisation (mexfile)
 		disp('*** MEX FACTORISATION ***');  
 		tic
-			[lambda,fact]=mexHierarchical_fact(matrix,params);
+			%[lambda,fact]=mexHierarchical_fact(matrix,params);
+			[lambda, core_obj] = mexHierarchical_fact(matrix, params);
+			F = Faust(core_obj, isreal(matrix));
 		t=toc;
 	case 'MATLAB' %% factorisation (matlab)
 		disp(['*** MATLAB FACTORISATION ***']); 
 		tic
 			[lambda,fact]=old_hierarchical_fact(matrix,params);
+			F=Faust(fact,lambda);
 		t=toc;
      
 	otherwise
@@ -113,7 +116,6 @@ if (abs(lambda - expectedLambda) > expectedLambdaPrecision)
 end
 
 
-F=Faust(fact,lambda);
 relative_error = norm(matrix - full(F));
 
 disp(['relative error :  ' num2str(relative_error)]);

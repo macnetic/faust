@@ -55,8 +55,8 @@ classdef FaustFactory
 		%> F =
 		%>
 		%> Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):
-		%> - FACTOR 0 (real) DENSE, size 500x32, density 0.15625, nnz 2500
-		%> - FACTOR 1 (real) DENSE, size 32x32, density 1, nnz 1024
+		%> - FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
+		%> - FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024
 		%>
 		%>
 		%==========================================================================================
@@ -74,9 +74,8 @@ classdef FaustFactory
 			end
 			% put mex_constraints in a cell array again because mex eats one level of array
 			mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'init_facts', {p.init_facts}, 'niter', p.stop_crit.num_its, 'sc_is_criterion_error', p.stop_crit.is_criterion_error, 'sc_error_treshold', p.stop_crit.error_treshold, 'sc_max_num_its', p.stop_crit.max_num_its);
-			[lambda, cell_facts] = mexPalm4MSA(mex_params);
-			cell_facts{1} = cell_facts{1}*lambda;
-			F = Faust(cell_facts);
+			[lambda, core_obj] = mexPalm4MSA(mex_params);
+			F = Faust(core_obj, isreal(M));
 		end
 
 		%==========================================================================================
@@ -115,10 +114,10 @@ classdef FaustFactory
 		%>  F = 
 		%>
 		%>  Faust size 500x32, density 0.189063, nnz_sum 3025, 4 factor(s): 
-		%>  - FACTOR 0 (real) DENSE, size 500x32, density 0.15625, nnz 2500
-		%>  - FACTOR 1 (real) DENSE, size 32x32, density 0.09375, nnz 96
-		%>  - FACTOR 2 (real) DENSE, size 32x32, density 0.09375, nnz 96
-		%>  - FACTOR 3 (real) DENSE, size 32x32, density 0.325195, nnz 333
+		%>  - FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
+		%>  - FACTOR 1 (real) SPARSE, size 32x32, density 0.09375, nnz 96
+		%>  - FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
+		%>  - FACTOR 3 (real) SPARSE, size 32x32, density 0.325195, nnz 333
 		%>
 		%==========================================================================================
 		function F = fact_hierarchical(M, p)
@@ -146,9 +145,8 @@ classdef FaustFactory
 				mex_constraints{2,i} = cur_cell;
 			end
 			mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left);
-			[lambda, cell_facts] = mexHierarchical_fact(M, mex_params);
-			cell_facts{1} = cell_facts{1}*lambda;
-			F = Faust(cell_facts);
+			[lambda, core_obj] = mexHierarchical_fact(M, mex_params);
+			F = Faust(core_obj, isreal(M));
 		end
 
 		%==========================================================================================
@@ -156,19 +154,19 @@ classdef FaustFactory
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b Faust.rand(N,S) with N and S two integers, generates a Faust of N factors. All factors are square matrices of order S. The type of factors (dense or sparse) is a random choice.
+		%> &nbsp;&nbsp;&nbsp; @b FaustFactory.rand(N,S) with N and S two integers, generates a Faust of N factors. All factors are square matrices of order S. The type of factors (dense or sparse) is a random choice.
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b Faust.rand([N1,N2],S) same as above except that here the number of factors is randomly chosen between N1 and N2 inclusively.
+		%> &nbsp;&nbsp;&nbsp; @b FaustFactory.rand([N1,N2],S) same as above except that here the number of factors is randomly chosen between N1 and N2 inclusively.
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b Faust.rand([N1,N2],[S1, S2]) or @b Faust.rand(N, [S1, S2]) same as above except that here the factor matrices have random sizes; the number of rows and columns are both randomly chosen between S1 and S2 inclusively.
+		%> &nbsp;&nbsp;&nbsp; @b FaustFactory.rand([N1,N2],[S1, S2]) or @b FaustFactory.rand(N, [S1, S2]) same as above except that here the factor matrices have random sizes; the number of rows and columns are both randomly chosen between S1 and S2 inclusively.
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b Faust.rand(N, S, D) or @b Faust.rand([N1, N2], [S1, S2], D) same as above but specifying D the approximate density of each factor.
+		%> &nbsp;&nbsp;&nbsp; @b FaustFactory.rand(N, S, D) or @b FaustFactory.rand([N1, N2], [S1, S2], D) same as above but specifying D the approximate density of each factor.
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b @b Faust\.rand(N, @b S, @b D, @b 'dense') or @b Faust\.rand(@b [@b  N1, @b N2], [@b S1, @b S2], @b D, @b 'dense') same as above but generating only dense matrices as factors.
+		%> &nbsp;&nbsp;&nbsp; @b @b FaustFactory\.rand(N, @b S, @b D, @b 'dense') or @b FaustFactory\.rand(@b [@b  N1, @b N2], [@b S1, @b S2], @b D, @b 'dense') same as above but generating only dense matrices as factors.
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b Faust\.rand(@b N, @b S, @b D, @b 'sparse') or @b Faust\.rand([@b N1, @b N2], [@b S1, @b S2], @b D, @b 'sparse') same as above but generating only sparse matrices as factors.
+		%> &nbsp;&nbsp;&nbsp; @b FaustFactory\.rand(@b N, @b S, @b D, @b 'sparse') or @b FaustFactory\.rand([@b N1, @b N2], [@b S1, @b S2], @b D, @b 'sparse') same as above but generating only sparse matrices as factors.
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b Faust\.rand(@b N, @b S, @b D, @b 'sparse', @b false), @b Faust\.rand([@b N1, @b N2], [@b S1, @b S2], @b D, @b 'sparse', @b false), Faust\.rand(@b N, @b S, @b D, @b 'dense', @b false) or @b Faust\.rand([@b N1, @b N2], [@b S1, @b S2], @b D, @b 'dense', @b false) same as above but generating a complex Faust, that is, matrices defined over a the complex field.
+		%> &nbsp;&nbsp;&nbsp; @b FaustFactory\.rand(@b N, @b S, @b D, @b 'sparse', @b false), @b FaustFactory\.rand([@b N1, @b N2], [@b S1, @b S2], @b D, @b 'sparse', @b false), FaustFactory\.rand(@b N, @b S, @b D, @b 'dense', @b false) or @b FaustFactory\.rand([@b N1, @b N2], [@b S1, @b S2], @b D, @b 'dense', @b false) same as above but generating a complex Faust, that is, matrices defined over the complex field.
 		%>
 		%>
 		%>
@@ -204,8 +202,8 @@ classdef FaustFactory
 		%> @b Example @b 1
 		%> @code
 		%> % in a matlab terminal
-		%> >> import matfaust.Faust
-		%> >> F = Faust.rand(2, 10, .5, 'mixed', false)
+		%> >> import matfaust.FaustFactory
+		%> >> F = FaustFactory.rand(2, 10, .5, 'mixed', false)
 		%>
 		%> F =
 		%>
@@ -215,8 +213,8 @@ classdef FaustFactory
 		%> @endcode
 		%> @b Example @b 2
 		%> @code
-		%> >> import matfaust.Faust
-		%> >> G = Faust.rand([2, 5], [10, 20], .5, 'dense')
+		%> >> import matfaust.FaustFactory
+		%> >> G = FaustFactory.rand([2, 5], [10, 20], .5, 'dense')
 		%>
 		%> G =
 		%>
@@ -243,7 +241,7 @@ classdef FaustFactory
 			%> Means DENSE or SPARSE
 			MIXED=2;
 			if(nargin < 2)
-				error('Faust.rand(): the number of arguments must be at least 2.')
+				error('FaustFactory.rand(): the number of arguments must be at least 2.')
 			end
 			% set num of factors
 			num_factors = varargin{1};
@@ -255,7 +253,7 @@ classdef FaustFactory
 				min_num_factors = num_factors(1);
 				max_num_factors = num_factors(2);
 			else
-				error('Faust.rand(): the first argument (num_factors) must be an integer or a vector of two integers.')
+				error('FaustFactory.rand(): the first argument (num_factors) must be an integer or a vector of two integers.')
 			end
 			% set sizes of factors
 			if(isscalar(dim_sizes) && mod(dim_sizes, 1) == 0)
@@ -265,7 +263,7 @@ classdef FaustFactory
 				min_dim_size = dim_sizes(1);
 				max_dim_size = dim_sizes(2);
 			else
-				error('Faust.rand(): the second argument (dim_sizes) must be an integer or a vector of two integers.')
+				error('FaustFactory.rand(): the second argument (dim_sizes) must be an integer or a vector of two integers.')
 			end
 			field = REAL;
 			fac_type = MIXED;
@@ -273,7 +271,7 @@ classdef FaustFactory
 				if(isnumeric(varargin{3}))
 					density = varargin{3};
 				else
-					error('Faust.rand(): the third argument (density) must be a real number in [0;1].')
+					error('FaustFactory.rand(): the third argument (density) must be a real number in [0;1].')
 				end
 				% set density type of factors
 				if(nargin >= 4)
@@ -286,7 +284,7 @@ classdef FaustFactory
 							fac_type = MIXED;
 						end
 					else
-						error('Faust.rand(): the fourth argument (fac_type) must be among a character array among ''sparse'', ''dense'' or ''mixed''.')
+						error('FaustFactory.rand(): the fourth argument (fac_type) must be among a character array among ''sparse'', ''dense'' or ''mixed''.')
 					end
 					%set the field of factors
 					if(nargin >= 5)
@@ -297,7 +295,7 @@ classdef FaustFactory
 								field = COMPLEX;
 							end
 						else
-							error('Faust.rand(): the fifth argument (isreal) must be a boolean.')
+							error('FaustFactory.rand(): the fifth argument (isreal) must be a boolean.')
 						end
 					else
 						field = REAL;

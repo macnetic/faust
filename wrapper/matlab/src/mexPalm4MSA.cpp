@@ -49,7 +49,9 @@
 #include <stdexcept>
 #include "mx2Faust.h"
 #include "faust2Mx.h"
-
+#include "faust_TransformHelper.h"
+#include "class_handle.hpp"
+using namespace Faust;
 
 void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFields);
 
@@ -278,15 +280,23 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
      plhs[0]=mxCreateDoubleScalar((double) lambda);
 
      std::vector<Faust::MatDense<FFPP,Cpu> > facts;
+	 std::vector<Faust::MatGeneric<FFPP, Cpu>*> sp_facts;
      facts=palm.get_facts();
 
+	 for(typename std::vector<Faust::MatDense<FFPP, Cpu>>::iterator it = facts.begin(); it != facts.end(); it++)
+	 {
+		 Faust::MatSparse<FFPP, Cpu> * M = new Faust::MatSparse<FFPP, Cpu>(*it);
+		 sp_facts.push_back(M);
+	 }
 
-     Faust::MatDense<FFPP,Cpu> current_fact = facts[0];
-     mxArray * cellFacts;
-     setCellFacts(&cellFacts,facts);
 
+	 TransformHelper<FFPP, Cpu> *F = new TransformHelper<FFPP, Cpu>(sp_facts, lambda, false);
+	 plhs[1] = convertPtr2Mat<Faust::TransformHelper<FFPP, Cpu>>(F);
 
-     plhs[1]=cellFacts;
+	 for(typename std::vector<Faust::MatGeneric<FFPP,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
+	 {
+		 delete *it;
+	 }
 	}
 	catch (const std::exception& e)
 	{

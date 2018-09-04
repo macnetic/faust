@@ -40,6 +40,8 @@
 
 #include "mex.h"
 #include "faust_HierarchicalFact.h"
+#include "faust_TransformHelper.h"
+#include "class_handle.hpp"
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -330,16 +332,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
      plhs[0]=mxCreateDoubleScalar((double) lambda);
 
-     std::vector<Faust::MatDense<FFPP,Cpu> > facts;
-     hier_fact.get_facts(facts);
+	 Faust::Transform<FFPP, Cpu> t;
+	 hier_fact.get_facts(t); //it sets sparse factors
 
+	 t.scalarMultiply((FFPP)lambda);
 
-     Faust::MatDense<FFPP,Cpu> current_fact = facts[0];
-     mxArray * cellFacts;
-     setCellFacts(&cellFacts,facts);
-
-
-     plhs[1]=cellFacts;
+	 Faust::TransformHelper<FFPP,Cpu>* F = new Faust::TransformHelper<FFPP, Cpu>(t);
+	 plhs[1] = convertPtr2Mat<Faust::TransformHelper<FFPP, Cpu>>(F);
 
 	}
 	 catch (const std::exception& e)

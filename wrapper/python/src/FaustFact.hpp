@@ -1,5 +1,6 @@
 #include <iostream>
 #include "faust_MatDense.h"
+#include "faust_MatSparse.h"
 #include "faust_Params.h"
 #include "faust_ParamsPalm.h"
 #include "faust_StoppingCriterion.h"
@@ -144,16 +145,26 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
 
     palm.compute_facts();
 
-
-//    palm.get_facts(faust);
-//
-    std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = const_cast< std::vector<Faust::MatDense<FPP,Cpu> >&>(palm.get_facts());
     FPP lambda = palm.get_lambda();
-    (full_facts[0]) *= lambda;
-    Faust::Transform<FPP, Cpu> faust(full_facts, true);
-    if(p->is_verbose) faust.Display();
 
-    Faust::TransformHelper<FPP, Cpu> th(faust);
+    std::vector<Faust::MatDense<FFPP,Cpu> > facts;
+    std::vector<Faust::MatGeneric<FFPP, Cpu>*> sp_facts;
+    facts=palm.get_facts();
+
+    for(typename std::vector<Faust::MatDense<FFPP, Cpu>>::iterator it = facts.begin(); it != facts.end(); it++)
+    {
+        Faust::MatSparse<FFPP, Cpu> * M = new Faust::MatSparse<FFPP, Cpu>(*it);
+        sp_facts.push_back(M);
+    }
+
+    Faust::TransformHelper<FFPP, Cpu> th(sp_facts, lambda, false);
+
+    for(typename std::vector<Faust::MatGeneric<FFPP,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
+    {
+        delete *it;
+    }
+    if(p->is_verbose) th.display();
+
     core = new FaustCoreCpp<FPP>(th);
 
     blasHandle.Destroy();
@@ -222,13 +233,13 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
     hierFact.get_facts(facts);
     FPP lambda = hierFact.get_lambda();
     (facts[0]) *= lambda;
-    // transform the sparse matrix into generic one
+    // transform the sparse matrix into matrix pointers
     std::vector<Faust::MatGeneric<FPP,Cpu> *> list_fact_generic;
     list_fact_generic.resize(facts.size());
     for (int i=0;i<list_fact_generic.size();i++)
         list_fact_generic[i]=facts[i].Clone();
 
-    Faust::Transform<FPP,Cpu> faust(list_fact_generic);
+    Faust::Transform<FPP,Cpu> faust(list_fact_generic, 1.0, false);
 
     for (int i=0;i<list_fact_generic.size();i++)
         delete list_fact_generic[i];

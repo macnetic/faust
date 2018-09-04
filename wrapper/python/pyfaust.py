@@ -952,7 +952,7 @@ class FaustFactory:
                 - FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
                 - FACTOR 1 (real) SPARSE, size 32x32, density 0.09375, nnz 96
                 - FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
-                - FACTOR 3 (real) DENSE, size 32x32, density 0.325195, nnz 333
+                - FACTOR 3 (real) SPARSE, size 32x32, density 0.325195, nnz 333
                 """
         if(not isinstance(p, ParamsHierarchicalFact)):
             raise ValueError("p must be a ParamsPalm4MSA object.")
