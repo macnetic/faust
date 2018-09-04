@@ -224,6 +224,18 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> 
 }
 
 template<typename FPP>
+Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu> >& facts, const bool optimizedCopy /*default value = false*/ ):	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
+	totalNonZeros(0)
+{
+	data.resize(facts.size());
+	for (int i=0 ; i<data.size() ; i++)
+	{
+		data[i]=facts[i].Clone(optimizedCopy);
+		totalNonZeros += data[i]->getNonZeros();
+	}
+}
+
+template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool transpose_A, const bool conj_A, const Transform<FPP, Cpu>* B, const bool transpose_B, const bool conj_B):
 	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()), totalNonZeros(0)
 {
@@ -358,7 +370,7 @@ void Faust::Transform<FPP, Cpu>::save_mat_file(const char* filename, bool transp
 void Faust::Transform<FPP,Cpu>::scalarMultiply(const FPP scalar)
 {
 	if (size() > 0)
-		data[0]*=scalar;
+		*(data[0])*=scalar;
 	else
 		handleError(m_className,"scalarMultiply : empty faust can't be multiplied ");
 }
