@@ -9,13 +9,8 @@
 #include <string>
 #include <cstring>
 #include <typeinfo>
+#include <stdint.h>
 
-
-
-#if !defined(__MACH__) && !defined(_STDINT_H) // from /usr/include/stdint.h and bits/stdint-uintn.h
-	typedef unsigned long int uint32_t;
-	typedef unsigned long long int uint64_t;
-#endif
 
 
 #define CLASS_HANDLE_SIGNATURE 0xFF00F0A5
