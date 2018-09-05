@@ -169,8 +169,11 @@ if( ${MATLAB_DIR_TMP} MATCHES "matlab")
 
 	elseif(WIN32)
 		string(REGEX REPLACE "([a-zA-Z0-9_\\:.]+)\\\\bin\\\\matlab.exe" "\\1" MATLAB_ROOT "${MATLAB_DIR_TMP}")
+		if(${CMAKE_GENERATOR} MATCHES "MinGW Makefiles")
+			string(REGEX REPLACE "\\\\" "/" MATLAB_ROOT ${MATLAB_ROOT}) # replacing \ chars (win. separator) by / to avoid error with path in makefile later (typically: C:\MATLAB could become C:MATLAB)
+		endif()
 	else()
-		message(WARNING "Unknown type of plateform for matlab")	
+		message(WARNING "Unknown type of plateform for matlab")
 	endif()
 	set(MATLAB_ROOT ${MATLAB_ROOT} CACHE PATH "Matlab root directory")
 	
