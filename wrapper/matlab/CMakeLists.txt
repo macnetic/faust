@@ -28,6 +28,11 @@ file(GLOB CPP_MEXTOOLS_FILES "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp")
 # include directory 
 #{${FAUST_EXCEPTION_SRC_DIR}
 include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR} ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}  ${FAUST_MATLAB_TOOLS_SRC_DIR} ${MATLAB_INCLUDE_DIR} ${EIGEN_INC_DIR} )
+
+if(MATIO_INC_DIR)
+	include_directories(${MATIO_INC_DIR})
+endif()
+
 #modif compatibilite ubuntu avec openblas
 if (BUILD_OPENBLAS)
 	include_directories(${OPENBLAS_INC_DIR})
@@ -79,15 +84,15 @@ if(UNIX)
 	    string(REGEX REPLACE "^(.+)/.*$" "-L\\1" LDD_MEX_FLAGS "${MATIO_LIB_FILE}")
 	    set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} "-L${FAUST_BIN_DIR}" "-l${FAUST_TARGET}" "-lmatio")
     endif()
-    if(BUILD_OPENBLAS)
-	set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}" "${OPENBLAS_LIB_FILE}")
-    endif()
 elseif(WIN32)
 	# MODIF ALALAL
 	#set(LDD_MEX_FLAGS "-L${FAUST_BIN_DIR}" "-l${FAUST_TARGET}")
-	if(BUILD_OPENBLAS)
-		set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}" "${OPENBLAS_LIB_FILE}")
-	endif()
+       #windows version uses static lib of matio
+       string(REGEX REPLACE "^(.+)/.*$" "\\1/libmatio.a" LDD_MEX_FLAGS "${MATIO_LIB_FILE}")
+endif()
+
+if(BUILD_OPENBLAS)
+	set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}" "${OPENBLAS_LIB_FILE}")
 endif()
 
 if(UNIX)
@@ -161,7 +166,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		file(GLOB OBJ_MEXTOOLS_FILES "${FAUST_TMPMEX_DIR}/*.${MEXOBJ_EXT}")
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 					COMMAND   ${MATLAB_ROOT}/bin/mex 
-					ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${OBJ_MEXTOOLS_FILES} #${MEXOBJ_FILES} # commented out because provoking double object files on cmd line
+					ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${OBJ_MEXTOOLS_FILES} ${MEXOBJ_FILES}
 						${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS}
 					DEPENDS ${MEXOBJ_FILES} 
 					COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}"
