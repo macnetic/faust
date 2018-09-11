@@ -51,12 +51,87 @@ configure_file(${FAUST_PYTHON_SRC_DIR}/pyfaust.py ${FAUST_PYTHON_BIN_DIR}/pyfaus
 
 add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET})
 
-foreach(PYTHON_EXE IN LISTS PYTHON_EXES)
-	add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
-		COMMAND   ${PYTHON_EXE}
-		ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace" 
-		COMMENT   "Creating PyFaust")
-endforeach()
+list(LENGTH PYTHON_EXES PYTHON_EXES_LEN)
+list(LENGTH CYTHON_EXES CYTHON_EXES_LEN)
+#TODO: check that the two LEN are equal
+
+#message(STATUS "PYTHON_EXES_LEN=${PYTHON_EXES_LEN}, PYTHON_EXES=${PYTHON_EXES}")
+#message(STATUS "CYTHON_EXES_LEN=${CYTHON_EXES_LEN}, CYTHON_EXES=${CYTHON_EXES}")
+if(UNIX)
+	foreach(PYTHON_EXE IN LISTS PYTHON_EXES)
+		exec_program("${PYTHON_EXE}" ARGS "--version" OUTPUT_VARIABLE PY_VER RETURN_VALUE PY_RES)
+		#message(STATUS "PY_VER=${PY_VER}")
+		string(REGEX REPLACE "Python ([0-9])\\.([0-9]).*$" "\\1\\2" PY_VER ${PY_VER})
+		add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
+			COMMAND   ${PYTHON_EXE}
+			ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace" 
+			COMMENT   "Creating pyfaust${PY_VER}")
+	endforeach()
+elseif(WIN32 AND ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles")
+	# manually compiling cython extension instead of using setup.py in order to avoid visual studio to melt into the compilation (we use mingw gcc here)
+	if(CYTHON_EXES_LEN)
+		foreach(INDEX RANGE 0 ${CYTHON_EXES_LEN} 1)
+			#message(STATUS "INDEX=${INDEX}")
+			if(${INDEX} LESS ${CYTHON_EXES_LEN})
+				list(GET CYTHON_EXES ${INDEX} CYTHON_EXE)
+				#list(GET PYTH0N_EXES ${INDEX} PYTHON_EXE) 
+				# workaround to the previous command which fails to retrieve PYTHON_EXES item
+				if(${INDEX} EQUAL 0) 
+					string(REGEX REPLACE "(.*);.*$" "\\1" PYTHON_EXE "${PYTHON_EXES}")
+				else()
+					string(REGEX REPLACE ".*;(.*)$" "\\1" PYTHON_EXE "${PYTHON_EXES}")
+				endif()
+				string(REGEX REPLACE "(.*)(/|\\\\).*" "\\1" PYTHON_PARENT_PATH ${PYTHON_EXE})
+				#message(STATUS "PYTHON_PARENT_PATH=${PYTHON_PARENT_PATH}")
+				#message(STATUS "PYTHON_EXE=${PYTHON_EXE}, PYTHON_EXES=${PYTHON_EXES}, INDEX=${INDEX}")
+				# get abbreviated python version
+				exec_program("${PYTHON_EXE}" ARGS "--version" OUTPUT_VARIABLE PY_VER RETURN_VALUE PY_RES)
+				#message(STATUS "PY_VER=${PY_VER}")
+				string(REGEX REPLACE "Python ([0-9])\\.([0-9]).*$" "\\1\\2" PY_VER ${PY_VER})
+				#message(STATUS "PY_VER=${PY_VER}")
+				# set header inclusion flags
+				string(REGEX REPLACE "," ";-I" FAUST_PY_CFLAGS ${FAUST_PYTHON_INCLUDE_DIR})
+				string(REGEX REPLACE "'" "" FAUST_PY_CFLAGS ${FAUST_PY_CFLAGS})
+				set(FAUST_PY_CFLAGS "${FAUST_PY_CFLAGS};-I${PYTHON_PARENT_PATH}\\include")
+				# get numpy header dir
+				execute_process(COMMAND "${PYTHON_EXE}" "-c" "import numpy;print(numpy.get_include())" OUTPUT_VARIABLE NUMPY_INCLUDE ERROR_VARIABLE PY_ERR RESULT_VARIABLE PY_RES)
+				#message(STATUS "NUMPY_INCLUDE=${NUMPY_INCLUDE}")
+				set(FAUST_PY_CFLAGS "-I${FAUST_PY_CFLAGS};-I${NUMPY_INCLUDE}")
+				string(REGEX REPLACE "\n" "" FAUST_PY_CFLAGS ${FAUST_PY_CFLAGS})
+				string(REGEX REPLACE ";?-I" ";-I" FAUST_PY_CFLAGS ${FAUST_PY_CFLAGS})
+				# find libfaust.a to statically link it into the python wrapper lib
+				#find_library(FAUST_LIB_PATH libfaust.a PATHS ${PROJECT_BINARY_DIR}/lib PATH_SUFFIXES release debug NO_DEFAULT_PATH)
+				# use rather generated expression to point to faust target file below ("$<TARGET_FILE:${FAUST_TARGET}>")
+				#message(STATUS "FAUST_LIB_PATH=${FAUST_LIB_PATH}")
+				find_library(MATIO_STATIC_LIB_PATH libmatio.a PATHS ${MATIO_LIB_DIR} NO_DEFAULT_PATH)
+				set(PYTHON_STATIC_LIB_PATH PYTHON_STATIC_LIB_PATH-NOTFOUND) # forcing search of lib (otherwise could be stuck to the previous iteration python)
+				find_library(PYTHON_STATIC_LIB_PATH libpython${PY_VER}.a PATHS ${PYTHON_PARENT_PATH} PATH_SUFFIXES libs NO_DEFAULT_PATH)
+				#message(STATUS "PYTHON_STATIC_LIB_PATH=${PYTHON_STATIC_LIB_PATH}")
+				if(PY_VER MATCHES 3)
+					set(PY_DYNLIB "FaustCorePy.cp${PY_VER}-win_amd64.pyd")
+				else() #py 2.7.x
+					set(PY_DYNLIB "FaustCorePy.pyd")
+				endif()
+				set(PY_STATIC_LIBS "$<TARGET_FILE:${FAUST_TARGET}>;${MATIO_STATIC_LIB_PATH};${PYTHON_STATIC_LIB_PATH}")
+				string(REGEX REPLACE "\n" ";" PY_STATIC_LIBS "${PY_STATIC_LIBS}")
+				add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
+					COMMAND   ${CYTHON_EXE}
+					ARGS "--cplus" "-o" "${FAUST_PYTHON_BIN_DIR}/FaustCorePy.cpp"  "${FAUST_PYTHON_BIN_DIR}/FaustCorePy.pyx" 
+					# patch the weird bug: missing cmath include in cython generated cpp code
+					COMMAND echo \#include ^<cmath^> ">" "FAUST_CORE_TMP_FILE"
+					COMMAND type
+					ARGS "FAUST_CORE_TMP_FILE" "FaustCorePy.cpp" ">" "FaustCorePy.cpp2" 2>NUL 
+					COMMAND type
+					ARGS "FaustCorePy.cpp2" ">" "FaustCorePy.cpp" 2>NUL
+					COMMAND ${CMAKE_CXX_COMPILER}
+					ARGS "-std=c++11" "-shared" "-DMS_WIN64" "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
+					COMMENT   "Creating pyfaust${PY_VER}")
+			endif()
+		endforeach()
+	endif()
+else()
+	message(FATAL_ERROR "Win32 python Faust version is supported only when compiling with MinGW")
+endif()
 
 #install the python wrapper
-install(DIRECTORY ${FAUST_PYTHON_BIN_DIR}/ DESTINATION ${CMAKE_INSTALL_PYTHON_PREFIX} FILE_PERMISSIONS  ${INSTALL_FILE_PERMISSION} DIRECTORY_PERMISSIONS ${INSTALL_DIR_PERMISSION} FILES_MATCHING PATTERN "*.${MEX_EXT}" PATTERN "*.py" PATTERN "*.so" PATTERN "build" EXCLUDE PATTERN "setup*" EXCLUDE PATTERN "CMakeFiles*" EXCLUDE)
+install(DIRECTORY ${FAUST_PYTHON_BIN_DIR}/ DESTINATION ${CMAKE_INSTALL_PYTHON_PREFIX} FILE_PERMISSIONS  ${INSTALL_FILE_PERMISSION} DIRECTORY_PERMISSIONS ${INSTALL_DIR_PERMISSION} FILES_MATCHING PATTERN "*.${MEX_EXT}" PATTERN "*.py" PATTERN "*.so" PATTERN "*.pyd" PATTERN "build" EXCLUDE PATTERN "setup*" EXCLUDE PATTERN "CMakeFiles*" EXCLUDE)
