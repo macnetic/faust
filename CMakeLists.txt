@@ -780,6 +780,9 @@ endif()
 # CPACK RULES
 ##############################################################################
 #INCLUDE(InstallRequiredSystemLibraries)
+if(WIN32)
+	configure_file(${PROJECT_SOURCE_DIR}/misc/nsis/faust.nsi ${PROJECT_BINARY_DIR}/faust.nsi @ONLY)
+endif()
 SET(CPACK_SET_DESTDIR "ON")
 SET(CPACK_PACKAGE_RELOCATABLE "FALSE")
 SET(CPACK_CMAKE_GENERATOR ${CMAKE_GENERATOR})
