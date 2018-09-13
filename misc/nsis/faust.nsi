@@ -1,7 +1,7 @@
 Name "Faust-@CPACK_PACKAGE_VERSION@"
 
 
-OutFile "Faust-@CPACK_PACKAGE_VERSION@-installer.exe"
+OutFile "faust-@CPACK_PACKAGE_VERSION@-amd64.exe"
 
 ; default install. dir.
 InstallDir "$PROGRAMFILES64\Faust"

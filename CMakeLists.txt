@@ -620,6 +620,15 @@ endif(BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MA
 #message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 ##################################################################
 
+###### MATIO inc and lib env. vars #########
+if(NOT "$ENV{MATIO_INC_DIR}" MATCHES "^$")
+    message(STATUS "MATIO_INC_DIR=$ENV{MATIO_INC_DIR}")
+    set(MATIO_INC_DIR "$ENV{MATIO_INC_DIR}")
+    set(MATIO_LIB_FILE "$ENV{MATIO_LIB_FILE}")
+endif()
+############################################
+
+
 #########################################
 ###### FIND EXTERNALS LIBRARY  ##########
 include(CMake/findExternalLibs.cmake)
