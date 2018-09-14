@@ -58,6 +58,7 @@ if(UNIX OR WIN32)
 		#message(STATUS $ENV{PYTHON2_PATH})
 		set(PYTHON_EXES $ENV{PYTHON2_PATH};$ENV{PYTHON3_PATH})
 		#message(STATUS "PYTHON_EXES=${PYTHON_EXES} set from environment.")
+		set(PYTHON_EXECUTABLE $ENV{PYTHON2_PATH}) # necessary for doxypypy
 	elseif ("$ENV{PYTHON_PATH}" MATCHES python)
 		set(PYTHON_EXE $ENV{PYTHON_PATH})
 		message(STATUS "PYTHON_EXE=$ENV{PYTHON_PATH} defined from environment variable")
