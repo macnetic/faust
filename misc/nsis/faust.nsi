@@ -89,9 +89,9 @@ Page instfiles
 
 Section "" ; no component so name not needed
 
-  CreateDirectory $INSTDIR\wrapper\matlab
-  CreateDirectory $INSTDIR\wrapper\python
-  CreateDirectory $INSTDIR\wrapper\doc
+  CreateDirectory $INSTDIR\matlab
+  CreateDirectory $INSTDIR\python
+  CreateDirectory $INSTDIR\doc\html
 
   ; install python wrapper
   SetOutPath $INSTDIR\python
@@ -158,7 +158,11 @@ Section "" ; no component so name not needed
 
   continue:	
 
-  ExecShell open "http://faust.inria.fr" ;TODO: replace by local doc page
+  ; install the doc
+  SetOutPath $INSTDIR\doc\html
+  File @PROJECT_BINARY_DIR@\doc\html\*
+
+  ExecShell open "file:///$INSTDIR/doc/html/index.html"
 
 SectionEnd
 

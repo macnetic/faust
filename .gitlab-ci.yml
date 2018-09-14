@@ -90,7 +90,7 @@ package_win:
         - 'set SHA_START=%CI_COMMIT_SHA:~0,8%'
         - if NOT EXIST build (mkdir build)
         - cd build
-        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DCMAKE_INSTALL_PREFIX=win_pkg_build ..'
+        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build ..'
         - make
         - makensis faust.nsi
     artifacts:
