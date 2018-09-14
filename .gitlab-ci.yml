@@ -155,6 +155,22 @@ package_macos_release:
     only:
         - tags
 
+package_win_release:
+    script:
+        - if NOT EXIST build (mkdir build)
+        - cd build
+        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build ..'
+        - make
+        - makensis faust.nsi
+    artifacts:
+        paths:
+            - build/faust-%CI_COMMIT_TAG%-amd64.exe
+        expire_in: '50 yrs'
+    tags:
+        - win7
+    only:
+        - tags
+
 package_linux_release:
    script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
