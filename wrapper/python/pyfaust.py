@@ -684,7 +684,7 @@ class Faust:
         else:
             return float(-1)
 
-    def norm(F, ord=2):
+    def norm(F, ord='fro'):
         """
         Computes the norm of F.todense(). Several types of norm are available: 1-norm, 2-norm and Frobenius norm.
 
@@ -696,7 +696,7 @@ class Faust:
         Args:
             F: the Faust object.
             ord: (optional) the norm order (1 or 2) or "fro" for
-            Frobenius norm (by default the 2-norm is computed).
+            Frobenius norm (by default the Frobenius norm is computed).
 
         Returns:
             the norm (float).
@@ -716,7 +716,7 @@ class Faust:
             >>> from pyfaust import FaustFactory
             >>> F = FaustFactory.rand([1, 2], [50, 100], .5)
             >>> F.norm()
-            80.0914231648143
+            133.96231832406144
             >>> F.norm(2)
             80.0914231648143
             >>> F.norm('fro')
