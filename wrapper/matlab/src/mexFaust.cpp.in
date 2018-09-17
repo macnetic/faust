@@ -291,7 +291,10 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
             {
                 if (nlhs != 0 || nrhs != 2)
                     mexErrMsgTxt("disp: Unexpected arguments");
-                core_ptr->display();
+                //core_ptr->display(); // doesn't work on windows,
+					// matlab terminal doesn't receive the mex lib std output
+					// we must use mexPrintf() to display content
+		mexPrintf(core_ptr->to_string().c_str());
                 return;
             }
 
