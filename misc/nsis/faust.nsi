@@ -171,7 +171,7 @@ Function matlabFoundCb
 
 	FileOpen $1 "$R4\toolbox\local\startup.m" a
 	FileSeek $1 0 END ; do not erase start of file (but risk to add Faust path multiple times)
-	FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\wrapper\matlab'))"
+	FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'))"
 	FileClose $1
 
 	;MessageBox MB_OK '$R0$\n$\nFaust bound into $R4.' 
