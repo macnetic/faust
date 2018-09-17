@@ -799,11 +799,18 @@ classdef Faust
 		end
 
 		%==========================================================================================
-		%> @brief Returns a Faust representing a submatrix of the dense matrix full(F).
+		%> @brief Returns a Faust representing a submatrix of the dense matrix full(F) or a
+		%>         scalar element if that Faust can be reduced to a single element.
+		%>
 		%>
 		%> This function is a Matlab built-in overload.
 		%>
-		%> @b WARNING: this function doesn't handle a slice step different to 1 (e.g. F(i:2:j,:) where slice step is 2.)
+		%> @b WARNING:
+		%> - This function doesn't handle a slice step different to 1 (e.g. F(i:2:j,:) where slice step is 2.)
+		%> - It is not advised to use this function as an element accessor
+		%>        (e.g. F(0,0)) because such an use induces to convert the Faust to its
+		%>        dense matrix representation and that is a very expensive computation if used
+		%>        repetitively.
 		%>
 		%> @b Usage
 		%>
@@ -812,7 +819,8 @@ classdef Faust
 		%> @param F the Faust object.
 		%> @param S the structure defining the Faust to extract like a submatrix (it's not supposed to be used directly ; usage and examples show how subscript should be used).
 		%>
-		%> @retval The Faust object requested.
+		%> @retval The Faust object requested or just the corresponding scalar if that Faust has
+		%>             a size equal to [1,1].
 		%>
 		%> @b Example
 		%> @code
@@ -822,8 +830,8 @@ classdef Faust
 		%>	i = randi(min(size(F)), 1, 2)
 		%>	i1 = i(1);i2 = i(2)
 		%>
-		%>	F(i1,i2) % a Faust representing a matrix with only one element
-		%>			 % at row i1, column i2
+		%>	F(i1,i2) % is the scalar element located
+		%>			 % at row i1, column i2 of the F's dense matrix
 		%>
 		%>	F(:,i2) % full column i2
 		%>
@@ -901,6 +909,11 @@ classdef Faust
 				submatrix = matfaust.Faust(F, mexFaustReal('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
 			else
 				submatrix = matfaust.Faust(F, mexFaustCplx('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
+			end
+
+			if(start_row_id == end_row_id && start_col_id == end_col_id)
+				submatrix = full(submatrix);
+				submatrix = submatrix(1,1);
 			end
 
 		end

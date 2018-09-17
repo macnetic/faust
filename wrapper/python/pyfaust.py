@@ -158,7 +158,7 @@ class Faust:
             #else:
                 #TODO: manage empty Faust
 
-    
+
     @property
     def shape(F):
         """
@@ -214,7 +214,7 @@ class Faust:
 
     def transpose(F):
         """
-        Returns the transpose of the Faust F.todense().
+        Returns the transpose of the Faust F.
 
         Args:
             F: the Faust object.
@@ -508,12 +508,17 @@ class Faust:
 
     def __getitem__(F, indices):
         """
-        Returns a Faust representing a submatrix of the dense matrix of F.
+        Returns a Faust representing a submatrix of the dense matrix of F or a scalar element if that Faust can be reduced to a single element.
 
         This function is a Python built-in overload.
 
-        WARNING: this function doesn't handle a slice step different to 1 (e.g. F[i:j:2,:]
-        where slice step is 2.)
+        WARNING:
+            - This function doesn't handle a slice step different to 1 (e.g. F[i:j:2,:]
+        where slice step is 2.).
+            - It is not advised to use this function as an element accessor
+        (e.g. F(0,0)) because such an use induces to convert the Faust to its
+        dense matrix representation and that is a very expensive computation if used
+        repetitively.
 
         Args:
             F: the Faust object.
@@ -522,7 +527,8 @@ class Faust:
             more than two indices is forbidden.
 
         Returns:
-            the Faust object requested.
+            the Faust object requested or just the corresponding scalar if that Faust has
+            a shape equal to (1,1).
 
         Raises:
             IndexError
@@ -537,8 +543,8 @@ class Faust:
             >>> i1 = randint(0, min(F.shape)-1)
             >>> i2 = randint(0, min(F.shape)-1)
 
-            >>> F[i1,i2] # a Faust representing a matrix with only one element
-                         # at row i1, column i2 of F's dense matrix
+            >>> F[i1,i2] # is the scalar element located at
+                         # at row i1, column i2 of the F's dense matrix
 
             >>> F[:, i2] # full column i2
 
@@ -550,6 +556,7 @@ class Faust:
                             # column before the last one.
 
             >>> F[0:i1, ...] # equivalent to F[0:i1, ::]
+            >>> F[2::, :3:] # equivalent to F[2:F.shape[0],0:3]
         """
         #TODO: refactor (by index when indices == tuple(2), error message,
         #      out_indices checking on the end)
@@ -599,11 +606,19 @@ class Faust:
                              " (`...`), and integer are valid indices")
         if(out_indices[0].start == None and out_indices[0].stop == None): #F[::] or F[::,any]
             out_indices[0] = slice(0,F.shape[0])
+        elif(out_indices[0].start == None): # out_indices[0].stop != None
+            out_indices[0] = slice(0, out_indices[0].stop)
+        elif(out_indices[0].stop == None): # out_indices[0].start != None
+            out_indices[0] = slice(out_indices[0].start, F.shape[0])
         if(out_indices[0].stop < 0):
             out_indices[0] = slice(out_indices[0].start,
                                    F.shape[0]+out_indices[0].stop)
         if(out_indices[1].start == None and out_indices[1].stop == None): #F[any, ::]
             out_indices[1] = slice(0,F.shape[1])
+        elif(out_indices[1].start == None): # out_indices[1].stop != None
+            out_indices[1] = slice(1, out_indices[1].stop)
+        elif(out_indices[1].stop == None): # out_indices[1].start != None
+            out_indices[1] = slice(out_indices[1].start, F.shape[1])
         if(out_indices[1].stop < 0):
             out_indices[1] = slice (out_indices[1].start,
                                     F.shape[1]+out_indices[1].stop)
