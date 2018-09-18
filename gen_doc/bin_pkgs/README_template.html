@@ -20,11 +20,11 @@
 
 <h3>1.1 For Python</h3>
 
-<p>FAµST supports at least Python 2.7. For macOS it&rsquo;s the only version supported for now.</p>
+<p>FAµST supports at least Python 2.7 and is also compiled for Python 3.6.</p>
+
+<p>If you want to use FAµST with Python 3 you must use this exact version because the FAµST Python wrapper delivered within the binary package is compiled for that version only.</p>
 
 <p>FAµST is designed for the Python ecosystem which as usual relies on numpy and scipy packages. So you have to ensure these packages are installed on your system.</p>
-
-<p>That requirement applies also to Python 3, assuming your version of Python is matching the version FAµST is compiled for (currently 3.6).</p>
 
 <h3>1.2 For Matlab</h3>
 
@@ -43,10 +43,10 @@ Neverthless, it could be useful to check that it really worked and set the envir
 
 <p>Here is how to test the FaµST Python wrapper has been setup properly from a Bash terminal:</p>
 
-<pre><code>    $ python2 -c "import pyfaust" &amp;&amp; echo "It worked!"
+<pre><code>    $ python2 -c "import pyfaust" &amp;&amp; echo "It works"
 </code></pre>
 
-<p>Obviously, if the the wrapper is set up properly you&rsquo;ll see the message &ldquo;It worked!&rdquo; as a result from the command above.</p>
+<p>Obviously, if the wrapper is set up properly you&rsquo;ll see the message &ldquo;It works&rdquo; as a result from the command above.</p>
 
 <p>If you see the following error message, then it didn&rsquo;t work:</p>
 
@@ -61,7 +61,7 @@ Neverthless, it could be useful to check that it really worked and set the envir
 
 <pre><code>    $ export PYTHONPATH=@CMAKE_INSTALL_PREFIX@/python
     # and test again
-    $ python2 -c "import pyfaust" &amp;&amp; echo "It worked!"
+    $ python2 -c "import pyfaust" &amp;&amp; echo "It works"
 </code></pre>
 
 <p>If it fails again you are likely on a different version of Python. Returns to the Prerequisites section and check your Python versions match FAµST requirements.</p>
@@ -71,7 +71,7 @@ Neverthless, it could be useful to check that it really worked and set the envir
 <pre><code>    $ matlab -nodisplay -nojvm -r "import matfaust.Faust;F = Faust.rand(1, 10, .5, 'dense', false);exit"
 </code></pre>
 
-<p>It worked only if you see an output similar to:</p>
+<p>It works only if you see an output similar to:</p>
 
 <pre><code>    F =
 
