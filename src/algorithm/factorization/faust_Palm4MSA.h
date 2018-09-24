@@ -48,7 +48,6 @@
 #ifdef __COMPILE_TIMERS__
     #include "faust_Timer.h"
 #endif
-
 #include "faust_MatDense.h"
 
 namespace Faust
@@ -58,10 +57,10 @@ namespace Faust
     template<typename FPP,Device DEVICE> class MatDense;
     template<typename FPP,Device DEVICE> class Transform;
 
-    template<typename FPP,Device DEVICE> class ConstraintGeneric;
-    template<typename FPP,Device DEVICE> class Params;
+    class ConstraintGeneric;
+    template<typename FPP,Device DEVICE, typename FPP2> class Params;
     //template<typename FPP,Device DEVICE> class ParamsPalm;
-    template<typename FPP> class StoppingCriterion;
+    template<typename FPP2> class StoppingCriterion;
     //template<Device DEVICE> class BlasHandle;
 
     /*! \class Palm4MSA
@@ -73,20 +72,21 @@ namespace Faust
        */
 
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,Device DEVICE,typename FPP2 = double>
     class Palm4MSA
     {
 
+
        public:
-            /*!
+      /*!
          *  \brief
          * initialize Palm4MSA from Faust::Params (HierarchicalFact parameter)
          *\tparam isGlobal_ : if true, the Palm4MSA StoppingCriterion stop_crit attribute is initialize from params_.stop_crit_global <br> and if false, it is initialize from stop_crit_2facts
          */
-          Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE>& params_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_);
-          Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE>& params_palm_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_=false);
+          Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE,FPP2>& params_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_);
+          Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FPP2>& params_palm_, const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_=false);
 
-          void set_constraint(const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
+          void set_constraint(const std::vector<const Faust::ConstraintGeneric*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
           void set_data(const Faust::MatDense<FPP,DEVICE>& data_){data=data_;}
           void set_lambda(const FPP lambda_){m_lambda = lambda_;}
 
@@ -129,10 +129,11 @@ namespace Faust
          *  \brief
          * useful in HierarchicalFact, update the factors of palm_global from palm_2
          */
-          void init_fact_from_palm(const Palm4MSA& palm, bool isFactSideLeft);
-          const std::vector<Faust::MatDense<FPP,DEVICE> >& get_facts()const {return S;}
-
-          ~Palm4MSA(){}
+		  void init_fact_from_palm(const Palm4MSA& palm, bool isFactSideLeft);
+		  const std::vector<Faust::MatDense<FPP,DEVICE> >& get_facts()const {return S;}
+		  void compute_xt_xhat(MatDense<FPP,DEVICE>& Xt_Xhat);
+		  void compute_xhatt_xhat(MatDense<FPP,DEVICE>& Xt_Xhat);
+		  ~Palm4MSA(){}
 
        private:
           void check_constraint_validity();
@@ -146,7 +147,7 @@ namespace Faust
           static const FPP lipschitz_multiplicator;
 
        public:
-          Faust::StoppingCriterion<FPP> stop_crit;
+          Faust::StoppingCriterion<FPP2> stop_crit;
 
 
        private:
@@ -169,7 +170,7 @@ namespace Faust
 
 
 
-          std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> const_vec; // vector of constraints of size nfact
+          std::vector<const Faust::ConstraintGeneric*> const_vec; // vector of constraints of size nfact
           int m_indFact; //indice de facteur (!= HierarchicalFact::indFact : indice de factorisation)
           int m_indIte;
           // FPP lipschitz_multiplicator;
@@ -244,6 +245,8 @@ namespace Faust
     #endif
 
     };
+
+
 
 }
 

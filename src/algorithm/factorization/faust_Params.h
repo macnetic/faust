@@ -63,7 +63,7 @@ namespace Faust
     template<typename FPP,Device DEVICE> class MatDense;
 
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,Device DEVICE, typename FPP2 = double>
     class Params
     {
 
@@ -74,10 +74,10 @@ namespace Faust
             const faust_unsigned_int nbRow,
             const faust_unsigned_int nbCol, 
             const unsigned int nbFact_,
-            const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & cons_,
+            const std::vector<const Faust::ConstraintGeneric*> & cons_,
             const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-            const Faust::StoppingCriterion<FPP>& stop_crit_2facts_ = Faust::StoppingCriterion<FPP>(defaultNiter1),
-            const Faust::StoppingCriterion<FPP>& stop_crit_global_  = Faust::StoppingCriterion<FPP>(defaultNiter2),
+            const Faust::StoppingCriterion<FPP2>& stop_crit_2facts_ = Faust::StoppingCriterion<FPP2>(defaultNiter1),
+            const Faust::StoppingCriterion<FPP2>& stop_crit_global_  = Faust::StoppingCriterion<FPP2>(defaultNiter2),
             const FPP residuum_decrease_speed = defaultDecreaseSpeed,
             const FPP residuum_prcent = defaultResiduumPercent,
             const bool isVerbose_ = defaultVerbosity ,
@@ -124,10 +124,10 @@ namespace Faust
             const faust_unsigned_int nbRow_,
             const faust_unsigned_int nbCol_,  		
             const unsigned int nbFact_,
-            const std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> >& cons_,
+            const std::vector<std::vector<const Faust::ConstraintGeneric*>> & cons_,
             const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-            const Faust::StoppingCriterion<FPP>& stop_crit_2facts_ = Faust::StoppingCriterion<FPP>(defaultNiter1),
-            const Faust::StoppingCriterion<FPP>& stop_crit_global_  = Faust::StoppingCriterion<FPP>(defaultNiter2),
+            const Faust::StoppingCriterion<FPP2>& stop_crit_2facts_ = Faust::StoppingCriterion<FPP2>(defaultNiter1),
+            const Faust::StoppingCriterion<FPP2>& stop_crit_global_  = Faust::StoppingCriterion<FPP2>(defaultNiter2),
             const bool isVerbose_ = defaultVerbosity ,
             const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
             const bool isFactSideLeft_ = defaultFactSideLeft ,
@@ -154,12 +154,12 @@ namespace Faust
 	faust_unsigned_int m_nbCol; // number of columns of the matrix to be factorized
 
         faust_unsigned_int m_nbFact; // number of factors
-        std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE> *> > cons; // vector of constraints
+        std::vector<std::vector<const Faust::ConstraintGeneric*>> cons; // vector of constraints
         std::vector<Faust::MatDense<FPP,DEVICE> > init_fact;
 
         // Optional members (set to default values if not defined)
-        Faust::StoppingCriterion<FPP> stop_crit_2facts;
-        Faust::StoppingCriterion<FPP> stop_crit_global;
+        Faust::StoppingCriterion<FPP2> stop_crit_2facts;
+        Faust::StoppingCriterion<FPP2> stop_crit_global;
         bool isVerbose;
         bool isUpdateWayR2L;
         bool isFactSideLeft;

@@ -455,7 +455,7 @@ void Faust::MatSparse<FPP,Cpu>::operator= (const Faust::MatDense<FPP,Cpu>& Mdens
 
 	for (int i=0;i<nbRow*nbCol;i++)
 	{
-		if (Mdense[i] != 0)
+		if (Mdense[i] != FPP(0))
 		{
 			tripletList.push_back( Tip(i%nbRow,((int) (i/nbRow)),Mdense[i]) );
 		}

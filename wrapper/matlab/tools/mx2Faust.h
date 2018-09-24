@@ -47,9 +47,9 @@
 
 
 namespace Faust {
-	template<typename FPP, Device DEVICE> class ConstraintGeneric;
+	class ConstraintGeneric;
 	template<typename FPP, Device DEVICE> class Vect;
-	template<typename FPP, Device DEVICE> class Params;
+	template<typename FPP, Device DEVICE, typename FPP2> class Params;
 	template<typename FPP, Device DEVICE> class MatGeneric;
 	template<typename FPP, Device DEVICE> class MatDense;
 	template<typename FPP, Device DEVICE> class MatSparse;
@@ -135,8 +135,8 @@ void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cp
 *                                                            - C{4} is the parameter of the constraint		       
 *  \tparam[in] concsS : std::vector of Faust::ConstraintGeneric<FPP,Cpu> C++ equivalent of the matlab palm4MSA constraint
 */
-template<typename FPP>
-void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS,mxArray* mxCons);
+template<typename FPP, typename FPP2>
+void getConstraint(std::vector<const Faust::ConstraintGeneric*> & consS,mxArray* mxCons);
 
 
 

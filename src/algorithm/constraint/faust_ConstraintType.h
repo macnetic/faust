@@ -42,19 +42,19 @@
 
 
 template<typename FPP,Device DEVICE> class ConstraintInt;
-template<typename FPP,Device DEVICE> class ConstraintFPP;
+template<typename FPP,Device DEVICE,typename FPP2> class ConstraintFPP;
 template<typename FPP,Device DEVICE> class ConstraintMat;
 
 
 //! \struct ConstraintType
 //! \brief This structure defined the type of constraint. See following table for more precision about the type of constraint. <br>
  //! <img src="../../doc/html/constraint.png" alt="constraint parameters" width=800px />
-template<typename FPP,Device DEVICE>
+template<typename FPP,Device DEVICE, typename FPP2=double>
 struct ConstraintType
 {
 
-	typedef const  Faust::ConstraintFPP<FPP,DEVICE>   ConstraintTypeNormcol;
-	typedef const  Faust::ConstraintFPP<FPP,DEVICE>   ConstraintTypeNormlin;
+	typedef const  Faust::ConstraintFPP<FPP,DEVICE,FPP2>   ConstraintTypeNormcol;
+	typedef const  Faust::ConstraintFPP<FPP,DEVICE,FPP2>   ConstraintTypeNormlin;
 	typedef const  Faust::ConstraintMat<FPP,DEVICE>   ConstraintTypeSupp;
 	typedef const  Faust::ConstraintMat<FPP,DEVICE>   ConstraintTypeConst;
 	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeSp;

@@ -51,155 +51,112 @@
 //modif AL AL
 //template<typename FPP,Device DEVICE> class ConstraintInt;
 
-template<typename FPP,Device DEVICE> class ConstraintFPP;
+template<typename FPP,Device DEVICE,typename FPP2> class ConstraintFPP;
 template<typename FPP,Device DEVICE> class ConstraintMat;
-template<typename FPP,Device DEVICE> class faust_ConstraintType;
-
-template<typename FPP,Device DEVICE>
-const char * Faust::ConstraintGeneric<FPP,DEVICE>::m_className="Faust::ConstraintGeneric::";
-
-template<typename FPP,Device DEVICE>
-const faust_constraint_name Faust::ConstraintGeneric<FPP,DEVICE>::get_constraint_type() const
-{
-   return m_constraintName;
-}
+template<typename FPP,Device DEVICE,typename FPP2> class faust_ConstraintType;
 
 
-
-
-
-template<typename FPP,Device DEVICE>
-const char* Faust::ConstraintGeneric<FPP,DEVICE>::get_constraint_name()const
+template<typename FPP, Device DEVICE, typename FPP2>
+const char*  Faust::ConstraintGeneric::get_type() const
 {
    switch(m_constraintName)
    {
       case CONSTRAINT_NAME_SP:
-         return "CONSTRAINT_NAME_SP";
-      case CONSTRAINT_NAME_SPCOL:
-         return "CONSTRAINT_NAME_SPCOL";
-      case CONSTRAINT_NAME_SPLIN:
-         return "CONSTRAINT_NAME_SPLIN";
-      case CONSTRAINT_NAME_NORMCOL:
-         return "CONSTRAINT_NAME_NORMCOL";
-      case CONSTRAINT_NAME_SPLINCOL:
-         return "CONSTRAINT_NAME_SPLINCOL";
-      case CONSTRAINT_NAME_CONST:
-         return "CONSTRAINT_NAME_CONST";
-      case CONSTRAINT_NAME_SP_POS:
-         return "CONSTRAINT_NAME_SP_POS";
-      case CONSTRAINT_NAME_BLKDIAG:
-         return "CONSTRAINT_NAME_BLKDIAG";
-      case CONSTRAINT_NAME_SUPP:
-         return "CONSTRAINT_NAME_SUPP";
-      case CONSTRAINT_NAME_NORMLIN:
-         return "CONSTRAINT_NAME_NORMLIN";
-      default:
-         return "unknown constraint name";
-   }
-}
-
-
-template<typename FPP,Device DEVICE>
-const char*  Faust::ConstraintGeneric<FPP,DEVICE>::get_type() const
-{
-   switch(m_constraintName)
-   {
-      case CONSTRAINT_NAME_SP:
-         if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSp)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
+         if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSp)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
             return "INT";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSp)==typeid(Faust::ConstraintFPP<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSp)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>))
             return "FAUST_REAL";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSp)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSp)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
             return "FAUST_MAT";
          else{
 				handleError(m_className,"get_type : unknown type parameter");
 			}
       case CONSTRAINT_NAME_SPCOL:
-         if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpcol)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
+         if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpcol)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
             return "INT";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpcol)==typeid(Faust::ConstraintFPP<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpcol)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>))
             return "FAUST_REAL";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpcol)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpcol)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
             return "FAUST_MAT";
          else{
 				handleError(m_className,"get_type : unknown type parameter");
 			}
       case CONSTRAINT_NAME_SPLIN:
-         if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplin)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
+         if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplin)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
             return "INT";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplin)==typeid(Faust::ConstraintFPP<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplin)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>))
             return "FAUST_REAL";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplin)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplin)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
             return "FAUST_MAT";
          else{
             handleError(m_className,"get_type : unknown type parameter");
 			}
       case CONSTRAINT_NAME_NORMCOL:
-         if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormcol)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
+         if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormcol)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
             return "INT";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormcol)==typeid(Faust::ConstraintFPP<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormcol)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>))
             return "FAUST_REAL";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormcol)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormcol)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
             return "FAUST_MAT";
          else{
            handleError(m_className,"get_type : unknown type parameter");
 		   }
       case CONSTRAINT_NAME_SPLINCOL:
-         if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplincol)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
+         if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplincol)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
             return "INT";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplincol)==typeid(Faust::ConstraintFPP<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplincol)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>))
             return "FAUST_REAL";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplincol)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplincol)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
             return "FAUST_MAT";
          else{
 				handleError(m_className,"get_type : unknown type parameter");
 		 }
       case CONSTRAINT_NAME_CONST:
-         if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeConst)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
+         if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeConst)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
             return "INT";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeConst)==typeid(Faust::ConstraintFPP<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeConst)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>))
             return "FAUST_REAL";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeConst)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeConst)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
             return "FAUST_MAT";
          else{
             handleError(m_className,"get_type : unknown type parameter");
 			}
       case CONSTRAINT_NAME_SP_POS:
-         if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpPos)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
+         if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpPos)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
             return "INT";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpPos)==typeid(Faust::ConstraintFPP<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpPos)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>))
             return "FAUST_REAL";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpPos)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpPos)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
             return "FAUST_MAT";
          else{
 				handleError(m_className,"get_type : unknown type parameter");
 			}
       case CONSTRAINT_NAME_BLKDIAG:
-         if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
+         if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
             return "INT";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintFPP<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>))
             return "FAUST_REAL";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
             return "FAUST_MAT";
          else{
 				handleError(m_className,"get_type : unknown type parameter");
 			}
       case CONSTRAINT_NAME_SUPP:
-         if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSupp)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
+         if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSupp)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
             return "INT";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSupp)==typeid(Faust::ConstraintFPP<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSupp)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>))
             return "FAUST_REAL";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSupp)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSupp)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
             return "FAUST_MAT";
          else{
 				handleError(m_className,"get_type : unknown type parameter");
 			}
       case CONSTRAINT_NAME_NORMLIN:
-         if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormlin)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
+         if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormlin)==typeid(Faust::ConstraintInt<FPP,DEVICE>))
             return "INT";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormlin)==typeid(Faust::ConstraintFPP<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormlin)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>))
             return "FAUST_REAL";
-         else if(typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormlin)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
+         else if(typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormlin)==typeid(Faust::ConstraintMat<FPP,DEVICE>))
             return "FAUST_MAT";
          else{
 			handleError(m_className,"get_type : unknown type parameter");
@@ -210,40 +167,40 @@ const char*  Faust::ConstraintGeneric<FPP,DEVICE>::get_type() const
 }
 
 
-template<typename FPP,Device DEVICE>
-bool Faust::ConstraintGeneric<FPP,DEVICE>::is_constraint_parameter_int()const
+template<typename FPP,Device DEVICE, typename FPP2>
+bool Faust::ConstraintGeneric::is_constraint_parameter_int()const
 {
 	switch(m_constraintName)
 	{
 		case CONSTRAINT_NAME_SP:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSp)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSp)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPCOL:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpcol)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpcol)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPLIN:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplin)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplin)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_NORMCOL:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormcol)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormcol)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPLINCOL:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplincol)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplincol)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_CONST:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeConst)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeConst)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SP_POS:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpPos)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpPos)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_BLKDIAG:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SUPP:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSupp)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSupp)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_NORMLIN:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormlin)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormlin)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
 		default:
 			handleError(m_className,"is_constraint_parameter_int : Unknown type of constraint");
@@ -252,40 +209,40 @@ bool Faust::ConstraintGeneric<FPP,DEVICE>::is_constraint_parameter_int()const
     return false;
 }
 
-template<typename FPP,Device DEVICE>
-bool Faust::ConstraintGeneric<FPP,DEVICE>::is_constraint_parameter_real()const
+template<typename FPP,Device DEVICE, typename FPP2>
+bool Faust::ConstraintGeneric::is_constraint_parameter_real()const
 {
 	switch(m_constraintName)
 	{
 		case CONSTRAINT_NAME_SP:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSp)==typeid(Faust::ConstraintFPP<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSp)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPCOL:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpcol)==typeid(Faust::ConstraintFPP<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpcol)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPLIN:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplin)==typeid(Faust::ConstraintFPP<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplin)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
 		case CONSTRAINT_NAME_NORMCOL:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormcol)==typeid(Faust::ConstraintFPP<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormcol)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPLINCOL:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplincol)==typeid(Faust::ConstraintFPP<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplincol)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
 		case CONSTRAINT_NAME_CONST:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeConst)==typeid(Faust::ConstraintFPP<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeConst)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SP_POS:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpPos)==typeid(Faust::ConstraintFPP<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpPos)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
 		case CONSTRAINT_NAME_BLKDIAG:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintFPP<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SUPP:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSupp)==typeid(Faust::ConstraintFPP<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSupp)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
 		case CONSTRAINT_NAME_NORMLIN:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormlin)==typeid(Faust::ConstraintFPP<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormlin)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
 		default:
 			handleError(m_className,"is_constraint_parameter_real : Unknown type of constraint");
@@ -294,40 +251,40 @@ bool Faust::ConstraintGeneric<FPP,DEVICE>::is_constraint_parameter_real()const
         return false;
 }
 
-template<typename FPP,Device DEVICE>
-bool Faust::ConstraintGeneric<FPP,DEVICE>::is_constraint_parameter_mat()const
+template<typename FPP,Device DEVICE, typename FPP2>
+bool Faust::ConstraintGeneric::is_constraint_parameter_mat()const
 {
 	switch(m_constraintName)
 	{
 		case CONSTRAINT_NAME_SP:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSp)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSp)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPCOL:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpcol)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpcol)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPLIN:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplin)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplin)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_NORMCOL:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormcol)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormcol)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SPLINCOL:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSplincol)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplincol)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_CONST:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeConst)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeConst)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SP_POS:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSpPos)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSpPos)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_BLKDIAG:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeBlkdiag)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_SUPP:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeSupp)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSupp)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_NORMLIN:
-			return (typeid(typename  ConstraintType<FPP,DEVICE>::ConstraintTypeNormlin)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormlin)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		default:
 			handleError(m_className,"is_constraint_parameter_mat : Unknown type of constraint");
@@ -336,5 +293,21 @@ bool Faust::ConstraintGeneric<FPP,DEVICE>::is_constraint_parameter_mat()const
         return false;
 }
 
-
+template<typename FPP,Device DEVICE, typename FPP2>
+void Faust::ConstraintGeneric::project(Faust::MatDense<FPP, DEVICE>& mat) const {
+	//unfortunately it's not possible to do template with virtual (pure or not) function
+	// (it needs to be a template class with virtual function using template types to be possible)
+	// (but we don't want that because it implies to pass all the templates types when instantiating the child classes
+	// and this would be non-efficient because for example FPP2 is not needed by ConstraintMat or ConstraintInt)
+	// (and we need FPP2 because the field to define the dense matrix has not be the same than the real type used to define
+	// the real constraints, by the way FPP could even be a complex so we do really need  FPP2 even if it's heavy impl. Neverthless, there is a default template value type of float to lighten the use.)
+//	std::cout << "Faust::ConstraintGeneric::project(mat) typeid="<< typeid(this).name() << std::endl;
+	if(this->is_constraint_parameter_mat<FPP,DEVICE,FPP2>())
+		dynamic_cast<const Faust::ConstraintMat<FPP,DEVICE>*>(this)->project(mat);
+	else if(this->is_constraint_parameter_real<FPP,DEVICE,FPP2>()){
+		dynamic_cast<const Faust::ConstraintFPP<FPP,DEVICE,FPP2>*>(this)->project(mat);
+	}
+	else if(this->is_constraint_parameter_int<FPP,DEVICE,FPP2>())
+		dynamic_cast<const Faust::ConstraintInt<FPP,DEVICE>*>(this)->project(mat);
+}
 #endif

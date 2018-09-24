@@ -66,11 +66,11 @@ See the parent class Faust::ConstraintGeneric for more detail. <br>
 namespace Faust
 {
 
-    template<typename FPP,Device DEVICE> class ConstraintGeneric;
+    class ConstraintGeneric;
     template<typename FPP,Device DEVICE> class MatDense;
 
-    template<typename FPP,Device DEVICE>
-    class ConstraintFPP : public Faust::ConstraintGeneric<FPP,DEVICE>
+    template<typename FPP,Device DEVICE, typename FPP2 = double>
+    class ConstraintFPP : public Faust::ConstraintGeneric
     {
 
 
@@ -85,13 +85,13 @@ namespace Faust
 
           ConstraintFPP(
              const faust_constraint_name& constraintName_,
-             const FPP parameter_,
+             const FPP2 parameter_,
              const int nbRows_,
              const int nbCols_);
 
           ConstraintFPP(const ConstraintFPP& constraint_);
 
-          FPP get_parameter() const {return m_parameter;};
+          FPP2 get_parameter() const {return m_parameter;};
 
           virtual void set_default_parameter();
           virtual void check_constraint_name()const;
@@ -100,7 +100,7 @@ namespace Faust
 
        private:
           // parameter of constraint
-          FPP m_parameter;
+          FPP2 m_parameter;
           static const char * m_className;
 
 

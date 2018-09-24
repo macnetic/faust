@@ -72,15 +72,15 @@
 
 using namespace std;
 
-template<typename FPP,Device DEVICE>
-const char * Faust::Palm4MSA<FPP,DEVICE>::m_className="Faust::Palm4MSA";
+template<typename FPP,Device DEVICE,typename FPP2>
+const char * Faust::Palm4MSA<FPP,DEVICE,FPP2>::m_className="Faust::Palm4MSA";
 
-template<typename FPP,Device DEVICE>
-const FPP Faust::Palm4MSA<FPP,DEVICE>::lipschitz_multiplicator=1.001;
+template<typename FPP,Device DEVICE,typename FPP2>
+const FPP Faust::Palm4MSA<FPP,DEVICE,FPP2>::lipschitz_multiplicator=1.001;
 
 
-template<typename FPP,Device DEVICE>
-Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M, const Faust::Params<FPP,DEVICE> & params_,const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_) :
+template<typename FPP,Device DEVICE,typename FPP2>
+Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M, const Faust::Params<FPP,DEVICE,FPP2> & params_,const Faust::BlasHandle<DEVICE> blasHandle, const bool isGlobal_) :
     data(M),
     m_lambda(params_.init_lambda),
     m_nbFact(0),
@@ -97,15 +97,15 @@ Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M, cons
     isConstraintSet(false),
     isGlobal(isGlobal_),
     isInit(false),
-    c(1/params_.step_size),
+    c(FPP(1)/params_.step_size),
     blas_handle(blasHandle)
 {
    RorL.reserve(params_.m_nbFact);
 
    if(isGlobal)
-      stop_crit = Faust::StoppingCriterion<FPP>(params_.stop_crit_global);
+      stop_crit = Faust::StoppingCriterion<FPP2>(params_.stop_crit_global);
    else
-      stop_crit = Faust::StoppingCriterion<FPP>(params_.stop_crit_2facts);
+      stop_crit = Faust::StoppingCriterion<FPP2>(params_.stop_crit_2facts);
 
 	if (isConstantStepSize)
         isCComputed = true;
@@ -114,8 +114,8 @@ Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M, cons
 
 }
 
-template<typename FPP,Device DEVICE>
-Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE>& params_palm_,const Faust::BlasHandle<DEVICE> blasHandle,const bool isGlobal_/*=false*/) :
+template<typename FPP,Device DEVICE,typename FPP2>
+Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FPP2>& params_palm_,const Faust::BlasHandle<DEVICE> blasHandle,const bool isGlobal_/*=false*/) :
    stop_crit(params_palm_.stop_crit),
    data(params_palm_.data),
    m_lambda(params_palm_.init_lambda),
@@ -134,7 +134,7 @@ Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE>& param
    isLastFact(false),
    isConstraintSet(false),
    isGlobal(isGlobal_),
-   c(1/params_palm_.step_size),
+   c(FPP(1)/params_palm_.step_size),
    blas_handle(blasHandle)
 {
    RorL.reserve(const_vec.size()+1);
@@ -148,8 +148,8 @@ Faust::Palm4MSA<FPP,DEVICE>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE>& param
 
 }
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::compute_facts()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_facts()
 {
 	while (do_continue())
 	{
@@ -158,8 +158,8 @@ void Faust::Palm4MSA<FPP,DEVICE>::compute_facts()
 
 }
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::get_facts(Faust::Transform<FPP,DEVICE> & faust_fact) const
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::get_facts(Faust::Transform<FPP,DEVICE> & faust_fact) const
 {
 	Faust::Transform<FPP,DEVICE> f(S);
 	faust_fact = f;
@@ -168,8 +168,8 @@ void Faust::Palm4MSA<FPP,DEVICE>::get_facts(Faust::Transform<FPP,DEVICE> & faust
 }
 
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::compute_projection()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_projection()
 {
 #ifdef __COMPILE_TIMERS__
 t_global_compute_projection.start();
@@ -179,7 +179,7 @@ t_local_compute_projection.start();
 
       //Faust::MatDense<FPP,DEVICE> matrix2project(S[m_indFact]);
       S[m_indFact] -= grad_over_c;
-      const_vec[m_indFact]->project(S[m_indFact]);
+      const_vec[m_indFact]->template project<FPP,DEVICE,FPP2>(S[m_indFact]);
 
 
     isProjectionComputed = true;
@@ -189,8 +189,8 @@ t_local_compute_projection.stop();
 #endif
 }
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::compute_grad_over_c()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c()
 {
 /*static int cmpt = -1;
 cmpt++;
@@ -317,7 +317,9 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       }
    }
 
-
+   //false is for disabling evaluation (because the transpose do it later)
+   LorR.conjugate(false);
+   RorL[m_indFact].conjugate(false);
 
    if (idx==0 || idx==2) // computing L'*error first, then (L'*error)*R'
    {
@@ -355,6 +357,12 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
 
     }
 
+   //TODO: avoid type checking by adding another template function (for complex and real types) or function pointer
+   if(typeid(data.getData()[0]) == typeid(complex<float>) || typeid(data.getData()[0]) == typeid(complex<double>))
+   {
+	   LorR.conjugate();
+	   RorL[m_indFact].conjugate();
+   }
     isGradComputed = true;
 
 #ifdef __COMPILE_TIMERS__
@@ -363,10 +371,41 @@ t_local_compute_grad_over_c.stop();
 #endif
 }
 
+template<typename FPP, Device DEVICE, typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_xt_xhat(Faust::MatDense<FPP,DEVICE>& Xt_Xhat)
+{
+	//TODO: replace by two functions to point to to avoid the comprison at each iteration
+	//TODO: replate compute_xt_xhat by a function pointer
+	if(typeid(FPP) == typeid(complex<double>) || typeid(FPP) == typeid(complex<float>)){
+		MatDense<FPP,DEVICE> data_cpy = data;
+		data_cpy.conjugate(false);
+		gemm(data_cpy, LorR, Xt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N', blas_handle);
+		Xt_Xhat.real();
+	}
+	else {
+		gemm(data, LorR, Xt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N', blas_handle);
+	}
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_xhatt_xhat(Faust::MatDense<FPP,DEVICE>& Xhatt_Xhat) {
+	//TODO: replace by two functions to point to to avoid the comprison at each iteration
+	//TODO: replate compute_xhatt_xhat by a function pointer
+	if(typeid(FPP) == typeid(complex<double>) || typeid(FPP) == typeid(complex<float>)){
+		Faust::MatDense<FPP,DEVICE> tmp_LoR = LorR;
+		tmp_LoR.conjugate(false);
+		gemm(tmp_LoR, LorR, Xhatt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N',blas_handle);
+		//   gemm(LorR, LorR, Xhatt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N',blas_handle);
+		Xhatt_Xhat.real();
+	}
+	else {
+		gemm(LorR, LorR, Xhatt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N',blas_handle);
+	}
+}
 
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::compute_lambda()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_lambda()
 {
 #ifdef __COMPILE_TIMERS__
 t_global_compute_lambda.start();
@@ -381,19 +420,17 @@ t_local_compute_lambda.start();
    // As LorR has also been updated at the end of the last iteration over the facts, LorR matches X_hat, which the product of all factors, including the last one.
    // Xt_Xhat = data'*X_hat
    Faust::MatDense<FPP,DEVICE> Xt_Xhat;
-   gemm(data, LorR, Xt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N', blas_handle);
-
+   this->compute_xt_xhat(Xt_Xhat);
    // Xhatt_Xhat = X_hat'*X_hat
    Faust::MatDense<FPP,DEVICE> Xhatt_Xhat;
-
-   gemm(LorR, LorR, Xhatt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N',blas_handle);
+   this->compute_xhatt_xhat(Xhatt_Xhat);
 
    FPP Xhatt_Xhat_tr = (FPP) Xhatt_Xhat.trace();
 
-   if (Xhatt_Xhat_tr != 0)
+   if (Xhatt_Xhat_tr != FPP(0))
    {
 		m_lambda = Xt_Xhat.trace()/Xhatt_Xhat_tr;
-		if (isnan(m_lambda))
+		if (isnan(std::complex<float>(m_lambda).real()) || isnan(std::complex<float>(m_lambda).imag()))
 		{
 			handleError(m_className,"compute_lambda : Xhatt_Xhat_tr is too small or Xt_Xhat.trace is too big so lambda is infinite");
 		}
@@ -411,8 +448,8 @@ t_local_compute_lambda.stop();
 }
 
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::update_R()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::update_R()
 {
 #ifdef __COMPILE_TIMERS__
 t_global_update_R.start();
@@ -456,8 +493,8 @@ t_local_update_R.stop();
 }
 
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::update_L()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::update_L()
 {
 
 
@@ -495,8 +532,8 @@ t_local_update_L.stop();
 #endif
 }
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::check_constraint_validity()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::check_constraint_validity()
 {
 #ifdef __COMPILE_TIMERS__
 t_global_check.start();
@@ -515,10 +552,10 @@ t_local_check.stop();
 
 
 #ifdef __PAS_FIXE__
-// Faust::Palm4MSA<FPP,DEVICE>::compute_c() has been defined as an inline method in Faust::Palm4MSA.h
+// Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_c() has been defined as an inline method in Faust::Palm4MSA.h
 #else
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::compute_c()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_c()
 {
 #ifdef __COMPILE_TIMERS__
 	t_global_compute_c.start();
@@ -531,7 +568,7 @@ void Faust::Palm4MSA<FPP,DEVICE>::compute_c()
 		faust_int flag1,flag2;
 
 	   int nbr_iter = 10000;
-	   FPP threshold = 1e-16;
+	   FPP2 threshold = 1e-16;
 	   FPP nL1=LorR.spectralNorm(nbr_iter,threshold,flag1,blas_handle);
 	   FPP nR1=RorL[m_indFact].spectralNorm(nbr_iter,threshold,flag2,blas_handle);
 		c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*m_lambda*m_lambda;
@@ -547,8 +584,8 @@ void Faust::Palm4MSA<FPP,DEVICE>::compute_c()
 }
 #endif
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::init_fact(int nbFacts_)
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::init_fact(int nbFacts_)
 {
 #ifdef __COMPILE_TIMERS__
 t_global_init_fact.start();
@@ -557,7 +594,7 @@ t_local_init_fact.start();
 
   /*if(isInit && isGlobal)
   {
-     cerr << "Error in Faust::Palm4MSA<FPP,DEVICE>::init_fact : global factorization has already been initialized" <<endl;
+     cerr << "Error in Faust::Palm4MSA<FPP,DEVICE,FPP2>::init_fact : global factorization has already been initialized" <<endl;
      exit(EXIT_FAILURE);
   }
   else if (isGlobal)
@@ -611,8 +648,8 @@ t_local_init_fact.stop();
  * \param
  * \param
  */
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::next_step()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::next_step()
 {
 #ifdef __COMPILE_TIMERS__
 t_global_next_step.start();
@@ -689,8 +726,8 @@ t_local_next_step.stop();
 #endif
 }
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::init_fact_from_palm(const Faust::Palm4MSA<FPP,DEVICE>& palm2, bool isFactSideLeft)
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::init_fact_from_palm(const Faust::Palm4MSA<FPP,DEVICE,FPP2>& palm2, bool isFactSideLeft)
 {
 #ifdef __COMPILE_TIMERS__
 t_global_init_fact_from_palm.start();
@@ -731,35 +768,35 @@ t_local_init_fact_from_palm.stop();
 
 #ifdef __COMPILE_TIMERS__
 
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_global_compute_projection;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_global_compute_grad_over_c;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_global_compute_c;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_global_compute_lambda;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_global_update_R;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_global_update_L;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_global_check;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_global_init_fact;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_global_next_step;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_global_init_fact_from_palm;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_global_compute_projection;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_global_compute_grad_over_c;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_global_compute_c;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_global_compute_lambda;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_global_update_R;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_global_update_L;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_global_check;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_global_init_fact;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_global_next_step;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_global_init_fact_from_palm;
 
 
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_prox_const;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_prox_sp;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_prox_spcol;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_prox_splin;
-template<typename FPP,Device DEVICE> Faust::Timer Faust::Palm4MSA<FPP,DEVICE>::t_prox_normcol;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_prox_const;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_prox_sp;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_prox_spcol;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_prox_splin;
+template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Palm4MSA<FPP,DEVICE,FPP2>::t_prox_normcol;
 
-template<typename FPP,Device DEVICE> int Faust::Palm4MSA<FPP,DEVICE>::nb_call_prox_const;
-template<typename FPP,Device DEVICE> int Faust::Palm4MSA<FPP,DEVICE>::nb_call_prox_sp;
-template<typename FPP,Device DEVICE> int Faust::Palm4MSA<FPP,DEVICE>::nb_call_prox_spcol;
-template<typename FPP,Device DEVICE> int Faust::Palm4MSA<FPP,DEVICE>::nb_call_prox_splin;
-template<typename FPP,Device DEVICE> int Faust::Palm4MSA<FPP,DEVICE>::nb_call_prox_normcol;
-
-
+template<typename FPP,Device DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_const;
+template<typename FPP,Device DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_sp;
+template<typename FPP,Device DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_spcol;
+template<typename FPP,Device DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_splin;
+template<typename FPP,Device DEVICE,typename FPP2> int Faust::Palm4MSA<FPP,DEVICE,FPP2>::nb_call_prox_normcol;
 
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::init_local_timers()
+
+
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::init_local_timers()
 {
 t_local_compute_projection.reset();
 t_local_compute_grad_over_c.reset();
@@ -773,8 +810,8 @@ t_local_next_step.reset();
 t_local_init_fact_from_palm.reset();
 }
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::print_global_timers()const
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::print_global_timers()const
 {
     cout << "timers in Faust::Palm4MSA : " << endl;
     cout << "t_global_next_step           = " << t_global_next_step.get_time()           << " s for "<< t_global_next_step.get_nb_call()           << " calls" << endl;
@@ -791,8 +828,8 @@ void Faust::Palm4MSA<FPP,DEVICE>::print_global_timers()const
 }
 
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::print_prox_timers() const
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::print_prox_timers() const
 {
 /*	cout << "prox timers in Faust::Palm4MSA : " << endl;
    cout << "total t_prox_const  =  " << t_prox_const.get_time()  << " s for "<< nb_call_prox_const  << " calls" << endl;
@@ -803,8 +840,8 @@ void Faust::Palm4MSA<FPP,DEVICE>::print_prox_timers() const
 */}
 
 
-template<typename FPP,Device DEVICE>
-void Faust::Palm4MSA<FPP,DEVICE>::print_local_timers()const
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::print_local_timers()const
 {
     cout << "timers in Faust::Palm4MSA : " << endl;
     cout << "t_local_next_step           = " << t_local_next_step.get_time()           << " s for "<< t_local_next_step.get_nb_call()           << " calls" << endl;

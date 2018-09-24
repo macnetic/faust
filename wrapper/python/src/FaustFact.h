@@ -45,7 +45,7 @@ class PyxStoppingCriterion
         unsigned long max_num_its;
 };
 
-template<typename FPP>
+template<typename FPP, typename FPP2 = double>
 class PyxParamsFact
 {
     public:
@@ -59,30 +59,30 @@ class PyxParamsFact
         bool constant_step_size;
 };
 
-template<typename FPP>
-class PyxParamsFactPalm4MSA : public PyxParamsFact<FPP>
+template<typename FPP, typename FPP2 = double>
+class PyxParamsFactPalm4MSA : public PyxParamsFact<FPP,FPP2>
 {
     public:
         FPP** init_facts;// num_facts elts
         unsigned long* init_fact_sizes;
-        PyxStoppingCriterion<FPP> stop_crit;
+        PyxStoppingCriterion<FPP2> stop_crit;
 };
 
-template<typename FPP>
-class PyxParamsHierarchicalFact : public PyxParamsFact<FPP>
+template<typename FPP, typename FPP2 = double>
+class PyxParamsHierarchicalFact : public PyxParamsFact<FPP,FPP2>
 {
     public:
         unsigned int num_rows;
         unsigned int num_cols;
-        PyxStoppingCriterion<FPP>* stop_crits; // must be of size 2
+        PyxStoppingCriterion<FPP2>* stop_crits; // must be of size 2
         bool is_fact_side_left;
 };
 
-template<typename FPP>
-FaustCoreCpp<FPP>* fact_palm4MSA(FPP*, unsigned int, unsigned int, PyxParamsFactPalm4MSA<FPP>*, bool);
+template<typename FPP, typename FPP2 = double>
+FaustCoreCpp<FPP>* fact_palm4MSA(FPP*, unsigned int, unsigned int, PyxParamsFactPalm4MSA<FPP,FPP2>*, bool);
 
-template<typename FPP>
-FaustCoreCpp<FPP>* fact_hierarchical(FPP*, unsigned int, unsigned int, PyxParamsHierarchicalFact<FPP>*, bool);
+template<typename FPP, typename FPP2 = double>
+FaustCoreCpp<FPP>* fact_hierarchical(FPP*, unsigned int, unsigned int, PyxParamsHierarchicalFact<FPP,FPP2>*, bool);
 
 #include "FaustFact.hpp"
 

@@ -970,7 +970,7 @@ class FaustFactory:
                 - FACTOR 3 (real) SPARSE, size 32x32, density 0.325195, nnz 333
                 """
         if(not isinstance(p, ParamsHierarchicalFact)):
-            raise ValueError("p must be a ParamsPalm4MSA object.")
+            raise ValueError("p must be a ParamsHierarchicalFact object.")
         FaustFactory._check_fact_mat('FaustFactory.fact_hierarchical()', M)
         return Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
 
@@ -1076,9 +1076,9 @@ class FaustFactory:
                                                                 np.float)):
             raise Exception(funcname+" 1st argument must be a float or complex "
                             "ndarray.")
-        if(isinstance(M[0,0], np.complex)):
-           raise Exception(funcname+" doesn't yet support complex matrix "
-                           "factorization.")
+        #if(isinstance(M[0,0], np.complex)):
+        #   raise Exception(funcname+" doesn't yet support complex matrix "
+        #                   "factorization.")
 
 
 
@@ -1094,7 +1094,7 @@ class ParamsFact(object):
         self.constraints = constraints
         self.is_verbose = is_verbose
         self.constant_step_size = constant_step_size
-    
+
 class ParamsPalm4MSA(ParamsFact):
 
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
@@ -1106,19 +1106,9 @@ class ParamsPalm4MSA(ParamsFact):
                                              constraints, step_size,
                                              constant_step_size,
                                              is_verbose)
-        if(not init_facts):
-            if(is_update_way_R2L):
-                zeros_id = num_facts-1
-            else:
-                zeros_id = 0
-            self.init_facts = [
-                        np.zeros([constraints[zeros_id].num_rows,constraints[zeros_id].num_cols]) ]
-            for i in [i for i in range(0,num_facts) if i != zeros_id]:
-                self.init_facts += [np.eye(constraints[i].num_rows,
-                                           constraints[i].num_cols)]
-        elif(not isinstance(init_facts, list) and not isinstance(init_facts,
+        if(init_facts != None and (not isinstance(init_facts, list) and not isinstance(init_facts,
                                                                tuple) or
-           len(init_facts) != num_facts):
+           len(init_facts) != num_facts)):
             raise ValueError('ParamsPalm4MSA init_facts argument must be a '
                              'list/tuple of '+str(num_facts)+" (num_facts) arguments.")
         else:

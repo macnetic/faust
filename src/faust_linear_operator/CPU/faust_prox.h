@@ -71,10 +71,10 @@ namespace Faust {
     void prox_splin_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
     template<typename FPP>
     void prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k);
-    template<typename FPP>
-    void prox_normcol(Faust::MatDense<FPP,Cpu> & M,FPP s);
-    template<typename FPP>
-    void prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP s);
+    template<typename FPP, typename FPP2>
+    void prox_normcol(Faust::MatDense<FPP,Cpu> & M,FPP2 s);
+    template<typename FPP, typename FPP2>
+    void prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP2 s);
     template<typename FPP>
     void prox_supp(Faust::MatDense<FPP,Cpu> & M, const Faust::MatDense<FPP,Cpu> & supp);
 //    template<typename FPP>

@@ -157,14 +157,17 @@ endif()
 
 foreach(TEST_FPP float double)
 	foreach(FILE faust_mult faust_mult_cplx)
-	configure_file(${FAUST_SRC_TEST_SRC_UNIT_DIR}/${FILE}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${FILE}_${TEST_FPP}.cpp @ONLY)
+		set(TEST_BIN_FILE ${FILE}_${TEST_FPP})
+		set(TEST_FILE_CPP ${TEST_BIN_FILE}.cpp)
+		message(STATUS ${TEST_FILE_CPP})
+		configure_file(${FAUST_SRC_TEST_SRC_UNIT_DIR}/${FILE}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} @ONLY)
 
 	# Generation of the binary files in double and float precision
-	add_executable(${FILE}_${TEST_FPP} ${FAUST_BIN_TEST_SRC_DIR}/${FILE}_${TEST_FPP}.cpp ${FAUST_BIN_TEST_SRC_DIR}/)
+	add_executable(${TEST_BIN_FILE} ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} ${FAUST_BIN_TEST_SRC_DIR}/)
    	
-	target_link_libraries(${FILE}_${TEST_FPP} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+	target_link_libraries(${TEST_BIN_FILE} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
 			
-	add_test(NAME UNIT_${FILE}_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/${FILE}_${TEST_FPP})
+	add_test(NAME UNIT_${TEST_BIN_FILE} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/${TEST_BIN_FILE})
 				
 	endforeach(FILE)
 endforeach(TEST_FPP)
@@ -188,17 +191,25 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
 	# test_palm4MSA : test the palm4MSA algorithm
 	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
  
-	foreach(TEST_FPP float double)	
-		foreach(testin hierarchicalFactorization test_palm4MSA faust_multiplication)
-			# copy CPU files cpp.in to the user's ./src/ directory in float et double precision
-			configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/${testin}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${testin}_${TEST_FPP}.cpp @ONLY)
+	foreach(TEST_FPP float double complex<float> complex<double>)	
+		foreach(testin hierarchicalFactorization test_palm4MSA faust_multiplication faust_matdense_conjugate)
+		string(REGEX REPLACE "<|>" "" TEST_FILE_CPP ${TEST_FPP})
+		set(TEST_CPP_NAME ${testin}_${TEST_FILE_CPP})
+		set(TEST_FILE_CPP ${TEST_CPP_NAME}.cpp)
+		message(STATUS ${TEST_FILE_CPP})			# copy CPU files cpp.in to the user's ./src/ directory in float et double precision
+		if(TEST_FPP MATCHES float)
+			set(TEST_FPP2 "float")
+		else()
+			set(TEST_FPP2 "double")
+		endif()
+		configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/${testin}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} @ONLY)
 			# Generation of the binary files in double and float precision
-			add_executable(${testin}_${TEST_FPP} ${FAUST_BIN_TEST_SRC_DIR}/${testin}_${TEST_FPP}.cpp ${FAUST_BIN_TEST_SRC_DIR}/ ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
+			add_executable(${TEST_CPP_NAME} ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} ${FAUST_BIN_TEST_SRC_DIR}/ ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
    	
 			if(BUILD_OPENBLAS)
-		      		target_link_libraries(${testin}_${TEST_FPP}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+				target_link_libraries(${TEST_CPP_NAME}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
 			else(BUILD_OPENBLAS)
-		      		target_link_libraries(${testin}_${TEST_FPP}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+				target_link_libraries(${TEST_CPP_NAME}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
 			endif(BUILD_OPENBLAS)	
 		endforeach()
 	endforeach()

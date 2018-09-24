@@ -63,6 +63,7 @@
 */
 
 typedef @TEST_FPP@ FPP;
+typedef @TEST_FPP2@ FPP2;
 
 int main(int argc, char* argv[])
 {
@@ -93,7 +94,7 @@ int main(int argc, char* argv[])
 		expectedLambda = atof(argv[3]);
 
 
-	FPP epsilon = 0.0001;
+	FPP2 epsilon = 0.0001;
 	if (argc >= 5)
 		epsilon = atof(argv[4]);
 
@@ -147,8 +148,8 @@ int main(int argc, char* argv[])
 	Faust::SpBlasHandle<Cpu> spblasHandle;
 
 	// parameter setting
-	Faust::Params<FPP,Cpu> params;
-	init_params_from_matiofile(params,configFilename.c_str(),"params");
+	Faust::Params<FPP,Cpu,FPP2> params;
+	init_params_from_matiofile<FPP,Cpu,FPP2>(params,configFilename.c_str(),"params");
 	params.Display();
 
 	// matrix to be factorized
@@ -160,8 +161,7 @@ int main(int argc, char* argv[])
 		matrix.transpose();
 	
 	//algorithm
-	Faust::HierarchicalFact<FPP,Cpu> hierFact(matrix,params,blasHandle,spblasHandle);
-
+	Faust::HierarchicalFact<FPP,Cpu,FPP2> hierFact(matrix,params,blasHandle,spblasHandle);
 	Faust::Timer t1;
 	t1.start();
 
@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
 	FPP lambda = hierFact.get_lambda();
 	if (argc >= 3)
 	{
-		if (std::abs(lambda - expectedLambda) > epsilon)
+		if (Faust::fabs(lambda - expectedLambda) > epsilon)
 		{
 			std::cerr<<"invalid lambda, must be equal to "<<std::setprecision(20)<<std::setprecision(20)<<expectedLambda<<" in the precision of "<<epsilon<<std::endl;
 			std::cerr<<"current value is "<<std::setprecision(20)<<lambda<<std::endl;
@@ -220,7 +220,7 @@ int main(int argc, char* argv[])
 	Faust::MatDense<FPP,Cpu> faustProduct;
 	faustProduct=hierFactCore.get_product();
 	faustProduct-=matrix;
-	FPP relativeError = faustProduct.norm()/matrix.norm();
+	FPP2 relativeError = faustProduct.norm()/matrix.norm();
 
 	std::cout<<std::endl;
 	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;

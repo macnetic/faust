@@ -47,7 +47,7 @@
 namespace Faust
 {
 
-    template<typename T>
+    template<typename T = double>
     class StoppingCriterion
     {
        public:
@@ -64,6 +64,7 @@ namespace Faust
           StoppingCriterion(bool isCriterionError_);
 
           StoppingCriterion(int nb_it, bool isCriterionError, T errorThreshold, int maxIteration=10000);
+
 
           ~StoppingCriterion(){}
 

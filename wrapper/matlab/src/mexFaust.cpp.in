@@ -65,9 +65,9 @@
 //    "delete" to delete the Faust::Transform<SCALAR> object dynamically allocated previously
 //    "multiply" to multiply the Faust::Transform<SCALAR> object by a vector or a matrix
 
-// prhs[1] : address of the Faust::Transform<SCALAR> object dynamically allocated previously
+// prhs[1] : address of the Faust::TransformHelper<SCALAR> object dynamically allocated previously
 
-// prhs[2] (only necessary if prhs[0] matches "multiply") : vector or matrix A to multiply by the Faust::Transform<SCALAR> object
+// prhs[2] (only necessary if prhs[0] matches "multiply") : vector or matrix A to multiply by the Faust::TransformHelper<SCALAR> object
 
 
 

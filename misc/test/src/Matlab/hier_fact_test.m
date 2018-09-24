@@ -82,7 +82,7 @@ switch(opt)
 		disp('*** MEX FACTORISATION ***');  
 		tic
 			%[lambda,fact]=mexHierarchical_fact(matrix,params);
-			[lambda, core_obj] = mexHierarchical_fact(matrix, params);
+			[lambda, core_obj] = mexHierarchical_factReal(matrix, params);
 			F = Faust(core_obj, isreal(matrix));
 		t=toc;
 	case 'MATLAB' %% factorisation (matlab)

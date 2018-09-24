@@ -63,7 +63,7 @@ namespace Faust
 {
     template<typename FPP,Device DEVICE> class MatDense;
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,Device DEVICE,typename FPP2 = double>
     class ParamsPalm
     {
 
@@ -73,9 +73,9 @@ namespace Faust
           ParamsPalm(
              const Faust::MatDense<FPP,DEVICE>& data_,
              const int nbFact_,
-             const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*>& cons_,
+             const std::vector<const Faust::ConstraintGeneric*>& cons_,
              const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-             const Faust::StoppingCriterion<FPP> & stop_crit_ = Faust::StoppingCriterion<FPP>(defaultNiter),
+             const Faust::StoppingCriterion<FPP2> & stop_crit_ = Faust::StoppingCriterion<FPP2>(defaultNiter),
              const bool isVerbose_ = defaultVerbosity ,
              const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
              const FPP init_lambda_ = defaultLambda,
@@ -91,11 +91,11 @@ namespace Faust
           // Required members
           Faust::MatDense<FPP,DEVICE> data;
           int nbFact; // number of factors
-          std::vector<const Faust::ConstraintGeneric<FPP,DEVICE> *> cons; // vector of constraints
+          std::vector<const Faust::ConstraintGeneric*> cons; // vector of constraints
 
           // Optional members (set to default values if not defined)
           std::vector<Faust::MatDense<FPP,DEVICE> > init_fact;
-          Faust::StoppingCriterion<FPP> stop_crit;
+          Faust::StoppingCriterion<FPP2> stop_crit;
           bool isVerbose;
           bool isUpdateWayR2L;
           bool isConstantStepSize;

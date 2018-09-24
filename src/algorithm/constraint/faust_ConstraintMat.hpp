@@ -51,7 +51,7 @@ const char * Faust::ConstraintMat<FPP,DEVICE>::m_className="Faust::ConstraintMat
 
 template<typename FPP,Device DEVICE>
 Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat() :
-   Faust::ConstraintGeneric<FPP,DEVICE>()
+   Faust::ConstraintGeneric()
 {
    set_default_parameter();
 }
@@ -61,7 +61,7 @@ Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat(
    const faust_constraint_name& constraintName_,
    const faust_unsigned_int nbRows_,
    const faust_unsigned_int nbCols_) :
-      Faust::ConstraintGeneric<FPP,DEVICE>(
+      Faust::ConstraintGeneric(
          constraintName_,
          nbRows_,
          nbCols_)
@@ -75,7 +75,7 @@ Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat(
    const Faust::MatDense<FPP,DEVICE> defaultParameter_,
    const faust_unsigned_int nbRows_,
    const faust_unsigned_int nbCols_) :
-      Faust::ConstraintGeneric<FPP,DEVICE>(
+      Faust::ConstraintGeneric(
          constraintName_,
          nbRows_,
          nbCols_),
@@ -87,7 +87,7 @@ Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat(
 template<typename FPP,Device DEVICE>
 Faust::ConstraintMat<FPP,DEVICE>::ConstraintMat(
    const Faust::ConstraintMat<FPP,DEVICE>& constraint_) :
-      Faust::ConstraintGeneric<FPP,DEVICE>(
+      Faust::ConstraintGeneric(
          constraint_.constraintName,
          constraint_.nbRows,
          constraint_.nbCols),

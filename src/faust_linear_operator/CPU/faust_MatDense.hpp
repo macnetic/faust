@@ -251,7 +251,6 @@ void Faust::MatDense<FPP,Cpu>::transpose()
 #endif
 
 }
-
 	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::conjugate()
 {
@@ -267,13 +266,42 @@ void Faust::MatDense<FPP,Cpu>::conjugate()
 #endif
 		return;
 	}
-
-	mat = mat.conjugate().eval();
-
+	conjugate(true);
 #ifdef __COMPILE_TIMERS__
 	//t_conjugate.stop(); //TODO
 #endif
 
+}
+	template<typename FPP>
+void Faust::MatDense<FPP,Cpu>::conjugate(const bool eval)
+{
+
+#ifdef __COMPILE_TIMERS__
+	//t_conjugate.start(); //TODO
+#endif
+
+	if(isZeros)
+	{
+#ifdef __COMPILE_TIMERS__
+		//			t_conjugate.stop(); //TODO
+#endif
+		return;
+	}
+
+	if(eval)
+		mat = mat.conjugate().eval();
+	else
+		mat = mat.conjugate();
+#ifdef __COMPILE_TIMERS__
+	//t_conjugate.stop(); //TODO
+#endif
+
+}
+
+template<typename FPP>
+void Faust::MatDense<FPP,Cpu>::real()
+{
+	mat = mat.real().eval().template cast<FPP>();
 }
 
 

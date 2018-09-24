@@ -71,54 +71,59 @@ namespace Faust {
 //! \class ConstraintGeneric
 //! \brief Contains the generic constraint parameters for the hierarchical factorization. See following table for more precision about the type of constraint. <br>
 //! <img src="../../doc/html/constraint.png" alt="constraint parameters" width=800px />
-    template<typename FPP,Device DEVICE>
     class ConstraintGeneric
     {
-        public:
-        ConstraintGeneric() : m_constraintName(CONSTRAINT_NAME_SP),m_nbRows(32),m_nbCols(32) {} // contrainte par defaut (a voir avec Luc)
+	public:
+	    ConstraintGeneric() : m_constraintName(CONSTRAINT_NAME_SP),m_nbRows(32),m_nbCols(32) {} // contrainte par defaut (a voir avec Luc)
 
-        ConstraintGeneric(
-            const faust_constraint_name& constraintName_,
-            const faust_unsigned_int nbRows_,
-            const faust_unsigned_int nbCols_) :
-                m_constraintName(constraintName_),
-                m_nbRows(nbRows_),
-                m_nbCols(nbCols_){}
+	    ConstraintGeneric(
+		    const faust_constraint_name& constraintName_,
+		    const faust_unsigned_int nbRows_,
+		    const faust_unsigned_int nbCols_) :
+		m_constraintName(constraintName_),
+		m_nbRows(nbRows_),
+		m_nbCols(nbCols_){}
 
-        ConstraintGeneric(const ConstraintGeneric& constraint) :
-            m_constraintName(constraint.constraintName),
-            m_nbRows(constraint.nbRows),
-            m_nbCols(constraint.nbCols){}
-
-
-
-        const char* get_type() const;
-        const char* get_constraint_name()const;
-        const faust_constraint_name get_constraint_type() const;
-        bool is_constraint_parameter_int()const;
-        bool is_constraint_parameter_real()const;
-        bool is_constraint_parameter_mat()const;
+	    ConstraintGeneric(const ConstraintGeneric& constraint) :
+		m_constraintName(constraint.m_constraintName),
+		m_nbRows(constraint.m_nbRows),
+		m_nbCols(constraint.m_nbCols){}
 
 
-        const faust_unsigned_int get_rows() const {return m_nbRows;}
-        const faust_unsigned_int get_cols() const {return m_nbCols;}
 
-        virtual void set_default_parameter()=0;
-        virtual void check_constraint_name()const=0;
-        virtual void project(MatDense<FPP,DEVICE> & mat)const=0;
+	    template<typename FPP,Device DEVICE, typename FPP2=double>
+		const char* get_type() const;
+	    const char* get_constraint_name()const;
+	    const faust_constraint_name get_constraint_type() const;
+	    template<typename FPP,Device DEVICE, typename FPP2=double>
+		bool is_constraint_parameter_int()const;
+	    template<typename FPP,Device DEVICE, typename FPP2=double>
+		bool is_constraint_parameter_real()const;
+	    template<typename FPP,Device DEVICE, typename FPP2=double>
+		bool is_constraint_parameter_mat()const;
 
-        ~ConstraintGeneric(){};
 
-        protected:
-        /// type of constraint
-        const faust_constraint_name m_constraintName;
-        // parameter of constraint
-        //const parameter_type parameter;
-        const faust_unsigned_int m_nbRows;
-        const faust_unsigned_int m_nbCols;
+	    const faust_unsigned_int get_rows() const {return m_nbRows;}
+	    const faust_unsigned_int get_cols() const {return m_nbCols;}
 
-        private :
-        static const char * m_className;
+	    virtual void set_default_parameter()=0;
+	    virtual void check_constraint_name()const=0;
+		template<typename FPP, Device DEVICE>
+		/*virtual*/ void project(MatDense<FPP,DEVICE> & mat)const;//=0; //template with (pure) virtual not authorized (otherwise it must be templates from class, not function)
+		template<typename FPP, Device DEVICE, typename FPP2>
+			/*virtual*/ void project(Faust::MatDense<FPP, DEVICE>&) const /*=0*/;
+	    ~ConstraintGeneric(){};
+
+	protected:
+	    /// type of constraint
+	    const faust_constraint_name m_constraintName;
+	    // parameter of constraint
+	    //const parameter_type parameter;
+	    const faust_unsigned_int m_nbRows;
+	    const faust_unsigned_int m_nbCols;
+
+	private :
+	    static const char * m_className;
 
 
     };

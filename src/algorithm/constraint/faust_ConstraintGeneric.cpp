@@ -120,3 +120,43 @@ int get_type_constraint(const char * type)
 	handleError("Faust::ConstraintGeneric","::add_constraint : invalid constraint type");
 }
 
+const faust_constraint_name Faust::ConstraintGeneric::get_constraint_type() const
+{
+   return m_constraintName;
+}
+
+
+
+
+
+const char* Faust::ConstraintGeneric::get_constraint_name()const
+{
+   switch(m_constraintName)
+   {
+      case CONSTRAINT_NAME_SP:
+         return "CONSTRAINT_NAME_SP";
+      case CONSTRAINT_NAME_SPCOL:
+         return "CONSTRAINT_NAME_SPCOL";
+      case CONSTRAINT_NAME_SPLIN:
+         return "CONSTRAINT_NAME_SPLIN";
+      case CONSTRAINT_NAME_NORMCOL:
+         return "CONSTRAINT_NAME_NORMCOL";
+      case CONSTRAINT_NAME_SPLINCOL:
+         return "CONSTRAINT_NAME_SPLINCOL";
+      case CONSTRAINT_NAME_CONST:
+         return "CONSTRAINT_NAME_CONST";
+      case CONSTRAINT_NAME_SP_POS:
+         return "CONSTRAINT_NAME_SP_POS";
+      case CONSTRAINT_NAME_BLKDIAG:
+         return "CONSTRAINT_NAME_BLKDIAG";
+      case CONSTRAINT_NAME_SUPP:
+         return "CONSTRAINT_NAME_SUPP";
+      case CONSTRAINT_NAME_NORMLIN:
+         return "CONSTRAINT_NAME_NORMLIN";
+      default:
+         return "unknown constraint name";
+   }
+}
+
+
+const char * Faust::ConstraintGeneric::m_className="Faust::ConstraintGeneric::";

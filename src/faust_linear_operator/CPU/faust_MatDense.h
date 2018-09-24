@@ -68,7 +68,7 @@
 * \tparam T scalar numeric type, e.g float or double
 */
 
-//template<typename FPP, Device DEVICE> class MatDense;
+//template<typename FPP,Device DEVICE> class MatDense;
 //template<typename FPP, Device DEVICE> class MatSparse;
 //template<typename FPP, Device DEVICE> class Vect;
 //template<typename FPP, Device DEVICE> class Transform;
@@ -326,10 +326,10 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
         //!  \brief Compute the Frobenius norm of the MatDense
         //! \return  the Frobenius norm
-        FPP norm() const {return mat.norm();}
+        template<typename FPP2=double> FPP2 norm() const {return mat.norm();}
 
         //!  \brief Normalize the matrix according to its Frobenius norm
-        void normalize() {scalarMultiply(1.0/norm());}
+        void normalize() {scalarMultiply(FPP(1.0)/FPP(norm()));}
 
 
         //!	\param nbr_iter_max : maximum number of iteration for the power algo
@@ -348,6 +348,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
 		//! \brief Replaces the matrix by its conjugate.
 		void conjugate();
+		void conjugate(const bool eval);
 
         //! \brief Replace this by (this) * A
         void multiplyRight(MatDense<FPP,Cpu> const& A);
@@ -381,6 +382,10 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         void print_file(const char* filename)const;
 
 		matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
+		//! \brief Keeps only real part of the matrix, erase imaginary part.
+		//
+		//	If the matrix is real, it does nothing.
+		void real();
 		FPP normL1() const;
 		FPP normL1(faust_unsigned_int&) const;
 		Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
@@ -428,7 +433,6 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		bool isIdentity;
 		bool isZeros;
 		static const char * m_className;
-
 
     #ifdef __COMPILE_TIMERS__
         public:

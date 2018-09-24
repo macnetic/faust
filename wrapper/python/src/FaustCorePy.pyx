@@ -464,8 +464,8 @@ cdef class FaustFact:
         cdef double[:,:] tmp_mat
         cdef complex[:,:] tmp_mat_cplx
 
-        cdef FaustCoreCy.PyxParamsFactPalm4MSA[double] cpp_params
-        cdef FaustCoreCy.PyxParamsFactPalm4MSA[complex] cpp_params_cplx
+        cdef FaustCoreCy.PyxParamsFactPalm4MSA[double,double] cpp_params
+        cdef FaustCoreCy.PyxParamsFactPalm4MSA[complex,double] cpp_params_cplx
         cdef PyxStoppingCriterion[double] cpp_stop_crit
         # template parameter is always double (never complex) because no need
         # to have a treshold error of complex type (it wouldn't make sense)
@@ -475,6 +475,22 @@ cdef class FaustFact:
         cpp_stop_crit.error_treshold = p.stop_crit.error_treshold
         cpp_stop_crit.num_its = p.stop_crit.num_its
         cpp_stop_crit.max_num_its = p.stop_crit.max_num_its
+
+        if(not p.init_facts):
+            if(p.is_update_way_R2L):
+                zeros_id = p.num_facts-1
+            else:
+                zeros_id = 0
+            p.init_facts = [
+                np.zeros([p.constraints[zeros_id].num_rows,p.constraints[zeros_id].num_cols]) ]
+            if(not isReal):
+                p.init_facts[0] = p.init_facts[0].astype(np.complex)
+            for i in [i for i in range(0,p.num_facts) if i != zeros_id]:
+                p.init_facts += [np.eye(p.constraints[i].num_rows,
+                                        p.constraints[i].num_cols)]
+                if(not isReal):
+                    p.init_facts[i] = p.init_facts[i].astype(np.complex)
+
 
         if(isReal):
             Mview=M
@@ -496,6 +512,7 @@ cdef class FaustFact:
             cpp_params_cplx.is_update_way_R2L = p.is_update_way_R2L
             cpp_params_cplx.init_lambda = p.init_lambda
             cpp_params_cplx.step_size = p.step_size
+            cpp_params_cplx.stop_crit = cpp_stop_crit
             cpp_params_cplx.init_facts = <complex**> \
                     PyMem_Malloc(sizeof(complex*)*p.num_facts)
             cpp_params_cplx.init_fact_sizes = <unsigned long*> \
@@ -564,15 +581,15 @@ cdef class FaustFact:
 
         core = FaustCore(core=True)
         if(isReal):
-            core.core_faust_dbl = FaustCoreCy.fact_palm4MSA(&Mview[0,0], M_num_rows, M_num_cols,
+            core.core_faust_dbl = FaustCoreCy.fact_palm4MSA[double,double](&Mview[0,0], M_num_rows, M_num_cols,
  #           FaustCoreCy.fact_palm4MSA(&Mview[0,0], M_num_rows, M_num_cols,
                                       &cpp_params)
             core._isReal = True
             #TODO: FPP == complex not yet supported by C++ code
-#        else:
-#            core.core_faust_cplx = FaustCoreCy.fact_palm4MSA(&Mview_cplx[0,0], M_num_rows, M_num_cols,
-#                                     &cpp_params_cplx)
-#            core._isReal = False
+        else:
+            core.core_faust_cplx = FaustCoreCy.fact_palm4MSA[complex,double](&Mview_cplx[0,0], M_num_rows, M_num_cols,
+                                     &cpp_params_cplx)
+            core._isReal = False
         for i in range(0,len(p.constraints)):
             PyMem_Free(cpp_constraints[i])
         PyMem_Free(cpp_constraints)
@@ -603,8 +620,8 @@ cdef class FaustFact:
         cdef double[:,:] tmp_mat
         cdef complex[:,:] tmp_mat_cplx
 
-        cdef FaustCoreCy.PyxParamsHierarchicalFact[double] cpp_params
-        cdef FaustCoreCy.PyxParamsHierarchicalFact[complex] cpp_params_cplx
+        cdef FaustCoreCy.PyxParamsHierarchicalFact[double,double] cpp_params
+        cdef FaustCoreCy.PyxParamsHierarchicalFact[complex,double] cpp_params_cplx
         cdef PyxStoppingCriterion[double]* cpp_stop_crits
         # template parameter is always double (never complex) because no need
         # to have a treshold error of complex type (it wouldn't make sense)
@@ -641,6 +658,7 @@ cdef class FaustFact:
             cpp_params_cplx.is_update_way_R2L = p.is_update_way_R2L
             cpp_params_cplx.init_lambda = p.init_lambda
             cpp_params_cplx.step_size = p.step_size
+            cpp_params_cplx.stop_crits = cpp_stop_crits
             cpp_params_cplx.is_verbose = p.is_verbose
             cpp_params_cplx.is_fact_side_left = p.is_fact_side_left
             cpp_params_cplx.constant_step_size = p.constant_step_size
@@ -696,19 +714,20 @@ cdef class FaustFact:
 
         core = FaustCore(core=True)
         if(isReal):
-            core.core_faust_dbl = FaustCoreCy.fact_hierarchical(&Mview[0,0], M_num_rows, M_num_cols,
+            core.core_faust_dbl = FaustCoreCy.fact_hierarchical[double,double](&Mview[0,0], M_num_rows, M_num_cols,
  #           FaustCoreCy.fact_hierarchical(&Mview[0,0], M_num_rows, M_num_cols,
                                       &cpp_params)
             core._isReal = True
             #TODO: FPP == complex not yet supported by C++ code
-#        else:
-#            core.core_faust_cplx = FaustCoreCy.fact_hierarchical(&Mview_cplx[0,0], M_num_rows, M_num_cols,
-#                                     &cpp_params_cplx)
-#            core._isReal = False
+        else:
+            core.core_faust_cplx = \
+            FaustCoreCy.fact_hierarchical[complex, double](&Mview_cplx[0,0], M_num_rows, M_num_cols,
+                                     &cpp_params_cplx)
+            core._isReal = False
         for i in range(0,len(p.constraints)):
             PyMem_Free(cpp_constraints[i])
         PyMem_Free(cpp_constraints)
-        
+
         PyMem_Free(cpp_stop_crits)
 
         return core

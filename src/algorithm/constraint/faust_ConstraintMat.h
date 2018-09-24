@@ -60,15 +60,15 @@
 namespace Faust
 {
 
-    template<typename FPP,Device DEVICE> class ConstraintGeneric;
+    class ConstraintGeneric;
     template<typename FPP,Device DEVICE> class MatDense;
 
     template<typename FPP,Device DEVICE>
-    class ConstraintMat : public Faust::ConstraintGeneric<FPP,DEVICE>
+    class ConstraintMat : public Faust::ConstraintGeneric
     {
 
        public:
-          ConstraintMat(); // ajouter parametre de contrainte par defaut (a voir avec Luc)
+          ConstraintMat(); // TODO: ajouter parametre de contrainte par defaut (a voir avec Luc)
 
           ConstraintMat(
              const faust_constraint_name& constraintName_,

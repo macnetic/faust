@@ -140,16 +140,22 @@ namespace Faust
     *	\param [in,out] flag : convergence flag
     *	\return	the the biggest eigenvalue of A
     */
-    template<typename FPP>
-    FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold,faust_int & flag);
-    template<typename FPP>
-    FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold,faust_int & flag,Faust::BlasHandle<Cpu> & handle)
+    template<typename FPP, typename FPP2 = double>
+    FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,faust_int & flag);
+    template<typename FPP, typename FPP2 = double>
+    FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,faust_int & flag,Faust::BlasHandle<Cpu> & handle)
     {Faust::power_iteration(A,nbr_iter_max,threshold,flag);}
 
 
     //! surcharge d'operateur * pour multiplier des matrices et des vecteurs
     template<typename FPP>
     Faust::Vect<FPP,Cpu> operator*(const Faust::MatDense<FPP,Cpu>& M, const Faust::Vect<FPP,Cpu>& v);
+
+	template<typename FPP>
+		FPP fabs(FPP c);
+
+	template<typename FPP>
+		FPP fabs(complex<FPP> c);
 
 }
 

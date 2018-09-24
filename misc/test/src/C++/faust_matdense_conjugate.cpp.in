@@ -1,0 +1,48 @@
+#include "faust_MatDense.h"
+#include <iostream>
+
+/** \brief unitary test for MatDense conjugate
+*/
+
+typedef @TEST_FPP@ FPP;
+
+
+using namespace Faust;
+using namespace std;
+
+int main(int argc, char* argv[])
+{
+	faust_unsigned_int dim1 = 3;
+	faust_unsigned_int dim2 = 4;
+
+
+
+	/* initilisation of the factors of the Faust */
+
+	// factor 1
+	MatDense<FPP,Cpu>* M;
+	MatDense<FPP,Cpu> M_copy;
+	M = MatDense<FPP,Cpu>::randMat(dim1,dim2);
+	M_copy = *M;
+	cout<<"mat value"<<endl;
+	M->Display();
+
+	M->conjugate(false);
+	cout<<"conjugate mat value (without eval)"<<endl;
+	M->Display();
+
+	M->transpose();
+	cout<<"conjugate-transpose mat value (with eval)"<<endl;
+	M->Display();
+
+	M->conjugate();
+	cout << "transpose mat value from conjugate-transpose (with eval)" << endl;
+	M->Display();
+
+	M->transpose();
+	assert(M->isEqual(M_copy));
+	cout << "mat value:" << endl;
+	M->Display();
+
+	return 0;
+}

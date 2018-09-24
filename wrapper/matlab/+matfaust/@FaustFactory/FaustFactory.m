@@ -74,7 +74,11 @@ classdef FaustFactory
 			end
 			% put mex_constraints in a cell array again because mex eats one level of array
 			mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'init_facts', {p.init_facts}, 'niter', p.stop_crit.num_its, 'sc_is_criterion_error', p.stop_crit.is_criterion_error, 'sc_error_treshold', p.stop_crit.error_treshold, 'sc_max_num_its', p.stop_crit.max_num_its);
-			[lambda, core_obj] = mexPalm4MSA(mex_params);
+			if(isreal(M))
+				[lambda, core_obj] = mexPalm4MSAReal(mex_params);
+			else
+				[lambda, core_obj] = mexPalm4MSACplx(mex_params);
+			end
 			F = Faust(core_obj, isreal(M));
 		end
 
@@ -145,7 +149,11 @@ classdef FaustFactory
 				mex_constraints{2,i} = cur_cell;
 			end
 			mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left);
-			[lambda, core_obj] = mexHierarchical_fact(M, mex_params);
+			if(isreal(M))
+				[lambda, core_obj] = mexHierarchical_factReal(M, mex_params);
+			else
+				[lambda, core_obj] = mexHierarchical_factCplx(M, mex_params);
+			end
 			F = Faust(core_obj, isreal(M));
 		end
 
@@ -329,9 +337,9 @@ classdef FaustFactory
 			if(~ isnumeric(M))
 				error([funcname, '() 1st argument (M) must be real or complex.'])
 			end
-			if(~ isreal(M))
-				error([funcname, '() doesn''t yet support complex matrix factorization.'])
-			end
+%			if(~ isreal(M))
+%				error([funcname, '() doesn''t yet support complex matrix factorization.'])
+%			end
 		end
 	end
 end

@@ -492,8 +492,8 @@ void setVectorFaustMat(std::vector<Faust::MatDense<FPP,Cpu> > &vecMat,mxArray *C
 
 
 
-template<typename FPP>
-void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS,mxArray* mxCons)
+template<typename FPP, typename FPP2>
+void getConstraint(std::vector<const Faust::ConstraintGeneric*> & consS,mxArray* mxCons)
 {
 	mwSize bufCharLen,nbRowCons,nbColCons,nb_params;
 	int status;
@@ -542,8 +542,8 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*> & consS
 		case 1:
 			{
 				mxConsParams=mxGetCell(mxCons,1);
-				FPP realParameter = (FPP) mxGetScalar(mxConsParams);
-				consS.push_back((new Faust::ConstraintFPP<FPP,Cpu>(consNameType,realParameter,nbRowCons,nbColCons)));
+				FPP2 realParameter = (FPP2) mxGetScalar(mxConsParams);
+				consS.push_back((new Faust::ConstraintFPP<FPP,Cpu, FPP2>(consNameType,realParameter,nbRowCons,nbColCons)));
 
 				break;
 			}

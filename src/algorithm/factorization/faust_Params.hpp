@@ -51,37 +51,37 @@
 
 
 template<typename FPP,Device DEVICE> class MatDense;
-template<typename FPP,Device DEVICE> class ConstraintFPP;
+template<typename FPP,Device DEVICE,typename FPP2> class ConstraintFPP;
 template<typename FPP,Device DEVICE> class ConstraintMat;
 
-template<typename FPP,Device DEVICE>
-const char * Faust::Params<FPP,DEVICE>::m_className = "Faust::Params<FPP,DEVICE>::";
+template<typename FPP,Device DEVICE,typename FPP2>
+const char * Faust::Params<FPP,DEVICE,FPP2>::m_className = "Faust::Params<FPP,DEVICE,FPP2>::";
 
 
 /// default Values of Faust::Params
-template<typename FPP,Device DEVICE> const bool Faust::Params<FPP,DEVICE>::defaultVerbosity = false;
-template<typename FPP,Device DEVICE> const int Faust::Params<FPP,DEVICE>::defaultNiter1 = 500;
-template<typename FPP,Device DEVICE> const int Faust::Params<FPP,DEVICE>::defaultNiter2 = 500;
-template<typename FPP,Device DEVICE> const bool Faust::Params<FPP,DEVICE>::defaultFactSideLeft = false;
-template<typename FPP,Device DEVICE> const bool Faust::Params<FPP,DEVICE>::defaultUpdateWayR2L = false;
-template<typename FPP,Device DEVICE> const FPP Faust::Params<FPP,DEVICE>::defaultLambda = 1.0;
-template<typename FPP,Device DEVICE> const bool Faust::Params<FPP,DEVICE>::defaultConstantStepSize = false;
-template<typename FPP,Device DEVICE> const FPP Faust::Params<FPP,DEVICE>::defaultStepSize = 1e-16;
+template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultVerbosity = false;
+template<typename FPP,Device DEVICE,typename FPP2> const int Faust::Params<FPP,DEVICE,FPP2>::defaultNiter1 = 500;
+template<typename FPP,Device DEVICE,typename FPP2> const int Faust::Params<FPP,DEVICE,FPP2>::defaultNiter2 = 500;
+template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultFactSideLeft = false;
+template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultUpdateWayR2L = false;
+template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultLambda = 1.0;
+template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultConstantStepSize = false;
+template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultStepSize = 1e-16;
 
-template<typename FPP,Device DEVICE> const FPP Faust::Params<FPP,DEVICE>::defaultDecreaseSpeed = 1.25;
-template<typename FPP,Device DEVICE> const FPP Faust::Params<FPP,DEVICE>::defaultResiduumPercent = 1.4;
+template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultDecreaseSpeed = 1.25;
+template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultResiduumPercent = 1.4;
 
-template<typename FPP,Device DEVICE>
-void Faust::Params<FPP,DEVICE>::check_constraint_validity()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity()
 {
     if (cons.size() != 2)
-		//handleError("Faust::Params<FPP,DEVICE>::check_constraint_validity :\n cons must have 2 rows instead of %d",cons.size());
+		//handleError("Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity :\n cons must have 2 rows instead of %d",cons.size());
         handleError(m_className,"check_constraint_validity :\n cons must have 2 rows");
 
     for (unsigned int i=0 ; i<cons.size() ; i++)
         if (cons[i].size() != m_nbFact-1)
         {
-            //handleError("Faust::Params<FPP,DEVICE>::check_constraint_validity :\n The number of constraints equal to %d is in conflict with the number of factors which is %d\n, number of columns of constraints must be equal to m_nbFact - 1",cons[i].size(),m_nbFact);
+            //handleError("Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity :\n The number of constraints equal to %d is in conflict with the number of factors which is %d\n, number of columns of constraints must be equal to m_nbFact - 1",cons[i].size(),m_nbFact);
             handleError(m_className,"check_constraint_validity :\n The number of constraints equal is in conflict with the number of factors,\n number of columns of constraints must be equal to m_nbFact - 1");
         }
 
@@ -103,19 +103,19 @@ void Faust::Params<FPP,DEVICE>::check_constraint_validity()
 
 
     if (!verifSize)
-        handleError(m_className,"Faust::Params<FPP,DEVICE>::check_constraint_validity :\n Size incompatibility in the constraints");
+        handleError(m_className,"Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity :\n Size incompatibility in the constraints");
 
 }
 
-template<typename FPP,Device DEVICE>
-Faust::Params<FPP,DEVICE>::Params(
+template<typename FPP,Device DEVICE,typename FPP2>
+Faust::Params<FPP,DEVICE,FPP2>::Params(
 	const faust_unsigned_int nbRow_,
         const faust_unsigned_int nbCol_,
 	const unsigned int nbFact_,
-	const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & cons_,
+	const std::vector<const Faust::ConstraintGeneric*> & cons_,
 	const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-	const Faust::StoppingCriterion<FPP>& stop_crit_2facts_,
-    const Faust::StoppingCriterion<FPP>& stop_crit_global_,
+	const Faust::StoppingCriterion<FPP2>& stop_crit_2facts_,
+    const Faust::StoppingCriterion<FPP2>& stop_crit_global_,
 	const FPP residuum_decrease_speed /* = 1.25 */,
 	const FPP residuum_prcent /* = 1.4 */,
 	const bool isVerbose_ , /* = false */
@@ -139,7 +139,7 @@ Faust::Params<FPP,DEVICE>::Params(
 {
     if (nbFact_ <= 2)
     {
-        //handleError("Faust::Params<FPP,DEVICE>::constructor : 	the number of factor is smaller than 2, use another constructor\n");
+        //handleError("Faust::Params<FPP,DEVICE,FPP2>::constructor : 	the number of factor is smaller than 2, use another constructor\n");
         handleError(m_className,"check_constraint_validity : Size incompatibility in the constraints");
     }
     if  (residuum_decrease_speed<=1)
@@ -155,8 +155,8 @@ Faust::Params<FPP,DEVICE>::Params(
         handleError(m_className,"constructor : m_nbFact and cons_.size() are in conflict\n");
     }
 
-    std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> residuumS_cons;
-	std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> factorS_cons;
+	std::vector<const Faust::ConstraintGeneric*> residuumS_cons;
+	std::vector<const Faust::ConstraintGeneric*> factorS_cons;
 	double cons_res_parameter = residuum_prcent;
 	if(isFactSideLeft)
 	{
@@ -219,15 +219,15 @@ Faust::Params<FPP,DEVICE>::Params(
 
 
 
-template<typename FPP,Device DEVICE>
-Faust::Params<FPP,DEVICE>::Params(
+template<typename FPP,Device DEVICE,typename FPP2>
+Faust::Params<FPP,DEVICE,FPP2>::Params(
 	 const faust_unsigned_int nbRow_,
          const faust_unsigned_int nbCol_,
          const unsigned int nbFact_,
-         const std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> >& cons_,
+         const std::vector<std::vector<const Faust::ConstraintGeneric*>> & cons_,
          const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-         const Faust::StoppingCriterion<FPP>& stop_crit_2facts_ /* = Faust::StoppingCriterion<FPP>() */,
-         const Faust::StoppingCriterion<FPP>& stop_crit_global_ /* = Faust::StoppingCriterion<FPP>() */,
+         const Faust::StoppingCriterion<FPP2>& stop_crit_2facts_ /* = Faust::StoppingCriterion<FPP2>() */,
+         const Faust::StoppingCriterion<FPP2>& stop_crit_global_ /* = Faust::StoppingCriterion<FPP2>() */,
          const bool isVerbose_ /* = false */,
          const bool isUpdateWayR2L_ /* = false */,
          const bool isFactSideLeft_ /* = false */,
@@ -259,11 +259,11 @@ Faust::Params<FPP,DEVICE>::Params(
 
 
 
-template<typename FPP,Device DEVICE>
-Faust::Params<FPP,DEVICE>::Params() : m_nbRow(0),
+template<typename FPP,Device DEVICE,typename FPP2>
+Faust::Params<FPP,DEVICE,FPP2>::Params() : m_nbRow(0),
 	m_nbCol(0),
 	m_nbFact(0),
-	cons(std::vector<std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> >()),
+	cons(std::vector<std::vector<const Faust::ConstraintGeneric*>>()),
 	isFactSideLeft(defaultFactSideLeft),
 	isVerbose(defaultVerbosity),
 	isUpdateWayR2L(defaultUpdateWayR2L),
@@ -274,8 +274,8 @@ Faust::Params<FPP,DEVICE>::Params() : m_nbRow(0),
 {}
 
 
-template<typename FPP,Device DEVICE>
-void Faust::Params<FPP,DEVICE>::Display() const
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Params<FPP,DEVICE,FPP2>::Display() const
 {
 	std::cout<<"NFACTS : "<<m_nbFact<<std::endl;
 	/*int nbr_iter_2_fact = 0;
@@ -325,25 +325,25 @@ void Faust::Params<FPP,DEVICE>::Display() const
 			//std::string type_cons;
 			//type_cons.resize(0);
 			//type_cons=get_constraint_type((*cons[jl][L]).get_constraint_type());
-			std::cout<<"type_cont : "<<cons[jl][L]->get_type()<<" ";
+			std::cout<<"type_cont : "<<cons[jl][L]->template get_type<FPP,DEVICE,FPP2>()<<" ";
 			std::cout<<(*cons[jl][L]).get_constraint_name();
 			std::cout<<" nb_row :"<<(*cons[jl][L]).get_rows();
 			std::cout<<" nb_col :"<<(*cons[jl][L]).get_cols();
 
 
-			if (cons[jl][L]->is_constraint_parameter_int())
+			if (cons[jl][L]->template is_constraint_parameter_int<FPP,DEVICE,FPP2>())
 			{
 				Faust::ConstraintInt<FPP,DEVICE>* const_int = (Faust::ConstraintInt<FPP,DEVICE>*)(cons[jl][L]);
 				std::cout<<" parameter :"<<(*const_int).get_parameter()<<std::endl;
 			}
 
-			else if (cons[jl][L]->is_constraint_parameter_real())
+			else if (cons[jl][L]->template is_constraint_parameter_real<FPP,DEVICE,FPP2>())
 			{
-				Faust::ConstraintFPP<FPP,DEVICE>* const_real = (Faust::ConstraintFPP<FPP,DEVICE>*)(cons[jl][L]);
+				Faust::ConstraintFPP<FPP,DEVICE,FPP2>* const_real = (Faust::ConstraintFPP<FPP,DEVICE,FPP2>*)(cons[jl][L]);
 				std::cout<<" parameter :"<<(*const_real).get_parameter()<<std::endl;
 			}
 
-			else if (cons[jl][L]->is_constraint_parameter_mat())
+			else if (cons[jl][L]->template is_constraint_parameter_mat<FPP,DEVICE,FPP2>())
 			{
 				Faust::ConstraintMat<FPP,DEVICE>* const_mat = (Faust::ConstraintMat<FPP,DEVICE>*)(cons[jl][L]);
 				std::cout<<" parameter :"<<std::endl;
@@ -356,8 +356,8 @@ void Faust::Params<FPP,DEVICE>::Display() const
 
 }
 
-template<typename FPP,Device DEVICE>
-void Faust::Params<FPP,DEVICE>::init_from_file(const char* filename)
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Params<FPP,DEVICE,FPP2>::init_from_file(const char* filename)
 {
 	char dataFilename[100];
 	int niter1,niter2;
@@ -417,17 +417,17 @@ void Faust::Params<FPP,DEVICE>::init_from_file(const char* filename)
 		handleError(m_className,"init_from_file : premature end of file");
 	fscanf(fp,"%d\n",&niter1);
 	std::cout<<"niter1 : "<<niter1<<std::endl;
-	Faust::StoppingCriterion<FPP> stopcrit2facts(niter1);
+	Faust::StoppingCriterion<FPP2> stopcrit2facts(niter1);
 	stop_crit_2facts = stopcrit2facts;
 	if (feof(fp))
 		handleError(m_className,"init_from_file : premature end of file");
 	fscanf(fp,"%d\n",&niter2);
 	std::cout<<"niter2 : "<<niter2<<std::endl;
-	Faust::StoppingCriterion<FPP> stopcritglobal(niter2);
+	Faust::StoppingCriterion<FPP2> stopcritglobal(niter2);
 	stop_crit_global = stopcritglobal;
 
-	vector<const Faust::ConstraintGeneric<FPP,DEVICE> *> consS;
-	vector<vector<const Faust::ConstraintGeneric<FPP,DEVICE> *> > consSS;
+	vector<const Faust::ConstraintGeneric*> consS;
+	vector<vector<const Faust::ConstraintGeneric*>> consSS;
 	for (int i=0;i<2;i++)
 	{
 
@@ -461,7 +461,7 @@ void Faust::Params<FPP,DEVICE>::init_from_file(const char* filename)
 				{
 					FPP real_parameter;
 					real_parameter=(FPP) atof(cons_parameter);
-					consS.push_back(new Faust::ConstraintFPP<FPP,DEVICE>(cons_name,real_parameter,consDim1,consDim2));
+					consS.push_back(new Faust::ConstraintFPP<FPP,DEVICE,FPP2>(cons_name,real_parameter,consDim1,consDim2));
 					break;
 				}
 				case 2 :
@@ -495,8 +495,8 @@ void Faust::Params<FPP,DEVICE>::init_from_file(const char* filename)
 
 
 
-template<typename FPP,Device DEVICE>
-void Faust::Params<FPP,DEVICE>::check_bool_validity()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Params<FPP,DEVICE,FPP2>::check_bool_validity()
 {
 	if (m_nbFact < 1)
 		handleError(m_className, "check_bool_validity : m_nbFact must be strcitly greater than 0");

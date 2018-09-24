@@ -369,6 +369,77 @@ class TestFaustFactory(unittest.TestCase):
         # misc/test/src/C++/hierarchicalFactorization.cpp
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.268513, places=5)
 
+    def testFactHierarchCplx(self):
+        print("Test FaustFactory.fact_hierarchicalCplx()")
+        from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintReal,\
+        ConstraintInt, ConstraintName, StoppingCriterion
+        num_facts = 4
+        is_update_way_R2L = False
+        init_lambda = 1.0
+        #M = np.random.rand(500, 32)
+        M = \
+        loadmat(sys.path[-1]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
+        M = M + np.complex(0,1)*M
+        # default step_size
+        fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+        fact1_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
+        fact2_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
+        res0_cons = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1)
+        res1_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 666)
+        res2_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333)
+        stop_crit1 = StoppingCriterion(num_its=200)
+        stop_crit2 = StoppingCriterion(num_its=200)
+        param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
+                                       [fact0_cons, fact1_cons, fact2_cons],
+                                       [res0_cons, res1_cons, res2_cons],
+                                       M.shape[0],M.shape[1],[stop_crit1,
+                                                              stop_crit2],
+                                       is_verbose=False)
+        F = FaustFactory.fact_hierarchical(M, param)
+        self.assertEqual(F.shape, M.shape)
+        #print(F.todense())
+        E = F.todense()-M
+        #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"),
+        print("err: ", norm(E,"fro")/norm(M,"fro"))
+        # matrix to factorize and reference relative error come from
+        # misc/test/src/C++/hierarchicalFactorization.cpp
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.99275, places=4)
+
+    def testFactPalm4MSACplx(self):
+        print("Test FaustFactory.fact_palm4msaCplx()")
+        from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintReal,\
+        ConstraintInt, ConstraintName, StoppingCriterion
+        num_facts = 2
+        is_update_way_R2L = False
+        init_lambda = 1.0
+#        init_facts = list()
+#        init_facts.append(np.zeros([500,32]))
+#        init_facts.append(np.eye(32))
+        #M = np.random.rand(500, 32)
+        M = \
+        loadmat(sys.path[-1]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
+        M = M + np.complex(0,1)*M
+        # default step_size
+        cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
+        cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32,
+                                 32, 1.0)
+        stop_crit = StoppingCriterion(num_its=200)
+        param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
+                               [cons1, cons2], stop_crit, init_facts=None,
+                               is_verbose=False, constant_step_size=False)
+        F = FaustFactory.fact_palm4msa(M, param)
+        #F.display()
+        #print("normF", F.norm("fro"))
+        self.assertEqual(F.shape, M.shape)
+        #print(F.todense())
+        E = F.todense()-M
+        #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"))
+        print("err: ", norm(E,"fro")/norm(M,"fro"))
+        # matrix to factorize and reference relative error come from
+        # misc/test/src/C++/test_palm4MSA.cpp
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.9094, places=4)
+
+
 if __name__ == "__main__":
     if(len(sys.argv)> 1):
         # argv[1] is for adding a directory in PYTHONPATH

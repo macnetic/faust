@@ -95,7 +95,7 @@ cdef extern from "FaustFact.h":
         FPP error_treshold
         unsigned long max_num_its
 
-    cdef cppclass PyxParamsFact[FPP]:
+    cdef cppclass PyxParamsFact[FPP,FPP2]:
         int num_facts
         bool is_update_way_R2L
         FPP init_lambda
@@ -105,20 +105,20 @@ cdef extern from "FaustFact.h":
         bool is_verbose
         bool constant_step_size
 
-    cdef cppclass PyxParamsFactPalm4MSA[FPP](PyxParamsFact[FPP]):
+    cdef cppclass PyxParamsFactPalm4MSA[FPP,FPP2](PyxParamsFact[FPP,FPP2]):
         FPP** init_facts # num_facts elts
         unsigned long* init_fact_sizes
-        PyxStoppingCriterion stop_crit
+        PyxStoppingCriterion[FPP2] stop_crit
 
-    cdef cppclass PyxParamsHierarchicalFact[FPP](PyxParamsFact[FPP]):
+    cdef cppclass PyxParamsHierarchicalFact[FPP,FPP2](PyxParamsFact[FPP,FPP2]):
         unsigned int num_rows
         unsigned int num_cols
-        PyxStoppingCriterion* stop_crits #must be of size 2
+        PyxStoppingCriterion[FPP2]* stop_crits #must be of size 2
         bool is_fact_side_left
 
-    cdef FaustCoreCpp[FPP]* fact_palm4MSA[FPP](FPP*,unsigned int, unsigned int,
-                                             PyxParamsFactPalm4MSA[FPP]*)
+    cdef FaustCoreCpp[FPP]* fact_palm4MSA[FPP,FPP2](FPP*,unsigned int, unsigned int,
+                                             PyxParamsFactPalm4MSA[FPP,FPP2]*)
 
-    cdef FaustCoreCpp[FPP]* fact_hierarchical[FPP](FPP*,unsigned int, unsigned int,
-                                             PyxParamsHierarchicalFact[FPP]*)
+    cdef FaustCoreCpp[FPP]* fact_hierarchical[FPP,FPP2](FPP*,unsigned int, unsigned int,
+                                             PyxParamsHierarchicalFact[FPP,FPP2]*)
 

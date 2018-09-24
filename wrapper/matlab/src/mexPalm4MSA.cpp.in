@@ -55,19 +55,20 @@ using namespace Faust;
 
 void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFields);
 
-
+typedef @FAUST_SCALAR@ SCALAR;
+typedef @FACT_FPP@ FPP2;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	#ifdef FAUST_VERBOSE
-		if (typeid(FFPP) == typeid(float))
+		if (typeid(SCALAR) == typeid(float))
 		{
-			std::cout<<"FFPP == float"<<std::endl;
+			std::cout<<"SCALAR == float"<<std::endl;
 		}
 
-		if (typeid(FFPP) == typeid(double))
+		if (typeid(SCALAR) == typeid(double))
 		{
-			std::cout<<"FFPP == double"<<std::endl;
+			std::cout<<"SCALAR == double"<<std::endl;
 		}
 		system("sleep 7");
 	#endif
@@ -94,7 +95,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
     // data initialisation
-    Faust::MatDense<FFPP,Cpu> data;
+    Faust::MatDense<SCALAR,Cpu> data;
     if (presentFields[0])
     {
         mxCurrentField = mxGetField(prhs[0],0,"data");
@@ -131,7 +132,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
     //constraints
-    std::vector<const Faust::ConstraintGeneric<FFPP,Cpu>*> consS;
+    std::vector<const Faust::ConstraintGeneric*> consS;
     if (presentFields[2])
     {
         mwSize nbRowCons,nbColCons;
@@ -163,7 +164,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             {
 //                mexPrintf("cons(%d)\n",j);
                 mxCurrentCons=mxGetCell(mxCurrentField,j);
-                getConstraint<FFPP>(consS,mxCurrentCons);
+                getConstraint<SCALAR,FPP2>(consS,mxCurrentCons);
                 //consS.push_back(consToAdd);
             }
 
@@ -173,12 +174,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
 //    std::cout<<"FINI_CONS"<<std::endl;
     //niter1
-//    Faust::StoppingCriterion<FFPP> crit1;
+//    Faust::StoppingCriterion<SCALAR> crit1;
 //    if (presentFields[3])
 //    {
 //         mxCurrentField = mxGetField(prhs[0],0,"niter");
 //        int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
-//        Faust::StoppingCriterion<FFPP> newCrit1(nb_iter1);
+//        Faust::StoppingCriterion<SCALAR> newCrit1(nb_iter1);
 //        crit1 = newCrit1;
 //    }
 //    mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
@@ -186,7 +187,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	//TODO: replace by default values as constants from StoppingCriterion class
 	bool is_criterion_error = false;
 	int num_its = 500;
-	FFPP error_treshold = 0.3;
+	FPP2 error_treshold = 0.3;
 	int max_num_its = 10000;
 	if(presentFields[3])
 	{
@@ -200,17 +201,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if(presentFields[9])
 	{
 		mxCurrentField = mxGetField(prhs[0], 0, "sc_error_treshold");
-		error_treshold = (FFPP) mxGetScalar(mxCurrentField);
+		error_treshold = (FPP2) mxGetScalar(mxCurrentField);
 	}
 	if(presentFields[10])
 	{
 		mxCurrentField = mxGetField(prhs[0], 0, "sc_max_num_its");
 		max_num_its = (int) mxGetScalar(mxCurrentField);
 	}
-	Faust::StoppingCriterion<FFPP> crit1(num_its, is_criterion_error, error_treshold, max_num_its);
+	Faust::StoppingCriterion<FPP2> crit1(num_its, is_criterion_error, error_treshold, max_num_its);
 //	crit1.Display();
     //init_facts
-    std::vector<Faust::MatDense<FFPP,Cpu> > init_facts;
+    std::vector<Faust::MatDense<SCALAR,Cpu> > init_facts;
     if (presentFields[4])
     {
          mxCurrentField = mxGetField(prhs[0],0,"init_facts");
@@ -241,11 +242,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
    //init_lambda
-   FFPP init_lambda = 1.0;
+   SCALAR init_lambda = 1.0;
    if (presentFields[6])
    {
-       mxCurrentField = mxGetField(prhs[0],0,"init_lambda");
-       init_lambda = (FFPP) mxGetScalar(mxCurrentField);
+	   mxCurrentField = mxGetField(prhs[0],0,"init_lambda");
+	   SCALAR* tmp_ptr = &init_lambda;
+	   // it works whatever mxCurrentField class is (complex or not)
+	   mxArray2Ptr<SCALAR>(const_cast<const mxArray*>(mxCurrentField),tmp_ptr);
+//       init_lambda = (SCALAR) mxGetScalar(mxCurrentField);
    }
 
    //compute_lambda
@@ -267,33 +271,38 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
      //creation de hierarchical fact
-    Faust::ParamsPalm<FFPP,Cpu> params(data,nbFact,consS,init_facts,crit1,isVerbose,updateway,init_lambda);
+    Faust::ParamsPalm<SCALAR,Cpu, FPP2> params(data,nbFact,consS,init_facts,crit1,isVerbose,updateway,init_lambda);
 //	params.Display();
 	Faust::BlasHandle<Cpu> blas_handle;
-	Faust::Palm4MSA<FFPP,Cpu> palm(params,blas_handle,false);
+	Faust::Palm4MSA<SCALAR,Cpu, FPP2> palm(params,blas_handle,false);
 	palm.compute_facts();
 
 
      //extraction des resultats
-     FFPP lambda = palm.get_lambda();
+     SCALAR lambda = palm.get_lambda();
 
-     plhs[0]=mxCreateDoubleScalar((double) lambda);
-
-     std::vector<Faust::MatDense<FFPP,Cpu> > facts;
-	 std::vector<Faust::MatGeneric<FFPP, Cpu>*> sp_facts;
+//	 if(typeid(SCALAR) == typeid(complex<FPP2>)) {
+		 Faust::MatDense<SCALAR,Cpu> mat1x1Lambda = Faust::MatDense<SCALAR, Cpu>(&lambda, 1, 1);
+		 plhs[0] = FaustMat2mxArray(mat1x1Lambda);
+//	 }
+//	 else
+//		 plhs[0]=mxCreateDoubleScalar((FPP2) complex<FPP2>(lambda).real()); //trick to handle compilation with templates
+//
+     std::vector<Faust::MatDense<SCALAR,Cpu> > facts;
+	 std::vector<Faust::MatGeneric<SCALAR, Cpu>*> sp_facts;
      facts=palm.get_facts();
 
-	 for(typename std::vector<Faust::MatDense<FFPP, Cpu>>::iterator it = facts.begin(); it != facts.end(); it++)
+	 for(typename std::vector<Faust::MatDense<SCALAR, Cpu>>::iterator it = facts.begin(); it != facts.end(); it++)
 	 {
-		 Faust::MatSparse<FFPP, Cpu> * M = new Faust::MatSparse<FFPP, Cpu>(*it);
+		 Faust::MatSparse<SCALAR, Cpu> * M = new Faust::MatSparse<SCALAR, Cpu>(*it);
 		 sp_facts.push_back(M);
 	 }
 
 
-	 TransformHelper<FFPP, Cpu> *F = new TransformHelper<FFPP, Cpu>(sp_facts, lambda, false);
-	 plhs[1] = convertPtr2Mat<Faust::TransformHelper<FFPP, Cpu>>(F);
+	 TransformHelper<SCALAR, Cpu> *F = new TransformHelper<SCALAR, Cpu>(sp_facts, lambda, false);
+	 plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);
 
-	 for(typename std::vector<Faust::MatGeneric<FFPP,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
+	 for(typename std::vector<Faust::MatGeneric<SCALAR,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
 	 {
 		 delete *it;
 	 }

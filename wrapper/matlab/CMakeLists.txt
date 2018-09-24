@@ -48,17 +48,24 @@ endforeach()
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 
 
-# configuration de mexFaust.cpp.in 
-# specialisation of the class mexFaust template scalar with real
-set(FAUST_SCALAR "double")
-configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustReal.cpp @ONLY)
-# specialisation of the class mexFaust template scalar with complex scalar
-set(FAUST_SCALAR "std::complex<double>")
-configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustCplx.cpp @ONLY)
+foreach(SCALAR_AND_FSUFFIX double:Real std::complex<double>:Cplx) # TODO: float and complex<float> versions
+	# configuration de mexFaust.cpp.in
+	# specialization of the class mexFaust template scalar with real or complex
+	string(REGEX REPLACE "(.*):.*" "\\1" SCALAR ${SCALAR_AND_FSUFFIX})
+	string(REGEX REPLACE ".*:(.*)" "\\1" FSUFFIX ${SCALAR_AND_FSUFFIX})
+	set(FAUST_SCALAR ${SCALAR})
+	set(FACT_FPP double) # TODO: we could allow float also
+	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust${FSUFFIX}.cpp @ONLY)
+	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexPalm4MSA.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexPalm4MSA${FSUFFIX}.cpp @ONLY)
+	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical_fact.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical_fact${FSUFFIX}.cpp @ONLY)
+	# copy the *.m for factorization now, because we have the FSUFFIX in hands
+	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact${FSUFFIX}.m COPYONLY)
+	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexPalm4MSA.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexPalm4MSA${FSUFFIX}.m COPYONLY)
+endforeach()
 
 file(GLOB CPP_MEX_FILES "${FAUST_MATLAB_MEX_SRC_DIR}/*.cpp")
 ## modif AL : bug pour les noms de PATH avec un point comme par exemple : ./faust_v1.10/interface_matlab/
-## On va chercher les nom des target 
+## On va chercher les nom des target
 #string(REGEX REPLACE "[a-zA-Z0-9_/:.]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
 string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
 

@@ -50,11 +50,11 @@ bool PyxConstraintGeneric::is_mat_constraint()
     }
 }
 
-template<typename FPP>
-void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned int num_cols, const PyxParamsFact<FPP>* p,
-        /* out args */vector<const Faust::ConstraintGeneric<FPP,Cpu>*>& cons)
+template<typename FPP, typename FPP2>
+void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned int num_cols, const PyxParamsFact<FPP,FPP2>* p,
+        /* out args */vector<const Faust::ConstraintGeneric*>& cons)
 {
-    Faust::ConstraintGeneric<FPP, Cpu>* tmp_cons;
+    Faust::ConstraintGeneric* tmp_cons;
     if(p->is_verbose)
     {
         cout << "fact_palm4MSA() mat[0]= " << mat[0] << endl;
@@ -66,7 +66,7 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
         cout << "p->constant_step_size: " << p->constant_step_size << endl;
     }
     PyxConstraintInt* cons_int;
-    PyxConstraintScalar<FPP>* cons_real;
+    PyxConstraintScalar<FPP2>* cons_real;
     PyxConstraintMat<FPP>* cons_mat;
     for(int i=0; i < p->num_constraints;i++)
     {
@@ -88,10 +88,10 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
         }
         else if(p->constraints[i]->is_real_constraint())
         {
-            cons_real = static_cast<PyxConstraintScalar<FPP>*>(p->constraints[i]);
+            cons_real = static_cast<PyxConstraintScalar<FPP2>*>(p->constraints[i]);
             if(p->is_verbose)
                 cout << "constraint[" << i << "]->parameter: " << cons_real->parameter << endl;
-            tmp_cons = new Faust::ConstraintFPP<FPP,Cpu>(static_cast<faust_constraint_name>(p->constraints[i]->name), cons_real->parameter, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
+            tmp_cons = new Faust::ConstraintFPP<FPP,Cpu,FPP2>(static_cast<faust_constraint_name>(p->constraints[i]->name), cons_real->parameter, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
             cons.push_back(tmp_cons);
         }
         else if(p->constraints[i]->is_mat_constraint())
@@ -110,12 +110,12 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
 
 }
 
-template<typename FPP>
-FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsFactPalm4MSA<FPP>* p)
+template<typename FPP, typename FPP2>
+FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsFactPalm4MSA<FPP,FPP2>* p)
 {
     FaustCoreCpp<FPP>* core;
     Faust::MatDense<FPP,Cpu> inMat(mat, num_rows, num_cols);
-    vector<const Faust::ConstraintGeneric<FPP,Cpu>*> cons;
+    vector<const Faust::ConstraintGeneric*> cons;
     vector<Faust::MatDense<FPP,Cpu> > initFacts;
     if(p->is_verbose) {
         cout << "stop_crit.is_criterion_error: " << p->stop_crit.is_criterion_error << endl;
@@ -133,33 +133,33 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
     }
     // set all constructor arguments because they could be at non-default
     // values
-    Faust::StoppingCriterion<FPP> crit(p->stop_crit.num_its, p->stop_crit.is_criterion_error, p->stop_crit.error_treshold, p->stop_crit.max_num_its);
+    Faust::StoppingCriterion<FPP2> crit(p->stop_crit.num_its, p->stop_crit.is_criterion_error, p->stop_crit.error_treshold, p->stop_crit.max_num_its);
 
-    Faust::ParamsPalm<FPP,Cpu> params(inMat, p->num_facts, cons, initFacts, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->constant_step_size, p->step_size);
+    Faust::ParamsPalm<FPP,Cpu,FPP2> params(inMat, p->num_facts, cons, initFacts, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->constant_step_size, p->step_size);
 
     if(p->is_verbose) params.Display();
 
     Faust::BlasHandle<Cpu> blasHandle;
 
-    Faust::Palm4MSA<FPP,Cpu> palm(params,blasHandle,true);
+    Faust::Palm4MSA<FPP,Cpu, FPP2> palm(params,blasHandle,true);
 
     palm.compute_facts();
 
     FPP lambda = palm.get_lambda();
 
-    std::vector<Faust::MatDense<FFPP,Cpu> > facts;
-    std::vector<Faust::MatGeneric<FFPP, Cpu>*> sp_facts;
+    std::vector<Faust::MatDense<FPP,Cpu> > facts;
+    std::vector<Faust::MatGeneric<FPP, Cpu>*> sp_facts;
     facts=palm.get_facts();
 
-    for(typename std::vector<Faust::MatDense<FFPP, Cpu>>::iterator it = facts.begin(); it != facts.end(); it++)
+    for(typename std::vector<Faust::MatDense<FPP, Cpu>>::iterator it = facts.begin(); it != facts.end(); it++)
     {
-        Faust::MatSparse<FFPP, Cpu> * M = new Faust::MatSparse<FFPP, Cpu>(*it);
+        Faust::MatSparse<FPP, Cpu> * M = new Faust::MatSparse<FPP, Cpu>(*it);
         sp_facts.push_back(M);
     }
 
-    Faust::TransformHelper<FFPP, Cpu> th(sp_facts, lambda, false);
+    Faust::TransformHelper<FPP, Cpu> th(sp_facts, lambda, false);
 
-    for(typename std::vector<Faust::MatGeneric<FFPP,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
+    for(typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
     {
         delete *it;
     }
@@ -169,7 +169,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
 
     blasHandle.Destroy();
 
-    for (typename std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*>::iterator it = cons.begin() ; it != cons.end(); ++it)
+    for (typename std::vector<const Faust::ConstraintGeneric*>::iterator it = cons.begin() ; it != cons.end(); ++it)
         delete *it;
 
 
@@ -177,15 +177,15 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
 
 }
 
-template<typename FPP>
-FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsHierarchicalFact<FPP>* p)
+template<typename FPP, typename FPP2>
+FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsHierarchicalFact<FPP, FPP2>* p)
 {
     FaustCoreCpp<FPP>* core;
     Faust::MatDense<FPP,Cpu> inMat(mat, num_rows, num_cols);
-    vector<const Faust::ConstraintGeneric<FPP,Cpu>*> cons;
-    vector<std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*>> cons_;
-    vector<const Faust::ConstraintGeneric<FPP,Cpu>*> fact_cons;
-    vector<const Faust::ConstraintGeneric<FPP,Cpu>*> residuum_cons;
+    vector<const Faust::ConstraintGeneric*> cons;
+    vector<std::vector<const Faust::ConstraintGeneric*>> cons_;
+    vector<const Faust::ConstraintGeneric*> fact_cons;
+    vector<const Faust::ConstraintGeneric*> residuum_cons;
     vector<Faust::MatDense<FPP,Cpu> > initFacts_deft;
     if(p->is_verbose)
     {
@@ -205,8 +205,8 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
 
     // set all constructor arguments because they could be at non-default
     // values
-    Faust::StoppingCriterion<FPP> crit0(p->stop_crits[0].num_its, p->stop_crits[0].is_criterion_error, p->stop_crits[0].error_treshold, p->stop_crits[0].max_num_its); //2 facts
-    Faust::StoppingCriterion<FPP> crit1(p->stop_crits[1].num_its, p->stop_crits[1].is_criterion_error, p->stop_crits[1].error_treshold, p->stop_crits[1].max_num_its); //global
+    Faust::StoppingCriterion<FPP2> crit0(p->stop_crits[0].num_its, p->stop_crits[0].is_criterion_error,p->stop_crits[0].error_treshold, p->stop_crits[0].max_num_its); //2 facts
+    Faust::StoppingCriterion<FPP2> crit1(p->stop_crits[1].num_its, p->stop_crits[1].is_criterion_error, p->stop_crits[1].error_treshold, p->stop_crits[1].max_num_its); //global
 
     for(int i=0;i<p->num_facts-1;i++)
         fact_cons.push_back(cons[i]);
@@ -217,7 +217,7 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
     cons_.push_back(fact_cons);
     cons_.push_back(residuum_cons);
 
-    Faust::Params<FPP,Cpu> params(p->num_rows, p->num_cols, p->num_facts, cons_, initFacts_deft, crit0, crit1, p->is_verbose, p->is_update_way_R2L, p->is_fact_side_left, p->init_lambda, p->constant_step_size, p->step_size);
+    Faust::Params<FPP,Cpu,FPP2> params(p->num_rows, p->num_cols, p->num_facts, cons_, initFacts_deft, crit0, crit1, p->is_verbose, p->is_update_way_R2L, p->is_fact_side_left, p->init_lambda, p->constant_step_size, p->step_size);
     
     if(p->is_verbose) params.Display();
 
@@ -225,7 +225,7 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
     Faust::BlasHandle<Cpu> blasHandle;
     Faust::SpBlasHandle<Cpu> spblasHandle;
 
-    Faust::HierarchicalFact<FPP,Cpu> hierFact(inMat, params,blasHandle,spblasHandle);
+    Faust::HierarchicalFact<FPP,Cpu,FPP2> hierFact(inMat, params,blasHandle,spblasHandle);
 
     hierFact.compute_facts();
 
@@ -252,7 +252,7 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
     blasHandle.Destroy();
     spblasHandle.Destroy();
 
-    for (typename std::vector<const Faust::ConstraintGeneric<FPP,Cpu>*>::iterator it = cons.begin() ; it != cons.end(); ++it)
+    for (typename std::vector<const Faust::ConstraintGeneric*>::iterator it = cons.begin() ; it != cons.end(); ++it)
         delete *it;
 
     return core;

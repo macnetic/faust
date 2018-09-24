@@ -44,22 +44,22 @@
 #include <cstdlib>
 #include "faust_exception.h"
 
-template<typename FPP,Device DEVICE>
-const char * Faust::ConstraintFPP<FPP,DEVICE>::m_className ="Faust::ConstraintFPP<FPP,DEVICE>::";
+template<typename FPP,Device DEVICE, typename FPP2>
+const char * Faust::ConstraintFPP<FPP,DEVICE,FPP2>::m_className ="Faust::ConstraintFPP<FPP,DEVICE,FPP2>::";
 
-template<typename FPP,Device DEVICE>
-Faust::ConstraintFPP<FPP,DEVICE>::ConstraintFPP() :
-   Faust::ConstraintGeneric<FPP,DEVICE>()
+template<typename FPP,Device DEVICE, typename FPP2>
+Faust::ConstraintFPP<FPP,DEVICE,FPP2>::ConstraintFPP() :
+   Faust::ConstraintGeneric()
 {
    set_default_parameter();
 }
 
-template<typename FPP,Device DEVICE>
-Faust::ConstraintFPP<FPP,DEVICE>::ConstraintFPP(
+template<typename FPP,Device DEVICE, typename FPP2>
+Faust::ConstraintFPP<FPP,DEVICE,FPP2>::ConstraintFPP(
    const faust_constraint_name& constraintName_,
    const int nbRows_,
    const int nbCols_) :
-      Faust::ConstraintGeneric<FPP,DEVICE>(
+      Faust::ConstraintGeneric(
          constraintName_,
          nbRows_,
          nbCols_)
@@ -67,13 +67,13 @@ Faust::ConstraintFPP<FPP,DEVICE>::ConstraintFPP(
    set_default_parameter();
 }
 
-template<typename FPP,Device DEVICE>
-Faust::ConstraintFPP<FPP,DEVICE>::ConstraintFPP(
+template<typename FPP,Device DEVICE, typename FPP2>
+Faust::ConstraintFPP<FPP,DEVICE,FPP2>::ConstraintFPP(
    const faust_constraint_name& constraintName_,
-   const FPP defaultParameter_,
+   const FPP2 defaultParameter_,
    const int nbRows_,
    const int nbCols_) :
-      Faust::ConstraintGeneric<FPP,DEVICE>(
+      Faust::ConstraintGeneric(
          constraintName_,
          nbRows_,
          nbCols_),
@@ -82,10 +82,10 @@ Faust::ConstraintFPP<FPP,DEVICE>::ConstraintFPP(
    check_constraint_name();
 }
 
-template<typename FPP,Device DEVICE>
-Faust::ConstraintFPP<FPP,DEVICE>::ConstraintFPP(
-   const Faust::ConstraintFPP<FPP,DEVICE>& constraint_) :
-      Faust::ConstraintGeneric<FPP,DEVICE>(
+template<typename FPP,Device DEVICE, typename FPP2>
+Faust::ConstraintFPP<FPP,DEVICE,FPP2>::ConstraintFPP(
+   const Faust::ConstraintFPP<FPP,DEVICE,FPP2>& constraint_) :
+      Faust::ConstraintGeneric(
          constraint_.constraintName,
          constraint_.nbRows,
          constraint_.nbCols),
@@ -96,8 +96,8 @@ Faust::ConstraintFPP<FPP,DEVICE>::ConstraintFPP(
 
 
 
-template<typename FPP,Device DEVICE>
-void Faust::ConstraintFPP<FPP,DEVICE>::check_constraint_name()const
+template<typename FPP,Device DEVICE, typename FPP2>
+void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::check_constraint_name()const
 {
    switch (this->m_constraintName)
    {
@@ -111,8 +111,8 @@ void Faust::ConstraintFPP<FPP,DEVICE>::check_constraint_name()const
    }
 }
 
-template<typename FPP,Device DEVICE>
-void Faust::ConstraintFPP<FPP,DEVICE>::set_default_parameter()
+template<typename FPP,Device DEVICE, typename FPP2>
+void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::set_default_parameter()
 {
 
    switch (this->m_constraintName)
@@ -129,16 +129,16 @@ void Faust::ConstraintFPP<FPP,DEVICE>::set_default_parameter()
    }
 }
 
-template<typename FPP,Device DEVICE>
-void Faust::ConstraintFPP<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat)const
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::project(Faust::MatDense<FPP,DEVICE> & mat)const
 {
 	switch (this->m_constraintName)
    	{
       		case CONSTRAINT_NAME_NORMCOL:
-         		Faust::prox_normcol(mat,m_parameter);
+         		Faust::prox_normcol<FPP, FPP2>(mat,m_parameter);
          	break;
       		case CONSTRAINT_NAME_NORMLIN:
-         		Faust::prox_normlin(mat,m_parameter);
+         		Faust::prox_normlin<FPP, FPP2>(mat,m_parameter);
          	break;
       		default:
          		handleError(m_className,"project : invalid constraint name");

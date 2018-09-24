@@ -47,18 +47,18 @@
 #include "faust_exception.h"
 
 //default value
-template<typename FPP,Device DEVICE> const int Faust::ParamsPalm<FPP,DEVICE>::defaultNiter = 300;
-template<typename FPP,Device DEVICE> const bool Faust::ParamsPalm<FPP,DEVICE>::defaultVerbosity = false;
-template<typename FPP,Device DEVICE> const bool Faust::ParamsPalm<FPP,DEVICE>::defaultUpdateWayR2L = false;
-template<typename FPP,Device DEVICE> const FPP Faust::ParamsPalm<FPP,DEVICE>::defaultLambda = 1.0;
-template<typename FPP,Device DEVICE> const bool Faust::ParamsPalm<FPP,DEVICE>::defaultConstantStepSize = false;
-template<typename FPP,Device DEVICE> const FPP Faust::ParamsPalm<FPP,DEVICE>::defaultStepSize = 1e-16;
+template<typename FPP,Device DEVICE,typename FPP2> const int Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultNiter = 300;
+template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultVerbosity = false;
+template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultUpdateWayR2L = false;
+template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultLambda = 1.0;
+template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultConstantStepSize = false;
+template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize = 1e-16;
 
-template<typename FPP,Device DEVICE>
-const char * Faust::ParamsPalm<FPP,DEVICE>::m_className = "Faust::ParamsPalm<FPP,DEVICE>::";
+template<typename FPP,Device DEVICE,typename FPP2>
+const char * Faust::ParamsPalm<FPP,DEVICE,FPP2>::m_className = "Faust::ParamsPalm<FPP,DEVICE,FPP2>::";
 
-template<typename FPP,Device DEVICE>
-void Faust::ParamsPalm<FPP,DEVICE>::check_constraint_validity()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::ParamsPalm<FPP,DEVICE,FPP2>::check_constraint_validity()
 {
 
    bool verifSize  =    data.getNbRow()     == cons[0]->get_rows()
@@ -80,13 +80,13 @@ void Faust::ParamsPalm<FPP,DEVICE>::check_constraint_validity()
 	}
 }
 
-template<typename FPP,Device DEVICE>
-Faust::ParamsPalm<FPP,DEVICE>::ParamsPalm(
+template<typename FPP,Device DEVICE,typename FPP2>
+Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm(
          const Faust::MatDense<FPP,DEVICE>& data_,
          const int nbFact_,
-         const std::vector<const Faust::ConstraintGeneric<FPP,DEVICE> *>& cons_,
+         const std::vector<const Faust::ConstraintGeneric*>& cons_,
          const std::vector<Faust::MatDense<FPP,DEVICE> > & init_fact_,
-         const Faust::StoppingCriterion<FPP> & stop_crit_ /* = Faust::StoppingCriterion() */,
+         const Faust::StoppingCriterion<FPP2> & stop_crit_ /* = Faust::StoppingCriterion() */,
          const bool isVerbose_ /* = false */,
          const bool isUpdateWayR2L_ /* = false */,
          const FPP init_lambda_ /* = 1.0 */,
@@ -106,11 +106,11 @@ Faust::ParamsPalm<FPP,DEVICE>::ParamsPalm(
  check_constraint_validity();
 }
 
-template<typename FPP,Device DEVICE>
-Faust::ParamsPalm<FPP,DEVICE>::ParamsPalm() : data(0,0),nbFact(0),cons(std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*>()),isVerbose(defaultVerbosity),isUpdateWayR2L(defaultUpdateWayR2L),init_fact(std::vector<Faust::MatDense<FPP,DEVICE> >()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize){}
+template<typename FPP,Device DEVICE,typename FPP2>
+Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm() : data(0,0),nbFact(0),cons(std::vector<const Faust::ConstraintGeneric*>()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize){}
 
-template<typename FPP,Device DEVICE>
-void Faust::ParamsPalm<FPP,DEVICE>::init_factors()
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::ParamsPalm<FPP,DEVICE,FPP2>::init_factors()
 {
 	init_fact.resize(nbFact);
    if (!isUpdateWayR2L)
@@ -136,8 +136,8 @@ void Faust::ParamsPalm<FPP,DEVICE>::init_factors()
 }
 
 
-template<typename FPP,Device DEVICE>
-void Faust::ParamsPalm<FPP,DEVICE>::Display() const
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::ParamsPalm<FPP,DEVICE,FPP2>::Display() const
 {
 	std::cout<<"NFACTS : "<<nbFact<<std::endl;
 	/*int nbr_iter_2_fact = 0;
@@ -171,25 +171,25 @@ void Faust::ParamsPalm<FPP,DEVICE>::Display() const
 			//std::string type_cons;
 			//type_cons.resize(0);
 			//type_cons=getConstraintType((*cons[jl][L]).getConstraintType());
-			std::cout<<"type_cont : "<<cons[L]->get_type()<<" ";
+			std::cout<<"type_cont : "<<cons[L]->template get_type<FPP,DEVICE,FPP2>()<<" ";
 			std::cout<<(*cons[L]).get_constraint_name();
 			std::cout<<" nb_row :"<<(*cons[L]).get_rows();
 			std::cout<<" nb_col :"<<(*cons[L]).get_cols();
 
 
-			if (cons[L]->is_constraint_parameter_int())
+			if (cons[L]->template is_constraint_parameter_int<FPP,DEVICE,FPP2>())
 			{
 				Faust::ConstraintInt<FPP,DEVICE>* const_int = (Faust::ConstraintInt<FPP,DEVICE>*)(cons[L]);
 				std::cout<<" parameter :"<<(*const_int).get_parameter()<<std::endl;
 			}
 
-			else if (cons[L]->is_constraint_parameter_real())
+			else if (cons[L]->template is_constraint_parameter_real<FPP,DEVICE,FPP2>())
 			{
 				Faust::ConstraintFPP<FPP,DEVICE>* const_real = (Faust::ConstraintFPP<FPP,DEVICE>*)(cons[L]);
 				std::cout<<" parameter :"<<(*const_real).get_parameter()<<std::endl;
 			}
 
-			else if (cons[L]->is_constraint_parameter_mat())
+			else if (cons[L]->template is_constraint_parameter_mat<FPP,DEVICE,FPP2>())
 			{
 				Faust::ConstraintMat<FPP,DEVICE>* const_mat = (Faust::ConstraintMat<FPP,DEVICE>*)(cons[L]);
 				std::cout<<" parameter :"<<std::endl;

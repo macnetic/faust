@@ -570,8 +570,8 @@ A.t_add_ext.stop();
 
 
 // compute the biggest eigenvalue of A, A must be semi-definite positive
-template<typename FPP>
-FPP Faust::power_iteration(const  Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag)
+template<typename FPP, typename FPP2>
+FPP Faust::power_iteration(const  Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold, faust_int & flag)
 {
 	#ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.start();
@@ -603,7 +603,7 @@ FPP Faust::power_iteration(const  Faust::MatDense<FPP,Cpu> & A, const faust_unsi
    	FPP lambda = 0.0;
    	FPP alpha = 1.0;
 	FPP beta = 0.0;
-	while(fabs(lambda_old-lambda)>threshold && i<nbr_iter_max)
+	while(Faust::fabs(lambda_old-lambda)> Faust::fabs(threshold) && i<nbr_iter_max)
 	{
 		i++;
       		lambda_old = lambda;
@@ -635,5 +635,23 @@ Faust::Vect<FPP,Cpu> Faust::operator*(const Faust::MatDense<FPP,Cpu>& M, const F
 	vec.multiplyLeft(M);
 	return vec;
 }
+
+
+template<typename FPP>
+FPP Faust::fabs(FPP f)
+{
+	return std::fabs(f);
+}
+
+template<typename FPP>
+FPP Faust::fabs(complex<FPP> c)
+{
+	//rewrite fabs even if c++11 standard provide it
+	//because clang++ from macOS failed to provide fabs(complex) 
+	//(gcc-g++ provides it! but we compile with clang on macOS)
+	return std::sqrt(std::norm(c));
+}
+
+
 
 #endif

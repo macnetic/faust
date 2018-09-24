@@ -59,23 +59,23 @@
 namespace Faust
 {
 
-    template<typename FPP,Device DEVICE> class ConstraintGeneric;
-    template<typename FPP,Device DEVICE> class Palm4MSA;
+    class ConstraintGeneric;
+    template<typename FPP,Device DEVICE,typename FPP2> class Palm4MSA;
     template<typename FPP,Device DEVICE> class MatDense;
     template<typename FPP,Device DEVICE> class MatSparse;
     template<typename FPP,Device DEVICE> class Transform;
 
-    template<typename FPP> class StoppingCriterion;
+    template<typename FPP2> class StoppingCriterion;
 //    template<Device DEVICE> class BlasHandle;
 //    template<Device DEVICE> class SpBlasHandle;
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,Device DEVICE,typename FPP2 = double>
     class HierarchicalFact
     {
 
        public:
 
-          HierarchicalFact(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE>& params_, Faust::BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle);
+          HierarchicalFact(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE,FPP2>& params_, Faust::BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle);
           void get_facts(Faust::Transform<FPP,DEVICE> &)const;
           void get_facts(std::vector<Faust::MatSparse<FPP,DEVICE> >&)const;
           void get_facts(std::vector<Faust::MatDense<FPP,DEVICE> >& fact)const{fact = palm_global.get_facts();}
@@ -92,17 +92,17 @@ namespace Faust
 
 
         private:
-          const std::vector< std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> > cons;
+          const std::vector< std::vector<const Faust::ConstraintGeneric*>> cons;
           bool m_isUpdateWayR2L;
           bool m_isFactSideLeft;
           bool m_isVerbose;
           int m_indFact ; //indice de factorisation (!= Faust::Palm4MSA::m_indFact : indice de facteur)
           int nbFact; // nombre de factorisations (!= Faust::Palm4MSA::nbFact : nombre de facteurs)
-          Faust::Palm4MSA<FPP,DEVICE> palm_2;
-          Faust::Palm4MSA<FPP,DEVICE> palm_global;
+          Faust::Palm4MSA<FPP,DEVICE,FPP2> palm_2;
+          Faust::Palm4MSA<FPP,DEVICE,FPP2> palm_global;
           const FPP default_lambda; // initial value of lambda for factorization into two factors
           //std::vector<Faust::MatDense<FPP,DEVICE> > S;
-          std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> cons_tmp_global;
+		  std::vector<const Faust::ConstraintGeneric*> cons_tmp_global;
           bool isFactorizationComputed;
           std::vector<std::vector<FPP> > errors;
           static const char * m_className;

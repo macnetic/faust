@@ -60,7 +60,7 @@
 
 using namespace std;
 template<typename FPP,Device DEVICE> class ConstraintMat;
-template<typename FPP,Device DEVICE> class ConstraintFPP;
+template<typename FPP,Device DEVICE, typename FPP2> class ConstraintFPP;
 
 template<typename FPP,Device DEVICE>
 void init_params_palm_from_matiofile(Faust::ParamsPalm<FPP,DEVICE>& params,const char* fileName, const char* variableName)
@@ -173,7 +173,7 @@ void init_params_palm_from_matiofile(Faust::ParamsPalm<FPP,DEVICE>& params,const
 		}
 		if (strcmp(current_fieldName,"cons")==0)
 		{
-			vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> consS;
+			vector<const Faust::ConstraintGeneric*> consS;
 
 			for (int j=0;j<(current_var->dims[1]);j++)
 			{
@@ -187,8 +187,8 @@ void init_params_palm_from_matiofile(Faust::ParamsPalm<FPP,DEVICE>& params,const
 }
 
 
-template<typename FPP,Device DEVICE>
-void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* fileName, const char* variableName)
+template<typename FPP,Device DEVICE, typename FPP2>
+void init_params_from_matiofile(Faust::Params<FPP,DEVICE, FPP2>& params, const char* fileName, const char* variableName)
 {
 	matvar_t* params_var = faust_matio_read_variable(fileName,variableName);
 
@@ -241,7 +241,7 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 		{
 			//cout<<"niter1="<<endl;
 			niter=(int)((double*)(current_var->data))[0];
-			Faust::StoppingCriterion<FPP> stop_cri(niter);
+			Faust::StoppingCriterion<FPP2> stop_cri(niter);
 			params.stop_crit_2facts=stop_cri;
 			//cout<<niter<<endl;
 		}
@@ -249,7 +249,7 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 		{
 			//cout<<"niter2="<<endl;
 			niter=(int)((double*)(current_var->data))[0];
-			Faust::StoppingCriterion<FPP> stop_cri(niter);
+			Faust::StoppingCriterion<FPP2> stop_cri(niter);
 			params.stop_crit_global=stop_cri;
 			//cout<<niter<<endl;
 		}
@@ -335,8 +335,8 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 
 		if (strcmp(current_fieldName,"cons")==0)
 		{
-			vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> consS;
-			vector<vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> > consSS;
+			vector<const Faust::ConstraintGeneric*> consS;
+			vector<vector<const Faust::ConstraintGeneric*> > consSS;
 			////cout<<"size_tab cont :dim1 "<<current_var->dims[0]<<endl;
 			////cout<<"size_tab cont :dim2 "<<current_var->dims[1]<<endl;
 			int shift = 0;
@@ -351,7 +351,7 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 				for (int j=0;j<(current_var->dims[1]);j++)
 				{	////cout<<"j"<<j<<endl;
 					current_cons_var = Mat_VarGetCell(current_var,2*j+shift);
-					add_constraint<FPP,DEVICE>(consS,current_cons_var);
+					add_constraint<FPP,DEVICE,FPP2>(consS,current_cons_var);
 				}
 				shift+=1;
 
@@ -385,8 +385,8 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE>& params, const char* f
 
 
 
-template<typename FPP,Device DEVICE>
-void add_constraint(std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & consS,matvar_t* cons_var)
+template<typename FPP,Device DEVICE, typename FPP2>
+void add_constraint(std::vector<const Faust::ConstraintGeneric*> & consS,matvar_t* cons_var)
 {
 
 	matvar_t* cons_name_var, *cons_field_var;
@@ -428,10 +428,10 @@ void add_constraint(std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & c
 
 		// CASE REAL
 		case 1 :
-		FPP real_parameter;
+			FPP2 real_parameter;
 			cons_field_var=Mat_VarGetCell(cons_var,1);
-			real_parameter =(FPP) (((double*) cons_field_var->data))[0];
-			consS.push_back(new Faust::ConstraintFPP<FPP,DEVICE>(cons_name,real_parameter,cons_dim1,cons_dim2));
+			real_parameter =(FPP2) (((double*) cons_field_var->data))[0];
+			consS.push_back(new Faust::ConstraintFPP<FPP,DEVICE,FPP2>(cons_name,real_parameter,cons_dim1,cons_dim2));
 			break;
 
         // CASE MAT CONSTRAINT
@@ -453,8 +453,8 @@ void add_constraint(std::vector<const Faust::ConstraintGeneric<FPP,DEVICE>*> & c
 
 
 
-template<typename FPP,Device DEVICE>
-void Display_params(Faust::Params<FPP,DEVICE> & params)
+template<typename FPP,Device DEVICE, typename FPP2>
+void Display_params(Faust::Params<FPP,DEVICE,FPP2> & params)
 {
 
 	cout<<"NFACTS : "<<params.m_nbFact<<endl;
@@ -502,7 +502,7 @@ void Display_params(Faust::Params<FPP,DEVICE> & params)
 
 			else if (params.cons[jl][L]->is_constraint_parameter_real())
 			{
-				Faust::ConstraintFPP<FPP,DEVICE>* const_real = (Faust::ConstraintFPP<FPP,DEVICE>*)(params.cons[jl][L]);
+				Faust::ConstraintFPP<FPP,DEVICE,FPP2>* const_real = (Faust::ConstraintFPP<FPP,DEVICE,FPP2>*)(params.cons[jl][L]);
 				cout<<" parameter :"<<(*const_real).get_parameter()<<endl;
 			}
 
