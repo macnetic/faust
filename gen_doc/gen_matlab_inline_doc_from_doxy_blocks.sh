@@ -69,7 +69,7 @@ do
                 # INLINE_DOC_START_NUM=${INLINE_DOC_LINE_NUMS[1]}
                 # INLINE_DOC_END_NUM=${INLINE_DOC_LINE_NUMS[-2]}
                 #[[ $INLINE_DOC_START_NUM =~ [[:digit:]]+ && $INLINE_DOC_END_NUM =~ [[:digit:]]+ ]] && sed -i "${INLINE_DOC_START_NUM},${INLINE_DOC_END_NUM}d" ${OUTPUT_FILE}
-                [[ $INLINE_DOC_START_NUM =~ [[:digit:]]+ && $INLINE_DOC_END_NUM =~ [[:digit:]]+ ]] && sed -ne "1,${INLINE_DOC_START_NUM}p;${INLINE_DOC_END_NUM},${FILE_NLINES}p" "${OUTPUT_FILE}" > tmp_${OUTPUT_FILE} && mv tmp_${OUTPUT_FILE} ${OUTPUT_FILE}
+                [[ $INLINE_DOC_START_NUM =~ [[:digit:]]+ && $INLINE_DOC_END_NUM =~ [[:digit:]]+ ]] && sed -ne "1,${INLINE_DOC_START_NUM}p;${INLINE_DOC_END_NUM},${FILE_NLINES}p" "${OUTPUT_FILE}" > ${OUTPUT_FILE}_tmp && mv ${OUTPUT_FILE}_tmp ${OUTPUT_FILE}
                 [  ! "$?" = 0 ] && echo "ERROR sed deleting old inline doc block." >&2 && exit 5
         # fi
 
