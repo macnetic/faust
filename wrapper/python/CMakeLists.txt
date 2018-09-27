@@ -53,7 +53,7 @@ add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET})
 
 list(LENGTH PYTHON_EXES PYTHON_EXES_LEN)
 list(LENGTH CYTHON_EXES CYTHON_EXES_LEN)
-#TODO: check that the two LEN are equal
+#TODO: check that the two LENGHTS are equal
 
 #message(STATUS "PYTHON_EXES_LEN=${PYTHON_EXES_LEN}, PYTHON_EXES=${PYTHON_EXES}")
 #message(STATUS "CYTHON_EXES_LEN=${CYTHON_EXES_LEN}, CYTHON_EXES=${CYTHON_EXES}")
@@ -61,7 +61,12 @@ if(UNIX)
 	foreach(PYTHON_EXE IN LISTS PYTHON_EXES)
 		exec_program("${PYTHON_EXE}" ARGS "--version" OUTPUT_VARIABLE PY_VER RETURN_VALUE PY_RES)
 		#message(STATUS "PY_VER=${PY_VER}")
+		string(REGEX REPLACE "Python ([0-9]\\.[0-9]).*$" "\\1" PY_VER_WITH_POINTS ${PY_VER})
 		string(REGEX REPLACE "Python ([0-9])\\.([0-9]).*$" "\\1\\2" PY_VER ${PY_VER})
+		if(PY_VER MATCHES 3)
+			set(PY_DYNLIB "FaustCorePy.cp${PY_VER}-win_amd64.pyd")
+			set(PY3_VER ${PY_VER_WITH_POINTS} PARENT_SCOPE)
+		endif()
 		add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
 			COMMAND   ${PYTHON_EXE}
 			ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace" 
@@ -87,6 +92,7 @@ elseif(WIN32 AND ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles")
 				# get abbreviated python version
 				exec_program("${PYTHON_EXE}" ARGS "--version" OUTPUT_VARIABLE PY_VER RETURN_VALUE PY_RES)
 				#message(STATUS "PY_VER=${PY_VER}")
+				string(REGEX REPLACE "Python ([0-9]\\.[0-9]).*$" "\\1." PY_VER_WITH_POINTS ${PY_VER})
 				string(REGEX REPLACE "Python ([0-9])\\.([0-9]).*$" "\\1\\2" PY_VER ${PY_VER})
 				#message(STATUS "PY_VER=${PY_VER}")
 				# set header inclusion flags
@@ -109,6 +115,7 @@ elseif(WIN32 AND ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles")
 				#message(STATUS "PYTHON_STATIC_LIB_PATH=${PYTHON_STATIC_LIB_PATH}")
 				if(PY_VER MATCHES 3)
 					set(PY_DYNLIB "FaustCorePy.cp${PY_VER}-win_amd64.pyd")
+					set(PY3_VER ${PY_VER_WITH_POINTS})
 				else() #py 2.7.x
 					set(PY_DYNLIB "FaustCorePy.pyd")
 				endif()
