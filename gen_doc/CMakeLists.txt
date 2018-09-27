@@ -64,6 +64,7 @@ if(BUILD_DOCUMENTATION)
 		#elif(WIN32) #TODO
 	endif()
 	file(REMOVE ${PROJECT_BINARY_DIR}/doc/README_install_part.html)
+	configure_file(${FAUST_DOC_SRC_DIR}/bin_pkgs/README_template.md ${PROJECT_BINARY_DIR}/doc/README.md)
 endif(BUILD_DOCUMENTATION) 
 
 
