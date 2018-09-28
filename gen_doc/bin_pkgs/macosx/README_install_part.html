@@ -1,14 +1,17 @@
 <a name="installation"><h2> Installation on macOS </h2></a>
 
 You can just double-click the .pkg file to launch the installation process.
-Maybe you'll need to authorize a non-appstore app installation into your preferences/security parameters.<br/>
-You must respect the default path for installation otherwise the auto-setup script for environment configuration won't work.
-Likewise, if Matlab has not been installed in its default path, it's most likely that the auto-setup script won't find it.
-
-You can also proceed with the following command in a terminal:
+You may need to authorize a non-appstore app installation into your preferences/security parameters or to right-click on the package for a one-shot authorization
+ that may require entering your password.<br/>
+Alternatively, you can also proceed with the following command in a terminal:
 
 <pre><code>    $ sudo installer -pkg /path/to/faust-*.pkg -target /
 </code></pre>
+
+<b>WARNING:</b> For the installation process to succeed you should respect the default destination path otherwise the auto-setup script for environment configuration won't work.
+Likewise, if Matlab has not been installed in its default path, it's most likely that the auto-setup script won't find it, see <a href="#installation_testing">below</a> then for troubleshooting.
+
+
 
 After installing the package, you'll need to restart your Matlab or Python session in order to take into account the new configuration of your environment.
 

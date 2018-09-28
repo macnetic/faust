@@ -5,36 +5,36 @@ Packages are available and tested for Debian, Ubuntu, Fedora and Centos.
 For rpm based Linux distributions like Centos, Fedora, you must install FAµST with the following command :
 
 
-<pre><code>	$ sudo rpm -i faust-@CPACK_PACKAGE_VERSION@-x86_64.rpm
-	# or equivalently if you're not in sudoers
-	$ su -c "rpm -i faust-@CPACK_PACKAGE_VERSION@-x86_64.rpm"
+<pre><code>    $ sudo rpm -i faust-@CPACK_PACKAGE_VERSION@-x86_64.rpm
+    # or equivalently if you're not in sudoers
+    $ su -c "rpm -i faust-@CPACK_PACKAGE_VERSION@-x86_64.rpm"
 </code></pre>
 
 For Debian and Ubuntu which use *.deb packages you must execute the next commands:
 
-<pre><code>	$ sudo dpkg -i faust-@CPACK_PACKAGE_VERSION@-x86_64.deb
-	# or equivalently if you're not in sudoers
-	su -c "dpkg -i faust-@CPACK_PACKAGE_VERSION@-x86_64.deb"
+<pre><code>    $ sudo dpkg -i faust-@CPACK_PACKAGE_VERSION@-x86_64.deb
+    # or equivalently if you're not in sudoers
+    su -c "dpkg -i faust-@CPACK_PACKAGE_VERSION@-x86_64.deb"
 </code></pre>
 
-If the package installation fails claiming libmatio dependency isn't found, you should install it through your package manager, typically dnf on Fedora, yum on Centos and apt-get on Debian or Ubuntu.<br/><br/>
+If the package installation fails claiming libmatio dependency isn't found, you should install it through your package manager, typically dnf on Fedora, yum on Centos and apt-get on Debian or Ubuntu.<br/>
 
 On Fedora:
-<pre><code>	$ sudo "dnf -y install matio"
-	# or equivalently if you're not in sudoers
-	$ su -c "dnf -y install matio"
+<pre><code>    $ sudo "dnf -y install matio"
+    # or equivalently if you're not in sudoers
+    $ su -c "dnf -y install matio"
 </code></pre>
 
 On Centos:
-<pre><code>	$ sudo "yum -y install matio"
-	# or equivalently if you're not in sudoers
-	$ su -c "yum -y install matio"
+<pre><code>    $ sudo "yum -y install matio"
+    # or equivalently if you're not in sudoers
+    $ su -c "yum -y install matio"
 </code></pre>
 
 On Ubuntu or Debian:
-<pre><code>	$ sudo "apt-get install libmatio-dev"
-	# or equivalently if you're not in sudoers
-	$ su -c "apt-get install libmatio-dev"
+<pre><code>    $ sudo "apt-get install libmatio-dev"
+    # or equivalently if you're not in sudoers
+    $ su -c "apt-get install libmatio-dev"
 </code></pre>
 
 
@@ -45,8 +45,8 @@ However it's not recommended to use this approach if you're system provides a su
 <br/><br/>
 The static packages for this release are:
 <br/>
-<pre>	faust-@CPACK_PACKAGE_VERSION@-static-x86_64.rpm<br/>
-	faust-@CPACK_PACKAGE_VERSION@-static-x86_64.deb
+<pre>	faust-@CPACK_PACKAGE_VERSION@-static-x86_64.rpm
+   faust-@CPACK_PACKAGE_VERSION@-static-x86_64.deb
 </pre>
 
 

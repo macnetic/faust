@@ -1,6 +1,6 @@
-\mainpage FAµST Library API Documentation
+\mainpage FAµST Toolbox API Documentation
 
-\section intro_sec Introduction
+\section intro_sec What is the FAµST Toolbox ?
 
 The FAµST toolbox provides algorithms and data structures to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation).
 
@@ -10,29 +10,40 @@ FaµST can be used to:
 - learn dictionaries with an intrinsically efficient implementation,
 - compute (approximate) fast Fourier transforms on graphs.
 
-A general introduction to FAµST is available in the following paper:
+The FAµST toolbox is organized in several parts:
 
-[1] [Le Magoarou L. and Gribonval R., “Flexible multi-layer sparse approximations of matrices and applications”](https://hal.archives-ouvertes.fr/hal-01167948), Journal of Selected Topics in Signal Processing, 2016.
-
-The next paper can come as complement:
-
-[2][Le Magoarou L. and Gribonval R., Gramfort A., “FAµST: speeding up linear transforms for tractable inverse problems“](https://hal.archives-ouvertes.fr/hal-01156478v1)
-
-The FAµST toolbox was initially released as a Matlab implementation (versions 1.x). A C++ implementation (versions 2.x), including Matlab wrappers, is now available and the object of further developments. A Python interface is being developed.
-
-FAµST is developped at [Rennes INRIA](https://hal.archives-ouvertes.fr/hal-01156478v1). <br>
-For more information on the FAµST Project, please visit the website [faust.inria.fr](http://faust.inria.fr). <br> 
-
-
-<HR>
+- The FAµST core library, a C++ backend implementing FAµST-related data structures and algorithms,
+- [matfaust](./namespacematfaust.html), a Matlab frontend to the FAµST library,
+- [pyfaust](./namespacepyfaust.html), a Python frontend to the FAµST library.
 
 
 @INCLUDE_SPECIFIC_DOC@
 
+\section more_info Learning more about the FAµST Framework
+
+A general introduction to the FAµST framework is available in the following paper:
+
+[1] [Le Magoarou L. and Gribonval R., “Flexible multi-layer sparse approximations of matrices and applications”](https://hal.archives-ouvertes.fr/hal-01167948), Journal of Selected Topics in Signal Processing, 2016.
+
+The following paper can come as complement:
+
+[2] [Le Magoarou L. and Gribonval R., Gramfort A., “FAµST: speeding up linear transforms for tractable inverse problems“](https://hal.archives-ouvertes.fr/hal-01156478v1)
+
+The FAµST toolbox was initially released as a Matlab implementation ([versions 1.x](http://faust.inria.fr/download/faust-1-x/)).
+<br/>Since version 2.0, it has been implemented in C++. Besides, the development of wrappers has made that C++ core accessible from Matlab and Python programming languages.
+
+
+\section Credits
+
+FAµST is developed in the [PANAMA team](https://team.inria.fr/panama/) at [INRIA Rennes](https://hal.archives-ouvertes.fr/hal-01156478v1). <br>
+For more information on the FAµST Project, please visit the website [faust.inria.fr](http://faust.inria.fr). <br>
+
+
+
 
 <HR>
-\authors Adrien Leman, Nicolas Bellot, Thomas Gautrais, Hakim H.
-\date @DOXYGEN_CURRENT_DATE@
+\authors Luc Le Magoarou, Rémi Gribonval, Adrien Leman, Nicolas Bellot, Thomas Gautrais, Hakim H.
+\date (of doc generation) @DOXYGEN_CURRENT_DATE@
 
 <HR>
 
