@@ -4,7 +4,7 @@
 
 [2. Installation](#installation)
 
-[3. Installation Testing](#installation_testing)
+[3. Testing and Troubleshooting](#installation_testing)
 
 [4. Usage](#usage)
 
