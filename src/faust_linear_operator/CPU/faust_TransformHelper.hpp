@@ -3,6 +3,19 @@
 namespace Faust {
 
 	template<typename FPP>
+		void conjugate(complex<FPP>* elts, faust_unsigned_int n)
+		{
+			for(faust_unsigned_int i=0; i< n; i++)
+				elts[i] = complex<FPP>(elts[i].real(), elts[i].imag());
+		}
+
+	template<typename FPP>
+		void conjugate(FPP* elts, faust_unsigned_int n)
+		{
+		//nothing to do for real numbers
+		}
+
+	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts,
 				const FPP lambda_, const bool optimizedCopy, const bool cloning_fact) : is_transposed(false),
 																						is_conjugate(false),
@@ -183,6 +196,112 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+		faust_unsigned_int TransformHelper<FPP,Cpu>::get_fact_nnz(const faust_unsigned_int id) const
+		{
+			if(id == 0 || id == this->size()-1)
+				return (this->eval_sliced_Transform())->get_fact_nnz(is_transposed?size()-id-1:id);
+			else
+				return this->transform->get_fact_nnz(is_transposed?size()-id-1:id);
+		}
+
+	template<typename FPP>
+		unsigned int TransformHelper<FPP,Cpu>::get_fact_nb_rows(const faust_unsigned_int id) const
+		{
+			return get_fact_dim_size(id,0);
+		}
+
+	template<typename FPP>
+		unsigned int TransformHelper<FPP,Cpu>::get_fact_nb_cols(const faust_unsigned_int id) const
+		{
+			return get_fact_dim_size(id,1);
+		}
+
+	template<typename FPP>
+		unsigned int TransformHelper<FPP,Cpu>::get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const
+		{
+			//dim == 0 to get num of cols, >0 otherwise
+			faust_unsigned_int rid; //real id
+			if(is_transposed) {
+				rid = size()-id-1;
+				dim = !dim;
+			}
+			else {
+				rid = id;
+				//dim = dim;
+			}
+			Faust::MatGeneric<FPP,Cpu>* mat;
+			if(rid == 0 || rid == this->size()-1)
+				mat = this->eval_sliced_Transform()->get_fact(rid, false);
+			else
+				mat = this->transform->get_fact(rid, false);
+			if(dim)
+				return mat->getNbCol();
+			else
+				return mat->getNbRow();
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+				const int** rowptr,
+				const int** col_ids,
+				const FPP** elts,
+				faust_unsigned_int* nnz,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols) const
+		{
+			if(id == 0 || id == this->size()-1)
+				(this->eval_sliced_Transform())->get_fact(is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols);
+			else
+				this->transform->get_fact(is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols);
+
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+				int* rowptr,
+				int* col_ids,
+				FPP* elts,
+				faust_unsigned_int* nnz,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols,
+				const bool transpose /* = false*/) const
+		{
+			if(id == 0 || id == this->size()-1)
+				(this->eval_sliced_Transform())->get_fact(is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols, is_transposed ^ transpose);
+			else
+				this->transform->get_fact(is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols, is_transposed ^ transpose);
+			if(is_conjugate)
+				Faust::conjugate(elts, *nnz);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+				const FPP** elts,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols) const
+		{
+			if(id == 0 || id == this->size()-1)
+				(this->eval_sliced_Transform())->get_fact(is_transposed?this->size()-id-1:id, elts, num_rows, num_cols);
+			else
+				this->transform->get_fact(is_transposed?this->size()-id-1:id, elts, num_rows, num_cols);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+				FPP* elts,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols,
+				const bool transpose /* default to false */) const
+		{
+			if(id == 0 || id == this->size()-1)
+				(this->eval_sliced_Transform())->get_fact(is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, is_transposed ^ transpose);
+			else
+				this->transform->get_fact(is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, is_transposed ^ transpose);
+			if(is_conjugate)
+				Faust::conjugate(elts,*num_cols*(*num_rows));
+		}
+
+	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_fact(faust_unsigned_int id) const
 		{
 			MatDense<FPP,Cpu> dense_factor;
@@ -215,6 +334,25 @@ namespace Faust {
 			if(is_transposed) dense_factor.transpose();
 			if(is_conjugate) dense_factor.conjugate();
 			return dense_factor;
+		}
+
+	template<typename FPP>
+		bool Faust::TransformHelper<FPP,Cpu>::is_fact_sparse(const faust_unsigned_int id) const
+		{
+			if(id == 0 || id == this->size()-1)
+				return (this->eval_sliced_Transform())->is_fact_sparse(is_transposed?size()-id-1:id);
+			else
+				return this->transform->is_fact_sparse(is_transposed?size()-id-1:id);
+		}
+
+
+	template<typename FPP>
+		bool Faust::TransformHelper<FPP,Cpu>::is_fact_dense(const faust_unsigned_int id) const
+		{
+			if(id == 0 || id == this->size()-1)
+				return (this->eval_sliced_Transform())->is_fact_dense(is_transposed?size()-id-1:id);
+			else
+				return this->transform->is_fact_dense(is_transposed?size()-id-1:id);
 		}
 
 	template<typename FPP>

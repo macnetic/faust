@@ -59,11 +59,24 @@ cdef extern from "FaustCoreCpp.h" :
         unsigned int get_fact_nb_rows(unsigned int& i) const
         unsigned int get_fact_nb_cols(unsigned int& i) const
         double get_fact(unsigned int& i, FPP* fact_ptr) const
+        void get_fact_sparse(unsigned int& i,
+                      int* rowptr,
+                      int* col_ids,
+                      FPP* elts,
+                      const bool transpose) const
+        void get_fact_dense(unsigned int& i,
+                      FPP* elts,
+                      unsigned int*,
+                      unsigned int*,
+                      const bool transpose) const
+        unsigned int get_fact_nnz(const unsigned int i) const
+        bool is_fact_sparse(const unsigned int i) const
         FaustCoreCpp[FPP]* get_slice(unsigned int, unsigned int, unsigned int,
                                     unsigned int) const
         FaustCoreCpp[FPP]* slice(unsigned int, unsigned int, unsigned int,
                                     unsigned int)
         void save_mat_file(const char* filepath) const
+        const bool isTransposed()
         FaustCoreCpp[FPP]* transpose()
         FaustCoreCpp[FPP]* conjugate()
         FaustCoreCpp[FPP]* adjoint()

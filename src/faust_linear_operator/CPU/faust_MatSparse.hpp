@@ -142,9 +142,9 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_
 
 template<typename FPP>
 template<typename FPP1>
-Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP1* value, const int* row_ptr, const int* id_col) :
-	Faust::MatGeneric<FPP,Cpu>(dim1_,dim2_),
-	mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(dim1_,dim2_)),
+Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP1* value, const int* row_ptr, const int* id_col, const bool transpose /*= false to default*/) :
+	Faust::MatGeneric<FPP,Cpu>(transpose?dim2_:dim1_,transpose?dim1_:dim2_),
+	mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(transpose?dim2_:dim1_,transpose?dim1_:dim2_)),
 	nnz(nnz_)
 {
 	vector<Eigen::Triplet<FPP> > tripletList;
@@ -160,7 +160,10 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_
 		for (int j = 0;j<nb_elt_rowi;j++)
 		{
 			//std::cout<<"i : "<<id_row[i+nbEltIns]<<" j :"<<j<<" value : "<<value[i+nbEltIns]<<std::endl;
-			tripletList.push_back(Eigen::Triplet<FPP>(i,(int) id_col[j+nbEltIns], (FPP) value[j+nbEltIns]));
+			if(transpose)
+				tripletList.push_back(Eigen::Triplet<FPP>((int) id_col[j+nbEltIns], i, (FPP) value[j+nbEltIns]));
+			else
+				tripletList.push_back(Eigen::Triplet<FPP>(i,(int) id_col[j+nbEltIns], (FPP) value[j+nbEltIns]));
 		}
 		nbEltIns += nb_elt_rowi;
 	}
@@ -227,7 +230,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatDense<FPP,Cpu>& M) :
 	int* rowind = new int[this->dim1*this->dim2];
 	int* colind = new int[this->dim1*this->dim2];
 	FPP* values = new FPP[this->dim1*this->dim2];
-
+	//TODO: opt here. use directly getValuePtr(), getRowPtr(), getColInd() to set triplets
 	for (int j=0 ; j<this->dim2 ; j++)
 		for (int i=0; i<this->dim1 ; i++)
 			if(M(i,j)!=FPP(0.0))

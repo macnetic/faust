@@ -52,6 +52,7 @@ from libc.string cimport memcpy, strlen;
 from libcpp cimport bool, complex
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from scipy import sparse
+from scipy.sparse import csr_matrix, csc_matrix
 from re import match
 
 cdef class FaustCore:
@@ -345,8 +346,8 @@ cdef class FaustCore:
         cdef complex[:,:] fact_cplx_view
         if(self._isReal):
             fact = np.zeros([self.core_faust_dbl.get_fact_nb_rows(i),
-                              self.core_faust_dbl.get_fact_nb_cols(i)], dtype='d',
-                             order='F')
+                             self.core_faust_dbl.get_fact_nb_cols(i)], dtype='d',
+                            order='F')
             fact_dbl_view = fact
             self.core_faust_dbl.get_fact(i, &fact_dbl_view[0, 0])
         else:
@@ -355,6 +356,107 @@ cdef class FaustCore:
                                  dtype='complex', order='F')
             fact_cplx_view = fact
             self.core_faust_cplx.get_fact(i, &fact_cplx_view[0, 0])
+        return fact
+
+    def get_fact_opt(self, i):
+        if(i >=  self.get_nb_factors() or i < 0):
+            raise ValueError("factor index must be greater or equal 0 and "
+                             "lower than "+str(self.get_nb_factors())+".")
+        cdef fact
+        cdef double[:,:] fact_dbl_view
+        cdef complex[:,:] fact_cplx_view
+        cdef rowptr, col_ids, elts, nnz
+        cdef int[:] rowptr_view, col_ids_view
+        if(self._isReal):
+            dtype = 'd'
+            is_fact_sparse = self.core_faust_dbl.is_fact_sparse(i)
+            is_transposed = self.core_faust_dbl.isTransposed()
+        else:
+            dtype = 'complex'
+            is_fact_sparse = self.core_faust_cplx.is_fact_sparse(i)
+            is_transposed = self.core_faust_cplx.isTransposed()
+        if(is_fact_sparse):
+            if(self._isReal):
+                # is_transposed = False # uncomment to disable the trick which
+                # uses csc representation instead of csr transpose
+                # to optimize copy
+                nnz = self.core_faust_dbl.get_fact_nnz(i)
+                col_ids = np.ndarray([nnz], dtype=np.int32)
+                elts = np.ndarray([1,nnz], dtype=dtype)
+                col_ids_view = col_ids
+                shape = [self.core_faust_dbl.get_fact_nb_rows(i),
+                 self.core_faust_dbl.get_fact_nb_cols(i)]
+                if(is_transposed):
+                    rowptr_sz = shape[1]+1
+                else:
+                    rowptr_sz = shape[0]+1
+
+                rowptr = np.ndarray([rowptr_sz], dtype=np.int32)
+                rowptr_view = rowptr
+                fact_dbl_view = elts
+    #                print("len(rowptr)=", len(rowptr))
+    #                print("len(col_ids)=", len(col_ids))
+    #                print("len(elts[0]=", len(elts[0,:]))
+                self.core_faust_dbl.get_fact_sparse(i, &rowptr_view[0],
+                                                        &col_ids_view[0],
+                                                        &fact_dbl_view[0,0],
+                                                       is_transposed)
+            else:
+                # is_transposed = False # uncomment to disable the trick which
+                # uses csc representation instead of csr transpose
+                # to optimize copy
+                nnz = self.core_faust_cplx.get_fact_nnz(i)
+                col_ids = np.ndarray([nnz], dtype=np.int32)
+                elts = np.ndarray([1,nnz], dtype=dtype)
+                col_ids_view = col_ids
+                shape = [self.core_faust_cplx.get_fact_nb_rows(i),
+                 self.core_faust_cplx.get_fact_nb_cols(i)]
+                if(is_transposed):
+                    rowptr_sz = shape[1]+1
+                else:
+                    rowptr_sz = shape[0]+1
+
+                rowptr = np.ndarray([rowptr_sz], dtype=np.int32)
+                rowptr_view = rowptr
+                fact_cplx_view = elts
+                self.core_faust_cplx.get_fact_sparse(i, &rowptr_view[0],
+                                                     &col_ids_view[0],
+                                                     &fact_cplx_view[0,0],
+                                                     is_transposed)
+                #print("(rowptr)=", (rowptr))
+#                print("(col_ids)=", (col_ids))
+#                print("(elts[0,:]=", (elts))
+            if(is_transposed):
+                fact = csc_matrix((elts[0,:], col_ids, rowptr), shape=shape)
+            else:
+                fact = csr_matrix((elts[0,:], col_ids, rowptr), shape=shape)
+        else: # dense matrix
+            if(is_transposed):
+                order = 'C'
+                # C contiguous repr. (row-major order ) is used to optimized the
+                # request of transpose factor (no need to reorder data as we
+                # should in col-major/Fortran repr.)
+            else:
+                order = 'F'
+            if(self._isReal):
+                fact = np.ndarray([self.core_faust_dbl.get_fact_nb_rows(i),
+                             self.core_faust_dbl.get_fact_nb_cols(i)], dtype=dtype,
+                            order=order)
+                fact_dbl_view = fact
+                self.core_faust_dbl.get_fact_dense(i, &fact_dbl_view[0, 0],
+                                               <unsigned int*>NULL,
+                                               <unsigned int*>NULL,
+                                               is_transposed)
+            else:
+                fact = np.ndarray([self.core_faust_cplx.get_fact_nb_rows(i),
+                             self.core_faust_cplx.get_fact_nb_cols(i)], dtype=dtype,
+                            order=order)
+                fact_cplx_view = fact
+                self.core_faust_cplx.get_fact_dense(i, &fact_cplx_view[0, 0],
+                                                   <unsigned int*>NULL,
+                                                   <unsigned int*>NULL,
+                                                   is_transposed)
+
         return fact
 
     def slice(self, start_row_id, end_row_id, start_col_id, end_col_id):
@@ -482,12 +584,12 @@ cdef class FaustFact:
             else:
                 zeros_id = 0
             p.init_facts = [
-                np.zeros([p.constraints[zeros_id].num_rows,p.constraints[zeros_id].num_cols]) ]
+                np.zeros([p.constraints[zeros_id]._num_rows,p.constraints[zeros_id]._num_cols]) ]
             if(not isReal):
                 p.init_facts[0] = p.init_facts[0].astype(np.complex)
             for i in [i for i in range(0,p.num_facts) if i != zeros_id]:
-                p.init_facts += [np.eye(p.constraints[i].num_rows,
-                                        p.constraints[i].num_cols)]
+                p.init_facts += [np.eye(p.constraints[i]._num_rows,
+                                        p.constraints[i]._num_cols)]
                 if(not isReal):
                     p.init_facts[i] = p.init_facts[i].astype(np.complex)
 
@@ -531,33 +633,33 @@ cdef class FaustFact:
             if(cons.is_int_constraint()):
                 #print("FaustFact.fact_palm4MSA() Int Constraint")
                 cpp_constraints[i] = <PyxConstraintInt*> PyMem_Malloc(sizeof(PyxConstraintInt))
-                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons.param
+                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons._cons_value
             elif(cons.is_real_constraint()):
                 #print("FaustFact.fact_palm4MSA() Real Constraint")
                 cpp_constraints[i] = <PyxConstraintScalar[double]*> \
                 PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
                 (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
-                        cons.param
-            elif(cons.is_mat_constraint()):
+                        cons._cons_value
+            elif(cons._is_mat_constraint()):
                 #print("FaustFact.fact_palm4MSA() Matrix Constraint")
                 if(isReal):
                     cpp_constraints[i] = <PyxConstraintMat[double]*> \
                             PyMem_Malloc(sizeof(PyxConstraintMat[double]))
-                    tmp_mat = cons.param
+                    tmp_mat = cons._cons_value
                     (<PyxConstraintMat[double]*>cpp_constraints[i]).parameter =\
                             &tmp_mat[0,0]
                 else:
                     cpp_constraints[i] = <PyxConstraintMat[complex]*> \
                             PyMem_Malloc(sizeof(PyxConstraintMat[complex]))
-                    tmp_mat_cplx = cons.param
+                    tmp_mat_cplx = cons._cons_value
                     (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter =\
                             &tmp_mat_cplx[0,0]
 
             else:
                 raise ValueError("Constraint type/name is not recognized.")
             cpp_constraints[i].name = cons.name
-            cpp_constraints[i].num_rows = cons.num_rows
-            cpp_constraints[i].num_cols = cons.num_cols
+            cpp_constraints[i].num_rows = cons._num_rows
+            cpp_constraints[i].num_cols = cons._num_cols
 
 
         if(isReal):
@@ -673,33 +775,33 @@ cdef class FaustFact:
             if(cons.is_int_constraint()):
                 #print("FaustFact.fact_hierarchical() Int Constraint")
                 cpp_constraints[i] = <PyxConstraintInt*> PyMem_Malloc(sizeof(PyxConstraintInt))
-                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons.param
+                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons._cons_value
             elif(cons.is_real_constraint()):
                 #print("FaustFact.fact_hierarchical() Real Constraint")
                 cpp_constraints[i] = <PyxConstraintScalar[double]*> \
                 PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
                 (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
-                        cons.param
-            elif(cons.is_mat_constraint()):
+                        cons._cons_value
+            elif(cons._is_mat_constraint()):
                 #print("FaustFact.fact_hierarchical() Matrix Constraint")
                 if(isReal):
                     cpp_constraints[i] = <PyxConstraintMat[double]*> \
                             PyMem_Malloc(sizeof(PyxConstraintMat[double]))
-                    tmp_mat = cons.param
+                    tmp_mat = cons._cons_value
                     (<PyxConstraintMat[double]*>cpp_constraints[i]).parameter =\
                             &tmp_mat[0,0]
                 else:
                     cpp_constraints[i] = <PyxConstraintMat[complex]*> \
                             PyMem_Malloc(sizeof(PyxConstraintMat[complex]))
-                    tmp_mat_cplx = cons.param
+                    tmp_mat_cplx = cons._cons_value
                     (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter =\
                             &tmp_mat_cplx[0,0]
 
             else:
                 raise ValueError("Constraint type/name is not recognized.")
             cpp_constraints[i].name = cons.name
-            cpp_constraints[i].num_rows = cons.num_rows
-            cpp_constraints[i].num_cols = cons.num_cols
+            cpp_constraints[i].num_rows = cons._num_rows
+            cpp_constraints[i].num_cols = cons._num_cols
 
         if(isReal):
             cpp_params.constraints = cpp_constraints

@@ -659,7 +659,7 @@ Faust::MatGeneric<FPP,Cpu>* Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_i
 {
 	if(id>=size())
 	{
-		handleError(m_className,"get_fact : id exceed Faust::Transform size or id < 0");
+		handleError(m_className,"get_fact : id exceeds Faust::Transform size or id < 0");
 	}
 
 	if(cloning_fact)
@@ -678,11 +678,128 @@ Faust::MatGeneric<FPP,Cpu>* Faust::Transform<FPP,Cpu>::get_fact(faust_unsigned_i
 
 }
 
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+		const int** rowptr,
+		const int** col_ids,
+		const FPP** elts,
+		faust_unsigned_int* nnz,
+		faust_unsigned_int* num_rows,
+		faust_unsigned_int* num_cols) const
+{
+	MatGeneric<FPP,Cpu>* mat_ptr = get_fact(id, false);
+	if(mat_ptr->getType() != Sparse)
+		handleError(m_className, "get_fact(uint,uint**,uint**,FPP**,uint*,uint*,uint*): this prototype must be called only on sparse factors.");
+	MatSparse<FPP,Cpu>* smat_ptr = dynamic_cast<MatSparse<FPP,Cpu>*>(mat_ptr);
+
+	*rowptr = smat_ptr->getRowPtr();
+	*col_ids = smat_ptr->getColInd();
+	*elts = smat_ptr->getValuePtr();
+	*nnz = smat_ptr->getNonZeros();
+	*num_rows = smat_ptr->getNbRow();
+	*num_cols = smat_ptr->getNbCol();
+}
+
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+		int* d_outer_count_ptr, int* d_inner_ptr, FPP* d_elts,
+		faust_unsigned_int* nnz,
+		faust_unsigned_int* num_rows, faust_unsigned_int* num_cols,
+		bool transpose /* default to false */) const
+{
+	const int* s_outer_count_ptr, *s_inner_ptr;
+	const FPP* s_elts;
+	this->get_fact(id, &s_outer_count_ptr, &s_inner_ptr, &s_elts,
+			nnz, num_rows, num_cols);
+	if(transpose)
+	{
+		MatSparse<FPP,Cpu> tmat(*nnz, *num_rows, *num_cols, s_elts, s_outer_count_ptr,
+				s_inner_ptr, transpose);
+		s_outer_count_ptr = tmat.getRowPtr();
+		s_inner_ptr = tmat.getColInd();
+		s_elts = tmat.getValuePtr();
+		//do the copy here, otherwise we'll lose tmat and its buffers when out of scope
+		memcpy(d_outer_count_ptr, s_outer_count_ptr, sizeof(int)*(*num_cols+1));
+		memcpy(d_inner_ptr, s_inner_ptr, sizeof(int)**nnz);
+		memcpy(d_elts, s_elts, sizeof(FPP)**nnz);
+		// swap num_cols and num_rows
+		// (with only these 2 variables -- F2 arithmetic trick)
+		*num_cols = *num_cols^*num_rows;
+		*num_rows = *num_cols^*num_rows;
+		*num_cols = *num_cols^*num_rows;
+	}
+	else
+	{
+		memcpy(d_outer_count_ptr, s_outer_count_ptr, sizeof(int)*(*num_rows+1));
+		memcpy(d_inner_ptr, s_inner_ptr, sizeof(int)**nnz);
+		memcpy(d_elts, s_elts, sizeof(FPP)**nnz);
+	}
+}
+
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+		 const FPP ** elts,
+		 faust_unsigned_int* num_rows,
+		 faust_unsigned_int* num_cols) const
+{
+	MatGeneric<FPP,Cpu>* mat_ptr = get_fact(id, false);
+	if(mat_ptr->getType() != Dense)
+		handleError(m_className, "get_fact(uint,FPP**,uint*,uint*,uint*): this prototype must be called only on dense factors.");
+	MatDense<FPP,Cpu>* dmat_ptr = dynamic_cast<MatDense<FPP,Cpu>*>(mat_ptr);
+	*elts = dmat_ptr->getData();
+	if(num_rows)
+		*num_rows = dmat_ptr->getNbRow();
+	if(num_cols)
+		*num_cols = dmat_ptr->getNbCol();
+}
+
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+		FPP* elts,
+		faust_unsigned_int* num_rows,
+		faust_unsigned_int* num_cols,
+		const bool transpose /*=false*/) const
+{
+	const FPP* s_elts;
+	get_fact(id, &s_elts, num_rows, num_cols);
+	if(transpose)
+	{
+		// change the order of s_elts to transpose
+		// the matrices are in Column-major order
+		for(int j=0;j<*num_cols;j++)
+			for(int i=0; i<*num_rows;i++)
+				elts[i**num_cols+j] = s_elts[j**num_rows+i];
+		// swap num_cols and num_rows
+		// (with only these 2 variables -- F2 arithmetic trick)
+		*num_cols = *num_cols^*num_rows;
+		*num_rows = *num_cols^*num_rows;
+		*num_cols = *num_cols^*num_rows;
+	}
+	else
+	{
+		memcpy(elts, s_elts, sizeof(FPP)*(*num_rows)*(*num_cols));
+	}
+}
 
 
+template<typename FPP>
+bool Faust::Transform<FPP,Cpu>::is_fact_sparse(const faust_unsigned_int id) const
+{
+	return get_fact(id, false)->getType() == Sparse;
+}
 
 
+template<typename FPP>
+bool Faust::Transform<FPP,Cpu>::is_fact_dense(const faust_unsigned_int id) const
+{
+	return get_fact(id, false)->getType() == Dense;
+}
 
+template<typename FPP>
+faust_unsigned_int Faust::Transform<FPP,Cpu>::get_fact_nnz(const faust_unsigned_int id) const
+{
+	return this->get_fact(id, false)->getNonZeros();
+}
 
 	template<typename FPP>
 void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,const bool optimizedCopy /*default value = true */, const bool conjugate)

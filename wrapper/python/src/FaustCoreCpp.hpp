@@ -179,28 +179,64 @@ const char* FaustCoreCpp<FPP>::to_string() const
 template<typename FPP>
 unsigned int FaustCoreCpp<FPP>::get_fact_nb_rows(unsigned int& i) const
 {
-    Faust::MatDense<FPP,Cpu> factor_generic = this->transform.get_fact(i);
-    unsigned int nb_rows = factor_generic.getNbRow();
-    return nb_rows;
+    return this->transform.get_fact_nb_rows(i);
 }
 
 template<typename FPP>
 unsigned int FaustCoreCpp<FPP>::get_fact_nb_cols(unsigned int& i) const
 {
-    Faust::MatDense<FPP,Cpu> factor_generic = this->transform.get_fact(i);
-    unsigned int nb_cols = factor_generic.getNbCol();
-    return nb_cols;
+    return this->transform.get_fact_nb_cols(i);
 }
 
 template<typename FPP>
-void FaustCoreCpp<FPP>::get_fact(unsigned int& i, FPP* fact_ptr) const
+faust_unsigned_int FaustCoreCpp<FPP>::get_fact_nnz(const faust_unsigned_int i) const
+{
+    return transform.get_fact_nnz(i);
+}
+
+template<typename FPP>
+void FaustCoreCpp<FPP>::get_fact(const unsigned int& i, FPP* fact_ptr) const
 {
     Faust::MatDense<FPP,Cpu> dense_factor = this->transform.get_fact(i);
-    //TODO: optimize here (we have two copies from C++ object to Py, the first in MatDense::Clone()
-    //the second here)
+    // not optimized here (we have three copies from C++ object to Py, the first in MatDense::Clone()
+    // (called from Faust::Transform::get_fact()) the second when converting to
+    // MatDense (even if not a MatSparse, the copy is made)
+    // and finally a third copy here)
     memcpy(fact_ptr, dense_factor.getData(),
             sizeof(FPP)*dense_factor.getNbCol()*dense_factor.getNbRow());
+    //optimized versions are get_fact_dense(), get_fact_sparse()
+}
 
+template<typename FPP>
+void FaustCoreCpp<FPP>::get_fact_dense(const unsigned int& i, FPP* fact_ptr,
+        unsigned int* num_rows, unsigned int* num_cols, const bool transpose) const
+{
+    faust_unsigned_int nrows, ncols;
+    // only one copy, directly in numpy buffer (optimization)
+    this->transform.get_fact(i, fact_ptr, &nrows, &ncols, transpose);
+    if(num_rows != NULL)
+        *num_rows = transpose?nrows:ncols;
+    if(num_cols != NULL)
+        *num_cols = transpose?ncols:nrows;
+}
+
+template<typename FPP>
+void FaustCoreCpp<FPP>::get_fact_sparse(const unsigned int& id,
+        int* rowptr,
+        int* col_ids,
+        FPP* elts,
+        const bool transpose) const
+{
+    faust_unsigned_int size, nrows, ncols; //TODO: delete nrows,ncols when NULL arg's ok
+    // only one copy per buffer (optimization) directly from underlying
+    // MatSparse buffers to scipy buffers
+    transform.get_fact(id, rowptr, col_ids, elts, &size, &nrows, &ncols, transpose);
+}
+
+template<typename FPP>
+bool FaustCoreCpp<FPP>::is_fact_sparse(const faust_unsigned_int id) const
+{
+    return transform.is_fact_sparse(id);
 }
 
 template<typename FPP>
@@ -241,6 +277,12 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::transpose()
     std::cout << "FaustCoreCpp::transpose() th=" << th << "core=" << core << std::endl;
 #endif
     return core;
+}
+
+template<typename FPP>
+const bool FaustCoreCpp<FPP>::isTransposed()
+{
+    return transform.isTransposed();
 }
 
     template<typename FPP>

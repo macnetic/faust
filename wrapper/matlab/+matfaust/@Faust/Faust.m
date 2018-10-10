@@ -693,7 +693,7 @@ classdef Faust
 		%> @param F the Faust object.
 		%> @param i the factor index.
 		%>
-		%> @retval factor the i-th factor as a dense matrix.
+		%> @retval factor a copy of the i-th factor without altering its storage organization in the Faust F (full or sparse).
 		%>
 		%> @b Example
 		%> @code
@@ -715,11 +715,11 @@ classdef Faust
 			% See also get_num_factors.
 
 			if (~isa(i,'double'))
-				error('get_fact second argument (indice) must either be real positive integers or logicals.');
+				error('get_factor second argument (indice) must either be real positive integers or logicals.');
 			end
 
 			if (floor(i) ~= i)
-				error('get_fact second argument (indice) must either be real positive integers or logicals.');
+				error('get_factor second argument (indice) must either be real positive integers or logicals.');
 			end
 
 			if (F.isReal)
@@ -730,6 +730,52 @@ classdef Faust
 
 		end
 
+		%=====================================================================
+		%> @brief DEPRECATED (Use Faust.get_factor) Returns the i-th factor of F.
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b factor = get_factor_nonopt(F, i)
+		%>
+		%> @param F the Faust object.
+		%> @param i the factor index.
+		%>
+		%> @retval factor the i-th factor as a dense matrix.
+		%>
+		%> @b Example
+		%> @code
+		%>	import matfaust.FaustFactory
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', false)
+		%>	f1 = get_factor_nonopt(F, 1)
+		%> @endcode
+		%> <p>@b See @b also Faust.get_num_factors
+		%=====================================================================
+		function factor = get_factor_nonopt(F, i)
+			%% GET_FACT Ith factor of the Faust.
+			%
+			% A=get_factor_nonopt(F,i) return the i factor A of the Faust F as a full storage matrix.
+			%
+			% Example of use :
+			% A=get_factor_nonopt(F,1) returns the 1st factor of the Faust F.
+			% A=get_factor_nonopt(F,4) returns the 4th factor of the Faust F.
+			%
+			% See also get_num_factors.
+
+			if (~isa(i,'double'))
+				error('get_fact second argument (indice) must either be real positive integers or logicals.');
+			end
+
+			if (floor(i) ~= i)
+				error('get_fact second argument (indice) must either be real positive integers or logicals.');
+			end
+
+			if (F.isReal)
+				factor = mexFaustReal('get_fact_nonopt',F.matrix.objectHandle,i);
+			else
+				factor = mexFaustCplx('get_fact_nonopt',F.matrix.objectHandle,i);
+			end
+
+		end
 
 		%==========================================================================================
 		%> @brief Gives the number of factors of F.

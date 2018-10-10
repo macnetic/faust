@@ -60,7 +60,13 @@ class TestFaustPy(unittest.TestCase):
         for i in range(0, F_ref.get_num_factors()):
             fact_ref = F_ref.get_factor(i)
             fact_test = F_test.get_factor(i)
-            self.assertEqual(fact_ref.shape, fact_test.shape)
+            if(not isinstance(fact_ref, np.ndarray)):
+                # fact_ref is a sparse matrix
+                fact_ref = fact_ref.toarray()
+            if(not isinstance(fact_test, np.ndarray)):
+                # fact_test is a sparse matrix
+                fact_test = fact_test.toarray()
+            self.assertEqual(fact_test.shape, fact_ref.shape)
             self.assertTrue((fact_ref == fact_test).all())
 
     def testGetNumRows(self):
@@ -77,7 +83,26 @@ class TestFaustPy(unittest.TestCase):
         for ref_fact,i in zip(self.factors,range(0,len(self.factors))):
             #print("testGetFac() fac ",i, " :", self.F.get_factor(i))
             #print("testGetFac() reffac",i, ":",ref_fact)
-            self.assertTrue((ref_fact == self.F.get_factor(i)).all())
+            test_fact = self.F.get_factor(i)
+            if(not isinstance(test_fact, np.ndarray)):
+                # test_fact is a sparse matrix
+                test_fact = test_fact.toarray()
+            #print(ref_fact.shape, test_fact.shape)
+            test_fact = np.asfortranarray(test_fact)
+            self.assertTrue((ref_fact == test_fact).all())
+        # and get_factor() on transpose Faust ?
+        tF = self.F.transpose()
+        for i in range(0,len(self.factors)):
+            #print("testGetFac() fac ",i, " :", self.F.get_factor(i))
+            #print("testGetFac() reffac",i, ":",ref_fact)
+            test_fact = tF.get_factor(i)
+            ref_fact = self.F.get_factor(len(self.factors)-i-1).transpose()
+            if(not isinstance(test_fact, np.ndarray)):
+                # test_fact is a sparse matrix
+                test_fact = test_fact.toarray()
+            #print(ref_fact.shape, test_fact.shape)
+            test_fact = np.asfortranarray(test_fact)
+            self.assertTrue((ref_fact == test_fact).all())
 
     def testGetNumFactors(self):
         print("testGetNumFactors()")

@@ -766,7 +766,38 @@ class Faust:
             i: the factor index.
 
         Returns:
-            the i-th factor as a dense matrix (of type numpy.ndarray).
+            a copy of the i-th factor, the copy type is:
+                - numpy.ndarray if it is a full storage matrix or,
+                - scipy.sparse.csc.matrix_csc if it's a sparse matrix of a
+                transposed Faust,
+                - scipy.sparse.csr.csr_matrix if it's a sparse matrix of a
+                non-transposed Faust.
+
+        Raises:
+            ValueError.
+
+
+        Examples:
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(5, [50, 100], .5)
+            >>> f0 = F.get_factor(0)
+
+        <b/> See also Faust.get_num_factors, Faust.transpose
+        """
+        fact = F.m_faust.get_fact_opt(i)
+        return fact
+
+    def get_factor_nonopt(F, i):
+        """
+        DEPRECATED: use Faust.get_factor
+        Returns the i-th factor of F.
+
+        Args:
+            F: the Faust object.
+            i: the factor index.
+
+        Returns:
+            a copy of the i-th factor as a dense matrix (of type numpy.ndarray).
 
         Raises:
             ValueError.
@@ -1173,6 +1204,24 @@ class StoppingCriterion(object):
                              "the stopping criterion.")
 
 class ConstraintName:
+    """
+    Attributes:
+        SP: Designates a constraint on the sparsity/0-norm of a matrix.
+        SPCOL: Designates a sparsity/0-norm constraint on the columns of a
+        matrix.
+        SPLIN: Designates a sparsity/0-norm constraint on the lines of a
+        matrix.
+        SPLINCOL: Designates a constraint that imposes both SPLIN and SPCOL
+        constraints.
+        SP_POS: Designates a constraint that imposes a SP constraints and
+        besides erase the negative coefficients (it doesn't apply to complex
+        matrices).
+        NORMCOL: Designates a 2-norm constraint on the columns of a matrix.
+        NORMLIN: Designates a 2-norm constraint on the lines of a matrix.
+        CONST: Designates a constraint imposing to a matrix to be constant.
+
+        
+    """
     SP = 0 # Int Constraint
     SPCOL = 1 # Int Constraint
     SPLIN=2 # Int Constraint
@@ -1205,45 +1254,106 @@ class ConstraintName:
         return self.name in [ConstraintName.SUPP, ConstraintName.CONST ]
 
 class ConstraintGeneric(object):
+    """
+    This is the parent class for representing a factor constraint in FAµST factorization algorithms.
 
-    def __init__(self, name, num_rows, num_cols, param):
-        self.value = name
-        self.num_rows = num_rows
-        self.num_cols = num_cols
-        self.param = param
+    This class shouldn't be instantiated, rather rely on sub-classes.
+
+    <b/> See also: ConstraintInt, ConstraintReal, ConstraintMat, FaustFactory.fact_palm4msa, FaustFactory.fact_hierarchical.
+
+    Attributes:
+        _name: The name of the constraint applied to the factor (ConstraintName instance).
+        _num_rows: The number of rows to constrain the factor to.
+        _num_cols: The number of columns to constrain the factor to.
+        _cons_value: The parameter value of the constraint.
+
+    """
+
+    def __init__(self, name, num_rows, num_cols, cons_value):
+        """
+        Constructs a generic constraint.
+
+        Args:
+            name: the name of the constraint applied to the factor (ConstraintName instance).
+            num_rows: the number of rows to constrain the factor to.
+            num_cols: the number of columns to constrain the factor to.
+            cons_value: the parameter value of the constraint.
+
+        """
+        self._name = name
+        self._num_rows = num_rows
+        self._num_cols = num_cols
+        self._cons_value = cons_value
 
     @property
     def name(self):
-        return self.value.name
+        """
+            Property to access the ConstraintName of the constraint.
+        """
+        return self._name.name
 
     def is_int_constraint(self):
-        return self.value.is_int_constraint()
+        """
+            Returns True if this constraint is a ConstraintInt, False otherwise.
+        """
+        return self._name.is_int_constraint()
 
     def is_real_constraint(self):
-        return self.value.is_real_constraint()
+        """
+            Returns True if this constraint is a ConstraintReal, False otherwise.
+        """
+        return self._name.is_real_constraint()
 
     def is_mat_constraint(self):
-        return self.value.is_mat_constraint()
+        """
+            Returns True if this constraint is a ConstraintMat, False otherwise.
+        """
+        return self._name.is_mat_constraint()
 
 class ConstraintReal(ConstraintGeneric):
+    """
+        This class represents a real constraint on a matrix-factor.
 
-    def __init__(self, name, num_rows, num_cols, param):
-        super(ConstraintReal, self).__init__(name, num_rows, num_cols, param)
-        if(not isinstance(param, np.float) and not isinstance(param, np.int)):
-            raise TypeError('ConstraintReal must receive a float as param '
+        It constrains a matrix by a column/row-vector 2-norm
+        (ConstraintName.NORMCOL, ConstraintName.NORMLIN).
+
+    """
+    def __init__(self, name, num_rows, num_cols, cons_value):
+        """
+        Constructs a real type constraint.
+
+        Args:
+            name: the name of the constraint applied to the factor. It must be
+            a ConstraintName instance.
+            num_rows: the number of rows to constrain the factor to.
+            num_cols: the number of columns to constrain the factor to.
+            cons_value: the parameter value of the constraint, it must be a
+            float number that designates the 2-norm imposed to all columns (if
+            name.name == ConstraintName.NORMCOL) or rows (if
+            name.name == ConstraintName.NORMLIN).
+        """
+        super(ConstraintReal, self).__init__(name, num_rows, num_cols, cons_value)
+        if(not isinstance(cons_value, np.float) and not isinstance(cons_value, np.int)):
+            raise TypeError('ConstraintReal must receive a float as cons_value '
                             'argument.')
-        self.param = float(self.param)
+        self._cons_value = float(self._cons_value)
         if(not isinstance(name, ConstraintName) or not name.is_real_constraint()):
             raise TypeError('ConstraintReal first argument must be a '
                             'ConstraintName with a real type name '
                             '(name.is_real_constraint() must return True).')
 
 class ConstraintInt(ConstraintGeneric):
+    """
+        This class represents an integer constraint on a matrix-factor.
 
-    def __init__(self, name, num_rows, num_cols, param):
-        super(ConstraintInt, self).__init__(name, num_rows, num_cols, param)
-        if(not isinstance(param, np.int)):
-            raise TypeError('CosntraintInt must receive a int as param '
+        It constrains a matrix by its column/row-vectors sparsity or 0-norm
+        (ConstraintName.SPLIN, ConstraintName.SPCOL, ConstraintName.SPLINCOL).
+
+    """
+    def __init__(self, name, num_rows, num_cols, cons_value):
+        super(ConstraintInt, self).__init__(name, num_rows, num_cols, cons_value)
+        if(not isinstance(cons_value, np.int)):
+            raise TypeError('ConstraintInt must receive a int as cons_value '
                             'argument.')
         if(not isinstance(name, ConstraintName) or not name.is_int_constraint()):
             raise TypeError('ConstraintInt first argument must be a '
@@ -1252,13 +1362,13 @@ class ConstraintInt(ConstraintGeneric):
 
 class ConstraintMat(ConstraintGeneric):
 
-    def __init__(self, name, num_rows, num_cols, param):
-        super(ConstraintMat, self).__init__(name, num_rows, num_cols, param)
-        if(not isinstance(param, np.matrix) and not isinstance(param,
+    def __init__(self, name, num_rows, num_cols, cons_value):
+        super(ConstraintMat, self).__init__(name, num_rows, num_cols, cons_value)
+        if(not isinstance(cons_value, np.matrix) and not isinstance(cons_value,
                                                                np.ndarray)):
-            raise TypeError('ConstraintMat must receive a numpy matrix as param '
+            raise TypeError('ConstraintMat must receive a numpy matrix as cons_value '
                             'argument.')
-        self.param = float(self.param)
+        self.cons_value = float(self.cons_value)
         if(not isinstance(name, ConstraintName) or not name.is_mat_constraint()):
             raise TypeError('ConstraintMat first argument must be a '
                             'ConstraintName with a matrix type name'

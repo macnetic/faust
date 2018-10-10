@@ -71,9 +71,20 @@ class FaustCoreCpp
     double get_nb_factors() const;
     unsigned int get_fact_nb_rows(unsigned int& i) const;
     unsigned int get_fact_nb_cols(unsigned int& i) const;
-    void get_fact(unsigned int& i, FPP* fact_ptr) const;
+    void get_fact(const unsigned int& i, FPP* fact_ptr) const;
+    void get_fact_sparse(const unsigned int& i,
+            int* rowptr,
+            int* col_ids,
+            FPP* elts,
+            const bool transpose = false) const;
+    void get_fact_dense(const unsigned int& i, FPP* elts,
+            unsigned int* num_rows, unsigned int* num_cols,
+            const bool transpose) const;
+    faust_unsigned_int get_fact_nnz(const faust_unsigned_int) const;
+    bool is_fact_sparse(const faust_unsigned_int id) const;
     FaustCoreCpp<FPP>* slice(unsigned int, unsigned int, unsigned int, unsigned int);
     void save_mat_file(const char* filepath) const;
+    const bool isTransposed();
     FaustCoreCpp<FPP>* transpose();
     FaustCoreCpp<FPP>* conjugate();
     FaustCoreCpp<FPP>* adjoint();

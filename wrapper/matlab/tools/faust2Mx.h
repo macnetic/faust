@@ -55,6 +55,7 @@ namespace Faust {
 	template<typename FPP, Device DEVICE> class MatSparse;
 	template<typename FPP, Device DEVICE> class Transform;
 	template<typename FPP, Device DEVICE> class LinearOperator;
+	template<typename FPP, Device DEVICE> class TransformHelper;
 }
 
 
@@ -89,7 +90,7 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<std::complex<FPP>,Cpu>& M);
 // split complex value ptr into real value ptr and imaginary value ptr,
 //real_ptr and imag_ptr must be allocated for nb_element
 template<typename FPP>
-void splitComplexPtr(const std::complex<FPP>*  cpx_ptr, int nb_element, FPP* & real_ptr, FPP* & imag_ptr);
+void splitComplexPtr(const std::complex<FPP>*  cpx_ptr, int nb_element, FPP* & real_ptr, FPP* & imag_ptr, const bool conjugate = false);
 template<typename FPP>
 void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data);
 
@@ -106,6 +107,18 @@ void setCellFacts(mxArray ** cellFacts,std::vector<Faust::MatDense<FPP,Cpu> > & 
 template<typename FPP>
 void DisplayParams(const Faust::Params<FPP,Cpu> & params);
 
+
+template<typename FPP>
+mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP,Cpu>* core_ptr);
+
+template<typename FPP>
+mxArray* transformFact2SparseMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,Cpu>* core_ptr);
+
+template<typename FPP>
+mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<FPP,Cpu>* core_ptr);
+
+template<typename FPP>
+mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,Cpu>* core_ptr);
 
 #include "faust2Mx.hpp"
 

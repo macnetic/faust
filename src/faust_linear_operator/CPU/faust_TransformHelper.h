@@ -57,7 +57,37 @@ namespace Faust {
 			faust_unsigned_int size() const;
 			void display() const;
 			string to_string() const;
+			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
+			unsigned int get_fact_nb_rows(const faust_unsigned_int id) const;
+			unsigned int get_fact_nb_cols(const faust_unsigned_int id) const;
+			unsigned int get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const;
 			MatDense<FPP,Cpu> get_fact(faust_unsigned_int id) const;
+			void get_fact(const faust_unsigned_int id,
+					const int** rowptr,
+					const int** col_ids,
+					const FPP** elts,
+					faust_unsigned_int* nnz,
+					faust_unsigned_int* num_rows,
+					faust_unsigned_int* num_cols) const;
+			void get_fact(const faust_unsigned_int id,
+				int* rowptr,
+				int* col_ids,
+				FPP* elts,
+				faust_unsigned_int* nnz,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols,
+				const bool transpose=false) const;
+			void get_fact(const faust_unsigned_int id,
+					const FPP** elts,
+					faust_unsigned_int* num_rows,
+					faust_unsigned_int* num_cols) const;
+			void get_fact(const faust_unsigned_int id,
+					FPP* elts,
+					faust_unsigned_int* num_rows,
+					faust_unsigned_int* num_cols,
+					const bool transpose = false) const;
+			bool is_fact_sparse(const faust_unsigned_int id) const;
+			bool is_fact_dense(const faust_unsigned_int id) const;
 			const Transform<FPP, Cpu>* eval_sliced_Transform() const;
 			TransformHelper<FPP, Cpu>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);

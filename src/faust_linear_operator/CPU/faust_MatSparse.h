@@ -147,7 +147,7 @@ namespace Faust
 
 			//!  \brief Constructor : from CCS (Compressed Column Storage) format
 			template<typename FPP1>
-				MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP1* value, const int* row_ptr, const int* id_col);
+				MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP1* value, const int* row_ptr, const int* id_col, const bool transpose = false);
 
 			void set(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP* value, const size_t* id_row, const size_t* col_ptr);
 			void resize(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
@@ -195,7 +195,8 @@ namespace Faust
 			//! return col index of length nnz
 			int* getInnerIndexPtr(){return mat.innerIndexPtr();}
 			const int* getInnerIndexPtr()const{return mat.innerIndexPtr();}
-
+			
+			//TODO: indices should be unsigned int
 			const int* getRowPtr()const{if(mat.IsRowMajor) return mat.outerIndexPtr(); else{handleError(m_className,"getRowPtr : matrix is not in rowMajor");}}
 			const int* getColInd()const{if(mat.IsRowMajor) return mat.innerIndexPtr(); else{handleError(m_className,"getColInd : matrix is not in rowMajor");}}
 			int* getRowPtr(){if(mat.IsRowMajor) return mat.outerIndexPtr(); else{handleError(m_className,"getRowPtr : matrix is not in rowMajor");}}

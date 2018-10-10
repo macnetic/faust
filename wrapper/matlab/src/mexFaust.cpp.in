@@ -255,11 +255,11 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
             }
 
             // get_fact : return the id factor of the faust
-            if (!strcmp("get_fact", cmd))
+            if (!strcmp("get_fact_nonopt", cmd))
             {
                 if (nlhs > 1 || nrhs != 3)
                 {
-                    mexErrMsgTxt("get_fact : incorrect number of arguments.");
+                    mexErrMsgTxt("get_factor_nonopt : incorrect number of arguments.");
                 }
                 int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
 
@@ -270,6 +270,21 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
                 return;
             }
 
+            // get_fact : return the id-th factor of the faust
+            if (!strcmp("get_fact", cmd))
+            {
+                if (nlhs > 1 || nrhs != 3)
+                {
+                    mexErrMsgTxt("get_factor : incorrect number of arguments.");
+                }
+                int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
+
+				if(core_ptr->is_fact_sparse(id_fact))
+					plhs[0] = transformFact2SparseMxArray(id_fact,core_ptr);
+				else
+					plhs[0] = transformFact2FullMxArray(id_fact,core_ptr);
+                return;
+            }
 
             if (!strcmp("get_nb_factor", cmd))
             {

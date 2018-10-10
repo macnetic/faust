@@ -128,7 +128,30 @@ namespace Faust
 				/** \brief return a copy of the factor of index id
 				//  \warning dynamic memory allocation is made for the return pointer if cloning_fact == true*/
 				Faust::MatGeneric<FPP,Cpu>* get_fact(faust_unsigned_int id, const bool cloning_fact = true) const;
-
+				bool is_fact_sparse(const faust_unsigned_int id) const;
+				bool is_fact_dense(const faust_unsigned_int id) const;
+				faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
+				void get_fact(const faust_unsigned_int id,
+						 const int** row_ids,
+						 const int** col_ids,
+						 const FPP** elts,
+						 faust_unsigned_int* size,
+						 faust_unsigned_int* num_rows,
+						 faust_unsigned_int* num_cols) const;
+				void get_fact(const faust_unsigned_int id,
+						int* d_outer_count_ptr, int* d_inner_ptr, FPP* d_elts,
+						faust_unsigned_int* nnz,
+						faust_unsigned_int* num_rows, faust_unsigned_int* num_cols,
+						const bool transpose=false) const;
+				void get_fact(const faust_unsigned_int id,
+						const FPP** elts,
+						faust_unsigned_int* num_rows,
+						faust_unsigned_int* num_cols) const;
+				void get_fact(const faust_unsigned_int id,
+						FPP* elts,
+						faust_unsigned_int* num_rows,
+						faust_unsigned_int* num_cols,
+						const bool transpose=false) const;
 				faust_unsigned_int getNbRow() const;
 				faust_unsigned_int getNbCol() const;
 				void print_file(const char* filename) const;
