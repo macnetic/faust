@@ -30,12 +30,12 @@ The following paper can come as complement:
 [2] [Le Magoarou L. and Gribonval R., Gramfort A., “FAµST: speeding up linear transforms for tractable inverse problems“](https://hal.archives-ouvertes.fr/hal-01156478v1)
 
 The FAµST toolbox was initially released as a Matlab implementation ([versions 1.x](http://faust.inria.fr/download/faust-1-x/)).
-<br/>Since version 2.0, it has been implemented in C++. Besides, the development of wrappers has made that C++ core accessible from Matlab and Python programming languages.
+<br/>Since version 2.0, it has been implemented in C++. Besides, the development of wrappers has made this C++ core accessible from Matlab and Python programming languages.
 
 
 \section Credits
 
-FAµST is developed in the [PANAMA team](https://team.inria.fr/panama/) at [INRIA Rennes](https://hal.archives-ouvertes.fr/hal-01156478v1). <br>
+FAµST is developed in the [PANAMA team](https://team.inria.fr/panama/) at [INRIA Rennes](https://www.inria.fr/en/centre/rennes). <br>
 For more information on the FAµST Project, please visit the website [faust.inria.fr](http://faust.inria.fr). <br>
 
 
