@@ -192,18 +192,27 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 	totalNonZeros(0)
 {
 	data.resize(facts.size());
-	for (int i=0 ; i<data.size() ; i++)
-	{
-		if(cloning_fact)
-			data[i]=facts[i]->Clone(optimizedCopy);
+	if(data.size() > 0) {
+		if(cloning_fact || lambda_ != FPP(1.0))
+		{
+			data[0] = facts[0]->Clone(optimizedCopy);
+		}
 		else
-			data[i] = facts[i];
-		totalNonZeros += data[i]->getNonZeros();
+			data[0] = facts[0];
+		totalNonZeros += data[0]->getNonZeros();
+		for (int i=1 ; i<data.size() ; i++)
+		{
+			if(cloning_fact)
+				data[i]=facts[i]->Clone(optimizedCopy);
+			else
+				data[i] = facts[i];
+			totalNonZeros += data[i]->getNonZeros();
+		}
+
+		if(lambda_ != FPP(1.0))
+			(*data[0]) *= lambda_;
+
 	}
-
-	if(lambda_ != FPP(1.0) && data.size()>0)
-		(*data[0]) *= lambda_;
-
 #ifdef __COMPILE_TIMERS__
 	this->t_multiply_vector.resize(data.size());
 #endif
