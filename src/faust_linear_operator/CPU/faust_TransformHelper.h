@@ -31,10 +31,10 @@ namespace Faust {
 			bool is_conjugate;
 			bool is_sliced;
 			Slice slices[2];
-
+			Transform<FPP,Cpu>* sliced_transform;
 			shared_ptr<Transform<FPP,Cpu>> transform;
 
-
+			const Transform<FPP, Cpu>* eval_sliced_Transform();
 			public:
 			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=true, const bool cloning_fact = true);
 			TransformHelper();
@@ -89,7 +89,6 @@ namespace Faust {
 					const bool transpose = false) const;
 			bool is_fact_sparse(const faust_unsigned_int id) const;
 			bool is_fact_dense(const faust_unsigned_int id) const;
-			const Transform<FPP, Cpu>* eval_sliced_Transform() const;
 			TransformHelper<FPP, Cpu>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 			MatDense<FPP,Cpu> get_product() const;
