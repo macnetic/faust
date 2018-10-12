@@ -81,6 +81,7 @@ cdef extern from "FaustCoreCpp.h" :
         FaustCoreCpp[FPP]* conjugate()
         FaustCoreCpp[FPP]* adjoint()
         FaustCoreCpp[FPP]* mul_faust(FaustCoreCpp[FPP]*)
+        FaustCoreCpp[FPP]* mul_scal(FPP scal)
         @staticmethod
         FaustCoreCpp[FPP]* randFaust(unsigned int t,
                                              unsigned int min_num_factors, unsigned int max_num_factors,

@@ -88,6 +88,15 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::mul_faust(FaustCoreCpp<FPP>* right)
 }
 
 template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::mul_scal(FPP scal)
+ {
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform.multiply(scal);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
+    core->transform = th;
+    return core;
+}
+
+template<typename FPP>
 void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x)const
 {
 

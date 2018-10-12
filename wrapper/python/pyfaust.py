@@ -59,7 +59,7 @@ class Faust:
     manipulating directly the corresponding (dense) numpy array/matrix.
 
     A particular example is the matrix associated to the discrete Fourier
-    transform, which can be represented exactly as a MuST, leading to a fast and
+    transform, which can be represented exactly as a Faust, leading to a fast and
     compact implementation.
 
     Although the sparse matrices are more interesting for optimization it's not
@@ -383,20 +383,21 @@ class Faust:
 
     def __mul__(F, A):
         """
-        Multiplies F by A which is a dense matrix or a Faust object.
+        Multiplies F by A which is a dense matrix, a Faust object or a scalar number.
 
         This method overloads a Python function/operator.
 
         NOTE: The primary goal of this function is to implement “fast” multiplication by a
-        MuST, which is the operation performed when A is a standard matrix (dense or
+        Faust, which is the operation performed when A is a standard matrix (dense or
         sparse).
         In the best cases, F*A is F.rcg() times faster than performing the
         equivalent F.toarray()*A.
-        <br/>When A is a MuST, F*A is itself a MuST.
+        <br/>When A is a Faust, F*A is itself a Faust.
 
         Args:
             F: the Faust object.
-            A: is a Faust object or a 2D dense matrix (numpy.ndarray, numpy.matrix).
+            A: is a scalar number or a Faust object or a 2D dense matrix (numpy.ndarray,
+            numpy.matrix).
             <br/> In the latter case, A must be Fortran contiguous (i.e. Column-major order;
                 `order' argument passed to np.ndararray() must be equal to str
                 'F').
@@ -404,7 +405,8 @@ class Faust:
         Returns:
             the result of the multiplication as a numpy.ndarray if A is a
             ndarray.<br/>
-            The result of the multiplication as a Faust object if A is a Faust.
+            The result of the multiplication as a Faust object if A is a Faust
+            or a scalar number.
 
         Raises:
             ValueError
@@ -429,6 +431,8 @@ class Faust:
                                                           "the two Fausts must "
                                                           "agree.")
             return Faust(core_obj=F.m_faust.multiply(A.m_faust))
+        elif(isinstance(A, float) or isinstance(A, int) or isinstance(A, np.complex)):
+            return Faust(core_obj=F.m_faust.multiply_scal(A))
         else:
             return F.m_faust.multiply(A)
 
@@ -437,7 +441,7 @@ class Faust:
         Converts the current Faust into a numpy array.
 
         WARNING: Using this function is discouraged except for test purposes,
-        as it loses the main potential interests of the MuST structure:
+        as it loses the main potential interests of the Faust structure:
         compressed memory storage and faster matrix-vector multiplication
         compared to its equivalent dense matrix representation.
 
@@ -474,7 +478,7 @@ class Faust:
         Converts the current Faust into a numpy matrix.
 
         WARNING: Using this function is discouraged except for test purposes,
-        as it loses the main potential interests of the MuST structure:
+        as it loses the main potential interests of the Faust structure:
         compressed memory storage and faster matrix-vector multiplication
         compared to its equivalent dense matrix representation.
 

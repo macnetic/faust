@@ -193,6 +193,28 @@ cdef class FaustCore:
         raise ValueError("F must be a Faust object")
 
 
+    def multiply_scal(self, scalar):
+        core = FaustCore(core=True)
+        if(isinstance(scalar, int)):
+            scalar = float(scalar)
+        if(self._isReal):
+            if(isinstance(scalar, float)):
+                core.core_faust_dbl = \
+                        self.core_faust_dbl.mul_scal(scalar)
+            else:
+                raise Exception("You cannot multiply a real Faust by a"
+                                " complex scalar (not yet implemented).")
+        else:
+            if(isinstance(scalar, np.complex) or isinstance(scalar,
+                                                            float)):
+                core.core_faust_cplx = \
+                        self.core_faust_cplx.mul_scal(scalar)
+            else:
+                raise Exception("The multiplicative scalar must be a real or "
+                                "a complex number.")
+        core._isReal = self._isReal
+        return core
+
 
 
 
