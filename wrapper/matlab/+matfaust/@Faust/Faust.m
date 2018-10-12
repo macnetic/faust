@@ -210,7 +210,7 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief Multiplies the Faust F by A which is a dense matrix or a Faust object.
+		%> @brief Multiplies the Faust F by A which is a dense matrix, a Faust object or a scalar.
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
@@ -221,11 +221,11 @@ classdef Faust
 		%>
 		%>
 		%> @b NOTE: The primary goal of this function is to implement “fast” multiplication by a
-		%> MuST, which is the operation performed when A is a standard matrix (dense or
+		%> Faust, which is the operation performed when A is a standard matrix (dense or
 		%> sparse).
 		%> In the best cases, F*A is rcg(F) times faster than performing the
 		%> equivalent full(F)*A.
-		%> <br/>When A is a MuST, F*A is itself a MuST.
+		%> <br/>When A is a Faust, F*A is itself a Faust.
 		%>
 		%> @param F the Faust object.
 		%> @param A The dense matrix to multiply or a Faust object.
@@ -301,6 +301,12 @@ classdef Faust
 					C = matfaust.Faust(F, mexFaustReal('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
 				else
 					C = matfaust.Faust(F, mexFaustCplx('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
+				end
+			elseif(isscalar(A))
+				if (F.isReal)
+					C = matfaust.Faust(F, mexFaustReal('mul_scalar', F.matrix.objectHandle, A));
+				else
+					C = matfaust.Faust(F, mexFaustCplx('mul_scalar', F.matrix.objectHandle, A));
 				end
 			elseif (F.isReal)
 				if (isreal(A))

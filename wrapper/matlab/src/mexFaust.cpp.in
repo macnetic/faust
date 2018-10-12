@@ -72,6 +72,7 @@
 
 
 typedef @FAUST_SCALAR@ SCALAR;
+typedef @FAUST_FPP@ FPP;
 
 using namespace Faust;
 
@@ -542,7 +543,21 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
             return;
 
         }
-		//     // Call the various class methods
+
+		if(!strcmp("mul_scalar", cmd)) {
+			//complex Faust times real scalar OK
+			//complex Faust times complex oK
+			//real Faust times complex NOT OK
+			//real Faust times real OK
+			if(mxIsComplex(prhs[2]) && (typeid(SCALAR) == typeid(double) || typeid(SCALAR) == typeid(float)))
+				mexErrMsgTxt("You cannot multiply a real Faust by a complex scalar.");
+
+			SCALAR scalar;
+			mxArray2Scalar<FPP>(prhs[2], &scalar);
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->multiply(scalar);
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+			return;
+		}		//     // Call the various class methods
 		//     // Train
 		//     if (!strcmp("train", cmd)) {
 		//         // Check parameters

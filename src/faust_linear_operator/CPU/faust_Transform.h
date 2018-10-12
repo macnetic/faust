@@ -67,6 +67,7 @@ namespace Faust
 	template<typename FPP,Device DEVICE> class MatSparse;
 	template<Device DEVICE> class BlasHandle;
 	template<Device DEVICE> class SpBlasHandle;
+	template<typename FPP, Device DEVICE> class TransformHelper;
 
 
 	// forward definition of friend function
@@ -262,6 +263,7 @@ namespace Faust
 				// friend function
 				friend Faust::Vect<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
 				friend Faust::MatDense<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
+				friend TransformHelper<FPP,Cpu>;
 		};
 
 }

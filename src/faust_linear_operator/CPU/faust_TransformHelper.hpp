@@ -21,24 +21,18 @@ namespace Faust {
 																						is_conjugate(false),
 																						is_sliced(false)
 	{
-		//TODO: transform is useless
-		//		Transform<FPP,Cpu>* transform = new Transform<FPP,Cpu>(facts, lambda_, optimizedCopy, cloning_fact);
 		this->transform = make_shared<Transform<FPP,Cpu>>(facts, lambda_, optimizedCopy, cloning_fact);
 	}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false), is_sliced(false)
 	{
-		//TODO: transform is useless
-		//		Transform<FPP,Cpu>* transform = new Transform<FPP,Cpu>();
 		this->transform = make_shared<Transform<FPP,Cpu>>();
 	}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(Transform<FPP,Cpu> &t) : is_transposed(false), is_conjugate(false), is_sliced(false)
 	{
-		//TODO: transform is useless
-		//		Transform<FPP,Cpu>* transform = new Transform<FPP,Cpu>();
 		this->transform = make_shared<Transform<FPP,Cpu>>(t);
 	}
 
@@ -132,6 +126,26 @@ namespace Faust {
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::multiply(TransformHelper<FPP, Cpu>* th_right)
 		{
 			return new TransformHelper<FPP,Cpu>(this, th_right);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::multiply(FPP& scalar)
+		{
+			const vector<MatGeneric<FPP,Cpu>*>& vec = transform->data; //TransformHelper is a friend class of Transform // we can access private attribute data
+			//the point here is to minimize the number of copies (with direct access)
+			// the constructor then will copy the factors from the vector
+			Transform<FPP,Cpu>* t = new Transform<FPP,Cpu>(vec, scalar, false, true); //optimizedCopy == false, cloning_fact == true
+			TransformHelper<FPP,Cpu>* th  = new TransformHelper<FPP,Cpu>(*t);
+			//TODO: refactor the attributes copy ? 
+			th->is_transposed = is_transposed;
+			th->is_conjugate = is_conjugate;
+			th->is_sliced = is_sliced;
+			if(is_sliced)
+			{
+				th->slices[0] = Slice(slices[0]);
+				th->slices[1] = Slice(slices[1]);
+			}
+			return th;
 		}
 
 	template<typename FPP>
@@ -430,7 +444,7 @@ namespace Faust {
 				}
 				return th;
 			}
-			return this->transform.get(); //need to return the stored Transform object ptr
+			return this->transform.get(); //needed to return the stored Transform object ptr
 		}
 
 	template<typename FPP>

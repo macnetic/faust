@@ -49,6 +49,7 @@ namespace Faust {
 			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose);
 			TransformHelper<FPP, Cpu>* multiply(TransformHelper<FPP, Cpu>*);
+			TransformHelper<FPP, Cpu>* multiply(FPP& scalar);
 			void push_back(const MatGeneric<FPP,Cpu>* M);
 			faust_unsigned_int getNbRow() const;
 			faust_unsigned_int getNbCol() const;

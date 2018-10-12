@@ -120,6 +120,13 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 template<typename FPP>
 mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper<complex<FPP>,Cpu>* core_ptr);
 
+template<typename FPP>
+void mxArray2Scalar(const mxArray* scalar, typename std::enable_if<std::is_floating_point<FPP>::value,FPP>::type* out);
+
+
+template<typename FPP>
+void mxArray2Scalar(const mxArray* scalar, complex<FPP>* out);
+
 #include "faust2Mx.hpp"
 
 #endif
