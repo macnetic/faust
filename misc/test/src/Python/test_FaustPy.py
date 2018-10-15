@@ -208,6 +208,15 @@ class TestFaustPy(unittest.TestCase):
                 self.assertEqual(prod[i, rand_j], 0)
             else:
                 self.assertLessEqual(abs(col[i,0]-(prod[i,rand_j]))/prod[i,rand_j],10**-6)
+        # test that the sliced Faust is consistent with the sliced full matrix
+        # of the Faust
+        rand_ii, rand_jj = self.r.randint(0,self.F.shape[0]),self.r.randint(0,self.F.shape[1])
+        si1 = min(rand_i,rand_ii)
+        si2 = max(rand_i,rand_ii)
+        sj1 = min(rand_j,rand_jj)
+        sj2 = max(rand_j,rand_jj)
+        sF = self.F[si1:si2,sj1:sj2]
+        self.assertTrue((sF.todense() == self.F.todense()[si1:si2,sj1:sj2]).all())
 
     def testToDense(self):
         print("testToDense()")
