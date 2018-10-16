@@ -152,7 +152,27 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			% matrix to factorize and reference relative error come from
 			% misc/test/src/C++/hierarchicalFactorization.cpp
 			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.99275, 'AbsTol', 0.00001)
-		end	end
+		end
+
+		function testHadamard(this)
+			disp('Test FaustFactory.hadamard()')
+			import matfaust.*
+			n = randi([1,10]);
+			H = FaustFactory.hadamard(n);
+			fH = full(H);
+			this.verifyEqual(nnz(fH), numel(fH));
+			i = 1;
+			while(i<2^n-1)
+				j = i + 1;
+				while(j<2^n)
+					this.verifyEqual(fH(i,:)*fH(j,:)',0);
+					j = j + 1;
+				end
+				i = i + 1;
+			end
+		end
+
+	end
 
 	methods
 		function faust_test = FaustFactoryTest(varargin)
