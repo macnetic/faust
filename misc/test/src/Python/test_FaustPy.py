@@ -473,6 +473,18 @@ class TestFaustFactory(unittest.TestCase):
         # misc/test/src/C++/test_palm4MSA.cpp
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.9094, places=4)
 
+    def testHadamard(self):
+        print("Test FaustFactory.hadamard()")
+        from pyfaust import FaustFactory
+        pow2_exp = random.Random().randint(1,10)
+        H = FaustFactory.hadamard(pow2_exp)
+        fH = H.todense()
+        self.assertEqual(np.count_nonzero(fH), fH.size)
+        for i in range(0,2**pow2_exp-1):
+            for j in range(i+1,2**pow2_exp):
+                self.assertTrue((fH[i,::].dot(fH[j,::].T) == 0).all())
+
+
 
 if __name__ == "__main__":
     if(len(sys.argv)> 1):
