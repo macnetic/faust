@@ -103,6 +103,7 @@ namespace Faust {
 			double normL1() const;
 			double normFro() const;
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f);
+			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n);
 			~TransformHelper();
 
 			private:

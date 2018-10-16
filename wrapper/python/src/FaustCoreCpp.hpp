@@ -317,7 +317,17 @@ template<typename FPP>
       return core;
   }
 
-    template<typename FPP>
+template<typename FPP>
+  FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::hadamardFaust(unsigned int n)
+{
+      Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::hadamardFaust(n);
+      if(!th) return NULL;
+      FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
+      core->transform = th;
+      return core;
+}
+
+template<typename FPP>
 FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::adjoint()
 {
     Faust::TransformHelper<FPP,Cpu>* th = this->transform.adjoint();

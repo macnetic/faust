@@ -155,6 +155,15 @@ cdef class FaustCore:
                              " 4 for complex")
         return core
 
+    @staticmethod
+    def hadamardFaust(n):
+        core = FaustCore(core=True)
+        core.core_faust_dbl = FaustCoreCy.FaustCoreCpp[double].hadamardFaust(n)
+        # hadamard is always a real Faust
+        core._isReal = True
+        # TODO: handle error for the object returned
+        return core
+
     #### METHOD ####
     #~ 	def getNbRow(self):
         #~ 		#return self.core_faust_dbl.getNbRow();

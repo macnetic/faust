@@ -1010,6 +1010,11 @@ class FaustFactory:
         return Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
 
     @staticmethod
+    def hadamard(n):
+        H = Faust(core_obj=FaustCorePy.FaustCore.hadamardFaust(n))
+        return H
+
+    @staticmethod
     def rand(num_factors, dim_sizes, density=0.1, fac_type="mixed",
                   is_real=True):
         """

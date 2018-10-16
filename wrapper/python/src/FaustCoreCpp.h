@@ -93,6 +93,7 @@ class FaustCoreCpp
             unsigned int min_num_factors, unsigned int max_num_factors,
             unsigned int min_dim_size,
             unsigned int max_dim_size, float density);
+    static FaustCoreCpp<FPP>* hadamardFaust(unsigned int n);
     private :
     Faust::TransformHelper<FPP,Cpu> transform;
 };

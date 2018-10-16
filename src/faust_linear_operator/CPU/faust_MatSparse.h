@@ -52,6 +52,7 @@
 
 // modif AL AL
 #include "faust_Transform.h"
+#include "faust_TransformHelper.h"
 #include "matio.h"
 #include <random>
 //! \class Faust::MatSparse<FPP,Cpu> faust_MatSparse.h
@@ -301,6 +302,7 @@ namespace Faust
 			//! *this = S * (*this)
 			friend void  Faust::Vect<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);
 			friend double Faust::Transform<FPP,Cpu>::normL1() const;
+			friend Faust::TransformHelper<FPP,Cpu>; //TODO: limit to hadamardFaust
 			/*friend void  Faust::MatDense<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);*/
 
 			// MODIF AL WARNING, ERROR WITH VISUAL STUDIO 2013 compiler
