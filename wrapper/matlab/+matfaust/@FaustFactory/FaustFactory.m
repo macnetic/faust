@@ -157,6 +157,18 @@ classdef FaustFactory
 			F = Faust(core_obj, isreal(M));
 		end
 
+
+		function H = hadamard(n)
+			core_obj = mexFaustReal('hadamard', n);
+			is_real = true;
+			% TODO: check n (must be integer > 0)
+			% TODO: handle errors on returned core_obj
+%			if(core_obj == 0)
+%				throw(e)
+%			end
+			H = matfaust.Faust(core_obj, is_real);
+		end
+
 		%==========================================================================================
 		%> @brief Generates a random Faust.
 		%>

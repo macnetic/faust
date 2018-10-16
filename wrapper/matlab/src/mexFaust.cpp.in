@@ -144,6 +144,28 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 
 		}
 
+			if(!strcmp("hadamard", cmd)){
+				if(nlhs!=1)
+					mexErrMsgTxt("hadamard(): 1 variable result is expected.");
+				if(nrhs < 2)
+					mexErrMsgTxt("hadamard(): wrong number of arguments (must be 2)");
+				//printf("mexFaust.cpp hadamard(): retrieving arguments\n");
+				unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
+
+				//printf("mexFaust.cpp hadamard(): faust creation\n");
+				Faust::TransformHelper<SCALAR,Cpu>* H = Faust::TransformHelper<SCALAR,Cpu>::hadamardFaust(n);
+				H->display();
+				if(H) //not NULL
+					plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(H);
+				else {
+					plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+					double* ptr_out = (double*) mxGetData(plhs[0]);
+					ptr_out[0]=(double) 0;
+				}
+				return;
+
+			}
+
             // New
             if (!strcmp("new", cmd))
             {
