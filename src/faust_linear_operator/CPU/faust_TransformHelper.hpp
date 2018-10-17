@@ -6,7 +6,7 @@ namespace Faust {
 		void conjugate(complex<FPP>* elts, faust_unsigned_int n)
 		{
 			for(faust_unsigned_int i=0; i< n; i++)
-				elts[i] = complex<FPP>(elts[i].real(), elts[i].imag());
+				elts[i] = complex<FPP>(elts[i].real(), - elts[i].imag());
 		}
 
 	template<typename FPP>

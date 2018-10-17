@@ -726,6 +726,7 @@ end
 for i=1:nb_fact
 	A=get_factor(F_conj,i);
 	if(~isequal(A,conj(factors{i})))
+		conj(factors{i})
         get_factor(F_conj,i)
 		error('get_fact : invalid factor');
 	end
@@ -766,6 +767,7 @@ end
 for i=1:nb_fact
 	A=get_factor(F_ctranspose,i)
 	if(~isequal(A,ctranspose(factors{nb_fact-i+1})))
+		ctranspose(factors{nb_fact-i+1})
         get_factor(F_ctranspose,i)
 		error('get_fact : invalid factor');
 	end

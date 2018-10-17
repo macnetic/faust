@@ -383,7 +383,7 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 		// cause it needs to be reordered
 		complex<FPP>* src_data_ptr = (complex<FPP>*) malloc(sizeof(complex<FPP>)*dim_sizes[0]*dim_sizes[1]); // TODO: alloc-free in c++ style (new/delete)
 		core_ptr->get_fact(id, src_data_ptr, &num_rows, &num_cols);
-		splitComplexPtr(src_data_ptr, num_cols*num_rows, data_ptr, img_data_ptr, core_ptr->isConjugate());
+		splitComplexPtr(src_data_ptr, num_cols*num_rows, data_ptr, img_data_ptr/*, core_ptr->isConjugate()*/); //let conjugate to false because it's handled internally by get_fact()
 		free(src_data_ptr);
 		// it's different to real transformFact2FullMxArray() case here
 		// because with complex we need to split im/real (until we stop to use separated complex API)
@@ -395,7 +395,8 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 		const complex<FPP>* src_data_ptr;
 		//not calling the same prototype of get_fact() called in transpose case (and real version of this function)
 		core_ptr->get_fact(id, &src_data_ptr, &num_rows, &num_cols);
-		splitComplexPtr(src_data_ptr, num_rows*num_cols, data_ptr, img_data_ptr, core_ptr->isConjugate());
+		splitComplexPtr(src_data_ptr, num_rows*num_cols, data_ptr, img_data_ptr, core_ptr->isConjugate());//let conjugate to false because it's handled internally by get_fact()
+
 	}
 	//TODO: matlab 2018 setComplexDoubles()/setComplexSingles() to avoid separating
 	// in real and imaginary part to copy, directly copy into mxArray with get_fact() in the pointer returned by mxComplexSingles()/mxComplexDoubles()
