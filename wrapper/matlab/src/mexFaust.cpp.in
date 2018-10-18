@@ -149,12 +149,11 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 					mexErrMsgTxt("hadamard(): 1 variable result is expected.");
 				if(nrhs < 2)
 					mexErrMsgTxt("hadamard(): wrong number of arguments (must be 2)");
-				//printf("mexFaust.cpp hadamard(): retrieving arguments\n");
 				unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
 
 				//printf("mexFaust.cpp hadamard(): faust creation\n");
 				Faust::TransformHelper<SCALAR,Cpu>* H = Faust::TransformHelper<SCALAR,Cpu>::hadamardFaust(n);
-				H->display();
+				//H->display();
 				if(H) //not NULL
 					plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(H);
 				else {
@@ -166,6 +165,26 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 
 			}
 
+			if(!strcmp("fourier", cmd)){
+				if(nlhs!=1)
+					mexErrMsgTxt("fourier(): 1 variable result is expected.");
+				if(nrhs < 2)
+					mexErrMsgTxt("fourier(): wrong number of arguments (must be 2)");
+				unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
+
+				//printf("mexFaust.cpp hadamard(): faust creation\n");
+				Faust::TransformHelper<complex<FPP>,Cpu>* F = Faust::TransformHelper<complex<FPP>,Cpu>::fourierFaust(n);
+				//H->display();
+				if(F) //not NULL
+					plhs[0]=convertPtr2Mat<Faust::TransformHelper<complex<FPP>,Cpu> >(F);
+				else {
+					plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+					double* ptr_out = (double*) mxGetData(plhs[0]);
+					ptr_out[0]=(double) 0;
+				}
+				return;
+
+			}
             // New
             if (!strcmp("new", cmd))
             {
@@ -306,7 +325,7 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 					plhs[0] = transformFact2SparseMxArray(id_fact,core_ptr);
 				else
 					plhs[0] = transformFact2FullMxArray(id_fact,core_ptr);
-                return;
+				return;
             }
 
             if (!strcmp("get_nb_factor", cmd))
@@ -332,7 +351,7 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
                 //core_ptr->display(); // doesn't work on windows,
 					// matlab terminal doesn't receive the mex lib std output
 					// we must use mexPrintf() to display content
-		mexPrintf(core_ptr->to_string().c_str());
+				mexPrintf(core_ptr->to_string().c_str());
                 return;
             }
 

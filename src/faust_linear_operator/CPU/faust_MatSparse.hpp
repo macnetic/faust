@@ -297,6 +297,16 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const vector<int>& rowidx, const vector<int
 	nnz = mat.nonZeros();
 }
 
+template<typename FPP>
+Faust::MatSparse<FPP,Cpu>::MatSparse(const unsigned int* rowidx, const unsigned int* colidx, const std::vector<FPP>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_)
+{
+	resize(values.size(), dim1_, dim2_);
+	for (int i=0 ; i<values.size() ; i++)
+		mat.coeffRef(rowidx[i], colidx[i]) = values[i];
+	mat.makeCompressed();
+	nnz = mat.nonZeros();
+}
+
 
 template<typename FPP>
 Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) :

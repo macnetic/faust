@@ -157,10 +157,28 @@ classdef FaustFactory
 			F = Faust(core_obj, isreal(M));
 		end
 
-
+		%==========================================================================================
+		%> @brief Constructs a Faust whose the full matrix is the Hadamard matrix of size 2^n*2^n.
+		%==========================================================================================
 		function H = hadamard(n)
 			core_obj = mexFaustReal('hadamard', n);
 			is_real = true;
+			% TODO: check n (must be integer > 0)
+			% TODO: handle errors on returned core_obj
+%			if(core_obj == 0)
+%				throw(e)
+%			end
+			H = matfaust.Faust(core_obj, is_real);
+		end
+
+		%==========================================================================================
+		%> @brief Constructs a Faust whose the full matrix is the FFT matrix of size 2^n*2^n.
+		%>
+		%> NOTE: The Factorization used is Cooley-Tukey.
+		%==========================================================================================
+		function H = fourier(n)
+			core_obj = mexFaustCplx('fourier', n);
+			is_real = false;
 			% TODO: check n (must be integer > 0)
 			% TODO: handle errors on returned core_obj
 %			if(core_obj == 0)

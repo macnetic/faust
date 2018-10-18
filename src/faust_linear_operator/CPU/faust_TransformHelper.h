@@ -6,6 +6,7 @@
 #include "faust_exception.h"
 #include "faust_Transform.h"
 #include "faust_Slice.h"
+#include "faust_bit_rev_permu.h"
 #include <random>
 
 namespace Faust {
@@ -104,6 +105,7 @@ namespace Faust {
 			double normFro() const;
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n);
+			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n);
 			~TransformHelper();
 
 			private:

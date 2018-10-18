@@ -142,6 +142,15 @@ namespace Faust
 			//!	\param dim2_ : number of column of the matrix
 			MatSparse(const std::vector<int>& rowidx, const std::vector<int>& colidx, const std::vector<FPP>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
 
+			//!  \brief Constructor
+			//	WARNING: using this constructor is discounraged because rowidx, colidx are not necessarily safe, its the responsibility of the caller to check their allocation space according to values.size().
+			//!	\param rowidx : row indices with for all k < values.size(), M[rowidx[k]][colidx[k]] = values[k];
+			//!	\param colidx : column indices with for all k < values.size(), M[rowidx[k]][colidx[k]] = values[k];
+			//!	\param values : vector<FPP,Cpu>
+			//!	\param dim1_ : number of row of the matrix
+			//!	\param dim2_ : number of column of the matrix
+			MatSparse(const unsigned int* rowidx, const unsigned int* colidx, const std::vector<FPP>& values, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
+
 			//! \brief Constructor : from CRS (Compressed Row Storage) format
 			MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP* value, const size_t* id_row, const size_t* col_ptr);
 

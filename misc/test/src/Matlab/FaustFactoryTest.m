@@ -157,7 +157,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		function testHadamard(this)
 			disp('Test FaustFactory.hadamard()')
 			import matfaust.*
-			n = randi([1,10]);
+			n = randi([1,6]);
 			H = FaustFactory.hadamard(n);
 			fH = full(H);
 			this.verifyEqual(nnz(fH), numel(fH));
@@ -172,6 +172,16 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			end
 		end
 
+		function testFourier(this)
+			disp('Test FaustFactory.fourier()')
+			import matfaust.*
+			n = randi([1,10]);
+			F = FaustFactory.fourier(n);
+			fF = full(F);
+			fftI = fft(eye(2^n));
+			% this.verifyEqual(nnz(fH), numel(fH));
+			this.verifyEqual(norm(fF-fftI), 0, 'RelTol',0.0005);
+		end
 	end
 
 	methods
