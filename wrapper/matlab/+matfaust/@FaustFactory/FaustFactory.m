@@ -1,26 +1,32 @@
 % ======================================================================
 %> @brief     This factory class provides methods for generating a Faust especially by factorization of a dense matrix.
 %>
+%>    This factory class provides methods for generating a Faust especially by factorization of a dense matrix.
+%>
 %>    This class gives access to the main factorization algorithms of
 %>    FAµST. Those algorithms can factorize a dense matrix to a sparse product
 %>    (i.e. a Faust object).
 %>
 %>    There are two algorithms for factorization.
 %>
-%>    The first one is Palm4MSA :
+%>    - The first one is Palm4MSA :
 %>    which stands for Proximal Alternating Linearized Minimization for
 %>    Multi-layer Sparse Approximation. Note that Palm4MSA is not
 %>    intended to be used directly. You should rather rely on the second algorithm.
 %>
-%>    The second one is the Hierarchical Factorization algorithm:
+%>    - The second one is the Hierarchical Factorization algorithm:
 %>    this is the central algorithm to factorize a dense matrix to a Faust.
 %>    It makes iterative use of Palm4MSA to proceed with the factorization of a given
 %>    dense matrix.
 %>
-%>    A more secondary functionality of this class is the pseudo-random generation of a
-%>    Faust with FaustFactory.rand().
+%>    A more secondary functionality of this class is the Faust generation.
+%>    Several methods are available:
 %>
-% ======================================================================
+%>    - The pseudo-random generation of a Faust with FaustFactory.rand(),
+%>    - the FFT transform with FaustFactory.fourier(),
+%>    - and the Hadamard transform with FaustFactory.hadamard().
+%>
+%======================================================================
 classdef FaustFactory
 	properties (SetAccess = public)
 
@@ -158,7 +164,41 @@ classdef FaustFactory
 		end
 
 		%==========================================================================================
-		%> @brief Constructs a Faust whose the full matrix is the Hadamard matrix of size 2^n*2^n.
+		%> @brief Constructs a Faust implementing the Hadamard transform of dimension 2^n.
+		%>
+		%> The resulting Faust has n sparse factors of order 2^n, each one having 2 non-zero elements
+		%> per row and per column.
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b H = hadamard(n)
+		%>
+		%> @param n the power of two exponent for a Hadamard matrix of order 2^n and a factorization into n factors.
+		%>
+		%> @retval H the Faust implementing the Hadamard transform of dimension 2^n.
+		%>
+		%> @Example
+		%> @code
+		%> % in a matlab terminal
+		%> >> import matfaust.FaustFactory.*
+		%> >> H = hadamard(10)
+		%> @endcode
+		%>
+		%>
+		%>H =
+		%>
+		%>Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10 factor(s):
+		%>- FACTOR 0 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%>- FACTOR 1 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%>- FACTOR 2 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%>- FACTOR 3 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%>- FACTOR 4 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%>- FACTOR 5 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%>- FACTOR 6 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%>- FACTOR 7 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%>- FACTOR 8 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%>- FACTOR 9 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%>
 		%==========================================================================================
 		function H = hadamard(n)
 			core_obj = mexFaustReal('hadamard', n);
@@ -172,9 +212,46 @@ classdef FaustFactory
 		end
 
 		%==========================================================================================
-		%> @brief Constructs a Faust whose the full matrix is the FFT matrix of size 2^n*2^n.
+		%> @brief Constructs a Faust whose the full matrix is the FFT square matrix of order 2^n.
 		%>
-		%> NOTE: The Factorization used is Cooley-Tukey.
+		%> The factorization algorithm used is Cooley-Tukey.
+		%>
+		%> The resulting Faust is complex and has (n+1) sparse factors whose the n first
+		%> has 2 non-zero elements per row and per column. The last factor is
+		%> a permutation matrix.
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b H = fourier(n)
+		%>
+		%> @param n: the power of two exponent for a FFT of order 2^n and a
+		%> factorization in n+1 factors.
+		%>
+		%>
+		%> @retval F the Faust implementing the FFT transform of dimension 2^n.
+		%>
+		%> @Example
+		%> @code
+		%> % in a matlab terminal
+		%> >> import matfaust.FaustFactory.*
+		%> >> F = fourier(10)
+		%> @endcode
+		%>
+		%>
+		%> F =
+		%>
+		%> Faust size 1024x1024, density 0.0205078, nnz_sum 21504, 11 factor(s):
+		%> - FACTOR 0 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%> - FACTOR 1 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%> - FACTOR 2 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%> - FACTOR 3 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%> - FACTOR 4 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%> - FACTOR 5 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%> - FACTOR 6 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%> - FACTOR 7 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%> - FACTOR 8 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%> - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+		%> - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
 		%==========================================================================================
 		function H = fourier(n)
 			core_obj = mexFaustCplx('fourier', n);

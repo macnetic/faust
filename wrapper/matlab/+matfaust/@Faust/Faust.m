@@ -818,7 +818,7 @@ classdef Faust
 		end
 
 		%==========================================================================================
-		%> @brief Saves the Faust F into file respecting the Matlab format version 5 (.mat file).
+		%> @brief Saves the Faust F into a file respecting the Matlab format version 5 (.mat file).
 		%>
 		%> @b NOTE: storing F should typically use rcg(F) times less storage than storing full(F).
 		%>

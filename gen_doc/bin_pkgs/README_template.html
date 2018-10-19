@@ -49,7 +49,53 @@ However it&rsquo;s not totally excluded that FAµST works with older or newer ve
 <p>Normally, after installing, nothing is left to do. The installation process should have seamlessly set up the Faust wrappers for Python and Matlab into your environment.
 Neverthless, it could be useful to check that it really worked and set the environment manually if needed like explained below.</p>
 
-<h3>3.1 Testing the Python Wrapper</h3>
+<h3>3.1 Testing the Matlab Wrapper</h3>
+
+<p>To test whether the FAµST Matlab wrapper auto-setup succeeded at install stage, you can open a terminal and type:</p>
+
+<pre><code>matlab -nodisplay -nojvm -r "import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', false);disp(F);exit"
+</code></pre>
+
+<p>Note: if Matlab is not set in your PATH environment variable you need to replace `matlab' with its full path
+    (e.g. on macOS /Applications/Matlab/MATLAB_R2018b.app/bin/matlab)</p>
+
+<p>It works only if you see an output similar to:</p>
+
+<pre><code>Faust size 10x10, density 0.57, nnz_sum 57, 1 factor(s):
+- FACTOR 0 (complex) DENSE, size 10x10, density 0.57, nnz 57
+&gt;&gt; % other values are possible for density, etc. because of the random generation
+</code></pre>
+
+<p>Otherwise it didn&rsquo;t work. So here is how to setup the wrapper manually.</p>
+
+<p>First, launch a Matlab terminal, then go in the FAµST directory:</p>
+
+<pre><code>&gt;&gt; cd @CMAKE_INSTALL_PREFIX@/matlab
+</code></pre>
+
+<p>Then launch the script that is responsible to add FAµST location in your Matlab path.</p>
+
+<pre><code>&gt;&gt; setup_FAUST
+&gt;&gt; % then test again FAµST
+&gt;&gt; import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', false);disp(F);exit
+</code></pre>
+
+<p>For that change to be applied permanently, you need to automatize the `addpath()&lsquo; call made by setup_FAUST.<br/>
+For that purpose:</p>
+
+<ol>
+<li>Look into your matlab installation directory (e.g. on macOS /Applications/Matlab/MATLAB_R2018b.app/bin/matlab), next:
+<li>Go into the sub-directory toolbox/local
+<li>Edit the file startup.m by adding the follwing line:
+<pre>
+    addpath(genpath('@CMAKE_INSTALL_PREFIX@/matlab'))
+</pre>
+</ol>
+
+
+<p>OK! You can follow the <a href="#usage">quick start usage</a> now.</p>
+
+<h3>3.2 Testing the Python Wrapper</h3>
 
 <p>To test whether the FaµST Python wrapper has been setup properly, simply open a terminal and type:</p>
 
@@ -95,79 +141,11 @@ Otherwise it works but you&rsquo;ll need to set the `export' command manually in
 
 <p>For that issue look at <a href="#prerequisites">Prerequisites</a>.</p>
 
-<h3>3.2 Testing the Matlab Wrapper</h3>
-
-<p>To test whether the FAµST Matlab wrapper auto-setup succeeded at install stage, you can open a terminal and type:</p>
-
-<pre><code>matlab -nodisplay -nojvm -r "import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', false);disp(F);exit"
-</code></pre>
-
-<p>Note: if Matlab is not set in your PATH environment variable you need to replace `matlab' with its full path
-    (e.g. on macOS /Applications/Matlab/MATLAB_R2018b.app/bin/matlab)</p>
-
-<p>It works only if you see an output similar to:</p>
-
-<pre><code>Faust size 10x10, density 0.57, nnz_sum 57, 1 factor(s):
-- FACTOR 0 (complex) DENSE, size 10x10, density 0.57, nnz 57
-&gt;&gt; % other values are possible for density, etc. because of the random generation
-</code></pre>
-
-<p>Otherwise it didn&rsquo;t work. So here is how to setup the wrapper manually.</p>
-
-<p>First, launch a Matlab terminal, then go in the FAµST directory:</p>
-
-<pre><code>&gt;&gt; cd @CMAKE_INSTALL_PREFIX@/matlab
-</code></pre>
-
-<p>Then launch the script that is responsible to add FAµST location in your Matlab path.</p>
-
-<pre><code>&gt;&gt; setup_FAUST
-&gt;&gt; % then test again FAµST
-&gt;&gt; import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', false);disp(F);exit
-</code></pre>
-
-<p>For that change to be applied permanently, you need to automatize the `addpath()&lsquo; call made by setup_FAUST.<br/>
-For that purpose:</p>
-
-<ol>
-<li>Look into your matlab installation directory (e.g. on macOS /Applications/Matlab/MATLAB_R2018b.app/bin/matlab), next:
-<li>Go into the sub-directory toolbox/local
-<li>Edit the file startup.m by adding the follwing line:
-<pre>
-    addpath(genpath('@CMAKE_INSTALL_PREFIX@/matlab'))
-</pre>
-</ol>
-
-
-<p>OK! You can follow the quick start usage now.</p>
+<p>OK! You can follow the <a href="#usage">quick start usage</a> now.</p>
 
 <h2><a name="usage">4. Usage<a/></h2>
 
-<h3>4.1 Python Wrapper</h3>
-
-<p>In the same spirit than the Matlab tutorial showed in the previous section, you can execute the quick start script for Python.</p>
-
-<pre><code>$ python2.7 @CMAKE_INSTALL_PREFIX@/python/quickstart.py
-</code></pre>
-
-<p>You can also go through the Python terminal to build a FAµST product and call its object methods.</p>
-
-<pre><code>$ python2.7
-&gt;&gt;&gt; import pyfaust
-&gt;&gt;&gt; A = pyfaust.Faust(filepath='@CMAKE_INSTALL_PREFIX@/python/A.mat') # A is the FAµST created through quickstart script
-&gt;&gt;&gt; A.rcg()
-6.666666666666667
-&gt;&gt;&gt; A.density()
-0.15
-&gt;&gt;&gt; A.get_num_factors()
-2
-&gt;&gt;&gt; F1 = A.get_factor(0)
-&gt;&gt;&gt; F2 = A.get_factor(1)
-&gt;&gt;&gt; A.shape
-(1000, 2000)
-</code></pre>
-
-<h3>4.2 Matlab Wrapper</h3>
+<h3>4.1 Matlab Wrapper</h3>
 
 <p>Let&rsquo;s test FAµST with the quickstart script, from a matlab terminal type:</p>
 
@@ -216,6 +194,32 @@ For that purpose:</p>
 
 <p>N.B.: to access the documentation, you need to be in the graphical interface of Matlab.</p>
 
-<p>You can also consult the doxygen doc for the API in <a href="file://@CMAKE_INSTALL_PREFIX@/doc/html/index.html">@CMAKE_INSTALL_PREFIX@/doc/html/index.html</a> from your web browser.</p>
+<p>Note that the doxygen documentation for the Matlab API is also available locally after installing Faust. You can consult it from your web browser: <a href="file://@CMAKE_INSTALL_PREFIX@/doc/html/namespacematfaust.html">@CMAKE_INSTALL_PREFIX@/doc/html/namespacematfaust.html</a>.</p>
+
+<h3>4.2 Python Wrapper</h3>
+
+<p>In the same spirit than the Matlab tutorial showed in the previous section, you can execute the quick start script for Python.</p>
+
+<pre><code>$ python2.7 @CMAKE_INSTALL_PREFIX@/python/quickstart.py
+</code></pre>
+
+<p>You can also go through the Python terminal to build a FAµST product and call its object methods.</p>
+
+<pre><code>$ python2.7
+&gt;&gt;&gt; import pyfaust
+&gt;&gt;&gt; A = pyfaust.Faust(filepath='@CMAKE_INSTALL_PREFIX@/python/A.mat') # A is the FAµST created through quickstart script
+&gt;&gt;&gt; A.rcg()
+6.666666666666667
+&gt;&gt;&gt; A.density()
+0.15
+&gt;&gt;&gt; A.get_num_factors()
+2
+&gt;&gt;&gt; F1 = A.get_factor(0)
+&gt;&gt;&gt; F2 = A.get_factor(1)
+&gt;&gt;&gt; A.shape
+(1000, 2000)
+</code></pre>
+
+<p>Note that the doxygen documentation for the Python API is also available locally after installing Faust. You can consult it from your web browser: <a href="file://@CMAKE_INSTALL_PREFIX@/doc/html/namespacepyfaust.html">@CMAKE_INSTALL_PREFIX@/doc/html/namespacepyfaust.html</a>.</p>
 </body>
 </html>
