@@ -164,6 +164,15 @@ cdef class FaustCore:
         # TODO: handle error for the object returned
         return core
 
+    @staticmethod
+    def fourierFaust(n):
+        core = FaustCore(core=True)
+        core.core_faust_cplx = FaustCoreCy.FaustCoreCpp[complex].fourierFaust(n)
+        # hadamard is always a real Faust
+        core._isReal = False
+        # TODO: handle error for the object returned
+        return core
+
     #### METHOD ####
     #~ 	def getNbRow(self):
         #~ 		#return self.core_faust_dbl.getNbRow();

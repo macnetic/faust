@@ -1011,8 +1011,19 @@ class FaustFactory:
 
     @staticmethod
     def hadamard(n):
+        """
+           Constructs a Faust whose the full matrix is the Hadamard matrix of size 2^n*2^n.
+        """
         H = Faust(core_obj=FaustCorePy.FaustCore.hadamardFaust(n))
         return H
+
+    @staticmethod
+    def fourier(n):
+        """
+            Constructs a Faust whose the full matrix is the FFT matrix of size 2^n*2^n.
+        """
+        F = Faust(core_obj=FaustCorePy.FaustCore.fourierFaust(n))
+        return F
 
     @staticmethod
     def rand(num_factors, dim_sizes, density=0.1, fac_type="mixed",

@@ -89,6 +89,8 @@ cdef extern from "FaustCoreCpp.h" :
                                              unsigned int max_dim_size, float density)
         @staticmethod
         FaustCoreCpp[FPP]* hadamardFaust(unsigned int n)
+        @staticmethod
+        FaustCoreCpp[FPP]* fourierFaust(unsigned int n)
 
 cdef extern from "FaustFact.h":
     cdef cppclass PyxConstraintGeneric:

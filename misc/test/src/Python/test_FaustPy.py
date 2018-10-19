@@ -484,7 +484,15 @@ class TestFaustFactory(unittest.TestCase):
             for j in range(i+1,2**pow2_exp):
                 self.assertTrue((fH[i,::].dot(fH[j,::].T) == 0).all())
 
-
+    def testFourier(self):
+        print("Test FaustFactory.fourier()")
+        from pyfaust import FaustFactory
+        from numpy.fft import fft
+        pow2_exp = random.Random().randint(1,10)
+        F = FaustFactory.fourier(pow2_exp)
+        fF = F.todense()
+        ref_fft = fft(np.eye(2**pow2_exp))
+        self.assertAlmostEqual(norm(ref_fft-fF)/norm(ref_fft),0)
 
 if __name__ == "__main__":
     if(len(sys.argv)> 1):

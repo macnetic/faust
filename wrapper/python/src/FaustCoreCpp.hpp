@@ -317,10 +317,22 @@ template<typename FPP>
       return core;
   }
 
+//TODO: hadamardFaust and fourierFaust shouldn't be here... or at least it
+//should be reconsidered
 template<typename FPP>
   FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::hadamardFaust(unsigned int n)
 {
       Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::hadamardFaust(n);
+      if(!th) return NULL;
+      FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
+      core->transform = th;
+      return core;
+}
+
+template<typename FPP>
+  FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::fourierFaust(unsigned int n)
+{
+      Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::fourierFaust(n);
       if(!th) return NULL;
       FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
       core->transform = th;
