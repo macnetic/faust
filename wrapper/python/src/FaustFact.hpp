@@ -157,13 +157,13 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
         sp_facts.push_back(M);
     }
 
-    Faust::TransformHelper<FPP, Cpu> th(sp_facts, lambda, false);
+    Faust::TransformHelper<FPP, Cpu> *th = new Faust::TransformHelper<FPP,Cpu>(sp_facts, lambda, false);
 
     for(typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
     {
         delete *it;
     }
-    if(p->is_verbose) th.display();
+    if(p->is_verbose) th->display();
 
     core = new FaustCoreCpp<FPP>(th);
 
@@ -239,14 +239,12 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
     for (int i=0;i<list_fact_generic.size();i++)
         list_fact_generic[i]=facts[i].Clone();
 
-    Faust::Transform<FPP,Cpu> faust(list_fact_generic, 1.0, false);
+    //don't delete list_fact_generic because they are directly used in
+    //TransformHelper (without copy)
 
-    for (int i=0;i<list_fact_generic.size();i++)
-        delete list_fact_generic[i];
+    Faust::TransformHelper<FPP, Cpu>* th = new Faust::TransformHelper<FPP,Cpu>(list_fact_generic, 1.0, false, false);
 
-    if(p->is_verbose) faust.Display();
-
-    Faust::TransformHelper<FPP, Cpu> th(faust);
+    if(p->is_verbose) th->display();
     core = new FaustCoreCpp<FPP>(th);
 
     blasHandle.Destroy();

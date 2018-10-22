@@ -48,12 +48,10 @@
 
 
 template<typename FPP>
-FaustCoreCpp<FPP>::FaustCoreCpp(Faust::TransformHelper<FPP,Cpu> &th)
+FaustCoreCpp<FPP>::FaustCoreCpp(Faust::TransformHelper<FPP,Cpu> *th)
 {
     this->transform = th;
 }
-
-
 
     template<typename FPP>
 void FaustCoreCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbcol)
@@ -62,7 +60,8 @@ void FaustCoreCpp<FPP>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int
     //TODO: why this auto-conversion in sparse mat ?
     Faust::MatSparse<FPP,Cpu> sparse_mat(dense_mat);
     //sparse_mat.Display();
-    this->transform.push_back(&sparse_mat);
+    if(transform == nullptr) transform = new Faust::TransformHelper<FPP,Cpu>();
+    this->transform->push_back(&sparse_mat);
 
 
 
@@ -75,24 +74,23 @@ void FaustCoreCpp<FPP>::push_back(FPP* data, int* row_ptr, int* id_col, int nnz,
     //    Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP1* value, const int* row_ptr, const int* id_col) :
       Faust::MatSparse<FPP, Cpu> sparse_mat(nnz, nrows, ncols, data, row_ptr, id_col);
 //      std::cout << "FaustCoreCpp::push_back()" << nrows << " " << sparse_mat.getNbRow() <<  " " << ncols << " " << sparse_mat.getNbCol() << std::endl;
-      this->transform.push_back(&sparse_mat);
+      if(transform == nullptr) transform = new Faust::TransformHelper<FPP,Cpu>();
+      this->transform->push_back(&sparse_mat);
 }
 
 template<typename FPP>
 FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::mul_faust(FaustCoreCpp<FPP>* right)
 {
-    Faust::TransformHelper<FPP,Cpu>* th = this->transform.multiply(&(right->transform));
-    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
-    core->transform = th;
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->multiply(right->transform);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
     return core;
 }
 
 template<typename FPP>
 FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::mul_scal(FPP scal)
  {
-    Faust::TransformHelper<FPP,Cpu>* th = this->transform.multiply(scal);
-    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
-    core->transform = th;
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->multiply(scal);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
     return core;
 }
 
@@ -121,7 +119,7 @@ void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value
         Faust::Vect<FPP,Cpu> Y;
 
 
-        Y = this->transform.multiply(X);
+        Y = this->transform->multiply(X);
 
         memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y);
     }else
@@ -129,7 +127,7 @@ void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value
         Faust::MatDense<FPP,Cpu> X(value_x,nbrow_x,nbcol_x);
         Faust::MatDense<FPP,Cpu> Y;
 
-        Y = this->transform.multiply(X);
+        Y = this->transform->multiply(X);
 
 
         memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y*nbcol_y);
@@ -142,7 +140,7 @@ void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value
 template<typename FPP>
 unsigned long long FaustCoreCpp<FPP>::nnz() const
 {
-    return this->transform.get_total_nnz();
+    return this->transform->get_total_nnz();
 }
 
 
@@ -154,9 +152,9 @@ double FaustCoreCpp<FPP>::norm(int ord) const
     int flag; //not used yet
     switch(ord) {
         case 2:
-            return this->transform.spectralNorm(nbr_iter_max, precision, flag);
+            return this->transform->spectralNorm(nbr_iter_max, precision, flag);
         case 1:
-            return this->transform.normL1();
+            return this->transform->normL1();
         default:
             handleError("FaustCoreCpp", "norm(int ord) unvalid norm order.");
     }
@@ -166,20 +164,20 @@ double FaustCoreCpp<FPP>::norm(int ord) const
 template<typename FPP>
 double FaustCoreCpp<FPP>::normFro() const
 {
-    return this->transform.normFro();
+    return this->transform->normFro();
 }
 
 template<typename FPP>
 double FaustCoreCpp<FPP>::get_nb_factors() const
 {
-    double nb_fact = this->transform.size();
+    double nb_fact = this->transform->size();
     return nb_fact;
 }
 
 template<typename FPP>
 const char* FaustCoreCpp<FPP>::to_string() const
 {
-    std::string str = this->transform.to_string();
+    std::string str = this->transform->to_string();
     char * c_str = (char*) malloc(str.size()+1);
     memcpy(c_str, str.c_str(), str.size()+1);
     return (const char*) c_str;
@@ -188,25 +186,25 @@ const char* FaustCoreCpp<FPP>::to_string() const
 template<typename FPP>
 unsigned int FaustCoreCpp<FPP>::get_fact_nb_rows(unsigned int& i) const
 {
-    return this->transform.get_fact_nb_rows(i);
+    return this->transform->get_fact_nb_rows(i);
 }
 
 template<typename FPP>
 unsigned int FaustCoreCpp<FPP>::get_fact_nb_cols(unsigned int& i) const
 {
-    return this->transform.get_fact_nb_cols(i);
+    return this->transform->get_fact_nb_cols(i);
 }
 
 template<typename FPP>
 faust_unsigned_int FaustCoreCpp<FPP>::get_fact_nnz(const faust_unsigned_int i) const
 {
-    return transform.get_fact_nnz(i);
+    return transform->get_fact_nnz(i);
 }
 
 template<typename FPP>
 void FaustCoreCpp<FPP>::get_fact(const unsigned int& i, FPP* fact_ptr) const
 {
-    Faust::MatDense<FPP,Cpu> dense_factor = this->transform.get_fact(i);
+    Faust::MatDense<FPP,Cpu> dense_factor = this->transform->get_fact(i);
     // not optimized here (we have three copies from C++ object to Py, the first in MatDense::Clone()
     // (called from Faust::Transform::get_fact()) the second when converting to
     // MatDense (even if not a MatSparse, the copy is made)
@@ -222,7 +220,7 @@ void FaustCoreCpp<FPP>::get_fact_dense(const unsigned int& i, FPP* fact_ptr,
 {
     faust_unsigned_int nrows, ncols;
     // only one copy, directly in numpy buffer (optimization)
-    this->transform.get_fact(i, fact_ptr, &nrows, &ncols, transpose);
+    this->transform->get_fact(i, fact_ptr, &nrows, &ncols, transpose);
     if(num_rows != NULL)
         *num_rows = transpose?nrows:ncols;
     if(num_cols != NULL)
@@ -239,21 +237,20 @@ void FaustCoreCpp<FPP>::get_fact_sparse(const unsigned int& id,
     faust_unsigned_int size, nrows, ncols; //TODO: delete nrows,ncols when NULL arg's ok
     // only one copy per buffer (optimization) directly from underlying
     // MatSparse buffers to scipy buffers
-    transform.get_fact(id, rowptr, col_ids, elts, &size, &nrows, &ncols, transpose);
+    transform->get_fact(id, rowptr, col_ids, elts, &size, &nrows, &ncols, transpose);
 }
 
 template<typename FPP>
 bool FaustCoreCpp<FPP>::is_fact_sparse(const faust_unsigned_int id) const
 {
-    return transform.is_fact_sparse(id);
+    return transform->is_fact_sparse(id);
 }
 
 template<typename FPP>
 FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::slice(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id)
 {
-    Faust::TransformHelper<FPP,Cpu>* th = this->transform.slice(start_row_id, end_row_id, start_col_id, end_col_id);
-    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
-    core->transform = th;
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->slice(start_row_id, end_row_id, start_col_id, end_col_id);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
     return core;
 }
 
@@ -261,27 +258,26 @@ template<typename FPP>
 void FaustCoreCpp<FPP>::save_mat_file(const char* filepath) const
 {
     //    std::cout << "FaustCoreCpp::save_mat_file()" << std::endl;
-    this->transform.save_mat_file(filepath);
+    this->transform->save_mat_file(filepath);
 }
 
 template<typename FPP>
 unsigned int FaustCoreCpp<FPP>::getNbRow() const
 {
-    return this->transform.getNbRow();
+    return this->transform->getNbRow();
 }
 
 template<typename FPP>
 unsigned int FaustCoreCpp<FPP>::getNbCol() const
 {
-    return this->transform.getNbCol();
+    return this->transform->getNbCol();
 }
 
     template<typename FPP>
 FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::transpose()
 {
-    Faust::TransformHelper<FPP,Cpu>* th = this->transform.transpose();
-    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
-    core->transform = th;
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->transpose();
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
 #ifdef FAUST_VERBOSE
     std::cout << "FaustCoreCpp::transpose() th=" << th << "core=" << core << std::endl;
 #endif
@@ -291,15 +287,14 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::transpose()
 template<typename FPP>
 const bool FaustCoreCpp<FPP>::isTransposed()
 {
-    return transform.isTransposed();
+    return transform->isTransposed();
 }
 
     template<typename FPP>
 FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::conjugate()
 {
-    Faust::TransformHelper<FPP,Cpu>* th = this->transform.conjugate();
-    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
-    core->transform = th;
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->conjugate();
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
 #ifdef FAUST_VERBOSE
     std::cout << "FaustCoreCpp::conjugate() th=" << th << "core=" << core << std::endl;
 #endif
@@ -312,8 +307,7 @@ template<typename FPP>
             unsigned int min_dim_size, unsigned int max_dim_size, float density) {
       Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::randFaust(Faust::RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density);
       if(!th) return NULL;
-      FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
-      core->transform = th;
+      FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
       return core;
   }
 
@@ -324,8 +318,7 @@ template<typename FPP>
 {
       Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::hadamardFaust(n);
       if(!th) return NULL;
-      FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
-      core->transform = th;
+      FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
       return core;
 }
 
@@ -334,19 +327,24 @@ template<typename FPP>
 {
       Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::fourierFaust(n);
       if(!th) return NULL;
-      FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
-      core->transform = th;
+      FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
       return core;
 }
 
 template<typename FPP>
 FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::adjoint()
 {
-    Faust::TransformHelper<FPP,Cpu>* th = this->transform.adjoint();
-    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>();
-    core->transform = th;
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->adjoint();
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
 #ifdef FAUST_VERBOSE
     std::cout << "FaustCoreCpp::adjoint() th=" << th << "core=" << core << std::endl;
 #endif
     return core;
 }
+
+template<typename FPP>
+FaustCoreCpp<FPP>::~FaustCoreCpp()
+{
+    if(transform) delete transform;
+}
+

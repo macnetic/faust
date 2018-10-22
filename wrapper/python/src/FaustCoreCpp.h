@@ -55,9 +55,9 @@ class FaustCoreCpp
     public :
 
 
-    FaustCoreCpp(): transform(){}
-    FaustCoreCpp(Faust::TransformHelper<FPP,Cpu> &th);
-    void Display() const { transform.display();}
+    FaustCoreCpp(): transform(nullptr) {}
+    FaustCoreCpp(Faust::TransformHelper<FPP,Cpu> *th);
+    void Display() const { transform->display();}
     const char* to_string() const;
     void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol);
     void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols);
@@ -89,6 +89,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP>* transpose();
     FaustCoreCpp<FPP>* conjugate();
     FaustCoreCpp<FPP>* adjoint();
+    ~FaustCoreCpp();
     static FaustCoreCpp<FPP>* randFaust(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,
             unsigned int min_dim_size,
@@ -96,7 +97,7 @@ class FaustCoreCpp
     static FaustCoreCpp<FPP>* hadamardFaust(unsigned int n);
     static FaustCoreCpp<FPP>* fourierFaust(unsigned int n);
     private :
-    Faust::TransformHelper<FPP,Cpu> transform;
+    Faust::TransformHelper<FPP,Cpu> *transform;
 };
 
 #include "FaustCoreCpp.hpp"
