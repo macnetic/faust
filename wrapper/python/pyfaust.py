@@ -62,7 +62,7 @@ class Faust:
     transform, which can be represented exactly as a Faust, leading to a fast and
     compact implementation.
 
-    Although the sparse matrices are more interesting for optimization it's not
+    Although sparse matrices are more interesting for optimization it's not
     forbidden to define a Faust as a product of dense matrices or a mix of dense
     and sparse matrices.
 
@@ -70,30 +70,43 @@ class Faust:
     defined on complex or real fields. Hence a Faust can be a complex Faust or a
     real Faust.
 
-    A Faust has ideally to be seen and used as a numpy dense matrix/array, but
-    this matrix exists only virtually and is actually represented by its factors.
-    In order to use a Faust like a numpy matrix, a certain number of Python
-    functions available for numpy matrices are implemented in this class but take
-    note that not all are.
+    Several Python builtins have been overloaded to ensure that a Faust is
+    almost handled as a native numpy array/matrix.
 
-    It's possible to retrieve the dense matrix with the method Faust.toarray but
-    it will cost the multiplication of the Faust's factors.
-    It's noteworthy that in this documentation the expression 'dense matrix'
-    designates the numpy dense matrix corresponding to a Faust, that is the
-    matrix obtained by the multiplication of the previously mentioned Faust's
-    factors.
-
-    Likewise, other Faust's methods need to calculate the factor product, and
-    they will be indicated with a warning in this documentation. You should avoid
-    to use them if it's not really necessary (for example you might limit their use
-    to test purposes).
-
-    Other important limitation is that contrary to a numpy dense matrix
-    a Faust is immutable. It means that you cannot affect elements of a Faust using
+    The main exception is that contrary to a numpy matrix a Faust is immutable.
+    It means that you cannot affect elements of a Faust using
     the affectation operator `=' like you do with a numpy matrix (e.g. `M[i,j] =
     2').
     That limitation is the reason why the Python built-in `__setitem__()' is not
     implemented in this class.
+
+    Other notable limitations are that one cannot:
+        - compute the real and imaginary parts of a Faust,
+        - perform elmentwise operations between two Fausts (e.g. elementwise
+        multiplication).
+        In particular, the addition F+G is undefined for Faust objects (so
+        far).
+        - concatenate,
+        - reshape.
+
+    Primarily for convenience and test purposes, a Faust can be converted into
+    the corresponding full matrix using the function Faust.todense or
+    Faust.toarray.
+
+    Warning: using Faust.todense or Faust.toarray is discouraged except for test purposes, as it
+    loses the main potential interests of the FAuST structure: compressed
+    memory storage and faster matrix-vector multiplication compared to its
+    equivalent full matrix representation.
+
+    In this documentation, the expression 'full matrix' designates the array
+    Faust.toarray() obtained by the multiplication of the Faust factors.
+
+    Likewise, some other Faust methods need to calculate the factor product, and
+    they will be indicated with a warning in this documentation. You should avoid
+    to use them if it's not really necessary (for example you might limit their use
+    to test purposes).
+
+    TODO: list of these functions here.
 
     For more information about FAµST take a look at http://faust.inria.fr.
     """
@@ -101,7 +114,9 @@ class Faust:
     def  __init__(F, factors=None, filepath=None, **kwargs):
         """ Creates a Faust from a list of factors or alternatively from a file.
 
-            Another easy way to create a Faust is to call the static method FaustFactory.rand().
+            Other easy ways to create a Faust is to call one of the
+            FaustFactory static methods: FaustFactory.rand(),
+            FaustFactory.fourier() or FaustFactory.hadamard().
 
         Args:
             factors: list/tuple of numpy matrices.<br/>
@@ -139,7 +154,6 @@ class Faust:
             >>> F.save("F.mat")
             >>> # define a Faust from file
             >>> H = Faust(filepath="F.mat")
-            >>> I = Faust(filepath="F.mat", scale) # I == scale*H
 
         <b/> See also Faust.save, FaustFactory.rand
 
@@ -169,12 +183,12 @@ class Faust:
     @property
     def shape(F):
         """
-        Gives the size of the Faust F.
+        Gives the shape of the Faust F.
 
         This function is intended to be used as a property (see the examples).
 
-        The size is a pair of numbers: the number of rows and the number of
-        columns of the equivalent dense matrix of F.
+        The shape is a pair of numbers: the number of rows and the number of
+        columns of F.todense().
 
         Args:
             F: the Faust object.
@@ -221,18 +235,19 @@ class Faust:
 
     def transpose(F):
         """
-        Returns the transpose of the Faust F.
+        Returns the transpose of F.
 
         Args:
             F: the Faust object.
 
         Returns:
-            F transpose as a Faust object.
+            a Faust object implementing the transpose of F.todense(), i.e. such
+            that F.transpose()*x == F.todense().transpose()*x for any vector x.
 
         Examples:
             >>> tF = F.transpose()
 
-        <b/> Faust.getH, Faust.H, Faust.T
+        <b/> See also Faust.conj, Faust.getH, Faust.H, Faust.T
         """
         F_trans = Faust(core_obj=F.m_faust.transpose())
         return F_trans
@@ -240,7 +255,7 @@ class Faust:
     @property
     def T(F):
         """
-        Returns the transpose of the Faust F.
+        Returns the transpose of F.
 
         This function is intended to be used as a property (see the examples).
 
@@ -248,29 +263,27 @@ class Faust:
             F: the Faust object.
 
         Returns:
-            F transpose as a Faust object.
+            a Faust object implementing the transpose of F.todense(), i.e. such
+            that F.T*x == F.todense().T*x for any vector x.
 
         Examples:
             >>> tF = F.T
 
-        <b/> Faust.getH, Faust.H, Faust.T
+        <b/> See also Faust.conj, Faust.getH, Faust.H, Faust.T
         """
         return F.transpose()
 
     def conj(F):
         """
-        Returns the conjugate of the current Faust.
+        Returns the conjugate of F or F itself if F.dtype == numpy.float.
 
         Args:
             F: the Faust object.
 
         Returns:
-            the conjugate as a Faust object.
-            <br/> if F is a real Faust then F_conj == F.
-            <br/> if F is a complex Faust, the value Fc returned verifies the
-            next assertion for i in range(0,F.get_num_factors()):
-
-            <code>F.get_factor(i).conj() == Fc.get_factor(i)</code>
+            a Faust object Fc implementing the conjugate of F.todense() such that
+            for any vector x of consistent shape:
+            <code>Fc*x == F.todense().conj()*x</code>
 
 
         Examples:
@@ -278,7 +291,7 @@ class Faust:
             >>> F = FaustFactory.rand(5, 50, is_real=False)
             >>> Fc = F.conj()
 
-        <b/> See also Faust.transpose, Faust.get_factor, Faust.get_num_factors, Faust.getH, Faust.H
+        <b/> See also Faust.transpose, Faust.getH, Faust.H
         """
         F_conj = Faust(core_obj=F.m_faust.conj())
         return F_conj
@@ -291,8 +304,9 @@ class Faust:
             F: the Faust object.
 
         Returns:
-            the conjugate transpose of F as a Faust object.
-
+            a Faust object H implementing the conjugate transpose of F.todense() such that
+            for any vector x of consistent shape:
+            <code>H*x == F.todense().H*x</code>
 
         Examples:
             >>> from pyfaust import FaustFactory
@@ -316,8 +330,9 @@ class Faust:
         This function is intended to be used as a property (see the examples).
 
         Returns:
-            the conjugate transpose of F as a Faust object.
-
+            a Faust object H implementing the conjugate transpose of F.todense() such that
+            for any vector x of consistent shape:
+            <code>H*x == F.todense().H*x</code>
 
         Examples:
             >>> from pyfaust import FaustFactory
@@ -390,20 +405,31 @@ class Faust:
 
     def __mul__(F, A):
         """
-        Multiplies F by A which is a dense matrix, a Faust object or a scalar number.
+        Multiplies F by A which is a full matrix, a Faust object or a scalar number.
 
         This method overloads a Python function/operator.
 
-        NOTE: The primary goal of this function is to implement “fast” multiplication by a
-        Faust, which is the operation performed when A is a standard matrix (dense or
-        sparse).
-        In the best cases, F*A is F.rcg() times faster than performing the
-        equivalent F.toarray()*A.
-        <br/>When A is a Faust, F*A is itself a Faust.
+        <b>The primary goal</b> of this function is to implement “fast” multiplication by a
+        Faust, which is the operation performed when A is a dense matrix.<br/>
+        In the best case, F*A is F.rcg() times faster than equivalent F.toarray()*A.
+
+        <b>Other use cases</b> are available for this function:
+        - If A is a Faust, no actual multiplication is performed, instead a
+        new Faust is built to implement the multiplication.<br/>
+        This Faust verifies that:<br/>
+            <code>
+            (F*A).todense() == F.todense()*A.todense()
+            </code>
+            <br/>N.B.: you could have an elementwise non-significant absolute
+            difference between the two members.
+        - If A is a scalar, F*A is also a Faust such that:<br/>
+        <code>
+        (F*A).get_factor(0) ==  F.get_factor(0)*A
+        </code>
 
         Args:
             F: the Faust object.
-            A: is a scalar number or a Faust object or a 2D dense matrix (numpy.ndarray,
+            A: is a scalar number, a Faust object or a 2D full matrix (numpy.ndarray,
             numpy.matrix).
             <br/> In the latter case, A must be Fortran contiguous (i.e. Column-major order;
                 `order' argument passed to np.ndararray() must be equal to str
@@ -417,7 +443,23 @@ class Faust:
 
         Raises:
             ValueError
-
+            The multiplying operand A is a sparse matrix:
+            <code>
+            >>> from scipy.sparse import csr_matrix
+            >>> from scipy.sparse import random as srand
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(5,50)
+            >>> S = srand(50,5000,.1)
+            >>> F*S
+            ValueError input M must a numpy.ndarray or a numpy.matrix.
+            </code>
+            ValueError
+            F is real but A is a complex scalar:
+            <code>
+            >>> import numpy
+            >>> F*numpy.complex(0,1)
+            ValueError You cannot multiply a real Faust by a complex scalar (not yet implemented).
+            </code>
 
         Examples:
             >>> from pyfaust import FaustFactory
@@ -430,7 +472,7 @@ class Faust:
             >>> G = FaustFactory.rand(5, F.shape[1])
             >>> H = F*G
             >>> # H is a Faust because F and G are
-            >>> F_times_two = 2*F
+            >>> F_times_two = F*2
 
         <b/>See also Faust.__init__, Faust.rcg
         """
@@ -446,12 +488,12 @@ class Faust:
 
     def toarray(F):
         """
-        Converts the current Faust into a numpy array.
+        Returns a numpy array for the full matrix implemented by F.
 
         WARNING: Using this function is discouraged except for test purposes,
         as it loses the main potential interests of the Faust structure:
         compressed memory storage and faster matrix-vector multiplication
-        compared to its equivalent dense matrix representation.
+        compared to its equivalent full matrix representation.
 
         Returns:
             A numpy ndarray.
@@ -459,6 +501,8 @@ class Faust:
         Raises:
             MemoryError
 
+        WARNING: running the example below is likely to raise a memory
+        error or freeze your computer for a certain amount of time.
 
         Examples:
             >>> from pyfaust import FaustFactory
@@ -470,7 +514,7 @@ class Faust:
                 FACTOR 3 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
                 FACTOR 4 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
             >>> # an attempt to convert F to a dense matrix is most likely to raise a memory error
-            >>> # the sparse format is the only way to handle a so big Faust
+            >>> # the sparse format is the only way to handle such a large Faust
             >>> F.toarray()
             ...
             MemoryError
@@ -483,19 +527,21 @@ class Faust:
 
     def todense(F):
         """
-        Converts the current Faust into a numpy matrix.
+        Returns a numpy matrix for the full matrix implemented by F.
 
         WARNING: Using this function is discouraged except for test purposes,
         as it loses the main potential interests of the Faust structure:
         compressed memory storage and faster matrix-vector multiplication
-        compared to its equivalent dense matrix representation.
+        compared to its equivalent full matrix representation.
 
         Returns:
-            A numpy matrix M which is such that M*x == F*x for any vector x.
+            A numpy matrix M such that M*x == F*x for any vector x.
 
         Raises:
             MemoryError
 
+        WARNING: running the example below is likely to raise a memory
+        error or freeze your computer for a certain amount of time.
 
         Examples:
             >>> from pyfaust import FaustFactory
@@ -508,7 +554,7 @@ class Faust:
             FACTOR 3 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
             FACTOR 4 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
             >>> # an attempt to convert F to a dense matrix is most likely to raise a memory error
-            >>> # the sparse format is the only way to handle a so big Faust
+            >>> # the sparse format is the only way to handle such a large Faust
             >>> F.todense()
             (...)
             MemoryError
@@ -520,15 +566,17 @@ class Faust:
 
     def __getitem__(F, indices):
         """
-        Returns a Faust representing a submatrix of the dense matrix of F or a scalar element if that Faust can be reduced to a single element.
+        Indexes or Slices a Faust.
 
-        This function is a Python built-in overload.
+        Returns a Faust representing a submatrix of F.toarray() or a scalar element if that Faust can be reduced to a single element.
+
+        This function overloads a Python built-in.
 
         WARNING:
-            - This function doesn't handle a slice step different to 1 (e.g. F[i:j:2,:]
+            - This function doesn't handle a slice step different from 1 (e.g. F[i:j:2,:]
         where slice step is 2.).
             - It is not advised to use this function as an element accessor
-        (e.g. F(0,0)) because such an use induces to convert the Faust to its
+        (e.g. F(0,0)) because such a use induces to convert the Faust to its
         dense matrix representation and that is a very expensive computation if used
         repetitively.
 
@@ -650,8 +698,8 @@ class Faust:
         """
         Gives the total number of non-zero elements in the factors of F.
 
-        The function sums together the number of non-zeros elements of
-        each factor and returns the result. Note that in fact the sum is
+        The function sums together the number of non-zero elements of
+        each factor and returns the result. Note that for efficiency the sum is
         computed at Faust creation time and kept in cache.
 
         Returns:
@@ -686,20 +734,23 @@ class Faust:
         """
         return float(F.nnz_sum())/F.size
 
+
     def rcg(F):
         """
-        Computes the Relative Complexity Gain (inverse of Faust.density).
+        Computes the Relative Complexity Gain.
 
-        RCG is the theoretical gain brought by Faust representation relatively to its dense
-        matrix equivalent. The higher is the RCG, the more computational
-        savings will be made. That gain applies both for storage and computation time.
+        RCG is the theoretical gain brought by the Faust representation relatively to its dense
+        matrix equivalent. <br/>The higher is the RCG, the more computational
+        savings will be made.
+        This gain applies both for storage space and computation time.
+
+        NOTE: F.rcg() == 1/F.density()
 
         Args:
             F: the Faust object.
 
         Returns:
             the RCG value (float).
-            F.rcg() == 1/F.density().
 
         <b/> See also: Faust.density, Faust.nnz_sum, Faust.shape.
         """
@@ -713,12 +764,14 @@ class Faust:
 
     def norm(F, ord='fro'):
         """
-        Computes the norm of F.todense(). Several types of norm are available: 1-norm, 2-norm and Frobenius norm.
+        Computes the norm of F.
 
-        NOTE: The norm of F is equal to the norm of its dense matrix
-        F.toarray().
+        Several types of norm are available: 1-norm, 2-norm and Frobenius norm.
 
-        WARNING: This function costs at least as much as Faust.__mul__.
+        The norm of F is equal to the numpy.linalg.norm of F.toarray().
+
+        WARNING: if [n,m] == size(F), the computation time can be expected to
+        be of the order of min(n,m) times that of multipliying F by a vector.
 
         Args:
             F: the Faust object.
@@ -727,13 +780,15 @@ class Faust:
 
         Returns:
             the norm (float).
-            <br/>If ord == 1, then the norm is the maximum absolute column sum of the
-            matrix F.todense().
-            <br/>If ord == 2, then the norm is approximately
-            max(scipy.linalg.svd(F.toarray())[1]) (the greatest singular value). This is
-            equivalent to norm(F).
-            <br/>If ord == 'fro', then the norm is the Frobenius norm of
-            F.todense().
+            <br/>If ord == 1, the norm is <code>norm(F.toarray(),1) ==
+            max(sum(abs(F.toarray())))</code>.
+            <br/>If ord == 2, the norm is the maximum singular value of F
+            or approximately <code>norm(F.toarray(), 2) ==
+            max(scipy.linalg.svd(F.toarray())[1])</code>.
+            <br/> &nbsp;&nbsp;&nbsp; This is the default norm calculated whthe default norm calculated when
+            calling to norm(F).
+            <br/>If ord == 'fro', the norm is <code>norm(F.toarray(),
+            'fro')</code>.
 
         Raises:
             ValueError.
@@ -755,7 +810,7 @@ class Faust:
 
     def get_num_factors(F):
         """
-        Gives the number of factors of F.
+        Returns the number of factors of F.
 
         Returns:
             the number of factors.
@@ -829,14 +884,16 @@ class Faust:
         """
         Saves the Faust F into a file.
 
-        NOTE: storing F should typically use rcg(F) times less storage than
+        The file is saved in Matlab format version 5 (.mat extension).
+
+        NOTE: storing F should typically use rcg(F) times less disk space than
         storing F.todense().
 
         Args:
             F: the Faust object.
             filepath: the path for saving the Faust (should end with .mat
             if Matlab format is used).
-            format: (optional) it designates the format to use for
+            format: (optional) The format to use for
             writing. By default, it's "Matlab" to save the Faust in a .mat
             file (currently only that format is available).
 
@@ -845,13 +902,10 @@ class Faust:
 
 
         Examples:
-            >>> from pyfaust import FaustFactory
+            >>> from pyfaust import FaustFactory, Faust
             >>> F = FaustFactory.rand([2, 3], [10, 20],.5, is_real=False)
             >>> F.save("F.mat")
             >>> G = Faust(filepath="F.mat")
-            >>> H = Faust(filepath="F.mat", scale=2)
-            >>> (H.toarray()/G.toarray() != 2).any()
-            False
 
             <b/> See also Faust.__init__, Faust.rcg.
         """

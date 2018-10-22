@@ -224,7 +224,7 @@ cdef class FaustCore:
                 core.core_faust_dbl = \
                         self.core_faust_dbl.mul_scal(scalar)
             else:
-                raise Exception("You cannot multiply a real Faust by a"
+                raise ValueError("You cannot multiply a real Faust by a"
                                 " complex scalar (not yet implemented).")
         else:
             if(isinstance(scalar, np.complex) or isinstance(scalar,
@@ -232,7 +232,7 @@ cdef class FaustCore:
                 core.core_faust_cplx = \
                         self.core_faust_cplx.mul_scal(scalar)
             else:
-                raise Exception("The multiplicative scalar must be a real or "
+                raise ValueError("The multiplicative scalar must be a real or "
                                 "a complex number.")
         core._isReal = self._isReal
         return core
@@ -249,7 +249,7 @@ cdef class FaustCore:
         if(isinstance(M, FaustCore)):
             return self.multiply_faust(M)
         if not isinstance(M, (np.ndarray) ):
-            raise ValueError('input M must a numpy ndarray')
+            raise ValueError('input M must a numpy.ndarray or a numpy.matrix')
         if(self._isReal):
            M=M.astype(float,'F')
            if not M.dtype=='float':
