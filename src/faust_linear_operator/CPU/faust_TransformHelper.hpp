@@ -619,6 +619,9 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::~TransformHelper() {
 			// transform is deleted auto. when no TransformHelper uses it (no more weak refs left)
+#ifdef FAUST_VERBOSE
+			cout << "Destroying Faust::TransformHelper object." << endl;
+#endif
 		}
 
 	template<typename FPP>
@@ -747,7 +750,7 @@ namespace Faust {
 			for(int i=1; i < n; i++)
 				factors[i] = factor->Clone();
 
-			TransformHelper<FPP,Cpu>* hadamardFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false);
+			TransformHelper<FPP,Cpu>* hadamardFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
 			return hadamardFaust;
 
 		}
@@ -760,7 +763,7 @@ namespace Faust {
 			fft_factors(n, factors);
 //			for(int i=0;i<n+1;i++)
 //				factors[i]->Display();
-			TransformHelper<FPP,Cpu>* fourierFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false);
+			TransformHelper<FPP,Cpu>* fourierFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
 			return fourierFaust;
 //			return nullptr;
 
