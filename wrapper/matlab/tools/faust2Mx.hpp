@@ -405,7 +405,7 @@ mxArray* transformFact2FullMxArray(faust_unsigned_int id, Faust::TransformHelper
 template<class FPP>
 void  mxArray2Scalar(const mxArray* scalar, typename std::enable_if<std::is_floating_point<FPP>::value, FPP>::type* out)
 {
-	cout << "mxArray2Scalar() FPP real" << endl;
+//	cout << "mxArray2Scalar() FPP real" << endl;
 	*out = mxGetScalar(scalar);
 }
 
@@ -418,7 +418,7 @@ void mxArray2Scalar(const mxArray* scalar, complex<FPP>* out)
 	if(mxIsComplex(scalar))
 	{
 		im_ptr = (FPP*) mxGetPi(scalar);
-		cout << "im_ptr[0]: " << im_ptr[0] << endl;
+//		cout << "im_ptr[0]: " << im_ptr[0] << endl;
 		cplx = complex<FPP>(real_part, im_ptr[0]);
 	}
 	else

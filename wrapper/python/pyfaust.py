@@ -423,6 +423,7 @@ class Faust:
             >>> G = FaustFactory.rand(5, F.shape[1])
             >>> H = F*G
             >>> # H is a Faust because F and G are
+            >>> F_times_two = 2*F
 
         <b/>See also Faust.__init__, Faust.rcg
         """

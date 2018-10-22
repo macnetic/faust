@@ -216,8 +216,10 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b B = mtimes(F, A)<br/>
-		%> &nbsp;&nbsp;&nbsp; @b B = F*A
+		%> &nbsp;&nbsp;&nbsp; @b G = mtimes(F, A)<br/>
+		%> &nbsp;&nbsp;&nbsp; @b G = F*A<br/>
+		%> &nbsp;&nbsp;&nbsp; @b G = F*s with s a scalar.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b G = s*F with s a scalar.
 		%>
 		%>
 		%> @b NOTE: The primary goal of this function is to implement “fast” multiplication by a
@@ -230,31 +232,38 @@ classdef Faust
 		%> @param F the Faust object.
 		%> @param A The dense matrix to multiply or a Faust object.
 		%>
-		%> @retval B The multiplication result (a dense matrix or a Faust object depending on what A is).
+		%> @retval G The multiplication result (a dense matrix or a Faust object depending on what A is).
 		%>
 		%> @b Example
 		%> @code
 		%>   import matfaust.FaustFactory
 		%>   F = FaustFactory.rand([2, 5], [50, 100], .5)
 		%>   A = rand(size(F,2), 50)
-		%>   B = F*A
-		%> % is equivalent to B = mtimes(F, A)
+		%>   G = F*A
+		%> % is equivalent to G = mtimes(F, A)
 		%>   G = FaustFactory.rand(5,size(F, 2))
 		%>   H = F*G
 		%> % H is a Faust because F and G are
+		%>   Fs = F*2
+		%>   sF = 2*F
+		%> % sF == Fs, i.e. the Faust F times 2.
 		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.Faust, Faust.rcg.
 		%>
 		%======================================================================
-		function B = mtimes(F,A)
+		function G = mtimes(F,A)
 			%% MTIMES * Faust Multiplication (overloaded Matlab built-in function).
 			%
-			% B=mtimes(F,A) is called for syntax 'B=F*A', when F is a Faust matrix and A a full
-			% storage matrix, B is also a full matrix storage.
+			% G=mtimes(F,A) is called for syntax 'G=F*A', when F is a Faust matrix and A a full
+			% storage matrix, G is also a full matrix storage.
 			%
 			% See also mtimes_trans
-			B = mtimes_trans(F, A, 0);
+			if(isa(A, 'matfaust.Faust') && isscalar(F))
+				G = mtimes_trans(A,F, 0);
+			else
+				G = mtimes_trans(F, A, 0);
+			end
 		end
 
 
