@@ -146,6 +146,8 @@ namespace Faust {
 																						is_conjugate(false),
 																						is_sliced(false)
 	{
+		if(lambda_ != FPP(1.0))
+			cerr << "WARNING: the constructor argument for multiplying the Faust by a scalar is DEPRECATED and might not be supported in next versions of FAµST." << endl;
 		this->transform = make_shared<Transform<FPP,Cpu>>(facts, lambda_, optimizedCopy, cloning_fact);
 	}
 

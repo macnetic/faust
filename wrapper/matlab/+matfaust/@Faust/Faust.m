@@ -85,7 +85,6 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; Faust(factors) creates a Faust from a list of factors (1D cell array).<br/><br>
 		%> &nbsp;&nbsp;&nbsp; Faust(factors, scale) same as above but multiplying the Faust with a scalar.<br/><br/>
 		%> &nbsp;&nbsp;&nbsp; Faust(filepath) creates a Faust from a previously saved Faust file (filepath is a character array).<br/><br/>
-		%> &nbsp;&nbsp;&nbsp; Faust(filepath, scale) save as above but multiplying the Faust with a scalar.
 		%>
 		%>
 		%> @param factors (varargin{1}) the 1D cell array of factors to initialize the Faust with.
@@ -94,7 +93,6 @@ classdef Faust
 		%> @param filepath (varargin{1}) the file from which a Faust is created. It must be a character array.<br/>
 		%>								The format is Matlab version 5 (.mat extension).<br/>
 		%>								The file must have been saved before with Faust.save().
-		%> @param scale (optional varargin{2}) a multiplicative scalar (see examples below).
 		%>
 		%> @b Examples
 		%> @code
@@ -112,13 +110,10 @@ classdef Faust
 		%>	% define a Faust with those factors
 		%>	F = Faust(factors)
 		%>
-		%>	scale = 2
-		%>	G = Faust(factors, scale) % G == scale*F
 		%>
 		%>	save(F, 'F.mat')
 		%>	% define a Faust from file
 		%>	H = Faust('F.mat')
-		%>	I = Faust('F.mat', scale) % I == scale*H
 		%>
 		%> @endcode
 		%>
@@ -140,6 +135,7 @@ classdef Faust
 			% - filepath: the file where a Faust was stored with Faust.save() (in matlab format version 5).
 			% - scale: (optional) multiplicative scalar.
 			err_msg = 'matfaust.Faust() error: the arguments are not valid.';
+			% scale argument is hidden for user (deprecated) but it's still available
 			if(nargin < 1 || nargin > 3)
 				error([err_msg ' Number of arguments passed is zero or greater than three.'])
 			elseif(iscell(varargin{1}))

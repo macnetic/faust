@@ -98,7 +98,7 @@ class Faust:
     For more information about FAµST take a look at http://faust.inria.fr.
     """
 
-    def  __init__(F, factors=None, scale=1.0, filepath=None, core_obj=None):
+    def  __init__(F, factors=None, filepath=None, **kwargs):
         """ Creates a Faust from a list of factors or alternatively from a file.
 
             Another easy way to create a Faust is to call the static method FaustFactory.rand().
@@ -113,8 +113,7 @@ class Faust:
             filepath: the file from which a Faust is created.<br/>
                       The format is Matlab version 5 (.mat extension).<br/>
                       The file must have been saved before with Faust.save().
-            scale: a multiplicative scalar (see examples below).
-            core_obj: for internal purpose only. Please don't fill this argument.
+            *kwargs: internal purpose arguments.
 
         WARNING: filepath and factors arguments are mutually exclusive. If you
         use filepath you must explicitely set argument with the keyword.
@@ -136,8 +135,6 @@ class Faust:
             >>> # define a Faust with those factors
             >>> F = Faust(factors)
 
-            >>> scale = 2
-            >>> G = Faust(factors, scale) # G == scale*F
 
             >>> F.save("F.mat")
             >>> # define a Faust from file
@@ -147,8 +144,18 @@ class Faust:
         <b/> See also Faust.save, FaustFactory.rand
 
         """
-        if(core_obj):
-            F.m_faust = core_obj
+        if("scale" in kwargs.keys()):
+            # scale hidden argument
+            scale = kwargs['scale']
+            if(not (isinstance(scale, float) or isinstance(scale, int) or
+               isinstance(scale, np.complex))):
+                raise Exception("Scale must be a number.")
+        else:
+            scale = 1.0
+        if("core_obj" in kwargs.keys()):
+            core_obj = kwargs['core_obj']
+            if(core_obj):
+                F.m_faust = core_obj
         else:
             if(filepath and isinstance(filepath, str)):
                     contents = loadmat(filepath)

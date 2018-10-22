@@ -73,6 +73,10 @@ cdef class FaustCore:
         cdef complex [:] data1d_cplx #only for csr mat factor
         cdef unsigned int nbrow
         cdef unsigned int nbcol
+        if(alpha != 1.0):
+            print("WARNING: the constructor argument for multiplying the Faust"
+                  " by a scalar is DEPRECATED and might not be supported in next"
+                  " versions of FAµST.")
         if(list_factors is not None):
             if(match('.*int', repr(list_factors[0].dtype))):
                list_factors[0] = list_factors[0].astype(np.float)
