@@ -180,7 +180,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			fF = full(F);
 			fftI = fft(eye(2^n));
 			% this.verifyEqual(nnz(fH), numel(fH));
-			this.verifyEqual(norm(fF-fftI), 0, 'RelTol',0.0005);
+			this.verifyEqual(norm(fF-fftI), 0, 'AbsTol',10^-13);
 		end
 	end
 
