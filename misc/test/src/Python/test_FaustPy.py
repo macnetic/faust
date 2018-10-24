@@ -217,6 +217,17 @@ class TestFaustPy(unittest.TestCase):
         sj2 = max(rand_j,rand_jj)
         sF = self.F[si1:si2,sj1:sj2]
         self.assertTrue((sF.todense() == self.F.todense()[si1:si2,sj1:sj2]).all())
+        # test a second slice on sF
+        rand_i, rand_j = self.r.randint(0,sF.shape[0]-1),self.r.randint(0,sF.shape[1]-1)
+        rand_ii, rand_jj = \
+        self.r.randint(rand_i+1,sF.shape[0]),self.r.randint(rand_j+1,sF.shape[1])
+        si1 = min(rand_i,rand_ii)
+        si2 = max(rand_i,rand_ii)
+        sj1 = min(rand_j,rand_jj)
+        sj2 = max(rand_j,rand_jj)
+        sF2 = sF[si1:si2,sj1:sj2]
+        self.assertTrue((sF2.todense() == sF.todense()[si1:si2,sj1:sj2]).all())
+
 
     def testToDense(self):
         print("testToDense()")

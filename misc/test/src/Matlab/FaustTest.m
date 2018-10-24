@@ -198,11 +198,35 @@ classdef FaustTest < matlab.unittest.TestCase
             col_i = randi([1,size(this.test_faust,2)]);
             test_F = full(this.test_faust(:,col_i));
             this.verifyEqual(test_F, ref_F(:,col_i), 'RelTol', 0.01)
-%			size(test_F)
-%			size(ref_F(:,col_i))
-%			size(ref_F)
-%			col_i
-        end
+			% test double-slice (on rows and cols at the same time)
+			tested_fausts = {this.test_faust, ctranspose(this.test_faust)}
+			for i=1,length(tested_fausts)
+				row_i1 = randi([1,size(tested_fausts{i},1)]);
+				row_i2 = randi([row_i1,size(tested_fausts{i},1)]);
+				col_i1 = randi([1,size(tested_fausts{i},2)]);
+				col_i2 = randi([col_i1,size(tested_fausts{i},2)]);
+				% slice test faust, affect the resulting Faust to G and compare the full matrices
+				full_test_F = full(tested_fausts{i});
+				G = tested_fausts{i}(row_i1:row_i2, col_i1:col_i2);
+				full_G = full(G);
+				this.verifyEqual(full_test_F(row_i1:row_i2, col_i1:col_i2),full_G,'RelTol', 0.0001)
+				% now slice G to get H
+				row_i1 = randi([1,size(G,1)]);
+				row_i2 = randi([row_i1,size(G,1)]);
+				col_i1 = randi([1,size(G,2)]);
+				col_i2 = randi([col_i1,size(G,2)]);
+				H = G(row_i1:row_i2, col_i1:col_i2);
+				full_H = full(H)
+				% ensure consistence of slicing on full matrices
+				this.verifyEqual(full_G(row_i1:row_i2, col_i1:col_i2), full_H, 'RelTol', 0.0001)
+				% test second slice on transpose of sliced Faust G
+				tG = transpose(G)
+				full_tG = full(tG)
+				I = tG(col_i1:col_i2, row_i1:row_i2)
+				full_I = full(I)
+				this.verifyEqual(full_I, full_tG(col_i1:col_i2, row_i1:row_i2), 'RelTol', 0.0001)
+			end
+		end
 
         function testFull(this)
             disp('Test Faust.full()')

@@ -201,16 +201,8 @@ namespace Faust {
 			this->is_conjugate = th->is_conjugate;
 			if(! (s[0].belong_to(0, th->getNbRow()) || s[1].belong_to(0, th->getNbCol())))
 				handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Slice overflows a Faust dimension.");
-			if(th->is_sliced) { // slice of slice
-				this->slices[0].start_id = th->slices[0].start_id+s[0].start_id;
-				this->slices[0].end_id = th->slices[0].start_id+s[0].end_id;
-				this->slices[1].start_id = th->slices[1].start_id+s[1].start_id;
-				this->slices[1].end_id = th->slices[1].start_id+s[1].end_id;
-			}
-			else {
-				this->slices[0] = s[0];
-				this->slices[1] = s[1];
-			}
+			this->slices[0] = s[0];
+			this->slices[1] = s[1];
 			this->is_sliced = true;
 			this->transform = make_shared<Transform<FPP,Cpu>>(*eval_sliced_Transform());
 		}
