@@ -766,7 +766,7 @@ class Faust:
         """
         Computes the norm of F.
 
-        Several types of norm are available: 1-norm, 2-norm and Frobenius norm.
+        Several types of norm are available: 1-norm, 2-norm, inf-norm and Frobenius norm.
 
         The norm of F is equal to the numpy.linalg.norm of F.toarray().
 
@@ -775,7 +775,7 @@ class Faust:
 
         Args:
             F: the Faust object.
-            ord: (optional) the norm order (1 or 2) or "fro" for
+            ord: (optional) the norm order (1, 2, numpy.inf) or "fro" for
             Frobenius norm (by default the Frobenius norm is computed).
 
         Returns:
@@ -785,8 +785,10 @@ class Faust:
             <br/>If ord == 2, the norm is the maximum singular value of F
             or approximately <code>norm(F.toarray(), 2) ==
             max(scipy.linalg.svd(F.toarray())[1])</code>.
-            <br/> &nbsp;&nbsp;&nbsp; This is the default norm calculated whthe default norm calculated when
+            <br/> &nbsp;&nbsp;&nbsp; This is the default norm calculated when
             calling to norm(F).
+            <br/>If ord = numpy.inf the norm is
+            <code>norm(F.toarray(),numpy.inf) == max(sum(abs(F.T.toarray())))</code>
             <br/>If ord == 'fro', the norm is <code>norm(F.toarray(),
             'fro')</code>.
 
@@ -798,14 +800,16 @@ class Faust:
             >>> from pyfaust import FaustFactory
             >>> F = FaustFactory.rand([1, 2], [50, 100], .5)
             >>> F.norm()
-            133.96231832406144
+            23.55588891399667
             >>> F.norm(2)
-            80.0914231648143
+            5.929720822717308
             >>> F.norm('fro')
-            133.96231832406144
+            23.55588891399667
+            >>> F.norm(numpy.inf)
+            18.509101197826254
         """
-        if(ord not in [1, 2, "fro"]):
-            raise ValueError("ord must have the value 1, 2 or 'fro'.")
+        if(ord not in [1, 2, "fro", np.inf]):
+            raise ValueError("ord must have the value 1, 2, 'fro' or numpy.inf.")
         return F.m_faust.norm(ord)
 
     def get_num_factors(F):

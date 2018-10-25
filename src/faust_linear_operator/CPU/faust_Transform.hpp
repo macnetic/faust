@@ -547,11 +547,11 @@ double Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double th
 
 
 template<typename FPP>
-double Faust::Transform<FPP,Cpu>::normL1() const
+double Faust::Transform<FPP,Cpu>::normL1(const bool transpose /* = false */) const
 {
 	double norm;
-	MatDense<FPP, Cpu> fact = get_product();
-	norm = std::abs(fact.normL1());
+	MatDense<FPP, Cpu> full = get_product(transpose?'T':'N');
+	norm = std::abs(full.normL1(/*transpose*/)); //transpose not necessary because full is already transposed if needed
 	return norm;
 }
 
@@ -560,7 +560,7 @@ double Faust::Transform<FPP,Cpu>::normL1(const char opThis, const bool isConj) c
 {
 	double norm;
 	MatDense<FPP, Cpu> fact = get_product(opThis, isConj);
-	norm = std::abs(fact.normL1());
+	norm = std::abs(fact.normL1(opThis=='T'?true:false));
 	return norm;
 }
 

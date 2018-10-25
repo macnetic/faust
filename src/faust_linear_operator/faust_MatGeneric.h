@@ -152,16 +152,18 @@ namespace Faust
 	virtual matvar_t* toMatIOVar(bool transpose, bool conjugate) const=0;
 
 	//! \brief Computes the L1-norm of the matrix.
+	// \param transpose: to compute the norm of the transpose matrix.
 	// \see Faust::normL1(faust_unsigned_int&)
 	// \see http://mathworld.wolfram.com/L1-Norm.html
-	virtual FPP normL1() const=0;
+	virtual FPP normL1(const bool transpose) const=0;
 
 	//! \brief Computes the L1-norm of the matrix.
 	// \param col_id: reference to receive the column index which the L1-norm is equal to the matrix's norm (if several exist, then the greater colummn index is kept).
+	// \param transpose: to compute the norm of the transpose matrix.
 	// \return The norm (its type is the matrix scalar's).
 	// \see Faust::normL1()
 	// \see http://mathworld.wolfram.com/L1-Norm.html
-	virtual FPP normL1(faust_unsigned_int& col_id) const=0;
+	virtual FPP normL1(faust_unsigned_int& col_id, const bool transpose) const=0;
 	//
 	//! \brief Returns a column of the matrix as a new Faust::Vect.
 	virtual Faust::Vect<FPP,DEVICE> get_col(faust_unsigned_int id) const=0;

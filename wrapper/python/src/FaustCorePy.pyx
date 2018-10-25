@@ -359,16 +359,20 @@ cdef class FaustCore:
 
     def norm(self, ord):
         cdef double norm
-        if(str(ord).lower() not in ["1","2","fro"]):
+        if(str(ord).lower() not in ["1","2","fro", "inf"]):
             raise ValueError("FaustCorePy.norm() invalid type of norm asked.")
         if(self._isReal):
             if(isinstance(ord,int)):
                 norm = self.core_faust_dbl.norm(ord)
+            elif(ord == np.inf):
+                norm = self.core_faust_dbl.normInf()
             else:
                 norm = self.core_faust_dbl.normFro()
         else:
             if(isinstance(ord,int)):
                 norm = self.core_faust_cplx.norm(ord)
+            elif(ord == np.inf):
+                norm = self.core_faust_cplx.normInf()
             else:
                 norm = self.core_faust_cplx.normFro()
         return norm

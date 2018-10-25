@@ -92,7 +92,7 @@ namespace Faust
     class Vect<FPP,Cpu>
     {
         template<class,Device> friend class Vect;
-		friend double Faust::Transform<FPP,Cpu>::normL1() const;
+		friend double Faust::Transform<FPP,Cpu>::normL1(const bool transpose) const;
 
         public :
         Vect() : dim(0), vec() {}

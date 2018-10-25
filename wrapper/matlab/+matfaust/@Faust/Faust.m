@@ -1141,7 +1141,7 @@ classdef Faust
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
-		%> Several types of norm are available: 1-norm, 2-norm and Frobenius norm.
+		%> Several types of norm are available: 1-norm, 2-norm, inf-norm and Frobenius norm.
 		%>
 		%> The norm of F is equal to the norm of full(F).
 		%>
@@ -1152,10 +1152,11 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F, 2) the 2-norm or maximum singular value of F: approximately norm(full(F),2) == max(svd(full(F))).<br/><br>
 		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F) the same as norm(F, 2).<br/><br>
 		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F, 1) the 1-norm of F: norm(full(F), 1) == max(sum(abs(full(F))))  <br/><br>
+		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F, inf) the inf-norm of F: norm(full(F), inf) == max(sum(abs(full(F)'))) <br/><br/>
 		%> &nbsp;&nbsp;&nbsp; @b n = @b @b norm(F, @b 'fro') the Frobenius norm of F: norm(full(F), 'fro').<br/><br>
 		%>
 		%> @param F the Faust object.
-		%> @param p (optional) the norm order or type. Respectively 1 or 2 for the 1-norm and 2-norm or 'fro' for the Frobenius norm (by default the 2-norm is computed).
+		%> @param p (optional) the norm order or type. Respectively 1, 2 or inf for the 1-norm, 2-norm and inf-norm or 'fro' for the Frobenius norm (by default the 2-norm is computed).
 		%>
 		%>
 		%> @retval n the norm (real).
@@ -1168,13 +1169,16 @@ classdef Faust
 		%> >> F = FaustFactory.rand([1, 2], [50, 100], .5)
 		%> >> norm(F)
 		%> ans =
-		%> 80.0914
+		%> 7.0151
 		%> >> norm(F,2)
 		%> ans =
-		%> 80.0914
+		%> 7.0151
 		%> >> norm(F, 'fro')
 		%> ans =
-		%> 133.9623
+		%> 30.1014
+		%> >> norm(F, inf)
+		%> ans =
+		%> 25.9277
 		%> @endcode
 		%>
 		%======================================================================
@@ -1206,8 +1210,8 @@ classdef Faust
 					end
 					return
 				end
-				if varargin{1} ~= 2 && varargin{1} ~= 1
-					error('only L1, L2 or Frobenius norms are supported for the Faust');
+				if varargin{1} ~= 2 && varargin{1} ~= 1 && varargin{1} ~= inf
+					error('only 1, 2, inf or Frobenius norms are supported for the Faust');
 				end
 				ord = varargin{1};
 			end

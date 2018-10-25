@@ -600,7 +600,12 @@ namespace Faust {
 
 	template<typename FPP>
 		double TransformHelper<FPP,Cpu>::normL1() const {
-			return this->transform->normL1();
+			return this->transform->normL1(is_transposed);
+		}
+
+	template<typename FPP>
+		double TransformHelper<FPP,Cpu>::normInf() const {
+			return this->transform->normL1(!is_transposed);
 		}
 
 	template<typename FPP>

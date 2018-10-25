@@ -698,15 +698,28 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate)
 }
 
 template<typename FPP>
-FPP Faust::MatSparse<FPP, Cpu>::normL1(faust_unsigned_int& col_id) const
+FPP Faust::MatSparse<FPP, Cpu>::normL1(faust_unsigned_int& col_id, const bool transpose /*default false*/) const
 {
+	//TODO: refactor this function with MatDense::normL1()
 	faust_unsigned_int i, j, max_j;
 	FPP sum, max_sum;
-	Eigen::Matrix<FPP, Eigen::Dynamic,1> vec;
-	for(j=0;j<this->getNbCol();j++)
+	Eigen::Matrix<FPP, Eigen::Dynamic,Eigen::Dynamic> vec;
+	int dim1, dim2;
+	if(transpose){
+		dim1 = this->getNbRow();
+		dim2 = this->getNbCol();
+	}
 	{
-		vec=mat.block(0,j,this->getNbRow(),1);
-		for(i=0,sum=0;i<this->getNbRow();i++)
+		dim1 = this->getNbCol();
+		dim2 = this->getNbRow();
+	}
+	for(j=0;j<dim1;j++)
+	{
+		if(transpose)
+			vec=mat.block(j,0,1,this->getNbCol());
+		else
+			vec=mat.block(0,j,this->getNbRow(),1);
+		for(i=0,sum=0;i<dim2;i++)
 			sum += std::abs(vec.data()[i]);
 		if(j==0 || std::abs(sum) > std::abs(max_sum))
 		{
@@ -719,10 +732,10 @@ FPP Faust::MatSparse<FPP, Cpu>::normL1(faust_unsigned_int& col_id) const
 }
 
 template<typename FPP>
-FPP Faust::MatSparse<FPP, Cpu>::normL1() const
+FPP Faust::MatSparse<FPP, Cpu>::normL1(const bool transpose /* default false */) const
 {
 	faust_unsigned_int id;
-	return normL1(id);
+	return normL1(id,transpose);
 }
 
 template<typename FPP>

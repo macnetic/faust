@@ -397,6 +397,9 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
                     norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
                 else if(ord==1)
                     norm_faust = (double) core_ptr->normL1();
+				else if(ord == -(1<<(32-1))) //that's the value for 'inf' from matlab
+											// a constant from c-c++ would be better
+					norm_faust = (double) core_ptr->normInf();
                 else
                     mexErrMsgTxt("norm : unvalid norm order.");
 

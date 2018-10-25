@@ -152,6 +152,12 @@ classdef FaustTest < matlab.unittest.TestCase
             this.verifyEqual(norm(ref_F, 'fro'), norm(this.test_faust, 'fro'), 'RelTol',0.05)
         end
 
+        function testNormInf(this)
+            disp('testNormInf()')
+            ref_F = this.mulFactors();
+            this.verifyEqual(norm(ref_F, inf), norm(this.test_faust, inf), 'RelTol',0.05)
+		end
+
         function testnnz(this)
             disp('testnnz()')
 			this.verifyEqual(nnz_sum(this.test_faust), FaustTest.nnzero_count(this.factors))

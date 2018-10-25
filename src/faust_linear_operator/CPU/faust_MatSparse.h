@@ -273,8 +273,8 @@ namespace Faust
 			// \see Faust::Transform::save_mat_file()
 			// \see toMatIOVar()
 			matvar_t* toMatIOVarDense(bool transpose, bool conjugate) const;
-			FPP normL1() const;
-			FPP normL1(faust_unsigned_int&) const;
+			FPP normL1(const bool transpose=false) const;
+			FPP normL1(faust_unsigned_int&, const bool transpose=false) const;
 			Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 			Faust::MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
 			Faust::MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
@@ -310,7 +310,7 @@ namespace Faust
 
 			//! *this = S * (*this)
 			friend void  Faust::Vect<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);
-			friend double Faust::Transform<FPP,Cpu>::normL1() const;
+			friend double Faust::Transform<FPP,Cpu>::normL1(const bool transpose) const;
 			friend Faust::TransformHelper<FPP,Cpu>; //TODO: limit to hadamardFaust
 			/*friend void  Faust::MatDense<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);*/
 

@@ -168,6 +168,12 @@ double FaustCoreCpp<FPP>::normFro() const
 }
 
 template<typename FPP>
+double FaustCoreCpp<FPP>::normInf() const
+{
+    return this->transform->normInf();
+}
+
+template<typename FPP>
 double FaustCoreCpp<FPP>::get_nb_factors() const
 {
     double nb_fact = this->transform->size();
