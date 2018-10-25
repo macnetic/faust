@@ -1344,6 +1344,21 @@ classdef Faust
 			end
 		end
 
+		function C = cat(varargin)
+			error('Function not implemented for Faust class');
+		end
+
+		function HC = horzcat(varargin)
+			error('Function not implemented for Faust class');
+		end
+
+		function VC = vertcat(varargin)
+			error('Function not implemented for Faust class');
+		end
+
+		function RF = reshape(varargin)
+			error('Function not implemented for Faust class');
+		end
 
 	end
 	methods(Static)
