@@ -49,11 +49,11 @@ A = rand(dim1,dim2);
 
 
 % Rational complexity Gain (theoretical speed-up) of the Faust
-rcg = 100;
+rcg_ = 100;
 % number of factor of the Faust
 nb_factor = 2;
 %% generate parameters of the factorisation
-params = generate_params(dim1,dim2,nb_factor,rcg);
+params = generate_params(dim1,dim2,nb_factor,rcg_);
 
 %% factorisation (create Faust from matrix A)
 faust_A = faust_decompose(A,params);

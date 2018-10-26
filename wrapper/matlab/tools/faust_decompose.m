@@ -44,9 +44,9 @@
 function Faust_M = faust_decompose(M,params)
 
 import matfaust.Faust
-[lambda,fact]=mexHierarchical_fact(M,params);
+[lambda,fact]=mexHierarchical_factReal(M,params);
 
-Faust_M=Faust(fact,lambda);
+Faust_M=Faust(fact,true);
 
 
 end
