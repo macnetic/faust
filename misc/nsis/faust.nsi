@@ -101,7 +101,7 @@ Section "" ; no component so name not needed
 
   ; install matlab wrapper
   SetOutPath $INSTDIR\matlab
-  File /r /x old_matlab @PROJECT_BINARY_DIR@\wrapper\matlab\*.m @PROJECT_BINARY_DIR@\wrapper\matlab\*.@MEX_EXT@
+  File /r /x old_matlab @PROJECT_BINARY_DIR@\wrapper\matlab\*.m @PROJECT_BINARY_DIR@\wrapper\matlab\*.@MEX_EXT@ @PROJECT_BINARY_DIR@\wrapper\matlab\*.mat
 
   ; post install pyfaust auto-setup in environment (only works if python is installed in path) 
   ${StrRep} '$0' $TEMP '\' '\\'
