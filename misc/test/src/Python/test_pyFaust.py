@@ -220,8 +220,8 @@ print("Ok")
 print("*** SLICING ***")
 for i in range(dim1):
 	for j in range(dim2):
-		F_i_j=F[i,j].todense();
-		F_trans_j_i=F_trans[j,i].todense();
+		F_i_j=F[i:i+1,j:j+1].todense();
+		F_trans_j_i=F_trans[j:j+1,i:i+1].todense();
 		if F_i_j[0,0] != F_dense[i,j]:
 			raise ValueError('invalid value')
 			
