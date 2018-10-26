@@ -258,6 +258,14 @@ class TestFaustPy(unittest.TestCase):
         prod = self.mulFactors().dot(rmat)
         test_prod = self.F*rmat
         self.assertProdEq(prod, test_prod)
+        # test mul by a complex matrix
+        j = np.complex(0,1)
+        rand = np.random.rand
+        cmat = rand(rmat.shape[0], rmat.shape[1]) + j*rand(rmat.shape[0],
+                                                           rmat.shape[1])
+        prod = self.mulFactors().dot(cmat)
+        test_prod = self.F*cmat
+        self.assertProdEq(prod, test_prod)
 
 
     def testTranspose(self):

@@ -483,6 +483,9 @@ class Faust:
             return Faust(core_obj=F.m_faust.multiply(A.m_faust))
         elif(isinstance(A, float) or isinstance(A, int) or isinstance(A, np.complex)):
             return Faust(core_obj=F.m_faust.multiply_scal(A))
+        elif(isinstance(A, np.ndarray) and isinstance(A[0,0], np.complex)):
+            j = np.complex(0,1)
+            return F.m_faust.multiply(A.real).astype(np.complex) + j*F.m_faust.multiply(A.imag)
         else:
             return F.m_faust.multiply(A)
 

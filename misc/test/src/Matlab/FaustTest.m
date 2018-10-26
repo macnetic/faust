@@ -260,6 +260,23 @@ classdef FaustTest < matlab.unittest.TestCase
             %TODO
         end
 
+
+		function testMul(this)
+			disp('Test Faust.mtimes()')
+			F = this.test_faust;
+			rmat = rand(size(F,2),size(F,2));
+			ref_full_faust = this.mulFactors();
+			ref_mat = ref_full_faust*rmat;
+			test_mat = F*rmat;
+			this.verifyEqual(test_mat,ref_mat, 'RelTol', 10^-3)
+			% do the same for a complex matrix
+			cmat = rand(size(F,2),size(F,2)) + i*rand(size(F,2),size(F,2));
+			ref_mat = ref_full_faust*cmat;
+			test_mat = F*cmat;
+			this.verifyEqual(test_mat,ref_mat, 'RelTol', 10^-3)
+
+		end
+
         function testDelete(this)
             disp('Test Faust.delete()')
             tFaust = transpose(this.test_faust);
