@@ -107,6 +107,13 @@ classdef FaustTest < matlab.unittest.TestCase
            this.verifyEqual(num_cols, size_last_fac(2))
         end
 
+		function testNumel(this)
+			disp('testNumel()')
+			test_numel = numel(this.test_faust);
+			ref_numel = numel(this.mulFactors());
+			this.verifyEqual(test_numel, ref_numel)
+		end
+
         function testGetFactorAndConstructor(this)
             disp('testGetFactorAndConstructor()')
             for i = 1:this.num_factors

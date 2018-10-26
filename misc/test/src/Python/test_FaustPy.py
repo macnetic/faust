@@ -304,9 +304,15 @@ class TestFaustPy(unittest.TestCase):
         os.remove(test_file)
         os.remove(ref_file)
 
+    def testShape(self):
+        print("testShape()")
+        self.assertEqual((self.F.shape[0],self.F.shape[1]), self.F.shape)
+
     def testSize(self):
         print("testSize()")
-        self.assertEqual((self.F.shape[0],self.F.shape[1]), self.F.shape)
+        test_size = self.F.size
+        ref_size = self.mulFactors().size
+        self.assertEqual(test_size,ref_size)
 
     def testDelete(self):
         print("Test del Faust")
