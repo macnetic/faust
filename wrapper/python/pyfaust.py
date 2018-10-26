@@ -635,6 +635,8 @@ class Faust:
         elif(isinstance(indices, tuple)):
             if(len(indices) == 2):
                 out_indices = [0,0]
+                if(isinstance(indices[0], int) and isinstance(indices[1],int)):
+                    return F.todense()[indices[0],indices[1]]
                 if(indices[0] == Ellipsis):
                     if(indices[1] == Ellipsis):
                         raise IndexError('an index can only have a single ellipsis '

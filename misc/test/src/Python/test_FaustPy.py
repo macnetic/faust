@@ -203,7 +203,7 @@ class TestFaustPy(unittest.TestCase):
         # test one random element
         rand_i, rand_j = self.r.randint(0,self.F.shape[0]-1),self.r.randint(0,self.F.shape[1]-1)
         if(prod[rand_i,rand_j] != 0):
-            self.assertLessEqual(abs(self.F[rand_i,rand_j].todense()[0]-prod[rand_i,rand_j])/abs(prod[rand_i,rand_j]),
+            self.assertLessEqual(abs(self.F[rand_i,rand_j]-prod[rand_i,rand_j])/abs(prod[rand_i,rand_j]),
                                  10**-6, msg=("compared values are (ref,rest) ="
                                               +str(prod[rand_i,rand_j])+str(prod[rand_i,rand_j])))
         # test one random row
