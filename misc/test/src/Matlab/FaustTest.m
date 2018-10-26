@@ -281,7 +281,18 @@ classdef FaustTest < matlab.unittest.TestCase
 			ref_mat = ref_full_faust*cmat;
 			test_mat = F*cmat;
 			this.verifyEqual(test_mat,ref_mat, 'RelTol', 10^-3)
-
+			% mul by real scalar
+			r = rand();
+			test_rF = full(F*r);
+			test_commu_rF = full(r*F)
+			ref_rF = ref_full_faust*r;
+			this.verifyEqual(test_rF,ref_rF, 'RelTol', 10^-3);
+			this.verifyEqual(test_commu_rF,ref_rF, 'RelTol', 10^-3);
+			this.verifyNotEqual(test_rF, ref_full_faust*(r+1))
+			this.verifyNotEqual(test_commu_rF, ref_full_faust*(r+1))
+			this.assertLessThan(norm(full(F'*r)-full(F)'*r)/norm(full(F)'*r), eps(1.))
+			this.assertLessThan(norm(full(F.'*r)-full(F).'*r)/norm(full(F).'*r), eps(1.))
+			% TODO: mul by complex scalar (when impl.)
 		end
 
         function testDelete(this)

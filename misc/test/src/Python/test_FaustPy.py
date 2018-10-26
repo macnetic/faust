@@ -266,7 +266,17 @@ class TestFaustPy(unittest.TestCase):
         prod = self.mulFactors().dot(cmat)
         test_prod = self.F*cmat
         self.assertProdEq(prod, test_prod)
+        # test mul by a real scalar
+        import random
+        r = random.random()*100
+        test_prod = self.F*r
+        ref_prod = self.mulFactors()*r
+        self.assertLess(norm(test_prod.toarray()-ref_prod)/norm(ref_prod),
+                        1**-5)
+        self.assertLess(norm((self.F.T*r).toarray()-self.F.toarray().T*r)/norm(self.F.toarray().T*r),1**-5)
+        self.assertLess(norm((self.F.H*r).toarray()-self.F.toarray().T.conj()*r)/norm(self.F.toarray().T.conj()*r),1**-5)
 
+        #TODO: test mul by a complex scalar when impl.
 
     def testTranspose(self):
         print("testTranspose()")
