@@ -142,7 +142,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_
 
 template<typename FPP>
 template<typename FPP1>
-Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP1* value, const int* row_ptr, const int* id_col, const bool transpose /*= false to default*/) :
+Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP1* value, const int* row_ptr, const int* id_col, const bool transpose /*= default to false */) :
 	Faust::MatGeneric<FPP,Cpu>(transpose?dim2_:dim1_,transpose?dim1_:dim2_),
 	mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(transpose?dim2_:dim1_,transpose?dim1_:dim2_)),
 	nnz(nnz_)
@@ -831,6 +831,28 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_i
 	return fsmat;
 }
 
+	template<typename FPP>
+Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::eye(faust_unsigned_int num_rows, faust_unsigned_int num_cols)
+{
+	faust_unsigned_int nnz = std::min(num_rows, num_cols);
+	FPP values[nnz];
+	int colind[nnz];
+	int rowptr[num_rows+1];
+	rowptr[0] = 0;
+//	cout << "MatSparse::eye stage 1" << endl;
+	for(faust_unsigned_int i=0;i<nnz;i++)
+	{
+		values[i] = FPP(1);
+		colind[i] = i;
+		rowptr[i+1] = 1+rowptr[i];
+	}
+	if(num_rows > num_cols)
+		for(faust_unsigned_int i=nnz+1;i<num_rows;i++)
+			rowptr[i+1] = rowptr[i];
+//	cout << "MatSparse::eye stage 2" << endl;
+	MatSparse<FPP,Cpu>* eye = new MatSparse(nnz, num_rows, num_cols, values, rowptr, colind);
+	return eye;
+}
 
 
 #endif
