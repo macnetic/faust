@@ -203,7 +203,6 @@ cdef class FaustCore:
     cdef multiply_faust(self, F):
         if(isinstance(F, FaustCore)):
             core = FaustCore(core=True)
-            core2 = FaustCore(core=True)
             if(self._isReal):
                 core.core_faust_dbl = \
                 self.core_faust_dbl.mul_faust((<FaustCore?>F).core_faust_dbl)
@@ -237,8 +236,35 @@ cdef class FaustCore:
         core._isReal = self._isReal
         return core
 
+    cdef _vertcat(self, F):
+         core = FaustCore(core=True)
+         #TODO/ G must be a FaustCore
+         if(self._isReal):
+             core.core_faust_dbl = self.core_faust_dbl.vertcat((<FaustCore?>F).core_faust_dbl)
 
+         else:
+             core.core_faust_cplx = \
+                     self.core_faust_cplx.vertcat((<FaustCore?>F).core_faust_cplx)
+         core._isReal = self._isReal
+         return core
 
+    def vertcat(self,F):
+        return self._vertcat(F)
+
+    cdef _horzcat(self, F):
+         core = FaustCore(core=True)
+         #TODO/ G must be a FaustCore
+         if(self._isReal):
+             core.core_faust_dbl = self.core_faust_dbl.horzcat((<FaustCore?>F).core_faust_dbl)
+
+         else:
+             core.core_faust_cplx = \
+                     self.core_faust_cplx.horzcat((<FaustCore?>F).core_faust_cplx)
+         core._isReal = self._isReal
+         return core
+
+    def horzcat(self,F):
+        return self._horzcat(F)
 
     # numpy.matrix is always 2-dimensional but C-style (RowMajor)  stored
     # not Fortran-style (ColMajor) as Faust lib use Fortran-style storage

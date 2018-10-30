@@ -1345,15 +1345,39 @@ classdef Faust
 		end
 
 		function C = cat(varargin)
-			error('Function not implemented for Faust class');
+			if(nargin > 0 && isscalar(varargin{1}))
+				if(varargin{1} == 1)
+					C = vertcat(varargin{2:end})
+					return
+				elseif(varargin{1} == 2)
+					C = horzcat(varargin{2:end})
+					return
+				end
+			else
+				error('Wrong first argument: must be an integer.')
+			end
 		end
 
-		function HC = horzcat(varargin)
-			error('Function not implemented for Faust class');
+		function HC = horzcat(F, A)
+			if(~ isa(A, 'matfaust.Faust'))
+				error('Can''t concatenate a Faust to something that is not a Faust.')
+			end
+			if(F.isReal)
+				HC = matfaust.Faust(F, mexFaustReal('horzcat', F.matrix.objectHandle, A.matrix.objectHandle));
+			else
+				HC = matfaust.Faust(F, mexFaustReal('horzcat', F.matrix.objectHandle, A.matrix.objectHandle));
+			end
 		end
 
-		function VC = vertcat(varargin)
-			error('Function not implemented for Faust class');
+		function VC = vertcat(F, A)
+			if(~ isa(A, 'matfaust.Faust'))
+				error('Can''t concatenate a Faust to something that is not a Faust.')
+			end
+			if(F.isReal)
+				VC = matfaust.Faust(F, mexFaustReal('vertcat', F.matrix.objectHandle, A.matrix.objectHandle));
+			else
+				VC = matfaust.Faust(F, mexFaustReal('vertcat', F.matrix.objectHandle, A.matrix.objectHandle));
+			end
 		end
 
 		function RF = reshape(varargin)

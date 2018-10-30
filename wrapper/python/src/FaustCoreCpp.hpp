@@ -87,6 +87,22 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::mul_faust(FaustCoreCpp<FPP>* right)
 }
 
 template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::vertcat(FaustCoreCpp<FPP>* right)
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->vertcat(right->transform);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
+    return core;
+}
+
+template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::horzcat(FaustCoreCpp<FPP>* right)
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->horzcat(right->transform);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
+    return core;
+}
+
+template<typename FPP>
 FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::mul_scal(FPP scal)
  {
     Faust::TransformHelper<FPP,Cpu>* th = this->transform->multiply(scal);

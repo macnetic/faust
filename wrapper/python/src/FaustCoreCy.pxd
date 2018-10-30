@@ -81,6 +81,8 @@ cdef extern from "FaustCoreCpp.h" :
         FaustCoreCpp[FPP]* transpose()
         FaustCoreCpp[FPP]* conjugate()
         FaustCoreCpp[FPP]* adjoint()
+        FaustCoreCpp[FPP]* vertcat(FaustCoreCpp[FPP]*)
+        FaustCoreCpp[FPP]* horzcat(FaustCoreCpp[FPP]*)
         FaustCoreCpp[FPP]* mul_faust(FaustCoreCpp[FPP]*)
         FaustCoreCpp[FPP]* mul_scal(FPP scal)
         @staticmethod

@@ -489,6 +489,22 @@ class Faust:
         else:
             return F.m_faust.multiply(A)
 
+    def concatenate(F, G, axis=0):
+        if(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
+                                                       "Faust with something "
+                                                       "which is not a Faust.")
+
+        if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
+           != G.shape[0]): raise ValueError("The dimensions of "
+                                            "the two Fausts must "
+                                            "agree.")
+        if(axis==0):
+            return Faust(core_obj=F.m_faust.vertcat(G.m_faust))
+        elif(axis==1):
+            return Faust(core_obj=F.m_faust.horzcat(G.m_faust))
+        else:
+            raise ValueError("axis must be 0 or 1.")
+
     def toarray(F):
         """
         Returns a numpy array for the full matrix implemented by F.

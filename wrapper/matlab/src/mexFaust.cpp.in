@@ -602,6 +602,38 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
 			return;
 		}		//     // Call the various class methods
+
+        if(!strcmp("vertcat", cmd)) {
+			//TODO: check number of args and results
+			Faust::TransformHelper<SCALAR,Cpu>* right_term = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[2]);
+			if(right_term->getNbCol() != core_ptr->getNbCol()) mexErrMsgTxt("The dimensions of the two Fausts must agree.");
+            Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->vertcat(right_term);
+            plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+#ifdef FAUST_VERBOSE
+            printf("new ptr for Faust vert-concatened TransformHelper obj=%p\n", th);
+            printf("isConjugate()=%d\n",th->isConjugate());
+            printf("isTransposed()=%d\n", th->isTransposed());
+#endif
+            return;
+
+        }
+
+        if(!strcmp("horzcat", cmd)) {
+			//TODO: check number of args and results
+			Faust::TransformHelper<SCALAR,Cpu>* right_term = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[2]);
+			if(right_term->getNbRow() != core_ptr->getNbRow()) mexErrMsgTxt("The dimensions of the two Fausts must agree.");
+            Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->horzcat(right_term);
+            plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+#ifdef FAUST_VERBOSE
+            printf("new ptr for Faust hor-concatened TransformHelper obj=%p\n", th);
+            printf("isConjugate()=%d\n",th->isConjugate());
+            printf("isTransposed()=%d\n", th->isTransposed());
+#endif
+            return;
+
+        }
+
+
 		//     // Train
 		//     if (!strcmp("train", cmd)) {
 		//         // Check parameters

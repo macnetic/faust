@@ -98,6 +98,8 @@ namespace Faust {
 			TransformHelper<FPP,Cpu>* transpose();
 			TransformHelper<FPP,Cpu>* conjugate();
 			TransformHelper<FPP,Cpu>* adjoint();
+			TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);
+			TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
 			bool isTransposed() const;
 			bool isConjugate() const;
 			const char isTransposed2char() const;
@@ -111,6 +113,7 @@ namespace Faust {
 
 			private:
 			void copy_slices(TransformHelper<FPP, Cpu>* th, const bool transpose = false);
+			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;
 		};
 }
 
