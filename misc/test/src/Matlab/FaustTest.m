@@ -295,6 +295,42 @@ classdef FaustTest < matlab.unittest.TestCase
 			% TODO: mul by complex scalar (when impl.)
 		end
 
+		function testcat(this)
+			import matfaust.*
+			disp('Test cat')
+			for dimcat=1,2
+				other_dim = mod(dimcat,2)+1
+				F = this.test_faust
+				%=============== test vert (or horz) cat
+				G = FaustFactory.rand(randi(FaustTest.MAX_NUM_FACTORS), size(F,other_dim))
+				% set a Faust with a random number of rows (or cols) from G
+				H_facs = cell(1,get_num_factors(G)+1)
+				if dimcat == 1
+					H_facs{1} = rand(randi(FaustTest.MAX_DIM_SIZE-1)+1,size(F,other_dim))
+					for i=1:get_num_factors(G)
+						H_facs{i+1} = get_factor(G, i)
+					end
+				else
+					H_facs{get_num_factors(G)+1} = rand(size(F,other_dim),randi(FaustTest.MAX_DIM_SIZE-1)+1)
+					for i=1:get_num_factors(G)
+						H_facs{i} = get_factor(G, i)
+					end
+				end
+				H = Faust(H_facs)
+				if dimcat == 1
+					C = vertcat(F,H)
+					D = [F;H]
+				else
+					C = horzcat(F,H)
+					D = [F H]
+				end
+				this.verifyEqual(full(C), full(D), 'AbsTol', 1e-11)
+				this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'AbsTol', 1e-11)
+				C = cat(dimcat,F,H)
+				this.verifyEqual(full(C), cat(dimcat, full(F),full(H)),'AbsTol', 1e-11)
+			end
+		end
+
         function testDelete(this)
             disp('Test Faust.delete()')
             tFaust = transpose(this.test_faust);
