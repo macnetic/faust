@@ -107,7 +107,6 @@ classdef Faust
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; Faust(factors) creates a Faust from a list of factors (1D cell array).<br/><br>
-		%> &nbsp;&nbsp;&nbsp; Faust(factors, scale) same as above but multiplying the Faust with a scalar.<br/><br/>
 		%> &nbsp;&nbsp;&nbsp; Faust(filepath) creates a Faust from a previously saved Faust file (filepath is a character array).<br/><br/>
 		%>
 		%>
