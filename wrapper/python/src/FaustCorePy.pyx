@@ -161,20 +161,28 @@ cdef class FaustCore:
 
     @staticmethod
     def hadamardFaust(n):
+        if(n>31):
+            raise ValueError("Faust doesn't handle a Hadamard of order larger than "
+                             "2**31")
         core = FaustCore(core=True)
         core.core_faust_dbl = FaustCoreCy.FaustCoreCpp[double].hadamardFaust(n)
+        if(core.core_faust_dbl == NULL):
+            raise MemoryError()
         # hadamard is always a real Faust
         core._isReal = True
-        # TODO: handle error for the object returned
         return core
 
     @staticmethod
     def fourierFaust(n):
+        if(n>31):
+            raise ValueError("Faust doesn't handle a FFT of order larger than "
+                             "2**31")
         core = FaustCore(core=True)
         core.core_faust_cplx = FaustCoreCy.FaustCoreCpp[complex].fourierFaust(n)
-        # hadamard is always a real Faust
+        if(core.core_faust_cplx == NULL):
+            raise MemoryError()
+        # fourier is always a complex Faust
         core._isReal = False
-        # TODO: handle error for the object returned
         return core
 
     #### METHOD ####

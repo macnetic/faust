@@ -201,13 +201,16 @@ classdef FaustFactory
 		%>
 		%==========================================================================================
 		function H = hadamard(n)
+			% TODO: check n (must be integer > 0)
+			if(n>31)
+				error('Can''t handle a Hadamard Faust of order larger than 2^31')
+			end
 			core_obj = mexFaustReal('hadamard', n);
 			is_real = true;
-			% TODO: check n (must be integer > 0)
-			% TODO: handle errors on returned core_obj
-%			if(core_obj == 0)
-%				throw(e)
-%			end
+			e = MException('FAUST:OOM', 'Out of Memory');
+			if(core_obj == 0)
+				throw(e)
+			end
 			H = matfaust.Faust(core_obj, is_real);
 		end
 
@@ -254,13 +257,16 @@ classdef FaustFactory
 		%> - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
 		%==========================================================================================
 		function H = fourier(n)
+			% TODO: check n (must be integer > 0)
+			if(n>31)
+				error('Can''t handle a FFT Faust of order larger than 2^31')
+			end
 			core_obj = mexFaustCplx('fourier', n);
 			is_real = false;
-			% TODO: check n (must be integer > 0)
-			% TODO: handle errors on returned core_obj
-%			if(core_obj == 0)
-%				throw(e)
-%			end
+			e = MException('FAUST:OOM', 'Out of Memory');
+			if(core_obj == 0)
+				throw(e)
+			end
 			H = matfaust.Faust(core_obj, is_real);
 		end
 

@@ -874,81 +874,90 @@ namespace Faust {
 				factors[0] = mat;
 				return new TransformHelper<FPP, Cpu>(factors,1.0,false);
 			}
-			unsigned int order = 1u << n;
-			vector<int> col_ids(order), row_ids(order);
-			vector<FPP> vals(order);
-			unsigned int order_over_2 = order >> 1;
-			unsigned int order_times_2 = order << 1;
-			unsigned int i_times_2;
+			TransformHelper<FPP,Cpu>* hadamardFaust = nullptr;
+			try {
+				unsigned int order = 1ull << n;
+				vector<int> col_ids(order), row_ids(order);
+				vector<FPP> vals(order);
+				unsigned int order_over_2 = order >> 1;
+				unsigned int order_times_2 = order << 1;
+				unsigned int i_times_2;
 
-//			// init the permutation matrix
+				//			// init the permutation matrix
 
-			for(unsigned int i=0; i < order_over_2; i++)
-			{
-				i_times_2 = i << 1;
-				row_ids[i] = i_times_2;
-				row_ids[i+order_over_2] = i_times_2+1;
-				col_ids[i] = i;
-				col_ids[i+order_over_2] = i + order_over_2;
-				vals[i] = vals[i+order_over_2] = 1;
-			}
-//			cout << row_ids.size() << endl;
-//			cout << col_ids.size() << endl;
-//			cout << vals.size() << endl;
-			MatSparse<FPP,Cpu> P(row_ids, col_ids, vals, order, order);
-			P.update_dim();
-
-			// init the base matrix
-			int row_ptr[order+1];
-			row_ptr[0] = 0;
-			int bcol_ids[order_times_2];
-			FPP bvalues[order_times_2];
-
-//			cout << "row_ptr: ";
-			for(int i = 1; i < order+1;i++)
-			{
-				row_ptr[i] = 2+row_ptr[i-1];
-//				cout << row_ptr[i] << ",";
-			}
-//			cout << endl;
-
-			bool parity = true; //row parity
-
-			int col_id = 0;
-//			cout << "bvalues: ";
-//			cout << "bcol_ids: ";
-			for(unsigned int i=0; i < order_times_2; i+=2)
-			{
-
-				if(parity) //row index is pair
-					bvalues[i] = bvalues[i+1] = 1;
-				else
+				for(unsigned int i=0; i < order_over_2; i++)
 				{
-					bvalues[i+1] = -1;
-					bvalues[i] = 1;
+					i_times_2 = i << 1;
+					row_ids[i] = i_times_2;
+					row_ids[i+order_over_2] = i_times_2+1;
+					col_ids[i] = i;
+					col_ids[i+order_over_2] = i + order_over_2;
+					vals[i] = vals[i+order_over_2] = 1;
 				}
-//				cout << bvalues[i] << " " << bvalues[i+1];
-				parity = ! parity;
-				bcol_ids[i] = col_id;
-				bcol_ids[i+1] = col_id+1;
-//				cout << bcol_ids[i] << " " << bcol_ids[i+1] << " ";
-				if(((i + 1) & 3u) == 3u) col_id+=2; // i+1 mod 4 == 0
+				//			cout << row_ids.size() << endl;
+				//			cout << col_ids.size() << endl;
+				//			cout << vals.size() << endl;
+				MatSparse<FPP,Cpu> P(row_ids, col_ids, vals, order, order);
+				P.update_dim();
+
+				// init the base matrix
+				int *row_ptr = new int[order+1];
+				row_ptr[0] = 0;
+				int *bcol_ids = new int[order_times_2];
+				FPP *bvalues = new FPP[order_times_2];
+
+				//			cout << "row_ptr: ";
+				for(int i = 1; i < order+1;i++)
+				{
+					row_ptr[i] = 2+row_ptr[i-1];
+					//				cout << row_ptr[i] << ",";
+				}
+				//			cout << endl;
+
+				bool parity = true; //row parity
+
+				int col_id = 0;
+				//			cout << "bvalues: ";
+				//			cout << "bcol_ids: ";
+				for(unsigned int i=0; i < order_times_2; i+=2)
+				{
+
+					if(parity) //row index is pair
+						bvalues[i] = bvalues[i+1] = 1;
+					else
+					{
+						bvalues[i+1] = -1;
+						bvalues[i] = 1;
+					}
+					//				cout << bvalues[i] << " " << bvalues[i+1];
+					parity = ! parity;
+					bcol_ids[i] = col_id;
+					bcol_ids[i+1] = col_id+1;
+					//				cout << bcol_ids[i] << " " << bcol_ids[i+1] << " ";
+					if(((i + 1) & 3u) == 3u) col_id+=2; // i+1 mod 4 == 0
+				}
+				//			cout << endl;
+				MatSparse<FPP,Cpu> B(order_times_2, order, order, bvalues, row_ptr, bcol_ids, false);
+				//			cout << "Faust::TransformHelper::hadamardFaust(), B:" << endl;
+				//			B.Display();
+				delete[] bvalues;
+				delete[] bcol_ids;
+				delete[] row_ptr;
+				std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) n);
+				MatSparse<FPP,Cpu>* factor = new MatSparse<FPP,Cpu>(order,order);
+				factor->mat = B.mat*P.mat;
+				factor->update_dim();
+
+				factors[0] = factor;
+				for(int i=1; i < n; i++)
+					factors[i] = factor->Clone();
+
+				hadamardFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
 			}
-//			cout << endl;
-			MatSparse<FPP,Cpu> B(order_times_2, order, order, bvalues, row_ptr, bcol_ids, false);
-//			cout << "Faust::TransformHelper::hadamardFaust(), B:" << endl;
-//			B.Display();
-
-			std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) n);
-			MatSparse<FPP,Cpu>* factor = new MatSparse<FPP,Cpu>(order,order);
-			factor->mat = B.mat*P.mat;
-			factor->update_dim();
-
-			factors[0] = factor;
-			for(int i=1; i < n; i++)
-				factors[i] = factor->Clone();
-
-			TransformHelper<FPP,Cpu>* hadamardFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+			catch(std::bad_alloc)
+			{
+				// nothing to do, out of memory return nullptr
+			}
 			return hadamardFaust;
 
 		}
@@ -958,13 +967,19 @@ namespace Faust {
 		{
 
 			vector<MatGeneric<FPP,Cpu>*> factors(n+1);
+			TransformHelper<FPP,Cpu>* fourierFaust = nullptr;
+			try
+			{
 			fft_factors(n, factors);
 //			for(int i=0;i<n+1;i++)
 //				factors[i]->Display();
-			TransformHelper<FPP,Cpu>* fourierFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+			new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+			}
+			catch(std::bad_alloc e)
+			{
+				//nothing to do, out of memory, return nullptr
+			}
 			return fourierFaust;
-//			return nullptr;
-
 		}
 
 	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
