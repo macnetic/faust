@@ -68,7 +68,6 @@
 %> multiplication).
 %> In particular, the addition F+G is undefined for Faust objects (so
 %> far).
-%> - concatenate,
 %> - reshape,
 %> - invert.
 %>
@@ -1343,6 +1342,112 @@ classdef Faust
 			end
 		end
 
+		%======================================================================
+		%> @brief Concatenates two Faust objects into a new Faust: C.
+		%>
+		%> This function overloads a Matlab built-in function.
+		%>
+		%> The resulting Faust C = cat(DIM,F,G) verifies that:
+		%> @code
+		%> full(C) == full(cat(DIM, full(F), full(A)))
+		%> @endcode
+		%> NOTE: you could have an elementwise non-significant absolute difference between the two members (not more than eps(1.0)).
+		%>
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b C=CAT(DIM,F,G) concatenates the Fausts F and G along the dimension DIM. The result is the Faust C. <br/>
+		%> &nbsp;&nbsp;&nbsp; @b CAT(2,F,G) is the same as [F,G].<br/>
+		%> &nbsp;&nbsp;&nbsp; @b CAT(1,F,G) is the same as [F;G].<br/>
+		%>
+		%>
+		%> @param DIM (1st arg.) the dimension along which to concatenate the two Fausts. DIM==1 means vertical concatenation, DIM==0 means horizontal concatenation.
+		%> @param F (2nd arg.) the first Faust object.
+		%> @param G (3rd arg.) the second Faust object to concatenate to F.
+		%>
+		%> @retval C the concatenation result as a new Faust.
+		%>
+		%>
+		%> @b Example
+		%> @code
+		%>% in a matlab terminal
+		%>>> import matfaust.FaustFactory
+		%>>> F = FaustFactory.rand(18,50);
+		%>>> G = FaustFactory.rand(5,50); 
+		%>>> [F;G] % equiv. to cat(1,F,G)
+		%>
+		%>ans = 
+		%>
+		%>Faust size 100x50, density 1.2326, nnz_sum 6163, 19 factor(s): 
+		%>- FACTOR 0 (real) SPARSE, size 100x100, density 0.0461, nnz 461
+		%>- FACTOR 1 (real) SPARSE, size 100x100, density 0.0478, nnz 478
+		%>- FACTOR 2 (real) SPARSE, size 100x100, density 0.0472, nnz 472
+		%>- FACTOR 3 (real) SPARSE, size 100x100, density 0.0475, nnz 475
+		%>- FACTOR 4 (real) SPARSE, size 100x100, density 0.0476, nnz 476
+		%>- FACTOR 5 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 6 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 7 (real) SPARSE, size 100x100, density 0.029, nnz 290
+		%>- FACTOR 8 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 9 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 10 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 11 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 12 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 13 (real) SPARSE, size 100x100, density 0.029, nnz 290
+		%>- FACTOR 14 (real) SPARSE, size 100x100, density 0.0292, nnz 292
+		%>- FACTOR 15 (real) SPARSE, size 100x100, density 0.0289, nnz 289
+		%>- FACTOR 16 (real) SPARSE, size 100x100, density 0.0283, nnz 283
+		%>- FACTOR 17 (real) SPARSE, size 100x100, density 0.029, nnz 290
+		%>- FACTOR 18 (real) SPARSE, size 100x50, density 0.02, nnz 100
+		%>>> [F,G] % equiv. to cat(2,F,G)
+		%>
+		%>ans =
+		%>
+		%>Faust size 50x100, density 1.2326, nnz_sum 6163, 19 factor(s):
+		%>- FACTOR 0 (real) SPARSE, size 50x100, density 0.02, nnz 100
+		%>- FACTOR 1 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 2 (real) SPARSE, size 100x100, density 0.0292, nnz 292
+		%>- FACTOR 3 (real) SPARSE, size 100x100, density 0.0287, nnz 287
+		%>- FACTOR 4 (real) SPARSE, size 100x100, density 0.029, nnz 290
+		%>- FACTOR 5 (real) SPARSE, size 100x100, density 0.0288, nnz 288
+		%>- FACTOR 6 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 7 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 8 (real) SPARSE, size 100x100, density 0.029, nnz 290
+		%>- FACTOR 9 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 10 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 11 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 12 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 13 (real) SPARSE, size 100x100, density 0.0281, nnz 281
+		%>- FACTOR 14 (real) SPARSE, size 100x100, density 0.047, nnz 470
+		%>- FACTOR 15 (real) SPARSE, size 100x100, density 0.0478, nnz 478
+		%>- FACTOR 16 (real) SPARSE, size 100x100, density 0.0474, nnz 474
+		%>- FACTOR 17 (real) SPARSE, size 100x100, density 0.0468, nnz 468
+		%>- FACTOR 18 (real) SPARSE, size 100x100, density 0.0478, nnz 478
+		%>
+		%> @endcode
+		%>
+		%> @b Errors
+		%> - The dimensions of F and G don't agree:
+		%>
+		%> @code
+		%>>> F = FaustFactory.rand(2,51);
+		%>>> G = FaustFactory.rand(2,25);
+		%>>> [F;G]
+		%>Error using mexFaustReal
+		%>The dimensions of the two Fausts must agree.
+		%>
+		%> @endcode
+		%> - The DIM argument is different from 1 and 2:
+		%>
+		%> @code
+		%>>> F = FaustFactory.rand(2,4);
+		%>>> G = FaustFactory.rand(2,4);
+		%>>> cat(3,F,G)
+		%>Error using matfaust.Faust/cat
+		%>Wrong first argument: must be an integer between 1 and 2.
+		%> @endcode
+		%> <p>@b See @b also Faust.vertcat, Faust.horzcat.
+		%>
+		%======================================================================
 		function C = cat(varargin)
 			if(nargin > 0 && isscalar(varargin{1}))
 				if(varargin{1} == 1)
@@ -1352,11 +1457,21 @@ classdef Faust
 					C = horzcat(varargin{2:end})
 					return
 				end
-			else
-				error('Wrong first argument: must be an integer.')
 			end
+			error('Wrong first argument: must be an integer between 1 and 2.')
 		end
 
+		%======================================================================
+		%> Horizontal concatenation [F,A] of the Faust objects F and A.
+		%>
+		%> It's equivalent to cat(2, F, A).
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b C=HORZCAT(F,A) concatenates the Fausts F and A horizontally. The result is the Faust C. @b HORZCAT(F,A) is the same as [F,G].<br/>
+		%>
+		%> <p>@b See @b also Faust.vertcat, Faust.cat.
+		%======================================================================
 		function HC = horzcat(F, A)
 			if(~ isa(A, 'matfaust.Faust'))
 				error('Can''t concatenate a Faust to something that is not a Faust.')
@@ -1367,6 +1482,18 @@ classdef Faust
 				HC = matfaust.Faust(F, mexFaustReal('horzcat', F.matrix.objectHandle, A.matrix.objectHandle));
 			end
 		end
+
+		%======================================================================
+		%> Vertical concatenation [F;A] of the Faust objects F and A.
+		%>
+		%> It's equivalent to cat(1, F, A).
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b C=VERTCAT(F,A) concatenates the Fausts F and A vertically. The result is the Faust C. @b VERTCAT(F,A) is the same as [F;G].<br/>
+		%>
+		%> <p>@b See @b also Faust.horzcat, Faust.cat.
+		%======================================================================
 
 		function VC = vertcat(F, A)
 			if(~ isa(A, 'matfaust.Faust'))
