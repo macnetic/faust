@@ -1355,7 +1355,7 @@ classdef Faust
 		%>
 		%> The resulting Faust C = cat(DIM,F,G) verifies that:
 		%> @code
-		%> full(C) == full(cat(DIM, full(F), full(A)))
+		%> full(C) == full(cat(DIM, full(F), full(G)))
 		%> @endcode
 		%> NOTE: you could have an elementwise non-significant absolute difference between the two members (not more than eps(1.0)).
 		%>
