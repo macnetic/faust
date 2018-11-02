@@ -194,6 +194,12 @@ classdef Faust
 				% create a Faust directly with the c++ object handler/pointer without any pre-existing Faust
 				F.matrix = FaustCore(varargin{1}, varargin{2});
 				F.isReal = varargin{2};
+				% hack to raise an error in case of non-consistent handle and isReal arg.
+				try
+					n = get_num_factors(F);
+				catch
+					error('The Faust handle passed as first argument is not valid or not consistent with the value of isReal (2nd argument).')
+				end
 			else
 				error(err_msg)
 			end
