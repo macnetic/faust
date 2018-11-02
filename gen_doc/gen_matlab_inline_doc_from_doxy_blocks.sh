@@ -107,4 +107,4 @@ echo -e "$INLINE_HEADER" | sed 's/^[[:blank:]]\{1,\}//' > ${OUTPUT_FILE}_tmp
 echo -e '\n\n' >> ${OUTPUT_FILE}_tmp
 sed -ne "${HEADER_START_END[0]},${OUT_NUM_LINES}p" $OUTPUT_FILE >> ${OUTPUT_FILE}_tmp
 [ "$?" = 0 ] && mv ${OUTPUT_FILE}_tmp ${OUTPUT_FILE}
-
+[[ -z "$DEBUG" ]] && rm  ${OUTPUT_FILE}_tmp
