@@ -1367,7 +1367,7 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; @b CAT(1,F,G) is the same as [F;G].<br/>
 		%>
 		%>
-		%> @param DIM (1st arg.) the dimension along which to concatenate the two Fausts. DIM==1 means vertical concatenation, DIM==0 means horizontal concatenation.
+		%> @param DIM (1st arg.) the dimension along which to concatenate the two Fausts. DIM==1 means vertical concatenation, DIM==2 means horizontal concatenation.
 		%> @param F (2nd arg.) the first Faust object.
 		%> @param G (3rd arg.) the second Faust object to concatenate to F.
 		%>
