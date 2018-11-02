@@ -970,10 +970,10 @@ namespace Faust {
 			TransformHelper<FPP,Cpu>* fourierFaust = nullptr;
 			try
 			{
-			fft_factors(n, factors);
-//			for(int i=0;i<n+1;i++)
-//				factors[i]->Display();
-			new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+				fft_factors(n, factors);
+				//			for(int i=0;i<n+1;i++)
+				//				factors[i]->Display();
+				fourierFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
 			}
 			catch(std::bad_alloc e)
 			{
