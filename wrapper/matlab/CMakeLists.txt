@@ -45,14 +45,20 @@ foreach(MATFAUST_CLASS IN LISTS FAUST_MATLAB_MATFAUST_CLASS_LIST)
 	get_filename_component(PARENT_DIR ${MATFAUST_CLASS} DIRECTORY)
 	file(MAKE_DIRECTORY ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${PARENT_DIR})
 	message(STATUS "Creating folder ${PARENT_DIR}")
-	# use script generating inline doc
-	if(WIN32)
-		execute_process(COMMAND git-bash ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_CLASS} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_CLASS} ERROR_QUIET)
-		#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_CLASS} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_CLASS} COPYONLY)
+	# use script generating inline doc only for real matlab classes
+	if(${MATFAUST_CLASS} MATCHES "@")
+		if(WIN32)
+			execute_process(COMMAND git-bash ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_CLASS} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_CLASS} ERROR_QUIET)
+			#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_CLASS} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_CLASS} COPYONLY)
+		else()
+			execute_process(COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_CLASS} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_CLASS} ERROR_QUIET)
+			#TODO: copy if error (fallback solution)
+		endif()
 	else()
-		execute_process(COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_CLASS} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_CLASS} ERROR_QUIET)
-		#TODO: copy if error (fallback solution)
+		# just copy the .m
+		configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_CLASS} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_CLASS} COPYONLY)
 	endif()
+
 endforeach()
 
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
