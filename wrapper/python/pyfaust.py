@@ -86,7 +86,6 @@ class Faust:
         multiplication).
         In particular, the addition F+G is undefined for Faust objects (so
         far).
-        - concatenate,
         - reshape.
 
     Primarily for convenience and test purposes, a Faust can be converted into
@@ -490,9 +489,75 @@ class Faust:
             return F.m_faust.multiply(A)
 
     def concatenate(F, G, axis=0):
+        """
+            Concatenates two Faust objects into a new Faust.
+
+            The resulting Faust <code>C = F.concatenate(G,axis)</code> verifies that:
+            <code>
+            C.toarray() == numpy.concatenate(F.toarray(), G.toarray(), axis)
+            </code>
+            <br/>N.B.: you could have an elementwise non-significant absolute
+            difference between the two members.
+
+
+           Args:
+               F: the Faust to concatenate to.
+               G: the Faust to be concatenated to F.
+               axis (optional): the dimension index (0 or 1) along to concatenate the
+               Faust objects. By default, the axis is 0 (for vertical
+               concatenation).
+
+            Returns:
+                The concatenation result as a Faust.
+
+            Raises:
+                ValueError
+                The dimensions of the two Fausts must agree.
+                <code>
+                >>> F = FaustFactory.rand(2,51);
+                >>> G = FaustFactory.rand(2,25);
+                >>> F.concatenate(G, 0)
+                </code>
+                ValueError
+                Axis must be 0 or 1.
+                <code>
+                >>> F = FaustFactory.rand(2,51);
+                >>> G = FaustFactory.rand(2,25);
+                >>> F.concatenate(G, 5)
+                </code>
+                ValueError
+                You can't concatenate a Faust with something that is not a Faust.
+                <code>
+                >>> F = FaustFactory.rand(2,51);
+                >>> F.concatenate(['a', 'b', 'c'], 5)
+                </code>
+
+            Examples:
+                >>> import pyfaust import FaustFactory
+                >>> F = FaustFactory.rand(5, 50)
+                >>> G = FaustFactory.rand(6, 50)
+                >>> F.concatenate(G) # equivalent to F.concatenate(G, 0)
+                Faust size 100x50, density 0.5634, nnz_sum 2817, 7 factor(s)<br/>
+                FACTOR 0 (real) SPARSE, size 100x100, density 0.0473, nnz 47<br/>
+                FACTOR 1 (real) SPARSE, size 100x100, density 0.0469, nnz 46<br/>
+                FACTOR 2 (real) SPARSE, size 100x100, density 0.0504, nnz 50<br/>
+                FACTOR 3 (real) SPARSE, size 100x100, density 0.0502, nnz 50<br/>
+                FACTOR 4 (real) SPARSE, size 100x100, density 0.0482, nnz 48<br/>
+                FACTOR 5 (real) SPARSE, size 100x100, density 0.0287, nnz 28<br/>
+                FACTOR 6 (real) SPARSE, size 100x50, density 0.02, nnz 10<br/>
+                >>> F.concatenate(G,1)
+                Faust size 50x100, density 0.5634, nnz_sum 2817, 7 factor(s)<br/>
+                FACTOR 0 (real) SPARSE, size 50x100, density 0.02, nnz 10<br/>
+                FACTOR 1 (real) SPARSE, size 100x100, density 0.0286, nnz 28<br/>
+                FACTOR 2 (real) SPARSE, size 100x100, density 0.0469, nnz 46<br/>
+                FACTOR 3 (real) SPARSE, size 100x100, density 0.0504, nnz 50<br/>
+                FACTOR 4 (real) SPARSE, size 100x100, density 0.0504, nnz 50<br/>
+                FACTOR 5 (real) SPARSE, size 100x100, density 0.0479, nnz 47<br/>
+                FACTOR 6 (real) SPARSE, size 100x100, density 0.0475, nnz 47<br/>
+        """
         if(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
                                                        "Faust with something "
-                                                       "which is not a Faust.")
+                                                       "that is not a Faust.")
 
         if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
            != G.shape[0]): raise ValueError("The dimensions of "
@@ -503,7 +568,7 @@ class Faust:
         elif(axis==1):
             return Faust(core_obj=F.m_faust.horzcat(G.m_faust))
         else:
-            raise ValueError("axis must be 0 or 1.")
+            raise ValueError("Axis must be 0 or 1.")
 
     def toarray(F):
         """
