@@ -1,3 +1,6 @@
+%% class ConstraintName
+%%%
+
 classdef ConstraintName
 	properties (SetAccess = public, Constant)
 		SP = 0

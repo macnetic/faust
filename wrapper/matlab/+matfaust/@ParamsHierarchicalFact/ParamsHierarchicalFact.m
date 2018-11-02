@@ -1,3 +1,5 @@
+%% class ParamsHierarchicalFact
+%%
 classdef ParamsHierarchicalFact < matfaust.ParamsFact
 	properties (SetAccess = public)
 		stop_crits

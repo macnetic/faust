@@ -1,3 +1,5 @@
+%% class ParamsPalm4MSA
+%%
 classdef ParamsPalm4MSA < matfaust.ParamsFact
 	properties (SetAccess = public)
 		init_facts

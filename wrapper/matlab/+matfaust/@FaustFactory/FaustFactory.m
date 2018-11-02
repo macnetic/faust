@@ -1,3 +1,6 @@
+%% class FaustFactory
+%%
+
 % ======================================================================
 %> @brief     This factory class provides methods for generating a Faust especially by factorization of a dense matrix.
 %>
@@ -26,7 +29,8 @@
 %>    - the FFT transform with FaustFactory.fourier(),
 %>    - and the Hadamard transform with FaustFactory.hadamard().
 %>
-%======================================================================
+% ======================================================================
+
 classdef FaustFactory
 	properties (SetAccess = public)
 

@@ -1,3 +1,5 @@
+%% class StoppingCriterion
+%%
 classdef StoppingCriterion
 	properties (SetAccess = public)
 		is_criterion_error

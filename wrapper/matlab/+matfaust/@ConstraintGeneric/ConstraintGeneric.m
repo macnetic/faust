@@ -1,3 +1,6 @@
+%% class ConstraintGeneric
+%%
+
 classdef ConstraintGeneric
 	properties (SetAccess = public)
 		name % obj of type ConstraintName

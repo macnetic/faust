@@ -1,3 +1,6 @@
+%% class ParamsFact
+%%
+
 classdef (Abstract) ParamsFact
 	properties (SetAccess = public)
 		num_facts

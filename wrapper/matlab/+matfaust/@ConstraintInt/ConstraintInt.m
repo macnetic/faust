@@ -1,3 +1,6 @@
+%% class ConstraintInt
+%%
+
 classdef ConstraintInt < matfaust.ConstraintGeneric
 	properties (SetAccess = public)
 

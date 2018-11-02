@@ -1,3 +1,5 @@
+%% class ConstraintReal
+%%
 classdef ConstraintReal < matfaust.ConstraintGeneric
 	properties (SetAccess = public)
 
