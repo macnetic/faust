@@ -131,6 +131,7 @@ OK! You can follow the [quick start usage](#usage) now.
 
 Let's test FAµST with the quickstart script, from a matlab terminal type:
 
+	>> import matfaust.demo.quickstart.*
 	>> quick_start
 
 And then type further instructions to test a bit of the FAµST API:

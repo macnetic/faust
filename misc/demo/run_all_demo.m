@@ -43,9 +43,12 @@
 %	[DOI] <http://dx.doi.org/10.1016/j.neuroimage.2013.10.027>
 %%
 
-%% Quick start
+% create the directory for the Figures used in different demo scripts
 mkdir Figures
+
+%% Quick start
 disp('*********** Quick Start Demos *************');
+import matfaust.demo.quickstart.*
 quick_start;
 factorize_matrix;
 construct_Faust_from_factors;

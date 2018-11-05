@@ -362,7 +362,7 @@ if (BUILD_WRAPPER_MATLAB)
 	set(FAUST_MATLAB_MAIN_CLASS_FQDN_REL_DIR "${FAUST_MATLAB_NAMESPACE_REL_DIR}/@Faust")
 	set(FAUST_MATLAB_NAMESPACE_SRC_DIR	${FAUST_MATLAB_SRC_DIR}/${FAUST_MATLAB_NAMESPACE_REL_DIR})
 	set(FAUST_MATLAB_NAMESPACE_BIN_DIR	${FAUST_MATLAB_BIN_DIR}/${FAUST_MATLAB_NAMESPACE_REL_DIR})
-	set(FAUST_MATLAB_MATFAUST_CLASS_LIST   "@FaustFactory/FaustFactory.m;@ConstraintInt/ConstraintInt.m;@ParamsHierarchicalFact/ParamsHierarchicalFact.m;@ConstraintGeneric/ConstraintGeneric.m;@ParamsFact/ParamsFact.m;@ConstraintMat/ConstraintMat.m;@ConstraintName/ConstraintName.m;@ConstraintReal/ConstraintReal.m;@StoppingCriterion/StoppingCriterion.m;@ParamsPalm4MSA/ParamsPalm4MSA.m;+demo/+hadamardfact/norm_hadamard.m;+demo/+hadamardfact/demo_fact_hadamard.m;+demo/+hadamardfact/speed_up_hadamard.m")
+	set(FAUST_MATLAB_MATFAUST_CLASS_LIST   "@FaustFactory/FaustFactory.m;@ConstraintInt/ConstraintInt.m;@ParamsHierarchicalFact/ParamsHierarchicalFact.m;@ConstraintGeneric/ConstraintGeneric.m;@ParamsFact/ParamsFact.m;@ConstraintMat/ConstraintMat.m;@ConstraintName/ConstraintName.m;@ConstraintReal/ConstraintReal.m;@StoppingCriterion/StoppingCriterion.m;@ParamsPalm4MSA/ParamsPalm4MSA.m;+demo/+hadamardfact/norm_hadamard.m;+demo/+hadamardfact/demo_fact_hadamard.m;+demo/+hadamardfact/speed_up_hadamard.m;+demo/+quickstart/construct_Faust_from_factors.m;+demo/+quickstart/factorize_matrix.m;+demo/+quickstart/quick_start.m")
 	set(FAUST_MATLAB_MAIN_CLASS_FQDN_SRC_DIR 	${FAUST_MATLAB_SRC_DIR}/${FAUST_MATLAB_MAIN_CLASS_FQDN_REL_DIR})
 	set(FAUST_MATLAB_MAIN_CLASS_FQDN_BIN_DIR 	${FAUST_MATLAB_BIN_DIR}/${FAUST_MATLAB_MAIN_CLASS_FQDN_REL_DIR})
 	####  INSTALL DIRECTORY ####
