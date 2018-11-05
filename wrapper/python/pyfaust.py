@@ -489,13 +489,15 @@ class Faust:
         else:
             return F.m_faust.multiply(A)
 
-    def concatenate(F, G, axis=0):
+    #def concatenate(F, *args, axis=0): # py. 2 doesn't handle this signature
+    def concatenate(F, *args, **kwargs):
         """
-            Concatenates two Faust objects or a Faust and an array into a new Faust.
+            Concatenates F with len(args) Faust objects, numpy arrays or scipy sparse matrices.
 
-            The resulting Faust <code>C = F.concatenate(G,axis)</code> verifies that:
+            The resulting Faust <code>C = F.concatenate(G, H, ... ,axis)</code> verifies that:
             <code>
-            C.toarray() == numpy.concatenate(F.toarray(), G.toarray(), axis)
+            C.toarray() == numpy.concatenate((F.toarray(), G.toarray(),
+            H.toarray(),...), axis)
             </code>
             <br/>N.B.: you could have an elementwise non-significant absolute
             difference between the two members.
@@ -503,9 +505,9 @@ class Faust:
 
            Args:
                F: the Faust to concatenate to.
-               G: the Faust or matrix (numpy array or
-               scipy.sparse.csr/csc_matrix) to be concatenated to F. If G is a
-               matrix it is Faust-converted on the fly.
+               args: the Fausts or matrices (numpy array or
+               scipy.sparse.csr/csc_matrix) to be concatenated to F. If args[i] is a
+               matrix it will be Faust-converted on the fly.
                axis (optional): the dimension index (0 or 1) along to concatenate the
                Faust objects. By default, the axis is 0 (for vertical
                concatenation).
@@ -576,27 +578,36 @@ class Faust:
                 FACTOR 3 (real) SPARSE, size 100x100, density 0.0286, nnz 286<br/>
                 FACTOR 4 (real) SPARSE, size 100x100, density 0.0285, nnz 285<br/>
                 FACTOR 5 (real) SPARSE, size 100x74, density 0.0355405, nnz 263<br/>
-<br/>
+                >>> F.concatenate(F, G, F, G, rand(34,50), F, G) # it's allowed to concatenate an arbitrary number of Fausts
         """
-        if(isinstance(G, np.ndarray) or isinstance(G, csr_matrix) \
-           or isinstance(G, csc_matrix)):
-            G = Faust([G])
-        if(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
-                                                       "Faust with something "
-                                                       "that is not a Faust, "
-                                                       "a numpy array or scipy "
-                                                       "sparse matrix.")
-
-        if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
-           != G.shape[0]): raise ValueError("The dimensions of "
-                                            "the two Fausts must "
-                                            "agree.")
-        if(axis==0):
-            return Faust(core_obj=F.m_faust.vertcat(G.m_faust))
-        elif(axis==1):
-            return Faust(core_obj=F.m_faust.horzcat(G.m_faust))
+        if("axis" in kwargs.keys()):
+            axis = kwargs['axis']
         else:
+            axis = 0
+        if(axis not in [0,1]):
             raise ValueError("Axis must be 0 or 1.")
+
+        for G in args:
+            if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
+               != G.shape[0]): raise ValueError("The dimensions of "
+                                                "the two Fausts must "
+                                                "agree.")
+
+        C=F
+        for G in args:
+           if(isinstance(G, np.ndarray) or isinstance(G, csr_matrix) \
+               or isinstance(G, csc_matrix)):
+               G = Faust([G])
+           if(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
+                                                           "Faust with something "
+                                                           "that is not a Faust, "
+                                                           "a numpy array or scipy "
+                                                           "sparse matrix.")
+           if(axis==0):
+                C = Faust(core_obj=C.m_faust.vertcat(G.m_faust))
+           elif(axis==1):
+                C = Faust(core_obj=C.m_faust.horzcat(G.m_faust))
+        return C
 
     def toarray(F):
         """
