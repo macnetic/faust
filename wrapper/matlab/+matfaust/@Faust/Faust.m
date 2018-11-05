@@ -1485,7 +1485,7 @@ classdef Faust
 			if(F.isReal)
 				HC = matfaust.Faust(F, mexFaustReal('horzcat', F.matrix.objectHandle, A.matrix.objectHandle));
 			else
-				HC = matfaust.Faust(F, mexFaustReal('horzcat', F.matrix.objectHandle, A.matrix.objectHandle));
+				HC = matfaust.Faust(F, mexFaustCplx('horzcat', F.matrix.objectHandle, A.matrix.objectHandle));
 			end
 		end
 
@@ -1508,7 +1508,7 @@ classdef Faust
 			if(F.isReal)
 				VC = matfaust.Faust(F, mexFaustReal('vertcat', F.matrix.objectHandle, A.matrix.objectHandle));
 			else
-				VC = matfaust.Faust(F, mexFaustReal('vertcat', F.matrix.objectHandle, A.matrix.objectHandle));
+				VC = matfaust.Faust(F, mexFaustCplx('vertcat', F.matrix.objectHandle, A.matrix.objectHandle));
 			end
 		end
 
