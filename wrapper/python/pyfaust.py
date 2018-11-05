@@ -44,6 +44,7 @@ import copy
 
 import numpy as np
 from scipy.io import savemat, loadmat
+from scipy.sparse import csr_matrix, csc_matrix
 import FaustCorePy
 
 
@@ -490,7 +491,7 @@ class Faust:
 
     def concatenate(F, G, axis=0):
         """
-            Concatenates two Faust objects into a new Faust.
+            Concatenates two Faust objects or a Faust and an array into a new Faust.
 
             The resulting Faust <code>C = F.concatenate(G,axis)</code> verifies that:
             <code>
@@ -502,7 +503,9 @@ class Faust:
 
            Args:
                F: the Faust to concatenate to.
-               G: the Faust to be concatenated to F.
+               G: the Faust or matrix (numpy array or
+               scipy.sparse.csr/csc_matrix) to be concatenated to F. If G is a
+               matrix it is Faust-converted on the fly.
                axis (optional): the dimension index (0 or 1) along to concatenate the
                Faust objects. By default, the axis is 0 (for vertical
                concatenation).
@@ -526,7 +529,8 @@ class Faust:
                 >>> F.concatenate(G, 5)
                 </code>
                 ValueError
-                You can't concatenate a Faust with something that is not a Faust.
+                You can't concatenate a Faust with something that is not a
+                Faust, a numpy array or a scipy sparse matrix.
                 <code>
                 >>> F = FaustFactory.rand(2,51);
                 >>> F.concatenate(['a', 'b', 'c'], 5)
@@ -545,7 +549,7 @@ class Faust:
                 FACTOR 4 (real) SPARSE, size 100x100, density 0.0482, nnz 48<br/>
                 FACTOR 5 (real) SPARSE, size 100x100, density 0.0287, nnz 28<br/>
                 FACTOR 6 (real) SPARSE, size 100x50, density 0.02, nnz 10<br/>
-                >>> F.concatenate(G,1)
+                >>> F.concatenate(G, 1)
                 Faust size 50x100, density 0.5634, nnz_sum 2817, 7 factor(s)<br/>
                 FACTOR 0 (real) SPARSE, size 50x100, density 0.02, nnz 10<br/>
                 FACTOR 1 (real) SPARSE, size 100x100, density 0.0286, nnz 28<br/>
@@ -554,10 +558,34 @@ class Faust:
                 FACTOR 4 (real) SPARSE, size 100x100, density 0.0504, nnz 50<br/>
                 FACTOR 5 (real) SPARSE, size 100x100, density 0.0479, nnz 47<br/>
                 FACTOR 6 (real) SPARSE, size 100x100, density 0.0475, nnz 47<br/>
+                >>> from numpy.random import rand
+                >>> F.concatenate(rand(34, 50), axis=0) # The random array is auto-converted to a Faust before the vertical concatenation
+                Faust size 84x50, density 0.765476, nnz_sum 3215, 6 factor(s):<br/>
+                FACTOR 0 (real) SPARSE, size 84x100, density 0.23119, nnz 1942<br/>
+                FACTOR 1 (real) SPARSE, size 100x100, density 0.0301, nnz 301<br/>
+                FACTOR 2 (real) SPARSE, size 100x100, density 0.0286, nnz 286<br/>
+                FACTOR 3 (real) SPARSE, size 100x100, density 0.0285, nnz 285<br/>
+                FACTOR 4 (real) SPARSE, size 100x100, density 0.0301, nnz 301<br/>
+                FACTOR 5 (real) SPARSE, size 100x50, density 0.02, nnz 100<br/>
+                >>> from scipy.sparse import rand as sprand
+                >>> F.concatenate(sprand(50, 24, format='csr'), axis=1) # The sparse random matrix is auto-converted to a Faust before the horizontal concatenation
+                Faust size 50x74, density 0.412703, nnz_sum 1527, 6 factor(s):<br/>
+                FACTOR 0 (real) SPARSE, size 50x100, density 0.02, nnz 100<br/>
+                FACTOR 1 (real) SPARSE, size 100x100, density 0.0292, nnz 292<br/>
+                FACTOR 2 (real) SPARSE, size 100x100, density 0.0301, nnz 301<br/>
+                FACTOR 3 (real) SPARSE, size 100x100, density 0.0286, nnz 286<br/>
+                FACTOR 4 (real) SPARSE, size 100x100, density 0.0285, nnz 285<br/>
+                FACTOR 5 (real) SPARSE, size 100x74, density 0.0355405, nnz 263<br/>
+<br/>
         """
+        if(isinstance(G, np.ndarray) or isinstance(G, csr_matrix) \
+           or isinstance(G, csc_matrix)):
+            G = Faust([G])
         if(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
                                                        "Faust with something "
-                                                       "that is not a Faust.")
+                                                       "that is not a Faust, "
+                                                       "a numpy array or scipy "
+                                                       "sparse matrix.")
 
         if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
            != G.shape[0]): raise ValueError("The dimensions of "
