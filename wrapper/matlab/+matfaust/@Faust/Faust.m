@@ -1482,13 +1482,13 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> Horizontal concatenation [F,A] of the Faust objects F and A.
-		%>
+		%> Horizontal concatenation [F,A] of F and A which is a Faust or a matrix (sparse or full).
+		%===
 		%> It's equivalent to cat(2, F, A).
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b C=HORZCAT(F,A) concatenates the Fausts F and A horizontally. The result is the Faust C. @b HORZCAT(F,A) is the same as [F,G].<br/>
+		%> &nbsp;&nbsp;&nbsp; @b C=HORZCAT(F,A) concatenates the Faust F and A horizontally. A is a Faust or a sparse/full matrix. The result is the Faust C. @b HORZCAT(F,A) is the same as [F,G].<br/>
 		%>
 		%> <p>@b See @b also Faust.vertcat, Faust.cat.
 		%======================================================================
@@ -1497,13 +1497,13 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> Vertical concatenation [F;A] of the Faust objects F and A.
-		%>
+		%> Vertical concatenation [F;A] of F and A which is a Faust or a matrix (sparse of full).
+		%===
 		%> It's equivalent to cat(1, F, A).
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b C=VERTCAT(F,A) concatenates the Fausts F and A vertically. The result is the Faust C. @b VERTCAT(F,A) is the same as [F;G].<br/>
+		%> &nbsp;&nbsp;&nbsp; @b C=VERTCAT(F,A) concatenates the Faust F and A vertically. A is a Faust or a sparse/full matrix. The result is the Faust C. @b VERTCAT(F,A) is the same as [F;G].<br/>
 		%>
 		%> <p>@b See @b also Faust.horzcat, Faust.cat.
 		%======================================================================

@@ -18,7 +18,7 @@ function parse_doxy_block {
         local FUNC=$(echo $1 | tr '[a-z]' '[A-Z]')
         local FUNC_LINE=$(echo "$3" | sed -e 's/^[[:blank:]]\{1,\}//')
         echo -e "$2" | sed -e "{
-                                                        s/^[[:blank:]]*%=\{1,\}//;
+                                                        s/^[[:blank:]]*%=\{4,\}//;
                                                         s/%>[[:blank:]]*@brief/%% $FUNC/;
                                                         s/^\([[:blank:]]\{1,\}\)%> @param F/\1% SPECS: $FUNC_LINE:\n\1\t% - Parameter F: /;
                                                         s/%>/%/;
@@ -51,7 +51,7 @@ cp "$INPUT_FILE" "$OUTPUT_FILE"
 
 [ ! "$?" = 0 ] && echo "ERROR in copying file." >&2 && exit 4
 
-DOXY_BLOCKS_LIMITS=($(sed -ne '/[[:blank:]]*\%=\{1,\}[[:blank:]]*/=' "$INPUT_FILE"))
+DOXY_BLOCKS_LIMITS=($(sed -ne '/[[:blank:]]*\%=\{4,\}[[:blank:]]*/=' "$INPUT_FILE"))
 typeset -i DOXY_BLOCK_ID=0
 
 for FUNC in $FUNCTIONS
