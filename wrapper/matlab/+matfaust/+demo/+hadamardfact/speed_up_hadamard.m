@@ -224,7 +224,7 @@ function speed_up_hadamard()
 	%% save the figure
 	runPath=which(mfilename);
 	pathname = fileparts(runPath);
-	figure_dir = [pathname filesep '..' filesep 'Figures'];
+	figure_dir = [ '.' filesep 'Figures'];
 	format_fig='-dpng';
 	figure_name=[figure_dir filesep 'Hadamard-speed_up'];
 	print(figure_name, format_fig);

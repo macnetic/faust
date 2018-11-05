@@ -44,6 +44,7 @@
 %%
 
 %% Quick start
+mkdir Figures
 disp('*********** Quick Start Demos *************');
 quick_start;
 factorize_matrix;
@@ -60,7 +61,8 @@ Fig_BSL;
 
 %% Hadamard factorization
 disp('*********** Hadamard Factorization *************');
-demo_fact_hadamard; 
+import matfaust.demo.hadamardfact.*
+demo_fact_hadamard;
 speed_up_hadamard;
 norm_hadamard;
 

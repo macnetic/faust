@@ -124,7 +124,7 @@ function demo_fact_hadamard()
 	% figure configuration
 	runPath=which(mfilename);
 	pathname = fileparts(runPath);
-	figure_dir = [pathname filesep '..' filesep 'Figures'];
+	figure_dir = [ '.' filesep 'Figures'];
 	format_fig='-dpng';
 
 
