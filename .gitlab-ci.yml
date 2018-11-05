@@ -60,10 +60,10 @@ package_macos:
     script:
         - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$SHA_START -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START  ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$SHA_START -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF ..'
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
-        - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
+          #- 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
         - pkgbuild --identifier fr.inria.faust --version $SHA_START --root /opt/local/faust-$SHA_START --install-location /opt/local/faust-$SHA_START --scripts . ./faust-$SHA_START.pkg
         - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
         - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
@@ -72,11 +72,12 @@ package_macos:
         - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$SHA_START.pkg
         - mv ./faust-matio-$SHA_START.pkg ./faust-$SHA_START.pkg
         # - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$SHA_START.dmg faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
-        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$SHA_START.dmg faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
+        #- if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$SHA_START.dmg faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
+        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
     artifacts:
         paths:
             - build/faust-${CI_COMMIT_SHA:0:8}.pkg
-            - build/faust-${CI_COMMIT_SHA:0:8}.dmg
+              #- build/faust-${CI_COMMIT_SHA:0:8}.dmg
         expire_in: '6 mos'
     tags:
         - macos
@@ -90,7 +91,7 @@ package_win:
         - 'set SHA_START=%CI_COMMIT_SHA:~0,8%'
         - if NOT EXIST build (mkdir build) else rmdir /S /Q build
         - cd build
-        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build ..'
+        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF ..'
         - make
         - makensis faust.nsi
     artifacts:
@@ -108,7 +109,7 @@ package_linux:
    script:
         - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START -DBUILD_TESTING=OFF ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
@@ -132,7 +133,7 @@ package_linux:
 package_macos_release:
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON -DBUILD_TESTING=OFF ..'
         - make
         - 'echo $MACOS_PASS | sudo -S make install'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust -ov -format UDRW faust-$CI_COMMIT_TAG'
@@ -143,11 +144,12 @@ package_macos_release:
         - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$CI_COMMIT_TAG'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
         - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$CI_COMMIT_TAG.pkg
         - mv ./faust-matio-$CI_COMMIT_TAG.pkg ./faust-$CI_COMMIT_TAG.pkg
-        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$CI_COMMIT_TAG.dmg faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
+          #- if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$CI_COMMIT_TAG.dmg faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
+        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
     artifacts:
         paths:
             - build/faust-${CI_COMMIT_TAG}.pkg
-            - build/faust-${CI_COMMIT_TAG}.dmg
+              #- build/faust-${CI_COMMIT_TAG}.dmg
         expire_in: '50 yrs'
     tags:
         - macos
@@ -158,7 +160,7 @@ package_win_release:
     script:
         - if NOT EXIST build (mkdir build) else rmdir /S /Q build
         - cd build
-        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build ..'
+        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF ..'
         - make
         - makensis faust.nsi
     artifacts:
@@ -173,7 +175,7 @@ package_win_release:
 package_linux_release:
    script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DBUILD_TESTING=OFF ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
@@ -192,7 +194,7 @@ package_linux_release:
 package_linux_release_static:
    script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a -DBUILD_TESTING=OFF ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
