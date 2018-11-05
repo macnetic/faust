@@ -41,6 +41,7 @@
 %%
 %======================================================================
 %> This demo makes some time comparison between the 2-norm of the Hadamard matrix and
+%======================================================================
 %>  her Faust representation for different dimension
 %>  of the Hadamard matrix.
 %>

@@ -40,10 +40,10 @@
 %
 %%
 %======================================================================
-%> Description demo_fact_hadamard
+%> This demo hierarchically factorizes the Hadamard dictionary and then plots the results.
+%======================================================================
 %>
-%>  This demo hierarchically factorizes the Hadamard dictionary and then
-%>  plots the results. This essentially reproduces figure 2 from [1].
+%>  This essentially reproduces figure 2 from [1].
 %>
 %>	<a href="https://hal.archives-ouvertes.fr/hal-01167948v1">[1]</a>
 %> 	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
