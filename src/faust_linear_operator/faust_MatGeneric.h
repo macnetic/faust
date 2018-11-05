@@ -142,7 +142,7 @@ namespace Faust
 	virtual void Display() const;
 
 	//! \brief Returns the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
-	virtual std::string to_string(const bool transpose=false) const;
+	virtual std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 
 	//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio.
 	// \param transpose: set to true to obtain the matio variable for the transpose Matrix.

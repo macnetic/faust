@@ -321,7 +321,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::display() const
 		{
-			this->transform->Display(is_transposed);
+			this->transform->Display(is_transposed, false);
 		}
 
 	template<typename FPP>

@@ -131,7 +131,7 @@ void Faust::MatGeneric<FPP,DEVICE>::Display() const
 }
 
 template<typename FPP,Device DEVICE>
-std::string Faust::MatGeneric<FPP,DEVICE>::to_string(const bool transpose /* set to false by default */) const
+std::string Faust::MatGeneric<FPP,DEVICE>::to_string(const bool transpose /* set to false by default */, const bool displaying_small_mat_elts) const
 {
 	std::ostringstream str;
 	str <<" size ";

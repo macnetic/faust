@@ -526,7 +526,7 @@ void Faust::MatDense<FPP,Cpu>::sub(Faust::MatDense<FPP,Cpu> const& A)
 
 
 template<typename FPP>
-std::string Faust::MatDense<FPP,Cpu>::to_string(const bool transpose /* set to false by default */) const
+std::string Faust::MatDense<FPP,Cpu>::to_string(const bool transpose /* set to false by default */, const bool displaying_small_mat_elts /* false by default */) const
 {
 	//using ostringstream because it's easier for concatenation (of complex and any number)
 	std::ostringstream  str;
@@ -540,7 +540,7 @@ std::string Faust::MatDense<FPP,Cpu>::to_string(const bool transpose /* set to f
 		str <<" identity matrix flag" << endl;
 	else
 	{
-		if (this->dim1*this->dim2 < 100)
+		if (displaying_small_mat_elts && this->dim1*this->dim2 < 100)
 		{
 			for (int i=0 ; i<this->dim1 ; i++)
 			{

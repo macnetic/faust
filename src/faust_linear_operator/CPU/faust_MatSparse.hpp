@@ -340,13 +340,13 @@ void Faust::MatSparse<FPP,Cpu>::init(const vector<int>& rowidx, const vector<int
 
 
 template<typename FPP>
-std::string Faust::MatSparse<FPP,Cpu>::to_string(const bool transpose /* set to false by default */) const
+std::string Faust::MatSparse<FPP,Cpu>::to_string(const bool transpose /* set to false by default */, const bool displaying_small_mat_elts /* false by default */) const
 {
 	std::ostringstream str;
 	str << " (" << (typeid(*getValuePtr()) == typeid(complex<double>) || typeid(*getValuePtr()) == typeid(complex<float>)?"complex":"real") << ")";
 	str<<" SPARSE,";
 	str << Faust::MatGeneric<FPP,Cpu>::to_string(transpose);
-	if (this->dim1*this->dim2 < 100)
+	if (displaying_small_mat_elts && this->dim1*this->dim2 < 100)
 	{
 		str << "rowPtr = " << getRowPtr() << " -> [ " ;
 		for (int i=0 ; i<this->dim1+1 ; i++)

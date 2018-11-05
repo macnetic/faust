@@ -1041,14 +1041,14 @@ void Faust::Transform<FPP,Cpu>::setOp(const char op, faust_unsigned_int& nbRowOp
 }
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::Display(const bool transpose /* default to false */)const
+void Faust::Transform<FPP,Cpu>::Display(const bool transpose /* default to false */,const bool displaying_small_mat_elts /*false by default*/)const
 {
-	std::cout << to_string(transpose);
+	std::cout << to_string(transpose,displaying_small_mat_elts);
 }
 
 
 template<typename FPP>
-std::string Faust::Transform<FPP,Cpu>::to_string(const bool transpose /* default to false */) const
+std::string Faust::Transform<FPP,Cpu>::to_string(const bool transpose /* default to false */, const bool displaying_small_mat_elts/* false by default */) const
 {
 	std::ostringstream str;
 
@@ -1070,7 +1070,7 @@ std::string Faust::Transform<FPP,Cpu>::to_string(const bool transpose /* default
 			else
 				j = i;
 			str << "- FACTOR " << i;
-			str << data[j]->to_string(transpose);
+			str << data[j]->to_string(transpose, displaying_small_mat_elts);
 		}
 	}
 	return str.str();
