@@ -4,8 +4,6 @@ file(GLOB MATLAB_SCRIPTS "*.m")
 
 if(BUILD_WRAPPER_MATLAB)
 
-	configure_file(${FAUST_DEMO_SRC_DIR}/run_all_demo.m ${FAUST_DEMO_BIN_DIR}/run_all_demo.m COPYONLY)
-
 	# copy BSL data matrices
 	file(GLOB BSL_DATA_FILE  RELATIVE ${FAUST_DATA_MAT_DIR} "${FAUST_DATA_MAT_DIR}/*MEG*.mat")
 	foreach(data_BSL ${BSL_DATA_FILE})

@@ -42,41 +42,56 @@
 %	NeuroImage, Volume 86, 1 February 2014, Pages 446-460, ISSN 1053-8119,
 %	[DOI] <http://dx.doi.org/10.1016/j.neuroimage.2013.10.027>
 %%
-
-%% Quick start
-disp('*********** Quick Start Demos *************');
-import matfaust.demo.quickstart.*
-quick_start;
-factorize_matrix;
-construct_Faust_from_factors;
-
-
-
-
-
-%% brain source localization
-disp('*********** Brain Source Localization *************');
-import matfaust.demo.bsl.*
-BSL;
-Fig_BSL;
-
-%% Hadamard factorization
-disp('*********** Hadamard Factorization *************');
-import matfaust.demo.hadamardfact.*
-demo_fact_hadamard;
-speed_up_hadamard;
-norm_hadamard;
-
-
-%% Fourier speed-up
-disp('*********** Fourier speed-up *************');
-import matfaust.demo.fft.*
-speed_up_fourier;
+%============================================================================
+%> Script used to run all demo (brain source localisation, hadamard factorization, …)
+%===
+%>
+%> The scripts reates corresponding figures of the article <a href="https://hal.archives-ouvertes.fr/hal-01167948v1">[1]</a>.
+%>
+%> References:
+%>
+%> [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
+%>	approximations of matrices and applications", Journal of Selected
+%>	Topics in Signal Processing, 2016.
+%>	<https://hal.archives-ouvertes.fr/hal-01167948v1>
+%>
+%============================================================================
+function runall()
+	%% Quick start
+	disp('*********** Quick Start Demos *************');
+	import matfaust.demo.quickstart.*
+	quick_start;
+	factorize_matrix;
+	construct_Faust_from_factors;
 
 
 
-%% Runtime comparison
-disp('*********** Runtime Comparison *************');
-import matfaust.demo.runtimecmp.*
-runtime_comparison;
-Fig_runtime_comparison;
+
+
+	%% brain source localization
+	disp('*********** Brain Source Localization *************');
+	import matfaust.demo.bsl.*
+	BSL;
+	Fig_BSL;
+
+	%% Hadamard factorization
+	disp('*********** Hadamard Factorization *************');
+	import matfaust.demo.hadamardfact.*
+	demo_fact_hadamard;
+	speed_up_hadamard;
+	norm_hadamard;
+
+
+	%% Fourier speed-up
+	disp('*********** Fourier speed-up *************');
+	import matfaust.demo.fft.*
+	speed_up_fourier;
+
+
+
+	%% Runtime comparison
+	disp('*********** Runtime Comparison *************');
+	import matfaust.demo.runtimecmp.*
+	runtime_comparison;
+	Fig_runtime_comparison;
+end
