@@ -59,6 +59,7 @@ construct_Faust_from_factors;
 
 %% brain source localization
 disp('*********** Brain Source Localization *************');
+import matfaust.demo.bsl.*
 BSL;
 Fig_BSL;
 
@@ -72,6 +73,7 @@ norm_hadamard;
 
 %% Fourier speed-up
 disp('*********** Fourier speed-up *************'); 
+iport matfaust.demo.fft.*
 speed_up_fourier;
 
 
