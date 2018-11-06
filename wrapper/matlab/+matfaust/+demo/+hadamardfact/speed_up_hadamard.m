@@ -220,6 +220,7 @@ function speed_up_hadamard()
 	runPath=which(mfilename);
 	pathname = fileparts(runPath);
 	figure_dir = [ '.' filesep 'Figures'];
+	mkdir(figure_dir)
 	format_fig='-dpng';
 	figure_name=[figure_dir filesep 'Hadamard-speed_up'];
 	print(figure_name, format_fig);

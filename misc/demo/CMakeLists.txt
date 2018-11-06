@@ -13,13 +13,6 @@ if(BUILD_WRAPPER_MATLAB)
    	endforeach()
 
 
-	####### Runtime Comparison ######################################
-	file(GLOB TIMECOMP_MATLAB_SCRIPTS  RELATIVE ${FAUST_DEMO_TIMECOMP_SRC_DIR} "${FAUST_DEMO_TIMECOMP_SRC_DIR}/*.m")
-	foreach(matlab_script ${TIMECOMP_MATLAB_SCRIPTS})
-		configure_file(${FAUST_DEMO_TIMECOMP_SRC_DIR}/${matlab_script} ${FAUST_DEMO_TIMECOMP_BIN_DIR}/${matlab_script} COPYONLY)
-	endforeach()
-
-
 	# copy data matrix for quick_start.m
 	configure_file(${FAUST_DATA_MAT_DIR}/faust_quick_start.mat ${FAUST_MATFAUST_DEMO_DATA_BIN_DIR}/faust_quick_start.mat COPYONLY)
 

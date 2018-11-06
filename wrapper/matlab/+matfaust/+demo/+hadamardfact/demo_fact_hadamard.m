@@ -125,6 +125,7 @@ function demo_fact_hadamard()
 	runPath=which(mfilename);
 	pathname = fileparts(runPath);
 	figure_dir = [ '.' filesep 'Figures'];
+	mkdir(figure_dir)
 	format_fig='-dpng';
 
 
