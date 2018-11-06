@@ -1129,7 +1129,7 @@ classdef Faust
 			%
 			%
 			% This function shows the size of the Faust,
-			%  its number of factor, its RCG ...
+			%  its number of factor, its RCG, …
 			%
 			if (F.isReal)
 				mexFaustReal('disp',F.matrix.objectHandle);
@@ -1349,13 +1349,13 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief Concatenates two Faust objects into a new Faust: C.
+		%> @brief Concatenates F with n Faust objects or full/sparse matrices.
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
-		%> The resulting Faust C = cat(DIM,F,G) verifies that:
+		%> The resulting Faust C = cat(DIM,F,G,…) verifies that:
 		%> @code
-		%> full(C) == full(cat(DIM, full(F), full(G)))
+		%> full(C) == full(cat(DIM, full(F), full(G), …))
 		%> @endcode
 		%> NOTE: you could have an elementwise non-significant absolute difference between the two members (not more than eps(1.0)).
 		%>
@@ -1365,11 +1365,12 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; @b C=CAT(DIM,F,G) concatenates the Faust F and G, which is a Faust or a matrix, along the dimension DIM. The result is the Faust C. <br/>
 		%> &nbsp;&nbsp;&nbsp; @b CAT(2,F,G) is the same as [F,G].<br/>
 		%> &nbsp;&nbsp;&nbsp; @b CAT(1,F,G) is the same as [F;G].<br/>
+		%> &nbsp;&nbsp;&nbsp; @b CAT(@b DIM, @b F, @b G,…) concatenates an arbitrary number of Fausts and matrices along the DIM-th dimension.<br/>
 		%>
 		%>
-		%> @param DIM (1st arg.) the dimension along which to concatenate the two Fausts. DIM==1 means vertical concatenation, DIM==2 means horizontal concatenation.
+		%> @param DIM (1st arg.) the dimension along which to concatenate. DIM==1 means vertical concatenation, DIM==2 means horizontal concatenation.
 		%> @param F (2nd arg.) the first Faust object.
-		%> @param G (3rd arg.) the second Faust object to concatenate to F. If G is a matrix (full or sparse) it will be automatically converted to a Faust.
+		%> @param G,… (3rd to n+3 args) the Faust objects or matrices to concatenate to F. The matrices can be sparse or full.
 		%>
 		%> @retval C the concatenation result as a new Faust.
 		%>
@@ -1426,6 +1427,8 @@ classdef Faust
 		%>- FACTOR 3 (real) SPARSE, size 100x100, density 0.0282, nnz 282
 		%>- FACTOR 4 (real) SPARSE, size 100x100, density 0.0292, nnz 292
 		%>- FACTOR 5 (real) SPARSE, size 100x50, density 0.02, nnz 100
+		%>>>>[F;G;F;G] # it's allowed to concatenate an arbitrary number of Fausts
+		%>>>>[F,G,F,G] # as long as the dimensions agree
 		%> @endcode
 		%>
 		%> @b Errors
@@ -1455,26 +1458,27 @@ classdef Faust
 			err_1st_arg = 'Wrong first argument: must be an integer between 1 and 2.';
 			if(nargin > 0 && isscalar(varargin{1}))
 				F = varargin{2}; % we kwnow it's a Faust or we wouldn't be here
-				A = varargin{3};
-				if(ismatrix(A) && ~ isa(A, 'matfaust.Faust'))
-					A = matfaust.Faust({A});
-				end
-				if(~ isa(A, 'matfaust.Faust'))
-					error('Can''t concatenate a Faust to something that is not a Faust or a matrix.')
-				end
 				if(varargin{1} == 1)
-					%C = vertcat(varargin{2:end})
 					mex_func_name = 'vertcat';
 				elseif(varargin{1} == 2)
-					%C = horzcat(varargin{2:end})
 					mex_func_name = 'horzcat';
 				else
 					error(err_1st_arg)
 				end
-				if(F.isReal)
-					C = matfaust.Faust(F, mexFaustReal(mex_func_name, F.matrix.objectHandle, A.matrix.objectHandle));
-				else
-					C = matfaust.Faust(F, mexFaustCplx(mex_func_name, F.matrix.objectHandle, A.matrix.objectHandle));
+				C = F
+				for i=3:nargin
+					A = varargin{i};
+					if(ismatrix(A) && ~ isa(A, 'matfaust.Faust'))
+						A = matfaust.Faust({A});
+					end
+					if(~ isa(A, 'matfaust.Faust'))
+						error('Can''t concatenate a Faust to something that is not a Faust or a matrix.')
+					end
+					if(F.isReal)
+						C = matfaust.Faust(C, mexFaustReal(mex_func_name, C.matrix.objectHandle, A.matrix.objectHandle));
+					else
+						C = matfaust.Faust(C, mexFaustCplx(mex_func_name, C.matrix.objectHandle, A.matrix.objectHandle));
+					end
 				end
 			else
 				error(err_1st_arg)
@@ -1482,14 +1486,15 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> Horizontal concatenation [F,A] of F and A which is a Faust or a matrix (sparse or full).
+		%> Horizontal concatenation [F,A, B, … ] where F is a Faust and A, B, … are Faust objects or sparse/full matrix.
 		%===
-		%> It's equivalent to cat(2, F, A).
+		%> It's equivalent to cat(2, F, A, B, …).
 		%>
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b C=HORZCAT(F,A) concatenates the Faust F and A horizontally. A is a Faust or a sparse/full matrix. The result is the Faust C. @b HORZCAT(F,A) is the same as [F,G].<br/>
-		%>
+		%> &nbsp;&nbsp;&nbsp; @b C=HORZCAT(@b F,@b A,@b B,…) concatenates horizontally F to A, B, etc. @b HORZCAT(@b F,@b A, @b B,…) is the same as [F,A,B,…].<br/>
+%>
 		%> <p>@b See @b also Faust.vertcat, Faust.cat.
 		%======================================================================
 		function HC = horzcat(F, A)
@@ -1497,13 +1502,14 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> Vertical concatenation [F;A] of F and A which is a Faust or a matrix (sparse of full).
+		%> Vertical concatenation [F;A;B;…] where F is a Faust and A, B, … are Faust objects or sparse/full matrices.
 		%===
-		%> It's equivalent to cat(1, F, A).
+		%> It's equivalent to cat(1, F, A, B, …).
 		%>
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b C=VERTCAT(F,A) concatenates the Faust F and A vertically. A is a Faust or a sparse/full matrix. The result is the Faust C. @b VERTCAT(F,A) is the same as [F;G].<br/>
+		%> &nbsp;&nbsp;&nbsp; @b C=VERTCAT(@b F, @b A, @b B,…) concatenates vertically F to A, B etc. @b VERTCAT(@b F, @b A, @b B,…) is the same as [F;A;B;…].<br/>
 		%>
 		%> <p>@b See @b also Faust.horzcat, Faust.cat.
 		%======================================================================
