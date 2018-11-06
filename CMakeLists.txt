@@ -359,15 +359,12 @@ if (BUILD_WRAPPER_MATLAB)
 	set(FAUST_MATLAB_OLD_PROX_BIN_DIR ${FAUST_MATLAB_OLD_BIN_DIR}/proxs CACHE INTERNAL "")
 	set(FAUST_MATLAB_OLD_UTILS_BIN_DIR ${FAUST_MATLAB_OLD_BIN_DIR}/utils CACHE INTERNAL "")
 	set(FAUST_MATLAB_NAMESPACE_REL_DIR "+matfaust")
-	set(FAUST_MATLAB_MAIN_CLASS_FQDN_REL_DIR "${FAUST_MATLAB_NAMESPACE_REL_DIR}/@Faust")
 	set(FAUST_MATLAB_NAMESPACE_SRC_DIR	${FAUST_MATLAB_SRC_DIR}/${FAUST_MATLAB_NAMESPACE_REL_DIR})
 	set(FAUST_MATLAB_NAMESPACE_BIN_DIR	${FAUST_MATLAB_BIN_DIR}/${FAUST_MATLAB_NAMESPACE_REL_DIR})
-	set(FAUST_MATLAB_MATFAUST_CLASS_LIST   "@FaustFactory/FaustFactory.m;@ConstraintInt/ConstraintInt.m;@ParamsHierarchicalFact/ParamsHierarchicalFact.m;@ConstraintGeneric/ConstraintGeneric.m;@ParamsFact/ParamsFact.m;@ConstraintMat/ConstraintMat.m;@ConstraintName/ConstraintName.m;@ConstraintReal/ConstraintReal.m;@StoppingCriterion/StoppingCriterion.m;@ParamsPalm4MSA/ParamsPalm4MSA.m;+demo/+hadamardfact/norm_hadamard.m;+demo/+hadamardfact/demo_fact_hadamard.m;+demo/+hadamardfact/speed_up_hadamard.m;+demo/+quickstart/construct_Faust_from_factors.m;+demo/+quickstart/factorize_matrix.m;+demo/+quickstart/quick_start.m")
-	set(FAUST_MATLAB_MAIN_CLASS_FQDN_SRC_DIR 	${FAUST_MATLAB_SRC_DIR}/${FAUST_MATLAB_MAIN_CLASS_FQDN_REL_DIR})
-	set(FAUST_MATLAB_MAIN_CLASS_FQDN_BIN_DIR 	${FAUST_MATLAB_BIN_DIR}/${FAUST_MATLAB_MAIN_CLASS_FQDN_REL_DIR})
+	file(GLOB_RECURSE FAUST_MATLAB_MATFAUST_FILE_LIST ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/*.m)
 	####  INSTALL DIRECTORY ####
 	#set(FAUST_MATLAB_INSTALL_DIR ${CMAKE_INSTALL_MATLAB_PREFIX})
-	
+
 	#set(FAUST_MATLAB_MEX_INSTALL_DIR 	${CMAKE_INSTALL_MATLAB_PREFIX}/mex)
 	#set(FAUST_MATLAB_TOOLS_INSTALL_DIR 	${CMAKE_INSTALL_MATLAB_PREFIX}/tools CACHE INTERNAL "")	
 
