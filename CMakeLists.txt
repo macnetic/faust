@@ -369,22 +369,9 @@ if (BUILD_WRAPPER_MATLAB)
 	#set(FAUST_MATLAB_TOOLS_INSTALL_DIR 	${CMAKE_INSTALL_MATLAB_PREFIX}/tools CACHE INTERNAL "")	
 
 
-	########## DEMO DIRECTORIES #############
-	###### SRC DIRECTORY #####
-	set(FAUST_DEMO_SRC_DIR ${FAUST_MISC_DIR}/demo CACHE INTERNAL "")
-	#set(FAUST_DEMO_BSL_DATA_SRC_DIR ${FAUST_DEMO_SRC_DIR}/Brain_source_localization/data/ CACHE INTERNAL "")
-	set(FAUST_DEMO_TOOLS_SRC_DIR 	${FAUST_DEMO_SRC_DIR}/tools CACHE INTERNAL "")
-
-	###### BIN DIRECTORY ######
-	set(FAUST_DEMO_BIN_DIR 		${FAUST_MATLAB_BIN_DIR}/demo CACHE INTERNAL "")
-	set(FAUST_DEMO_TOOLS_BIN_DIR 	${FAUST_DEMO_BIN_DIR}/tools CACHE INTERNAL "")
+	###### DEMO DATA BIN DIRECTORY ######
 	set(FAUST_MATFAUST_DEMO_DATA_BIN_DIR ${FAUST_MATLAB_BIN_DIR}/data CACHE INTERNAL "")
 
-
-	####  INSTALL DIRECTORY ####
-	# No need to specify installation demo  directory because 
-	# it has the same architecture as FAUST_DEMO_BIN_DIR
-	# so FAUST_DEMO_BIN_DIR is directly installed
 
 
 endif(BUILD_WRAPPER_MATLAB)
@@ -638,7 +625,6 @@ endif (BUILD_USE_GPU)
 
 if (BUILD_WRAPPER_MATLAB)
 	add_subdirectory(${FAUST_MATLAB_SRC_DIR} ${FAUST_MATLAB_MEX_BIN_DIR})
-	add_subdirectory(${FAUST_DEMO_SRC_DIR} ${FAUST_DEMO_BIN_DIR})
 endif()
 ##################################################################
 
