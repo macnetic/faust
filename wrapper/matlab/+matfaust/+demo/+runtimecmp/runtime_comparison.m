@@ -192,7 +192,9 @@ function runtime_comparison()
 
 	runPath=which(mfilename);
 	pathname = 'output'
-	mkdir(pathname)
+	if(~ exist(pathname))
+		mkdir(pathname)
+	end
 	matfile = fullfile(pathname, 'runtime_comparison.mat');
 	save(matfile,'t_faust','t_dense','params');
 

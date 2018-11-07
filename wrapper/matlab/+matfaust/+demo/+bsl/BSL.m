@@ -179,7 +179,9 @@ function BSL()
 	end
 	close(h);
 
-	mkdir 'output'
+	if(~ exist('output'))
+		mkdir 'output'
+	end
 	matfile = [ 'output' filesep 'results_BSL_user' ];
 	save(matfile,'resDist','Sparsity','RCG_list','compute_Times','Ntraining','nb_MEG_matrix');
 

@@ -83,7 +83,9 @@ function Fig_runtime_comparison()
 
 	% figure configuration
 	figure_dir = [ '.' filesep 'Figures'];
-	mkdir(figure_dir)
+	if(~ exist(figure_dir))
+		mkdir(figure_dir)
+	end
 	format_fig='-dpng';
 
 

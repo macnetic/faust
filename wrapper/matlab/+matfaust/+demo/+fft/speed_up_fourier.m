@@ -167,7 +167,9 @@ function speed_up_fourier()
 	runPath=which(mfilename);
 	pathname = fileparts(runPath);
 	figure_dir = ['.' filesep 'Figures'];
-	mkdir(figure_dir)
+	if(~ exist(figure_dir))
+		mkdir(figure_dir)
+	end
 	format_fig='-dpng';
 	figure_name=[figure_dir filesep 'Fourier-speed_up'];
 	print(figure_name, format_fig);
