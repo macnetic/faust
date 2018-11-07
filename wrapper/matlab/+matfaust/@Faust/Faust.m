@@ -1517,8 +1517,12 @@ classdef Faust
 			VC = cat(1, F, A);
 		end
 
+		%======================================================================
+		%> Function not implemented in the Faust class.
+		%>
+		%======================================================================
 		function RF = reshape(varargin)
-			error('Function not implemented for Faust class');
+			error('Function not implemented in the Faust class.');
 		end
 
 	end
