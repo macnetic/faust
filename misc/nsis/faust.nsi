@@ -94,8 +94,9 @@ Section "" ; no component so name not needed
   CreateDirectory $INSTDIR\doc\html
 
   ; install python wrapper
-  SetOutPath $INSTDIR\python
+  SetOutPath $INSTDIR\python\pyfaust
   File @PROJECT_BINARY_DIR@\wrapper\python\*py
+  SetOutPath $INSTDIR\python
   File @PROJECT_BINARY_DIR@\wrapper\python\*pyd
   File @PROJECT_BINARY_DIR@\wrapper\python\*pxd
 
@@ -115,8 +116,9 @@ Section "" ; no component so name not needed
   FileClose $1
   ;MessageBox MB_OK "$2"
 
-  SetOutPath $2 
-  File @PROJECT_BINARY_DIR@\wrapper\python\*py
+  SetOutPath $2\pyfaust 
+  File /r @PROJECT_BINARY_DIR@\wrapper\python\pyfaust\*py
+  SetOutPath $2
   File @PROJECT_BINARY_DIR@\wrapper\python\*pyd
   File @PROJECT_BINARY_DIR@\wrapper\python\*pxd
 

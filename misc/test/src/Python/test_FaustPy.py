@@ -427,8 +427,10 @@ class TestFaustFactory(unittest.TestCase):
 
     def testFactPalm4MSA(self):
         print("Test FaustFactory.fact_palm4msa()")
-        from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintReal,\
-        ConstraintInt, ConstraintName, StoppingCriterion
+        from pyfaust import FaustFactory;
+        from pyfaust.constraints import ConstraintReal,\
+                ConstraintInt, ConstraintName
+        from pyfaust.params import ParamsPalm4MSA, StoppingCriterion
         num_facts = 2
         is_update_way_R2L = False
         init_lambda = 1.0
@@ -459,8 +461,10 @@ class TestFaustFactory(unittest.TestCase):
 
     def testFactHierarch(self):
         print("Test FaustFactory.fact_hierarchical()")
-        from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintReal,\
-        ConstraintInt, ConstraintName, StoppingCriterion
+        from pyfaust import FaustFactory
+        from pyfaust.params import ParamsHierarchicalFact, StoppingCriterion
+        from pyfaust.constraints import ConstraintReal, ConstraintInt,\
+                ConstraintName
         num_facts = 4
         is_update_way_R2L = False
         init_lambda = 1.0
@@ -493,8 +497,10 @@ class TestFaustFactory(unittest.TestCase):
 
     def testFactHierarchCplx(self):
         print("Test FaustFactory.fact_hierarchicalCplx()")
-        from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintReal,\
-        ConstraintInt, ConstraintName, StoppingCriterion
+        from pyfaust import FaustFactory
+        from pyfaust.params import ParamsHierarchicalFact, StoppingCriterion
+        from pyfaust.constraints import ConstraintReal,\
+                ConstraintInt, ConstraintName
         num_facts = 4
         is_update_way_R2L = False
         init_lambda = 1.0
@@ -529,8 +535,10 @@ class TestFaustFactory(unittest.TestCase):
 
     def testFactPalm4MSACplx(self):
         print("Test FaustFactory.fact_palm4msaCplx()")
-        from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintReal,\
-        ConstraintInt, ConstraintName, StoppingCriterion
+        from pyfaust import FaustFactory
+        from pyfaust.params import ParamsPalm4MSA,StoppingCriterion
+        from pyfaust.constraints import ConstraintReal,\
+                ConstraintInt, ConstraintName
         num_facts = 2
         is_update_way_R2L = False
         init_lambda = 1.0
