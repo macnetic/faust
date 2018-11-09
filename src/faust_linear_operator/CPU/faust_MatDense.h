@@ -428,6 +428,8 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
 		static Faust::MatDense<FPP,Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols);
 		static Faust::MatDense<FPP,Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, float density);
+		//\param : per_row means the density applies for each line rather than globally for the matrix
+		static Faust::MatDense<FPP,Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, float density, bool per_row);
 		private:
 		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;
 		bool isIdentity;

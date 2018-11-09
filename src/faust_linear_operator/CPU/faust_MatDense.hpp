@@ -913,6 +913,26 @@ Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int
 				if(distribution(generator) > density)
 					mat_tmp(i,j) = 0;
 		mat = new Faust::MatDense<FPP, Cpu>(mat_tmp.data(), num_rows, num_cols);
+		mat_tmp.resize(0,0);
+	}
+	catch(std::bad_alloc e) {
+//		std::cerr << "Out of memory." << std::endl;
+	}
+	return mat;
+}
+
+	template<typename FPP>
+Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, float density, bool per_row)
+{
+	Faust::MatDense<FPP, Cpu>* mat = nullptr;
+	try {
+		// create a rand MatSparse and convert it to MatDense (because the density accuracy of MatSparse::randMat() is better)
+		MatSparse<FPP, Cpu>* spmat = MatSparse<FPP, Cpu>::randMat(num_rows, num_cols, density, per_row);
+		if(spmat != nullptr)
+		{
+			mat = new MatDense<FPP, Cpu>(*spmat);
+			delete spmat;
+		}
 	}
 	catch(std::bad_alloc e) {
 //		std::cerr << "Out of memory." << std::endl;

@@ -802,21 +802,90 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_i
 	FPP rand_number;
 	complex<double> rs;
 	try {
-		tripletList.reserve((size_t)(num_rows*num_cols*density));
 		faust_unsigned_int num_elts = (faust_unsigned_int)(num_rows*num_cols*density);
-		faust_unsigned_int i,col_id,row_id, r, nrows_times_ncols = (num_cols-1)*(num_rows-1);
+		tripletList.reserve(num_elts);
+		faust_unsigned_int i,col_id,row_id, r;
 		i = 0;
 		while(i < num_elts)
 		{
 			r = int_distribution(generator);
 			row_id = r/num_cols;
 			col_id = r - row_id * num_cols;
-			assert(col_id >= 0 && col_id < num_cols); 
+			assert(col_id >= 0 && col_id < num_cols);
 			rs = complex<double>(distribution(generator), distribution(generator));
 			memcpy(&rand_number, &rs, sizeof(FPP));
 //			cout << row_id << " " << col_id << " " << rand_number << endl;
 			tripletList.push_back(T(row_id,col_id, rand_number));
 			i++;
+		}
+		mat.setFromTriplets(tripletList.begin(), tripletList.end());
+		fsmat->mat = mat;
+		fsmat->update_dim();
+		//	fsmat->Display();
+	}
+	catch(std::exception e) {
+		delete fsmat;
+		fsmat = NULL;
+		//		std::cerr << "Out of memory." << std::endl;
+	}
+	return fsmat;
+}
+
+	template<typename FPP>
+Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density, bool per_row)
+{
+	std::default_random_engine generator(rand());
+	std::uniform_real_distribution<double> distribution(0, 1);
+	typedef Eigen::Triplet<FPP,faust_unsigned_int> T;
+	std::vector<T> tripletList;
+	MatSparse<FPP, Cpu>* fsmat = new MatSparse<FPP,Cpu>();
+	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat(num_rows, num_cols);
+	FPP rand_number;
+	faust_unsigned_int vec_size, num_vecs, vec_nnz, col_id,row_id, j, k;
+	complex<double> rs;
+	std::vector<faust_unsigned_int> id_list;
+	if(per_row)
+	{
+		num_vecs = num_rows;
+		vec_size = num_cols;
+	}
+	else
+	{
+		num_vecs = num_cols;
+		vec_size = num_rows;
+	}
+	vec_nnz = density*vec_size;
+	try {
+		tripletList.reserve((size_t)(num_vecs*vec_nnz));
+		for(faust_unsigned_int i = 0; i < num_vecs; i++)
+		{
+			if(per_row)
+				row_id = i;
+			else
+				col_id = i;
+			//(re)set the indices available for the vec (of weight vec_nnz)
+			id_list.resize(0);
+			for(j=0;j<vec_size;j++)
+				id_list.push_back(j);
+			j = vec_nnz;
+			while(j > 0)
+			{
+				// set the uniform random law to pick an index among the remaining ones
+				std::uniform_int_distribution<faust_unsigned_int> int_distribution(0, id_list.size()-1);
+				// pick this index
+				k = int_distribution(generator);
+				if(per_row)
+					col_id = id_list[k];
+				else
+					row_id = id_list[k];
+				// remove the used index (don't want to use it twice to set vector)
+				id_list.erase(id_list.begin()+k);
+				// random value
+				rs = complex<double>(distribution(generator), distribution(generator));
+				memcpy(&rand_number, &rs, sizeof(FPP));
+				tripletList.push_back(T(row_id, col_id, rand_number));
+				j--;
+			}
 		}
 		mat.setFromTriplets(tripletList.begin(), tripletList.end());
 		fsmat->mat = mat;
