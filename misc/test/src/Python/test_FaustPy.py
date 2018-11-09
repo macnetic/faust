@@ -279,7 +279,9 @@ class TestFaustPy(unittest.TestCase):
         #TODO: test mul by a complex scalar when impl.
 
     def testConcatenate(self):
+        print("testConcatenate()")
         from pyfaust import FaustFactory
+        from numpy.linalg import norm
         F = self.F
         FAUST,SPARSE,FULL=0,1,2
         for typeH in range(0,3):
@@ -306,19 +308,20 @@ class TestFaustPy(unittest.TestCase):
                         self.r.randint(1,TestFaustPy.MAX_DIM_SIZE)).astype(F.dtype))
                     H = Faust([G.get_factor(i) for i in
                            range(0,G.get_num_factors())]+[M])
-            if(typeH == FAUST):
-                H_ = H
-            elif(typeH == SPARSE):
-                from scipy.sparse import csr_matrix
-                H_ = csr_matrix(H.toarray())
-            else: # typeH == FULL
-                H_ = H.toarray()
-            print("testConcatenate() F.shape, H.shape", F.shape, H.shape)
-            C = F.concatenate(H_,axis=cat_axis)
-            ref_C = np.concatenate((F.toarray(),
-                                    H.toarray()),
-                                   axis=cat_axis)
-            self.assertLessEqual(np.linalg.norm(C.toarray()-ref_C)/norm(ref_C),
+                if(typeH == FAUST):
+                    H_ = H
+                elif(typeH == SPARSE):
+                    from scipy.sparse import csr_matrix
+                    H_ = csr_matrix(H.toarray())
+                else: # typeH == FULL
+                    H_ = H.toarray()
+                print("testConcatenate() F.shape, H.shape", F.shape, H.shape)
+                C = F.concatenate(H_,axis=cat_axis)
+                ref_C = np.concatenate((F.toarray(),
+                                        H.toarray()),
+                                       axis=cat_axis)
+                self.assertEqual(C.shape, ref_C.shape)
+                self.assertLessEqual(norm(C.toarray()-ref_C)/norm(ref_C),
                             10**-5)
 
     def testTranspose(self):
