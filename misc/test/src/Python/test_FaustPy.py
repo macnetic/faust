@@ -284,10 +284,14 @@ class TestFaustPy(unittest.TestCase):
         FAUST,SPARSE,FULL=0,1,2
         for typeH in range(0,3):
             for cat_axis in [0,1]:
+                if(isinstance(self,TestFaustPyCplx)):
+                    field = 'complex'
+                else:
+                    field = 'real'
                 G = \
                 FaustFactory.rand(self.r.randint(1,TestFaustPy.MAX_NUM_FACTORS),
                                   F.shape[(cat_axis+1)%2],
-                                  is_real=not isinstance(self,TestFaustPyCplx))
+                                  field=field)
                 # add one random factor to get a random number of rows to test
                 # vertcat and a random number of cols to test horzcat
                 if cat_axis == 0:

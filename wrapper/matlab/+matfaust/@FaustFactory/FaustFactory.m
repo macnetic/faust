@@ -299,26 +299,25 @@ classdef FaustFactory
 		%>
 		%>
 		%>
-		%> @param num_factors (varargin{1}) If it's an integer it will be the number of random factors to set in the Faust.
+		%> @param num_factors (arg. 1) If it's an integer it will be the number of random factors to set in the Faust.
 		%>                    If num_factors is a vector of 2 integers then the
 		%>                    number of factors will be set randomly between
 		%>                    num_factors(1) and num_factors(2) (inclusively).
-		%> @param dim_sizes (varargin{2}) if it's an integer it will be the order of the square
+		%> @param dim_sizes (arg. 2) if it's an integer it will be the order of the square
 		%> 					matrix factors (of size size_dims^2).
 		%> 					If it's a vector of 2 integers then the
 		%> 					number of rows and columns will
 		%> 					be a random number between size_dims(1) and
 		%> 					size_dims(2) (inclusively).
-		%> @param density	(varargin{3}, optional) the approximate density of factors generated. The default value is 0.1.
+		%> @param density	(arg. 3, optional) the approximate density of factors generated. The default value is 0.1.
 		%> 					It should be a floating point number between 0 and 1.
-		%> @param fac_type	(varargin{4}, optional) the type of factors. Must be
+		%> @param fac_type	(arg. 4, optional) the type of factors. Must be
 		%>                 	'sparse', 'dense' or 'mixed' if you want a mix of dense and
 		%>                  sparse matrices in the generated Faust (choice's done according
 		%>                  to an uniform distribution).
 		%>                  The default value is 'mixed'.
-		%> @param is_real	(varargin{5}, optional) a boolean set to true to generate a real Faust,
-		%>                  set to false to generate a complex Faust.
-		%>                  The default value is true.
+		%> @param field	(arg. 5, optional) 'real' or 'complex' to set the Faust field.
+		%>                  The default value is 'real'.
 		%>
 		%>
 		%>
@@ -328,7 +327,7 @@ classdef FaustFactory
 		%> @code
 		%> % in a matlab terminal
 		%> >> import matfaust.FaustFactory
-		%> >> F = FaustFactory.rand(2, 10, .5, 'mixed', false)
+		%> >> F = FaustFactory.rand(2, 10, .5, 'mixed', 'complex')
 		%>
 		%> F =
 		%>
@@ -413,17 +412,13 @@ classdef FaustFactory
 					end
 					%set the field of factors
 					if(nargin >= 5)
-						if(islogical(varargin{5}))
-							if(varargin{5})
-								field = REAL;
-							else
-								field = COMPLEX;
-							end
+						if(varargin{5} == 'real')
+							field = REAL;
+						elseif(varargin{5} == 'complex')
+							field = COMPLEX;
 						else
-							error('FaustFactory.rand(): the fifth argument (isreal) must be a boolean.')
+							error('FaustFactory.rand(): the fifth argument (isreal) must be ''complex'' or ''real''.')
 						end
-					else
-						field = REAL;
 					end
 				else
 					fac_type = MIXED;

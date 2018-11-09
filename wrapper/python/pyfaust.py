@@ -199,7 +199,7 @@ class Faust:
 
         Examples:
             >>> from pyfaust import FaustFactory
-            >>> F = FaustFactory.rand(2, 50, is_real=False)
+            >>> F = FaustFactory.rand(2, 50, field='complex')
             >>> nrows, ncols = F.shape
             >>> nrows = F.shape[0]
             >>> ncols = F.shape[1]
@@ -225,7 +225,7 @@ class Faust:
 
         Examples:
             >>> from pyfaust import FaustFactory
-            >>> F = FaustFactory.rand(2, 50, is_real=False)
+            >>> F = FaustFactory.rand(2, 50, field='complex')
             >>> size = F.size
 
         <b/> See also Faust.shape
@@ -288,7 +288,7 @@ class Faust:
 
         Examples:
             >>> from pyfaust import FaustFactory
-            >>> F = FaustFactory.rand(5, 50, is_real=False)
+            >>> F = FaustFactory.rand(5, 50, field='complex')
             >>> Fc = F.conj()
 
         <b/> See also Faust.transpose, Faust.getH, Faust.H
@@ -310,7 +310,7 @@ class Faust:
 
         Examples:
             >>> from pyfaust import FaustFactory
-            >>> F = FaustFactory.rand(5, 50, is_real=False)
+            >>> F = FaustFactory.rand(5, 50, field='complex')
             >>> H1 = F.getH()
             >>> H2 = F.transpose()
             >>> H2 = H2.conj()
@@ -336,7 +336,7 @@ class Faust:
 
         Examples:
             >>> from pyfaust import FaustFactory
-            >>> F = FaustFactory.rand(5, 50, is_real=False)
+            >>> F = FaustFactory.rand(5, 50, field='complex')
             >>> H1 = F.H
             >>> H2 = F.transpose()
             >>> H2 = H2.conj()
@@ -1032,7 +1032,7 @@ class Faust:
 
         Examples:
             >>> from pyfaust import FaustFactory, Faust
-            >>> F = FaustFactory.rand([2, 3], [10, 20],.5, is_real=False)
+            >>> F = FaustFactory.rand([2, 3], [10, 20],.5, field='complex')
             >>> F.save("F.mat")
             >>> G = Faust(filepath="F.mat")
 
@@ -1063,7 +1063,7 @@ class Faust:
 
         Examples:
             >>> from pyfaust import FaustFactory
-            >>> F = FaustFactory.rand([2, 3], [10, 20],.5, is_real=False)
+            >>> F = FaustFactory.rand([2, 3], [10, 20],.5, field='complex')
             dtype('complex128')
             >>> F = FaustFactory.rand([2, 3], [10, 20],.5)
             dtype('float64')
@@ -1278,7 +1278,7 @@ class FaustFactory:
 
     @staticmethod
     def rand(num_factors, dim_sizes, density=0.1, fac_type="mixed",
-                  is_real=True):
+                  field='real'):
         """
         Generates a random Faust.
 
@@ -1301,16 +1301,15 @@ class FaustFactory:
                 sparse matrices in the generated Faust (choice's done according
                 to an uniform distribution).
                             The default value is "mixed".
-                is_real: (optional) a boolean set to True to generate a real Faust,
-                        set to False to generate a complex Faust. The default value
-                        is True.
+                field: (optional) a str to set the Faust field: 'real' or
+                'complex'. By default, the value is 'real'.
 
         Returns:
             the random Faust.
 
         Examples:
             >>> from pyfaust import FaustFactory
-            >>> F = FaustFactory.rand(2, 10, .5, is_real=False)
+            >>> F = FaustFactory.rand(2, 10, .5, field='complex')
             >>> G = FaustFactory.rand([2, 5], [10, 20], .5, fac_type="dense")
             >>> F
             Faust size 10x10, density 0.99, nnz_sum 99, 2 factors:<br/>
@@ -1325,6 +1324,12 @@ class FaustFactory:
 
         <b/> See also Faust.__init__
         """
+        if(field == 'real'):
+            is_real = True
+        elif(field == 'complex'):
+            is_real = False
+        else:
+            raise ValueError('field argument must be either "real" or "complex".')
         DENSE=0
         SPARSE=1
         MIXED=2

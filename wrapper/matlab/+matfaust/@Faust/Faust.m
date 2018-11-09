@@ -545,7 +545,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', false)
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	F_ctrans = F'
 		%>	F_ctrans2 = ctranspose(F)
 		%>	% F_ctrans == F_ctrans2
@@ -588,7 +588,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', false)
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	F_conj = conj(F)
 		%> @endcode
 		%>
@@ -628,7 +628,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', false)
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	[nrows, ncols] = size(F)
 		%>	nrows = size(F, 1)
 		%>	ncols = size(F, 2)
@@ -708,7 +708,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', false)
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	n = numel(F)
 		%> @endcode
 		%>
@@ -797,7 +797,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', false)
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	f1 = get_factor(F, 1)
 		%> @endcode
 		%> <p>@b See @b also Faust.get_num_factors
@@ -844,7 +844,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', false)
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	f1 = get_factor_nonopt(F, 1)
 		%> @endcode
 		%> <p>@b See @b also Faust.get_num_factors
@@ -890,7 +890,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', false)
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	nf = get_num_factors(F)
 		%> @endcode
 		%>
@@ -927,7 +927,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	import matfaust.*
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', false)
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	save(F, 'F.mat')
 		%>	G = Faust('F.mat')
 		%> @endcode

@@ -53,7 +53,7 @@ Neverthless, it could be useful to check that it really worked and set the envir
 
 <p>To test whether the FAµST Matlab wrapper auto-setup succeeded at install stage, you can open a terminal and type:</p>
 
-<pre><code>matlab -nodisplay -nojvm -r "import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', false);disp(F);exit"
+<pre><code>matlab -nodisplay -nojvm -r "import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', 'complex');disp(F);exit"
 </code></pre>
 
 <p>Note: if Matlab is not set in your PATH environment variable you need to replace `matlab' with its full path
@@ -77,7 +77,7 @@ Neverthless, it could be useful to check that it really worked and set the envir
 
 <pre><code>&gt;&gt; setup_FAUST
 &gt;&gt; % then test again FAµST
-&gt;&gt; import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', false);disp(F);exit
+&gt;&gt; import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', 'complex');disp(F);exit
 </code></pre>
 
 <p>For that change to be applied permanently, you need to automatize the `addpath()&lsquo; call made by setup_FAUST.<br/>
