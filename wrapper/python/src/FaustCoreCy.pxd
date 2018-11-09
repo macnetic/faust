@@ -89,7 +89,8 @@ cdef extern from "FaustCoreCpp.h" :
         FaustCoreCpp[FPP]* randFaust(unsigned int t,
                                              unsigned int min_num_factors, unsigned int max_num_factors,
                                              unsigned int min_dim_size,
-                                             unsigned int max_dim_size, float density)
+                                             unsigned int max_dim_size,
+                                             float density, bool per_row)
         @staticmethod
         FaustCoreCpp[FPP]* hadamardFaust(unsigned int n)
         @staticmethod

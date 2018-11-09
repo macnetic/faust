@@ -1277,8 +1277,8 @@ class FaustFactory:
         return F
 
     @staticmethod
-    def rand(num_factors, dim_sizes, density=0.1, fac_type="mixed",
-                  field='real'):
+    def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
+                  field='real', per_row=True):
         """
         Generates a random Faust.
 
@@ -1294,15 +1294,19 @@ class FaustFactory:
                             be a random number between size_dims[0] and
                             size_dims[1] (inclusively).
                 density: (optional) the approximate density of factors. The
-                default value is 0.1. It should be a floating point number
-                between 0 and 1.
-                fac_type: (optional) the type of density of factors. Must be
+                default value is such that each factor will have 5 non-zero
+                elements per row, if per_row is True, or per column otherwise.
+                It should be a floating point number between 0 and 1.
+                fac_type: (optional) the storage representation of factors. Must be
                 "sparse", "dense" or "mixed" if you want a mix of dense and
                 sparse matrices in the generated Faust (choice's done according
                 to an uniform distribution).
                             The default value is "mixed".
                 field: (optional) a str to set the Faust field: 'real' or
                 'complex'. By default, the value is 'real'.
+                per_row: if True the factor matrix is constructed per row
+                applying the density to each row. If False the construction is
+                made with the density applied on each column.
 
         Returns:
             the random Faust.
@@ -1335,7 +1339,7 @@ class FaustFactory:
         MIXED=2
         REAL=3
         COMPLEX=4
-        # set density type of factors
+        # set repr. type of factors
         if(not isinstance(fac_type, str) or fac_type not in ["sparse",
                                                              "dense",
                                                              "mixed"]):
@@ -1370,9 +1374,16 @@ class FaustFactory:
         else:
             raise ValueError("FaustFactory.rand(): dim_sizes argument must be an "
                              "integer or a list/tuple of 2 integers.")
+        if(not isinstance(per_row, bool)):
+           raise ValueError("FaustFact.rand(): per_row argument must be a "
+                            "bool.")
+        if(not density):
+            density = -1
+        elif(not isinstance(density, numpy.float)):
+            raise ValueError("FaustFactory.rand(): density must be a float")
         rF = Faust(core_obj=FaustCorePy.FaustCore.randFaust(
             fac_type_map[fac_type], field, min_num_factors, max_num_factors,
-            min_dim_size, max_dim_size, density))
+            min_dim_size, max_dim_size, density, per_row))
         return rF
 
     @staticmethod

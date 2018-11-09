@@ -529,6 +529,8 @@ namespace Faust {
 					for(faust_unsigned_int i = 1; i < size-1; i++)
 					{
 						gen_facs[i-1] = this->transform->get_fact(i, cloning_fact);
+
+
 						factors.insert(++it, gen_facs[i-1]);
 					}
 					factors.insert(factors.begin()+(size-1), last_sub_fac);
@@ -823,7 +825,7 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density) {
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */) {
 			if(!TransformHelper<FPP,Cpu>::seed_init) {
 				srand(time(NULL)); //seed init needed for MatDense rand generation
 				TransformHelper<FPP,Cpu>::seed_init = true;
@@ -837,21 +839,29 @@ namespace Faust {
 			// create factors randomly respecting the RandFaustType asked and dims interval
 			std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) num_factors);
 			unsigned int num_rows, num_cols = dim_distr(generator);
+			float fact_density;
 			for(unsigned int i=0;i<num_factors;i++) {
 				num_rows = num_cols;
 				num_cols = dim_distr(generator);
+#ifdef FAUST_VERBOSE
+				cout << "TransformHelper<FPP,Cpu>::randFaust() per_row: " <<  per_row << endl;
+#endif
+				if(density == -1.)
+					fact_density = per_row?5.1/num_cols:5.1/num_rows;
+				else
+					fact_density = density;
 				switch(t){
 					case DENSE:
-						factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, density);
+						factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
 						break;
 					case SPARSE:
-						factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, density);
+						factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
 						break;
-					case MIXTE:
+					case MIXED:
 						if(bin_distr(generator))
-							factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, density);
+							factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
 						else
-							factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, density);
+							factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
 						break;
 					default:
 						handleError("Faust::TransformHelper", "randFaust(): Unknown RandFaustType");

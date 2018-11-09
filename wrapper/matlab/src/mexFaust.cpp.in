@@ -129,9 +129,10 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 								   min_dim_size = (faust_unsigned_int) mxGetScalar(prhs[4]),
 								   max_dim_size = (faust_unsigned_int) mxGetScalar(prhs[5]);
 				float density = (float) mxGetScalar(prhs[6]);
+				bool per_row = (bool) mxGetScalar(prhs[7]);
 
 				//printf("mexFaust.cpp rand(): faust creation\n");
-				Faust::TransformHelper<SCALAR,Cpu>* F = Faust::TransformHelper<SCALAR,Cpu>::randFaust(RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density);
+				Faust::TransformHelper<SCALAR,Cpu>* F = Faust::TransformHelper<SCALAR,Cpu>::randFaust(RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
 
 				if(F) //not NULL
 					plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);

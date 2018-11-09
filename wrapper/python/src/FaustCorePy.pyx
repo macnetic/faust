@@ -142,16 +142,16 @@ cdef class FaustCore:
 
     @staticmethod
     def randFaust(t,field,min_num_factors, max_num_factors, min_dim_size,
-                   max_dim_size, density=0.1):
+                   max_dim_size, density=0.1, per_row=True):
         core = FaustCore(core=True)
         if(field == 3):
             core.core_faust_dbl = FaustCoreCy.FaustCoreCpp[double].randFaust(t,min_num_factors, max_num_factors, min_dim_size,
-                   max_dim_size, density)
+                   max_dim_size, density, per_row)
             core._isReal = True
             if(core.core_faust_dbl == NULL): raise MemoryError()
         elif(field == 4):
             core.core_faust_cplx = FaustCoreCy.FaustCoreCpp[complex].randFaust(t,min_num_factors, max_num_factors, min_dim_size,
-                   max_dim_size, density)
+                   max_dim_size, density, per_row)
             if(core.core_faust_cplx == NULL): raise MemoryError()
             core._isReal = False
         else:

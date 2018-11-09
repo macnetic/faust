@@ -326,8 +326,8 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::conjugate()
 template<typename FPP>
   FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::randFaust(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,
-            unsigned int min_dim_size, unsigned int max_dim_size, float density) {
-      Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::randFaust(Faust::RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density);
+            unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row) {
+      Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::randFaust(Faust::RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
       if(!th) return NULL;
       FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
       return core;

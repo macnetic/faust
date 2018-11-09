@@ -20,7 +20,7 @@ namespace Faust {
 	enum RandFaustType {
 		DENSE,
 		SPARSE,
-		MIXTE
+		MIXED
 	};
 
 	template<typename FPP>
@@ -106,7 +106,7 @@ namespace Faust {
 			double normL1() const;
 			double normFro() const;
 			double normInf() const;
-			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f);
+			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n);
 			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n);
 			~TransformHelper();
