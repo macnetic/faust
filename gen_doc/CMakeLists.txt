@@ -10,10 +10,11 @@ if(BUILD_DOCUMENTATION)
 			string(CONCAT DOXYGEN_FILE_PATTERNS ${DOXYGEN_FILE_PATTERNS} " Faust.m StoppingCriterion.m ConstraintGeneric.m ConstraintMat.m ConstraintReal.m ConstraintInt.m ConstraintName.m ParamsFact.m ParamsHierarchicalFact.m ParamsPalm4MSA.m FaustFactory.m norm_hadamard.m demo_fact_hadamard.m speed_up_hadamard.m construct_Faust_from_factors.m quick_start.m factorize_matrix.m speed_up_fourier.m Fig_BSL.m BSL.m Fig_runtime_comparison.m runtime_comparison.m runall.m")
 		endif()
 		if(BUILD_WRAPPER_PYTHON)
-			string(CONCAT DOXYGEN_FILE_PATTERNS ${DOXYGEN_FILE_PATTERNS} " pyfaust.py")
+			string(CONCAT DOXYGEN_FILE_PATTERNS ${DOXYGEN_FILE_PATTERNS} " __init__.py constraints.py params.py demo.py")
 		endif()
 		configure_file(${FAUST_DOC_SRC_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY)
-		# ./gen_doc/images/* files is duplicated in doc/html/ to call images documentation in the source code with relative path of image's files, from build directory.     
+		# ./gen_doc/images/* files is duplicated in doc/html/ to call images documentation in the source code with relative path of image's files, from build directory.
+		configure_file(${FAUST_DOC_SRC_DIR}/py_filterout_namespace.py ${PROJECT_BINARY_DIR}/doc/py_filterout_namespace.py @ONLY)
 		if(UNIX)
 			configure_file(${FAUST_DOC_SRC_DIR}/py_filter.sh.in ${PROJECT_BINARY_DIR}/doc/py_filter @ONLY)
 			configure_file(${FAUST_DOC_SRC_DIR}/doxymatlab/m2cpp.pl ${PROJECT_BINARY_DIR}/doc/m2cpp @ONLY)

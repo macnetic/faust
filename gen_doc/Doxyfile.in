@@ -463,7 +463,7 @@ INPUT			=	"@PROJECT_BINARY_DIR@/doc/mainpage.md" \
 					"@FAUST_ALGORITHM_FACTORIZATION_SRC_DIR@" \
 					"@FAUST_BIN_CMDLINE_SRC_DIR@" \
 					"@FAUST_BIN_TEST_SRC_DIR@" \
-					@FAUST_PYTHON_SRC_DIR@ @FAUST_MATLAB_SRC_DIR@
+					@FAUST_PYTHON_BIN_DIR@  @FAUST_MATLAB_SRC_DIR@
 USE_MDFILE_AS_MAINPAGE = mainpage
 
 INPUT_ENCODING         = UTF-8
@@ -563,7 +563,8 @@ INPUT_FILTER           =
 # info on how filters are used. If FILTER_PATTERNS is empty, INPUT_FILTER 
 # is applied to all files.
 
-FILTER_PATTERNS        = *.py=@FAUST_DOC_BIN_DIR@/py_filter \
+FILTER_PATTERNS        =  \
+		         *.py="@FAUST_DOC_BIN_DIR@/py_filter --ns=pyfaust" \
 			 *.m=@FAUST_DOC_BIN_DIR@/m2cpp
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using 
