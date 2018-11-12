@@ -250,7 +250,7 @@ if (BUILD_WRAPPER_PYTHON)
 
 			if(PYTHON_MODULE_SCIPY)
 				add_test(NAME PYTHON${PY_VER}_FAUST_TIME COMMAND ${PYTHON_EXE} ${FAUST_SRC_TEST_SRC_PYTHON_DIR}/test_pyFaust_time.py ${FAUST_PYTHON_BIN_DIR} ${FAUST_BIN_TEST_FIG_DIR})
-				add_test(NAME PYTHON${PY_VER}_FAUST_DEMO_INSTALL COMMAND ${PYTHON_EXE} -c "from pyfaust.demo import quickstart; quickstart.run()")
+				add_test(NAME PYTHON${PY_VER}_FAUST_DEMO_INSTALL COMMAND ${PYTHON_EXE} -c "import sys; sys.path += ['${FAUST_PYTHON_BIN_DIR}'];from pyfaust.demo import quickstart; quickstart.run()")
 				add_test(NAME PYTHON${PY_VER}_FAUST_UNIT_TESTS COMMAND ${PYTHON_EXE} ${FAUST_SRC_TEST_SRC_PYTHON_DIR}/test_FaustPy.py ${FAUST_PYTHON_BIN_DIR}) # second arg. is the FaustPy's dir. to add to PYTHONPATH
 			endif(PYTHON_MODULE_SCIPY)
 		endif()
