@@ -176,7 +176,17 @@ Note that the doxygen documentation for the Matlab API is also available locally
 
 In the same spirit than the Matlab tutorial showed in the previous section, you can execute the quick start script for Python.
 
-	$ python2.7 @CMAKE_INSTALL_PREFIX@/python/quickstart.py
+	$ python2.7 -c "from pyfaust.demo import quickstart; quickstart.run()"
+	dimension of the Faust :  (1000, 2000)
+	multiplication SPEED-UP using Faust
+	Faust is 1.83845941093 faster than a full matrix
+	Faust nnz: 300000
+	Faust density: 0.15
+	Faust RCG: 6.66666666667
+	Faust norm: 55156456.373
+	Faust nb of factors: 2
+	end quickstart.py
+
 
 You can also go through the Python terminal to build a FAµST product and call its object methods.
 
