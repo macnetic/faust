@@ -1379,7 +1379,7 @@ class FaustFactory:
                             "bool.")
         if(not density):
             density = -1
-        elif(not isinstance(density, numpy.float)):
+        elif(not isinstance(density, np.float)):
             raise ValueError("FaustFactory.rand(): density must be a float")
         rF = Faust(core_obj=FaustCorePy.FaustCore.randFaust(
             fac_type_map[fac_type], field, min_num_factors, max_num_factors,
