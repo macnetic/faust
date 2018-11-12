@@ -1117,7 +1117,8 @@ class FaustFactory:
             The Faust object result of the factorization.
 
         Examples:
-        >>> from pyfaust import FaustFactory, ParamsPalm4MSA, ConstraintReal,\
+        >>> from pyfaust import FaustFactory
+        >>> from pyfaust.factparams import ParamsPalm4MSA, ConstraintReal,\
         >>> ConstraintInt, ConstraintName, StoppingCriterion
         >>> import numpy as np
         >>> num_facts = 2
@@ -1146,7 +1147,7 @@ class FaustFactory:
         >>>     print(norm(F.get_factor(1)[:,i]), end=end)
         1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0
         """
-        if(not isinstance(p, pyfaust.params.ParamsPalm4MSA)):
+        if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSA)):
             raise ValueError("p must be a ParamsPalm4MSA object.")
         FaustFactory._check_fact_mat('FaustFactory.fact_palm4msa()', M)
         return Faust(core_obj=FaustCorePy.FaustFact.fact_palm4MSA(M, p))
@@ -1164,7 +1165,8 @@ class FaustFactory:
             The Faust object result of the factorization.
 
         Examples:
-            >>> from pyfaust import FaustFactory, ParamsHierarchicalFact, ConstraintReal,\
+            >>> from pyfaust import FaustFactory
+            >>> from pyfaust.factparams import ParamsHierarchicalFact, ConstraintReal,\
             >>> ConstraintInt, ConstraintName, StoppingCriterion
             >>> import numpy as np
             >>> num_facts = 4
@@ -1199,7 +1201,7 @@ class FaustFactory:
                 - FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
                 - FACTOR 3 (real) SPARSE, size 32x32, density 0.325195, nnz 333
                 """
-        if(not isinstance(p, pyfaust.params.ParamsHierarchicalFact)):
+        if(not isinstance(p, pyfaust.factparams.ParamsHierarchicalFact)):
             raise ValueError("p must be a ParamsHierarchicalFact object.")
         FaustFactory._check_fact_mat('FaustFactory.fact_hierarchical()', M)
         return Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
