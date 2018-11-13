@@ -18,6 +18,7 @@ bool PyxConstraintGeneric::is_int_constraint()
         case CONSTRAINT_NAME_SP:
         case CONSTRAINT_NAME_SPCOL:
         case CONSTRAINT_NAME_SPLIN:
+        case CONSTRAINT_NAME_SPLINCOL:
         case CONSTRAINT_NAME_SP_POS:
             return true;
         default:
