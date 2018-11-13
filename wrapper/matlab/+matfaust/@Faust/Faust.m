@@ -1020,7 +1020,7 @@ classdef Faust
 			end
 
 			if (length(S.subs) ~=2)
-				invalid(' subsref invalid slicing must have 2 index since F is a 2D-array');
+				error(' subsref invalid slicing must have 2 index since F is a 2D-array');
 			end
 
 
