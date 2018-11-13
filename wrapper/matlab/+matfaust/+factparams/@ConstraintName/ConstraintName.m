@@ -20,7 +20,7 @@ classdef ConstraintName
 	methods
 
 		function cons_name = ConstraintName(name)
-			import matfaust.ConstraintName
+			import matfaust.factparams.ConstraintName
 			if(name > ConstraintName.NORMLIN || name < ConstraintName.SP) %|| name == ConstraintName.BLKDIAG)
 				msg = 'name must be an integer among ConstraintName.SP, ConstraintName.SPCOL, ConstraintName.NORMCOL, ConstraintName.SPLINCOL, ConstraintName.CONST, ConstraintName.SP_POS, ConstraintName.SUPP, ConstraintName.NORMLIN';
 				error(msg)
@@ -29,7 +29,7 @@ classdef ConstraintName
 		end
 
 		function is_int = is_int_constraint(obj)
-			%import matfaust.ConstraintName
+			%import matfaust.factparams.ConstraintName
 			% use obj instead of ConstraintName to avoid to import the class
 			% obj has access to static attributes of its class
 			% (doing the same for is_real_constraint(), is_mat_constraint(), conv2str())

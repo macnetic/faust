@@ -15,10 +15,10 @@ classdef StoppingCriterion
 			num_its = 500;
 			max_num_its = 1000;
 			if(nargin < 1)
-				error('matfaust.StoppingCriterion needs at least one argument.')
+				error('matfaust.factparams.StoppingCriterion needs at least one argument.')
 			else
 				if(~ isscalar(varargin{1}))
-						error('matfaust.StoppingCriterion 1th argument must be a scalar.')
+						error('matfaust.factparams.StoppingCriterion 1th argument must be a scalar.')
 				end
 				if(nargin == 1 && (varargin{1}-floor(varargin{1})) == 0) % num_its criterion
 					num_its = varargin{1};
@@ -26,16 +26,16 @@ classdef StoppingCriterion
 				else
 					is_criterion_error = true; %varargin{1};
 					%if( ~islogical(is_criterion_error))
-					%	error('matfaust.StoppingCriterion 1th argument (is_criterion_error) must be logical.')
+					%	error('matfaust.factparams.StoppingCriterion 1th argument (is_criterion_error) must be logical.')
 					%end
 					error_treshold = varargin{1};
 					if(~ isscalar(error_treshold) || ~ isreal(error_treshold))
-						error('matfaust.StoppingCriterion 2nd argument (error_treshold) must be a real number.')
+						error('matfaust.factparams.StoppingCriterion 2nd argument (error_treshold) must be a real number.')
 					end
 					if(nargin > 1)
 						max_num_its = varargin{2};
 						if(~ isscalar(max_num_its) || ~ isreal(max_num_its))
-							error('matfaust.StoppingCriterion 3rd argument (max_num_its) must be an integer.')
+							error('matfaust.factparams.StoppingCriterion 3rd argument (max_num_its) must be an integer.')
 						end
 						max_num_its = floor(max_num_its);
 					end

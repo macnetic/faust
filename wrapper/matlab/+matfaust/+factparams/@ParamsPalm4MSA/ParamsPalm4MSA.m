@@ -1,16 +1,16 @@
 %% class ParamsPalm4MSA
 %%
-classdef ParamsPalm4MSA < matfaust.ParamsFact
+classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 	properties (SetAccess = public)
 		init_facts
 		stop_crit
 	end
 	methods
 		function p = ParamsPalm4MSA(varargin)
-			import matfaust.ParamsFact
+			import matfaust.factparams.ParamsFact
 			MIN_NARGIN = 5;
 			if(nargin < MIN_NARGIN)
-				error(['matfaust.ParamsPalm4MSA() must receive at least ', int2str(MIN_NARGIN),' arguments.'])
+				error(['matfaust.factparams.ParamsPalm4MSA() must receive at least ', int2str(MIN_NARGIN),' arguments.'])
 			end
 			num_facts = varargin{1};
 			is_update_way_R2L = varargin{2};
@@ -36,7 +36,7 @@ classdef ParamsPalm4MSA < matfaust.ParamsFact
 			end
 
 			% parent constructor handles verification for its own arguments
-			p = p@matfaust.ParamsFact(num_facts, is_update_way_R2L, init_lambda, ...
+			p = p@matfaust.factparams.ParamsFact(num_facts, is_update_way_R2L, init_lambda, ...
 				constraints, step_size, constant_step_size, is_verbose);
 			if(is_init_facts_to_default || iscell(init_facts) && length(init_facts) == 0)
 				init_facts = cell(num_facts, 1)
@@ -53,18 +53,18 @@ classdef ParamsPalm4MSA < matfaust.ParamsFact
 				init_facts{zeros_id} = ...
 					zeros(constraints{zeros_id}.num_rows, constraints{zeros_id}.num_cols)
 			elseif(~ iscell(init_facts)) % TODO: check init_facts length
-				error('matfaust.ParamsFactPalm4MSA 4th argument (init_facts) must be a cell array.')
+				error('matfaust.factparams.ParamsFactPalm4MSA 4th argument (init_facts) must be a cell array.')
 			else
 				for i = 1:length(init_facts)
 					if(~ ismatrix(init_facts{i}) || ~ isnumeric(init_facts{i}))
-						error('matfaust.ParamsFactPalm4MSA 4th argument (init_facts) must contain matrices.')
+						error('matfaust.factparams.ParamsFactPalm4MSA 4th argument (init_facts) must contain matrices.')
 						%TODO: check matrix dimensions
 					end
 				end
 			end
 			p.init_facts = init_facts
-			if(~ isa(stop_crit, 'matfaust.StoppingCriterion'))
-				error('matfaust.ParamsPalm4MSA argument (stop_crit) must be a matfaust.StoppingCriterion objects.')
+			if(~ isa(stop_crit, 'matfaust.factparams.StoppingCriterion'))
+				error('matfaust.factparams.ParamsPalm4MSA argument (stop_crit) must be a matfaust.factparams.StoppingCriterion objects.')
 			end
 			p.stop_crit = stop_crit;
 		end

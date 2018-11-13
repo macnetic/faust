@@ -1,6 +1,6 @@
 %% class ConstraintReal
 %%
-classdef ConstraintReal < matfaust.ConstraintGeneric
+classdef ConstraintReal < matfaust.factparams.ConstraintGeneric
 	properties (SetAccess = public)
 
 	end
@@ -10,8 +10,8 @@ classdef ConstraintReal < matfaust.ConstraintGeneric
 			if(~ isreal(param) || ~ isscalar(param))
 				error('ConstraintReal must receive a real as param argument.')
 			end
-			constraint = constraint@matfaust.ConstraintGeneric(name, num_rows, num_cols, param);
-			if(~ isa(name, 'matfaust.ConstraintName') || ~ name.is_real_constraint())
+			constraint = constraint@matfaust.factparams.ConstraintGeneric(name, num_rows, num_cols, param);
+			if(~ isa(name, 'matfaust.factparams.ConstraintName') || ~ name.is_real_constraint())
 				error('ConstraintReal first argument must be a ConstraintName with a real type name.')
 			end
 		end

@@ -64,6 +64,7 @@ classdef FaustFactory
 		%>
 		%> @code
 		%>  import matfaust.*
+		%>  import matfaust.factparams.*
 		%>  num_facts = 2
 		%>  is_update_way_R2L = false
 		%>  init_lambda = 1.0
@@ -117,7 +118,8 @@ classdef FaustFactory
 		%>
 		%> @Example
 		%> @code
-		%>  import matfaust.*;
+		%>  import matfaust.*
+		%>  import matfaust.factparams.*
 		%>  num_facts = 4;
 		%>  is_update_way_R2L = false;
 		%>  init_lambda = 1.0;
@@ -150,6 +152,7 @@ classdef FaustFactory
 		%==========================================================================================
 		function F = fact_hierarchical(M, p)
 			import matfaust.Faust
+			import matfaust.factparams.*
 			mex_constraints = cell(2, p.num_facts-1);
 			matfaust.FaustFactory.check_fact_mat('FaustFactory.fact_hierarchical', M)
 			%mex_fact_constraints = cell(1, p.num_facts-1)

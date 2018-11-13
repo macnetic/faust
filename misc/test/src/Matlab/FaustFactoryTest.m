@@ -20,7 +20,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 	methods (Test)
 		function test_fact_palm4msa(this)
 			disp('Test FaustFactory.fact_palm4msa()')
-			import matfaust.*;
+			import matfaust.*
+			import matfaust.factparams.*
 			num_facts = 2;
 			is_update_way_R2L = false;
 			init_lambda = 1.0;
@@ -50,7 +51,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 		function test_fact_palm4msaCplx(this)
 			disp('Test FaustFactory.fact_palm4msaCplx()')
-			import matfaust.*;
+			import matfaust.*
+			import matfaust.factparams.*
 			num_facts = 2;
 			is_update_way_R2L = false;
 			init_lambda = 1.0;
@@ -78,7 +80,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 		function test_fact_hierarchical(this)
 			disp('Test FaustFactory.fact_hierarchical()')
-			import matfaust.*;
+			import matfaust.*
+			import matfaust.factparams.*
 			num_facts = 4;
 			is_update_way_R2L = false;
 			init_lambda = 1.0;
@@ -117,7 +120,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 		function test_fact_hierarchicalCplx(this)
 			disp('Test FaustFactory.fact_hierarchicalCplx()')
-			import matfaust.*;
+			import matfaust.*
+			import matfaust.factparams.*
 			num_facts = 4;
 			is_update_way_R2L = false;
 			init_lambda = 1.0;

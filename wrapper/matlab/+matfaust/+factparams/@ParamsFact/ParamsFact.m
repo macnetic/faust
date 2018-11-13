@@ -20,34 +20,34 @@ classdef (Abstract) ParamsFact
 		function p = ParamsFact(varargin)
 			MIN_NARGIN = 4;
 			if(nargin < MIN_NARGIN)
-				error(['matfaust.ParamsFact() must receive at least ', int2str(MIN_NARGIN),' arguments.'])
+				error(['matfaust.factparams.ParamsFact() must receive at least ', int2str(MIN_NARGIN),' arguments.'])
 			end
 			num_facts = varargin{1};
 			is_update_way_R2L = varargin{2};
 			init_lambda = varargin{3};
 			constraints = varargin{4};
 			% set default values
-			step_size = matfaust.ParamsFact.DEFAULT_STEP_SIZE;
-			is_verbose = matfaust.ParamsFact.DEFAULT_VERBOSITY;
-			constant_step_size = matfaust.ParamsFact.DEFAULT_CONSTANT_STEP_SIZE;
+			step_size = matfaust.factparams.ParamsFact.DEFAULT_STEP_SIZE;
+			is_verbose = matfaust.factparams.ParamsFact.DEFAULT_VERBOSITY;
+			constant_step_size = matfaust.factparams.ParamsFact.DEFAULT_CONSTANT_STEP_SIZE;
 			if(~ isscalar(num_facts) || ~ isreal(num_facts))
-				error('matfaust.ParamsFact 1st argument (num_facts) must be an integer.')
+				error('matfaust.factparams.ParamsFact 1st argument (num_facts) must be an integer.')
 			else
 				num_facts = floor(num_facts);
 			end
 			if(~ islogical(is_update_way_R2L))
-				error('matfaust.ParamsFact 2nd argument (is_update_way_R2L) must be logical.')
+				error('matfaust.factparams.ParamsFact 2nd argument (is_update_way_R2L) must be logical.')
 			end
 			if(~ isscalar(init_lambda))
-				error('matfaust.ParamsFact 3rd argument (init_lambda) must be a scalar.')
+				error('matfaust.factparams.ParamsFact 3rd argument (init_lambda) must be a scalar.')
 			end
 
 			if(~ iscell(constraints))
-				error('matfaust.ParamsFact 4th argument (constraints) must be a cell array.')
+				error('matfaust.factparams.ParamsFact 4th argument (constraints) must be a cell array.')
 			end
 			for i = 1:length(constraints) %TODO: check constraints length in sub-class
-				if(~ isa(constraints{i}, 'matfaust.ConstraintGeneric'))
-					error('matfaust.ParamsFact 5th argument (constraints) must contain matfaust.ConstraintGeneric objects.')
+				if(~ isa(constraints{i}, 'matfaust.factparams.ConstraintGeneric'))
+					error('matfaust.factparams.ParamsFact 5th argument (constraints) must contain matfaust.factparams.ConstraintGeneric objects.')
 				end
 			end
 			if(nargin > MIN_NARGIN)
@@ -61,13 +61,13 @@ classdef (Abstract) ParamsFact
 			end
 			if(~ isscalar(step_size))
 				step_size
-				error(['matfaust.ParamsHierarchicalFact ', int2str(MIN_NARGIN+1), 'th argument (step_size) must be a real.'])
+				error(['matfaust.factparams.ParamsHierarchicalFact ', int2str(MIN_NARGIN+1), 'th argument (step_size) must be a real.'])
 			end
 			if(~ islogical(constant_step_size))
-				error(['matfaust.ParamsFact ', int2str(MIN_NARGIN+2), 'th argument (constant_step_size) must be logical.'])
+				error(['matfaust.factparams.ParamsFact ', int2str(MIN_NARGIN+2), 'th argument (constant_step_size) must be logical.'])
 			end
 			if(~ islogical(is_verbose))
-				error(['matfaust.ParamsFact ',int2str(MIN_NARGIN+3),' argument (is_verbose) must be logical.'])
+				error(['matfaust.factparams.ParamsFact ',int2str(MIN_NARGIN+3),' argument (is_verbose) must be logical.'])
 			end
 			p.num_facts = num_facts;
 			p.is_update_way_R2L = is_update_way_R2L;
