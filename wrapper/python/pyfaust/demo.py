@@ -4,6 +4,9 @@ from pylab import *
 import os,sys
 
 
+DEFT_DATA_DIR = 'pyfaust_demo_output'
+DEFT_FIG_DIR = 'pyfaust_demo_figures'
+
 class quickstart:
 
     @staticmethod
@@ -198,11 +201,6 @@ class fft:
         print()
 
         print("Gathering computation times...")
-        from time import time, clock
-        if sys.platform == 'win32':
-            timer = clock
-        else:
-            timer = time
 
         mult_times = ndarray(shape=(fft._nb_mults, len(fft._dims), 3))
         # 3 for: fft._FFT_FAUST_FULL, fft._FFT_FAUST, fft._FFT_NATIVE
@@ -299,12 +297,7 @@ class runtimecmp:
                     fausts[j,k,l] = F
                     assert(F.shape == (dim,dim))
 
-        # time comparison
-        from time import time, clock
-        if sys.platform == 'win32':
-            timer = clock
-        else:
-            timer = time
+
 
         tdense = ndarray(shape=(runtimecmp._nb_mults, runtimecmp._dims_len, 2))
         tfaust = ndarray(shape=(runtimecmp._nb_mults, runtimecmp._dims_len,
@@ -455,16 +448,28 @@ class runtimecmp:
 
 class hadamardfact:
 
-    def run():
+    _nb_mults = 5000
+    _n = 5
+    _nfacts = _n
+    _tdense_fname = 'hadamardfact_mul_runtime_dense.txt'
+    _tfaust_fname = 'hadamardfact_mul_runtime_faust.txt'
+    _had_faust_fname = 'hadamardfact_faust.mat'
+    _fig1_fname = 'Hadamard-factorization.png'
+    _fig2_fname = 'Hadamard-factorization_nnz_coeff.png'
+
+    @staticmethod
+    def run_fact(output_dir=DEFT_DATA_DIR):
         from pyfaust import FaustFactory
         from pyfaust.factparams import ParamsHierarchicalFact, ConstraintInt, \
         ConstraintName, StoppingCriterion
-        n = 5
+
+        # generate a Hadamard transform and factorize its full matrix
+        n = hadamardfact._n
         d = 2**n
         H = FaustFactory.hadamard(n)
         full_H = H.toarray()
 
-        params = ParamsHierarchicalFact(n, is_update_way_R2L=True, init_lambda=1.0,
+        params = ParamsHierarchicalFact(hadamardfact._nfacts, is_update_way_R2L=True, init_lambda=1.0,
                                         fact_constraints=[ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
                                         for i in range(0,n-1)],
                                         res_constraints=[ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,int(d/2.**(i+1)))
@@ -477,4 +482,125 @@ class hadamardfact:
         rel_err = norm(full_had_faust-full_H)/norm(full_H)
         print("\n\nRelative error between hadamard matrix and its transform: ",
               rel_err)
+
+        # gather computation times
+        _nb_mults = hadamardfact._nb_mults
+        dense_times = empty(_nb_mults)
+        faust_times = empty(_nb_mults)
+
+        for i in range(0,_nb_mults):
+            print("\r\r #muls =",i+1,'/', _nb_mults, end='')
+            x = rand(d,1)
+
+            t = timer()
+            y_X = full_H.dot(x)
+            dense_times[i] = timer()-t
+
+            t = timer()
+            y_faust = had_faust*x
+            faust_times[i] = timer()-t
+
+        print()
+
+
+        path_tdense = _write_array_in_file(output_dir,
+                                           hadamardfact._tdense_fname,
+                                           dense_times)
+        path_tfaust = _write_array_in_file(output_dir,
+                                           hadamardfact._tfaust_fname,
+                                           faust_times)
+        had_faust.save(_prefix_fname_with_dir(output_dir,
+                                              hadamardfact._had_faust_fname))
+
+        # test
+#        tfaust_r = loadtxt(path_tfaust)
+#        assert(all(tfaust_r == faust_times))
+#        tdense_r = loadtxt(path_tdense)
+#        assert(all(tdense_r == dense_times))
+
+
+    @staticmethod
+    def fig_fact(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+        from pyfaust import Faust
+        fig_dir = 'pyfaust_demo_figures'
+        if(not os.path.exists(fig_dir)):
+            os.mkdir(fig_dir)
+        hold(True)
+
+        had_faust = Faust(filepath=_prefix_fname_with_dir(input_dir,
+                                                          hadamardfact._had_faust_fname))
+        fig1 = figure(1)
+        subplot("1"+str(had_faust.get_num_factors()+1)+'1')
+        imshow(had_faust.toarray())
+        xticks([])
+        yticks([])
+        facts = [];
+        for i in range(0,had_faust.get_num_factors()):
+            subplot("1"+str(hadamardfact._nfacts+1)+str(i+2))
+            # all factors are normally sparse
+            fac = had_faust.get_factor(i)
+            facts.append(fac)
+            if(not isinstance(fac,ndarray)):
+                fac = fac.toarray()
+            imshow(fac)
+            xticks([])
+            yticks([])
+
+        fig2 = figure(2)
+        subplot("1"+str(had_faust.get_num_factors()+1)+'1')
+        imshow(had_faust.toarray())
+        xticks([])
+        yticks([])
+        for i in range(0,had_faust.get_num_factors()):
+            subplot("1"+str(hadamardfact._nfacts+1)+str(i+2))
+            title("nz = "+str(count_nonzero(fac)))
+            spy(facts[i], markersize=1)
+            xticks([])
+            yticks([])
+
+        _write_fig_in_file(output_dir, hadamardfact._fig1_fname, fig1)
+        _write_fig_in_file(output_dir, hadamardfact._fig2_fname, fig2)
+        show()
+
+def _write_array_in_file(output_dir, fname, array):
+    """
+    output_dir: directory folder created if doesn't exist.
+    fname: output file in output_dir.
+    array: the numpy ndarray is flattened before saving. (N-D to 1D). You need
+    to keep the dimensions to read-reshape to original array.
+    """
+    import os.path
+    if(not os.path.exists(output_dir)):
+       os.mkdir(output_dir)
+    fpath = _prefix_fname_with_dir(output_dir, fname)
+    savetxt(fpath, array.reshape(array.size))
+    return fpath
+
+def _write_fig_in_file(output_dir, fname, fig, dpi=200):
+    """
+    output_path: directory folder created if doesn't exist.
+    fname: output file in output_dir.
+    fig: the figure to save.
+    """
+    import os.path
+    if(not os.path.exists(output_dir)):
+        os.mkdir(output_dir)
+    fpath = _prefix_fname_with_dir(output_dir, fname)
+    if(not isinstance(fig, Figure)):
+        raise Exception("fig must be a Figure object")
+    fig.savefig(fpath,dpi=dpi)
+
+def _prefix_fname_with_dir(dir, fname):
+    import os.path
+    return dir+os.sep+fname
+
+
+# time comparison function to use
+from time import time, clock
+if sys.platform == 'win32':
+    timer = clock
+else:
+    timer = time
+
+
 
