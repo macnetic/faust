@@ -42,7 +42,7 @@
 
 import copy
 
-import numpy as np
+import numpy as np, scipy
 from scipy.io import savemat, loadmat
 from scipy.sparse import csr_matrix, csc_matrix
 import FaustCorePy
@@ -119,12 +119,16 @@ class Faust:
             FaustFactory.fourier() or FaustFactory.hadamard().
 
         Args:
-            factors: list/tuple of numpy matrices.<br/>
+            factors: list of numpy/scipy array/matrices or a single array/matrix.<br/>
                      The factors must respect the dimensions needed for
                      the product to be defined (for i=0 to len(factors)-1,
                      factors[i].shape[1] == factors[i+1].shape[0]).<br/>
                      The factors can be sparse or dense matrices
-                     (either scipy.sparse.csr.csr_matrix or numpy.ndarray).
+                     (either scipy.sparse.csr.csr_matrix or
+                     numpy.ndarray).<br/>
+                     Passing only an array or or sparse matrix to the
+                     constructor is equivalent to
+                     passing a list of a single factor.
             filepath: the file from which a Faust is created.<br/>
                       The format is Matlab version 5 (.mat extension).<br/>
                       The file must have been saved before with Faust.save().
@@ -150,10 +154,12 @@ class Faust:
             >>> # define a Faust with those factors
             >>> F = Faust(factors)
 
-
             >>> F.save("F.mat")
             >>> # define a Faust from file
             >>> H = Faust(filepath="F.mat")
+
+            >>> Faust(np.random.rand(10,10)) # creating a Faust with only one
+                                             # factor
 
         <b/> See also Faust.save, FaustFactory.rand
 
@@ -174,11 +180,19 @@ class Faust:
             if(filepath and isinstance(filepath, str)):
                     contents = loadmat(filepath)
                     factors = contents['faust_factors'][0]
-            if(factors is not None):
+            if((isinstance(factors, np.ndarray) and factors.ndim == 2)
+               or isinstance(factors,
+                             scipy.sparse.csc.csc_matrix)
+               or isinstance(factors, scipy.sparse.csr.csr_matrix)):
+                factors = [ factors ]
+            if(not isinstance(factors, list) and not
+               isinstance(factors, np.ndarray)):
+                raise Exception("factors must be a non-empty list of/or a numpy.ndarray, "
+                                "scipy.sparse.csr.csr_matrix/csc.csc_matrix.")
+            if(factors is not None and len(factors) > 0):
                 F.m_faust = FaustCorePy.FaustCore(factors, scale);
-            #else:
-                #TODO: manage empty Faust
-
+            else:
+                raise Exception("Cannot create an empty Faust.")
 
     @property
     def shape(F):

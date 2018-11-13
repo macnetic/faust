@@ -112,6 +112,8 @@ classdef Faust
 		%> @param factors (varargin{1}) the 1D cell array of factors to initialize the Faust with.
 		%> <br/> The factors must respect the dimensions needed for the product to be defined (for i=1 to size(factors,2), size(factors{i},2) == size(factors{i+1},1)).
 		%> <br/> The factors can be sparse or dense matrices.
+		%> <br/> Passing a single matrix to the constructor instead of
+		%> a cell array is equivalent to passing a singleton cell array.
 		%> @param filepath (varargin{1}) the file from which a Faust is created. It must be a character array.<br/>
 		%>								The format is Matlab version 5 (.mat extension).<br/>
 		%>								The file must have been saved before with Faust.save().
@@ -136,6 +138,8 @@ classdef Faust
 		%>	save(F, 'F.mat')
 		%>	% define a Faust from file
 		%>	H = Faust('F.mat')
+		%>
+		%>	F(rand(10,10)) % creating a Faust with only one factor
 		%>
 		%> @endcode
 		%>
@@ -165,6 +169,9 @@ classdef Faust
 				% check if the factors are real or complex, one complex factor implies a complex faust
 				factors=varargin{1};
 				isRealFlag = 1;
+				if(length(factors) == 0)
+					error([ err_msg ' Cannot create an empty Faust.'])
+				end
 				for i=1:length(factors)
 					if (~isreal(factors{i}))
 						isRealFlag = 0;
@@ -184,6 +191,10 @@ classdef Faust
 					error('Faust : invalid file');
 				end
 				F = matfaust.Faust(faust_factors, varargin{2:end});
+			elseif(ismatrix(varargin{1}) && nargin == 1)
+				c = cell(1, 1);
+				c{1} = varargin{1};
+				F = matfaust.Faust(c);
 			elseif(isa(varargin{1}, 'matfaust.Faust'))
 				% create a Faust from another one but not with the same
 				% handle to set inside the FaustCore object (matrix)
