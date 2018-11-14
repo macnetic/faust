@@ -448,14 +448,20 @@ class runtimecmp:
 
 class hadamardfact:
 
-    _nb_mults = 5000
+    _nb_mults = 500
     _n = 5
     _nfacts = _n
     _tdense_fname = 'hadamardfact_mul_runtime_dense.txt'
     _tfaust_fname = 'hadamardfact_mul_runtime_faust.txt'
     _had_faust_fname = 'hadamardfact_faust.mat'
+    _tspeedup_times_fname = 'hadamardfact_speedup_times.txt'
     _fig1_fname = 'Hadamard-factorization.png'
     _fig2_fname = 'Hadamard-factorization_nnz_coeff.png'
+    _fig_speedup = 'Hadamard-speedup.png'
+    _HAD_DENSE, _HAD_TRANS_DENSE, _HAD_FAUST, _HAD_TRANS_FAUST = range(0,4)
+    _NUM_TIME_TYPES = 4
+    _log2_dims = arange(6,13)
+    _dims = 2**_log2_dims
 
     @staticmethod
     def run_fact(output_dir=DEFT_DATA_DIR):
@@ -500,6 +506,8 @@ class hadamardfact:
             y_faust = had_faust*x
             faust_times[i] = timer()-t
 
+
+
         print()
 
 
@@ -522,7 +530,7 @@ class hadamardfact:
     @staticmethod
     def fig_fact(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
         from pyfaust import Faust
-        fig_dir = 'pyfaust_demo_figures'
+        fig_dir = DEFT_FIG_DIR
         if(not os.path.exists(fig_dir)):
             os.mkdir(fig_dir)
         hold(True)
@@ -562,6 +570,139 @@ class hadamardfact:
         _write_fig_in_file(output_dir, hadamardfact._fig2_fname, fig2)
         show()
 
+    @staticmethod
+    def  run_speedup_hadamard(output_dir=DEFT_DATA_DIR):
+       from pyfaust import FaustFactory
+       treshold = 10.**-10
+       print("Speedup Hadamard")
+       print("================")
+       print("Generating data...")
+
+       had_mats = []
+       had_fausts = []
+       _dims, _log2_dims = hadamardfact._dims, hadamardfact._log2_dims
+       for k in range(0, len(_dims)):
+           print("\rHadamard dims processed: ", _dims[0:k+1], end='')
+           F = FaustFactory.hadamard(_log2_dims[k])
+           had_fausts += [ F ]
+           had_mats += [ F.toarray() ]
+       print()
+
+       print("Gathering multiplication computation times...")
+
+       _nb_mults = hadamardfact._nb_mults
+       _NUM_TIME_TYPES = hadamardfact._NUM_TIME_TYPES
+       _HAD_DENSE, _HAD_TRANS_DENSE, _HAD_FAUST, _HAD_TRANS_FAUST = \
+       hadamardfact._HAD_DENSE, hadamardfact._HAD_TRANS_DENSE, \
+       hadamardfact._HAD_FAUST, hadamardfact._HAD_TRANS_FAUST
+       mult_times = ndarray(shape=(_nb_mults, len(_dims), _NUM_TIME_TYPES))
+
+       for i in range(0,_nb_mults):
+           print('\r#muls:',i+1,'/', _nb_mults, end='')
+           for k in range(0,len(_dims)):
+               dim = _dims[k]
+               had_mat = had_mats[k]
+               had_faust = had_fausts[k]
+
+               x = rand(dim,1)
+
+               t = timer()
+               ydense = had_mat.dot(x)
+               mult_times[i,k,_HAD_DENSE] = timer()-t
+
+               t = timer()
+               yfaust = had_faust*x
+               mult_times[i,k,_HAD_FAUST] = timer()-t
+
+               if(norm(ydense-yfaust) > treshold):
+                   raise Exception("speedup hadamard: mul. error greater than "
+                                   "treshold")
+
+               t = timer()
+               ydense_trans = had_mat.T.dot(x)
+               mult_times[i,k,_HAD_TRANS_DENSE] = timer()-t
+
+               t = timer()
+               yfaust_trans = had_faust.T*x
+               mult_times[i,k,_HAD_TRANS_FAUST] = timer()-t
+
+               if(norm(yfaust_trans-ydense_trans) > treshold):
+                   raise Exception("speedup_hadamard: mul. error on transpose "
+                                   "faust/mat.")
+
+
+       print()
+
+       path_mult_times = _write_array_in_file(output_dir,
+                                              hadamardfact._tspeedup_times_fname,
+                                              mult_times.reshape(mult_times.size))
+       mult_times_r = loadtxt(path_mult_times)
+       assert(all(mult_times_r.reshape(mult_times.shape) == mult_times))
+
+    @staticmethod
+    def fig_speedup_hadamard(output_dir=DEFT_FIG_DIR, input_dir=DEFT_DATA_DIR):
+        times_txt_fpath = _prefix_fname_with_dir(input_dir, hadamardfact._tspeedup_times_fname)
+        if(not os.path.exists(times_txt_fpath)):
+            raise Exception("Input file doesn't exist, please call "
+                            "run_speedup_hadamard() before calling "
+                            "fig_speedup_hadamard()")
+        _nb_mults, _dims, _NUM_TIME_TYPES = hadamardfact._nb_mults, \
+                hadamardfact._dims, hadamardfact._NUM_TIME_TYPES
+        mult_times = loadtxt(times_txt_fpath).reshape(_nb_mults, len(_dims),
+                                                      _NUM_TIME_TYPES)
+
+        _HAD_DENSE, _HAD_TRANS_DENSE, _HAD_FAUST, _HAD_TRANS_FAUST = \
+               hadamardfact._HAD_DENSE, hadamardfact._HAD_TRANS_DENSE, \
+               hadamardfact._HAD_FAUST, hadamardfact._HAD_TRANS_FAUST
+        _log2_dims = hadamardfact._log2_dims
+
+        # mean times of each category and speedups
+        mean_mult_times = mult_times.mean(axis=0)
+        print(mult_times)
+        speedup_trans = mean_mult_times[:,_HAD_TRANS_DENSE] / \
+        mean_mult_times[:,_HAD_TRANS_FAUST]
+        speedup = mean_mult_times[:,_HAD_DENSE] / mean_mult_times[:,_HAD_FAUST]
+        plt.rcParams['figure.figsize'] = [12.0, 8]
+
+        # plot results
+        line_width = 2.
+        for t in [("1","A*x", _HAD_FAUST, _HAD_DENSE),("3", "A.T*x",
+                                                       _HAD_TRANS_FAUST,
+                                                       _HAD_TRANS_DENSE)]:
+            ymin = min(min(mean_mult_times[:,t[2]]),
+                       min(mean_mult_times[:,t[3]]))
+            ymax = max(max(mean_mult_times[:,t[2]]),
+                       max(mean_mult_times[:,t[3]]))
+
+            subplot("22"+t[0])
+            title('Runtime Hadamard '+t[1])
+            grid(True)
+            hold(True)
+            semilogy(_log2_dims, mean_mult_times[:,t[2]], lw=line_width)
+            semilogy(_log2_dims, mean_mult_times[:, t[3]], lw=line_width)
+            ylabel('Computed Time (sec)')
+            if(t[0] == "3"): xlabel('log(dim)')
+            legend(['Faust', 'Dense'])
+            axes([_log2_dims[0], _log2_dims[-1], ymin, ymax])
+
+        for t in [("2","A*x", speedup),("4", "A.T*x", speedup_trans)]:
+            ymin = min(t[2])
+            ymax = max(t[2])
+
+            subplot("22"+t[0])
+            title('Speedup Hadamard '+t[1])
+            grid(True)
+            hold(True)
+            semilogy(_log2_dims, t[2], lw=line_width)
+            semilogy(_log2_dims, t[2]/t[2], lw=line_width, c='black')
+            ylabel('Speedup')
+            if(t[0] == "4"): xlabel('log(dim)')
+            legend(['Faust', 'Neutral'])
+            axes([_log2_dims[0], _log2_dims[-1], ymin, ymax])
+
+        _write_fig_in_file(output_dir, hadamardfact._fig_speedup, figure(1))
+        show()
+
 def _write_array_in_file(output_dir, fname, array):
     """
     output_dir: directory folder created if doesn't exist.
@@ -569,9 +710,7 @@ def _write_array_in_file(output_dir, fname, array):
     array: the numpy ndarray is flattened before saving. (N-D to 1D). You need
     to keep the dimensions to read-reshape to original array.
     """
-    import os.path
-    if(not os.path.exists(output_dir)):
-       os.mkdir(output_dir)
+    _create_dir_if_doesnt_exist(output_dir)
     fpath = _prefix_fname_with_dir(output_dir, fname)
     savetxt(fpath, array.reshape(array.size))
     return fpath
@@ -582,9 +721,7 @@ def _write_fig_in_file(output_dir, fname, fig, dpi=200):
     fname: output file in output_dir.
     fig: the figure to save.
     """
-    import os.path
-    if(not os.path.exists(output_dir)):
-        os.mkdir(output_dir)
+    _create_dir_if_doesnt_exist(output_dir)
     fpath = _prefix_fname_with_dir(output_dir, fname)
     if(not isinstance(fig, Figure)):
         raise Exception("fig must be a Figure object")
@@ -594,6 +731,10 @@ def _prefix_fname_with_dir(dir, fname):
     import os.path
     return dir+os.sep+fname
 
+def _create_dir_if_doesnt_exist(output_dir):
+    import os.path
+    if(not os.path.exists(output_dir)):
+        os.mkdir(output_dir)
 
 # time comparison function to use
 from time import time, clock
