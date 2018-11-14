@@ -105,7 +105,7 @@ disp('');
 %% creation du faust
 disp(' TEST CONSTRUCTOR : ');
 F = Faust(factors,1.0,copyOptimized);
-empty_F=Faust({});
+%empty_F=Faust({});
 disp('Ok');
 
 %% size test
@@ -131,13 +131,13 @@ end
 
 
 
-[dim1_empty,dim2_empty]=size(empty_F);
+%[dim1_empty,dim2_empty]=size(empty_F);
 
-if (dim1_empty ~= 0) | (dim2_empty ~= 0)
-	dim1_empty
-	dim2_empty
-	error('size : invalid dimension for an empty Faust');
-end
+%if (dim1_empty ~= 0) | (dim2_empty ~= 0)
+%	dim1_empty
+%	dim2_empty
+%	error('size : invalid dimension for an empty Faust');
+%end
 
 
 disp('Ok');
@@ -222,12 +222,12 @@ if(nz_F ~= expected_nz_2)
 end
 
 
-expected_nz_empty_F = 0;
-nz_empty_F = nnz_sum(empty_F);
-
-if(nz_empty_F ~= expected_nz_empty_F)	
-    error('nnz : invalid number of nonzeros (empty Faust)');
-end
+%expected_nz_empty_F = 0;
+%nz_empty_F = nnz_sum(empty_F);
+%
+%if(nz_empty_F ~= expected_nz_empty_F)	
+%    error('nnz : invalid number of nonzeros (empty Faust)');
+%end
  
 
 disp('Ok');
@@ -248,11 +248,11 @@ if(dens2 ~= expected_density2)
 end
 
 
-expected_density_empty_F = -1;
-density_empty_F = density(empty_F);
-if(density_empty_F ~= expected_density_empty_F)
-    error('density : invalid value');
-end
+%expected_density_empty_F = -1;
+%density_empty_F = density(empty_F);
+%if(density_empty_F ~= expected_density_empty_F)
+%    error('density : invalid value');
+%end
 
 
 
@@ -277,11 +277,11 @@ if(rcg2_F ~= expected_RCG2)
     error('RCG : invalid value');
 end
 
-expected_RCG_empty_F = -1;
-RCG_empty_F = rcg(empty_F);
-if(RCG_empty_F ~= expected_RCG_empty_F)
-    error('RCG : invalid value');
-end
+%expected_RCG_empty_F = -1;
+%RCG_empty_F = rcg(empty_F);
+%if(RCG_empty_F ~= expected_RCG_empty_F)
+%    error('RCG : invalid value');
+%end
 
 disp('Ok');
 
