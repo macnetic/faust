@@ -449,19 +449,26 @@ class runtimecmp:
 class hadamardfact:
 
     _nb_mults = 500
+    _norm_nb_mults = 10
     _n = 5
     _nfacts = _n
     _tdense_fname = 'hadamardfact_mul_runtime_dense.txt'
     _tfaust_fname = 'hadamardfact_mul_runtime_faust.txt'
     _had_faust_fname = 'hadamardfact_faust.mat'
-    _tspeedup_times_fname = 'hadamardfact_speedup_times.txt'
+    _speedup_times_fname = 'hadamardfact_speedup_times.txt'
+    _norm_times_fname = 'hadamard_norm_times.txt'
+    _norm_err_fname = 'hadamard_norm_errs.txt'
     _fig1_fname = 'Hadamard-factorization.png'
     _fig2_fname = 'Hadamard-factorization_nnz_coeff.png'
     _fig_speedup = 'Hadamard-speedup.png'
-    _HAD_DENSE, _HAD_TRANS_DENSE, _HAD_FAUST, _HAD_TRANS_FAUST = range(0,4)
+    _fig_norm = 'Hadamard-norm.png'
+    _HAD_DENSE, _HAD_FAUST, _HAD_TRANS_DENSE, _HAD_TRANS_FAUST = range(0,4)
     _NUM_TIME_TYPES = 4
     _log2_dims = arange(6,13)
     _dims = 2**_log2_dims
+    _norm_log2_dims = arange(6,12)
+    _norm_dims = 2**_norm_log2_dims
+    _NUM_NORM_TIME_TYPES = 2
 
     @staticmethod
     def run_fact(output_dir=DEFT_DATA_DIR):
@@ -571,22 +578,28 @@ class hadamardfact:
         show()
 
     @staticmethod
-    def  run_speedup_hadamard(output_dir=DEFT_DATA_DIR):
-       from pyfaust import FaustFactory
+    def _create_hadamard_fausts_mats(dims, log2_dims):
+        from pyfaust import FaustFactory
+        had_mats = []
+        had_fausts = []
+        for k in range(0, len(log2_dims)):
+            print("\rHadamard dims processed: ", dims[0:k+1], end='')
+            F = FaustFactory.hadamard(log2_dims[k])
+            had_fausts += [ F ]
+            had_mats += [ F.toarray() ]
+        print()
+        return had_mats, had_fausts
+
+    @staticmethod
+    def run_speedup_hadamard(output_dir=DEFT_DATA_DIR):
        treshold = 10.**-10
        print("Speedup Hadamard")
        print("================")
        print("Generating data...")
 
-       had_mats = []
-       had_fausts = []
        _dims, _log2_dims = hadamardfact._dims, hadamardfact._log2_dims
-       for k in range(0, len(_dims)):
-           print("\rHadamard dims processed: ", _dims[0:k+1], end='')
-           F = FaustFactory.hadamard(_log2_dims[k])
-           had_fausts += [ F ]
-           had_mats += [ F.toarray() ]
-       print()
+
+       had_mats, had_fausts = hadamardfact._create_hadamard_fausts_mats(_dims, _log2_dims)
 
        print("Gathering multiplication computation times...")
 
@@ -634,14 +647,14 @@ class hadamardfact:
        print()
 
        path_mult_times = _write_array_in_file(output_dir,
-                                              hadamardfact._tspeedup_times_fname,
+                                              hadamardfact._speedup_times_fname,
                                               mult_times.reshape(mult_times.size))
        mult_times_r = loadtxt(path_mult_times)
        assert(all(mult_times_r.reshape(mult_times.shape) == mult_times))
 
     @staticmethod
     def fig_speedup_hadamard(output_dir=DEFT_FIG_DIR, input_dir=DEFT_DATA_DIR):
-        times_txt_fpath = _prefix_fname_with_dir(input_dir, hadamardfact._tspeedup_times_fname)
+        times_txt_fpath = _prefix_fname_with_dir(input_dir, hadamardfact._speedup_times_fname)
         if(not os.path.exists(times_txt_fpath)):
             raise Exception("Input file doesn't exist, please call "
                             "run_speedup_hadamard() before calling "
@@ -702,6 +715,64 @@ class hadamardfact:
 
         _write_fig_in_file(output_dir, hadamardfact._fig_speedup, figure(1))
         show()
+
+    @staticmethod
+    def run_norm_hadamard(output_dir=DEFT_DATA_DIR):
+        treshold = 10.**-10
+        print("2-Norm Hadamard")
+        print("================")
+        print("Generating data...")
+
+        _dims, _log2_dims = hadamardfact._norm_dims, \
+                hadamardfact._norm_log2_dims
+        _nb_mults = hadamardfact._norm_nb_mults
+        _HAD_DENSE, _HAD_FAUST = hadamardfact._HAD_DENSE, \
+        hadamardfact._HAD_FAUST
+        had_mats, had_fausts = hadamardfact._create_hadamard_fausts_mats(_dims, _log2_dims)
+        rcgs = empty((len(_dims)))
+        norm_faust = empty(len(_dims))
+        norm_dense = empty(len(_dims))
+        mult_times = ndarray(shape=(_nb_mults, len(_dims), len([_HAD_DENSE,
+                                                                _HAD_FAUST])))
+
+        for i in range(0,_nb_mults):
+            print('\r#muls:', i+1,'/', _nb_mults, end='')
+            for k in range(0,len(_dims)):
+                had_mat = had_mats[k]
+                had_faust = had_fausts[k]
+                if(i == 0):
+                    rcgs[k] = had_faust.rcg()
+
+                t = timer()
+                norm_dense[k] = norm(had_mat, 2)
+                mult_times[i, k, _HAD_DENSE] = timer()-t
+
+                t = timer()
+                norm_faust[k] = had_faust.norm(2)
+                mult_times[i, k, _HAD_FAUST] = timer()-t
+
+        print()
+        expected_norm = 2.**_log2_dims
+
+        norm_errs = empty((2, len(_dims)))
+        norm_errs[_HAD_DENSE,:] = sqrt((norm_dense - expected_norm)**2)
+        norm_errs[_HAD_FAUST,:] = sqrt((norm_faust - expected_norm)**2)
+
+        h = hadamardfact
+        _write_array_in_file(output_dir, h._norm_times_fname, mult_times)
+        _write_array_in_file(output_dir, h._norm_err_fname, norm_errs)
+        mult_times_r = \
+                loadtxt(_prefix_fname_with_dir(output_dir,h._norm_times_fname)).reshape(mult_times.shape)
+        assert(all(mult_times_r == mult_times))
+        norm_errs_r = \
+                loadtxt(_prefix_fname_with_dir(output_dir,h._norm_err_fname)).reshape(norm_errs.shape)
+        assert(all(norm_errs_r == norm_errs))
+
+
+
+    @staticmethod
+    def fig_norm_hadamard():
+        pass
 
 def _write_array_in_file(output_dir, fname, array):
     """
