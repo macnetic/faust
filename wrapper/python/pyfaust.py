@@ -1,45 +1,45 @@
 # -*- coding: utf-8 -*-
-##############################################################################
-##                              Description:                                ##
-##                                                                          ##
-##          pyfaust is a python module  which delivers                      ##
-##          a class named Faust which represents a dense matrix             ##
-##          by a product of 'sparse' factors (i.e Faust)                    ##
-##          Python wrapper class implemented in C++                         ##
-##                                                                          ##
-##  For more information on the FAuST Project, please visit the website     ##
-##  of the project : <http://faust.inria.fr>                         ##
-##                                                                          ##
-##                              License:                                    ##
-##  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      ##
-##                      Luc Le Magoarou, Remi Gribonval                     ##
-##                      INRIA Rennes, FRANCE                                ##
-##                      http://www.inria.fr/                                ##
-##                                                                          ##
-##  The FAuST Toolbox is distributed under the terms of the GNU Affero      ##
-##  General Public License.                                                 ##
-##  This program is free software: you can redistribute it and/or modify    ##
-##  it under the terms of the GNU Affero General Public License as          ##
-##  published by the Free Software Foundation.                              ##
-##                                                                          ##
-##  This program is distributed in the hope that it will be useful, but     ##
-##  WITHOUT ANY WARRANTY; without even the implied warranty of              ##
-##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    ##
-##  See the GNU Affero General Public License for more details.             ##
-##                                                                          ##
-##  You should have received a copy of the GNU Affero General Public        ##
-##  License along with this program.                                        ##
-##  If not, see <http://www.gnu.org/licenses/>.                             ##
-##                                                                          ##
-##                             Contacts:                                    ##
-##      Nicolas Bellot  : nicolas.bellot@inria.fr                           ##
-##      Adrien Leman    : adrien.leman@inria.fr                             ##
-##      Thomas Gautrais : thomas.gautrais@inria.fr                          ##
-##      Luc Le Magoarou : luc.le-magoarou@inria.fr                          ##
-##      Remi Gribonval  : remi.gribonval@inria.fr                           ##
-##                                                                          ##
-##############################################################################
+#                              Description:                                ##
+#                                                                          ##
+#          pyfaust is a python module  which delivers                      ##
+#          a class named Faust which represents a dense matrix             ##
+#          by a product of 'sparse' factors (i.e Faust)                    ##
+#          Python wrapper class implemented in C++                         ##
+#                                                                          ##
+#  For more information on the FAuST Project, please visit the website     ##
+#  of the project : <http://faust.inria.fr>                                ##
+#                                                                          ##
+#                              License:                                    ##
+#  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      ##
+#                      Luc Le Magoarou, Remi Gribonval                     ##
+#                      INRIA Rennes, FRANCE                                ##
+#                      http://www.inria.fr/                                ##
+#                                                                          ##
+#  The FAuST Toolbox is distributed under the terms of the GNU Affero      ##
+#  General Public License.                                                 ##
+#  This program is free software: you can redistribute it and/or modify    ##
+#  it under the terms of the GNU Affero General Public License as          ##
+#  published by the Free Software Foundation.                              ##
+#                                                                          ##
+#  This program is distributed in the hope that it will be useful, but     ##
+#  WITHOUT ANY WARRANTY; without even the implied warranty of              ##
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    ##
+#  See the GNU Affero General Public License for more details.             ##
+#                                                                          ##
+#  You should have received a copy of the GNU Affero General Public        ##
+#  License along with this program.                                        ##
+#  If not, see <http://www.gnu.org/licenses/>.                             ##
+#                                                                          ##
+#                             Contacts:                                    ##
+#      Nicolas Bellot  : nicolas.bellot@inria.fr                           ##
+#      Adrien Leman    : adrien.leman@inria.fr                             ##
+#      Thomas Gautrais : thomas.gautrais@inria.fr                          ##
+#      Luc Le Magoarou : luc.le-magoarou@inria.fr                          ##
+#      Remi Gribonval  : remi.gribonval@inria.fr                           ##
+#                                                                          ##
+#############################################################################
 
+## @package pyfaust @brief <b> The FAµST Python Wrapper</b>
 import copy
 
 import numpy as np, scipy
@@ -101,12 +101,7 @@ class Faust:
     In this documentation, the expression 'full matrix' designates the array
     Faust.toarray() obtained by the multiplication of the Faust factors.
 
-    Likewise, some other Faust methods need to calculate the factor product, and
-    they will be indicated with a warning in this documentation. You should avoid
-    to use them if it's not really necessary (for example you might limit their use
-    to test purposes).
-
-    TODO: list of these functions here.
+   List of functions that are computionally costly: toarray(), todense().
 
     For more information about FAµST take a look at http://faust.inria.fr.
     """
@@ -289,7 +284,7 @@ class Faust:
 
     def conj(F):
         """
-        Returns the conjugate of F or F itself if F.dtype == numpy.float.
+        Returns the complex conjugate of F.
 
         Args:
             F: the Faust object.
@@ -449,11 +444,11 @@ class Faust:
                 `order' argument passed to np.ndararray() must be equal to str
                 'F').
 
-        Returns:
-            the result of the multiplication as a numpy.ndarray if A is a
-            ndarray.<br/>
-            The result of the multiplication as a Faust object if A is a Faust
+        Returns: The result of the multiplication
+            - as a numpy.ndarray if A is a ndarray,<br/>
+            - as a Faust object if A is a Faust
             or a scalar number.
+            - When either F or A is complex, G=F*A is also complex.
 
         Raises:
             ValueError
@@ -911,6 +906,8 @@ class Faust:
 
         WARNING: if [n,m] == size(F), the computation time can be expected to
         be of the order of min(n,m) times that of multipliying F by a vector.
+        Nevertheless, the implementation ensures that memory usage remains
+        controlled by avoiding to explicitly compute F.toarray().
 
         Args:
             F: the Faust object.

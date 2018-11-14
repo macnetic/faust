@@ -39,6 +39,8 @@
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %%
 
+%> @package matfaust @brief <b> The FAµST Matlab Wrapper
+
 % ======================================================================
 %> @brief FAµST Matlab wrapper main class.
 %>
@@ -82,9 +84,7 @@
 %> In this documentation, the expression 'full matrix' designates the Matlab array
 %> Faust.full() obtained by the multiplication of the Faust factors.
 %>
-%> Likewise, some other Faust methods need to calculate the factor product, and they will be indicated with a warning in this documentation. You should avoid to use them if it's not really necessary (for example you might limit their use to test purposes).
-%>
-%> TODO: list of these functions here.
+%> List of functions that are computionally costly: full().
 %>
 %> For more information about FAµST take a look at http://faust.inria.fr.
 %>
@@ -139,7 +139,7 @@ classdef Faust
 		%>	% define a Faust from file
 		%>	H = Faust('F.mat')
 		%>
-		%>	F(rand(10,10)) % creating a Faust with only one factor
+		%>	Faust(rand(10,10)) % creating a Faust with only one factor
 		%>
 		%> @endcode
 		%>
@@ -262,14 +262,14 @@ classdef Faust
 		%> @code
 		%> full(F*A) == full(F)*full(A)
 		%> @endcode
-		%> NOTE: you could have an elementwise non-significant absolute difference between the two members (not more than eps(1.0)).
+		%> @note you could have an elementwise non-significant absolute difference between the two members (not more than eps(1.0)).
 		%>
 		%> - If A is a scalar, F*A is also a Faust such that:
 		%> @code
 		%> get_factor(F*A,1) == get_factor(F,1)*A
 		%> @endcode
 		%>
-		%>
+		%> - Any Faust F (real or complex) can be multiplied by any Faust/array/scalar (real or complex) of appropriate dimensions.
 		%>
 		%> @b Usage
 		%>
@@ -288,6 +288,7 @@ classdef Faust
 		%> @retval G the multiplication result:
 		%> - When A is a full matrix, G = F*A is also a full matrix.
 		%> - When A is a Faust or a scalar, G = F*A is itself a Faust.
+		%> - When either F or A is complex, G=F*A is also complex.
 		%>
 		%>
 		%>
@@ -477,7 +478,7 @@ classdef Faust
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
-		%> @b NOTE: if F is a real Faust, all factors are real.
+		%> @b @note if F is a real Faust, all factors are real.
 		%> If F is a complex Faust, at least one factor is complex.
 		%>
 		%> @b Usage
@@ -551,7 +552,7 @@ classdef Faust
 		%> @param F the Faust object.
 		%>
 		%> @retval F_ctrans a Faust object implementing the conjugate transpose of full(F), such that for any vector x of consistent size:<br/>
-		%> <code>F_ctrans*x = conj(full(F))*x</code>
+		%> <code>F_ctrans*x = full(F)'*x</code>
 		%>
 		%> @b Example
 		%> @code
@@ -583,7 +584,7 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief The complex conjugate of F or F itself if isreal(F) == true.
+		%> @brief The complex conjugate of F.
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
@@ -628,9 +629,9 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; [@b nrows,@B ncols] = @b size(F)<br/>
-		%> &nbsp;&nbsp;&nbsp; @b n = @b size(f,dim) with n being the size of the dim-th dimension of F.<br/>
-		%> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In other words n == nrows if dim == 1, N = ncols if dim == 2.
+		%> &nbsp;&nbsp;&nbsp; [@b nrows, @b ncols] = @b size(F)<br/>
+		%> &nbsp;&nbsp;&nbsp; @b n = @b size(F,dim) with n being the size of the dim-th dimension of F.<br/>
+		%> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In other words n == nrows if dim == 1, n == ncols if dim == 2.
 		%>
 		%> @param F the Faust object.
 		%> @param dim (optional) the index of the dimension to get the size of.
@@ -706,7 +707,7 @@ classdef Faust
 		%======================================================================
 		%> @brief The number of elements in F.
 		%>
-		%> It's equivalent to <code>prod(size(F)</code>.
+		%> It's equivalent to <code>prod(size(F))</code>.
 		%>
 		%> @b Usage
 		%>
@@ -926,7 +927,7 @@ classdef Faust
 		%>
 		%> The file is saved in Matlab format version 5 (.mat extension).
 		%>
-		%> @b NOTE: storing F should typically use rcg(F) times less disk space than storing full(F).
+		%> @b @note storing F should typically use rcg(F) times less disk space than storing full(F).
 		%>
 		%> @b Usage
 		%>
@@ -1160,7 +1161,7 @@ classdef Faust
 		%>
 		%> The norm of F is equal to the norm of full(F).
 		%>
-		%> @b WARNING: if [n,m] == size(F), the computation time can be expected to be of the order of min(n,m) times that of multipliying F by a vector.
+		%> @b WARNING: if [n,m] == size(F), the computation time can be expected to be of the order of min(n,m) times that of multipliying F by a vector. Nevertheless, the implementation ensures that memory usage remains controlled by avoiding to explicitly compute full(F).
 		%>
 		%> @b Usage
 		%>
@@ -1276,11 +1277,11 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; @b dens = density(F)
 		%>
 		%>
-		%> @b NOTE: a value of density below one indicates potential memory savings compared
+		%> @b @note a value of density below one indicates potential memory savings compared
 		%> to storing the corresponding dense matrix full(F), as well as potentially
 		%> faster matrix-vector multiplication when applying F*x instead of full(F)*x.
 		%>
-		%> @b NOTE: a density above one is possible but prevents any saving.
+		%> @b @note a density above one is possible but prevents any saving.
 		%>
 		%>
 		%> @param F the Faust object.
@@ -1324,7 +1325,7 @@ classdef Faust
 		%> savings will be made.
 		%> This gain applies both for storage space and computation time.
 		%>
-		%> @b NOTE: rcg(F) == 1/density(F)
+		%> @b @note rcg(F) == 1/density(F)
 		%>
 		%> @b Usage
 		%>
@@ -1368,7 +1369,7 @@ classdef Faust
 		%> @code
 		%> full(C) == full(cat(DIM, full(F), full(G), …))
 		%> @endcode
-		%> NOTE: you could have an elementwise non-significant absolute difference between the two members (not more than eps(1.0)).
+		%> @note you could have an elementwise non-significant absolute difference between the two members (not more than eps(1.0)).
 		%>
 		%>
 		%> @b Usage
