@@ -449,7 +449,7 @@ class runtimecmp:
 class hadamardfact:
 
     _nb_mults = 500
-    _norm_nb_mults = 10
+    _nb_norms = 10
     _n = 5
     _nfacts = _n
     _tdense_fname = 'hadamardfact_mul_runtime_dense.txt'
@@ -458,6 +458,7 @@ class hadamardfact:
     _speedup_times_fname = 'hadamardfact_speedup_times.txt'
     _norm_times_fname = 'hadamard_norm_times.txt'
     _norm_err_fname = 'hadamard_norm_errs.txt'
+    _norm_rcgs_fname = 'hadamard_norm-rcgs.txt'
     _fig1_fname = 'Hadamard-factorization.png'
     _fig2_fname = 'Hadamard-factorization_nnz_coeff.png'
     _fig_speedup = 'Hadamard-speedup.png'
@@ -725,18 +726,18 @@ class hadamardfact:
 
         _dims, _log2_dims = hadamardfact._norm_dims, \
                 hadamardfact._norm_log2_dims
-        _nb_mults = hadamardfact._norm_nb_mults
+        _nb_norms = hadamardfact._nb_norms
         _HAD_DENSE, _HAD_FAUST = hadamardfact._HAD_DENSE, \
         hadamardfact._HAD_FAUST
         had_mats, had_fausts = hadamardfact._create_hadamard_fausts_mats(_dims, _log2_dims)
         rcgs = empty((len(_dims)))
         norm_faust = empty(len(_dims))
         norm_dense = empty(len(_dims))
-        mult_times = ndarray(shape=(_nb_mults, len(_dims), len([_HAD_DENSE,
+        norm_times = ndarray(shape=(_nb_norms, len(_dims), len([_HAD_DENSE,
                                                                 _HAD_FAUST])))
 
-        for i in range(0,_nb_mults):
-            print('\r#muls:', i+1,'/', _nb_mults, end='')
+        for i in range(0,_nb_norms):
+            print('\r#norm:', i+1,'/', _nb_norms, end='')
             for k in range(0,len(_dims)):
                 had_mat = had_mats[k]
                 had_faust = had_fausts[k]
@@ -745,34 +746,119 @@ class hadamardfact:
 
                 t = timer()
                 norm_dense[k] = norm(had_mat, 2)
-                mult_times[i, k, _HAD_DENSE] = timer()-t
+                norm_times[i, k, _HAD_DENSE] = timer()-t
 
                 t = timer()
                 norm_faust[k] = had_faust.norm(2)
-                mult_times[i, k, _HAD_FAUST] = timer()-t
+                norm_times[i, k, _HAD_FAUST] = timer()-t
 
         print()
-        expected_norm = 2.**_log2_dims
+        expected_norm = sqrt(2.**(_log2_dims))
 
         norm_errs = empty((2, len(_dims)))
         norm_errs[_HAD_DENSE,:] = sqrt((norm_dense - expected_norm)**2)
+        #print("norm_errs[_HAD_DENSE,:]=", norm_errs[_HAD_DENSE,:])
+        #print("norm_dense=", norm_dense)
         norm_errs[_HAD_FAUST,:] = sqrt((norm_faust - expected_norm)**2)
+        #print("norm_errs[_HAD_FAUST,:]=", norm_errs[_HAD_FAUST,:])
+        #print("norm_faust=", norm_faust)
 
         h = hadamardfact
-        _write_array_in_file(output_dir, h._norm_times_fname, mult_times)
+        _write_array_in_file(output_dir, h._norm_times_fname, norm_times)
         _write_array_in_file(output_dir, h._norm_err_fname, norm_errs)
-        mult_times_r = \
-                loadtxt(_prefix_fname_with_dir(output_dir,h._norm_times_fname)).reshape(mult_times.shape)
-        assert(all(mult_times_r == mult_times))
-        norm_errs_r = \
-                loadtxt(_prefix_fname_with_dir(output_dir,h._norm_err_fname)).reshape(norm_errs.shape)
-        assert(all(norm_errs_r == norm_errs))
+        _write_array_in_file(output_dir, h._norm_rcgs_fname, rcgs)
+#        norm_times_r = \
+#                loadtxt(_prefix_fname_with_dir(output_dir,h._norm_times_fname)).reshape(norm_times.shape)
+#        assert(all(norm_times_r == norm_times))
+#        norm_errs_r = \
+#                loadtxt(_prefix_fname_with_dir(output_dir,h._norm_err_fname)).reshape(norm_errs.shape)
+#        assert(all(norm_errs_r == norm_errs))
+#        rcgs_r = \
+#        loadtxt(_prefix_fname_with_dir(output_dir,h._norm_rcgs_fname)).reshape(rcgs.shape)
+#        assert(all(rcgs_r == rcgs))
 
 
 
     @staticmethod
-    def fig_norm_hadamard():
-        pass
+    def fig_norm_hadamard(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+        h = hadamardfact
+        _nb_norms, _dims, _HAD_DENSE, _HAD_FAUST = h._nb_norms, h._norm_dims, \
+                h._HAD_DENSE, h._HAD_FAUST
+        num_types = len([_HAD_DENSE, _HAD_FAUST])
+
+        #TODO test file existences
+
+        norm_times_fpath = _prefix_fname_with_dir(input_dir,
+                                                  h._norm_times_fname)
+        norm_errs_fpath = _prefix_fname_with_dir(input_dir,
+                                                 h._norm_err_fname)
+        rcgs_fpath = _prefix_fname_with_dir(input_dir, h._norm_rcgs_fname)
+        norm_times = loadtxt(norm_times_fpath).reshape(_nb_norms,
+                                                       len(_dims),
+                                                       num_types)
+        norm_errs = loadtxt(norm_errs_fpath).reshape(num_types, len(_dims))
+
+        rcgs = loadtxt(rcgs_fpath)
+
+        line_width = 3
+
+        mean_times = norm_times.mean(axis=0)
+        faust_speedup = mean_times[:,_HAD_DENSE] / mean_times[:,_HAD_FAUST]
+
+        plt.rcParams['figure.figsize'] = [13.0, 8]
+
+        # runtime
+        subplot(131)
+        hold(True)
+        grid(True)
+        axis([ h._norm_log2_dims[0], h._norm_log2_dims[-1], mean_times.min(),
+              mean_times.max() ])
+        semilogy(h._norm_log2_dims, mean_times[:,_HAD_FAUST], lw=line_width)
+        semilogy(h._norm_log2_dims, mean_times[:,_HAD_DENSE], lw=line_width)
+        legend(['Faust','Dense'])
+        ylabel('Computed Time (sec)')
+        xlabel('log(dim)')
+        title('Runtime')
+
+        # speedup
+        subplot(132)
+        hold(True)
+        grid(True)
+        axis([h._norm_log2_dims[0], h._norm_log2_dims[-1],
+              min(faust_speedup.min(), rcgs.min(), 1),
+              max(faust_speedup.max(), rcgs.max(), 1)])
+        semilogy(h._norm_log2_dims, faust_speedup, lw=line_width)
+        semilogy(h._norm_log2_dims, rcgs, lw=line_width)
+        semilogy(h._norm_log2_dims, ones(len(_dims)), lw=line_width, c='black')
+        ylabel('Speedup')
+        xlabel('log(dim)')
+        legend(['Faust', 'Theoritical', 'Neutral'])
+        title("Speedup norm(A)")
+
+        # errors
+        subplot(133)
+        hold(True)
+        grid(True)
+        #indices = find(norm_errs[_HAD_DENSE,:]>0)
+        indices = range(0,len(h._norm_log2_dims))
+        plot(h._norm_log2_dims[indices], norm_errs[_HAD_DENSE, indices],
+             lw=line_width)
+        #indices = find(norm_errs[_HAD_FAUST,:]>0)
+        plot(h._norm_log2_dims[indices], norm_errs[_HAD_FAUST, indices],"r^-",
+             lw=line_width)
+        axis([h._norm_log2_dims[0], h._norm_log2_dims[-1],
+              norm_errs.min(),
+              norm_errs.max()])
+        legend(['Faust', 'Dense'])
+        ylabel('error')
+        xlabel('log(dim)')
+        title('Error')
+
+
+
+
+
+        show()
 
 def _write_array_in_file(output_dir, fname, array):
     """
