@@ -194,7 +194,7 @@ class fft:
 
         for k in range(0,len(fft._dims)):
             print('\rFFT fft._dims processed: ', fft._dims[0:k+1], end='')
-            F = FaustFactory.fourier(fft._log2_dims[k])
+            F = FaustFactory.dft(fft._log2_dims[k])
             fft_mat = F.toarray()#fft(eye(fft._dims[k])) # or TODO: F.toarray() ?
             fft_fausts += [ F ]
             fft_mats += [ fft_mat ]
@@ -446,7 +446,7 @@ class runtimecmp:
         #tight_layout()
         #show()
 
-class hadamardfact:
+class hadamard:
 
     _nb_mults = 500
     _nb_norms = 10
@@ -478,12 +478,12 @@ class hadamardfact:
         ConstraintName, StoppingCriterion
 
         # generate a Hadamard transform and factorize its full matrix
-        n = hadamardfact._n
+        n = hadamard._n
         d = 2**n
-        H = FaustFactory.hadamard(n)
+        H = FaustFactory.wht(n)
         full_H = H.toarray()
 
-        params = ParamsHierarchicalFact(hadamardfact._nfacts, is_update_way_R2L=True, init_lambda=1.0,
+        params = ParamsHierarchicalFact(hadamard._nfacts, is_update_way_R2L=True, init_lambda=1.0,
                                         fact_constraints=[ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
                                         for i in range(0,n-1)],
                                         res_constraints=[ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,int(d/2.**(i+1)))
@@ -498,7 +498,7 @@ class hadamardfact:
               rel_err)
 
         # gather computation times
-        _nb_mults = hadamardfact._nb_mults
+        _nb_mults = hadamard._nb_mults
         dense_times = empty(_nb_mults)
         faust_times = empty(_nb_mults)
 
@@ -520,13 +520,13 @@ class hadamardfact:
 
 
         path_tdense = _write_array_in_file(output_dir,
-                                           hadamardfact._tdense_fname,
+                                           hadamard._tdense_fname,
                                            dense_times)
         path_tfaust = _write_array_in_file(output_dir,
-                                           hadamardfact._tfaust_fname,
+                                           hadamard._tfaust_fname,
                                            faust_times)
         had_faust.save(_prefix_fname_with_dir(output_dir,
-                                              hadamardfact._had_faust_fname))
+                                              hadamard._had_faust_fname))
 
         # test
 #        tfaust_r = loadtxt(path_tfaust)
@@ -544,7 +544,7 @@ class hadamardfact:
         hold(True)
 
         had_faust = Faust(filepath=_prefix_fname_with_dir(input_dir,
-                                                          hadamardfact._had_faust_fname))
+                                                          hadamard._had_faust_fname))
         fig1 = figure(1)
         subplot("1"+str(had_faust.get_num_factors()+1)+'1')
         imshow(had_faust.toarray())
@@ -552,7 +552,7 @@ class hadamardfact:
         yticks([])
         facts = [];
         for i in range(0,had_faust.get_num_factors()):
-            subplot("1"+str(hadamardfact._nfacts+1)+str(i+2))
+            subplot("1"+str(hadamard._nfacts+1)+str(i+2))
             # all factors are normally sparse
             fac = had_faust.get_factor(i)
             facts.append(fac)
@@ -568,14 +568,14 @@ class hadamardfact:
         xticks([])
         yticks([])
         for i in range(0,had_faust.get_num_factors()):
-            subplot("1"+str(hadamardfact._nfacts+1)+str(i+2))
+            subplot("1"+str(hadamard._nfacts+1)+str(i+2))
             title("nz = "+str(count_nonzero(fac)))
             spy(facts[i], markersize=1)
             xticks([])
             yticks([])
 
-        _write_fig_in_file(output_dir, hadamardfact._fig1_fname, fig1)
-        _write_fig_in_file(output_dir, hadamardfact._fig2_fname, fig2)
+        _write_fig_in_file(output_dir, hadamard._fig1_fname, fig1)
+        _write_fig_in_file(output_dir, hadamard._fig2_fname, fig2)
         show()
 
     @staticmethod
@@ -585,7 +585,7 @@ class hadamardfact:
         had_fausts = []
         for k in range(0, len(log2_dims)):
             print("\rHadamard dims processed: ", dims[0:k+1], end='')
-            F = FaustFactory.hadamard(log2_dims[k])
+            F = FaustFactory.wht(log2_dims[k])
             had_fausts += [ F ]
             had_mats += [ F.toarray() ]
         print()
@@ -598,17 +598,17 @@ class hadamardfact:
        print("================")
        print("Generating data...")
 
-       _dims, _log2_dims = hadamardfact._dims, hadamardfact._log2_dims
+       _dims, _log2_dims = hadamard._dims, hadamard._log2_dims
 
-       had_mats, had_fausts = hadamardfact._create_hadamard_fausts_mats(_dims, _log2_dims)
+       had_mats, had_fausts = hadamard._create_hadamard_fausts_mats(_dims, _log2_dims)
 
        print("Gathering multiplication computation times...")
 
-       _nb_mults = hadamardfact._nb_mults
-       _NUM_TIME_TYPES = hadamardfact._NUM_TIME_TYPES
+       _nb_mults = hadamard._nb_mults
+       _NUM_TIME_TYPES = hadamard._NUM_TIME_TYPES
        _HAD_DENSE, _HAD_TRANS_DENSE, _HAD_FAUST, _HAD_TRANS_FAUST = \
-       hadamardfact._HAD_DENSE, hadamardfact._HAD_TRANS_DENSE, \
-       hadamardfact._HAD_FAUST, hadamardfact._HAD_TRANS_FAUST
+       hadamard._HAD_DENSE, hadamard._HAD_TRANS_DENSE, \
+       hadamard._HAD_FAUST, hadamard._HAD_TRANS_FAUST
        mult_times = ndarray(shape=(_nb_mults, len(_dims), _NUM_TIME_TYPES))
 
        for i in range(0,_nb_mults):
@@ -648,27 +648,27 @@ class hadamardfact:
        print()
 
        path_mult_times = _write_array_in_file(output_dir,
-                                              hadamardfact._speedup_times_fname,
+                                              hadamard._speedup_times_fname,
                                               mult_times.reshape(mult_times.size))
        mult_times_r = loadtxt(path_mult_times)
        assert(all(mult_times_r.reshape(mult_times.shape) == mult_times))
 
     @staticmethod
     def fig_speedup_hadamard(output_dir=DEFT_FIG_DIR, input_dir=DEFT_DATA_DIR):
-        times_txt_fpath = _prefix_fname_with_dir(input_dir, hadamardfact._speedup_times_fname)
+        times_txt_fpath = _prefix_fname_with_dir(input_dir, hadamard._speedup_times_fname)
         if(not os.path.exists(times_txt_fpath)):
             raise Exception("Input file doesn't exist, please call "
                             "run_speedup_hadamard() before calling "
                             "fig_speedup_hadamard()")
-        _nb_mults, _dims, _NUM_TIME_TYPES = hadamardfact._nb_mults, \
-                hadamardfact._dims, hadamardfact._NUM_TIME_TYPES
+        _nb_mults, _dims, _NUM_TIME_TYPES = hadamard._nb_mults, \
+                hadamard._dims, hadamard._NUM_TIME_TYPES
         mult_times = loadtxt(times_txt_fpath).reshape(_nb_mults, len(_dims),
                                                       _NUM_TIME_TYPES)
 
         _HAD_DENSE, _HAD_TRANS_DENSE, _HAD_FAUST, _HAD_TRANS_FAUST = \
-               hadamardfact._HAD_DENSE, hadamardfact._HAD_TRANS_DENSE, \
-               hadamardfact._HAD_FAUST, hadamardfact._HAD_TRANS_FAUST
-        _log2_dims = hadamardfact._log2_dims
+               hadamard._HAD_DENSE, hadamard._HAD_TRANS_DENSE, \
+               hadamard._HAD_FAUST, hadamard._HAD_TRANS_FAUST
+        _log2_dims = hadamard._log2_dims
 
         # mean times of each category and speedups
         mean_mult_times = mult_times.mean(axis=0)
@@ -714,7 +714,7 @@ class hadamardfact:
             legend(['Faust', 'Neutral'])
             axes([_log2_dims[0], _log2_dims[-1], ymin, ymax])
 
-        _write_fig_in_file(output_dir, hadamardfact._fig_speedup, figure(1))
+        _write_fig_in_file(output_dir, hadamard._fig_speedup, figure(1))
         show()
 
     @staticmethod
@@ -724,12 +724,12 @@ class hadamardfact:
         print("================")
         print("Generating data...")
 
-        _dims, _log2_dims = hadamardfact._norm_dims, \
-                hadamardfact._norm_log2_dims
-        _nb_norms = hadamardfact._nb_norms
-        _HAD_DENSE, _HAD_FAUST = hadamardfact._HAD_DENSE, \
-        hadamardfact._HAD_FAUST
-        had_mats, had_fausts = hadamardfact._create_hadamard_fausts_mats(_dims, _log2_dims)
+        _dims, _log2_dims = hadamard._norm_dims, \
+                hadamard._norm_log2_dims
+        _nb_norms = hadamard._nb_norms
+        _HAD_DENSE, _HAD_FAUST = hadamard._HAD_DENSE, \
+        hadamard._HAD_FAUST
+        had_mats, had_fausts = hadamard._create_hadamard_fausts_mats(_dims, _log2_dims)
         rcgs = empty((len(_dims)))
         norm_faust = empty(len(_dims))
         norm_dense = empty(len(_dims))
@@ -763,7 +763,7 @@ class hadamardfact:
         #print("norm_errs[_HAD_FAUST,:]=", norm_errs[_HAD_FAUST,:])
         #print("norm_faust=", norm_faust)
 
-        h = hadamardfact
+        h = hadamard
         _write_array_in_file(output_dir, h._norm_times_fname, norm_times)
         _write_array_in_file(output_dir, h._norm_err_fname, norm_errs)
         _write_array_in_file(output_dir, h._norm_rcgs_fname, rcgs)
@@ -781,7 +781,7 @@ class hadamardfact:
 
     @staticmethod
     def fig_norm_hadamard(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
-        h = hadamardfact
+        h = hadamard
         _nb_norms, _dims, _HAD_DENSE, _HAD_FAUST = h._nb_norms, h._norm_dims, \
                 h._HAD_DENSE, h._HAD_FAUST
         num_types = len([_HAD_DENSE, _HAD_FAUST])

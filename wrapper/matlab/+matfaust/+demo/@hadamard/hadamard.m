@@ -121,7 +121,7 @@
 %	Topics in Signal Processing, 2016.
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %%
-classdef hadamardfact
+classdef hadamard
 	methods(Static)
 		%======================================================================
 		%> This demo hierarchically factorizes the Hadamard dictionary and then plots the results.

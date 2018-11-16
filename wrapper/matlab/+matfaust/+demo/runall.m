@@ -76,7 +76,7 @@ function runall()
 
 	%% Hadamard factorization
 	disp('*********** Hadamard Factorization *************');
-	import matfaust.demo.hadamardfact.*
+	import matfaust.demo.hadamard.*
 	demo_fact_hadamard;
 	speed_up_hadamard;
 	norm_hadamard;
