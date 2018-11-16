@@ -577,10 +577,10 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.9094, places=4)
 
     def testHadamard(self):
-        print("Test FaustFactory.hadamard()")
+        print("Test FaustFactory.wht()")
         from pyfaust import FaustFactory
         pow2_exp = random.Random().randint(1,10)
-        H = FaustFactory.hadamard(pow2_exp)
+        H = FaustFactory.wht(pow2_exp)
         fH = H.todense()
         self.assertEqual(np.count_nonzero(fH), fH.size)
         for i in range(0,2**pow2_exp-1):
@@ -588,11 +588,11 @@ class TestFaustFactory(unittest.TestCase):
                 self.assertTrue((fH[i,::].dot(fH[j,::].T) == 0).all())
 
     def testFourier(self):
-        print("Test FaustFactory.fourier()")
+        print("Test FaustFactory.dft()")
         from pyfaust import FaustFactory
         from numpy.fft import fft
         pow2_exp = random.Random().randint(1,10)
-        F = FaustFactory.fourier(pow2_exp)
+        F = FaustFactory.dft(pow2_exp)
         fF = F.todense()
         ref_fft = fft(np.eye(2**pow2_exp))
         self.assertAlmostEqual(norm(ref_fft-fF)/norm(ref_fft),0)

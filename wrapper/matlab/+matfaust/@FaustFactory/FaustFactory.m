@@ -26,8 +26,8 @@
 %>    Several methods are available:
 %>
 %>    - The pseudo-random generation of a Faust with FaustFactory.rand(),
-%>    - the FFT transform with FaustFactory.fourier(),
-%>    - and the Hadamard transform with FaustFactory.hadamard().
+%>    - the discrete Fourier transform with FaustFactory.dft(),
+%>    - and the Hadamard transform with FaustFactory.wht().
 %>
 % ======================================================================
 
@@ -185,14 +185,14 @@ classdef FaustFactory
 		end
 
 		%==========================================================================================
-		%> @brief Constructs a Faust implementing the Hadamard transform of dimension 2^n.
+		%> @brief Constructs a Faust implementing the Walsh-Hadamard Transform of order 2^n.
 		%>
 		%> The resulting Faust has n sparse factors of order 2^n, each one having 2 non-zero elements
 		%> per row and per column.
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b H = hadamard(n)
+		%> &nbsp;&nbsp;&nbsp; @b H = wht(n)
 		%>
 		%> @param n the power of two exponent for a Hadamard matrix of order 2^n and a factorization into n factors.
 		%>
@@ -202,7 +202,7 @@ classdef FaustFactory
 		%> @code
 		%> % in a matlab terminal
 		%> >> import matfaust.FaustFactory.*
-		%> >> H = hadamard(10)
+		%> >> H = wht(10)
 		%> @endcode
 		%>
 		%>
@@ -221,7 +221,7 @@ classdef FaustFactory
 		%>- FACTOR 9 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 		%>
 		%==========================================================================================
-		function H = hadamard(n)
+		function H = wht(n)
 			% TODO: check n (must be integer > 0)
 			if(n>31)
 				error('Can''t handle a Hadamard Faust of order larger than 2^31')
@@ -236,17 +236,18 @@ classdef FaustFactory
 		end
 
 		%==========================================================================================
-		%> @brief Constructs a Faust whose the full matrix is the FFT square matrix of order 2^n.
+		%> @brief Constructs a Faust whose the full matrix is the Discrete Fourier Transform square matrix of order 2^n.
 		%>
-		%> The factorization algorithm used is Cooley-Tukey.
+		%> The factorization algorithm used is Cooley-Tukey (FFT).
 		%>
 		%> The resulting Faust is complex and has (n+1) sparse factors whose the n first
 		%> has 2 non-zero elements per row and per column. The last factor is
 		%> a permutation matrix.
 		%>
+		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b H = fourier(n)
+		%> &nbsp;&nbsp;&nbsp; @b H = dft(n)
 		%>
 		%> @param n: the power of two exponent for a FFT of order 2^n and a
 		%> factorization in n+1 factors.
@@ -258,7 +259,7 @@ classdef FaustFactory
 		%> @code
 		%> % in a matlab terminal
 		%> >> import matfaust.FaustFactory.*
-		%> >> F = fourier(10)
+		%> >> F = dft(10)
 		%> @endcode
 		%>
 		%>
@@ -277,7 +278,7 @@ classdef FaustFactory
 		%> - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 		%> - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
 		%==========================================================================================
-		function H = fourier(n)
+		function H = dft(n)
 			% TODO: check n (must be integer > 0)
 			if(n>31)
 				error('Can''t handle a FFT Faust of order larger than 2^31')

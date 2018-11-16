@@ -159,10 +159,10 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function testHadamard(this)
-			disp('Test FaustFactory.hadamard()')
+			disp('Test FaustFactory.wht()')
 			import matfaust.*
 			n = randi([1,6]);
-			H = FaustFactory.hadamard(n);
+			H = FaustFactory.wht(n);
 			fH = full(H);
 			this.verifyEqual(nnz(fH), numel(fH));
 			i = 1;
@@ -177,10 +177,10 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function testFourier(this)
-			disp('Test FaustFactory.fourier()')
+			disp('Test FaustFactory.dft()')
 			import matfaust.*
 			n = randi([1,10]);
-			F = FaustFactory.fourier(n);
+			F = FaustFactory.dft(n);
 			fF = full(F);
 			fftI = fft(eye(2^n));
 			% this.verifyEqual(nnz(fH), numel(fH));

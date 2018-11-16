@@ -111,7 +111,7 @@ class Faust:
 
             Other easy ways to create a Faust is to call one of the
             FaustFactory static methods: FaustFactory.rand(),
-            FaustFactory.fourier() or FaustFactory.hadamard().
+            FaustFactory.dft() or FaustFactory.wht().
 
         Args:
             factors: list of numpy/scipy array/matrices or a single array/matrix.<br/>
@@ -1110,8 +1110,8 @@ class FaustFactory:
     Several methods are available:
 
     - The pseudo-random generation of a Faust with FaustFactory.rand(),
-    - the FFT transform with FaustFactory.fourier(),
-    - and the Hadamard transform with FaustFactory.hadamard().
+    - the discrete Fourier transform with FaustFactory.dft(),
+    - and the Hadamard transform with FaustFactory.wht().
 
     """
 
@@ -1218,7 +1218,7 @@ class FaustFactory:
         return Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
 
     @staticmethod
-    def hadamard(n):
+    def wht(n):
         """
            Constructs a Faust implementing the Hadamard transform of dimension 2^n.
 
@@ -1234,7 +1234,7 @@ class FaustFactory:
 
           Examples:
               >>> from pyfaust import FaustFactory
-              >>>  FaustFactory.hadamard(10)
+              >>>  FaustFactory.wht(10)
               Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10
               factor(s):
                   - FACTOR 0 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
@@ -1253,9 +1253,9 @@ class FaustFactory:
         return H
 
     @staticmethod
-    def fourier(n):
+    def dft(n):
         """
-            Constructs a Faust whose the full matrix is the FFT square matrix of order 2^n.
+            Constructs a Faust whose the full matrix is the Discrete Fourier Transform square matrix of order 2^n.
 
             The factorization algorithm used is Cooley-Tukey.
 
@@ -1264,15 +1264,15 @@ class FaustFactory:
             a permutation matrix.
 
             Args:
-            n: the power of two exponent for a FFT of order 2^n and a
+            n: the power of two exponent for a DFT of order 2^n and a
             factorization in n+1 factors.
 
             Returns:
-            The Faust implementing the FFT transform of dimension 2^n.
+            The Faust implementing the DFT of dimension 2^n.
 
             Examples:
                 >>> from pyfaust import FaustFactory
-                >>> FaustFactory.fourier(10)
+                >>> FaustFactory.dft(10)
                 Faust size 1024x1024, density 0.0205078, nnz_sum 21504, 11 factor(s):
                 - FACTOR 0 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
                 - FACTOR 1 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048

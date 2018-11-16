@@ -48,7 +48,7 @@
 %>
 %>A FAµST data structure is designed to allow fast matrix-vector multiplications together with reduced memory storage compared to what would be obtained by manipulating directly the corresponding (dense) Matlab array.
 %>
-%>A particular example is the matrix associated to the discrete Fourier transform, which can be represented exactly as a FAµST, leading to a fast and compact implementation (see FaustFactory.fourier()).
+%>A particular example is the matrix associated to the discrete Fourier transform, which can be represented exactly as a FAµST, leading to a fast and compact implementation (see FaustFactory.dft()).
 %>
 %> Although sparse matrices are more interesting for optimization it's not forbidden to define a Faust as a product of dense matrices or a mix of dense and sparse matrices.
 %>
@@ -101,7 +101,7 @@ classdef Faust
 		%======================================================================
 		%> @brief Creates a Faust from a list of factors or alternatively from a file.
 		%>
-		%> Other easy ways to create a Faust is to call one of the FaustFactory static methods: FaustFactory.rand(), FaustFactory.fourier() or FaustFactory.hadamard().
+		%> Other easy ways to create a Faust is to call one of the FaustFactory static methods: FaustFactory.rand(), FaustFactory.dft() or FaustFactory.wht().
 		%>
 		%> @b Usage
 		%>
