@@ -1086,6 +1086,34 @@ class Faust:
         else:
             return np.dtype(np.complex)
 
+    def imshow(F):
+        """
+        Displays image of F's full matrix and its factors.
+
+        <b> See also Faust.display. </b>
+
+        Examples:
+        >>> from pyfaust import FaustFactory
+        >>> import matplotlib.pyplot as plt
+        >>> F = FaustFactory.rand([2, 3], [10, 20],.5, field='complex')
+        >>> F.imshow()
+        >>> plt.show()
+
+
+        """
+        import matplotlib.pyplot as plt
+        nf = F.get_num_factors()
+        plt.subplot(1,nf+1,1)
+        plt.imshow(abs(F.toarray()),extent=[0,100,0,1], aspect='auto')
+        plt.xticks([]); plt.yticks([])
+        for i in range(0,nf):
+            plt.subplot(1,F.get_num_factors()+1,i+2)
+            fac = F.get_factor(i)
+            if(not isinstance(fac, np.ndarray)):
+                fac = fac.toarray()
+            plt.xticks([]); plt.yticks([])
+            plt.imshow(abs(fac),extent=[0,100,0,1], aspect='auto')
+
 class FaustFactory:
     """
     This factory class provides methods for generating a Faust especially by factorization of a dense matrix.

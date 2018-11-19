@@ -1502,6 +1502,8 @@ classdef Faust
 		%===
 		%> It's equivalent to cat(2, F, A, B, …).
 		%>
+		%> This function overloads a Matlab built-in function.
+		%>
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b C=HORZCAT(F,A) concatenates the Faust F and A horizontally. A is a Faust or a sparse/full matrix. The result is the Faust C. @b HORZCAT(F,A) is the same as [F,G].<br/>
@@ -1516,7 +1518,10 @@ classdef Faust
 		%======================================================================
 		%> Vertical concatenation [F;A;B;…] where F is a Faust and A, B, … are Faust objects or sparse/full matrices.
 		%===
+		%>
 		%> It's equivalent to cat(1, F, A, B, …).
+		%>
+		%> This function overloads a Matlab built-in function.
 		%>
 		%> @b Usage
 		%>
@@ -1537,6 +1542,39 @@ classdef Faust
 			error('Function not implemented in the Faust class.');
 		end
 
+
+		%=====================================================================
+		%> Displays image of F's full matrix and its factors.
+		%===
+		%> This function overloads a Matlab built-in function.
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b imagesc(F)
+		%>
+		%> Data is scaled to use the full colormap.
+		%>
+		%> @b Example
+		%> @code
+		%>	import matfaust.FaustFactory
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	imagesc(F)
+		%>	print('test_imsc', '-dpng')
+		%>	@endcode
+		%>
+		%> <p>@b See @b also Faust.disp.
+		%======================================================================
+		function imagesc(F)
+			numfacts = get_num_factors(F);
+			subplot(1,numfacts+1,1); imagesc(abs(real(full(F))));
+			set(gca,'XTick',[], 'YTick', []);
+			for i=1:numfacts
+				subplot(1,numfacts+1,1+i);
+				fac = get_factor(F,i);
+				imagesc(abs(real(fac)));
+				set(gca,'XTick',[], 'YTick', []);
+			end
+		end
 	end
 	methods(Static)
 	end
