@@ -872,6 +872,17 @@ Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_cols(faust_unsigned_int 
 }
 
 template<typename FPP>
+Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const
+{
+	//TODO: check args
+	FPP data[this->getNbRow()*n];
+	for(faust_unsigned_int i=0; i<n;i++)
+		memcpy(data+i*this->getNbRow(), getData()+col_ids[i]*this->getNbRow(), this->getNbRow()*sizeof(FPP));
+	Faust::MatDense<FPP, Cpu>* cols = new Faust::MatDense<FPP, Cpu>(data, this->getNbRow(), n);
+	return cols;
+}
+
+template<typename FPP>
 Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const
 {
 	//TODO: check args
@@ -880,6 +891,19 @@ Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_rows(faust_unsigned_int 
 		memcpy(data+i*num_rows, getData()+start_row_id+i*this->getNbRow(), num_rows*sizeof(FPP));
 	}
 	Faust::MatDense<FPP, Cpu>* rows = new Faust::MatDense<FPP, Cpu>(data, num_rows, this->getNbCol());
+	return rows;
+}
+
+template<typename FPP>
+Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_rows(faust_unsigned_int* row_ids, faust_unsigned_int n) const
+{
+	//TODO: check args
+	FPP data[this->getNbCol()*n];
+	for(faust_unsigned_int i = 0; i < n; i++) // row_ids[i]
+		for(faust_unsigned_int j = 0; j < this->getNbCol(); j++)
+			//copy ele row_ids[i],j
+			data[j*n+i] = this->mat(row_ids[i],j);
+	Faust::MatDense<FPP, Cpu>* rows = new Faust::MatDense<FPP, Cpu>(data, n, this->getNbCol());
 	return rows;
 }
 

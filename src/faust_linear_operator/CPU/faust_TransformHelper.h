@@ -32,10 +32,15 @@ namespace Faust {
 			bool is_conjugate;
 			bool is_sliced;
 			Slice slices[2];
+			bool is_fancy_indexed;
+			faust_unsigned_int * fancy_indices[2];
+			faust_unsigned_int fancy_num_rows;
+			faust_unsigned_int fancy_num_cols;
 			Transform<FPP,Cpu>* sliced_transform;
 			shared_ptr<Transform<FPP,Cpu>> transform;
 
 			const Transform<FPP, Cpu>* eval_sliced_Transform();
+			const Transform<FPP, Cpu>* eval_fancy_idx_Transform();
 			public:
 			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=true, const bool cloning_fact = true);
 			TransformHelper();
@@ -43,7 +48,8 @@ namespace Faust {
 			TransformHelper(TransformHelper<FPP,Cpu>* th);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]);
-			TransformHelper(Transform<FPP,Cpu> &t);
+			TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
+TransformHelper(Transform<FPP,Cpu> &t);
 
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x) const;
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose);
@@ -92,6 +98,7 @@ namespace Faust {
 			bool is_fact_dense(const faust_unsigned_int id) const;
 			TransformHelper<FPP, Cpu>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
+			TransformHelper<FPP, Cpu>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			MatDense<FPP,Cpu> get_product() const;
 			void save_mat_file(const char* filename) const;
 			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;

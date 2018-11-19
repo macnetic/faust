@@ -541,18 +541,57 @@ cdef class FaustCore:
 
         return fact
 
-    def slice(self, start_row_id, end_row_id, start_col_id, end_col_id):
+    def slice(self, indices):
+        # TODO: rename this function or cut in two: slice and fancy indexing
         core = FaustCore(core=True)
+        start_row_id, end_row_id, start_col_id, end_col_id = (indices[0].start,
+                                                              indices[0].stop,
+                                                              indices[1].start,
+                                                              indices[1].stop)
         if(self._isReal):
             core.core_faust_dbl = self.core_faust_dbl.slice(start_row_id,
-                                                                end_row_id,
-                                                                start_col_id,
-                                                                end_col_id)
+                                                            end_row_id,
+                                                            start_col_id,
+                                                            end_col_id)
         else:
             core.core_faust_cplx = self.core_faust_cplx.slice(start_row_id,
-                                                                end_row_id,
-                                                                start_col_id,
-                                                                end_col_id)
+                                                              end_row_id,
+                                                              start_col_id,
+                                                              end_col_id)
+
+        core._isReal = self._isReal
+        return core
+
+    def fancy_idx(self, indices):
+        cdef unsigned long int[:] row_indices_view
+        cdef unsigned long int[:] col_indices_view
+        core = FaustCore(core=True)
+        # fancy indexing
+        #convert possible slice (on index 0 or 1 of out_indices) to
+        # an array of indices
+        for i in range(0,2):
+            if(isinstance(indices[i], slice)):
+               indices[i] = list(range(indices[i].start, indices[i].stop,
+                                       indices[i].step))
+        row_indices = np.array(indices[0], dtype=np.uint64)
+        col_indices = np.array(indices[1], dtype=np.uint64)
+        row_indices_view = row_indices
+        col_indices_view = col_indices
+        print("FaustCorePy.pyx row_indices=", row_indices, " size=",
+              row_indices.size)
+        print("FaustCorePy.pyx row_indices=", col_indices," size=",
+              col_indices.size)
+        if(self._isReal):
+            core.core_faust_dbl = \
+            self.core_faust_dbl.fancy_idx(&row_indices_view[0], row_indices.size,
+                                          &col_indices_view[0], col_indices.size)
+        else:
+            core.core_faust_cplx = \
+            self.core_faust_cplx.fancy_idx(&row_indices_view[0],
+                                           row_indices.size,
+                                           &col_indices_view[0],
+                                           col_indices.size)
+
         core._isReal = self._isReal
         return core
 

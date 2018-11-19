@@ -145,7 +145,8 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>::TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts,
 				const FPP lambda_, const bool optimizedCopy, const bool cloning_fact) : is_transposed(false),
 																						is_conjugate(false),
-																						is_sliced(false)
+																						is_sliced(false),
+																						is_fancy_indexed(false)
 	{
 		if(lambda_ != FPP(1.0))
 			cerr << "WARNING: the constructor argument for multiplying the Faust by a scalar is DEPRECATED and might not be supported in next versions of FAµST." << endl;
@@ -153,20 +154,20 @@ namespace Faust {
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false), is_sliced(false)
+		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false)
 	{
 		this->transform = make_shared<Transform<FPP,Cpu>>();
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(Transform<FPP,Cpu> &t) : is_transposed(false), is_conjugate(false), is_sliced(false)
+		TransformHelper<FPP,Cpu>::TransformHelper(Transform<FPP,Cpu> &t) : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false)
 	{
 		this->transform = make_shared<Transform<FPP,Cpu>>(t);
 	}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right)
-		: is_transposed(false), is_conjugate(false), is_sliced(false)
+		: is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false)
 		{
 			this->transform = make_shared<Transform<FPP,Cpu>>(th_left->eval_sliced_Transform(), th_left->is_transposed, th_left->is_conjugate,
 					th_right->eval_sliced_Transform(), th_right->is_transposed, th_right->is_conjugate);
@@ -178,6 +179,7 @@ namespace Faust {
 			this->transform = th->transform;
 			this->is_transposed = transpose?!th->is_transposed:th->is_transposed;
 			this->is_sliced = th->is_sliced;
+			this->is_fancy_indexed = false;
 			if(th->is_sliced)
 				copy_slices(th);
 			this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
@@ -197,7 +199,7 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2])
 		{
-			this->transform = th->transform;
+			this->transform = th->transform; //do not remove this line, necessary for eval_sliced_transform()
 			this->is_transposed = th->is_transposed;
 			this->is_conjugate = th->is_conjugate;
 			if(! (s[0].belong_to(0, th->getNbRow()) || s[1].belong_to(0, th->getNbCol())))
@@ -206,6 +208,28 @@ namespace Faust {
 			this->slices[1] = s[1];
 			this->is_sliced = true;
 			this->transform = make_shared<Transform<FPP,Cpu>>(*eval_sliced_Transform());
+		}
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
+		{
+			this->transform = th->transform; //do not remove this line, necessary for eval*()
+			this->is_transposed = th->is_transposed;
+			this->is_conjugate = th->is_conjugate;
+			this->is_sliced = false;
+			//TODO: check indices
+//				handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Fancy indexing overflows a Faust dimension.");
+			this->fancy_indices[0] = new faust_unsigned_int[num_rows];
+			this->fancy_indices[1] = new faust_unsigned_int[num_cols];
+			this->fancy_num_cols = num_cols;
+			this->fancy_num_rows = num_rows;
+			this->is_fancy_indexed= true;
+			cout << "TransformHelper num_rows=" << num_rows << endl;
+			cout << "TransformHelper num_cols=" << num_cols << endl;
+			memcpy(this->fancy_indices[0], row_ids, num_rows*sizeof(faust_unsigned_int));
+			memcpy(this->fancy_indices[1], col_ids, num_cols*sizeof(faust_unsigned_int));
+			this->transform = make_shared<Transform<FPP,Cpu>>(*eval_fancy_idx_Transform());
+			delete[] this->fancy_indices[0];
+			delete[] this->fancy_indices[1];
 		}
 
 	template<typename FPP>
@@ -501,6 +525,64 @@ namespace Faust {
 				s[1] = sc;
 			}
 			return new TransformHelper<FPP, Cpu>(this, s);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
+		{
+			return new TransformHelper<FPP,Cpu>(this, row_ids, num_rows, col_ids, num_cols);
+		}
+
+	template<typename FPP>
+	const Transform<FPP, Cpu>* TransformHelper<FPP, Cpu>::eval_fancy_idx_Transform()
+		{
+			if(this->is_fancy_indexed) {
+				bool cloning_fact = false;
+				faust_unsigned_int size = this->size();
+				std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) size);
+				MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
+				MatGeneric<FPP,Cpu>* gen_facs[size-2];
+				gen_fac = this->transform->get_fact(0, cloning_fact);
+//				first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
+				//		first_sub_fac->Display();
+				first_sub_fac = gen_fac->get_rows(this->fancy_indices[0], this->fancy_num_rows);
+				if(cloning_fact)
+					delete gen_fac;
+				if(size > 1) {
+					gen_fac = this->transform->get_fact(size-1, cloning_fact);
+//					last_sub_fac = gen_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
+					last_sub_fac = gen_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);	//		std::cout << "---" << std::endl;
+					//		last_sub_fac->Display();
+					if(cloning_fact)
+						delete gen_fac;
+					factors.insert(factors.begin(), first_sub_fac);
+					auto it = factors.begin();
+					for(faust_unsigned_int i = 1; i < size-1; i++)
+					{
+						gen_facs[i-1] = this->transform->get_fact(i, cloning_fact);
+
+
+						factors.insert(++it, gen_facs[i-1]);
+					}
+					factors.insert(factors.begin()+(size-1), last_sub_fac);
+					factors.resize(size);
+				}
+				else { //only one factor
+					last_sub_fac = gen_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);
+					delete first_sub_fac;
+					factors[0] = last_sub_fac;
+					factors.resize(1);
+				}
+				Transform<FPP, Cpu>* th = new Transform<FPP, Cpu>(factors, 1.0, false, cloning_fact);
+				if(cloning_fact) {
+					for(faust_unsigned_int i = 1; i < size-1; i++)
+						delete gen_facs[i-1];
+					delete first_sub_fac;
+					delete last_sub_fac;
+				}
+				return th;
+			}
+			return this->transform.get(); //needed to return the stored Transform object ptr
 		}
 
 	template<typename FPP>

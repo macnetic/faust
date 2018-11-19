@@ -172,7 +172,10 @@ namespace Faust
 	virtual Faust::MatGeneric<FPP,DEVICE>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const=0;
 	//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
 	virtual Faust::MatGeneric<FPP,DEVICE>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const=0;
-
+	//! \brief Returns a sub-group of columns of this matrix as the same type of matrix
+	virtual Faust::MatGeneric<FPP,DEVICE>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const=0;
+	//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
+	virtual Faust::MatGeneric<FPP,DEVICE>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const=0;
 
 	//! \brief 
 	//! \warning : declare a virtual destructor is mandatory for an abstract class

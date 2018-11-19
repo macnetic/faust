@@ -277,6 +277,16 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::slice(unsigned int start_row_id, unsigned 
 }
 
 template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::fancy_idx(unsigned long int* row_ids, unsigned long int
+        num_rows, unsigned long int* col_ids,
+        unsigned long int num_cols)
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->fancy_index(row_ids, num_rows, col_ids, num_cols);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
+    return core;
+}
+
+template<typename FPP>
 void FaustCoreCpp<FPP>::save_mat_file(const char* filepath) const
 {
     //    std::cout << "FaustCoreCpp::save_mat_file()" << std::endl;

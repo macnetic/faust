@@ -754,6 +754,7 @@ class Faust:
         #      out_indices checking on the end)
         #TODO: check that step == 1 on slices and stop on failure if it is or
         # implement negative steps
+        print("__getitem__(), indices=",indices)
         if(indices == Ellipsis): # F[...]
             out_indices = [slice(0,F.shape[0]), slice(0, F.shape[1])]
         elif(isinstance(indices,int)): # F[i] # a line
@@ -761,6 +762,9 @@ class Faust:
         elif(isinstance(indices,slice)):
             #F[i:j] a group of contiguous lines
             out_indices = [indices, slice(0, F.shape[1])]
+        elif(isinstance(indices, list)):
+            out_indices = [indices, list(range(0,F.shape[1]))]
+            #TODO: check indices are all integers
         elif(isinstance(indices, tuple)):
             if(len(indices) == 2):
                 out_indices = [0,0]
@@ -778,6 +782,9 @@ class Faust:
                     out_indices[0] = slice(indices[0], indices[0]+1)
                 elif(isinstance(indices[0], slice)):
                     out_indices[0] = indices[0]
+                elif(isinstance(indices[0], list)):
+                    print("indices[0] is list")
+                    out_indices[0] = indices[0]
                 else:
                      raise IndexError("only integers, slices (`:`), ellipsis"
                                      " (`...`), and integer are valid indices")
@@ -789,6 +796,9 @@ class Faust:
                     out_indices[1] = slice(indices[1], indices[1]+1)
                 elif(isinstance(indices[1], slice)):
                     out_indices[1] = indices[1]
+                elif(isinstance(indices[1], list)):
+                    print("indices[1] is list")
+                    out_indices[1] = indices[1]
                 else:
                      raise IndexError("only integers, slices (`:`), ellipsis"
                                     " (`...`), and integer are valid indices")
@@ -798,35 +808,35 @@ class Faust:
             print("type indices:", type(indices))
             raise IndexError("only integers, slices (`:`), ellipsis"
                              " (`...`), and integer are valid indices")
-        if(out_indices[0].start == None and out_indices[0].stop == None): #F[::] or F[::,any]
-            out_indices[0] = slice(0,F.shape[0])
-        elif(out_indices[0].start == None): # out_indices[0].stop != None
-            out_indices[0] = slice(0, out_indices[0].stop)
-        elif(out_indices[0].stop == None): # out_indices[0].start != None
-            out_indices[0] = slice(out_indices[0].start, F.shape[0])
-        if(out_indices[0].stop < 0):
-            out_indices[0] = slice(out_indices[0].start,
-                                   F.shape[0]+out_indices[0].stop)
-        if(out_indices[1].start == None and out_indices[1].stop == None): #F[any, ::]
-            out_indices[1] = slice(0,F.shape[1])
-        elif(out_indices[1].start == None): # out_indices[1].stop != None
-            out_indices[1] = slice(1, out_indices[1].stop)
-        elif(out_indices[1].stop == None): # out_indices[1].start != None
-            out_indices[1] = slice(out_indices[1].start, F.shape[1])
-        if(out_indices[1].stop < 0):
-            out_indices[1] = slice (out_indices[1].start,
-                                    F.shape[1]+out_indices[1].stop)
         for i in range(0,2):
-            if(out_indices[i].start >= F.shape[i] or out_indices[i].stop > F.shape[i]):
-                raise IndexError("index "+
-                                 str(max(out_indices[i].start,out_indices[i].stop-1))+
-                                 " is out of bounds for axis "+str(i)+" with size "+
-                                 str(F.shape[i]))
-        slice_F = Faust(core_obj=F.m_faust.slice(out_indices[0].start,
-                                         out_indices[0].stop,
-                                         out_indices[1].start,
-                                         out_indices[1].stop))
-        return slice_F
+            if(isinstance(out_indices[i], slice)):
+                if(out_indices[i].start == None and out_indices[i].stop == None):
+                    #F[::] or F[::,any] or F[any, ::]
+                    out_indices[i] = slice(0,F.shape[i])
+                elif(out_indices[i].start == None): # out_indices[i].stop != None
+                    out_indices[i] = slice(0, out_indices[i].stop)
+                elif(out_indices[i].stop == None): # out_indices[i].start != None
+                    out_indices[i] = slice(out_indices[i].start, F.shape[i])
+                if(out_indices[i].stop < 0):
+                    out_indices[i] = slice(out_indices[i].start,
+                                           F.shape[i]+out_indices[i].stop)
+
+                if(out_indices[i].step == None):
+                    out_indices[i] = slice(out_indices[i].start,
+                                                out_indices[i].stop,
+                                                1)
+                if(out_indices[i].start >= F.shape[i] or out_indices[i].stop > F.shape[i]):
+                    raise IndexError("index "+
+                                     str(max(out_indices[i].start,out_indices[i].stop-1))+
+                                     " is out of bounds for axis "+str(i)+" with size "+
+                                     str(F.shape[i]))
+        if(isinstance(out_indices[0],list) or
+                      isinstance(out_indices[1], list)):
+            sub_F = Faust(core_obj=F.m_faust.fancy_idx(out_indices))
+        else:
+            sub_F = Faust(core_obj=F.m_faust.slice(out_indices))
+
+        return sub_F
 
     def nnz_sum(F):
         """

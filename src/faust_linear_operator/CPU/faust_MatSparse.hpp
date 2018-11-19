@@ -770,6 +770,19 @@ Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_cols(faust_unsigned_in
 }
 
 template<typename FPP>
+Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const
+{
+	//TODO: create directly a MatSparse
+	MatDense<FPP,Cpu> D = *this;
+	MatDense<FPP,Cpu>* E = D.get_cols(col_ids, num_cols);
+	MatSparse<FPP,Cpu>* F = new MatSparse<FPP,Cpu>(*E);
+	delete E;
+	return F;
+}
+
+
+
+template<typename FPP>
 Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const
 {
 	//TODO: args checking
@@ -787,6 +800,17 @@ Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_rows(faust_unsigned_in
 	subMatrix->mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	subMatrix->nnz = subMatrix->mat.nonZeros();
 	return subMatrix;
+}
+
+template<typename FPP>
+Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const
+{
+	//TODO: create directly a MatSparse
+	MatDense<FPP,Cpu> D = *this;
+	MatDense<FPP,Cpu>* E = D.get_rows(row_ids, num_rows);
+	MatSparse<FPP,Cpu>* F = new MatSparse<FPP,Cpu>(*E);
+	delete E;
+	return F;
 }
 
 	template<typename FPP>

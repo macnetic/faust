@@ -87,6 +87,9 @@ class FaustCoreCpp
     faust_unsigned_int get_fact_nnz(const faust_unsigned_int) const;
     bool is_fact_sparse(const faust_unsigned_int id) const;
     FaustCoreCpp<FPP>* slice(unsigned int, unsigned int, unsigned int, unsigned int);
+    FaustCoreCpp<FPP>* fancy_idx(unsigned long int* row_ids, unsigned long int
+                                  num_rows, unsigned long int* col_ids,
+                                  unsigned long int num_cols);
     void save_mat_file(const char* filepath) const;
     const bool isTransposed();
     FaustCoreCpp<FPP>* transpose();
