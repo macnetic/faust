@@ -574,6 +574,19 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 			return;
 		}
 
+		if(!strcmp("subsref_byvec", cmd))
+		{
+			unsigned long int *row_pr;
+			row_pr = (unsigned long int*) mxGetData(prhs[2]);
+
+			unsigned long int *col_pr;
+			col_pr = (unsigned long int*) mxGetData(prhs[3]);
+
+			Faust::TransformHelper<SCALAR, Cpu>* th = core_ptr->fancy_index(row_pr, mxGetNumberOfElements(prhs[2]), col_pr, mxGetNumberOfElements(prhs[3]));
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+			return;
+		}
+
         if(!strcmp("mul_faust", cmd)) {
 			Faust::TransformHelper<SCALAR,Cpu>* right_term = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[2]);
 			if(right_term->getNbRow() != core_ptr->getNbCol()) mexErrMsgTxt("The dimensions of the two Fausts must agree.");

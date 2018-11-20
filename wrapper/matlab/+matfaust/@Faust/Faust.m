@@ -1037,37 +1037,65 @@ classdef Faust
 
 			end_ids = zeros(1,2);
 			start_ids = zeros(1,2);
+			indexing_by_slice = [ true, true ];
+			ind_lists = cell(1,2);
 			ROW=1;
 			COL=2;
 
 			for i=ROW:COL
-				slicing_list=S.subs{i};
-				if ischar(slicing_list)
+				ind_list=S.subs{i};
+				if ischar(ind_list)
 					start_ids(i) = 1;
 					end_ids(i) = size(F,i);
+					%indexing_by_slice(i) = true
+					ind_list = 1:size(F,i); % needed if other dim is not a slice
 				else
-					start_ids(i) = slicing_list(1);
-					end_ids(i) = slicing_list(end);
+					if(any(ind_list < 1))
+						error(' Subscript indices must be integers >= 1.')
+					elseif(any(ind_list > size(F,i)))
+						error(' Index exceeds Faust dimensions.')
+					end
+					% check if indices in range are indexing_by_slice
+					sl_sz = size(ind_list,2);
+					if(sl_sz >= 2)
+						% TODO: couldn't be without a loop by verifiying two shifted views of array ?
+						for j=2:sl_sz
+							d = ind_list(j)-ind_list(j-1);
+							if(abs(d) > 1 || d < 0)
+								indexing_by_slice(i) = false;
+								break
+							end
+						end
+					end
+					if(indexing_by_slice(i))
+						start_ids(i) = ind_list(1);
+						end_ids(i) = ind_list(end);
+					end
 				end
-				if(start_ids(i) < 1 || end_ids(i) < 1)
-					error(' Subscript indices must be integers >= 1.')
-				end
-
-				if(start_ids(i) > size(F,i) || end_ids(i) > size(F,i))
-					error(' Index exceeds Faust dimensions.')
-				end
+				ind_lists{i} = ind_list;
 			end
 
 
 			if(F.isReal)
-				submatrix = matfaust.Faust(F, mexFaustReal('subsref', F.matrix.objectHandle, start_ids(ROW), end_ids(ROW), start_ids(COL), end_ids(COL)));
+				if(indexing_by_slice)
+					submatrix = matfaust.Faust(F, mexFaustReal('subsref', F.matrix.objectHandle, start_ids(ROW), end_ids(ROW), start_ids(COL), end_ids(COL)));
+				else
+					% -1 is for converting to 0-base index used in C world
+					submatrix =  matfaust.Faust(F, mexFaustReal('subsref_byvec', F.matrix.objectHandle, uint64(ind_lists{1}-1), uint64(ind_lists{2}-1)));
+				end
 			else
-				submatrix = matfaust.Faust(F, mexFaustCplx('subsref', F.matrix.objectHandle, start_ids(ROW), end_ids(ROW), start_ids(COL), end_ids(COL)));
+				if(indexing_by_slice)
+					submatrix = matfaust.Faust(F, mexFaustCplx('subsref', F.matrix.objectHandle, start_ids(ROW), end_ids(ROW), start_ids(COL), end_ids(COL)));
+				else
+					submatrix = matfaust.Faust(F, mexFaustCplx('subsref_byvec', F.matrix.objectHandle, uint64(ind_lists{1}-1), uint64(ind_lists{2}-1)));
+				end
 			end
 
-			if(start_ids(ROW) == end_ids(ROW) && start_ids(COL) == end_ids(COL))
-				submatrix = full(submatrix);
-				submatrix = submatrix(1,1);
+			if(indexing_by_slice(i))
+				if(start_ids(ROW) == end_ids(ROW) && start_ids(COL) == end_ids(COL))
+					submatrix = full(submatrix);
+					submatrix = submatrix(1,1);
+				end
 			end
 		end
 
