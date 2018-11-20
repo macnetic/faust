@@ -675,16 +675,15 @@ if (full(F_slice_slice_2) ~= full(F_dense))
 	error('F(1:dim1,1:dim2) ~= F_dense');
 end
 
-%TODO: re-enable later when negative step will be implemented
-%F_inv=F(dim1:-1:1,dim2:-1:1);
-%if (size(F_inv,1) ~= dim1) | (size(F_inv,2) ~= dim2)
-%	error('invalid dimension');
-%end
+F_inv=F(dim1:-1:1,dim2:-1:1);
+if (size(F_inv,1) ~= dim1) | (size(F_inv,2) ~= dim2)
+	error('invalid dimension');
+end
 
 
-%if (F_inv ~= F_dense(dim1:-1:1,dim2:-1:1))
-%	error('F(1:dim1,1:dim2) ~= F_dense(dim1:-1:1,dim2:-1:1)');
-%end
+if (full(F_inv) ~= full(F_dense(dim1:-1:1,dim2:-1:1)))
+	error('F(1:dim1,1:dim2) ~= F_dense(dim1:-1:1,dim2:-1:1)');
+end
 
 
 %% operator end with slicing
