@@ -1035,48 +1035,40 @@ classdef Faust
 				error(' subsref invalid slicing must have 2 index since F is a 2D-array');
 			end
 
+			end_ids = zeros(1,2);
+			start_ids = zeros(1,2);
+			ROW=1;
+			COL=2;
 
+			for i=ROW:COL
+				slicing_list=S.subs{i};
+				if ischar(slicing_list)
+					start_ids(i) = 1;
+					end_ids(i) = size(F,i);
+				else
+					start_ids(i) = slicing_list(1);
+					end_ids(i) = slicing_list(end);
+				end
+				if(start_ids(i) < 1 || end_ids(i) < 1)
+					error(' Subscript indices must be integers >= 1.')
+				end
 
-			slicing_row=S.subs{1};
-			slicing_col=S.subs{2};
-
-			[dim1 dim2]=size(F);
-
-			if ischar(slicing_row)
-				start_row_id = 1;
-				end_row_id = dim1;
-			else
-				start_row_id = slicing_row(1);
-				end_row_id = slicing_row(end);
+				if(start_ids(i) > size(F,i) || end_ids(i) > size(F,i))
+					error(' Index exceeds Faust dimensions.')
+				end
 			end
 
-			if ischar(slicing_col)
-				start_col_id = 1;
-				end_col_id = dim2;
-			else
-				start_col_id = slicing_col(1);
-				end_col_id = slicing_col(end);
-			end
-
-			if(start_row_id < 0 || end_row_id < 0 || end_col_id < 0 || start_col_id < 0)
-				error(' Subscript indices must be positive integers.')
-			end
-
-			if(start_row_id > dim1 || end_row_id > dim1 || end_col_id > dim2 || start_col_id > dim2)
-				error(' Index exceeds Faust dimensions.')
-			end
 
 			if(F.isReal)
-				submatrix = matfaust.Faust(F, mexFaustReal('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
+				submatrix = matfaust.Faust(F, mexFaustReal('subsref', F.matrix.objectHandle, start_ids(ROW), end_ids(ROW), start_ids(COL), end_ids(COL)));
 			else
-				submatrix = matfaust.Faust(F, mexFaustCplx('subsref', F.matrix.objectHandle, start_row_id, end_row_id, start_col_id, end_col_id));
+				submatrix = matfaust.Faust(F, mexFaustCplx('subsref', F.matrix.objectHandle, start_ids(ROW), end_ids(ROW), start_ids(COL), end_ids(COL)));
 			end
 
-			if(start_row_id == end_row_id && start_col_id == end_col_id)
+			if(start_ids(ROW) == end_ids(ROW) && start_ids(COL) == end_ids(COL))
 				submatrix = full(submatrix);
 				submatrix = submatrix(1,1);
 			end
-
 		end
 
 		%======================================================================
