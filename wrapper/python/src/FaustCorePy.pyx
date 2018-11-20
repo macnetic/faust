@@ -577,10 +577,10 @@ cdef class FaustCore:
         col_indices = np.array(indices[1], dtype=np.uint64)
         row_indices_view = row_indices
         col_indices_view = col_indices
-        print("FaustCorePy.pyx row_indices=", row_indices, " size=",
-              row_indices.size)
-        print("FaustCorePy.pyx row_indices=", col_indices," size=",
-              col_indices.size)
+#        print("FaustCorePy.fancy_idx(), row_indices=", row_indices, " size=",
+#              row_indices.size)
+#        print("FaustCorePy.fancy_idx(), col_indices=", col_indices," size=",
+#              col_indices.size)
         if(self._isReal):
             core.core_faust_dbl = \
             self.core_faust_dbl.fancy_idx(&row_indices_view[0], row_indices.size,

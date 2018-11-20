@@ -754,7 +754,6 @@ class Faust:
         #      out_indices checking on the end)
         #TODO: check that step == 1 on slices and stop on failure if it is or
         # implement negative steps
-        print("__getitem__(), indices=",indices)
         if(indices == Ellipsis): # F[...]
             out_indices = [slice(0,F.shape[0]), slice(0, F.shape[1])]
         elif(isinstance(indices,int)): # F[i] # a line
@@ -764,7 +763,7 @@ class Faust:
             out_indices = [indices, slice(0, F.shape[1])]
         elif(isinstance(indices, list)):
             out_indices = [indices, list(range(0,F.shape[1]))]
-            #TODO: check indices are all integers
+            #TODO: check indices are all integers lying into F shape
         elif(isinstance(indices, tuple)):
             if(len(indices) == 2):
                 out_indices = [0,0]
@@ -783,7 +782,6 @@ class Faust:
                 elif(isinstance(indices[0], slice)):
                     out_indices[0] = indices[0]
                 elif(isinstance(indices[0], list)):
-                    print("indices[0] is list")
                     out_indices[0] = indices[0]
                 else:
                      raise IndexError("only integers, slices (`:`), ellipsis"
@@ -797,7 +795,6 @@ class Faust:
                 elif(isinstance(indices[1], slice)):
                     out_indices[1] = indices[1]
                 elif(isinstance(indices[1], list)):
-                    print("indices[1] is list")
                     out_indices[1] = indices[1]
                 else:
                      raise IndexError("only integers, slices (`:`), ellipsis"

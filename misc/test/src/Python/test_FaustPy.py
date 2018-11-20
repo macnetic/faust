@@ -122,13 +122,15 @@ class TestFaustPy(unittest.TestCase):
 
     def testNorm2(self):
         print("testNorm2()")
-        ref_norm = norm(self.mulFactors())
+        ref_norm = norm(self.mulFactors(),2)
         test_norm = self.F.norm(2)
         print("ref_norm=", ref_norm, "test_norm=", test_norm)
         # TODO: remove this workaround when the supposed bug will be corrected in core lib
         if(math.isnan(test_norm) and not math.isnan(ref_norm)):
             return
-        self.assertLessEqual(abs(ref_norm-test_norm)/abs(ref_norm), 0.05)
+        if(ref_norm == 0.0):
+            self.assertLessEqual(test_norm, 0.0005)
+        self.assertLessEqual(abs(ref_norm-test_norm)/ref_norm, 0.05)
 
     def testNorm1(self):
         print('test Faust.norm(1)')
@@ -224,23 +226,57 @@ class TestFaustPy(unittest.TestCase):
                 self.assertLessEqual(abs(col[i,0]-(prod[i,rand_j]))/prod[i,rand_j],10**-6)
         # test that the sliced Faust is consistent with the sliced full matrix
         # of the Faust
-        rand_ii, rand_jj = self.r.randint(0,self.F.shape[0]),self.r.randint(0,self.F.shape[1])
-        si1 = min(rand_i,rand_ii)
-        si2 = max(rand_i,rand_ii)
-        sj1 = min(rand_j,rand_jj)
-        sj2 = max(rand_j,rand_jj)
-        sF = self.F[si1:si2,sj1:sj2]
-        self.assertTrue((sF.todense() == self.F.todense()[si1:si2,sj1:sj2]).all())
+        rand_ii, rand_jj = \
+        self.r.randint(rand_i+1,self.F.shape[0]),self.r.randint(rand_j+1,self.F.shape[1])
+        sF = self.F[rand_i:rand_ii,rand_j:rand_jj]
+        self.assertTrue((sF.todense() ==
+                         self.F.todense()[rand_i:rand_ii,rand_j:rand_jj]).all())
         # test a second slice on sF
         rand_i, rand_j = self.r.randint(0,sF.shape[0]-1),self.r.randint(0,sF.shape[1]-1)
         rand_ii, rand_jj = \
         self.r.randint(rand_i+1,sF.shape[0]),self.r.randint(rand_j+1,sF.shape[1])
-        si1 = min(rand_i,rand_ii)
-        si2 = max(rand_i,rand_ii)
-        sj1 = min(rand_j,rand_jj)
-        sj2 = max(rand_j,rand_jj)
-        sF2 = sF[si1:si2,sj1:sj2]
-        self.assertTrue((sF2.todense() == sF.todense()[si1:si2,sj1:sj2]).all())
+        sF2 = sF[rand_i:rand_ii,rand_j:rand_jj]
+        n1 = norm(sF2.todense()-sF.todense()[rand_i:rand_ii,rand_j:rand_jj])
+        n2 = norm(sF.todense()[rand_i:rand_ii,rand_j:rand_jj])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2,0.005)
+        print("test fancy indexing on rows")
+        F = self.F
+        num_inds = self.r.randint(1,F.shape[0])
+        row_ids = [ self.r.randint(0,F.shape[0]-1) for i in
+                   range(0,num_inds)]
+        F_rows = F[row_ids,:]
+        self.assertTrue((F_rows.toarray() == F.toarray()[row_ids,:]).all())
+        print("test fancy indexing on cols")
+        F = self.F
+        num_inds = self.r.randint(1,F.shape[1])
+        col_ids = [ self.r.randint(0,F.shape[1]-1) for i in
+                   range(0,num_inds)]
+        F_cols = F[:,col_ids]
+        self.assertTrue((F_cols.toarray() == F.toarray()[:,col_ids]).all())
+        print("test fancy indexing on rows with slice on cols")
+        F = self.F
+        num_inds = self.r.randint(1,F.shape[0]-1)
+        col_slice_start = self.r.randint(0,F.shape[1]-1)
+        col_slice_stop = self.r.randint(col_slice_start+1,F.shape[1])
+        row_ids = [ self.r.randint(0,F.shape[0]-1) for i in
+                   range(0,num_inds)]
+        F_rows = F[row_ids,col_slice_start:col_slice_stop]
+        self.assertLessEqual(norm(F_rows.toarray()-F.toarray()[row_ids,col_slice_start:col_slice_stop])/norm(F.toarray()[row_ids,col_slice_start:col_slice_stop]),
+                            0.005)
+        print("test fancy indexing on cols with slice on rows")
+        F = self.F
+        num_inds = self.r.randint(1,F.shape[1])
+        col_ids = [ self.r.randint(0,F.shape[1]-1) for i in
+                   range(0,num_inds)]
+        row_slice_start = self.r.randint(0,F.shape[0]-1)
+        row_slice_stop = self.r.randint(row_slice_start+1, F.shape[0])
+        F_cols = F[row_slice_start:row_slice_stop,col_ids]
+        self.assertTrue((F_cols.toarray() ==
+                         F.toarray()[row_slice_start:row_slice_stop,col_ids]).all())
+
 
 
     def testToDense(self):

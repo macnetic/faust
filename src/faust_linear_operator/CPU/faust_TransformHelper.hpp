@@ -223,8 +223,6 @@ namespace Faust {
 			this->fancy_num_cols = num_cols;
 			this->fancy_num_rows = num_rows;
 			this->is_fancy_indexed= true;
-			cout << "TransformHelper num_rows=" << num_rows << endl;
-			cout << "TransformHelper num_cols=" << num_cols << endl;
 			memcpy(this->fancy_indices[0], row_ids, num_rows*sizeof(faust_unsigned_int));
 			memcpy(this->fancy_indices[1], col_ids, num_cols*sizeof(faust_unsigned_int));
 			this->transform = make_shared<Transform<FPP,Cpu>>(*eval_fancy_idx_Transform());
@@ -568,7 +566,7 @@ namespace Faust {
 					factors.resize(size);
 				}
 				else { //only one factor
-					last_sub_fac = gen_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);
+					last_sub_fac = first_sub_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);
 					delete first_sub_fac;
 					factors[0] = last_sub_fac;
 					factors.resize(1);
