@@ -1054,8 +1054,10 @@ classdef Faust
 						error(' Subscript indices must be integers >= 1.')
 					elseif(any(ind_list > size(F,i)))
 						error(' Index exceeds Faust dimensions.')
+					elseif(size(ind_list,2) == 0)
+						error(' Cannot create empty Faust')
 					end
-					% check if indices in range are indexing_by_slice
+					% check if indices in range are contiguous and not negative step
 					sl_sz = size(ind_list,2);
 					if(sl_sz >= 2)
 						% TODO: couldn't be without a loop by verifiying two shifted views of array ?
