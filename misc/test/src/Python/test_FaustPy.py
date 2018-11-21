@@ -255,7 +255,12 @@ class TestFaustPy(unittest.TestCase):
         col_ids = [ self.r.randint(0,F.shape[1]-1) for i in
                    range(0,num_inds)]
         F_cols = F[:,col_ids]
-        self.assertTrue((F_cols.toarray() == F.toarray()[:,col_ids]).all())
+        n1 = norm(F_cols.toarray() - F.toarray()[:,col_ids])
+        n2 = norm(F.toarray()[:,col_ids])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2, 0.005)
         print("test fancy indexing on rows with slice on cols")
         F = self.F
         num_inds = self.r.randint(1,F.shape[0]-1)
@@ -274,10 +279,13 @@ class TestFaustPy(unittest.TestCase):
         row_slice_start = self.r.randint(0,F.shape[0]-1)
         row_slice_stop = self.r.randint(row_slice_start+1, F.shape[0])
         F_cols = F[row_slice_start:row_slice_stop,col_ids]
-        self.assertTrue((F_cols.toarray() ==
-                         F.toarray()[row_slice_start:row_slice_stop,col_ids]).all())
-
-
+        n1 = norm(F_cols.toarray() -
+                  F.toarray()[row_slice_start:row_slice_stop,col_ids])
+        n2 = norm(F.toarray()[row_slice_start:row_slice_stop,col_ids])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2, 0.005)
 
     def testToDense(self):
         print("testToDense()")
