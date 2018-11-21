@@ -837,6 +837,8 @@ class Faust:
                     if(len(out_indices[i]) == 0): raise empty_faust_except
                 elif(out_indices[i].start >= out_indices[i].stop):
                     raise empty_faust_except
+                elif(out_indices[i].step == 0):
+                    raise ValueError("slice step cannot be zero")
 
         if(isinstance(out_indices[0],list) or
                       isinstance(out_indices[1], list)):
