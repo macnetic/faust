@@ -250,7 +250,6 @@ class TestFaustPy(unittest.TestCase):
         F_rows = F[row_ids,:]
         self.assertTrue((F_rows.toarray() == F.toarray()[row_ids,:]).all())
         print("test fancy indexing on cols")
-        F = self.F
         num_inds = self.r.randint(1,F.shape[1])
         col_ids = [ self.r.randint(0,F.shape[1]-1) for i in
                    range(0,num_inds)]
@@ -262,7 +261,6 @@ class TestFaustPy(unittest.TestCase):
         else:
             self.assertLessEqual(n1/n2, 0.005)
         print("test fancy indexing on rows with slice on cols")
-        F = self.F
         num_inds = self.r.randint(1,F.shape[0]-1)
         col_slice_start = self.r.randint(0,F.shape[1]-1)
         col_slice_stop = self.r.randint(col_slice_start+1,F.shape[1])
@@ -272,7 +270,6 @@ class TestFaustPy(unittest.TestCase):
         self.assertLessEqual(norm(F_rows.toarray()-F.toarray()[row_ids,col_slice_start:col_slice_stop])/norm(F.toarray()[row_ids,col_slice_start:col_slice_stop]),
                             0.005)
         print("test fancy indexing on cols with slice on rows")
-        F = self.F
         num_inds = self.r.randint(1,F.shape[1])
         col_ids = [ self.r.randint(0,F.shape[1]-1) for i in
                    range(0,num_inds)]
@@ -286,6 +283,65 @@ class TestFaustPy(unittest.TestCase):
             self.assertLessEqual(n1,0.0005)
         else:
             self.assertLessEqual(n1/n2, 0.005)
+        print("test slicing with positive step equal or greater than one")
+        # rows
+        rstep = self.r.randint(1, F.shape[0])
+        assert(rstep >= 1)
+        sF = F[rand_i:rand_ii:rstep]
+        n1 = norm(sF.toarray()-F.toarray()[rand_i:rand_ii:rstep])
+        n2 = norm(F.toarray()[rand_i:rand_ii:rstep])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2, 0.005)
+        # columns
+        cstep = self.r.randint(1, F.shape[1])
+        assert(cstep >= 1)
+        sF = F[:,rand_j:rand_jj:cstep]
+        n1 = norm(sF.toarray()-F.toarray()[:,rand_j:rand_jj:cstep])
+        n2 = norm(F.toarray()[:,rand_j:rand_jj:cstep])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2, 0.005)
+        # rows and cols
+        sF = F[rand_i:rand_ii:rstep,rand_j:rand_jj:cstep]
+        n1 = \
+        norm(sF.toarray()-F.toarray()[rand_i:rand_ii:rstep,rand_j:rand_jj:cstep])
+        n2 = norm(F.toarray()[rand_i:rand_ii:rstep,rand_j:rand_jj:cstep])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2, 0.005)
+        print("test slicing with negative step")
+        # rows
+        sF = F[rand_ii:rand_i:-rstep]
+        n1 = norm(sF.toarray()-F.toarray()[rand_ii:rand_i:-rstep])
+        n2 = norm(F.toarray()[rand_ii:rand_i:-rstep])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2, 0.005)
+        # cols
+        sF = F[:,rand_jj:rand_j:-cstep]
+        n1 = norm(sF.toarray()-F.toarray()[:,rand_jj:rand_j:-cstep])
+        n2 = norm(F.toarray()[:,rand_jj:rand_j:-cstep])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2, 0.005)
+        # rows and cols
+        sF = F[rand_ii:rand_i:-rstep,rand_jj:rand_j:-cstep]
+        n1 = \
+        norm(sF.toarray()-F.toarray()[rand_ii:rand_i:-rstep,rand_jj:rand_j:-cstep])
+        n2 = norm(F.toarray()[rand_ii:rand_i:-rstep,rand_jj:rand_j:-cstep])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2, 0.005)
+
+
+
 
     def testToDense(self):
         print("testToDense()")
