@@ -796,6 +796,10 @@ class Faust:
                 elif(isinstance(indices[1], slice)):
                     out_indices[1] = indices[1]
                 elif(isinstance(indices[1], list)):
+                    if(isinstance(indices[0],list)): raise \
+                    Exception("F[list1,list2] error: fancy indexing "
+                              "on both dimensions is not implemented "
+                              "rather use F[list1][:,list2].")
                     if(len(indices[1]) == 0): raise empty_faust_except
                     out_indices[1] = indices[1]
                 else:
