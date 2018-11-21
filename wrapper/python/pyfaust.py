@@ -752,8 +752,9 @@ class Faust:
         """
         #TODO: refactor (by index when indices == tuple(2), error message,
         #      out_indices checking on the end)
-        #TODO: check that step == 1 on slices and stop on failure if it is or
-        # implement negative steps
+        empty_faust_except = Exception("Cannot create empty Faust.")
+        idx_error_exception = IndexError("only integers, slices (`:`), ellipsis"
+                                     " (`...`), and integer are valid indices")
         if(indices == Ellipsis): # F[...]
             out_indices = [slice(0,F.shape[0]), slice(0, F.shape[1])]
         elif(isinstance(indices,int)): # F[i] # a line
@@ -782,10 +783,10 @@ class Faust:
                 elif(isinstance(indices[0], slice)):
                     out_indices[0] = indices[0]
                 elif(isinstance(indices[0], list)):
+                    if(len(indices[0]) == 0): raise empty_faust_except
                     out_indices[0] = indices[0]
                 else:
-                     raise IndexError("only integers, slices (`:`), ellipsis"
-                                     " (`...`), and integer are valid indices")
+                     raise idx_error_exception
                 if(indices[1] == Ellipsis):
                     # all lines
                     out_indices[1] = slice(0, F.shape[1])
@@ -795,16 +796,15 @@ class Faust:
                 elif(isinstance(indices[1], slice)):
                     out_indices[1] = indices[1]
                 elif(isinstance(indices[1], list)):
+                    if(len(indices[1]) == 0): raise empty_faust_except
                     out_indices[1] = indices[1]
                 else:
-                     raise IndexError("only integers, slices (`:`), ellipsis"
-                                    " (`...`), and integer are valid indices")
+                     raise idx_error_exception
             else:
                 raise IndexError('Too many indices.')
         else:
-            print("type indices:", type(indices))
-            raise IndexError("only integers, slices (`:`), ellipsis"
-                             " (`...`), and integer are valid indices")
+            raise idx_error_exception
+
         for i in range(0,2):
             if(isinstance(out_indices[i], slice)):
                 if(out_indices[i].start == None and out_indices[i].stop == None):
@@ -827,6 +827,17 @@ class Faust:
                                      str(max(out_indices[i].start,out_indices[i].stop-1))+
                                      " is out of bounds for axis "+str(i)+" with size "+
                                      str(F.shape[i]))
+                
+                # transform slice with neg. step to a list for using fancy
+                # indexing
+                # likewise for step > 1
+                if(out_indices[i].step < 0 or out_indices[i].step > 1):
+                    out_indices[i] = \
+                    list(range(out_indices[i].start,out_indices[i].stop,out_indices[i].step))
+                    if(len(out_indices[i]) == 0): raise empty_faust_except
+                elif(out_indices[i].start >= out_indices[i].stop):
+                    raise empty_faust_except
+
         if(isinstance(out_indices[0],list) or
                       isinstance(out_indices[1], list)):
             sub_F = Faust(core_obj=F.m_faust.fancy_idx(out_indices))
