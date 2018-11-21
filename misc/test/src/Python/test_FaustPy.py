@@ -229,8 +229,12 @@ class TestFaustPy(unittest.TestCase):
         rand_ii, rand_jj = \
         self.r.randint(rand_i+1,self.F.shape[0]),self.r.randint(rand_j+1,self.F.shape[1])
         sF = self.F[rand_i:rand_ii,rand_j:rand_jj]
-        self.assertTrue((sF.todense() ==
-                         self.F.todense()[rand_i:rand_ii,rand_j:rand_jj]).all())
+        n1 = norm(sF.toarray()-self.F.todense()[rand_i:rand_ii,rand_j:rand_jj])
+        n2 = norm(self.F.todense()[rand_i:rand_ii,rand_j:rand_jj])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2,0.005)
         # test a second slice on sF
         rand_i, rand_j = self.r.randint(0,sF.shape[0]-1),self.r.randint(0,sF.shape[1]-1)
         rand_ii, rand_jj = \
@@ -267,8 +271,13 @@ class TestFaustPy(unittest.TestCase):
         row_ids = [ self.r.randint(0,F.shape[0]-1) for i in
                    range(0,num_inds)]
         F_rows = F[row_ids,col_slice_start:col_slice_stop]
-        self.assertLessEqual(norm(F_rows.toarray()-F.toarray()[row_ids,col_slice_start:col_slice_stop])/norm(F.toarray()[row_ids,col_slice_start:col_slice_stop]),
-                            0.005)
+        n1 = \
+        norm(F_rows.toarray()-F.toarray()[row_ids,col_slice_start:col_slice_stop])
+        n2 = norm(F.toarray()[row_ids,col_slice_start:col_slice_stop])
+        if(n2 == 0): # avoid nan error
+            self.assertLessEqual(n1,0.0005)
+        else:
+            self.assertLessEqual(n1/n2, 0.005)
         print("test fancy indexing on cols with slice on rows")
         num_inds = self.r.randint(1,F.shape[1])
         col_ids = [ self.r.randint(0,F.shape[1]-1) for i in
