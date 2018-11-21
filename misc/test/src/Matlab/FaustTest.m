@@ -238,6 +238,39 @@ classdef FaustTest < matlab.unittest.TestCase
 				I = tG(col_i1:col_i2, row_i1:row_i2)
 				full_I = full(I)
 				this.verifyEqual(full_I, full_tG(col_i1:col_i2, row_i1:row_i2), 'RelTol', 0.0001)
+				%============= test indexing by arbitrary vectors
+				F = tested_fausts{i};
+				num_rows = randi([1,size(F,1)*2]);
+				num_cols = randi([1,size(F,2)*2]);
+				row_ids = zeros(1,num_rows);
+				col_ids = zeros(1,num_cols);
+				for j=1:num_rows
+					row_ids(1,j) = randi([1,size(F,1)]);
+				end
+				for j=1:num_cols
+					col_ids(1,j) = randi([1,size(F,2)]);
+				end
+				row_ids = row_ids(1,1:num_rows);
+				col_ids = col_ids(1,1:num_cols);
+				fF = full(F);
+				% test sub-indexing on rows, all columns;
+				ref_sfF = fF(row_ids,:);
+				test_sF = full(F(row_ids,:));
+				this.verifyEqual(ref_sfF, test_sF, 'RelTol', 0.0001);
+				% test sub-indexing on cols, all rows;
+				ref_sfF = fF(:,col_ids);
+				test_sF = full(F(:,col_ids));
+				this.verifyEqual(ref_sfF, test_sF, 'RelTol', 0.0001);
+				% test sub-indexing on rows and cols;
+				ref_sfF = fF(row_ids,col_ids);
+				test_sF = full(F(row_ids,col_ids));
+				this.verifyEqual(ref_sfF, test_sF, 'RelTol', 0.0001);
+				%============= test slice indexing with negative steps;
+				row_step = randi([row_i1-row_i2-1, -1])
+				col_step = randi([col_i1-col_i2-1, -1])
+				ref_sfF = fF(row_i2:row_step:row_i1,col_i2:col_step:col_i1);
+				test_sF = full(F(row_i2:row_step:row_i1,col_i2:col_step:col_i1));
+				this.verifyEqual(ref_sfF, test_sF, 'RelTol', 0.0001);
 			end
 		end
 

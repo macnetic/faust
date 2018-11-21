@@ -1075,7 +1075,6 @@ classdef Faust
 				ind_lists{i} = ind_list;
 			end
 
-
 			if(F.isReal)
 				if(indexing_by_slice)
 					submatrix = matfaust.Faust(F, mexFaustReal('subsref', F.matrix.objectHandle, start_ids(ROW), end_ids(ROW), start_ids(COL), end_ids(COL)));
@@ -1091,11 +1090,9 @@ classdef Faust
 				end
 			end
 
-			if(indexing_by_slice(i))
-				if(start_ids(ROW) == end_ids(ROW) && start_ids(COL) == end_ids(COL))
-					submatrix = full(submatrix);
-					submatrix = submatrix(1,1);
-				end
+			if(size(submatrix) == [1,1])
+				submatrix = full(submatrix);
+				submatrix = submatrix(1,1);
 			end
 		end
 
