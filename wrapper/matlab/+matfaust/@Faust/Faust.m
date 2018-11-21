@@ -66,7 +66,7 @@
 %>
 %> Other notable limitations are that one cannot:
 %> - compute the real and imaginary parts of a Faust,
-%> - perform elmentwise operations between two Fausts (e.g. elementwise
+%> - perform elementwise operations between two Fausts (e.g. elementwise
 %> multiplication).
 %> In particular, the addition F+G is undefined for Faust objects (so
 %> far).
@@ -84,7 +84,7 @@
 %> In this documentation, the expression 'full matrix' designates the Matlab array
 %> Faust.full() obtained by the multiplication of the Faust factors.
 %>
-%> List of functions that are computionally costly: full().
+%> List of functions that are memory costly: full().
 %>
 %> For more information about FAµST take a look at http://faust.inria.fr.
 %>
@@ -510,7 +510,8 @@ classdef Faust
 		%>
 		%> @param F the Faust object.
 		%>
-		%> @retval F_trans a Faust object implementing the transpose of full(F), i.e. such that F_trans*x == full(F).'*x for any vector x.
+		%> @retval F_trans a Faust object implementing the transpose of full(F) such that:
+		%> <code>full(F_trans) == full(F).' == transpose(full(F)).</code>
 		%>
 		%>
 		%> @b Example
@@ -551,8 +552,8 @@ classdef Faust
 		%>
 		%> @param F the Faust object.
 		%>
-		%> @retval F_ctrans a Faust object implementing the conjugate transpose of full(F), such that for any vector x of consistent size:<br/>
-		%> <code>F_ctrans*x = full(F)'*x</code>
+		%> @retval F_ctrans a Faust object implementing the conjugate transpose of full(F), such that:<br/>
+		%> <code>full(F_ctrans) == full(F)' == ctranspose(full(F))</code>
 		%>
 		%> @b Example
 		%> @code
@@ -594,8 +595,8 @@ classdef Faust
 		%>
 		%> @param F the Faust object.
 		%>
-		%> @retval F_conj a Faust object implementing the conjugate of full(F), such that for any vector x of consistent size:<br/>
-		%> <code>F_conj*x = conj(full(F))*x</code>
+		%> @retval F_conj a Faust object implementing the conjugate of full(F), such that:<br/>
+		%> <code>full(F_conj) == conj(full(F))</code>
 		%>
 		%> @b Example
 		%> @code
@@ -967,11 +968,11 @@ classdef Faust
 		%> This function overloads a Matlab built-in.
 		%>
 		%> @b WARNING:
-		%> - This function doesn't handle a slice step different from 1 (e.g. F(i:2:j,:) where slice step is 2.)
 		%> - It is not advised to use this function as an element accessor
 		%>        (e.g. F(1,1)) because such a use induces to convert the Faust to its
 		%>        dense matrix representation and that is a very expensive computation if used
 		%>        repetitively.
+		%> - Subindexing a Faust which would create an empty Faust will raise an error.
 		%>
 		%> @b Usage
 		%>
@@ -999,6 +1000,11 @@ classdef Faust
 		%>	F(3:4,2:5) % from row 3 to line 4, each row containing only elements from column 2 to 5.
 		%>
 		%>	F(1:end,5:end-1)  % from row 1 to end row, each one containing only elements from column 5 to column before the last one.
+		%>	F(1:2:end,:) % every row of odd index
+		%>	F(end:-2:1,:) %  starts from the last row and goes backward to take one in two rows until the first one (reversing row order of F)
+		%>	F([1,18,2],:) % takes in this order the rows 1, 18 and 2.
+		%>	F(:,[1,18,2]) % takes in this order the columns 1, 18 and 2
+		%>	F[[1,18,2], [1,2]) % takes the rows 1, 18 and 2 but keeps only columns 1 and 2 in these rows.
 		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.end.
@@ -1460,6 +1466,7 @@ classdef Faust
 		%>- FACTOR 5 (real) SPARSE, size 100x50, density 0.02, nnz 100
 		%>>>>[F;G;F;G] # it's allowed to concatenate an arbitrary number of Fausts
 		%>>>>[F,G,F,G] # as long as the dimensions agree
+		%>>>>[F,G;F,G]
 		%> @endcode
 		%>
 		%> @b Errors
@@ -1530,8 +1537,8 @@ classdef Faust
 %>
 		%> <p>@b See @b also Faust.vertcat, Faust.cat.
 		%======================================================================
-		function HC = horzcat(F, A)
-			HC = cat(2, F, A);
+		function HC = horzcat(varargin)
+			HC = cat(2, varargin{1}, varargin{2:end});
 		end
 
 		%======================================================================
@@ -1549,8 +1556,8 @@ classdef Faust
 		%>
 		%> <p>@b See @b also Faust.horzcat, Faust.cat.
 		%======================================================================
-		function VC = vertcat(F, A)
-			VC = cat(1, F, A);
+		function VC = vertcat(varargin)
+			VC = cat(1, varargin{1}, varargin{2:end});
 		end
 
 		%======================================================================

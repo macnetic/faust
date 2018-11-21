@@ -83,7 +83,7 @@ class Faust:
 
     Other notable limitations are that one cannot:
         - compute the real and imaginary parts of a Faust,
-        - perform elmentwise operations between two Fausts (e.g. elementwise
+        - perform elementwise operations between two Fausts (e.g. elementwise
         multiplication).
         In particular, the addition F+G is undefined for Faust objects (so
         far).
@@ -101,7 +101,7 @@ class Faust:
     In this documentation, the expression 'full matrix' designates the array
     Faust.toarray() obtained by the multiplication of the Faust factors.
 
-   List of functions that are computionally costly: toarray(), todense().
+   List of functions that are memory costly: toarray(), todense().
 
     For more information about FAµST take a look at http://faust.inria.fr.
     """
@@ -250,8 +250,9 @@ class Faust:
             F: the Faust object.
 
         Returns:
-            a Faust object implementing the transpose of F.todense(), i.e. such
-            that F.transpose()*x == F.todense().transpose()*x for any vector x.
+            a Faust object implementing the transpose of F.todense(), such
+            that:
+            <code>F.transpose().todense() == F.todense().transpose()</code>
 
         Examples:
             >>> tF = F.transpose()
@@ -272,8 +273,9 @@ class Faust:
             F: the Faust object.
 
         Returns:
-            a Faust object implementing the transpose of F.todense(), i.e. such
-            that F.T*x == F.todense().T*x for any vector x.
+            a Faust object implementing the transpose of F.todense(), such
+            that:
+            <code>F.T.todense() == F.todense().T</code>
 
         Examples:
             >>> tF = F.T
@@ -290,9 +292,9 @@ class Faust:
             F: the Faust object.
 
         Returns:
-            a Faust object Fc implementing the conjugate of F.todense() such that
-            for any vector x of consistent shape:
-            <code>Fc*x == F.todense().conj()*x</code>
+            a Faust object Fc implementing the conjugate of F.todense() such
+            that:
+            <code>Fc.todense() == F.todense().conj()</code>
 
 
         Examples:
@@ -313,9 +315,9 @@ class Faust:
             F: the Faust object.
 
         Returns:
-            a Faust object H implementing the conjugate transpose of F.todense() such that
-            for any vector x of consistent shape:
-            <code>H*x == F.todense().H*x</code>
+            a Faust object H implementing the conjugate transpose of
+            F.todense() such that:
+            <code>H.todense() == F.todense().getH()</code>
 
         Examples:
             >>> from pyfaust import FaustFactory
@@ -339,9 +341,9 @@ class Faust:
         This function is intended to be used as a property (see the examples).
 
         Returns:
-            a Faust object H implementing the conjugate transpose of F.todense() such that
-            for any vector x of consistent shape:
-            <code>H*x == F.todense().H*x</code>
+            a Faust object H implementing the conjugate transpose of
+            F.todense() such that:
+            <code>H.todense() == F.todense().H</code>
 
         Examples:
             >>> from pyfaust import FaustFactory
@@ -705,12 +707,14 @@ class Faust:
         This function overloads a Python built-in.
 
         WARNING:
-            - This function doesn't handle a slice step different from 1 (e.g. F[i:j:2,:]
-        where slice step is 2.).
+            - This function doesn't implement F[l1,l2] where l1 and l2 are
+            integer list objects, rather use F[l1][:,l2].
             - It is not advised to use this function as an element accessor
         (e.g. F(0,0)) because such a use induces to convert the Faust to its
         dense matrix representation and that is a very expensive computation if used
         repetitively.
+            - Subindexing a Faust which would create an empty Faust will raise
+            an error.
 
         Args:
             F: the Faust object.
@@ -732,8 +736,8 @@ class Faust:
             >>> from random import randint
 
             >>> F = FaustFactory.rand(5, [50, 100])
-            >>> i1 = randint(0, min(F.shape)-1)
-            >>> i2 = randint(0, min(F.shape)-1)
+            >>> i1 = randint(1, min(F.shape)-1)
+            >>> i2 = randint(1, min(F.shape)-1)
 
             >>> F[i1,i2] # is the scalar element located at
                          # at row i1, column i2 of the F's dense matrix
@@ -749,6 +753,11 @@ class Faust:
 
             >>> F[0:i1, ...] # equivalent to F[0:i1, ::]
             >>> F[2::, :3:] # equivalent to F[2:F.shape[0],0:3]
+            >>> F[0:i2:2,:] # takes every row of even index until the row i2 (excluded)
+            >>> F[i2:0:-2,:] # starts from row i2 and goes backward to take one in two rows until the first one (reversing order of F)
+            >>> F[[1,18,2],:] # takes in this order the rows 1, 18 and 2
+            >>> F[:, [1,18,2]] # takes in this order the columns 1, 18 and 2
+            >>> F[[1,18,2], [1,2]] # takes the rows 1, 18 and 2 but keeps only columns 1 and 2 in these rows
         """
         #TODO: refactor (by index when indices == tuple(2), error message,
         #      out_indices checking on the end)
