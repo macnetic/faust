@@ -84,7 +84,7 @@
 %> In this documentation, the expression 'full matrix' designates the Matlab array
 %> Faust.full() obtained by the multiplication of the Faust factors.
 %>
-%> List of functions that are memory costly: full().
+%> List of functions that are memory costly: Faust.full(), Faust.pinv(), Faust.mldivide().
 %>
 %> For more information about FAµST take a look at http://faust.inria.fr.
 %>
@@ -1601,6 +1601,38 @@ classdef Faust
 				set(gca,'XTick',[], 'YTick', []);
 			end
 		end
+
+		%=====================================================================
+		%> \   Backslash or left full(F) divide.
+		%===
+		%>
+		%> @b Usage
+		%>
+		%>  &nbsp;&nbsp;&nbsp; <b> X = F\ B </b> is the matrix division of full(F) into B, which is roughly the
+		%>          same as Faust.pinv(F)*B.
+		%>
+		%> <p> @b See @b also Faust.pinv, mldivide Matlab built-in.
+		%=====================================================================
+		function X = mldivide(F,B)
+			X = mldivide(full(F),B)
+		end
+
+		%=====================================================================
+		%> Pseudoinverse matrix of full(F).
+		%===
+		%> This function overloads a Matlab built-in function.
+		%>
+		%> @b Usage
+		%>
+		%>  &nbsp;&nbsp;&nbsp; <b> X = PINV(F) </b> produces the matrix X of the same dimensions as F'
+		%>  so that F*(F'*X')' == full(F) (or approximately).
+		%>
+		%> <p> @b See @b also Faust.mldivide, pinv Matlab built-in.
+		%=====================================================================
+		function X = pinv(F)
+			X = pinv(full(F))
+		end
+
 	end
 	methods(Static)
 	end
