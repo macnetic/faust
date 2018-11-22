@@ -754,6 +754,7 @@ class Faust:
             >>> F[0:i1, ...] # equivalent to F[0:i1, ::]
             >>> F[2::, :3:] # equivalent to F[2:F.shape[0],0:3]
             >>> F[0:i2:2,:] # takes every row of even index until the row i2 (excluded)
+            >>> F[-1:-3:-1,:] # takes the two last rows in reverse order
             >>> F[i2:0:-2,:] # starts from row i2 and goes backward to take one in two rows until the first one (reversing order of F)
             >>> F[[1,18,2],:] # takes in this order the rows 1, 18 and 2
             >>> F[:, [1,18,2]] # takes in this order the columns 1, 18 and 2
@@ -822,19 +823,27 @@ class Faust:
             if(isinstance(out_indices[i], slice)):
                 if(out_indices[i].start == None and out_indices[i].stop == None):
                     #F[::] or F[::,any] or F[any, ::]
-                    out_indices[i] = slice(0,F.shape[i])
+                    out_indices[i] = slice(0,F.shape[i],out_indices[i].step)
                 elif(out_indices[i].start == None): # out_indices[i].stop != None
-                    out_indices[i] = slice(0, out_indices[i].stop)
+                    out_indices[i] = slice(0, out_indices[i].stop,
+                                           out_indices[i].step)
                 elif(out_indices[i].stop == None): # out_indices[i].start != None
-                    out_indices[i] = slice(out_indices[i].start, F.shape[i])
+                    out_indices[i] = slice(out_indices[i].start,
+                                           F.shape[i],out_indices[i].step)
                 if(out_indices[i].stop < 0):
                     out_indices[i] = slice(out_indices[i].start,
-                                           F.shape[i]+out_indices[i].stop)
+                                           F.shape[i]+out_indices[i].stop,
+                                           out_indices[i].step)
 
                 if(out_indices[i].step == None):
                     out_indices[i] = slice(out_indices[i].start,
                                                 out_indices[i].stop,
                                                 1)
+                if(out_indices[i].start < 0):
+                    out_indices[i] = \
+                    slice(F.shape[i]+out_indices[i].start,out_indices[i].stop,
+                         out_indices[i].step)
+
                 if(out_indices[i].start >= F.shape[i] or out_indices[i].stop > F.shape[i]):
                     raise IndexError("index "+
                                      str(max(out_indices[i].start,out_indices[i].stop-1))+

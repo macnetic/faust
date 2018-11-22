@@ -199,17 +199,18 @@ class TestFaustPy(unittest.TestCase):
         prod = self.mulFactors()
         test_prod = self.F[::,::].todense()
         self.assertProdEq(prod, test_prod)
+        # reminder the Faust is of minimal size 3 for the both dims (MIN_DIM_SIZE)
         # test_prod = self.F[...,...].todense() # forbidden (only one index can
         # be an ellipsis)
         # self.assertProdEq(prod, test_prod)
         # test one random element
-        rand_i, rand_j = self.r.randint(0,self.F.shape[0]-1),self.r.randint(0,self.F.shape[1]-1)
+        rand_i, rand_j = self.r.randint(0,self.F.shape[0]-2),self.r.randint(0,self.F.shape[1]-2)
         if(prod[rand_i,rand_j] != 0):
             self.assertLessEqual(abs(self.F[rand_i,rand_j]-prod[rand_i,rand_j])/abs(prod[rand_i,rand_j]),
                                  10**-6, msg=("compared values are (ref,rest) ="
                                               +str(prod[rand_i,rand_j])+str(prod[rand_i,rand_j])))
         # test one random row
-        rand_i = self.r.randint(0,self.F.shape[0]-1)
+        rand_i = self.r.randint(0,self.F.shape[0]-2)
         row = self.F[rand_i,...].todense()
         for j in range(0,self.F.shape[1]):
             if(row[0,j] == 0):
@@ -217,7 +218,7 @@ class TestFaustPy(unittest.TestCase):
             else:
                 self.assertLessEqual(abs(row[0,j]-(prod[rand_i,j]))/prod[rand_i,j],10**-6)
         # test one random col
-        rand_j = self.r.randint(0,self.F.shape[1]-1)
+        rand_j = self.r.randint(0,self.F.shape[1]-2)
         col = self.F[..., rand_j].todense()
         for i in range(0,self.F.shape[0]):
             if(col[i,0] == 0):
@@ -227,7 +228,7 @@ class TestFaustPy(unittest.TestCase):
         # test that the sliced Faust is consistent with the sliced full matrix
         # of the Faust
         rand_ii, rand_jj = \
-        self.r.randint(rand_i+1,self.F.shape[0]),self.r.randint(rand_j+1,self.F.shape[1])
+        self.r.randint(rand_i+1,self.F.shape[0]-1),self.r.randint(rand_j+1,self.F.shape[1]-1)
         sF = self.F[rand_i:rand_ii,rand_j:rand_jj]
         n1 = norm(sF.toarray()-self.F.todense()[rand_i:rand_ii,rand_j:rand_jj])
         n2 = norm(self.F.todense()[rand_i:rand_ii,rand_j:rand_jj])
@@ -236,9 +237,9 @@ class TestFaustPy(unittest.TestCase):
         else:
             self.assertLessEqual(n1/n2,0.005)
         # test a second slice on sF
-        rand_i, rand_j = self.r.randint(0,sF.shape[0]-1),self.r.randint(0,sF.shape[1]-1)
+        rand_i, rand_j = self.r.randint(0,sF.shape[0]-2),self.r.randint(0,sF.shape[1]-2)
         rand_ii, rand_jj = \
-        self.r.randint(rand_i+1,sF.shape[0]),self.r.randint(rand_j+1,sF.shape[1])
+        self.r.randint(rand_i+1,sF.shape[0]-1),self.r.randint(rand_j+1,sF.shape[1]-1)
         sF2 = sF[rand_i:rand_ii,rand_j:rand_jj]
         n1 = norm(sF2.todense()-sF.todense()[rand_i:rand_ii,rand_j:rand_jj])
         n2 = norm(sF.todense()[rand_i:rand_ii,rand_j:rand_jj])
@@ -246,6 +247,10 @@ class TestFaustPy(unittest.TestCase):
             self.assertLessEqual(n1,0.0005)
         else:
             self.assertLessEqual(n1/n2,0.005)
+        rand_i, rand_j = \
+        self.r.randint(0,self.F.shape[0]-2),self.r.randint(0,self.F.shape[1]-2)
+        rand_ii, rand_jj = \
+        self.r.randint(rand_i+1,self.F.shape[0]-1),self.r.randint(rand_j+1,self.F.shape[1]-1)
         print("test fancy indexing on rows")
         F = self.F
         num_inds = self.r.randint(1,F.shape[0])
@@ -348,6 +353,31 @@ class TestFaustPy(unittest.TestCase):
             self.assertLessEqual(n1,0.0005)
         else:
             self.assertLessEqual(n1/n2, 0.005)
+        print("test slicing with start and stop indices being negative (relative "
+              "position to the end: -1 for the last elt etc.")
+        # assuming F.shape[0] > rand_ii > rand_i >= 0, likewise for rand_j,
+        # rand_jj
+        # reminder: slice(None) means 0:-1:1
+        # test multiple confs in a loop
+        for slice_row, slice_col in \
+        [(slice(rand_i-F.shape[0],rand_ii-F.shape[0]),slice(None)), # conf1
+         (slice(None),slice(rand_j-F.shape[1],rand_jj-F.shape[1])), # conf2
+         # conf 3
+         (slice(rand_i-F.shape[0],rand_ii-F.shape[0]),
+          slice(rand_j-F.shape[1],rand_jj-F.shape[1])),
+         #conf 4
+         (slice(rand_i-F.shape[0],rand_ii-F.shape[0], rstep),slice(None)),
+         #conf 5
+         (slice(None),slice(rand_j-F.shape[1],rand_jj-F.shape[1],cstep))
+        ]:
+            sF = F[slice_row, slice_col]
+            n1 = norm(sF.toarray()-F.toarray()[slice_row,slice_col])
+            n2 = norm(F.toarray()[slice_row,slice_col])
+            if(n2 == 0): # avoid nan error
+                self.assertLessEqual(n1,0.0005)
+            else:
+                self.assertLessEqual(n1/n2, 0.005)
+
 
 
 
