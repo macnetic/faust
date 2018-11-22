@@ -101,7 +101,8 @@ class Faust:
     In this documentation, the expression 'full matrix' designates the array
     Faust.toarray() obtained by the multiplication of the Faust factors.
 
-   List of functions that are memory costly: toarray(), todense().
+   List of functions that are memory costly: Faust.toarray(), Faust.todense(),
+   Faust.pinv().
 
     For more information about FAµST take a look at http://faust.inria.fr.
     """
@@ -1155,6 +1156,14 @@ class Faust:
                 fac = fac.toarray()
             plt.xticks([]); plt.yticks([])
             plt.imshow(abs(fac),extent=[0,100,0,1], aspect='auto')
+
+    def pinv(F):
+        """
+            Computes the (Moore-Penrose) pseudo-inverse of a Faust full matrix.
+
+        """
+        from numpy.linalg.linalg import pinv
+        return pinv(F.toarray())
 
 class FaustFactory:
     """
