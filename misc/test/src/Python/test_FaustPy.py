@@ -236,17 +236,19 @@ class TestFaustPy(unittest.TestCase):
             self.assertLessEqual(n1,0.0005)
         else:
             self.assertLessEqual(n1/n2,0.005)
-        # test a second slice on sF
-        rand_i, rand_j = self.r.randint(0,sF.shape[0]-2),self.r.randint(0,sF.shape[1]-2)
-        rand_ii, rand_jj = \
-        self.r.randint(rand_i+1,sF.shape[0]-1),self.r.randint(rand_j+1,sF.shape[1]-1)
-        sF2 = sF[rand_i:rand_ii,rand_j:rand_jj]
-        n1 = norm(sF2.todense()-sF.todense()[rand_i:rand_ii,rand_j:rand_jj])
-        n2 = norm(sF.todense()[rand_i:rand_ii,rand_j:rand_jj])
-        if(n2 == 0): # avoid nan error
-            self.assertLessEqual(n1,0.0005)
-        else:
-            self.assertLessEqual(n1/n2,0.005)
+        # test a second slice on sF only if the shape allows it # min shape (1,1)
+        if(sF.shape[0] >= 2 and sF.shape[1] >= 2):
+            rand_i, rand_j = \
+            self.r.randint(0,sF.shape[0]-2),self.r.randint(0,sF.shape[1]-2)
+            rand_ii, rand_jj = \
+                    self.r.randint(rand_i+1,sF.shape[0]-1),self.r.randint(rand_j+1,sF.shape[1]-1)
+            sF2 = sF[rand_i:rand_ii,rand_j:rand_jj]
+            n1 = norm(sF2.todense()-sF.todense()[rand_i:rand_ii,rand_j:rand_jj])
+            n2 = norm(sF.todense()[rand_i:rand_ii,rand_j:rand_jj])
+            if(n2 == 0): # avoid nan error
+                self.assertLessEqual(n1,0.0005)
+            else:
+                self.assertLessEqual(n1/n2,0.005)
         rand_i, rand_j = \
         self.r.randint(0,self.F.shape[0]-2),self.r.randint(0,self.F.shape[1]-2)
         rand_ii, rand_jj = \
