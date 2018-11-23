@@ -340,7 +340,7 @@ classdef Faust
 		%>You cannot multiply a real Faust by a complex scalar (not yet implemented).
 		%> @endcode
 		%>
-		%> <p>@b See @b also Faust.Faust, Faust.rcg, Faust.ctranspose.
+		%> <p>@b See @b also Faust.Faust, Faust.rcg, Faust.ctranspose, Faust.complex
 		%>
 		%======================================================================
 		function G = mtimes(F,A)
@@ -351,7 +351,7 @@ classdef Faust
 			%
 			% See also mtimes_trans
 			if(isa(A, 'matfaust.Faust') && isscalar(F))
-				G = mtimes_trans(A,F, 0);
+				G = mtimes_trans(A, F, 0);
 			else
 				G = mtimes_trans(F, A, 0);
 			end
@@ -394,6 +394,9 @@ classdef Faust
 			if (trans ~= 1) && (trans ~= 0)
 				error('invalid argument trans, must be equal to 0 or 1');
 			end
+			% TODO: take trans into account when mul F to a scal or a Faust
+			% it's not a serious issue because mtimes_trans() shouln't be called by final user
+			% (func's doc is filtered out in doxydoc)
 			if(issparse(A))
 				error('Faust multiplication to a sparse matrix isn''t supported.')
 			elseif(isa(A,'matfaust.Faust'))
@@ -404,7 +407,12 @@ classdef Faust
 				end
 			elseif(isscalar(A))
 				if (F.isReal)
-					C = matfaust.Faust(F, mexFaustReal('mul_scalar', F.matrix.objectHandle, A));
+					if(isreal(A))
+						C = matfaust.Faust(F, mexFaustReal('mul_scalar', F.matrix.objectHandle, A));
+					else
+						cF = complex(F)
+						C = mtimes_trans(cF, A, trans)
+					end
 				else
 					C = matfaust.Faust(F, mexFaustCplx('mul_scalar', F.matrix.objectHandle, A));
 				end
@@ -487,6 +495,7 @@ classdef Faust
 		%>
 		%> @retval bool 1 if F is a real Faust, 0 if it's a complex Faust.
 		%>
+		%> <p/>@b See @b also Faust.complex
 		%======================================================================
 		function bool = isreal(F)
 			%% ISREAL True for real scalar Faust (overloaded Matlab built-in function).
@@ -567,7 +576,7 @@ classdef Faust
 		%>	% F_ctrans == F_ctrans2
 		%> @endcode
 		%>
-		%> <p/>@b See @b also Faust.transpose, Faust.conj
+		%> <p/>@b See @b also Faust.transpose, Faust.conj, Faust.complex
 		%>
 		%======================================================================
 		function F_ctrans = ctranspose(F)
@@ -605,7 +614,7 @@ classdef Faust
 		%>	F_conj = conj(F)
 		%> @endcode
 		%>
-		%> <p/>@b See @b also Faust.transpose, Faust.ctranspose
+		%> <p/>@b See @b also Faust.transpose, Faust.ctranspose, Faust.complex
 		%>
 		%======================================================================
 		function F_conj = conj(F)
@@ -1631,6 +1640,37 @@ classdef Faust
 		%=====================================================================
 		function X = pinv(F)
 			X = pinv(full(F))
+		end
+
+		%================================================================
+		%> Converts F to a complex Faust.
+		%===
+		%> This function overloads a Matlab built-in function.
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; <b> cF = COMPLEX(F) </b> for real Faust F returns the complex result cF
+		%> with real part F and zero matrix as imaginary part of all cF's factors.
+		%>
+		%> <p> @b See @b also Faust.isreal, Faust.conj
+		%================================================================
+		function cF = complex(F)
+			if(~ isreal(F))
+				cF = F;
+			else
+				n = get_num_factors(F);
+				factors = cell(1,n);
+				for i=1:n
+					factors{i} = get_factor(F,i);
+					if(issparse(factors{i}))
+						% avoid complex() error: Input A must be numeric and full.
+						factors{i} = sparse(complex(full(factors{i})));
+					else
+						factors{i} = complex(factors{i});
+					end
+				end
+				cF = matfaust.Faust(factors);
+			end
 		end
 
 	end
