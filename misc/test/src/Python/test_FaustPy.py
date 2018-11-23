@@ -394,12 +394,13 @@ class TestFaustPy(unittest.TestCase):
 
     def testMul(self):
         print("testMul()")
+        print("test mul by a full real matrix")
         rmat = np.random.rand(self.F.shape[1],
                               self.r.randint(1,TestFaustPy.MAX_DIM_SIZE))
         prod = self.mulFactors().dot(rmat)
         test_prod = self.F*rmat
         self.assertProdEq(prod, test_prod)
-        # test mul by a complex matrix
+        print("test mul by a full complex matrix")
         j = np.complex(0,1)
         rand = np.random.rand
         cmat = rand(rmat.shape[0], rmat.shape[1]) + j*rand(rmat.shape[0],
@@ -407,7 +408,7 @@ class TestFaustPy(unittest.TestCase):
         prod = self.mulFactors().dot(cmat)
         test_prod = self.F*cmat
         self.assertProdEq(prod, test_prod)
-        # test mul by a real scalar
+        print("test mul by a real scalar")
         import random
         r = random.random()*100
         test_prod = self.F*r
@@ -417,7 +418,13 @@ class TestFaustPy(unittest.TestCase):
         self.assertLess(norm((self.F.T*r).toarray()-self.F.toarray().T*r)/norm(self.F.toarray().T*r),1**-5)
         self.assertLess(norm((self.F.H*r).toarray()-self.F.toarray().T.conj()*r)/norm(self.F.toarray().T.conj()*r),1**-5)
 
-        #TODO: test mul by a complex scalar when impl.
+        print("test mul by a complex scalar")
+        c = np.complex(r, random.random()*100)
+        test_prod = self.F*c
+        ref_prod = self.mulFactors()*c
+        self.assertLess(norm(test_prod.toarray()-ref_prod)/norm(ref_prod),
+                        1**-5)
+
 
     def testConcatenate(self):
         print("testConcatenate()")

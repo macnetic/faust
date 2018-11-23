@@ -224,24 +224,32 @@ cdef class FaustCore:
 
     def multiply_scal(self, scalar):
         core = FaustCore(core=True)
+        core._isReal = self._isReal
         if(isinstance(scalar, int)):
             scalar = float(scalar)
+        scalar_type_err = TypeError("The mul. scalar must be a real or a"
+                                    " complex number")
         if(self._isReal):
             if(isinstance(scalar, float)):
                 core.core_faust_dbl = \
                         self.core_faust_dbl.mul_scal(scalar)
+            elif(isinstance(scalar, np.complex)):
+                 cplx_facs = [self.get_fact_opt(i).astype(np.complex) for i in \
+                              range(0,self.get_nb_factors())]
+                 cplx_facs[0] *= scalar # instead of passing the scal to the
+                                        # construc. It avoids disp of
+                                        # deprecation warning
+                 core = FaustCore(cplx_facs)#, alpha=scalar)
+                 core._isReal = False
             else:
-                raise ValueError("You cannot multiply a real Faust by a"
-                                " complex scalar (not yet implemented).")
+                raise scalar_type_err
         else:
             if(isinstance(scalar, np.complex) or isinstance(scalar,
                                                             float)):
                 core.core_faust_cplx = \
                         self.core_faust_cplx.mul_scal(scalar)
             else:
-                raise ValueError("The multiplicative scalar must be a real or "
-                                "a complex number.")
-        core._isReal = self._isReal
+                raise scalar_type_err
         return core
 
     cdef _vertcat(self, F):
