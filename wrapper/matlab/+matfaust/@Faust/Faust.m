@@ -401,7 +401,11 @@ classdef Faust
 				error('Faust multiplication to a sparse matrix isn''t supported.')
 			elseif(isa(A,'matfaust.Faust'))
 				if (F.isReal)
-					C = matfaust.Faust(F, mexFaustReal('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
+					if(isreal(A))
+						C = matfaust.Faust(F, mexFaustReal('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
+					else
+						C = mtimes_trans(complex(F), A, trans);
+					end
 				else
 					C = matfaust.Faust(F, mexFaustCplx('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
 				end
@@ -410,8 +414,7 @@ classdef Faust
 					if(isreal(A))
 						C = matfaust.Faust(F, mexFaustReal('mul_scalar', F.matrix.objectHandle, A));
 					else
-						cF = complex(F)
-						C = mtimes_trans(cF, A, trans)
+						C = mtimes_trans(complex(F), A, trans);
 					end
 				else
 					C = matfaust.Faust(F, mexFaustCplx('mul_scalar', F.matrix.objectHandle, A));

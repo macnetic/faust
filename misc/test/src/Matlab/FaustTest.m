@@ -336,7 +336,15 @@ classdef FaustTest < matlab.unittest.TestCase
 			this.verifyNotEqual(test_commu_rF, ref_full_faust*(r+1))
 			this.assertLessThan(norm(full(F'*r)-full(F)'*r)/norm(full(F)'*r), eps(1.))
 			this.assertLessThan(norm(full(F.'*r)-full(F).'*r)/norm(full(F).'*r), eps(1.))
-
+			disp('test mul of two Fausts')
+			r_fausts = {matfaust.FaustFactory.rand(randi(100), size(F,2)),
+			matfaust.FaustFactory.rand(randi(100), size(F,2), .5, 'complex')};
+			for ii=1:length(r_fausts)
+				rF = r_fausts{ii};
+				test_rF = full(F*rF);
+				ref_rF = ref_full_faust*full(rF);
+				this.verifyEqual(test_rF, ref_rF, 'RelTol', 10^-3);
+			end
 		end
 
 		function testcat(this)
