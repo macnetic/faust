@@ -248,6 +248,38 @@ classdef Faust
 		end
 
 		%======================================================================
+		%======================================================================
+		function F = plus(varargin)
+			import matfaust.Faust
+			F = varargin{1}
+			for i=2:nargin
+				G = varargin{i};
+				if(isa(G,'matfaust.Faust'))
+					if(size(G) ~= size(F))
+						error('Dimensions must agree.')
+					end
+					C = [F,G];
+					Id = speye(size(C,2)/2);
+					F = C*Faust([ Id  ; Id ]);
+				elseif(isscalar(G))
+					F = F+(Faust({speye(size(F,1),size(F,2)), ones(size(F,2), 1)*G, ones(1, size(F,2))}));
+				else
+					error('Cannot add a Faust to something that is not a Faust or a scalar.')
+				end
+			end
+		end
+
+		%======================================================================
+		%======================================================================
+		function M = minus(varargin)
+			M = varargin{1}
+			for i=2:nargin
+				varargin{i} = varargin{i}*-1;
+			end
+			M  = plus(M, varargin{2:end});
+		end
+
+		%======================================================================
 		%>  /   Slash or right Faust divide.
 		%===
 		%> @b Usage
@@ -1536,7 +1568,7 @@ classdef Faust
 				else
 					error(err_1st_arg)
 				end
-				C = F
+				C = F;
 				for i=3:nargin
 					A = varargin{i};
 					if(ismatrix(A) && ~ isa(A, 'matfaust.Faust'))
