@@ -415,6 +415,24 @@ class Faust:
         print(F.__repr__())
         #F.m_faust.display()
 
+    def __truediv__(F,s):
+        """
+        Divides F by the scalar s.
+
+        Args:
+            - F: the Faust object.
+            - s: the scalar to divide the Faust object with.
+
+        Returns: the division result as a Faust object.
+        """
+        if(isinstance(s, float) or isinstance(s, np.complex) or isinstance(s,
+                                                                           int)):
+            return F*(1./s)
+        else:
+            raise Exception("unsupported operand type(s) for /: a Faust can only be "
+                  "divided by a scalar.")
+
+
     def __mul__(F, A):
         """
         Multiplies F by A which is a full matrix, a Faust object or a scalar number.
@@ -1491,3 +1509,4 @@ class FaustFactory:
         #                   "factorization.")
 
 
+pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__

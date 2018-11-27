@@ -392,6 +392,17 @@ class TestFaustPy(unittest.TestCase):
         #self.assertTrue((self.F.toarray() == prod).all())
 
 
+    def testScalDiv(self):
+        print("test div by a scalar: real and complex.")
+        scals = [ self.r.random()*100,
+                 np.complex(self.r.random()*100,self.r.random()*100),
+                 self.r.randint(1,100)]
+        F = self.F
+        for s in scals:
+            test_F = F/s
+            ref_full_F = self.mulFactors()/s
+            self.assertAlmostEqual(norm(test_F.toarray()-ref_full_F), 0, places=3)
+
     def testMul(self):
         print("testMul()")
         print("test mul by a full real matrix")
@@ -434,10 +445,10 @@ class TestFaustPy(unittest.TestCase):
             assert(isinstance(rF, Faust))
             test_prod = F*rF
             ref_prod = self.mulFactors().dot(rF.toarray())
-            print('test_prod=', test_prod)
-            print('ref_prof=', ref_prod.shape)
-            print("test_prod=", test_prod.toarray())
-            print("ref_prof=", ref_prod)
+#            print('test_prod=', test_prod)
+#            print('ref_prof=', ref_prod.shape)
+#            print("test_prod=", test_prod.toarray())
+#            print("ref_prof=", ref_prod)
             self.assertLess(norm(test_prod.toarray()-ref_prod)/norm(ref_prod),
                             1**-5)
 
