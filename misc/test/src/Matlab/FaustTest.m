@@ -347,6 +347,15 @@ classdef FaustTest < matlab.unittest.TestCase
 			end
 		end
 
+		function testdiv(this)
+			s = rand(1,1);
+			disp(['test div of a Faust by scalar = ' num2str(s)])
+			F = this.test_faust;
+			full_test_F = full(F/s);
+			ref = full(F)/s;
+			this.verifyEqual(full_test_F, ref, 'RelTol', 10^-3)
+		end
+
 		function testcat(this)
 			import matfaust.*
 			disp('Test cat')

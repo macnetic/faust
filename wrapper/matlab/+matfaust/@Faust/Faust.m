@@ -248,6 +248,27 @@ classdef Faust
 		end
 
 		%======================================================================
+		%>  /   Slash or right Faust divide.
+		%===
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; G = F/s is the division of the Faust F by the scalar s.<br/>
+		%> &nbsp;&nbsp;&nbsp; G = MRDIVIDE(F,s) is called for the syntax 'F / s' when s is a scalar.
+		%>
+		%> @param F The Faust object to divide.
+		%> @param s The scalar to divide F with.
+		%>
+		%> @retval G: the division result as a Faust object.
+		%>
+		%======================================================================
+		function G = mrdivide(F,s)
+			if(~ isscalar(s))
+				error('Unsupported operand type(s) for /: a Faust can only be divided by a scalar.')
+			end
+			G = mtimes(F,1/s)
+		end
+
+		%======================================================================
 		%> @brief Multiplies the Faust F by A which is a full matrix, a Faust object or a scalar.
 		%>
 		%> This function overloads a Matlab built-in function.
