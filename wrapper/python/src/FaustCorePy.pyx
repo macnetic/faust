@@ -211,16 +211,33 @@ cdef class FaustCore:
     cdef multiply_faust(self, F):
         if(isinstance(F, FaustCore)):
             core = FaustCore(core=True)
-            if(self._isReal):
-                core.core_faust_dbl = \
-                self.core_faust_dbl.mul_faust((<FaustCore?>F).core_faust_dbl)
-            else:
-                core.core_faust_cplx = \
-                        self.core_faust_cplx.mul_faust((<FaustCore?>F).core_faust_cplx)
             core._isReal = self._isReal
+            if(self._isReal):
+                if(F.isReal()):
+                    core.core_faust_dbl = \
+                            self.core_faust_dbl.mul_faust((<FaustCore?>F).core_faust_dbl)
+                else:
+                    core = \
+                   <FaustCore?> (<FaustCore?> self._ascomplex()).multiply_faust(F)
+            else:
+                if(F.isReal()):
+                    core.core_faust_cplx = \
+                             self.core_faust_cplx.mul_faust((<FaustCore?>((<FaustCore?>((<FaustCore?>F)._ascomplex())))).core_faust_cplx)
+                else:
+                    core.core_faust_cplx = \
+                            self.core_faust_cplx.mul_faust((<FaustCore?>F).core_faust_cplx)
             return core
         raise ValueError("F must be a Faust object")
 
+    cdef _ascomplex(self, scalar=1.0):
+        cplx_facs = [self.get_fact_opt(i).astype(np.complex) for i in \
+                              range(0,self.get_nb_factors())]
+        cplx_facs[0] *= scalar # instead of passing the scal to the
+        # construc. It avoids disp of
+        # deprecation warning
+        core = FaustCore(cplx_facs)#, alpha=scalar)
+        core._isReal = False
+        return core
 
     def multiply_scal(self, scalar):
         core = FaustCore(core=True)
@@ -234,13 +251,8 @@ cdef class FaustCore:
                 core.core_faust_dbl = \
                         self.core_faust_dbl.mul_scal(scalar)
             elif(isinstance(scalar, np.complex)):
-                 cplx_facs = [self.get_fact_opt(i).astype(np.complex) for i in \
-                              range(0,self.get_nb_factors())]
-                 cplx_facs[0] *= scalar # instead of passing the scal to the
-                                        # construc. It avoids disp of
-                                        # deprecation warning
-                 core = FaustCore(cplx_facs)#, alpha=scalar)
-                 core._isReal = False
+                core = <FaustCore?>self._ascomplex(scalar)
+                core._isReal = False
             else:
                 raise scalar_type_err
         else:

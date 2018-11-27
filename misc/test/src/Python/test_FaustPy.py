@@ -424,6 +424,22 @@ class TestFaustPy(unittest.TestCase):
         ref_prod = self.mulFactors()*c
         self.assertLess(norm(test_prod.toarray()-ref_prod)/norm(ref_prod),
                         1**-5)
+        print("test mul of two Fausts")
+        from pyfaust import FaustFactory as FF, Faust
+        F = self.F
+        r_fausts = [FF.rand(self.r.randint(1,10), F.shape[1]),
+                    FF.rand(self.r.randint(1,10), F.shape[1], field='complex')]
+        for i in range(0,len(r_fausts)):
+            rF = r_fausts[i]
+            assert(isinstance(rF, Faust))
+            test_prod = F*rF
+            ref_prod = self.mulFactors().dot(rF.toarray())
+            print('test_prod=', test_prod)
+            print('ref_prof=', ref_prod.shape)
+            print("test_prod=", test_prod.toarray())
+            print("ref_prof=", ref_prod)
+            self.assertLess(norm(test_prod.toarray()-ref_prod)/norm(ref_prod),
+                            1**-5)
 
 
     def testConcatenate(self):
