@@ -415,6 +415,30 @@ class Faust:
         print(F.__repr__())
         #F.m_faust.display()
 
+    def __add__(F,*args):
+        for i in range(0,len(args)):
+            G = args[i]
+            if(isinstance(G,Faust)):
+                if(F.shape != G.shape):
+                    raise('Dimensions must agree')
+                C = F.concatenate(G, axis=1)
+                Id = np.eye(int(C.shape[1]/2))
+                F = C*Faust(np.concatenate((Id,Id)),axis=0)
+            elif(isinstance(G,int) or isinstance(G,float) or isinstance(G, np.complex)):
+                F = F+Faust([np.eye(F.shape[0], F.shape[1]),
+                             np.ones((F.shape[1], 1))*G,
+                             np.ones((1, F.shape[1]))])
+            else:
+                raise Exception("Cannot add a Faust to something that is not a"
+                                " Faust or a scalar.")
+        return F
+
+    def __sub__(F,*args):
+        nargs = []
+        for arg in args:
+            nargs += [ arg*-1 ]
+        return F.__add__(*nargs)
+
     def __truediv__(F,s):
         """
         Divides F by the scalar s.
