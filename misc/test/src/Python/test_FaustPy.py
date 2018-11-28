@@ -11,8 +11,8 @@ import math
 
 class TestFaustPy(unittest.TestCase):
 
-    MAX_NUM_FACTORS = 8  # for the tested Faust
-    MAX_DIM_SIZE = 512
+    MAX_NUM_FACTORS = 4  # for the tested Faust
+    MAX_DIM_SIZE = 256
     MIN_DIM_SIZE = 3
 
     def setUp(self):
