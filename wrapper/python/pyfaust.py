@@ -1567,3 +1567,8 @@ class FaustFactory:
 
 
 pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__
+
+def version():
+    """Returns the FAµST package version.
+    """
+    return "@CPACK_PACKAGE_VERSION@"
