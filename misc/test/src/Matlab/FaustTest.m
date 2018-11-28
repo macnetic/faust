@@ -361,19 +361,19 @@ classdef FaustTest < matlab.unittest.TestCase
 
 		function testplus(this)
 			disp('test addition of Faust and scalar (complex and real)')
-			scals = [rand(1,1)] %, rand(1,1)+rand(1,1)*j] %TODO: re-enable complex when #72 is solved
+			scals = [rand(1,1), rand(1,1)+rand(1,1)*j]
 			F = this.test_faust;
 			for i=1:size(scals,2)
 				s = scals(i);
 				disp(['test add of a Faust and scalar = ' num2str(s)])
 				full_test_F = full(F+s);
 				ref = full(F)+s;
-				this.verifyEqual(full_test_F, ref, 'RelTol', 10^-2)
+				this.verifyEqual(norm(full_test_F), norm(ref), 'RelTol', 10^-2)
 			end
 			disp('test plus(Faust1,Faust2)')
 			import matfaust.FaustFactory
 			import matfaust.Faust
-			fausts = {FaustFactory.rand(5,size(F,1))*Faust(rand(size(F,1),size(F,2)))} %, FaustFactory.rand(5,size(F,1), .5, 'complex')*rand(size(F,2),size(F,2))} %TODO: re-enable complex Faust when #72 is solved
+			fausts = {FaustFactory.rand(5,size(F,1))*Faust(rand(size(F,1),size(F,2))), FaustFactory.rand(5,size(F,1), .5, 'complex')*Faust(rand(size(F,1),size(F,2)))}
 			for i=1:length(fausts)
 				F2 = fausts{i}
 				this.verifyEqual(full(F+F2),full(F)+full(F2),'RelTol', 10^-2)

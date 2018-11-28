@@ -293,6 +293,37 @@ classdef FaustFactory
 		end
 
 		%==========================================================================================
+		%> @brief Faust identity matrix.
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b FaustFactory.eye(m,n) forms a M-by-N Faust F = Faust(speye(M,N)).
+		%> &nbsp;&nbsp;&nbsp; @b FaustFactory.eye(m) is a short for FaustFactory.eye(m,n).
+		%> &nbsp;&nbsp;&nbsp; @b FaustFactory.eye(m,n, 'complex') or FaustFactory.eye(m, 'complex') same as above but for getting a complex Faust.
+		%>
+		%==========================================================================================
+		function F = eye(varargin)
+			% TODO: more checking on type and number of arguments
+			if(nargin < 1)
+				error('First argument is mandatory')
+			end
+			import matfaust.Faust
+			m = varargin{1};
+			if(nargin > 1 && isnumeric(varargin{2}))
+				n = varargin{2};
+			else
+				n = m;
+			end
+			if(varargin{nargin} == 'complex')
+				% hack to avoid passing through a full matrix
+				F = Faust(sparse(1:m, 1:n, 1+eps(1)*j));
+			else
+				F = Faust(speye(m,n));
+			end
+		end
+
+
+		%==========================================================================================
 		%> @brief Generates a random Faust.
 		%>
 		%> @b Usage

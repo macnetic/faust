@@ -251,20 +251,36 @@ classdef Faust
 		%======================================================================
 		function F = plus(varargin)
 			import matfaust.Faust
-			F = varargin{1}
+			import matfaust.FaustFactory
+			F = varargin{1};
 			for i=2:nargin
 				G = varargin{i};
 				if(isa(G,'matfaust.Faust'))
-					if(size(G) ~= size(F))
+					if(any(size(G) ~= size(F)))
 						error('Dimensions must agree.')
 					end
 					C = [F,G];
-					Id = speye(size(C,2)/2);
-					F = C*Faust([ Id  ; Id ]);
+					if(~ C.isReal)
+						Fid = FaustFactory.eye(size(C,2)/2, 'complex');
+					else
+						Fid = FaustFactory.eye(size(C,2)/2);
+					end
+					F = C*[Fid;Fid];
 				elseif(isscalar(G))
-					F = F+(Faust({speye(size(F,1),size(F,2)), ones(size(F,2), 1)*G, ones(1, size(F,2))}));
+					if(~ isreal(G) && F.isReal)
+						F = complex(F);
+					elseif(~ isreal(F) && isreal(G))
+						G = complex(G);
+					end
+					if(size(F,1) <= size(F,2))
+						F = F+(Faust({speye(size(F,1),size(F,2)), ones(size(F,2), 1)*G, ones(1, size(F,2))}));
+					else
+						F = F+(Faust({speye(size(F,2),size(F,1)), ones(size(F,1), 1)*G, ones(1, size(F,1))})).';
+					end
+				elseif(ismatrix(G))
+					F = plus(F,Faust(G));
 				else
-					error('Cannot add a Faust to something that is not a Faust or a scalar.')
+					error('Cannot add a Faust to something that is not a Faust, a matrix/array, or a scalar.')
 				end
 			end
 		end
@@ -460,6 +476,9 @@ classdef Faust
 						C = mtimes_trans(complex(F), A, trans);
 					end
 				else
+					if(A.isReal)
+						A = complex(A);
+					end
 					C = matfaust.Faust(F, mexFaustCplx('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
 				end
 			elseif(isscalar(A))
@@ -1577,9 +1596,17 @@ classdef Faust
 					if(~ isa(A, 'matfaust.Faust'))
 						error('Can''t concatenate a Faust to something that is not a Faust or a matrix.')
 					end
-					if(F.isReal)
-						C = matfaust.Faust(C, mexFaustReal(mex_func_name, C.matrix.objectHandle, A.matrix.objectHandle));
+					if(C.isReal)
+						if(~ isreal(A))
+							C = complex(C)
+							C = matfaust.Faust(C, mexFaustCplx(mex_func_name, C.matrix.objectHandle, A.matrix.objectHandle));
+						else
+							C = matfaust.Faust(C, mexFaustReal(mex_func_name, C.matrix.objectHandle, A.matrix.objectHandle));
+						end
 					else
+						if(isreal(A))
+							A = complex(A)
+						end
 						C = matfaust.Faust(C, mexFaustCplx(mex_func_name, C.matrix.objectHandle, A.matrix.objectHandle));
 					end
 				end

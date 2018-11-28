@@ -392,6 +392,57 @@ class TestFaustPy(unittest.TestCase):
         #self.assertTrue((self.F.toarray() == prod).all())
 
 
+    def testPlus(self):
+        from pyfaust import FaustFactory
+        from numpy.random import rand
+        print("testPlus()")
+        print("addition of a Faust-scalar")
+        scals = [ self.r.random()*100,
+                 np.complex(self.r.random()*100,self.r.random()*100),
+                 self.r.randint(1,100)]
+        F = self.F
+        for s in scals:
+            print("scalar=", s)
+            test_F = F+s
+            ref_full_F = self.mulFactors()+s
+            self.assertAlmostEqual(norm(test_F.toarray()-ref_full_F), 0, places=3)
+        print("addition Faust-Faust")
+        fausts = \
+        [ FaustFactory.rand(5,F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
+         FaustFactory.rand(5,F.shape[0], .5,
+                           field='complex')*Faust(rand(F.shape[0],F.shape[1]))]
+        for i in range(0,len(fausts)):
+            F2 = fausts[i]
+            self.assertAlmostEqual(norm((F+F2).toarray()-
+                                        (F.toarray()+F2.toarray())), 0,
+                                   places=2)
+
+    def testMinus(self):
+        from pyfaust import FaustFactory
+        from numpy.random import rand
+        print("testMinus()")
+        print("substraction of a Faust-scalar")
+        scals = [ self.r.random()*100,
+                 np.complex(self.r.random()*100,self.r.random()*100),
+                 self.r.randint(1,100)]
+        F = self.F
+        for s in scals:
+            print("scalar=", s)
+            test_F = F+s
+            ref_full_F = self.mulFactors()+s
+            self.assertAlmostEqual(norm(test_F.toarray()-ref_full_F), 0,
+                                   places=3)
+        print("subtraction Faust-Faust")
+        fausts = \
+        [ FaustFactory.rand(5,F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
+         FaustFactory.rand(5,F.shape[0], .5,
+                           field='complex')*Faust(rand(F.shape[0],F.shape[1]))]
+        for i in range(0,len(fausts)):
+            F2 = fausts[i]
+            self.assertAlmostEqual(norm((F-F2).toarray()-
+                                        (F.toarray()-F2.toarray())), 0,
+                                   places=2)
+
     def testScalDiv(self):
         print("test div by a scalar: real and complex.")
         scals = [ self.r.random()*100,

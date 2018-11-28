@@ -266,32 +266,43 @@ cdef class FaustCore:
 
     cdef _vertcat(self, F):
          core = FaustCore(core=True)
-         #TODO/ G must be a FaustCore
+         #TODO/ F must be a FaustCore
          if(self._isReal):
-             core.core_faust_dbl = self.core_faust_dbl.vertcat((<FaustCore?>F).core_faust_dbl)
-
+             if(not F.isReal()):
+                 self = self._ascomplex()
+                 core.core_faust_cplx = self.core_faust_cplx.vertcat((<FaustCore?>F).core_faust_cplx)
+             else:
+                 core.core_faust_dbl = self.core_faust_dbl.vertcat((<FaustCore?>F).core_faust_dbl)
          else:
              core.core_faust_cplx = \
                      self.core_faust_cplx.vertcat((<FaustCore?>F).core_faust_cplx)
-         core._isReal = self._isReal
+         core._isReal = core.core_faust_dbl != NULL
          return core
 
     def vertcat(self,F):
+        if(F.isReal() and not self.isReal()):
+            return self._vertcat((<FaustCore?>F)._ascomplex())
         return self._vertcat(F)
 
     cdef _horzcat(self, F):
+         #TODO: refactor with _vertcat(), maybe by passing func ref to a cat func
          core = FaustCore(core=True)
-         #TODO/ G must be a FaustCore
+         #TODO/ F must be a FaustCore
          if(self._isReal):
-             core.core_faust_dbl = self.core_faust_dbl.horzcat((<FaustCore?>F).core_faust_dbl)
-
+             if(not F.isReal()):
+                 self = self._ascomplex()
+                 core.core_faust_cplx = self.core_faust_cplx.horzcat((<FaustCore?>F).core_faust_cplx)
+             else:
+                 core.core_faust_dbl = self.core_faust_dbl.horzcat((<FaustCore?>F).core_faust_dbl)
          else:
              core.core_faust_cplx = \
                      self.core_faust_cplx.horzcat((<FaustCore?>F).core_faust_cplx)
-         core._isReal = self._isReal
+         core._isReal = core.core_faust_dbl != NULL
          return core
 
     def horzcat(self,F):
+        if(F.isReal() and not self.isReal()):
+            return self._horzcat((<FaustCore?>F)._ascomplex())
         return self._horzcat(F)
 
     # numpy.matrix is always 2-dimensional but C-style (RowMajor)  stored

@@ -420,17 +420,28 @@ class Faust:
             G = args[i]
             if(isinstance(G,Faust)):
                 if(F.shape != G.shape):
-                    raise('Dimensions must agree')
+                    raise Exception('Dimensions must agree')
                 C = F.concatenate(G, axis=1)
-                Id = np.eye(int(C.shape[1]/2))
-                F = C*Faust(np.concatenate((Id,Id)),axis=0)
+                # Id = np.eye(int(C.shape[1]/2))
+                Fid = FaustFactory.eye(int(C.shape[1]/2))
+                #F = C*Faust(np.concatenate((Id,Id)),axis=0)
+                F = C*Fid.concatenate(Fid,axis=0)
+            elif(isinstance(G,np.ndarray) or
+                 isinstance(G,scipy.sparse.csr_matrix) or
+                 isinstance(G,scipy.sparse.csc_matrix)):
+                F = F+Faust(G)
             elif(isinstance(G,int) or isinstance(G,float) or isinstance(G, np.complex)):
-                F = F+Faust([np.eye(F.shape[0], F.shape[1]),
-                             np.ones((F.shape[1], 1))*G,
-                             np.ones((1, F.shape[1]))])
+                if(F.shape[0] <= F.shape[1]):
+                    F = F+Faust([np.eye(F.shape[0], F.shape[1]),
+                                 np.ones((F.shape[1], 1))*G,
+                                 np.ones((1, F.shape[1]))])
+                else:
+                    F = F+Faust([np.eye(F.shape[1], F.shape[0]),
+                                 np.ones((F.shape[0], 1))*G,
+                                 np.ones((1, F.shape[0]))]).T
             else:
                 raise Exception("Cannot add a Faust to something that is not a"
-                                " Faust or a scalar.")
+                                " Faust, a matrix/array or a scalar.")
         return F
 
     def __sub__(F,*args):
@@ -1409,6 +1420,28 @@ class FaustFactory:
         """
         F = Faust(core_obj=FaustCorePy.FaustCore.fourierFaust(n))
         return F
+
+    @staticmethod
+    def eye(m,n=None,t='real'):
+        """
+            Identity matrix as Faust.
+
+            Args:
+              m: number of rows,
+              n (optional): number of columns, set to m if not specified.
+              t: 'complex' to return a complex Faust otherwise (by default)
+              it's a real Faust.
+        """
+        from scipy.sparse import eye
+        #TODO: more checking on type and value of arguments
+        if(not n):
+            n = m
+        e = eye(m,n).tocsr()
+        if(t == 'complex'):
+            e = e.astype(np.complex)
+        return Faust(e)
+
+
 
     @staticmethod
     def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
