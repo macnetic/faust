@@ -1758,6 +1758,15 @@ classdef Faust
 
 	end
 	methods(Static)
+		%================================================================
+		%> Returns true if obj is a Faust object, false otherwise.
+		%===
+		%>
+		%> <p> @b See @b also Faust.Faust
+		%================================================================
+		function bool = isFaust(obj)
+			bool = isa(obj, 'matfaust.Faust');
+		end
 	end
 end
 

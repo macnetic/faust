@@ -1218,6 +1218,14 @@ class Faust:
         from numpy.linalg.linalg import pinv
         return pinv(F.toarray())
 
+    @staticmethod
+    def isFaust(obj):
+        """
+        Returns True if obj is a Faust object, False otherwise.
+        """
+        return isinstance(obj, Faust)
+
+
 class FaustFactory:
     """
     This factory class provides methods for generating a Faust especially by factorization of a dense matrix.
