@@ -84,9 +84,7 @@ class Faust:
     Other notable limitations are that one cannot:
         - compute the real and imaginary parts of a Faust,
         - perform elementwise operations between two Fausts (e.g. elementwise
-        multiplication).
-        In particular, the addition F+G is undefined for Faust objects (so
-        far).
+        multiplication),
         - reshape.
 
     Primarily for convenience and test purposes, a Faust can be converted into
@@ -415,7 +413,21 @@ class Faust:
         print(F.__repr__())
         #F.m_faust.display()
 
-    def __add__(F,*args):
+    def __add__(F, *args):
+        """
+        Sums F to one or a sequence of variables. Faust objects, arrays or scalars.
+
+        This method overloads the Python function/operator +.
+
+        Args:
+            *args: the list of variables to sum all together with F. These can
+            be: Faust objects, arrays (and scipy.sparse.csr_matrix) or scalars.
+            Faust and arrays/matrices must be of compatible size.
+
+        Returns: the sum as a Faust object.
+
+        <b/>See also Faust.__sub__
+        """
         for i in range(0,len(args)):
             G = args[i]
             if(isinstance(G,Faust)):
@@ -445,6 +457,21 @@ class Faust:
         return F
 
     def __sub__(F,*args):
+        """
+        Substracts from F one or a sequence of variables. Faust objects, arrays or scalars.
+
+        This method overloads the Python function/operator -.
+
+        Args:
+            *args: the list of variables to compute the difference with F. These can
+            be: Faust objects, arrays (and scipy.sparse.csr_matrix) or scalars.
+            Faust and arrays/matrices must be of compatible size.
+
+        Returns: the difference as a Faust object.
+
+        <b/>See also Faust.__add__
+        """
+
         nargs = []
         for arg in args:
             nargs += [ arg*-1 ]
@@ -454,11 +481,17 @@ class Faust:
         """
         Divides F by the scalar s.
 
-        Args:
-            - F: the Faust object.
-            - s: the scalar to divide the Faust object with.
+        This method overloads the Python function/operator `/' (whether s is a
+        float or an integer).
 
-        Returns: the division result as a Faust object.
+        Args:
+        F: the Faust object.
+        s: the scalar to divide the Faust object with.
+
+        Returns:
+            the division result as a Faust object.
+
+        <b/> See also Faust.__mul__
         """
         if(isinstance(s, float) or isinstance(s, np.complex) or isinstance(s,
                                                                            int)):
@@ -539,7 +572,7 @@ class Faust:
             >>> # H is a Faust because F and G are
             >>> F_times_two = F*2
 
-        <b/>See also Faust.__init__, Faust.rcg
+        <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__
         """
         if(isinstance(A, Faust)):
             if(F.shape[1] != A.shape[0]): raise ValueError("The dimensions of "

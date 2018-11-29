@@ -68,8 +68,6 @@
 %> - compute the real and imaginary parts of a Faust,
 %> - perform elementwise operations between two Fausts (e.g. elementwise
 %> multiplication).
-%> In particular, the addition F+G is undefined for Faust objects (so
-%> far).
 %> - reshape,
 %> - invert.
 %>
@@ -248,6 +246,24 @@ classdef Faust
 		end
 
 		%======================================================================
+		%> @brief Plus
+		%>
+		%===
+		%> This function overloads a Matlab built-in function.
+		%>
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b plus(F,G) or F+G adds two Faust together, sizes must be compatible.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b plus(F,A) or F+A adds a Faust and a matrix A, sizes must be compatible.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b plus(F,s) or F+s, with s being a scalar, such that full(F+s) == full(F)+s.<br/>
+		%>
+		%> @param F (first arg.) The Faust object.
+		%> @param G, A, s,… (2nd to n-th args) The variables to add to F; Fausts, matrices or scalars.
+		%>
+		%> @retval S: the sum as a Faust object.
+		%>
+		%> <p>@b See @b also Faust.minus
 		%======================================================================
 		function F = plus(varargin)
 			import matfaust.Faust
@@ -286,6 +302,24 @@ classdef Faust
 		end
 
 		%======================================================================
+		%> @brief Minus
+		%>
+		%===
+		%> This function overloads a Matlab built-in function.
+		%>
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b minus(F,G) or F-G substracts the Faust G from F, sizes must be compatible.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b minus(F,A) or F-A substracts a matrix A from F, sizes must be compatible.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b minus(F,s) or F-s substracts a scalar s from F, such that full(F-s) == full(F)-s.<br/>
+		%>
+		%> @param F (first arg.) The Faust object.
+		%> @param G, A, s,… (2nd to n-th args) The variables to substract from F; Fausts, matrices or scalars.
+		%>
+		%> @retval M: the difference as a Faust object.
+		%>
+		%> <p>@b See @b also Faust.plus
 		%======================================================================
 		function M = minus(varargin)
 			M = varargin{1}
@@ -300,7 +334,7 @@ classdef Faust
 		%===
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; G = F/s is the division of the Faust F by the scalar s.<br/>
+		%> &nbsp;&nbsp;&nbsp; G = F/s is the division of the Faust F by the scalar s, such that full(F)/s == full(F/s)<br/>
 		%> &nbsp;&nbsp;&nbsp; G = MRDIVIDE(F,s) is called for the syntax 'F / s' when s is a scalar.
 		%>
 		%> @param F The Faust object to divide.
@@ -308,6 +342,7 @@ classdef Faust
 		%>
 		%> @retval G: the division result as a Faust object.
 		%>
+		%> <p>@b See @b also Faust.mtimes
 		%======================================================================
 		function G = mrdivide(F,s)
 			if(~ isscalar(s))
