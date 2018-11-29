@@ -35,7 +35,7 @@ classdef FaustFactory
 	properties (SetAccess = public)
 
 	end
-	properties(SetAccess = private, Hidden = false, Constant)
+	properties(SetAccess = private, Hidden = true, Constant)
 			%> Identifies a complex Faust.
 			COMPLEX=3;
 			%> Identifies a real Faust.

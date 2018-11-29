@@ -292,11 +292,11 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M)
+		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M, bool optimizedCopy /* false by default */)
 		{
 			//warning: should not be called after initialization of factors (to respect the immutable property)
 			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after)
-			this->transform->push_back(M, true, is_conjugate); //2nd argument is for opt. (transforming dense matrix in sparse if possible)
+			this->transform->push_back(M, optimizedCopy, is_conjugate); //2nd argument is for opt. (possibly converting dense <-> sparse)
 		}
 
 	template<typename FPP>

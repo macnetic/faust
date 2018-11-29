@@ -92,11 +92,11 @@ namespace Faust
 				/** \brief Constructor
 				 * \tparam facts : std::Vector including MatGeneric pointer representing the factor of the Transform that will be copied in the Transform
 				 * \tparam lambda (optional) : the multiplicative scalar (default value 1.0)
-				 * \tparam optimizedCopy (optionnal) : boolean to control which type of copy of facts is made,
+				 * \tparam optimizedCopy (optional) : boolean to control which type of copy of facts is made,
 				 if True, the copy is optimized, the dynamic type of the factor can changed
 				 if False, the dynamic type stay the same
-				 (default value true)*/
-				Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=true, const bool cloning_fact=true);
+				 (default value false)*/
+				Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact=true);
 
 				Transform(const Transform<FPP,Cpu> & A);
 
@@ -171,21 +171,21 @@ namespace Faust
 				  F={S_0,S_1,S_2,..,S_n} becomes {S_0,S_1,S_2,..,S_n,copy(M)}
 				 * \tparam M : MatGeneric pointer representing the factor that will be copied at the end of the Faust
 
-				 * \param optimizedCopy (optionnal) : boolean to control which type of copy of the fact is made,
+				 * \param optimizedCopy (optional) : boolean to control which type of copy of the fact is made,
 				 if True, the copy is optimized, the dynamic type of the factor can changed
 				 if False, the dynamic type stay the same
-				 (default value true)*/
-				void push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=true, const bool conjugate=false);
+				 (default value false)*/
+				void push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false);
 
 
 
 				/** \brief Constructor
 				 * \tparam M : MatGeneric pointer representing the factor that will be copied
-				 * \param optimizedCopy (optionnal) : boolean to control which type of copy of the fact is made,
+				 * \param optimizedCopy (optional) : boolean to control which type of copy of the fact is made,
 				 if True, the copy is optimized, the dynamic type of the factor can changed
 				 if False, the dynamic type stay the same
-				 (default value true)*/
-				void push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=true);
+				 (default value false)*/
+				void push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false);
 				//void pop_back(Faust::MatGeneric<FPP,Cpu>* M);
 				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M);
 				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M) const;

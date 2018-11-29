@@ -187,7 +187,7 @@ Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 }
 
 template<typename FPP>
-Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *> & facts, const FPP lambda_ /*default value = 1.0 */,const bool optimizedCopy /*default value = true*/, const bool cloning_fact /* default to true */) :
+Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *> & facts, const FPP lambda_ /*default value = 1.0 */,const bool optimizedCopy /*default value = false*/, const bool cloning_fact /* default to true */) :
 	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	totalNonZeros(0)
 {
@@ -811,7 +811,7 @@ faust_unsigned_int Faust::Transform<FPP,Cpu>::get_fact_nnz(const faust_unsigned_
 }
 
 	template<typename FPP>
-void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,const bool optimizedCopy /*default value = true */, const bool conjugate)
+void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,const bool optimizedCopy /*default value = false */, const bool conjugate)
 {
 	if (size()>0)
 	{
@@ -833,7 +833,7 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,co
 
 
 	template<typename FPP>
-void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /*default value = true */)
+void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /*default value = false */)
 {
 	if (size()>0)
 		if(this->getNbRow()!=M->getNbCol() || M->getNbRow()<1)

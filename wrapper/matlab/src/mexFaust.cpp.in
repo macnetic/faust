@@ -225,7 +225,7 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 
 
                 // 3rd input (optionnal) : boolean to determine the type of copy
-                bool optimizedCopy = true;
+                bool optimizedCopy = false;
                 if (nrhs > 3)
                 {
                     double optimizedCopy_inter = mxGetScalar(prhs[3]);

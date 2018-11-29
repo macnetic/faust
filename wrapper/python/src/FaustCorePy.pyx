@@ -64,7 +64,8 @@ cdef class FaustCore:
     cdef bool _isReal
     #### CONSTRUCTOR ####
     #def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
-    def  __cinit__(self,list_factors=None, alpha=1.0, core=False):
+    def  __cinit__(self,list_factors=None, alpha=1.0, core=False,
+                   optimizedCopy=False):
         cdef double [:,:] data
         cdef double [:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -73,6 +74,9 @@ cdef class FaustCore:
         cdef complex [:] data1d_cplx #only for csr mat factor
         cdef unsigned int nbrow
         cdef unsigned int nbcol
+        optimizedCopy=False # TODO: for the moment the auto-conversion of
+        #  factors (for opt. of mul by vec) is not enabled, re-enable it later
+        # by getting from constructor set by a call from a Faust constructor
         if(alpha != 1.0):
             print("WARNING: the constructor argument for multiplying the Faust"
                   " by a scalar is DEPRECATED and might not be supported in next"
@@ -108,13 +112,15 @@ cdef class FaustCore:
                 if(self._isReal):
                    if(isinstance(factor, np.ndarray)):
                       data=factor.astype(float,'F')
-                      self.core_faust_dbl.push_back(&data[0,0], nbrow, nbcol)
+                      self.core_faust_dbl.push_back(&data[0,0], nbrow, nbcol,
+                                                    optimizedCopy)
                    else: #csr.csr_matrix
                       data1d=factor.data.astype(float,'F')
                       indices=factor.indices.astype(np.int32, 'F')
                       indptr=factor.indptr.astype(np.int32, 'F')
                       self.core_faust_dbl.push_back(&data1d[0], &indptr[0],
-                                                    &indices[0], factor.nnz, nbrow, nbcol)
+                                                    &indices[0], factor.nnz,
+                                                    nbrow, nbcol, optimizedCopy)
                 else:
                     if(isinstance(factor, sparse.csc.csc_matrix)):
                         #TODO: understand how is it possible to have a sparse
@@ -125,14 +131,17 @@ cdef class FaustCore:
                     #print("FaustCorePy.pyx factor=",factor)
                     if(isinstance(factor, np.ndarray)):
                         data_cplx=factor.astype(np.complex128,'F')
-                        self.core_faust_cplx.push_back(&data_cplx[0,0], nbrow, nbcol)
+                        self.core_faust_cplx.push_back(&data_cplx[0,0], nbrow,
+                                                       nbcol, optimizedCopy)
                     else:
                         #print("FaustCore, factor dims:", nbrow, nbcol)
                         data1d_cplx = factor.data.astype(np.complex128, 'F')
                         indices=factor.indices.astype(np.int32, 'F')
                         indptr=factor.indptr.astype(np.int32, 'F')
                         self.core_faust_cplx.push_back(&data1d_cplx[0], &indptr[0],
-                                                    &indices[0], factor.nnz, nbrow, nbcol)
+                                                    &indices[0], factor.nnz,
+                                                       nbrow, nbcol,
+                                                       optimizedCopy)
         elif(core): # trick to initialize a new FaustCoreCpp from C++ (see
         # transpose, conj and adjoint)
             pass
@@ -985,3 +994,4 @@ cdef class FaustFact:
         PyMem_Free(cpp_stop_crits)
 
         return core
+

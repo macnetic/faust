@@ -44,9 +44,10 @@ cdef extern from "FaustCoreCpp.h" :
         FaustCoreCpp()
         void Display() const
         const char* to_string() const
-        void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol)
+        void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol,
+                       bool optimizedCopy)
         void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows,
-                       int ncols)
+                       int ncols, bool optimizedCopy)
         void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,
                       int nbrow_x, int nbcol_x);#,bool isTranspose*/);
         unsigned int getNbRow() const

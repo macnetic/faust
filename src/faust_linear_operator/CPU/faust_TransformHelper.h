@@ -57,7 +57,7 @@ TransformHelper(Transform<FPP,Cpu> &t);
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose);
 			TransformHelper<FPP, Cpu>* multiply(TransformHelper<FPP, Cpu>*);
 			TransformHelper<FPP, Cpu>* multiply(FPP& scalar);
-			void push_back(const MatGeneric<FPP,Cpu>* M);
+			void push_back(const MatGeneric<FPP,Cpu>* M, bool optimizedCopy=false);
 			faust_unsigned_int getNbRow() const;
 			faust_unsigned_int getNbCol() const;
 			bool isReal() const;
