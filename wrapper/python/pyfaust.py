@@ -1284,7 +1284,8 @@ class FaustFactory:
 
     - The pseudo-random generation of a Faust with FaustFactory.rand(),
     - the discrete Fourier transform with FaustFactory.dft(),
-    - and the Hadamard transform with FaustFactory.wht().
+    - the Hadamard transform with FaustFactory.wht(),
+    - and the identity Faust with FaustFactory.eye(). 
 
     """
 
@@ -1465,21 +1466,22 @@ class FaustFactory:
     @staticmethod
     def eye(m,n=None,t='real'):
         """
-            Identity matrix as Faust.
+            Identity matrix as a Faust object.
 
             Args:
               m: number of rows,
               n (optional): number of columns, set to m if not specified.
-              t: 'complex' to return a complex Faust otherwise (by default)
+              t (optional): 'complex' to return a complex Faust otherwise (by default)
               it's a real Faust.
         """
         from scipy.sparse import eye
-        #TODO: more checking on type and value of arguments
         if(not n):
             n = m
         e = eye(m,n).tocsr()
         if(t == 'complex'):
             e = e.astype(np.complex)
+        elif(t != 'real'):
+            raise ValueError("t must be 'real' or 'complex'")
         return Faust(e)
 
 
