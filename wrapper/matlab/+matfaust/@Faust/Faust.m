@@ -919,22 +919,24 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b factor = get_factor(F, i)
+		%> &nbsp;&nbsp;&nbsp; @b factor = get_factor(F, i) returns the i-th factor of F.
+		%> &nbsp;&nbsp;&nbsp; @b factor = get_factor(F, i:j) returns a new Faust formed of the F's factors from the i-th to the j-th included.
 		%>
 		%> @param F the Faust object.
-		%> @param i the factor index.
+		%> @param varargin the factor indices.
 		%>
-		%> @retval factor a copy of the i-th factor without altering its storage organization in the Faust F (full or sparse).
+		%> @retval factors a matrix copy of the i-th factor if i is a single index or a new Faust composed of i-th to the j-th factors of F. The factors copies keep the storage organization of the source matrix (full or sparse).
 		%>
 		%> @b Example
 		%> @code
 		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
-		%>	f1 = get_factor(F, 1)
+		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex');
+		%>	f1 = get_factor(F, 1);
+		%>	G = get_factor(F, 4:5); % a new Faust composed of the two last factors of F
 		%> @endcode
 		%> <p>@b See @b also Faust.get_num_factors
 		%=====================================================================
-		function factor = get_factor(F, i)
+		function factors = get_factor(F, varargin)
 			%% GET_FACT Ith factor of the Faust.
 			%
 			% A=get_factor(F,i) return the i factor A of the Faust F as a full storage matrix.
@@ -944,21 +946,32 @@ classdef Faust
 			% A=get_factor(F,4) returns the 4th factor of the Faust F.
 			%
 			% See also get_num_factors.
+			factors = cell(1, size(varargin{1},2));
+			for j=1:length(factors)
+				i = varargin{1};
+				if(j < length(factors) && i(j+1) - i(j) ~= 1)
+					error('Indices must be contiguous.')
+				end
+				i = i(j);
+				if (~isa(i,'double'))
+					error('get_factor second argument (indice) must either be real positive integers or logicals.');
+				end
 
-			if (~isa(i,'double'))
-				error('get_factor second argument (indice) must either be real positive integers or logicals.');
+				if (floor(i) ~= i)
+					error('get_factor second argument (indice) must either be real positive integers or logicals.');
+				end
+
+				if (F.isReal)
+					factors{j} = mexFaustReal('get_fact',F.matrix.objectHandle,i);
+				else
+					factors{j} = mexFaustCplx('get_fact',F.matrix.objectHandle,i);
+				end
 			end
-
-			if (floor(i) ~= i)
-				error('get_factor second argument (indice) must either be real positive integers or logicals.');
-			end
-
-			if (F.isReal)
-				factor = mexFaustReal('get_fact',F.matrix.objectHandle,i);
+			if(length(factors) > 1)
+				factors = matfaust.Faust(factors);
 			else
-				factor = mexFaustCplx('get_fact',F.matrix.objectHandle,i);
+				factors = factors{j};
 			end
-
 		end
 
 		%=====================================================================

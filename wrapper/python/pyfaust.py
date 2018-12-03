@@ -1093,16 +1093,20 @@ class Faust:
         """
         return F.m_faust.get_nb_factors()
 
-    def get_factor(F, i):
+    def get_factor(F, indices):
         """
         Returns the i-th factor of F.
 
         Args:
             F: the Faust object.
-            i: the factor index.
+            indices: the factor contiguous indices.
 
         Returns:
-            a copy of the i-th factor, the copy type is:
+            if indices is a single index: a copy of the i-th factor.
+            Otherwise: a new Faust composed of copies of the contigous factors of F
+            pointed by indices.
+
+            Each copy type is:
                 - numpy.ndarray if it is a full storage matrix or,
                 - scipy.sparse.csc.matrix_csc if it's a sparse matrix of a
                 transposed Faust,
@@ -1117,11 +1121,27 @@ class Faust:
             >>> from pyfaust import FaustFactory
             >>> F = FaustFactory.rand(5, [50, 100], .5)
             >>> f0 = F.get_factor(0)
+            >>> G = F.get_factor(range(3:5)) # a new Faust composed of the two last factors of F
 
         <b/> See also Faust.get_num_factors, Faust.transpose
         """
-        fact = F.m_faust.get_fact_opt(i)
-        return fact
+        if(hasattr(indices, '__iter__')):
+            indices = list(indices)
+        else:
+            indices = list([indices])
+        factors = []
+        oi = None
+        for i in indices:
+            if(not isinstance(i, int)):
+                raise not_int_e
+            if(oi != None and i-oi != 1):
+                raise Exception("Index must be contiguous.")
+            factors += [F.m_faust.get_fact_opt(i)]
+            oi = i
+        if(len(factors) == 1):
+            return factors[0]
+        else:
+            return pyfaust.Faust(factors)
 
     def get_factor_nonopt(F, i):
         """
