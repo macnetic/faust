@@ -42,7 +42,7 @@ namespace Faust {
 			const Transform<FPP, Cpu>* eval_sliced_Transform();
 			const Transform<FPP, Cpu>* eval_fancy_idx_Transform();
 			public:
-			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=true, const bool cloning_fact = true);
+			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true);
 			TransformHelper();
 			TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right);
 			TransformHelper(TransformHelper<FPP,Cpu>* th);
@@ -113,6 +113,8 @@ TransformHelper(Transform<FPP,Cpu> &t);
 			double normL1() const;
 			double normFro() const;
 			double normInf() const;
+			TransformHelper<FPP,Cpu>* normalize(const int meth = 2/* 1 for 1-norm, 2 for 2-norm, MAX for inf-norm */) const;
+
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n);
 			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n);

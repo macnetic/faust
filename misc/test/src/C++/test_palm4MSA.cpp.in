@@ -127,7 +127,7 @@ int main()
 	Faust::MatDense<FPP,Cpu> faustProduct;
 	faustProduct=t->get_product();
 	faustProduct-=data;
-	FPP2 relativeError = faustProduct.norm()/data.norm();
+	FPP2 relativeError = Faust::fabs(faustProduct.norm()/data.norm());
 
 	std::cout<<std::endl;
 	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;

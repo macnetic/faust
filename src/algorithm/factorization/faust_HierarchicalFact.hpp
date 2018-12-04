@@ -308,7 +308,7 @@ void Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_errors()
    const Faust::MatDense<FPP,DEVICE> estimate_mat = faust_Transform_tmp.get_product(cublas_handle, cusparse_handle);
    Faust::MatDense<FPP,DEVICE> data(palm_global.get_data());
    	
-   FPP2 data_norm = data.norm();
+   FPP2 data_norm = Faust::fabs(data.norm());
 
    
    data -= estimate_mat;

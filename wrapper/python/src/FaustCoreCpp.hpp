@@ -189,6 +189,14 @@ double FaustCoreCpp<FPP>::normInf() const
 }
 
 template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::normalize() const
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->normalize();
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
+    return core;
+}
+
+template<typename FPP>
 double FaustCoreCpp<FPP>::get_nb_factors() const
 {
     double nb_fact = this->transform->size();

@@ -897,6 +897,62 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), MAX for inf-norm */) const
+		{
+			const int MAX = std::numeric_limits<int>::max();
+			const MatGeneric<FPP,Cpu>* last_fact = get_gen_fact(this->size()-1);
+			unsigned int ncols = this->getNbCol();
+			unsigned int nrows = this->getNbRow();
+			double precision =  0.001;
+			faust_unsigned_int nbr_iter_max=100;
+			int flag;
+
+			vector<FPP> norm_invs(ncols);
+			vector<int> coords(ncols);
+			TransformHelper<FPP,Cpu>* normalizedTh = nullptr;
+			//			last_fact->Display();
+			for(faust_unsigned_int i=0;i<ncols;i++)
+			{
+				//TODO: we shouldn't have to const_cast, slice() must be const
+				const TransformHelper<FPP,Cpu> * col = const_cast<TransformHelper<FPP,Cpu> *>(this)->slice(0,nrows, i, i+1);
+				switch(meth)
+				{
+					case 1:
+						norm_invs[i] = 1./col->normL1();
+						break;
+					case 2:
+						norm_invs[i] = 1./col->spectralNorm(nbr_iter_max, precision, flag);
+						break;
+						//TODO: add fro with meth == -2
+					case MAX:
+						norm_invs[i] = 1./col->normInf();
+						break;
+				}
+				coords[i] = i;
+				delete col;
+			}
+			MatSparse<FPP,Cpu> norm_diag(coords, coords,
+					norm_invs, ncols, ncols);
+			//			norm_diag.Display();
+			vector<MatGeneric<FPP,Cpu>*> factors;
+			for(int i =0; i < size(); i++)
+				//NOTE: about const cast: no problem, we know we won't write it
+				//NOTE: don't use get_gen_fact() to avoid transpose auto-handling
+				factors.push_back(const_cast<Faust::MatGeneric<FPP, (Device)0u>*>(this->transform->data[i]));
+			if(this->is_transposed)
+				factors.insert(factors.begin(), &norm_diag);
+			else
+				factors.push_back(&norm_diag);
+			normalizedTh = new TransformHelper<FPP,Cpu>(factors);
+			normalizedTh->is_transposed = this->is_transposed;
+			//			normalizedTh->display();
+			return normalizedTh;
+		}
+
+
+
+
+	template<typename FPP>
 		TransformHelper<FPP,Cpu>::~TransformHelper() {
 			// transform is deleted auto. when no TransformHelper uses it (no more weak refs left)
 #ifdef FAUST_VERBOSE

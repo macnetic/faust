@@ -1077,6 +1077,10 @@ class Faust:
             raise ValueError("ord must have the value 1, 2, 'fro' or numpy.inf.")
         return F.m_faust.norm(ord)
 
+
+    def normalize(F):
+        return Faust(core_obj=F.m_faust.normalize())
+
     def get_num_factors(F):
         """
         Returns the number of factors of F.

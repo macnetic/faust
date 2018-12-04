@@ -220,7 +220,7 @@ int main(int argc, char* argv[])
 	Faust::MatDense<FPP,Cpu> faustProduct;
 	faustProduct=hierFactCore.get_product();
 	faustProduct-=matrix;
-	FPP2 relativeError = faustProduct.norm()/matrix.norm();
+	FPP2 relativeError = Faust::fabs(faustProduct.norm()/matrix.norm());
 
 	std::cout<<std::endl;
 	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;

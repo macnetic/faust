@@ -326,7 +326,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
         //!  \brief Compute the Frobenius norm of the MatDense
         //! \return  the Frobenius norm
-        template<typename FPP2=double> FPP2 norm() const {return mat.norm();}
+        FPP norm() const {return mat.norm();}
 
         //!  \brief Normalize the matrix according to its Frobenius norm
         void normalize() {scalarMultiply(FPP(1.0)/FPP(norm()));}

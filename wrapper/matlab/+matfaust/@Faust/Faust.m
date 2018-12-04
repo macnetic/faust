@@ -1397,6 +1397,15 @@ classdef Faust
 
 		end
 
+		function NF = normalize(F)
+			if(F.isReal)
+				NF = matfaust.Faust(F, mexFaustReal('normalize', F.matrix.objectHandle));
+			else
+				NF = matfaust.Faust(F, mexFaustCplx('normalize', F.matrix.objectHandle));
+			end
+		end
+
+
 		%==========================================================================================
 		%> @brief The total number of non-zero elements in the factors of F.
 		%>

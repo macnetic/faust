@@ -151,11 +151,23 @@ namespace Faust
 	// \see Faust::Transform::save_mat_file()
 	virtual matvar_t* toMatIOVar(bool transpose, bool conjugate) const=0;
 
+	//TODO: only one function norm() with argument for type of norm
+	//TODO: norm() should return a type different from FPP which can be a complex, though norm is always a real
+	//		NOTE: using a template function isn't a solution because:
+	//		- in this class it would be forbidden because the function is virtual.
+	//		- in child class it would let the virtual pure function of the parent class undefined because the child function template type would correspond to another signature, so the child class would also be abstract.
+	//		NOTE: two solutions are possible 1. add a specific generic type for the norm in the class decl. (the more complicated solution) ; MatGeneric<FPP,DEVICE, NORM_TYPE>
+	//		2. don't use template type FPP by adding two signatures of norm(): norm(float) and norm(double) (the simpler one)
+	//		NOTE: it will avoid to do a weird Faust::fabs() to enclose norm() calls needed because of the complex<?> case.
+
 	//! \brief Computes the L1-norm of the matrix.
 	// \param transpose: to compute the norm of the transpose matrix.
 	// \see Faust::normL1(faust_unsigned_int&)
 	// \see http://mathworld.wolfram.com/L1-Norm.html
 	virtual FPP normL1(const bool transpose) const=0;
+
+	//! \brief Frobenius norm.
+	virtual FPP norm() const=0;
 
 	//! \brief Computes the L1-norm of the matrix.
 	// \param col_id: reference to receive the column index which the L1-norm is equal to the matrix's norm (if several exist, then the greater colummn index is kept).
