@@ -860,6 +860,140 @@ class hadamard:
 
         show()
 
+class bsl:
+
+    @staticmethod
+    def sparse_coeffs(D, ntraining, sparsity):
+        """
+        sparse_coeffs. Generation of sparse coefficients
+        Gamma = sparse_coeffs(D, ntraining, sparsity) generates ntraining sparse
+        vectors stacked in a matrix Gamma. Each sparse vector is of size the
+        number of atoms in the dictionary D, its support is drawn uniformly at
+        random and each non-zero entry is iid Gaussian.
+
+          References:
+              [1] Le Magoarou L. and Gribonval R., "Learning computationally efficient
+              dictionaries and their implementation as fast transforms", submitted to
+              NIPS 2014
+        """
+        natoms = D.shape[1]
+        gamma = zeros((natoms, ntraining))
+        for i in range(0, ntraining):
+            r = randn(sparsity, 1)
+            pos_temp = permutation(natoms)
+            pos = pos_temp[0:sparsity]
+            gamma[pos,i:i+1] = r
+        return gamma
+
+    @staticmethod
+    def run(input_data_dir='@FAUST_MATFAUST_DEMO_DATA_BIN_DIR@',
+            output_dir=DEFT_DATA_DIR):
+        from pyfaust import Faust
+        from scipy.io import loadmat,savemat
+        from pyfaust.tools import greed_omp_chol
+        MEG_Faust_filenames = [
+            'faust_MEG_rcg_6.mat','faust_MEG_rcg_8.mat','faust_MEG_rcg_16.mat','faust_MEG_rcg_25.mat']
+        num_MEG_Fausts = len(MEG_Faust_filenames)
+        num_MEGs = num_MEG_Fausts + 1 # MEG Faust approximations + MEG original matrix
+        MEG_Fausts = []
+        MEG_Faust_rcgs = []
+        MEGs = []
+
+        MEG_matrix = loadmat(input_data_dir+os.sep+'matrix_MEG.mat')['matrix']
+        # print(MEG_matrix.shape, type(MEG_matrix))
+        # normalize the matrix through a Faust
+        MEG_matrix = Faust(MEG_matrix).T.normalize().toarray()
+        points = loadmat(input_data_dir+os.sep+'matrix_MEG.mat')['points']
+        MEGs.append(matrix(MEG_matrix))
+
+
+        #print(MEG_matrix)
+
+        for filename in MEG_Faust_filenames:
+            scale = loadmat(input_data_dir+os.sep+filename)['lambda'][0,0]
+            facts = loadmat(input_data_dir+os.sep+filename)['facts']
+            # convert facts to a list (it was a ndarray of sparse mats)
+            facts = [facts[0,i] for i in range(facts.shape[1]) ]
+            MEG_Fausts.append(Faust(facts, scale=scale).normalize())
+            MEG_Faust_rcgs.append(MEG_Fausts[-1].rcg())
+            # print(MEG_Fausts[-1].shape)
+            # input()
+            MEGs.append(MEG_Fausts[-1])
+
+        M = MEG_matrix.shape[1] # number of points used in the MEG matrix
+        Ntraining = 500 # number of trainings
+        sparsity = 2 # number of sources per training vector
+        dist_paliers = [0.01,0.05,0.08,0.5]
+
+        resDist = zeros((num_MEGs, len(dist_paliers)-1, sparsity, Ntraining))
+        compute_times = zeros((num_MEGs, len(dist_paliers)-1, Ntraining))
+
+        for k in range(0,len(dist_paliers)-1):
+            # parameter settings
+            # generates the different source positions
+            gamma = zeros((M,Ntraining))
+            for j in range(0,Ntraining):
+                dist_sources = -1
+                while not (dist_paliers[k] < dist_sources and dist_sources <
+                           dist_paliers[k+1]):
+                    gamma[:,j:j+1] = bsl.sparse_coeffs(MEG_matrix, 1, sparsity)
+                    idx = find(gamma[:,j])
+                    dist_sources = norm(points[idx[0],:] - points[idx[1],:])
+
+            # compute the data registered by MEG sensor
+            data = MEG_matrix.dot(gamma)
+#            print("data.shape=", data.shape)
+#            print("gamma.shape=", gamma.shape)
+#            print("MEG_matrix.shape=", MEG_matrix.shape)
+            for i in range(0,Ntraining):
+                print("Brain Source Localization : MEG matrix and its faust "
+                  "approximations with omp solver, progress:",
+                      100*(k*Ntraining+i)/(len(dist_paliers)-1)/Ntraining)
+                # index of the real source localization
+                idx = find(gamma[:,i])
+                for j in range(0,num_MEGs):
+
+                    MEG = MEGs[j]
+
+                    #find active source
+                    t = timer()
+                    #print(matrix(data[:,i:i+1]).shape,  MEG.shape, M)
+                    solver_sol = greed_omp_chol(matrix(data[:,i:i+1]), MEG, M,
+                                                stopTol=sparsity,
+                                                verbose=False)
+                    compute_times[j,k,i] = timer() - t
+                    # compute the disntance between estimated source and the
+                    # real one
+                    solver_idx = solver_sol.nonzero()
+                    # print("solver_idx=", solver_idx)
+                    # input()
+                    resDist[j,k,0,i] = min(norm(points[idx[0],:] -
+                                                points[solver_idx[0][0],:], 2),norm(points[idx[0],:]
+                                                                              - points[solver_idx[0][1],:],
+                                                                                   2));
+                    resDist[j,k,1,i] = min(norm(points[idx[1],:] -
+                                                points[solver_idx[0][0],:],2),norm(points[idx[1],:]
+                                                                              - points[solver_idx[0][1],:],2));
+
+
+        # keep matlab demo version names for mat file
+        savemat(output_dir+os.sep+"results_BSL_user.mat", { 'resDist' :
+                                                           resDist, 'Sparsity'
+                                                           : np.float(sparsity),
+                                                           'RCG_list' :
+                                                           array(MEG_Faust_rcgs),
+                                                           'compute_Times':
+                                                           compute_times,
+                                                           'Ntraining':
+                                                           np.float(Ntraining),
+                                                           'nb_MEG_matrix':
+                                                           np.float(len(MEGs))})
+
+    @staticmethod
+    def fig():
+        pass
+
+
 def _write_array_in_file(output_dir, fname, array):
     """
     output_dir: directory folder created if doesn't exist.

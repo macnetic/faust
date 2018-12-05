@@ -17,10 +17,12 @@ def greed_omp_chol(x, A, m, stopTol=None, verbose=False):
     else:
         raise Exception("x must be a vector")
     if(Faust.isFaust(A) or isinstance(A, matrix)):
-        P = lambda z : A*z
-        Pt = lambda z : A.H*z
+        P = lambda z : matrix(A*z)
+        Pt = lambda z : matrix(A.H*z)
     else:
-        raise Exception("A must be a Faust or a numpy.matrix.")
+        raise Exception("A must be a Faust or a numpy.matrix. Here A is "
+                        "a:"+str(type(A)))
+    #TODO: raise exception for x also if not a matrix-vector (type matrix)
 
     # pre-calculate Pt(x) because it's used repeatedly
     Ptx = Pt(x)
@@ -63,6 +65,7 @@ def greed_omp_chol(x, A, m, stopTol=None, verbose=False):
         R[0:r_count+1, 0:r_count+1] = UpdateCholeskyFull(R[0:r_count,
                                                            0:r_count], P, Pt,
                                                          IN, m)
+
         r_count+=1
 
         Rs = lstsq(R[0:r_count, 0:r_count].H, Ptx[IN])[0]
@@ -77,7 +80,7 @@ def greed_omp_chol(x, A, m, stopTol=None, verbose=False):
         if(not done and verbose):
             print("Iteration",  it, "---", stopTol-it, "iterations to go")
 
-        if(err<1**-16):
+        if(err<1**-16 and r_count > 1):
             print("Stopping. Exact signal representation found!")
             done=True
 
@@ -190,4 +193,5 @@ def UpdateCholeskySparse(R,P,Pt,index,m):
                                                  R_ii))))
 
     return R
+
 
