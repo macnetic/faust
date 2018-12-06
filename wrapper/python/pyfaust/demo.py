@@ -862,6 +862,10 @@ class hadamard:
 
 class bsl:
 
+    _speedup_fig_fname = 'BSL-speed_up_omp_solver.png'
+    _time_cmp_fig_fname = 'BSL-runtime_comparison_omp_solver.png'
+    _convergence_fig_fname = 'BSL-convergence_Cpp_omp_solver.png'
+
     @staticmethod
     def sparse_coeffs(D, ntraining, sparsity):
         """
@@ -997,12 +1001,37 @@ class bsl:
 
     def fig_time_cmp(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
         from scipy.io import loadmat
-        compute_times = \
-        loadmat(input_data_dir+os.sep+'matrix_MEG.mat')['compute_Times']
+        mat_file_entries = loadmat(input_dir+os.sep+'results_BSL_user.mat')
+        compute_times = mat_file_entries['compute_Times']
+        RCG_list = mat_file_entries['RCG_list']
 
-        times = concatenate(2, compute_times[:,0,:], compute_times[:,1,:],
-                            compute_times[:,2,:])
-        times = squeeze(1000*times) # ms
+        times = [squeeze(compute_times[i,:,:]*1000) for i in
+                 range(0,compute_times.shape[0])] # in ms
+
+        fig = figure()
+        boxplot(times, showfliers=False)
+        plt.rc('text', usetex=True)
+        #plt.rcParams['figure.figsize'] = [12.0, 8]
+        plt.rc('figure', figsize=[12.0, 8])
+        minY = min(yticks()[0])
+        text(xticks()[0][0], minY,
+             '${\mathbf{M}}$',
+             horizontalalignment='center', verticalalignment='baseline')
+
+
+        for i in range(1,len(times)):
+            text(xticks()[0][i], minY,
+                 '$\widehat{\mathbf{M}}_{'+str(int(round(RCG_list[0][i-1])))+'}$',
+                horizontalalignment='center', verticalalignment='baseline')
+
+        legend()
+        xticks([])
+        ylabel("Computed Time (ms)")
+        title("BSL - time comparison (FAUST vs dense matrix) omp solver")
+
+        _write_fig_in_file(output_dir, bsl._time_cmp_fig_fname, fig)
+
+        #show()
 
 
     def fig_speedup(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
@@ -1021,10 +1050,9 @@ class bsl:
         #                    compute_times[:,2,:]), axis=0)
         mean_times = compute_times.mean(axis=1)
         mean_times = mean_times.mean(axis=1)
-        print(mean_times.shape)
         dense_matrix_time = mean_times[0]
         real_RCGs = dense_matrix_time/mean_times
-
+        fig = figure()
         plot(arange(0,mean_times.shape[0]-1), real_RCGs[1:], lw=1.5)
         hold(True)
         plot(arange(0,mean_times.shape[0]-1), ones((mean_times.shape[0]-1)),
@@ -1035,13 +1063,25 @@ class bsl:
         maxY = max(max(real_RCGs[1:]), .9)
         xticks([])
         #tight_layout()
-
-        plt.rcParams['figure.figsize'] = [12.0, 8]
+        plt.rc('text', usetex=True)
+        #plt.rcParams['figure.figsize'] = [12.0, 8]
+        plt.rc('figure', figsize=[12.0, 8])
         for i in range(0,len(real_RCGs)-1):
-            text(i, minY - (maxY-minY)/20, 'M'+str(int(round(RCG_list[0][i]))),
+            text(i, minY - (maxY-minY)/20,
+                 '$\widehat{\mathbf{M}}_{'+str(int(round(RCG_list[0][i])))+'}$',
                 horizontalalignment='center', verticalalignment='top')
-        show()
-        pass
+
+        _write_fig_in_file(output_dir, bsl._speedup_fig_fname, fig)
+
+        #show()
+
+        print("**** MEG with OMP solver time comparison ****")
+        print("M time:", mean_times[0]*1000)
+        for i in range(1,mean_times.shape[0]):
+            print('M_'+str(int(round(RCG_list[0][i-1]))),'time:',
+                  mean_times[i]*1000,'ms', 'speedup: ',
+                  real_RCGs[i])
+
 
     def fig_bsl_convergence(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
         pass
