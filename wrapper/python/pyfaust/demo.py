@@ -990,7 +990,60 @@ class bsl:
                                                            np.float(len(MEGs))})
 
     @staticmethod
-    def fig():
+    def fig(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+        fig_time_cmp(input_dir, output_dir)
+        fig_speedup(input_dir, output_dir)
+        fig_bsl_convergence(input_dir, output_dir)
+
+    def fig_time_cmp(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+        from scipy.io import loadmat
+        compute_times = \
+        loadmat(input_data_dir+os.sep+'matrix_MEG.mat')['compute_Times']
+
+        times = concatenate(2, compute_times[:,0,:], compute_times[:,1,:],
+                            compute_times[:,2,:])
+        times = squeeze(1000*times) # ms
+
+
+    def fig_speedup(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+#        Ntraining          1x1                       8  double
+#        RCG_list           1x4                      32  double
+#        Sparsity           1x1                       8  double
+#        compute_Times      5x3x500               60000  double
+#        nb_MEG_matrix      1x1                       8  double
+#        resDist            5x3x2x500            120000  double
+        from scipy.io import loadmat
+        mat_file_entries = loadmat(input_dir+os.sep+'results_BSL_user.mat')
+        compute_times = mat_file_entries['compute_Times']
+        RCG_list = mat_file_entries['RCG_list']
+
+        #times = concatenate((compute_times[:,0,:], compute_times[:,1,:],
+        #                    compute_times[:,2,:]), axis=0)
+        mean_times = compute_times.mean(axis=1)
+        mean_times = mean_times.mean(axis=1)
+        print(mean_times.shape)
+        dense_matrix_time = mean_times[0]
+        real_RCGs = dense_matrix_time/mean_times
+
+        plot(arange(0,mean_times.shape[0]-1), real_RCGs[1:], lw=1.5)
+        hold(True)
+        plot(arange(0,mean_times.shape[0]-1), ones((mean_times.shape[0]-1)),
+            lw=1.5)
+        legend(["speed up FAuST", "neutral speed up"])
+        title("BSL -speed up using FAUST OMP solver")
+        minY = min(min(real_RCGs[1:]), .9)
+        maxY = max(max(real_RCGs[1:]), .9)
+        xticks([])
+        #tight_layout()
+
+        plt.rcParams['figure.figsize'] = [12.0, 8]
+        for i in range(0,len(real_RCGs)-1):
+            text(i, minY - (maxY-minY)/20, 'M'+str(int(round(RCG_list[0][i]))),
+                horizontalalignment='center', verticalalignment='top')
+        show()
+        pass
+
+    def fig_bsl_convergence(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
         pass
 
 
