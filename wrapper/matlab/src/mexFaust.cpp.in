@@ -429,7 +429,9 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 
 			if(!strcmp("normalize", cmd))
 			{
-				Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->normalize();
+                int ord = (int) mxGetScalar(prhs[2]);
+
+				Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->normalize(ord);
 				plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
 				return;
 			}

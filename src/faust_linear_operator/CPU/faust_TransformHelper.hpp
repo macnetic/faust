@@ -903,6 +903,7 @@ namespace Faust {
 			const MatGeneric<FPP,Cpu>* last_fact = get_gen_fact(this->size()-1);
 			unsigned int ncols = this->getNbCol();
 			unsigned int nrows = this->getNbRow();
+			//2-norm parameters
 			double precision =  0.001;
 			faust_unsigned_int nbr_iter_max=100;
 			int flag;
@@ -915,18 +916,27 @@ namespace Faust {
 			{
 				//TODO: we shouldn't have to const_cast, slice() must be const
 				const TransformHelper<FPP,Cpu> * col = const_cast<TransformHelper<FPP,Cpu> *>(this)->slice(0,nrows, i, i+1);
+//				cout << "TransformHelper normalize, meth=" << meth << endl;
 				switch(meth)
 				{
-					case 1:
+					case 1: //1-norm
+//						cout << "normalize with 1-norm" << endl;
 						norm_invs[i] = 1./col->normL1();
 						break;
-					case 2:
+					case 2: //2-norm
+//						cout << "normalize with 2-norm" << endl;
 						norm_invs[i] = 1./col->spectralNorm(nbr_iter_max, precision, flag);
 						break;
-						//TODO: add fro with meth == -2
-					case MAX:
+					case -2: // fro norm
+//						cout << "normalize with fro-norm" << endl;
+						norm_invs[i] = 1./col->normFro();
+						break;
+					case -1: //inf norm
+//						cout << "normalize with inf-norm" << endl;
 						norm_invs[i] = 1./col->normInf();
 						break;
+					default:
+						handleError("Faust::TransformHelper::normalize()", "order for the norm to use is not valid");
 				}
 				coords[i] = i;
 				delete col;

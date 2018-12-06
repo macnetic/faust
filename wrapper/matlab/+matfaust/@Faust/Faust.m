@@ -1397,11 +1397,47 @@ classdef Faust
 
 		end
 
-		function NF = normalize(F)
+		function NF = normalize(F, varargin)
+			nargs = length(varargin);
+			dim = 2;
+			for i=1:nargs;
+				if(strcmp(varargin{i}, 'norm'))
+					if(nargs > i)
+						ord = varargin{i+1};
+					else
+						ord = 2;
+					%	error('norm argument passed without a norm order in argument just after')
+					end
+					break
+				elseif(isnumeric(varargin{i}) && ~ exist('ord'))
+					dim = varargin{i};
+					if(dim ~= 1 && dim ~= 2);
+						error('dimension is not valid')
+					end
+				else
+					error('invalid argument.')
+				end
+			end
+			if(~ exist('ord'))
+				ord = 2;
+			end
+			switch(ord)
+				case {1,2}
+					mex_ord = ord;
+				case Inf
+					mex_ord = -1;
+				case 'fro'
+					mex_ord = -2;
+				otherwise
+					error('Invalid type of norm.')
+			end
+			if(dim == 1);
+				F = F.';
+			end
 			if(F.isReal)
-				NF = matfaust.Faust(F, mexFaustReal('normalize', F.matrix.objectHandle));
+				NF = matfaust.Faust(F, mexFaustReal('normalize', F.matrix.objectHandle, mex_ord));
 			else
-				NF = matfaust.Faust(F, mexFaustCplx('normalize', F.matrix.objectHandle));
+				NF = matfaust.Faust(F, mexFaustCplx('normalize', F.matrix.objectHandle, mex_ord));
 			end
 		end
 
