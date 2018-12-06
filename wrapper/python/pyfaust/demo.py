@@ -997,7 +997,7 @@ class bsl:
     def fig(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
         fig_time_cmp(input_dir, output_dir)
         fig_speedup(input_dir, output_dir)
-        fig_bsl_convergence(input_dir, output_dir)
+        fig_convergence(input_dir, output_dir)
 
     def fig_time_cmp(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
         from scipy.io import loadmat
@@ -1083,8 +1083,58 @@ class bsl:
                   real_RCGs[i])
 
 
-    def fig_bsl_convergence(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
-        pass
+    def fig_convergence(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+#        Ntraining          1x1                       8  double
+#        RCG_list           1x4                      32  double
+#        Sparsity           1x1                       8  double
+#        compute_Times      5x3x500               60000  double
+#        nb_MEG_matrix      1x1                       8  double
+#        resDist            5x3x2x500            120000  double
+        from scipy.io import loadmat
+        mat_file_entries = loadmat(input_dir+os.sep+'results_BSL_user.mat')
+        res_dist = mat_file_entries['resDist']
+        Ntraining = mat_file_entries['Ntraining'][0,0]
+        sparsity = mat_file_entries['Sparsity'][0,0]
+        RCG_list = mat_file_entries['RCG_list']
+        ntest = Ntraining*sparsity
+
+        plt.rc('figure', figsize=[12.0, 8])
+        plt.rc('text', usetex=True)
+        d = []
+        test2 = []
+        for i in range(0,3):
+            d.append([])
+            for j in range(0,res_dist.shape[0]):
+                test2.append(100*np.concatenate((res_dist[j,i,0,:],
+                                             res_dist[j,i,1,:]), axis=0))
+            #test2.append(squeeze(d[-1]))
+            if(i < 2):
+                test2.append(zeros(1,ntest))
+
+        fig = figure()
+        print(len(test2))
+        T = boxplot(test2, showfliers=False)
+        #legend(T['means'])
+        plt.rc('figure', figsize=[12.0, 8])
+        for j in range(0,3):
+            text(xticks()[0][res_dist.shape[0]*j+j], min(yticks()[0]),
+                 '${\mathbf{M}}$',
+                 horizontalalignment='center', verticalalignment='bottom')
+
+            for i in range(1,res_dist.shape[0]):
+                text(xticks()[0][j*res_dist.shape[0]+i+j], min(yticks()[0]),
+                     '$\widehat{\mathbf{M}}_{'+str(int(round(RCG_list[0][i-1])))+'}$',
+                     horizontalalignment='center', verticalalignment='bottom')
+
+        xticks(xticks()[0], ['' for i in range(xticks()[0].shape[0])])
+
+        ylabel("Distance between true and estimated sources (cm)")
+        title("BSL - convergence (C++ wrapper faust) omp solver")
+
+        #show()
+        _write_fig_in_file(output_dir, bsl._convergence_fig_fname, fig)
+
+
 
 
 def _write_array_in_file(output_dir, fname, array):
