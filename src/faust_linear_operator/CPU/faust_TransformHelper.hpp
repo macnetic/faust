@@ -909,6 +909,7 @@ namespace Faust {
 			int flag;
 
 			vector<FPP> norm_invs(ncols);
+			FPP norm;
 			vector<int> coords(ncols);
 			TransformHelper<FPP,Cpu>* normalizedTh = nullptr;
 			//			last_fact->Display();
@@ -921,23 +922,25 @@ namespace Faust {
 				{
 					case 1: //1-norm
 //						cout << "normalize with 1-norm" << endl;
-						norm_invs[i] = 1./col->normL1();
+						norm = col->normL1();
 						break;
 					case 2: //2-norm
 //						cout << "normalize with 2-norm" << endl;
-						norm_invs[i] = 1./col->spectralNorm(nbr_iter_max, precision, flag);
+						norm = col->spectralNorm(nbr_iter_max, precision, flag);
 						break;
 					case -2: // fro norm
 //						cout << "normalize with fro-norm" << endl;
-						norm_invs[i] = 1./col->normFro();
+						norm = col->normFro();
 						break;
 					case -1: //inf norm
 //						cout << "normalize with inf-norm" << endl;
-						norm_invs[i] = 1./col->normInf();
+						norm = col->normInf();
 						break;
 					default:
 						handleError("Faust::TransformHelper::normalize()", "order for the norm to use is not valid");
 				}
+				if(norm != FPP(0))
+					norm_invs[i] = 1./norm;
 				coords[i] = i;
 				delete col;
 			}
