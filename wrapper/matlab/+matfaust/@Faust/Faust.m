@@ -107,12 +107,12 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; Faust(filepath) creates a Faust from a previously saved Faust file (filepath is a character array).<br/><br/>
 		%>
 		%>
-		%> @param factors (varargin{1}) the 1D cell array of factors to initialize the Faust with.
+		%> @param factors (1st arg.) the 1D cell array of factors to initialize the Faust with.
 		%> <br/> The factors must respect the dimensions needed for the product to be defined (for i=1 to size(factors,2), size(factors{i},2) == size(factors{i+1},1)).
 		%> <br/> The factors can be sparse or dense matrices.
 		%> <br/> Passing a single matrix to the constructor instead of
 		%> a cell array is equivalent to passing a singleton cell array.
-		%> @param filepath (varargin{1}) the file from which a Faust is created. It must be a character array.<br/>
+		%> @param filepath (1st arg.) the file from which a Faust is created. It must be a character array.<br/>
 		%>								The format is Matlab version 5 (.mat extension).<br/>
 		%>								The file must have been saved before with Faust.save().
 		%>
