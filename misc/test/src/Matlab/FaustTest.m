@@ -141,6 +141,60 @@ classdef FaustTest < matlab.unittest.TestCase
             this.verifyEqual(get_num_factors(this.test_faust), this.num_factors)
         end
 
+		function testNormalize(this)
+			disp(['testNormalize on faust of size: ' int2str(size(this.test_faust))])
+			orig_ref_full_F = this.mulFactors();
+			% all signatures to test
+			tests = {
+			% ENOTE: without enclosed cell {'2-norm', 2} I got the error 'inconsistent matrix dimensions'
+			{{ '2-norm', 2}, % norm name and corresponding argument/order for norm()
+			{ {},{'norm'},{'norm', 2},{2, 'norm', 2},{2, 'norm'}, {1, 'norm'}, {1, 'norm', 2}} % varargin for normalize(F, varargin{:})
+			},
+			{ {'inf-norm', inf},
+			{ {'norm', inf},{2, 'norm', inf}, {1, 'norm', inf}}
+			},
+			{ {'1-norm', 1},
+			{ {'norm', 1},{2, 'norm', 1}, {1, 'norm', 1}}
+			},
+			{ {'fro-norm', 'fro'},
+			{ {'norm', 'fro'},{2, 'norm', 'fro'}, {1, 'norm', 'fro'}}
+			}
+			};
+			for i=1:length(tests)
+				test_infos = tests{i};
+				header = test_infos{1};
+				test_name = header{1};
+				test_norm = header{2};
+				test_signatures = test_infos{2};
+				disp(['test ' test_name ' based normalizations'])
+				% ENOTE: no need to bother getting size args dim by dim to pass them to zeros()
+				ref_full_NFs = {zeros(size(orig_ref_full_F)), zeros(size(orig_ref_full_F))};
+				for i=1:size(orig_ref_full_F,1)
+					ref_full_NF = ref_full_NFs{1};
+					ref_full_NF(i,:) = orig_ref_full_F(i,:)/norm(orig_ref_full_F(i,:), test_norm);
+					% ENOTE: the cell array indexing returns a copy otherwise we wouldn't need to copy back into it after modif.
+					ref_full_NFs{1} = ref_full_NF;
+				end
+				for i=1:size(orig_ref_full_F,2)
+					ref_full_NF = ref_full_NFs{2};
+					ref_full_NF(:,i) = orig_ref_full_F(:,i)/norm(orig_ref_full_F(:,i), test_norm);
+					ref_full_NFs{2} = ref_full_NF;
+				end
+				for i=1:length(test_signatures)
+					args = test_signatures{i};
+					test_full_NF = full(normalize(this.test_faust, args{:}));
+					ndim = 2; % cols by default
+					dim_norm_strs = {' (row normalization)', ' (col normalization)'};
+					if(length(args) > 0 && isnumeric(args{1}) && args{1} == 1)
+						ndim = 1;
+					end
+					disp(['testing signature ' int2str(i) dim_norm_strs{ndim}])
+					%args
+					this.verifyEqual(test_full_NF, ref_full_NFs{ndim}, 'AbsTol', .05);
+				end
+			end
+		end
+
         function testNorm2(this)
             disp('testNorm2()')
             ref_F = this.mulFactors();
@@ -463,7 +517,12 @@ classdef FaustTest < matlab.unittest.TestCase
 	methods
 		function faust_test = FaustTest(varargin)
 			faust_test.faust_paths = varargin
-			run(faust_test)
+			%ENOTE char arrays concat doesn't work without space or comma separator between arrays
+			try % try to call only a single unit test
+				run(faust_test, varargin{end})
+			catch
+				run(faust_test)
+			end
 		end
 
         function prod_F = mulFactors(this)

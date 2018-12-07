@@ -1431,13 +1431,16 @@ classdef Faust
 				otherwise
 					error('Invalid type of norm.')
 			end
-			if(dim == 1);
+			if(dim == 1)
 				F = F.';
 			end
 			if(F.isReal)
 				NF = matfaust.Faust(F, mexFaustReal('normalize', F.matrix.objectHandle, mex_ord));
 			else
 				NF = matfaust.Faust(F, mexFaustCplx('normalize', F.matrix.objectHandle, mex_ord));
+			end
+			if(dim == 1)
+				NF = NF.';
 			end
 		end
 
