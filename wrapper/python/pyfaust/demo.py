@@ -906,7 +906,7 @@ class bsl:
         MEG_matrix = loadmat(input_data_dir+os.sep+'matrix_MEG.mat')['matrix']
         # print(MEG_matrix.shape, type(MEG_matrix))
         # normalize the matrix through a Faust
-        MEG_matrix = Faust(MEG_matrix).T.normalize().toarray()
+        MEG_matrix = Faust(MEG_matrix).T.normalize(2).toarray()
         points = loadmat(input_data_dir+os.sep+'matrix_MEG.mat')['points']
         MEGs.append(matrix(MEG_matrix))
 
@@ -918,7 +918,7 @@ class bsl:
             facts = loadmat(input_data_dir+os.sep+filename)['facts']
             # convert facts to a list (it was a ndarray of sparse mats)
             facts = [facts[0,i] for i in range(facts.shape[1]) ]
-            MEG_Fausts.append(Faust(facts, scale=scale).normalize())
+            MEG_Fausts.append(Faust(facts, scale=scale).normalize(2))
             MEG_Faust_rcgs.append(MEG_Fausts[-1].rcg())
             # print(MEG_Fausts[-1].shape)
             # input()
@@ -995,9 +995,9 @@ class bsl:
 
     @staticmethod
     def fig(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
-        fig_time_cmp(input_dir, output_dir)
-        fig_speedup(input_dir, output_dir)
-        fig_convergence(input_dir, output_dir)
+        bsl.fig_time_cmp(input_dir, output_dir)
+        bsl.fig_speedup(input_dir, output_dir)
+        bsl.fig_convergence(input_dir, output_dir)
 
     def fig_time_cmp(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
         from scipy.io import loadmat

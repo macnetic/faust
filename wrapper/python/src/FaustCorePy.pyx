@@ -451,12 +451,12 @@ cdef class FaustCore:
                 norm = self.core_faust_cplx.normFro()
         return norm
 
-    def normalize(self):
+    def normalize(self, ord):
         core = FaustCore(core=True)
         if(self._isReal):
-            core.core_faust_dbl = self.core_faust_dbl.normalize()
+            core.core_faust_dbl = self.core_faust_dbl.normalize(ord)
         else:
-            core.core_faust_cplx = self.core_faust_cplx.normalize()
+            core.core_faust_cplx = self.core_faust_cplx.normalize(ord)
         core._isReal = self._isReal
         return core
 

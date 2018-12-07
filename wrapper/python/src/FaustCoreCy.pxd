@@ -57,7 +57,7 @@ cdef extern from "FaustCoreCpp.h" :
         double norm(int ord) const
         double normFro() const
         double normInf() const
-        FaustCoreCpp[FPP]* normalize() const
+        FaustCoreCpp[FPP]* normalize(int ord) const
         double get_nb_factors() const
         unsigned int get_fact_nb_rows(unsigned int& i) const
         unsigned int get_fact_nb_cols(unsigned int& i) const

@@ -1078,8 +1078,25 @@ class Faust:
         return F.m_faust.norm(ord)
 
 
-    def normalize(F):
-        return Faust(core_obj=F.m_faust.normalize())
+    def normalize(F, ord='fro', axis=1):
+        """
+        """
+        if(ord not in [1, 2, np.inf, "fro"]):
+            raise ValueError("ord must have the value 1, 2, 'fro' or "
+                             "numpy.inf.")
+        if(axis not in [0,1]):
+            raise ValueError("Invalid axis.")
+        if(ord == float('Inf') or ord == np.inf):
+            ord = -1
+        elif(ord == "fro"):
+            ord = -2
+        if(axis == 0):
+            tF = F.T
+            NF = Faust(core_obj=tF.m_faust.normalize(ord))
+            NF = NF.T
+        else:
+            NF = Faust(core_obj=F.m_faust.normalize(ord))
+        return NF
 
     def get_num_factors(F):
         """

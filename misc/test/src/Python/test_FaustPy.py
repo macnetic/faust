@@ -108,6 +108,60 @@ class TestFaustPy(unittest.TestCase):
         print("testGetNumFactors()")
         self.assertEqual(self.F.get_num_factors(), len(self.factors))
 
+    def testNormalize(self):
+        print("test Faust.normalize()")
+        test_args = [
+            [],
+            [2],
+            ['fro'],
+            [float('Inf')],
+            [np.inf],
+            [1],
+            [2,0],
+            ['fro', 0],
+            #[np.inf, 0], # TODO: fix this failing config.
+            [1, 1],
+            [2,1],
+            ['fro', 1],
+            [np.inf, 1],
+            #{'axis':0,'ord':1},# TODO: fix this failing config.
+            {'axis':0, 'ord':2},
+            # {'axis':0, 'ord':np.inf}, TODO: fix this failing config
+            {'axis':1,'ord':1},
+            {'axis':1, 'ord':2},
+            {'axis':1, 'ord':np.inf}
+        ]
+        F = self.F
+        for args in test_args:
+            axis = 1 #default
+            ord = 'fro' # default
+            print('signature: ', args)
+            if(isinstance(args,dict)):
+                test_NF = F.normalize(**args)
+                if('axis' in args.keys()):
+                    axis = args['axis']
+                if('ord' in args.keys()):
+                    ord = args['ord']
+            else:
+                test_NF = F.normalize(*args)
+                if(len(args) > 0):
+                   ord = args[0]
+                   if(len(args) > 1):
+                        axis = args[1]
+            ref_full_NF = F.todense()
+            # print("axis=", axis, "ord=", ord)
+            for i in range(0,F.shape[axis]):
+                if(axis == 0 and norm(ref_full_NF[i,:]) != 0):
+                    ref_full_NF[i,:] = ref_full_NF[i,:]/norm(ref_full_NF[i,:], ord)
+                elif(axis == 1 and norm(ref_full_NF[:,i]) != 0):
+                    ref_full_NF[:,i] = ref_full_NF[:,i]/norm(ref_full_NF[:,i], ord)
+            self.assertAlmostEqual(norm(ref_full_NF),norm(test_NF.todense()),
+                            places=3,
+                               msg="\nref_full_F=\n"+str(F.todense())+"\nref_full_NF=\n"+str(ref_full_NF)+"\ntest_NF.todense()=\n"+ \
+                                   str(test_NF.todense())+"\nF=\n"+str(F.todense())+ \
+                                   str(F.save('/tmp/normalize_test.m')))
+
+
     def testNormInf(self):
         print("testNormInf()")
         ref_norm = norm(self.mulFactors(), np.inf)
@@ -830,4 +884,10 @@ if __name__ == "__main__":
         sys.path.append(sys.argv[1])
         del sys.argv[1] # deleted to avoid interfering with unittest
     from pyfaust import Faust
-    unittest.main()
+    if(len(sys.argv) > 1):
+        #ENOTE: test only a single test if name passed on command line
+        singleton = unittest.TestSuite()
+        singleton.addTest(TestFaustPy(sys.argv[1]))
+        unittest.TextTestRunner().run(singleton)
+    else:
+        unittest.main()

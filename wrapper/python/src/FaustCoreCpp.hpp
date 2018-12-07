@@ -189,9 +189,9 @@ double FaustCoreCpp<FPP>::normInf() const
 }
 
 template<typename FPP>
-FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::normalize() const
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::normalize(int ord) const
 {
-    Faust::TransformHelper<FPP,Cpu>* th = this->transform->normalize();
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->normalize(ord);
     FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
     return core;
 }

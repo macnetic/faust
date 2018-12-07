@@ -68,7 +68,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP>* vertcat(FaustCoreCpp<FPP>* right);
     FaustCoreCpp<FPP>* horzcat(FaustCoreCpp<FPP>* right);
     FaustCoreCpp<FPP>* mul_scal(FPP scal);
-    FaustCoreCpp<FPP>* normalize() const;
+    FaustCoreCpp<FPP>* normalize(int ord) const;
     unsigned long long nnz()const;
     double norm(int ord) const;
     double normFro() const;
