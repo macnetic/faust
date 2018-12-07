@@ -1397,6 +1397,18 @@ classdef Faust
 
 		end
 
+		%===============================================================================
+		%> Normalized F.
+		%===
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b normalize(F,'norm')  normalizes columns with vector 2-norm.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b normalize(F,'norm',p) normalizes columns with vector p-norm (see Faust.norm).<br/>
+		%> &nbsp;&nbsp;&nbsp; @b normalize(F,DIM,'norm') normalizes rows (DIM=1) or columns (DIM=2, default) with vector 2-norm.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b normalize(F,DIM,'norm',p) normalizes rows (DIM=1) or columns (DIM=2, default) with vector p-norm.<br/>
+		%>
+		%> <p>@b See @b also Faust.norm
+		%===============================================================================
 		function NF = normalize(F, varargin)
 			nargs = length(varargin);
 			dim = 2;

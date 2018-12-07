@@ -1080,6 +1080,16 @@ class Faust:
 
     def normalize(F, ord='fro', axis=1):
         """
+        Normalize F along the axis dimension using the ord-norm.
+
+        Args:
+            ord: the norm order to use (see Faust.norm).
+            axis: if 1 the columns are normalized, if 0 the rows.
+
+        Returns:
+            the normalized Faust
+
+        <b/> See also: Faust.norm
         """
         if(ord not in [1, 2, np.inf, "fro"]):
             raise ValueError("ord must have the value 1, 2, 'fro' or "
