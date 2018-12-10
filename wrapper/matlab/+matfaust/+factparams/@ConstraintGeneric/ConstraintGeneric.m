@@ -10,6 +10,10 @@ classdef ConstraintGeneric
 	end
 	methods
 		function constraint = ConstraintGeneric(name, num_rows, num_cols, param)
+			%ENOTE: ischar(name{:})
+			if(ischar(name) || iscell(name) && ischar(name{:}))
+				name = matfaust.factparams.ConstraintName(name);
+			end
 			constraint.name = name;
 			if(~ isreal(num_rows) || ~ isscalar(num_rows))
 				error('ConstraintGeneric 2nd argument must be an integer.')

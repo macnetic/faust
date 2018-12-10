@@ -1362,8 +1362,8 @@ class FaustFactory:
         >>> is_update_way_R2L = False
         >>> init_lambda = 1.0
         >>> M = np.random.rand(500, 32)
-        >>> cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
-        >>> cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0)
+        >>> cons1 = ConstraintInt('splin', 500, 32, 5)
+        >>> cons2 = ConstraintReal('normcol', 32, 32, 1.0)
         >>> stop_crit = StoppingCriterion(num_its=200)
         >>> # default step_size is 1e-16
         >>> param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
@@ -1410,12 +1410,12 @@ class FaustFactory:
             >>> is_update_way_R2L = False
             >>> init_lambda = 1.0
             >>> M = np.random.rand(500, 32)
-            >>> fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
-            >>> fact1_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
-            >>> fact2_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
-            >>> res0_cons = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1)
-            >>> res1_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 666)
-            >>> res2_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333)
+            >>> fact0_cons = ConstraintInt('splin', 500, 32, 5)
+            >>> fact1_cons = ConstraintInt('sp', 32, 32, 96)
+            >>> fact2_cons = ConstraintInt('sp', 32, 32, 96)
+            >>> res0_cons = ConstraintReal('normcol', 32, 32, 1)
+            >>> res1_cons =  ConstraintInt('sp', 32, 32, 666)
+            >>> res2_cons =  ConstraintInt('sp', 32, 32, 333)
             >>> stop_crit1 = StoppingCriterion(num_its=200)
             >>> stop_crit2 = StoppingCriterion(num_its=200)
             >>> param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,

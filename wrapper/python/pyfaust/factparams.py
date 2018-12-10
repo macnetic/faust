@@ -35,6 +35,8 @@ class ConstraintGeneric(object):
             cons_value: the parameter value of the constraint.
 
         """
+        if(isinstance(name, str)):
+            name = ConstraintName(name)
         self._name = name
         self._num_rows = num_rows
         self._num_cols = num_cols
@@ -78,7 +80,7 @@ class ConstraintInt(ConstraintGeneric):
         if(not isinstance(cons_value, np.int)):
             raise TypeError('ConstraintInt must receive a int as cons_value '
                             'argument.')
-        if(not isinstance(name, ConstraintName) or not name.is_int_constraint()):
+        if(not isinstance(self._name, ConstraintName) or not self._name.is_int_constraint()):
             raise TypeError('ConstraintInt first argument must be a '
                             'ConstraintName with a int type name '
                             '(name.is_int_constraint() must return True).')
@@ -92,7 +94,7 @@ class ConstraintMat(ConstraintGeneric):
             raise TypeError('ConstraintMat must receive a numpy matrix as cons_value '
                             'argument.')
         self.cons_value = float(self.cons_value)
-        if(not isinstance(name, ConstraintName) or not name.is_mat_constraint()):
+        if(not isinstance(self._name, ConstraintName) or not self._name.is_mat_constraint()):
             raise TypeError('ConstraintMat first argument must be a '
                             'ConstraintName with a matrix type name '
                             '(name.is_mat_constraint() must return True)')
@@ -124,7 +126,7 @@ class ConstraintReal(ConstraintGeneric):
             raise TypeError('ConstraintReal must receive a float as cons_value '
                             'argument.')
         self._cons_value = float(self._cons_value)
-        if(not isinstance(name, ConstraintName) or not name.is_real_constraint()):
+        if(not isinstance(self._name, ConstraintName) or not self._name.is_real_constraint()):
             raise TypeError('ConstraintReal first argument must be a '
                             'ConstraintName with a real type name '
                             '(name.is_real_constraint() must return True).')
@@ -160,6 +162,8 @@ class ConstraintName:
     NORMLIN = 9 # Real Constraint
 
     def __init__(self, name):
+        if(isinstance(name,str)):
+            name = ConstraintName.str2name_int(name)
         if(not isinstance(name, np.int) or name < ConstraintName.SP or name > ConstraintName.NORMLIN):
             raise ValueError("name must be an integer among ConstraintName.SP,"
                              "ConstraintName.SPCOL, ConstraintName.NORMCOL,"
@@ -179,6 +183,32 @@ class ConstraintName:
     def is_mat_constraint(self):
         return self.name in [ConstraintName.SUPP, ConstraintName.CONST ]
 
+    @staticmethod
+    def str2name_int(_str):
+        err_msg = "Invalid argument to designate a ConstraintName."
+        if(not isinstance(_str, str)):
+            raise ValueError(err_msg)
+        if(_str == 'sp'):
+            id = ConstraintName.SP
+        elif(_str == 'splin'):
+            id = ConstraintName.SPLIN
+        elif(_str == 'spcol'):
+            id = ConstraintName.SPCOL
+        elif(_str == 'splincol'):
+            id = ConstraintName.SPLINCOL
+        elif(_str == 'sppos'):
+            id = ConstraintName.SP_POS
+        elif(_str == 'normcol'):
+            id = ConstraintName.NORMCOL
+        elif(_str == 'normlin'):
+            id = ConstraintName.NORMLIN
+        elif(_str == 'supp'):
+            id = ConstraintName.SUPP
+        elif(_str == 'const'):
+            id = ConstraintName.CONST
+        else:
+            raise ValueError(err_msg)
+        return id
 
 class ParamsFact(object):
 

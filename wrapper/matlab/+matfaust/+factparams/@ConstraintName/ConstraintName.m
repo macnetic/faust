@@ -21,6 +21,9 @@ classdef ConstraintName
 
 		function cons_name = ConstraintName(name)
 			import matfaust.factparams.ConstraintName
+			if(ischar(name) || iscell(name))
+				name = ConstraintName.str2name_int(name);
+			end
 			if(name > ConstraintName.NORMLIN || name < ConstraintName.SP) %|| name == ConstraintName.BLKDIAG)
 				msg = 'name must be an integer among ConstraintName.SP, ConstraintName.SPCOL, ConstraintName.NORMCOL, ConstraintName.SPLINCOL, ConstraintName.CONST, ConstraintName.SP_POS, ConstraintName.SUPP, ConstraintName.NORMLIN';
 				error(msg)
@@ -66,12 +69,42 @@ classdef ConstraintName
 					str = 'supp';
 				case obj.CONST;
 					str = 'const';
-				%case obj.BLKDIAG;
-				%	str = 'blkdiag'
+					%case obj.BLKDIAG;
+					%	str = 'blkdiag'
 				otherwise
 					error('Unknown name')
 			end
 		end
-
+	end
+	methods(Static)
+		function id = str2name_int(str)
+			import matfaust.factparams.ConstraintName
+			err_msg = 'Invalid argument to designate a ConstraintName.';
+			if(~ ischar(str) && ~ iscell(str))
+				error(err_msg)
+			end
+			switch(str)
+				case 'sp'
+					id = ConstraintName.SP;
+				case 'splin'
+					id = ConstraintName.SPLIN;
+				case 'spcol'
+					id = ConstraintName.SPCOL;
+				case 'splincol'
+					id = ConstraintName.SPLINCOL;
+				case 'sppos'
+					id = ConstraintName.SP_POS;
+				case 'normcol'
+					id = ConstraintName.NORMCOL;
+				case 'normlin'
+					id = ConstraintName.NORMLIN;
+				case 'supp'
+					id = ConstraintName.SUPP;
+				case 'const'
+					id = ConstraintName.CONST;
+				otherwise
+					error(err_msg)
+			end
+		end
 	end
 end

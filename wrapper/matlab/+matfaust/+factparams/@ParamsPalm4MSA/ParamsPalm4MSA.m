@@ -39,19 +39,19 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 			p = p@matfaust.factparams.ParamsFact(num_facts, is_update_way_R2L, init_lambda, ...
 				constraints, step_size, constant_step_size, is_verbose);
 			if(is_init_facts_to_default || iscell(init_facts) && length(init_facts) == 0)
-				init_facts = cell(num_facts, 1)
+				init_facts = cell(num_facts, 1);
 				if(is_update_way_R2L)
-					zeros_id = num_facts
+					zeros_id = num_facts;
 				else
-					zeros_id = 1
+					zeros_id = 1;
 				end
 				for i=1:num_facts
 					if(i ~= zeros_id)
-						init_facts{i} = eye(constraints{i}.num_rows, constraints{i}.num_cols)
+						init_facts{i} = eye(constraints{i}.num_rows, constraints{i}.num_cols);
 					end
 				end
 				init_facts{zeros_id} = ...
-					zeros(constraints{zeros_id}.num_rows, constraints{zeros_id}.num_cols)
+					zeros(constraints{zeros_id}.num_rows, constraints{zeros_id}.num_cols);
 			elseif(~ iscell(init_facts)) % TODO: check init_facts length
 				error('matfaust.factparams.ParamsFactPalm4MSA 4th argument (init_facts) must be a cell array.')
 			else
@@ -62,7 +62,7 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 					end
 				end
 			end
-			p.init_facts = init_facts
+			p.init_facts = init_facts;
 			if(~ isa(stop_crit, 'matfaust.factparams.StoppingCriterion'))
 				error('matfaust.factparams.ParamsPalm4MSA argument (stop_crit) must be a matfaust.factparams.StoppingCriterion objects.')
 			end
