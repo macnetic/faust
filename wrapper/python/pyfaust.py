@@ -802,6 +802,7 @@ class Faust:
         repetitively.
             - Subindexing a Faust which would create an empty Faust will raise
             an error.
+            - fancy indexing must be done with a list not a numpy array.
 
         Args:
             F: the Faust object.

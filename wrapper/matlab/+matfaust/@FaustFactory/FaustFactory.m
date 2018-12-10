@@ -4,7 +4,6 @@
 % ======================================================================
 %> @brief     This factory class provides methods for generating a Faust especially by factorization of a dense matrix.
 %>
-%>    This factory class provides methods for generating a Faust especially by factorization of a dense matrix.
 %>
 %>    This class gives access to the main factorization algorithms of
 %>    FAµST. Those algorithms can factorize a dense matrix to a sparse product
