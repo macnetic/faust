@@ -77,5 +77,14 @@ classdef (Abstract) ParamsFact
 			p.is_verbose = is_verbose;
 			p.constant_step_size = constant_step_size;
 		end
+
+		function bool = is_mat_consistent(this, M)
+			if(~ ismatrix(M))
+				error('M must be a matrix.')
+			else
+				s = size(M);
+				bool = s(1) == this.constraints{1}.num_rows && s(2) == this.constraints{end}.num_cols;
+			end
+		end
 	end
 end

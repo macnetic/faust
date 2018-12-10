@@ -89,6 +89,9 @@ classdef FaustFactory
 			import matfaust.Faust
 			mex_constraints = cell(1, length(p.constraints));
 			matfaust.FaustFactory.check_fact_mat('FaustFactory.fact_palm4msa', M)
+			if(~ isa(p ,'matfaust.factparams.ParamsPalm4MSA'))
+				error('p must be a ParamsPalm4MSA object.')
+			end
 			for i=1:length(p.constraints)
 				cur_cell = cell(1, 4);
 				cur_cell{1} = p.constraints{i}.name.conv2str();
@@ -96,6 +99,9 @@ classdef FaustFactory
 				cur_cell{3} = p.constraints{i}.num_rows;
 				cur_cell{4} = p.constraints{i}.num_cols;
 				mex_constraints{i} = cur_cell;
+			end
+			if(~ p.is_mat_consistent(M))
+				error('M''s number of columns must be consistent with the last residuum constraint defined in p. Likewise its number of rows must be consistent with the first factor constraint defined in p.')
 			end
 			% put mex_constraints in a cell array again because mex eats one level of array
 			mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'init_facts', {p.init_facts}, 'niter', p.stop_crit.num_its, 'sc_is_criterion_error', p.stop_crit.is_criterion_error, 'sc_error_treshold', p.stop_crit.error_treshold, 'sc_max_num_its', p.stop_crit.max_num_its, 'update_way', p.is_update_way_R2L);
@@ -134,7 +140,7 @@ classdef FaustFactory
 		%>  res_cons{3} =  ConstraintInt('sp', 32, 32, 333);
 		%>  stop_crit = StoppingCriterion(200);
 		%>  stop_crit2 = StoppingCriterion(200);
-		%>  params = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda, fact_cons, res_cons, size(M,1), size(M,2), {stop_crit, stop_crit2});
+		%>  params = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda, fact_cons, res_cons, {stop_crit, stop_crit2});
 		%>  F = FaustFactory.fact_hierarchical(M, params)
 		%>  @endcode
 		%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation 1/3<br/>
@@ -155,6 +161,9 @@ classdef FaustFactory
 			import matfaust.factparams.*
 			mex_constraints = cell(2, p.num_facts-1);
 			matfaust.FaustFactory.check_fact_mat('FaustFactory.fact_hierarchical', M)
+			if(~ isa(p ,'ParamsHierarchicalFact'))
+				error('p must be a ParamsHierarchicalFact object.')
+			end
 			%mex_fact_constraints = cell(1, p.num_facts-1)
 			for i=1:p.num_facts-1
 				cur_cell = cell(1, 4);
@@ -175,6 +184,10 @@ classdef FaustFactory
 				%mex_residuum_constraints{i} = cur_cell;
 				mex_constraints{2,i} = cur_cell;
 			end
+			if(~ p.is_mat_consistent(M))
+				error('M''s number of columns must be consistent with the last residuum constraint defined in p. Likewise its number of rows must be consistent with the first factor constraint defined in p.')
+			end
+			% the setters for num_rows/cols verifies consistency with constraints
 			mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left, 'update_way', p.is_update_way_R2L);
 			if(isreal(M))
 				[lambda, core_obj] = mexHierarchical_factReal(M, mex_params);

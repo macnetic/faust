@@ -105,7 +105,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
 			params = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,...
-				fact_cons, res_cons, size(M,1), size(M,2), {stop_crit, stop_crit2});
+				fact_cons, res_cons, {stop_crit, stop_crit2});
 			F = FaustFactory.fact_hierarchical(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
@@ -145,7 +145,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
 			params = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,...
-				fact_cons, res_cons, size(M,1), size(M,2), {stop_crit, stop_crit2});
+				fact_cons, res_cons, {stop_crit, stop_crit2});
 			F = FaustFactory.fact_hierarchical(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
