@@ -78,7 +78,7 @@ package_macos:
         paths:
             - build/faust-${CI_COMMIT_SHA:0:8}.pkg
               #- build/faust-${CI_COMMIT_SHA:0:8}.dmg
-        expire_in: '6 mos'
+        expire_in: '1 week'
     tags:
         - macos
     except:
@@ -97,7 +97,7 @@ package_win:
     artifacts:
         paths:
             - build/faust-%CI_COMMIT_SHA:~0,8%-amd64.exe
-        expire_in: '6 mos'
+        expire_in: '1 week'
     tags:
         - win7
     except:
@@ -118,7 +118,7 @@ package_linux:
         paths:
             - build/faust-${CI_COMMIT_SHA:0:8}-x86_64.deb
             - build/faust-${CI_COMMIT_SHA:0:8}-x86_64.rpm
-        expire_in: '6 mos'
+        expire_in: '1 week'
    tags:
         - linux
    except:
