@@ -770,8 +770,7 @@ class TestFaustFactory(unittest.TestCase):
         param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
                                        [fact0_cons, fact1_cons, fact2_cons],
                                        [res0_cons, res1_cons, res2_cons],
-                                       M.shape[0],M.shape[1],[stop_crit1,
-                                                              stop_crit2],
+                                       [stop_crit1, stop_crit2],
                                        is_verbose=False)
         F = FaustFactory.fact_hierarchical(M, param)
         self.assertEqual(F.shape, M.shape)
@@ -807,8 +806,7 @@ class TestFaustFactory(unittest.TestCase):
         param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
                                        [fact0_cons, fact1_cons, fact2_cons],
                                        [res0_cons, res1_cons, res2_cons],
-                                       M.shape[0],M.shape[1],[stop_crit1,
-                                                              stop_crit2],
+                                       [stop_crit1, stop_crit2],
                                        is_verbose=False)
         F = FaustFactory.fact_hierarchical(M, param)
         self.assertEqual(F.shape, M.shape)

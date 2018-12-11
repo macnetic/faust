@@ -223,11 +223,17 @@ class ParamsFact(object):
         self.is_verbose = is_verbose
         self.constant_step_size = constant_step_size
 
+    def is_mat_consistent(self, M):
+        if(not isinstance(M, np.ndarray)):
+            raise ValueError("M must be a numpy ndarray")
+        return M.shape[0] == self.constraints[0]._num_rows and \
+                M.shape[1] == self.constraints[-1]._num_cols
+
+
 class ParamsHierarchicalFact(ParamsFact):
 
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
-                 fact_constraints, res_constraints, data_num_rows,
-                 data_num_cols, stop_crits,
+                 fact_constraints, res_constraints, stop_crits,
                  step_size=10.0**-16, constant_step_size=False,
                  is_verbose=False,
                  is_fact_side_left = False):
@@ -238,8 +244,7 @@ class ParamsHierarchicalFact(ParamsFact):
                                                      constraints, step_size,
                                                      constant_step_size,
                                                      is_verbose)
-        self.data_num_rows = data_num_rows
-        self.data_num_cols = data_num_cols
+
         self.stop_crits = stop_crits
         self.is_fact_side_left = is_fact_side_left
         #TODO: verify number of constraints is consistent with num_facts in
@@ -256,6 +261,9 @@ class ParamsHierarchicalFact(ParamsFact):
                     range(0,len(constraints))]).any()):
             raise TypeError('constraints argument must be a list/tuple of '
                             'ConstraintGeneric (or subclasses) objects')
+        # auto-infer matrix dimension sizes according to the constraints
+        self.data_num_rows = constraints[0]._num_rows
+        self.data_num_cols = constraints[-1]._num_cols
 
 class ParamsPalm4MSA(ParamsFact):
 

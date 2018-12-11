@@ -1385,8 +1385,13 @@ class FaustFactory:
         1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0
         """
         if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSA)):
-            raise ValueError("p must be a ParamsPalm4MSA object.")
+            raise TypeError("p must be a ParamsPalm4MSA object.")
         FaustFactory._check_fact_mat('FaustFactory.fact_palm4msa()', M)
+        if(not p.is_mat_consistent(M)):
+            raise ValueError("M's number of columns must be consistent with "
+                             "the last residuum constraint defined in p. "
+                             "Likewise its number of rows must be consistent "
+                             "with the first factor constraint defined in p.")
         return Faust(core_obj=FaustCorePy.FaustFact.fact_palm4MSA(M, p))
 
     @staticmethod
@@ -1421,8 +1426,7 @@ class FaustFactory:
             >>> param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
             >>>                                [fact0_cons, fact1_cons, fact2_cons],
             >>>                                [res0_cons, res1_cons, res2_cons],
-            >>>                                M.shape[0],M.shape[1],[stop_crit1,
-            >>>                                                       stop_crit2],
+            >>>                                [stop_crit1, stop_crit2],
             >>>                                is_verbose=False)
             >>> F = FaustFactory.fact_hierarchical(M, param)
             Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
@@ -1439,8 +1443,13 @@ class FaustFactory:
                 - FACTOR 3 (real) SPARSE, size 32x32, density 0.325195, nnz 333
                 """
         if(not isinstance(p, pyfaust.factparams.ParamsHierarchicalFact)):
-            raise ValueError("p must be a ParamsHierarchicalFact object.")
+            raise TypeError("p must be a ParamsHierarchicalFact object.")
         FaustFactory._check_fact_mat('FaustFactory.fact_hierarchical()', M)
+        if(not p.is_mat_consistent(M)):
+            raise ValueError("M's number of columns must be consistent with "
+                             "the last residuum constraint defined in p. "
+                             "Likewise its number of rows must be consistent "
+                             "with the first factor constraint defined in p.")
         return Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
 
     @staticmethod
