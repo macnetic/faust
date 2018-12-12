@@ -1311,6 +1311,8 @@ class Faust:
         return isinstance(obj, Faust)
 
 
+import pyfaust.factparams
+
 class FaustFactory:
     """
     This factory class provides methods for generating a Faust especially by factorization of a dense matrix.
@@ -1418,6 +1420,18 @@ class FaustFactory:
                 - FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
                 - FACTOR 3 (real) SPARSE, size 32x32, density 0.325195, nnz 333
                 """
+         
+        if(isinstance(p, str) and p.lower() == "hadamard"):
+            #TODO: FactParamFactory.create('hadamard')
+            from pyfaust.factparams import \
+            ParamsHierarchicalFactHadamard, StoppingCriterion
+            pot = np.log2(M.shape[0])
+            if(pot > int(pot) or M.shape[0] != M.shape[1]):
+                raise ValueError('For the Hadamard parameters, M must be a '
+                                 'square matrix of order a power of '
+                                 'two.')
+            pot = int(pot)
+            p = ParamsHierarchicalFactHadamard(pot)
         if(not isinstance(p, pyfaust.factparams.ParamsHierarchicalFact)):
             raise TypeError("p must be a ParamsHierarchicalFact object.")
         FaustFactory._check_fact_mat('FaustFactory.fact_hierarchical()', M)

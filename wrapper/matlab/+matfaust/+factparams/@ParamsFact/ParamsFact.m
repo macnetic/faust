@@ -134,7 +134,7 @@ classdef (Abstract) ParamsFact
 						end
 					end
 					if(~ i_arg_matched)
-						unrecognized_argument = cell_args{i}
+						unrecognized_argument = cell_args{i};
 						error(['Value above is an unrecognized keyword argument.'])
 					end
 					i = i + 2;

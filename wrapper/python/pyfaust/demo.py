@@ -483,14 +483,12 @@ class hadamard:
         H = FaustFactory.wht(n)
         full_H = H.toarray()
 
-        params = ParamsHierarchicalFact(hadamard._nfacts, is_update_way_R2L=True, init_lambda=1.0,
-                                        fact_constraints=[ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
+        params = ParamsHierarchicalFact([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
                                         for i in range(0,n-1)],
-                                        res_constraints=[ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,int(d/2.**(i+1)))
+                                        [ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,int(d/2.**(i+1)))
                                          for i in range(0,n-1)],
-                                        data_num_rows=d, data_num_cols=d,
-                                        stop_crits=[StoppingCriterion(num_its=30),StoppingCriterion(num_its=30)],
-                                        is_verbose=False)
+                                        StoppingCriterion(num_its=30),StoppingCriterion(num_its=30),
+                                        is_update_way_R2L=True)
         had_faust = FaustFactory.fact_hierarchical(H.toarray(), params)
         full_had_faust = had_faust.toarray()
         rel_err = norm(full_had_faust-full_H)/norm(full_H)

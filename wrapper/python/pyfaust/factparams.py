@@ -269,6 +269,19 @@ class ParamsHierarchicalFact(ParamsFact):
         self.data_num_rows = constraints[0]._num_rows
         self.data_num_cols = constraints[-1]._num_cols
 
+class ParamsHierarchicalFactHadamard(ParamsHierarchicalFact):
+
+    def __init__(self, n):
+        d = 2**int(n)
+        stop_crit = StoppingCriterion(num_its=30)
+        super(ParamsHierarchicalFactHadamard, self).__init__([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
+                                        for i in range(0,n-1)],
+                                        [ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,int(d/2.**(i+1)))
+                                         for i in range(0,n-1)],
+                                        stop_crit, stop_crit,
+                                        is_update_way_R2L=True)
+
+
 class ParamsPalm4MSA(ParamsFact):
 
     def __init__(self, constraints, stop_crit, init_facts=None,

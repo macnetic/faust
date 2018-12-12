@@ -147,6 +147,13 @@ classdef FaustFactory
 		function F = fact_hierarchical(M, p)
 			import matfaust.Faust
 			import matfaust.factparams.*
+			if(strcmp(p,'hadamard'))
+				pot = log2(size(M,1));
+				if(size(M,1) ~= size(M,2) || pot-floor(pot) > 0)
+					error('For the Hadamard parameters, M must be a square matrix of order a power of two.')
+				end
+				p = ParamsHierarchicalFactHadamard(pot);
+			end
 			mex_constraints = cell(2, p.num_facts-1);
 			matfaust.FaustFactory.check_fact_mat('FaustFactory.fact_hierarchical', M)
 			if(~ isa(p ,'ParamsHierarchicalFact'))
