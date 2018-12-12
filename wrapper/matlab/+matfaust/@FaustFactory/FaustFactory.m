@@ -65,15 +65,10 @@ classdef FaustFactory
 		%> @code
 		%>  import matfaust.*
 		%>  import matfaust.factparams.*
-		%>  num_facts = 2;
-		%>  is_update_way_R2L = false;
-		%>  init_lambda = 1.0;
 		%>  M = rand(500, 32);
-		%>  cons = cell(2,1);
-		%>  cons{1} = ConstraintInt('splin', 500, 32, 5);
-		%>  cons{2} = ConstraintReal('normcol', 32, 32, 1.0);
+		%>  cons = {ConstraintInt('splin', 500, 32, 5), ConstraintReal('normcol', 32, 32, 1.0)};
 		%>  stop_crit = StoppingCriterion(200);
-		%>  params = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda, cons, stop_crit);
+		%>  params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', false, 'init_lambda', 1.0);
 		%>  F = FaustFactory.fact_palm4msa(M, params)
 		%> @endcode
 		%>
@@ -126,21 +121,14 @@ classdef FaustFactory
 		%> @code
 		%>  import matfaust.*
 		%>  import matfaust.factparams.*
-		%>  num_facts = 4;
-		%>  is_update_way_R2L = false;
-		%>  init_lambda = 1.0;
 		%>  M = rand(500, 32);
 		%>  fact_cons = cell(3, 1);
 		%>  res_cons = cell(3, 1);
-		%>  fact_cons{1} = ConstraintInt('splin', 500, 32, 5);
-		%>  fact_cons{2} = ConstraintInt('sp', 32, 32, 96);
-		%>  fact_cons{3} = ConstraintInt('sp', 32, 32, 96);
-		%>  res_cons{1} = ConstraintReal('normcol', 32, 32, 1);
-		%>  res_cons{2} =  ConstraintInt('sp', 32, 32, 666);
-		%>  res_cons{3} =  ConstraintInt('sp', 32, 32, 333);
+		%>  fact_cons = {ConstraintInt('splin', 500, 32, 5), ConstraintInt('sp', 32, 32, 96), ConstraintInt('sp', 32, 32, 96)};
+		%>  res_cons = {ConstraintReal('normcol', 32, 32, 1), ConstraintInt('sp', 32, 32, 666), ConstraintInt('sp', 32, 32, 333)};
 		%>  stop_crit = StoppingCriterion(200);
 		%>  stop_crit2 = StoppingCriterion(200);
-		%>  params = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda, fact_cons, res_cons, {stop_crit, stop_crit2});
+		%>  params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2, 'is_update_way_R2L', false, 'init_lambda', 1.0);
 		%>  F = FaustFactory.fact_hierarchical(M, params)
 		%>  @endcode
 		%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation 1/3<br/>

@@ -9,54 +9,56 @@ classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
 	end
 	properties(Constant)
 		DEFAULT_IS_FACT_SIDE_LEFT = false
+		IDX_IS_FACT_SIDE_LEFT = 1
+		OPT_ARG_NAMES2 = { 'is_fact_side_left' }
 	end
 	methods
-		function p = ParamsHierarchicalFact(varargin)
-			MIN_NARGIN = 6;
-			if(nargin < MIN_NARGIN)
-				error(['matfaust.factparams.ParamsHierarchicalFact() must receive at least',int2str(MIN_NARGIN),' arguments'])
+		function p = ParamsHierarchicalFact(fact_constraints, res_constraints, stop_crit1, stop_crit2, varargin)
+			import matfaust.factparams.*
+			if(~ iscell(fact_constraints))
+				error('fact_constraints (argument 1) must be a cell array')
 			end
-			num_facts = varargin{1};
-			is_update_way_R2L = varargin{2};
-			init_lambda = varargin{3};
-			fact_constraints = varargin{4};
-			res_constraints = varargin{5};
+			if(~ iscell(res_constraints))
+				error('res_constraints (argument 2) must be a cell array')
+			end
+			if(length(fact_constraints) ~= length(res_constraints))
+				error('lengths of fact_constraints and res_constraints must be equal.')
+			end
+			if(~ isa(stop_crit1, 'StoppingCriterion'))
+				error('stop_crit1 (argument 3) must a StoppingCriterion')
+			end
+			if(~ isa(stop_crit2, 'StoppingCriterion'))
+				error('stop_crit2 (argument 4) must a StoppingCriterion')
+			end
 			constraints = {fact_constraints{:}, res_constraints{:}};
-			% data_num_rows/data_num_cols are set by FaustFactory.fact_hierarchical()
-			stop_crits = varargin{6};
-			% set default values
-			is_fact_side_left = matfaust.factparams.ParamsHierarchicalFact.DEFAULT_IS_FACT_SIDE_LEFT;
-			step_size = matfaust.factparams.ParamsFact.DEFAULT_STEP_SIZE;
-			is_verbose = matfaust.factparams.ParamsFact.DEFAULT_VERBOSITY;
-			constant_step_size = matfaust.factparams.ParamsFact.DEFAULT_CONSTANT_STEP_SIZE;
-			if(nargin > MIN_NARGIN+1)
-				step_size = varargin{MIN_NARGIN+2};
-				if(nargin > MIN_NARGIN+2)
-					constant_step_size = varargin{MIN_NARGIN+3};
-					if(nargin > MIN_NARGIN+3)
-						is_verbose = varargin{MIN_NARGIN+4};
-						if(nargin > MIN_NARGIN+4)
-							is_fact_side_left = varargin{MIN_NARGIN+5};
-						end
+			stop_crits = {stop_crit1, stop_crit2};
+			% infer number of factors from constraints
+			num_facts = length(fact_constraints)+1;
+			parent_args = {};
+			opt_arg_map = containers.Map();
+			if(length(varargin) > 0)
+				% retrieve all optional argument key-value pairs
+				opt_arg_names = {ParamsFact.OPT_ARG_NAMES, ParamsHierarchicalFact.OPT_ARG_NAMES2};
+				opt_arg_names = {opt_arg_names{1}{:}, opt_arg_names{2}{:}};
+				ParamsFact.parse_opt_args(varargin, opt_arg_names, opt_arg_map)
+				% gather all parent argument key-value pairs
+
+				for i=1:length(ParamsFact.OPT_ARG_NAMES)
+					if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{i}))
+						parent_args = [ parent_args, {ParamsFact.OPT_ARG_NAMES{i}}, {opt_arg_map(ParamsFact.OPT_ARG_NAMES{i}) }];
 					end
 				end
+				% parent constructor handles verification for its own arguments
 			end
-			% parent constructor handles verification for its own arguments
-			p = p@matfaust.factparams.ParamsFact(num_facts, is_update_way_R2L, init_lambda, ...
-				constraints, step_size, constant_step_size, is_verbose);
-			if(~ iscell(stop_crits))
-				error('matfaust.factparams.ParamsHierarchicalFact 6th argument (stop_crits) must be a cell array.')
-				if(length(stop_crits) ~= 2 )
-					error('matfaust.factparams.ParamsHierarchicalFact 6th argument (stop_crits) must be a cell array of 2 elements.')
-				end
-				for i = 1:length(stop_crits)
-					if(~ isa(stop_crits{i}, matfaust.factparams.StoppingCriterion))
-						error('matfaust.factparams.ParamsHierarchicalFact 6th argument (stop_crits) must contain matfaust.factparams.StoppingCriterion objects.')
-					end
-				end
+			p = p@matfaust.factparams.ParamsFact(num_facts, constraints, parent_args{:});
+			% data_num_rows/data_num_cols are set by FaustFactory.fact_hierarchical()
+			% set default values
+			is_fact_side_left = ParamsHierarchicalFact.DEFAULT_IS_FACT_SIDE_LEFT;
+			if(opt_arg_map.isKey(ParamsHierarchicalFact.OPT_ARG_NAMES2{p.IDX_IS_FACT_SIDE_LEFT}))
+				is_fact_side_left = opt_arg_map(ParamsHierarchicalFact.OPT_ARG_NAMES2{p.IDX_IS_FACT_SIDE_LEFT});
 			end
 			if(~ islogical(is_fact_side_left))
-				error('matfaust.factparams.ParamsHierarchicalFact 11th argument (is_fact_side_left) must be logical.')
+				error('matfaust.factparams.ParamsHierarchicalFact: is_fact_side_left argument must be logical.')
 			end
 			p.stop_crits = stop_crits;
 			p.is_fact_side_left = is_fact_side_left;

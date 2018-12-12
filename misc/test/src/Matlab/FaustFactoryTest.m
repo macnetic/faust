@@ -36,7 +36,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			cons{1} = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5);
 			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
 			stop_crit = StoppingCriterion(200);
-			params = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda, cons, stop_crit, init_facts, ParamsFact.DEFAULT_STEP_SIZE, ParamsFact.DEFAULT_CONSTANT_STEP_SIZE);
+			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda, 'step_size', ParamsFact.DEFAULT_STEP_SIZE,...
+			'constant_step_size', ParamsFact.DEFAULT_CONSTANT_STEP_SIZE);
 			F = FaustFactory.fact_palm4msa(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
@@ -67,7 +68,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			cons{1} = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5);
 			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
 			stop_crit = StoppingCriterion(200);
-			params = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda, cons, stop_crit, init_facts, ParamsFact.DEFAULT_STEP_SIZE, ParamsFact.DEFAULT_CONSTANT_STEP_SIZE);
+			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda);
 			F = FaustFactory.fact_palm4msa(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
@@ -104,8 +105,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			res_cons{3} =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333);
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
-			params = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,...
-				fact_cons, res_cons, {stop_crit, stop_crit2});
+			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2);
 			F = FaustFactory.fact_hierarchical(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
@@ -144,8 +144,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			res_cons{3} =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333);
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
-			params = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,...
-				fact_cons, res_cons, {stop_crit, stop_crit2});
+			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2,...
+					'init_lambda', init_lambda, 'is_update_way_R2L', is_update_way_R2L);
 			F = FaustFactory.fact_hierarchical(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
@@ -184,7 +184,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			fF = full(F);
 			fftI = fft(eye(2^n));
 			% this.verifyEqual(nnz(fH), numel(fH));
-			this.verifyEqual(norm(fF-fftI), 0, 'AbsTol',10^-13);
+			this.verifyEqual(norm(fF-fftI), 0, 'AbsTol',10^-12);
 		end
 	end
 

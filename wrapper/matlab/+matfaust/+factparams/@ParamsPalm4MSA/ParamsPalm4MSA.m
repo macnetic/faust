@@ -1,64 +1,60 @@
+
 %% class ParamsPalm4MSA
 %%
+%
 classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 	properties (SetAccess = public)
 		init_facts
 		stop_crit
 	end
+	properties (Constant, SetAccess = private)
+		IDX_INIT_FACTS = 1
+		OPT_ARG_NAMES2 = { 'init_facts' }
+	end
 	methods
-		function p = ParamsPalm4MSA(varargin)
-			import matfaust.factparams.ParamsFact
-			MIN_NARGIN = 5;
-			if(nargin < MIN_NARGIN)
-				error(['matfaust.factparams.ParamsPalm4MSA() must receive at least ', int2str(MIN_NARGIN),' arguments.'])
+		function p = ParamsPalm4MSA(constraints, stop_crit, varargin)
+			import matfaust.factparams.*
+			if(~ iscell(constraints))
+				error('constraints (argument 1) must be a cell array')
 			end
-			num_facts = varargin{1};
-			is_update_way_R2L = varargin{2};
-			init_lambda = varargin{3};
-			constraints = varargin{4};
-			stop_crit = varargin{5};
-			% set default values
-			step_size = ParamsFact.DEFAULT_STEP_SIZE;
-			is_verbose = ParamsFact.DEFAULT_VERBOSITY;
-			constant_step_size = ParamsFact.DEFAULT_CONSTANT_STEP_SIZE;
-			is_init_facts_to_default = nargin <= MIN_NARGIN;
-			if(~ is_init_facts_to_default)
-				init_facts = varargin{MIN_NARGIN+1};
-				if(nargin > MIN_NARGIN+1)
-					step_size = varargin{MIN_NARGIN+2};
-					if(nargin > MIN_NARGIN+2)
-						constant_step_size = varargin{MIN_NARGIN+3};
-						if(nargin > MIN_NARGIN+3)
-							is_verbose = varargin{MIN_NARGIN+4};
-						end
-					end
-				end
+			num_facts = length(constraints);
+			if(~ isa(stop_crit, 'StoppingCriterion'))
+				error('stop_crit (argument 2) must a StoppingCriterion')
 			end
-
-			% parent constructor handles verification for its own arguments
-			p = p@matfaust.factparams.ParamsFact(num_facts, is_update_way_R2L, init_lambda, ...
-				constraints, step_size, constant_step_size, is_verbose);
-			if(is_init_facts_to_default || iscell(init_facts) && length(init_facts) == 0)
-				init_facts = cell(num_facts, 1);
-				if(is_update_way_R2L)
-					zeros_id = num_facts;
-				else
-					zeros_id = 1;
-				end
-				for i=1:num_facts
-					if(i ~= zeros_id)
-						init_facts{i} = eye(constraints{i}.num_rows, constraints{i}.num_cols);
+			parent_args = {};
+			opt_arg_map = containers.Map();
+			if(length(varargin) > 0)
+				% retrieve all optional argument key-value pairs
+				opt_arg_names = {ParamsFact.OPT_ARG_NAMES, ParamsPalm4MSA.OPT_ARG_NAMES2};
+				opt_arg_names = {opt_arg_names{1}{:}, opt_arg_names{2}{:}};
+				ParamsFact.parse_opt_args(varargin, opt_arg_names, opt_arg_map)
+				% gather all parent argument key-value pairs
+				for i=1:length(ParamsFact.OPT_ARG_NAMES)
+					if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{i}))
+						parent_args = [ parent_args, {ParamsFact.OPT_ARG_NAMES{i}}, {opt_arg_map(ParamsFact.OPT_ARG_NAMES{i}) }];
 					end
-				end
-				init_facts{zeros_id} = ...
-					zeros(constraints{zeros_id}.num_rows, constraints{zeros_id}.num_cols);
+				end%
+				% parent constructor handles verification for its own arguments
+			end
+			p = p@matfaust.factparams.ParamsFact(num_facts, constraints, parent_args{:});
+			init_facts_name = p.OPT_ARG_NAMES{p.IDX_INIT_FACTS};
+			try
+				init_facts = opt_arg_map(init_facts_name);
+			catch
+				% arg int_facts not passed
+			end
+			if(~ exist(init_facts_name) || iscell(init_facts) && length(init_facts) == 0)
+				init_facts = p.get_default_init_facts(num_facts);
 			elseif(~ iscell(init_facts)) % TODO: check init_facts length
-				error('matfaust.factparams.ParamsFactPalm4MSA 4th argument (init_facts) must be a cell array.')
+				error(['matfaust.factparams.ParamsFactPalm4MSA argument ' init_facts_name ' must be a cell array.'])
 			else
+				% check init_facts
+				% TODO: check the number of init_facts
 				for i = 1:length(init_facts)
 					if(~ ismatrix(init_facts{i}) || ~ isnumeric(init_facts{i}))
-						error('matfaust.factparams.ParamsFactPalm4MSA 4th argument (init_facts) must contain matrices.')
-						%TODO: check matrix dimensions
+						error(['matfaust.factparams.ParamsFactPalm4MSA ' init_facts_name ' argument must contain matrices.'])
+						% matrix dimensions are tested later by fact_palm4msa() with is_mat_consistent()
+						% TODO: add to is_mat_consistent() the checking of init_facts
 					end
 				end
 			end
@@ -67,6 +63,23 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 				error('matfaust.factparams.ParamsPalm4MSA argument (stop_crit) must be a matfaust.factparams.StoppingCriterion objects.')
 			end
 			p.stop_crit = stop_crit;
+		end
+	end
+	methods
+		function init_facts = get_default_init_facts(p, num_facts)
+			init_facts = cell(num_facts, 1);
+			if(p.is_update_way_R2L)
+				zeros_id = num_facts;
+			else
+				zeros_id = 1;
+			end
+			for i=1:num_facts
+				if(i ~= zeros_id)
+					init_facts{i} = eye(p.constraints{i}.num_rows, p.constraints{i}.num_cols);
+				end
+			end
+			init_facts{zeros_id} = ...
+				zeros(p.constraints{zeros_id}.num_rows, p.constraints{zeros_id}.num_cols);
 		end
 	end
 end
