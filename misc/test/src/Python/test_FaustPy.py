@@ -151,15 +151,15 @@ class TestFaustPy(unittest.TestCase):
             ref_full_NF = F.todense()
             # print("axis=", axis, "ord=", ord)
             for i in range(0,F.shape[axis]):
-                if(axis == 0 and norm(ref_full_NF[i,:]) != 0):
+                if(axis == 0 and norm(ref_full_NF[i,:], ord) != 0):
                     ref_full_NF[i,:] = ref_full_NF[i,:]/norm(ref_full_NF[i,:], ord)
-                elif(axis == 1 and norm(ref_full_NF[:,i]) != 0):
+                elif(axis == 1 and norm(ref_full_NF[:,i], ord) != 0):
                     ref_full_NF[:,i] = ref_full_NF[:,i]/norm(ref_full_NF[:,i], ord)
             self.assertAlmostEqual(norm(ref_full_NF),norm(test_NF.todense()),
                             places=3,
                                msg="\nref_full_F=\n"+str(F.todense())+"\nref_full_NF=\n"+str(ref_full_NF)+"\ntest_NF.todense()=\n"+ \
                                    str(test_NF.todense())+"\nF=\n"+str(F.todense())+ \
-                                   str(F.save('/tmp/normalize_test.m')))
+                                   str(F.save('/tmp/normalize_test.mat')))
 
 
     def testNormInf(self):
@@ -718,9 +718,9 @@ class TestFaustFactory(unittest.TestCase):
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName
         from pyfaust.factparams import ParamsPalm4MSA, StoppingCriterion
-        num_facts = 2
-        is_update_way_R2L = False
-        init_lambda = 1.0
+        #num_facts = 2
+        #is_update_way_R2L = False
+        #init_lambda = 1.0
 #        init_facts = list()
 #        init_facts.append(np.zeros([500,32]))
 #        init_facts.append(np.eye(32))
@@ -732,8 +732,8 @@ class TestFaustFactory(unittest.TestCase):
         cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32,
                                  32, 1.0)
         stop_crit = StoppingCriterion(num_its=200)
-        param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
-                               [cons1, cons2], stop_crit, init_facts=None,
+        param = ParamsPalm4MSA([cons1, cons2], stop_crit, init_facts=None,
+                               is_update_way_R2L=False, init_lambda=1.0,
                                is_verbose=False, constant_step_size=False)
         F = FaustFactory.fact_palm4msa(M, param)
         #F.display()
@@ -767,10 +767,9 @@ class TestFaustFactory(unittest.TestCase):
         res2_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333)
         stop_crit1 = StoppingCriterion(num_its=200)
         stop_crit2 = StoppingCriterion(num_its=200)
-        param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
-                                       [fact0_cons, fact1_cons, fact2_cons],
+        param = ParamsHierarchicalFact([fact0_cons, fact1_cons, fact2_cons],
                                        [res0_cons, res1_cons, res2_cons],
-                                       [stop_crit1, stop_crit2],
+                                       stop_crit1, stop_crit2,
                                        is_verbose=False)
         F = FaustFactory.fact_hierarchical(M, param)
         self.assertEqual(F.shape, M.shape)
@@ -803,10 +802,9 @@ class TestFaustFactory(unittest.TestCase):
         res2_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333)
         stop_crit1 = StoppingCriterion(num_its=200)
         stop_crit2 = StoppingCriterion(num_its=200)
-        param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
-                                       [fact0_cons, fact1_cons, fact2_cons],
+        param = ParamsHierarchicalFact([fact0_cons, fact1_cons, fact2_cons],
                                        [res0_cons, res1_cons, res2_cons],
-                                       [stop_crit1, stop_crit2],
+                                       stop_crit1, stop_crit2,
                                        is_verbose=False)
         F = FaustFactory.fact_hierarchical(M, param)
         self.assertEqual(F.shape, M.shape)
@@ -839,9 +837,9 @@ class TestFaustFactory(unittest.TestCase):
         cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32,
                                  32, 1.0)
         stop_crit = StoppingCriterion(num_its=200)
-        param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
-                               [cons1, cons2], stop_crit, init_facts=None,
-                               is_verbose=False, constant_step_size=False)
+        param = ParamsPalm4MSA([cons1, cons2], stop_crit, init_facts=None,
+                               is_verbose=False, constant_step_size=False,
+                               is_update_way_R2L=False, init_lambda=1.0)
         F = FaustFactory.fact_palm4msa(M, param)
         #F.display()
         #print("normF", F.norm("fro"))

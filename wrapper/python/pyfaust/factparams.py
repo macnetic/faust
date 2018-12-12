@@ -213,8 +213,8 @@ class ConstraintName:
 class ParamsFact(object):
 
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
-                 constraints, step_size, constant_step_size=False, is_verbose=False,
-                 ):
+                 constraints, step_size, constant_step_size,
+                 is_verbose):
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
@@ -229,22 +229,26 @@ class ParamsFact(object):
         return M.shape[0] == self.constraints[0]._num_rows and \
                 M.shape[1] == self.constraints[-1]._num_cols
 
-
 class ParamsHierarchicalFact(ParamsFact):
 
-    def __init__(self, num_facts, is_update_way_R2L, init_lambda,
-                 fact_constraints, res_constraints, stop_crits,
+    def __init__(self, fact_constraints, res_constraints, stop_crit1,
+                 stop_crit2, is_update_way_R2L=False, init_lambda=1.0,
                  step_size=10.0**-16, constant_step_size=False,
-                 is_verbose=False,
-                 is_fact_side_left = False):
+                 is_fact_side_left=False,
+                 is_verbose=False):
+        if(not isinstance(fact_constraints, list)):
+            raise TypeError('fact_constraints must be a list.')
+        if(not isinstance(res_constraints, list)):
+            raise TypeError('res_constraints must be a list.')
+        num_facts = len(fact_constraints)+1
         constraints = fact_constraints + res_constraints
+        stop_crits = [ stop_crit1, stop_crit2 ]
         super(ParamsHierarchicalFact, self).__init__(num_facts,
                                                      is_update_way_R2L,
                                                      init_lambda,
                                                      constraints, step_size,
                                                      constant_step_size,
                                                      is_verbose)
-
         self.stop_crits = stop_crits
         self.is_fact_side_left = is_fact_side_left
         #TODO: verify number of constraints is consistent with num_facts in
@@ -267,10 +271,14 @@ class ParamsHierarchicalFact(ParamsFact):
 
 class ParamsPalm4MSA(ParamsFact):
 
-    def __init__(self, num_facts, is_update_way_R2L, init_lambda,
-                 constraints, stop_crit, init_facts=None, step_size=10.0**-16,
+    def __init__(self, constraints, stop_crit, init_facts=None,
+                 is_update_way_R2L=False, init_lambda=1.0,
+                 step_size=10.0**-16,
                  constant_step_size=False,
                  is_verbose=False):
+        if(not isinstance(constraints, list)):
+            raise TypeError('constraints argument must be a list.')
+        num_facts = len(constraints)
         super(ParamsPalm4MSA, self).__init__(num_facts, is_update_way_R2L,
                                              init_lambda,
                                              constraints, step_size,

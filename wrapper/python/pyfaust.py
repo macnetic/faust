@@ -1358,31 +1358,16 @@ class FaustFactory:
         >>> from pyfaust.factparams import ParamsPalm4MSA, ConstraintReal,\
         >>> ConstraintInt, ConstraintName, StoppingCriterion
         >>> import numpy as np
-        >>> num_facts = 2
-        >>> is_update_way_R2L = False
-        >>> init_lambda = 1.0
         >>> M = np.random.rand(500, 32)
-        >>> cons1 = ConstraintInt('splin', 500, 32, 5)
-        >>> cons2 = ConstraintReal('normcol', 32, 32, 1.0)
+        >>> cons = [ ConstraintInt('splin', 500, 32, 5),
+        >>>          ConstraintReal('normcol', 32, 32, 1.0)]
         >>> stop_crit = StoppingCriterion(num_its=200)
-        >>> # default step_size is 1e-16
-        >>> param = ParamsPalm4MSA(num_facts, is_update_way_R2L, init_lambda,
-        >>>                        [cons1, cons2], stop_crit,
-        >>>                        is_verbose=False)
+        >>> param = ParamsPalm4MSA(cons, stop_crit)
         >>> F = FaustFactory.fact_palm4msa(M, param)
         >>> F.display()
         Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):<br/>
         FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500<br/>
         FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024<br/>
-        >>> # verify if NORMCOL constraint is respected by the 2nd factor
-        >>> from numpy.linalg import norm
-        >>> for i in range(0, F.get_factor(1).shape[1]):
-        >>>     if(i<F.get_factor(1).shape[1]-1):
-        >>>             end=' '
-        >>>     else:
-        >>>             end='\n'
-        >>>     print(norm(F.get_factor(1)[:,i]), end=end)
-        1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0
         """
         if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSA)):
             raise TypeError("p must be a ParamsPalm4MSA object.")
@@ -1411,23 +1396,14 @@ class FaustFactory:
             >>> from pyfaust.factparams import ParamsHierarchicalFact, ConstraintReal,\
             >>> ConstraintInt, ConstraintName, StoppingCriterion
             >>> import numpy as np
-            >>> num_facts = 4
-            >>> is_update_way_R2L = False
-            >>> init_lambda = 1.0
             >>> M = np.random.rand(500, 32)
-            >>> fact0_cons = ConstraintInt('splin', 500, 32, 5)
-            >>> fact1_cons = ConstraintInt('sp', 32, 32, 96)
-            >>> fact2_cons = ConstraintInt('sp', 32, 32, 96)
-            >>> res0_cons = ConstraintReal('normcol', 32, 32, 1)
-            >>> res1_cons =  ConstraintInt('sp', 32, 32, 666)
-            >>> res2_cons =  ConstraintInt('sp', 32, 32, 333)
+            >>> fact_cons = [ ConstraintInt('splin', 500, 32, 5), ConstraintInt('sp', 32, 32, 96),
+            >>>               ConstraintInt('sp', 32, 32, 96)]
+            >>> res_cons = [ ConstraintReal('normcol', 32, 32, 1), ConstraintInt('sp', 32, 32, 666),
+            >>>              ConstraintInt('sp', 32, 32, 333)]
             >>> stop_crit1 = StoppingCriterion(num_its=200)
             >>> stop_crit2 = StoppingCriterion(num_its=200)
-            >>> param = ParamsHierarchicalFact(num_facts, is_update_way_R2L, init_lambda,
-            >>>                                [fact0_cons, fact1_cons, fact2_cons],
-            >>>                                [res0_cons, res1_cons, res2_cons],
-            >>>                                [stop_crit1, stop_crit2],
-            >>>                                is_verbose=False)
+            >>> param = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit1, stop_crit2)
             >>> F = FaustFactory.fact_hierarchical(M, param)
             Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
             1/3<br/>
