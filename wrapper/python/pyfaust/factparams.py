@@ -240,8 +240,14 @@ class ParamsHierarchicalFact(ParamsFact):
             raise TypeError('fact_constraints must be a list.')
         if(not isinstance(res_constraints, list)):
             raise TypeError('res_constraints must be a list.')
+        if(len(fact_constraints) != len(res_constraints)):
+            raise ValueError('fact_constraints and res_constraints must have'
+                             ' same length.')
         num_facts = len(fact_constraints)+1
-        constraints = fact_constraints + res_constraints
+        if(is_fact_side_left):
+            constraints = res_constraints + fact_constraints
+        else:
+            constraints = fact_constraints + res_constraints
         stop_crits = [ stop_crit1, stop_crit2 ]
         super(ParamsHierarchicalFact, self).__init__(num_facts,
                                                      is_update_way_R2L,
@@ -251,7 +257,6 @@ class ParamsHierarchicalFact(ParamsFact):
                                                      is_verbose)
         self.stop_crits = stop_crits
         self.is_fact_side_left = is_fact_side_left
-        #TODO: verify number of constraints is consistent with num_facts in
         if((not isinstance(stop_crits, list) and not isinstance(stop_crits,
                                                                 tuple)) or
            len(stop_crits) != 2 or
@@ -266,20 +271,59 @@ class ParamsHierarchicalFact(ParamsFact):
             raise TypeError('constraints argument must be a list/tuple of '
                             'ConstraintGeneric (or subclasses) objects')
         # auto-infer matrix dimension sizes according to the constraints
-        self.data_num_rows = constraints[0]._num_rows
-        self.data_num_cols = constraints[-1]._num_cols
+        if(is_fact_side_left):
+            self.data_num_rows = res_constraints[-1]._num_rows
+            self.data_num_cols = fact_constraints[0]._num_cols
+        else:
+            self.data_num_rows = constraints[0]._num_rows
+            self.data_num_cols = constraints[-1]._num_cols
 
-class ParamsHierarchicalFactHadamard(ParamsHierarchicalFact):
+    def is_mat_consistent(self, M):
+        if(not isinstance(M, np.ndarray)):
+            raise ValueError("M must be a numpy ndarray")
+        return M.shape[0] == self.data_num_rows and \
+                M.shape[1] == self.data_num_cols
+
+class ParamsHierarchicalFactSquareMat(ParamsHierarchicalFact):
 
     def __init__(self, n):
         d = 2**int(n)
         stop_crit = StoppingCriterion(num_its=30)
-        super(ParamsHierarchicalFactHadamard, self).__init__([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
+        super(ParamsHierarchicalFactSquareMat, self).__init__([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
                                         for i in range(0,n-1)],
                                         [ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,int(d/2.**(i+1)))
                                          for i in range(0,n-1)],
                                         stop_crit, stop_crit,
                                         is_update_way_R2L=True)
+
+
+
+class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
+
+    DEFAULT_P_CONST_FACT = 1.4
+
+    def __init__(self, m, n, j, k, s, rho=0.8, P=None):
+        #TODO: test args
+        from math import ceil
+        if(not P):
+            P=ParamsHierarchicalFactRectMat.DEFAULT_P_CONST_FACT*m**2
+            S1_cons = ConstraintInt('spcol', m, n, k)
+
+        S_cons = [S1_cons];
+        for i in range(j-2):
+            S_cons += [ ConstraintInt('sp', m, m, s*m) ]
+
+        R_cons = []
+        for i in range(j-1):
+            R_cons += [ConstraintInt('sp', m, m, ceil(P*rho**i))]
+
+        stop_crit = StoppingCriterion(num_its=30)
+
+        super(ParamsHierarchicalFactRectMat, self).__init__(S_cons, R_cons,
+                                                            stop_crit,
+                                                            stop_crit,
+                                                            is_update_way_R2L=True,
+                                                            is_fact_side_left=True)
 
 
 class ParamsPalm4MSA(ParamsFact):

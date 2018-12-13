@@ -30,10 +30,7 @@ classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
 			if(~ isa(stop_crit2, 'StoppingCriterion'))
 				error('stop_crit2 (argument 4) must a StoppingCriterion')
 			end
-			constraints = {fact_constraints{:}, res_constraints{:}};
-			stop_crits = {stop_crit1, stop_crit2};
-			% infer number of factors from constraints
-			num_facts = length(fact_constraints)+1;
+
 			parent_args = {};
 			opt_arg_map = containers.Map();
 			if(length(varargin) > 0)
@@ -50,24 +47,45 @@ classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
 				end
 				% parent constructor handles verification for its own arguments
 			end
-			p = p@matfaust.factparams.ParamsFact(num_facts, constraints, parent_args{:});
-			% data_num_rows/data_num_cols are set by FaustFactory.fact_hierarchical()
 			% set default values
 			is_fact_side_left = ParamsHierarchicalFact.DEFAULT_IS_FACT_SIDE_LEFT;
-			if(opt_arg_map.isKey(ParamsHierarchicalFact.OPT_ARG_NAMES2{p.IDX_IS_FACT_SIDE_LEFT}))
-				is_fact_side_left = opt_arg_map(ParamsHierarchicalFact.OPT_ARG_NAMES2{p.IDX_IS_FACT_SIDE_LEFT});
+			if(opt_arg_map.isKey(ParamsHierarchicalFact.OPT_ARG_NAMES2{ParamsHierarchicalFact.IDX_IS_FACT_SIDE_LEFT}))
+				is_fact_side_left = opt_arg_map(ParamsHierarchicalFact.OPT_ARG_NAMES2{ParamsHierarchicalFact.IDX_IS_FACT_SIDE_LEFT});
 			end
 			if(~ islogical(is_fact_side_left))
 				error('matfaust.factparams.ParamsHierarchicalFact: is_fact_side_left argument must be logical.')
 			end
+			if(is_fact_side_left)
+				constraints = {res_constraints{:}, fact_constraints{:}};
+			else
+				constraints = {fact_constraints{:}, res_constraints{:}};
+			end
+			stop_crits = {stop_crit1, stop_crit2};
+			% infer number of factors from constraints
+			num_facts = length(fact_constraints)+1;
+			p = p@matfaust.factparams.ParamsFact(num_facts, constraints, parent_args{:});
 			p.stop_crits = stop_crits;
 			p.is_fact_side_left = is_fact_side_left;
 			% auto-deduced to-factorize-matrix dim. sizes
-			p.data_num_rows = p.constraints{1}.num_rows;
-			p.data_num_cols = p.constraints{end}.num_cols;
+			if(p.is_fact_side_left)
+				p.data_num_rows = res_constraints{end}.num_rows;
+				p.data_num_cols = fact_constraints{1}.num_cols;
+			else
+				p.data_num_rows = p.constraints{1}.num_rows;
+				p.data_num_cols = p.constraints{end}.num_cols;
+			end
 		end
 
-
+		function bool = is_mat_consistent(this, M)
+			if(~ ismatrix(M))
+				error('M must be a matrix.')
+			else
+				% no need to take care of is_fact_side_left
+				% because data_num_rows and data_num_cols have been infered according to the constraints and is_fact_side_left
+				s = size(M);
+				bool = all(s == [this.data_num_rows, this.data_num_cols]);
+			end
+		end
 
 	end
 end

@@ -1,11 +1,12 @@
-classdef ParamsHierarchicalFactHadamard < matfaust.factparams.ParamsHierarchicalFact
+classdef ParamsHierarchicalFactSquareMat < matfaust.factparams.ParamsHierarchicalFact
 	methods
-		function p = ParamsHierarchicalFactHadamard(n)
+		function p = ParamsHierarchicalFactSquareMat(n)
 			import matfaust.factparams.*
 			d = 2^floor(n);
 			fact_cons = {};
 			res_cons = {};
 			stop_crit = StoppingCriterion(30);
+			% ENOTE: cell concatenation
 			for i=0:(n-2)
 				fact_cons = [ fact_cons, {ConstraintInt('splincol',d,d,2)} ];
 			end
