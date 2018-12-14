@@ -147,5 +147,6 @@ cdef extern from "FaustFact.h":
                                              PyxParamsFactPalm4MSA[FPP,FPP2]*)
 
     cdef FaustCoreCpp[FPP]* fact_hierarchical[FPP,FPP2](FPP*,unsigned int, unsigned int,
-                                             PyxParamsHierarchicalFact[FPP,FPP2]*)
+                                             PyxParamsHierarchicalFact[FPP,FPP2]*,
+                                                       FPP*)
 

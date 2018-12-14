@@ -889,6 +889,9 @@ cdef class FaustFact:
         cdef double[:,:] Mview
         cdef complex[:,:] Mview_cplx
 
+        cdef double[:] lambdaview
+        cdef complex[:] lambdaview_cplx
+
         cdef double[:,:] tmp_mat
         cdef complex[:,:] tmp_mat_cplx
 
@@ -912,7 +915,7 @@ cdef class FaustFact:
         cpp_stop_crits[1].max_num_its = p.stop_crits[1].max_num_its
 
 
-
+        _lambda = np.array([0], dtype=M.dtype)
         if(isReal):
             Mview=M
             cpp_params.num_facts = p.num_facts
@@ -923,6 +926,7 @@ cdef class FaustFact:
             cpp_params.is_verbose = p.is_verbose
             cpp_params.is_fact_side_left = p.is_fact_side_left
             cpp_params.constant_step_size = p.constant_step_size
+            lambdaview = _lambda
         else:
             Mview_cplx=M
             cpp_params_cplx.num_facts = p.num_facts
@@ -934,6 +938,7 @@ cdef class FaustFact:
             cpp_params_cplx.is_verbose = p.is_verbose
             cpp_params_cplx.is_fact_side_left = p.is_fact_side_left
             cpp_params_cplx.constant_step_size = p.constant_step_size
+            lambdaview_cplx = _lambda
 
         cpp_constraints = \
         <PyxConstraintGeneric**> \
@@ -988,13 +993,13 @@ cdef class FaustFact:
         if(isReal):
             core.core_faust_dbl = FaustCoreCy.fact_hierarchical[double,double](&Mview[0,0], M_num_rows, M_num_cols,
  #           FaustCoreCy.fact_hierarchical(&Mview[0,0], M_num_rows, M_num_cols,
-                                      &cpp_params)
+                                      &cpp_params, &lambdaview[0])
             core._isReal = True
             #TODO: FPP == complex not yet supported by C++ code
         else:
             core.core_faust_cplx = \
             FaustCoreCy.fact_hierarchical[complex, double](&Mview_cplx[0,0], M_num_rows, M_num_cols,
-                                     &cpp_params_cplx)
+                                     &cpp_params_cplx, &lambdaview_cplx[0])
             core._isReal = False
         for i in range(0,len(p.constraints)):
             PyMem_Free(cpp_constraints[i])
@@ -1002,5 +1007,5 @@ cdef class FaustFact:
 
         PyMem_Free(cpp_stop_crits)
 
-        return core
+        return core,np.real(_lambda[0])
 

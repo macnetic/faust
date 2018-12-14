@@ -82,7 +82,7 @@ template<typename FPP, typename FPP2 = double>
 FaustCoreCpp<FPP>* fact_palm4MSA(FPP*, unsigned int, unsigned int, PyxParamsFactPalm4MSA<FPP,FPP2>*, bool);
 
 template<typename FPP, typename FPP2 = double>
-FaustCoreCpp<FPP>* fact_hierarchical(FPP*, unsigned int, unsigned int, PyxParamsHierarchicalFact<FPP,FPP2>*, bool);
+FaustCoreCpp<FPP>* fact_hierarchical(FPP*, unsigned int, unsigned int, PyxParamsHierarchicalFact<FPP,FPP2>*, bool, FPP*);
 
 #include "FaustFact.hpp"
 

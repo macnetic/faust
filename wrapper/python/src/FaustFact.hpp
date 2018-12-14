@@ -179,7 +179,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
 }
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsHierarchicalFact<FPP, FPP2>* p)
+FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsHierarchicalFact<FPP, FPP2>* p, FPP* out_lambda)
 {
     FaustCoreCpp<FPP>* core;
     Faust::MatDense<FPP,Cpu> inMat(mat, num_rows, num_cols);
@@ -233,6 +233,7 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
     vector<Faust::MatSparse<FPP,Cpu> > facts;
     hierFact.get_facts(facts);
     FPP lambda = hierFact.get_lambda();
+    *out_lambda =  lambda;
     (facts[0]) *= lambda;
     // transform the sparse matrix into matrix pointers
     std::vector<Faust::MatGeneric<FPP,Cpu> *> list_fact_generic;

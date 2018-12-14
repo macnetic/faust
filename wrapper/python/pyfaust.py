@@ -1382,7 +1382,7 @@ class FaustFactory:
         return Faust(core_obj=FaustCorePy.FaustFact.fact_palm4MSA(M, p))
 
     @staticmethod
-    def fact_hierarchical(M, p):
+    def fact_hierarchical(M, p, ret_lambda=False):
         """
         Factorizes the matrix M with Hierarchical Factorization using the parameters set in p.
 
@@ -1428,13 +1428,19 @@ class FaustFactory:
         if(not isinstance(p, ParamsHierarchicalFact)):
             raise TypeError("p must be a ParamsHierarchicalFact object.")
         FaustFactory._check_fact_mat('FaustFactory.fact_hierarchical()', M)
+        if(not isinstance(ret_lambda, bool)):
+            raise TypeError("ret_lambda must be a bool.")
         if(not p.is_mat_consistent(M)):
             raise ValueError("M's number of columns must be consistent with "
                              "the last residuum constraint defined in p. "
                              "Likewise its number of rows must be consistent "
                              "with the first factor constraint defined in p.")
-        F = Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
-        return F
+        core_obj,_lambda = FaustCorePy.FaustFact.fact_hierarchical(M, p)
+        F = Faust(core_obj=core_obj)
+        if(ret_lambda):
+            return F, _lambda
+        else:
+            return F
 
     @staticmethod
     def wht(n):
