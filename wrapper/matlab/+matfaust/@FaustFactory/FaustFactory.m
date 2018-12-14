@@ -147,22 +147,20 @@ classdef FaustFactory
 		function F = fact_hierarchical(M, p)
 			import matfaust.Faust
 			import matfaust.factparams.*
-			transp = false;
-			if(ischar(p) && (strcmp(p,'hadamard') || strcmp(p, 'squaremat') || strcmp(p, 'fft')))
-				pot = log2(size(M,1));
-				if(size(M,1) ~= size(M,2) || pot-floor(pot) > 0)
-					error('For the Hadamard parameters, M must be a square matrix of order a power of two.')
-				end
-				p = ParamsHierarchicalFactSquareMat(pot);
-			elseif(iscell(p) && length(p) == 4 && (strcmp(p{1}, 'rectmat') || strcmp(p{1}, 'meg')))
-				s = size(M)
-				transp = s(1) > s(2);
-				if(transp)
-					M = M.'
-				end
-				% p = {'rectmat', j, k, s}
-				p = ParamsHierarchicalFactRectMat(size(M,1), size(M,2), p{2}, p{3}, p{4})
+			if(~ isa(p, 'ParamsHierarchicalFact') && ParamsFactFactory.is_a_valid_simplification(p))
+				p = ParamsFactFactory.createParams(M, p);
 			end
+%			if(ischar(p) && (strcmp(p,'hadamard') || strcmp(p, 'squaremat') || strcmp(p, 'fft')))
+%				pot = log2(size(M,1));
+%				if(size(M,1) ~= size(M,2) || pot-floor(pot) > 0)
+%					error('For the Hadamard parameters, M must be a square matrix of order a power of two.')
+%				end
+%				p = ParamsHierarchicalFactSquareMat(pot);
+%			elseif(iscell(p) && length(p) == 4 && (strcmp(p{1}, 'rectmat') || strcmp(p{1}, 'meg')))
+%				s = size(M)
+%				% p = {'rectmat', j, k, s}
+%				p = ParamsHierarchicalFactRectMat(size(M,1), size(M,2), p{2}, p{3}, p{4})
+%			end
 			mex_constraints = cell(2, p.num_facts-1);
 			matfaust.FaustFactory.check_fact_mat('FaustFactory.fact_hierarchical', M)
 			if(~ isa(p ,'ParamsHierarchicalFact'))
@@ -199,9 +197,6 @@ classdef FaustFactory
 				[lambda, core_obj] = mexHierarchical_factCplx(M, mex_params);
 			end
 			F = Faust(core_obj, isreal(M));
-			if(transp)
-				F = F.'
-			end
 		end
 
 		%==========================================================================================

@@ -17,4 +17,14 @@ classdef ParamsHierarchicalFactSquareMat < matfaust.factparams.ParamsHierarchica
 			stop_crit, 'is_update_way_R2L', true);
 		end
 	end
+	methods(Static)
+		function sp = createParams(M, p)
+			import matfaust.factparams.ParamsHierarchicalFactSquareMat
+			pot = log2(size(M,1));
+			if(size(M,1) ~= size(M,2) || pot-floor(pot) > 0)
+				error('M must be a square matrix of order a power of two.')
+			end
+			sp = ParamsHierarchicalFactSquareMat(pot);
+		end
+	end
 end

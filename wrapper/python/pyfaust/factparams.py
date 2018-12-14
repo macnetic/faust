@@ -296,6 +296,16 @@ class ParamsHierarchicalFactSquareMat(ParamsHierarchicalFact):
                                         stop_crit, stop_crit,
                                         is_update_way_R2L=True)
 
+    @staticmethod
+    def createParams(M, p):
+        pot = np.log2(M.shape[0])
+        if(pot > int(pot) or M.shape[0] != M.shape[1]):
+            raise ValueError('M must be a '
+                             'square matrix of order a power of '
+                             'two.')
+        pot = int(pot)
+        return ParamsHierarchicalFactSquareMat(pot)
+
 
 
 class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
@@ -303,8 +313,15 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
     DEFAULT_P_CONST_FACT = 1.4
 
     def __init__(self, m, n, j, k, s, rho=0.8, P=None):
-        #TODO: test args
         from math import ceil
+        #test args
+        for arg,aname in zip([m, n, j, k, s],["m","n","j","k","s"]):
+            if(not isinstance(m, int) and not isinstance(m, np.integer)):
+                raise TypeError(aname+" must be an integer.")
+        if(not isinstance(rho, float)):
+            raise TypeError('rho must be a float')
+        if(not isinstance(rho, float)):
+            raise TypeError('p must be a float')
         if(not P):
             P=ParamsHierarchicalFactRectMat.DEFAULT_P_CONST_FACT*m**2
             S1_cons = ConstraintInt('spcol', m, n, k)
@@ -325,6 +342,17 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
                                                             is_update_way_R2L=True,
                                                             is_fact_side_left=True)
 
+    @staticmethod
+    def createParams(M, p):
+        # p = ('rectmat', j, k, s)
+        if(not isinstance(p, tuple) and not isinstance(p, list)):
+            raise TypeError('p must be a tuple or a list.')
+        if(not isinstance(M, np.ndarray)):
+            raise TypeError('M must be a numpy.ndarray.')
+        if(len(p) < 4):
+            raise ValueError('p must be of length greater or equal 4.')
+        p = ParamsHierarchicalFactRectMat(M.shape[0], M.shape[1], *p[1:])
+        return p
 
 class ParamsPalm4MSA(ParamsFact):
 
@@ -372,4 +400,44 @@ class StoppingCriterion(object):
             raise ValueError("When is_criterion_error == True it's forbidden to use"
                              " other arguments than num_its argument to define "
                              "the stopping criterion.")
+
+class ParamsFactFactory:
+
+    SIMPLIFIED_PARAMS = [
+        [ "squaremat", "hadamard"],
+        ["rectmat", "meg"]
+    ]
+    SQRMAT_ID = 0
+    RECTMAT_ID = 1
+
+    @staticmethod
+    def createParams(M, p):
+        """
+        """
+        from pyfaust.factparams import \
+        (ParamsHierarchicalFactSquareMat,
+        ParamsHierarchicalFactRectMat)
+        param_id = None
+        c = ParamsFactFactory # class alias
+        if(isinstance(p, str)):
+            param_id = p
+        elif(ParamsFactFactory.is_a_valid_simplification(p)):
+            param_id = p[0]
+        else:
+            raise TypeError('Invalid p to represent a simplified '
+                            'parametrization.')
+
+        if(param_id.lower() in c.SIMPLIFIED_PARAMS[c.SQRMAT_ID]):
+            return ParamsHierarchicalFactSquareMat.createParams(M, p)
+        elif(param_id.lower() in c.SIMPLIFIED_PARAMS[c.RECTMAT_ID]):
+            return ParamsHierarchicalFactRectMat.createParams(M, p)
+        else:
+            raise ValueError("p is not a known simplified parametrization.")
+
+    @staticmethod
+    def is_a_valid_simplification(p):
+        return isinstance(p, str) or ((isinstance(p, tuple) or isinstance(p,
+                                                                        list))
+                                      and len(p) > 0 and isinstance(p[0],
+                                                                    str))
 

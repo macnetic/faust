@@ -1420,28 +1420,12 @@ class FaustFactory:
                 - FACTOR 2 (real) SPARSE, size 32x32, density 0.09375, nnz 96
                 - FACTOR 3 (real) SPARSE, size 32x32, density 0.325195, nnz 333
         """
-        transp = False
-        if(isinstance(p, str) and p.lower() in ("hadamard", "fft", "squaremat")):
-            #TODO: FactParamFactory.create('hadamard')
-            from pyfaust.factparams import ParamsHierarchicalFactSquareMat
-            pot = np.log2(M.shape[0])
-            if(pot > int(pot) or M.shape[0] != M.shape[1]):
-                raise ValueError('For the Hadamard parameters, M must be a '
-                                 'square matrix of order a power of '
-                                 'two.')
-            pot = int(pot)
-            p = ParamsHierarchicalFactSquareMat(pot)
-        elif((isinstance(p, tuple) or isinstance(p, list)) and len(p) == 4 and isinstance(p[0],str)
-           and p[0].lower() in ("rectmat", "meg")):
-            from pyfaust.factparams import ParamsHierarchicalFactRectMat
-            s = M.shape
-            transp = s[0]>s[1]
-            if(transp):
-                M = M.T
-            # p = ('rectmat', j, k, s)
-            p = ParamsHierarchicalFactRectMat(M.shape[0], M.shape[1], p[1], p[2],
-                                          p[3])
-        if(not isinstance(p, pyfaust.factparams.ParamsHierarchicalFact)):
+        from pyfaust.factparams import (ParamsHierarchicalFact,
+        ParamsFactFactory)
+        if(not isinstance(p, ParamsHierarchicalFact) and
+           ParamsFactFactory.is_a_valid_simplification(p)):
+            p = ParamsFactFactory.createParams(M, p)
+        if(not isinstance(p, ParamsHierarchicalFact)):
             raise TypeError("p must be a ParamsHierarchicalFact object.")
         FaustFactory._check_fact_mat('FaustFactory.fact_hierarchical()', M)
         if(not p.is_mat_consistent(M)):
@@ -1450,8 +1434,6 @@ class FaustFactory:
                              "Likewise its number of rows must be consistent "
                              "with the first factor constraint defined in p.")
         F = Faust(core_obj=FaustCorePy.FaustFact.fact_hierarchical(M, p))
-        if(transp):
-            F = F.T
         return F
 
     @staticmethod
