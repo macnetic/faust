@@ -26,5 +26,13 @@ classdef ConstraintGeneric
 			% child classes verify the param type
 			constraint.param = param;
 		end
+
+		function pM = project(this, M)
+			if(isreal(M))
+				pM = mexFaustReal('prox', M, this.name.name, this.param);
+			else
+				mexFaustCplx('prox', M, this.name.name, this.param);
+			end
+		end
 	end
 end

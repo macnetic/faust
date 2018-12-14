@@ -144,7 +144,7 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 				return;
 
 		}
-
+			//TODO: hadamard, fourier, and proxs must be in there own mex function (one for hadamard and fourier, another for the prox)
 			if(!strcmp("hadamard", cmd)){
 				if(nlhs!=1)
 					mexErrMsgTxt("hadamard(): 1 variable result is expected.");
@@ -186,6 +186,80 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 				return;
 
 			}
+
+			if(!strcmp("prox", cmd))
+			{
+				if(nlhs!=1)
+					mexErrMsgTxt("prox(): 1 output variable is expected.");
+				if(nrhs < 4)
+					mexErrMsgTxt("prox(): wrong number of arguments (must be 4)");
+
+				unsigned int constraint_type = (unsigned int) mxGetScalar(prhs[2]);
+				bool const is_param_scalar = (1u == mxGetNumberOfElements(prhs[3]));
+				double scal_param;
+				const mxArray* mxMat_in = prhs[1];
+
+				const size_t nrows_mat = mxGetM(mxMat_in);
+                const size_t ncols_mat = mxGetN(mxMat_in);
+				SCALAR* mat_data = NULL;
+				mxArray2Ptr(mxMat_in, mat_data);
+				Faust::MatDense<SCALAR, Cpu> mat(mat_data, nrows_mat, ncols_mat);
+				Faust::MatDense<SCALAR, Cpu>* mat_param = nullptr;
+
+
+
+				if(is_param_scalar)
+				{
+					scal_param = mxGetScalar(prhs[3]);
+				}
+				else
+				{
+					mxArray2Ptr(prhs[3], mat_data);
+					// constraint matrix has normally same dim as constrainted matrix (TODO: must be checked from matlab code)
+					mat_param = new Faust::MatDense<SCALAR, Cpu>(mat_data, nrows_mat, ncols_mat);
+				}
+
+
+				cout << "mex prox, scal_param: " << scal_param << " constraint id: " << constraint_type << endl;
+				switch(constraint_type)
+				{
+					case CONSTRAINT_NAME_SP: /*!< fixed number of non zero elements, INT (frobenius norm 1) */
+						Faust::prox_sp(mat, (faust_unsigned_int) scal_param);
+						break;
+					case CONSTRAINT_NAME_SPCOL: /*!< fixed number of non zero elements per column INT (frobenius norm 1) */
+						Faust::prox_spcol(mat, (faust_unsigned_int) scal_param);
+						break;
+					case CONSTRAINT_NAME_SPLIN: /*!< fixed number of non zero elements per line INT (frobenius norm 1) */
+						Faust::prox_splin(mat, (faust_unsigned_int) scal_param);
+						break;
+					case CONSTRAINT_NAME_SPLINCOL:
+						Faust::prox_splincol(mat, (faust_unsigned_int) scal_param);
+						break;
+					case CONSTRAINT_NAME_SP_POS:/**< fixed number of non zeros coefficients: INT (frobenius norm 1) */
+						Faust::prox_sp_pos(mat, (faust_unsigned_int) scal_param);
+						break;
+					case CONSTRAINT_NAME_NORMLIN:/**< 2nd norm of the lines of matrix A ; REAL  */
+						Faust::prox_normlin(mat, scal_param);
+						break;
+					case CONSTRAINT_NAME_NORMCOL:/*!< 2nd norm of the colons of A REAL */
+						Faust::prox_normcol(mat, scal_param);
+						break;
+					case CONSTRAINT_NAME_CONST: /**< Matrix equal to A ; MAT */
+						// nothing to do, same mat returned 
+						break	;
+					case CONSTRAINT_NAME_BLKDIAG:
+						//not impl. yet in cpp core
+						break;
+					case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
+						Faust::prox_supp(mat, *mat_param);
+						break;
+				}
+				plhs[0] = FaustMat2mxArray(mat);
+				if(mat_param != nullptr)
+					delete mat_param;
+				return;
+			}
+
             // New
             if (!strcmp("new", cmd))
             {
@@ -502,7 +576,7 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 
                 SCALAR* ptr_data = NULL;
                 if ((core_ptr->isReal() ) && ( mxIsComplex(inMatlabMatrix) ) )
-                    mexErrMsgTxt("impossibility to multiply real scalar Faust with complex matrix");
+                    mexErrMsgTxt("impossibility to multiply a real Faust with complex matrix");
 
                 mxArray2Ptr(inMatlabMatrix, ptr_data);
 
