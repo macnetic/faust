@@ -227,7 +227,10 @@ classdef FaustFactory
 		%>
 		%==========================================================================================
 		function H = wht(n)
-			% TODO: check n (must be integer > 0)
+			% check n (must be integer > 0)
+			if(~ isreal(n) || n < 0 || abs(n-floor(n)) > 0)
+				error('n must be an integer greater than zero')
+			end
 			if(n>31)
 				error('Can''t handle a Hadamard Faust of order larger than 2^31')
 			end
@@ -284,7 +287,10 @@ classdef FaustFactory
 		%> - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
 		%==========================================================================================
 		function H = dft(n)
-			% TODO: check n (must be integer > 0)
+			% check n (must be integer > 0)
+			if(~ isreal(n) || n < 0 || abs(n-floor(n)) > 0)
+				error('n must be an integer greater than zero')
+			end
 			if(n>31)
 				error('Can''t handle a FFT Faust of order larger than 2^31')
 			end
