@@ -1339,7 +1339,7 @@ class FaustFactory:
     - The pseudo-random generation of a Faust with FaustFactory.rand(),
     - the discrete Fourier transform with FaustFactory.dft(),
     - the Hadamard transform with FaustFactory.wht(),
-    - and the identity Faust with FaustFactory.eye(). 
+    - and the identity Faust with FaustFactory.eye().
 
     """
 
@@ -1379,7 +1379,7 @@ class FaustFactory:
                              "the last residuum constraint defined in p. "
                              "Likewise its number of rows must be consistent "
                              "with the first factor constraint defined in p.")
-        return Faust(core_obj=FaustCorePy.FaustFact.fact_palm4MSA(M, p))
+        return Faust(core_obj=FaustCorePy.FaustFact.fact_palm4msa(M, p))
 
     @staticmethod
     def fact_hierarchical(M, p, ret_lambda=False):

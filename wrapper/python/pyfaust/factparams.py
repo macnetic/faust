@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyfaust import *
+import FaustCorePy
 
 """
     This module provides all the classes that represent the input parameters needed
@@ -67,6 +68,10 @@ class ConstraintGeneric(object):
         """
         return self._name.is_mat_constraint()
 
+    def project(self, M):
+        if(M.shape[0] != self._num_rows or M.shape[1] != self._num_cols):
+            raise ValueError("The dimensions must agree.")
+
 class ConstraintInt(ConstraintGeneric):
     """
         This class represents an integer constraint on a matrix-factor.
@@ -85,6 +90,12 @@ class ConstraintInt(ConstraintGeneric):
                             'ConstraintName with a int type name '
                             '(name.is_int_constraint() must return True).')
 
+    def project(self, M):
+        # TODO: call parent project()
+        return FaustCorePy.ConstraintIntCore.project(M, self._name.name, self._num_rows,
+                                              self._num_cols, self._cons_value)
+
+
 class ConstraintMat(ConstraintGeneric):
 
     def __init__(self, name, num_rows, num_cols, cons_value):
@@ -93,11 +104,17 @@ class ConstraintMat(ConstraintGeneric):
                                                                np.ndarray)):
             raise TypeError('ConstraintMat must receive a numpy matrix as cons_value '
                             'argument.')
-        self.cons_value = float(self.cons_value)
+        self.cons_value = self._cons_value
         if(not isinstance(self._name, ConstraintName) or not self._name.is_mat_constraint()):
             raise TypeError('ConstraintMat first argument must be a '
                             'ConstraintName with a matrix type name '
                             '(name.is_mat_constraint() must return True)')
+
+    def project(self, M):
+        # TODO: call parent project()
+        return FaustCorePy.ConstraintMatCore.project(M, self._name.name, self._num_rows,
+                                              self._num_cols, self._cons_value)
+
 
 class ConstraintReal(ConstraintGeneric):
     """
@@ -130,6 +147,11 @@ class ConstraintReal(ConstraintGeneric):
             raise TypeError('ConstraintReal first argument must be a '
                             'ConstraintName with a real type name '
                             '(name.is_real_constraint() must return True).')
+
+    def project(self, M):
+        return FaustCorePy.ConstraintRealCore.project(M, self._name.name, self._num_rows,
+                                              self._num_cols, self._cons_value)
+
 
 class ConstraintName:
     """

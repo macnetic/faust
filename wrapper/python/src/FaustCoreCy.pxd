@@ -101,14 +101,27 @@ cdef extern from "FaustCoreCpp.h" :
         @staticmethod
         FaustCoreCpp[FPP]* fourierFaust(unsigned int n)
 
+# TODO: all the headers below should be in their own pxd file FaustFact.pxd
 cdef extern from "FaustFact.h":
     cdef cppclass PyxConstraintGeneric:
         int name
         unsigned long num_rows
         unsigned long num_cols
+        bool is_int_constraint()
+        bool is_real_constraint()
+        bool is_mat_constraint()
 
     cdef cppclass PyxConstraintInt(PyxConstraintGeneric):
         unsigned long parameter
+
+    void prox_int[FPP](unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
+                  unsigned long num_cols, FPP* mat_out)
+
+    void prox_real[FPP,FPP2](unsigned int cons_type, FPP2 cons_param, FPP* mat_in, unsigned long num_rows,
+                  unsigned long num_cols, FPP* mat_out)
+
+    void prox_mat[FPP](unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned long num_rows,
+                  unsigned long num_cols, FPP* mat_out)
 
     cdef cppclass PyxConstraintScalar[FPP](PyxConstraintGeneric):
         FPP parameter

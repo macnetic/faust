@@ -51,6 +51,70 @@ bool PyxConstraintGeneric::is_mat_constraint()
     }
 }
 
+template<typename FPP>
+void prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out)
+{
+    Faust::MatDense<FPP, Cpu> fmat(mat_in, num_rows, num_cols);
+    switch(static_cast<faust_constraint_name>(cons_type))
+	{
+		case CONSTRAINT_NAME_CONST: /**< Matrix equal to A ; MAT */
+			// nothing to do, same mat returned
+			break;
+		case CONSTRAINT_NAME_BLKDIAG:
+			//not impl. yet in cpp core
+			break;
+		case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
+			Faust::prox_supp(fmat, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols));
+			break;
+		default:
+			throw invalid_argument("PyxConstraintMat::project() inconsistent constraint name");
+	}
+    memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+}
+
+template<typename FPP>
+void prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
+        unsigned long num_cols, FPP* mat_out)
+{
+    Faust::MatDense<FPP, Cpu> fmat(mat_in, num_rows, num_cols);
+    switch(static_cast<faust_constraint_name>(cons_type))
+    {
+        case CONSTRAINT_NAME_SPCOL: /*!< fixed number of non zero elements per column INT (frobenius norm 1) */
+            Faust::prox_spcol(fmat, (faust_unsigned_int) cons_param);
+            break;
+        case CONSTRAINT_NAME_SPLIN: /*!< fixed number of non zero elements per line INT (frobenius norm 1) */
+            Faust::prox_splin(fmat, (faust_unsigned_int) cons_param);
+            break;
+        case CONSTRAINT_NAME_SPLINCOL:
+            Faust::prox_splincol(fmat, (faust_unsigned_int) cons_param);
+            break;
+        case CONSTRAINT_NAME_SP_POS:/**< fixed number of non zeros coefficients: INT (frobenius norm 1) */
+            Faust::prox_sp_pos(fmat, (faust_unsigned_int) cons_param);
+            break;
+        default:
+            throw invalid_argument("PyxConstraintInt::project() inconsistent constraint name");
+    }
+    memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+}
+
+template<typename FPP, typename FPP2>
+void prox_real(unsigned int cons_type, FPP2 cons_param, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out)
+{
+    Faust::MatDense<FPP, Cpu> fmat(mat_in, num_rows, num_cols);
+    switch(static_cast<faust_constraint_name>(cons_type))
+	{
+		case CONSTRAINT_NAME_NORMLIN:/**< 2nd norm of the lines of matrix A ; REAL  */
+			Faust::prox_normlin(fmat, cons_param);
+			break;
+		case CONSTRAINT_NAME_NORMCOL:/*!< 2nd norm of the columns of A REAL */
+			Faust::prox_normcol(fmat, cons_param);
+			break;
+		default:
+			throw invalid_argument("PyxConstraintScalar::project() inconsistent constraint name");
+	}
+    memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+}
+
 template<typename FPP, typename FPP2>
 void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned int num_cols, const PyxParamsFact<FPP,FPP2>* p,
         /* out args */vector<const Faust::ConstraintGeneric*>& cons)
@@ -106,7 +170,7 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
         else
             handleError("FaustFact", "Invalid constraint.");
     }
-    
+ 
 
 
 }

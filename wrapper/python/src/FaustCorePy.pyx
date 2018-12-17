@@ -715,16 +715,118 @@ cdef check_matrix(isReal, M):
         if (ndim_M > 2) | (ndim_M < 1):
             raise ValueError('input M invalid number of dimensions')
 
+cdef class ConstraintIntCore:
+
+    # no need to create an object, because project() needs to create core object
+    # for each call and for that purpose it needs to determine if mat is real or complex
+    # so it can't create the object before the call
+    # in that conditions a static method will suffice
+    @staticmethod
+    def project(M, name, num_rows, num_cols, parameter):
+        cdef double[:,:] M_view_dbl
+        cdef double[:,:] M_out_view_dbl
+        cdef complex[:,:] M_view_cplx
+        cdef complex[:,:] M_out_view_cplx
+
+        isReal = M.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+
+        M_out = np.empty(M.shape, dtype=M.dtype, order='F')
+
+        check_matrix(isReal, M)
+        if(isReal):
+            M_view_dbl = M
+            M_out_view_dbl = M_out
+            FaustCoreCy.prox_int[double](name, parameter, &M_view_dbl[0,0], num_rows,
+                                         num_cols,&M_out_view_dbl[0,0])
+        else:
+            M_view_cplx = M
+            M_out_view_cplx = M_out
+            FaustCoreCy.prox_int[complex](name, parameter, &M_view_cplx[0,0],
+                                          num_rows, num_cols, &M_out_view_cplx[0,0])
+
+        return M_out
+
+cdef class ConstraintMatCore:
+
+    @staticmethod
+    def project(M, name, num_rows, num_cols, parameter):
+        cdef double[:,:] M_view_dbl
+        cdef double[:,:] M_out_view_dbl
+        cdef complex[:,:] M_view_cplx
+        cdef complex[:,:] M_out_view_cplx
+        cdef double[:,:] param_view_dbl
+        cdef complex[:,:] param_view_cplx
+
+        isReal = M.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+
+        M_out = np.empty(M.shape, dtype=M.dtype, order='F')
+
+        check_matrix(isReal, M)
+        check_matrix(isReal, parameter)
+        if(isReal):
+            M_view_dbl = M
+            M_out_view_dbl = M_out
+            param_view_dbl = parameter
+            FaustCoreCy.prox_mat[double](name, &param_view_dbl[0,0], &M_view_dbl[0,0], num_rows,
+                                         num_cols,&M_out_view_dbl[0,0])
+        else:
+            M_view_cplx = M
+            M_out_view_cplx = M_out
+            param_view_cplx = parameter
+            FaustCoreCy.prox_mat[complex](name, &param_view_cplx[0,0], &M_view_cplx[0,0],
+                                          num_rows, num_cols, &M_out_view_cplx[0,0])
+
+        return M_out
+
+cdef class ConstraintRealCore:
+
+    # no need to create an object, because project() needs to create core object
+    # for each call and for that purpose it needs to determine if mat is real or complex
+    # so it can't create the object before the call
+    # in that conditions a static method will suffice
+    @staticmethod
+    def project(M, name, num_rows, num_cols, parameter):
+        cdef double[:,:] M_view_dbl
+        cdef double[:,:] M_out_view_dbl
+        cdef complex[:,:] M_view_cplx
+        cdef complex[:,:] M_out_view_cplx
+
+        isReal = M.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+
+
+        M_out = np.empty(M.shape, dtype=M.dtype, order='F')
+
+        check_matrix(isReal, M)
+        if(isReal):
+            M_view_dbl = M
+            M_out_view_dbl = M_out
+            FaustCoreCy.prox_real[double, double](name, parameter, &M_view_dbl[0,0], num_rows,
+                                         num_cols,&M_out_view_dbl[0,0])
+        else:
+            M_view_cplx = M
+            M_out_view_cplx = M_out
+            FaustCoreCy.prox_real[complex, double](name, parameter, &M_view_cplx[0,0],
+                                          num_rows, num_cols, &M_out_view_cplx[0,0])
+
+        return M_out
+
+
 
 cdef class FaustFact:
 
     @staticmethod
-    def fact_palm4MSA(M, p):
+    def fact_palm4msa(M, p):
         isReal = M.dtype in [ 'float', 'float128',
                              'float16', 'float32',
                              'float64', 'double']
         # double == float64
-        #TODO: it not float nor complex, raise exception
+        #TODO: if not float nor complex, raise exception
         check_matrix(isReal, M)
 
         cdef unsigned int M_num_rows=M.shape[0]
