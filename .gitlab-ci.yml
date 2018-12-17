@@ -22,6 +22,7 @@ ctest_python:
         - schedules
         - tags
     stage: test_wrapper
+    allow_failure: true
 
 ctest_matlab:
     <<: *ctest_script
