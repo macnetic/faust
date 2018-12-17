@@ -38,8 +38,8 @@
 ##                                                                          ##
 ##############################################################################
 
-
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
+#from distutils.core import setup, Extension
 from Cython.Build import cythonize
 import numpy
 
@@ -54,6 +54,14 @@ PyFaust = Extension('FaustCorePy',
 )
 
 setup(
-    name = 'FaustCorePy',
+    name = 'pyfaust',
+    version = '@CPACK_PACKAGE_VERSION@',
     ext_modules = cythonize(PyFaust),
+    packages = [ 'pyfaust' ],
+    url = 'http://faust.inria.fr',
+    description = 'TODO',
+    long_description = 'TODO',
+    classifiers = [ 'TODO' ],
+    install_requires = [ 'scipy', 'numpy' ] #ENOTE: order matters (last pkg installed first)
+    #TODO: data_files, license
 )
