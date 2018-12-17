@@ -92,7 +92,14 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
             return;
         }
         //	printf("save: filepath = %s, nargs = %d\n", filepath, nargs);
-        core_ptr->save_mat_file(filepath/*, mxGetScalar(args[1])*/);
+		try
+		{
+			core_ptr->save_mat_file(filepath/*, mxGetScalar(args[1])*/);
+		}
+		catch(exception& e)
+		{
+			mexErrMsgTxt("Failed to save the file.");
+		}
     }
 
     void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])

@@ -653,9 +653,11 @@ cdef class FaustCore:
             cfilepath[i] = fparr[i]
         cfilepath[i+1] = 0
         if(self._isReal):
-            self.core_faust_dbl.save_mat_file(cfilepath)
+            ret = self.core_faust_dbl.save_mat_file(cfilepath)
         else:
-            self.core_faust_cplx.save_mat_file(cfilepath)
+            ret = self.core_faust_cplx.save_mat_file(cfilepath)
+        if(not ret):
+            raise Exception("Failed to save the file: "+filepath)
         PyMem_Free(cfilepath)
 
     def transpose(self):

@@ -294,10 +294,18 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::fancy_idx(unsigned long int* row_ids, unsi
 }
 
 template<typename FPP>
-void FaustCoreCpp<FPP>::save_mat_file(const char* filepath) const
+bool FaustCoreCpp<FPP>::save_mat_file(const char* filepath) const
 {
     //    std::cout << "FaustCoreCpp::save_mat_file()" << std::endl;
-    this->transform->save_mat_file(filepath);
+    try
+    {
+        this->transform->save_mat_file(filepath);
+        return true;
+    }
+    catch(exception& e) {
+        //cerr << e.what() << endl;
+        return false;
+    }
 }
 
 template<typename FPP>
