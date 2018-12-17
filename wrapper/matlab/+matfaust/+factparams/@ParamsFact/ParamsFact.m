@@ -11,7 +11,7 @@ classdef (Abstract) ParamsFact
 		constraints
 		is_verbose
 	end
-	properties (Constant, SetAccess = public)
+	properties (Constant, SetAccess = protected, Hidden)
 		DEFAULT_STEP_SIZE = 10^-16
 		DEFAULT_VERBOSITY = false
 		DEFAULT_CONSTANT_STEP_SIZE = false

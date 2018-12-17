@@ -1,5 +1,5 @@
 classdef ParamsHierarchicalFactRectMat < matfaust.factparams.ParamsHierarchicalFact
-	properties(Constant)
+	properties(Constant, SetAccess = protected, Hidden)
 		DEFAULT_RHO = 0.8
 		DEFAULT_P_CONST_FACT = 1.4
 		IDX_RHO = 1

@@ -7,7 +7,7 @@ classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
 		data_num_cols
 		is_fact_side_left
 	end
-	properties(Constant)
+	properties(Constant, SetAccess = protected, Hidden)
 		DEFAULT_IS_FACT_SIDE_LEFT = false
 		IDX_IS_FACT_SIDE_LEFT = 1
 		OPT_ARG_NAMES2 = { 'is_fact_side_left' }

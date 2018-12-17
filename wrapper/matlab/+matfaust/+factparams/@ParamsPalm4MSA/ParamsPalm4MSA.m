@@ -7,7 +7,7 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 		init_facts
 		stop_crit
 	end
-	properties (Constant, SetAccess = private)
+	properties (Constant, SetAccess = protected, Hidden)
 		IDX_INIT_FACTS = 1
 		OPT_ARG_NAMES2 = { 'init_facts' }
 	end
