@@ -322,7 +322,7 @@ classdef Faust
 		%> <p>@b See @b also Faust.plus
 		%======================================================================
 		function M = minus(varargin)
-			M = varargin{1}
+			M = varargin{1};
 			for i=2:nargin
 				varargin{i} = varargin{i}*-1;
 			end
