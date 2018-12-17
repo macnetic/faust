@@ -1668,3 +1668,12 @@ def version():
     """Returns the FAµST package version.
     """
     return "@CPACK_PACKAGE_VERSION@"
+
+def faust_fact(*args, **kwargs):
+    """
+    This function is a shorthand for FaustFactory.fact_hierarchical().
+
+    <b/> See also FaustFactory.fact_hierarchical
+    """
+    return FaustFactory.fact_hierarchical(*args, **kwargs)
+
