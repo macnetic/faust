@@ -1382,7 +1382,7 @@ class FaustFactory:
         return Faust(core_obj=FaustCorePy.FaustFact.fact_palm4msa(M, p))
 
     @staticmethod
-    def fact_hierarchical(M, p, ret_lambda=False):
+    def fact_hierarchical(M, p, ret_lambda=False, ret_params=False):
         """
         Factorizes the matrix M with Hierarchical Factorization using the parameters set in p.
 
@@ -1437,10 +1437,12 @@ class FaustFactory:
                              "with the first factor constraint defined in p.")
         core_obj,_lambda = FaustCorePy.FaustFact.fact_hierarchical(M, p)
         F = Faust(core_obj=core_obj)
+        ret_list = [ F ]
         if(ret_lambda):
-            return F, _lambda
-        else:
-            return F
+            ret_list += [ _lambda ]
+        if(ret_params):
+            ret_list += [ p ]
+        return ret_list
 
     @staticmethod
     def wht(n):

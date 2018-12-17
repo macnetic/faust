@@ -186,7 +186,7 @@ classdef FaustFactory
 				[lambda, core_obj] = mexHierarchical_factCplx(M, mex_params);
 			end
 			F = Faust(core_obj, isreal(M));
-			varargout = {F, lambda};
+			varargout = {F, lambda, p};
 		end
 
 		%==========================================================================================
