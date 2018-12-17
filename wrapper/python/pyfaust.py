@@ -1442,7 +1442,10 @@ class FaustFactory:
             ret_list += [ _lambda ]
         if(ret_params):
             ret_list += [ p ]
-        return ret_list
+        if(ret_lambda or ret_params):
+            return ret_list
+        else:
+            return F
 
     @staticmethod
     def wht(n):
