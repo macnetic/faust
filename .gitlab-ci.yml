@@ -86,6 +86,36 @@ package_macos:
         - schedules
         - tags
 
+.package_purepy: &package_purepy
+    stage: package_rev
+    script:
+        - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
+        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$SHA_START -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF ..'
+        - make
+        - cd wrapper/python
+        - python3 setup.py bdist_wheel
+        - python3 setup.py bdist_egg
+        - python2 setup.py bdist_wheel
+        - python2 setup.py bdist_egg
+    artifacts:
+        paths:
+              - build/wrapper/python/dist
+        expire_in: '1 week'
+    except:
+        - schedules
+        - tags
+
+package_macos_purepy:
+    <<: *package_purepy
+    tags:
+        - macos
+
+package_linux_purepy:
+    <<: *package_purepy
+    tags:
+        - linux
+
 package_win:
     stage: package_rev
     script:
@@ -125,8 +155,6 @@ package_linux:
    except:
         - schedules
         - tags
-
-
 
 # jobs triggered by git tag can force cpack to use the tag name as version but it's not necessary for MacOSX (not using cpack for that sys.)
 # it's done for linux packages
@@ -209,6 +237,8 @@ package_linux_release_static:
         - linux
    only:
         - tags
+
+
 
 pages:
     script:
