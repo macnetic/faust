@@ -86,36 +86,6 @@ package_macos:
         - schedules
         - tags
 
-.package_purepy: &package_purepy
-    stage: package_rev
-    script:
-        - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
-        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$SHA_START -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF ..'
-        - make
-        - cd wrapper/python
-        - python3 setup.py bdist_wheel
-        - python3 setup.py bdist_egg
-        - python2 setup.py bdist_wheel
-        - python2 setup.py bdist_egg
-    artifacts:
-        paths:
-              - build/wrapper/python/dist
-        expire_in: '1 week'
-    except:
-        - schedules
-        - tags
-
-package_macos_purepy:
-    <<: *package_purepy
-    tags:
-        - macos
-
-package_linux_purepy:
-    <<: *package_purepy
-    tags:
-        - linux
-
 package_win:
     stage: package_rev
     script:
@@ -254,4 +224,63 @@ pages:
         - linux
     only:
         - tags
+
+.package_purepy: &package_purepy
+    script:
+        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON ..'
+        - make
+        - cd wrapper/python
+        - python3 setup.py bdist_wheel
+        - python3 setup.py bdist_egg
+        - python2 setup.py bdist_wheel
+        - python2 setup.py bdist_egg
+    artifacts:
+        paths:
+              - build/wrapper/python/dist
+    except:
+        - schedules
+
+.package_purepy_rev:
+    extends: .package_purepy
+    stage: package_rev
+    before_script:
+        - VERSION=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
+    artifacts:
+        expire_in: '1 week'
+    except:
+        - schedules
+        - tags
+
+package_macos_purepy_rev:
+    extends: .package_purepy_rev
+    tags:
+        - macos
+
+package_linux_purepy_rev:
+    extends: .package_purepy_rev
+    tags:
+        - linux
+
+.package_purepy_release:
+    extends: .package_purepy
+    before_script:
+        - VERSION=$CI_COMMIT_TAG
+    artifacts:
+        expire_in: '50 yrs'
+    except:
+        - schedules
+    only:
+        - tags
+
+package_macos_purepy_release:
+    extends: .package_purepy_release
+    tags:
+        - macos
+
+package_linux_purepy_release:
+    extends: .package_purepy_release
+    tags:
+        - linux
+
 
