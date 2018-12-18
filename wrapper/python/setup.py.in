@@ -62,6 +62,9 @@ setup(
     description = 'TODO',
     long_description = 'TODO',
     classifiers = [ 'TODO' ],
-    install_requires = [ 'scipy', 'numpy' ] #ENOTE: order matters (last pkg installed first)
-    #TODO: data_files, license
+    install_requires = [ 'scipy', 'numpy', 'matplotlib' ], #ENOTE: order matters (last pkg installed first)
+    #TODO: license
+    package_data = {
+        'pyfaust': ['data/*.mat']
+    }
 )

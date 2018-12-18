@@ -1473,7 +1473,8 @@ class FaustFactory:
            (the BSL demo MEG matrix)</b>
            >>> from pyfaust import *
            >>> from scipy.io import loadmat
-           >>> d = loadmat('@FAUST_MATFAUST_DEMO_DATA_BIN_DIR@/matrix_MEG.mat')
+           >>> from pyfaust.demo import get_data_dirpath
+           >>> d = loadmat(get_data_dirpath()+'/matrix_MEG.mat')
            >>> MEG = d['matrix']
            >>> num_facts = 9
            >>> k = 10

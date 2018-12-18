@@ -7,6 +7,18 @@ import os,sys
 DEFT_DATA_DIR = 'pyfaust_demo_output'
 DEFT_FIG_DIR = 'pyfaust_demo_figures'
 
+def get_data_dirpath():
+    from pkg_resources import resource_filename
+    import os.path
+    path = resource_filename(__name__, 'data')
+    if(not os.path.exists(path)):
+        # fallback to matlab wrapper data
+        # it will not help if we are from pip pkg
+        # but it shouldn't happen
+        path = '@FAUST_MATFAUST_DEMO_DATA_BIN_DIR@'
+    return path
+
+
 class quickstart:
 
     @staticmethod
@@ -888,7 +900,7 @@ class bsl:
         return gamma
 
     @staticmethod
-    def run(input_data_dir='@FAUST_MATFAUST_DEMO_DATA_BIN_DIR@',
+    def run(input_data_dir=get_data_dirpath(),
             output_dir=DEFT_DATA_DIR):
         from pyfaust import Faust
         from scipy.io import loadmat,savemat
@@ -978,6 +990,7 @@ class bsl:
                                                                               - points[solver_idx[0][1],:],2));
 
 
+        _create_dir_if_doesnt_exist(output_dir)
         # keep matlab demo version names for mat file
         savemat(output_dir+os.sep+"results_BSL_user.mat", { 'resDist' :
                                                            resDist, 'Sparsity'
