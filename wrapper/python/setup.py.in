@@ -42,29 +42,66 @@ from setuptools import setup, Extension
 #from distutils.core import setup, Extension
 from Cython.Build import cythonize
 import numpy
+import sys
 
-PyFaust = Extension('FaustCorePy',
-    sources = ['@FAUST_PYTHON_BIN_DIR@/FaustCorePy.pyx'],
-    language = 'c++',
-    include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],
-    library_dirs=[@FAUST_PYTHON_LIB_DIR@],
-    libraries=['faust'@FAUST_PYTHON_LIBS@],
-    extra_compile_args = [ "-std=c++11"],
-    extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
-)
+if sys.platform == 'win32':
+    # binary libs are compiled manually from cython and then integrated in
+    # wheel/egg pkgs here
+    from setuptools.dist import Distribution
+    from glob import glob
+    from shutil import copyfile
+    from os import sep
+    class BinaryDistribution(Distribution):
+            """Distribution which always forces a binary package with platform
+            name"""
+            def has_ext_modules(foo):
+                return True
+    if sys.version_info > (3,0):
+        lib = glob('FaustCorePy.cp3*-win_amd64.pyd')[0]
+    else:
+        lib = 'FaustCorePy.pyd'
+    # we need to copy the dyn. lib in pyfaust pkg
+    copyfile(lib, 'pyfaust'+sep+lib)
+    setup(
+        name = 'pyfaust',
+        version = '@CPACK_PACKAGE_VERSION@',
+        #ext_modules = cythonize(PyFaust),
+        distclass = BinaryDistribution, # forces setup-tools to set the arch in
+        # pkg name
+        packages = [ 'pyfaust' ],
+        url = 'http://faust.inria.fr',
+        description = 'TODO',
+        long_description = 'TODO',
+        classifiers = [ 'TODO' ],
+        install_requires = [ 'scipy', 'numpy', 'matplotlib' ], #ENOTE: order matters (last pkg installed first)
+        #TODO: license
+        package_data = {
+            'pyfaust': ['data/*.mat', lib ]
+        }
+    )
+else: # linux and mac
+    PyFaust = Extension('FaustCorePy',
+                        sources = ['@FAUST_PYTHON_BIN_DIR@/FaustCorePy.pyx'],
+                        language = 'c++',
+                        include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],
+                        library_dirs=[@FAUST_PYTHON_LIB_DIR@],
+                        libraries=['faust'@FAUST_PYTHON_LIBS@],
+                        extra_compile_args = [ "-std=c++11"],
+                        extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
+                       )
 
-setup(
-    name = 'pyfaust',
-    version = '@CPACK_PACKAGE_VERSION@',
-    ext_modules = cythonize(PyFaust),
-    packages = [ 'pyfaust' ],
-    url = 'http://faust.inria.fr',
-    description = 'TODO',
-    long_description = 'TODO',
-    classifiers = [ 'TODO' ],
-    install_requires = [ 'scipy', 'numpy', 'matplotlib' ], #ENOTE: order matters (last pkg installed first)
-    #TODO: license
-    package_data = {
-        'pyfaust': ['data/*.mat']
-    }
-)
+    setup(
+        name = 'pyfaust',
+        version = '@CPACK_PACKAGE_VERSION@',
+        ext_modules = cythonize(PyFaust),
+        packages = [ 'pyfaust' ],
+        url = 'http://faust.inria.fr',
+        description = 'TODO',
+        long_description = 'TODO',
+        classifiers = [ 'TODO' ],
+        install_requires = [ 'scipy', 'numpy', 'matplotlib' ], #ENOTE: order matters (last pkg installed first)
+        #TODO: license
+        package_data = {
+            'pyfaust': ['data/*.mat']
+        }
+    )
