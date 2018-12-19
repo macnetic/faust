@@ -122,6 +122,14 @@ Section "" ; no component so name not needed
   File @PROJECT_BINARY_DIR@\wrapper\python\*pyd
   File @PROJECT_BINARY_DIR@\wrapper\python\*pxd
 
+  ;add data path in __init__.py
+  FileOpen $1 "$2\pyfaust\__init__.py" a
+  ; go at the end of file (but with append mode is that necessary ?)
+  FileSeek $1 0 END
+  ; add the install path
+  FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
+  FileClose $1
+
   ; post install matfaust auto-setup
   !include "FileFunc.nsh" ; for Locate
   !include "WordFunc.nsh" ; for WordFind

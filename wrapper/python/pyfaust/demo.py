@@ -10,7 +10,16 @@ DEFT_FIG_DIR = 'pyfaust_demo_figures'
 def get_data_dirpath():
     from pkg_resources import resource_filename
     import os.path
+    from os import sep
     path = resource_filename(__name__, 'data')
+    if (sys.platform == 'win32' and not os.path.exists(path)):
+        from pyfaust import _NSI_INSTALL_PATH
+        # in windows nsis based installation the data can be anywhere
+        # users choose to install faust
+        # the nsi installer is responsible to set this const var
+        # at installation stage
+        # in this case, matlab is inst so point to its data dir
+        path = _NSI_INSTALL_PATH+sep+'matlab'+sep+'data'
     if(not os.path.exists(path)):
         # fallback to matlab wrapper data
         # it will not help if we are from pip pkg
@@ -1187,6 +1196,4 @@ if sys.platform == 'win32':
     timer = clock
 else:
     timer = time
-
-
 
