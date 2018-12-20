@@ -15,6 +15,12 @@ classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
 	methods
 		function p = ParamsHierarchicalFact(fact_constraints, res_constraints, stop_crit1, stop_crit2, varargin)
 			import matfaust.factparams.*
+			if(isa(fact_constraints, 'ConstraintList'))
+				fact_constraints = fact_constraints.clist;
+			end
+			if(isa(res_constraints, 'ConstraintList'))
+				res_constraints = res_constraints.clist;
+			end
 			if(~ iscell(fact_constraints))
 				error('fact_constraints (argument 1) must be a cell array')
 			end

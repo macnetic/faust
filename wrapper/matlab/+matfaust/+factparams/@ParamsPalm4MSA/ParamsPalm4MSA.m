@@ -14,6 +14,9 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 	methods
 		function p = ParamsPalm4MSA(constraints, stop_crit, varargin)
 			import matfaust.factparams.*
+			if(isa(constraints, 'ConstraintList'))
+				constraints = constraints.clist;
+			end
 			if(~ iscell(constraints))
 				error('constraints (argument 1) must be a cell array')
 			end

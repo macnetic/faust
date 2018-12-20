@@ -66,7 +66,7 @@ classdef FaustFactory
 		%>  import matfaust.*
 		%>  import matfaust.factparams.*
 		%>  M = rand(500, 32);
-		%>  cons = {ConstraintInt('splin', 500, 32, 5), ConstraintReal('normcol', 32, 32, 1.0)};
+		%>  cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1, 32, 32);
 		%>  stop_crit = StoppingCriterion(200);
 		%>  params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', false, 'init_lambda', 1.0);
 		%>  F = FaustFactory.fact_palm4msa(M, params)
@@ -132,10 +132,8 @@ classdef FaustFactory
 		%>  import matfaust.*
 		%>  import matfaust.factparams.*
 		%>  M = rand(500, 32);
-		%>  fact_cons = cell(3, 1);
-		%>  res_cons = cell(3, 1);
-		%>  fact_cons = {ConstraintInt('splin', 500, 32, 5), ConstraintInt('sp', 32, 32, 96), ConstraintInt('sp', 32, 32, 96)};
-		%>  res_cons = {ConstraintReal('normcol', 32, 32, 1), ConstraintInt('sp', 32, 32, 666), ConstraintInt('sp', 32, 32, 333)};
+		%>  fact_cons = ConstraintList('splin', 5, 500, 32, 'sp', 96, 32, 32, 'sp', 96, 32, 32);
+		%>  res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp', 333, 32, 32);
 		%>  stop_crit = StoppingCriterion(200);
 		%>  stop_crit2 = StoppingCriterion(200);
 		%>  params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2, 'is_update_way_R2L', false, 'init_lambda', 1.0);
