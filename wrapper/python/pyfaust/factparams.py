@@ -346,8 +346,7 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
             raise TypeError('p must be a float')
         if(not P):
             P=ParamsHierarchicalFactRectMat.DEFAULT_P_CONST_FACT*m**2
-            S1_cons = ConstraintInt('spcol', m, n, k)
-
+        S1_cons = ConstraintInt('spcol', m, n, k)
         S_cons = [S1_cons];
         for i in range(j-2):
             S_cons += [ ConstraintInt('sp', m, m, s*m) ]
@@ -366,13 +365,29 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
 
     @staticmethod
     def createParams(M, p):
-        # p = ('rectmat', j, k, s)
-        if(not isinstance(p, tuple) and not isinstance(p, list)):
-            raise TypeError('p must be a tuple or a list.')
+        # caller is responsible to check if name in p is really 'rectmat'
+        def parse_p():
+            nonlocal p
+            # p = ('rectmat', j, k, s)
+            # or p is (['rectmat', j, k, s ],{'rho':rho, P: P})
+            if(isinstance(p, tuple) or isinstance(p, list)):
+                if(len(p) == 2 and (isinstance(p[0], list) or isinstance(p[0],
+                                                                        tuple))
+                  and len(p[0]) == 4 and isinstance(p[1], dict) and 'rho' in
+                   p[1].keys() and 'P' in p[1].keys()):
+                    p = [*p[0][:],p[1]['rho'], p[1]['P']]
+                elif(len(p) == 4 and (isinstance(p, list) or isinstance(p,
+                                                                        tuple))):
+                    pass #nothing to do
+                else:
+                    raise ValueError('The valid formats for p are: '
+                                     '("rectmat",j,k,s) or '
+                                     '[("rectmat",j,k,s),{"rho": rho, "P": P}]'
+                                     ' with j, k, s being integers and rho and'
+                                     ' P being floats')
+        parse_p()
         if(not isinstance(M, np.ndarray)):
             raise TypeError('M must be a numpy.ndarray.')
-        if(len(p) < 4):
-            raise ValueError('p must be of length greater or equal 4.')
         p = ParamsHierarchicalFactRectMat(M.shape[0], M.shape[1], *p[1:])
         return p
 
@@ -425,7 +440,7 @@ class StoppingCriterion(object):
 
 class ParamsFactFactory:
 
-    SIMPLIFIED_PARAMS = [
+    SIMPLIFIED_PARAM_NAMES = [
         [ "squaremat", "hadamard"],
         ["rectmat", "meg"]
     ]
@@ -441,25 +456,34 @@ class ParamsFactFactory:
         ParamsHierarchicalFactRectMat)
         param_id = None
         c = ParamsFactFactory # class alias
-        if(isinstance(p, str)):
-            param_id = p
-        elif(ParamsFactFactory.is_a_valid_simplification(p)):
-            param_id = p[0]
-        else:
+        if(not c.is_a_valid_simplification(p)):
             raise TypeError('Invalid p to represent a simplified '
                             'parametrization.')
-
-        if(param_id.lower() in c.SIMPLIFIED_PARAMS[c.SQRMAT_ID]):
+        param_id = c.get_simplification_name(p)
+        if(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.SQRMAT_ID]):
             return ParamsHierarchicalFactSquareMat.createParams(M, p)
-        elif(param_id.lower() in c.SIMPLIFIED_PARAMS[c.RECTMAT_ID]):
+        elif(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.RECTMAT_ID]):
             return ParamsHierarchicalFactRectMat.createParams(M, p)
         else:
             raise ValueError("p is not a known simplified parametrization.")
 
     @staticmethod
-    def is_a_valid_simplification(p):
-        return isinstance(p, str) or ((isinstance(p, tuple) or isinstance(p,
-                                                                        list))
-                                      and len(p) > 0 and isinstance(p[0],
-                                                                    str))
+    def get_simplification_name(p):
+        # to be a valid simplification form
+        # p must be something among:
+        # 1. a str
+        # 2. a list/tuple with l[0] being a str
+        # 3. a list/tuple with first elt a list/tuple such that l[0][0] is a str
+        max_depth=3
+        l = [p]
+        for i in range(max_depth):
+            if((isinstance(l, list) or isinstance(l, tuple))):
+                if(isinstance(l[0], str)):
+                    return l[0]
+                else:
+                    l = l[0]
+        return None
 
+    @staticmethod
+    def is_a_valid_simplification(p):
+        return ParamsFactFactory.get_simplification_name(p) != None
