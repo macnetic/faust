@@ -486,7 +486,7 @@ class TestFaustPy(unittest.TestCase):
             ref_full_F = self.mulFactors()+s
             self.assertAlmostEqual(norm(test_F.toarray()-ref_full_F), 0,
                                    places=3)
-        print("subtraction Faust-Faust")
+        print("substraction Faust-Faust")
         fausts = \
         [ FaustFactory.rand(5,F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
          FaustFactory.rand(5,F.shape[0], .5,

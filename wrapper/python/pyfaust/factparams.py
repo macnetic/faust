@@ -244,6 +244,55 @@ class ConstraintName:
             raise ValueError(err_msg)
         return id
 
+class ConstraintList(object):
+    """
+        A class helper for constructing a list of consistent
+        ConstraintGeneric objects.
+    """
+    def __init__(self, *args):
+        # constraint definition tuple
+        tuple_len = 4 # name, value, nrows, ncols
+        i = 0
+        j = 1 # the number of processed constraints
+        self.clist = []
+        while(i < len(args)):
+              cname = ConstraintName(args[i])
+              if(i+1 > len(args)):
+                raise ValueError("No value/parameter given to define the "
+                                 +str(j)+"-th constraint.")
+              cval = args[i+1]
+              if(i+2 > len(args)):
+                raise ValueError("No number of rows given to define the "
+                                 +str(j)+"-th constraint.")
+              nrows = args[i+2]
+              if(i+3 > len(args)):
+                raise ValueError("No number of columns given to define the "
+                                 +str(j)+"-th constraint.")
+              ncols = args[i+3]
+              if(cname.is_int_constraint()):
+                cons = ConstraintInt(cname, nrows, ncols, cval)
+              elif(cname.is_real_constraint()):
+                cons = ConstraintReal(cname, nrows, ncols, cval)
+              elif(cname.is_mat_constraint()):
+                cons = ConstraintMat(cname, nrows, ncols, cval)
+              else:
+                raise Exception(cname +" is not a valid name for a "
+                                "ConstraintGeneric object")
+              self.clist += [ cons ]
+              i += tuple_len
+
+    def __len__(self):
+        return len(self.clist)
+
+    def __add__(self, other):
+        """
+        Warning: it  returns a python list not a ConstraintList.
+        """
+        if(not isinstance(other, ConstraintList)):
+           raise TypeError("Can't concatenate a ConstraintList with something"
+                           " else.")
+        return self.clist + other.clist
+
 class ParamsFact(object):
 
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
@@ -253,7 +302,10 @@ class ParamsFact(object):
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
         self.step_size = step_size
-        self.constraints = constraints
+        if(isinstance(constraints, ConstraintList)):
+            self.constraints = constraints.clist
+        else:
+            self.constraints = constraints
         self.is_verbose = is_verbose
         self.constant_step_size = constant_step_size
 
@@ -270,10 +322,13 @@ class ParamsHierarchicalFact(ParamsFact):
                  step_size=10.0**-16, constant_step_size=False,
                  is_fact_side_left=False,
                  is_verbose=False):
-        if(not isinstance(fact_constraints, list)):
-            raise TypeError('fact_constraints must be a list.')
-        if(not isinstance(res_constraints, list)):
-            raise TypeError('res_constraints must be a list.')
+        if(not isinstance(fact_constraints, list) and not
+           isinstance(fact_constraints, ConstraintList)):
+            raise TypeError('fact_constraints must be a list or a'
+                            ' ConstraintList.')
+        if(not isinstance(res_constraints, list) and not
+           isinstance(res_constraints, ConstraintList)):
+            raise TypeError('res_constraints must be a list or a ConstraintList.')
         if(len(fact_constraints) != len(res_constraints)):
             raise ValueError('fact_constraints and res_constraints must have'
                              ' same length.')
@@ -296,8 +351,8 @@ class ParamsHierarchicalFact(ParamsFact):
            len(stop_crits) != 2 or
            not isinstance(stop_crits[0],StoppingCriterion) or not
            isinstance(stop_crits[1],StoppingCriterion)):
-            raise TypeError('ParamsHierarchicalFact stop_crits argument must be a list/tuple of two '
-                            'StoppingCriterion objects')
+            raise TypeError('ParamsHierarchicalFact stop_crits argument must be'
+                            ' a list/tuple of two StoppingCriterion objects')
         if((not isinstance(constraints, list) and not isinstance(constraints,
                                                                 tuple)) or
            np.array([not isinstance(constraints[i],ConstraintGeneric) for i in
@@ -412,8 +467,10 @@ class ParamsPalm4MSA(ParamsFact):
                  step_size=10.0**-16,
                  constant_step_size=False,
                  is_verbose=False):
-        if(not isinstance(constraints, list)):
-            raise TypeError('constraints argument must be a list.')
+        if(not isinstance(constraints, list) and not
+           isinstance(constraints, ConstraintList)):
+            raise TypeError('constraints argument must be a list or a'
+                            ' ConstraintList.')
         num_facts = len(constraints)
         super(ParamsPalm4MSA, self).__init__(num_facts, is_update_way_R2L,
                                              init_lambda,

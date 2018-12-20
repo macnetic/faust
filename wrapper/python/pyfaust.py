@@ -1357,16 +1357,14 @@ class FaustFactory:
 
         Examples:
         >>> from pyfaust import FaustFactory
-        >>> from pyfaust.factparams import ParamsPalm4MSA, ConstraintReal,\
-        >>> ConstraintInt, ConstraintName, StoppingCriterion
+        >>> from pyfaust.factparams import ParamsPalm4MSA, ConstraintList, StoppingCriterion
         >>> import numpy as np
         >>> M = np.random.rand(500, 32)
-        >>> cons = [ ConstraintInt('splin', 500, 32, 5),
-        >>>          ConstraintReal('normcol', 32, 32, 1.0)]
+        >>> cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1.0, 32, 32)
         >>> stop_crit = StoppingCriterion(num_its=200)
         >>> param = ParamsPalm4MSA(cons, stop_crit)
         >>> F = FaustFactory.fact_palm4msa(M, param)
-        >>> F.display()
+        >>> F
         Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):<br/>
         FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500<br/>
         FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024<br/>
@@ -1420,14 +1418,11 @@ class FaustFactory:
         Examples:
             <b> 1. Fully Defined Parameters for a Random Matrix Factorization </b>
             >>> from pyfaust import FaustFactory
-            >>> from pyfaust.factparams import ParamsHierarchicalFact, ConstraintReal,\
-            >>> ConstraintInt, ConstraintName, StoppingCriterion
+            >>> from pyfaust.factparams import ParamsHierarchicalFact, ConstraintList, StoppingCriterion
             >>> import numpy as np
             >>> M = np.random.rand(500, 32)
-            >>> fact_cons = [ ConstraintInt('splin', 500, 32, 5), ConstraintInt('sp', 32, 32, 96),
-            >>>               ConstraintInt('sp', 32, 32, 96)]
-            >>> res_cons = [ ConstraintReal('normcol', 32, 32, 1), ConstraintInt('sp', 32, 32, 666),
-            >>>              ConstraintInt('sp', 32, 32, 333)]
+            >>> fact_cons = ConstraintList('splin', 5, 500, 32, 'sp', 96, 32, 32, 'sp', 96, 32, 32)
+            >>> res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp', 333, 32, 32)
             >>> stop_crit1 = StoppingCriterion(num_its=200)
             >>> stop_crit2 = StoppingCriterion(num_its=200)
             >>> param = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit1, stop_crit2)
