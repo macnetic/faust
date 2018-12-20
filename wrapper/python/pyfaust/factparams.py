@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 from pyfaust import *
 import FaustCorePy
+import sys
+if sys.version_info > (3,0):
+    from abc import ABC, abstractmethod
+else:
+    from abc import abstractmethod
+    ABC = object # trick to handle py2 missing ABC
+                 # but not using abstract class in py2.7
 
 """
     This module provides all the classes that represent the input parameters needed
@@ -9,7 +16,7 @@ import FaustCorePy
     FaustFactory.fact_hierarchical()
 """
 
-class ConstraintGeneric(object):
+class ConstraintGeneric(ABC):
     """
     This is the parent class for representing a factor constraint in FAµST factorization algorithms.
 
@@ -68,7 +75,12 @@ class ConstraintGeneric(object):
         """
         return self._name.is_mat_constraint()
 
+
+    @abstractmethod
     def project(self, M):
+        """
+            Applies the constraint to the matrix M.
+        """
         if(M.shape[0] != self._num_rows or M.shape[1] != self._num_cols):
             raise ValueError("The dimensions must agree.")
 
@@ -353,7 +365,7 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
 
         R_cons = []
         for i in range(j-1):
-            R_cons += [ConstraintInt('sp', m, m, ceil(P*rho**i))]
+            R_cons += [ConstraintInt('sp', m, m, int(ceil(P*rho**i)))]
 
         stop_crit = StoppingCriterion(num_its=30)
 
@@ -366,8 +378,7 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
     @staticmethod
     def createParams(M, p):
         # caller is responsible to check if name in p is really 'rectmat'
-        def parse_p():
-            nonlocal p
+        def parse_p(p):
             # p = ('rectmat', j, k, s)
             # or p is (['rectmat', j, k, s ],{'rho':rho, P: P})
             if(isinstance(p, tuple) or isinstance(p, list)):
@@ -375,7 +386,9 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
                                                                         tuple))
                   and len(p[0]) == 4 and isinstance(p[1], dict) and 'rho' in
                    p[1].keys() and 'P' in p[1].keys()):
-                    p = [*p[0][:],p[1]['rho'], p[1]['P']]
+                    # ENOTE: concatenation instead of unpacking into list
+                    # because of py2 (it would be ok for py3)
+                    p = list(p[0][:])+[p[1]['rho'], p[1]['P']]
                 elif(len(p) == 4 and (isinstance(p, list) or isinstance(p,
                                                                         tuple))):
                     pass #nothing to do
@@ -385,7 +398,8 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
                                      '[("rectmat",j,k,s),{"rho": rho, "P": P}]'
                                      ' with j, k, s being integers and rho and'
                                      ' P being floats')
-        parse_p()
+            return p
+        p = parse_p(p)
         if(not isinstance(M, np.ndarray)):
             raise TypeError('M must be a numpy.ndarray.')
         p = ParamsHierarchicalFactRectMat(M.shape[0], M.shape[1], *p[1:])

@@ -1,7 +1,7 @@
 %% class ConstraintGeneric
 %%
 
-classdef ConstraintGeneric
+classdef (Abstract) ConstraintGeneric
 	properties (SetAccess = public)
 		name % obj of type ConstraintName
 		num_rows
