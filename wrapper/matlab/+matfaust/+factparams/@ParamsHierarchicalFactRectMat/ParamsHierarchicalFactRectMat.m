@@ -1,3 +1,6 @@
+% =========================================================
+%> The simplified parameterization class for factorizing a rectangular matrix with the hierarchical factorization algorithm.
+% =========================================================
 classdef ParamsHierarchicalFactRectMat < matfaust.factparams.ParamsHierarchicalFact
 	properties(Constant, SetAccess = protected, Hidden)
 		DEFAULT_RHO = 0.8

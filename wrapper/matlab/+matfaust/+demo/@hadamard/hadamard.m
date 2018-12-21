@@ -121,6 +121,10 @@
 %	Topics in Signal Processing, 2016.
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %%
+
+% ======================================================================
+%> The demo for the hierarchical factorization of Hadamard matrices.
+% ======================================================================
 classdef hadamard
 	methods(Static)
 		%======================================================================

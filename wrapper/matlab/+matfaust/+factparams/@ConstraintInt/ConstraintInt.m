@@ -1,6 +1,6 @@
-%% class ConstraintInt
-%%
-
+% ======================================================================
+%> This class represents an integer constraint on a matrix.
+% ======================================================================
 classdef ConstraintInt < matfaust.factparams.ConstraintGeneric
 	properties (SetAccess = public)
 

@@ -3,6 +3,8 @@ from __future__ import print_function
 from pylab import *
 import os,sys
 
+## @package pyfaust.demo @brief The pyfaust module for the demos partly based on research papers
+
 
 DEFT_DATA_DIR = 'pyfaust_demo_output'
 DEFT_FIG_DIR = 'pyfaust_demo_figures'
@@ -29,7 +31,9 @@ def get_data_dirpath():
 
 
 class quickstart:
-
+    """
+        The FAµST quickstart script, a good place to look at for a first tour.
+    """
     @staticmethod
     def run():
         #import the pyfaust package
@@ -132,6 +136,9 @@ class quickstart:
         print("end quickstart.py")
 
 class fft:
+    """
+    FFT demo: multiplication runtime comparison between DFT matrix-vector and Faust(FFT)-vector.
+    """
 
     _nb_mults = 500
     _log2_dims = arange(6,13)
@@ -277,7 +284,9 @@ class fft:
 
 
 class runtimecmp:
-
+    """
+        Runtime comparison demo: Faust-vector and dense matrix-vector multiplications, differents RCGs, transpose.
+    """
     _rcgs = [2, 4, 8]
     _dims = [128, 256, 512]
     _nb_facts = [2, 4, 8]
@@ -468,7 +477,9 @@ class runtimecmp:
         #show()
 
 class hadamard:
-
+    """
+        The demo for the hierarchical factorization of Hadamard matrices.
+    """
     _nb_mults = 500
     _nb_norms = 10
     _n = 5
@@ -880,6 +891,9 @@ class hadamard:
         show()
 
 class bsl:
+    """
+        Brain Source Localization demo.
+    """
 
     _speedup_fig_fname = 'BSL-speed_up_omp_solver.png'
     _time_cmp_fig_fname = 'BSL-runtime_comparison_omp_solver.png'

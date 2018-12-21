@@ -1,6 +1,6 @@
-%% class ConstraintGeneric
-%%
-
+% ======================================================================
+%> This is the parent class for representing a factor constraint in FAµST factorization algorithms.
+% ======================================================================
 classdef (Abstract) ConstraintGeneric
 	properties (SetAccess = public)
 		name % obj of type ConstraintName

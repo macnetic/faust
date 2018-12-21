@@ -24,7 +24,9 @@
 %	Luc Le Magoarou	: luc.le-magoarou@inria.fr
 %	Remi Gribonval	: remi.gribonval@inria.fr
 
-
+% ======================================================================
+%> @brief Brain Source Localization demo.
+% ======================================================================
 classdef bsl
 	properties(SetAccess = public)
 	end

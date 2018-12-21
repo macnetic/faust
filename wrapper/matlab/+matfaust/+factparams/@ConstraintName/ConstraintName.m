@@ -1,6 +1,9 @@
 %% class ConstraintName
 %%%
 
+% =========================================================
+%> This class defines the names for the sub-types of constraints into the ConstraintGeneric hierarchy of classes.
+% =========================================================
 classdef ConstraintName
 	properties (SetAccess = public, Constant)
 		SP = 0

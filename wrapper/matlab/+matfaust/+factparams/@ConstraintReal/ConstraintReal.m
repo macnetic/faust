@@ -1,5 +1,6 @@
-%% class ConstraintReal
-%%
+% =========================================================
+%> This class represents a real constraint on a matrix.
+% =========================================================
 classdef ConstraintReal < matfaust.factparams.ConstraintGeneric
 	properties (SetAccess = public)
 

@@ -1,5 +1,12 @@
-%% class StoppingCriterion
-%%
+% =========================================================
+%> @brief This class defines a StoppingCriterion for the FAµST's algorithms.
+%>
+%> A stopping criterion can be of two kinds:
+%>
+%>     - number of iterations,
+%>     - error treshold for the approximation of the matrix.
+%>
+% =========================================================
 classdef StoppingCriterion
 	properties (SetAccess = public)
 		is_criterion_error

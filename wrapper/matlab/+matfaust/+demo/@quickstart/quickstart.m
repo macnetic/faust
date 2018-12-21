@@ -1,3 +1,5 @@
+%> @package matfaust.demo @brief The matfaust namespace for the demos partly based on research papers
+
 %% Description quick_start
 %
 %  This demo shows that a Faust is handled as matlab builtin matrix,
@@ -123,6 +125,10 @@
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %
 %%
+
+% =====================================================================
+%> The FAµST quickstart script, a good place to look at for a first tour.
+% =====================================================================
 classdef quickstart
 	methods(Static)
 		%==========================================================================

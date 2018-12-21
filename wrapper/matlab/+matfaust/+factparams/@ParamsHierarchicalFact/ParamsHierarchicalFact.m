@@ -1,5 +1,7 @@
-%% class ParamsHierarchicalFact
-%%
+
+% =========================================================
+%> The parent class to set input parameters for the hierarchical factorization algorithm.
+% =========================================================
 classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
 	properties (SetAccess = public)
 		stop_crits

@@ -1,6 +1,6 @@
-%% class ConstraintMat
-%%
-
+% ======================================================================
+%> This class represents a matrix-based constraint on a matrix.
+% ======================================================================
 classdef ConstraintMat < matfaust.factparams.ConstraintGeneric
 	properties (SetAccess = public)
 

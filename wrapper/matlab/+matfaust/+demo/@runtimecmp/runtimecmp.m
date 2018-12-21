@@ -112,6 +112,10 @@
 % example of inputfile and outputdir
 %inputfile='@FAUST_BIN_TEST_OUTPUT_DIR@/multiply_compare_time.mat';
 %outputdir='@FAUST_BIN_TEST_FIG_DIR@';
+
+% =====================================================================
+%> Runtime comparison demo: Faust-vector and dense matrix-vector multiplications, differents RCGs, transpose.
+% =====================================================================
 classdef runtimecmp
 	methods(Static)
 		%============================================================================

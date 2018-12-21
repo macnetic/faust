@@ -1,6 +1,8 @@
-%% class ParamsFact
-%%
+%> @package matfaust.factparams @brief The module for the parametrization of FAµST's algorithms (Palm4MSA and Hierarchical Factorization)
 
+% =========================================================
+%> The parent abstract class to represent the general factorization parameters.
+% =========================================================
 classdef (Abstract) ParamsFact
 	properties (SetAccess = public)
 		num_facts

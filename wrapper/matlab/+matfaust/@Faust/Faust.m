@@ -42,7 +42,7 @@
 %> @package matfaust @brief <b> The FAµST Matlab Wrapper
 
 % ======================================================================
-%> @brief FAµST Matlab wrapper main class.
+%> @brief <b>FAµST Matlab wrapper main class</b> for using multi-layer sparse transforms.
 %>
 %> This class provides a Matlab array-like interface for operations with FAµST data structures, which correspond to matrices that can be written exactly as the product of sparse matrices.
 %>

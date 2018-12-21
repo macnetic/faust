@@ -37,6 +37,11 @@
 %	Topics in Signal Processing, 2016.
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %%
+
+
+% ======================================================================
+%> @brief FFT multiplication runtime comparison between DFT matrix-vector and Faust(FFT)-vector.
+% ======================================================================
 classdef fft
 	methods(Static)
 		%======================================================================

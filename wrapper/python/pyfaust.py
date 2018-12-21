@@ -49,7 +49,7 @@ import FaustCorePy
 import pyfaust
 
 class Faust:
-    """FAµST Python wrapper main class.
+    """<b>FAµST Python wrapper main class</b> for using multi-layer sparse transforms.
 
     This class provides a numpy-like interface for operations
     with FAµST data structures, which correspond to matrices that can be

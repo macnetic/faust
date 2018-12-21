@@ -1,7 +1,6 @@
-
-%% class ParamsPalm4MSA
-%%
-%
+% =========================================================
+%> The class is to set input parameters for the Palm4MSA algorithm.
+% =========================================================
 classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 	properties (SetAccess = public)
 		init_facts

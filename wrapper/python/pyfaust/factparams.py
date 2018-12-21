@@ -9,6 +9,8 @@ else:
     ABC = object # trick to handle py2 missing ABC
                  # but not using abstract class in py2.7
 
+## @package pyfaust.factparams @brief The module for the parametrization of FAµST's algorithms (Palm4MSA and Hierarchical Factorization).
+
 """
     This module provides all the classes that represent the input parameters needed
 
@@ -86,7 +88,7 @@ class ConstraintGeneric(ABC):
 
 class ConstraintInt(ConstraintGeneric):
     """
-        This class represents an integer constraint on a matrix-factor.
+        This class represents an integer constraint on a matrix.
 
         It constrains a matrix by its column/row-vectors sparsity or 0-norm
         (ConstraintName.SPLIN, ConstraintName.SPCOL, ConstraintName.SPLINCOL).
@@ -109,7 +111,9 @@ class ConstraintInt(ConstraintGeneric):
 
 
 class ConstraintMat(ConstraintGeneric):
-
+    """
+        This class represents a matrix-based constraint to apply on a matrix.
+    """
     def __init__(self, name, num_rows, num_cols, cons_value):
         super(ConstraintMat, self).__init__(name, num_rows, num_cols, cons_value)
         if(not isinstance(cons_value, np.matrix) and not isinstance(cons_value,
@@ -130,7 +134,7 @@ class ConstraintMat(ConstraintGeneric):
 
 class ConstraintReal(ConstraintGeneric):
     """
-        This class represents a real constraint on a matrix-factor.
+        This class represents a real constraint on a matrix.
 
         It constrains a matrix by a column/row-vector 2-norm
         (ConstraintName.NORMCOL, ConstraintName.NORMLIN).
@@ -167,6 +171,8 @@ class ConstraintReal(ConstraintGeneric):
 
 class ConstraintName:
     """
+    This class defines the names for the sub-types of constraints into the ConstraintGeneric hierarchy of classes.
+
     Attributes:
         SP: Designates a constraint on the sparsity/0-norm of a matrix.
         SPCOL: Designates a sparsity/0-norm constraint on the columns of a
@@ -246,8 +252,7 @@ class ConstraintName:
 
 class ConstraintList(object):
     """
-        A class helper for constructing a list of consistent
-        ConstraintGeneric objects.
+        An helper class for constructing a list of consistent ConstraintGeneric objects.
     """
     def __init__(self, *args):
         # constraint definition tuple
@@ -293,8 +298,15 @@ class ConstraintList(object):
                            " else.")
         return self.clist + other.clist
 
-class ParamsFact(object):
+class ParamsFact(ABC):
+    """
+        The parent abstract class to represent the general factorization parameters.
 
+        The class is the base parameters for Palm4MSA and Hierarchical
+        factorization but as an abstract class it's not for direct use.
+
+    <b/> See also  ParamsHierarchicalFact, ParamsPalm4MSA
+    """
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
                  constraints, step_size, constant_step_size,
                  is_verbose):
@@ -309,14 +321,25 @@ class ParamsFact(object):
         self.is_verbose = is_verbose
         self.constant_step_size = constant_step_size
 
+    @abstractmethod
     def is_mat_consistent(self, M):
         if(not isinstance(M, np.ndarray)):
             raise ValueError("M must be a numpy ndarray")
+        print("M.shape=", M.shape)
         return M.shape[0] == self.constraints[0]._num_rows and \
                 M.shape[1] == self.constraints[-1]._num_cols
 
 class ParamsHierarchicalFact(ParamsFact):
+    """
+        The parent class to set input parameters for the hierarchical factorization algorithm.
 
+        The class' goal is to instantiate a fully defined set of parameters
+        for the algorithm. But it exists simplified parametrizations for the
+        same algorithm as child classes.
+
+        <b/> See also ParamsHierarchicalFactSquareMat,
+        ParamsHierarchicalFactRectMat, FaustFactory.fact_hierarchical
+    """
     def __init__(self, fact_constraints, res_constraints, stop_crit1,
                  stop_crit2, is_update_way_R2L=False, init_lambda=1.0,
                  step_size=10.0**-16, constant_step_size=False,
@@ -374,7 +397,14 @@ class ParamsHierarchicalFact(ParamsFact):
                 M.shape[1] == self.data_num_cols
 
 class ParamsHierarchicalFactSquareMat(ParamsHierarchicalFact):
+    """
+    The simplified parameterization class for factorizing a square matrix (of order a power of two) with the hierarchical factorization algorithm.
 
+    This type of parameters is typically used for Hadamard matrix
+    factorization.
+
+    <b/> See also FaustFactory.fact_hierarchical, pyfaust.demo.hadamard
+    """
     def __init__(self, n):
         d = 2**int(n)
         stop_crit = StoppingCriterion(num_its=30)
@@ -398,6 +428,11 @@ class ParamsHierarchicalFactSquareMat(ParamsHierarchicalFact):
 
 
 class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
+    """
+    The simplified parameterization class for factorizing a rectangular matrix with the hierarchical factorization algorithm.
+
+    <b/> See also FaustFactory.fact_hierarchical, pyfaust.demo.bsl
+    """
 
     DEFAULT_P_CONST_FACT = 1.4
 
@@ -461,6 +496,11 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
         return p
 
 class ParamsPalm4MSA(ParamsFact):
+    """
+        The class is to set input parameters for the Palm4MSA algorithm.
+
+        <b/> See also  FaustFactory.fact_palm4msa
+    """
 
     def __init__(self, constraints, stop_crit, init_facts=None,
                  is_update_way_R2L=False, init_lambda=1.0,
@@ -490,8 +530,17 @@ class ParamsPalm4MSA(ParamsFact):
         self.stop_crit = stop_crit
         #TODO: verify number of constraints is consistent with num_facts
 
-class StoppingCriterion(object):
+    def is_mat_consistent(self, M):
+        return super(ParamsPalm4MSA, self).is_mat_consistent(M)
 
+class StoppingCriterion(object):
+    """
+        This class defines a StoppingCriterion for the FAµST's algorithms.
+
+        A stopping criterion can be of two kinds:
+            - number of iterations,
+            - error treshold for the approximation of the matrix.
+    """
     def __init__(self, is_criterion_error = False , error_treshold = 0.3,
                  num_its = 500,
                  max_num_its = 1000):
@@ -510,7 +559,15 @@ class StoppingCriterion(object):
                              "the stopping criterion.")
 
 class ParamsFactFactory:
+    """
+        The factory for creating simplified FAµST hierarchical algorithm parameters (ParamsHierarchicalFact).
 
+        Note: this factory is not related to ParamsPalm4MSA, it only creates
+        ParamsHierarchicalFact instances.
+
+        <b/> See also  ParamsHierarchicalFactRectMat,
+        ParamsHierarchicalFactSquareMat, FaustFactory.fact_hierarchical()
+    """
     SIMPLIFIED_PARAM_NAMES = [
         [ "squaremat", "hadamard"],
         ["rectmat", "meg"]
