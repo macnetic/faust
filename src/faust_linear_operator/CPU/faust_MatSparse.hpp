@@ -892,7 +892,7 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_i
 			for(j=0;j<vec_size;j++)
 				id_list.push_back(j);
 			j = vec_nnz;
-			while(j > 0)
+			while(j > 0 && id_list.size() > 0)
 			{
 				// set the uniform random law to pick an index among the remaining ones
 				std::uniform_int_distribution<faust_unsigned_int> int_distribution(0, id_list.size()-1);
