@@ -10,10 +10,10 @@ else:
                  # but not using abstract class in py2.7
 
 ## @package pyfaust.factparams @brief The module for the parametrization of FAµST's algorithms (Palm4MSA and Hierarchical Factorization).
+## <b/> See also: FaustFactory.fact_hierarchical, FaustFactory.fact_palm4msa
 
 """
     This module provides all the classes that represent the input parameters needed
-
     by factorization algorithms FaustFactory.fact_palm4msa()
     FaustFactory.fact_hierarchical()
 """
@@ -23,14 +23,19 @@ class ConstraintGeneric(ABC):
     This is the parent class for representing a factor constraint in FAµST factorization algorithms.
 
     This class shouldn't be instantiated, rather rely on sub-classes.
+    Typically, a constraint finds its place into a ParamsFact or sub-class
+    instance (as a container for the factorization parameters).
+    It's also possible to set a list of constraints with the ConstraintList class.
 
-    <b/> See also: ConstraintInt, ConstraintReal, ConstraintMat, FaustFactory.fact_palm4msa, FaustFactory.fact_hierarchical.
+    <b/> See also: ConstraintInt, ConstraintReal, ConstraintMat,
+    FaustFactory.fact_palm4msa, FaustFactory.fact_hierarchical, ParamsPalm4MSA,
+    ParamsHierarchicalFact.
 
     Attributes:
         _name: The name of the constraint applied to the factor (ConstraintName instance).
-        _num_rows: The number of rows to constrain the factor to.
-        _num_cols: The number of columns to constrain the factor to.
-        _cons_value: The parameter value of the constraint.
+        _num_rows: the number of columns of the constrained matrix.
+        _num_cols: the number of columns of the constrained matrix.
+        _cons_value: The value of the constraint.
 
     """
 
@@ -38,11 +43,19 @@ class ConstraintGeneric(ABC):
         """
         Constructs a generic constraint.
 
+        Warning: This constructor shouldn't be called directly as the class is
+        abstract.
+
         Args:
-            name: the name of the constraint applied to the factor (ConstraintName instance).
-            num_rows: the number of rows to constrain the factor to.
-            num_cols: the number of columns to constrain the factor to.
-            cons_value: the parameter value of the constraint.
+            name: The name of the constraint applied to the factor (ConstraintName instance).
+            num_rows: the number of columns of the constrained matrix.
+            num_cols: the number of columns of the constrained matrix.
+            cons_value: The value of the constraint.
+
+        Raises:
+            TypeError: Can't instantiate abstract class ConstraintGeneric with
+            abstract methods project. This exception is python 3 only, but
+            this class shouldn't be instantiated in python 2.7 either.
 
         """
         if(isinstance(name, str)):
@@ -82,7 +95,21 @@ class ConstraintGeneric(ABC):
     def project(self, M):
         """
             Applies the constraint to the matrix M.
+
+            NOTE: The project function is also called a proximal operator.
+
+            Args:
+                M: a numpy array, it must be of the same size as set in object attributes self._num_rows, self._num_cols.
+
+            Raises:
+                ValueError: if M.shape and self._num_rows, self._num_cols don't agree.
+                TypeError: if M is not a numpy.ndarray
+
+            Returns:
+                The proximal operator result as a numpy array.
         """
+        if(isinstance(M, np.ndarray)):
+           raise TypeError("M must be a numpy array.")
         if(M.shape[0] != self._num_rows or M.shape[1] != self._num_cols):
             raise ValueError("The dimensions must agree.")
 
@@ -90,11 +117,39 @@ class ConstraintInt(ConstraintGeneric):
     """
         This class represents an integer constraint on a matrix.
 
-        It constrains a matrix by its column/row-vectors sparsity or 0-norm
-        (ConstraintName.SPLIN, ConstraintName.SPCOL, ConstraintName.SPLINCOL).
+        It constrains a matrix by its column/row-vectors sparsity or also
+        called 0-norm: ConstraintName.SPLIN, ConstraintName.SPCOL, ConstraintName.SPLINCOL.
+
+        The other constraint names of this type are: ConstraintName.SP,
+        ConstraintName.SP_POS, which both designate the 0-norm based constraint of the
+        matrix with besides for SP_POS the zero replacement of all
+        negative values.
+
 
     """
     def __init__(self, name, num_rows, num_cols, cons_value):
+        """
+            Args:
+                name: must be a ConstraintName instance set with a value among SP_POS, SP, SPLIN, SPCOL, SPLINCOL (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'sppos', 'sp', 'splin', 'spcol', 'splincol'.
+                num_rows: the number of rows of the constrained matrix.
+                num_cols: the number of columns of the constrained matrix.
+                cons_value: the integer value of the constraint (the 0-norm as
+                sparsity).
+
+            Example:
+                >>> from pyfaust.factparams import ConstraintInt
+                >>> from numpy.random import rand
+                >>> import numpy as np
+                >>> cons = ConstraintInt('sppos', 10, 10, 2) # a short for ConstraintInt(ConstraintName(ConstraintName.SP_POS), 10, 10, 2)
+                >>> # cons_value == 2 here and this is the 0-norm we want to constrain M to
+                >>> M = rand(10,10)
+                >>> np.count_nonzero(M)
+                100
+                >>> np.count_nonzero(cons.project(M))
+                2
+
+            <b/> See also: ConstraintGeneric.__init__
+        """
         super(ConstraintInt, self).__init__(name, num_rows, num_cols, cons_value)
         if(not isinstance(cons_value, np.int)):
             raise TypeError('ConstraintInt must receive a int as cons_value '
@@ -105,6 +160,9 @@ class ConstraintInt(ConstraintGeneric):
                             '(name.is_int_constraint() must return True).')
 
     def project(self, M):
+        """
+            <b/> See: ConstraintGeneric.project
+        """
         # TODO: call parent project()
         return FaustCorePy.ConstraintIntCore.project(M, self._name.name, self._num_rows,
                                               self._num_cols, self._cons_value)
@@ -113,8 +171,45 @@ class ConstraintInt(ConstraintGeneric):
 class ConstraintMat(ConstraintGeneric):
     """
         This class represents a matrix-based constraint to apply on a matrix.
+
     """
     def __init__(self, name, num_rows, num_cols, cons_value):
+        """
+        Constructs a matrix type constraint.
+
+        Args:
+            name: must be a ConstraintName instance set with a value among
+            SUPP or CONST (cf. ConstraintName) or it can also be one of the
+            more handy str aliases which are respectively: 'supp' and 'const'.
+            num_rows: the number of rows of the constrainted matrix.
+            num_cols: the number of columns of the constrained matrix.
+            cons_value: the value of the constraint, it must be a numpy.array
+            that defines the constraint (the matrix support for SUPP and the
+            constant matrix for CONST).
+
+        Example:
+            >>> from pyfaust.factparams import ConstraintMat
+            >>> from numpy.random import rand
+            >>> from numpy import eye
+            >>> from numpy.linalg import norm
+            >>> cons = ConstraintMat('supp', 10, 10, eye(10))
+            >>> M = rand(10,10)
+            >>> from numpy import count_nonzero
+            >>> count_nonzero(M)
+            100
+            >>> count_nonzero(cons.project(M))
+            10
+            >>> from numpy import diag
+            >>> diag(M)
+            array([ 0.77861201,  0.88512726,  0.56276019,  0.89159211,  0.85893333,
+                           0.59919467,  0.02603014,  0.16725741,  0.20578577,  0.40803648])
+            >>> diag(cons.project(M))
+            array([ 0.39756071,  0.4519476 ,  0.28734638,  0.45524856,  0.43857293,
+                           0.30594989,  0.01329104,  0.08540194,  0.10507459,  0.20834417])
+            >>> norm(cons.project(M))
+            0.99999999999999989
+
+        """
         super(ConstraintMat, self).__init__(name, num_rows, num_cols, cons_value)
         if(not isinstance(cons_value, np.matrix) and not isinstance(cons_value,
                                                                np.ndarray)):
@@ -127,6 +222,9 @@ class ConstraintMat(ConstraintGeneric):
                             '(name.is_mat_constraint() must return True)')
 
     def project(self, M):
+        """
+            <b/> See: ConstraintGeneric.project
+        """
         # TODO: call parent project()
         return FaustCorePy.ConstraintMatCore.project(M, self._name.name, self._num_rows,
                                               self._num_cols, self._cons_value)
@@ -145,14 +243,27 @@ class ConstraintReal(ConstraintGeneric):
         Constructs a real type constraint.
 
         Args:
-            name: the name of the constraint applied to the factor. It must be
-            a ConstraintName instance.
-            num_rows: the number of rows to constrain the factor to.
-            num_cols: the number of columns to constrain the factor to.
+            name: must be a ConstraintName instance set with a value among NORMCOL, NORMLIN (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'normcol', 'normlin'.
+            num_rows: the number of columns of the constrained matrix.
+            num_cols: the number of columns of the constrained matrix.
             cons_value: the parameter value of the constraint, it must be a
             float number that designates the 2-norm imposed to all columns (if
-            name.name == ConstraintName.NORMCOL) or rows (if
-            name.name == ConstraintName.NORMLIN).
+            name is ConstraintName.NORMCOL) or rows (if
+            name is ConstraintName.NORMLIN).
+
+        Example:
+            >>> from pyfaust.factparams import ConstraintReal
+            >>> from numpy.random import rand
+            >>> from numpy.linalg import norm
+            >>> cons = ConstraintReal('normcol', 10, 10, 2.) # a short for ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 10, 10, 2.)
+            >>> M = rand(10,10)*10
+            >>> norm(M[:,2],2)
+            17.041462424512272
+            >>> norm(cons.project(M)[:,2])
+            2.0
+
+
+            <b/> See also: ConstraintGeneric.__init__
         """
         super(ConstraintReal, self).__init__(name, num_rows, num_cols, cons_value)
         if(not isinstance(cons_value, np.float) and not isinstance(cons_value, np.int)):
@@ -165,6 +276,9 @@ class ConstraintReal(ConstraintGeneric):
                             '(name.is_real_constraint() must return True).')
 
     def project(self, M):
+        """
+        <b/> See: ConstraintGeneric.project 
+        """
         return FaustCorePy.ConstraintRealCore.project(M, self._name.name, self._num_rows,
                                               self._num_cols, self._cons_value)
 
@@ -173,22 +287,22 @@ class ConstraintName:
     """
     This class defines the names for the sub-types of constraints into the ConstraintGeneric hierarchy of classes.
 
+    The table <a href="constraint.png">here</a> is a summary of the available
+    constraints.
+
     Attributes:
         SP: Designates a constraint on the sparsity/0-norm of a matrix.
-        SPCOL: Designates a sparsity/0-norm constraint on the columns of a
-        matrix.
-        SPLIN: Designates a sparsity/0-norm constraint on the lines of a
-        matrix.
-        SPLINCOL: Designates a constraint that imposes both SPLIN and SPCOL
-        constraints.
-        SP_POS: Designates a constraint that imposes a SP constraints and
-        besides erase the negative coefficients (it doesn't apply to complex
-        matrices).
-        NORMCOL: Designates a 2-norm constraint on the columns of a matrix.
-        NORMLIN: Designates a 2-norm constraint on the lines of a matrix.
+        SPCOL: Designates a sparsity/0-norm constraint on the columns of a matrix.
+        SPLIN: Designates a sparsity/0-norm constraint on the rows of a matrix.
+        SPLINCOL: Designates a constraint that imposes both SPLIN and SPCOL constraints.
+        SP_POS: Designates a constraint that imposes a SP constraints and besides set to zero the negative coefficients (it doesn't apply to complex matrices).
+        NORMCOL: Designates a 2-norm constraint on each column of a matrix.
+        NORMLIN: Designates a 2-norm constraint on each row of a matrix.
         CONST: Designates a constraint imposing to a matrix to be constant.
+        SUPP: Designates a constraint by a support matrix S (element-wisely multiplying the matrix to constrain to obtain a matrix for which the 2-norm equals 1, see: ConstraintMat.project()).
+        name: The name of the constraint (actually an integer among the valid constants).
 
-        
+
     """
     SP = 0 # Int Constraint
     SPCOL = 1 # Int Constraint
@@ -202,6 +316,13 @@ class ConstraintName:
     NORMLIN = 9 # Real Constraint
 
     def __init__(self, name):
+        """
+            Constructor of the ConstraintName object.
+
+            Args:
+                name: must be a valid constraint name (integer among the
+                static constants defined in the class: ConstraintName.SP, ...).
+        """
         if(isinstance(name,str)):
             name = ConstraintName.str2name_int(name)
         if(not isinstance(name, np.int) or name < ConstraintName.SP or name > ConstraintName.NORMLIN):
@@ -213,18 +334,32 @@ class ConstraintName:
         self.name = name
 
     def is_int_constraint(self):
+        """
+            A delegate for ConstraintGeneric.is_int_constraint.
+        """
         return self.name in [ ConstraintName.SP, ConstraintName.SPCOL,
                              ConstraintName.SPLIN, ConstraintName.SPLINCOL,
                              ConstraintName.SP_POS ]
 
     def is_real_constraint(self):
+        """
+            A delegate for ConstraintGeneric.is_real_constraint.
+        """
         return self.name in [ ConstraintName.NORMCOL, ConstraintName.NORMLIN ]
 
     def is_mat_constraint(self):
+        """
+            A delegate for ConstraintGeneric.is_mat_constraint.
+        """
         return self.name in [ConstraintName.SUPP, ConstraintName.CONST ]
 
     @staticmethod
     def str2name_int(_str):
+        """
+            Converts a str constraint shortname to its integer constant name equivalent.
+
+            For example, str2name_int('sp') returns ConstraintName.SP.
+        """
         err_msg = "Invalid argument to designate a ConstraintName."
         if(not isinstance(_str, str)):
             raise ValueError(err_msg)
