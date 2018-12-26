@@ -59,6 +59,7 @@ classdef FaustFactory
 		%> @param p the ParamsPalm4MSA instance to define the algorithm parameters.
 		%>
 		%> @retval F the Faust object result of the factorization.
+		%> @retval [F, lambda] = fact_palm4msa(M, p) to optionally get lambda (scale).
 		%>
 		%> @b Example
 		%>
@@ -80,7 +81,7 @@ classdef FaustFactory
 		%>
 		%>
 		%==========================================================================================
-		function  F = fact_palm4msa(M, p)
+		function  [F,lambda] = fact_palm4msa(M, p)
 			import matfaust.Faust
 			mex_constraints = cell(1, length(p.constraints));
 			matfaust.FaustFactory.check_fact_mat('FaustFactory.fact_palm4msa', M)

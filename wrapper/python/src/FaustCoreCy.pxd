@@ -157,7 +157,8 @@ cdef extern from "FaustFact.h":
         bool is_fact_side_left
 
     cdef FaustCoreCpp[FPP]* fact_palm4MSA[FPP,FPP2](FPP*,unsigned int, unsigned int,
-                                             PyxParamsFactPalm4MSA[FPP,FPP2]*)
+                                             PyxParamsFactPalm4MSA[FPP,FPP2]*,
+                                                   FPP*)
 
     cdef FaustCoreCpp[FPP]* fact_hierarchical[FPP,FPP2](FPP*,unsigned int, unsigned int,
                                              PyxParamsHierarchicalFact[FPP,FPP2]*,

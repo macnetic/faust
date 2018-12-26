@@ -176,7 +176,7 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
 }
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsFactPalm4MSA<FPP,FPP2>* p)
+FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsFactPalm4MSA<FPP,FPP2>* p, FPP* out_lambda)
 {
     FaustCoreCpp<FPP>* core;
     Faust::MatDense<FPP,Cpu> inMat(mat, num_rows, num_cols);
@@ -237,6 +237,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
     for (typename std::vector<const Faust::ConstraintGeneric*>::iterator it = cons.begin() ; it != cons.end(); ++it)
         delete *it;
 
+    *out_lambda = lambda;
 
     return core;
 

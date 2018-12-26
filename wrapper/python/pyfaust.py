@@ -1364,16 +1364,18 @@ class FaustFactory:
     """
 
     @staticmethod
-    def fact_palm4msa(M, p):
+    def fact_palm4msa(M, p, ret_lambda=False):
         """
         Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
 
         Args:
             M: the numpy matrix to factorize.
             p: the ParamsPalm4MSA instance to define the algorithm parameters.
+            ret_lambda: set to True to ask the function to return the scale factor (False by default).
 
         Returns:
             The Faust object result of the factorization.
+            if ret_lambda == True then the function returns a tuple (Faust, lambda).
 
         Examples:
         >>> from pyfaust import FaustFactory
@@ -1397,7 +1399,12 @@ class FaustFactory:
                              "the last residuum constraint defined in p. "
                              "Likewise its number of rows must be consistent "
                              "with the first factor constraint defined in p.")
-        return Faust(core_obj=FaustCorePy.FaustFact.fact_palm4msa(M, p))
+        core_obj, _lambda = FaustCorePy.FaustFact.fact_palm4msa(M, p)
+        F = Faust(core_obj=core_obj)
+        if(ret_lambda):
+            return F, _lambda
+        else:
+            return F
 
     @staticmethod
     def fact_hierarchical(M, p, ret_lambda=False, ret_params=False):

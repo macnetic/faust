@@ -840,6 +840,9 @@ cdef class FaustFact:
         cdef double[:,:] tmp_mat
         cdef complex[:,:] tmp_mat_cplx
 
+        cdef double[:] lambdaview
+        cdef complex[:] lambdaview_cplx
+
         cdef FaustCoreCy.PyxParamsFactPalm4MSA[double,double] cpp_params
         cdef FaustCoreCy.PyxParamsFactPalm4MSA[complex,double] cpp_params_cplx
         cdef PyxStoppingCriterion[double] cpp_stop_crit
@@ -867,6 +870,7 @@ cdef class FaustFact:
                 if(not isReal):
                     p.init_facts[i] = p.init_facts[i].astype(np.complex)
 
+        _lambda = np.array([0], dtype=M.dtype)
 
         if(isReal):
             Mview=M
@@ -881,6 +885,7 @@ cdef class FaustFact:
             PyMem_Malloc(sizeof(unsigned long)*2*p.num_facts)
             cpp_params.is_verbose = p.is_verbose
             cpp_params.constant_step_size = p.constant_step_size
+            lambdaview = _lambda
         else:
             Mview_cplx=M
             cpp_params_cplx.num_facts = p.num_facts
@@ -895,7 +900,7 @@ cdef class FaustFact:
             PyMem_Malloc(sizeof(unsigned long)*2*p.num_facts)
             cpp_params_cplx.is_verbose = p.is_verbose
             cpp_params_cplx.constant_step_size = p.constant_step_size
-
+            lambdaview_cplx = _lambda
 
         cpp_constraints = \
         <PyxConstraintGeneric**> \
@@ -959,12 +964,12 @@ cdef class FaustFact:
         if(isReal):
             core.core_faust_dbl = FaustCoreCy.fact_palm4MSA[double,double](&Mview[0,0], M_num_rows, M_num_cols,
  #           FaustCoreCy.fact_palm4MSA(&Mview[0,0], M_num_rows, M_num_cols,
-                                      &cpp_params)
+                                      &cpp_params, &lambdaview[0])
             core._isReal = True
             #TODO: FPP == complex not yet supported by C++ code
         else:
             core.core_faust_cplx = FaustCoreCy.fact_palm4MSA[complex,double](&Mview_cplx[0,0], M_num_rows, M_num_cols,
-                                     &cpp_params_cplx)
+                                     &cpp_params_cplx, &lambdaview_cplx[0])
             core._isReal = False
         for i in range(0,len(p.constraints)):
             PyMem_Free(cpp_constraints[i])
@@ -976,7 +981,7 @@ cdef class FaustFact:
             PyMem_Free(cpp_params_cplx.init_facts)
             PyMem_Free(cpp_params_cplx.init_fact_sizes)
 #
-        return core
+        return core, np.real(_lambda[0])
 
     @staticmethod
     def fact_hierarchical(M, p):
