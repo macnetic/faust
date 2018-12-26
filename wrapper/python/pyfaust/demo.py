@@ -30,6 +30,38 @@ def get_data_dirpath():
         path = '@FAUST_MATFAUST_DEMO_DATA_BIN_DIR@'
     return path
 
+def runall():
+    """
+    Runs all the demos in a row.
+    """
+    def print_header(title):
+        print("******************** Running", title, "demo")
+    for func,title in zip([ quickstart.run, runtimecmp.runtime_comparison, bsl.run,
+                 fft.speed_up_fourier, hadamard.run_fact, hadamard.run_norm_hadamard,
+                 hadamard.run_speedup_hadamard], ["quickstart", "runtime"+
+                                                  " comparison", "BSL", "FFT",
+                                                  "Hadamard factorization",
+                                                  "Hadamard norm", "Hadamard"+
+                                                  " speedup"]):
+        print_header(title)
+        func()
+
+def allfigs():
+    """
+    Renders all the demo figures into files.
+
+    NOTE: must be call after runall() or after each demo run* function executed
+    separately.
+    """
+    def print_header(title):
+        print("******************** Rendering figure: ", title, "demo")
+    for func,title in zip([ runtimecmp.fig_runtime_comparison, bsl.fig,
+                 fft.fig_speed_up_fourier, hadamard.figs], ["quickstart", "runtime"+
+                                                  " comparison", "BSL", "FFT",
+                                                  "Hadamard factorization,"+
+                                                           "norm and speedup"]):
+        print_header(title)
+        func()
 
 class quickstart:
     """
@@ -142,7 +174,7 @@ class fft:
     """
 
     _nb_mults = 500
-    _log2_dims = arange(6,13)
+    _log2_dims = arange(6,12)
     _dims = 2**_log2_dims
 
     _FFT_FAUST_FULL=0
@@ -205,7 +237,7 @@ class fft:
             os.mkdir(output_dir)
         savefig(output_dir+os.sep+'Fourier-RuntimeComp-Speedup.png',
                 dpi=200)
-        show()
+        #show()
 
 
 
@@ -607,7 +639,7 @@ class hadamard:
 
         _write_fig_in_file(output_dir, hadamard._fig1_fname, fig1)
         _write_fig_in_file(output_dir, hadamard._fig2_fname, fig2)
-        show()
+        #show()
 
     @staticmethod
     def _create_hadamard_fausts_mats(dims, log2_dims):
@@ -746,7 +778,7 @@ class hadamard:
             axes([_log2_dims[0], _log2_dims[-1], ymin, ymax])
 
         _write_fig_in_file(output_dir, hadamard._fig_speedup, figure(1))
-        show()
+        #show()
 
     @staticmethod
     def run_norm_hadamard(output_dir=DEFT_DATA_DIR):
@@ -889,7 +921,14 @@ class hadamard:
 
 
 
-        show()
+        #show()
+
+    @staticmethod
+    def figs(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+        h = hadamard
+        h.fig_norm_hadamard(input_dir, output_dir)
+        h.fig_fact(input_dir, output_dir)
+        h.fig_speedup_hadamard()
 
 class bsl:
     """
