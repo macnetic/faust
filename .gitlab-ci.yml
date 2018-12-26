@@ -17,7 +17,7 @@ ctest:
 
 ctest_python:
     <<: *ctest_script
-    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", GIT_STRATEGY: none}
+    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON"} #, GIT_STRATEGY: none}
     except:
         - schedules
         - tags

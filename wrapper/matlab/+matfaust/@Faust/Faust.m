@@ -1445,6 +1445,11 @@ classdef Faust
 			end
 			if(dim == 1)
 				F = F.';
+				if(mex_ord == -1)
+					mex_ord = 1;
+				elseif(mex_ord == 1)
+					mex_ord = -1;
+				end
 			end
 			if(F.isReal)
 				NF = matfaust.Faust(F, mexFaustReal('normalize', F.matrix.objectHandle, mex_ord));

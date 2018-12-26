@@ -209,6 +209,7 @@ namespace Faust {
 			this->is_sliced = true;
 			this->transform = make_shared<Transform<FPP,Cpu>>(*eval_sliced_Transform());
 		}
+
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
 		{
@@ -941,6 +942,8 @@ namespace Faust {
 				}
 				if(norm != FPP(0))
 					norm_invs[i] = 1./norm;
+				else
+					norm_invs[i] = 1;
 				coords[i] = i;
 				delete col;
 			}

@@ -1103,6 +1103,10 @@ class Faust:
             ord = -2
         if(axis == 0):
             tF = F.T
+            if(ord == -1):
+                ord = 1
+            elif(ord == 1):
+                ord = -1
             NF = Faust(core_obj=tF.m_faust.normalize(ord))
             NF = NF.T
         else:

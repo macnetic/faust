@@ -23,7 +23,7 @@ class TestFaustPy(unittest.TestCase):
         d2 = r.randint(TestFaustPy.MIN_DIM_SIZE, TestFaustPy.MAX_DIM_SIZE)
         for i in range(0, num_factors):
             d1, d2 = d2, r.randint(1, TestFaustPy.MAX_DIM_SIZE)
-            factors += [sparse.random(d1, d2, density=0.1, format='csr',
+            factors += [sparse.random(d1, d2, density=0.5, format='csr',
                         dtype=np.float64)] #.toarray() removed
             #print("factor",i,":", factors[i])
         self.F = Faust(factors)
@@ -119,14 +119,14 @@ class TestFaustPy(unittest.TestCase):
             [1],
             [2,0],
             ['fro', 0],
-            #[np.inf, 0], # TODO: fix this failing config.
+            [np.inf, 0],
             [1, 1],
             [2,1],
             ['fro', 1],
             [np.inf, 1],
-            #{'axis':0,'ord':1},# TODO: fix this failing config.
+            {'axis':0,'ord':1},
             {'axis':0, 'ord':2},
-            # {'axis':0, 'ord':np.inf}, TODO: fix this failing config
+            {'axis':0, 'ord':np.inf},
             {'axis':1,'ord':1},
             {'axis':1, 'ord':2},
             {'axis':1, 'ord':np.inf}
@@ -150,16 +150,33 @@ class TestFaustPy(unittest.TestCase):
                         axis = args[1]
             ref_full_NF = F.todense()
             # print("axis=", axis, "ord=", ord)
-            for i in range(0,F.shape[axis]):
-                if(axis == 0 and norm(ref_full_NF[i,:], ord) != 0):
-                    ref_full_NF[i,:] = ref_full_NF[i,:]/norm(ref_full_NF[i,:], ord)
-                elif(axis == 1 and norm(ref_full_NF[:,i], ord) != 0):
-                    ref_full_NF[:,i] = ref_full_NF[:,i]/norm(ref_full_NF[:,i], ord)
-            self.assertAlmostEqual(norm(ref_full_NF),norm(test_NF.todense()),
-                            places=3,
-                               msg="\nref_full_F=\n"+str(F.todense())+"\nref_full_NF=\n"+str(ref_full_NF)+"\ntest_NF.todense()=\n"+ \
-                                   str(test_NF.todense())+"\nF=\n"+str(F.todense())+ \
-                                   str(F.save('/tmp/normalize_test.mat')))
+            i = self.r.randint(0, F.shape[axis]-1)
+            #for i in range(0,F.shape[axis]):
+            # test only one random column/row (speeder)
+            if(axis == 0 and norm(ref_full_NF[i:i+1,:], ord) != 0):
+                vec_ref_full_NF = ref_full_NF[i,:] = ref_full_NF[i,:]/norm(ref_full_NF[i:i+1,:], ord)
+            elif(axis == 1 and norm(ref_full_NF[:,i:i+1], ord) != 0):
+                vec_ref_full_NF = ref_full_NF[:,i] = \
+                        ref_full_NF[:,i]/norm(ref_full_NF[:,i:i+1], ord)
+            else:
+                continue
+            if(F.dtype == np.complex):
+                places=1 # accuracy is less good with complex
+            else:
+                places=3
+            if(axis==0):
+                n1 = norm(ref_full_NF[i,:])
+                n2 = test_NF[i,:].norm()
+                vec_test_NF = test_NF[i,:]
+            else: #axis == 1
+                n1 = norm(ref_full_NF[:,i])
+                n2 = test_NF[:,i].norm()
+                vec_test_NF = test_NF[:,i]
+            self.assertAlmostEqual(n1,n2,
+                places=places,
+                       msg="\nref_full_F=\n"+str(F.todense())+"\nvec_ref_full_NF=\n"+str(vec_ref_full_NF)+"\nvec_test_NF=\n"+ \
+                       str(vec_test_NF.toarray())+"\nF=\n"+ \
+                       str(str(F.save('/tmp/normalize_test.mat'))+", i="+str(i)))
 
 
     def testNormInf(self):
@@ -694,10 +711,11 @@ class TestFaustPyCplx(TestFaustPy):
                     # we can't use scipy.sparse.random directly because only float type is
                     # supported for random sparse matrix generation
                     factors += [sparse.random(d1, d2, dtype=np.float64, format='csr',
-                                       density=r.random()).astype(np.complex)]
+                                       density=min(r.random()+.5,1)).astype(np.complex)]
                     #print("setUp() i=",i, "d1=",d1, "d2=", d2, "factor.shape[0]=",
                     #      factors[i].shape[0])
-                    factors[i] *= np.complex(r.random(), r.random())
+                    factors[i] *= np.complex(r.random(), r.random())*5 # 5 is
+                    # arbitrary
             self.F = Faust(factors)
             self.factors = factors
             # we keep dense matrices as reference for the tests

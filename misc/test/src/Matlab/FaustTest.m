@@ -171,7 +171,16 @@ classdef FaustTest < matlab.unittest.TestCase
 				ref_full_NFs = {zeros(size(orig_ref_full_F)), zeros(size(orig_ref_full_F))};
 				for i=1:size(orig_ref_full_F,1)
 					ref_full_NF = ref_full_NFs{1};
-					ref_full_NF(i,:) = orig_ref_full_F(i,:)/norm(orig_ref_full_F(i,:), test_norm);
+					% ENOTE: matlab always takes a vector as a column when computing norm (norm(v,1) == norm(v.', 1))
+					% so we need to swap 1-norm and inf-norm when test one or other
+					if(test_norm == 1)
+						rtest_norm = inf;
+					elseif(test_norm == inf)
+						rtest_norm = 1;
+					else
+						rtest_norm = test_norm;
+					end
+					ref_full_NF(i,:) = orig_ref_full_F(i,:)/norm(orig_ref_full_F(i,:), rtest_norm);
 					% ENOTE: the cell array indexing returns a copy otherwise we wouldn't need to copy back into it after modif.
 					ref_full_NFs{1} = ref_full_NF;
 				end
@@ -190,7 +199,7 @@ classdef FaustTest < matlab.unittest.TestCase
 					end
 					disp(['testing signature ' int2str(i) dim_norm_strs{ndim}])
 					%args
-					this.verifyEqual(test_full_NF, ref_full_NFs{ndim}, 'AbsTol', .05);
+					this.verifyEqual(norm(test_full_NF), norm(ref_full_NFs{ndim}), 'AbsTol', .05);
 				end
 			end
 		end
