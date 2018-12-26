@@ -163,7 +163,7 @@ class ConstraintInt(ConstraintGeneric):
         """
             <b/> See: ConstraintGeneric.project
         """
-        # TODO: call parent project()
+        super(ConstraintGeneric, self).project(M)
         return FaustCorePy.ConstraintIntCore.project(M, self._name.name, self._num_rows,
                                               self._num_cols, self._cons_value)
 
@@ -225,7 +225,7 @@ class ConstraintMat(ConstraintGeneric):
         """
             <b/> See: ConstraintGeneric.project
         """
-        # TODO: call parent project()
+        super(ConstraintGeneric, self).project(M)
         return FaustCorePy.ConstraintMatCore.project(M, self._name.name, self._num_rows,
                                               self._num_cols, self._cons_value)
 
@@ -277,8 +277,9 @@ class ConstraintReal(ConstraintGeneric):
 
     def project(self, M):
         """
-        <b/> See: ConstraintGeneric.project 
+        <b/> See: ConstraintGeneric.project
         """
+        super(ConstraintGeneric, self).project(M)
         return FaustCorePy.ConstraintRealCore.project(M, self._name.name, self._num_rows,
                                               self._num_cols, self._cons_value)
 
