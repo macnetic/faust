@@ -4,7 +4,7 @@
 /*  of the project : <http://faust.inria.fr>                         */
 /*                                                                          */
 /*                              License:                                    */
-/*  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*  Copyright (2018):    Hakim Hadj-Djilani, Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
 /*                      Luc Le Magoarou, Remi Gribonval                     */
 /*                      INRIA Rennes, FRANCE                                */
 /*                      http://www.inria.fr/                                */
@@ -25,6 +25,7 @@
 /*  If not, see <http://www.gnu.org/licenses/>.                             */
 /*                                                                          */
 /*                             Contacts:                                    */
+/*      Hakim H. hakim.hadj-djilani@inria.fr                                */
 /*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
 /*      Adrien Leman    : adrien.leman@inria.fr                             */
 /*      Thomas Gautrais : thomas.gautrais@inria.fr                          */

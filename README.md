@@ -50,8 +50,8 @@ For more information, please refer to the [Mathworks website](http://fr.mathwork
 License
 ========
 
-Copyright (2016):          Luc Le Magoarou, Remi Gribonval,
-                      Nicolas Bellot, Adrien Leman, Thomas Gautrais
+Copyright (2018):          Luc Le Magoarou, Remi Gribonval,
+                      Nicolas Bellot, Adrien Leman, Thomas Gautrais, Hakim Hadj-Djilani
                                 INRIA Rennes, FRANCE
                                 http://www.inria.fr/
 
