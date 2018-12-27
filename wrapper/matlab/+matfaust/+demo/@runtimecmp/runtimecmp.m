@@ -1,18 +1,6 @@
-%% Description runtime_comparison.m
-%  Runtime comparison
-%
-%  This script performs runtime comparison between faust multiplication
-%  and dense matrix multiplication for various configuration of faust
-%  (dimension of the faust, number of factors, Relative Complexity Gain
-%  (RCG), fix type of sparsity (sp, spcol,splin))
-%
-%
-%
-% For more information on the FAuST Project, please visit the website of
-% the project :  <http://faust.inria.fr>
-%
+
 %% License:
-% Copyright (2016):	Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval
+% Copyright (2018):	Hakim Hadj-dji., Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval
 %			INRIA Rennes, FRANCE
 %			http://www.inria.fr/
 %
@@ -31,56 +19,7 @@
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 %% Contacts:
-%   Nicolas Bellot : nicolas.bellot@inria.fr
-%   Leman Adrien   : adrien.leman@inria.fr
-%	Luc Le Magoarou: luc.le-magoarou@inria.fr
-%	Remi Gribonval : remi.gribonval@inria.fr
-%
-%% References:
-% [1]	Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
-%	approximations of matrices and applications", Journal of Selected
-%	Topics in Signal Processing, 2016.
-%	<https://hal.archives-ouvertes.fr/hal-01167948v1>
-%
-% [2]   A. Gramfort, M. Luessi, E. Larson, D. Engemann, D. Strohmeier,
-%	C. Brodbeck, L. Parkkonen, M. Hamalainen, MNE software for processing
-%	MEG and EEG data <http://www.ncbi.nlm.nih.gov/pubmed/24161808>,
-%	NeuroImage, Volume 86, 1 February 2014, Pages 446-460, ISSN 1053-8119,
-%	[DOI] <http://dx.doi.org/10.1016/j.neuroimage.2013.10.027>
-%%------------------------------------------------------------------------------------
-%% Description Fig_runtime_comparison.m
-%  Runtime comparison
-%
-%  This script displays the result of the runtime comparison between
-%  faust multiplication and dense matrix multiplication for various
-%  configuration of faust (dimension of the faust, number of factors,
-%  Relative Complexity Gain  (RCG), fix type of sparsity (sp, spcol,splin))
-%
-%
-%
-% For more information on the FAuST Project, please visit the website of
-% the project :  <http://faust.inria.fr>
-%
-%% License:
-% Copyright (2016):	Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval
-%			INRIA Rennes, FRANCE
-%			http://www.inria.fr/
-%
-% The FAuST Toolbox is distributed under the terms of the GNU Affero
-% General Public License.
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Affero General Public License as published
-% by the Free Software Foundation.
-%
-% This program is distributed in the hope that it will be useful, but
-% WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-% See the GNU Affero General Public License for more details.
-%
-% You should have received a copy of the GNU Affero General Public License
-% along with this program.  If not, see <http://www.gnu.org/licenses/>.
-%
-%% Contacts:
+%	Hakim Hadj-dji. : hakim.hadj-djilani@inria.fr
 %   Nicolas Bellot : nicolas.bellot@inria.fr
 %   Leman Adrien   : adrien.leman@inria.fr
 %	Luc Le Magoarou: luc.le-magoarou@inria.fr
@@ -98,20 +37,6 @@
 %	NeuroImage, Volume 86, 1 February 2014, Pages 446-460, ISSN 1053-8119,
 %	[DOI] <http://dx.doi.org/10.1016/j.neuroimage.2013.10.027>
 
-
-%% this function displays the resulting C++ computed times between the 2 different
-% multiplication (faust vs dense matrix) for different RCG, dimension and
-% matrix
-%% WARNING this script must be run after @FAUST_SRC_TEST_DIR@/gen_artificial_faust.m
-% which store some Faust::Transform example with different dimensions RCG and
-% number of factors in
-% after run the executable
-% @FAUST_BIN_TEST_BIN_DIR@/multiply_compare_time that will do some time
-% comparison between dense mat-vector product and faust-vector product
-%
-% example of inputfile and outputdir
-%inputfile='@FAUST_BIN_TEST_OUTPUT_DIR@/multiply_compare_time.mat';
-%outputdir='@FAUST_BIN_TEST_FIG_DIR@';
 
 % =====================================================================
 %> Runtime comparison demo: Faust-vector and dense matrix-vector multiplications, differents RCGs, transpose.

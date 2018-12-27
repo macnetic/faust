@@ -18,7 +18,8 @@
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 %% Contacts:
-%   Nicolas Bellot	: nicolas.bellot@inria.fr
+%	Hakim Hadj-dji. : hakim.hadj-djilani@inria.fr
+%	Nicolas Bellot	: nicolas.bellot@inria.fr
 %   Adrien Leman	: adrien.leman@inria.fr
 %   Thomas Gautrais	: thomas.gautrais@inria.fr
 %	Luc Le Magoarou	: luc.le-magoarou@inria.fr

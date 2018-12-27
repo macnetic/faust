@@ -1757,3 +1757,7 @@ def faust_fact(*args, **kwargs):
     """
     return FaustFactory.fact_hierarchical(*args, **kwargs)
 
+def license():
+    """ Prints the FAµST license.
+    """
+    print("""@PYFAUST_LICENSE_HEADER@""")
