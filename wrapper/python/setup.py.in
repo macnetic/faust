@@ -44,6 +44,13 @@ from Cython.Build import cythonize
 import numpy
 import sys
 
+version = '@CPACK_PACKAGE_VERSION@'
+
+if(version == ''):
+    version = '0.0.0' # typically when compiling just for testing
+                    # (not for packaging with a proper version)
+                    # it avoids error PEP440
+
 if sys.platform == 'win32':
     # binary libs are compiled manually from cython and then integrated in
     # wheel/egg pkgs here
@@ -64,7 +71,7 @@ if sys.platform == 'win32':
     copyfile(lib, 'pyfaust'+sep+lib)
     setup(
         name = 'pyfaust',
-        version = '@CPACK_PACKAGE_VERSION@',
+        version = version, # cf. header
         #ext_modules = cythonize(PyFaust),
         distclass = BinaryDistribution, # forces setup-tools to set the arch in
         # pkg name
@@ -73,7 +80,7 @@ if sys.platform == 'win32':
         description = 'TODO',
         long_description = 'TODO',
         classifiers = [ 'TODO' ],
-        install_requires = [ 'scipy', 'numpy', 'matplotlib' ], #ENOTE: order matters (last pkg installed first)
+        install_requires = [ 'scipy', 'numpy', 'matplotlib' ],
         license = "GNU AFFERO GPL",
         package_data = {
             'pyfaust': [ 'data/*.mat', lib, 'license*.txt' ]
@@ -92,7 +99,7 @@ else: # linux and mac
 
     setup(
         name = 'pyfaust',
-        version = '@CPACK_PACKAGE_VERSION@',
+        version = version, # cf. header
         ext_modules = cythonize(PyFaust),
         packages = [ 'pyfaust' ],
         url = 'http://faust.inria.fr',
