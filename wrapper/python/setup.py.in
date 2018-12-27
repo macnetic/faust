@@ -56,7 +56,8 @@ else: # linux and mac
                         include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],
                         library_dirs=[@FAUST_PYTHON_LIB_DIR@],
                         libraries=['faust'@FAUST_PYTHON_LIBS@],
-                        extra_compile_args = [ "-std=c++11"],
+                        extra_compile_args = [ "-std=c++11", "-O2"],
+                        extra_link_args = [ "-s" ],
                         extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
                        )
 

@@ -151,7 +151,7 @@ elseif(WIN32 AND ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles")
 					COMMAND type
 					ARGS "FaustCorePy.cpp2" ">" "FaustCorePy.cpp" 2>NUL
 					COMMAND ${CMAKE_CXX_COMPILER}
-					ARGS "-std=c++11" "-shared" "-DMS_WIN64" "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
+					ARGS "-std=c++11" "-shared" "-DMS_WIN64" "-s" "-O2" "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
 					COMMENT   "Creating pyfaust${PY_VER}")
 			endif()
 		endforeach()
