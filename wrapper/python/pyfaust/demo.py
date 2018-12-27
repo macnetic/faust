@@ -1,16 +1,26 @@
 # -*- coding: utf-8 -*-
+# @PYFAUST_LICENSE_HEADER@
 
 from __future__ import print_function
 from pylab import *
 import os,sys
 
 ## @package pyfaust.demo @brief The pyfaust module for the demos partly based on research papers
+##
+## The run*() functions produce the results (by default in demo.DEFT_RESULTS_DIR)
+## and the fig*() functions produce the figures based on the results (by
+## default in demo.DEFT_FIG_DIR).
+## @warning this demo module is a recent port from matlab version and should be considered in beta status.
 
-
-DEFT_DATA_DIR = 'pyfaust_demo_output'
+## \brief The default output directory for the demo results.
+DEFT_RESULTS_DIR = 'pyfaust_demo_output'
+## \brief The default figure output directory for the demos.
 DEFT_FIG_DIR = 'pyfaust_demo_figures'
 
 def get_data_dirpath():
+    """
+        Returns the data directory path which varies according to the way pyfaust was installed.
+    """
     from pkg_resources import resource_filename
     import os.path
     from os import sep
@@ -36,7 +46,7 @@ def runall():
     """
     def print_header(title):
         print("******************** Running", title, "demo")
-    for func,title in zip([ quickstart.run, runtimecmp.runtime_comparison, bsl.run,
+    for func,title in zip([ quickstart.run, runtimecmp.run, bsl.run,
                  fft.speed_up_fourier, hadamard.run_fact, hadamard.run_norm_hadamard,
                  hadamard.run_speedup_hadamard], ["quickstart", "runtime"+
                                                   " comparison", "BSL", "FFT",
@@ -50,12 +60,12 @@ def allfigs():
     """
     Renders all the demo figures into files.
 
-    NOTE: must be call after runall() or after each demo run* function executed
+    NOTE: The function must be call after runall() or after each demo run* function executed
     separately.
     """
     def print_header(title):
         print("******************** Rendering figure: ", title, "demo")
-    for func,title in zip([ runtimecmp.fig_runtime_comparison, bsl.fig,
+    for func,title in zip([ runtimecmp.fig, bsl.fig,
                  fft.fig_speed_up_fourier, hadamard.figs], ["quickstart", "runtime"+
                                                   " comparison", "BSL", "FFT",
                                                   "Hadamard factorization,"+
@@ -69,7 +79,9 @@ class quickstart:
     """
     @staticmethod
     def run():
-        #import the pyfaust package
+        """
+            Launches the quickstart demo.
+        """
         import pyfaust;
 
         # import module to generate data
@@ -185,15 +197,13 @@ class fft:
 
 
     @staticmethod
-    def fig_speed_up_fourier():
+    def fig_speed_up_fourier(input_dir=DEFT_RESULTS_DIR,
+                             output_dir=DEFT_FIG_DIR):
         """
-        TODO
+            Builds the speedup figure.
         """
         import os.path
 
-        output_dir = 'pyfaust_demo_figures'
-
-        input_dir = 'pyfaust_demo_output'
         input_path = input_dir+os.sep+'speed_up_fourier.txt'
         mult_times = loadtxt(input_path).reshape(fft._nb_mults, len(fft._dims), fft._NUM_FFT_TYPES)
         # fft._NUM_FFT_TYPES == 3 is for fft._FFT_FAUST, fft._FFT_FAUST_FULL, fft._FFT_NATIVE
@@ -242,7 +252,10 @@ class fft:
 
 
     @staticmethod
-    def speed_up_fourier():
+    def speed_up_fourier(output_dir=DEFT_RESULTS_DIR):
+        """
+            Runs the multiplication benchmark.
+        """
         from pyfaust import Faust, FaustFactory
         treshold = 10**-10
 
@@ -279,15 +292,15 @@ class fft:
                ydense_trans = empty(dim)
                yfaust_trans = empty(dim)
                x = rand(dim,1)
-               t = timer()
+               t = _timer()
                ydense = fft_mat.dot(x)
-               mult_times[i,k,fft._FFT_FAUST_FULL] = timer()-t
-               t = timer()
+               mult_times[i,k,fft._FFT_FAUST_FULL] = _timer()-t
+               t = _timer()
                yfaust = fft_faust*x
-               mult_times[i,k,fft._FFT_FAUST] = timer()-t
-               t = timer()
+               mult_times[i,k,fft._FFT_FAUST] = _timer()-t
+               t = _timer()
                yfft = fft2(x)
-               mult_times[i,k,fft._FFT_NATIVE] = timer()-t
+               mult_times[i,k,fft._FFT_NATIVE] = _timer()-t
                if(norm(ydense-yfaust)>treshold):
                    raise Exception('Multiplication error: larger error than '
                                    'treshold for ydense.')
@@ -303,7 +316,6 @@ class fft:
         print()
 
 
-        output_dir = 'pyfaust_demo_output'
         import os.path
         if(not os.path.exists(output_dir)):
            os.mkdir(output_dir)
@@ -330,9 +342,9 @@ class runtimecmp:
     _nb_facts_len = len(_nb_facts)
 
     @staticmethod
-    def runtime_comparison():
+    def run(output_dir=DEFT_RESULTS_DIR):
         """
-        TODO
+        Runs the runtime comparision benchmark.
         """
         from pyfaust import Faust, FaustFactory
 
@@ -388,23 +400,22 @@ class runtimecmp:
 
                         if(k == 0 and l == 0):
                             A = dense_mats[j]
-                            t = timer()
+                            t = _timer()
                             y = A.dot(x)
-                            tdense[i,j,0] = timer()-t
-                            t = timer()
+                            tdense[i,j,0] = _timer()-t
+                            t = _timer()
                             y_trans = A.T.dot(x)
-                            tdense[i,j,1] = timer()-t
+                            tdense[i,j,1] = _timer()-t
 
                         F = fausts[j,k,l]
-                        t = timer()
+                        t = _timer()
                         yfaust = F*x
-                        tfaust[i,j,k,l,0] = timer()-t
-                        t = timer()
+                        tfaust[i,j,k,l,0] = _timer()-t
+                        t = _timer()
                         yfaust_trans = F.T*x
-                        tfaust[i,j,k,l,1] = timer()-t
+                        tfaust[i,j,k,l,1] = _timer()-t
 
         print()
-        output_dir = 'pyfaust_demo_output'
         import os.path
         if(not os.path.exists(output_dir)):
            os.mkdir(output_dir)
@@ -420,13 +431,13 @@ class runtimecmp:
         #assert(all(tdense_r == tdense))
 
     @staticmethod
-    def fig_runtime_comparison():
+    def fig(input_dir=DEFT_RESULTS_DIR,
+                               output_dir=DEFT_FIG_DIR):
         """
-        TODO
+        Renders in file the demo figure in file from the results of runtimecmp.run.
+
         """
         import os.path, os
-        output_dir = 'pyfaust_demo_figures'
-        input_dir = 'pyfaust_demo_output'
         input_file_existing = False
 
         for matrix_or_vector in  ('vector', 'matrix'):
@@ -438,7 +449,7 @@ class runtimecmp:
 
         if(not input_file_existing):
             raise Exception("Input files don't exist, please run"
-                            " runtime_comparison.py first.")
+                            " runtimecmp.run() first.")
 
         if(not os.path.exists(output_dir)):
             os.mkdir(output_dir)
@@ -537,7 +548,17 @@ class hadamard:
     _NUM_NORM_TIME_TYPES = 2
 
     @staticmethod
-    def run_fact(output_dir=DEFT_DATA_DIR):
+    def run_fact(output_dir=DEFT_RESULTS_DIR):
+        """
+        This demo hierarchically factorizes the Hadamard dictionary and then plots the results.
+
+        This essentially reproduces figure 2 from [1].
+
+        [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
+        approximations of matrices and applications", Journal of Selected
+        Topics in Signal Processing, 2016.
+
+        """
         from pyfaust import FaustFactory
         from pyfaust.factparams import ParamsHierarchicalFact, ConstraintInt, \
         ConstraintName, StoppingCriterion
@@ -569,13 +590,13 @@ class hadamard:
             print("\r\r #muls =",i+1,'/', _nb_mults, end='')
             x = rand(d,1)
 
-            t = timer()
+            t = _timer()
             y_X = full_H.dot(x)
-            dense_times[i] = timer()-t
+            dense_times[i] = _timer()-t
 
-            t = timer()
+            t = _timer()
             y_faust = had_faust*x
-            faust_times[i] = timer()-t
+            faust_times[i] = _timer()-t
 
 
 
@@ -599,7 +620,10 @@ class hadamard:
 
 
     @staticmethod
-    def fig_fact(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+    def fig_fact(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
+        """
+        Renders in file the figure for the results produced by hadamard.run_fact.
+        """
         from pyfaust import Faust
         fig_dir = DEFT_FIG_DIR
         if(not os.path.exists(fig_dir)):
@@ -655,69 +679,74 @@ class hadamard:
         return had_mats, had_fausts
 
     @staticmethod
-    def run_speedup_hadamard(output_dir=DEFT_DATA_DIR):
-       treshold = 10.**-10
-       print("Speedup Hadamard")
-       print("================")
-       print("Generating data...")
+    def run_speedup_hadamard(output_dir=DEFT_RESULTS_DIR):
+        """
+		This demo makes some time comparison between (Hadamard matrix)-vector multiplication and (Hadamard factorisation i.e a FAµST)-vector multiplication for Hadamard matrices of different sizes.
+        """
+        treshold = 10.**-10
+        print("Speedup Hadamard")
+        print("================")
+        print("Generating data...")
+        _dims, _log2_dims = hadamard._dims, hadamard._log2_dims
 
-       _dims, _log2_dims = hadamard._dims, hadamard._log2_dims
+        had_mats, had_fausts = hadamard._create_hadamard_fausts_mats(_dims, _log2_dims)
 
-       had_mats, had_fausts = hadamard._create_hadamard_fausts_mats(_dims, _log2_dims)
+        print("Gathering multiplication computation times...")
 
-       print("Gathering multiplication computation times...")
+        _nb_mults = hadamard._nb_mults
+        _NUM_TIME_TYPES = hadamard._NUM_TIME_TYPES
+        _HAD_DENSE, _HAD_TRANS_DENSE, _HAD_FAUST, _HAD_TRANS_FAUST = \
+                hadamard._HAD_DENSE, hadamard._HAD_TRANS_DENSE, \
+                hadamard._HAD_FAUST, hadamard._HAD_TRANS_FAUST
+        mult_times = ndarray(shape=(_nb_mults, len(_dims), _NUM_TIME_TYPES))
 
-       _nb_mults = hadamard._nb_mults
-       _NUM_TIME_TYPES = hadamard._NUM_TIME_TYPES
-       _HAD_DENSE, _HAD_TRANS_DENSE, _HAD_FAUST, _HAD_TRANS_FAUST = \
-       hadamard._HAD_DENSE, hadamard._HAD_TRANS_DENSE, \
-       hadamard._HAD_FAUST, hadamard._HAD_TRANS_FAUST
-       mult_times = ndarray(shape=(_nb_mults, len(_dims), _NUM_TIME_TYPES))
+        for i in range(0,_nb_mults):
+            print('\r#muls:',i+1,'/', _nb_mults, end='')
+            for k in range(0,len(_dims)):
+                dim = _dims[k]
+                had_mat = had_mats[k]
+                had_faust = had_fausts[k]
 
-       for i in range(0,_nb_mults):
-           print('\r#muls:',i+1,'/', _nb_mults, end='')
-           for k in range(0,len(_dims)):
-               dim = _dims[k]
-               had_mat = had_mats[k]
-               had_faust = had_fausts[k]
+                x = rand(dim,1)
 
-               x = rand(dim,1)
+                t = _timer()
+                ydense = had_mat.dot(x)
+                mult_times[i,k,_HAD_DENSE] = _timer()-t
 
-               t = timer()
-               ydense = had_mat.dot(x)
-               mult_times[i,k,_HAD_DENSE] = timer()-t
+                t = _timer()
+                yfaust = had_faust*x
+                mult_times[i,k,_HAD_FAUST] = _timer()-t
 
-               t = timer()
-               yfaust = had_faust*x
-               mult_times[i,k,_HAD_FAUST] = timer()-t
-
-               if(norm(ydense-yfaust) > treshold):
+                if(norm(ydense-yfaust) > treshold):
                    raise Exception("speedup hadamard: mul. error greater than "
                                    "treshold")
 
-               t = timer()
-               ydense_trans = had_mat.T.dot(x)
-               mult_times[i,k,_HAD_TRANS_DENSE] = timer()-t
+                t = _timer()
+                ydense_trans = had_mat.T.dot(x)
+                mult_times[i,k,_HAD_TRANS_DENSE] = _timer()-t
 
-               t = timer()
-               yfaust_trans = had_faust.T*x
-               mult_times[i,k,_HAD_TRANS_FAUST] = timer()-t
+                t = _timer()
+                yfaust_trans = had_faust.T*x
+                mult_times[i,k,_HAD_TRANS_FAUST] = _timer()-t
 
-               if(norm(yfaust_trans-ydense_trans) > treshold):
+                if(norm(yfaust_trans-ydense_trans) > treshold):
                    raise Exception("speedup_hadamard: mul. error on transpose "
                                    "faust/mat.")
 
 
-       print()
+        print()
 
-       path_mult_times = _write_array_in_file(output_dir,
+        path_mult_times = _write_array_in_file(output_dir,
                                               hadamard._speedup_times_fname,
                                               mult_times.reshape(mult_times.size))
-       mult_times_r = loadtxt(path_mult_times)
-       assert(all(mult_times_r.reshape(mult_times.shape) == mult_times))
+        mult_times_r = loadtxt(path_mult_times)
+        assert(all(mult_times_r.reshape(mult_times.shape) == mult_times))
 
     @staticmethod
-    def fig_speedup_hadamard(output_dir=DEFT_FIG_DIR, input_dir=DEFT_DATA_DIR):
+    def fig_speedup_hadamard(output_dir=DEFT_FIG_DIR, input_dir=DEFT_RESULTS_DIR):
+        """
+        Renders in file the figure for the results produced by hadamard.run_speedup_hadamard.
+        """
         times_txt_fpath = _prefix_fname_with_dir(input_dir, hadamard._speedup_times_fname)
         if(not os.path.exists(times_txt_fpath)):
             raise Exception("Input file doesn't exist, please call "
@@ -781,7 +810,11 @@ class hadamard:
         #show()
 
     @staticmethod
-    def run_norm_hadamard(output_dir=DEFT_DATA_DIR):
+    def run_norm_hadamard(output_dir=DEFT_RESULTS_DIR):
+        """
+        This demo makes some time comparison between the 2-norm of the Hadamard matrix and its Faust representation for differents sizes of the Hadamard matrix.
+
+        """
         treshold = 10.**-10
         print("2-Norm Hadamard")
         print("================")
@@ -807,13 +840,13 @@ class hadamard:
                 if(i == 0):
                     rcgs[k] = had_faust.rcg()
 
-                t = timer()
+                t = _timer()
                 norm_dense[k] = norm(had_mat, 2)
-                norm_times[i, k, _HAD_DENSE] = timer()-t
+                norm_times[i, k, _HAD_DENSE] = _timer()-t
 
-                t = timer()
+                t = _timer()
                 norm_faust[k] = had_faust.norm(2)
-                norm_times[i, k, _HAD_FAUST] = timer()-t
+                norm_times[i, k, _HAD_FAUST] = _timer()-t
 
         print()
         expected_norm = sqrt(2.**(_log2_dims))
@@ -843,7 +876,10 @@ class hadamard:
 
 
     @staticmethod
-    def fig_norm_hadamard(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+    def fig_norm_hadamard(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
+        """
+        Renders in file the figure for the results produced by hadamard.run_norm_hadamard.
+        """
         h = hadamard
         _nb_norms, _dims, _HAD_DENSE, _HAD_FAUST = h._nb_norms, h._norm_dims, \
                 h._HAD_DENSE, h._HAD_FAUST
@@ -924,7 +960,10 @@ class hadamard:
         #show()
 
     @staticmethod
-    def figs(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+    def figs(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
+        """
+        Calls all hadamard.fig_* functions in a row.
+        """
         h = hadamard
         h.fig_norm_hadamard(input_dir, output_dir)
         h.fig_fact(input_dir, output_dir)
@@ -942,10 +981,13 @@ class bsl:
     @staticmethod
     def sparse_coeffs(D, ntraining, sparsity):
         """
-        sparse_coeffs. Generation of sparse coefficients
+        Generates sparse coefficients.
+
         Gamma = sparse_coeffs(D, ntraining, sparsity) generates ntraining sparse
-        vectors stacked in a matrix Gamma. Each sparse vector is of size the
-        number of atoms in the dictionary D, its support is drawn uniformly at
+        vectors stacked in a matrix Gamma.
+
+        Each sparse vector is of size the number of atoms in the dictionary D,
+        its support is drawn uniformly at
         random and each non-zero entry is iid Gaussian.
 
           References:
@@ -964,7 +1006,35 @@ class bsl:
 
     @staticmethod
     def run(input_data_dir=get_data_dirpath(),
-            output_dir=DEFT_DATA_DIR):
+            output_dir=DEFT_RESULTS_DIR):
+        """
+        This function performs brain source localization.
+
+        It uses several gain matrices [2], including FAuSTs, and OMP solver.
+        It reproduces the source localization experiment of [1].
+
+        The results are stored in output_dir+"results_BSL_user.mat".
+
+        DURATION:
+            Computations should take around 3 minutes.
+
+            The MEG gain matrices used are the precomputed ones in
+            get_data_dirpath()+"/faust_MEG_rcg_X.mat"
+            (in the installation directory of the FAµST toolbox)
+
+            References:
+
+                [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer
+                sparse approximations of matrices and applications", Journal of
+                Selected Topics in Signal Processing, 2016.
+                https://hal.archives-ouvertes.fr/hal-01167948v1
+
+                [2] A. Gramfort, M. Luessi, E. Larson, D. Engemann, D.
+                Strohmeier, C. Brodbeck, L. Parkkonen, M. Hamalainen, MNE
+                software for processing MEG and EEG data
+                http://www.ncbi.nlm.nih.gov/pubmed/24161808, NeuroImage, Volume
+                86, 1 February 2014, Pages 446-460, ISSN 1053-8119
+        """
         from pyfaust import Faust
         from scipy.io import loadmat,savemat
         from pyfaust.tools import greed_omp_chol
@@ -1033,12 +1103,12 @@ class bsl:
                     MEG = MEGs[j]
 
                     #find active source
-                    t = timer()
+                    t = _timer()
                     #print(matrix(data[:,i:i+1]).shape,  MEG.shape, M)
                     solver_sol = greed_omp_chol(matrix(data[:,i:i+1]), MEG, M,
                                                 stopTol=sparsity,
                                                 verbose=False)
-                    compute_times[j,k,i] = timer() - t
+                    compute_times[j,k,i] = _timer() - t
                     # compute the disntance between estimated source and the
                     # real one
                     solver_idx = solver_sol.nonzero()
@@ -1068,12 +1138,20 @@ class bsl:
                                                            np.float(len(MEGs))})
 
     @staticmethod
-    def fig(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+    def fig(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
+        """
+            Calls all fig*() functions of bsl demo.
+
+            Note: Must be call after the bsl.run function.
+        """
         bsl.fig_time_cmp(input_dir, output_dir)
         bsl.fig_speedup(input_dir, output_dir)
         bsl.fig_convergence(input_dir, output_dir)
 
-    def fig_time_cmp(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+    def fig_time_cmp(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
+        """
+            Builds the time comparison figure for the BSL with the differents Faust representations of the MEG matrix.
+        """
         from scipy.io import loadmat
         mat_file_entries = loadmat(input_dir+os.sep+'results_BSL_user.mat')
         compute_times = mat_file_entries['compute_Times']
@@ -1108,7 +1186,10 @@ class bsl:
         #show()
 
 
-    def fig_speedup(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+    def fig_speedup(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
+        """
+            Builds the speedup comparison figure for the BSL with the differents Faust representations of the MEG matrix.
+        """
 #        Ntraining          1x1                       8  double
 #        RCG_list           1x4                      32  double
 #        Sparsity           1x1                       8  double
@@ -1157,7 +1238,17 @@ class bsl:
                   real_RCGs[i])
 
 
-    def fig_convergence(input_dir=DEFT_DATA_DIR, output_dir=DEFT_FIG_DIR):
+    def fig_convergence(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
+        """
+        This function builds a figure similar to the BSL figure (Fig 9) used in [1].
+
+        References:
+
+            [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse
+            approximations of matrices and applications", Journal of Selected
+            Topics in Signal Processing, 2016.
+            https://hal.archives-ouvertes.fr/hal-01167948v1 
+        """
 #        Ntraining          1x1                       8  double
 #        RCG_list           1x4                      32  double
 #        Sparsity           1x1                       8  double
@@ -1247,7 +1338,6 @@ def _create_dir_if_doesnt_exist(output_dir):
 # time comparison function to use
 from time import time, clock
 if sys.platform == 'win32':
-    timer = clock
+    _timer = clock
 else:
-    timer = time
-
+    _timer = time
