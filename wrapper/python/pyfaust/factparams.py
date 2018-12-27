@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# @PYFAUST_LICENSE_HEADER@
 from pyfaust import *
 import FaustCorePy
 import sys

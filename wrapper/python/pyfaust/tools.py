@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @PYFAUST_LICENSE_HEADER@
+
 import numpy as np
 from scipy.sparse.linalg import spsolve_triangular
 from numpy.linalg import solve, lstsq, norm

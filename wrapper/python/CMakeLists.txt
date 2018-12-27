@@ -40,6 +40,10 @@ if(BUILD_OPENBLAS)
 	set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS},'openblas'")
 endif(BUILD_OPENBLAS)
 
+# read the license header to insert in top of each pyfaust python file
+file(READ ${FAUST_PYTHON_SRC_DIR}/PYFAUST_LICENSE_HEADER.txt PYFAUST_LICENSE_HEADER)
+
+
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)
 configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/FaustCorePy.pyx COPYONLY)
@@ -57,9 +61,8 @@ endforeach()
 configure_file(${PROJECT_SOURCE_DIR}/license.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust/license.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/license.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust/license_matio.txt COPYONLY)
 
-
 message(STATUS "Installing pyfaust.py as pyfaust/__init__.py")
-configure_file(${FAUST_PYTHON_SRC_DIR}/pyfaust.py ${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py)
+configure_file(${FAUST_PYTHON_SRC_DIR}/pyfaust.py ${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py @ONLY)
 FILE(GLOB_RECURSE PYFAUST_FILES RELATIVE ${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_SRC_DIR}/pyfaust/*py)
 foreach(PYFAUST_FILE ${PYFAUST_FILES})
 	message(STATUS "Installing ${PYFAUST_FILE}")
