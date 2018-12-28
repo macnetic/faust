@@ -14,9 +14,11 @@
 
 FAµST is designed for the Python ecosystem which as usual relies on the numpy and scipy packages.
 
+If you want to run de FAµST demos (module pyfaust.demo), you'll also need the matplotlib package.
+
 Please ensure these packages are installed on your system. One way to install them is to use the pip program delivered with your python version.
 
-	pip install numpy scipy
+	pip install numpy scipy matplotlib
 	# it could be pip3 instead of pip
 
 Note that you probably have to install those packages for all versions of Python you want to use (each one have normally its associated pip executable).<br/>
