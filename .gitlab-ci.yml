@@ -228,7 +228,7 @@ pages:
 .package_purepy: &package_purepy
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH ..'
         - make
         - cd wrapper/python
         - python3 setup.py bdist_wheel
@@ -254,11 +254,13 @@ pages:
 
 package_macos_purepy_rev:
     extends: .package_purepy_rev
+    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a"}
     tags:
         - macos
 
 package_linux_purepy_rev:
     extends: .package_purepy_rev
+    variables: {MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a"}
     tags:
         - linux
 
@@ -275,11 +277,13 @@ package_linux_purepy_rev:
 
 package_macos_purepy_release:
     extends: .package_purepy_release
+    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a"}
     tags:
         - macos
 
 package_linux_purepy_release:
     extends: .package_purepy_release
+    variables: {MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a"}
     tags:
         - linux
 
