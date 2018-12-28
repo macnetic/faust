@@ -322,7 +322,7 @@ package_win_purepy_rev:
 package_win_purepy_release:
     extends: .package_win_purepy
     before_script:
-        - 'set VERSION=$CI_COMMIT_TAG'
+        - 'set VERSION=%CI_COMMIT_TAG%'
     artifacts:
         expire_in: '50 yrs'
     only:
