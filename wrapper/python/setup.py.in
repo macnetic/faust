@@ -43,7 +43,7 @@ if sys.platform == 'win32':
         description = 'TODO',
         long_description = 'TODO',
         classifiers = [ 'TODO' ],
-        install_requires = [ 'scipy', 'numpy', 'matplotlib' ],
+        install_requires = [ 'scipy', 'numpy', 'matplotlib>=2.0.0' ],
         license = "GNU AFFERO GPL",
         package_data = {
             'pyfaust': [ 'data/*.mat', lib, 'license*.txt' ]
@@ -70,7 +70,7 @@ else: # linux and mac
         description = 'TODO',
         long_description = 'TODO',
         classifiers = [ 'TODO' ],
-        install_requires = [ 'scipy', 'numpy', 'matplotlib' ], #ENOTE: order matters (last pkg installed first)
+        install_requires = [ 'scipy', 'numpy', 'matplotlib>=2.0.0' ], #ENOTE: order matters (last pkg installed first)
         license = "GNU AFFERO GPL",
         package_data = {
             'pyfaust': [ 'data/*.mat', 'license*.txt' ]

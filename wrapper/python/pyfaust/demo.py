@@ -216,7 +216,7 @@ class fft:
         plt.rcParams['figure.figsize'] = [12.0, 8]
         subplot(211)
 
-        hold(True)
+        #hold(True)
         line_marker_types = [ 'ro-', 'bo-', 'go-', 'r+-', 'b+-', 'g+-' ]
 
         title('Runtime Fourier A*x')
@@ -491,7 +491,7 @@ class runtimecmp:
                     lines.append(*ax[h,nf].semilogy(log2(runtimecmp._dims), mean_tfaust[:, k, nf, h],
                              '-+', lw=curve_thickness))
                     legend_curve.append('Faust RCG '+str(runtimecmp._rcgs[k]))
-                    hold(True)
+                    #hold(True)
 
                 lines.append(*ax[h,nf].semilogy(log2(runtimecmp._dims), squeeze(mean_tdense[:,h]), '-+', c=(0, .8, .8),
                          lw=curve_thickness))
@@ -628,7 +628,7 @@ class hadamard:
         fig_dir = DEFT_FIG_DIR
         if(not os.path.exists(fig_dir)):
             os.mkdir(fig_dir)
-        hold(True)
+        #hold(True)
 
         had_faust = Faust(filepath=_prefix_fname_with_dir(input_dir,
                                                           hadamard._had_faust_fname))
@@ -783,7 +783,7 @@ class hadamard:
             subplot("22"+t[0])
             title('Runtime Hadamard '+t[1])
             grid(True)
-            hold(True)
+            #hold(True)
             semilogy(_log2_dims, mean_mult_times[:,t[2]], lw=line_width)
             semilogy(_log2_dims, mean_mult_times[:, t[3]], lw=line_width)
             ylabel('Computed Time (sec)')
@@ -798,7 +798,7 @@ class hadamard:
             subplot("22"+t[0])
             title('Speedup Hadamard '+t[1])
             grid(True)
-            hold(True)
+            #hold(True)
             semilogy(_log2_dims, t[2], lw=line_width)
             semilogy(_log2_dims, t[2]/t[2], lw=line_width, c='black')
             ylabel('Speedup')
@@ -908,7 +908,7 @@ class hadamard:
 
         # runtime
         subplot(131)
-        hold(True)
+        #hold(True)
         grid(True)
         axis([ h._norm_log2_dims[0], h._norm_log2_dims[-1], mean_times.min(),
               mean_times.max() ])
@@ -921,7 +921,7 @@ class hadamard:
 
         # speedup
         subplot(132)
-        hold(True)
+        #hold(True)
         grid(True)
         axis([h._norm_log2_dims[0], h._norm_log2_dims[-1],
               min(faust_speedup.min(), rcgs.min(), 1),
@@ -936,7 +936,7 @@ class hadamard:
 
         # errors
         subplot(133)
-        hold(True)
+        #hold(True)
         grid(True)
         #indices = find(norm_errs[_HAD_DENSE,:]>0)
         indices = range(0,len(h._norm_log2_dims))
@@ -953,6 +953,7 @@ class hadamard:
         xlabel('log(dim)')
         title('Error')
 
+        _write_fig_in_file(output_dir, hadamard._fig_norm, figure(1))
 
 
 
@@ -1209,7 +1210,7 @@ class bsl:
         real_RCGs = dense_matrix_time/mean_times
         fig = figure()
         plot(arange(0,mean_times.shape[0]-1), real_RCGs[1:], lw=1.5)
-        hold(True)
+        #hold(True)
         plot(arange(0,mean_times.shape[0]-1), ones((mean_times.shape[0]-1)),
             lw=1.5)
         legend(["speed up FAuST", "neutral speed up"])

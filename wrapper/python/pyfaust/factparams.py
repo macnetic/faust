@@ -691,7 +691,7 @@ class StoppingCriterion(object):
                              " criterion when is_criterion_error == True.")
         elif(not is_criterion_error and (max_num_its != 1000 or error_treshold
                                          != 0.3)):
-            raise ValueError("When is_criterion_error == True it's forbidden to use"
+            raise ValueError("When is_criterion_error == False it's forbidden to use"
                              " other arguments than num_its argument to define "
                              "the stopping criterion.")
 
