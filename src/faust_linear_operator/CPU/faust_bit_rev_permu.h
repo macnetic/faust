@@ -4,5 +4,5 @@
  *  And proceeds with a bit reversal permutation.
  *  E.g. : if n = 3, v=(0, 1, 2, 3, 4, 5, 6, 7, 8) and becomes (0, 4, 2, 6, 1, 5, 3, 7).
  */
-unsigned int bit_rev_permu(unsigned int n, unsigned int* v, const bool initv=true);
+void bit_rev_permu(unsigned int n, unsigned int* v, const bool initv=true);
 

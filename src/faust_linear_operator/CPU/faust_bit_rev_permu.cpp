@@ -1,5 +1,5 @@
 //TODO: move this file and its header to a Faust::utils namespace
-unsigned int bit_rev_permu(unsigned int n, unsigned int* v, const bool initv)
+void bit_rev_permu(unsigned int n, unsigned int* v, const bool initv)
 {
 	unsigned int size = 1<<n;
 	if(initv)
