@@ -928,10 +928,10 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_i
 	template<typename FPP>
 Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::eye(faust_unsigned_int num_rows, faust_unsigned_int num_cols)
 {
-	faust_unsigned_int nnz = std::min(num_rows, num_cols);
-	FPP values[nnz];
-	int colind[nnz];
-	int rowptr[num_rows+1];
+	faust_unsigned_int nnz = min(num_rows, num_cols);
+	FPP *values = new FPP[nnz];
+	int *colind = new int[nnz];
+	int *rowptr= new int[num_rows+1];
 	rowptr[0] = 0;
 //	cout << "MatSparse::eye stage 1" << endl;
 	for(faust_unsigned_int i=0;i<nnz;i++)
@@ -945,6 +945,9 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::eye(faust_unsigned_int n
 			rowptr[i+1] = rowptr[i];
 //	cout << "MatSparse::eye stage 2" << endl;
 	MatSparse<FPP,Cpu>* eye = new MatSparse(nnz, num_rows, num_cols, values, rowptr, colind);
+	delete[] values;
+	delete[] colind;
+	delete[] rowptr;
 	return eye;
 }
 

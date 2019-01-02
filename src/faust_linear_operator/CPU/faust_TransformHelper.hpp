@@ -580,7 +580,7 @@ namespace Faust {
 				faust_unsigned_int size = this->size();
 				std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) size);
 				MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
-				MatGeneric<FPP,Cpu>* gen_facs[size-2];
+				MatGeneric<FPP,Cpu>** gen_facs = new MatGeneric<FPP,Cpu>*[size-2];
 				gen_fac = this->transform->get_fact(0, cloning_fact);
 //				first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
 				//		first_sub_fac->Display();
@@ -619,6 +619,7 @@ namespace Faust {
 					delete first_sub_fac;
 					delete last_sub_fac;
 				}
+				delete[] gen_facs;
 				return th;
 			}
 			return this->transform.get(); //needed to return the stored Transform object ptr
@@ -632,7 +633,7 @@ namespace Faust {
 				std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) this->size());
 				faust_unsigned_int size = this->size();
 				MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
-				MatGeneric<FPP,Cpu>* gen_facs[size-2];
+				MatGeneric<FPP,Cpu>** gen_facs = new MatGeneric<FPP,Cpu>*[size-2];
 				gen_fac = this->transform->get_fact(0, cloning_fact);
 				first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
 				//		first_sub_fac->Display();
@@ -670,6 +671,7 @@ namespace Faust {
 					delete first_sub_fac;
 					delete last_sub_fac;
 				}
+				delete[] gen_facs;
 				return th;
 			}
 			return this->transform.get(); //needed to return the stored Transform object ptr
@@ -710,7 +712,7 @@ namespace Faust {
 			TransformHelper<FPP,Cpu>* T = nullptr;
 			// take the greater number of factors from this and G as the concatened Faust number
 			// of factors
-			std::vector<MatGeneric<FPP,Cpu>*> facts(std::max(G->size(),this->size())+1);
+			std::vector<MatGeneric<FPP,Cpu>*> facts(max(G->size(),this->size())+1);
 			const MatSparse<FPP,Cpu> * F_fac, *G_fac, *tmp_fac;
 			const MatGeneric<FPP,Cpu> *tmp_fac_gen;
 			MatSparse<FPP,Cpu>* T_fac;
@@ -940,7 +942,7 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), MAX for inf-norm */) const
 		{
-			const int MAX = std::numeric_limits<int>::max();
+			const int MAX = (1u << 31) - 1;// numeric_limits<int>::max();
 			const MatGeneric<FPP,Cpu>* last_fact = get_gen_fact(this->size()-1);
 			unsigned int ncols = this->getNbCol();
 			unsigned int nrows = this->getNbRow();
