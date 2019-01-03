@@ -580,7 +580,6 @@ namespace Faust {
 				faust_unsigned_int size = this->size();
 				std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) size);
 				MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
-				MatGeneric<FPP,Cpu>** gen_facs = new MatGeneric<FPP,Cpu>*[size-2];
 				gen_fac = this->transform->get_fact(0, cloning_fact);
 //				first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
 				//		first_sub_fac->Display();
@@ -595,13 +594,14 @@ namespace Faust {
 					if(cloning_fact)
 						delete gen_fac;
 					factors.insert(factors.begin(), first_sub_fac);
-					auto it = factors.begin();
-					for(faust_unsigned_int i = 1; i < size-1; i++)
+					if(size > 2)
 					{
-						gen_facs[i-1] = this->transform->get_fact(i, cloning_fact);
-
-
-						factors.insert(++it, gen_facs[i-1]);
+						auto it = factors.begin();
+						for(faust_unsigned_int i = 1; i < size-1; i++)
+						{
+							gen_fac = this->transform->get_fact(i, cloning_fact);
+							factors.insert(++it, gen_fac);
+						}
 					}
 					factors.insert(factors.begin()+(size-1), last_sub_fac);
 					factors.resize(size);
@@ -614,12 +614,9 @@ namespace Faust {
 				}
 				Transform<FPP, Cpu>* th = new Transform<FPP, Cpu>(factors, 1.0, false, cloning_fact);
 				if(cloning_fact) {
-					for(faust_unsigned_int i = 1; i < size-1; i++)
-						delete gen_facs[i-1];
-					delete first_sub_fac;
-					delete last_sub_fac;
+					for(faust_unsigned_int i = 0; i < size; i++)
+						delete factors[i];
 				}
-				delete[] gen_facs;
 				return th;
 			}
 			return this->transform.get(); //needed to return the stored Transform object ptr
@@ -633,7 +630,6 @@ namespace Faust {
 				std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) this->size());
 				faust_unsigned_int size = this->size();
 				MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
-				MatGeneric<FPP,Cpu>** gen_facs = new MatGeneric<FPP,Cpu>*[size-2];
 				gen_fac = this->transform->get_fact(0, cloning_fact);
 				first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
 				//		first_sub_fac->Display();
@@ -647,13 +643,16 @@ namespace Faust {
 					if(cloning_fact)
 						delete gen_fac;
 					factors.insert(factors.begin(), first_sub_fac);
-					auto it = factors.begin();
-					for(faust_unsigned_int i = 1; i < size-1; i++)
+					if(size > 2)
 					{
-						gen_facs[i-1] = this->transform->get_fact(i, cloning_fact);
+						auto it = factors.begin();
+						for(faust_unsigned_int i = 1; i < size-1; i++)
+						{
+							gen_fac = this->transform->get_fact(i, cloning_fact);
 
 
-						factors.insert(++it, gen_facs[i-1]);
+							factors.insert(++it, gen_fac);
+						}
 					}
 					factors.insert(factors.begin()+(size-1), last_sub_fac);
 					factors.resize(size);
@@ -666,12 +665,9 @@ namespace Faust {
 				}
 				Transform<FPP, Cpu>* th = new Transform<FPP, Cpu>(factors, 1.0, false, cloning_fact);
 				if(cloning_fact) {
-					for(faust_unsigned_int i = 1; i < size-1; i++)
-						delete gen_facs[i-1];
-					delete first_sub_fac;
-					delete last_sub_fac;
+					for(faust_unsigned_int i = 0; i < size; i++)
+						delete factors[i];
 				}
-				delete[] gen_facs;
 				return th;
 			}
 			return this->transform.get(); //needed to return the stored Transform object ptr
