@@ -293,18 +293,20 @@ package_linux_purepy_release:
     script:
         - if NOT EXIST build (mkdir build) else rmdir /S /Q build
         - cd build
-        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF ..'
-        - make
+        - 'cmake -G "Visual Studio 14 2015" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF  -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH="C:/Users/faust/Downloads/matio-1.5.13/visual_studio/x64/Release/libmatio.lib" -DZ_STATIC_LIB_PATH="C:/Users/faust/Downloads/zlib-1.2.11/contrib/vstudio/vc14/x64/ZlibStatDebug/zlibstat.lib" -DHDF5_STATIC_LIB_PATH="C:/Users/faust/Downloads/hdf5-1.10.3/build/bin/Release/libhdf5.lib" ..'
+        #- make
+        - cmake --build . --target FAUST
         - cd wrapper/python
-        - 'start %PYTHON2_PATH% setup.py bdist_wheel'
-        - 'start %PYTHON2_PATH% setup.py bdist_egg'
-        - 'start %PYTHON3_PATH% setup.py bdist_wheel'
-        - 'start %PYTHON3_PATH% setup.py bdist_egg'
+          # only python3 for windows
+          #- 'start %PYTHON2_PATH% setup.py bdist_wheel'
+          #- 'start %PYTHON2_PATH% setup.py bdist_egg'
+        - 'call %PYTHON_PATH% setup.py bdist_wheel'
+        - 'call %PYTHON_PATH% setup.py bdist_egg'
     artifacts:
         paths:
-            - build/wrapper/python/dist
+            - build\wrapper\python\dist
     tags:
-        - win7
+        - win10
     except:
         - schedules
 
