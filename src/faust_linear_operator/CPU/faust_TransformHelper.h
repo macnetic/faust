@@ -76,11 +76,10 @@ namespace Faust {
 			faust_unsigned_int * fancy_indices[2];
 			faust_unsigned_int fancy_num_rows;
 			faust_unsigned_int fancy_num_cols;
-			Transform<FPP,Cpu>* sliced_transform;
 			shared_ptr<Transform<FPP,Cpu>> transform;
 
-			const Transform<FPP, Cpu>* eval_sliced_Transform();
-			const Transform<FPP, Cpu>* eval_fancy_idx_Transform();
+			void eval_sliced_Transform();
+			void eval_fancy_idx_Transform();
 			public:
 			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true);
 			TransformHelper();

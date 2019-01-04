@@ -214,7 +214,8 @@ namespace Faust
 #ifdef FAUST_VERBOSE
 					std::cout << "~Transform()" << std::endl;
 #endif
-					for (int i=0;i<data.size();i++) delete data[i];}
+					if(this->dtor_delete_data)
+						for (int i=0;i<data.size();i++) delete data[i];}
 
 
 				/*!
@@ -249,12 +250,14 @@ namespace Faust
 				void print_timers() const;
 #endif
 
-
+			private:
+				void disable_data_deletion() { this->dtor_delete_data = false; }
 
 			private:
 				long long int totalNonZeros;
 				static const char * m_className;
 				std::vector<Faust::MatGeneric<FPP,Cpu>*> data;
+				bool dtor_delete_data;
 
 #ifdef __COMPILE_TIMERS__
 				mutable std::vector<Faust::Timer> t_multiply_vector;

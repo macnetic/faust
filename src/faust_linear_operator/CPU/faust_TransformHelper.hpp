@@ -209,8 +209,8 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right)
 		: is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false)
 		{
-			this->transform = make_shared<Transform<FPP,Cpu>>(th_left->eval_sliced_Transform(), th_left->is_transposed, th_left->is_conjugate,
-					th_right->eval_sliced_Transform(), th_right->is_transposed, th_right->is_conjugate);
+			this->transform = make_shared<Transform<FPP,Cpu>>(th_left->transform.get(), th_left->is_transposed, th_left->is_conjugate,
+					th_right->transform.get(), th_right->is_transposed, th_right->is_conjugate);
 		}
 
 	template<typename FPP>
@@ -247,7 +247,7 @@ namespace Faust {
 			this->slices[0] = s[0];
 			this->slices[1] = s[1];
 			this->is_sliced = true;
-			this->transform = make_shared<Transform<FPP,Cpu>>(*eval_sliced_Transform());
+			eval_sliced_Transform();
 		}
 
 	template<typename FPP>
@@ -266,7 +266,7 @@ namespace Faust {
 			this->is_fancy_indexed= true;
 			memcpy(this->fancy_indices[0], row_ids, num_rows*sizeof(faust_unsigned_int));
 			memcpy(this->fancy_indices[1], col_ids, num_cols*sizeof(faust_unsigned_int));
-			this->transform = make_shared<Transform<FPP,Cpu>>(*eval_fancy_idx_Transform());
+			eval_fancy_idx_Transform();
 			delete[] this->fancy_indices[0];
 			delete[] this->fancy_indices[1];
 		}
@@ -573,105 +573,97 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-	const Transform<FPP, Cpu>* TransformHelper<FPP, Cpu>::eval_fancy_idx_Transform()
-		{
-			if(this->is_fancy_indexed) {
-				bool cloning_fact = false;
-				faust_unsigned_int size = this->size();
-				std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) size);
-				MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
-				gen_fac = this->transform->get_fact(0, cloning_fact);
-//				first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
-				//		first_sub_fac->Display();
-				first_sub_fac = gen_fac->get_rows(this->fancy_indices[0], this->fancy_num_rows);
-				if(cloning_fact)
-					delete gen_fac;
-				if(size > 1) {
-					gen_fac = this->transform->get_fact(size-1, cloning_fact);
-//					last_sub_fac = gen_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
-					last_sub_fac = gen_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);	//		std::cout << "---" << std::endl;
-					//		last_sub_fac->Display();
-					if(cloning_fact)
-						delete gen_fac;
-					factors.insert(factors.begin(), first_sub_fac);
-					if(size > 2)
-					{
-						auto it = factors.begin();
-						for(faust_unsigned_int i = 1; i < size-1; i++)
-						{
-							gen_fac = this->transform->get_fact(i, cloning_fact);
-							factors.insert(++it, gen_fac);
-						}
-					}
-					factors.insert(factors.begin()+(size-1), last_sub_fac);
-					factors.resize(size);
+	void TransformHelper<FPP, Cpu>::eval_fancy_idx_Transform()
+	{
+		bool cloning_fact = true;
+		faust_unsigned_int size = this->size();
+		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) size);
+		MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
+		gen_fac = this->transform->get_fact(0, cloning_fact);
+		//				first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
+		//		first_sub_fac->Display();
+		first_sub_fac = gen_fac->get_rows(this->fancy_indices[0], this->fancy_num_rows);
+		if(cloning_fact)
+			delete gen_fac;
+		if(size > 1) {
+			gen_fac = this->transform->get_fact(size-1, cloning_fact);
+			//					last_sub_fac = gen_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
+			last_sub_fac = gen_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);	//		std::cout << "---" << std::endl;
+			//		last_sub_fac->Display();
+			if(cloning_fact)
+				delete gen_fac;
+			factors.insert(factors.begin(), first_sub_fac);
+			if(size > 2)
+			{
+				auto it = factors.begin();
+				for(faust_unsigned_int i = 1; i < size-1; i++)
+				{
+					gen_fac = this->transform->get_fact(i, cloning_fact);
+					factors.insert(++it, gen_fac);
 				}
-				else { //only one factor
-					last_sub_fac = first_sub_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);
-					delete first_sub_fac;
-					factors[0] = last_sub_fac;
-					factors.resize(1);
-				}
-				Transform<FPP, Cpu>* th = new Transform<FPP, Cpu>(factors, 1.0, false, cloning_fact);
-				if(cloning_fact) {
-					for(faust_unsigned_int i = 0; i < size; i++)
-						delete factors[i];
-				}
-				return th;
 			}
-			return this->transform.get(); //needed to return the stored Transform object ptr
+			factors.insert(factors.begin()+(size-1), last_sub_fac);
+			factors.resize(size);
 		}
+		else { //only one factor
+			last_sub_fac = first_sub_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);
+			delete first_sub_fac;
+			factors[0] = last_sub_fac;
+			factors.resize(1);
+		}
+		this->transform = make_shared<Transform<FPP, Cpu>>(factors, 1.0, false, cloning_fact);
+		if(cloning_fact) {
+			for(faust_unsigned_int i = 0; i < size; i++)
+				delete factors[i];
+		}
+	}
 
 	template<typename FPP>
-	const Transform<FPP, Cpu>* TransformHelper<FPP, Cpu>::eval_sliced_Transform()
-		{
-			if(is_sliced) {
-				bool cloning_fact = false;
-				std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) this->size());
-				faust_unsigned_int size = this->size();
-				MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
-				gen_fac = this->transform->get_fact(0, cloning_fact);
-				first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
-				//		first_sub_fac->Display();
-				if(cloning_fact)
-					delete gen_fac;
-				if(size > 1) {
-					gen_fac = this->transform->get_fact(size-1, cloning_fact);
-					last_sub_fac = gen_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
-					//		std::cout << "---" << std::endl;
-					//		last_sub_fac->Display();
-					if(cloning_fact)
-						delete gen_fac;
-					factors.insert(factors.begin(), first_sub_fac);
-					if(size > 2)
-					{
-						auto it = factors.begin();
-						for(faust_unsigned_int i = 1; i < size-1; i++)
-						{
-							gen_fac = this->transform->get_fact(i, cloning_fact);
+	void TransformHelper<FPP, Cpu>::eval_sliced_Transform()
+	{
+		bool cloning_fact = true;
+		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) this->size());
+		faust_unsigned_int size = this->size();
+		MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
+		gen_fac = this->transform->get_fact(0, cloning_fact);
+		first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
+		//		first_sub_fac->Display();
+		if(cloning_fact)
+			delete gen_fac;
+		if(size > 1) {
+			gen_fac = this->transform->get_fact(size-1, cloning_fact);
+			last_sub_fac = gen_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
+			//		std::cout << "---" << std::endl;
+			//		last_sub_fac->Display();
+			if(cloning_fact)
+				delete gen_fac;
+			factors.insert(factors.begin(), first_sub_fac);
+			if(size > 2)
+			{
+				auto it = factors.begin();
+				for(faust_unsigned_int i = 1; i < size-1; i++)
+				{
+					gen_fac = this->transform->get_fact(i, cloning_fact);
 
 
-							factors.insert(++it, gen_fac);
-						}
-					}
-					factors.insert(factors.begin()+(size-1), last_sub_fac);
-					factors.resize(size);
+					factors.insert(++it, gen_fac);
 				}
-				else { //only one factor
-					last_sub_fac = first_sub_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
-					delete first_sub_fac;
-					factors[0] = last_sub_fac;
-					factors.resize(1);
-				}
-				Transform<FPP, Cpu>* th = new Transform<FPP, Cpu>(factors, 1.0, false, cloning_fact);
-				if(cloning_fact) {
-					for(faust_unsigned_int i = 0; i < size; i++)
-						delete factors[i];
-				}
-				return th;
 			}
-			return this->transform.get(); //needed to return the stored Transform object ptr
+			factors.insert(factors.begin()+(size-1), last_sub_fac);
+			factors.resize(size);
 		}
+		else { //only one factor
+			last_sub_fac = first_sub_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
+			delete first_sub_fac;
+			factors[0] = last_sub_fac;
+			factors.resize(1);
+		}
+		this->transform = make_shared<Transform<FPP,Cpu>>(factors, 1.0, false, cloning_fact);
+		if(cloning_fact) {
+			for(faust_unsigned_int i = 0; i < size; i++)
+				delete factors[i];
+		}
+	}
 
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product() const {
@@ -985,7 +977,7 @@ namespace Faust {
 				coords[i] = i;
 				delete col;
 			}
-			MatSparse<FPP,Cpu> norm_diag(coords, coords,
+			MatSparse<FPP,Cpu>* norm_diag = new MatSparse<FPP,Cpu>(coords, coords,
 					norm_invs, ncols, ncols);
 			//			norm_diag.Display();
 			vector<MatGeneric<FPP,Cpu>*> factors;
@@ -994,10 +986,10 @@ namespace Faust {
 				//NOTE: don't use get_gen_fact() to avoid transpose auto-handling
 				factors.push_back(const_cast<Faust::MatGeneric<FPP, (Device)0u>*>(this->transform->data[i]));
 			if(this->is_transposed)
-				factors.insert(factors.begin(), &norm_diag);
+				factors.insert(factors.begin(), norm_diag);
 			else
-				factors.push_back(&norm_diag);
-			normalizedTh = new TransformHelper<FPP,Cpu>(factors);
+				factors.push_back(norm_diag);
+			normalizedTh = new TransformHelper<FPP,Cpu>(factors, FPP(1.0), false, true);
 			normalizedTh->is_transposed = this->is_transposed;
 			//			normalizedTh->display();
 			return normalizedTh;

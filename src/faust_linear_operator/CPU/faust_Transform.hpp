@@ -158,7 +158,7 @@ const char * Faust::Transform<FPP,Cpu>::m_className="Faust::Transform<FPP,Cpu>";
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform() :
 	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
-	totalNonZeros(0)
+	totalNonZeros(0), dtor_delete_data(true)
 {
 
 #ifdef __COMPILE_TIMERS__
@@ -171,7 +171,7 @@ Faust::Transform<FPP,Cpu>::Transform() :
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
-	totalNonZeros(A.totalNonZeros)
+	totalNonZeros(A.totalNonZeros), dtor_delete_data(true)
 {
 	//std::cout<<"debut inside copy constructor"<<std::endl;
 	data.resize(A.size());
@@ -190,7 +190,7 @@ Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *> & facts, const FPP lambda_ /*default value = 1.0 */,const bool optimizedCopy /*default value = false*/, const bool cloning_fact /* default to true */) :
 	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
-	totalNonZeros(0)
+	totalNonZeros(0), dtor_delete_data(true)
 {
 	data.resize(facts.size());
 	if(data.size() > 0) {
@@ -222,7 +222,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts, const bool optimizedCopy /*default value = false*/ ):	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
-	totalNonZeros(0)
+	totalNonZeros(0), dtor_delete_data(true)
 {
 	data.resize(facts.size());
 	for (int i=0 ; i<data.size() ; i++)
@@ -235,7 +235,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> 
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu> >& facts, const bool optimizedCopy /*default value = false*/ ):	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
-	totalNonZeros(0)
+	totalNonZeros(0), dtor_delete_data(true)
 {
 	data.resize(facts.size());
 	for (int i=0 ; i<data.size() ; i++)
@@ -247,7 +247,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu>
 
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool transpose_A, const bool conj_A, const Transform<FPP, Cpu>* B, const bool transpose_B, const bool conj_B):
-	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()), totalNonZeros(0)
+	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()), totalNonZeros(0), dtor_delete_data(true)
 {
 	data.resize(A->size()+B->size());
 	int i = transpose_A?A->size()-1:0;
