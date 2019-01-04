@@ -5,12 +5,13 @@ from __future__ import print_function
 from pylab import *
 import os,sys
 
-## @package pyfaust.demo @brief The pyfaust module for the demos partly based on research papers
+## @package pyfaust.demo @brief The pyfaust module for the demos partly based on research papers (see references in each demo).
 ##
 ## The run*() functions produce the results (by default in demo.DEFT_RESULTS_DIR)
 ## and the fig*() functions produce the figures based on the results (by
 ## default in demo.DEFT_FIG_DIR).
 ## @warning this demo module is a recent port from matlab version and should be considered in beta status.
+
 
 ## \brief The default output directory for the demo results.
 DEFT_RESULTS_DIR = 'pyfaust_demo_output'
@@ -43,6 +44,15 @@ def get_data_dirpath():
 def runall():
     """
     Runs all the demos in a row.
+
+    ## @fn pyfaust.demo.runall
+
+    Example:
+        >>> from pyfaust.demo import runall, allfigs
+        >>> runall()
+        >>> # benchmark data files go in DEFT_RESULTS_DIR
+        >>> allfigs()
+        >>> # figures resulting from benchmark go in DEFT_FIG_DIR
     """
     def print_header(title):
         print("******************** Running", title, "demo")

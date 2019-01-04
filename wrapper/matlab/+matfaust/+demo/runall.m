@@ -1,10 +1,3 @@
-%% script run_all_demo
-%  Script used to run all demo (brain source localisation, hadamard factorization)
-%  corresponding figures of the article [1].
-%
-% For more information on the FAuST Project, please visit the website of
-% the project :  <http://faust.inria.fr>
-%
 %% License:
 % Copyright (2018):	Luc Le Magoarou, Remi Gribonval
 %			INRIA Rennes, FRANCE
@@ -43,11 +36,11 @@
 %	NeuroImage, Volume 86, 1 February 2014, Pages 446-460, ISSN 1053-8119,
 %	[DOI] <http://dx.doi.org/10.1016/j.neuroimage.2013.10.027>
 %%
-%============================================================================
+% ============================================================================
 %> Script used to run all demo (brain source localisation, hadamard factorization, …)
 %===
-%>
-%> The scripts reates corresponding figures of the article <a href="https://hal.archives-ouvertes.fr/hal-01167948v1">[1]</a>.
+%> @fn matfaust.demo.runall
+%> The scripts creates corresponding figures of the article <a href="https://hal.archives-ouvertes.fr/hal-01167948v1">[1]</a>.
 %>
 %> References:
 %>
@@ -56,7 +49,15 @@
 %>	Topics in Signal Processing, 2016.
 %>	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %>
-%============================================================================
+%> @Example
+%> @code
+%> import matfaust.demo *
+%> runall()
+%> % You'll find the figures in Figures folder located in current directory.
+%> % The benchmark files from which figures are based are in the folder output (in the current directory also).
+%> @endcode
+%>
+% ============================================================================
 function runall()
 	%% Quick start
 	disp('*********** Quick Start Demos *************');
