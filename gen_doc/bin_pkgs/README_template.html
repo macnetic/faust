@@ -20,6 +20,8 @@
 
 <h3>1.1 For Python</h3>
 
+<p>@note  this section is intended to describe installation of the FAµST Python wrapper only from system packages/installers but note that some pip packages are also available.</p>
+
 <p>FAµST is designed for the Python ecosystem which as usual relies on the numpy and scipy packages.</p>
 
 <p>If you want to run de FAµST demos (module pyfaust.demo), you&rsquo;ll also need the matplotlib package.</p>
@@ -219,7 +221,7 @@ end quickstart.py
 
 <pre><code>$ python2.7
 &gt;&gt;&gt; import pyfaust
-&gt;&gt;&gt; A = pyfaust.Faust(filepath='@CMAKE_INSTALL_PREFIX@/python/A.mat') # A is the FAµST created through quickstart script
+&gt;&gt;&gt; A = pyfaust.Faust(filepath='A.mat') # A is the FAµST created through quickstart script
 &gt;&gt;&gt; A.rcg()
 6.666666666666667
 &gt;&gt;&gt; A.density()

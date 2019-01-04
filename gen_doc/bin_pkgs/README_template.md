@@ -12,6 +12,8 @@
 
 ### 1.1 For Python
 
+@note  this section is intended to describe installation of the FAµST Python wrapper only from system packages/installers but note that some pip packages are also available.
+
 FAµST is designed for the Python ecosystem which as usual relies on the numpy and scipy packages.
 
 If you want to run de FAµST demos (module pyfaust.demo), you'll also need the matplotlib package.
@@ -194,7 +196,7 @@ You can also go through the Python terminal to build a FAµST product and call i
 
 	$ python2.7
 	>>> import pyfaust
-	>>> A = pyfaust.Faust(filepath='@CMAKE_INSTALL_PREFIX@/python/A.mat') # A is the FAµST created through quickstart script
+	>>> A = pyfaust.Faust(filepath='A.mat') # A is the FAµST created through quickstart script
 	>>> A.rcg()
 	6.666666666666667
 	>>> A.density()
