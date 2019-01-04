@@ -1159,6 +1159,7 @@ class bsl:
         bsl.fig_speedup(input_dir, output_dir)
         bsl.fig_convergence(input_dir, output_dir)
 
+    @staticmethod
     def fig_time_cmp(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
         """
             Builds the time comparison figure for the BSL with the differents Faust representations of the MEG matrix.
@@ -1196,7 +1197,7 @@ class bsl:
 
         #show()
 
-
+    @staticmethod
     def fig_speedup(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
         """
             Builds the speedup comparison figure for the BSL with the differents Faust representations of the MEG matrix.
@@ -1248,7 +1249,7 @@ class bsl:
                   mean_times[i]*1000,'ms', 'speedup: ',
                   real_RCGs[i])
 
-
+    @staticmethod
     def fig_convergence(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
         """
         This function builds a figure similar to the BSL figure (Fig 9) used in [1].
