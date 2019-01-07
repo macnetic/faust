@@ -4,7 +4,6 @@
 
 stages:
         - test
-        - test_wrapper
         - package_rev
 
 ctest:
@@ -21,7 +20,7 @@ ctest_python:
     except:
         - schedules
         - tags
-    stage: test_wrapper
+    stage: test
     allow_failure: false
 
 ctest_matlab:
@@ -30,7 +29,7 @@ ctest_matlab:
     except:
         - schedules
         - tags
-    stage: test_wrapper
+    stage: test
 
 .ctest_nightly: &ctest_nightly_script
     <<: *ctest_script
