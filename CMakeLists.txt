@@ -861,47 +861,51 @@ ELSE(WIN32 AND NOT UNIX)
 		SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "${PACKAGE_DESCRIPTION}")
 		SET(CPACK_RPM_PACKAGE_DESCRIPTION "${PACKAGE_DESCRIPTION}")
 		file(REMOVE ${PROJECT_BINARY_DIR}/postinst) # needed to remove possible postinstall script left here 
-							       # really needed only when BUILD_WRAPPER_MATLAB==OFF and BUILD_WRAPPER_PYTHON==ON
-	        if(BUILD_WRAPPER_MATLAB)
-		    # prepare script to set matlab path for faust automatically after package installation
-		    configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/debrpm/postinst_matlab.sh.in ${PROJECT_BINARY_DIR}/postinst @ONLY)
+		# really needed only when BUILD_WRAPPER_MATLAB==OFF and BUILD_WRAPPER_PYTHON==ON
+		if(BUILD_WRAPPER_MATLAB)
+			# prepare script to set matlab path for faust automatically after package installation
+			configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/debrpm/postinst_matlab.sh.in ${PROJECT_BINARY_DIR}/postinst @ONLY)
 		endif()
 		if(BUILD_WRAPPER_PYTHON)
-		    # prepare the script allowing the user to avoid PYTHONPATH setting
-		    configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/debrpm/postinst_py.sh ${PROJECT_BINARY_DIR}/postinst2 @ONLY)
-		    file(READ ${PROJECT_BINARY_DIR}/postinst2 POSTINST2_LINES)
-		    file(APPEND ${PROJECT_BINARY_DIR}/postinst "${POSTINST2_LINES}")
-		    file(REMOVE ${PROJECT_BINARY_DIR}/postinst2)
-	    endif()
+			# prepare the script allowing the user to avoid PYTHONPATH setting
+			configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/debrpm/postinst_py.sh ${PROJECT_BINARY_DIR}/postinst2 @ONLY)
+			file(READ ${PROJECT_BINARY_DIR}/postinst2 POSTINST2_LINES)
+			file(APPEND ${PROJECT_BINARY_DIR}/postinst "${POSTINST2_LINES}")
+			file(REMOVE ${PROJECT_BINARY_DIR}/postinst2)
+			#set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, python3 >= 3.6.5, python3-numpy >= 1.13.3, python3-scipy >= 1.0.0")
+			#set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, python3, python3-numpy, python3-scipy)
+		endif()
+		# postscript to auto open/indicate readme
+		configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/debrpm/postinst_open_readme.sh ${PROJECT_BINARY_DIR}/postinstall2 @ONLY)
+		file(READ ${PROJECT_BINARY_DIR}/postinstall2 POSTINST2_LINES)
+		file(APPEND ${PROJECT_BINARY_DIR}/postinst "${POSTINST2_LINES}")
+		file(REMOVE ${PROJECT_BINARY_DIR}/postinstall2)
 
-#SET(CPACK_RPM_PACKAGE_DEPENDS "libmat, libmex, libmx ")
-#CPACK_RPM_PACKAGE_GROUP
-#SET (CPACK_RPM_PACKAGE_REQUIRES )
-#set(CPACK_RPM_COMPONENT_INSTALL ON)
+		#SET(CPACK_RPM_PACKAGE_DEPENDS "libmat, libmex, libmx ")
+		#CPACK_RPM_PACKAGE_GROUP
+		#SET (CPACK_RPM_PACKAGE_REQUIRES )
+		#set(CPACK_RPM_COMPONENT_INSTALL ON)
 
-set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST "/opt") # to not conflict with filesystem package on fedora
+		set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST "/opt") # to not conflict with filesystem package on fedora
 
-if(NOT ${USE_MATIO_STATIC_LIBS})
-	set(CPACK_RPM_PACKAGE_REQUIRES "matio >= 1.5.7")
-	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libmatio-dev (>= 1.5.7)")
-	# add postinst script to symlink matio lib if needed
-	file(READ ${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/debrpm/postinst_matio_symlink.sh POSTINST2_LINES)
-	file(APPEND ${PROJECT_BINARY_DIR}/postinst "${POSTINST2_LINES}")
-	file(REMOVE ${PROJECT_BINARY_DIR}/postinst2)
-endif()
-if(BUILD_WRAPPER_PYTHON)
-	#set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, python3 >= 3.6.5, python3-numpy >= 1.13.3, python3-scipy >= 1.0.0")
-	#set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, python3, python3-numpy, python3-scipy)
-endif()
-#no need to exclude library auto-deps for debian package/ubuntu
-set(CPACK_RPM_SPEC_MORE_DEFINE "%define __requires_exclude ^libmex[.]so.*|libmat[.]so.*|libmx[.]so.*|libpython.*[.]so.*$ ")
+		if(NOT ${USE_MATIO_STATIC_LIBS})
+			set(CPACK_RPM_PACKAGE_REQUIRES "matio >= 1.5.7")
+			set(CPACK_DEBIAN_PACKAGE_DEPENDS "libmatio-dev (>= 1.5.7)")
+			# add postinst script to symlink matio lib if needed
+			file(READ ${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/debrpm/postinst_matio_symlink.sh POSTINST2_LINES)
+			file(APPEND ${PROJECT_BINARY_DIR}/postinst "${POSTINST2_LINES}")
+			file(REMOVE ${PROJECT_BINARY_DIR}/postinst2)
+		endif()
 
-set(CPACK_RPM_PACKAGE_RELEASE "1")
-SET(CPACK_RPM_PACKAGE_LICENSE "GNU AFFERO GENERAL PUBLIC LICENSE")
-set(CPACK_RPM_PACKAGE_GROUP "unknown")
-set(CPACK_RPM_PACKAGE_VENDOR ${CPACK_PACKAGE_VENDOR})
-set(CPACK_RPM_PACKAGE_URL ${CPACK_PACKAGE_URL} )
-#set(CPACK_RPM_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION_SUMMARY})
+		#no need to exclude library auto-deps for debian package/ubuntu
+		set(CPACK_RPM_SPEC_MORE_DEFINE "%define __requires_exclude ^libmex[.]so.*|libmat[.]so.*|libmx[.]so.*|libpython.*[.]so.*$ ")
+
+		set(CPACK_RPM_PACKAGE_RELEASE "1")
+		SET(CPACK_RPM_PACKAGE_LICENSE "GNU AFFERO GENERAL PUBLIC LICENSE")
+		set(CPACK_RPM_PACKAGE_GROUP "unknown")
+		set(CPACK_RPM_PACKAGE_VENDOR ${CPACK_PACKAGE_VENDOR})
+		set(CPACK_RPM_PACKAGE_URL ${CPACK_PACKAGE_URL} )
+		#set(CPACK_RPM_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION_SUMMARY})
 		IF(CMAKE_SIZEOF_VOID_P MATCHES "4")
 			if(NOT DEFINED CPACK_PACKAGE_FILE_NAME)
 				SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Linux")
