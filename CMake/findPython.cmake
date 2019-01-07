@@ -183,4 +183,17 @@ foreach(PYTHON_EXE IN LISTS PYTHON_EXES)
 	message(STATUS "CYTHON_BIN_DIR has been found : ${CYTHON_BIN_DIR}")
 	message(STATUS "------------------------------------------------")
 	list(APPEND CYTHON_EXES ${CYTHON_BIN_DIR})
+
+    # store python path in variable PYTHON2_EXE or PYTHON3_EXE according to
+    # its version (overridding previous iteration versions)
+    exec_program("${PYTHON_EXE}" ARGS "--version" OUTPUT_VARIABLE PY_VER RETURN_VALUE PY_RES)
+    #message(STATUS "PY_VER=${PY_VER}")
+    string(REGEX REPLACE "Python ([0-9]\\.[0-9]).*$" "\\1" PY_VER_WITH_POINTS ${PY_VER})
+    string(REGEX REPLACE "Python ([0-9])\\.([0-9]).*$" "\\1\\2" PY_VER ${PY_VER})
+    if(PY_VER MATCHES 3)
+        set(PYTHON3_EXE ${PYTHON_EXE})
+    else()
+        set(PYTHON2_EXE ${PYTHON_EXE})
+    endif()
+
 endforeach()

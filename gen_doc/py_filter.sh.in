@@ -1,6 +1,6 @@
 #!/bin/bash
 
 
-@PYTHON_EXECUTABLE@ -m doxypypy.doxypypy -a -c $* | @PYTHON_EXECUTABLE@ py_filterout_namespace.py pyfaust.__init__. pyfaust.factparams. pyfaust.demo.
+@PYTHON3_EXE@ -m doxypypy.doxypypy -a -c $* | @PYTHON3_EXE@ py_filterout_namespace.py pyfaust.__init__. pyfaust.factparams. pyfaust.demo.
 
 

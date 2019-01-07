@@ -1,2 +1,2 @@
-@PYTHON_EXECUTABLE@ -m doxypypy.doxypypy -a -c %1 %2 |  @PYTHON_EXECUTABLE@ py_filterout_namespace.py pyfaust.__init__. pyfaust.factparams. pyfaust.demo.
+@PYTHON3_EXE@ -m doxypypy.doxypypy -a -c %1 %2 %3 |  @PYTHON3_EXE@ py_filterout_namespace.py pyfaust.__init__. pyfaust.factparams. pyfaust.demo.
 
