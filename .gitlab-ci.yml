@@ -13,6 +13,8 @@ ctest:
         - schedules
         - tags
     stage: test
+    tags:
+        - linux
 
 ctest_python:
     <<: *ctest_script
@@ -22,6 +24,8 @@ ctest_python:
         - tags
     stage: test
     allow_failure: false
+    tags:
+        - linux
 
 ctest_matlab:
     <<: *ctest_script
@@ -30,6 +34,8 @@ ctest_matlab:
         - schedules
         - tags
     stage: test
+    tags:
+        - matlab
 
 .ctest_nightly: &ctest_nightly_script
     <<: *ctest_script
@@ -41,6 +47,7 @@ ctest_matlab:
     <<: *ctest_nightly_script
     tags:
        - linux
+       - matlab
 
 ctest_nightly_macos:
     <<: *ctest_nightly_script
@@ -121,6 +128,8 @@ package_linux:
         expire_in: '1 week'
    tags:
         - linux
+        - matlab
+        - tux_packager
    except:
         - schedules
         - tags
@@ -185,6 +194,8 @@ package_linux_release:
         expire_in: '50 yrs'
    tags:
         - linux
+        - matlab
+        - tux_packager
    only:
         - tags
 
@@ -204,6 +215,8 @@ package_linux_release_static:
         expire_in: '50 yrs'
    tags:
         - linux
+        - matlab
+        - tux_packager
    only:
         - tags
 
@@ -262,6 +275,7 @@ package_linux_purepy_rev:
     variables: {MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a"}
     tags:
         - linux
+        - tux_packager
 
 .package_purepy_release:
     extends: .package_purepy
@@ -285,6 +299,7 @@ package_linux_purepy_release:
     variables: {MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a"}
     tags:
         - linux
+        - tux_packager
 
 ########### pip binary packages for windows
 
