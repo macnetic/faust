@@ -42,10 +42,12 @@ else: # linux and mac
                         extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
                        )
 
+
+
 setup(
     name = 'pyfaust',
     version = version, # cf. header
-    ext_modules = cythonize(PyFaust),
+    ext_modules = cythonize(PyFaust, compiler_directives={'language_level': sys.version_info.major }),
     packages = [ 'pyfaust' ],
     url = 'http://faust.inria.fr',
     description = 'TODO',
