@@ -12,7 +12,8 @@
 
 ### 1.1 For Python
 
-@note  this section is intended to describe installation of the FAµST Python wrapper only from system packages/installers but note that some pip packages are also available.
+@note  This section treats only of system packages/installers but note that some pip packages are also available. You might install them in virtual environments:
+\ref install_pyfaust_in_venv
 
 FAµST is designed for the Python ecosystem which as usual relies on the numpy and scipy packages.
 
@@ -26,7 +27,7 @@ Please ensure these packages are installed on your system. One way to install th
 Note that you probably have to install those packages for all versions of Python you want to use (each one have normally its associated pip executable).<br/>
 Note also that you can rely on your system package manager to install the Python packages (e.g. dnf/yum repositories on Fedora/Centos Linux systems).
 
-FAµST supports at least Python 2.7 and is also compiled for Python @PY3_VER@.
+FAµST supports at least Python 2.7.15 and is also compiled for Python @PY3_VER@.
 
 If you want to use FAµST with Python 3 you must use precisely the @PY3_VER@ version because the FAµST Python wrapper delivered within the binary package is compiled for that version only.
 
