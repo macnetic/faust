@@ -234,6 +234,7 @@ pages:
            - public/
     tags:
         - linux
+        - matlab
     only:
         - tags
 
