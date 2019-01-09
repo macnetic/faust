@@ -58,4 +58,11 @@ And finally launch the version test command to check the whole process:
 	$ python -c 'from pyfaust import version; print(version())'
 
 
+Anaconda
+========
 
+Within Anaconda you can also create virtual environments and use pyfaust into it. It's quite similar to the Python way described previous sections. For that purpose you'll use the command conda create.
+
+Please rely on the documentation here: https://conda.readthedocs.io/en/latest/
+
+or for more details here:  https://conda.io/docs/commands/conda-create.html
