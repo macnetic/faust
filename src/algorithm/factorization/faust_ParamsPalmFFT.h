@@ -1,0 +1,39 @@
+#ifndef __FAUST_PARAMS_PALM_FFT_H__
+#define __FAUST_PARAMS_PALM_FFT_H__
+
+#include "faust_ParamsPalm.h"
+
+using namespace Faust;
+
+namespace Faust
+{
+
+
+	template<typename FPP, Device DEVICE, typename FPP2 = double>
+		class ParamsPalmFFT : public Faust::ParamsPalm<FPP,DEVICE,FPP2>
+	{
+		public:
+
+			//ctor definitions in header because it consists mainly to call parent ctor
+
+			ParamsPalmFFT(const Faust::MatDense<FPP,DEVICE>& data_,
+					const int nbFact_,
+					const std::vector<const Faust::ConstraintGeneric*>& cons_,
+					const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
+					const Faust::StoppingCriterion<FPP2> & stop_crit_ = StoppingCriterion<FPP2>(ParamsPalm<FPP,DEVICE,FPP2>::defaultNiter),
+					const bool isVerbose_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultVerbosity ,
+					const bool isUpdateWayR2L_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultUpdateWayR2L ,
+					const FPP init_lambda_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultLambda,
+					const bool constant_step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultConstantStepSize,
+					const FPP step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize) : ParamsPalm<FPP, DEVICE, FPP2>(data_, nbFact_, cons_, init_fact_, stop_crit_, isVerbose_, isUpdateWayR2L_, init_lambda_, constant_step_size_, step_size_) {}
+
+			ParamsPalmFFT() : ParamsPalm<FPP,DEVICE,FPP2>() {}
+
+			MatDense<FPP,DEVICE> init_D;
+
+	};
+
+#include "faust_ParamsPalmFFT.hpp"
+
+}
+#endif
