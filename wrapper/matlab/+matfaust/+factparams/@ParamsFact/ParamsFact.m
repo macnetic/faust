@@ -77,10 +77,10 @@ classdef (Abstract) ParamsFact
 
 			% then check validity of opt args (it's useless for default values but it's not too costfull)
 			if(~ islogical(is_update_way_R2L))
-				error('matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_IS_UPDATE_WAY_R2L} ,' argument (is_update_way_R2L) must be logical.')
+				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_IS_UPDATE_WAY_R2L} ,' argument (is_update_way_R2L) must be logical.'])
 			end
 			if(~ isscalar(init_lambda))
-				error('matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_INIT_LAMBDA},' argument (init_lambda) must be a scalar.')
+				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_INIT_LAMBDA},' argument (init_lambda) must be a scalar.'])
 			end
 			if(~ isscalar(step_size))
 				step_size
