@@ -44,21 +44,21 @@ However it's not totally excluded that FAµST works with older or newer versions
 ## <a name="installation_testing">3. Testing and Troubleshooting<a/>
 
 Normally, after installing, nothing is left to do. The installation process should have seamlessly set up the Faust wrappers for Python and Matlab into your environment.
-Neverthless, it could be useful to check that it really worked and set the environment manually if needed like explained below.
+Nevertheless, it could be useful to check that it really worked and set the environment manually if needed like explained below.
 
 ### 3.1 Testing the Matlab Wrapper
 
 To test whether the FAµST Matlab wrapper auto-setup succeeded at install stage, you can open a terminal and type:
 
-	matlab -nodisplay -nojvm -r "import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', 'complex');disp(F);exit"
+	matlab -nodisplay -nojvm -r "import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', 'complex'); F"
 
 Note: if Matlab is not set in your PATH environment variable you need to replace `matlab' with its full path
 	(e.g. on macOS /Applications/Matlab/MATLAB_R2018b.app/bin/matlab)
 
 It works only if you see an output similar to:
 
-	Faust size 10x10, density 0.57, nnz_sum 57, 1 factor(s):
-	- FACTOR 0 (complex) DENSE, size 10x10, density 0.57, nnz 57
+	Faust size 10x10, density 0.50, nnz_sum 50, 1 factor(s):
+	- FACTOR 0 (complex) DENSE, size 10x10, density 0.5, nnz 50
 	>> % other values are possible for density, etc. because of the random generation
 
 Otherwise it didn't work. So here is how to setup the wrapper manually.
@@ -137,19 +137,17 @@ OK! You can follow the [quick start usage](#usage) now.
 Let's test FAµST with the quickstart script, from a matlab terminal type:
 
 	>> import matfaust.demo.quickstart.*
-	>> quick_start
+	>> A = quick_start
 
-And then type further instructions to test a bit of the FAµST API:
-
-Let's see what variables quickstart script has added.
-
-	>> whos
-
-Now call some functions on FAµST object A:
+And then call some functions on Faust object A to test a bit of the FAµST API:
 
 	>> rcg(A)
 	>> density(A)
 	>> get_num_factors(A)
+
+@note if you're wondering what are these functions just consult the inline doc:
+
+	>> help A.rcg
 
 Retrieve the product factors:
 
@@ -207,7 +205,7 @@ You can also go through the Python terminal to build a FAµST product and call i
 	>>> F1 = A.get_factor(0)
 	>>> F2 = A.get_factor(1)
 	>>> A.shape
-	(1000, 2000)
+	(1000L, 2000L)
 
 Note that the doxygen documentation for the Python API is also available locally after installing Faust. You can consult it from your web browser: [@CMAKE_INSTALL_PREFIX@/doc/html/namespacepyfaust.html](file://@CMAKE_INSTALL_PREFIX@/doc/html/namespacepyfaust.html).
 

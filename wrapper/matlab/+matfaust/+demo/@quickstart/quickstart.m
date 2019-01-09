@@ -135,7 +135,7 @@ classdef quickstart
 		%==========================================================================
 		%> This demo shows that a Faust is handled as matlab builtin matrix, presenting functions that are overloaded by the Faust class (size, mtimes, transpose...) and ends with a little time comparison to illustrate the speed-up of using a Faust for multiplication.
 		%==========================================================================
-		function quick_start()
+		function A = quick_start()
 			import matfaust.Faust
 
 

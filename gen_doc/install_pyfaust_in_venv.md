@@ -22,7 +22,7 @@ It remains now to install pyfaust in this environment.
 
 All the dependencies will be downloaded and installed by the command above.
 
-You can launch a test python command to valid the installation:
+You can launch a test python command to validate the installation:
 
 	$ python -c 'from pyfaust import version; print(version())'
 
