@@ -257,7 +257,7 @@ class fft:
             os.mkdir(output_dir)
         savefig(output_dir+os.sep+'Fourier-RuntimeComp-Speedup.png',
                 dpi=200)
-        #show()
+        show(block=False)
 
 
 
@@ -528,7 +528,7 @@ class runtimecmp:
         savefig(output_dir+os.sep+'RuntimeComp-'+matrix_or_vector+'_multiplication_constraint_'+constraint_str+'.png',
                dpi=200)
         #tight_layout()
-        #show()
+        show(block=False)
 
 class hadamard:
     """
@@ -673,7 +673,7 @@ class hadamard:
 
         _write_fig_in_file(output_dir, hadamard._fig1_fname, fig1)
         _write_fig_in_file(output_dir, hadamard._fig2_fname, fig2)
-        #show()
+        show(block=False)
 
     @staticmethod
     def _create_hadamard_fausts_mats(dims, log2_dims):
@@ -817,7 +817,7 @@ class hadamard:
             axes([_log2_dims[0], _log2_dims[-1], ymin, ymax])
 
         _write_fig_in_file(output_dir, hadamard._fig_speedup, figure(1))
-        #show()
+        show(block=False)
 
     @staticmethod
     def run_norm_hadamard(output_dir=DEFT_RESULTS_DIR):
@@ -968,7 +968,7 @@ class hadamard:
 
 
 
-        #show()
+        show(block=False)
 
     @staticmethod
     def figs(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
@@ -1195,7 +1195,7 @@ class bsl:
 
         _write_fig_in_file(output_dir, bsl._time_cmp_fig_fname, fig)
 
-        #show()
+        show(block=False)
 
     @staticmethod
     def fig_speedup(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
@@ -1240,7 +1240,7 @@ class bsl:
 
         _write_fig_in_file(output_dir, bsl._speedup_fig_fname, fig)
 
-        #show()
+        show(block=False)
 
         print("**** MEG with OMP solver time comparison ****")
         print("M time:", mean_times[0]*1000)
@@ -1308,7 +1308,7 @@ class bsl:
         ylabel("Distance between true and estimated sources (cm)")
         title("BSL - convergence (C++ wrapper faust) omp solver")
 
-        #show()
+        show(block=False)
         _write_fig_in_file(output_dir, bsl._convergence_fig_fname, fig)
 
 
