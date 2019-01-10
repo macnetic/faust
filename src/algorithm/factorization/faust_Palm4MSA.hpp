@@ -318,7 +318,7 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       }
    }
 
-   //false is for disabling evaluation (because the transpose do it later)
+   //false is for disabling evaluation (because the transpose does it later)
    LorR.conjugate(false);
    RorL[m_indFact].conjugate(false);
 

@@ -136,14 +136,14 @@ namespace Faust
 		  void compute_xhatt_xhat(MatDense<FPP,DEVICE>& Xt_Xhat);
 		  ~Palm4MSA(){}
 
-       private:
+       protected:
           void check_constraint_validity();
           void compute_c();
-          void compute_grad_over_c();
+          virtual void compute_grad_over_c();
           void compute_projection();
           void update_L();
           void update_R();
-          void compute_lambda();
+          virtual void compute_lambda();
           static const char * m_className;
           static const FPP lipschitz_multiplicator;
 

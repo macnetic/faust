@@ -44,7 +44,7 @@
 #include "faust_StoppingCriterion.h"
 #include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
-#include "faust_Palm4MSA.h"
+#include "faust_Palm4MSAFFT.h"
 #include "faust_BlasHandle.h"
 
 #include <iostream>
@@ -115,24 +115,28 @@ int main()
 
 	Faust::BlasHandle<Cpu> blasHandle;
 
-//	Faust::Palm4MSA<FPP,Cpu,FPP2> palm2(params,blasHandle,true);
-//
-////	palm2.next_step();
-//	palm2.compute_facts();
-//    std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = const_cast< std::vector<Faust::MatDense<FPP,Cpu> >&>(palm2.get_facts());
-//	FPP lambda = palm2.get_lambda();
-//	(full_facts[0]) *= lambda;
-//
-//	Faust::Transform<FPP, Cpu>* t = new Faust::Transform<FPP, Cpu>(full_facts);
-//	//relativeError
-//	Faust::MatDense<FPP,Cpu> faustProduct;
-//	faustProduct=t->get_product();
-//	faustProduct-=data;
-//	FPP2 relativeError = Faust::fabs(faustProduct.norm()/data.norm());
-//
-//	std::cout<<std::endl;
-//	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
-//	std::cout<< "\t\t" << relativeError<<std::endl<<std::endl;
+	Faust::Palm4MSAFFT<FPP,Cpu,FPP2> palm2(params,blasHandle,true);
+
+//	Faust::MatDense<FPP,Cpu> eye = Faust::MatDense<FPP,Cpu>::eye(10,10);
+//	eye.Display();
+
+
+//	palm2.next_step();
+	palm2.compute_facts();
+    std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = const_cast< std::vector<Faust::MatDense<FPP,Cpu> >&>(palm2.get_facts());
+	FPP lambda = palm2.get_lambda();
+	(full_facts[0]) *= lambda;
+
+	Faust::Transform<FPP, Cpu>* t = new Faust::Transform<FPP, Cpu>(full_facts);
+	//relativeError
+	Faust::MatDense<FPP,Cpu> faustProduct;
+	faustProduct=t->get_product();
+	faustProduct-=data;
+	FPP2 relativeError = Faust::fabs(faustProduct.norm()/data.norm());
+
+	std::cout<<std::endl;
+	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+	std::cout<< "\t\t" << relativeError<<std::endl<<std::endl;
 
 
 	return 0;
