@@ -89,7 +89,7 @@ namespace Faust
 
     //////////FONCTION Faust::MatDense<FPP,Cpu> - Faust::MatDense<FPP,Cpu> ////////////////////
     // C = A * B;
-    //l'objet C doit etre different de A et B
+    //l'objet C doit etre different de A et B (but gemm() manages it with two copies)
     //! \fn multiply
     //! \brief Multiplication C = A * B
     //! \warning Object C must be different of A and B.

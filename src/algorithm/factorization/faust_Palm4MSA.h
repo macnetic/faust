@@ -112,7 +112,7 @@ namespace Faust
           FPP get_RMSE()const{return Faust::fabs(error.norm())/sqrt((double)(data.getNbRow()*data.getNbCol()));}
           const Faust::MatDense<FPP,DEVICE>& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
           const Faust::MatDense<FPP,DEVICE>& get_data()const{return data;}
-          void get_facts(Faust::Transform<FPP,DEVICE> & faust_fact) const;
+		  void get_facts(Faust::Transform<FPP,DEVICE> & faust_fact) const;
 
 
               /*!
@@ -151,7 +151,7 @@ namespace Faust
           Faust::StoppingCriterion<FPP2> stop_crit;
 
 
-       private:
+       protected:
           // modif AL AL
           Faust::MatDense<FPP,DEVICE> data;
 
