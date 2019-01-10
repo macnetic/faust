@@ -174,6 +174,14 @@ void Faust::MatDense<FPP,Cpu>::setEyes()
 	isZeros = false;
 }
 
+template<typename FPP>
+Faust::MatDense<FPP,Cpu> Faust::MatDense<FPP,Cpu>::eye(faust_unsigned_int nrows, faust_unsigned_int ncols)
+{
+	Faust::MatDense<FPP,Cpu> mat(nrows, ncols);
+	mat.setEyes();
+	return mat;
+}
+
 // EGALITE //
 template<typename FPP>
 bool Faust::MatDense<FPP,Cpu>::isEqual(const Faust::MatDense<FPP,Cpu> & B) const

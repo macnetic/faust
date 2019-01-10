@@ -276,6 +276,10 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! \brief Set the matrix to the one diagonal matrix
         void setEyes();
 
+		//! \brief Returns the identity matrix.
+		static Faust::MatDense<FPP,Cpu> eye(faust_unsigned_int nrows, faust_unsigned_int ncols);
+
+
         //! \brief Access to the ith coefficient of the matrix pointer, Colmajor format and zero indexing
         //! \param i : position
         //! \return : ith coefficient of the matrix
