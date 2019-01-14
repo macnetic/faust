@@ -1,9 +1,9 @@
+#include <cstring>
 
 	template <typename FPP, Device DEVICE, typename FPP2>
 Palm4MSAFFT<FPP,DEVICE,FPP2>::Palm4MSAFFT(const ParamsPalmFFT<FPP, DEVICE, FPP2>& params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(params, blasHandle, isGlobal), D(params.init_D)
 {
-	//TODO: manage init_D ?
-
+	//TODO: is there something to check additionally to what parent's ctor checks ?
 }
 
 
@@ -157,5 +157,63 @@ template <typename FPP, Device DEVICE, typename FPP2>
 void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_lambda()
 {
 	//TODO: override parent's method
+	// Xhat = (S[0]*...*S[nfact-1])*D*(S[0]*...*S[nfact-1])'
+	// Xhat = LorR*D*LorR' //  LorR equals the prod of all factors after their update iterations (in loop of next_step())
+	MatDense<FPP,Cpu> tmp;
+	// tmp = D*LorR'
+	gemm(this->D, this->LorR, tmp, (FPP) 1.0, (FPP) 0.0, 'N', 'T', this->blas_handle);
+	// LorR = LorR*tmp
+	gemm(this->LorR, tmp, D_grad_over_c, (FPP) 1.0, (FPP) 0.0, 'N', 'N', this->blas_handle);
+	tmp = this->LorR;
+	this->LorR = D_grad_over_c;
+	//NOTE: D_grad_over_c has nothing to do here but is equal to LorR*D*LorR*D'
+	//		this product is thus not re-computed in compute_D_grad_over_c()
+	//TODO: avoid all these copies
+	// at this stage we can rely on parent function to compute lambda
 	Palm4MSA<FPP,DEVICE,FPP2>::compute_lambda();
+	// reset LorR at the factor product to continue next iterations
+	this->LorR = tmp;
+	//then we finish the lambda computation with a sqrt() (Fro. norm)
+	this->m_lambda = std::sqrt(this->m_lambda);
+	// (that's an additional operation in Palm4MSAFFT)
 }
+
+template <typename FPP, Device DEVICE, typename FPP2>
+void Palm4MSAFFT<FPP,DEVICE,FPP2>::next_step()
+{
+	Palm4MSA<FPP, Cpu, FPP2>::next_step();
+	// besides to what the parent has done
+	// we need to update D
+	this->compute_D();
+}
+
+template <typename FPP, Device DEVICE, typename FPP2>
+void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_D()
+{
+	// besides to what the parent has done
+	// we need to update D
+	compute_D_grad_over_c();
+	D_grad_over_c.scalarMultiply(this->m_lambda/this->c);
+	D -= D_grad_over_c;
+	//TODO: optimize MatSparse + no-copy (Eigen::DiagonalMatrix ?)
+	FPP * data = new FPP[D.getNbRow()*D.getNbCol()];
+	memset(data, 0, sizeof(FPP)*D.getNbRow()*D.getNbCol());
+	for(faust_unsigned_int i = 0; i < D.getNbCol();i++)
+		data[i*D.getNbCol()+i] = D[i*D.getNbCol()+i];
+	D = MatDense<FPP,Cpu>(data, D.getNbRow(), D.getNbCol());
+}
+
+template <typename FPP, Device DEVICE, typename FPP2>
+void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
+{
+	// grad = 0.5*LorR'*(LorR*D*LorR' - X)*LorR
+	MatDense<FPP, Cpu> tmp;
+	//compute_lambda has already compute D_grad_over_c = LorR*D*LorR'
+	D_grad_over_c -= this->data;
+	//TODO: opt. by determining best order of product
+	// tmp = LorR'*(LorR*D*LorR' - X)
+	gemm(this->LorR, D_grad_over_c, tmp, (FPP) 1., (FPP) 0., 'T', 'N', this->blas_handle);
+	// D_grad_over_c = LorR'*(LorR*D*LorR' - X)*LorR
+	gemm(tmp, this->LorR, D_grad_over_c, (FPP) 1., (FPP) 0., 'N', 'N', this->blas_handle);
+}
+

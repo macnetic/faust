@@ -60,13 +60,21 @@ typedef @TEST_FPP2@ FPP2;
  */
 int main()
 {
-	Faust::MatDense<FPP,Cpu> data, initFacts1, initFacts2;
+	Faust::MatDense<FPP,Cpu> data, orig_data;
+
+	//TODO: this test is just a sketch to verify WIP and is to re-define properly later
 
 	char configPalm2Filename[] = "@FAUST_DATA_MAT_DIR@/config_compared_palm2.mat";
 
-	init_faust_mat_from_matio(data, configPalm2Filename, "data");
-	init_faust_mat_from_matio(initFacts1, configPalm2Filename, "init_facts1");
-	init_faust_mat_from_matio(initFacts2, configPalm2Filename, "init_facts2");
+	init_faust_mat_from_matio(orig_data, configPalm2Filename, "data");
+	// we only used a 32x32 part of the data from .mat file because in Palm4MSAFFT
+	// we work on square matrix (FFT)
+	data = Faust::MatDense<FPP,Cpu>(orig_data.getData(), 32,32);
+	data.scalarMultiply((FPP).2);
+	Faust::MatDense<FPP, Cpu> initFacts1(data.getNbRow(), data.getNbCol());
+	Faust::MatDense<FPP, Cpu> initFacts2(data.getNbRow(), data.getNbCol());
+	initFacts1.setEyes();
+	initFacts2.setEyes();
 
 	int cons1Name, cons1Parameter, cons1Row, cons1Col;
 	int cons2Name, cons2Row, cons2Col;
@@ -77,14 +85,13 @@ int main()
 
 	cons1Name = init_int_from_matio(configPalm2Filename, "cons1_name");
 	cons1Parameter = init_int_from_matio(configPalm2Filename, "cons1_parameter");
-	cons1Row = init_int_from_matio(configPalm2Filename, "cons1_row");
-	cons1Col = init_int_from_matio(configPalm2Filename, "cons1_col");
+	cons1Row = initFacts1.getNbRow();
+	cons1Col = initFacts1.getNbCol();
 
 	cons2Name = init_int_from_matio(configPalm2Filename, "cons2_name");
 	cons2Parameter = (FPP2) init_double_from_matio(configPalm2Filename, "cons2_parameter");
-	cons2Row = init_int_from_matio(configPalm2Filename, "cons2_row");
-	cons2Col = init_int_from_matio(configPalm2Filename, "cons2_col");
-
+	cons2Row = initFacts2.getNbRow();
+	cons2Col = initFacts2.getNbCol();
 
 	initLambda = (FPP) init_double_from_matio(configPalm2Filename, "init_lambda");
 	nfacts = init_int_from_matio(configPalm2Filename, "nfacts");
@@ -95,7 +102,8 @@ int main()
 
 	// Creation du vecteur de contrainte
 	const Faust::ConstraintInt<FPP,Cpu> cons1(static_cast<faust_constraint_name>(cons1Name), cons1Parameter, cons1Row, cons1Col);
-	const Faust::ConstraintFPP<FPP,Cpu,FPP2> cons2(static_cast<faust_constraint_name>(cons2Name), cons2Parameter, cons2Row, cons2Col);
+
+			const Faust::ConstraintFPP<FPP,Cpu,FPP2> cons2(static_cast<faust_constraint_name>(cons2Name), cons2Parameter, cons2Row, cons2Col);
 
 	vector<const Faust::ConstraintGeneric*> cons;
 	cons.push_back(&cons1);
@@ -117,8 +125,6 @@ int main()
 
 	Faust::Palm4MSAFFT<FPP,Cpu,FPP2> palm2(params,blasHandle,true);
 
-//	Faust::MatDense<FPP,Cpu> eye = Faust::MatDense<FPP,Cpu>::eye(10,10);
-//	eye.Display();
 
 
 //	palm2.next_step();

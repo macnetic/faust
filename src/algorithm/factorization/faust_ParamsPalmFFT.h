@@ -24,7 +24,7 @@ namespace Faust
 					const bool isUpdateWayR2L_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultUpdateWayR2L ,
 					const FPP init_lambda_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultLambda,
 					const bool constant_step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultConstantStepSize,
-					const FPP step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize) : ParamsPalm<FPP, DEVICE, FPP2>(data_, nbFact_, cons_, init_fact_, stop_crit_, isVerbose_, isUpdateWayR2L_, init_lambda_, constant_step_size_, step_size_), init_D(MatDense<FPP,DEVICE>::eye(data_.getNbRow(), data_.getNbCol())) {}
+					const FPP step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize) : ParamsPalm<FPP, DEVICE, FPP2>(data_, nbFact_, cons_, init_fact_, stop_crit_, isVerbose_, isUpdateWayR2L_, init_lambda_, constant_step_size_, step_size_), init_D(MatDense<FPP,DEVICE>::eye(data_.getNbCol(), data_.getNbCol())) {}
 
 			ParamsPalmFFT() : ParamsPalm<FPP,DEVICE,FPP2>(), init_D(0,0) {}
 

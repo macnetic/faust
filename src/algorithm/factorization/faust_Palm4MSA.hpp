@@ -375,8 +375,8 @@ t_local_compute_grad_over_c.stop();
 template<typename FPP, Device DEVICE, typename FPP2>
 void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_xt_xhat(Faust::MatDense<FPP,DEVICE>& Xt_Xhat)
 {
-	//TODO: replace by two functions to point to to avoid the comprison at each iteration
-	//TODO: replate compute_xt_xhat by a function pointer
+	//TODO: replace by two functions to point to, to avoid the comparison at each iteration
+	//TODO: replace compute_xt_xhat by a function pointer
 	if(typeid(FPP) == typeid(complex<double>) || typeid(FPP) == typeid(complex<float>)){
 		MatDense<FPP,DEVICE> data_cpy = data;
 		data_cpy.conjugate(false);
@@ -390,8 +390,8 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_xt_xhat(Faust::MatDense<FPP,DEVIC
 
 template<typename FPP, Device DEVICE, typename FPP2>
 void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_xhatt_xhat(Faust::MatDense<FPP,DEVICE>& Xhatt_Xhat) {
-	//TODO: replace by two functions to point to to avoid the comprison at each iteration
-	//TODO: replate compute_xhatt_xhat by a function pointer
+	//TODO: replace by two functions to point to, to avoid the comparison at each iteration
+	//TODO: replace compute_xhatt_xhat by a function pointer
 	if(typeid(FPP) == typeid(complex<double>) || typeid(FPP) == typeid(complex<float>)){
 		Faust::MatDense<FPP,DEVICE> tmp_LoR = LorR;
 		tmp_LoR.conjugate(false);
@@ -675,10 +675,10 @@ t_local_next_step.start();
 
     int* ind_ptr = new int[m_nbFact];
     for (int j=0 ; j<m_nbFact ; j++)
-    if (!isUpdateWayR2L)
-        ind_ptr[j] = j;
-    else
-        ind_ptr[j] = m_nbFact-1-j;
+		if (!isUpdateWayR2L)
+			ind_ptr[j] = j;
+		else
+			ind_ptr[j] = m_nbFact-1-j;
 
     for (int j=0 ; j<m_nbFact ; j++)
     {
