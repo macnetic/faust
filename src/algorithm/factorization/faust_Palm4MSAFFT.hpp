@@ -47,7 +47,6 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 
 	int idx = distance(complexity.begin(), min_element(complexity.begin(), complexity.end()));
 
-
 	this->error = this->data;
 	Faust::MatDense<FPP,DEVICE> tmp1,tmp2,tmp3;
 
@@ -215,5 +214,11 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
 	gemm(this->LorR, D_grad_over_c, tmp, (FPP) 1., (FPP) 0., 'T', 'N', this->blas_handle);
 	// D_grad_over_c = LorR'*(LorR*D*LorR' - X)*LorR
 	gemm(tmp, this->LorR, D_grad_over_c, (FPP) 1., (FPP) 0., 'N', 'N', this->blas_handle);
+}
+
+template <typename FPP, Device DEVICE, typename FPP2>
+const MatDense<FPP, DEVICE>& Palm4MSAFFT<FPP,DEVICE,FPP2>::get_D()
+{
+	return this->D;
 }
 

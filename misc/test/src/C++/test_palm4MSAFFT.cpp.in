@@ -60,66 +60,74 @@ typedef @TEST_FPP2@ FPP2;
  */
 int main()
 {
-	Faust::MatDense<FPP,Cpu> data, orig_data;
+	Faust::MatDense<FPP,Cpu> data, init_facts1, init_facts2, init_D;
 
-	//TODO: this test is just a sketch to verify WIP and is to re-define properly later
 
-	char configPalm2Filename[] = "@FAUST_DATA_MAT_DIR@/config_compared_palm2.mat";
+	string input_path = "@FAUST_DATA_MAT_DIR@/ref_test_PALM4SMA_FFT2.mat";
 
-	init_faust_mat_from_matio(orig_data, configPalm2Filename, "data");
-	// we only used a 32x32 part of the data from .mat file because in Palm4MSAFFT
-	// we work on square matrix (FFT)
-	data = Faust::MatDense<FPP,Cpu>(orig_data.getData(), 32,32);
-	data.scalarMultiply((FPP).2);
-	Faust::MatDense<FPP, Cpu> initFacts1(data.getNbRow(), data.getNbCol());
-	Faust::MatDense<FPP, Cpu> initFacts2(data.getNbRow(), data.getNbCol());
-	initFacts1.setEyes();
-	initFacts2.setEyes();
+	const char *configPalm2Filename = input_path.c_str();
+	cout << input_path << endl;
+
+	// data is a Laplacian (symmetric matrix)
+	init_faust_mat_from_matio(data, configPalm2Filename, "data");
+
+	init_faust_mat_from_matio(init_facts1, configPalm2Filename, "p_init_facts1");
+	init_faust_mat_from_matio(init_facts2, configPalm2Filename, "p_init_facts2");
+	// init_D is the starting point for D (not the identity matrix)
+	init_faust_mat_from_matio(init_D, configPalm2Filename, "p_init_D");
 
 	int cons1Name, cons1Parameter, cons1Row, cons1Col;
-	int cons2Name, cons2Row, cons2Col;
-	FPP2 cons2Parameter;
+	int cons2Name, cons2Row, cons2Col, cons2Parameter;
 	int nfacts, niter;
 	bool updateWay, verbose;
-	FPP initLambda;
+	FPP initLambda, step_size;
 
-	cons1Name = init_int_from_matio(configPalm2Filename, "cons1_name");
-	cons1Parameter = init_int_from_matio(configPalm2Filename, "cons1_parameter");
-	cons1Row = initFacts1.getNbRow();
-	cons1Col = initFacts1.getNbCol();
+	cons1Name = init_int_from_matio(configPalm2Filename, "p_cons1_name");
+	cons1Parameter = init_int_from_matio(configPalm2Filename, "p_cons1_val");
+	cons1Row = init_facts1.getNbRow();
+	cons1Col = init_facts1.getNbCol();
 
-	cons2Name = init_int_from_matio(configPalm2Filename, "cons2_name");
-	cons2Parameter = (FPP2) init_double_from_matio(configPalm2Filename, "cons2_parameter");
-	cons2Row = initFacts2.getNbRow();
-	cons2Col = initFacts2.getNbCol();
+	cons2Name = init_int_from_matio(configPalm2Filename, "p_cons2_name");
+	cons2Parameter = (FPP2) init_double_from_matio(configPalm2Filename, "p_cons2_val");
+	cons2Row = init_facts2.getNbRow();
+	cons2Col = init_facts2.getNbCol();
 
-	initLambda = (FPP) init_double_from_matio(configPalm2Filename, "init_lambda");
-	nfacts = init_int_from_matio(configPalm2Filename, "nfacts");
-	niter = init_int_from_matio(configPalm2Filename, "niter");
+	initLambda = (FPP) init_double_from_matio(configPalm2Filename, "p_init_lambda");
+	step_size = (FPP) init_double_from_matio(configPalm2Filename, "p_stepsize");
+	nfacts = init_int_from_matio(configPalm2Filename, "p_nfacts");
+	niter = init_int_from_matio(configPalm2Filename, "p_niter");
 
-	updateWay = init_bool_from_matio(configPalm2Filename, "update_way");
-	verbose = init_bool_from_matio(configPalm2Filename, "verbose");
+	updateWay = init_bool_from_matio(configPalm2Filename, "p_update_way");
+	verbose = init_bool_from_matio(configPalm2Filename, "p_verbose");
 
 	// Creation du vecteur de contrainte
 	const Faust::ConstraintInt<FPP,Cpu> cons1(static_cast<faust_constraint_name>(cons1Name), cons1Parameter, cons1Row, cons1Col);
 
-			const Faust::ConstraintFPP<FPP,Cpu,FPP2> cons2(static_cast<faust_constraint_name>(cons2Name), cons2Parameter, cons2Row, cons2Col);
+	const Faust::ConstraintInt<FPP,Cpu> cons2(static_cast<faust_constraint_name>(cons2Name), cons2Parameter, cons2Row, cons2Col);
 
 	vector<const Faust::ConstraintGeneric*> cons;
 	cons.push_back(&cons1);
 	cons.push_back(&cons2);
 
 
-	// Creation du vecteur de matrice initFact;
 	vector<Faust::MatDense<FPP,Cpu> > initFact;
-	initFact.push_back(initFacts1);
-	initFact.push_back(initFacts2);
+	initFact.push_back(init_facts1);
+	initFact.push_back(init_facts2);
+	// initFact is U (matrix Fourier)
 
-	// Creation du critere d'arret
 	Faust::StoppingCriterion<FPP2> crit(niter);
 
-	Faust::ParamsPalmFFT<FPP,Cpu,FPP2> params(data, nfacts, cons, initFact, crit, verbose, updateWay, initLambda);
+	Faust::ParamsPalmFFT<FPP,Cpu,FPP2> params(data, nfacts, cons, initFact, init_D, crit, verbose, updateWay, initLambda, true, step_size);
 
+#ifdef DEBUG
+	params.Display();
+
+	data.Display();
+	cout << "init_facts1: " << endl;
+	init_facts1.Display();
+	cout << "init_facts2: " << endl;
+	init_facts2.Display();
+#endif
 
 	Faust::BlasHandle<Cpu> blasHandle;
 
@@ -135,13 +143,29 @@ int main()
 
 	Faust::Transform<FPP, Cpu>* t = new Faust::Transform<FPP, Cpu>(full_facts);
 	//relativeError
-	Faust::MatDense<FPP,Cpu> faustProduct;
-	faustProduct=t->get_product();
-	faustProduct-=data;
-	FPP2 relativeError = Faust::fabs(faustProduct.norm()/data.norm());
+
+	cout << "relative difference between init_D and D (must be small but not zero)" << endl;
+	Faust::MatDense<FPP,Cpu> diff_D = init_D;
+	diff_D -= palm2.get_D();
+	cout << diff_D.norm()/init_D.norm() << endl;
+	cout << "res. D.norm(): " <<  palm2.get_D().norm() << endl;
+	cout << "Faust::Transform result approximating U:" << endl;
+	t->Display();
+	cout << "its norm: " <<  t->normFro() << endl;
+	assert(t->get_fact(0)->getNonZeros() == cons1Parameter);
+	assert(t->get_fact(1)->getNonZeros() == cons2Parameter);
+
+	// calc Uhat*D*Uhat' and verify it's not too far from Laplacian
+	Faust::MatDense<FPP,Cpu> mat = t->get_product(), mat2;
+	mat.multiplyRight(palm2.get_D());
+	mat2 = t->get_product();
+	mat2.transpose();
+	mat.multiplyRight(mat2);
+	mat-= data;
+	double relativeError = Faust::fabs(mat.norm()/data.norm());
 
 	std::cout<<std::endl;
-	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST*D*Faust.transpose AND DATA LAPLACIAN MATRIX **************** "<<std::endl;
 	std::cout<< "\t\t" << relativeError<<std::endl<<std::endl;
 
 
