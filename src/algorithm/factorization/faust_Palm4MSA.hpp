@@ -743,7 +743,7 @@ t_local_init_fact_from_palm.start();
 
     if(!isConstraintSet)
     {
-        handleError(m_className,"init_fact_from_palm : constrainst must be set before calling init_fact_from_palm");
+        handleError(m_className,"init_fact_from_palm : constraints must be set before calling init_fact_from_palm");
     }
 
     if(isFactSideLeft)

@@ -1,5 +1,6 @@
 #include "faust_ParamsPalmFFT.h"
 #include "faust_Palm4MSA.h"
+#include "faust_ParamsFFT.h"
 
 #ifndef __FAUST_PALM4MSA_FFT_H__
 #define __FAUST_PALM4MSA_FFT_H__
@@ -12,10 +13,11 @@ namespace Faust {
 		class Palm4MSAFFT : public Palm4MSA<FPP, DEVICE, FPP2>
 	{
 		MatDense<FPP, DEVICE> D; //TODO: later it will need to be Sparse (which needs to add a prototype overload for multiplication in faust_linear_algebra.h)
-		Faust::MatDense<FPP,DEVICE> D_grad_over_c; //TODO: move to sparse mat later
+		MatDense<FPP,DEVICE> D_grad_over_c; //TODO: move to sparse mat later
 		public:
 			//TODO: another ctor (like in Palm4MSA) for hierarchical algo. use
 			Palm4MSAFFT(const ParamsPalmFFT<FPP, DEVICE, FPP2>& params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal=false);
+			Palm4MSAFFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal);
 			virtual void next_step();
 			const MatDense<FPP, DEVICE>& get_D();
 		private:

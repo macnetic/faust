@@ -6,6 +6,11 @@ Palm4MSAFFT<FPP,DEVICE,FPP2>::Palm4MSAFFT(const ParamsPalmFFT<FPP, DEVICE, FPP2>
 	//TODO: is there something to check additionally to what parent's ctor checks ?
 }
 
+template<typename FPP,Device DEVICE,typename FPP2>
+Palm4MSAFFT<FPP,DEVICE,FPP2>::Palm4MSAFFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(Lap, params, blasHandle, isGlobal), D(params.init_D)
+{
+
+}
 
 template <typename FPP, Device DEVICE, typename FPP2>
 void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_grad_over_c()

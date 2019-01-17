@@ -81,7 +81,7 @@ Faust::HierarchicalFact<FPP,DEVICE,FPP2>::HierarchicalFact(const Faust::MatDense
 {
 	   // check if the params and M are compatible
    if ((M.getNbRow() != params_.m_nbRow) |  (M.getNbCol() != params_.m_nbCol))
-		handleError(m_className,"constructor : params and matrix haven't compatible size"); 
+		handleError(m_className,"constructor : params and matrix haven't compatible size");
 }
 
 
@@ -251,9 +251,9 @@ void Faust::HierarchicalFact<FPP,DEVICE,FPP2>::get_facts(std::vector<Faust::MatS
    const std::vector<Faust::MatDense<FPP,DEVICE> >& full_facts = palm_global.get_facts();
    sparse_facts.resize(full_facts.size());
    for (int i=0 ; i<sparse_facts.size() ; i++)
-{
-      sparse_facts[i].init(full_facts[i],cusparse_handle);
-}
+   {
+	   sparse_facts[i].init(full_facts[i],cusparse_handle);
+   }
 }
 
 
@@ -269,7 +269,7 @@ void Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts()
   init();
   for (int i=0 ; i<=nbFact-1 ; i++)
   {
-     cout << "Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorisation "<<i+1<<"/"<<nbFact <<endl;
+     cout << "Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization "<<i+1<<"/"<<nbFact <<endl;
      next_step();
   }
 

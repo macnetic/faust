@@ -136,8 +136,8 @@ namespace Faust
             const bool constant_step_size_ = defaultConstantStepSize,
             const FPP step_size_ = defaultStepSize);
 
-        void init_from_file(const char* filename);
         Params();
+        void init_from_file(const char* filename);
 
         void check_constraint_validity();
         void check_bool_validity();
