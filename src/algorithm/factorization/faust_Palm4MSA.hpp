@@ -99,7 +99,10 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,
     isGlobal(isGlobal_),
     isInit(false),
     c(FPP(1)/params_.step_size),
-    blas_handle(blasHandle)
+    blas_handle(blasHandle),
+	is_complex(typeid(data.getData()[0]) == typeid(complex<float>) || typeid(data.getData()[0]) == typeid(complex<double>)
+),
+	TorH(is_complex?'H':'T')
 {
    RorL.reserve(params_.m_nbFact);
 
@@ -136,7 +139,10 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FP
    isConstraintSet(false),
    isGlobal(isGlobal_),
    c(FPP(1)/params_palm_.step_size),
-   blas_handle(blasHandle)
+   blas_handle(blasHandle),
+	is_complex(typeid(data.getData()[0]) == typeid(complex<float>) || typeid(data.getData()[0]) == typeid(complex<double>)
+),
+	TorH(is_complex?'H':'T')
 {
    RorL.reserve(const_vec.size()+1);
 
@@ -327,16 +333,16 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       if (!isUpdateWayR2L)
       {
          // tmp3 = m_lambda*L'*error (= m_lambda*L' * (m_lambda*L*S*R - data) )
-         gemm(LorR, error, tmp3, m_lambda,(FPP) 0.0, 'T', 'N', blas_handle);
+         gemm(LorR, error, tmp3, m_lambda,(FPP) 0.0, TorH, 'N', blas_handle);
          // grad_over_c = 1/c*tmp3*R' (= 1/c*m_lambda*L' * (m_lambda*L*S*R - data) * R' )
-         gemm(tmp3, RorL[m_indFact], grad_over_c,(FPP) 1.0/c,(FPP) 0.0,'N','T', blas_handle);
+         gemm(tmp3, RorL[m_indFact], grad_over_c,(FPP) 1.0/c,(FPP) 0.0,'N',TorH, blas_handle);
       }
       else
       {
          // tmp3 = m_lambda*L'*error (= m_lambda*L' * (m_lambda*L*S*R - data) )
-         gemm(RorL[m_indFact], error, tmp3, m_lambda, (FPP) 0.0, 'T', 'N', blas_handle);
+         gemm(RorL[m_indFact], error, tmp3, m_lambda, (FPP) 0.0, TorH, 'N', blas_handle);
          // grad_over_c = 1/c*tmp3*R' (= 1/c*m_lambda*L' * (m_lambda*L*S*R - data) * R' )
-         gemm(tmp3, LorR, grad_over_c, (FPP) 1.0/c, (FPP) (FPP) 0.0,'N','T', blas_handle);
+         gemm(tmp3, LorR, grad_over_c, (FPP) 1.0/c, (FPP) (FPP) 0.0,'N',TorH, blas_handle);
       }
    }
    else // computing error*R' first, then L'*(error*R')
@@ -344,26 +350,20 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       if (!isUpdateWayR2L)
       {
          // tmp3 = m_lambda*error*R' (= m_lambda*(m_lambda*L*S*R - data) * R' )
-         gemm(error, RorL[m_indFact], tmp3, m_lambda, (FPP) 0.0, 'N', 'T', blas_handle);
+         gemm(error, RorL[m_indFact], tmp3, m_lambda, (FPP) 0.0, 'N', TorH, blas_handle);
          // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * m_lambda*(m_lambda*L*S*R - data) * R' )
-         gemm(LorR, tmp3, grad_over_c,(FPP) 1.0/c, (FPP) 0.0,'T','N', blas_handle);
+         gemm(LorR, tmp3, grad_over_c,(FPP) 1.0/c, (FPP) 0.0,TorH,'N', blas_handle);
       }
       else
       {
          // tmp3 = m_lambda*error*R' (= m_lambda * (m_lambda*L*S*R - data) * R' )
-         gemm(error, LorR, tmp3, m_lambda, (FPP) 0.0, 'N', 'T', blas_handle);
+         gemm(error, LorR, tmp3, m_lambda, (FPP) 0.0, 'N', TorH, blas_handle);
          // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * m_lambda*(m_lambda*L*S*R - data) * R' )
-         gemm(RorL[m_indFact], tmp3, grad_over_c, (FPP) 1.0/c, (FPP) 0.0,'T','N', blas_handle);
+         gemm(RorL[m_indFact], tmp3, grad_over_c, (FPP) 1.0/c, (FPP) 0.0,TorH,'N', blas_handle);
       }
 
     }
 
-   //TODO: avoid type checking by adding another template function (for complex and real types) or function pointer
-   if(typeid(data.getData()[0]) == typeid(complex<float>) || typeid(data.getData()[0]) == typeid(complex<double>))
-   {
-	   LorR.conjugate();
-	   RorL[m_indFact].conjugate();
-   }
     isGradComputed = true;
 
 #ifdef __COMPILE_TIMERS__
@@ -371,39 +371,6 @@ t_global_compute_grad_over_c.stop();
 t_local_compute_grad_over_c.stop();
 #endif
 }
-
-template<typename FPP, Device DEVICE, typename FPP2>
-void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_xt_xhat(Faust::MatDense<FPP,DEVICE>& Xt_Xhat)
-{
-	//TODO: replace by two functions to point to, to avoid the comparison at each iteration
-	//TODO: replace compute_xt_xhat by a function pointer
-	if(typeid(FPP) == typeid(complex<double>) || typeid(FPP) == typeid(complex<float>)){
-		MatDense<FPP,DEVICE> data_cpy = data;
-		data_cpy.conjugate(false);
-		gemm(data_cpy, LorR, Xt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N', blas_handle);
-		Xt_Xhat.real();
-	}
-	else {
-		gemm(data, LorR, Xt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N', blas_handle);
-	}
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_xhatt_xhat(Faust::MatDense<FPP,DEVICE>& Xhatt_Xhat) {
-	//TODO: replace by two functions to point to, to avoid the comparison at each iteration
-	//TODO: replace compute_xhatt_xhat by a function pointer
-	if(typeid(FPP) == typeid(complex<double>) || typeid(FPP) == typeid(complex<float>)){
-		Faust::MatDense<FPP,DEVICE> tmp_LoR = LorR;
-		tmp_LoR.conjugate(false);
-		gemm(tmp_LoR, LorR, Xhatt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N',blas_handle);
-		//   gemm(LorR, LorR, Xhatt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N',blas_handle);
-		Xhatt_Xhat.real();
-	}
-	else {
-		gemm(LorR, LorR, Xhatt_Xhat, (FPP) 1.0, (FPP) 0.0, 'T','N',blas_handle);
-	}
-}
-
 
 template<typename FPP,Device DEVICE,typename FPP2>
 void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_lambda()
@@ -421,10 +388,10 @@ t_local_compute_lambda.start();
    // As LorR has also been updated at the end of the last iteration over the facts, LorR matches X_hat, which the product of all factors, including the last one.
    // Xt_Xhat = data'*X_hat
    Faust::MatDense<FPP,DEVICE> Xt_Xhat;
-   this->compute_xt_xhat(Xt_Xhat);
+   gemm(data, LorR, Xt_Xhat, (FPP) 1.0, (FPP) 0.0, TorH,'N', blas_handle);
    // Xhatt_Xhat = X_hat'*X_hat
    Faust::MatDense<FPP,DEVICE> Xhatt_Xhat;
-   this->compute_xhatt_xhat(Xhatt_Xhat);
+   gemm(LorR, LorR, Xhatt_Xhat, (FPP) 1.0, (FPP) 0.0, TorH,'N',blas_handle);
 
    FPP Xhatt_Xhat_tr = (FPP) Xhatt_Xhat.trace();
 

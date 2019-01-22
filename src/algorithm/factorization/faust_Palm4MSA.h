@@ -132,8 +132,6 @@ namespace Faust
          */
 		  void init_fact_from_palm(const Palm4MSA& palm, bool isFactSideLeft);
 		  const std::vector<Faust::MatDense<FPP,DEVICE> >& get_facts()const {return S;}
-		  void compute_xt_xhat(MatDense<FPP,DEVICE>& Xt_Xhat);
-		  void compute_xhatt_xhat(MatDense<FPP,DEVICE>& Xt_Xhat);
 		  ~Palm4MSA(){}
 
        protected:
@@ -189,8 +187,10 @@ namespace Faust
           FPP c;
           Faust::MatDense<FPP,DEVICE> error; // error = lambda*L*S*R - data
           Faust::BlasHandle<DEVICE> blas_handle;
-
-
+		  /** is_complex == true if the algorithm is running on a complex matrix (to approximate) */
+		  bool is_complex;
+		  /** TorH == 'T' if this->is_complex == false otherwise it's 'H'. T designates the transposition and H the hermitian matrix, it intervenes in Palm4MSA algorithms for the computation of the gradient and lambda so that the algo. uses the hermitian when working on complex matrices (i.e. the matrix to approx. is complex) */
+		  const char TorH;
 
 
 
