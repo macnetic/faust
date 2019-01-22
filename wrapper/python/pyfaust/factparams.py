@@ -109,7 +109,7 @@ class ConstraintGeneric(ABC):
             Returns:
                 The proximal operator result as a numpy array.
         """
-        if(isinstance(M, np.ndarray)):
+        if(not isinstance(M, np.ndarray)):
            raise TypeError("M must be a numpy array.")
         if(M.shape[0] != self._num_rows or M.shape[1] != self._num_cols):
             raise ValueError("The dimensions must agree.")
@@ -164,7 +164,7 @@ class ConstraintInt(ConstraintGeneric):
         """
             <b/> See: ConstraintGeneric.project
         """
-        super(ConstraintGeneric, self).project(M)
+        super(ConstraintInt, self).project(M)
         return FaustCorePy.ConstraintIntCore.project(M, self._name.name, self._num_rows,
                                               self._num_cols, self._cons_value)
 
@@ -226,7 +226,7 @@ class ConstraintMat(ConstraintGeneric):
         """
             <b/> See: ConstraintGeneric.project
         """
-        super(ConstraintGeneric, self).project(M)
+        super(ConstraintMat, self).project(M)
         return FaustCorePy.ConstraintMatCore.project(M, self._name.name, self._num_rows,
                                               self._num_cols, self._cons_value)
 
@@ -280,7 +280,7 @@ class ConstraintReal(ConstraintGeneric):
         """
         <b/> See: ConstraintGeneric.project
         """
-        super(ConstraintGeneric, self).project(M)
+        super(ConstraintReal, self).project(M)
         return FaustCorePy.ConstraintRealCore.project(M, self._name.name, self._num_rows,
                                               self._num_cols, self._cons_value)
 
@@ -545,7 +545,8 @@ class ParamsHierarchicalFactSquareMat(ParamsHierarchicalFact):
     def __init__(self, n):
         d = 2**int(n)
         stop_crit = StoppingCriterion(num_its=30)
-        super(ParamsHierarchicalFactSquareMat, self).__init__([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
+        super(ParamsHierarchicalFactSquareMat,
+              self).__init__([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
                                         for i in range(0,n-1)],
                                         [ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,int(d/2.**(i+1)))
                                          for i in range(0,n-1)],

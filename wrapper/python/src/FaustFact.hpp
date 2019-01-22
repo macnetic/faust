@@ -91,6 +91,8 @@ void prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, uns
         case CONSTRAINT_NAME_SP_POS:/**< fixed number of non zeros coefficients: INT (frobenius norm 1) */
             Faust::prox_sp_pos(fmat, (faust_unsigned_int) cons_param);
             break;
+        case CONSTRAINT_NAME_SP:
+            Faust::prox_sp(fmat, (faust_unsigned_int) cons_param);            break;
         default:
             throw invalid_argument("PyxConstraintInt::project() inconsistent constraint name");
     }
