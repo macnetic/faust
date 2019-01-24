@@ -1,4 +1,4 @@
-/****************************************************************************/
+/****************************************************************************//*{{{*/
 /*                              Description:                                */
 /*  For more information on the FAuST Project, please visit the website     */
 /*  of the project : <http://faust.inria.fr>                         */
@@ -36,7 +36,7 @@
 /*  approximations of matrices and applications", Journal of Selected       */
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
-/****************************************************************************/
+/****************************************************************************//*}}}*/
 #include "faust_MatDense.h"
 #include "faust_Params.h"
 #include "faust_ParamsPalm.h"
@@ -55,15 +55,30 @@
 using namespace std;
 typedef @TEST_FPP@ FPP;
 typedef @TEST_FPP2@ FPP2;
+
+
+void create_matrix(Faust::MatDense<complex<FPP2>,Cpu>& data, Faust::MatDense<complex<FPP2>,Cpu>& idata)
+{
+	idata = data;
+	idata.scalarMultiply(complex<FPP2>(0,1));
+	data += idata;
+}
+
+void create_matrix(Faust::MatDense<FPP2,Cpu>& data, Faust::MatDense<FPP2,Cpu>& idata)
+{
+	//nothing todo
+}
+
 /** \brief Run a test of Faust::Palm4MSA
  */
 int main()
 {
-	Faust::MatDense<FPP,Cpu> data, initFacts1, initFacts2;
+	Faust::MatDense<FPP,Cpu> data, idata, initFacts1, initFacts2;
 
 	char configPalm2Filename[] = "@FAUST_DATA_MAT_DIR@/config_compared_palm2.mat";
 
 	init_faust_mat_from_matio(data, configPalm2Filename, "data");
+	create_matrix(data, idata);
 	init_faust_mat_from_matio(initFacts1, configPalm2Filename, "init_facts1");
 	init_faust_mat_from_matio(initFacts2, configPalm2Filename, "init_facts2");
 
@@ -110,8 +125,6 @@ int main()
 	Faust::StoppingCriterion<FPP2> crit(niter);
 
 	Faust::ParamsPalm<FPP,Cpu,FPP2> params(data, nfacts, cons, initFact, crit, verbose, updateWay, initLambda);
-
-
 	Faust::BlasHandle<Cpu> blasHandle;
 
 	Faust::Palm4MSA<FPP,Cpu,FPP2> palm2(params,blasHandle,true);

@@ -76,7 +76,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			E = full(F)-M;
 			disp('err: ')
 			norm(E,'fro')/norm(M,'fro')
-			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.9094, 'AbsTol', 0.0001)
+			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.29177, 'AbsTol', 0.0001)
 		end
 
 		function test_fact_hierarchical(this)
@@ -155,7 +155,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			norm(E,'fro')/norm(M,'fro')
 			% matrix to factorize and reference relative error come from
 			% misc/test/src/C++/hierarchicalFactorization.cpp
-			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.99275, 'AbsTol', 0.00001)
+			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 1.0063, 'AbsTol', 0.0001)
 		end
 
 		function testHadamard(this)

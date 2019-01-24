@@ -7,6 +7,7 @@ import sys
 import numpy as np
 from scipy.io import savemat,loadmat
 from numpy.linalg import norm
+from pyfaust import Faust
 import math
 
 class TestFaustPy(unittest.TestCase):
@@ -832,7 +833,7 @@ class TestFaustFactory(unittest.TestCase):
         print("err: ", norm(E,"fro")/norm(M,"fro"))
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorization.cpp
-        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.99275, places=4)
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 1.0063, places=4)
 
     def testFactPalm4MSACplx(self):
         print("Test FaustFactory.fact_palm4msaCplx()")
@@ -868,7 +869,7 @@ class TestFaustFactory(unittest.TestCase):
         print("err: ", norm(E,"fro")/norm(M,"fro"))
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/test_palm4MSA.cpp
-        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.9094, places=4)
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.29177, places=4)
 
     def testHadamard(self):
         print("Test FaustFactory.wht()")
@@ -897,7 +898,6 @@ if __name__ == "__main__":
         # (to find pyfaust module)
         sys.path.append(sys.argv[1])
         del sys.argv[1] # deleted to avoid interfering with unittest
-    from pyfaust import Faust
     if(len(sys.argv) > 1):
         #ENOTE: test only a single test if name passed on command line
         singleton = unittest.TestSuite()
