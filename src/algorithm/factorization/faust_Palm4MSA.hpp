@@ -530,7 +530,6 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_c()
 	t_local_compute_c.start();
 #endif
 
-
    if (!isConstantStepSize)
    {
 		faust_int flag1,flag2;

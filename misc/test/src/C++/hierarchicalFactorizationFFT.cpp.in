@@ -14,44 +14,48 @@
 #include <iostream>
 #include <iomanip>
 
+using namespace Faust;
+
 typedef @TEST_FPP@ FPP;
 typedef @TEST_FPP2@ FPP2;
+void doit(HierarchicalFact<FPP,Cpu,FPP2>* hierfact, int argc, FPP expectedLambda, FPP2 epsilon, Faust::MatDense<FPP, Cpu> & U, Faust::MatDense<FPP, Cpu> & Lap, vector<Faust::MatDense<FPP,Cpu>>& ref_facts);
 
 int main(int argc, char* argv[])
 {
+	vector<Faust::MatDense<FPP,Cpu>> ref_facts;
+
 	if (typeid(FPP) == typeid(double))
-  	{
+	{
 		cout<<"floating point precision == double"<<endl;
-  	}
+	}
 
-  	if (typeid(FPP) == typeid(float))
-  	{
+	if (typeid(FPP) == typeid(float))
+	{
 		cout<<"floating point precision == float"<<endl;
-  	}
+	}
 
-	//TODO: this test is for now totally irelevant, we must get a Laplacian and a Fourier graph matrix to test properly HierarchicalFactFFT	
-	//default value
-	string configFilename = "@FAUST_CONFIG_MAT_DIR@/config_hierarchical_fact.mat";
-	string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_hierarchical_fact.mat";
+	string configFilename = "@FAUST_DATA_MAT_DIR@/HierarchicalFactFFT_test_U_L_params.mat";
+	string U_Filename = configFilename;
+	string Lap_Filename = configFilename;
 
 	if (argc >= 3)
-	{	
-		MatrixFilename = argv[1];
-		configFilename = argv[2];
-		
+	{
+		U_Filename = argv[1];
+		Lap_Filename = argv[2];
+		configFilename = argv[3];
 	}
 
 	FPP expectedLambda = 0;
-	if (argc >= 4)
+	if (argc >= 5)
 		expectedLambda = atof(argv[3]);
 
 
 	FPP2 epsilon = 0.0001;
-	if (argc >= 5)
+	if (argc >= 6)
 		epsilon = atof(argv[4]);
 
 	char transposedMatrix='N';
-	if (argc >= 6)
+	if (argc >= 7)
 		transposedMatrix=argv[5][0];
 
 
@@ -94,7 +98,6 @@ int main(int argc, char* argv[])
 	}
 
 
-
 	// useless for CPU but use for compatibility with GPU
 	Faust::BlasHandle<Cpu> blasHandle;
 	Faust::SpBlasHandle<Cpu> spblasHandle;
@@ -102,34 +105,84 @@ int main(int argc, char* argv[])
 	// parameter setting
 	Faust::ParamsFFT<FPP,Cpu,FPP2> params;
 	init_params_from_matiofile<FPP,Cpu,FPP2>(params,configFilename.c_str(),"params");
+//	params.init_D =  Faust::MatDense<FPP,Cpu>::eye(params.m_nbRow, params.m_nbCol);
+//	init_faust_mat_from_matio(params.init_D,U_Filename.c_str(),"init_D");
+//	cout << "init_lambda before overridding: " << params.init_lambda << endl;
+//	params.init_lambda = 1.0;
+//	params.isConstantStepSize = true;
+	params.isFactSideLeft = false; //false changes the accurracy to a lot better (but it's also very different from the matlab script's results)
+	init_faust_mat_from_matio(params.init_D,configFilename.c_str(),"init_D");
+	params.isVerbose = true;
 
 	params.Display();
 
+	Faust::MatDense<FPP,Cpu> tmp;
+	char mat_names[params.m_nbFact][7];
+	for(int i = 0; i < params.m_nbFact; i++)
+	{
+		sprintf(mat_names[i], "ref_f%d", i+1);
+		printf("%s\n", mat_names[i]); 
+	}
+	for(int i = 0; i < params.m_nbFact; i++)
+	{
+		init_faust_mat_from_matio(tmp, configFilename.c_str(),mat_names[i]);
+		ref_facts.push_back(tmp);
+	}
+
+
+	cout << "norm init_D: " << params.init_D.norm() << endl;
+	cout << "init_D: " << endl; params.init_D.Display();
+
 	// matrix to be factorized
-	Faust::MatDense<FPP,Cpu> matrix;
-	init_faust_mat_from_matio(matrix,MatrixFilename.c_str(),"matrix");
-	
+	Faust::MatDense<FPP,Cpu> U, Lap;
+	init_faust_mat_from_matio(U,U_Filename.c_str(),"U");
+	init_faust_mat_from_matio(Lap, Lap_Filename.c_str(), "Lap");
+
 	// transposed the matrix if needed
 	if (transposedMatrix == 'T')
-		matrix.transpose();
-	
+		U.transpose();
+
 	//algorithm
-	Faust::HierarchicalFactFFT<FPP,Cpu,FPP2> hierFact(matrix,matrix,params,blasHandle,spblasHandle);
+	Faust::HierarchicalFactFFT<FPP,Cpu,FPP2> hierFact(U,Lap,params,blasHandle,spblasHandle);
+	Faust::HierarchicalFact<FPP,Cpu,FPP2> hierFact_(U,params,blasHandle,spblasHandle);
+
+	doit(&hierFact, argc, expectedLambda, epsilon, U, Lap, ref_facts);
+	doit(&hierFact_, argc, expectedLambda, epsilon, U, Lap, ref_facts);
+
+	blasHandle.Destroy();
+	spblasHandle.Destroy();
+
+
+	return 0;
+
+}
+
+void doit(HierarchicalFact<FPP,Cpu,FPP2>* hierFact, int argc, FPP expectedLambda, FPP2 epsilon, Faust::MatDense<FPP, Cpu> & U, Faust::MatDense<FPP, Cpu> & Lap, vector<Faust::MatDense<FPP, Cpu>> & ref_facts)
+{
 	Faust::Timer t1;
 	t1.start();
 
-	hierFact.compute_facts();
+	hierFact->compute_facts();
 
 	t1.stop();
 	#ifdef __COMPILE_TIMERS__
-		hierFact.print_timers();
+		hierFact->print_timers();
 		//hierFact.print_prox_timers();
 	#endif
 	cout <<"total hierarchical fact = "<<t1.get_time()<<endl;
 
+
 	vector<Faust::MatSparse<FPP,Cpu> > facts;
-	hierFact.get_facts(facts);
-	FPP lambda = hierFact.get_lambda();
+	hierFact->get_facts(facts);
+	Faust::MatDense<FPP,Cpu> tmp;
+	for(int i=0; i < ref_facts.size(); i++)
+	{
+		tmp = facts[i];
+		tmp -= ref_facts[i];
+		cout << "relerr fact " << i << ": " << tmp.norm()/ref_facts[i].norm() << endl;
+	}
+
+	FPP lambda = hierFact->get_lambda();
 	if (argc >= 3)
 	{
 		if (Faust::fabs(lambda - expectedLambda) > epsilon)
@@ -140,7 +193,7 @@ int main(int argc, char* argv[])
 		}
 
 	}
-	(facts[0]) *= hierFact.get_lambda();
+	(facts[0]) *= hierFact->get_lambda();
 	// transform the sparse matrix into generic one
 	std::vector<Faust::MatGeneric<FPP,Cpu> *> list_fact_generic;
 	list_fact_generic.resize(facts.size());
@@ -148,78 +201,82 @@ int main(int argc, char* argv[])
 		list_fact_generic[i]=facts[i].Clone();
 
 	Faust::Transform<FPP,Cpu> hierFactCore(list_fact_generic);
-
+	cout << "Uhat Faust: " << endl;
+	hierFactCore.Display();
 	for (int i=0;i<list_fact_generic.size();i++)
 		delete list_fact_generic[i];
-
-	char nomFichier[100];
-	string outputFile="@FAUST_BIN_TEST_OUTPUT_DIR@/hier_fact_factorisation.dat";
-	
-	//WARNING no implemented	
-	// hierFactCore.print_file(outputFile.c_str());
-
-	//write the given factorisation into a mat file
-	stringstream outputFilename;
-	outputFilename<<"@FAUST_BIN_TEST_OUTPUT_DIR@/"<<configFileBodyFile<<"_factorisation.mat";
-	std::cout<<"**************** WRITING FACTORISATION INTO ****************"<<std::endl;
-	std::cout<<"output filename : "<<outputFilename.str();
-	//WARNING no implemented	
-	// hierFactCore.print_file(outputFile.c_str());	
-	// modif NB : v1102 not implemented
-	//write_faust_core_into_matfile(hierFactCore,outputFilename.str().c_str(),"fact");
-
 
 	//relativeError
 	Faust::MatDense<FPP,Cpu> faustProduct;
 	faustProduct=hierFactCore.get_product();
-	faustProduct-=matrix;
-	FPP2 relativeError = Faust::fabs(faustProduct.norm()/matrix.norm());
+	faustProduct-=U;
+	FPP2 relativeError = Faust::fabs(faustProduct.norm()/U.norm());
 
 	std::cout<<std::endl;
-	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND Fourier MATRIX **************** "<<std::endl;
 	std::cout<<"		"<<relativeError<<std::endl<<std::endl;
-
-
-	//time comparison between matrix vector product and faust-vector product
-	int niterTimeComp = 10;
-	if (niterTimeComp > 0)
+	HierarchicalFactFFT<FPP,Cpu,FPP2> *hierFactFFT;
+	if(hierFactFFT = dynamic_cast<HierarchicalFactFFT<FPP,Cpu, FPP2>*>(hierFact))
 	{
+		
+		//relativeError 2
+		Faust::MatDense<FPP,Cpu> lapProduct, lapErr;
+		const Faust::MatDense<FPP,Cpu>& D = hierFactFFT->get_D();
+		lapErr = hierFactCore.get_product();
+		lapProduct = hierFactCore.get_product();
+		lapProduct.transpose();
+		// lapErr = Uhat*D*Uhat'
+		lapErr.multiplyRight(D);
+		lapErr.multiplyRight(lapProduct);
+		cout << "Lap norm: " << Lap.norm() << endl;
+		cout << "norm Uhat*D*Uhat':" << lapErr.norm() << endl;
+		// lapErr = Uhat*D*Uhat'-Lap
+		lapErr-=Lap;
+		FPP2 relativeError2 = Faust::fabs(lapErr.norm()/Lap.norm());
 
-		Faust::Timer tdense;
-		Faust::Timer tfaust;
-		Faust::Vect<FPP,Cpu> x(matrix.getNbCol());
-		Faust::Vect<FPP,Cpu> ydense(matrix.getNbRow());
-		Faust::Vect<FPP,Cpu> yfaust(hierFactCore.getNbRow());
-		for (int i=0;i<niterTimeComp;i++)
-		{
-			//random initilisation of vector x
-	 		for (int j=0;j<x.size();j++)
-			{
-				x[j]=std::rand()*2.0/RAND_MAX-1.0;
-			}
-
-			tdense.start();
-			ydense = matrix * x;
-			tdense.stop();
-
-	 		tfaust.start();
-			yfaust = hierFactCore * x;
-			tfaust.stop();
-
-	 	}
 		std::cout<<std::endl;
+		std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST*D*FAUST' AND Lap MATRIX **************** "<<std::endl;
+		std::cout<<"		"<<relativeError2<<std::endl<<std::endl;
 
-		std::cout<<"**************** TIME COMPARISON MATRIX VECTOR PRODUCT **************** "<<std::endl;
-		std::cout<<"	TIME  SPEED-UP : "<<tdense.get_time()/tfaust.get_time()<<std::endl;
-		std::cout<<"	MEAN TIME dense : "<<tdense.get_time()/((float) niterTimeComp)<<std::endl;
-		std::cout<<"	MEAN TIME faust : "<<tfaust.get_time()/((float) niterTimeComp)<<std::endl;
-		cout<<"lambda="<<std::setprecision(20)<<hierFact.get_lambda()<<endl;
+		cout<< " D info:" << endl;
+		cout << " D fro. norm: " << D.norm() << endl;
+		cout << " D nnz: " << D.getNonZeros() << endl;
+
+		//time comparison between matrix vector product and faust-vector product
+		int niterTimeComp = 10;
+		if (niterTimeComp > 0)
+		{
+
+			Faust::Timer tdense;
+			Faust::Timer tfaust;
+			Faust::Vect<FPP,Cpu> x(U.getNbCol());
+			Faust::Vect<FPP,Cpu> ydense(U.getNbRow());
+			Faust::Vect<FPP,Cpu> yfaust(hierFactCore.getNbRow());
+			for (int i=0;i<niterTimeComp;i++)
+			{
+				//random initilisation of vector x
+				for (int j=0;j<x.size();j++)
+				{
+					x[j]=std::rand()*2.0/RAND_MAX-1.0;
+				}
+
+				tdense.start();
+				ydense = U * x;
+				tdense.stop();
+
+				tfaust.start();
+				yfaust = hierFactCore * x;
+				tfaust.stop();
+
+			}
+			std::cout<<std::endl;
+
+			std::cout<<"**************** TIME COMPARISON MATRIX VECTOR PRODUCT **************** "<<std::endl;
+			std::cout<<"	TIME  SPEED-UP : "<<tdense.get_time()/tfaust.get_time()<<std::endl;
+			std::cout<<"	MEAN TIME dense : "<<tdense.get_time()/((float) niterTimeComp)<<std::endl;
+			std::cout<<"	MEAN TIME faust : "<<tfaust.get_time()/((float) niterTimeComp)<<std::endl;
+			cout<<"lambda="<<std::setprecision(20)<<hierFactFFT->get_lambda()<<endl;
+		}
+
 	}
-
-	blasHandle.Destroy();
-	spblasHandle.Destroy();
-
-
-	return 0;
-
 }

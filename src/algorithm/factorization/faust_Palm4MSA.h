@@ -57,6 +57,7 @@ namespace Faust
 
     template<typename FPP,Device DEVICE> class MatDense;
     template<typename FPP,Device DEVICE> class Transform;
+	template<typename FPP, Device DEVICE, typename FPP2> class HierarchicalFactFFT;
 
     class ConstraintGeneric;
     template<typename FPP,Device DEVICE, typename FPP2> class Params;
@@ -76,7 +77,7 @@ namespace Faust
     template<typename FPP,Device DEVICE,typename FPP2 = double>
     class Palm4MSA
     {
-
+//		friend class Faust::HierarchicalFactFFT<FPP,DEVICE, FPP2>;
 
        public:
       /*!
@@ -132,11 +133,11 @@ namespace Faust
          */
 		  void init_fact_from_palm(const Palm4MSA& palm, bool isFactSideLeft);
 		  const std::vector<Faust::MatDense<FPP,DEVICE> >& get_facts()const {return S;}
-		  ~Palm4MSA(){}
+		  virtual ~Palm4MSA(){}
 
        protected:
           void check_constraint_validity();
-          void compute_c();
+          virtual void compute_c();
           virtual void compute_grad_over_c();
           void compute_projection();
           void update_L();

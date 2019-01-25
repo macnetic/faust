@@ -30,7 +30,7 @@ namespace Faust
 				const bool isFactSideLeft = Params<FPP,DEVICE,FPP2>::defaultFactSideLeft,
 				const FPP init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
 				const bool constant_step_size = Params<FPP,DEVICE,FPP2>::defaultConstantStepSize,
-				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): Params<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, stop_crit_2facts, stop_crit_global, isVerbose, isFactSideLeft, init_lambda, constant_step_size, step_size), init_D(init_D)
+				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): Params<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, stop_crit_2facts, stop_crit_global, isVerbose, isFactSideLeft, init_lambda, true, step_size), init_D(init_D)
 		{
 
 		}

@@ -7,7 +7,6 @@ import sys
 import numpy as np
 from scipy.io import savemat,loadmat
 from numpy.linalg import norm
-from pyfaust import Faust
 import math
 
 class TestFaustPy(unittest.TestCase):
@@ -898,6 +897,7 @@ if __name__ == "__main__":
         # (to find pyfaust module)
         sys.path.append(sys.argv[1])
         del sys.argv[1] # deleted to avoid interfering with unittest
+    from pyfaust import Faust
     if(len(sys.argv) > 1):
         #ENOTE: test only a single test if name passed on command line
         singleton = unittest.TestSuite()

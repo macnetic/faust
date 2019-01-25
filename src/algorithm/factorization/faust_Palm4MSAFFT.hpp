@@ -9,7 +9,6 @@ Palm4MSAFFT<FPP,DEVICE,FPP2>::Palm4MSAFFT(const ParamsPalmFFT<FPP, DEVICE, FPP2>
 template<typename FPP,Device DEVICE,typename FPP2>
 Palm4MSAFFT<FPP,DEVICE,FPP2>::Palm4MSAFFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(Lap, params, blasHandle, isGlobal), D(params.init_D)
 {
-
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
@@ -95,7 +94,6 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 	// this->error = lambda*tmp1*lambda*tmp2'-data // this->error is data before this call
 	gemm(tmp1, tmp2, this->error, this->m_lambda*this->m_lambda, (FPP)-1.0, 'N', this->TorH, this->blas_handle);
 
-
 	if (idx==0 || idx==2) // computing L'*this->error first, then (L'*this->error)*R'
 	{
 		if (!this->isUpdateWayR2L)
@@ -113,7 +111,7 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 			gemm(tmp1, this->LorR, tmp2, this->m_lambda, (FPP) 0, 'N', this->TorH, this->blas_handle);
 		}
 		// grad_over_c = 1/this->c*tmp3*tmp2
-		gemm(tmp3, tmp2, this->grad_over_c, (FPP) 1.0/this->c, (FPP) (FPP) 0.0,'N','N', this->blas_handle);
+		gemm(tmp3, tmp2, this->grad_over_c, (FPP) 1.0/this->c, (FPP) 0.0,'N','N', this->blas_handle);
 
 	}
 	else // computing this->error*R' first, then L'*(this->error*lambda*LSRD*R')
@@ -139,7 +137,6 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 
 	}
 
-	
 	this->isGradComputed = true;
 
 #ifdef __COMPILE_TIMERS__
@@ -152,7 +149,7 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 template <typename FPP, Device DEVICE, typename FPP2>
 void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_lambda()
 {
-	//TODO: override parent's method
+	// override parent's method
 	// Xhat = (S[0]*...*S[nfact-1])*D*(S[0]*...*S[nfact-1])'
 	// Xhat = LorR*D*LorR' //  LorR equals the prod of all factors after their update iterations (in loop of next_step())
 	MatDense<FPP,Cpu> tmp;
@@ -170,7 +167,7 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_lambda()
 	// reset LorR at the factor product to continue next iterations
 	this->LorR = tmp;
 	//then we finish the lambda computation with a sqrt() (Fro. norm)
-	this->m_lambda = std::sqrt(this->m_lambda);
+	this->m_lambda = std::sqrt(/*Faust::abs(*/this->m_lambda);//);
 	// (that's an additional operation in Palm4MSAFFT)
 }
 
@@ -183,13 +180,15 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::next_step()
 	this->compute_D();
 }
 
+
+
+
 template <typename FPP, Device DEVICE, typename FPP2>
 void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_D()
 {
 	// besides to what the parent has done
 	// we need to update D
 	compute_D_grad_over_c();
-	D_grad_over_c.scalarMultiply(this->m_lambda/this->c);
 	D -= D_grad_over_c;
 	//TODO: optimize MatSparse + no-copy (Eigen::DiagonalMatrix ?)
 	FPP * data = new FPP[D.getNbRow()*D.getNbCol()];
@@ -197,25 +196,36 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_D()
 	for(faust_unsigned_int i = 0; i < D.getNbCol();i++)
 		data[i*D.getNbCol()+i] = D[i*D.getNbCol()+i];
 	D = MatDense<FPP,Cpu>(data, D.getNbRow(), D.getNbCol());
+	delete data;
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
 void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
 {
-	// grad = 0.5*LorR'*(LorR*D*LorR' - X)*LorR
+	// Uhat = lambda*LorR
+	// grad = 0.5*Uhat'*(Uhat*D*Uhat' - X)*Uhat
 	MatDense<FPP, Cpu> tmp;
 	//compute_lambda has already compute D_grad_over_c = LorR*D*LorR'
+	D_grad_over_c.scalarMultiply(this->m_lambda*this->m_lambda);
 	D_grad_over_c -= this->data;
 	//TODO: opt. by determining best order of product
-	// tmp = LorR'*(LorR*D*LorR' - X)
-	gemm(this->LorR, D_grad_over_c, tmp, (FPP) 1., (FPP) 0., this->TorH, 'N', this->blas_handle);
-	// D_grad_over_c = LorR'*(LorR*D*LorR' - X)*LorR
-	gemm(tmp, this->LorR, D_grad_over_c, (FPP) 1., (FPP) 0., 'N', 'N', this->blas_handle);
+	// tmp = Uhat'*(Uhat*D*Uhat' - X)
+	gemm(this->LorR, D_grad_over_c, tmp, (FPP) this->m_lambda, (FPP) 0., this->TorH, 'N', this->blas_handle);
+	// D_grad_over_c = 0.5*Uhat'*(Uhat*D*Uhat' - X)*Uhat
+	gemm(tmp, this->LorR, D_grad_over_c, (FPP) .5*this->m_lambda/this->c, (FPP) 0., 'N', 'N', this->blas_handle);
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
 const MatDense<FPP, DEVICE>& Palm4MSAFFT<FPP,DEVICE,FPP2>::get_D()
 {
 	return this->D;
+}
+
+
+template <typename FPP, Device DEVICE, typename FPP2>
+void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_c()
+{
+	//do nothing because the Palm4MSAFFT has always a constant step size
+	this->isCComputed = true;
 }
 

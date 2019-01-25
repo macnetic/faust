@@ -79,11 +79,11 @@ namespace Faust
           HierarchicalFact(const Faust::MatDense<FPP,DEVICE>& M, const Faust::Params<FPP,DEVICE,FPP2>& params_, Faust::BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle);
           void get_facts(Faust::Transform<FPP,DEVICE> &)const;
           void get_facts(std::vector<Faust::MatSparse<FPP,DEVICE> >&)const;
-          void get_facts(std::vector<Faust::MatDense<FPP,DEVICE> >& fact)const{fact = palm_global.get_facts();}
+          void get_facts(std::vector<Faust::MatDense<FPP,DEVICE> >& fact)const{fact = palm_global->get_facts();}
           void compute_facts();
-          FPP get_lambda()const{return palm_global.get_lambda();}
+          FPP get_lambda()const{return palm_global->get_lambda();}
           const std::vector<std::vector< FPP> >& get_errors()const;
-
+		  virtual ~HierarchicalFact();
 
         private:
           void init();
@@ -101,7 +101,7 @@ namespace Faust
           int m_indFact ; //indice de factorisation (!= Faust::Palm4MSA::m_indFact : indice de facteur)
           int nbFact; // nombre de factorisations (!= Faust::Palm4MSA::nbFact : nombre de facteurs)
           Faust::Palm4MSA<FPP,DEVICE,FPP2> palm_2;
-          Faust::Palm4MSA<FPP,DEVICE,FPP2> palm_global;
+          Faust::Palm4MSA<FPP,DEVICE,FPP2>* palm_global;
           const FPP default_lambda; // initial value of lambda for factorization into two factors
           //std::vector<Faust::MatDense<FPP,DEVICE> > S;
 		  std::vector<const Faust::ConstraintGeneric*> cons_tmp_global;

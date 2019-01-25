@@ -1,4 +1,4 @@
-/****************************************************************************/
+/*****************************************************************************//*{{{*/
 /*                              Description:                                */
 /*  For more information on the FAuST Project, please visit the website     */
 /*  of the project : <http://faust.inria.fr>                         */
@@ -37,7 +37,7 @@
 /*  approximations of matrices and applications", Journal of Selected       */
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
-/****************************************************************************/
+/****************************************************************************//*}}}*//*}}}*//*}}}*/
 #include "faust_MatDense.h"
 #include "faust_Params.h"
 #include "faust_ParamsPalmFFT.h"
@@ -60,7 +60,8 @@ typedef @TEST_FPP2@ FPP2;
  */
 int main()
 {
-	Faust::MatDense<FPP,Cpu> data, init_facts1, init_facts2, init_D;
+	Faust::MatDense<FPP,Cpu> data, init_facts1, init_facts2, init_D, ref_Uhat1, ref_Uhat2, err_Uhat1, err_Uhat2;
+	FPP tmp;
 
 
 	string input_path = "@FAUST_DATA_MAT_DIR@/ref_test_PALM4SMA_FFT2.mat";
@@ -70,6 +71,8 @@ int main()
 
 	// data is a Laplacian (symmetric matrix)
 	init_faust_mat_from_matio(data, configPalm2Filename, "data");
+	init_faust_mat_from_matio(ref_Uhat1, configPalm2Filename, "Uhat1");
+	init_faust_mat_from_matio(ref_Uhat2, configPalm2Filename, "Uhat2");
 
 	init_faust_mat_from_matio(init_facts1, configPalm2Filename, "p_init_facts1");
 	init_faust_mat_from_matio(init_facts2, configPalm2Filename, "p_init_facts2");
@@ -117,7 +120,8 @@ int main()
 
 	Faust::StoppingCriterion<FPP2> crit(niter);
 
-	Faust::ParamsPalmFFT<FPP,Cpu,FPP2> params(data, nfacts, cons, initFact, init_D, crit, verbose, updateWay, initLambda, true, step_size);
+	Faust::ParamsPalmFFT<FPP,Cpu,FPP2> params(data, nfacts, cons, initFact, init_D, crit, verbose, updateWay, initLambda, step_size);
+	params.isVerbose = true;
 
 #ifdef DEBUG
 	params.Display();
@@ -138,8 +142,23 @@ int main()
 //	palm2.next_step();
 	palm2.compute_facts();
     std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = const_cast< std::vector<Faust::MatDense<FPP,Cpu> >&>(palm2.get_facts());
+
 	FPP lambda = palm2.get_lambda();
 	(full_facts[0]) *= lambda;
+
+	err_Uhat1 = ref_Uhat1;
+	err_Uhat1 -= full_facts[0];
+	tmp = ref_Uhat1.norm();
+
+	cout << "RE for Uhat1: " << err_Uhat1.norm()/tmp << endl;
+
+	err_Uhat2 = ref_Uhat2;
+	err_Uhat2 -= full_facts[1];
+	tmp = ref_Uhat2.norm();
+
+	cout << "RE for Uhat2: " << err_Uhat2.norm()/tmp << endl;
+
+
 
 	Faust::Transform<FPP, Cpu>* t = new Faust::Transform<FPP, Cpu>(full_facts);
 	//relativeError
@@ -165,7 +184,7 @@ int main()
 	double relativeError = Faust::fabs(mat.norm()/data.norm());
 
 	std::cout<<std::endl;
-	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST*D*Faust.transpose AND DATA LAPLACIAN MATRIX **************** "<<std::endl;
+	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST_UHAT*D*Faust_UHAT.transpose AND DATA LAPLACIAN MATRIX **************** "<<std::endl;
 	std::cout<< "\t\t" << relativeError<<std::endl<<std::endl;
 
 

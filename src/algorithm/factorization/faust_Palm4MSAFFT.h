@@ -18,13 +18,14 @@ namespace Faust {
 			//TODO: another ctor (like in Palm4MSA) for hierarchical algo. use
 			Palm4MSAFFT(const ParamsPalmFFT<FPP, DEVICE, FPP2>& params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal=false);
 			Palm4MSAFFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal);
-			virtual void next_step();
+			void next_step();
 			const MatDense<FPP, DEVICE>& get_D();
 		private:
-			virtual void compute_grad_over_c();
-			virtual void compute_lambda();
+			void compute_grad_over_c();
+			void compute_lambda();
 			void compute_D();
 			void compute_D_grad_over_c();
+			void compute_c();
 	};
 
 #include "faust_Palm4MSAFFT.hpp"

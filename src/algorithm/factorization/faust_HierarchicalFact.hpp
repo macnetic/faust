@@ -71,7 +71,7 @@ Faust::HierarchicalFact<FPP,DEVICE,FPP2>::HierarchicalFact(const Faust::MatDense
    m_isVerbose(params_.isVerbose),
    nbFact(params_.m_nbFact-1),
    palm_2(Palm4MSA<FPP,DEVICE,FPP2>(M,params_, cublasHandle, false)),
-   palm_global(Palm4MSA<FPP,DEVICE,FPP2>(M,params_, cublasHandle, true)),
+   palm_global(new Palm4MSA<FPP,DEVICE,FPP2>(M,params_, cublasHandle, true)),
    cons_tmp_global(vector<const Faust::ConstraintGeneric*>()),
    default_lambda(params_.init_lambda),
    isFactorizationComputed(false),
@@ -101,8 +101,8 @@ t_init.start();
       cons_tmp_global.push_back(cons[1][m_indFact]);
 
 
-   palm_global.set_constraint(cons_tmp_global);
-   palm_global.init_fact(1);
+   palm_global->set_constraint(cons_tmp_global);
+   palm_global->init_fact(1);
 
 
 #ifdef __COMPILE_TIMERS__
@@ -182,7 +182,7 @@ palm_2.init_local_timers();
 #ifdef __COMPILE_TIMERS__
 palm_2.print_local_timers();
 #endif
-   palm_global.update_lambda_from_palm(palm_2);
+   palm_global->update_lambda_from_palm(palm_2);
 
 
    if (m_isFactSideLeft)
@@ -200,22 +200,22 @@ palm_2.print_local_timers();
       cons_tmp_global[m_indFact+1]=cons[1][m_indFact];
    }
 
-   palm_global.set_constraint(cons_tmp_global);
+   palm_global->set_constraint(cons_tmp_global);
 
 
-   palm_global.init_fact_from_palm(palm_2, m_isFactSideLeft);
+   palm_global->init_fact_from_palm(palm_2, m_isFactSideLeft);
 
 #ifdef __COMPILE_TIMERS__
-palm_global.init_local_timers();
+palm_global->init_local_timers();
 #endif
-   //while(palm_global.do_continue())
-    //  palm_global.next_step();
-	palm_global.compute_facts();
+   //while(palm_global->do_continue())
+    //  palm_global->next_step();
+	this->palm_global->compute_facts();
 #ifdef __COMPILE_TIMERS__
-palm_global.print_local_timers();
+palm_global->print_local_timers();
 #endif
 
-   palm_2.set_data(palm_global.get_res(m_isFactSideLeft, m_indFact));
+   palm_2.set_data(palm_global->get_res(m_isFactSideLeft, m_indFact));
 
 
    compute_errors();
@@ -248,7 +248,7 @@ void Faust::HierarchicalFact<FPP,DEVICE,FPP2>::get_facts(std::vector<Faust::MatS
       exit(EXIT_FAILURE);
    }*/
 
-   const std::vector<Faust::MatDense<FPP,DEVICE> >& full_facts = palm_global.get_facts();
+   const std::vector<Faust::MatDense<FPP,DEVICE> >& full_facts = palm_global->get_facts();
    sparse_facts.resize(full_facts.size());
    for (int i=0 ; i<sparse_facts.size() ; i++)
    {
@@ -307,7 +307,7 @@ void Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_errors()
 	delete 	Transform_facts[i];
   
    const Faust::MatDense<FPP,DEVICE> estimate_mat = faust_Transform_tmp.get_product(cublas_handle, cusparse_handle);
-   Faust::MatDense<FPP,DEVICE> data(palm_global.get_data());
+   Faust::MatDense<FPP,DEVICE> data(palm_global->get_data());
    	
    FPP2 data_norm = Faust::fabs(data.norm());
 
@@ -327,7 +327,7 @@ template<typename FPP,Device DEVICE,typename FPP2> Faust::Timer Faust::Hierarchi
 template<typename FPP,Device DEVICE,typename FPP2>
 void Faust::HierarchicalFact<FPP,DEVICE,FPP2>::print_timers()const
 {
-   palm_global.print_global_timers();
+   palm_global->print_global_timers();
    cout << "timers in Faust::HierarchicalFact :" << endl;
    cout << "t_init      = " << t_init.get_time()      << " s for "<< t_init.get_nb_call()      << " calls" << endl;
    cout << "t_next_step = " << t_next_step.get_time() << " s for "<< t_next_step.get_nb_call() << " calls" << endl<<endl;
@@ -336,5 +336,9 @@ void Faust::HierarchicalFact<FPP,DEVICE,FPP2>::print_timers()const
 
 }
 #endif
-
+template<typename FPP,Device DEVICE,typename FPP2>
+Faust::HierarchicalFact<FPP,DEVICE,FPP2>::~HierarchicalFact()
+{
+	delete this->palm_global;
+}
 #endif
