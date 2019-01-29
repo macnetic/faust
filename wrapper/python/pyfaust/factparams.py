@@ -296,7 +296,7 @@ class ConstraintName:
         SP: Designates a constraint on the sparsity/0-norm of a matrix.
         SPCOL: Designates a sparsity/0-norm constraint on the columns of a matrix.
         SPLIN: Designates a sparsity/0-norm constraint on the rows of a matrix.
-        SPLINCOL: Designates a constraint that imposes both SPLIN and SPCOL constraints.
+        SPLINCOL: Designates a constraint that imposes both SPLIN and SPCOL constraints (see example above for clarification).
         SP_POS: Designates a constraint that imposes a SP constraints and besides set to zero the negative coefficients (it doesn't apply to complex matrices).
         NORMCOL: Designates a 2-norm constraint on each column of a matrix.
         NORMLIN: Designates a 2-norm constraint on each row of a matrix.
@@ -304,6 +304,34 @@ class ConstraintName:
         SUPP: Designates a constraint by a support matrix S (element-wisely multiplying the matrix to constrain to obtain a matrix for which the 2-norm equals 1, see: ConstraintMat.project()).
         name: The name of the constraint (actually an integer among the valid constants).
 
+    Example:
+        >>> # SPLINCOL Comprehensive Example
+        >>> # This constraint doesn't necessarily
+        >>> # lead to a  projected matrix with asked sparsity respected
+        >>> # both for columns and rows
+        >>> from numpy.random import rand
+        >>> from numpy.linalg import norm
+        >>> n = 10; m = 10; v = 2;
+        >>> M = rand(10,10)
+        >>> Mspcol = ConstraintInt('spcol', n, m, v).project(M)
+        >>> Msplin = ConstraintInt('splin', n, m, v).project(M)
+        >>> Mp = ConstraintInt('splincol', n, m, v).project(M)
+        >>> Mp_ = Mspcol + np.where(Mspcol != 0, 0, Msplin) # the sum of Mspcol and Msplin minus their non-zero matrix intersection
+        >>> Mp_/= norm(Mp_)
+        >>> # Mp is approximately equal to Mp_
+        >>> print(norm(Mp-Mp_,2)/norm(Mp_), 2)
+        0.00769281206496
+        >>> from numpy import count_nonzero
+        >>> count_nonzero(Mp[:,1])
+        3
+        >>> # sparsity value v is not respected
+        >>> count_nonzero(Mp_[:,1])
+        3
+        >>> count_nonzero(Mp_[1,:])
+        2
+        >>> count_nonzero(Mp[1,:])
+        2
+        >>> # v is respected for this row
 
     """
     SP = 0 # Int Constraint
