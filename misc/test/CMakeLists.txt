@@ -192,7 +192,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
 	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
  
 	foreach(TEST_FPP float double complex<float> complex<double>)	
-		foreach(testin hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication faust_matdense_conjugate)
+		foreach(testin hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication faust_matdense_conjugate GivensFGFT)
 		string(REGEX REPLACE "<|>" "" TEST_FILE_CPP ${TEST_FPP})
 		set(TEST_CPP_NAME ${testin}_${TEST_FILE_CPP})
 		set(TEST_FILE_CPP ${TEST_CPP_NAME}.cpp)

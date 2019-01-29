@@ -1,0 +1,19 @@
+
+#include "faust_GivensFGFT.h"
+#include "faust_MatDense.h"
+
+
+#include <complex>
+
+using namespace Faust;
+typedef @TEST_FPP@ FPP;
+typedef @TEST_FPP2@ FPP2;
+
+
+int main()
+{
+	Faust::MatDense<FPP,Cpu> Lap(10,10);
+	GivensFGFT<FPP,Cpu> algo(Lap,3);
+	return 0;
+}
+
