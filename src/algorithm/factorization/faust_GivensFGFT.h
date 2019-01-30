@@ -18,6 +18,7 @@ namespace Faust {
 			vector<FPP2> errs;
 			vector<pair<faust_unsigned_int,faust_unsigned_int>> coord_choices;
 			Faust::MatDense<FPP, DEVICE> Lap;
+			Faust::MatDense<FPP, DEVICE> L;
 
 			faust_unsigned_int p, q;
 
@@ -44,7 +45,7 @@ namespace Faust {
 			void update_fact();
 
 			/**
-			 * \brief ALgo. step 2.4
+			 * \brief Algo. step 2.4
 			 */
 			void update_L();
 
@@ -56,8 +57,41 @@ namespace Faust {
 			/**
 			 * \brief Algo. step 2.6.
 			 */
-			void calc_err();
+			void update_err();
 
+			/**
+			 *
+			 */
+			const vector<FPP2>& get_errs() const;
+
+			/**
+			 *
+			 */
+			FPP2 get_err(faust_unsigned_int j) const;
+
+			/**
+			 *
+			 */
+			const MatDense<FPP,DEVICE>& get_D() const;
+
+			/**
+			 *
+			 */
+			const MatDense<FPP,DEVICE>& get_L() const ;
+
+			/**
+			 *
+			 */
+			const vector<pair<faust_unsigned_int,faust_unsigned_int>>& get_coord_choices() const;
+
+			/**
+			 *
+			 */
+			void get_coord_choice(faust_unsigned_int j, faust_unsigned_int& p, faust_unsigned_int& q) const;
+
+			const MatDense<FPP,DEVICE>& get_Lap() const;
+
+			const vector<MatSparse<FPP,DEVICE>>& get_facts() const;
 		};
 
 }

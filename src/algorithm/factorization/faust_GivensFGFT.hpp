@@ -90,7 +90,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_D()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::calc_err()
+void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 {
 // Matlab ref. code:
 //        if mod(j,100)==0
@@ -112,16 +112,70 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 template<typename FPP, Device DEVICE, typename FPP2>
 GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, faust_unsigned_int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbRow()), errs(J), coord_choices(J)
 {
-	/** Matlab ref. code:
-	 *     facts = cell(1,J);
-	 *     n=size(Lap,1);
-	 *     L=Lap;
-	 *     C = 15*ones(n);
-	 *     err=zeros(1,J);
-	 *     coord_choices = zeros(2,J);
-	 *
-	 */
+/** Matlab ref. code:
+ *     facts = cell(1,J);
+ *     n=size(Lap,1);
+ *     L=Lap;
+ *     C = 15*ones(n);
+ *     err=zeros(1,J);
+ *     coord_choices = zeros(2,J);
+ *
+ */
 }
 
+template<typename FPP, Device DEVICE, typename FPP2>
+FPP2 GivensFGFT<FPP,DEVICE,FPP2>::get_err(faust_unsigned_int j) const
+{
+	if(j > 0 && j < errs.size())
+		return errs[j];
+	else
+		throw out_of_range("GivensFGFT::get_err(j): j is out of range.");
+}
 
+template<typename FPP, Device DEVICE, typename FPP2>
+const vector<FPP2>& GivensFGFT<FPP,DEVICE,FPP2>::get_errs() const
+{
+	return errs;
+}
 
+template<typename FPP, Device DEVICE, typename FPP2>
+const MatDense<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_D() const
+{
+	return D;
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+const MatDense<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_L() const
+{
+	return L;
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+const vector<pair<faust_unsigned_int,faust_unsigned_int>>& GivensFGFT<FPP,DEVICE,FPP2>::get_coord_choices() const
+{
+	return coord_choices;
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFT<FPP,DEVICE,FPP2>::get_coord_choice(faust_unsigned_int j, faust_unsigned_int& p, faust_unsigned_int& q) const
+{
+	if(j > 0 && j < coord_choices.size())
+	{
+		p = coord_choices[j].first;
+		q = coord_choices[j].second;
+	}
+	else
+		throw out_of_range("GivensFGFT::get_coord_choice(j,p,q): j is out of range.");
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+const MatDense<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_Lap() const
+{
+	return Lap;
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+const vector<Faust::MatSparse<FPP,DEVICE>>& GivensFGFT<FPP,DEVICE,FPP2>::get_facts() const
+{
+	return facts;
+}
