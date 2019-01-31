@@ -14,6 +14,7 @@ int main()
 {
 	Faust::MatDense<FPP,Cpu> Lap(10,10);
 	GivensFGFT<FPP,Cpu> algo(Lap,3);
+	algo.compute_facts();
 	return 0;
 }
 

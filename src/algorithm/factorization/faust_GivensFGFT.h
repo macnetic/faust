@@ -9,6 +9,7 @@
 
 namespace Faust {
 
+
 	template<typename FPP, Device DEVICE, typename FPP2 = float>
 		class GivensFGFT {
 
@@ -20,14 +21,33 @@ namespace Faust {
 			Faust::MatDense<FPP, DEVICE> Lap;
 			Faust::MatDense<FPP, DEVICE> L;
 
+			/**
+			 * Matrix pivot and column indices.
+			 */
 			faust_unsigned_int p, q;
+
+			/**
+			 * Current iteration index (pointing to the current factor to update).
+			 */
+			unsigned int ite;
+
+			/**
+			 * Function pointer to any step of the algorithm.
+			 */
+			typedef void (GivensFGFT<FPP,DEVICE,FPP2>::*substep_fun)();
+
 
 			public:
 			GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, faust_unsigned_int J);
+
 			/**
 			 * \brief Algo. main step.
 			 */
 			void next_step();
+
+			/**
+			 * \brief Algo. main loop (facts.size() iterations).
+			 */
 			void compute_facts();
 			/** \brief Algo. step 2.1.
 			*/

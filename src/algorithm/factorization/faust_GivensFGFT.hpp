@@ -4,6 +4,21 @@ template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::next_step()
 {
 
+	substep_fun substep[] = {
+		&GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot,
+		&GivensFGFT<FPP,DEVICE,FPP2>::sort_L_in_C,
+		&GivensFGFT<FPP,DEVICE,FPP2>::calc_theta,
+		&GivensFGFT<FPP,DEVICE,FPP2>::update_fact,
+		&GivensFGFT<FPP,DEVICE,FPP2>::update_L,
+		&GivensFGFT<FPP,DEVICE,FPP2>::update_D};
+
+	for(int i=0;i<sizeof(substep)/sizeof(substep_fun);i++)
+	{
+#ifdef DEBUG_GIVENS
+		cout << "GivensFGFT ite=" << ite << " substep i=" << i << endl;
+#endif
+		(this->*substep[i])();
+	}
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -106,7 +121,12 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 {
-
+	ite = 0;
+	while(ite < facts.size())
+	{
+		next_step();
+		ite++;
+	}
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -121,6 +141,7 @@ GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, faust_
  *     coord_choices = zeros(2,J);
  *
  */
+	//initialization's ok
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
