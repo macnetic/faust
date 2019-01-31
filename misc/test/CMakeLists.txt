@@ -193,6 +193,10 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
  
 	foreach(TEST_FPP float double complex<float> complex<double>)	
 		foreach(testin hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication faust_matdense_conjugate GivensFGFT)
+		if(${TEST_FPP} MATCHES complex AND ${testin} MATCHES GivensFGFT)
+			continue()
+			# GivensFGFT doesn't handle complex matrices
+		endif()
 		string(REGEX REPLACE "<|>" "" TEST_FILE_CPP ${TEST_FPP})
 		set(TEST_CPP_NAME ${testin}_${TEST_FILE_CPP})
 		set(TEST_FILE_CPP ${TEST_CPP_NAME}.cpp)

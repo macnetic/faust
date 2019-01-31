@@ -1,12 +1,14 @@
 using namespace Faust;
 
+#include <cmath>
+
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::next_step()
 {
 
 	substep_fun substep[] = {
+		&GivensFGFT<FPP,DEVICE,FPP2>::max_L_into_C,
 		&GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot,
-		&GivensFGFT<FPP,DEVICE,FPP2>::sort_L_in_C,
 		&GivensFGFT<FPP,DEVICE,FPP2>::calc_theta,
 		&GivensFGFT<FPP,DEVICE,FPP2>::update_fact,
 		&GivensFGFT<FPP,DEVICE,FPP2>::update_L,
@@ -29,40 +31,88 @@ void GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot()
 //        q = q_candidates(p);
 //        coord_choices(1,j) = p;
 //        coord_choices(2,j) = q;
+	C_min_row.min(&p);
+	q = q_candidates[p];
+	coord_choices[ite] = pair<int,int>(p,q);
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::sort_L_in_C()
+void GivensFGFT<FPP,DEVICE,FPP2>::max_L_into_C()
 {
-// Matlab ref. code:
-//**************  at initialization
-//    for r=1:n
-//        for s=r+1:n
-//            C(r,s) = -abs(L(r,s));%-2*L(r,s)^2;
-//        end
-//    end
-//    [C_min_row, q_candidates] = min(C,[],2);
-//
-/************ at end of ite.
-*       for r=[p,q]
-*           for s=r+1:n
-*               C(r,s) = -abs(L(r,s));%-2*L(r,s)^2;
-*           end
-*           [C_min_row(r), q_candidates(r)] = min(C(r,:));
-*       end
-*
-* 		for s=[p,q]
-*            for r=1:s-1
-*                C(r,s) = -abs(L(r,s));%-2*L(r,s)^2;
-*                if C(r,s)<C_min_row(r)
-*                    C_min_row(r) = C(r,s);
-*                    q_candidates(r) = s;
-*                elseif q_candidates(r) == s
-*                    [C_min_row(r), q_candidates(r)] = min(C(r,:));
-*                end
-*            end
-*        end
-*/
+	// Matlab ref. code:
+	//**************  at initialization
+	//    for r=1:n
+	//        for s=r+1:n
+	//            C(r,s) = -abs(L(r,s));%-2*L(r,s)^2;
+	//        end
+	//    end
+	//    [C_min_row, q_candidates] = min(C,[],2);
+	//
+	faust_unsigned_int n = Lap.getNbRow(), r, s;
+	if(!ite)
+	{
+		//first iteration
+		for(r=0;r<n;r++)
+			for(s=r+1;s<n;s++)
+			{
+				//TODO: really slow (element-by-element copy) see if we can use a max and directly copy L per block
+				// MatDense's data is in column-major order
+				C.getData()[s*n+r] = -Faust::fabs(L(r,s));
+			}
+			C_min_row = C.rowwise_min(q_candidates);
+	}
+
+	/************ at end of ite.
+	 *       for r=[p,q]
+	 *           for s=r+1:n
+	 *               C(r,s) = -abs(L(r,s));%-2*L(r,s)^2;
+	 *           end
+	 *           [C_min_row(r), q_candidates(r)] = min(C(r,:));
+	 *       end
+	 *
+	 * 		for s=[p,q]
+	 *            for r=1:s-1
+	 *                C(r,s) = -abs(L(r,s));%-2*L(r,s)^2;
+	 *                if C(r,s)<C_min_row(r)
+	 *                    C_min_row(r) = C(r,s);
+	 *                    q_candidates(r) = s;
+	 *                elseif q_candidates(r) == s
+	 *                    [C_min_row(r), q_candidates(r)] = min(C(r,:));
+	 *                end
+	 *            end
+	 *        end
+	 */
+	else
+	{ // 2nd to last iteration
+		int pq[2] = { p , q };
+		int rid;
+		for(int i=0;i<2;i++)
+		{
+			r = pq[i];
+			for(int s=r+1;s<n;s++)
+				C.getData()[s*n+r] = - Faust::fabs(L(r,s));
+			C_min_row.getData()[r] = C.get_row(r).min(&rid);
+			q_candidates[r] = rid;
+		}
+		for(int i=0;i<2;i++)
+		{
+			s = pq[i];
+			for(r=0;r<s;r++)
+			{
+				C.getData()[s*n+r] = - Faust::fabs(L(r,s));
+				if(C(r,s) < C_min_row[r])
+				{
+					C_min_row[r] = C(r,s);
+					q_candidates[r] = s;
+				}
+				else if(q_candidates[r] == s)
+				{
+					C_min_row.getData()[r] = C.get_row(r).min(&rid);
+					q_candidates[r] = rid;
+				}
+			}
+		}
+	}
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -78,6 +128,20 @@ void GivensFGFT<FPP,DEVICE,FPP2>::calc_theta()
 //        else
 //            theta=theta2;
 //        end
+//
+
+#define calc_err(theta) L(p,q)*cos(2*theta2) + 0.5*(L(q,q) - L(p,p))*sin(2*theta2)
+
+	FPP2 theta1, theta2, err_theta1, err_theta2;
+
+	theta1 = atan(L(q,q) - L(p,p)/(2*L(p,q)))/2;
+	theta2 = theta1 + M_PI_4; // from cmath
+	err_theta1 = calc_err(theta1);
+	err_theta2 = calc_err(theta2);
+	if(err_theta1 < err_theta2)
+		theta = theta1;
+	else
+		theta = theta2;
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -90,6 +154,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_fact()
 //        S = sparse(S);
 //        facts{j} = S;
 //
+
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -130,7 +195,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, faust_unsigned_int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbRow()), errs(J), coord_choices(J)
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, faust_unsigned_int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbCol()), errs(J), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()])
 {
 /** Matlab ref. code:
  *     facts = cell(1,J);
@@ -200,3 +265,5 @@ const vector<Faust::MatSparse<FPP,DEVICE>>& GivensFGFT<FPP,DEVICE,FPP2>::get_fac
 {
 	return facts;
 }
+
+

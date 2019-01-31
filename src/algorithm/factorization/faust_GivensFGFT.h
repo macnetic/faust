@@ -15,16 +15,19 @@ namespace Faust {
 
 			vector<Faust::MatSparse<FPP,DEVICE>> facts;
 			Faust::MatSparse<FPP,DEVICE> D;
-			Faust::MatSparse<FPP,DEVICE> C;
+			Faust::MatDense<FPP,DEVICE> C;
+			Faust::Vect<FPP,DEVICE> C_min_row;
+			int* q_candidates; //default IndexType for underlying eigen matrix is int
 			vector<FPP2> errs;
-			vector<pair<faust_unsigned_int,faust_unsigned_int>> coord_choices;
+			vector<pair<int,int>> coord_choices;
 			Faust::MatDense<FPP, DEVICE> Lap;
 			Faust::MatDense<FPP, DEVICE> L;
+			FPP2 theta;
 
 			/**
 			 * Matrix pivot and column indices.
 			 */
-			faust_unsigned_int p, q;
+			int p, q;
 
 			/**
 			 * Current iteration index (pointing to the current factor to update).
@@ -39,6 +42,7 @@ namespace Faust {
 
 			public:
 			GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, faust_unsigned_int J);
+			~GivensFGFT() {delete q_candidates;};
 
 			/**
 			 * \brief Algo. main step.
@@ -49,16 +53,20 @@ namespace Faust {
 			 * \brief Algo. main loop (facts.size() iterations).
 			 */
 			void compute_facts();
+
 			/** \brief Algo. step 2.1.
 			*/
 			void choose_pivot();
+
 			/** \brief Algo. step 2.1.1
 			 *
 			 */
-			void sort_L_in_C();
+			void max_L_into_C();
+
 			/** \brief Algo. step 2.2.
 			*/
 			void calc_theta();
+
 			/**
 			 * \brief Algo. step 2.3.
 			 */
