@@ -394,6 +394,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		FPP normL1(const bool transpose=false) const;
 		FPP normL1(faust_unsigned_int&, const bool transpose=false) const;
 		Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
+		Faust::Vect<FPP,Cpu> get_row(faust_unsigned_int id) const;
 		Faust::MatDense<FPP,Cpu>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;
 		Faust::MatDense<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const;
 		Faust::MatDense<FPP,Cpu>* get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const;

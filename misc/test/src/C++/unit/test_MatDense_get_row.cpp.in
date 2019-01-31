@@ -1,0 +1,32 @@
+
+#include "faust_MatDense.h"
+
+
+#include <complex>
+#include <random>
+
+using namespace Faust;
+typedef @TEST_FPP@ FPP;
+
+
+int main()
+{
+	std::random_device rd; //random device gives the seed
+	std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+	std::uniform_int_distribution<> dis(0, 2);
+
+
+	MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(3,4);
+	cout << "Random matrix for the test:" << endl;
+	for(int i=0;i<3;i++) {
+		for(int j=0;j<4;j++)
+			cout << M->getData()[j*3+i] << " ";
+		cout << endl;
+	}
+	int rid = dis(gen);
+	Faust::Vect<FPP,Cpu> row = M->get_row(rid);
+	cout << "row id: " << rid << endl;
+	cout << "row: " << endl;
+	row.Display();
+	return 0;
+}

@@ -871,6 +871,16 @@ Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::get_col(faust_unsigned_int id) co
 }
 
 template<typename FPP>
+Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::get_row(faust_unsigned_int id) const
+{
+	if(id > this->getNbRow())
+		handleError("Faust::MatDense", "Too big row index passed to get_col().");
+	Eigen::Matrix<FPP, Eigen::Dynamic,1> vec;
+	vec = mat.row(id);
+	return Vect<FPP,Cpu>(this->getNbCol(),vec.data());
+}
+
+template<typename FPP>
 Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const
 {
 	//TODO: check args
