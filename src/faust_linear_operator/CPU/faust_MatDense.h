@@ -398,6 +398,11 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		Faust::MatDense<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const;
 		Faust::MatDense<FPP,Cpu>* get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const;
         Faust::MatDense<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int n) const;
+
+		FPP min() const {return mat.minCoeff();}
+		Faust::Vect<FPP,Cpu> rowwise_min() const;
+		Faust::Vect<FPP,Cpu> rowwise_min(int* col_indices) const;
+
 		void operator=(MatDense<FPP,Cpu> const& A);
 
         template<typename FPP1>

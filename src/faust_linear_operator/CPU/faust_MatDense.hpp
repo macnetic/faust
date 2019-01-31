@@ -167,7 +167,7 @@ void Faust::MatDense<FPP,Cpu>::setEyes()
 {
 	setZeros();
 	FPP* ptr_data = getData();
-	for (int i=0 ; i<min(this->dim1,this->dim2); i++)
+	for (int i=0 ; i<std::min(this->dim1,this->dim2); i++)
 		ptr_data[i*this->dim1+i] = FPP(1.0);
 	if (this->dim1 == this->dim2)
 		isIdentity = true;
@@ -918,6 +918,22 @@ Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_rows(faust_unsigned_int*
 	Faust::MatDense<FPP, Cpu>* rows = new Faust::MatDense<FPP, Cpu>(data, n, this->getNbCol());
 	delete data;
 	return rows;
+}
+
+
+template<typename FPP>
+Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::rowwise_min() const
+{
+	return Faust::Vect<FPP,Cpu>(this->getNbCol(), mat.rowwise().minCoeff().eval().data());
+}
+
+template<typename FPP>
+Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::rowwise_min(int* col_indices) const
+{
+	Faust::Vect<FPP,Cpu> vec(this->getNbRow());
+	for(int i=0;i<this->getNbRow();i++)
+		vec.getData()[i] = mat.row(i).minCoeff(col_indices+i);
+	return vec;
 }
 
 	template<typename FPP>

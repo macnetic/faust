@@ -1,0 +1,45 @@
+
+#include "faust_MatDense.h"
+
+
+#include <complex>
+#include <random>
+
+using namespace Faust;
+typedef @TEST_FPP@ FPP;
+
+
+int main()
+{
+	std::random_device rd; //random device gives the seed
+	std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+	std::uniform_real_distribution<> dis(1.0, 200);
+
+	FPP *data = new FPP[9];
+	for(int i=0;i<3;i++) {
+		for(int j=0;j<3;j++)
+			data[3*j+i] = dis(gen);
+	}
+	MatDense<FPP,Cpu> M(data, 3, 3);
+	cout << "Random matrix for the test:" << endl;
+	for(int i=0;i<3;i++) {
+		for(int j=0;j<3;j++)
+			cout << M.getData()[j*3+i] << " ";
+		cout << endl;
+	}
+	cout << "M.min():" << M.min() << endl;
+	int indices[3];
+
+	cout << "M.rowwise_min()" << endl;
+	Faust::Vect<FPP, Cpu> vec = M.rowwise_min();
+	vec.Display();
+
+	cout << "M.rowwise_min(indices)" << endl;
+	Faust::Vect<FPP, Cpu> vec2 = M.rowwise_min(indices);
+	vec2.Display();
+	cout << "indices: " << endl;
+	for(int i=0;i<3;i++)
+		cout << " " << indices[i] << endl;
+
+	return 0;
+}
