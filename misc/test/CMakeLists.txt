@@ -156,7 +156,7 @@ endif()
 
 
 foreach(TEST_FPP float double)
-	foreach(FILE faust_mult faust_mult_cplx)
+	foreach(FILE faust_mult faust_mult_cplx test_Vect_min)
 		set(TEST_BIN_FILE ${FILE}_${TEST_FPP})
 		set(TEST_FILE_CPP ${TEST_BIN_FILE}.cpp)
 		message(STATUS ${TEST_FILE_CPP})
