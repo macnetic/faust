@@ -24,6 +24,11 @@ namespace Faust {
 			Faust::MatDense<FPP, DEVICE> L;
 			FPP2 theta;
 
+			// model to blank fact before update (in update_fact())
+			vector<int> fact_mod_row_ids;
+			vector<int> fact_mod_col_ids;
+			vector<FPP> fact_mod_values;
+
 			/**
 			 * Matrix pivot and column indices.
 			 */
@@ -41,8 +46,8 @@ namespace Faust {
 
 
 			public:
-			GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, faust_unsigned_int J);
-			~GivensFGFT() {delete q_candidates;};
+			GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J);
+			~GivensFGFT() {delete[] q_candidates;};
 
 			/**
 			 * \brief Algo. main step.
@@ -95,12 +100,12 @@ namespace Faust {
 			/**
 			 *
 			 */
-			FPP2 get_err(faust_unsigned_int j) const;
+			FPP2 get_err(int j) const;
 
 			/**
 			 *
 			 */
-			const MatDense<FPP,DEVICE>& get_D() const;
+			const MatDense<FPP,DEVICE> get_D() const;
 
 			/**
 			 *
@@ -110,12 +115,12 @@ namespace Faust {
 			/**
 			 *
 			 */
-			const vector<pair<faust_unsigned_int,faust_unsigned_int>>& get_coord_choices() const;
+			const vector<pair<int,int>>& get_coord_choices() const;
 
 			/**
 			 *
 			 */
-			void get_coord_choice(faust_unsigned_int j, faust_unsigned_int& p, faust_unsigned_int& q) const;
+			void get_coord_choice(int j, int& p, int& q) const;
 
 			const MatDense<FPP,DEVICE>& get_Lap() const;
 

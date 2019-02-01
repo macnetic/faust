@@ -12,7 +12,8 @@ void GivensFGFT<FPP,DEVICE,FPP2>::next_step()
 		&GivensFGFT<FPP,DEVICE,FPP2>::calc_theta,
 		&GivensFGFT<FPP,DEVICE,FPP2>::update_fact,
 		&GivensFGFT<FPP,DEVICE,FPP2>::update_L,
-		&GivensFGFT<FPP,DEVICE,FPP2>::update_D};
+		&GivensFGFT<FPP,DEVICE,FPP2>::update_D,
+		&GivensFGFT<FPP,DEVICE,FPP2>::update_err};
 
 	for(int i=0;i<sizeof(substep)/sizeof(substep_fun);i++)
 	{
@@ -48,7 +49,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::max_L_into_C()
 	//    end
 	//    [C_min_row, q_candidates] = min(C,[],2);
 	//
-	faust_unsigned_int n = Lap.getNbRow(), r, s;
+	int n = Lap.getNbRow(), r, s;
 	if(!ite)
 	{
 		//first iteration
@@ -59,7 +60,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::max_L_into_C()
 				// MatDense's data is in column-major order
 				C.getData()[s*n+r] = -Faust::fabs(L(r,s));
 			}
-			C_min_row = C.rowwise_min(q_candidates);
+		C_min_row = C.rowwise_min(q_candidates);
 	}
 
 	/************ at end of ite.
@@ -97,7 +98,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::max_L_into_C()
 		for(int i=0;i<2;i++)
 		{
 			s = pq[i];
-			for(r=0;r<s;r++)
+			for(r=0;r<s-1;r++)
 			{
 				C.getData()[s*n+r] = - Faust::fabs(L(r,s));
 				if(C(r,s) < C_min_row[r])
@@ -130,11 +131,11 @@ void GivensFGFT<FPP,DEVICE,FPP2>::calc_theta()
 //        end
 //
 
-#define calc_err(theta) L(p,q)*cos(2*theta2) + 0.5*(L(q,q) - L(p,p))*sin(2*theta2)
+#define calc_err(theta) L(p,q)*cos(2*theta) + 0.5*(L(q,q) - L(p,p))*sin(2*theta)
 
 	FPP2 theta1, theta2, err_theta1, err_theta2;
 
-	theta1 = atan(L(q,q) - L(p,p)/(2*L(p,q)))/2;
+	theta1 = atan2(L(q,q) - L(p,p),(2*L(p,q)))/2;
 	theta2 = theta1 + M_PI_4; // from cmath
 	err_theta1 = calc_err(theta1);
 	err_theta2 = calc_err(theta2);
@@ -147,26 +148,59 @@ void GivensFGFT<FPP,DEVICE,FPP2>::calc_theta()
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::update_fact()
 {
-// Matlab ref. code:
-//        S = eye(n);
-//        S(p,p) = cos(theta); S(p,q) = -sin(theta);
-//        S(q,p) = sin(theta); S(q,q) = cos(theta);
-//        S = sparse(S);
-//        facts{j} = S;
-//
-
+	// Matlab ref. code:
+	//        S = eye(n);
+	//        S(p,p) = cos(theta); S(p,q) = -sin(theta);
+	//        S(q,p) = sin(theta); S(q,q) = cos(theta);
+	//        S = sparse(S);
+	//        facts{j} = S;
+	//
+	int n = Lap.getNbRow();
+	// forget previous rotation coeffs
+	// and keep identity part (n first coeffs)
+	fact_mod_row_ids.resize(n);
+	fact_mod_col_ids.resize(n);
+	fact_mod_values.resize(n);
+	// write new coeffs
+	// 1st one
+	fact_mod_row_ids.push_back(p);
+	fact_mod_col_ids.push_back(p);
+	fact_mod_values.push_back(cos(theta));
+	// 2nd
+	fact_mod_row_ids.push_back(p);
+	fact_mod_col_ids.push_back(q);
+	fact_mod_values.push_back(-sin(theta));
+	// 3rd
+	fact_mod_row_ids.push_back(q);
+	fact_mod_col_ids.push_back(p);
+	fact_mod_values.push_back(sin(theta));
+	// 4th
+	fact_mod_row_ids.push_back(q);
+	fact_mod_col_ids.push_back(q);
+	fact_mod_values.push_back(cos(theta));
+	facts[ite] = MatSparse<FPP,DEVICE>(fact_mod_row_ids, fact_mod_col_ids, fact_mod_values, n, n);
+	cout << "norm facts ite: " << ite << facts[ite].norm() << endl;
+	facts[ite].Display();
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
 {
-// L = S'*L*S
+	// L = S'*L*S
+	facts[ite].multiply(L, 'T');
+	L.multiplyRight(MatDense<FPP,Cpu>(facts[ite]));
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::update_D()
 {
-// D = spdiag(diag(L))
+	// D = spdiag(diag(L))
+	for(int i=0;i<L.getNbRow();i++)
+		D.setCoeff(i,i, L(i,i));
+#ifdef DEBUG_GIVENS
+	D.Display();
+	cout << "D fro. norm: " << D.norm() << endl;
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -181,6 +215,15 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 //            %    disp(['Number of edges: ' num2str(N_edges)])
 //        end
 //
+	MatDense<FPP,Cpu> tmp = D;
+	tmp -= Lap;
+	FPP2 err = tmp.norm(), err_d;
+//	err *= err;
+	err_d = Lap.norm();
+//	err_d *= err_d;
+	err /= err_d;
+	cout << "ite. i: "<< ite << " err.: " << err << endl;
+	//TODO: boolean to display error or verbose mode
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -195,22 +238,37 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, faust_unsigned_int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbCol()), errs(J), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()])
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbCol()), errs(J), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()])
 {
-/** Matlab ref. code:
- *     facts = cell(1,J);
- *     n=size(Lap,1);
- *     L=Lap;
- *     C = 15*ones(n);
- *     err=zeros(1,J);
- *     coord_choices = zeros(2,J);
- *
- */
-	//initialization's ok
+	/** Matlab ref. code:
+	 *     facts = cell(1,J);
+	 *     n=size(Lap,1);
+	 *     L=Lap;
+	 *     C = 15*ones(n);
+	 *     err=zeros(1,J);
+	 *     coord_choices = zeros(2,J);
+	 *
+	 */
+	C.setOnes();
+	C.scalarMultiply(15); // purely abitrary
+	if(Lap.getNbCol() != Lap.getNbRow())
+		handleError("Faust::GivensFGFT", "Laplacian must be a square matrix.");
+
+	// init the identity part of the factor buffer model
+	// allocate the mem. space for the 4 additional rotation part coeffs
+	for(int i=0;i<Lap.getNbRow();i++)
+	{
+		fact_mod_values.push_back(FPP(1));
+		fact_mod_col_ids.push_back(i);
+		fact_mod_row_ids.push_back(i);
+	}
+
+	// init. D
+	D.setZeros();
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-FPP2 GivensFGFT<FPP,DEVICE,FPP2>::get_err(faust_unsigned_int j) const
+FPP2 GivensFGFT<FPP,DEVICE,FPP2>::get_err(int j) const
 {
 	if(j > 0 && j < errs.size())
 		return errs[j];
@@ -225,7 +283,7 @@ const vector<FPP2>& GivensFGFT<FPP,DEVICE,FPP2>::get_errs() const
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-const MatDense<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_D() const
+const MatDense<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_D() const
 {
 	return D;
 }
@@ -237,13 +295,13 @@ const MatDense<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_L() const
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-const vector<pair<faust_unsigned_int,faust_unsigned_int>>& GivensFGFT<FPP,DEVICE,FPP2>::get_coord_choices() const
+const vector<pair<int,int>>& GivensFGFT<FPP,DEVICE,FPP2>::get_coord_choices() const
 {
 	return coord_choices;
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::get_coord_choice(faust_unsigned_int j, faust_unsigned_int& p, faust_unsigned_int& q) const
+void GivensFGFT<FPP,DEVICE,FPP2>::get_coord_choice(int j, int& p, int& q) const
 {
 	if(j > 0 && j < coord_choices.size())
 	{
