@@ -1,7 +1,8 @@
 
 #include "faust_GivensFGFT.h"
 #include "faust_MatDense.h"
-
+#include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_core.h"
 
 #include <complex>
 
@@ -12,9 +13,112 @@ typedef @TEST_FPP2@ FPP2;
 
 int main()
 {
-	Faust::MatDense<FPP,Cpu> Lap(10,10);
-	GivensFGFT<FPP,Cpu> algo(Lap,3);
+	string configFilename = "@FAUST_DATA_MAT_DIR@/test_GivensDiag_Lap_U_J.mat";
+
+	Faust::MatDense<FPP,Cpu> Lap;
+	init_faust_mat_from_matio(Lap,configFilename.c_str(),"Lap");
+
+	GivensFGFT<FPP,Cpu> algo(Lap,5472);
 	algo.compute_facts();
+
+	vector<pair<int,int>> coord_choices = algo.get_coord_choices();
+//
+//	for(auto choice : coord_choices)
+//	{
+//		cout << choice.first+1 << " " << choice.second+1 << endl;
+//	}
+
+//
+//
+//fourier_diag = eye(size(Lap,1));
+//for j=1:numel(facts_givens)
+//	    %fourier_diag=facts_givens{j}'*fourier_diag;
+//    fourier_diag = fourier_diag*facts_givens{j};
+//	end
+
+
+	Faust::MatDense<FPP,Cpu> fourier_diag(Lap.getNbRow(), Lap.getNbCol());
+	fourier_diag.setEyes();
+	const vector<Faust::MatSparse<FPP,Cpu>>& givens_facts = algo.get_facts();
+	for(auto fact : givens_facts)
+		fact.multiply(fourier_diag, 'N');
+
+	cout << "fourier_diag fro norm: " << fourier_diag.norm() << endl;
+
+	const Faust::MatSparse<FPP,Cpu> D = algo.get_D();
+	Faust::MatDense<FPP,Cpu> full_D = Faust::MatDense<FPP,Cpu>(D);
+	cout << "D fro norm:" << D.norm() << endl;
+	cout << "diag D:" << endl;
+	vector<FPP> D_diag, D_ord_diag;
+	vector<int> D_indices;
+	for(int i=0;i<D.getNbRow();i++){
+		cout  << D.getValuePtr()[i] << " " << endl;
+		D_diag.push_back(D.getValuePtr()[i]);
+		D_indices.push_back(i);
+	}
+	sort(D_indices.begin(), D_indices.end(), [&D_diag](int i, int j) {
+			return D_diag[i] < D_diag[j];
+			});
+
+	cout << "sorted diag D:" << endl;
+	for(int i=0;i<D_indices.size();i++){
+		cout  << D_diag[D_indices[i]] << " " << endl;
+		D_ord_diag.push_back(D_diag[D_indices[i]]);
+	}
+
+	Faust::MatDense<FPP,Cpu> * ordered_fourier_diag = fourier_diag.get_cols(D_indices);
+
+
+	vector<int> cols, rows;
+	for(int i=0;i<D.getNbRow();i++)
+	{
+		cols.push_back(i);
+		rows.push_back(i);
+	}
+	Faust::MatDense<FPP,Cpu> * ordered_D = new Faust::MatDense<FPP,Cpu>(Faust::MatSparse<FPP,Cpu>(cols,rows,D_ord_diag, D_ord_diag.size(), D_ord_diag.size()));
+
+
+	cout << "orderded D fro norm: " << ordered_D->norm() << endl;
+	cout << "ordered_D:" << endl;
+	ordered_D->Display();
+
+	cout << "ordered D eles" << endl;
+	for(int i=0;i<ordered_D->getNbRow();i++)
+	{
+		cout << ordered_D->getData()[i*ordered_D->getNbRow()+i] << " " << full_D(i,i) << endl;
+	}
+
+	cout << "orderded fourier_diag fro norm: " << ordered_fourier_diag->norm() << endl;
+	cout << "Lap fro norm: " << Lap.norm() << endl;
+
+	Faust::MatDense<FPP,Cpu> tmp = *ordered_fourier_diag;
+	tmp.multiplyRight(*ordered_D);
+	ordered_fourier_diag->transpose();
+	tmp.multiplyRight(*ordered_fourier_diag);
+	ordered_fourier_diag->transpose();
+	tmp -= Lap;
+	cout << tmp.norm()/Lap.norm() << endl;
+
+//
+//	spectrum = diag(D);
+//	[~,I] = sort(spectrum);
+
+
+
+
+//		% fourier_diag_full = full(fourier_diag');
+//	fourier_diag_full = full(fourier_diag);
+//	Uhat_givens = fourier_diag_full(:,I);
+//	for i=1:size(Uhat_givens,2)
+//		    Uhat_givens(:,i) = Uhat_givens(:,i).*sign(Uhat_givens(:,i)'*U(:,i));
+//	end
+//
+//		RC_givens = 4*J/nnz(U);
+//	disp(['RCG_givens = ' num2str(1/RC_givens)])
+//
+//		err1 = norm(U-Uhat_givens,'fro')/norm(U,'fro')
+//		err2 = norm(Uhat_givens'*Lap*Uhat_givens - diag(diag(Uhat_givens'*Lap*Uhat_givens)),'fro')/norm(Lap,'fro')
+//
 	return 0;
 }
 
