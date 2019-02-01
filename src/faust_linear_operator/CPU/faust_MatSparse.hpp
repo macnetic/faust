@@ -504,6 +504,17 @@ void Faust::MatSparse<FPP,Cpu>::operator/=(const FPP alpha)
 	update_dim();
 }
 
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::setCoeff(const int& i, const int& j, const FPP & val)
+{
+	if(i > this->getNbRow() || i < 0 || j > this->getNbCol() || j < 0)
+		handleError(m_className, "setCoeff() received invalid element indices");
+	mat.coeffRef(i,j) = val;
+	update_dim();
+}
+
+
+
 
 template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::print_file(const char* filename)const

@@ -174,6 +174,7 @@ namespace Faust
 			{(*this)=Mdense;}
 			void operator*=(const FPP alpha);
 			void operator/=(const FPP alpha);
+			void setCoeff(const int& i, const int& j, const FPP & val);
 
 			//! \brief check if the dimension and number of nonzeros of the Faust::MatSparse are coherent */
 			void check_dim_validity() const;
