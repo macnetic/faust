@@ -67,8 +67,19 @@ int main()
 	Faust::MatDense<FPP,Cpu> full_D = Faust::MatDense<FPP,Cpu>(D);
 	cout << "D fro norm:" << D.norm() << endl;
 
+	Faust::MatDense<FPP,Cpu> fourier_diag2 = algo.compute_fourier();
+	Faust::MatDense<FPP,Cpu> ordered_fourier_diag2 = algo.compute_fourier(true);
+
 	Faust::MatDense<FPP,Cpu> * ordered_fourier_diag = fourier_diag.get_cols(algo.get_ord_indices());
 
+	fourier_diag2 -= fourier_diag;
+	ordered_fourier_diag2 -= *ordered_fourier_diag;
+	cout << "norm(fourier_diag2-fourier_diag): " << fourier_diag2.norm() << endl;
+	cout << "norm(ordered_fourier_diag2-ordered_fourier_diag): " << ordered_fourier_diag2.norm() << endl;
+
+	//verify approx. fourier is properly computed (when ordered or not)
+	assert(fourier_diag2.norm()==0);
+	assert(ordered_fourier_diag2.norm()==0);
 
 	Faust::MatDense<FPP,Cpu> ordered_D(algo.get_D(true));
 
@@ -82,7 +93,7 @@ int main()
 		cout << ordered_D.getData()[i*ordered_D.getNbRow()+i] << " " << full_D(i,i) << endl;
 	}
 
-	cout << "orderded fourier_diag fro norm: " << ordered_fourier_diag->norm() << endl;
+	cout << "ordered fourier_diag fro norm: " << ordered_fourier_diag->norm() << endl;
 	cout << "Lap fro norm: " << Lap.norm() << endl;
 
 	Faust::MatDense<FPP,Cpu> tmp = *ordered_fourier_diag;

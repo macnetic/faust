@@ -125,6 +125,12 @@ namespace Faust {
 
 			/**
 			 *
+			 *
+			 */
+			const MatDense<FPP,DEVICE> compute_fourier(const bool ord=false);
+
+			/**
+			 *
 			 */
 			const MatDense<FPP,DEVICE>& get_L() const ;
 

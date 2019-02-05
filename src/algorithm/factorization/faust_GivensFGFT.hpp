@@ -335,6 +335,26 @@ const Faust::MatSparse<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_D(const bool
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
+const Faust::MatDense<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::compute_fourier(const bool ord /* default to false */)
+{
+	Faust::MatDense<FPP,Cpu> fourier(Lap.getNbRow(), Lap.getNbCol());
+	Faust::MatDense<FPP,Cpu>* ord_fourier;
+	fourier.setEyes();
+	for(int i=facts.size()-1;i>=0;i--)
+		facts[i].multiply(fourier, 'N');
+	if(ord)
+	{
+		if(!is_D_ordered)
+			order_D();
+		ord_fourier = fourier.get_cols(ord_indices);
+		fourier = *ord_fourier;
+		delete ord_fourier;
+	}
+	return fourier;
+}
+
+
+template<typename FPP, Device DEVICE, typename FPP2>
 const MatDense<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_L() const
 {
 	return L;
