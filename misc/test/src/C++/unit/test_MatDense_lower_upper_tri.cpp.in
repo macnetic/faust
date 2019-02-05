@@ -1,0 +1,31 @@
+
+#define DEBUG_TRI 1
+#include "faust_MatDense.h"
+
+
+#include <complex>
+#include <random>
+
+using namespace Faust;
+typedef @TEST_FPP@ FPP;
+
+
+int main()
+{
+	MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(5,5);
+
+
+	Faust::MatSparse<FPP,Cpu> ltri_M = M->lower_tri();
+
+	ltri_M.Display();
+
+	ltri_M = M->lower_tri(false);
+	ltri_M.Display();
+
+	Faust::MatSparse<FPP,Cpu> utri_M = M->upper_tri();
+	utri_M.Display();
+	utri_M = M->upper_tri(false);
+	utri_M.Display();
+
+	return 0;
+}

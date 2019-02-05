@@ -153,6 +153,44 @@ void Faust::MatDense<FPP,Cpu>::check_dim_validity()
 #endif
 
 }
+
+
+template<typename FPP>
+Faust::MatDense<FPP,Cpu> Faust::MatDense<FPP,Cpu>::lower_tri(const bool diag) const
+{
+	Faust::MatDense<FPP,Cpu> tri = Faust::MatDense<FPP,Cpu>(this->dim1, this->dim2);
+	if(diag)
+		tri.mat = mat.template triangularView<Eigen::Lower>();
+	else
+		tri.mat = mat.template triangularView<Eigen::StrictlyLower>();
+#ifdef DEBUG_TRI
+	cout << "MatDense::lower_tri(" << diag << ")" << endl;
+	cout << "orig. mat.:" << endl;
+	cout << mat << endl;
+	cout << "tri. mat.:" << endl;
+	cout << tri.mat << endl;
+#endif
+	return tri;
+}
+
+template<typename FPP>
+Faust::MatDense<FPP,Cpu> Faust::MatDense<FPP,Cpu>::upper_tri(const bool diag) const
+{
+	Faust::MatDense<FPP,Cpu> tri = Faust::MatDense<FPP,Cpu>(this->dim1, this->dim2);
+	if(diag)
+		tri.mat = mat.template triangularView<Eigen::Upper>();
+	else
+		tri.mat = mat.template triangularView<Eigen::StrictlyUpper>();
+#ifdef DEBUG_TRI
+	cout << "MatDense::upper_tri(" << diag << ")" << endl;
+	cout << "orig. mat.:" << endl;
+	cout << mat << endl;
+	cout << "tri. mat.:" << endl;
+	cout << tri.mat << endl;
+#endif
+	return tri;
+}
+
 	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::setOnes()
 {

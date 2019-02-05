@@ -448,6 +448,19 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		static Faust::MatDense<FPP,Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, float density);
 		//\param : per_row means the density applies for each line rather than globally for the matrix
 		static Faust::MatDense<FPP,Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, float density, bool per_row);
+		/**
+		 * \brief Returns the lower-triangular matrix with or without the diagonal.
+		 *
+		 * param diag true to include the diagonal, false otherwise.
+		 */
+		Faust::MatDense<FPP,Cpu> lower_tri(const bool diag=true) const;
+		/**
+		 * \brief Returns the upper-triangular matrix with or without the diagonal.
+		 *
+		 * param diag true to include the diagonal, false otherwise.
+		 */
+		Faust::MatDense<FPP,Cpu> upper_tri(const bool diag=true) const;
+
 		private:
 		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;
 		bool isIdentity;
