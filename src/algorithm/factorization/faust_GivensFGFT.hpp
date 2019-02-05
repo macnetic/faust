@@ -238,8 +238,36 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFT<FPP,DEVICE,FPP2>::order_D()
+{
+	vector<FPP> D_ord_diag;
+	vector<int> nat_ord_indices;
+	for(int i=0;i<D.getNbRow();i++)
+		ord_indices.push_back(i);
+	nat_ord_indices = ord_indices;
+	sort(ord_indices.begin(), ord_indices.end(), [this](int i, int j) {
+			return D.getValuePtr()[i] < D.getValuePtr()[j];
+			});
+	for(int i=0;i<ord_indices.size();i++){
+		D_ord_diag.push_back(this->D.getValuePtr()[ord_indices[i]]);
+	}
+	ordered_D = MatSparse<FPP,Cpu>(nat_ord_indices, nat_ord_indices, D_ord_diag, nat_ord_indices.size(), nat_ord_indices.size());
+	is_D_ordered = true;
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+const vector<int>& GivensFGFT<FPP,DEVICE,FPP2>::get_ord_indices()
+{
+	if(! is_D_ordered)
+		order_D();
+	return ord_indices;
+}
+
+
+template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 {
+	is_D_ordered = false; // facts (re)computed then D must be reordered
 	ite = 0;
 	while(ite < facts.size())
 	{
@@ -249,7 +277,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbCol()), errs(J), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()])
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbCol()), errs(J), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false)
 {
 	/** Matlab ref. code:
 	 *     facts = cell(1,J);
@@ -294,8 +322,15 @@ const vector<FPP2>& GivensFGFT<FPP,DEVICE,FPP2>::get_errs() const
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-const MatDense<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_D() const
+const Faust::MatSparse<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_D(const bool ord /* default to false */)
 {
+	if(ord)
+	{
+		if(!is_D_ordered)
+			order_D();
+		return ordered_D;
+
+	}
 	return D;
 }
 

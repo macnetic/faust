@@ -66,51 +66,27 @@ int main()
 	const Faust::MatSparse<FPP,Cpu> D = algo.get_D();
 	Faust::MatDense<FPP,Cpu> full_D = Faust::MatDense<FPP,Cpu>(D);
 	cout << "D fro norm:" << D.norm() << endl;
-	cout << "diag D:" << endl;
-	vector<FPP> D_diag, D_ord_diag;
-	vector<int> D_indices;
-	for(int i=0;i<D.getNbRow();i++){
-		cout  << D.getValuePtr()[i] << " " << endl;
-		D_diag.push_back(D.getValuePtr()[i]);
-		D_indices.push_back(i);
-	}
-	sort(D_indices.begin(), D_indices.end(), [&D_diag](int i, int j) {
-			return D_diag[i] < D_diag[j];
-			});
 
-	cout << "sorted diag D:" << endl;
-	for(int i=0;i<D_indices.size();i++){
-		cout  << D_diag[D_indices[i]] << " " << endl;
-		D_ord_diag.push_back(D_diag[D_indices[i]]);
-	}
-
-	Faust::MatDense<FPP,Cpu> * ordered_fourier_diag = fourier_diag.get_cols(D_indices);
+	Faust::MatDense<FPP,Cpu> * ordered_fourier_diag = fourier_diag.get_cols(algo.get_ord_indices());
 
 
-	vector<int> cols, rows;
-	for(int i=0;i<D.getNbRow();i++)
-	{
-		cols.push_back(i);
-		rows.push_back(i);
-	}
-	Faust::MatDense<FPP,Cpu> * ordered_D = new Faust::MatDense<FPP,Cpu>(Faust::MatSparse<FPP,Cpu>(cols,rows,D_ord_diag, D_ord_diag.size(), D_ord_diag.size()));
+	Faust::MatDense<FPP,Cpu> ordered_D(algo.get_D(true));
 
-
-	cout << "orderded D fro norm: " << ordered_D->norm() << endl;
+	cout << "orderded D fro norm: " << ordered_D.norm() << endl;
 	cout << "ordered_D:" << endl;
-	ordered_D->Display();
+	ordered_D.Display();
 
 	cout << "ordered D eles" << endl;
-	for(int i=0;i<ordered_D->getNbRow();i++)
+	for(int i=0;i<ordered_D.getNbRow();i++)
 	{
-		cout << ordered_D->getData()[i*ordered_D->getNbRow()+i] << " " << full_D(i,i) << endl;
+		cout << ordered_D.getData()[i*ordered_D.getNbRow()+i] << " " << full_D(i,i) << endl;
 	}
 
 	cout << "orderded fourier_diag fro norm: " << ordered_fourier_diag->norm() << endl;
 	cout << "Lap fro norm: " << Lap.norm() << endl;
 
 	Faust::MatDense<FPP,Cpu> tmp = *ordered_fourier_diag;
-	tmp.multiplyRight(*ordered_D);
+	tmp.multiplyRight(ordered_D);
 	ordered_fourier_diag->transpose();
 	tmp.multiplyRight(*ordered_fourier_diag);
 	ordered_fourier_diag->transpose();

@@ -29,6 +29,11 @@ namespace Faust {
 			vector<int> fact_mod_col_ids;
 			vector<FPP> fact_mod_values;
 
+			//ordered indices of D to get increasing eigenvalues
+			vector<int> ord_indices;
+			Faust::MatSparse<FPP,DEVICE> ordered_D;
+			bool is_D_ordered;
+
 			/**
 			 * Matrix pivot and column indices.
 			 */
@@ -59,6 +64,7 @@ namespace Faust {
 			 */
 			void compute_facts();
 
+			private:
 			/** \brief Algo. step 2.1.
 			*/
 			void choose_pivot();
@@ -93,6 +99,16 @@ namespace Faust {
 			void update_err();
 
 			/**
+			 * Order D into ordered_D and keeps ordered indices in ord_indices.
+			 */
+			void order_D();
+
+			public:
+
+			const vector<int>& get_ord_indices();
+
+
+			/**
 			 *
 			 */
 			const vector<FPP2>& get_errs() const;
@@ -105,7 +121,7 @@ namespace Faust {
 			/**
 			 *
 			 */
-			const MatDense<FPP,DEVICE> get_D() const;
+			const MatSparse<FPP,DEVICE> get_D(const bool ord=false);
 
 			/**
 			 *
@@ -125,6 +141,8 @@ namespace Faust {
 			const MatDense<FPP,DEVICE>& get_Lap() const;
 
 			const vector<MatSparse<FPP,DEVICE>>& get_facts() const;
+
+
 		};
 
 }
