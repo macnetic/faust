@@ -18,7 +18,9 @@ int main()
 	Faust::MatDense<FPP,Cpu> Lap;
 	init_faust_mat_from_matio(Lap,configFilename.c_str(),"Lap");
 
-	GivensFGFT<FPP,Cpu> algo(Lap,5472);
+	int J = 5472;
+	GivensFGFT<FPP,Cpu> algo(Lap,J);
+
 	algo.compute_facts();
 
 	vector<pair<int,int>> coord_choices = algo.get_coord_choices();
@@ -27,6 +29,30 @@ int main()
 //	{
 //		cout << choice.first+1 << " " << choice.second+1 << endl;
 //	}
+
+	mat_t *matfp;
+
+	matfp = Mat_Open(configFilename.c_str(),MAT_ACC_RDONLY);
+	if ( NULL == matfp ) {
+		fprintf(stderr,"Error opening MAT file %s", configFilename.c_str());
+		return EXIT_FAILURE;
+	}
+	matvar_t* cell_choices = Mat_VarRead(matfp, "choices");
+	int* p_choices = new int[J];
+	int* q_choices = new int[J];
+	cout << "=======================================" << endl;
+    if ( NULL != cell_choices) {
+        for (int i = 0; i < J*2; i+=2 )
+		{
+				p_choices[i/2] = (int)((double*) (cell_choices->data))[i];
+				q_choices[i/2] = (int)((double*) (cell_choices->data))[i+1];
+		}
+        free(cell_choices);
+	}
+	Mat_Close(matfp);
+
+	for(int j=0;j<J;j++)
+		printf("ite=%d (1-base index) ref. p=%d q=%d, algo. p=%d q=%d\n", j, p_choices[j], q_choices[j], coord_choices[j].first+1, coord_choices[j].second+1);
 
 //
 //
@@ -40,8 +66,8 @@ int main()
 	Faust::MatDense<FPP,Cpu> fourier_diag(Lap.getNbRow(), Lap.getNbCol());
 	fourier_diag.setEyes();
 	const vector<Faust::MatSparse<FPP,Cpu>>& givens_facts = algo.get_facts();
-	for(auto fact : givens_facts)
-		fact.multiply(fourier_diag, 'N');
+	for(int i=givens_facts.size()-1;i>=0;i--)
+		givens_facts[i].multiply(fourier_diag, 'N');
 
 	cout << "fourier_diag fro norm: " << fourier_diag.norm() << endl;
 
@@ -119,6 +145,8 @@ int main()
 //		err1 = norm(U-Uhat_givens,'fro')/norm(U,'fro')
 //		err2 = norm(Uhat_givens'*Lap*Uhat_givens - diag(diag(Uhat_givens'*Lap*Uhat_givens)),'fro')/norm(Lap,'fro')
 //
+	delete []p_choices;
+	delete []q_choices;
 	return 0;
 }
 
