@@ -179,16 +179,24 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_fact()
 	fact_mod_col_ids.push_back(q);
 	fact_mod_values.push_back(cos(theta));
 	facts[ite] = MatSparse<FPP,DEVICE>(fact_mod_row_ids, fact_mod_col_ids, fact_mod_values, n, n);
-	cout << "norm facts ite: " << ite << facts[ite].norm() << endl;
+#ifdef DEBUG_GIVENS
+	cout << "GivensFGFT::update_fact() ite: " << ite << " fact norm: " << facts[ite].norm() << endl;
 	facts[ite].Display();
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
 {
 	// L = S'*L*S
+#ifdef DEBUG_GIVENS
+	cout << "L(p,q) before update_L():" << L(p,q) << endl;
+#endif
 	facts[ite].multiply(L, 'T');
 	L.multiplyRight(MatDense<FPP,Cpu>(facts[ite]));
+#ifdef DEBUG_GIVENS
+	cout << "L(p,q) after update_L():" << L(p,q) << endl;
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -206,24 +214,27 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_D()
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 {
-// Matlab ref. code:
-//        if mod(j,100)==0
-//            %err(j) = norm(D-L,'fro')^2/norm(L,'fro')^2;
-//            err(j) = norm(D-L,'fro')^2/norm(Lap,'fro')^2;
-//            %err(j) = norm(D-L)/norm(Lap);
-//            disp(['Iter ' num2str(j) ', error = ' num2str(err(j))])
-//            %    disp(['Number of edges: ' num2str(N_edges)])
-//        end
-//
-	MatDense<FPP,Cpu> tmp = D;
-	tmp -= Lap;
-	FPP2 err = tmp.norm(), err_d;
-//	err *= err;
-	err_d = Lap.norm();
-//	err_d *= err_d;
-	err /= err_d;
-	cout << "ite. i: "<< ite << " err.: " << err << endl;
-	//TODO: boolean to display error or verbose mode
+	// Matlab ref. code:
+	//        if mod(j,100)==0
+	//            %err(j) = norm(D-L,'fro')^2/norm(L,'fro')^2;
+	//            err(j) = norm(D-L,'fro')^2/norm(Lap,'fro')^2;
+	//            %err(j) = norm(D-L)/norm(Lap);
+	//            disp(['Iter ' num2str(j) ', error = ' num2str(err(j))])
+	//            %    disp(['Number of edges: ' num2str(N_edges)])
+	//        end
+	//
+	if(!(ite%100))
+	{
+		MatDense<FPP,Cpu> tmp = D;
+		tmp -= L;
+		FPP2 err = tmp.norm(), err_d;
+		err *= err;
+		err_d = Lap.norm();
+		err_d *= err_d;
+		err /= err_d;
+		cout << "ite. i: "<< ite << " err.: " << err << endl;
+		//TODO: boolean to display error or verbose mode
+	}
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
