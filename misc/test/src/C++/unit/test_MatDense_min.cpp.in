@@ -27,7 +27,7 @@ int main()
 			cout << M.getData()[j*3+i] << " ";
 		cout << endl;
 	}
-	cout << "M.min():" << M.min() << endl;
+	cout << "M.min_coeff():" << M.min_coeff() << endl;
 	int indices[3];
 
 	cout << "M.rowwise_min()" << endl;
