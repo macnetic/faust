@@ -192,7 +192,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
 	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
  
 	foreach(TEST_FPP float double complex<float> complex<double>)	
-		foreach(testin hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication faust_matdense_conjugate GivensFGFT)
+		foreach(testin hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication faust_matdense_conjugate GivensFGFT GivensFGFTParallel)
 		if(${TEST_FPP} MATCHES complex AND ${testin} MATCHES GivensFGFT)
 			continue()
 			# GivensFGFT doesn't handle complex matrices

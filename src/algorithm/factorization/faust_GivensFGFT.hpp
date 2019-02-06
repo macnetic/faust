@@ -7,7 +7,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::next_step()
 {
 
 	substep_fun substep[] = {
-		&GivensFGFT<FPP,DEVICE,FPP2>::max_L_into_C,
+		&GivensFGFT<FPP,DEVICE,FPP2>::max_L,
 		&GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot,
 		&GivensFGFT<FPP,DEVICE,FPP2>::calc_theta,
 		&GivensFGFT<FPP,DEVICE,FPP2>::update_fact,
@@ -38,7 +38,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::max_L_into_C()
+void GivensFGFT<FPP,DEVICE,FPP2>::max_L()
 {
 	// Matlab ref. code:
 	//**************  at initialization
@@ -139,7 +139,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::calc_theta()
 	theta2 = theta1 + M_PI_4; // from cmath
 	err_theta1 = calc_err(theta1);
 	err_theta2 = calc_err(theta2);
-	if(err_theta1 < err_theta2)
+	if(err_theta1 < err_theta2 && !always_theta2)
 		theta = theta1;
 	else
 		theta = theta2;
@@ -277,7 +277,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbCol()), errs(J), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false)
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbCol()), errs(J), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false)
 {
 	/** Matlab ref. code:
 	 *     facts = cell(1,J);

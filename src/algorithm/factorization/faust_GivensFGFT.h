@@ -13,6 +13,7 @@ namespace Faust {
 	template<typename FPP, Device DEVICE, typename FPP2 = float>
 		class GivensFGFT {
 
+			protected:
 			vector<Faust::MatSparse<FPP,DEVICE>> facts;
 			Faust::MatSparse<FPP,DEVICE> D;
 			Faust::MatDense<FPP,DEVICE> C;
@@ -35,7 +36,7 @@ namespace Faust {
 			bool is_D_ordered;
 
 			/**
-			 * Matrix pivot and column indices.
+			 * L pivot row and column indices.
 			 */
 			int p, q;
 
@@ -43,6 +44,9 @@ namespace Faust {
 			 * Current iteration index (pointing to the current factor to update).
 			 */
 			unsigned int ite;
+
+			// in calc_theta() two values are calculated, set this bool to true to always choose theta2 (useful for GivensFGFTParallel)
+			bool always_theta2;
 
 			/**
 			 * Function pointer to any step of the algorithm.
@@ -52,27 +56,27 @@ namespace Faust {
 
 			public:
 			GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J);
-			~GivensFGFT() {delete[] q_candidates;};
+			virtual ~GivensFGFT() {delete[] q_candidates;};
 
 			/**
 			 * \brief Algo. main step.
 			 */
-			void next_step();
+			virtual void next_step();
 
 			/**
 			 * \brief Algo. main loop (facts.size() iterations).
 			 */
 			void compute_facts();
 
-			private:
+			protected:
 			/** \brief Algo. step 2.1.
 			*/
-			void choose_pivot();
+			virtual void choose_pivot();
 
 			/** \brief Algo. step 2.1.1
 			 *
 			 */
-			void max_L_into_C();
+			virtual void max_L();
 
 			/** \brief Algo. step 2.2.
 			*/
@@ -81,7 +85,7 @@ namespace Faust {
 			/**
 			 * \brief Algo. step 2.3.
 			 */
-			void update_fact();
+			virtual void update_fact();
 
 			/**
 			 * \brief Algo. step 2.4
