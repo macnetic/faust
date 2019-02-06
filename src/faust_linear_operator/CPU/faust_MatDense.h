@@ -46,6 +46,7 @@
 
 #include "faust_constant.h"
 #include <vector>
+#include <list>
 #include <iterator>
 #include "faust_MatGeneric.h"
 #include "faust_exception.h"
@@ -464,7 +465,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		/**
 		 * \brief Returns the nonzeros indices.
 		 */
-		vector<pair<int,int>> nonzeros_indices() const;
+		list<pair<int,int>> nonzeros_indices() const;
 
 		private:
 		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;

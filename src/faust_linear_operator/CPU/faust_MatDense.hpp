@@ -193,9 +193,9 @@ Faust::MatDense<FPP,Cpu> Faust::MatDense<FPP,Cpu>::upper_tri(const bool diag) co
 
 
 template<typename FPP>
-vector<pair<int,int>> Faust::MatDense<FPP,Cpu>::nonzeros_indices() const
+list<pair<int,int>> Faust::MatDense<FPP,Cpu>::nonzeros_indices() const
 {
-	vector<pair<int,int>> nz_inds;
+	list<pair<int,int>> nz_inds;
 	if(isIdentity)
 		for(int i=0;i<min(this->dim1, this->dim2);i++)
 			nz_inds.push_back(make_pair(i,i));

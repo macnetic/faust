@@ -1,12 +1,15 @@
 #include "faust_MatDense.h"
 
 
+#include <list>
 #include <complex>
 #include <random>
 
 using namespace Faust;
 typedef @TEST_FPP@ FPP;
 
+
+using namespace std;
 
 int main()
 {
@@ -36,8 +39,8 @@ int main()
 
 	assert(M->getNonZeros() == nnz);
 
-	vector<pair<int,int>> ref_nz_inds;
-	vector<pair<int,int>> nz_inds = M->nonzeros_indices();
+	list<pair<int,int>> ref_nz_inds;
+	list<pair<int,int>> nz_inds = M->nonzeros_indices();
 
 	for(auto indp : nz_inds)
 		cout <<  "(" << indp.first << "," << indp.second << ") ";
