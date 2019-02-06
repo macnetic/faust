@@ -1,0 +1,80 @@
+#include "faust_MatDense.h"
+
+
+#include <complex>
+#include <random>
+
+using namespace Faust;
+typedef @TEST_FPP@ FPP;
+
+
+int main()
+{
+	int mat_nrows = 5, mat_ncols = 5;
+	int nz = 3;
+	int nnz = mat_nrows*mat_ncols-nz;
+	int * zero_inds = new int[nz*2];
+
+	//ele 0
+	zero_inds[0] = 1;
+	zero_inds[1] = 3;
+	//ele 1
+	zero_inds[1*2+0] = 0;
+	zero_inds[1*2+1] = 4;
+	//ele 2
+	zero_inds[2*2+0] = 3;
+	zero_inds[2*2+1] = 2;
+
+
+	MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(mat_nrows, mat_ncols);
+	M->scalarMultiply(100);
+
+	assert(M->getNonZeros() == mat_nrows*mat_ncols);
+
+	for(int i=0;i<nz;i++)
+		M->getData()[zero_inds[i*2+1]*M->getNbRow()+zero_inds[i*2+0]]= FPP(0);
+
+	assert(M->getNonZeros() == nnz);
+
+	vector<pair<int,int>> ref_nz_inds;
+	vector<pair<int,int>> nz_inds = M->nonzeros_indices();
+
+	for(auto indp : nz_inds)
+		cout <<  "(" << indp.first << "," << indp.second << ") ";
+	cout << endl;
+
+
+	bool keep;
+	for(int i=0;i<mat_nrows;i++)
+		for(int j=0;j<mat_ncols;j++)
+		{
+			keep = true;
+			for(int k=0;k<nz && keep;k++)
+				if(i == zero_inds[k*2+0] && j == zero_inds[k*2+1])
+					keep = false;
+			if(keep) ref_nz_inds.push_back(make_pair(i,j));
+		}
+
+	assert(ref_nz_inds.size() == nnz);
+	assert(nz_inds.size() == nnz);
+
+	//assert we find all nonzeros indices and that zero indices are really excluded
+	for(auto ref_pair : ref_nz_inds)
+	{
+//		cout << ref_pair.first << " " << ref_pair.second << endl;
+		assert(find(begin(nz_inds), end(nz_inds), ref_pair) != end(nz_inds));
+	}
+
+	for(int i=0;i<nz;i++)
+	{
+		auto p = make_pair(zero_inds[i*2+0], zero_inds[i*2+1]);
+		assert(find(begin(nz_inds), end(nz_inds), p) == end(nz_inds));
+	}
+
+
+	M->Display();
+
+
+	delete [] zero_inds;
+	return 0;
+}

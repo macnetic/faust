@@ -191,6 +191,29 @@ Faust::MatDense<FPP,Cpu> Faust::MatDense<FPP,Cpu>::upper_tri(const bool diag) co
 	return tri;
 }
 
+
+template<typename FPP>
+vector<pair<int,int>> Faust::MatDense<FPP,Cpu>::nonzeros_indices() const
+{
+	vector<pair<int,int>> nz_inds;
+	if(isIdentity)
+		for(int i=0;i<min(this->dim1, this->dim2);i++)
+			nz_inds.push_back(make_pair(i,i));
+	else if(! isZeros)
+	{
+		int i,j;
+		for(int k=0;k<this->dim1*this->dim2;k++)
+			if(mat(k) != FPP(0))
+			{
+				j = k/this->dim1;
+				i = k-j*this->dim1;
+				nz_inds.push_back(make_pair(i,j));
+			}
+	}
+	return nz_inds;
+}
+
+
 	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::setOnes()
 {

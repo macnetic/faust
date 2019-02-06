@@ -461,6 +461,11 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		 */
 		Faust::MatDense<FPP,Cpu> upper_tri(const bool diag=true) const;
 
+		/**
+		 * \brief Returns the nonzeros indices.
+		 */
+		vector<pair<int,int>> nonzeros_indices() const;
+
 		private:
 		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;
 		bool isIdentity;
