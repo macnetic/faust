@@ -15,10 +15,11 @@ namespace Faust {
 			/**
 			 * \class Faust::GivensFGFT
 			 *
-			 * This class implements the Givens FGFT algorithm.
+			 * \brief This class implements the Givens FGFT algorithm.
 			 * This algorithm is based on the classical Jacobi eigenvalues algorithm.
 			 *
 			 *  References:
+			 *
 			 *  [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
 			 *    graph Fourier transforms via multi-layer sparse approximations",
 			 *    submitted to IEEE Transactions on Signal and Information Processing
