@@ -51,7 +51,8 @@ n=size(Lap,1);
 L=sparse(Lap);
 C = zeros(n);
 err=zeros(1,round(J/t));
-coord_choices = zeros(2,J);
+%coord_choices = zeros(2,J);
+coord_choices = []
 %N_edges = (nnz(Lap)-n)/2;
 
 
@@ -64,8 +65,7 @@ for j=1:round(J/t)
     %%%%%%%%% Un tri
     ind_nnz = find(L_low);
     %disp(['nnz in L :' num2str(numel(ind_nnz))])
-    
-    [~,ind_sorted] = sort(L_low(ind_nnz),'descend');
+	[~,ind_sorted] = sort(L_low(ind_nnz),'descend');
     [Rvec, Svec] = ind2sub([n,n],ind_nnz(ind_sorted));
     RSmat = [Rvec, Svec];
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,8 +116,9 @@ for j=1:round(J/t)
             RSmatnew = RSmat(~tokill,:);
             RSmat = RSmatnew;
             % if  ~any(abs(p-chosen)<0.5) && ~any(abs(q-chosen)<0.5)%numel(find(S(p,:)))==1 && numel(find(S(:,q)))==1
-            coord_choices(1,j) = p;
-            coord_choices(2,j) = q;
+            %coord_choices(1,j) = p;
+            %coord_choices(2,j) = q;
+			coord_choices = [ coord_choices, [p;q]];
             theta = atan2(L(q,q) - L(p,p),2*L(p,q))/2 + pi/4;
             S(p,p) = cos(theta); S(p,q) = -sin(theta);
             S(q,p) = sin(theta); S(q,q) = cos(theta);
@@ -130,7 +131,8 @@ for j=1:round(J/t)
     end
     L = S'*L*S;
     facts{j} = sparse(S);
-    D = spdiag(diag(L));
+	D = spdiag(diag(L)); 
+    % D = sparse(diag(diag(L)));
     %    errchg = err - norm(D-L,'fro')^2
     if mod(j,1)==0
         %err(j) = norm(D-L,'fro')^2/norm(L,'fro')^2;

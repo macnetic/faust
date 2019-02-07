@@ -7,6 +7,7 @@ GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatDense<FPP,DEVI
 {
 	this->facts.resize(round(J/(float)t));
 	this->always_theta2 = true;
+	this->coord_choices.resize(0);
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -26,7 +27,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::max_L()
 
 #ifdef DEBUG_GIVENS
 	for(auto &p : fact_nz_inds)
-		cout << "GivensFGFTParallel::max_L() before sort :" << L_low(p.first, p.second) << endl;
+		cout << "GivensFGFTParallel::max_L() before sort (" << p.first+1 <<  "," << p.second+1 << ") :" << L_low(p.first, p.second) << endl;
 #endif
 
 	//ENOTE: can't use sort(it,it, lambda) as vector because list doesn't provide random access it.
@@ -36,7 +37,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::max_L()
 			});
 #ifdef DEBUG_GIVENS
 	for(auto &p : fact_nz_inds)
-		cout << "GivensFGFTParallel::max_L() after sort :" << L_low(p.first, p.second) << endl;
+		cout << "GivensFGFTParallel::max_L() after sort (" << p.first+1 <<  "," << p.second+1 << ") :" << L_low(p.first, p.second) << endl;
 #endif
 }
 
@@ -53,11 +54,15 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_fact_nz_inds()
 	//remove all pairs containing p or q
 	for(auto i = fact_nz_inds.begin(); i != fact_nz_inds.end();)
 	{
-		if((*i).first == this->p || (*i).second == this->q)
+		if((*i).first == this->p || (*i).second == this->q || (*i).first == this->q || (*i).second == this->p)
 			i = fact_nz_inds.erase(i);
 		else
 			i++;
 	}
+#ifdef DEBUG_GIVENS
+	for(auto &p : fact_nz_inds)
+		cout << "GivensFGFTParallel::update_fact_nz_inds() after purge (" << p.first+1 <<  "," << p.second+1 << ") :" << endl;
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -105,9 +110,10 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::choose_pivot()
 	pair<int,int> max_elt = *(fact_nz_inds.begin());
 	this->p = max_elt.first;
 	this->q = max_elt.second;
-	//keep only the last pivot selected as in Matlab version
-	this->coord_choices[this->ite] = pair<int,int>(this->p,this->q);
+	this->coord_choices.push_back(pair<int,int>(this->p,this->q));
+#ifdef DEBUG_GIVENS
 	cout << "choose_pivot() p: " << this->p+1 << " q:" << this->q+1 << " " << "L(p,q): " << this->L(this->p,this->q) << " nrots: " << fact_nrots << endl;
+#endif
 }
 
 
@@ -147,8 +153,8 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::finish_fact()
 {
 	int n = this->Lap.getNbRow();
 	this->facts[this->ite] = MatSparse<FPP,DEVICE>(this->fact_mod_row_ids, this->fact_mod_col_ids, this->fact_mod_values, n, n);
-//#ifdef DEBUG_GIVENS
+#ifdef DEBUG_GIVENS
 	cout << "GivensFGFTParallel::finish_fact() ite: " << this->ite << " fact norm: " << this->facts[this->ite].norm() << endl;
 	this->facts[this->ite].Display();
-//#endif
+#endif
 }
