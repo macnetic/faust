@@ -43,6 +43,7 @@
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
 #include "faust_Transform.h"
+#include "faust_TransformHelper.h"
 #include <string>
 
 
@@ -116,5 +117,18 @@ int main(int argc, char* argv[])
 
 		assert(ref_fact == test_fact3);
 	}
+
+	cout << "Test move into a TransformHelper object: " << endl;
+	TransformHelper<FPP,Cpu> th(t3, true); //true to do a std::move(t3) in constructor
+
+	for(int i=0;i<n_mats;i++)
+	{
+		MatGeneric<FPP,Cpu>* ref_fact = facts[i];
+		unsigned long long test_fact4 = th.get_fact_addr(i);
+cout << "orig ptr fact[" << i << "]: " << ref_fact << " the moved one by ctor: " << ((void*)test_fact4) << endl;
+
+		assert((unsigned long long) ref_fact == test_fact4);
+	}
+
 	return 0;
 }

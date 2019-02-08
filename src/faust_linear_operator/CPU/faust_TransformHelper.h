@@ -88,7 +88,7 @@ namespace Faust {
 			TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
-TransformHelper(Transform<FPP,Cpu> &t);
+TransformHelper(Transform<FPP,Cpu> &t, const bool moving=false);
 
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x) const;
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose);
@@ -159,6 +159,7 @@ TransformHelper(Transform<FPP,Cpu> &t);
 			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n);
 			~TransformHelper();
 
+			unsigned long long get_fact_addr(const faust_unsigned_int id) const;
 			private:
 			void copy_slices(TransformHelper<FPP, Cpu>* th, const bool transpose = false);
 			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;

@@ -200,9 +200,12 @@ namespace Faust {
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(Transform<FPP,Cpu> &t) : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false)
+		TransformHelper<FPP,Cpu>::TransformHelper(Transform<FPP,Cpu> &t, const bool moving /* default to false */) : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false)
 	{
-		this->transform = make_shared<Transform<FPP,Cpu>>(t);
+		if(moving)
+			this->transform = make_shared<Transform<FPP,Cpu>>(std::move(t));
+		else
+			this->transform = make_shared<Transform<FPP,Cpu>>(t);
 	}
 
 	template<typename FPP>
@@ -443,6 +446,12 @@ namespace Faust {
 		const MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact(const faust_unsigned_int id) const
 		{
 			return this->transform->data[is_transposed?size()-id-1:id];
+		}
+
+	template<typename FPP>
+		unsigned long long TransformHelper<FPP,Cpu>::get_fact_addr(const faust_unsigned_int id) const
+		{
+			return (unsigned long long) this->transform->data[is_transposed?size()-id-1:id];
 		}
 
 	template<typename FPP>
