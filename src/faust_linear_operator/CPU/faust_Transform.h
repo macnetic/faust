@@ -99,7 +99,11 @@ namespace Faust
 				 (default value false)*/
 				Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact=true);
 
+				/** \brief Copy constructor. */
 				Transform(const Transform<FPP,Cpu> & A);
+
+				/** \brief Move constructor. Factors are not duplicated in memory but T loses its.*/
+				Transform(Transform<FPP,Cpu> && T);
 
 				Transform(const Transform<FPP, Cpu>* A, const bool transpose_A, const bool conj_A, const Transform<FPP, Cpu>* B, const bool transpose_B, const bool conj_B);
 				/** \brief
@@ -239,6 +243,8 @@ namespace Faust
 				 */
 				Faust::MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis='N') const;
 
+				/** \brief Move assign operator overload. Factors are not duplicated in memory but T loses its.*/
+				Transform<FPP,Cpu>& operator=(Faust::Transform<FPP,Cpu>&& T);
 
 				void operator=(const Transform<FPP,Cpu>&  f);//{data=f.data;totalNonZeros=f.totalNonZeros;}
 				/// add all of the sparse matrices from f.data to this->data

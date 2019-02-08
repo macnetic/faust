@@ -220,6 +220,16 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 	this->check_factors_validity();
 }
 
+
+template<typename FPP>
+Faust::Transform<FPP,Cpu>::Transform(Faust::Transform<FPP,Cpu>&& T) : totalNonZeros(T.totalNonZeros), dtor_delete_data(T.dtor_delete_data)
+{
+	data = std::move(T.data);
+}
+
+
+
+
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts, const bool optimizedCopy /*default value = false*/ ):	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	totalNonZeros(0), dtor_delete_data(true)
@@ -602,6 +612,13 @@ void Faust::Transform<FPP,Cpu>::operator=(const Transform<FPP,Cpu>&  f)
 
 
 
+template<typename FPP>
+Faust::Transform<FPP,Cpu>& Faust::Transform<FPP,Cpu>::operator=(Faust::Transform<FPP,Cpu>&& T)
+{
+	data = std::move(T.data);
+	totalNonZeros = T.totalNonZeros;
+	dtor_delete_data = T.dtor_delete_data;
+}
 
 	template<typename FPP>
 void Faust::Transform<FPP,Cpu>::multiply(const Faust::Transform<FPP,Cpu> & A) // modif AL <FPP,Cpu>
