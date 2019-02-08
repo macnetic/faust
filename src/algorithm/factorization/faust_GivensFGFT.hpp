@@ -1,6 +1,11 @@
 using namespace Faust;
 
+// handle Visual Studio's whim https://msdn.microsoft.com/en-us/library/4hwaceh6.aspx
+#define _USE_MATH_DEFINES
 #include <cmath>
+#ifndef M_PI_4
+#define M_PI_4 (M_PI/4.0)
+#endif
 
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::next_step()
@@ -32,7 +37,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot()
 //        q = q_candidates(p);
 //        coord_choices(1,j) = p;
 //        coord_choices(2,j) = q;
-	C_min_row.min(&p);
+	C_min_row.min_coeff(&p);
 	q = q_candidates[p];
 	coord_choices[ite] = pair<int,int>(p,q);
 }
@@ -92,7 +97,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::max_L()
 			r = pq[i];
 			for(int s=r+1;s<n;s++)
 				C.getData()[s*n+r] = - Faust::fabs(L(r,s));
-			C_min_row.getData()[r] = C.get_row(r).min(&rid);
+			C_min_row.getData()[r] = C.get_row(r).min_coeff(&rid);
 			q_candidates[r] = rid;
 		}
 		for(int i=0;i<2;i++)
@@ -108,7 +113,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::max_L()
 				}
 				else if(q_candidates[r] == s)
 				{
-					C_min_row.getData()[r] = C.get_row(r).min(&rid);
+					C_min_row.getData()[r] = C.get_row(r).min_coeff(&rid);
 					q_candidates[r] = rid;
 				}
 			}
@@ -335,6 +340,15 @@ const Faust::MatSparse<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_D(const bool
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFT<FPP,DEVICE,FPP2>::get_D(FPP* diag_data, const bool ord /* default to false */)
+{
+	get_D(ord);
+	FPP* src_data_ptr = ord?ordered_D.getValuePtr():D.getValuePtr();
+	memcpy(diag_data, src_data_ptr, sizeof(FPP)*D.getNbRow());
+}
+
+
+template<typename FPP, Device DEVICE, typename FPP2>
 const Faust::MatDense<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::compute_fourier(const bool ord /* default to false */)
 {
 	Faust::MatDense<FPP,Cpu> fourier(Lap.getNbRow(), Lap.getNbCol());
@@ -355,7 +369,7 @@ const Faust::MatDense<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::compute_fourier(c
 
 
 template<typename FPP, Device DEVICE, typename FPP2>
-const MatDense<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_L() const
+const Faust::MatDense<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_L() const
 {
 	return L;
 }
@@ -379,7 +393,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::get_coord_choice(int j, int& p, int& q) const
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-const MatDense<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_Lap() const
+const Faust::MatDense<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_Lap() const
 {
 	return Lap;
 }
@@ -390,4 +404,22 @@ const vector<Faust::MatSparse<FPP,DEVICE>>& GivensFGFT<FPP,DEVICE,FPP2>::get_fac
 	return facts;
 }
 
-
+template<typename FPP, Device DEVICE, typename FPP2>
+Faust::Transform<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_transform(bool ord)
+{
+	//TODO: an optimization is possible by changing type of facts to vector<MatGeneric*> it would avoid copying facts into Transform and rather use them directly. It will need a destructor that deletes them eventually if they weren't transfered to a Transform object before.
+	if(ord)
+	{
+		// add a permutation factor to reorder according to ordered D
+		if(!is_D_ordered)
+			order_D();
+		MatSparse<FPP,DEVICE> & last_fact = *(facts.end()-1);
+		MatSparse<FPP,DEVICE> P(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact is a sqr. mat.
+		for(int i=0;i<ord_indices.size();i++)
+			P.setCoeff( ord_indices[i],i, FPP(1.0));
+		facts.push_back(P);
+	}
+	Faust::Transform<FPP,DEVICE> t = Faust::Transform<FPP,DEVICE>(facts);
+	// remove the permutation factor if added temporarily for reordering
+	return ord?facts.erase(facts.end()-1),t:t;
+}

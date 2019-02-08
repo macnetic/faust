@@ -24,7 +24,7 @@ int main()
 	init_faust_mat_from_matio(Lap,configFilename.c_str(),"Lap");
 
 	int J = 5472; //TODO: should be retrieved from .mat file (not be a hard-coded value)
-	GivensFGFTParallel<FPP,Cpu> algo(Lap,J,/*t=*/ Lap.getNbRow()/2);
+	GivensFGFTParallel<FPP,Cpu, FPP> algo(Lap,J,/*t=*/ Lap.getNbRow()/2);
 
 	algo.compute_facts();
 

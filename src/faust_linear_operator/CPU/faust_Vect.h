@@ -138,8 +138,8 @@ namespace Faust
         FPP sum()const{return vec.sum();}
         FPP mean()const{return vec.mean();}
         FPP dot(const Vect<FPP,Cpu> & v)const;
-		FPP min() const {return vec.minCoeff();};
-		FPP min(int *index) const { int col_index; return vec.minCoeff(index, &col_index); }
+		FPP min_coeff() const {return vec.minCoeff();};
+		FPP min_coeff(int *index) const { int col_index; return vec.minCoeff(index, &col_index); }
 
         template<typename FPP1>
         void operator=(Vect<FPP1,Cpu> const& y);

@@ -891,6 +891,39 @@ class TestFaustFactory(unittest.TestCase):
         ref_fft = fft(np.eye(2**pow2_exp))
         self.assertAlmostEqual(norm(ref_fft-fF)/norm(ref_fft),0)
 
+    def testFGFTGivens(self):
+        print("Test FaustFactory.fgft_givens()")
+        from pyfaust import FaustFactory as FF
+        L = loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        L = L.astype(np.float64)
+        J = \
+        loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J']
+        F, D = FF.fgft_givens(L, J, 0)
+        print("Lap norm:", norm(L, 'fro'))
+        err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
+        print("err: ", err)
+        # the error reference is from the C++ test,
+        # misc/test/src/C++/GivensFGFT.cpp.in
+        self.assertAlmostEqual(err, 0.0326529, places=7)
+
+    def testFGFTGivensParallel(self):
+        print("Test FaustFactory.fgft_givens() -- parallel")
+        from pyfaust import FaustFactory as FF
+        L = loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        L = L.astype(np.float64)
+        J = \
+                loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J']
+        F, D = FF.fgft_givens(L, J, L.shape[0]/2)
+        print("Lap norm:", norm(L, 'fro'))
+        err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
+        print("err: ", err)
+        # the error reference is from the C++ test,
+        # misc/test/src/C++/GivensFGFTParallel.cpp.in
+        self.assertAlmostEqual(err, 0.0410448, places=7)
+
+
+
+
 if __name__ == "__main__":
     if(len(sys.argv)> 1):
         # argv[1] is for adding a directory in PYTHONPATH

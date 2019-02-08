@@ -5,6 +5,7 @@
 #include "faust_constant.h"
 #include "faust_MatSparse.h"
 #include "faust_MatDense.h"
+#include "faust_Transform.h"
 #include <vector>
 
 namespace Faust {
@@ -49,7 +50,7 @@ namespace Faust {
 				/** \brief Rotation angle theta for the current iteration's Givens matrix. */
 				FPP2 theta;
 
-				/* Precomputed model identity matrix to blank facts[ite] before update.
+				/* Precomputed model identity matrix to init. facts[ite] before update.
 				 * Identity matrix is completed later with cos/sin coefficients (in update_fact()).
 				 */
 
@@ -198,6 +199,14 @@ namespace Faust {
 				const MatSparse<FPP,DEVICE> get_D(const bool ord=false);
 
 				/**
+				 * Returns the diagonal by copying it in the buffer diag_data (should be allocated by the callee).
+				 *
+				 * \param ord true to get the data ordered by ascendant eigenvalues false otherwise.
+				 */
+				void get_D(FPP* diag_data, const bool ord=false);
+
+
+				/**
 				 * Computes and returns the Fourier matrix approximate from the Givens factors computed up to this time.
 				 *
 				 */
@@ -232,6 +241,14 @@ namespace Faust {
 				 * Returns the vector of Givens matrices at this stage of algorithm execution (terminated or not).
 				 */
 				const vector<MatSparse<FPP,DEVICE>>& get_facts() const;
+
+
+				/**
+				 * Returns a Faust::Transform object with copy of facts into it.
+				 *
+				 * \param ord true to get the Transform's facts ordering the last one columns according to ascendant eigenvalues, false to let facts as they went out from the algorithm (without reordering).
+				 */
+				Faust::Transform<FPP,DEVICE> get_transform(bool ord);
 
 
 		};

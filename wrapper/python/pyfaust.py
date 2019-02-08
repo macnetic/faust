@@ -1730,6 +1730,40 @@ class FaustFactory:
         return rF
 
     @staticmethod
+    def fgft_givens(Lap, J, t=None):
+        """
+        Diagonalizes the graph Laplacian matrix Lap using the Givens FGFT algorithm.
+
+        Args:
+            Lap: the Laplacian matrix as a numpy array. Must be symmetric and square.
+            J: the number of factors for the Fourier matrix (aka the Givens
+            matrices).
+            t: the number of rotations per Fourier factor (2D sub-matrices).
+            If None (default value) the non-parallel version of the algorithm
+            is used.
+
+        Returns:
+            The tuple (FGFT,D): with FGFT being the Faust object representing the Fourier matrix
+            factorization/approximate and D the diagonalized matrix of the
+            Laplacian. The eigenvalues are ordered in ascendant order along the
+            rows/columns.
+
+        References:
+        [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
+        graph Fourier transforms via multi-layer sparse approximations",
+        submitted to IEEE Transactions on Signal and Information Processing
+        over Networks.
+        <https://hal.inria.fr/hal-01416110>
+
+        """
+        if((Lap.T != Lap).all() and Lap.shape[0] == Lap.shape[1]):
+            raise ValueError("Laplacian matrix must be square and symmetric.")
+        if(not t):
+            t = 0
+        core_obj,D = FaustCorePy.FaustFact.fact_givens_fgft(Lap, J, t)
+        return Faust(core_obj=core_obj), D
+
+    @staticmethod
     def _check_fact_mat(funcname, M):
         if(not isinstance(M, np.ndarray)):
             raise Exception(funcname+" 1st argument must be a numpy ndarray.")

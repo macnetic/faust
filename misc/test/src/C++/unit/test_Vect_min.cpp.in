@@ -12,9 +12,9 @@ int main()
 {
 	FPP test_vec_data[] = { FPP(22.0), FPP(-33), FPP(2)};
 	Faust::Vect<FPP,Cpu> test_vec(3, test_vec_data);
-	cout << "test_vec.min():" << test_vec.min() << endl;
+	cout << "test_vec.min():" << test_vec.min_coeff() << endl;
 	int index;
-	cout << "test_vec.min(&index):" << test_vec.min(&index) << endl;
+	cout << "test_vec.min(&index):" << test_vec.min_coeff(&index) << endl;
 	cout << "index: " << index << endl;
 
 	return 0;

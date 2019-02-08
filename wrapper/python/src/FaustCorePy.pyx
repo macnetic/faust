@@ -699,23 +699,24 @@ cdef class FaustCore:
 
 cdef check_matrix(isReal, M):
         if not isinstance(M, (np.ndarray) ):
-            raise ValueError('input M must a numpy ndarray')
+            raise ValueError('input must a numpy ndarray')
         if(isReal):
             M=M.astype(float,'F')
             if not M.dtype=='float':
-                raise ValueError('input M must be double array')
+                raise ValueError('input numpy array dtype must be double (not'
+                                 ' float)')
         else:
             M=M.astype(complex,'F')
             if(M.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
-                raise ValueError('input M must be complex array')
+                raise ValueError('input array must be complex array')
         #TODO: raise exception if not real nor complex
         if not M.flags['F_CONTIGUOUS']:
-            raise ValueError('input M must be Fortran contiguous (Colmajor)')
+            raise ValueError('input array must be Fortran contiguous (Colmajor)')
 
         ndim_M=M.ndim;
 
         if (ndim_M > 2) | (ndim_M < 1):
-            raise ValueError('input M invalid number of dimensions')
+            raise ValueError('input matrix/array invalid number of dimensions')
 
 cdef class ConstraintIntCore:
 
@@ -989,7 +990,7 @@ cdef class FaustFact:
                              'float16', 'float32',
                              'float64', 'double']
         # double == float64
-        #TODO: it not float nor complex, raise exception
+        #TODO: if not float nor complex, raise exception
         check_matrix(isReal, M)
 
         cdef unsigned int M_num_rows=M.shape[0]
@@ -1104,7 +1105,6 @@ cdef class FaustFact:
  #           FaustCoreCy.fact_hierarchical(&Mview[0,0], M_num_rows, M_num_cols,
                                       &cpp_params, &lambdaview[0])
             core._isReal = True
-            #TODO: FPP == complex not yet supported by C++ code
         else:
             core.core_faust_cplx = \
             FaustCoreCy.fact_hierarchical[complex, double](&Mview_cplx[0,0], M_num_rows, M_num_cols,
@@ -1118,3 +1118,34 @@ cdef class FaustFact:
 
         return core,np.real(_lambda[0])
 
+    @staticmethod
+    def fact_givens_fgft(Lap, J, t):
+        isReal = Lap.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+        # double == float64
+        check_matrix(isReal, Lap)
+
+        if(not isReal):
+            raise TypeError('Laplacian must be a real matrix.')
+
+        cdef unsigned int Lap_num_rows=Lap.shape[0]
+        cdef unsigned int Lap_num_cols=Lap.shape[1]
+
+        cdef double[:,:] Lap_view
+        cdef double[:] D_view
+
+        Lap_view = Lap
+        D = np.empty(Lap.shape[0], dtype=Lap.dtype)
+        D_view = D
+
+        core = FaustCore(core=True)
+        core.core_faust_dbl = FaustCoreCy.fact_givens_fgft[double, double](&Lap_view[0,0],
+                                                     Lap_num_rows,
+                                                     Lap_num_cols, J, t,
+                                                     &D_view[0])
+
+        core._isReal = True
+        from scipy.sparse import spdiags
+        D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
+        return core, D_spdiag

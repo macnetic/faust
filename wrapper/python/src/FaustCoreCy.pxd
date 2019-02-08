@@ -164,3 +164,8 @@ cdef extern from "FaustFact.h":
                                              PyxParamsHierarchicalFact[FPP,FPP2]*,
                                                        FPP*)
 
+cdef extern from "FaustFactGivensFGFT.h":
+
+    cdef FaustCoreCpp[FPP]* fact_givens_fgft[FPP,FPP2](const FPP* Lap, unsigned int num_rows,
+                                   unsigned int num_cols, unsigned int J,
+                                   unsigned int t, FPP* D)
