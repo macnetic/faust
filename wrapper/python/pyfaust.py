@@ -1752,14 +1752,42 @@ class FaustFactory:
         return rF
 
     @staticmethod
+    def trunc_jacobi(M, J, t=None):
+        """
+        Diagonalizes the real matrix M using the truncated Jacobi algorithm.
+
+        NOTE: this function is just an alias for fgft_givens
+
+        Args:
+            M: the real matrix to diagonalize. Must be real, symmetric and square.
+            J: the number of factors for the factorization of the eigenvector matrix.
+            t: the number of Givens rotations per matrix.
+
+        Returns:
+            The tuple (F,D): with F the Faust object representing the
+            approximate factorization of M eigenvector matrix and D the
+            approximate diagonal matrix for the eigenvalues (ascendant order
+            along the rows/columns).
+
+        References:
+        [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
+        graph Fourier transforms via multi-layer sparse approximations",
+        submitted to IEEE Transactions on Signal and Information Processing
+        over Networks.
+        <https://hal.inria.fr/hal-01416110>
+
+        <b/> See also FaustFactory.fgft_givens, FaustFactory.fact_palm4msa_fgft
+        """
+        return FaustFactory.fgft_givens(M, J, t)
+
+    @staticmethod
     def fgft_givens(Lap, J, t=None):
         """
         Diagonalizes the graph Laplacian matrix Lap using the Givens FGFT algorithm.
 
         Args:
-            Lap: the Laplacian matrix as a numpy array. Must be symmetric and square.
-            J: the number of factors for the Fourier matrix (aka the Givens
-            matrices).
+            Lap: the Laplacian matrix as a numpy array. Must be real, symmetric and square.
+            J: the number of factors for the Fourier matrix (aka the Givens matrices).
             t: the number of rotations per Fourier factor (2D sub-matrices).
             If None (default value) the non-parallel version of the algorithm
             is used.
@@ -1777,6 +1805,7 @@ class FaustFactory:
         over Networks.
         <https://hal.inria.fr/hal-01416110>
 
+        <b/> See also FaustFactory.trunc_jacobi, FaustFactory.fact_palm4msa_fgft
         """
         if((Lap.T != Lap).any() or Lap.shape[0] != Lap.shape[1]):
             raise ValueError("Laplacian matrix must be square and symmetric.")

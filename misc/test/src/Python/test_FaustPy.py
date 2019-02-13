@@ -922,6 +922,13 @@ class TestFaustFactory(unittest.TestCase):
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in
         self.assertAlmostEqual(err, 0.0410448, places=7)
+        F2, D2 = FF.trunc_jacobi(L, J, L.shape[0]/2)
+        print("Lap norm:", norm(L, 'fro'))
+        err2 = norm((F2*D.todense())*F2.T.todense()-L,"fro")/norm(L,"fro")
+        print("err2: ", err2)
+        # the error reference is from the C++ test,
+        # misc/test/src/C++/GivensFGFTParallel.cpp.in
+        self.assertEqual(err, err2)
 
     def testFactPalm4MSA_fgft(self):
         print("Test FaustFactory.fact_palm4msa_fgft()")
