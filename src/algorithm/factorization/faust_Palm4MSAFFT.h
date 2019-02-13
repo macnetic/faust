@@ -20,6 +20,7 @@ namespace Faust {
 			Palm4MSAFFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal);
 			void next_step();
 			const MatDense<FPP, DEVICE>& get_D();
+			void get_D(FPP* diag_data);
 		private:
 			void compute_grad_over_c();
 			void compute_lambda();

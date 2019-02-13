@@ -5,11 +5,13 @@
 #include "faust_ParamsPalm.h"
 #include "faust_StoppingCriterion.h"
 #include "faust_Palm4MSA.h"
+#include "faust_Palm4MSAFFT.h"
 #include "faust_HierarchicalFact.h"
 #include "faust_BlasHandle.h"
 #include "faust_ConstraintGeneric.h"
 
 using namespace std;
+using namespace Faust;
 
 bool PyxConstraintGeneric::is_int_constraint()
 {
@@ -178,12 +180,30 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
 }
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsFactPalm4MSA<FPP,FPP2>* p, FPP* out_lambda)
+FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsFactPalm4MSA<FPP,FPP2>* p, FPP* out_lambda_D)
+{
+    return fact_palm4MSA_gen(mat, num_rows, num_cols, p, out_lambda_D);
+}
+
+template<typename FPP, typename FPP2>
+FaustCoreCpp<FPP>* fact_palm4MSAFFT(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsFactPalm4MSAFFT<FPP,FPP2>* p, FPP* out_lambda)
+{
+    return fact_palm4MSA_gen(mat, num_rows, num_cols, p, out_lambda);
+}
+
+
+template<typename FPP, typename FPP2>
+FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsFactPalm4MSA<FPP,FPP2>* p, FPP* out_buf)
 {
     FaustCoreCpp<FPP>* core;
+    Faust::ParamsPalm<FPP,Cpu,FPP2>* params;
     Faust::MatDense<FPP,Cpu> inMat(mat, num_rows, num_cols);
     vector<const Faust::ConstraintGeneric*> cons;
     vector<Faust::MatDense<FPP,Cpu> > initFacts;
+    Faust::Palm4MSA<FPP,Cpu,FPP2>* palm;
+    PyxParamsFactPalm4MSAFFT<FPP,FPP2> *p_fft = nullptr;
+    Faust::BlasHandle<Cpu> blasHandle;
+
     if(p->is_verbose) {
         cout << "stop_crit.is_criterion_error: " << p->stop_crit.is_criterion_error << endl;
         cout << "stop_crit.error_treshold: " << p->stop_crit.error_treshold << endl;
@@ -202,21 +222,27 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
     // values
     Faust::StoppingCriterion<FPP2> crit(p->stop_crit.num_its, p->stop_crit.is_criterion_error, p->stop_crit.error_treshold, p->stop_crit.max_num_its);
 
-    Faust::ParamsPalm<FPP,Cpu,FPP2> params(inMat, p->num_facts, cons, initFacts, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->constant_step_size, p->step_size);
+    if(p_fft = dynamic_cast<PyxParamsFactPalm4MSAFFT<FPP,FPP2>*>(p))
+    {
+        params = new ParamsPalmFFT<FPP,Cpu,FPP2>(inMat, p->num_facts, cons, initFacts, p_fft->init_D, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->step_size);
 
-    if(p->is_verbose) params.Display();
+        palm = new Palm4MSAFFT<FPP,Cpu,FPP2>(*static_cast<ParamsPalmFFT<FPP,Cpu,FPP2>*>(params),blasHandle,true);
+    }
+    else {
+        params = new ParamsPalm<FPP,Cpu,FPP2>(inMat, p->num_facts, cons, initFacts, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->constant_step_size, p->step_size);
+        palm = new Palm4MSA<FPP,Cpu,FPP2>(*params,blasHandle,true);
+    }
 
-    Faust::BlasHandle<Cpu> blasHandle;
+    if(p->is_verbose) params->Display();
 
-    Faust::Palm4MSA<FPP,Cpu, FPP2> palm(params,blasHandle,true);
 
-    palm.compute_facts();
+    palm->compute_facts();
 
-    FPP lambda = palm.get_lambda();
+    FPP lambda = palm->get_lambda();
 
     std::vector<Faust::MatDense<FPP,Cpu> > facts;
     std::vector<Faust::MatGeneric<FPP, Cpu>*> sp_facts;
-    facts=palm.get_facts();
+    facts=palm->get_facts();
 
     for(typename std::vector<Faust::MatDense<FPP, Cpu>>::iterator it = facts.begin(); it != facts.end(); it++)
     {
@@ -239,11 +265,24 @@ FaustCoreCpp<FPP>* fact_palm4MSA(FPP* mat, unsigned int num_rows, unsigned int n
     for (typename std::vector<const Faust::ConstraintGeneric*>::iterator it = cons.begin() ; it != cons.end(); ++it)
         delete *it;
 
-    *out_lambda = lambda;
+    if(p_fft == nullptr)
+        // palm4MSA basis case, just get lambda
+        *out_buf = lambda;
+    else
+    {
+        // retrieve D matrix from Palm4MSAFFT
+        // out buffer must have been allocated from outside
+        dynamic_cast<Palm4MSAFFT<FPP,Cpu,FPP2>*>(palm)->get_D(out_buf+1);
+        // add lambda at the first position
+        out_buf[0] = lambda;
+    }
 
+    delete params;
+    delete palm;
     return core;
 
 }
+
 
 template<typename FPP, typename FPP2>
 FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsHierarchicalFact<FPP, FPP2>* p, FPP* out_lambda)

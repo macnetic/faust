@@ -1369,6 +1369,28 @@ class FaustFactory:
             return F
 
     @staticmethod
+    def fact_palm4msa_fgft(Lap, p, ret_lambda=False):
+        """
+        """
+        if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSAFGFT)):
+            raise TypeError("p must be a ParamsPalm4MSAFGFT object.")
+        FaustFactory._check_fact_mat('FaustFactory.fact_palm4msa_fgft()', Lap)
+        if((Lap.T != Lap).any() or Lap.shape[0] != Lap.shape[1]):
+            raise ValueError("Laplacian matrix must be square and symmetric.")
+        if(not p.is_mat_consistent(Lap)):
+            raise ValueError("M's number of columns must be consistent with "
+                             "the last residuum constraint defined in p. "
+                             "Likewise its number of rows must be consistent "
+                             "with the first factor constraint defined in p.")
+        core_obj, _lambda, D = FaustCorePy.FaustFact.fact_palm4msa_fft(Lap, p)
+        F = Faust(core_obj=core_obj)
+        if(ret_lambda):
+            return F, D, _lambda
+        else:
+            return F, D
+
+
+    @staticmethod
     def fact_hierarchical(M, p, ret_lambda=False, ret_params=False):
         """
         Factorizes the matrix M with Hierarchical Factorization using the parameters set in p.
@@ -1756,7 +1778,7 @@ class FaustFactory:
         <https://hal.inria.fr/hal-01416110>
 
         """
-        if((Lap.T != Lap).all() and Lap.shape[0] == Lap.shape[1]):
+        if((Lap.T != Lap).any() or Lap.shape[0] != Lap.shape[1]):
             raise ValueError("Laplacian matrix must be square and symmetric.")
         if(not t):
             t = 0

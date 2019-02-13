@@ -490,7 +490,7 @@ class ParamsFact(ABC):
     def is_mat_consistent(self, M):
         if(not isinstance(M, np.ndarray)):
             raise ValueError("M must be a numpy ndarray")
-        print("M.shape=", M.shape)
+        #print("M.shape=", M.shape)
         return M.shape[0] == self.constraints[0]._num_rows and \
                 M.shape[1] == self.constraints[-1]._num_cols
 
@@ -661,6 +661,7 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
         p = ParamsHierarchicalFactRectMat(M.shape[0], M.shape[1], *p[1:])
         return p
 
+
 class ParamsPalm4MSA(ParamsFact):
     """
         The class is to set input parameters for the Palm4MSA algorithm.
@@ -698,6 +699,34 @@ class ParamsPalm4MSA(ParamsFact):
 
     def is_mat_consistent(self, M):
         return super(ParamsPalm4MSA, self).is_mat_consistent(M)
+
+class ParamsPalm4MSAFGFT(ParamsPalm4MSA):
+    """
+    """
+
+    def __init__(self, constraints, stop_crit, init_facts=None,
+                 init_D=None,
+                 is_update_way_R2L=False, init_lambda=1.0,
+                 step_size=10.0**-16,
+                 is_verbose=False):
+        super(ParamsPalm4MSAFGFT, self).__init__(constraints, stop_crit,
+                                                 init_facts, is_update_way_R2L,
+                                                 init_lambda, step_size,
+                                                 True, is_verbose)
+        if(not isinstance(init_D, np.ndarray) and init_D == None):
+            init_D = np.ones(self.constraints[0]._num_rows)
+        self.init_D = init_D
+        self._check_init_D_is_consistent(init_D)
+
+    def _check_init_D_is_consistent(self, init_D):
+        if(not isinstance(init_D, np.ndarray)):
+            raise ValueError("init_D must be a numpy ndarray")
+        if(init_D.ndim != 1):
+            raise ValueError("init_D must be a vector.")
+        if(init_D.shape[0] != self.constraints[0]._num_rows):
+            raise ValueError("init_D must have the same size as first "
+                             "constraint's number of rows")
+
 
 class StoppingCriterion(object):
     """

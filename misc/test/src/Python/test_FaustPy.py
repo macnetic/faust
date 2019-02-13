@@ -753,13 +753,14 @@ class TestFaustFactory(unittest.TestCase):
         param = ParamsPalm4MSA([cons1, cons2], stop_crit, init_facts=None,
                                is_update_way_R2L=False, init_lambda=1.0,
                                is_verbose=False, constant_step_size=False)
-        F = FaustFactory.fact_palm4msa(M, param)
+        F, _lambda= FaustFactory.fact_palm4msa(M, param, ret_lambda=True)
         #F.display()
         #print("normF", F.norm("fro"))
         self.assertEqual(F.shape, M.shape)
         E = F.todense()-M
         #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"))
-        print("err: ", norm(E,"fro")/norm(M,"fro"))
+        print("err:", norm(E,"fro")/norm(M,"fro"))
+        print("_lambda:", _lambda)
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/test_palm4MSA.cpp
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.270954109668, places=4)
@@ -858,14 +859,15 @@ class TestFaustFactory(unittest.TestCase):
         param = ParamsPalm4MSA([cons1, cons2], stop_crit, init_facts=None,
                                is_verbose=False, constant_step_size=False,
                                is_update_way_R2L=False, init_lambda=1.0)
-        F = FaustFactory.fact_palm4msa(M, param)
+        F,_lambda = FaustFactory.fact_palm4msa(M, param, ret_lambda=True)
         #F.display()
         #print("normF", F.norm("fro"))
         self.assertEqual(F.shape, M.shape)
         #print(F.todense())
         E = F.todense()-M
         #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"))
-        print("err: ", norm(E,"fro")/norm(M,"fro"))
+        print("err:", norm(E,"fro")/norm(M,"fro"))
+        print("lambda:", _lambda)
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/test_palm4MSA.cpp
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.29177, places=4)
@@ -921,7 +923,47 @@ class TestFaustFactory(unittest.TestCase):
         # misc/test/src/C++/GivensFGFTParallel.cpp.in
         self.assertAlmostEqual(err, 0.0410448, places=7)
 
+    def testFactPalm4MSA_fgft(self):
+        print("Test FaustFactory.fact_palm4msa_fgft()")
+        from pyfaust.factparams import ConstraintReal,\
+                ConstraintInt, ConstraintName, StoppingCriterion
+        #from pyfaust.factparams import ParamsPalm4MSAFGFT, StoppingCriterion
+        from numpy import diag,copy
+        from pyfaust import FaustFactory
+        from pyfaust.factparams import ParamsPalm4MSAFGFT
 
+        from pyfaust import FaustFactory as FF
+        L = \
+        loadmat(sys.path[-1]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['data']
+        init_D = \
+        loadmat(sys.path[-1]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_D']
+        init_D = copy(diag(init_D))
+        init_facts1 = \
+                loadmat(sys.path[-1]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_facts1']
+        init_facts2 = \
+                loadmat(sys.path[-1]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_facts2']
+        init_facts = [ init_facts1, init_facts2 ]
+        L = L.astype(np.float64)
+        # other params should be set from file also but do it manually
+        cons1 = ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128,
+                              12288)
+        cons2 = ConstraintInt(ConstraintName(ConstraintName.SP), 128,
+                                 128, 384)
+        stop_crit = StoppingCriterion(num_its=100)
+        param = ParamsPalm4MSAFGFT([cons1, cons2], stop_crit,
+                                   init_facts=init_facts,
+                                   init_D=init_D,
+                                   is_update_way_R2L=False, init_lambda=128,
+                                   is_verbose=True, step_size=1e-6)
+        F, D, _lambda = FaustFactory.fact_palm4msa_fgft(L, param, ret_lambda=True)
+        print("Lap norm:", norm(L, 'fro'))
+        print("out lambda:", _lambda)
+        D = diag(D)
+        err = norm((F.todense()*D)*F.T.todense()-L,"fro")/norm(L,"fro")
+        print("err: ", err)
+        # the error reference is from the C++ test,
+        # misc/test/src/C++/test_Palm4MSAFFT.cpp.in
+        self.assertAlmostEqual(err, 1.39352e-5, places=5)
 
 
 if __name__ == "__main__":

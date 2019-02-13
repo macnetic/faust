@@ -150,11 +150,19 @@ cdef extern from "FaustFact.h":
         unsigned long* init_fact_sizes
         PyxStoppingCriterion[FPP2] stop_crit
 
+    cdef cppclass \
+    PyxParamsFactPalm4MSAFFT[FPP,FPP2](PyxParamsFactPalm4MSA[FPP,FPP2]):
+        FPP* init_D
+
     cdef cppclass PyxParamsHierarchicalFact[FPP,FPP2](PyxParamsFact[FPP,FPP2]):
         unsigned int num_rows
         unsigned int num_cols
         PyxStoppingCriterion[FPP2]* stop_crits #must be of size 2
         bool is_fact_side_left
+
+    cdef FaustCoreCpp[FPP]* fact_palm4MSAFFT[FPP,FPP2](FPP*,unsigned int, unsigned int,
+                                             PyxParamsFactPalm4MSAFFT[FPP,FPP2]*,
+                                                   FPP*)
 
     cdef FaustCoreCpp[FPP]* fact_palm4MSA[FPP,FPP2](FPP*,unsigned int, unsigned int,
                                              PyxParamsFactPalm4MSA[FPP,FPP2]*,

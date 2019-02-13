@@ -77,6 +77,15 @@ class PyxParamsFactPalm4MSA : public PyxParamsFact<FPP,FPP2>
         FPP** init_facts;// num_facts elts
         unsigned long* init_fact_sizes;
         PyxStoppingCriterion<FPP2> stop_crit;
+        virtual PyxStoppingCriterion<FPP2>& get_stop_crit() {return stop_crit;};
+
+};
+
+template<typename FPP, typename FPP2 = double>
+class PyxParamsFactPalm4MSAFFT : public PyxParamsFactPalm4MSA<FPP,FPP2>
+{
+    public:
+        FPP* init_D; // a vector for the diagonal
 };
 
 template<typename FPP, typename FPP2 = double>
@@ -89,8 +98,20 @@ class PyxParamsHierarchicalFact : public PyxParamsFact<FPP,FPP2>
         bool is_fact_side_left;
 };
 
+
+
+/**
+ * Generic function acting on behalf of fact_palm4MSAFFT() and fact_palm4MSA().
+ */
 template<typename FPP, typename FPP2 = double>
 FaustCoreCpp<FPP>* fact_palm4MSA(FPP*, unsigned int, unsigned int, PyxParamsFactPalm4MSA<FPP,FPP2>*, bool, FPP*);
+
+template<typename FPP, typename FPP2 = double>
+FaustCoreCpp<FPP>* fact_palm4MSAFFT(FPP*, unsigned int, unsigned int, PyxParamsFactPalm4MSAFFT<FPP,FPP2>*, bool, FPP*);
+
+/** this function is here to factorize the code of the two functions above */
+template<typename FPP, typename FPP2 = double>
+FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP*, unsigned int, unsigned int, PyxParamsFactPalm4MSA<FPP,FPP2>*, bool, FPP*);
 
 template<typename FPP, typename FPP2 = double>
 FaustCoreCpp<FPP>* fact_hierarchical(FPP*, unsigned int, unsigned int, PyxParamsHierarchicalFact<FPP,FPP2>*, bool, FPP*);

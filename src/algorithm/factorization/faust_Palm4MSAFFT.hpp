@@ -221,6 +221,13 @@ const MatDense<FPP, DEVICE>& Palm4MSAFFT<FPP,DEVICE,FPP2>::get_D()
 	return this->D;
 }
 
+template <typename FPP, Device DEVICE, typename FPP2>
+void Palm4MSAFFT<FPP,DEVICE,FPP2>::get_D(FPP* diag_data)
+{
+	for(int i=0;i<D.getNbRow();i++)
+		diag_data[i] = D.getData()[i*D.getNbRow()+i];
+	//TODO: when D will switch to MatSparse (or diag mat) directory copy the buffer per block
+}
 
 template <typename FPP, Device DEVICE, typename FPP2>
 void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_c()
