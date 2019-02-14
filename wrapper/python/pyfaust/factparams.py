@@ -661,7 +661,6 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
         p = ParamsHierarchicalFactRectMat(M.shape[0], M.shape[1], *p[1:])
         return p
 
-
 class ParamsPalm4MSA(ParamsFact):
     """
         The class is to set input parameters for the Palm4MSA algorithm.
@@ -703,7 +702,6 @@ class ParamsPalm4MSA(ParamsFact):
 class ParamsPalm4MSAFGFT(ParamsPalm4MSA):
     """
     """
-
     def __init__(self, constraints, stop_crit, init_facts=None,
                  init_D=None,
                  is_update_way_R2L=False, init_lambda=1.0,
@@ -713,19 +711,26 @@ class ParamsPalm4MSAFGFT(ParamsPalm4MSA):
                                                  init_facts, is_update_way_R2L,
                                                  init_lambda, step_size,
                                                  True, is_verbose)
-        if(not isinstance(init_D, np.ndarray) and init_D == None):
-            init_D = np.ones(self.constraints[0]._num_rows)
-        self.init_D = init_D
-        self._check_init_D_is_consistent(init_D)
+        self.init_D = _init_init_D(init_D, self.constraints[0]._num_rows)
 
-    def _check_init_D_is_consistent(self, init_D):
+def _init_init_D(init_D, dim_sz):
+    """
+        Utility function for ParamsHierarchicalFactFGFT, ParamsPalm4MSAFGFT
+    """
+    def _check_init_D_is_consistent(init_D):
         if(not isinstance(init_D, np.ndarray)):
             raise ValueError("init_D must be a numpy ndarray")
         if(init_D.ndim != 1):
             raise ValueError("init_D must be a vector.")
-        if(init_D.shape[0] != self.constraints[0]._num_rows):
+        if(init_D.shape[0] != dim_sz):
             raise ValueError("init_D must have the same size as first "
                              "constraint's number of rows")
+
+    if(not isinstance(init_D, np.ndarray) and init_D == None):
+        init_D = np.ones(dim_sz)
+    _check_init_D_is_consistent(init_D)
+    return init_D
+
 
 
 class StoppingCriterion(object):

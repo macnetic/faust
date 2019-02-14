@@ -96,9 +96,15 @@ class PyxParamsHierarchicalFact : public PyxParamsFact<FPP,FPP2>
         unsigned int num_cols;
         PyxStoppingCriterion<FPP2>* stop_crits; // must be of size 2
         bool is_fact_side_left;
+        virtual const PyxStoppingCriterion<FPP2>* get_stop_crits() {return stop_crits;};
 };
 
-
+template<typename FPP, typename FPP2 = double>
+class PyxParamsHierarchicalFactFFT : public PyxParamsHierarchicalFact<FPP,FPP2>
+{
+    public:
+        FPP* init_D;
+};
 
 /**
  * Generic function acting on behalf of fact_palm4MSAFFT() and fact_palm4MSA().
@@ -114,7 +120,14 @@ template<typename FPP, typename FPP2 = double>
 FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP*, unsigned int, unsigned int, PyxParamsFactPalm4MSA<FPP,FPP2>*, bool, FPP*);
 
 template<typename FPP, typename FPP2 = double>
-FaustCoreCpp<FPP>* fact_hierarchical(FPP*, unsigned int, unsigned int, PyxParamsHierarchicalFact<FPP,FPP2>*, bool, FPP*);
+FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP*, FPP*, unsigned int, unsigned int, PyxParamsHierarchicalFact<FPP,FPP2>*, bool, FPP*);
+
+template<typename FPP, typename FPP2>
+FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsHierarchicalFact<FPP, FPP2>* p, FPP* out_lambda);
+
+template<typename FPP, typename FPP2>
+FaustCoreCpp<FPP>* fact_hierarchical_fft(FPP* U, FPP* L, unsigned int num_rows, unsigned int num_cols, PyxParamsHierarchicalFactFFT<FPP, FPP2>* p, FPP* out_lambda_D);
+
 
 #include "FaustFact.hpp"
 

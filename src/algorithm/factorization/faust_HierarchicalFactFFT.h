@@ -16,23 +16,20 @@ namespace Faust
 
 		public:
 		//TODO: move def. code in .hpp
-		HierarchicalFactFFT(const MatDense<FPP,DEVICE>& U, const MatDense<FPP,DEVICE>& Lap, ParamsFFT<FPP,DEVICE,FPP2>& params, BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle): HierarchicalFact<FPP, DEVICE, FPP2>(U, params, cublasHandle, cusparseHandle) 
-																																			//TODO: verify if palm_global is really initialized after parent ctor call
+		HierarchicalFactFFT(const MatDense<FPP,DEVICE>& U, const MatDense<FPP,DEVICE>& Lap, ParamsFFT<FPP,DEVICE,FPP2>& params, BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle): HierarchicalFact<FPP, DEVICE, FPP2>(U, params, cublasHandle, cusparseHandle)
 		{
 			if ((U.getNbRow() != params.m_nbRow) |  (U.getNbCol() != params.m_nbCol))
 				handleError(m_className,"constructor : params and Fourier matrix U haven't compatible size");
 			if((Lap.getNbRow() != params.m_nbRow) |  (Lap.getNbCol() != params.m_nbCol))
 				handleError(m_className,"constructor : params and Laplacian matrix Lap haven't compatible size");
 			delete this->palm_global;
-			cout << "HierarchicalFactFFT init_lambda:" << params.init_lambda << endl;
 			this->palm_global = new Palm4MSAFFT<FPP,DEVICE,FPP2>(Lap, params, cublasHandle, true);
 		}
 
 
-		const MatDense<FPP, DEVICE>& get_D()
-		{
-			return dynamic_cast<Palm4MSAFFT<FPP,Cpu,FPP2>*>(this->palm_global)->get_D();
-		}
+		const MatDense<FPP, DEVICE>& get_D();
+
+		void get_D(FPP* out_diag) const;
 
 		void next_step()
 		{

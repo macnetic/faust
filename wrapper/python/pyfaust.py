@@ -1519,21 +1519,8 @@ class FaustFactory:
            8.0
 
         """
-        from pyfaust.factparams import (ParamsHierarchicalFact,
-        ParamsFactFactory)
-        if(not isinstance(p, ParamsHierarchicalFact) and
-           ParamsFactFactory.is_a_valid_simplification(p)):
-            p = ParamsFactFactory.createParams(M, p)
-        if(not isinstance(p, ParamsHierarchicalFact)):
-            raise TypeError("p must be a ParamsHierarchicalFact object.")
-        FaustFactory._check_fact_mat('FaustFactory.fact_hierarchical()', M)
-        if(not isinstance(ret_lambda, bool)):
-            raise TypeError("ret_lambda must be a bool.")
-        if(not p.is_mat_consistent(M)):
-            raise ValueError("M's number of columns must be consistent with "
-                             "the last residuum constraint defined in p. "
-                             "Likewise its number of rows must be consistent "
-                             "with the first factor constraint defined in p.")
+        p = FaustFactory._prepare_hierarchical_fact(M,p, "fact_hierarchical", ret_lambda,
+                                  ret_params)
         core_obj,_lambda = FaustCorePy.FaustFact.fact_hierarchical(M, p)
         F = Faust(core_obj=core_obj)
         ret_list = [ F ]
@@ -1545,6 +1532,51 @@ class FaustFactory:
             return ret_list
         else:
             return F
+
+    @staticmethod
+    def fact_hierarchical_fgft(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
+        from pyfaust.factparams import _init_init_D
+        from pyfaust.factparams import (ParamsHierarchicalFact,
+                                        ParamsFactFactory)
+        p = FaustFactory._prepare_hierarchical_fact(U, p, "fact_hierarchical_fgft", ret_lambda,
+                                  ret_params, 'U')
+        init_D = _init_init_D(init_D, U.shape[0])
+        core_obj, _lambda, D = FaustCorePy.FaustFact.fact_hierarchical_fft(U, Lap, p,
+                                                                        init_D)
+        F = Faust(core_obj=core_obj)
+        ret_list = [ F, D ]
+        if(ret_lambda):
+            ret_list += [ _lambda ]
+        if(ret_params):
+            ret_list += [ p ]
+        return ret_list
+
+    @staticmethod
+    def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
+                                   M_name='M'):
+        """
+        Utility func. for fact_hierarchical() and fact_hierarchical_fgft().
+        Among other checkings, it sets parameters from simplified ones.
+        """
+        from pyfaust.factparams import (ParamsHierarchicalFact,
+        ParamsFactFactory)
+        if(not isinstance(p, ParamsHierarchicalFact) and
+           ParamsFactFactory.is_a_valid_simplification(p)):
+            p = ParamsFactFactory.createParams(M, p)
+        if(not isinstance(p, ParamsHierarchicalFact)):
+            raise TypeError("p must be a ParamsHierarchicalFact object.")
+        FaustFactory._check_fact_mat('FaustFactory.'+callee_name+'()', M)
+        if(not isinstance(ret_lambda, bool)):
+            raise TypeError("ret_lambda must be a bool.")
+        if(not isinstance(ret_params, bool)):
+            raise TypeError("ret_params must be a bool.")
+        if(not p.is_mat_consistent(M)):
+            raise ValueError("M's number of columns must be consistent with "
+                             "the last residuum constraint defined in p. "
+                             "Likewise its number of rows must be consistent "
+                             "with the first factor constraint defined in p.")
+        return p
+
 
     @staticmethod
     def wht(n):

@@ -160,6 +160,10 @@ cdef extern from "FaustFact.h":
         PyxStoppingCriterion[FPP2]* stop_crits #must be of size 2
         bool is_fact_side_left
 
+    cdef cppclass PyxParamsHierarchicalFactFFT[FPP,FPP2](PyxParamsHierarchicalFact[FPP,FPP2]):
+        FPP* init_D
+
+
     cdef FaustCoreCpp[FPP]* fact_palm4MSAFFT[FPP,FPP2](FPP*,unsigned int, unsigned int,
                                              PyxParamsFactPalm4MSAFFT[FPP,FPP2]*,
                                                    FPP*)
@@ -170,6 +174,10 @@ cdef extern from "FaustFact.h":
 
     cdef FaustCoreCpp[FPP]* fact_hierarchical[FPP,FPP2](FPP*,unsigned int, unsigned int,
                                              PyxParamsHierarchicalFact[FPP,FPP2]*,
+                                                       FPP*)
+
+    cdef FaustCoreCpp[FPP]* fact_hierarchical_fft[FPP,FPP2](FPP*, FPP*, unsigned int, unsigned int,
+                                             PyxParamsHierarchicalFactFFT[FPP,FPP2]*,
                                                        FPP*)
 
 cdef extern from "FaustFactGivensFGFT.h":

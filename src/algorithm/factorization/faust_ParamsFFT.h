@@ -30,10 +30,55 @@ namespace Faust
 				const bool isFactSideLeft = Params<FPP,DEVICE,FPP2>::defaultFactSideLeft,
 				const FPP init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
 				const bool constant_step_size = Params<FPP,DEVICE,FPP2>::defaultConstantStepSize,
-				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): Params<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, stop_crit_2facts, stop_crit_global, isVerbose, isFactSideLeft, init_lambda, true, step_size), init_D(init_D)
+				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): Params<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size), init_D(init_D)
 		{
 
 		}
+
+		ParamsFFT(
+				const faust_unsigned_int nbRow,
+				const faust_unsigned_int nbCol,
+				const unsigned int nbFact,
+				const std::vector<std::vector<const Faust::ConstraintGeneric*>> & cons,
+				const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact,
+				const Faust::Vect<FPP, DEVICE>& init_D_diag,
+				const Faust::StoppingCriterion<FPP2>& stop_crit_2facts = StoppingCriterion<FPP2>(Params<FPP,DEVICE,FPP2>::defaultNiter1),
+				const Faust::StoppingCriterion<FPP2>& stop_crit_global = StoppingCriterion<FPP2>(Params<FPP,DEVICE,FPP2>::defaultNiter2),
+				const bool isVerbose = Params<FPP,DEVICE,FPP2>::defaultVerbosity,
+				const bool isUpdateWayR2L = Params<FPP,DEVICE,FPP2>::defaultUpdateWayR2L,
+				const bool isFactSideLeft = Params<FPP,DEVICE,FPP2>::defaultFactSideLeft,
+				const FPP init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
+				const bool constant_step_size = Params<FPP,DEVICE,FPP2>::defaultConstantStepSize,
+				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): Params<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size), init_D(nbRow, nbCol)
+		{
+			init_D.setZeros();
+			// set init_D from diagonal vector init_D_diag
+			for(int i=0;i<nbRow;i++)
+				init_D.getData()[i*nbRow+i] = init_D_diag.getData()[i];
+			cout << "src/algorithm/factorization/faust_ParamsFFT.h init_D norm" << init_D.norm() << endl;
+
+		}
+
+		ParamsFFT(
+				const faust_unsigned_int nbRow,
+				const faust_unsigned_int nbCol,
+				const unsigned int nbFact,
+				const std::vector<std::vector<const Faust::ConstraintGeneric*>> & cons,
+				const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact,
+				const FPP* init_D_diag,
+				const Faust::StoppingCriterion<FPP2>& stop_crit_2facts = StoppingCriterion<FPP2>(Params<FPP,DEVICE,FPP2>::defaultNiter1),
+				const Faust::StoppingCriterion<FPP2>& stop_crit_global = StoppingCriterion<FPP2>(Params<FPP,DEVICE,FPP2>::defaultNiter2),
+				const bool isVerbose = Params<FPP,DEVICE,FPP2>::defaultVerbosity,
+				const bool isUpdateWayR2L = Params<FPP,DEVICE,FPP2>::defaultUpdateWayR2L,
+				const bool isFactSideLeft = Params<FPP,DEVICE,FPP2>::defaultFactSideLeft,
+				const FPP init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
+				const bool constant_step_size = Params<FPP,DEVICE,FPP2>::defaultConstantStepSize,
+				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): ParamsFFT<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, Faust::Vect<FPP,DEVICE>(nbRow, init_D_diag), stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size)
+		{
+
+		}
+
+
 
 		ParamsFFT() {}
 

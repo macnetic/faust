@@ -11,7 +11,7 @@ template<typename FPP,Device DEVICE,typename FPP2>
 					const FPP step_size_) : ParamsPalm<FPP, DEVICE, FPP2>(data_, nbFact_, cons_, init_fact_, stop_crit_, isVerbose_, isUpdateWayR2L_, init_lambda_, true /*constant_step_size is always true for Palm4MSAFFT */, step_size_),  init_D(data_.getNbRow(), data_.getNbCol())
 {
 	init_D.setZeros();
-	// set init_D from diagonla vector init_D_diag
+	// set init_D from diagonal vector init_D_diag
 	for(int i=0;i<data_.getNbRow();i++)
 		init_D.getData()[i*init_D.getNbRow()+i] = init_D_diag.getData()[i];
 }

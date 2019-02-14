@@ -972,6 +972,69 @@ class TestFaustFactory(unittest.TestCase):
         # misc/test/src/C++/test_Palm4MSAFFT.cpp.in
         self.assertAlmostEqual(err, 1.39352e-5, places=5)
 
+    def testFactHierarchFGFT(self):
+        print("Test FaustFactory.fact_hierarchical_fgft()")
+        from pyfaust import FaustFactory
+        from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
+        from pyfaust.factparams import ConstraintReal, ConstraintInt,\
+                ConstraintName
+        from numpy import diag, copy
+        num_facts = 4
+        is_update_way_R2L = False
+        init_lambda = 1.0
+        #M = np.random.rand(500, 32)
+        U = \
+        loadmat(sys.path[-1]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['U']
+        Lap = \
+        loadmat(sys.path[-1]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['Lap'].astype(np.float)
+        init_D = \
+        loadmat(sys.path[-1]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['init_D']
+        params_struct = \
+        loadmat(sys.path[-1]+'/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat')['params']
+        nfacts = params_struct['nfacts'][0,0][0,0]
+        niter1 = params_struct['niter1'][0,0][0,0]
+        niter2 = params_struct['niter2'][0,0][0,0]
+        verbose = params_struct['verbose'][0,0][0,0]==1
+        is_update_way_R2L = params_struct['update_way'][0,0][0,0]==1
+        init_lambda = params_struct['init_lambda'][0,0][0,0]
+        stepsize = params_struct['stepsize'][0,0][0,0]
+        factside = params_struct['fact_side'][0,0][0,0] == 1
+        # for convenience I set the constraints manually and don't take them
+        # from mat file, but they are the same
+        # default step_size
+        fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 128,
+                                   128, 12288)
+        fact1_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128,
+                                  6144)
+        fact2_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128,
+                                  3072)
+        res0_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 128,
+                                   128, 384)
+        res1_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128,
+                                  384)
+        res2_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128,
+                                   384)
+        stop_crit1 = StoppingCriterion(num_its=niter1)
+        stop_crit2 = StoppingCriterion(num_its=niter2)
+        param = ParamsHierarchicalFact([fact0_cons, fact1_cons, fact2_cons],
+                                       [res0_cons, res1_cons, res2_cons],
+                                       stop_crit1, stop_crit2,
+                                       is_verbose=verbose,
+                                       init_lambda=init_lambda,
+                                       constant_step_size=False)
+        diag_init_D = copy(diag(init_D))
+        print("norm(init_D):", norm(init_D))
+        F,D, _lambda = FaustFactory.fact_hierarchical_fgft(U, Lap, param,
+                                                           diag_init_D,
+                                                           ret_lambda=True)
+        print("out_lambda:", _lambda)
+        self.assertEqual(F.shape, U.shape)
+        D = diag(D)
+        err = norm((F.todense()*D)*F.T.todense()-Lap,"fro")/norm(Lap,"fro")
+        # matrix to factorize and reference relative error come from
+        # misc/test/src/C++/hierarchicalFactorizationFFT.cpp
+        self.assertAlmostEqual(err, 0.084417, places=5)
+
 
 if __name__ == "__main__":
     if(len(sys.argv)> 1):
