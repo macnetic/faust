@@ -22,7 +22,6 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::max_L()
 	MatDense<FPP,DEVICE> L_low = this->L;
 	L_low.abs();
 	L_low =	L_low.lower_tri(false);
-	cout << " GivensFGFTParallel::max_L() norm(L_low): " <<  L_low.norm() << endl;
 	fact_nz_inds = L_low.nonzeros_indices();
 
 #ifdef DEBUG_GIVENS

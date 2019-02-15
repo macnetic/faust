@@ -55,7 +55,6 @@ namespace Faust
 			// set init_D from diagonal vector init_D_diag
 			for(int i=0;i<nbRow;i++)
 				init_D.getData()[i*nbRow+i] = init_D_diag.getData()[i];
-			cout << "src/algorithm/factorization/faust_ParamsFFT.h init_D norm" << init_D.norm() << endl;
 
 		}
 
