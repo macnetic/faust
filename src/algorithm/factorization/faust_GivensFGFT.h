@@ -69,6 +69,9 @@ namespace Faust {
 				/** \brief true if D has already been ordered (order_D() was called). */
 				bool is_D_ordered;
 
+				/** \brief The level of verbosity (0 for nothing, 1 for iteration numbers,...) */
+				unsigned int verbosity;
+
 				/**
 				 * \brief Row index for the selected pivot in L.
 				 */

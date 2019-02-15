@@ -237,8 +237,8 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 		err_d = Lap.norm();
 		err_d *= err_d;
 		err /= err_d;
-		cout << "ite. i: "<< ite << " err.: " << err << endl;
-		//TODO: boolean to display error or verbose mode
+		if(verbosity)
+			cout << "GivensFGFT ite. i: "<< ite << " err.: " << err << endl;
 	}
 }
 
@@ -282,7 +282,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbCol()), errs(J), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false)
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbCol()), errs(J), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(0)
 {
 	/* Matlab ref. code:
 	 *     facts = cell(1,J);
