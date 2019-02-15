@@ -377,6 +377,14 @@ classdef FaustTest < matlab.unittest.TestCase
 			ref_mat = ref_full_faust*cmat;
 			test_mat = F*cmat;
 			this.verifyEqual(test_mat,ref_mat, 'RelTol', 10^-3)
+			% transpose products
+			tref_mat = rmat'*ref_full_faust';
+			ttest_mat = rmat'*F';
+			this.verifyEqual(ttest_mat,tref_mat, 'RelTol', 10^-3)
+			% against complex matrix
+			tref_mat = cmat'*ref_full_faust';
+			ttest_mat = cmat'*F';
+			this.verifyEqual(ttest_mat,tref_mat, 'RelTol', 10^-3)
 			disp('test real mul by real scalar')
 			r = rand();
 			test_rF = full(F*r);
@@ -407,6 +415,10 @@ classdef FaustTest < matlab.unittest.TestCase
 				test_rF = full(F*rF);
 				ref_rF = ref_full_faust*full(rF);
 				this.verifyEqual(test_rF, ref_rF, 'RelTol', 10^-3);
+				% transpose prod
+				ttest_rF = full(rF'*F');
+				tref_rF = full(rF)'*ref_full_faust';
+				this.verifyEqual(ttest_rF, tref_rF, 'RelTol', 10^-3);
 			end
 		end
 

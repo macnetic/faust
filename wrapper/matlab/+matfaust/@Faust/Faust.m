@@ -455,8 +455,12 @@ classdef Faust
 			% storage matrix, G is also a full matrix storage.
 			%
 			% See also mtimes_trans
-			if(isa(A, 'matfaust.Faust') && isscalar(F))
-				G = mtimes_trans(A, F, 0);
+			if(isa(A, 'matfaust.Faust'))
+				if(isscalar(F))
+					G = mtimes_trans(A, F, 0);
+				elseif(ismatrix(F))
+					G = mtimes_trans(A', F', 0)';
+				end
 			else
 				G = mtimes_trans(F, A, 0);
 			end
