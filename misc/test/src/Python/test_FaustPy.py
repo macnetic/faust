@@ -899,8 +899,8 @@ class TestFaustFactory(unittest.TestCase):
         L = loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         J = \
-        loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J']
-        F, D = FF.fgft_givens(L, J, 0)
+        int(loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
+        F, D = FF._fgft_givens(L, J, 0)
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
         print("err: ", err)
@@ -914,15 +914,16 @@ class TestFaustFactory(unittest.TestCase):
         L = loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         J = \
-                loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J']
-        F, D = FF.fgft_givens(L, J, L.shape[0]/2)
+                int(loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
+        t = int(L.shape[0]/2)
+        F, D = FF._fgft_givens(L, J, t)
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in
         self.assertAlmostEqual(err, 0.0410448, places=7)
-        F2, D2 = FF.trunc_jacobi(L, J, L.shape[0]/2)
+        F2, D2 = FF.eigtj(L, J, t)
         print("Lap norm:", norm(L, 'fro'))
         err2 = norm((F2*D.todense())*F2.T.todense()-L,"fro")/norm(L,"fro")
         print("err2: ", err2)

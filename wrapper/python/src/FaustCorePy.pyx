@@ -1256,7 +1256,7 @@ cdef class FaustFact:
         check_matrix(isReal, Lap)
 
         if(not isReal):
-            raise TypeError('Laplacian must be a real matrix.')
+            raise TypeError('Matrix must be a real.')
 
         cdef unsigned int Lap_num_rows=Lap.shape[0]
         cdef unsigned int Lap_num_cols=Lap.shape[1]

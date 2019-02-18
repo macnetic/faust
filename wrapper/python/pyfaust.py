@@ -1784,22 +1784,38 @@ class FaustFactory:
         return rF
 
     @staticmethod
-    def trunc_jacobi(M, J, t=None):
+    def eigtj(M, J, t=1):
         """
-        Diagonalizes the real matrix M using the truncated Jacobi algorithm.
+        Computes the eigenvalues and the eigenvectors transform (as a Faust object) using the truncated Jacobi algorithm.
 
-        NOTE: this function is just an alias for fgft_givens
+        The Faust object for the eigenvectors is an approximation (as the
+        eigenvalues are). The trade-off between accuracy and sparsity can be set
+        through the parameters J and t.
 
         Args:
-            M: the real matrix to diagonalize. Must be real, symmetric and square.
-            J: the number of factors for the factorization of the eigenvector matrix.
-            t: the number of Givens rotations per matrix.
+            M: the matrix to diagonalize. Must be real, symmetric and square.
+            J: defines the number of factors in the eigenvector transform V.
+            if t == 1 the number of factors is J, but more generally this
+            number is round(J/t). Note that the last permutation factor
+            is not in count here (in fact, the total number of factors in V is rather
+            round(J/t)+1).
+            t: the number of Givens rotations per factor. Note that t is
+            forced to the value min(J,t). Besides, a value of t such that t >
+            M.shape[0]/2 won't lead to the desired effect because the maximum
+            number of rotations matrices per factor is anyway M.shape[0]/2.
+            The parameter t is meaningful in the parallel version of the
+            truncated Jacobi algorithm (cf. references below). If t <= 1 (by default)
+            then the function runs the non-parallel algorithm.
+
 
         Returns:
-            The tuple (F,D): with F the Faust object representing the
-            approximate factorization of M eigenvector matrix and D the
-            approximate diagonal matrix for the eigenvalues (ascendant order
-            along the rows/columns).
+            The tuple (V,W):
+                - V the Faust object representing the approximate eigenvector
+                transform. V has its last factor being a permutation matrix,
+                the goal of this factor is to apply to V the same order as
+                eigenvalues set in W.
+                - W the approximate diagonal matrix of the eigenvalues
+                (ascendant order along the rows/columns). The type is scipy.sparse.dia.dia_matrix.
 
         References:
         [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
@@ -1808,27 +1824,28 @@ class FaustFactory:
         over Networks.
         <https://hal.inria.fr/hal-01416110>
 
-        <b/> See also FaustFactory.fgft_givens, FaustFactory.fact_palm4msa_fgft
+
         """
-        return FaustFactory.fgft_givens(M, J, t)
+        return FaustFactory._fgft_givens(M, J, t)
 
     @staticmethod
-    def fgft_givens(Lap, J, t=None):
+    def _fgft_givens(Lap, J, t=1):
         """
         Diagonalizes the graph Laplacian matrix Lap using the Givens FGFT algorithm.
 
         Args:
             Lap: the Laplacian matrix as a numpy array. Must be real, symmetric and square.
-            J: the number of factors for the Fourier matrix (aka the Givens matrices).
-            t: the number of rotations per Fourier factor (2D sub-matrices).
-            If None (default value) the non-parallel version of the algorithm
-            is used.
+            J: see FaustFactory.eigtj
+            t: FaustFactory.eigtj
 
         Returns:
-            The tuple (FGFT,D): with FGFT being the Faust object representing the Fourier matrix
-            factorization/approximate and D the diagonalized matrix of the
-            Laplacian. The eigenvalues are ordered in ascendant order along the
-            rows/columns.
+            The tuple (FGFT,D):
+            - with FGFT being the Faust object representing
+            the Fourier transform and,
+            - D the eigenvalues of the Laplacian. The eigenvalues are ordered
+            in ascendant order along the rows/columns. The type is
+            scipy.sparse.dia.dia_matrix.
+
 
         References:
         [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
@@ -1837,12 +1854,15 @@ class FaustFactory:
         over Networks.
         <https://hal.inria.fr/hal-01416110>
 
-        <b/> See also FaustFactory.trunc_jacobi, FaustFactory.fact_palm4msa_fgft
+        <b/> See also FaustFactory.eigtj
         """
         if((Lap.T != Lap).any() or Lap.shape[0] != Lap.shape[1]):
-            raise ValueError("Laplacian matrix must be square and symmetric.")
-        if(not t):
-            t = 0
+            raise ValueError(" the matrix/array must be square and should be symmetric.")
+        if(not isinstance(J, int)): raise TypeError("J must be a int")
+        if(J < 1): raise ValueError("J must be >= 1")
+        if(not isinstance(t, int)): raise TypeError("t must be a int")
+        if(t < 0): raise ValueError("t must be >= 0")
+        t = min(t,J)
         core_obj,D = FaustCorePy.FaustFact.fact_givens_fgft(Lap, J, t)
         return Faust(core_obj=core_obj), D
 
