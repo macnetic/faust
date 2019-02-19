@@ -932,7 +932,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertEqual(err, err2)
 
     def testFactPalm4MSA_fgft(self):
-        print("Test FaustFactory.fact_palm4msa_fgft()")
+        print("Test FaustFactory._fact_palm4msa_fgft()")
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName, StoppingCriterion
         #from pyfaust.factparams import ParamsPalm4MSAFGFT, StoppingCriterion
@@ -963,7 +963,7 @@ class TestFaustFactory(unittest.TestCase):
                                    init_D=init_D,
                                    is_update_way_R2L=False, init_lambda=128,
                                    is_verbose=True, step_size=1e-6)
-        F, D, _lambda = FaustFactory.fact_palm4msa_fgft(L, param, ret_lambda=True)
+        F, D, _lambda = FaustFactory._fact_palm4msa_fgft(L, param, ret_lambda=True)
         print("Lap norm:", norm(L, 'fro'))
         print("out lambda:", _lambda)
         D = diag(D)
@@ -974,7 +974,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(err, 1.39352e-5, places=5)
 
     def testFactHierarchFGFT(self):
-        print("Test FaustFactory.fact_hierarchical_fgft()")
+        print("Test FaustFactory.eig_palm()")
         from pyfaust import FaustFactory
         from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
         from pyfaust.factparams import ConstraintReal, ConstraintInt,\
@@ -1025,7 +1025,7 @@ class TestFaustFactory(unittest.TestCase):
                                        constant_step_size=False)
         diag_init_D = copy(diag(init_D))
         print("norm(init_D):", norm(init_D))
-        F,D, _lambda = FaustFactory.fact_hierarchical_fgft(U, Lap, param,
+        F,D, _lambda = FaustFactory.eig_palm(U, Lap, param,
                                                            diag_init_D,
                                                            ret_lambda=True)
         print("out_lambda:", _lambda)

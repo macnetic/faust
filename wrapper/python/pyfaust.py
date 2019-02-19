@@ -1369,12 +1369,12 @@ class FaustFactory:
             return F
 
     @staticmethod
-    def fact_palm4msa_fgft(Lap, p, ret_lambda=False):
+    def _fact_palm4msa_fgft(Lap, p, ret_lambda=False):
         """
         """
         if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSAFGFT)):
             raise TypeError("p must be a ParamsPalm4MSAFGFT object.")
-        FaustFactory._check_fact_mat('FaustFactory.fact_palm4msa_fgft()', Lap)
+        FaustFactory._check_fact_mat('FaustFactory._fact_palm4msa_fgft()', Lap)
         if((Lap.T != Lap).any() or Lap.shape[0] != Lap.shape[1]):
             raise ValueError("Laplacian matrix must be square and symmetric.")
         if(not p.is_mat_consistent(Lap)):
@@ -1533,29 +1533,12 @@ class FaustFactory:
         else:
             return F
 
-    @staticmethod
-    def fact_hierarchical_fgft(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
-        from pyfaust.factparams import _init_init_D
-        from pyfaust.factparams import (ParamsHierarchicalFact,
-                                        ParamsFactFactory)
-        p = FaustFactory._prepare_hierarchical_fact(U, p, "fact_hierarchical_fgft", ret_lambda,
-                                  ret_params, 'U')
-        init_D = _init_init_D(init_D, U.shape[0])
-        core_obj, _lambda, D = FaustCorePy.FaustFact.fact_hierarchical_fft(U, Lap, p,
-                                                                        init_D)
-        F = Faust(core_obj=core_obj)
-        ret_list = [ F, D ]
-        if(ret_lambda):
-            ret_list += [ _lambda ]
-        if(ret_params):
-            ret_list += [ p ]
-        return ret_list
 
     @staticmethod
     def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
                                    M_name='M'):
         """
-        Utility func. for fact_hierarchical() and fact_hierarchical_fgft().
+        Utility func. for fact_hierarchical() and eig_palm().
         Among other checkings, it sets parameters from simplified ones.
         """
         from pyfaust.factparams import (ParamsHierarchicalFact,
@@ -1784,25 +1767,42 @@ class FaustFactory:
         return rF
 
     @staticmethod
+    def eig_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
+        from pyfaust.factparams import _init_init_D
+        from pyfaust.factparams import (ParamsHierarchicalFact,
+                                        ParamsFactFactory)
+        p = FaustFactory._prepare_hierarchical_fact(U, p, "eig_palm", ret_lambda,
+                                  ret_params, 'U')
+        init_D = _init_init_D(init_D, U.shape[0])
+        core_obj, _lambda, D = FaustCorePy.FaustFact.fact_hierarchical_fft(U, Lap, p,
+                                                                        init_D)
+        F = Faust(core_obj=core_obj)
+        ret_list = [ F, D ]
+        if(ret_lambda):
+            ret_list += [ _lambda ]
+        if(ret_params):
+            ret_list += [ p ]
+        return ret_list
+
+    @staticmethod
     def eigtj(M, J, t=1):
         """
         Computes the eigenvalues and the eigenvectors transform (as a Faust object) using the truncated Jacobi algorithm.
 
-        The Faust object for the eigenvectors is an approximation (as the
-        eigenvalues are). The trade-off between accuracy and sparsity can be set
-        through the parameters J and t.
+        The eigenvalues and the eigenvectors are approximate.
+        The trade-off between accuracy and sparsity can be set through the
+        parameters J and t.
 
         Args:
-            M: the matrix to diagonalize. Must be real, symmetric and square.
-            J: defines the number of factors in the eigenvector transform V.
-            if t == 1 the number of factors is J, but more generally this
-            number is round(J/t). Note that the last permutation factor
+            M: (numpy.ndarray) the matrix to diagonalize. Must be real and symmetric.
+            J: (int) defines the number of factors in the eigenvector transform V.
+            The number of factors is round(J/t). Note that the last permutation factor
             is not in count here (in fact, the total number of factors in V is rather
             round(J/t)+1).
-            t: the number of Givens rotations per factor. Note that t is
+            t: (int) the number of Givens rotations per factor. Note that t is
             forced to the value min(J,t). Besides, a value of t such that t >
             M.shape[0]/2 won't lead to the desired effect because the maximum
-            number of rotations matrices per factor is anyway M.shape[0]/2.
+            number of rotation matrices per factor is anyway M.shape[0]/2.
             The parameter t is meaningful in the parallel version of the
             truncated Jacobi algorithm (cf. references below). If t <= 1 (by default)
             then the function runs the non-parallel algorithm.
@@ -1812,10 +1812,10 @@ class FaustFactory:
             The tuple (V,W):
                 - V the Faust object representing the approximate eigenvector
                 transform. V has its last factor being a permutation matrix,
-                the goal of this factor is to apply to V the same order as
+                the goal of this factor is to apply to the columns of V the same order as
                 eigenvalues set in W.
-                - W the approximate diagonal matrix of the eigenvalues
-                (ascendant order along the rows/columns). The type is scipy.sparse.dia.dia_matrix.
+                - W (scipy.sparse.dia.dia_matrix) the approximate diagonal matrix of the eigenvalues
+                (in ascendant order along the rows/columns).
 
         References:
         [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
@@ -1823,6 +1823,21 @@ class FaustFactory:
         submitted to IEEE Transactions on Signal and Information Processing
         over Networks.
         <https://hal.inria.fr/hal-01416110>
+
+        Example:
+            from pyfaust import FaustFactory as FF
+            from scipy.io import loadmat
+            from os.path import sep
+            from pyfaust.demo import get_data_dirpath
+
+            # get a graph Laplacian to diagonalize
+            demo_path = sep.join((get_data_dirpath(),'Laplacian_256_community.mat'))
+            data_dict = loadmat(demo_path)
+            Lap = data_dict['Lap'].astype(np.float)
+
+            Uhat, Dhat = FF.eigtj(Lap,J=Lap.shape[0]*100,t=int(Lap.shape[0]/2))
+            # Uhat is the Faust Fourier matrix approximation (200 factors + permutation mat.)
+            # Dhat the eigenvalues diagonal approx.
 
 
         """
@@ -1834,7 +1849,7 @@ class FaustFactory:
         Diagonalizes the graph Laplacian matrix Lap using the Givens FGFT algorithm.
 
         Args:
-            Lap: the Laplacian matrix as a numpy array. Must be real, symmetric and square.
+            Lap: the Laplacian matrix as a numpy array. Must be real and symmetric.
             J: see FaustFactory.eigtj
             t: FaustFactory.eigtj
 

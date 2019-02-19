@@ -6,8 +6,8 @@
 # copy and install the matlab wrapping the underlying C++ class
 
 #file(MAKE_DIRECTORY ${FAUST_MATLAB_TOOLS_INSTALL_DIR})
-# copy BSL data matrices
-file(GLOB BSL_DATA_FILE  RELATIVE ${FAUST_DATA_MAT_DIR} "${FAUST_DATA_MAT_DIR}/*MEG*.mat")
+# copy BSL data matrices and Laplacians
+file(GLOB BSL_DATA_FILE  RELATIVE ${FAUST_DATA_MAT_DIR} "${FAUST_DATA_MAT_DIR}/*MEG*.mat" "${FAUST_DATA_MAT_DIR}/Laplacian*.mat")
 foreach(data_BSL ${BSL_DATA_FILE})
 	configure_file(${FAUST_DATA_MAT_DIR}/${data_BSL} ${FAUST_MATFAUST_DEMO_DATA_BIN_DIR}/${data_BSL} COPYONLY)
 endforeach()
