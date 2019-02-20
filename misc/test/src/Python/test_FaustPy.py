@@ -900,7 +900,7 @@ class TestFaustFactory(unittest.TestCase):
         L = L.astype(np.float64)
         J = \
         int(loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
-        F, D = FF._fgft_givens(L, J, 0)
+        F, D = FF.fgft_givens(L, J, 0)
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
         print("err: ", err)
@@ -916,7 +916,7 @@ class TestFaustFactory(unittest.TestCase):
         J = \
                 int(loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
         t = int(L.shape[0]/2)
-        F, D = FF._fgft_givens(L, J, t)
+        F, D = FF.fgft_givens(L, J, t)
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
         print("err: ", err)
@@ -974,7 +974,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(err, 1.39352e-5, places=5)
 
     def testFactHierarchFGFT(self):
-        print("Test FaustFactory.eig_palm()")
+        print("Test FaustFactory.fgft_palm()")
         from pyfaust import FaustFactory
         from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
         from pyfaust.factparams import ConstraintReal, ConstraintInt,\
@@ -1025,7 +1025,7 @@ class TestFaustFactory(unittest.TestCase):
                                        constant_step_size=False)
         diag_init_D = copy(diag(init_D))
         print("norm(init_D):", norm(init_D))
-        F,D, _lambda = FaustFactory.eig_palm(U, Lap, param,
+        F,D, _lambda = FaustFactory.fgft_palm(U, Lap, param,
                                                            diag_init_D,
                                                            ret_lambda=True)
         print("out_lambda:", _lambda)

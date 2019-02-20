@@ -1303,7 +1303,7 @@ class FaustFactory:
     FAµST. Those algorithms can factorize a dense matrix to a sparse product
     (i.e. a Faust object).
 
-    There are two algorithms for factorization.
+    There are several algorithms for factorization.
 
     - The first one is Palm4MSA :
     which stands for Proximal Alternating Linearized Minimization for
@@ -1314,6 +1314,9 @@ class FaustFactory:
     this is the central algorithm to factorize a dense matrix to a Faust.
     It makes iterative use of Palm4MSA to proceed with the factorization of a given
     dense matrix.
+
+    - The third group of algorithms is for FGFT computing:
+        FaustFactory.fgft_palm, FaustFactory.fgft_givens, FaustFactory.eigtj
 
     A more secondary functionality of this class is the Faust generation.
     Several methods are available:
@@ -1538,7 +1541,7 @@ class FaustFactory:
     def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
                                    M_name='M'):
         """
-        Utility func. for fact_hierarchical() and eig_palm().
+        Utility func. for fact_hierarchical() and fgft_palm().
         Among other checkings, it sets parameters from simplified ones.
         """
         from pyfaust.factparams import (ParamsHierarchicalFact,
@@ -1767,12 +1770,127 @@ class FaustFactory:
         return rF
 
     @staticmethod
-    def eig_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
+    def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
+        """
+        Computes the FGFT for the Fourier matrix U (it should be the eigenvectors of the Laplacian Lap).
+
+
+        NOTE: this algorithm is a variant of FaustFactory.fact_hierarchical.
+
+
+		Example:
+			from pyfaust import FaustFactory
+			from pyfaust.factparams import *
+			from pyfaust.demo import get_data_dirpath
+			from scipy.io import loadmat, savemat
+			from numpy.linalg import eig, eigh, norm
+			from numpy import sort, argsort, log2, size, copy, diag, dot
+			from os.path import join
+
+			# get the Laplacian
+			d = loadmat(join(get_data_dirpath(), "Laplacian_128_ring.mat"))
+			Lap = d['Lap']
+
+			# eigenvalues/vectors decomposition
+			D, U = eig(Lap)
+
+			# sort D and U accordingly
+			indices = argsort(D)
+			D = D[indices]
+			U = U[:,indices]
+			print("eig(Lap), U error:", norm(dot(Lap,U)-dot(U,diag(D))))
+
+			dim = Lap.shape[0]
+
+			# wanted number of factors for U transform
+			nfacts = int(round(log2(dim))-3)
+			over_sp = 1.5 # sparsity overhead
+			dec_fact = .5 # decrease of the residuum sparsity
+
+			# define the sparsity constraints for the factors
+			fact_cons, res_cons = [], []
+			for j in range(1, nfacts):
+					fact_cons += [ ConstraintInt('sp',dim,dim,
+							min(int(round(dec_fact**j*dim**2*over_sp)),size(Lap)))
+					]
+					res_cons += [
+						ConstraintInt('sp',
+						dim,
+						dim,
+						min(int(round(2*dim*over_sp)),size(Lap)))
+					]
+
+			# set the parameters for the PALM hierarchical algo.
+			params = ParamsHierarchicalFact(fact_cons,
+							res_cons,
+							StoppingCriterion(num_its=50),
+							StoppingCriterion(num_its=100),
+							step_size=1.0000e-06,
+							constant_step_size=True,
+							init_lambda=1.0,
+							is_fact_side_left=False)
+			Lap = Lap.astype(float)
+
+			# compute FGFT for Lap, U, D
+			Uhat,Dhat = FaustFactory.fgft_palm(Lap, U, params, init_D=D)
+
+			# errors on FGFT and Laplacian reconstruction
+			err_U = (Uhat-U).norm()/norm(U)
+			err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense())/norm(Lap)
+			print("err_U:", err_U)
+			print("err_Lap:", err_Lap)
+
+			#Output:
+			#	eig(Lap), U error: 1.36688422173e-13
+			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/3
+			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/3
+			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/3
+			#	err_U: 1.00138959974
+			#	err_Lap: 0.00319004898686
+
+
+		Args:
+			Lap: (numpy.ndarray) The Laplacian matrix.
+			U: (numpy.ndarray) The Fourier matrix.
+			init_D: (numpy.ndarray) The initial diagonal vector. if None it will be the ones() vector by default.
+            p: (ParamsHierarchicalFact) The PALM hierarchical algorithm parameters.
+			ret_lambda: (bool) True to return the lambda scale factor used in PALM algorithm.
+			ret_params: (bool) True to return the parameters used by the hierarchical PALM algorithm (normally it's p except if p is a simplifed form of parameters -- not instance of ParamsHierarchicalFact).
+
+        Returns:
+            FGFT: (Faust object) The Fourier transform.
+            - if ret_lambda == True (and ret_params == False), then the function returns the
+            tuple (FGFT,_lambda) (_lambda is the scale factor at the end of
+            factorization).
+            - if ret_params == True (and ret_lambda == False), then the function returns the
+            tuple (FGFT, p) (p being the ParamsHierarchicalFact instance really used by the
+            algorithm).
+            - if ret_lambda == True and ret_params == True, then the function returns the
+            tuple (FGFT, _lambda, p).
+
+        See also:
+            FaustFactory.fact_hierarchical, FaustFactory.fgft_givens, FaustFactory.eigtj
+
+        References:
+            - [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
+            graph Fourier transforms via multi-layer sparse approximations",
+            submitted to IEEE Transactions on Signal and Information Processing
+            over Networks.
+            <https://hal.inria.fr/hal-01416110>
+            - [2] Le Magoarou L. and Gribonval R., "Are there approximate Fast
+            Fourier Transforms on graphs ?", ICASSP, 2016.  <https://hal.inria.fr/hal-01254108>
+
+
+        """
         from pyfaust.factparams import _init_init_D
         from pyfaust.factparams import (ParamsHierarchicalFact,
                                         ParamsFactFactory)
-        p = FaustFactory._prepare_hierarchical_fact(U, p, "eig_palm", ret_lambda,
+
+        p = FaustFactory._prepare_hierarchical_fact(U, p, "fgft_palm", ret_lambda,
                                   ret_params, 'U')
+        if(init_D.dtype != Lap.dtype or Lap.dtype != U.dtype or U.dtype != init_D.dtype):
+            raise ValueError("All the numpy arrays must be of the same dtype.")
+
         init_D = _init_init_D(init_D, U.shape[0])
         core_obj, _lambda, D = FaustCorePy.FaustFact.fact_hierarchical_fft(U, Lap, p,
                                                                         init_D)
@@ -1839,27 +1957,27 @@ class FaustFactory:
             # Uhat is the Faust Fourier matrix approximation (200 factors + permutation mat.)
             # Dhat the eigenvalues diagonal approx.
 
-
+        See also:
+            FaustFactory.fgft_givens, FaustFactory.fgft_palm
         """
-        return FaustFactory._fgft_givens(M, J, t)
+        return FaustFactory.fgft_givens(M, J, t)
 
     @staticmethod
-    def _fgft_givens(Lap, J, t=1):
+    def fgft_givens(Lap, J, t=1):
         """
         Diagonalizes the graph Laplacian matrix Lap using the Givens FGFT algorithm.
 
         Args:
             Lap: the Laplacian matrix as a numpy array. Must be real and symmetric.
             J: see FaustFactory.eigtj
-            t: FaustFactory.eigtj
+            t: see FaustFactory.eigtj
 
         Returns:
             The tuple (FGFT,D):
             - with FGFT being the Faust object representing
             the Fourier transform and,
-            - D the eigenvalues of the Laplacian. The eigenvalues are ordered
-            in ascendant order along the rows/columns. The type is
-            scipy.sparse.dia.dia_matrix.
+            - (scipy.sparse.dia.dia_matrix) D the eigenvalues of the Laplacian.
+            The eigenvalues are in ascendant order along the rows/columns.
 
 
         References:
@@ -1869,7 +1987,7 @@ class FaustFactory:
         over Networks.
         <https://hal.inria.fr/hal-01416110>
 
-        <b/> See also FaustFactory.eigtj
+        <b/> See also FaustFactory.eigtj, FaustFactory.fgft_palm
         """
         if((Lap.T != Lap).any() or Lap.shape[0] != Lap.shape[1]):
             raise ValueError(" the matrix/array must be square and should be symmetric.")
