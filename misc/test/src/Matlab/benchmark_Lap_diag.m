@@ -1,3 +1,5 @@
+% this script uses factorization algorithms from FAµST 1.03 even if it uses matfaust version >= 2 to create Faust
+% the goal is to benchmark original algorithm implementations to compare their results to recent FAµST'
 import matfaust.Faust
 
 fpath = mfilename('fullpath');
@@ -19,7 +21,12 @@ U_hier_errs = {};
 U_givens_errs = {};
 U_par_givens_errs = {};
 
-num_graphs = 60; % only first 60 graph Laps which are of 6 types (random sensor, etc.)
+hier_palm_times = {};
+hier_fgft_times = {};
+givens_fgft_times = {};
+par_givens_fgft_times = {};
+
+num_graphs = 45; % only first 60 graph Laps which are of 6 types (random sensor, etc.)
 for i=1:num_graphs
 	disp(['benchmarking graph. Laplacian ' num2str(i) '/' num2str(num_graphs)])
 	U = Us{i};
@@ -49,17 +56,18 @@ for i=1:num_graphs
 	params.niter2 = 100;
 	params.verbose=0;
 
+	tic
 	[lambda, facts, errors] = hierarchical_fact(params);
-	complexity_global=0;
-	for j=1:nfacts
-		complexity_global = complexity_global + nnz(facts{j});
-	end
-	F = Faust(facts);
+	F = Faust(facts, lambda);
+	hier_palm_times = [ hier_palm_times toc ];
+	complexity_global = nnz_sum(F);
 	RC_PALM = complexity_global/nnz(U);
 
+	tic
 	[lambda, facts, Dhat, errors] = hierarchical_fact_FFT(params);
 	facts{1} = lambda*facts{1};
 	Uhat_PALM = Faust(facts);
+	hier_fgft_times = [ hier_fgft_times toc ];
 	hier_err = norm(Uhat_PALM*Dhat*Uhat_PALM' - Lap, 'fro')/norm(Lap, 'fro');
 	hier_errs = [ hier_errs hier_err];
 
@@ -67,13 +75,17 @@ for i=1:num_graphs
 
 
 	J=round(RC_PALM*nnz(U)/4);
+	tic
 	[facts_givens,Dhat,err,L,choices] = diagonalization_givens(Lap,J);
+	givens_fgft_times = [ givens_fgft_times toc];
 	Uhat_givens = Faust(facts_givens);
 	givens_err = norm(Uhat_givens*full(Dhat)*Uhat_givens' - Lap, 'fro')/norm(Lap, 'fro');
 	givens_errs = [ givens_errs givens_err];
 	U_givens_errs = [ U_givens_errs norm(Uhat_givens - U, 'fro')/norm(U, 'fro')];
 
+	tic
 	[facts_givens_parall,Dhat,err,L,coord_choices] = diagonalization_givens_parall(Lap,J,dim/2);
+	par_givens_fgft_times = [ par_givens_fgft_times toc ];
 	Uhat_givens_par = Faust(facts_givens_parall);
 	par_givens_err = norm(Uhat_givens_par*full(Dhat)*Uhat_givens_par' - Lap, 'fro')/norm(Lap, 'fro');
 	par_givens_errs = [ par_givens_errs par_givens_err];
@@ -81,7 +93,7 @@ for i=1:num_graphs
 
 end
 
-save('benchmark_Lap_diag_output.mat', 'hier_errs', 'givens_errs', 'par_givens_errs', 'U_hier_errs', 'U_givens_errs', 'U_par_givens_errs')
+save('benchmark_Lap_diag_output.mat', 'hier_errs', 'givens_errs', 'par_givens_errs', 'U_hier_errs', 'U_givens_errs', 'U_par_givens_errs', 'hier_fgft_times', 'givens_fgft_times', 'par_givens_fgft_times', 'hier_palm_times')
 
 hier_errs
 givens_errs
@@ -91,3 +103,7 @@ U_hier_errs
 U_givens_errs
 U_par_givens_errs
 
+hier_palm_times
+hier_fgft_times
+givens_fgft_times
+par_givens_fgft_times

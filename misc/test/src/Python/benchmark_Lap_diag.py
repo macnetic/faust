@@ -7,6 +7,7 @@ from numpy.linalg import norm
 from pyfaust.factparams import *
 from pyfaust import *
 from pylab import *
+from time import clock
 
 
 
@@ -34,6 +35,11 @@ if __name__ == '__main__':
     U_givens_errs = empty(num_laps)
     U_par_givens_errs = empty(num_laps)
 
+    hier_palm_times = empty(num_laps)
+    hier_fgft_times = empty(num_laps)
+    givens_times = empty(num_laps)
+    par_givens_times = empty(num_laps)
+
     if exists('benchmark_pyfaust_fgft.txt'):
         saved_lap_errs = loadtxt('benchmark_pyfaust_fgft.txt')
         len_saved = saved_lap_errs[0].shape[0]
@@ -43,6 +49,9 @@ if __name__ == '__main__':
         U_givens_errs[:len_saved], U_par_givens_errs[:len_saved], \
         U_hier_fgft_errs[:len_saved] = \
         saved_U_errs
+        saved_fgft_times = loadtxt('benchmark_pyfaust_fgft_times.txt')
+        givens_times[:len_saved], par_givens_times[:len_saved],\
+                hier_fgft_times[:len_saved], hier_palm_times[:len_saved] = saved_fgft_times
         start_i = len_saved
         if(saved_U_errs[0].shape[0] != saved_lap_errs[0].shape[0]):
             raise Exception("Error files not consistent, delete and recompute")
@@ -69,16 +78,20 @@ if __name__ == '__main__':
                                         init_lambda=1.0,
                                         is_fact_side_left=False)
 
+        t = clock()
         F = FaustFactory.fact_hierarchical(U,params)
-        print(F)
+        hier_palm_times[i] = clock()-t
         complexity_global = F.nnz_sum()
         rc_palm = complexity_global / count_nonzero(U)
 
         diag_init_D = diag(D)
         diag_init_D = numpy.copy(diag_init_D)
+        t = clock()
         F, Dhat = FaustFactory.fgft_palm(U, Lap,
                                                       params,
                                                       diag_init_D)
+        t = clock()-t
+        hier_fgft_times[i] = t
         hier_fgft_err = norm((F.todense()*diag(Dhat))*F.T.todense()-Lap,"fro")/norm(Lap,"fro")
         hier_fgft_errs[i] = hier_fgft_err
         U_hier_fgft_errs[i] =  (F-U).norm("fro")/norm(U,"fro")
@@ -88,12 +101,19 @@ if __name__ == '__main__':
         #nfacts = complexity_global/(2*dim)
         #J = round(nfacts*(dim/2))
         J = round(complexity_global/4)
+        t = clock()
         F, Dhat = FaustFactory.fgft_givens(Lap, J, 0)
+        t = clock()-t
+        givens_times[i] = t
+
         givens_err = norm((F*Dhat.todense())*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
-        givens_errs[i] = givens_err 
+        givens_errs[i] = givens_err
         U_givens_errs[i] = (F-U).norm("fro")/norm(U,"fro")
 
+        t = clock()
         F, Dhat = FaustFactory.fgft_givens(Lap, J, int(dim/2))
+        t = clock()-t
+        par_givens_times[i] = t
         print("J=", J)
         print("nnz_sum FGFT givens parallel=", F.nnz_sum(), "num of facts:",
               F.get_num_factors())
@@ -110,6 +130,11 @@ if __name__ == '__main__':
         savetxt('benchmark_pyfaust_fgft_U.txt', np.array([U_givens_errs[:i+1],
                                                           U_par_givens_errs[:i+1],
                                                           U_hier_fgft_errs[:i+1]]))
+        savetxt('benchmark_pyfaust_fgft_times.txt', np.array([givens_times[:i+1],
+                                                          par_givens_times[:i+1],
+                                                          hier_fgft_times[:i+1],
+                                                          hier_palm_times[:i+1]]))
+
 
 matlab_matfile = None
 if(len(argv) > 1 and exists(argv[1]) and re.match(".*.mat", argv[1])):
@@ -126,6 +151,18 @@ if(len(argv) > 1 and exists(argv[1]) and re.match(".*.mat", argv[1])):
                               range(matlab_matfile['par_givens_errs'].shape[1]) ]
 
 
+    matlab_hier_palm_times = [ matlab_matfile['hier_palm_times'][0,i][0,0] for i in
+                             range(matlab_matfile['hier_palm_times'].shape[1]) ]
+
+    matlab_hier_fgft_times = [ matlab_matfile['hier_fgft_times'][0,i][0,0] for i in
+                             range(matlab_matfile['hier_fgft_times'].shape[1]) ]
+    matlab_givens_times = [ matlab_matfile['givens_fgft_times'][0,i][0,0] for i in
+                             range(matlab_matfile['givens_fgft_times'].shape[1]) ]
+    matlab_par_givens_times = [ matlab_matfile['par_givens_fgft_times'][0,i][0,0] for i in
+                             range(matlab_matfile['par_givens_fgft_times'].shape[1]) ]
+
+
+
 
 print('hier_fgft_errs = ', hier_fgft_errs)
 print('givens_errs = ', givens_errs)
@@ -133,7 +170,10 @@ print('par_givens_errs = ', par_givens_errs)
 print('U_hier_fgft_errs = ', U_hier_fgft_errs)
 print('U_givens_errs = ', U_givens_errs)
 print('U_par_givens_errs = ', U_par_givens_errs)
-
+print('hier_palm_times = ', hier_palm_times)
+print('hier_fgft_times = ', hier_fgft_times)
+print('givens_times = ', givens_times)
+print('par_givens_times = ', par_givens_times)
 
 plt.rcParams['figure.figsize'] = [18.0, 12]
 lap_indices = arange(num_laps)
@@ -194,6 +234,7 @@ xlabel("Fourier matrices")
 title("Error benchmark on "+str(num_laps)+" Graph Fourier matrices (128x128)")
 legend()
 
+savefig('benchmark_Lap_diag_pyfaust_Fourier_figure.png')
 if matlab_matfile:
     print('matlab_hier_fgft_errs = ', matlab_hier_fgft_errs)
     print('matlab_givens_errs = ', matlab_givens_errs)
@@ -202,8 +243,38 @@ if matlab_matfile:
     print('matlab_U_givens_errs = ', matlab_U_givens_errs)
     print('matlab_U_par_givens_errs = ', matlab_U_par_givens_errs)
 
+figure(3)
+semilogy(lap_indices, givens_times, c='b', label='pyfaust Givens FGFT Time',
+     marker='o')
+semilogy(lap_indices, par_givens_times, c='r', label='pyfaust // Givens FGFT Time',
+    marker='o')
+semilogy(lap_indices, hier_fgft_times, c='y', label='pyfaust PALM FGFT Time',
+     marker='o')
+semilogy(lap_indices, hier_palm_times, c='black', label='pyfaust PALM U Fac. Time',
+     marker='o')
 
-savefig('benchmark_Lap_diag_pyfaust_Fourier_figure.png')
+if matlab_matfile:
+    plot(lap_indices, matlab_givens_times[:len(lap_indices)], c='b', label='Matlab Givens FGFT Time',
+         marker='+', markersize=20)
+    plot(lap_indices, matlab_par_givens_times[:len(lap_indices)], c='r', label='Matlab // Givens FGFT Time',
+         marker='+', markersize=20)
+    plot(lap_indices, matlab_hier_fgft_times[:len(lap_indices)], c='y', label='Matlab PALM FGFT Time',
+         marker='+', markersize=20)
+    plot(lap_indices, matlab_hier_palm_times[:len(lap_indices)], c='black', label='Matlab PALM U Fac. Time',
+         marker='+', markersize=20)
+
+ylabel("Factorization Compute Time (sec)")
+xlabel("Laplacians\n i-th Lap. is for"
+      " erdos-renyi if i==0 (mod 6)\ncommunity if i==1 (mod 6)\nsensor if i=="
+      "2 (mod 6)\npath if i==3 (mod 6)\nrandom ring if i==4 (mod6), ring if i=="
+      "5 (mod6)")
+
+xticks(lap_indices)
+grid(True, which='both', axis='both')
+
+legend()
+savefig('benchmark_pyfaust_fac_time_figure.png')
+
 
 show()
 
