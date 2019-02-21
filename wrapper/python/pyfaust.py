@@ -1442,11 +1442,11 @@ class FaustFactory:
             >>> stop_crit2 = StoppingCriterion(num_its=200)
             >>> param = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit1, stop_crit2)
             >>> F = FaustFactory.fact_hierarchical(M, param)
-            Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
+            Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization
             1/3<br/>
-            Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
+            Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization
             2/3<br/>
-            Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation
+            Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization
             3/3<br/>
             >>> F
             Faust size 500x32, density 0.189063, nnz_sum 3025, 4 factor(s):

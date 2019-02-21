@@ -140,9 +140,9 @@ classdef FaustFactory
 		%>  params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2, 'is_update_way_R2L', false, 'init_lambda', 1.0);
 		%>  F = FaustFactory.fact_hierarchical(M, params)
 		%>  @endcode
-		%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation 1/3<br/>
-		%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation 2/3<br/>
-		%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorisation 3/3<br/>
+		%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization 1/3<br/>
+		%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization 2/3<br/>
+		%>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization 3/3<br/>
 		%>
 		%>  F = 
 		%>
