@@ -158,6 +158,43 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 1.0063, 'AbsTol', 0.0001)
 		end
 
+		function test_fgft_palm(this)
+			disp('Test FaustFactory.fgft_palm()')
+			import matfaust.*
+			import matfaust.factparams.*
+			num_facts = 4;
+			is_update_way_R2L = false;
+			init_lambda = 1.0;
+
+			load([this.faust_paths{1},'../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat'])
+			% U, Lap, init_D, params are loaded from file
+
+			fact_cons = cell(3,1);
+			res_cons = cell(3, 1);
+			fact_cons{1} = ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128, 12288);
+			fact_cons{2} = ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128, 6144);
+			fact_cons{3} = ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128, 3072);
+			res_cons{1} = ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128, 384);
+			res_cons{2} =  ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128, 384);
+			res_cons{3} =  ConstraintInt(ConstraintName(ConstraintName.SP), 128, 128, 384);
+			stop_crit = StoppingCriterion(params.niter1);
+			stop_crit2 = StoppingCriterion(params.niter2);
+			params.fact_side = 0 % forced
+			params.verbose = 1 % forced
+			params.init_lambda = 128;
+			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2, 'is_fact_side_left', params.fact_side == 1, 'is_update_way_R2L', params.update_way == 1, 'init_lambda', params.init_lambda, 'step_size', params.stepsize, 'constant_step_size', false, 'is_verbose', true);
+			diag_init_D = diag(init_D)
+			[F,lambda] = FaustFactory.fgft_palm(U, Lap, params, diag_init_D)
+			this.verifyEqual(size(F), size(U))
+			%disp('norm F: ')
+			%norm(F, 'fro')
+			E = full(F)-U;
+			err = norm(E,'fro')/norm(U,'fro')
+			% matrix to factorize and reference relative error come from
+			% misc/test/src/C++/hierarchicalFactorizationFFT.cpp
+			this.verifyEqual(err, 0.05539, 'AbsTol', 0.00001)
+		end
+
 		function testHadamard(this)
 			disp('Test FaustFactory.wht()')
 			import matfaust.*

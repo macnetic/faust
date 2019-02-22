@@ -40,6 +40,7 @@
 
 #include "mex.h"
 #include "faust_HierarchicalFact.h"
+#include "faust_HierarchicalFactFFT.h"
 #include "faust_TransformHelper.h"
 #include "class_handle.hpp"
 #include <vector>
@@ -68,12 +69,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	system("sleep 7");
 #endif
 
-	if (nrhs != 2)
-	{
+	bool is_fgft = false;
+	if(nrhs == 3)
+		is_fgft = true;
+	else if(nrhs == 2)
+		is_fgft = false;
+	else
 		mexErrMsgTxt("Bad Number of inputs arguments");
-	}
-	const mxArray* matlab_matrix = prhs[0];	
-	const mxArray* matlab_params = prhs[1];  	
+
+	const mxArray* matlab_matrix = prhs[0];
+	const mxArray* matlab_params = prhs[1];
 	if(!mxIsStruct(matlab_params))
 	{
 		mexErrMsgTxt("Input must be a structure.");
@@ -86,7 +91,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	auto *params = mxArray2FaustParams<SCALAR,FPP2>(matlab_params);
 
 	///////////// HIERARCHICAL LAUNCH ///////////////
-	// creation des parametres
 	try{
 		//		std::cout<<"nb_row : "<<nb_row<<std::endl;
 		//		std::cout<<"nb_col : "<<nb_col<<std::endl;
@@ -99,7 +103,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		Faust::HierarchicalFact<SCALAR,Cpu, FPP2>* hier_fact;
 
-		hier_fact = new Faust::HierarchicalFact<SCALAR,Cpu,FPP2>(matrix,*params,blas_handle,spblas_handle);
+
+		if(dynamic_cast<const ParamsFFT<SCALAR,Cpu,FPP2>*>(params))
+		{
+			if(! is_fgft) mexErrMsgTxt("Bad Number of inputs arguments for PALM FGFT.");
+			Faust::MatDense<SCALAR,Cpu> laplacian_mat;
+			const mxArray* matlab_lap_mat = prhs[2];
+			mxArray2FaustMat(matlab_lap_mat,laplacian_mat);
+			params->Display();
+			hier_fact = new Faust::HierarchicalFactFFT<SCALAR,Cpu,FPP2>(matrix,laplacian_mat,*dynamic_cast<const ParamsFFT<SCALAR,Cpu,FPP2>*>(params),blas_handle,spblas_handle);
+		}
+		else
+			hier_fact = new Faust::HierarchicalFact<SCALAR,Cpu,FPP2>(matrix,*params,blas_handle,spblas_handle);
+
 		hier_fact->compute_facts();
 
 

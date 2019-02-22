@@ -50,6 +50,7 @@
 #include "faust_ConstraintMat.h"
 #include "faust_ConstraintInt.h"
 #include "faust_Params.h"
+#include "faust_ParamsFFT.h"
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
 #include "faust_Vect.h"
@@ -756,13 +757,27 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 	if (presentFields[INIT_LAMBDA])
 	{
 		mxCurrentField = mxGetField(matlab_params,0,mat_field_type2str(INIT_LAMBDA).c_str());
-		SCALAR* tmp_ptr = &init_lambda;
+//		SCALAR* tmp_ptr = &init_lambda;
 		// it works whatever mxCurrentField class is (complex or not)
-		mxArray2Ptr<SCALAR>(const_cast<const mxArray*>(mxCurrentField), tmp_ptr);
+//		mxArray2Ptr<SCALAR>(const_cast<const mxArray*>(mxCurrentField), tmp_ptr);
 		//       init_lambda = (SCALAR) mxGetScalar(mxCurrentField);
+		init_lambda = (SCALAR) mxGetScalar(mxCurrentField);
 	}
 
-	Faust::Params<SCALAR,Cpu,FPP2>* params = new Params<SCALAR,Cpu,FPP2>(nb_row,nb_col,nbFact,consSS,/*std::vector<Faust::MatDense<SCALAR,Cpu> >()*/ init_facts,crit1,crit2,isVerbose,updateway,factside,init_lambda);
+	Faust::Params<SCALAR,Cpu,FPP2>* params;
+	if(presentFields[INIT_D])
+	{
+		//get the diagonal vector to define the init_D matrix (cf. FactHierarchicalF(G)FT
+		SCALAR* init_D = new SCALAR[nb_row]; //nb_col == nb_row when using FactHierarchicalF(G)FT
+		mxCurrentField = mxGetField(matlab_params,0,mat_field_type2str(INIT_D).c_str());
+		mxArray2Ptr<SCALAR>(const_cast<const mxArray*>(mxCurrentField), init_D);
+		params = new ParamsFFT<SCALAR,Cpu,FPP2>(nb_row,nb_col,nbFact,consSS, init_facts, init_D, crit1,crit2,isVerbose,updateway,factside,init_lambda);
+		delete init_D;
+	}
+	else
+	{
+		params = new Params<SCALAR,Cpu,FPP2>(nb_row,nb_col,nbFact,consSS,/*std::vector<Faust::MatDense<SCALAR,Cpu> >()*/ init_facts,crit1,crit2,isVerbose,updateway,factside,init_lambda);
+	}
 	return params;
 }
 

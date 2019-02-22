@@ -992,14 +992,14 @@ class TestFaustFactory(unittest.TestCase):
         loadmat(sys.path[-1]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['init_D']
         params_struct = \
         loadmat(sys.path[-1]+'/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat')['params']
-        nfacts = params_struct['nfacts'][0,0][0,0]
+        nfacts = params_struct['nfacts'][0,0][0,0] #useless
         niter1 = params_struct['niter1'][0,0][0,0]
         niter2 = params_struct['niter2'][0,0][0,0]
         verbose = params_struct['verbose'][0,0][0,0]==1
         is_update_way_R2L = params_struct['update_way'][0,0][0,0]==1
         init_lambda = params_struct['init_lambda'][0,0][0,0]
         stepsize = params_struct['stepsize'][0,0][0,0]
-        factside = params_struct['fact_side'][0,0][0,0] == 1
+        factside = params_struct['fact_side'][0,0][0,0] == 1 # ignored
         # for convenience I set the constraints manually and don't take them
         # from mat file, but they are the same
         # default step_size

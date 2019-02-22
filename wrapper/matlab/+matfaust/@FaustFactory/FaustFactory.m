@@ -262,13 +262,73 @@ classdef FaustFactory
 				error('M''s number of columns must be consistent with the last residuum constraint defined in p. Likewise its number of rows must be consistent with the first factor constraint defined in p.')
 			end
 			% the setters for num_rows/cols verifies consistency with constraints
-			mex_params = struct('nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left, 'update_way', p.is_update_way_R2L);
+			mex_params = struct('nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left, 'update_way', p.is_update_way_R2L, 'verbose', p.is_verbose, 'init_lambda', p.init_lambda);
 			if(isreal(M))
 				[lambda, core_obj] = mexHierarchical_factReal(M, mex_params);
 			else
 				[lambda, core_obj] = mexHierarchical_factCplx(M, mex_params);
 			end
 			F = Faust(core_obj, isreal(M));
+			varargout = {F, lambda, p};
+		end
+
+		function varargout = fgft_palm(U, Lap, p, varargin)
+			import matfaust.Faust
+			import matfaust.factparams.*
+			% TODO: check U, Lap sizes, same field
+			% TODO: refactor with fact_hierarchical
+			if(length(varargin) == 1)
+				init_D = varargin{1};
+				if(~ ismatrix(init_D) || ~ isnumeric(init_D))
+					error('fgft_palm arg. 4 must be a matrix')
+				end
+			elseif(length(varargin) > 1)
+				error('fgft_palm, too many arguments.')
+			else % nargin == 0
+				init_D = ones(size(U,1));
+				if(~ isreal(U))
+					init_D = complex(init_D);
+				end
+			end
+			matfaust.FaustFactory.check_fact_mat('FaustFactory.fgft_palm', U)
+			if(~ isa(p, 'ParamsHierarchicalFact') && ParamsFactFactory.is_a_valid_simplification(p))
+				p = ParamsFactFactory.createParams(U, p);
+			end
+			mex_constraints = cell(2, p.num_facts-1);
+			if(~ isa(p ,'ParamsHierarchicalFact'))
+				error('p must be a ParamsHierarchicalFact object.')
+			end
+			%mex_fact_constraints = cell(1, p.num_facts-1)
+			for i=1:p.num_facts-1
+				cur_cell = cell(1, 4);
+				cur_cell{1} = p.constraints{i}.name.conv2str();
+				cur_cell{2} = p.constraints{i}.param;
+				cur_cell{3} = p.constraints{i}.num_rows;
+				cur_cell{4} = p.constraints{i}.num_cols;
+				%mex_fact_constraints{i} = cur_cell;
+				mex_constraints{1,i} = cur_cell;
+			end
+			%mex_residuum_constraints = cell(1, p.num_facts-1)
+			for i=1:p.num_facts-1
+				cur_cell = cell(1, 4);
+				cur_cell{1} = p.constraints{i+p.num_facts-1}.name.conv2str();
+				cur_cell{2} = p.constraints{i+p.num_facts-1}.param;
+				cur_cell{3} = p.constraints{i+p.num_facts-1}.num_rows;
+				cur_cell{4} = p.constraints{i+p.num_facts-1}.num_cols;
+				%mex_residuum_constraints{i} = cur_cell;
+				mex_constraints{2,i} = cur_cell;
+			end
+			if(~ p.is_mat_consistent(U))
+				error('U''s number of columns must be consistent with the last residuum constraint defined in p. Likewise its number of rows must be consistent with the first factor constraint defined in p.')
+			end
+			% the setters for num_rows/cols verifies consistency with constraints
+			mex_params = struct('nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left, 'update_way', p.is_update_way_R2L, 'init_D', init_D, 'verbose', p.is_verbose, 'init_lambda', p.init_lambda);
+			if(isreal(U))
+				[lambda, core_obj] = mexHierarchical_factReal(U, mex_params, Lap);
+			else
+				[lambda, core_obj] = mexHierarchical_factCplx(U, mex_params, Lap);
+			end
+			F = Faust(core_obj, isreal(U));
 			varargout = {F, lambda, p};
 		end
 

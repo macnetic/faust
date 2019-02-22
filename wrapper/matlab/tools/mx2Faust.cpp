@@ -101,6 +101,8 @@ const string mat_field_type2str(MAT_FIELD_TYPE f)
 			return "sc_max_num_its2";
 		case INIT_FACTS:
 			return "init_facts";
+		case INIT_D:
+			return "init_D";
 	}
 }
 
@@ -124,21 +126,8 @@ void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
   presentFields.resize(MAT_FIELD_TYPE_LEN);
   presentFields.assign(MAT_FIELD_TYPE_LEN,false);
 
-  //TODO: this function should be modified to be more reliable
-  // the consistency between the matlab structure
-  // and the STL vector is not enough reliable and is prone to errors when extending structure with new fields
-  // maybe a structure in C++ should be used instead of a vector to avoid index overflow situations
-  // (that kind of bugs already happened)
-  // the structure would be a C++ equivalent of the matlab struct with default values.
-  // Fields would be retrieved by name not by index
-  // By the way it would be an optimization from the caller pt of view not having to call mxGetField
-  // (and neither to do a bunch of strcmp-s for each field of the structure)
-  // In brief, consistency check + fields retrival in one time + error raising when *
-  // unknown fields found or mandatory fields not found
-  // An equivalent function is located in mexPalm4MSA (testCoherencePalm4MSA()) and also applies to this modification
-
   if(nbr_field < 3)
-      mexErrMsgTxt("The number of field of params must be at least 3 ");
+      mexErrMsgTxt("The number of fields in params must be at least 3 ");
 
   for(int i=0;i<nbr_field;i++)
 	  presentFields[mat_field_str2type(string(mxGetFieldNameByNumber(params,i)))] = true;

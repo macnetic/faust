@@ -16,7 +16,7 @@ namespace Faust
 
 		public:
 		//TODO: move def. code in .hpp
-		HierarchicalFactFFT(const MatDense<FPP,DEVICE>& U, const MatDense<FPP,DEVICE>& Lap, ParamsFFT<FPP,DEVICE,FPP2>& params, BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle): HierarchicalFact<FPP, DEVICE, FPP2>(U, params, cublasHandle, cusparseHandle)
+		HierarchicalFactFFT(const MatDense<FPP,DEVICE>& U, const MatDense<FPP,DEVICE>& Lap, const ParamsFFT<FPP,DEVICE,FPP2>& params, BlasHandle<DEVICE> cublasHandle, SpBlasHandle<DEVICE> cusparseHandle): HierarchicalFact<FPP, DEVICE, FPP2>(U, params, cublasHandle, cusparseHandle)
 		{
 			if ((U.getNbRow() != params.m_nbRow) |  (U.getNbCol() != params.m_nbCol))
 				handleError(m_className,"constructor : params and Fourier matrix U haven't compatible size");

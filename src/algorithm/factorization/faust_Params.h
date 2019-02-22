@@ -142,7 +142,7 @@ namespace Faust
         void check_constraint_validity();
         void check_bool_validity();
 
-        void Display() const;
+        virtual void Display() const;
         ~Params(){}
 
 

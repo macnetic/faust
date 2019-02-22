@@ -13,7 +13,7 @@ namespace Faust
 	{
 
 		public:
-		MatDense<FPP, DEVICE> init_D; //TODO: convert to Sparse or Diag repres.
+		MatDense<FPP, DEVICE> init_D; //TODO: convert to Sparse or Diag repres. and set private or protected
 		//TODO: does it really need to be public 
 		//TODO: move the ctor def into .hpp
 		ParamsFFT(
@@ -55,7 +55,6 @@ namespace Faust
 			// set init_D from diagonal vector init_D_diag
 			for(int i=0;i<nbRow;i++)
 				init_D.getData()[i*nbRow+i] = init_D_diag.getData()[i];
-
 		}
 
 		ParamsFFT(
@@ -80,6 +79,9 @@ namespace Faust
 
 
 		ParamsFFT() {}
+
+		void Display() const;
+
 
 	};
 }
