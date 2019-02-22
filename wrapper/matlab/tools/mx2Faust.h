@@ -43,8 +43,9 @@
 #include "mex.h"
 #include <vector>
 #include "faust_constant.h"
+#include "faust_Params.h"
 #include <complex>
-
+#include <string>
 
 namespace Faust {
 	class ConstraintGeneric;
@@ -57,7 +58,7 @@ namespace Faust {
 	template<typename FPP, Device DEVICE> class LinearOperator;
 }
 
-
+using namespace Faust;
 
 /*!
 *  \brief check if the Faust::Transform T has compatible scalar with MATLAB matrix Matlab_Mat (currently real is only compatible with real and complex is only compatible with complex)
@@ -66,6 +67,7 @@ namespace Faust {
         */
 template<typename FPP>
 bool isScalarCompatible(const Faust::LinearOperator<FPP,Cpu> & L,const mxArray * Matlab_Mat);
+
 
 
 
@@ -149,10 +151,37 @@ template<typename FPP>
 void setVectorFaustMat(std::vector<Faust::MatDense<FPP,Cpu> > &vecMat, mxArray *Cells);
 
 
+enum MAT_FIELD_TYPE
+{
+	/** All the matlab fields possible in params struct  (1st arg. in testCoherence() */
+	NROW,
+	NCOL,
+	NFACTS,
+	CONS,
+	NITER1,
+	NITER2,
+	VERBOSE,
+	FACT_SIDE,
+	UPDATE_WAY,
+	INIT_LAMBDA,
+	SC_IS_CRITERION_ERROR,
+	SC_ERROR_TRESHOLD,
+	SC_MAX_NUM_ITS,
+	SC_IS_CRITERION_ERROR2,
+	SC_ERROR_TRESHOLD2,
+	SC_MAX_NUM_ITS2,
+	INIT_FACTS,
+};
 
+const string mat_field_type2str(MAT_FIELD_TYPE f);
+const MAT_FIELD_TYPE mat_field_str2type(const string& fstr);
+
+const unsigned int MAT_FIELD_TYPE_LEN = 17;
 
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
 
+template<typename SCALAR, typename FPP2>
+const Params<SCALAR,Cpu,FPP2>* mxArray2FaustParams(const mxArray* matlab_params);
 
 #include "mx2Faust.hpp"
 

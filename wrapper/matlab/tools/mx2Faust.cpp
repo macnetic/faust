@@ -42,14 +42,15 @@
 
 
 
-
+//why this macro here ? it's not a header
 #ifndef __FAUST_MX2FAUST_CPP__
 #define __FAUST_MX2FAUST_CPP__
 
 
 
 
-
+#include <string>
+#include <stdexcept>
 #include "mx2Faust.h"
 #include "faust_ConstraintGeneric.h"
 #include "faust_ConstraintFPP.h"
@@ -57,21 +58,71 @@
 #include "faust_ConstraintInt.h"
 #include "faust_Params.h"
 
+using namespace Faust;
 
 
 
+const string mat_field_type2str(MAT_FIELD_TYPE f)
+{
+	// better map than an array because the order of fields doesn't matter
+	switch(f)
+	{
+		case NROW:
+			return "nrow";
+		case NCOL:
+			return "ncol";
+		case NFACTS:
+			return "nfacts";
+		case CONS:
+			return "cons";
+		case NITER1:
+			return "niter1";
+		case NITER2:
+			return "niter2";
+		case VERBOSE:
+			return "verbose";
+		case FACT_SIDE:
+			return "fact_side";
+		case UPDATE_WAY:
+			return "update_way";
+		case INIT_LAMBDA:
+			return "init_lambda";
+		case SC_IS_CRITERION_ERROR:
+			return "sc_is_criterion_error";
+		case SC_ERROR_TRESHOLD:
+			return "sc_error_treshold";
+		case SC_MAX_NUM_ITS:
+			return "sc_max_num_its";
+		case SC_IS_CRITERION_ERROR2:
+			return "sc_is_criterion_error2";
+		case SC_ERROR_TRESHOLD2:
+			return "sc_error_treshold2";
+		case SC_MAX_NUM_ITS2:
+			return "sc_max_num_its2";
+		case INIT_FACTS:
+			return "init_facts";
+	}
+}
 
 
-
+const MAT_FIELD_TYPE mat_field_str2type(const string& fstr)
+{
+	for(int i=0;i<MAT_FIELD_TYPE_LEN;i++)
+	{
+		MAT_FIELD_TYPE ft = static_cast<MAT_FIELD_TYPE>(i);
+		if(fstr == mat_field_type2str(ft))
+			return ft;
+	}
+	throw invalid_argument("Invalid matlab struct field name: "+fstr);
+}
 
 
 
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
 {
   int nbr_field=mxGetNumberOfFields(params);
-  const unsigned int NUM_OF_FIELDS = 17;
-  presentFields.resize(NUM_OF_FIELDS);
-  presentFields.assign(NUM_OF_FIELDS,false);
+  presentFields.resize(MAT_FIELD_TYPE_LEN);
+  presentFields.assign(MAT_FIELD_TYPE_LEN,false);
 
   //TODO: this function should be modified to be more reliable
   // the consistency between the matlab structure
@@ -87,90 +138,10 @@ void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
   // An equivalent function is located in mexPalm4MSA (testCoherencePalm4MSA()) and also applies to this modification
 
   if(nbr_field < 3)
-  {
       mexErrMsgTxt("The number of field of params must be at least 3 ");
-  }
 
-
-  for (int i=0;i<nbr_field;i++)
-  {
-        const char * fieldName;
-        fieldName = mxGetFieldNameByNumber(params,i);
-        //mexPrintf("fieldname %d : %s\n",i,fieldName);
-
-        if (strcmp(fieldName,"nrow") == 0)
-        {
-            presentFields[0] = true;
-        }
-	if (strcmp(fieldName,"ncol") == 0)
-        {
-            presentFields[1] = true;
-        }
-        if (strcmp(fieldName,"nfacts") == 0)
-        {
-            presentFields[2] = true;
-        }
-        if (strcmp(fieldName,"cons") == 0)
-        {
-            presentFields[3] = true;
-        }
-        if (strcmp(fieldName,"niter1") == 0)
-        {
-            presentFields[4] = true;
-        }
-        if (strcmp(fieldName,"niter2") == 0)
-        {
-            presentFields[5] = true;
-        }
-        if (strcmp(fieldName,"verbose") == 0)
-        {
-            presentFields[6] = true;
-        }
-        if (strcmp(fieldName,"fact_side") == 0)
-        {
-            presentFields[7] = true;
-        }
-        if (strcmp(fieldName,"update_way") == 0)
-        {
-            presentFields[8] = true;
-        }
-        if (strcmp(fieldName,"init_lambda") == 0)
-        {
-            presentFields[9] = true;
-        }
-		//sc stands for StoppingCriterion
-		else if(!strcmp(fieldName, "sc_is_criterion_error"))
-		{
-			presentFields[10] = true;
-		}
-		else if(!strcmp(fieldName, "sc_error_treshold"))
-		{
-			presentFields[11] = true;
-		}
-        else if(!strcmp(fieldName, "sc_max_num_its"))
-		{
-			presentFields[12] = true;
-		}        
-		else if(!strcmp(fieldName, "sc_is_criterion_error2"))
-		{
-			presentFields[13] = true;
-		}
-		else if(!strcmp(fieldName, "sc_error_treshold2"))
-		{
-			presentFields[14] = true;
-		}
-        else if(!strcmp(fieldName, "sc_max_num_its2"))
-		{
-			presentFields[15] = true;
-		}
-		else if (strcmp(fieldName,"init_facts") == 0)
-        {
-            presentFields[16] = true;
-        }// if (strcmp(fieldName,"compute_lambda") == 0)
-        // {
-            // presentFields[9] = true;
-        // }
-  }
+  for(int i=0;i<nbr_field;i++)
+	  presentFields[mat_field_str2type(string(mxGetFieldNameByNumber(params,i)))] = true;
 
 }
 

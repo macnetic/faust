@@ -324,6 +324,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFields)
 {
+ ////TODO: this function should be modified to be more reliable/simple as the function testCoherence() in mx2Faust.cpp has been modified
   int nbr_field=mxGetNumberOfFields(params);
   presentFields.resize(8);
   presentFields.assign(8,false);
