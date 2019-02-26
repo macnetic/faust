@@ -1,4 +1,3 @@
-
 #                                                                          ##
 #                              License:                                    ##
 #  Copyright (2018):   Hakim Hadj-Djilani, Nicolas Bellot, Adrien Leman,   ##
@@ -7,22 +6,19 @@
 #                      INRIA Rennes, FRANCE                                ##
 #                      http://www.inria.fr/                                ##
 #                                                                          ##
-#  The FAuST Toolbox is distributed under the terms of the GNU Affero      ##
-#  General Public License.                                                 ##
-#  This program is free software: you can redistribute it and/or modify    ##
-#  it under the terms of the GNU Affero General Public License as          ##
-#  published by the Free Software Foundation.                              ##
+#                                                                          ##
+#   For academic research activities only, this Software is freely         ##
+#   available under the terms of the license agreement you'll find in      ##
+#   download section of the project web site: http://faust.inria.fr.       ##
+#   For all other uses, the software is available under                    ##
+#   an Inria commercial license. Please contact stip-rba@inria.fr          ##
+#                                                                          ##
 #                                                                          ##
 #  This program is distributed in the hope that it will be useful, but     ##
 #  WITHOUT ANY WARRANTY; without even the implied warranty of              ##
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    ##
-#  See the GNU Affero General Public License for more details.             ##
 #                                                                          ##
-#  You should have received a copy of the GNU Affero General Public        ##
-#  License along with this program.                                        ##
-#  If not, see <http://www.gnu.org/licenses/>.                             ##
-#                                                                          ##
-#                             Contacts:                                    ##
+#                              Contacts:                                   ##
 #      Remi Gribonval  : remi.gribonval@inria.fr                           ##
 #      Hakim Hadj-dji. : hakim.hadj-djilani@inria.fr                       ##
 #      Nicolas Bellot  : nicolas.bellot@inria.fr                           ##
