@@ -1943,6 +1943,7 @@ class FaustFactory:
         <https://hal.inria.fr/hal-01416110>
 
         Example:
+            import numpy as np
             from pyfaust import FaustFactory as FF
             from scipy.io import loadmat
             from os.path import sep
@@ -1956,6 +1957,8 @@ class FaustFactory:
             Uhat, Dhat = FF.eigtj(Lap,J=Lap.shape[0]*100,t=int(Lap.shape[0]/2))
             # Uhat is the Faust Fourier matrix approximation (200 factors + permutation mat.)
             # Dhat the eigenvalues diagonal approx.
+            print(Uhat)
+            print(Dhat)
 
         See also:
             FaustFactory.fgft_givens, FaustFactory.fgft_palm
