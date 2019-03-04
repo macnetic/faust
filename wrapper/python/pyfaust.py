@@ -1903,7 +1903,7 @@ class FaustFactory:
         return ret_list
 
     @staticmethod
-    def eigtj(M, J, t=1):
+    def eigtj(M, J, t=1, verbosity=0):
         """
         Computes the eigenvalues and the eigenvectors transform (as a Faust object) using the truncated Jacobi algorithm.
 
@@ -1924,6 +1924,8 @@ class FaustFactory:
             The parameter t is meaningful in the parallel version of the
             truncated Jacobi algorithm (cf. references below). If t <= 1 (by default)
             then the function runs the non-parallel algorithm.
+            verbosity: (int) the level of verbosity, the greater the more info.
+            is displayed.
 
 
         Returns:
@@ -1963,10 +1965,10 @@ class FaustFactory:
         See also:
             FaustFactory.fgft_givens, FaustFactory.fgft_palm
         """
-        return FaustFactory.fgft_givens(M, J, t)
+        return FaustFactory.fgft_givens(M, J, t, verbosity)
 
     @staticmethod
-    def fgft_givens(Lap, J, t=1):
+    def fgft_givens(Lap, J, t=1, verbosity=0):
         """
         Diagonalizes the graph Laplacian matrix Lap using the Givens FGFT algorithm.
 
@@ -1974,6 +1976,7 @@ class FaustFactory:
             Lap: the Laplacian matrix as a numpy array. Must be real and symmetric.
             J: see FaustFactory.eigtj
             t: see FaustFactory.eigtj
+            verbosity: see FaustFactory.eigtj
 
         Returns:
             The tuple (FGFT,D):
@@ -1999,7 +2002,8 @@ class FaustFactory:
         if(not isinstance(t, int)): raise TypeError("t must be a int")
         if(t < 0): raise ValueError("t must be >= 0")
         t = min(t,J)
-        core_obj,D = FaustCorePy.FaustFact.fact_givens_fgft(Lap, J, t)
+        core_obj,D = FaustCorePy.FaustFact.fact_givens_fgft(Lap, J, t,
+                                                            verbosity)
         return Faust(core_obj=core_obj), D
 
     @staticmethod

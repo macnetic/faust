@@ -228,7 +228,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 	//            %    disp(['Number of edges: ' num2str(N_edges)])
 	//        end
 	//
-	if(!((ite+1)%100))
+	if(!((ite+1)%100) || verbosity > 1)
 	{
 		MatDense<FPP,Cpu> tmp = D;
 		tmp -= L;

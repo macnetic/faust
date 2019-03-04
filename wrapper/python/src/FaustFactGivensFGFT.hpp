@@ -6,7 +6,7 @@ using namespace Faust;
 
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t /* end of input parameters*/, FPP* D)
+FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t /* end of input parameters*/, FPP* D, unsigned int verbosity)
 {
     //TODO: optimization possible here by avoiding Lap copy in MatDense (by
     //just using the data in Lap as underlying pointer of MatDense)
@@ -17,11 +17,11 @@ FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsig
 
     if(t <= 0)
     {
-        algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J);
+        algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity);
     }
     else
     {
-        algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t);
+        algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity);
     }
 
     algo->compute_facts();

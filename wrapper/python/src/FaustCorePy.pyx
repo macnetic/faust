@@ -1248,7 +1248,7 @@ cdef class FaustFact:
             return core, np.real(_out_buf[0])
 
     @staticmethod
-    def fact_givens_fgft(Lap, J, t):
+    def fact_givens_fgft(Lap, J, t, verbosity=0):
         isReal = Lap.dtype in [ 'float', 'float128',
                              'float16', 'float32',
                              'float64', 'double']
@@ -1272,7 +1272,7 @@ cdef class FaustFact:
         core.core_faust_dbl = FaustCoreCy.fact_givens_fgft[double, double](&Lap_view[0,0],
                                                      Lap_num_rows,
                                                      Lap_num_cols, J, t,
-                                                     &D_view[0])
+                                                     &D_view[0], verbosity)
 
         core._isReal = True
         from scipy.sparse import spdiags
