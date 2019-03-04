@@ -60,11 +60,9 @@ function [facts,D,err,L,coord_choices] = diagonalization_givens(Lap,J)
 			C(r,s) = -abs(L(r,s));%-2*L(r,s)^2;
 		end
 	end
-	%norm(C, 'fro')
-	%C
+
+
 	[C_min_row, q_candidates] = min(C,[],2);
-	%C_min_row
-	%q_candidates
 
 
 	for j=1:J
@@ -91,11 +89,11 @@ function [facts,D,err,L,coord_choices] = diagonalization_givens(Lap,J)
 		%     [p,q] = ind2sub(size(C),I);
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-		[~,p] = min(C_min_row)
-		q = q_candidates(p)
-%		if(j > 105)
-%			input Z
-%		end
+		[~,p] = min(C_min_row);
+		q = q_candidates(p);
+
+
+
 		coord_choices(1,j) = p;
 		coord_choices(2,j) = q;
 		theta1 = atan2(L(q,q) - L(p,p),2*L(p,q))/2 ;
@@ -107,17 +105,15 @@ function [facts,D,err,L,coord_choices] = diagonalization_givens(Lap,J)
 		else
 			theta=theta2;
 		end
-		theta
-%		if(j == 105)
-%			input A
-%		end
+
+
+
+
 		S = eye(n);
 		S(p,p) = cos(theta); S(p,q) = -sin(theta);
 		S(q,p) = sin(theta); S(q,q) = cos(theta);
 		S = sparse(S);
 		facts{j} = S;
-		norm(S, 'fro')
-		nnz(S)
 %		if(j == 105)
 %			input B
 %		end
@@ -159,12 +155,10 @@ function [facts,D,err,L,coord_choices] = diagonalization_givens(Lap,J)
 		%     L(:,q) = -s * L_old(:,p)  + c * L_old(:,q);
 		% N_edges = (nnz(L)-n)/2;
 		L = S'*L*S;
-		norm(L, 'fro')
-		J
-%		if(j == 105)
-%			input C
-%		end
-		D = spdiag(diag(L));
+
+
+
+		D = sparse(diag(diag(L)));
 		%    errchg = err - norm(D-L,'fro')^2
 		if mod(j,100)==0
 			%err(j) = norm(D-L,'fro')^2/norm(L,'fro')^2;
@@ -193,9 +187,8 @@ function [facts,D,err,L,coord_choices] = diagonalization_givens(Lap,J)
 				end
 			end
 		end
-%		if(j == 105)
-%			norm(C, 'fro')
-%			input Y
-%		end
+
+
+
 	end
 end

@@ -21,8 +21,9 @@ int main()
 {
 	string configFilename = "@FAUST_DATA_MAT_DIR@/test_GivensDiag_Lap_U_J.mat";
 
-	Faust::MatDense<FPP,Cpu> Lap;
+	Faust::MatDense<FPP,Cpu> Lap, U;
 	init_faust_mat_from_matio(Lap,configFilename.c_str(),"Lap");
+	init_faust_mat_from_matio(U,configFilename.c_str(),"U");
 
 	int J = 5472; //TODO: should be retrieved from .mat file (not be a hard-coded value)
 	GivensFGFT<FPP,Cpu,FPP> algo(Lap,J);
@@ -52,9 +53,17 @@ int main()
 	}
 	Mat_Close(matfp);
 
+	bool eq; // are ref and test pivots equal ?
+	bool all_eq = true; //all past pivots are eq
 	for(int j=0;j<J;j++)
-		printf("ite=%d (1-base index) ref. p=%d q=%d, algo. p=%d q=%d\n", j, p_choices[j], q_choices[j], coord_choices[j].first+1, coord_choices[j].second+1);
-
+	{
+		cout << "ite=" << j;
+		cout << " (1-base index) ref. p=" << p_choices[j] << ", q=" << q_choices[j] << ", algo. p=" << coord_choices[j].first+1 << " q=" << coord_choices[j].second+1;
+		eq = p_choices[j] == coord_choices[j].first+1 && q_choices[j] == coord_choices[j].second+1;
+		all_eq = all_eq && eq;
+		cout << " equal=" << eq;
+		cout << " all ites eq=" << all_eq << endl;
+	}
 
 	Faust::MatDense<FPP,Cpu> fourier_diag(Lap.getNbRow(), Lap.getNbCol());
 	fourier_diag.setEyes();
@@ -64,7 +73,7 @@ int main()
 
 	cout << "fourier_diag fro norm: " << fourier_diag.norm() << endl;
 
-	const Faust::MatSparse<FPP,Cpu> D = algo.get_D();
+	const Faust::MatSparse<FPP,Cpu>& D = algo.get_D();
 	Faust::MatDense<FPP,Cpu> full_D = Faust::MatDense<FPP,Cpu>(D);
 	cout << "D fro norm:" << D.norm() << endl;
 
@@ -115,7 +124,34 @@ int main()
 	cout << "Error relatively to the Laplacian: (computed from Transform object)" << endl;
 	cout << P.norm()/Lap.norm() << endl;
 
+	ordered_fourier_diag2 = algo.compute_fourier(true);
+	tmp = ordered_fourier_diag2;
+	tmp -= U;
+	cout << "Error relatively to Fourier matrix:" << endl;
+	cout << tmp.norm()/U.norm() << endl;
+
 //	t.Display();
+
+
+	Faust::MatDense<FPP,Cpu> ref_Dhat;
+	init_faust_mat_from_matio(ref_Dhat,configFilename.c_str(),"Dhat");
+	tmp = ref_Dhat;
+	tmp -= ordered_D;
+	cout << "Relative difference on Dhat between matlab ref script and C++ impl:" << endl;
+	cout << tmp.norm()/ref_Dhat.norm() << endl;
+
+	Faust::MatDense<FPP,Cpu> ref_errs;
+	init_faust_mat_from_matio(ref_errs,configFilename.c_str(),"err");
+	const vector<FPP2>& errs = algo.get_errs();
+	FPP2 d;
+	int i=99;
+	for(FPP2 err: errs)
+	{
+		d = std::abs(err - ref_errs.getData()[i]);
+		cout << "ref err:" << ref_errs.getData()[i] << " test err:" << err << "abs. diff:" << d << endl;
+		i += 100; // matlab Givens code stores a value for all ites but computes only one error a hundred
+		// C++ Givens computes and stores only one error a hundred
+	}
 
 	delete []p_choices;
 	delete []q_choices;

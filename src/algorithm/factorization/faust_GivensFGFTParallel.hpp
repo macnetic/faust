@@ -70,7 +70,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::next_step()
 
 	substep_fun substep[] = {
 		&GivensFGFTParallel<FPP,DEVICE,FPP2>::max_L,
-		&GivensFGFTParallel<FPP,DEVICE,FPP2>::loop_update_fact, //responsible to call choose_pivot() and calc_theta(), update_fact()
+		&GivensFGFTParallel<FPP,DEVICE,FPP2>::loop_update_fact, //responsible to call choose_pivot(), calc_theta() and update_fact()
 		&GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L,
 		&GivensFGFTParallel<FPP,DEVICE,FPP2>::update_D,
 		&GivensFGFTParallel<FPP,DEVICE,FPP2>::update_err};

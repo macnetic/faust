@@ -28,17 +28,17 @@ namespace Faust {
 			 *    <https://hal.inria.fr/hal-01416110>
 			 *
 			 */
+			/** \brief Temporary storage matrix for maximization of L. */
+			Faust::MatDense<FPP,DEVICE> C;
+			/** \brief Column vector for the rowwise minimization of C (i.e. maximization of L). */
+			Faust::Vect<FPP,DEVICE> C_min_row;
+			/** \brief Pivot candidates q coordinates. */
+			int* q_candidates;  /* default IndexType for underlying eigen matrix is int. */
 			protected:
 				/** \brief Fourier matrix factorization matrices (Givens matrix). */
 				vector<Faust::MatSparse<FPP,DEVICE>> facts;
 				/** \brief Diagonalization approximate of Laplacian. */
 				Faust::MatSparse<FPP,DEVICE> D;
-				/** \brief Temporary storage matrix for maximization of L. */
-				Faust::MatDense<FPP,DEVICE> C;
-				/** \brief Column vector for the rowwise minimization of C (i.e. maximization of L). */
-				Faust::Vect<FPP,DEVICE> C_min_row;
-				/** \brief Pivot candidates q coordinates. */
-				int* q_candidates;  /* default IndexType for underlying eigen matrix is int. */
 				/** \brief Queue of errors (cf. calc_err()). */
 				vector<FPP2> errs;
 				/** \brief Pivot choices (p, q) coordinates. */
@@ -199,7 +199,7 @@ namespace Faust {
 				/**
 				 * Returns the matrix D in its current status (which is updated at each iteration).
 				 */
-				const MatSparse<FPP,DEVICE> get_D(const bool ord=false);
+				const MatSparse<FPP,DEVICE>& get_D(const bool ord=false);
 
 				/**
 				 * Returns the diagonal by copying it in the buffer diag_data (should be allocated by the callee).
