@@ -3,7 +3,7 @@ using namespace Faust;
 #include <cmath>
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t) : GivensFGFT<FPP,DEVICE,FPP2>(Lap,J), t(t), fact_nrots(0)
+GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity) : GivensFGFT<FPP,DEVICE,FPP2>(Lap,J, verbosity), t(t), fact_nrots(0)
 {
 	this->facts.resize(round(J/(float)t));
 	this->always_theta2 = true;

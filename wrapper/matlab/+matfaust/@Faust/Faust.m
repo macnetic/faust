@@ -349,7 +349,7 @@ classdef Faust
 			if(~ isscalar(s))
 				error('Unsupported operand type(s) for /: a Faust can only be divided by a scalar.')
 			end
-			G = mtimes(F,1/s)
+			G = mtimes(F,1/s);
 		end
 
 		%======================================================================

@@ -100,7 +100,7 @@ namespace Faust {
 				 * \param Lap The Laplacian matrix to approximate/diagonalize.
 				 * \param J The number of iterations, Givens rotations factors.
 				 * */
-				GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J);
+				GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0);
 				/** Destructor */
 				virtual ~GivensFGFT() {delete[] q_candidates;};
 

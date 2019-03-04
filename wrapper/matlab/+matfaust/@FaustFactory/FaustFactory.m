@@ -275,17 +275,24 @@ classdef FaustFactory
 		function varargout = fgft_palm(U, Lap, p, varargin)
 			import matfaust.Faust
 			import matfaust.factparams.*
-			% TODO: check U, Lap sizes, same field
+			if(~ ismatrix(U) || ~ isnumeric(U) || ~ ismatrix(Lap) || ~ isnumeric(Lap))
+				error('U and Lap must be real or complex matrices.')
+			elseif(any(size(U) ~= size(Lap)) || any(size(Lap,1) ~= size(Lap,2)))
+				error('U and Lap must be square matrices of same size.')
+			end
 			% TODO: refactor with fact_hierarchical
 			if(length(varargin) == 1)
 				init_D = varargin{1};
 				if(~ ismatrix(init_D) || ~ isnumeric(init_D))
-					error('fgft_palm arg. 4 must be a matrix')
+					error('fgft_palm arg. 4 (init_D) must be a matrix')
+				end
+				if(size(init_D,1) ~= size(U,1))
+					error('fgft_palm arg. 4 (init_D) must be a diagonal vector of size == size(U,1).')
 				end
 			elseif(length(varargin) > 1)
 				error('fgft_palm, too many arguments.')
 			else % nargin == 0
-				init_D = ones(size(U,1));
+				init_D = ones(size(U,1),1);
 				if(~ isreal(U))
 					init_D = complex(init_D);
 				end
@@ -330,6 +337,32 @@ classdef FaustFactory
 			end
 			F = Faust(core_obj, isreal(U));
 			varargout = {F, lambda, p};
+		end
+
+		%==========================================================================================
+		%> @brief Computes the FGFT for the Laplacian matrix Lap.
+		%>
+		%>
+		%==========================================================================================
+		function [FGFT,D] = fgft_givens(Lap, J, varargin)
+			import matfaust.Faust
+			t = 1; % default value
+			if(~ ismatrix(Lap) || ~ isreal(Lap))
+				error('fgft_givens(): Lap must be a real matrix.')
+			end
+			if(size(Lap,1) ~= size(Lap,2))
+				error('fgft_givens(): Lap must be square')
+			end
+			if(length(varargin) == 1)
+				t = varargin{1};
+				if(~ isnumeric(t) || t-floor(t) > 0)
+					error('fgft_givens(): t must be an integer.')
+				end
+			elseif(length(varargin) ~= 0)
+				error('fgft_givens(): bad number of arguments.')
+			end
+			[core_obj, D] = mexfgftgivensReal(Lap, J, t);
+			FGFT = Faust(core_obj, true);
 		end
 
 		%==========================================================================================

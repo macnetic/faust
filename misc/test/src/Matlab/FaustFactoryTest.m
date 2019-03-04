@@ -158,6 +158,39 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 1.0063, 'AbsTol', 0.0001)
 		end
 
+		function test_fgft_givens(this)
+			disp('Test FaustFactory.fgft_givens()')
+			import matfaust.*
+			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
+			% Lap and J available
+			[F,D] = FaustFactory.fgft_givens(Lap, J);
+			this.verifyEqual(size(F), size(Lap))
+			%disp('norm F: ')
+			%norm(F, 'fro')
+			E = F*diag(D)*F'-Lap;
+			err = norm(E,'fro')/norm(Lap,'fro')
+			% the error reference is from the C++ test,
+			% misc/test/src/C++/GivensFGFT.cpp.in
+			this.verifyEqual(err, 0.0326529, 'AbsTol', 0.00001)
+		end
+
+		function test_fgft_givens_parallel(this)
+			disp('Test FaustFactory.fgft_givens() -- parallel')
+			import matfaust.*
+			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
+			% Lap and J available
+			t = size(Lap,1)/2;
+			[F,D] = FaustFactory.fgft_givens(Lap, J, t);
+			this.verifyEqual(size(F), size(Lap))
+			%disp('norm F: ')
+			%norm(F, 'fro')
+			E = F*diag(D)*F'-Lap;
+			err = norm(E,'fro')/norm(Lap,'fro')
+			% the error reference is from the C++ test,
+			% misc/test/src/C++/GivensFGFTParallel.cpp.in
+			this.verifyEqual(err,0.0410448, 'AbsTol', 0.00001)
+		end
+
 		function test_fgft_palm(this)
 			disp('Test FaustFactory.fgft_palm()')
 			import matfaust.*

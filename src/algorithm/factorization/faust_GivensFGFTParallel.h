@@ -80,7 +80,7 @@ namespace Faust {
 		 * \param t the maximum number of 2D rotation matrices (Givens matrices) to insert in each factor. The effective number can be less than t if there is not enough pivot candidates left in the matrix L of the current iteration.
 		 *
 		 */
-		GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t);
+		GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0);
 
 	};
 

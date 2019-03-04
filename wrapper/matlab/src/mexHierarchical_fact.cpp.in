@@ -110,7 +110,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			Faust::MatDense<SCALAR,Cpu> laplacian_mat;
 			const mxArray* matlab_lap_mat = prhs[2];
 			mxArray2FaustMat(matlab_lap_mat,laplacian_mat);
-			params->Display();
+			// params->Display();
 			hier_fact = new Faust::HierarchicalFactFFT<SCALAR,Cpu,FPP2>(matrix,laplacian_mat,*dynamic_cast<const ParamsFFT<SCALAR,Cpu,FPP2>*>(params),blas_handle,spblas_handle);
 		}
 		else

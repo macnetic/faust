@@ -1,0 +1,109 @@
+/****************************************************************************/
+/*                              Description:                                */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.inria.fr>                                */
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2019):   Hakim HADJ-DJILANI,									*/
+/*  					Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of INRIA.              */
+/*																			*/
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*                                                                          */
+/*  More information about license: http://faust.inria.fr                   */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+
+
+#include "mex.h"
+#include "faust_GivensFGFT.h"
+#include "faust_GivensFGFTParallel.h"
+#include "faust_TransformHelper.h"
+#include "class_handle.hpp"
+#include "faust_Vect.h"
+#include <vector>
+#include <string>
+#include <algorithm>
+#include "mx2Faust.h"
+#include "faust2Mx.h"
+#include <stdexcept>
+
+//normally Givens is only for double, float scalars
+typedef @FAUST_SCALAR@ SCALAR;
+typedef @FACT_FPP@ FPP2;
+
+using namespace Faust;
+
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+
+	int J;
+	int t = 1; // default value for non-parallel Givens FGFT
+
+	if(nrhs < 2 || nrhs > 3)
+		mexErrMsgTxt("Bad Number of inputs arguments");
+
+	J = (int) mxGetScalar(prhs[1]);
+	if(nrhs == 3)
+		t = (int) mxGetScalar(prhs[2]);
+
+	const mxArray* matlab_matrix = prhs[0]; // Laplacian
+
+	// initialization of the matrix that will be factorized
+	Faust::MatDense<SCALAR,Cpu> Lap;
+	mxArray2FaustMat(matlab_matrix, Lap);
+
+
+	try{
+
+		//TODO: blas handles to pass later ? (if you want to do the calculation with blas instead of eigen)
+		Faust::BlasHandle<Cpu> blas_handle;
+		Faust::SpBlasHandle<Cpu> spblas_handle;
+
+		Faust::GivensFGFT<SCALAR, Cpu, FPP2>* algo;
+		Faust::Vect<SCALAR,Cpu> D(Lap.getNbRow());
+
+		if(t <= 1)
+			algo = new GivensFGFT<SCALAR,Cpu,FPP2>(Lap, J);
+		else
+			algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(Lap, J, t);
+
+		algo->compute_facts();
+
+		// true below is for ascendant order of eigenvalues
+		algo->get_D(const_cast<SCALAR*>(D.getData()), true); // don't respect constness for optimization (saving a vector copy)
+
+		plhs[1] = FaustVec2mxArray(D);
+
+		Faust::Transform<SCALAR,Cpu> trans = std::move(algo->get_transform(true)); // true for same order of "eigenvectors" as eigenvalues
+	    TransformHelper<SCALAR,Cpu> *th = new TransformHelper<SCALAR,Cpu>(trans, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
+
+		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(th);
+
+		delete algo;
+	}
+	 catch (const std::exception& e)
+	{
+		 mexErrMsgTxt(e.what());
+	}
+
+
+}
+
