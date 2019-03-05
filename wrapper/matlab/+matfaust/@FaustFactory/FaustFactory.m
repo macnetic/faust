@@ -347,22 +347,45 @@ classdef FaustFactory
 		function [FGFT,D] = fgft_givens(Lap, J, varargin)
 			import matfaust.Faust
 			t = 1; % default value
+			verbosity = 0; % default value
 			if(~ ismatrix(Lap) || ~ isreal(Lap))
-				error('fgft_givens(): Lap must be a real matrix.')
+				error('Lap must be a real matrix.')
 			end
 			if(size(Lap,1) ~= size(Lap,2))
-				error('fgft_givens(): Lap must be square')
+				error('Lap must be square')
 			end
-			if(length(varargin) == 1)
+			bad_arg_err = 'bad number of arguments.';
+			if(length(varargin) >= 1)
 				t = varargin{1};
 				if(~ isnumeric(t) || t-floor(t) > 0)
-					error('fgft_givens(): t must be an integer.')
+					error('t must be an integer.')
 				end
-			elseif(length(varargin) ~= 0)
-				error('fgft_givens(): bad number of arguments.')
+				if(length(varargin) >= 2)
+					if(~ strcmp(varargin{2}, 'verbosity'))
+						error('arg. 4, if used, must be the str `verbosity''.')
+					end
+					if(length(varargin) == 3)
+						if(isnumeric(varargin{3}))
+							verbosity = floor(real(varargin{3}));
+						else
+							error('verbosity must be numeric')
+						end
+					else
+						error(bad_arg_err)
+					end
+				end
 			end
-			[core_obj, D] = mexfgftgivensReal(Lap, J, t);
+			[core_obj, D] = mexfgftgivensReal(Lap, J, t, verbosity);
 			FGFT = Faust(core_obj, true);
+		end
+
+		%==========================================================================================
+		%> @brief Computes the eigenvalues and the eigenvectors transform (as a Faust object) using the truncated Jacobi algorithm. 
+		%>
+		%>
+		%==========================================================================================
+		function [FGFT,D] = eigtj(Lap, J, varargin)
+			[FGFT, D] = matfaust.FaustFactory.fgft_givens(Lap, J, varargin{:})
 		end
 
 		%==========================================================================================

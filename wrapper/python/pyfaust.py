@@ -1924,7 +1924,7 @@ class FaustFactory:
             The parameter t is meaningful in the parallel version of the
             truncated Jacobi algorithm (cf. references below). If t <= 1 (by default)
             then the function runs the non-parallel algorithm.
-            verbosity: (int) the level of verbosity, the greater the more info.
+            verbosity: (int) the level of verbosity, the greater the value the more info.
             is displayed.
 
 
