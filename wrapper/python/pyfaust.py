@@ -1836,6 +1836,7 @@ class FaustFactory:
 
 			# errors on FGFT and Laplacian reconstruction
 			err_U = (Uhat-U).norm()/norm(U)
+            err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense()-Lap)/norm(Lap)
 			err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense())/norm(Lap)
 			print("err_U:", err_U)
 			print("err_Lap:", err_Lap)
@@ -1846,7 +1847,7 @@ class FaustFactory:
 			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/3
 			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/3
 			#	err_U: 1.00138959974
-			#	err_Lap: 0.00319004898686
+			#	err_Lap: 0.997230709335
 
 
 		Args:
@@ -1874,8 +1875,8 @@ class FaustFactory:
         References:
             - [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
             graph Fourier transforms via multi-layer sparse approximations",
-            submitted to IEEE Transactions on Signal and Information Processing
-            over Networks.
+            IEEE Transactions on Signal and Information Processing
+            over Networks 2018, 4(2), pp 407-420
             <https://hal.inria.fr/hal-01416110>
             - [2] Le Magoarou L. and Gribonval R., "Are there approximate Fast
             Fourier Transforms on graphs ?", ICASSP, 2016.  <https://hal.inria.fr/hal-01254108>
@@ -1940,8 +1941,8 @@ class FaustFactory:
         References:
         [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
         graph Fourier transforms via multi-layer sparse approximations",
-        submitted to IEEE Transactions on Signal and Information Processing
-        over Networks.
+        IEEE Transactions on Signal and Information Processing
+        over Networks 2018, 4(2), pp 407-420
         <https://hal.inria.fr/hal-01416110>
 
         Example:
@@ -1957,8 +1958,9 @@ class FaustFactory:
             Lap = data_dict['Lap'].astype(np.float)
 
             Uhat, Dhat = FF.eigtj(Lap,J=Lap.shape[0]*100,t=int(Lap.shape[0]/2))
-            # Uhat is the Faust Fourier matrix approximation (200 factors + permutation mat.)
-            # Dhat the eigenvalues diagonal approx.
+            # Uhat is the Fourier matrix/eigenvectors approximattion as a Faust
+            # (200 factors + permutation mat.)
+            # Dhat the eigenvalues diagonal matrix approx.
             print(Uhat)
             print(Dhat)
 
@@ -1989,8 +1991,8 @@ class FaustFactory:
         References:
         [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
         graph Fourier transforms via multi-layer sparse approximations",
-        submitted to IEEE Transactions on Signal and Information Processing
-        over Networks.
+        IEEE Transactions on Signal and Information Processing
+        over Networks 2018, 4(2), pp 407-420.
         <https://hal.inria.fr/hal-01416110>
 
         <b/> See also FaustFactory.eigtj, FaustFactory.fgft_palm

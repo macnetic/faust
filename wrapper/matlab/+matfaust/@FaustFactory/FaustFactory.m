@@ -272,6 +272,82 @@ classdef FaustFactory
 			varargout = {F, lambda, p};
 		end
 
+		%===================================================================================
+		%> Computes the FGFT for the Fourier matrix U (it should be the eigenvectors of the Laplacian Lap).
+		%>
+		%> @note this algorithm is a variant of FaustFactory.fact_hierarchical.
+		%>
+		%> @param Lap The laplacian matrix.
+		%> @param U The Fourier matrix.
+		%> @param p The PALM hierarchical algorithm parameters.
+		%> @param init_D The initial diagonal vector. If none it will be the ones() vector by default.
+		%>
+		%> @retval [Uhat, Dhat, lambda, p]
+		%> - Uhat: the Faust factorization of U.
+		%> - Dhat: the diagonal matrix approximation of eigenvaules.
+		%> - lambda: see FaustFactory.fact_hierarchical
+		%> - p: see FaustFactory.fact_hierarchical
+		%>
+		%>
+		%> @b Example
+		%> @code
+		%> import matfaust.factparams.*
+		%>
+		%> % get the Laplacian
+		%> load('Laplacian_128_ring.mat');
+		%>
+		%> [U, D] = eig(Lap);
+		%> [D, I] = sort(diag(D));
+		%> D = diag(D);
+		%> U = U(:,I);
+		%>
+		%> dim = size(Lap, 1);
+		%>
+		%> nfacts = round(log2(dim)-3);
+		%> over_sp = 1.5; % sparsity overhead
+		%> dec_fact = .5; % decrease of the residuum sparsity
+		%>
+		%> % define the sparsity constraints for the factors
+		%> fact_cons = {};
+		%> res_cons = {};
+		%> for i=1:nfacts
+		%>     fact_cons = [ fact_cons {ConstraintInt('sp', dim, dim, min(round(dec_fact^j*dim^2*over_sp), size(Lap,1)))} ];
+		%>     res_cons = [ res_cons {ConstraintInt('sp', dim, dim, min(round(2*dim*over_sp), size(Lap, 1)))} ];
+		%> end
+		%>
+		%> % set the parameters for the PALM hierarchical algo.
+		%> params = ParamsHierarchicalFact(fact_cons, res_cons, StoppingCriterion(50), StoppingCriterion(100), 'step_size', 1e-6, 'constant_step_size', true, 'init_lambda', 1.0, 'is_fact_side_left', false);
+		%> %% compute FGFT for Lap, U, D
+		%> init_D_diag = diag(D);
+		%> [Uhat, Dhat, lambda, ~ ] = FaustFactory.fgft_palm(U, Lap, params, init_D_diag);
+		%>
+		%> %% errors on FGFT and Laplacian reconstruction
+		%> err_U = norm(Uhat-U, 'fro')/norm(U, 'fro')
+		%> err_Lap = norm(Uhat*full(Dhat)*Uhat'-Lap, 'fro') / norm(Lap, 'fro')
+		%> % Output:
+		%> % Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/4
+		%> % Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/4
+		%> % Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/4
+		%> % Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 4/4
+		%> %    err_U =
+		%> %   		1.0013
+		%> %    err_Lap =
+		%> %    	0.9707
+		%>
+		%> @endcode
+		%>
+		%> <p> @b See @b also FaustFactory.fact_hierarchical, FaustFactory.eigtj, FaustFactory.fgft_givens
+		%>
+		%> @b References:
+		%> - [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
+		%> graph Fourier transforms via multi-layer sparse approximations",
+		%> IEEE Transactions on Signal and Information Processing
+		%> over Networks 2018, 4(2), pp 407-420
+		%> <https://hal.inria.fr/hal-01416110>
+		%> - [2] Le Magoarou L. and Gribonval R., "Are there approximate Fast
+		%> Fourier Transforms on graphs ?", ICASSP, 2016.  <https://hal.inria.fr/hal-01254108>
+		%>
+		%===================================================================================
 		function varargout = fgft_palm(U, Lap, p, varargin)
 			import matfaust.Faust
 			import matfaust.factparams.*
@@ -331,17 +407,45 @@ classdef FaustFactory
 			% the setters for num_rows/cols verifies consistency with constraints
 			mex_params = struct('nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left, 'update_way', p.is_update_way_R2L, 'init_D', init_D, 'verbose', p.is_verbose, 'init_lambda', p.init_lambda);
 			if(isreal(U))
-				[lambda, core_obj] = mexHierarchical_factReal(U, mex_params, Lap);
+				[lambda, core_obj, Ddiag] = mexHierarchical_factReal(U, mex_params, Lap);
 			else
-				[lambda, core_obj] = mexHierarchical_factCplx(U, mex_params, Lap);
+				[lambda, core_obj, Ddiag] = mexHierarchical_factCplx(U, mex_params, Lap);
 			end
+			D = spdiag(Ddiag);
 			F = Faust(core_obj, isreal(U));
-			varargout = {F, lambda, p};
+			varargout = {F, D, lambda, p};
 		end
 
 		%==========================================================================================
 		%> @brief Computes the FGFT for the Laplacian matrix Lap.
 		%>
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b fgft_givens(Lap, J) calls the non-parallel Givens algorithm.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b fgft_givens(Lap, J, 0) or fgft_givens(Lap, J, 1) do the same as in previous line.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b fgft_givens(Lap, J, t) calls the parallel Givens algorithm (if t > 1, otherwise it calls basic Givens algorithm), see FaustFactory.eigtj. <br/>
+		%> &nbsp;&nbsp;&nbsp; @b fgft_givens(Lap, J, t, 'verbosity', 2) same as above with a level of verbosity of 2 in output. <br/>
+
+		%>
+		%> @param Lap the Laplacian matrix as a numpy array. Must be real and symmetric.
+		%> @param J see FaustFactory.eigtj
+		%> @param t see FaustFactory.eigtj
+		%> @param verbosity see FaustFactory.eigtj
+		%>
+		%> @retval [FGFT,D]:
+		%> - with FGFT being the Faust object representing the Fourier transform and,
+		%> -  D as a sparse diagonal matrix of the eigenvalues in ascendant order along the rows/columns.
+		%>
+		%>
+		%> @b References:
+		%> - [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
+		%> graph Fourier transforms via multi-layer sparse approximations",
+		%> IEEE Transactions on Signal and Information Processing
+		%> over Networks 2018, 4(2), pp 407-420
+		%>
+		%>
+		%> <p> @b See @b also FaustFactory.eigtj, FaustFactory.fgft_palm
 		%>
 		%==========================================================================================
 		function [FGFT,D] = fgft_givens(Lap, J, varargin)
@@ -354,12 +458,17 @@ classdef FaustFactory
 			if(size(Lap,1) ~= size(Lap,2))
 				error('Lap must be square')
 			end
+			if(~ isnumeric(J) || J-floor(J) > 0 || J <= 0)
+				error('J must be a positive integer.')
+			end
 			bad_arg_err = 'bad number of arguments.';
 			if(length(varargin) >= 1)
 				t = varargin{1};
-				if(~ isnumeric(t) || t-floor(t) > 0)
-					error('t must be an integer.')
+				if(~ isnumeric(t))
+					error('t must be a positive or nul integer.')
 				end
+				t = floor(abs(t));
+				t = min(t, J);
 				if(length(varargin) >= 2)
 					if(~ strcmp(varargin{2}, 'verbosity'))
 						error('arg. 4, if used, must be the str `verbosity''.')
@@ -376,16 +485,57 @@ classdef FaustFactory
 				end
 			end
 			[core_obj, D] = mexfgftgivensReal(Lap, J, t, verbosity);
+			D = spdiag(D);
 			FGFT = Faust(core_obj, true);
 		end
 
 		%==========================================================================================
-		%> @brief Computes the eigenvalues and the eigenvectors transform (as a Faust object) using the truncated Jacobi algorithm. 
+		%> @brief Computes the eigenvalues and the eigenvectors transform (as a Faust object) using the truncated Jacobi algorithm.
 		%>
+		%> The eigenvalues and the eigenvectors are approximate. The trade-off between accuracy and sparsity can be set through the parameters J and t.
+		%>
+		%>
+		%> @b Usage
+		%>
+		%> &nbsp;&nbsp;&nbsp; @b eigtj(M, J) calls the non-parallel Givens algorithm.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b eigtj(M, J, 0) or eigtj(M, J, 1) do the same as in previous line.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b eigtj(M, J, t) calls the parallel Givens algorithm (if t > 1, otherwise it calls basic Givens algorithm)<br/>
+		%> &nbsp;&nbsp;&nbsp; @b eigtj(M, J, t, 'verbosity', 2) same as above with a level of verbosity of 2 in output. <br/>
+		%>
+		%> @param M the matrix to diagonalize. Must be real and symmetric.
+		%> @param J defines the number of factors in the eigenvector transform V. The number of factors is round(J/t). Note that the last permutation factor is not in count here (in fact, the total number of factors in V is rather round(J/t)+1).
+		%> @param t the number of Givens rotations per factor. Note that t is forced to the value min(J,t). Besides, a value of t such that t > size(M,1)/2 won't lead to the desired effect because the maximum number of rotation matrices per factor is anyway size(M,1)/2. The parameter t is meaningful in the parallel version of the truncated Jacobi algorithm (cf. references below). If t <= 1 (by default) then the function runs the non-parallel algorithm.
+		%> @param verbosity the level of verbosity, the greater the value the more info. is displayed.
+		%>
+		%> @retval [V,W]
+		%> - V the Faust object representing the approximate eigenvector transform. V has its last factor being a permutation matrix, the goal of this factor is to apply to the columns of V the same order as eigenvalues set in W.
+		%> - W the approximate sparse diagonal matrix of the eigenvalues (in ascendant order along the rows/columns).
+		%>
+		%> @b Example
+		%> @code
+		%> import matfaust.*
+		%>
+		%> % get a Laplacian to diagonalize
+		%> load('Laplacian_256_community.mat')
+		%> % do it
+		%> [Uhat, Dhat] = FaustFactory.eigtj(Lap, size(Lap,1)*100, size(Lap, 1)/2, 'verbosity', 2)
+		%> % Uhat is the Fourier matrix/eigenvectors approximattion as a Faust (200 factors + permutation mat.)
+		%> % Dhat the eigenvalues diagonal matrix approx.
+		%> @endcode
+		%>
+		%>
+		%>
+		%> @b References:
+		%> - [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
+		%> graph Fourier transforms via multi-layer sparse approximations",
+		%> IEEE Transactions on Signal and Information Processing
+		%> over Networks 2018, 4(2), pp 407-420
+		%>
+		%> <p> @b See @b also FaustFactory.fgft_givens, FaustFactory.fgft_palm
 		%>
 		%==========================================================================================
-		function [FGFT,D] = eigtj(Lap, J, varargin)
-			[FGFT, D] = matfaust.FaustFactory.fgft_givens(Lap, J, varargin{:})
+		function [V,W] = eigtj(M, J, varargin)
+			[V, W] = matfaust.FaustFactory.fgft_givens(M, J, varargin{:});
 		end
 
 		%==========================================================================================

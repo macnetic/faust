@@ -138,6 +138,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		Faust::TransformHelper<SCALAR,Cpu>* F = new Faust::TransformHelper<SCALAR, Cpu>(t);
 		plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);
 
+		if(is_fgft)
+		{
+			Faust::Vect<SCALAR,Cpu> D(matrix.getNbRow());
+			(dynamic_cast<Faust::HierarchicalFactFFT<SCALAR,Cpu,FPP2>*>(hier_fact))->get_D(const_cast<SCALAR*>(D.getData())); // not respecting constness for optimiation (saving a vector copy)
+			plhs[2] = FaustVec2mxArray(D);
+		}
+
 		delete hier_fact;
 	}
 	 catch (const std::exception& e)
