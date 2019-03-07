@@ -15,7 +15,7 @@ FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsig
     GivensFGFT<FPP, Cpu, FPP2>* algo;
 
 
-    if(t <= 0)
+    if(t <= 1)
     {
         algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity);
     }
