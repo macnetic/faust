@@ -83,7 +83,8 @@ void Faust::multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<
 template<typename FPP>
 void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
 
-
+template<typename FPP>
+void Faust::wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors);
 
 //! \namespace Faust
 //! \brief Faust namespace contains the principal class of the project.
@@ -102,6 +103,8 @@ namespace Faust
 		class MatSparse<FPP,Cpu> : public Faust::MatGeneric<FPP,Cpu>
 		{
 
+			friend Faust::TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
+			friend void Faust::wht_factors<>(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors);
 			friend class MatDense<FPP,Cpu>;
 			//friend void MatDense<FPP,Cpu>::operator+=(const MatSparse<FPP,Cpu>& S);
 
@@ -319,7 +322,7 @@ static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_
 			//! *this = S * (*this)
 			friend void  Faust::Vect<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);
 			friend double Faust::Transform<FPP,Cpu>::normL1(const bool transpose) const;
-			friend Faust::TransformHelper<FPP,Cpu>; //TODO: limit to hadamardFaust
+
 			/*friend void  Faust::MatDense<FPP,Cpu>::multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS);*/
 
 			// MODIF AL WARNING, ERROR WITH VISUAL STUDIO 2013 compiler
