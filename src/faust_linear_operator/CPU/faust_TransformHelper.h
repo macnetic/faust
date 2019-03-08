@@ -46,7 +46,6 @@
 #include "faust_exception.h"
 #include "faust_Transform.h"
 #include "faust_Slice.h"
-#include "faust_bit_rev_permu.h"
 #include <random>
 
 namespace Faust {
