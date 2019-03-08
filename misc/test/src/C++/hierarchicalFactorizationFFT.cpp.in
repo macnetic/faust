@@ -1,10 +1,10 @@
 #include "faust_MatSparse.h"
-#include "faust_HierarchicalFactFFT.h"
+#include "faust_HierarchicalFactFGFT.h"
 #include "faust_Timer.h"
 #include "faust_Transform.h"
 #include "faust_init_from_matio_params.h"
 #include "faust_init_from_matio_core.h"
-#include "faust_ParamsFFT.h"
+#include "faust_ParamsFGFT.h"
 #include <string>
 #include <sstream>
 #include "faust_BlasHandle.h"
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 	Faust::SpBlasHandle<Cpu> spblasHandle;
 
 	// parameter setting
-	Faust::ParamsFFT<FPP,Cpu,FPP2> params;
+	Faust::ParamsFGFT<FPP,Cpu,FPP2> params;
 	init_params_from_matiofile<FPP,Cpu,FPP2>(params,configFilename.c_str(),"params");
 //	params.init_D =  Faust::MatDense<FPP,Cpu>::eye(params.m_nbRow, params.m_nbCol);
 //	init_faust_mat_from_matio(params.init_D,U_Filename.c_str(),"init_D");
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 		U.transpose();
 
 	//algorithm
-	Faust::HierarchicalFactFFT<FPP,Cpu,FPP2> hierFact(U,Lap,params,blasHandle,spblasHandle);
+	Faust::HierarchicalFactFGFT<FPP,Cpu,FPP2> hierFact(U,Lap,params,blasHandle,spblasHandle);
 	Faust::HierarchicalFact<FPP,Cpu,FPP2> hierFact_(U,params,blasHandle,spblasHandle);
 
 	doit(&hierFact, argc, expectedLambda, epsilon, U, Lap, ref_facts);
@@ -215,8 +215,8 @@ void doit(HierarchicalFact<FPP,Cpu,FPP2>* hierFact, int argc, FPP expectedLambda
 	std::cout<<std::endl;
 	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND Fourier MATRIX **************** "<<std::endl;
 	std::cout<<"		"<<relativeError<<std::endl<<std::endl;
-	HierarchicalFactFFT<FPP,Cpu,FPP2> *hierFactFFT;
-	if(hierFactFFT = dynamic_cast<HierarchicalFactFFT<FPP,Cpu, FPP2>*>(hierFact))
+	HierarchicalFactFGFT<FPP,Cpu,FPP2> *hierFactFFT;
+	if(hierFactFFT = dynamic_cast<HierarchicalFactFGFT<FPP,Cpu, FPP2>*>(hierFact))
 	{
 		
 		//relativeError 2

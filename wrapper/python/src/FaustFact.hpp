@@ -2,13 +2,13 @@
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
 #include "faust_Params.h"
-#include "faust_ParamsFFT.h"
+#include "faust_ParamsFGFT.h"
 #include "faust_ParamsPalm.h"
 #include "faust_StoppingCriterion.h"
 #include "faust_Palm4MSA.h"
-#include "faust_Palm4MSAFFT.h"
+#include "faust_Palm4MSAFGFT.h"
 #include "faust_HierarchicalFact.h"
-#include "faust_HierarchicalFactFFT.h"
+#include "faust_HierarchicalFactFGFT.h"
 #include "faust_BlasHandle.h"
 #include "faust_ConstraintGeneric.h"
 
@@ -226,9 +226,9 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
 
     if(p_fft = dynamic_cast<PyxParamsFactPalm4MSAFFT<FPP,FPP2>*>(p))
     {
-        params = new ParamsPalmFFT<FPP,Cpu,FPP2>(inMat, p->num_facts, cons, initFacts, p_fft->init_D, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->step_size);
+        params = new ParamsPalmFGFT<FPP,Cpu,FPP2>(inMat, p->num_facts, cons, initFacts, p_fft->init_D, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->step_size);
 
-        palm = new Palm4MSAFFT<FPP,Cpu,FPP2>(*static_cast<ParamsPalmFFT<FPP,Cpu,FPP2>*>(params),blasHandle,true);
+        palm = new Palm4MSAFGFT<FPP,Cpu,FPP2>(*static_cast<ParamsPalmFGFT<FPP,Cpu,FPP2>*>(params),blasHandle,true);
     }
     else {
         params = new ParamsPalm<FPP,Cpu,FPP2>(inMat, p->num_facts, cons, initFacts, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->constant_step_size, p->step_size);
@@ -274,7 +274,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
     {
         // retrieve D matrix from Palm4MSAFFT
         // out buffer must have been allocated from outside
-        dynamic_cast<Palm4MSAFFT<FPP,Cpu,FPP2>*>(palm)->get_D(out_buf+1);
+        dynamic_cast<Palm4MSAFGFT<FPP,Cpu,FPP2>*>(palm)->get_D(out_buf+1);
         // add lambda at the first position
         out_buf[0] = lambda;
     }
@@ -347,8 +347,8 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
     if(p_fft = dynamic_cast<PyxParamsHierarchicalFactFFT<FPP,FPP2>*>(p))
     {
         inMat2 = new Faust::MatDense<FPP,Cpu>(mat2, num_rows, num_cols);
-        params = new Faust::ParamsFFT<FPP,Cpu,FPP2>(p->num_rows, p->num_cols, p->num_facts, cons_, initFacts_deft, p_fft->init_D, crit0, crit1, p->is_verbose, p->is_update_way_R2L, p->is_fact_side_left, p->init_lambda, p->constant_step_size, p->step_size);
-        hierFact = new HierarchicalFactFFT<FPP,Cpu,FPP2>(inMat, *inMat2, *(static_cast<ParamsFFT<FPP,Cpu,FPP2>*>(params)), blasHandle, spblasHandle);
+        params = new Faust::ParamsFGFT<FPP,Cpu,FPP2>(p->num_rows, p->num_cols, p->num_facts, cons_, initFacts_deft, p_fft->init_D, crit0, crit1, p->is_verbose, p->is_update_way_R2L, p->is_fact_side_left, p->init_lambda, p->constant_step_size, p->step_size);
+        hierFact = new HierarchicalFactFGFT<FPP,Cpu,FPP2>(inMat, *inMat2, *(static_cast<ParamsFGFT<FPP,Cpu,FPP2>*>(params)), blasHandle, spblasHandle);
     }
     else
     {
@@ -393,7 +393,7 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
     {
         // retrieve D matrix from HierarchicalFactFFT
         // out buffer must have been allocated from outside
-        dynamic_cast<HierarchicalFactFFT<FPP,Cpu,FPP2>*>(hierFact)->get_D(out_buf+1);
+        dynamic_cast<HierarchicalFactFGFT<FPP,Cpu,FPP2>*>(hierFact)->get_D(out_buf+1);
         // add lambda at the first position
         out_buf[0] = lambda;
         delete inMat2;

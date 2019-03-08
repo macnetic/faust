@@ -40,11 +40,11 @@
 /****************************************************************************//*}}}*//*}}}*//*}}}*/
 #include "faust_MatDense.h"
 #include "faust_Params.h"
-#include "faust_ParamsPalmFFT.h"
+#include "faust_ParamsPalmFGFT.h"
 #include "faust_StoppingCriterion.h"
 #include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
-#include "faust_Palm4MSAFFT.h"
+#include "faust_Palm4MSAFGFT.h"
 #include "faust_BlasHandle.h"
 
 #include <iostream>
@@ -120,7 +120,7 @@ int main()
 
 	Faust::StoppingCriterion<FPP2> crit(niter);
 
-	Faust::ParamsPalmFFT<FPP,Cpu,FPP2> params(data, nfacts, cons, initFact, init_D, crit, verbose, updateWay, initLambda, step_size);
+	Faust::ParamsPalmFGFT<FPP,Cpu,FPP2> params(data, nfacts, cons, initFact, init_D, crit, verbose, updateWay, initLambda, step_size);
 	params.isVerbose = true;
 
 #ifdef DEBUG
@@ -135,7 +135,7 @@ int main()
 
 	Faust::BlasHandle<Cpu> blasHandle;
 
-	Faust::Palm4MSAFFT<FPP,Cpu,FPP2> palm2(params,blasHandle,true);
+	Faust::Palm4MSAFGFT<FPP,Cpu,FPP2> palm2(params,blasHandle,true);
 
 
 

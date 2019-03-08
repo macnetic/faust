@@ -40,7 +40,7 @@
 
 #include "mex.h"
 #include "faust_HierarchicalFact.h"
-#include "faust_HierarchicalFactFFT.h"
+#include "faust_HierarchicalFactFGFT.h"
 #include "faust_TransformHelper.h"
 #include "class_handle.hpp"
 #include <vector>
@@ -104,14 +104,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		Faust::HierarchicalFact<SCALAR,Cpu, FPP2>* hier_fact;
 
 
-		if(dynamic_cast<const ParamsFFT<SCALAR,Cpu,FPP2>*>(params))
+		if(dynamic_cast<const ParamsFGFT<SCALAR,Cpu,FPP2>*>(params))
 		{
 			if(! is_fgft) mexErrMsgTxt("Bad Number of inputs arguments for PALM FGFT.");
 			Faust::MatDense<SCALAR,Cpu> laplacian_mat;
 			const mxArray* matlab_lap_mat = prhs[2];
 			mxArray2FaustMat(matlab_lap_mat,laplacian_mat);
 			// params->Display();
-			hier_fact = new Faust::HierarchicalFactFFT<SCALAR,Cpu,FPP2>(matrix,laplacian_mat,*dynamic_cast<const ParamsFFT<SCALAR,Cpu,FPP2>*>(params),blas_handle,spblas_handle);
+			hier_fact = new Faust::HierarchicalFactFGFT<SCALAR,Cpu,FPP2>(matrix,laplacian_mat,*dynamic_cast<const ParamsFGFT<SCALAR,Cpu,FPP2>*>(params),blas_handle,spblas_handle);
 		}
 		else
 			hier_fact = new Faust::HierarchicalFact<SCALAR,Cpu,FPP2>(matrix,*params,blas_handle,spblas_handle);
@@ -141,7 +141,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(is_fgft)
 		{
 			Faust::Vect<SCALAR,Cpu> D(matrix.getNbRow());
-			(dynamic_cast<Faust::HierarchicalFactFFT<SCALAR,Cpu,FPP2>*>(hier_fact))->get_D(const_cast<SCALAR*>(D.getData())); // not respecting constness for optimiation (saving a vector copy)
+			(dynamic_cast<Faust::HierarchicalFactFGFT<SCALAR,Cpu,FPP2>*>(hier_fact))->get_D(const_cast<SCALAR*>(D.getData())); // not respecting constness for optimiation (saving a vector copy)
 			plhs[2] = FaustVec2mxArray(D);
 		}
 

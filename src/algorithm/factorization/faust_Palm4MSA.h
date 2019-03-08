@@ -57,7 +57,7 @@ namespace Faust
 
     template<typename FPP,Device DEVICE> class MatDense;
     template<typename FPP,Device DEVICE> class Transform;
-	template<typename FPP, Device DEVICE, typename FPP2> class HierarchicalFactFFT;
+	template<typename FPP, Device DEVICE, typename FPP2> class HierarchicalFactFGFT;
 
     class ConstraintGeneric;
     template<typename FPP,Device DEVICE, typename FPP2> class Params;
@@ -77,7 +77,7 @@ namespace Faust
     template<typename FPP,Device DEVICE,typename FPP2 = double>
     class Palm4MSA
     {
-//		friend class Faust::HierarchicalFactFFT<FPP,DEVICE, FPP2>;
+//		friend class Faust::HierarchicalFactFGFT<FPP,DEVICE, FPP2>;
 
        public:
       /*!

@@ -1,18 +1,18 @@
 #include <cstring>
 
 	template <typename FPP, Device DEVICE, typename FPP2>
-Palm4MSAFFT<FPP,DEVICE,FPP2>::Palm4MSAFFT(const ParamsPalmFFT<FPP, DEVICE, FPP2>& params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(params, blasHandle, isGlobal), D(params.init_D)
+Palm4MSAFGFT<FPP,DEVICE,FPP2>::Palm4MSAFGFT(const ParamsPalmFGFT<FPP, DEVICE, FPP2>& params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(params, blasHandle, isGlobal), D(params.init_D)
 {
 	//TODO: is there something to check additionally to what parent's ctor checks ?
 }
 
 template<typename FPP,Device DEVICE,typename FPP2>
-Palm4MSAFFT<FPP,DEVICE,FPP2>::Palm4MSAFFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(Lap, params, blasHandle, isGlobal), D(params.init_D)
+Palm4MSAFGFT<FPP,DEVICE,FPP2>::Palm4MSAFGFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFGFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(Lap, params, blasHandle, isGlobal), D(params.init_D)
 {
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
-void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
+void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 {
 
 	if(!this->isCComputed)
@@ -147,7 +147,7 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 
 
 template <typename FPP, Device DEVICE, typename FPP2>
-void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_lambda()
+void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_lambda()
 {
 	// override parent's method
 	// Xhat = (S[0]*...*S[nfact-1])*D*(S[0]*...*S[nfact-1])'
@@ -168,11 +168,11 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_lambda()
 	this->LorR = tmp;
 	//then we finish the lambda computation with a sqrt() (Fro. norm)
 	this->m_lambda = std::sqrt(/*Faust::abs(*/this->m_lambda);//);
-	// (that's an additional operation in Palm4MSAFFT)
+	// (that's an additional operation in Palm4MSAFGFT)
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
-void Palm4MSAFFT<FPP,DEVICE,FPP2>::next_step()
+void Palm4MSAFGFT<FPP,DEVICE,FPP2>::next_step()
 {
 	Palm4MSA<FPP, Cpu, FPP2>::next_step();
 	// besides to what the parent has done
@@ -184,7 +184,7 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::next_step()
 
 
 template <typename FPP, Device DEVICE, typename FPP2>
-void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_D()
+void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_D()
 {
 	// besides to what the parent has done
 	// we need to update D
@@ -200,7 +200,7 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_D()
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
-void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
+void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
 {
 	// Uhat = lambda*LorR
 	// grad = 0.5*Uhat'*(Uhat*D*Uhat' - X)*Uhat
@@ -216,13 +216,13 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
-const MatDense<FPP, DEVICE>& Palm4MSAFFT<FPP,DEVICE,FPP2>::get_D()
+const MatDense<FPP, DEVICE>& Palm4MSAFGFT<FPP,DEVICE,FPP2>::get_D()
 {
 	return this->D;
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
-void Palm4MSAFFT<FPP,DEVICE,FPP2>::get_D(FPP* diag_data)
+void Palm4MSAFGFT<FPP,DEVICE,FPP2>::get_D(FPP* diag_data)
 {
 	for(int i=0;i<D.getNbRow();i++)
 		diag_data[i] = D.getData()[i*D.getNbRow()+i];
@@ -230,9 +230,9 @@ void Palm4MSAFFT<FPP,DEVICE,FPP2>::get_D(FPP* diag_data)
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
-void Palm4MSAFFT<FPP,DEVICE,FPP2>::compute_c()
+void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_c()
 {
-	//do nothing because the Palm4MSAFFT has always a constant step size
+	//do nothing because the Palm4MSAFGFT has always a constant step size
 	this->isCComputed = true;
 }
 

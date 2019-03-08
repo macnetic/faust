@@ -50,7 +50,7 @@
 #include "faust_ConstraintMat.h"
 #include "faust_ConstraintInt.h"
 #include "faust_Params.h"
-#include "faust_ParamsFFT.h"
+#include "faust_ParamsFGFT.h"
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
 #include "faust_Vect.h"
@@ -771,7 +771,7 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 		SCALAR* init_D = new SCALAR[nb_row]; //nb_col == nb_row when using FactHierarchicalF(G)FT
 		mxCurrentField = mxGetField(matlab_params,0,mat_field_type2str(INIT_D).c_str());
 		mxArray2Ptr<SCALAR>(const_cast<const mxArray*>(mxCurrentField), init_D);
-		params = new ParamsFFT<SCALAR,Cpu,FPP2>(nb_row,nb_col,nbFact,consSS, init_facts, init_D, crit1,crit2,isVerbose,updateway,factside,init_lambda);
+		params = new ParamsFGFT<SCALAR,Cpu,FPP2>(nb_row,nb_col,nbFact,consSS, init_facts, init_D, crit1,crit2,isVerbose,updateway,factside,init_lambda);
 		delete init_D;
 	}
 	else

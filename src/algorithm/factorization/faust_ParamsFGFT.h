@@ -1,6 +1,6 @@
 
-#ifndef __FAUST_PARAMSFFT_H__
-#define __FAUST_PARAMSFFT_H__
+#ifndef __FAUST_PARAMSFGFT_H__
+#define __FAUST_PARAMSFGFT_H__
 
 #include "faust_Params.h"
 
@@ -9,14 +9,14 @@ using namespace Faust;
 namespace Faust
 {
 	template<typename FPP, Device DEVICE, typename FPP2 = double>
-	class ParamsFFT : public Params<FPP, DEVICE, FPP2>
+	class ParamsFGFT : public Params<FPP, DEVICE, FPP2>
 	{
 
 		public:
 		MatDense<FPP, DEVICE> init_D; //TODO: convert to Sparse or Diag repres. and set private or protected
 		//TODO: does it really need to be public 
 		//TODO: move the ctor def into .hpp
-		ParamsFFT(
+		ParamsFGFT(
 				const faust_unsigned_int nbRow,
 				const faust_unsigned_int nbCol,
 				const unsigned int nbFact,
@@ -35,7 +35,7 @@ namespace Faust
 
 		}
 
-		ParamsFFT(
+		ParamsFGFT(
 				const faust_unsigned_int nbRow,
 				const faust_unsigned_int nbCol,
 				const unsigned int nbFact,
@@ -57,7 +57,7 @@ namespace Faust
 				init_D.getData()[i*nbRow+i] = init_D_diag.getData()[i];
 		}
 
-		ParamsFFT(
+		ParamsFGFT(
 				const faust_unsigned_int nbRow,
 				const faust_unsigned_int nbCol,
 				const unsigned int nbFact,
@@ -71,14 +71,14 @@ namespace Faust
 				const bool isFactSideLeft = Params<FPP,DEVICE,FPP2>::defaultFactSideLeft,
 				const FPP init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
 				const bool constant_step_size = Params<FPP,DEVICE,FPP2>::defaultConstantStepSize,
-				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): ParamsFFT<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, Faust::Vect<FPP,DEVICE>(nbRow, init_D_diag), stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size)
+				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): ParamsFGFT<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, Faust::Vect<FPP,DEVICE>(nbRow, init_D_diag), stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size)
 		{
 
 		}
 
 
 
-		ParamsFFT() {}
+		ParamsFGFT() {}
 
 		void Display() const;
 
@@ -86,6 +86,6 @@ namespace Faust
 	};
 }
 
-#include "faust_ParamsFFT.hpp"
+#include "faust_ParamsFGFT.hpp"
 
 #endif
