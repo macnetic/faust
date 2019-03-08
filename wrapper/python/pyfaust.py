@@ -1779,75 +1779,75 @@ class FaustFactory:
 
 
 		Example:
-			from pyfaust import FaustFactory
-			from pyfaust.factparams import *
-			from pyfaust.demo import get_data_dirpath
-			from scipy.io import loadmat, savemat
-			from numpy.linalg import eig, eigh, norm
-			from numpy import sort, argsort, log2, size, copy, diag, dot
-			from os.path import join
+        from pyfaust import FaustFactory
+        from pyfaust.factparams import *
+        from pyfaust.demo import get_data_dirpath
+        from scipy.io import loadmat, savemat
+        from numpy.linalg import eig, eigh, norm
+        from numpy import sort, argsort, log2, size, copy, diag, dot
+        from os.path import join
 
-			# get the Laplacian
-			d = loadmat(join(get_data_dirpath(), "Laplacian_128_ring.mat"))
-			Lap = d['Lap']
+        # get the Laplacian
+        d = loadmat(join(get_data_dirpath(), "Laplacian_128_ring.mat"))
+        Lap = d['Lap']
 
-			# eigenvalues/vectors decomposition
-			D, U = eig(Lap)
+        # eigenvalues/vectors decomposition
+        D, U = eig(Lap)
 
-			# sort D and U accordingly
-			indices = argsort(D)
-			D = D[indices]
-			U = U[:,indices]
-			print("eig(Lap), U error:", norm(dot(Lap,U)-dot(U,diag(D))))
+        # sort D and U accordingly
+        indices = argsort(D)
+        D = D[indices]
+        U = U[:,indices]
+        print("eig(Lap), U error:", norm(dot(Lap,U)-dot(U,diag(D))))
 
-			dim = Lap.shape[0]
+        dim = Lap.shape[0]
 
-			# wanted number of factors for U transform
-			nfacts = int(round(log2(dim))-3)
-			over_sp = 1.5 # sparsity overhead
-			dec_fact = .5 # decrease of the residuum sparsity
+        # wanted number of factors for U transform
+        nfacts = int(round(log2(dim))-3)
+        over_sp = 1.5 # sparsity overhead
+        dec_fact = .5 # decrease of the residuum sparsity
 
-			# define the sparsity constraints for the factors
-			fact_cons, res_cons = [], []
-			for j in range(1, nfacts):
-					fact_cons += [ ConstraintInt('sp',dim,dim,
-							min(int(round(dec_fact**j*dim**2*over_sp)),size(Lap)))
-					]
-					res_cons += [
-						ConstraintInt('sp',
-						dim,
-						dim,
-						min(int(round(2*dim*over_sp)),size(Lap)))
-					]
+        # define the sparsity constraints for the factors
+        fact_cons, res_cons = [], []
+        for j in range(1, nfacts):
+                fact_cons += [ ConstraintInt('sp',dim,dim,
+                        min(int(round(dec_fact**j*dim**2*over_sp)),size(Lap)))
+                ]
+                res_cons += [
+                    ConstraintInt('sp',
+                    dim,
+                    dim,
+                    min(int(round(2*dim*over_sp)),size(Lap)))
+                ]
 
-			# set the parameters for the PALM hierarchical algo.
-			params = ParamsHierarchicalFact(fact_cons,
-							res_cons,
-							StoppingCriterion(num_its=50),
-							StoppingCriterion(num_its=100),
-							step_size=1.0000e-06,
-							constant_step_size=True,
-							init_lambda=1.0,
-							is_fact_side_left=False)
-			Lap = Lap.astype(float)
+        # set the parameters for the PALM hierarchical algo.
+        params = ParamsHierarchicalFact(fact_cons,
+                        res_cons,
+                        StoppingCriterion(num_its=50),
+                        StoppingCriterion(num_its=100),
+                        step_size=1.0000e-06,
+                        constant_step_size=True,
+                        init_lambda=1.0,
+                        is_fact_side_left=False)
+        Lap = Lap.astype(float)
 
-			# compute FGFT for Lap, U, D
-			Uhat,Dhat = FaustFactory.fgft_palm(Lap, U, params, init_D=D)
+        # compute FGFT for Lap, U, D
+        Uhat,Dhat = FaustFactory.fgft_palm(Lap, U, params, init_D=D)
 
-			# errors on FGFT and Laplacian reconstruction
-			err_U = (Uhat-U).norm()/norm(U)
-            err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense()-Lap)/norm(Lap)
-			err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense())/norm(Lap)
-			print("err_U:", err_U)
-			print("err_Lap:", err_Lap)
+        # errors on FGFT and Laplacian reconstruction
+        err_U = (Uhat-U).norm()/norm(U)
+        err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense()-Lap)/norm(Lap)
+        err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense())/norm(Lap)
+        print("err_U:", err_U)
+        print("err_Lap:", err_Lap)
 
-			#Output:
-			#	eig(Lap), U error: 1.36688422173e-13
-			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/3
-			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/3
-			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/3
-			#	err_U: 1.00138959974
-			#	err_Lap: 0.997230709335
+        #Output:
+        #	eig(Lap), U error: 1.36688422173e-13
+        #	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/3
+        #	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/3
+        #	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/3
+        #	err_U: 1.00138959974
+        #	err_Lap: 0.997230709335
 
 
 		Args:

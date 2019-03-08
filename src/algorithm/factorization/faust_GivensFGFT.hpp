@@ -40,6 +40,9 @@ void GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot()
 	C_min_row.min_coeff(&p);
 	q = q_candidates[p];
 	coord_choices[ite] = pair<int,int>(p,q);
+#ifdef DEBUG_GIVENS
+	cout << "GivensFGFT::choose_pivot() ite: " << ite << " p: " << p << " q: " << q << endl;
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
