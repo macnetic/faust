@@ -1239,8 +1239,12 @@ cdef class FaustFact:
 
         if(isReal):
             del cpp_params
+            if(core.core_faust_dbl == NULL): raise Exception("fact_hierarchical"
+                                                            " has failed.");
         else:
             del cpp_params_cplx
+            if(core.core_faust_cplx == NULL): raise Exception("fact_hierarchical"
+                                                            " has failed.");
 
         if(calling_fft_algo):
             return core, np.real(_out_buf[0]), _out_buf[1:]

@@ -197,7 +197,7 @@ FaustCoreCpp<FPP>* fact_palm4MSAFFT(FPP* mat, unsigned int num_rows, unsigned in
 template<typename FPP, typename FPP2>
 FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned int num_cols, PyxParamsFactPalm4MSA<FPP,FPP2>* p, FPP* out_buf)
 {
-    FaustCoreCpp<FPP>* core;
+    FaustCoreCpp<FPP>* core = nullptr;
     Faust::ParamsPalm<FPP,Cpu,FPP2>* params;
     Faust::MatDense<FPP,Cpu> inMat(mat, num_rows, num_cols);
     vector<const Faust::ConstraintGeneric*> cons;
@@ -237,8 +237,17 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
 
     if(p->is_verbose) params->Display();
 
-
-    palm->compute_facts();
+    try {
+        palm->compute_facts();
+    }
+    catch(std::logic_error& e)
+    {
+        //intercept error like what():  Faust::Palm4MSA : compute_lambda :
+        //Xhatt_Xhat_tr is too small or Xt_Xhat.trace is too big so lambda is
+        //infinite
+        cerr << e.what() << endl;
+        return core; // core is nullptr (way to detect error in caller code)
+    }
 
     FPP lambda = palm->get_lambda();
 
@@ -300,7 +309,7 @@ FaustCoreCpp<FPP>* fact_hierarchical_fft(FPP* U, FPP* L, unsigned int num_rows, 
 template<typename FPP, typename FPP2>
 FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_rows, unsigned int num_cols, PyxParamsHierarchicalFact<FPP, FPP2>* p, FPP* out_buf)
 {
-    FaustCoreCpp<FPP>* core;
+    FaustCoreCpp<FPP>* core = nullptr;
     Faust::MatDense<FPP,Cpu> inMat(mat, num_rows, num_cols);
     vector<const Faust::ConstraintGeneric*> cons;
     vector<std::vector<const Faust::ConstraintGeneric*>> cons_;
@@ -358,7 +367,18 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
 
     if(p->is_verbose) params->Display();
 
-    hierFact->compute_facts();
+    try {
+
+        hierFact->compute_facts();
+    }
+    catch(std::logic_error& e)
+    {
+        //intercept error like what():  Faust::Palm4MSA : compute_lambda :
+        //Xhatt_Xhat_tr is too small or Xt_Xhat.trace is too big so lambda is
+        //infinite
+        cerr << e.what() << endl;
+        return core; // core is nullptr (way to detect error in caller code)
+    }
 
     vector<Faust::MatSparse<FPP,Cpu> > facts;
     hierFact->get_facts(facts);
