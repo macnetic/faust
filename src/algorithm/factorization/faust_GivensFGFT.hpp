@@ -212,7 +212,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_D()
 {
 	// D = spdiag(diag(L))
 	for(int i=0;i<L.getNbRow();i++)
-		D.setCoeff(i,i, L(i,i));
+		D.getData()[i] = L(i,i);
 #ifdef DEBUG_GIVENS
 	D.Display();
 	cout << "D fro. norm: " << D.norm() << endl;
@@ -233,7 +233,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 	//
 	if(!((ite+1)%100) || verbosity > 1)
 	{
-		MatDense<FPP,Cpu> tmp = D;
+		MatDense<FPP,Cpu> tmp = this->get_Dspm(false);
 		tmp -= L;
 		FPP2 err = tmp.norm(), err_d;
 		err *= err;
@@ -249,18 +249,15 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::order_D()
 {
-	vector<FPP> D_ord_diag;
-	vector<int> nat_ord_indices;
-	for(int i=0;i<D.getNbRow();i++)
+	ordered_D = Vect<FPP,DEVICE>(D.size());
+	ord_indices.resize(0);
+	for(int i=0;i<D.size();i++)
 		ord_indices.push_back(i);
-	nat_ord_indices = ord_indices;
 	sort(ord_indices.begin(), ord_indices.end(), [this](int i, int j) {
-			return D.getValuePtr()[i] < D.getValuePtr()[j];
+			return D.getData()[i] < D.getData()[j];
 			});
-	for(int i=0;i<ord_indices.size();i++){
-		D_ord_diag.push_back(this->D.getValuePtr()[ord_indices[i]]);
-	}
-	ordered_D = MatSparse<FPP,Cpu>(nat_ord_indices, nat_ord_indices, D_ord_diag, nat_ord_indices.size(), nat_ord_indices.size());
+	for(int i=0;i<ord_indices.size();i++)
+		ordered_D.getData()[i] = D.getData()[ord_indices[i]];
 	is_D_ordered = true;
 }
 
@@ -286,7 +283,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */) : Lap(Lap), facts(J), D(Lap.getNbRow(), Lap.getNbCol()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(verbosity)
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */) : Lap(Lap), facts(J), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(J), L(Lap), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(verbosity)
 {
 	/* Matlab ref. code:
 	 *     facts = cell(1,J);
@@ -312,7 +309,7 @@ GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J,
 	}
 
 	// init. D
-	D.setZeros();
+	memset(D.getData(), 0, sizeof(FPP)*Lap.getNbRow());
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -331,7 +328,7 @@ const vector<FPP2>& GivensFGFT<FPP,DEVICE,FPP2>::get_errs() const
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-const Faust::MatSparse<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_D(const bool ord /* default to false */)
+const Faust::Vect<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_D(const bool ord /* default to false */)
 {
 	if(ord)
 	{
@@ -344,11 +341,26 @@ const Faust::MatSparse<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_D(const boo
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
+const Faust::MatSparse<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_Dspm(const bool ord /* default to false */)
+{
+	const Faust::Vect<FPP,DEVICE>& D_ = this->get_D(ord);
+	vector<int> nat_ord_indices;
+	vector<FPP> diag_D;
+	for(int i=0;i<D_.size();i++)
+	{
+		nat_ord_indices.push_back(i);
+		diag_D.push_back(D_.getData()[i]);
+	}
+	MatSparse<FPP,DEVICE> spD(nat_ord_indices, nat_ord_indices, diag_D, nat_ord_indices.size(), nat_ord_indices.size());
+	return spD;
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::get_D(FPP* diag_data, const bool ord /* default to false */)
 {
-	get_D(ord);
-	FPP* src_data_ptr = ord?ordered_D.getValuePtr():D.getValuePtr();
-	memcpy(diag_data, src_data_ptr, sizeof(FPP)*D.getNbRow());
+	const Faust::Vect<FPP,DEVICE>& D_ = get_D(ord);
+	const FPP* src_data_ptr = D_.getData();
+	memcpy(diag_data, src_data_ptr, sizeof(FPP)*D_.size());
 }
 
 

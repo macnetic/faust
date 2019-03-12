@@ -38,7 +38,7 @@ namespace Faust {
 				/** \brief Fourier matrix factorization matrices (Givens matrix). */
 				vector<Faust::MatSparse<FPP,DEVICE>> facts;
 				/** \brief Diagonalization approximate of Laplacian. */
-				Faust::MatSparse<FPP,DEVICE> D;
+				Faust::Vect<FPP,DEVICE> D;
 				/** \brief Queue of errors (cf. calc_err()). */
 				vector<FPP2> errs;
 				/** \brief Pivot choices (p, q) coordinates. */
@@ -65,7 +65,7 @@ namespace Faust {
 				/** \brief Ordered indices of D to get increasing eigenvalues along the diagonal. */
 				vector<int> ord_indices;
 				/** \brief Cache for the ordered D. */
-				Faust::MatSparse<FPP,DEVICE> ordered_D;
+				Faust::Vect<FPP,DEVICE> ordered_D;
 				/** \brief true if D has already been ordered (order_D() was called). */
 				bool is_D_ordered;
 
@@ -197,9 +197,16 @@ namespace Faust {
 				FPP2 get_err(int j) const;
 
 				/**
-				 * Returns the matrix D in its current status (which is updated at each iteration).
+				 * Returns the diag. vector D in its current status (which is updated at each iteration).
 				 */
-				const MatSparse<FPP,DEVICE>& get_D(const bool ord=false);
+				const Vect<FPP,DEVICE>& get_D(const bool ord=false);
+
+				/** \brief Returns the diagonal vector as a sparse matrix.
+				 *
+				 * \note This function makes copies, is not intented for repeated use (use get_D() for optimized calls).
+				 *
+				 **/
+				const Faust::MatSparse<FPP,DEVICE> get_Dspm(const bool ord=false);
 
 				/**
 				 * Returns the diagonal by copying it in the buffer diag_data (should be allocated by the callee).

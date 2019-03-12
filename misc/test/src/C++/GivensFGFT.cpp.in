@@ -73,7 +73,7 @@ int main()
 
 	cout << "fourier_diag fro norm: " << fourier_diag.norm() << endl;
 
-	const Faust::MatSparse<FPP,Cpu>& D = algo.get_D();
+	const Faust::MatSparse<FPP,Cpu> D = algo.get_Dspm();
 	Faust::MatDense<FPP,Cpu> full_D = Faust::MatDense<FPP,Cpu>(D);
 	cout << "D fro norm:" << D.norm() << endl;
 
@@ -91,7 +91,7 @@ int main()
 	assert(fourier_diag2.norm()==0);
 	assert(ordered_fourier_diag2.norm()==0);
 
-	Faust::MatDense<FPP,Cpu> ordered_D(algo.get_D(true));
+	Faust::MatDense<FPP,Cpu> ordered_D(algo.get_Dspm(true));
 
 	cout << "orderded D fro norm: " << ordered_D.norm() << endl;
 	cout << "ordered_D:" << endl;
