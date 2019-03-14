@@ -146,6 +146,16 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_fact()
 	this->fact_mod_values.push_back(cos(this->theta));
 }
 
+template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L()
+{
+	// L = S'*L*S
+#ifdef DEBUG_GIVENS
+	cout << "L(p,q) before update_L():" << L(p,q) << endl;
+#endif
+	this->facts[this->ite].multiply(this->L, 'T');
+	this->L.multiplyRight(this->facts[this->ite]);
+}
 
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTParallel<FPP,DEVICE,FPP2>::finish_fact()

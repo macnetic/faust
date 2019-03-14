@@ -164,6 +164,8 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_fact()
 	//        facts{j} = S;
 	//
 	int n = Lap.getNbRow();
+	FPP2 c = cos(theta);
+	FPP2 s = sin(theta);
 	// forget previous rotation coeffs
 	// and keep identity part (n first coeffs)
 	fact_mod_row_ids.resize(n);
@@ -173,19 +175,19 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_fact()
 	// 1st one
 	fact_mod_row_ids.push_back(p);
 	fact_mod_col_ids.push_back(p);
-	fact_mod_values.push_back(cos(theta));
+	fact_mod_values.push_back(c);
 	// 2nd
 	fact_mod_row_ids.push_back(p);
 	fact_mod_col_ids.push_back(q);
-	fact_mod_values.push_back(-sin(theta));
+	fact_mod_values.push_back(-s);
 	// 3rd
 	fact_mod_row_ids.push_back(q);
 	fact_mod_col_ids.push_back(p);
-	fact_mod_values.push_back(sin(theta));
+	fact_mod_values.push_back(s);
 	// 4th
 	fact_mod_row_ids.push_back(q);
 	fact_mod_col_ids.push_back(q);
-	fact_mod_values.push_back(cos(theta));
+	fact_mod_values.push_back(c);
 	facts[ite] = MatSparse<FPP,DEVICE>(fact_mod_row_ids, fact_mod_col_ids, fact_mod_values, n, n);
 #ifdef DEBUG_GIVENS
 	cout << "GivensFGFT::update_fact() ite: " << ite << " fact norm: " << facts[ite].norm() << endl;
@@ -200,8 +202,52 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
 #ifdef DEBUG_GIVENS
 	cout << "L(p,q) before update_L():" << L(p,q) << endl;
 #endif
+#define OPT_UPDATE_L
+#ifndef OPT_UPDATE_L
 	facts[ite].multiply(L, 'T');
-	L.multiplyRight(MatDense<FPP,Cpu>(facts[ite]));
+	L.multiplyRight(facts[ite]);
+#else
+	Vect<FPP,DEVICE> L_vec_p = L.get_row(p), L_vec_q = L.get_row(q);
+	Vect<FPP,DEVICE> tmp, tmp2;
+	FPP2 c = *(fact_mod_values.end()-1); // cos(theta)
+	FPP2 s = *(fact_mod_values.end()-2); // sin(theta)
+#define copy_vec2Lrow(vec,rowi) \
+	for(int i=0;i<L.getNbCol();i++) L.getData()[L.getNbRow()*i+rowi] = tmp[i]
+
+	/*========== L = S'*L */
+	// L(p,:) = c*L(p,:) + s*L(q,:)
+	tmp = L_vec_p;
+	tmp *= c;
+	tmp2 = L_vec_q;
+	tmp2 *= s;
+	tmp += tmp2;
+	copy_vec2Lrow(tmp,p);
+
+	// L(q,:) = -s*L(p,:) + c*L(q,:)
+	tmp = L_vec_p;
+	tmp *= -s;
+	tmp2 = L_vec_q;
+	tmp2 *= c;
+	tmp += tmp2;
+	copy_vec2Lrow(tmp, q);
+	/*========== L *= S */
+	L_vec_p = L.get_col(p), L_vec_q = L.get_col(q);
+	// L(:,p) = c*L(:,p) + s*L(:,q)
+	tmp = L_vec_p;
+	tmp *= c;
+	tmp2 = L_vec_q;
+	tmp2 *= s;
+	tmp += tmp2;
+
+	memcpy(L.getData()+L.getNbRow()*p, tmp.getData(), sizeof(FPP)*L.getNbRow());
+	// L(:,q) = -s*L(:,p) + c*L(:,q)
+	tmp = L_vec_p;
+	tmp *= -s;
+	tmp2 = L_vec_q;
+	tmp2 *= c;
+	tmp += tmp2;
+	memcpy(L.getData()+L.getNbRow()*q, tmp.getData(), sizeof(FPP)*L.getNbRow());
+#endif
 #ifdef DEBUG_GIVENS
 	cout << "L(p,q) after update_L():" << L(p,q) << endl;
 #endif

@@ -153,7 +153,7 @@ namespace Faust {
 				 *
 				 * Updates L after Givens factor update for the next iteration.
 				 */
-				void update_L();
+				virtual void update_L();
 
 				/**
 				 * \brief Algo. step 2.5.
