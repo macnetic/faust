@@ -184,8 +184,8 @@ void Faust::Vect<FPP,Cpu>::operator+=(const Faust::Vect<FPP,Cpu>& v)
 
 	  handleError(m_className,"operator+= : dimensions are in conflict");
    }
-   FPP*const ptr_data = getData();
-   FPP*const v_ptr_data = getData();
+   FPP* ptr_data = getData();
+   const FPP* v_ptr_data = v.getData();
    for (int i=0 ; i<size() ; i++)
       ptr_data[i] += v_ptr_data[i];
 }
