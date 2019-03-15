@@ -207,14 +207,26 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
 	facts[ite].multiply(L, 'T');
 	L.multiplyRight(facts[ite]);
 #else
-	Vect<FPP,DEVICE> L_vec_p = L.get_row(p), L_vec_q = L.get_row(q);
-	Vect<FPP,DEVICE> tmp, tmp2;
+	Faust::Vect<FPP,DEVICE> L_vec_p, L_vec_q;
 	FPP2 c = *(fact_mod_values.end()-1); // cos(theta)
 	FPP2 s = *(fact_mod_values.end()-2); // sin(theta)
+	update_L_first(L_vec_p, L_vec_q, c, s);
+	update_L_second(L_vec_p, L_vec_q, c, s);
+#endif
+#ifdef DEBUG_GIVENS
+	cout << "L(p,q) after update_L():" << L(p,q) << endl;
+#endif
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s)
+{
 #define copy_vec2Lrow(vec,rowi) \
 	for(int i=0;i<L.getNbCol();i++) L.getData()[L.getNbRow()*i+rowi] = tmp[i]
 
+	Faust::Vect<FPP,DEVICE> tmp, tmp2;
 	/*========== L = S'*L */
+	L_vec_p = L.get_row(p), L_vec_q = L.get_row(q);
 	// L(p,:) = c*L(p,:) + s*L(q,:)
 	tmp = L_vec_p;
 	tmp *= c;
@@ -230,6 +242,12 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
 	tmp2 *= c;
 	tmp += tmp2;
 	copy_vec2Lrow(tmp, q);
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s)
+{
+	Faust::Vect<FPP,DEVICE> tmp, tmp2;
 	/*========== L *= S */
 	L_vec_p = L.get_col(p), L_vec_q = L.get_col(q);
 	// L(:,p) = c*L(:,p) + s*L(:,q)
@@ -247,10 +265,6 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
 	tmp2 *= c;
 	tmp += tmp2;
 	memcpy(L.getData()+L.getNbRow()*q, tmp.getData(), sizeof(FPP)*L.getNbRow());
-#endif
-#ifdef DEBUG_GIVENS
-	cout << "L(p,q) after update_L():" << L(p,q) << endl;
-#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -295,7 +309,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::order_D()
 {
-	ordered_D = Vect<FPP,DEVICE>(D.size());
+	ordered_D = Faust::Vect<FPP,DEVICE>(D.size());
 	ord_indices.resize(0);
 	for(int i=0;i<D.size();i++)
 		ord_indices.push_back(i);

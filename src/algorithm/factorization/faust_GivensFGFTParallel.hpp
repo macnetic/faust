@@ -88,15 +88,13 @@ template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTParallel<FPP,DEVICE,FPP2>::loop_update_fact()
 {
 	fact_nrots = 0;
-	int k = 0;
-	while(k < t && k < fact_nz_inds.size())
+	while(fact_nrots < t && fact_nrots < fact_nz_inds.size())
 	{
 		choose_pivot();
 		update_fact_nz_inds();
 		this->calc_theta();
 		this->update_fact();
 		fact_nrots++;
-		k++;
 	}
 	finish_fact();
 }
@@ -150,11 +148,39 @@ template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L()
 {
 	// L = S'*L*S
-#ifdef DEBUG_GIVENS
-	cout << "L(p,q) before update_L():" << L(p,q) << endl;
-#endif
+//#undef OPT_UPDATE_L
+#ifdef OPT_UPDATE_L
+	int choice_id;
+	Vect<FPP,DEVICE> L_vec_p, L_vec_q;
+	FPP2 c,s;
+	// L = S'*L
+	for(int i=0; i < fact_nrots; i++)
+	{
+		// applying first the last rotation submatrix
+		choice_id = this->coord_choices.size()-1-i;
+		c = *(this->fact_mod_values.end()-1-4*i); // cos(theta)
+		s = *(this->fact_mod_values.end()-2*(2*i+1)); // sin(theta)
+		this->p = this->coord_choices[choice_id].first;
+		this->q = this->coord_choices[choice_id].second;
+		//rely on parent for doing the job
+		this->update_L_first(L_vec_p, L_vec_q, c, s);
+	}
+	// L = L*S
+	for(int i=0; i < fact_nrots; i++)
+	{
+		// applying first the last rotation submatrix
+		choice_id = this->coord_choices.size()-1-i;
+		c = *(this->fact_mod_values.end()-1-4*i); // cos(theta)
+		s = *(this->fact_mod_values.end()-2*(2*i+1)); // sin(theta)
+		this->p = this->coord_choices[choice_id].first;
+		this->q = this->coord_choices[choice_id].second;
+		//rely on parent for doing the job
+		this->update_L_second(L_vec_p, L_vec_q, c, s);
+	}
+#else
 	this->facts[this->ite].multiply(this->L, 'T');
 	this->L.multiplyRight(this->facts[this->ite]);
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>

@@ -156,6 +156,18 @@ namespace Faust {
 				virtual void update_L();
 
 				/**
+				 * Computes the first S'*L (only used by update_L() in optimization enabled code).
+				 *
+				 */
+				void update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s);
+
+				/**
+				 * Computes L*S (only used by update_L() in optimization enabled code).
+				 * Must be called after update_L_first() to finish the update of L = S'*L*S.
+				 */
+				void update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s);
+
+				/**
 				 * \brief Algo. step 2.5.
 				 *
 				 * Updates the diagonal approximate D from L (the diagonal part is taken).
@@ -199,7 +211,7 @@ namespace Faust {
 				/**
 				 * Returns the diag. vector D in its current status (which is updated at each iteration).
 				 */
-				const Vect<FPP,DEVICE>& get_D(const bool ord=false);
+				const Faust::Vect<FPP,DEVICE>& get_D(const bool ord=false);
 
 				/** \brief Returns the diagonal vector as a sparse matrix.
 				 *
