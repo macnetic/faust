@@ -210,8 +210,8 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
 	Faust::Vect<FPP,DEVICE> L_vec_p, L_vec_q;
 	FPP2 c = *(fact_mod_values.end()-1); // cos(theta)
 	FPP2 s = *(fact_mod_values.end()-2); // sin(theta)
-	update_L_first(L_vec_p, L_vec_q, c, s);
-	update_L_second(L_vec_p, L_vec_q, c, s);
+	update_L_first(L_vec_p, L_vec_q, c, s, this->p, this->q);
+	update_L_second(L_vec_p, L_vec_q, c, s, this->p, this->q);
 #endif
 #ifdef DEBUG_GIVENS
 	cout << "L(p,q) after update_L():" << L(p,q) << endl;
@@ -219,7 +219,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s)
+void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q)
 {
 #define copy_vec2Lrow(vec,rowi) \
 	for(int i=0;i<L.getNbCol();i++) L.getData()[L.getNbRow()*i+rowi] = tmp[i]
@@ -245,7 +245,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s)
+void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q)
 {
 	Faust::Vect<FPP,DEVICE> tmp, tmp2;
 	/*========== L *= S */
