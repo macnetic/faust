@@ -507,9 +507,9 @@ classdef FaustFactory
 		%> @param t the number of Givens rotations per factor. Note that t is forced to the value min(J,t). Besides, a value of t such that t > size(M,1)/2 won't lead to the desired effect because the maximum number of rotation matrices per factor is anyway size(M,1)/2. The parameter t is meaningful in the parallel version of the truncated Jacobi algorithm (cf. references below). If t <= 1 (by default) then the function runs the non-parallel algorithm.
 		%> @param verbosity the level of verbosity, the greater the value the more info. is displayed.
 		%>
-		%> @retval [V,W]
-		%> - V the Faust object representing the approximate eigenvector transform. V has its last factor being a permutation matrix, the goal of this factor is to apply to the columns of V the same order as eigenvalues set in W.
-		%> - W the approximate sparse diagonal matrix of the eigenvalues (in ascendant order along the rows/columns).
+		%> @retval [V,D]
+		%> - V the Faust object representing the approximate eigenvector transform. V has its last factor being a permutation matrix, the goal of this factor is to apply to the columns of V the same order as eigenvalues set in D.
+		%> - D the approximate sparse diagonal matrix of the eigenvalues (in ascendant order along the rows/columns).
 		%>
 		%> @b Example
 		%> @code
@@ -534,8 +534,21 @@ classdef FaustFactory
 		%> <p> @b See @b also FaustFactory.fgft_givens, FaustFactory.fgft_palm
 		%>
 		%==========================================================================================
-		function [V,W] = eigtj(M, J, varargin)
-			[V, W] = matfaust.FaustFactory.fgft_givens(M, J, varargin{:});
+		function [V,D] = eigtj(M, J, varargin)
+			[V, D] = matfaust.FaustFactory.fgft_givens(M, J, varargin{:});
+		end
+
+		function [U,S,V] = svdtj(M, J, varargin)
+			[W1,D1] = matfaust.FaustFactory.eigtj(M*M', J, varargin{:});
+			[W2,D2] = matfaust.FaustFactory.eigtj(M'*M, J, varargin{:});
+			S = diag(W1'*M*W2);
+			[~,I] = sort(abs(S), 'desc')
+			S = spdiag(S(I))
+			sign_S = sign(S);
+			S = S*sign_S
+			Id = eye(size(S));
+			U = W1*matfaust.Faust({Id(:,I),sign_S});
+			V = W2*matfaust.Faust(Id(:,I));
 		end
 
 		%==========================================================================================
