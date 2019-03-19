@@ -1904,6 +1904,24 @@ class FaustFactory:
         return ret_list
 
     @staticmethod
+    def svdtj(M, J, t=1):
+        from scipy.sparse import spdiags
+        from scipy import diag
+        from pyfaust import Faust
+        from numpy import argsort,sign,eye
+        W1, D1 = FaustFactory.eigtj(M@M.T, J, t)
+        W2, D2 = FaustFactory.eigtj(M.T@M, J, t)
+        S = diag(W1.T*M*W2.todense())
+        I = argsort(abs(S))[::-1]
+        sign_S = spdiags(sign(S[I]), [0], S.shape[0], S.shape[0])
+        S = spdiags(S[I], [0], S.shape[0], S.shape[0])
+        S *= sign_S
+        Id = eye(S.shape[0])
+        U = W1*Faust([Id[:,I],sign_S.toarray()])
+        V = W2*Faust(Id[:,I])
+        return U,S,V
+
+    @staticmethod
     def eigtj(M, J, t=1, verbosity=0):
         """
         Computes the eigenvalues and the eigenvectors transform (as a Faust object) using the truncated Jacobi algorithm.
