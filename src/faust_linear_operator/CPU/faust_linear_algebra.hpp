@@ -64,6 +64,7 @@
 template<typename FPP>
 void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)
 {
+	//TODO: refactoring should be done to avoid repeating similar block of code for different cases (typeA,typeB,alpha,beta)
 //#ifdef __COMPILE_TIMERS__
 //	A.t_gemm.start();
 //#endif
@@ -74,7 +75,7 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 		handleError("linear_algebra", " Faust::spgemm : C is the same object as A or B");
 	}
 
-	if (typeA == 'T')
+	if (typeA == 'T' || typeA == 'H')
 	{
 		nbRowOpA = A.getNbCol();
 		nbColOpA = A.getNbRow();
@@ -85,7 +86,7 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 	}
 
 
-	if (typeB == 'T')
+	if (typeB == 'T' || typeA == 'H')
 	{
 		nbRowOpB = B.getNbCol();
 		nbColOpB = B.getNbRow();
@@ -135,6 +136,11 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 			C=A;
 			if(typeA == 'T')
 				C.transpose();
+			else if(typeA = 'H')
+			{
+				C.transpose();
+				C.conjugate();
+			}
 			if(alpha!=FPP(1.0))
 				C*= alpha;
 			C.isZeros = false;
@@ -149,18 +155,31 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 			{
 				if (typeB == 'N')
 					C.mat.noalias() = alpha * A.mat * B.mat;
-				else
+				else if(typeB == 'T')
 					C.mat.noalias() = alpha * A.mat * B.mat.transpose();
-			}else
+				else // typeB == 'H'
+					C.mat.noalias() = alpha * A.mat * B.mat.adjoint();
+			}else if(typeA == 'T')
 			{
 				if (typeB == 'N')
 					C.mat.noalias() = alpha * A.mat.transpose() * B.mat;
-				else
+				else if(typeB == 'T')
 					C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose();
+				else // typeB == 'H'
+					C.mat.noalias() = alpha * A.mat.transpose() * B.mat.adjoint();
+			} else // typeA == 'H'
+			{
+				if (typeB == 'N')
+					C.mat.noalias() = alpha * A.mat.adjoint() * B.mat;
+				else if(typeB == 'T')
+					C.mat.noalias() = alpha * A.mat.adjoint() * B.mat.transpose();
+				else // typeB == 'H'
+					C.mat.noalias() = alpha * A.mat.adjoint() * B.mat.adjoint();
+
 			}
 
 
-	}else
+	}else //beta != 0
 	{
 		if(B.isZeros)
 		{
@@ -188,6 +207,11 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 			Faust::MatDense<FPP,Cpu> A_tmp(A);
 			if(typeA == 'T')
 				A_tmp.transpose();
+			else if(typeA == 'H')
+			{
+				A_tmp.conjugate(false);
+				A_tmp.transpose();
+			}
 			if(alpha != FPP(1.0))
 				A_tmp *= alpha;
 			C += A_tmp;
@@ -200,21 +224,32 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 			return;
 		}
 
-			if (typeA == 'N')
-			{
-				if (typeB == 'N')
-				{
-						C.mat = alpha * A.mat * B.mat + beta * C.mat;
-				}else
-					C.mat = alpha * A.mat * B.mat.transpose() + beta * C.mat;
-			}else
-			{
-				if (typeB == 'N')
-					C.mat = alpha * A.mat.transpose() * B.mat + beta * C.mat ;
-				else
-					C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
-			}
-
+		if (typeA == 'N')
+		{
+			if (typeB == 'N')
+				C.mat = alpha * A.mat * B.mat + beta * C.mat;
+			else if(typeB == 'T')
+				C.mat = alpha * A.mat * B.mat.transpose() + beta * C.mat;
+			else //typeB == 'H'
+				C.mat = alpha * A.mat * B.mat.adjoint() + beta * C.mat;
+		}else if(typeA == 'T')
+		{
+			if (typeB == 'N')
+				C.mat = alpha * A.mat.transpose() * B.mat + beta * C.mat ;
+			else if(typeB == 'T')
+				C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
+			else //typeB 'H'
+				C.mat = alpha * A.mat.transpose() * B.mat.adjoint() + beta * C.mat;
+		}
+		else //typeA == 'H'
+		{
+			if (typeB == 'N')
+				C.mat = alpha * A.mat.adjoint() * B.mat + beta * C.mat ;
+			else if(typeB == 'T')
+				C.mat = alpha * A.mat.adjoint() * B.mat.transpose() + beta * C.mat;
+			else //typeB 'H'
+				C.mat = alpha * A.mat.adjoint() * B.mat.adjoint() + beta * C.mat;
+		}
 
 	}
 	C.isZeros = false;
