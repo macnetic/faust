@@ -77,7 +77,7 @@ void Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 		M.setZeros();
 	else
 	{
-		if (k<nb_elt_mat && k < M.getNonZeros())
+		if (k<nb_elt_mat /* && k < M.getNonZeros()*/)
 		{
 		const std::vector<FPP> vec(M.getData(), M.getData()+nb_elt_mat);
 		std::vector<int> index;
