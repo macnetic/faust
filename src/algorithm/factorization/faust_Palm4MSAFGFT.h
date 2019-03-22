@@ -12,14 +12,13 @@ namespace Faust {
 	template<typename FPP, Device DEVICE, typename FPP2 = double>
 		class Palm4MSAFGFT : public Palm4MSA<FPP, DEVICE, FPP2>
 	{
-		MatDense<FPP, DEVICE> D; //TODO: later it will need to be Sparse (which needs to add a prototype overload for multiplication in faust_linear_algebra.h)
-		MatDense<FPP,DEVICE> D_grad_over_c; //TODO: move to sparse mat later
+		MatSparse<FPP, DEVICE> D;
+		MatDense<FPP,DEVICE> D_grad_over_c;
 		public:
-			//TODO: another ctor (like in Palm4MSA) for hierarchical algo. use
 			Palm4MSAFGFT(const ParamsPalmFGFT<FPP, DEVICE, FPP2>& params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal=false);
 			Palm4MSAFGFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFGFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal);
 			void next_step();
-			const MatDense<FPP, DEVICE>& get_D();
+			const MatSparse<FPP, DEVICE>& get_D();
 			void get_D(FPP* diag_data);
 		private:
 			void compute_grad_over_c();

@@ -143,6 +143,7 @@ namespace Faust
           void update_L();
           void update_R();
           virtual void compute_lambda();
+		  void compute_lambda(Faust::MatDense<FPP,DEVICE>& LorR);
           static const char * m_className;
           static const FPP lipschitz_multiplicator;
 

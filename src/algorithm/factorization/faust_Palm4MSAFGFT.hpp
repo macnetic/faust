@@ -1,15 +1,16 @@
 #include <cstring>
 
 	template <typename FPP, Device DEVICE, typename FPP2>
-Palm4MSAFGFT<FPP,DEVICE,FPP2>::Palm4MSAFGFT(const ParamsPalmFGFT<FPP, DEVICE, FPP2>& params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(params, blasHandle, isGlobal), D(params.init_D)
+Palm4MSAFGFT<FPP,DEVICE,FPP2>::Palm4MSAFGFT(const ParamsPalmFGFT<FPP, DEVICE, FPP2>& params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(params, blasHandle, isGlobal), D(MatSparse<FPP,Cpu>(params.init_D))
 {
-	//TODO: is there something to check additionally to what parent's ctor checks ?
 }
 
 template<typename FPP,Device DEVICE,typename FPP2>
-Palm4MSAFGFT<FPP,DEVICE,FPP2>::Palm4MSAFGFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFGFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(Lap, params, blasHandle, isGlobal), D(params.init_D)
+Palm4MSAFGFT<FPP,DEVICE,FPP2>::Palm4MSAFGFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFGFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(Lap, params, blasHandle, isGlobal), D(MatSparse<FPP,Cpu>(params.init_D))
 {
 }
+
+
 
 template <typename FPP, Device DEVICE, typename FPP2>
 void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
@@ -50,7 +51,6 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 	complexity[3] = L2*S2*R2 + L1*L2*R2 + L1*R2*S2 + L2*L1*S2;
 
 	int idx = distance(complexity.begin(), min_element(complexity.begin(), complexity.end()));
-
 	this->error = this->data;
 	Faust::MatDense<FPP,DEVICE> tmp1,tmp2,tmp3;
 
@@ -88,9 +88,9 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 			multiply(this->RorL[this->m_indFact], tmp1, tmp2, this->blas_handle);
 		}
 	}
-	// tmp1 = L*this->S*R*D //TODO: review the mul with D being MatSparse
-	//TODO: optimize by determining the best product order regarding computation time
-	multiply(tmp2, D, tmp1, this->blas_handle);
+	// tmp1 = L*this->S*R*D
+	tmp1 = tmp2;
+	tmp1 *= D;
 	// this->error = lambda*tmp1*lambda*tmp2'-data // this->error is data before this call
 	gemm(tmp1, tmp2, this->error, this->m_lambda*this->m_lambda, (FPP)-1.0, 'N', this->TorH, this->blas_handle);
 
@@ -137,6 +137,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 
 	}
 
+
 	this->isGradComputed = true;
 
 #ifdef __COMPILE_TIMERS__
@@ -154,18 +155,14 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_lambda()
 	// Xhat = LorR*D*LorR' //  LorR equals the prod of all factors after their update iterations (in loop of next_step())
 	MatDense<FPP,Cpu> tmp;
 	// tmp = D*LorR'
-	gemm(this->D, this->LorR, tmp, (FPP) 1.0, (FPP) 0.0, 'N', this->TorH, this->blas_handle);
+	Faust::spgemm(this->D, this->LorR, tmp, (FPP) 1.0, (FPP) 0.0, 'N', this->TorH/*, this->blas_handle*/);
 	// LorR = LorR*tmp
 	gemm(this->LorR, tmp, D_grad_over_c, (FPP) 1.0, (FPP) 0.0, 'N', 'N', this->blas_handle);
-	tmp = this->LorR;
-	this->LorR = D_grad_over_c;
-	//NOTE: D_grad_over_c has nothing to do here but is equal to LorR*D*LorR*D'
+	//NOTE: D_grad_over_c has nothing to do here but is equal to LorR*D*LorR'
 	//		this product is thus not re-computed in compute_D_grad_over_c()
-	//TODO: avoid all these copies
 	// at this stage we can rely on parent function to compute lambda
-	Palm4MSA<FPP,DEVICE,FPP2>::compute_lambda();
+	Palm4MSA<FPP,DEVICE,FPP2>::compute_lambda(D_grad_over_c);
 	// reset LorR at the factor product to continue next iterations
-	this->LorR = tmp;
 	//then we finish the lambda computation with a sqrt() (Fro. norm)
 	this->m_lambda = std::sqrt(/*Faust::abs(*/this->m_lambda);//);
 	// (that's an additional operation in Palm4MSAFGFT)
@@ -181,22 +178,15 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::next_step()
 }
 
 
-
-
 template <typename FPP, Device DEVICE, typename FPP2>
 void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_D()
 {
 	// besides to what the parent has done
 	// we need to update D
 	compute_D_grad_over_c();
-	D -= D_grad_over_c;
-	//TODO: optimize MatSparse + no-copy (Eigen::DiagonalMatrix ?)
-	FPP * data = new FPP[D.getNbRow()*D.getNbCol()];
-	memset(data, 0, sizeof(FPP)*D.getNbRow()*D.getNbCol());
+//#pragma omp parallel for schedule(static)
 	for(faust_unsigned_int i = 0; i < D.getNbCol();i++)
-		data[i*D.getNbCol()+i] = D[i*D.getNbCol()+i];
-	D = MatDense<FPP,Cpu>(data, D.getNbRow(), D.getNbCol());
-	delete data;
+		D.getValuePtr()[i] = D.getValuePtr()[i]-D_grad_over_c.getData()[i*D.getNbCol()+i];
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
@@ -205,10 +195,9 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
 	// Uhat = lambda*LorR
 	// grad = 0.5*Uhat'*(Uhat*D*Uhat' - X)*Uhat
 	MatDense<FPP, Cpu> tmp;
-	//compute_lambda has already compute D_grad_over_c = LorR*D*LorR'
+	//compute_lambda has already computed D_grad_over_c = LorR*D*LorR'
 	D_grad_over_c.scalarMultiply(this->m_lambda*this->m_lambda);
 	D_grad_over_c -= this->data;
-	//TODO: opt. by determining best order of product
 	// tmp = Uhat'*(Uhat*D*Uhat' - X)
 	gemm(this->LorR, D_grad_over_c, tmp, (FPP) this->m_lambda, (FPP) 0., this->TorH, 'N', this->blas_handle);
 	// D_grad_over_c = 0.5*Uhat'*(Uhat*D*Uhat' - X)*Uhat
@@ -216,7 +205,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>
-const MatDense<FPP, DEVICE>& Palm4MSAFGFT<FPP,DEVICE,FPP2>::get_D()
+const MatSparse<FPP, DEVICE>& Palm4MSAFGFT<FPP,DEVICE,FPP2>::get_D()
 {
 	return this->D;
 }
@@ -224,9 +213,7 @@ const MatDense<FPP, DEVICE>& Palm4MSAFGFT<FPP,DEVICE,FPP2>::get_D()
 template <typename FPP, Device DEVICE, typename FPP2>
 void Palm4MSAFGFT<FPP,DEVICE,FPP2>::get_D(FPP* diag_data)
 {
-	for(int i=0;i<D.getNbRow();i++)
-		diag_data[i] = D.getData()[i*D.getNbRow()+i];
-	//TODO: when D will switch to MatSparse (or diag mat) directory copy the buffer per block
+	memcpy(diag_data, this->D.getValuePtr(), sizeof(FPP)*this->D.getNbCol());
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>

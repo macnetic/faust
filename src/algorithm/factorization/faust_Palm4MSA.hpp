@@ -375,6 +375,12 @@ t_local_compute_grad_over_c.stop();
 template<typename FPP,Device DEVICE,typename FPP2>
 void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_lambda()
 {
+	compute_lambda(LorR);
+}
+
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_lambda(Faust::MatDense<FPP,DEVICE>& LorR)
+{
 #ifdef __COMPILE_TIMERS__
 t_global_compute_lambda.start();
 t_local_compute_lambda.start();
