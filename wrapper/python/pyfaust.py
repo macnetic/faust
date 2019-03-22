@@ -1905,20 +1905,46 @@ class FaustFactory:
 
     @staticmethod
     def svdtj(M, J, t=1):
+        """
+            Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
+
+            NOTE: this function is based on FaustFactory.eigtj.
+
+            Args:
+                M: a real matrix.
+                J: see FaustFactory.eigtj
+                t: see FaustFactory.eigtj
+
+            Returns:
+                The tuple U,S,V: U*S.todense()*V' being the approximation of M.
+                    - (sparse diagonal matrix) S the singular values in
+                    descendant order.
+                    - (Faust object) U the left-singular transform.
+                    - (faust object) V the right-singular transform.
+
+            Example:
+            >>> from pyfaust import FaustFactory as FF
+            >>> from numpy.random import rand
+            >>> M = rand(128,128)
+            >>> U,S,V = FF.svdtj(M)
+
+         See also:
+            FaustFactory.eigtj
+        """
         from scipy.sparse import spdiags
         from scipy import diag
         from pyfaust import Faust
         from numpy import argsort,sign,eye
-        W1, D1 = FaustFactory.eigtj(M@M.T, J, t)
-        W2, D2 = FaustFactory.eigtj(M.T@M, J, t)
+        W1, D1 = FaustFactory.eigtj(M.dot(M.T), J, t)
+        W2, D2 = FaustFactory.eigtj(M.T.dot(M), J, t)
         S = diag(W1.T*M*W2.todense())
         I = argsort(abs(S))[::-1]
         sign_S = spdiags(sign(S[I]), [0], S.shape[0], S.shape[0])
         S = spdiags(S[I], [0], S.shape[0], S.shape[0])
         S *= sign_S
         Id = eye(S.shape[0])
-        U = W1*Faust([Id[:,I],sign_S.toarray()])
-        V = W2*Faust(Id[:,I])
+        U = W1[:,0:S.shape[0]]*Faust([Id[:,I],sign_S.toarray()])
+        V = W2[:,0:S.shape[0]]*Faust(Id[:,I])
         return U,S,V
 
     @staticmethod
