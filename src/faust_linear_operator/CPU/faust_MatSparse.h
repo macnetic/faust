@@ -263,7 +263,10 @@ namespace Faust
 			void multiply(Faust::Vect<FPP,Cpu> & vec, char opThis='N') const
 			{ vec.multiplyLeft((*this),opThis);}
 
-
+			Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> & vec) const
+			{
+				return *this * vec;
+			}
 			//! \brief compute MatSparse-MatDense multiplication
 			//! \param M : the dense matrix
 			//! \param opThis : character

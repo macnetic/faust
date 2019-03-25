@@ -64,50 +64,7 @@
 
 
 // const char * core_algebra_name="Faust::Transform<FPP,Cpu>_algebra : ";
-template<typename FPP>
-FPP Faust::power_iteration(const  Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max,double threshold, int & flag)
-{
 
-
- const int nb_col = A.getNbCol();
-   int i = 0;
-   flag = 0;
-
-   if (nbr_iter_max <= 0)
-      handleError("faust_transform_algebra "," power_iteration :  nbr_iter_max <= 0");
-   if (nb_col != A.getNbRow())
-      handleError("faust_transform_algebra "," power_iteration : Faust::Transform_gpu<FPP,Cpu> 1 must be a squared matrix");
-
-   Faust::Vect<FPP,Cpu> xk(nb_col);
-   xk.setOnes();
-   xk.normalize();
-   Faust::Vect<FPP,Cpu> xk_norm(xk);
-   FPP lambda_old=FPP(1.0);
-   FPP lambda = FPP(0.0);
-   while(absValue(lambda_old-lambda)>threshold && i<nbr_iter_max)
-   {
-      i++;
-      lambda_old = lambda;
-      xk_norm = xk;
-      xk_norm.normalize();
-      xk = A*xk_norm;
-      lambda = xk_norm.dot(xk);
-
-	
-   }
-   flag = (i<nbr_iter_max)?i:-1;
-   return lambda;
-
-
-
-
-
-
-
-
-
-
-}
 
 
 

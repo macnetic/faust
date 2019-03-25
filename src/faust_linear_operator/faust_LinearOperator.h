@@ -64,6 +64,8 @@ namespace Faust
     // modif AL AL
     template<typename FPP,Device DEVICE>
     class MatDense;
+	template<typename FPP, Device DEVICE>
+		class Vect;
 
     template<typename FPP,Device DEVICE>
     class LinearOperator
@@ -78,6 +80,8 @@ namespace Faust
         *  \brief Transpose the Faust::MatDense
         */
         virtual void transpose()=0;
+
+		virtual Faust::Vect<FPP,DEVICE> multiply(const Faust::Vect<FPP,DEVICE> &v) const=0;
 
         /*! \brief faust_gemm — Performs a matrix calculation of the form alpha . (*this).B +beta.C, with B and C 2 faust_matrix and two real constants you supply. <br>
 

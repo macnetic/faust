@@ -43,6 +43,7 @@
 
 #include "faust_constant.h"
 #include "faust_MatSparse.h"
+#include "faust_linear_algebra.h"
 #include <complex>
 
 
@@ -53,9 +54,6 @@ namespace Faust
 	template<typename FPP,Device DEVICE> class Vect;
 	template<typename FPP,Device DEVICE> class Transform;
 
-
-	template<typename FPP>
-	FPP power_iteration(const Faust::Transform<FPP,Cpu> & A, const int nbr_iter_max,double threshold, int & flag);
 
 	// compute absolute value of complex scalar
 	template<typename FPP>

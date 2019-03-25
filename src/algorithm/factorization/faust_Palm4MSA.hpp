@@ -538,7 +538,7 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_c()
 
    if (!isConstantStepSize)
    {
-		faust_int flag1,flag2;
+		int flag1,flag2;
 
 	   int nbr_iter = 10000;
 	   FPP2 threshold = 1e-16;

@@ -238,7 +238,10 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 	void multiply(Faust::Vect<FPP,Cpu> & vec,const char opThis) const
 	{Faust::gemv((*this),vec,vec,(FPP) 1.0, (FPP) 0.0,opThis);}
 
-
+	Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> & vec) const
+	{
+		return *this * vec;
+	}
 
 
 	//! \brief compute MatGeneric-MatDense multiplication
@@ -346,7 +349,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! \param flag : convergence flag
         //! \return Return the estimated spectral norm (maximum singular value in absolute value) using power iteration algorithm
         //! See also, template<typename FPP> FPP power_iteration(const MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold,faust_int & flag);
-        FPP spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, faust_int & flag,Faust::BlasHandle<Cpu>  blas_handle=Faust::BlasHandle<Cpu>()) const;
+        FPP spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, int & flag,Faust::BlasHandle<Cpu>  blas_handle=Faust::BlasHandle<Cpu>()) const;
 
         //! \brief Compute the trace of the MatDense
         //! \return  the trace

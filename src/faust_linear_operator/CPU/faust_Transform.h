@@ -230,7 +230,12 @@ namespace Faust
 				 *! \tparam  x :  the vector to be multiplied
 				 *! \tparam opThis : character
 				 */
-				Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis='N') const;
+				Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis) const;
+
+				Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu>& x) const
+				{
+					return this->multiply(x,'N');
+				}
 
 
 				/*!

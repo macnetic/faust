@@ -43,6 +43,7 @@
 
 #include <iostream>
 
+#include "faust_LinearOperator.h"
 #include "faust_Vect.h"
 #include "faust_MatDense.h"
 #include "faust_constant.h"
@@ -645,7 +646,7 @@ A.t_add_ext.stop();
 
 // compute the biggest eigenvalue of A, A must be semi-definite positive
 template<typename FPP, typename FPP2>
-FPP Faust::power_iteration(const  Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold, faust_int & flag)
+FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold, int & flag)
 {
 	#ifdef __COMPILE_TIMERS__
 		A.t_power_iteration.start();
@@ -683,7 +684,7 @@ FPP Faust::power_iteration(const  Faust::MatDense<FPP,Cpu> & A, const faust_unsi
       		lambda_old = lambda;
       		xk_norm = xk;
       		xk_norm.normalize();
-      		xk = A*xk_norm;
+      		xk = A.multiply(xk_norm);
       		lambda = xk_norm.dot(xk);
      		//std::cout << "i = " << i << " ; lambda=" << lambda << std::endl;
    	}
@@ -709,6 +710,16 @@ Faust::Vect<FPP,Cpu> Faust::operator*(const Faust::MatDense<FPP,Cpu>& M, const F
 	vec.multiplyLeft(M);
 	return vec;
 }
+
+template<typename FPP>
+Faust::Vect<FPP,Cpu> Faust::operator*(const Faust::MatSparse<FPP,Cpu>& M, const Faust::Vect<FPP,Cpu>& v)
+{
+	Faust::Vect<FPP,Cpu> vec(v);
+	vec.multiplyLeft(M);
+	return vec;
+}
+
+
 
 
 template<typename FPP>
