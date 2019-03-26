@@ -160,14 +160,12 @@ unsigned long long FaustCoreCpp<FPP>::nnz() const
 
 
 template<typename FPP>
-double FaustCoreCpp<FPP>::norm(int ord) const
+double FaustCoreCpp<FPP>::norm(int ord, double threshold, int max_num_its) const
 {
-    double precision = 0.001;
-    faust_unsigned_int nbr_iter_max = 100;
     int flag; //not used yet
     switch(ord) {
         case 2:
-            return this->transform->spectralNorm(nbr_iter_max, precision, flag);
+            return this->transform->spectralNorm(max_num_its, threshold, flag);
         case 1:
             return this->transform->normL1();
         default:

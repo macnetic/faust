@@ -70,7 +70,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP>* mul_scal(FPP scal);
     FaustCoreCpp<FPP>* normalize(int ord) const;
     unsigned long long nnz()const;
-    double norm(int ord) const;
+    double norm(int ord, double threshold=.001, int max_num_its=100) const;
     double normFro() const;
     double normInf() const;
     double get_nb_factors() const;

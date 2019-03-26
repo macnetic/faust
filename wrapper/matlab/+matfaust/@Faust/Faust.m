@@ -1327,14 +1327,17 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F, 2) the 2-norm or maximum singular value of F: approximately norm(full(F),2) == max(svd(full(F))).<br/><br>
+		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F, 2) the 2-norm or maximum singular value of F: approximately norm(full(F),2) == max(svd(full(F))).<br/><br/>
+		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F, 2, 'threshold', 0.001, 'max_num_its', 1000).<br/><br/>
 		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F) the same as norm(F, 2).<br/><br>
-		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F, 1) the 1-norm of F: norm(full(F), 1) == max(sum(abs(full(F))))  <br/><br>
+		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F, 1) the 1-norm of F: norm(full(F), 1) == max(sum(abs(full(F))))  <br/><br/>
 		%> &nbsp;&nbsp;&nbsp; @b n = @b norm(F, inf) the inf-norm of F: norm(full(F), inf) == max(sum(abs(full(F)'))) <br/><br/>
-		%> &nbsp;&nbsp;&nbsp; @b n = @b @b norm(F, @b 'fro') the Frobenius norm of F: norm(full(F), 'fro').<br/><br>
+		%> &nbsp;&nbsp;&nbsp; @b n = @b @b norm(F, @b 'fro') the Frobenius norm of F: norm(full(F), 'fro').<br/><br/>
 		%>
 		%> @param F the Faust object.
 		%> @param p (optional) the norm order or type. Respectively 1, 2 or inf for the 1-norm, 2-norm and inf-norm or 'fro' for the Frobenius norm (by default the 2-norm is computed).
+		%> @param threshold (optional) power iteration algorithm threshold (default to .001). Used only for norm(2). It's passed in a key-value pair fashion: 'threshold', .001
+		%> @param max_num_its (optional) maximum number of iterations for power iteration algorithm. Used only for norm(2). It's passed in a key-value pair fashion: 'max_num_its', 1000.
 		%>
 		%>
 		%> @retval n the norm (real).
@@ -1374,12 +1377,14 @@ classdef Faust
 			% 'fro'.
 
 			nb_input = length(varargin);
-			if (nb_input > 1)
+			if (nb_input > 5)
 				error('Too many input arguments');
 			end
 
 			ord = 2;
-			if nb_input == 1
+			args = {ord}
+			ord2_valid_param = false;
+			if nb_input >= 1
 				if(varargin{1} == 'fro')
 					if (F.isReal)
 						n = mexFaustReal('normfro',F.matrix.objectHandle);
@@ -1392,12 +1397,38 @@ classdef Faust
 					error('only 1, 2, inf or Frobenius norms are supported for the Faust');
 				end
 				ord = varargin{1};
+				args = {ord};
+				extra_opts = cell(2);
+				if(ord == 2)
+					keys = {'threshold', 'max_num_its'};
+					i = 2;
+					while i <= nb_input
+						for j=1:length(keys)
+							if(strcmp(varargin{i}, keys{j}))
+								if(nb_input>i && isnumeric(varargin{i+1}) && isreal(varargin{i+1}))
+									eval 'extra_opts{j} = varargin{i+1};';
+									ord2_valid_param = true;
+									i = i + 1;
+								else
+									error(['Parameter value (argument index ' num2str(i+2) ') not valid for parameter key ' keys{j}]);
+								end
+							end
+						end
+						if(~ ord2_valid_param)
+							error(['invalid argument ' num2str(i+1)])
+						end
+						i = i + 1;
+						ord2_valid_param = false;
+					end
+				end
 			end
-
+			if(ord == 2 && nb_input > 2)
+				args = [ args, extra_opts{:} ];
+			end
 			if (F.isReal)
-				n = mexFaustReal('norm',F.matrix.objectHandle, ord);
+				n = mexFaustReal('norm',F.matrix.objectHandle, args{:});
 			else
-				n = mexFaustCplx('norm',F.matrix.objectHandle, ord);
+				n = mexFaustCplx('norm',F.matrix.objectHandle, args{:});
 			end
 
 		end

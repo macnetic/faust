@@ -54,7 +54,7 @@ cdef extern from "FaustCoreCpp.h" :
         unsigned int getNbCol() const
 #        void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
         unsigned long long nnz() const
-        double norm(int ord) const
+        double norm(int ord, double threshold, int max_num_its) const
         double normFro() const
         double normInf() const
         FaustCoreCpp[FPP]* normalize(int ord) const

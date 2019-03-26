@@ -460,30 +460,39 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
             // compute the 2-norm of the faust
             if (!strcmp("norm",cmd))
             {
-                if (nlhs != 1 || nrhs != 3)
+                if (nlhs != 1 || nrhs > 5 || nrhs < 3)
                     mexErrMsgTxt("norm: Unexpected arguments");
                 if(core_ptr->size() == 0)
                     mexErrMsgTxt("norm : empty faust core");
 
-
                 double precision =  0.001;
-                faust_unsigned_int nbr_iter_max=100;
+                double norm_faust;
+				int nbr_iter_max=100;
                 int flag;
                 int ord = (int) mxGetScalar(prhs[2]);
-                //printf("mexFaust.cpp norm() ord=%d\n", ord);
-                //spectralNorm(const int nbr_iter_max, FPP threshold, int &flag) const;
 
-                double norm_faust;
+				if(nrhs > 3)
+					// the treshold come before
+					precision = mxGetScalar(prhs[3]); //mxGetUint32s not available before mat2019
+				if(nrhs > 4)
+				{
+					nbr_iter_max = (int) mxGetScalar(prhs[4]);
+					if(nbr_iter_max < 0 || nbr_iter_max > 1000000000)
+					{
+						mexWarnMsgTxt("Invalid max_num_its value, go back to default value.");
+						nbr_iter_max=100;
+					}
+				}
 
                 if(ord==2)
                     norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
                 else if(ord==1)
                     norm_faust = (double) core_ptr->normL1();
-				else if(ord == -(1<<(32-1))) //that's the value for 'inf' from matlab
+				else if(ord == -(1<<(32-1))) //that's the value for 'inf' in matlab
 											// a constant from c-c++ would be better
 					norm_faust = (double) core_ptr->normInf();
                 else
-                    mexErrMsgTxt("norm : unvalid norm order.");
+                    mexErrMsgTxt("norm : invalid norm order.");
 
                 plhs[0]=mxCreateDoubleScalar(norm_faust);
 

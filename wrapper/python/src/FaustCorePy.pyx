@@ -431,20 +431,27 @@ cdef class FaustCore:
             nnz = self.core_faust_cplx.nnz()
         return nnz
 
-    def norm(self, ord):
+    def norm(self, ord, **kwargs):
         cdef double norm
+        cdef double threshold
         if(str(ord).lower() not in ["1","2","fro", "inf"]):
             raise ValueError("FaustCorePy.norm() invalid type of norm asked.")
+        threshold = .001
+        max_num_its = 100
+        if('threshold' in kwargs.keys()):
+            threshold = kwargs['threshold']
+        if('max_num_its' in kwargs.keys()):
+            max_num_its = kwargs['max_num_its']
         if(self._isReal):
             if(isinstance(ord,int)):
-                norm = self.core_faust_dbl.norm(ord)
+                norm = self.core_faust_dbl.norm(ord, threshold, max_num_its)
             elif(ord == np.inf):
                 norm = self.core_faust_dbl.normInf()
             else:
                 norm = self.core_faust_dbl.normFro()
         else:
             if(isinstance(ord,int)):
-                norm = self.core_faust_cplx.norm(ord)
+                norm = self.core_faust_cplx.norm(ord, threshold, max_num_its)
             elif(ord == np.inf):
                 norm = self.core_faust_cplx.normInf()
             else:

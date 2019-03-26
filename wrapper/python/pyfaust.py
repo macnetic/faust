@@ -1004,7 +1004,7 @@ class Faust:
         else:
             return float(-1)
 
-    def norm(F, ord='fro'):
+    def norm(F, ord='fro', **kwargs):
         """
         Computes the norm of F.
 
@@ -1021,6 +1021,11 @@ class Faust:
             F: the Faust object.
             ord: (optional) the norm order (1, 2, numpy.inf) or "fro" for
             Frobenius norm (by default the Frobenius norm is computed).
+            threshold: (optional) power iteration algorithm threshold (default
+            to .001). Used only for norm(2).
+            param max_num_its: (optional) maximum number of iterations for
+            power iteration algorithm. Used only for norm(2).
+
 
         Returns:
             the norm (float).
@@ -1054,7 +1059,7 @@ class Faust:
         """
         if(ord not in [1, 2, "fro", np.inf]):
             raise ValueError("ord must have the value 1, 2, 'fro' or numpy.inf.")
-        return F.m_faust.norm(ord)
+        return F.m_faust.norm(ord, **kwargs)
 
 
     def normalize(F, ord='fro', axis=1):
