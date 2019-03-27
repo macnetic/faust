@@ -46,6 +46,7 @@
 
 
 #include "faust_transform_algebra.h"
+#include "faust_RefManager.h"
 
 //#include "faust_Vect.h"
 //#include "faust_MatDense.h"
@@ -214,13 +215,26 @@ namespace Faust
 				double normL1(const char opThis, const bool isConj) const;
 				double normFro() const;
 				double normFro(const char opThis, const bool isConj) const;
+
+				static void delete_fact(void * fact)
+				{
+#ifdef DEBUG
+					cout << "Faust::Transform delete_fact" << endl;
+#endif
+					delete static_cast<MatGeneric<FPP,Cpu>*>(fact);
+				}
+
 				~Transform(){
 #ifdef FAUST_VERBOSE
 					std::cout << "~Transform()" << std::endl;
 #endif
-					if(this->dtor_delete_data)
-						for (int i=0;i<data.size();i++) delete data[i];}
-
+					ref_man.set_free_cb(Faust::Transform<FPP,Cpu>::delete_fact);
+					for (int i=0;i<data.size();i++)
+						if(this->dtor_delete_data)
+							delete data[i];
+						else
+							ref_man.release(data[i]);
+				}
 
 				/*!
 				 * \brief multiplication between with vector x
@@ -269,6 +283,7 @@ namespace Faust
 				static const char * m_className;
 				std::vector<Faust::MatGeneric<FPP,Cpu>*> data;
 				bool dtor_delete_data;
+				static RefManager ref_man;
 
 #ifdef __COMPILE_TIMERS__
 				mutable std::vector<Faust::Timer> t_multiply_vector;

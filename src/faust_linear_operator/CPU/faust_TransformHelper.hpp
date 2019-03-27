@@ -461,7 +461,7 @@ namespace Faust {
 	template<typename FPP>
 	void TransformHelper<FPP, Cpu>::eval_fancy_idx_Transform()
 	{
-		bool cloning_fact = true;
+		bool cloning_fact = false;
 		faust_unsigned_int size = this->size();
 		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) size);
 		MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
@@ -507,7 +507,7 @@ namespace Faust {
 	template<typename FPP>
 	void TransformHelper<FPP, Cpu>::eval_sliced_Transform()
 	{
-		bool cloning_fact = true;
+		bool cloning_fact = false;
 		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) this->size());
 		faust_unsigned_int size = this->size();
 		MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
@@ -875,7 +875,7 @@ namespace Faust {
 				factors.insert(factors.begin(), norm_diag);
 			else
 				factors.push_back(norm_diag);
-			normalizedTh = new TransformHelper<FPP,Cpu>(factors, FPP(1.0), false, true);
+			normalizedTh = new TransformHelper<FPP,Cpu>(factors, FPP(1.0), false, false);
 			normalizedTh->is_transposed = this->is_transposed;
 			//			normalizedTh->display();
 			return normalizedTh;

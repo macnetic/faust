@@ -43,6 +43,7 @@
 #define __FAUST_TRANSFORM_HELPER___
 
 #include <memory>
+#include "faust_RefManager.h"
 #include "faust_exception.h"
 #include "faust_Transform.h"
 #include "faust_Slice.h"
@@ -76,6 +77,7 @@ namespace Faust {
 			faust_unsigned_int fancy_num_rows;
 			faust_unsigned_int fancy_num_cols;
 			shared_ptr<Transform<FPP,Cpu>> transform;
+			RefManager refman;
 
 			void eval_sliced_Transform();
 			void eval_fancy_idx_Transform();
