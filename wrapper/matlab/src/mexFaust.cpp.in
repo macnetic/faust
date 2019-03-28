@@ -299,13 +299,13 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
                     }
                 }
 
-                // 2nd input (optionnal) : multiplicative scalar
+                // 2nd input (optional) : multiplicative scalar
                 SCALAR lambda = 1.0;
                 if (nrhs > 2)
                     lambda = (SCALAR) mxGetScalar(prhs[2]);
 
 
-                // 3rd input (optionnal) : boolean to determine the type of copy
+                // 3rd input (optional) : boolean to determine the type of copy
                 bool optimizedCopy = false;
                 if (nrhs > 3)
                 {
