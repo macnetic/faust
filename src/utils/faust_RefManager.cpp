@@ -1,4 +1,5 @@
 #include "faust_RefManager.h"
+#include <exception>
 
 void Faust::RefManager::acquire(void* ref)
 {
@@ -37,6 +38,8 @@ void Faust::RefManager::release(void* ref)
 		else
 			refCounts[ref]--;
 	}
+	else
+		throw runtime_error("RefManager error: unknown pointer reference asked.");
 }
 
 void Faust::RefManager::set_free_cb(void(*cb)(void*))

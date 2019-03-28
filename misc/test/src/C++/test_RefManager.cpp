@@ -5,7 +5,7 @@
 #include "faust_constant.h"
 
 using namespace Faust;
-
+using namespace std;
 void free_cb(void* ref)
 {
 	cout << "\tcallback frees MatGeneric" << endl;
@@ -32,5 +32,13 @@ int main()
 	manager.release(mat1);
 	cout << "release mat2" << endl;
 	manager.release(mat2);
+	try
+	{
+		manager.release(mat2);
+	}
+	catch(runtime_error re)
+	{
+		cerr << re.what() << endl;
+	}
 	return EXIT_SUCCESS;
 }
