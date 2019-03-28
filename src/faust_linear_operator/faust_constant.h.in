@@ -42,7 +42,7 @@
 #define FAUST_CONSTANT_H
 
 
-#define FAUST_VERSION 2.0
+#define FAUST_VERSION @CPACK_PACKAGE_VERSION@ 
 
 ///if defined, compilation with openblas for dense algebra
 #cmakedefine __GEMM_WITH_OPENBLAS__
@@ -89,6 +89,7 @@ enum MatType
 {
    Dense, 
    Sparse, 
+   Diag
 };
 
 

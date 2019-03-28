@@ -1,0 +1,19 @@
+#include "faust_MatDiag.h"
+#include <cstdlib>
+
+
+#include <complex>
+
+using namespace Faust;
+typedef @TEST_FPP@ FPP;
+
+
+int main()
+{
+	FPP data[3];
+	data[0] = FPP(1);
+	data[1] = FPP(2);
+	data[2] = FPP(3);
+	MatDiag<FPP> mdiag(10,data);
+	return EXIT_SUCCESS;
+}
