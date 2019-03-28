@@ -9,7 +9,7 @@
 %>    FAµST. Those algorithms can factorize a dense matrix to a sparse product
 %>    (i.e. a Faust object).
 %>
-%>    There are two algorithms for factorization.
+%>    There are several factorization algorithms.
 %>
 %>    - The first one is Palm4MSA :
 %>    which stands for Proximal Alternating Linearized Minimization for
@@ -20,6 +20,8 @@
 %>    this is the central algorithm to factorize a dense matrix to a Faust.
 %>    It makes iterative use of Palm4MSA to proceed with the factorization of a given
 %>    dense matrix.
+%>
+%>    - The third group of algorithms is for FGFT computing: FaustFactory.fgft_palm FaustFactory.fgft_givens FaustFactory.eigtj
 %>
 %>    A more secondary functionality of this class is the Faust generation.
 %>    Several methods are available:
@@ -273,7 +275,7 @@ classdef FaustFactory
 		end
 
 		%===================================================================================
-		%> Computes the FGFT for the Fourier matrix U (it should be the eigenvectors of the Laplacian Lap).
+		%> @brief Computes the FGFT for the Fourier matrix U which should be the eigenvectors of the Laplacian Lap.
 		%>
 		%> @note this algorithm is a variant of FaustFactory.fact_hierarchical.
 		%>
@@ -539,7 +541,7 @@ classdef FaustFactory
 		end
 
 		%====================================================================
-		%> Performs a singular value decomposition and returns the left and
+		%> @brief Performs a singular value decomposition and returns the left and
 		%> right singular vectors as Faust transforms.
 		%>
 		%> @note: this function is based on FaustFactory.eigtj.
@@ -691,7 +693,7 @@ classdef FaustFactory
 		end
 
 		%==========================================================================================
-		%> @brief Faust identity matrix.
+		%> @brief Faust identity.
 		%>
 		%> @b Usage
 		%>
