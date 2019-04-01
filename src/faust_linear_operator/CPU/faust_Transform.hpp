@@ -179,6 +179,7 @@ Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 	{
 		//std::cout<<"iter "<<i<<"/"<<data.size()<<std::endl;
 		data[i]=A.data[i]->Clone();
+		if(!dtor_delete_data) ref_man.acquire(data[i]);
 	}
 	//std::cout<<"fin inside copy constructor"<<std::endl;
 #ifdef __COMPILE_TIMERS__
@@ -200,7 +201,6 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 		}
 		else
 			data[0] = facts[0];
-		ref_man.acquire(data[0]);
 		totalNonZeros += data[0]->getNonZeros();
 		for (int i=1 ; i<data.size() ; i++)
 		{
@@ -209,11 +209,13 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 			else
 				data[i] = facts[i];
 			totalNonZeros += data[i]->getNonZeros();
-			ref_man.acquire(data[i]);
+			if(!dtor_delete_data) ref_man.acquire(data[i]);
 		}
 
 		if(lambda_ != FPP(1.0))
 			(*data[0]) *= lambda_;
+
+		if(!dtor_delete_data) ref_man.acquire(data[0]);
 
 	}
 #ifdef __COMPILE_TIMERS__
@@ -227,6 +229,8 @@ template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(Faust::Transform<FPP,Cpu>&& T) : totalNonZeros(T.totalNonZeros), dtor_delete_data(T.dtor_delete_data)
 {
 	data = std::move(T.data);
+	totalNonZeros = T.totalNonZeros;
+	T.data.resize(0);
 }
 
 
@@ -240,7 +244,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatDense<FPP,Cpu> 
 	for (int i=0 ; i<data.size() ; i++)
 	{
 		data[i]=facts[i].Clone(optimizedCopy);
-		ref_man.acquire(data[i]);
+		if(!dtor_delete_data) ref_man.acquire(data[i]);
 		totalNonZeros += data[i]->getNonZeros();
 	}
 
@@ -255,6 +259,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu>
 	{
 		data[i]=facts[i].Clone(optimizedCopy);
 		totalNonZeros += data[i]->getNonZeros();
+		if(!dtor_delete_data) ref_man.acquire(data[i]);
 	}
 }
 
@@ -284,6 +289,7 @@ Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool tr
 		}
 		if(conj_A) data[j]->conjugate();
 		totalNonZeros += data[j]->getNonZeros();
+		if(!dtor_delete_data) ref_man.acquire(data[j]);
 		j++;
 	}
 	i = transpose_B?B->size()-1:0;
@@ -304,6 +310,7 @@ Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool tr
 		}
 		if(conj_B) data[j]->conjugate();
 		totalNonZeros += data[j]->getNonZeros();
+		if(!dtor_delete_data) ref_man.acquire(data[j]);
 		j++;
 	}
 	this->check_factors_validity();
@@ -333,7 +340,7 @@ void Faust::Transform<FPP,Cpu>::check_factors_validity() const
 
 
 template<typename FPP>
-Faust::RefManager Faust::Transform<FPP,Cpu>::ref_man;
+Faust::RefManager Faust::Transform<FPP,Cpu>::ref_man(Faust::Transform<FPP,Cpu>::delete_fact);
 
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::print_file(const char* filename) const
@@ -604,13 +611,23 @@ double Faust::Transform<FPP,Cpu>::normFro() const
 void Faust::Transform<FPP,Cpu>::operator=(const Transform<FPP,Cpu>&  f)
 {
 	for (int i=0;i<size();i++)
-		delete data[i];
+	{
+		if(dtor_delete_data)
+			delete data[i];
+		else
+		{
+			ref_man.release(data[i]);
+		}
+	}
 
 	data.resize(0);
 	data.resize(f.size());
 
 	for (int i=0;i<f.size();i++)
+	{
 		data[i]=f.data[i]->Clone();
+		if(!dtor_delete_data) ref_man.acquire(data[i]);
+	}
 
 	this->totalNonZeros=f.totalNonZeros;
 
@@ -625,6 +642,7 @@ Faust::Transform<FPP,Cpu>& Faust::Transform<FPP,Cpu>::operator=(Faust::Transform
 	data = std::move(T.data);
 	totalNonZeros = T.totalNonZeros;
 	dtor_delete_data = T.dtor_delete_data;
+	T.data.resize(0);
 }
 
 	template<typename FPP>
@@ -848,6 +866,7 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,co
 	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone(optimizedCopy);
 	if(conjugate) M_copy->conjugate();
 	data.push_back(M_copy);
+	if(!dtor_delete_data) ref_man.acquire(M_copy);
 	totalNonZeros += M_copy->getNonZeros();
 
 #ifdef __COMPILE_TIMERS__
@@ -868,6 +887,7 @@ void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M, 
 
 	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone(optimizedCopy);
 	data.insert(data.begin(),M_copy);
+	if(!dtor_delete_data) ref_man.acquire(M_copy);
 	totalNonZeros += M_copy->getNonZeros();
 
 #ifdef __COMPILE_TIMERS__

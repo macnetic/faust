@@ -7,7 +7,6 @@ using namespace std;
 namespace Faust {
 	class RefManager {
 		map<void*,unsigned int> refCounts;
-		typedef void (RefManager::*free_cb)(void*);
 		void(*cb)(void*);
 
 		public:
@@ -16,6 +15,9 @@ namespace Faust {
 		void release(void* ref);
 
 		void set_free_cb(void (*cb)(void*));
+
+		RefManager();
+		RefManager(void(*cb)(void*));
 	};
 }
 #endif

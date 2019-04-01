@@ -162,6 +162,12 @@ namespace Faust
 				faust_unsigned_int getNbRow() const;
 				faust_unsigned_int getNbCol() const;
 				void print_file(const char* filename) const;
+				void print_data_ptrs() const
+				{
+					for(int i=0;i<data.size();i++)
+						cout << data[i] << " ";
+					cout << endl;
+				}
 				void init_from_file(const char* filename);
 				/**
 				 *	\brief Writes the FAuST into a Matlab file. The product is written as a cell array with the matrix factors as elements.
@@ -228,7 +234,6 @@ namespace Faust
 #ifdef FAUST_VERBOSE
 					std::cout << "~Transform()" << std::endl;
 #endif
-					ref_man.set_free_cb(Faust::Transform<FPP,Cpu>::delete_fact);
 					for (int i=0;i<data.size();i++)
 						if(this->dtor_delete_data)
 							delete data[i];
@@ -277,6 +282,7 @@ namespace Faust
 
 			private:
 				void disable_data_deletion() { this->dtor_delete_data = false; }
+				void enable_data_deletion() { this->dtor_delete_data = true; }
 
 			private:
 				long long int totalNonZeros;

@@ -46,3 +46,12 @@ void Faust::RefManager::set_free_cb(void(*cb)(void*))
 {
 	this->cb = cb;
 }
+
+Faust::RefManager::RefManager()
+{
+}
+
+Faust::RefManager::RefManager(void(*cb)(void*))
+{
+	set_free_cb(cb);
+}
