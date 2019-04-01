@@ -4,7 +4,7 @@
 % ==========================================
 function license()
 	disp('% License:')
-	disp(' Copyright (2018):	Hakim Hadj-djilani, Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval')
+	disp(' Copyright (2019):	Hakim Hadj-djilani, Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval')
 	disp('			INRIA Rennes, FRANCE')
 	disp('			http://www.inria.fr/')
 	disp('')

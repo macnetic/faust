@@ -1,6 +1,6 @@
 
 %% License:
-% Copyright (2018):	Hakim Hadj-dji., Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval
+% Copyright (2019):	Hakim Hadj-dji., Nicolas Bellot, Adrien Leman, Thomas Gautrais, Luc Le Magoarou, Remi Gribonval
 %			INRIA Rennes, FRANCE
 %			http://www.inria.fr/
 %

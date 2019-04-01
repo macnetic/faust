@@ -1,5 +1,5 @@
 
-Copyright (2018):
+Copyright (2019):
 	Hakim Hadj-Djilani, Nicolas Bellot, Adrien Leman,
 	Thomas Gautrais,
 	Luc Le Magoarou, Remi Gribonval
@@ -21,10 +21,6 @@ License:
 Contacts:
 	Remi Gribonval  : remi.gribonval@inria.fr
 	Hakim Hadj-dji. : hakim.hadj-djilani@inria.fr
-	Nicolas Bellot  : nicolas.bellot@inria.fr
-	Adrien Leman    : adrien.leman@inria.fr
-	Thomas Gautrais : thomas.gautrais@inria.fr
-	Luc Le Magoarou : luc.le-magoarou@inria.fr
 
 
 

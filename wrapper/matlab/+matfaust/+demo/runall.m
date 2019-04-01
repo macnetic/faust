@@ -1,5 +1,5 @@
 %% License:
-% Copyright (2018):	Luc Le Magoarou, Remi Gribonval
+% Copyright (2019):	Luc Le Magoarou, Remi Gribonval
 %			INRIA Rennes, FRANCE
 %			http://www.inria.fr/
 %
