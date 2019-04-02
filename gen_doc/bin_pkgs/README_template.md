@@ -173,7 +173,7 @@ For more information on the FAµST API, and a whole function listing, consult th
 
 N.B.: to access the documentation, you need to be in the graphical interface of Matlab.
 
-Note that the doxygen documentation for the Matlab API is also available locally after installing Faust. You can consult it from your web browser: [@CMAKE_INSTALL_PREFIX@/doc/html/namespacematfaust.html](file://@CMAKE_INSTALL_PREFIX@/doc/html/namespacematfaust.html).
+Note that the doxygen documentation for the Matlab API is also available locally after installing Faust. You can consult it from your web browser: [namespacematfaust.html](@API_DOC_BASE_URL@/html/namespacematfaust.html).
 
 ### 4.2 Python Wrapper
 
@@ -207,6 +207,7 @@ You can also go through the Python terminal to build a FAµST product and call i
 	>>> A.shape
 	(1000L, 2000L)
 
-Note that the doxygen documentation for the Python API is also available locally after installing Faust. You can consult it from your web browser: [@CMAKE_INSTALL_PREFIX@/doc/html/namespacepyfaust.html](file://@CMAKE_INSTALL_PREFIX@/doc/html/namespacepyfaust.html).
+Note that the doxygen documentation for the Python API is also available locally after installing Faust. You can consult it from your web browser: [namespacepyfaust.html](@API_DOC_BASE_URL@/html/namespacepyfaust.html).
+
 
 

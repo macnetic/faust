@@ -225,6 +225,7 @@ option(BUILD_USE_PROFILING "Profiling the code" OFF) # CACHE BOOL )
 option(SLOW_TESTS "Enabling tests which take much time." ON)
 option(EXCLUDE_FAUST_LIB_INSTALL "Excluding faust static core library from installation files." OFF)
 option(INCLUDE_ALL_SYS_INSTALL_INSTRUCS "In generated doc/html/README.html put all systems instructions for installation, not just the building system ones." OFF)
+option(API_DOC_BASE_URL "Base URL for the online or local documentation.") # see gen_doc/CMakeLists.txt
 #set(BUILD_MULTITHREAD OFF CACHE BOOL "OpenMP Multithreading")
 #set(BUILD_VERBOSE OFF CACHE BOOL "Display useful message for debugging")
 #set(BUILD_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")
