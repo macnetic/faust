@@ -12,9 +12,35 @@ if [[ ! -d "${MATLAB_ROOT}" || ! -x "${MATLAB_ROOT}/bin/matlab" ]]
 then
 	echo -e "\033[1mWARNING\033[0m: couldn't find Matlab root dir. You'll need to update the matlab path manually in order to use Faust matlab wrapper (or maybe you're not using matlab at all and that's not a problem)." >&2
 else
+	MATLAB_BIN="${MATLAB_ROOT}/bin/matlab"
 	STARTUP_DIR="${MATLAB_ROOT}/toolbox/local/"
 	STARTUP_FILE=${STARTUP_DIR}/startup.m
 	[[ -r "$STARTUP_FILE" ]] && grep -i -v faust "$STARTUP_FILE" > "$STARTUP_FILE" 2>/dev/null
 	FAUST_MATLAB_WRAPPER_PATH="@CMAKE_INSTALL_MATLAB_PREFIX@"
-	[[ -d "${FAUST_MATLAB_WRAPPER_PATH}" ]] && echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE" && echo -e "\033[1mNOTICE\033[0m: Faust matlab setup is complete." || echo "ERROR: Faust matlab wrapper path isn't valid."
+	#USR_STARTUP_FILE=$($MATLAB_BIN -nojvm -nodisplay -r "which startup;exit" | tail -n 2 | head -n 1) # useless in root
+	if [[ -d "${FAUST_MATLAB_WRAPPER_PATH}" ]]
+	then
+		echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE"
+		RET1=$?
+		RET2=0
+		# try edit startup.m of all users (only when files exist)
+		for USER_DIR in /home/*
+		do
+			for USR_STARTUP_FILE in  $USER_DIR/Documents/MATLAB/startup.m $USER_DIR/matlab/startup.m
+			do
+				#if [[ ! "${USR_STARTUP_FILE}" = "${STARTUP_FILE}" ]]
+				#then
+				if [[ -r "$USR_STARTUP_FILE" ]]
+				then
+					grep -i -v faust "$USR_STARTUP_FILE" > "$USR_STARTUP_FILE" 2>/dev/null
+					echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> $USR_STARTUP_FILE
+					RET2=$(($?+$RET2))
+				fi
+				#fi
+			done
+		done
+		[[ $RET1 = 0 && $RET2 = 0 ]] && echo -e "\033[1mNOTICE\033[0m: Faust matlab setup is complete." || echo "ERROR: something went wrong in matlab startup script editing."
+	else
+		echo "ERROR: Faust matlab wrapper path isn't valid."
+	fi
 fi
