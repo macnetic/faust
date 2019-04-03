@@ -128,7 +128,7 @@
 %%
 
 % =====================================================================
-%> The FAµST quickstart script, a good place to look at for a first tour.
+%> The FAuST quickstart script, a good place to look at for a first tour.
 % =====================================================================
 classdef quickstart
 	methods(Static)

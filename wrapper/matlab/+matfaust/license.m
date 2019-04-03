@@ -1,6 +1,6 @@
 
 % ==========================================
-%> Prints the FAµST license.
+%> Prints the FAuST license.
 % ==========================================
 function license()
 	disp('% License:')

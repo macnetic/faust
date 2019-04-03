@@ -1,5 +1,5 @@
 % =========================================================
-%> @brief This class defines a StoppingCriterion for the FAµST's algorithms.
+%> @brief This class defines a StoppingCriterion for the FAuST's algorithms.
 %>
 %> A stopping criterion can be of two kinds:
 %>

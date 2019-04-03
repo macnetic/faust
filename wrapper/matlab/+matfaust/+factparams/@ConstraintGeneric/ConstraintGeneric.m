@@ -1,5 +1,5 @@
 % ======================================================================
-%> This is the parent class for representing a factor constraint in FAµST factorization algorithms.
+%> This is the parent class for representing a factor constraint in FAuST factorization algorithms.
 % ======================================================================
 classdef (Abstract) ConstraintGeneric
 	properties (SetAccess = public)

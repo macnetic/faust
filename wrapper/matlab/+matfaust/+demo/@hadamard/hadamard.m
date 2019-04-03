@@ -84,7 +84,7 @@
 %% Description speed_up_hadamard
 %
 %  This demo makes some time comparison between (Hadamard matrix)-vector multiplication and
-%  (Hadamard factorisation i.e a FAµST)-vector multiplication for different dimension
+%  (Hadamard factorisation i.e a FAuST)-vector multiplication for different dimension
 %  of the Hadamard matrix.
 %
 % For more information on the FAuST Project, please visit the website of 
@@ -434,7 +434,7 @@ classdef hadamard
 
 		end
 		%===============================================================================
-		%> This demo makes some time comparison between (Hadamard matrix)-vector multiplication and (Hadamard factorisation i.e a FAµST)-vector multiplication for different dimension of the Hadamard matrix.
+		%> This demo makes some time comparison between (Hadamard matrix)-vector multiplication and (Hadamard factorisation i.e a FAuST)-vector multiplication for different dimension of the Hadamard matrix.
 		%===============================================================================
 		function speed_up_hadamard()
 			import matfaust.Faust

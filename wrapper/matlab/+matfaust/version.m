@@ -1,5 +1,5 @@
 % ====================================
-%> Returns the FAµST package version.
+%> Returns the FAuST package version.
 %===
 %>
 % ====================================

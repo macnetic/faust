@@ -40,16 +40,16 @@
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %%
 
-%> @package matfaust @brief <b> The FAµST Matlab Wrapper
+%> @package matfaust @brief <b> The FAuST Matlab Wrapper
 
 % ======================================================================
-%> @brief <b>FAµST Matlab wrapper main class</b> for using multi-layer sparse transforms.
+%> @brief <b>FAuST Matlab wrapper main class</b> for using multi-layer sparse transforms.
 %>
-%> This class provides a Matlab array-like interface for operations with FAµST data structures, which correspond to matrices that can be written exactly as the product of sparse matrices.
+%> This class provides a Matlab array-like interface for operations with FAuST data structures, which correspond to matrices that can be written exactly as the product of sparse matrices.
 %>
-%> A FAµST data structure is designed to allow fast matrix-vector multiplications together with reduced memory storage compared to what would be obtained by manipulating directly the corresponding (dense) Matlab array.
+%> A FAuST data structure is designed to allow fast matrix-vector multiplications together with reduced memory storage compared to what would be obtained by manipulating directly the corresponding (dense) Matlab array.
 %>
-%> A particular example is the matrix associated to the discrete Fourier transform, which can be represented exactly as a FAµST, leading to a fast and compact implementation (see FaustFactory.dft()).
+%> A particular example is the matrix associated to the discrete Fourier transform, which can be represented exactly as a FAuST, leading to a fast and compact implementation (see FaustFactory.dft()).
 %>
 %> Although sparse matrices are more interesting for optimization it's not forbidden to define a Faust as a product of dense matrices or a mix of dense and sparse matrices.
 %>
@@ -85,7 +85,7 @@
 %>
 %> List of functions that are memory costly: Faust.full(), Faust.pinv(), Faust.mldivide().
 %>
-%> For more information about FAµST take a look at http://faust.inria.fr.
+%> For more information about FAuST take a look at http://faust.inria.fr.
 %>
 % ======================================================================
 

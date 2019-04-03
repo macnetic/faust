@@ -1,7 +1,7 @@
 %% Description speed_up_Fourier
 %
 %  This demo makes some time comparison between (Fourier matrix)-vector multiplication and
-%  (Fourier factorisation i.e a FAµST)-vector multiplication for different dimension
+%  (Fourier factorisation i.e a FAuST)-vector multiplication for different dimension
 %  of the Fourier matrix.
 %
 % For more information on the FAuST Project, please visit the website of
@@ -46,7 +46,7 @@
 classdef fft
 	methods(Static)
 		%======================================================================
-		%> This demo makes some time comparison between (Fourier matrix)-vector multiplication and (Fourier factorisation i.e a FAµST)-vector multiplication for different dimension of the Fourier matrix.
+		%> This demo makes some time comparison between (Fourier matrix)-vector multiplication and (Fourier factorisation i.e a FAuST)-vector multiplication for different dimension of the Fourier matrix.
 		%======================================================================
 		function speed_up_fourier()
 			import matfaust.Faust

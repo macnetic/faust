@@ -1,4 +1,4 @@
-%> @package matfaust.factparams @brief The module for the parametrization of FAµST's algorithms (Palm4MSA and Hierarchical Factorization)
+%> @package matfaust.factparams @brief The module for the parametrization of FAuST's algorithms (Palm4MSA and Hierarchical Factorization)
 
 % =========================================================
 %> The parent abstract class to represent the general factorization parameters.

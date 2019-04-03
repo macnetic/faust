@@ -44,7 +44,7 @@ classdef bsl
 		%>  DURATION: Computations should take around 3 minutes.
 		%>
 		%>  The MEG gain matrices used are
-		%>         the precomputed ones in "data/faust_MEG_rcg_X.mat" (in the installation directory of the FAµST toolbox)
+		%>         the precomputed ones in "data/faust_MEG_rcg_X.mat" (in the installation directory of the FAuST toolbox)
 		%>
 		%> References:
 		%>

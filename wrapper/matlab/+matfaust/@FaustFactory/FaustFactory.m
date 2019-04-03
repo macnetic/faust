@@ -6,7 +6,7 @@
 %>
 %>
 %>    This class gives access to the main factorization algorithms of
-%>    FAµST. Those algorithms can factorize a dense matrix to a sparse product
+%>    FAuST. Those algorithms can factorize a dense matrix to a sparse product
 %>    (i.e. a Faust object).
 %>
 %>    There are several factorization algorithms.
