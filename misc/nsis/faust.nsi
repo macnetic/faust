@@ -184,6 +184,13 @@ Function matlabFoundCb
 	FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'))"
 	FileClose $1
 
+	FileOpen $1 "$DOCUMENTS\MATLAB\startup.m" w
+	IfErrors done
+	FileSeek $1 0 END
+	FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'))"
+	FileClose $1
+	done:
+
 	;MessageBox MB_OK '$R0$\n$\nFaust bound into $R4.' 
 	;MessageBox MB_YESNO 'Faust installed for $R4. Do you want to continue searching another version of Matlab to install Faust for ?' IDYES +2
 	StrCpy $0 StopLocate
