@@ -828,6 +828,7 @@ IF(WIN32 AND NOT UNIX)
 	# NSIS not used yet, cause of a bug with suitable ZIP programme
 	# There is a bug in NSI that does not handle full unix paths properly. Make
 	# sure there is at least one set of four (4) backlasshes.
+	# UPDATE: NSIS is used externally, see misc/nsis/faust.nis
 	# SET(CPACK_PACKAGE_ICON "${CMake_SOURCE_DIR}/Utilities/Release\\\\InstallIcon.bmp")
 	SET(CPACK_NSIS_DISPLAY_NAME "FAUST")
 #	SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.irisa.fr/metiss/home_html-fr")
@@ -857,11 +858,15 @@ ELSE(WIN32 AND NOT UNIX)
 		    file(APPEND ${PROJECT_BINARY_DIR}/postinstall "${POSTINST2_LINES}")
 		    file(REMOVE ${PROJECT_BINARY_DIR}/postinstall2)
 		endif()
-		# postscript to auto open readme
+		# post-install script to auto open readme
 		configure_file(${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/macosx/postinst_open_readme.sh ${PROJECT_BINARY_DIR}/postinstall2 @ONLY)
 		file(READ ${PROJECT_BINARY_DIR}/postinstall2 POSTINST2_LINES)
 		file(APPEND ${PROJECT_BINARY_DIR}/postinstall "${POSTINST2_LINES}")
 		file(REMOVE ${PROJECT_BINARY_DIR}/postinstall2)
+		# post-install script to download FAµST data from remote site into matlab wrapper data folder
+		if(REMOTE_DATA_URL AND REMOTE_DATA_FILE)
+			file(APPEND ${PROJECT_BINARY_DIR}/postinstall "mkdir -p @CMAKE_INSTALL_MATLAB_PREFIX@/data/;python  @CMAKE_INSTALL_PYTHON_PREFIX@/pyfaust/datadl.py @CMAKE_INSTALL_MATLAB_PREFIX@/data/;")
+		endif()
 	ELSE(APPLE)
 		SET(CPACK_GENERATOR "DEB;RPM")
 		#SET(CPACK_DEBIAN_PACKAGE_DEPENDS "python, python-numpy, libfftw3-3, libsndfile1")
@@ -905,7 +910,10 @@ ELSE(WIN32 AND NOT UNIX)
 			file(APPEND ${PROJECT_BINARY_DIR}/postinst "${POSTINST2_LINES}")
 			file(REMOVE ${PROJECT_BINARY_DIR}/postinst2)
 		endif()
-
+		# post-install script to download FAµST data from remote site into matlab wrapper data folder
+		if(REMOTE_DATA_URL AND REMOTE_DATA_FILE)
+			file(APPEND ${PROJECT_BINARY_DIR}/postinst "mkdir -p @CMAKE_INSTALL_MATLAB_PREFIX@/data/;python @CMAKE_INSTALL_PYTHON_PREFIX@/pyfaust/datadl.py  @CMAKE_INSTALL_MATLAB_PREFIX@/data/;")
+		endif()
 		#no need to exclude library auto-deps for debian package/ubuntu
 		set(CPACK_RPM_SPEC_MORE_DEFINE "%define __requires_exclude ^libmex[.]so.*|libmat[.]so.*|libmx[.]so.*|libpython.*[.]so.*$ ")
 
