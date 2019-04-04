@@ -23,8 +23,9 @@ def get_data_dirpath():
         Returns the data directory path which varies according to the way pyfaust was installed.
     """
     from pkg_resources import resource_filename
-    import os.path
-    from os import sep
+    from os.path import exists, join, expanduser, isfile
+    from os import sep, listdir, mkdir
+    from pyfaust.datadl import download_uncompress
     path = resource_filename(__name__, 'data')
     if (sys.platform == 'win32' and not os.path.exists(path)):
         from pyfaust import _NSI_INSTALL_PATH
@@ -34,11 +35,21 @@ def get_data_dirpath():
         # at installation stage
         # in this case, matlab is inst so point to its data dir
         path = _NSI_INSTALL_PATH+sep+'matlab'+sep+'data'
-    if(not os.path.exists(path)):
+    if(not exists(path)):
         # fallback to matlab wrapper data
         # it will not help if we are from pip pkg
         # but it shouldn't happen
         path = '@FAUST_MATFAUST_DEMO_DATA_BIN_DIR@'
+    if(exists(path)):
+        loc_files = [f for f in listdir(path) if isfile(join(path, f))]
+    else:
+        loc_files = []
+    if(len(loc_files) == 0):
+        # download data in user folder
+        path = join(expanduser('~'), "pyfaust_data")
+        if(not exists(path)):
+            mkdir(path)
+        download_uncompress(path)
     return path
 
 def runall():

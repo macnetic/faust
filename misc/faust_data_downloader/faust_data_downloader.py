@@ -4,15 +4,15 @@ from __future__ import print_function
 
 import urllib
 import zipfile
-from os.path import join, isdir
+from os.path import join, isdir, isfile
 import tempfile
 from sys import argv, version_info
 if version_info[0] == 3:
     import urllib.request
+from os import listdir
 
-
-ARCH_NAME = "faust_data-2.4.2.zip"
-BASE_URL = "https://gforge.inria.fr/frs/download.php/file/37960/"
+ARCH_NAME = "@REMOTE_DATA_FILE@"
+BASE_URL = "@REMOTE_DATA_URL@"
 
 def download_uncompress(uncompress_dir=None):
     ARCH_URL = join(BASE_URL, ARCH_NAME)
@@ -22,6 +22,16 @@ def download_uncompress(uncompress_dir=None):
 
     def reporthook(x,y,z):
         print("\rDownloading FAµST data:", int((x*y)*100.0/z),'%', end='')
+
+    if(uncompress_dir):
+        if(not isdir(uncompress_dir)):
+            raise Exception(uncompress_dir+" is not an existing "
+                            "directory/folder.")
+        loc_files = [f for f in listdir(uncompress_dir) if isfile(join(uncompress_dir, f))]
+        if(len(loc_files) > 0):
+            print("It seems FAµST data is already available locally. To renew"
+                  " the download please empty the directory:", uncompress_dir)
+            return
 
     if version_info[0] == 2:
         urllib.urlretrieve (ARCH_URL, DEST_FILE, reporthook=reporthook)

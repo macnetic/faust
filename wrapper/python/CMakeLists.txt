@@ -74,13 +74,19 @@ configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/FaustCorePy.pyx COPYONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCy.pxd ${FAUST_PYTHON_BIN_DIR}/FaustCoreCy.pxd COPYONLY)
 
-# install data files used by pyfaust.demo
-# they will be included only in pip/easyinstall packages (see install cmake function/rule in the end of file)
-FILE(GLOB DEMO_MAT_FILES RELATIVE ${FAUST_DATA_MAT_DIR} ${FAUST_DATA_MAT_DIR}/*MEG*.mat ${FAUST_DATA_MAT_DIR}/*quick_start*.mat ${FAUST_DATA_MAT_DIR}/Laplacian*.mat)
-foreach(MAT_FILE ${DEMO_MAT_FILES})
-	message(STATUS "Copying demo mat files into ${FAUST_PYTHON_BIN_DIR}/data")
-	configure_file(${FAUST_DATA_MAT_DIR}/${MAT_FILE} ${FAUST_PYTHON_BIN_DIR}/pyfaust/data/${MAT_FILE} COPYONLY)
-endforeach()
+
+if(NOT REMOTE_DATA_URL OR NOT REMOTE_DATA_FILE)
+	# install data files used by pyfaust.demo
+	# they will be included only in pip/easyinstall packages (see install cmake function/rule in the end of file)
+	FILE(GLOB DEMO_MAT_FILES RELATIVE ${FAUST_DATA_MAT_DIR} ${FAUST_DATA_MAT_DIR}/*MEG*.mat ${FAUST_DATA_MAT_DIR}/*quick_start*.mat ${FAUST_DATA_MAT_DIR}/Laplacian*.mat)
+	foreach(MAT_FILE ${DEMO_MAT_FILES})
+		message(STATUS "Copying demo mat files into ${FAUST_PYTHON_BIN_DIR}/data")
+		configure_file(${FAUST_DATA_MAT_DIR}/${MAT_FILE} ${FAUST_PYTHON_BIN_DIR}/pyfaust/data/${MAT_FILE} COPYONLY)
+	endforeach()
+endif()
+
+# embed data downloader script in pyfaust package
+configure_file(${FAUST_MISC_DIR}/faust_data_downloader/faust_data_downloader.py ${FAUST_PYTHON_BIN_DIR}/pyfaust/datadl.py @ONLY)
 
 # copy license files which setup.py will need to package
 configure_file(${PROJECT_SOURCE_DIR}/license.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust/license.txt COPYONLY)
