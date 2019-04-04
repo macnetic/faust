@@ -15,7 +15,7 @@ ARCH_NAME = "@REMOTE_DATA_FILE@"
 BASE_URL = "@REMOTE_DATA_URL@"
 
 def download_uncompress(uncompress_dir=None):
-    ARCH_URL = join(BASE_URL, ARCH_NAME)
+    ARCH_URL = "/".join([BASE_URL, ARCH_NAME])
 
     TMP_DIR = tempfile.gettempdir()
     DEST_FILE = join(TMP_DIR, ARCH_NAME)

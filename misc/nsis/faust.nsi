@@ -102,7 +102,10 @@ Section "" ; no component so name not needed
 
   ; install matlab wrapper
   SetOutPath $INSTDIR\matlab
-  File /r /x old_matlab @PROJECT_BINARY_DIR@\wrapper\matlab\*.m @PROJECT_BINARY_DIR@\wrapper\matlab\*.@MEX_EXT@ @PROJECT_BINARY_DIR@\wrapper\matlab\*.mat
+  File /nonfatal /r /x old_matlab @PROJECT_BINARY_DIR@\wrapper\matlab\*.m @PROJECT_BINARY_DIR@\wrapper\matlab\*.@MEX_EXT@ @PROJECT_BINARY_DIR@\wrapper\matlab\*.mat
+  ; nonfatal useful in case of data *.mat not used/present (because they are downloaded at installation)
+
+
 
   ; post install pyfaust auto-setup in environment (only works if python is installed in path) 
   ${StrRep} '$0' $TEMP '\' '\\'
@@ -129,6 +132,13 @@ Section "" ; no component so name not needed
   ; add the install path
   FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
   FileClose $1
+  ;
+  ; download data into matlab wrapper data folder
+  ; create data folder
+  ${StrRep} '$3' $INSTDIR '\' '\\'
+  Exec "python -c $\"from os import mkdir; mkdir('$3\\matlab\\data')$\""
+  ; download data
+  Exec "python $2\pyfaust\datadl.py $\"$INSTDIR\matlab\data$\""
 
   ; post install matfaust auto-setup
   !include "FileFunc.nsh" ; for Locate
