@@ -6,7 +6,7 @@ variables:
 
 .ctest_template: &ctest_script
     script:
-        - ctest -O ctest.log -S ./CDashConfScript.cmake
+        - ctest -O ctest.log -S ./CDashConfScript.cmake -j4
 
 stages:
         - test
