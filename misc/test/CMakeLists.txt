@@ -154,25 +154,22 @@ endif()
 ####### UNIT TEST ########
 
 
+if(NOT NOCPPTESTS)
+	foreach(TEST_FPP float double)
+		foreach(FILE faust_mult faust_mult_cplx test_Vect_min test_MatDense_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move)
+			set(TEST_BIN_FILE ${FILE}_${TEST_FPP})
+			set(TEST_FILE_CPP ${TEST_BIN_FILE}.cpp)
+			message(STATUS ${TEST_FILE_CPP})
+			configure_file(${FAUST_SRC_TEST_SRC_UNIT_DIR}/${FILE}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} @ONLY)
 
-foreach(TEST_FPP float double)
-	foreach(FILE faust_mult faust_mult_cplx test_Vect_min test_MatDense_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move)
-		set(TEST_BIN_FILE ${FILE}_${TEST_FPP})
-		set(TEST_FILE_CPP ${TEST_BIN_FILE}.cpp)
-		message(STATUS ${TEST_FILE_CPP})
-		configure_file(${FAUST_SRC_TEST_SRC_UNIT_DIR}/${FILE}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} @ONLY)
+			# Generation of the binary files in double and float precision
+			add_executable(${TEST_BIN_FILE} ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} ${FAUST_BIN_TEST_SRC_DIR}/)
+			target_link_libraries(${TEST_BIN_FILE} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+			add_test(NAME UNIT_${TEST_BIN_FILE} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/${TEST_BIN_FILE})
 
-	# Generation of the binary files in double and float precision
-	add_executable(${TEST_BIN_FILE} ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} ${FAUST_BIN_TEST_SRC_DIR}/)
-   	
-	target_link_libraries(${TEST_BIN_FILE} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
-			
-	add_test(NAME UNIT_${TEST_BIN_FILE} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/${TEST_BIN_FILE})
-				
-	endforeach(FILE)
-endforeach(TEST_FPP)
-	
-
+		endforeach(FILE)
+	endforeach(TEST_FPP)
+endif(NOT NOCPPTESTS)
 
 
 ####### FIN UNIT TEST #####
@@ -184,7 +181,7 @@ endforeach(TEST_FPP)
 
 
 ####### IF THE MATIO LIBRARY IS AVAILABLE ELSE WE USE TXT OR XML DATA  #######
-if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE)
+if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) # AND HDF5_LIB_FILE)
 
 	### list of executable generated in double and simple precision
 	# hierarchical_fact : test the hierarchical_fact algorithm
@@ -224,9 +221,9 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE) # AND HDF5_LIB_FILE
 
 
 ###### IN CASE MATIO IS NOT AVAILABLE YOU CAN RUN THE TEST ######
-else(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE)	
+else(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS)	
 	#message(STATUS "Library matio is not available. Please used .xml input files.")
-endif(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE)
+endif(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS)
 
 
 
@@ -261,82 +258,83 @@ if (BUILD_WRAPPER_PYTHON)
 	endforeach()	
 endif(BUILD_WRAPPER_PYTHON)
 
+if(NOT NOCPPTESTS)
+	# MATLAB input format
+	if (BUILD_READ_MAT_FILE)
 
-# MATLAB input format
-if (BUILD_READ_MAT_FILE)
-	
-	foreach(TEST_FPP float double)
-		add_test(NAME MATFILE_FACT_HADAMARD_${TEST_FPP} COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_HADAMARD_32.mat	${FAUST_CONFIG_MAT_DIR}/config_HADAMARD_32.mat 5930 30)
-		add_test(NAME MATFILE_FACT_HIER_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_hierarchical_fact.mat	${FAUST_CONFIG_MAT_DIR}/config_hierarchical_fact.mat 9401.5 0.1)
-	
-		add_test(NAME MATFILE_MULTIPLICATION_MEG_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat T ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_6.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_8.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_16.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_25.mat)
+		foreach(TEST_FPP float double)
+			add_test(NAME MATFILE_FACT_HADAMARD_${TEST_FPP} COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_HADAMARD_32.mat	${FAUST_CONFIG_MAT_DIR}/config_HADAMARD_32.mat 5930 30)
+			add_test(NAME MATFILE_FACT_HIER_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_hierarchical_fact.mat	${FAUST_CONFIG_MAT_DIR}/config_hierarchical_fact.mat 9401.5 0.1)
 
-		if (EXISTS ${FAUST_DATA_MAT_DIR}/visage/)
-			# data equipe visage test
-			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G1_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G1.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G1_RCG_10_factor_3.mat)
-	
-			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G2_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G2.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G2_RCG_10_factor_3.mat)
+			add_test(NAME MATFILE_MULTIPLICATION_MEG_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat T ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_6.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_8.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_16.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_25.mat)
 
-			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G3_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G3.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G3_RCG_10_factor_3.mat)
+			if (EXISTS ${FAUST_DATA_MAT_DIR}/visage/)
+				# data equipe visage test
+				add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G1_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G1.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G1_RCG_10_factor_3.mat)
 
-			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G4_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G4.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G4_RCG_10_factor_3.mat)
+				add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G2_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G2.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G2_RCG_10_factor_3.mat)
 
-			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G5_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G5.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G5_RCG_10_factor_3.mat)
+				add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G3_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G3.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G3_RCG_10_factor_3.mat)
 
-			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G6_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G6.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G6_RCG_10_factor_3.mat)
+				add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G4_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G4.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G4_RCG_10_factor_3.mat)
 
-			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G7_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G7.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G7_RCG_10_factor_3.mat)
+				add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G5_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G5.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G5_RCG_10_factor_3.mat)
 
-			add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G8_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G8.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G8_RCG_10_factor_3.mat)
+				add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G6_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G6.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G6_RCG_10_factor_3.mat)
 
-		else ()
-			message (STATUS "Warning : The data for demo Visage are not available. ")		
-		endif()
+				add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G7_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G7.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G7_RCG_10_factor_3.mat)
 
-		add_test(NAME MATFILE_PALM4MSA_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSA_${TEST_FPP} )
-		add_test(NAME MATFILE_PALM4MSA_FFT_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSAFFT_${TEST_FPP} )
+				add_test(NAME MATFILE_MULTIPLICATION_VISAGE_G8_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/visage/matrix_G8.mat N ${FAUST_DATA_MAT_DIR}/visage/faust_G8_RCG_10_factor_3.mat)
 
+			else ()
+				message (STATUS "Warning : The data for demo Visage are not available. ")		
+			endif()
+
+			add_test(NAME MATFILE_PALM4MSA_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSA_${TEST_FPP} )
+			add_test(NAME MATFILE_PALM4MSA_FFT_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_palm4MSAFFT_${TEST_FPP} )
+
+			# limit the time of the process in case of bug... 
+			set_tests_properties(MATFILE_FACT_HADAMARD_${TEST_FPP} MATFILE_FACT_HIER_${TEST_FPP} PROPERTIES TIMEOUT ${TIMEOUT_COMP})
+
+		endforeach()
+
+		if(${SLOW_TESTS})	
+			# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) in simple and 	double precision
+
+			add_test(NAME MATFILE_FACT_MEG_float COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG.mat 22450 500)
+			add_test(NAME MATFILE_FACT_MEG_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG.mat 22480 1)
+
+			add_test(NAME MATFILE_FACT_MEG_TRANSPOSED_float COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG_transposed.mat 22450 400 T)
+			add_test(NAME MATFILE_FACT_MEG_TRANSPOSED_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG_transposed.mat 22480 1 T)
+
+			set_tests_properties(MATFILE_FACT_MEG_float MATFILE_FACT_MEG_double PROPERTIES TIMEOUT ${TIMEOUT_MEG})
+			set_tests_properties(MATFILE_FACT_MEG_TRANSPOSED_float MATFILE_FACT_MEG_TRANSPOSED_double PROPERTIES TIMEOUT ${TIMEOUT_MEG_TRANSPOSED})
+
+		endif(${SLOW_TESTS})
+
+
+
+
+	endif (BUILD_READ_MAT_FILE)
+
+
+	# XML input format
+	if (BUILD_READ_XML_FILE)
+		add_test(NAME XML_FACT_HIER COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/hier_fact_config.xml ${FAUST_DATA_TXT_DIR}/hier_fact_data.txt )
+
+		add_test(NAME XML_FACT_HIER_TRANSPOSE COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/trans_hier_fact_config.xml ${FAUST_DATA_TXT_DIR}/hier_fact_data.txt  T)
+
+		add_test(NAME XML_FACT_MEG COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/MEG_config.xml ${FAUST_DATA_TXT_DIR}/MEG_data.txt )
 		# limit the time of the process in case of bug... 
-		set_tests_properties(MATFILE_FACT_HADAMARD_${TEST_FPP} MATFILE_FACT_HIER_${TEST_FPP} PROPERTIES TIMEOUT ${TIMEOUT_COMP})
+		set_tests_properties(XML_FACT_HIER XML_FACT_HIER_TRANSPOSE PROPERTIES TIMEOUT ${TIMEOUT_COMP})
+		set_tests_properties(XML_FACT_MEG PROPERTIES TIMEOUT ${TIMEOUT_MEG})	 
+	endif(BUILD_READ_XML_FILE)
 
-	endforeach()
+	add_executable(test_RefManager ${FAUST_SRC_TEST_SRC_CPP_DIR}/test_RefManager.cpp ${FAUST_BIN_TEST_SRC_DIR}/)
+	target_link_libraries(test_RefManager ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+	add_test(NAME test_RefManager COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_RefManager)
 
-	if(${SLOW_TESTS})	
-		# test for the algorithm (palm4MSA and hierarchical_fact) for different configuration (MEG, Hadamard,...) in simple and 	double precision
-		
-		add_test(NAME MATFILE_FACT_MEG_float COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG.mat 22450 500)
-		add_test(NAME MATFILE_FACT_MEG_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG.mat 22480 1)
-		
-		add_test(NAME MATFILE_FACT_MEG_TRANSPOSED_float COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_float ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG_transposed.mat 22450 400 T)
-		add_test(NAME MATFILE_FACT_MEG_TRANSPOSED_double COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_double ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat ${FAUST_CONFIG_MAT_DIR}/config_MEG_transposed.mat 22480 1 T)
-
-		set_tests_properties(MATFILE_FACT_MEG_float MATFILE_FACT_MEG_double PROPERTIES TIMEOUT ${TIMEOUT_MEG})
-		set_tests_properties(MATFILE_FACT_MEG_TRANSPOSED_float MATFILE_FACT_MEG_TRANSPOSED_double PROPERTIES TIMEOUT ${TIMEOUT_MEG_TRANSPOSED})
-		
-	endif(${SLOW_TESTS})
-
-	
-
-
-endif (BUILD_READ_MAT_FILE)
-
-
-# XML input format
-if (BUILD_READ_XML_FILE)
-	add_test(NAME XML_FACT_HIER COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/hier_fact_config.xml ${FAUST_DATA_TXT_DIR}/hier_fact_data.txt )
-
-	add_test(NAME XML_FACT_HIER_TRANSPOSE COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/trans_hier_fact_config.xml ${FAUST_DATA_TXT_DIR}/hier_fact_data.txt  T)
-
-	add_test(NAME XML_FACT_MEG COMMAND ${FAUST_BIN_CMDLINE_BIN_DIR}/launch_hierarchical_fact ${FAUST_CONFIG_XML_DIR}/MEG_config.xml ${FAUST_DATA_TXT_DIR}/MEG_data.txt )
-	# limit the time of the process in case of bug... 
-	set_tests_properties(XML_FACT_HIER XML_FACT_HIER_TRANSPOSE PROPERTIES TIMEOUT ${TIMEOUT_COMP})
-	set_tests_properties(XML_FACT_MEG PROPERTIES TIMEOUT ${TIMEOUT_MEG})	 
-endif(BUILD_READ_XML_FILE)
-
-add_executable(test_RefManager ${FAUST_SRC_TEST_SRC_CPP_DIR}/test_RefManager.cpp ${FAUST_BIN_TEST_SRC_DIR}/)
-target_link_libraries(test_RefManager ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
-add_test(NAME test_RefManager COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_RefManager)
-
+endif(NOT NOCPPTESTS)
 
 endif(BUILD_TESTING)
 

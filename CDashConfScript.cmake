@@ -21,7 +21,9 @@ else()
 	message(FATAL_ERROR "Unknown system.")
 endif()
 
-
+if($ENV{NOCPPTESTS} MATCHES "ON")
+	set(CONF_OPTIONS "${CONF_OPTIONS} -DNOCPPTESTS=ON")
+endif()
 
 if($ENV{BUILD_WRAPPER_PYTHON} MATCHES "ON")
 	set(CTEST_SITE "${CTEST_SITE}Python")
