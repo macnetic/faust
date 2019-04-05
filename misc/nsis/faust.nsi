@@ -132,13 +132,23 @@ Section "" ; no component so name not needed
   ; add the install path
   FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
   FileClose $1
-  ;
+
   ; download data into matlab wrapper data folder
   ; create data folder
+  ; try with python first
   ${StrRep} '$3' $INSTDIR '\' '\\'
   Exec "python -c $\"from os import mkdir; mkdir('$3\\matlab\\data')$\""
   ; download data
   Exec "python $2\pyfaust\datadl.py $\"$INSTDIR\matlab\data$\""
+  IfErrors 0 after_data_dl
+  MessageBox MB_OK "Downloading FAuST data with python has failed, now trying with powershell."
+  ClearErrors
+  ExecWait "powershell Invoke-WebRequest $\"@REMOTE_DATA_URL@/@REMOTE_DATA_FILE@$\" -O $\"$TEMP\@REMOTE_DATA_FILE@$\"" ; ExecWait because unzipping needs download finished
+  Exec "powershell Expand-Archive -Force $\"$TEMP\@REMOTE_DATA_FILE@$\" '$INSTDIR\matlab\data'" ; output folder data is created auto. ; simple quote used to avoid powershell to think there is two arguments when we meant one argument for the dest. path (double quote doesn't allow that).
+  IfErrors 0 after_data_dl
+  MessageBox MB_OK "Error downloading FAuST data. You'll need to download manually (please check the documentation)." IDOK after_data_dl
+
+  after_data_dl:
 
   ; post install matfaust auto-setup
   !include "FileFunc.nsh" ; for Locate
