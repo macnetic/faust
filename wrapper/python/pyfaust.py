@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @PYFAUST_LICENSE_HEADER@
 
-## @package pyfaust @brief <b> The FAµST Python Wrapper</b>
+## @package pyfaust @brief <b> The FAuST Python Wrapper</b>
 import copy
 
 import numpy as np, scipy
@@ -11,13 +11,13 @@ import FaustCorePy
 import pyfaust
 
 class Faust:
-    """<b>FAµST Python wrapper main class</b> for using multi-layer sparse transforms.
+    """<b>FAuST Python wrapper main class</b> for using multi-layer sparse transforms.
 
     This class provides a numpy-like interface for operations
-    with FAµST data structures, which correspond to matrices that can be
+    with FAuST data structures, which correspond to matrices that can be
     written exactly as the product of sparse matrices.
 
-    A FAµST data structure is designed to allow fast matrix-vector multiplications
+    A FAuST data structure is designed to allow fast matrix-vector multiplications
     together with reduced memory storage compared to what would be obtained by
     manipulating directly the corresponding (dense) numpy array/matrix.
 
@@ -64,7 +64,7 @@ class Faust:
    List of functions that are memory costly: Faust.toarray(), Faust.todense(),
    Faust.pinv().
 
-    For more information about FAµST take a look at http://faust.inria.fr.
+    For more information about FAuST take a look at http://faust.inria.fr.
     """
 
     def  __init__(F, factors=None, filepath=None, **kwargs):
@@ -1305,7 +1305,7 @@ class FaustFactory:
     This factory class provides methods for generating a Faust especially by factorization of a dense matrix.
 
     This class gives access to the main factorization algorithms of
-    FAµST. Those algorithms can factorize a dense matrix to a sparse product
+    FAuST. Those algorithms can factorize a dense matrix to a sparse product
     (i.e. a Faust object).
 
     There are several algorithms for factorization.
@@ -2073,7 +2073,7 @@ class FaustFactory:
 pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__
 
 def version():
-    """Returns the FAµST package version.
+    """Returns the FAuST package version.
     """
     return "@CPACK_PACKAGE_VERSION@"
 
@@ -2086,6 +2086,6 @@ def faust_fact(*args, **kwargs):
     return FaustFactory.fact_hierarchical(*args, **kwargs)
 
 def license():
-    """ Prints the FAµST license.
+    """ Prints the FAuST license.
     """
     print("""@PYFAUST_LICENSE_HEADER@""")

@@ -10,7 +10,7 @@ else:
     ABC = object # trick to handle py2 missing ABC
                  # but not using abstract class in py2.7
 
-## @package pyfaust.factparams @brief The module for the parametrization of FAµST's algorithms (Palm4MSA and Hierarchical Factorization).
+## @package pyfaust.factparams @brief The module for the parametrization of FAuST's algorithms (Palm4MSA and Hierarchical Factorization).
 ## <b/> See also: FaustFactory.fact_hierarchical, FaustFactory.fact_palm4msa
 
 """
@@ -21,7 +21,7 @@ else:
 
 class ConstraintGeneric(ABC):
     """
-    This is the parent class for representing a factor constraint in FAµST factorization algorithms.
+    This is the parent class for representing a factor constraint in FAuST factorization algorithms.
 
     This class shouldn't be instantiated, rather rely on sub-classes.
     Typically, a constraint finds its place into a ParamsFact or sub-class
@@ -735,7 +735,7 @@ def _init_init_D(init_D, dim_sz):
 
 class StoppingCriterion(object):
     """
-        This class defines a StoppingCriterion for the FAµST's algorithms.
+        This class defines a StoppingCriterion for the FAuST's algorithms.
 
         A stopping criterion can be of two kinds:
             - number of iterations,
@@ -760,7 +760,7 @@ class StoppingCriterion(object):
 
 class ParamsFactFactory:
     """
-        The factory for creating simplified FAµST hierarchical algorithm parameters (ParamsHierarchicalFact).
+        The factory for creating simplified FAuST hierarchical algorithm parameters (ParamsHierarchicalFact).
 
         Note: this factory is not related to ParamsPalm4MSA, it only creates
         ParamsHierarchicalFact instances.

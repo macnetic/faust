@@ -96,7 +96,7 @@ def allfigs():
 
 class quickstart:
     """
-        The FAµST quickstart script, a good place to look at for a first tour.
+        The FAuST quickstart script, a good place to look at for a first tour.
     """
     @staticmethod
     def run():
@@ -702,7 +702,7 @@ class hadamard:
     @staticmethod
     def run_speedup_hadamard(output_dir=DEFT_RESULTS_DIR):
         """
-		This demo makes some time comparison between (Hadamard matrix)-vector multiplication and (Hadamard factorisation i.e a FAµST)-vector multiplication for Hadamard matrices of different sizes.
+		This demo makes some time comparison between (Hadamard matrix)-vector multiplication and (Hadamard factorisation i.e a FAuST)-vector multiplication for Hadamard matrices of different sizes.
         """
         treshold = 10.**-10
         print("Speedup Hadamard")
@@ -1042,7 +1042,7 @@ class bsl:
 
             The MEG gain matrices used are the precomputed ones in
             get_data_dirpath()+"/faust_MEG_rcg_X.mat"
-            (in the installation directory of the FAµST toolbox)
+            (in the installation directory of the FAuST toolbox)
 
             References:
 
