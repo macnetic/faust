@@ -86,6 +86,7 @@ if(BUILD_DOCUMENTATION)
 	endif()
 	file(REMOVE ${PROJECT_BINARY_DIR}/doc/README_install_part.html)
 	configure_file(${FAUST_DOC_SRC_DIR}/bin_pkgs/README_template.md ${PROJECT_BINARY_DIR}/doc/README.md)
+	configure_file(${FAUST_DOC_SRC_DIR}/faq.md ${PROJECT_BINARY_DIR}/doc/faq.md)
 endif(BUILD_DOCUMENTATION) 
 
 

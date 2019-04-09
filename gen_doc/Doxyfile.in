@@ -458,6 +458,7 @@ WARN_LOGFILE           = "@PROJECT_BINARY_DIR@/doc/doxygen.log"
 INPUT			=	"@PROJECT_BINARY_DIR@/doc/mainpage.md" \
 				"@PROJECT_BINARY_DIR@/doc/README.md" \
 				"@PROJECT_BINARY_DIR@/doc/install_pyfaust_in_venv.md" \
+				"@PROJECT_BINARY_DIR@/doc/faq.md" \
 					"@FAUST_SRC_LINEAR_OPERATOR_DIR@" \
 					"@FAUST_ALGORITHM_CONSTRAINT_SRC_DIR@" \
 					"@FAUST_ALGORITHM_FACTORIZATION_SRC_DIR@" \
