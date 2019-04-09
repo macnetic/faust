@@ -58,6 +58,7 @@ if(BUILD_DOCUMENTATION)
 		endif()
 	endif()
 
+	SET(FAUST_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}") # needed for windows because the install prefix could be not set on gitlab-runner
 	if(APPLE)
 		configure_file(${FAUST_DOC_SRC_DIR}/bin_pkgs/macosx/installer_readme.html.in ${PROJECT_BINARY_DIR}/doc/installer_readme.html @ONLY)
 		file(COPY ${FAUST_DOC_SRC_DIR}/bin_pkgs/macosx/licenses.html DESTINATION ${PROJECT_BINARY_DIR}/doc/)
@@ -75,6 +76,7 @@ if(BUILD_DOCUMENTATION)
 		endif()
 		configure_file(${FAUST_DOC_SRC_DIR}/bin_pkgs/README_template.html ${PROJECT_BINARY_DIR}/doc/html/README.html @ONLY)
 	elseif(WIN32)
+		SET(FAUST_INSTALL_PATH "C:/Program Files/Faust") # path of installation is always this on Windows
 		if(NOT DEFINED OS_SPECIFIC_INSTALL_GUIDE_INSTRUCS)
 		    configure_file(${FAUST_DOC_SRC_DIR}/bin_pkgs/win/README_install_part.html ${PROJECT_BINARY_DIR}/doc/README_install_part.html)
 		    file(READ ${PROJECT_BINARY_DIR}/doc/README_install_part.html OS_SPECIFIC_INSTALL_GUIDE_INSTRUCS)

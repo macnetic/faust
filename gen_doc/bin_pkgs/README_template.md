@@ -65,7 +65,7 @@ Otherwise it didn't work. So here is how to setup the wrapper manually.
 
 First, launch a Matlab terminal, then go in the FAµST directory:
 
-	>> cd @CMAKE_INSTALL_PREFIX@/matlab
+	>> cd @FAUST_INSTALL_PATH@/matlab
 
 Then launch the script that is responsible to add FAµST location in your Matlab path.
 
@@ -81,7 +81,7 @@ For that purpose:
 <li>Go into the sub-directory toolbox/local
 <li>Edit the file startup.m by adding the follwing line:
 <pre>
-	addpath(genpath('@CMAKE_INSTALL_PREFIX@/matlab'))
+	addpath(genpath('@FAUST_INSTALL_PATH@/matlab'))
 </pre>
 </ol>
 OK! You can follow the [quick start usage](#usage) now.
@@ -107,13 +107,13 @@ indicates that you need to add the Python wrapper manually in your Python path a
 
 - For Linux and macOS in a Bash terminal:
 
-	$ export PYTHONPATH=$PYTHONPATH:@CMAKE_INSTALL_PREFIX@/python
+	$ export PYTHONPATH=$PYTHONPATH:@FAUST_INSTALL_PATH@/python
 	# and test again
 	$ python2 -c "import pyfaust; print('It works.')"
 
 - For Windows in the command prompt:
 
-	set PYTHONPATH=%PYTHONPATH%;@CMAKE_INSTALL_PREFIX@/python
+	set PYTHONPATH=%PYTHONPATH%;@FAUST_INSTALL_PATH@/python
 	:: and test again
 	python -c "import pyfaust; print('It works.')"
 
