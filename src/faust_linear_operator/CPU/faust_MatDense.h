@@ -212,7 +212,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 	
 		
 	MatType getType() const
-	{ return Dense;}
+	{ return MatType::Dense;}
 	
 
 	/*!  \brief return a "copy" to the given matrix

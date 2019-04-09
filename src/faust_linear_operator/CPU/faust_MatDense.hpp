@@ -131,7 +131,6 @@ faust_unsigned_int Faust::MatDense<FPP,Cpu>::getNonZeros()const
 	}
 
 	return nnz;	
-
 }
 
 

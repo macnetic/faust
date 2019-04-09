@@ -740,7 +740,7 @@ void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
 		faust_unsigned_int* num_cols) const
 {
 	MatGeneric<FPP,Cpu>* mat_ptr = get_fact(id, false);
-	if(mat_ptr->getType() != Sparse)
+	if(mat_ptr->getType() != MatType::Sparse)
 		handleError(m_className, "get_fact(uint,uint**,uint**,FPP**,uint*,uint*,uint*): this prototype must be called only on sparse factors.");
 	MatSparse<FPP,Cpu>* smat_ptr = dynamic_cast<MatSparse<FPP,Cpu>*>(mat_ptr);
 
@@ -795,7 +795,7 @@ void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
 		 faust_unsigned_int* num_cols) const
 {
 	MatGeneric<FPP,Cpu>* mat_ptr = get_fact(id, false);
-	if(mat_ptr->getType() != Dense)
+	if(mat_ptr->getType() != MatType::Dense)
 		handleError(m_className, "get_fact(uint,FPP**,uint*,uint*,uint*): this prototype must be called only on dense factors.");
 	MatDense<FPP,Cpu>* dmat_ptr = dynamic_cast<MatDense<FPP,Cpu>*>(mat_ptr);
 	*elts = dmat_ptr->getData();
@@ -837,14 +837,14 @@ void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
 template<typename FPP>
 bool Faust::Transform<FPP,Cpu>::is_fact_sparse(const faust_unsigned_int id) const
 {
-	return get_fact(id, false)->getType() == Sparse;
+	return get_fact(id, false)->getType() == MatType::Sparse;
 }
 
 
 template<typename FPP>
 bool Faust::Transform<FPP,Cpu>::is_fact_dense(const faust_unsigned_int id) const
 {
-	return get_fact(id, false)->getType() == Dense;
+	return get_fact(id, false)->getType() == MatType::Dense;
 }
 
 template<typename FPP>
@@ -1146,7 +1146,7 @@ void Faust::Transform<FPP,Cpu>::print_timers() const
 		density = 100.0 * data[i]->density(); //percentage 0 < value < 100
 
 		std::cout<<"- FACTOR "<<i<<": TYPE ";
-		if (data[i]->getType() == Dense)
+		if (data[i]->getType() == MatType::Dense)
 			cout<<"dense ";
 		else if (data[i]->getType() == Sparse)
 			cout<<"sparse ";

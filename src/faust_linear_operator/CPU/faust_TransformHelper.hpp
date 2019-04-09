@@ -389,14 +389,14 @@ namespace Faust {
 
 			switch (factor_generic->getType())
 			{
-				case Dense :
+				case MatType::Dense :
 					{
 						MatDense<FPP,Cpu>* factor_dense_ptr = dynamic_cast<MatDense<FPP,Cpu>* > (factor_generic);
 						dense_factor = (*factor_dense_ptr); //copy
 					}
 					break;
 
-				case Sparse :
+				case MatType::Sparse :
 					{
 						MatSparse<FPP,Cpu>* factor_sparse_ptr = dynamic_cast<MatSparse<FPP,Cpu>* > (factor_generic);
 						dense_factor = (*factor_sparse_ptr); //copy
@@ -604,7 +604,7 @@ namespace Faust {
 				if(i < this->size())
 				{
 					tmp_fac_gen = get_gen_fact(i); //this->transform->data[i];
-					if(F_inter_fac_allocated = (tmp_fac_gen->getType() == Dense))
+					if(F_inter_fac_allocated = (tmp_fac_gen->getType() == MatType::Dense))
 					{
 						F_fac = new MatSparse<FPP,Cpu>(*dynamic_cast<const MatDense<FPP,Cpu>*>(tmp_fac_gen));
 						if(is_transposed) const_cast<MatSparse<FPP,Cpu>*>(F_fac)->transpose();
@@ -643,7 +643,7 @@ namespace Faust {
 				if(i < G->size())
 				{
 					tmp_fac_gen = G->get_gen_fact(i);//G->transform->data[i];
-					if((G_inter_fac_allocated = (tmp_fac_gen->getType() == Dense)))
+					if((G_inter_fac_allocated = (tmp_fac_gen->getType() == MatType::Dense)))
 					{
 						G_fac = new MatSparse<FPP,Cpu>(*dynamic_cast<const MatDense<FPP,Cpu>*>(tmp_fac_gen));
 						if(G->is_transposed) const_cast<MatSparse<FPP,Cpu>*>(G_fac)->transpose();

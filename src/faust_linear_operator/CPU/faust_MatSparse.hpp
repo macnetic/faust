@@ -88,6 +88,33 @@ Faust::MatGeneric<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::Clone(const bool isOptimi
 
 
 
+
+template<typename FPP>
+Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatDiag<FPP>& D) : Faust::MatGeneric<FPP,Cpu>(D.getNbRow(),D.getNbCol()), mat(Eigen::SparseMatrix<FPP,Eigen::RowMajor>(D.getNbRow(), D.getNbCol())), nnz(D.getNonZeros())
+{
+	size_t* id_row = new size_t[nnz];
+	size_t* col_ptr = new size_t[nnz+1];
+	FPP* data = new FPP[nnz];
+	FPP c;
+	int j = 0;
+	col_ptr[0] = 0;
+	for(int i=0; i < this->dim1; i++)
+		if((c = D.getData()[i]) != FPP(0))
+		{
+			id_row[j] = i;
+			data[j] = c;
+			col_ptr[i+1] = 1+col_ptr[i];
+			j++;
+		}
+		else
+			col_ptr[i+1] = col_ptr[i];
+	*this = MatSparse<FPP,Cpu>(j, this->dim1, this->dim2, data, id_row, col_ptr);
+	delete[] col_ptr;
+	delete[] id_row;
+	delete[] data;
+}
+
+
 template<typename FPP>
 	template<typename FPP1>
 void Faust::MatSparse<FPP,Cpu>::operator=(const Faust::MatSparse<FPP1,Cpu>& M)

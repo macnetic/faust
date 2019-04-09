@@ -1,4 +1,5 @@
 #include "faust_MatDiag.h"
+#include "faust_MatSparse.h"
 #include <cstdlib>
 
 
@@ -6,14 +7,30 @@
 
 using namespace Faust;
 typedef @TEST_FPP@ FPP;
+typedef @TEST_FPP2@ FPP2;
 
 
 int main()
 {
-	FPP data[3];
-	data[0] = FPP(1);
-	data[1] = FPP(2);
-	data[2] = FPP(3);
-	MatDiag<FPP> mdiag(10,data);
+	cout << "start of test_MatDiag" << endl;
+	FPP data[10];
+	for(int i=0; i < 10; i++)
+		data[i] = FPP(i);
+	data[4] = FPP(0);
+	MatDiag<FPP> diagMat (10, data);
+	cout << diagMat.to_string(false,true) << endl;
+	cout << "test mul by scalar: 5" << endl;
+	diagMat *= 5;
+	cout << diagMat.to_string(false,true) << endl;
+	cout << "try to convert to a MatSparse" << endl;
+	Faust::MatSparse<FPP,Cpu> matsp(diagMat);
+	cout << matsp.to_string(false,true) << endl;
+	for(int i=0;i<10;i++)
+	{
+		for(int j=0;j<10;j++)
+			cout << MatDense<FPP,Cpu>(matsp)(i,j) << " ";
+		cout << endl;
+	}
+	cout << "end of test_MatDiag" << endl;
 	return EXIT_SUCCESS;
 }

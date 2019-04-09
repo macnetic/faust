@@ -18,15 +18,18 @@ namespace Faust
 		{
 
 			DiagonalMatrix<FPP,Dynamic> mat;
+			bool isZeros; //TODO: init!
 
 			public:
-			MatDiag(faust_unsigned_int n): MatGeneric<FPP,Cpu>(n,n) {}
+			MatDiag(faust_unsigned_int n): MatGeneric<FPP,Cpu>(n,n), isZeros(true) {}
 
-			MatDiag(faust_unsigned_int n, FPP* data): MatGeneric<FPP,Cpu>(n,n)
+			MatDiag(faust_unsigned_int n, FPP* data): MatGeneric<FPP,Cpu>(n,n), isZeros(false)
 			{
 				Matrix<FPP, Dynamic, 1> v(n);
 				memcpy(v.data(), data, sizeof(FPP)*n);
 				mat = v.asDiagonal();
+//				cout << mat.diagonal().size() << endl;
+//				cout << mat.rows() << " " << mat.cols() << endl;
 			}
 
 			MatType getType() const { return Diag; }
@@ -38,7 +41,7 @@ namespace Faust
 			void multiply(MatDense<FPP,Cpu> & M, char opThis) const;
 			void transpose() { /* nothing to do */ }
 			void conjugate() {  };//TODO:
-			faust_unsigned_int getNonZeros() const { return 0; } //TODO
+			faust_unsigned_int getNonZeros() const { return mat.diagonal().nonZeros(); } //TODO
 
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
 			FPP normL1(const bool transpose) const;
@@ -56,6 +59,12 @@ namespace Faust
 			MatGeneric<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			MatGeneric<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
 			MatGeneric<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
+			//! \brief Returns all the features of the MatDense.
+			std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
+			void Display() const;
+
+			const FPP* getData() const { return mat.diagonal().data();};
+
 		};
 #include "faust_MatDiag.hpp"
 }

@@ -42,6 +42,7 @@
 #define __FAUST_MATSPARSE_H__
 
 #include "faust_constant.h"
+#include "faust_MatDiag.h"
 #include "faust_MatDense.h"
 #include <Eigen/SparseCore>
 #include <Eigen/Dense>
@@ -63,7 +64,8 @@
 //! \param FPP scalar numeric type, e.g float or double
 //!
 
-
+#include "faust_MatDiag.h"
+//template<typename FPP> class MatDiag;
 
 //! Faust::MatSparse class template of sparse matrix
 template<typename FPP,Device DEVICE> class MatSparse;
@@ -94,7 +96,7 @@ namespace Faust
 	template<typename FPP,Device DEVICE> class MatGeneric;
 
 
-
+	template<typename FPP> class MatDiag;
 
 	//! Faust::MatDense class template of dense matrix
 	template<typename FPP,Device DEVICE> class MatDense;
@@ -110,6 +112,8 @@ namespace Faust
 
 			public:
 			MatSparse();
+			MatSparse(const Faust::MatDiag<FPP>&);
+
 
 
 			void faust_gemm(const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C, const FPP & alpha, const FPP & beta, char typeA, char typeB)
@@ -219,7 +223,7 @@ namespace Faust
 			bool isRowMajor() const{return mat.IsRowMajor;}
 
 			// Virtual Function (inherited method from MatGeneric)
-			MatType getType() const{ return Sparse;}
+			MatType getType() const{ return MatType::Sparse;}
 
 
 			/*!  \brief return a "copy" to the given matrix
