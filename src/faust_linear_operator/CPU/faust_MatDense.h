@@ -168,11 +168,15 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
     //template<Device DEVICE> class BlasHandle;
 
     template<typename FPP>
+    class MatDiag;
+
+    template<typename FPP>
     class MatDense<FPP,Cpu> : public Faust::MatGeneric<FPP,Cpu>
     {
 
-	friend class MatSparse<FPP,Cpu>;
-        
+		friend class MatSparse<FPP,Cpu>;
+		friend void  MatDiag<FPP>::multiply(MatDense<FPP,Cpu> & M, char opThis) const;
+
 	/// All derived class template of MatDense are considered as friends
         template<class,Device> friend class MatDense;
 

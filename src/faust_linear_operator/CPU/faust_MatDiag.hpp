@@ -39,20 +39,31 @@ void MatDiag<FPP>::faust_gemm(const Faust::MatDense<FPP,Cpu> & B, Faust::MatDens
 template<typename FPP>
 Vect<FPP,Cpu> MatDiag<FPP>::multiply(const Vect<FPP,Cpu> &v) const
 {
-	Vect<FPP,Cpu> v_(v);
-	return v;
+	Vect<FPP,Cpu> v_(this->getNbRow());
+	v_.vec = mat * v.vec;
+	return v_;
 }
 
 template<typename FPP>
 void  MatDiag<FPP>::multiply(Vect<FPP,Cpu> & vec, char opThis) const
 {
-	//TODO
+	if(opThis == 'T')
+	{
+		MatDiag<FPP> tmat(this->getNbCol(), this->getNbRow(), this->getData());
+		vec.vec = tmat.mat * vec.vec;
+	}
+	else vec.vec = mat * vec.vec;
 }
 
 template<typename FPP>
 void  MatDiag<FPP>::multiply(MatDense<FPP,Cpu> & M, char opThis) const
 {
-	//TODO
+	if (opThis == 'N')
+		M.mat = this->mat * M.mat;
+	else {
+		MatDiag<FPP> tmat(this->getNbCol(), this->getNbRow(), this->getData());
+		M.mat = tmat.mat * M.mat;
+	}
 }
 
 template<typename FPP>

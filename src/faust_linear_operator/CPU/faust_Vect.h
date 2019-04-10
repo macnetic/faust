@@ -81,6 +81,10 @@ namespace Faust
     template<typename FPP,Device DEVICE>
     class MatSparse;
 
+
+template<typename FPP>
+    class MatDiag;
+
    // friend function of faust_linear_algebra.h
    template<typename FPP>
    void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
@@ -94,6 +98,9 @@ namespace Faust
     {
         template<class,Device> friend class Vect;
 		friend double Faust::Transform<FPP,Cpu>::normL1(const bool transpose) const;
+		friend Vect<FPP,Cpu> Faust::MatDiag<FPP>::multiply(const Vect<FPP,Cpu> & vec) const;
+		friend void  MatDiag<FPP>::multiply(Vect<FPP,Cpu> & vec, char opThis) const;
+
 
         public :
         Vect() : dim(0), vec() {}

@@ -10,12 +10,37 @@ typedef @TEST_FPP@ FPP;
 typedef @TEST_FPP2@ FPP2;
 
 
+
+void display_all_elts(MatDense<FPP,Cpu> matdense)
+{
+	for(int i=0;i<matdense.getNbRow();i++)
+	{
+		for(int j=0;j<matdense.getNbCol();j++)
+			cout << matdense(i,j) << " ";
+		cout << endl;
+	}
+}
+
+void display_all_elts(Faust::MatSparse<FPP,Cpu> matsp)
+{
+	display_all_elts(MatDense<FPP,Cpu>(matsp));
+}
+
+void display_all_elts(MatDiag<FPP> matdiag)
+{
+	display_all_elts(Faust::MatSparse<FPP,Cpu>(matdiag));
+}
+
 int main()
 {
 	cout << "start of test_MatDiag" << endl;
 	FPP data[10];
 	for(int i=0; i < 10; i++)
+#if(@TEST_IS_COMPLEX@==1)
+		data[i] = FPP(i,i);
+#else
 		data[i] = FPP(i);
+#endif
 	data[4] = FPP(0);
 	MatDiag<FPP> diagMat (10, data);
 	cout << diagMat.to_string(false,true) << endl;
@@ -25,12 +50,25 @@ int main()
 	cout << "try to convert to a MatSparse" << endl;
 	Faust::MatSparse<FPP,Cpu> matsp(diagMat);
 	cout << matsp.to_string(false,true) << endl;
-	for(int i=0;i<10;i++)
-	{
-		for(int j=0;j<10;j++)
-			cout << MatDense<FPP,Cpu>(matsp)(i,j) << " ";
-		cout << endl;
-	}
+	display_all_elts(diagMat);
+	cout << "conjugate()" << endl;
+	diagMat.conjugate();
+	display_all_elts(diagMat);
+	cout << "vec mul.:" << endl;
+	FPP vec_data[diagMat.getNbCol()];
+	for(int i=0;i<diagMat.getNbCol();i++)
+		vec_data[i] = FPP(i);
+	const Faust::Vect<FPP,Cpu> v(diagMat.getNbCol(), vec_data);
+	Faust::Vect<FPP,Cpu> vr = diagMat.multiply(v);
+	vr.Display();
+	cout << "mat. mul.:" << endl;
+	MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(diagMat.getNbCol(), 4);
+	cout << "matrix to mul." << endl;
+	*M *= FPP(20);
+	display_all_elts(*M);
+	diagMat.multiply(*M, 'N');
+	cout << "matrix multiplied:" << endl;
+	display_all_elts(*M);
 	cout << "end of test_MatDiag" << endl;
 	return EXIT_SUCCESS;
 }

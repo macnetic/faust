@@ -22,15 +22,24 @@ namespace Faust
 
 			public:
 			MatDiag(faust_unsigned_int n): MatGeneric<FPP,Cpu>(n,n), isZeros(true) {}
+			MatDiag(faust_unsigned_int nrows, faust_unsigned_int ncols): MatGeneric<FPP,Cpu>(nrows,ncols), isZeros(true) {}
 
-			MatDiag(faust_unsigned_int n, FPP* data): MatGeneric<FPP,Cpu>(n,n), isZeros(false)
+			MatDiag(faust_unsigned_int n, const FPP* data): MatGeneric<FPP,Cpu>(n,n), isZeros(false)
 			{
 				Matrix<FPP, Dynamic, 1> v(n);
 				memcpy(v.data(), data, sizeof(FPP)*n);
 				mat = v.asDiagonal();
 //				cout << mat.diagonal().size() << endl;
 //				cout << mat.rows() << " " << mat.cols() << endl;
+				isZeros = getNonZeros() == 0;
 			}
+
+			MatDiag(faust_unsigned_int nrows, faust_unsigned_int ncols, const FPP* data): MatDiag<FPP>(min(nrows,ncols), data)
+			{
+				this->dim1 = nrows;
+				this->dim2 = ncols;
+			}
+
 
 			MatType getType() const { return Diag; }
 
@@ -39,9 +48,9 @@ namespace Faust
 			void multiply(Vect<FPP,Cpu> & vec, char opThis='N') const;
 
 			void multiply(MatDense<FPP,Cpu> & M, char opThis) const;
-			void transpose() { /* nothing to do */ }
-			void conjugate() {  };//TODO:
-			faust_unsigned_int getNonZeros() const { return mat.diagonal().nonZeros(); } //TODO
+			void transpose() { faust_unsigned_int tmp; tmp = this->dim1; this->dim1 = this->dim2; this->dim2 = tmp; }
+			void conjugate() { mat = mat.diagonal().conjugate().asDiagonal(); }
+			faust_unsigned_int getNonZeros() const { return mat.diagonal().nonZeros(); }
 
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
 			FPP normL1(const bool transpose) const;
