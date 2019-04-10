@@ -40,6 +40,10 @@ namespace Faust
 				this->dim2 = ncols;
 			}
 
+			MatDiag(const MatDiag<FPP> & M) : MatDiag(M.dim1, M.dim2, M.getData())
+			{
+			}
+
 
 			MatType getType() const { return Diag; }
 
@@ -53,7 +57,7 @@ namespace Faust
 			faust_unsigned_int getNonZeros() const { return mat.diagonal().nonZeros(); }
 
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
-			FPP normL1(const bool transpose) const;
+			FPP normL1(const bool transpose=false) const;
 			FPP norm() const;
 			FPP normL1(faust_unsigned_int& col_id, const bool transpose) const;
 

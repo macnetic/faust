@@ -69,8 +69,7 @@ void  MatDiag<FPP>::multiply(MatDense<FPP,Cpu> & M, char opThis) const
 template<typename FPP>
 MatGeneric<FPP,Cpu>* MatDiag<FPP>::Clone(const bool isOptimize) const
 {
-	//TODO
-	return nullptr;
+	return new MatDiag<FPP>(*this);
 }
 
 template<typename FPP>
@@ -83,38 +82,62 @@ matvar_t* MatDiag<FPP>::toMatIOVar(bool transpose, bool conjugate) const
 template<typename FPP>
 FPP MatDiag<FPP>::normL1(const bool transpose) const
 {
-	//TODO
-	return FPP(0);
+	faust_unsigned_int i;
+	return normL1(i,transpose);
 }
 
 template<typename FPP>
 FPP MatDiag<FPP>::norm() const
 {
-	//TODO
-	return FPP(0);
+	return mat.diagonal().norm();
 }
 
 template<typename FPP>
 FPP MatDiag<FPP>::normL1(faust_unsigned_int& col_id, const bool transpose) const
 {
-	//TODO
-	return FPP(0);
+	const FPP* data = getData();
+	FPP max = 0, a;
+	for(faust_unsigned_int i=0;i<min(this->dim1, this->dim2);i++)
+		if(Faust::fabs(a=Faust::fabs(data[i])) > Faust::fabs(max))
+		{
+			max = a;
+			col_id = i;
+		}
+	return max;
 }
 
 template<typename FPP>
 Vect<FPP,Cpu> MatDiag<FPP>::get_col(faust_unsigned_int id) const
 {
-	//TODO
-	Vect<FPP,Cpu> v;
+	Vect<FPP,Cpu> v(this->getNbRow());
+	memset(v.getData(),0, sizeof(FPP)*this->getNbRow());
+	if(id>=this->getNbCol())
+		handleError("Matdiag", "column index is out of dimension size.");
+	if(id < min(this->getNbRow(), this->getNbCol()))
+		v.getData()[id] = getData()[id];
 	return v;
 }
 
 template<typename FPP>
 MatGeneric<FPP,Cpu>* MatDiag<FPP>::get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const
 {
-	//TODO
-	return nullptr;
-
+	if(num_cols+col_id_start>=this->getNbCol())
+		handleError("Matdiag", "column index is out of dimension size.");
+	faust_unsigned_int dmin = min(this->getNbRow(), this->getNbCol());
+	FPP * data = new FPP[num_cols];
+	if(col_id_start > dmin)
+		memset(data, 0, sizeof(FPP)*num_cols);
+	else {
+		if(col_id_start+num_cols > dmin)
+		{
+			faust_unsigned_int overflow = col_id_start+num_cols-dmin;
+			memset(data+num_cols-overflow, 0, sizeof(FPP)*overflow);
+		}
+		memcpy(data, getData()+col_id_start, num_cols*sizeof(FPP));
+	}
+	MatDiag<FPP> * ret = new MatDiag<FPP>(this->getNbRow(), num_cols, data);
+	delete[] data;
+	return ret;
 }
 
 template<typename FPP>

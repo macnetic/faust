@@ -69,6 +69,20 @@ int main()
 	diagMat.multiply(*M, 'N');
 	cout << "matrix multiplied:" << endl;
 	display_all_elts(*M);
+	cout << "Clone()" << endl;
+	MatGeneric<FPP,Cpu>* diagMatClone = diagMat.Clone();
+	display_all_elts(diagMat);
+	FPP n = diagMat.normL1();
+	cout << "1-norm:" << n << endl;
+	n = diagMat.norm();
+	cout << "fro-norm:" << n << endl;
+	cout << "getcol(3)" << endl;
+	diagMat.get_col(3).Display();
+	cout << "getcol(5)" << endl;
+	diagMat.get_col(5).Display();
+	cout << "getcols(2,5)" << endl;
+	MatGeneric<FPP,Cpu>* cols = diagMat.get_cols(2,5);
+	display_all_elts(*dynamic_cast<MatDiag<FPP>*>(cols));
 	cout << "end of test_MatDiag" << endl;
 	return EXIT_SUCCESS;
 }

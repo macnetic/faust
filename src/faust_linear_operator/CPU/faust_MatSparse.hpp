@@ -98,7 +98,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatDiag<FPP>& D) : Faust::MatG
 	FPP c;
 	int j = 0;
 	col_ptr[0] = 0;
-	for(int i=0; i < this->dim1; i++)
+	for(int i=0; i < min(this->dim1, this->dim2); i++)
 		if((c = D.getData()[i]) != FPP(0))
 		{
 			id_row[j] = i;
