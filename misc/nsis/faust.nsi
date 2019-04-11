@@ -192,8 +192,8 @@ Section "" ; no component so name not needed
   SetOutPath $INSTDIR\doc\html
   File @PROJECT_BINARY_DIR@\doc\html\*
 
-  ExecShell open "file:///$INSTDIR/doc/html/index.html"
-
+  ;ExecShell open "file:///$INSTDIR/doc/html/index.html" ; enable this link again when the bug issue #99 is fixed (doxypypy failing on windows)
+  ExecShell open "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/"
 SectionEnd
 
 Function matlabFoundCb
