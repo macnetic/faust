@@ -1,4 +1,4 @@
-%> @package matfaust.demo @brief The matfaust namespace for the demos partly based on research papers
+%> @package matfaust.demo @brief The matfaust namespace for the demos partly based on research papers (see references in each demo)
 
 %% Description quick_start
 %

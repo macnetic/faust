@@ -24,7 +24,6 @@ namespace Faust
 				handleError(m_className,"constructor : params and Laplacian matrix Lap haven't compatible size");
 			delete this->palm_global;
 			this->palm_global = new Palm4MSAFGFT<FPP,DEVICE,FPP2>(Lap, params, cublasHandle, true);
-			params.Display();
 		}
 
 

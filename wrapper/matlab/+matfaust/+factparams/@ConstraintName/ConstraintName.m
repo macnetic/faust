@@ -2,7 +2,7 @@
 %%%
 
 % =========================================================
-%> This class defines the names for the sub-types of constraints into the ConstraintGeneric hierarchy of classes.
+%> @brief This class defines the names for the sub-types of constraints into the ConstraintGeneric hierarchy of classes.
 %>
 %> The table <a href="constraint.png">here</a> is a summary of the available constraints.
 %>

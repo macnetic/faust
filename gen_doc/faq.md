@@ -18,13 +18,15 @@ For example, running this matlab command if quickstart.mat file is not found you
 	For product information, visit www.mathworks.com.
 
 	Error using load
-	Unable to read file 'faust\_quick\_start.mat'. No such file or directory.
+	Unable to read file 'faust_quick_start.mat'. No such file or directory.
 
 	Error in matfaust.Faust (line 226)
 					load(filename);
 
-	Error in matfaust.demo.quickstart.quick\_start (line 19)
+	Error in matfaust.demo.quickstart.quick_start (line 19)
 				A=Faust('faust_quick_start.mat')
+
+The same kind of error might happen also with pyfaust, the python wrapper, which depends on the same data.
 
 Normally, at installation stage the FAµST externalized data (basically a bunch of matlab .mat files) is downloaded from a remote web server and unarchived in FAµST installation path.
 Nevertheless, it might not work properly for any reason (e.g. network issue happening at installation), so here are two ways to download the data manually.
@@ -42,8 +44,8 @@ Here is an example of commands you can type to download the data (it's on Linux 
 
 First, find where pyfaust is installed (if you installed pyfaust for python 3, run python3 not 2.7):
 
-	$ python -c "import pyfaust; print(pyfaust.\_\_file\_\_)"
-	/usr/lib64/python2.7/site-packages/pyfaust/\__init__.pyc
+	$ python -c "import pyfaust; print(pyfaust.__file__)"
+	/usr/lib64/python2.7/site-packages/pyfaust/__init__.pyc
 
 Second, run these commands to download and uncompress the data:
 

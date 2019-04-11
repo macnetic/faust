@@ -17,7 +17,7 @@
 
 FAµST is designed for the Python ecosystem which as usual relies on the numpy and scipy packages.
 
-If you want to run de FAµST demos (module pyfaust.demo), you'll also need the matplotlib package.
+If you want to run the FAµST demos (module pyfaust.demo), you'll also need the matplotlib package.
 
 Please ensure these packages are installed on your system. One way to install them is to use the pip program delivered with your python version.
 
@@ -84,6 +84,9 @@ For that purpose:
 	addpath(genpath('@FAUST_INSTALL_PATH@/matlab'))
 </pre>
 </ol>
+
+Note: you can also edit a user specific startup.m script instead of system's startup.m. Look the Matlab documentation [here](https://fr.mathworks.com/help/matlab/matlab_env/startup-options.html).
+
 OK! You can follow the [quick start usage](#usage) now.
 
 ### 3.2 Testing the Python Wrapper
@@ -93,7 +96,7 @@ To test whether the FaµST Python wrapper has been setup properly, simply open a
 	python2 -c "import pyfaust; print('It works.')"
 
 	# it could be python2.7, python3, python@PY3_VER@ or just python,
-	# depending your configuration and the python version you want to use
+	# depending on your configuration and the python version you want to use
 
 It goes without saying that if the wrapper is set up properly you'll see the message "It works." as a result of the command above.
 

@@ -25,7 +25,7 @@
 
 <p>FAµST is designed for the Python ecosystem which as usual relies on the numpy and scipy packages.</p>
 
-<p>If you want to run de FAµST demos (module pyfaust.demo), you&rsquo;ll also need the matplotlib package.</p>
+<p>If you want to run the FAµST demos (module pyfaust.demo), you&rsquo;ll also need the matplotlib package.</p>
 
 <p>Please ensure these packages are installed on your system. One way to install them is to use the pip program delivered with your python version.</p>
 
@@ -75,7 +75,7 @@ Nevertheless, it could be useful to check that it really worked and set the envi
 
 <p>First, launch a Matlab terminal, then go in the FAµST directory:</p>
 
-<pre><code>&gt;&gt; cd @CMAKE_INSTALL_PREFIX@/matlab
+<pre><code>&gt;&gt; cd @FAUST_INSTALL_PATH@/matlab
 </code></pre>
 
 <p>Then launch the script that is responsible to add FAµST location in your Matlab path.</p>
@@ -93,10 +93,12 @@ For that purpose:</p>
 <li>Go into the sub-directory toolbox/local
 <li>Edit the file startup.m by adding the follwing line:
 <pre>
-    addpath(genpath('@CMAKE_INSTALL_PREFIX@/matlab'))
+    addpath(genpath('@FAUST_INSTALL_PATH@/matlab'))
 </pre>
 </ol>
 
+
+<p>Note: you can also edit a user specific startup.m script instead of system&rsquo;s startup.m. Look the Matlab documentation <a href="https://fr.mathworks.com/help/matlab/matlab_env/startup-options.html">here</a>.</p>
 
 <p>OK! You can follow the <a href="#usage">quick start usage</a> now.</p>
 
@@ -107,7 +109,7 @@ For that purpose:</p>
 <pre><code>python2 -c "import pyfaust; print('It works.')"
 
 # it could be python2.7, python3, python@PY3_VER@ or just python,
-# depending your configuration and the python version you want to use
+# depending on your configuration and the python version you want to use
 </code></pre>
 
 <p>It goes without saying that if the wrapper is set up properly you&rsquo;ll see the message &ldquo;It works.&rdquo; as a result of the command above.</p>
@@ -124,12 +126,12 @@ ModuleNotFoundError: No module named 'pyfaust'
 <ul>
 <li><p>For Linux and macOS in a Bash terminal:</p>
 
-<p>  $ export PYTHONPATH=$PYTHONPATH:@CMAKE_INSTALL_PREFIX@/python
+<p>  $ export PYTHONPATH=$PYTHONPATH:@FAUST_INSTALL_PATH@/python
   # and test again
   $ python2 -c &ldquo;import pyfaust; print(&lsquo;It works.&rsquo;)&rdquo;</p></li>
 <li><p>For Windows in the command prompt:</p>
 
-<p>  set PYTHONPATH=%PYTHONPATH%;@CMAKE_INSTALL_PREFIX@/python
+<p>  set PYTHONPATH=%PYTHONPATH%;@FAUST_INSTALL_PATH@/python
   :: and test again
   python -c &ldquo;import pyfaust; print(&lsquo;It works.&rsquo;)&rdquo;</p></li>
 </ul>

@@ -95,7 +95,7 @@ Section "" ; no component so name not needed
 
   ; install python wrapper
   SetOutPath $INSTDIR\python\pyfaust
-  File @PROJECT_BINARY_DIR@\wrapper\python\*py
+  File /r @PROJECT_BINARY_DIR@\wrapper\python\pyfaust\*py
   SetOutPath $INSTDIR\python
   File @PROJECT_BINARY_DIR@\wrapper\python\*pyd
   File @PROJECT_BINARY_DIR@\wrapper\python\*pxd
@@ -125,13 +125,20 @@ Section "" ; no component so name not needed
   File @PROJECT_BINARY_DIR@\wrapper\python\*pyd
   File @PROJECT_BINARY_DIR@\wrapper\python\*pxd
 
-  ;add data path in __init__.py
-  FileOpen $1 "$2\pyfaust\__init__.py" a
+  ;add data path in __init__.py (both into site-packages and $INSTDIR)
+  FileOpen $1 "$INSTDIR\pyfaust\__init__.py" a
   ; go at the end of file (but with append mode is that necessary ?)
   FileSeek $1 0 END
   ; add the install path
   FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
   FileClose $1
+
+  FileOpen $1 "$2\pyfaust\__init__.py" a
+  FileSeek $1 0 END
+  FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
+  FileClose $1
+  ; =================================================
+
 
   ; download data into matlab wrapper data folder
   ; create data folder
@@ -139,14 +146,15 @@ Section "" ; no component so name not needed
   ${StrRep} '$3' $INSTDIR '\' '\\'
   Exec "python -c $\"from os import mkdir; mkdir('$3\\matlab\\data')$\""
   ; download data
+  ClearErrors ; in case the data dir was already existing
   Exec "python $2\pyfaust\datadl.py $\"$INSTDIR\matlab\data$\""
   IfErrors 0 after_data_dl
-  MessageBox MB_OK "Downloading FAuST data with python has failed, now trying with powershell."
+  MessageBox MB_OK "Downloading FAuST data with python seems to have failed (or maybe it's already done), now trying with powershell."
   ClearErrors
   ExecWait "powershell Invoke-WebRequest $\"@REMOTE_DATA_URL@/@REMOTE_DATA_FILE@$\" -O $\"$TEMP\@REMOTE_DATA_FILE@$\"" ; ExecWait because unzipping needs download finished
   Exec "powershell Expand-Archive -Force $\"$TEMP\@REMOTE_DATA_FILE@$\" '$INSTDIR\matlab\data'" ; output folder data is created auto. ; simple quote used to avoid powershell to think there is two arguments when we meant one argument for the dest. path (double quote doesn't allow that).
   IfErrors 0 after_data_dl
-  MessageBox MB_OK "Error downloading FAuST data. You'll need to download manually (please check the documentation)." IDOK after_data_dl
+  MessageBox MB_OK "Error downloading FAuST data (or maybe it's already done). You'll need to download manually (please check the documentation)." IDOK after_data_dl
 
   after_data_dl:
 

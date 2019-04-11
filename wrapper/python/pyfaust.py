@@ -47,7 +47,7 @@ class Faust:
         - compute the real and imaginary parts of a Faust,
         - perform elementwise operations between two Fausts (e.g. elementwise
         multiplication), the addition and substraction are available though,
-        - reshape.
+        - reshape a Faust.
 
     Primarily for convenience and test purposes, a Faust can be converted into
     the corresponding full matrix using the function Faust.todense or
@@ -77,8 +77,7 @@ class Faust:
         Args:
             factors: list of numpy/scipy array/matrices or a single array/matrix.<br/>
                      The factors must respect the dimensions needed for
-                     the product to be defined (for i=0 to len(factors)-1,
-                     factors[i].shape[1] == factors[i+1].shape[0]).<br/>
+                     the product to be defined <code>(for i in range(0,len(factors)-1): factors[i].shape[1] == factors[i+1].shape[0])</code>.<br/>
                      The factors can be sparse or dense matrices
                      (either scipy.sparse.csr.csr_matrix or
                      numpy.ndarray).<br/>
@@ -94,7 +93,7 @@ class Faust:
         use filepath you must explicitely set argument with the keyword.
 
         Examples:
-            >>> from pyfaust import FaustFactory
+            >>> from pyfaust import FaustFactory, Faust
             >>> import numpy as np
             >>> from scipy import sparse
             >>> factors = []
@@ -627,7 +626,7 @@ class Faust:
                 FACTOR 4 (real) SPARSE, size 100x100, density 0.0482, nnz 48<br/>
                 FACTOR 5 (real) SPARSE, size 100x100, density 0.0287, nnz 28<br/>
                 FACTOR 6 (real) SPARSE, size 100x50, density 0.02, nnz 10<br/>
-                >>> F.concatenate(G, 1)
+                >>> F.concatenate(G, axis=1)
                 Faust size 50x100, density 0.5634, nnz_sum 2817, 7 factor(s)<br/>
                 FACTOR 0 (real) SPARSE, size 50x100, density 0.02, nnz 10<br/>
                 FACTOR 1 (real) SPARSE, size 100x100, density 0.0286, nnz 28<br/>
@@ -638,13 +637,19 @@ class Faust:
                 FACTOR 6 (real) SPARSE, size 100x100, density 0.0475, nnz 47<br/>
                 >>> from numpy.random import rand
                 >>> F.concatenate(rand(34, 50), axis=0) # The random array is auto-converted to a Faust before the vertical concatenation
-                Faust size 84x50, density 0.765476, nnz_sum 3215, 6 factor(s):<br/>
-                FACTOR 0 (real) SPARSE, size 84x100, density 0.23119, nnz 1942<br/>
-                FACTOR 1 (real) SPARSE, size 100x100, density 0.0301, nnz 301<br/>
-                FACTOR 2 (real) SPARSE, size 100x100, density 0.0286, nnz 286<br/>
-                FACTOR 3 (real) SPARSE, size 100x100, density 0.0285, nnz 285<br/>
-                FACTOR 4 (real) SPARSE, size 100x100, density 0.0301, nnz 301<br/>
-                FACTOR 5 (real) SPARSE, size 100x50, density 0.02, nnz 100<br/>
+                Faust size 384x50, density 0.677083, nnz_sum 13000, 12 factor(s):
+                FACTOR 0 (real) SPARSE, size 384x400, density 0.0224609, nnz 3450
+                FACTOR 1 (real) SPARSE, size 400x400, density 0.01125, nnz 1800
+                FACTOR 2 (real) SPARSE, size 400x400, density 0.01125, nnz 1800
+                FACTOR 3 (real) SPARSE, size 400x400, density 0.01125, nnz 1800
+                FACTOR 4 (real) SPARSE, size 400x400, density 0.01125, nnz 1800
+                FACTOR 5 (real) SPARSE, size 400x350, density 0.00714286, nnz 1000
+                FACTOR 6 (real) SPARSE, size 350x300, density 0.00333333, nnz 350
+                FACTOR 7 (real) SPARSE, size 300x250, density 0.004, nnz 300
+                FACTOR 8 (real) SPARSE, size 250x200, density 0.005, nnz 250
+                FACTOR 9 (real) SPARSE, size 200x150, density 0.00666667, nnz 200
+                FACTOR 10 (real) SPARSE, size 150x100, density 0.01, nnz 150
+                FACTOR 11 (real) SPARSE, size 100x50, density 0.02, nnz 100
                 >>> from scipy.sparse import rand as sprand
                 >>> F.concatenate(sprand(50, 24, format='csr'), axis=1) # The sparse random matrix is auto-converted to a Faust before the horizontal concatenation
                 Faust size 50x74, density 0.412703, nnz_sum 1527, 6 factor(s):<br/>
@@ -663,11 +668,6 @@ class Faust:
         if(axis not in [0,1]):
             raise ValueError("Axis must be 0 or 1.")
 
-        for G in args:
-            if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
-               != G.shape[0]): raise ValueError("The dimensions of "
-                                                "the two Fausts must "
-                                                "agree.")
 
         C=F
         for G in args:
@@ -679,6 +679,11 @@ class Faust:
                                                            "that is not a Faust, "
                                                            "a numpy array or scipy "
                                                            "sparse matrix.")
+           if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
+              != G.shape[0]): raise ValueError("The dimensions of "
+                                               "the two Fausts must "
+                                               "agree.")
+
            if(axis==0):
                 C = Faust(core_obj=C.m_faust.vertcat(G.m_faust))
            elif(axis==1):
@@ -765,7 +770,7 @@ class Faust:
 
     def __getitem__(F, indices):
         """
-        Indexes or Slices a Faust.
+        Indexes or slices a Faust.
 
         Returns a Faust representing a submatrix of F.toarray() or a scalar element if that Faust can be reduced to a single element.
 
@@ -773,14 +778,14 @@ class Faust:
 
         WARNING:
             - This function doesn't implement F[l1,l2] where l1 and l2 are
-            integer list objects, rather use F[l1][:,l2].
+            integer lists, rather use F[l1][:,l2].
             - It is not advised to use this function as an element accessor
-        (e.g. F(0,0)) because such a use induces to convert the Faust to its
+        (e.g. F[0,0]) because such a use induces to convert the Faust to its
         dense matrix representation and that is a very expensive computation if used
         repetitively.
             - Subindexing a Faust which would create an empty Faust will raise
             an error.
-            - fancy indexing must be done with a list not a numpy array.
+            - 'Fancy indexing' must be done with a list not a numpy array.
 
         Args:
             F: the Faust object.
@@ -824,7 +829,7 @@ class Faust:
             >>> F[i2:0:-2,:] # starts from row i2 and goes backward to take one in two rows until the first one (reversing order of F)
             >>> F[[1,18,2],:] # takes in this order the rows 1, 18 and 2
             >>> F[:, [1,18,2]] # takes in this order the columns 1, 18 and 2
-            >>> F[[1,18,2], [1,2]] # takes the rows 1, 18 and 2 but keeps only columns 1 and 2 in these rows
+            >>> F[[1,18,2]][:,[1,2]] # takes the rows 1, 18 and 2 but keeps only columns 1 and 2 in these rows
         """
         #TODO: refactor (by index when indices == tuple(2), error message,
         #      out_indices checking on the end)
@@ -1047,6 +1052,7 @@ class Faust:
 
         Examples:
             >>> from pyfaust import FaustFactory
+            >>> import numpy as np
             >>> F = FaustFactory.rand([1, 2], [50, 100], .5)
             >>> F.norm()
             23.55588891399667
@@ -1054,7 +1060,7 @@ class Faust:
             5.929720822717308
             >>> F.norm('fro')
             23.55588891399667
-            >>> F.norm(numpy.inf)
+            >>> F.norm(np.inf)
             18.509101197826254
         """
         if(ord not in [1, 2, "fro", np.inf]):
@@ -1140,7 +1146,7 @@ class Faust:
             >>> from pyfaust import FaustFactory
             >>> F = FaustFactory.rand(5, [50, 100], .5)
             >>> f0 = F.get_factor(0)
-            >>> G = F.get_factor(range(3:5)) # a new Faust composed of the two last factors of F
+            >>> G = F.get_factor(range(3,5)) # a new Faust composed of the two last factors of F
 
         <b/> See also Faust.get_num_factors, Faust.transpose
         """
@@ -1243,8 +1249,10 @@ class Faust:
         Examples:
             >>> from pyfaust import FaustFactory
             >>> F = FaustFactory.rand([2, 3], [10, 20],.5, field='complex')
+            >>> F.dtype
             dtype('complex128')
             >>> F = FaustFactory.rand([2, 3], [10, 20],.5)
+            >>> F.dtype
             dtype('float64')
 
 
@@ -1272,10 +1280,12 @@ class Faust:
         import matplotlib.pyplot as plt
         nf = F.get_num_factors()
         plt.subplot(1,nf+1,1)
+        plt.title('F.toarray()')
         plt.imshow(abs(F.toarray()),extent=[0,100,0,1], aspect='auto')
         plt.xticks([]); plt.yticks([])
         for i in range(0,nf):
             plt.subplot(1,F.get_num_factors()+1,i+2)
+            plt.title('F.get_factor('+str(i)+')')
             fac = F.get_factor(i)
             if(not isinstance(fac, np.ndarray)):
                 fac = fac.toarray()
@@ -1294,6 +1304,14 @@ class Faust:
     def isFaust(obj):
         """
         Returns True if obj is a Faust object, False otherwise.
+
+        Examples:
+            >>> from pyfaust import *
+            >>> Faust.isFaust(2)
+            False
+            >>> Faust.isFaust(FaustFactory.rand(5,10))
+            True
+
         """
         return isinstance(obj, Faust)
 
@@ -1586,7 +1604,7 @@ class FaustFactory:
 
           Examples:
               >>> from pyfaust import FaustFactory
-              >>>  FaustFactory.wht(10)
+              >>> FaustFactory.wht(10)
               Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10
               factor(s):
                   - FACTOR 0 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
@@ -1651,6 +1669,18 @@ class FaustFactory:
               n (optional): number of columns, set to m if not specified.
               t (optional): 'complex' to return a complex Faust otherwise (by default)
               it's a real Faust.
+
+            Examples:
+                >>> from pyfaust import FaustFactory
+                >>> FaustFactory.eye(5)
+                Faust size 5x5, density 0.2, nnz_sum 5, 1 factor(s):<br/>
+                FACTOR 0 (real) SPARSE, size 5x5, density 0.2, nnz 5<br/>
+                >>> FaustFactory.eye(5,4)
+                Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):<br/>
+                FACTOR 0 (real) SPARSE, size 5x4, density 0.2, nnz 4<br/>
+                >>> FaustFactory.eye(5,t='complex')
+                Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):<br/>
+                FACTOR 0 (complex) SPARSE, size 5x4, density 0.2, nnz 4<br/>
         """
         from scipy.sparse import eye
         if(not n):
@@ -1784,75 +1814,68 @@ class FaustFactory:
 
 
 		Example:
-        from pyfaust import FaustFactory
-        from pyfaust.factparams import *
-        from pyfaust.demo import get_data_dirpath
-        from scipy.io import loadmat, savemat
-        from numpy.linalg import eig, eigh, norm
-        from numpy import sort, argsort, log2, size, copy, diag, dot
-        from os.path import join
+			from pyfaust import FaustFactory
+			from pyfaust.factparams import *
+			from scipy.io import loadmat, savemat
+			from numpy.linalg import eig, eigh, norm
+			from numpy import sort, argsort, log2, size, copy, diag
 
-        # get the Laplacian
-        d = loadmat(join(get_data_dirpath(), "Laplacian_128_ring.mat"))
-        Lap = d['Lap']
+			d = loadmat("../../../misc/data/mat/Laplacian_128_ring.mat")
+			Lap = d['Lap']
 
-        # eigenvalues/vectors decomposition
-        D, U = eig(Lap)
 
-        # sort D and U accordingly
-        indices = argsort(D)
-        D = D[indices]
-        U = U[:,indices]
-        print("eig(Lap), U error:", norm(dot(Lap,U)-dot(U,diag(D))))
+			D, U = eig(Lap)
 
-        dim = Lap.shape[0]
+			indices = argsort(D)
+			D = D[indices]
+			U = U[:,indices]
 
-        # wanted number of factors for U transform
-        nfacts = int(round(log2(dim))-3)
-        over_sp = 1.5 # sparsity overhead
-        dec_fact = .5 # decrease of the residuum sparsity
+			print(D.shape, type(D))
+			print("eig(Lap), U error:", norm(Lap.dot(U)-U.dot(diag(D))))
+			dim = Lap.shape[0]
+			nfacts = int(round(log2(dim))-3)
+			over_sp = 1.5 # sparsity overhead
+			dec_fact = .5 # decrease of the residum sparsity
+			fact_cons, res_cons = [], []
+			for j in range(1, nfacts):
+				fact_cons += [ ConstraintInt('sp',dim,dim,
+                                min(int(round(dec_fact**j*dim**2*over_sp)),size(Lap)))
+                            ]
+				res_cons += [
+					ConstraintInt('sp',
+                                    dim,
+                                    dim,
+                                    min(int(round(2*dim*over_sp)),size(Lap)))
+				]
 
-        # define the sparsity constraints for the factors
-        fact_cons, res_cons = [], []
-        for j in range(1, nfacts):
-                fact_cons += [ ConstraintInt('sp',dim,dim,
-                        min(int(round(dec_fact**j*dim**2*over_sp)),size(Lap)))
-                ]
-                res_cons += [
-                    ConstraintInt('sp',
-                    dim,
-                    dim,
-                    min(int(round(2*dim*over_sp)),size(Lap)))
-                ]
+			params = ParamsHierarchicalFact(fact_cons,
+				res_cons,
+				StoppingCriterion(num_its=50),
+				StoppingCriterion(num_its=100),
+				step_size=1.0000e-06,
+				constant_step_size=True,
+				init_lambda=1.0,
+				is_fact_side_left=False)
 
-        # set the parameters for the PALM hierarchical algo.
-        params = ParamsHierarchicalFact(fact_cons,
-                        res_cons,
-                        StoppingCriterion(num_its=50),
-                        StoppingCriterion(num_its=100),
-                        step_size=1.0000e-06,
-                        constant_step_size=True,
-                        init_lambda=1.0,
-                        is_fact_side_left=False)
-        Lap = Lap.astype(float)
 
-        # compute FGFT for Lap, U, D
-        Uhat,Dhat = FaustFactory.fgft_palm(Lap, U, params, init_D=D)
+			Lap = Lap.astype(float)
+			Uhat,Dhat = FaustFactory.fgft_palm(Lap, U, params, init_D=D)
 
-        # errors on FGFT and Laplacian reconstruction
-        err_U = (Uhat-U).norm()/norm(U)
-        err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense()-Lap)/norm(Lap)
-        err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense())/norm(Lap)
-        print("err_U:", err_U)
-        print("err_Lap:", err_Lap)
+			err_U = (Uhat-U).norm()/norm(U)
+			err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense()-Lap)/norm(Lap)
+			print(norm(diag(Dhat), 2))
 
-        #Output:
-        #	eig(Lap), U error: 1.36688422173e-13
-        #	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/3
-        #	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/3
-        #	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/3
-        #	err_U: 1.00138959974
-        #	err_Lap: 0.997230709335
+			print("err_U:", err_U)
+			print("err_Lap:", err_Lap)
+
+
+			#end of output:
+			#	eig(Lap), U error: 1.36688422173e-13
+			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 1/3
+			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 2/3
+			#	Faust::HierarchicalFact<FPP,DEVICE,FPP2>::compute_facts : factorization 3/3
+			#	err_U: 1.00138959974
+			#	err_Lap: 0.997230709335
 
 
 		Args:
@@ -1928,10 +1951,10 @@ class FaustFactory:
                     - (faust object) V the right-singular transform.
 
             Example:
-            >>> from pyfaust import FaustFactory as FF
-            >>> from numpy.random import rand
-            >>> M = rand(128,128)
-            >>> U,S,V = FF.svdtj(M)
+                >>> from pyfaust import FaustFactory as FF
+                >>> from numpy.random import rand
+                >>> M = rand(128,128)
+                >>> U,S,V = FF.svdtj(M, 1024, 64)
 
          See also:
             FaustFactory.eigtj
@@ -2000,12 +2023,12 @@ class FaustFactory:
             from scipy.io import loadmat
             from os.path import sep
             from pyfaust.demo import get_data_dirpath
-
+            >>>
             # get a graph Laplacian to diagonalize
             demo_path = sep.join((get_data_dirpath(),'Laplacian_256_community.mat'))
             data_dict = loadmat(demo_path)
             Lap = data_dict['Lap'].astype(np.float)
-
+            >>>
             Uhat, Dhat = FF.eigtj(Lap,J=Lap.shape[0]*100,t=int(Lap.shape[0]/2))
             # Uhat is the Fourier matrix/eigenvectors approximattion as a Faust
             # (200 factors + permutation mat.)
