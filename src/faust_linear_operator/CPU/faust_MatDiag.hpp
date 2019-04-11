@@ -165,15 +165,12 @@ MatGeneric<FPP,Cpu>* MatDiag<FPP>::get_rows(faust_unsigned_int row_id_start, fau
 template<typename FPP>
 MatGeneric<FPP,Cpu>* MatDiag<FPP>::get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const
 {
-	//TODO
-	return nullptr;
-
+	return MatSparse<FPP,Cpu>(*this).get_cols(col_ids, num_cols);
 }
 
 template<typename FPP>
 MatGeneric<FPP,Cpu>* MatDiag<FPP>::get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const
 {
-	//TODO
-	return nullptr;
+	return MatSparse<FPP,Cpu>(*this).get_rows(row_ids, num_rows);
 }
 

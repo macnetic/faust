@@ -86,6 +86,14 @@ int main()
 	cout << "getrows(2,5)" << endl;
 	MatGeneric<FPP,Cpu>* rows = diagMat.get_rows(2,5);
 	display_all_elts(*dynamic_cast<MatDiag<FPP>*>(rows));
+	cout << "get_rows unordered 2, 3, 8" << endl;
+	faust_unsigned_int rids[3] = {2, 3, 8};
+	MatGeneric<FPP,Cpu>* sprows = diagMat.get_rows(rids, 3);
+	display_all_elts(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(sprows));
+	cout << "get_cols unordered 2, 3, 8" << endl;
+	faust_unsigned_int cids[3] = {2, 3, 8};
+	MatGeneric<FPP,Cpu>* spcols = diagMat.get_cols(cids, 3);
+	display_all_elts(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(spcols));
 	cout << "end of test_MatDiag" << endl;
 	return EXIT_SUCCESS;
 }
