@@ -83,6 +83,9 @@ int main()
 	cout << "getcols(2,5)" << endl;
 	MatGeneric<FPP,Cpu>* cols = diagMat.get_cols(2,5);
 	display_all_elts(*dynamic_cast<MatDiag<FPP>*>(cols));
+	cout << "getrows(2,5)" << endl;
+	MatGeneric<FPP,Cpu>* rows = diagMat.get_rows(2,5);
+	display_all_elts(*dynamic_cast<MatDiag<FPP>*>(rows));
 	cout << "end of test_MatDiag" << endl;
 	return EXIT_SUCCESS;
 }

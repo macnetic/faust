@@ -143,9 +143,23 @@ MatGeneric<FPP,Cpu>* MatDiag<FPP>::get_cols(faust_unsigned_int col_id_start, fau
 template<typename FPP>
 MatGeneric<FPP,Cpu>* MatDiag<FPP>::get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const
 {
-	//TODO
-	return nullptr;
-
+	if(num_rows+row_id_start>=this->getNbRow())
+		handleError("Matdiag", "row index is out of dimension size.");
+	faust_unsigned_int dmin = min(this->getNbRow(), this->getNbCol());
+	FPP * data = new FPP[num_rows];
+	if(row_id_start > dmin)
+		memset(data, 0, sizeof(FPP)*num_rows);
+	else {
+		if(row_id_start+num_rows > dmin)
+		{
+			faust_unsigned_int overflow = row_id_start+num_rows-dmin;
+			memset(data+num_rows-overflow, 0, sizeof(FPP)*overflow);
+		}
+		memcpy(data, getData()+row_id_start, num_rows*sizeof(FPP));
+	}
+	MatDiag<FPP> * ret = new MatDiag<FPP>(num_rows, this->getNbCol(), data);
+	delete[] data;
+	return ret;
 }
 
 template<typename FPP>
