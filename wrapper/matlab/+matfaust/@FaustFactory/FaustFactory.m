@@ -293,6 +293,7 @@ classdef FaustFactory
 		%>
 		%> @b Example
 		%> @code
+		%> import matfaust.*
 		%> import matfaust.factparams.*
 		%>
 		%> % get the Laplacian
@@ -559,9 +560,9 @@ classdef FaustFactory
 		%> @Example
 		%> @code
 		%> % in a matlab terminal
-		%> >>> import matfaust.*
-		%> >>> M = rand(128,128)
-		%> >>> [U,S,V] = FaustFactory.svdtj(M,1024,64)
+		%> >> import matfaust.*
+		%> >> M = rand(128,128)
+		%> >> [U,S,V] = FaustFactory.svdtj(M,1024,64)
 		%> @endcode
 		%>
 		%====================================================================

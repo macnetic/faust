@@ -42,9 +42,7 @@
 %%-------------------------------------------------------------------------
 %% Description norm_hadamard
 %
-%  This demo makes some time comparison between the 2-norm of the Hadamard matrix and
-%  her Faust representation for different dimension
-%  of the Hadamard matrix.
+%  This demo makes some time comparison between the 2-norm of the Hadamard matrix and her Faust representation for different dimension of the Hadamard matrix.
 %
 % For more information on the FAuST Project, please visit the website of 
 % the project :  <http://faust.inria.fr>
@@ -265,10 +263,8 @@ classdef hadamard
 
 		end
 		%======================================================================
-		%> This demo makes some time comparison between the 2-norm of the Hadamard matrix and
+		%> This demo makes some time comparison between the 2-norm of the Hadamard matrix and its Faust representation for different dimension of the Hadamard matrix.
 		%===
-		%>  her Faust representation for different dimension
-		%>  of the Hadamard matrix.
 		%>
 		%======================================================================
 		function norm_hadamard()

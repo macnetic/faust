@@ -68,14 +68,13 @@
 %> Other notable limitations are that one cannot:
 %> - compute the real and imaginary parts of a Faust,
 %> - perform elementwise operations between two Fausts (e.g. elementwise
-%> multiplication).
-%> - reshape,
-%> - invert.
+%> multiplication), the addition and substraction are available though,
+%> - reshape a Faust.
 %>
 %> Primarily for convenience and test purposes, a Faust can be converted into
 %> the corresponding full matrix using the function Faust.full.
 %>
-%> Warning: using Faust.full is discouraged except for test purposes, as it
+%> \warning using Faust.full is discouraged except for test purposes, as it
 %> loses the main potential interests of the FAuST structure: compressed
 %> memory storage and faster matrix-vector multiplication compared to its
 %> equivalent full matrix representation.
@@ -119,16 +118,16 @@ classdef Faust
 		%>
 		%> @b Examples
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	factors = cell(1,5)
-		%>	is_sparse = false
+		%>	import matfaust.*
+		%>	factors = cell(1,5);
+		%>	is_sparse = false;
 		%>	for i=1:5
 		%>		if(is_sparse) % odd index factors are sparse matrices
-		%>			factors{i} = sprand(100, 100, 0.1)
+		%>			factors{i} = sprand(100, 100, 0.1);
 		%>		else % even index gives a dense matrix
-		%>			factors{i} = rand(100, 100)
+		%>			factors{i} = rand(100, 100);
 		%>		end
-		%>		is_sparse = ~ is_sparse
+		%>		is_sparse = ~ is_sparse;
 		%>	end
 		%>	% define a Faust with those factors
 		%>	F = Faust(factors)
@@ -472,7 +471,7 @@ classdef Faust
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
-		%> @b WARNING: if A is a matrix the function costs get_num_factors(F) matrix multiplications.
+		%> @warning if A is a matrix the function costs get_num_factors(F) matrix multiplications.
 		%> In that case its use is discouraged except for test purpose. However if A is a Faust object,
 		%> it costs the same that a Faust initialization with a number of factors equal to
 		%> F.get_num_factors()+A.get_num_factors() (like you can do directly with Faust.Faust).
@@ -553,7 +552,7 @@ classdef Faust
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b A = full(F)
 		%>
-		%> @b Warning: using this function is discouraged except for test purposes,
+		%> @warning using this function is discouraged except for test purposes,
 		%> as it loses the main potential interests of the FAuST structure:
 		%> compressed memory storage and faster matrix-vector multiplication compared
 		%> to its equivalent dense matrix representation.
@@ -562,7 +561,7 @@ classdef Faust
 		%> @retval A the Matlab native matrix such that A*x == F*x
 		%> for any vector x.
 		%>
-		%> @b Warning: running the example below is likely to raise a memory error or freeze
+		%> @warning Running the example below is likely to raise a memory error or freeze
 		%> your computer for a certain amount of time.
 		%>
 		%> @b Example
@@ -924,7 +923,7 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b factor = get_factor(F, i) returns the i-th factor of F.
+		%> &nbsp;&nbsp;&nbsp; @b factor = get_factor(F, i) returns the i-th factor of F.<br/>
 		%> &nbsp;&nbsp;&nbsp; @b factor = get_factor(F, i:j) returns a new Faust formed of the F's factors from the i-th to the j-th included.
 		%>
 		%> @param F the Faust object.
@@ -1104,7 +1103,7 @@ classdef Faust
 		%>
 		%> This function overloads a Matlab built-in.
 		%>
-		%> @b WARNING:
+		%> @warning
 		%> - It is not advised to use this function as an element accessor
 		%>        (e.g. F(1,1)) because such a use induces to convert the Faust to its
 		%>        dense matrix representation and that is a very expensive computation if used
@@ -1141,7 +1140,7 @@ classdef Faust
 		%>	F(end:-2:1,:) %  starts from the last row and goes backward to take one in two rows until the first one (reversing row order of F)
 		%>	F([1,18,2],:) % takes in this order the rows 1, 18 and 2.
 		%>	F(:,[1,18,2]) % takes in this order the columns 1, 18 and 2
-		%>	F[[1,18,2], [1,2]) % takes the rows 1, 18 and 2 but keeps only columns 1 and 2 in these rows.
+		%>	F([1,18,2], [1,2]) % takes the rows 1, 18 and 2 but keeps only columns 1 and 2 in these rows.
 		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.end.
@@ -1242,7 +1241,7 @@ classdef Faust
 		end
 
 		%======================================================================
-		%> @brief @b WARNING this function is not implemented because a Faust object is immutable.
+		%> @brief @warning this function is not implemented because a Faust object is immutable.
 		%>
 		%> This function overloads a Matlab built-in function.
 		%> This function just throws an error.
@@ -1323,7 +1322,7 @@ classdef Faust
 		%>
 		%> The norm of F is equal to the norm of full(F).
 		%>
-		%> @b WARNING: if [n,m] == size(F), the computation time can be expected to be of the order of min(n,m) times that of multipliying F by a vector. Nevertheless, the implementation ensures that memory usage remains controlled by avoiding to explicitly compute full(F).
+		%> @warning if [n,m] == size(F), the computation time can be expected to be of the order of min(n,m) times that of multipliying F by a vector. Nevertheless, the implementation ensures that memory usage remains controlled by avoiding to explicitly compute full(F).
 		%>
 		%> @b Usage
 		%>
@@ -1373,7 +1372,7 @@ classdef Faust
 			% norm(F,'fro') when F is a Faust returns the Frobenius norm of F.
 			% norm(F) is the same as norm(F,2)
 			%
-			% @b WARNING : norm(F,P) is only supported when P equals 1, 2 or
+			% @warning norm(F,P) is only supported when P equals 1, 2 or
 			% 'fro'.
 
 			nb_input = length(varargin);
@@ -1382,7 +1381,7 @@ classdef Faust
 			end
 
 			ord = 2;
-			args = {ord}
+			args = {ord};
 			ord2_valid_param = false;
 			if nb_input >= 1
 				if(varargin{1} == 'fro')
@@ -1535,11 +1534,11 @@ classdef Faust
 		%> &nbsp;&nbsp;&nbsp; @b dens = density(F)
 		%>
 		%>
-		%> @b @note a value of density below one indicates potential memory savings compared
+		%> @note A value of density below one indicates potential memory savings compared
 		%> to storing the corresponding dense matrix full(F), as well as potentially
 		%> faster matrix-vector multiplication when applying F*x instead of full(F)*x.
 		%>
-		%> @b @note a density above one is possible but prevents any saving.
+		%> @note A density above one is possible but prevents any saving.
 		%>
 		%>
 		%> @param F the Faust object.
@@ -1697,9 +1696,9 @@ classdef Faust
 		%>- FACTOR 3 (real) SPARSE, size 100x100, density 0.0282, nnz 282
 		%>- FACTOR 4 (real) SPARSE, size 100x100, density 0.0292, nnz 292
 		%>- FACTOR 5 (real) SPARSE, size 100x50, density 0.02, nnz 100
-		%>>>>[F;G;F;G] # it's allowed to concatenate an arbitrary number of Fausts
-		%>>>>[F,G,F,G] # as long as the dimensions agree
-		%>>>>[F,G;F,G]
+		%>>>[F;G;F;G] % it's allowed to concatenate an arbitrary number of Fausts
+		%>>>[F,G,F,G] % as long as the dimensions agree
+		%>>>[F,G;F,G]
 		%> @endcode
 		%>
 		%> @b Errors
@@ -1817,7 +1816,8 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b imagesc(F)
+		%> &nbsp;&nbsp;&nbsp; @b imagesc(F)<br/>
+		%> &nbsp;&nbsp;&nbsp; @b imagesc(F, 'faust_name') to name the Faust on the plotted figure.
 		%>
 		%> Data is scaled to use the full colormap.
 		%>
@@ -1831,16 +1831,26 @@ classdef Faust
 		%>
 		%> <p>@b See @b also Faust.disp.
 		%======================================================================
-		function imagesc(F)
+		function imagesc(F, varargin)
 			numfacts = get_num_factors(F);
 			subplot(1,numfacts+1,1); imagesc(abs(real(full(F))));
+			name = 'F';
+			if(nargin > 1)
+				name = varargin{1};
+				if(~ isstr(name))
+					error('argument 2 must be a str.')
+				end
+			end
+			title(['full(' name ')'])
 			set(gca,'XTick',[], 'YTick', []);
 			for i=1:numfacts
 				subplot(1,numfacts+1,1+i);
 				fac = get_factor(F,i);
 				imagesc(abs(real(fac)));
+				title([int2str(i)])
 				set(gca,'XTick',[], 'YTick', []);
 			end
+			suptitle(['Faust ' name '''s factors'])
 		end
 
 		%=====================================================================

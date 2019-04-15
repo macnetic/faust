@@ -1262,9 +1262,13 @@ class Faust:
         else:
             return np.dtype(np.complex)
 
-    def imshow(F):
+    def imshow(F, name='F'):
         """
         Displays image of F's full matrix and its factors.
+
+        Args:
+            F: the Faust object.
+            name: (optional str) the displayed name on the plotted figure.
 
         <b> See also Faust.display. </b>
 
@@ -1278,18 +1282,20 @@ class Faust:
 
         """
         import matplotlib.pyplot as plt
+        if(not isinstance(name, str)): raise TypeError('name must be a str.')
         nf = F.get_num_factors()
         plt.subplot(1,nf+1,1)
-        plt.title('F.toarray()')
+        plt.title(name+'.toarray()')
         plt.imshow(abs(F.toarray()),extent=[0,100,0,1], aspect='auto')
         plt.xticks([]); plt.yticks([])
         for i in range(0,nf):
             plt.subplot(1,F.get_num_factors()+1,i+2)
-            plt.title('F.get_factor('+str(i)+')')
+            plt.title(str(i))
             fac = F.get_factor(i)
             if(not isinstance(fac, np.ndarray)):
                 fac = fac.toarray()
             plt.xticks([]); plt.yticks([])
+            plt.suptitle('Faust '+ name +'\'s factors')
             plt.imshow(abs(fac),extent=[0,100,0,1], aspect='auto')
 
     def pinv(F):
