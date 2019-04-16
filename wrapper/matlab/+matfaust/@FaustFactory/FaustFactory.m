@@ -575,6 +575,9 @@ classdef FaustFactory
 			sign_S = sign(S);
 			S = S*sign_S;
 			Id = eye(size(S));
+			% copy the factors
+			W1 = get_factor(W1, 1:get_num_factors(W1));
+			W2 = get_factor(W2, 1:get_num_factors(W2));
 			U = W1(:,1:size(Id,1))*matfaust.Faust({Id(:,I),sign_S});
 			V = W2(:,1:size(Id,1))*matfaust.Faust(Id(:,I));
 		end
