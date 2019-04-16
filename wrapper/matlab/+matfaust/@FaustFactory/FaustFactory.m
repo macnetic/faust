@@ -539,13 +539,15 @@ classdef FaustFactory
 		%==========================================================================================
 		function [V,D] = eigtj(M, J, varargin)
 			[V, D] = matfaust.FaustFactory.fgft_givens(M, J, varargin{:});
+			V = get_factor(V,1:get_num_factors(V))
+			% copy seems unecessary but it's to workaround a bug (temporarily)
 		end
 
 		%====================================================================
 		%> @brief Performs a singular value decomposition and returns the left and
 		%> right singular vectors as Faust transforms.
 		%>
-		%> @note: this function is based on FaustFactory.eigtj.
+		%> @note this function is based on FaustFactory.eigtj.
 		%>
 		%> @param M: a real matrix.
 		%> @param J: see FaustFactory.eigtj
@@ -575,9 +577,6 @@ classdef FaustFactory
 			sign_S = sign(S);
 			S = S*sign_S;
 			Id = eye(size(S));
-			% copy the factors
-			W1 = get_factor(W1, 1:get_num_factors(W1));
-			W2 = get_factor(W2, 1:get_num_factors(W2));
 			U = W1(:,1:size(Id,1))*matfaust.Faust({Id(:,I),sign_S});
 			V = W2(:,1:size(Id,1))*matfaust.Faust(Id(:,I));
 		end
