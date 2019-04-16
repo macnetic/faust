@@ -414,7 +414,7 @@ classdef FaustFactory
 			else
 				[lambda, core_obj, Ddiag] = mexHierarchical_factCplx(U, mex_params, Lap);
 			end
-			D = spdiag(Ddiag);
+			D = sparse(diag(Ddiag));
 			F = Faust(core_obj, isreal(U));
 			varargout = {F, D, lambda, p};
 		end
@@ -488,7 +488,7 @@ classdef FaustFactory
 				end
 			end
 			[core_obj, D] = mexfgftgivensReal(Lap, J, t, verbosity);
-			D = spdiag(D);
+			D = sparse(diag(D));
 			FGFT = Faust(core_obj, true);
 		end
 
@@ -570,8 +570,8 @@ classdef FaustFactory
 			[W1,D1] = matfaust.FaustFactory.eigtj(M*M', J, varargin{:});
 			[W2,D2] = matfaust.FaustFactory.eigtj(M'*M, J, varargin{:});
 			S = diag(W1'*M*W2);
-			[~,I] = sort(abs(S), 'desc')
-			S = spdiag(S(I))
+			[~,I] = sort(abs(S), 'desc');
+			S = sparse(diag(S(I)));
 			sign_S = sign(S);
 			S = S*sign_S;
 			Id = eye(size(S));
