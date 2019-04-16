@@ -570,7 +570,7 @@ classdef FaustFactory
 			[W1,D1] = matfaust.FaustFactory.eigtj(M*M', J, varargin{:});
 			[W2,D2] = matfaust.FaustFactory.eigtj(M'*M, J, varargin{:});
 			S = diag(W1'*M*W2);
-			[~,I] = sort(abs(S), 'desc');
+			[~,I] = sort(abs(S), 'descend');
 			S = sparse(diag(S(I)));
 			sign_S = sign(S);
 			S = S*sign_S;
