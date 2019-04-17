@@ -267,6 +267,28 @@ class Faust:
         F_conj = Faust(core_obj=F.m_faust.conj())
         return F_conj
 
+    def conjugate(F):
+        """
+        Returns the complex conjugate of F.
+
+        Args:
+            F: the Faust object.
+
+        Returns:
+            a Faust object Fc implementing the conjugate of F.todense() such
+            that:
+            <code>Fc.todense() == F.todense().conjugate()</code>
+
+
+        Examples:
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(5, 50, field='complex')
+            >>> Fc = F.conjugate()
+
+        <b/> See also Faust.transpose, Faust.getH, Faust.H
+        """
+        return F.conj()
+
     def getH(F):
         """
         Returns the conjugate transpose of F.
