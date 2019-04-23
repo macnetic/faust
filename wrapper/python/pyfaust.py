@@ -1306,19 +1306,28 @@ class Faust:
         import matplotlib.pyplot as plt
         if(not isinstance(name, str)): raise TypeError('name must be a str.')
         nf = F.get_num_factors()
-        plt.subplot(1,nf+1,1)
+        max_cols = 5
+        ncols = min(nf,max_cols)
+        nrows = int(nf/ncols)+1
+        plt.subplot(nrows,ncols,nrows*ncols)
         plt.title(name+'.toarray()')
-        plt.imshow(abs(F.toarray()),extent=[0,100,0,1], aspect='auto')
-        plt.xticks([]); plt.yticks([])
+        if(F.dtype == np.complex):
+            plt.imshow(abs(F.toarray()), aspect='equal')
+        else:
+            plt.imshow(F.toarray(), aspect='equal')
+        #plt.xticks([]); plt.yticks([])
         for i in range(0,nf):
-            plt.subplot(1,F.get_num_factors()+1,i+2)
+            plt.subplot(nrows,ncols,(i%ncols)+int(i/ncols)*ncols+1)
             plt.title(str(i))
             fac = F.get_factor(i)
             if(not isinstance(fac, np.ndarray)):
                 fac = fac.toarray()
             plt.xticks([]); plt.yticks([])
             plt.suptitle('Faust '+ name +'\'s factors')
-            plt.imshow(abs(fac),extent=[0,100,0,1], aspect='auto')
+            if(fac.dtype == np.complex):
+                plt.imshow(abs(fac),aspect='equal')
+            else:
+                plt.imshow(fac, aspect='equal')
 
     def pinv(F):
         """
