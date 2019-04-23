@@ -89,6 +89,8 @@ if(BUILD_DOCUMENTATION)
 	configure_file(${FAUST_DOC_SRC_DIR}/faq.md ${PROJECT_BINARY_DIR}/doc/faq.md)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_creation.ipynb ${PROJECT_BINARY_DIR}/doc/html/Faust_creation.ipynb COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_creation.html ${PROJECT_BINARY_DIR}/doc/html/Faust_creation.html COPYONLY)
+	configure_file(${FAUST_DOC_SRC_DIR}/Faust_manipulation.ipynb ${PROJECT_BINARY_DIR}/doc/html/Faust_manipulation.ipynb COPYONLY)
+	configure_file(${FAUST_DOC_SRC_DIR}/Faust_manipulation.html ${PROJECT_BINARY_DIR}/doc/html/Faust_manipulation.html COPYONLY)
 endif(BUILD_DOCUMENTATION)
 
 
