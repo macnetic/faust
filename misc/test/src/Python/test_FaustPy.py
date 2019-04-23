@@ -531,7 +531,7 @@ class TestFaustPy(unittest.TestCase):
         rmat = np.random.rand(self.F.shape[1],
                               self.r.randint(1,TestFaustPy.MAX_DIM_SIZE))
         prod = self.mulFactors().dot(rmat)
-        test_prod = self.F*rmat
+        test_prod = self.F.dot(rmat)
         self.assertProdEq(prod, test_prod)
         print("test mul by a full complex matrix")
         j = np.complex(0,1)
@@ -539,7 +539,7 @@ class TestFaustPy(unittest.TestCase):
         cmat = rand(rmat.shape[0], rmat.shape[1]) + j*rand(rmat.shape[0],
                                                            rmat.shape[1])
         prod = self.mulFactors().dot(cmat)
-        test_prod = self.F*cmat
+        test_prod = self.F.dot(cmat)
         self.assertProdEq(prod, test_prod)
         print("test mul by a real scalar")
         import random

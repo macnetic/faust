@@ -29,7 +29,7 @@ The following papers can come as complement:
 
 [2] [Le Magoarou L. and Gribonval R., Gramfort A., “FAµST: speeding up linear transforms for tractable inverse problems“](https://hal.archives-ouvertes.fr/hal-01156478v1), European Signal Processing Conference (EUSIPCO), Aug 2015, Nice, France.
 
-[3] [Le Magoarou L., Gribonval R., Trembaly N., “Approximate fast graph Fourier transforms via multi-layer sparse approximation“](https://hal.inria.fr/hal-01416110),Transactions on Signal and Information Processing over Networks
+[3] [Le Magoarou L., Gribonval R., Tremblay N., “Approximate fast graph Fourier transforms via multi-layer sparse approximation“](https://hal.inria.fr/hal-01416110),Transactions on Signal and Information Processing over Networks
 
 The FAµST toolbox was initially released as a Matlab implementation ([versions 1.x](http://faust.inria.fr/download/faust-1-x/)).
 <br/>Since version 2.0, it has been implemented in C++. Besides, the development of wrappers has made this C++ core accessible from Matlab and Python programming languages.

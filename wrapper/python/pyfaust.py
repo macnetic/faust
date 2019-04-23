@@ -19,7 +19,7 @@ class Faust:
 
     A FAuST data structure is designed to allow fast matrix-vector multiplications
     together with reduced memory storage compared to what would be obtained by
-    manipulating directly the corresponding (dense) numpy array/matrix.
+    manipulating directly the corresponding (dense) numpy.matrix.
 
     A particular example is the matrix associated to the discrete Fourier
     transform, which can be represented exactly as a Faust, leading to a fast and
@@ -34,7 +34,7 @@ class Faust:
     real Faust.
 
     Several Python builtins have been overloaded to ensure that a Faust is
-    almost handled as a native numpy array/matrix.
+    almost handled as a native numpy.matrix.
 
     The main exception is that contrary to a numpy matrix a Faust is immutable.
     It means that you cannot affect elements of a Faust using
@@ -59,10 +59,10 @@ class Faust:
     equivalent full matrix representation.
 
     In this documentation, the expression 'full matrix' designates the array
-    Faust.toarray() obtained by the multiplication of the Faust factors.
+    Faust.todense() obtained by the multiplication of the Faust factors.
 
-   List of functions that are memory costly: Faust.toarray(), Faust.todense(),
-   Faust.pinv().
+    List of functions that are memory costly: Faust.toarray(), Faust.todense(),
+    Faust.pinv().
 
     For more information about FAuST take a look at http://faust.inria.fr.
     """
@@ -500,30 +500,103 @@ class Faust:
             raise Exception("unsupported operand type(s) for /: a Faust can only be "
                   "divided by a scalar.")
 
-
-    def __mul__(F, A):
+    def __matmul__(F, A):
         """
-        Multiplies F by A which is a full matrix, a Faust object or a scalar number.
+        Multiplies F by A which is a dense numpy.matrix/numpy.ndarray or a Faust object.
 
-        This method overloads a Python function/operator.
+        @warning The operator @ is not supported in Python 2, you can use *.
+
+        This method overloads a Python function/operator (@).
 
         <b>The primary goal</b> of this function is to implement “fast” multiplication by a
         Faust, which is the operation performed when A is a dense matrix.<br/>
-        In the best case, F*A is F.rcg() times faster than equivalent F.toarray()*A.
+        In the best case, F @ A is F.rcg() times faster than equivalent
+        F.toarray() @ A.
 
-        <b>Other use cases</b> are available for this function:
+        <b>Other use case</b> is available for this function:
         - If A is a Faust, no actual multiplication is performed, instead a
         new Faust is built to implement the multiplication.<br/>
         This Faust verifies that:<br/>
             <code>
-            (F*A).todense() == F.todense()*A.todense()
+            (F @ A).todense() == F.todense()*A.todense()
             </code>
             <br/>N.B.: you could have an elementwise non-significant absolute
             difference between the two members.
-        - If A is a scalar, F*A is also a Faust such that:<br/>
-        <code>
-        (F*A).get_factor(0) ==  F.get_factor(0)*A
-        </code>
+
+        Args:
+            F: the Faust object.
+            A: a Faust object or a 2D full matrix (numpy.ndarray, numpy.matrix).
+            <br/> In the latter case, A must be Fortran contiguous (i.e. Column-major order;
+                `order' argument passed to np.ndararray() must be equal to str
+                'F').
+
+        Returns: The result of the multiplication
+            - as a numpy.ndarray if A is a ndarray,<br/>
+            - as a Faust object if A is a Faust.
+            - When either F or A is complex, G=F @ A is also complex.
+
+        Raises: ValueError
+            The multiplying operand A is a scalar:
+            <code>
+            >>> from pyfaust import FaustFactory
+            >>> F = FaustFactory.rand(5,50)
+            >>> F@2
+            ValueError Scalar operands are not allowed, use '*' instead
+            </code>
+
+        Examples:
+            >>> from pyfaust import FaustFactory
+            >>> import numpy as np
+            >>> F = FaustFactory.rand(5, [50, 100])
+            >>> A = np.random.rand(F.shape[1], 50)
+            >>> B = F@A # == F*A or F.dot(A)
+            >>> # is equivalent to B = F.__matmul__(A)
+            >>> G = FaustFactory.rand(5, F.shape[1])
+            >>> H = F@G
+            >>> # H is a Faust because F and G are
+
+        <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
+        """
+        if(isinstance(A, Faust)):
+            if(F.shape[1] != A.shape[0]): raise ValueError("The dimensions of "
+                                                          "the two Fausts must "
+                                                          "agree.")
+            return Faust(core_obj=F.m_faust.multiply(A.m_faust))
+        elif(isinstance(A, float) or isinstance(A, int) or isinstance(A, np.complex)):
+            raise ValueError("Scalar operands are not allowed, use '*'"
+                             " instead")
+        elif(isinstance(A, np.ndarray) and isinstance(A[0,0], np.complex)):
+            j = np.complex(0,1)
+            return F.m_faust.multiply(A.real).astype(np.complex) + j*F.m_faust.multiply(A.imag)
+        else:
+            return F.m_faust.multiply(A)
+
+
+    def dot(F, A):
+        """
+        Performs equivalent operation of numpy.dot() between the Faust F and A.
+
+        More specifically:
+            - Scalar multiplication if A is a scalar but F*A is preferred.
+            - Matrix multiplication if A is a Faust or numpy.ndarray/numpy.matrix but F @ A is preferred.
+
+        <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
+        """
+        if(isinstance(A, float) or isinstance(A, int) or isinstance(A,
+                                                                    np.complex)):
+            return F*A
+        return F.__matmul__(A)
+
+    def __mul__(F, A):
+        """
+        Multiplies the Faust F by A.
+
+        This method overloads a Python function/operator (*).
+
+        More specifically:
+        - It's a scalar multiplication if A is a scalar number.
+        - If A is a Faust, a numpy.matrix or a numpy.ndarray it performs a
+        Faust.__matmul__() (@ operator).
 
         Args:
             F: the Faust object.
@@ -534,57 +607,39 @@ class Faust:
                 'F').
 
         Returns: The result of the multiplication
-            - as a numpy.ndarray if A is a ndarray,<br/>
-            - as a Faust object if A is a Faust
-            or a scalar number.
+            - as a numpy.ndarray if A is a ndarray/matrix,<br/>
+            - as a Faust object if A is a Faust or a scalar number.
             - When either F or A is complex, G=F*A is also complex.
 
-        Raises: Error
-            The multiplying operand A is a sparse matrix:
-            <code>
-            >>> from scipy.sparse import csr_matrix
-            >>> from scipy.sparse import random as srand
-            >>> from pyfaust import FaustFactory
-            >>> F = FaustFactory.rand(5,50)
-            >>> S = srand(50,5000,.1)
-            >>> F*S
-            ValueError input M must a numpy.ndarray or a numpy.matrix.
-            </code>
-            ValueError
-            F is real but A is a complex scalar:
+        Raises: TypeError
+            If the type of A is not supported:
             <code>
             >>> import numpy
-            >>> F*numpy.complex(0,1)
-            ValueError You cannot multiply a real Faust by a complex scalar (not yet implemented).
+            >>> F*'a'
+            TypeError ufunc 'multiply' did not contain a loop with signature matching types dtype('<U32') dtype('<U32') dtype('<U32')
             </code>
 
         Examples:
             >>> from pyfaust import FaustFactory
             >>> import numpy as np
-
             >>> F = FaustFactory.rand(5, [50, 100])
-            >>> A = np.random.rand(F.shape[1], 50)
+            >>> A = np.random.rand(F.shape[1], 10)
             >>> B = F*A
             >>> # is equivalent to B = F.__mul__(A)
             >>> G = FaustFactory.rand(5, F.shape[1])
             >>> H = F*G
             >>> # H is a Faust because F and G are
+            >>> ((F*G).toarray() == (F@G).toarray()).all() #@ is not supported in python2
+            True
             >>> F_times_two = F*2
 
-        <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__
+        <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
         """
-        if(isinstance(A, Faust)):
-            if(F.shape[1] != A.shape[0]): raise ValueError("The dimensions of "
-                                                          "the two Fausts must "
-                                                          "agree.")
-            return Faust(core_obj=F.m_faust.multiply(A.m_faust))
-        elif(isinstance(A, float) or isinstance(A, int) or isinstance(A, np.complex)):
+        if(isinstance(A, float) or isinstance(A, int) or isinstance(A, np.complex)):
             return Faust(core_obj=F.m_faust.multiply_scal(A))
-        elif(isinstance(A, np.ndarray) and isinstance(A[0,0], np.complex)):
-            j = np.complex(0,1)
-            return F.m_faust.multiply(A.real).astype(np.complex) + j*F.m_faust.multiply(A.imag)
-        else:
-            return F.m_faust.multiply(A)
+        else: # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
+        # (but it will fail)
+            return F.__matmul__(A)
 
     #def concatenate(F, *args, axis=0): # py. 2 doesn't handle this signature
     def concatenate(F, *args, **kwargs):
@@ -659,19 +714,19 @@ class Faust:
                 FACTOR 6 (real) SPARSE, size 100x100, density 0.0475, nnz 47<br/>
                 >>> from numpy.random import rand
                 >>> F.concatenate(rand(34, 50), axis=0) # The random array is auto-converted to a Faust before the vertical concatenation
-                Faust size 384x50, density 0.677083, nnz_sum 13000, 12 factor(s):
-                FACTOR 0 (real) SPARSE, size 384x400, density 0.0224609, nnz 3450
-                FACTOR 1 (real) SPARSE, size 400x400, density 0.01125, nnz 1800
-                FACTOR 2 (real) SPARSE, size 400x400, density 0.01125, nnz 1800
-                FACTOR 3 (real) SPARSE, size 400x400, density 0.01125, nnz 1800
-                FACTOR 4 (real) SPARSE, size 400x400, density 0.01125, nnz 1800
-                FACTOR 5 (real) SPARSE, size 400x350, density 0.00714286, nnz 1000
-                FACTOR 6 (real) SPARSE, size 350x300, density 0.00333333, nnz 350
-                FACTOR 7 (real) SPARSE, size 300x250, density 0.004, nnz 300
-                FACTOR 8 (real) SPARSE, size 250x200, density 0.005, nnz 250
-                FACTOR 9 (real) SPARSE, size 200x150, density 0.00666667, nnz 200
-                FACTOR 10 (real) SPARSE, size 150x100, density 0.01, nnz 150
-                FACTOR 11 (real) SPARSE, size 100x50, density 0.02, nnz 100
+                Faust size 384x50, density 0.677083, nnz_sum 13000, 12 factor(s):<br/>
+                FACTOR 0 (real) SPARSE, size 384x400, density 0.0224609, nnz 3450<br/>
+                FACTOR 1 (real) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
+                FACTOR 2 (real) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
+                FACTOR 3 (real) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
+                FACTOR 4 (real) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
+                FACTOR 5 (real) SPARSE, size 400x350, density 0.00714286, nnz 1000<br/>
+                FACTOR 6 (real) SPARSE, size 350x300, density 0.00333333, nnz 350<br/>
+                FACTOR 7 (real) SPARSE, size 300x250, density 0.004, nnz 300<br/>
+                FACTOR 8 (real) SPARSE, size 250x200, density 0.005, nnz 250<br/>
+                FACTOR 9 (real) SPARSE, size 200x150, density 0.00666667, nnz 200<br/>
+                FACTOR 10 (real) SPARSE, size 150x100, density 0.01, nnz 150<br/>
+                FACTOR 11 (real) SPARSE, size 100x50, density 0.02, nnz 100<br/>
                 >>> from scipy.sparse import rand as sprand
                 >>> F.concatenate(sprand(50, 24, format='csr'), axis=1) # The sparse random matrix is auto-converted to a Faust before the horizontal concatenation
                 Faust size 50x74, density 0.412703, nnz_sum 1527, 6 factor(s):<br/>
@@ -983,7 +1038,7 @@ class Faust:
 
         NOTE: A value of density below one indicates potential memory savings
         compared to storing the corresponding dense matrix F.todense(), as well
-        as potentially faster matrix-vector multiplication when applying F*x
+        as potentially faster matrix-vector multiplication when applying F * x
         instead of F.todense()*x.
 
         NOTE: A density above one is possible but prevents any saving.
@@ -1985,7 +2040,7 @@ class FaustFactory:
                     - (sparse diagonal matrix) S the singular values in
                     descendant order.
                     - (Faust object) U the left-singular transform.
-                    - (faust object) V the right-singular transform.
+                    - (Faust object) V the right-singular transform.
 
             Example:
                 >>> from pyfaust import FaustFactory as FF

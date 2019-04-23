@@ -157,7 +157,7 @@ for j in range(nb_dim):
 
 
 		t=time.time()
-		y_Faust=F*x
+		y_Faust=F.dot(x)
 		t_list[i,j,2]=time.time()-t
 		assert((y_dense == y_Faust).all())
 		
@@ -168,7 +168,7 @@ for j in range(nb_dim):
 
 		
 		t=time.time()
-		y_Faust_trans=F.transpose()*x
+		y_Faust_trans=F.transpose().dot(x)
 		t_list[i,j,4]=time.time()-t
 		assert((y_dense_trans == y_Faust_trans).all())
 

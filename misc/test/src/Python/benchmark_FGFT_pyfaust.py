@@ -144,7 +144,7 @@ for j in range(old_nruns,nruns):
               F.get_num_factors())
         all_data[i,LAP_ERR_ID,PARGIVENS,j] = norm((F*Dhat.todense())*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
         all_data[i,FOURIER_ERR_ID,PARGIVENS,j] = (F-U).norm("fro")/norm(U,"fro")
-        print("err:", norm(Lap * F.toarray() - F.toarray()*Dhat)/norm(Lap))
+        print("err:", norm(Lap @ F.toarray() - F.toarray()@Dhat)/norm(Lap))
         savez(data_file, all_data[:,:,:,:j+1])
         i += 1
 

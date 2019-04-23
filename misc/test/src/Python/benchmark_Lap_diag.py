@@ -120,7 +120,7 @@ if __name__ == '__main__':
         par_givens_err = norm((F*Dhat.todense())*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
         par_givens_errs[i] = par_givens_err
         U_par_givens_errs[i] = (F-U).norm("fro")/norm(U,"fro")
-        print("err:", norm(Lap * F.toarray() - F.toarray()*Dhat)/norm(Lap))
+        print("err:", norm(Lap @ F.toarray() - F.toarray()@Dhat)/norm(Lap))
 
 
 

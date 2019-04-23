@@ -93,4 +93,5 @@ if __name__ == '__main__':
         f.write(str(errs[0,i])+" "+str(rcs[0,i])+"\n")
     f.close()
     #plt.plot(rcs, errs)
+    plt.tight_layout()
     plt.show()
