@@ -1,4 +1,4 @@
-from pyfaust import Faust
+from pyfaust import Faust, FaustFactory
 import numpy as np
 import os
 import matplotlib.pyplot as plt
@@ -15,8 +15,8 @@ if __name__ == '__main__':
     for i, d in zip(
                     list(range(0, ntests)),
         np.linspace(startd, endd, ntests)):
-        F = Faust.randFaust(nfactors,
-                            [min_dim_sz, max_dim_sz], d)
+        F = FaustFactory.rand(nfactors,
+                            [min_dim_sz, max_dim_sz], d, fac_type='sparse')
         filepath = 'test_faust_size'+str(i)+'.mat'
         F.save(filepath)
         stat = os.stat(filepath)
@@ -28,5 +28,6 @@ if __name__ == '__main__':
     plt.xlabel('Relative Complexity/Density')
     plt.ylabel('File Size (bytes)')
     #plt.scatter(rcs, sizes, s=1)
+    plt.tight_layout()
     plt.plot(rcs, sizes)
     plt.show()
