@@ -1433,7 +1433,7 @@ classdef Faust
 		end
 
 		%===============================================================================
-		%> Normalized F.
+		%> Returns the normalized F.
 		%===
 		%> @b Usage
 		%>

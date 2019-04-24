@@ -1147,7 +1147,23 @@ class Faust:
 
     def normalize(F, ord='fro', axis=1):
         """
-        Normalize F along the axis dimension using the ord-norm.
+        Normalizes F along the axis dimension using the ord-norm.
+
+        The function is able to normalize the columns (default axis=1):
+        <br/><code>
+            NF = F.normalize(ord='fro', axis=1) is such that for all i in
+        range(0,F.shape[1]) NF.todense()[:,i] ==
+        F.todense()[:,i]/norm(F.todense(),'fro')
+        </code>
+
+        Likewise for normalization of the rows (axis=0):
+        <br/><code>
+            NF = F.normalize(ord='fro', axis=0) is such that for all i in
+            range(0,F.shape[0]) NF.todense()[i,:] ==
+            F.todense()[i,:]/norm(F.todense(),'fro')
+        </code>
+
+        Of course these assertions remain valid for any other available norms.
 
         Args:
             ord: the norm order to use (see Faust.norm).
