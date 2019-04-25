@@ -1322,7 +1322,7 @@ classdef Faust
 		%>
 		%> The norm of F is equal to the norm of full(F).
 		%>
-		%> @warning if [n,m] == size(F), the computation time can be expected to be of the order of min(n,m) times that of multipliying F by a vector. Nevertheless, the implementation ensures that memory usage remains controlled by avoiding to explicitly compute full(F).
+		%> @warning the computation time can be expected to be of order n*min(size(F)) with n the time for multipliying F by a vector. Nevertheless, the implementation ensures that memory usage remains controlled by avoiding to explicitly compute full(F) (at least for 2-norm).
 		%>
 		%> @b Usage
 		%>

@@ -1094,10 +1094,11 @@ class Faust:
 
         The norm of F is equal to the numpy.linalg.norm of F.toarray().
 
-        WARNING: if [n,m] == size(F), the computation time can be expected to
-        be of the order of min(n,m) times that of multipliying F by a vector.
+        WARNING: the computation time can be expected to be of order
+        n*min(F.shape) with n the time for multipliying F by a vector.
         Nevertheless, the implementation ensures that memory usage remains
-        controlled by avoiding to explicitly compute F.toarray().
+        controlled by avoiding to explicitly compute F.toarray() (at least for
+        2-norm).
 
         Args:
             F: the Faust object.
@@ -1151,19 +1152,19 @@ class Faust:
 
         The function is able to normalize the columns (default axis=1):
         <br/><code>
-            NF = F.normalize(ord='fro', axis=1) is such that for all i in
+            NF = F.normalize(ord) is such that for all i in
         range(0,F.shape[1]) NF.todense()[:,i] ==
-        F.todense()[:,i]/norm(F.todense(),'fro')
+        F.todense()[:,i]/norm(F.todense(), ord)
         </code>
 
         Likewise for normalization of the rows (axis=0):
         <br/><code>
-            NF = F.normalize(ord='fro', axis=0) is such that for all i in
+            NF = F.normalize(ord, axis=0) is such that for all i in
             range(0,F.shape[0]) NF.todense()[i,:] ==
-            F.todense()[i,:]/norm(F.todense(),'fro')
+            F.todense()[i,:]/norm(F.todense(), ord)
         </code>
 
-        Of course these assertions remain valid for any other available norms.
+        The variable ord designates one of the Faust.norm() compatible norms.
 
         Args:
             ord: the norm order to use (see Faust.norm).
@@ -1363,7 +1364,6 @@ class Faust:
             F: the Faust object.
             name: (optional str) the displayed name on the plotted figure.
 
-        <b> See also Faust.display. </b>
 
         Examples:
         >>> from pyfaust import FaustFactory
@@ -1373,6 +1373,7 @@ class Faust:
         >>> plt.show()
 
 
+        <b/> See also Faust.display.
         """
         import matplotlib.pyplot as plt
         if(not isinstance(name, str)): raise TypeError('name must be a str.')
@@ -1591,8 +1592,8 @@ class FaustFactory:
             >>> from pyfaust import FaustFactory as Facto
             >>> from numpy.linalg import norm
             >>> # generate a Hadamard Faust of size 32x32
-            >>> FH = Facto.wht(5);
-            >>> H = FH.toarray(); # the full matrix version
+            >>> FH = Facto.wht(5)
+            >>> H = FH.toarray() # the full matrix version
             >>> # factorize it
             >>> FH2 = Facto.fact_hierarchical(H, 'squaremat');
             >>> # test the relative error
@@ -1925,10 +1926,12 @@ class FaustFactory:
 			from pyfaust import FaustFactory
 			from pyfaust.factparams import *
 			from scipy.io import loadmat, savemat
+			from pyfaust.demo import get_data_dirpath
+			from os.path import sep
 			from numpy.linalg import eig, eigh, norm
 			from numpy import sort, argsort, log2, size, copy, diag
 
-			d = loadmat("../../../misc/data/mat/Laplacian_128_ring.mat")
+			d = loadmat(sep.join((get_data_dirpath(),'Laplacian_128_ring.mat')))
 			Lap = d['Lap']
 
 
