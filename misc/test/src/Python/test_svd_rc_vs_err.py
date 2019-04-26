@@ -1,14 +1,15 @@
 
 # this script aims to show how SVD could be useful to get a better RCG than
-# the full matrix while not totally losing the accuracy
+# the dense matrix while not totally losing the accuracy
 
-# The SVD case here can be seen as a particular situation for a FAµST
+# The SVD case here can be seen as a particular a FAµST
 
 from sys import argv
 from matplotlib import pyplot as plt
 import numpy as np
 from numpy.linalg import norm
 from numpy.random import rand
+from numpy import diag,copy,savetxt,empty
 from threading import Thread
 from scipy.linalg import svd
 
@@ -28,31 +29,20 @@ class TruncSvd(Thread):
 
     def run(s):
         global norm_ord
-        S = np.zeros([s.U.shape[1], s.V.shape[0]])
-        if(norm_ord == "fro"): nfroM = 0
-        for i in range(0, s.S.shape[0]):
-            S[i, i] = s.S[i]
-            if(norm_ord == "fro"): nfroM += S[i,i]**2
-        if(norm_ord == "fro"): nfroM = np.sqrt(nfroM)
-        # assert((abs(M - s.U.dot(S).dot(s.V))/abs(s.M) < .01).all())
+        S = diag(s.S)
         while(s.r < min(s.M.shape[0], s.M.shape[1])):
-            #s.Mr = (s.U[:, 0:s.r].dot(S[0:s.r, 0:s.r])).dot(s.V[0:s.r, :])
-            #s.errs[0, s.r-1] = norm(s.M-s.Mr, norm_ord)/norm(s.M, norm_ord)
+            Sr = copy(S)
+            Sr[s.r:, s.r:] = 0
             if(norm_ord == 2):
                 err = S[s.r, s.r]/S[0,0]
-                #assert(err == s.errs[0, s.r-1])
-                #print(s.errs[0, s.r-1], err)
                 s.errs[0, s.r-1] = err
+                #print(norm(M-U@Sr@V,2)/norm(M,2),err)
             elif(norm_ord == "fro"):
-                err = 0
-                for j in range(s.r, s.S.shape[0]):
-                    err += s.S[j]**2
-                err = np.sqrt(err)/nfroM
-                #print(s.errs[0, s.r-1], err)
-                #assert(err == s.errs[0, s.r-1])
+                err = norm(s.S[s.r:s.S.shape[0]])/norm(s.S)
                 s.errs[0, s.r-1] = err
+                #print(norm(M-U@Sr@V,'fro')/norm(M,'fro'),err)
             s.rcs[0, s.r-1] = (s.r*(s.M.shape[0]+s.M.shape[1]))
-            s.rcs[0, s.r-1] /= s.M.shape[0] * s.M.shape[1]
+            s.rcs[0, s.r-1] /= s.M.size
             s.r += s.offset
 
 if __name__ == '__main__':
@@ -74,7 +64,7 @@ if __name__ == '__main__':
     rcs = np.zeros([1, min(m, n)])
     M = rand(m, n)
     U, S, V = svd(M)
-    ths = list()
+    ths = []
     for i in range(1, nthreads+1):
         th = TruncSvd(nthreads, M, U, S, V, i, errs, rcs)
         ths.append(th)
@@ -82,16 +72,13 @@ if __name__ == '__main__':
     for th in ths:
         th.join()
     plt.scatter(rcs[0, :], errs[0, :], s=1)
-    # plt.gca().set_xscale('log', basex=.5)
-    #plt.gca().invert_xaxis()
     plt.xlabel('Density')
     plt.ylabel('Relative Error')
     plt.title('Relative Error vs Density of Truncated SVDs for a dense matrix M ('
               + str(m) + 'x' + str(n)+')')
-    f = open("svd_err_vs_rc_output_"+str(nthreads), "w")
-    for i in range(0,errs.shape[1]):
-        f.write(str(errs[0,i])+" "+str(rcs[0,i])+"\n")
-    f.close()
-    #plt.plot(rcs, errs)
+    xy = empty((errs.shape[1],2))
+    xy[:,0] = errs[0,:]
+    xy[:,1] = rcs[0,:]
+    savetxt("svd_err_vs_rc_output_"+str(nthreads)+"_err_"+str(norm_ord), xy)
     plt.tight_layout()
     plt.show()
