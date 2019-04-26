@@ -84,9 +84,9 @@ if __name__ == '__main__':
     plt.scatter(rcs[0, :], errs[0, :], s=1)
     # plt.gca().set_xscale('log', basex=.5)
     #plt.gca().invert_xaxis()
-    plt.xlabel('Relative Complexity/Density')
+    plt.xlabel('Density')
     plt.ylabel('Relative Error')
-    plt.title('Relative Error over RC of Truncated SVDs for a dense matrix M ('
+    plt.title('Relative Error vs Density of Truncated SVDs for a dense matrix M ('
               + str(m) + 'x' + str(n)+')')
     f = open("svd_err_vs_rc_output_"+str(nthreads), "w")
     for i in range(0,errs.shape[1]):
