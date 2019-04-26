@@ -68,7 +68,7 @@
 %> Other notable limitations are that one cannot:
 %> - compute the real and imaginary parts of a Faust,
 %> - perform elementwise operations between two Fausts (e.g. elementwise
-%> multiplication), the addition and substraction are available though,
+%> multiplication), the addition and subtraction are available though,
 %> - reshape a Faust.
 %>
 %> Primarily for convenience and test purposes, a Faust can be converted into
@@ -310,12 +310,12 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b minus(F,G) or F-G substracts the Faust G from F, sizes must be compatible.<br/>
-		%> &nbsp;&nbsp;&nbsp; @b minus(F,A) or F-A substracts a matrix A from F, sizes must be compatible.<br/>
-		%> &nbsp;&nbsp;&nbsp; @b minus(F,s) or F-s substracts a scalar s from F, such that full(F-s) == full(F)-s.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b minus(F,G) or F-G subtracts the Faust G from F, sizes must be compatible.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b minus(F,A) or F-A subtracts a matrix A from F, sizes must be compatible.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b minus(F,s) or F-s subtracts a scalar s from F, such that full(F-s) == full(F)-s.<br/>
 		%>
 		%> @param F (first arg.) The Faust object.
-		%> @param G, A, s,… (2nd to n-th args) The variables to substract from F; Fausts, matrices or scalars.
+		%> @param G, A, s,… (2nd to n-th args) The variables to subtract from F; Fausts, matrices or scalars.
 		%>
 		%> @retval M: the difference as a Faust object.
 		%>

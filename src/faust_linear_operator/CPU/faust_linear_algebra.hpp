@@ -137,7 +137,7 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 			C=A;
 			if(typeA == 'T')
 				C.transpose();
-			else if(typeA = 'H')
+			else if(typeA == 'H')
 			{
 				C.transpose();
 				C.conjugate();

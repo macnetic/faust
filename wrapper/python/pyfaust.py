@@ -46,7 +46,7 @@ class Faust:
     Other notable limitations are that one cannot:
         - compute the real and imaginary parts of a Faust,
         - perform elementwise operations between two Fausts (e.g. elementwise
-        multiplication), the addition and substraction are available though,
+        multiplication), the addition and subtraction are available though,
         - reshape a Faust.
 
     Primarily for convenience and test purposes, a Faust can be converted into
@@ -450,7 +450,7 @@ class Faust:
 
     def __sub__(F,*args):
         """
-        Substracts from F one or a sequence of variables. Faust objects, arrays or scalars.
+        Subtracts from F one or a sequence of variables. Faust objects, arrays or scalars.
 
         NOTE: This method overloads the Python function/operator -.
 
