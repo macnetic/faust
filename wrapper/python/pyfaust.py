@@ -565,7 +565,7 @@ class Faust:
         elif(isinstance(A, float) or isinstance(A, int) or isinstance(A, np.complex)):
             raise ValueError("Scalar operands are not allowed, use '*'"
                              " instead")
-        elif(isinstance(A, np.ndarray) and isinstance(A[0,0], np.complex)):
+        elif(isinstance(A, np.ndarray) and A.dtype == np.complex):
             j = np.complex(0,1)
             return F.m_faust.multiply(A.real).astype(np.complex) + j*F.m_faust.multiply(A.imag)
         else:
