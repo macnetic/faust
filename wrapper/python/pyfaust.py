@@ -49,6 +49,10 @@ class Faust:
         multiplication), the addition and subtraction are available though,
         - reshape a Faust.
 
+    A last but not least caveat is that Faust doesn't support numpy universal
+    functions (ufuncs) except if the contrary is specified in the API doc. for
+    a particular function.
+
     Primarily for convenience and test purposes, a Faust can be converted into
     the corresponding full matrix using the function Faust.todense or
     Faust.toarray.
@@ -448,6 +452,14 @@ class Faust:
                                 " Faust, a matrix/array or a scalar.")
         return F
 
+    def __radd__(F,lhs_op):
+        """
+        Returns lhs_op+F.
+
+        <b/>See also Faust.__add__
+        """
+        return F.__add__(lhs_op)
+
     def __sub__(F,*args):
         """
         Subtracts from F one or a sequence of variables. Faust objects, arrays or scalars.
@@ -468,7 +480,6 @@ class Faust:
             >>> G = F-F
             >>> H = F-2
 
-
         <b/>See also Faust.__add__
         """
 
@@ -476,6 +487,14 @@ class Faust:
         for arg in args:
             nargs += [ arg*-1 ]
         return F.__add__(*nargs)
+
+    def __rsub__(F,lhs_op):
+        """
+        Returns lhs_op-F.
+
+        <b/>See also Faust.__sub__
+        """
+        return F.__mul__(-1).__radd__(lhs_op)
 
     def __truediv__(F,s):
         """
@@ -640,6 +659,36 @@ class Faust:
         else: # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
         # (but it will fail)
             return F.__matmul__(A)
+
+    def __rmul__(F, lhs_op):
+        """ lhs_op*F
+
+        <b/>See also Faust.__mul__
+        """
+        if(isinstance(lhs_op,np.ndarray)):
+            return (F.T*lhs_op.T).T
+        else:
+            # a scalar or something not Faust-mul-compatible
+            return F*lhs_op
+
+    __array_ufunc__ = None # mandatory to override rmatmul
+                           # it means Faust doesn't support ufuncs
+    def __rmatmul__(F,lhs_op):
+        """
+        Returns lhs_op.__matmul__(F).
+
+        <b>See also Faust.__matmul__</b>
+
+        Examples:
+            >>> from pyfaust import FaustFactory
+            >>> import numpy as np
+            >>> F = FaustFactory.rand(5, [50, 100])
+            >>> A = np.random.rand(50, F.shape[0])
+            >>> B = A@F # == A*F or pyfaust.dot(A,F)
+
+
+        """
+        return (F.T*lhs_op.T).T
 
     #def concatenate(F, *args, axis=0): # py. 2 doesn't handle this signature
     def concatenate(F, *args, **kwargs):
@@ -2223,3 +2272,30 @@ def license():
     """ Prints the FAuST license.
     """
     print("""@PYFAUST_LICENSE_HEADER@""")
+
+
+def norm(F, ord='fro'):
+    """
+        Returns Faust.norm(F, ord) or numpy.linalg.norm(F, ord) depending of F type.
+
+    <b/>See also Faust.norm
+    """
+    if(Faust.isFaust(F)):
+        return F.norm(ord)
+    else: # if F is not a Faust, try to rely on numpy (not breaking possible
+          # past import)
+        return np.linalg.norm(F, ord)
+
+def dot(A, B):
+    """
+        Returns Faust.dot(A,B) if A or B is a Faust object, returns numpy.dot(A,B) ortherwise.
+
+    <b/>See also Faust.norm
+    """
+    if(Faust.isFaust(A)):
+        return A.dot(B)
+    elif(Faust.isFaust(B)):
+        return B.T.dot(A.T).T
+    else: # if F is not a Faust, try to rely on numpy (not breaking possible
+          # past import)
+        return np.dot(A,B)
