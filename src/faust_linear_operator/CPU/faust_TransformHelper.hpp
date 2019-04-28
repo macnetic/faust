@@ -507,7 +507,11 @@ namespace Faust {
 	template<typename FPP>
 	void TransformHelper<FPP, Cpu>::eval_sliced_Transform()
 	{
+#ifdef _MSC_VER
+		bool cloning_fact = true; //temporarily disabling opt. for Windows VS compiler
+#else
 		bool cloning_fact = false;
+#endif
 		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) this->size());
 		faust_unsigned_int size = this->size();
 		MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
