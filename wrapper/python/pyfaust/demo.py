@@ -28,7 +28,10 @@ def get_data_dirpath():
     from pyfaust.datadl import download_uncompress
     path = resource_filename(__name__, 'data')
     if (sys.platform == 'win32' and not os.path.exists(path)):
-        from pyfaust import _NSI_INSTALL_PATH
+        try:
+            from pyfaust import _NSI_INSTALL_PATH
+        else:
+            _NSI_INSTALL_PATH = ''
         # in windows nsis based installation the data can be anywhere
         # users choose to install faust
         # the nsi installer is responsible to set this const var
