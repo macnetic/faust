@@ -12736,7 +12736,7 @@ If $L$ is the Laplacian matrix, $\hat U$ the Fourier sparse transform and $\hat 
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>170 µs ± 14.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+<pre>119 µs ± 4.9 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 </pre>
 </div>
 </div>
@@ -12767,7 +12767,7 @@ If $L$ is the Laplacian matrix, $\hat U$ the Fourier sparse transform and $\hat 
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>46.4 ms ± 5.95 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<pre>34.8 ms ± 5.69 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>
@@ -12811,12 +12811,12 @@ It's much more complicated to configure but starting from an example you'll be a
 <span class="kn">from</span> <span class="nn">scipy.io</span> <span class="k">import</span> <span class="n">loadmat</span><span class="p">,</span> <span class="n">savemat</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">eig</span><span class="p">,</span> <span class="n">eigh</span><span class="p">,</span> <span class="n">norm</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">sort</span><span class="p">,</span> <span class="n">argsort</span><span class="p">,</span> <span class="n">log2</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">copy</span><span class="p">,</span> <span class="n">diag</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">loadmat</span><span class="p">(</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">get_data_dirpath</span><span class="p">(),</span><span class="s1">&#39;Laplacian_128_ring.mat&#39;</span><span class="p">)))</span>
-<span class="n">Lap</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;Lap&#39;</span><span class="p">]</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">loadmat</span><span class="p">(</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">get_data_dirpath</span><span class="p">(),</span><span class="s1">&#39;Laplacian_256_ring.mat&#39;</span><span class="p">)))</span>
+<span class="n">Lap</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;Lap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
 <span class="n">D</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">eig</span><span class="p">(</span><span class="n">Lap</span><span class="p">)</span>
 <span class="n">indices</span> <span class="o">=</span> <span class="n">argsort</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
-<span class="n">D</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
-<span class="n">U</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span><span class="n">indices</span><span class="p">]</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span><span class="n">indices</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">D</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;eig(Lap), U error:&quot;</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">Lap</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">U</span><span class="p">)</span><span class="o">-</span><span class="n">U</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diag</span><span class="p">(</span><span class="n">D</span><span class="p">))))</span>
 <span class="n">dim</span> <span class="o">=</span> <span class="n">Lap</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -12864,10 +12864,10 @@ It's much more complicated to configure but starting from an example you'll be a
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>(128,) &lt;class &#39;numpy.ndarray&#39;&gt;
-eig(Lap), U error: 1.2791299640518516e-13
-3.999999999030188
-err_U: 1.000098954999539
+<pre>(256,) &lt;class &#39;numpy.ndarray&#39;&gt;
+eig(Lap), U error: 2.48804253058e-13
+4.00000002531
+err_U: 1.00130027735
 </pre>
 </div>
 </div>

@@ -1980,15 +1980,15 @@ class FaustFactory:
 			from numpy.linalg import eig, eigh, norm
 			from numpy import sort, argsort, log2, size, copy, diag
 
-			d = loadmat(sep.join((get_data_dirpath(),'Laplacian_128_ring.mat')))
-			Lap = d['Lap']
+			d = loadmat(sep.join((get_data_dirpath(),'Laplacian_256_ring.mat')))
+			Lap = d['Lap'].astype('float')
 
 
 			D, U = eig(Lap)
 
 			indices = argsort(D)
-			D = D[indices]
-			U = U[:,indices]
+			D = D[indices].astype('float')
+			U = U[:,indices].astype('float')
 
 			print(D.shape, type(D))
 			print("eig(Lap), U error:", norm(Lap.dot(U)-U.dot(diag(D))))
