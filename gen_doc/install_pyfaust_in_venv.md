@@ -5,17 +5,17 @@ Python @PY3_VER@
 
 First, you need to create your virtual environment into a directory reserved to pyfaust:
 
-	$ python3 -m venv test_pyfaust-3.6
+	$ python3 -m venv test_pyfaust-@PY3_VER@
 
 Second, you need to enable the virtual environment:
 
-	$ source ./test_pyfaust-3.6/bin/activate
+	$ source ./test_pyfaust-@PY3_VER@/bin/activate
 
 \note For Windows users the command is rather:
 
-	C:\> call .\test_pyfaust-3.6\Scripts\activate
+	C:\> call .\test_pyfaust-@PY3_VER@\Scripts\activate
 
-Then, if all worked correctly you must see the test_pyfaut-3.6 prompt of your virtual environment.
+Then, if all worked correctly you must see the test_pyfaut-@PY3_VER@ prompt of your virtual environment.
 
 It remains now to install pyfaust in this environment.
 
@@ -69,3 +69,5 @@ Within Anaconda you can also create virtual environments and use pyfaust into it
 Please rely on the documentation here: https://conda.readthedocs.io/en/latest/
 
 Or for more details about this specific command please look here: [conda-create](https://conda.io/projects/conda/en/latest/commands/create.html)
+
+Please note that if you're using conda, you still need to install pyfaust (whl) package through pip. You can install pip with conda and then install pyfaust pip package as described above with a pip install command (in a conda virtual environment or not). And final point, don't forget to use the good version of python3: @PY3_VER@.x.

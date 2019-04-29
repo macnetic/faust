@@ -1945,7 +1945,7 @@ class FaustFactory:
         len(dim_sizes) == 2):
             min_dim_size = dim_sizes[0]
             max_dim_size = dim_sizes[1]
-        elif(isinstance(dim_sizes, int)):
+        elif(isinstance(dim_sizes, int) or isinstance(dim_sizes, long)):
             min_dim_size = max_dim_size = dim_sizes
         else:
             raise ValueError("FaustFactory.rand(): dim_sizes argument must be an "

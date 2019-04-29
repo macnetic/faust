@@ -2,7 +2,7 @@
 # this script aims to show how SVD could be useful to get a better RCG than
 # the dense matrix while not totally losing the accuracy
 
-# The SVD case here can be seen as a particular a FAµST
+# The SVD case here can be seen as a particular Faust
 
 from sys import argv
 from matplotlib import pyplot as plt
