@@ -2,13 +2,13 @@
 # @PYFAUST_LICENSE_HEADER@
 
 ## @package pyfaust @brief <b> The FAuST Python Wrapper</b>
-import copy
 
 import numpy as np, scipy
-from scipy.io import savemat, loadmat
+from scipy.io import loadmat
 from scipy.sparse import csr_matrix, csc_matrix
 import FaustCorePy
 import pyfaust
+import pyfaust.factparams
 
 class Faust:
     """<b>FAuST Python wrapper main class</b> for using multi-layer sparse transforms.
@@ -1474,7 +1474,6 @@ class Faust:
         return isinstance(obj, Faust)
 
 
-import pyfaust.factparams
 
 class FaustFactory:
     """
@@ -1726,7 +1725,7 @@ class FaustFactory:
         Among other checkings, it sets parameters from simplified ones.
         """
         from pyfaust.factparams import (ParamsHierarchicalFact,
-        ParamsFactFactory)
+                                        ParamsFactFactory)
         if(not isinstance(p, ParamsHierarchicalFact) and
            ParamsFactFactory.is_a_valid_simplification(p)):
             p = ParamsFactFactory.createParams(M, p)
@@ -2072,8 +2071,6 @@ class FaustFactory:
 
         """
         from pyfaust.factparams import _init_init_D
-        from pyfaust.factparams import (ParamsHierarchicalFact,
-                                        ParamsFactFactory)
 
         p = FaustFactory._prepare_hierarchical_fact(U, p, "fgft_palm", ret_lambda,
                                   ret_params, 'U')
