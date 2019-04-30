@@ -478,6 +478,7 @@ namespace Faust {
 			//		last_sub_fac->Display();
 			if(cloning_fact)
 				delete gen_fac;
+			factors.reserve(size);
 			factors.insert(factors.begin(), first_sub_fac);
 			if(size > 2)
 			{
@@ -485,7 +486,7 @@ namespace Faust {
 				for(faust_unsigned_int i = 1; i < size-1; i++)
 				{
 					gen_fac = this->transform->get_fact(i, cloning_fact);
-					factors.insert(++it, gen_fac);
+					factors[i] = gen_fac;
 				}
 			}
 			factors.insert(factors.begin()+(size-1), last_sub_fac);
@@ -507,17 +508,14 @@ namespace Faust {
 	template<typename FPP>
 	void TransformHelper<FPP, Cpu>::eval_sliced_Transform()
 	{
-#ifdef _MSC_VER
-		bool cloning_fact = true; //temporarily disabling opt. for Windows VS compiler
-#else
-		bool cloning_fact = false;
-#endif
+		bool cloning_fact = true;
 		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) this->size());
 		faust_unsigned_int size = this->size();
 		MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
 		gen_fac = this->transform->get_fact(0, cloning_fact);
 		first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
 		//		first_sub_fac->Display();
+		//
 		if(cloning_fact)
 			delete gen_fac;
 		if(size > 1) {
@@ -527,17 +525,16 @@ namespace Faust {
 			//		last_sub_fac->Display();
 			if(cloning_fact)
 				delete gen_fac;
+			factors.reserve(size);
 			factors.insert(factors.begin(), first_sub_fac);
 			if(size > 2)
 			{
-				auto it = factors.begin();
 				for(faust_unsigned_int i = 1; i < size-1; i++)
 				{
 					gen_fac = this->transform->get_fact(i, cloning_fact);
-
-
-					factors.insert(++it, gen_fac);
+					factors[i] = gen_fac;
 				}
+
 			}
 			factors.insert(factors.begin()+(size-1), last_sub_fac);
 			factors.resize(size);
