@@ -53,7 +53,7 @@ setup(
     description = 'TODO',
     long_description = 'TODO',
     classifiers = [ 'TODO' ],
-    install_requires = [ 'scipy', 'numpy', 'matplotlib>=2.0.0' ], #ENOTE: order matters (last pkg installed first)
+    install_requires = [ 'pygsp', 'scipy', 'numpy', 'matplotlib>=2.0.0' ], #ENOTE: order matters (last pkg installed first)
     license = "GNU AFFERO GPL",
     package_data = {
         'pyfaust': [ 'data/*.mat', 'license*.txt' ]

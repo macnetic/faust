@@ -31,6 +31,7 @@ FAµST supports at least Python 2.7.15 and is also compiled for Python @PY3_VER@
 
 If you want to use FAµST with Python 3 you must use precisely the @PY3_VER@ version because the FAµST Python wrapper delivered within the binary package is compiled for that version only.
 
+@note pygsp is an optional python package to install in order to generate graphs and their Laplacians for testing the FGFT algorithms added in FAµST 2.4.
 
 ### 1.2 For Matlab
 
