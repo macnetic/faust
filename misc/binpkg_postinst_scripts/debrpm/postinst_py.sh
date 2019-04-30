@@ -8,7 +8,7 @@ uid=$(id -u)
 [[ -z "$FAUST_PY_WRAPPER_PATH" ]] && echo "USAGE: $0 <path>" && exit 2
 [[ ! -d "$FAUST_PY_WRAPPER_PATH" ]] && echo "ERROR: directory $FAUST_PY_WRAPPER_PATH doesn't exist" && exit 3
 
-SUPPORTED_PY3=6
+SUPPORTED_PY3=7
 
 function link_py_files(){
 	PY_MAJOR_VER=$1
