@@ -1073,29 +1073,30 @@ cdef class FaustFact:
                              'float64', 'double']
         # double == float64
         check_matrix(isReal, M)
+        if(isReal):
+            return FaustFact.fact_hierarchical_gen_real(M, p, init_D, Lap)
+        else:
+            return FaustFact.fact_hierarchical_gen_cplx(M, p, init_D, Lap)
+
+    @staticmethod
+    def fact_hierarchical_gen_real(M, p, init_D=None, Lap=None):
 
         cdef unsigned int M_num_rows=M.shape[0]
         cdef unsigned int M_num_cols=M.shape[1]
 
         cdef double[:,:] Mview
-        cdef complex[:,:] Mview_cplx
 
         cdef double[:,:] Lapview
-        cdef complex[:,:] Lapview_cplx
 
         # views for lambda and optionally D out buffer (FGFT)
         cdef double[:] outbufview
-        cdef complex[:] outbufview_cplx
 
         # only for FGFT
         cdef double[:] init_D_view
-        cdef complex[:] init_D_view_cplx
 
         cdef double[:,:] tmp_mat
-        cdef complex[:,:] tmp_mat_cplx
 
         cdef FaustCoreCy.PyxParamsHierarchicalFact[double,double]* cpp_params
-        cdef FaustCoreCy.PyxParamsHierarchicalFact[complex,double]* cpp_params_cplx
         cdef PyxStoppingCriterion[double]* cpp_stop_crits
         # template parameter is always double (never complex) because no need
         # to have a treshold error of complex type (it wouldn't make sense)
@@ -1115,8 +1116,6 @@ cdef class FaustFact:
 
 
         calling_fft_algo = isinstance(init_D, np.ndarray)
-        if(calling_fft_algo):
-            check_matrix(isReal, Lap)
 
         if(calling_fft_algo):
             # FFT/FGFT case, we store lambda in first position and the diagonal
@@ -1126,47 +1125,25 @@ cdef class FaustFact:
             # store only lambda as a return from Palm4MSA algo
             _out_buf = np.array([0], dtype=M.dtype)
 
-        if(isReal):
-            if(calling_fft_algo):
-                cpp_params = new \
-                FaustCoreCy.PyxParamsHierarchicalFactFFT[double,double]()
-                Lapview = Lap
-                init_D_view = init_D
-                (<FaustCoreCy.PyxParamsHierarchicalFactFFT[double,double]*>cpp_params).init_D = &init_D_view[0]
-            else:
-                cpp_params = new \
-                FaustCoreCy.PyxParamsHierarchicalFact[double,double]()
-            Mview=M
-            cpp_params.num_facts = p.num_facts
-            cpp_params.is_update_way_R2L = p.is_update_way_R2L
-            cpp_params.init_lambda = p.init_lambda
-            cpp_params.step_size = p.step_size
-            cpp_params.stop_crits = cpp_stop_crits
-            cpp_params.is_verbose = p.is_verbose
-            cpp_params.is_fact_side_left = p.is_fact_side_left
-            cpp_params.constant_step_size = p.constant_step_size
-            outbufview = _out_buf
+        if(calling_fft_algo):
+            cpp_params = new \
+            FaustCoreCy.PyxParamsHierarchicalFactFFT[double,double]()
+            Lapview = Lap
+            init_D_view = init_D
+            (<FaustCoreCy.PyxParamsHierarchicalFactFFT[double,double]*>cpp_params).init_D = &init_D_view[0]
         else:
-            if(calling_fft_algo):
-                cpp_params_cplx = new \
-                FaustCoreCy.PyxParamsHierarchicalFactFFT[complex,double]()
-                init_D_view_cplx = init_D
-                Lapview_cplx = Lap
-                (<FaustCoreCy.PyxParamsHierarchicalFactFFT[complex,double]*>cpp_params_cplx).init_D = &init_D_view_cplx[0]
-            else:
-                cpp_params_cplx = new \
-                FaustCoreCy.PyxParamsHierarchicalFact[complex,double]()
-            Mview_cplx=M
-            cpp_params_cplx.num_facts = p.num_facts
-            cpp_params_cplx.num_facts = p.num_facts
-            cpp_params_cplx.is_update_way_R2L = p.is_update_way_R2L
-            cpp_params_cplx.init_lambda = p.init_lambda
-            cpp_params_cplx.step_size = p.step_size
-            cpp_params_cplx.stop_crits = cpp_stop_crits
-            cpp_params_cplx.is_verbose = p.is_verbose
-            cpp_params_cplx.is_fact_side_left = p.is_fact_side_left
-            cpp_params_cplx.constant_step_size = p.constant_step_size
-            outbufview_cplx = _out_buf
+            cpp_params = new \
+            FaustCoreCy.PyxParamsHierarchicalFact[double,double]()
+        Mview=M
+        cpp_params.num_facts = p.num_facts
+        cpp_params.is_update_way_R2L = p.is_update_way_R2L
+        cpp_params.init_lambda = p.init_lambda
+        cpp_params.step_size = p.step_size
+        cpp_params.stop_crits = cpp_stop_crits
+        cpp_params.is_verbose = p.is_verbose
+        cpp_params.is_fact_side_left = p.is_fact_side_left
+        cpp_params.constant_step_size = p.constant_step_size
+        outbufview = _out_buf
 
         cpp_constraints = \
         <PyxConstraintGeneric**> \
@@ -1187,18 +1164,143 @@ cdef class FaustFact:
                         cons._cons_value
             elif(cons._is_mat_constraint()):
                 #print("FaustFact.fact_hierarchical() Matrix Constraint")
-                if(isReal):
-                    cpp_constraints[i] = <PyxConstraintMat[double]*> \
-                            PyMem_Malloc(sizeof(PyxConstraintMat[double]))
-                    tmp_mat = cons._cons_value
-                    (<PyxConstraintMat[double]*>cpp_constraints[i]).parameter =\
-                            &tmp_mat[0,0]
-                else:
-                    cpp_constraints[i] = <PyxConstraintMat[complex]*> \
-                            PyMem_Malloc(sizeof(PyxConstraintMat[complex]))
-                    tmp_mat_cplx = cons._cons_value
-                    (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter =\
-                            &tmp_mat_cplx[0,0]
+                cpp_constraints[i] = <PyxConstraintMat[double]*> \
+                        PyMem_Malloc(sizeof(PyxConstraintMat[double]))
+                tmp_mat = cons._cons_value
+                (<PyxConstraintMat[double]*>cpp_constraints[i]).parameter =\
+                        &tmp_mat[0,0]
+            else:
+                raise ValueError("Constraint type/name is not recognized.")
+            cpp_constraints[i].name = cons.name
+            cpp_constraints[i].num_rows = cons._num_rows
+            cpp_constraints[i].num_cols = cons._num_cols
+
+        cpp_params.constraints = cpp_constraints
+        cpp_params.num_rows = p.data_num_rows
+        cpp_params.num_cols = p.data_num_cols
+        cpp_params.num_constraints = len(p.constraints)
+
+        core = FaustCore(core=True)
+        if(calling_fft_algo):
+            core.core_faust_dbl = \
+            FaustCoreCy.fact_hierarchical_fft[double,double](&Mview[0,0],
+                                                             &Lapview[0,0], M_num_rows, M_num_cols,
+                                                             <FaustCoreCy.PyxParamsHierarchicalFactFFT[double,double]*>cpp_params,
+                                                             &outbufview[0])
+        else:
+            core.core_faust_dbl = \
+            FaustCoreCy.fact_hierarchical[double,double](&Mview[0,0], M_num_rows, M_num_cols,
+#           FaustCoreCy.fact_hierarchical(&Mview[0,0], M_num_rows, M_num_cols,
+                                  cpp_params, &outbufview[0])
+        core._isReal = True
+
+        for i in range(0,len(p.constraints)):
+            PyMem_Free(cpp_constraints[i])
+        PyMem_Free(cpp_constraints)
+
+        PyMem_Free(cpp_stop_crits)
+
+        del cpp_params
+        if(core.core_faust_dbl == NULL): raise Exception("fact_hierarchical"
+                                                          " has failed.");
+
+        if(calling_fft_algo):
+            return core, np.real(_out_buf[0]), _out_buf[1:]
+        else:
+            return core, np.real(_out_buf[0])
+
+    @staticmethod
+    def fact_hierarchical_gen_cplx(M, p, init_D=None, Lap=None):
+
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+
+        cdef complex[:,:] Mview_cplx
+
+        cdef complex[:,:] Lapview_cplx
+
+        # view for lambda and optionally D out buffer (FGFT)
+        cdef complex[:] outbufview_cplx
+
+        # only for FGFT
+        cdef complex[:] init_D_view_cplx
+
+        cdef complex[:,:] tmp_mat_cplx
+
+        cdef FaustCoreCy.PyxParamsHierarchicalFact[complex,double]* cpp_params_cplx
+        cdef PyxStoppingCriterion[double]* cpp_stop_crits
+        # template parameter is always double (never complex) because no need
+        # to have a treshold error of complex type (it wouldn't make sense)
+        cdef PyxConstraintGeneric** cpp_constraints
+
+        cpp_stop_crits = <PyxStoppingCriterion[double]*>\
+        PyMem_Malloc(sizeof(PyxStoppingCriterion[double])*2)
+
+        cpp_stop_crits[0].is_criterion_error = p.stop_crits[0].is_criterion_error
+        cpp_stop_crits[0].error_treshold = p.stop_crits[0].error_treshold
+        cpp_stop_crits[0].num_its = p.stop_crits[0].num_its
+        cpp_stop_crits[0].max_num_its = p.stop_crits[0].max_num_its
+        cpp_stop_crits[1].is_criterion_error = p.stop_crits[1].is_criterion_error
+        cpp_stop_crits[1].error_treshold = p.stop_crits[1].error_treshold
+        cpp_stop_crits[1].num_its = p.stop_crits[1].num_its
+        cpp_stop_crits[1].max_num_its = p.stop_crits[1].max_num_its
+
+
+        calling_fft_algo = isinstance(init_D, np.ndarray)
+
+        if(calling_fft_algo):
+            # FFT/FGFT case, we store lambda in first position and the diagonal
+            # of D in the next
+            _out_buf = np.empty(init_D.shape[0]+1, dtype=M.dtype)
+        else:
+            # store only lambda as a return from Palm4MSA algo
+            _out_buf = np.array([0], dtype=M.dtype)
+
+        if(calling_fft_algo):
+            cpp_params_cplx = new \
+            FaustCoreCy.PyxParamsHierarchicalFactFFT[complex,double]()
+            init_D_view_cplx = init_D
+            Lapview_cplx = Lap
+            (<FaustCoreCy.PyxParamsHierarchicalFactFFT[complex,double]*>cpp_params_cplx).init_D = &init_D_view_cplx[0]
+        else:
+            cpp_params_cplx = new \
+            FaustCoreCy.PyxParamsHierarchicalFact[complex,double]()
+        Mview_cplx=M
+        cpp_params_cplx.num_facts = p.num_facts
+        cpp_params_cplx.num_facts = p.num_facts
+        cpp_params_cplx.is_update_way_R2L = p.is_update_way_R2L
+        cpp_params_cplx.init_lambda = p.init_lambda
+        cpp_params_cplx.step_size = p.step_size
+        cpp_params_cplx.stop_crits = cpp_stop_crits
+        cpp_params_cplx.is_verbose = p.is_verbose
+        cpp_params_cplx.is_fact_side_left = p.is_fact_side_left
+        cpp_params_cplx.constant_step_size = p.constant_step_size
+        outbufview_cplx = _out_buf
+
+        cpp_constraints = \
+        <PyxConstraintGeneric**> \
+        PyMem_Malloc(sizeof(PyxConstraintGeneric*)*len(p.constraints))
+
+        for i in range(0,len(p.constraints)):
+            cons = p.constraints[i]
+            #print("FaustFact.fact_hierarchical() cons.name =", cons.name)
+            if(cons.is_int_constraint()):
+                #print("FaustFact.fact_hierarchical() Int Constraint")
+                cpp_constraints[i] = <PyxConstraintInt*> PyMem_Malloc(sizeof(PyxConstraintInt))
+                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons._cons_value
+            elif(cons.is_real_constraint()):
+                #print("FaustFact.fact_hierarchical() Real Constraint")
+                cpp_constraints[i] = <PyxConstraintScalar[double]*> \
+                PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
+                (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
+                        cons._cons_value
+            elif(cons._is_mat_constraint()):
+                #print("FaustFact.fact_hierarchical() Matrix Constraint")
+                cpp_constraints[i] = <PyxConstraintMat[complex]*> \
+                        PyMem_Malloc(sizeof(PyxConstraintMat[complex]))
+                tmp_mat_cplx = cons._cons_value
+                (<PyxConstraintMat[complex]*>cpp_constraints[i]).parameter =\
+                        &tmp_mat_cplx[0,0]
 
             else:
                 raise ValueError("Constraint type/name is not recognized.")
@@ -1206,59 +1308,34 @@ cdef class FaustFact:
             cpp_constraints[i].num_rows = cons._num_rows
             cpp_constraints[i].num_cols = cons._num_cols
 
-        if(isReal):
-            cpp_params.constraints = cpp_constraints
-            cpp_params.num_rows = p.data_num_rows
-            cpp_params.num_cols = p.data_num_cols
-            cpp_params.num_constraints = len(p.constraints)
-        else:
-            cpp_params_cplx.constraints = cpp_constraints
-            cpp_params_cplx.num_rows = p.data_num_rows
-            cpp_params_cplx.num_cols = p.data_num_cols
-            cpp_params_cplx.num_constraints = len(p.constraints)
+        cpp_params_cplx.constraints = cpp_constraints
+        cpp_params_cplx.num_rows = p.data_num_rows
+        cpp_params_cplx.num_cols = p.data_num_cols
+        cpp_params_cplx.num_constraints = len(p.constraints)
 
         core = FaustCore(core=True)
-        if(isReal):
-            if(calling_fft_algo):
-                core.core_faust_dbl = \
-                FaustCoreCy.fact_hierarchical_fft[double,double](&Mview[0,0],
-                                                                 &Lapview[0,0], M_num_rows, M_num_cols,
-                                                                 <FaustCoreCy.PyxParamsHierarchicalFactFFT[double,double]*>cpp_params,
-                                                                 &outbufview[0])
-            else:
-                core.core_faust_dbl = \
-                FaustCoreCy.fact_hierarchical[double,double](&Mview[0,0], M_num_rows, M_num_cols,
- #           FaustCoreCy.fact_hierarchical(&Mview[0,0], M_num_rows, M_num_cols,
-                                      cpp_params, &outbufview[0])
-            core._isReal = True
+        if(calling_fft_algo):
+            core.core_faust_cplx = \
+                    FaustCoreCy.fact_hierarchical_fft[complex,
+                                                      double](&Mview_cplx[0,0],
+                                                              &Lapview_cplx[0,0], M_num_rows, M_num_cols,
+                                                              <FaustCoreCy.PyxParamsHierarchicalFactFFT[complex,double]*>cpp_params_cplx,
+                                                              &outbufview_cplx[0])
         else:
-            if(calling_fft_algo):
-                core.core_faust_cplx = \
-                        FaustCoreCy.fact_hierarchical_fft[complex,
-                                                          double](&Mview_cplx[0,0],
-                                                                  &Lapview_cplx[0,0], M_num_rows, M_num_cols,
-                                                                  <FaustCoreCy.PyxParamsHierarchicalFactFFT[complex,double]*>cpp_params_cplx,
-                                                                  &outbufview_cplx[0])
-            else:
-                core.core_faust_cplx = \
-                        FaustCoreCy.fact_hierarchical[complex,
-                                                      double](&Mview_cplx[0,0], M_num_rows, M_num_cols,
-                                                              cpp_params_cplx, &outbufview_cplx[0])
-            core._isReal = False
+            core.core_faust_cplx = \
+                    FaustCoreCy.fact_hierarchical[complex,
+                                                  double](&Mview_cplx[0,0], M_num_rows, M_num_cols,
+                                                          cpp_params_cplx, &outbufview_cplx[0])
+        core._isReal = False
         for i in range(0,len(p.constraints)):
             PyMem_Free(cpp_constraints[i])
         PyMem_Free(cpp_constraints)
 
         PyMem_Free(cpp_stop_crits)
 
-        if(isReal):
-            del cpp_params
-            if(core.core_faust_dbl == NULL): raise Exception("fact_hierarchical"
-                                                            " has failed.");
-        else:
-            del cpp_params_cplx
-            if(core.core_faust_cplx == NULL): raise Exception("fact_hierarchical"
-                                                            " has failed.");
+        del cpp_params_cplx
+        if(core.core_faust_cplx == NULL): raise Exception("fact_hierarchical"
+                                                          " has failed.");
 
         if(calling_fft_algo):
             return core, np.real(_out_buf[0]), _out_buf[1:]
