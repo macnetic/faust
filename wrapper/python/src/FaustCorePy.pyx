@@ -974,7 +974,7 @@ cdef class FaustFact:
                 PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
                 (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
                         cons._cons_value
-            elif(cons._is_mat_constraint()):
+            elif(cons.is_mat_constraint()):
                 #print("FaustFact.fact_palm4MSA() Matrix Constraint")
                 if(isReal):
                     cpp_constraints[i] = <PyxConstraintMat[double]*> \
@@ -1166,7 +1166,7 @@ cdef class FaustFact:
                 PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
                 (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
                         cons._cons_value
-            elif(cons._is_mat_constraint()):
+            elif(cons.is_mat_constraint()):
                 #print("FaustFact.fact_hierarchical() Matrix Constraint")
                 cpp_constraints[i] = <PyxConstraintMat[double]*> \
                         PyMem_Malloc(sizeof(PyxConstraintMat[double]))
