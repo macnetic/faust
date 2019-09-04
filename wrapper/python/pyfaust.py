@@ -1743,6 +1743,88 @@ class FaustFactory:
                              "with the first factor constraint defined in p.")
         return p
 
+    @staticmethod
+    def fact_hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
+        """
+        Tries to approximate M by \f$ A \prod_j S_j B \f$ using the FaustFactory.fact_hierarchical.
+
+        It needs to add one additional residuum constraint and also one factor
+        constraint into p relatively to the number of constraints you would
+        have defined if you just factorized M into prod \f$ \prod_j S_j \f$.
+
+        Examples:
+			from pyfaust import FaustFactory as FF
+			import numpy as np
+			from numpy.random import rand
+			from pyfaust.factparams import (ParamsHierarchicalFact, ConstraintList,
+											StoppingCriterion)
+			import sys
+
+			M = rand(32,32)
+			A = rand(32,32)
+			B = rand(32,32)
+			stop_crit1 = StoppingCriterion(num_its=200)
+			stop_crit2 = StoppingCriterion(num_its=200)
+			fact_cons = ConstraintList('splin', 5, 32, 32, 'sp', 96, 32, 32, 'sp', 96,
+									   32, 32,
+									   'sp', 225, 32, 32)
+			res_cons = ConstraintList('normcol', 1, 32, 32,
+									  'normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp',
+									  333, 32, 32)
+			param = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit1, stop_crit2)
+			F, _lambda = FF.fact_hierarchical_constends(M, param, A, B, ret_lambda=True)
+
+			assert(np.allclose(F.get_factor(0).toarray(), A))
+			assert(np.allclose(F.get_factor(5).toarray(), B))
+
+        """
+        from pyfaust.factparams import ConstraintList
+        from pyfaust.factparams import ParamsHierarchicalFact
+        A = np.asfortranarray(A)
+        B = np.asfortranarray(B)
+        consA = ConstraintList('const', A, *A.shape)
+        consB = ConstraintList('const', B, *B.shape)
+        consts = p.constraints
+        nconsts = len(consts)
+        # consts : factor constraints + residuum constraints
+        fac_cons = [ consts[i] for i in range(0, p.num_facts-1) ]
+        res_cons = [ consts[i] for i in range(p.num_facts-1, len(consts))]
+        assert(nconsts == len(fac_cons) + len(res_cons))
+        # add two CONST(ants) factor constraint: A and B to the constraints
+        # depending of the factorization direction we need to switch A and B
+        # constraint positions
+        if(p.is_fact_side_left):
+            new_fact_cons = consB + ConstraintList(*fac_cons)
+            new_res_cons = ConstraintList(*res_cons) + consA
+        else:
+            new_fact_cons = consA + ConstraintList(*fac_cons)
+            new_res_cons = ConstraintList(*res_cons) + consB
+        assert(nconsts == len(new_fact_cons) + len(new_res_cons) - 2)
+        p = ParamsHierarchicalFact(new_fact_cons, new_res_cons, *p.stop_crits,
+                                   p.is_update_way_R2L, p.init_lambda,
+                                   p.step_size, p.constant_step_size,
+                                   p.is_fact_side_left,
+                                   p.is_verbose)
+        F, _lambda = FaustFactory.fact_hierarchical(M, p, ret_lambda=True,
+                                              ret_params=False)
+        FA_lambda = F.get_factor(0)
+        FA = FA_lambda/_lambda
+        new_F_factors = [ FA ]
+        F_without_A = F.get_factor(range(1,F.get_num_factors()))
+        F_without_A = F_without_A * _lambda
+        new_F_factors += [ F_without_A.get_factor(i) for i in
+                          range(0,F_without_A.get_num_factors()) ]
+        new_F = Faust(new_F_factors)
+        F = new_F
+        ret_list = [F]
+        if(ret_lambda):
+            ret_list += [ _lambda ]
+        if(ret_params):
+            ret_list += [ p ]
+        if(ret_lambda or ret_params):
+            return ret_list
+        else:
+            return F
 
     @staticmethod
     def wht(n):
