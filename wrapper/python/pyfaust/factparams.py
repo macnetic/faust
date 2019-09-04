@@ -417,7 +417,7 @@ class ConstraintName:
 
 class ConstraintList(object):
     """
-        An helper class for constructing a list of consistent ConstraintGeneric objects.
+        A helper class for constructing a list of consistent ConstraintGeneric objects.
     """
     def __init__(self, *args):
         # constraint definition tuple
@@ -426,6 +426,10 @@ class ConstraintList(object):
         j = 1 # the number of processed constraints
         self.clist = []
         while(i < len(args)):
+              if(isinstance(args[i], ConstraintGeneric)):
+                  self.clist += [ args[i] ]
+                  i += 1
+                  continue
               cname = ConstraintName(args[i])
               if(i+1 > len(args)):
                 raise ValueError("No value/parameter given to define the "
@@ -456,12 +460,32 @@ class ConstraintList(object):
 
     def __add__(self, other):
         """
-        Warning: it  returns a python list not a ConstraintList.
+        Returns the concatenation of two lists (self and other) as a new ConstraintList.
+
+        Examples:
+            >>> from pyfaust.factparams import *
+            >>> l1 = ConstraintList('normcol', 1, 32, 32, 'sp', 128, 32, 32,
+                                    'sp', 128, 32, 32)
+            >>> l2 = ConstraintList('sp', 128, 32, 32, 'sp', 128, 32, 32)
+            >>> l1 + l2
+
         """
         if(not isinstance(other, ConstraintList)):
            raise TypeError("Can't concatenate a ConstraintList with something"
                            " else.")
-        return self.clist + other.clist
+        return ConstraintList(*(self.clist + other.clist))
+
+    def __getitem__(self, ind):
+        """
+        x.__getitem__(y) <==> x[y]
+
+            Examples:
+                >>> from pyfaust.factparams import *
+                >>> cl = ConstraintList('sp', 128, 32, 32, 'sp', 128, 32, 32)
+                >>> cl[1]
+                <pyfaust.factparams.ConstraintInt at 0x7f13a78fd3c8>
+        """
+        return self.clist.__getitem__(ind)
 
 class ParamsFact(ABC):
     """
@@ -542,7 +566,8 @@ class ParamsHierarchicalFact(ParamsFact):
             raise TypeError('ParamsHierarchicalFact stop_crits argument must be'
                             ' a list/tuple of two StoppingCriterion objects')
         if((not isinstance(constraints, list) and not isinstance(constraints,
-                                                                tuple)) or
+                                                                tuple) and not
+           (isinstance(constraints, ConstraintList))) or
            np.array([not isinstance(constraints[i],ConstraintGeneric) for i in
                     range(0,len(constraints))]).any()):
             raise TypeError('constraints argument must be a list/tuple of '
