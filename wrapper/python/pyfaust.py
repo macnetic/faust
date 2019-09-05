@@ -973,6 +973,8 @@ class Faust:
             out_indices = [indices, list(range(0,F.shape[1]))]
             #TODO: check indices are all integers lying into F shape
         elif(isinstance(indices, tuple)):
+            if(len(indices) == 1):
+                return F.__getitem__(indices[0])
             if(len(indices) == 2):
                 out_indices = [0,0]
                 if(isinstance(indices[0], int) and isinstance(indices[1],int)):
@@ -1798,7 +1800,8 @@ class FaustFactory:
             new_fact_cons = consA + ConstraintList(*fac_cons)
             new_res_cons = ConstraintList(*res_cons) + consB
         assert(nconsts == len(new_fact_cons) + len(new_res_cons) - 2)
-        p = ParamsHierarchicalFact(new_fact_cons, new_res_cons, *p.stop_crits,
+        p = ParamsHierarchicalFact(new_fact_cons, new_res_cons,
+                                   p.stop_crits[0], p.stop_crits[1],
                                    p.is_update_way_R2L, p.init_lambda,
                                    p.step_size, p.constant_step_size,
                                    p.is_fact_side_left,
@@ -1827,7 +1830,7 @@ class FaustFactory:
     @staticmethod
     def fact_palm4msa_constends(M, p, A, B=None, ret_lambda=False):
         """
-        Tries to approximate M by \f$ A \prod_j S_j B\f$ (B being optional).
+        Tries to approximate M by \f$ A \prod_j S_j B\f$ using FaustFactory.fact_palm4msa (B being optional).
 
         """
         from pyfaust.factparams import ConstraintList

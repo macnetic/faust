@@ -139,13 +139,21 @@ namespace Faust {
 			this->is_sliced = false;
 			//TODO: check indices
 //				handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Fancy indexing overflows a Faust dimension.");
-			this->fancy_indices[0] = new faust_unsigned_int[num_rows];
-			this->fancy_indices[1] = new faust_unsigned_int[num_cols];
+			unsigned int id0=0, id1=1;
 			this->fancy_num_cols = num_cols;
 			this->fancy_num_rows = num_rows;
+			if(this->is_transposed)
+			{
+				id0 = 1;
+				id1 = 0;
+				this->fancy_num_cols = num_rows;
+				this->fancy_num_rows = num_cols;
+			}
+			this->fancy_indices[id0] = new faust_unsigned_int[num_rows];
+			this->fancy_indices[id1] = new faust_unsigned_int[num_cols];
 			this->is_fancy_indexed= true;
-			memcpy(this->fancy_indices[0], row_ids, num_rows*sizeof(faust_unsigned_int));
-			memcpy(this->fancy_indices[1], col_ids, num_cols*sizeof(faust_unsigned_int));
+			memcpy(this->fancy_indices[id0], row_ids, num_rows*sizeof(faust_unsigned_int));
+			memcpy(this->fancy_indices[id1], col_ids, num_cols*sizeof(faust_unsigned_int));
 			eval_fancy_idx_Transform();
 			delete[] this->fancy_indices[0];
 			delete[] this->fancy_indices[1];
