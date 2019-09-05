@@ -1758,8 +1758,6 @@ class FaustFactory:
 			from numpy.random import rand
 			from pyfaust.factparams import (ParamsHierarchicalFact, ConstraintList,
 											StoppingCriterion)
-			import sys
-
 			M = rand(32,32)
 			A = rand(32,32)
 			B = rand(32,32)
@@ -1825,6 +1823,29 @@ class FaustFactory:
             return ret_list
         else:
             return F
+
+    @staticmethod
+    def fact_palm4msa_constends(M, p, A, B=None, ret_lambda=False):
+        """
+        Tries to approximate M by \f$ A \prod_j S_j B\f$ (B being optional).
+
+        """
+        from pyfaust.factparams import ConstraintList
+        from pyfaust.factparams import ParamsPalm4MSA
+        A = np.asfortranarray(A)
+        B = np.asfortranarray(B)
+        consA = ConstraintList('const', A, *A.shape)
+        consts = ConstraintList(*p.constraints)
+        new_consts = consA + consts
+        if(B):
+            consB = ConstraintList('const', B, *B.shape)
+            new_consts = new_consts + consB
+        p = ParamsPalm4MSA(new_consts, stop_crit=p.stop_crit, init_facts=p.init_facts,
+                           is_update_way_R2L=p.is_update_way_R2L,
+                           init_lambda=p.init_lambda, step_size=p.step_size,
+                           constant_step_size = p.constant_step_size,
+                           is_verbose = p.is_verbose)
+        return FaustFactory.fact_palm4msa(M, p, ret_lambda=ret_lambda)
 
     @staticmethod
     def wht(n):
