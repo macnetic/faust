@@ -1521,7 +1521,7 @@ class FaustFactory:
             ret_lambda: set to True to ask the function to return the scale factor (False by default).
 
         Returns:
-            The Faust object result of the factorization.
+            The Faust object resulting of the factorization.
             if ret_lambda == True then the function returns a tuple (Faust, lambda).
 
         Examples:
@@ -1832,6 +1832,28 @@ class FaustFactory:
         """
         Tries to approximate M by \f$ A \prod_j S_j B\f$ using FaustFactory.fact_palm4msa (B being optional).
 
+
+        Example:
+            m pyfaust import FaustFactory as FF
+            from pyfaust.factparams import (ParamsPalm4MSA, ConstraintList,
+                                            StoppingCriterion)
+            import numpy as np
+            from numpy.random import rand
+            from random import randint
+            n = 32
+            k = 16
+            M = rand(n, n)
+            A = rand(n, k)
+            B = rand(k, n)
+            stop_crit = StoppingCriterion(num_its=100)
+            consts = ConstraintList('spcol', randint(1, A.shape[1]), A.shape[1],
+                                                     B.shape[0])
+            param = ParamsPalm4MSA(consts, stop_crit)
+            F = FF.fact_palm4msa_constends(M, param, A, B)
+
+            assert(np.allclose(F.get_factor(0).toarray(), A))
+            assert(np.allclose(F.get_factor(2).toarray(), B))
+
         """
         from pyfaust.factparams import ConstraintList
         from pyfaust.factparams import ParamsPalm4MSA
@@ -1840,7 +1862,7 @@ class FaustFactory:
         consA = ConstraintList('const', A, *A.shape)
         consts = ConstraintList(*p.constraints)
         new_consts = consA + consts
-        if(B):
+        if(isinstance(B, np.matrix) or isinstance(B, np.ndarray)):
             consB = ConstraintList('const', B, *B.shape)
             new_consts = new_consts + consB
         p = ParamsPalm4MSA(new_consts, stop_crit=p.stop_crit, init_facts=p.init_facts,
@@ -1848,7 +1870,17 @@ class FaustFactory:
                            init_lambda=p.init_lambda, step_size=p.step_size,
                            constant_step_size = p.constant_step_size,
                            is_verbose = p.is_verbose)
-        return FaustFactory.fact_palm4msa(M, p, ret_lambda=ret_lambda)
+        F, _lambda = FaustFactory.fact_palm4msa(M, p, ret_lambda=True)
+        F = \
+        Faust([F.get_factor(0)/_lambda]+[F.get_factor(1)*_lambda]+
+              [F.get_factor(i)
+               for i in
+               range(2,F.get_num_factors())])
+        if(ret_lambda):
+            return F, _lambda
+        else:
+            return F
+
 
     @staticmethod
     def wht(n):
