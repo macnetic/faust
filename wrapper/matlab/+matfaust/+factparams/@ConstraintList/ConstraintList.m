@@ -12,6 +12,11 @@ classdef ConstraintList
 			nargs = length(varargin);
 			this.clist = {};
 			while(i <= length(varargin))
+				if(isa(varargin{i}, 'ConstraintGeneric'))
+					this.clist = [ this.clist, {varargin{i}} ];
+					i = i + 1;
+					continue
+				end
 				cname = ConstraintName(varargin{i});
 				if(i+1 > nargs)
 					% ENOTE: throw() is a function (it needs ())
@@ -34,7 +39,7 @@ classdef ConstraintList
 				elseif(cname.is_real_constraint())
 					cons = ConstraintReal(cname, nrows, ncols, cval);
 				elseif(cname.is_mat_constraint())
-					cons = ConstraintMat(cname, nrows, ncols, cval);
+					cons = ConstraintMat(cname, cval);
 				else
 					% it shouldn't happen because ConstraintName has verified the input data
 					msg = ' Not a valid name for a ConstraintGeneric object.';
