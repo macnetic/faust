@@ -227,7 +227,6 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 				}
 
 
-				cout << "mex prox, scal_param: " << scal_param << " constraint id: " << constraint_type << endl;
 				switch(constraint_type)
 				{
 					case CONSTRAINT_NAME_SP: /*!< fixed number of non zero elements, INT (frobenius norm 1) */
@@ -252,7 +251,7 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 						Faust::prox_normcol(mat, scal_param);
 						break;
 					case CONSTRAINT_NAME_CONST: /**< Matrix equal to A ; MAT */
-						// nothing to do, same mat returned 
+						mat = *mat_param;
 						break	;
 					case CONSTRAINT_NAME_BLKDIAG:
 						//not impl. yet in cpp core

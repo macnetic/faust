@@ -31,7 +31,7 @@ classdef (Abstract) ConstraintGeneric
 			if(isreal(M))
 				pM = mexFaustReal('prox', M, this.name.name, this.param);
 			else
-				mexFaustCplx('prox', M, this.name.name, this.param);
+				pM = mexFaustCplx('prox', M, this.name.name, this.param);
 			end
 		end
 	end
