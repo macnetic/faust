@@ -1458,7 +1458,7 @@ class Faust:
 
         """
         from numpy.linalg.linalg import pinv
-        return pinv(F.toarray())
+        return pinv(F.todense())
 
     @staticmethod
     def isFaust(obj):
@@ -2402,3 +2402,15 @@ def dot(A, B):
     else: # if F is not a Faust, try to rely on numpy (not breaking possible
           # past import)
         return np.dot(A,B)
+
+def pinv(F):
+    """
+    A package function alias for the member function Faust.pinv().
+
+    Args:
+        F: is a Faust object.
+    """
+    if(Faust.isFaust(F)):
+        return F.pinv()
+    else:
+        return np.linalg.linalg.pinv(F)
