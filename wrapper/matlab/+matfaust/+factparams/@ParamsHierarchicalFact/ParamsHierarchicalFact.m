@@ -33,7 +33,7 @@ classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
 				error('lengths of fact_constraints and res_constraints must be equal.')
 			end
 			if(~ isa(stop_crit1, 'StoppingCriterion'))
-				error('stop_crit1 (argument 3) must a StoppingCriterion')
+				error('stop_crit1 (argument 3) must be a StoppingCriterion')
 			end
 			if(~ isa(stop_crit2, 'StoppingCriterion'))
 				error('stop_crit2 (argument 4) must a StoppingCriterion')
