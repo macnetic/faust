@@ -12111,7 +12111,7 @@ Actually, this is quite clear now I think, but this function implements the hiea
 <strong>2.</strong> (the <em>global optimization</em>) At the end of each iteration $i$, PALM4MSA is called again to ideally compute the $argmin_{\{S_1, ..., S_i\}, R_i}$ $\|M - (\prod_{j=1}^i S_j) R_i\|$ </li>
 <li>So ideally at the end of the iteration (J-1) you'll get something like $M \approx \prod_{i=1}^J S_i$ taking $S_J = R_{J-1} $.</li>
 </ul>
-<h3 id="1.2.1-Defining-the-Constraints">1.2.1 Defining the Constraints<a class="anchor-link" href="#1.2.1-Defining-the-Constraints">&#182;</a></h3><p>The explanation above is eluding something primary: the sparsity constraints. Indeed, he purpose of the algorithm is not only to decompose a matrix but also to enhance its sparsity, as hinted by the FAµST acronym: Flexible Approximate Multi-layer Sparse Transform.</p>
+<h3 id="1.2.1-Defining-the-Constraints">1.2.1 Defining the Constraints<a class="anchor-link" href="#1.2.1-Defining-the-Constraints">&#182;</a></h3><p>The explanation above is eluding something primary: the sparsity constraints. Indeed, the purpose of the algorithm is not only to decompose a matrix but also to enhance its sparsity, as hinted by the FAµST acronym: Flexible Approximate Multi-layer Sparse Transform.</p>
 <p>So you'll need to feed the algorithm with sparsity constraints. In fact, you'll define one pair of constraints per iteration, the first is for the factor $S_{i}$ and the second for $R_i$ (the <em>residuum</em>).</p>
 <p>The pyfaust API is here to help you define the constraints in one shot but you can if you want define constraints one by one as we'll see later.</p>
 <p>Let's unveil the factorization constraints to decompose the Hadamard matrix $H \in \mathbb R^{n \times n}$. Generally in pyfaust, the constraints are defined in terms of norms, in our case of Hadamard factorization we'll use 0-norms:</p>
@@ -12152,7 +12152,7 @@ Actually, this is quite clear now I think, but this function implements the hiea
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The <code>'splincol'</code> constraint used here is for defining the maximum number of nonzeros elements to respect for any row or column of the considered matrix (here $S_i$ or $R_i$). 
 Looking at <code>S_constraints</code> initialization, we see in the first line <code>'splincol', 2, n, n</code>; the value 2 means we impose 2 nonzeros per-column and per-row, the next arguments define the size of the matrix to constrain (its number of rows and columns).</p>
-<p>So in the example of <code>S_constraints</code> all the matrix will have a 0-norm equal to 2n, that is exactly what (C1) defined.<br/>
+<p>So in the example of <code>S_constraints</code> all the matrices will have a 0-norm equal to 2n, that is exactly what (C1) defined.<br/>
 I let you decrypt why <code>R_constraints</code> correspond likewise to (C2).</p>
 <p>But wait a minute, what would happen if we have a set of one hundred constraints? Don't worry! The pyfaust API allows to alternatively set the constraints one by one:</p>
 
@@ -12181,7 +12181,7 @@ I let you decrypt why <code>R_constraints</code> correspond likewise to (C2).</p
 <p><code>S_constraints</code> and <code>R_constraints</code> are still the exact same set of constraints as before.</p>
 <p><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ConstraintInt.html">ConstraintInt</a> is a family of integer constraints. More globally, there is a hierarchy of classes whose parent class is <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ConstraintGeneric.html">ConstraintGeneric</a> where you'll find other kind of constraints ; <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ConstraintMat.html">ConstraintMat</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ConstraintReal.html">ConstraintReal</a>.</p>
 <p>The table <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/constraint.png">here</a> can give you an idea of each constraint definition. A constraint is always associated to a proximal operator which projects the matrix into the set of matrices defined by the constraint or at least it tries to (because it's not necessarily possible).</p>
-<p>In the last versions of FAµST it's possible to <code>project</code> matrices from the wrappers themselves, let's try one ConstraintInt:</p>
+<p>In the latest version of FAµST it's possible to <code>project</code> matrices from the wrappers themselves, let's try one ConstraintInt:</p>
 
 </div>
 </div>
