@@ -156,6 +156,9 @@ def UpdateCholeskyFull(R,P,Pt,index,m):
                 cat((R,new_col),axis=1),
                 cat((np.zeros((1, R.shape[1])), R_ii),axis=1)
                 ),axis=0)
+    #assert(np.allclose((R.H*R).H, R.H*R))
+    #D = P(np.eye(m,m))
+    #assert(np.allclose(D[:,index].H*D[:,index], R.H*R))
     return R
 
 
