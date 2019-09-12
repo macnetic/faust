@@ -3,7 +3,7 @@
 
 namespace Faust {
 	template<typename FPP>
-		void wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors)
+		void wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool cloning_fact)
 		{
 			if(n == 0)
 			{
@@ -88,7 +88,10 @@ namespace Faust {
 
 				factors[0] = factor;
 				for(int i=1; i < n; i++)
-					factors[i] = factor->Clone();
+					if(cloning_fact)
+						factors[i] = factor->Clone();
+					else
+						factors[i] = factor;
 
 			}
 		}

@@ -8,7 +8,7 @@ namespace Faust {
 	 * \brief Fast Walsh-Hadamard Transform.
 	 */
 	template<typename FPP>
-	void wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors);
+	void wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool cloning_fact=true);
 
 }
 #include "faust_WHT.hpp"

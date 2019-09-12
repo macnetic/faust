@@ -954,8 +954,10 @@ namespace Faust {
 		{
 			TransformHelper<FPP,Cpu>* hadamardFaust = nullptr;
 			vector<MatGeneric<FPP,Cpu>*> factors;
+			bool cloning_fact = false; // big opt. allowed only because of the RefManager used in Transform class
+			//this opt. avoids to duplicate the same factor
 			try {
-				wht_factors(n, factors);
+				wht_factors(n, factors, cloning_fact);
 				hadamardFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
 			}
 			catch(std::bad_alloc)
