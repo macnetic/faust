@@ -210,6 +210,10 @@ namespace Faust
 				void conjugate();
 				void updateNonZeros();
 				void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const;
+				/**
+				 * \brief Returns the first and last indices of matrices that are not orthogonal and where between them none or not all matrices are orthogonal.
+				 */
+				void get_nonortho_interior_prod_ids(int &start_id, int &end_id);
 				///(*this) = (*this) * A
 				void multiply(const Transform<FPP,Cpu> & A);
 				///(*this) = A * (*this)

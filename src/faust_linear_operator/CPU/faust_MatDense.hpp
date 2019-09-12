@@ -665,6 +665,7 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatDense<FPP,Cpu> const& A)
 	this->dim2 = A.dim2;
 	isZeros = A.isZeros;
 	isIdentity = A.isIdentity;
+	this->is_ortho = A.is_ortho;
 }
 
 template<typename FPP>
@@ -676,6 +677,7 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatDense<FPP1,Cpu> const& A)
 		(*this)[i]=(FPP) A(i);
 	isZeros = A.isZeros;
 	isIdentity = A.isIdentity;
+	this->is_ortho = A.is_ortho;
 }
 
 	template<typename FPP>
@@ -703,6 +705,7 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatSparse<FPP,Cpu> const& S)
 	}
 	isZeros = false;
 	isIdentity = false;
+	this->is_ortho = S.is_ortho;
 }
 
 

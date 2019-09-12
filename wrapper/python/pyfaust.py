@@ -2318,12 +2318,10 @@ class FaustFactory:
             from scipy.io import loadmat
             from os.path import sep
             from pyfaust.demo import get_data_dirpath
-            >>>
             # get a graph Laplacian to diagonalize
             demo_path = sep.join((get_data_dirpath(),'Laplacian_256_community.mat'))
             data_dict = loadmat(demo_path)
             Lap = data_dict['Lap'].astype(np.float)
-            >>>
             Uhat, Dhat = FF.eigtj(Lap,J=Lap.shape[0]*100,t=int(Lap.shape[0]/2))
             # Uhat is the Fourier matrix/eigenvectors approximattion as a Faust
             # (200 factors + permutation mat.)

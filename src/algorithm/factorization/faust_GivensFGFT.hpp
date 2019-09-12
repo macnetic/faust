@@ -189,6 +189,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_fact()
 	fact_mod_col_ids.push_back(q);
 	fact_mod_values.push_back(c);
 	facts[ite] = MatSparse<FPP,DEVICE>(fact_mod_row_ids, fact_mod_col_ids, fact_mod_values, n, n);
+	facts[ite].set_orthogonal(true);
 #ifdef DEBUG_GIVENS
 	cout << "GivensFGFT::update_fact() ite: " << ite << " fact norm: " << facts[ite].norm() << endl;
 	facts[ite].Display();
@@ -491,6 +492,7 @@ Faust::Transform<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_transform(bool ord
 			order_D();
 		MatSparse<FPP,DEVICE> & last_fact = *(facts.end()-1);
 		MatSparse<FPP,DEVICE> P(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact is a sqr. mat.
+		P.set_orthogonal(true);
 		for(int i=0;i<ord_indices.size();i++)
 			P.setCoeff( ord_indices[i],i, FPP(1.0));
 		facts.push_back(P);

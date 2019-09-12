@@ -66,11 +66,12 @@ namespace Faust
     template<typename FPP,Device DEVICE>
     class MatGeneric : public Faust::LinearOperator<FPP,DEVICE>
     {
+
         public:
         
-	MatGeneric() : dim1(0), dim2(0) {}
+	MatGeneric() : dim1(0), dim2(0), is_ortho(false) {}
 
-        MatGeneric(faust_unsigned_int dim1_, faust_unsigned_int dim2_) : dim1(dim1_), dim2(dim2_){}
+        MatGeneric(faust_unsigned_int dim1_, faust_unsigned_int dim2_) : dim1(dim1_), dim2(dim2_), is_ortho(false){}
     	
 	//! \brief get the dimension of op((*this))
 	//! \param op : char if op=='N' op(*this)=(*this), if op=='T' op((*this))==transpose((*this))
@@ -190,6 +191,9 @@ namespace Faust
 	//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
 	virtual Faust::MatGeneric<FPP,DEVICE>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const=0;
 
+	void set_orthogonal(const bool is_ortho) { this->is_ortho = is_ortho; /* TODO: move def in hpp*/}
+
+	bool is_orthogonal() { return this->is_ortho; /* TODO: move def in hpp*/}
 	//! \brief 
 	//! \warning : declare a virtual destructor is mandatory for an abstract class
 	//! in order to allow descendant class destructor to clean up in case of pointer to the abstract class 
@@ -201,6 +205,7 @@ namespace Faust
         protected:
         faust_unsigned_int dim1;
         faust_unsigned_int dim2;
+		bool is_ortho;
 
 
 		    

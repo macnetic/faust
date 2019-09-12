@@ -221,6 +221,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::finish_fact()
 {
 	int n = this->Lap.getNbRow();
 	this->facts[this->ite] = MatSparse<FPP,DEVICE>(this->fact_mod_row_ids, this->fact_mod_col_ids, this->fact_mod_values, n, n);
+	this->facts[this->ite].set_orthogonal(true);
 #ifdef DEBUG_GIVENS
 	cout << "GivensFGFTParallel::finish_fact() ite: " << this->ite << " fact norm: " << this->facts[this->ite].norm() << endl;
 	this->facts[this->ite].Display();

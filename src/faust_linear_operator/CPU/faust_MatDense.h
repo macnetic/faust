@@ -199,12 +199,12 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         *  \brief Copy Constructor of MatDense
         *  \tparam A : another MatDense
         */
-        MatDense(const MatDense<FPP,Cpu> & A) : MatGeneric<FPP,Cpu>(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) {}
+        MatDense(const MatDense<FPP,Cpu> & A) : MatGeneric<FPP,Cpu>(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) { this->is_ortho = A.is_ortho; }
         template<typename FPP1>
         MatDense(const MatDense<FPP1,Cpu> & A){this->operator=(A);}
         template<typename FPP1>
-        MatDense(const Faust::MatSparse<FPP1,Cpu> & A){this->operator=(A);}
-        MatDense(const Faust::MatSparse<FPP,Cpu> & A){this->operator=(A);}
+        MatDense(const Faust::MatSparse<FPP1,Cpu> & A)  {this->operator=(A);this->is_ortho = A.is_ortho;}
+        MatDense(const Faust::MatSparse<FPP,Cpu> & A)  {this->operator=(A);this->is_ortho = A.is_ortho;}
 
         MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : MatGeneric<FPP,Cpu>(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
         MatDense(const faust_unsigned_int nbRow) : MatGeneric<FPP,Cpu>(nbRow,nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}

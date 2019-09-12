@@ -463,7 +463,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThi
 
 	prod.setEyes();
 
-	Faust::MatDense<FPP,Cpu> p = this->multiply(prod,opThis);
+	Faust::MatDense<FPP,Cpu> p = this->multiply(prod, opThis);
 
 	if(isConj) p.conjugate();
 
@@ -1010,6 +1010,27 @@ Faust::Vect<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::Vect<FPP,C
 
 
 
+
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::get_nonortho_interior_prod_ids(int &start_id, int &end_id)
+{
+	start_id = -1;
+	end_id = -1;
+	int i = 0;
+	while (i < this->size() && (data[i]->is_orthogonal() /*|| data[i]->isIdentity*/))
+		i++;
+	if(i<data.size())
+	{
+		start_id = i;
+		end_id = start_id;
+		i = this->size()-1;
+		while (i > start_id && (data[i]->is_orthogonal() /*|| data[i]->isIdentity*/))
+			i--;
+		if(i > start_id)
+			end_id = i;
+	}
+}
+
 template<typename FPP>
 Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis) const
 {
@@ -1020,9 +1041,10 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDen
 
 	Faust::MatDense<FPP,Cpu> mat(A);
 
+
 	if (opThis == 'N')
 	{
-		for (int i=this->size()-1 ; i >= 0 ; i--)
+		for (int i=this->size()-1; i >= 0; i--)
 		{
 			//#ifdef __COMPILE_TIMERS__
 			//	this->t_multiply_mat[i].start();
@@ -1034,7 +1056,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDen
 		}
 	}else
 	{
-		for (int i=0 ; i < this->size() ; i++)
+		for (int i=0; i < this->size(); i++)
 		{
 			//#ifdef __COMPILE_TIMERS__
 			//	this->t_multiply_mat[i].start();

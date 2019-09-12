@@ -61,7 +61,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse() :
 	Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatSparse<FPP,Cpu>& M) :
 		Faust::MatGeneric<FPP,Cpu>(M.getNbRow(),M.getNbCol()),
 		mat(M.mat),
-		nnz(M.mat.nonZeros()){}
+		nnz(M.mat.nonZeros()) {this->set_orthogonal(M.is_ortho);}
 
 		template<typename FPP>
 		Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) :
@@ -138,6 +138,7 @@ void Faust::MatSparse<FPP,Cpu>::operator=(const Faust::MatSparse<FPP1,Cpu>& M)
 	}
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	makeCompression();
+	this->is_ortho = M.is_ortho;
 }
 
 
@@ -278,6 +279,7 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatDense<FPP,Cpu>& M) :
 	delete[] rowind ; rowind=NULL;
 	delete[] colind ; colind=NULL;
 	delete[] values ; values=NULL;
+	this->set_orthogonal(M.is_ortho);
 }
 
 
@@ -477,6 +479,7 @@ void Faust::MatSparse<FPP,Cpu>::operator=(const Faust::MatSparse<FPP,Cpu>& M)
 	mat = M.mat;
 	mat.makeCompressed();
 	update_dim();
+	this->is_ortho = M.is_ortho;
 }
 
 
