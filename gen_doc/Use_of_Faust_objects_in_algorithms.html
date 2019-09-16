@@ -11775,10 +11775,10 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Using-the-FA&#181;ST-API-in-Algorithms">Using the FA&#181;ST API in Algorithms<a class="anchor-link" href="#Using-the-FA&#181;ST-API-in-Algorithms">&#182;</a></h1><p>After the little tour we've done in the previous notebooks, about the creation of Faust objects, their manipulation and their use in factorization algorithms, we shall see in this fourth notebook how the FAµST API can be deployed seamlessly in algorithms.
+<h1 id="Using-the-FA&#181;ST-API-in-Algorithms">Using the FA&#181;ST API in Algorithms<a class="anchor-link" href="#Using-the-FA&#181;ST-API-in-Algorithms">&#182;</a></h1><p>After the little tour we've done in the previous notebooks, about the <a href="#creation_links">creation of Faust objects</a>, their <a href="#manip_links">manipulation</a> and their creation using <a href="#facto_links">factorization</a> algorithms, we shall see in this fourth notebook how the FAµST API can be deployed seamlessly in algorithms.
 Our example, already alluded in the second notebook, we'll be the Orthogonal Matching Pursuit algorithm (OMP).</p>
-<p>This algorithm intervenes in the dictionary learning problem. Of course, I won't treat the theory behind but I assume the reader is already familiar to.
-They're not so much to say so let's go straight in the code example.</p>
+<p>This algorithm intervenes in the dictionary learning problem. Of course, I will not treat the theory behind but I assume the reader is already familiar to.
+There is not so much to say so let's go straight to the code example.</p>
 
 </div>
 </div>
@@ -11805,7 +11805,7 @@ They're not so much to say so let's go straight in the code example.</p>
     <span class="n">supp</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">K</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="o">*</span><span class="n">D</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
     <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">supp</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">K</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">niter</span><span class="p">):</span>
         <span class="n">j</span> <span class="o">=</span> <span class="n">argmax</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">T</span><span class="o">*</span><span class="n">res</span><span class="p">))</span>
         <span class="n">supp</span> <span class="o">+=</span> <span class="p">[</span><span class="n">j</span><span class="p">]</span> 
@@ -11825,8 +11825,8 @@ They're not so much to say so let's go straight in the code example.</p>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The most important point to notice in this code is that except the import part in the header, all the code seems to be a natural numpy implementation of OMP.<br>
-This is in fact the core philosophy of the FAµST API, as explained in previous notebooks and also in the API documentation, we have wanted a Faust to be seen as a numpy array (or rather as a numpy.matrix) hence this code is in fact totally compatible with the two APIs: the D function argument, which is the dictionary, can be indifferentially a pyfaust.Faust object or a numpy.matrix object.</p>
-<p>In the next, we'll test this implementation in the both cases. But first, let's define a test case.</p>
+This is in fact the core philosophy of the FAµST API, as explained in previous notebooks and also in the API documentation, we made sure sure that a Faust can be seen as a numpy array (or rather as a <code>numpy.matrix</code>) hence this code is in fact totally compatible with the two APIs: the D function argument, which is the dictionary, can be indifferently a <code>pyfaust.Faust</code> object or a <code>numpy.matrix</code> object.</p>
+<p>Next we'll test this implementation in the both cases. But first, let us define a test case.</p>
 
 </div>
 </div>
@@ -11843,8 +11843,8 @@ This is in fact the core philosophy of the FAµST API, as explained in previous 
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For convenience, we shall set up a dictionary which garanties uniqueness of representations.
-The dictionary will hence be the concatenation of an identity matrix and a Hadamard matrix, and because we work with Faust objects, this concatenation will be a Faust object.</p>
+<p>For convenience, we shall set up a dictionary which garantees uniqueness of inefficiently sparse representations.
+The dictionary is the concatenation of an identity matrix and a Hadamard matrix, and because we work with Faust objects, this concatenation will be a Faust object.</p>
 <p>Below is the block matrix of our dictionary:<br>
 $
 D =
@@ -11854,10 +11854,10 @@ I_n &amp; H_n \\
 \end{array}
 \right]
 $</p>
-<p>$I_n$ is the identity or dirac matrix and $H_n$ the hadamard matrix, with n being a power of two.</p>
-<p>The condition on which the uniqueness of the representation $x$ of a vector $y$  is insured is defined by the following inequality:<br>
-$ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictionary and in case of our specially crafted dictionary $\mu = {1 \over \sqrt n}$</p>
-<p>So let's construct the Faust of D, compute y for a unique x and test our OMP implementation to find out if we effectively retrieve the unique x as we should according to this theorem.</p>
+<p>$I_n$ is the identity or Dirac matrix and $H_n$ the Hadamard matrix, with n being a power of two.</p>
+<p>The condition on which the uniqueness of the sparse representation $x$ of a vector $y$  is insured is defined by the following inequality:<br>
+$ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictionary and in case of our specially crafted dictionary $\mu = {1 \over \sqrt n}$.</p>
+<p>So let's construct the Faust of D, compute y for a unique sparse x and test our OMP implementation to find out if we effectively retrieve the unique x as we should according to this theorem.</p>
 <p>Note that, for a better view and understanding you might consult this document: <a href="http://videos.rennes.inria.fr/hdr/gribonval/HDR2007.pdf">Rémi Gribonval HDR</a>.</p>
 
 </div>
@@ -11910,7 +11910,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Now that we have our dictionary both defined as a Faust and as a matrix, let's construct our sparsity satisfiying vector x, we'll call it $x_0$.</p>
+<p>Now that we have our dictionary both defined as a Faust (FD) and as a matrix (D), let's construct our reference sparse vector x, we'll call it $x_0$.</p>
 
 </div>
 </div>
@@ -11924,13 +11924,15 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">randn</span>
 <span class="kn">from</span> <span class="nn">random</span> <span class="k">import</span> <span class="n">randint</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">floor</span><span class="p">,</span> <span class="n">sqrt</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">combinations</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="k">import</span> <span class="n">binom</span>
 <span class="n">x0</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">FD</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">nnz</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">floor</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)))))</span>
-<span class="n">nonzero_inds</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonzero_inds</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">nnz</span><span class="p">:</span>
-    <span class="n">nonzero_inds</span> <span class="o">+=</span> <span class="p">[</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nnz</span><span class="p">)</span> <span class="p">]</span>
-    <span class="n">nonzero_inds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">nonzero_inds</span><span class="p">))</span> <span class="c1"># set imposes id. uniqueness</span>
-<span class="c1"># we got nz indices, now build the vector x0</span>
+<span class="n">nnz</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">floor</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)))))</span> <span class="c1"># min 0-norm is 5</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">combinations</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">)),</span> <span class="n">nnz</span><span class="p">)</span> <span class="c1"># all possible combinations of nnz indices</span>
+<span class="n">nc</span> <span class="o">=</span> <span class="n">binom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">nnz</span><span class="p">)</span>
+<span class="c1"># pick random nnz indices</span>
+<span class="n">nonzero_inds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">nc</span><span class="p">,</span><span class="mi">20</span><span class="p">)))][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># limiting to 20 iterations to accelerate</span>
+<span class="c1"># we got nnz indices, now build the vector x0</span>
 <span class="n">x0</span><span class="p">[</span><span class="n">nonzero_inds</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="n">randn</span><span class="p">()</span><span class="o">*</span><span class="mi">50</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">nonzero_inds</span><span class="p">))</span> <span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;l0 norm of x0: &quot;</span><span class="p">,</span> <span class="n">count_nonzero</span><span class="p">(</span><span class="n">x0</span><span class="p">))</span>
 </pre></div>
@@ -11949,7 +11951,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>l0 norm of x0:  1
+<pre>l0 norm of x0:  5
 </pre>
 </div>
 </div>
@@ -11986,7 +11988,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Our test case is complete, we are fully prepared to run our OMP algorithm using a well-defined dictionary as a Faust or as numpy array we should retrieve our $x_0$ from the vector y. Let's try!</p>
+<p>Our test case is complete, we are fully prepared to run the OMP algorithm using a well-defined dictionary as a Faust or as numpy array, this should retrieve our $x_0$ from the vector y. Let's try!</p>
 
 </div>
 </div>
@@ -12037,7 +12039,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We tested OMP on a Faust, go ahead and verify what I was aiming to in the first part of the notebook; is this OMP implementation really working as well on a Faust and on a numpy.matrix?</p>
+<p>We tested OMP on a Faust, go ahead and verify what I was aiming at in the first part of the notebook: is this OMP implementation really working identically on a Faust and a <code>numpy.matrix</code>?</p>
 
 </div>
 </div>
@@ -12079,6 +12081,54 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>As a complementary test, let's verify that the two runs of <code>omp()</code> on FD and D give the same results even if the vector to retrieve is not sparse. Here for instance, $ \| x_1 \|_0 = 98 $</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">nnz</span> <span class="o">=</span> <span class="mi">98</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">combinations</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">)),</span> <span class="mi">98</span><span class="p">)</span>
+<span class="n">x1</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">FD</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">nnz_inds</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="n">x1</span><span class="p">[</span><span class="n">nnz_inds</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="n">randn</span><span class="p">()</span><span class="o">*</span><span class="mi">50</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">nnz_inds</span><span class="p">))</span> <span class="p">]</span>
+<span class="n">x2</span> <span class="o">=</span> <span class="n">omp</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">nnz</span><span class="p">)</span>
+<span class="n">x3</span> <span class="o">=</span> <span class="n">omp</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">FD</span><span class="p">,</span> <span class="n">nnz</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">allclose</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">x3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Is x1 retrieved?&quot;</span><span class="p">,</span> <span class="n">allclose</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Is x1 retrieved? False
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>We can conclude that the algorithm is indeed available to both numpy and Faust worlds, and we can imagine surely that other algorithms are reachable through the FAµST API. That's anyway in that purpose that the FAµST library will be extended in the future (starting from the latest version which is 2.5.1).</p>
 
 </div>
@@ -12088,7 +12138,18 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong><em>The fourth notebook is ending here</em></strong>, I hope you'll be interested to try yourself writing another algorithm with the FAµST API and maybe discover any current limitation. Don't hesitate to contact us in that case, we'll appreciate any feedback!</p>
+<p><strong><em>The fourth notebook is ending here</em></strong>, I hope you'll be interested in trying yourself to write another algorithm with the FAµST API and maybe discovering any current limitation. Don't hesitate to contact us in that case, we'll appreciate any feedback!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Links">Links<a class="anchor-link" href="#Links">&#182;</a></h3><p><a name="creation_links">Faust creation notebook: </a> <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_creation.html">html</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_creation.ipynb">ipynb</a><br>
+<a name="manip_links">Faust manipulation notebook:</a> <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_manipulation.html">html</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_manipulation.ipynb">ipynb</a><br>
+<a name="facto_links">Factorization notebook: </a><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_factorization.html">html</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_factorization.ipynb">ipynb</a></p>
 
 </div>
 </div>
