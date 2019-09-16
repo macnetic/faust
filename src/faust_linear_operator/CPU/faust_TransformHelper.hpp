@@ -580,11 +580,11 @@ namespace Faust {
 //			cout << "start_id=" << start_id << "end_id=" << end_id << endl;
 			if(start_id < 0)
 				return 1.0;
-			else if(start_id == 0 && end_id == this->size()-1)
+			else if(start_id == 0)
 				return this->transform->spectralNorm(nbr_iter_max, threshold, flag);
 //			cout << "optimized norm2" << endl;
-			vector<MatGeneric<FPP,Cpu>*> non_ortho_ends(orig_facts.begin()+start_id, orig_facts.begin()+end_id+1);
-			TransformHelper<FPP, Cpu> t(non_ortho_ends, 1.0, false, false);
+			vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
+			TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
 			return t.transform->spectralNorm(nbr_iter_max, threshold, flag);
 		}
 
@@ -830,7 +830,16 @@ namespace Faust {
 
 	template<typename FPP>
 		double TransformHelper<FPP,Cpu>::normFro() const {
-			return this->transform->normFro();
+			vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
+			int start_id, end_id;
+			this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
+			if(start_id < 0)
+				return Faust::fabs(MatDense<FPP,Cpu>::eye(this->getNbCol(), this->getNbCol()).norm());
+			else if(start_id == 0)
+				return this->transform->normFro();
+			vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
+			TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
+			return t.transform->normFro();
 		}
 
 	template<typename FPP>
