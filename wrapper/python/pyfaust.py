@@ -2444,3 +2444,56 @@ def pinv(F):
         return F.pinv()
     else:
         return np.linalg.linalg.pinv(F)
+
+def concatenate(_tuple, axis=0):
+    """
+    A package function alias for the member function Faust.concatenate.
+
+
+    <b>See also</b> numpy.concatenate
+
+    Example:
+        >>> from pyfaust import *
+        >>> from pyfaust import FaustFactory as FF
+        >>> F1 = FF.rand(5,50)
+        >>> F2 = FF.rand(5,50)
+        >>> concatenate((F1, F2), axis=0)
+
+    """
+    if(Faust.isFaust(_tuple[0])):
+        return _tuple[0].concatenate(*_tuple[1:], axis=axis)
+    else:
+        return np.concatenate(_tuple, axis=axis)
+
+def hstack(_tuple):
+    """
+    Concatenates horizontally Faust and/or numpy.ndarray objects using Faust.concatenate().
+
+    <b>See also</b> numpy.hstack
+
+    Example:
+        >>> from pyfaust import *
+        >>> from pyfaust import FaustFactory as FF
+        >>> F1 = FF.rand(5,50)
+        >>> F2 = FF.rand(5,50)
+        >>> hstack((F1, F2))
+
+
+    """
+    return pyfaust.concatenate(_tuple, axis=1)
+
+def vstack(_tuple):
+    """
+    Concatenates vertically Faust and/or numpy.ndarray arrays using Faust.concatenate().
+
+    <b>See also</b> numpy.vstack
+
+    Example:
+        >>> from pyfaust import *
+        >>> from pyfaust import FaustFactory as FF
+        >>> F1 = FF.rand(5,50)
+        >>> F2 = FF.rand(5,50)
+        >>> vstack((F1, F2))
+
+    """
+    return pyfaust.concatenate(_tuple, axis=0)
