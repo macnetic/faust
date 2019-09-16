@@ -11872,7 +11872,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">log2</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">128</span>
 <span class="n">log2n</span> <span class="o">=</span> <span class="n">log2</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="n">FD</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">FF</span><span class="o">.</span><span class="n">wht</span><span class="p">(</span><span class="n">log2n</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">FD</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">FF</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="n">FF</span><span class="o">.</span><span class="n">wht</span><span class="p">(</span><span class="n">log2n</span><span class="p">)))</span>
 <span class="n">D</span> <span class="o">=</span> <span class="n">FD</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
 </pre></div>
@@ -11951,7 +11951,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>l0 norm of x0:  5
+<pre>l0 norm of x0:  6
 </pre>
 </div>
 </div>
