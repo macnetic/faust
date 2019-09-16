@@ -579,7 +579,7 @@ namespace Faust {
 			this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
 //			cout << "start_id=" << start_id << "end_id=" << end_id << endl;
 			if(start_id < 0)
-				return 1.d;
+				return 1.0;
 			else if(start_id == 0 && end_id == this->size()-1)
 				return this->transform->spectralNorm(nbr_iter_max, threshold, flag);
 //			cout << "optimized norm2" << endl;
