@@ -10,6 +10,23 @@ from numpy import matrix, zeros, argmax, empty
 from pyfaust import Faust
 
 def greed_omp_chol(x, A, m, stopTol=None, verbose=False):
+    """
+    Runs greedy OMP algorithm optimized by Cholesky decomposition.
+
+    Params:
+        A: the dictionary as a numpy matrix or a Faust.
+        x: the vector to approximate by A*y.
+        m: the dimension from which A maps (the number of columns of A).
+        stopTol:  stopping criterion based on the number of iterations (by default it's a
+        quarter of the size of x) and it can't be greater than the size of x. This
+        criterion doesn't disable the other criterion based on the precision of
+        the solution (the algorithm will stop anyway if a precision lower or equal to
+        1^-16 is reached).
+        verbose: to enable the verbosity (value to True).
+
+    Returns:
+        y: the solution of x = A*y.
+    """
     #TODO: check x is a numpy.matrix (or a matrix_csr ?)
     sp = x.shape
     if(sp[1] == 1):
@@ -20,8 +37,8 @@ def greed_omp_chol(x, A, m, stopTol=None, verbose=False):
     else:
         raise Exception("x must be a vector")
     if(Faust.isFaust(A) or isinstance(A, matrix)):
-        P = lambda z : matrix(A*z)
-        Pt = lambda z : matrix(A.H*z)
+        P = lambda z : A*z
+        Pt = lambda z : A.H*z
     else:
         raise Exception("A must be a Faust or a numpy.matrix. Here A is "
                         "a:"+str(type(A)))

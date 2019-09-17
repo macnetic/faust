@@ -399,9 +399,9 @@ cdef class FaustCore:
             else:
                 self.core_faust_cplx.multiply(&yview_cplx[0,0],nbrow_y,nbcol_y,&xview_2D_cplx[0,0],nbrow_x,nbcol_x)
 
-        return y
+        return np.matrix(y, copy=False)
 
-    
+
 
     # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)
     def display(self):
