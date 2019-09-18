@@ -393,14 +393,15 @@ cdef class FaustCore:
             else:
                 self.core_faust_cplx.multiply(&yview_cplx[0,0], nbrow_y,
                                               nbcol_y, &xview_1D_cplx[0], nbrow_x,nbcol_x)
+            y = np.squeeze(y) # we want a single dim. (but we created two
+            # above)
         else:
             if(self._isReal):
                 self.core_faust_dbl.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x)
             else:
                 self.core_faust_cplx.multiply(&yview_cplx[0,0],nbrow_y,nbcol_y,&xview_2D_cplx[0,0],nbrow_x,nbcol_x)
 
-        return np.matrix(y, copy=False)
-
+        return y
 
 
     # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)
