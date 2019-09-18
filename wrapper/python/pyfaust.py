@@ -182,6 +182,13 @@ class Faust:
         return F.m_faust.shape()
 
     @property
+    def ndim(F):
+        """
+            Number of Faust dimensions (always 2).
+        """
+        return 2
+
+    @property
     def size(F):
         """
         Gives the number of elements in the Faust F.
@@ -673,6 +680,7 @@ class Faust:
 
     __array_ufunc__ = None # mandatory to override rmatmul
                            # it means Faust doesn't support ufuncs
+
     def __rmatmul__(F,lhs_op):
         """
         Returns lhs_op.__matmul__(F).
