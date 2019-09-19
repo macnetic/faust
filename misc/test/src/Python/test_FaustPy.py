@@ -874,24 +874,30 @@ class TestFaustFactory(unittest.TestCase):
 
     def testHadamard(self):
         print("Test FaustFactory.wht()")
-        from pyfaust import FaustFactory
+        from pyfaust import FaustFactory as FF
         pow2_exp = random.Random().randint(1,10)
-        H = FaustFactory.wht(pow2_exp)
+        n = 2**pow2_exp
+        H = FF.wht(n, False)
         fH = H.todense()
         self.assertEqual(np.count_nonzero(fH), fH.size)
-        for i in range(0,2**pow2_exp-1):
-            for j in range(i+1,2**pow2_exp):
+        for i in range(0,n-1):
+            for j in range(i+1,n):
                 self.assertTrue((fH[i,::].dot(fH[j,::].T) == 0).all())
+        assert(np.allclose(FF.wht(n, True).toarray(),
+               FF.wht(n).normalize().toarray()))
 
     def testFourier(self):
         print("Test FaustFactory.dft()")
-        from pyfaust import FaustFactory
+        from pyfaust import FaustFactory as FF
         from numpy.fft import fft
         pow2_exp = random.Random().randint(1,10)
-        F = FaustFactory.dft(pow2_exp)
+        n = 2**pow2_exp
+        F = FF.dft(n, False)
         fF = F.todense()
-        ref_fft = fft(np.eye(2**pow2_exp))
+        ref_fft = fft(np.eye(n))
         self.assertAlmostEqual(norm(ref_fft-fF)/norm(ref_fft),0)
+        assert(np.allclose(FF.dft(n, True).toarray(),
+                           FF.dft(n).normalize().toarray()))
 
     def testFGFTGivens(self):
         print("Test FaustFactory.fgft_givens()")

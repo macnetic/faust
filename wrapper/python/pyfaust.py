@@ -1895,8 +1895,8 @@ class FaustFactory:
         """
            Constructs a Faust implementing the Hadamard transform of dimension n.
 
-           The resulting Faust has n sparse factors of order n, each one having 2 non-zero
-           elements per row and per column.
+           The resulting Faust has n sparse factors of order n, each one having
+           2 nonzero elements per row and per column.
 
            Args:
                n: the power of two exponent for a Hadamard matrix of order n

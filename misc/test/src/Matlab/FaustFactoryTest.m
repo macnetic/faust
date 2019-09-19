@@ -239,30 +239,34 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		function testHadamard(this)
 			disp('Test FaustFactory.wht()')
 			import matfaust.*
-			n = randi([1,6]);
-			H = FaustFactory.wht(n);
+			log2n = randi([1,6]);
+			n = 2^log2n;
+			H = FaustFactory.wht(n, false);
 			fH = full(H);
 			this.verifyEqual(nnz(fH), numel(fH));
 			i = 1;
-			while(i<2^n-1)
+			while(i<n-1)
 				j = i + 1;
-				while(j<2^n)
+				while(j<n)
 					this.verifyEqual(fH(i,:)*fH(j,:)',0);
 					j = j + 1;
 				end
 				i = i + 1;
 			end
+			this.assertEqual(full(FaustFactory.wht(n)), full(normalize(FaustFactory.wht(n))), 'AbsTol', 10^-12)
 		end
 
 		function testFourier(this)
 			disp('Test FaustFactory.dft()')
 			import matfaust.*
-			n = randi([1,10]);
-			F = FaustFactory.dft(n);
+			log2n = randi([1,10]);
+			n = 2^log2n;
+			F = FaustFactory.dft(n, false);
 			fF = full(F);
-			fftI = fft(eye(2^n));
+			fftI = fft(eye(n));
 			% this.verifyEqual(nnz(fH), numel(fH));
-			this.verifyEqual(norm(fF-fftI), 0, 'AbsTol',10^-12);
+			this.verifyEqual(norm(fF-fftI), 0, 'AbsTol', 10^-12);
+			this.assertEqual(full(FaustFactory.dft(n)), full(normalize(FaustFactory.dft(n))), 'AbsTol', 10^-12)
 		end
 	end
 

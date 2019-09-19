@@ -160,7 +160,7 @@ classdef FaustFactory
 		%> import matfaust.*
 		%> import matfaust.FaustFactory.*
 		%> % generate a Hadamard Faust of size 32x32
-		%> FH = wht(5);
+		%> FH = wh(32);
 		%> H = full(FH); % the full matrix version
 		%> % factorize it
 		%> FH2 = FaustFactory.fact_hierarchical(H, 'squaremat');
@@ -708,24 +708,27 @@ classdef FaustFactory
 		end
 
 		%==========================================================================================
-		%> @brief Constructs a Faust implementing the Walsh-Hadamard Transform of order 2^n.
+		%> @brief Constructs a Faust implementing the Walsh-Hadamard Transform of order n.
 		%>
-		%> The resulting Faust has n sparse factors of order 2^n, each one having 2 non-zero elements
+		%> The resulting Faust has log2(n) sparse factors of order n, each one having 2 non-zero elements
 		%> per row and per column.
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b H = wht(n)
+		%> &nbsp;&nbsp;&nbsp; @b H = wht(n) <br/>
+		%> &nbsp;&nbsp;&nbsp; @b H = wht(n, norma)
 		%>
-		%> @param n the power of two exponent for a Hadamard matrix of order 2^n and a factorization into n factors.
+		%> @param n the power of two exponent for a Hadamard matrix of order n and a factorization into log2(n) factors.
+		%> @param norma: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 		%>
-		%> @retval H the Faust implementing the Hadamard transform of dimension 2^n.
+		%> @retval H the Faust implementing the Hadamard transform of dimension n.
 		%>
 		%> @b Example
 		%> @code
 		%> % in a matlab terminal
 		%> >> import matfaust.FaustFactory.*
-		%> >> H = wht(10)
+		%> >> H = wht(1024) % is equal to
+		%> >> H = normalize(wht(1024, false))
 		%> @endcode
 		%>
 		%>
@@ -744,48 +747,60 @@ classdef FaustFactory
 		%>- FACTOR 9 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 		%>
 		%==========================================================================================
-		function H = wht(n)
+		function H = wht(n, varargin)
 			% check n (must be integer > 0)
 			if(~ isreal(n) || n < 0 || abs(n-floor(n)) > 0)
 				error('n must be an integer greater than zero')
 			end
-			if(n>31)
+			log2n = floor(log2(n));
+			if(2^log2n < n)
+				error('n must be a power of 2')
+			end
+			if(log2n > 31)
 				error('Can''t handle a Hadamard Faust of order larger than 2^31')
 			end
-			core_obj = mexFaustReal('hadamard', n);
+			core_obj = mexFaustReal('hadamard', log2n);
 			is_real = true;
 			e = MException('FAUST:OOM', 'Out of Memory');
 			if(core_obj == 0)
 				throw(e)
 			end
 			H = matfaust.Faust(core_obj, is_real);
+			if(length(varargin) > 0)
+				if(~ islogical(varargin{1}))
+					error('wht optional second argument must be a boolean');
+				end
+			else
+				H =H*(1/sqrt(n));
+			end
 		end
 
 		%==========================================================================================
-		%> @brief Constructs a Faust whose the full matrix is the Discrete Fourier Transform square matrix of order 2^n.
+		%> @brief Constructs a Faust whose the full matrix is the Discrete Fourier Transform square matrix of order n.
 		%>
 		%> The factorization algorithm used is Cooley-Tukey (FFT).
 		%>
-		%> The resulting Faust is complex and has (n+1) sparse factors whose the n first
-		%> has 2 non-zero elements per row and per column. The last factor is
-		%> a permutation matrix.
+		%> The resulting Faust is complex and has log2(n)+1 sparse factors whose the log2(n) first
+		%> have 2 nonzero elements per row and per column. The last factor is a permutation matrix.
 		%>
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b H = dft(n)
+		%> &nbsp;&nbsp;&nbsp; @b F = dft(n) <br/>
+		%> &nbsp;&nbsp;&nbsp; @b F = dft(n, norma)
 		%>
-		%> @param n: the power of two exponent for a FFT of order 2^n and a
-		%> factorization in n+1 factors.
+		%> @param n: the power of two for a FFT of order n and a factorization in log2(n)+1 factors.
+		%> @param norma: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 		%>
 		%>
-		%> @retval F the Faust implementing the FFT transform of dimension 2^n.
+		%> @retval F the Faust implementing the FFT transform of dimension n.
 		%>
 		%> @b Example
 		%> @code
 		%> % in a matlab terminal
 		%> >> import matfaust.FaustFactory.*
-		%> >> F = dft(10)
+		%> >> F = dft(1024) % is equal to
+		%> >> F = normalize(dft(1024))
 		%> @endcode
 		%>
 		%>
@@ -804,21 +819,33 @@ classdef FaustFactory
 		%> - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
 		%> - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
 		%==========================================================================================
-		function H = dft(n)
+		function F = dft(n, varargin)
 			% check n (must be integer > 0)
 			if(~ isreal(n) || n < 0 || abs(n-floor(n)) > 0)
 				error('n must be an integer greater than zero')
 			end
-			if(n>31)
+			log2n = floor(log2(n));
+			if(2^log2n < n)
+				error('n must be a power of 2')
+			end
+			if(log2n>31)
 				error('Can''t handle a FFT Faust of order larger than 2^31')
 			end
-			core_obj = mexFaustCplx('fourier', n);
+			core_obj = mexFaustCplx('fourier', log2n);
 			is_real = false;
 			e = MException('FAUST:OOM', 'Out of Memory');
 			if(core_obj == 0)
 				throw(e)
 			end
-			H = matfaust.Faust(core_obj, is_real);
+			F = matfaust.Faust(core_obj, is_real);
+			if(length(varargin) > 0)
+				if(~ islogical(varargin{1}))
+					error('wht optional second argument must be a boolean');
+				end
+			else
+				F = F*(1/sqrt(n));
+			end
+
 		end
 
 		%==========================================================================================
