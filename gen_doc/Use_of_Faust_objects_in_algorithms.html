@@ -11776,8 +11776,8 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Using-the-FA&#181;ST-API-in-Algorithms">Using the FA&#181;ST API in Algorithms<a class="anchor-link" href="#Using-the-FA&#181;ST-API-in-Algorithms">&#182;</a></h1><p>After the little tour we've done in the previous notebooks, about the <a href="#creation_links">creation of Faust objects</a>, their <a href="#manip_links">manipulation</a> and their creation using <a href="#facto_links">factorization</a> algorithms, we shall see in this fourth notebook how the FAµST API can be deployed seamlessly in algorithms.
-Our example, already alluded in the second notebook, we'll be the Orthogonal Matching Pursuit algorithm (OMP).</p>
-<p>This algorithm intervenes in the dictionary learning problem. Of course, I will not treat the theory behind but I assume the reader is already familiar to.
+Our example, already alluded in the <a href="#manip_links">second notebook</a>, will be the Orthogonal Matching Pursuit algorithm (OMP).</p>
+<p>This algorithm intervenes in the dictionary learning problem. Of course, I will not treat the theory behind but I assume the reader is already familiar with.
 There is not so much to say so let's go straight to the code example.</p>
 
 </div>
@@ -11800,12 +11800,12 @@ There is not so much to say so let's go straight to the code example.</p>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">copy</span><span class="p">,</span> <span class="n">argmax</span>
 
 <span class="k">def</span> <span class="nf">omp</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">niter</span><span class="p">):</span>
-    <span class="n">m</span><span class="p">,</span><span class="n">n</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">ncols</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">supp</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">K</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">)</span>
     <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">supp</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">K</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">niter</span><span class="p">):</span>
         <span class="n">j</span> <span class="o">=</span> <span class="n">argmax</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">D</span><span class="o">.</span><span class="n">T</span><span class="o">*</span><span class="n">res</span><span class="p">))</span>
         <span class="n">supp</span> <span class="o">+=</span> <span class="p">[</span><span class="n">j</span><span class="p">]</span> 
@@ -11825,8 +11825,8 @@ There is not so much to say so let's go straight to the code example.</p>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The most important point to notice in this code is that except the import part in the header, all the code seems to be a natural numpy implementation of OMP.<br>
-This is in fact the core philosophy of the FAµST API, as explained in previous notebooks and also in the API documentation, we made sure sure that a Faust can be seen as a numpy array (or rather as a <code>numpy.matrix</code>) hence this code is in fact totally compatible with the two APIs: the D function argument, which is the dictionary, can be indifferently a <code>pyfaust.Faust</code> object or a <code>numpy.matrix</code> object.</p>
-<p>Next we'll test this implementation in the both cases. But first, let us define a test case.</p>
+This is in fact the core philosophy of the FAµST API, as explained in previous notebooks and also in the API documentation, we made sure that a Faust can be seen as a numpy array (or rather as a <code>numpy.matrix</code>) hence this code is in fact totally compatible with the two APIs: the D function argument, which is the dictionary, can be indifferently a <code>pyfaust.Faust</code> object or a <code>numpy.matrix</code> object.</p>
+<p>Next we will test this implementation in both cases. But first, let us define a test case.</p>
 
 </div>
 </div>
@@ -11843,7 +11843,7 @@ This is in fact the core philosophy of the FAµST API, as explained in previous 
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For convenience, we shall set up a dictionary which garantees uniqueness of inefficiently sparse representations.
+<p>For convenience, we shall set up a dictionary which garantees uniqueness of sufficiently sparse representations.
 The dictionary is the concatenation of an identity matrix and a Hadamard matrix, and because we work with Faust objects, this concatenation will be a Faust object.</p>
 <p>Below is the block matrix of our dictionary:<br>
 $
@@ -11854,11 +11854,11 @@ I_n &amp; H_n \\
 \end{array}
 \right]
 $</p>
-<p>$I_n$ is the identity or Dirac matrix and $H_n$ the Hadamard matrix, with n being a power of two.</p>
+<p>$I_n$ is the identity or Dirac matrix and $H_n$ the orthonormal Hadamard matrix, with n being a power of two.</p>
 <p>The condition on which the uniqueness of the sparse representation $x$ of a vector $y$  is insured is defined by the following inequality:<br>
 $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictionary and in case of our specially crafted dictionary $\mu = {1 \over \sqrt n}$.</p>
 <p>So let's construct the Faust of D, compute y for a unique sparse x and test our OMP implementation to find out if we effectively retrieve the unique x as we should according to this theorem.</p>
-<p>Note that, for a better view and understanding you might consult this document: <a href="http://videos.rennes.inria.fr/hdr/gribonval/HDR2007.pdf">Rémi Gribonval HDR</a>.</p>
+<p>Note that, for a better view and understanding you might consult this article <a href="#[1]">[1]</a>.</p>
 
 </div>
 </div>
@@ -11871,8 +11871,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">FaustFactory</span> <span class="k">as</span> <span class="n">FF</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">log2</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">128</span>
-<span class="n">log2n</span> <span class="o">=</span> <span class="n">log2</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="n">FD</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">FF</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="n">FF</span><span class="o">.</span><span class="n">wht</span><span class="p">(</span><span class="n">log2n</span><span class="p">)))</span>
+<span class="n">FD</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">FF</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="n">FF</span><span class="o">.</span><span class="n">wht</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
 <span class="n">D</span> <span class="o">=</span> <span class="n">FD</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
 </pre></div>
@@ -11891,13 +11890,19 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[[ 1.  0.  0. ...,  1.  1.  1.]
- [ 0.  1.  0. ..., -1.  1. -1.]
- [ 0.  0.  1. ...,  1. -1. -1.]
+<pre>[[ 1.          0.          0.         ...,  0.08838835  0.08838835
+   0.08838835]
+ [ 0.          1.          0.         ..., -0.08838835  0.08838835
+  -0.08838835]
+ [ 0.          0.          1.         ...,  0.08838835 -0.08838835
+  -0.08838835]
  ..., 
- [ 0.  0.  0. ...,  1. -1.  1.]
- [ 0.  0.  0. ..., -1.  1.  1.]
- [ 0.  0.  0. ...,  1.  1. -1.]]
+ [ 0.          0.          0.         ...,  0.08838835 -0.08838835
+   0.08838835]
+ [ 0.          0.          0.         ..., -0.08838835  0.08838835
+   0.08838835]
+ [ 0.          0.          0.         ...,  0.08838835  0.08838835
+  -0.08838835]]
 </pre>
 </div>
 </div>
@@ -11921,16 +11926,14 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">count_nonzero</span>
-<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">randn</span><span class="p">,</span> <span class="n">permutation</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">randn</span><span class="p">,</span> <span class="n">permutation</span> <span class="k">as</span> <span class="n">randperm</span>
 <span class="kn">from</span> <span class="nn">random</span> <span class="k">import</span> <span class="n">randint</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">floor</span><span class="p">,</span> <span class="n">sqrt</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">combinations</span>
-<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="k">import</span> <span class="n">binom</span>
-<span class="n">x0</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">FD</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">nnz</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">randint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">floor</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)))))</span> <span class="c1"># min 0-norm is 5</span>
-<span class="n">nonzero_inds</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">(</span><span class="n">x0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])[:</span><span class="n">nnz</span><span class="p">]</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># NB: FD.shape[1] == 2*n</span>
+<span class="n">nnz</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
+<span class="n">nonzero_inds</span> <span class="o">=</span> <span class="n">randperm</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">)[:</span><span class="n">nnz</span><span class="p">]</span>
 <span class="c1"># we got nnz indices, now build the vector x0</span>
-<span class="n">x0</span><span class="p">[</span><span class="n">nonzero_inds</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="n">randn</span><span class="p">()</span><span class="o">*</span><span class="mi">50</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">nonzero_inds</span><span class="p">))</span> <span class="p">]</span>
+<span class="n">x0</span><span class="p">[</span><span class="n">nonzero_inds</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">randn</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;l0 norm of x0: &quot;</span><span class="p">,</span> <span class="n">count_nonzero</span><span class="p">(</span><span class="n">x0</span><span class="p">))</span>
 </pre></div>
 
@@ -11948,7 +11951,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>l0 norm of x0:  5
+<pre>l0 norm of x0:  6
 </pre>
 </div>
 </div>
@@ -11961,7 +11964,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>It remains to compute $y$, normalizing FD and D before.</p>
+<p>It remains to compute $y$.</p>
 
 </div>
 </div>
@@ -11971,9 +11974,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">FD</span> <span class="o">=</span> <span class="n">FD</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
-<span class="n">D</span> <span class="o">=</span> <span class="n">FD</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">FD</span><span class="o">*</span><span class="n">x0</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">FD</span><span class="o">*</span><span class="n">x0</span>
 </pre></div>
 
 </div>
@@ -12088,10 +12089,11 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">nnz</span> <span class="o">=</span> <span class="mi">98</span>
-<span class="n">x1</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="n">FD</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">nnz_inds</span> <span class="o">=</span> <span class="n">permutation</span><span class="p">(</span><span class="n">n</span><span class="p">)[:</span><span class="n">nnz</span><span class="p">]</span>
-<span class="n">x1</span><span class="p">[</span><span class="n">nnz_inds</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="n">randn</span><span class="p">()</span><span class="o">*</span><span class="mi">50</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">nnz_inds</span><span class="p">))</span> <span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">nnz</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">x1</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">nnz_inds</span> <span class="o">=</span> <span class="n">randperm</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">)[:</span><span class="n">nnz</span><span class="p">]</span>
+<span class="n">x1</span><span class="p">[</span><span class="n">nnz_inds</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">randn</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">FD</span><span class="o">*</span><span class="n">x1</span>
 <span class="n">x2</span> <span class="o">=</span> <span class="n">omp</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">nnz</span><span class="p">)</span>
 <span class="n">x3</span> <span class="o">=</span> <span class="n">omp</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">FD</span><span class="p">,</span> <span class="n">nnz</span><span class="p">)</span>
 <span class="c1"># verify that at least the two solutions have the same support</span>
@@ -12116,7 +12118,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>norm(x2-x3)/norm(x3): 0.564913284811
+<pre>norm(x2-x3)/norm(x3): 0.0
 Is x1 retrieved into x2 ? False
 Is x1 retrieved into x3 ? False
 </pre>
@@ -12248,155 +12250,155 @@ bsl.fig_time_cmp()
 
 
 <div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
+<img src="data:image/png;base64,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
 "
 >
 </div>
@@ -12429,9 +12431,10 @@ NzOrIQd/M7Ma+v9MJchzmURwowAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Links">Links<a class="anchor-link" href="#Links">&#182;</a></h3><p><a name="creation_links">Faust creation notebook: </a> <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_creation.html">html</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_creation.ipynb">ipynb</a><br>
-<a name="manip_links">Faust manipulation notebook:</a> <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_manipulation.html">html</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_manipulation.ipynb">ipynb</a><br>
-<a name="facto_links">Factorization notebook: </a><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_factorization.html">html</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_factorization.ipynb">ipynb</a></p>
+<h3 id="Links">Links<a class="anchor-link" href="#Links">&#182;</a></h3><p><a name="creation_links">Faust creation (1st) notebook: </a> <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_creation.html">html</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_creation.ipynb">ipynb</a><br>
+<a name="manip_links">Faust manipulation (2nd) notebook:</a> <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_manipulation.html">html</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_manipulation.ipynb">ipynb</a><br>
+<a name="facto_links">Factorization (3rd) notebook: </a><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_factorization.html">html</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_factorization.ipynb">ipynb</a><br>
+<a name="[1]">[1]</a> <a href="http://doi.org/10.1109/TIT.2004.834793">Tropp, J. A. (2004). Greed is Good: Algorithmic Results for Sparse Approximation. IEEE Transactions on Information Theory, 50(10), 2231–2242</a>.</p>
 
 </div>
 </div>
