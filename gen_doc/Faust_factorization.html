@@ -11819,8 +11819,8 @@ This method allows you to generate sparse Hadamard transforms.</p>
 <span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">FaustFactory</span> <span class="k">as</span> <span class="n">FF</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">norm</span>
 <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">rand</span>
-<span class="c1"># generate a Hadamard Faust of size 32x32</span>
-<span class="n">FH</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">wht</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="c1"># generate a Hadamard Faust of size 32x32 (norma=False is to avoid normalization)</span>
+<span class="n">FH</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">wht</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">norma</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">H</span> <span class="o">=</span> <span class="n">FH</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span> <span class="c1"># the dense matrix version</span>
 <span class="n">FH</span><span class="o">.</span><span class="n">imshow</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -12737,7 +12737,7 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>172 µs ± 14.3 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+<pre>148 µs ± 28.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 </pre>
 </div>
 </div>
@@ -12768,7 +12768,7 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>51.3 ms ± 10.8 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<pre>54.2 ms ± 9.6 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>

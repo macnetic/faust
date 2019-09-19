@@ -1145,7 +1145,7 @@ class Faust:
         else:
             return float(-1)
 
-    def norm(F, ord='fro', **kwargs):
+    def norm(F, ord='fro', axis=None, keepdims=False): #**kwargs):
         """
         Computes the norm of F.
 
@@ -1202,7 +1202,7 @@ class Faust:
         """
         if(ord not in [1, 2, "fro", np.inf]):
             raise ValueError("ord must have the value 1, 2, 'fro' or numpy.inf.")
-        return F.m_faust.norm(ord, **kwargs)
+        return F.m_faust.norm(ord)# **kwargs)
 
 
     def normalize(F, ord='fro', axis=1):
@@ -1650,7 +1650,7 @@ class FaustFactory:
             >>> from pyfaust import FaustFactory as Facto
             >>> from numpy.linalg import norm
             >>> # generate a Hadamard Faust of size 32x32
-            >>> FH = Facto.wht(5)
+            >>> FH = Facto.wht(32)
             >>> H = FH.toarray() # the full matrix version
             >>> # factorize it
             >>> FH2 = Facto.fact_hierarchical(H, 'squaremat');
@@ -1891,25 +1891,25 @@ class FaustFactory:
 
 
     @staticmethod
-    def wht(n):
+    def wht(n, norma=True):
         """
-           Constructs a Faust implementing the Hadamard transform of dimension 2^n.
+           Constructs a Faust implementing the Hadamard transform of dimension n.
 
-           The resulting Faust has n sparse factors of order 2^n, each one having 2 non-zero
+           The resulting Faust has n sparse factors of order n, each one having 2 non-zero
            elements per row and per column.
 
            Args:
-               n: the power of two exponent for a Hadamard matrix of order 2^n
-               and a factorization in n factors.
-
+               n: the power of two exponent for a Hadamard matrix of order n
+               and a factorization in log2(n) factors.
+               norma: default to True to normalize the Hadamard Faust as if you called
+               Faust.normalize() and False otherwise.
            Returns:
-               The Faust implementing the Hadamard transform of dimension 2^n.
+               The Faust implementing the Hadamard transform of dimension n.
 
           Examples:
               >>> from pyfaust import FaustFactory
-              >>> FaustFactory.wht(10)
-              Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10
-              factor(s):
+              >>> FaustFactory.wht(1024)
+              Faust size 1024x1024, density 0.0195312, nnz_sum 20480, 10 factor(s):
                   - FACTOR 0 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
                   - FACTOR 1 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
                   - FACTOR 2 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
@@ -1920,32 +1920,42 @@ class FaustFactory:
                   - FACTOR 7 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
                   - FACTOR 8 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
                   - FACTOR 9 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
+              >>> Faust.wht(1024, norma=True) # is equiv. to next call
+              >>> Faust.wht(1024, norma=False).normalize() # which is less optimized though
 
         """
-        H = Faust(core_obj=FaustCorePy.FaustCore.hadamardFaust(n))
+        log2n = np.floor(np.log2(n))
+        if(n > 2**log2n): raise ValueError("n must be a power of 2.")
+        H = Faust(core_obj=FaustCorePy.FaustCore.hadamardFaust(log2n))
+        if(norma == True):
+            H = H*(1/np.sqrt(n))
+        elif(norma != False):
+            raise TypeError("norma must be True of False.")
         return H
 
     @staticmethod
-    def dft(n):
+    def dft(n, norma=True):
         """
-            Constructs a Faust whose the full matrix is the Discrete Fourier Transform square matrix of order 2^n.
+            Constructs a Faust whose the full matrix is the Discrete Fourier Transform square matrix of order n.
 
             The factorization algorithm used is Cooley-Tukey.
 
-            The resulting Faust is complex and has (n+1) sparse factors whose the n first
-            has 2 non-zero elements per row and per column. The last factor is
-            a permutation matrix.
+            The resulting Faust is complex and has (log2(n)+1) sparse factors
+            whose the log2(n) first has 2 non-zero elements per row and per column.
+            The last factor is a permutation matrix.
 
             Args:
-            n: the power of two exponent for a DFT of order 2^n and a
-            factorization in n+1 factors.
+            n: the power of two exponent for a DFT of order n and a
+            factorization in log2(n)+1 factors.
+            norma: default to True to normalize the DFT Faust as if you called
+            Faust.normalize() and False otherwise.
 
             Returns:
-            The Faust implementing the DFT of dimension 2^n.
+            The Faust implementing the DFT of dimension n.
 
             Examples:
                 >>> from pyfaust import FaustFactory
-                >>> FaustFactory.dft(10)
+                >>> FaustFactory.dft(1024)
                 Faust size 1024x1024, density 0.0205078, nnz_sum 21504, 11 factor(s):
                 - FACTOR 0 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
                 - FACTOR 1 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
@@ -1958,8 +1968,16 @@ class FaustFactory:
                 - FACTOR 8 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
                 - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
                 - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
+                >>> Faust.dft(1024, norma=True) # is equiv. to next call
+                >>> Faust.dft(1024, norma=False).normalize() # which is less optimized though
         """
-        F = Faust(core_obj=FaustCorePy.FaustCore.fourierFaust(n))
+        log2n = np.floor(np.log2(n))
+        if(n > 2**log2n): raise ValueError("n must be a power of 2.")
+        F = Faust(core_obj=FaustCorePy.FaustCore.fourierFaust(log2n))
+        if(norma == True):
+            F = F*(1/np.sqrt(n))
+        elif(norma != False):
+            raise TypeError("norma must be True of False.")
         return F
 
     @staticmethod
