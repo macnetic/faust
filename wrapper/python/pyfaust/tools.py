@@ -37,8 +37,8 @@ def greed_omp_chol(x, A, m, stopTol=None, verbose=False):
     else:
         raise Exception("x must be a vector")
     if(Faust.isFaust(A) or isinstance(A, matrix)):
-        P = lambda z : A*z
-        Pt = lambda z : A.H*z
+        P = lambda z : matrix(A*z, copy=False)
+        Pt = lambda z : matrix(A.H*z, copy=False)
     else:
         raise Exception("A must be a Faust or a numpy.matrix. Here A is "
                         "a:"+str(type(A)))
