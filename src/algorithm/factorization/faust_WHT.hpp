@@ -3,7 +3,7 @@
 
 namespace Faust {
 	template<typename FPP>
-		void wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool cloning_fact)
+		void wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool cloning_fact, const bool norma)
 		{
 			if(n == 0)
 			{
@@ -92,6 +92,12 @@ namespace Faust {
 						factors[i] = factor->Clone();
 					else
 						factors[i] = factor;
+
+				if(norma)
+				{
+					factors[0] = factor->Clone();
+					*factors[0] *= static_cast<FPP>(1.0/sqrt((float)order));
+				}
 
 			}
 		}

@@ -86,7 +86,7 @@ template<typename FPP>
 void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
 
 template<typename FPP>
-void Faust::wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool);
+void Faust::wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 
 //! \namespace Faust
 //! \brief Faust namespace contains the principal class of the project.
@@ -106,7 +106,7 @@ namespace Faust
 		{
 
 			friend Faust::TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
-			friend void Faust::wht_factors<>(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool);
+			friend void Faust::wht_factors<>(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 			friend class MatDense<FPP,Cpu>;
 			//friend void MatDense<FPP,Cpu>::operator+=(const MatSparse<FPP,Cpu>& S);
 
