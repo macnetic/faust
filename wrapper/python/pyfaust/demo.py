@@ -1109,7 +1109,8 @@ class bsl:
                 while not (dist_paliers[k] < dist_sources and dist_sources <
                            dist_paliers[k+1]):
                     gamma[:,j:j+1] = bsl.sparse_coeffs(MEG_matrix, 1, sparsity)
-                    idx = find(gamma[:,j])
+                    #idx = find(gamma[:,j])
+                    idx = nonzero(ravel(gamma[:,j]))[0]
                     dist_sources = norm(points[idx[0],:] - points[idx[1],:])
 
             # compute the data registered by MEG sensor
@@ -1122,7 +1123,8 @@ class bsl:
                   "approximations with omp solver, progress:",
                       100*(k*Ntraining+i)/(len(dist_paliers)-1)/Ntraining)
                 # index of the real source localization
-                idx = find(gamma[:,i])
+                # idx = find(gamma[:,i])
+                idx = nonzero(ravel(gamma[:,i]))[0]
                 for j in range(0,num_MEGs):
 
                     MEG = MEGs[j]
@@ -1183,9 +1185,12 @@ class bsl:
         compute_times = mat_file_entries['compute_Times']
         RCG_list = mat_file_entries['RCG_list']
 
-        times = [squeeze(compute_times[i,:,:]*1000) for i in
-                 range(0,compute_times.shape[0])] # in ms
-
+        #times = [squeeze(compute_times[i,:,:]*1000) for i in
+        #         range(0,compute_times.shape[0])] # in ms
+        times = \
+            [squeeze(compute_times[i,:,:]*1000).reshape(compute_times.shape[1]*compute_times.shape[2])
+                \
+             for i in range(0,compute_times.shape[0])]
         fig = figure()
         boxplot(times, showfliers=False)
         plt.rc('text', usetex=True)
