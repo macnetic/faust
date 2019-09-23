@@ -169,12 +169,13 @@ cdef class FaustCore:
         return core
 
     @staticmethod
-    def hadamardFaust(n):
+    def hadamardFaust(n, norma):
         if(n>31):
             raise ValueError("Faust doesn't handle a Hadamard of order larger than "
                              "2**31")
         core = FaustCore(core=True)
-        core.core_faust_dbl = FaustCoreCy.FaustCoreCpp[double].hadamardFaust(n)
+        core.core_faust_dbl = FaustCoreCy.FaustCoreCpp[double].hadamardFaust(n,
+                                                                            norma)
         if(core.core_faust_dbl == NULL):
             raise MemoryError()
         # hadamard is always a real Faust

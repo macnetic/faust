@@ -970,14 +970,14 @@ namespace Faust {
 
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::hadamardFaust(unsigned int n)
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::hadamardFaust(unsigned int n, const bool norma)
 		{
 			TransformHelper<FPP,Cpu>* hadamardFaust = nullptr;
 			vector<MatGeneric<FPP,Cpu>*> factors;
 			bool cloning_fact = false; // big opt. allowed only because of the RefManager used in Transform class
 			//this opt. avoids to duplicate the same factor
 			try {
-				wht_factors(n, factors, cloning_fact);
+				wht_factors(n, factors, cloning_fact, norma);
 				hadamardFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
 			}
 			catch(std::bad_alloc)

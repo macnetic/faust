@@ -97,7 +97,7 @@ cdef extern from "FaustCoreCpp.h" :
                                              unsigned int max_dim_size,
                                              float density, bool per_row)
         @staticmethod
-        FaustCoreCpp[FPP]* hadamardFaust(unsigned int n)
+        FaustCoreCpp[FPP]* hadamardFaust(unsigned int n, const bool norma)
         @staticmethod
         FaustCoreCpp[FPP]* fourierFaust(unsigned int n)
 

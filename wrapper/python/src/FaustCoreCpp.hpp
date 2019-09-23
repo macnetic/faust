@@ -359,9 +359,9 @@ template<typename FPP>
 //TODO: hadamardFaust and fourierFaust shouldn't be here... or at least it
 //should be reconsidered
 template<typename FPP>
-  FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::hadamardFaust(unsigned int n)
+  FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::hadamardFaust(unsigned int n, const bool norma)
 {
-      Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::hadamardFaust(n);
+      Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::hadamardFaust(n, norma);
       if(!th) return NULL;
       FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
       return core;

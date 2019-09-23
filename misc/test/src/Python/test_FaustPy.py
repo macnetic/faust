@@ -883,8 +883,8 @@ class TestFaustFactory(unittest.TestCase):
         for i in range(0,n-1):
             for j in range(i+1,n):
                 self.assertTrue((fH[i,::].dot(fH[j,::].T) == 0).all())
-        assert(np.allclose(FF.wht(n, True).toarray(),
-               FF.wht(n).normalize().toarray()))
+        assert(np.allclose(FF.wht(n).toarray(),
+               FF.wht(n, False).normalize().toarray()))
 
     def testFourier(self):
         print("Test FaustFactory.dft()")
