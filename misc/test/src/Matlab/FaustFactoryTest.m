@@ -253,7 +253,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 				end
 				i = i + 1;
 			end
-			this.assertEqual(full(FaustFactory.wht(n)), full(normalize(FaustFactory.wht(n))), 'AbsTol', 10^-12)
+			this.assertEqual(full(FaustFactory.wht(n)), full(normalize(FaustFactory.wht(n, false))), 'AbsTol', 10^-12)
 		end
 
 		function testFourier(this)
@@ -266,7 +266,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			fftI = fft(eye(n));
 			% this.verifyEqual(nnz(fH), numel(fH));
 			this.verifyEqual(norm(fF-fftI), 0, 'AbsTol', 10^-12);
-			this.assertEqual(full(FaustFactory.dft(n)), full(normalize(FaustFactory.dft(n))), 'AbsTol', 10^-12)
+			this.assertEqual(full(FaustFactory.dft(n)), full(normalize(FaustFactory.dft(n, false))), 'AbsTol', 10^-12)
 		end
 	end
 

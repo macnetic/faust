@@ -832,20 +832,21 @@ classdef FaustFactory
 			if(log2n>31)
 				error('Can''t handle a FFT Faust of order larger than 2^31')
 			end
-			core_obj = mexFaustCplx('fourier', log2n);
+			if(length(varargin) > 0)
+				if(~ islogical(varargin{1}))
+					error('wht optional second argument must be a boolean');
+				end
+				norma = varargin{1};
+			else
+				norma = true; % normalization by default
+			end
+			core_obj = mexFaustCplx('fourier', log2n, norma);
 			is_real = false;
 			e = MException('FAUST:OOM', 'Out of Memory');
 			if(core_obj == 0)
 				throw(e)
 			end
 			F = matfaust.Faust(core_obj, is_real);
-			if(length(varargin) > 0)
-				if(~ islogical(varargin{1}))
-					error('wht optional second argument must be a boolean');
-				end
-			else
-				F = F*(1/sqrt(n));
-			end
 		end
 
 		%==========================================================================================
