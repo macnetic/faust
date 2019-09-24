@@ -155,12 +155,13 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 			if(!strcmp("hadamard", cmd)){
 				if(nlhs!=1)
 					mexErrMsgTxt("hadamard(): 1 variable result is expected.");
-				if(nrhs < 2)
+				if(nrhs < 3)
 					mexErrMsgTxt("hadamard(): wrong number of arguments (must be 2)");
 				unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
+				bool norma = (bool) mxGetScalar(prhs[2]);
 
 				//printf("mexFaust.cpp hadamard(): faust creation\n");
-				Faust::TransformHelper<SCALAR,Cpu>* H = Faust::TransformHelper<SCALAR,Cpu>::hadamardFaust(n);
+				Faust::TransformHelper<SCALAR,Cpu>* H = Faust::TransformHelper<SCALAR,Cpu>::hadamardFaust(n, norma);
 				//H->display();
 				if(H) //not NULL
 					plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(H);
@@ -519,7 +520,7 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 			if(!strcmp("normalize", cmd))
 			{
                 int ord = (int) mxGetScalar(prhs[2]);
-				if(ord == 2) ord = -2; //tmp workaround to the bug in normalization according 2-norm on complex Faust
+
 				Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->normalize(ord);
 				plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
 				return;

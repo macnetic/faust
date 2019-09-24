@@ -759,20 +759,21 @@ classdef FaustFactory
 			if(log2n > 31)
 				error('Can''t handle a Hadamard Faust of order larger than 2^31')
 			end
-			core_obj = mexFaustReal('hadamard', log2n);
+			if(length(varargin) > 0)
+				if(~ islogical(varargin{1}))
+					error('wht optional second argument must be a boolean');
+				end
+				norma = varargin{1};
+			else
+				norma = true; % normalization by default
+			end
+			core_obj = mexFaustReal('hadamard', log2n, norma);
 			is_real = true;
 			e = MException('FAUST:OOM', 'Out of Memory');
 			if(core_obj == 0)
 				throw(e)
 			end
 			H = matfaust.Faust(core_obj, is_real);
-			if(length(varargin) > 0)
-				if(~ islogical(varargin{1}))
-					error('wht optional second argument must be a boolean');
-				end
-			else
-				H =H*(1/sqrt(n));
-			end
 		end
 
 		%==========================================================================================
@@ -845,7 +846,6 @@ classdef FaustFactory
 			else
 				F = F*(1/sqrt(n));
 			end
-
 		end
 
 		%==========================================================================================
