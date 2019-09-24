@@ -368,9 +368,9 @@ template<typename FPP>
 }
 
 template<typename FPP>
-  FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::fourierFaust(unsigned int n)
+  FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::fourierFaust(unsigned int n, const bool norma)
 {
-      Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::fourierFaust(n);
+      Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::fourierFaust(n, norma);
       if(!th) return NULL;
       FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
       return core;

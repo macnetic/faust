@@ -896,8 +896,8 @@ class TestFaustFactory(unittest.TestCase):
         fF = F.todense()
         ref_fft = fft(np.eye(n))
         self.assertAlmostEqual(norm(ref_fft-fF)/norm(ref_fft),0)
-        assert(np.allclose(FF.dft(n, True).toarray(),
-                           FF.dft(n).normalize().toarray()))
+        assert(np.allclose(FF.dft(n).toarray(),
+                           FF.dft(n, False).normalize().toarray()))
 
     def testFGFTGivens(self):
         print("Test FaustFactory.fgft_givens()")

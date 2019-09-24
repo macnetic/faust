@@ -157,7 +157,7 @@ TransformHelper(Transform<FPP,Cpu> &t, const bool moving=false);
 
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n, const bool norma=true);
-			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n);
+			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n, const bool norma=true);
 			~TransformHelper();
 
 			unsigned long long get_fact_addr(const faust_unsigned_int id) const;

@@ -99,7 +99,7 @@ cdef extern from "FaustCoreCpp.h" :
         @staticmethod
         FaustCoreCpp[FPP]* hadamardFaust(unsigned int n, const bool norma)
         @staticmethod
-        FaustCoreCpp[FPP]* fourierFaust(unsigned int n)
+        FaustCoreCpp[FPP]* fourierFaust(unsigned int n, const bool norma)
 
 # TODO: all the headers below should be in their own pxd file FaustFact.pxd
 cdef extern from "FaustFact.h":

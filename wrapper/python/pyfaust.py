@@ -1971,11 +1971,9 @@ class FaustFactory:
         """
         log2n = np.floor(np.log2(n))
         if(n > 2**log2n): raise ValueError("n must be a power of 2.")
-        F = Faust(core_obj=FaustCorePy.FaustCore.fourierFaust(log2n))
-        if(norma == True):
-            F = F*(1/np.sqrt(n))
-        elif(norma != False):
+        if(not isinstance(norma, bool)):
             raise TypeError("norma must be True of False.")
+        F = Faust(core_obj=FaustCorePy.FaustCore.fourierFaust(log2n, norma))
         return F
 
     @staticmethod

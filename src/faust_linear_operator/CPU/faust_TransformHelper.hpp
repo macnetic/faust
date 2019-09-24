@@ -988,7 +988,7 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaust(unsigned int n)
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaust(unsigned int n, const bool norma)
 		{
 
 			vector<MatGeneric<FPP,Cpu>*> factors(n+1);
@@ -998,7 +998,8 @@ namespace Faust {
 				fft_factors(n, factors);
 				//			for(int i=0;i<n+1;i++)
 				//				factors[i]->Display();
-				fourierFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+				float alpha = norma?1/sqrt((double)(1 << n)):1.0;
+				fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false);
 			}
 			catch(std::bad_alloc e)
 			{
