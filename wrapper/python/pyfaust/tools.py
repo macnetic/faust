@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # @PYFAUST_LICENSE_HEADER@
 
+## @package pyfaust @brief <b> The FAµST tools module</b> 
+
 import numpy as np
 from scipy.sparse.linalg import spsolve_triangular
 from numpy.linalg import solve, lstsq, norm
@@ -9,62 +11,65 @@ from numpy import concatenate as cat
 from numpy import matrix, zeros, argmax, empty
 from pyfaust import Faust
 
-def greed_omp_chol(x, A, m, stopTol=None, verbose=False):
+def omp(y, D, msetol=10**-16, maxiter=None, verbose=False):
     """
-    Runs greedy OMP algorithm optimized by Cholesky decomposition.
+    Runs the greedy OMP algorithm optimized by Cholesky decomposition.
 
-    Params:
-        A: the dictionary as a numpy matrix or a Faust.
-        x: the vector to approximate by A*y.
-        m: the dimension from which A maps (the number of columns of A).
-        stopTol:  stopping criterion based on the number of iterations (by default it's a
-        quarter of the size of x) and it can't be greater than the size of x. This
-        criterion doesn't disable the other criterion based on the precision of
-        the solution (the algorithm will stop anyway if a precision lower or equal to
-        1^-16 is reached).
+    maxiter and msetol define concurrently the stop criterion. The first
+    criterion verified stops the algorithm.
+
+    Args:
+        D: the dictionary as a numpy matrix or a Faust.
+        y: the vector to approximate by D*x.
+        msetol: stop criterion defined by mean squared error.
+        maxiter: stop criterion defined by number of iterations (by default
+        it is a quarter of the y size). The value must be lower or equal to the dictionary's
+        number of atoms.
         verbose: to enable the verbosity (value to True).
 
     Returns:
-        y: the solution of x = A*y.
+        x: the solution of y = D*x.
     """
-    #TODO: check x is a numpy.matrix (or a matrix_csr ?)
-    sp = x.shape
+    # check y is a numpy.matrix (or a matrix_csr ?)
+    if(isinstance(y, np.ndarray)): y = matrix(y, copy=False)
+    m = D.shape[1]
+    sp = y.shape
     if(sp[1] == 1):
         n = sp[0]
     elif sp[0] == 1:
-        x = x.H
+        y = y.H
         n = sp[1]
     else:
-        raise Exception("x must be a vector")
-    if(Faust.isFaust(A) or isinstance(A, matrix)):
-        P = lambda z : matrix(A*z, copy=False)
-        Pt = lambda z : matrix(A.H*z, copy=False)
+        raise Exception("y must be a vector")
+    if(Faust.isFaust(D) or isinstance(D, matrix)):
+        P = lambda z : matrix(D*z, copy=False)
+        Pt = lambda z : matrix(D.H*z, copy=False)
     else:
-        raise Exception("A must be a Faust or a numpy.matrix. Here A is "
-                        "a:"+str(type(A)))
-    #TODO: raise exception for x also if not a matrix-vector (type matrix)
+        raise Exception("D must be a Faust or a numpy.matrix. Here D is "
+                        "a:"+str(type(D)))
+    #TODO: raise exception for y also if not a matrix-vector (type matrix)
 
-    # pre-calculate Pt(x) because it's used repeatedly
-    Ptx = Pt(x)
+    # pre-calculate Pt(y) because it's used repeatedly
+    Ptx = Pt(y)
 
-    maxM = stopTol
+    if(not maxiter):
+        if(not (type(maxiter) in [int, float])):
+            raise ValueError("maxiter must be a number.")
+        maxiter = int(n/4)
+
     # try if enough memory
     try:
-        R = matrix(zeros(maxM))
+        R = matrix(zeros(maxiter))
     except:
         raise Exception("Variable size is too large.")
 
-    if(not stopTol):
-        stopTol = int(n/4)
-
     r_count = 0
-    sigsize = x.H*x/n
     # initialize
     s_initial = matrix(zeros((m,1))).astype(np.complex)
-    residual = x
+    residual = y
     s = s_initial
-    R = matrix(empty((stopTol+1,stopTol+1))).astype(np.complex)
-    oldErr = sigsize
+    R = matrix(empty((maxiter+1,maxiter+1))).astype(np.complex)
+    oldErr = y.H*y/n
     err_mse = []
 
     t=0
@@ -91,16 +96,16 @@ def greed_omp_chol(x, A, m, stopTol=None, verbose=False):
         Rs = lstsq(R[0:r_count, 0:r_count].H, Ptx[IN])[0]
         s[IN] = lstsq(R[0:r_count, 0:r_count], Rs)[0]
 
-        residual = x - P(s)
+        residual = y - P(s)
         DR = Pt(residual)
 
         err = residual.H*residual/n
 
-        done = it >= stopTol
+        done = it >= maxiter
         if(not done and verbose):
-            print("Iteration",  it, "---", stopTol-it, "iterations to go")
+            print("Iteration",  it, "---", maxiter-it, "iterations to go")
 
-        if(err<1**-16 and r_count > 1):
+        if(err < msetol and r_count > 1):
             print("Stopping. Exact signal representation found!")
             done=True
 
@@ -178,7 +183,6 @@ def UpdateCholeskyFull(R,P,Pt,index,m):
     #assert(np.allclose(D[:,index].H*D[:,index], R.H*R))
     return R
 
-
 def UpdateCholeskySparse(R,P,Pt,index,m):
     """
     Args:
@@ -217,4 +221,4 @@ def UpdateCholeskySparse(R,P,Pt,index,m):
 
     return R
 
-
+greed_omp_chol = omp
