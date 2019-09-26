@@ -118,6 +118,8 @@ if(UNIX)
 		string(REGEX REPLACE "Python ([0-9])\\.([0-9]).*$" "\\1\\2" PY_VER ${PY_VER})
 		if(PY_VER MATCHES 3)
 			set(PY3_VER ${PY_VER_WITH_POINTS} PARENT_SCOPE)
+			string(REGEX REPLACE ".*([0-9])$" "\\1" PY3_MINOR_VER ${PY_VER})
+			set(PY3_MINOR_VER ${PY3_MINOR_VER} PARENT_SCOPE)
 		endif()
 		add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
 			COMMAND   ${PYTHON_EXE}
@@ -139,6 +141,9 @@ elseif(WIN32)
 					COMMAND   ${PYTHON_EXE}
 					ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace" 
 					COMMENT   "Creating pyfaust${PY_VER}")
+				string(REGEX REPLACE ".*\\.([0-9])$" "\\1" PY3_MINOR_VER ${PY3_VER})
+				string(REGEX REPLACE ".*([0-9])$" "\\1" PY3_MINOR_VER ${PY_VER})
+				set(PY3_MINOR_VER ${PY3_MINOR_VER} PARENT_SCOPE)
 			endif()
 		endforeach()
 	else() #  ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles"
@@ -185,6 +190,8 @@ elseif(WIN32)
 					if(PY_VER MATCHES 3)
 						set(PY_DYNLIB "FaustCorePy.cp${PY_VER}-win_amd64.pyd")
 						set(PY3_VER ${PY_VER_WITH_POINTS})
+						string(REGEX REPLACE ".*([0-9])$" "\\1" PY3_MINOR_VER ${PY_VER})
+						set(PY3_MINOR_VER ${PY3_MINOR_VER} PARENT_SCOPE)
 					else() #py 2.7.x
 						set(PY_DYNLIB "FaustCorePy.pyd")
 					endif()
@@ -212,3 +219,6 @@ endif()
 
 #install the python wrapper
 install(DIRECTORY ${FAUST_PYTHON_BIN_DIR}/ DESTINATION ${CMAKE_INSTALL_PYTHON_PREFIX} FILE_PERMISSIONS  ${INSTALL_FILE_PERMISSION} DIRECTORY_PERMISSIONS ${INSTALL_DIR_PERMISSION} FILES_MATCHING PATTERN "pyfaust/*.py" PATTERN "*.so" PATTERN "*.pyd" PATTERN "build" EXCLUDE PATTERN "setup*" EXCLUDE PATTERN "CMakeFiles*" EXCLUDE)
+
+
+

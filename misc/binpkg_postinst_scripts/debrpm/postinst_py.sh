@@ -8,7 +8,7 @@ uid=$(id -u)
 [[ -z "$FAUST_PY_WRAPPER_PATH" ]] && echo "USAGE: $0 <path>" && exit 2
 [[ ! -d "$FAUST_PY_WRAPPER_PATH" ]] && echo "ERROR: directory $FAUST_PY_WRAPPER_PATH doesn't exist" && exit 3
 
-SUPPORTED_PY3=7
+SUPPORTED_PY3=@PY3_MINOR_VER@ # needed because python3 has ABI changes between minor versions (the pyfaust shared lib. is compiled specifically for python major and minor version)
 
 function link_py_files(){
 	PY_MAJOR_VER=$1
