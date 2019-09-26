@@ -1132,9 +1132,13 @@ class bsl:
                     #find active source
                     t = _timer()
                     #print(matrix(data[:,i:i+1]).shape,  MEG.shape, M)
+                    n = max(matrix(data[:,i:i+1]).shape)
                     solver_sol = greed_omp_chol(matrix(data[:,i:i+1]), MEG,
-                                                maxiter=sparsity,
+                                                maxiter=min(sparsity,floor(n/4)),
+                                                tol=10**-8*np.sqrt(n),
                                                 verbose=False)
+                    # about tol: it's the square root of 10**-16 (because
+                    # the square of tol is used into greed_omp_chol) 
                     compute_times[j,k,i] = _timer() - t
                     # compute the disntance between estimated source and the
                     # real one

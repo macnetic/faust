@@ -11,20 +11,19 @@ from numpy import concatenate as cat
 from numpy import matrix, zeros, argmax, empty
 from pyfaust import Faust
 
-def omp(y, D, msetol=10**-16, maxiter=None, verbose=False):
+def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
     """
     Runs the greedy OMP algorithm optimized by Cholesky decomposition.
-
-    maxiter and msetol define concurrently the stop criterion. The first
-    criterion verified stops the algorithm.
 
     Args:
         D: the dictionary as a numpy matrix or a Faust.
         y: the vector to approximate by D*x.
-        msetol: stop criterion defined by mean squared error.
-        maxiter: stop criterion defined by number of iterations (by default
-        it is a quarter of the y size). The value must be lower or equal to the dictionary's
-        number of atoms.
+        maxiter: the maximum number of iterations of the algorithm.
+        By default (None) it's y's dimension: max(y.shape).
+        tol: the tolerance error under what the algorithm stops. By default,
+        it's zero for not stopping on error criterion.
+        relerr: the type of error stopping criterion. Default to
+        True to use relative error, otherwise (False) the absolute error is used.
         verbose: to enable the verbosity (value to True).
 
     Returns:
@@ -47,15 +46,20 @@ def omp(y, D, msetol=10**-16, maxiter=None, verbose=False):
     else:
         raise Exception("D must be a Faust or a numpy.matrix. Here D is "
                         "a:"+str(type(D)))
-    #TODO: raise exception for y also if not a matrix-vector (type matrix)
 
     # pre-calculate Pt(y) because it's used repeatedly
     Ptx = Pt(y)
 
     if(not maxiter):
+        maxiter = int(n)
+    else:
         if(not (type(maxiter) in [int, float])):
             raise ValueError("maxiter must be a number.")
-        maxiter = int(n/4)
+
+    tolerr = tol**2
+    if(relerr):
+        tolerr *= (y.H*y)[0,0]
+
 
     # try if enough memory
     try:
@@ -69,7 +73,7 @@ def omp(y, D, msetol=10**-16, maxiter=None, verbose=False):
     residual = y
     s = s_initial
     R = matrix(empty((maxiter+1,maxiter+1))).astype(np.complex)
-    oldErr = y.H*y/n
+    oldErr = y.H*y
     err_mse = []
 
     t=0
@@ -99,13 +103,13 @@ def omp(y, D, msetol=10**-16, maxiter=None, verbose=False):
         residual = y - P(s)
         DR = Pt(residual)
 
-        err = residual.H*residual/n
+        err = residual.H*residual #/n
 
         done = it >= maxiter
         if(not done and verbose):
             print("Iteration",  it, "---", maxiter-it, "iterations to go")
 
-        if(err < msetol and r_count > 1):
+        if(err < tolerr and r_count > 1):
             print("Stopping. Exact signal representation found!")
             done=True
 
@@ -119,7 +123,6 @@ def omp(y, D, msetol=10**-16, maxiter=None, verbose=False):
     if((s.imag == 0).all()):
         return s.real
     return s
-
 
 
 def UpdateCholesky(R,P,Pt,index,m):
