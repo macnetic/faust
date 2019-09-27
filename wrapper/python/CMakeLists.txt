@@ -141,7 +141,6 @@ elseif(WIN32)
 					COMMAND   ${PYTHON_EXE}
 					ARGS "${FAUST_PYTHON_BIN_DIR}/setup.py"  "build_ext" "--inplace" 
 					COMMENT   "Creating pyfaust${PY_VER}")
-				string(REGEX REPLACE ".*\\.([0-9])$" "\\1" PY3_MINOR_VER ${PY3_VER})
 				string(REGEX REPLACE ".*([0-9])$" "\\1" PY3_MINOR_VER ${PY_VER})
 				set(PY3_MINOR_VER ${PY3_MINOR_VER} PARENT_SCOPE)
 			endif()
