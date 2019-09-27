@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @PYFAUST_LICENSE_HEADER@
 
-## @package pyfaust @brief <b> The FAµST tools module</b> 
+## @package pyfaust.tools @brief The pyfaust tools module
 
 import numpy as np
 from scipy.sparse.linalg import spsolve_triangular
@@ -27,7 +27,7 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
         verbose: to enable the verbosity (value to True).
 
     Returns:
-        x: the solution of y = D*x.
+        x: the solution of y = D*x (according to the error).
     """
     # check y is a numpy.matrix (or a matrix_csr ?)
     if(isinstance(y, np.ndarray)): y = matrix(y, copy=False)
@@ -56,10 +56,10 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
         if(not (type(maxiter) in [int, float])):
             raise ValueError("maxiter must be a number.")
 
-    tolerr = tol**2
     if(relerr):
-        tolerr *= (y.H*y)[0,0]
-
+        tolerr = tol * (y.H*y)[0,0]
+    else:
+        tolerr = tol**2
 
     # try if enough memory
     try:
