@@ -11777,7 +11777,7 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Using-the-FA&#181;ST-API-in-Algorithms">Using the FA&#181;ST API in Algorithms<a class="anchor-link" href="#Using-the-FA&#181;ST-API-in-Algorithms">&#182;</a></h1><p>After the little tour we've done in the previous notebooks, about the <a href="#creation_links">creation of Faust objects</a>, their <a href="#manip_links">manipulation</a> and their creation using <a href="#facto_links">factorization</a> algorithms, we shall see in this fourth notebook how the FAµST API can be deployed seamlessly in algorithms.
 Our example, already alluded in the <a href="#manip_links">second notebook</a>, will be the Orthogonal Matching Pursuit algorithm (OMP).</p>
-<p>This algorithm intervenes in the dictionary learning problem. Of course, I will not treat the theory behind but I assume the reader is already familiar with.
+<p>This algorithm intervenes in the dictionary learning problem. Of course, I will not treat the theory behind but I assume the reader is already familiar with it.
 There is not so much to say so let's go straight to the code example.</p>
 
 </div>
@@ -11787,7 +11787,7 @@ There is not so much to say so let's go straight to the code example.</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="1.-The-OMP-Algorithm-Implementation">1. The OMP Algorithm Implementation<a class="anchor-link" href="#1.-The-OMP-Algorithm-Implementation">&#182;</a></h3>
+<h3 id="1.-The-Toy-OMP-Algorithm-Implementation">1. The Toy OMP Algorithm Implementation<a class="anchor-link" href="#1.-The-Toy-OMP-Algorithm-Implementation">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -11825,7 +11825,7 @@ There is not so much to say so let's go straight to the code example.</p>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The most important point to notice in this code is that except the import part in the header, all the code seems to be a natural numpy implementation of OMP.<br>
-This is in fact the core philosophy of the FAµST API, as explained in previous notebooks and also in the API documentation, we made sure that a Faust can be seen as a numpy array (or rather as a <code>numpy.matrix</code>) hence this code is in fact totally compatible with the two APIs: the D function argument, which is the dictionary, can be indifferently a <code>pyfaust.Faust</code> object or a <code>numpy.matrix</code> object.<br>
+This is in fact the core philosophy of the FAµST API, as explained in previous notebooks and also in the API documentation, we made sure that a Faust can be seen as a numpy array (or rather as a <code>numpy.matrix</code>) hence this code is in fact totally compatible with the two APIs: the function argument D, which is the dictionary, can be indifferently a <code>pyfaust.Faust</code> object or a <code>numpy.matrix</code> object.<br>
 A secondary point is that this implementation is more like a toy concept (as indicated by the "t" in the function name). A more advanced and optimized version is introduced in the <a href="#4.-A-Greedy-OMP-Cholesky-Implementation">last part of this notebook</a> and in particular allows to define the algorithm stopping criterion according to the error tolerance the user wants.</p>
 <p>Next we will test this implementation in both cases. But first, let us define a test case.</p>
 
@@ -11844,7 +11844,7 @@ A secondary point is that this implementation is more like a toy concept (as ind
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For convenience, we shall set up a dictionary which garantees uniqueness of sufficiently sparse representations.
+<p>For convenience, we shall set up a dictionary which guarantees uniqueness of sufficiently sparse representations.
 The dictionary is the concatenation of an identity matrix and a Hadamard matrix, and because we work with Faust objects, this concatenation will be a Faust object.</p>
 <p>Below is the block matrix of our dictionary:<br>
 $
@@ -11856,9 +11856,9 @@ I_n &amp; H_n \\
 \right]
 $</p>
 <p>$I_n$ is the identity or Dirac matrix and $H_n$ the orthonormal Hadamard matrix, with n being a power of two.</p>
-<p>The condition on which the uniqueness of the sparse representation $x$ of a vector $y$  is insured is defined by the following inequality:<br>
+<p>The condition on which the uniqueness of the sparse representation $x$ of a vector $y$  is ensured is defined by the following inequality:<br>
 $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictionary and in case of our specially crafted dictionary $\mu = {1 \over \sqrt n}$.</p>
-<p>So let's construct the Faust of D, compute y for a unique sparse x and test our OMP implementation to find out if we effectively retrieve the unique x as we should according to this theorem.</p>
+<p>So let's construct the Faust of D, compute y for a sparse enough x and test our OMP implementation to find out if we effectively retrieve this unique x as we should according to this theorem.</p>
 <p>Note that, for a better view and understanding you might consult this article <a href="#[1]">[1]</a>.</p>
 
 </div>
@@ -11870,7 +11870,6 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">FaustFactory</span> <span class="k">as</span> <span class="n">FF</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">log2</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">128</span>
 <span class="n">FD</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">FF</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="n">FF</span><span class="o">.</span><span class="n">wht</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
 <span class="n">D</span> <span class="o">=</span> <span class="n">FD</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
@@ -11928,7 +11927,6 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">count_nonzero</span>
 <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">randn</span><span class="p">,</span> <span class="n">permutation</span> <span class="k">as</span> <span class="n">randperm</span>
-<span class="kn">from</span> <span class="nn">random</span> <span class="k">import</span> <span class="n">randint</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">floor</span><span class="p">,</span> <span class="n">sqrt</span>
 <span class="n">x0</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># NB: FD.shape[1] == 2*n</span>
 <span class="n">nnz</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
@@ -12080,7 +12078,7 @@ $ \| x \|_0 &lt; (1 + 1/\mu)/2 $ where $\mu$ denotes the coherence of the dictio
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can conclude that the algorithm is indeed available to both numpy and Faust worlds, and we can imagine surely that other algorithms are reachable through the FAµST API. That's anyway in that purpose that the FAµST library will be extended in the future (starting from the latest version which is 2.5.1).</p>
+<p>We can conclude that the algorithm is indeed available to both numpy and Faust worlds, and we can imagine surely that other algorithms are reachable through the FAµST API. That's anyway in that purpose that the FAµST library will be extended if needed in the future (starting from the latest version which is 2.5.1).</p>
 
 </div>
 </div>
@@ -12121,19 +12119,18 @@ This algorithm is implemented into the <code>tools</code> module of pyfaust.</p>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Help on function omp in module pyfaust.tools:
 
-omp(y, D, msetol=1e-16, maxiter=None, verbose=False)
+omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False)
     Runs the greedy OMP algorithm optimized by Cholesky decomposition.
-    
-    maxiter and msetol define concurrently the stop criterion. The first
-    criterion verified stops the algorithm.
     
     Args:
         D: the dictionary as a numpy matrix or a Faust.
         y: the vector to approximate by D*x.
-        msetol: stop criterion defined by mean squared error.
-        maxiter: stop criterion defined by number of iterations (by default
-        it is a quarter of the y size). The value must be lower or equal to the dictionary&#39;s
-        number of atoms.
+        maxiter: the maximum number of iterations of the algorithm.
+        By default (None) it&#39;s y&#39;s dimension: max(y.shape).
+        tol: the tolerance error under what the algorithm stops. By default,
+        it&#39;s zero for not stopping on error criterion.
+        relerr: the type of error stopping criterion. Default to
+        True to use relative error, otherwise (False) the absolute error is used.
         verbose: to enable the verbosity (value to True).
     
     Returns:
@@ -12199,145 +12196,148 @@ bsl.fig_time_cmp()
 
 
 <div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-AFuSOuSflvQWoNif9SDprLTVWdBg72NrUnPeqaSm3D5Jcwvz9yDVzJcNsolLSX13O+Y+g4/m7Y3U
-QUoXc2wB/AOwvtW+i8dA3ZL/1bk55hFSZ987I+L2PG8b4CrSadoq0rfyEU3rP0o63Wq8XjeCGL5P
-6ldYLemhEazf7LOkzrfrla5K+AmpTXcTEfFTUgfav5DaR29iQ+3jOFLt9AFSOZwREUtGEdfXSaf4
-q0md1x/I079GqvHeD/yK4Se4F5AS86PAj4EvRMSNEfEE6f91GOkM4wvAOyLizhHGfyGFTs4hvBO4
-KjfbrG68SP+XIyX1RMQv87Y+RWpSujm/zs7bWA+8ElimdIXTj0jNjiO6TjzS1WzfIp1dfbMwq4dU
-ARggNbf9jnQstHIsqe9jLemL6tnLXiPiblKN/aOkhPpbUkd8mXyyC3Al6TPY6KS9NM87kdQ5/CtS
-OS0iXfwwKhExAPw96bheS7qg4ZrC/P8iNd/cnZucnldis+cBKyPiolzeJwLnasMVZCeQzo6eGGT9
-M0lnBbeRvmhvIZ2ZjNRVOYa1pItZ3hYRT7VY7tljQLlSYDZmJN0IfCMi/rXbsYyG0s147498o5dZ
-Gfms4OfAwbkJuer9nU3q4D95OOuN+o5Vs8kqIjbpDzJrJ9Idvi9su2CX1a3Zx8zMADf7mJnVkGv+
-ZmY15ORvZlZD47bDd8cdd4y99tqr22GYmU0oK1aseCgiprdbbtwm/7322ovly5d3OwwzswlFUss7
-x5u52cfMrIac/M3MasjJ38yshpz8zcxqyMnfzKyGnPzNzGrIyd/MrIbG7XX+nTCMX2gckp+PZGYT
-Ta2Tf5mkLcnJ3cwmHTf7mJnVkJO/mVkNOfmbmdWQk7+ZWQ05+ZuZ1ZCTv5lZDTn5m5nVkJO/mVkN
-OfmbmdWQk7+ZWQ05+ZuZ1ZCTv5lZDTn5m5nVkJO/mVkNOfmbmdWQk7+ZWQ05+ZuZ1ZCTv5lZDVX2
-M46SFuXBtRFxSp62AOgDlkXEeVXt28zMhlZJzV/SHGBJRBwNrJDUL2kmQJ42TVJfFfs2M7P2qmr2
-WQX05OEZ+W8/sCQPL8vjZmbWBZUk/4i4lVS7X5nHlwLTgLV5kQE2fCmYmVmHVdXs02jimZHHSzXx
-SJorabmk5WvWrKkiNDMzo7pmn2PY0MSzBJgDPAz05mk9eXwjEbEwImZFxKzp06dXFJqZmVWV/FcC
-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
+<img src="data:image/png;base64,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
 "
 >
 </div>
@@ -12352,7 +12352,7 @@ ZjXk5G9mVkNO/mZmNeTkb2ZWQ07+ZmY19P8BpG+kJW1nlP4AAAAASUVORK5CYII=
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>What we see in this figure is that it takes a few dozens of milliseconds (the median time) to compute the BSL experiment on the the matrix M. This is well above the time it takes with Faust approximates $\hat M_6$ to $\hat M_{23}$ in which the numbers 6 and 23 denote the Faust <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a6a51a05c20041504a0b8f2a73dd8d05a">RCG</a>. The greater the RCG the better the computation time is, as we already saw in the <a href="#manip_links">notebook</a> about Faust manipulations.</p>
+<p>What we see in this figure is that it takes a few dozens of milliseconds (the median time) to compute the BSL experiment on the dense matrix M. This is well above the time it takes with Faust approximates $\hat M_6$ to $\hat M_{23}$ in which the numbers 6 and 23 denote the Faust <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a6a51a05c20041504a0b8f2a73dd8d05a">RCG</a>. The greater the RCG the better the computation time is, as we already saw in the <a href="#manip_links">notebook</a> about Faust manipulations.</p>
 
 </div>
 </div>
@@ -12361,14 +12361,14 @@ ZjXk5G9mVkNO/mZmNeTkb2ZWQ07+ZmY19P8BpG+kJW1nlP4AAAAASUVORK5CYII=
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As a complementary test, let's verify that the two runs of <code>omp()</code> on FD and D we constructed before for the toy omp give the same results even if the vector to retrieve is not sparse. Here for instance, $ \| x_1 \|_0 = 98 $</p>
+<p>As a complementary test, let's verify that the two runs of <code>omp()</code> on FD and D we constructed before for the toy omp give the same results even if the vector to retrieve is not very sparse. Here for instance, $ \| x_1 \|_0 = 98 $</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">nnz</span> <span class="o">=</span> <span class="mi">98</span>
@@ -12376,15 +12376,12 @@ ZjXk5G9mVkNO/mZmNeTkb2ZWQ07+ZmY19P8BpG+kJW1nlP4AAAAASUVORK5CYII=
 <span class="n">nnz_inds</span> <span class="o">=</span> <span class="n">randperm</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">)[:</span><span class="n">nnz</span><span class="p">]</span>
 <span class="n">x1</span><span class="p">[</span><span class="n">nnz_inds</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">randn</span><span class="p">()</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">FD</span><span class="o">*</span><span class="n">x1</span>
-<span class="n">x2</span> <span class="o">=</span> <span class="n">omp</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="n">nnz</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">x3</span> <span class="o">=</span> <span class="n">omp</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">FD</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="n">nnz</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x2</span> <span class="o">=</span> <span class="n">omp</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="n">nnz</span><span class="p">)</span>
+<span class="n">x3</span> <span class="o">=</span> <span class="n">omp</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">FD</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="n">nnz</span><span class="p">)</span>
 <span class="c1"># verify if the solutions differ</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Are x2 and x3 solutions almost equal?&quot;</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">x2</span><span class="o">-</span><span class="n">x3</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">x3</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">12</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Is x1 retrieved into x2?&quot;</span><span class="p">,</span> <span class="n">allclose</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">x2</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Is x1 retrieved into x3?&quot;</span><span class="p">,</span> <span class="n">allclose</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">x3</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;x3 mse: &quot;</span><span class="p">,</span><span class="n">norm</span><span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">D</span><span class="o">*</span><span class="n">x2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;x2 mse: &quot;</span><span class="p">,</span><span class="n">norm</span><span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">FD</span><span class="o">*</span><span class="n">x3</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;x2 and x3 nnz:&quot;</span><span class="p">,</span> <span class="n">count_nonzero</span><span class="p">(</span><span class="n">x2</span><span class="p">),</span> <span class="n">count_nonzero</span><span class="p">(</span><span class="n">x3</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -12401,14 +12398,9 @@ ZjXk5G9mVkNO/mZmNeTkb2ZWQ07+ZmY19P8BpG+kJW1nlP4AAAAASUVORK5CYII=
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Stopping. Exact signal representation found!
-Stopping. Exact signal representation found!
-Are x2 and x3 solutions almost equal? True
+<pre>Are x2 and x3 solutions almost equal? True
 Is x1 retrieved into x2? False
 Is x1 retrieved into x3? False
-x3 mse:  9.97158316108e-31
-x2 mse:  1.0338666537e-30
-x2 and x3 nnz: 84 84
 </pre>
 </div>
 </div>
@@ -12421,19 +12413,19 @@ x2 and x3 nnz: 84 84
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As expected, we didn't retrieve our starting x1 (the reason is the condition already discussed in 1.). However we did even better by finding sparser representations. Anyway let's mention that here again like it was with the toy OMP it works the same with the Faust API or with numpy.</p>
-<p>Finally, let's check the compute time for applying our dictionary to a vector both for the numpy and Faust versions.</p>
+<p>As expected, we didn't retrieve our starting x1 (the reason is the condition already discussed in <a href="#2.-The-Test-Case-Dictionary">2.</a>. However let's mention that here again like it was with the toy OMP it works the same with the Faust API or with numpy.</p>
+<p>Finally, let's check the computation time for applying our dictionary to a vector both for the numpy and Faust versions.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">timeit</span> D*x2
-<span class="o">%</span><span class="k">timeit</span> FD*x3
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">timeit</span> D*x
+<span class="o">%</span><span class="k">timeit</span> FD*x
 </pre></div>
 
 </div>
@@ -12450,9 +12442,9 @@ x2 and x3 nnz: 84 84
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>The slowest run took 4.50 times longer than the fastest. This could mean that an intermediate result is being cached.
-47.1 µs ± 30.2 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
-25.7 µs ± 1.98 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+<pre>The slowest run took 5.22 times longer than the fastest. This could mean that an intermediate result is being cached.
+52.1 µs ± 40.7 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+23.6 µs ± 2.56 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 </pre>
 </div>
 </div>
