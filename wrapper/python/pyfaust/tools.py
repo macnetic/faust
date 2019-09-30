@@ -97,8 +97,8 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
 
         r_count+=1
 
-        Rs = lstsq(R[0:r_count, 0:r_count].H, Ptx[IN])[0]
-        s[IN] = lstsq(R[0:r_count, 0:r_count], Rs)[0]
+        Rs = lstsq(R[0:r_count, 0:r_count].H, Ptx[IN], rcond=-1)[0]
+        s[IN] = lstsq(R[0:r_count, 0:r_count], Rs, rcond=-1)[0]
 
         residual = y - P(s)
         DR = Pt(residual)
@@ -173,7 +173,7 @@ def UpdateCholeskyFull(R,P,Pt,index,m):
         # linsolve_options_transpose.UT = true;
         # linsolve_options_transpose.TRANSA = true;
         # matlab opts for linsolve() are respected here
-        new_col = lstsq(R.H, Pt_new_vector[index[0:-1]])[0] # solve() only works
+        new_col = lstsq(R.H, Pt_new_vector[index[0:-1]], rcond=-1)[0] # solve() only works
         # for full rank square matrices, that's why we use ltsq
         R_ii = np.sqrt(new_vector.H*new_vector -
                        new_col.H*new_col.astype(np.complex))
