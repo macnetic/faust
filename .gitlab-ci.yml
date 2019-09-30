@@ -77,9 +77,9 @@ package_macos:
         - make LANG=en_GB.UTF-8
         - 'echo $MACOS_PASS | sudo -S make install LANG=en_GB.UTF-8'
           #- 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
-        - pkgbuild --identifier fr.inria.faust --version $SHA_START --root /opt/local/faust-$SHA_START --install-location /opt/local/faust-$SHA_START --scripts . ./faust-$SHA_START.pkg
+        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust --version $SHA_START --root /opt/local/faust-$SHA_START --install-location /opt/local/faust-$SHA_START --scripts . ./faust-$SHA_START.pkg
         - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
-        - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
+        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
         - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$SHA_START.pkg ./distribution.plist
         - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$SHA_START'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
         - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$SHA_START.pkg
@@ -150,9 +150,9 @@ package_macos_release:
         - make LANG=en_GB.UTF-8
         - 'echo $MACOS_PASS | sudo -S make install LANG=en_GB.UTF-8'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust -ov -format UDRW faust-$CI_COMMIT_TAG'
-        - pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust --install-location /opt/local/faust --scripts . ./faust-$CI_COMMIT_TAG.pkg
+        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust --install-location /opt/local/faust --scripts . ./faust-$CI_COMMIT_TAG.pkg
         - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
-        - pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
+        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
         - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_TAG.pkg ./distribution.plist
         - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$CI_COMMIT_TAG'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
         - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$CI_COMMIT_TAG.pkg
