@@ -99,6 +99,7 @@ if(BUILD_DOCUMENTATION)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_factorization.ipynb ${PROJECT_BINARY_DIR}/doc/html/Faust_factorization.ipynb COPYONLY)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_factorization.html ${PROJECT_BINARY_DIR}/doc/html/Faust_factorization.html COPYONLY)
 	configure_file(${FAUST_SRC_TEST_SRC_PYTHON_DIR}/test_svd_rc_vs_err.py ${PROJECT_BINARY_DIR}/doc/html/test_svd_rc_vs_err.py COPYONLY)
+	# create a zip archive for the notebooks
 	if(UNIX)
 		file(GLOB IPYNB_FILES "${FAUST_DOC_SRC_DIR}" "*.ipynb")
 		#message(STATUS "IPYNB_FILES=${IPYNB_FILES}")
@@ -114,6 +115,8 @@ if(BUILD_DOCUMENTATION)
 		# set(IPYNB_ZIP_ARG Faust_creation.ipynb Faust_factorization.ipynb Faust_manipulation.ipynb Use_of_Faust_objects_in_algorithms.ipynb)
 		add_custom_target(zip_notebooks ALL zip pyfaust_notebooks.zip -b ${PROJECT_BINARY_DIR}/doc/html ${IPYNB_ZIP_ARG} WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/doc/html COMMENT "Archiving the notebook in a zip file" VERBATIM)
 	endif(UNIX)
+	# filter out the HTML tags in pyfaust doc strings
+	add_custom_target(filter_html_tag_in_pyfaust ALL ${PYTHON3_EXE} ${FAUST_DOC_SRC_DIR}/post_docgen_html_tags_filter.py ${FAUST_PYTHON_BIN_DIR}/pyfaust WORKING_DIRECTORY ${PROJECT_BINARY_DIR} COMMENT "Filtering out HTML tags from pyfaust modules" VERBATIM)
 endif(BUILD_DOCUMENTATION)
 
 
