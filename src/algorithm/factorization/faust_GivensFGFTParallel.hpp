@@ -176,7 +176,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L()
 		int th_id = 0;
 		int th_offset = 0;
 #endif
-//first attempt to openmize the loops (abandonned for the single section started above)
+//first attempt to openmp-ize the loops (abandoned for the single section started above)
 //#ifdef OPT_UPDATE_L_OMP
 //#pragma omp parallel for schedule(static) private(c, s, choice_id, p, q, i) default(shared) // num_threads(4)
 //#endif OPT_UPDATE_L_OMP

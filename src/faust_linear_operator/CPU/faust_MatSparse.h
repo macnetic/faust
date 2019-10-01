@@ -277,7 +277,15 @@ namespace Faust
 			//! M = (*this) * M if opThis='N'
 			// M = (*this)' * M if opThis='T'
 			void multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const;
+			//! \brief compute MatSparse-MatSparse multiplication
+			//! \param M : the dense matrix
+			//! \param opThis : character
+			//! M = (*this) * M if opThis='N'
+			// M = (*this)' * M if opThis='T'
+			void multiply(Faust::MatSparse<FPP,Cpu> & M, char opThis) const;
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
+			//! \brief multiply this by M into this.
+			void multiplyRight(Faust::MatSparse<FPP,Cpu> & M);
 			//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio. The variable is encoded in full matrix format (on the contrary to toMatVarIOVar() which keeps the sparse representation).
 			// \param transpose: set to true to obtain the matio variable for the transpose Matrix.
 			// \param conjugate: set it to true to obtain the matio variable for the conjugate Matrix.
@@ -293,7 +301,7 @@ namespace Faust
 
 			Faust::MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			Faust::MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
-static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density);
+			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density);
 			//\param : per_row means the density applies for each line rather than globally for the matrix
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density, bool per_row);
 			static MatSparse<FPP, Cpu>* eye(faust_unsigned_int num_rows, faust_unsigned_int num_cols);

@@ -77,7 +77,6 @@ namespace Faust {
 			faust_unsigned_int fancy_num_rows;
 			faust_unsigned_int fancy_num_cols;
 			shared_ptr<Transform<FPP,Cpu>> transform;
-			RefManager refman;
 
 			void eval_sliced_Transform();
 			void eval_fancy_idx_Transform();

@@ -240,13 +240,31 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opTh
 
 }
 
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatSparse<FPP,Cpu> & M, char opThis) const
+{
+	faust_unsigned_int nbColOpS, nbRowOpS;
+	this->setOp(opThis,nbRowOpS, nbColOpS);
 
+	if(nbColOpS != M.getNbRow())
+	{
+		handleError(m_className,"multiply: incorrect matrix dimensions\n");
+	}
 
+	if (opThis == 'N')
+		M.mat = this->mat * M.mat;
+	else
+		M.mat = this->mat.transpose() * M.mat;
 
+	M.dim1 = nbRowOpS;
+}
 
-
-
-
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::multiplyRight(Faust::MatSparse<FPP,Cpu> & M)
+{
+	this->mat = this->mat*M.mat;
+	this->update_dim();
+}
 
 template<typename FPP>
 Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatDense<FPP,Cpu>& M) :
