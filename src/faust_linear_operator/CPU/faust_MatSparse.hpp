@@ -260,7 +260,7 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatSparse<FPP,Cpu> & M, char opT
 }
 
 template<typename FPP>
-void Faust::MatSparse<FPP,Cpu>::multiplyRight(Faust::MatSparse<FPP,Cpu> & M)
+void Faust::MatSparse<FPP,Cpu>::multiplyRight(Faust::MatSparse<FPP,Cpu> const& M)
 {
 	this->mat = this->mat*M.mat;
 	this->update_dim();

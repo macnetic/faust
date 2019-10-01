@@ -437,6 +437,52 @@ void Faust::MatDense<FPP,Cpu>::multiplyRight(Faust::MatDense<FPP,Cpu> const& A)
 
 }
 
+	template<typename FPP>
+void Faust::MatDense<FPP,Cpu>::multiplyRight(Faust::MatSparse<FPP,Cpu> const& A)
+{
+
+#ifdef __COMPILE_TIMERS__
+	t_mult_right.start();
+#endif
+
+	if (this->dim2 != A.dim1)
+	{
+		handleError(m_className, "multiplyRight : dimension conflict between matrix");
+	}
+
+	if(isZeros)
+	{
+		//std::cout<<"zero"<<std::endl;
+		resize(this->dim1,A.dim2);
+		FPP *const ptr_data_dst = getData();
+		memset(ptr_data_dst, 0, sizeof(FPP) * this->dim1*this->dim2);
+		isZeros = true;
+		isIdentity = false;
+#ifdef __COMPILE_TIMERS__
+		t_mult_right.stop();
+#endif
+		return;
+	}
+
+	if(isIdentity)
+	{
+		this->operator=(A);
+#ifdef __COMPILE_TIMERS__
+		t_mult_right.stop();
+#endif
+		return;
+	}
+
+	MatDense this_copy((*this));
+	spgemm<FPP>(this_copy,A,(*this),1.0,0.0,'N','N');
+
+
+#ifdef __COMPILE_TIMERS__
+	t_mult_right.stop();
+#endif
+
+}
+
 /*
    template<typename FPP>
    void Faust::MatDense<FPP,Cpu>::multiplyLeft(Faust::MatDense<FPP,Cpu> const& A)
@@ -580,6 +626,29 @@ void Faust::MatDense<FPP,Cpu>::add(Faust::MatDense<FPP,Cpu> const& A)
 
 	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::sub(Faust::MatDense<FPP,Cpu> const& A)
+{
+#ifdef __COMPILE_TIMERS__
+	t_sub.start();
+#endif
+	if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
+	{
+		std::cout<<"sub"<<std::endl;			
+		std::cout<<" this dimension ("<<this->getNbRow()<<","<<this->getNbCol()<<")"<<std::endl;		
+		std::cout<<" A dimension ("<<A.getNbRow()<<","<<A.getNbCol()<<")"<<std::endl;	
+		handleError(m_className, "sub : matrix dimension not equal");
+	}
+	mat = mat - A.mat;
+
+	isZeros = false;
+	isIdentity = false;
+
+#ifdef __COMPILE_TIMERS__
+	t_sub.stop();
+#endif
+}
+
+	template<typename FPP>
+void Faust::MatDense<FPP,Cpu>::sub(Faust::MatSparse<FPP,Cpu> const& A)
 {
 #ifdef __COMPILE_TIMERS__
 	t_sub.start();

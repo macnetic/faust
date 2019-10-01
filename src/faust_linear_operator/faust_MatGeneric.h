@@ -117,6 +117,11 @@ namespace Faust
 	// M = (*this)' * M if opThis='T' 
 	virtual void multiply(Faust::MatDense<FPP,DEVICE> & M, char opThis) const=0;
 
+	virtual void multiply(Faust::MatSparse<FPP, DEVICE>& M, char opThis) const=0;
+
+	virtual void multiplyRight(Faust::MatSparse<FPP, DEVICE> const& M) =0;
+
+
 
 	
 	//! \brief transpose the matrix
@@ -192,6 +197,8 @@ namespace Faust
 	virtual Faust::MatGeneric<FPP,DEVICE>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const=0;
 
 	void set_orthogonal(const bool is_ortho) { this->is_ortho = is_ortho; /* TODO: move def in hpp*/}
+
+	virtual const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const =0;
 
 	bool is_orthogonal() { return this->is_ortho; /* TODO: move def in hpp*/}
 	//! \brief 

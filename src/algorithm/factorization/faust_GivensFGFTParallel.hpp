@@ -74,7 +74,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::next_step()
 	substep_fun substep[] = {
 		&GivensFGFTParallel<FPP,DEVICE,FPP2>::max_L,
 		&GivensFGFTParallel<FPP,DEVICE,FPP2>::loop_update_fact, //responsible to call choose_pivot(), calc_theta() and update_fact()
-		&GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L,
+		&GivensFGFT<FPP,DEVICE,FPP2>::update_L,
 		&GivensFGFTParallel<FPP,DEVICE,FPP2>::update_D,
 		&GivensFGFTParallel<FPP,DEVICE,FPP2>::update_err};
 
@@ -148,7 +148,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_fact()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L()
+void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(MatDense<FPP,Cpu> & L)
 {
 	// L = S'*L*S
 //#undef OPT_UPDATE_L
@@ -215,6 +215,15 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L()
 	this->L.multiplyRight(this->facts[this->ite]);
 #endif
 }
+
+template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(MatSparse<FPP,Cpu> & L)
+{
+	// L = S'*L*S
+	this->facts[this->ite].multiply(this->L, 'T');
+	this->L.multiplyRight(this->facts[this->ite]);
+}
+
 
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTParallel<FPP,DEVICE,FPP2>::finish_fact()

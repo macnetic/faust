@@ -285,7 +285,8 @@ namespace Faust
 			void multiply(Faust::MatSparse<FPP,Cpu> & M, char opThis) const;
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
 			//! \brief multiply this by M into this.
-			void multiplyRight(Faust::MatSparse<FPP,Cpu> & M);
+			void multiplyRight(Faust::MatSparse<FPP,Cpu> const & M);
+
 			//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio. The variable is encoded in full matrix format (on the contrary to toMatVarIOVar() which keeps the sparse representation).
 			// \param transpose: set to true to obtain the matio variable for the transpose Matrix.
 			// \param conjugate: set it to true to obtain the matio variable for the conjugate Matrix.
@@ -295,7 +296,8 @@ namespace Faust
 			matvar_t* toMatIOVarDense(bool transpose, bool conjugate) const;
 			FPP normL1(const bool transpose=false) const;
 			FPP normL1(faust_unsigned_int&, const bool transpose=false) const;
-			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return const_cast<Eigen::SparseMatrix<FPP,Eigen::RowMajor>*>(&mat)->coeffRef(i,j);}
+			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return mat.coeff(i,j);}
+
 			Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 			Faust::MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
 			Faust::MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;

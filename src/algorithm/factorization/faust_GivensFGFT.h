@@ -46,7 +46,7 @@ namespace Faust {
 				/** \brief Graph Laplacian to diagonalize/approximate. */
 				Faust::MatDense<FPP, DEVICE> Lap;
 				/** \brief L iteration factor:  L_i = S^T L_{i-1} S, initialized from Lap (with S being facts[i]). */
-				Faust::MatDense<FPP, DEVICE> L;
+				Faust::MatGeneric<FPP, DEVICE> &L;
 				/** \brief Rotation angle theta for the current iteration's Givens matrix. */
 				FPP2 theta;
 
@@ -155,17 +155,21 @@ namespace Faust {
 				 */
 				virtual void update_L();
 
+				virtual void update_L(MatDense<FPP,Cpu> &);
+
+				virtual void update_L(MatSparse<FPP,Cpu> &);
+
 				/**
 				 * Computes the first S'*L (only used by update_L() in optimization enabled code).
 				 *
 				 */
-				void update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q);
+				void update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L);
 
 				/**
 				 * Computes L*S (only used by update_L() in optimization enabled code).
 				 * Must be called after update_L_first() to finish the update of L = S'*L*S.
 				 */
-				void update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q);
+				void update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L);
 
 				/**
 				 * \brief Algo. step 2.5.
@@ -242,7 +246,7 @@ namespace Faust {
 				 * @see get_Lap()
 				 *
 				 */
-				const MatDense<FPP,DEVICE>& get_L() const ;
+				const MatGeneric<FPP,DEVICE>& get_L() const ;
 
 				/**
 				 * Returns the vector of all pivot choices (p, q) coordinates made by the algorithm until the last iteration.

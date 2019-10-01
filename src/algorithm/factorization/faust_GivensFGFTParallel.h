@@ -56,7 +56,8 @@ namespace Faust {
 		 * Computes the coefficients of the last selected rotation matrix to be put later in current iteration factor.
 		 */
 		void update_fact();
-		void update_L();
+		void update_L(MatSparse<FPP,Cpu> &L);
+		void update_L(MatDense<FPP,Cpu> &L);
 		/**
 		 * Constructs the current factor after computing all the coefficients (of rotation matrices) in temporary buffers (see update_fact()).
 		 */

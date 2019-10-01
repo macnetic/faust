@@ -253,8 +253,22 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 	//! \param opThis : character	
 	//! M = (*this) * M if opThis='N'
 	//  M = (*this)' * M if opThis='T' 
-	void multiply(Faust::MatDense<FPP,Cpu> & M, const char opThis) const
+	void multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const
 	{Faust::gemm<FPP>((*this),M,M,1.0,0.0,opThis,'N');}
+
+	void multiply(Faust::MatSparse<FPP,Cpu> & M, char opThis) const
+	{
+		//compute (this^T, M^T)^T 
+		if(opThis == 'T' || opThis == 'H')
+			opThis = 'N';
+		else
+			opThis = 'H';
+		Faust::MatDense<FPP,Cpu> out;
+		Faust::spgemm<FPP>(M, *this,out,1.0,0.0,'H', opThis);
+		M = out;
+		M.makeCompression();
+		M.transpose();
+	}
 
 
  	///********* FIN METHOD INHERITED FROM VIRTUAL MATGENERIC *********///
@@ -369,7 +383,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! \brief Replace this by (this) * A
         void multiplyRight(MatDense<FPP,Cpu> const& A);
 
-
+		void multiplyRight(MatSparse<FPP, Cpu> const& A);
 
 
         //!  \brief replace this by lambda * (*this)
@@ -383,6 +397,8 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
         //!  \brief (*this) = (*this) - A
         void sub(MatDense<FPP,Cpu> const& A);
+
+		void sub(MatSparse<FPP,Cpu> const& A);
 
         //! \brief Displays the MatDense
         void Display() const;
@@ -426,6 +442,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
         void operator=(Faust::MatSparse<FPP,Cpu> const& A);
         void operator-=(MatDense<FPP,Cpu> const& A){sub(A);}
+		void operator-=(MatSparse<FPP,Cpu> const& A){sub(A);}
         void operator+=(MatDense<FPP,Cpu> const& A){add(A);}
         void operator*=(MatDense<FPP,Cpu> const& A){multiplyRight(A);}
 
