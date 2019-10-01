@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from sys import argv
 from glob import glob
 from os.path import join
@@ -8,7 +9,7 @@ html_tags = [ '<br>', '<br/>', '<b>', '<b/>', '</b>', '<code>', '</code>' ]
 if __name__ == "__main__":
     py_mods = glob(join(argv[1], '**.py'))
     for script2filter in py_mods:
-        f = open(script2filter)
+        f = open(script2filter, encoding='utf8')
         lines = f.readlines()
         filtered_lines = []
         for line in lines:
