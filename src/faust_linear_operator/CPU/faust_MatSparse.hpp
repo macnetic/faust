@@ -260,7 +260,7 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatSparse<FPP,Cpu> & M, char opT
 }
 
 template<typename FPP>
-void Faust::MatSparse<FPP,Cpu>::multiplyRight(Faust::MatSparse<FPP,Cpu> const& M)
+void Faust::MatSparse<FPP,Cpu>::multiplyRight(Faust::MatSparse<FPP,Cpu> const & M)
 {
 	this->mat = this->mat*M.mat;
 	this->update_dim();
@@ -1008,6 +1008,29 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::eye(faust_unsigned_int n
 	delete[] colind;
 	delete[] rowptr;
 	return eye;
+}
+
+template<typename FPP>
+list<pair<int,int>> Faust::MatSparse<FPP,Cpu>::nonzeros_indices() const
+{
+	list<pair<int,int>> nz_inds;
+	int i,j, k;
+	unsigned int rowi_nelts = 0;
+	//makeCompression(); // assuming it's already done
+	for(i=0;i<this->dim1;i++)
+	{
+		rowi_nelts = getOuterIndexPtr()[i+1] - getOuterIndexPtr()[i];
+		if(rowi_nelts)
+		{
+			//non-empty row (nonzero elements)
+			for(k=getOuterIndexPtr()[i];k<getOuterIndexPtr()[i+1];k++)
+			{
+				j = getInnerIndexPtr()[k];
+				nz_inds.push_back(make_pair(i,j));
+			}
+		}
+	}
+	return nz_inds;
 }
 
 

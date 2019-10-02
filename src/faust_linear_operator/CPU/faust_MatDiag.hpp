@@ -173,4 +173,12 @@ MatGeneric<FPP,Cpu>* MatDiag<FPP>::get_rows(faust_unsigned_int* row_ids, faust_u
 {
 	return MatSparse<FPP,Cpu>(*this).get_rows(row_ids, num_rows);
 }
+template<typename FPP>
+list<pair<int,int>> MatDiag<FPP>::nonzeros_indices() const
+{
+	list<pair<int,int>> nz_inds;
+	for(int i=0;i<this->getNbRow();i++)
+		nz_inds.push_back(make_pair(i,i));
+	return nz_inds;
+}
 

@@ -304,10 +304,14 @@ namespace Faust
 
 			Faust::MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			Faust::MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
+
+			list<pair<int,int>> nonzeros_indices() const;
+
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density);
 			//\param : per_row means the density applies for each line rather than globally for the matrix
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density, bool per_row);
 			static MatSparse<FPP, Cpu>* eye(faust_unsigned_int num_rows, faust_unsigned_int num_cols);
+			
 			//! Destructor
 			~MatSparse(){/*std::cout<<"destructor MatSparse"<<std::endl;*//*this->mat.resize(0,0);*/}
 
