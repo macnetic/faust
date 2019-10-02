@@ -44,9 +44,9 @@ namespace Faust {
 				/** \brief Pivot choices (p, q) coordinates. */
 				vector<pair<int,int>> coord_choices;
 				/** \brief Graph Laplacian to diagonalize/approximate. */
-				Faust::MatDense<FPP, DEVICE> Lap;
+				Faust::MatGeneric<FPP, DEVICE>& Lap;
 				/** \brief L iteration factor:  L_i = S^T L_{i-1} S, initialized from Lap (with S being facts[i]). */
-				Faust::MatGeneric<FPP, DEVICE> &L;
+				Faust::MatGeneric<FPP, DEVICE> *L;
 				/** \brief Rotation angle theta for the current iteration's Givens matrix. */
 				FPP2 theta;
 
@@ -100,9 +100,10 @@ namespace Faust {
 				 * \param Lap The Laplacian matrix to approximate/diagonalize.
 				 * \param J The number of iterations, Givens rotations factors.
 				 * */
+				GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0);
 				GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0);
 				/** Destructor */
-				virtual ~GivensFGFT() {delete[] q_candidates;};
+				virtual ~GivensFGFT() {delete[] q_candidates; delete L;};
 
 				/**
 				 * \brief Algo. main step.

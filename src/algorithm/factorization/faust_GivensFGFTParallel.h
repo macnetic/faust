@@ -40,6 +40,7 @@ namespace Faust {
 		list<pair<int,int>> fact_nz_inds;
 
 		void max_L();
+
 		/**
 		 * After selecting a pivot in iteration previous steps, it's necessary to remove them.
 		 * That's what this function is responsible for.
@@ -83,6 +84,7 @@ namespace Faust {
 		 *
 		 */
 		GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0);
+		GivensFGFTParallel(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0);
 
 	};
 

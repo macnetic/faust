@@ -6,7 +6,15 @@ using namespace Faust;
 #endif
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity) : GivensFGFT<FPP,DEVICE,FPP2>(Lap,J, verbosity), t(t), fact_nrots(0)
+GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity) : GivensFGFT<FPP,DEVICE,FPP2>(Lap, J, verbosity), t(t), fact_nrots(0)
+{
+	this->facts.resize(round(J/(float)t));
+	this->always_theta2 = true;
+	this->coord_choices.resize(0);
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+GivensFGFTParallel<FPP,DEVICE,FPP2>::GivensFGFTParallel(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity) : GivensFGFT<FPP,DEVICE,FPP2>(Lap, J, verbosity), t(t), fact_nrots(0)
 {
 	this->facts.resize(round(J/(float)t));
 	this->always_theta2 = true;
@@ -22,10 +30,21 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::max_L()
 	//    [~,ind_sorted] = sort(L_low(ind_nnz),'descend');
 	//    [Rvec, Svec] = ind2sub([n,n],ind_nnz(ind_sorted));
 	//    RSmat = [Rvec, Svec];
-	MatDense<FPP,DEVICE> L_low = this->L;
+	bool is_L_sparse;
+	MatSparse<FPP,DEVICE> * sL;
+	MatDense<FPP,DEVICE> * dL = dynamic_cast<MatDense<FPP,DEVICE>*>(this->L);
+	MatDense<FPP,DEVICE> L_low;
+	if(is_L_sparse = (dL == nullptr))
+	{
+		sL = dynamic_cast<MatSparse<FPP,DEVICE>*>(this->L);
+		L_low = *sL;
+	}
+	else
+		L_low = *dL;
 	L_low.abs();
 	L_low =	L_low.lower_tri(false);
 	fact_nz_inds = L_low.nonzeros_indices();
+
 
 #ifdef DEBUG_GIVENS
 	for(auto &p : fact_nz_inds)
@@ -189,7 +208,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(MatDense<FPP,Cpu> & L)
 			p = this->coord_choices[choice_id].first;
 			q = this->coord_choices[choice_id].second;
 			//rely on parent for doing the job
-			this->update_L_first(L_vec_p, L_vec_q, c, s, p, q);
+			this->update_L_first(L_vec_p, L_vec_q, c, s, p, q, L);
 		}
 #ifdef OPT_UPDATE_L_OMP
 #pragma omp barrier //S'*L must be computed before starting L*S computation
@@ -207,12 +226,12 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(MatDense<FPP,Cpu> & L)
 			p = this->coord_choices[choice_id].first;
 			q = this->coord_choices[choice_id].second;
 			//rely on parent for doing the job
-			this->update_L_second(L_vec_p, L_vec_q, c, s, p, q);
+			this->update_L_second(L_vec_p, L_vec_q, c, s, p, q, L);
 		}
 	}
 #else
-	this->facts[this->ite].multiply(this->L, 'T');
-	this->L.multiplyRight(this->facts[this->ite]);
+	this->facts[this->ite].multiply(L, 'T');
+	L.multiplyRight(this->facts[this->ite]);
 #endif
 }
 
@@ -220,8 +239,8 @@ template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(MatSparse<FPP,Cpu> & L)
 {
 	// L = S'*L*S
-	this->facts[this->ite].multiply(this->L, 'T');
-	this->L.multiplyRight(this->facts[this->ite]);
+	this->facts[this->ite].multiply(L, 'T');
+	L.multiplyRight(this->facts[this->ite]);
 }
 
 
