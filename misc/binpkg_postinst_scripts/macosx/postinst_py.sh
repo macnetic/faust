@@ -17,8 +17,8 @@ function link_py_files(){
 	[[ ! -d "${PY_SITE_PACKAGES_PATH}" ]] && return
 	[[ -n "$DEBUG" ]] && echo PY_SITE_PACKAGES_PATH=${PY_SITE_PACKAGES_PATH}
 	PYFILES=${FAUST_PY_WRAPPER_PATH}/pyfaust
-	[[ "$PY_MAJOR_MINOR_VER" = 3* ]] && PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/FaustCorePy.cpython-3*so" || \
-					    PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/FaustCorePy.so"
+	[[ "$PY_MAJOR_MINOR_VER" = 3* ]] && PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/_FaustCorePy.cpython-3*so" || \
+					    PYFILES+=" ${FAUST_PY_WRAPPER_PATH}/_FaustCorePy.so"
 	for PYFILE in $PYFILES
 	do
 		[[ -n "$DEBUG" ]] && echo ln -sf "$PYFILE" "${PY_SITE_PACKAGES_PATH}/"

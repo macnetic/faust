@@ -2,7 +2,7 @@
 set(FAUST_PYTHON_LIB_DIR "'${FAUST_BIN_DIR}'")
 
 # set the variable for cython extension sources
-set(PY_EXT_SOURCES "['${FAUST_PYTHON_BIN_DIR}/FaustCorePy.pyx']")
+set(PY_EXT_SOURCES "['${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx']")
 
 set(FAUST_PYTHON_LIBS "'faust'")
 
@@ -71,7 +71,7 @@ file(READ ${FAUST_PYTHON_SRC_DIR}/PYFAUST_LICENSE_HEADER.txt PYFAUST_LICENSE_HEA
 
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)
 configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
-configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/FaustCorePy.pyx COPYONLY)
+configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx COPYONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCy.pxd ${FAUST_PYTHON_BIN_DIR}/FaustCoreCy.pxd COPYONLY)
 
 
@@ -187,26 +187,26 @@ elseif(WIN32)
 					find_library(PYTHON_STATIC_LIB_PATH libpython${PY_VER}.a PATHS ${PYTHON_PARENT_PATH} PATH_SUFFIXES libs NO_DEFAULT_PATH)
 					#message(STATUS "PYTHON_STATIC_LIB_PATH=${PYTHON_STATIC_LIB_PATH}")
 					if(PY_VER MATCHES 3)
-						set(PY_DYNLIB "FaustCorePy.cp${PY_VER}-win_amd64.pyd")
+						set(PY_DYNLIB "_FaustCorePy.cp${PY_VER}-win_amd64.pyd")
 						set(PY3_VER ${PY_VER_WITH_POINTS})
 						string(REGEX REPLACE ".*([0-9])$" "\\1" PY3_MINOR_VER ${PY_VER})
 						set(PY3_MINOR_VER ${PY3_MINOR_VER} PARENT_SCOPE)
 					else() #py 2.7.x
-						set(PY_DYNLIB "FaustCorePy.pyd")
+						set(PY_DYNLIB "_FaustCorePy.pyd")
 					endif()
 					set(PY_STATIC_LIBS "$<TARGET_FILE:${FAUST_TARGET}>;${MATIO_STATIC_LIB_PATH};${PYTHON_STATIC_LIB_PATH}")
 					string(REGEX REPLACE "\n" ";" PY_STATIC_LIBS "${PY_STATIC_LIBS}")
 					add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
 						COMMAND   ${CYTHON_EXE}
-						ARGS "--cplus" "-o" "${FAUST_PYTHON_BIN_DIR}/FaustCorePy.cpp"  "${FAUST_PYTHON_BIN_DIR}/FaustCorePy.pyx" 
+						ARGS "--cplus" "-o" "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.cpp"  "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx" 
 						# patch the weird bug: missing cmath include in cython generated cpp code
 						COMMAND echo \#include ^<cmath^> ">" "FAUST_CORE_TMP_FILE"
 						COMMAND type
-						ARGS "FAUST_CORE_TMP_FILE" "FaustCorePy.cpp" ">" "FaustCorePy.cpp2" 2>NUL 
+						ARGS "FAUST_CORE_TMP_FILE" "_FaustCorePy.cpp" ">" "_FaustCorePy.cpp2" 2>NUL 
 						COMMAND type
-						ARGS "FaustCorePy.cpp2" ">" "FaustCorePy.cpp" 2>NUL
+						ARGS "_FaustCorePy.cpp2" ">" "_FaustCorePy.cpp" 2>NUL
 						COMMAND ${CMAKE_CXX_COMPILER}
-						ARGS "-std=c++11" "-shared" "-DMS_WIN64" "-s" "-O2" "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
+						ARGS "-std=c++11" "-shared" "-DMS_WIN64" "-s" "-O2" "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
 						COMMENT   "Creating pyfaust${PY_VER}")
 				endif()
 			endforeach()

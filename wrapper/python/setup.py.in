@@ -18,7 +18,7 @@ if sys.platform == 'win32':
     from os import sep
     from glob import glob
 
-    PyFaust = Extension('FaustCorePy',
+    PyFaust = Extension('_FaustCorePy',
                         sources = @PY_EXT_SOURCES@,
                         language = 'c++',
                         include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],
@@ -31,7 +31,7 @@ if sys.platform == 'win32':
 
 
 else: # linux and mac
-    PyFaust = Extension('FaustCorePy',
+    PyFaust = Extension('_FaustCorePy',
                         sources = @PY_EXT_SOURCES@,
                         language = 'c++',
                         include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],

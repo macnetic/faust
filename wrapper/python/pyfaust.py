@@ -6,7 +6,7 @@
 import numpy as np, scipy
 from scipy.io import loadmat
 from scipy.sparse import csr_matrix, csc_matrix
-import FaustCorePy
+import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
 
@@ -149,7 +149,7 @@ class Faust:
                 raise Exception("factors must be a non-empty list of/or a numpy.ndarray, "
                                 "scipy.sparse.csr.csr_matrix/csc.csc_matrix.")
             if(factors is not None and len(factors) > 0):
-                F.m_faust = FaustCorePy.FaustCore(factors, scale);
+                F.m_faust = _FaustCorePy.FaustCore(factors, scale);
             else:
                 raise Exception("Cannot create an empty Faust.")
 
@@ -1325,6 +1325,10 @@ class Faust:
         """
         Returns the right hand side factors of F from index i to F.numfactors()-1.
 
+        Returns:
+            a Faust if the size factor set to be returned is greater than 1, a
+            numpy array or matrix otherwise.
+
         <b/> See also Faust.factors, Faust.left, Faust.numfactors
         """
         i = F._check_factor_idx(i)
@@ -1333,6 +1337,10 @@ class Faust:
     def left(F, i):
         """
         Returns the left hand side factors of F from index 0 to i included.
+
+        Returns:
+            a Faust if the size of factor set to be returned is greater than 1, a
+            numpy array or matrix otherwise.
 
         <b/> See also Faust.factors, Faust.right
         """
@@ -1580,7 +1588,7 @@ class FaustFactory:
                              "the last residuum constraint defined in p. "
                              "Likewise its number of rows must be consistent "
                              "with the first factor constraint defined in p.")
-        core_obj, _lambda = FaustCorePy.FaustFact.fact_palm4msa(M, p)
+        core_obj, _lambda = _FaustCorePy.FaustFact.fact_palm4msa(M, p)
         F = Faust(core_obj=core_obj)
         if(ret_lambda):
             return F, _lambda
@@ -1601,7 +1609,7 @@ class FaustFactory:
                              "the last residuum constraint defined in p. "
                              "Likewise its number of rows must be consistent "
                              "with the first factor constraint defined in p.")
-        core_obj, _lambda, D = FaustCorePy.FaustFact.fact_palm4msa_fft(Lap, p)
+        core_obj, _lambda, D = _FaustCorePy.FaustFact.fact_palm4msa_fft(Lap, p)
         F = Faust(core_obj=core_obj)
         if(ret_lambda):
             return F, D, _lambda
@@ -1740,7 +1748,7 @@ class FaustFactory:
         """
         p = FaustFactory._prepare_hierarchical_fact(M,p, "fact_hierarchical", ret_lambda,
                                   ret_params)
-        core_obj,_lambda = FaustCorePy.FaustFact.fact_hierarchical(M, p)
+        core_obj,_lambda = _FaustCorePy.FaustFact.fact_hierarchical(M, p)
         F = Faust(core_obj=core_obj)
         ret_list = [ F ]
         if(ret_lambda):
@@ -1954,7 +1962,7 @@ class FaustFactory:
         if(n > 2**log2n): raise ValueError("n must be a power of 2.")
         if(not isinstance(norma, bool)):
             raise TypeError("norma must be True of False.")
-        H = Faust(core_obj=FaustCorePy.FaustCore.hadamardFaust(log2n, norma))
+        H = Faust(core_obj=_FaustCorePy.FaustCore.hadamardFaust(log2n, norma))
         return H
 
     @staticmethod
@@ -1999,7 +2007,7 @@ class FaustFactory:
         if(n > 2**log2n): raise ValueError("n must be a power of 2.")
         if(not isinstance(norma, bool)):
             raise TypeError("norma must be True of False.")
-        F = Faust(core_obj=FaustCorePy.FaustCore.fourierFaust(log2n, norma))
+        F = Faust(core_obj=_FaustCorePy.FaustCore.fourierFaust(log2n, norma))
         return F
 
     @staticmethod
@@ -2142,7 +2150,7 @@ class FaustFactory:
             density = -1
         elif(not isinstance(density, np.float)):
             raise ValueError("FaustFactory.rand(): density must be a float")
-        rF = Faust(core_obj=FaustCorePy.FaustCore.randFaust(
+        rF = Faust(core_obj=_FaustCorePy.FaustCore.randFaust(
             fac_type_map[fac_type], field, min_num_factors, max_num_factors,
             min_dim_size, max_dim_size, density, per_row))
         return rF
@@ -2264,7 +2272,7 @@ class FaustFactory:
             raise ValueError("All the numpy arrays must be of the same dtype.")
 
         init_D = _init_init_D(init_D, U.shape[0])
-        core_obj, _lambda, D = FaustCorePy.FaustFact.fact_hierarchical_fft(U, Lap, p,
+        core_obj, _lambda, D = _FaustCorePy.FaustFact.fact_hierarchical_fft(U, Lap, p,
                                                                         init_D)
         F = Faust(core_obj=core_obj)
         ret_list = [ F, D ]
@@ -2417,7 +2425,7 @@ class FaustFactory:
         if(not isinstance(t, int)): raise TypeError("t must be a int")
         if(t < 0): raise ValueError("t must be >= 0")
         t = min(t,J)
-        core_obj,D = FaustCorePy.FaustFact.fact_givens_fgft(Lap, J, t,
+        core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft(Lap, J, t,
                                                             verbosity)
         return Faust(core_obj=core_obj), D
 
