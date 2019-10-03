@@ -2519,3 +2519,16 @@ def vstack(_tuple):
 
     """
     return pyfaust.concatenate(_tuple, axis=0)
+
+def isFaust(obj):
+    """
+        Returns True if obj is a Faust object, False otherwise.
+
+        Examples:
+            >>> from pyfaust import isFaust, FaustFactory
+            >>> isFaust(2)
+            False
+            >>> isFaust(FaustFactory.rand(5,10))
+            True
+    """
+    return Faust.isFaust(obj)
