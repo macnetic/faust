@@ -11970,7 +11970,7 @@ Most of them are also available independently with specific functions.</p>
 <p>For instance, if you want information about factors, nothing is more simple than calling directly the next functions:</p>
 <ul>
 <li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a2b46d3c068ef20d74bb90e382848014e">get_num_factors()</a> ; which gives you the number of factors (aka layers) a Faust object is composed of.</li>
-<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#adc91fd04c17ccaa2f32b7423955ef37d">get_factor()</a> ; which allows you to copy any of the Faust's factors givens its index.</li>
+<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#adc91fd04c17ccaa2f32b7423955ef37d">factors()</a> ; which allows you to copy any of the Faust's factors givens its index.</li>
 </ul>
 <p>Going back to our F object, let's call these functions:</p>
 
@@ -12024,7 +12024,7 @@ Most of them are also available independently with specific functions.</p>
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">f3</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">get_factor</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">f3</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">f3</span>
 </pre></div>
 
@@ -12067,7 +12067,7 @@ Most of them are also available independently with specific functions.</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Contrary to what the singular form of 'get_factor' indicates, it's possible (since Faust 2.3 again) to retrieve a sub-sequence of Faust factors.</p>
+<p>Contrary to what the singular form of 'factors' indicates, it's possible (since Faust 2.3 again) to retrieve a sub-sequence of Faust factors.</p>
 <p>Go straight to the example, extracting factors from F:</p>
 
 </div>
@@ -12078,7 +12078,7 @@ Most of them are also available independently with specific functions.</p>
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">get_factor</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -12124,7 +12124,7 @@ Most of them are also available independently with specific functions.</p>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">Faust</span>
-<span class="n">F2</span> <span class="o">=</span> <span class="n">Faust</span><span class="p">([</span><span class="n">F</span><span class="o">.</span><span class="n">get_factor</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">F</span><span class="o">.</span><span class="n">get_factor</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="n">Faust</span><span class="p">([</span><span class="n">F</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">F</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
 <span class="n">F2</span>
 </pre></div>
 
@@ -15096,7 +15096,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 <div class="prompt input_prompt">In&nbsp;[59]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">NF</span><span class="o">.</span><span class="n">get_factor</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">NF</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
 </pre></div>
 
 </div>

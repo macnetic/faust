@@ -176,8 +176,8 @@ Otherwise it works but you&rsquo;ll need to set the `export' command manually in
 
 <p>Retrieve the product factors:</p>
 
-<pre><code>&gt;&gt; F1 = get_factor(A,1);
-&gt;&gt; F2 = get_factor(A,2);
+<pre><code>&gt;&gt; F1 = factors(A,1);
+&gt;&gt; F2 = factors(A,2);
 </code></pre>
 
 <p>Check the sizes:</p>
@@ -231,8 +231,8 @@ end quickstart.py
 0.15
 &gt;&gt;&gt; A.get_num_factors()
 2
-&gt;&gt;&gt; F1 = A.get_factor(0)
-&gt;&gt;&gt; F2 = A.get_factor(1)
+&gt;&gt;&gt; F1 = A.factors(0)
+&gt;&gt;&gt; F2 = A.factors(1)
 &gt;&gt;&gt; A.shape
 (1000L, 2000L)
 </code></pre>

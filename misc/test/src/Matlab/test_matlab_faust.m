@@ -56,20 +56,20 @@
 
 
 
- function test_matlab_faust(factors,expected_F_dense,dim3,copyOptimized)
+ function test_matlab_faust(factors_,expected_F_dense,dim3,copyOptimized)
 %function test_matlab_faust(dim1,dim2,dim3,nb_fact)
 import matfaust.Faust
 int_max= 100;
 threshold = 0.2;
 
 
-nb_fact=length(factors);
+nb_fact=length(factors_);
 if (nb_fact == 0)
 	error('empty faust is not taking into account');
 end
 
-dim1=size(factors{1},1);
-dim2=size(factors{nb_fact},2);
+dim1=size(factors_{1},1);
+dim2=size(factors_{nb_fact},2);
 
 if (size(expected_F_dense,1) ~= dim1) | (size(expected_F_dense,2) ~= dim2)
 	error('the factor dimension mismatch expected_F_dense');
@@ -87,7 +87,7 @@ end
 
 expected_nz = 0;
 for i=1:nb_fact
-	expected_nz = expected_nz + nnz(factors{i});
+	expected_nz = expected_nz + nnz(factors_{i});
 end
 
 expected_density = expected_nz/(dim1*dim2);
@@ -104,7 +104,7 @@ disp('');
 
 %% creation du faust
 disp(' TEST CONSTRUCTOR : ');
-F = Faust(factors,1.0,copyOptimized);
+F = Faust(factors_,1.0,copyOptimized);
 %empty_F=Faust({});
 disp('Ok');
 
@@ -154,8 +154,8 @@ disp('Ok');
 
 
 disp('TEST GET_NB_FACTOR : ');
-%% get_num_factors test
-nb_fact_test=get_num_factors(F);
+%% numfactors test
+nb_fact_test=numfactors(F);
 if (nb_fact_test ~= nb_fact)
 	error('get_nb_factor : invalid number of factor of the faust');
 end
@@ -570,15 +570,15 @@ if (dim1_loaded ~= dim1) | (dim2_loaded ~= dim2)
 	error('load and save faust : invalid dimension');
 end
 
-nb_fact_load=get_num_factors(F);
+nb_fact_load=numfactors(F);
 if (nb_fact_load ~= nb_fact)
 	error('load and save faust : invalid number of factor of the loaded faust ');
 end
 
 for i=1:nb_fact
-	A=get_factor(F_loaded,i);
-	if(~isequal(A,factors{i}))
-        get_factor(F,i)
+	A=factors(F_loaded,i);
+	if(~isequal(A,factors_{i}))
+        factors(F,i)
         error('get_fact : invalid factor');
 	end
 
@@ -614,11 +614,11 @@ end
 
 disp('Ok');
 
-%% get_factor test
+%% factors_ test
 disp('TEST GET_FACT : ');
 for i=1:nb_fact
-	A=get_factor(F,i);
-	if(A~=factors{i})
+	A=factors(F,i);
+	if(A~=factors_{i})
 		error('get_fact : invalid factor');
 	end
 
@@ -721,12 +721,12 @@ if ( ~isequal(expected_F_conj_full,F_conj_full) )
     F_conj_full
     error(['conj test 1 failed.']);
 end
-% test get_factor on conj
+% test factors_ on conj
 for i=1:nb_fact
-	A=get_factor(F_conj,i);
-	if(~isequal(A,conj(factors{i})))
-		conj(factors{i})
-        get_factor(F_conj,i)
+	A=factors(F_conj,i);
+	if(~isequal(A,conj(factors_{i})))
+		conj(factors_{i})
+        factors(F_conj,i)
 		error('get_fact : invalid factor');
 	end
 end
@@ -762,12 +762,12 @@ if ( ~isequal(expected_F_ctranspose_full,F_ctranspose_full) )
     F_ctranspose_full
     error(['ctranspose test 1 failed.']);
 end
-% test get_factor on ctranspose
+% test factors_ on ctranspose
 for i=1:nb_fact
-	A=get_factor(F_ctranspose,i)
-	if(~isequal(A,ctranspose(factors{nb_fact-i+1})))
-		ctranspose(factors{nb_fact-i+1})
-        get_factor(F_ctranspose,i)
+	A=factors(F_ctranspose,i)
+	if(~isequal(A,ctranspose(factors_{nb_fact-i+1})))
+		ctranspose(factors_{nb_fact-i+1})
+        factors(F_ctranspose,i)
 		error('get_fact : invalid factor');
 	end
 end

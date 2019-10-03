@@ -205,7 +205,7 @@ classdef Faust
 				F.isReal = varargin{2};
 				% hack to raise an error in case of non-consistent handle and isReal arg.
 				try
-					n = get_num_factors(F);
+					n = numfactors(F);
 				catch
 					error('The Faust handle passed as first argument is not valid or not consistent with the value of isReal (2nd argument).')
 				end
@@ -370,7 +370,7 @@ classdef Faust
 		%>
 		%> - If A is a scalar, F*A is also a Faust such that:
 		%> @code
-		%> get_factor(F*A,1) == get_factor(F,1)*A
+		%> factors(F*A,1) == factors(F,1)*A
 		%> @endcode
 		%>
 		%> - Any Faust F (real or complex) can be multiplied by any Faust/array/scalar (real or complex) of appropriate dimensions.
@@ -471,10 +471,10 @@ classdef Faust
 		%>
 		%> This function overloads a Matlab built-in function.
 		%>
-		%> @warning if A is a matrix the function costs get_num_factors(F) matrix multiplications.
+		%> @warning if A is a matrix the function costs numfactors(F) matrix multiplications.
 		%> In that case its use is discouraged except for test purpose. However if A is a Faust object,
 		%> it costs the same that a Faust initialization with a number of factors equal to
-		%> F.get_num_factors()+A.get_num_factors() (like you can do directly with Faust.Faust).
+		%> F.numfactors()+A.numfactors() (like you can do directly with Faust.Faust).
 		%>
 		%> @param F the Faust object.
 		%> @param A The dense matrix to multiply or a Faust object.
@@ -923,8 +923,8 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b factor = get_factor(F, i) returns the i-th factor of F.<br/>
-		%> &nbsp;&nbsp;&nbsp; @b factor = get_factor(F, i:j) returns a new Faust formed of the F's factors from the i-th to the j-th included.
+		%> &nbsp;&nbsp;&nbsp; @b factor = factors(F, i) returns the i-th factor of F.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b factor = factors(F, i:j) returns a new Faust formed of the F's factors from the i-th to the j-th included.
 		%>
 		%> @param F the Faust object.
 		%> @param varargin the factor indices.
@@ -935,21 +935,21 @@ classdef Faust
 		%> @code
 		%>	import matfaust.FaustFactory
 		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex');
-		%>	f1 = get_factor(F, 1);
-		%>	G = get_factor(F, 4:5); % a new Faust composed of the two last factors of F
+		%>	f1 = factors(F, 1);
+		%>	G = factors(F, 4:5); % a new Faust composed of the two last factors of F
 		%> @endcode
-		%> <p>@b See @b also Faust.get_num_factors
+		%> <p>@b See @b also Faust.numfactors
 		%=====================================================================
-		function factors = get_factor(F, varargin)
+		function factors = factors(F, varargin)
 			%% GET_FACT Ith factor of the Faust.
 			%
-			% A=get_factor(F,i) return the i factor A of the Faust F as a full storage matrix.
+			% A=factors(F,i) return the i factor A of the Faust F as a full storage matrix.
 			%
 			% Example of use :
-			% A=get_factor(F,1) returns the 1st factor of the Faust F.
-			% A=get_factor(F,4) returns the 4th factor of the Faust F.
+			% A=factors(F,1) returns the 1st factor of the Faust F.
+			% A=factors(F,4) returns the 4th factor of the Faust F.
 			%
-			% See also get_num_factors.
+			% See also numfactors.
 			factors = cell(1, size(varargin{1},2));
 			for j=1:length(factors)
 				i = varargin{1};
@@ -958,11 +958,11 @@ classdef Faust
 				end
 				i = i(j);
 				if (~isa(i,'double'))
-					error('get_factor second argument (indice) must either be real positive integers or logicals.');
+					error('factors second argument (indice) must either be real positive integers or logicals.');
 				end
 
 				if (floor(i) ~= i)
-					error('get_factor second argument (indice) must either be real positive integers or logicals.');
+					error('factors second argument (indice) must either be real positive integers or logicals.');
 				end
 
 				if (F.isReal)
@@ -979,7 +979,7 @@ classdef Faust
 		end
 
 		%=====================================================================
-		%> @brief DEPRECATED (Use Faust.get_factor) Returns the i-th factor of F.
+		%> @brief DEPRECATED (Use Faust.factors) Returns the i-th factor of F.
 		%>
 		%> @b Usage
 		%>
@@ -996,7 +996,7 @@ classdef Faust
 		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	f1 = get_factor_nonopt(F, 1)
 		%> @endcode
-		%> <p>@b See @b also Faust.get_num_factors
+		%> <p>@b See @b also Faust.numfactors
 		%=====================================================================
 		function factor = get_factor_nonopt(F, i)
 			%% GET_FACT Ith factor of the Faust.
@@ -1007,7 +1007,7 @@ classdef Faust
 			% A=get_factor_nonopt(F,1) returns the 1st factor of the Faust F.
 			% A=get_factor_nonopt(F,4) returns the 4th factor of the Faust F.
 			%
-			% See also get_num_factors.
+			% See also numfactors.
 
 			if (~isa(i,'double'))
 				error('get_fact second argument (indice) must either be real positive integers or logicals.');
@@ -1030,7 +1030,7 @@ classdef Faust
 		%>
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b A = get_num_factors(F)
+		%> &nbsp;&nbsp;&nbsp; @b A = numfactors(F)
 		%>
 		%> @param F the Faust object.
 		%>
@@ -1040,18 +1040,18 @@ classdef Faust
 		%> @code
 		%>	import matfaust.FaustFactory
 		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
-		%>	nf = get_num_factors(F)
+		%>	nf = numfactors(F)
 		%> @endcode
 		%>
-		%> <p>@b See @b also Faust.get_factor.
+		%> <p>@b See @b also Faust.factors.
 		%==========================================================================================
-		function num_factors = get_num_factors(F)
+		function num_factors = numfactors(F)
 			%% GET_NB_FACTOR Number of factor of the Faust.
 			%
-			% num_factors = get_num_factors(F) return the number of factor of the
+			% num_factors = numfactors(F) return the number of factor of the
 			% Faust F.
 			%
-			% See also get_factor.
+			% See also factors.
 			if (F.isReal)
 				num_factors = mexFaustReal('get_nb_factor', F.matrix.objectHandle);
 			else
@@ -1293,7 +1293,7 @@ classdef Faust
 		%>
 		%> @endcode
 		%>
-		%> <p>@b See @b also Faust.nnz_sum, Faust.density, Faust.size, Faust.get_factor, Faust.get_num_factors
+		%> <p>@b See @b also Faust.nnz_sum, Faust.density, Faust.size, Faust.factors, Faust.numfactors
 		%>
 		%>
 		%======================================================================
@@ -1832,7 +1832,7 @@ classdef Faust
 		%> <p>@b See @b also Faust.disp.
 		%======================================================================
 		function imagesc(F, varargin)
-			numfacts = get_num_factors(F);
+			numfacts = numfactors(F);
 			subplot(1,numfacts+1,1); imagesc(abs(real(full(F))));
 			name = 'F';
 			if(nargin > 1)
@@ -1845,7 +1845,7 @@ classdef Faust
 			set(gca,'XTick',[], 'YTick', []);
 			for i=1:numfacts
 				subplot(1,numfacts+1,1+i);
-				fac = get_factor(F,i);
+				fac = factors(F,i);
 				imagesc(abs(real(fac)));
 				title([int2str(i)])
 				set(gca,'XTick',[], 'YTick', []);
@@ -1900,10 +1900,10 @@ classdef Faust
 			if(~ isreal(F))
 				cF = F;
 			else
-				n = get_num_factors(F);
+				n = numfactors(F);
 				factors = cell(1,n);
 				for i=1:n
-					factors{i} = get_factor(F,i);
+					factors{i} = factors(F,i);
 					if(issparse(factors{i}))
 						% avoid complex() error: Input A must be numeric and full.
 						factors{i} = sparse(complex(full(factors{i})));

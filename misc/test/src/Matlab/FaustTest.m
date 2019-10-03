@@ -66,8 +66,8 @@ classdef FaustTest < matlab.unittest.TestCase
 			filepath = [ tempdir filesep 'test_faust' rand_suffix '.mat']
 			save(this.test_faust, filepath)
 			F = Faust(filepath)
-			for i = 1:get_num_factors(F)
-				this.verifyEqual(full(get_factor(this.test_faust,i)), full(get_factor(F,i)))
+			for i = 1:numfactors(F)
+				this.verifyEqual(full(factors(this.test_faust,i)), full(factors(F,i)))
 			end
 			delete(filepath)
         end
@@ -77,20 +77,20 @@ classdef FaustTest < matlab.unittest.TestCase
 			rand_suffix = int2str(randi(10000))
 			filepath_ref = [ tempdir filesep 'ref_faust' rand_suffix '.mat']
 			filepath_test = [ tempdir filesep 'test_faust' rand_suffix '.mat']
-			nb_fact=get_num_factors(this.test_faust);
+			nb_fact=numfactors(this.test_faust);
 
 			faust_factors=cell(1,nb_fact);
 
 			for i=1:nb_fact
-				faust_factors{i}=get_factor(this.test_faust,i);
+				faust_factors{i}=factors(this.test_faust,i);
 			end
 			save(filepath_ref,'faust_factors');
 			save(this.test_faust,filepath_test)
 			ref_F = Faust(filepath_ref)
 			test_F = Faust(filepath_test)
-			this.verifyEqual(get_num_factors(ref_F), get_num_factors(test_F))
-			for i = 1:get_num_factors(ref_F)
-				this.verifyEqual(full(get_factor(ref_F,i)), full(get_factor(test_F,i)))
+			this.verifyEqual(numfactors(ref_F), numfactors(test_F))
+			for i = 1:numfactors(ref_F)
+				this.verifyEqual(full(factors(ref_F,i)), full(factors(test_F,i)))
 			end
 
 			delete(filepath_ref)
@@ -117,28 +117,28 @@ classdef FaustTest < matlab.unittest.TestCase
         function testGetFactorAndConstructor(this)
             disp('testGetFactorAndConstructor()')
             for i = 1:this.num_factors
-               this.verifyEqual(full(get_factor(this.test_faust, i)), full(this.factors{i}))
+               this.verifyEqual(full(factors(this.test_faust, i)), full(this.factors{i}))
             end
-			% test get_factor on transpose Faust
+			% test factors on transpose Faust
 			tF = this.test_faust.'
 			for i = 1:this.num_factors
-               this.verifyEqual(full(transpose(get_factor(tF, this.num_factors-i+1))), full(this.factors{i}))
+               this.verifyEqual(full(transpose(factors(tF, this.num_factors-i+1))), full(this.factors{i}))
             end
-			% test get_factor on conj Faust
+			% test factors on conj Faust
 			cF = conj(this.test_faust)
 			for i = 1:this.num_factors
-               this.verifyEqual(full(conj(get_factor(cF, i))), full(this.factors{i}))
+               this.verifyEqual(full(conj(factors(cF, i))), full(this.factors{i}))
             end
-			% test get_factor on transpose Faust
+			% test factors on transpose Faust
 			tcF = this.test_faust.'
 			for i = 1:this.num_factors
-               this.verifyEqual(full(conj(transpose(get_factor(tcF, this.num_factors-i+1)))), full(this.factors{i}))
+               this.verifyEqual(full(conj(transpose(factors(tcF, this.num_factors-i+1)))), full(this.factors{i}))
 		   end
 		end
 
         function testGetNumFactors(this)
             disp('testGetNumFactors()')
-            this.verifyEqual(get_num_factors(this.test_faust), this.num_factors)
+            this.verifyEqual(numfactors(this.test_faust), this.num_factors)
         end
 
 		function testNormalize(this)
@@ -488,18 +488,18 @@ classdef FaustTest < matlab.unittest.TestCase
 					F = this.test_faust;
 					%=============== test vert (or horz) cat
 					G = FaustFactory.rand(randi(FaustTest.MAX_NUM_FACTORS), size(F,other_dim));
-					G_num_factors = get_num_factors(G);
+					G_num_factors = numfactors(G);
 					% set a Faust with a random number of rows (or cols) from G
 					H_facs = cell(1,G_num_factors+1);
 					if dimcat == 1
 						H_facs{1} = rand(randi(FaustTest.MAX_DIM_SIZE-1)+1,size(F,other_dim));
 						for i=1:G_num_factors
-							H_facs{i+1} = get_factor(G, i);
+							H_facs{i+1} = factors(G, i);
 						end
 					else
 						H_facs{G_num_factors+1} = rand(size(F,other_dim),randi(FaustTest.MAX_DIM_SIZE-1)+1);
 						for i=1:G_num_factors
-							H_facs{i} = get_factor(G, i);
+							H_facs{i} = factors(G, i);
 						end
 					end
 					H = Faust(H_facs);

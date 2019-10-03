@@ -40,7 +40,7 @@ for is_square in [True]:#,False]:
                         F = F.T
                     m1 = clock()
                     for k in range(0, NUM_OF_ITERS):
-                        F.get_factor(1)
+                        F.factors(1)
                     m2 = clock()
                     opt_times += [m2-m1]
                     if(mat_format == 'Sparse'):

@@ -116,7 +116,7 @@ if __name__ == '__main__':
         par_givens_times[i] = t
         print("J=", J)
         print("nnz_sum FGFT givens parallel=", F.nnz_sum(), "num of facts:",
-              F.get_num_factors())
+              F.numfactors())
         par_givens_err = norm((F*Dhat.todense())*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
         par_givens_errs[i] = par_givens_err
         U_par_givens_errs[i] = (F-U).norm("fro")/norm(U,"fro")

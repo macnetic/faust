@@ -213,7 +213,7 @@ classdef FaustFactory
 		%>
 		%> @code
 		%> >> % verify the constraint k == 10, on column 5
-		%> >> fac9 = get_factor(MEG16,9);
+		%> >> fac9 = factors(MEG16,9);
 		%> >> numel(nonzeros(fac9(:,5)))
 		%> @endcode
 		%> ans =
@@ -222,7 +222,7 @@ classdef FaustFactory
 		%>
 		%> @code
 		%> >> % now verify the s constraint is respected on MEG16 factor 2
-		%> >> numel(nonzeros(get_factor(MEG16, 2)))/size(MEG16,1)
+		%> >> numel(nonzeros(factors(MEG16, 2)))/size(MEG16,1)
 		%> @endcode
 		%>
 		%>ans =
@@ -292,8 +292,8 @@ classdef FaustFactory
 		%> B = rand(20, 10);
 		%> [F, lamdba] = FaustFactory.fact_palm4msa_constends(M, p, A, B)
 		%>
-		%> assert(norm(A - get_factor(F,1))/norm(A) <= eps(double(1)))
-		%> assert(norm(B - get_factor(F,4))/norm(B) <= eps(double(1)))
+		%> assert(norm(A - factors(F,1))/norm(A) <= eps(double(1)))
+		%> assert(norm(B - factors(F,4))/norm(B) <= eps(double(1)))
 		%>
 		%> @endcode
 		%==========================================================================================
@@ -319,12 +319,12 @@ classdef FaustFactory
 				'init_lambda', p.init_lambda, 'step_size', p.step_size, 'constant_step_size', ...
 				p.constant_step_size, 'is_verbose', p.is_verbose);
 			[F, lambda ] = FaustFactory.fact_palm4msa(M, p);
-			f1 = get_factor(F, 1);
+			f1 = factors(F, 1);
 			f1 = f1 / lambda;
 			nF = cell(1, get_num_factors(F));
 			nF{1} = f1;
 			for i=2:get_num_factors(F)
-				nF{i} = get_factor(F, i);
+				nF{i} = factors(F, i);
 			end
 			nF{2} = nF{2}*lambda;
 			F = matfaust.Faust(nF);
@@ -348,8 +348,8 @@ classdef FaustFactory
 		%> B = rand(20, 10);
 		%> [F, lamdba, ~] = FaustFactory.fact_hierarchical_constends(M, p, A, B)
 		%>
-		%> assert(norm(A - get_factor(F,1))/norm(A) <= eps(double(1)))
-		%> assert(norm(B - get_factor(F,4))/norm(B) <= eps(double(1)))
+		%> assert(norm(A - factors(F,1))/norm(A) <= eps(double(1)))
+		%> assert(norm(B - factors(F,4))/norm(B) <= eps(double(1)))
 		%> @endcode
 		%>
 		%==========================================================================================
@@ -388,12 +388,12 @@ classdef FaustFactory
 				'init_lambda', p.init_lambda, 'step_size', p.step_size, 'constant_step_size', ...
 				p.constant_step_size, 'is_verbose', p.is_verbose, 'is_fact_side_left', p.is_fact_side_left);
 			[F, lambda, p] = FaustFactory.fact_hierarchical(M, p);
-			f1 = get_factor(F, 1);
+			f1 = factors(F, 1);
 			f1 = f1 / lambda;
 			nF = cell(1, get_num_factors(F));
 			nF{1} = f1;
 			for i=2:get_num_factors(F)
-				nF{i} = get_factor(F, i);
+				nF{i} = factors(F, i);
 			end
 			nF{2} = nF{2}*lambda;
 			F = matfaust.Faust(nF);
@@ -665,7 +665,7 @@ classdef FaustFactory
 		%==========================================================================================
 		function [V,D] = eigtj(M, J, varargin)
 			[V, D] = matfaust.FaustFactory.fgft_givens(M, J, varargin{:});
-			V = get_factor(V,1:get_num_factors(V))
+			V = factors(V,1:get_num_factors(V))
 			% copy seems unecessary but it's to workaround a bug (temporarily)
 		end
 

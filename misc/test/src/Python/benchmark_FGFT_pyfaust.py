@@ -141,7 +141,7 @@ for j in range(old_nruns,nruns):
         all_data[i,TIME_ID,PARGIVENS,j] = t
         print("J=", J)
         print("nnz_sum FGFT givens parallel=", F.nnz_sum(), "num of facts:",
-              F.get_num_factors())
+              F.numfactors())
         all_data[i,LAP_ERR_ID,PARGIVENS,j] = norm((F*Dhat.todense())*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
         all_data[i,FOURIER_ERR_ID,PARGIVENS,j] = (F-U).norm("fro")/norm(U,"fro")
         print("err:", norm(Lap @ F.toarray() - F.toarray()@Dhat)/norm(Lap))

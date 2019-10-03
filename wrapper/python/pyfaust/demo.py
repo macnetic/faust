@@ -180,27 +180,27 @@ class quickstart:
         print("Faust density: "+str(A.density()))
         print("Faust RCG: "+str(A.rcg()))
         print("Faust norm: "+str(A.norm()))
-        print("Faust nb of factors: "+str(A.get_num_factors()))
-        for i in range(0,A.get_num_factors()):
-            #print("Faust size of factor ",i,"=",A.get_factor(i).shape)
+        print("Faust nb of factors: "+str(A.numfactors()))
+        for i in range(0,A.numfactors()):
+            #print("Faust size of factor ",i,"=",A.factors(i).shape)
             # test Faust gets back the same sparse factors given at init
-            assert((A.get_factor(i) == list_factor_sparse[i]).all())
-            #print(A.get_factor(i))
+            assert((A.factors(i) == list_factor_sparse[i]).all())
+            #print(A.factors(i))
 
         # test Faust saving
         A.save("A.mat")
         As = pyfaust.Faust(filepath="A.mat")
-        assert((A.get_factor(0) == As.get_factor(0)).all())
-        assert((A.get_factor(1) == As.get_factor(1)).all())
+        assert((A.factors(0) == As.factors(0)).all())
+        assert((A.factors(1) == As.factors(1)).all())
 
         # test Faust transpose
-        #print(A.get_factor(0))
+        #print(A.factors(0))
         tA = A.transpose()
-        tf1 = tA.get_factor(1)
+        tf1 = tA.factors(1)
         #print(tf1)
         f1 = np.transpose(tf1)
-        assert(not (tf1 == A.get_factor(0)).all() or (tf1 == f1).all())
-        assert((f1 == A.get_factor(0)).all())
+        assert(not (tf1 == A.factors(0)).all() or (tf1 == f1).all())
+        assert((f1 == A.factors(0)).all())
 
         print("end quickstart.py")
 
@@ -657,15 +657,15 @@ class hadamard:
         had_faust = Faust(filepath=_prefix_fname_with_dir(input_dir,
                                                           hadamard._had_faust_fname))
         fig1 = figure(1)
-        subplot("1"+str(had_faust.get_num_factors()+1)+'1')
+        subplot("1"+str(had_faust.numfactors()+1)+'1')
         imshow(had_faust.toarray())
         xticks([])
         yticks([])
         facts = [];
-        for i in range(0,had_faust.get_num_factors()):
+        for i in range(0,had_faust.numfactors()):
             subplot("1"+str(hadamard._nfacts+1)+str(i+2))
             # all factors are normally sparse
-            fac = had_faust.get_factor(i)
+            fac = had_faust.factors(i)
             facts.append(fac)
             if(not isinstance(fac,ndarray)):
                 fac = fac.toarray()
@@ -674,11 +674,11 @@ class hadamard:
             yticks([])
 
         fig2 = figure(2)
-        subplot("1"+str(had_faust.get_num_factors()+1)+'1')
+        subplot("1"+str(had_faust.numfactors()+1)+'1')
         imshow(had_faust.toarray())
         xticks([])
         yticks([])
-        for i in range(0,had_faust.get_num_factors()):
+        for i in range(0,had_faust.numfactors()):
             subplot("1"+str(hadamard._nfacts+1)+str(i+2))
             title("nz = "+str(count_nonzero(fac)))
             spy(facts[i], markersize=1)

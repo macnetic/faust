@@ -47,19 +47,19 @@ class TestFaustPy(unittest.TestCase):
         # save the Faust relying on numpy API
         ref_file = tmp_dir+"A_ref"+str(rand_suffix)+".mat"
         mdict = {'faust_factors':
-                 np.ndarray(shape=(1, self.F.get_num_factors()), dtype=object)}
+                 np.ndarray(shape=(1, self.F.numfactors()), dtype=object)}
         # self.F.display()
-        for i in range(0, self.F.get_num_factors()):
-            mdict['faust_factors'][0, i] = self.F.get_factor(i)
+        for i in range(0, self.F.numfactors()):
+            mdict['faust_factors'][0, i] = self.F.factors(i)
         savemat(ref_file, mdict)
         # open the two saved files and compare the fausts
         F_test = Faust(filepath=test_file)
         F_ref = Faust(filepath=ref_file)
-        # print("self.F.get_num_factors()=", self.F.get_num_factors())
-        self.assertEqual(F_test.get_num_factors(), F_ref.get_num_factors())
-        for i in range(0, F_ref.get_num_factors()):
-            fact_ref = F_ref.get_factor(i)
-            fact_test = F_test.get_factor(i)
+        # print("self.F.numfactors()=", self.F.numfactors())
+        self.assertEqual(F_test.numfactors(), F_ref.numfactors())
+        for i in range(0, F_ref.numfactors()):
+            fact_ref = F_ref.factors(i)
+            fact_test = F_test.factors(i)
             if(not isinstance(fact_ref, np.ndarray)):
                 # fact_ref is a sparse matrix
                 fact_ref = fact_ref.toarray()
@@ -81,22 +81,22 @@ class TestFaustPy(unittest.TestCase):
     def testGetFactorAndConstructor(self):
         print("testGetFactorAndConstructor()")
         for ref_fact,i in zip(self.factors,range(0,len(self.factors))):
-            #print("testGetFac() fac ",i, " :", self.F.get_factor(i))
+            #print("testGetFac() fac ",i, " :", self.F.factors(i))
             #print("testGetFac() reffac",i, ":",ref_fact)
-            test_fact = self.F.get_factor(i)
+            test_fact = self.F.factors(i)
             if(not isinstance(test_fact, np.ndarray)):
                 # test_fact is a sparse matrix
                 test_fact = test_fact.toarray()
             #print(ref_fact.shape, test_fact.shape)
             test_fact = np.asfortranarray(test_fact)
             self.assertTrue((ref_fact == test_fact).all())
-        # and get_factor() on transpose Faust ?
+        # and factors() on transpose Faust ?
         tF = self.F.transpose()
         for i in range(0,len(self.factors)):
-            #print("testGetFac() fac ",i, " :", self.F.get_factor(i))
+            #print("testGetFac() fac ",i, " :", self.F.factors(i))
             #print("testGetFac() reffac",i, ":",ref_fact)
-            test_fact = tF.get_factor(i)
-            ref_fact = self.F.get_factor(len(self.factors)-i-1).transpose()
+            test_fact = tF.factors(i)
+            ref_fact = self.F.factors(len(self.factors)-i-1).transpose()
             if(not isinstance(test_fact, np.ndarray)):
                 # test_fact is a sparse matrix
                 test_fact = test_fact.toarray()
@@ -106,7 +106,7 @@ class TestFaustPy(unittest.TestCase):
 
     def testGetNumFactors(self):
         print("testGetNumFactors()")
-        self.assertEqual(self.F.get_num_factors(), len(self.factors))
+        self.assertEqual(self.F.numfactors(), len(self.factors))
 
     def testNormalize(self):
         print("test Faust.normalize()")
@@ -597,14 +597,14 @@ class TestFaustPy(unittest.TestCase):
                     M = sparse.csr_matrix(np.random.rand(
                         self.r.randint(1,TestFaustPy.MAX_DIM_SIZE),
                         F.shape[(cat_axis+1)%2]).astype(F.dtype))
-                    H = Faust([M]+[G.get_factor(i) for i in
-                           range(0,G.get_num_factors())])
+                    H = Faust([M]+[G.factors(i) for i in
+                           range(0,G.numfactors())])
                 else:
                     M = sparse.csr_matrix(np.random.rand(
                         F.shape[(cat_axis+1)%2],
                         self.r.randint(1,TestFaustPy.MAX_DIM_SIZE)).astype(F.dtype))
-                    H = Faust([G.get_factor(i) for i in
-                           range(0,G.get_num_factors())]+[M])
+                    H = Faust([G.factors(i) for i in
+                           range(0,G.numfactors())]+[M])
                 if(typeH == FAUST):
                     H_ = H
                 elif(typeH == SPARSE):

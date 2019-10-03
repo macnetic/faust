@@ -227,7 +227,7 @@ classdef hadamard
 			%get the factor of the Faust
 			facts=cell(1,M);
 			for i=1:M
-				facts{i}=get_factor(hadamard_faust,i);
+				facts{i}=factors(hadamard_faust,i);
 			end
 
 			for kk = 1:params_hadamard.nfacts

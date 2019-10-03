@@ -371,8 +371,8 @@ class Faust:
             >>> # the same function is called when typing F in a terminal:
             >>> F
 
-        <b/>See also Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.get_factor,
-        <b/>Faust.get_num_factors, Faust.display
+        <b/>See also Faust.nnz_sum, Faust.rcg, Faust.shape, Faust.factors,
+        <b/>Faust.numfactors, Faust.display
 
         """
         #_str = super(object, F).__repr__()
@@ -400,8 +400,8 @@ class Faust:
             FACTOR 1 (real) SPARSE, size 78x82, density 0.390869, nnz 2500<br/>
             <!-- >>> -->
 
-        <b/>See also Faust.nnz_sum, Faust.density, Faust.shape, Faust.get_factor,
-        <b/>Faust.get_num_factors, Faust.__repr__
+        <b/>See also Faust.nnz_sum, Faust.density, Faust.shape, Faust.factors,
+        <b/>Faust.numfactors, Faust.__repr__
 
         """
         print(F.__repr__())
@@ -1255,7 +1255,7 @@ class Faust:
             NF = Faust(core_obj=F.m_faust.normalize(ord))
         return NF
 
-    def get_num_factors(F):
+    def numfactors(F):
         """
         Returns the number of factors of F.
 
@@ -1265,13 +1265,13 @@ class Faust:
         Examples:
         >>> from pyfaust import FaustFactory
         >>> F = FaustFactory.rand(2, 100, .5)
-        >>> nf = F.get_num_factors()
+        >>> nf = F.numfactors()
 
-        <b/> See also Faust.get_factor
+        <b/> See also Faust.factors
         """
         return F.m_faust.get_nb_factors()
 
-    def get_factor(F, indices):
+    def factors(F, indices):
         """
         Returns the i-th factor of F.
 
@@ -1298,10 +1298,10 @@ class Faust:
         Examples:
             >>> from pyfaust import FaustFactory
             >>> F = FaustFactory.rand(5, [50, 100], .5)
-            >>> f0 = F.get_factor(0)
-            >>> G = F.get_factor(range(3,5)) # a new Faust composed of the two last factors of F
+            >>> f0 = F.factors(0)
+            >>> G = F.factors(range(3,5)) # a new Faust composed of the two last factors of F
 
-        <b/> See also Faust.get_num_factors, Faust.transpose
+        <b/> See also Faust.numfactors, Faust.transpose
         """
         if(hasattr(indices, '__iter__')):
             indices = list(indices)
@@ -1323,7 +1323,7 @@ class Faust:
 
     def get_factor_nonopt(F, i):
         """
-        DEPRECATED: use Faust.get_factor
+        DEPRECATED: use Faust.factors
         Returns the i-th factor of F.
 
         Args:
@@ -1340,9 +1340,9 @@ class Faust:
         Examples:
             >>> from pyfaust import FaustFactory
             >>> F = FaustFactory.rand(5, [50, 100], .5)
-            >>> f0 = F.get_factor(0)
+            >>> f0 = F.factors(0)
 
-        <b/> See also Faust.get_num_factors
+        <b/> See also Faust.numfactors
         """
         fact = F.m_faust.get_fact(i)
         return fact
@@ -1436,7 +1436,7 @@ class Faust:
         """
         import matplotlib.pyplot as plt
         if(not isinstance(name, str)): raise TypeError('name must be a str.')
-        nf = F.get_num_factors()
+        nf = F.numfactors()
         max_cols = 5
         ncols = min(nf,max_cols)
         nrows = int(nf/ncols)+1
@@ -1450,7 +1450,7 @@ class Faust:
         for i in range(0,nf):
             plt.subplot(nrows,ncols,(i%ncols)+int(i/ncols)*ncols+1)
             plt.title(str(i))
-            fac = F.get_factor(i)
+            fac = F.factors(i)
             if(not isinstance(fac, np.ndarray)):
                 fac = fac.toarray()
             plt.xticks([]); plt.yticks([])
@@ -1705,10 +1705,10 @@ class FaustFactory:
                81930
 
            >>> # verify the constraint k == 10, on column 4
-           >>> count_nonzero(MEG16.get_factor(8)[:,4].toarray())
+           >>> count_nonzero(MEG16.factors(8)[:,4].toarray())
            10
            >>> # now verify the s constraint is respected on MEG16 factor 1
-           >>> count_nonzero(MEG16.get_factor(1).toarray())/MEG16.shape[0]
+           >>> count_nonzero(MEG16.factors(1).toarray())/MEG16.shape[0]
            8.0
 
         """
@@ -1782,8 +1782,8 @@ class FaustFactory:
 			param = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit1, stop_crit2)
 			F, _lambda = FF.fact_hierarchical_constends(M, param, A, B, ret_lambda=True)
 
-			assert(np.allclose(F.get_factor(0).toarray(), A))
-			assert(np.allclose(F.get_factor(5).toarray(), B))
+			assert(np.allclose(F.factors(0).toarray(), A))
+			assert(np.allclose(F.factors(5).toarray(), B))
 
         """
         from pyfaust.factparams import ConstraintList
@@ -1816,13 +1816,13 @@ class FaustFactory:
                                    p.is_verbose)
         F, _lambda = FaustFactory.fact_hierarchical(M, p, ret_lambda=True,
                                               ret_params=False)
-        FA_lambda = F.get_factor(0)
+        FA_lambda = F.factors(0)
         FA = FA_lambda/_lambda
         new_F_factors = [ FA ]
-        F_without_A = F.get_factor(range(1,F.get_num_factors()))
+        F_without_A = F.factors(range(1,F.numfactors()))
         F_without_A = F_without_A * _lambda
-        new_F_factors += [ F_without_A.get_factor(i) for i in
-                          range(0,F_without_A.get_num_factors()) ]
+        new_F_factors += [ F_without_A.factors(i) for i in
+                          range(0,F_without_A.numfactors()) ]
         new_F = Faust(new_F_factors)
         F = new_F
         ret_list = [F]
@@ -1859,8 +1859,8 @@ class FaustFactory:
             param = ParamsPalm4MSA(consts, stop_crit)
             F = FF.fact_palm4msa_constends(M, param, A, B)
 
-            assert(np.allclose(F.get_factor(0).toarray(), A))
-            assert(np.allclose(F.get_factor(2).toarray(), B))
+            assert(np.allclose(F.factors(0).toarray(), A))
+            assert(np.allclose(F.factors(2).toarray(), B))
 
         """
         from pyfaust.factparams import ConstraintList
@@ -1880,10 +1880,10 @@ class FaustFactory:
                            is_verbose = p.is_verbose)
         F, _lambda = FaustFactory.fact_palm4msa(M, p, ret_lambda=True)
         F = \
-        Faust([F.get_factor(0)/_lambda]+[F.get_factor(1)*_lambda]+
-              [F.get_factor(i)
+        Faust([F.factors(0)/_lambda]+[F.factors(1)*_lambda]+
+              [F.factors(i)
                for i in
-               range(2,F.get_num_factors())])
+               range(2,F.numfactors())])
         if(ret_lambda):
             return F, _lambda
         else:
