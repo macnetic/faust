@@ -123,6 +123,13 @@ namespace Faust {
 				 */
 				void compute_facts();
 
+				/**
+				 * \brief Algo. step 2.4
+				 *
+				 * Updates L after Givens factor update for the next iteration.
+				 */
+				virtual void update_L();
+
 			protected:
 				/** \brief Algo. step 2.1.
 				*/
@@ -148,13 +155,6 @@ namespace Faust {
 				 *
 				 */
 				virtual void update_fact();
-
-				/**
-				 * \brief Algo. step 2.4
-				 *
-				 * Updates L after Givens factor update for the next iteration.
-				 */
-				virtual void update_L();
 
 				virtual void update_L(MatDense<FPP,Cpu> &);
 
