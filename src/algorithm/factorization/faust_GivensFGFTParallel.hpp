@@ -167,7 +167,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_fact()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(MatDense<FPP,Cpu> & L)
+void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 {
 	// L = S'*L*S
 //#undef OPT_UPDATE_L
@@ -236,7 +236,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(MatDense<FPP,Cpu> & L)
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(MatSparse<FPP,Cpu> & L)
+void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 {
 	// L = S'*L*S
 	this->facts[this->ite].multiply(L, 'T');

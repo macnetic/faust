@@ -197,7 +197,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_fact()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L(MatDense<FPP,Cpu> & L)
+void GivensFGFT<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 {
 	// L = S'*L*S
 #ifdef DEBUG_GIVENS
@@ -220,7 +220,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L(MatDense<FPP,Cpu> & L)
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L(MatSparse<FPP,Cpu> & L)
+void GivensFGFT<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 {
 	// L = S'*L*S
 	facts[ite].multiply(L, 'T');
@@ -236,7 +236,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L)
+void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
 {
 #define copy_vec2Lrow(vec,rowi) \
 	for(int i=0;i<L.getNbCol();i++) L.getData()[L.getNbRow()*i+rowi] = tmp[i]
@@ -262,7 +262,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L)
+void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
 {
 	Faust::Vect<FPP,DEVICE> tmp, tmp2;
 	/*========== L *= S */
