@@ -1321,6 +1321,32 @@ class Faust:
         else:
             return pyfaust.Faust(factors)
 
+    def right(F, i):
+        """
+        Returns the right hand side factors of F from index i to F.numfactors()-1.
+
+        <b/> See also Faust.factors, Faust.left, Faust.numfactors
+        """
+        i = F._check_factor_idx(i)
+        return F.factors(range(i,F.numfactors()))
+
+    def left(F, i):
+        """
+        Returns the left hand side factors of F from index 0 to i included.
+
+        <b/> See also Faust.factors, Faust.right
+        """
+        i = F._check_factor_idx(i)
+        return F.factors(range(0, i+1))
+
+    def _check_factor_idx(F, i):
+        if(not isinstance(i, (float, int))):
+            raise TypeError('i must be an integer.')
+        i = int(np.floor(i))
+        if(i < 0 or i >= F.numfactors()):
+            raise ValueError('i is out of range.')
+        return i
+
     def get_factor_nonopt(F, i):
         """
         DEPRECATED: use Faust.factors
