@@ -679,7 +679,7 @@ std::string Faust::MatDense<FPP,Cpu>::to_string(const bool transpose /* set to f
 	std::ostringstream  str;
 
 	str << " (" << (typeid(*getData()) == typeid(complex<double>) || typeid(*getData()) == typeid(complex<float>)?"complex":"real") << ")";
-	str<<" DENSE,";
+	str<<" DENSE, "; //number of trailing spaces matters to align with SPARSE to_string()
 	str << Faust::MatGeneric<FPP,Cpu>::to_string(transpose);
 	if(isZeros)
 		str <<"zeros matrix flag" << endl;
