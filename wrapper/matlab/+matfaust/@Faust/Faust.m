@@ -919,7 +919,7 @@ classdef Faust
 
 
 		%=====================================================================
-		%> @brief Returns the i-th factor of F.
+		%> @brief Returns the i-th factor or a range of factors of F.
 		%>
 		%> @b Usage
 		%>
@@ -941,15 +941,6 @@ classdef Faust
 		%> <p>@b See @b also Faust.numfactors
 		%=====================================================================
 		function factors = factors(F, varargin)
-			%% GET_FACT Ith factor of the Faust.
-			%
-			% A=factors(F,i) return the i factor A of the Faust F as a full storage matrix.
-			%
-			% Example of use :
-			% A=factors(F,1) returns the 1st factor of the Faust F.
-			% A=factors(F,4) returns the 4th factor of the Faust F.
-			%
-			% See also numfactors.
 			factors = cell(1, size(varargin{1},2));
 			for j=1:length(factors)
 				i = varargin{1};
@@ -976,6 +967,27 @@ classdef Faust
 			else
 				factors = factors{j};
 			end
+		end
+		%================================================================
+		%> Returns the left hand side factors of F from index 1 to i included.
+		%===
+		%>
+		%> <p> @b See @b also Faust.factors, Faust.right
+		%================================================================
+		function lfactors = left(F, i)
+			i = check_factor_idx(F, i);
+			lfactors = factors(F, 1:i);
+		end
+
+		%================================================================
+		%> Returns the right hand side factors of F from index i to end.
+		%===
+		%>
+		%> <p> @b See @b also Faust.factors, Faust.left
+		%================================================================
+		function rfactors = right(F, i)
+			i = check_factor_idx(F, i);
+			rfactors = factors(F, i:numfactors(F));
 		end
 
 		%=====================================================================
@@ -1915,6 +1927,22 @@ classdef Faust
 			end
 		end
 
+	end
+	methods(Access = private)
+		%================================================================
+		%> Returns true if i is a valid factor index for the Faust F.
+		%===
+		%================================================================
+		function  i = check_factor_idx(F,i)
+			if(~ isnumeric(i) || ~ isscalar(i))
+				error('i must be a scalar.')
+			end
+			if( i <= 0 || i > numfactors(F))
+				error('i is out of range')
+			end
+			i = floor(i);
+
+		end
 	end
 	methods(Static)
 		%================================================================
