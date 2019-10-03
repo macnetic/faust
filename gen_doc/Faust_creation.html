@@ -11786,7 +11786,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">FaustFactory</span><span class="p">,</span> <span class="n">Faust</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">Faust</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">sparse</span>
 <span class="n">factors</span> <span class="o">=</span> <span class="p">[]</span>
@@ -11841,11 +11841,11 @@ div#notebook {
 
 <div class="output_text output_subarea output_execute_result">
 <pre>Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s): 
-- FACTOR 0 (real) DENSE, size 100x100, density 1, nnz 10000
+- FACTOR 0 (real) DENSE,  size 100x100, density 1, nnz 10000
 - FACTOR 1 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 2 (real) DENSE, size 100x100, density 1, nnz 10000
+- FACTOR 2 (real) DENSE,  size 100x100, density 1, nnz 10000
 - FACTOR 3 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 4 (real) DENSE, size 100x100, density 1, nnz 10000</pre>
+- FACTOR 4 (real) DENSE,  size 100x100, density 1, nnz 10000</pre>
 </div>
 
 </div>
@@ -11888,18 +11888,18 @@ You can also call <strong><a href="https://faustgrp.gitlabpages.inria.fr/faust/l
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s): 
-- FACTOR 0 (real) DENSE, size 100x100, density 1, nnz 10000
+- FACTOR 0 (real) DENSE,  size 100x100, density 1, nnz 10000
 - FACTOR 1 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 2 (real) DENSE, size 100x100, density 1, nnz 10000
+- FACTOR 2 (real) DENSE,  size 100x100, density 1, nnz 10000
 - FACTOR 3 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 4 (real) DENSE, size 100x100, density 1, nnz 10000
+- FACTOR 4 (real) DENSE,  size 100x100, density 1, nnz 10000
 
 Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s): 
-- FACTOR 0 (real) DENSE, size 100x100, density 1, nnz 10000
+- FACTOR 0 (real) DENSE,  size 100x100, density 1, nnz 10000
 - FACTOR 1 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 2 (real) DENSE, size 100x100, density 1, nnz 10000
+- FACTOR 2 (real) DENSE,  size 100x100, density 1, nnz 10000
 - FACTOR 3 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 4 (real) DENSE, size 100x100, density 1, nnz 10000
+- FACTOR 4 (real) DENSE,  size 100x100, density 1, nnz 10000
 
 </pre>
 </div>
@@ -11967,11 +11967,11 @@ Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s):
 
 <div class="output_text output_subarea output_execute_result">
 <pre>Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s): 
-- FACTOR 0 (real) DENSE, size 100x100, density 1, nnz 10000
+- FACTOR 0 (real) DENSE,  size 100x100, density 1, nnz 10000
 - FACTOR 1 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 2 (real) DENSE, size 100x100, density 1, nnz 10000
+- FACTOR 2 (real) DENSE,  size 100x100, density 1, nnz 10000
 - FACTOR 3 (real) SPARSE, size 100x100, density 0.1, nnz 1000
-- FACTOR 4 (real) DENSE, size 100x100, density 1, nnz 10000</pre>
+- FACTOR 4 (real) DENSE,  size 100x100, density 1, nnz 10000</pre>
 </div>
 
 </div>
@@ -11993,8 +11993,8 @@ Faust size 100x100, density 3.2, nnz_sum 32000, 5 factor(s):
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="3.-Generating-a-Random-Faust">3. Generating a Random Faust<a class="anchor-link" href="#3.-Generating-a-Random-Faust">&#182;</a></h3><p>The pyfaust package provides a class called <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1FaustFactory.html">FaustFactory</a> responsible for generating Faust objects by many manners.
-One noticeable function of this class is <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1FaustFactory.html#a92535c4d3532acdc60847e5f86c63394">rand()</a>. This function allows to generate a random Faust satisfying certain constraints; the number of factors, the size of these factors, the density, the scalar type, etc.</p>
+<h3 id="3.-Generating-a-Random-Faust">3. Generating a Random Faust<a class="anchor-link" href="#3.-Generating-a-Random-Faust">&#182;</a></h3><p>The pyfaust package provides functions for generating Faust objects by many manners.
+One noticeable function of this package is <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html#a270bdf9e09799e86c95a21f16bc612b8">rand()</a>. This function allows to generate a random Faust satisfying certain constraints; the number of factors, the size of these factors, the density, the scalar type, etc.</p>
 <p>Below are examples of random generations.</p>
 
 </div>
@@ -12005,9 +12005,9 @@ One noticeable function of this class is <a href="https://faustgrp.gitlabpages.i
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">FaustFactory</span> <span class="k">as</span> <span class="n">FF</span>
-<span class="n">F</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">density</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">rand</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">density</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;dense&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">rand</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">density</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">density</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;dense&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12049,8 +12049,8 @@ One noticeable function of this class is <a href="https://faustgrp.gitlabpages.i
 
 <div class="output_text output_subarea output_execute_result">
 <pre>Faust size 10x10, density 1, nnz_sum 100, 2 factor(s): 
-- FACTOR 0 (complex) DENSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (complex) SPARSE, size 10x10, density 0.5, nnz 50</pre>
+- FACTOR 0 (complex) DENSE,  size 10x10, density 0.5, nnz 50
+- FACTOR 1 (complex) DENSE,  size 10x10, density 0.5, nnz 50</pre>
 </div>
 
 </div>
@@ -12063,7 +12063,7 @@ One noticeable function of this class is <a href="https://faustgrp.gitlabpages.i
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>G is a real Faust (the default scalar type). The <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1FaustFactory.html#a92535c4d3532acdc60847e5f86c63394">rand()</a> call first argument (<code>[2, 5]</code>) is the bounds in which we want the number of factors to be and likewise the second argument defines the bounds in which to randomly choose the sizes of the two dimensions of each factor composing the Faust. The sizes are chosen to keep G consistent though, this is a matrix product!</p>
+<p>G is a real Faust (the default scalar type). The <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html#a270bdf9e09799e86c95a21f16bc612b8">rand()</a> call first argument (<code>[2, 5]</code>) is the bounds in which we want the number of factors to be and likewise the second argument defines the bounds in which to randomly choose the sizes of the two dimensions of each factor composing the Faust. The sizes are chosen to keep G consistent though, this is a matrix product!</p>
 
 </div>
 </div>
@@ -12092,12 +12092,10 @@ One noticeable function of this class is <a href="https://faustgrp.gitlabpages.i
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 18x10, density 3.32222, nnz_sum 598, 5 factor(s): 
-- FACTOR 0 (real) DENSE, size 18x17, density 0.470588, nnz 144
-- FACTOR 1 (real) DENSE, size 17x16, density 0.5, nnz 136
-- FACTOR 2 (real) DENSE, size 16x19, density 0.473684, nnz 144
-- FACTOR 3 (real) DENSE, size 19x12, density 0.5, nnz 114
-- FACTOR 4 (real) DENSE, size 12x10, density 0.5, nnz 60</pre>
+<pre>Faust size 10x17, density 2.22353, nnz_sum 378, 3 factor(s): 
+- FACTOR 0 (real) DENSE,  size 10x19, density 0.473684, nnz 90
+- FACTOR 1 (real) DENSE,  size 19x17, density 0.470588, nnz 152
+- FACTOR 2 (real) DENSE,  size 17x17, density 0.470588, nnz 136</pre>
 </div>
 
 </div>
@@ -12110,7 +12108,7 @@ One noticeable function of this class is <a href="https://faustgrp.gitlabpages.i
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1FaustFactory.html#a92535c4d3532acdc60847e5f86c63394">rand()</a> function will surely be of a great help if you want to test the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html">Faust</a> member functions. A second notebook might guide you in that road: <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_manipulation.html">How to Manipulate a Faust</a>.</p>
+<p>The <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html#a270bdf9e09799e86c95a21f16bc612b8">rand()</a> function will surely be of a great help if you want to test the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html">Faust</a> member functions. A second notebook might guide you in that road: <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_manipulation.html">How to Manipulate a Faust</a>.</p>
 
 </div>
 </div>
@@ -12119,7 +12117,7 @@ One noticeable function of this class is <a href="https://faustgrp.gitlabpages.i
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="4.-Other-Ways-of-Creation">4. Other Ways of Creation<a class="anchor-link" href="#4.-Other-Ways-of-Creation">&#182;</a></h3><p>There exist many ways to create a Faust, please look at the documentation of <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1FaustFactory.html">FaustFactory</a> for more information.
+<h3 id="4.-Other-Ways-of-Creation">4. Other Ways of Creation<a class="anchor-link" href="#4.-Other-Ways-of-Creation">&#182;</a></h3><p>There exist many ways to create a Faust, please look at the package <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html">documentation</a> for more information.
 It would be the topic of another notebook! If you want, for example, to learn about Faust generation based on the FAµST's factorization algorithms, check this notebook: <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_factorization.html">Using the FAµST Factorization Wrappers</a>.</p>
 
 </div>

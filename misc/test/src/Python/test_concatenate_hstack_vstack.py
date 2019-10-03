@@ -1,9 +1,9 @@
-from pyfaust import FaustFactory as FF
+from pyfaust import rand
 from pyfaust import *
 import numpy as np
 
-F1 = FF.rand(5,50)
-F2 = FF.rand(5,50)
+F1 = rand(5,50)
+F2 = rand(5,50)
 
 
 concatenate((F1, F2), axis=0)

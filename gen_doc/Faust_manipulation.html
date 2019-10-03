@@ -11795,7 +11795,7 @@ It comes after the first notebook (available <a href="https://faustgrp.gitlabpag
 <a href="#2.7-Faust-Indexing-and-Slicing">2.7 Faust Indexing and Slicing</a><br/></p>
 <h1 id="1.-Getting-Basic-Information-about-a-Faust-Object">1. Getting Basic Information about a Faust Object<a class="anchor-link" href="#1.-Getting-Basic-Information-about-a-Faust-Object">&#182;</a></h1><p>First of all, given any object, you might ask yourself if it's a Faust or not (typically when you receive an object in a function, python being built on dynamic types, you can't say for sure it's a Faust). 
 <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a965047e6c0161e59a1c3e08f2b60e806">Faust.isFaust()</a> is the function to verify an object is a Faust.
-It's use is straighforward as you can see in the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a965047e6c0161e59a1c3e08f2b60e806">documentation</a>.</p>
+Its use is straighforward as you can see in the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a965047e6c0161e59a1c3e08f2b60e806">documentation</a>. Note by the way, that a more accessible alias is available at the package root (<code>pyfaust.isFaust</code>).</p>
 <h3 id="1.1-Obtaining-Dimension-and-Scalar-Type-Information">1.1 Obtaining Dimension and Scalar Type Information<a class="anchor-link" href="#1.1-Obtaining-Dimension-and-Scalar-Type-Information">&#182;</a></h3><p>Firstly, let's list basic Faust informative methods/attributes you're probably used to for numpy arrays:</p>
 <ul>
 <li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a64b167c138d18a23bb5b9794fcb03ef1">shape</a>,</li>
@@ -11809,11 +11809,11 @@ It's use is straighforward as you can see in the <a href="https://faustgrp.gitla
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">FaustFactory</span> <span class="k">as</span> <span class="n">FF</span>
-<span class="n">F</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">rand</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
 </pre></div>
 
@@ -11821,34 +11821,10 @@ It's use is straighforward as you can see in the <a href="https://faustgrp.gitla
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
-- FACTOR 0 (real) DENSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (real) DENSE, size 10x10, density 0.5, nnz 50
-- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 3 (real) DENSE, size 10x10, density 0.5, nnz 50
-- FACTOR 4 (real) DENSE, size 10x10, density 0.5, nnz 50
-
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">shape</span>
@@ -11858,30 +11834,10 @@ It's use is straighforward as you can see in the <a href="https://faustgrp.gitla
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[2]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>(10, 10)</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">size</span>
@@ -11891,56 +11847,16 @@ It's use is straighforward as you can see in the <a href="https://faustgrp.gitla
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[3]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>100</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">dtype</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[4]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>dtype(&#39;float64&#39;)</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -11969,8 +11885,8 @@ It's use is straighforward as you can see in the <a href="https://faustgrp.gitla
 Most of them are also available independently with specific functions.</p>
 <p>For instance, if you want information about factors, nothing is more simple than calling directly the next functions:</p>
 <ul>
-<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a2b46d3c068ef20d74bb90e382848014e">get_num_factors()</a> ; which gives you the number of factors (aka layers) a Faust object is composed of.</li>
-<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#adc91fd04c17ccaa2f32b7423955ef37d">factors()</a> ; which allows you to copy any of the Faust's factors givens its index.</li>
+<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#ab6e7f82d0a34b9ec90c73f9c887a2b51">numfactors()</a> ; which gives you the number of factors (aka layers) a Faust object is composed of.</li>
+<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html#a9cefcbcee255b2af0747b6d7693b26b4">factors()</a> ; which allows you to copy any of the Faust's factors givens its index.</li>
 </ul>
 <p>Going back to our F object, let's call these functions:</p>
 
@@ -11979,33 +11895,13 @@ Most of them are also available independently with specific functions.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">get_num_factors</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">numfactors</span><span class="p">()</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[5]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>5</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12021,7 +11917,7 @@ Most of them are also available independently with specific functions.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">f3</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -12029,27 +11925,6 @@ Most of them are also available independently with specific functions.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[6]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>&lt;10x10 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
-	with 50 stored elements in Compressed Sparse Row format&gt;</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12075,35 +11950,13 @@ Most of them are also available independently with specific functions.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[7]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 10x10, density 1, nnz_sum 100, 2 factor(s): 
-- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (real) DENSE, size 10x10, density 0.5, nnz 50</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12120,7 +11973,7 @@ Most of them are also available independently with specific functions.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">Faust</span>
@@ -12129,28 +11982,6 @@ Most of them are also available independently with specific functions.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[8]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 10x10, density 1, nnz_sum 100, 2 factor(s): 
-- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (real) DENSE, size 10x10, density 0.5, nnz 50</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12168,7 +11999,7 @@ How about plotting a Faust in a more graphical fashion ?</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -12178,162 +12009,6 @@ How about plotting a Faust in a more graphical fashion ?</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-sohIJP4X9iouZSiT918AAAAASUVORK5CYII=
-"
->
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12351,7 +12026,7 @@ Note that you can change the default <a href="https://matplotlib.org/tutorials/c
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">Faust</span>
@@ -12360,107 +12035,6 @@ Note that you can change the default <a href="https://matplotlib.org/tutorials/c
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-SU0y/CQ1yfCT1CSHtNKMMuiN54PcCO9N77OLPT9JTTL8JDXJ8JPUJMNPUpMMP0lNMvwkNcnwk9Qk
-w09Skww/SU2aVU94TOdh8Q849LdTti1Jg7PnJ6lJhp+kJhl+kppk+ElqkuEnqUmz6mqvNJ5B7ghw
-LMDZxZ6fpCYZfpKaZPhJapLhJ6lJhp+kJhl+kppk+ElqkuEnqUmGn6QmGX6SmmT4SWqS4SepSYaf
-pCY5qstGTOVIHEvrninblqTBGX4aupXce/cFdeaNo65jsubsNMjaN0xVGRrfbhNZyPDT0FXV00Zd
-g+Q5P0lNMvwkNcnwk9Qkw09Skww/SU0y/CQ1yfCT1CTDT1KTDD9JTTL8JDXJ8JPUJMNPUpMMP0lN
-MvwkNcnwk9Qkw09Skww/SU1KVU184eQuYMYNPz5N7OYIxtL0Manwk6TZwsNeSU0y/CQ1yfCT1CTD
-T1KTDD9JTTL8JDXJ8JPUJMNPUpMMP0lNMvwkNcnwk9Qkw09Skww/SU0y/KSGJdkqyc+TPL37/Mkk
-R426rmEw/KQJSLI8yYNJftP3s/OYZY5KctGIStxU7wAuqKo7u88fAT6YZO4IaxoKw0+auFdV1dZ9
-P7cOq+H1hdEUBdTbgVPXfaiqFcAvgVdOwbanNcNPmgJJ9gU+Bfxh1yu8u5u+fZLTktzV9R7flyTd
-vD2TXJjkniR3Jzk1yXZ921yR5B+SXAP8diPTPpBkWZKVSZYkeXU3fask9yXZu2+bOyX5bZIdkuwB
-LAQuG7M7FwGv2Exf1bRh+ElToKquAY4B/rvrFe7YzfoMMB/YAzgE+Evgrd28ACcAOwH7dMv805hN
-vxF4ObDdRqYtBQ7qPn8I+FqSZ1TVQ8A3gcP71n0zcH5V3QPsC9xQVY+MafM6YL9JfQEzkOEnTdw5
-XU/qviTnjLdwknnAnwHHVdXKqloGfBw4AqCqllbVD6tqTXfO7ePAwWM2c3JVraiqBzc0raq+WVW3
-VdWjVfU1YDmwuFv234E3r+ttdm2vO8zdHli5ntJXdvNmtVl/UlOaQq+tqgsmsfzTgTk8/qVfNwK7
-ACR5JvBJer22beh1Ru4as42b17Pdx01LciTwbmC3btLWwI4AVfU/SdYCf5DkXmBX4Lvdcvd27Y61
-DXDfuHs3w9nzk6bO2LeB3Qk8wmOhBL3wuaX7/cPAamDfqtoWOJLeofDGtvm4ad15u8/Su2q7Q1Vt
-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
-TkSuQmCC
-"
->
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12478,33 +12052,13 @@ TkSuQmCC
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">nnz_sum</span><span class="p">()</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[11]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>250</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12522,7 +12076,7 @@ TkSuQmCC
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">density</span><span class="p">()</span>
@@ -12532,56 +12086,16 @@ TkSuQmCC
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[12]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>2.5</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">rcg</span><span class="p">()</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[13]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>0.40000000000000002</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12597,10 +12111,10 @@ TkSuQmCC
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">Faust</span><span class="p">,</span> <span class="n">FaustFactory</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">Faust</span><span class="p">,</span> <span class="n">rand</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span> 
@@ -12616,7 +12130,7 @@ TkSuQmCC
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
                 <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ntests</span><span class="p">)),</span>
     <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">startd</span><span class="p">,</span> <span class="n">endd</span><span class="p">,</span> <span class="n">ntests</span><span class="p">)):</span>
-    <span class="n">F</span> <span class="o">=</span> <span class="n">FaustFactory</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">nfactors</span><span class="p">,</span> <span class="n">dim_sz</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">nfactors</span><span class="p">,</span> <span class="n">dim_sz</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">)</span>
     <span class="n">filepath</span> <span class="o">=</span> <span class="s1">&#39;test_faust_size&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.mat&#39;</span>
     <span class="n">F</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
@@ -12634,302 +12148,6 @@ TkSuQmCC
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-"
->
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -13428,10 +12646,10 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,[</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">],</span><span class="n">field</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,[</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">],</span><span class="n">field</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -13441,7 +12659,7 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span><span class="o">.</span><span class="n">T</span>
@@ -13451,35 +12669,10 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[16]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 12x13, density 1.92308, nnz_sum 300, 5 factor(s): 
-- FACTOR 0 (complex) DENSE, size 12x10, density 0.416667, nnz 50
-- FACTOR 1 (complex) DENSE, size 10x13, density 0.5, nnz 65
-- FACTOR 2 (complex) SPARSE, size 13x12, density 0.384615, nnz 60
-- FACTOR 3 (complex) DENSE, size 12x12, density 0.416667, nnz 60
-- FACTOR 4 (complex) DENSE, size 12x13, density 0.416667, nnz 65</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>
@@ -13489,66 +12682,16 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[17]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x12, density 1.92308, nnz_sum 300, 5 factor(s): 
-- FACTOR 0 (complex) DENSE, size 13x12, density 0.416667, nnz 65
-- FACTOR 1 (complex) DENSE, size 12x12, density 0.416667, nnz 60
-- FACTOR 2 (complex) SPARSE, size 12x13, density 0.384615, nnz 60
-- FACTOR 3 (complex) DENSE, size 13x10, density 0.5, nnz 65
-- FACTOR 4 (complex) DENSE, size 10x12, density 0.416667, nnz 50</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span><span class="o">.</span><span class="n">H</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[18]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 12x13, density 1.92308, nnz_sum 300, 5 factor(s): 
-- FACTOR 0 (complex) DENSE, size 12x10, density 0.416667, nnz 50
-- FACTOR 1 (complex) DENSE, size 10x13, density 0.5, nnz 65
-- FACTOR 2 (complex) SPARSE, size 13x12, density 0.384615, nnz 60
-- FACTOR 3 (complex) DENSE, size 12x12, density 0.416667, nnz 60
-- FACTOR 4 (complex) DENSE, size 12x13, density 0.416667, nnz 65</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -13572,43 +12715,15 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">G</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">G</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">G</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">G</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">F</span><span class="o">+</span><span class="n">G</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[19]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x13, density 4.30769, nnz_sum 728, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 13x26, density 0.0769231, nnz 26
-- FACTOR 1 (real) SPARSE, size 26x26, density 0.192308, nnz 130
-- FACTOR 2 (real) SPARSE, size 26x26, density 0.192308, nnz 130
-- FACTOR 3 (real) SPARSE, size 26x26, density 0.192308, nnz 130
-- FACTOR 4 (real) SPARSE, size 26x26, density 0.192308, nnz 130
-- FACTOR 5 (real) SPARSE, size 26x26, density 0.192308, nnz 130
-- FACTOR 6 (real) SPARSE, size 26x26, density 0.0384615, nnz 26
-- FACTOR 7 (real) SPARSE, size 26x13, density 0.0769231, nnz 26</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -13624,7 +12739,7 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">norm</span>
@@ -13632,26 +12747,6 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[20]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>0.0</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -13672,41 +12767,13 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">-</span><span class="n">G</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[21]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x13, density 4.30769, nnz_sum 728, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 13x26, density 0.0769231, nnz 26
-- FACTOR 1 (real) SPARSE, size 26x26, density 0.192308, nnz 130
-- FACTOR 2 (real) SPARSE, size 26x26, density 0.192308, nnz 130
-- FACTOR 3 (real) SPARSE, size 26x26, density 0.192308, nnz 130
-- FACTOR 4 (real) SPARSE, size 26x26, density 0.192308, nnz 130
-- FACTOR 5 (real) SPARSE, size 26x26, density 0.192308, nnz 130
-- FACTOR 6 (real) SPARSE, size 26x26, density 0.0384615, nnz 26
-- FACTOR 7 (real) SPARSE, size 26x13, density 0.0769231, nnz 26</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -13722,41 +12789,13 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">+</span><span class="mi">2</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[22]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x13, density 2.76923, nnz_sum 468, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 13x26, density 0.0769231, nnz 26
-- FACTOR 1 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 2 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 3 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 4 (real) SPARSE, size 26x14, density 0.214286, nnz 78
-- FACTOR 5 (real) SPARSE, size 14x26, density 0.214286, nnz 78
-- FACTOR 6 (real) SPARSE, size 26x26, density 0.0384615, nnz 26
-- FACTOR 7 (real) SPARSE, size 26x13, density 0.0769231, nnz 26</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -13773,7 +12812,7 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="mi">2</span><span class="o">+</span><span class="n">F</span>
@@ -13783,72 +12822,16 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[23]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x13, density 2.76923, nnz_sum 468, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 13x26, density 0.0769231, nnz 26
-- FACTOR 1 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 2 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 3 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 4 (real) SPARSE, size 26x14, density 0.214286, nnz 78
-- FACTOR 5 (real) SPARSE, size 14x26, density 0.214286, nnz 78
-- FACTOR 6 (real) SPARSE, size 26x26, density 0.0384615, nnz 26
-- FACTOR 7 (real) SPARSE, size 26x13, density 0.0769231, nnz 26</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="mi">2</span><span class="o">-</span><span class="n">F</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[24]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x13, density 2.76923, nnz_sum 468, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 13x26, density 0.0769231, nnz 26
-- FACTOR 1 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 2 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 3 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 4 (real) SPARSE, size 26x14, density 0.214286, nnz 78
-- FACTOR 5 (real) SPARSE, size 14x26, density 0.214286, nnz 78
-- FACTOR 6 (real) SPARSE, size 26x26, density 0.0384615, nnz 26
-- FACTOR 7 (real) SPARSE, size 26x13, density 0.0769231, nnz 26</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -13864,7 +12847,7 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">+</span><span class="n">F</span> <span class="c1"># or F+F.toarray()</span>
@@ -13874,38 +12857,10 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[25]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x13, density 3.69231, nnz_sum 624, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 13x26, density 0.0769231, nnz 26
-- FACTOR 1 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 2 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 3 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 4 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 5 (real) SPARSE, size 26x26, density 0.346154, nnz 234
-- FACTOR 6 (real) SPARSE, size 26x26, density 0.0384615, nnz 26
-- FACTOR 7 (real) SPARSE, size 26x13, density 0.0769231, nnz 26</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">-</span><span class="n">F</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span> <span class="c1"># F.toarray()-F is supported too</span>
@@ -13915,64 +12870,16 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[26]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x13, density 3.69231, nnz_sum 624, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 13x26, density 0.0769231, nnz 26
-- FACTOR 1 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 2 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 3 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 4 (real) SPARSE, size 26x26, density 0.115385, nnz 78
-- FACTOR 5 (real) SPARSE, size 26x26, density 0.346154, nnz 234
-- FACTOR 6 (real) SPARSE, size 26x26, density 0.0384615, nnz 26
-- FACTOR 7 (real) SPARSE, size 26x13, density 0.0769231, nnz 26</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">((</span><span class="n">F</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">-</span><span class="n">F</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[27]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>True</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -13988,7 +12895,7 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">FG</span> <span class="o">=</span> <span class="n">F</span><span class="o">*</span><span class="n">G</span>
@@ -14001,33 +12908,13 @@ ASAAAECQIQAEAAAIMv8fomx0rLQsLooAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">FG</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">-</span><span class="n">F</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">*</span><span class="n">G</span><span class="o">.</span><span class="n">todense</span><span class="p">())</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">*</span><span class="n">G</span><span class="o">.</span><span class="n">todense</span><span class="p">())</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[29]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>1.5276725686333651e-16</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14044,33 +12931,13 @@ FG is a Faust too!</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">Faust</span><span class="o">.</span><span class="n">isFaust</span><span class="p">(</span><span class="n">FG</span><span class="p">)</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[30]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>True</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14086,38 +12953,13 @@ FG is a Faust too!</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">*</span><span class="mi">2</span> <span class="c1"># or 2*F</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[31]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x13, density 1.92308, nnz_sum 325, 5 factor(s): 
-- FACTOR 0 (real) SPARSE, size 13x13, density 0.384615, nnz 65
-- FACTOR 1 (real) DENSE, size 13x13, density 0.384615, nnz 65
-- FACTOR 2 (real) SPARSE, size 13x13, density 0.384615, nnz 65
-- FACTOR 3 (real) DENSE, size 13x13, density 0.384615, nnz 65
-- FACTOR 4 (real) SPARSE, size 13x13, density 0.384615, nnz 65</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14142,47 +12984,15 @@ FG is a Faust too!</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">rand</span>
-<span class="n">vec</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">1</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">rand</span> <span class="k">as</span> <span class="n">nrand</span>
+<span class="n">vec</span> <span class="o">=</span> <span class="n">nrand</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">F</span><span class="o">*</span><span class="n">vec</span> <span class="c1"># or F.dot(vec), F*vec, (or only with python3) F@vec</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[32]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([[ 47.08320887],
-       [ 48.92241997],
-       [ 47.22848147],
-       [ 59.1297748 ],
-       [ 38.90236538],
-       [ 40.01572454],
-       [ 46.81942327],
-       [ 25.97223946],
-       [ 36.58778821],
-       [ 46.20416627],
-       [ 38.90694405],
-       [ 19.29944959],
-       [ 31.33946958]])</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14199,7 +13009,7 @@ FG is a Faust too!</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">F</span><span class="o">*</span><span class="n">vec</span>
@@ -14209,28 +13019,10 @@ FG is a Faust too!</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>13.5 µs ± 1.29 µs per loop (mean ± std. dev. of 7 runs, 100000 loops each)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[34]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">FD</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span> <span class="c1"># be careful: todense() returns a matrix while toarray() a ndarray</span>
@@ -14243,7 +13035,7 @@ FG is a Faust too!</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[35]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">FD</span><span class="o">*</span><span class="n">vec</span>
@@ -14253,28 +13045,10 @@ FG is a Faust too!</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>4.98 µs ± 391 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[36]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">allclose</span>
@@ -14285,56 +13059,16 @@ FG is a Faust too!</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[36]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>True</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">rcg</span><span class="p">()</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[37]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>0.52000000000000002</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14350,12 +13084,12 @@ FG is a Faust too!</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[38]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">density</span><span class="o">=.</span><span class="mi">001</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">density</span><span class="o">=.</span><span class="mi">001</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">)</span>
 <span class="n">GD</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
-<span class="n">vec2</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
+<span class="n">vec2</span> <span class="o">=</span> <span class="n">nrand</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
 </pre></div>
 
 </div>
@@ -14365,7 +13099,7 @@ FG is a Faust too!</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[39]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">G</span><span class="o">*</span><span class="n">vec2</span>
@@ -14375,28 +13109,10 @@ FG is a Faust too!</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>22.4 µs ± 312 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[40]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">GD</span><span class="o">*</span><span class="n">vec2</span>
@@ -14406,54 +13122,16 @@ FG is a Faust too!</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>476 µs ± 92.2 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[41]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span><span class="o">.</span><span class="n">rcg</span><span class="p">()</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[41]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>341.33333333333331</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14471,7 +13149,7 @@ I hope the example above has finished to convince you.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[42]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">norm</span>
@@ -14479,26 +13157,6 @@ I hope the example above has finished to convince you.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[42]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>4.0731473265507737e-16</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14514,10 +13172,10 @@ I hope the example above has finished to convince you.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[43]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">M</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">M</span> <span class="o">=</span> <span class="n">nrand</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -14527,7 +13185,7 @@ I hope the example above has finished to convince you.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[44]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">G</span><span class="o">*</span><span class="n">M</span>
@@ -14537,28 +13195,10 @@ I hope the example above has finished to convince you.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>529 µs ± 62.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[45]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">GD</span><span class="o">*</span><span class="n">M</span>
@@ -14568,54 +13208,16 @@ I hope the example above has finished to convince you.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>8.59 ms ± 1.34 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[46]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">GD</span><span class="o">*</span><span class="n">M</span><span class="o">-</span><span class="n">G</span><span class="o">*</span><span class="n">M</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">GD</span><span class="o">*</span><span class="n">M</span><span class="p">)</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[46]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>1.1321188248976998e-16</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14643,7 +13245,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[47]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -14653,30 +13255,10 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[47]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>160.94032601139284</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[48]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
@@ -14686,56 +13268,16 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[48]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>126.92637308212312</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[49]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="s1">&#39;fro&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[49]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>99.35532103959507</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14751,7 +13293,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[50]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">norm</span>
@@ -14762,30 +13304,10 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[50]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>160.94032601139284</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[51]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">todense</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
@@ -14795,56 +13317,16 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[51]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>126.92637308212312</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[52]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">todense</span><span class="p">(),</span> <span class="s1">&#39;fro&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[52]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>99.355321039595069</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14860,7 +13342,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[53]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="o">-</span><span class="n">n</span> <span class="mi">10</span> <span class="n">G</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -14870,52 +13352,16 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>739 µs ± 57.5 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[54]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="o">-</span><span class="n">n</span> <span class="mi">10</span> <span class="n">norm</span><span class="p">(</span><span class="n">GD</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># sorry, it could be slow</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>796 ms ± 57.7 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -14931,7 +13377,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[55]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">((</span><span class="n">G</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">norm</span><span class="p">(</span><span class="n">GD</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">GD</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
@@ -14939,26 +13385,6 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[55]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>0.00061486173772805472</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -14983,10 +13409,10 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[56]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">NF</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
 </pre></div>
 
@@ -15016,7 +13442,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[57]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span>
@@ -15026,35 +13452,10 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[57]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
-- FACTOR 0 (real) DENSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 3 (real) DENSE, size 10x10, density 0.5, nnz 50
-- FACTOR 4 (real) DENSE, size 10x10, density 0.5, nnz 50</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[58]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">NF</span>
@@ -15064,36 +13465,10 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[58]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 10x10, density 2.6, nnz_sum 260, 6 factor(s): 
-- FACTOR 0 (real) DENSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 3 (real) DENSE, size 10x10, density 0.5, nnz 50
-- FACTOR 4 (real) DENSE, size 10x10, density 0.5, nnz 50
-- FACTOR 5 (real) SPARSE, size 10x10, density 0.1, nnz 10</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[59]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">NF</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
@@ -15103,49 +13478,10 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[59]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>matrix([[ 0.05115476,  0.        ,  0.        ,  0.        ,  0.        ,
-          0.        ,  0.        ,  0.        ,  0.        ,  0.        ],
-        [ 0.        ,  0.06499964,  0.        ,  0.        ,  0.        ,
-          0.        ,  0.        ,  0.        ,  0.        ,  0.        ],
-        [ 0.        ,  0.        ,  0.05403455,  0.        ,  0.        ,
-          0.        ,  0.        ,  0.        ,  0.        ,  0.        ],
-        [ 0.        ,  0.        ,  0.        ,  0.04759628,  0.        ,
-          0.        ,  0.        ,  0.        ,  0.        ,  0.        ],
-        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.03982301,
-          0.        ,  0.        ,  0.        ,  0.        ,  0.        ],
-        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-          0.03516077,  0.        ,  0.        ,  0.        ,  0.        ],
-        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-          0.        ,  0.03145437,  0.        ,  0.        ,  0.        ],
-        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-          0.        ,  0.        ,  0.21265708,  0.        ,  0.        ],
-        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-          0.        ,  0.        ,  0.        ,  0.03711339,  0.        ],
-        [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-          0.        ,  0.        ,  0.        ,  0.        ,  0.08153877]])</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[60]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">cumerr</span> <span class="o">=</span> <span class="mi">0</span>
@@ -15155,26 +13491,6 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[60]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>1.5738497793445163e-15</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -15207,12 +13523,12 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[61]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">rand</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">rand</span> <span class="k">as</span> <span class="n">nrand</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">eye</span><span class="p">,</span> <span class="n">concatenate</span>
-<span class="n">M</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">nrand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">I</span> <span class="o">=</span> <span class="n">eye</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">concatenate</span><span class="p">((</span><span class="n">M</span><span class="p">,</span><span class="n">I</span><span class="p">))</span>
 </pre></div>
@@ -15221,39 +13537,10 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[61]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([[ 0.98824777,  0.8416767 ,  0.10987026,  0.52692037,  0.23099392],
-       [ 0.79539152,  0.61388666,  0.24066613,  0.8795504 ,  0.05511843],
-       [ 0.47286912,  0.1893449 ,  0.77935439,  0.82953017,  0.08993922],
-       [ 0.21982767,  0.70992636,  0.95762212,  0.27294071,  0.98437245],
-       [ 0.76053662,  0.28169856,  0.16161273,  0.60498563,  0.29763943],
-       [ 1.        ,  0.        ,  0.        ,  0.        ,  0.        ],
-       [ 0.        ,  1.        ,  0.        ,  0.        ,  0.        ],
-       [ 0.        ,  0.        ,  1.        ,  0.        ,  0.        ],
-       [ 0.        ,  0.        ,  0.        ,  1.        ,  0.        ],
-       [ 0.        ,  0.        ,  0.        ,  0.        ,  1.        ]])</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[62]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># it was vertical concatenation, now let&#39;s concatenate horizontally</span>
@@ -15261,35 +13548,6 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[62]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([[ 0.98824777,  0.8416767 ,  0.10987026,  0.52692037,  0.23099392,
-         1.        ,  0.        ,  0.        ,  0.        ,  0.        ],
-       [ 0.79539152,  0.61388666,  0.24066613,  0.8795504 ,  0.05511843,
-         0.        ,  1.        ,  0.        ,  0.        ,  0.        ],
-       [ 0.47286912,  0.1893449 ,  0.77935439,  0.82953017,  0.08993922,
-         0.        ,  0.        ,  1.        ,  0.        ,  0.        ],
-       [ 0.21982767,  0.70992636,  0.95762212,  0.27294071,  0.98437245,
-         0.        ,  0.        ,  0.        ,  1.        ,  0.        ],
-       [ 0.76053662,  0.28169856,  0.16161273,  0.60498563,  0.29763943,
-         0.        ,  0.        ,  0.        ,  0.        ,  1.        ]])</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -15305,7 +13563,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[63]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
@@ -15315,36 +13573,10 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[63]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 20x10, density 2.6, nnz_sum 520, 6 factor(s): 
-- FACTOR 0 (real) SPARSE, size 20x20, density 0.25, nnz 100
-- FACTOR 1 (real) SPARSE, size 20x20, density 0.25, nnz 100
-- FACTOR 2 (real) SPARSE, size 20x20, density 0.25, nnz 100
-- FACTOR 3 (real) SPARSE, size 20x20, density 0.25, nnz 100
-- FACTOR 4 (real) SPARSE, size 20x20, density 0.25, nnz 100
-- FACTOR 5 (real) SPARSE, size 20x10, density 0.1, nnz 20</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[64]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">C</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -15357,52 +13589,13 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[65]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">C</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">-</span><span class="n">concatenate</span><span class="p">((</span><span class="n">F</span><span class="o">.</span><span class="n">todense</span><span class="p">(),</span> <span class="n">F</span><span class="o">.</span><span class="n">todense</span><span class="p">()),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[65]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>matrix([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-          0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-          0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-          0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-          0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-          0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-          0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-          0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-          0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-          0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-          0.,  0.,  0.,  0.,  0.,  0.,  0.]])</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -15420,42 +13613,13 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[66]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[66]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 10x70, density 2.72857, nnz_sum 1910, 9 factor(s): 
-- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
-- FACTOR 1 (real) SPARSE, size 20x30, density 0.05, nnz 30
-- FACTOR 2 (real) SPARSE, size 30x40, density 0.0333333, nnz 40
-- FACTOR 3 (real) SPARSE, size 40x70, density 0.025, nnz 70
-- FACTOR 4 (real) SPARSE, size 70x70, density 0.0714286, nnz 350
-- FACTOR 5 (real) SPARSE, size 70x70, density 0.0714286, nnz 350
-- FACTOR 6 (real) SPARSE, size 70x70, density 0.0714286, nnz 350
-- FACTOR 7 (real) SPARSE, size 70x70, density 0.0714286, nnz 350
-- FACTOR 8 (real) SPARSE, size 70x70, density 0.0714286, nnz 350</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -15490,33 +13654,13 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[67]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[67]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>7.690151586000086</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -15532,7 +13676,7 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[68]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">F</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
@@ -15542,52 +13686,16 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>39.8 µs ± 7.08 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[69]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">FD</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>1.46 µs ± 191 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -15604,38 +13712,13 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[70]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[70]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 3x7, density 9.42857, nnz_sum 198, 5 factor(s): 
-- FACTOR 0 (real) DENSE, size 3x10, density 0.5, nnz 15
-- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 3 (real) DENSE, size 10x10, density 0.5, nnz 50
-- FACTOR 4 (real) DENSE, size 10x7, density 0.471429, nnz 33</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -15660,7 +13743,7 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[71]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">FI</span> <span class="o">=</span> <span class="n">F</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">],:]</span>
@@ -15668,26 +13751,6 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[71]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>True</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -15703,7 +13766,7 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[72]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">FI</span><span class="o">.</span><span class="n">todense</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">F</span><span class="o">.</span><span class="n">todense</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> \
@@ -15712,26 +13775,6 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[72]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>True</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 

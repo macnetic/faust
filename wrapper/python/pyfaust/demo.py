@@ -280,7 +280,7 @@ class fft:
         """
             Runs the multiplication benchmark.
         """
-        from pyfaust import Faust, FaustFactory
+        from pyfaust import Faust, dft
         treshold = 10**-10
 
         print('Speedup Fourier')
@@ -292,7 +292,7 @@ class fft:
 
         for k in range(0,len(fft._dims)):
             print('\rFFT fft._dims processed: ', fft._dims[0:k+1], end='')
-            F = FaustFactory.dft(fft._log2_dims[k])
+            F = dft(fft._log2_dims[k])
             fft_mat = F.toarray()#fft(eye(fft._dims[k])) # or TODO: F.toarray() ?
             fft_fausts += [ F ]
             fft_mats += [ fft_mat ]
@@ -370,7 +370,7 @@ class runtimecmp:
         """
         Runs the runtime comparision benchmark.
         """
-        from pyfaust import Faust, FaustFactory
+        from pyfaust import (Faust, rand as frand)
 
         matrix_or_vector = 'vector'
 
@@ -390,7 +390,7 @@ class runtimecmp:
 
                 for l in range(0,runtimecmp._nb_facts_len):
                     nf = runtimecmp._nb_facts[l]
-                    F = FaustFactory.rand(nf , dim, 1./(nf*rcg),
+                    F = frand(nf , dim, 1./(nf*rcg),
                                           per_row=runtimecmp._constraint, fac_type='sparse')
                     assert(F.rcg() == rcg)
                     fausts[j,k,l] = F
@@ -583,14 +583,14 @@ class hadamard:
         Topics in Signal Processing, 2016.
 
         """
-        from pyfaust import FaustFactory
+        from pyfaust import FaustFactory, wht
         from pyfaust.factparams import ParamsHierarchicalFact, ConstraintInt, \
         ConstraintName, StoppingCriterion
 
         # generate a Hadamard transform and factorize its full matrix
         n = hadamard._n
         d = 2**n
-        H = FaustFactory.wht(n)
+        H = wht(n)
         full_H = H.toarray()
 
         params = ParamsHierarchicalFact([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
@@ -691,12 +691,12 @@ class hadamard:
 
     @staticmethod
     def _create_hadamard_fausts_mats(dims, log2_dims):
-        from pyfaust import FaustFactory
+        from pyfaust import FaustFactory, wht
         had_mats = []
         had_fausts = []
         for k in range(0, len(log2_dims)):
             print("\rHadamard dims processed: ", dims[0:k+1], end='')
-            F = FaustFactory.wht(log2_dims[k])
+            F = wht(log2_dims[k])
             had_fausts += [ F ]
             had_mats += [ F.toarray() ]
         print()

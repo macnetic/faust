@@ -464,7 +464,7 @@ class TestFaustPy(unittest.TestCase):
 
 
     def testPlus(self):
-        from pyfaust import FaustFactory
+        from pyfaust import rand as frand
         from numpy.random import rand
         print("testPlus()")
         print("addition of a Faust-scalar")
@@ -479,8 +479,8 @@ class TestFaustPy(unittest.TestCase):
             self.assertAlmostEqual(norm(test_F.toarray()-ref_full_F), 0, places=3)
         print("addition Faust-Faust")
         fausts = \
-        [ FaustFactory.rand(5,F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
-         FaustFactory.rand(5,F.shape[0], .5,
+        [ frand(5,F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
+         frand(5,F.shape[0], .5,
                            field='complex')*Faust(rand(F.shape[0],F.shape[1]))]
         for i in range(0,len(fausts)):
             F2 = fausts[i]
@@ -489,7 +489,7 @@ class TestFaustPy(unittest.TestCase):
                                    places=2)
 
     def testMinus(self):
-        from pyfaust import FaustFactory
+        from pyfaust import rand as frand
         from numpy.random import rand
         print("testMinus()")
         print("substraction of a Faust-scalar")
@@ -505,8 +505,8 @@ class TestFaustPy(unittest.TestCase):
                                    places=3)
         print("substraction Faust-Faust")
         fausts = \
-        [ FaustFactory.rand(5,F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
-         FaustFactory.rand(5,F.shape[0], .5,
+        [ frand(5,F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
+         frand(5,F.shape[0], .5,
                            field='complex')*Faust(rand(F.shape[0],F.shape[1]))]
         for i in range(0,len(fausts)):
             F2 = fausts[i]
@@ -558,10 +558,10 @@ class TestFaustPy(unittest.TestCase):
         self.assertLess(norm(test_prod.toarray()-ref_prod)/norm(ref_prod),
                         1**-5)
         print("test mul of two Fausts")
-        from pyfaust import FaustFactory as FF, Faust
+        from pyfaust import rand as frand, Faust
         F = self.F
-        r_fausts = [FF.rand(self.r.randint(1,10), F.shape[1]),
-                    FF.rand(self.r.randint(1,10), F.shape[1], field='complex')]
+        r_fausts = [ frand(self.r.randint(1,10), F.shape[1]),
+                    frand(self.r.randint(1,10), F.shape[1], field='complex')]
         for i in range(0,len(r_fausts)):
             rF = r_fausts[i]
             assert(isinstance(rF, Faust))
@@ -577,7 +577,7 @@ class TestFaustPy(unittest.TestCase):
 
     def testConcatenate(self):
         print("testConcatenate()")
-        from pyfaust import FaustFactory
+        from pyfaust import rand
         from numpy.linalg import norm
         F = self.F
         FAUST,SPARSE,FULL=0,1,2
@@ -587,8 +587,7 @@ class TestFaustPy(unittest.TestCase):
                     field = 'complex'
                 else:
                     field = 'real'
-                G = \
-                FaustFactory.rand(self.r.randint(1,TestFaustPy.MAX_NUM_FACTORS),
+                G = rand(self.r.randint(1,TestFaustPy.MAX_NUM_FACTORS),
                                   F.shape[(cat_axis+1)%2],
                                   field=field)
                 # add one random factor to get a random number of rows to test
@@ -873,31 +872,31 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.29177, places=4)
 
     def testHadamard(self):
-        print("Test FaustFactory.wht()")
-        from pyfaust import FaustFactory as FF
+        print("Test pyfaust.wht()")
+        from pyfaust import wht
         pow2_exp = random.Random().randint(1,10)
         n = 2**pow2_exp
-        H = FF.wht(n, False)
+        H = wht(n, False)
         fH = H.todense()
         self.assertEqual(np.count_nonzero(fH), fH.size)
         for i in range(0,n-1):
             for j in range(i+1,n):
                 self.assertTrue((fH[i,::].dot(fH[j,::].T) == 0).all())
-        assert(np.allclose(FF.wht(n).toarray(),
-               FF.wht(n, False).normalize().toarray()))
+        assert(np.allclose(wht(n).toarray(),
+               wht(n, False).normalize().toarray()))
 
     def testFourier(self):
-        print("Test FaustFactory.dft()")
-        from pyfaust import FaustFactory as FF
+        print("Test pyfaust.dft()")
+        from pyfaust import dft
         from numpy.fft import fft
         pow2_exp = random.Random().randint(1,10)
         n = 2**pow2_exp
-        F = FF.dft(n, False)
+        F = dft(n, False)
         fF = F.todense()
         ref_fft = fft(np.eye(n))
         self.assertAlmostEqual(norm(ref_fft-fF)/norm(ref_fft),0)
-        assert(np.allclose(FF.dft(n).toarray(),
-                           FF.dft(n, False).normalize().toarray()))
+        assert(np.allclose(dft(n).toarray(),
+                           dft(n, False).normalize().toarray()))
 
     def testFGFTGivens(self):
         print("Test FaustFactory.fgft_givens()")
