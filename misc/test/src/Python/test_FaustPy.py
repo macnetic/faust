@@ -730,8 +730,8 @@ class TestFaustPyCplx(TestFaustPy):
 class TestFaustFactory(unittest.TestCase):
 
     def testFactPalm4MSA(self):
-        print("Test FaustFactory.fact_palm4msa()")
-        from pyfaust import FaustFactory;
+        from pyfaust.fact import fact_palm4msa
+        print("Test pyfaust.fact.fact_palm4msa()")
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName
         from pyfaust.factparams import ParamsPalm4MSA, StoppingCriterion
@@ -743,7 +743,7 @@ class TestFaustFactory(unittest.TestCase):
 #        init_facts.append(np.eye(32))
         #M = np.random.rand(500, 32)
         M = \
-        loadmat(sys.path[-1]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
+                loadmat(sys.path[0]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
         # default step_size
         cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
         cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32,
@@ -752,7 +752,7 @@ class TestFaustFactory(unittest.TestCase):
         param = ParamsPalm4MSA([cons1, cons2], stop_crit, init_facts=None,
                                is_update_way_R2L=False, init_lambda=1.0,
                                is_verbose=False, constant_step_size=False)
-        F, _lambda= FaustFactory.fact_palm4msa(M, param, ret_lambda=True)
+        F, _lambda = fact_palm4msa(M, param, ret_lambda=True)
         #F.display()
         #print("normF", F.norm("fro"))
         self.assertEqual(F.shape, M.shape)
@@ -765,8 +765,8 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.270954109668, places=4)
 
     def testFactHierarch(self):
-        print("Test FaustFactory.fact_hierarchical()")
-        from pyfaust import FaustFactory
+        print("Test pyfaust.fact.fact_hierarchical()")
+        from pyfaust.fact import fact_hierarchical
         from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
         from pyfaust.factparams import ConstraintReal, ConstraintInt,\
                 ConstraintName
@@ -775,7 +775,7 @@ class TestFaustFactory(unittest.TestCase):
         init_lambda = 1.0
         #M = np.random.rand(500, 32)
         M = \
-        loadmat(sys.path[-1]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
+        loadmat(sys.path[0]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
         # default step_size
         fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
         fact1_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
@@ -789,7 +789,7 @@ class TestFaustFactory(unittest.TestCase):
                                        [res0_cons, res1_cons, res2_cons],
                                        stop_crit1, stop_crit2,
                                        is_verbose=False)
-        F = FaustFactory.fact_hierarchical(M, param)
+        F = fact_hierarchical(M, param)
         self.assertEqual(F.shape, M.shape)
         E = F.todense()-M
         #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"),
@@ -799,8 +799,8 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.268513, places=5)
 
     def testFactHierarchCplx(self):
-        print("Test FaustFactory.fact_hierarchicalCplx()")
-        from pyfaust import FaustFactory
+        print("Test pyfaust.fact.fact_hierarchicalCplx()")
+        from pyfaust.fact import fact_hierarchical
         from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName
@@ -809,7 +809,7 @@ class TestFaustFactory(unittest.TestCase):
         init_lambda = 1.0
         #M = np.random.rand(500, 32)
         M = \
-        loadmat(sys.path[-1]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
+        loadmat(sys.path[0]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
         M = M + np.complex(0,1)*M
         # default step_size
         fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
@@ -824,7 +824,7 @@ class TestFaustFactory(unittest.TestCase):
                                        [res0_cons, res1_cons, res2_cons],
                                        stop_crit1, stop_crit2,
                                        is_verbose=False)
-        F = FaustFactory.fact_hierarchical(M, param)
+        F = fact_hierarchical(M, param)
         self.assertEqual(F.shape, M.shape)
         #print(F.todense())
         E = F.todense()-M
@@ -835,8 +835,8 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 1.0063, places=4)
 
     def testFactPalm4MSACplx(self):
-        print("Test FaustFactory.fact_palm4msaCplx()")
-        from pyfaust import FaustFactory
+        print("Test pyfaust.fact.fact_palm4msaCplx()")
+        from pyfaust.fact import fact_palm4msa
         from pyfaust.factparams import ParamsPalm4MSA,StoppingCriterion
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName
@@ -848,7 +848,7 @@ class TestFaustFactory(unittest.TestCase):
 #        init_facts.append(np.eye(32))
         #M = np.random.rand(500, 32)
         M = \
-        loadmat(sys.path[-1]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
+        loadmat(sys.path[0]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
         M = M + np.complex(0,1)*M
         # default step_size
         cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
@@ -858,7 +858,7 @@ class TestFaustFactory(unittest.TestCase):
         param = ParamsPalm4MSA([cons1, cons2], stop_crit, init_facts=None,
                                is_verbose=False, constant_step_size=False,
                                is_update_way_R2L=False, init_lambda=1.0)
-        F,_lambda = FaustFactory.fact_palm4msa(M, param, ret_lambda=True)
+        F,_lambda = fact_palm4msa(M, param, ret_lambda=True)
         #F.display()
         #print("normF", F.norm("fro"))
         self.assertEqual(F.shape, M.shape)
@@ -899,13 +899,14 @@ class TestFaustFactory(unittest.TestCase):
                            dft(n, False).normalize().toarray()))
 
     def testFGFTGivens(self):
-        print("Test FaustFactory.fgft_givens()")
-        from pyfaust import FaustFactory as FF
-        L = loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        print("Test fact.fgft_givens()")
+        print(sys.path)
+        import pyfaust.fact
+        L = loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         J = \
-        int(loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
-        F, D = FF.fgft_givens(L, J, 0, verbosity=0)
+        int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
+        F, D = pyfaust.fact.fgft_givens(L, J, 0, verbosity=0)
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
         print("err: ", err)
@@ -914,21 +915,21 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(err, 0.0326529, places=7)
 
     def testFGFTGivensParallel(self):
-        print("Test FaustFactory.fgft_givens() -- parallel")
-        from pyfaust import FaustFactory as FF
-        L = loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        print("Test pyfaust.fact.fgft_givens() -- parallel")
+        from pyfaust.fact import eigtj, fgft_givens
+        L = loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         J = \
-                int(loadmat(sys.path[-1]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
+                int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
         t = int(L.shape[0]/2)
-        F, D = FF.fgft_givens(L, J, t, verbosity=0)
+        F, D = fgft_givens(L, J, t, verbosity=0)
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in
         self.assertAlmostEqual(err, 0.0410448, places=7)
-        F2, D2 = FF.eigtj(L, J, t, verbosity=0)
+        F2, D2 = eigtj(L, J, t, verbosity=0)
         print("Lap norm:", norm(L, 'fro'))
         err2 = norm((F2*D.todense())*F2.T.todense()-L,"fro")/norm(L,"fro")
         print("err2: ", err2)
@@ -937,24 +938,23 @@ class TestFaustFactory(unittest.TestCase):
         self.assertEqual(err, err2)
 
     def testFactPalm4MSA_fgft(self):
-        print("Test FaustFactory._fact_palm4msa_fgft()")
+        print("Test pyfaust.fact._fact_palm4msa_fgft()")
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName, StoppingCriterion
         #from pyfaust.factparams import ParamsPalm4MSAFGFT, StoppingCriterion
         from numpy import diag,copy
-        from pyfaust import FaustFactory
+        from pyfaust.fact import _fact_palm4msa_fgft
         from pyfaust.factparams import ParamsPalm4MSAFGFT
 
-        from pyfaust import FaustFactory as FF
         L = \
-        loadmat(sys.path[-1]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['data']
+        loadmat(sys.path[0]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['data']
         init_D = \
-        loadmat(sys.path[-1]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_D']
+        loadmat(sys.path[0]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_D']
         init_D = copy(diag(init_D))
         init_facts1 = \
-                loadmat(sys.path[-1]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_facts1']
+                loadmat(sys.path[0]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_facts1']
         init_facts2 = \
-                loadmat(sys.path[-1]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_facts2']
+                loadmat(sys.path[0]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_facts2']
         init_facts = [ init_facts1, init_facts2 ]
         L = L.astype(np.float64)
         # other params should be set from file also but do it manually
@@ -968,7 +968,7 @@ class TestFaustFactory(unittest.TestCase):
                                    init_D=init_D,
                                    is_update_way_R2L=False, init_lambda=128,
                                    is_verbose=True, step_size=1e-6)
-        F, D, _lambda = FaustFactory._fact_palm4msa_fgft(L, param, ret_lambda=True)
+        F, D, _lambda = _fact_palm4msa_fgft(L, param, ret_lambda=True)
         print("Lap norm:", norm(L, 'fro'))
         print("out lambda:", _lambda)
         D = diag(D)
@@ -979,8 +979,8 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(err, 1.39352e-5, places=5)
 
     def testFactHierarchFGFT(self):
-        print("Test FaustFactory.fgft_palm()")
-        from pyfaust import FaustFactory
+        print("Test pyfaust.fact.fgft_palm()")
+        import pyfaust.fact
         from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
         from pyfaust.factparams import ConstraintReal, ConstraintInt,\
                 ConstraintName
@@ -990,13 +990,13 @@ class TestFaustFactory(unittest.TestCase):
         init_lambda = 1.0
         #M = np.random.rand(500, 32)
         U = \
-        loadmat(sys.path[-1]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['U']
+        loadmat(sys.path[0]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['U']
         Lap = \
-        loadmat(sys.path[-1]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['Lap'].astype(np.float)
+        loadmat(sys.path[0]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['Lap'].astype(np.float)
         init_D = \
-        loadmat(sys.path[-1]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['init_D']
+        loadmat(sys.path[0]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['init_D']
         params_struct = \
-        loadmat(sys.path[-1]+'/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat')['params']
+        loadmat(sys.path[0]+'/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat')['params']
         nfacts = params_struct['nfacts'][0,0][0,0] #useless
         niter1 = params_struct['niter1'][0,0][0,0]
         niter2 = params_struct['niter2'][0,0][0,0]
@@ -1030,7 +1030,7 @@ class TestFaustFactory(unittest.TestCase):
                                        constant_step_size=False)
         diag_init_D = copy(diag(init_D))
         print("norm(init_D):", norm(init_D))
-        F,D, _lambda = FaustFactory.fgft_palm(U, Lap, param,
+        F,D, _lambda = pyfaust.fact.fgft_palm(U, Lap, param,
                                                            diag_init_D,
                                                            ret_lambda=True)
         print("out_lambda:", _lambda)
@@ -1046,7 +1046,8 @@ if __name__ == "__main__":
     if(len(sys.argv)> 1):
         # argv[1] is for adding a directory in PYTHONPATH
         # (to find pyfaust module)
-        sys.path.append(sys.argv[1])
+        #sys.path.append(sys.argv[1])
+        sys.path = [sys.argv[1]]+sys.path # gives priority to pyfaust path
         del sys.argv[1] # deleted to avoid interfering with unittest
     from pyfaust import Faust
     if(len(sys.argv) > 1):

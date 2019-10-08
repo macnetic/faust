@@ -19,7 +19,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 
 	methods (Test)
 		function test_fact_palm4msa(this)
-			disp('Test FaustFactory.fact_palm4msa()')
+			disp('Test matfaust.fact.fact_palm4msa()')
 			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 2;
@@ -38,7 +38,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda, 'step_size', ParamsFact.DEFAULT_STEP_SIZE,...
 			'constant_step_size', ParamsFact.DEFAULT_CONSTANT_STEP_SIZE);
-			F = FaustFactory.fact_palm4msa(M, params)
+			F = matfaust.fact.fact_palm4msa(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -51,7 +51,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_fact_palm4msaCplx(this)
-			disp('Test FaustFactory.fact_palm4msaCplx()')
+			disp('Test matfaust.fact.fact_palm4msaCplx()')
 			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 2;
@@ -69,7 +69,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
 			stop_crit = StoppingCriterion(200);
 			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda);
-			F = FaustFactory.fact_palm4msa(M, params)
+			F = matfaust.fact.fact_palm4msa(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -80,7 +80,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_fact_hierarchical(this)
-			disp('Test FaustFactory.fact_hierarchical()')
+			disp('Test matfaust.fact.fact_hierarchical()')
 			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 4;
@@ -106,7 +106,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
 			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2);
-			F = FaustFactory.fact_hierarchical(M, params)
+			F = matfaust.fact.fact_hierarchical(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -119,7 +119,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_fact_hierarchicalCplx(this)
-			disp('Test FaustFactory.fact_hierarchicalCplx()')
+			disp('Test matfaust.fact.fact_hierarchicalCplx()')
 			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 4;
@@ -146,7 +146,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit2 = StoppingCriterion(200);
 			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2,...
 					'init_lambda', init_lambda, 'is_update_way_R2L', is_update_way_R2L);
-			F = FaustFactory.fact_hierarchical(M, params)
+			F = matfaust.fact.fact_hierarchical(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -159,11 +159,11 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 		end
 
 		function test_fgft_givens(this)
-			disp('Test FaustFactory.fgft_givens()')
+			disp('Test matfaust.fact.fgft_givens()')
 			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
-			[F,D] = FaustFactory.fgft_givens(Lap, J);%, 0, 'verbosity', 1);
+			[F,D] = matfaust.fact.fgft_givens(Lap, J);%, 0, 'verbosity', 1);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -173,18 +173,18 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			% misc/test/src/C++/GivensFGFT.cpp.in
 			this.verifyEqual(err, 0.0326529, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
-			[F2,D2] = FaustFactory.eigtj(Lap, J);%, 0, 'verbosity', 2);
+			[F2,D2] = matfaust.fact.eigtj(Lap, J);%, 0, 'verbosity', 2);
 			this.verifyEqual(full(F2),full(F))
 			this.verifyEqual(D,D2)
 		end
 
 		function test_fgft_givens_parallel(this)
-			disp('Test FaustFactory.fgft_givens() -- parallel')
+			disp('Test matfaust.fact.fgft_givens() -- parallel')
 			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			t = size(Lap,1)/2;
-			[F,D] = FaustFactory.fgft_givens(Lap, J, t); %, 'verbosity', 2);
+			[F,D] = matfaust.fact.fgft_givens(Lap, J, t); %, 'verbosity', 2);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -194,13 +194,13 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			% misc/test/src/C++/GivensFGFTParallel.cpp.in
 			this.verifyEqual(err,0.0410448, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
-			[F2,D2] = FaustFactory.eigtj(Lap, J, t); %, 'verbosity', 2);
+			[F2,D2] = matfaust.fact.eigtj(Lap, J, t); %, 'verbosity', 2);
 			this.verifyEqual(full(F2),full(F))
 			this.verifyEqual(D,D2)
 		end
 
 		function test_fgft_palm(this)
-			disp('Test FaustFactory.fgft_palm()')
+			disp('Test matfaust.fact.fgft_palm()')
 			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 4;
@@ -225,7 +225,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			params.init_lambda = 128;
 			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2, 'is_fact_side_left', params.fact_side == 1, 'is_update_way_R2L', params.update_way == 1, 'init_lambda', params.init_lambda, 'step_size', params.stepsize, 'constant_step_size', false, 'is_verbose', params.verbose ~= 1);
 			diag_init_D = diag(init_D)
-			[F,D,lambda] = FaustFactory.fgft_palm(U, Lap, params, diag_init_D)
+			[F,D,lambda] = matfaust.fact.fgft_palm(U, Lap, params, diag_init_D)
 			this.verifyEqual(size(F), size(U))
 			%disp('norm F: ')
 			%norm(F, 'fro')
