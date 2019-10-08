@@ -408,8 +408,8 @@ classdef FaustTest < matlab.unittest.TestCase
 			this.assertLessThan(norm(full(F'*r)-full(F)'*r)/norm(full(F)'*r), eps(1.))
 			this.assertLessThan(norm(full(F.'*r)-full(F).'*r)/norm(full(F).'*r), eps(1.))
 			disp('test mul of two Fausts')
-			r_fausts = {matfaust.FaustFactory.rand(randi(100), size(F,2)),
-			matfaust.FaustFactory.rand(randi(100), size(F,2), .5, 'complex')};
+			r_fausts = {matfaust.rand(randi(100), size(F,2)),
+			matfaust.rand(randi(100), size(F,2), .5, 'complex')};
 			for ii=1:length(r_fausts)
 				rF = r_fausts{ii};
 				test_rF = full(F*rF);
@@ -448,7 +448,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			disp('test plus(Faust1,Faust2)')
 			import matfaust.FaustFactory
 			import matfaust.Faust
-			fausts = {FaustFactory.rand(5,size(F,1))*Faust(rand(size(F,1),size(F,2))), FaustFactory.rand(5,size(F,1), .5, 'complex')*Faust(rand(size(F,1),size(F,2)))}
+			fausts = {matfaust.rand(5,size(F,1))*Faust(rand(size(F,1),size(F,2))), matfaust.rand(5,size(F,1), .5, 'complex')*Faust(rand(size(F,1),size(F,2)))}
 			for i=1:length(fausts)
 				F2 = fausts{i}
 				this.verifyEqual(full(F+F2),full(F)+full(F2),'RelTol', 10^-2)
@@ -469,7 +469,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			disp('test minus(Faust1,Faust2)')
 			import matfaust.FaustFactory
 			import matfaust.Faust
-			fausts = {FaustFactory.rand(5,size(F,1))*Faust(rand(size(F,1),size(F,2)))} %, FaustFactory.rand(5,size(F,1), .5, 'complex')*rand(size(F,2),size(F,2))} %TODO: re-enable complex Faust when #72 is solved
+			fausts = {matfaust.rand(5,size(F,1))*Faust(rand(size(F,1),size(F,2)))} %, matfaust.rand(5,size(F,1), .5, 'complex')*rand(size(F,2),size(F,2))} %TODO: re-enable complex Faust when #72 is solved
 			for i=1:length(fausts)
 				F2 = fausts{i}
 				this.verifyEqual(full(F-F2),full(F)-full(F2),'RelTol', 10^-2)
@@ -477,17 +477,18 @@ classdef FaustTest < matlab.unittest.TestCase
 		end
 
 		function testcat(this)
-			import matfaust.*
+			import matfaust.rand
+			import matfaust.Faust
 			disp('Test cat')
-			FAUST=0
-			SPARSE=1
-			FULL=2
+			FAUST=0;
+			SPARSE=1;
+			FULL=2;
 			for typeG=0:2
 				for dimcat=1:2
 					other_dim = mod(dimcat,2)+1;
 					F = this.test_faust;
 					%=============== test vert (or horz) cat
-					G = FaustFactory.rand(randi(FaustTest.MAX_NUM_FACTORS), size(F,other_dim));
+					G = matfaust.rand(randi(FaustTest.MAX_NUM_FACTORS), size(F,other_dim));
 					G_num_factors = numfactors(G);
 					% set a Faust with a random number of rows (or cols) from G
 					H_facs = cell(1,G_num_factors+1);
