@@ -586,6 +586,7 @@ class hadamard:
         from pyfaust import FaustFactory, wht
         from pyfaust.factparams import ParamsHierarchicalFact, ConstraintInt, \
         ConstraintName, StoppingCriterion
+        from pyfaust.fact import hierarchical
 
         # generate a Hadamard transform and factorize its full matrix
         n = hadamard._n
@@ -599,7 +600,7 @@ class hadamard:
                                          for i in range(0,n-1)],
                                         StoppingCriterion(num_its=30),StoppingCriterion(num_its=30),
                                         is_update_way_R2L=True)
-        had_faust = FaustFactory.fact_hierarchical(H.toarray(), params)
+        had_faust = hierarchical(H.toarray(), params)
         full_had_faust = had_faust.toarray()
         rel_err = norm(full_had_faust-full_H)/norm(full_H)
         print("\n\nRelative error between hadamard matrix and its transform: ",
