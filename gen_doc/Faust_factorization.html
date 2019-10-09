@@ -11775,7 +11775,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Using-the-FA&#181;ST-Factorization-Wrappers">Using the FA&#181;ST Factorization Wrappers<a class="anchor-link" href="#Using-the-FA&#181;ST-Factorization-Wrappers">&#182;</a></h1><p>Previous notebooks already addressed a part of the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1FaustFactory.html">FaustFactory's</a> functionalities however this class is mainly dedicated to the algorithms that (approximately) factorize a dense matrix into a <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html">Faust</a> object.
+<h1 id="Using-the-FA&#181;ST-Factorization-Wrappers">Using the FA&#181;ST Factorization Wrappers<a class="anchor-link" href="#Using-the-FA&#181;ST-Factorization-Wrappers">&#182;</a></h1><p>Previous notebooks already addressed a part of the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html">pyfaust's</a> functionalities however <code>pyfaust.fact</code> which is a central module was not covered. It is mainly dedicated to the algorithms that (approximately) factorize a dense matrix into a <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1Faust.html">Faust</a> object.
 This is the subject covered (partly) in this notebook.</p>
 <p>You will see how to launch the algorithms easily, how to feed them with your own complex set of parameters, how to run them for only few steps when possible, how to use a variant or another, how to enable debugging information, etc.</p>
 <p><strong>NOTE</strong>: the notebook is made to be executed sequentially, otherwise, skipping some cells, you would end up on an import error.</p>
@@ -11803,7 +11803,7 @@ This is the subject covered (partly) in this notebook.</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="1.1-Generating-a-Hadamard-Matrix">1.1 Generating a Hadamard Matrix<a class="anchor-link" href="#1.1-Generating-a-Hadamard-Matrix">&#182;</a></h3><p>Before to tackle Hadamard matrices factorization, let's introduce one of the FaustFactory method which is actually directly related: <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1FaustFactory.html#a63efd7f7fd058b499a2edcf251361590">FaustFactory.wht</a>.
+<h3 id="1.1-Generating-a-Hadamard-Matrix">1.1 Generating a Hadamard Matrix<a class="anchor-link" href="#1.1-Generating-a-Hadamard-Matrix">&#182;</a></h3><p>Before to tackle Hadamard matrices factorization, let's introduce one pyfaust's function which is actually directly related: <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html#a7dca1d7342d67faaf765f6c80ce16008">wht</a>.<br>
 This method allows you to generate sparse Hadamard transforms.</p>
 
 </div>
@@ -11811,16 +11811,16 @@ This method allows you to generate sparse Hadamard transforms.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">FaustFactory</span> <span class="k">as</span> <span class="n">FF</span>
+<span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">wht</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">norm</span>
 <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">rand</span>
-<span class="c1"># generate a Hadamard Faust of size 32x32 (norma=False is to avoid normalization)</span>
-<span class="n">FH</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">wht</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">norma</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="c1"># generate a Hadamard Faust of size 32x32</span>
+<span class="n">FH</span> <span class="o">=</span> <span class="n">wht</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># normed=False is to avoid column normalization</span>
 <span class="n">H</span> <span class="o">=</span> <span class="n">FH</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span> <span class="c1"># the dense matrix version</span>
 <span class="n">FH</span><span class="o">.</span><span class="n">imshow</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -11830,32 +11830,10 @@ This method allows you to generate sparse Hadamard transforms.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-"
->
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">count_nonzero</span>
@@ -11863,26 +11841,6 @@ This method allows you to generate sparse Hadamard transforms.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[2]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>1024</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -11898,7 +11856,7 @@ This method allows you to generate sparse Hadamard transforms.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">FH</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">())</span>
@@ -11906,28 +11864,6 @@ This method allows you to generate sparse Hadamard transforms.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-"
->
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -11943,7 +11879,7 @@ This method allows you to generate sparse Hadamard transforms.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">array</span>
@@ -11958,26 +11894,6 @@ This method allows you to generate sparse Hadamard transforms.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[4]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>True</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12002,7 +11918,7 @@ This method allows you to generate sparse Hadamard transforms.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">faust_fact</span>
@@ -12012,45 +11928,6 @@ This method allows you to generate sparse Hadamard transforms.</p>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s): 
-- FACTOR 0 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-- FACTOR 1 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-- FACTOR 2 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-- FACTOR 3 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-- FACTOR 4 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-"
->
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12067,7 +11944,7 @@ Just to be sure let's verify the relative error against H.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;err=&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">FH2</span><span class="o">-</span><span class="n">H</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
@@ -12077,56 +11954,34 @@ Just to be sure let's verify the relative error against H.</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>err= 1.1015152586160387e-16
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This is good! Now to explain a little bit, the <code>faust_fact</code>'s 2nd argument <code>'hadamard'</code> is a shorthand to designate a more complicated set of parameters fitting the Hadamard matrix factorization which was encoded into pyfaust like other configurations.</p>
-<p>Speaking about shorthand, it's noteworthy that <code>faust_fact</code> is an alias of <a href="file:///home/hinria/faust/build/doc/html/classpyfaust_1_1FaustFactory.html#ad4538456220163da26c32c1b956f1fe9">FaustFactory.hierarchical_fact</a>.
-Actually, this is quite clear now I think, but this function implements the hiearchical factorization which is PALM4MSA based. For details about the theory behind the algorithms you can read the Luc <a href="https://tel.archives-ouvertes.fr/tel-01412558">Le Magoarou's thesis</a>.</p>
-<p>We won't go into details nevertheless it's important to see how to define the parameters manually in order to proceed to your own custom factorizations. For that purpose we need to describe approximately the algorithm but please keep in mind this is just an insight (for instance, the norms below are voluntarily not defined).</p>
+<p>Good! The argument <code>'hadamard'</code> of <code>faust_fact</code> is a shorthand to a set of parameters fitting the factorization of Hadamard matrices.</p>
+<p>Speaking about shorthand, <code>faust_fact</code> is an alias of <a href="file:///home/hinria/faust/build/doc/html/namespacepyfaust_1_1fact.html#ad2108e97e89a17da27ce480d65155eb4">pyfaust.fact.hierarchical</a>.
+This function implements the hiearchical factorization based on PALM4MSA. For details about the theory behind these algorithms you can read the thesis of <a href="https://tel.archives-ouvertes.fr/tel-01412558">Luc Le Magoarou</a>.</p>
+<p>We won't go into further details nevertheless it's important to see how to define the parameters manually in order to proceed to your own custom factorizations. For that purpose we need to describe approximately the algorithm but please keep in mind this is just an insight (for instance, the norms below are voluntarily not defined).</p>
 <p>Basically, the hierarchical algorithm works like this:</p>
 <ul>
 <li>If you want to decompose a matrix $M$ in $J$ factors, the algorithm will iterate $(J-1)$ times. Each iteration follows two steps:<br/>
-<strong>1.</strong> (the <em>local optimization</em>) At each iteration $i$, the currently considered matrix $R_{i-1}$ (with $R_0=M$) is decomposed in two factors by the PALM4MSA algorithm as respect to the minimization $\| R_{i-1} - S_{i}R_{i} \|$. <br/>$S_i$ is the resulting factor while $R_{i}$ is the <em>residuum</em> of our factorization.<br/>
-<strong>2.</strong> (the <em>global optimization</em>) At the end of each iteration $i$, PALM4MSA is called again to ideally compute the $argmin_{\{S_1, ..., S_i\}, R_i}$ $\|M - (\prod_{j=1}^i S_j) R_i\|$ </li>
+<strong>1.</strong> (<em>local optimization</em>) At each iteration $i$, the currently considered matrix $R_{i-1}$ (with $R_0=M$) is decomposed in two factors by the PALM4MSA algorithm as respect to the minimization $\| R_{i-1} - S_{i}R_{i} \|$. <br/>$S_i$ is the resulting factor while $R_{i}$ is the <em>residual</em> of our factorization.<br/>
+<strong>2.</strong> (<em>global optimization</em>) At the end of each iteration $i$, PALM4MSA is called again to ideally compute the $argmin_{\{S_1, ..., S_i\}, R_i}$ $\|M - (\prod_{j=1}^i S_j) R_i\|$ </li>
 <li>So ideally at the end of the iteration (J-1) you'll get something like $M \approx \prod_{i=1}^J S_i$ taking $S_J = R_{J-1} $.</li>
 </ul>
-<h3 id="1.2.1-Defining-the-Constraints">1.2.1 Defining the Constraints<a class="anchor-link" href="#1.2.1-Defining-the-Constraints">&#182;</a></h3><p>The explanation above is eluding something primary: the sparsity constraints. Indeed, the purpose of the algorithm is not only to decompose a matrix but also to enhance its sparsity, as hinted by the FAµST acronym: Flexible Approximate Multi-layer Sparse Transform.</p>
-<p>So you'll need to feed the algorithm with sparsity constraints. In fact, you'll define one pair of constraints per iteration, the first is for the factor $S_{i}$ and the second for $R_i$ (the <em>residuum</em>).</p>
+<h3 id="1.2.1-Defining-the-Constraints">1.2.1 Defining the Constraints<a class="anchor-link" href="#1.2.1-Defining-the-Constraints">&#182;</a></h3><p>The explanation above is eluding something essential: the sparsity constraints. Indeed, the purpose of the algorithm is not only to decompose a matrix but also to enhance its sparsity, as hinted by the FAµST acronym: Flexible Approximate Multi-layer Sparse Transform.</p>
+<p>So you'll need to feed the algorithm with sparsity constraints. In fact, you'll define one pair of constraints per iteration, the first is for the factor $S_{i}$ and the second for $R_i$ (the <em>residual</em>).</p>
 <p>The pyfaust API is here to help you define the constraints in one shot but you can if you want define constraints one by one as we'll see later.</p>
-<p>Let's unveil the factorization constraints to decompose the Hadamard matrix $H \in \mathbb R^{n \times n}$. Generally in pyfaust, the constraints are defined in terms of norms, in our case of Hadamard factorization we'll use 0-norms:</p>
-<ul>
-<li>$ \forall i \in \{1,...,J-1\}, \|S_i\|_0 = 2n  \hspace{1cm} (C1) $</li>
-<li>$ \forall i \in \{1,...,J-1\}, \| R_i \|_0 = {n^2 \over 2^i}  \hspace{1cm} (C2)$</li>
-</ul>
-<p>Enough of explanations! Let's go back to the code and define our constraints as lists (provided by the module <code>pyfaust.factparams</code>):</p>
+<p>Let's unveil the factorization constraints to decompose the Hadamard matrix $H \in \mathbb R^{n \times n}$.<br>
+Let's go back to the code and define our constraints as lists (provided by the module <code>pyfaust.factparams</code>):</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.factparams</span> <span class="k">import</span> <span class="n">ConstraintList</span>
@@ -12151,28 +12006,21 @@ Actually, this is quite clear now I think, but this function implements the hiea
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The <code>'splincol'</code> constraint used here is for defining the maximum number of nonzeros elements to respect for any row or column of the considered matrix (here $S_i$ or $R_i$). 
-Looking at <code>S_constraints</code> initialization, we see in the first line <code>'splincol', 2, n, n</code>; the value 2 means we impose 2 nonzeros per-column and per-row, the next arguments define the size of the matrix to constrain (its number of rows and columns).</p>
-<p>So in the example of <code>S_constraints</code> all the matrices will have a 0-norm equal to 2n, that is exactly what (C1) defined.<br/>
-I let you decrypt why <code>R_constraints</code> correspond likewise to (C2).</p>
+Looking at <code>S_constraints</code> initialization, we see in the first line <code>'splincol', 2, n, n</code>; the value 2 means we target 2 nonzeros per-column and per-row, the next arguments define the size of the matrix to constrain (its number of rows and columns).</p>
+<p>So in the example of <code>S_constraints</code> all the targeted matrices have a 0-norm equal to 2n.</p>
+<p>More generally in pyfaust, the constraints are defined in terms of norms, in our case of Hadamard factorization we used the following 0-norms:</p>
+<ul>
+<li>$ \forall i \in \{1,...,J-1\}, \|S_i\|_0 = 2n  \hspace{1cm} (C1) $</li>
+<li>$ \forall i \in \{1,...,J-1\}, \| R_i \|_0 = {n^2 \over 2^i}  \hspace{1cm} (C2)$</li>
+</ul>
+<p>Enough of explanations! I let you decrypt why <code>R_constraints</code> correspond likewise to (C2).</p>
 <p>But wait a minute, what would happen if we have a set of one hundred constraints? Don't worry! The pyfaust API allows to alternatively set the constraints one by one:</p>
+<p>from pyfaust.factparams import ConstraintInt
+S_constraints = [ConstraintInt('splincol', n, n, 2) for i in range(0,4)]
+R_constraints = [ConstraintInt('splincol', n, n, int(n/2**i)) for i in range(1,5)]</p>
 
 </div>
 </div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.factparams</span> <span class="k">import</span> <span class="n">ConstraintInt</span>
-<span class="n">S_constraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">ConstraintInt</span><span class="p">(</span><span class="s1">&#39;splincol&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">)]</span>
-<span class="n">R_constraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">ConstraintInt</span><span class="p">(</span><span class="s1">&#39;splincol&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -12180,7 +12028,7 @@ I let you decrypt why <code>R_constraints</code> correspond likewise to (C2).</p
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><code>S_constraints</code> and <code>R_constraints</code> are still the exact same set of constraints as before.</p>
 <p><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ConstraintInt.html">ConstraintInt</a> is a family of integer constraints. More globally, there is a hierarchy of classes whose parent class is <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ConstraintGeneric.html">ConstraintGeneric</a> where you'll find other kind of constraints ; <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ConstraintMat.html">ConstraintMat</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1factparams_1_1ConstraintReal.html">ConstraintReal</a>.</p>
-<p>The table <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/constraint.png">here</a> can give you an idea of each constraint definition. A constraint is always associated to a proximal operator which projects the matrix into the set of matrices defined by the constraint or at least it tries to (because it's not necessarily possible).</p>
+<p>The table <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/constraint.png">here</a> can give you an idea of each constraint definition. Most constraints are associated to a proximal operator which projects the matrix into the set of matrices defined by the constraint or at least it tries to (because it's not necessarily possible).</p>
 <p>In the latest version of FAµST it's possible to <code>project</code> matrices from the wrappers themselves, let's try one ConstraintInt:</p>
 
 </div>
@@ -12188,33 +12036,16 @@ I let you decrypt why <code>R_constraints</code> correspond likewise to (C2).</p
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.factparams</span> <span class="k">import</span> <span class="n">ConstraintInt</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">A_</span> <span class="o">=</span> <span class="n">ConstraintInt</span><span class="p">(</span><span class="s1">&#39;sp&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">18</span><span class="p">)</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;A nnz:&quot;</span><span class="p">,</span> <span class="n">count_nonzero</span><span class="p">(</span><span class="n">A</span><span class="p">),</span> <span class="s2">&quot;A_ nnz:&quot;</span><span class="p">,</span> <span class="n">count_nonzero</span><span class="p">(</span><span class="n">A_</span><span class="p">))</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>A nnz: 100 A_ nnz: 18
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -12235,7 +12066,7 @@ You have to define two stopping criteria, one for the <em>local optimization</em
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.factparams</span> <span class="k">import</span> <span class="n">StoppingCriterion</span>
@@ -12252,7 +12083,7 @@ You have to define two stopping criteria, one for the <em>local optimization</em
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The type of stopping criterion used here is the number of iterations of PALM4MSA, that is the number of times all the current factors ($R_i$ included) are updated either for the local or the global optimization. So, regarded the initialization of <code>loc_stop</code> and <code>glob_stop</code> above, if you asked J factors (through the number of constraints you set) you'd count a total of $(30+30)*(J-1)$ iterations of PALM4MSA.</p>
+<p>The type of stopping criterion used here is the number of iterations of PALM4MSA, that is the number of times all the current factors ($R_i$ included) are updated either for the local or the global optimization. So, with the initialization of <code>loc_stop</code> and <code>glob_stop</code> above, if you ask J factors (through the number of constraints you set) you'd count a total of $(30+30)*(J-1)$ iterations of PALM4MSA.</p>
 <p>Ok, I think we're done with the algorithm parameters, we can pack them into one object and give it to <code>faust_fact</code>.</p>
 
 </div>
@@ -12260,7 +12091,7 @@ You have to define two stopping criteria, one for the <em>local optimization</em
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.factparams</span> <span class="k">import</span> <span class="n">ParamsHierarchicalFact</span>
@@ -12275,31 +12106,6 @@ You have to define two stopping criteria, one for the <em>local optimization</em
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[11]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s): 
-- FACTOR 0 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-- FACTOR 1 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-- FACTOR 2 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-- FACTOR 3 (real) SPARSE, size 32x32, density 0.0625, nnz 64
-- FACTOR 4 (real) SPARSE, size 32x32, density 0.0625, nnz 64</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -12307,7 +12113,7 @@ You have to define two stopping criteria, one for the <em>local optimization</em
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>You might wonder what is the boolean <code>is_update_way_R2L</code>. Its role is to define if the PALM4MSA algorithm will update the $S_i$ and last $R_i$ factors from the left to right (if <code>False</code>) or toward the opposite direction (if <code>True</code>). It does change the results of factorization!</p>
 <p>I must mention that there are several other optional arguments you'd want to play with for configuring, just dive into the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html">documentation</a>.</p>
-<p>You also might call the PALM4MSA algorithm directly (not the hierarchical algorithm which makes use of it), the function is <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1FaustFactory.html#ab21d4f590515e18250687e67acc58f23">here</a>. You can theoretically reproduce the hierarchical algorithm step by step calling <code>fact_palm4msa()</code> by yourself.</p>
+<p>You also might call the PALM4MSA algorithm directly (not the hierarchical algorithm which makes use of it), the function is <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a62842439447dad2e2e696f2e695d6399">here</a>. You can theoretically reproduce the hierarchical algorithm step by step calling <code>fact_palm4msa()</code> by yourself.</p>
 <p>Well, there would be a lot to say and show about these two pyfaust algorithms and their parameters but at least with this example, I hope, you got an insight of how it works.</p>
 
 </div>
@@ -12317,7 +12123,7 @@ You have to define two stopping criteria, one for the <em>local optimization</em
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="2.-The-FGFT-Algorithms">2. The FGFT Algorithms<a class="anchor-link" href="#2.-The-FGFT-Algorithms">&#182;</a></h2><p>Since the version 2.4 FAµST is able to compute Fast Graph Fourier Transforms.
+<h2 id="2.-The-FGFT-Algorithms">2. The FGFT Algorithms<a class="anchor-link" href="#2.-The-FGFT-Algorithms">&#182;</a></h2><p>Since version 2.4, FAµST is able to compute Fast Graph Fourier Transforms.
 FAµST includes two algorithms with this goal:</p>
 <ul>
 <li>The first one is a variant of the hierarchical algorithm discussed in <a href="#1.-The-Hierarchical-PALM4MSA-Algorithm">1</a>.</li>
@@ -12331,7 +12137,7 @@ FAµST includes two algorithms with this goal:</p>
 <li><p>Le Magoarou L. and Gribonval R., <a href="https://hal.inria.fr/hal-01254108">"Are there approximate Fast Fourier Transforms on graphs ?", ICASSP, 2016</a></p>
 </li>
 </ul>
-<h3 id="2.0-The-pygsp-Toolbox">2.0 The pygsp Toolbox<a class="anchor-link" href="#2.0-The-pygsp-Toolbox">&#182;</a></h3><p>Since we're going to work with graph Laplacians it would be a pity not to plot things. The pygsp toolbox provides what you need to easily obtain Laplacians of different graph families. Please install the package with pip (or maybe conda).</p>
+<h3 id="2.0-The-pygsp-Toolbox">2.0 The pygsp Toolbox<a class="anchor-link" href="#2.0-The-pygsp-Toolbox">&#182;</a></h3><p>Since we're going to work with graph Laplacians it would be a pity not to plot things. The pygsp toolbox provides what you need to easily obtain Laplacians of different graph families. Please install the <a href="https://pypi.org/project/PyGSP/">package</a> with pip (or maybe conda).</p>
 <p>Let's plot the Minnesota graph (on the right) and its associated Laplacian matrix (on the left).</p>
 
 </div>
@@ -12339,7 +12145,7 @@ FAµST includes two algorithms with this goal:</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pygsp.graphs</span> <span class="k">import</span> <span class="n">minnesota</span>
@@ -12355,35 +12161,12 @@ FAµST includes two algorithms with this goal:</p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-"
->
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The goal of our FGFT algorithms is basically to produce an approximate sparse transform (a Faust) of the Fourier basis (i.e. the basis of eigenvectors of the graph Laplacian) and the diagonal matrix of the corresponding eigenvalues.
-If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat U$ and a diagonal factor $\hat D$ such that: $ L \approx \hat U \hat D \hat U ^ T$</p>
+<p>The goal of FGFT algorithms is to obtain an orthonormal Faust that nearly diagonalizes a symmetric matrix. In terms of graph signal processing, the considered symmetric matrix is typically a graph Laplacian $L$, and the Faust is expected to approximate the graph Fourier basis, i.e., the basis of eigenvectors of $L$. Given $L$, the algorithm outputs an orthonormal Faust $\hat U$ and a diagonal factor $\hat D$ such that: $L \approx \hat U \hat D \hat U^T$.</p>
 
 </div>
 </div>
@@ -12392,7 +12175,7 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="2.1-The-Givens-/-Jacobi-Truncated-Algorithms">2.1 The Givens / Jacobi Truncated Algorithms<a class="anchor-link" href="#2.1-The-Givens-/-Jacobi-Truncated-Algorithms">&#182;</a></h3>
+<h3 id="2.1-The-Truncated-Jacobi-Algorithms">2.1 The Truncated Jacobi Algorithms<a class="anchor-link" href="#2.1-The-Truncated-Jacobi-Algorithms">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -12400,21 +12183,24 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's run the first algorithm (truncated Jacobi, hence the name <code>eigtj</code>) on our Laplacian example. You'll see it's really straightforward!</p>
+<p>Let's run the first algorithm (truncated Jacobi for eigen decomposition, hence the name <code>eigtj</code>) on the Minnesota Laplacian example. You'll see it's really straightforward!</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">FaustFactory</span> <span class="k">as</span> <span class="n">FF</span>
+<span class="kn">from</span> <span class="nn">pyfaust.fact</span> <span class="k">import</span> <span class="n">eigtj</span>
 <span class="n">L</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
-<span class="n">Uhat</span><span class="p">,</span> <span class="n">Dhat</span> <span class="o">=</span> <span class="n">FF</span><span class="o">.</span><span class="n">eigtj</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">J</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">5</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
-<span class="n">Uhat</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">min</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="n">Uhat</span><span class="o">.</span><span class="n">get_num_factors</span><span class="p">())))</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Uhat0-9&#39;</span><span class="p">)</span>
+<span class="n">Uhat</span><span class="p">,</span> <span class="n">Dhat</span> <span class="o">=</span> <span class="n">eigtj</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">J</span><span class="o">=</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">5</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">Uhat</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">min</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="n">Uhat</span><span class="o">.</span><span class="n">numfactors</span><span class="p">())))</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Uhat0-9&#39;</span><span class="p">)</span> <span class="c1"># For the sake of visibility </span>
+                                                                        <span class="c1"># only the first nine factors of Uhat </span>
+                                                                        <span class="c1"># are displayed, as you can see they are</span>
+                                                                        <span class="c1"># sparse and Dhat is a diagonal matrix.</span>
 <span class="n">_a</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">Dhat</span><span class="o">.</span><span class="n">toarray</span><span class="p">())</span>
 <span class="n">title</span> <span class="o">=</span> <span class="n">_a</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Dhat</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -12424,118 +12210,41 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXgAAAESCAYAAAD38s6aAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDIuMi4zLCBodHRwOi8vbWF0cGxvdGxpYi5vcmcvIxREBQAAIABJREFUeJzt3XmcHGW1//HPmZksZJKQhLBkY+tkCIEYRC4giggiyL4FAiIILtw2YUlMvC4/F4SrXn0JKIp68bLIFdITkgAhwgUVUHFBEFlkCwkEEggkZN+X6fP7o2qgU10zmUlmpqqrv+/Xa15JV2+nnq4+/dSpp54yd0dERLKnJukARESkcyjBi4hklBK8iEhGKcGLiGSUEryISEYpwYuIZJQSvHQ4M/ucmT2SdBwdyQK3mdkKM/tL0vGItIUSfMqZ2XwzW29ma0r+Bnfi+/3azK5s5f7hZlZ28sS2nteO9z/WzObHLP+Smb1lZivN7H/MrHsrr9HfzP7XzJaY2WIz+0bJfXVmtmU7QvsocBQw2N2P2I7nN79/7PqJdAYl+Mpwirv3Lvl7M+mAupKZnQRMBo4G9gH2A77ZylOuB7oBewKHA58xswt2MIy9gFfdfd0Ovs4OMbO6JN9fKosSfIUysxozmx72aleY2SNmtn/J/Y+a2UUlt98tm4TPvT7s3a40s2fMbJSZjQfGAV8L9xTu2rEQ7bowtlfM7LhILC+Y2Wozm2dmnwuX7wzcC+xZsreyG/Bp4EZ3f8HdlwH/CVwU857NTga+7+7r3f0V4BbgMy0E+dlwL2l1GOe5MY+5BPgFcGQY0zfMbBczuy/cS1huZvea2ZCS5+xiZrea2aLw/hktrZ+Z9Qw/j0Vm9oaZXdu8h9Lc4zezr5nZW8Avw+fcF7btMjP7Y9s/FqkmSvCVbTYwAtgD+Bfwv2183gkEPdsRQH/gXGCZu/8MaAS+G+4pnLEDsR0BPAvsAlwH3FRy39vASUBf4PPAT8zsfe6+EjgFeL1kb2UxcADwdMnznwaGhAkzjoV/pbcPBHD3Le5eB2BmfYFrgY+7ex/gQ8Az0Rdz9xuBS4E/hTFdTfDd+SXBXsJewGbgxyVPuwPoDowCdgd+3Mr6fRM4BHgf8P4wjq+WvNZQoHf4XuOBLwGvALsSfPbfQCSGEnxluDvsra0ws7sB3L3o7re6+2p33wBcCXzAzOrb8HqbCZLryPC1nnf3tzo45nnufrO7NwG/Aoaa2cDw/e5191c88BDwe+DIVl6rN7Cy5Hbz//u08Pj/A75iZr3NbARBb79XC4914EAz6+nui9z9+basnLsvcfe7wr2EVcB3CWr0mNkw4GPAF9x9ubtvcvfWetnnA1eGr7kYuAooLSltCe/f5O7rCT6/wcCe4bI/tCVmqT5K8JXhdHfvF/6dDmBmtWb2g7CssAqYGz524LZezN0fJCg5/Bx428x+YWYtJcuoLeH7d4ss70aQeJqV/mA01617h8892cweC8sLK4DjthH3GoIfpGbN/28ulzSXO34aLr8UaALmAXcBU4GF0RcNE/N5wATgLTObbWYNrcTxLjOrDw/2vh62/0Ml6zAMeCfssbfFIOC1ktuvAUNKbr/t7ptKbv9X+JjfhyWuL7XxfaTKKMFXrguBE4FjgJ2B4eHy5tLEWrbute5R+mR3/5G7H0xQuhgFfLH5rm287xsEyXPvyPJ92DpJxTKznYDpwPeA3d29H/BgSdxx7/8cMKbk9hjgDXdf4e5Xl5Q7Lg3X7R13P8/dd3f3A4E64O9x8bj7/e5+LEGSnQv897bWIfQfBOt8qLv3Jfgcmi0ABoYloLK3jFm2iKDM02xPgnaOfY67r3L3Se6+N3A68GUzO6qNcUsVUYKvXH2AjcBSgkT+ncj9TwFnmdlOYa/03YOMZnZo+FdH8EOwiSBpQ1Af37elN3X3zQS94u+a2QAz6xaOUBkBPNCGuHsQ1KaXAE1mdjJBOaPZ2wTJsXSP4jbg82Y20swGAF8Hbm3pDSwYyjnAgiGRJwGfpbx9MLNBZnaKmfUiaIO1vNcO29KHYM9kuZntQsmoHndfAPwOuMHM+oVt9JFW1m8q8E0zG2hmuxLU1H/dyvqdYmY5MzOCclVTO+KWKqIEX7luAd4M/54Doiff/JCg57cYuJmtE0Y/goOeK4D5BD3I68L7/gcYE478mN7Ce+eB1QQHURcD/w6c6O5LthW0u68AJhH8SCwDxhIcLG6+/1/ADGB+eMxhN3efHcb3xzDelwnq1C35N4I2WQVcDYxz9xdjHldLcMByEcEP5REE5Z22uJZgz2kpQdvfH7n/U+G/cwiS+mUtrR/wbYIDx88SHOR9jGAPpyX7EZSE1gB/JjiA+2gb45YqYrrgh4hINqkHLyKSUUrwIiIZpQQvIpJRSvAiIhmlBC8iklFK8CIiGZXaBB+eqHKXma01s9fM7JNJx5QkM7vUzJ4ws41mdmvS8aSBmfUws5vC7WO1mf3TzE5IOq6kWTA3/yIzW2VmcyycrVPAzEaY2QYza/FEsixJ89zSNxCcXbg7cBDwGzN72t2fSzasxLxJME3u8cBOCceSFnUE0wIcBbxOMHXDNDMb7e7zkwwsYd8DPuvuG81sJPCImf3T3f+RdGApcAPweNJBdJVU9uDDGRHPAr7h7mvCs/RmsfUMe1XF3We6+90EZ04K4O5r3f1Kd58fzq45G3gV+EDSsSXJ3Z9z943NN8O/XIIhpYIFc/2vIJi9tCqkMsEDDUCTu88pWfY0wbzgIrHMbHeCbada9/LeZWY/M7N1wIsEUzHcl3BIiQonfruK4MpgVSOtCT46/zfh7bZOaStVJpy++HbgVy3MO1NV3H08wfflSGAmwcR01exq4KZwIriqkdYEH53/m/D26gRikZQzsxqCq1ltou2ThWWeuzeF5c2hwBeSjicpZnYQcCzvTahXNdJ6kHUOUGdmI9z95XDZGLTrLRHhlLk3ERyMPzGczli2Vkd11+A/SnD9gteDzYXeQK2ZjQqviZBZqezBu/tagt3Kq8Ir53wIOI22X3M0c8K5zXsSTHFba8GFmtP6A92Vfg7sD5wSXs6uqoUX5D43vFxhrZkdT3DVqoeSji1BNxL8wB0U/v0C+A3BiLRMS2WCD40nGA64mOCCCF+o4iGSEFzkYj3wFYK5xteHy6qWme1FMBf9QQSX3Gu+dN/5CYeWJCcoxywElhNcF2Ciu9+TaFQJcvd17v5W8x9BCXhDW65fUOk0H7yISEaluQcvIiI7QAleRCSjlOBFRDJKCV5EJKOU4EVEMqpd46hr6+t9v9xm5i3fvbPiSdyWZctoWrvW2vr42vp6f//wJp5dtmtnhpW4TQsXvuPubVrJ2t713r3PAIoZH6XfnjaBoF0O2HcTLy3fozPDStSW5ctoWtOO70/veh++bxPzl+v70xna9RWsGzCADRdN5LVx13BEYzbn7Hnjuh+16/F1Awaw7KKJjH7WWDY6u0NOX/3ilNfa+ti6/gPYY/JE5p37C3KFfGeGlaj5k9reJhC0y+rPTOS1s6/hg3dm8/vz5jXt/P70H8Cmz0xk9DPG0vdl9/vT3m2lo2xXieaIxslMP+vHHR1LRVs22tn5pTZ3XKpCrpDn+lNvTTqM1PngnZOZd+4vkg4jVZa+z/nD2B8mHUbmbHcNfuyMK2i4ZXlHxlLxVu7n3Df2mqTDSJXLZ11E7s6qn0GgTK6QV5KPOGr6FLVJB9uhg6xzLu6vnnzEidMnc/BhL2/7gVVk3tk78b2TpyYdRurkCnmeH/eTpMNIlVwhz7PnXJ90GJmxw6Noxs64gr+MU6+11JOPjVC5JuKrs88jN2ND0mGkzqjGyxg+ZmHSYaTK6GmXM2fcz5IOIxM6ZJjkEY2TGfa7po54qcxYuZ8z9zztbpaad1ZP7YLHmPv0ULVLREPjeLVJB+iwcfALjq1Vko8YPjXPU+PaN6og61R7jqd2KZcr5HlUB153SIee6LTg2FqVayIOapxI/QKdT1YqV8hz++k3JB1G6uQKeV4cp3Yp9WEdeN0hHZ55VK4pt3ZYkRfO1Re31Pl3T+D+s9QZiBrZOEH154hcIc+T51Td1fY6RKd0LRccW6vRNRH7FyaoXBNxwozJXHPKr5MOI3UaGsez65NJR5EuB0+bRL8XNXChvTqtdjB2xhXqyUcc1DiR36qmuJXJ935KPdYYSw6G+jdU2iu1YqQz7QwNoWyPTt2CVJMv9/HpU2g8UxtpqYbG8RoqGGPtkKLqzxHn3HW52qQdOr2LcETjZJ3xGjFu5uUaQhkx9+mh/PVsdQaicoU8dUPWJR1GquQKeXaeo3JNW3TJPuCci/sryUcMn5pXko/44J2TGXf0X5IOI3W2vNGLWWfqIGOplQ1O33kqYW1Ll7WQknw5JflyjQ8fodP3Y5w6cxI3nvbLpMNIlVU5lbC2pUt/Audc3J+5n9QHUmr41Dx/OlsHXkuNaryMGWdoFFbUJfd8nqEPF5MOI1Vyhbx++FrR5fs4w+/I68BrxJF3TuEhJfmtnHXXFey0WLvgUQuPrtHEbRGX3PN59eRbkMg36IjGyUryEcfcOYXvn3JH0mGkyvrdtAse56uzz6PXPquSDiNVNNVDvMS6SLpoSLkv3/tJ1eQjcoU8t5yuNola92pfJbSIXCHPbk8kHUW6JLoPPHbGFarJR2iCsnIX363eWZxcIc/Qh1STL7X4ELStlEi8yDn8jrx68hEHNU6kzyuJfzSpol3weAuPqVG7ROQKeZ3xGkpFFtHl/8qt3rfIOcdoTHgpJfl4uUKePR/YknQYqXLOXZdrqmFSkuBB4+TjTHvoCNXkI5Tk471+fJ0mKIv48PQpVT/PUWoSPOgar3F0MlS5XCFPr0Wp2nRTYcnB0Felva00NI7n9tNvqNo9nNRtDSrXlFOSL7duULHqe2dxVu1bpNdbqftaJ6qw/DC+9/P/TjqMRKRyS5hzcX9NNRyhJF+uoXE8Z370saTDSJ11exR5TBO3vevePxzC+XdPoNvqVKa7TpXaNV5wbC0Dn0o6inQZPjXP9DNVwio185HD2P3vSUeRPofdOVnHKiI296m+E+dSm+AB3jkInfEaMXbmFdQvTPXH1uXePhTt8cXIFfL84GSdHV0qV8iz3/tfTzqMLpP6TKFpDcqtHaprvEYtOLaW/s9rjvCo/5j9SQb/yZMOI1Ve+ueeVdOTT32CByX5OPsXJvCfJzcmHUaqLB/lOvAa480jjR5LK+Kr3mVyhTwvjst+J6liPvUjGidrNzzi67PH6cBrREPj+Kr44rbXxl2KapeIkY0T+EPGT4aqmAQPwW64xslvbfjUPDu/pNJEqZGNE6pmF7w9RjZO4PpTb006jFQ5avqUTLdJRSV40ARlcVbu50ryEblCnm5D1yYdRupcPusihhfULqUun3VRZjsEFZfgQROUxVm5n7PLU0rypTYvrGefWZuSDiN15p5bn/nSRHvlCnlsjw1Jh9HhKjLBg854jbP0IFdNPuLVU7vrwGuMo6ZPyWyvdXv5Wz0zt61UbIIHXeM1zvCpeR5Q72wrDY3juem0G5MOI3U0cVu5hsbxfOvE6UmH0WEqOsFDUK7R6JqtHT99inryEZ+955JMH0zbXkry5b5939jMtEnFJ3jQ6Jo4mrum3OWzLuK207O1C94RdEC6XK6Qz0S5JhMJHlSTj6MkX+7Cu8dz8bGPJB1G6mxeWM9dZ+pSkaUaGsdXfE8+MwkeVJOPM3xqnhG3rUw6jFS55Xcfrfgvbmc4Y+bETPRaO1LzGa89l1RmqqzMqFsx/I68knzEyxfurFkoI3KFPA23rUo6jNRpaBzPdafclnQYqbL/I5/jqUt/knQY2yVzCR6U5OOMnXmFevIRcy7sq558jEn3Xqh2KeFv92Bk4wR2ervy0mXlRdxGSvLlXr5wZ4Y+pBFHpTSKJF6ukGegTpzbyvrdK28++cwmeFCSj7PwmFol+YhcIc/T5+gAY9Q7B3nFJbTOVmnbSqYTPCjJx1l4TC27PK3eWakx0yby5DnXJR1G6uQKeXIzsncK/44YM21ixfzwZT7Bg5J8nKVjXEk+4uBpk3S1rBjzzupZMQmtq1TKOPmq2ZqV5MstHeMaXROxdmiRvq9UzdeizXSsolxD43gePCvd04JU1ZasJF9u7MwrdDJUxKp9i/TT9MtlcoU8z4+rzOGCneW4GVPY+eX0bitVleBBST6OToYqt2I/1xWQYoxqvIwPHPpy0mGkysoR6d1Wqi7Bg5J8nJcv3Jm/nKPr3pYa2TiBfi+mt3eWlH/8fURFjSTpCmm9ilhVJnhQko9zxLTJGkIZsWKkhgrGGTNtYurrz10tV8izx1896TC2UrUJHpTk42gIZblcIc83TpzJN06cmXQoqXLcDF00JOqtD1qq2qSqEzwoycdZOsZVroloPPfYpENIJY2uKZcr5Jl4/P1JhwEowQNK8nGOmDZZQyhLzLmwL1ffd6aSWYxcIU+vN5VKSv3ogRNSMU5en0pISb6cJigrlyvkGfpQMekwUmfd4KLmroloaByf+Bz7SvAlht+RZ/SAJUmHkSovX7izavIRC4+pUU8+xjsHub4/EWfMTHZaA3Nv+1FfM1sCvNZ54aTCXu6+a1sfXCVtAu1oF7VJvCppF7VJvHa1S0dpV4IXEZHKoRKNiEhGKcGLiGSUEryISEalNsGb2SNmtsHM1oR/LyUdUxqY2blm9oKZrTWzeWZ2ZNIxJaVk22j+azKzqp/u0Mz2NrP7zGy5mb1lZj81s7qk40qame1vZg+Z2Uozm2tmZyQdU2dLbYIPXeruvcO//ZIOJmlm9nHg+8DFQB/gI8AriQaVoJJtozewO7AeuDPhsNLgZ8BiYBBwEHAUMD7RiBIW/sDdA8wGBgCXAL82s4ZEA+tkaU/wsrVvA1e5+9/cvejub7j7G0kHlRJjCZLan5IOJAX2Aaa5+wZ3fwv4P+CAhGNK2khgMHCduze5+0PAn4ELkg2rc6U9wX/PzN4xsz+b2UeTDiZJZlYLHALsGu5eLgx3vXdKOraU+DRwm2vcL8CPgXPNrJeZDQFOIEjy1SzubD0DDuzqQLpSmhP8l4F9gSHAjcC9ZpZLNqRE7Q50I+ipHkmw6/1+4OtJBpUGZrYnQRniV0nHkhJ/IOixrwIWAk8AdycaUfJeJNjD+5KZdTOz4wi2mV7JhtW5Upvg3f0xd1/t7hvd/VcEu1MnJh1XgtaH//7E3Re5+zvAtVR3mzS7EHjU3V9NOpCkmVkN8AAwE6gHBgL9CY7dVC133wycDpwEvAVMBqYR/ABmVmoTfAwnfjerKrj7coKNUSWIchei3nuzAcAw4Kdh52gpcAvqCODuz7j7Ue6+i7sfT1Ah+HvScXWmVCZ4M+tnZsebWU8zqzOz8wlGjDyQdGwJuwW4zMx2M7P+wESCUQFVy8yOICjjafQMEO7ZvQp8Ifzu9CM4PvF0spElz8zeF+aUXmY2hWCU0a0Jh9WpUpngCWrN/wksAd4BLgNOd/dqHwt/NfA4MAd4Afgn8J1EI0rep4GZ7r466UBS5EzgEwTfn7nAFmBSohGlwwXAIoJa/MeAj7v7xmRD6lyabExEJKPS2oMXEZEdpAQvIpJRSvAiIhmlBC8iklHtmmFu4IBaX10/uLNiSYUty5fRtGZtm8fbV0ObAGxauPCdtl5yTG0Sr++AOt9YP6gzQ0qcvj/x2rutdJR2JfjV9YPZ+/NfZFPf7F5V/s1r2ncV9NX1gznwuEksG53t0UjzJ01p83UzV9cPZv3jPckV8p0ZUuLa0yYAG+sH6fsToW2lc7W7RLOpb5ERt2vIcalloz3RK6enUa6Qx7tn+0dve2zqW9S2EpEr5NUmnWS7avAvn99HH0iENtJytsnUJjFyhTxPnnNd0mGkir4/nWO7D7LmCnmO+dCzHRlLxcsV8nRfoePWpXKFPAP+VbVTCLXo4GmTlNAicoU8L467IekwMmWHstFDfx5NbsaGjoolEzb1KzJn3M+SDiNVlh3odFutH74o9VrLjWycoDbpQDv8rZt3Vk9uO10JrVRD43geO/uapMNIlc19VHuOoyRfLlfIq5PUQTqkW3Xh3eO1kUYcdudktUmEklm8XCHP4D/pgHSphsbxSvIdoMP2m/XlLZcr5OmbW5F0GKmi7STem0cadet0rKKU9oR3XIcWRvXlLbdqXj+1SUSukOeJs69NOozU2dJLw22jtCe8Yzr8yJfqZ+VyhTy1G9Q7K3XInV9k9plK8lG5Qh4fuCnpMFIlV8jTfZUO0m+PTmm1hsbxDDng7c546YrV1FO9s6iTZ35RnYEY9k53dh6+POkwUmVT3yL3n6VyTXt12s/iG8/tzrPnXN9ZL1+RtHdTrqFRB+jjrJzbnwnHPZh0GKlywozJGiffTp263zN62uX68kY0NI6n9wLtbpbSsZt4Nzx4nDoEERon3z6dnmlyhTzfOamxs9+moqwZVqTYK7sTTm0PJfl42sMpp3mO2q5LupL/7zfjNGoiomZdDTPO+HHSYaSKkny8XCHPbk8kHUW62Caj+7C1SYeRel1WKzjkzi/qyxtx1l1XaBc8Qkk+3uJD0ARlEZsW1Gtb2YYuLQbnCnl6LlH9uZR2wcvpYHS8g6dN4rLj/y/pMFIlV8iz7z0bkw4jtbo8227YVXOSRKnXWq6hcTzXn3pr0mGkzk8e+ASDRi1OOoxUeeW0Hvr+tCCR7rQSWrlcIc++d6knUuryWRdpO4mx6Pnd1C4RuUKeYt8tSYeROonVS5Tky71yhnoiUblCnl2e0VnAUSpjlatZVadzbyISLYgryZdTm5Rb+j6dBRynoXE8e/wt6SjSZfS0y2FX7Qk3S/yIZ66Q598Om5N0GKmSK+R5eOwPkw4jVXKFPMN+25R0GKnz1uHo7M6oJdoTbpZ4ggd4/LEG7W5GHD19iq6CFLHg47X0WKY2iRrZOIEbTr0l6TBSJVfI64xxUpLgQRP8x9FVkMptHKA2iTNh1sXqyUesGaZtJTUJHsJ5Wl5LVUiJa67Ja7rU9+g4RbyRjRM042JEtW8rqcsaa/bSr27UPvd/jhcu0d5NqVwhrx5rjBNmTGb4mIVJh5Eq1ZzkU5fgQUPAompW1gXj5Me8kXQoqTKycQK1g9YnHUbqzH16KP1f0NDSUrlCnm+cODPpMLpcKhM8BOUajX/e2itPD6nankhLmhbtpDlaYizfX0NLo66+70yeH/eTpMPoUqlN8BCMf/YBm5MOI1WqeXezJQdPm6Q2iZEr5On5Tqq/4l1uVONlVTUFRuo/fVvWTcOdInKFPN2GaqrUUrlCngfP0rkDURsGFnXiT0Q1TYFREZlzzbAiU8+orl2rbdm8sJ5rTvl10mGkynEzplTdLnibLOnBwH+q3FkqV8jzg5PvSDqMTlcRCR7gvLsu00VDIibf+6mq6Ym01ajGy3S1rBjvvF81+aj/mP1J6tZl+4evYhI86KIhcXKFPCd95B9Jh5EqNetqmHWmDrxG6fhNuS29sv3DV1EJHoKN9HeqtW7lN3/8QKY30u1x6sxJmj42hpJ8uVwhzy77LU06jE5RcQke4NgZU3SSS4TOHShXs6pOySxGrpBnzwc1cVuppS/tksnvT0UmeAhOctGXd2sNjePp/XrFfqSdQme8xnv9uFpqN2S7/txeWbx8ZkVnA+1ulluzZ5Gnz/lR0mGkijoD8Zp6Zrv+vD2y1iGo6AQPSvJxxkybqDaJ0HYST+1SbmTjBMYenY0rqVR8godgI519poZQlsoV8vSdm4mPt8PkCnm+deL0pMNIHSX5ctMfPjwTl//LTAY4eaaGUEatGq6ZOaO+fd9Yuq/MzGbfYXKFPLs+CX/QlcTeNXra5RX//cnUlp4r5PneyVOTDiNVcoU83sOTDiNVNu1cpHajDjBGDZj9AmO/NiXpMFIlV8jTY881SYex3TKV4AG+Ovs8er2ZudXaIbbRKr4n0tGaeugAY9RL39yfJQejdonY+Hrvip3nKJOZcN3gYlXO/dyaXCHPo9r93orOHYiXK+QzUX/uSMfNmFKRU2BkMsFDMPezeiJb+/D0KWqTiCyOfe4IWag/d7SadTUVN5ldZhM8BD0RjQnfWtbG+XYEjTiKp9E15UY1XsZ5x/w56TDaLPNbtcaEl9OJP+U04iieyljlpj70IQY0LEs6jDbJfIKHYCO960z15EvlCnkO+MD8pMNIFfVY4zU0juevZ1+TdBipsmzOgIrYVqoiwQOcMXMivRZVzeq2yXP/2LsiNtKulCvkuf8sJbOoD945WdtKRCWUO6sq460bVKTP/Kpa5W1Sr7XcCTOUzOLkCnl6LtH3p1Tay51V92mt3ruY+l/drpYr5LULHqHac7wNuxapf6Pq0karcoV8akfXVOUnlfZf3SR88M7JSvIRGkIZb+0QHZCOGtV4WSrbpCoTPKg0EUd11nKVUGdNgr4/5dLYJlWb4CGdH0jS1CblRjZO4PlxP6FuyLqkQ0kVbSvl0nYWcFUneAg+kH87bE7SYaRK2jbSNDjkuit45sM3JR1G6qS5/pyU0dMup9gvHdcDrvoED/D4Yw064zVi9LTLleRLrBtcTG2dNWlql3I1K9JxPWAl+JDOeC2n+UjK5Qp59pm1KekwUidXyDNo1OKkw0iVNEzVrQRfIlfIM3rAkqTDSJVcIY8PVEIr9eqp3XXB6hiLnt+NAwcoyZeyjcbAp5LbVsy97b8wZrYEeK3zwkmFvdx917Y+uEraBNrRLmqTeFXSLmqTeO1ql47SrgQvIiKVQyUaEZGMUoIXEckoJXgR2SFm9lEzW5h0HFlmZlPN7PTw/6eaWaEtz1OCF5FWmZmb2fDIsivN7Ncd8Np7h69fF1n+STN7zczWmtndZjagldfoYWbXmdmbZrbczH5mZt3a835pZmbvA8YA9wC4+yzgwHB5q5TgRSRVzOwA4L+BC4DdgXVAa1N7fgU4BDgQaAAOBr7eyWHGMrPatixrp38HbvetR8RMBS7Z1hOV4EWkQ5jZZDNbbGaLzOzikuUnmdk/zWyVmS0wsytLnvbH8N8VZrbGzD4InA/c6+5/dPc1wDeAM82sTwtvfQpwvbsvc/clwPXAZ1p4bNn7mVmNmX093GPSbJHiAAALzElEQVRYbGa3mdnOJfHfaWZvmdlKM/tj+APUfN+tZvZzM7vPzNYCR7ewrMU2MLPfmNllkbZ8prkkA5wA/CGyHo8AJ7Wwju9SgheRjrAHsDMwBPgscIOZ9Q/vWwtcCPQjSEpfKEleHwn/7efuvd39r8ABwNPNL+zu84BNBL3zOBb+ld4eWpqkS8S930Xh39HAvkBv4Kclz7kfGAHsBjwJ3B55zU8C3wH6AI+2sKy1NvgV8Kl3gzcbQ9CO95lZPbAP8FLkPV8A9jazvjHr+C4leBHpCJuBq9x9s7vfB6wB9gNw90fc/Vl3L7r7MwTlhaNaea3ewMrIspUEyTLO/cAVZrarme0BXB4u79XG2M8HrnX3V8I9hq8C5zbX6d39Zndf7e4bgSuBMZEfj3vc/c/h+m2IW7aNNrgHGGFmI8LbFwCN7r6J4AcBYHUk5ubb/WiFEryIbEsTED1o2Y0gqTdb6u6lUyiuI0jUmNlhZvawmS0xs5VAHhjYyvutAaI9077AajM7PyytrDGz+8P7vgP8E3gK+AtwdxhbW+dNGMzWZ9O+BtQBu5tZrZn9l5nNM7NVwPzwMaXxL4h5za2WtdYG4Q/HNOBTZlYDnAf8b/jUFeG/0R+3PpH7YynBi8i2vA7sHVm2D22fYuAOYBYwzN13Bn7BeyWVuFPpnyMYNQKAme0L9ADmuPvtYWmlt7ufAODu6939Uncf4u77AkuBf7h7U8xrx73fm8BeJbf3BLYAbxOUWk4DjiUoQe3dHNY2XjO6rLU2gKBMcz7wMWBdWDrC3dcC8ygvT+0PzHf3VTHv/S4leBHZlkbg62Y2NDwgeSzBgc3pbXx+H2CZu28ws0MJkmazJUCRoPbd7HbgFDM7MqxBXwXMdPdomQIAMxtiZoMtcDjBQdlvtRBL3PtNBSaZ2T5m1hv4LkGJZEsY+0aCH41e4X3bo7U2IEzoReAa3uu9N7uP8pLWUQSlqVYpwYvItlxFUPp4FFgO/AA4393/1cbnjweuMrPVwDcJyhEAuPs6ghLLn81shZkd7u7PEZQwbicos/QJX6MluTC+tQQ94a+4+4PNd5rZ/Wb2tZbeD7iZIKn+EXgV2AA0j2q5jWBP5Q3geeBvbVznNrdBiduA0UD0/IIbgfPNrLTHfx7BUNJWabIxEZEUMLMLgUvc/cMx990BTHP3u83sFOACdz9nm6+pBC8ikiwz6wU8BPzM3W/rqNdViUZEOoyZfcLMXjKzuWb2laTjqQRmdjzBsYG3CQ7GdtxrqwcvIh0hPCV/DvBxYCHwOHCeuz+faGBVTD14EekohwJzwxOGNgEFgiGGkpCKmVFNRFJvCFuf4LMQOCz6IDO7hHCiLOve/QPddtuta6JL0KaFC99J4pJ9SvAi0lHiri5dVgN29xsJhv7RY9gwHzxlIrbF8NrslovnT5qSyHVnVaIRkY6yEBhWcnsowVmirXPYZ9aGbT5M2k8JXkQ6yuMEk2btY2bdgXMJTs/fplfO6EGxPm5mAdkRSvAi0iHCU/svBR4gmM52WnhWapvUrK3lo0eUnxxrTXGVH2kL1eBFpMOEUwXft73Pf+QvB1KzySh2f68en+XafGdTD15EUqXY3akdvC7pMDJBCV5EUqfpzV6w28akw6h4SvAikk6LeyhD7SA1n4ikVxF6vaU0tb3UciKSauv2KGokzXZSgheR1PNafy9bKde3mRK8iFSGIhR7N707+YH3CP5jxQRjSjmNgxeRitBtdQ2bgZotRrHOsY1BV97VTW2RmkZEKsLmPkFXvVjnFPtoWoO2UIIXkYpRsyXotdesrqXYU7WZbVGCF5GKUax7b9qCmg017PK0jri2RgleRCpSsb6JpWOcnkuUxlqilhGRilSzthaADbsWKe6kck0cJXgRqXg162sY9rvgwGvNJpVtminBi0gmLDi2lv7PvzfVsKY4UIIXkQxZPsrxMMGv20NlGyV4Eal4Xvve/22TxR549brqu3CIEryIVDyLnPe0YdfyCcpsS/XV5pXgRSSTvNapHbQ+6TASpQQvIpnVtGgnajYZNZuD3nu1TUymBC8imeZ7rmfve4OefLVNTFZlqysiWVS3fuv6erH/5nf/72/15JUzezKgYVlXh5U4JXgRqXhbdtp6hEzN8m5lj1k2Z0Awn3yzKjjmqgQvIlWjZk0tXz5hFlAdo2qU4EWkqnz//lOxYngZwIxTgheRquM11TGiRgleRKqS18CQA95OOoxOpQQvIlXrjed2f3fumixSgheRqmYZnl5YCV5EqpqFHfhir+wV5ZXgRaSqediBr1lXw6BRi5MNpoMpwYuIhBY9vxtjj/5b0mF0GCV4EZES0x8+nF6Latj/4NeSDmWHKcGLiESs36PI80/vlXQYO0wJXqSKmdkwM3vYzF4ws+fM7Ipw+QAz+62ZvRz+2z9cbmZ2vZnNNbNnzOzgktf6dPj4l83s00mt0w6rCery1gTFPk0VPWeNErxIddsCTHb3/YHDgQlmNgr4CvB7dx8B/D68DXACMCL8uwT4OQQ/CMC3gMOAQ4FvNf8oVJzSwTR1RTAY8K/KzPJK8CJVzN0XufuT4f9XAy8AQ4DTgF+FD/sVcHr4/9OA2zzwN6CfmQ0Cjgd+6+7L3H058FvgE124Kp2i+8LuWBPs8qnXkw5luyjBiwgAZrY38H7gMWB3d18EwY8AsFv4sCHAgpKnLQyXtbS8om2pd9zg5aeGVWS2rMCQRaSjmVlvYAYw0d1XtfbQmGXeyvK497rEzJ4wsyea1q5tf7BJKYLvsinpKNpFCV6kyplZN4Lkfru7zwwXvx2WXgj/bT4DaCEwrOTpQ4E3W1lext1vdPdD3P2Q2vr6jluRLmBLu1Osb9r2A1NCCV6kipmZATcBL7j7tSV3zQKaR8J8GrinZPmF4Wiaw4GVYQnnAeA4M+sfHlw9LlyWOb3ndaP7sMrY86hLOgARSdSHgAuAZ83sqXDZ14D/AqaZ2WeB14Gzw/vuA04E5gLrgIsB3H2ZmV0NPB4+7ip3z+RFUDf1cbYsqMe7ObY53aNrlOBFqpi7P0rLI70/FvN4Bya08Fo3Azd3XHTptKU+OLRgm429Z29m/snl139NC5VoRES2U5qTOyjBi4jsuFYyaZKXBlSCFxHZUUXoOy8+nXqCWVYJXkRkO1hklP+qXJHaQevfvV23PvkDsErwIiLbwWPyd9OindhpcQ1WhC07JX+tVyV4EZEOtOe9S7Fi8r13UIIXEelQL322P8U6p+c7yafX5CMQEcmgDQOTv4i3EryISCcq9klu7hoLTkwTEel6ZrYaeCnpODrBQOCdktt7ufuuXR2EpioQkSS95O6HJB1ERzOzJ9KwXirRiIhklBK8iEhGKcGLSJJuTDqATpKK9dJBVhGRjFIPXkQko5TgRaTLmdknzOwlM5trZl9JOp62MLNhZvawmb1gZs+Z2RXh8ivN7A0zeyr8O7HkOV8N1/ElMzu+ZHmXrL9KNCLSpcysFpgDfJzgYt2PA+e5+/OJBrYN4cXHB7n7k2bWB/gHcDpwDrDG3X8YefwoYCpwKDAY+B3QEN7dJeuvcfAi0tUOBea6+ysAZlYATgNSneDDi4svCv+/2sxeAIa08pTTgIK7bwReNbO5BOsOXbT+KtGISFcbAiwoub2Q1hNl6pjZ3sD7gcfCRZea2TNmdrOZ9Q+XtbSeXbb+SvAi0tXi5tKtmFqxmfUGZgAT3X0V8HMgBxxE0MO/pvmhMU/3VpZ3OJVoRKSrLQSGldweCryZUCztYmbdCJL77e4+E8Dd3y65/5fA7PBma+vZJeuvHryIdLXHgRFmto+ZdQfOBWYlHNM2mZkBNwEvuPu1JcsHlTzsDOBf4f9nAeeaWQ8z2wcYAfydLlx/9eBFpEu5+xYzuxR4AKgFbnb35xIOqy0+BFwAPGtmT4XLvgacZ2YHEZRZ5gP/DuDuz5nZNIKDp1uACe7eBNBV669hkiIiGaUSjYhIRinBi4hklBK8iEhGKcGLiGSUEryISEYpwYuIZJQSvIhIRinBi4hk1P8HrA2R+pQMiNcAAAAASUVORK5CYII=
-"
->
-</div>
-
-</div>
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-"
->
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For the sake of visibility only the first nine factors of $\hat U$ are displayed, as you can see they are sparse and $\hat D$ is a diagonal matrix.</p>
-<p>Write some code to check the first factor of $\hat U $ is orthogonal and then that $\hat U$ itself is orthogonal.</p>
+<p>Write some code to check the first factor of $\hat U $ is orthogonal and then that $\hat U$ itself is orthogonal (with a tolerance near to the machine espilon).</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">eye</span>
 <span class="n">Uhat0</span> <span class="o">=</span> <span class="n">Uhat</span><span class="o">.</span><span class="n">factors</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="p">((</span><span class="n">Uhat0</span><span class="o">*</span><span class="n">Uhat0</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span> <span class="o">==</span> <span class="n">eye</span><span class="p">(</span><span class="o">*</span><span class="n">Uhat0</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">Uhat0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">((</span><span class="n">Uhat0</span><span class="o">*</span><span class="n">Uhat0</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span> <span class="o">==</span> <span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[14]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>True</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">norm</span><span class="p">((</span><span class="n">Uhat</span><span class="o">*</span><span class="n">Uhat</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">-</span><span class="n">eye</span><span class="p">(</span><span class="o">*</span><span class="n">Uhat</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="p">((</span><span class="n">Uhat</span><span class="o">*</span><span class="n">Uhat</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">-</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[15]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>1.5680839454617488e-14</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12551,33 +12260,13 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">Uhat</span><span class="o">*</span><span class="n">Dhat</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">*</span><span class="n">Uhat</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">-</span><span class="n">L</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">norm</span><span class="p">(</span><span class="n">Uhat</span><span class="o">*</span><span class="n">Dhat</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">*</span><span class="n">Uhat</span><span class="o">.</span><span class="n">T</span><span class="o">-</span><span class="n">L</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[16]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>0.15622590258534189</pre>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -12586,7 +12275,7 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Good! The Laplacian approximation defined by $\hat U$ and $\hat D$ seems not so bad according to the relative error. Do you want a smaller error ? It's time to read the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1FaustFactory.html#a14b07bcd09f4e929aefd28e17d62c866">documentation</a>, the <code>eigtj()</code>'s keyword argument <code>J</code> can help you in that goal.</p>
+<p>Good! The Laplacian approximation defined by $\hat U$ and $\hat D$ seems not so bad according to the relative error. Do you want a smaller error ? It's time to read the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a82967b7913a66c945f32b7bd1ec6625a">documentation</a>, the <code>eigtj()</code>'s keyword argument <code>J</code> can help you in that goal.</p>
 <p>Is that all? No, we can evaluate the memory saving $\hat U$ brings as a Faust relatively to the matrix U obtained by <code>numpy.linalg.eig()</code>.</p>
 
 </div>
@@ -12594,7 +12283,7 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">eig</span>
@@ -12608,28 +12297,10 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>0.020388531679158176
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">Uhat</span><span class="o">.</span><span class="n">nnz_sum</span><span class="p">()</span>
@@ -12639,30 +12310,10 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[18]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>50576</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
@@ -12672,42 +12323,22 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[19]:</div>
-
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>6980164</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The memory space to store $\hat U$ is smaller since its number of nonzeros elements is less than U's.</p>
+<p>The memory space to store $\hat U$ is smaller since its number of nonzeros elements is less than that of $U$.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">Uhat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">1</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12717,62 +12348,26 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">Uhat</span><span class="nd">@x</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">Uhat</span><span class="nd">@x</span> <span class="c1"># note: @ and * are both the matrix product when a Faust is one of the operands</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>148 µs ± 28.3 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">U</span><span class="nd">@x</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">timeit</span> <span class="n">U</span><span class="nd">@x</span> <span class="c1"># note: * isn&#39;t equivalent to matrix product when using numpy arrays</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>54.2 ms ± 9.6 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -12782,7 +12377,7 @@ If $L$ is the Laplacian matrix, the algorithm outputs an orthonormal Faust $\hat
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The execution time for Faust-vector multiplication is really better too (compared to the matrix-vector multiplication) !
-Applying the Graph Fourier Transform Uhat on x is faster.</p>
+Applying the Graph Fourier Transform $\hat U$ on x is faster.</p>
 
 </div>
 </div>
@@ -12791,21 +12386,21 @@ Applying the Graph Fourier Transform Uhat on x is faster.</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="2.2-The-Hierarchical-PALM4SMA-based-FGFT-Algorithms">2.2 The Hierarchical PALM4SMA based FGFT Algorithms<a class="anchor-link" href="#2.2-The-Hierarchical-PALM4SMA-based-FGFT-Algorithms">&#182;</a></h3><p>To finish this notebook briefly, we won't go into further details about the second algorithm for computing approximate FGFTs because it's an extension of the algorithms discussed in <a href="#1.-The-Hierarchical-PALM4MSA-Algorithm">1</a>.</p>
-<p>However, you'll find below a copy of the main example of <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1FaustFactory.html#a687ab9cbf9e82f9f945771447b3f00a2">fgft_palm()</a>. This function is the entry point of the algorithm and again it's very similar to what you've seen above.
+<h3 id="2.2-The-Hierarchical-PALM4MSA-based-FGFT-Algorithms">2.2 The Hierarchical PALM4MSA based FGFT Algorithms<a class="anchor-link" href="#2.2-The-Hierarchical-PALM4MSA-based-FGFT-Algorithms">&#182;</a></h3><p>To finish this notebook briefly, we won't go into further details about the second algorithm for computing approximate FGFTs because it's an extension of the algorithms discussed in <a href="#1.-The-Hierarchical-PALM4MSA-Algorithm">1</a>.</p>
+<p>However, you'll find below a copy of the main example of <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a82967b7913a66c945f32b7bd1ec6625a">fgft_palm()</a>. This function is the entry point of the algorithm and again it's very similar to what you've seen above.
 You can try to unroll it progressively and understand how it tries to do the same thing as the eigtj() on another Laplacian matrix.
 It's much more complicated to configure but starting from an example you'll be able to write your own FGFT calculation.</p>
-<p>About the Laplacian matrix used in the code, note that pyfaust embeds some data (matrices in matlab v7 format) but depending on how you installed the package you may need to download them. It's not a big deal normally because <code>get_data_dirpath()</code> should handle it automatically (otherwise please read the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/FAQ.html">help doc</a>). Note that depending on your connection the download can take some time.</p>
+<p>About the Laplacian matrix used in the code, note that pyfaust embeds some data examples (matrices in matlab v7 format) but depending on how you installed the package you may need to download them. It's not a big deal normally because <code>get_data_dirpath()</code> should handle it automatically (otherwise please read the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/FAQ.html">help doc</a>). Note that depending on your connection the download can take some time.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">FaustFactory</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.fact</span> <span class="k">import</span> <span class="n">fgft_palm</span>
 <span class="kn">from</span> <span class="nn">pyfaust.factparams</span> <span class="k">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">pyfaust.demo</span> <span class="k">import</span> <span class="n">get_data_dirpath</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">sep</span>
@@ -12844,7 +12439,7 @@ It's much more complicated to configure but starting from an example you'll be a
         <span class="n">init_lambda</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">is_fact_side_left</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">Lap</span> <span class="o">=</span> <span class="n">Lap</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-<span class="n">Uhat</span><span class="p">,</span><span class="n">Dhat</span> <span class="o">=</span> <span class="n">FaustFactory</span><span class="o">.</span><span class="n">fgft_palm</span><span class="p">(</span><span class="n">Lap</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">init_D</span><span class="o">=</span><span class="n">D</span><span class="p">)</span>
+<span class="n">Uhat</span><span class="p">,</span><span class="n">Dhat</span> <span class="o">=</span> <span class="n">fgft_palm</span><span class="p">(</span><span class="n">Lap</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">init_D</span><span class="o">=</span><span class="n">D</span><span class="p">)</span>
 <span class="n">err_U</span> <span class="o">=</span> <span class="p">(</span><span class="n">Uhat</span><span class="o">-</span><span class="n">U</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
 <span class="n">err_Lap</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">Uhat</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">*</span><span class="n">diag</span><span class="p">(</span><span class="n">Dhat</span><span class="p">)</span><span class="o">*</span><span class="n">Uhat</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">-</span><span class="n">Lap</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">Lap</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">diag</span><span class="p">(</span><span class="n">Dhat</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
@@ -12852,27 +12447,6 @@ It's much more complicated to configure but starting from an example you'll be a
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>(256,) &lt;class &#39;numpy.ndarray&#39;&gt;
-eig(Lap), U error: 2.48804253058e-13
-4.00000002531
-err_U: 1.00130027735
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 

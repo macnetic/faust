@@ -1182,12 +1182,17 @@ class bsl:
         bsl.fig_convergence(input_dir, output_dir)
 
     @staticmethod
-    def fig_time_cmp(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR):
+    def fig_time_cmp(input_dir=DEFT_RESULTS_DIR, output_dir=DEFT_FIG_DIR,
+                     use_precomputed_data=False):
         """
             Builds the time comparison figure for the BSL with the differents Faust representations of the MEG matrix.
         """
         from scipy.io import loadmat
-        mat_file_entries = loadmat(input_dir+os.sep+'results_BSL_user.mat')
+        if(use_precomputed_data):
+            mat_file_entries = \
+            loadmat(os.path.join(get_data_dirpath(),"results_BSL_user.mat"))
+        else:
+            mat_file_entries = loadmat(input_dir+os.sep+'results_BSL_user.mat')
         compute_times = mat_file_entries['compute_Times']
         RCG_list = mat_file_entries['RCG_list']
 

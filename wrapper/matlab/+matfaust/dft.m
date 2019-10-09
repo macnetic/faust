@@ -10,10 +10,10 @@
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b F = dft(n) <br/>
-%> &nbsp;&nbsp;&nbsp; @b F = dft(n, norma)
+%> &nbsp;&nbsp;&nbsp; @b F = dft(n, normed)
 %>
 %> @param n: the power of two for a FFT of order n and a factorization in log2(n)+1 factors.
-%> @param norma: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
+%> @param normed: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 %>
 %>
 %> @retval F the Faust implementing the FFT transform of dimension n.
@@ -58,11 +58,11 @@ function F = dft(n, varargin)
 		if(~ islogical(varargin{1}))
 			error('wht optional second argument must be a boolean');
 		end
-		norma = varargin{1};
+		normed = varargin{1};
 	else
-		norma = true; % normalization by default
+		normed = true; % normalization by default
 	end
-	core_obj = mexFaustCplx('fourier', log2n, norma);
+	core_obj = mexFaustCplx('fourier', log2n, normed);
 	is_real = false;
 	e = MException('FAUST:OOM', 'Out of Memory');
 	if(core_obj == 0)

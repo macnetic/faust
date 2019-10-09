@@ -7,10 +7,10 @@
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b H = wht(n) <br/>
-%> &nbsp;&nbsp;&nbsp; @b H = wht(n, norma)
+%> &nbsp;&nbsp;&nbsp; @b H = wht(n, normed)
 %>
 %> @param n the power of two exponent for a Hadamard matrix of order n and a factorization into log2(n) factors.
-%> @param norma: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
+%> @param normed: (optional) true (by default) to normalize the returned Faust as if Faust.normalize() was called, false otherwise.
 %>
 %> @retval H the Faust implementing the Hadamard transform of dimension n.
 %>
@@ -54,11 +54,11 @@ function H = wht(n, varargin)
 		if(~ islogical(varargin{1}))
 			error('wht optional second argument must be a boolean');
 		end
-		norma = varargin{1};
+		normed = varargin{1};
 	else
-		norma = true; % normalization by default
+		normed = true; % normalization by default
 	end
-	core_obj = mexFaustReal('hadamard', log2n, norma);
+	core_obj = mexFaustReal('hadamard', log2n, normed);
 	is_real = true;
 	e = MException('FAUST:OOM', 'Out of Memory');
 	if(core_obj == 0)

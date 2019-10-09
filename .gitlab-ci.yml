@@ -1,8 +1,8 @@
 variables:
     # variables defining where to find the FAµST external data
     # used by package build scripts
-    DURL: "https://gforge.inria.fr/frs/download.php/file/37960"
-    DFILE: "faust_data-2.4.2.zip"
+    DURL: "https://gforge.inria.fr/frs/download.php/file/38169/"
+    DFILE: "faust_data-2.6.0.zip"
 
 .ctest_template: &ctest_script
     script:

@@ -1528,12 +1528,12 @@ def version():
 
 def faust_fact(*args, **kwargs):
     """
-    This function is a shorthand for FaustFactory.fact_hierarchical().
+    This function is a shorthand for pyfaust.fact.hierarchical.
 
     <b/> See also FaustFactory.fact_hierarchical
     """
     import pyfaust.fact
-    return pyfaust.fact.fact_hierarchical(*args, **kwargs)
+    return pyfaust.fact.hierarchical(*args, **kwargs)
 
 def license():
     """ Prints the FAuST license.
@@ -1642,7 +1642,7 @@ def isFaust(obj):
     """
     return Faust.isFaust(obj)
 
-def wht(n, norma=True):
+def wht(n, normed=True):
     """
        Constructs a Faust implementing the Hadamard transform of dimension n.
 
@@ -1652,7 +1652,7 @@ def wht(n, norma=True):
        Args:
            n: the power of two exponent for a Hadamard matrix of order n
            and a factorization in log2(n) factors.
-           norma: default to True to normalize the Hadamard Faust as if you called
+           normed: default to True to normalize the Hadamard Faust as if you called
            Faust.normalize() and False otherwise.
        Returns:
            The Faust implementing the Hadamard transform of dimension n.
@@ -1671,18 +1671,18 @@ def wht(n, norma=True):
               - FACTOR 7 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
               - FACTOR 8 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
               - FACTOR 9 (real) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
-          >>> wht(1024, norma=True) # is equiv. to next call
-          >>> wht(1024, norma=False).normalize() # which is less optimized though
+          >>> wht(1024, normed=True) # is equiv. to next call
+          >>> wht(1024, normed=False).normalize() # which is less optimized though
 
     """
     log2n = np.floor(np.log2(n))
     if(n > 2**log2n): raise ValueError("n must be a power of 2.")
-    if(not isinstance(norma, bool)):
-        raise TypeError("norma must be True of False.")
-    H = Faust(core_obj=_FaustCorePy.FaustCore.hadamardFaust(log2n, norma))
+    if(not isinstance(normed, bool)):
+        raise TypeError("normed must be True of False.")
+    H = Faust(core_obj=_FaustCorePy.FaustCore.hadamardFaust(log2n, normed))
     return H
 
-def dft(n, norma=True):
+def dft(n, normed=True):
     """
         Constructs a Faust F such that F.toarray() is the Discrete Fourier Transform square matrix of order n.
 
@@ -1695,7 +1695,7 @@ def dft(n, norma=True):
         Args:
             n: the power of two exponent for a DFT of order n and a
             factorization in log2(n)+1 factors.
-            norma: default to True to normalize the DFT Faust as if you called
+            normed: default to True to normalize the DFT Faust as if you called
             Faust.normalize() and False otherwise.
 
         Returns:
@@ -1716,14 +1716,14 @@ def dft(n, norma=True):
             - FACTOR 8 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
             - FACTOR 9 (complex) SPARSE, size 1024x1024, density 0.00195312, nnz 2048
             - FACTOR 10 (complex) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
-            >>> dft(1024, norma=True) # is equiv. to next call
-            >>> dft(1024, norma=False).normalize() # which is less optimized though
+            >>> dft(1024, normed=True) # is equiv. to next call
+            >>> dft(1024, normed=False).normalize() # which is less optimized though
     """
     log2n = np.floor(np.log2(n))
     if(n > 2**log2n): raise ValueError("n must be a power of 2.")
-    if(not isinstance(norma, bool)):
-        raise TypeError("norma must be True of False.")
-    F = Faust(core_obj=_FaustCorePy.FaustCore.fourierFaust(log2n, norma))
+    if(not isinstance(normed, bool)):
+        raise TypeError("normed must be True of False.")
+    F = Faust(core_obj=_FaustCorePy.FaustCore.fourierFaust(log2n, normed))
     return F
 
 def eye(m,n=None,t='real'):

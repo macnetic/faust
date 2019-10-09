@@ -4,6 +4,6 @@
 %> <p>@b See @b also FaustFactory.fact_hierarchical
 %====================================
 function varargout = faust_fact(varargin)
-	[F, lambda, p] = matfaust.FaustFactory.fact_hierarchical(varargin{:});
+	[F, lambda, p] = matfaust.fact.hierarchical(varargin{:});
 	varargout = {F, lambda, p};
 end
