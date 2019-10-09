@@ -278,7 +278,8 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		PATTERN TransStockhamFact.m EXCLUDE
 		PATTERN test_Givens.m EXCLUDE
 		PATTERN test_GivensDiag.m EXCLUDE
-		PATTERN faust_decompose.m EXCLUDE)
+        )#PATTERN faust_decompose.m EXCLUDE #TODO: uncomment later when
+    #  matfaust.demo.hadamard will be updated to use hierarchical)
 	
 
 	
