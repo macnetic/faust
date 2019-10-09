@@ -730,8 +730,8 @@ class TestFaustPyCplx(TestFaustPy):
 class TestFaustFactory(unittest.TestCase):
 
     def testFactPalm4MSA(self):
-        from pyfaust.fact import fact_palm4msa
-        print("Test pyfaust.fact.fact_palm4msa()")
+        from pyfaust.fact import palm4msa
+        print("Test pyfaust.fact.palm4msa()")
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName
         from pyfaust.factparams import ParamsPalm4MSA, StoppingCriterion
@@ -752,7 +752,7 @@ class TestFaustFactory(unittest.TestCase):
         param = ParamsPalm4MSA([cons1, cons2], stop_crit, init_facts=None,
                                is_update_way_R2L=False, init_lambda=1.0,
                                is_verbose=False, constant_step_size=False)
-        F, _lambda = fact_palm4msa(M, param, ret_lambda=True)
+        F, _lambda = palm4msa(M, param, ret_lambda=True)
         #F.display()
         #print("normF", F.norm("fro"))
         self.assertEqual(F.shape, M.shape)
@@ -765,8 +765,8 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.270954109668, places=4)
 
     def testFactHierarch(self):
-        print("Test pyfaust.fact.fact_hierarchical()")
-        from pyfaust.fact import fact_hierarchical
+        print("Test pyfaust.fact.hierarchical()")
+        from pyfaust.fact import hierarchical
         from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
         from pyfaust.factparams import ConstraintReal, ConstraintInt,\
                 ConstraintName
@@ -789,7 +789,7 @@ class TestFaustFactory(unittest.TestCase):
                                        [res0_cons, res1_cons, res2_cons],
                                        stop_crit1, stop_crit2,
                                        is_verbose=False)
-        F = fact_hierarchical(M, param)
+        F = hierarchical(M, param)
         self.assertEqual(F.shape, M.shape)
         E = F.todense()-M
         #print("err.:",norm(F.todense(), "fro"),  norm(E,"fro"), norm (M,"fro"),
@@ -799,8 +799,8 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.268513, places=5)
 
     def testFactHierarchCplx(self):
-        print("Test pyfaust.fact.fact_hierarchicalCplx()")
-        from pyfaust.fact import fact_hierarchical
+        print("Test pyfaust.fact.hierarchicalCplx()")
+        from pyfaust.fact import hierarchical
         from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName
@@ -824,7 +824,7 @@ class TestFaustFactory(unittest.TestCase):
                                        [res0_cons, res1_cons, res2_cons],
                                        stop_crit1, stop_crit2,
                                        is_verbose=False)
-        F = fact_hierarchical(M, param)
+        F = hierarchical(M, param)
         self.assertEqual(F.shape, M.shape)
         #print(F.todense())
         E = F.todense()-M
@@ -835,8 +835,8 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 1.0063, places=4)
 
     def testFactPalm4MSACplx(self):
-        print("Test pyfaust.fact.fact_palm4msaCplx()")
-        from pyfaust.fact import fact_palm4msa
+        print("Test pyfaust.fact.palm4msaCplx()")
+        from pyfaust.fact import palm4msa
         from pyfaust.factparams import ParamsPalm4MSA,StoppingCriterion
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName
@@ -858,7 +858,7 @@ class TestFaustFactory(unittest.TestCase):
         param = ParamsPalm4MSA([cons1, cons2], stop_crit, init_facts=None,
                                is_verbose=False, constant_step_size=False,
                                is_update_way_R2L=False, init_lambda=1.0)
-        F,_lambda = fact_palm4msa(M, param, ret_lambda=True)
+        F,_lambda = palm4msa(M, param, ret_lambda=True)
         #F.display()
         #print("normF", F.norm("fro"))
         self.assertEqual(F.shape, M.shape)
@@ -938,12 +938,12 @@ class TestFaustFactory(unittest.TestCase):
         self.assertEqual(err, err2)
 
     def testFactPalm4MSA_fgft(self):
-        print("Test pyfaust.fact._fact_palm4msa_fgft()")
+        print("Test pyfaust.fact._palm4msa_fgft()")
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName, StoppingCriterion
         #from pyfaust.factparams import ParamsPalm4MSAFGFT, StoppingCriterion
         from numpy import diag,copy
-        from pyfaust.fact import _fact_palm4msa_fgft
+        from pyfaust.fact import _palm4msa_fgft
         from pyfaust.factparams import ParamsPalm4MSAFGFT
 
         L = \
@@ -968,7 +968,7 @@ class TestFaustFactory(unittest.TestCase):
                                    init_D=init_D,
                                    is_update_way_R2L=False, init_lambda=128,
                                    is_verbose=True, step_size=1e-6)
-        F, D, _lambda = _fact_palm4msa_fgft(L, param, ret_lambda=True)
+        F, D, _lambda = _palm4msa_fgft(L, param, ret_lambda=True)
         print("Lap norm:", norm(L, 'fro'))
         print("out lambda:", _lambda)
         D = diag(D)

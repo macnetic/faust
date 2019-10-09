@@ -1,10 +1,10 @@
 %==========================================================================================
-%> @brief Approximates M by A S_1 … S_n B using fact_palm4msa.
+%> @brief Approximates M by A S_1 … S_n B using palm4msa.
 %>
 %>
 %> @Example
 %> @code
-%> import matfaust.fact.fact_palm4msa
+%> import matfaust.fact.palm4msa
 %> import matfaust.factparams.*
 %>
 %> p = ParamsPalm4MSA(…
@@ -13,16 +13,16 @@
 %> M = rand(10,10);
 %> A = matfaust.rand(10,10);
 %> B = matfaust.rand(20, 10);
-%> [F, lamdba] = fact_palm4msa_constends(M, p, A, B)
+%> [F, lamdba] = palm4msa_constends(M, p, A, B)
 %>
 %> assert(norm(A - factors(F,1))/norm(A) <= eps(double(1)))
 %> assert(norm(B - factors(F,4))/norm(B) <= eps(double(1)))
 %>
 %> @endcode
 %==========================================================================================
-function [F, lambda] = fact_palm4msa_constends(M, p, A, varargin)
+function [F, lambda] = palm4msa_constends(M, p, A, varargin)
 	import matfaust.factparams.*
-	import matfaust.fact.fact_palm4msa
+	import matfaust.fact.palm4msa
 	if(~ ismatrix(A))
 		error('A must be a matrix.')
 	end
@@ -41,7 +41,7 @@ function [F, lambda] = fact_palm4msa_constends(M, p, A, varargin)
 	p = ParamsPalm4MSA(new_consts, p.stop_crit, 'is_update_way_R2L', p.is_update_way_R2L, ...
 		'init_lambda', p.init_lambda, 'step_size', p.step_size, 'constant_step_size', ...
 		p.constant_step_size, 'is_verbose', p.is_verbose);
-	[F, lambda ] = fact_palm4msa(M, p);
+	[F, lambda ] = palm4msa(M, p);
 	f1 = factors(F, 1);
 	f1 = f1 / lambda;
 	nF = cell(1, numfactors(F));

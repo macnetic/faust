@@ -190,7 +190,7 @@ def _check_fact_mat(funcname, M):
     #   raise Exception(funcname+" doesn't yet support complex matrix "
     #                   "factorization.")
 
-def fact_palm4msa(M, p, ret_lambda=False):
+def palm4msa(M, p, ret_lambda=False):
     """
     Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
 
@@ -211,7 +211,7 @@ def fact_palm4msa(M, p, ret_lambda=False):
     >>> cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1.0, 32, 32)
     >>> stop_crit = StoppingCriterion(num_its=200)
     >>> param = ParamsPalm4MSA(cons, stop_crit)
-    >>> F = fact_palm4msa(M, param)
+    >>> F = palm4msa(M, param)
     >>> F
     Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):<br/>
     FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500<br/>
@@ -219,7 +219,7 @@ def fact_palm4msa(M, p, ret_lambda=False):
     """
     if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSA)):
         raise TypeError("p must be a ParamsPalm4MSA object.")
-    _check_fact_mat('fact_palm4msa()', M)
+    _check_fact_mat('palm4msa()', M)
     if(not p.is_mat_consistent(M)):
         raise ValueError("M's number of columns must be consistent with "
                          "the last residuum constraint defined in p. "
@@ -232,12 +232,12 @@ def fact_palm4msa(M, p, ret_lambda=False):
     else:
         return F
 
-def _fact_palm4msa_fgft(Lap, p, ret_lambda=False):
+def _palm4msa_fgft(Lap, p, ret_lambda=False):
     """
     """
     if(not isinstance(p, pyfaust.factparams.ParamsPalm4MSAFGFT)):
         raise TypeError("p must be a ParamsPalm4MSAFGFT object.")
-    _check_fact_mat('_fact_palm4msa_fgft()', Lap)
+    _check_fact_mat('_palm4msa_fgft()', Lap)
     if((Lap.T != Lap).any() or Lap.shape[0] != Lap.shape[1]):
         raise ValueError("Laplacian matrix must be square and symmetric.")
     if(not p.is_mat_consistent(Lap)):
@@ -253,14 +253,14 @@ def _fact_palm4msa_fgft(Lap, p, ret_lambda=False):
         return F, D
 
 
-def fact_hierarchical(M, p, ret_lambda=False, ret_params=False):
+def hierarchical(M, p, ret_lambda=False, ret_params=False):
     """
     Factorizes the matrix M with Hierarchical Factorization using the parameters set in p.
     @note This function has its shorthand pyfaust.faust_fact(). For
     convenience you might use it like this:<br/>
             <code>
             from pyfaust import *;
-            F = faust_fact(M, p) # equiv. to fact_hierarchical(M, p)
+            F = faust_fact(M, p) # equiv. to hierarchical(M, p)
             </code>
 
     Args:
@@ -291,7 +291,7 @@ def fact_hierarchical(M, p, ret_lambda=False, ret_params=False):
 
     Examples:
         <b> 1. Fully Defined Parameters for a Random Matrix Factorization </b>
-        >>> from pyfaust.fact import fact_hierarchical
+        >>> from pyfaust.fact import hierarchical
         >>> from pyfaust.factparams import ParamsHierarchicalFact, ConstraintList, StoppingCriterion
         >>> import numpy as np
         >>> M = np.random.rand(500, 32)
@@ -300,7 +300,7 @@ def fact_hierarchical(M, p, ret_lambda=False, ret_params=False):
         >>> stop_crit1 = StoppingCriterion(num_its=200)
         >>> stop_crit2 = StoppingCriterion(num_its=200)
         >>> param = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit1, stop_crit2)
-        >>> F = fact_hierarchical(M, param)
+        >>> F = hierarchical(M, param)
         Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization
         1/3<br/>
         Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization
@@ -317,13 +317,13 @@ def fact_hierarchical(M, p, ret_lambda=False, ret_params=False):
         <b>2. Simplified Parameters for Hadamard Factorization</b>
 
         >>> from pyfaust import wht
-        >>> from pyfaust.fact import fact_hierarchical
+        >>> from pyfaust.fact import hierarchical
         >>> from numpy.linalg import norm
         >>> # generate a Hadamard Faust of size 32x32
         >>> FH = wht(32)
         >>> H = FH.toarray() # the full matrix version
         >>> # factorize it
-        >>> FH2 = fact_hierarchical(H, 'squaremat');
+        >>> FH2 = hierarchical(H, 'squaremat');
         >>> # test the relative error
         >>> (FH-FH2).norm('fro')/FH.norm('fro') # the result is 1.1015e-16, the factorization is accurate
         >>> FH
@@ -352,7 +352,7 @@ def fact_hierarchical(M, p, ret_lambda=False, ret_params=False):
        >>> num_facts = 9
        >>> k = 10
        >>> s = 8
-       >>> MEG16 = fact_hierarchical(MEG, ['rectmat', num_facts, k, s])
+       >>> MEG16 = hierarchical(MEG, ['rectmat', num_facts, k, s])
        >>> MEG16
        Faust size 204x8193, density 0.0631655, nnz_sum 105573, 9 factor(s):
            - FACTOR 0 (real) SPARSE, size 204x204, density 0.293613, nnz
@@ -382,7 +382,7 @@ def fact_hierarchical(M, p, ret_lambda=False, ret_params=False):
        8.0
 
     """
-    p = _prepare_hierarchical_fact(M,p, "fact_hierarchical", ret_lambda,
+    p = _prepare_hierarchical_fact(M,p, "hierarchical", ret_lambda,
                               ret_params)
     core_obj,_lambda = _FaustCorePy.FaustFact.fact_hierarchical(M, p)
     F = Faust(core_obj=core_obj)
@@ -400,7 +400,7 @@ def fact_hierarchical(M, p, ret_lambda=False, ret_params=False):
 def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
                                M_name='M'):
     """
-    Utility func. for fact_hierarchical() and fgft_palm().
+    Utility func. for hierarchical() and fgft_palm().
     Among other checkings, it sets parameters from simplified ones.
     """
     from pyfaust.factparams import (ParamsHierarchicalFact,
@@ -422,9 +422,9 @@ def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
                          "with the first factor constraint defined in p.")
     return p
 
-def fact_hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
+def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
     """
-    Tries to approximate M by \f$ A \prod_j S_j B \f$ using the fact_hierarchical.
+    Tries to approximate M by \f$ A \prod_j S_j B \f$ using the hierarchical.
 
     It needs to add one additional residuum constraint and also one factor
     constraint into p relatively to the number of constraints you would
@@ -432,7 +432,7 @@ def fact_hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
 
     Examples:
         from pyfaust import rand
-        from pyfaust import fact_hierarchical
+        from pyfaust import hierarchical
         import numpy as np
         from numpy.random import rand
         from pyfaust.factparams import (ParamsHierarchicalFact, ConstraintList,
@@ -449,7 +449,7 @@ def fact_hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
                                   'normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp',
                                   333, 32, 32)
         param = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit1, stop_crit2)
-        F, _lambda = fact_hierarchical_constends(M, param, A, B, ret_lambda=True)
+        F, _lambda = hierarchical_constends(M, param, A, B, ret_lambda=True)
 
         assert(np.allclose(F.factors(0).toarray(), A))
         assert(np.allclose(F.factors(5).toarray(), B))
@@ -483,7 +483,7 @@ def fact_hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
                                p.step_size, p.constant_step_size,
                                p.is_fact_side_left,
                                p.is_verbose)
-    F, _lambda = fact_hierarchical(M, p, ret_lambda=True,
+    F, _lambda = hierarchical(M, p, ret_lambda=True,
                                           ret_params=False)
     FA_lambda = F.factors(0)
     FA = FA_lambda/_lambda
@@ -504,14 +504,14 @@ def fact_hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
     else:
         return F
 
-def fact_palm4msa_constends(M, p, A, B=None, ret_lambda=False):
+def palm4msa_constends(M, p, A, B=None, ret_lambda=False):
     """
-    Tries to approximate M by \f$ A \prod_j S_j B\f$ using fact_palm4msa (B being optional).
+    Tries to approximate M by \f$ A \prod_j S_j B\f$ using palm4msa (B being optional).
 
 
     Example:
         from pyfaust import rand
-        from pyfaust.fact import fact_palm4msa_constends
+        from pyfaust.fact import palm4msa_constends
         from pyfaust.factparams import (ParamsPalm4MSA, ConstraintList,
                                         StoppingCriterion)
         import numpy as np
@@ -526,7 +526,7 @@ def fact_palm4msa_constends(M, p, A, B=None, ret_lambda=False):
         consts = ConstraintList('spcol', randint(1, A.shape[1]), A.shape[1],
                                                  B.shape[0])
         param = ParamsPalm4MSA(consts, stop_crit)
-        F = fact_palm4msa_constends(M, param, A, B)
+        F = palm4msa_constends(M, param, A, B)
 
         assert(np.allclose(F.factors(0).toarray(), A))
         assert(np.allclose(F.factors(2).toarray(), B))
@@ -547,7 +547,7 @@ def fact_palm4msa_constends(M, p, A, B=None, ret_lambda=False):
                        init_lambda=p.init_lambda, step_size=p.step_size,
                        constant_step_size = p.constant_step_size,
                        is_verbose = p.is_verbose)
-    F, _lambda = fact_palm4msa(M, p, ret_lambda=True)
+    F, _lambda = palm4msa(M, p, ret_lambda=True)
     F = \
     Faust([F.factors(0)/_lambda]+[F.factors(1)*_lambda]+
           [F.factors(i)
@@ -563,7 +563,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
     Computes the FGFT for the Fourier matrix U (it should be the eigenvectors of the Laplacian Lap).
 
 
-    NOTE: this algorithm is a variant of fact_hierarchical.
+    NOTE: this algorithm is a variant of hierarchical.
 
 
     Example:
@@ -653,7 +653,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
         tuple (FGFT, _lambda, p).
 
     See also:
-        fact_hierarchical, fgft_givens, eigtj
+        hierarchical, fgft_givens, eigtj
 
     References:
         - [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast

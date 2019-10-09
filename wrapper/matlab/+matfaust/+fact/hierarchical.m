@@ -11,24 +11,24 @@
 %> @note - This function has its shorthand matfaust.faust_fact(). For convenience you might use it like this:
 %> @code
 %> import matfaust.*
-%> F = faust_fact(M, p) % equiv. to matfaust.fact.fact_hierarchical(M, p)
+%> F = faust_fact(M, p) % equiv. to matfaust.fact.hierarchical(M, p)
 %> @endcode
 %>
 %> @retval F The Faust object result of the factorization.
-%> @retval [F, lambda, p_obj] = fact_hierarchical(M, p) to optionally get lambda (scale) and the p_obj ParamsHierarchicalFact instance used to factorize.
+%> @retval [F, lambda, p_obj] = hierarchical(M, p) to optionally get lambda (scale) and the p_obj ParamsHierarchicalFact instance used to factorize.
 %>
 %> @b Example 1: Fully Defined Parameters for a Random Matrix Factorization
 %> @code
 %>  import matfaust.*
 %>  import matfaust.factparams.*
-%>  import matfaust.fact.fact_hierarchical
+%>  import matfaust.fact.hierarchical
 %>  M = rand(500, 32);
 %>  fact_cons = ConstraintList('splin', 5, 500, 32, 'sp', 96, 32, 32, 'sp', 96, 32, 32);
 %>  res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp', 333, 32, 32);
 %>  stop_crit = StoppingCriterion(200);
 %>  stop_crit2 = StoppingCriterion(200);
 %>  params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2, 'is_update_way_R2L', false, 'init_lambda', 1.0);
-%>  F = fact_hierarchical(M, params)
+%>  F = hierarchical(M, params)
 %>  @endcode
 %>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization 1/3<br/>
 %>  Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization 2/3<br/>
@@ -45,12 +45,12 @@
 %>  @b Example 2: Simplified Parameters for Hadamard Factorization
 %>@code
 %> import matfaust.*
-%> import matfaust.fact.fact_hierarchical
+%> import matfaust.fact.hierarchical
 %> % generate a Hadamard Faust of size 32x32
 %> FH = wh(32);
 %> H = full(FH); % the full matrix version
 %> % factorize it
-%> FH2 = fact_hierarchical(H, 'squaremat');
+%> FH2 = hierarchical(H, 'squaremat');
 %> % test the relative error
 %> norm(FH-FH2, 'fro')/norm(FH, 'fro') % the result is 1.1015e-16, the factorization is accurate
 %>@endcode
@@ -78,13 +78,13 @@
 %> @code
 %> >> % in a matlab terminal
 %> >> import matfaust.*
-%> >> import matfaust.fact.fact_hierarchical
+%> >> import matfaust.fact.hierarchical
 %> >> load('matrix_MEG.mat')
 %> >> MEG = matrix;
 %> >> num_facts = 9;
 %> >> k = 10;
 %> >> s = 8;
-%> >> MEG16 = fact_hierarchical(MEG, {'rectmat', num_facts, k, s})
+%> >> MEG16 = hierarchical(MEG, {'rectmat', num_facts, k, s})
 %> @endcode
 %> MEG16 =
 %>
@@ -118,11 +118,11 @@
 %> 8
 %> <p> @b See @b also matfaust.faust_fact, factparams.ParamsHierarchicalFact, factparams.ParamsHierarchicalFactSquareMat, factparams.ParamsHierarchicalFactRectMat
 %==========================================================================================
-function varargout = fact_hierarchical(M, p)
+function varargout = hierarchical(M, p)
 	import matfaust.Faust
 	import matfaust.factparams.*
 	import matfaust.fact.check_fact_mat
-	check_fact_mat('matfaust.fact.fact_hierarchical', M)
+	check_fact_mat('matfaust.fact.hierarchical', M)
 	if(~ isa(p, 'ParamsHierarchicalFact') && ParamsFactFactory.is_a_valid_simplification(p))
 		p = ParamsFactFactory.createParams(M, p);
 	end

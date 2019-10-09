@@ -18,8 +18,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 	end
 
 	methods (Test)
-		function test_fact_palm4msa(this)
-			disp('Test matfaust.fact.fact_palm4msa()')
+		function test_palm4msa(this)
+			disp('Test matfaust.fact.palm4msa()')
 			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 2;
@@ -38,7 +38,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda, 'step_size', ParamsFact.DEFAULT_STEP_SIZE,...
 			'constant_step_size', ParamsFact.DEFAULT_CONSTANT_STEP_SIZE);
-			F = matfaust.fact.fact_palm4msa(M, params)
+			F = matfaust.fact.palm4msa(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -50,8 +50,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.2710, 'AbsTol', 0.0001)
 		end
 
-		function test_fact_palm4msaCplx(this)
-			disp('Test matfaust.fact.fact_palm4msaCplx()')
+		function test_palm4msaCplx(this)
+			disp('Test matfaust.fact.palm4msaCplx()')
 			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 2;
@@ -69,7 +69,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			cons{2} = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32, 32, 1.0);
 			stop_crit = StoppingCriterion(200);
 			params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', is_update_way_R2L, 'init_lambda', init_lambda);
-			F = matfaust.fact.fact_palm4msa(M, params)
+			F = matfaust.fact.palm4msa(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -79,8 +79,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.29177, 'AbsTol', 0.0001)
 		end
 
-		function test_fact_hierarchical(this)
-			disp('Test matfaust.fact.fact_hierarchical()')
+		function test_hierarchical(this)
+			disp('Test matfaust.fact.hierarchical()')
 			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 4;
@@ -106,7 +106,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
 			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2);
-			F = matfaust.fact.fact_hierarchical(M, params)
+			F = matfaust.fact.hierarchical(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -118,8 +118,8 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(norm(E,'fro')/norm(M,'fro'), 0.26851, 'AbsTol', 0.00001)
 		end
 
-		function test_fact_hierarchicalCplx(this)
-			disp('Test matfaust.fact.fact_hierarchicalCplx()')
+		function test_hierarchicalCplx(this)
+			disp('Test matfaust.fact.hierarchicalCplx()')
 			import matfaust.*
 			import matfaust.factparams.*
 			num_facts = 4;
@@ -146,7 +146,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			stop_crit2 = StoppingCriterion(200);
 			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2,...
 					'init_lambda', init_lambda, 'is_update_way_R2L', is_update_way_R2L);
-			F = matfaust.fact.fact_hierarchical(M, params)
+			F = matfaust.fact.hierarchical(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
 			%norm(F, 'fro')

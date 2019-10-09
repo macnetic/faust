@@ -6,19 +6,19 @@
 %> @param p the ParamsPalm4MSA instance to define the algorithm parameters.
 %>
 %> @retval F the Faust object result of the factorization.
-%> @retval [F, lambda] = fact_palm4msa(M, p) to optionally get lambda (scale).
+%> @retval [F, lambda] = palm4msa(M, p) to optionally get lambda (scale).
 %>
 %> @b Example
 %>
 %> @code
 %>  import matfaust.*
 %>  import matfaust.factparams.*
-%>  import matfaust.fact.fact_palm4msa
+%>  import matfaust.fact.palm4msa
 %>  M = rand(500, 32);
 %>  cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1, 32, 32);
 %>  stop_crit = StoppingCriterion(200);
 %>  params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', false, 'init_lambda', 1.0);
-%>  F = fact_palm4msa(M, params)
+%>  F = palm4msa(M, params)
 %> @endcode
 %>
 %> F =
@@ -29,11 +29,11 @@
 %>
 %>
 %==========================================================================================
-function  [F,lambda] = fact_palm4msa(M, p)
+function  [F,lambda] = palm4msa(M, p)
 	import matfaust.Faust
 	import matfaust.fact.check_fact_mat
 	mex_constraints = cell(1, length(p.constraints));
-	check_fact_mat('matfaust.fact.fact_palm4msa', M)
+	check_fact_mat('matfaust.fact.palm4msa', M)
 	if(~ isa(p ,'matfaust.factparams.ParamsPalm4MSA'))
 		error('p must be a ParamsPalm4MSA object.')
 	end

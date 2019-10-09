@@ -1,9 +1,9 @@
 %==========================================================================================
-%> @brief Approximates M by A S_1 ... S_n B using fact_hierarchical.
+%> @brief Approximates M by A S_1 ... S_n B using hierarchical.
 %>
 %> @Example
 %> @code
-%> import matfaust.fact.fact_hierarchical
+%> import matfaust.fact.hierarchical
 %> import matfaust.factparams.*
 %>
 %> p = ParamsHierarchicalFact(…
@@ -14,16 +14,16 @@
 %> M = rand(10,10);
 %> A = matfaust.rand(10,10);
 %> B = matfaust.rand(20, 10);
-%> [F, lamdba, ~] = fact_hierarchical_constends(M, p, A, B)
+%> [F, lamdba, ~] = hierarchical_constends(M, p, A, B)
 %>
 %> assert(norm(A - factors(F,1))/norm(A) <= eps(double(1)))
 %> assert(norm(B - factors(F,4))/norm(B) <= eps(double(1)))
 %> @endcode
 %>
 %==========================================================================================
-function varargout = fact_hierarchical_constends(M, p, A, B)
+function varargout = hierarchical_constends(M, p, A, B)
 	import matfaust.factparams.*
-	import matfaust.fact.fact_hierarchical
+	import matfaust.fact.hierarchical
 	if(~ ismatrix(A) || ~ ismatrix(B))
 		error('A and B must be matrices.')
 	end
@@ -55,7 +55,7 @@ function varargout = fact_hierarchical_constends(M, p, A, B)
 		p.stop_crits{1}, p.stop_crits{2}, 'is_update_way_R2L', p.is_update_way_R2L, ...
 		'init_lambda', p.init_lambda, 'step_size', p.step_size, 'constant_step_size', ...
 		p.constant_step_size, 'is_verbose', p.is_verbose, 'is_fact_side_left', p.is_fact_side_left);
-	[F, lambda, p] = fact_hierarchical(M, p);
+	[F, lambda, p] = hierarchical(M, p);
 	f1 = factors(F, 1);
 	f1 = f1 / lambda;
 	nF = cell(1, numfactors(F));
