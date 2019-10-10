@@ -937,6 +937,48 @@ class TestFaustFactory(unittest.TestCase):
         # misc/test/src/C++/GivensFGFTParallel.cpp.in
         self.assertEqual(err, err2)
 
+    def testFGFTGivensSparse(self):
+        print("Test fact.fgft_givens_sparse()")
+        print(sys.path)
+        from scipy.sparse import csr_matrix
+        import pyfaust.fact
+        L = loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        L = L.astype(np.float64)
+        J = \
+        int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
+        F, D = pyfaust.fact.fgft_givens(csr_matrix(L), J, 0, verbosity=0)
+        print("Lap norm:", norm(L, 'fro'))
+        err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
+        print("err: ", err)
+        # the error reference is from the C++ test,
+        # misc/test/src/C++/GivensFGFT.cpp.in
+        self.assertAlmostEqual(err, 0.0326529, places=7)
+
+    def testFGFTGivensParallelSparse(self):
+        print("Test pyfaust.fact.fgft_givens() -- parallel")
+        from pyfaust.fact import eigtj, fgft_givens
+        from scipy.sparse import csr_matrix
+        L = loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        L = L.astype(np.float64)
+        J = \
+                int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
+        t = int(L.shape[0]/2)
+        F, D = fgft_givens(csr_matrix(L), J, t, verbosity=0)
+        print("Lap norm:", norm(L, 'fro'))
+        err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
+        print("err: ", err)
+        # the error reference is from the C++ test,
+        # misc/test/src/C++/GivensFGFTParallel.cpp.in
+        self.assertAlmostEqual(err, 0.0410448, places=7)
+        F2, D2 = eigtj(L, J, t, verbosity=0)
+        print("Lap norm:", norm(L, 'fro'))
+        err2 = norm((F2*D.todense())*F2.T.todense()-L,"fro")/norm(L,"fro")
+        print("err2: ", err2)
+        # the error reference is from the C++ test,
+        # misc/test/src/C++/GivensFGFTParallel.cpp.in
+        self.assertEqual(err, err2)
+
+
     def testFactPalm4MSA_fgft(self):
         print("Test pyfaust.fact._palm4msa_fgft()")
         from pyfaust.factparams import ConstraintReal,\
