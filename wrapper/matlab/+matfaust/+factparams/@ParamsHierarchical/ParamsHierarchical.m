@@ -2,7 +2,7 @@
 % =========================================================
 %> The parent class to set input parameters for the hierarchical factorization algorithm.
 % =========================================================
-classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
+classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 	properties (SetAccess = public)
 		stop_crits
 		data_num_rows
@@ -15,7 +15,7 @@ classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
 		OPT_ARG_NAMES2 = { 'is_fact_side_left' }
 	end
 	methods
-		function p = ParamsHierarchicalFact(fact_constraints, res_constraints, stop_crit1, stop_crit2, varargin)
+		function p = ParamsHierarchical(fact_constraints, res_constraints, stop_crit1, stop_crit2, varargin)
 			import matfaust.factparams.*
 			if(isa(fact_constraints, 'ConstraintList'))
 				fact_constraints = fact_constraints.clist;
@@ -43,7 +43,7 @@ classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
 			opt_arg_map = containers.Map();
 			if(length(varargin) > 0)
 				% retrieve all optional argument key-value pairs
-				opt_arg_names = {ParamsFact.OPT_ARG_NAMES, ParamsHierarchicalFact.OPT_ARG_NAMES2};
+				opt_arg_names = {ParamsFact.OPT_ARG_NAMES, ParamsHierarchical.OPT_ARG_NAMES2};
 				opt_arg_names = {opt_arg_names{1}{:}, opt_arg_names{2}{:}};
 				ParamsFact.parse_opt_args(varargin, opt_arg_names, opt_arg_map)
 				% gather all parent argument key-value pairs
@@ -56,12 +56,12 @@ classdef ParamsHierarchicalFact < matfaust.factparams.ParamsFact
 				% parent constructor handles verification for its own arguments
 			end
 			% set default values
-			is_fact_side_left = ParamsHierarchicalFact.DEFAULT_IS_FACT_SIDE_LEFT;
-			if(opt_arg_map.isKey(ParamsHierarchicalFact.OPT_ARG_NAMES2{ParamsHierarchicalFact.IDX_IS_FACT_SIDE_LEFT}))
-				is_fact_side_left = opt_arg_map(ParamsHierarchicalFact.OPT_ARG_NAMES2{ParamsHierarchicalFact.IDX_IS_FACT_SIDE_LEFT});
+			is_fact_side_left = ParamsHierarchical.DEFAULT_IS_FACT_SIDE_LEFT;
+			if(opt_arg_map.isKey(ParamsHierarchical.OPT_ARG_NAMES2{ParamsHierarchical.IDX_IS_FACT_SIDE_LEFT}))
+				is_fact_side_left = opt_arg_map(ParamsHierarchical.OPT_ARG_NAMES2{ParamsHierarchical.IDX_IS_FACT_SIDE_LEFT});
 			end
 			if(~ islogical(is_fact_side_left))
-				error('matfaust.factparams.ParamsHierarchicalFact: is_fact_side_left argument must be logical.')
+				error('matfaust.factparams.ParamsHierarchical: is_fact_side_left argument must be logical.')
 			end
 			if(is_fact_side_left)
 				constraints = {res_constraints{:}, fact_constraints{:}};

@@ -1,7 +1,7 @@
 % =========================================================
 %> The simplified parameterization class for factorizing a rectangular matrix with the hierarchical factorization algorithm.
 % =========================================================
-classdef ParamsHierarchicalFactRectMat < matfaust.factparams.ParamsHierarchicalFact
+classdef ParamsHierarchicalRectMat < matfaust.factparams.ParamsHierarchical
 	properties(Constant, SetAccess = protected, Hidden)
 		DEFAULT_RHO = 0.8
 		DEFAULT_P_CONST_FACT = 1.4
@@ -10,7 +10,7 @@ classdef ParamsHierarchicalFactRectMat < matfaust.factparams.ParamsHierarchicalF
 		OPT_ARG_NAMES3 = { 'rho', 'P' }
 	end
 	methods
-		function p = ParamsHierarchicalFactRectMat(m, n, j, k, s, varargin)
+		function p = ParamsHierarchicalRectMat(m, n, j, k, s, varargin)
 			import matfaust.factparams.*
 			% verify arguments
 			args = {m,n,j,k,s};
@@ -26,16 +26,16 @@ classdef ParamsHierarchicalFactRectMat < matfaust.factparams.ParamsHierarchicalF
 			k = floor(k);
 			s = floor(s);
 			opt_arg_map = containers.Map();
-			opt_arg_names = ParamsHierarchicalFactRectMat.OPT_ARG_NAMES3;
+			opt_arg_names = ParamsHierarchicalRectMat.OPT_ARG_NAMES3;
 			if(length(varargin) > 0)
 				% retrieve all optional argument key-value pairs
 				ParamsFact.parse_opt_args(varargin, opt_arg_names)
 			end
 			% set default values for optional args
-			rho = ParamsHierarchicalFactRectMat.DEFAULT_RHO;
-			P = ParamsHierarchicalFactRectMat.DEFAULT_P_CONST_FACT*m^2;
-			idx_rho = ParamsHierarchicalFactRectMat.IDX_RHO;
-			idx_P = ParamsHierarchicalFactRectMat.IDX_P;
+			rho = ParamsHierarchicalRectMat.DEFAULT_RHO;
+			P = ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT*m^2;
+			idx_rho = ParamsHierarchicalRectMat.IDX_RHO;
+			idx_P = ParamsHierarchicalRectMat.IDX_P;
 			% get customed values if provided
 			if(opt_arg_map.isKey(opt_arg_names{idx_rho}))
 				rho = opt_arg_map(opt_arg_names{idx_rho});
@@ -53,13 +53,13 @@ classdef ParamsHierarchicalFactRectMat < matfaust.factparams.ParamsHierarchicalF
 				R_cons = [ R_cons, {ConstraintInt('sp', m, m, P*rho^(i-1))} ];
 			end
 			stop_crit = StoppingCriterion(30);
-			p = p@matfaust.factparams.ParamsHierarchicalFact(S_cons, R_cons, stop_crit,...
+			p = p@matfaust.factparams.ParamsHierarchical(S_cons, R_cons, stop_crit,...
 			stop_crit, 'is_update_way_R2L', true, 'is_fact_side_left', true);
 		end
 	end
 	methods(Static)
 		function sp = createParams(M, p)
-			import matfaust.factparams.ParamsHierarchicalFactRectMat
+			import matfaust.factparams.ParamsHierarchicalRectMat
 			if(~ iscell(p))
 				error('p must be a cell array')
 			end
@@ -69,7 +69,7 @@ classdef ParamsHierarchicalFactRectMat < matfaust.factparams.ParamsHierarchicalF
 			if(length(p) < 4)
 				error('p must be of length 4')
 			end
-			sp = ParamsHierarchicalFactRectMat(size(M,1), size(M,2), p{2:end});
+			sp = ParamsHierarchicalRectMat(size(M,1), size(M,2), p{2:end});
 		end
 	end
 end

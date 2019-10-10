@@ -105,7 +105,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			res_cons{3} =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333);
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
-			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2);
+			params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2);
 			F = matfaust.fact.hierarchical(M, params)
 			this.verifyEqual(size(F), size(M))
 			%disp('norm F: ')
@@ -144,7 +144,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			res_cons{3} =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333);
 			stop_crit = StoppingCriterion(200);
 			stop_crit2 = StoppingCriterion(200);
-			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2,...
+			params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2,...
 					'init_lambda', init_lambda, 'is_update_way_R2L', is_update_way_R2L);
 			F = matfaust.fact.hierarchical(M, params)
 			this.verifyEqual(size(F), size(M))
@@ -223,7 +223,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			params.fact_side = 0 % forced
 			params.verbose = 0 % forced
 			params.init_lambda = 128;
-			params = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit, stop_crit2, 'is_fact_side_left', params.fact_side == 1, 'is_update_way_R2L', params.update_way == 1, 'init_lambda', params.init_lambda, 'step_size', params.stepsize, 'constant_step_size', false, 'is_verbose', params.verbose ~= 1);
+			params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2, 'is_fact_side_left', params.fact_side == 1, 'is_update_way_R2L', params.update_way == 1, 'init_lambda', params.init_lambda, 'step_size', params.stepsize, 'constant_step_size', false, 'is_verbose', params.verbose ~= 1);
 			diag_init_D = diag(init_D)
 			[F,D,lambda] = matfaust.fact.fgft_palm(U, Lap, params, diag_init_D)
 			this.verifyEqual(size(F), size(U))

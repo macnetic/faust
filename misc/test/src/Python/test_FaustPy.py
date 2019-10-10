@@ -767,7 +767,7 @@ class TestFaustFactory(unittest.TestCase):
     def testFactHierarch(self):
         print("Test pyfaust.fact.hierarchical()")
         from pyfaust.fact import hierarchical
-        from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
+        from pyfaust.factparams import ParamsHierarchical, StoppingCriterion
         from pyfaust.factparams import ConstraintReal, ConstraintInt,\
                 ConstraintName
         num_facts = 4
@@ -785,7 +785,7 @@ class TestFaustFactory(unittest.TestCase):
         res2_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333)
         stop_crit1 = StoppingCriterion(num_its=200)
         stop_crit2 = StoppingCriterion(num_its=200)
-        param = ParamsHierarchicalFact([fact0_cons, fact1_cons, fact2_cons],
+        param = ParamsHierarchical([fact0_cons, fact1_cons, fact2_cons],
                                        [res0_cons, res1_cons, res2_cons],
                                        stop_crit1, stop_crit2,
                                        is_verbose=False)
@@ -801,7 +801,7 @@ class TestFaustFactory(unittest.TestCase):
     def testFactHierarchCplx(self):
         print("Test pyfaust.fact.hierarchicalCplx()")
         from pyfaust.fact import hierarchical
-        from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
+        from pyfaust.factparams import ParamsHierarchical, StoppingCriterion
         from pyfaust.factparams import ConstraintReal,\
                 ConstraintInt, ConstraintName
         num_facts = 4
@@ -820,7 +820,7 @@ class TestFaustFactory(unittest.TestCase):
         res2_cons =  ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 333)
         stop_crit1 = StoppingCriterion(num_its=200)
         stop_crit2 = StoppingCriterion(num_its=200)
-        param = ParamsHierarchicalFact([fact0_cons, fact1_cons, fact2_cons],
+        param = ParamsHierarchical([fact0_cons, fact1_cons, fact2_cons],
                                        [res0_cons, res1_cons, res2_cons],
                                        stop_crit1, stop_crit2,
                                        is_verbose=False)
@@ -981,7 +981,7 @@ class TestFaustFactory(unittest.TestCase):
     def testFactHierarchFGFT(self):
         print("Test pyfaust.fact.fgft_palm()")
         import pyfaust.fact
-        from pyfaust.factparams import ParamsHierarchicalFact, StoppingCriterion
+        from pyfaust.factparams import ParamsHierarchical, StoppingCriterion
         from pyfaust.factparams import ConstraintReal, ConstraintInt,\
                 ConstraintName
         from numpy import diag, copy
@@ -1022,7 +1022,7 @@ class TestFaustFactory(unittest.TestCase):
                                    384)
         stop_crit1 = StoppingCriterion(num_its=niter1)
         stop_crit2 = StoppingCriterion(num_its=niter2)
-        param = ParamsHierarchicalFact([fact0_cons, fact1_cons, fact2_cons],
+        param = ParamsHierarchical([fact0_cons, fact1_cons, fact2_cons],
                                        [res0_cons, res1_cons, res2_cons],
                                        stop_crit1, stop_crit2,
                                        is_verbose=verbose,

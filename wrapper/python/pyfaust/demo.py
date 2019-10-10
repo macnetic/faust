@@ -584,7 +584,7 @@ class hadamard:
 
         """
         from pyfaust import FaustFactory, wht
-        from pyfaust.factparams import ParamsHierarchicalFact, ConstraintInt, \
+        from pyfaust.factparams import ParamsHierarchical, ConstraintInt, \
         ConstraintName, StoppingCriterion
         from pyfaust.fact import hierarchical
 
@@ -594,7 +594,7 @@ class hadamard:
         H = wht(n)
         full_H = H.toarray()
 
-        params = ParamsHierarchicalFact([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
+        params = ParamsHierarchical([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
                                         for i in range(0,n-1)],
                                         [ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,int(d/2.**(i+1)))
                                          for i in range(0,n-1)],

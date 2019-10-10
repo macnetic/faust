@@ -12094,8 +12094,8 @@ You have to define two stopping criteria, one for the <em>local optimization</em
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.factparams</span> <span class="k">import</span> <span class="n">ParamsHierarchicalFact</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">ParamsHierarchicalFact</span><span class="p">(</span><span class="n">S_constraints</span><span class="p">,</span> <span class="n">R_constraints</span><span class="p">,</span> <span class="n">loc_stop</span><span class="p">,</span> <span class="n">glob_stop</span><span class="p">,</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.factparams</span> <span class="k">import</span> <span class="n">ParamsHierarchical</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">ParamsHierarchical</span><span class="p">(</span><span class="n">S_constraints</span><span class="p">,</span> <span class="n">R_constraints</span><span class="p">,</span> <span class="n">loc_stop</span><span class="p">,</span> <span class="n">glob_stop</span><span class="p">,</span>
                                 <span class="n">is_update_way_R2L</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># the argument order matters!</span>
 <span class="c1"># launch the factorization</span>
 <span class="n">FH3</span> <span class="o">=</span> <span class="n">faust_fact</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
@@ -12430,7 +12430,7 @@ It's much more complicated to configure but starting from an example you'll be a
             <span class="n">dim</span><span class="p">,</span>
             <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">dim</span><span class="o">*</span><span class="n">over_sp</span><span class="p">)),</span><span class="n">size</span><span class="p">(</span><span class="n">Lap</span><span class="p">)))</span>
         <span class="p">]</span>
-<span class="n">params</span> <span class="o">=</span> <span class="n">ParamsHierarchicalFact</span><span class="p">(</span><span class="n">fact_cons</span><span class="p">,</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">ParamsHierarchical</span><span class="p">(</span><span class="n">fact_cons</span><span class="p">,</span>
         <span class="n">res_cons</span><span class="p">,</span>
         <span class="n">StoppingCriterion</span><span class="p">(</span><span class="n">num_its</span><span class="o">=</span><span class="mi">50</span><span class="p">),</span>
         <span class="n">StoppingCriterion</span><span class="p">(</span><span class="n">num_its</span><span class="o">=</span><span class="mi">100</span><span class="p">),</span>

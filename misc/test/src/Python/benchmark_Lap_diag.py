@@ -70,7 +70,7 @@ if __name__ == '__main__':
             res_cons += [ ConstraintInt('sp', dim, dim,
                                         min(int(round(2*dim*over_sp)),size(Lap))) ]
 
-        params = ParamsHierarchicalFact(fact_cons, res_cons,
+        params = ParamsHierarchical(fact_cons, res_cons,
                                         StoppingCriterion(num_its=50),
                                         StoppingCriterion(num_its=100),
                                         step_size=1.0000e-06,

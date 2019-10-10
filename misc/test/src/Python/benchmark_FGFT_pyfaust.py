@@ -90,7 +90,7 @@ for j in range(old_nruns,nruns):
             res_cons += [ ConstraintInt('sp', dim, dim,
                                         min(int(round(2*dim*over_sp)),Lap.shape[0])) ]
 
-        params = ParamsHierarchicalFact(fact_cons, res_cons,
+        params = ParamsHierarchical(fact_cons, res_cons,
                                         StoppingCriterion(num_its=50),
                                         StoppingCriterion(num_its=100),
                                         step_size=1.0000e-06,

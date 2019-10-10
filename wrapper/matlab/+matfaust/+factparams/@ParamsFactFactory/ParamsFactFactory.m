@@ -21,9 +21,9 @@ classdef ParamsFactFactory
 				param_id = lower(p{1});
 			end
 			if(strcmp_anycell(param_id, ParamsFactFactory.SIMPLIFIED_PARAMS{ParamsFactFactory.SQRTMAT_ID}))
-				sp = ParamsHierarchicalFactSquareMat.createParams(M, p);
+				sp = ParamsHierarchicalSquareMat.createParams(M, p);
 			elseif(strcmp_anycell(param_id, ParamsFactFactory.SIMPLIFIED_PARAMS{ParamsFactFactory.RECTMAT_ID}))
-				sp = ParamsHierarchicalFactRectMat.createParams(M, p);
+				sp = ParamsHierarchicalRectMat.createParams(M, p);
 			else
 				error('p is not a known simplified parametrization')
 			end

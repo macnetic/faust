@@ -265,17 +265,17 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False):
 
     Args:
         M: the numpy matrix to factorize.
-        p: is a set of factorization parameters. It might be a fully defined instance of parameters (pyfaust.factparams.ParamsHierarchicalFact) or a simplified expression which designates a pre-defined parametrization:
+        p: is a set of factorization parameters. It might be a fully defined instance of parameters (pyfaust.factparams.ParamsHierarchical) or a simplified expression which designates a pre-defined parametrization:
             - 'squaremat' to use pre-defined parameters typically used to factorize a Hadamard square matrix of order a power of two (see pyfaust.demo.hadamard).
-            - ['rectmat', j, k, s] to use pre-defined parameters used for instance in factorization of the MEG matrix which is a rectangular matrix of size m*n such that m < n (see pyfaust.demo.bsl); j is the number of factors, k the sparsity of the main factor's columns, and s the sparsity of rows for all other factors except the residuum (that is the first factor here because the factorization is made toward the left -- is_side_fact_left == true, cf. pyfaust.factparams.ParamsHierarchicalFact).
+            - ['rectmat', j, k, s] to use pre-defined parameters used for instance in factorization of the MEG matrix which is a rectangular matrix of size m*n such that m < n (see pyfaust.demo.bsl); j is the number of factors, k the sparsity of the main factor's columns, and s the sparsity of rows for all other factors except the residuum (that is the first factor here because the factorization is made toward the left -- is_side_fact_left == true, cf. pyfaust.factparams.ParamsHierarchical).
             <br/>The residuum has a sparsity of P*rho^(num_facts-1). <br/> By default, rho == .8 and P = 1.4. It's possible to set custom values with for example p == ( ['rectmat', j, k, s], {'rho':.4, 'P':.7 }). <br/>The sparsity is here the number of non-zero elements.
 
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
         ret_params: set to True to ask the function to return the
-        ParamsHierarchicalFact instance used (False by default).
+        ParamsHierarchical instance used (False by default).
         It is useful for consulting what precisely means the
         simplified parametrizations used to generate a
-        ParamsHierarchicalFact instance and possibly adjust its attributes to factorize again.
+        ParamsHierarchical instance and possibly adjust its attributes to factorize again.
 
 
     Returns:
@@ -284,7 +284,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False):
         returns the tuple (F,_lambda) (_lambda is the scale factor at the
         end of factorization).<br/>
         if ret_params == True (and ret_lambda == False), then the function
-        returns the tuple (F, p) (p being the ParamsHierarchicalFact
+        returns the tuple (F, p) (p being the ParamsHierarchical
         instance really used by the algorithm).<br/>
         if ret_lambda == True and ret_params == True, then the function
         returns the tuple (F, _lambda, p).
@@ -292,14 +292,14 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False):
     Examples:
         <b> 1. Fully Defined Parameters for a Random Matrix Factorization </b>
         >>> from pyfaust.fact import hierarchical
-        >>> from pyfaust.factparams import ParamsHierarchicalFact, ConstraintList, StoppingCriterion
+        >>> from pyfaust.factparams import ParamsHierarchical, ConstraintList, StoppingCriterion
         >>> import numpy as np
         >>> M = np.random.rand(500, 32)
         >>> fact_cons = ConstraintList('splin', 5, 500, 32, 'sp', 96, 32, 32, 'sp', 96, 32, 32)
         >>> res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp', 333, 32, 32)
         >>> stop_crit1 = StoppingCriterion(num_its=200)
         >>> stop_crit2 = StoppingCriterion(num_its=200)
-        >>> param = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit1, stop_crit2)
+        >>> param = ParamsHierarchical(fact_cons, res_cons, stop_crit1, stop_crit2)
         >>> F = hierarchical(M, param)
         Faust::HierarchicalFact<FPP,DEVICE>::compute_facts : factorization
         1/3<br/>
@@ -403,13 +403,13 @@ def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
     Utility func. for hierarchical() and fgft_palm().
     Among other checkings, it sets parameters from simplified ones.
     """
-    from pyfaust.factparams import (ParamsHierarchicalFact,
+    from pyfaust.factparams import (ParamsHierarchical,
                                     ParamsFactFactory)
-    if(not isinstance(p, ParamsHierarchicalFact) and
+    if(not isinstance(p, ParamsHierarchical) and
        ParamsFactFactory.is_a_valid_simplification(p)):
         p = ParamsFactFactory.createParams(M, p)
-    if(not isinstance(p, ParamsHierarchicalFact)):
-        raise TypeError("p must be a ParamsHierarchicalFact object.")
+    if(not isinstance(p, ParamsHierarchical)):
+        raise TypeError("p must be a ParamsHierarchical object.")
     _check_fact_mat(''+callee_name+'()', M)
     if(not isinstance(ret_lambda, bool)):
         raise TypeError("ret_lambda must be a bool.")
@@ -435,7 +435,7 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
         from pyfaust import hierarchical
         import numpy as np
         from numpy.random import rand
-        from pyfaust.factparams import (ParamsHierarchicalFact, ConstraintList,
+        from pyfaust.factparams import (ParamsHierarchical, ConstraintList,
                                         StoppingCriterion)
         M = rand(32,32)
         A = rand(32,32)
@@ -448,7 +448,7 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
         res_cons = ConstraintList('normcol', 1, 32, 32,
                                   'normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp',
                                   333, 32, 32)
-        param = ParamsHierarchicalFact(fact_cons, res_cons, stop_crit1, stop_crit2)
+        param = ParamsHierarchical(fact_cons, res_cons, stop_crit1, stop_crit2)
         F, _lambda = hierarchical_constends(M, param, A, B, ret_lambda=True)
 
         assert(np.allclose(F.factors(0).toarray(), A))
@@ -456,7 +456,7 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
 
     """
     from pyfaust.factparams import ConstraintList
-    from pyfaust.factparams import ParamsHierarchicalFact
+    from pyfaust.factparams import ParamsHierarchical
     A = np.asfortranarray(A)
     B = np.asfortranarray(B)
     consA = ConstraintList('const', A, *A.shape)
@@ -477,7 +477,7 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
         new_fact_cons = consA + ConstraintList(*fac_cons)
         new_res_cons = ConstraintList(*res_cons) + consB
     assert(nconsts == len(new_fact_cons) + len(new_res_cons) - 2)
-    p = ParamsHierarchicalFact(new_fact_cons, new_res_cons,
+    p = ParamsHierarchical(new_fact_cons, new_res_cons,
                                p.stop_crits[0], p.stop_crits[1],
                                p.is_update_way_R2L, p.init_lambda,
                                p.step_size, p.constant_step_size,
@@ -603,7 +603,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
                                 min(int(round(2*dim*over_sp)),size(Lap)))
             ]
 
-        params = ParamsHierarchicalFact(fact_cons,
+        params = ParamsHierarchical(fact_cons,
             res_cons,
             StoppingCriterion(num_its=50),
             StoppingCriterion(num_its=100),
@@ -637,9 +637,9 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
         Lap: (numpy.ndarray) The Laplacian matrix.
         U: (numpy.ndarray) The Fourier matrix.
         init_D: (numpy.ndarray) The initial diagonal vector. if None it will be the ones() vector by default.
-        p: (ParamsHierarchicalFact) The PALM hierarchical algorithm parameters.
+        p: (ParamsHierarchical) The PALM hierarchical algorithm parameters.
         ret_lambda: (bool) True to return the lambda scale factor used in PALM algorithm.
-        ret_params: (bool) True to return the parameters used by the hierarchical PALM algorithm (normally it's p except if p is a simplifed form of parameters -- not instance of ParamsHierarchicalFact).
+        ret_params: (bool) True to return the parameters used by the hierarchical PALM algorithm (normally it's p except if p is a simplifed form of parameters -- not instance of ParamsHierarchical).
 
     Returns:
         FGFT: (Faust object) The Fourier transform.
@@ -647,7 +647,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
         tuple (FGFT,_lambda) (_lambda is the scale factor at the end of
         factorization).
         - if ret_params == True (and ret_lambda == False), then the function returns the
-        tuple (FGFT, p) (p being the ParamsHierarchicalFact instance really used by the
+        tuple (FGFT, p) (p being the ParamsHierarchical instance really used by the
         algorithm).
         - if ret_lambda == True and ret_params == True, then the function returns the
         tuple (FGFT, _lambda, p).

@@ -30,7 +30,7 @@ class ConstraintGeneric(ABC):
 
     <b/> See also: ConstraintInt, ConstraintReal, ConstraintMat,
     FaustFactory.fact_palm4msa, FaustFactory.fact_hierarchical, ParamsPalm4MSA,
-    ParamsHierarchicalFact.
+    ParamsHierarchical.
 
     Attributes:
         _name: The name of the constraint applied to the factor (ConstraintName instance).
@@ -494,7 +494,7 @@ class ParamsFact(ABC):
         The class is the base parameters for Palm4MSA and Hierarchical
         factorization but as an abstract class it's not for direct use.
 
-    <b/> See also  ParamsHierarchicalFact, ParamsPalm4MSA
+    <b/> See also  ParamsHierarchical, ParamsPalm4MSA
     """
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
                  constraints, step_size, constant_step_size,
@@ -518,7 +518,7 @@ class ParamsFact(ABC):
         return M.shape[0] == self.constraints[0]._num_rows and \
                 M.shape[1] == self.constraints[-1]._num_cols
 
-class ParamsHierarchicalFact(ParamsFact):
+class ParamsHierarchical(ParamsFact):
     """
         The parent class to set input parameters for the hierarchical factorization algorithm.
 
@@ -526,8 +526,8 @@ class ParamsHierarchicalFact(ParamsFact):
         for the algorithm. But it exists simplified parametrizations for the
         same algorithm as child classes.
 
-        <b/> See also ParamsHierarchicalFactSquareMat,
-        ParamsHierarchicalFactRectMat, FaustFactory.fact_hierarchical
+        <b/> See also ParamsHierarchicalSquareMat,
+        ParamsHierarchicalRectMat, FaustFactory.fact_hierarchical
     """
     def __init__(self, fact_constraints, res_constraints, stop_crit1,
                  stop_crit2, is_update_way_R2L=False, init_lambda=1.0,
@@ -550,7 +550,7 @@ class ParamsHierarchicalFact(ParamsFact):
         else:
             constraints = fact_constraints + res_constraints
         stop_crits = [ stop_crit1, stop_crit2 ]
-        super(ParamsHierarchicalFact, self).__init__(num_facts,
+        super(ParamsHierarchical, self).__init__(num_facts,
                                                      is_update_way_R2L,
                                                      init_lambda,
                                                      constraints, step_size,
@@ -563,7 +563,7 @@ class ParamsHierarchicalFact(ParamsFact):
            len(stop_crits) != 2 or
            not isinstance(stop_crits[0],StoppingCriterion) or not
            isinstance(stop_crits[1],StoppingCriterion)):
-            raise TypeError('ParamsHierarchicalFact stop_crits argument must be'
+            raise TypeError('ParamsHierarchical stop_crits argument must be'
                             ' a list/tuple of two StoppingCriterion objects')
         if((not isinstance(constraints, list) and not isinstance(constraints,
                                                                 tuple) and not
@@ -586,7 +586,7 @@ class ParamsHierarchicalFact(ParamsFact):
         return M.shape[0] == self.data_num_rows and \
                 M.shape[1] == self.data_num_cols
 
-class ParamsHierarchicalFactSquareMat(ParamsHierarchicalFact):
+class ParamsHierarchicalSquareMat(ParamsHierarchical):
     """
     The simplified parameterization class for factorizing a square matrix (of order a power of two) with the hierarchical factorization algorithm.
 
@@ -598,7 +598,7 @@ class ParamsHierarchicalFactSquareMat(ParamsHierarchicalFact):
     def __init__(self, n):
         d = 2**int(n)
         stop_crit = StoppingCriterion(num_its=30)
-        super(ParamsHierarchicalFactSquareMat,
+        super(ParamsHierarchicalSquareMat,
               self).__init__([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
                                         for i in range(0,n-1)],
                                         [ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,int(d/2.**(i+1)))
@@ -614,11 +614,11 @@ class ParamsHierarchicalFactSquareMat(ParamsHierarchicalFact):
                              'square matrix of order a power of '
                              'two.')
         pot = int(pot)
-        return ParamsHierarchicalFactSquareMat(pot)
+        return ParamsHierarchicalSquareMat(pot)
 
 
 
-class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
+class ParamsHierarchicalRectMat(ParamsHierarchical):
     """
     The simplified parameterization class for factorizing a rectangular matrix with the hierarchical factorization algorithm.
 
@@ -638,7 +638,7 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
         if(not isinstance(rho, float)):
             raise TypeError('p must be a float')
         if(not P):
-            P=ParamsHierarchicalFactRectMat.DEFAULT_P_CONST_FACT*m**2
+            P=ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT*m**2
         S1_cons = ConstraintInt('spcol', m, n, k)
         S_cons = [S1_cons];
         for i in range(j-2):
@@ -650,7 +650,7 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
 
         stop_crit = StoppingCriterion(num_its=30)
 
-        super(ParamsHierarchicalFactRectMat, self).__init__(S_cons, R_cons,
+        super(ParamsHierarchicalRectMat, self).__init__(S_cons, R_cons,
                                                             stop_crit,
                                                             stop_crit,
                                                             is_update_way_R2L=True,
@@ -683,7 +683,7 @@ class ParamsHierarchicalFactRectMat(ParamsHierarchicalFact):
         p = parse_p(p)
         if(not isinstance(M, np.ndarray)):
             raise TypeError('M must be a numpy.ndarray.')
-        p = ParamsHierarchicalFactRectMat(M.shape[0], M.shape[1], *p[1:])
+        p = ParamsHierarchicalRectMat(M.shape[0], M.shape[1], *p[1:])
         return p
 
 class ParamsPalm4MSA(ParamsFact):
@@ -740,7 +740,7 @@ class ParamsPalm4MSAFGFT(ParamsPalm4MSA):
 
 def _init_init_D(init_D, dim_sz):
     """
-        Utility function for ParamsHierarchicalFactFGFT, ParamsPalm4MSAFGFT
+        Utility function for ParamsHierarchicalFGFT, ParamsPalm4MSAFGFT
     """
     def _check_init_D_is_consistent(init_D):
         if(not isinstance(init_D, np.ndarray)):
@@ -785,13 +785,13 @@ class StoppingCriterion(object):
 
 class ParamsFactFactory:
     """
-        The factory for creating simplified FAuST hierarchical algorithm parameters (ParamsHierarchicalFact).
+        The factory for creating simplified FAuST hierarchical algorithm parameters (ParamsHierarchical).
 
         Note: this factory is not related to ParamsPalm4MSA, it only creates
-        ParamsHierarchicalFact instances.
+        ParamsHierarchical instances.
 
-        <b/> See also  ParamsHierarchicalFactRectMat,
-        ParamsHierarchicalFactSquareMat, FaustFactory.fact_hierarchical()
+        <b/> See also  ParamsHierarchicalRectMat,
+        ParamsHierarchicalSquareMat, FaustFactory.fact_hierarchical()
     """
     SIMPLIFIED_PARAM_NAMES = [
         [ "squaremat", "hadamard"],
@@ -805,8 +805,8 @@ class ParamsFactFactory:
         """
         """
         from pyfaust.factparams import \
-        (ParamsHierarchicalFactSquareMat,
-        ParamsHierarchicalFactRectMat)
+        (ParamsHierarchicalSquareMat,
+        ParamsHierarchicalRectMat)
         param_id = None
         c = ParamsFactFactory # class alias
         if(not c.is_a_valid_simplification(p)):
@@ -814,9 +814,9 @@ class ParamsFactFactory:
                             'parametrization.')
         param_id = c.get_simplification_name(p)
         if(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.SQRMAT_ID]):
-            return ParamsHierarchicalFactSquareMat.createParams(M, p)
+            return ParamsHierarchicalSquareMat.createParams(M, p)
         elif(param_id.lower() in c.SIMPLIFIED_PARAM_NAMES[c.RECTMAT_ID]):
-            return ParamsHierarchicalFactRectMat.createParams(M, p)
+            return ParamsHierarchicalRectMat.createParams(M, p)
         else:
             raise ValueError("p is not a known simplified parametrization.")
 

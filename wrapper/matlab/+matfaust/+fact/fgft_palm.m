@@ -44,7 +44,7 @@
 %> end
 %>
 %> % set the parameters for the PALM hierarchical algo.
-%> params = ParamsHierarchicalFact(fact_cons, res_cons, StoppingCriterion(50), StoppingCriterion(100), 'step_size', 1e-6, 'constant_step_size', true, 'init_lambda', 1.0, 'is_fact_side_left', false);
+%> params = ParamsHierarchical(fact_cons, res_cons, StoppingCriterion(50), StoppingCriterion(100), 'step_size', 1e-6, 'constant_step_size', true, 'init_lambda', 1.0, 'is_fact_side_left', false);
 %> %% compute FGFT for Lap, U, D
 %> init_D_diag = diag(D);
 %> [Uhat, Dhat, lambda, ~ ] = fgft_palm(U, Lap, params, init_D_diag);
@@ -103,12 +103,12 @@ function varargout = fgft_palm(U, Lap, p, varargin)
 		end
 	end
 	check_fact_mat('fgft_palm', U)
-	if(~ isa(p, 'ParamsHierarchicalFact') && ParamsFactFactory.is_a_valid_simplification(p))
+	if(~ isa(p, 'ParamsHierarchical') && ParamsFactFactory.is_a_valid_simplification(p))
 		p = ParamsFactFactory.createParams(U, p);
 	end
 	mex_constraints = cell(2, p.num_facts-1);
-	if(~ isa(p ,'ParamsHierarchicalFact'))
-		error('p must be a ParamsHierarchicalFact object.')
+	if(~ isa(p ,'ParamsHierarchical'))
+		error('p must be a ParamsHierarchical object.')
 	end
 	%mex_fact_constraints = cell(1, p.num_facts-1)
 	for i=1:p.num_facts-1
