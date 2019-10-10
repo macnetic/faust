@@ -168,15 +168,22 @@ def fgft_givens(Lap, J, t=1, verbosity=0):
 
     <b/> See also eigtj, fgft_palm
     """
-    if((Lap.T != Lap).any() or Lap.shape[0] != Lap.shape[1]):
+    if((isinstance(Lap, np.ndarray) and (Lap.T != Lap).any()) or Lap.shape[0] != Lap.shape[1]):
         raise ValueError(" the matrix/array must be square and should be symmetric.")
     if(not isinstance(J, int)): raise TypeError("J must be a int")
     if(J < 1): raise ValueError("J must be >= 1")
     if(not isinstance(t, int)): raise TypeError("t must be a int")
     if(t < 0): raise ValueError("t must be >= 0")
     t = min(t,J)
-    core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft(Lap, J, t,
+    if(isinstance(Lap, np.ndarray)):
+       core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft(Lap, J, t,
                                                         verbosity)
+    elif(isinstance(Lap, csr_matrix)):
+        core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_sparse(Lap, J, t,
+                                                                    verbosity)
+    else:
+        raise TypeError("The matrix to diagonalize must be a"
+                        " scipy.sparse.csr_matrix or a numpy array.")
     return Faust(core_obj=core_obj), D
 
 def _check_fact_mat(funcname, M):

@@ -4,6 +4,22 @@
 
 using namespace Faust;
 
+template<typename FPP, typename FPP2>
+FaustCoreCpp<FPP>* fact_givens_fgft_sparse(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols,
+        unsigned int J, unsigned int t /* end of input parameters*/, FPP* D, unsigned int verbosity)
+{
+      Faust::MatSparse<FPP, Cpu> mat_Lap(nnz, nrows, ncols, data, id_col, row_ptr);
+      GivensFGFT<FPP, Cpu, FPP2>* algo;
+      if(t <= 1)
+      {
+          algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity);
+      }
+      else
+      {
+          algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity);
+      }
+      return fact_givens_fgft_generic(algo, D);
+}
 
 template<typename FPP, typename FPP2>
 FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t /* end of input parameters*/, FPP* D, unsigned int verbosity)
@@ -13,8 +29,6 @@ FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsig
     Faust::MatDense<FPP,Cpu> mat_Lap(Lap, num_rows, num_cols);
 
     GivensFGFT<FPP, Cpu, FPP2>* algo;
-
-
     if(t <= 1)
     {
         algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity);
@@ -23,12 +37,19 @@ FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsig
     {
         algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity);
     }
+    return fact_givens_fgft_generic(algo, D);
+}
+
+template<typename FPP, typename FPP2>
+FaustCoreCpp<FPP>* fact_givens_fgft_generic(GivensFGFT<FPP, Cpu, FPP2>* algo, FPP* D)
+{
+
 
     algo->compute_facts();
 
-
     Faust::Transform<FPP,Cpu> trans = std::move(algo->get_transform(true));
     TransformHelper<FPP,Cpu> *th = new TransformHelper<FPP,Cpu>(trans, true); // 1st true is for ordering (according to ascendant eigenvalues order), 2nd true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
+
 
     //copy ordered diagonal in buffer D (allocated from the outside)
     algo->get_D(D, true);
@@ -37,5 +58,3 @@ FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsig
 
     return new FaustCoreCpp<FPP>(th);
 }
-
-

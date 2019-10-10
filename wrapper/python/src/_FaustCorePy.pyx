@@ -1350,6 +1350,37 @@ cdef class FaustFact:
             return core, np.real(_out_buf[0])
 
     @staticmethod
+    def fact_givens_fgft_sparse(Lap, J, t, verbosity=0):
+        from scipy.sparse import spdiags
+        cdef double [:] data1d #only for csr mat factor
+        cdef int [:] indices # only for csr mat
+        cdef int [:] indptr # only for csr mat
+        cdef unsigned int Lap_num_rows=Lap.shape[0]
+        cdef unsigned int Lap_num_cols=Lap.shape[1]
+        cdef double[:] D_view
+
+        data1d=Lap.data.astype(float,'F')
+        indices=Lap.indices.astype(np.int32, 'F')
+        indptr=Lap.indptr.astype(np.int32, 'F')
+
+        D = np.empty(Lap.shape[0], dtype=Lap.dtype)
+        D_view = D
+
+        core = FaustCore(core=True)
+        core.core_faust_dbl = FaustCoreCy.fact_givens_fgft_sparse[double,
+                                                           double](&data1d[0],
+                                                                   &indices[0],
+                                                                   &indptr[0],
+                                                                   Lap.nnz,
+                                                                   Lap_num_rows,
+                                                                   Lap_num_cols, J, t,
+                                                                   &D_view[0], verbosity)
+
+        core._isReal = True
+        D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
+        return core, D_spdiag
+
+    @staticmethod
     def fact_givens_fgft(Lap, J, t, verbosity=0):
         isReal = Lap.dtype in [ 'float', 'float128',
                              'float16', 'float32',
