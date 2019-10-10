@@ -70,41 +70,56 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	const mxArray* matlab_matrix = prhs[0]; // Laplacian
 
 	// initialization of the matrix that will be factorized
-	Faust::MatDense<SCALAR,Cpu> Lap;
-	mxArray2FaustMat(matlab_matrix, Lap);
+	Faust::MatGeneric<SCALAR,Cpu>* Lap;
+	Faust::MatDense<SCALAR,Cpu> dLap;
+	Faust::MatSparse<SCALAR,Cpu> sLap;
+	Faust::BlasHandle<Cpu> blas_handle;
+	Faust::SpBlasHandle<Cpu> spblas_handle;
+
+	Faust::GivensFGFT<SCALAR, Cpu, FPP2>* algo;
 
 
 	try{
+		if (mxIsSparse(matlab_matrix))
+		{
+			mxArray2FaustspMat(matlab_matrix,sLap);
+			Lap = &sLap;
+			//TODO: blas handles to pass later ? (if you want to do the calculation with blas instead of eigen)
+			if(t <= 1)
+				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(sLap, J, verbosity);
+			else
+				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(sLap, J, t, verbosity);
 
-		//TODO: blas handles to pass later ? (if you want to do the calculation with blas instead of eigen)
-		Faust::BlasHandle<Cpu> blas_handle;
-		Faust::SpBlasHandle<Cpu> spblas_handle;
+		}else
+		{
+			mxArray2FaustMat(matlab_matrix,dLap);
+			Lap = &dLap;
+			if(t <= 1)
+				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(dLap, J, verbosity);
+			else
+				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(dLap, J, t, verbosity);
+		}
 
-		Faust::GivensFGFT<SCALAR, Cpu, FPP2>* algo;
-		Faust::Vect<SCALAR,Cpu> D(Lap.getNbRow());
 
-		if(t <= 1)
-			algo = new GivensFGFT<SCALAR,Cpu,FPP2>(Lap, J, verbosity);
-		else
-			algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(Lap, J, t, verbosity);
 
 		algo->compute_facts();
 
+		Faust::Vect<SCALAR,Cpu> D(Lap->getNbRow());
 		// true below is for ascendant order of eigenvalues
 		algo->get_D(const_cast<SCALAR*>(D.getData()), true); // don't respect constness for optimization (saving a vector copy)
 
 		plhs[1] = FaustVec2mxArray(D);
 
 		Faust::Transform<SCALAR,Cpu> trans = std::move(algo->get_transform(true)); // true for same order of "eigenvectors" as eigenvalues
-	    TransformHelper<SCALAR,Cpu> *th = new TransformHelper<SCALAR,Cpu>(trans, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
+		TransformHelper<SCALAR,Cpu> *th = new TransformHelper<SCALAR,Cpu>(trans, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(th);
 
 		delete algo;
 	}
-	 catch (const std::exception& e)
+	catch (const std::exception& e)
 	{
-		 mexErrMsgTxt(e.what());
+		mexErrMsgTxt(e.what());
 	}
 
 
