@@ -222,9 +222,21 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 {
+//#define OPT_UPDATE_SPARSE_L
+#undef OPT_UPDATE_SPARSE_L
+#ifndef OPT_UPDATE_SPARSE_L
 	// L = S'*L*S
 	facts[ite].multiply(L, 'T');
 	L.multiplyRight(facts[ite]);
+#else
+	Eigen::SparseMatrix<FPP,RowMajor> L_vec_p, L_vec_q;
+	FPP2 c = *(fact_mod_values.end()-1); // cos(theta)
+	FPP2 s = *(fact_mod_values.end()-2); // sin(theta)
+	update_L_first(L_vec_p, L_vec_q, c, s, this->p, this->q, L);
+	L.update_dim();
+//	update_L_second(L_vec_p, L_vec_q, c, s, this->p, this->q, L);
+	L.multiplyRight(facts[ite]);
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -282,6 +294,57 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec
 	tmp2 *= c;
 	tmp += tmp2;
 	memcpy(L.getData()+L.getNbRow()*q, tmp.getData(), sizeof(FPP)*L.getNbRow());
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFT<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP,RowMajor > & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
+{
+	Eigen::SparseMatrix<FPP, RowMajor> tmp, tmp2;
+	/*========== L *= S */
+	//L_vec_p = L.get_col(p), L_vec_q = L.get_col(q);
+	L_vec_p = L.mat.block(0, p, L.getNbRow(), 1);
+	L_vec_q = L.mat.block(0, q, L.getNbRow(), 1);
+	// L(:,p) = c*L(:,p) + s*L(:,q)
+	tmp = L_vec_p;
+	tmp *= c;
+	tmp2 = L_vec_q;
+	tmp2 *= s;
+	tmp += tmp2;
+	L.mat.col(p) = tmp;
+
+	// L(:,q) = -s*L(:,p) + c*L(:,q)
+	tmp = L_vec_p;
+	tmp *= -s;
+	tmp2 = L_vec_q;
+	tmp2 *= c;
+	tmp += tmp2;
+	L.mat.col(q) = tmp;
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFT<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP, RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
+{
+	Eigen::SparseMatrix<FPP, RowMajor> tmp, tmp2, tmp3;
+	/*========== L = S'*L */
+	L_vec_p = L.mat.innerVector(p), L_vec_q = L.mat.innerVector(q);
+//	L_vec_p = L.mat.block(p, 0, 1, L.getNbCol());
+//	L_vec_q = L.mat.block(q, 0, 1, L.getNbCol());
+	// L(p,:) = c*L(p,:) + s*L(q,:)
+	tmp = L_vec_p;
+	tmp *= c;
+	tmp2 = L_vec_q;
+	tmp2 *= s;
+	tmp += tmp2;
+	L.mat.innerVector(p) = tmp;
+	//
+	//
+	// L(q,:) = -s*L(p,:) + c*L(q,:)
+	tmp = L_vec_p;
+	tmp *= -s;
+	tmp2 = L_vec_q;
+	tmp2 *= c;
+	tmp += tmp2;
+	L.mat.innerVector(q) = tmp;
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>

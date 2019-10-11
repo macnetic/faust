@@ -239,8 +239,72 @@ template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 {
 	// L = S'*L*S
+#ifdef OPT_UPDATE__SPARSE_L
+	int choice_id;
+	FPP2 c,s;
+	int p, q, i;
+	// L = S'*L
+// HINT to enable OpenMP: add flag -fopenmp (to compilation and linker flags in CMakeCache)
+// likewise in setup.py for python wrapper (into extra_compile_args and extra_link_args list -- setuptools)
+// NOTE: OpenMP was an attempt not really useful because no speedup was noticed in two or four threads (running on 4-core CPU)
+// The code is nevertheless kept here, just in case, to use it you need to set the compilation/preprocessor constant OPT_UPDATE_L_OMP
+#ifdef OPT_UPDATE_L_OMP
+#pragma omp parallel private(c, s, choice_id, p, q, i)
+#endif
+	{
+		Eigen::SparseMatrix<FPP, Eigen::RowMajor> L_vec_p, L_vec_q;
+#ifdef OPT_UPDATE_L_OMP
+		int num_per_th = fact_nrots/omp_get_num_threads();
+		int th_id = omp_get_thread_num();
+		int th_offset = fact_nrots/omp_get_num_threads()*th_id;
+		if(th_id == omp_get_num_threads() - 1) num_per_th += fact_nrots % omp_get_num_threads();
+#else
+		int num_per_th = fact_nrots; // a single thread is used (no openmp)
+		int th_id = 0;
+		int th_offset = 0;
+#endif
+//first attempt to openmp-ize the loops (abandoned for the single section started above)
+//#ifdef OPT_UPDATE_L_OMP
+//#pragma omp parallel for schedule(static) private(c, s, choice_id, p, q, i) default(shared) // num_threads(4)
+//#endif OPT_UPDATE_L_OMP
+		for(i=th_offset; i < th_offset+num_per_th; i++)
+		{
+			// applying first the last rotation submatrix
+			choice_id = this->coord_choices.size()-1-i;
+			c = *(this->fact_mod_values.end()-1-4*i); // cos(theta)
+			s = *(this->fact_mod_values.end()-2*(2*i+1)); // sin(theta)
+			p = this->coord_choices[choice_id].first;
+			q = this->coord_choices[choice_id].second;
+			//rely on parent for doing the job
+			this->update_L_first(L_vec_p, L_vec_q, c, s, p, q, L);
+		}
+#ifdef OPT_UPDATE_L_OMP
+#pragma omp barrier //S'*L must be computed before starting L*S computation
+#endif
+		// L = L*S
+//#ifdef OPT_UPDATE_L_OMP
+//#pragma omp parallel for schedule(static) private(c, s, choice_id, p, q, i) default(shared) // num_threads(4)
+//#endif
+//		for(i=th_offset; i < th_offset+num_per_th; i++)
+//		{
+//			// applying first the last rotation submatrix
+//			choice_id = this->coord_choices.size()-1-i;
+//			c = *(this->fact_mod_values.end()-1-4*i); // cos(theta)
+//			s = *(this->fact_mod_values.end()-2*(2*i+1)); // sin(theta)
+//			p = this->coord_choices[choice_id].first;
+//			q = this->coord_choices[choice_id].second;
+//			//rely on parent for doing the job
+//			this->update_L_second(L_vec_p, L_vec_q, c, s, p, q, L);
+//			L.update_dim();
+//		}
+		L.multiplyRight(this->facts[this->ite]);
+//		L.update_dim();
+	}
+#else
+	// L = S'*L*S
 	this->facts[this->ite].multiply(L, 'T');
 	L.multiplyRight(this->facts[this->ite]);
+#endif
 }
 
 

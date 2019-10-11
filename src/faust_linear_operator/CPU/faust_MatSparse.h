@@ -100,11 +100,17 @@ namespace Faust
 
 	//! Faust::MatDense class template of dense matrix
 	template<typename FPP,Device DEVICE> class MatDense;
+	template<typename FPP, Device DEVICE, typename FPP2> class GivensFGFT;
+	template<typename FPP, Device DEVICE, typename FPP2> class GivensFGFTParallel;
 
 	template<typename FPP>
 		class MatSparse<FPP,Cpu> : public Faust::MatGeneric<FPP,Cpu>
 		{
 
+			friend Faust::GivensFGFT<FPP,Cpu, double>;
+			friend Faust::GivensFGFTParallel<FPP,Cpu, double>;
+			friend Faust::GivensFGFT<FPP,Cpu, float>;
+			friend Faust::GivensFGFTParallel<FPP,Cpu, float>;
 			friend Faust::TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
 			friend void Faust::wht_factors<>(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 			friend class MatDense<FPP,Cpu>;
