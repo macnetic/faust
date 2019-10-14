@@ -78,27 +78,27 @@ def svdtj(M, J, t=1):
     V = W2[:,0:S.shape[0]]*Faust(Id[:,I])
     return U,S,V
 
-def eigtj(M, J, t=1, verbosity=0):
+def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     """
-    Computes the eigenvalues and the eigenvectors transform (as a Faust object) using the truncated Jacobi algorithm.
+    Runs the truncated Jacobi algorithm to compute the eigenvalues of M (returned in W) and the corresponding eigenvectors (in Faust V) using the truncated Jacobi algorithm.
 
-    The eigenvalues and the eigenvectors are approximate.
+    The output is such that V*W.todense()*V.T approximates M.
+
     The trade-off between accuracy and sparsity can be set through the
-    parameters J and t.
+    parameters maxiter and nGivens_per_fac.
 
     Args:
         M: (numpy.ndarray) the matrix to diagonalize. Must be real and symmetric.
-        J: (int) defines the number of factors in the eigenvector transform V.
-        The number of factors is round(J/t). Note that the last permutation factor
-        is not in count here (in fact, the total number of factors in V is rather
-        round(J/t)+1).
-        t: (int) the number of Givens rotations per factor. Note that t is
-        forced to the value min(J,t). Besides, a value of t such that t >
-        M.shape[0]/2 won't lead to the desired effect because the maximum
-        number of rotation matrices per factor is anyway M.shape[0]/2.
-        The parameter t is meaningful in the parallel version of the
-        truncated Jacobi algorithm (cf. references below). If t <= 1 (by default)
-        then the function runs the non-parallel algorithm.
+        maxiter: (int) defines the number of Givens rotations that are computed in
+        eigenvector transform V. The number of rotations per factor of V is
+        defined by nGivens_per_fac.
+        tol: (float) the tolerance error under what the algorithm stops. By default,
+        it's zero for not stopping on error criterion.
+        relErr: (bool) the type of error stopping criterion. Default to True to use
+        relative error, otherwise (False) the absolute error is used.
+        nGivens_per_fac: (int) the number of Givens rotations per factor of V, must be
+        an integer between 1 to M.shape[0]/2 which is the default value (when
+        nGivens_per_fac == None).
         verbosity: (int) the level of verbosity, the greater the value the more info.
         is displayed.
 
@@ -106,11 +106,11 @@ def eigtj(M, J, t=1, verbosity=0):
     Returns:
         The tuple (V,W):
             - V the Faust object representing the approximate eigenvector
-            transform. V has its last factor being a permutation matrix,
-            the goal of this factor is to apply to the columns of V the same order as
+            transform. The last factor of V is a permutation matrix.
+            The goal of this factor is to apply to the columns of V the same order as
             eigenvalues set in W.
-            - W (scipy.sparse.dia.dia_matrix) the approximate diagonal matrix of the eigenvalues
-            (in ascendant order along the rows/columns).
+            - W (scipy.sparse.dia.dia_matrix) the diagonal matrix of the
+            approximate eigenvalues (in ascendant order along the rows/columns).
 
     References:
     [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
@@ -129,8 +129,8 @@ def eigtj(M, J, t=1, verbosity=0):
         demo_path = sep.join((get_data_dirpath(),'Laplacian_256_community.mat'))
         data_dict = loadmat(demo_path)
         Lap = data_dict['Lap'].astype(np.float)
-        Uhat, Dhat = eigtj(Lap,J=Lap.shape[0]*100,t=int(Lap.shape[0]/2))
-        # Uhat is the Fourier matrix/eigenvectors approximattion as a Faust
+        Uhat, Dhat = eigtj(Lap, maxiter=Lap.shape[0]*100)
+        # Uhat is the Fourier matrix/eigenvectors approximation as a Faust
         # (200 factors + permutation mat.)
         # Dhat the eigenvalues diagonal matrix approx.
         print(Uhat)
@@ -139,16 +139,18 @@ def eigtj(M, J, t=1, verbosity=0):
     See also:
         fgft_givens, fgft_palm
     """
-    return fgft_givens(M, J, t, verbosity)
+    return fgft_givens(M, maxiter, tol, relerr, nGivens_per_fac, verbosity)
 
-def fgft_givens(Lap, J, t=1, verbosity=0):
+def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None, verbosity=0):
     """
     Diagonalizes the graph Laplacian matrix Lap using the Givens FGFT algorithm.
 
     Args:
         Lap: the Laplacian matrix as a numpy array. Must be real and symmetric.
-        J: see eigtj
-        t: see eigtj
+        maxiter: see eigtj
+        tol: see eigtj
+        relerr: see eigtj
+        nGivens_per_fac: see eigtj
         verbosity: see eigtj
 
     Returns:
@@ -170,17 +172,21 @@ def fgft_givens(Lap, J, t=1, verbosity=0):
     """
     if((isinstance(Lap, np.ndarray) and (Lap.T != Lap).any()) or Lap.shape[0] != Lap.shape[1]):
         raise ValueError(" the matrix/array must be square and should be symmetric.")
-    if(not isinstance(J, int)): raise TypeError("J must be a int")
-    if(J < 1): raise ValueError("J must be >= 1")
-    if(not isinstance(t, int)): raise TypeError("t must be a int")
-    if(t < 0): raise ValueError("t must be >= 0")
-    t = min(t,J)
+    if(not isinstance(maxiter, int)): raise TypeError("maxiter must be a int")
+    if(maxiter < 1): raise ValueError("maxiter must be >= 1")
+    if(not isinstance(nGivens_per_fac, int)): raise TypeError("nGivens_per_fac must be a int")
+    nGivens_per_fac = max(nGivens_per_fac, 1)
+    nGivens_per_fac = min(nGivens_per_fac, maxiter)
     if(isinstance(Lap, np.ndarray)):
-       core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft(Lap, J, t,
-                                                        verbosity)
+        core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft(Lap, maxiter, nGivens_per_fac,
+                                                             verbosity, tol,
+                                                             relerr)
     elif(isinstance(Lap, csr_matrix)):
-        core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_sparse(Lap, J, t,
-                                                                    verbosity)
+        core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_sparse(Lap, maxiter,
+                                                                    nGivens_per_fac,
+                                                                    verbosity,
+                                                                    tol,
+                                                                    relerr)
     else:
         raise TypeError("The matrix to diagonalize must be a"
                         " scipy.sparse.csr_matrix or a numpy array.")
@@ -429,6 +435,7 @@ def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
                          "with the first factor constraint defined in p.")
     return p
 
+# experimental block start
 def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
     """
     Tries to approximate M by \f$ A \prod_j S_j B \f$ using the hierarchical.
@@ -510,7 +517,9 @@ def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):
         return ret_list
     else:
         return F
+# experimental block end
 
+# experimental block start
 def palm4msa_constends(M, p, A, B=None, ret_lambda=False):
     """
     Tries to approximate M by \f$ A \prod_j S_j B\f$ using palm4msa (B being optional).
@@ -564,6 +573,7 @@ def palm4msa_constends(M, p, A, B=None, ret_lambda=False):
         return F, _lambda
     else:
         return F
+# experimental block end
 
 def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
     """

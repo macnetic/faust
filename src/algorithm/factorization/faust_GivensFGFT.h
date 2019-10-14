@@ -35,6 +35,7 @@ namespace Faust {
 			/** \brief Pivot candidates q coordinates. */
 			int* q_candidates;  /* default IndexType for underlying eigen matrix is int. */
 			protected:
+				const static unsigned int ERROR_CALC_PERIOD = 100;
 				/** \brief Fourier matrix factorization matrices (Givens matrix). */
 				vector<Faust::MatSparse<FPP,DEVICE>> facts;
 				/** \brief Diagonalization approximate of Laplacian. */
@@ -88,6 +89,10 @@ namespace Faust {
 				/** \brief In calc_theta() two values are calculated for theta, this boolean is set to true to always choose theta2 (useful for GivensFGFTParallel). */
 				bool always_theta2;
 
+				bool stoppingCritIsError;
+				double stoppingError;
+				bool errIsRel;
+
 				/**
 				 * Function pointer to any step of the algorithm (internal purpose only).
 				 */
@@ -100,8 +105,8 @@ namespace Faust {
 				 * \param Lap The Laplacian matrix to approximate/diagonalize.
 				 * \param J The number of iterations, Givens rotations factors.
 				 * */
-				GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0);
-				GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0);
+				GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true);
+				GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true);
 				/** Destructor */
 				virtual ~GivensFGFT() {delete[] q_candidates; delete L;};
 

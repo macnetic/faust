@@ -81,10 +81,11 @@ namespace Faust {
 		 * \param Lap The Laplacian matrix to approximate/diagonalize.
 		 * \param J round(J/t) is the number of factors to approximate the Fourier matrix (as a product of factors).
 		 * \param t the maximum number of 2D rotation matrices (Givens matrices) to insert in each factor. The effective number can be less than t if there is not enough pivot candidates left in the matrix L of the current iteration.
+		 * \param stoppingError defines a stopping criterion based on error (absolute relative error).
 		 *
 		 */
-		GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0);
-		GivensFGFTParallel(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0);
+		GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0,  const bool errIsRel = true);
+		GivensFGFTParallel(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0, const bool errIsRel = true);
 
 	};
 

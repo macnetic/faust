@@ -184,9 +184,14 @@ cdef extern from "FaustFactGivensFGFT.h":
 
     cdef FaustCoreCpp[FPP]* fact_givens_fgft[FPP,FPP2](const FPP* Lap, unsigned int num_rows,
                                    unsigned int num_cols, unsigned int J,
-                                   unsigned int t, FPP* D, unsigned int verbosity)
+                                   unsigned int t, FPP* D, unsigned int verbosity,
+                                                       const double stoppingError,
+                                                       const bool errIsRel)
 
     cdef FaustCoreCpp[FPP]* fact_givens_fgft_sparse[FPP,FPP2](const FPP* data, int* row_ptr,
                                                        int* id_col, int nnz, unsigned int num_rows,
                                                        unsigned int num_cols, unsigned int J,
-                                                       unsigned int t, FPP* D, unsigned int verbosity)
+                                                              unsigned int t, FPP* D,
+                                                              unsigned int verbosity,
+                                                              const double stoppingError,
+                                                              const bool errIsRel)

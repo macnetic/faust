@@ -1350,7 +1350,8 @@ cdef class FaustFact:
             return core, np.real(_out_buf[0])
 
     @staticmethod
-    def fact_givens_fgft_sparse(Lap, J, t, verbosity=0):
+    def fact_givens_fgft_sparse(Lap, J, t, verbosity=0, stoppingError = 0.0,
+                                errIsRel=True):
         from scipy.sparse import spdiags
         cdef double [:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -1374,14 +1375,18 @@ cdef class FaustFact:
                                                                    Lap.nnz,
                                                                    Lap_num_rows,
                                                                    Lap_num_cols, J, t,
-                                                                   &D_view[0], verbosity)
+                                                                   &D_view[0],
+                                                                   verbosity,
+                                                                   stoppingError,
+                                                                   errIsRel)
 
         core._isReal = True
         D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
         return core, D_spdiag
 
     @staticmethod
-    def fact_givens_fgft(Lap, J, t, verbosity=0):
+    def fact_givens_fgft(Lap, J, t, verbosity=0, stoppingError = 0.0,
+                         errIsRel=True):
         isReal = Lap.dtype in [ 'float', 'float128',
                              'float16', 'float32',
                              'float64', 'double']
@@ -1403,9 +1408,11 @@ cdef class FaustFact:
 
         core = FaustCore(core=True)
         core.core_faust_dbl = FaustCoreCy.fact_givens_fgft[double, double](&Lap_view[0,0],
-                                                     Lap_num_rows,
-                                                     Lap_num_cols, J, t,
-                                                     &D_view[0], verbosity)
+                                                                           Lap_num_rows,
+                                                                           Lap_num_cols, J, t,
+                                                                           &D_view[0], verbosity,
+                                                                           stoppingError,
+                                                                           errIsRel)
 
         core._isReal = True
         from scipy.sparse import spdiags

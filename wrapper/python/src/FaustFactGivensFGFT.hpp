@@ -6,23 +6,23 @@ using namespace Faust;
 
 template<typename FPP, typename FPP2>
 FaustCoreCpp<FPP>* fact_givens_fgft_sparse(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols,
-        unsigned int J, unsigned int t /* end of input parameters*/, FPP* D, unsigned int verbosity)
+        unsigned int J, unsigned int t /* end of input parameters*/, FPP* D, unsigned int verbosity, const double stoppingError, const bool errIsRel)
 {
       Faust::MatSparse<FPP, Cpu> mat_Lap(nnz, nrows, ncols, data, id_col, row_ptr);
       GivensFGFT<FPP, Cpu, FPP2>* algo;
       if(t <= 1)
       {
-          algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity);
+          algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity, stoppingError, errIsRel);
       }
       else
       {
-          algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity);
+          algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel);
       }
       return fact_givens_fgft_generic(algo, D);
 }
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t /* end of input parameters*/, FPP* D, unsigned int verbosity)
+FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t /* end of input parameters*/, FPP* D, unsigned int verbosity, const double stoppingError, const bool errIsRel)
 {
     //TODO: optimization possible here by avoiding Lap copy in MatDense (by
     //just using the data in Lap as underlying pointer of MatDense)
@@ -31,11 +31,11 @@ FaustCoreCpp<FPP>* fact_givens_fgft(const FPP* Lap, unsigned int num_rows, unsig
     GivensFGFT<FPP, Cpu, FPP2>* algo;
     if(t <= 1)
     {
-        algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity);
+        algo = new GivensFGFT<FPP, Cpu, FPP2>(mat_Lap, (int)J, verbosity, stoppingError, errIsRel);
     }
     else
     {
-        algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity);
+        algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel);
     }
     return fact_givens_fgft_generic(algo, D);
 }
