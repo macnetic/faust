@@ -11,10 +11,11 @@
 %> @param 'tol', number see fact.eigtj
 %> @param 'relerr', bool see fact.eigtj
 %> @param 'verbosity', integer see fact.eigtj
+%> @param 'order', integer see fact.eigtj
 %>
 %> @retval [FGFT,D]:
 %> - with FGFT being the Faust object representing the Fourier transform and,
-%> -  D as a sparse diagonal matrix of the eigenvalues in ascendant order along the rows/columns.
+%> -  D as a sparse diagonal matrix of the eigenvalues by default in ascendant order along the rows/columns.
 %>
 %>
 %> @b References:
@@ -45,6 +46,7 @@ function [FGFT,D] = fgft_givens(Lap, maxiter, varargin)
 	relerr = true;
 	verbosity = 0;
 	argc = length(varargin);
+	order = 1; % ascending order
 	if(argc > 0)
 		for i=1:argc
 			switch(varargin{i})
@@ -52,27 +54,33 @@ function [FGFT,D] = fgft_givens(Lap, maxiter, varargin)
 					if(argc == i || ~ isscalar(varargin{i+1}))
 						error('tol keyword arg. is not followed by a number')
 					else
-						tol = real(varargin{i+1}) % real in case of cplx num
+						tol = real(varargin{i+1}); % real in case of cplx num
 					end
 				case 'relerr'
 					if(argc == i || ~ islogical(varargin{i+1}))
 						error('relerr keyword argument is not followed by a logical')
 					else
-						relerr = varargin{i+1}
+						relerr = varargin{i+1};
 					end
 				case 'verbosity'
 					if(argc == i || ~ isscalar(varargin{i+1}))
 						error('verbose keyword argument is not followed by a number')
 					else
-						verbosity = floor(real(varargin{i+1}))
+						verbosity = floor(real(varargin{i+1}));
 					end
 				case 'nGivens_per_fac'
-					if(argc == i || ~ isscalar(varargin{i+1}) || ~ isnumeric(nGivens_per_fac))
+					if(argc == i || ~ isscalar(varargin{i+1}) || ~ isnumeric(varargin{i+1}))
 						error('nGivens_per_fac must be followed by a positive integer.')
 					else
 						nGivens_per_fac = floor(abs(real(varargin{i+1})));
 						nGivens_per_fac = min(nGivens_per_fac, maxiter);
-						nGivens_per_fac = max(1, nGivens_per_fac)
+						nGivens_per_fac = max(1, nGivens_per_fac);
+					end
+				case 'order'
+					if(argc == i || ~ isscalar(varargin{i+1}) || ~ isnumeric(varargin{i+1}))
+						error('order must be followed by an integer.')
+					else
+						order = varargin{i+1};
 					end
 				otherwise
 					if(isstr(varargin{i}))
@@ -81,7 +89,7 @@ function [FGFT,D] = fgft_givens(Lap, maxiter, varargin)
 			end
 		end
 	end
-	[core_obj, D] = mexfgftgivensReal(Lap, maxiter, nGivens_per_fac, verbosity, tol, relerr);
+	[core_obj, D] = mexfgftgivensReal(Lap, maxiter, nGivens_per_fac, verbosity, tol, relerr, order);
 	D = sparse(diag(D));
 	FGFT = Faust(core_obj, true);
 end

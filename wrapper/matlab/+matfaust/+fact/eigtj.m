@@ -22,11 +22,12 @@
 %> @param 'relerr', true (optional) For a stopping criterion based on the relative squared error (this is the default error).
 %> @param 'relerr', false (optional) For a stopping criterion based on the absolute squared error.
 %> @param 'verbosity', integer (optional) the level of verbosity, the greater the value the more info. is displayed.
+%> @param 'order', integer (optional) -1 for a descending order of eigenvalues, 1 for an ascending order.
 %>
 %> @retval [V,D]
 %> - V the Faust object representing the approximate eigenvector transform. The column V(:, i) is the eigenvector corresponding to the eigenvalue D(i,i).
 %> The last factor of V is a permutation matrix. The goal of this factor is to apply to the columns of V the same order as eigenvalues set in D.
-%> - D the approximate sparse diagonal matrix of the eigenvalues (in ascendant order along the rows/columns).
+%> - D the approximate sparse diagonal matrix of the eigenvalues (by default in ascendant order along the rows/columns).
 %>
 %> @b Example
 %> @code

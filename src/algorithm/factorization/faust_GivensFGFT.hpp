@@ -403,16 +403,23 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::order_D()
 {
+	order_D(1);
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFT<FPP,DEVICE,FPP2>::order_D(const int order /* -1 for descending order, 1 for ascending order */)
+{
 	ordered_D = Faust::Vect<FPP,DEVICE>(D.size());
 	ord_indices.resize(0);
 	for(int i=0;i<D.size();i++)
 		ord_indices.push_back(i);
-	sort(ord_indices.begin(), ord_indices.end(), [this](int i, int j) {
-			return D.getData()[i] < D.getData()[j];
+	sort(ord_indices.begin(), ord_indices.end(), [this, &order](int i, int j) {
+			return order>0?D.getData()[i] < D.getData()[j]:D.getData()[i] > D.getData()[j];
 			});
 	for(int i=0;i<ord_indices.size();i++)
 		ordered_D.getData()[i] = D.getData()[ord_indices[i]];
 	is_D_ordered = true;
+	D_order_dir = order;
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -528,7 +535,18 @@ const Faust::Vect<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_D(const bool ord
 		if(!is_D_ordered)
 			order_D();
 		return ordered_D;
+	}
+	return D;
+}
 
+template<typename FPP, Device DEVICE, typename FPP2>
+const Faust::Vect<FPP,DEVICE>& GivensFGFT<FPP,DEVICE,FPP2>::get_D(const int ord /* default to false */)
+{
+	if(ord != 0)
+	{
+		if(!is_D_ordered || ord != D_order_dir)
+			order_D(ord);
+		return ordered_D;
 	}
 	return D;
 }
@@ -551,11 +569,16 @@ const Faust::MatSparse<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_Dspm(const b
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFT<FPP,DEVICE,FPP2>::get_D(FPP* diag_data, const bool ord /* default to false */)
 {
+	get_D(diag_data, ord?1:0);
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFT<FPP,DEVICE,FPP2>::get_D(FPP* diag_data, const int ord /* default to false */)
+{
 	const Faust::Vect<FPP,DEVICE>& D_ = get_D(ord);
 	const FPP* src_data_ptr = D_.getData();
 	memcpy(diag_data, src_data_ptr, sizeof(FPP)*D_.size());
 }
-
 
 template<typename FPP, Device DEVICE, typename FPP2>
 const Faust::MatDense<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::compute_fourier(const bool ord /* default to false */)
@@ -616,12 +639,19 @@ const vector<Faust::MatSparse<FPP,DEVICE>>& GivensFGFT<FPP,DEVICE,FPP2>::get_fac
 template<typename FPP, Device DEVICE, typename FPP2>
 Faust::Transform<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_transform(bool ord)
 {
+	return get_transform(ord?1:0);
+}
+
+
+template<typename FPP, Device DEVICE, typename FPP2>
+Faust::Transform<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_transform(int ord)
+{
 	//TODO: an optimization is possible by changing type of facts to vector<MatGeneric*> it would avoid copying facts into Transform and rather use them directly. It will need a destructor that deletes them eventually if they weren't transfered to a Transform object before.
 	if(ord)
 	{
 		// add a permutation factor to reorder according to ordered D
-		if(!is_D_ordered)
-			order_D();
+		if(ord != 0 && (!is_D_ordered || ord != D_order_dir))
+			order_D(ord);
 		MatSparse<FPP,DEVICE> & last_fact = *(facts.end()-1);
 		MatSparse<FPP,DEVICE> P(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact is a sqr. mat.
 		P.set_orthogonal(true);

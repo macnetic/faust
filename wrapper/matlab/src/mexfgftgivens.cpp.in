@@ -59,8 +59,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	unsigned int verbosity = 0; //default verbosity (no info. displayed)
 	double tol = 0;
 	bool relErr = true;
+	int order;
 
-	if(nrhs < 2 || nrhs > 6)
+	if(nrhs < 2 || nrhs > 7)
 		mexErrMsgTxt("Bad Number of inputs arguments");
 
 	J = (int) mxGetScalar(prhs[1]);
@@ -72,6 +73,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		tol = (double) mxGetScalar(prhs[4]);
 	if(nrhs >= 6)
 		relErr = (bool) mxGetScalar(prhs[5]);
+	if(nrhs >= 7)
+		order = (int) mxGetScalar(prhs[6]); //eigenvalues order
 
 	const mxArray* matlab_matrix = prhs[0]; // Laplacian
 
@@ -112,11 +115,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		Faust::Vect<SCALAR,Cpu> D(Lap->getNbRow());
 		// true below is for ascendant order of eigenvalues
-		algo->get_D(const_cast<SCALAR*>(D.getData()), true); // don't respect constness for optimization (saving a vector copy)
+		algo->get_D(const_cast<SCALAR*>(D.getData()), order); // don't respect constness for optimization (saving a vector copy)
 
 		plhs[1] = FaustVec2mxArray(D);
 
-		Faust::Transform<SCALAR,Cpu> trans = std::move(algo->get_transform(true)); // true for same order of "eigenvectors" as eigenvalues
+		Faust::Transform<SCALAR,Cpu> trans = std::move(algo->get_transform(order)); // true for same order of "eigenvectors" as eigenvalues
 		TransformHelper<SCALAR,Cpu> *th = new TransformHelper<SCALAR,Cpu>(trans, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(th);

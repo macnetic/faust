@@ -69,6 +69,7 @@ namespace Faust {
 				Faust::Vect<FPP,DEVICE> ordered_D;
 				/** \brief true if D has already been ordered (order_D() was called). */
 				bool is_D_ordered;
+				int D_order_dir;
 
 				/** \brief The level of verbosity (0 for nothing, 1 for iteration numbers,...) */
 				unsigned int verbosity;
@@ -196,9 +197,17 @@ namespace Faust {
 				void update_err();
 
 				/**
-				 * Order D into ordered_D and keeps ordered indices in ord_indices.
+				 * Order (sort) D ascendantly into ordered_D and keeps ordered indices in ord_indices.
 				 */
 				void order_D();
+
+				/**
+				 * Order D into ascendantly or descendantly into order_D and keeps ordered indices in ord_indices.
+				 *
+				 * \param order -1 to order descendantly, 1 to order ascendantly.
+				 */
+				void order_D(int order);
+
 
 			public:
 
@@ -225,6 +234,12 @@ namespace Faust {
 				 */
 				const Faust::Vect<FPP,DEVICE>& get_D(const bool ord=false);
 
+				/**
+				 * \param ord 0 (no sort), 1 (ascendant sort), -1 (descendant sort).
+				 */
+				const Faust::Vect<FPP,DEVICE>& get_D(const int ord=0);
+
+
 				/** \brief Returns the diagonal vector as a sparse matrix.
 				 *
 				 * \note This function makes copies, is not intented for repeated use (use get_D() for optimized calls).
@@ -238,6 +253,12 @@ namespace Faust {
 				 * \param ord true to get the data ordered by ascendant eigenvalues false otherwise.
 				 */
 				void get_D(FPP* diag_data, const bool ord=false);
+
+				/**
+				 *
+				 * \param ord: 0 for no sort, -1 for descending order, 1 for descending order.
+				 */
+				void get_D(FPP* diag_data, const int ord=0);
 
 
 				/**
@@ -283,6 +304,10 @@ namespace Faust {
 				 * \param ord true to get the Transform's facts ordering the last one columns according to ascendant eigenvalues, false to let facts as they went out from the algorithm (without reordering).
 				 */
 				Faust::Transform<FPP,DEVICE> get_transform(bool ord);
+				/**
+				 * \param ord -1 for descending order, 1 for ascending order.
+				 */
+				Faust::Transform<FPP,DEVICE> get_transform(int ord);
 
 
 		};
