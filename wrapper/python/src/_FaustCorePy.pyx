@@ -1381,8 +1381,9 @@ cdef class FaustFact:
                                                                    errIsRel)
 
         core._isReal = True
-        D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
-        return core, D_spdiag
+        #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
+        #return core, D_spdiag
+        return core, D
 
     @staticmethod
     def fact_givens_fgft(Lap, J, t, verbosity=0, stoppingError = 0.0,
@@ -1415,6 +1416,7 @@ cdef class FaustFact:
                                                                            errIsRel)
 
         core._isReal = True
-        from scipy.sparse import spdiags
-        D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
-        return core, D_spdiag
+        #from scipy.sparse import spdiags
+        #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
+        #return core, D_spdiag
+        return core, D

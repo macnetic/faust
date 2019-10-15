@@ -80,9 +80,9 @@ def svdtj(M, J, t=1):
 
 def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     """
-    Runs the truncated Jacobi algorithm to compute the eigenvalues of M (returned in W) and the corresponding eigenvectors (in Faust V) using the truncated Jacobi algorithm.
+    Runs the truncated Jacobi algorithm to compute the eigenvalues of M (returned in W) and the corresponding transform of eigenvectors (in Faust V columns).
 
-    The output is such that V*W.todense()*V.T approximates M.
+    The output is such that dot(dot(V,diag(W)), V.T) approximates M.
 
     The trade-off between accuracy and sparsity can be set through the
     parameters maxiter and nGivens_per_fac.
@@ -104,13 +104,14 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
 
 
     Returns:
-        The tuple (V,W):
-            - V the Faust object representing the approximate eigenvector
-            transform. The last factor of V is a permutation matrix.
+        The tuple (W,V):
+           - W (numpy.ndarray) the vector of the eigenvalues of M (in ascendant order).
+           - V the Faust object representing the approximate eigenvector
+            transform. The column V[:, i] is the eigenvector
+            corresponding to the eigenvalue W[i].<br/>
+            The last factor of V is a permutation matrix.
             The goal of this factor is to apply to the columns of V the same order as
             eigenvalues set in W.
-            - W (scipy.sparse.dia.dia_matrix) the diagonal matrix of the
-            approximate eigenvalues (in ascendant order along the rows/columns).
 
     References:
     [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
@@ -129,7 +130,7 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
         demo_path = sep.join((get_data_dirpath(),'Laplacian_256_community.mat'))
         data_dict = loadmat(demo_path)
         Lap = data_dict['Lap'].astype(np.float)
-        Uhat, Dhat = eigtj(Lap, maxiter=Lap.shape[0]*100)
+        Dhat, Uhat = eigtj(Lap, maxiter=Lap.shape[0]*100)
         # Uhat is the Fourier matrix/eigenvectors approximation as a Faust
         # (200 factors + permutation mat.)
         # Dhat the eigenvalues diagonal matrix approx.
@@ -154,11 +155,11 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None, verbos
         verbosity: see eigtj
 
     Returns:
-        The tuple (FGFT,D):
+        The tuple (D, FGFT):
         - with FGFT being the Faust object representing
         the Fourier transform and,
-        - (scipy.sparse.dia.dia_matrix) D the eigenvalues of the Laplacian.
-        The eigenvalues are in ascendant order along the rows/columns.
+        - (numpy.ndarray) D a vector of the eigenvalues of the Laplacian (in
+        ascendant order).
 
 
     References:
@@ -168,8 +169,10 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None, verbos
     over Networks 2018, 4(2), pp 407-420.
     <https://hal.inria.fr/hal-01416110>
 
-    <b/> See also eigtj, fgft_palm
+    See also:
+        eigtj, fgft_palm
     """
+    if(nGivens_per_fac == None): nGivens_per_fac = int(Lap.shape[0]/2)
     if((isinstance(Lap, np.ndarray) and (Lap.T != Lap).any()) or Lap.shape[0] != Lap.shape[1]):
         raise ValueError(" the matrix/array must be square and should be symmetric.")
     if(not isinstance(maxiter, int)): raise TypeError("maxiter must be a int")
@@ -190,7 +193,7 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None, verbos
     else:
         raise TypeError("The matrix to diagonalize must be a"
                         " scipy.sparse.csr_matrix or a numpy array.")
-    return Faust(core_obj=core_obj), D
+    return D, Faust(core_obj=core_obj)
 
 def _check_fact_mat(funcname, M):
     if(not isinstance(M, np.ndarray)):
