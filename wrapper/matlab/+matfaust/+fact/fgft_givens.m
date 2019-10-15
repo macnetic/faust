@@ -1,18 +1,16 @@
 %==========================================================================================
-%> @brief Computes the FGFT for the Laplacian matrix Lap.
+%> @brief Computes the FGFT of the Laplacian matrix Lap (using fact.eigtj).
 %>
 %>
 %> @b Usage
-%>
-%> &nbsp;&nbsp;&nbsp; @b fgft_givens(Lap, J) calls the non-parallel Givens algorithm.<br/>
-%> &nbsp;&nbsp;&nbsp; @b fgft_givens(Lap, J, 0) or fgft_givens(Lap, J, 1) do the same as in previous line.<br/>
-%> &nbsp;&nbsp;&nbsp; @b fgft_givens(Lap, J, t) calls the parallel Givens algorithm (if t > 1, otherwise it calls basic Givens algorithm), see eigtj. <br/>
-%> &nbsp;&nbsp;&nbsp; @b fgft_givens(Lap, J, t, 'verbosity', 2) same as above with a level of verbosity of 2 in output. <br/>
+%>  &nbsp;&nbsp;&nbsp; @b See fact.eigtj
 %>
 %> @param Lap the Laplacian matrix as a numpy array. Must be real and symmetric.
-%> @param J see eigtj
-%> @param t see eigtj
-%> @param verbosity see eigtj
+%> @param maxiter see fact.eigtj
+%> @param 'nGivens_per_fac', integer see fact.eigtj
+%> @param 'tol', number see fact.eigtj
+%> @param 'relerr', bool see fact.eigtj
+%> @param 'verbosity', integer see fact.eigtj
 %>
 %> @retval [FGFT,D]:
 %> - with FGFT being the Faust object representing the Fourier transform and,
@@ -23,15 +21,15 @@
 %> - [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
 %> graph Fourier transforms via multi-layer sparse approximations",
 %> IEEE Transactions on Signal and Information Processing
-%> over Networks 2018, 4(2), pp 407-420
+%> over Networks 2018, 4(2), pp 407-420 <https://hal.inria.fr/hal-01416110>
 %>
 %>
 %> <p> @b See @b also fact.eigtj, fact.fgft_palm
 %>
 %==========================================================================================
-function [FGFT,D] = fgft_givens(Lap, J, varargin)
+function [FGFT,D] = fgft_givens(Lap, maxiter, varargin)
 	import matfaust.Faust
-	t = 1; % default value
+	nGivens_per_fac = 1; % default value
 	verbosity = 0; % default value
 	if(~ ismatrix(Lap) || ~ isreal(Lap))
 		error('Lap must be a real matrix.')
@@ -39,33 +37,51 @@ function [FGFT,D] = fgft_givens(Lap, J, varargin)
 	if(size(Lap,1) ~= size(Lap,2))
 		error('Lap must be square')
 	end
-	if(~ isnumeric(J) || J-floor(J) > 0 || J <= 0)
-		error('J must be a positive integer.')
+	if(~ isnumeric(maxiter) || maxiter-floor(maxiter) > 0 || maxiter <= 0)
+		error('maxiter must be a positive integer.')
 	end
 	bad_arg_err = 'bad number of arguments.';
-	if(length(varargin) >= 1)
-		t = varargin{1};
-		if(~ isnumeric(t))
-			error('t must be a positive or nul integer.')
-		end
-		t = floor(abs(t));
-		t = min(t, J);
-		if(length(varargin) >= 2)
-			if(~ strcmp(varargin{2}, 'verbosity'))
-				error('arg. 4, if used, must be the str `verbosity''.')
-			end
-			if(length(varargin) == 3)
-				if(isnumeric(varargin{3}))
-					verbosity = floor(real(varargin{3}));
-				else
-					error('verbosity must be numeric')
-				end
-			else
-				error(bad_arg_err)
+	tol = 0;
+	relerr = true;
+	verbosity = 0;
+	argc = length(varargin);
+	if(argc > 0)
+		for i=1:argc
+			switch(varargin{i})
+				case 'tol'
+					if(argc == i || ~ isscalar(varargin{i+1}))
+						error('tol keyword arg. is not followed by a number')
+					else
+						tol = real(varargin{i+1}) % real in case of cplx num
+					end
+				case 'relerr'
+					if(argc == i || ~ islogical(varargin{i+1}))
+						error('relerr keyword argument is not followed by a logical')
+					else
+						relerr = varargin{i+1}
+					end
+				case 'verbosity'
+					if(argc == i || ~ isscalar(varargin{i+1}))
+						error('verbose keyword argument is not followed by a number')
+					else
+						verbosity = floor(real(varargin{i+1}))
+					end
+				case 'nGivens_per_fac'
+					if(argc == i || ~ isscalar(varargin{i+1}) || ~ isnumeric(nGivens_per_fac))
+						error('nGivens_per_fac must be followed by a positive integer.')
+					else
+						nGivens_per_fac = floor(abs(real(varargin{i+1})));
+						nGivens_per_fac = min(nGivens_per_fac, maxiter);
+						nGivens_per_fac = max(1, nGivens_per_fac)
+					end
+				otherwise
+					if(isstr(varargin{i}))
+						error([ varargin{i} ' unrecognized argument'])
+					end
 			end
 		end
 	end
-	[core_obj, D] = mexfgftgivensReal(Lap, J, t, verbosity);
+	[core_obj, D] = mexfgftgivensReal(Lap, maxiter, nGivens_per_fac, verbosity, tol, relerr);
 	D = sparse(diag(D));
 	FGFT = Faust(core_obj, true);
 end

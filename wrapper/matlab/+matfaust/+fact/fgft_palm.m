@@ -1,18 +1,18 @@
 %===================================================================================
 %> @brief Computes the FGFT for the Fourier matrix U which should be the eigenvectors of the Laplacian Lap.
 %>
-%> @note this algorithm is a variant of fact_hierarchical.
+%> @note this algorithm is a variant of fact.hierarchical.
 %>
-%> @param Lap The laplacian matrix.
+%> @param Lap The Laplacian matrix.
 %> @param U The Fourier matrix.
 %> @param p The PALM hierarchical algorithm parameters.
 %> @param init_D The initial diagonal vector. If none it will be the ones() vector by default.
 %>
 %> @retval [Uhat, Dhat, lambda, p]
 %> - Uhat: the Faust factorization of U.
-%> - Dhat: the diagonal matrix approximation of eigenvaules.
-%> - lambda: see fact_hierarchical
-%> - p: see fact_hierarchical
+%> - Dhat: the diagonal matrix approximation of eigenvalues.
+%> - lambda: see fact.hierarchical
+%> - p: see fact.hierarchical
 %>
 %>
 %> @b Example

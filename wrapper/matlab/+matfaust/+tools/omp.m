@@ -59,7 +59,7 @@ function x = omp(y, D, varargin)
 					end
 				otherwise
 					if(isstr(varargin{i}))
-						error('unrecognized argument')
+						error([ varargin{i} ' unrecognized argument'])
 					end
 			end
 		end

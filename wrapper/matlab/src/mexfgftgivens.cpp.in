@@ -57,8 +57,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	int J;
 	int t = 1; // default value for non-parallel Givens FGFT
 	unsigned int verbosity = 0; //default verbosity (no info. displayed)
+	double tol = 0;
+	bool relErr = true;
 
-	if(nrhs < 2 || nrhs > 4)
+	if(nrhs < 2 || nrhs > 6)
 		mexErrMsgTxt("Bad Number of inputs arguments");
 
 	J = (int) mxGetScalar(prhs[1]);
@@ -66,6 +68,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		t = (int) mxGetScalar(prhs[2]);
 	if(nrhs >= 4)
 		verbosity = (int) mxGetScalar(prhs[3]);
+	if(nrhs >= 5)
+		tol = (double) mxGetScalar(prhs[4]);
+	if(nrhs >= 6)
+		relErr = (bool) mxGetScalar(prhs[5]);
 
 	const mxArray* matlab_matrix = prhs[0]; // Laplacian
 
@@ -86,18 +92,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			Lap = &sLap;
 			//TODO: blas handles to pass later ? (if you want to do the calculation with blas instead of eigen)
 			if(t <= 1)
-				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(sLap, J, verbosity);
+				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(sLap, J, verbosity, tol, relErr);
 			else
-				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(sLap, J, t, verbosity);
+				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(sLap, J, t, verbosity, tol, relErr);
 
 		}else
 		{
 			mxArray2FaustMat(matlab_matrix,dLap);
 			Lap = &dLap;
 			if(t <= 1)
-				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(dLap, J, verbosity);
+				algo = new GivensFGFT<SCALAR,Cpu,FPP2>(dLap, J, verbosity, tol, relErr);
 			else
-				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(dLap, J, t, verbosity);
+				algo = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(dLap, J, t, verbosity, tol, relErr);
 		}
 
 

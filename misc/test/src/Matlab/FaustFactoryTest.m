@@ -204,7 +204,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			t = size(Lap,1)/2;
-			[F,D] = matfaust.fact.fgft_givens(Lap, J, t); %, 'verbosity', 2);
+			[F,D] = matfaust.fact.fgft_givens(Lap, J, 'nGivens_per_fac', t); %, 'verbosity', 2);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -214,7 +214,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			% misc/test/src/C++/GivensFGFTParallel.cpp.in
 			this.verifyEqual(err,0.0410448, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
-			[F2,D2] = matfaust.fact.eigtj(Lap, J, t); %, 'verbosity', 2);
+			[F2,D2] = matfaust.fact.eigtj(Lap, J, 'nGivens_per_fac', t); %, 'verbosity', 2);
 			this.verifyEqual(full(F2),full(F))
 			this.verifyEqual(D,D2)
 		end
@@ -225,7 +225,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			t = size(Lap,1)/2;
-			[F,D] = matfaust.fact.fgft_givens(sparse(Lap), J, t); %, 'verbosity', 2);
+			[F,D] = matfaust.fact.fgft_givens(sparse(Lap), J, 'nGivens_per_fac', t); %, 'verbosity', 2);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -235,7 +235,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			% misc/test/src/C++/GivensFGFTParallel.cpp.in
 			this.verifyEqual(err,0.0410448, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
-			[F2,D2] = matfaust.fact.eigtj(Lap, J, t); %, 'verbosity', 2);
+			[F2,D2] = matfaust.fact.eigtj(Lap, J, 'nGivens_per_fac', t); %, 'verbosity', 2);
 			this.verifyEqual(full(F2),full(F))
 			this.verifyEqual(D,D2)
 		end

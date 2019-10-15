@@ -35,16 +35,19 @@ import pyfaust.factparams
 from pyfaust import Faust
 import _FaustCorePy
 
-def svdtj(M, J, t=1):
+def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
-        NOTE: this function is based on eigtj.
+        NOTE: this function is based on fact.eigtj.
 
         Args:
             M: a real matrix.
-            J: see eigtj
-            t: see eigtj
+            maxiter: see fact.eigtj
+            tol: see fact.eigtj
+            relerr: see fact.eigtj
+            nGivens_per_fac: see fact.eigtj
+            verbosity: see fact.eigtj
 
         Returns:
             The tuple U,S,V: U*S.todense()*V' being the approximation of M.
@@ -66,8 +69,9 @@ def svdtj(M, J, t=1):
     from scipy import diag
     from pyfaust import Faust
     from numpy import argsort,sign,eye
-    W1, D1 = eigtj(M.dot(M.T), J, t)
-    W2, D2 = eigtj(M.T.dot(M), J, t)
+    D1, W1 = eigtj(M.dot(M.T), maxiter, tol, relerr,
+                   nGivens_per_fac, verbosity)
+    D2, W2 = eigtj(M.T.dot(M), maxiter, tol, relerr,  nGivens_per_fac, verbosity)
     S = diag(W1.T*M*W2.todense())
     I = argsort(abs(S))[::-1]
     sign_S = spdiags(sign(S[I]), [0], S.shape[0], S.shape[0])
@@ -144,15 +148,15 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
 
 def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None, verbosity=0):
     """
-    Diagonalizes the graph Laplacian matrix Lap using the Givens FGFT algorithm.
+    Computes the FGFT of the Laplacian matrix Lap (using fact.eigtj).
 
     Args:
         Lap: the Laplacian matrix as a numpy array. Must be real and symmetric.
-        maxiter: see eigtj
-        tol: see eigtj
-        relerr: see eigtj
-        nGivens_per_fac: see eigtj
-        verbosity: see eigtj
+        maxiter: see fact.eigtj
+        tol: see fact.eigtj
+        relerr: see fact.eigtj
+        nGivens_per_fac: see fact.eigtj
+        verbosity: see fact.eigtj
 
     Returns:
         The tuple (D, FGFT):
