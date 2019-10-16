@@ -83,7 +83,7 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     return U,S,V
 
 def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
-          order=1):
+          order='ascend'):
     """
     Runs the truncated Jacobi algorithm to compute the eigenvalues of M (returned in W) and the corresponding transform of eigenvectors (in Faust V columns).
 
@@ -106,8 +106,8 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
         nGivens_per_fac == None).
         verbosity: (int) the level of verbosity, the greater the value the more info.
         is displayed.
-        order: (int) default to 1 to sort eigenvalues in ascending order
-        order, 1 for a descending order.
+        order: (int) order of eigenvalues, default to 'ascend', other values
+        are 'descend' or 'undef'.
 
 
     Returns:
@@ -151,7 +151,7 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
                        order)
 
 def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
-                verbosity=0, order=1):
+                verbosity=0, order='ascend'):
     """
     Computes the FGFT of the Laplacian matrix Lap (using fact.eigtj).
 

@@ -1351,7 +1351,7 @@ cdef class FaustFact:
 
     @staticmethod
     def fact_givens_fgft_sparse(Lap, J, t, verbosity=0, stoppingError = 0.0,
-                                errIsRel=True, order=1):
+                                errIsRel=True, order='ascend'):
         from scipy.sparse import spdiags
         cdef double [:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -1359,6 +1359,10 @@ cdef class FaustFact:
         cdef unsigned int Lap_num_rows=Lap.shape[0]
         cdef unsigned int Lap_num_cols=Lap.shape[1]
         cdef double[:] D_view
+
+        if(order == 'ascend'): order = 1
+        elif(order == 'descend'): order = -1
+        elif(order == 'undef'): order = 0
 
         data1d=Lap.data.astype(float,'F')
         indices=Lap.indices.astype(np.int32, 'F')
@@ -1394,6 +1398,12 @@ cdef class FaustFact:
                              'float64', 'double']
         # double == float64
         check_matrix(isReal, Lap)
+
+        if(order == 'ascend'): order = 1
+        elif(order == 'descend'): order = -1
+        elif(order == 'undef'): order = 0
+        else: raise ValueError('order argument must be something among'
+                               '\'ascend\', \'descend\' or \'undef\'')
 
         if(not isReal):
             raise TypeError('Matrix must be a real.')

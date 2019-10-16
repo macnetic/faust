@@ -77,13 +77,20 @@ function [FGFT,D] = fgft_givens(Lap, maxiter, varargin)
 						nGivens_per_fac = max(1, nGivens_per_fac);
 					end
 				case 'order'
-					if(argc == i || ~ isscalar(varargin{i+1}) || ~ isnumeric(varargin{i+1}))
-						error('order must be followed by an integer.')
+					if(argc == i || (~ strcmp(varargin{i+1}, 'ascend') && ~ strcmp(varargin{i+1}, 'descend') && ~ strcmp(varargin{i+1}, 'undef')))
+						error('order must be followed by a char array among ''ascend'', ''descend'' or ''undef''.')
 					else
 						order = varargin{i+1};
+						if(order(1) == 'a')
+							order = 1
+						elseif(order(1) == 'd')
+							order = -1
+						else
+							order = 0
+						end
 					end
 				otherwise
-					if(isstr(varargin{i}))
+					if(isstr(varargin{i}) && (~ strcmp(varargin{i}, 'ascend') && ~ strcmp(varargin{i}, 'descend') && ~ strcmp(varargin{i}, 'undef')) )
 						error([ varargin{i} ' unrecognized argument'])
 					end
 			end
