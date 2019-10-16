@@ -44,7 +44,7 @@ For more information on the FAµST Project, please visit the website [faust.inri
 
 
 <HR>
-\authors Luc Le Magoarou, Rémi Gribonval, Adrien Leman, Nicolas Bellot, Thomas Gautrais, Hakim H.
+\authors Luc Le Magoarou, Rémi Gribonval, Adrien Leman, Nicolas Bellot, Thomas Gautrais, Hakim HADJ-DJILANI
 \date (of doc generation) @DOXYGEN_CURRENT_DATE@
 
 <HR>
