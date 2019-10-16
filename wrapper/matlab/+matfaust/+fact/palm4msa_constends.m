@@ -1,3 +1,4 @@
+% experimental block start
 %==========================================================================================
 %> @brief Approximates M by A S_1 … S_n B using palm4msa.
 %>
@@ -52,3 +53,4 @@ function [F, lambda] = palm4msa_constends(M, p, A, varargin)
 	nF{2} = nF{2}*lambda;
 	F = matfaust.Faust(nF);
 end
+% experimental block end

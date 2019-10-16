@@ -1,3 +1,4 @@
+% experimental block start
 %==========================================================================================
 %> @brief Approximates M by A S_1 ... S_n B using hierarchical.
 %>
@@ -67,3 +68,4 @@ function varargout = hierarchical_constends(M, p, A, B)
 	F = matfaust.Faust(nF);
 	varargout = {F, lambda, p};
 end
+% experimental block end

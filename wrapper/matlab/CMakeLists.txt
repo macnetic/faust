@@ -65,6 +65,13 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 		message(STATUS "matfaust function file: " ${MATFAUST_FILE})
 		# just copy the .m
 		configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} @ONLY)
+        # filter out experimental code
+        execute_process(COMMAND
+            python
+            "${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py"
+            ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
+            ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} "--no-empty")
+        # --no-empty deletes emtpy file after filtering
 	endif()
 
 endforeach()
