@@ -82,7 +82,8 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     V = W2[:,0:S.shape[0]]*Faust(Id[:,I])
     return U,S,V
 
-def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
+def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
+          order=1):
     """
     Runs the truncated Jacobi algorithm to compute the eigenvalues of M (returned in W) and the corresponding transform of eigenvectors (in Faust V columns).
 
@@ -105,6 +106,8 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
         nGivens_per_fac == None).
         verbosity: (int) the level of verbosity, the greater the value the more info.
         is displayed.
+        order: (int) default to 1 to sort eigenvalues in ascending order
+        order, 1 for a descending order.
 
 
     Returns:
@@ -144,9 +147,11 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     See also:
         fgft_givens, fgft_palm
     """
-    return fgft_givens(M, maxiter, tol, relerr, nGivens_per_fac, verbosity)
+    return fgft_givens(M, maxiter, tol, relerr, nGivens_per_fac, verbosity,
+                       order)
 
-def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None, verbosity=0):
+def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
+                verbosity=0, order=1):
     """
     Computes the FGFT of the Laplacian matrix Lap (using fact.eigtj).
 
@@ -157,6 +162,7 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None, verbos
         relerr: see fact.eigtj
         nGivens_per_fac: see fact.eigtj
         verbosity: see fact.eigtj
+        order: see fact.eigtj
 
     Returns:
         The tuple (D, FGFT):
@@ -187,13 +193,14 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None, verbos
     if(isinstance(Lap, np.ndarray)):
         core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft(Lap, maxiter, nGivens_per_fac,
                                                              verbosity, tol,
-                                                             relerr)
+                                                             relerr, order)
     elif(isinstance(Lap, csr_matrix)):
         core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_sparse(Lap, maxiter,
                                                                     nGivens_per_fac,
                                                                     verbosity,
                                                                     tol,
-                                                                    relerr)
+                                                                    relerr,
+                                                                    order)
     else:
         raise TypeError("The matrix to diagonalize must be a"
                         " scipy.sparse.csr_matrix or a numpy array.")

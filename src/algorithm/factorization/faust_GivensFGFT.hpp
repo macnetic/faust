@@ -414,7 +414,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::order_D(const int order /* -1 for descending o
 	for(int i=0;i<D.size();i++)
 		ord_indices.push_back(i);
 	sort(ord_indices.begin(), ord_indices.end(), [this, &order](int i, int j) {
-			return order>0?D.getData()[i] < D.getData()[j]:D.getData()[i] > D.getData()[j];
+			return order>0?D.getData()[i] < D.getData()[j]:(order <0?D.getData()[i] > D.getData()[j]:0);
 			});
 	for(int i=0;i<ord_indices.size();i++)
 		ordered_D.getData()[i] = D.getData()[ord_indices[i]];

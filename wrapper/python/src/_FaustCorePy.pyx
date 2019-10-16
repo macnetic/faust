@@ -1351,7 +1351,7 @@ cdef class FaustFact:
 
     @staticmethod
     def fact_givens_fgft_sparse(Lap, J, t, verbosity=0, stoppingError = 0.0,
-                                errIsRel=True):
+                                errIsRel=True, order=1):
         from scipy.sparse import spdiags
         cdef double [:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -1378,7 +1378,8 @@ cdef class FaustFact:
                                                                    &D_view[0],
                                                                    verbosity,
                                                                    stoppingError,
-                                                                   errIsRel)
+                                                                   errIsRel,
+                                                                   int(order))
 
         core._isReal = True
         #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
@@ -1387,7 +1388,7 @@ cdef class FaustFact:
 
     @staticmethod
     def fact_givens_fgft(Lap, J, t, verbosity=0, stoppingError = 0.0,
-                         errIsRel=True):
+                         errIsRel=True, order=1):
         isReal = Lap.dtype in [ 'float', 'float128',
                              'float16', 'float32',
                              'float64', 'double']
@@ -1413,7 +1414,8 @@ cdef class FaustFact:
                                                                            Lap_num_cols, J, t,
                                                                            &D_view[0], verbosity,
                                                                            stoppingError,
-                                                                           errIsRel)
+                                                                           errIsRel,
+                                                                           int(order))
 
         core._isReal = True
         #from scipy.sparse import spdiags

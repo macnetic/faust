@@ -119,7 +119,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		plhs[1] = FaustVec2mxArray(D);
 
-		Faust::Transform<SCALAR,Cpu> trans = std::move(algo->get_transform(order)); // true for same order of "eigenvectors" as eigenvalues
+		Faust::Transform<SCALAR,Cpu> trans = std::move(algo->get_transform(order));
 		TransformHelper<SCALAR,Cpu> *th = new TransformHelper<SCALAR,Cpu>(trans, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(th);
