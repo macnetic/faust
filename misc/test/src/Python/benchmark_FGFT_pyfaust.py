@@ -6,17 +6,24 @@ from random import randint
 import numpy as np
 from numpy import empty,log2, size, count_nonzero, diag, savez, load
 from pyfaust import *
+import pyfaust.fact
 from pyfaust.factparams import *
 from numpy.linalg import eig, norm
 from time import clock
 from os.path import exists
-
+from scipy.sparse import spdiags
+from scipy.sparse import csr_matrix
+from scipy.io import savemat
+#sys.path.append(sys.environ['HOME']+'/givens-factorization') # TODO: output arg
+#from util import symmetrized_norm
+from lapsolver import solve_dense
 
 graph_ctors = [ erdosrenyi.ErdosRenyi, community.Community, path.Path,
                sensor.Sensor, randomring.RandomRing, ring.Ring ]
 
 graph_names = [ 'erdosrenyi', 'community', 'path', 'sensor', 'randring', 'ring'
                ]
+
 dim_size = 128
 
 plt.rcParams['lines.markersize'] = .7
@@ -36,10 +43,12 @@ data_type_str = [ 'Fourier Error', 'Laplacian Error', 'Execution Time (sec)' ]
 GIVENS = 0
 PARGIVENS = 1
 HIERPALM = 2
+COORDDESCENT_TFRERIX = 3
 
-algo_str = [ 'Givens', 'Parallel Givens', 'Hierarchical PALM' ]
+algo_str = [ 'Givens', 'Parallel Givens', 'Hierarchical PALM', 'L1 Coordinate'
+            ' Descent' ]
 
-all_data = empty((len(graph_ctors), 3, 3, nruns), dtype=np.float) # 1st 3 is
+all_data = empty((len(graph_ctors), 3, 4, nruns), dtype=np.float) # 1st 3 is
                                                                   # for type of data: times, fourier_errs, lap_errs
                                                                   # 3 is for algos used
 
@@ -58,6 +67,27 @@ if(exists(data_file)):
     all_data[:od.shape[0],:od.shape[1],:od.shape[2],:od.shape[3]] = od
     old_nruns = od.shape[3]
 
+
+J = 0
+
+def compute_cost_matrix(U, V):
+    d = U.shape[0]
+    C = np.empty((d,2*d))
+    for i in range(0, d):
+        for j in range(0, d):
+            diff1 = U[:,i] + V[:,j]
+            diff2 = U[:,i] - V[:,j]
+            diff1 *= diff1
+            diff2 *= diff2 
+            C[i,[j,j*2]] = np.sum(diff1), np.sum(diff2)
+    return C
+
+def symmetrized_norm(U, V): 
+    C = compute_cost_matrix(U, V)
+    row_idx, col_idx = solve_dense(C)
+    print("linear sum prob sol:", row_idx, col_idx)
+    best_frobenius_norm = np.sqrt(C[row_idx, col_idx].sum())
+    return best_frobenius_norm
 
 for j in range(old_nruns,nruns):
     print("================= #run:", j)
@@ -91,16 +121,19 @@ for j in range(old_nruns,nruns):
                                         min(int(round(2*dim*over_sp)),Lap.shape[0])) ]
 
         params = ParamsHierarchical(fact_cons, res_cons,
-                                        StoppingCriterion(num_its=50),
-                                        StoppingCriterion(num_its=100),
-                                        step_size=1.0000e-06,
-                                        constant_step_size=False,
-                                        init_lambda=1.0,
-                                        is_fact_side_left=True, is_verbose=True)
+                                    StoppingCriterion(num_its=50),
+                                    StoppingCriterion(num_its=100),
+                                    step_size=1.0000e-06,
+                                    constant_step_size=False,
+                                    init_lambda=1.0,
+                                    is_fact_side_left=True,
+                                    is_verbose=False)
 
         #t = clock()
+        print("running Hierarchical PALM4MSA on U")
         try:
-            F = FaustFactory.fact_hierarchical(U,params)
+            F = pyfaust.fact.hierarchical(U,params)
+            pass
         except:
             # PALM failing on this Laplacian, repeat this iteration on another
             continue
@@ -108,43 +141,99 @@ for j in range(old_nruns,nruns):
         complexity_global = F.nnz_sum()
 
         #diag_init_D = diag(D)
+        print("running Hierarchical PALM4MSA for FGFT")
         diag_init_D = np.copy(D)
         t = clock()
         try:
-            F, Dhat = FaustFactory.fgft_palm(U, Lap,
+            F, Dhat = pyfaust.fact.fgft_palm(U, Lap,
                                          params,
                                          init_D=diag_init_D)
         except:
             # PALM failing on this Laplacian, repeat this iteration on another
+            # one
             continue
         t = clock()-t
         all_data[i,TIME_ID,HIERPALM,j] = t
         hier_fgft_err = norm((F.todense()*diag(Dhat))*F.T.todense()-Lap,"fro")/norm(Lap,"fro")
         all_data[i,LAP_ERR_ID,HIERPALM,j]= hier_fgft_err
-        all_data[i,FOURIER_ERR_ID,HIERPALM,j] =  (F-U).norm("fro")/norm(U,"fro")
+        all_data[i,FOURIER_ERR_ID,HIERPALM,j] = symmetrized_norm(U,
+                                                                 F.toarray())/norm(U,'fro') #(F-U).norm("fro")/norm(U,"fro")
+
+
+
+
 
         #nfacts = complexity_global/(2*dim)
-        #J = round(nfacts*(dim/2))
+        print("running Trunc. Jacobi")#J = round(nfacts*(dim/2))
         J = round(complexity_global/4)
+        #print("J=", J)
+        #J = 64*64
+        #J = Lap.shape[0]//2*(Lap.shape[0]-1)
         t = clock()
-        F, Dhat = FaustFactory.fgft_givens(Lap, J, 0)
+        Dhat, F = pyfaust.fact.fgft_givens(Lap, J, nGivens_per_fac=0)
         t = clock()-t
+        Dhat = spdiags(Dhat, [0], Lap.shape[0], Lap.shape[0])
         all_data[i,TIME_ID,GIVENS,j] = t
 
         givens_err = norm((F*Dhat.todense())*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
         all_data[i,LAP_ERR_ID,GIVENS,j] = givens_err
-        all_data[i,FOURIER_ERR_ID,GIVENS,j] = (F-U).norm("fro")/norm(U,"fro")
+        all_data[i,FOURIER_ERR_ID,GIVENS,j] = symmetrized_norm(U,
+                                                               F.toarray())/norm(U,'fro')
+        print("errs Uhat permuted, Uhat:", symmetrized_norm(U,
+                                                           F.toarray())/norm(U,'fro'),
+             (F-U).norm('fro')/norm(U,'fro'))
 
+# (F-U).norm("fro")/norm(U,"fro")
+
+        print("running Parallel Trunc. Jacobi")
         t = clock()
-        F, Dhat = FaustFactory.fgft_givens(Lap, J, int(dim/2))
+        Dhat, F = pyfaust.fact.fgft_givens(Lap, J, nGivens_per_fac=int(dim/2))
         t = clock()-t
+        Dhat = spdiags(Dhat, [0], Lap.shape[0], Lap.shape[0])
         all_data[i,TIME_ID,PARGIVENS,j] = t
         print("J=", J)
         print("nnz_sum FGFT givens parallel=", F.nnz_sum(), "num of facts:",
               F.numfactors())
         all_data[i,LAP_ERR_ID,PARGIVENS,j] = norm((F*Dhat.todense())*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
-        all_data[i,FOURIER_ERR_ID,PARGIVENS,j] = (F-U).norm("fro")/norm(U,"fro")
+        all_data[i,FOURIER_ERR_ID,PARGIVENS,j] = symmetrized_norm(U,
+                                                                  F.toarray())/norm(U,'fro')
+        print("errs Uhat permuted, Uhat:", symmetrized_norm(U,
+                                                           F.toarray())/norm(U,'fro'),
+             (F-U).norm('fro')/norm(U,'fro'))
+
+ # (F-U).norm("fro")/norm(U,"fro")
         print("err:", norm(Lap @ F.toarray() - F.toarray()@Dhat)/norm(Lap))
+
+#        # Thomas Frerix L1 Coordinate Descent algorithm
+#        f = lambda x: norm(x,1)
+#        from coordinate_descent import coordinate_descent
+#        import scipy.sparse
+#        print("running L1 coordinate_descent")
+#        t = clock()
+#        res_tuple = coordinate_descent(U,f, J)
+#        t = clock()-t
+#        # construct Givens factors and the Faust from them
+#        Gs = []
+#        for alpha,p,q in list(reversed(res_tuple)):
+#            G = scipy.sparse.eye(*U.shape).tocsr()
+#            G[p,p] = np.cos(alpha)
+#            G[p,q] = -np.sin(alpha)
+#            G[q,p]= np.sin(alpha)
+#            G[q,q] = np.cos(alpha)
+#            Gs += [G]
+#        print("Gs=")
+#        Gs = Faust(Gs)
+#        print(Gs)
+#        Gs.save('Gs.mat')
+#        dU = { 'U': U }
+#        savemat('U.mat', dU)
+#        all_data[i,TIME_ID,COORDDESCENT_TFRERIX,j] = t
+#        all_data[i,LAP_ERR_ID,COORDDESCENT_TFRERIX,j] = 1 # not computed
+#        abs_err = symmetrized_norm(U, Gs.toarray())
+#        print("sym_norm:", abs_err, "rel err", abs_err/norm(U,'fro'), "err"
+#              " without permutation:", (Gs-U).norm('fro')/norm(U, 'fro'))
+#        all_data[i,FOURIER_ERR_ID,COORDDESCENT_TFRERIX,j] = abs_err/norm(U,"fro")
+
         savez(data_file, all_data[:,:,:,:j+1])
         i += 1
 
