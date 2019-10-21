@@ -156,7 +156,7 @@ endif()
 
 if(NOT NOCPPTESTS)
 	foreach(TEST_FPP float double)
-		foreach(FILE faust_mult faust_mult_cplx test_Vect_min test_MatDense_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move)
+		foreach(FILE faust_mult faust_mult_cplx test_Vect_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move)
 			set(TEST_BIN_FILE ${FILE}_${TEST_FPP})
 			set(TEST_FILE_CPP ${TEST_BIN_FILE}.cpp)
 			message(STATUS ${TEST_FILE_CPP})
@@ -189,7 +189,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
  
 	foreach(TEST_FPP float double complex<float> complex<double>)	
-		foreach(testin hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication faust_matdense_conjugate GivensFGFT GivensFGFTSparse GivensFGFTParallel GivensFGFTParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op)
+		foreach(testin hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication test_MatDense_min faust_matdense_conjugate GivensFGFT GivensFGFTSparse GivensFGFTParallel GivensFGFTParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op GivensFGFTComplex)
 			if(${TEST_FPP} MATCHES complex )
 				set(TEST_IS_COMPLEX 1)
 				if(${testin} MATCHES GivensFGFT)

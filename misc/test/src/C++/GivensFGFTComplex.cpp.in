@@ -1,0 +1,160 @@
+
+#include "faust_GivensFGFTComplex.h"
+#include "faust_MatDense.h"
+#include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_core.h"
+#include "faust_Transform.h"
+
+#include <complex>
+
+using namespace Faust;
+typedef @TEST_FPP@ FPP;
+typedef @TEST_FPP2@ FPP2;
+
+/***
+ * This test results have to be compared with what misc/test/src/Matlab/test_GivensDiag.m outputs.
+ * That's a way to validate the C++ impl. of Givens Jacobi FGFT.
+ */
+
+
+int main()
+{
+	string configFilename = "@FAUST_DATA_MAT_DIR@/test_GivensDiag_Lap_U_J.mat";
+
+	Faust::MatDense<complex<FPP>,Cpu> Lap, U;
+	init_faust_mat_from_matio(Lap,configFilename.c_str(),"Lap");
+	init_faust_mat_from_matio(U,configFilename.c_str(),"U");
+
+	int J = 5472; //TODO: should be retrieved from .mat file (not be a hard-coded value)
+	GivensFGFTComplex<complex<FPP>,Cpu,FPP> algo(Lap,J);
+
+	algo.compute_facts();
+
+	vector<pair<int,int>> coord_choices = algo.get_coord_choices();
+
+	mat_t *matfp;
+
+	matfp = Mat_Open(configFilename.c_str(),MAT_ACC_RDONLY);
+	if ( NULL == matfp ) {
+		fprintf(stderr,"Error opening MAT file %s", configFilename.c_str());
+		return EXIT_FAILURE;
+	}
+	matvar_t* cell_choices = Mat_VarRead(matfp, "choices");
+	int* p_choices = new int[J];
+	int* q_choices = new int[J];
+	cout << "=======================================" << endl;
+    if ( NULL != cell_choices) {
+        for (int i = 0; i < J*2; i+=2 )
+		{
+				p_choices[i/2] = (int)((double*) (cell_choices->data))[i];
+				q_choices[i/2] = (int)((double*) (cell_choices->data))[i+1];
+		}
+        free(cell_choices);
+	}
+	Mat_Close(matfp);
+
+	bool eq; // are ref and test pivots equal ?
+	bool all_eq = true; //all past pivots are eq
+	for(int j=0;j<J;j++)
+	{
+		cout << "ite=" << j;
+		cout << " (1-base index) ref. p=" << p_choices[j] << ", q=" << q_choices[j] << ", algo. p=" << coord_choices[j].first+1 << " q=" << coord_choices[j].second+1;
+		eq = p_choices[j] == coord_choices[j].first+1 && q_choices[j] == coord_choices[j].second+1;
+		all_eq = all_eq && eq;
+		cout << " equal=" << eq;
+		cout << " all ites eq=" << all_eq << endl;
+	}
+
+	Faust::MatDense<complex<FPP>,Cpu> fourier_diag(Lap.getNbRow(), Lap.getNbCol());
+	fourier_diag.setEyes();
+	const vector<Faust::MatSparse<complex<FPP>,Cpu>>& givens_facts = algo.get_facts();
+	for(int i=givens_facts.size()-1;i>=0;i--)
+		givens_facts[i].multiply(fourier_diag, 'N');
+
+	cout << "fourier_diag fro norm: " << fourier_diag.norm() << endl;
+
+	const Faust::MatSparse<complex<FPP>,Cpu> D = algo.get_Dspm();
+	Faust::MatDense<complex<FPP>,Cpu> full_D = Faust::MatDense<complex<FPP>,Cpu>(D);
+	cout << "D fro norm:" << D.norm() << endl;
+
+	Faust::MatDense<complex<FPP>,Cpu> fourier_diag2 = algo.compute_fourier();
+	Faust::MatDense<complex<FPP>,Cpu> ordered_fourier_diag2 = algo.compute_fourier(true);
+
+	Faust::MatDense<complex<FPP>,Cpu> * ordered_fourier_diag = fourier_diag.get_cols(algo.get_ord_indices());
+
+	fourier_diag2 -= fourier_diag;
+	ordered_fourier_diag2 -= *ordered_fourier_diag;
+	cout << "norm(fourier_diag2-fourier_diag): " << fourier_diag2.norm() << endl;
+	cout << "norm(ordered_fourier_diag2-ordered_fourier_diag): " << ordered_fourier_diag2.norm() << endl;
+
+	//verify approx. fourier is properly computed (when ordered or not)
+	assert(fourier_diag2.norm()==FPP(0));
+	assert(ordered_fourier_diag2.norm()==FPP(0));
+
+	Faust::MatDense<complex<FPP>,Cpu> ordered_D(algo.get_Dspm(true));
+
+	cout << "orderded D fro norm: " << ordered_D.norm() << endl;
+	cout << "ordered_D:" << endl;
+	ordered_D.Display();
+
+	cout << "ordered D eles" << endl;
+	for(int i=0;i<ordered_D.getNbRow();i++)
+	{
+		cout << ordered_D.getData()[i*ordered_D.getNbRow()+i] << " " << full_D(i,i) << endl;
+	}
+
+	cout << "ordered fourier_diag fro norm: " << ordered_fourier_diag->norm() << endl;
+	cout << "Lap fro norm: " << Lap.norm() << endl;
+
+	Faust::MatDense<complex<FPP>,Cpu> tmp = *ordered_fourier_diag;
+	tmp.multiplyRight(ordered_D);
+	ordered_fourier_diag->transpose();
+	tmp.multiplyRight(*ordered_fourier_diag);
+	ordered_fourier_diag->transpose();
+	tmp -= Lap;
+	cout << "Error relatively to the Laplacian: " << endl;
+	cout << tmp.norm()/Lap.norm() << endl;
+
+	//do the same but simpler with Transform object
+	Faust::Transform<complex<FPP>,Cpu> t = std::move(algo.get_transform(true));
+	Faust::MatDense<complex<FPP>,Cpu> P = t.multiply(ordered_D);//t.get_product();
+//	P.multiplyRight(ordered_D);
+	P.multiplyRight(t.get_product('T'));
+	P -= Lap;
+	cout << "Error relatively to the Laplacian: (computed from Transform object)" << endl;
+	cout << P.norm()/Lap.norm() << endl;
+
+	ordered_fourier_diag2 = algo.compute_fourier(true);
+	tmp = ordered_fourier_diag2;
+	tmp -= U;
+	cout << "Error relatively to Fourier matrix:" << endl;
+	cout << tmp.norm()/U.norm() << endl;
+
+//	t.Display();
+
+
+	Faust::MatDense<FPP,Cpu> ref_Dhat;
+	init_faust_mat_from_matio(ref_Dhat,configFilename.c_str(),"Dhat");
+	tmp = ref_Dhat;
+	tmp -= ordered_D;
+	cout << "Relative difference on Dhat between matlab ref script and C++ impl:" << endl;
+	cout << tmp.norm()/ref_Dhat.norm() << endl;
+
+	Faust::MatDense<FPP,Cpu> ref_errs;
+	init_faust_mat_from_matio(ref_errs,configFilename.c_str(),"err");
+	const vector<FPP2>& errs = algo.get_errs();
+	FPP2 d;
+	int i=99;
+	for(FPP2 err: errs)
+	{
+		d = std::abs(err - ref_errs.getData()[i]);
+		cout << "ref err:" << ref_errs.getData()[i] << " test err:" << err << "abs. diff:" << d << endl;
+		i += 100; // matlab Givens code stores a value for all ites but computes only one error a hundred
+		// C++ Givens computes and stores only one error a hundred
+	}
+
+	delete []p_choices;
+	delete []q_choices;
+	return 0;
+}
+

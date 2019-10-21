@@ -154,9 +154,6 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
 
 
-
-
-
     template<typename FPP, Device DEVICE>
     class MatDense;
 
@@ -432,6 +429,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		FPP min_coeff() const;
 		Faust::Vect<FPP,Cpu> rowwise_min() const;
 		Faust::Vect<FPP,Cpu> rowwise_min(int* col_indices) const;
+		Faust::Vect<FPP,Cpu> rowwise_max(int* col_indices) const;
 
 		void operator=(MatDense<FPP,Cpu> const& A);
 

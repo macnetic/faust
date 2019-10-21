@@ -1105,6 +1105,27 @@ Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::rowwise_min(int* col_indices) con
 	return vec;
 }
 
+template<typename FPP>
+Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::rowwise_max(int* col_indices) const
+{
+	Faust::Vect<FPP,Cpu> vec(this->getNbRow());
+	for(int i=0;i<this->getNbRow();i++)
+	{
+		FPP max = FPP(std::numeric_limits<double>::min()), e;
+		for(int j=0;j<this->getNbCol();j++)
+		{
+			e = getData()[j*this->getNbRow()+i];
+			if(Faust::fabs(e) > Faust::fabs(max)) 
+			{
+				max = e;
+				if(col_indices != nullptr) col_indices[i] = j;
+			}
+		}
+		vec.getData()[i] = max;
+	}
+	return vec;
+}
+
 	template<typename FPP>
 Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols)
 {

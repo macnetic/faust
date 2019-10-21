@@ -102,6 +102,8 @@ namespace Faust
 	template<typename FPP,Device DEVICE> class MatDense;
 	template<typename FPP, Device DEVICE, typename FPP2> class GivensFGFT;
 	template<typename FPP, Device DEVICE, typename FPP2> class GivensFGFTParallel;
+	template<typename FPP, Device DEVICE, typename FPP2> class GivensFGFTComplex;
+	//TODO: simplify/remove the friendship by adding/using a public setter to is_ortho
 
 	template<typename FPP>
 		class MatSparse<FPP,Cpu> : public Faust::MatGeneric<FPP,Cpu>
@@ -111,6 +113,8 @@ namespace Faust
 			friend Faust::GivensFGFTParallel<FPP,Cpu, double>;
 			friend Faust::GivensFGFT<FPP,Cpu, float>;
 			friend Faust::GivensFGFTParallel<FPP,Cpu, float>;
+			friend Faust::GivensFGFTComplex<FPP,Cpu, double>;
+			friend Faust::GivensFGFTComplex<FPP,Cpu, float>;
 			friend Faust::TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
 			friend void Faust::wht_factors<>(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 			friend class MatDense<FPP,Cpu>;

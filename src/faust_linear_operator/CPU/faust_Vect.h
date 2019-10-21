@@ -46,6 +46,8 @@
 #include <vector>
 #include <iterator>
 #include "faust_exception.h"
+#include <complex>
+#include <iostream>
 
 // modif AL
 //#include "faust_linear_algebra.h"
@@ -71,6 +73,12 @@
 //! \brief Faust namespace contains the principal class of the project.
 namespace Faust
 {
+
+	template<typename FPP>
+		FPP fabs(FPP c);
+
+	template<typename FPP>
+		FPP fabs(std::complex<FPP> c);
 
     template<typename FPP,Device DEVICE>
     class Vect;
@@ -145,8 +153,25 @@ template<typename FPP>
         FPP sum()const{return vec.sum();}
         FPP mean()const{return vec.mean();}
         FPP dot(const Vect<FPP,Cpu> & v)const;
-		FPP min_coeff() const {return vec.minCoeff();};
+//		FPP min_coeff() const {return vec.minCoeff();};
+		FPP min_coeff() const {int index; return this->min_coeff(&index);};
 		FPP min_coeff(int *index) const { int col_index; return vec.minCoeff(index, &col_index); }
+		FPP max_coeff(int *index) const {
+			FPP max = 0; //FPP(std::numeric_limits<double>::max());
+			FPP e;
+			*index = 0;
+			//			vec.getData()[i] = Eigen::abs(mat.row(i)).maxCoeff(col_indices+i);
+			for(int j=0;j<this->size(); j++)
+			{
+				e = getData()[j];
+				if(Faust::fabs(e) > Faust::fabs(max))
+				{
+					max = e;
+					*index = j;
+				}
+			}
+			return max;
+		}
 
         template<typename FPP1>
         void operator=(Vect<FPP1,Cpu> const& y);
