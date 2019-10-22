@@ -52,7 +52,7 @@ void Faust::MatGeneric<FPP,DEVICE>::setOp(const char op, faust_unsigned_int& nbR
         nbRowOp=getNbRow();
         nbColOp=getNbCol();
     }
-    else if(op == 'T')
+    else if(op == 'T' || op == 'H')
     {
         nbRowOp=getNbCol();
         nbColOp=getNbRow();

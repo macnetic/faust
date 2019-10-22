@@ -1405,9 +1405,6 @@ cdef class FaustFact:
         else: raise ValueError('order argument must be something among'
                                '\'ascend\', \'descend\' or \'undef\'')
 
-        if(not isReal):
-            raise TypeError('Matrix must be a real.')
-
         cdef unsigned int Lap_num_rows=Lap.shape[0]
         cdef unsigned int Lap_num_cols=Lap.shape[1]
 
@@ -1428,6 +1425,46 @@ cdef class FaustFact:
                                                                            int(order))
 
         core._isReal = True
+        #from scipy.sparse import spdiags
+        #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
+        #return core, D_spdiag
+        return core, D
+
+    @staticmethod
+    def fact_givens_fgft_cplx(Lap, J, t, verbosity=0, stoppingError = 0.0,
+                         errIsRel=True, order=1):
+        isReal = Lap.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+        # double == float64
+        check_matrix(isReal, Lap)
+
+        if(order == 'ascend'): order = 1
+        elif(order == 'descend'): order = -1
+        elif(order == 'undef'): order = 0
+        else: raise ValueError('order argument must be something among'
+                               '\'ascend\', \'descend\' or \'undef\'')
+
+        cdef unsigned int Lap_num_rows=Lap.shape[0]
+        cdef unsigned int Lap_num_cols=Lap.shape[1]
+
+        cdef complex[:,:] Lap_view
+        cdef complex[:] D_view
+
+        Lap_view = Lap
+        D = np.empty(Lap.shape[0], dtype=Lap.dtype)
+        D_view = D
+
+        core = FaustCore(core=True)
+        core.core_faust_cplx = FaustCoreCy.fact_givens_fgft_cplx[complex,double](&Lap_view[0,0],
+                                                                    Lap_num_rows,
+                                                                    Lap_num_cols, J, t,
+                                                                    &D_view[0], verbosity,
+                                                                    stoppingError,
+                                                                    errIsRel,
+                                                                    int(order))
+
+        core._isReal = False
         #from scipy.sparse import spdiags
         #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
         #return core, D_spdiag

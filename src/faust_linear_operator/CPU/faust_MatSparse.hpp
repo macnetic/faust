@@ -253,8 +253,10 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatSparse<FPP,Cpu> & M, char opT
 
 	if (opThis == 'N')
 		M.mat = this->mat * M.mat;
-	else
+	else if(opThis == 'T')
 		M.mat = this->mat.transpose() * M.mat;
+	else // if(opThis == 'H') 
+		M.mat = this->mat.conjugate().transpose() * M.mat;
 
 	M.dim1 = nbRowOpS;
 }

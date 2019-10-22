@@ -152,7 +152,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	int n = Lap.getNbRow();
 	FPP sin_theta2, cos_theta2;
 	FPP c_pp, c_pq, c_qp, c_qq;
-	FPP i = complex<FPP2>(0,1);
+	FPP i = complex<typename FPP::value_type>(0,1);
 	sin_theta2 = sin(theta2);
 	cos_theta2 = cos(theta2);
 	c_pp = - i * exp(-i*theta1) * sin_theta2;
@@ -187,17 +187,17 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	fact_mod_values.push_back(c_qq);
 	facts[ite] = MatSparse<FPP,DEVICE>(fact_mod_row_ids, fact_mod_col_ids, fact_mod_values, n, n);
 	facts[ite].set_orthogonal(true);
-//	MatSparse<FPP,DEVICE> test1(facts[ite]);
-//	MatSparse<FPP,DEVICE> test2(facts[ite]);
-//	test2.conjugate();
-//	test2.transpose();
-//	test1.multiply(test2, 'N');
-//	for(int j = 0; j < n; j++) {
-////		for(int k = 0; k < n; k++)
-//			cout << "ite=" << ite << "S*S'(" << j << "," << j << ")=" << test2(j,j) << endl;
-////			assert(Faust::abs(test2(j,j)-FPP(1,0)) < 1);
-//	}
 #ifdef DEBUG_GIVENS
+	MatSparse<FPP,DEVICE> test1(facts[ite]);
+	MatSparse<FPP,DEVICE> test2(facts[ite]);
+	test2.conjugate();
+	test2.transpose();
+	test1.multiply(test2, 'N');
+	for(int j = 0; j < n; j++) {
+//		for(int k = 0; k < n; k++)
+			cout << "ite=" << ite << "S*S'(" << j << "," << j << ")=" << test2(j,j) << endl;
+			assert(Faust::abs(test2(j,j)-FPP(1,0)) < .01);
+	}
 	cout << "GivensFGFTComplex::update_fact() ite: " << ite << " fact norm: " << facts[ite].norm() << endl;
 	facts[ite].Display();
 #endif
@@ -220,7 +220,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 	FPP c_qp = *(fact_mod_values.end()-2);
 	FPP c_pq = *(fact_mod_values.end()-3);
 	FPP c_pp = *(fact_mod_values.end()-4);
-	update_L_first(L_vec_p, L_vec_q, conj(c_pp), conj(c_pq), conj(c_qp), conj(c_qq), this->p, this->q, L);
+	update_L_first(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 	update_L_second(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 #endif
 #ifdef DEBUG_GIVENS
@@ -239,9 +239,12 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 	L.multiplyRight(facts[ite]);
 #else
 	Eigen::SparseMatrix<FPP,RowMajor> L_vec_p, L_vec_q;
-	FPP c = *(fact_mod_values.end()-1); // cos(theta)
-	FPP s = *(fact_mod_values.end()-2); // sin(theta)
-	update_L_first(L_vec_p, L_vec_q, c, s, this->p, this->q, L);
+	FPP c_qq = *(fact_mod_values.end()-1);
+	FPP c_qp = *(fact_mod_values.end()-2);
+	FPP c_pq = *(fact_mod_values.end()-3);
+	FPP c_pp = *(fact_mod_values.end()-4);
+
+	update_L_first(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 	L.update_dim();
 //	update_L_second(L_vec_p, L_vec_q, c, s, this->p, this->q, L);
 	L.multiplyRight(facts[ite]);
@@ -267,17 +270,17 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>&
 	L_vec_p = L.get_row(p), L_vec_q = L.get_row(q);
 	// L(p,:) = c*L(p,:) + s*L(q,:)
 	tmp = L_vec_p;
-	tmp *= c_pp;
+	tmp *= conj(c_pp);
 	tmp2 = L_vec_q;
-	tmp2 *= c_qp;
+	tmp2 *= conj(c_qp);
 	tmp += tmp2;
 	copy_vec2Lrow(tmp,p);
 
 	// L(q,:) = -s*L(p,:) + c*L(q,:)
 	tmp = L_vec_p;
-	tmp *= c_pq;
+	tmp *= conj(c_pq);
 	tmp2 = L_vec_q;
-	tmp2 *= c_qq;
+	tmp2 *= conj(c_qq);
 	tmp += tmp2;
 	copy_vec2Lrow(tmp, q);
 }
@@ -306,7 +309,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP,RowMajor > & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP& c, const FPP& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
+void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP,RowMajor > & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
 {
 	Eigen::SparseMatrix<FPP, RowMajor> tmp, tmp2;
 	/*========== L *= S */
@@ -315,23 +318,23 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP
 	L_vec_q = L.mat.block(0, q, L.getNbRow(), 1);
 	// L(:,p) = c*L(:,p) + s*L(:,q)
 	tmp = L_vec_p;
-	tmp *= c;
+	tmp *= c_pp;
 	tmp2 = L_vec_q;
-	tmp2 *= s;
+	tmp2 *= c_qp;
 	tmp += tmp2;
 	L.mat.col(p) = tmp;
 
 	// L(:,q) = -s*L(:,p) + c*L(:,q)
 	tmp = L_vec_p;
-	tmp *= -s;
+	tmp *= c_pq;
 	tmp2 = L_vec_q;
-	tmp2 *= c;
+	tmp2 *= c_qq;
 	tmp += tmp2;
 	L.mat.col(q) = tmp;
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP, RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP& c, const FPP& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
+void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP, RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
 {
 	Eigen::SparseMatrix<FPP, RowMajor> tmp, tmp2, tmp3;
 	/*========== L = S'*L */
@@ -340,18 +343,18 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP,
 //	L_vec_q = L.mat.block(q, 0, 1, L.getNbCol());
 	// L(p,:) = c*L(p,:) + s*L(q,:)
 	tmp = L_vec_p;
-	tmp *= c;
+	tmp *= c_pp;
 	tmp2 = L_vec_q;
-	tmp2 *= s;
+	tmp2 *= c_qp;
 	tmp += tmp2;
 	L.mat.innerVector(p) = tmp;
 	//
 	//
 	// L(q,:) = -s*L(p,:) + c*L(q,:)
 	tmp = L_vec_p;
-	tmp *= -s;
+	tmp *= c_pq;
 	tmp2 = L_vec_q;
-	tmp2 *= c;
+	tmp2 *= c_qq;
 	tmp += tmp2;
 	L.mat.innerVector(q) = tmp;
 }

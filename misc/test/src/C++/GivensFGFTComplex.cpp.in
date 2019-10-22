@@ -109,8 +109,10 @@ int main()
 	Faust::MatDense<complex<FPP>,Cpu> tmp = *ordered_fourier_diag;
 	tmp.multiplyRight(ordered_D);
 	ordered_fourier_diag->transpose();
+	ordered_fourier_diag->conjugate();
 	tmp.multiplyRight(*ordered_fourier_diag);
 	ordered_fourier_diag->transpose();
+	ordered_fourier_diag->conjugate();
 	tmp -= Lap;
 	cout << "Error relatively to the Laplacian: " << endl;
 	cout << tmp.norm()/Lap.norm() << endl;
@@ -119,7 +121,7 @@ int main()
 	Faust::Transform<complex<FPP>,Cpu> t = std::move(algo.get_transform(true));
 	Faust::MatDense<complex<FPP>,Cpu> P = t.multiply(ordered_D);//t.get_product();
 //	P.multiplyRight(ordered_D);
-	P.multiplyRight(t.get_product('T'));
+	P.multiplyRight(t.get_product('T', true /* isConj */));
 	P -= Lap;
 	cout << "Error relatively to the Laplacian: (computed from Transform object)" << endl;
 	cout << P.norm()/Lap.norm() << endl;

@@ -191,16 +191,31 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
     nGivens_per_fac = max(nGivens_per_fac, 1)
     nGivens_per_fac = min(nGivens_per_fac, maxiter)
     if(isinstance(Lap, np.ndarray)):
-        core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft(Lap, maxiter, nGivens_per_fac,
-                                                             verbosity, tol,
-                                                             relerr, order)
+        if(Lap.dtype in [ 'float', 'float128',
+                         'float16', 'float32',
+                         'float64', 'double']):
+            core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft(Lap, maxiter, nGivens_per_fac,
+                                                                 verbosity, tol,
+                                                                 relerr, order)
+        else: #complex
+            core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_cplx(Lap, maxiter, nGivens_per_fac,
+                                                                 verbosity, tol,
+                                                                 relerr, order)
+
     elif(isinstance(Lap, csr_matrix)):
-        core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_sparse(Lap, maxiter,
-                                                                    nGivens_per_fac,
-                                                                    verbosity,
-                                                                    tol,
-                                                                    relerr,
-                                                                    order)
+        if(Lap.dtype in [ 'float', 'float128',
+                         'float16', 'float32',
+                         'float64', 'double']):
+            core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_sparse(Lap, maxiter,
+                                                                        nGivens_per_fac,
+                                                                        verbosity,
+                                                                        tol,
+                                                                        relerr,
+                                                                        order)
+        else: #complex
+            core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_sparse_cplx(Lap, maxiter, nGivens_per_fac,
+                                                                 verbosity, tol,
+                                                                 relerr, order)
     else:
         raise TypeError("The matrix to diagonalize must be a"
                         " scipy.sparse.csr_matrix or a numpy array.")
