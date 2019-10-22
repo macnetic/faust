@@ -170,13 +170,13 @@ namespace Faust {
 				 * Computes the first S'*L (only used by update_L() in optimization enabled code).
 				 *
 				 */
-				void update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP& c, const FPP& s, int p, int q, MatDense<FPP,DEVICE> & L);
+				void update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, MatDense<FPP,DEVICE> & L);
 
 				/**
 				 * Computes L*S (only used by update_L() in optimization enabled code).
 				 * Must be called after update_L_first() to finish the update of L = S'*L*S.
 				 */
-				void update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP& c, const FPP& s, int p, int q, MatDense<FPP,DEVICE> & L);
+				void update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, MatDense<FPP,DEVICE> & L);
 
 				void update_L_first(Eigen::SparseMatrix<FPP, RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP& c, const FPP& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L);
 				void update_L_second(Eigen::SparseMatrix<FPP, RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP& c, const FPP& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L);

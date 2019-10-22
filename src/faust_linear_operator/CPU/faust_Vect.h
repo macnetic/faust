@@ -157,7 +157,7 @@ template<typename FPP>
 		FPP min_coeff() const {int index; return this->min_coeff(&index);};
 		FPP min_coeff(int *index) const { int col_index; return vec.minCoeff(index, &col_index); }
 		FPP max_coeff(int *index) const {
-			FPP max = 0; //FPP(std::numeric_limits<double>::max());
+			FPP max = getData()[0]; //FPP(std::numeric_limits<double>::max());
 			FPP e;
 			*index = 0;
 			//			vec.getData()[i] = Eigen::abs(mat.row(i)).maxCoeff(col_indices+i);

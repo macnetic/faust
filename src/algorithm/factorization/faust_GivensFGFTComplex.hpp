@@ -187,16 +187,16 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	fact_mod_values.push_back(c_qq);
 	facts[ite] = MatSparse<FPP,DEVICE>(fact_mod_row_ids, fact_mod_col_ids, fact_mod_values, n, n);
 	facts[ite].set_orthogonal(true);
-	MatSparse<FPP,DEVICE> test1(facts[ite]);
-	MatSparse<FPP,DEVICE> test2(facts[ite]);
-	test2.conjugate();
-	test2.transpose();
-	test1.multiply(test2, 'N');
-	for(int j = 0; j < n; j++) {
-//		for(int k = 0; k < n; k++)
-			cout << "ite=" << ite << "S*S'(" << j << "," << j << ")=" << test2(j,j) << endl;
-//			assert(Faust::abs(test2(j,j)-FPP(1,0)) < 1);
-	}
+//	MatSparse<FPP,DEVICE> test1(facts[ite]);
+//	MatSparse<FPP,DEVICE> test2(facts[ite]);
+//	test2.conjugate();
+//	test2.transpose();
+//	test1.multiply(test2, 'N');
+//	for(int j = 0; j < n; j++) {
+////		for(int k = 0; k < n; k++)
+//			cout << "ite=" << ite << "S*S'(" << j << "," << j << ")=" << test2(j,j) << endl;
+////			assert(Faust::abs(test2(j,j)-FPP(1,0)) < 1);
+//	}
 #ifdef DEBUG_GIVENS
 	cout << "GivensFGFTComplex::update_fact() ite: " << ite << " fact norm: " << facts[ite].norm() << endl;
 	facts[ite].Display();
@@ -212,14 +212,16 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 #endif
 #define OPT_UPDATE_L
 #ifndef OPT_UPDATE_L
-	facts[ite].multiply(L, 'T');
+	facts[ite].multiply(L, 'H');
 	L.multiplyRight(facts[ite]);
 #else
 	Faust::Vect<FPP,DEVICE> L_vec_p, L_vec_q;
-	FPP c = *(fact_mod_values.end()-1); // cos(theta)
-	FPP s = *(fact_mod_values.end()-2); // sin(theta)
-	update_L_first(L_vec_p, L_vec_q, c, s, this->p, this->q, L);
-	update_L_second(L_vec_p, L_vec_q, c, s, this->p, this->q, L);
+	FPP c_qq = *(fact_mod_values.end()-1);
+	FPP c_qp = *(fact_mod_values.end()-2);
+	FPP c_pq = *(fact_mod_values.end()-3);
+	FPP c_pp = *(fact_mod_values.end()-4);
+	update_L_first(L_vec_p, L_vec_q, conj(c_pp), conj(c_pq), conj(c_qp), conj(c_qq), this->p, this->q, L);
+	update_L_second(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 #endif
 #ifdef DEBUG_GIVENS
 	cout << "L(p,q) after update_L():" << L(p,q) << endl;
@@ -233,7 +235,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 #undef OPT_UPDATE_SPARSE_L
 #ifndef OPT_UPDATE_SPARSE_L
 	// L = S'*L*S
-	facts[ite].multiply(L, 'T');
+	facts[ite].multiply(L, 'H');
 	L.multiplyRight(facts[ite]);
 #else
 	Eigen::SparseMatrix<FPP,RowMajor> L_vec_p, L_vec_q;
@@ -255,7 +257,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP& c, const FPP& s, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
+void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
 {
 #define copy_vec2Lrow(vec,rowi) \
 	for(int i=0;i<L.getNbCol();i++) L.getData()[L.getNbRow()*i+rowi] = tmp[i]
@@ -265,40 +267,40 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>&
 	L_vec_p = L.get_row(p), L_vec_q = L.get_row(q);
 	// L(p,:) = c*L(p,:) + s*L(q,:)
 	tmp = L_vec_p;
-	tmp *= c;
+	tmp *= c_pp;
 	tmp2 = L_vec_q;
-	tmp2 *= s;
+	tmp2 *= c_qp;
 	tmp += tmp2;
 	copy_vec2Lrow(tmp,p);
 
 	// L(q,:) = -s*L(p,:) + c*L(q,:)
 	tmp = L_vec_p;
-	tmp *= -s;
+	tmp *= c_pq;
 	tmp2 = L_vec_q;
-	tmp2 *= c;
+	tmp2 *= c_qq;
 	tmp += tmp2;
 	copy_vec2Lrow(tmp, q);
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP& c, const FPP& s, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
+void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
 {
 	Faust::Vect<FPP,DEVICE> tmp, tmp2;
 	/*========== L *= S */
 	L_vec_p = L.get_col(p), L_vec_q = L.get_col(q);
 	// L(:,p) = c*L(:,p) + s*L(:,q)
 	tmp = L_vec_p;
-	tmp *= c;
+	tmp *= c_pp;
 	tmp2 = L_vec_q;
-	tmp2 *= s;
+	tmp2 *= c_qp;
 	tmp += tmp2;
 
 	memcpy(L.getData()+L.getNbRow()*p, tmp.getData(), sizeof(FPP)*L.getNbRow());
 	// L(:,q) = -s*L(:,p) + c*L(:,q)
 	tmp = L_vec_p;
-	tmp *= -s;
+	tmp *= c_pq;
 	tmp2 = L_vec_q;
-	tmp2 *= c;
+	tmp2 *= c_qq;
 	tmp += tmp2;
 	memcpy(L.getData()+L.getNbRow()*q, tmp.getData(), sizeof(FPP)*L.getNbRow());
 }
