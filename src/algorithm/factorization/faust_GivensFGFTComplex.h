@@ -87,9 +87,6 @@ namespace Faust {
 					 */
 					unsigned int ite;
 
-				/** \brief In calc_theta() two values are calculated for theta, this boolean is set to true to always choose theta2 (useful for GivensFGFTComplexParallel). */
-				bool always_theta2;
-
 				bool stoppingCritIsError;
 				double stoppingError;
 				bool errIsRel;

@@ -2,6 +2,7 @@
 #include "faust_GivensFGFTParallel.h"
 #include "faust_GivensFGFT.h"
 #include "faust_GivensFGFTComplex.h"
+#include "faust_GivensFGFTParallelComplex.h"
 using namespace Faust;
 
 template<typename FPP, typename FPP2>
@@ -71,8 +72,7 @@ FaustCoreCpp<FPP>* fact_givens_fgft_sparse_cplx(FPP* data, int* row_ptr, int* id
       }
       else
       {
-//          algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel);
-          return nullptr;
+          algo = new GivensFGFTParallelComplex<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel);
       }
       return fact_givens_fgft_generic_cplx(algo, D, order);
 }
@@ -91,8 +91,7 @@ FaustCoreCpp<FPP>* fact_givens_fgft_cplx(const FPP* Lap, unsigned int num_rows, 
     }
     else
     {
-//        algo = new GivensFGFTParallel<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel);
-        return nullptr;
+        algo = new GivensFGFTParallelComplex<FPP, Cpu, FPP2>(mat_Lap, (int)J, (int) t, verbosity, stoppingError, errIsRel);
     }
     return fact_givens_fgft_generic_cplx(algo, D, order);
 }
