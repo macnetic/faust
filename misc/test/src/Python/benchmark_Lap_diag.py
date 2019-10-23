@@ -5,6 +5,7 @@ from numpy import diag, copy, log2, count_nonzero, size, loadtxt, savetxt
 import numpy, re
 from numpy.linalg import norm
 from pyfaust.factparams import *
+from pyfaust.fact import *
 from pyfaust import *
 from pylab import *
 from time import clock
@@ -79,7 +80,7 @@ if __name__ == '__main__':
                                         is_fact_side_left=False)
 
         t = clock()
-        F = FaustFactory.fact_hierarchical(U,params)
+        F = hierarchical(U,params)
         hier_palm_times[i] = clock()-t
         complexity_global = F.nnz_sum()
         rc_palm = complexity_global / count_nonzero(U)
@@ -87,7 +88,7 @@ if __name__ == '__main__':
         diag_init_D = diag(D)
         diag_init_D = numpy.copy(diag_init_D)
         t = clock()
-        F, Dhat = FaustFactory.fgft_palm(U, Lap,
+        F, Dhat = fgft_palm(U, Lap,
                                                       params,
                                                       diag_init_D)
         t = clock()-t
@@ -102,25 +103,25 @@ if __name__ == '__main__':
         #J = round(nfacts*(dim/2))
         J = round(complexity_global/4)
         t = clock()
-        F, Dhat = FaustFactory.fgft_givens(Lap, J, 0)
+        Dhat, F = fgft_givens(Lap, J, nGivens_per_fac=0)
         t = clock()-t
         givens_times[i] = t
 
-        givens_err = norm((F*Dhat.todense())*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
+        givens_err = norm((F*diag(Dhat))*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
         givens_errs[i] = givens_err
         U_givens_errs[i] = (F-U).norm("fro")/norm(U,"fro")
 
         t = clock()
-        F, Dhat = FaustFactory.fgft_givens(Lap, J, int(dim/2))
+        Dhat, F = fgft_givens(Lap, J, nGivens_per_fac=int(dim/2))
         t = clock()-t
         par_givens_times[i] = t
         print("J=", J)
         print("nnz_sum FGFT givens parallel=", F.nnz_sum(), "num of facts:",
               F.numfactors())
-        par_givens_err = norm((F*Dhat.todense())*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
+        par_givens_err = norm(F*diag(Dhat)*F.T.todense()-Lap,'fro')/norm(Lap,'fro')
         par_givens_errs[i] = par_givens_err
         U_par_givens_errs[i] = (F-U).norm("fro")/norm(U,"fro")
-        print("err:", norm(Lap @ F.toarray() - F.toarray()@Dhat)/norm(Lap))
+        print("err:", norm(Lap @ F.toarray() - F.toarray()@diag(Dhat))/norm(Lap))
 
 
 
