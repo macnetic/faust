@@ -183,7 +183,7 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
         eigtj, fgft_palm
     """
     if(nGivens_per_fac == None): nGivens_per_fac = int(Lap.shape[0]/2)
-    if((isinstance(Lap, np.ndarray) and (Lap.T != Lap).any()) or Lap.shape[0] != Lap.shape[1]):
+    if((isinstance(Lap, np.ndarray) and (np.matrix(Lap).H != Lap).any()) or Lap.shape[0] != Lap.shape[1]):
         raise ValueError(" the matrix/array must be square and should be symmetric.")
     if(not isinstance(maxiter, int)): raise TypeError("maxiter must be a int")
     if(maxiter < 1): raise ValueError("maxiter must be >= 1")

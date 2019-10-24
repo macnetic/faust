@@ -15,7 +15,7 @@
 %> &nbsp;&nbsp;&nbsp; @b eigtj(M, J, 'nGivens_per_fac', t, 'tol', 0.01, 'relerr', true) Uses a stopping criterion based on relative squared error norm(V*D*V'-M, 'fro')^2/norm(M, 'fro')^2. This criterion is concurrent to maxiter (here J).<br/>
 %> &nbsp;&nbsp;&nbsp; @b eigtj(M, J, 'nGivens_per_fac', t, 'tol', 0.01, 'relerr', true) Uses a stopping criterion based on absolute squared error norm(V*D*V'-M, 'fro')^2. This criterion is concurrent to maxiter (here J).<br/>
 %>
-%> @param M the matrix to diagonalize. Must be real and symmetric.
+%> @param M the matrix to diagonalize. Must be real and symmetric or hermitian.
 %> @param maxiter defines the number of Givens rotations that are computed in eigenvector transform V. The number of rotations per factor of V is defined by nGivens_per_fac.
 %> @param 'nGivens_per_fac', integer the number of Givens rotations per factor of V, must be an integer between 1 to floor(size(M, 1)/2) which is the default value.
 %> @param 'tol', number (optional) the tolerance error under what the algorithm stops. By default, it's zero for not stopping on error criterion.

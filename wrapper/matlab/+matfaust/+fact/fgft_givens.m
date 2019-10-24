@@ -5,7 +5,7 @@
 %> @b Usage
 %>  &nbsp;&nbsp;&nbsp; @b See fact.eigtj
 %>
-%> @param Lap the Laplacian matrix (which is symmetric).
+%> @param Lap the Laplacian matrix (which is symmetric or hermitian).
 %> @param maxiter see fact.eigtj
 %> @param 'nGivens_per_fac', integer see fact.eigtj
 %> @param 'tol', number see fact.eigtj
