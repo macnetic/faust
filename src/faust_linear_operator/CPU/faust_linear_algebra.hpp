@@ -361,7 +361,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 
 #ifdef __GEMM_WITH_OPENBLAS__
 	if(typeA == 'H' || typeB == 'H')
-		handleError("linear_algebra", " gemm: Hermitian matrix is not yet handled with BLAS.");
+		handleError("linear_algebra", " gemm: complex adjoint matrix is not yet handled with BLAS.");
 #endif
 	faust_unsigned_int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
 

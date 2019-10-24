@@ -1469,3 +1469,43 @@ cdef class FaustFact:
         #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
         #return core, D_spdiag
         return core, D
+
+    @staticmethod
+    def fact_givens_fgft_sparse_cplx(Lap, J, t, verbosity=0, stoppingError = 0.0,
+                                errIsRel=True, order='ascend'):
+        from scipy.sparse import spdiags
+        cdef complex[:] data1d #only for csr mat factor
+        cdef int [:] indices # only for csr mat
+        cdef int [:] indptr # only for csr mat
+        cdef unsigned int Lap_num_rows=Lap.shape[0]
+        cdef unsigned int Lap_num_cols=Lap.shape[1]
+        cdef complex[:] D_view
+
+        if(order == 'ascend'): order = 1
+        elif(order == 'descend'): order = -1
+        elif(order == 'undef'): order = 0
+
+        data1d=Lap.data.astype(complex,'F')
+        indices=Lap.indices.astype(np.int32, 'F')
+        indptr=Lap.indptr.astype(np.int32, 'F')
+
+        D = np.empty(Lap.shape[0], dtype=Lap.dtype)
+        D_view = D
+
+        core = FaustCore(core=True)
+        core.core_faust_cplx = FaustCoreCy.fact_givens_fgft_sparse_cplx[complex, double](&data1d[0],
+                                                                   &indices[0],
+                                                                   &indptr[0],
+                                                                   Lap.nnz,
+                                                                   Lap_num_rows,
+                                                                   Lap_num_cols, J, t,
+                                                                   &D_view[0],
+                                                                   verbosity,
+                                                                   stoppingError,
+                                                                   errIsRel,
+                                                                   int(order))
+
+        core._isReal = False
+        #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
+        #return core, D_spdiag
+        return core, D

@@ -160,7 +160,7 @@ void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, un
 	Faust::GivensFGFTComplex<complex<SCALAR>, Cpu, FPP2>* algo;
 
 	try{
-/*		if (mxIsSparse(matlab_matrix))
+		if (mxIsSparse(matlab_matrix))
 		{
 			mxArray2FaustspMat(matlab_matrix,sLap);
 			Lap = &sLap;
@@ -168,17 +168,17 @@ void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, un
 			if(t <= 1)
 				algo = new GivensFGFTComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, verbosity, tol, relErr);
 			else
-				algo = new GivensFGFTParallel<complex<SCALAR>,Cpu,FPP2>(sLap, J, t, verbosity, tol, relErr);
+				algo = new GivensFGFTParallelComplex<complex<SCALAR>,Cpu,FPP2>(sLap, J, t, verbosity, tol, relErr);
 
 		}else
-		{*/
+		{
 			mxArray2FaustMat(matlab_matrix,dLap);
 			Lap = &dLap;
 			if(t <= 1)
 				algo = new GivensFGFTComplex<complex<SCALAR>,Cpu,FPP2>(dLap, J, verbosity, tol, relErr);
 			else
 				algo = new GivensFGFTParallelComplex<complex<SCALAR>,Cpu,FPP2>(dLap, J, t, verbosity, tol, relErr);
-		//}
+		}
 
 
 
