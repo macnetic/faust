@@ -5,7 +5,7 @@
 %> @b Usage
 %>  &nbsp;&nbsp;&nbsp; @b See fact.eigtj
 %>
-%> @param Lap the Laplacian matrix as a numpy array. Must be real and symmetric.
+%> @param Lap the Laplacian matrix (which is symmetric).
 %> @param maxiter see fact.eigtj
 %> @param 'nGivens_per_fac', integer see fact.eigtj
 %> @param 'tol', number see fact.eigtj
@@ -32,9 +32,9 @@ function [FGFT,D] = fgft_givens(Lap, maxiter, varargin)
 	import matfaust.Faust
 	nGivens_per_fac = 1; % default value
 	verbosity = 0; % default value
-	if(~ ismatrix(Lap) || ~ isreal(Lap))
-		error('Lap must be a real matrix.')
-	end
+%	if(~ ismatrix(Lap) || ~ isreal(Lap))
+%		error('Lap must be a real matrix.')
+%	end
 	if(size(Lap,1) ~= size(Lap,2))
 		error('Lap must be square')
 	end
@@ -98,5 +98,5 @@ function [FGFT,D] = fgft_givens(Lap, maxiter, varargin)
 	end
 	[core_obj, D] = mexfgftgivensReal(Lap, maxiter, nGivens_per_fac, verbosity, tol, relerr, order);
 	D = sparse(diag(D));
-	FGFT = Faust(core_obj, true);
+	FGFT = Faust(core_obj, isreal(Lap));
 end
