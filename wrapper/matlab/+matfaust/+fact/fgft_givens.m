@@ -97,6 +97,6 @@ function [FGFT,D] = fgft_givens(Lap, maxiter, varargin)
 		end
 	end
 	[core_obj, D] = mexfgftgivensReal(Lap, maxiter, nGivens_per_fac, verbosity, tol, relerr, order);
-	D = sparse(diag(D));
+	D = sparse(diag(real(D)));
 	FGFT = Faust(core_obj, isreal(Lap));
 end

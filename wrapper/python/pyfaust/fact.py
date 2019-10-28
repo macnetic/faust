@@ -219,7 +219,7 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
     else:
         raise TypeError("The matrix to diagonalize must be a"
                         " scipy.sparse.csr_matrix or a numpy array.")
-    return D, Faust(core_obj=core_obj)
+    return D.astype(np.float), Faust(core_obj=core_obj)
 
 def _check_fact_mat(funcname, M):
     if(not isinstance(M, np.ndarray)):
