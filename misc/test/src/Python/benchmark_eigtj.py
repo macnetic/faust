@@ -17,6 +17,7 @@ from scipy.io import savemat
 #sys.path.append(sys.environ['HOME']+'/givens-factorization') # TODO: output arg
 #from util import symmetrized_norm
 from lapsolver import solve_dense
+import math
 
 graph_ctors = [ erdosrenyi.ErdosRenyi, community.Community, path.Path,
                sensor.Sensor, randomring.RandomRing, ring.Ring ]
@@ -51,19 +52,26 @@ PARGIVENS_REAL_SPARSE = 5
 PARGIVENS_REAL_AS_CPLX = 6
 PARGIVENS_REAL_AS_CPLX_SPARSE = 7
 
+GIVENS_HERMIT = 8
+GIVENS_HERMIT_SPARSE = 9
+PARGIVENS_HERMIT = 10
+PARGIVENS_HERMIT_SPARSE = 11
+
 algo_str = [ 'Givens (real dense)', 'Givens (real sparse)'
             , 'Givens (cplx dense)',  'Givens (cplx sparse)']
 algo_str += [ 'Givens //(real dense)', 'Givens //(real sparse)'
-            , 'Givens //(cplx dense)',  'Givens //(cplx sparse)']
+            , 'Givens //(cplx dense)',  'Givens //(cplx sparse)' ]
 
-all_data = empty((len(graph_ctors), 4, 8, nruns), dtype=np.float) # arg 4 is
+algo_str += [ 'Givens (hermit. dense)', 'Givens (hermit. sparse)',
+             'Givens // (hermit. dense)', 'Givens // (hermit. sparse)' ]
+
+all_data = empty((len(graph_ctors), 4, len(algo_str), nruns), dtype=np.float) # arg 4 is
                                                                   # for type of
                                                                   # data:
                                                                       # times,
                                                                       # fourier_errs,
                                                                       # lap_errs,
                                                                       # D err
-                                                                  # arg 8 is for algos used
 
 
 #times = all_data[:, : ,TIME_ID, :]
@@ -92,10 +100,10 @@ def compute_cost_matrix(U, V):
             diff2 = U[:,i] - V[:,j]
             diff1 *= diff1
             diff2 *= diff2
-            C[i,[j,j*2]] = np.sum(diff1), np.sum(diff2)
+            C[i,[j,d+j]] = np.sum(abs(diff1)), np.sum(abs(diff2))
     return C
 
-def symmetrized_norm(U, V): 
+def symmetrized_norm(U, V):
     C = compute_cost_matrix(U, V)
     row_idx, col_idx = solve_dense(C)
     #print("linear sum prob sol:", row_idx, col_idx)
@@ -111,12 +119,13 @@ def best_permutation(U, V, D):
     for i,j in enumerate(col_idx):
         if(j >= U.shape[0]):
             j = j%U.shape[0]
-            pV[i] = -V[:,j]
-            pD[i] = D[j]
-        else:
             pV[:,i] = V[:,j]
             pD[i] = D[j]
+        else:
+            pV[:,i] = -V[:,j]
+            pD[i] = pD[j]
     return pD, pV
+
 
 def permu_near_id(U):
     I = [ i for i in range(0,U.shape[1]) ]
@@ -126,6 +135,22 @@ def permu_near_id(U):
         I.remove(J[-1])
     return U[:,J]
 
+
+def hermitian_from_lap(Lap):
+    """
+    builds an hermitian matrix from the real Laplacian
+    by multiplying nonzero coeffs by a random phase
+    """
+    H = Lap.astype(np.complex)
+    for r in range(0,Lap.shape[0]):
+        for c in range(0,r+1):
+            if(Lap[r,c] != 0):
+                theta = np.random.rand()*math.pi*2
+                H[r,c] = Lap[r,c]*np.exp(theta*np.complex(0,1))
+    H = np.tril(H) + np.tril(H).conj().T
+    assert((H.conj().T == H).all())
+    assert((H.imag != 0).any())
+    return H
 
 for j in range(old_nruns,nruns):
     print("================= #run:", j)
@@ -162,8 +187,8 @@ for j in range(old_nruns,nruns):
                 Lapa = csr_matrix(Lapa)
             t = clock()
             Dhat, F = pyfaust.fact.eigtj(Lapa, J, nGivens_per_fac=0)
-            Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
             t = clock()-t
+            Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
             all_data[i,D_ERR_ID,a, j] = norm(D-Dhat)/norm(D)
             Dhat = spdiags(Dhat, [0], Lapa.shape[0], Lapa.shape[0])
             all_data[i,TIME_ID,a,j] = t
@@ -214,34 +239,103 @@ for j in range(old_nruns,nruns):
             print("fourier err:",  all_data[i,FOURIER_ERR_ID,a,j])
             print("fourier err2:",
                   norm(permu_near_id(Fa.T.conj()@U)-np.eye(*(U.shape)))/norm(np.eye(*(U.shape))))
-
             #print("errs Uhat permuted, Uhat:", symmetrized_norm(U, Fa)/norm(U,'fro'),
             #     norm(U-Fa, 'fro')/norm(U,'fro'))
             #all_data[i,FOURIER_ERR_ID,a, j] = norm(U-Fa,'fro')/norm(U,'fro')
             print("err:", norm(Lap @ F.toarray() - F.toarray()@Dhat)/norm(Lap))
+
+        H = hermitian_from_lap(Lap)
+        D, U = eigh(H)
+        # benchmark truncated jacobi cplx algo on it
+        for a in range(8, 12):
+            if(a < 10):
+                print("Running truncated jacobi on a hermitian matrix"
+                      " (deduced from Laplacian)")
+                nGivens_per_fac=0
+            else:
+                print("Running parallel truncated jacobi on a hermitian"
+                      " matrix (deduced from Laplacian)")
+                nGivens_per_fac=H.shape[0]//2
+            print(algo_str[a])
+            if(a in [GIVENS_HERMIT_SPARSE, PARGIVENS_HERMIT_SPARSE]):
+                H = csr_matrix(H)
+            J = round(dim_size*(dim_size-1)/2)
+            t = clock()
+            Dhat, F = pyfaust.fact.eigtj(H, J,
+                                         nGivens_per_fac=nGivens_per_fac)
+            t = clock()-t
+            Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
+            D_err1 = norm(D-Dhat)/norm(D)
+            D_err2 = norm(D-Dhata)/norm(D)
+            print('D_err1, D_err2:', D_err1, D_err2)
+            all_data[i,D_ERR_ID,a, j] = D_err1
+            print("Greatest/Last eigenvalues of Dhat, Dhata, and D:", Dhat[-1],
+                  Dhata[-1], D[-1])
+            Dhat = spdiags(Dhat, [0], H.shape[0], H.shape[0])
+            all_data[i,TIME_ID,a,j] = t
+
+            if(a in [GIVENS_HERMIT_SPARSE, PARGIVENS_HERMIT_SPARSE]):
+                H = H.todense()
+            givens_err = \
+            norm(Fa@diag(Dhata)@Fa.T.conj()-H,'fro')/norm(H,'fro')
+            givens_err2 = \
+            norm(F@Dhat.todense()@F.toarray().T.conj()-H,'fro')/norm(H,'fro')
+            all_data[i,LAP_ERR_ID,a,j] = min(givens_err, givens_err2)
+            print("lap err:", givens_err, givens_err2)
+            all_data[i,FOURIER_ERR_ID,a,j] = symmetrized_norm(U, F.toarray())/norm(U,'fro')
+            print("fourier err:",  all_data[i,FOURIER_ERR_ID,a,j])
+            print("fourier err2:",
+                  norm(permu_near_id(Fa.T.conj()@U)-np.eye(*(U.shape)))/norm(np.eye(*(U.shape))))
+            #print("errs Uhat permuted, Uhat:", symmetrized_norm(U, Fa)/norm(U,'fro'),
+            #     norm(U-Fa, 'fro')/norm(U,'fro'))
+            #all_data[i,FOURIER_ERR_ID,a, j] = norm(U-Fa,'fro')/norm(U,'fro')
+            print("err:", norm(H @ F.toarray() - F.toarray()@Dhat)/norm(H))
+
 
         savez(data_file, all_data[:,:,:,:j+1])
         i += 1
 
 plt.rcParams['figure.figsize'] = [12.0, 8]
 for j in range(0,4): # j : index for type of data
-    for a in range(0,2):
-        f, axes = plt.subplots(1, len(algo_str)//2, sharey=True)
+    for a in range(0,2): # a == 0 (Givens), a == 1 (Givens //)
+        nsubplots = 4
+        f, axes = plt.subplots(1, nsubplots, sharey=True)
         plt.suptitle("pyfaust eigtj benchmark on "+data_type_str[j]+"\n"+str(nruns)+" runs "
                      "(Laplacian size: "+str(dim_size)+'^2)'
                      ' J='+str(round(dim_size*(dim_size-1)/2)), size=14)
-        for i in range(0,len(algo_str)//2): # i : index for type of algo
+        for i in range(0,nsubplots): # i : index for type of algo
             # k is for type of graph
             # plt.figure()
-            axes[i].set_title("Algo: "+ algo_str[i+a*len(algo_str)//2])
+            axes[i].set_title("Algo: "+ algo_str[i+a*nsubplots])
             if(j == TIME_ID):
                 axes[i].semilogy()
-            axes[i].boxplot([all_data[k,j,i+a*len(algo_str)//2, :] for k in
+            axes[i].boxplot([all_data[k,j,i+a*nsubplots, :] for k in
                              range(0,len(graph_ctors))],showfliers=True)
             axes[i].set_xticklabels(list(graph_names[:]), rotation='vertical')
 
         axes[0].set_ylabel(data_type_str[j])
         plt.savefig('pyfaust_eigtj_benchmark-'+data_type_str[j]+'-'+str(a)+'.png')
+
+    # plots results for GIVENS_HERMIT, GIVENS_HERMIT_SPARSE, PARGIVENS_HERMIT,
+    # PARGIVENS_HERMIT_SPARSE
+    nsubplots = 4
+    f, axes = plt.subplots(1, nsubplots, sharey=True)
+    plt.suptitle("pyfaust eigtj benchmark on "+data_type_str[j]+"\n"+str(nruns)+" runs "
+                 "(Laplacian size: "+str(dim_size)+'^2)'
+                 ' J='+str(round(dim_size*(dim_size-1)/2)), size=14)
+    for i in range(0,nsubplots): # i : offset for type of algo
+        # k is for type of graph
+        # plt.figure()
+        axes[i].set_title("Algo: "+ algo_str[8+i])
+        if(j == TIME_ID):
+            axes[i].semilogy()
+        axes[i].boxplot([all_data[k,j,8+i, :] for k in
+                         range(0,len(graph_ctors))],showfliers=True)
+        axes[i].set_xticklabels(list(graph_names[:]), rotation='vertical')
+
+    axes[0].set_ylabel(data_type_str[j])
+    plt.savefig('pyfaust_eigtj_benchmark-'+data_type_str[j]+'-'+str(2)+'.png')
+
 plt.show(block=True)
 
 
