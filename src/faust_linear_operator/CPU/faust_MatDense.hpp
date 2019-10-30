@@ -752,6 +752,7 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatDense<FPP1,Cpu> const& A)
 	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatSparse<FPP,Cpu> const& S)
 {
+	const_cast<Faust::MatSparse<FPP,Cpu>&>(S).update_dim();
 	S.check_dim_validity();
 	try {
 	resize(S.getNbRow(),S.getNbCol());
@@ -1111,11 +1112,12 @@ Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::rowwise_max(int* col_indices) con
 	Faust::Vect<FPP,Cpu> vec(this->getNbRow());
 	for(int i=0;i<this->getNbRow();i++)
 	{
-		FPP max = FPP(std::numeric_limits<double>::min()), e;
+//		FPP max = FPP(std::numeric_limits<double>::min()) /* contrary to gcc and clang Visual Studio is not happy with that line: error C2589: '(': illegal token on right side of '::' */, e;
+		FPP max, e;
 		for(int j=0;j<this->getNbCol();j++)
 		{
 			e = getData()[j*this->getNbRow()+i];
-			if(Faust::fabs(e) > Faust::fabs(max)) 
+			if(j == 0 || Faust::fabs(e) > Faust::fabs(max))
 			{
 				max = e;
 				if(col_indices != nullptr) col_indices[i] = j;
