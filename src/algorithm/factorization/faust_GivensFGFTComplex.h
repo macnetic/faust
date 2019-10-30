@@ -16,7 +16,7 @@ namespace Faust {
 			/**
 			 * \class Faust::GivensFGFTComplex
 			 *
-			 * \brief This class implements the Givens FGFT algorithm.
+			 * \brief This class implements the Givens FGFT algorithm (Truncated Jacobi algorithm) for the complex matrix case (ideal case being the Hermitian matrix case).
 			 * This algorithm is based on the classical Jacobi eigenvalues algorithm.
 			 *
 			 *  References:
@@ -27,6 +27,9 @@ namespace Faust {
 			 *    over Networks.
 			 *    <https://hal.inria.fr/hal-01416110>
 			 *
+			 *    For the complex version of the algorithm, see generalization here:
+			 *    https://en.wikipedia.org/wiki/Jacobi_method_for_complex_Hermitian_matrices
+			 *
 			 */
 			/** \brief Temporary storage matrix for maximization of L. */
 			Faust::MatDense<FPP,DEVICE> C;
@@ -36,7 +39,7 @@ namespace Faust {
 			int* q_candidates;  /* default IndexType for underlying eigen matrix is int. */
 			protected:
 				const static unsigned int ERROR_CALC_PERIOD = 100;
-				/** \brief Fourier matrix factorization matrices (Givens matrix). */
+				/** \brief Fourier matrix/eigenvectors factorization matrices (Givens matrix). */
 				vector<Faust::MatSparse<FPP,DEVICE>> facts;
 				/** \brief Diagonalization approximate of Laplacian. */
 				Faust::Vect<FPP,DEVICE> D;

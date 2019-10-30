@@ -93,7 +93,10 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
     parameters maxiter and nGivens_per_fac.
 
     Args:
-        M: (numpy.ndarray) the matrix to diagonalize. Must be real and symmetric.
+        M: (numpy.ndarray or csr_matrix) the matrix to diagonalize. Must be
+        real and symmetric or hermitian if complex. Be warn that the sparse or
+        dense chosen format for M is respected along the algorithm execution so
+        that the performances and accuracy can be different.
         maxiter: (int) defines the number of Givens rotations that are computed in
         eigenvector transform V. The number of rotations per factor of V is
         defined by nGivens_per_fac.
@@ -156,7 +159,8 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
     Computes the FGFT of the Laplacian matrix Lap (using fact.eigtj).
 
     Args:
-        Lap: the Laplacian matrix as a numpy array. Must be real and symmetric.
+        Lap: the Laplacian matrix as a numpy array or csr_matrix. Must be real
+        and symmetric or hermitian if complex.
         maxiter: see fact.eigtj
         tol: see fact.eigtj
         relerr: see fact.eigtj

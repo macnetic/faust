@@ -14,7 +14,7 @@ namespace Faust {
 		/**
 		 * \class Faust::GivensFGFTParallelComplex
 		 *
-		 * \brief This class implements the parallel version of Givens FGFT algorithm.
+		 * \brief This class implements the parallel version of Givens FGFT algorithm (for the complex case).
 		 *
 		 * This variant of the parent class algorithm consists mainly to put t 2D rotation matrices in each iteration factor S (i.e. facts[ite]) when the basis version puts only a single rotation matrix into L.
 		 *
@@ -27,6 +27,8 @@ namespace Faust {
 		 *    submitted to IEEE Transactions on Signal and Information Processing
 		 *    over Networks.
 		 *    <https://hal.inria.fr/hal-01416110>
+		 *
+		 *  Complementary reference for the complex case: https://en.wikipedia.org/wiki/Jacobi_method_for_complex_Hermitian_matrices
 		 *
 		 */
 
