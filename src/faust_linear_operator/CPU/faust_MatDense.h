@@ -347,13 +347,8 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! All the other line contains one coefficient in ColMajor access
         void init_from_file(const char* filename);
 
-        //! Absolute value calculated from the library eigen.
-        void abs() {
-#define EIGEN_STATIC_ASSERT(X,MSG) static_assert(1==1,#MSG); //avoid error on old version of eigen used on Windows release, the casting is OK
-			mat=mat.cwiseAbs();
-#define EIGEN_STATIC_ASSERT(X,MSG) static_assert(X,#MSG);
-		}
-
+        //! Absolute elementwise value
+        void abs();
 
         //!  \brief Compute the Frobenius norm of the MatDense
         //! \return  the Frobenius norm

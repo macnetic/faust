@@ -1128,6 +1128,20 @@ Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::rowwise_max(int* col_indices) con
 	return vec;
 }
 
+template<typename FPP>
+void Faust::MatDense<FPP,Cpu>::abs()
+{
+	// not able to use cwiseAbs() from Eigen for certain versions of the lib and compilers
+	// so doing it by hand, but shouldn't be slower
+	faust_unsigned_int col_offset, i, j;
+	for(j=0;j<this->getNbCol();j++)
+	{
+		col_offset = this->getNbRow()*j;
+		for(i=0;i<this->getNbRow();i++)
+			getData()[col_offset+i] = FPP(Faust::fabs((*this)(i,j)));
+	}
+}
+
 	template<typename FPP>
 Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols)
 {
