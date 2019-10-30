@@ -30,16 +30,18 @@ dim_size = 128
 plt.rcParams['lines.markersize'] = .7
 
 
-nruns = 20
+nruns = 1
 plotting = False
 
 # types of data for the benchmark
 FOURIER_ERR_ID = 0
 LAP_ERR_ID = 1
 D_ERR_ID = 2
-TIME_ID = 3
+LARGEST_EIGVAL_ERR_ID = 3
+TIME_ID = 4
 
-data_type_str = [ 'Fourier Error', 'Laplacian Error', 'D error', 'Execution Time (sec)' ]
+data_type_str = [ 'Fourier Error', 'Laplacian Error', 'D error', 'Largest '
+                 'Eigval error', 'Execution Time (sec)' ]
 
 # FGFT algos/confs tested
 GIVENS_REAL = 0
@@ -65,13 +67,16 @@ algo_str += [ 'Givens //(real dense)', 'Givens //(real sparse)'
 algo_str += [ 'Givens (hermit. dense)', 'Givens (hermit. sparse)',
              'Givens // (hermit. dense)', 'Givens // (hermit. sparse)' ]
 
-all_data = empty((len(graph_ctors), 4, len(algo_str), nruns), dtype=np.float) # arg 4 is
+all_data = empty((len(graph_ctors), 5, len(algo_str), nruns), dtype=np.float) # arg 5 is
                                                                   # for type of
                                                                   # data:
                                                                       # times,
                                                                       # fourier_errs,
                                                                       # lap_errs,
-                                                                      # D err
+                                                                      # D err,
+                                                                      # Largest
+                                                                      # eigval
+                                                                      # err
 
 
 #times = all_data[:, : ,TIME_ID, :]
@@ -190,6 +195,7 @@ for j in range(old_nruns,nruns):
             t = clock()-t
             Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
             all_data[i,D_ERR_ID,a, j] = norm(D-Dhat)/norm(D)
+            all_data[i,LARGEST_EIGVAL_ERR_ID,a,j] = (max(D)-max(Dhat))/max(D)
             Dhat = spdiags(Dhat, [0], Lapa.shape[0], Lapa.shape[0])
             all_data[i,TIME_ID,a,j] = t
 
@@ -225,6 +231,7 @@ for j in range(old_nruns,nruns):
             t = clock()-t
             Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
             all_data[i,D_ERR_ID,a, j] = norm(D-Dhat)/norm(D)
+            all_data[i,LARGEST_EIGVAL_ERR_ID,a,j] = (max(D)-max(Dhat))/max(D)
             Dhat = spdiags(Dhat, [0], Lap.shape[0], Lap.shape[0])
             all_data[i,TIME_ID,a,j] = t
             if(a in [PARGIVENS_REAL_SPARSE, PARGIVENS_REAL_AS_CPLX_SPARSE]):
@@ -269,6 +276,7 @@ for j in range(old_nruns,nruns):
             D_err2 = norm(D-Dhata)/norm(D)
             print('D_err1, D_err2:', D_err1, D_err2)
             all_data[i,D_ERR_ID,a, j] = D_err1
+            all_data[i,LARGEST_EIGVAL_ERR_ID,a,j] = (max(D)-max(Dhat))/max(D)
             print("Greatest/Last eigenvalues of Dhat, Dhata, and D:", Dhat[-1],
                   Dhata[-1], D[-1])
             Dhat = spdiags(Dhat, [0], H.shape[0], H.shape[0])
@@ -296,7 +304,7 @@ for j in range(old_nruns,nruns):
         i += 1
 
 plt.rcParams['figure.figsize'] = [12.0, 8]
-for j in range(0,4): # j : index for type of data
+for j in range(0,5): # j : index for type of data
     for a in range(0,2): # a == 0 (Givens), a == 1 (Givens //)
         nsubplots = 4
         f, axes = plt.subplots(1, nsubplots, sharey=True)
@@ -306,7 +314,7 @@ for j in range(0,4): # j : index for type of data
         for i in range(0,nsubplots): # i : index for type of algo
             # k is for type of graph
             # plt.figure()
-            axes[i].set_title("Algo: "+ algo_str[i+a*nsubplots])
+            axes[i].set_title(algo_str[i+a*nsubplots])
             if(j == TIME_ID):
                 axes[i].semilogy()
             axes[i].boxplot([all_data[k,j,i+a*nsubplots, :] for k in
@@ -326,7 +334,7 @@ for j in range(0,4): # j : index for type of data
     for i in range(0,nsubplots): # i : offset for type of algo
         # k is for type of graph
         # plt.figure()
-        axes[i].set_title("Algo: "+ algo_str[8+i])
+        axes[i].set_title(algo_str[8+i])
         if(j == TIME_ID):
             axes[i].semilogy()
         axes[i].boxplot([all_data[k,j,8+i, :] for k in
