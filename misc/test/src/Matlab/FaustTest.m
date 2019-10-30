@@ -446,7 +446,6 @@ classdef FaustTest < matlab.unittest.TestCase
 				this.verifyEqual(norm(full_test_F), norm(ref), 'RelTol', 10^-2)
 			end
 			disp('test plus(Faust1,Faust2)')
-			import matfaust.FaustFactory
 			import matfaust.Faust
 			fausts = {matfaust.rand(5,size(F,1))*Faust(rand(size(F,1),size(F,2))), matfaust.rand(5,size(F,1), .5, 'complex')*Faust(rand(size(F,1),size(F,2)))}
 			for i=1:length(fausts)
@@ -467,7 +466,6 @@ classdef FaustTest < matlab.unittest.TestCase
 				this.verifyEqual(full_test_F, ref, 'RelTol', 10^-2)
 			end
 			disp('test minus(Faust1,Faust2)')
-			import matfaust.FaustFactory
 			import matfaust.Faust
 			fausts = {matfaust.rand(5,size(F,1))*Faust(rand(size(F,1),size(F,2)))} %, matfaust.rand(5,size(F,1), .5, 'complex')*rand(size(F,2),size(F,2))} %TODO: re-enable complex Faust when #72 is solved
 			for i=1:length(fausts)
@@ -477,7 +475,6 @@ classdef FaustTest < matlab.unittest.TestCase
 		end
 
 		function testcat(this)
-			import matfaust.rand
 			import matfaust.Faust
 			disp('Test cat')
 			FAUST=0;
@@ -503,6 +500,7 @@ classdef FaustTest < matlab.unittest.TestCase
 							H_facs{i} = factors(G, i);
 						end
 					end
+					H_facs
 					H = Faust(H_facs);
 					if(typeG == SPARSE)
 						H_ = sparse(full(H));

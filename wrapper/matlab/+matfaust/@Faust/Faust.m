@@ -1913,17 +1913,17 @@ classdef Faust
 				cF = F;
 			else
 				n = numfactors(F);
-				factors = cell(1,n);
+				facs = cell(1,n);
 				for i=1:n
-					factors{i} = factors(F,i);
-					if(issparse(factors{i}))
+					facs{i} = factors(F,i);
+					if(issparse(facs{i}))
 						% avoid complex() error: Input A must be numeric and full.
-						factors{i} = sparse(complex(full(factors{i})));
+						facs{i} = sparse(complex(full(facs{i})));
 					else
-						factors{i} = complex(factors{i});
+						facs{i} = complex(facs{i});
 					end
 				end
-				cF = matfaust.Faust(factors);
+				cF = matfaust.Faust(facs);
 			end
 		end
 
