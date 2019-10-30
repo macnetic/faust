@@ -98,6 +98,8 @@ if(BUILD_DOCUMENTATION)
 	configure_file(${FAUST_DOC_SRC_DIR}/Faust_manipulation.html ${PROJECT_BINARY_DIR}/doc/html/Faust_manipulation.html COPYONLY)
 	# configure_file(${FAUST_DOC_SRC_DIR}/Faust_factorization.ipynb ${PROJECT_BINARY_DIR}/doc/html/Faust_factorization.ipynb COPYONLY)
 	# configure_file(${FAUST_DOC_SRC_DIR}/Faust_factorization.html ${PROJECT_BINARY_DIR}/doc/html/Faust_factorization.html COPYONLY)
+	configure_file(${FAUST_DOC_SRC_DIR}/Use_of_Faust_objects_in_algorithms.ipynb ${PROJECT_BINARY_DIR}/doc/html/Use_of_Faust_objects_in_algorithms.ipynb COPYONLY)
+	configure_file(${FAUST_DOC_SRC_DIR}/Use_of_Faust_objects_in_algorithms.html ${PROJECT_BINARY_DIR}/doc/html/Use_of_Faust_objects_in_algorithms.html COPYONLY)
 	configure_file(${FAUST_SRC_TEST_SRC_PYTHON_DIR}/test_svd_rc_vs_err.py ${PROJECT_BINARY_DIR}/doc/html/test_svd_rc_vs_err.py COPYONLY)
 	# create a zip archive for the notebooks
 	if(UNIX)
