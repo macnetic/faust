@@ -97,7 +97,7 @@ class Faust:
         use filepath you must explicitely set argument with the keyword.
 
         Examples:
-            >>> from pyfaust import FaustFactory, Faust
+            >>> from pyfaust import Faust
             >>> import numpy as np
             >>> from scipy import sparse
             >>> factors = []
@@ -1488,7 +1488,7 @@ class Faust:
             if(not isinstance(fac, np.ndarray)):
                 fac = fac.toarray()
             plt.xticks([]); plt.yticks([])
-            plt.suptitle('Faust '+ name +'\'s factors')
+            plt.suptitle('Factors of the Faust '+ name)
             if(fac.dtype == np.complex):
                 plt.imshow(abs(fac),aspect='equal')
             else:
@@ -1530,7 +1530,7 @@ def faust_fact(*args, **kwargs):
     """
     This function is a shorthand for pyfaust.fact.hierarchical.
 
-    <b/> See also FaustFactory.fact_hierarchical
+    <b/> See also pyfaust.fact.hierarchical
     """
     import pyfaust.fact
     return pyfaust.fact.hierarchical(*args, **kwargs)
@@ -1634,7 +1634,7 @@ def isFaust(obj):
         Returns True if obj is a Faust object, False otherwise.
 
         Examples:
-            >>> from pyfaust import isFaust, FaustFactory
+            >>> from pyfaust import isFaust
             >>> isFaust(2)
             False
             >>> isFaust(rand(5,10))
