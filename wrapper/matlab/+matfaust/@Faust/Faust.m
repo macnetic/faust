@@ -49,7 +49,7 @@
 %>
 %> A FAuST data structure is designed to allow fast matrix-vector multiplications together with reduced memory storage compared to what would be obtained by manipulating directly the corresponding (dense) Matlab array.
 %>
-%> A particular example is the matrix associated to the discrete Fourier transform, which can be represented exactly as a FAuST, leading to a fast and compact implementation (see FaustFactory.dft()).
+%> A particular example is the matrix associated to the discrete Fourier transform, which can be represented exactly as a FAuST, leading to a fast and compact implementation (see matfaust.dft()).
 %>
 %> Although sparse matrices are more interesting for optimization it's not forbidden to define a Faust as a product of dense matrices or a mix of dense and sparse matrices.
 %>
@@ -99,7 +99,7 @@ classdef Faust
 		%======================================================================
 		%> @brief Creates a Faust from a list of factors or alternatively from a file.
 		%>
-		%> Other easy ways to create a Faust is to call one of the FaustFactory static methods: FaustFactory.rand(), FaustFactory.dft() or FaustFactory.wht().
+		%> Other easy ways to create a Faust is to call one of the following functions: matfaust.rand(), matfaust.dft() or matfaust.wht().
 		%>
 		%> @b Usage
 		%>
@@ -142,7 +142,7 @@ classdef Faust
 		%> @endcode
 		%>
 		%>
-		%> <p>@b See @b also Faust.delete, Faust.save, FaustFactory.rand</p>
+		%> <p>@b See @b also Faust.delete, Faust.save, matfaust.rand</p>
 		%>
 		%======================================================================
 		function F = Faust(varargin)
@@ -226,15 +226,14 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand([2, 5], [50, 100], .5)
+		%>	F = matfaust.rand([2, 5], [50, 100], .5)
 		%>	delete(F)
-		%>	F = FaustFactory.rand([2, 5], [50, 100], .5)
-		%>	G = FaustFactory.rand([2, 5], [50, 100], .5)
+		%>	F = matfaust.rand([2, 5], [50, 100], .5)
+		%>	G = matfaust.rand([2, 5], [50, 100], .5)
 		%>	clear % equivalent to delete(F);delete(G)
 		%> @endcode
 		%>
-		%> <p>@b See @b also Faust.Faust, clear (built-in), FaustFactory</p>
+		%> <p>@b See @b also Faust.Faust, clear (built-in)</p>
 		%>
 		%======================================================================
 		function delete(F)
@@ -267,7 +266,6 @@ classdef Faust
 		%======================================================================
 		function F = plus(varargin)
 			import matfaust.Faust
-			import matfaust.FaustFactory
 			F = varargin{1};
 			for i=2:nargin
 				G = varargin{i};
@@ -277,9 +275,9 @@ classdef Faust
 					end
 					C = [F,G];
 					if(~ C.isReal)
-						Fid = FaustFactory.eye(size(C,2)/2, 'complex');
+						Fid = matfaust.eye(size(C,2)/2, 'complex');
 					else
-						Fid = FaustFactory.eye(size(C,2)/2);
+						Fid = matfaust.eye(size(C,2)/2);
 					end
 					F = C*[Fid;Fid];
 				elseif(isscalar(G))
@@ -398,12 +396,11 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>   import matfaust.FaustFactory
-		%>   F = FaustFactory.rand([2, 5], [50, 100], .5)
+		%>   F = matfaust.rand([2, 5], [50, 100], .5)
 		%>   A = rand(size(F,2), 50)
 		%>   G = F*A
 		%> % is equivalent to G = mtimes(F, A)
-		%>   G = FaustFactory.rand(5,size(F, 2))
+		%>   G = matfaust.rand(5,size(F, 2))
 		%>   H = F*G
 		%> % H is a Faust because F and G are
 		%>   Fs = F*2
@@ -567,8 +564,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>   % in a matlab terminal
-		%>   >> import matfaust.FaustFactory
-		%>   >> F = FaustFactory.rand(5, 10^6, 10^-5, 'sparse')
+		%>   >> F = matfaust.rand(5, 10^6, 10^-5, 'sparse')
 		%>   Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factor(s):
 		%>   - FACTOR 0 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999
 		%>   - FACTOR 1 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999
@@ -680,8 +676,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	F_ctrans = F'
 		%>	F_ctrans2 = ctranspose(F)
 		%>	% F_ctrans == F_ctrans2
@@ -723,8 +718,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	F_conj = conj(F)
 		%> @endcode
 		%>
@@ -763,8 +757,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	[nrows, ncols] = size(F)
 		%>	nrows = size(F, 1)
 		%>	ncols = size(F, 2)
@@ -843,8 +836,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	n = numel(F)
 		%> @endcode
 		%>
@@ -864,9 +856,7 @@ classdef Faust
 	 	%> @b Example
 		%> @code
 		%>	% in a matlab terminal
-		%>	>> import matfaust.FaustFactory
-		%>	>>
-		%>	>> F = FaustFactory.rand([4, 5], 3, .9);
+		%>	>> F = matfaust.rand([4, 5], 3, .9);
 		%>	>> full(F)
 		%>	ans =
 		%>
@@ -933,8 +923,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex');
+		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex');
 		%>	f1 = factors(F, 1);
 		%>	G = factors(F, 4:5); % a new Faust composed of the two last factors of F
 		%> @endcode
@@ -1004,8 +993,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	f1 = get_factor_nonopt(F, 1)
 		%> @endcode
 		%> <p>@b See @b also Faust.numfactors
@@ -1050,8 +1038,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	nf = numfactors(F)
 		%> @endcode
 		%>
@@ -1088,7 +1075,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	import matfaust.*
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	save(F, 'F.mat')
 		%>	G = Faust('F.mat')
 		%> @endcode
@@ -1134,9 +1121,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>
-		%>	F = FaustFactory.rand([2, 5], [50, 100], .5)
+		%>	F = matfaust.rand([2, 5], [50, 100], .5)
 		%>	i = randi(min(size(F)), 1, 2)
 		%>	i1 = i(1);i2 = i(2)
 		%>
@@ -1290,9 +1275,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	% in a matlab terminal
-		%>	>> import matfaust.FaustFactory
-		%>	>>
-		%>	>> F = FaustFactory.rand([1, 2], [50, 100], .5)
+		%>	>> F = matfaust.rand([1, 2], [50, 100], .5)
 		%>	>> disp(F)
 		%>	Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factor(s):
 		%>	- FACTOR 0 (real) SPARSE, size 98x78, density 0.395081, nnz 3020
@@ -1357,8 +1340,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%> % in a matlab terminal
-		%> >> import matfaust.FaustFactory
-		%> >> F = FaustFactory.rand([1, 2], [50, 100], .5)
+		%> >> F = matfaust.rand([1, 2], [50, 100], .5)
 		%> >> norm(F)
 		%> ans =
 		%> 7.0151
@@ -1559,8 +1541,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand([2, 5], [50, 100], .5)
+		%>	F = matfaust.rand([2, 5], [50, 100], .5)
 		%>	dens = density(F)
 		%> @endcode
 		%>
@@ -1659,9 +1640,8 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>% in a matlab terminal
-		%>>> import matfaust.FaustFactory
-		%>>> F = FaustFactory.rand(5,50);
-		%>>> G = FaustFactory.rand(6,50);
+		%>>> F = matfaust.rand(5,50);
+		%>>> G = matfaust.rand(6,50);
 		%>>> [F;G] % equiv. to cat(1,F,G)
 		%>
 		%>ans =
@@ -1717,8 +1697,8 @@ classdef Faust
 		%> - The dimensions of F and G don't agree:
 		%>
 		%> @code
-		%>>> F = FaustFactory.rand(2,51);
-		%>>> G = FaustFactory.rand(2,25);
+		%>>> F = matfaust.rand(2,51);
+		%>>> G = matfaust.rand(2,25);
 		%>>> [F;G]
 		%>Error using mexFaustReal
 		%>The dimensions of the two Fausts must agree.
@@ -1727,8 +1707,8 @@ classdef Faust
 		%> - The DIM argument is different from 1 and 2:
 		%>
 		%> @code
-		%>>> F = FaustFactory.rand(2,4);
-		%>>> G = FaustFactory.rand(2,4);
+		%>>> F = matfaust.rand(2,4);
+		%>>> G = matfaust.rand(2,4);
 		%>>> cat(3,F,G)
 		%>Error using matfaust.Faust/cat
 		%>Wrong first argument: must be an integer between 1 and 2.
@@ -1835,8 +1815,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	import matfaust.FaustFactory
-		%>	F = FaustFactory.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
 		%>	imagesc(F)
 		%>	print('test_imsc', '-dpng')
 		%>	@endcode
@@ -1845,7 +1824,13 @@ classdef Faust
 		%======================================================================
 		function imagesc(F, varargin)
 			numfacts = numfactors(F);
-			subplot(1,numfacts+1,1); imagesc(abs(real(full(F))));
+			facs = cell(1,numfacts+1);
+			for i=1:numfacts
+				facs{i} = factors(F,i);
+			end
+			facs{i+1} = full(F);
+			numfacts = numfacts + 1;
+			fig = figure();
 			name = 'F';
 			if(nargin > 1)
 				name = varargin{1};
@@ -1853,16 +1838,64 @@ classdef Faust
 					error('argument 2 must be a str.')
 				end
 			end
-			title(['full(' name ')'])
+			facs_per_row = 5;
 			set(gca,'XTick',[], 'YTick', []);
-			for i=1:numfacts
-				subplot(1,numfacts+1,1+i);
-				fac = factors(F,i);
-				imagesc(abs(real(fac)));
-				title([int2str(i)])
-				set(gca,'XTick',[], 'YTick', []);
+			num_rows = numfacts/facs_per_row;
+			if(floor(num_rows) < num_rows)
+				num_rows = floor(num_rows)+1;
+			elseif(num_rows == 0)
+				num_rows = numfacts;
 			end
-			suptitle(['Faust ' name '''s factors'])
+			row_widths = zeros(1,num_rows);
+			% compute widths of all rows
+			for i=1:numfacts
+				row_widths(1, floor((i-1)/facs_per_row)+1) = row_widths(1, floor((i-1)/facs_per_row)+1) + size(facs{i}, 2);
+			end
+			maxw = max(row_widths);
+			sumw = maxw;
+			sumw = sumw+(facs_per_row)*sumw/100; % extra with for space between subplots
+			cumw = (1 - (row_widths(1,floor(1/facs_per_row)+1))/sumw - (facs_per_row-1)*.01)/2;
+
+			figpos = get(fig, 'Position');
+			aratio = figpos(3)/figpos(4);
+			maxh = 0;
+			for i=1:facs_per_row
+				fac = facs{i};
+				h = size(fac,1)/sumw*aratio;
+				if(h > maxh)
+					maxh = h;
+				end
+			end
+			b = 1 - maxh - 0.01;
+			for i=1:numfacts
+				fac = facs{i};
+				l = cumw;
+				w = size(fac,2)/sumw;
+				h = size(fac,1)/sumw*aratio;
+				pos = [l b w h];
+				subplot('position', pos)
+				cumw = cumw + w + .01; % extra percent for space
+				imagesc(abs(real(fac)));
+				if(i == numfacts)
+					text(size(fac,2)/2, size(fac,1)/2, 'full(F)')
+				else
+					text(size(fac,2)/2, size(fac,1)/2, [int2str(i)])
+				end
+				set(gca,'XTick',[], 'YTick', []);
+				if(mod(i,facs_per_row) == 0 && i < numfacts)
+					cumw = (1 - (row_widths(1,floor(i/facs_per_row)+1))/sumw - (facs_per_row-1)*.01)/2;
+					maxh = 0;
+					for j=i+1:min(facs_per_row+i,numfacts)
+						fac = facs{j};
+						h = size(fac,1)/sumw*aratio;
+						if(h > maxh)
+							maxh = h;
+						end
+					end
+					b = b - maxh - 0.01;
+				end
+			end
+			suptitle(['Factor of the Faust ' name ])
 		end
 
 		%=====================================================================
@@ -1953,7 +1986,7 @@ classdef Faust
 		%> @code
 		%> import matfaust.*
 		%> Faust.isFaust(1) % returns 0
-		%> Faust.isFaust(FaustFactory.rand(5,10)) % returns 1
+		%> Faust.isFaust(matfaust.rand(5,10)) % returns 1
 		%> @endcode
 		%>
 		%> <p> @b See @b also Faust.Faust
