@@ -8,4 +8,5 @@ You might also be interested in this introduction to pyfaust through Jupyter Not
 - [How to Create a Faust](./Faust_creation.html) 
 - [How to Manipulate a Faust](./Faust_manipulation.html) 
 - [Using the FAµST API in Algorithms](./Use_of_Faust_objects_in_algorithms.html) 
+
 Download all the notebooks (.ipynb) [here](./pyfaust_notebooks.zip).
