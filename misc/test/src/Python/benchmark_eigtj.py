@@ -30,7 +30,7 @@ dim_size = 128
 plt.rcParams['lines.markersize'] = .7
 
 
-nruns = 1
+nruns = 20
 plotting = False
 
 # types of data for the benchmark
@@ -202,8 +202,9 @@ for j in range(old_nruns,nruns):
             if(a in [GIVENS_REAL_SPARSE, GIVENS_REAL_AS_CPLX_SPARSE]):
                 Lapa = Lapa.todense()
             givens_err = \
-            norm(Fa@diag(Dhata)@Fa.T.conj()-Lap,'fro')/norm(Lap,'fro')
-            givens_err2 = norm(F@Dhat.todense()@F.toarray().T.conj()-Lap,'fro')/norm(Lap,'fro')
+            norm(Fa@diag(Dhata)@Fa.T.conj()-Lapa,'fro')/norm(Lapa,'fro')
+            givens_err2 = \
+            norm(F@Dhat.todense()@F.toarray().T.conj()-Lapa,'fro')/norm(Lapa,'fro')
             all_data[i,LAP_ERR_ID,a,j] = min(givens_err, givens_err2)
             print("lap err:", givens_err, givens_err2)
             all_data[i,FOURIER_ERR_ID,a,j] = symmetrized_norm(U, F.toarray())/norm(U,'fro')
@@ -227,7 +228,7 @@ for j in range(old_nruns,nruns):
                 Lapa = csr_matrix(Lapa)
 
             t = clock()
-            Dhat, F = pyfaust.fact.eigtj(Lap, J, nGivens_per_fac=int(dim/2))
+            Dhat, F = pyfaust.fact.eigtj(Lapa, J, nGivens_per_fac=int(dim/2))
             t = clock()-t
             Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
             all_data[i,D_ERR_ID,a, j] = norm(D-Dhat)/norm(D)
@@ -238,8 +239,9 @@ for j in range(old_nruns,nruns):
                 Lapa = Lapa.todense()
             print("J=", J)
             pargivens_err1 = \
-                    norm(Fa@diag(Dhata)@Fa.T.conj()-Lap,'fro')/norm(Lap,'fro')
-            pargivens_err2 = norm(F@Dhat.todense()@F.toarray().T.conj()-Lap,'fro')/norm(Lap,'fro')
+                    norm(Fa@diag(Dhata)@Fa.T.conj()-Lapa,'fro')/norm(Lapa,'fro')
+            pargivens_err2 = \
+            norm(F@Dhat.todense()@F.toarray().T.conj()-Lapa,'fro')/norm(Lapa,'fro')
             all_data[i,LAP_ERR_ID,a,j] = min(pargivens_err1, pargivens_err2)
             print("lap err:", pargivens_err1, givens_err2)
             all_data[i,FOURIER_ERR_ID,a,j] = symmetrized_norm(U, F.toarray())/norm(U,'fro')
