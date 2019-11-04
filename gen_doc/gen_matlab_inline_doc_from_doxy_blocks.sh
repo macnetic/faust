@@ -85,7 +85,7 @@ do
 
         # insert parsed block
         FUNC_DEF_LINE=$(sed -ne $FUNC_LINE'p' $OUTPUT_FILE)
-    sed -ne '1,'$FUNC_LINE'p' $OUTPUT_FILE > ${OUTPUT_FILE}_tmp
+	sed -ne '1,'$FUNC_LINE'p' $OUTPUT_FILE > ${OUTPUT_FILE}_tmp
             # parse doxy block for inline block
         INLINE_BLOCK=$(parse_doxy_block $FUNC "$DOXY_BLOCK" "$FUNC_DEF_LINE")
         echo -e "$INLINE_BLOCK" >> ${OUTPUT_FILE}_tmp

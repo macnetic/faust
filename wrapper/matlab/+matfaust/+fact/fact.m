@@ -2,8 +2,9 @@
 %>
 %>
 %>    This module gives access to the main factorization algorithms of
-%>    FAuST. Those algorithms can factorize a dense matrix to a sparse product
-%>    (i.e. a Faust object).
+%>    FAuST. These algorithms can factorize a dense matrix to a sparse product
+%>    (i.e. a Faust object). A few of these algorithms are only available in experimental packages.
+% experimental block start
 %>
 %>    There are several factorization algorithms.
 %>
@@ -18,6 +19,7 @@
 %>    dense matrix.
 %>
 %>    - The third group of algorithms is for FGFT computing: fact.fgft_palm fact.fgft_givens fact.eigtj
+% experimental block end
 %>
 %>
 % ======================================================================

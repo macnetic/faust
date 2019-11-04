@@ -1,3 +1,4 @@
+% experimental block start
 %% Description demo_fact_hadamard
 %
 %  This demo hierarchically factorizes the Hadamard dictionary and then
@@ -626,3 +627,4 @@ classdef hadamard
 	end
 
 end
+% experimental block end

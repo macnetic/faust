@@ -229,6 +229,8 @@ option(API_DOC_BASE_URL "Base URL for the online or local documentation.") # see
 option(REMOTE_DATA_URL "Base URL for getting FAµST data archive (filename excluded from URL, see variable REMOTE_DATA_FILE)." "")
 option(REMOTE_DATA_FILE "Filename of the FAµST data zip archive." "")
 option(NOCPPTESTS "Enabling/Disabling CPP tests (only testing python or matlab wrappers if built)." OFF)
+option(EXPERIMENTAL_PKG "Enabling/Disabling experimental code." OFF)
+# experimental code is delimited for example in matlab scripts by comments like "% experimental block start / end"
 #set(BUILD_MULTITHREAD OFF CACHE BOOL "OpenMP Multithreading")
 #set(BUILD_VERBOSE OFF CACHE BOOL "Display useful message for debugging")
 #set(BUILD_USE_GPU OFF CACHE BOOL "Using both CPU and GPU process")

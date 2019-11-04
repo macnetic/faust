@@ -45,6 +45,8 @@ if (BUILD_OPENBLAS)
 	include_directories(${OPENBLAS_INC_DIR})
 endif(BUILD_OPENBLAS)
 
+FILE(COPY ${FAUST_MATLAB_NAMESPACE_SRC_DIR} DESTINATION ${PROJECT_BINARY_DIR}/tmp_gendoc_matfaust)
+
 #message(FATAL_ERROR ${FAUST_MATLAB_MATFAUST_FILE_LIST})
 foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 	string(REGEX REPLACE "[^+]*\\+matfaust\\/" "" MATFAUST_FILE ${MATFAUST_FILE})
@@ -60,20 +62,27 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 		else()
 			execute_process(COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} ERROR_QUIET)
 			#TODO: copy if error (fallback solution)
+			#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} COPYONLY)
 		endif()
 	else()
 		message(STATUS "matfaust function file: " ${MATFAUST_FILE})
 		# just copy the .m
 		configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} @ONLY)
-        # filter out experimental code
-        execute_process(COMMAND
-            python
-            "${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py"
-            ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
-            ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} "--no-empty")
-        # --no-empty deletes emtpy file after filtering
 	endif()
-
+	if(NOT EXPERIMENTAL_PKG)
+		# filter out experimental code
+		foreach(MATFAUST_DIR ${FAUST_MATLAB_NAMESPACE_BIN_DIR} ${PROJECT_BINARY_DIR}/tmp_gendoc_matfaust/+matfaust)
+			execute_process(COMMAND
+				python
+				"${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py"
+				${MATFAUST_DIR}/${MATFAUST_FILE}
+				${MATFAUST_DIR}/${MATFAUST_FILE} "--no-empty")
+		endforeach()
+		# --no-empty deletes emtpy file after filtering
+		# easy way to delete the whole module instead of having to insert deletion tags into each file
+		FILE(REMOVE_RECURSE "${FAUST_MATLAB_NAMESPACE_BIN_DIR}/+factparams") #TODO: do it in py script directly with a special arg
+		FILE(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/tmp_gendoc_matfaust/+matfaust/+factparams") #TODO: do it in py script directly with a special arg
+	endif()
 endforeach()
 
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})

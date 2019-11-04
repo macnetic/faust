@@ -1,3 +1,4 @@
+% experimental block start
 %====================================================================
 %> @brief Performs a singular value decomposition and returns the left and
 %> right singular vectors as Faust transforms.
@@ -39,3 +40,4 @@ function [U,S,V] = svdtj(M, maxiter, varargin)
 	U = W1(:,1:size(Id,1))*matfaust.Faust({Id(:,I),sign_S});
 	V = W2(:,1:size(Id,1))*matfaust.Faust(Id(:,I));
 end
+% experimental block end

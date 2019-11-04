@@ -1,3 +1,4 @@
+% experimental block start
 %===================================================================================
 %> @brief Computes the FGFT for the Fourier matrix U which should be the eigenvectors of the Laplacian Lap.
 %>
@@ -144,3 +145,4 @@ function varargout = fgft_palm(U, Lap, p, varargin)
 	F = Faust(core_obj, isreal(U));
 	varargout = {F, D, lambda, p};
 end
+% experimental block end

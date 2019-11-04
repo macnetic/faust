@@ -5,7 +5,7 @@ from __future__ import print_function
 from pylab import *
 import os,sys
 
-## @package pyfaust.demo @brief The pyfaust module for the demos partly based on research papers (see references in each demo).
+## @package pyfaust.demo @brief The pyfaust demo module.
 ##
 ## The run*() functions produce the results (by default in demo.DEFT_RESULTS_DIR)
 ## and the fig*() functions produce the figures based on the results (by
@@ -544,6 +544,7 @@ class runtimecmp:
         #tight_layout()
         show(block=False)
 
+# experimental block start
 class hadamard:
     """
         The demo for the hierarchical factorization of Hadamard matrices.
@@ -994,6 +995,7 @@ class hadamard:
         h.fig_norm_hadamard(input_dir, output_dir)
         h.fig_fact(input_dir, output_dir)
         h.fig_speedup_hadamard()
+# experimental block end
 
 class bsl:
     """

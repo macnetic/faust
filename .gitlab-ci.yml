@@ -73,7 +73,7 @@ package_macos:
     script:
         - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$SHA_START -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$SHA_START -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON ..'
         - make LANG=en_GB.UTF-8
         - 'echo $MACOS_PASS | sudo -S make install LANG=en_GB.UTF-8'
           #- 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
@@ -104,7 +104,7 @@ package_win:
         - 'set SHA_START=%CI_COMMIT_SHA:~0,8%'
         - if NOT EXIST build (mkdir build) else rmdir /S /Q build
         - cd build
-        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" ..'
+        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=ON ..'
         - make
         - makensis faust.nsi
     artifacts:
@@ -122,7 +122,7 @@ package_linux:
    script:
         - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
@@ -247,7 +247,7 @@ pages:
 .package_purepy: &package_purepy
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG ..'
         - make
         - cd wrapper/python
         - python3 setup.py bdist_wheel
@@ -265,6 +265,7 @@ pages:
     stage: package_rev
     before_script:
         - VERSION=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
+        - 'set EXPERIMENTAL_PKG=ON'
     artifacts:
         expire_in: '1 week'
     except:
@@ -314,7 +315,7 @@ package_linux_purepy_release:
     script:
         - if NOT EXIST build (mkdir build) else rmdir /S /Q build
         - cd build
-        - 'cmake -G "Visual Studio 14 2015" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF  -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH="C:/Users/faust/Downloads/matio-1.5.13/visual_studio/x64/Release/libmatio.lib" -DZ_STATIC_LIB_PATH="C:/Users/faust/Downloads/zlib-1.2.11/contrib/vstudio/vc14/x64/ZlibStatDebug/zlibstat.lib" -DHDF5_STATIC_LIB_PATH="C:/Users/faust/Downloads/hdf5-1.10.3/build/bin/Release/libhdf5.lib" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" ..'
+        - 'cmake -G "Visual Studio 14 2015" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF  -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH="C:/Users/faust/Downloads/matio-1.5.13/visual_studio/x64/Release/libmatio.lib" -DZ_STATIC_LIB_PATH="C:/Users/faust/Downloads/zlib-1.2.11/contrib/vstudio/vc14/x64/ZlibStatDebug/zlibstat.lib" -DHDF5_STATIC_LIB_PATH="C:/Users/faust/Downloads/hdf5-1.10.3/build/bin/Release/libhdf5.lib" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=%EXPERIMENTAL_PKG% ..'
         #- make
         - cmake --build . --target FAUST
         - cd wrapper/python
@@ -336,6 +337,7 @@ package_win_purepy_rev:
     stage: package_rev
     before_script:
         - 'set VERSION=%CI_COMMIT_SHA:~0,8%'
+        - 'set EXPERIMENTAL_PKG=ON'
     artifacts:
         expire_in: '1 week'
     except:

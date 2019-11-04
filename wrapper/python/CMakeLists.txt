@@ -100,12 +100,14 @@ FILE(GLOB_RECURSE PYFAUST_FILES RELATIVE ${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_
 foreach(PYFAUST_FILE ${PYFAUST_FILES})
 	message(STATUS "Installing ${PYFAUST_FILE}")
 	configure_file(${FAUST_PYTHON_SRC_DIR}/${PYFAUST_FILE} ${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE} @ONLY)
-    # filter experimental code out of pyfaust modules
-    execute_process(COMMAND
-        python
-        "${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py"
-        ${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE}
-        ${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE} "--no-empty")
+	if(NOT EXPERIMENTAL_PKG)
+		# filter experimental code out of pyfaust modules
+		execute_process(COMMAND
+			python
+			"${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py"
+			${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE}
+			${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE} "--no-empty")
+	endif()
 endforeach()
 
 add_custom_target(${FAUST_PYTHON_TARGET} ALL DEPENDS ${FAUST_TARGET})
