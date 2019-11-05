@@ -103,6 +103,8 @@ class FaustCoreCpp
             unsigned int max_dim_size, float density, bool per_row);
     static FaustCoreCpp<FPP>* hadamardFaust(unsigned int n, const bool norma);
     static FaustCoreCpp<FPP>* fourierFaust(unsigned int n, const bool norma);
+    static FaustCoreCpp<FPP>* eyeFaust(unsigned int n, unsigned int m);
+
     private :
     Faust::TransformHelper<FPP,Cpu> *transform;
 };

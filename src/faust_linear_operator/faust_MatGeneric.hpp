@@ -141,6 +141,8 @@ std::string Faust::MatGeneric<FPP,DEVICE>::to_string(const bool transpose /* set
 	else
 		str << getNbRow() << "x" << getNbCol();
 	str << ", density "<< this->density()<<", nnz "<<this->getNonZeros()<<endl;
+	if (this->is_identity)
+		str <<" identity matrix flag" << endl;
 	return str.str();
 }
 

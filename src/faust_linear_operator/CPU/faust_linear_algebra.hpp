@@ -126,58 +126,61 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 			FPP *const ptr_data_dst = C.getData();
 			memset(ptr_data_dst, 0, sizeof(FPP) * C.dim1*C.dim2);
 			C.isZeros = true;
-			C.isIdentity = false;
+			C.set_id(false);
 			//#ifdef __COMPILE_TIMERS__
 			//	A.t_gemm.stop();
 			//#endif
 			return;
 		}
-		if(B.isIdentity)
+
+#define M_times_alpha_into_C(alpha, M, typeM) \
+		{ \
+			C=M; \
+			if(typeM == 'T') \
+			C.transpose(); \
+			else if(typeM == 'H') \
+			{ \
+				C.transpose(); \
+				C.conjugate(); \
+			} \
+			if(alpha!=FPP(1.0)) \
+			C*= alpha; \
+			return; \
+		}
+
+
+		if(B.is_id())
+			M_times_alpha_into_C(alpha, A, typeA); //return here
+
+		if(A.is_id())
+			M_times_alpha_into_C(alpha, B, typeB); //return here
+
+		if (typeA == 'N')
 		{
-			C=A;
-			if(typeA == 'T')
-				C.transpose();
-			else if(typeA == 'H')
-			{
-				C.transpose();
-				C.conjugate();
-			}
-			if(alpha!=FPP(1.0))
-				C*= alpha;
-			C.isZeros = false;
-			C.isIdentity = false;
-			//#ifdef __COMPILE_TIMERS__
-			//	A.t_gemm.stop();
-			//#endif
-			return;
+			if (typeB == 'N')
+				C.mat.noalias() = alpha * A.mat * B.mat;
+			else if(typeB == 'T')
+				C.mat.noalias() = alpha * A.mat * B.mat.transpose();
+			else // typeB == 'H'
+				C.mat.noalias() = alpha * A.mat * B.mat.adjoint();
+		}else if(typeA == 'T')
+		{
+			if (typeB == 'N')
+				C.mat.noalias() = alpha * A.mat.transpose() * B.mat;
+			else if(typeB == 'T')
+				C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose();
+			else // typeB == 'H'
+				C.mat.noalias() = alpha * A.mat.transpose() * B.mat.adjoint();
+		} else // typeA == 'H'
+		{
+			if (typeB == 'N')
+				C.mat.noalias() = alpha * A.mat.adjoint() * B.mat;
+			else if(typeB == 'T')
+				C.mat.noalias() = alpha * A.mat.adjoint() * B.mat.transpose();
+			else // typeB == 'H'
+				C.mat.noalias() = alpha * A.mat.adjoint() * B.mat.adjoint();
+
 		}
-
-			if (typeA == 'N')
-			{
-				if (typeB == 'N')
-					C.mat.noalias() = alpha * A.mat * B.mat;
-				else if(typeB == 'T')
-					C.mat.noalias() = alpha * A.mat * B.mat.transpose();
-				else // typeB == 'H'
-					C.mat.noalias() = alpha * A.mat * B.mat.adjoint();
-			}else if(typeA == 'T')
-			{
-				if (typeB == 'N')
-					C.mat.noalias() = alpha * A.mat.transpose() * B.mat;
-				else if(typeB == 'T')
-					C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose();
-				else // typeB == 'H'
-					C.mat.noalias() = alpha * A.mat.transpose() * B.mat.adjoint();
-			} else // typeA == 'H'
-			{
-				if (typeB == 'N')
-					C.mat.noalias() = alpha * A.mat.adjoint() * B.mat;
-				else if(typeB == 'T')
-					C.mat.noalias() = alpha * A.mat.adjoint() * B.mat.transpose();
-				else // typeB == 'H'
-					C.mat.noalias() = alpha * A.mat.adjoint() * B.mat.adjoint();
-
-			}
 
 
 	}else //beta != 0
@@ -186,44 +189,41 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 		{
 			C *= beta;
 			C.isZeros = false;
-			C.isIdentity = false;
+			C.set_id(false);
 			//#ifdef __COMPILE_TIMERS__
 			//	A.t_gemm.stop();
 			//#endif
 			return;
 		}
-		if(B.isIdentity)
-		{
-			C *= beta;
-			if(typeA == 'N' && alpha == FPP(1.0))
-			{
-				C += A;
-				C.isZeros = false;
-				C.isIdentity = false;
-				//#ifdef __COMPILE_TIMERS__
-				//	A.t_gemm.stop();
-				//#endif
-				return;
-			}
-			Faust::MatDense<FPP,Cpu> A_tmp(A);
-			if(typeA == 'T')
-				A_tmp.transpose();
-			else if(typeA == 'H')
-			{
-				A_tmp.conjugate(false);
-				A_tmp.transpose();
-			}
-			if(alpha != FPP(1.0))
-				A_tmp *= alpha;
-			C += A_tmp;
-			C.isZeros = false;
-			C.isIdentity = false;
 
-			//#ifdef __COMPILE_TIMERS__
-			//	A.t_gemm.stop();
-			//#endif
-			return;
+#define M_times_alpha_plus_beta_times_C_into_C(M, typeM, alpha, beta, C)\
+		{ \
+			C *= beta; \
+			if(typeM == 'N' && alpha == FPP(1.0)) \
+			{ \
+				C += M; \
+				C.isZeros = false; \
+				C.set_id(false); \
+			} \
+			Faust::MatDense<FPP,Cpu> M_tmp(M); \
+			if(typeM == 'T') \
+			M_tmp.transpose(); \
+			else if(typeM == 'H') \
+			{ \
+				M_tmp.conjugate(false); \
+				M_tmp.transpose(); \
+			} \
+			if(alpha != FPP(1.0)) \
+			M_tmp *= alpha; \
+			C += M_tmp; \
+			return; \
 		}
+
+		if(B.is_id())
+			M_times_alpha_plus_beta_times_C_into_C(A, typeA, alpha, beta, C); // return here
+
+		if(A.is_id())
+			M_times_alpha_plus_beta_times_C_into_C(B, typeB, alpha, beta, C); //return here
 
 		if (typeA == 'N')
 		{
@@ -254,7 +254,7 @@ void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP
 
 	}
 	C.isZeros = false;
-	C.isIdentity = false;
+	C.set_id(false);
 //#ifdef __COMPILE_TIMERS__
 //A.t_gemm.stop();
 //#endif
@@ -306,7 +306,12 @@ void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> &
 	#ifndef __GEMM_WITH_OPENBLAS__
 	if (beta == FPP(0.0))
 	{
-		if (typeA == 'N')
+		if(A.is_id() && alpha == FPP(1.0))
+		{
+			cout << "gemv identity opt." << endl;
+			memcpy(y.getData(), px->getData(), sizeof(FPP)*nbRowOpA);
+		}
+		else if (typeA == 'N')
 		{
 			y.vec.noalias() = alpha * A.mat * px->vec;
 		}else
@@ -433,52 +438,33 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 			FPP *const ptr_data_dst = C.getData();
 			memset(ptr_data_dst, 0, sizeof(FPP) * C.dim1*C.dim2);
 			C.isZeros = true;
-			C.isIdentity = false;
+			C.set_id(false);
 			#ifdef __COMPILE_TIMERS__
 				A.t_gemm.stop();
 			#endif
 			return;
 		}
 
-		if(A.isIdentity)
-		{
-			C=B;
-			if(typeB == 'T')
-				C.transpose();
-			else if(typeB == 'H')
-			{
-				C.conjugate(false);
-				C.transpose();
-			}
-			if(alpha!=FPP(1.0))
-				C*= alpha;
-			C.isZeros = false;
-			C.isIdentity = false;
-			#ifdef __COMPILE_TIMERS__
-				A.t_gemm.stop();
-			#endif
-			return;
-		}
-		if(B.isIdentity)
-		{
-			C=A;
-			if(typeA == 'T')
-				C.transpose();
-			else if(typeA == 'H')
-			{
-				C.conjugate(false);
-				C.transpose();
-			}
-			if(alpha!=FPP(1.0))
-				C*= alpha;
-			C.isZeros = false;
-			C.isIdentity = false;
-			#ifdef __COMPILE_TIMERS__
-				A.t_gemm.stop();
-			#endif
-			return;
+#define N_times_alpha_into_C(N, typeN, alpha, C) \
+		{ \
+			C = N; \
+			if(typeN == 'T') \
+			C.transpose(); \
+			else if(typeN == 'H') \
+			{ \
+				C.conjugate(false); \
+				C.transpose(); \
+			} \
+			if(alpha!=FPP(1.0)) \
+			C *= alpha; \
+			return; \
 		}
 
+		if(A.is_id())
+			N_times_alpha_into_C(B, typeB, alpha, C);
+
+		if(B.is_id())
+			N_times_alpha_into_C(A, typeA, alpha, C);
 
 		#ifndef __GEMM_WITH_OPENBLAS__
 		// std::cout<<" A normal Faust::gemm"<<std::endl;
@@ -521,14 +507,14 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 		{
 			C *= beta;
 			C.isZeros = false;
-			C.isIdentity = false;
+			C.set_id(false);
 			#ifdef __COMPILE_TIMERS__
 				A.t_gemm.stop();
 			#endif
 			return;
 		}
 
-		if(A.isIdentity)
+		if(A.is_id())
 		{
 			C *= beta;
 			if(typeB == 'N' && alpha == FPP(1.0))
@@ -551,20 +537,20 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 				B_tmp *= alpha;
 			C += B_tmp;
 			C.isZeros = false;
-			C.isIdentity = false;
+			C.set_id(false);
 			#ifdef __COMPILE_TIMERS__
 				A.t_gemm.stop();
 			#endif
 			return;
 		}
-		if(B.isIdentity)
+		if(B.is_id())
 		{
 			C *= beta;
 			if(typeA == 'N' && alpha == FPP(1.0))
 			{
 				C += A;
 				C.isZeros = false;
-				C.isIdentity = false;
+				C.set_id(false);
 				#ifdef __COMPILE_TIMERS__
 					A.t_gemm.stop();
 				#endif
@@ -582,7 +568,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 				A_tmp *= alpha;
 			C += A_tmp;
 			C.isZeros = false;
-			C.isIdentity = false;
+			C.set_id(false);
 
 			#ifdef __COMPILE_TIMERS__
 				A.t_gemm.stop();
@@ -614,7 +600,7 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 
 	}
 	C.isZeros = false;
-	C.isIdentity = false;
+	C.set_id(false);
 #ifdef __COMPILE_TIMERS__
 A.t_gemm.stop();
 #endif
@@ -636,7 +622,7 @@ A.t_add_ext.start();
 		C.mat = A.mat + B.mat;
 	}
 	C.isZeros = false;
-	C.isIdentity = false;
+	C.set_id(false);
 #ifdef __COMPILE_TIMERS__
 A.t_add_ext.stop();
 #endif

@@ -65,170 +65,177 @@ namespace Faust
 
     template<typename FPP,Device DEVICE>
     class MatGeneric : public Faust::LinearOperator<FPP,DEVICE>
-    {
+	{
 
-        public:
-        
-	MatGeneric() : dim1(0), dim2(0), is_ortho(false) {}
+		public:
 
-        MatGeneric(faust_unsigned_int dim1_, faust_unsigned_int dim2_) : dim1(dim1_), dim2(dim2_), is_ortho(false){}
-    	
-	//! \brief get the dimension of op((*this))
-	//! \param op : char if op=='N' op(*this)=(*this), if op=='T' op((*this))==transpose((*this))
-	//! \param nbRowOp : (in/out) faust_unsigned_int, number of rows of op(*this)
-	//! \param nbColOp : (in/out) faust_unsigned_int, number of columns of op(*this) 
-	void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const; 
+			MatGeneric() : dim1(0), dim2(0), is_ortho(false) {}
 
-	//! \brief return the number of rows of (*this)
-        faust_unsigned_int getNbRow() const {return dim1;}
-	
-	//! \brief return the number of column of (*this)        
-	faust_unsigned_int getNbCol() const {return dim2;}
-	
-	//! \brief resize (*this)
-	//! \param dim1_ : new number of rows
-	//! \param dim2_ : new number of columns
-        void resize(const faust_unsigned_int dim1_,const faust_unsigned_int dim2_){dim1=dim1_;dim2=dim2_;}
-	
-	//purely virtual function : must be redefined in all the descendant class 	
-	/*!  \brief return a "copy" to the given matrix
-	*  \param isOptimize (optionnal) : boolean which the style of copy <br>
-			       -True, the return copy is optimized for the product <br>
-	                       which means dynamic type of the copy could be different from the original one <br>
-	                      -False, the return copy is simple, the dynamic type isn't changed <br>   						(default value is False) <br>					
-        //! \return  a pointer of MatGeneric
-	//  \warning the dynamic type of the copy can be different from the original object, 
-	//  \warning dynamic allocation of the return pointer, must be delete by hand
-	*/
-	virtual MatGeneric<FPP,DEVICE>* Clone(const bool isOptimize=false) const=0;
-	
-	//! \brief compute MatGeneric-vector multiplication
-	//! \param vec : the vector
-	//! \param opThis : character	
-	//! vec = (*this) * vec if opThis='N'
-	// vec = (*this)' * vec if opThis='T' 
-	virtual void multiply(Faust::Vect<FPP,DEVICE> & vec, char opThis='N') const=0;
+			MatGeneric(faust_unsigned_int dim1_, faust_unsigned_int dim2_) : dim1(dim1_), dim2(dim2_), is_ortho(false), is_identity(false) {}
+
+			MatGeneric(faust_unsigned_int dim1_, faust_unsigned_int dim2_, bool is_ortho, bool is_identity) : dim1(dim1_), dim2(dim2_), is_ortho(is_ortho), is_identity(is_identity) {}
 
 
-	//! \brief compute MatGeneric-MatDense multiplication
-	//! \param M : the dense matrix
-	//! \param opThis : character	
-	//! M = (*this) * M if opThis='N'
-	// M = (*this)' * M if opThis='T' 
-	virtual void multiply(Faust::MatDense<FPP,DEVICE> & M, char opThis) const=0;
+			//! \brief get the dimension of op((*this))
+			//! \param op : char if op=='N' op(*this)=(*this), if op=='T' op((*this))==transpose((*this))
+			//! \param nbRowOp : (in/out) faust_unsigned_int, number of rows of op(*this)
+			//! \param nbColOp : (in/out) faust_unsigned_int, number of columns of op(*this)
+			void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const;
 
-	virtual void multiply(Faust::MatSparse<FPP, DEVICE>& M, char opThis) const=0;
+			//! \brief return the number of rows of (*this)
+			faust_unsigned_int getNbRow() const {return dim1;}
 
-	virtual void multiplyRight(Faust::MatSparse<FPP, DEVICE> const& M) =0;
+			//! \brief return the number of column of (*this)
+			faust_unsigned_int getNbCol() const {return dim2;}
 
+			//! \brief resize (*this)
+			//! \param dim1_ : new number of rows
+			//! \param dim2_ : new number of columns
+			void resize(const faust_unsigned_int dim1_,const faust_unsigned_int dim2_){dim1=dim1_;dim2=dim2_;}
 
+			//purely virtual function : must be redefined in all the descendant class
+			/*!  \brief return a "copy" to the given matrix
+			 *  \param isOptimize (optionnal) : boolean which the style of copy <br>
+			 -True, the return copy is optimized for the product <br>
+			 which means dynamic type of the copy could be different from the original one <br>
+			 -False, the return copy is simple, the dynamic type isn't changed <br>   						(default value is False) <br>
+			//! \return  a pointer of MatGeneric
+			//  \warning the dynamic type of the copy can be different from the original object,
+			//  \warning dynamic allocation of the return pointer, must be delete by hand
+			*/
+			virtual MatGeneric<FPP,DEVICE>* Clone(const bool isOptimize=false) const=0;
 
-	
-	//! \brief transpose the matrix
-	virtual void transpose()=0;
-
-	//! \brief Replaces the matrix by its conjugate.
-	virtual void conjugate()=0;
-	
-	//! \brief return the number of non-zeros element in the matrix
-	virtual faust_unsigned_int getNonZeros()const=0;
-
-	//!brief return the percentage of non-zeros coefficient in the matrix, 
-	//! \return value between 0 and 1
-	float density() const{return ((float) this->getNonZeros())/((float)this->getNbCol()*this->getNbRow());}
-	
-	//! \brief get the dynamic type of the matrix (SPARSE or DENSE)
-	virtual MatType getType() const=0;
-	
-	//! \brief multiply a matrix by the given scalar alpha
-	// \param alpha : multplicative scalar
-	virtual void operator*=(const FPP alpha)=0;
-
-
-	//! \brief Display the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
-	virtual void Display() const;
-
-	//! \brief Returns the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
-	virtual std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
-
-	//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio.
-	// \param transpose: set to true to obtain the matio variable for the transpose Matrix.
-	// \param conjugate: set it to true to obtain the matio variable for the conjugate Matrix. 
-	// \return The matio variable matvar_t if it succeeded or NULL otherwise.
-	// \see Faust::Transform::save_mat_file()
-	virtual matvar_t* toMatIOVar(bool transpose, bool conjugate) const=0;
-
-	//TODO: only one function norm() with argument for type of norm
-	//TODO: norm() should return a type different from FPP which can be a complex, though norm is always a real
-	//		NOTE: using a template function isn't a solution because:
-	//		- in this class it would be forbidden because the function is virtual.
-	//		- in child class it would let the virtual pure function of the parent class undefined because the child function template type would correspond to another signature, so the child class would also be abstract.
-	//		NOTE: two solutions are possible 1. add a specific generic type for the norm in the class decl. (the more complicated solution) ; MatGeneric<FPP,DEVICE, NORM_TYPE>
-	//		2. don't use template type FPP by adding two signatures of norm(): norm(float) and norm(double) (the simpler one)
-	//		NOTE: it will avoid to do a weird Faust::fabs() to enclose norm() calls needed because of the complex<?> case.
-
-	//! \brief Computes the L1-norm of the matrix.
-	// \param transpose: to compute the norm of the transpose matrix.
-	// \see Faust::normL1(faust_unsigned_int&)
-	// \see http://mathworld.wolfram.com/L1-Norm.html
-	virtual FPP normL1(const bool transpose) const=0;
-
-	//! \brief Frobenius norm.
-	virtual FPP norm() const=0;
-
-	//! \brief Computes the L1-norm of the matrix.
-	// \param col_id: reference to receive the column index which the L1-norm is equal to the matrix's norm (if several exist, then the greater colummn index is kept).
-	// \param transpose: to compute the norm of the transpose matrix.
-	// \return The norm (its type is the matrix scalar's).
-	// \see Faust::normL1()
-	// \see http://mathworld.wolfram.com/L1-Norm.html
-	virtual FPP normL1(faust_unsigned_int& col_id, const bool transpose) const=0;
-	//
-	//! \brief Returns a column of the matrix as a new Faust::Vect.
-	virtual Faust::Vect<FPP,DEVICE> get_col(faust_unsigned_int id) const=0;
-
-	//! \brief Returns a sub-group of columns of this matrix as the same type of matrix
-	virtual Faust::MatGeneric<FPP,DEVICE>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const=0;
-	//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
-	virtual Faust::MatGeneric<FPP,DEVICE>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const=0;
-	//! \brief Returns a sub-group of columns of this matrix as the same type of matrix
-	virtual Faust::MatGeneric<FPP,DEVICE>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const=0;
-	//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
-	virtual Faust::MatGeneric<FPP,DEVICE>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const=0;
-	virtual list<pair<int,int>> nonzeros_indices() const=0;
-	void set_orthogonal(const bool is_ortho) { this->is_ortho = is_ortho; /* TODO: move def in hpp*/}
-
-	virtual const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const =0;
-
-	bool is_orthogonal() { return this->is_ortho; /* TODO: move def in hpp*/}
-	//! \brief 
-	//! \warning : declare a virtual destructor is mandatory for an abstract class
-	//! in order to allow descendant class destructor to clean up in case of pointer to the abstract class 
-	virtual ~ MatGeneric()=0;
-	
-
-	
-	
-        protected:
-        faust_unsigned_int dim1;
-        faust_unsigned_int dim2;
-		bool is_ortho;
+			//! \brief compute MatGeneric-vector multiplication
+			//! \param vec : the vector
+			//! \param opThis : character
+			//! vec = (*this) * vec if opThis='N'
+			// vec = (*this)' * vec if opThis='T'
+			virtual void multiply(Faust::Vect<FPP,DEVICE> & vec, char opThis='N') const=0;
 
 
-		    
-    };
+			//! \brief compute MatGeneric-MatDense multiplication
+			//! \param M : the dense matrix
+			//! \param opThis : character
+			//! M = (*this) * M if opThis='N'
+			// M = (*this)' * M if opThis='T'
+			virtual void multiply(Faust::MatDense<FPP,DEVICE> & M, char opThis) const=0;
 
-    //! 	
+			virtual void multiply(Faust::MatSparse<FPP, DEVICE>& M, char opThis) const=0;
+
+			virtual void multiplyRight(Faust::MatSparse<FPP, DEVICE> const& M) =0;
+
+
+
+
+			//! \brief transpose the matrix
+			virtual void transpose()=0;
+
+			//! \brief Replaces the matrix by its conjugate.
+			virtual void conjugate()=0;
+
+			//! \brief return the number of non-zeros element in the matrix
+			virtual faust_unsigned_int getNonZeros()const=0;
+
+			//!brief return the percentage of non-zeros coefficient in the matrix,
+			//! \return value between 0 and 1
+			float density() const{return ((float) this->getNonZeros())/((float)this->getNbCol()*this->getNbRow());}
+
+			//! \brief get the dynamic type of the matrix (SPARSE or DENSE)
+			virtual MatType getType() const=0;
+
+			//! \brief multiply a matrix by the given scalar alpha
+			// \param alpha : multplicative scalar
+			virtual void operator*=(const FPP alpha)=0;
+
+
+			//! \brief Display the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
+			virtual void Display() const;
+
+			//! \brief Returns the features of the matrix (type Dense/Sparse, size, nnz, density of nnz ... )
+			virtual std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
+
+			//! \brief Converts the Matrix to a matio variable, especially useful for writing into a file with libmatio.
+			// \param transpose: set to true to obtain the matio variable for the transpose Matrix.
+			// \param conjugate: set it to true to obtain the matio variable for the conjugate Matrix.
+			// \return The matio variable matvar_t if it succeeded or NULL otherwise.
+			// \see Faust::Transform::save_mat_file()
+			virtual matvar_t* toMatIOVar(bool transpose, bool conjugate) const=0;
+
+			//TODO: only one function norm() with argument for type of norm
+			//TODO: norm() should return a type different from FPP which can be a complex, though norm is always a real
+			//		NOTE: using a template function isn't a solution because:
+			//		- in this class it would be forbidden because the function is virtual.
+			//		- in child class it would let the virtual pure function of the parent class undefined because the child function template type would correspond to another signature, so the child class would also be abstract.
+			//		NOTE: two solutions are possible 1. add a specific generic type for the norm in the class decl. (the more complicated solution) ; MatGeneric<FPP,DEVICE, NORM_TYPE>
+			//		2. don't use template type FPP by adding two signatures of norm(): norm(float) and norm(double) (the simpler one)
+			//		NOTE: it will avoid to do a weird Faust::fabs() to enclose norm() calls needed because of the complex<?> case.
+
+			//! \brief Computes the L1-norm of the matrix.
+			// \param transpose: to compute the norm of the transpose matrix.
+			// \see Faust::normL1(faust_unsigned_int&)
+			// \see http://mathworld.wolfram.com/L1-Norm.html
+			virtual FPP normL1(const bool transpose) const=0;
+
+			//! \brief Frobenius norm.
+			virtual FPP norm() const=0;
+
+			//! \brief Computes the L1-norm of the matrix.
+			// \param col_id: reference to receive the column index which the L1-norm is equal to the matrix's norm (if several exist, then the greater colummn index is kept).
+			// \param transpose: to compute the norm of the transpose matrix.
+			// \return The norm (its type is the matrix scalar's).
+			// \see Faust::normL1()
+			// \see http://mathworld.wolfram.com/L1-Norm.html
+			virtual FPP normL1(faust_unsigned_int& col_id, const bool transpose) const=0;
+			//
+			//! \brief Returns a column of the matrix as a new Faust::Vect.
+			virtual Faust::Vect<FPP,DEVICE> get_col(faust_unsigned_int id) const=0;
+
+			//! \brief Returns a sub-group of columns of this matrix as the same type of matrix
+			virtual Faust::MatGeneric<FPP,DEVICE>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const=0;
+			//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
+			virtual Faust::MatGeneric<FPP,DEVICE>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const=0;
+			//! \brief Returns a sub-group of columns of this matrix as the same type of matrix
+			virtual Faust::MatGeneric<FPP,DEVICE>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const=0;
+			//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
+			virtual Faust::MatGeneric<FPP,DEVICE>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const=0;
+			virtual list<pair<int,int>> nonzeros_indices() const=0;
+			void set_orthogonal(const bool is_ortho) { this->is_ortho = is_ortho; /* TODO: move def in hpp*/}
+			void set_id(const bool is_identity) { this->is_identity = is_identity; /* TODO: move def in hpp*/}
+
+			virtual const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const =0;
+
+			bool is_orthogonal() { return this->is_ortho; /* TODO: move def in hpp*/}
+			bool is_id() const { return this->is_identity; /* TODO: move def in hpp*/}
+
+			//! \brief
+			//! \warning : declare a virtual destructor is mandatory for an abstract class
+			//! in order to allow descendant class destructor to clean up in case of pointer to the abstract class
+			virtual ~ MatGeneric()=0;
+
+
+
+
+		protected:
+			faust_unsigned_int dim1;
+			faust_unsigned_int dim2;
+			bool is_ortho;
+			bool is_identity;
+
+
+
+	};
+
+    //!
     //! \brief compare which format between the sparse matrix and the dense matrix is the quickiest for multiplication with vector and return a pointer to the mother class MatGeneric, with a dynamic type equals to the most efficient format
    //! for multiplication
    //! \tparam M : MatDense
    //! \tparam S : MatSparse
    //  \return a pointer of MatGeneric
-   
+
    //template <typename FPP, Device DEVICE>
-   template<typename FPP>	 
+   template<typename FPP>
    Faust::MatGeneric<FPP,Cpu>* optimize(Faust::MatDense<FPP,Cpu> const & M,Faust::MatSparse<FPP,Cpu> const & S);
-	
+
 
 }
 #include "faust_MatGeneric.hpp"

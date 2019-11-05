@@ -196,16 +196,18 @@ cdef class FaustCore:
         core._isReal = False
         return core
 
-    #### METHOD ####
-    #~ 	def getNbRow(self):
-        #~ 		#return self.core_faust_dbl.getNbRow();
-        #~ 		(dim1,dim2)=self.shape();
-        #~ 		return dim1
-
-#~ 	def getNbCol(self):
-    #~ 		(dim1,dim2)=self.shape();
-    #~ 		return dim2
-
+    @staticmethod
+    def eyeFaust(n, m, t='real'):
+        core = FaustCore(core=True)
+        if(t == 'real'):
+            core.core_faust_dbl = FaustCoreCy.FaustCoreCpp[double].eyeFaust(n,
+                                                                             m)
+            core._isReal = True
+        elif(t == 'complex'):
+            core.core_faust_cplx = FaustCoreCy.FaustCoreCpp[complex].eyeFaust(n,
+                                                                             m)
+            core._isReal = False
+        return core
 
     def shape(self):
         cdef unsigned int nbrow = 0

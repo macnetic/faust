@@ -191,20 +191,20 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
             \tparam nbCol : number of column of the matrix
         */
         MatDense(const FPP  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol );
-        MatDense() : MatGeneric<FPP,Cpu>(), mat(0,0), isIdentity(false), isZeros(false) {}
+        MatDense() : MatGeneric<FPP,Cpu>(), mat(0,0), isZeros(false) {}
         /*!
         *  \brief Copy Constructor of MatDense
         *  \tparam A : another MatDense
         */
-        MatDense(const MatDense<FPP,Cpu> & A) : MatGeneric<FPP,Cpu>(A.dim1,A.dim2), mat(A.mat), isIdentity(A.isIdentity), isZeros(A.isZeros) { this->is_ortho = A.is_ortho; }
+        MatDense(const MatDense<FPP,Cpu> & A) : MatGeneric<FPP,Cpu>(A.dim1,A.dim2, A.is_ortho, A.is_identity), mat(A.mat), isZeros(A.isZeros) { }
         template<typename FPP1>
         MatDense(const MatDense<FPP1,Cpu> & A){this->operator=(A);}
         template<typename FPP1>
         MatDense(const Faust::MatSparse<FPP1,Cpu> & A)  {this->operator=(A);this->is_ortho = A.is_ortho;}
         MatDense(const Faust::MatSparse<FPP,Cpu> & A)  {this->operator=(A);this->is_ortho = A.is_ortho;}
 
-        MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : MatGeneric<FPP,Cpu>(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false), isZeros(false){}
-        MatDense(const faust_unsigned_int nbRow) : MatGeneric<FPP,Cpu>(nbRow,nbRow), mat(nbRow,nbRow), isIdentity(false), isZeros(false){}
+        MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol) : MatGeneric<FPP,Cpu>(nbRow,nbCol), mat(nbRow,nbCol), isZeros(false){}
+        MatDense(const faust_unsigned_int nbRow) : MatGeneric<FPP,Cpu>(nbRow,nbRow), mat(nbRow,nbRow), isZeros(false){}
         /// Destructor of MatDense
         ~MatDense(){resize(0,0);/*std::cout<<"destructor dense mat"<<std::endl;*/}
 
@@ -305,7 +305,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! \brief Access to the ith coefficient of the matrix pointer, Colmajor format and zero indexing
         //! \param i : position
         //! \return : ith coefficient of the matrix
-        FPP& operator[](faust_unsigned_int i){isZeros=false; isIdentity=false;return mat.data()[i];}
+        FPP& operator[](faust_unsigned_int i){isZeros=false;this->is_identity=false;return mat.data()[i];}
 
         //!  \brief Access to the ith coefficient of the matrix pointer, Colmajor format and zero indexing (version with "[]" )
         //! \param i : position
@@ -335,7 +335,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         
 	void multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S,const char TransS='N');
 
-        FPP* getData(){isZeros=false; isIdentity=false;return mat.data();}
+        FPP* getData(){isZeros=false;this->is_identity=false;return mat.data();}
         const FPP* getData()const{return mat.data();}
 
         bool isEqual(const MatDense<FPP,Cpu> & B) const;
@@ -463,7 +463,6 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         friend void Faust::gemv<>(const MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 //	friend void  Faust::MatSparse<FPP,Cpu>::multiply(MatDense<FPP,Cpu> & M,const char opThis) const;
 		friend double Faust::Transform<FPP,Cpu>::normL1(const bool transpose) const;
-		bool estIdentite()const{return isIdentity;}
         bool estNulle()const{return isZeros;}
 
 		static Faust::MatDense<FPP,Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols);
@@ -490,7 +489,6 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
 		private:
 		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;
-		bool isIdentity;
 		bool isZeros;
 		static const char * m_className;
 

@@ -59,9 +59,9 @@ Faust::MatSparse<FPP,Cpu>::MatSparse() :
 
 	template<typename FPP>
 	Faust::MatSparse<FPP,Cpu>::MatSparse(const Faust::MatSparse<FPP,Cpu>& M) :
-		Faust::MatGeneric<FPP,Cpu>(M.getNbRow(),M.getNbCol()),
+		Faust::MatGeneric<FPP,Cpu>(M.getNbRow(),M.getNbCol(), M.is_ortho, M.is_identity),
 		mat(M.mat),
-		nnz(M.mat.nonZeros()) {this->set_orthogonal(M.is_ortho);}
+		nnz(M.mat.nonZeros()) { }
 
 		template<typename FPP>
 		Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_) :
@@ -77,10 +77,10 @@ template<typename FPP>
 Faust::MatGeneric<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::Clone(const bool isOptimize /*default value=false*/) const
 {
 	if (isOptimize)
-	{	
+	{
 		Faust::MatDense<FPP,Cpu> M((*this));
 		return optimize(M,(*this));
-	}else
+	} else
 	{
 		return new Faust::MatSparse<FPP,Cpu>((*this));
 	}
@@ -139,6 +139,7 @@ void Faust::MatSparse<FPP,Cpu>::operator=(const Faust::MatSparse<FPP1,Cpu>& M)
 	mat.setFromTriplets(tripletList.begin(), tripletList.end());
 	makeCompression();
 	this->is_ortho = M.is_ortho;
+	this->is_identity = M.is_identity;
 }
 
 
@@ -203,19 +204,19 @@ Faust::MatSparse<FPP,Cpu>::MatSparse(const faust_unsigned_int nnz_, const faust_
 template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const
 {
-	faust_unsigned_int nbColOpS,nbRowOpS;	
-	this->setOp(opThis,nbRowOpS,nbColOpS);	
+	faust_unsigned_int nbColOpS,nbRowOpS;
+	this->setOp(opThis,nbRowOpS,nbColOpS);
 
 	if(nbColOpS != M.getNbRow())
 	{
 		handleError(m_className,"multiply : incorrect matrix dimensions\n");
 	}
 
-	if (M.isIdentity)
+	if (M.is_id())
 	{
 
 		M = (*this);
-		M.isIdentity = false;
+		M.set_id(false);
 		M.isZeros = false;
 
 		if (opThis == 'T')
@@ -229,7 +230,7 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opTh
 	else
 	{
 
-		if (opThis == 'N') 			
+		if (opThis == 'N')
 			M.mat = this->mat * M.mat;
 		else
 			M.mat = this->mat.transpose() * M.mat;
@@ -1006,6 +1007,7 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::eye(faust_unsigned_int n
 			rowptr[i+1] = rowptr[i];
 //	cout << "MatSparse::eye stage 2" << endl;
 	MatSparse<FPP,Cpu>* eye = new MatSparse(nnz, num_rows, num_cols, values, rowptr, colind);
+	eye->set_id(true);
 	delete[] values;
 	delete[] colind;
 	delete[] rowptr;

@@ -377,6 +377,15 @@ template<typename FPP>
 }
 
 template<typename FPP>
+  FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::eyeFaust(unsigned int n, unsigned int m)
+{
+      Faust::TransformHelper<FPP,Cpu>* th = Faust::TransformHelper<FPP,Cpu>::eyeFaust(n, m);
+      if(!th) return NULL;
+      FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
+      return core;
+}
+
+template<typename FPP>
 FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::adjoint()
 {
     Faust::TransformHelper<FPP,Cpu>* th = this->transform->adjoint();

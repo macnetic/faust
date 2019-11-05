@@ -1017,14 +1017,14 @@ void Faust::Transform<FPP,Cpu>::get_nonortho_interior_prod_ids(int &start_id, in
 	start_id = -1;
 	end_id = -1;
 	int i = 0;
-	while (i < this->size() && (data[i]->is_orthogonal() /*|| data[i]->isIdentity*/))
+	while (i < this->size() && (data[i]->is_orthogonal() /*|| data[i]-this->is_identity*/))
 		i++;
 	if(i<data.size())
 	{
 		start_id = i;
 		end_id = start_id;
 		i = this->size()-1;
-		while (i > start_id && (data[i]->is_orthogonal() /*|| data[i]->isIdentity*/))
+		while (i > start_id && (data[i]->is_orthogonal() /*|| data[i]-this->is_identity*/))
 			i--;
 		if(i > start_id)
 			end_id = i;

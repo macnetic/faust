@@ -1008,6 +1008,24 @@ namespace Faust {
 			return fourierFaust;
 		}
 
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::eyeFaust(unsigned int n, unsigned int m)
+		{
+			vector<MatGeneric<FPP,Cpu>*> factors(1);
+			TransformHelper<FPP,Cpu>* eyeFaust = nullptr;
+			try
+			{
+				MatSparse<FPP,Cpu>* eye = MatSparse<FPP,Cpu>::eye(n, m);
+				factors[0] = eye;
+				eyeFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+			}
+			catch(std::bad_alloc e)
+			{
+				//nothing to do, out of memory, return nullptr
+			}
+			return eyeFaust;
+		}
+
 	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
 	template<typename FPP> std::default_random_engine TransformHelper<FPP,Cpu>::generator(time(NULL));
 }

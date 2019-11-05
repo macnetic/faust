@@ -65,7 +65,7 @@ const char * Faust::MatDense<FPP,Cpu>::m_className = "Faust::MatDense<FPP,Cpu>::
 
 
 	template<typename FPP>
-Faust::MatDense<FPP,Cpu>::MatDense(const FPP  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol ) : Faust::MatGeneric<FPP,Cpu>(nbRow,nbCol), mat(nbRow,nbCol), isIdentity(false),isZeros(false)
+Faust::MatDense<FPP,Cpu>::MatDense(const FPP  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol ) : Faust::MatGeneric<FPP,Cpu>(nbRow,nbCol), mat(nbRow,nbCol), isZeros(false)
 {
 
 #ifdef __COMPILE_TIMERS__
@@ -86,10 +86,10 @@ Faust::MatGeneric<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::Clone(const bool isOptimiz
 {
 
 	if (isOptimize)
-	{ 		
-		Faust::MatSparse<FPP,Cpu> S((*this));		
+	{
+		Faust::MatSparse<FPP,Cpu> S((*this));
 		return optimize((*this),S);
-	}	
+	}
 	else
 	{
 		return new MatDense<FPP,Cpu>((*this));
@@ -112,7 +112,7 @@ void Faust::MatDense<FPP,Cpu>::resize(const faust_unsigned_int nbRow,const faust
 	}
 
 	isZeros = false;
-	isIdentity = false;
+this->is_identity = false;
 
 #ifdef __COMPILE_TIMERS__
 	t_resize.stop();
@@ -195,7 +195,7 @@ template<typename FPP>
 list<pair<int,int>> Faust::MatDense<FPP,Cpu>::nonzeros_indices() const
 {
 	list<pair<int,int>> nz_inds;
-	if(isIdentity)
+	if(this->is_identity)
 		for(int i=0;i<min(this->dim1, this->dim2);i++)
 			nz_inds.push_back(make_pair(i,i));
 	else if(! isZeros)
@@ -220,7 +220,7 @@ void Faust::MatDense<FPP,Cpu>::setOnes()
 	for (int i=0 ; i<this->dim1*this->dim2; i++)
 		ptr_data[i] = FPP(1.0);
 	isZeros = false;
-	isIdentity = false;
+this->is_identity = false;
 }
 
 	template<typename FPP>
@@ -228,7 +228,7 @@ void Faust::MatDense<FPP,Cpu>::setZeros()
 {
 	memset(getData(), 0, sizeof(FPP) * this->dim1*this->dim2);
 	isZeros = true;
-	isIdentity = false;
+this->is_identity = false;
 }
 
 	template<typename FPP>
@@ -239,7 +239,7 @@ void Faust::MatDense<FPP,Cpu>::setEyes()
 	for (int i=0;i<min(this->dim1,this->dim2); i++)
 		ptr_data[i*this->dim1+i] = FPP(1.0);
 	if (this->dim1 == this->dim2)
-		isIdentity = true;
+	this->is_identity = true;
 	isZeros = false;
 }
 
@@ -310,7 +310,7 @@ void Faust::MatDense<FPP,Cpu>::transpose()
 	t_transpose.start();
 #endif
 
-	if(isZeros || isIdentity)
+	if(isZeros || this->is_identity)
 	{
 		resize(this->dim2,this->dim1);
 #ifdef __COMPILE_TIMERS__
@@ -411,14 +411,14 @@ void Faust::MatDense<FPP,Cpu>::multiplyRight(Faust::MatDense<FPP,Cpu> const& A)
 		FPP *const ptr_data_dst = getData();
 		memset(ptr_data_dst, 0, sizeof(FPP) * this->dim1*this->dim2);
 		isZeros = true;
-		isIdentity = false;
+	this->is_identity = false;
 #ifdef __COMPILE_TIMERS__
 		t_mult_right.stop();
 #endif
 		return;
 	}
 
-	if(isIdentity)
+	if(this->is_identity)
 	{
 		this->operator=(A);
 #ifdef __COMPILE_TIMERS__
@@ -457,14 +457,14 @@ void Faust::MatDense<FPP,Cpu>::multiplyRight(Faust::MatSparse<FPP,Cpu> const& A)
 		FPP *const ptr_data_dst = getData();
 		memset(ptr_data_dst, 0, sizeof(FPP) * this->dim1*this->dim2);
 		isZeros = true;
-		isIdentity = false;
+	this->is_identity = false;
 #ifdef __COMPILE_TIMERS__
 		t_mult_right.stop();
 #endif
 		return;
 	}
 
-	if(isIdentity)
+	if(this->is_identity)
 	{
 		this->operator=(A);
 #ifdef __COMPILE_TIMERS__
@@ -518,7 +518,7 @@ t_mult_left.stop();
 return;
 }
 
-if(isIdentity)
+if(this->is_identity)
 {
 this->operator=(A);
 #ifdef __COMPILE_TIMERS__
@@ -555,7 +555,7 @@ FPP Faust::MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max
 		return 0;
 	}
 
-	if(isIdentity)
+	if(this->is_identity)
 	{
 		flag = -3;
 #ifdef __COMPILE_TIMERS__
@@ -618,7 +618,7 @@ void Faust::MatDense<FPP,Cpu>::add(Faust::MatDense<FPP,Cpu> const& A)
 	}
 	mat = mat + A.mat;
 	isZeros = false;
-	isIdentity = false;
+	this->is_identity = false;
 #ifdef __COMPILE_TIMERS__
 	t_add.stop();
 #endif
@@ -640,7 +640,7 @@ void Faust::MatDense<FPP,Cpu>::sub(Faust::MatDense<FPP,Cpu> const& A)
 	mat = mat - A.mat;
 
 	isZeros = false;
-	isIdentity = false;
+this->is_identity = false;
 
 #ifdef __COMPILE_TIMERS__
 	t_sub.stop();
@@ -663,7 +663,7 @@ void Faust::MatDense<FPP,Cpu>::sub(Faust::MatSparse<FPP,Cpu> const& A)
 	mat = mat - A.mat;
 
 	isZeros = false;
-	isIdentity = false;
+this->is_identity = false;
 
 #ifdef __COMPILE_TIMERS__
 	t_sub.stop();
@@ -683,8 +683,6 @@ std::string Faust::MatDense<FPP,Cpu>::to_string(const bool transpose /* set to f
 	str << Faust::MatGeneric<FPP,Cpu>::to_string(transpose);
 	if(isZeros)
 		str <<"zeros matrix flag" << endl;
-	else if (isIdentity)
-		str <<" identity matrix flag" << endl;
 	else
 	{
 		if (displaying_small_mat_elts && this->dim1*this->dim2 < 100)
@@ -733,7 +731,7 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatDense<FPP,Cpu> const& A)
 	this->dim1 = A.dim1;
 	this->dim2 = A.dim2;
 	isZeros = A.isZeros;
-	isIdentity = A.isIdentity;
+	this->is_identity = A.is_identity;
 	this->is_ortho = A.is_ortho;
 }
 
@@ -745,7 +743,7 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatDense<FPP1,Cpu> const& A)
 	for (int i=0;i<this->dim1*this->dim2;i++)
 		(*this)[i]=(FPP) A(i);
 	isZeros = A.isZeros;
-	isIdentity = A.isIdentity;
+this->is_identity = A.isIdentity;
 	this->is_ortho = A.is_ortho;
 }
 
@@ -774,7 +772,7 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatSparse<FPP,Cpu> const& S)
 		std::cerr << "Out of memory." << std::endl;
 	}
 	isZeros = false;
-	isIdentity = false;
+this->is_identity = false;
 	this->is_ortho = S.is_ortho;
 }
 
@@ -787,10 +785,10 @@ void Faust::MatDense<FPP,Cpu>::operator*=(const Faust::MatSparse<FPP,Cpu>& S)
 		handleError(m_className, "operator*= : incorrect matrix dimensions");
 	}
 
-	if (isIdentity)
+	if (this->is_identity)
 	{
 		this->operator=(S);
-		isIdentity = false;
+	this->is_identity = false;
 		isZeros = false;
 	}
 	else if (isZeros)
@@ -815,7 +813,7 @@ void Faust::MatDense<FPP,Cpu>::operator+=(const Faust::MatSparse<FPP,Cpu>& S)
 		handleError(m_className,"operator+= : incorrect matrix dimensions");
 	}
 	mat += S.mat;
-	isIdentity = false;
+	this->is_identity = false;
 	isZeros = false;
 }
 
@@ -829,7 +827,7 @@ void Faust::MatDense<FPP,Cpu>::scalarMultiply(Faust::MatDense<FPP,Cpu> const& A)
 		handleError(m_className,"scalarMultiply : incorrect matrix dimensions\n");
 	}
 	mat = (mat.array() * A.mat.array()).matrix();
-	isIdentity = false;
+this->is_identity = false;
 	isZeros = false;
 }
 
@@ -846,10 +844,10 @@ void Faust::MatDense<FPP,Cpu>::multiplyLeft(const Faust::MatSparse<FPP,Cpu>& S,c
 		handleError(m_className,"multiplyLeft : incorrect matrix dimensions\n");
 	}
 
-	if (isIdentity)
+	if (this->is_identity)
 	{
 		this->operator=(S);
-		isIdentity = false;
+	this->is_identity = false;
 		isZeros = false;
 
 		if (TransS == 'T')
@@ -898,7 +896,7 @@ void Faust::MatDense<FPP,Cpu>::init_from_file(const char* filename)
 	memcpy(getData(), &vec[2], sizeof(FPP) * this->dim1 * this->dim2);
 
 	isZeros = false;
-	isIdentity = false;
+this->is_identity = false;
 
 #ifdef __COMPILE_TIMERS__
 	t_print_file.stop();

@@ -1748,15 +1748,20 @@ def eye(m,n=None,t='real'):
             Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):<br/>
             FACTOR 0 (complex) SPARSE, size 5x4, density 0.2, nnz 4<br/>
     """
-    from scipy.sparse import eye
-    if(not n):
-        n = m
-    e = eye(m,n).tocsr()
-    if(t == 'complex'):
-        e = e.astype(np.complex)
-    elif(t != 'real'):
+    if(t not in ['complex', 'real']):
         raise ValueError("t must be 'real' or 'complex'")
-    return Faust(e)
+    if(n == None): n = m
+    rF = Faust(core_obj=_FaustCorePy.FaustCore.eyeFaust(m, n, t))
+    return rF
+#    from scipy.sparse import eye
+#    if(not n):
+#        n = m
+#    e = eye(m,n).tocsr()
+#    if(t == 'complex'):
+#        e = e.astype(np.complex)
+#    elif(t != 'real'):
+#        raise ValueError("t must be 'real' or 'complex'")
+#    return Faust(e)
 
 def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
               field='real', per_row=True):
