@@ -16,6 +16,7 @@
 %>
 %>Faust size 4x4, density 0.25, nnz_sum 4, 1 factor(s):
 %>- FACTOR 0 (real) SPARSE, size 4x4, density 0.25, nnz 4
+%>identity matrix flag
 %>
 %>>> full(matfaust.eye(4))
 %>
@@ -99,9 +100,13 @@ function F = eye(varargin)
 	if(nargin ~= 1 && ~ isnumeric(la) && (ischar(la) || ischar(cell2mat(la))))
 		% F = Faust(sparse(1:m, 1:n, 1+eps(1)*j)); % hack to avoid passing through a full matrix
 		if(strcmp(la,'complex'))
-			F = Faust(eye(m,n,'like', sparse(1,1,1+i)));
+			% F = Faust(eye(m,n,'like', sparse(1,1,1+i)));
+			core_obj = mexFaustCplx('eye', m, n);
+			is_real = false;
 		elseif(strcmp(la, 'real'))
-			F = Faust(speye(m,n));
+			% F = Faust(speye(m,n));
+			core_obj = mexFaustReal('eye', m, n);
+			is_real = true;
 		else
 			if(iscell(la))
 				la = cell2mat(la)
@@ -109,6 +114,14 @@ function F = eye(varargin)
 			error(['Unknown option: ' la])
 		end
 	else
-		F = Faust(speye(m,n));
+		% F = Faust(speye(m,n));
+		core_obj = mexFaustReal('eye', m, n);
+		is_real = true;
 	end
+	e = MException('FAUST:OOM', 'Out of Memory');
+	if(core_obj == 0)
+		throw(e)
+	end
+	F = matfaust.Faust(core_obj, is_real);
+
 end

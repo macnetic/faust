@@ -154,9 +154,9 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 			//TODO: hadamard, fourier, and proxs must be in there own mex function (one for hadamard and fourier, another for the prox)
 			if(!strcmp("hadamard", cmd)){
 				if(nlhs!=1)
-					mexErrMsgTxt("hadamard(): 1 variable result is expected.");
+					mexErrMsgTxt("mex wht(): too many left hand side variables.");
 				if(nrhs < 3)
-					mexErrMsgTxt("hadamard(): wrong number of arguments (must be 2)");
+					mexErrMsgTxt("mex wht(): wrong number of arguments (must be 3)");
 				unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
 				bool norma = (bool) mxGetScalar(prhs[2]);
 
@@ -174,11 +174,12 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 
 			}
 
-			if(!strcmp("fourier", cmd)){
+			if(!strcmp("fourier", cmd))
+			{
 				if(nlhs!=1)
-					mexErrMsgTxt("fourier(): 1 variable result is expected.");
+					mexErrMsgTxt("mex dft(): too many left hand side variables.");
 				if(nrhs < 3)
-					mexErrMsgTxt("fourier(): wrong number of arguments (must be 2)");
+					mexErrMsgTxt("mex dft(): wrong number of arguments (must be 3)");
 				unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
 				bool norma = (bool) mxGetScalar(prhs[2]);
 
@@ -194,6 +195,25 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 				}
 				return;
 
+			}
+
+			if(!strcmp("eye", cmd))
+			{
+				if(nlhs != 1)
+					mexErrMsgTxt("eye(): too many left hand side variables.");
+				unsigned int n, m;
+				n = mxGetScalar(prhs[1]);
+				m = mxGetScalar(prhs[2]);
+				Faust::TransformHelper<SCALAR,Cpu>* eye = Faust::TransformHelper<SCALAR,Cpu>::eyeFaust(n, m);
+				if(eye) // not NULL
+					plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu>>(eye);
+				else
+				{
+					plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+					double* ptr_out = (double*) mxGetData(plhs[0]);
+					ptr_out[0]=(double) 0;
+				}
+				return;
 			}
 
 			if(!strcmp("prox", cmd))
