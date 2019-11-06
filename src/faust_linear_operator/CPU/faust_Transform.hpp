@@ -1032,6 +1032,24 @@ void Faust::Transform<FPP,Cpu>::get_nonortho_interior_prod_ids(int &start_id, in
 }
 
 template<typename FPP>
+Faust::MatSparse<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatSparse<FPP,Cpu> A,const char opThis) const
+{
+	if (size() == 0)
+		handleWarning("Faust::Transform<FPP,Cpu> : multiply : empty Faust::Transform<FPP,Cpu>");
+
+	Faust::MatSparse<FPP,Cpu> mat(A);
+
+	if (opThis == 'N')
+		for (int i=this->size()-1; i >= 0; i--)
+			data[i]->multiply(mat,opThis);
+	else
+		for (int i=0; i < this->size(); i++)
+			data[i]->multiply(mat,opThis);
+
+	return mat;
+}
+
+template<typename FPP>
 Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis) const
 {
 
@@ -1050,9 +1068,9 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDen
 			//	this->t_multiply_mat[i].start();
 			//#endif
 			data[i]->multiply(mat,opThis);
-			//#ifdef __COMPILE_TIMERS__
-			//	this->t_multiply_mat[i].stop();
-			//#endif
+				//#ifdef __COMPILE_TIMERS__
+				//	this->t_multiply_mat[i].stop();
+				//#endif
 		}
 	}else
 	{

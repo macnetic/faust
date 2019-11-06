@@ -168,6 +168,14 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+		MatSparse<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> A, const bool transpose /* deft to false */) const
+		{
+			MatSparse<FPP,Cpu> M = this->transform->multiply(A, isTransposed2char());
+			if(is_conjugate) M.conjugate();
+			return M;
+		}
+
+	template<typename FPP>
 		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> x) const
 		{
 			Vect<FPP,Cpu> v = this->transform->multiply(x, isTransposed2char());

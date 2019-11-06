@@ -271,6 +271,9 @@ namespace Faust
 				 */
 				Faust::MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> A,const char opThis='N') const;
 
+				Faust::MatSparse<FPP,Cpu> multiply(const Faust::MatSparse<FPP,Cpu> A,const char opThis='N') const;
+
+
 				/** \brief Move assign operator overload. Factors are not duplicated in memory but T loses its.*/
 				Transform<FPP,Cpu>& operator=(Faust::Transform<FPP,Cpu>&& T);
 

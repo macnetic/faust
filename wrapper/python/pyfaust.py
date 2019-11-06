@@ -594,6 +594,8 @@ class Faust:
         elif(isinstance(A, np.ndarray) and A.dtype == np.complex):
             j = np.complex(0,1)
             return F.m_faust.multiply(A.real).astype(np.complex) + j*F.m_faust.multiply(A.imag)
+        elif(isinstance(A, scipy.sparse.csr_matrix)):
+            return F.m_faust.multiply_csr_mat(A)
         else:
             return F.m_faust.multiply(A)
 

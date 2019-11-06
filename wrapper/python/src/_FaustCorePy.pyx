@@ -220,6 +220,32 @@ cdef class FaustCore:
             nbcol = self.core_faust_cplx.getNbCol();
         return (nbrow,nbcol)
 
+    def multiply_csr_mat(self, X):
+        cdef double [:] x_data1d
+        cdef int [:] x_indices
+        cdef int [:] x_indptr
+        cdef complex [:] x_data_cplx
+        cdef double [:,:] y_data
+        cdef complex [:,:] y_data_cplx
+        # X is supposed to be a csr_matrix
+        x_data1d = X.data
+        x_indices = X.indices
+        x_indptr = X.indptr
+        x_nnz = X.nnz
+        if(self._isReal):
+            nbrow = self.core_faust_dbl.getNbRow()
+            nbcol = X.shape[1]
+            y_data_arr = np.empty((nbrow,nbcol), dtype=np.double, order='F') # we don't know beforehand Y nnz
+            y_data = y_data_arr
+            self.core_faust_dbl.multiply(&y_data[0,0], nbrow, nbcol,
+                                                 &x_data1d[0], &x_indptr[0],
+                                                 &x_indices[0],
+                                                 x_nnz, X.shape[0], X.shape[1])
+        else:
+            raise Exception("complex Faust-csr_matrix mul not yet supported")
+        return y_data_arr
+
+
 
     cdef multiply_faust(self, F):
         if(isinstance(F, FaustCore)):

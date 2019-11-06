@@ -63,6 +63,7 @@ class FaustCoreCpp
     void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols, bool optimizedCopy=false);
     unsigned int getNbRow() const;
     unsigned int getNbCol() const;
+    void multiply(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols);
     void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x/*,bool isTranspose*/)const;
     FaustCoreCpp<FPP>* mul_faust(FaustCoreCpp<FPP>* right);
     FaustCoreCpp<FPP>* vertcat(FaustCoreCpp<FPP>* right);

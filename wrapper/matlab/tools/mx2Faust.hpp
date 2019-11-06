@@ -200,36 +200,36 @@ void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 template<typename FPP>
 void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S)
 {
-	
+
 	if (!mxIsSparse(spMat_array))
 	{
 		mexErrMsgIdAndTxt("tools_mex.h:mxArray2FaustspMat",
-           "input array must be sparse");
+				"input array must be sparse");
 	}
 
-    	
-    int nnzMax = mxGetNzmax(spMat_array);
-    int nbCol = mxGetN(spMat_array);
-    int nbRow = mxGetM(spMat_array);
-    //mexPrintf("DIM (%d,%d) NNZMAX : %d\n",nbRow,nbCol,nnzMax);
 
-    size_t* jc,*ir;
-    FPP* ptr_data;
+	int nnzMax = mxGetNzmax(spMat_array);
+	int nbCol = mxGetN(spMat_array);
+	int nbRow = mxGetM(spMat_array);
+	//mexPrintf("DIM (%d,%d) NNZMAX : %d\n",nbRow,nbCol,nnzMax);
 
-    //jc = (size_t *) mxCalloc(nbCol+1,sizeof(size_t));
-    jc = (size_t *)mxGetJc(spMat_array);
-    //ir = (size_t *) mxCalloc(nnzMax,sizeof(size_t));
-    ir = (size_t *) mxGetIr(spMat_array);
-    //pr = (double *) mxCalloc(nnzMax,sizeof(double));
-    
-   		
-    mxArray2Ptr(spMat_array,ptr_data);  
-  	
+	size_t* jc,*ir;
+	FPP* ptr_data;
 
-    S.set(nnzMax,nbRow,nbCol,ptr_data,ir,jc);
-    
-    if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
-   	
+	//jc = (size_t *) mxCalloc(nbCol+1,sizeof(size_t));
+	jc = (size_t *)mxGetJc(spMat_array);
+	//ir = (size_t *) mxCalloc(nnzMax,sizeof(size_t));
+	ir = (size_t *) mxGetIr(spMat_array);
+	//pr = (double *) mxCalloc(nnzMax,sizeof(double));
+
+
+	mxArray2Ptr(spMat_array,ptr_data);
+
+
+	S.set(nnzMax,nbRow,nbCol,ptr_data,ir,jc);
+
+	if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
+
 
 }
 

@@ -110,6 +110,15 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::mul_scal(FPP scal)
 }
 
 template<typename FPP>
+void FaustCoreCpp<FPP>::multiply(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols)
+{
+    Faust::MatSparse<FPP, Cpu> X(x_nnz, x_nrows, x_ncols, x_data, x_row_ptr, x_id_col);
+    Faust::MatDense<FPP, Cpu> Y;
+    Y = this->transform->multiply(X);
+    memcpy(y_data, Y.getData(),sizeof(FPP)*y_ncols*y_nrows);
+}
+
+template<typename FPP>
 void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x)const
 {
 
@@ -147,8 +156,6 @@ void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value
 
         memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y*nbcol_y);
     }
-
-
 }
 
 
