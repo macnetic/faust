@@ -396,7 +396,7 @@ void Faust::MatDense<FPP,Cpu>::multiplyRight(Faust::MatDense<FPP,Cpu> const& A)
 		handleError(m_className, "multiplyRight : dimension conflict between matrix");
 	}
 
-	if(A.isIdentity)
+	if(A.is_id())
 	{
 #ifdef __COMPILE_TIMERS__
 		t_mult_right.stop();
@@ -743,7 +743,7 @@ void Faust::MatDense<FPP,Cpu>::operator=(Faust::MatDense<FPP1,Cpu> const& A)
 	for (int i=0;i<this->dim1*this->dim2;i++)
 		(*this)[i]=(FPP) A(i);
 	isZeros = A.isZeros;
-this->is_identity = A.isIdentity;
+	this->is_identity = A.is_identity;
 	this->is_ortho = A.is_ortho;
 }
 
