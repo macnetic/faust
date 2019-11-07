@@ -69,7 +69,7 @@ namespace Faust
 
 		public:
 
-			MatGeneric() : dim1(0), dim2(0), is_ortho(false) {}
+			MatGeneric() : dim1(0), dim2(0), is_ortho(false), is_identity(false) {}
 
 			MatGeneric(faust_unsigned_int dim1_, faust_unsigned_int dim2_) : dim1(dim1_), dim2(dim2_), is_ortho(false), is_identity(false) {}
 
