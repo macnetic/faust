@@ -102,12 +102,14 @@ foreach(SCALAR_AND_FSUFFIX double:Real std::complex<double>:Cplx) # TODO: float 
 	# Givens FGFT is only for double and float scalars
 	if(NOT ${FAUST_SCALAR} MATCHES "complex")
 		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens${FSUFFIX}.cpp @ONLY)
+		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj${FSUFFIX}.cpp @ONLY)
 	endif()
 	# copy the *.m for factorization now, because we have the FSUFFIX in hands
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact${FSUFFIX}.m COPYONLY)
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexPalm4MSA.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexPalm4MSA${FSUFFIX}.m COPYONLY)
 	if(NOT ${FAUST_SCALAR} MATCHES "complex")
 		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexfgftgivens.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexfgftgivens${FSUFFIX}.m COPYONLY)
+		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexsvdtj.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexsvdtj${FSUFFIX}.m COPYONLY)
 	endif()
 endforeach()
 

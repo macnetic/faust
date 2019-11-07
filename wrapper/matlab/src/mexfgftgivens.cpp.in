@@ -38,6 +38,7 @@
 #include "faust_GivensFGFTComplex.h"
 #include "faust_GivensFGFTParallelComplex.h"
 #include "faust_TransformHelper.h"
+#include "faust_linear_algebra.h"
 #include "class_handle.hpp"
 #include "faust_Vect.h"
 #include <vector>
@@ -200,6 +201,8 @@ void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, un
 	catch (const std::exception& e)
 	{
 
-	} 
+	}
 
 }
+
+
