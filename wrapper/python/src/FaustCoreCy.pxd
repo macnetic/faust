@@ -48,6 +48,7 @@ cdef extern from "FaustCoreCpp.h" :
                        bool optimizedCopy)
         void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows,
                        int ncols, bool optimizedCopy)
+        void get_product(FPP* data, int nbrow, int nbcol);
         void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,
                       int nbrow_x, int nbcol_x);#,bool isTranspose*/);
         # Faust-by-csr product -> dense mat

@@ -551,10 +551,16 @@ class Faust:
 
         Args:
             F: the Faust object.
-            A: a Faust object or a 2D full matrix (numpy.ndarray, numpy.matrix).
+            A: a Faust object a scipy.sparse.csr_matrix or a 2D full matrix (numpy.ndarray, numpy.matrix).
             <br/> In the latter case, A must be Fortran contiguous (i.e. Column-major order;
                 `order' argument passed to np.ndararray() must be equal to str
                 'F').
+            <br/> Note that performing a Faust-csr_matrix product is often
+            slower than converting first the csr_matrix to a dense
+            representation (toarray()) and then proceed to the
+            Faust-dense_matrix multiplication. In some cases though, it stays
+            quicker: moreover when the Faust is composed of a small number of
+            factors.
 
         Returns: The result of the multiplication
             - as a numpy.ndarray if A is a ndarray,<br/>
@@ -861,9 +867,8 @@ class Faust:
 
         <b/>See also Faust.todense
         """
-        identity = np.eye(F.shape[1], F.shape[1])
-        F_dense = F*identity
-        return F_dense
+        return F.m_faust.get_product()
+
 
     def todense(F):
         """

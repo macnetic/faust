@@ -245,7 +245,24 @@ cdef class FaustCore:
             raise Exception("complex Faust-csr_matrix mul not yet supported")
         return y_data_arr
 
+    def get_product(self):
+        cdef double [:,:] y_data
+        cdef complex [:,:] y_data_cplx
 
+        if(self._isReal):
+            y_arr = np.empty((self.core_faust_dbl.getNbRow(), self.core_faust_dbl.getNbCol()), dtype='d',
+                             order='F')
+            y_data = y_arr
+            self.core_faust_dbl.get_product(&y_data[0,0], y_arr.shape[0],
+                                            y_arr.shape[1])
+        else:
+            y_arr = np.empty((self.core_faust_cplx.getNbRow(), self.core_faust_cplx.getNbCol()),
+                             dtype=np.complex,
+                             order='F')
+            y_data_cplx = y_arr
+            self.core_faust_cplx.get_product(&y_data_cplx[0,0], y_arr.shape[0],
+                                            y_arr.shape[1])
+        return y_arr
 
     cdef multiply_faust(self, F):
         if(isinstance(F, FaustCore)):

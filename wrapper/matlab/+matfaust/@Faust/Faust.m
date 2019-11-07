@@ -376,7 +376,7 @@ classdef Faust
 		%> @b Usage
 		%>
 		%> &nbsp;&nbsp;&nbsp; @b G = mtimes(F, A)<br/>
-		%> &nbsp;&nbsp;&nbsp; @b G = F*A with A and G being full matrices.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b G = F*A with A and G being full matrices. A could also be a sparse matrix but note that often the Faust-sparse matrix multiplication is slower than performing F*full(A) multiplication. In some cases though, it stays quicker: moreover when the Faust is composed of a small number of factors.<br/>
 		%> &nbsp;&nbsp;&nbsp; @b G = F*s with s a scalar and G a Faust.<br/>
 		%> &nbsp;&nbsp;&nbsp; @b G = s*F with s a scalar and G a Faust.<br/>
 		%> &nbsp;&nbsp;&nbsp; @b G = s*F' with s a scalar multiplying the conjugate-transpose of F.<br/>
@@ -409,21 +409,6 @@ classdef Faust
 		%> @endcode
 		%>
 		%> @b Errors
-		%> - The multiplying operand A is a sparse matrix:
-		%>
-		%> @code
-		%>>> issparse(S)
-		%>
-		%>ans =
-		%>
-		%>  logical
-		%>
-		%>     1
-		%>
-		%>>> F*S
-		%> Error using matfaust
-		%> Faust multiplication to a sparse matrix isn't supported.
-		%> @endcode
 		%>
 		%> - F is real but A is a complex scalar.
 		%>
@@ -502,9 +487,10 @@ classdef Faust
 			% TODO: take trans into account when mul F to a scal or a Faust
 			% it's not a serious issue because mtimes_trans() shouln't be called by final user
 			% (func's doc is filtered out in doxydoc)
-			if(issparse(A))
-				error('Faust multiplication to a sparse matrix isn''t supported.')
-			elseif(isa(A,'matfaust.Faust'))
+			%if(issparse(A))
+			%	error('Faust multiplication to a sparse matrix isn''t supported.')
+			%elseif(isa(A,'matfaust.Faust'))
+			if(isa(A,'matfaust.Faust'))
 				if (F.isReal)
 					if(isreal(A))
 						C = matfaust.Faust(F, mexFaustReal('mul_faust', F.matrix.objectHandle, A.matrix.objectHandle));
