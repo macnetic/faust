@@ -120,7 +120,7 @@ void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int 
 			else
 			{
 				algoW1 = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(dMM_, J, t, verbosity, tol, relErr);
-				algoW2 = new GivensFGFT<SCALAR,Cpu,FPP2>(dM_M, J, verbosity, tol, relErr);
+				algoW2 = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(dM_M, J, t, verbosity, tol, relErr);
 			}
 		}else
 		{
@@ -136,12 +136,12 @@ void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int 
 			else
 			{
 				algoW1 = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(dMM_, J, t, verbosity, tol, relErr);
-				algoW2 = new GivensFGFT<SCALAR,Cpu,FPP2>(dM_M, J, verbosity, tol, relErr);
+				algoW2 = new GivensFGFTParallel<SCALAR,Cpu,FPP2>(dM_M, J, t, verbosity, tol, relErr);
 			}
 
 		}
 
-		//TODO: parallelize
+		//TODO: parallelize with OpenMP
 		algoW1->compute_facts();
 		algoW2->compute_facts();
 
@@ -153,21 +153,41 @@ void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int 
 
 		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(thW1);
 
-		Faust::Transform<SCALAR,Cpu> transW2 = std::move(algoW1->get_transform(order));
+		Faust::Transform<SCALAR,Cpu> transW2 = std::move(algoW2->get_transform(order));
 		TransformHelper<SCALAR,Cpu> *thW2 = new TransformHelper<SCALAR,Cpu>(transW2, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 		plhs[2] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(thW2);
 
 		// compute S = W1'*M*W2 = W1'*(W2^T*M)^T
-		thW2->transpose();
+		dM.transpose();
 		Faust::MatDense<SCALAR,Cpu> MW2 = thW2->multiply(dM, /* transpose */ true);
-		thW1->transpose();
+		MW2.transpose();
 		Faust::MatDense<SCALAR,Cpu> W1_MW2 = thW1->multiply(MW2, /* transpose */ true);
-		// create diagonal vector
-		for(int i=0;i<S.size();i++)
-			S.getData()[i] = W1_MW2(i,i);
 
-		plhs[1] = FaustVec2mxArray(S);
+		// create diagonal vector
+		for(int i=0;i<S.size();i++){
+			S.getData()[i] = W1_MW2(i,i);
+			std::cout << "% " << S.getData()[i] << std::endl;
+		}
+
+		//order D descendently according to the abs value
+		vector<int> ord_indices;
+		Faust::Vect<SCALAR,Cpu> ordered_S = Faust::Vect<SCALAR,Cpu>(S.size());
+		ord_indices.resize(0);
+		order = 1;
+		for(int i=0;i<S.size();i++)
+			ord_indices.push_back(i);
+		sort(ord_indices.begin(), ord_indices.end(), [S, &order](int i, int j) {
+				return Faust::fabs(S.getData()[i]) > Faust::fabs(S.getData()[j])?1:0;
+				});
+		for(int i=0;i<ord_indices.size();i++)
+		{
+			ordered_S.getData()[i] = S.getData()[ord_indices[i]];
+			std::cout << "* " << ordered_S.getData()[i] << std::endl;
+		}
+		// TODO: and change the sign when the value is negative
+		// it gives a signed permutation matrix to append to W1
+		plhs[1] = FaustVec2mxArray(ordered_S);
 
 		delete algoW1;
 		delete algoW2;
