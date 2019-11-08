@@ -431,34 +431,34 @@ void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data)
 template<typename FPP>
 void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cpu> *> &list_mat)
 {
-	
+
 	if (mxMat == NULL)
-	   mexErrMsgTxt("concatMatGeneric : empty matlab matrix"); 
+		mexErrMsgTxt("concatMatGeneric : empty matlab matrix"); 
 
 	Faust::MatGeneric<FPP,Cpu> *  M;
-	
-	
+
+
 
 
 
 	if (!mxIsSparse(mxMat))
 	{	
-		
+
 		Faust::MatDense<FPP,Cpu> denseM;
 		mxArray2FaustMat(mxMat,denseM);
 		M=denseM.Clone();
-		
+
 	}else
 	{
-				
+
 		Faust::MatSparse<FPP,Cpu> spM;		
 		mxArray2FaustspMat(mxMat,spM);
 		M=spM.Clone();
 	}
 
-		list_mat.push_back(M);
-		
-	
+	list_mat.push_back(M);
+
+
 }
 
 
