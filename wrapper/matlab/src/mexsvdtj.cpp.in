@@ -41,6 +41,7 @@
 #include "faust_linear_algebra.h"
 #include "class_handle.hpp"
 #include "faust_Vect.h"
+#include "faust_MatSparse.h"
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -151,12 +152,10 @@ void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int 
 		Faust::Transform<SCALAR,Cpu> transW1 = std::move(algoW1->get_transform(order));
 		TransformHelper<SCALAR,Cpu> *thW1 = new TransformHelper<SCALAR,Cpu>(transW1, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
-		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(thW1);
 
 		Faust::Transform<SCALAR,Cpu> transW2 = std::move(algoW2->get_transform(order));
 		TransformHelper<SCALAR,Cpu> *thW2 = new TransformHelper<SCALAR,Cpu>(transW2, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
-		plhs[2] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(thW2);
 
 		// compute S = W1'*M*W2 = W1'*(W2^T*M)^T
 		dM.transpose();
@@ -167,12 +166,16 @@ void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int 
 		// create diagonal vector
 		for(int i=0;i<S.size();i++){
 			S.getData()[i] = W1_MW2(i,i);
-			std::cout << "% " << S.getData()[i] << std::endl;
 		}
 
-		//order D descendently according to the abs value
+		// order D descendently according to the abs value
+		// and change the sign when the value is negative
+		// it gives a signed permutation matrix P to append to W1, abs(P2) is append to W2
 		vector<int> ord_indices;
 		Faust::Vect<SCALAR,Cpu> ordered_S = Faust::Vect<SCALAR,Cpu>(S.size());
+		vector<SCALAR> values(S.size());
+		vector<SCALAR> values2(S.size());
+		vector<int> col_ids(S.size());
 		ord_indices.resize(0);
 		order = 1;
 		for(int i=0;i<S.size();i++)
@@ -182,15 +185,25 @@ void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int 
 				});
 		for(int i=0;i<ord_indices.size();i++)
 		{
-			ordered_S.getData()[i] = S.getData()[ord_indices[i]];
-			std::cout << "* " << ordered_S.getData()[i] << std::endl;
+			col_ids[i] = i;
+			ordered_S.getData()[i] = Faust::fabs(S.getData()[ord_indices[i]]);
+			if(S.getData()[ord_indices[i]] < 0)
+				values[i] = -1;
+			else
+				values[i] = 1;
+			values2[i] = 1;
 		}
-		// TODO: and change the sign when the value is negative
-		// it gives a signed permutation matrix to append to W1
-		plhs[1] = FaustVec2mxArray(ordered_S);
-
+		Faust::MatSparse<SCALAR, Cpu>* PS = new Faust::MatSparse<SCALAR, Cpu>(ord_indices, col_ids, values, M->getNbRow(), M->getNbCol());
+		thW1->push_back(PS);
+		Faust::MatSparse<SCALAR, Cpu>* P = new Faust::MatSparse<SCALAR, Cpu>(ord_indices, col_ids, values2, M->getNbRow(), M->getNbCol());
+		thW2->push_back(P);
 		delete algoW1;
 		delete algoW2;
+
+		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(thW1);
+		plhs[1] = FaustVec2mxArray(ordered_S);
+		plhs[2] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(thW2);
+
 	}
 	catch (const std::exception& e)
 	{
