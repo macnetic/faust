@@ -38,7 +38,7 @@ from pyfaust import Faust
 import _FaustCorePy
 
 # experimental block start
-def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
+def svdtj2(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
@@ -84,6 +84,43 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     U = W1[:,0:S.shape[0]]*Faust([Id[:,I],sign_S.toarray()])
     V = W2[:,0:S.shape[0]]*Faust(Id[:,I])
     return U,S,V
+
+def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
+    """
+        Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
+
+        NOTE: this function is based on fact.eigtj.
+
+        Args:
+            M: a real matrix.
+            maxiter: see fact.eigtj
+            tol: see fact.eigtj
+            relerr: see fact.eigtj
+            nGivens_per_fac: see fact.eigtj
+            verbosity: see fact.eigtj
+
+        Returns:
+            The tuple U,S,V: U*S.todense()*V' being the approximation of M.
+                - (sparse diagonal matrix) S the singular values in
+                descendant order.
+                - (Faust object) U the left-singular transform.
+                - (Faust object) V the right-singular transform.
+
+        Example:
+            >>> from pyfaust.fact import svdtj
+            >>> from numpy.random import rand
+            >>> M = rand(128,128)
+            >>> U,S,V = svdtj(M, 1024, 64)
+
+     See also:
+        eigtj
+    """
+    Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, maxiter, nGivens_per_fac, verbosity, tol, relerr)
+    U = Faust(core_obj=Ucore)
+    V = Faust(core_obj=Vcore)
+    return U, S, V
+
+
 # experimental block end
 
 def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,

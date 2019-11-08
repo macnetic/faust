@@ -220,3 +220,9 @@ cdef extern from "FaustFactGivensFGFT.h":
                                  const double stoppingError,
                                  const bool errIsRel,
                                  const int order)
+
+    cdef void svdtj[FPP, FPP2](FaustCoreCpp[FPP]** U, FaustCoreCpp[FPP] **V, FPP* S,
+                         const FPP* M_data, unsigned int num_rows, unsigned int
+                         num_cols, unsigned int J, unsigned int t, unsigned int
+                         verbosity, const double stoppingError, const bool errIsRel)
+

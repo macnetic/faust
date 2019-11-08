@@ -1554,3 +1554,41 @@ cdef class FaustFact:
         #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
         #return core, D_spdiag
         return core, D
+
+    @staticmethod
+    def svdtj(M, J, t, verbosity=0, stoppingError = 0.0,
+              errIsRel=True):
+        isReal = M.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+        # double == float64
+        check_matrix(isReal, M)
+
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+
+        cdef double[:,:] M_view
+        cdef double[:] S_view
+
+        M_view = M
+        S = np.empty(M.shape[0], dtype=M.dtype)
+        S_view = S
+
+        coreU = FaustCore(core=True)
+        coreV = FaustCore(core=True)
+        FaustCoreCy.svdtj[double, double](&(coreU.core_faust_dbl),
+                                          &(coreV.core_faust_dbl),
+                                          &S_view[0],
+                                          &M_view[0,0],
+                                          M_num_rows,
+                                          M_num_cols, int(J), int(t),
+                                          verbosity,
+                                          stoppingError,
+                                          errIsRel)
+
+        coreU._isReal = coreV._isReal = True
+        #from scipy.sparse import spdiags
+        #S_spdiag = spdiags(S, [0], M.shape[0], M.shape[0])
+        #return core, S_spdiag
+        return coreU, S, coreV
+
