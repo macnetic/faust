@@ -117,7 +117,7 @@ FaustCoreCpp<FPP>* fact_givens_fgft_generic_cplx(GivensFGFTComplex<FPP, Cpu, FPP
 }
 
 template<typename FPP, typename FPP2 = float>
-void svdtj(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* M_data, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true  )
+void svdtj(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* M_data, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t, unsigned int verbosity, const double stoppingError, const bool errIsRel)
 {
     Faust::MatDense<FPP,Cpu> M(M_data, (faust_unsigned_int) num_rows, (faust_unsigned_int) num_cols);
 //MatDense<FPP, Cpu> & dM, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, TransformHelper<FPP,Cpu> ** U, TransformHelper<FPP,Cpu> **V, Faust::Vect<FPP,Cpu> ** S_
