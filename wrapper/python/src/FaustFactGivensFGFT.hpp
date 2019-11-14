@@ -127,6 +127,7 @@ void svdtj(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of inpu
     *U = new FaustCoreCpp<FPP>(U_);
     *V = new FaustCoreCpp<FPP>(V_);
     //TODO: avoid this copy by directly edit outside buffer S
-    delete S;
+//    delete S;
     memcpy(S, S_->getData(), sizeof(FPP)* S_->size());
+    delete S_;
 }

@@ -108,9 +108,14 @@ void Faust::svdtj_core(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatD
 		values2[i] = 1;
 	}
 	Faust::MatSparse<FPP, DEVICE>* PS = new Faust::MatSparse<FPP, DEVICE>(ord_indices, col_ids, values, M->getNbRow(), M->getNbCol());
-	thW1->push_back(PS);
+	MatGeneric<FPP,Cpu>* lf = (MatGeneric<FPP,Cpu>*)(thW1->get_fact_addr(thW1->size()-1)); 
+	lf->multiplyRight(*PS);
+	//	thW1->push_back(PS);
+
 	Faust::MatSparse<FPP, DEVICE>* P = new Faust::MatSparse<FPP, DEVICE>(ord_indices, col_ids, values2, M->getNbRow(), M->getNbCol());
-	thW2->push_back(P);
+	lf = (MatGeneric<FPP,Cpu>*)(thW2->get_fact_addr(thW1->size()-1)); 
+	lf->multiplyRight(*P);
+	//	thW2->push_back(P);
 	delete algoW1;
 	delete algoW2;
 
