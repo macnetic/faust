@@ -1,4 +1,3 @@
-# experimental block start
 # -*- coding: utf-8 -*-
 # @PYFAUST_LICENSE_HEADER@
 from pyfaust import *
@@ -841,4 +840,3 @@ class ParamsFactFactory:
     @staticmethod
     def is_a_valid_simplification(p):
         return ParamsFactFactory.get_simplification_name(p) != None
-# experimental block end

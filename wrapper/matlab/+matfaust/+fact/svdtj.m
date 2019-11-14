@@ -1,4 +1,3 @@
-% experimental block start
 %====================================================================
 %> @brief Performs a singular value decomposition and returns the left and
 %> right singular vectors as Faust transforms.
@@ -112,4 +111,3 @@ function [U,S,V] = svdtj(M, maxiter, varargin)
 	U = Faust(core_obj1, isreal(M));
 	V = Faust(core_obj2, isreal(M));
 end
-% experimental block end

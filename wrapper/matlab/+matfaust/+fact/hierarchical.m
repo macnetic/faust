@@ -1,4 +1,3 @@
-% experimental block start
 %==========================================================================================
 %> @brief Factorizes the matrix M with Hierarchical Factorization using the parameters set in p.
 %>
@@ -164,4 +163,3 @@ function varargout = hierarchical(M, p)
 	F = Faust(core_obj, isreal(M));
 	varargout = {F, lambda, p};
 end
-% experimental block end

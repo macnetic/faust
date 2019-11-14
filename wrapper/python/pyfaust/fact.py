@@ -8,7 +8,6 @@
 ##    (i.e. a Faust object). A few of them are only available in experimental
 ##    packages.
 ##
-# experimental block start
 ##    There are several factorization algorithms.
 ##
 ##    - The first one is Palm4MSA :
@@ -21,11 +20,11 @@
 ##    It makes iterative use of Palm4MSA to proceed with the factorization of a given
 ##    dense matrix.
 ##
-##    - The third group of algorithms is for FGFT computing: fgft_palm, fgft_givens, eigtj
+##    - The third group of algorithms is for FGFT computing: fgft_givens,
+##      eigtj and fgft_palm (only in experimental version for the latter).
 ##
 ##
 ##
-# experimental block end
 
 
 import numpy as np, scipy
@@ -84,6 +83,8 @@ def svdtj2(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     U = W1[:,0:S.shape[0]]*Faust([Id[:,I],sign_S.toarray()])
     V = W2[:,0:S.shape[0]]*Faust(Id[:,I])
     return U,S,V
+# experimental block end
+
 
 def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     """
@@ -92,7 +93,7 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
         NOTE: this function is based on fact.eigtj.
 
         Args:
-            M: a real matrix.
+            M: a real matrixi (np.ndarray or scipy.sparse.csr_matrix).
             maxiter: see fact.eigtj
             tol: see fact.eigtj
             relerr: see fact.eigtj
@@ -119,12 +120,14 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
         Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, maxiter, nGivens_per_fac, verbosity, tol, relerr)
     elif(isinstance(M, csr_matrix)):
         Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse(M, maxiter, nGivens_per_fac, verbosity, tol, relerr)
+    else:
+        raise ValueError("invalid type for M (first argument): only np.ndarray "
+                         "or scipy.sparse.csr_matrix are supported.")
     U = Faust(core_obj=Ucore)
     V = Faust(core_obj=Vcore)
     return U, S, V
 
 
-# experimental block end
 
 def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
           order='ascend'):
@@ -280,7 +283,6 @@ def _check_fact_mat(funcname, M):
     #   raise Exception(funcname+" doesn't yet support complex matrix "
     #                   "factorization.")
 
-# experimental block start
 def palm4msa(M, p, ret_lambda=False):
     """
     Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
@@ -323,6 +325,7 @@ def palm4msa(M, p, ret_lambda=False):
     else:
         return F
 
+# experimental block start
 def _palm4msa_fgft(Lap, p, ret_lambda=False):
     """
     """
@@ -343,6 +346,7 @@ def _palm4msa_fgft(Lap, p, ret_lambda=False):
     else:
         return F, D
 
+# experimental block end
 
 def hierarchical(M, p, ret_lambda=False, ret_params=False):
     """
@@ -512,7 +516,6 @@ def _prepare_hierarchical_fact(M, p, callee_name, ret_lambda, ret_params,
                          "Likewise its number of rows must be consistent "
                          "with the first factor constraint defined in p.")
     return p
-# experimental block end
 
 # experimental block start
 def hierarchical_constends(M, p, A, B, ret_lambda=False, ret_params=False):

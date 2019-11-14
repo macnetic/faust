@@ -1,4 +1,3 @@
-% experimental block start
 %==========================================================================================
 %> @brief Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
 %>
@@ -58,4 +57,3 @@ function  [F,lambda] = palm4msa(M, p)
 	end
 	F = Faust(core_obj, isreal(M));
 end
-% experimental block end
