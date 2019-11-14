@@ -80,8 +80,8 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 		endforeach()
 		# --no-empty deletes emtpy file after filtering
 		# easy way to delete the whole module instead of having to insert deletion tags into each file
-		FILE(REMOVE_RECURSE "${FAUST_MATLAB_NAMESPACE_BIN_DIR}/+factparams") #TODO: do it in py script directly with a special arg
-		FILE(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/tmp_gendoc_matfaust/+matfaust/+factparams") #TODO: do it in py script directly with a special arg
+		#FILE(REMOVE_RECURSE "${FAUST_MATLAB_NAMESPACE_BIN_DIR}/+factparams") #TODO: do it in py script directly with a special arg
+		#FILE(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/tmp_gendoc_matfaust/+matfaust/+factparams") #TODO: do it in py script directly with a special arg
 	endif()
 endforeach()
 
