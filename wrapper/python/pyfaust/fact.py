@@ -115,7 +115,10 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
      See also:
         eigtj
     """
-    Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, maxiter, nGivens_per_fac, verbosity, tol, relerr)
+    if(isinstance(M, np.ndarray)):
+        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, maxiter, nGivens_per_fac, verbosity, tol, relerr)
+    elif(isinstance(M, csr_matrix)):
+        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse(M, maxiter, nGivens_per_fac, verbosity, tol, relerr)
     U = Faust(core_obj=Ucore)
     V = Faust(core_obj=Vcore)
     return U, S, V

@@ -1592,3 +1592,44 @@ cdef class FaustFact:
         #return core, S_spdiag
         return coreU, S, coreV
 
+    @staticmethod
+    def svdtj_sparse(M, J, t, verbosity=0, stoppingError = 0.0,
+                     errIsRel=True):
+        from scipy.sparse import spdiags
+        cdef double [:] data1d #only for csr mat factor
+        cdef int [:] indices # only for csr mat
+        cdef int [:] indptr # only for csr mat
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+        cdef double[:] S_view
+
+
+        data1d = M.data.astype(float,'F')
+        indices = M.indices.astype(np.int32, 'F')
+        indptr = M.indptr.astype(np.int32, 'F')
+
+        S = np.empty(M.shape[0], dtype=M.dtype)
+        S_view = S
+
+        coreU = FaustCore(core=True)
+        coreV = FaustCore(core=True)
+        FaustCoreCy.svdtj_sparse[double,double](
+            &(coreU.core_faust_dbl),
+            &(coreV.core_faust_dbl),
+            &S_view[0],
+            &data1d[0],
+            &indices[0],
+            &indptr[0],
+            M.nnz,
+            M_num_rows,
+            M_num_cols, J, t,
+            verbosity,
+            stoppingError,
+            errIsRel)
+
+        coreU._isReal = coreV._isReal = True
+        #D_spdiag = spdiags(D, [0], M.shape[0], M.shape[0])
+        #return core, D_spdiag
+        return coreU, S, coreV
+
+
