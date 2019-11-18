@@ -54,7 +54,7 @@ def svdtj2(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
         Returns:
             The tuple U,S,V: U*S.todense()*V' being the approximation of M.
                 - (sparse diagonal matrix) S the singular values in
-                descendant order.
+                descending order.
                 - (Faust object) U the left-singular transform.
                 - (Faust object) V the right-singular transform.
 
@@ -74,7 +74,7 @@ def svdtj2(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     D1, W1 = eigtj(M.dot(M.T), maxiter, tol, relerr,
                    nGivens_per_fac, verbosity)
     D2, W2 = eigtj(M.T.dot(M), maxiter, tol, relerr,  nGivens_per_fac, verbosity)
-    S = diag(W1.T*M*W2.todense())
+    S = diag((W1.T*M)*W2)
     I = argsort(abs(S))[::-1]
     sign_S = spdiags(sign(S[I]), [0], S.shape[0], S.shape[0])
     S = spdiags(S[I], [0], S.shape[0], S.shape[0])
@@ -85,7 +85,6 @@ def svdtj2(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     return U,S,V
 # experimental block end
 
-
 def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
@@ -93,7 +92,7 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
         NOTE: this function is based on fact.eigtj.
 
         Args:
-            M: a real matrixi (np.ndarray or scipy.sparse.csr_matrix).
+            M: a real matrix (np.ndarray or scipy.sparse.csr_matrix).
             maxiter: see fact.eigtj
             tol: see fact.eigtj
             relerr: see fact.eigtj
@@ -101,9 +100,9 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
             verbosity: see fact.eigtj
 
         Returns:
-            The tuple U,S,V: U*S.todense()*V' being the approximation of M.
-                - (sparse diagonal matrix) S the singular values in
-                descendant order.
+            The tuple U,S,V: U*numpy.diag(S)*V.H being the approximation of M.
+                - (np.array vector) S the singular values in
+                descending order.
                 - (Faust object) U the left-singular transform.
                 - (Faust object) V the right-singular transform.
 
@@ -111,7 +110,7 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
             >>> from pyfaust.fact import svdtj
             >>> from numpy.random import rand
             >>> M = rand(128,128)
-            >>> U,S,V = svdtj(M, 1024, 64)
+            >>> U,S,V = svdtj(M, 1024, nGivens_per_fac=64)
 
      See also:
         eigtj
@@ -162,7 +161,7 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
 
     Returns:
         The tuple (W,V):
-           - W (numpy.ndarray) the vector of the eigenvalues of M (in ascendant order).
+           - W (numpy.ndarray) the vector of the eigenvalues of M (in ascending order).
            - V the Faust object representing the approximate eigenvector
             transform. The column V[:, i] is the eigenvector
             corresponding to the eigenvalue W[i].<br/>
@@ -220,7 +219,7 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
         - with FGFT being the Faust object representing
         the Fourier transform and,
         - (numpy.ndarray) D a vector of the eigenvalues of the Laplacian (in
-        ascendant order).
+        ascending order).
 
 
     References:

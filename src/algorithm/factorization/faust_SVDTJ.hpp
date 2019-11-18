@@ -40,7 +40,7 @@ void Faust::svdtj(MatSparse<FPP, DEVICE> & sM, int J, int t, double tol, unsigne
 }
 
 	template<typename FPP, Device DEVICE, typename FPP2>
-void Faust::svdtj_core(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
+void Faust::svdtj_core(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, double tol, unsigned int verbosity, bool relErr, int order /* ignored anyway, kept here just in case */, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
 {
 	GivensFGFT<FPP, DEVICE, FPP2>* algoW1;
 	GivensFGFT<FPP, DEVICE, FPP2>* algoW2;
@@ -63,11 +63,11 @@ void Faust::svdtj_core(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatD
 	Faust::Vect<FPP,DEVICE> S(M->getNbRow());
 
 
-	Faust::Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(order));
+	Faust::Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ 0)); // 0 for no order
 	TransformHelper<FPP,DEVICE> *thW1 = new TransformHelper<FPP,DEVICE>(transW1, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 
-	Faust::Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(order));
+	Faust::Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/* order*/ 0)); //0 for no order
 	TransformHelper<FPP,DEVICE> *thW2 = new TransformHelper<FPP,DEVICE>(transW2, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 
@@ -82,7 +82,7 @@ void Faust::svdtj_core(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatD
 		S.getData()[i] = W1_MW2(i,i);
 	}
 
-	// order D descendently according to the abs value
+	// order D descendantly according to the abs value
 	// and change the sign when the value is negative
 	// it gives a signed permutation matrix P to append to W1, abs(P2) is append to W2
 	vector<int> ord_indices;
@@ -95,7 +95,7 @@ void Faust::svdtj_core(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatD
 	for(int i=0;i<S.size();i++)
 		ord_indices.push_back(i);
 	sort(ord_indices.begin(), ord_indices.end(), [S, &order](int i, int j) {
-			return Faust::fabs(S.getData()[i]) > Faust::fabs(S.getData()[j])?1:0;
+			return Faust::fabs(S.getData()[i]) > Faust::fabs(S.getData()[j]);
 			});
 	for(int i=0;i<ord_indices.size();i++)
 	{
@@ -108,14 +108,14 @@ void Faust::svdtj_core(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatD
 		values2[i] = 1;
 	}
 	Faust::MatSparse<FPP, DEVICE>* PS = new Faust::MatSparse<FPP, DEVICE>(ord_indices, col_ids, values, M->getNbRow(), M->getNbCol());
-	MatGeneric<FPP,Cpu>* lf = (MatGeneric<FPP,Cpu>*)(thW1->get_fact_addr(thW1->size()-1)); 
+	MatGeneric<FPP,Cpu>* lf = (MatGeneric<FPP,Cpu>*)(thW1->get_fact_addr(thW1->size()-1));
 	lf->multiplyRight(*PS);
-	//	thW1->push_back(PS);
+	// thW1->push_back(PS);
 
 	Faust::MatSparse<FPP, DEVICE>* P = new Faust::MatSparse<FPP, DEVICE>(ord_indices, col_ids, values2, M->getNbRow(), M->getNbCol());
-	lf = (MatGeneric<FPP,Cpu>*)(thW2->get_fact_addr(thW1->size()-1)); 
+	lf = (MatGeneric<FPP,Cpu>*)(thW2->get_fact_addr(thW2->size()-1));
 	lf->multiplyRight(*P);
-	//	thW2->push_back(P);
+	// thW2->push_back(P);
 	delete algoW1;
 	delete algoW2;
 

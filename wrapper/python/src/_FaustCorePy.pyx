@@ -1570,7 +1570,7 @@ cdef class FaustFact:
         cdef double[:,:] M_view
         cdef double[:] S_view
 
-        M_view = M
+        M_view = np.asfortranarray(M)
         S = np.empty(M.shape[0], dtype=M.dtype)
         S_view = S
 
@@ -1586,7 +1586,7 @@ cdef class FaustFact:
                                           stoppingError,
                                           errIsRel)
 
-        coreU._isReal = coreV._isReal = True
+        coreU._isReal = True; coreV._isReal = True
         #from scipy.sparse import spdiags
         #S_spdiag = spdiags(S, [0], M.shape[0], M.shape[0])
         #return core, S_spdiag
@@ -1627,7 +1627,7 @@ cdef class FaustFact:
             stoppingError,
             errIsRel)
 
-        coreU._isReal = coreV._isReal = True
+        coreU._isReal = True; coreV._isReal = True
         #D_spdiag = spdiags(D, [0], M.shape[0], M.shape[0])
         #return core, D_spdiag
         return coreU, S, coreV

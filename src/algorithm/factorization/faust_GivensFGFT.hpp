@@ -656,7 +656,7 @@ Faust::Transform<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_transform(int ord)
 		MatSparse<FPP,DEVICE> P(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact is a sqr. mat.
 		P.set_orthogonal(true);
 		for(int i=0;i<ord_indices.size();i++)
-			P.setCoeff( ord_indices[i],i, FPP(1.0));
+			P.setCoeff(ord_indices[i],i, FPP(1.0));
 		facts.push_back(P);
 	}
 	Faust::Transform<FPP,DEVICE> t = Faust::Transform<FPP,DEVICE>(facts);
