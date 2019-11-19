@@ -271,7 +271,7 @@ void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> &
 		px = &x;
 
 
-	if (typeA == 'T')
+	if (typeA == 'T' || typeA == 'H')
 	{
 		nbRowOpA = A.getNbCol();
 		nbColOpA = A.getNbRow();
@@ -297,7 +297,7 @@ void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> &
 
 	#ifdef __GEMM_WITH_OPENBLAS__
 		CBLAS_TRANSPOSE transA,transB;
-		if (typeA=='T')
+		if (typeA=='T' || typeB == 'H')
 			transA = CblasTrans;
 		else
 			transA = CblasNoTrans;
@@ -314,27 +314,32 @@ void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> &
 		else if (typeA == 'N')
 		{
 			y.vec.noalias() = alpha * A.mat * px->vec;
-		}else
+		}else if (typeA == 'T')
 		{
 
 			y.vec.noalias() = alpha * A.mat.transpose() * px->vec;
+		}else // typeA == 'H'
+		{
+			y.vec.noalias() = alpha * A.mat.adjoint() * px->vec;
 		}
 	}else
 	{
 		if (typeA == 'N')
 		{
 			y.vec = alpha * A.mat * px->vec + beta * y.vec;
-		}else
+		}else if(typeA == 'T')
 		{
 			y.vec = alpha * A.mat.transpose() * px->vec + beta * y.vec;
+		}
+		else // typeA == 'H'
+		{
+			y.vec = alpha * A.mat.adjoint() * px->vec + beta * y.vec;
 		}
 	}
 	#else
 
 		Faust::cblas_gemv<FPP>(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
 	#endif
-
-
 
 	if  ((&x) == (&y))
 		delete px;
