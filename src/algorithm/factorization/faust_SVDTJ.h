@@ -10,6 +10,13 @@ namespace Faust
 	template<typename FPP, Device DEVICE, typename FPP2 = float>
 		void svdtj_core(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_);
 
+	template<typename FPP, Device DEVICE, typename FPP2 = float>
+		void svdtj_cplx(MatDense<FPP, DEVICE> & M, int J, int t, double tol, unsigned int verbosity, bool relErr, int order,TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S);
+	template<typename FPP, Device DEVICE, typename FPP2 = float>
+		void svdtj_cplx(MatSparse<FPP, DEVICE> & M, int J, int t, double tol, unsigned int verbosity, bool relErr, int order,TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S);
+	template<typename FPP, Device DEVICE, typename FPP2 = float>
+		void svdtj_core_cplx(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_);
+
 };
 
 #include "faust_SVDTJ.hpp"
