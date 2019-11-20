@@ -864,23 +864,23 @@ namespace Faust {
 			{
 				//TODO: we shouldn't have to const_cast, slice() must be const
 				const TransformHelper<FPP,Cpu> * col = const_cast<TransformHelper<FPP,Cpu> *>(this)->slice(0,nrows, i, i+1);
-//				cout << "TransformHelper normalize, meth=" << meth << endl;
+				//				cout << "TransformHelper normalize, meth=" << meth << endl;
 				switch(meth)
 				{
 					case 1: //1-norm
-//						cout << "normalize with 1-norm" << endl;
+						//						cout << "normalize with 1-norm" << endl;
 						norm = col->normL1();
 						break;
 					case 2: //2-norm
-//						cout << "normalize with 2-norm" << endl;
+						//						cout << "normalize with 2-norm" << endl;
 						norm = col->spectralNorm(nbr_iter_max, precision, flag);
 						break;
 					case -2: // fro norm
-//						cout << "normalize with fro-norm" << endl;
+						//						cout << "normalize with fro-norm" << endl;
 						norm = col->normFro();
 						break;
 					case -1: //inf norm
-//						cout << "normalize with inf-norm" << endl;
+						//						cout << "normalize with inf-norm" << endl;
 						norm = col->normInf();
 						break;
 					default:
@@ -901,10 +901,59 @@ namespace Faust {
 				//NOTE: about const cast: no problem, we know we won't write it
 				//NOTE: don't use get_gen_fact() to avoid transpose auto-handling
 				factors.push_back(const_cast<Faust::MatGeneric<FPP, (Device)0u>*>(this->transform->data[i]));
+#ifdef NON_OPT_FAUST_NORMALIZATION
 			if(this->is_transposed)
 				factors.insert(factors.begin(), norm_diag);
 			else
 				factors.push_back(norm_diag);
+#else
+			MatGeneric<FPP,Cpu>* scaled_f0;
+			MatSparse<FPP, Cpu>* fs;
+			MatDense<FPP,Cpu>* fd;
+
+			if(this->is_transposed)
+			{
+				/** this approach is abandoned because casting approach (as below) is quicker than transposing */
+				// the faust is transposed
+				// that's why we compute (Faust[0]^T*norm_diag)^T
+				// (the Faust structure will transpose this factor again when necessary because of its this->is_transposed flag)
+				//				factors[0]->transpose();
+				//				factors[0]->multiplyRight(*norm_diag);
+				//				factors[0]->transpose();
+				/****************************************/
+				fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[0]);
+				if(!fs)
+				{
+					fd = dynamic_cast<MatDense<FPP,Cpu>*>(factors[0]);
+					scaled_f0 = new MatDense<FPP,Cpu>(*fd);
+					fd = (MatDense<FPP,Cpu>*)scaled_f0; // needed befause there is no prototype of multiply(MatGeneric,...)
+					norm_diag->multiply(*fd, 'N');
+				}
+				else
+				{
+					scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
+					fs = (MatSparse<FPP,Cpu>*) scaled_f0;
+					norm_diag->multiply(*fs, 'N');
+				}
+				factors[0] = scaled_f0;
+			}
+			else
+			{
+				//factors[size()-1]->multiplyRight(*norm_diag);
+				if(fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[size()-1]))
+					scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
+				else
+				{
+					fd = dynamic_cast<MatDense<FPP,Cpu>*>(factors[size()-1]);
+					scaled_f0 = new MatDense<FPP,Cpu>(*fd);
+
+				}
+				scaled_f0->multiplyRight(*norm_diag);
+				factors[size()-1] = scaled_f0;
+			}
+
+			delete norm_diag;
+#endif
 			normalizedTh = new TransformHelper<FPP,Cpu>(factors, FPP(1.0), false, false);
 			normalizedTh->is_transposed = this->is_transposed;
 			//			normalizedTh->display();
