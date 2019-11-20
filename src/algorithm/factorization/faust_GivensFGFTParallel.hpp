@@ -81,8 +81,10 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_fact_nz_inds()
 			i++;
 	}
 #ifdef DEBUG_GIVENS
+	cout << "GivensFGFTParallel::update_fact_nz_inds() after purge: ";
 	for(auto &p : fact_nz_inds)
-		cout << "GivensFGFTParallel::update_fact_nz_inds() after purge (" << p.first+1 <<  "," << p.second+1 << ") :" << endl;
+		cout << "(" << p.first+1 <<  "," << p.second+1 << ") :";
+	cout <<  endl;
 #endif
 }
 
@@ -110,7 +112,7 @@ template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTParallel<FPP,DEVICE,FPP2>::loop_update_fact()
 {
 	fact_nrots = 0;
-	while(fact_nrots < t && fact_nrots < fact_nz_inds.size())
+	while(fact_nrots < t && 0 < fact_nz_inds.size())
 	{
 		choose_pivot();
 		update_fact_nz_inds();
@@ -131,7 +133,7 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::choose_pivot()
 	this->q = max_elt.second;
 	this->coord_choices.push_back(pair<int,int>(this->p,this->q));
 #ifdef DEBUG_GIVENS
-	cout << "choose_pivot() p: " << this->p+1 << " q:" << this->q+1 << " " << "L(p,q): " << this->L(this->p,this->q) << " nrots: " << fact_nrots << endl;
+	cout << "choose_pivot() p: " << this->p+1 << " q:" << this->q+1 << " " << "L(p,q): " << (*(this->L))(this->p,this->q) << " nrots: " << fact_nrots << endl;
 #endif
 }
 

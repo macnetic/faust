@@ -112,7 +112,7 @@ template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::loop_update_fact()
 {
 	fact_nrots = 0;
-	while(fact_nrots < t && fact_nrots < fact_nz_inds.size())
+	while(fact_nrots < t && 0 < fact_nz_inds.size())
 	{
 		choose_pivot();
 		update_fact_nz_inds();
@@ -121,6 +121,7 @@ void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::loop_update_fact()
 		fact_nrots++;
 	}
 	finish_fact();
+#ifdef DEBUG_GIVENS
 	int n = this->L->getNbRow();
 //	cout << "n=" << n << endl;
 	MatSparse<FPP,DEVICE> test1(this->facts[this->ite]);
@@ -133,7 +134,7 @@ void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::loop_update_fact()
 //		cout << "ite=" << this->ite << "S*S'(" << j << "," << j << ")=" << test2(j,j) << endl;
 		assert(Faust::abs(test2(j,j)-FPP(1,0)) < 1);
 	}
-
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
