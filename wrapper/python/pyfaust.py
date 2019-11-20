@@ -551,7 +551,7 @@ class Faust:
 
         Args:
             F: the Faust object.
-            A: a Faust object a scipy.sparse.csr_matrix or a 2D full matrix (numpy.ndarray, numpy.matrix).
+            A: a Faust object, a sparse matrix (scipy.sparse.csr_matrix or dia_matrix) or a 2D full matrix (numpy.ndarray, numpy.matrix).
             <br/> In the latter case, A must be Fortran contiguous (i.e. Column-major order;
                 `order' argument passed to np.ndararray() must be equal to str
                 'F').
@@ -602,6 +602,8 @@ class Faust:
             return F.m_faust.multiply(A.real).astype(np.complex) + j*F.m_faust.multiply(A.imag)
         elif(isinstance(A, scipy.sparse.csr_matrix)):
             return F.m_faust.multiply_csr_mat(A)
+        elif(isinstance(A, scipy.sparse.dia_matrix)):
+            return F.__matmul__(A.tocsr())
         else:
             return F.m_faust.multiply(A)
 
@@ -635,7 +637,8 @@ class Faust:
         Args:
             F: the Faust object.
             A: is a scalar number, a Faust object or a 2D full matrix (numpy.ndarray,
-            numpy.matrix).
+            numpy.matrix) or a sparse matrix (scipy.sparse.csr_matrix or
+            dia_matrix).
             <br/> In the latter case, A must be Fortran contiguous (i.e. Column-major order;
                 `order' argument passed to np.ndararray() must be equal to str
                 'F').

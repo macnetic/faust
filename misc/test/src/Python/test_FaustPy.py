@@ -575,6 +575,14 @@ class TestFaustPy(unittest.TestCase):
             self.assertLess(norm(test_prod.toarray()-ref_prod)/norm(ref_prod),
                             1**-5)
 
+        if(F.dtype == 'float64'): # Faust-complex_csr_mat is not yet suppored
+            from scipy.sparse import dia_matrix
+            print("test mul of a Faust by a dia_matrix")
+            D = dia_matrix((np.random.rand(1,F.shape[1]),np.array([0])),
+                           shape=(F.shape[1],F.shape[1]))
+            test_prod = F*D
+            self.assertTrue(np.allclose(test_prod, F.toarray()@D))
+
 
     def testConcatenate(self):
         print("testConcatenate()")
