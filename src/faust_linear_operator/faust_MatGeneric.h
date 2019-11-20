@@ -122,6 +122,7 @@ namespace Faust
 
 			virtual void multiply(Faust::MatSparse<FPP, DEVICE>& M, char opThis) const=0;
 
+			//! \brief Replace this by (this) * A
 			virtual void multiplyRight(Faust::MatSparse<FPP, DEVICE> const& M) =0;
 
 

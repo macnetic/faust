@@ -239,7 +239,8 @@ void Faust::svdtj_core_cplx(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM,
 	// thW2->push_back(P);
 	delete algoW1;
 	delete algoW2;
-
+	delete PS;
+	delete P;
 	*U = thW1;
 	*V = thW2;
 	*S_ = ordered_S;

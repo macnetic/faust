@@ -23,8 +23,8 @@
 %> % in a matlab terminal
 %> >> import matfaust.fact.svdtj
 %> >> M = rand(128,128)
-%>%> >> [U,S,V] = svdtj(M,1024,'nGivens_per_fac', 64)
-%>%> @endcode
+%> >> [U,S,V] = svdtj(M,1024,'nGivens_per_fac', 64)
+%> @endcode
 %>If we call svdtj on the matrix M, it makes two internal calls to eigtj. 
 %>
 %>        In Matlab it would be:
