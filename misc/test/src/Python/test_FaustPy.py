@@ -930,8 +930,8 @@ class TestFaustFactory(unittest.TestCase):
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
-        # misc/test/src/C++/GivensFGFTParallel.cpp.in
-        self.assertAlmostEqual(err, 0.0410448, places=7)
+        # misc/test/src/C++/GivensFGFTParallel.cpp.in (_double version)
+        self.assertAlmostEqual(err, 0.0398154, places=7)
         D2, F2 = eigtj(L, J, nGivens_per_fac=t, verbosity=0)
         D2 = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
@@ -974,8 +974,8 @@ class TestFaustFactory(unittest.TestCase):
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
         print("err: ", err)
         # the error reference is from the C++ test,
-        # misc/test/src/C++/GivensFGFTParallel.cpp.in
-        self.assertAlmostEqual(err, 0.0410448, places=7)
+        # misc/test/src/C++/GivensFGFTParallel.cpp.in (_double version)
+        self.assertAlmostEqual(err, 0.0398154, places=7)
         D2, F2 = eigtj(L, J, nGivens_per_fac=t, verbosity=0)
         D2 = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))

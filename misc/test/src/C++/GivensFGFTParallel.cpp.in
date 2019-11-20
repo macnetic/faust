@@ -51,7 +51,8 @@ int main()
 	}
 	Mat_Close(matfp);
 
-	for(int j=0;j<J;j++)
+	//the number of factors is smaller than J (because of t : the number of Givens rotations per factor)
+	for(int j=0;j<algo.get_transform(false).size();j++)
 		printf("ite=%d (1-base index) ref. p=%d q=%d, algo. p=%d q=%d eq=%d\n", j, p_choices[j], q_choices[j], coord_choices[j].first+1, coord_choices[j].second+1, p_choices[j] == coord_choices[j].first+1 && q_choices[j] == coord_choices[j].second+1);
 
 
