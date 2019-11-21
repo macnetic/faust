@@ -63,11 +63,11 @@ void Faust::svdtj_core(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatD
 	Faust::Vect<FPP,DEVICE> S(M->getNbRow());
 
 
-	Faust::Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ 0)); // 0 for no order
+	Faust::Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ -1)); // 0 for no order
 	TransformHelper<FPP,DEVICE> *thW1 = new TransformHelper<FPP,DEVICE>(transW1, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 
-	Faust::Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/* order*/ 0)); //0 for no order
+	Faust::Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/* order*/ -1)); //0 for no order
 	TransformHelper<FPP,DEVICE> *thW2 = new TransformHelper<FPP,DEVICE>(transW2, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 
@@ -184,11 +184,11 @@ void Faust::svdtj_core_cplx(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM,
 	Faust::Vect<FPP,DEVICE> S(M->getNbRow());
 
 
-	Faust::Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ 0)); // 0 for no order
+	Faust::Transform<FPP,DEVICE> transW1 = std::move(algoW1->get_transform(/*order*/ -1)); // 0 for no order
 	TransformHelper<FPP,DEVICE> *thW1 = new TransformHelper<FPP,DEVICE>(transW1, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 
-	Faust::Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/* order*/ 0)); //0 for no order
+	Faust::Transform<FPP,DEVICE> transW2 = std::move(algoW2->get_transform(/* order*/ -1)); //0 for no order
 	TransformHelper<FPP,DEVICE> *thW2 = new TransformHelper<FPP,DEVICE>(transW2, true); // true is for moving and not copying the Transform object into TransformHelper (optimization possible cause we know the original object won't be used later)
 
 
