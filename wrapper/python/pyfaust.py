@@ -601,7 +601,12 @@ class Faust:
             j = np.complex(0,1)
             return F.m_faust.multiply(A.real).astype(np.complex) + j*F.m_faust.multiply(A.imag)
         elif(isinstance(A, scipy.sparse.csr_matrix)):
-            return F.m_faust.multiply_csr_mat(A)
+            if(A.dtype == np.complex and F.dtype != np.complex):
+                j = np.complex(0,1)
+                return (F.__matmul__(A.real))*np.complex(1,0) + \
+                        (F.__matmul__(A.imag))*j
+            else:
+                return F.m_faust.multiply_csr_mat(A.astype(F.dtype))
         elif(isinstance(A, scipy.sparse.dia_matrix)):
             return F.__matmul__(A.tocsr())
         else:

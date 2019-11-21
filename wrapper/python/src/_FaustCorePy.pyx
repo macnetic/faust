@@ -228,21 +228,41 @@ cdef class FaustCore:
         cdef double [:,:] y_data
         cdef complex [:,:] y_data_cplx
         # X is supposed to be a csr_matrix
-        x_data1d = X.data
         x_indices = X.indices
         x_indptr = X.indptr
         x_nnz = X.nnz
-        if(self._isReal):
+        nbcol = X.shape[1]
+        e = Exception("Dimensions must agree")
+        if(X.dtype in [ 'float', 'float128',
+                       'float16', 'float32',
+                       'float64', 'double']):
+            x_data1d = X.data
             nbrow = self.core_faust_dbl.getNbRow()
-            nbcol = X.shape[1]
+            if(self.core_faust_dbl.getNbCol() != X.shape[0]): raise e
             y_data_arr = np.empty((nbrow,nbcol), dtype=np.double, order='F') # we don't know beforehand Y nnz
             y_data = y_data_arr
-            self.core_faust_dbl.multiply(&y_data[0,0], nbrow, nbcol,
-                                                 &x_data1d[0], &x_indptr[0],
-                                                 &x_indices[0],
-                                                 x_nnz, X.shape[0], X.shape[1])
+            if(self._isReal):
+                self.core_faust_dbl.multiply(&y_data[0,0], nbrow, nbcol,
+                                             &x_data1d[0], &x_indptr[0],
+                                             &x_indices[0],
+                                             x_nnz, X.shape[0], X.shape[1])
+            else:
+                raise("x must be real if Faust is.")
+                # shouldn't happen normally (avoided by calling function)
         else:
-            raise Exception("complex Faust-csr_matrix mul not yet supported")
+            x_data_cplx = X.data
+            nbrow = self.core_faust_cplx.getNbRow()
+            if(self.core_faust_cplx.getNbCol() != X.shape[0]): raise e
+            y_data_arr = np.empty((nbrow,nbcol), dtype=np.complex, order='F') # we don't know beforehand Y nnz
+            y_data_cplx = y_data_arr
+            if(not self._isReal):
+                self.core_faust_cplx.multiply(&y_data_cplx[0,0], nbrow, nbcol,
+                                          &x_data_cplx[0], &x_indptr[0],
+                                          &x_indices[0],
+                                          x_nnz, X.shape[0], X.shape[1])
+            else:
+                raise("x must be complex if Faust is")
+                # shouldn't happen normally (avoided by calling function)
         return y_data_arr
 
     def get_product(self):
@@ -1570,7 +1590,7 @@ cdef class FaustFact:
         cdef double[:,:] M_view
         cdef double[:] S_view
 
-        M_view = np.asfortranarray(M)
+        M_view = M
         S = np.empty(M.shape[0], dtype=M.dtype)
         S_view = S
 
@@ -1586,7 +1606,7 @@ cdef class FaustFact:
                                           stoppingError,
                                           errIsRel)
 
-        coreU._isReal = True; coreV._isReal = True
+        coreU._isReal = coreV._isReal = True
         #from scipy.sparse import spdiags
         #S_spdiag = spdiags(S, [0], M.shape[0], M.shape[0])
         #return core, S_spdiag
@@ -1627,7 +1647,7 @@ cdef class FaustFact:
             stoppingError,
             errIsRel)
 
-        coreU._isReal = True; coreV._isReal = True
+        coreU._isReal = coreV._isReal = True
         #D_spdiag = spdiags(D, [0], M.shape[0], M.shape[0])
         #return core, D_spdiag
         return coreU, S, coreV
