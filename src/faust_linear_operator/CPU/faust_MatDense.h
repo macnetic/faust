@@ -253,19 +253,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 	void multiply(Faust::MatDense<FPP,Cpu> & M, char opThis) const
 	{Faust::gemm<FPP>((*this),M,M,1.0,0.0,opThis,'N');}
 
-	void multiply(Faust::MatSparse<FPP,Cpu> & M, char opThis) const
-	{
-		//compute (this^T, M^T)^T 
-		if(opThis == 'T' || opThis == 'H')
-			opThis = 'N';
-		else
-			opThis = 'H';
-		Faust::MatDense<FPP,Cpu> out;
-		Faust::spgemm<FPP>(M, *this,out,1.0,0.0,'H', opThis);
-		M = out;
-		M.makeCompression();
-		M.transpose();
-	}
+	void multiply(Faust::MatSparse<FPP,Cpu> & M, char opThis) const;
 
 
  	///********* FIN METHOD INHERITED FROM VIRTUAL MATGENERIC *********///

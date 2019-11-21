@@ -382,6 +382,32 @@ void Faust::MatDense<FPP,Cpu>::real()
 	mat = mat.real().eval().template cast<FPP>();
 }
 
+template<typename FPP>
+	void Faust::MatDense<FPP,Cpu>::multiply(Faust::MatSparse<FPP,Cpu> & M, char opThis) const
+{
+	//TODO: this function should not rely on spgemm which forces us to transconjugate
+	bool alt_conj = false;
+	if(opThis == 'H')
+		//compute (this, M^H)^H
+		opThis = 'N';
+	else if(opThis == 'T')
+	{
+		//compute (this->conjugate(), M^H)^H
+		const_cast<Faust::MatDense<FPP,Cpu>*>(this)->conjugate();
+		opThis = 'N';
+		alt_conj = true; //keep track of conj to undo it on the end // dirty
+	}
+	else
+		//compute (this^H, M^H)^H
+		opThis = 'H';
+	Faust::MatDense<FPP,Cpu> out;
+	Faust::spgemm<FPP>(M, *this,out,1.0,0.0,'H', opThis);
+	M = out;
+	M.makeCompression();
+	M.transpose();
+	M.conjugate();
+	if(alt_conj) const_cast<Faust::MatDense<FPP,Cpu>*>(this)->conjugate();
+}
 
 	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::multiplyRight(Faust::MatDense<FPP,Cpu> const& A)
