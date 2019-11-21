@@ -256,10 +256,13 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatSparse<FPP,Cpu> & M, char opT
 		M.mat = this->mat * M.mat;
 	else if(opThis == 'T')
 		M.mat = this->mat.transpose() * M.mat;
-	else // if(opThis == 'H') 
+	else // if(opThis == 'H')
 		M.mat = this->mat.conjugate().transpose() * M.mat;
 
 	M.dim1 = nbRowOpS;
+	//M.dim2 doesn't change
+
+	M.nnz = M.mat.nonZeros();
 }
 
 template<typename FPP>
