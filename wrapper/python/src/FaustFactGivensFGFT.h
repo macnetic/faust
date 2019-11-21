@@ -30,6 +30,13 @@ void svdtj( FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S /** end of outp
 template<typename FPP, typename FPP2 = float>
 void svdtj_sparse(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols, unsigned int J, unsigned int t, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true);
 
+template<typename FPP, typename FPP2 = float>
+void svdtj_cplx( FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S /** end of output parameters */, const FPP* M, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true /* end of input parameters*/);
+
+template<typename FPP, typename FPP2 = float>
+void svdtj_sparse_cplx(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols, unsigned int J, unsigned int t, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true);
+
+
 #include "FaustFactGivensFGFT.hpp"
 
 #endif

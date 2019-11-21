@@ -580,19 +580,19 @@ class TestFaustPy(unittest.TestCase):
         D = dia_matrix((np.random.rand(1,F.shape[1]),np.array([0])),
                        shape=(F.shape[1],F.shape[1]))
         test_prod = F*D
-        self.assertTrue(np.allclose(test_prod, F.toarray()@D))
+        self.assertTrue(np.allclose(test_prod, F.toarray().dot(D.toarray())))
         print("test mul of a Faust by a complex dia_matrix")
         D = \
         dia_matrix((np.random.rand(1,F.shape[1])+np.random.rand(1,F.shape[1])*np.complex(0,1),np.array([0])),
                        shape=(F.shape[1],F.shape[1]))
         test_prod = F*D
-        self.assertTrue(np.allclose(test_prod, F.toarray()@D))
+        self.assertTrue(np.allclose(test_prod, F.toarray().dot(D.toarray())))
         Mr = csr_matrix(rand(F.shape[1],10))
         Mc = csr_matrix(rand(F.shape[1],10)+np.complex(0,1)*rand(F.shape[1],10))
         print("test mul Faust-csr_matrix")
-        self.assertTrue(np.allclose(F*Mr, F.toarray()@Mr))
+        self.assertTrue(np.allclose(F*Mr, F.toarray().dot(Mr.toarray())))
         print("test mul Faust-complex csr_matrix")
-        self.assertTrue(np.allclose(F*Mc, F.toarray()@Mc))
+        self.assertTrue(np.allclose(F*Mc, F.toarray().dot(Mc.toarray())))
 
     def testConcatenate(self):
         print("testConcatenate()")

@@ -1652,4 +1652,80 @@ cdef class FaustFact:
         #return core, D_spdiag
         return coreU, S, coreV
 
+    @staticmethod
+    def svdtj_cplx(M, J, t, verbosity=0, stoppingError = 0.0,
+              errIsRel=True):
+        isReal = M.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+        # double == float64
+        check_matrix(isReal, M)
+
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+
+        cdef complex[:,:] M_view
+        cdef complex[:] S_view
+
+        M_view = np.asfortranarray(M)
+        S = np.empty(M.shape[0], dtype=M.dtype)
+        S_view = S
+
+        coreU = FaustCore(core=True)
+        coreV = FaustCore(core=True)
+        FaustCoreCy.svdtj_cplx[complex, double](&(coreU.core_faust_cplx),
+                                          &(coreV.core_faust_cplx),
+                                          &S_view[0],
+                                          &M_view[0,0],
+                                          M_num_rows,
+                                          M_num_cols, int(J), int(t),
+                                          verbosity,
+                                          stoppingError,
+                                          errIsRel)
+
+        coreU._isReal = coreV._isReal = False
+        #from scipy.sparse import spdiags
+        #S_spdiag = spdiags(S, [0], M.shape[0], M.shape[0])
+        #return core, S_spdiag
+        return coreU, S, coreV
+
+    @staticmethod
+    def svdtj_sparse_cplx(M, J, t, verbosity=0, stoppingError = 0.0,
+                     errIsRel=True):
+        from scipy.sparse import spdiags
+        cdef complex [:] data1d #only for csr mat factor
+        cdef int [:] indices # only for csr mat
+        cdef int [:] indptr # only for csr mat
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+        cdef complex[:] S_view
+
+
+        data1d = M.data.astype(np.complex,'F')
+        indices = M.indices.astype(np.int32, 'F')
+        indptr = M.indptr.astype(np.int32, 'F')
+
+        S = np.empty(M.shape[0], dtype=M.dtype)
+        S_view = S
+
+        coreU = FaustCore(core=True)
+        coreV = FaustCore(core=True)
+        FaustCoreCy.svdtj_sparse_cplx[complex,double](
+            &(coreU.core_faust_cplx),
+            &(coreV.core_faust_cplx),
+            &S_view[0],
+            &data1d[0],
+            &indices[0],
+            &indptr[0],
+            M.nnz,
+            M_num_rows,
+            M_num_cols, J, t,
+            verbosity,
+            stoppingError,
+            errIsRel)
+
+        coreU._isReal = coreV._isReal = False
+        #D_spdiag = spdiags(D, [0], M.shape[0], M.shape[0])
+        #return core, D_spdiag
+        return coreU, S, coreV
 

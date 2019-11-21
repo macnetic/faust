@@ -232,3 +232,14 @@ cdef extern from "FaustFactGivensFGFT.h":
                                       unsigned int t, unsigned int verbosity,
                                       const double stoppingError, const bool errIsRel)
 
+    cdef void svdtj_cplx[FPP, FPP2](FaustCoreCpp[FPP]** U, FaustCoreCpp[FPP] **V, FPP* S,
+                         const FPP* M_data, unsigned int num_rows, unsigned int
+                         num_cols, unsigned int J, unsigned int t, unsigned int
+                         verbosity, const double stoppingError, const bool errIsRel)
+
+    cdef void svdtj_sparse_cplx[FPP, FPP2](FaustCoreCpp[FPP]** U, FaustCoreCpp[FPP] **V, FPP* S,
+                                      const FPP* data, int* row_ptr, int* id_col, int
+                                      nnz, int nrows, int ncols, unsigned int J,
+                                      unsigned int t, unsigned int verbosity,
+                                      const double stoppingError, const bool errIsRel)
+

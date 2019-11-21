@@ -143,3 +143,31 @@ void svdtj_sparse(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start 
     memcpy(S, S_->getData(), sizeof(FPP)* S_->size());
     delete S_;
 }
+
+template<typename FPP, typename FPP2>
+void svdtj_cplx(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* M_data, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t, unsigned int verbosity, const double stoppingError, const bool errIsRel)
+{
+    Faust::MatDense<FPP,Cpu> M(M_data, (faust_unsigned_int) num_rows, (faust_unsigned_int) num_cols);
+    TransformHelper<FPP,Cpu> *U_,  *V_;
+    Faust::Vect<FPP,Cpu> * S_;
+    svdtj_cplx(M, J, t, stoppingError, verbosity, errIsRel, 1 /* order (useless) */, &U_, &V_, &S_);
+    *U = new FaustCoreCpp<FPP>(U_);
+    *V = new FaustCoreCpp<FPP>(V_);
+    //TODO: avoid this copy by directly edit outside buffer S
+    memcpy(S, S_->getData(), sizeof(FPP)* S_->size());
+    delete S_;
+}
+
+template<typename FPP, typename FPP2>
+void svdtj_sparse_cplx(FaustCoreCpp<FPP>** U, FaustCoreCpp<FPP> **V, FPP* S, /*start of input parameters*/ const FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols, unsigned int J, unsigned int t, unsigned int verbosity, const double stoppingError, const bool errIsRel)
+{
+    Faust::MatSparse<FPP, Cpu> M(nnz, nrows, ncols, data, id_col, row_ptr);
+    TransformHelper<FPP,Cpu> *U_,  *V_;
+    Faust::Vect<FPP,Cpu> * S_;
+    svdtj_cplx(M, J, t, stoppingError, verbosity, errIsRel, 1 /* order (useless) */, &U_, &V_, &S_);
+    *U = new FaustCoreCpp<FPP>(U_);
+    *V = new FaustCoreCpp<FPP>(V_);
+    //TODO factorize with svdtj
+    memcpy(S, S_->getData(), sizeof(FPP)* S_->size());
+    delete S_;
+}
