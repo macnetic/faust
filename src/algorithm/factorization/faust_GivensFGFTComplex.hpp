@@ -671,9 +671,11 @@ Faust::Transform<FPP,DEVICE> GivensFGFTComplex<FPP,DEVICE,FPP2>::get_transform(i
 		P.set_orthogonal(true);
 		for(int i=0;i<ord_indices.size();i++)
 			P.setCoeff( ord_indices[i],i, FPP(1.0));
-		facts.push_back(P);
+//		facts.push_back(P);
+		last_fact.multiplyRight(P);
 	}
 	Faust::Transform<FPP,DEVICE> t = Faust::Transform<FPP,DEVICE>(facts);
 	// remove the permutation factor if added temporarily for reordering
-	return ord?facts.erase(facts.end()-1),t:t;
+//	return ord?facts.erase(facts.end()-1),t:t;
+	return t;
 }
