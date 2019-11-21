@@ -1590,7 +1590,7 @@ cdef class FaustFact:
         cdef double[:,:] M_view
         cdef double[:] S_view
 
-        M_view = M
+        M_view = np.asfortranarray(M)
         S = np.empty(M.shape[0], dtype=M.dtype)
         S_view = S
 
