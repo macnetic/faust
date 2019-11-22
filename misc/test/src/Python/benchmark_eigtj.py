@@ -30,7 +30,7 @@ dim_size = 128
 plt.rcParams['lines.markersize'] = .7
 
 
-nruns = 20
+nruns = 5
 plotting = False
 
 # types of data for the benchmark

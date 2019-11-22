@@ -132,6 +132,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::calc_theta()
 	phi1 = atan((*L)(p,q).imag() / (*L)(p,q).real());
 	phi2 = atan(2*Faust::fabs((*L)(p,q)) / ((*L)(p,p) - (*L)(q,q)));
 
+
 	theta1 = (FPP(2)*phi1 - FPP(M_PI))/FPP(4);
 	theta2 = phi2/FPP(2);
 #ifdef DEBUG_GIVENS
@@ -150,7 +151,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	//        facts{j} = S;
 	//
 	int n = Lap.getNbRow();
-	FPP sin_theta2, cos_theta2;
+	FPP tmp, sin_theta2, cos_theta2;
 	FPP c_pp, c_pq, c_qp, c_qq;
 	FPP i = complex<typename FPP::value_type>(0,1);
 	sin_theta2 = sin(theta2);
@@ -159,10 +160,66 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	c_pq = - exp(i*theta1) * cos_theta2;
 	c_qp = exp(-i*theta1) * cos_theta2;
 	c_qq = i*exp(i*theta1) * sin_theta2;
+
+	tmp = c_pq;
+//	c_pp = complex<typename FPP::value_type>(c_pp.real(), - c_pp.imag());
+	c_pp = conj(c_pp);
+//	c_pq = complex<typename FPP::value_type>(c_qp.real(), - c_qp.imag());
+	c_pq = conj(c_qp);
+//	c_qp = complex<typename FPP::value_type>(tmp.real(), - tmp.imag());
+	c_qp = conj(tmp);
+//	c_qq = complex<typename FPP::value_type>(c_qq.real(), - c_qq.imag());
+	c_qq = conj(c_qq);
 #ifdef DEBUG_GIVENS
 	cout << "c_pp=" << c_pp << "c_pq=" << c_pq << endl;
 	cout << "c_qp=" << c_qp << "c_qq=" << c_qq << endl;
 #endif
+// check theta2 is a solution
+//	Faust::Vect<FPP,DEVICE> tmpv, tmp2, L_vec_p, L_vec_q;
+//	/*========== L = S'*L */
+//	MatDense<FPP,DEVICE>* L = dynamic_cast<MatDense<FPP,DEVICE>*>(this->L);
+//	L_vec_p = L->get_row(p), L_vec_q = L->get_row(q);
+//	// L(p,:) = c*L(p,:) + s*L(q,:)
+//	tmpv = L_vec_p;
+//	tmpv *= conj(c_pp);
+//	tmp2 = L_vec_q;
+//	tmp2 *= conj(c_qp);
+//	tmpv += tmp2;
+
+//	Faust::Vect<FPP,DEVICE> L_col_q = L->get_col(q);
+//	FPP im_pivot_pq = FPP(0);
+//	for(int j=0; j<L_col_q.size();j++)
+//	{
+//		im_pivot_pq += L_col_q[j]* tmpv[j];
+//	}
+//	tmpv[p] = conj(c_pp)*(*L)(p,p)+conj(c_qp)*(*L)(q,p);
+//	tmpv[q] = conj(c_pp)*(*L)(p,q)+conj(c_qp)*(*L)(q,q);
+//	im_pivot_pq += tmpv[p]*c_pq + tmpv[q]*c_qq;
+	FPP im_pivot_pq = (conj(c_pp)*(*L)(p,p)+conj(c_qp)*(*L)(q,p))*c_pq + (conj(c_pp)*(*L)(p,q)+conj(c_qp)*(*L)(q,q))*c_qq;
+
+	cout << "im_L(p,q)=" << im_pivot_pq << endl;
+	if(Faust::fabs(im_pivot_pq) > 1e-3)
+	{
+		theta2 = - theta2;
+		sin_theta2 = sin(theta2);
+		cos_theta2 = cos(theta2);
+		c_pp = - i * exp(-i*theta1) * sin_theta2;
+		c_pq = - exp(i*theta1) * cos_theta2;
+		c_qp = exp(-i*theta1) * cos_theta2;
+		c_qq = i*exp(i*theta1) * sin_theta2;
+
+		tmp = c_pq;
+		//	c_pp = complex<typename FPP::value_type>(c_pp.real(), - c_pp.imag());
+		c_pp = conj(c_pp);
+		//	c_pq = complex<typename FPP::value_type>(c_qp.real(), - c_qp.imag());
+		c_pq = conj(c_qp);
+		//	c_qp = complex<typename FPP::value_type>(tmp.real(), - tmp.imag());
+		c_qp = conj(tmp);
+		//	c_qq = complex<typename FPP::value_type>(c_qq.real(), - c_qq.imag());
+		c_qq = conj(c_qq);
+
+	}
+
 	// forget previous rotation coeffs
 	// and keep identity part (n first coeffs)
 	fact_mod_row_ids.resize(n);
@@ -187,7 +244,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	fact_mod_values.push_back(c_qq);
 	facts[ite] = MatSparse<FPP,DEVICE>(fact_mod_row_ids, fact_mod_col_ids, fact_mod_values, n, n);
 	facts[ite].set_orthogonal(true);
-#ifdef DEBUG_GIVENS
+//#ifdef DEBUG_GIVENS
 	MatSparse<FPP,DEVICE> test1(facts[ite]);
 	MatSparse<FPP,DEVICE> test2(facts[ite]);
 	test2.conjugate();
@@ -195,25 +252,32 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	test1.multiply(test2, 'N');
 	for(int j = 0; j < n; j++) {
 //		for(int k = 0; k < n; k++)
-			cout << "ite=" << ite << "S*S'(" << j << "," << j << ")=" << test2(j,j) << endl;
+//			cout << "ite=" << ite << "S*S'(" << j << "," << j << ")=" << test2(j,j) << endl;
 			assert(Faust::abs(test2(j,j)-FPP(1,0)) < .01);
 	}
 	cout << "GivensFGFTComplex::update_fact() ite: " << ite << " fact norm: " << facts[ite].norm() << endl;
 	facts[ite].Display();
-#endif
+//#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 {
+	Faust::MatDense<FPP,Cpu> L_copy = L;
 	// L = S'*L*S
-#ifdef DEBUG_GIVENS
+//#ifdef DEBUG_GIVENS
 	cout << "L(p,q) before update_L():" << L(p,q) << endl;
-#endif
-#define OPT_UPDATE_L
-#ifndef OPT_UPDATE_L
+//#endif
+#define OPT_UPDATE_L_CPLX
+#ifndef OPT_UPDATE_L_CPLX
 	facts[ite].multiply(L, 'H');
 	L.multiplyRight(facts[ite]);
+//	facts[ite].multiply(L, 'N');
+//	facts[ite].transpose();
+//	facts[ite].conjugate();
+//	L.multiplyRight(facts[ite]);
+//	facts[ite].transpose();
+//	facts[ite].conjugate();
 #else
 	Faust::Vect<FPP,DEVICE> L_vec_p, L_vec_q;
 	FPP c_qq = *(fact_mod_values.end()-1);
@@ -223,9 +287,26 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 	update_L_first(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 	update_L_second(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 #endif
-#ifdef DEBUG_GIVENS
+//#ifdef DEBUG_GIVENS
 	cout << "L(p,q) after update_L():" << L(p,q) << endl;
-#endif
+	cout << "L(p,p): "<< L(p,p) << endl;
+	cout << "L(q,q): "<< L(q,q) << endl;
+//	for(int i=0;i<L.getNbRow();i++)
+//		for(int j=i+1;j<L.getNbCol();j++)
+//		{
+//			cout << Faust::fabs(L(i,j)-conj(L(j,i))) << endl;
+//			assert(Faust::fabs(L(i,j)-conj(L(j,i))) < 1e-3);
+//		}
+//	cout << endl;
+//#endif
+//	if(Faust::fabs(L(p,q)) > 1e-3)
+//	{
+//		cout << "launch recomputing after not null L(p,q)" << endl;
+//		L = L_copy;
+//		this->theta2 = - this->theta2;
+//		this->update_fact();
+//		this->update_L(L);
+//	}
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -426,7 +507,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::order_D(const int order /* -1 for desce
 	for(int i=0;i<D.size();i++)
 		ord_indices.push_back(i);
 	sort(ord_indices.begin(), ord_indices.end(), [this, &order](int i, int j) {
-			return order>0?Faust::fabs(D.getData()[i]) < Faust::fabs(D.getData()[j]):(order <0?Faust::fabs(D.getData()[i]) > Faust::fabs(D.getData()[j]):0);
+			return order>0?D.getData()[i].real() < D.getData()[j].real():(order <0?D.getData()[i].real() > D.getData()[j].real():0);
 			});
 	for(int i=0;i<ord_indices.size();i++)
 		ordered_D.getData()[i] = D.getData()[ord_indices[i]];

@@ -103,8 +103,10 @@ int main()
 	Faust::MatDense<complex<FPP>,Cpu> tmp = *ordered_fourier_diag;
 	tmp.multiplyRight(ordered_D);
 	ordered_fourier_diag->transpose();
+	ordered_fourier_diag->conjugate();
 	tmp.multiplyRight(*ordered_fourier_diag);
 	ordered_fourier_diag->transpose();
+	ordered_fourier_diag->conjugate();
 	tmp -= Lap;
 	cout << tmp.norm()/Lap.norm() << endl;
 
