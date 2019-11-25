@@ -197,7 +197,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 //	im_pivot_pq += tmpv[p]*c_pq + tmpv[q]*c_qq;
 	FPP im_pivot_pq = (conj(c_pp)*(*L)(p,p)+conj(c_qp)*(*L)(q,p))*c_pq + (conj(c_pp)*(*L)(p,q)+conj(c_qp)*(*L)(q,q))*c_qq;
 
-	cout << "im_L(p,q)=" << im_pivot_pq << endl;
+//	cout << "im_L(p,q)=" << im_pivot_pq << endl;
 	if(Faust::fabs(im_pivot_pq) > 1e-3)
 	{
 		theta2 = - theta2;
@@ -244,7 +244,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	fact_mod_values.push_back(c_qq);
 	facts[ite] = MatSparse<FPP,DEVICE>(fact_mod_row_ids, fact_mod_col_ids, fact_mod_values, n, n);
 	facts[ite].set_orthogonal(true);
-//#ifdef DEBUG_GIVENS
+#ifdef DEBUG_GIVENS
 	MatSparse<FPP,DEVICE> test1(facts[ite]);
 	MatSparse<FPP,DEVICE> test2(facts[ite]);
 	test2.conjugate();
@@ -257,7 +257,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	}
 	cout << "GivensFGFTComplex::update_fact() ite: " << ite << " fact norm: " << facts[ite].norm() << endl;
 	facts[ite].Display();
-//#endif
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -265,9 +265,9 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 {
 	Faust::MatDense<FPP,Cpu> L_copy = L;
 	// L = S'*L*S
-//#ifdef DEBUG_GIVENS
+#ifdef DEBUG_GIVENS
 	cout << "L(p,q) before update_L():" << L(p,q) << endl;
-//#endif
+#endif
 #define OPT_UPDATE_L_CPLX
 #ifndef OPT_UPDATE_L_CPLX
 	facts[ite].multiply(L, 'H');
@@ -287,7 +287,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 	update_L_first(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 	update_L_second(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 #endif
-//#ifdef DEBUG_GIVENS
+#ifdef DEBUG_GIVENS
 	cout << "L(p,q) after update_L():" << L(p,q) << endl;
 	cout << "L(p,p): "<< L(p,p) << endl;
 	cout << "L(q,q): "<< L(q,q) << endl;
@@ -307,6 +307,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 //		this->update_fact();
 //		this->update_L(L);
 //	}
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
