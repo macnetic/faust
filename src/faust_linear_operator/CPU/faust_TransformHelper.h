@@ -90,11 +90,10 @@ namespace Faust {
 			TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 TransformHelper(Transform<FPP,Cpu> &t, const bool moving=false);
 
-			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x) const;
-			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose);
+			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose=false, const bool conjugate=false);
 //			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
-			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false);
-			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> A, const bool transpose=false);
+			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
+			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 
 			TransformHelper<FPP, Cpu>* multiply(TransformHelper<FPP, Cpu>*);
 			TransformHelper<FPP, Cpu>* multiply(FPP& scalar);

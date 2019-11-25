@@ -160,37 +160,36 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> A, const bool transpose /* deft to false */)
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> A, const bool transpose /* deft to false */, const bool conjugate)
 		{
 			is_transposed ^= transpose;
+			is_conjugate ^= conjugate;
 			MatDense<FPP,Cpu> M = this->transform->multiply(A, isTransposed2char());
 			is_transposed ^= transpose;
+			is_conjugate ^= conjugate;
 			return M;
 		}
 
-	template<typename FPP>
-		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> x) const
-		{
-			Vect<FPP,Cpu> v = this->transform->multiply(x, isTransposed2char());
-			if(is_conjugate) v.conjugate();
-			return v;
-		}
 
 	template<typename FPP>
-		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> x, const bool transpose)
+		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> x, const bool transpose, const bool conjugate)
 		{
 			is_transposed ^= transpose;
+			is_conjugate ^= conjugate;
 			Vect<FPP,Cpu> v = this->transform->multiply(x, isTransposed2char());
 			is_transposed ^= transpose;
+			is_conjugate ^= conjugate;
 			return v;
 		}
 
 
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> A, const bool transpose)
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> A, const bool transpose, const bool conjugate)
 		{
 			is_transposed ^= transpose;
+			is_conjugate ^= conjugate;
 			MatDense<FPP,Cpu> M = this->transform->multiply(A, isTransposed2char());
+			is_conjugate ^= conjugate;
 			is_transposed ^= transpose;
 			return M;
 		}
@@ -816,7 +815,7 @@ namespace Faust {
 	template<typename FPP>
 		const char TransformHelper<FPP,Cpu>::isTransposed2char() const
 		{
-			return is_transposed?'T':'N';
+			return is_transposed?(is_conjugate?'H':'T'):'N';
 		}
 
 	template<typename FPP>

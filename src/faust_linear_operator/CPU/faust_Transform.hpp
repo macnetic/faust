@@ -454,7 +454,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThi
 
 	// modif NB v1102 : new method compatible with factor as MatGeneric
 	faust_unsigned_int dim;
-	if (opThis == 'T')
+	if (opThis == 'T' || opThis == 'H')
 		dim = data[0]->getNbRow();
 	else
 		dim = data[size()-1]->getNbCol();
@@ -465,7 +465,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::get_product(const char opThi
 
 	Faust::MatDense<FPP,Cpu> p = this->multiply(prod, opThis);
 
-	if(isConj) p.conjugate();
+	if(isConj && opThis != 'H') p.conjugate();
 
 	return p;
 

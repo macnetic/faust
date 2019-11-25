@@ -221,6 +221,11 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opTh
 
 		if (opThis == 'T')
 			M.transpose();
+		else if (opThis == 'T' || opThis == 'H')
+		{
+			M.transpose();
+			M.conjugate();
+		}
 	}
 	else if (M.isZeros)
 	{
@@ -232,8 +237,10 @@ void Faust::MatSparse<FPP,Cpu>::multiply(Faust::MatDense<FPP,Cpu> & M, char opTh
 
 		if (opThis == 'N')
 			M.mat = this->mat * M.mat;
-		else
+		else if(opThis == 'T')
 			M.mat = this->mat.transpose() * M.mat;
+		else if(opThis == 'H')
+			M.mat = this->mat.transpose().conjugate() * M.mat;
 
 		M.dim1 = nbRowOpS;
 	}
