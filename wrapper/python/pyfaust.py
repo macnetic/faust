@@ -689,7 +689,10 @@ class Faust:
         <b/>See also Faust.__mul__
         """
         if(isinstance(lhs_op,np.ndarray)):
-            return (F.T*lhs_op.T).T
+            if(F.dtype == np.complex or lhs_op.dtype == np.complex):
+                return (F.T.conj()*lhs_op.T.conj()).T.conj()
+            else: # real Faust
+                return (F.T*lhs_op.T).T
         else:
             # a scalar or something not Faust-mul-compatible
             return F*lhs_op
@@ -712,7 +715,10 @@ class Faust:
 
 
         """
-        return (F.T*lhs_op.T).T
+        if(F.dtype == np.complex or lhs_op.dtype == np.complex):
+            return (F.T.conj()*lhs_op.T.conj()).T.conj()
+        else: # real Faust and real lhs_op
+            return (F.T*lhs_op.T).T
 
     #def concatenate(F, *args, axis=0): # py. 2 doesn't handle this signature
     def concatenate(F, *args, **kwargs):
