@@ -35,7 +35,6 @@ namespace Faust {
 			/** \brief Pivot candidates q coordinates. */
 			int* q_candidates;  /* default IndexType for underlying eigen matrix is int. */
 			protected:
-				const static unsigned int ERROR_CALC_PERIOD = 100;
 				/** \brief Fourier matrix factorization matrices (Givens matrix). */
 				vector<Faust::MatSparse<FPP,DEVICE>> facts;
 				/** \brief Diagonalization approximate of Laplacian. */
@@ -65,6 +64,10 @@ namespace Faust {
 
 				/** \brief Ordered indices of D to get increasing eigenvalues along the diagonal. */
 				vector<int> ord_indices;
+
+				/** \brief inverse permutation of ord_indices (needed to retrieve start undefined order). */
+				vector<int> inv_ord_indices;
+
 				/** \brief Cache for the ordered D. */
 				Faust::Vect<FPP,DEVICE> ordered_D;
 				/** \brief true if D has already been ordered (order_D() was called). */
@@ -102,6 +105,7 @@ namespace Faust {
 
 			public:
 
+				const static unsigned int ERROR_CALC_PERIOD = 100;
 				/** Algorithm class constructor.
 				 * \param Lap The Laplacian matrix to approximate/diagonalize.
 				 * \param J The number of iterations, Givens rotations factors.

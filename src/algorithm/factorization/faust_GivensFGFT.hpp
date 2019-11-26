@@ -418,6 +418,17 @@ void GivensFGFT<FPP,DEVICE,FPP2>::order_D(const int order /* -1 for descending o
 			});
 	for(int i=0;i<ord_indices.size();i++)
 		ordered_D.getData()[i] = D.getData()[ord_indices[i]];
+	// compute inverse permutation to keep easily possible retrieving undefined order
+	inv_ord_indices.resize(ord_indices.size());
+	int j = 0, i = 0;
+	while(j<ord_indices.size())
+		if(ord_indices[i] == j)
+		{
+			inv_ord_indices[j++] = i;
+			i = 0;
+		}
+		else
+			i++;
 	is_D_ordered = true;
 	D_order_dir = order;
 }
@@ -647,21 +658,31 @@ template<typename FPP, Device DEVICE, typename FPP2>
 Faust::Transform<FPP,DEVICE> GivensFGFT<FPP,DEVICE,FPP2>::get_transform(int ord)
 {
 	//TODO: an optimization is possible by changing type of facts to vector<MatGeneric*> it would avoid copying facts into Transform and rather use them directly. It will need a destructor that deletes them eventually if they weren't transfered to a Transform object before.
+	MatSparse<FPP,DEVICE> & last_fact = *(facts.end()-1);
+	MatSparse<FPP,DEVICE> P(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact permutation matrix
+	// (to reorder eigenvector transform according to ordered D)
+
+	if(ord && ord != D_order_dir || !ord && is_D_ordered)
+	{
+		// non-ordered eigenvector transform (ord == 0) or opposite order asked (ord != D_order_dir)
+		// get back to undefined order
+		for(int i=0;i<inv_ord_indices.size();i++)
+			P.setCoeff(inv_ord_indices[i],i, FPP(1.0));
+		last_fact.multiplyRight(P);
+	}
+
 	if(ord)
 	{
-		// add a permutation factor to reorder according to ordered D
-		if(ord != 0 && (!is_D_ordered || ord != D_order_dir))
+		if(!is_D_ordered || ord != D_order_dir)
 			order_D(ord);
-		MatSparse<FPP,DEVICE> & last_fact = *(facts.end()-1);
-		MatSparse<FPP,DEVICE> P(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact is a sqr. mat.
-		P.set_orthogonal(true);
 		for(int i=0;i<ord_indices.size();i++)
 			P.setCoeff(ord_indices[i],i, FPP(1.0));
-//		facts.push_back(P); // we prefer to directly multiply the last factor by P
+		//		P.set_orthogonal(true);
+		//		facts.push_back(P); // we prefer to directly multiply the last factor by P
 		last_fact.multiplyRight(P);
 	}
 	Faust::Transform<FPP,DEVICE> t = Faust::Transform<FPP,DEVICE>(facts);
-//	// remove the permutation factor if added temporarily for reordering
-//	return ord?facts.erase(facts.end()-1),t:t;
+	//	// remove the permutation factor if added temporarily for reordering
+	//	return ord?facts.erase(facts.end()-1),t:t;
 	return t;
 }
