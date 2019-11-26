@@ -152,7 +152,6 @@ void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::choose_pivot()
 #endif
 }
 
-
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::update_fact()
 {
@@ -172,28 +171,8 @@ void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::update_fact()
 	c_pq = conj(c_qp);
 	c_qp = conj(tmp);
 
-	FPP im_pivot_pq = (conj(c_pp)*(*this->L)(this->p,this->p)+conj(c_qp)*(*this->L)(this->q,this->p))*c_pq +
-		(conj(c_pp)*(*this->L)(this->p,this->q)+conj(c_qp)*(*this->L)(this->q,this->q))*c_qq;
+	this->check_pivot_image(c_pp, c_pq, c_qp, c_qq);
 
-//	cout << "im_L(p,q)=" << im_pivot_pq << endl;
-	if(Faust::fabs(im_pivot_pq) > 1e-3)
-	{
-		this->theta2 = - this->theta2;
-		sin_theta2 = sin(this->theta2);
-		cos_theta2 = cos(this->theta2);
-		c_pp = - i * exp(-i*this->theta1) * sin_theta2;
-		c_pq = - exp(i*this->theta1) * cos_theta2;
-		c_qp = exp(-i*this->theta1) * cos_theta2;
-		c_qq = i*exp(i*this->theta1) * sin_theta2;
-
-		tmp = c_pq;
-		c_pp = conj(c_pp);
-		c_qq = conj(c_qq);
-		c_pq = conj(c_qp);
-		c_qp = conj(tmp);
-	}
-
-//	cout << "theta1 :" << this->theta1 << "sin_theta2" << sin_theta2 <<  "theta2:" << this->theta2 << endl;
 	assert(!std::isnan(Faust::fabs(c_pp)));
 	if(fact_nrots == 0)
 	{
@@ -293,8 +272,9 @@ void GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cp
 	this->facts[this->ite].multiply(L, 'T');
 	this->facts[this->ite].conjugate();
 	L.multiplyRight(this->facts[this->ite]);
-//	cout << "L(p,q) after update_L():" << L(this->p,this->q) << endl;
-//#endif
+#ifdef DEBUG_GIVENS
+	cout << "L(p,q) after update_L():" << L(this->p,this->q) << endl;
+#endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>

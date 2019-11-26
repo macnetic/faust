@@ -141,6 +141,21 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::calc_theta()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
+void GivensFGFTComplex<FPP,DEVICE,FPP2>::check_pivot_image(FPP& c_pp, FPP& c_pq, FPP& c_qp, FPP& c_qq)
+{
+	FPP im_pivot_pq = (conj(c_pp)*(*L)(p,p)+conj(c_qp)*(*L)(q,p))*c_pq +(conj(c_pp)*(*L)(p,q)+conj(c_qp)*(*L)(q,q))*c_qq;
+
+#ifdef DEBUG_GIVENS
+	cout << "First value of theta2 gives pivot image im_L(p,q)=" << im_pivot_pq << endl;
+#endif
+	if(Faust::fabs(im_pivot_pq) > 1e-3)
+	{
+		c_pp = - c_pp;
+		c_qq = - c_qq;
+	}
+}
+
+template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 {
 	// Matlab ref. code:
@@ -174,51 +189,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	cout << "c_pp=" << c_pp << "c_pq=" << c_pq << endl;
 	cout << "c_qp=" << c_qp << "c_qq=" << c_qq << endl;
 #endif
-// check theta2 is a solution
-//	Faust::Vect<FPP,DEVICE> tmpv, tmp2, L_vec_p, L_vec_q;
-//	/*========== L = S'*L */
-//	MatDense<FPP,DEVICE>* L = dynamic_cast<MatDense<FPP,DEVICE>*>(this->L);
-//	L_vec_p = L->get_row(p), L_vec_q = L->get_row(q);
-//	// L(p,:) = c*L(p,:) + s*L(q,:)
-//	tmpv = L_vec_p;
-//	tmpv *= conj(c_pp);
-//	tmp2 = L_vec_q;
-//	tmp2 *= conj(c_qp);
-//	tmpv += tmp2;
-
-//	Faust::Vect<FPP,DEVICE> L_col_q = L->get_col(q);
-//	FPP im_pivot_pq = FPP(0);
-//	for(int j=0; j<L_col_q.size();j++)
-//	{
-//		im_pivot_pq += L_col_q[j]* tmpv[j];
-//	}
-//	tmpv[p] = conj(c_pp)*(*L)(p,p)+conj(c_qp)*(*L)(q,p);
-//	tmpv[q] = conj(c_pp)*(*L)(p,q)+conj(c_qp)*(*L)(q,q);
-//	im_pivot_pq += tmpv[p]*c_pq + tmpv[q]*c_qq;
-	FPP im_pivot_pq = (conj(c_pp)*(*L)(p,p)+conj(c_qp)*(*L)(q,p))*c_pq + (conj(c_pp)*(*L)(p,q)+conj(c_qp)*(*L)(q,q))*c_qq;
-
-//	cout << "im_L(p,q)=" << im_pivot_pq << endl;
-	if(Faust::fabs(im_pivot_pq) > 1e-3)
-	{
-		theta2 = - theta2;
-		sin_theta2 = sin(theta2);
-		cos_theta2 = cos(theta2);
-		c_pp = - i * exp(-i*theta1) * sin_theta2;
-		c_pq = - exp(i*theta1) * cos_theta2;
-		c_qp = exp(-i*theta1) * cos_theta2;
-		c_qq = i*exp(i*theta1) * sin_theta2;
-
-		tmp = c_pq;
-		//	c_pp = complex<typename FPP::value_type>(c_pp.real(), - c_pp.imag());
-		c_pp = conj(c_pp);
-		//	c_pq = complex<typename FPP::value_type>(c_qp.real(), - c_qp.imag());
-		c_pq = conj(c_qp);
-		//	c_qp = complex<typename FPP::value_type>(tmp.real(), - tmp.imag());
-		c_qp = conj(tmp);
-		//	c_qq = complex<typename FPP::value_type>(c_qq.real(), - c_qq.imag());
-		c_qq = conj(c_qq);
-
-	}
+	check_pivot_image(c_pp, c_pq, c_qp, c_qq);
 
 	// forget previous rotation coeffs
 	// and keep identity part (n first coeffs)

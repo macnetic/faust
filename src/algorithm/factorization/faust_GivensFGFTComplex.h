@@ -155,6 +155,11 @@ namespace Faust {
 				void calc_theta();
 
 				/**
+				 * This function verifies the sign of theta2 and recompute the Givens coefficients if needed (in case the pivot image is not null). This function is called from update_fact().
+				 */
+				void check_pivot_image(FPP& c_pp, FPP& c_pq, FPP& c_qp, FPP& c_qq);
+
+				/**
 				 * \brief Algo. step 2.3.
 				 *
 				 * Updates the current Givens factor according to the pivot chosen for the iteration.
