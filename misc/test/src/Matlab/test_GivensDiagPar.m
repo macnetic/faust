@@ -33,6 +33,11 @@ disp("Error: norm(Uhat*Dhat*Uhat'- Lap, 'fro')/norm(Lap, 'fro')")
 err0 = norm(Uhat_givens*full(diag(sorted_spectrum))*Uhat_givens' - Lap, 'fro')/norm(Lap, 'fro')
 %err2 = norm(Uhat_givens'*Lap*Uhat_givens - diag(diag(Uhat_givens'*Lap*Uhat_givens)),'fro')/norm(Lap,'fro') % equals err0
 %
+err1 = norm(U-Uhat_givens, 'fro')/norm(U, 'fro')
+
 disp("Verifying that reference choices for pivots are respected by this exec.")
 disp("ref_choices == choices:")
 all(all(ref_choices == choices))
+Dhat = full(diag(sorted_spectrum));
+Uhat = Uhat_givens
+save([filepath '/../../../data/mat/test_GivensDiagParallel_Lap_U_J_choices.mat'], '-v7', 'Uhat', 'Dhat', 'choices', 'U', 'Lap', 'J', 'err', 'err0', 'err1')

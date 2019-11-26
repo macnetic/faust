@@ -67,7 +67,8 @@ namespace Faust {
 
 				/** \brief inverse permutation of ord_indices (needed to retrieve start undefined order). */
 				vector<int> inv_ord_indices;
-
+				/** \brief True is the last fact (of facts) has been permuted */
+				bool last_fact_permuted;
 				/** \brief Cache for the ordered D. */
 				Faust::Vect<FPP,DEVICE> ordered_D;
 				/** \brief true if D has already been ordered (order_D() was called). */

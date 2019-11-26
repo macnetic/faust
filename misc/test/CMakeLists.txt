@@ -182,12 +182,23 @@ endif(NOT NOCPPTESTS)
 
 ####### IF THE MATIO LIBRARY IS AVAILABLE ELSE WE USE TXT OR XML DATA  #######
 if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) # AND HDF5_LIB_FILE)
+	include_directories(${FAUST_BIN_TEST_SRC_DIR})
+	set(GIVENS_CLASS "GivensFGFTComplex<SCALAR,DEVICE,SCALAR2>")
+	set(GIVENS_SCALAR "Complex")
+	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/GivensFGFTUtil.h ${FAUST_BIN_TEST_SRC_DIR}/GivensFGFTUtilComplex.h @ONLY)
+	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/GivensFGFTUtil.hpp ${FAUST_BIN_TEST_SRC_DIR}/GivensFGFTUtilComplex.hpp @ONLY)
+	set(GIVENS_CLASS "GivensFGFT<SCALAR,DEVICE,SCALAR2>")
+	set(GIVENS_SCALAR "Real")
+	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/GivensFGFTUtil.h ${FAUST_BIN_TEST_SRC_DIR}/GivensFGFTUtilReal.h @ONLY)
+	configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/GivensFGFTUtil.hpp ${FAUST_BIN_TEST_SRC_DIR}/GivensFGFTUtilReal.hpp @ONLY)
 
 	### list of executable generated in double and simple precision
 	# hierarchical_fact : test the hierarchical_fact algorithm
 	# test_palm4MSA : test the palm4MSA algorithm
 	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
- 
+
+
+
 	foreach(TEST_FPP float double complex<float> complex<double>)	
 		foreach(testin hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate GivensFGFT GivensFGFTSparse GivensFGFTParallel GivensFGFTParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op GivensFGFTComplex GivensFGFTComplexSparse GivensFGFTParallelComplex)
 			if(${TEST_FPP} MATCHES complex )

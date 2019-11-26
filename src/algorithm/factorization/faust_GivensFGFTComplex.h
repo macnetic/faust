@@ -52,7 +52,7 @@ namespace Faust {
 				Faust::MatGeneric<FPP, DEVICE> *L;
 				/** \brief Rotation angle theta for the current iteration's Givens matrix. */
 				FPP theta1, theta2;
-
+				bool last_fact_permuted;
 				/* Precomputed model identity matrix to init. facts[ite] before update.
 				 * Identity matrix is completed later with cos/sin coefficients (in update_fact()).
 				 */

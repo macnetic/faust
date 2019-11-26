@@ -32,8 +32,8 @@ D_fronorm = norm(D, 'fro')
 Uhat = fourier_diag_full(:,I);
 
 err0 = norm(Uhat*full(diag(Dhat))*Uhat' - Lap, 'fro')/norm(Lap, 'fro')
-%err2 = norm(Uhat'*Lap*Uhat - diag(diag(Uhat'*Lap*Uhat)),'fro')/norm(Lap,'fro') % equals err0 ?
+%err2 = norm(Uhat'*Lap*Uhat - diag(diag(Uhat'*Lap*Uhat)),'fro')/norm(Lap,'fro') % error on remaining offdiag coeffs
 err1 = norm(U-Uhat, 'fro')/norm(U, 'fro')
 Dhat = full(diag(Dhat));
 
-save('~/faust/misc/data/mat/test_GivensDiag_Lap_U_J.mat', '-v7', 'Uhat', 'Dhat', 'choices', 'U', 'Lap', 'J', 'err')
+save([filepath '/../../../data/mat/test_GivensDiag_Lap_U_J.mat'], '-v7', 'Uhat', 'Dhat', 'choices', 'U', 'Lap', 'J', 'err', 'err0', 'err1')
