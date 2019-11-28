@@ -373,27 +373,19 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 	//
 	if(!((ite+1)%GivensFGFT<FPP,DEVICE,FPP2>::ERROR_CALC_PERIOD) || stoppingCritIsError || verbosity > 1)
 	{
-		MatDense<FPP,DEVICE> tmp = this->get_Dspm(false);
-		MatDense<FPP,DEVICE>* dL;
-		MatSparse<FPP,DEVICE> * sL = dynamic_cast<MatSparse<FPP,DEVICE>*>(L);
-		if(sL)
+		FPP2 err = 0, err_d;
+		for(int i=0;i<D.size();i++)
+			err += D(i)*D(i);
+		if(Lap_squared_fro_norm == FPP(0))
 		{
-			MatDense<FPP,DEVICE> ddl(*sL);
-			tmp -= ddl;
+			err_d = Faust::fabs(Lap.norm());
+			err_d = err_d*err_d;
+			Lap_squared_fro_norm = err_d;
 		}
 		else
-		{
-			dL = dynamic_cast<MatDense<FPP,DEVICE>*>(L);
-			tmp -= *dL;
-		}
-		FPP2 err = tmp.norm(), err_d;
-		err *= err;
-		if(errIsRel)
-		{
-			err_d = Lap.norm();
-			err_d *= err_d;
-			err /= err_d;
-		}
+			err_d = Faust::fabs(Lap_squared_fro_norm);
+		err = Faust::fabs(err_d - err);
+		if(errIsRel) err /= err_d;
 		if(verbosity)
 			cout << "GivensFGFT factor : "<< ite <<  ", transform " << ((errIsRel)?"relative ":"absolute ") << "err.: " << err << endl;
 		errs.push_back(err);
@@ -460,7 +452,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel) : Lap(Lap), facts(J), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(J), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false)
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel) : Lap(Lap), facts(J), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(J), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(0)
 
 {
 	/* Matlab ref. code:
@@ -493,7 +485,7 @@ GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) : Lap(Lap), facts(J), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(J), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false)
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) : Lap(Lap), facts(J), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(J), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(0)
 {
 	/* Matlab ref. code:
 	 *     facts = cell(1,J);

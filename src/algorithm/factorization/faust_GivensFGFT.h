@@ -45,6 +45,7 @@ namespace Faust {
 				vector<pair<int,int>> coord_choices;
 				/** \brief Graph Laplacian to diagonalize/approximate. */
 				Faust::MatGeneric<FPP, DEVICE>& Lap;
+				FPP Lap_squared_fro_norm;
 				/** \brief L iteration factor:  L_i = S^T L_{i-1} S, initialized from Lap (with S being facts[i]). */
 				Faust::MatGeneric<FPP, DEVICE> *L;
 				/** \brief Rotation angle theta for the current iteration's Givens matrix. */
