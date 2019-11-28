@@ -1576,6 +1576,53 @@ cdef class FaustFact:
         return core, D
 
     @staticmethod
+    def eigtj(M, maxiter=None, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
+          order='ascend'):
+        if(maxiter == None): 
+            if(tol == 0):
+                raise Exception("You must specify maxiter or tol argument"
+                        " (to define a stopping  criterion)")
+            maxiter = 0 
+        if(nGivens_per_fac == None): nGivens_per_fac = int(M.shape[0]/2)
+        if((isinstance(M, np.ndarray) and (np.matrix(M, copy=False).H != M).any()) or M.shape[0] != M.shape[1]):
+            raise ValueError(" the matrix/array must be symmetric or hermitian.")
+        if(not isinstance(maxiter, int)): raise TypeError("maxiter must be a int")
+        if(not isinstance(nGivens_per_fac, int)): raise TypeError("nGivens_per_fac must be a int")
+        nGivens_per_fac = max(nGivens_per_fac, 1)
+        nGivens_per_fac = min(nGivens_per_fac, maxiter)
+        tol *= tol # the C++ impl. works on squared norms to measure errors
+
+        M_is_real = M.dtype in [ 'float', 'float128',
+                             'float16', 'float32',
+                             'float64', 'double']
+        if(isinstance(M, np.ndarray)):
+            if(M_is_real):
+                core_obj,D = FaustFact.fact_givens_fgft(M, maxiter, nGivens_per_fac,
+                        verbosity, tol,
+                        relerr, order)
+            else: #complex
+                core_obj,D = FaustFact.fact_givens_fgft_cplx(M, maxiter, nGivens_per_fac,
+                        verbosity, tol,
+                        relerr, order)
+
+        elif(isinstance(M, csr_matrix)):
+            if(M_is_real):
+                core_obj,D = FaustFact.fact_givens_fgft_sparse(M, maxiter,
+                        nGivens_per_fac,
+                        verbosity,
+                        tol,
+                        relerr,
+                        order)
+            else: #complex
+                core_obj,D = FaustFact.fact_givens_fgft_sparse_cplx(M, maxiter, nGivens_per_fac,
+                        verbosity, tol,
+                        relerr, order)
+        else:
+            raise TypeError("The matrix to diagonalize must be a"
+                            " scipy.sparse.csr_matrix or a numpy array.")
+        return D.astype(np.float), core_obj
+
+    @staticmethod
     def svdtj(M, J, t, verbosity=0, stoppingError = 0.0,
               errIsRel=True):
         isReal = M.dtype in [ 'float', 'float128',

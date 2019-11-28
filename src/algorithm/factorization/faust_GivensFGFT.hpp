@@ -39,7 +39,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::choose_pivot()
 //        coord_choices(2,j) = q;
 	C_min_row.min_coeff(&p);
 	q = q_candidates[p];
-	coord_choices[ite] = pair<int,int>(p,q);
+	coord_choices.push_back(pair<int,int>(p,q));
 #ifdef DEBUG_GIVENS
 	cout << "GivensFGFT::choose_pivot() ite: " << ite << " p: " << p << " q: " << q << endl;
 #endif
@@ -188,6 +188,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_fact()
 	fact_mod_row_ids.push_back(q);
 	fact_mod_col_ids.push_back(q);
 	fact_mod_values.push_back(c);
+	if(J == 0) facts.resize(ite+1);
 	facts[ite] = MatSparse<FPP,DEVICE>(fact_mod_row_ids, fact_mod_col_ids, fact_mod_values, n, n);
 	facts[ite].set_orthogonal(true);
 #ifdef DEBUG_GIVENS
@@ -439,11 +440,11 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 {
 	is_D_ordered = false; // facts (re)computed then D must be reordered
 	ite = 0;
-	while(ite < facts.size())
+	while(J == 0 || ite < facts.size()) // when J == 0 the stopping criterion is the error against Lap
 	{
 		next_step();
 		ite++;
-		if(stoppingCritIsError && *(errs.end()-1) <= stoppingError)
+		if(stoppingCritIsError && ((*(errs.end()-1) <= stoppingError || ite > 1 && errs[ite-1]-errs[ite-2] > 0)))
 		{
 			facts.resize(ite);
 			break;
@@ -452,7 +453,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel) : Lap(Lap), facts(J), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(J), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(0)
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel) : Lap(Lap), facts(J>0?J:1), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(1), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(0), J(J)
 
 {
 	/* Matlab ref. code:
@@ -464,6 +465,7 @@ GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J
 	 *     coord_choices = zeros(2,J);
 	 *
 	 */
+	if(J == 0 && ! stoppingCritIsError) handleError("GivensFGFT", "Either J or stoppingError must be > 0");
 	C.setOnes();
 	C.scalarMultiply(15); // purely abitrary
 	if(Lap.getNbCol() != Lap.getNbRow())
@@ -485,7 +487,7 @@ GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) : Lap(Lap), facts(J), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(J), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(0)
+GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) : Lap(Lap), facts(J>0?J:1), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(1), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), always_theta2(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(0), J(J)
 {
 	/* Matlab ref. code:
 	 *     facts = cell(1,J);
@@ -496,6 +498,7 @@ GivensFGFT<FPP,DEVICE,FPP2>::GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J,
 	 *     coord_choices = zeros(2,J);
 	 *
 	 */
+	if(J == 0 && ! stoppingCritIsError) handleError("GivensFGFT", "Either J or stoppingError must be > 0");
 	C.setOnes();
 	C.scalarMultiply(15); // purely abitrary
 	if(Lap.getNbCol() != Lap.getNbRow())

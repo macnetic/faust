@@ -35,6 +35,8 @@ namespace Faust {
 			/** \brief Pivot candidates q coordinates. */
 			int* q_candidates;  /* default IndexType for underlying eigen matrix is int. */
 			protected:
+				/** \brief The number of targeted transform factors (when only one Givens rotation is stored per factor).*/
+				int J;
 				/** \brief Fourier matrix factorization matrices (Givens matrix). */
 				vector<Faust::MatSparse<FPP,DEVICE>> facts;
 				/** \brief Diagonalization approximate of Laplacian. */

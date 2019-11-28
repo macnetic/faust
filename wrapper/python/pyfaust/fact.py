@@ -89,7 +89,7 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
-        NOTE: this function is based on fact.eigtj (See below the example for further detailsi on how svdtj is defined using eigtj).
+        NOTE: this function is based on fact.eigtj (See below the example for further details on how svdtj is defined using eigtj).
 
         Args:
             M: a real matrix (np.ndarray or scipy.sparse.csr_matrix).
@@ -156,12 +156,12 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     V = Faust(core_obj=Vcore)
     return U, S, V
 
-def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
+def eigtj(M, maxiter=None, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
           order='ascend'):
     """
     Runs the truncated Jacobi algorithm to compute the eigenvalues of M (returned in W) and the corresponding transform of eigenvectors (in Faust V columns).
 
-    The output is such that dot(dot(V,diag(W)), V.T) approximates M.
+    The output is such that dot(dot(V,diag(W)), V.H) approximates M.
 
     The trade-off between accuracy and sparsity can be set through the
     parameters maxiter and nGivens_per_fac.
@@ -170,14 +170,14 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
         M: (numpy.ndarray or csr_matrix) the matrix to diagonalize. Must be
         real and symmetric or hermitian if complex. Be warn that the sparse or
         dense chosen format for M is respected along the algorithm execution so
-        that the performances and accuracy can be different.
+        that the performances can differ.
         maxiter: (int) defines the number of Givens rotations that are computed in
         eigenvector transform V. The number of rotations per factor of V is
         defined by nGivens_per_fac.
-        tol: (float) the tolerance error under what the algorithm stops. By default,
+        tol: (float) the error tolerance under what the algorithm stops. By default,
         it's zero for not stopping on error criterion.
-        relErr: (bool) the type of error stopping criterion. Default to True to use
-        relative error, otherwise (False) the absolute error is used.
+        relErr: (bool) the type of error used as stopping criterion. The default value 
+        is True for relative error, otherwise (False) the absolute error is used.
         nGivens_per_fac: (int) the number of Givens rotations per factor of V, must be
         an integer between 1 to M.shape[0]/2 which is the default value (when
         nGivens_per_fac == None).
@@ -193,9 +193,6 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
            - V the Faust object representing the approximate eigenvector
             transform. The column V[:, i] is the eigenvector
             corresponding to the eigenvalue W[i].<br/>
-            The last factor of V is a permutation matrix.
-            The goal of this factor is to apply to the columns of V the same order as
-            eigenvalues set in W.
 
     References:
     [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
@@ -216,17 +213,20 @@ def eigtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
         Lap = data_dict['Lap'].astype(np.float)
         Dhat, Uhat = eigtj(Lap, maxiter=Lap.shape[0]*100)
         # Uhat is the Fourier matrix/eigenvectors approximation as a Faust
-        # (200 factors + permutation mat.)
+        # (200 factors)
         # Dhat the eigenvalues diagonal matrix approx.
+        print("err: ", np.linalg.norm(Lap-Uhat*np.diag(Dhat)*Uhat.H)/np.linalg.norm(Lap)) # about 6.5e-3
         print(Uhat)
         print(Dhat)
 
     See also:
         fgft_givens, fgft_palm
     """
-    return fgft_givens(M, maxiter, tol, relerr, nGivens_per_fac, verbosity,
-                       order)
-
+    D, core_obj = _FaustCorePy.FaustFact.eigtj(M, maxiter, tol, relerr,
+            nGivens_per_fac, verbosity, order)
+    return D, Faust(core_obj=core_obj)
+    
+# experimental block start
 def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
                 verbosity=0, order='ascend'):
     """
@@ -260,44 +260,8 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
     See also:
         eigtj, fgft_palm
     """
-    if(nGivens_per_fac == None): nGivens_per_fac = int(Lap.shape[0]/2)
-    if((isinstance(Lap, np.ndarray) and (np.matrix(Lap).H != Lap).any()) or Lap.shape[0] != Lap.shape[1]):
-        raise ValueError(" the matrix/array must be square and should be symmetric.")
-    if(not isinstance(maxiter, int)): raise TypeError("maxiter must be a int")
-    if(maxiter < 1): raise ValueError("maxiter must be >= 1")
-    if(not isinstance(nGivens_per_fac, int)): raise TypeError("nGivens_per_fac must be a int")
-    nGivens_per_fac = max(nGivens_per_fac, 1)
-    nGivens_per_fac = min(nGivens_per_fac, maxiter)
-    if(isinstance(Lap, np.ndarray)):
-        if(Lap.dtype in [ 'float', 'float128',
-                         'float16', 'float32',
-                         'float64', 'double']):
-            core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft(Lap, maxiter, nGivens_per_fac,
-                                                                 verbosity, tol,
-                                                                 relerr, order)
-        else: #complex
-            core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_cplx(Lap, maxiter, nGivens_per_fac,
-                                                                 verbosity, tol,
-                                                                 relerr, order)
-
-    elif(isinstance(Lap, csr_matrix)):
-        if(Lap.dtype in [ 'float', 'float128',
-                         'float16', 'float32',
-                         'float64', 'double']):
-            core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_sparse(Lap, maxiter,
-                                                                        nGivens_per_fac,
-                                                                        verbosity,
-                                                                        tol,
-                                                                        relerr,
-                                                                        order)
-        else: #complex
-            core_obj,D = _FaustCorePy.FaustFact.fact_givens_fgft_sparse_cplx(Lap, maxiter, nGivens_per_fac,
-                                                                 verbosity, tol,
-                                                                 relerr, order)
-    else:
-        raise TypeError("The matrix to diagonalize must be a"
-                        " scipy.sparse.csr_matrix or a numpy array.")
-    return D.astype(np.float), Faust(core_obj=core_obj)
+    return eigtj(M, maxiter, tol, relerr, nGivens_per_fac, verbosity, order)
+# experimental block end
 
 def _check_fact_mat(funcname, M):
     if(not isinstance(M, np.ndarray)):
