@@ -6,6 +6,7 @@
 #include "faust_MatSparse.h"
 #include "faust_MatDense.h"
 #include "faust_Transform.h"
+#include <cfloat>
 #include <vector>
 
 namespace Faust {

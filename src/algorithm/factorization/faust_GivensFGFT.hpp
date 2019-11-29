@@ -388,7 +388,11 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_err()
 		err = Faust::fabs(err_d - err);
 		if(errIsRel) err /= err_d;
 		if(verbosity)
-			cout << "GivensFGFT factor : "<< ite <<  ", transform " << ((errIsRel)?"relative ":"absolute ") << "err.: " << err << endl;
+		{
+			cout << "factor : "<< ite <<  ", " << ((errIsRel)?"relative ":"absolute ") << "err.: " << err;
+			if(stoppingCritIsError) cout << " stoppingError: " << stoppingError << ")";
+			cout << endl;
+		}
 		errs.push_back(err);
 	}
 }
@@ -440,11 +444,14 @@ void GivensFGFT<FPP,DEVICE,FPP2>::compute_facts()
 {
 	is_D_ordered = false; // facts (re)computed then D must be reordered
 	ite = 0;
+	bool stopping = false;
 	while(J == 0 || ite < facts.size()) // when J == 0 the stopping criterion is the error against Lap
 	{
 		next_step();
 		ite++;
-		if(stoppingCritIsError && ((*(errs.end()-1) <= stoppingError || ite > 1 && errs[ite-1]-errs[ite-2] > 0)))
+		if(stopping = (ite > 1 && errs.size() > 2 && errs[ite-1]-errs[ite-2] > FLT_EPSILON))
+			if(verbosity>0) cerr << "warning: the algorithm stopped because the last error is greater than the previous one." << endl;
+		if(stopping || stoppingCritIsError && errs.size() > 0 && (*(errs.end()-1) - stoppingError ) < FLT_EPSILON)
 		{
 			facts.resize(ite);
 			break;

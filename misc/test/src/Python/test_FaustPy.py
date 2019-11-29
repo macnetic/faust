@@ -1003,6 +1003,32 @@ class TestFaustFactory(unittest.TestCase):
         # misc/test/src/C++/GivensFGFTParallel.cpp.in
         self.assertEqual(err, err2)
 
+    def testeigtj_abserr(self):
+        from numpy.random import rand
+        from pyfaust.fact import eigtj
+        err = .01
+        M = rand(128,128)
+        M = M@M.T
+        D,U = eigtj(M, tol=err, relerr=False)
+        self.assertAlmostEqual(norm(M-U*np.diag(D)*U.T), err, places=3 )
+        M_cplx = M*np.complex(1,0) + rand(128,128)*np.complex(0,1)
+        M_cplx = M_cplx@np.matrix(M_cplx,copy=False).H
+        err=.1
+        D,U = eigtj(M_cplx, tol=err)
+        self.assertLessEqual(norm(M_cplx-U*np.diag(D)*U.H), err)
+
+    def testeigtj_relerr(self):
+        from numpy.random import rand
+        from pyfaust.fact import eigtj
+        err = .01
+        M = rand(128,128)
+        M = M@M.T
+        D,U = eigtj(M, tol=err)
+        self.assertLessEqual(norm(M-U*np.diag(D)*U.T)/norm(M), err)
+        M_cplx = M + rand(128,128)*np.complex(0,1)
+        M_cplx = M_cplx@np.matrix(M_cplx, copy=False).H
+        D,U = eigtj(M_cplx, tol=err)
+        self.assertLessEqual(norm(M_cplx-U*np.diag(D)*U.H)/norm(M_cplx), err)
 
     def testFactPalm4MSA_fgft(self):
         print("Test pyfaust.fact._palm4msa_fgft()")

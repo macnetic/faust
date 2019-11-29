@@ -84,6 +84,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	if(nrhs >= 7)
 		order = (int) mxGetScalar(prhs[6]); //eigenvalues order
 
+	tol *= tol; // C++ backend works with squared norm error
+
 	const mxArray* matlab_matrix = prhs[0]; // Laplacian
 
 	if(mxIsComplex(matlab_matrix))

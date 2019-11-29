@@ -260,7 +260,7 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
     See also:
         eigtj, fgft_palm
     """
-    return eigtj(M, maxiter, tol, relerr, nGivens_per_fac, verbosity, order)
+    return eigtj(Lap, maxiter, tol, relerr, nGivens_per_fac, verbosity, order)
 # experimental block end
 
 def _check_fact_mat(funcname, M):

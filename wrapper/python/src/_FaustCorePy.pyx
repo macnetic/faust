@@ -1584,12 +1584,13 @@ cdef class FaustFact:
                         " (to define a stopping  criterion)")
             maxiter = 0 
         if(nGivens_per_fac == None): nGivens_per_fac = int(M.shape[0]/2)
-        if((isinstance(M, np.ndarray) and (np.matrix(M, copy=False).H != M).any()) or M.shape[0] != M.shape[1]):
+        if(isinstance(M, np.ndarray) and \
+            not np.allclose(np.matrix(M, copy=False).H, M) or M.shape[0] != M.shape[1]):
             raise ValueError(" the matrix/array must be symmetric or hermitian.")
         if(not isinstance(maxiter, int)): raise TypeError("maxiter must be a int")
         if(not isinstance(nGivens_per_fac, int)): raise TypeError("nGivens_per_fac must be a int")
         nGivens_per_fac = max(nGivens_per_fac, 1)
-        nGivens_per_fac = min(nGivens_per_fac, maxiter)
+        if(maxiter > 0): nGivens_per_fac = min(nGivens_per_fac, maxiter)
         tol *= tol # the C++ impl. works on squared norms to measure errors
 
         M_is_real = M.dtype in [ 'float', 'float128',
