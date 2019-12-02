@@ -66,8 +66,8 @@ Anaconda
 
 Within Anaconda you can also create virtual environments and use pyfaust into it. It's quite similar to the Python way described in previous sections. For that purpose you'll use the command conda create.
 
-Please rely on the documentation here: https://conda.readthedocs.io/en/latest/
+Please rely on the documentation here: https://docs.conda.io/en/latest/
 
-Or for more details about this specific command please look here: [conda-create](https://conda.io/projects/conda/en/latest/commands/create.html)
+Or for more details about this specific command please look here: [conda-create](https://docs.conda.io/projects/conda/en/latest/commands/create.html)
 
 Please note that if you're using conda, you still need to install pyfaust (whl) package through pip. You can install pip with conda and then install pyfaust pip package as described above with a pip install command (in a conda virtual environment or not). And final point, don't forget to use the good version of python3: @PY3_VER@.x.

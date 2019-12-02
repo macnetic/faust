@@ -7,18 +7,19 @@
 %>
 %> &nbsp;&nbsp;&nbsp; @b x=omp(y, D) runs the algorithm with the default configuration which is equivalent to <b> x=omp(y, D, 'maxiter', length(y), 'verbose', false)</b>.<br/>
 %> &nbsp;&nbsp;&nbsp; <b> x=omp(y, D, 'maxiter', N)</b> stops the algorithm after N iterations.<br/>
-%> &nbsp;&nbsp;&nbsp; <b> x=omp(y, D, 'tol', 10**-16)</b> runs the algoritm until the relative error is lower or equal 10**-16. This is equivalent to <b>x=omp(y, D, 'tol', 10**-16, 'relerr', true)</b><br/>
-%> &nbsp;&nbsp;&nbsp; <b>x=omp(y, D, 'tol', 10**-16, 'relerr', false)</b> runs the algoritm until the absolute error is lower or equal 10**-16.<br/><br/>
+%> &nbsp;&nbsp;&nbsp; <b> x=omp(y, D, 'tol', 10^-16)</b> runs the algoritm until the relative error is lower or equal to 10**-16. This is equivalent to <b>x=omp(y, D, 'tol', 10^-16, 'relerr', true)</b><br/>
+%> &nbsp;&nbsp;&nbsp; <b> x=omp(y, D, 'maxiter', N, 'tol', 10^-16)</b> runs at most N iterations until the <code>tol</code> precision is reached.<br/>
+%> &nbsp;&nbsp;&nbsp; <b>x=omp(y, D, 'tol', 10^-16, 'relerr', false)</b> runs the algoritm until the absolute error is lower or equal to 10**-16.<br/><br/>
 %>
 %>
 %> @param y The vector to approximate by D*x.
 %> @param D The dictionary as a matrix or a Faust.
+%> @param 'maxiter', number (optional) To define a maximum number of iterations (by default this length(y)).
+%> @param 'tol', number (optional) To define the error value used for the relative or absolute error (by default this is 0, for not stopping on any error criterion).
+%> @param 'relerr', true (optional) To define a stopping criterion based on the relative error (this is the default error).
+%> @param 'relerr', false (optional) To define a stopping criterion based on the absolute error.
 %> @param 'verbose', true (optional) To enable the verbosity.
 %> @param 'verbose', false (optional) To disable the verbosity (this is the default option).
-%> @param 'maxiter', number (optional) To define a maximum number of iterations (by default this length(y)).
-%> @param 'relerr', true (optional) For a stopping criterion based on the relative error (this is the default error).
-%> @param 'relerr', false (optional) For a stopping criterion based on the absolute error.
-%> @param 'tol', number (optional) To define the error value used for the relative or absolute error (by default this is 0, for not stopping on any error criterion).
 %>
 %>
 %>@return x the solution of y = D*x (according to the error).

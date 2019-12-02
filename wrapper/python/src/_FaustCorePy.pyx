@@ -1641,6 +1641,7 @@ cdef class FaustFact:
         M_view = np.asfortranarray(M)
         S = np.empty(M.shape[0], dtype=M.dtype)
         S_view = S
+        stoppingError *= stoppingError # the C++ impl. works on squared norms to measure errors
 
         coreU = FaustCore(core=True)
         coreV = FaustCore(core=True)
@@ -1678,6 +1679,7 @@ cdef class FaustFact:
 
         S = np.empty(M.shape[0], dtype=M.dtype)
         S_view = S
+        stoppingError *= stoppingError # the C++ impl. works on squared norms to measure errors
 
         coreU = FaustCore(core=True)
         coreV = FaustCore(core=True)
@@ -1718,6 +1720,7 @@ cdef class FaustFact:
         M_view = np.asfortranarray(M)
         S = np.empty(M.shape[0], dtype=M.dtype)
         S_view = S
+        stoppingError *= stoppingError # the C++ impl. works on squared norms to measure errors
 
         coreU = FaustCore(core=True)
         coreV = FaustCore(core=True)
@@ -1755,6 +1758,7 @@ cdef class FaustFact:
 
         S = np.empty(M.shape[0], dtype=M.dtype)
         S_view = S
+        stoppingError *= stoppingError # the C++ impl. works on squared norms to measure errors
 
         coreU = FaustCore(core=True)
         coreV = FaustCore(core=True)

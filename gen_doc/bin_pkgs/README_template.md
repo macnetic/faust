@@ -12,8 +12,8 @@
 
 ### 1.1 For Python
 
-@note  This section treats only of system packages/installers but note that some pip packages are also available. You might install them in virtual environments:
-\ref install_pyfaust_in_venv
+@note  This section treats only of system packages/installers but note that some pip packages are also available and this is in fact the recommended way of installing pyfaust, in particular because of the easier weak dependency management. You might install them in virtual environments:
+\ref install_pyfaust_in_venv.<br/> 
 
 FAµST is designed for the Python ecosystem which as usual relies on the numpy and scipy packages.
 
@@ -21,7 +21,7 @@ If you want to run the FAµST demos (module pyfaust.demo), you'll also need the 
 
 Please ensure these packages are installed on your system. One way to install them is to use the pip program delivered with your python version.
 
-	pip install numpy scipy matplotlib
+	pip install numpy scipy matplotlib # pygsp
 	# it could be pip3 instead of pip
 
 Note that you probably have to install those packages for all versions of Python you want to use (each one have normally its associated pip executable).<br/>
@@ -31,7 +31,7 @@ FAµST supports at least Python 2.7.15 and is also compiled for Python @PY3_VER@
 
 If you want to use FAµST with Python 3 you must use precisely the @PY3_VER@ version because the FAµST Python wrapper delivered within the binary package is compiled for that version only.
 
-@note pygsp is an optional python package to install in order to generate graphs and their Laplacians for testing the FGFT algorithms added in FAµST 2.4.
+@note pygsp is an optional python package to install in order to generate graphs and their Laplacians for testing the FGFT/eigen decomposition algorithms.
 
 ### 1.2 For Matlab
 
@@ -147,7 +147,7 @@ And then call some functions on Faust object A to test a bit of the FAµST API:
 
 	>> rcg(A)
 	>> density(A)
-	>> get_num_factors(A)
+	>> numfactors(A)
 
 @note if you're wondering what are these functions just consult the inline doc:
 
@@ -155,8 +155,8 @@ And then call some functions on Faust object A to test a bit of the FAµST API:
 
 Retrieve the product factors:
 
-	>> F1 = get_factor(A,1);
-	>> F2 = get_factor(A,2);
+	>> F1 = factors(A,1);
+	>> F2 = factors(A,2);
 
 Check the sizes:
 

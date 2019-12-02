@@ -16,8 +16,8 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
     Runs the greedy OMP algorithm optimized by Cholesky decomposition.
 
     Args:
-        D: the dictionary as a numpy matrix or a Faust.
         y: the vector to approximate by D*x.
+        D: the dictionary as a numpy matrix or a Faust.
         maxiter: the maximum number of iterations of the algorithm.
         By default (None) it's y's dimension: max(y.shape).
         tol: the tolerance error under what the algorithm stops. By default,
@@ -28,6 +28,13 @@ def omp(y, D, maxiter=None, tol=0, relerr=True, verbose=False):
 
     Returns:
         x: the solution of y = D*x (according to the error).
+
+    Example:
+        >>> from pyfaust.tools import omp
+        >>> # generate yours y and D and maxiter then call omp:
+        >>> x = omp(y, D, maxiter, tol=10**-16)
+        >>> # omp() runs at most maxiter iterations until the error tolerance is
+        >>> # reached
     """
     # check y is a numpy.matrix (or a matrix_csr ?)
     if(isinstance(y, np.ndarray)): y = matrix(y, copy=False)

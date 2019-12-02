@@ -4,7 +4,7 @@
 ## @package pyfaust.fact @brief The pyfaust factorization module
 ##
 ##    This module gives access to the main factorization algorithms of
-##    FAuST. These algorithms can factorize a dense matrix to a sparse product
+##    FAuST. These algorithms can factorize a dense matrix into a sparse product
 ##    (i.e. a Faust object). A few of them are only available in experimental
 ##    packages.
 ##
@@ -16,7 +16,7 @@
 ##    intended to be used directly. You should rather rely on the second algorithm.
 ##
 ##    - The second one is the Hierarchical Factorization algorithm:
-##    this is the central algorithm to factorize a dense matrix to a Faust.
+##    this is the central algorithm to factorize a dense matrix into a Faust.
 ##    It makes iterative use of Palm4MSA to proceed with the factorization of a given
 ##    dense matrix.
 ##
@@ -41,8 +41,7 @@ def svdtj2(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
-        NOTE: this function is based on fact.eigtj.
-
+        NOTE: this function is based on fact.eigtj. 
         Args:
             M: a real matrix.
             maxiter: see fact.eigtj
@@ -89,12 +88,13 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
-        NOTE: this function is based on fact.eigtj (See below the example for further details on how svdtj is defined using eigtj).
+        NOTE: this function is based on fact.eigtj. See below the example for further details on how svdtj is defined using eigtj.
 
         Args:
             M: a real matrix (np.ndarray or scipy.sparse.csr_matrix).
             maxiter: see fact.eigtj
-            tol: see fact.eigtj
+            tol: see fact.eigtj (the error tolerance is not exactly for the svd
+            but for the subsequent eigtj calls).
             relerr: see fact.eigtj
             nGivens_per_fac: see fact.eigtj
             verbosity: see fact.eigtj
@@ -112,20 +112,20 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
             >>> M = rand(128,128)
             >>> U,S,V = svdtj(M, 1024, nGivens_per_fac=64)
 
-        If we call svdtj on the matrix M, it makes two internal calls to eigtj. 
+        If we call svdtj on the matrix M, it makes two internal calls to eigtj.
 
         In Python it would be:
-        1.  D1, W1 = eigtj(M.dot(M.H))
-        2.  D2, W2 = eigtj(M.H.dot(M))
+        1.  D1, W1 = eigtj(M.dot(M.H), next_args...)
+        2.  D2, W2 = eigtj(M.H.dot(M), next_args...)
 
-        It gives the following equalities (ignoring the fact that eigtj computes approximations):  
-        \f[ 
-            W_1 D_1 W_1^* = M M^* 
-        \f]  
+        It gives the following equalities (ignoring the fact that eigtj computes approximations):
+        \f[
+            W_1 D_1 W_1^* = M M^*
+        \f]
         \f[
                 W_2 D_2 W_2^* = M^* M
-        \f]  
-        But because of the SVD \f$ M = USV^* \f$ we also have:  
+        \f]
+        But because of the SVD \f$ M = USV^* \f$ we also have:
         \f[MM^* = U S V^* V S U^* = U S^2 U^* = W_1 D_1 W_1^*\f]
         \f[M^* M = V S U^* U S V^* = V S^2 V^* = W_2 D_2  W_2^*\f]
         It allows to identify the left singular vectors of M to W1,
@@ -133,7 +133,7 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
 
         To compute a consistent approximation of S we observe that U and V are orthogonal/unitary hence \f$ S  = U^* M V \f$ so we ignore the off-diagonal coefficients of the approximation and take \f$ S = diag(U^* M V)  \approx diag(W_1^* M W_2)\f$
 
-        The last step performed by svdtj() is to sort the singular values of S in descending order and build a signed permutation matrix to order the left singular vectors of W1 accordingly. The -1 elements of the signed permutation matrix allow to change the sign of each negative values of S by reporting it on the corresponding left singular vector (\f$ \sigma v_i = (-\sigma_i) (-v_i )\f$).<br/>   
+        The last step performed by svdtj() is to sort the singular values of S in descending order and build a signed permutation matrix to order the left singular vectors of W1 accordingly. The -1 elements of the signed permutation matrix allow to change the sign of each negative values of S by reporting it on the corresponding left singular vector (\f$ \sigma v_i = (-\sigma_i) (-v_i )\f$).<br/>
         To sum up W1 is replaced by W1 P and W2 by W2 abs(P) (because W2 also needs to be ordered), with P the signed permutation resulting of the descending sort of S. That new transforms/Fausts W1 and W2 are returned by svdtj along with the ordered S. Note that the permutation factor is not append to the transform W1 (or W2) but multiplied directly to the last factor of W1 (or W2).
 
 
@@ -159,30 +159,33 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
 def eigtj(M, maxiter=None, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
           order='ascend'):
     """
-    Runs the truncated Jacobi algorithm to compute the eigenvalues of M (returned in W) and the corresponding transform of eigenvectors (in Faust V columns).
+    Performs a eigendecomposition of M and returns the eigenvalues in W along with the corresponding left eigenvectors (as the columns of the Faust object V).
 
-    The output is such that dot(dot(V,diag(W)), V.H) approximates M.
+    The output is such that V*numpy.diag(W)*V.H approximates M.
 
     The trade-off between accuracy and sparsity can be set through the
-    parameters maxiter and nGivens_per_fac.
+    parameters maxiter and nGivens_per_fac or concurrently with the arguments
+    tol and relerr that define the targeted error.
 
     Args:
         M: (numpy.ndarray or csr_matrix) the matrix to diagonalize. Must be
-        real and symmetric or hermitian if complex. Be warn that the sparse or
-        dense chosen format for M is respected along the algorithm execution so
-        that the performances can differ.
-        maxiter: (int) defines the number of Givens rotations that are computed in
-        eigenvector transform V. The number of rotations per factor of V is
-        defined by nGivens_per_fac.
+        real and symmetric or complex hermitian.
+        maxiter: (int) the maximum number of iterations which is defined by the
+        number of Givens rotations that can be computed in eigenvector transform V.
+        The number of rotations per factor of V is defined by nGivens_per_fac.
         tol: (float) the error tolerance under what the algorithm stops. By default,
-        it's zero for not stopping on error criterion.
-        relErr: (bool) the type of error used as stopping criterion. The default value 
+        it's zero for not stopping on error criterion. Note that the error
+        reaching is not guaranteed (in particular, if the error starts to
+        increase from one iteration to another then the algorithm is stopped).
+        relErr: (bool) the type of error used as stopping criterion. The default value
         is True for relative error, otherwise (False) the absolute error is used.
         nGivens_per_fac: (int) the number of Givens rotations per factor of V, must be
         an integer between 1 to M.shape[0]/2 which is the default value (when
         nGivens_per_fac == None).
-        verbosity: (int) the level of verbosity, the greater the value the more info.
-        is displayed.
+        verbosity: (int) the level of verbosity, the greater the value the more
+        info is displayed. It can be helpful to understand for example why the
+        algorithm stopped before reaching the tol error or the maxiter
+        number of iterations.
         order: (int) order of eigenvalues, default to 'ascend', other values
         are 'descend' or 'undef'.
 
@@ -225,7 +228,7 @@ def eigtj(M, maxiter=None, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=
     D, core_obj = _FaustCorePy.FaustFact.eigtj(M, maxiter, tol, relerr,
             nGivens_per_fac, verbosity, order)
     return D, Faust(core_obj=core_obj)
-    
+
 # experimental block start
 def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
                 verbosity=0, order='ascend'):

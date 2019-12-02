@@ -1,32 +1,33 @@
 %==========================================================================================
-%> @brief Runs the truncated Jacobi algorithm to compute the eigenvalues of M (returned in D) and the corresponding transform of eigenvectors (in Faust V columns).
+%> @brief Performs a eigendecomposition of M and returns the eigenvalues in D along with the corresponding left eigenvectors (as the columns of the Faust object V).
 %>
-%> The output is such that V*D*V' approximates M.
+%> The output is such that <code>V*D*V'</code> approximates M.
 %>
-%> The trade-off between accuracy and sparsity can be set through the parameters maxiter and nGivens_per_fac.
+%> The trade-off between accuracy and sparsity can be set through the parameters maxiter and nGivens_per_fac or concurrently with the arguments tol and relerr that define the targeted error.
 %>
 %>
 %> @b Usage
 %>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, J) computes only one Givens rotation per factor of V.<br/>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, J, 'nGivens_per_fac', 1) do the same as in previous line.<br/>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, J, 'nGivens_per_fac', t) as above but with t Givens rotations per V factor.<br/>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, J, 'nGivens_per_fac', t, 'verbosity', 2) same as above with a level of verbosity of 2 in output. <br/>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, J, 'nGivens_per_fac', t, 'tol', 0.01, 'relerr', true) Uses a stopping criterion based on relative squared error norm(V*D*V'-M, 'fro')^2/norm(M, 'fro')^2. This criterion is concurrent to maxiter (here J).<br/>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, J, 'nGivens_per_fac', t, 'tol', 0.01, 'relerr', true) Uses a stopping criterion based on absolute squared error norm(V*D*V'-M, 'fro')^2. This criterion is concurrent to maxiter (here J).<br/>
+%> &nbsp;&nbsp;&nbsp; <b>[V,D] = eigtj(M, 'maxiter', J)</b> computes V in which each factor contains by default <code>n = floor(size(M,1)/2)</code> Givens rotation.<br/>
+%> &nbsp;&nbsp;&nbsp; @b eigtj(M, 'maxiter', J, 'nGivens_per_fac', 1) does the same as in previous line.<br/>
+%> &nbsp;&nbsp;&nbsp; @b eigtj(M, 'maxiter', J, 'nGivens_per_fac', t) as above but with t Givens rotations per factor.<br/>
+%> &nbsp;&nbsp;&nbsp; @b eigtj(M, 'maxiter', J, 'nGivens_per_fac', t, 'verbosity', 2) same as above with a level of output verbosity of 2. <br/>
+%> &nbsp;&nbsp;&nbsp; @b eigtj(M, 'maxiter', J, 'nGivens_per_fac', t, 'tol', 0.01, 'relerr', true) Uses a stopping criterion based on relative error <code>norm(V*D*V'-M, 'fro')/norm(M, 'fro')</code>. This criterion is concurrent to maxiter (here J).<br/>
+%> &nbsp;&nbsp;&nbsp; @b eigtj(M, 'maxiter', J, 'nGivens_per_fac', t, 'tol', 0.01, 'relerr', true) Uses a stopping criterion based on absolute error <code>norm(V*D*V'-M, 'fro')</code>. This criterion is concurrent to maxiter (here J).<br/>
 %>
-%> @param M the matrix to diagonalize. Must be real and symmetric or hermitian if complex. Be warn that the dense or sparse chosen format will be respected along the algorithm execution so that the performances and accuracy can be different moreover if there is many iterations.
-%> @param maxiter defines the number of Givens rotations that are computed in eigenvector transform V. The number of rotations per factor of V is defined by nGivens_per_fac.
-%> @param 'nGivens_per_fac', integer the number of Givens rotations per factor of V, must be an integer between 1 to floor(size(M, 1)/2) which is the default value.
-%> @param 'tol', number (optional) the tolerance error under what the algorithm stops. By default, it's zero for not stopping on error criterion.
-%> @param 'relerr', true (optional) For a stopping criterion based on the relative squared error (this is the default error).
-%> @param 'relerr', false (optional) For a stopping criterion based on the absolute squared error.
-%> @param 'verbosity', integer (optional) the level of verbosity, the greater the value the more info. is displayed.
+%> @param M the matrix to diagonalize. Must be real and symmetric or complex hermitian.
+%> @param maxiter, integer (optional if tol is set) the maximum number of iterations which is defined by the
+%> number of Givens rotations that can be computed in eigenvector transform V.
+%> The number of rotations per factor of V is defined by nGivens_per_fac.
+%> @param 'nGivens_per_fac', integer (optional) the number of Givens rotations per factor of V, must be an integer between 1 to <code>floor(size(M, 1)/2)</code> which is the default value.
+%> @param 'tol', number (optional if maxiter is set) the tolerance error under what the algorithm stops. By default, it's zero for not stopping on error criterion. Note that the error reaching is not guaranteed (in particular, if the error starts to increase from one iteration to another then the algorithm is stopped).
+%> @param 'relerr', true (optional) For a stopping criterion based on the relative error (this is the default error).
+%> @param 'relerr', false (optional) For a stopping criterion based on the absolute error.
+%> @param 'verbosity', integer (optional) the level of verbosity, the greater the value the more info is displayed. It can be helpful to understand for example why the  algorithm stopped before reaching the tol error or the maxiter number of iterations.
 %> @param 'order', char (optional) 'descend' for a descending order of eigenvalues, 'ascend' for an ascending order (default value) or 'undef' for no sort.
 %>
 %> @retval [V,D]
-%> - V the Faust object representing the approximate eigenvector transform. The column V(:, i) is the eigenvector corresponding to the eigenvalue D(i,i).
-%> The last factor of V is a permutation matrix. The goal of this factor is to apply to the columns of V the same order as eigenvalues set in D.
+%> - V the Faust object representing the approximate eigenvector transform. The column <code>V(:, i)</code> is the eigenvector corresponding to the eigenvalue <code>D(i,i)</code>.
 %> - D the approximate sparse diagonal matrix of the eigenvalues (by default in ascendant order along the rows/columns).
 %>
 %> @b Example
@@ -36,8 +37,8 @@
 %> % get a Laplacian to diagonalize
 %> load('Laplacian_256_community.mat')
 %> % do it
-%> [Uhat, Dhat] = eigtj(Lap, size(Lap,1)*100, 'nGivens_per_fac', size(Lap, 1)/2, 'verbosity', 2)
-%> % Uhat is the Fourier matrix/eigenvectors approximation as a Faust (200 factors + permutation mat.)
+%> [Uhat, Dhat] = eigtj(Lap, 'maxiter', size(Lap,1)*100, 'nGivens_per_fac', size(Lap, 1)/2, 'verbosity', 2)
+%> % Uhat is the Fourier matrix/eigenvectors approximation as a Faust (200 factors)
 %> % Dhat the eigenvalues diagonal matrix approx.
 %> @endcode
 %>
@@ -49,7 +50,10 @@
 %> IEEE Transactions on Signal and Information Processing
 %> over Networks 2018, 4(2), pp 407-420 <https://hal.inria.fr/hal-01416110>
 %>
+%> <p> @b See @b also fact.svdtj
+% experimental block start
 %> <p> @b See @b also fact.fgft_givens, fact.fgft_palm
+% experimental block stop
 %>
 %==========================================================================================
 function [V,D] = eigtj(M, varargin)
