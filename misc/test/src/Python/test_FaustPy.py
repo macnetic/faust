@@ -1006,15 +1006,19 @@ class TestFaustFactory(unittest.TestCase):
     def testeigtj_abserr(self):
         from numpy.random import rand
         from pyfaust.fact import eigtj
+        from scipy.io import loadmat
+        import sys
         err = .01
         M = rand(128,128)
-        M = M@M.T
+        M = M.dot(M.T)
         D,U = eigtj(M, tol=err, relerr=False)
         self.assertAlmostEqual(norm(M-U*np.diag(D)*U.T), err, places=3 )
-        M_cplx = M*np.complex(1,0) + rand(128,128)*np.complex(0,1)
-        M_cplx = M_cplx@np.matrix(M_cplx,copy=False).H
+        L = loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        L = L.astype(np.float64)
+        M_cplx = L*np.complex(1,0) + L*np.complex(0,1)
+        M_cplx = M_cplx.dot(np.matrix(M_cplx).H)
         err=.1
-        D,U = eigtj(M_cplx, tol=err)
+        D,U = eigtj(M_cplx, tol=err, relerr=False, verbosity=0)
         self.assertLessEqual(norm(M_cplx-U*np.diag(D)*U.H), err)
 
     def testeigtj_relerr(self):
@@ -1022,11 +1026,11 @@ class TestFaustFactory(unittest.TestCase):
         from pyfaust.fact import eigtj
         err = .01
         M = rand(128,128)
-        M = M@M.T
+        M = M.dot(M.T)
         D,U = eigtj(M, tol=err)
         self.assertLessEqual(norm(M-U*np.diag(D)*U.T)/norm(M), err)
         M_cplx = M + rand(128,128)*np.complex(0,1)
-        M_cplx = M_cplx@np.matrix(M_cplx, copy=False).H
+        M_cplx = M_cplx.dot(np.matrix(M_cplx).H)
         D,U = eigtj(M_cplx, tol=err)
         self.assertLessEqual(norm(M_cplx-U*np.diag(D)*U.H)/norm(M_cplx), err)
 

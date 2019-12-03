@@ -515,7 +515,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::compute_facts()
 	{
 		next_step();
 		ite++;
-		if(stopping = (ite > 1 && errs.size() > 2 && errs[ite-1]-errs[ite-2] > FLT_EPSILON))
+		if(stopping = (ite > 1 && stoppingCritIsError && errs.size() > 2 && errs[ite-1]-errs[ite-2] > FLT_EPSILON))
 			if(verbosity>0) cerr << "warning: the algorithm stopped because the last error is greater than the previous one." << endl;
 		if(stopping || stoppingCritIsError && errs.size() > 0 && (*(errs.end()-1) - stoppingError ) < FLT_EPSILON)
 		{
@@ -526,7 +526,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::compute_facts()
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel) : Lap(Lap), facts(J>0?J:1), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(J), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(FPP(0)), J(J)
+GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel) : Lap(Lap), facts(J>0?J:1), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(0), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(FPP(0)), J(J)
 {
 	/* Matlab ref. code:
 	 *     facts = cell(1,J);
@@ -560,7 +560,7 @@ GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatSparse<FPP,DEVIC
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) : Lap(Lap), facts(J>0?J:1), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(J), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(FPP(0)), J(J)
+GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) : Lap(Lap), facts(J>0?J:1), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(0), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(FPP(0)), J(J)
 {
 	/* Matlab ref. code:
 	 *     facts = cell(1,J);
