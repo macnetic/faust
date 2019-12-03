@@ -43,7 +43,6 @@
 
 #include <vector>
 #include <iostream>
-#include "algorithm"
 
 
 // const char * interface_prox_name="prox : ";
@@ -70,6 +69,13 @@ void Faust::sort_idx(const std::vector<FPP> &v, std::vector<int>& idx, int s)
 template<typename FPP>
 void Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
+	Faust::prox_sp_normfree(M, k);
+	M.normalize();
+}
+
+template<typename FPP>
+void Faust::prox_sp_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+{
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
 	const faust_unsigned_int nb_elt_mat = dim1*dim2;
@@ -90,7 +96,6 @@ void Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 		}
 
 	}
-	M.normalize();
 }
 
 template<typename FPP>
@@ -177,6 +182,13 @@ void Faust::prox_splin(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 template<typename FPP>
 void Faust::prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k)
 {
+	Faust::prox_splincol_normfree(M, k);
+	M.normalize();
+}
+
+template<typename FPP>
+void Faust::prox_splincol_normfree(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k)
+{
 	Faust::MatDense<FPP,Cpu> Mspcol = M;
 	Faust::MatDense<FPP,Cpu> Msplin = M;
 
@@ -194,11 +206,8 @@ void Faust::prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k)
 			Msplin.getData()[i]=0;
 	}
 	Mspcol+=Msplin;
-	Mspcol.normalize();
 	M=Mspcol;
-
 }
-
 
 template<typename FPP, typename FPP2>
 void Faust::prox_normcol(Faust::MatDense<FPP,Cpu> & M, FPP2 s)
@@ -253,6 +262,13 @@ void Faust::prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP2 s)
 template<typename FPP>
 void Faust::prox_sp_pos(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 {
+	Faust::prox_sp_pos_normfree(M, k);
+	M.normalize();
+}
+
+template<typename FPP>
+void Faust::prox_sp_pos_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+{
 	FPP*const ptr_data = M.getData();
 	//treshold de la matrice
 //	bool is_cplx = typeid(ptr_data[0])==typeid(std::complex<double>())||typeid(ptr_data[0])==typeid(std::complex<float>());
@@ -263,11 +279,9 @@ void Faust::prox_sp_pos(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 		if (!is_cplx && std::complex<float>(ptr_data[i]).real() < 0)
 			ptr_data[i]=0;
 
-	Faust::prox_sp(M,k);
+	Faust::prox_sp_normfree(M,k);
 
 }
-
-
 /*
 // M needs to be square and k must divide dimension of M
 template<typename FPP>
@@ -314,14 +328,18 @@ void Faust::prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,int k)
 template<typename FPP>
 void Faust::prox_supp(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & supp)
 {
+	Faust::prox_supp_normfree(M, supp);
+	M.normalize();
+}
+
+template<typename FPP>
+void Faust::prox_supp_normfree(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & supp)
+{
 	if ( (supp.getNbRow() != M.getNbRow()) || (supp.getNbCol() != M.getNbCol()) )
 	{
 		handleError("prox : ","Faust::prox_supp : dimensions of the matrix are not equal");
 	}
 	M.scalarMultiply(supp);
-	M.normalize();
 }
-
-
 
 #endif

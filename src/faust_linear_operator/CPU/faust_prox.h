@@ -60,8 +60,12 @@ namespace Faust {
 
     template<typename FPP>
     void prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
+	template<typename FPP>
+    void prox_sp_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
     template<typename FPP>
     void prox_sp_pos(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
+	template<typename FPP>
+    void prox_sp_pos_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
     template<typename FPP>
     void prox_spcol(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
     template<typename FPP>
@@ -72,12 +76,17 @@ namespace Faust {
     void prox_splin_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
     template<typename FPP>
     void prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k);
+	template<typename FPP>
+    void prox_splincol_normfree(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k);
     template<typename FPP, typename FPP2>
     void prox_normcol(Faust::MatDense<FPP,Cpu> & M,FPP2 s);
     template<typename FPP, typename FPP2>
     void prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP2 s);
     template<typename FPP>
     void prox_supp(Faust::MatDense<FPP,Cpu> & M, const Faust::MatDense<FPP,Cpu> & supp);
+	template<typename FPP>
+	void prox_supp_normfree(Faust::MatDense<FPP,Cpu> & M, const Faust::MatDense<FPP,Cpu> & supp);
+
 //    template<typename FPP>
 //    void prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
 

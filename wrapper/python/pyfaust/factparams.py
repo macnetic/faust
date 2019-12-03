@@ -160,13 +160,14 @@ class ConstraintInt(ConstraintGeneric):
                             'ConstraintName with a int type name '
                             '(name.is_int_constraint() must return True).')
 
-    def project(self, M):
+    def project(self, M, normalized=True):
         """
             <b/> See: ConstraintGeneric.project
         """
         super(ConstraintInt, self).project(M)
         return _FaustCorePy.ConstraintIntCore.project(M, self._name.name, self._num_rows,
-                                              self._num_cols, self._cons_value)
+                                                      self._num_cols, self._cons_value,
+                                                      normalized)
 
 
 class ConstraintMat(ConstraintGeneric):

@@ -807,7 +807,7 @@ cdef class ConstraintIntCore:
     # so it can't create the object before the call
     # in that conditions a static method will suffice
     @staticmethod
-    def project(M, name, num_rows, num_cols, parameter):
+    def project(M, name, num_rows, num_cols, parameter, normalized=True):
         cdef double[:,:] M_view_dbl
         cdef double[:,:] M_out_view_dbl
         cdef complex[:,:] M_view_cplx
@@ -824,12 +824,14 @@ cdef class ConstraintIntCore:
             M_view_dbl = M
             M_out_view_dbl = M_out
             FaustCoreCy.prox_int[double](name, parameter, &M_view_dbl[0,0], num_rows,
-                                         num_cols,&M_out_view_dbl[0,0])
+                                         num_cols,&M_out_view_dbl[0,0],
+                                         normalized)
         else:
             M_view_cplx = M
             M_out_view_cplx = M_out
             FaustCoreCy.prox_int[complex](name, parameter, &M_view_cplx[0,0],
-                                          num_rows, num_cols, &M_out_view_cplx[0,0])
+                                          num_rows, num_cols,
+                                          &M_out_view_cplx[0,0], normalized)
 
         return M_out
 
