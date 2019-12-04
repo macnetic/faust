@@ -138,10 +138,11 @@ void Faust::ConstraintMat<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
    switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_CONST:
-         mat=m_parameter;
+         //mat=m_parameter;
+		 Faust::prox_const(mat, m_parameter, false);
          break;
       case CONSTRAINT_NAME_SUPP:
-         Faust::prox_supp(mat,m_parameter);
+         Faust::prox_supp(mat,m_parameter, true);
          break;
       default:
          handleError(m_className,"project : invalid constraint_name");

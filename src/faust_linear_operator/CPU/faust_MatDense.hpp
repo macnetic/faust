@@ -1003,7 +1003,7 @@ FPP Faust::MatDense<FPP, Cpu>::normL1(faust_unsigned_int& col_id, const bool tra
 	}
 	for(j=0;j<dim1;j++)
 	{
-		if(transpose) //get a line
+		if(transpose) //get a row
 			vec=mat.block(j,0,1,this->getNbCol());
 		else //get a column
 			vec=mat.block(0,j,this->getNbRow(),1);

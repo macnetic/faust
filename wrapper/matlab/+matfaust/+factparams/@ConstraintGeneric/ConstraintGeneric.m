@@ -7,9 +7,12 @@ classdef (Abstract) ConstraintGeneric
 		num_rows
 		num_cols
 		param % type determined by child classes
+		normalized % flag to normalize or not the projection image afterward
+		default_normalized % flag to determine if the normalized flag has its default value or user customed one
+		pos % flag to set negative matrix elements to zero through the projection
 	end
 	methods
-		function constraint = ConstraintGeneric(name, num_rows, num_cols, param)
+		function constraint = ConstraintGeneric(name, num_rows, num_cols, param, varargin)
 			%ENOTE: ischar(name{:})
 			if(ischar(name) || iscell(name) && ischar(name{:}))
 				name = matfaust.factparams.ConstraintName(name);
@@ -25,20 +28,25 @@ classdef (Abstract) ConstraintGeneric
 			constraint.num_cols = floor(num_cols);
 			% child classes verify the param type
 			constraint.param = param;
-		end
-
-		function pM = project(this, M, varargin)
 			% optional key-value arguments
 			argc = length(varargin);
-			normalized = true;
+			constraint.normalized = true;
+			constraint.default_normalized = true;
+			constraint.pos = false;
 			if(argc > 0)
 				for i=1:argc
 					switch(varargin{i})
 						case 'normalized'
-							if(argc == i || ~ islogical(normalized))
+							if(argc == i || ~ islogical(varargin{i+1}))
 								error('normalized keyword arg. is not followed by a boolean')
 							end
-							normalized = varargin{i+1};
+							constraint.normalized = varargin{i+1};
+							constraint.default_normalized = false;
+						case 'pos'
+							if(argc == i || ~ islogical(varargin{i+1}))
+								error('pos keyword arg. is not followed by a boolean')
+							end
+							constraint.pos = varargin{i+1};
 						otherwise
 							if(isstr(varargin{i}))
 								error([ varargin{i} ' unrecognized argument'])
@@ -46,10 +54,13 @@ classdef (Abstract) ConstraintGeneric
 					end
 				end
 			end
+		end
+
+		function pM = project(this, M)
 			if(isreal(M))
-				pM = mexFaustReal('prox', M, this.name.name, this.param, normalized);
+				pM = mexFaustReal('prox', M, this.name.name, this.param, this.normalized, this.pos);
 			else
-				pM = mexFaustCplx('prox', M, this.name.name, this.param, normalized);
+				pM = mexFaustCplx('prox', M, this.name.name, this.param, this.normalized, this.pos);
 			end
 		end
 	end

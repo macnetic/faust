@@ -37,14 +37,14 @@ class PyxConstraintMat : public PyxConstraintGeneric
 
 template<typename FPP>
 void prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
-        unsigned long num_cols, FPP* mat_out, const bool normalized=true);
+        unsigned long num_cols, FPP* mat_out, const bool normalized=true, const bool pos=false);
 
 template<typename FPP, typename FPP2>
 void prox_real(unsigned int cons_type, FPP2 cons_param, FPP* mat_in, unsigned long num_rows,
-        unsigned long num_cols, FPP* mat_out);
+        unsigned long num_cols, FPP* mat_out, const bool normalized=false, const bool pos=false);
 
 template<typename FPP>
-void prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out);
+void prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out, const bool normalized=false, const bool pos=false);
 
 template<typename FPP>
 class PyxStoppingCriterion

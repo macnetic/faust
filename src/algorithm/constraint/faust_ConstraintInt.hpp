@@ -38,6 +38,7 @@
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 /****************************************************************************/
+#include "faust_prox.h"
 #include "faust_ConstraintInt.h"
 #include <iostream>
 #include <cstdlib>

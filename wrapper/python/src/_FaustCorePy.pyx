@@ -807,7 +807,8 @@ cdef class ConstraintIntCore:
     # so it can't create the object before the call
     # in that conditions a static method will suffice
     @staticmethod
-    def project(M, name, num_rows, num_cols, parameter, normalized=True):
+    def project(M, name, num_rows, num_cols, parameter, normalized=True,
+                pos=False):
         cdef double[:,:] M_view_dbl
         cdef double[:,:] M_out_view_dbl
         cdef complex[:,:] M_view_cplx
@@ -816,8 +817,11 @@ cdef class ConstraintIntCore:
         isReal = M.dtype in [ 'float', 'float128',
                              'float16', 'float32',
                              'float64', 'double']
+        order = 'C'
+        if(np.isfortran(M)):
+            order = 'FORTRAN'
+        M_out = np.empty(M.shape, dtype=M.dtype, order=order)
 
-        M_out = np.empty(M.shape, dtype=M.dtype, order='F')
 
         check_matrix(isReal, M)
         if(isReal):
@@ -825,20 +829,22 @@ cdef class ConstraintIntCore:
             M_out_view_dbl = M_out
             FaustCoreCy.prox_int[double](name, parameter, &M_view_dbl[0,0], num_rows,
                                          num_cols,&M_out_view_dbl[0,0],
-                                         normalized)
+                                         normalized, pos)
         else:
             M_view_cplx = M
             M_out_view_cplx = M_out
             FaustCoreCy.prox_int[complex](name, parameter, &M_view_cplx[0,0],
                                           num_rows, num_cols,
-                                          &M_out_view_cplx[0,0], normalized)
+                                          &M_out_view_cplx[0,0], normalized,
+                                          pos)
 
         return M_out
 
 cdef class ConstraintMatCore:
 
     @staticmethod
-    def project(M, name, num_rows, num_cols, parameter):
+    def project(M, name, num_rows, num_cols, parameter, normalized=False,
+                pos=False):
         cdef double[:,:] M_view_dbl
         cdef double[:,:] M_out_view_dbl
         cdef complex[:,:] M_view_cplx
@@ -863,13 +869,16 @@ cdef class ConstraintMatCore:
             M_out_view_dbl = M_out
             param_view_dbl = parameter
             FaustCoreCy.prox_mat[double](name, &param_view_dbl[0,0], &M_view_dbl[0,0], num_rows,
-                                         num_cols,&M_out_view_dbl[0,0])
+                                         num_cols,&M_out_view_dbl[0,0],
+                                         normalized, pos)
         else:
             M_view_cplx = M
             M_out_view_cplx = M_out
             param_view_cplx = parameter
             FaustCoreCy.prox_mat[complex](name, &param_view_cplx[0,0], &M_view_cplx[0,0],
-                                          num_rows, num_cols, &M_out_view_cplx[0,0])
+                                          num_rows, num_cols,
+                                          &M_out_view_cplx[0,0], normalized,
+                                          pos)
 
         return M_out
 
@@ -880,7 +889,8 @@ cdef class ConstraintRealCore:
     # so it can't create the object before the call
     # in that conditions a static method will suffice
     @staticmethod
-    def project(M, name, num_rows, num_cols, parameter):
+    def project(M, name, num_rows, num_cols, parameter, normalized=False,
+                pos=False):
         cdef double[:,:] M_view_dbl
         cdef double[:,:] M_out_view_dbl
         cdef complex[:,:] M_view_cplx
@@ -891,19 +901,26 @@ cdef class ConstraintRealCore:
                              'float64', 'double']
 
 
-        M_out = np.empty(M.shape, dtype=M.dtype, order='F')
+
+        order = 'C'
+        if(np.isfortran(M)):
+            order = 'FORTRAN'
+        M_out = np.empty(M.shape, dtype=M.dtype, order=order)
 
         check_matrix(isReal, M)
         if(isReal):
             M_view_dbl = M
             M_out_view_dbl = M_out
             FaustCoreCy.prox_real[double, double](name, parameter, &M_view_dbl[0,0], num_rows,
-                                         num_cols,&M_out_view_dbl[0,0])
+                                         num_cols,&M_out_view_dbl[0,0],
+                                                  normalized, pos)
         else:
             M_view_cplx = M
             M_out_view_cplx = M_out
             FaustCoreCy.prox_real[complex, double](name, parameter, &M_view_cplx[0,0],
-                                          num_rows, num_cols, &M_out_view_cplx[0,0])
+                                          num_rows, num_cols,
+                                                   &M_out_view_cplx[0,0],
+                                                   normalized, pos)
 
         return M_out
 

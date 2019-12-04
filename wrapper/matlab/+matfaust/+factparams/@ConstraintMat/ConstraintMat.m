@@ -6,14 +6,20 @@ classdef ConstraintMat < matfaust.factparams.ConstraintGeneric
 
 	end
 	methods
-		function constraint = ConstraintMat(name, param)
+		function constraint = ConstraintMat(name, param, varargin)
 			% check param is a mat
 			if(~ ismatrix(param) || ~ isnumeric(param))
 				error('ConstraintMat must receive a matrix as param argument.')
 			end
-			constraint = constraint@matfaust.factparams.ConstraintGeneric(name, size(param, 1), size(param, 2), param);
+			constraint = constraint@matfaust.factparams.ConstraintGeneric(name, size(param, 1), size(param, 2), param, varargin{:});
 			if(~ isa(constraint.name, 'matfaust.factparams.ConstraintName') || ~ constraint.name.is_mat_constraint())
 				error('ConstraintMat first argument must be a ConstraintName with a matrix type name.')
+			end
+			constraint.name.name
+			if(constraint.default_normalized && constraint.name.name == matfaust.factparams.ConstraintName.CONST)
+				% for CONST proj the default is to not normalize
+				constraint.normalized = false;
+				% for SUPP it is true (which is handled by ConstraintGeneric parent
 			end
 		end
 	end

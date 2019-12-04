@@ -120,13 +120,13 @@ cdef extern from "FaustFact.h":
         unsigned long parameter
 
     void prox_int[FPP](unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
-                  unsigned long num_cols, FPP* mat_out, const bool normalized)
+                  unsigned long num_cols, FPP* mat_out, const bool normalized, const bool pos)
 
     void prox_real[FPP,FPP2](unsigned int cons_type, FPP2 cons_param, FPP* mat_in, unsigned long num_rows,
-                  unsigned long num_cols, FPP* mat_out)
+                  unsigned long num_cols, FPP* mat_out, const bool normalized, const bool pos)
 
     void prox_mat[FPP](unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned long num_rows,
-                  unsigned long num_cols, FPP* mat_out)
+                  unsigned long num_cols, FPP* mat_out, const bool normalized, const bool pos)
 
     cdef cppclass PyxConstraintScalar[FPP](PyxConstraintGeneric):
         FPP parameter

@@ -38,8 +38,6 @@
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 /****************************************************************************/
-#ifndef __FAUST_CONSTRAINT_GENERIC_HPP__
-#define __FAUST_CONSTRAINT_GENERIC_HPP__
 
 #include "faust_ConstraintInt.h"
 #include "faust_ConstraintFPP.h"
@@ -311,4 +309,3 @@ void Faust::ConstraintGeneric::project(Faust::MatDense<FPP, DEVICE>& mat) const 
 	else if(this->is_constraint_parameter_int<FPP,DEVICE,FPP2>())
 		dynamic_cast<const Faust::ConstraintInt<FPP,DEVICE>*>(this)->project(mat);
 }
-#endif

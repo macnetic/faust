@@ -40,7 +40,7 @@ class ConstraintGeneric(ABC):
 
     """
 
-    def __init__(self, name, num_rows, num_cols, cons_value):
+    def __init__(self, name, num_rows, num_cols, cons_value, normalized=True, pos=False):
         """
         Constructs a generic constraint.
 
@@ -65,6 +65,8 @@ class ConstraintGeneric(ABC):
         self._num_rows = num_rows
         self._num_cols = num_cols
         self._cons_value = cons_value
+        self.normalized = normalized
+        self.pos = pos
 
     @property
     def name(self):
@@ -128,7 +130,7 @@ class ConstraintInt(ConstraintGeneric):
 
 
     """
-    def __init__(self, name, num_rows, num_cols, cons_value):
+    def __init__(self, name, num_rows, num_cols, cons_value, normalized=True, pos=False):
         """
             Args:
                 name: must be a ConstraintName instance set with a value among SP_POS, SP, SPLIN, SPCOL, SPLINCOL (cf. ConstraintName) or it can also be one of the more handy str aliases which are respectively: 'sppos', 'sp', 'splin', 'spcol', 'splincol'.
@@ -151,7 +153,8 @@ class ConstraintInt(ConstraintGeneric):
 
             <b/> See also: ConstraintGeneric.__init__
         """
-        super(ConstraintInt, self).__init__(name, num_rows, num_cols, cons_value)
+        super(ConstraintInt, self).__init__(name, num_rows, num_cols,
+                                            cons_value, normalized, pos)
         if(not isinstance(cons_value, np.int)):
             raise TypeError('ConstraintInt must receive a int as cons_value '
                             'argument.')
@@ -160,22 +163,85 @@ class ConstraintInt(ConstraintGeneric):
                             'ConstraintName with a int type name '
                             '(name.is_int_constraint() must return True).')
 
-    def project(self, M, normalized=True):
+    def project(self, M):
         """
             <b/> See: ConstraintGeneric.project
         """
         super(ConstraintInt, self).project(M)
         return _FaustCorePy.ConstraintIntCore.project(M, self._name.name, self._num_rows,
                                                       self._num_cols, self._cons_value,
-                                                      normalized)
+                                                      self.normalized, self.pos)
 
+def sp(shape, k, normalized=True, pos=False):
+    """
+    """
+    c = ConstraintInt('sp', *shape, k, normalized, pos)
+    def proj(M):
+        return c.project(M)
+    return proj
+
+def splin(shape, k, normalized=True, pos=False):
+    """
+    """
+    c = ConstraintInt('splin', *shape, k, normalized, pos)
+    def proj(M):
+        return c.project(M)
+    return proj
+
+def spcol(shape, k, normalized=True, pos=False):
+    """
+    """
+    c = ConstraintInt('spcol', *shape, k, normalized, pos)
+    def proj(M):
+        return c.project(M)
+    return proj
+
+def splincol(shape, k, normalized=True, pos=False):
+    """
+    """
+    c = ConstraintInt('splincol', *shape, k, normalized, pos)
+    def proj(M):
+        return c.project(M)
+    return proj
+
+def supp(S, normalized=True, pos=False):
+    """
+    """
+    c = ConstraintMat('supp', S, normalized, pos)
+    def proj(M):
+        return c.project(M)
+    return proj
+
+def const(C, normalized=False):
+    """
+    """
+    c = ConstraintMat('const', C, normalized, pos=False)
+    def proj(M):
+        return c.project(M)
+    return proj
+
+def normcol(shape, normval, normalized=False, pos=False):
+    """
+    """
+    c = ConstraintReal('normcol', *shape, normval, normalized, pos)
+    def proj(M):
+        return c.project(M)
+    return proj
+
+def normlin(shape, normval, normalized=False, pos=False):
+    """
+    """
+    c = ConstraintReal('normlin', *shape, normval, normalized, pos)
+    def proj(M):
+        return c.project(M)
+    return proj
 
 class ConstraintMat(ConstraintGeneric):
     """
         This class represents a matrix-based constraint to apply on a matrix.
 
     """
-    def __init__(self, name, num_rows, num_cols, cons_value):
+    def __init__(self, name, cons_value, normalized=None, pos=False):
         """
         Constructs a matrix type constraint.
 
@@ -194,7 +260,7 @@ class ConstraintMat(ConstraintGeneric):
             >>> from numpy.random import rand
             >>> from numpy import eye
             >>> from numpy.linalg import norm
-            >>> cons = ConstraintMat('supp', 10, 10, eye(10))
+            >>> cons = ConstraintMat('supp', eye(10))
             >>> M = rand(10,10)
             >>> from numpy import count_nonzero
             >>> count_nonzero(M)
@@ -212,12 +278,19 @@ class ConstraintMat(ConstraintGeneric):
             0.99999999999999989
 
         """
-        super(ConstraintMat, self).__init__(name, num_rows, num_cols, cons_value)
+        super(ConstraintMat, self).__init__(name, *cons_value.shape,
+                                            cons_value, normalized, pos)
         if(not isinstance(cons_value, np.matrix) and not isinstance(cons_value,
                                                                np.ndarray)):
             raise TypeError('ConstraintMat must receive a numpy matrix as cons_value '
                             'argument.')
         self.cons_value = self._cons_value
+        if(normalized == None):
+            if(self.name.name == ContraintName.CONST):
+                # for const proj the default is to not normalize
+                self.normalized = False
+            else: # self._name.name is 'supp'
+                self.normalized = True
         if(not isinstance(self._name, ConstraintName) or not self._name.is_mat_constraint()):
             raise TypeError('ConstraintMat first argument must be a '
                             'ConstraintName with a matrix type name '
@@ -229,7 +302,9 @@ class ConstraintMat(ConstraintGeneric):
         """
         super(ConstraintMat, self).project(M)
         return _FaustCorePy.ConstraintMatCore.project(M, self._name.name, self._num_rows,
-                                              self._num_cols, self._cons_value)
+                                                      self._num_cols,
+                                                      self._cons_value,
+                                                      self.normalized, self.pos)
 
 
 class ConstraintReal(ConstraintGeneric):
@@ -240,7 +315,7 @@ class ConstraintReal(ConstraintGeneric):
         (ConstraintName.NORMCOL, ConstraintName.NORMLIN).
 
     """
-    def __init__(self, name, num_rows, num_cols, cons_value):
+    def __init__(self, name, num_rows, num_cols, cons_value, normalized=False, pos=False):
         """
         Constructs a real type constraint.
 
@@ -267,7 +342,8 @@ class ConstraintReal(ConstraintGeneric):
 
             <b/> See also: ConstraintGeneric.__init__
         """
-        super(ConstraintReal, self).__init__(name, num_rows, num_cols, cons_value)
+        super(ConstraintReal, self).__init__(name, num_rows, num_cols,
+                                             cons_value, normalized=False, pos=False)
         if(not isinstance(cons_value, np.float) and not isinstance(cons_value, np.int)):
             raise TypeError('ConstraintReal must receive a float as cons_value '
                             'argument.')
@@ -283,7 +359,9 @@ class ConstraintReal(ConstraintGeneric):
         """
         super(ConstraintReal, self).project(M)
         return _FaustCorePy.ConstraintRealCore.project(M, self._name.name, self._num_rows,
-                                              self._num_cols, self._cons_value)
+                                                       self._num_cols,
+                                                       self._cons_value,
+                                                       self.normalized, self.pos)
 
 
 class ConstraintName:
@@ -449,7 +527,7 @@ class ConstraintList(object):
               elif(cname.is_real_constraint()):
                 cons = ConstraintReal(cname, nrows, ncols, cval)
               elif(cname.is_mat_constraint()):
-                cons = ConstraintMat(cname, nrows, ncols, cval)
+                cons = ConstraintMat(cname, cval)
               else:
                 raise Exception(cname +" is not a valid name for a "
                                 "ConstraintGeneric object")

@@ -43,6 +43,7 @@
 
 #include <vector>
 #include <iostream>
+#include <type_traits>
 
 
 // const char * interface_prox_name="prox : ";
@@ -67,18 +68,12 @@ void Faust::sort_idx(const std::vector<FPP> &v, std::vector<int>& idx, int s)
 }
 
 template<typename FPP>
-void Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
-{
-	Faust::prox_sp_normfree(M, k);
-	M.normalize();
-}
-
-template<typename FPP>
-void Faust::prox_sp_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+void Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized /* true by deft */, const bool pos)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
 	const faust_unsigned_int nb_elt_mat = dim1*dim2;
+	if(pos) Faust::pre_prox_pos(M);
 	if (k<=0)
 		M.setZeros();
 	else
@@ -96,24 +91,17 @@ void Faust::prox_sp_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
 		}
 
 	}
+	if(normalized) M.normalize();
 }
 
 template<typename FPP>
-void Faust::prox_spcol(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
-{
-	Faust::prox_spcol_normfree(M,k);
-	M.normalize();
-
-}
-
-
-template<typename FPP>
-void Faust::prox_spcol_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+void Faust::prox_spcol(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized /* deft to true */, const bool pos)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
 	const faust_unsigned_int nb_elt_mat = dim1*dim2;
 
+	if(pos) Faust::pre_prox_pos(M);
 	if (k<=0)
 		M.setZeros();
 	else
@@ -136,15 +124,17 @@ void Faust::prox_spcol_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int 
 		}
 
 	}
-
+	if(normalized) M.normalize();
 }
 
 template<typename FPP>
-void Faust::prox_splin_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+void Faust::prox_splin(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized, const bool pos)
 {
 	const faust_unsigned_int dim1 = M.getNbRow();
 	const faust_unsigned_int dim2 = M.getNbCol();
 	const faust_unsigned_int nb_elt_mat = dim1*dim2;
+
+	if(pos) Faust::pre_prox_pos(M);
 	if (k<=0)
 		M.setZeros();
 	else
@@ -168,33 +158,19 @@ void Faust::prox_splin_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int 
 		}
 
 	}
+	if(normalized) M.normalize();
 }
 
 template<typename FPP>
-void Faust::prox_splin(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
-{
-	Faust::prox_splin_normfree(M,k);
-	M.normalize();
-
-}
-
-
-template<typename FPP>
-void Faust::prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k)
-{
-	Faust::prox_splincol_normfree(M, k);
-	M.normalize();
-}
-
-template<typename FPP>
-void Faust::prox_splincol_normfree(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k)
+void Faust::prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k, const bool normalized /* deft to true*/, const bool pos)
 {
 	Faust::MatDense<FPP,Cpu> Mspcol = M;
 	Faust::MatDense<FPP,Cpu> Msplin = M;
 
 
-	Faust::prox_spcol_normfree(Mspcol,k);
-	Faust::prox_splin_normfree(Msplin,k);
+	if(pos) Faust::pre_prox_pos(M);
+	Faust::prox_spcol(Mspcol,k, false);
+	Faust::prox_splin(Msplin,k, false);
 
 	//Msplin.transpose();
 	//prox_spcol_normfree(Msplin,k);
@@ -207,14 +183,18 @@ void Faust::prox_splincol_normfree(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_in
 	}
 	Mspcol+=Msplin;
 	M=Mspcol;
+	if(normalized) M.normalize();
 }
 
 template<typename FPP, typename FPP2>
-void Faust::prox_normcol(Faust::MatDense<FPP,Cpu> & M, FPP2 s)
+void Faust::prox_normcol(Faust::MatDense<FPP,Cpu> & M, FPP2 s, const bool normalized /* default to false */, const bool pos)
 {
 
 	faust_unsigned_int dim1 = M.getNbRow();
 	faust_unsigned_int dim2 = M.getNbCol();
+
+	if(pos) Faust::pre_prox_pos(M);
+
 	if (s < 0)
 	{
 		handleError("prox : ","Faust::prox_normcol : s < 0 ");
@@ -248,40 +228,43 @@ void Faust::prox_normcol(Faust::MatDense<FPP,Cpu> & M, FPP2 s)
 		}
 	}
 
+	if(normalized) M.normalize();
+
 }
 
 template<typename FPP, typename FPP2>
-void Faust::prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP2 s)
+void Faust::prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized /* default to false */, const bool pos)
 {
 	M.transpose();
-	Faust::prox_normcol<FPP,FPP2>(M,s);
+	Faust::prox_normcol<FPP,FPP2>(M,s, normalized, pos);
 	M.transpose();
-
 }
 
 template<typename FPP>
-void Faust::prox_sp_pos(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
-{
-	Faust::prox_sp_pos_normfree(M, k);
-	M.normalize();
-}
-
-template<typename FPP>
-void Faust::prox_sp_pos_normfree(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k)
+void
+Faust::pre_prox_pos(MatDense<FPP,Cpu> & M)
 {
 	FPP*const ptr_data = M.getData();
 	//treshold de la matrice
-//	bool is_cplx = typeid(ptr_data[0])==typeid(std::complex<double>())||typeid(ptr_data[0])==typeid(std::complex<float>());
+	//	bool is_cplx = typeid(ptr_data[0])==typeid(std::complex<double>())||typeid(ptr_data[0])==typeid(std::complex<float>());
 	//don't want to duplicate the function for all realizations of template we need
 	//so we use a little trick to make the code valid for double/float and complex<double>/complex<float>
 	bool is_cplx = std::is_same<FPP,complex<double>>::value || std::is_same<FPP, complex<float>>::value;
 	for (int i=0;i<(M.getNbRow() * M.getNbCol());i++)
 		if (!is_cplx && std::complex<float>(ptr_data[i]).real() < 0)
 			ptr_data[i]=0;
-
-	Faust::prox_sp_normfree(M,k);
-
 }
+
+
+template<typename FPP>
+void
+Faust::prox_sp_pos(MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized /* default to true*/, const bool pos)
+{
+	Faust::pre_prox_pos(M);
+	Faust::prox_sp(M, k, false /*normfree*/);
+	if(normalized) M.normalize();
+}
+
 /*
 // M needs to be square and k must divide dimension of M
 template<typename FPP>
@@ -326,20 +309,35 @@ void Faust::prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,int k)
 
 
 template<typename FPP>
-void Faust::prox_supp(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & supp)
+void Faust::prox_supp(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & supp, const bool normalized /* deft to false */, const bool pos)
 {
-	Faust::prox_supp_normfree(M, supp);
-	M.normalize();
-}
-
-template<typename FPP>
-void Faust::prox_supp_normfree(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & supp)
-{
+	if(pos) pre_prox_pos(M);
 	if ( (supp.getNbRow() != M.getNbRow()) || (supp.getNbCol() != M.getNbCol()) )
 	{
 		handleError("prox : ","Faust::prox_supp : dimensions of the matrix are not equal");
 	}
 	M.scalarMultiply(supp);
+	if(normalized) M.normalize();
 }
+
+template<typename FPP>
+void Faust::prox_const(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & const_mat, const bool normalized /* deft to false */, const bool pos /* false */)
+{
+//	if(pos) pre_prox_pos(M); // useless
+	if ( (const_mat.getNbRow() != M.getNbRow()) || (const_mat.getNbCol() != M.getNbCol()) )
+	{
+		handleError("prox : ","Faust::prox_const_mat : dimensions of the matrix are not equal");
+	}
+	M = const_mat;
+	if(normalized) M.normalize();
+}
+
+
+//template<typename FPP>
+//void Faust::prox_nonneg_supp_normfree(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cpu> & supp)
+//{
+//
+//}
+
 
 #endif
