@@ -27,11 +27,29 @@ classdef (Abstract) ConstraintGeneric
 			constraint.param = param;
 		end
 
-		function pM = project(this, M)
+		function pM = project(this, M, varargin)
+			% optional key-value arguments
+			argc = length(varargin);
+			normalized = true;
+			if(argc > 0)
+				for i=1:argc
+					switch(varargin{i})
+						case 'normalized'
+							if(argc == i || ~ islogical(normalized))
+								error('normalized keyword arg. is not followed by a boolean')
+							end
+							normalized = varargin{i+1};
+						otherwise
+							if(isstr(varargin{i}))
+								error([ varargin{i} ' unrecognized argument'])
+							end
+					end
+				end
+			end
 			if(isreal(M))
-				pM = mexFaustReal('prox', M, this.name.name, this.param);
+				pM = mexFaustReal('prox', M, this.name.name, this.param, normalized);
 			else
-				pM = mexFaustCplx('prox', M, this.name.name, this.param);
+				pM = mexFaustCplx('prox', M, this.name.name, this.param, normalized);
 			end
 		end
 	end

@@ -11,6 +11,7 @@ classdef ConstraintInt < matfaust.factparams.ConstraintGeneric
 			if(~ isreal(param) || ~ isscalar(param))
 				error('ConstraintInt must receive an integer as param argument.')
 			end
+
 			constraint = constraint@matfaust.factparams.ConstraintGeneric(name, num_rows, num_cols, floor(param));
 			if(~ isa(constraint.name, 'matfaust.factparams.ConstraintName') || ~ constraint.name.is_int_constraint())
 				error(['ConstraintInt first argument must be a ConstraintName with a int type name ', ...
