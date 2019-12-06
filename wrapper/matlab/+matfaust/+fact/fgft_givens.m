@@ -7,7 +7,7 @@
 %>  &nbsp;&nbsp;&nbsp; @b See fact.eigtj
 %>
 %> @param Lap the Laplacian matrix (which is symmetric or hermitian).
-%> @param maxiter see fact.eigtj
+%> @param nGivens see fact.eigtj
 %> @param 'nGivens_per_fac', integer see fact.eigtj
 %> @param 'tol', number see fact.eigtj
 %> @param 'relerr', bool see fact.eigtj
@@ -29,7 +29,7 @@
 %> <p> @b See @b also fact.eigtj, fact.fgft_palm
 %>
 %==========================================================================================
-function [FGFT,D] = fgft_givens(Lap, maxiter, varargin)
-	[FGFT, D] = matfaust.fact.eigtj(Lap, maxiter, varargin{:});
+function [FGFT,D] = fgft_givens(Lap, nGivens, varargin)
+	[FGFT, D] = matfaust.fact.eigtj(Lap, nGivens, varargin{:});
 end
 % experimental block end

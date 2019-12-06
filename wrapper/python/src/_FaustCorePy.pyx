@@ -1616,6 +1616,7 @@ cdef class FaustFact:
                              'float16', 'float32',
                              'float64', 'double']
         if(isinstance(M, np.ndarray)):
+            M = np.asfortranarray(M)
             if(M_is_real):
                 core_obj,D = FaustFact.fact_givens_fgft(M, maxiter, nGivens_per_fac,
                         verbosity, tol,

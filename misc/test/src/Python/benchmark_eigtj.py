@@ -30,7 +30,7 @@ dim_size = 128
 plt.rcParams['lines.markersize'] = .7
 
 
-nruns = 1
+nruns = 10
 plotting = False
 
 recording_best_permu_err = False
@@ -171,97 +171,96 @@ for j in range(old_nruns,nruns):
         G = graph_ctors[i](N=dim_size, **kwargs)
         G.set_coordinates(**kwargs) # kind = 'spring'
         Lap = G.L.toarray().astype(np.float)
-#        #print(L)
-#        if((Lap != Lap.T).any()): exit("Lap. not valid")
-#        if(plotting):
-#            fig, axes = plt.subplots(1, 2)
-#            _ = axes[0].spy(G.W,markersize=.7)
-#            _ = G.plot(ax=axes[1], vertex_size=.9)
-#        D, U = eigh(Lap)
-#        dim = Lap.shape[0]
-#
-#        print("running Trunc. Jacobi")
-#        #print("J=", J)
-#        #J = 64*64
-#        #J = Lap.shape[0]//2*(Lap.shape[0]-1)
-#        for a in range(0, 4):
-#            print(algo_str[a])
-#            J = round(dim_size*(dim_size-1)/2)
-#            Lapa = Lap
-#            if(a in [GIVENS_REAL_AS_CPLX, GIVENS_REAL_AS_CPLX_SPARSE]):
-#                Lapa = Lapa.astype(np.complex)
-#            if(a in [GIVENS_REAL_SPARSE, GIVENS_REAL_AS_CPLX_SPARSE]):
-#                Lapa = csr_matrix(Lapa)
-#            t = clock()
-#            Dhat, F = pyfaust.fact.eigtj(Lapa, J, nGivens_per_fac=0)
-#            t = clock()-t
-#            Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
-#            all_data[i,D_ERR_ID,a, j] = norm(D-Dhat)/norm(D)
-#            all_data[i,LARGEST_EIGVAL_ERR_ID,a,j] = (max(D)-max(Dhat))/max(D)
-#            Dhat = spdiags(Dhat, [0], Lapa.shape[0], Lapa.shape[0])
-#            all_data[i,TIME_ID,a,j] = t
-#
-#            if(a in [GIVENS_REAL_SPARSE, GIVENS_REAL_AS_CPLX_SPARSE]):
-#                Lapa = Lapa.todense()
-#            givens_err = \
-#            norm(Fa@diag(Dhata)@Fa.T.conj()-Lapa,'fro')/norm(Lapa,'fro')
-#            givens_err2 = \
-#            norm(F@Dhat.todense()@F.H-Lapa,'fro')/norm(Lapa,'fro')
-#            if(recording_best_permu_err):
-#                all_data[i,LAP_ERR_ID,a,j] = min(givens_err, givens_err2)
-#            else:
-#                all_data[i,LAP_ERR_ID,a,j] = givens_err2
-#            print("lap err:", givens_err, givens_err2)
-#            all_data[i,FOURIER_ERR_ID,a,j] = symmetrized_norm(U, F.toarray())/norm(U,'fro')
-#            print("fourier err:",  all_data[i,FOURIER_ERR_ID,a,j])
-#            print("fourier err2:",
-#                  norm(permu_near_id(Fa.T.conj()@U)-np.eye(*(U.shape)))/norm(np.eye(*(U.shape))))
-#
-##            print("errs Uhat permuted, Uhat:", symmetrized_norm(U,
-##                                                               Fa)/norm(U,'fro'),
-##                 norm(Fa-U, 'fro')/norm(U,'fro'))
-#            #all_data[i,FOURIER_ERR_ID,a, j] = norm(U-Fa,'fro')/norm(U,'fro')
-#
-#        print("running Parallel Trunc. Jacobi")
-#        for a in range(4, 8):
-#            print(algo_str[a])
-#            J = round(dim_size*(dim_size-1)/2)
-#            Lapa = Lap
-#            if(a in [PARGIVENS_REAL_AS_CPLX, PARGIVENS_REAL_AS_CPLX_SPARSE]):
-#                Lapa = Lapa.astype(np.complex)
-#            if(a in [PARGIVENS_REAL_SPARSE, PARGIVENS_REAL_AS_CPLX_SPARSE]):
-#                Lapa = csr_matrix(Lapa)
-#
-#            t = clock()
-#            Dhat, F = pyfaust.fact.eigtj(Lapa, J, nGivens_per_fac=int(dim/2))
-#            t = clock()-t
-#            Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
-#            all_data[i,D_ERR_ID,a, j] = norm(D-Dhat)/norm(D)
-#            all_data[i,LARGEST_EIGVAL_ERR_ID,a,j] = (max(D)-max(Dhat))/max(D)
-#            Dhat = spdiags(Dhat, [0], Lap.shape[0], Lap.shape[0])
-#            all_data[i,TIME_ID,a,j] = t
-#            if(a in [PARGIVENS_REAL_SPARSE, PARGIVENS_REAL_AS_CPLX_SPARSE]):
-#                Lapa = Lapa.todense()
-#            print("J=", J)
-#            pargivens_err1 = \
-#                    norm(Fa@diag(Dhata)@Fa.T.conj()-Lapa,'fro')/norm(Lapa,'fro')
-#            pargivens_err2 = norm(F@Dhat.todense()@F.H-Lapa,'fro')/norm(Lapa,'fro')
-#            if(recording_best_permu_err):
-#                all_data[i,LAP_ERR_ID,a,j] = min(pargivens_err1, pargivens_err2)
-#            else:
-#                all_data[i,LAP_ERR_ID,a,j] = pargivens_err2
-#            print("lap err:", pargivens_err1, pargivens_err2)
-#            all_data[i,FOURIER_ERR_ID,a,j] = symmetrized_norm(U, F.toarray())/norm(U,'fro')
-#            print("fourier err:",  all_data[i,FOURIER_ERR_ID,a,j])
-#            print("fourier err2:",
-#                  norm(permu_near_id(Fa.T.conj()@U)-np.eye(*(U.shape)))/norm(np.eye(*(U.shape))))
-#            #print("errs Uhat permuted, Uhat:", symmetrized_norm(U, Fa)/norm(U,'fro'),
-#            #     norm(U-Fa, 'fro')/norm(U,'fro'))
-#            #all_data[i,FOURIER_ERR_ID,a, j] = norm(U-Fa,'fro')/norm(U,'fro')
-#            print("err:", norm(Lap @ F - F@Dhat)/norm(Lap))
+        #print(L)
+        if((Lap != Lap.T).any()): exit("Lap. not valid")
+        if(plotting):
+            fig, axes = plt.subplots(1, 2)
+            _ = axes[0].spy(G.W,markersize=.7)
+            _ = G.plot(ax=axes[1], vertex_size=.9)
+        D, U = eigh(Lap)
+        dim = Lap.shape[0]
+
+        print("running Trunc. Jacobi")
+        #print("J=", J)
+        #J = 64*64
+        #J = Lap.shape[0]//2*(Lap.shape[0]-1)
+        for a in range(0, 4):
+            print(algo_str[a])
+            J = round(dim_size*(dim_size-1)/2)
+            Lapa = Lap
+            if(a in [GIVENS_REAL_AS_CPLX, GIVENS_REAL_AS_CPLX_SPARSE]):
+                Lapa = Lapa*np.complex(1,0)
+            if(a in [GIVENS_REAL_SPARSE, GIVENS_REAL_AS_CPLX_SPARSE]):
+                Lapa = csr_matrix(Lapa)
+            t = clock()
+            Dhat, F = pyfaust.fact.eigtj(Lapa, nGivens_per_fac=1, tol=0.1)
+            t = clock()-t
+            Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
+            all_data[i,D_ERR_ID,a, j] = norm(D-Dhat)/norm(D)
+            all_data[i,LARGEST_EIGVAL_ERR_ID,a,j] = (max(D)-max(Dhat))/max(D)
+            Dhat = spdiags(Dhat, [0], Lapa.shape[0], Lapa.shape[0])
+            all_data[i,TIME_ID,a,j] = t
+
+            if(a in [GIVENS_REAL_SPARSE, GIVENS_REAL_AS_CPLX_SPARSE]):
+                Lapa = Lapa.todense()
+            givens_err = \
+            norm(Fa@diag(Dhata)@Fa.T.conj()-Lapa,'fro')/norm(Lapa,'fro')
+            givens_err2 = \
+            norm(F@Dhat.todense()@F.H-Lapa,'fro')/norm(Lapa,'fro')
+            if(recording_best_permu_err):
+                all_data[i,LAP_ERR_ID,a,j] = min(givens_err, givens_err2)
+            else:
+                all_data[i,LAP_ERR_ID,a,j] = givens_err2
+            print("lap err:", givens_err, givens_err2)
+            all_data[i,FOURIER_ERR_ID,a,j] = symmetrized_norm(U, F.toarray())/norm(U,'fro')
+            print("fourier err:",  all_data[i,FOURIER_ERR_ID,a,j])
+            print("fourier err2:",
+                  norm(permu_near_id(Fa.T.conj()@U)-np.eye(*(U.shape)))/norm(np.eye(*(U.shape))))
+
+#            print("errs Uhat permuted, Uhat:", symmetrized_norm(U,
+#                                                               Fa)/norm(U,'fro'),
+#                 norm(Fa-U, 'fro')/norm(U,'fro'))
+            #all_data[i,FOURIER_ERR_ID,a, j] = norm(U-Fa,'fro')/norm(U,'fro')
+
+        print("running Parallel Trunc. Jacobi")
+        for a in range(4, 8):
+            print(algo_str[a])
+            J = round(dim_size*(dim_size-1)/2)
+            Lapa = Lap
+            if(a in [PARGIVENS_REAL_AS_CPLX, PARGIVENS_REAL_AS_CPLX_SPARSE]):
+                Lapa = Lapa.astype(np.complex)
+            if(a in [PARGIVENS_REAL_SPARSE, PARGIVENS_REAL_AS_CPLX_SPARSE]):
+                Lapa = csr_matrix(Lapa)
+
+            t = clock()
+            Dhat, F = pyfaust.fact.eigtj(Lapa, tol=0.1)
+            t = clock()-t
+            Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
+            all_data[i,D_ERR_ID,a, j] = norm(D-Dhat)/norm(D)
+            all_data[i,LARGEST_EIGVAL_ERR_ID,a,j] = (max(D)-max(Dhat))/max(D)
+            Dhat = spdiags(Dhat, [0], Lap.shape[0], Lap.shape[0])
+            all_data[i,TIME_ID,a,j] = t
+            if(a in [PARGIVENS_REAL_SPARSE, PARGIVENS_REAL_AS_CPLX_SPARSE]):
+                Lapa = Lapa.todense()
+            print("J=", J)
+            pargivens_err1 = \
+                    norm(Fa@diag(Dhata)@Fa.T.conj()-Lapa,'fro')/norm(Lapa,'fro')
+            pargivens_err2 = norm(F@Dhat.todense()@F.H-Lapa,'fro')/norm(Lapa,'fro')
+            if(recording_best_permu_err):
+                all_data[i,LAP_ERR_ID,a,j] = min(pargivens_err1, pargivens_err2)
+            else:
+                all_data[i,LAP_ERR_ID,a,j] = pargivens_err2
+            print("lap err:", pargivens_err1, pargivens_err2)
+            all_data[i,FOURIER_ERR_ID,a,j] = symmetrized_norm(U, F.toarray())/norm(U,'fro')
+            print("fourier err:",  all_data[i,FOURIER_ERR_ID,a,j])
+            print("fourier err2:",
+                  norm(permu_near_id(Fa.T.conj()@U)-np.eye(*(U.shape)))/norm(np.eye(*(U.shape))))
+            #print("errs Uhat permuted, Uhat:", symmetrized_norm(U, Fa)/norm(U,'fro'),
+            #     norm(U-Fa, 'fro')/norm(U,'fro'))
+            #all_data[i,FOURIER_ERR_ID,a, j] = norm(U-Fa,'fro')/norm(U,'fro')
+            print("err:", norm(Lap @ F - F@Dhat.toarray())/norm(Lap))
 
         H = hermitian_from_lap(Lap)
-        savemat('H.mat', {'H': H})
         D, U = eigh(H)
         # benchmark truncated jacobi cplx algo on it
         for a in range(8, 12):
@@ -278,8 +277,7 @@ for j in range(old_nruns,nruns):
                 H = csr_matrix(H)
             J = round(dim_size*(dim_size-1)/2)
             t = clock()
-            Dhat, F = pyfaust.fact.eigtj(H, J,
-                                         nGivens_per_fac=nGivens_per_fac)
+            Dhat, F = pyfaust.fact.eigtj(H, tol=0.1, nGivens_per_fac=nGivens_per_fac)
             t = clock()-t
             Dhata, Fa = best_permutation(U, F.toarray(), Dhat)
             D_err1 = norm(D-Dhat)/norm(D)
@@ -296,7 +294,10 @@ for j in range(old_nruns,nruns):
                 H = H.todense()
             givens_err = \
             norm(Fa@diag(Dhata)@Fa.T.conj()-H,'fro')/norm(H,'fro')
-            givens_err2 = norm(F@Dhat@F.H-H,'fro')/norm(H,'fro')
+            givens_err2 = norm(F@Dhat.toarray()@F.H-H,'fro')/norm(H,'fro')
+#            if(givens_err2 > 0.1):
+#                savemat('H.mat', {'H': H})
+#                exit(0)
             if(recording_best_permu_err):
                 all_data[i,LAP_ERR_ID,a,j] = min(givens_err, givens_err2)
             else:
@@ -309,7 +310,7 @@ for j in range(old_nruns,nruns):
             #print("errs Uhat permuted, Uhat:", symmetrized_norm(U, Fa)/norm(U,'fro'),
             #     norm(U-Fa, 'fro')/norm(U,'fro'))
             #all_data[i,FOURIER_ERR_ID,a, j] = norm(U-Fa,'fro')/norm(U,'fro')
-            print("err:", norm(H @ F - F@Dhat)/norm(H))
+            print("err:", norm(H @ F - F@Dhat.toarray())/norm(H))
 
 
         savez(data_file, all_data[:,:,:,:j+1])
@@ -321,8 +322,7 @@ for j in range(0,5): # j : index for type of data
         nsubplots = 4
         f, axes = plt.subplots(1, nsubplots, sharey=True)
         plt.suptitle("pyfaust eigtj benchmark on "+data_type_str[j]+"\n"+str(nruns)+" runs "
-                     "(Laplacian size: "+str(dim_size)+'^2)'
-                     ' J='+str(round(dim_size*(dim_size-1)/2)), size=14)
+                     "(Laplacian size: "+str(dim_size)+'^2)', size=14)
         for i in range(0,nsubplots): # i : index for type of algo
             # k is for type of graph
             # plt.figure()
@@ -341,8 +341,7 @@ for j in range(0,5): # j : index for type of data
     nsubplots = 4
     f, axes = plt.subplots(1, nsubplots, sharey=True)
     plt.suptitle("pyfaust eigtj benchmark on "+data_type_str[j]+"\n"+str(nruns)+" runs "
-                 "(Laplacian size: "+str(dim_size)+'^2)'
-                 ' J='+str(round(dim_size*(dim_size-1)/2)), size=14)
+                 "(Laplacian size: "+str(dim_size)+'^2)', size=14)
     for i in range(0,nsubplots): # i : offset for type of algo
         # k is for type of graph
         # plt.figure()

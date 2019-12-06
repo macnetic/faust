@@ -1,3 +1,5 @@
+#ifndef __FAUST_SVDTJ__
+#define __FAUST_SVDTJ__
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
 
@@ -20,3 +22,4 @@ namespace Faust
 };
 
 #include "faust_SVDTJ.hpp"
+#endif

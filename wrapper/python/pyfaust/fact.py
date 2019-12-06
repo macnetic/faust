@@ -37,14 +37,16 @@ from pyfaust import Faust
 import _FaustCorePy
 
 # experimental block start
-def svdtj2(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
+def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     """
-        Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
+        Performs an approximate singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
-        NOTE: this function is based on fact.eigtj. 
+        NOTE: this function is based on fact.eigtj which relies on the
+        truncated Jacobi algorithm, hence the 'tj' in the name.
+
         Args:
-            M: a real matrix.
-            maxiter: see fact.eigtj
+            M: a real or complex, dense or sparse (csr) matrix.
+            nGivens: see fact.eigtj
             tol: see fact.eigtj
             relerr: see fact.eigtj
             nGivens_per_fac: see fact.eigtj
@@ -61,7 +63,7 @@ def svdtj2(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
             >>> from pyfaust.fact import svdtj
             >>> from numpy.random import rand
             >>> M = rand(128,128)
-            >>> U,S,V = svdtj(M, 1024, 64)
+            >>> U,S,V = svdtj(M, 1024, nGivens_per_fac=64)
 
      See also:
         eigtj
@@ -70,10 +72,10 @@ def svdtj2(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     from scipy import diag
     from pyfaust import Faust
     from numpy import argsort,sign,eye
-    D1, W1 = eigtj(M.dot(M.T), maxiter, tol, relerr,
+    D1, W1 = eigtj(M.dot(M.T.conj()), nGivens, tol, relerr,
                    nGivens_per_fac, verbosity)
-    D2, W2 = eigtj(M.T.dot(M), maxiter, tol, relerr,  nGivens_per_fac, verbosity)
-    S = diag((W1.T*M)*W2)
+    D2, W2 = eigtj(M.T.conj().dot(M), nGivens, tol, relerr,  nGivens_per_fac, verbosity)
+    S = diag((W1.T.conj()*M)*W2)
     I = argsort(abs(S))[::-1]
     sign_S = spdiags(sign(S[I]), [0], S.shape[0], S.shape[0])
     S = spdiags(S[I], [0], S.shape[0], S.shape[0])
@@ -84,7 +86,8 @@ def svdtj2(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     return U,S,V
 # experimental block end
 
-def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
+def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
+          nGivens_per_fac=None, verbosity=0):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
@@ -92,12 +95,15 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
 
         Args:
             M: a real matrix (np.ndarray or scipy.sparse.csr_matrix).
-            maxiter: see fact.eigtj
-            tol: see fact.eigtj (the error tolerance is not exactly for the svd
+            nGivens: see fact.eigtj
+            tol: see fact.eigtj (the error tolerance is not exactly for
+            the svd).
             but for the subsequent eigtj calls).
+            order: see fact.eigtj
             relerr: see fact.eigtj
             nGivens_per_fac: see fact.eigtj
             verbosity: see fact.eigtj
+
 
         Returns:
             The tuple U,S,V: U*numpy.diag(S)*V.H being the approximation of M.
@@ -140,15 +146,22 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
      See also:
         eigtj
     """
+    if(nGivens == None):
+        if(tol == 0):
+            raise Exception("You must specify nGivens or tol argument"
+                            " (to define a stopping  criterion)")
+        nGivens = 0
+    if(nGivens_per_fac == None): nGivens_per_fac = int(M.shape[0]/2)
+
     if(M.dtype == np.complex):
         if(isinstance(M, np.ndarray)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_cplx(M, maxiter, nGivens_per_fac, verbosity, tol, relerr)
+            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_cplx(M, nGivens, nGivens_per_fac, verbosity, tol, relerr)
         elif(isinstance(M, csr_matrix)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse_cplx(M, maxiter, nGivens_per_fac, verbosity, tol, relerr)
+            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse_cplx(M, nGivens, nGivens_per_fac, verbosity, tol, relerr)
     elif(isinstance(M, np.ndarray)):
-        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, maxiter, nGivens_per_fac, verbosity, tol, relerr)
+        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr)
     elif(isinstance(M, csr_matrix)):
-        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse(M, maxiter, nGivens_per_fac, verbosity, tol, relerr)
+        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr)
     else:
         raise ValueError("invalid type for M (first argument): only np.ndarray "
                          "or scipy.sparse.csr_matrix are supported.")
@@ -156,43 +169,46 @@ def svdtj(M, maxiter, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     V = Faust(core_obj=Vcore)
     return U, S, V
 
-def eigtj(M, maxiter=None, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
-          order='ascend'):
+def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
+          nGivens_per_fac=None, verbosity=0):
     """
-    Performs a eigendecomposition of M and returns the eigenvalues in W along with the corresponding left eigenvectors (as the columns of the Faust object V).
+    Performs an approximate eigendecomposition of M and returns the eigenvalues in W along with the corresponding left eigenvectors (as the columns of the Faust object V).
 
-    The output is such that V*numpy.diag(W)*V.H approximates M.
+    The output is such that V*numpy.diag(W)*V.H approximates M. V is a product
+    of Givens rotations obtained by truncating the Jacobi algorithm.
 
     The trade-off between accuracy and sparsity can be set through the
-    parameters maxiter and nGivens_per_fac or concurrently with the arguments
+    parameters nGivens and nGivens_per_fac or concurrently with the arguments
     tol and relerr that define the targeted error.
 
     Args:
         M: (numpy.ndarray or csr_matrix) the matrix to diagonalize. Must be
-        real and symmetric or complex hermitian.
-        maxiter: (int) the maximum number of iterations which is defined by the
-        number of Givens rotations that can be computed in eigenvector transform V.
+        real and symmetric, or complex hermitian. Can be in dense or sparse format.
+        nGivens: (int) the number of Givens rotations that can be computed in
+        eigenvector transform V.
         The number of rotations per factor of V is defined by nGivens_per_fac.
-        tol: (float) the error tolerance under what the algorithm stops. By default,
-        it's zero for not stopping on error criterion. Note that the error
+        tol: (float) the tolerance error at which the algorithm stops. By default,
+        it's zero for not stopping on an error criterion. Note that the error
         reaching is not guaranteed (in particular, if the error starts to
         increase from one iteration to another then the algorithm is stopped).
-        relErr: (bool) the type of error used as stopping criterion. The default value
-        is True for relative error, otherwise (False) the absolute error is used.
+        order: (int) order of eigenvalues, default to 'ascend', other values
+        are 'descend' or 'undef'.
         nGivens_per_fac: (int) the number of Givens rotations per factor of V, must be
         an integer between 1 to M.shape[0]/2 which is the default value (when
         nGivens_per_fac == None).
+        relErr: (bool) the type of error used as stopping criterion. The default value
+        is True for relative error, otherwise (False) the absolute error is used.
         verbosity: (int) the level of verbosity, the greater the value the more
         info is displayed. It can be helpful to understand for example why the
-        algorithm stopped before reaching the tol error or the maxiter
-        number of iterations.
-        order: (int) order of eigenvalues, default to 'ascend', other values
-        are 'descend' or 'undef'.
+        algorithm stopped before reaching the tol error or the number of Givens
+        (nGivens).
+
 
 
     Returns:
         The tuple (W,V):
-           - W (numpy.ndarray) the vector of the eigenvalues of M (in ascending order).
+           - W (numpy.ndarray) the vector of the approximate eigenvalues of M
+           (in ascending order by default).
            - V the Faust object representing the approximate eigenvector
             transform. The column V[:, i] is the eigenvector
             corresponding to the eigenvalue W[i].<br/>
@@ -210,40 +226,56 @@ def eigtj(M, maxiter=None, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=
         from scipy.io import loadmat
         from os.path import sep
         from pyfaust.demo import get_data_dirpath
+        from numpy.linalg import norm
         # get a graph Laplacian to diagonalize
         demo_path = sep.join((get_data_dirpath(),'Laplacian_256_community.mat'))
         data_dict = loadmat(demo_path)
         Lap = data_dict['Lap'].astype(np.float)
-        Dhat, Uhat = eigtj(Lap, maxiter=Lap.shape[0]*100)
+        Dhat, Uhat = eigtj(Lap, nGivens=Lap.shape[0]*100)
         # Uhat is the Fourier matrix/eigenvectors approximation as a Faust
         # (200 factors)
         # Dhat the eigenvalues diagonal matrix approx.
-        print("err: ", np.linalg.norm(Lap-Uhat*np.diag(Dhat)*Uhat.H)/np.linalg.norm(Lap)) # about 6.5e-3
+        print("err: ", norm(Lap-Uhat*np.diag(Dhat)*Uhat.H)/norm(Lap)) # about 6.5e-3
         print(Uhat)
         print(Dhat)
+        Dhat2, Uhat2 = eigtj(Lap, tol=0.01)
+        assert(norm(Lap-Uhat2*np.diag(Dhat2)*Uhat2.H)/norm(Lap) < .011)
+        # and then asking for an absolute error
+        Dhat3, Uhat3 = eigtj(Lap, tol=0.1, relerr=False)
+        assert(norm(Lap-Uhat3*np.diag(Dhat3)*Uhat3.H) < .11)
+        # now recompute Uhat2, Dhat2 but asking a descending order of
+        eigenvalues
+        Dhat4, Uhat4 = eigtj(Lap, tol=0.01)
+        assert((Dhat4[::-1] == Dhat2[::]).all())
+        # and now with no sort
+        Dhat5, Uhat5 = eigtj(Lap, tol=0.01, order='undef')
+        assert((np.sort(Dhat5) == Dhat2).all())
+
+    See also:
+        svdtj
 
     See also:
         fgft_givens, fgft_palm
     """
-    D, core_obj = _FaustCorePy.FaustFact.eigtj(M, maxiter, tol, relerr,
+    D, core_obj = _FaustCorePy.FaustFact.eigtj(M, nGivens, tol, relerr,
             nGivens_per_fac, verbosity, order)
     return D, Faust(core_obj=core_obj)
 
 # experimental block start
-def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
-                verbosity=0, order='ascend'):
+def fgft_givens(Lap, nGivens=None, tol=0, order='ascend', relerr=True,
+          nGivens_per_fac=None, verbosity=0):
     """
     Computes the FGFT of the Laplacian matrix Lap (using fact.eigtj).
 
     Args:
         Lap: the Laplacian matrix as a numpy array or csr_matrix. Must be real
         and symmetric or hermitian if complex.
-        maxiter: see fact.eigtj
+        nGivens: see fact.eigtj
         tol: see fact.eigtj
+        order: see fact.eigtj
         relerr: see fact.eigtj
         nGivens_per_fac: see fact.eigtj
         verbosity: see fact.eigtj
-        order: see fact.eigtj
 
     Returns:
         The tuple (D, FGFT):
@@ -263,7 +295,7 @@ def fgft_givens(Lap, maxiter, tol=0.0, relerr=True, nGivens_per_fac=None,
     See also:
         eigtj, fgft_palm
     """
-    return eigtj(Lap, maxiter, tol, relerr, nGivens_per_fac, verbosity, order)
+    return eigtj(Lap, nGivens, tol, order, relerr, nGivens_per_fac, verbosity)
 # experimental block end
 
 def _check_fact_mat(funcname, M):

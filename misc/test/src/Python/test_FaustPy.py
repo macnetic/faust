@@ -933,6 +933,10 @@ class TestFaustFactory(unittest.TestCase):
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFT.cpp.in
         self.assertAlmostEqual(err, 0.0326529, places=7)
+        # check nnz for the F.numfactors()-1 first factors
+        for fac in [F.factors(i) for i in range(0,F.numfactors())]:
+            nnz = np.count_nonzero(fac.toarray())
+            self.assertEqual(nnz, 2+L.shape[0])
 
     def testFGFTGivensParallel(self):
         print("Test pyfaust.fact.fgft_givens() -- parallel")
@@ -958,6 +962,11 @@ class TestFaustFactory(unittest.TestCase):
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in
         self.assertEqual(err, err2)
+        # check nnz for the last factors (avoiding errors due to pivot image
+        # near to zero in first factors)
+        for fac in [F.factors(i) for i in range(F.numfactors()-10,F.numfactors())]:
+            nnz = np.count_nonzero(fac.toarray())
+            self.assertEqual(nnz, 2*t+L.shape[0])
 
     def testFGFTGivensSparse(self):
         print("Test fact.fgft_givens_sparse()")
@@ -976,6 +985,10 @@ class TestFaustFactory(unittest.TestCase):
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFT.cpp.in
         self.assertAlmostEqual(err, 0.0326529, places=7)
+        # check nnz for the F.numfactors()-1 first factors
+        for fac in [F.factors(i) for i in range(0,F.numfactors())]:
+            nnz = np.count_nonzero(fac.toarray())
+            self.assertEqual(nnz, 2+L.shape[0])
 
     def testFGFTGivensParallelSparse(self):
         print("Test pyfaust.fact.fgft_givens_sparse() -- parallel")
@@ -994,7 +1007,7 @@ class TestFaustFactory(unittest.TestCase):
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in (_double version)
         self.assertAlmostEqual(err, 0.0398154, places=7)
-        D2, F2 = eigtj(L, J, nGivens_per_fac=t, verbosity=0)
+        D2, F2 = eigtj(csr_matrix(L), J, nGivens_per_fac=t, verbosity=0)
         D2 = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
         err2 = norm((F2*D.todense())*F2.T.todense()-L,"fro")/norm(L,"fro")
@@ -1002,6 +1015,10 @@ class TestFaustFactory(unittest.TestCase):
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in
         self.assertEqual(err, err2)
+        # check nnz for the last factors
+        for fac in [F2.factors(i) for i in range(F2.numfactors()-10, F2.numfactors())]:
+            nnz = np.count_nonzero(fac.toarray())
+            self.assertEqual(nnz, 2*t+L.shape[0])
 
     def testeigtj_abserr(self):
         from numpy.random import rand

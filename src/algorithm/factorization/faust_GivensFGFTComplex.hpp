@@ -235,9 +235,9 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 {
-	Faust::MatDense<FPP,Cpu> L_copy = L;
 	// L = S'*L*S
 #ifdef DEBUG_GIVENS
+	//Faust::MatDense<FPP,Cpu> L_copy = L;
 	cout << "L(p,q) before update_L():" << L(p,q) << endl;
 #endif
 #define OPT_UPDATE_L_CPLX

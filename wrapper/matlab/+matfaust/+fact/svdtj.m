@@ -1,33 +1,32 @@
 %====================================================================
-%> @brief Performs a singular value decomposition and returns the left and
+%> @brief Performs an approximate singular value decomposition and returns the left and
 %> right singular vectors as Faust transforms.
 %>
-%> @note this function is based on fact.eigtj.
+%> @note this function is based on fact.eigtj which relies on the truncated Jacobi algorithm, hence the 'tj' in the name.
 %>
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b [U,S,V] = svdtj(M, varargin). See below for further details on how svdtj is defined using eigtj.<br/>
 %%>
-%> @param M: a real matrix.
-%> @param maxiter: see fact.eigtj
+%> @param M: a real or complex, dense or sparse matrix.
+%> @param nGivens, integer: see fact.eigtj
 %> @param 'nGivens_per_fac',integer see fact.eigtj
-%> @param nGivens_per_fac: see fact.eigtj
 %> @param 'tol', number see fact.eigtj (the error tolerance is not exactly for the svdtj but for the subsequent eigtj calls).
 %> @param 'relerr', bool see fact.eigtj
 %> @param 'verbosity', integer see fact.eigtj
 %>
 %> @retval [U,S,V]: U*S*V' being the approximation of M.
-%>      - S: (sparse diagonal matrix) S the singular values in
+%>      - S: (sparse diagonal matrix) the singular values in
 %>		descendant order.
-%>      - U: (Faust object) U the left-singular transform.
-%>      - V: (Faust object) V the right-singular transform.
+%>      - U: (Faust object) the left-singular transform.
+%>      - V: (Faust object) the right-singular transform.
 %>
 %> @Example
 %> @code
 %> % in a matlab terminal
 %> >> import matfaust.fact.svdtj
 %> >> M = rand(128,128)
-%> >> [U,S,V] = svdtj(M, 'maxiter', 1024,'nGivens_per_fac', 64)
+%> >> [U,S,V] = svdtj(M, 'nGivens', 1024, 'nGivens_per_fac', 64)
 %> @endcode
 %>If we call svdtj on the matrix M, it makes two internal calls to eigtj.
 %>
@@ -58,8 +57,8 @@
 %>
 %====================================================================
 function [U,S,V] = svdtj(M, varargin)
-%	[W1,D1] = matfaust.fact.eigtj(M*M', maxiter, varargin{:});
-%	[W2,D2] = matfaust.fact.eigtj(M'*M, maxiter, varargin{:});
+%	[W1,D1] = matfaust.fact.eigtj(M*M', nGivens, varargin{:});
+%	[W2,D2] = matfaust.fact.eigtj(M'*M, nGivens, varargin{:});
 %	S = diag(W1'*M*W2);
 %	[~,I] = sort(abs(S), 'descend');
 %	S = sparse(diag(S(I)));
@@ -70,7 +69,6 @@ function [U,S,V] = svdtj(M, varargin)
 %	V = W2(:,1:size(Id,1))*matfaust.Faust(Id(:,I));
 %	TODO: factorize argument parsing code with fgft_givens
 	import matfaust.Faust
-	nGivens_per_fac = 1; % default value
 	verbosity = 0; % default value
 %	if(~ ismatrix(M) || ~ isreal(M))
 %		error('M must be a real matrix.')
@@ -79,7 +77,8 @@ function [U,S,V] = svdtj(M, varargin)
 		error('M must be square')
 	end
 	bad_arg_err = 'bad number of arguments.';
-	maxiter = 0;
+	nGivens_per_fac = floor(size(M,1)/2); % default value
+	nGivens = 0;
 	tol = 0;
 	relerr = true;
 	verbosity = 0;
@@ -88,10 +87,10 @@ function [U,S,V] = svdtj(M, varargin)
 	if(argc > 0)
 		for i=1:argc
 			switch(varargin{i})
-				case 'maxiter'
-					maxiter = varargin{i+1};
-					if(argc == i || ~ isnumeric(maxiter) || maxiter-floor(maxiter) > 0 || maxiter <= 0 )
-						error('maxiter keyword arg. is not followed by an integer')
+				case 'nGivens'
+					nGivens = varargin{i+1};
+					if(argc == i || ~ isnumeric(nGivens) || nGivens-floor(nGivens) > 0 || nGivens <= 0 )
+						error('nGivens keyword arg. is not followed by an integer')
 					end
 				case 'tol'
 					if(argc == i || ~ isscalar(varargin{i+1}))
@@ -138,13 +137,13 @@ function [U,S,V] = svdtj(M, varargin)
 			end
 		end
 	end
-	if(maxiter == 0 && tol == 0)
-		error('Either maxiter or tol must be greater than zero.')
+	if(nGivens == 0 && tol == 0)
+		error('Either nGivens or tol must be greater than zero.')
 	end
-	if(maxiter > 0)
-		nGivens_per_fac = min(nGivens_per_fac, maxiter);
+	if(nGivens > 0)
+		nGivens_per_fac = min(nGivens_per_fac, nGivens);
 	end
-	[core_obj1, S, core_obj2] = mexsvdtjReal(M, maxiter, nGivens_per_fac, verbosity, tol, relerr, order);
+	[core_obj1, S, core_obj2] = mexsvdtjReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order);
 	S = sparse(diag(real(S)));
 	U = Faust(core_obj1, isreal(M));
 	V = Faust(core_obj2, isreal(M));
