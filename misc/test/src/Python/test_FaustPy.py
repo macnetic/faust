@@ -1155,6 +1155,23 @@ class TestFaustFactory(unittest.TestCase):
         # misc/test/src/C++/hierarchicalFactorizationFFT.cpp
         self.assertAlmostEqual(err, 0.084417, places=5)
 
+    def test_splin(self):
+        from pyfaust.factparams import splin
+        from random import randint
+        from numpy.random import rand
+        from numpy import count_nonzero
+        from numpy.linalg import norm
+        min_n, min_m = 5, 5
+        m = randint(min_m, 128)
+        n = randint(min_n, 128)
+        M = rand(m,n)
+        k = randint(1,n)
+        p = splin((m,n),k)
+        Mp = p(M)
+        for i in range(0,m):
+            self.assertLessEqual(count_nonzero(Mp[i,:]), k)
+        self.assertAlmostEqual(norm(Mp), 1)
+
 
 if __name__ == "__main__":
     if(len(sys.argv)> 1):

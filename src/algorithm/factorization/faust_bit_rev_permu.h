@@ -1,3 +1,5 @@
+#ifndef __FAUST_BIT_REV_PERMU__
+#define __FAUST_BIT_REV_PERMU__
 namespace Faust {
 	/**
 	 * \brief This function is only utility for faust_FFT.h(pp).
@@ -8,3 +10,4 @@ namespace Faust {
 	 */
 	void bit_rev_permu(unsigned int n, unsigned int* v, const bool initv=true);
 }
+#endif

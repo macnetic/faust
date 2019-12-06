@@ -115,6 +115,7 @@ class ConstraintGeneric(ABC):
            raise TypeError("M must be a numpy array.")
         if(M.shape[0] != self._num_rows or M.shape[1] != self._num_cols):
             raise ValueError("The dimensions must agree.")
+        M = np.asfortranarray(M)
 
 class ConstraintInt(ConstraintGeneric):
     """
@@ -175,7 +176,7 @@ class ConstraintInt(ConstraintGeneric):
 def sp(shape, k, normalized=True, pos=False):
     """
     """
-    c = ConstraintInt('sp', *shape, k, normalized, pos)
+    c = ConstraintInt('sp', shape[0], shape[1], k, normalized, pos)
     def proj(M):
         return c.project(M)
     return proj
@@ -183,7 +184,7 @@ def sp(shape, k, normalized=True, pos=False):
 def splin(shape, k, normalized=True, pos=False):
     """
     """
-    c = ConstraintInt('splin', *shape, k, normalized, pos)
+    c = ConstraintInt('splin', shape[0], shape[1], k, normalized, pos)
     def proj(M):
         return c.project(M)
     return proj
@@ -191,7 +192,7 @@ def splin(shape, k, normalized=True, pos=False):
 def spcol(shape, k, normalized=True, pos=False):
     """
     """
-    c = ConstraintInt('spcol', *shape, k, normalized, pos)
+    c = ConstraintInt('spcol', shape[0], shape[1], k, normalized, pos)
     def proj(M):
         return c.project(M)
     return proj
@@ -199,7 +200,7 @@ def spcol(shape, k, normalized=True, pos=False):
 def splincol(shape, k, normalized=True, pos=False):
     """
     """
-    c = ConstraintInt('splincol', *shape, k, normalized, pos)
+    c = ConstraintInt('splincol', shape[0], shape[1], k, normalized, pos)
     def proj(M):
         return c.project(M)
     return proj
@@ -223,7 +224,7 @@ def const(C, normalized=False):
 def normcol(shape, normval, normalized=False, pos=False):
     """
     """
-    c = ConstraintReal('normcol', *shape, normval, normalized, pos)
+    c = ConstraintReal('normcol', shape[0], shape[1], normval, normalized, pos)
     def proj(M):
         return c.project(M)
     return proj
@@ -231,7 +232,7 @@ def normcol(shape, normval, normalized=False, pos=False):
 def normlin(shape, normval, normalized=False, pos=False):
     """
     """
-    c = ConstraintReal('normlin', *shape, normval, normalized, pos)
+    c = ConstraintReal('normlin', shape[0], shape[1], normval, normalized, pos)
     def proj(M):
         return c.project(M)
     return proj

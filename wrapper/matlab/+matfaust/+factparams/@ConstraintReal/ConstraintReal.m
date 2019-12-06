@@ -12,7 +12,7 @@ classdef ConstraintReal < matfaust.factparams.ConstraintGeneric
 				error('ConstraintReal must receive a real as param argument.')
 			end
 			constraint = constraint@matfaust.factparams.ConstraintGeneric(name, num_rows, num_cols, param, varargin{:});
-			if(constraint.default_normalized && lower(constraint.name.name).strcmp('const'))
+			if(constraint.default_normalized && constraint.name.name == matfaust.factparams.ConstraintName.CONST)
 				constraint.normalized = false;
 			end
 			if(~ isa(constraint.name, 'matfaust.factparams.ConstraintName') || ~ constraint.name.is_real_constraint())
