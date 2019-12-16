@@ -1533,10 +1533,10 @@ cdef class FaustFact:
         cdef unsigned int Lap_num_cols=Lap.shape[1]
 
         cdef complex[:,:] Lap_view
-        cdef complex[:] D_view
+        cdef double[:] D_view
 
         Lap_view = Lap
-        D = np.empty(Lap.shape[0], dtype=Lap.dtype)
+        D = np.empty(Lap.shape[0], dtype='double')
         D_view = D
 
         core = FaustCore(core=True)
@@ -1563,7 +1563,7 @@ cdef class FaustFact:
         cdef int [:] indptr # only for csr mat
         cdef unsigned int Lap_num_rows=Lap.shape[0]
         cdef unsigned int Lap_num_cols=Lap.shape[1]
-        cdef complex[:] D_view
+        cdef double[:] D_view
 
         if(order == 'ascend'): order = 1
         elif(order == 'descend'): order = -1
@@ -1573,7 +1573,7 @@ cdef class FaustFact:
         indices=Lap.indices.astype(np.int32, 'F')
         indptr=Lap.indptr.astype(np.int32, 'F')
 
-        D = np.empty(Lap.shape[0], dtype=Lap.dtype)
+        D = np.empty(Lap.shape[0], dtype='double')
         D_view = D
 
         core = FaustCore(core=True)
@@ -1641,7 +1641,7 @@ cdef class FaustFact:
         else:
             raise TypeError("The matrix to diagonalize must be a"
                             " scipy.sparse.csr_matrix or a numpy array.")
-        return D.astype(np.float), core_obj
+        return D, core_obj
 
     @staticmethod
     def svdtj(M, J, t, verbosity=0, stoppingError = 0.0,

@@ -23,7 +23,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::next_step()
 	for(int i=0;i<sizeof(substep)/sizeof(substep_fun);i++)
 	{
 #ifdef DEBUG_GIVENS
-		cout << "GivensFGFTComplex ite=" << ite << " substep i=" << i << endl;
+		cout << "GivensFGFTComplex ite=" << this->ite << " substep i=" << i << endl;
 #endif
 		(this->*substep[i])();
 	}
@@ -37,11 +37,11 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::choose_pivot()
 //        q = q_candidates(p);
 //        coord_choices(1,j) = p;
 //        coord_choices(2,j) = q;
-	C_min_row.max_coeff(&p);
-	q = q_candidates[p];
-	coord_choices.push_back(pair<int,int>(p,q));
+	C_min_row.max_coeff(&(this->p));
+	this->q = this->q_candidates[this->p];
+	this->coord_choices.push_back(pair<int,int>(this->p,this->q));
 #ifdef DEBUG_GIVENS
-	cout << "GivensFGFTComplex::choose_pivot() ite: " << ite << " p: " << p << " q: " << q << endl;
+	cout << "GivensFGFTComplex::choose_pivot() ite: " << this->ite << " p: " << this->p << " q: " << this->q << endl;
 #endif
 }
 
@@ -57,8 +57,8 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::max_L()
 	//    end
 	//    [C_min_row, q_candidates] = min(C,[],2);
 	//
-	int n = Lap.getNbRow(), r, s;
-	if(!ite)
+	int n = this->dim_size, r, s;
+	if(!this->ite)
 	{
 		//first iteration
 		for(r=0;r<n;r++)
@@ -66,9 +66,9 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::max_L()
 			{
 				//TODO: really slow (element-by-element copy) see if we can use a max and directly copy L per block
 				// MatDense's data is in column-major order
-				C.getData()[s*n+r] = Faust::fabs((*L)(r,s));
+				C.getData()[s*n+r] = Faust::fabs((*this->L)(r,s));
 			}
-		C_min_row = C.rowwise_max(q_candidates);
+		C_min_row = C.rowwise_max(this->q_candidates);
 	}
 
 	/************ at end of ite.
@@ -93,31 +93,31 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::max_L()
 	 */
 	else
 	{ // 2nd to last iteration
-		int pq[2] = { p , q };
+		int pq[2] = { this->p , this->q };
 		int rid;
 		for(int i=0;i<2;i++)
 		{
 			r = pq[i];
 			for(int s=r+1;s<n;s++)
-				C.getData()[s*n+r] = Faust::fabs((*L)(r,s));
+				C.getData()[s*n+r] = Faust::fabs((*this->L)(r,s));
 			C_min_row.getData()[r] = C.get_row(r).max_coeff(&rid);
-			q_candidates[r] = rid;
+			this->q_candidates[r] = rid;
 		}
 		for(int i=0;i<2;i++)
 		{
 			s = pq[i];
 			for(r=0;r<s-1;r++)
 			{
-				C.getData()[s*n+r] =  Faust::fabs((*L)(r,s));
+				C.getData()[s*n+r] =  Faust::fabs((*this->L)(r,s));
 				if(Faust::fabs(C(r,s)) > Faust::fabs(C_min_row[r]))
 				{
 					C_min_row[r] = C(r,s);
-					q_candidates[r] = s;
+					this->q_candidates[r] = s;
 				}
-				else if(q_candidates[r] == s)
+				else if(this->q_candidates[r] == s)
 				{
 					C_min_row.getData()[r] = C.get_row(r).max_coeff(&rid);
-					q_candidates[r] = rid;
+					this->q_candidates[r] = rid;
 				}
 			}
 		}
@@ -129,8 +129,8 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::calc_theta()
 {
 	FPP phi1, phi2;
 
-	phi1 = atan((*L)(p,q).imag() / (*L)(p,q).real());
-	phi2 = atan(2*Faust::fabs((*L)(p,q)) / ((*L)(p,p) - (*L)(q,q)));
+	phi1 = atan((*this->L)(this->p,this->q).imag() / (*this->L)(this->p,this->q).real());
+	phi2 = atan(2*Faust::fabs((*this->L)(this->p,this->q)) / ((*this->L)(this->p,this->p) - (*this->L)(this->q,this->q)));
 
 
 	theta1 = (FPP(2)*phi1 - FPP(M_PI))/FPP(4);
@@ -143,7 +143,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::calc_theta()
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::check_pivot_image(FPP& c_pp, FPP& c_pq, FPP& c_qp, FPP& c_qq)
 {
-	FPP im_pivot_pq = (conj(c_pp)*(*L)(p,p)+conj(c_qp)*(*L)(q,p))*c_pq +(conj(c_pp)*(*L)(p,q)+conj(c_qp)*(*L)(q,q))*c_qq;
+	FPP im_pivot_pq = (conj(c_pp)*(*this->L)(this->p,this->p)+conj(c_qp)*(*this->L)(this->q,this->p))*c_pq +(conj(c_pp)*(*this->L)(this->p,this->q)+conj(c_qp)*(*this->L)(this->q,this->q))*c_qq;
 
 #ifdef DEBUG_GIVENS
 	cout << "First value of theta2 gives pivot image im_L(p,q)=" << im_pivot_pq << endl;
@@ -165,10 +165,11 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 	//        S = sparse(S);
 	//        facts{j} = S;
 	//
-	int n = Lap.getNbRow();
+	int n = this->dim_size;
 	FPP tmp, sin_theta2, cos_theta2;
 	FPP c_pp, c_pq, c_qp, c_qq;
-	FPP i = complex<typename FPP::value_type>(0,1);
+	FPP i = complex<typename FPP::value_type>(0,1); //TODO: replace by 1i if C++14
+	//ref: https://en.cppreference.com/w/cpp/numeric/complex/operator%22%22i
 	sin_theta2 = sin(theta2);
 	cos_theta2 = cos(theta2);
 	c_pp = - i * exp(-i*theta1) * sin_theta2;
@@ -193,32 +194,32 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 
 	// forget previous rotation coeffs
 	// and keep identity part (n first coeffs)
-	fact_mod_row_ids.resize(n);
-	fact_mod_col_ids.resize(n);
-	fact_mod_values.resize(n);
+	this->fact_mod_row_ids.resize(n);
+	this->fact_mod_col_ids.resize(n);
+	this->fact_mod_values.resize(n);
 	// write new coeffs
 	// 1st one
-	fact_mod_row_ids.push_back(p);
-	fact_mod_col_ids.push_back(p);
-	fact_mod_values.push_back(c_pp);
+	this->fact_mod_row_ids.push_back(this->p);
+	this->fact_mod_col_ids.push_back(this->p);
+	this->fact_mod_values.push_back(c_pp);
 	// 2nd
-	fact_mod_row_ids.push_back(p);
-	fact_mod_col_ids.push_back(q);
-	fact_mod_values.push_back(c_pq);
+	this->fact_mod_row_ids.push_back(this->p);
+	this->fact_mod_col_ids.push_back(this->q);
+	this->fact_mod_values.push_back(c_pq);
 	// 3rd
-	fact_mod_row_ids.push_back(q);
-	fact_mod_col_ids.push_back(p);
-	fact_mod_values.push_back(c_qp);
+	this->fact_mod_row_ids.push_back(this->q);
+	this->fact_mod_col_ids.push_back(this->p);
+	this->fact_mod_values.push_back(c_qp);
 	// 4th
-	fact_mod_row_ids.push_back(q);
-	fact_mod_col_ids.push_back(q);
-	fact_mod_values.push_back(c_qq);
-	if(J == 0) facts.resize(ite+1);
-	facts[ite] = MatSparse<FPP,DEVICE>(fact_mod_row_ids, fact_mod_col_ids, fact_mod_values, n, n);
-	facts[ite].set_orthogonal(true);
+	this->fact_mod_row_ids.push_back(this->q);
+	this->fact_mod_col_ids.push_back(this->q);
+	this->fact_mod_values.push_back(c_qq);
+	if(this->J == 0) this->facts.resize(this->ite+1);
+	this->facts[this->ite] = MatSparse<FPP,DEVICE>(this->fact_mod_row_ids, this->fact_mod_col_ids, this->fact_mod_values, n, n);
+	this->facts[this->ite].set_orthogonal(true);
 #ifdef DEBUG_GIVENS
-	MatSparse<FPP,DEVICE> test1(facts[ite]);
-	MatSparse<FPP,DEVICE> test2(facts[ite]);
+	MatSparse<FPP,DEVICE> test1(this->facts[this->ite]);
+	MatSparse<FPP,DEVICE> test2(this->facts[this->ite]);
 	test2.conjugate();
 	test2.transpose();
 	test1.multiply(test2, 'N');
@@ -227,8 +228,8 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 //			cout << "ite=" << ite << "S*S'(" << j << "," << j << ")=" << test2(j,j) << endl;
 			assert(Faust::abs(test2(j,j)-FPP(1,0)) < .01);
 	}
-	cout << "GivensFGFTComplex::update_fact() ite: " << ite << " fact norm: " << facts[ite].norm() << endl;
-	facts[ite].Display();
+	cout << "GivensFGFTComplex::update_fact() ite: " << this->ite << " fact norm: " << this->facts[this->ite].norm() << endl;
+	this->facts[this->ite].Display();
 #endif
 }
 
@@ -238,12 +239,12 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 	// L = S'*L*S
 #ifdef DEBUG_GIVENS
 	//Faust::MatDense<FPP,Cpu> L_copy = L;
-	cout << "L(p,q) before update_L():" << L(p,q) << endl;
+	cout << "L(p,q) before update_L():" << L(this->p,this->q) << endl;
 #endif
 #define OPT_UPDATE_L_CPLX
 #ifndef OPT_UPDATE_L_CPLX
-	facts[ite].multiply(L, 'H');
-	L.multiplyRight(facts[ite]);
+	this->facts[this->ite].multiply(L, 'H');
+	L.multiplyRight(this->facts[this->ite]);
 //	facts[ite].multiply(L, 'N');
 //	facts[ite].transpose();
 //	facts[ite].conjugate();
@@ -252,10 +253,10 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 //	facts[ite].conjugate();
 #else
 	Faust::Vect<FPP,DEVICE> L_vec_p, L_vec_q;
-	FPP c_qq = *(fact_mod_values.end()-1);
-	FPP c_qp = *(fact_mod_values.end()-2);
-	FPP c_pq = *(fact_mod_values.end()-3);
-	FPP c_pp = *(fact_mod_values.end()-4);
+	FPP c_qq = *(this->fact_mod_values.end()-1);
+	FPP c_qp = *(this->fact_mod_values.end()-2);
+	FPP c_pq = *(this->fact_mod_values.end()-3);
+	FPP c_pp = *(this->fact_mod_values.end()-4);
 	update_L_first(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 	update_L_second(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 #endif
@@ -289,28 +290,28 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 #undef OPT_UPDATE_SPARSE_L
 #ifndef OPT_UPDATE_SPARSE_L
 	// L = S'*L*S
-	facts[ite].multiply(L, 'H');
-	L.multiplyRight(facts[ite]);
+	this->facts[this->ite].multiply(L, 'H');
+	L.multiplyRight(this->facts[this->ite]);
 #else
 	Eigen::SparseMatrix<FPP,RowMajor> L_vec_p, L_vec_q;
-	FPP c_qq = *(fact_mod_values.end()-1);
-	FPP c_qp = *(fact_mod_values.end()-2);
-	FPP c_pq = *(fact_mod_values.end()-3);
-	FPP c_pp = *(fact_mod_values.end()-4);
+	FPP c_qq = *(this->fact_mod_values.end()-1);
+	FPP c_qp = *(this->fact_mod_values.end()-2);
+	FPP c_pq = *(this->fact_mod_values.end()-3);
+	FPP c_pp = *(this->fact_mod_values.end()-4);
 
 	update_L_first(L_vec_p, L_vec_q, c_pp, c_pq, c_qp, c_qq, this->p, this->q, L);
 	L.update_dim();
 //	update_L_second(L_vec_p, L_vec_q, c, s, this->p, this->q, L);
-	L.multiplyRight(facts[ite]);
+	L.multiplyRight(this->facts[this->ite]);
 #endif
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L()
 {
-	MatSparse<FPP, DEVICE>* sL = dynamic_cast<MatSparse<FPP, DEVICE>*>(L);
+	MatSparse<FPP, DEVICE>* sL = dynamic_cast<MatSparse<FPP, DEVICE>*>(this->L);
 	if(sL) update_L(*sL);
-	else update_L(*dynamic_cast<MatDense<FPP, DEVICE>*>(L));
+	else update_L(*dynamic_cast<MatDense<FPP, DEVICE>*>(this->L));
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
@@ -413,17 +414,11 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP,
 	L.mat.innerVector(q) = tmp;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_D()
-{
-	// D = spdiag(diag(L))
-	for(int i=0;i<L->getNbRow();i++)
-		D.getData()[i] = (*L)(i,i);
-#ifdef DEBUG_GIVENS
-	D.Display();
-	cout << "D fro. norm: " << D.norm() << endl;
-#endif
-}
+//template<typename FPP, Device DEVICE, typename FPP2>
+//void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_D()
+//{
+//	GivensFGFTGen<typename FPP::value_type, DEVICE, FPP2, FPP>::update_D(this->L);
+//}
 
 template<typename FPP, Device DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_err()
@@ -437,96 +432,97 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_err()
 	//            %    disp(['Number of edges: ' num2str(N_edges)])
 	//        end
 	//
-	if(!((ite+1)%GivensFGFTComplex<FPP,DEVICE,FPP2>::ERROR_CALC_PERIOD) || stoppingCritIsError || verbosity > 1)
+	if(!((this->ite+1)%GivensFGFTComplex<FPP,DEVICE,FPP2>::ERROR_CALC_PERIOD) || this->stoppingCritIsError || this->verbosity > 1)
 	{
 		FPP2 err = 0, err_d;
-		for(int i=0;i<D.size();i++)
-			err += Faust::fabs(D(i)*D(i));
-		if(Lap_squared_fro_norm == FPP(0))
+		for(int i=0;i<this->D.size();i++)
+			err += /*Faust::fabs(*/this->D(i)*this->D(i)/*)*/;
+		if(this->Lap_squared_fro_norm == FPP2(0))
 		{
-			err_d = Faust::fabs(Lap.norm());
+			err_d = Faust::fabs(this->Lap.norm());
 			err_d = err_d*err_d;
-			Lap_squared_fro_norm = err_d;
+			this->Lap_squared_fro_norm = err_d;
 		}
 		else
-			err_d = Faust::fabs(Lap_squared_fro_norm);
+			err_d = Faust::fabs(this->Lap_squared_fro_norm);
 		err = Faust::fabs(err_d - err);
-		if(errIsRel) err /= err_d;
-		if(verbosity)
+		if(this->errIsRel) err /= err_d;
+		if(this->verbosity)
 		{
-			cout << "factor : "<< ite <<  ", " << ((errIsRel)?"relative ":"absolute ") << "err.: " << err;
-			if(stoppingCritIsError) cout << " stoppingError: " << stoppingError << ")";
+			cout << "factor : "<< this->ite <<  ", " << ((this->errIsRel)?"relative ":"absolute ") << "err.: " << err;
+			if(this->stoppingCritIsError) cout << " stoppingError: " << this->stoppingError << ")";
 			cout << endl;
 		}
-		errs.push_back(err);
+		this->errs.push_back(err);
 	}
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::order_D()
-{
-	order_D(1);
-}
+//template<typename FPP, Device DEVICE, typename FPP2>
+//void GivensFGFTComplex<FPP,DEVICE,FPP2>::order_D()
+//{
+//	order_D(1);
+//}
+
+//template<typename FPP, Device DEVICE, typename FPP2>
+//void GivensFGFTComplex<FPP,DEVICE,FPP2>::order_D(const int order /* -1 for descending order, 1 for ascending order */)
+//{
+//	ordered_D = Faust::Vect<DType /*FPP*/,DEVICE>(this->D.size());
+//	ord_indices.resize(0);
+//	for(int i=0;i<this->D.size();i++)
+//		ord_indices.push_back(i);
+//	sort(ord_indices.begin(), ord_indices.end(), [this, &order](int i, int j) {
+//			return order>0?this->D.getData()[i]/*.real()*/ < this->D.getData()[j]/*.real()*/:(order <0?this->D.getData()[i]/*.real()*/ > this->D.getData()[j]/*.real()*/:0);
+//			});
+//	for(int i=0;i<ord_indices.size();i++)
+//	{
+//		ordered_D.getData()[i] = this->D.getData()[ord_indices[i]];
+//	}
+//	// compute inverse permutation to keep easily possible retrieving undefined order
+//	inv_ord_indices.resize(ord_indices.size());
+//	int j = 0, i = 0;
+//	while(j<ord_indices.size())
+//		if(ord_indices[i] == j)
+//		{
+//			inv_ord_indices[j++] = i;
+//			i = 0;
+//		}
+//		else
+//			i++;
+//	is_D_ordered = true;
+//	D_order_dir = order;
+//}
+
+//template<typename FPP, Device DEVICE, typename FPP2>
+//const vector<int>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_ord_indices()
+//{
+//	if(! is_D_ordered)
+//		order_D();
+//	return ord_indices;
+//}
+
+
+//template<typename FPP, Device DEVICE, typename FPP2>
+//void GivensFGFTComplex<FPP,DEVICE,FPP2>::compute_facts()
+//{
+//	this->is_D_ordered = false; // facts (re)computed then D must be reordered
+//	this->ite = 0;
+//	bool stopping = false;
+//	while(this->J == 0 || this->ite < this->facts.size()) // when J == 0 the stopping criterion is the error against Lap
+//	{
+//		next_step();
+//		this->ite++;
+//		if(stopping = (this->ite > 1 && this->stoppingCritIsError && this->errs.size() > 2 && this->errs[this->ite-1]-this->errs[this->ite-2] > FLT_EPSILON))
+//			if(this->verbosity>0) cerr << "warning: the algorithm stopped because the last error is greater than the previous one." << endl;
+//		if(stopping || this->stoppingCritIsError && this->errs.size() > 0 && (*(this->errs.end()-1) - this->stoppingError ) < FLT_EPSILON)
+//		{
+//			this->facts.resize(this->ite);
+//			break;
+//		}
+//	}
+//}
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::order_D(const int order /* -1 for descending order, 1 for ascending order */)
-{
-	ordered_D = Faust::Vect<FPP,DEVICE>(D.size());
-	ord_indices.resize(0);
-	for(int i=0;i<D.size();i++)
-		ord_indices.push_back(i);
-	sort(ord_indices.begin(), ord_indices.end(), [this, &order](int i, int j) {
-			return order>0?D.getData()[i].real() < D.getData()[j].real():(order <0?D.getData()[i].real() > D.getData()[j].real():0);
-			});
-	for(int i=0;i<ord_indices.size();i++)
-	{
-		ordered_D.getData()[i] = D.getData()[ord_indices[i]];
-	}
-	// compute inverse permutation to keep easily possible retrieving undefined order
-	inv_ord_indices.resize(ord_indices.size());
-	int j = 0, i = 0;
-	while(j<ord_indices.size())
-		if(ord_indices[i] == j)
-		{
-			inv_ord_indices[j++] = i;
-			i = 0;
-		}
-		else
-			i++;
-	is_D_ordered = true;
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-const vector<int>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_ord_indices()
-{
-	if(! is_D_ordered)
-		order_D();
-	return ord_indices;
-}
-
-
-template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::compute_facts()
-{
-	is_D_ordered = false; // facts (re)computed then D must be reordered
-	ite = 0;
-	bool stopping = false;
-	while(J == 0 || ite < facts.size()) // when J == 0 the stopping criterion is the error against Lap
-	{
-		next_step();
-		ite++;
-		if(stopping = (ite > 1 && stoppingCritIsError && errs.size() > 2 && errs[ite-1]-errs[ite-2] > FLT_EPSILON))
-			if(verbosity>0) cerr << "warning: the algorithm stopped because the last error is greater than the previous one." << endl;
-		if(stopping || stoppingCritIsError && errs.size() > 0 && (*(errs.end()-1) - stoppingError ) < FLT_EPSILON)
-		{
-			facts.resize(ite);
-			break;
-		}
-	}
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel) : Lap(Lap), facts(J>0?J:1), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(0), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(FPP(0)), J(J)
+GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel) : Faust::GivensFGFTGen<typename FPP::value_type, DEVICE, FPP2, FPP>(Lap, J, verbosity, stoppingError, errIsRel),/* Lap(Lap), facts(J>0?J:1), D(Lap.getNbRow()), */ C(Lap.getNbRow(), Lap.getNbCol())/*,errs(0),  coord_choices(0), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel),last_fact_permuted(false), Lap_squared_fro_norm(FPP2(0)) J(J)*/
 {
 	/* Matlab ref. code:
 	 *     facts = cell(1,J);
@@ -537,30 +533,30 @@ GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatSparse<FPP,DEVIC
 	 *     coord_choices = zeros(2,J);
 	 *
 	 */
-	if(J == 0 && ! stoppingCritIsError) handleError("GivensFGFT", "Either J or stoppingError must be > 0");
+//	if(this->J == 0 && ! this->stoppingCritIsError) handleError("GivensFGFT", "Either J or stoppingError must be > 0");
 	C.setZeros();
 	//	C.setOnes();
 	//	C.scalarMultiply(-15); // purely abitrary
-	if(Lap.getNbCol() != Lap.getNbRow())
-		handleError("Faust::GivensFGFTComplex", "Laplacian must be a square matrix.");
+//	if(Lap.getNbCol() != Lap.getNbRow())
+//		handleError("Faust::GivensFGFTComplex", "Laplacian must be a square matrix.");
 
-	// init the identity part of the factor buffer model
-	// allocate the mem. space for the 4 additional rotation part coeffs
-	for(int i=0;i<Lap.getNbRow();i++)
-	{
-		fact_mod_values.push_back(FPP(1));
-		fact_mod_col_ids.push_back(i);
-		fact_mod_row_ids.push_back(i);
-	}
+//	// init the identity part of the factor buffer model
+//	// allocate the mem. space for the 4 additional rotation part coeffs
+//	for(int i=0;i<Lap.getNbRow();i++)
+//	{
+//		fact_mod_values.push_back(FPP(1));
+//		fact_mod_col_ids.push_back(i);
+//		fact_mod_row_ids.push_back(i);
+//	}
 
 	// init. D
-	memset(D.getData(), 0, sizeof(FPP)*Lap.getNbRow());
+//	memset(this->D.getData(), 0, sizeof(DType/*FPP*/)*Lap.getNbRow());
 
-	L =  new MatSparse<FPP,DEVICE>(Lap);
+//	L =  new MatSparse<FPP,DEVICE>(Lap);
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) : Lap(Lap), facts(J>0?J:1), D(Lap.getNbRow()), C(Lap.getNbRow(), Lap.getNbCol()), errs(0), coord_choices(0), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(FPP(0)), J(J)
+GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) : Faust::GivensFGFTGen<typename FPP::value_type, DEVICE, FPP2, FPP>(Lap, J, verbosity, stoppingError, errIsRel), /* Lap(Lap), facts(J>0?J:1), D(Lap.getNbRow()), */ C(Lap.getNbRow(), Lap.getNbCol())/*, errs(0), coord_choices(0), q_candidates(new int[Lap.getNbCol()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), last_fact_permuted(false), Lap_squared_fro_norm(FPP2(0)) J(J)*/
 {
 	/* Matlab ref. code:
 	 *     facts = cell(1,J);
@@ -571,190 +567,193 @@ GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatDense<FPP,DEVICE
 	 *     coord_choices = zeros(2,J);
 	 *
 	 */
-	if(J == 0 && ! stoppingCritIsError) handleError("GivensFGFT", "Either J or stoppingError must be > 0");
+//	if(this->J == 0 && ! this->stoppingCritIsError) handleError("GivensFGFT", "Either J or stoppingError must be > 0");
 	C.setZeros();
 //	C.setOnes();
 //	C.scalarMultiply(FPP(-15)); // purely abitrary
-	if(Lap.getNbCol() != Lap.getNbRow())
-		handleError("Faust::GivensFGFTComplex", "Laplacian must be a square matrix.");
+//	if(Lap.getNbCol() != Lap.getNbRow())
+//		handleError("Faust::GivensFGFTComplex", "Laplacian must be a square matrix.");
 
-	// init the identity part of the factor buffer model
-	// allocate the mem. space for the 4 additional rotation part coeffs
-	for(int i=0;i<Lap.getNbRow();i++)
-	{
-		fact_mod_values.push_back(FPP(1));
-		fact_mod_col_ids.push_back(i);
-		fact_mod_row_ids.push_back(i);
-	}
+//	// init the identity part of the factor buffer model
+//	// allocate the mem. space for the 4 additional rotation part coeffs
+//	for(int i=0;i<Lap.getNbRow();i++)
+//	{
+//		fact_mod_values.push_back(FPP(1));
+//		fact_mod_col_ids.push_back(i);
+//		fact_mod_row_ids.push_back(i);
+//	}
 
 	// init. D
-	memset(D.getData(), 0, sizeof(FPP)*Lap.getNbRow());
+	//memset(this->D.getData(), 0, sizeof(DType/*FPP*/)*Lap.getNbRow());
 
-	L = new MatDense<FPP,DEVICE>(Lap);
+//	L = new MatDense<FPP,DEVICE>(Lap);
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
-FPP2 GivensFGFTComplex<FPP,DEVICE,FPP2>::get_err(int j) const
-{
-	if(j > 0 && j < errs.size())
-		return errs[j];
-	else
-		throw out_of_range("GivensFGFTComplex::get_err(j): j is out of range.");
-}
+//template<typename FPP, Device DEVICE, typename FPP2>
+//FPP2 GivensFGFTComplex<FPP,DEVICE,FPP2>::get_err(int j) const
+//{
+//	if(j > 0 && j < errs.size())
+//		return errs[j];
+//	else
+//		throw out_of_range("GivensFGFTComplex::get_err(j): j is out of range.");
+//}
+
+//template<typename FPP, Device DEVICE, typename FPP2>
+//const vector<FPP2>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_errs() const
+//{
+//	return errs;
+//}
+
+//template<typename FPP, Device DEVICE, typename FPP2>
+//const Faust::Vect<typename FPP::value_type/*FPP*/,DEVICE>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_D(const bool ord /* default to false */)
+//{
+//	if(ord)
+//	{
+//		if(!is_D_ordered)
+//			order_D();
+//		return ordered_D;
+//	}
+//	return D;
+//}
+
+//template<typename FPP, Device DEVICE, typename FPP2>
+//const Faust::Vect<typename FPP::value_type/*FPP*/,DEVICE>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_D(const int ord /* default to false */)
+//{
+//	if(ord != 0)
+//	{
+//		if(!is_D_ordered || ord != D_order_dir)
+//			order_D(ord);
+//		return ordered_D;
+//	}
+//	return D;
+//}
 
 template<typename FPP, Device DEVICE, typename FPP2>
-const vector<FPP2>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_errs() const
+const Faust::MatSparse<FPP,DEVICE> GivensFGFTComplex<FPP,DEVICE,FPP2>::get_Dspm(const bool ord /* default to false*/) 
 {
-	return errs;
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-const Faust::Vect<FPP,DEVICE>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_D(const bool ord /* default to false */)
-{
-	if(ord)
-	{
-		if(!is_D_ordered)
-			order_D();
-		return ordered_D;
-	}
-	return D;
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-const Faust::Vect<FPP,DEVICE>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_D(const int ord /* default to false */)
-{
-	if(ord != 0)
-	{
-		if(!is_D_ordered || ord != D_order_dir)
-			order_D(ord);
-		return ordered_D;
-	}
-	return D;
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-const Faust::MatSparse<FPP,DEVICE> GivensFGFTComplex<FPP,DEVICE,FPP2>::get_Dspm(const bool ord /* default to false */)
-{
-	const Faust::Vect<FPP,DEVICE>& D_ = this->get_D(ord);
-	vector<int> nat_ord_indices;
-	vector<FPP> diag_D;
-	for(int i=0;i<D_.size();i++)
-	{
-		nat_ord_indices.push_back(i);
-		diag_D.push_back(D_.getData()[i]);
-	}
-	MatSparse<FPP,DEVICE> spD(nat_ord_indices, nat_ord_indices, diag_D, nat_ord_indices.size(), nat_ord_indices.size());
+	MatSparse <FPP,DEVICE> spD;
+	GivensFGFTGen<typename FPP::value_type,DEVICE,FPP2,FPP>::get_Dspm(spD, ord);
 	return spD;
+//	const Faust::Vect<FPP,DEVICE>& D_ = this->get_D(ord);
+//	vector<int> nat_ord_indices;
+//	vector<FPP> diag_D;
+//	for(int i=0;i<D_.size();i++)
+//	{
+//		nat_ord_indices.push_back(i);
+//		diag_D.push_back(FPP(D_.getData()[i]));
+//	}
+//	MatSparse<FPP,DEVICE> spD(nat_ord_indices, nat_ord_indices, diag_D, nat_ord_indices.size(), nat_ord_indices.size());
+//	return spD;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::get_D(FPP* diag_data, const bool ord /* default to false */)
-{
-	get_D(diag_data, ord?1:0);
-}
+//template<typename FPP, Device DEVICE, typename FPP2>
+//void GivensFGFTComplex<FPP,DEVICE,FPP2>::get_D(DType* /*FPP**/ diag_data, const bool ord /* default to false */)
+//{
+//	get_D(diag_data, ord?1:0);
+//}
+//
+//template<typename FPP, Device DEVICE, typename FPP2>
+//void GivensFGFTComplex<FPP,DEVICE,FPP2>::get_D(DType* /*FPP**/ diag_data, const int ord /* default to false */)
+//{
+//	const Faust::Vect<FPP,DEVICE>& D_ = get_D(ord);
+//	const DType* /*FPP**/ src_data_ptr = D_.getData();
+//	memcpy(diag_data, src_data_ptr, sizeof(FPP)*D_.size());
+//}
 
-template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::get_D(FPP* diag_data, const int ord /* default to false */)
-{
-	const Faust::Vect<FPP,DEVICE>& D_ = get_D(ord);
-	const FPP* src_data_ptr = D_.getData();
-	memcpy(diag_data, src_data_ptr, sizeof(FPP)*D_.size());
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-const Faust::MatDense<FPP,DEVICE> GivensFGFTComplex<FPP,DEVICE,FPP2>::compute_fourier(const bool ord /* default to false */)
-{
-	Faust::MatDense<FPP,Cpu> fourier(Lap.getNbRow(), Lap.getNbCol());
-	Faust::MatDense<FPP,Cpu>* ord_fourier;
-	fourier.setEyes();
-	for(int i=facts.size()-1;i>=0;i--)
-		facts[i].multiply(fourier, 'N');
-	if(ord)
-	{
-		if(!is_D_ordered)
-			order_D();
-		ord_fourier = fourier.get_cols(ord_indices);
-		fourier = *ord_fourier;
-		delete ord_fourier;
-	}
-	return fourier;
-}
-
-
-template<typename FPP, Device DEVICE, typename FPP2>
-const Faust::MatGeneric<FPP,DEVICE>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_L() const
-{
-	return *L;
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-const vector<pair<int,int>>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_coord_choices() const
-{
-	return coord_choices;
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::get_coord_choice(int j, int& p, int& q) const
-{
-	if(j > 0 && j < coord_choices.size())
-	{
-		p = coord_choices[j].first;
-		q = coord_choices[j].second;
-	}
-	else
-		throw out_of_range("GivensFGFTComplex::get_coord_choice(j,p,q): j is out of range.");
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-const Faust::MatDense<FPP,DEVICE>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_Lap() const
-{
-	return Lap;
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-const vector<Faust::MatSparse<FPP,DEVICE>>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_facts() const
-{
-	return facts;
-}
-
-template<typename FPP, Device DEVICE, typename FPP2>
-Faust::Transform<FPP,DEVICE> GivensFGFTComplex<FPP,DEVICE,FPP2>::get_transform(bool ord)
-{
-	return get_transform(ord?1:0);
-}
+//template<typename FPP, Device DEVICE, typename FPP2>
+//const Faust::MatDense<FPP,DEVICE> GivensFGFTComplex<FPP,DEVICE,FPP2>::compute_fourier(const bool ord /* default to false */)
+//{
+//	Faust::MatDense<FPP,Cpu> fourier(L->getNbRow(), L->getNbCol());
+//	Faust::MatDense<FPP,Cpu>* ord_fourier;
+//	fourier.setEyes();
+//	for(int i=facts.size()-1;i>=0;i--)
+//		facts[i].multiply(fourier, 'N');
+//	if(ord)
+//	{
+//		if(!this->is_D_ordered)
+//			this->order_D();
+//		ord_fourier = fourier.get_cols(this->ord_indices);
+//		fourier = *ord_fourier;
+//		delete ord_fourier;
+//	}
+//	return fourier;
+//}
 
 
-template<typename FPP, Device DEVICE, typename FPP2>
-Faust::Transform<FPP,DEVICE> GivensFGFTComplex<FPP,DEVICE,FPP2>::get_transform(int ord)
-{
-		//TODO: an optimization is possible by changing type of facts to vector<MatGeneric*> it would avoid copying facts into Transform and rather use them directly. It will need a destructor that deletes them eventually if they weren't transfered to a Transform object before.
-	MatSparse<FPP,DEVICE> & last_fact = *(facts.end()-1);
-	MatSparse<FPP,DEVICE> P(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact permutation matrix
-	// (to reorder eigenvector transform according to ordered D)
+//template<typename FPP, Device DEVICE, typename FPP2>
+//const Faust::MatGeneric<FPP,DEVICE>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_L() const
+//{
+//	return *L;
+//}
 
-	if(last_fact_permuted)
-	{
-		// non-ordered eigenvector transform (ord == 0) or opposite order asked (ord != D_order_dir)
-		// get back to undefined order
-		for(int i=0;i<inv_ord_indices.size();i++)
-			P.setCoeff(inv_ord_indices[i],i, FPP(1.0));
-		last_fact.multiplyRight(P);
-		last_fact_permuted = false;
-	}
+//template<typename FPP, Device DEVICE, typename FPP2>
+//const vector<pair<int,int>>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_coord_choices() const
+//{
+//	return coord_choices;
+//}
 
-	if(ord)
-	{
-		if(!is_D_ordered || ord != D_order_dir)
-			order_D(ord);
-		for(int i=0;i<ord_indices.size();i++)
-			P.setCoeff(ord_indices[i],i, FPP(1.0));
-		//		P.set_orthogonal(true);
-		//		facts.push_back(P); // we prefer to directly multiply the last factor by P
-		last_fact_permuted = true;
-		last_fact.multiplyRight(P);
-	}
-	Faust::Transform<FPP,DEVICE> t = Faust::Transform<FPP,DEVICE>(facts);
-	//	// remove the permutation factor if added temporarily for reordering
-	//	return ord?facts.erase(facts.end()-1),t:t;
-	return t;
-}
+//template<typename FPP, Device DEVICE, typename FPP2>
+//void GivensFGFTComplex<FPP,DEVICE,FPP2>::get_coord_choice(int j, int& p, int& q) const
+//{
+//	if(j > 0 && j < coord_choices.size())
+//	{
+//		p = coord_choices[j].first;
+//		q = coord_choices[j].second;
+//	}
+//	else
+//		throw out_of_range("GivensFGFTComplex::get_coord_choice(j,p,q): j is out of range.");
+//}
+
+//template<typename FPP, Device DEVICE, typename FPP2>
+//const Faust::MatDense<FPP,DEVICE>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_Lap() const
+//{
+//	return Lap;
+//}
+
+//template<typename FPP, Device DEVICE, typename FPP2>
+//const vector<Faust::MatSparse<FPP,DEVICE>>& GivensFGFTComplex<FPP,DEVICE,FPP2>::get_facts() const
+//{
+//	return this->facts;
+//}
+
+//template<typename FPP, Device DEVICE, typename FPP2>
+//Faust::Transform<FPP,DEVICE> GivensFGFTComplex<FPP,DEVICE,FPP2>::get_transform(bool ord)
+//{
+//	return get_transform(ord?1:0);
+//}
+//
+//
+//template<typename FPP, Device DEVICE, typename FPP2>
+//Faust::Transform<FPP,DEVICE> GivensFGFTComplex<FPP,DEVICE,FPP2>::get_transform(int ord)
+//{
+//		//TODO: an optimization is possible by changing type of facts to vector<MatGeneric*> it would avoid copying facts into Transform and rather use them directly. It will need a destructor that deletes them eventually if they weren't transfered to a Transform object before.
+//	MatSparse<FPP,DEVICE> & last_fact = *(this->facts.end()-1);
+//	MatSparse<FPP,DEVICE> P(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact permutation matrix
+//	// (to reorder eigenvector transform according to ordered D)
+//
+//	if(last_fact_permuted)
+//	{
+//		// non-ordered eigenvector transform (ord == 0) or opposite order asked (ord != D_order_dir)
+//		// get back to undefined order
+//		for(int i=0;i<this->inv_ord_indices.size();i++)
+//			P.setCoeff(this->inv_ord_indices[i],i, FPP(1.0));
+//		last_fact.multiplyRight(P);
+//		last_fact_permuted = false;
+//	}
+//
+//	if(ord)
+//	{
+//		if(!this->is_D_ordered || ord != this->D_order_dir)
+//			this->order_D(ord);
+//		for(int i=0;i<this->ord_indices.size();i++)
+//			P.setCoeff(this->ord_indices[i],i, FPP(1.0));
+//		//		P.set_orthogonal(true);
+//		//		facts.push_back(P); // we prefer to directly multiply the last factor by P
+//		last_fact_permuted = true;
+//		last_fact.multiplyRight(P);
+//	}
+//	Faust::Transform<FPP,DEVICE> t = Faust::Transform<FPP,DEVICE>(this->facts);
+//	//	// remove the permutation factor if added temporarily for reordering
+//	//	return ord?facts.erase(facts.end()-1),t:t;
+//	return t;
+//}

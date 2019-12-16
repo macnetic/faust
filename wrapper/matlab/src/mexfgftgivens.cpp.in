@@ -187,9 +187,9 @@ void fgft_givens_cplx(const mxArray* matlab_matrix, int J, int t, double tol, un
 
 		algo->compute_facts();
 
-		Faust::Vect<complex<SCALAR>,Cpu> D(Lap->getNbRow());
+		Faust::Vect<SCALAR,Cpu> D(Lap->getNbRow());
 		// true below is for ascendant order of eigenvalues
-		algo->get_D(const_cast<complex<SCALAR>*>(D.getData()), order); // don't respect constness for optimization (saving a vector copy)
+		algo->get_D(const_cast<SCALAR*>(D.getData()), order); // don't respect constness for optimization (saving a vector copy)
 
 		plhs[1] = FaustVec2mxArray(D);
 

@@ -63,7 +63,7 @@ FaustCoreCpp<FPP>* fact_givens_fgft_generic(GivensFGFT<FPP, Cpu, FPP2>* algo, FP
 
 template<typename FPP, typename FPP2>
 FaustCoreCpp<FPP>* fact_givens_fgft_sparse_cplx(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols,
-        unsigned int J, unsigned int t /* end of input parameters*/, FPP* D, unsigned int verbosity, const double stoppingError, const bool errIsRel, const int order)
+        unsigned int J, unsigned int t /* end of input parameters*/, FPP2* D, unsigned int verbosity, const double stoppingError, const bool errIsRel, const int order)
 {
       Faust::MatSparse<FPP, Cpu> mat_Lap(nnz, nrows, ncols, data, id_col, row_ptr);
       GivensFGFTComplex<FPP, Cpu, FPP2>* algo;
@@ -79,7 +79,7 @@ FaustCoreCpp<FPP>* fact_givens_fgft_sparse_cplx(FPP* data, int* row_ptr, int* id
 }
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* fact_givens_fgft_cplx(const FPP* Lap, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t /* end of input parameters*/, FPP* D, unsigned int verbosity, const double stoppingError, const bool errIsRel, const int order)
+FaustCoreCpp<FPP>* fact_givens_fgft_cplx(const FPP* Lap, unsigned int num_rows, unsigned int num_cols, unsigned int J, unsigned int t /* end of input parameters*/, FPP2* D, unsigned int verbosity, const double stoppingError, const bool errIsRel, const int order)
 {
     //TODO: optimization possible here by avoiding Lap copy in MatDense (by
     //just using the data in Lap as underlying pointer of MatDense)
@@ -98,7 +98,7 @@ FaustCoreCpp<FPP>* fact_givens_fgft_cplx(const FPP* Lap, unsigned int num_rows, 
 }
 
 template<typename FPP, typename FPP2>
-FaustCoreCpp<FPP>* fact_givens_fgft_generic_cplx(GivensFGFTComplex<FPP, Cpu, FPP2>* algo, FPP* D, const int order)
+FaustCoreCpp<FPP>* fact_givens_fgft_generic_cplx(GivensFGFTComplex<FPP, Cpu, FPP2>* algo, FPP2* D, const int order)
 {
 
 
