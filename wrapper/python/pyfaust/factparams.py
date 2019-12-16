@@ -115,7 +115,6 @@ class ConstraintGeneric(ABC):
            raise TypeError("M must be a numpy array.")
         if(M.shape[0] != self._num_rows or M.shape[1] != self._num_cols):
             raise ValueError("The dimensions must agree.")
-        M = np.asfortranarray(M)
 
 class ConstraintInt(ConstraintGeneric):
     """
@@ -279,7 +278,8 @@ class ConstraintMat(ConstraintGeneric):
             0.99999999999999989
 
         """
-        super(ConstraintMat, self).__init__(name, *cons_value.shape,
+        super(ConstraintMat, self).__init__(name, cons_value.shape[0],
+                                            cons_value.shape[1],
                                             cons_value, normalized, pos)
         if(not isinstance(cons_value, np.matrix) and not isinstance(cons_value,
                                                                np.ndarray)):

@@ -817,10 +817,12 @@ cdef class ConstraintIntCore:
         isReal = M.dtype in [ 'float', 'float128',
                              'float16', 'float32',
                              'float64', 'double']
-        order = 'C'
-        if(np.isfortran(M)):
-            order = 'FORTRAN'
-        M_out = np.empty(M.shape, dtype=M.dtype, order=order)
+        #order = 'C'
+        #if(np.isfortran(M)):
+        #    order = 'FORTRAN'
+        M = np.asfortranarray(M)
+
+        M_out = np.empty(M.shape, dtype=M.dtype, order='F')
 
 
         check_matrix(isReal, M)

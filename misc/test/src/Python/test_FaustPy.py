@@ -1169,9 +1169,27 @@ class TestFaustFactory(unittest.TestCase):
         p = splin((m,n),k)
         Mp = p(M)
         for i in range(0,m):
+            # np.savez('M.npz', M, Mp, k)
             self.assertLessEqual(count_nonzero(Mp[i,:]), k)
         self.assertAlmostEqual(norm(Mp), 1)
 
+    def test_spcol(self):
+        from pyfaust.factparams import spcol
+        from random import randint
+        from numpy.random import rand
+        from numpy import count_nonzero
+        from numpy.linalg import norm
+        min_n, min_m = 5, 5
+        m = randint(min_m, 128)
+        n = randint(min_n, 128)
+        M = rand(m,n)
+        k = randint(1,m)
+        p = spcol((m,n),k)
+        Mp = p(M)
+        for i in range(0,n):
+            # np.savez('M.npz', M, Mp, k)
+            self.assertLessEqual(count_nonzero(Mp[:,i]), k)
+        self.assertAlmostEqual(norm(Mp), 1)
 
 if __name__ == "__main__":
     if(len(sys.argv)> 1):
