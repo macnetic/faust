@@ -253,9 +253,6 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
 
     See also:
         svdtj
-
-    See also:
-        fgft_givens, fgft_palm
     """
     D, core_obj = _FaustCorePy.FaustFact.eigtj(M, nGivens, tol, relerr,
             nGivens_per_fac, verbosity, order)

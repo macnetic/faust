@@ -63,9 +63,6 @@
 %> over Networks 2018, 4(2), pp 407-420 <https://hal.inria.fr/hal-01416110>
 %>
 %> <p> @b See @b also fact.svdtj
-% experimental block start
-%> <p> @b See @b also fact.fgft_givens, fact.fgft_palm
-% experimental block stop
 %>
 %==========================================================================================
 function [V,D] = eigtj(M, varargin)
