@@ -858,10 +858,9 @@ cdef class ConstraintMatCore:
                              'float16', 'float32',
                              'float64', 'double']
 
-        order = 'C'
-        if(np.isfortran(M)):
-            order = 'FORTRAN'
-        M_out = np.empty(M.shape, dtype=M.dtype, order=order)
+        M = np.asfortranarray(M)
+
+        M_out = np.empty(M.shape, dtype=M.dtype, order='F')
 
 
         check_matrix(isReal, M)
@@ -902,12 +901,11 @@ cdef class ConstraintRealCore:
                              'float16', 'float32',
                              'float64', 'double']
 
-
-
-        order = 'C'
-        if(np.isfortran(M)):
-            order = 'FORTRAN'
-        M_out = np.empty(M.shape, dtype=M.dtype, order=order)
+#        order = 'C'
+#        if(np.isfortran(M)):
+#            order = 'FORTRAN'
+        M = np.asfortranarray(M)
+        M_out = np.empty(M.shape, dtype=M.dtype, order='F')
 
         check_matrix(isReal, M)
         if(isReal):

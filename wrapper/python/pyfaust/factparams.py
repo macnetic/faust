@@ -285,7 +285,8 @@ class ConstraintMat(ConstraintGeneric):
                                                                np.ndarray)):
             raise TypeError('ConstraintMat must receive a numpy matrix as cons_value '
                             'argument.')
-        self.cons_value = self._cons_value
+        self.cons_value = np.asfortranarray(self._cons_value)
+        self._cons_value = self.cons_value
         if(normalized == None):
             if(self.name.name == ContraintName.CONST):
                 # for const proj the default is to not normalize
@@ -335,7 +336,7 @@ class ConstraintReal(ConstraintGeneric):
             >>> from numpy.linalg import norm
             >>> cons = ConstraintReal('normcol', 10, 10, 2.) # a short for ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 10, 10, 2.)
             >>> M = rand(10,10)*10
-            >>> norm(M[:,2],2)
+            >>> norm(M[:,2])
             17.041462424512272
             >>> norm(cons.project(M)[:,2])
             2.0

@@ -1191,6 +1191,113 @@ class TestFaustFactory(unittest.TestCase):
             self.assertLessEqual(count_nonzero(Mp[:,i]), k)
         self.assertAlmostEqual(norm(Mp), 1)
 
+    def test_splincol(self):
+        from pyfaust.factparams import splincol
+        from random import randint
+        from numpy.random import rand
+        from numpy import count_nonzero
+        from numpy.linalg import norm
+        min_n, min_m = 5, 5
+        m = randint(min_m, 128)
+        n = randint(min_n, 128)
+        M = rand(m,n)
+        k = randint(1,m)
+        p = splincol((m,n),k)
+        Mp = p(M)
+        # TODO: define sparsity assertions to verify on Mp
+        self.assertAlmostEqual(norm(Mp), 1)
+
+    def test_sp(self):
+        from pyfaust.factparams import sp
+        from random import randint
+        from numpy.random import rand
+        from numpy import count_nonzero
+        from numpy.linalg import norm
+        min_n, min_m = 5, 5
+        m = randint(min_m, 128)
+        n = randint(min_n, 128)
+        M = rand(m,n)
+        k = randint(1,m*n)
+        p = sp((m,n),k)
+        Mp = p(M)
+        for i in range(0,n):
+            # np.savez('M.npz', M, Mp, k)
+            self.assertLessEqual(count_nonzero(Mp[:,i]), k)
+        self.assertAlmostEqual(norm(Mp), 1)
+
+    def test_supp(self):
+        from pyfaust.factparams import supp
+        from numpy.random import rand
+        from numpy.random import randn, permutation as randperm
+        from numpy.linalg import norm
+        from random import randint
+        min_n, min_m = 5, 5
+        m = randint(min_m, 128)
+        n = randint(min_n, 128)
+        M = rand(m,n)
+        k = randint(1, min(m,n))
+        nnz_rinds = randperm(m)[:k]
+        nnz_cinds = randperm(n)[:k]
+        S = np.zeros((m,n))
+        S[nnz_rinds, nnz_cinds] = 1
+        p = supp(S)
+        pM = p(M)
+        # same nnz number
+        self.assertEqual(np.count_nonzero(pM), np.count_nonzero(S))
+        # same support
+        self.assertTrue(np.allclose(pM != 0, S != 0))
+        # pM normalized (according to fro-norm)
+        self.assertAlmostEqual(norm(pM), 1)
+        # same projection without normalization
+        p = supp(S, normalized=False)
+        pM = p(M)
+        self.assertTrue(np.allclose(pM[pM != 0], M[S != 0]))
+
+    def test_const(self):
+        from pyfaust.factparams import const
+        from numpy.random import rand
+        from random import randint
+        min_n, min_m = 5, 5
+        m = randint(min_m, 128)
+        n = randint(min_n, 128)
+        M = rand(m,n)
+        C = rand(m,n)
+        p = const(C, normalized=False)
+        pM = p(M)
+        self.assertTrue(np.allclose(C, pM))
+
+    def test_normcol(self):
+        from pyfaust.factparams import normcol
+        from numpy.random import rand
+        from numpy.random import randn, permutation as randperm
+        from numpy.linalg import norm
+        from random import randint, random
+        min_n, min_m = 5, 5
+        m = randint(min_m, 128)
+        n = randint(min_n, 128)
+        M = rand(m,n)*random()*50
+        k = random()*50
+        p = normcol(M.shape,k, normalized=False)
+        pM = p(M)
+        for i in range(pM.shape[1]):
+            self.assertAlmostEqual(norm(pM[:,i]), k)
+
+    def test_normlin(self):
+        from pyfaust.factparams import normlin
+        from numpy.random import rand
+        from numpy.random import randn, permutation as randperm
+        from numpy.linalg import norm
+        from random import randint, random
+        min_n, min_m = 5, 5
+        m = randint(min_m, 128)
+        n = randint(min_n, 128)
+        M = rand(m,n)*random()*50
+        k = random()*50
+        p = normlin(M.shape,k, normalized=False)
+        pM = p(M)
+        for i in range(pM.shape[0]):
+            self.assertAlmostEqual(norm(pM[i,:]), k)
+
 if __name__ == "__main__":
     if(len(sys.argv)> 1):
         # argv[1] is for adding a directory in PYTHONPATH
