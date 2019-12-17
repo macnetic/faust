@@ -30,9 +30,9 @@ namespace Faust {
 			 *
 			 */
 			/** \brief Temporary storage matrix for maximization of L. */
-//			Faust::MatDense<FPP,DEVICE> C;
+//			Faust::MatDense<FPP4,DEVICE> C;
 			/** \brief Column vector for the rowwise minimization of C (i.e. maximization of L). */
-//			Faust::Vect<FPP,DEVICE> C_min_row;
+//			Faust::Vect<FPP4,DEVICE> C_min_row;
 			protected:
 				/** \brief Fourier matrix/eigenvectors factorization matrices (Givens matrix). */
 				vector<Faust::MatSparse<FPP4,DEVICE>> facts;
