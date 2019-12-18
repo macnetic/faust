@@ -242,13 +242,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
    //init_lambda
-   SCALAR init_lambda = 1.0;
+   FPP2 init_lambda = 1.0;
    if (presentFields[6])
    {
 	   mxCurrentField = mxGetField(prhs[0],0,"init_lambda");
-	   SCALAR* tmp_ptr = &init_lambda;
+	   FPP2* tmp_ptr = &init_lambda;
 	   // it works whatever mxCurrentField class is (complex or not)
-	   mxArray2Ptr<SCALAR>(const_cast<const mxArray*>(mxCurrentField),tmp_ptr);
+	   mxArray2Ptr<FPP2>(const_cast<const mxArray*>(mxCurrentField),tmp_ptr);
 //       init_lambda = (SCALAR) mxGetScalar(mxCurrentField);
    }
 
@@ -279,10 +279,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
      //extraction des resultats
-     SCALAR lambda = palm.get_lambda();
+     FPP2 lambda = palm.get_lambda();
 
 //	 if(typeid(SCALAR) == typeid(complex<FPP2>)) {
-		 Faust::MatDense<SCALAR,Cpu> mat1x1Lambda = Faust::MatDense<SCALAR, Cpu>(&lambda, 1, 1);
+		 Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
 		 plhs[0] = FaustMat2mxArray(mat1x1Lambda);
 //	 }
 //	 else
@@ -299,7 +299,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	 }
 
 
-	 TransformHelper<SCALAR, Cpu> *F = new TransformHelper<SCALAR, Cpu>(sp_facts, lambda, false);
+	 TransformHelper<SCALAR, Cpu> *F = new TransformHelper<SCALAR, Cpu>(sp_facts, SCALAR(lambda), false);
 	 plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);
 
 	 for(typename std::vector<Faust::MatGeneric<SCALAR,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)

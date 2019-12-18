@@ -90,7 +90,7 @@ namespace Faust
 
           void set_constraint(const std::vector<const Faust::ConstraintGeneric*> const_vec_){const_vec=const_vec_;isConstraintSet=true;}
           void set_data(const Faust::MatDense<FPP,DEVICE>& data_){data=data_;}
-          void set_lambda(const FPP lambda_){m_lambda = lambda_;}
+          void set_lambda(const FPP2 lambda_){m_lambda = lambda_;}
 
           /*!
          *  \brief
@@ -108,7 +108,7 @@ namespace Faust
          *  \brief
          * return the multiplicative scalar lambda
          */
-          FPP get_lambda()const{return m_lambda;}
+          FPP2 get_lambda()const{return m_lambda;}
 
           FPP get_RMSE()const{return Faust::fabs(error.norm())/sqrt((double)(data.getNbRow()*data.getNbCol()));}
           const Faust::MatDense<FPP,DEVICE>& get_res(bool isFactSideLeft_, int ind_)const{return isFactSideLeft_ ? S[0] : S[ind_+1];}
@@ -145,7 +145,7 @@ namespace Faust
           virtual void compute_lambda();
 		  void compute_lambda(Faust::MatDense<FPP,DEVICE>& LorR);
           static const char * m_className;
-          static const FPP lipschitz_multiplicator;
+          static const FPP2 lipschitz_multiplicator;
 
        public:
           Faust::StoppingCriterion<FPP2> stop_crit;
@@ -155,7 +155,7 @@ namespace Faust
           // modif AL AL
           Faust::MatDense<FPP,DEVICE> data;
 
-          FPP m_lambda;
+          FPP2 m_lambda;
           int m_nbFact; // number of factors
           std::vector<Faust::MatDense<FPP,DEVICE> > S; // contains S_0^i, S_1^i, ...
 
@@ -186,7 +186,7 @@ namespace Faust
           const bool isGlobal;
           bool isInit; // only used for global factorization (if isGlobal)
           Faust::MatDense<FPP,DEVICE> grad_over_c;
-          FPP c;
+          FPP2 c;
           Faust::MatDense<FPP,DEVICE> error; // error = lambda*L*S*R - data
           Faust::BlasHandle<DEVICE> blas_handle;
 		  /** is_complex == true if the algorithm is running on a complex matrix (to approximate) */

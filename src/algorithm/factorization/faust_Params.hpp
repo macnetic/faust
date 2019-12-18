@@ -65,9 +65,9 @@ template<typename FPP,Device DEVICE,typename FPP2> const int Faust::Params<FPP,D
 template<typename FPP,Device DEVICE,typename FPP2> const int Faust::Params<FPP,DEVICE,FPP2>::defaultNiter2 = 500;
 template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultFactSideLeft = false;
 template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultUpdateWayR2L = false;
-template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultLambda = 1.0;
+template<typename FPP,Device DEVICE,typename FPP2> const FPP2 Faust::Params<FPP,DEVICE,FPP2>::defaultLambda = 1.0;
 template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultConstantStepSize = false;
-template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultStepSize = 1e-16;
+template<typename FPP,Device DEVICE,typename FPP2> const FPP2 Faust::Params<FPP,DEVICE,FPP2>::defaultStepSize = 1e-16;
 
 template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultDecreaseSpeed = 1.25;
 template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultResiduumPercent = 1.4;
@@ -122,9 +122,9 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
 	const bool isVerbose_ , /* = false */
     const bool isUpdateWayR2L_  , /* = false */
     const bool isFactSideLeft_ , /* = false */
-    const FPP init_lambda_  /* = 1.0 */,
+    const FPP2 init_lambda_  /* = 1.0 */,
 	const bool constant_step_size_,
-	const FPP step_size_):
+	const FPP2 step_size_):
         m_nbRow(nbRow_),
 	m_nbCol(nbCol_),
         m_nbFact(nbFact_),
@@ -232,9 +232,9 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
          const bool isVerbose_ /* = false */,
          const bool isUpdateWayR2L_ /* = false */,
          const bool isFactSideLeft_ /* = false */,
-         const FPP init_lambda_ /* = 1.0 */,
+         const FPP2 init_lambda_ /* = 1.0 */,
 		 const bool constant_step_size_ ,
-		 const FPP step_size_ ) :
+		 const FPP2 step_size_ ) :
             m_nbRow(nbRow_),
 	    m_nbCol(nbCol_),
             m_nbFact(nbFact_),

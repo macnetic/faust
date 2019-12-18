@@ -771,11 +771,11 @@ matvar_t* Faust::MatSparse<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate)
 }
 
 template<typename FPP>
-FPP Faust::MatSparse<FPP, Cpu>::normL1(faust_unsigned_int& col_id, const bool transpose /*default false*/) const
+Real<FPP> Faust::MatSparse<FPP, Cpu>::normL1(faust_unsigned_int& col_id, const bool transpose /*default false*/) const
 {
 	//TODO: refactor this function with MatDense::normL1()
 	faust_unsigned_int i, j, max_j;
-	FPP sum, max_sum;
+	Real<FPP> sum, max_sum;
 	Eigen::Matrix<FPP, Eigen::Dynamic,Eigen::Dynamic> vec;
 	int dim1, dim2;
 	if(transpose){
@@ -805,7 +805,7 @@ FPP Faust::MatSparse<FPP, Cpu>::normL1(faust_unsigned_int& col_id, const bool tr
 }
 
 template<typename FPP>
-FPP Faust::MatSparse<FPP, Cpu>::normL1(const bool transpose /* default false */) const
+Real<FPP> Faust::MatSparse<FPP, Cpu>::normL1(const bool transpose /* default false */) const
 {
 	faust_unsigned_int id;
 	return normL1(id,transpose);

@@ -7,8 +7,8 @@ template<typename FPP,Device DEVICE,typename FPP2>
 					const Faust::StoppingCriterion<FPP2> & stop_crit_ ,
 					const bool isVerbose_ ,
 					const bool isUpdateWayR2L_ ,
-					const FPP init_lambda_ ,
-					const FPP step_size_) : ParamsPalm<FPP, DEVICE, FPP2>(data_, nbFact_, cons_, init_fact_, stop_crit_, isVerbose_, isUpdateWayR2L_, init_lambda_, true /*constant_step_size is always true for Palm4MSAFGFT */, step_size_),  init_D(data_.getNbRow(), data_.getNbCol())
+					const FPP2 init_lambda_ ,
+					const FPP2 step_size_) : ParamsPalm<FPP, DEVICE, FPP2>(data_, nbFact_, cons_, init_fact_, stop_crit_, isVerbose_, isUpdateWayR2L_, init_lambda_, true /*constant_step_size is always true for Palm4MSAFGFT */, step_size_),  init_D(data_.getNbRow(), data_.getNbCol())
 {
 	init_D.setZeros();
 	// set init_D from diagonal vector init_D_diag

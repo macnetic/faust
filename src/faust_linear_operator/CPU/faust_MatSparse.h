@@ -184,7 +184,7 @@ namespace Faust
 			void setEyes(){mat.setIdentity();update_dim();}
 			void transpose();
 			void conjugate();
-			FPP norm() const {return mat.norm();}
+			typename Eigen::NumTraits<FPP>::Real norm() const {return mat.norm();}
 			void operator= (const MatSparse<FPP,Cpu>& M);
 			void operator= (const Faust::MatDense<FPP,Cpu>& Mdense);
 			void init (const Faust::MatDense<FPP,Cpu>& Mdense,Faust::SpBlasHandle<Cpu> spblas_handle)
@@ -256,7 +256,7 @@ namespace Faust
 			//! \brief Display the support of Faust::MatSparse (i.e where are the non zero entries)
 			void display_support() const;
 
-			FPP norm(){return mat.norm();}
+			Real<FPP> norm(){return mat.norm();}
 
 			//! \brief Write Faust::MatSparse into text file
 			//! \param filename : name of the file
@@ -304,8 +304,8 @@ namespace Faust
 			// \see Faust::Transform::save_mat_file()
 			// \see toMatIOVar()
 			matvar_t* toMatIOVarDense(bool transpose, bool conjugate) const;
-			FPP normL1(const bool transpose=false) const;
-			FPP normL1(faust_unsigned_int&, const bool transpose=false) const;
+			Real<FPP> normL1(const bool transpose=false) const;
+			Real<FPP> normL1(faust_unsigned_int&, const bool transpose=false) const;
 			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{return const_cast<Eigen::SparseMatrix<FPP,Eigen::RowMajor>*>(&mat)->coeffRef(i,j);}
 
 			Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;

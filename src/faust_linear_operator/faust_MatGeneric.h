@@ -46,6 +46,7 @@
 #include "faust_Vect.h"
 #include "faust_MatDense.h"
 #include "matio.h"
+#include "Eigen/Core"
 /**
  * \class MatGeneric faust_MatGeneric.h
  * \brief This MatGeneric class serves as a base class for the derived class Faust::MatDense and Faust::MatSparse .
@@ -68,6 +69,7 @@ namespace Faust
 	{
 
 		public:
+
 
 			MatGeneric() : dim1(0), dim2(0), is_ortho(false), is_identity(false) {}
 
@@ -175,10 +177,10 @@ namespace Faust
 			// \param transpose: to compute the norm of the transpose matrix.
 			// \see Faust::normL1(faust_unsigned_int&)
 			// \see http://mathworld.wolfram.com/L1-Norm.html
-			virtual FPP normL1(const bool transpose) const=0;
+			virtual Real<FPP> normL1(const bool transpose) const=0;
 
 			//! \brief Frobenius norm.
-			virtual FPP norm() const=0;
+			virtual Real<FPP> norm() const=0;
 
 			//! \brief Computes the L1-norm of the matrix.
 			// \param col_id: reference to receive the column index which the L1-norm is equal to the matrix's norm (if several exist, then the greater colummn index is kept).
@@ -186,7 +188,7 @@ namespace Faust
 			// \return The norm (its type is the matrix scalar's).
 			// \see Faust::normL1()
 			// \see http://mathworld.wolfram.com/L1-Norm.html
-			virtual FPP normL1(faust_unsigned_int& col_id, const bool transpose) const=0;
+			virtual Real<FPP> normL1(faust_unsigned_int& col_id, const bool transpose) const=0;
 			//
 			//! \brief Returns a column of the matrix as a new Faust::Vect.
 			virtual Faust::Vect<FPP,DEVICE> get_col(faust_unsigned_int id) const=0;

@@ -77,7 +77,7 @@ template<typename FPP,Device DEVICE,typename FPP2>
 const char * Faust::Palm4MSA<FPP,DEVICE,FPP2>::m_className="Faust::Palm4MSA";
 
 template<typename FPP,Device DEVICE,typename FPP2>
-const FPP Faust::Palm4MSA<FPP,DEVICE,FPP2>::lipschitz_multiplicator=1.001;
+const FPP2 Faust::Palm4MSA<FPP,DEVICE,FPP2>::lipschitz_multiplicator=1.001;
 
 
 template<typename FPP,Device DEVICE,typename FPP2>
@@ -98,7 +98,7 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,
     isConstraintSet(false),
     isGlobal(isGlobal_),
     isInit(false),
-    c(FPP(1)/params_.step_size),
+    c(FPP2(1)/params_.step_size),
     blas_handle(blasHandle),
 	is_complex(typeid(data.getData()[0]) == typeid(complex<float>) || typeid(data.getData()[0]) == typeid(complex<double>)
 ),
@@ -138,7 +138,7 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FP
    isLastFact(false),
    isConstraintSet(false),
    isGlobal(isGlobal_),
-   c(FPP(1)/params_palm_.step_size),
+   c(FPP2(1)/params_palm_.step_size),
    blas_handle(blasHandle),
 	is_complex(typeid(data.getData()[0]) == typeid(complex<float>) || typeid(data.getData()[0]) == typeid(complex<double>)
 ),
@@ -265,7 +265,7 @@ sprintf(nomFichier,"error_0_%d_host.tmp",cmpt);
 error.print_file(nomFichier);
 cout << "appel " << cmpt<<" : lambda0 = "<< m_lambda<<endl;*/
          // error = m_lambda*tmp1*R - error (= m_lambda*L*S*R - data )
-         gemm(tmp1, RorL[m_indFact], error, m_lambda, (FPP)-1.0, 'N', 'N', blas_handle);
+         gemm(tmp1, RorL[m_indFact], error, FPP(m_lambda), (FPP)-1.0, 'N', 'N', blas_handle);
 /*sprintf(nomFichier,"LorR_1_%d_device.tmp",cmpt);
 LorR.print_file(nomFichier);
 sprintf(nomFichier,"S%d_1_%d_host.tmp",m_indFact,cmpt);
@@ -281,7 +281,7 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
          // tmp1 = L*S
          multiply(RorL[m_indFact], S[m_indFact], tmp1, blas_handle);
          // error = m_lambda*tmp1*R - error (= m_lambda*L*S*R - data )
-         gemm(tmp1, LorR, error, m_lambda,(FPP) -1.0, 'N', 'N', blas_handle);
+         gemm(tmp1, LorR, error, FPP(m_lambda),(FPP) -1.0, 'N', 'N', blas_handle);
       }
    }
    else // computing S*R first, then L*(S*R)
@@ -303,7 +303,7 @@ error.print_file(nomFichier);
 cout << "appel " << cmpt<<" : lambda0 = "<< m_lambda<<endl;*/
 
          // error = m_lambda*L*tmp1 - error (= m_lambda*L*S*R - data )
-         gemm(LorR, tmp1, error, m_lambda,(FPP) -1.0, 'N', 'N', blas_handle);
+         gemm(LorR, tmp1, error, FPP(m_lambda),(FPP) -1.0, 'N', 'N', blas_handle);
 /*sprintf(nomFichier,"LorR_1_%d_device.tmp",cmpt);
 LorR.print_file(nomFichier);
 sprintf(nomFichier,"S%d_1_%d_device.tmp",m_indFact,cmpt);
@@ -320,7 +320,7 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
          // tmp1 = S*R
          multiply(S[m_indFact], LorR, tmp1, blas_handle);
          // error = m_lambda*L*tmp1 - error (= m_lambda*L*S*R - data )
-         gemm(RorL[m_indFact], tmp1, error, m_lambda,(FPP) -1.0, 'N', 'N', blas_handle);
+         gemm(RorL[m_indFact], tmp1, error, FPP(m_lambda),(FPP) -1.0, 'N', 'N', blas_handle);
       }
    }
 
@@ -333,14 +333,14 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       if (!isUpdateWayR2L)
       {
          // tmp3 = m_lambda*L'*error (= m_lambda*L' * (m_lambda*L*S*R - data) )
-         gemm(LorR, error, tmp3, m_lambda,(FPP) 0.0, TorH, 'N', blas_handle);
+         gemm(LorR, error, tmp3, FPP(m_lambda),(FPP) 0.0, TorH, 'N', blas_handle);
          // grad_over_c = 1/c*tmp3*R' (= 1/c*m_lambda*L' * (m_lambda*L*S*R - data) * R' )
          gemm(tmp3, RorL[m_indFact], grad_over_c,(FPP) 1.0/c,(FPP) 0.0,'N',TorH, blas_handle);
       }
       else
       {
          // tmp3 = m_lambda*L'*error (= m_lambda*L' * (m_lambda*L*S*R - data) )
-         gemm(RorL[m_indFact], error, tmp3, m_lambda, (FPP) 0.0, TorH, 'N', blas_handle);
+         gemm(RorL[m_indFact], error, tmp3, FPP(m_lambda), (FPP) 0.0, TorH, 'N', blas_handle);
          // grad_over_c = 1/c*tmp3*R' (= 1/c*m_lambda*L' * (m_lambda*L*S*R - data) * R' )
          gemm(tmp3, LorR, grad_over_c, (FPP) 1.0/c, (FPP) (FPP) 0.0,'N',TorH, blas_handle);
       }
@@ -350,14 +350,14 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       if (!isUpdateWayR2L)
       {
          // tmp3 = m_lambda*error*R' (= m_lambda*(m_lambda*L*S*R - data) * R' )
-         gemm(error, RorL[m_indFact], tmp3, m_lambda, (FPP) 0.0, 'N', TorH, blas_handle);
+         gemm(error, RorL[m_indFact], tmp3, FPP(m_lambda), (FPP) 0.0, 'N', TorH, blas_handle);
          // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * m_lambda*(m_lambda*L*S*R - data) * R' )
          gemm(LorR, tmp3, grad_over_c,(FPP) 1.0/c, (FPP) 0.0,TorH,'N', blas_handle);
       }
       else
       {
          // tmp3 = m_lambda*error*R' (= m_lambda * (m_lambda*L*S*R - data) * R' )
-         gemm(error, LorR, tmp3, m_lambda, (FPP) 0.0, 'N', TorH, blas_handle);
+         gemm(error, LorR, tmp3, FPP(m_lambda), (FPP) 0.0, 'N', TorH, blas_handle);
          // grad_over_c = 1/c*L'*tmp3 (= 1/c*L' * m_lambda*(m_lambda*L*S*R - data) * R' )
          gemm(RorL[m_indFact], tmp3, grad_over_c, (FPP) 1.0/c, (FPP) 0.0,TorH,'N', blas_handle);
       }
@@ -403,8 +403,8 @@ t_local_compute_lambda.start();
 
    if (Xhatt_Xhat_tr != FPP(0))
    {
-		m_lambda = Xt_Xhat.trace()/Xhatt_Xhat_tr;
-		if (isnan(std::complex<float>(m_lambda).real()) || isnan(std::complex<float>(m_lambda).imag()))
+		m_lambda = Faust::fabs(Xt_Xhat.trace()/Xhatt_Xhat_tr);
+		if (isnan(m_lambda) || isnan(m_lambda))
 		{
 			handleError(m_className,"compute_lambda : Xhatt_Xhat_tr is too small or Xt_Xhat.trace is too big so lambda is infinite");
 		}
@@ -542,9 +542,9 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_c()
 
 	   int nbr_iter = 10000;
 	   FPP2 threshold = 1e-16;
-	   FPP nL1=LorR.spectralNorm(nbr_iter,threshold,flag1,blas_handle);
-	   FPP nR1=RorL[m_indFact].spectralNorm(nbr_iter,threshold,flag2,blas_handle);
-		c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*m_lambda*m_lambda;
+	   FPP2 nL1=LorR.spectralNorm(nbr_iter,threshold,flag1,blas_handle);
+	   FPP2 nR1=RorL[m_indFact].spectralNorm(nbr_iter,threshold,flag2,blas_handle);
+	   c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*m_lambda*m_lambda;
    }
 
    isCComputed = true;

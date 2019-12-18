@@ -83,7 +83,7 @@ int main()
 	int cons2Name, cons2Row, cons2Col, cons2Parameter;
 	int nfacts, niter;
 	bool updateWay, verbose;
-	FPP initLambda, step_size;
+	FPP2 initLambda, step_size;
 
 	cons1Name = init_int_from_matio(configPalm2Filename, "p_cons1_name");
 	cons1Parameter = init_int_from_matio(configPalm2Filename, "p_cons1_val");
@@ -95,8 +95,8 @@ int main()
 	cons2Row = init_facts2.getNbRow();
 	cons2Col = init_facts2.getNbCol();
 
-	initLambda = (FPP) init_double_from_matio(configPalm2Filename, "p_init_lambda");
-	step_size = (FPP) init_double_from_matio(configPalm2Filename, "p_stepsize");
+	initLambda = (FPP2) init_double_from_matio(configPalm2Filename, "p_init_lambda");
+	step_size = (FPP2) init_double_from_matio(configPalm2Filename, "p_stepsize");
 	nfacts = init_int_from_matio(configPalm2Filename, "p_nfacts");
 	niter = init_int_from_matio(configPalm2Filename, "p_niter");
 
@@ -143,8 +143,8 @@ int main()
 	palm2.compute_facts();
     std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = const_cast< std::vector<Faust::MatDense<FPP,Cpu> >&>(palm2.get_facts());
 
-	FPP lambda = palm2.get_lambda();
-	(full_facts[0]) *= lambda;
+	FPP2 lambda = palm2.get_lambda();
+	(full_facts[0]) *= FPP(lambda);
 
 	err_Uhat1 = ref_Uhat1;
 	err_Uhat1 -= full_facts[0];

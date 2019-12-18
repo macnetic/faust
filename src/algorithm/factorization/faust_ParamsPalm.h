@@ -79,9 +79,9 @@ namespace Faust
              const Faust::StoppingCriterion<FPP2> & stop_crit_ = Faust::StoppingCriterion<FPP2>(defaultNiter),
              const bool isVerbose_ = defaultVerbosity ,
              const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
-             const FPP init_lambda_ = defaultLambda,
+             const FPP2 init_lambda_ = defaultLambda,
              const bool constant_step_size_ = defaultConstantStepSize,
-             const FPP step_size_ = defaultStepSize);
+             const FPP2 step_size_ = defaultStepSize);
 
           void check_constraint_validity();
            ParamsPalm();
@@ -100,17 +100,17 @@ namespace Faust
           bool isVerbose;
           bool isUpdateWayR2L;
           bool isConstantStepSize;
-          FPP step_size;
-          FPP init_lambda;
+          FPP2 step_size;
+          FPP2 init_lambda;
 
           void Display() const;
           void init_factors();
           static const int defaultNiter;
           static const bool defaultVerbosity;
           static const bool defaultUpdateWayR2L;
-          static const FPP defaultLambda;
+          static const FPP2 defaultLambda;
           static const bool defaultConstantStepSize;
-          static const FPP defaultStepSize;
+          static const FPP2 defaultStepSize;
           private :
           static const char *  m_className;
 

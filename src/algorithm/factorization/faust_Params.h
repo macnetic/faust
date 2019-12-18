@@ -84,9 +84,9 @@ namespace Faust
             const bool isVerbose_ = defaultVerbosity ,
             const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
             const bool isFactSideLeft_ = defaultFactSideLeft ,
-            const FPP init_lambda_ = defaultLambda ,
+            const FPP2 init_lambda_ = defaultLambda ,
             const bool constant_step_size_ = defaultConstantStepSize,
-            const FPP step_size_ = defaultStepSize);
+            const FPP2 step_size_ = defaultStepSize);
 
 
         /*!
@@ -132,9 +132,9 @@ namespace Faust
             const bool isVerbose_ = defaultVerbosity ,
             const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
             const bool isFactSideLeft_ = defaultFactSideLeft ,
-            const FPP init_lambda_ = defaultLambda ,
+            const FPP2 init_lambda_ = defaultLambda ,
             const bool constant_step_size_ = defaultConstantStepSize,
-            const FPP step_size_ = defaultStepSize);
+            const FPP2 step_size_ = defaultStepSize);
 
         Params();
         void init_from_file(const char* filename);
@@ -164,9 +164,9 @@ namespace Faust
         bool isVerbose;
         bool isUpdateWayR2L;
         bool isFactSideLeft;
-        FPP init_lambda;
+        FPP2 init_lambda;
         bool isConstantStepSize;
-        FPP step_size;
+        FPP2 step_size;
 
         //default value
         static const int defaultNiter1;
@@ -174,9 +174,9 @@ namespace Faust
         static const bool defaultVerbosity;
         static const bool defaultFactSideLeft;
         static const bool defaultUpdateWayR2L;
-        static const FPP defaultLambda;
+        static const FPP2 defaultLambda;
         static const bool defaultConstantStepSize;
-        static const FPP defaultStepSize;
+        static const FPP2 defaultStepSize;
         static const FPP defaultDecreaseSpeed;
         static const FPP defaultResiduumPercent;
 

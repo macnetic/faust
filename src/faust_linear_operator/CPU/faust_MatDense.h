@@ -340,10 +340,10 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
         //!  \brief Compute the Frobenius norm of the MatDense
         //! \return  the Frobenius norm
-        FPP norm() const {return mat.norm();}
+        Real<FPP> norm() const {return mat.norm();}
 
         //!  \brief Normalize the matrix according to its Frobenius norm
-        void normalize() {scalarMultiply(FPP(1.0)/FPP(norm()));}
+        void normalize() {scalarMultiply(FPP(1.0/norm()));}
 
 
         //!	\param nbr_iter_max : maximum number of iteration for the power algo
@@ -351,7 +351,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         //! \param flag : convergence flag
         //! \return Return the estimated spectral norm (maximum singular value in absolute value) using power iteration algorithm
         //! See also, template<typename FPP> FPP power_iteration(const MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP threshold,faust_int & flag);
-        FPP spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, int & flag,Faust::BlasHandle<Cpu>  blas_handle=Faust::BlasHandle<Cpu>()) const;
+        Real<FPP> spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, int & flag,Faust::BlasHandle<Cpu>  blas_handle=Faust::BlasHandle<Cpu>()) const;
 
         //! \brief Compute the trace of the MatDense
         //! \return  the trace
@@ -402,8 +402,8 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		//
 		//	If the matrix is real, it does nothing.
 		void real();
-		FPP normL1(const bool transpose=false) const;
-		FPP normL1(faust_unsigned_int&, const bool transpose=false) const;
+		Real<FPP> normL1(const bool transpose=false) const;
+		Real<FPP> normL1(faust_unsigned_int&, const bool transpose=false) const;
 		Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 		Faust::Vect<FPP,Cpu> get_row(faust_unsigned_int id) const;
 		Faust::MatDense<FPP,Cpu>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;

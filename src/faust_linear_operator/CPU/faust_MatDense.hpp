@@ -567,7 +567,7 @@ t_mult_left.stop();
 
 
 template<typename FPP>
-FPP Faust::MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, int & flag,Faust::BlasHandle<Cpu> blas_handle/*=Faust::BlasHandle<Cpu>()*/) const
+Real<FPP> Faust::MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max,FPP threshold, int & flag,Faust::BlasHandle<Cpu> blas_handle/*=Faust::BlasHandle<Cpu>()*/) const
 {
 #ifdef __COMPILE_FPPIMERS__
 	t_spectral_norm2.start();
@@ -597,13 +597,13 @@ FPP Faust::MatDense<FPP,Cpu>::spectralNorm(const faust_unsigned_int nbr_iter_max
 	Faust::MatDense<FPP,Cpu> AtA;
 	if (nb_row <= nb_col)
 	{
-		gemm((*this),(*this),AtA,(FPP)1.,(FPP)0.0,'N','T');
+		gemm((*this),(*this),AtA,(FPP)1.,(FPP)0.0,'N', 'H'/*'T'*/);
 	}else
 	{
-		gemm((*this),(*this),AtA,(FPP)1.,(FPP)0.0,'T','N');
+		gemm((*this),(*this),AtA,(FPP)1.,(FPP)0.0,'H' /*equiv. to 'T' if FPP real*/,'N');
 	}
 
-	FPP  res=std::sqrt(power_iteration(AtA,nbr_iter_max,threshold,flag));
+	Real<FPP> res=std::sqrt(std::abs(power_iteration(AtA,nbr_iter_max,threshold,flag)));
 
 
 #ifdef __COMPILE_TIMERS__
@@ -986,11 +986,11 @@ matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) 
 }
 
 template<typename FPP>
-FPP Faust::MatDense<FPP, Cpu>::normL1(faust_unsigned_int& col_id, const bool transpose /* default false */) const
+Real<FPP> Faust::MatDense<FPP, Cpu>::normL1(faust_unsigned_int& col_id, const bool transpose /* default false */) const
 {
 	//TODO: refactor this function with MatSparse::normL1()
 	faust_unsigned_int i, j, max_j;
-	FPP sum, max_sum;
+	Real<FPP> sum, max_sum;
 	Eigen::Matrix<FPP, Eigen::Dynamic,Eigen::Dynamic> vec;
 	int dim1, dim2;
 	if(transpose){
@@ -1020,7 +1020,7 @@ FPP Faust::MatDense<FPP, Cpu>::normL1(faust_unsigned_int& col_id, const bool tra
 }
 
 template<typename FPP>
-FPP Faust::MatDense<FPP, Cpu>::normL1(const bool transpose /* default false */) const
+Real<FPP> Faust::MatDense<FPP, Cpu>::normL1(const bool transpose /* default false */) const
 {
 	faust_unsigned_int id; //useless but mandatory
 	return normL1(id, transpose);

@@ -89,7 +89,7 @@ void init_params_palm_from_matiofile(Faust::ParamsPalm<FPP,DEVICE>& params,const
 	int niter,nfacts,verbose,update_way,dim1,dim2,cons_parameter,cons_dim1,cons_dim2;
 	Faust::MatDense<FPP,DEVICE> data_mat,current_fact;
 	vector<Faust::MatDense<FPP,DEVICE> > init_facts;
-	FPP init_lambda;
+	Real<FPP> init_lambda;
 
 	for (int i=0;i<nbr_params;i++)
 	{
@@ -152,7 +152,7 @@ void init_params_palm_from_matiofile(Faust::ParamsPalm<FPP,DEVICE>& params,const
 			//cout<<"init_lambda"<<endl;
 			init_lambda=(double)((double*)(current_var->data))[0];
 			//cout<<init_lambda<<endl;
-			params.init_lambda = (FPP)init_lambda;
+			params.init_lambda = (Real<FPP>)init_lambda;
 		}
 		if (strcmp(current_fieldName,"init_facts")==0)
 		{
@@ -321,7 +321,7 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE, FPP2>& params, const c
 			//cout<<"init_lambda"<<endl;
 			init_lambda=(double)((double*)(current_var->data))[0];
 			//cout<<init_lambda<<endl;
-			params.init_lambda = (FPP) init_lambda;
+			params.init_lambda = (Real<FPP>) init_lambda;
 			//cout<<params.init_lambda<<endl;
 		}
 

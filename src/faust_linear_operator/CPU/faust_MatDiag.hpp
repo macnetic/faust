@@ -80,23 +80,23 @@ matvar_t* MatDiag<FPP>::toMatIOVar(bool transpose, bool conjugate) const
 }
 
 template<typename FPP>
-FPP MatDiag<FPP>::normL1(const bool transpose) const
+Real<FPP> MatDiag<FPP>::normL1(const bool transpose) const
 {
 	faust_unsigned_int i;
 	return normL1(i,transpose);
 }
 
 template<typename FPP>
-FPP MatDiag<FPP>::norm() const
+Real<FPP> MatDiag<FPP>::norm() const
 {
 	return mat.diagonal().norm();
 }
 
 template<typename FPP>
-FPP MatDiag<FPP>::normL1(faust_unsigned_int& col_id, const bool transpose) const
+Real<FPP> MatDiag<FPP>::normL1(faust_unsigned_int& col_id, const bool transpose) const
 {
 	const FPP* data = getData();
-	FPP max = 0, a;
+	Real<FPP> max = 0, a;
 	for(faust_unsigned_int i=0;i<min(this->dim1, this->dim2);i++)
 		if(Faust::fabs(a=Faust::fabs(data[i])) > Faust::fabs(max))
 		{

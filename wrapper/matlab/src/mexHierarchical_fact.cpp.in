@@ -120,10 +120,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
 		//extraction des resultats
-		SCALAR lambda = hier_fact->get_lambda();
+		FPP2 lambda = hier_fact->get_lambda();
 
 		//if(typeid(SCALAR) == typeid(complex<FPP2>))
-		Faust::MatDense<SCALAR,Cpu> mat1x1Lambda = Faust::MatDense<SCALAR, Cpu>(&lambda, 1, 1);
+		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
 		plhs[0] = FaustMat2mxArray(mat1x1Lambda);
 		//}
 		//	 else

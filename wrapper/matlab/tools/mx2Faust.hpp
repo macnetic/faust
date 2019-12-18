@@ -753,7 +753,7 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 
 
 	//init_lambda
-	SCALAR init_lambda = (SCALAR) 1.0;
+	FPP2 init_lambda = 1.0;
 	if (presentFields[INIT_LAMBDA])
 	{
 		mxCurrentField = mxGetField(matlab_params,0,mat_field_type2str(INIT_LAMBDA).c_str());
@@ -761,7 +761,7 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 		// it works whatever mxCurrentField class is (complex or not)
 //		mxArray2Ptr<SCALAR>(const_cast<const mxArray*>(mxCurrentField), tmp_ptr);
 		//       init_lambda = (SCALAR) mxGetScalar(mxCurrentField);
-		init_lambda = (SCALAR) mxGetScalar(mxCurrentField);
+		init_lambda = (FPP2) mxGetScalar(mxCurrentField);
 	}
 
 	Faust::Params<SCALAR,Cpu,FPP2>* params;

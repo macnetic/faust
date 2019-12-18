@@ -28,9 +28,9 @@ namespace Faust
 				const bool isVerbose = Params<FPP,DEVICE,FPP2>::defaultVerbosity,
 				const bool isUpdateWayR2L = Params<FPP,DEVICE,FPP2>::defaultUpdateWayR2L,
 				const bool isFactSideLeft = Params<FPP,DEVICE,FPP2>::defaultFactSideLeft,
-				const FPP init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
+				const FPP2 init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
 				const bool constant_step_size = Params<FPP,DEVICE,FPP2>::defaultConstantStepSize,
-				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): Params<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size), init_D(init_D)
+				const FPP2 step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): Params<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size), init_D(init_D)
 		{
 
 		}
@@ -47,9 +47,9 @@ namespace Faust
 				const bool isVerbose = Params<FPP,DEVICE,FPP2>::defaultVerbosity,
 				const bool isUpdateWayR2L = Params<FPP,DEVICE,FPP2>::defaultUpdateWayR2L,
 				const bool isFactSideLeft = Params<FPP,DEVICE,FPP2>::defaultFactSideLeft,
-				const FPP init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
+				const FPP2 init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
 				const bool constant_step_size = Params<FPP,DEVICE,FPP2>::defaultConstantStepSize,
-				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): Params<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size), init_D(nbRow, nbCol)
+				const FPP2 step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): Params<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size), init_D(nbRow, nbCol)
 		{
 			init_D.setZeros();
 			// set init_D from diagonal vector init_D_diag
@@ -69,9 +69,9 @@ namespace Faust
 				const bool isVerbose = Params<FPP,DEVICE,FPP2>::defaultVerbosity,
 				const bool isUpdateWayR2L = Params<FPP,DEVICE,FPP2>::defaultUpdateWayR2L,
 				const bool isFactSideLeft = Params<FPP,DEVICE,FPP2>::defaultFactSideLeft,
-				const FPP init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
+				const FPP2 init_lambda = Params<FPP,DEVICE,FPP2>::defaultLambda,
 				const bool constant_step_size = Params<FPP,DEVICE,FPP2>::defaultConstantStepSize,
-				const FPP step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): ParamsFGFT<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, Faust::Vect<FPP,DEVICE>(nbRow, init_D_diag), stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size)
+				const FPP2 step_size = Params<FPP,DEVICE,FPP2>::defaultStepSize): ParamsFGFT<FPP, DEVICE, FPP2>(nbRow, nbCol, nbFact, cons, init_fact, Faust::Vect<FPP,DEVICE>(nbRow, init_D_diag), stop_crit_2facts, stop_crit_global, isVerbose, isUpdateWayR2L, isFactSideLeft, init_lambda, constant_step_size, step_size)
 		{
 
 		}

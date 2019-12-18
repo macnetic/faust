@@ -60,9 +60,9 @@ namespace Faust
 			faust_unsigned_int getNonZeros() const { return mat.diagonal().nonZeros(); }
 
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
-			FPP normL1(const bool transpose=false) const;
-			FPP norm() const;
-			FPP normL1(faust_unsigned_int& col_id, const bool transpose) const;
+			Real<FPP> normL1(const bool transpose=false) const;
+			typename Eigen::NumTraits<FPP>::Real norm() const;
+			Real<FPP> normL1(faust_unsigned_int& col_id, const bool transpose) const;
 
 			Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 

@@ -92,23 +92,23 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 	tmp1 = tmp2;
 	tmp1 *= D;
 	// this->error = lambda*tmp1*lambda*tmp2'-data // this->error is data before this call
-	gemm(tmp1, tmp2, this->error, this->m_lambda*this->m_lambda, (FPP)-1.0, 'N', this->TorH, this->blas_handle);
+	gemm(tmp1, tmp2, this->error, FPP(this->m_lambda*this->m_lambda), (FPP)-1.0, 'N', this->TorH, this->blas_handle);
 
 	if (idx==0 || idx==2) // computing L'*this->error first, then (L'*this->error)*R'
 	{
 		if (!this->isUpdateWayR2L)
 		{
 			// tmp3 = this->m_lambda*L'*this->error (= this->m_lambda*L' * (this->m_lambda*L*this->S*R - data) )
-			gemm(this->LorR, this->error, tmp3, this->m_lambda,(FPP) 0.0, this->TorH, 'N', this->blas_handle);
+			gemm(this->LorR, this->error, tmp3, FPP(this->m_lambda),(FPP) 0.0, this->TorH, 'N', this->blas_handle);
 			// tmp2 = lambda*L*this->S*R*D*R'
-			gemm(tmp1, this->RorL[this->m_indFact], tmp2, this->m_lambda, (FPP) 0, 'N', this->TorH, this->blas_handle);
+			gemm(tmp1, this->RorL[this->m_indFact], tmp2, FPP(this->m_lambda), (FPP) 0, 'N', this->TorH, this->blas_handle);
 		}
 		else
 		{
 			// tmp3 = this->m_lambda*L'*this->error (= this->m_lambda*L' * (this->m_lambda*L*this->S*R - data) )
-			gemm(this->RorL[this->m_indFact], this->error, tmp3, this->m_lambda, (FPP) 0.0, this->TorH, 'N', this->blas_handle);
+			gemm(this->RorL[this->m_indFact], this->error, tmp3, FPP(this->m_lambda), (FPP) 0.0, this->TorH, 'N', this->blas_handle);
 			// tmp2 = lambda*L*this->S*R*D*R'
-			gemm(tmp1, this->LorR, tmp2, this->m_lambda, (FPP) 0, 'N', this->TorH, this->blas_handle);
+			gemm(tmp1, this->LorR, tmp2, FPP(this->m_lambda), (FPP) 0, 'N', this->TorH, this->blas_handle);
 		}
 		// grad_over_c = 1/this->c*tmp3*tmp2
 		gemm(tmp3, tmp2, this->grad_over_c, (FPP) 1.0/this->c, (FPP) 0.0,'N','N', this->blas_handle);
@@ -121,7 +121,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 			// tmp2 = lambda*tmp1*R' = lambda*LSRD*R'
 			gemm(tmp1, this->RorL[this->m_indFact], tmp2, (FPP) this->m_lambda, (FPP) 0, 'N', this->TorH, this->blas_handle);
 			// tmp3 = this->m_lambda*this->error*tmp2
-			gemm(this->error, tmp2, tmp3, this->m_lambda, (FPP) 0.0, 'N', 'N', this->blas_handle);
+			gemm(this->error, tmp2, tmp3, FPP(this->m_lambda), (FPP) 0.0, 'N', 'N', this->blas_handle);
 			// grad_over_c = 1/this->c*L'*tmp3
 			gemm(this->LorR, tmp3, this->grad_over_c,(FPP) 1.0/this->c, (FPP) 0.0,this->TorH,'N', this->blas_handle);
 		}
@@ -130,7 +130,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 			// tmp2 = lambda*tmp1*R' = lambda*LSRD*R'
 			gemm(tmp1, this->LorR, tmp2, (FPP) this->m_lambda, (FPP) 0, 'N', this->TorH, this->blas_handle);
 			// tmp3 = this->m_lambda*this->error*tmp2
-			gemm(this->error, tmp2, tmp3, this->m_lambda, (FPP) 0.0, 'N', 'N', this->blas_handle);
+			gemm(this->error, tmp2, tmp3, FPP(this->m_lambda), (FPP) 0.0, 'N', 'N', this->blas_handle);
 			// grad_over_c = 1/this->c*L'*tmp3
 			gemm(this->RorL[this->m_indFact], tmp3, this->grad_over_c, (FPP) 1.0/this->c, (FPP) 0.0,this->TorH,'N', this->blas_handle);
 		}
@@ -196,12 +196,12 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
 	// grad = 0.5*Uhat'*(Uhat*D*Uhat' - X)*Uhat
 	MatDense<FPP, Cpu> tmp;
 	//compute_lambda has already computed D_grad_over_c = LorR*D*LorR'
-	D_grad_over_c.scalarMultiply(this->m_lambda*this->m_lambda);
+	D_grad_over_c.scalarMultiply(FPP(this->m_lambda*this->m_lambda));
 	D_grad_over_c -= this->data;
 	// tmp = Uhat'*(Uhat*D*Uhat' - X)
 	gemm(this->LorR, D_grad_over_c, tmp, (FPP) this->m_lambda, (FPP) 0., this->TorH, 'N', this->blas_handle);
 	// D_grad_over_c = 0.5*Uhat'*(Uhat*D*Uhat' - X)*Uhat
-	gemm(tmp, this->LorR, D_grad_over_c, (FPP) .5*this->m_lambda/this->c, (FPP) 0., 'N', 'N', this->blas_handle);
+	gemm(tmp, this->LorR, D_grad_over_c, (FPP) FPP(.5*this->m_lambda/this->c), (FPP) 0., 'N', 'N', this->blas_handle);
 }
 
 template <typename FPP, Device DEVICE, typename FPP2>

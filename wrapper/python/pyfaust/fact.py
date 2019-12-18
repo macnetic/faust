@@ -320,7 +320,7 @@ def palm4msa(M, p, ret_lambda=False):
         if ret_lambda == True then the function returns a tuple (Faust, lambda).
 
     Examples:
-    >>> from pyfaust import FaustFactory
+    >>> from pyfaust.fact import palm4msa
     >>> from pyfaust.factparams import ParamsPalm4MSA, ConstraintList, StoppingCriterion
     >>> import numpy as np
     >>> M = np.random.rand(500, 32)
@@ -690,7 +690,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
 
 
     Example:
-        from pyfaust import FaustFactory
+        from pyfaust.fact import fgft_palm
         from pyfaust.factparams import *
         from scipy.io import loadmat, savemat
         from pyfaust.demo import get_data_dirpath

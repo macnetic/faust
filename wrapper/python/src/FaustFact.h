@@ -62,8 +62,8 @@ class PyxParamsFact
     public:
         int num_facts;
         bool is_update_way_R2L;
-        FPP init_lambda;
-        FPP step_size;
+        FPP2 init_lambda;
+        FPP2 step_size;
         PyxConstraintGeneric** constraints; // size: (num_facts-1)*2
         unsigned int num_constraints;
         bool is_verbose;

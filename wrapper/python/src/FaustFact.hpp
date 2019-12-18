@@ -251,7 +251,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
         return core; // core is nullptr (way to detect error in caller code)
     }
 
-    FPP lambda = palm->get_lambda();
+    FPP2 lambda = palm->get_lambda();
 
     std::vector<Faust::MatDense<FPP,Cpu> > facts;
     std::vector<Faust::MatGeneric<FPP, Cpu>*> sp_facts;
@@ -263,7 +263,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
         sp_facts.push_back(M);
     }
 
-    Faust::TransformHelper<FPP, Cpu> *th = new Faust::TransformHelper<FPP,Cpu>(sp_facts, lambda, false);
+    Faust::TransformHelper<FPP, Cpu> *th = new Faust::TransformHelper<FPP,Cpu>(sp_facts, FPP(lambda), false);
 
     for(typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
     {
@@ -280,14 +280,14 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
 
     if(p_fft == nullptr)
         // palm4MSA basis case, just get lambda
-        *out_buf = lambda;
+        *out_buf = FPP(lambda);
     else
     {
         // retrieve D matrix from Palm4MSAFFT
         // out buffer must have been allocated from outside
         dynamic_cast<Palm4MSAFGFT<FPP,Cpu,FPP2>*>(palm)->get_D(out_buf+1);
         // add lambda at the first position
-        out_buf[0] = lambda;
+        out_buf[0] = FPP(lambda);
     }
 
     delete params;
@@ -384,9 +384,9 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
 
     vector<Faust::MatSparse<FPP,Cpu> > facts;
     hierFact->get_facts(facts);
-    FPP lambda = hierFact->get_lambda();
-    *out_buf =  lambda;
-    (facts[0]) *= lambda;
+    FPP2 lambda = hierFact->get_lambda();
+    *out_buf =  FPP(lambda);
+    (facts[0]) *= FPP(lambda);
     // transform the sparse matrix into matrix pointers
     std::vector<Faust::MatGeneric<FPP,Cpu> *> list_fact_generic;
     list_fact_generic.resize(facts.size());
@@ -410,14 +410,14 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
 
     if(p_fft == nullptr)
         // palm4MSA basis case, just get lambda
-        *out_buf = lambda;
+        *out_buf = FPP(lambda);
     else
     {
         // retrieve D matrix from HierarchicalFactFFT
         // out buffer must have been allocated from outside
         dynamic_cast<HierarchicalFactFGFT<FPP,Cpu,FPP2>*>(hierFact)->get_D(out_buf+1);
         // add lambda at the first position
-        out_buf[0] = lambda;
+        out_buf[0] = FPP(lambda);
         delete inMat2;
     }
 

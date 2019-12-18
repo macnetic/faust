@@ -87,7 +87,7 @@ int main()
 	FPP2 cons2Parameter;
 	int nfacts, niter;
 	bool updateWay, verbose;
-	FPP initLambda;
+	FPP2 initLambda;
 
 	cons1Name = init_int_from_matio(configPalm2Filename, "cons1_name");
 	cons1Parameter = init_int_from_matio(configPalm2Filename, "cons1_parameter");
@@ -100,7 +100,7 @@ int main()
 	cons2Col = init_int_from_matio(configPalm2Filename, "cons2_col");
 
 
-	initLambda = (FPP) init_double_from_matio(configPalm2Filename, "init_lambda");
+	initLambda = (FPP2) init_double_from_matio(configPalm2Filename, "init_lambda");
 	nfacts = init_int_from_matio(configPalm2Filename, "nfacts");
 	niter = init_int_from_matio(configPalm2Filename, "niter");
 
@@ -132,8 +132,8 @@ int main()
 //	palm2.next_step();
 	palm2.compute_facts();
     std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = const_cast< std::vector<Faust::MatDense<FPP,Cpu> >&>(palm2.get_facts());
-	FPP lambda = palm2.get_lambda();
-	(full_facts[0]) *= lambda;
+	FPP2 lambda = palm2.get_lambda();
+	(full_facts[0]) *= FPP(lambda);
 
 	Faust::Transform<FPP, Cpu>* t = new Faust::Transform<FPP, Cpu>(full_facts);
 	//relativeError

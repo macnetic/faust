@@ -51,9 +51,9 @@
 template<typename FPP,Device DEVICE,typename FPP2> const int Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultNiter = 300;
 template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultVerbosity = false;
 template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultUpdateWayR2L = false;
-template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultLambda = 1.0;
+template<typename FPP,Device DEVICE,typename FPP2> const FPP2 Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultLambda = 1.0;
 template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultConstantStepSize = false;
-template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize = 1e-16;
+template<typename FPP,Device DEVICE,typename FPP2> const FPP2 Faust::ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize = 1e-16;
 
 template<typename FPP,Device DEVICE,typename FPP2>
 const char * Faust::ParamsPalm<FPP,DEVICE,FPP2>::m_className = "Faust::ParamsPalm<FPP,DEVICE,FPP2>::";
@@ -90,9 +90,9 @@ Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm(
          const Faust::StoppingCriterion<FPP2> & stop_crit_ /* = Faust::StoppingCriterion() */,
          const bool isVerbose_ /* = false */,
          const bool isUpdateWayR2L_ /* = false */,
-         const FPP init_lambda_ /* = 1.0 */,
+         const FPP2 init_lambda_ /* = 1.0 */,
 		 const bool constant_step_size_,
-		 const FPP step_size_) :
+		 const FPP2 step_size_) :
             data(data_),
             nbFact(nbFact_),
             cons(cons_),
