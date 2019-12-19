@@ -306,6 +306,50 @@ def _check_fact_mat(funcname, M):
     #   raise Exception(funcname+" doesn't yet support complex matrix "
     #                   "factorization.")
 
+
+# experimental block start
+def palm4msa_py(A, J, N, proxs, dims):
+    # start Faust, identity factors
+    S = Faust([np.eye(dims[i][0], dims[i][1]) for i in range(J)])
+    _lambda = 1
+    lipschitz_multiplicator=1.001
+    for i in range(N):
+        for j in range(0,J):
+            #print("S=", S)
+            #if(2 == S.numfactors()):
+            if(j == 0):
+                L = np.eye(dims[0][0],dims[0][0])
+                S_j = S.factors(j)
+                R = S.right(j+1)
+            elif(j == S.numfactors()-1):
+                L = S.left(j-1)
+                S_j = S.factors(j)
+                R = np.eye(dims[j][1], dims[j][1])
+            else:
+                L = S.left(j-1)
+                R = S.right(j+1)
+                S_j = S.factors(j)
+            if(not pyfaust.isFaust(L)): L = Faust(L)
+            if(not pyfaust.isFaust(R)): R = Faust(R)
+            c = \
+            lipschitz_multiplicator*_lambda**2*R.norm(2,max_num_its=1000,
+                                                      treshold=1e-16)**2 * \
+                    L.norm(2,max_num_its=1000, treshold=1e-16)**2
+            #print("j=",j,
+            #      (S_j-_lambda*(L.H*(_lambda*L*(S_j*R)-A)*R.H)*1/c).shape)
+            S_j = proxs[j](S_j-_lambda*(L.H*(_lambda*L*(S_j*R)-A)*R.H)*1/c)
+            if(S.numfactors() > 2 and j > 0 and j < S.numfactors()-1):
+                S = L*Faust(S_j)*R
+            elif(j == 0):
+                S = Faust(S_j)*R
+            else:
+                S = L*Faust(S_j)
+        _lambda = np.trace(A.T.conj()*S).real/S.norm()**2
+        #print("lambda:", _lambda)
+    S = _lambda*S
+    return S, _lambda
+# experimental block end
+
 def palm4msa(M, p, ret_lambda=False):
     """
     Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
