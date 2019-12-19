@@ -1166,7 +1166,7 @@ class Faust:
         else:
             return float(-1)
 
-    def norm(F, ord='fro', axis=None, keepdims=False): #**kwargs):
+    def norm(F, ord='fro', axis=None, keepdims=False, **kwargs):
         """
         Computes the norm of F.
 
@@ -1223,7 +1223,9 @@ class Faust:
         """
         if(ord not in [1, 2, "fro", np.inf]):
             raise ValueError("ord must have the value 1, 2, 'fro' or numpy.inf.")
-        return F.m_faust.norm(ord)# **kwargs)
+        kwargs['axis'] = axis
+        kwargs['keepdims'] = keepdims
+        return F.m_faust.norm(ord, **kwargs)
 
 
     def normalize(F, ord='fro', axis=1):
@@ -1562,17 +1564,21 @@ def license():
     print("""@PYFAUST_LICENSE_HEADER@""")
 
 
-def norm(F, ord='fro'):
+def norm(F, ord='fro', **kwargs):
     """
         Returns Faust.norm(F, ord) or numpy.linalg.norm(F, ord) depending of F type.
 
     <b/>See also Faust.norm
     """
     if(Faust.isFaust(F)):
-        return F.norm(ord)
+        return F.norm(ord, **kwargs)
     else: # if F is not a Faust, try to rely on numpy (not breaking possible
           # past import)
-        return np.linalg.norm(F, ord)
+        axis = None
+        keepdims = False
+        if('axis' in kwargs.keys()): axis = kwargs['axis']
+        if('keepdims' in kwargs.keys()): keepdims = kwargs['keepdims']
+        return np.linalg.norm(F, ord, axis=axis, keepdims=keepdims)
 
 def dot(A, B):
     """
