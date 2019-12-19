@@ -82,7 +82,7 @@ void Faust::svdtj_core(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatD
 		S.getData()[i] = W1_MW2(i,i);
 	}
 
-	// order D descendantly according to the abs value
+	// sort D in descending order according to the abs value
 	// and change the sign when the value is negative
 	// it gives a signed permutation matrix P to append to W1, abs(P2) is append to W2
 	vector<int> ord_indices;

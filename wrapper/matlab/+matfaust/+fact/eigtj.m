@@ -1,34 +1,42 @@
 %==========================================================================================
-%> @brief Performs an approximate eigendecomposition of M and returns the eigenvalues in D along with the corresponding left eigenvectors (as the columns of the Faust object V).
+%> @brief Performs an approximate eigendecomposition of M and returns the eigenvalues in D along with the corresponding normalized right eigenvectors (as the columns of the Faust object V).
 %>
 %> The output is such that <code>V*D*V'</code> approximates M. V is a product of Givens rotations obtained by truncating the Jacobi algorithm.
 %>
-%> The trade-off between accuracy and sparsity of V can be set through the parameters nGivens and nGivens_per_fac or concurrently with the arguments tol and relerr that define the targeted error.
+%> The trade-off between accuracy and complexity of V can be set through the parameters nGivens and tol that define the targeted number of Givens rotations and targeted error.
 %>
 %>
 %> @b Usage
 %>
-%> &nbsp;&nbsp;&nbsp; <b>[V,D] = eigtj(M, 'nGivens', n)</b> computes V with n Givens rotations grouped into factors containing ideally <code>m = floor(size(M,1)/2)</code> Givens rotation each (if m doesn't divide n, the first factor at least contains less than m rotations).<br/>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, 'nGivens', n, 'nGivens_per_fac', 1) does the same as in previous line but limiting to 1 the number of Givens rotation per factor. Setting nGivens_per_fac to 0 produces the same results. <br/>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, 'nGivens', n, 'nGivens_per_fac', t) as above but with t Givens rotatons per factor.<br/>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, 'nGivens', n, 'nGivens_per_fac', t, 'verbosity', 2) same as above with a level of output verbosity of 2. <br/>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, 'nGivens', n, 'nGivens_per_fac', t, 'tol', 0.01, 'relerr', true) Uses a stopping criterion based on relative error <code>norm(V*D*V'-M, 'fro')/norm(M, 'fro')</code>. This criterion is concurrent to nGivens (here n).<br/>
-%> &nbsp;&nbsp;&nbsp; @b eigtj(M, 'nGivens', n, 'nGivens_per_fac', t, 'tol', 0.01, 'relerr', true) Uses a stopping criterion based on absolute error <code>norm(V*D*V'-M, 'fro')</code>. This criterion is concurrent to nGivens (here n).<br/>
+%> &nbsp;&nbsp;&nbsp; Primary examples of calls include:<br/>
+%> &nbsp;&nbsp;&nbsp; <b>[V,D] = eigtj(M, 'nGivens', n)</b> outputs V as a Faust object made of n elementary Givens rotations grouped into factors containing ideally <code>m = floor(size(M,1)/2)</code> such Givens rotations, and the diagonal entries of D are the approximate eigenvalues in ascending order.<br/>
+%>&nbsp;&nbsp;&nbsp; <b>[V,D]  =  eigtj(M,’tol’,0.01)</b> same as above with n determined adaptively by a relative approximation error 0.01.<br/>
+%>&nbsp;&nbsp;&nbsp; <b>[V,D] = eigtj(M,’tol’,0.01)</b> same as above with n determined adaptively by a relative approximation error 0.01.<br/>
+%>&nbsp;&nbsp;&nbsp; <b>[V,D] = eigtj(M,’tol’,0.01,’relerr’,False)</b> same as above with an absolute approximation error.<br/>
+%>&nbsp;&nbsp;&nbsp; <b>[V,D] = eigtj(M,’nGivens’,n,’tol’,0.01)</b> same as above with a number of elementary Givens bounded by n even if the targeted approximation error is not achieved.<br/>
+%>&nbsp;&nbsp;&nbsp; <b>[V,D]= eigtj(M,’nGivens’,n,’tol’,0.01,’nGivens_per_fac’,t)</b> same as above with (up to) t Givens rotations per factor.<br/>
+%>&nbsp;&nbsp;&nbsp; <b>[V,D]= eigtj(M,’nGivens’,n,’order’,’descend’) </b> same as above where the diagonal entries of D are the approximate eigenvalues in descending order (and with columns of V permuted accordingly).<br/>
+%>&nbsp;&nbsp;&nbsp; <b>eigtj(M, 'nGivens', n, 'nGivens_per_fac', t, 'tol', 0.01, 'relerr', true)</b> uses a stopping criterion based on absolute error norm(V*D*V'-M, 'fro'). This criterion is concurrent to nGivens (here n).<br/>
 %>
 %> @param M the matrix to diagonalize. Must be real and symmetric, or complex hermitian. Can be in dense or sparse format.
-%> @param nGivens, integer (optional if tol is set) the maximum number of iterations which is defined by the
-%> number of Givens rotations that can be computed in eigenvector transform V.
+%> @param nGivens, integer [optional if tol is set] targeted number of Givens rotations.
 %> The number of rotations per factor of V is defined by nGivens_per_fac.
-%> @param 'tol', number (optional if nGivens is set) the tolerance error at which the algorithm stops. By default, it's zero for not stopping on an error criterion. Note that the error reaching is not guaranteed (in particular, if the error starts to increase from one iteration to another then the algorithm is stopped).
-%> @param 'order', char (optional) 'descend' for a descending order of eigenvalues, 'ascend' for an ascending order (default value) or 'undef' for no sort.
-%> @param 'nGivens_per_fac', integer (optional) the number of Givens rotations per factor of V, must be an integer between 1 to <code>floor(size(M, 1)/2)</code> which is the default value.
-%> @param 'relerr', true (optional) For a stopping criterion based on the relative error (this is the default error).
-%> @param 'relerr', false (optional) For a stopping criterion based on the absolute error.
-%> @param 'verbosity', integer (optional) the level of verbosity, the greater the value the more info is displayed. It can be helpful to understand for example why the  algorithm stopped before reaching the tol error or the number of Givens (nGivens).
+%> @param 'tol', number [optional if nGivens is set] the tolerance error at which the algorithm stops. The default value is zero so that stopping is based on reaching the targeted nGivens.
+%> @param 'order', char [optional, default is ‘ascend’] order of eigenvalues, possible choices are ‘ascend, 'descend' or 'undef' (to avoid a sorting operation and save some time).
+%> @param 'nGivens_per_fac', integer [optional, default is <code>floor(size(M, 1)/2)</code>] targeted number of Givens rotations per factor of V. Must be an integer between 1 to <code>floor(size(M, 1)/2)</code>.
+%> @param 'relerr', bool [optional, default is True] the type of error used as stopping criterion. (true) for the relative error norm(V*D*V'-M, 'fro')/norm(M, 'fro'), (false) for the absolute error norm(V*D*V'-M, 'fro').
+%> @param 'verbosity', integer [optional] verbosity level. The greater the value the more info is displayed. It can be helpful to understand for example why the algorithm stopped before reaching the tol error or the number of Givens (nGivens).
+%>
 %>
 %> @retval [V,D]
 %> - V the Faust object representing the approximate eigenvector transform. The column <code>V(:, i)</code> is the eigenvector corresponding to the eigenvalue <code>D(i,i)</code>.
-%> - D the sparse diagonal matrix of the approximate eigenvalues (by default in ascendant order along the rows/columns).
+%> - D the sparse (real) diagonal matrix of the approximate eigenvalues (by default in ascending order along the diagonal).
+%>
+%> @note
+%>	- When  ‘nGivens’ and ‘tol’ are used simultaneously, the number of Givens rotations in V may be smaller than specified by ‘nGivens’ if the error criterion is met first, and the achieved error may be larger than specified if ‘nGivens’ is reached first during the iterations of the truncated Jacobi algorithm.
+%> @note
+%> - When nGivens_per_fac > 1, all factors have exactly nGivens_per_fac except the leftmost one which may have fewer if the total number of Givens rotations is not a multiple of nGivens_per_fact
+%>
 %>
 %> @b Example
 %> @code
