@@ -1673,7 +1673,7 @@ cdef class FaustFact:
 
     @staticmethod
     def svdtj(M, J, t, verbosity=0, stoppingError = 0.0,
-              errIsRel=True):
+              errIsRel=True, enable_large_Faust=False):
         isReal = M.dtype in [ 'float', 'float128',
                              'float16', 'float32',
                              'float64', 'double']
@@ -1707,11 +1707,16 @@ cdef class FaustFact:
         #from scipy.sparse import spdiags
         #S_spdiag = spdiags(S, [0], M.shape[0], M.shape[0])
         #return core, S_spdiag
+        if(coreU._isReal and coreU.core_faust_dbl == NULL or \
+           not coreU._isReal and coreU.core_faust_cplx == NULL):
+            raise Exception("Empty transform (nGivens is too big ? Set"
+                            " enable_large_Faust to True to force the computation).")
+
         return coreU, S, coreV
 
     @staticmethod
     def svdtj_sparse(M, J, t, verbosity=0, stoppingError = 0.0,
-                     errIsRel=True):
+                     errIsRel=True, enable_large_Faust=False):
         from scipy.sparse import spdiags
         cdef double [:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -1743,16 +1748,22 @@ cdef class FaustFact:
             M_num_cols, J, t,
             verbosity,
             stoppingError,
-            errIsRel)
+            errIsRel,
+            enable_large_Faust)
 
         coreU._isReal = coreV._isReal = True
         #D_spdiag = spdiags(D, [0], M.shape[0], M.shape[0])
         #return core, D_spdiag
+        if(coreU._isReal and coreU.core_faust_dbl == NULL or \
+           not coreU._isReal and coreU.core_faust_cplx == NULL):
+            raise Exception("Empty transform (nGivens is too big ? Set"
+                            " enable_large_Faust to True to force the computation).")
+
         return coreU, S, coreV
 
     @staticmethod
     def svdtj_cplx(M, J, t, verbosity=0, stoppingError = 0.0,
-              errIsRel=True):
+              errIsRel=True, enable_large_Faust=False):
         isReal = M.dtype in [ 'float', 'float128',
                              'float16', 'float32',
                              'float64', 'double']
@@ -1772,7 +1783,7 @@ cdef class FaustFact:
 
         coreU = FaustCore(core=True)
         coreV = FaustCore(core=True)
-        FaustCoreCy.svdtj_cplx[complex, double](&(coreU.core_faust_cplx),
+        FaustCoreCy.svdtj_cplx[complex,double](&(coreU.core_faust_cplx),
                                           &(coreV.core_faust_cplx),
                                           &S_view[0],
                                           &M_view[0,0],
@@ -1780,17 +1791,21 @@ cdef class FaustFact:
                                           M_num_cols, int(J), int(t),
                                           verbosity,
                                           stoppingError,
-                                          errIsRel)
+                                          errIsRel, enable_large_Faust)
 
         coreU._isReal = coreV._isReal = False
         #from scipy.sparse import spdiags
         #S_spdiag = spdiags(S, [0], M.shape[0], M.shape[0])
         #return core, S_spdiag
+        if(coreU._isReal and coreU.core_faust_dbl == NULL or \
+           not coreU._isReal and coreU.core_faust_cplx == NULL):
+            raise Exception("Empty transform (nGivens is too big ? Set"
+                            " enable_large_Faust to True to force the computation).")
         return coreU, S, coreV
 
     @staticmethod
     def svdtj_sparse_cplx(M, J, t, verbosity=0, stoppingError = 0.0,
-                     errIsRel=True):
+                     errIsRel=True, enable_large_Faust=False):
         from scipy.sparse import spdiags
         cdef complex [:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -1822,10 +1837,15 @@ cdef class FaustFact:
             M_num_cols, J, t,
             verbosity,
             stoppingError,
-            errIsRel)
+            errIsRel, enable_large_Faust)
 
         coreU._isReal = coreV._isReal = False
         #D_spdiag = spdiags(D, [0], M.shape[0], M.shape[0])
         #return core, D_spdiag
+
+        if(coreU._isReal and coreU.core_faust_dbl == NULL or \
+           not coreU._isReal and coreU.core_faust_cplx == NULL):
+            raise Exception("Empty transform (nGivens is too big ? Set"
+                            " enable_large_Faust to True to force the computation).")
         return coreU, S, coreV
 

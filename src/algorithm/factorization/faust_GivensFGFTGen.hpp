@@ -449,7 +449,6 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 	if(stopping = !enable_large_Faust && ! stoppingCritIsError && dim_size*dim_size <= J*4)
 	{
 		cerr << "WARNING: the eigtj algorithm stopped because the transform to be computed doesn't worth it according to its complexity (in space and time) relatively to the size of the matrix to decompose. Still, if you want to force the computation, please use the enable_large_Faust flag." << endl;
-		cerr << "nGivens: " << J << " matrix size: " << dim_size << endl;
 		facts.resize(0);
 	}
 	while(! stopping && (J == 0 || ite < facts.size())) // when J == 0 the stopping criterion is the error against Lap

@@ -37,7 +37,8 @@ from pyfaust import Faust
 import _FaustCorePy
 
 # experimental block start
-def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
+def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
+          enable_large_Faust=False):
     """
         Performs an approximate singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
@@ -72,9 +73,10 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
     from scipy import diag
     from pyfaust import Faust
     from numpy import argsort,sign,eye
-    D1, W1 = eigtj(M.dot(M.T.conj()), nGivens, tol, relerr,
-                   nGivens_per_fac, verbosity)
-    D2, W2 = eigtj(M.T.conj().dot(M), nGivens, tol, relerr,  nGivens_per_fac, verbosity)
+    D1, W1 = eigtj(M.dot(M.T.conj()), nGivens, tol, 'undef', relerr,
+                   nGivens_per_fac, verbosity, enable_large_Faust)
+    D2, W2 = eigtj(M.T.conj().dot(M), nGivens, tol, 'undef', relerr,  nGivens_per_fac,
+                   verbosity, enable_large_Faust)
     S = diag((W1.T.conj()*M)*W2)
     I = argsort(abs(S))[::-1]
     sign_S = spdiags(sign(S[I]), [0], S.shape[0], S.shape[0])
@@ -87,7 +89,7 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0):
 # experimental block end
 
 def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
-          nGivens_per_fac=None, verbosity=0):
+          nGivens_per_fac=None, verbosity=0, enable_large_Faust=False):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
@@ -155,13 +157,13 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
 
     if(M.dtype == np.complex):
         if(isinstance(M, np.ndarray)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_cplx(M, nGivens, nGivens_per_fac, verbosity, tol, relerr)
+            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_cplx(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
         elif(isinstance(M, csr_matrix)):
-            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse_cplx(M, nGivens, nGivens_per_fac, verbosity, tol, relerr)
+            Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse_cplx(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
     elif(isinstance(M, np.ndarray)):
-        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr)
+        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
     elif(isinstance(M, csr_matrix)):
-        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr)
+        Ucore, S, Vcore =  _FaustCorePy.FaustFact.svdtj_sparse(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, enable_large_Faust)
     else:
         raise ValueError("invalid type for M (first argument): only np.ndarray "
                          "or scipy.sparse.csr_matrix are supported.")
