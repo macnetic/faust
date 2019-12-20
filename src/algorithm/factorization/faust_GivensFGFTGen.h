@@ -107,7 +107,8 @@ namespace Faust {
 				double stoppingError;
 				/** \brief true if the stopping error is taken as relative error (absolute otherwise). */
 				bool errIsRel;
-
+				/** \brief (false to default) true to force the computation of the transform even if it doesn't worth it in term of complexity */
+				bool enable_large_Faust;
 
 			public:
 
@@ -117,10 +118,10 @@ namespace Faust {
 				 * \param J The number of iterations, Givens rotations factors.
 				 * TODO: complete argument list
 				 * */
-				GivensFGFTGen(Faust::MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel);
+				GivensFGFTGen(Faust::MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
 
-				GivensFGFTGen(Faust::MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel);
-				GivensFGFTGen(Faust::MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel);
+				GivensFGFTGen(Faust::MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
+				GivensFGFTGen(Faust::MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
 
 				/** Destructor */
 				virtual ~GivensFGFTGen() {delete[] q_candidates; delete L;};

@@ -170,7 +170,7 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
     return U, S, V
 
 def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
-          nGivens_per_fac=None, verbosity=0):
+          nGivens_per_fac=None, verbosity=0, enable_large_Faust=False):
     """
     Performs an approximate eigendecomposition of M and returns the eigenvalues in W along with the corresponding left eigenvectors (as the columns of the Faust object V).
 
@@ -255,12 +255,13 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         svdtj
     """
     D, core_obj = _FaustCorePy.FaustFact.eigtj(M, nGivens, tol, relerr,
-            nGivens_per_fac, verbosity, order)
+                                               nGivens_per_fac, verbosity, order,
+                                               enable_large_Faust)
     return D, Faust(core_obj=core_obj)
 
 # experimental block start
 def fgft_givens(Lap, nGivens=None, tol=0, order='ascend', relerr=True,
-          nGivens_per_fac=None, verbosity=0):
+          nGivens_per_fac=None, verbosity=0, enable_large_Faust=False):
     """
     Computes the FGFT of the Laplacian matrix Lap (using fact.eigtj).
 
@@ -292,7 +293,8 @@ def fgft_givens(Lap, nGivens=None, tol=0, order='ascend', relerr=True,
     See also:
         eigtj, fgft_palm
     """
-    return eigtj(Lap, nGivens, tol, order, relerr, nGivens_per_fac, verbosity)
+    return eigtj(Lap, nGivens, tol, order, relerr, nGivens_per_fac, verbosity,
+                enable_large_Faust)
 # experimental block end
 
 def _check_fact_mat(funcname, M):

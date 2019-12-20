@@ -446,12 +446,18 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 	is_D_ordered = false; // facts (re)computed then D must be reordered
 	ite = 0;
 	bool stopping = false;
-	while(J == 0 || ite < facts.size()) // when J == 0 the stopping criterion is the error against Lap
+	if(stopping = !enable_large_Faust && ! stoppingCritIsError && dim_size*dim_size <= J*4)
+	{
+		cerr << "WARNING: the eigtj algorithm stopped because the transform to be computed doesn't worth it according to its complexity (in space and time) relatively to the size of the matrix to decompose. Still, if you want to force the computation, please use the enable_large_Faust flag." << endl;
+		cerr << "nGivens: " << J << " matrix size: " << dim_size << endl;
+		facts.resize(0);
+	}
+	while(! stopping && (J == 0 || ite < facts.size())) // when J == 0 the stopping criterion is the error against Lap
 	{
 		next_step();
 		ite++;
 		if(stopping = (ite > 1 && stoppingCritIsError && errs.size() > 2 && errs[ite-1]-errs[ite-2] > FLT_EPSILON))
-			if(verbosity>0) cerr << "warning: the algorithm stopped because the last error is greater than the previous one." << endl;
+			/*if(verbosity>0) */cerr << "WARNING: the eigtj algorithm stopped because the last error is greater than the previous one." << endl;
 		if(stopping || stoppingCritIsError && errs.size() > 0 && (*(errs.end()-1) - stoppingError ) < FLT_EPSILON)
 		{
 			facts.resize(ite);
@@ -529,8 +535,8 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 //
 
 template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
-GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) :
-Lap(*Lap),  D(Lap->getNbRow()), errs(0), coord_choices(0), q_candidates(new int[Lap->getNbRow()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), Lap_squared_fro_norm(0), facts(J>0?J:1), last_fact_permuted(false), J(J), dim_size(Lap->getNbRow())
+GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust /* deft to false */) :
+Lap(*Lap),  D(Lap->getNbRow()), errs(0), coord_choices(0), q_candidates(new int[Lap->getNbRow()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), Lap_squared_fro_norm(0), facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):1 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), last_fact_permuted(false), J(J), dim_size(Lap->getNbRow()), enable_large_Faust(enable_large_Faust)
 {
 	if(Lap->getNbCol() != Lap->getNbRow())
 		handleError("Faust::GivensFGFTComplex", "Laplacian must be a square matrix.");
@@ -549,13 +555,13 @@ Lap(*Lap),  D(Lap->getNbRow()), errs(0), coord_choices(0), q_candidates(new int[
 }
 
 template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
-GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) :  GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel)
+GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */) :  GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust)
 {
 	L = new MatSparse<FPP4,DEVICE>(Lap);
 }
 
 template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
-GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel) : GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel)
+GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */) : GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel,  enable_large_Faust)
 {
 	L = new MatDense<FPP4,DEVICE>(Lap);
 }
@@ -695,6 +701,8 @@ template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
 Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform(int ord)
 {
 	//TODO: an optimization is possible by changing type of facts to vector<MatGeneric*> it would avoid copying facts into Transform and rather use them directly. It will need a destructor that deletes them eventually if they weren't transfered to a Transform object before.
+	if(facts.size() == 0)
+		throw out_of_range("The transform is empty. The algorithm stopped before computing any factor.");
 	MatSparse<FPP4,DEVICE> & last_fact = *(facts.end()-1);
 	MatSparse<FPP4,DEVICE> P(last_fact.getNbCol(), last_fact.getNbCol()); //last_fact permutation matrix
 	// (to reorder eigenvector transform according to ordered D)

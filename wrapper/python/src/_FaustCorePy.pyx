@@ -1435,7 +1435,7 @@ cdef class FaustFact:
 
     @staticmethod
     def fact_givens_fgft_sparse(Lap, J, t, verbosity=0, stoppingError = 0.0,
-                                errIsRel=True, order='ascend'):
+                                errIsRel=True, order='ascend', enable_large_Faust=False):
         from scipy.sparse import spdiags
         cdef double [:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -1467,16 +1467,23 @@ cdef class FaustFact:
                                                                    verbosity,
                                                                    stoppingError,
                                                                    errIsRel,
-                                                                   int(order))
+                                                                   int(order),
+                                                                   enable_large_Faust)
 
         core._isReal = True
         #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
         #return core, D_spdiag
+        if(core._isReal and core.core_faust_dbl == NULL or \
+           not core._isReal and core.core_faust_cplx == NULL):
+            raise Exception("Empty transform (nGivens is too big ? Set"
+                            " enable_large_Faust to True to force the computation).")
+
+
         return core, D
 
     @staticmethod
     def fact_givens_fgft(Lap, J, t, verbosity=0, stoppingError = 0.0,
-                         errIsRel=True, order=1):
+                         errIsRel=True, order=1, enable_large_Faust=False):
         isReal = Lap.dtype in [ 'float', 'float128',
                              'float16', 'float32',
                              'float64', 'double']
@@ -1506,17 +1513,24 @@ cdef class FaustFact:
                                                                            &D_view[0], verbosity,
                                                                            stoppingError,
                                                                            errIsRel,
-                                                                           int(order))
+                                                                           int(order),
+                                                                           enable_large_Faust)
 
         core._isReal = True
         #from scipy.sparse import spdiags
         #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
         #return core, D_spdiag
+        if(core._isReal and core.core_faust_dbl == NULL or \
+           not core._isReal and core.core_faust_cplx == NULL):
+            raise Exception("Empty transform (nGivens is too big ? Set"
+                            " enable_large_Faust to True to force the computation).")
+
+
         return core, D
 
     @staticmethod
     def fact_givens_fgft_cplx(Lap, J, t, verbosity=0, stoppingError = 0.0,
-                         errIsRel=True, order=1):
+                         errIsRel=True, order=1, enable_large_Faust=False):
         isReal = Lap.dtype in [ 'float', 'float128',
                              'float16', 'float32',
                              'float64', 'double']
@@ -1541,22 +1555,29 @@ cdef class FaustFact:
 
         core = FaustCore(core=True)
         core.core_faust_cplx = FaustCoreCy.fact_givens_fgft_cplx[complex,double](&Lap_view[0,0],
-                                                                    Lap_num_rows,
-                                                                    Lap_num_cols, J, t,
-                                                                    &D_view[0], verbosity,
-                                                                    stoppingError,
-                                                                    errIsRel,
-                                                                    int(order))
+                                                                                 Lap_num_rows,
+                                                                                 Lap_num_cols, J, t,
+                                                                                 &D_view[0], verbosity,
+                                                                                 stoppingError,
+                                                                                 errIsRel,
+                                                                                 int(order),
+                                                                                 enable_large_Faust)
 
         core._isReal = False
         #from scipy.sparse import spdiags
         #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
         #return core, D_spdiag
+        if(core._isReal and core.core_faust_dbl == NULL or \
+           not core._isReal and core.core_faust_cplx == NULL):
+            raise Exception("Empty transform (nGivens is too big ? Set"
+                            " enable_large_Faust to True to force the computation).")
+
         return core, D
 
     @staticmethod
     def fact_givens_fgft_sparse_cplx(Lap, J, t, verbosity=0, stoppingError = 0.0,
-                                errIsRel=True, order='ascend'):
+                                     errIsRel=True, order='ascend',
+                                     enable_large_Faust=False):
         from scipy.sparse import spdiags
         cdef complex[:] data1d #only for csr mat factor
         cdef int [:] indices # only for csr mat
@@ -1577,39 +1598,46 @@ cdef class FaustFact:
         D_view = D
 
         core = FaustCore(core=True)
-        core.core_faust_cplx = FaustCoreCy.fact_givens_fgft_sparse_cplx[complex, double](&data1d[0],
-                                                                   &indices[0],
-                                                                   &indptr[0],
-                                                                   Lap.nnz,
-                                                                   Lap_num_rows,
-                                                                   Lap_num_cols, J, t,
-                                                                   &D_view[0],
-                                                                   verbosity,
-                                                                   stoppingError,
-                                                                   errIsRel,
-                                                                   int(order))
+        core.core_faust_cplx = \
+        FaustCoreCy.fact_givens_fgft_sparse_cplx[complex, double](&data1d[0],
+                                                                  &indices[0],
+                                                                  &indptr[0],
+                                                                  Lap.nnz,
+                                                                  Lap_num_rows,
+                                                                  Lap_num_cols, J, t,
+                                                                  &D_view[0],
+                                                                  verbosity,
+                                                                  stoppingError,
+                                                                  errIsRel,
+                                                                  int(order),
+                                                                  enable_large_Faust)
 
         core._isReal = False
         #D_spdiag = spdiags(D, [0], Lap.shape[0], Lap.shape[0])
         #return core, D_spdiag
+        if(core._isReal and core.core_faust_dbl == NULL or \
+           not core._isReal and core.core_faust_cplx == NULL):
+            raise Exception("Empty transform (nGivens is too big ? Set"
+                            " enable_large_Faust to True to force the computation).")
+
         return core, D
 
     @staticmethod
-    def eigtj(M, maxiter=None, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
-          order='ascend'):
-        if(maxiter == None): 
+    def eigtj(M, nGivens=None, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
+          order='ascend', enable_large_Faust=False):
+        if(nGivens == None):
             if(tol == 0):
-                raise Exception("You must specify maxiter or tol argument"
+                raise Exception("You must specify nGivens or tol argument"
                         " (to define a stopping  criterion)")
-            maxiter = 0 
+            nGivens = 0
         if(nGivens_per_fac == None): nGivens_per_fac = int(M.shape[0]/2)
         if(isinstance(M, np.ndarray) and \
             not np.allclose(np.matrix(M, copy=False).H, M) or M.shape[0] != M.shape[1]):
             raise ValueError(" the matrix/array must be symmetric or hermitian.")
-        if(not isinstance(maxiter, int)): raise TypeError("maxiter must be a int")
+        if(not isinstance(nGivens, int)): raise TypeError("nGivens must be a int")
         if(not isinstance(nGivens_per_fac, int)): raise TypeError("nGivens_per_fac must be a int")
         nGivens_per_fac = max(nGivens_per_fac, 1)
-        if(maxiter > 0): nGivens_per_fac = min(nGivens_per_fac, maxiter)
+        if(nGivens > 0): nGivens_per_fac = min(nGivens_per_fac, nGivens)
         tol *= tol # the C++ impl. works on squared norms to measure errors
 
         M_is_real = M.dtype in [ 'float', 'float128',
@@ -1618,26 +1646,26 @@ cdef class FaustFact:
         if(isinstance(M, np.ndarray)):
             M = np.asfortranarray(M)
             if(M_is_real):
-                core_obj,D = FaustFact.fact_givens_fgft(M, maxiter, nGivens_per_fac,
+                core_obj,D = FaustFact.fact_givens_fgft(M, nGivens, nGivens_per_fac,
                         verbosity, tol,
-                        relerr, order)
+                        relerr, order, enable_large_Faust)
             else: #complex
-                core_obj,D = FaustFact.fact_givens_fgft_cplx(M, maxiter, nGivens_per_fac,
+                core_obj,D = FaustFact.fact_givens_fgft_cplx(M, nGivens, nGivens_per_fac,
                         verbosity, tol,
-                        relerr, order)
+                        relerr, order, enable_large_Faust)
 
         elif(isinstance(M, csr_matrix)):
             if(M_is_real):
-                core_obj,D = FaustFact.fact_givens_fgft_sparse(M, maxiter,
+                core_obj,D = FaustFact.fact_givens_fgft_sparse(M, nGivens,
                         nGivens_per_fac,
                         verbosity,
                         tol,
                         relerr,
-                        order)
+                        order, enable_large_Faust)
             else: #complex
-                core_obj,D = FaustFact.fact_givens_fgft_sparse_cplx(M, maxiter, nGivens_per_fac,
+                core_obj,D = FaustFact.fact_givens_fgft_sparse_cplx(M, nGivens, nGivens_per_fac,
                         verbosity, tol,
-                        relerr, order)
+                        relerr, order, enable_large_Faust)
         else:
             raise TypeError("The matrix to diagonalize must be a"
                             " scipy.sparse.csr_matrix or a numpy array.")

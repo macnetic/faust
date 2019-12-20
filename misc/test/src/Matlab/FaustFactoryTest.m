@@ -163,7 +163,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
-			[F,D] = matfaust.fact.fgft_givens(Lap, 'nGivens', J);%, 0, 'verbosity', 1);
+			[F,D] = matfaust.fact.fgft_givens(Lap, 'nGivens', J, 'enable_large_Faust', true, 'nGivens_per_fac', 1);%, 0, 'verbosity', 1);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -173,7 +173,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			% misc/test/src/C++/GivensFGFT.cpp.in
 			this.verifyEqual(err, 0.0326529, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
-			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J);%, 0, 'verbosity', 2);
+			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'enable_large_Faust', true, 'nGivens_per_fac', 1);%, 0, 'verbosity', 2);
 			this.verifyEqual(full(F2),full(F))
 			this.verifyEqual(D,D2)
 		end
@@ -183,7 +183,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
-			[F,D] = matfaust.fact.fgft_givens(sparse(Lap), 'nGivens', J);%, 0, 'verbosity', 1);
+			[F,D] = matfaust.fact.fgft_givens(sparse(Lap), 'nGivens', J, 'enable_large_Faust', true, 'nGivens_per_fac', 1);%, 0, 'verbosity', 1);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -193,18 +193,18 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			% misc/test/src/C++/GivensFGFT.cpp.in
 			this.verifyEqual(err, 0.0326529, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
-			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J);%, 0, 'verbosity', 2);
+			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'nGivens_per_fac', 1, 'enable_large_Faust', true);%, 0, 'verbosity', 2);
 			this.verifyEqual(full(F2),full(F))
 			this.verifyEqual(D,D2)
 		end
 
 		function test_fgft_givens_parallel(this)
-			disp('Test matfaust.fact.fgft_givens_sparse() -- parallel')
+			disp('Test matfaust.fact.fgft_givens() -- parallel')
 			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			t = size(Lap,1)/2;
-			[F,D] = matfaust.fact.fgft_givens(Lap, 'nGivens', J, 'nGivens_per_fac', t); %, 'verbosity', 2);
+			[F,D] = matfaust.fact.fgft_givens(Lap, 'nGivens', J, 'nGivens_per_fac', t, 'enable_large_Faust', true); %, 'verbosity', 2);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -214,7 +214,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			% misc/test/src/C++/GivensFGFTParallel.cpp.in
 			this.verifyEqual(err,0.0398154, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
-			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'nGivens_per_fac', t); %, 'verbosity', 2);
+			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'nGivens_per_fac', t, 'enable_large_Faust', true); %, 'verbosity', 2);
 			this.verifyEqual(full(F2),full(F))
 			this.verifyEqual(D,D2)
 		end
@@ -225,7 +225,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			t = size(Lap,1)/2;
-			[F,D] = matfaust.fact.fgft_givens(sparse(Lap), 'nGivens', J, 'nGivens_per_fac', t); %, 'verbosity', 2);
+			[F,D] = matfaust.fact.fgft_givens(sparse(Lap), 'nGivens', J, 'nGivens_per_fac', t, 'enable_large_Faust', true); %, 'verbosity', 2);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -235,7 +235,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			% misc/test/src/C++/GivensFGFTParallel.cpp.in
 			this.verifyEqual(err, 0.0398154, 'AbsTol', 0.00001)
 			% verify it works the same using the eigtj() alias function
-			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'nGivens_per_fac', t); %, 'verbosity', 2);
+			[F2,D2] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'nGivens_per_fac', t, 'enable_large_Faust', true); %, 'verbosity', 2);
 			this.verifyEqual(full(F2),full(F))
 			this.verifyEqual(D,D2)
 		end

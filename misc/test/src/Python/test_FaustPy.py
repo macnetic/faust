@@ -925,7 +925,7 @@ class TestFaustFactory(unittest.TestCase):
         L = L.astype(np.float64)
         J = \
         int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
-        D, F = pyfaust.fact.fgft_givens(L, J, nGivens_per_fac=1, verbosity=0)
+        D, F = pyfaust.fact.fgft_givens(L, J, nGivens_per_fac=1, verbosity=0, enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
@@ -946,7 +946,8 @@ class TestFaustFactory(unittest.TestCase):
         J = \
                 int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
         t = int(L.shape[0]/2)
-        D, F = fgft_givens(L, J, nGivens_per_fac=t, verbosity=0)
+        D, F = fgft_givens(L, J, nGivens_per_fac=t, verbosity=0,
+                           enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
@@ -954,7 +955,8 @@ class TestFaustFactory(unittest.TestCase):
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in (_double version)
         self.assertAlmostEqual(err, 0.0398154, places=7)
-        D2, F2 = eigtj(L, J, nGivens_per_fac=t, verbosity=0)
+        D2, F2 = eigtj(L, J, nGivens_per_fac=t, verbosity=0,
+                       enable_large_Faust=True)
         D2 = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
         err2 = norm((F2*D.todense())*F2.T.todense()-L,"fro")/norm(L,"fro")
@@ -977,7 +979,8 @@ class TestFaustFactory(unittest.TestCase):
         L = L.astype(np.float64)
         J = \
         int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
-        D, F = pyfaust.fact.fgft_givens(csr_matrix(L), J, nGivens_per_fac=0, verbosity=0)
+        D, F = pyfaust.fact.fgft_givens(csr_matrix(L), J, nGivens_per_fac=0,
+                                        verbosity=0,enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
@@ -999,7 +1002,7 @@ class TestFaustFactory(unittest.TestCase):
         J = \
                 int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
         t = int(L.shape[0]/2)
-        D, F = fgft_givens(csr_matrix(L), J, nGivens_per_fac=t, verbosity=0)
+        D, F = fgft_givens(csr_matrix(L), J, nGivens_per_fac=t, verbosity=0, enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
@@ -1007,7 +1010,8 @@ class TestFaustFactory(unittest.TestCase):
         # the error reference is from the C++ test,
         # misc/test/src/C++/GivensFGFTParallel.cpp.in (_double version)
         self.assertAlmostEqual(err, 0.0398154, places=7)
-        D2, F2 = eigtj(csr_matrix(L), J, nGivens_per_fac=t, verbosity=0)
+        D2, F2 = eigtj(csr_matrix(L), J, nGivens_per_fac=t, verbosity=0,
+                       enable_large_Faust=True)
         D2 = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
         err2 = norm((F2*D.todense())*F2.T.todense()-L,"fro")/norm(L,"fro")

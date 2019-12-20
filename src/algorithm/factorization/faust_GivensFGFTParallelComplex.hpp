@@ -6,16 +6,16 @@ using namespace Faust;
 #endif
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel) : GivensFGFTComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel), t(t), fact_nrots(0)
+GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel,  const bool enable_large_Faust) : GivensFGFTComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), t(t), fact_nrots(0)
 {
-	this->facts.resize(round(J/(float)t));
+	if(J > 0) this->facts.resize(round(J/(float)t));
 	this->coord_choices.resize(0);
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel) : GivensFGFTComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel), t(t), fact_nrots(0)
+GivensFGFTParallelComplex<FPP,DEVICE,FPP2>::GivensFGFTParallelComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity, const double stoppingError, const bool errIsRel, const bool enable_large_Faust) : GivensFGFTComplex<FPP,DEVICE,FPP2>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), t(t), fact_nrots(0)
 {
-	this->facts.resize(round(J/(float)t));
+	if(J > 0) this->facts.resize(round(J/(float)t));
 	this->coord_choices.resize(0);
 }
 

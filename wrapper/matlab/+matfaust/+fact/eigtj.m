@@ -75,7 +75,7 @@
 %==========================================================================================
 function [V,D] = eigtj(M, varargin)
 	import matfaust.Faust
-	nGivens_per_fac = 1; % default value
+	nGivens_per_fac = floor(size(M,1)/2); % default value
 	verbosity = 0; % default value
 %	if(~ ismatrix(M) || ~ isreal(M))
 %		error('M must be a real matrix.')
@@ -88,11 +88,18 @@ function [V,D] = eigtj(M, varargin)
 	tol = 0;
 	relerr = true;
 	verbosity = 0;
+	enable_large_Faust = false;
 	argc = length(varargin);
 	order = 1; % ascending order
 	if(argc > 0)
 		for i=1:argc
 			switch(varargin{i})
+				case 'enable_large_Faust'
+					if(argc == i || ~ islogical(varargin{i+1}))
+						error('enable_large_Faust keyword argument is not followed by a logical')
+					else
+						enable_large_Faust = varargin{i+1};
+					end
 				case 'nGivens'
 					if(argc == i || ~ isnumeric(varargin{i+1}) || varargin{i+1}-floor(varargin{i+1}) > 0 || varargin{i+1} <= 0 )
 						error('nGivens keyword arg. is not followed by an integer')
@@ -149,7 +156,7 @@ function [V,D] = eigtj(M, varargin)
 	if(nGivens > 0)
 		nGivens_per_fac = min(nGivens_per_fac, nGivens);
 	end
-	[core_obj, D] = mexfgftgivensReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order);
+	[core_obj, D] = mexfgftgivensReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
 	D = sparse(diag(real(D)));
 	V = Faust(core_obj, isreal(M));
 end
