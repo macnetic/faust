@@ -55,9 +55,9 @@ typedef @FACT_FPP@ FPP2;
 
 using namespace Faust;
 
-//void svdtj_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, mxArray **plhs);
+//void svdtj_cplx(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust mxArray **plhs);
 
-void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, mxArray **plhs);
+void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, mxArray **plhs);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -67,10 +67,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	unsigned int verbosity = 0; //default verbosity (no info. displayed)
 	double tol = 0;
 	bool relErr = true;
-	int order;
+	int order = -1;
+	bool enable_large_Faust = false;
 
-	if(nrhs < 2 || nrhs > 7)
-		mexErrMsgTxt("Bad Number of inputs arguments");
+	if(nrhs < 2 || nrhs > 8)
+		mexErrMsgTxt("Bad Number of input arguments");
 
 	J = (int) mxGetScalar(prhs[1]);
 	if(nrhs >= 3)
@@ -83,6 +84,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		relErr = (bool) mxGetScalar(prhs[5]);
 	if(nrhs >= 7)
 		order = (int) mxGetScalar(prhs[6]); //eigenvalues order
+	if(nrhs >= 8)
+		enable_large_Faust = (bool) mxGetScalar(prhs[7]);
 
 	tol *= tol; // C++ backend works with squared norm error
 	const mxArray* matlab_matrix = prhs[0]; // Laplacian
@@ -90,19 +93,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //	if(mxIsComplex(matlab_matrix))
 //		svdtj_cplx(matlab_matrix, J, t, tol, verbosity, relErr, order, plhs);
 //	else
-	svdtj(matlab_matrix, J, t, tol, verbosity, relErr, order, plhs);
+	svdtj(matlab_matrix, J, t, tol, verbosity, relErr, order, enable_large_Faust, plhs);
 
 }
 
-void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, mxArray **plhs)
+void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, mxArray **plhs)
 {
 	Faust::MatDense<SCALAR,Cpu> dM;
 	Faust::MatSparse<SCALAR,Cpu> sM;
-	TransformHelper<SCALAR,Cpu> *U, *V;
+	TransformHelper<SCALAR,Cpu> *U = nullptr, *V = nullptr;
 	Faust::Vect<SCALAR,Cpu>* S;
 	Faust::MatDense<complex<SCALAR>,Cpu> dM_cplx;
 	Faust::MatSparse<complex<SCALAR>,Cpu> sM_cplx;
-	TransformHelper<complex<SCALAR>,Cpu> *U_cplx, *V_cplx;
+	TransformHelper<complex<SCALAR>,Cpu> *U_cplx = nullptr, *V_cplx = nullptr;
 	Faust::Vect<complex<SCALAR>,Cpu>* S_cplx;
 
 	Faust::BlasHandle<Cpu> blas_handle;
@@ -117,36 +120,45 @@ void svdtj(const mxArray* matlab_matrix, int J, int t, double tol, unsigned int 
 			if (mxIsSparse(matlab_matrix))
 			{
 				mxArray2FaustspMat(matlab_matrix,sM_cplx);
-				svdtj_cplx<complex<SCALAR>,Cpu,FPP2>(sM_cplx, J, t, tol, verbosity, relErr, order, &U_cplx, &V_cplx, &S_cplx);
+				svdtj_cplx<complex<SCALAR>,Cpu,FPP2>(sM_cplx, J, t, tol, verbosity, relErr, order, enable_large_Faust, &U_cplx, &V_cplx, &S_cplx);
 			}else
 			{
 				mxArray2FaustMat(matlab_matrix, dM_cplx);
-				svdtj_cplx<complex<SCALAR>,Cpu,FPP2>(dM_cplx, J, t, tol, verbosity, relErr, order, &U_cplx, &V_cplx, &S_cplx);
+				svdtj_cplx<complex<SCALAR>,Cpu,FPP2>(dM_cplx, J, t, tol, verbosity, relErr, order, enable_large_Faust, &U_cplx, &V_cplx, &S_cplx);
 			}
-			plhs[0] = convertPtr2Mat<Faust::TransformHelper<complex<SCALAR>, Cpu>>(U_cplx);
-			plhs[1] = FaustVec2mxArray(*S_cplx);
-			plhs[2] = convertPtr2Mat<Faust::TransformHelper<complex<SCALAR>, Cpu>>(V_cplx);
-			delete S_cplx;
+			if(U_cplx != nullptr)
+			{
+				plhs[0] = convertPtr2Mat<Faust::TransformHelper<complex<SCALAR>, Cpu>>(U_cplx);
+				plhs[1] = FaustVec2mxArray(*S_cplx);
+				plhs[2] = convertPtr2Mat<Faust::TransformHelper<complex<SCALAR>, Cpu>>(V_cplx);
+				delete S_cplx; //allocated internally by Faust::svdtj
+
+			}
 		}
 		else
 		{
 			if (mxIsSparse(matlab_matrix))
 			{
 				mxArray2FaustspMat(matlab_matrix,sM);
-				svdtj(sM, J, t, tol, verbosity, relErr, order, &U, &V, &S);
+				svdtj(sM, J, t, tol, verbosity, relErr, order, enable_large_Faust, &U, &V, &S);
 			}else
 			{
 				mxArray2FaustMat(matlab_matrix, dM);
-				svdtj(dM, J, t, tol, verbosity, relErr, order, &U, &V, &S);
+				svdtj(dM, J, t, tol, verbosity, relErr, order, enable_large_Faust, &U, &V, &S);
 			}
+			if(U != nullptr)
+			{
                plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(U);
                plhs[1] = FaustVec2mxArray(*S);
                plhs[2] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(V);
-               delete S; //allocated internally by Faust::svdtj
+			   delete S; //allocated internally by Faust::svdtj
+			}
 		}
 	}
 	catch (const std::exception& e)
 	{
 		mexErrMsgTxt(e.what());
 	}
+	if(U_cplx == nullptr && U == nullptr)
+		mexErrMsgTxt("Empty transform (nGivens is too big ? Set enable_large_Faust to true to force the computation).");
 }

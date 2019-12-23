@@ -86,6 +86,7 @@ function [U,S,V] = svdtj(M, varargin)
 	relerr = true;
 	verbosity = 0;
 	argc = length(varargin);
+	enable_large_Faust = false;
 	order = -1; % descending order
 	if(argc > 0)
 		for i=1:argc
@@ -133,6 +134,12 @@ function [U,S,V] = svdtj(M, varargin)
 							order = 0
 						end
 					end
+				case 'enable_large_Faust'
+					if(argc == i || ~ islogical(varargin{i+1}))
+						error('enable_large_Faust keyword argument is not followed by a logical')
+					else
+						enable_large_Faust = varargin{i+1};
+					end
 				otherwise
 					if(isstr(varargin{i}) && (~ strcmp(varargin{i}, 'ascend') && ~ strcmp(varargin{i}, 'descend') && ~ strcmp(varargin{i}, 'undef')) )
 						error([ varargin{i} ' unrecognized argument'])
@@ -146,7 +153,7 @@ function [U,S,V] = svdtj(M, varargin)
 	if(nGivens > 0)
 		nGivens_per_fac = min(nGivens_per_fac, nGivens);
 	end
-	[core_obj1, S, core_obj2] = mexsvdtjReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order);
+	[core_obj1, S, core_obj2] = mexsvdtjReal(M, nGivens, nGivens_per_fac, verbosity, tol, relerr, order, enable_large_Faust);
 	S = sparse(diag(real(S)));
 	U = Faust(core_obj1, isreal(M));
 	V = Faust(core_obj2, isreal(M));
