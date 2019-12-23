@@ -263,7 +263,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
         sp_facts.push_back(M);
     }
 
-    Faust::TransformHelper<FPP, Cpu> *th = new Faust::TransformHelper<FPP,Cpu>(sp_facts, FPP(lambda), false);
+    Faust::TransformHelper<FPP, Cpu> *th = new Faust::TransformHelper<FPP,Cpu>(sp_facts, FPP(lambda), false, true, /* internal call */ true);
 
     for(typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
     {
@@ -396,7 +396,7 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
     //don't delete list_fact_generic because they are directly used in
     //TransformHelper (without copy)
 
-    Faust::TransformHelper<FPP, Cpu>* th = new Faust::TransformHelper<FPP,Cpu>(list_fact_generic, 1.0, false, false);
+    Faust::TransformHelper<FPP, Cpu>* th = new Faust::TransformHelper<FPP,Cpu>(list_fact_generic, 1.0, false, true, /* internal call */ true);
 
     if(p->is_verbose) th->display();
     core = new FaustCoreCpp<FPP>(th);

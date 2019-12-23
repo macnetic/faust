@@ -81,14 +81,14 @@ namespace Faust {
 			void eval_sliced_Transform();
 			void eval_fancy_idx_Transform();
 			public:
-			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true);
+			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
 			TransformHelper();
 			TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right);
 			TransformHelper(TransformHelper<FPP,Cpu>* th);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
-TransformHelper(Transform<FPP,Cpu> &t, const bool moving=false);
+			TransformHelper(Transform<FPP,Cpu> &t, const bool moving=false);
 
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose=false, const bool conjugate=false);
 //			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;

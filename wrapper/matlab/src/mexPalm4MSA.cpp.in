@@ -299,7 +299,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	 }
 
 
-	 TransformHelper<SCALAR, Cpu> *F = new TransformHelper<SCALAR, Cpu>(sp_facts, SCALAR(lambda), false);
+	 TransformHelper<SCALAR, Cpu> *F = new TransformHelper<SCALAR, Cpu>(sp_facts, SCALAR(lambda), false, true, /* internal call */ true);
 	 plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);
 
 	 for(typename std::vector<Faust::MatGeneric<SCALAR,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)

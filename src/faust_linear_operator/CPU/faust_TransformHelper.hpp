@@ -60,12 +60,13 @@ namespace Faust {
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts,
-				const FPP lambda_, const bool optimizedCopy, const bool cloning_fact) : is_transposed(false),
+				const FPP lambda_, const bool optimizedCopy, const bool cloning_fact,
+				const bool internal_call) : is_transposed(false),
 																						is_conjugate(false),
 																						is_sliced(false),
 																						is_fancy_indexed(false)
 	{
-		if(lambda_ != FPP(1.0))
+		if(lambda_ != FPP(1.0) && ! internal_call)
 			cerr << "WARNING: the constructor argument for multiplying the Faust by a scalar is DEPRECATED and might not be supported in next versions of FAµST." << endl;
 		this->transform = make_shared<Transform<FPP,Cpu>>(facts, lambda_, optimizedCopy, cloning_fact);
 	}
@@ -1048,7 +1049,7 @@ namespace Faust {
 				//			for(int i=0;i<n+1;i++)
 				//				factors[i]->Display();
 				float alpha = norma?1/sqrt((double)(1 << n)):1.0;
-				fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false);
+				fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
 			}
 			catch(std::bad_alloc e)
 			{
