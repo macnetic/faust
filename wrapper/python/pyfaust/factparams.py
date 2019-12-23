@@ -172,69 +172,69 @@ class ConstraintInt(ConstraintGeneric):
                                                       self._num_cols, self._cons_value,
                                                       self.normalized, self.pos)
 
-def sp(shape, k, normalized=True, pos=False):
-    """
-    """
-    c = ConstraintInt('sp', shape[0], shape[1], k, normalized, pos)
-    def proj(M):
-        return c.project(M)
-    return proj
+class proj_gen(ABC):
 
-def splin(shape, k, normalized=True, pos=False):
-    """
-    """
-    c = ConstraintInt('splin', shape[0], shape[1], k, normalized, pos)
-    def proj(M):
-        return c.project(M)
-    return proj
+    @abstractmethod
+    def __init__(self):
+        pass
 
-def spcol(shape, k, normalized=True, pos=False):
-    """
-    """
-    c = ConstraintInt('spcol', shape[0], shape[1], k, normalized, pos)
-    def proj(M):
-        return c.project(M)
-    return proj
+    def __call__(self, M):
+        return self.constraint.project(M)
 
-def splincol(shape, k, normalized=True, pos=False):
-    """
-    """
-    c = ConstraintInt('splincol', shape[0], shape[1], k, normalized, pos)
-    def proj(M):
-        return c.project(M)
-    return proj
+class sp(proj_gen):
 
-def supp(S, normalized=True, pos=False):
-    """
-    """
-    c = ConstraintMat('supp', S, normalized, pos)
-    def proj(M):
-        return c.project(M)
-    return proj
+    def __init__(self, shape, k, normalized=True, pos=False):
+        """
+        """
+        self.constraint = ConstraintInt('sp', shape[0], shape[1], k, normalized, pos)
 
-def const(C, normalized=False):
-    """
-    """
-    c = ConstraintMat('const', C, normalized, pos=False)
-    def proj(M):
-        return c.project(M)
-    return proj
+class splin(proj_gen):
 
-def normcol(shape, normval, normalized=False, pos=False):
-    """
-    """
-    c = ConstraintReal('normcol', shape[0], shape[1], normval, normalized, pos)
-    def proj(M):
-        return c.project(M)
-    return proj
+    def __init__(self, shape, k, normalized=True, pos=False):
+        """
+        """
+        self.constraint = ConstraintInt('splin', shape[0], shape[1], k, normalized, pos)
 
-def normlin(shape, normval, normalized=False, pos=False):
-    """
-    """
-    c = ConstraintReal('normlin', shape[0], shape[1], normval, normalized, pos)
-    def proj(M):
-        return c.project(M)
-    return proj
+class spcol(proj_gen):
+
+    def __init__(self, shape, k, normalized=True, pos=False):
+        """
+        """
+        self.constraint = ConstraintInt('spcol', shape[0], shape[1], k, normalized, pos)
+
+class splincol(proj_gen):
+
+    def __init__(self, shape, k, normalized=True, pos=False):
+        """
+        """
+        self.constraint = ConstraintInt('splincol', shape[0], shape[1], k, normalized, pos)
+
+class supp(proj_gen):
+
+    def __init__(self, S, normalized=True, pos=False):
+        """
+        """
+        self.constraint = ConstraintMat('supp', S, normalized, pos)
+
+class const(proj_gen):
+
+    def __init__(self, C, normalized=False):
+        """
+        """
+        self.constraint = ConstraintMat('const', C, normalized, pos=False)
+
+class normcol(proj_gen):
+    def __init__(self, shape, normval, normalized=False, pos=False):
+        """
+        """
+        self.constraint = ConstraintReal('normcol', shape[0], shape[1], normval, normalized, pos)
+
+class normlin(proj_gen):
+
+    def __init__(self, shape, normval, normalized=False, pos=False):
+        """
+        """
+        self.constraint = ConstraintReal('normlin', shape[0], shape[1], normval, normalized, pos)
 
 class ConstraintMat(ConstraintGeneric):
     """
