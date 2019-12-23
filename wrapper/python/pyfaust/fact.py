@@ -312,7 +312,9 @@ def _check_fact_mat(funcname, M):
 
 
 # experimental block start
-def palm4msa_py(A, J, N, proxs, dims):
+def palm4msa_py(A, J, N, proxs):
+    dims = [(prox.constraint._num_rows, prox.constraint._num_cols) for prox in
+            proxs ]
     # start Faust, identity factors
     S = Faust([np.eye(dims[i][0], dims[i][1]) for i in range(J)])
     _lambda = 1
