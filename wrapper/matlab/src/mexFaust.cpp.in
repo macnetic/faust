@@ -100,607 +100,626 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 		{
 			mexErrMsgTxt("Failed to save the file.");
 		}
-    }
+}
 
-    void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-    {
+template<typename T>
+void fourierFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	if(nlhs!=1)
+		mexErrMsgTxt("mex dft(): too many left hand side variables.");
+	if(nrhs < 3)
+		mexErrMsgTxt("mex dft(): wrong number of arguments (must be 3)");
+	unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
+	bool norma = (bool) mxGetScalar(prhs[2]);
+
+	//printf("mexFaust.cpp hadamard(): faust creation\n");
+	Faust::TransformHelper<complex<FPP>,Cpu>* F = Faust::TransformHelper<complex<FPP>,Cpu>::fourierFaust(n, norma);
+	//H->display();
+	if(F) //not NULL
+		plhs[0]=convertPtr2Mat<Faust::TransformHelper<complex<FPP>,Cpu> >(F);
+	else {
+		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+		double* ptr_out = (double*) mxGetData(plhs[0]);
+		ptr_out[0]=(double) 0;
+	}
+
+}
+
+template<typename T>
+void hadamardFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	if(nlhs!=1)
+		mexErrMsgTxt("mex wht(): too many left hand side variables.");
+	if(nrhs < 3)
+		mexErrMsgTxt("mex wht(): wrong number of arguments (must be 3)");
+	unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
+	bool norma = (bool) mxGetScalar(prhs[2]);
+
+	//printf("mexFaust.cpp hadamard(): faust creation\n");
+	Faust::TransformHelper<T,Cpu>* H = Faust::TransformHelper<T,Cpu>::hadamardFaust(n, norma);
+	//H->display();
+	if(H) //not NULL
+		plhs[0]=convertPtr2Mat<Faust::TransformHelper<T,Cpu> >(H);
+	else {
+		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+		double* ptr_out = (double*) mxGetData(plhs[0]);
+		ptr_out[0]=(double) 0;
+	}
+
+}
+
+template<typename T>
+void eyeFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	if(nlhs != 1)
+		mexErrMsgTxt("eye(): too many left hand side variables.");
+	unsigned int n, m;
+	n = mxGetScalar(prhs[1]);
+	m = mxGetScalar(prhs[2]);
+	Faust::TransformHelper<SCALAR,Cpu>* eye = Faust::TransformHelper<SCALAR,Cpu>::eyeFaust(n, m);
+	if(eye) // not NULL
+		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu>>(eye);
+	else
+	{
+		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+		double* ptr_out = (double*) mxGetData(plhs[0]);
+		ptr_out[0]=(double) 0;
+	}
+	return;
+}
+
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
 #ifdef FAUST_VERBOSE
-        if (typeid(SCALAR) == typeid(float))
-        {
-            std::cout<<"SCALAR == float"<<std::endl;
-        }
+	if (typeid(SCALAR) == typeid(float))
+	{
+		std::cout<<"SCALAR == float"<<std::endl;
+	}
 
-        if (typeid(SCALAR) == typeid(double))
-        {
-            std::cout<<"SCALAR == double"<<std::endl;
-        }
+	if (typeid(SCALAR) == typeid(double))
+	{
+		std::cout<<"SCALAR == double"<<std::endl;
+	}
 #endif
-        try{
-			// Get the command string
-			char cmd[256];
-			if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
-				mexErrMsgTxt("First input should be a command string less than 256 characters long.");
-			// Check there is a second input, which should be the class instance handle
-			if (nrhs < 2)
-				mexErrMsgTxt("Second input should be a class instance handle.");
+	try{
+		// Get the command string
+		char cmd[256];
+		if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
+			mexErrMsgTxt("First input should be a command string less than 256 characters long.");
+		// Check there is a second input, which should be the class instance handle
+		if (nrhs < 2)
+			mexErrMsgTxt("Second input should be a class instance handle.");
 
-			if(!strcmp("rand", cmd)){
-				if(nlhs!=1)
-					mexErrMsgTxt("rand(): 1 variable result is expected.");
-				if(nrhs < 6)
-					mexErrMsgTxt("rand(): wrong number of arguments (must be 6 to 7)");
-				//printf("mexFaust.cpp rand(): retrieving arguments\n");
-				faust_unsigned_int t = (faust_unsigned_int) mxGetScalar(prhs[1]),
-								   min_num_factors = (faust_unsigned_int) mxGetScalar(prhs[2]),
-								   max_num_factors = (faust_unsigned_int) mxGetScalar(prhs[3]),
-								   min_dim_size = (faust_unsigned_int) mxGetScalar(prhs[4]),
-								   max_dim_size = (faust_unsigned_int) mxGetScalar(prhs[5]);
-				float density = (float) mxGetScalar(prhs[6]);
-				bool per_row = (bool) mxGetScalar(prhs[7]);
+		if(!strcmp("rand", cmd)){
+			if(nlhs!=1)
+				mexErrMsgTxt("rand(): 1 variable result is expected.");
+			if(nrhs < 6)
+				mexErrMsgTxt("rand(): wrong number of arguments (must be 6 to 7)");
+			//printf("mexFaust.cpp rand(): retrieving arguments\n");
+			faust_unsigned_int t = (faust_unsigned_int) mxGetScalar(prhs[1]),
+							   min_num_factors = (faust_unsigned_int) mxGetScalar(prhs[2]),
+							   max_num_factors = (faust_unsigned_int) mxGetScalar(prhs[3]),
+							   min_dim_size = (faust_unsigned_int) mxGetScalar(prhs[4]),
+							   max_dim_size = (faust_unsigned_int) mxGetScalar(prhs[5]);
+			float density = (float) mxGetScalar(prhs[6]);
+			bool per_row = (bool) mxGetScalar(prhs[7]);
 
-				//printf("mexFaust.cpp rand(): faust creation\n");
-				Faust::TransformHelper<SCALAR,Cpu>* F = Faust::TransformHelper<SCALAR,Cpu>::randFaust(RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			//printf("mexFaust.cpp rand(): faust creation\n");
+			Faust::TransformHelper<SCALAR,Cpu>* F = Faust::TransformHelper<SCALAR,Cpu>::randFaust(RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
 
-				if(F) //not NULL
-					plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
-				else {
-					plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-					double* ptr_out = (double*) mxGetData(plhs[0]);
-					ptr_out[0]=(double) 0;
-				}
-				return;
+			if(F) //not NULL
+				plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
+			else {
+				plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+				double* ptr_out = (double*) mxGetData(plhs[0]);
+				ptr_out[0]=(double) 0;
+			}
+			return;
 
 		}
-			//TODO: hadamard, fourier, and proxs must be in there own mex function (one for hadamard and fourier, another for the prox)
-			if(!strcmp("hadamard", cmd)){
-				if(nlhs!=1)
-					mexErrMsgTxt("mex wht(): too many left hand side variables.");
-				if(nrhs < 3)
-					mexErrMsgTxt("mex wht(): wrong number of arguments (must be 3)");
-				unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
-				bool norma = (bool) mxGetScalar(prhs[2]);
+		//TODO: hadamard, fourier, and proxs must be in there own mex function (one for hadamard and fourier, another for the prox)
+		if(!strcmp("hadamard", cmd)){
+			hadamardFaust<SCALAR>(nlhs, plhs, nrhs, prhs);
+			return;
+		}
 
-				//printf("mexFaust.cpp hadamard(): faust creation\n");
-				Faust::TransformHelper<SCALAR,Cpu>* H = Faust::TransformHelper<SCALAR,Cpu>::hadamardFaust(n, norma);
-				//H->display();
-				if(H) //not NULL
-					plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(H);
-				else {
-					plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-					double* ptr_out = (double*) mxGetData(plhs[0]);
-					ptr_out[0]=(double) 0;
-				}
-				return;
+		if(!strcmp("fourier", cmd))
+		{
+			fourierFaust<complex<FPP>>(nlhs, plhs, nrhs, prhs);
+			return;
+		}
 
-			}
+		if(!strcmp("eye", cmd))
+		{
+			eyeFaust<SCALAR>(nlhs, plhs, nrhs, prhs);
+			return;
+		}
 
-			if(!strcmp("fourier", cmd))
+		if(!strcmp("prox", cmd))
+		{
+			if(nlhs!=1)
+				mexErrMsgTxt("prox(): 1 output variable is expected.");
+			if(nrhs < 4)
+				mexErrMsgTxt("prox(): wrong number of arguments (must be 4)");
+
+			unsigned int constraint_type = (unsigned int) mxGetScalar(prhs[2]);
+			bool const is_param_scalar = (1u == mxGetNumberOfElements(prhs[3]));
+			double scal_param;
+			const mxArray* mxMat_in = prhs[1];
+
+			const size_t nrows_mat = mxGetM(mxMat_in);
+			const size_t ncols_mat = mxGetN(mxMat_in);
+			SCALAR* mat_data = NULL;
+			mxArray2Ptr(mxMat_in, mat_data);
+			Faust::MatDense<SCALAR, Cpu> mat(mat_data, nrows_mat, ncols_mat);
+			Faust::MatDense<SCALAR, Cpu>* mat_param = nullptr;
+			bool normalized = true, pos = false;
+
+			if(is_param_scalar)
 			{
-				if(nlhs!=1)
-					mexErrMsgTxt("mex dft(): too many left hand side variables.");
-				if(nrhs < 3)
-					mexErrMsgTxt("mex dft(): wrong number of arguments (must be 3)");
-				unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
-				bool norma = (bool) mxGetScalar(prhs[2]);
-
-				//printf("mexFaust.cpp hadamard(): faust creation\n");
-				Faust::TransformHelper<complex<FPP>,Cpu>* F = Faust::TransformHelper<complex<FPP>,Cpu>::fourierFaust(n, norma);
-				//H->display();
-				if(F) //not NULL
-					plhs[0]=convertPtr2Mat<Faust::TransformHelper<complex<FPP>,Cpu> >(F);
-				else {
-					plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-					double* ptr_out = (double*) mxGetData(plhs[0]);
-					ptr_out[0]=(double) 0;
-				}
-				return;
-
+				scal_param = mxGetScalar(prhs[3]);
 			}
-
-			if(!strcmp("eye", cmd))
+			else
 			{
-				if(nlhs != 1)
-					mexErrMsgTxt("eye(): too many left hand side variables.");
-				unsigned int n, m;
-				n = mxGetScalar(prhs[1]);
-				m = mxGetScalar(prhs[2]);
-				Faust::TransformHelper<SCALAR,Cpu>* eye = Faust::TransformHelper<SCALAR,Cpu>::eyeFaust(n, m);
-				if(eye) // not NULL
-					plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu>>(eye);
-				else
-				{
-					plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-					double* ptr_out = (double*) mxGetData(plhs[0]);
-					ptr_out[0]=(double) 0;
-				}
-				return;
+				mxArray2Ptr(prhs[3], mat_data);
+				// constraint matrix has normally same dim as constrainted matrix (TODO: must be checked from matlab code)
+				// it's verified in C++
+				mat_param = new Faust::MatDense<SCALAR, Cpu>(mat_data, nrows_mat, ncols_mat);
 			}
 
-			if(!strcmp("prox", cmd))
+			if(nrhs > 4)
 			{
-				if(nlhs!=1)
-					mexErrMsgTxt("prox(): 1 output variable is expected.");
-				if(nrhs < 4)
-					mexErrMsgTxt("prox(): wrong number of arguments (must be 4)");
-
-				unsigned int constraint_type = (unsigned int) mxGetScalar(prhs[2]);
-				bool const is_param_scalar = (1u == mxGetNumberOfElements(prhs[3]));
-				double scal_param;
-				const mxArray* mxMat_in = prhs[1];
-
-				const size_t nrows_mat = mxGetM(mxMat_in);
-				const size_t ncols_mat = mxGetN(mxMat_in);
-				SCALAR* mat_data = NULL;
-				mxArray2Ptr(mxMat_in, mat_data);
-				Faust::MatDense<SCALAR, Cpu> mat(mat_data, nrows_mat, ncols_mat);
-				Faust::MatDense<SCALAR, Cpu>* mat_param = nullptr;
-				bool normalized = true, pos = false;
-
-				if(is_param_scalar)
-				{
-					scal_param = mxGetScalar(prhs[3]);
-				}
-				else
-				{
-					mxArray2Ptr(prhs[3], mat_data);
-					// constraint matrix has normally same dim as constrainted matrix (TODO: must be checked from matlab code)
-					// it's verified in C++
-					mat_param = new Faust::MatDense<SCALAR, Cpu>(mat_data, nrows_mat, ncols_mat);
-				}
-
-				if(nrhs > 4)
-				{
-					normalized = (bool) mxGetScalar(prhs[4]);
-				}
-
-				if(nrhs > 5)
-				{
-					pos = (bool) mxGetScalar(prhs[5]);
-				}
-
-
-				switch(constraint_type)
-				{
-					case CONSTRAINT_NAME_SP: /*!< fixed number of non zero elements, INT (frobenius norm 1) */
-						Faust::prox_sp(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_SPCOL: /*!< fixed number of non zero elements per column INT (frobenius norm 1) */
-						Faust::prox_spcol(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_SPLIN: /*!< fixed number of non zero elements per line INT (frobenius norm 1) */
-						Faust::prox_splin(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_SPLINCOL:
-						Faust::prox_splincol(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_SP_POS:/**< fixed number of non zeros coefficients: INT (frobenius norm 1) */
-						Faust::prox_sp_pos(mat, (faust_unsigned_int) scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_NORMLIN:/**< 2nd norm of the lines of matrix A ; REAL  */
-						Faust::prox_normlin(mat, scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_NORMCOL:/*!< 2nd norm of the colons of A REAL */
-						Faust::prox_normcol(mat, scal_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_CONST: /**< Matrix equal to A ; MAT */
-						Faust::prox_const(mat, *mat_param, normalized, pos);
-						break;
-					case CONSTRAINT_NAME_BLKDIAG:
-						//not impl. yet in cpp core
-						break;
-					case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
-						Faust::prox_supp(mat, *mat_param, normalized, pos);
-						break;
-				}
-				plhs[0] = FaustMat2mxArray(mat);
-				if(mat_param != nullptr)
-					delete mat_param;
-				return;
+				normalized = (bool) mxGetScalar(prhs[4]);
 			}
 
-            // New
-            if (!strcmp("new", cmd))
-            {
-
-                if(nlhs!=1)
-                    mexErrMsgTxt("1 output is expected.");
-                if((nrhs<2) || (nrhs>4))
-                    mexErrMsgTxt("between 1 and 3 inputs are expected.");
+			if(nrhs > 5)
+			{
+				pos = (bool) mxGetScalar(prhs[5]);
+			}
 
 
-                if(!mxIsCell(prhs[1]))
-                    mexErrMsgTxt("1st arg input must be a cell-array");
+			switch(constraint_type)
+			{
+				case CONSTRAINT_NAME_SP: /*!< fixed number of non zero elements, INT (frobenius norm 1) */
+					Faust::prox_sp(mat, (faust_unsigned_int) scal_param, normalized, pos);
+					break;
+				case CONSTRAINT_NAME_SPCOL: /*!< fixed number of non zero elements per column INT (frobenius norm 1) */
+					Faust::prox_spcol(mat, (faust_unsigned_int) scal_param, normalized, pos);
+					break;
+				case CONSTRAINT_NAME_SPLIN: /*!< fixed number of non zero elements per line INT (frobenius norm 1) */
+					Faust::prox_splin(mat, (faust_unsigned_int) scal_param, normalized, pos);
+					break;
+				case CONSTRAINT_NAME_SPLINCOL:
+					Faust::prox_splincol(mat, (faust_unsigned_int) scal_param, normalized, pos);
+					break;
+				case CONSTRAINT_NAME_SP_POS:/**< fixed number of non zeros coefficients: INT (frobenius norm 1) */
+					Faust::prox_sp_pos(mat, (faust_unsigned_int) scal_param, normalized, pos);
+					break;
+				case CONSTRAINT_NAME_NORMLIN:/**< 2nd norm of the lines of matrix A ; REAL  */
+					Faust::prox_normlin(mat, scal_param, normalized, pos);
+					break;
+				case CONSTRAINT_NAME_NORMCOL:/*!< 2nd norm of the colons of A REAL */
+					Faust::prox_normcol(mat, scal_param, normalized, pos);
+					break;
+				case CONSTRAINT_NAME_CONST: /**< Matrix equal to A ; MAT */
+					Faust::prox_const(mat, *mat_param, normalized, pos);
+					break;
+				case CONSTRAINT_NAME_BLKDIAG:
+					//not impl. yet in cpp core
+					break;
+				case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
+					Faust::prox_supp(mat, *mat_param, normalized, pos);
+					break;
+			}
+			plhs[0] = FaustMat2mxArray(mat);
+			if(mat_param != nullptr)
+				delete mat_param;
+			return;
+		}
 
-                // v1105 : Faust::Transform<SCALAR,Cpu> is no longer made of Faust::MatSparse<SCALAR,Cpu> but of pointer of abstract class Faust::MatGeneric<SCALAR,Cpu>
-                //old version : std::vector<Faust::MatSparse<SCALAR,Cpu> > vec_spmat;
-                std::vector<Faust::MatGeneric<SCALAR,Cpu>*> list_factor;
-                mwSize nb_element = mxGetNumberOfElements(prhs[1]);
+		// New
+		if (!strcmp("new", cmd))
+		{
 
-
-
-                if (nb_element != 0)
-                {
-                    mxArray * mxMat;
-                    for (int i=0; i < nb_element; i++)
-                    {
-                        mxMat=mxGetCell(prhs[1],i);
-
-                        concatMatGeneric<SCALAR>(mxMat,list_factor);
-
-                    }
-                }
-
-                // 2nd input (optional) : multiplicative scalar
-                SCALAR lambda = 1.0;
-                if (nrhs > 2)
-                    lambda = (SCALAR) mxGetScalar(prhs[2]);
-
-
-                // 3rd input (optional) : boolean to determine the type of copy
-                bool optimizedCopy = false;
-                if (nrhs > 3)
-                {
-                    double optimizedCopy_inter = mxGetScalar(prhs[3]);
-                    if ((optimizedCopy_inter != 1.0) and (optimizedCopy_inter != 0.0))
-                        mexErrMsgTxt("invalid boolean argument.");
-
-                    optimizedCopy = (bool) optimizedCopy_inter;
-
-                }
-
-
-                Faust::TransformHelper<SCALAR,Cpu>* F = new Faust::TransformHelper<SCALAR,Cpu>(list_factor, lambda, optimizedCopy);
-                for (int i=0;i<list_factor.size();i++)
-                    delete list_factor[i];
-
-                plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
-
-                return;
-            }
+			if(nlhs!=1)
+				mexErrMsgTxt("1 output is expected.");
+			if((nrhs<2) || (nrhs>4))
+				mexErrMsgTxt("between 1 and 3 inputs are expected.");
 
 
+			if(!mxIsCell(prhs[1]))
+				mexErrMsgTxt("1st arg input must be a cell-array");
+
+			// v1105 : Faust::Transform<SCALAR,Cpu> is no longer made of Faust::MatSparse<SCALAR,Cpu> but of pointer of abstract class Faust::MatGeneric<SCALAR,Cpu>
+			//old version : std::vector<Faust::MatSparse<SCALAR,Cpu> > vec_spmat;
+			std::vector<Faust::MatGeneric<SCALAR,Cpu>*> list_factor;
+			mwSize nb_element = mxGetNumberOfElements(prhs[1]);
 
 
-            // Delete
-            if (!strcmp("delete", cmd))
-            {
-                // Destroy the C++ object
-                destroyObject<Faust::TransformHelper<SCALAR,Cpu> >(prhs[1]);
-                // Warn if other commands were ignored
-                if (nlhs != 0 || nrhs != 2)
-                    mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
-                return;
-            }
+
+			if (nb_element != 0)
+			{
+				mxArray * mxMat;
+				for (int i=0; i < nb_element; i++)
+				{
+					mxMat=mxGetCell(prhs[1],i);
+
+					concatMatGeneric<SCALAR>(mxMat,list_factor);
+
+				}
+			}
+
+			// 2nd input (optional) : multiplicative scalar
+			SCALAR lambda = 1.0;
+			if (nrhs > 2)
+				lambda = (SCALAR) mxGetScalar(prhs[2]);
 
 
-            // Get the class instance pointer from the second input
-            Faust::TransformHelper<SCALAR,Cpu>* core_ptr = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[1]);
+			// 3rd input (optional) : boolean to determine the type of copy
+			bool optimizedCopy = false;
+			if (nrhs > 3)
+			{
+				double optimizedCopy_inter = mxGetScalar(prhs[3]);
+				if ((optimizedCopy_inter != 1.0) and (optimizedCopy_inter != 0.0))
+					mexErrMsgTxt("invalid boolean argument.");
+
+				optimizedCopy = (bool) optimizedCopy_inter;
+
+			}
+
+
+			Faust::TransformHelper<SCALAR,Cpu>* F = new Faust::TransformHelper<SCALAR,Cpu>(list_factor, lambda, optimizedCopy);
+			for (int i=0;i<list_factor.size();i++)
+				delete list_factor[i];
+
+			plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
+
+			return;
+		}
+
+
+
+
+		// Delete
+		if (!strcmp("delete", cmd))
+		{
+			// Destroy the C++ object
+			destroyObject<Faust::TransformHelper<SCALAR,Cpu> >(prhs[1]);
+			// Warn if other commands were ignored
+			if (nlhs != 0 || nrhs != 2)
+				mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
+			return;
+		}
+
+
+		// Get the class instance pointer from the second input
+		Faust::TransformHelper<SCALAR,Cpu>* core_ptr = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[1]);
 #ifdef FAUST_VERBOSE
-            printf("cmd = %s, core_ptr = %p\n", cmd, core_ptr);
+		printf("cmd = %s, core_ptr = %p\n", cmd, core_ptr);
 #endif
 
-            if (!strcmp("size",cmd))
-            {
-                const size_t SIZE_B1 = core_ptr->getNbRow();
-                const size_t SIZE_B2 = core_ptr->getNbCol();
-                const mwSize dims[2]={1,2};
-                plhs[0]=mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL);
-                double* ptr_out = (double*) mxGetData(plhs[0]);
-                ptr_out[0]=(double) SIZE_B1;
-                ptr_out[1]=(double) SIZE_B2;
-                return;
-            }
+		if (!strcmp("size",cmd))
+		{
+			const size_t SIZE_B1 = core_ptr->getNbRow();
+			const size_t SIZE_B2 = core_ptr->getNbCol();
+			const mwSize dims[2]={1,2};
+			plhs[0]=mxCreateNumericArray(2,dims,mxDOUBLE_CLASS,mxREAL);
+			double* ptr_out = (double*) mxGetData(plhs[0]);
+			ptr_out[0]=(double) SIZE_B1;
+			ptr_out[1]=(double) SIZE_B2;
+			return;
+		}
 
-            if (!strcmp("isReal",cmd))
-            {
-                plhs[0] = mxCreateDoubleScalar((double) core_ptr->isReal());
-                return;
-            }
-            // return the number of non zeros coefficients of the matrix
-            if (!strcmp("nnz",cmd))
-            {
-                if (nlhs > 1 || nrhs != 2)
-                {
-                    mexErrMsgTxt("nnz : incorrect number of arguments.");
-                }
-
-                long long int nnz = core_ptr->get_total_nnz();
-                plhs[0]=mxCreateDoubleScalar(nnz);
-                return;
-            }
-
-            // get_fact : return the id factor of the faust
-            if (!strcmp("get_fact_nonopt", cmd))
-            {
-                if (nlhs > 1 || nrhs != 3)
-                {
-                    mexErrMsgTxt("get_factor_nonopt : incorrect number of arguments.");
-                }
-                int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
-
-                Faust::MatDense<SCALAR,Cpu> dense_factor = core_ptr->get_fact(id_fact);
-
-                //*conversion to mxArray*/
-                plhs[0]=FaustMat2mxArray(dense_factor);
-                return;
-            }
-
-            // get_fact : return the id-th factor of the faust
-            if (!strcmp("get_fact", cmd))
-            {
-                if (nlhs > 1 || nrhs != 3)
-                {
-                    mexErrMsgTxt("get_factor : incorrect number of arguments.");
-                }
-                int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
-
-				if(core_ptr->is_fact_sparse(id_fact))
-					plhs[0] = transformFact2SparseMxArray(id_fact,core_ptr);
-				else
-					plhs[0] = transformFact2FullMxArray(id_fact,core_ptr);
-				return;
-            }
-
-            if (!strcmp("get_nb_factor", cmd))
-            {
-                if (nlhs != 1 || nrhs != 2)
-                {
-                    mexErrMsgTxt("get_nb_factor : incorrect number of arguments.");
-                }
-
-                faust_unsigned_int nb_fact = core_ptr->size();
-                plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-                double* ptr_out = (double*) mxGetData(plhs[0]);
-                ptr_out[0]=(double) nb_fact;
-                return;
-
-
-            }
-
-            if (!strcmp("disp",cmd))
-            {
-                if (nlhs != 0 || nrhs != 2)
-                    mexErrMsgTxt("disp: Unexpected arguments");
-                //core_ptr->display(); // doesn't work on windows,
-					// matlab terminal doesn't receive the mex lib std output
-					// we must use mexPrintf() to display content
-				mexPrintf(core_ptr->to_string().c_str());
-                return;
-            }
-
-
-            if (!strcmp("full",cmd))
-            {
-
-                if (nlhs != 1 || nrhs != 2)
-                    mexErrMsgTxt("full: Unexpected arguments");
-                if(core_ptr->size() == 0)
-                    mexErrMsgTxt("full : empty faust core");
-
-                faust_unsigned_int nbRowOp,nbColOp;
-                const size_t SIZE_B1 = core_ptr->getNbRow();
-                const size_t SIZE_B2 = core_ptr->getNbCol();
-                Faust::MatDense<SCALAR,Cpu> prod=core_ptr->get_product();
-                const mwSize dims[2]={SIZE_B1,SIZE_B2};
-
-
-                plhs[0] = FaustMat2mxArray(prod);
-                return;
-            }
-
-            // compute the 2-norm of the faust
-            if (!strcmp("norm",cmd))
-            {
-                if (nlhs != 1 || nrhs > 5 || nrhs < 3)
-                    mexErrMsgTxt("norm: Unexpected arguments");
-                if(core_ptr->size() == 0)
-                    mexErrMsgTxt("norm : empty faust core");
-
-                double precision =  0.001;
-                double norm_faust;
-				int nbr_iter_max=100;
-                int flag;
-                int ord = (int) mxGetScalar(prhs[2]);
-
-				if(nrhs > 3)
-					// the treshold come before
-					precision = mxGetScalar(prhs[3]); //mxGetUint32s not available before mat2019
-				if(nrhs > 4)
-				{
-					nbr_iter_max = (int) mxGetScalar(prhs[4]);
-					if(nbr_iter_max < 0 || nbr_iter_max > 1000000000)
-					{
-						mexWarnMsgTxt("Invalid max_num_its value, go back to default value.");
-						nbr_iter_max=100;
-					}
-				}
-
-                if(ord==2)
-                    norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
-                else if(ord==1)
-                    norm_faust = (double) core_ptr->normL1();
-				else if(ord == -(1<<(32-1))) //that's the value for 'inf' in matlab
-											// a constant from c-c++ would be better
-					norm_faust = (double) core_ptr->normInf();
-                else
-                    mexErrMsgTxt("norm : invalid norm order.");
-
-                plhs[0]=mxCreateDoubleScalar(norm_faust);
-
-                return;
-            }
-
-            if(!strcmp("normfro", cmd))
+		if (!strcmp("isReal",cmd))
+		{
+			plhs[0] = mxCreateDoubleScalar((double) core_ptr->isReal());
+			return;
+		}
+		// return the number of non zeros coefficients of the matrix
+		if (!strcmp("nnz",cmd))
+		{
+			if (nlhs > 1 || nrhs != 2)
 			{
-				if (nlhs != 1 || nrhs != 2)
-					mexErrMsgTxt("normfro: Unexpected arguments");
-				if(core_ptr->size() == 0)
-					mexErrMsgTxt("normfro : empty faust core");
-
-
-				double norm_faust;
-
-				norm_faust = core_ptr->normFro();
-
-				plhs[0]=mxCreateDoubleScalar(norm_faust);
-
-				return;
-
+				mexErrMsgTxt("nnz : incorrect number of arguments.");
 			}
 
-			if(!strcmp("normalize", cmd))
+			long long int nnz = core_ptr->get_total_nnz();
+			plhs[0]=mxCreateDoubleScalar(nnz);
+			return;
+		}
+
+		// get_fact : return the id factor of the faust
+		if (!strcmp("get_fact_nonopt", cmd))
+		{
+			if (nlhs > 1 || nrhs != 3)
 			{
-                int ord = (int) mxGetScalar(prhs[2]);
-				if(ord == 2) ord = -2; //tmp workaround to the bug in normalization according 2-norm on complex Faust
-				Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->normalize(ord);
+				mexErrMsgTxt("get_factor_nonopt : incorrect number of arguments.");
+			}
+			int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
+
+			Faust::MatDense<SCALAR,Cpu> dense_factor = core_ptr->get_fact(id_fact);
+
+			//*conversion to mxArray*/
+			plhs[0]=FaustMat2mxArray(dense_factor);
+			return;
+		}
+
+		// get_fact : return the id-th factor of the faust
+		if (!strcmp("get_fact", cmd))
+		{
+			if (nlhs > 1 || nrhs != 3)
+			{
+				mexErrMsgTxt("get_factor : incorrect number of arguments.");
+			}
+			int id_fact = (faust_unsigned_int) (mxGetScalar(prhs[2])-1);
+
+			if(core_ptr->is_fact_sparse(id_fact))
+				plhs[0] = transformFact2SparseMxArray(id_fact,core_ptr);
+			else
+				plhs[0] = transformFact2FullMxArray(id_fact,core_ptr);
+			return;
+		}
+
+		if (!strcmp("get_nb_factor", cmd))
+		{
+			if (nlhs != 1 || nrhs != 2)
+			{
+				mexErrMsgTxt("get_nb_factor : incorrect number of arguments.");
+			}
+
+			faust_unsigned_int nb_fact = core_ptr->size();
+			plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+			double* ptr_out = (double*) mxGetData(plhs[0]);
+			ptr_out[0]=(double) nb_fact;
+			return;
+
+
+		}
+
+		if (!strcmp("disp",cmd))
+		{
+			if (nlhs != 0 || nrhs != 2)
+				mexErrMsgTxt("disp: Unexpected arguments");
+			//core_ptr->display(); // doesn't work on windows,
+			// matlab terminal doesn't receive the mex lib std output
+			// we must use mexPrintf() to display content
+			mexPrintf(core_ptr->to_string().c_str());
+			return;
+		}
+
+
+		if (!strcmp("full",cmd))
+		{
+
+			if (nlhs != 1 || nrhs != 2)
+				mexErrMsgTxt("full: Unexpected arguments");
+			if(core_ptr->size() == 0)
+				mexErrMsgTxt("full : empty faust core");
+
+			faust_unsigned_int nbRowOp,nbColOp;
+			const size_t SIZE_B1 = core_ptr->getNbRow();
+			const size_t SIZE_B2 = core_ptr->getNbCol();
+			Faust::MatDense<SCALAR,Cpu> prod=core_ptr->get_product();
+			const mwSize dims[2]={SIZE_B1,SIZE_B2};
+
+
+			plhs[0] = FaustMat2mxArray(prod);
+			return;
+		}
+
+		// compute the 2-norm of the faust
+		if (!strcmp("norm",cmd))
+		{
+			if (nlhs != 1 || nrhs > 5 || nrhs < 3)
+				mexErrMsgTxt("norm: Unexpected arguments");
+			if(core_ptr->size() == 0)
+				mexErrMsgTxt("norm : empty faust core");
+
+			double precision =  0.001;
+			double norm_faust;
+			int nbr_iter_max=100;
+			int flag;
+			int ord = (int) mxGetScalar(prhs[2]);
+
+			if(nrhs > 3)
+				// the treshold come before
+				precision = mxGetScalar(prhs[3]); //mxGetUint32s not available before mat2019
+			if(nrhs > 4)
+			{
+				nbr_iter_max = (int) mxGetScalar(prhs[4]);
+				if(nbr_iter_max < 0 || nbr_iter_max > 1000000000)
+				{
+					mexWarnMsgTxt("Invalid max_num_its value, go back to default value.");
+					nbr_iter_max=100;
+				}
+			}
+
+			if(ord==2)
+				norm_faust = (double) core_ptr->spectralNorm(nbr_iter_max,precision,flag);
+			else if(ord==1)
+				norm_faust = (double) core_ptr->normL1();
+			else if(ord == -(1<<(32-1))) //that's the value for 'inf' in matlab
+				// a constant from c-c++ would be better
+				norm_faust = (double) core_ptr->normInf();
+			else
+				mexErrMsgTxt("norm : invalid norm order.");
+
+			plhs[0]=mxCreateDoubleScalar(norm_faust);
+
+			return;
+		}
+
+		if(!strcmp("normfro", cmd))
+		{
+			if (nlhs != 1 || nrhs != 2)
+				mexErrMsgTxt("normfro: Unexpected arguments");
+			if(core_ptr->size() == 0)
+				mexErrMsgTxt("normfro : empty faust core");
+
+
+			double norm_faust;
+
+			norm_faust = core_ptr->normFro();
+
+			plhs[0]=mxCreateDoubleScalar(norm_faust);
+
+			return;
+
+		}
+
+		if(!strcmp("normalize", cmd))
+		{
+			int ord = (int) mxGetScalar(prhs[2]);
+			if(ord == 2) ord = -2; //tmp workaround to the bug in normalization according 2-norm on complex Faust
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->normalize(ord);
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+			return;
+		}
+
+		if (!strcmp("copy",cmd))
+		{
+
+
+
+			if (nlhs > 1)
+				mexErrMsgTxt("copy : too much output argument");
+			else
+			{
+				//Faust::Timer t1,t2,t3;
+				//t1.start();
+				//				Faust::Transform<SCALAR,Cpu>* F = new Faust::Transform<SCALAR,Cpu>((*core_ptr));
+				//t1.stop();
+				//t2.start();
+				//(*F).transpose();
+				//t2.stop();
+				//t3.start();
+				//				plhs[0]=convertPtr2Mat<Faust::Transform<SCALAR,Cpu> >(F);
+				//				plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
+				//t3.stop();
+				//std::cout<<"t1 new : "<<t1.get_time()<<std::endl;
+				//std::cout<<"t2 transpose : "<<t2.get_time()<<std::endl;
+				//std::cout<<"t3 convertPtrMat : "<<t3.get_time()<<std::endl;
+				TransformHelper<SCALAR,Cpu>* th = new TransformHelper<SCALAR,Cpu>(core_ptr);
 				plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-				return;
 			}
+			return;
 
-            if (!strcmp("copy",cmd))
-            {
-
-
-
-                if (nlhs > 1)
-                    mexErrMsgTxt("copy : too much output argument");
-                else
-                {
-                    //Faust::Timer t1,t2,t3;
-                    //t1.start();
-    //				Faust::Transform<SCALAR,Cpu>* F = new Faust::Transform<SCALAR,Cpu>((*core_ptr));
-                    //t1.stop();
-                    //t2.start();
-                    //(*F).transpose();
-                    //t2.stop();
-                    //t3.start();
-    //				plhs[0]=convertPtr2Mat<Faust::Transform<SCALAR,Cpu> >(F);
-    //				plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
-                    //t3.stop();
-                    //std::cout<<"t1 new : "<<t1.get_time()<<std::endl;
-                    //std::cout<<"t2 transpose : "<<t2.get_time()<<std::endl;
-                    //std::cout<<"t3 convertPtrMat : "<<t3.get_time()<<std::endl;
-                    TransformHelper<SCALAR,Cpu>* th = new TransformHelper<SCALAR,Cpu>(core_ptr);
-                    plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
-                }
-                return;
-
-            }
+		}
 
 
-            if (!strcmp("multiply", cmd)) {
+		if (!strcmp("multiply", cmd)) {
 
-                if (nlhs > 1 ||  nrhs != 4)
-                    mexErrMsgTxt("Multiply: Unexcepted number of arguments.");
+			if (nlhs > 1 ||  nrhs != 4)
+				mexErrMsgTxt("Multiply: Unexcepted number of arguments.");
 
-                mwSize nelem = mxGetNumberOfElements(prhs[3]);
-                if (nelem != 1)
-                    mexErrMsgTxt("invalid char argument.");
-                // boolean flag to know if the faust needs to be transposed
-                bool transpose_flag = (bool) mxGetScalar(prhs[3]);
+			mwSize nelem = mxGetNumberOfElements(prhs[3]);
+			if (nelem != 1)
+				mexErrMsgTxt("invalid char argument.");
+			// boolean flag to know if the faust needs to be transposed
+			bool transpose_flag = (bool) mxGetScalar(prhs[3]);
 
-                // input matrix or vector from MATLAB
-                const mxArray * inMatlabMatrix = prhs[2];
+			// input matrix or vector from MATLAB
+			const mxArray * inMatlabMatrix = prhs[2];
 
-				if(mxIsSparse(inMatlabMatrix))
+			if(mxIsSparse(inMatlabMatrix))
+			{
+				Faust::MatSparse<SCALAR,Cpu> spA;
+				mxArray2FaustspMat<SCALAR>(inMatlabMatrix, spA);
+				Faust::MatDense<SCALAR,Cpu> B;
+				B = (*core_ptr).multiply(spA, transpose_flag);
+				plhs[0] = FaustMat2mxArray(B);
+			}
+			else
+			{
+				const size_t nbRowA = mxGetM(inMatlabMatrix);
+				const size_t nbColA = mxGetN(inMatlabMatrix);
+				faust_unsigned_int nbRowOp_,nbColOp_;
+				const size_t nbRowOp = core_ptr->getNbRow();
+				const size_t nbColOp = core_ptr->getNbCol();
+				const size_t nbRowB = nbRowOp;
+				const size_t nbColB = nbColA;
+
+
+				/** Check parameters **/
+
+				//check dimension match
+				if (mxGetNumberOfDimensions(inMatlabMatrix) != 2
+						|| nbRowA != nbColOp && (nbRowA != nbRowOp && transpose_flag))
+					mexErrMsgTxt("Multiply : Wrong number of dimensions for the input vector or matrix (third argument).");
+
+
+				SCALAR* ptr_data = NULL;
+				if ((core_ptr->isReal() ) && ( mxIsComplex(inMatlabMatrix) ) )
+					mexErrMsgTxt("impossibility to multiply a real Faust with complex matrix");
+
+				mxArray2Ptr(inMatlabMatrix, ptr_data);
+
+				// Si inMatlabMatrix est un vecteur
+
+				if(nbColA == 1)
 				{
-					Faust::MatSparse<SCALAR,Cpu> spA;
-					mxArray2FaustspMat<SCALAR>(inMatlabMatrix, spA);
-					Faust::MatDense<SCALAR,Cpu> B;
-					B = (*core_ptr).multiply(spA, transpose_flag);
-					plhs[0] = FaustMat2mxArray(B);
+					// applying the Faust to a vector
+					Faust::Vect<SCALAR,Cpu> A(nbRowA, ptr_data);
+					Faust::Vect<SCALAR,Cpu> B(nbRowB);
+					B = (*core_ptr).multiply(A, transpose_flag);
+
+
+					plhs[0]=FaustVec2mxArray(B);
 				}
 				else
-				{
-					const size_t nbRowA = mxGetM(inMatlabMatrix);
-					const size_t nbColA = mxGetN(inMatlabMatrix);
-					faust_unsigned_int nbRowOp_,nbColOp_;
-					const size_t nbRowOp = core_ptr->getNbRow();
-					const size_t nbColOp = core_ptr->getNbCol();
-					const size_t nbRowB = nbRowOp;
-					const size_t nbColB = nbColA;
+				{ // applying the Faust to a matrix
+					Faust::MatDense<SCALAR,Cpu> A(ptr_data, nbRowA, nbColA);
+					Faust::MatDense<SCALAR,Cpu> B(nbRowB, nbColA);
+					B = (*core_ptr).multiply(A, transpose_flag);
 
+					plhs[0]=FaustMat2mxArray(B);
 
-					/** Check parameters **/
-
-					//check dimension match
-					if (mxGetNumberOfDimensions(inMatlabMatrix) != 2
-							|| nbRowA != nbColOp && (nbRowA != nbRowOp && transpose_flag))
-						mexErrMsgTxt("Multiply : Wrong number of dimensions for the input vector or matrix (third argument).");
-
-
-					SCALAR* ptr_data = NULL;
-					if ((core_ptr->isReal() ) && ( mxIsComplex(inMatlabMatrix) ) )
-						mexErrMsgTxt("impossibility to multiply a real Faust with complex matrix");
-
-					mxArray2Ptr(inMatlabMatrix, ptr_data);
-
-					// Si inMatlabMatrix est un vecteur
-
-					if(nbColA == 1)
-					{
-						// applying the Faust to a vector
-						Faust::Vect<SCALAR,Cpu> A(nbRowA, ptr_data);
-						Faust::Vect<SCALAR,Cpu> B(nbRowB);
-						B = (*core_ptr).multiply(A, transpose_flag);
-
-
-						plhs[0]=FaustVec2mxArray(B);
-					}
-					else
-					{ // applying the Faust to a matrix
-						Faust::MatDense<SCALAR,Cpu> A(ptr_data, nbRowA, nbColA);
-						Faust::MatDense<SCALAR,Cpu> B(nbRowB, nbColA);
-						B = (*core_ptr).multiply(A, transpose_flag);
-
-						plhs[0]=FaustMat2mxArray(B);
-
-					}
-
-
-
-					if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
 				}
-                return;
-            }
+
+
+
+				if(ptr_data) {delete [] ptr_data ; ptr_data = NULL;}
+			}
+			return;
+		}
 
 		if(!strcmp("save", cmd))
 			return save(convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[1]), nrhs-2, &prhs[2]);
 
-        if(!strcmp("transpose", cmd)) { //TODO: verify no arguments passed or 
-            Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->transpose();
-            plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+		if(!strcmp("transpose", cmd)) { //TODO: verify no arguments passed or 
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->transpose();
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
 #ifdef FAUST_VERBOSE
-            printf("new ptr for Faust transpose's TransformHelper obj=%p\n", th);
-            printf("transpose()\n");
-            printf("isTransposed()=%d\n",th->isTransposed());
+			printf("new ptr for Faust transpose's TransformHelper obj=%p\n", th);
+			printf("transpose()\n");
+			printf("isTransposed()=%d\n",th->isTransposed());
 #endif
-            return;
-        }
+			return;
+		}
 
-        if(!strcmp("conj", cmd)) { //TODO: verify no arguments passed or 
-            Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->conjugate();
-            plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+		if(!strcmp("conj", cmd)) { //TODO: verify no arguments passed or 
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->conjugate();
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
 #ifdef FAUST_VERBOSE
-            printf("new ptr for Faust conjugate's TransformHelper obj=%p\n", th);
-            printf("conjugate()\n");
-            printf("isConjugate()=%d\n",th->isConjugate());
+			printf("new ptr for Faust conjugate's TransformHelper obj=%p\n", th);
+			printf("conjugate()\n");
+			printf("isConjugate()=%d\n",th->isConjugate());
 #endif
-            return;
-        }
+			return;
+		}
 
-        if(!strcmp("ctranspose", cmd)) {
-            Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->adjoint();
-            plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+		if(!strcmp("ctranspose", cmd)) {
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->adjoint();
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
 #ifdef FAUST_VERBOSE
-            printf("new ptr for Faust conjugate's TransformHelper obj=%p\n", th);
-            printf("conjugate()\n");
-            printf("isConjugate()=%d\n",th->isConjugate());
-            printf("isTransposed()=%d\n", th->isTransposed());
+			printf("new ptr for Faust conjugate's TransformHelper obj=%p\n", th);
+			printf("conjugate()\n");
+			printf("isConjugate()=%d\n",th->isConjugate());
+			printf("isTransposed()=%d\n", th->isTransposed());
 #endif
-            return;
+			return;
 
-        }
+		}
 
 		if(!strcmp("subsref", cmd)){
 			int start_row_id = (int) mxGetScalar(prhs[2]);
@@ -725,20 +744,20 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 			return;
 		}
 
-        if(!strcmp("mul_faust", cmd)) {
+		if(!strcmp("mul_faust", cmd)) {
 			Faust::TransformHelper<SCALAR,Cpu>* right_term = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[2]);
 			if(right_term->getNbRow() != core_ptr->getNbCol()) mexErrMsgTxt("The dimensions of the two Fausts must agree.");
-            Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->multiply(right_term);
-            plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->multiply(right_term);
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
 #ifdef FAUST_VERBOSE
-            printf("new ptr for Faust multiply's TransformHelper obj=%p\n", th);
-            printf("multiply(\"faust\")\n");
-            printf("isConjugate()=%d\n",th->isConjugate());
-            printf("isTransposed()=%d\n", th->isTransposed());
+			printf("new ptr for Faust multiply's TransformHelper obj=%p\n", th);
+			printf("multiply(\"faust\")\n");
+			printf("isConjugate()=%d\n",th->isConjugate());
+			printf("isTransposed()=%d\n", th->isTransposed());
 #endif
-            return;
+			return;
 
-        }
+		}
 
 		if(!strcmp("mul_scalar", cmd)) {
 			//complex Faust times real scalar OK
@@ -755,55 +774,36 @@ void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray
 			return;
 		}		//     // Call the various class methods
 
-        if(!strcmp("vertcat", cmd)) {
+		if(!strcmp("vertcat", cmd)) {
 			//TODO: check number of args and results
 			Faust::TransformHelper<SCALAR,Cpu>* right_term = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[2]);
 			if(right_term->getNbCol() != core_ptr->getNbCol()) mexErrMsgTxt("The dimensions of the two Fausts must agree.");
-            Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->vertcat(right_term);
-            plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->vertcat(right_term);
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
 #ifdef FAUST_VERBOSE
-            printf("new ptr for Faust vert-concatened TransformHelper obj=%p\n", th);
-            printf("isConjugate()=%d\n",th->isConjugate());
-            printf("isTransposed()=%d\n", th->isTransposed());
+			printf("new ptr for Faust vert-concatened TransformHelper obj=%p\n", th);
+			printf("isConjugate()=%d\n",th->isConjugate());
+			printf("isTransposed()=%d\n", th->isTransposed());
 #endif
-            return;
+			return;
 
-        }
+		}
 
-        if(!strcmp("horzcat", cmd)) {
+		if(!strcmp("horzcat", cmd)) {
 			//TODO: check number of args and results
 			Faust::TransformHelper<SCALAR,Cpu>* right_term = convertMat2Ptr<Faust::TransformHelper<SCALAR,Cpu> >(prhs[2]);
 			if(right_term->getNbRow() != core_ptr->getNbRow()) mexErrMsgTxt("The dimensions of the two Fausts must agree.");
-            Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->horzcat(right_term);
-            plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->horzcat(right_term);
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
 #ifdef FAUST_VERBOSE
-            printf("new ptr for Faust hor-concatened TransformHelper obj=%p\n", th);
-            printf("isConjugate()=%d\n",th->isConjugate());
-            printf("isTransposed()=%d\n", th->isTransposed());
+			printf("new ptr for Faust hor-concatened TransformHelper obj=%p\n", th);
+			printf("isConjugate()=%d\n",th->isConjugate());
+			printf("isTransposed()=%d\n", th->isTransposed());
 #endif
-            return;
+			return;
 
-        }
+		}
 
-
-		//     // Train
-		//     if (!strcmp("train", cmd)) {
-		//         // Check parameters
-		//         if (nlhs < 0 || nrhs < 2)
-		//             mexErrMsgTxt("Train: Unexpected arguments.");
-		//         // Call the method
-		//         dummy_instance->train();
-		//         return;
-		//     }
-		//     // Test
-		//     if (!strcmp("test", cmd)) {
-		//         // Check parameters
-		//         if (nlhs < 0 || nrhs < 2)
-		//             mexErrMsgTxt("Test: Unexpected arguments.");
-		//         // Call the method
-		//         dummy_instance->test();
-		//         return;
-		//     }
 
 		// Got here, so command not recognized
 		mexErrMsgTxt("Command not recognized.");
