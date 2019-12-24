@@ -25,7 +25,7 @@ namespace Faust
 					const bool isVerbose_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultVerbosity ,
 					const bool isUpdateWayR2L_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultUpdateWayR2L ,
 					const FPP2 init_lambda_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultLambda,
-					const FPP2 step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize) : ParamsPalm<FPP, DEVICE, FPP2>(data_, nbFact_, cons_, init_fact_, stop_crit_, isVerbose_, isUpdateWayR2L_, init_lambda_, true /*constant_step_size is always true for Palm4MSAFGFT */, step_size_), init_D(init_D) {}
+					const FPP2 step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize, const Faust::GradientCalcOptMode gradCalcOptMode = Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode) : ParamsPalm<FPP, DEVICE, FPP2>(data_, nbFact_, cons_, init_fact_, stop_crit_, isVerbose_, isUpdateWayR2L_, init_lambda_, true /*constant_step_size is always true for Palm4MSAFGFT */, step_size_, gradCalcOptMode), init_D(init_D) {}
 
 			ParamsPalmFGFT() : ParamsPalm<FPP,DEVICE,FPP2>(), init_D(0,0) {}
 
@@ -38,7 +38,7 @@ namespace Faust
 					const bool isVerbose_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultVerbosity ,
 					const bool isUpdateWayR2L_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultUpdateWayR2L ,
 					const FPP2 init_lambda_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultLambda,
-					const FPP2 step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize);
+					const FPP2 step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize,const Faust::GradientCalcOptMode gradCalcOptMode = Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode);
 
 			ParamsPalmFGFT(const Faust::MatDense<FPP,DEVICE>& data_,
 					const int nbFact_,
@@ -49,7 +49,7 @@ namespace Faust
 					const bool isVerbose_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultVerbosity ,
 					const bool isUpdateWayR2L_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultUpdateWayR2L ,
 					const FPP2 init_lambda_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultLambda,
-					const FPP2 step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize) : ParamsPalmFGFT<FPP,DEVICE,FPP2>(data_, nbFact_, cons_, init_fact_, Faust::Vect<FPP,DEVICE>(data_.getNbRow(), init_D_diag), stop_crit_, isVerbose_, isUpdateWayR2L_, init_lambda_, step_size_) {}
+					const FPP2 step_size_ = ParamsPalm<FPP,DEVICE,FPP2>::defaultStepSize, const Faust::GradientCalcOptMode gradCalcOptMode = Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode) : ParamsPalmFGFT<FPP,DEVICE,FPP2>(data_, nbFact_, cons_, init_fact_, Faust::Vect<FPP,DEVICE>(data_.getNbRow(), init_D_diag), stop_crit_, isVerbose_, isUpdateWayR2L_, init_lambda_, step_size_, gradCalcOptMode) {}
 
 
 			MatDense<FPP,DEVICE> init_D;

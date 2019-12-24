@@ -68,6 +68,7 @@ class PyxParamsFact
         unsigned int num_constraints;
         bool is_verbose;
         bool constant_step_size;
+        unsigned int grad_calc_opt_mode;
 };
 
 template<typename FPP, typename FPP2 = double>

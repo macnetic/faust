@@ -178,6 +178,7 @@ namespace Faust
           const bool verbose;
           const bool isUpdateWayR2L;
           const bool isConstantStepSize;
+		  const GradientCalcOptMode gradCalcOptMode;
           bool isCComputed;
           bool isGradComputed;
           bool isProjectionComputed;

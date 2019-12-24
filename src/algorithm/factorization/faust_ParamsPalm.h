@@ -50,6 +50,7 @@
 #endif
 #include "faust_StoppingCriterion.h"
 #include "faust_ConstraintGeneric.h"
+#include "faust_Params.h"
 
 
 /*! \class Faust::ParamsPalm
@@ -81,7 +82,8 @@ namespace Faust
              const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
              const FPP2 init_lambda_ = defaultLambda,
              const bool constant_step_size_ = defaultConstantStepSize,
-             const FPP2 step_size_ = defaultStepSize);
+             const FPP2 step_size_ = defaultStepSize,
+			 const GradientCalcOptMode gradCalcOptMode = Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode);
 
           void check_constraint_validity();
            ParamsPalm();
@@ -102,6 +104,7 @@ namespace Faust
           bool isConstantStepSize;
           FPP2 step_size;
           FPP2 init_lambda;
+		  GradientCalcOptMode gradCalcOptMode;
 
           void Display() const;
           void init_factors();

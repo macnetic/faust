@@ -137,6 +137,7 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
         cout << "p->step_size: " << p->step_size << endl;
         cout << "p->is_verbose: " << p->is_verbose << endl;
         cout << "p->constant_step_size: " << p->constant_step_size << endl;
+        cout << "p->grad_calc_opt_mode: " << p->grad_calc_opt_mode << endl; 
     }
     PyxConstraintInt* cons_int;
     PyxConstraintScalar<FPP2>* cons_real;
@@ -228,12 +229,12 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
 
     if(p_fft = dynamic_cast<PyxParamsFactPalm4MSAFFT<FPP,FPP2>*>(p))
     {
-        params = new ParamsPalmFGFT<FPP,Cpu,FPP2>(inMat, p->num_facts, cons, initFacts, p_fft->init_D, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->step_size);
+        params = new ParamsPalmFGFT<FPP,Cpu,FPP2>(inMat, p->num_facts, cons, initFacts, p_fft->init_D, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->step_size, static_cast<Faust::GradientCalcOptMode>(p->grad_calc_opt_mode));
 
         palm = new Palm4MSAFGFT<FPP,Cpu,FPP2>(*static_cast<ParamsPalmFGFT<FPP,Cpu,FPP2>*>(params),blasHandle,true);
     }
     else {
-        params = new ParamsPalm<FPP,Cpu,FPP2>(inMat, p->num_facts, cons, initFacts, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->constant_step_size, p->step_size);
+        params = new ParamsPalm<FPP,Cpu,FPP2>(inMat, p->num_facts, cons, initFacts, crit, p->is_verbose, p->is_update_way_R2L, p->init_lambda, p->constant_step_size, p->step_size, static_cast<Faust::GradientCalcOptMode>(p->grad_calc_opt_mode));
         palm = new Palm4MSA<FPP,Cpu,FPP2>(*params,blasHandle,true);
     }
 
@@ -338,6 +339,8 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
         cout << "stop_crits[1].error_treshold: " << p->stop_crits[1].error_treshold << endl;
         cout << "stop_crits[1].num_its: " << p->stop_crits[1].num_its << endl;
         cout << "stop_crits[1].max_num_its: " << p->stop_crits[1].max_num_its << endl;
+        cout << "p->grad_calc_opt_mode: " << p->grad_calc_opt_mode << endl;
+
     }
     prepare_fact(mat, num_rows, num_cols, p, cons);
 
@@ -358,12 +361,12 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
     if(p_fft = dynamic_cast<PyxParamsHierarchicalFactFFT<FPP,FPP2>*>(p))
     {
         inMat2 = new Faust::MatDense<FPP,Cpu>(mat2, num_rows, num_cols);
-        params = new Faust::ParamsFGFT<FPP,Cpu,FPP2>(p->num_rows, p->num_cols, p->num_facts, cons_, initFacts_deft, p_fft->init_D, crit0, crit1, p->is_verbose, p->is_update_way_R2L, p->is_fact_side_left, p->init_lambda, p->constant_step_size, p->step_size);
+        params = new Faust::ParamsFGFT<FPP,Cpu,FPP2>(p->num_rows, p->num_cols, p->num_facts, cons_, initFacts_deft, p_fft->init_D, crit0, crit1, p->is_verbose, p->is_update_way_R2L, p->is_fact_side_left, p->init_lambda, p->constant_step_size, p->step_size, static_cast<Faust::GradientCalcOptMode>(p->grad_calc_opt_mode));
         hierFact = new HierarchicalFactFGFT<FPP,Cpu,FPP2>(inMat, *inMat2, *(static_cast<ParamsFGFT<FPP,Cpu,FPP2>*>(params)), blasHandle, spblasHandle);
     }
     else
     {
-        params = new Params<FPP,Cpu,FPP2>(p->num_rows, p->num_cols, p->num_facts, cons_, initFacts_deft, crit0, crit1, p->is_verbose, p->is_update_way_R2L, p->is_fact_side_left, p->init_lambda, p->constant_step_size, p->step_size);
+        params = new Params<FPP,Cpu,FPP2>(p->num_rows, p->num_cols, p->num_facts, cons_, initFacts_deft, crit0, crit1, p->is_verbose, p->is_update_way_R2L, p->is_fact_side_left, p->init_lambda, p->constant_step_size, p->step_size, static_cast<Faust::GradientCalcOptMode>(p->grad_calc_opt_mode));
         hierFact = new HierarchicalFact<FPP,Cpu,FPP2>(inMat, *params, blasHandle, spblasHandle);
     }
 

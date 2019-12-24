@@ -1013,6 +1013,7 @@ cdef class FaustFact:
             cpp_params.is_update_way_R2L = p.is_update_way_R2L
             cpp_params.init_lambda = p.init_lambda
             cpp_params.step_size = p.step_size
+            cpp_params.grad_calc_opt_mode = p.grad_calc_opt_mode
             cpp_params.stop_crit = cpp_stop_crit
             cpp_params.init_facts = <double**> \
                     PyMem_Malloc(sizeof(double*)*p.num_facts)
@@ -1036,6 +1037,7 @@ cdef class FaustFact:
             cpp_params_cplx.is_update_way_R2L = p.is_update_way_R2L
             cpp_params_cplx.init_lambda = p.init_lambda
             cpp_params_cplx.step_size = p.step_size
+            cpp_params_cplx.grad_calc_opt_mode = p.grad_calc_opt_mode
             cpp_params_cplx.stop_crit = cpp_stop_crit
             cpp_params_cplx.init_facts = <complex**> \
                     PyMem_Malloc(sizeof(complex*)*p.num_facts)
@@ -1230,6 +1232,7 @@ cdef class FaustFact:
         cpp_params.is_update_way_R2L = p.is_update_way_R2L
         cpp_params.init_lambda = p.init_lambda
         cpp_params.step_size = p.step_size
+        cpp_params.grad_calc_opt_mode = p.grad_calc_opt_mode
         cpp_params.stop_crits = cpp_stop_crits
         cpp_params.is_verbose = p.is_verbose
         cpp_params.is_fact_side_left = p.is_fact_side_left
@@ -1362,6 +1365,7 @@ cdef class FaustFact:
         cpp_params_cplx.is_update_way_R2L = p.is_update_way_R2L
         cpp_params_cplx.init_lambda = p.init_lambda
         cpp_params_cplx.step_size = p.step_size
+        cpp_params_cplx.grad_calc_opt_mode = p.grad_calc_opt_mode
         cpp_params_cplx.stop_crits = cpp_stop_crits
         cpp_params_cplx.is_verbose = p.is_verbose
         cpp_params_cplx.is_fact_side_left = p.is_fact_side_left

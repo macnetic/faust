@@ -61,6 +61,14 @@
 namespace Faust
 {
 
+	/** Modes avaiable for the possible optimization in compute_grad_over_c() */
+	enum GradientCalcOptMode
+	{
+		DISABLED, // no optimization at all
+		INTERNAL_OPT, //the optimization defined internally must be used
+		EXTERNAL_OPT //the optimization defined externally in faust_linear_algebra must be used
+	};
+
     template<typename FPP,Device DEVICE> class MatDense;
 
 
@@ -86,7 +94,8 @@ namespace Faust
             const bool isFactSideLeft_ = defaultFactSideLeft ,
             const FPP2 init_lambda_ = defaultLambda ,
             const bool constant_step_size_ = defaultConstantStepSize,
-            const FPP2 step_size_ = defaultStepSize);
+            const FPP2 step_size_ = defaultStepSize,
+			const GradientCalcOptMode gradCalcOptMode = defaultGradCalcOptMode);
 
 
         /*!
@@ -123,7 +132,7 @@ namespace Faust
         */
         Params(
             const faust_unsigned_int nbRow_,
-            const faust_unsigned_int nbCol_,  		
+            const faust_unsigned_int nbCol_,
             const unsigned int nbFact_,
             const std::vector<std::vector<const Faust::ConstraintGeneric*>> & cons_,
             const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
@@ -134,14 +143,14 @@ namespace Faust
             const bool isFactSideLeft_ = defaultFactSideLeft ,
             const FPP2 init_lambda_ = defaultLambda ,
             const bool constant_step_size_ = defaultConstantStepSize,
-            const FPP2 step_size_ = defaultStepSize);
+            const FPP2 step_size_ = defaultStepSize,
+			const GradientCalcOptMode gradCalcOptMode = defaultGradCalcOptMode);
 
         Params();
         void init_from_file(const char* filename);
 
         void check_constraint_validity();
         void check_bool_validity();
-
         virtual void Display() const;
         ~Params(){}
 
@@ -167,6 +176,7 @@ namespace Faust
         FPP2 init_lambda;
         bool isConstantStepSize;
         FPP2 step_size;
+		GradientCalcOptMode gradCalcOptMode;
 
         //default value
         static const int defaultNiter1;
@@ -179,6 +189,7 @@ namespace Faust
         static const FPP2 defaultStepSize;
         static const FPP defaultDecreaseSpeed;
         static const FPP defaultResiduumPercent;
+		static const GradientCalcOptMode defaultGradCalcOptMode;
 
         //const int nb_rows; // number of rows of the first factor
         //const int nb_cols; // number of columns of the last factor

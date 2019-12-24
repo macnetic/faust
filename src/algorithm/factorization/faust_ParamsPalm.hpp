@@ -92,7 +92,8 @@ Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm(
          const bool isUpdateWayR2L_ /* = false */,
          const FPP2 init_lambda_ /* = 1.0 */,
 		 const bool constant_step_size_,
-		 const FPP2 step_size_) :
+		 const FPP2 step_size_,
+		 const GradientCalcOptMode gradCalcOptMode /* default INTERNAL_OPT*/) :
             data(data_),
             nbFact(nbFact_),
             cons(cons_),
@@ -102,13 +103,14 @@ Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm(
             isUpdateWayR2L(isUpdateWayR2L_),
             init_lambda(init_lambda_),
 			isConstantStepSize(constant_step_size_),
-			step_size(step_size_)
+			step_size(step_size_),
+			gradCalcOptMode(gradCalcOptMode)
 {
  check_constraint_validity();
 }
 
 template<typename FPP,Device DEVICE,typename FPP2>
-Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm() : data(0,0),nbFact(0),cons(std::vector<const Faust::ConstraintGeneric*>()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize){}
+Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm() : data(0,0),nbFact(0),cons(std::vector<const Faust::ConstraintGeneric*>()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize), gradCalcOptMode(Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode) {}
 
 template<typename FPP,Device DEVICE,typename FPP2>
 void Faust::ParamsPalm<FPP,DEVICE,FPP2>::init_factors()
@@ -160,6 +162,7 @@ void Faust::ParamsPalm<FPP,DEVICE,FPP2>::Display() const
 	std::cout<<"step_size : "<<step_size<<std::endl;
 	std::cout<<"data :  nbRow "<<data.getNbRow()<<" NbCol : "<< data.getNbCol()<<std::endl;
 	std::cout<<"stop_crit : "<<stop_crit.get_crit()<<std::endl;
+	std::cout << "gradCalcOptMode: "<< gradCalcOptMode << std::endl;
 	/*cout<<"INIT_FACTS :"<<endl;
 	for (int L=0;L<init_fact.size();L++)init_fact[L].Display();*/
 

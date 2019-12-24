@@ -149,6 +149,7 @@ cdef extern from "FaustFact.h":
         unsigned int num_constraints
         bool is_verbose
         bool constant_step_size
+        unsigned int grad_calc_opt_mode
 
     cdef cppclass PyxParamsFactPalm4MSA[FPP,FPP2](PyxParamsFact[FPP,FPP2]):
         FPP** init_facts # num_facts elts

@@ -71,6 +71,8 @@ template<typename FPP,Device DEVICE,typename FPP2> const FPP2 Faust::Params<FPP,
 
 template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultDecreaseSpeed = 1.25;
 template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultResiduumPercent = 1.4;
+template<typename FPP,Device DEVICE,typename FPP2> const Faust::GradientCalcOptMode Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode = INTERNAL_OPT;
+
 
 template<typename FPP,Device DEVICE,typename FPP2>
 void Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity()
@@ -124,7 +126,8 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
     const bool isFactSideLeft_ , /* = false */
     const FPP2 init_lambda_  /* = 1.0 */,
 	const bool constant_step_size_,
-	const FPP2 step_size_):
+	const FPP2 step_size_,
+	const GradientCalcOptMode gradCalcOptMode/* default INTERNAL_OPT */):
         m_nbRow(nbRow_),
 	m_nbCol(nbCol_),
         m_nbFact(nbFact_),
@@ -136,7 +139,8 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
         isFactSideLeft(isFactSideLeft_),
         init_lambda(init_lambda_),
         isConstantStepSize(constant_step_size_),
-		step_size(step_size_)
+		step_size(step_size_),
+		gradCalcOptMode(gradCalcOptMode)
 {
     if (nbFact_ <= 2)
     {
@@ -234,9 +238,10 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
          const bool isFactSideLeft_ /* = false */,
          const FPP2 init_lambda_ /* = 1.0 */,
 		 const bool constant_step_size_ ,
-		 const FPP2 step_size_ ) :
+		 const FPP2 step_size_ ,
+		 const GradientCalcOptMode gradCalcOptMode /* default INTERNAL_OPT */) :
             m_nbRow(nbRow_),
-	    m_nbCol(nbCol_),
+			m_nbCol(nbCol_),
             m_nbFact(nbFact_),
             cons(cons_),
             init_fact(init_fact_),
@@ -247,7 +252,8 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
             isFactSideLeft(isFactSideLeft_),
             init_lambda(init_lambda_),
 			isConstantStepSize(constant_step_size_),
-			step_size(step_size_)
+			step_size(step_size_),
+			gradCalcOptMode(gradCalcOptMode)
 
 {
  check_constraint_validity();
@@ -271,7 +277,8 @@ Faust::Params<FPP,DEVICE,FPP2>::Params() : m_nbRow(0),
 	init_fact(std::vector<Faust::MatDense<FPP,DEVICE> >()),
 	init_lambda(defaultLambda),
 	isConstantStepSize(defaultConstantStepSize),
-	step_size(defaultStepSize)
+	step_size(defaultStepSize),
+	gradCalcOptMode(defaultGradCalcOptMode)
 {}
 
 
@@ -300,7 +307,7 @@ void Faust::Params<FPP,DEVICE,FPP2>::Display() const
 	std::cout<<"Matrix :  nbRow "<<m_nbRow<<" NbCol : "<< m_nbCol<<std::endl;
 	std::cout<<"stop_crit_2facts : "<<stop_crit_2facts.get_crit()<<std::endl;
 	std::cout<<"stop_crit_global : "<<stop_crit_global.get_crit()<<std::endl;
-
+	std::cout << "gradCalcOptMode: "<< gradCalcOptMode << std::endl;
 	/*cout<<"INIT_FACTS :"<<endl;
 	for (int L=0;L<init_fact.size();L++)init_fact[L].Display();*/
 

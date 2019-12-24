@@ -99,6 +99,7 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,
     isGlobal(isGlobal_),
     isInit(false),
     c(FPP2(1)/params_.step_size),
+	gradCalcOptMode(params_.gradCalcOptMode),
     blas_handle(blasHandle),
 	is_complex(typeid(data.getData()[0]) == typeid(complex<float>) || typeid(data.getData()[0]) == typeid(complex<double>)
 ),
@@ -120,26 +121,27 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,
 
 template<typename FPP,Device DEVICE,typename FPP2>
 Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FPP2>& params_palm_,const Faust::BlasHandle<DEVICE> blasHandle,const bool isGlobal_/*=false*/) :
-   stop_crit(params_palm_.stop_crit),
-   data(params_palm_.data),
-   m_lambda(params_palm_.init_lambda),
-   m_nbFact(params_palm_.nbFact),
-   S(params_palm_.init_fact),
-   RorL(vector<Faust::MatDense<FPP,DEVICE> >(2)),
-   LorR(Faust::MatDense<FPP,DEVICE>(params_palm_.init_fact[0].getNbRow())),
-   const_vec(params_palm_.cons),
-   m_indFact(0),
-   m_indIte(-1),
-   verbose(params_palm_.isVerbose),
-   isUpdateWayR2L(params_palm_.isUpdateWayR2L),
-   isConstantStepSize(params_palm_.isConstantStepSize),
-   isGradComputed(false),
-   isProjectionComputed(false),
-   isLastFact(false),
-   isConstraintSet(false),
-   isGlobal(isGlobal_),
-   c(FPP2(1)/params_palm_.step_size),
-   blas_handle(blasHandle),
+	stop_crit(params_palm_.stop_crit),
+	data(params_palm_.data),
+	m_lambda(params_palm_.init_lambda),
+	m_nbFact(params_palm_.nbFact),
+	S(params_palm_.init_fact),
+	RorL(vector<Faust::MatDense<FPP,DEVICE> >(2)),
+	LorR(Faust::MatDense<FPP,DEVICE>(params_palm_.init_fact[0].getNbRow())),
+	const_vec(params_palm_.cons),
+	m_indFact(0),
+	m_indIte(-1),
+	verbose(params_palm_.isVerbose),
+	isUpdateWayR2L(params_palm_.isUpdateWayR2L),
+	isConstantStepSize(params_palm_.isConstantStepSize),
+	isGradComputed(false),
+	isProjectionComputed(false),
+	isLastFact(false),
+	isConstraintSet(false),
+	isGlobal(isGlobal_),
+	c(FPP2(1)/params_palm_.step_size),
+	gradCalcOptMode(params_palm_.gradCalcOptMode),
+	blas_handle(blasHandle),
 	is_complex(typeid(data.getData()[0]) == typeid(complex<float>) || typeid(data.getData()[0]) == typeid(complex<double>)
 ),
 	TorH(is_complex?'H':'T')
@@ -246,7 +248,7 @@ t_local_compute_grad_over_c.start();
     error = data;
     Faust::MatDense<FPP,DEVICE> tmp1,tmp3;
 
-   if (idx==0 || idx==1) // computing L*S first, then (L*S)*R
+   if (idx==0 || idx==1 || gradCalcOptMode == DISABLED) // computing L*S first, then (L*S)*R
    {
       if (!isUpdateWayR2L)
       {
@@ -323,7 +325,7 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
       }
    }
 
-   if (idx==0 || idx==2) // computing L'*error first, then (L'*error)*R'
+   if (idx==0 || idx==2 || gradCalcOptMode == DISABLED) // computing L'*error first, then (L'*error)*R'
    {
       if (!isUpdateWayR2L)
       {

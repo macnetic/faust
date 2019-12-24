@@ -577,9 +577,12 @@ class ParamsFact(ABC):
 
     <b/> See also  ParamsHierarchical, ParamsPalm4MSA
     """
+    DISABLED_OPT = 0
+    INTERNAL_OPT = 1
+    EXTERNAL_OPT = 2
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
                  constraints, step_size, constant_step_size,
-                 is_verbose):
+                 is_verbose, grad_calc_opt_mode=INTERNAL_OPT):
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
@@ -590,6 +593,7 @@ class ParamsFact(ABC):
             self.constraints = constraints
         self.is_verbose = is_verbose
         self.constant_step_size = constant_step_size
+        self.grad_calc_opt_mode = grad_calc_opt_mode
 
     @abstractmethod
     def is_mat_consistent(self, M):
@@ -614,7 +618,8 @@ class ParamsHierarchical(ParamsFact):
                  stop_crit2, is_update_way_R2L=False, init_lambda=1.0,
                  step_size=10.0**-16, constant_step_size=False,
                  is_fact_side_left=False,
-                 is_verbose=False):
+                 is_verbose=False,
+                 grad_calc_opt_mode=ParamsFact.INTERNAL_OPT):
         if(not isinstance(fact_constraints, list) and not
            isinstance(fact_constraints, ConstraintList)):
             raise TypeError('fact_constraints must be a list or a'
@@ -632,11 +637,12 @@ class ParamsHierarchical(ParamsFact):
             constraints = fact_constraints + res_constraints
         stop_crits = [ stop_crit1, stop_crit2 ]
         super(ParamsHierarchical, self).__init__(num_facts,
-                                                     is_update_way_R2L,
-                                                     init_lambda,
-                                                     constraints, step_size,
-                                                     constant_step_size,
-                                                     is_verbose)
+                                                 is_update_way_R2L,
+                                                 init_lambda,
+                                                 constraints, step_size,
+                                                 constant_step_size,
+                                                 is_verbose,
+                                                 grad_calc_opt_mode)
         self.stop_crits = stop_crits
         self.is_fact_side_left = is_fact_side_left
         if((not isinstance(stop_crits, list) and not isinstance(stop_crits,
@@ -778,7 +784,7 @@ class ParamsPalm4MSA(ParamsFact):
                  is_update_way_R2L=False, init_lambda=1.0,
                  step_size=10.0**-16,
                  constant_step_size=False,
-                 is_verbose=False):
+                 is_verbose=False, grad_calc_opt_mode=ParamsFact.INTERNAL_OPT):
         if(not isinstance(constraints, list) and not
            isinstance(constraints, ConstraintList)):
             raise TypeError('constraints argument must be a list or a'
@@ -788,7 +794,7 @@ class ParamsPalm4MSA(ParamsFact):
                                              init_lambda,
                                              constraints, step_size,
                                              constant_step_size,
-                                             is_verbose)
+                                             is_verbose, grad_calc_opt_mode)
         if(init_facts != None and (not isinstance(init_facts, list) and not isinstance(init_facts,
                                                                tuple) or
            len(init_facts) != num_facts)):
