@@ -198,7 +198,38 @@ t_local_compute_projection.stop();
 }
 
 template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c_ext_opt()
+{
+	// compute error = m_lambda*L*S*R-data
+	error = data;
+	std::vector<MatDense<FPP,DEVICE>*> facts;
+	std::vector<char> tc_flags;
+	if(isUpdateWayR2L)
+		facts = { &RorL[m_indFact], &S[m_indFact], &LorR };
+	else
+		facts = { &LorR, &S[m_indFact], &RorL[m_indFact] };
+	multiply_order_opt(facts, error, (FPP) m_lambda, (FPP) -1.0);
+	// compute m_lambda/c * L'*error*R'
+	if(isUpdateWayR2L)
+		facts = { &RorL[m_indFact], &error, &LorR };
+	else
+		facts = {&LorR, &error, &RorL[m_indFact]};
+	tc_flags = {TorH, 'N', TorH};
+	multiply_order_opt(facts, grad_over_c, (FPP) m_lambda/c, (FPP)0, tc_flags);
+	isGradComputed = true;
+}
+
+template<typename FPP,Device DEVICE,typename FPP2>
 void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c()
+{
+	if(gradCalcOptMode == EXTERNAL_OPT)
+		compute_grad_over_c_ext_opt();
+	else
+		compute_grad_over_c_int_opt();
+}
+
+template<typename FPP,Device DEVICE,typename FPP2>
+void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c_int_opt()
 {
 /*static int cmpt = -1;
 cmpt++;

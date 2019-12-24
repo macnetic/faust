@@ -582,7 +582,7 @@ class ParamsFact(ABC):
     EXTERNAL_OPT = 2
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
                  constraints, step_size, constant_step_size,
-                 is_verbose, grad_calc_opt_mode=INTERNAL_OPT):
+                 is_verbose, grad_calc_opt_mode=EXTERNAL_OPT):
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
@@ -619,7 +619,7 @@ class ParamsHierarchical(ParamsFact):
                  step_size=10.0**-16, constant_step_size=False,
                  is_fact_side_left=False,
                  is_verbose=False,
-                 grad_calc_opt_mode=ParamsFact.INTERNAL_OPT):
+                 grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
         if(not isinstance(fact_constraints, list) and not
            isinstance(fact_constraints, ConstraintList)):
             raise TypeError('fact_constraints must be a list or a'
@@ -784,7 +784,7 @@ class ParamsPalm4MSA(ParamsFact):
                  is_update_way_R2L=False, init_lambda=1.0,
                  step_size=10.0**-16,
                  constant_step_size=False,
-                 is_verbose=False, grad_calc_opt_mode=ParamsFact.INTERNAL_OPT):
+                 is_verbose=False, grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
         if(not isinstance(constraints, list) and not
            isinstance(constraints, ConstraintList)):
             raise TypeError('constraints argument must be a list or a'

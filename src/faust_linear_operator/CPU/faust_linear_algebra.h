@@ -49,123 +49,125 @@
 namespace Faust
 {
 
-    template<typename FPP,Device DEVICE> class Vect;
-    template<typename FPP,Device DEVICE> class MatDense;
+		template<typename FPP,Device DEVICE> class Vect;
+		template<typename FPP,Device DEVICE> class MatDense;
 
-    template <typename FPP>
-    void setOp(const Faust::MatDense<FPP,Cpu>& A, const char opA, faust_unsigned_int& opA1, faust_unsigned_int& opA2);
-
-
-//modif AL AL
-    //! \fn add
-    //! \brief (*this) = (*this) + A
-    template<typename FPP>
-    void add(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C);
-    
-    	
-    //! \fn Faust::spgemm
-    //! \brief performs Sparse matrices multiplication
-    template<typename FPP>
-    void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB);
-      	
-
-    /*! \fn gemm
-    *   \brief Performs a matrix calculation of the form a(AB) +bC, with three matrices and two real constants you supply. <br>
-    * C = alpha *op(A)*op(B) + beta * C; <br>
-    * op(A) = A if typeA='N', op(A) = transpose(A) if typeA='T'<br>
-    * op(B) = B if typeB='N', op(B) = transpose(B) if typeB='T'<br>
-    * The Object C must be different of A and B. <br>
-    * \param A : Dense Matrix
-    * \param B : Dense Matrix
-    * \param C : Dense Matrix
-    * \param alpha : Template coefficient
-    * \param beta : Template coefficient
-    */
-    template<typename FPP>
-    void gemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
-    template<typename FPP>
-    void gemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB, Faust::BlasHandle<Cpu> const blas_handle)
-    {Faust::gemm(A,B,C,alpha,beta,typeA,typeB);}
+		template <typename FPP>
+		void setOp(const Faust::MatDense<FPP,Cpu>& A, const char opA, faust_unsigned_int& opA1, faust_unsigned_int& opA2);
 
 
-    //////////FONCTION Faust::MatDense<FPP,Cpu> - Faust::MatDense<FPP,Cpu> ////////////////////
-    // C = A * B;
-    //l'objet C doit etre different de A et B (but gemm() manages it with two copies)
-    //! \fn multiply
-    //! \brief Multiplication C = A * B
-    //! \warning Object C must be different of A and B.
-    template<typename FPP>
-    void multiply(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C)
-    {Faust::gemm(A,B,C,(FPP) 1.0,(FPP)0.0,'N','N');}
-    template<typename FPP>
-    void multiply(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C, Faust::BlasHandle<Cpu> const handle)
-    {Faust::multiply(A,B,C);}
-
-// modif AL AL
-    //modif AL AL
-    template<typename FPP,Device DEVICE> class Transform;
-    template<typename FPP>
-    void multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
-// modif AL AL
-
-    template<typename FPP>
-    void gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
+		//modif AL AL
+		//! \fn add
+		//! \brief (*this) = (*this) + A
+		template<typename FPP>
+		void add(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C);
 
 
-    /*! \fn Faust::gemv
-    *   \brief Performs a matrix vector multiplies of the form ????, with one matrice and two vectors and two real constants you supply. <br>
-    * C = alpha *op(A) + beta * C; <br>
-    * op(A) = A si typeA='N', op(A) = transpose(A) si typeA='T'<br>
-    * op(B) = B si typeB='N', op(B) = transpose(B) si typeB='T'<br>
-    * The Object C must be different of A and B. <br>
-    * \param A : Dense Matrix
-    * \param x : vector
-    * \param y : vector
-    * \param alpha : Template coefficient
-    * \param beta : Template coefficient
-    * \param typeA : char
-    */
-    template<typename FPP>
-    void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
-    template<typename FPP>
-    void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA,Faust::BlasHandle<Cpu> & handle)
-    {Faust::gemv(A,x,y,alpha,beta,typeA);}
+		//! \fn Faust::spgemm
+		//! \brief performs Sparse matrices multiplication
+		template<typename FPP>
+		void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB);
 
 
+		/*! \fn gemm
+		 *   \brief Performs a matrix calculation of the form a(AB) +bC, with three matrices and two real constants you supply. <br>
+		 * C = alpha *op(A)*op(B) + beta * C; <br>
+		 * op(A) = A if typeA='N', op(A) = transpose(A) if typeA='T'<br>
+		 * op(B) = B if typeB='N', op(B) = transpose(B) if typeB='T'<br>
+		 * The Object C must be different of A and B. <br>
+		 * \param A : Dense Matrix
+		 * \param B : Dense Matrix
+		 * \param C : Dense Matrix
+		 * \param alpha : Template coefficient
+		 * \param beta : Template coefficient
+		 */
+		template<typename FPP>
+		void gemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
+		template<typename FPP>
+		void gemm(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB, Faust::BlasHandle<Cpu> const blas_handle)
+		{Faust::gemm(A,B,C,alpha,beta,typeA,typeB);}
 
-    /*!
-    *  \fn FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,T threshold,faust_int & flag)
-    *  \brief compute the biggest eigenvalue of A using power_iteration algorithm
-    * 	\param [in] A : input matrix must be semidefinite positive
-    *	\param [in] nbr_iter_max : maximum number of iteration
-    *	\param [in] threshold : threshold until convergence
-    *	\param [in,out] flag : convergence flag
-    *	\return	the the biggest eigenvalue of A
-    */
-//    template<typename FPP, typename FPP2 = double>
-//    FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,faust_int & flag);
-    template<typename FPP, typename FPP2 = double>
-    FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,faust_int & flag,Faust::BlasHandle<Cpu> & handle)
-    {Faust::power_iteration(A,nbr_iter_max,threshold,flag);}
-    template<typename FPP, typename FPP2 = double>
-    FPP power_iteration(const Faust::LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,int & flag);
 
-
-    //! surcharge d'operateur * pour multiplier des matrices et des vecteurs
-    template<typename FPP>
-    Faust::Vect<FPP,Cpu> operator*(const Faust::MatDense<FPP,Cpu>& M, const Faust::Vect<FPP,Cpu>& v);
+		//////////FONCTION Faust::MatDense<FPP,Cpu> - Faust::MatDense<FPP,Cpu> ////////////////////
+		// C = A * B;
+		//l'objet C doit etre different de A et B (but gemm() manages it with two copies)
+		//! \fn multiply
+		//! \brief Multiplication C = A * B
+		//! \warning Object C must be different of A and B.
+		template<typename FPP>
+		void multiply(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C)
+		{Faust::gemm(A,B,C,(FPP) 1.0,(FPP)0.0,'N','N');}
 	template<typename FPP>
-    Faust::Vect<FPP,Cpu> operator*(const Faust::MatSparse<FPP,Cpu>& M, const Faust::Vect<FPP,Cpu>& v);
-template<typename FPP>
-    Faust::Vect<FPP,Cpu> operator*(const Faust::Transform<FPP,Cpu>& M, const Faust::Vect<FPP,Cpu>& v);
+		void multiply(const Faust::MatDense<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C, Faust::BlasHandle<Cpu> const handle)
+		{Faust::multiply(A,B,C);}
+
+		// modif AL AL
+		//modif AL AL
+		template<typename FPP,Device DEVICE> class Transform;
+		template<typename FPP>
+		void multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
+		// modif AL AL
+
+		template<typename FPP>
+		void gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP  alpha, const FPP  beta, char  typeA, char  typeB);
 
 
-//
-	template<typename FPP>
+		/*! \fn Faust::gemv
+		 *   \brief Performs a matrix vector multiplies of the form ????, with one matrice and two vectors and two real constants you supply. <br>
+		 * C = alpha *op(A) + beta * C; <br>
+		 * op(A) = A si typeA='N', op(A) = transpose(A) si typeA='T'<br>
+		 * op(B) = B si typeB='N', op(B) = transpose(B) si typeB='T'<br>
+		 * The Object C must be different of A and B. <br>
+		 * \param A : Dense Matrix
+		 * \param x : vector
+		 * \param y : vector
+		 * \param alpha : Template coefficient
+		 * \param beta : Template coefficient
+		 * \param typeA : char
+		 */
+		template<typename FPP>
+		void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
+		template<typename FPP>
+		void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA,Faust::BlasHandle<Cpu> & handle)
+		{Faust::gemv(A,x,y,alpha,beta,typeA);}
+
+
+
+		/*!
+		 *  \fn FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,T threshold,faust_int & flag)
+		 *  \brief compute the biggest eigenvalue of A using power_iteration algorithm
+		 * 	\param [in] A : input matrix must be semidefinite positive
+		 *	\param [in] nbr_iter_max : maximum number of iteration
+		 *	\param [in] threshold : threshold until convergence
+		 *	\param [in,out] flag : convergence flag
+		 *	\return	the the biggest eigenvalue of A
+		 */
+		//    template<typename FPP, typename FPP2 = double>
+		//    FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,faust_int & flag);
+		template<typename FPP, typename FPP2 = double>
+		FPP power_iteration(const Faust::MatDense<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,faust_int & flag,Faust::BlasHandle<Cpu> & handle)
+		{Faust::power_iteration(A,nbr_iter_max,threshold,flag);}
+	    template<typename FPP, typename FPP2 = double>
+		FPP power_iteration(const Faust::LinearOperator<FPP,Cpu> & A, const faust_unsigned_int nbr_iter_max,FPP2 threshold,int & flag);
+
+
+		//! surcharge d'operateur * pour multiplier des matrices et des vecteurs
+		template<typename FPP>
+		Faust::Vect<FPP,Cpu> operator*(const Faust::MatDense<FPP,Cpu>& M, const Faust::Vect<FPP,Cpu>& v);
+		template<typename FPP>
+		Faust::Vect<FPP,Cpu> operator*(const Faust::MatSparse<FPP,Cpu>& M, const Faust::Vect<FPP,Cpu>& v);
+		template<typename FPP>
+		Faust::Vect<FPP,Cpu> operator*(const Faust::Transform<FPP,Cpu>& M, const Faust::Vect<FPP,Cpu>& v);
+
+
+		//
+		template<typename FPP>
 		FPP fabs(FPP c);
 
-	template<typename FPP>
+		template<typename FPP>
 		FPP fabs(complex<FPP> c);
+		template<typename FPP, Device DEVICE>
+		void multiply_order_opt(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
 
 }
 

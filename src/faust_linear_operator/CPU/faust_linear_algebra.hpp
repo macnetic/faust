@@ -49,7 +49,6 @@
 #include "faust_constant.h"
 
 
-
 #ifdef __COMPILE_TIMERS__
     #include "faust_Timer.h"
 #endif
@@ -728,6 +727,50 @@ FPP Faust::fabs(complex<FPP> c)
 	return std::sqrt(std::norm(c));
 }
 
-
+//TODO: allow nflags == 1 and all factors using with same flag
+/**
+ *	\brief Multiply all the matrices together (as a product of n factors) with an optimization based on the associativity of the matrix product ; following an order that minimizes the number of scalar operations.
+ *	\note: the vector facts is altered after the call! Don't reuse it.
+ */
+template<typename FPP, Device DEVICE>
+void Faust::multiply_order_opt(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
+{
+	Faust::MatDense<FPP, DEVICE> tmpr, tmpl;
+	int nfacts = facts.size();
+	int ri = 0, li = nfacts-1;
+	Faust::MatDense<FPP,DEVICE> *R1, *R2, *L1, *L2;
+	faust_unsigned_int R1nr, R1nc, L1nr, L1nc;
+	while(li-ri > 1)
+	{
+		R1 = facts[ri];
+		R2 = facts[ri+1];
+		L1 = facts[li-1];
+		L2 = facts[li];
+		R1nr = R1->getNbRow();
+		R1nc = R1->getNbCol();
+		L1nr = L1->getNbRow();
+		L1nc = L1->getNbCol();
+		//TODO: allow matrix mul. of two factors in the middle with a deletion of the right factor afterward
+		if(R1nr * R1nc * R2->getNbCol() < L1nr * L1nc * L2->getNbCol())
+		{
+			gemm(*R1, *R2, tmpr, (FPP)1.0, (FPP)0.0, transconj_flags[transconj_flags.size()>ri?ri:0], transconj_flags[transconj_flags.size()>ri+1?ri+1:0]);
+			ri++;
+			facts[ri] = &tmpr;
+			if(transconj_flags.size() > ri)
+				transconj_flags[ri] = 'N';
+		}
+		else
+		{
+			gemm(*L1, *L2, tmpl, (FPP)1.0, (FPP)0.0, transconj_flags[transconj_flags.size()>li-1?li-1:0], transconj_flags[transconj_flags.size()>li?li:0]);
+			li--;
+			facts[li] = &tmpl;
+			if(transconj_flags.size() > li)
+				transconj_flags[li] = 'N';
+		}
+	}
+	// last mul
+	gemm(*facts[ri], *facts[li], out, alpha, beta_out, ri==0?transconj_flags[0]:'N', li==nfacts-1&&transconj_flags.size()>li?transconj_flags[li]:'N');
+	facts.erase(facts.begin());
+}
 
 #endif

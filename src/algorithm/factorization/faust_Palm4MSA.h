@@ -139,6 +139,8 @@ namespace Faust
           void check_constraint_validity();
           virtual void compute_c();
           virtual void compute_grad_over_c();
+		  virtual void compute_grad_over_c_ext_opt();
+		  virtual void compute_grad_over_c_int_opt();
           void compute_projection();
           void update_L();
           void update_R();
