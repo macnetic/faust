@@ -851,7 +851,7 @@ class TestFaustFactory(unittest.TestCase):
         print("err: ", norm(E,"fro")/norm(M,"fro"))
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorization.cpp
-        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 1.12118, places=4)
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.272704 , places=4)
 
     def testFactPalm4MSACplx(self):
         print("Test pyfaust.fact.palm4msaCplx()")
@@ -888,7 +888,7 @@ class TestFaustFactory(unittest.TestCase):
         print("lambda:", _lambda)
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/test_palm4MSA.cpp
-        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 1.17861, places=4)
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.272814, places=4)
 
     def testHadamard(self):
         print("Test pyfaust.wht()")
