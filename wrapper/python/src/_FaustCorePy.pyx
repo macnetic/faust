@@ -1097,7 +1097,7 @@ cdef class FaustFact:
                 cpp_params.init_fact_sizes[i*2+0] = p.init_facts[i].shape[0]
                 cpp_params.init_fact_sizes[i*2+1] = p.init_facts[i].shape[1]
             else:
-                tmp_mat_cplx = p.init_facts[i]
+                tmp_mat_cplx = p.init_facts[i].astype('complex')
                 cpp_params_cplx.init_facts[i] = &tmp_mat_cplx[0,0]
                 cpp_params_cplx.init_fact_sizes[i*2+0] = p.init_facts[i].shape[0]
                 cpp_params_cplx.init_fact_sizes[i*2+1] = p.init_facts[i].shape[1]

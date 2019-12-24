@@ -152,7 +152,6 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FP
 		isCComputed = false;
 
    check_constraint_validity();
-
 }
 
 template<typename FPP,Device DEVICE,typename FPP2>
@@ -323,10 +322,6 @@ sprintf(nomFichier,"error_1_%d_device.tmp",cmpt);*/
          gemm(RorL[m_indFact], tmp1, error, FPP(m_lambda),(FPP) -1.0, 'N', 'N', blas_handle);
       }
    }
-
-   //false is for disabling evaluation (because the transpose does it later)
-   LorR.conjugate(false);
-   RorL[m_indFact].conjugate(false);
 
    if (idx==0 || idx==2) // computing L'*error first, then (L'*error)*R'
    {
