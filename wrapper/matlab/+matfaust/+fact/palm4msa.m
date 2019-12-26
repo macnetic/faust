@@ -11,7 +11,6 @@
 %> @b Example
 %>
 %> @code
-%>  import matfaust.*
 %>  import matfaust.factparams.*
 %>  import matfaust.fact.palm4msa
 %>  M = rand(500, 32);
@@ -49,7 +48,7 @@ function  [F,lambda] = palm4msa(M, p)
 		error('M''s number of columns must be consistent with the last residuum constraint defined in p. Likewise its number of rows must be consistent with the first factor constraint defined in p.')
 	end
 	% put mex_constraints in a cell array again because mex eats one level of array
-	mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'init_facts', {p.init_facts}, 'niter', p.stop_crit.num_its, 'sc_is_criterion_error', p.stop_crit.is_criterion_error, 'sc_error_treshold', p.stop_crit.error_treshold, 'sc_max_num_its', p.stop_crit.max_num_its, 'update_way', p.is_update_way_R2L);
+	mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'init_facts', {p.init_facts}, 'niter', p.stop_crit.num_its, 'sc_is_criterion_error', p.stop_crit.is_criterion_error, 'sc_error_treshold', p.stop_crit.error_treshold, 'sc_max_num_its', p.stop_crit.max_num_its, 'update_way', p.is_update_way_R2L, 'grad_calc_opt_mode', p.grad_calc_opt_mode, 'constant_step_size', p.constant_step_size, 'step_size', p.step_size, 'verbose', p.is_verbose);
 	if(isreal(M))
 		[lambda, core_obj] = mexPalm4MSAReal(mex_params);
 	else

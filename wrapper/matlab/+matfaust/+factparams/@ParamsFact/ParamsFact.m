@@ -12,6 +12,7 @@ classdef (Abstract) ParamsFact
 		constant_step_size
 		constraints
 		is_verbose
+		grad_calc_opt_mode
 	end
 	properties (Constant, SetAccess = protected, Hidden)
 		DEFAULT_STEP_SIZE = 10^-16
@@ -25,8 +26,14 @@ classdef (Abstract) ParamsFact
 		IDX_STEP_SIZE = 3
 		IDX_CONSTANT_STEP_SIZE = 4
 		IDX_VERBOSITY = 5
+		IDX_GRAD_CALC_OPT_MODE = 6
+		% flags to control the optimization of the multiplication L'(LSR)R' in PALM4MSA
+		DISABLED_OPT = 0
+		INTERNAL_OPT = 1
+		EXTERNAL_OPT = 2
+		DEFAULT_OPT = 2
 		% the order of names matters and must respect the indices above
-		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose'}
+		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose', 'grad_calc_opt_mode'}
 	end
 	methods
 		function p = ParamsFact(num_facts, constraints, varargin)
@@ -37,6 +44,7 @@ classdef (Abstract) ParamsFact
 			step_size = ParamsFact.DEFAULT_STEP_SIZE;
 			is_verbose = ParamsFact.DEFAULT_VERBOSITY;
 			constant_step_size = ParamsFact.DEFAULT_CONSTANT_STEP_SIZE;
+			grad_calc_opt_mode = ParamsFact.DEFAULT_OPT;
 			% check mandatory arguments
 			if(~ isscalar(num_facts) || ~ isreal(num_facts))
 				error('matfaust.factparams.ParamsFact num_facts argument must be an integer.')
@@ -74,7 +82,9 @@ classdef (Abstract) ParamsFact
 			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_VERBOSITY}))
 				is_verbose = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_VERBOSITY});
 			end
-
+			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_GRAD_CALC_OPT_MODE}))
+				grad_calc_opt_mode = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_GRAD_CALC_OPT_MODE});
+			end
 			% then check validity of opt args (it's useless for default values but it's not too costfull)
 			if(~ islogical(is_update_way_R2L))
 				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_IS_UPDATE_WAY_R2L} ,' argument (is_update_way_R2L) must be logical.'])
@@ -92,6 +102,9 @@ classdef (Abstract) ParamsFact
 			if(~ islogical(is_verbose))
 				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_VERBOSITY},' argument (is_verbose) must be logical.'])
 			end
+			if(~ isscalar(grad_calc_opt_mode) && (grad_calc_opt_mode == ParamsFact.INTERNAL_OPT || grad_calc_opt_mode == ParamsFact.EXTERNAL_OPT || grad_calc_opt_mode == ParamsFact.DISABLED_OPT))
+				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_GRAD_CALC_OPT_MODE},' argument (grad_calc_opt_mode) must be an integer equal to ParamsFact.INTERNAL_OPT, ParamsFact.EXTERNAL_OPT, or ParamsFact.DISABLED_OPT.'])
+			end
 			p.num_facts = num_facts;
 			p.is_update_way_R2L = is_update_way_R2L;
 			p.init_lambda = init_lambda;
@@ -99,6 +112,7 @@ classdef (Abstract) ParamsFact
 			p.step_size = step_size;
 			p.is_verbose = is_verbose;
 			p.constant_step_size = constant_step_size;
+			p.grad_calc_opt_mode = grad_calc_opt_mode;
 		end
 
 		function bool = is_mat_consistent(this, M)
