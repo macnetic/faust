@@ -200,6 +200,8 @@ t_local_compute_projection.stop();
 template<typename FPP,Device DEVICE,typename FPP2>
 void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c_ext_opt()
 {
+//#define mul_3_facts multiply_order_opt
+#define mul_3_facts multiply_order_opt_ext // this one only optimize the product on factor ends but for three factors it doesn't change anything comparing to multiply_order_opt
 	// compute error = m_lambda*L*S*R-data
 	error = data;
 	std::vector<MatDense<FPP,DEVICE>*> facts;
@@ -208,14 +210,14 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c_ext_opt()
 		facts = { &RorL[m_indFact], &S[m_indFact], &LorR };
 	else
 		facts = { &LorR, &S[m_indFact], &RorL[m_indFact] };
-	multiply_order_opt(facts, error, (FPP) m_lambda, (FPP) -1.0);
+	mul_3_facts(facts, error, (FPP) m_lambda, (FPP) -1.0);
 	// compute m_lambda/c * L'*error*R'
 	if(isUpdateWayR2L)
 		facts = { &RorL[m_indFact], &error, &LorR };
 	else
 		facts = {&LorR, &error, &RorL[m_indFact]};
 	tc_flags = {TorH, 'N', TorH};
-	multiply_order_opt(facts, grad_over_c, (FPP) m_lambda/c, (FPP)0, tc_flags);
+	mul_3_facts(facts, grad_over_c, (FPP) m_lambda/c, (FPP)0, tc_flags);
 	isGradComputed = true;
 }
 
