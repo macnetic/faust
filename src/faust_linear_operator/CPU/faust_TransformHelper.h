@@ -73,6 +73,7 @@ namespace Faust {
 			bool is_sliced;
 			Slice slices[2];
 			bool is_fancy_indexed;
+			bool enable_mul_order_opt;
 			faust_unsigned_int * fancy_indices[2];
 			faust_unsigned_int fancy_num_rows;
 			faust_unsigned_int fancy_num_cols;
@@ -93,6 +94,7 @@ namespace Faust {
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose=false, const bool conjugate=false);
 //			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
+			void set_enable_mul_order_opt(const bool enable_mul_order_opt);
 			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 
 			TransformHelper<FPP, Cpu>* multiply(TransformHelper<FPP, Cpu>*);

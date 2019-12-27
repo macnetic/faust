@@ -128,7 +128,7 @@ Faust::MatGeneric<FPP,DEVICE>::~MatGeneric()
 template<typename FPP,Device DEVICE>
 void Faust::MatGeneric<FPP,DEVICE>::Display() const
 {
-	cout << to_string();
+	std::cout << to_string();
 }
 
 template<typename FPP,Device DEVICE>
@@ -140,9 +140,9 @@ std::string Faust::MatGeneric<FPP,DEVICE>::to_string(const bool transpose /* set
 		str << getNbCol() << "x" << getNbRow();
 	else
 		str << getNbRow() << "x" << getNbCol();
-	str << ", density "<< this->density()<<", nnz "<<this->getNonZeros()<<endl;
+	str << ", density "<< this->density()<<", nnz "<<this->getNonZeros()<<std::endl;
 	if (this->is_identity)
-		str <<" identity matrix flag" << endl;
+		str <<" identity matrix flag" << std::endl;
 	return str.str();
 }
 

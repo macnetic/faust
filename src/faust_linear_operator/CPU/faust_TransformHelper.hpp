@@ -41,6 +41,7 @@
 
 #include "faust_FFT.h"
 #include "faust_WHT.h"
+#include "faust_linear_algebra.h"
 
 namespace Faust {
 
@@ -61,10 +62,7 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts,
 				const FPP lambda_, const bool optimizedCopy, const bool cloning_fact,
-				const bool internal_call) : is_transposed(false),
-																						is_conjugate(false),
-																						is_sliced(false),
-																						is_fancy_indexed(false)
+				const bool internal_call) :TransformHelper<FPP,Cpu>()
 	{
 		if(lambda_ != FPP(1.0) && ! internal_call)
 			cerr << "WARNING: the constructor argument for multiplying the Faust by a scalar is DEPRECATED and might not be supported in next versions of FAµST." << endl;
@@ -72,13 +70,13 @@ namespace Faust {
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false)
+		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), enable_mul_order_opt(false)
 	{
 		this->transform = make_shared<Transform<FPP,Cpu>>();
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(Transform<FPP,Cpu> &t, const bool moving /* default to false */) : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false)
+		TransformHelper<FPP,Cpu>::TransformHelper(Transform<FPP,Cpu> &t, const bool moving /* default to false */) : TransformHelper<FPP,Cpu>()
 	{
 		if(moving)
 			this->transform = make_shared<Transform<FPP,Cpu>>(std::move(t));
@@ -88,14 +86,14 @@ namespace Faust {
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right)
-		: is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false)
+		: TransformHelper<FPP,Cpu>()
 		{
 			this->transform = make_shared<Transform<FPP,Cpu>>(th_left->transform.get(), th_left->is_transposed, th_left->is_conjugate,
 					th_right->transform.get(), th_right->is_transposed, th_right->is_conjugate);
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate)
+		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate) : TransformHelper<FPP,Cpu>()
 		{
 			this->transform = th->transform;
 			this->is_transposed = transpose?!th->is_transposed:th->is_transposed;
@@ -104,10 +102,11 @@ namespace Faust {
 			if(th->is_sliced)
 				copy_slices(th);
 			this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
+			this->enable_mul_order_opt = th->enable_mul_order_opt;
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th)
+		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th): TransformHelper<FPP,Cpu>()
 		{
 			this->transform = th->transform;
 			this->is_transposed = th->is_transposed;
@@ -115,10 +114,12 @@ namespace Faust {
 			this->is_sliced = th->is_sliced;
 			if(th->is_sliced)
 				copy_slices(th);
+			this->enable_mul_order_opt = th->enable_mul_order_opt;
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2])
+		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]): TransformHelper<FPP,Cpu>()
+
 		{
 			this->transform = th->transform; //do not remove this line, necessary for eval_sliced_transform()
 			this->is_transposed = th->is_transposed;
@@ -129,10 +130,11 @@ namespace Faust {
 			this->slices[1] = s[1];
 			this->is_sliced = true;
 			eval_sliced_Transform();
+			this->enable_mul_order_opt = th->enable_mul_order_opt;
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
+		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols): TransformHelper<FPP,Cpu>()
 		{
 			this->transform = th->transform; //do not remove this line, necessary for eval*()
 			this->is_transposed = th->is_transposed;
@@ -158,6 +160,7 @@ namespace Faust {
 			eval_fancy_idx_Transform();
 			delete[] this->fancy_indices[0];
 			delete[] this->fancy_indices[1];
+			this->enable_mul_order_opt = th->enable_mul_order_opt;
 		}
 
 	template<typename FPP>
@@ -185,14 +188,29 @@ namespace Faust {
 
 
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> A, const bool transpose, const bool conjugate)
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(MatDense<FPP,Cpu> A, const bool transpose, const bool conjugate)
 		{
 			is_transposed ^= transpose;
 			is_conjugate ^= conjugate;
-			MatDense<FPP,Cpu> M = this->transform->multiply(A, isTransposed2char());
+			Faust::MatDense<FPP,Cpu> M;
+			if(this->enable_mul_order_opt)
+			{
+				this->transform->data.push_back(&A);
+				Faust::multiply_order_opt(this->transform->data, M);
+				this->transform->data.erase(this->transform->data.end()-1);
+			}
+			else
+				M = this->transform->multiply(A, isTransposed2char());
 			is_conjugate ^= conjugate;
 			is_transposed ^= transpose;
 			return M;
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::set_enable_mul_order_opt(const bool enable_mul_order_opt)
+		{
+			this->enable_mul_order_opt = enable_mul_order_opt;
+			std::cout << "mul order opt enabled: " << this->enable_mul_order_opt << std::endl;
 		}
 
 	template<typename FPP>

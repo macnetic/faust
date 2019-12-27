@@ -148,7 +148,6 @@ cdef class FaustCore:
         #else:
         #TODO: raise error for undefined object here
 
-
     @staticmethod
     def randFaust(t,field,min_num_factors, max_num_factors, min_dim_size,
                    max_dim_size, density=0.1, per_row=True):
@@ -166,6 +165,7 @@ cdef class FaustCore:
         else:
             raise ValueError("FaustCorePy.randFaust(): field must be 3 for real or"
                              " 4 for complex")
+
         return core
 
     @staticmethod
@@ -390,18 +390,19 @@ cdef class FaustCore:
         if(isinstance(M, FaustCore)):
             return self.multiply_faust(M)
         if not isinstance(M, (np.ndarray) ):
-            raise ValueError('input M must a numpy.ndarray or a numpy.matrix')
+            raise ValueError('input M must be a numpy.ndarray or a numpy.matrix')
         if(self._isReal):
            M=M.astype(float,'F')
            if not M.dtype=='float':
-               raise ValueError('input M must be double array')
+               raise ValueError('input M must be a double array')
         else:
            M=M.astype(complex,'F')
            if(M.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
                raise ValueError('input M must be complex array')
         #TODO: raise exception if not real nor complex
         if not M.flags['F_CONTIGUOUS']:
-            raise ValueError('input M must be Fortran contiguous (Colmajor)')
+            raise ValueError('input M must be Fortran contiguous (column major '
+                            'order)')
 
         ndim_M=M.ndim;
 
@@ -459,7 +460,8 @@ cdef class FaustCore:
                 self.core_faust_dbl.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x)
             else:
                 self.core_faust_cplx.multiply(&yview_cplx[0,0], nbrow_y,
-                                              nbcol_y, &xview_1D_cplx[0], nbrow_x,nbcol_x)
+                                              nbcol_y, &xview_1D_cplx[0],
+                                              nbrow_x,nbcol_x)
             y = np.squeeze(y) # we want a single dim. (but we created two
             # above)
         else:
@@ -469,6 +471,12 @@ cdef class FaustCore:
                 self.core_faust_cplx.multiply(&yview_cplx[0,0],nbrow_y,nbcol_y,&xview_2D_cplx[0,0],nbrow_x,nbcol_x)
 
         return y
+
+    def set_enable_mul_order_opt(self, enable):
+        if(self._isReal):
+            self.core_faust_dbl.set_enable_mul_order_opt(enable)
+        else:
+            self.core_faust_cplx.set_enable_mul_order_opt(enable)
 
 
     # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)
@@ -781,7 +789,7 @@ cdef class FaustCore:
 
 cdef check_matrix(isReal, M):
         if not isinstance(M, (np.ndarray) ):
-            raise ValueError('input must a numpy ndarray')
+            raise ValueError('input must be a numpy ndarray')
         if(isReal):
             M=M.astype(float,'F')
             if not M.dtype=='float':

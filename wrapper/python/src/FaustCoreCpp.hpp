@@ -137,7 +137,7 @@ void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value
     nbColThis = this->getNbCol();
 
     if ( (nbrow_y != nbRowThis) | (nbrow_x != nbColThis) | (nbcol_y != nbcol_x) )
-    {	
+    {
         std::cout<<"nbRowThis "<<nbRowThis<<" must be equal to nb row y  "<<nbrow_y<<std::endl;
         std::cout<<"nbColThis "<<nbColThis<<" must be equal to nb row x  "<<nbrow_x<<std::endl;
         std::cout<<"nbcol_y "<<nbcol_y<<" must be equal to nbcol_x  "<<nbcol_x<<std::endl;
@@ -159,11 +159,15 @@ void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value
 
         Y = this->transform->multiply(X);
 
-
         memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y*nbcol_y);
     }
 }
 
+template<typename FPP>
+void FaustCoreCpp<FPP>::set_enable_mul_order_opt(const bool enable)
+{
+    this->transform->set_enable_mul_order_opt(enable);
+}
 
 template<typename FPP>
 unsigned long long FaustCoreCpp<FPP>::nnz() const

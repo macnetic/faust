@@ -49,8 +49,6 @@
 #include <complex>
 #include <iostream>
 
-// modif AL
-//#include "faust_linear_algebra.h"
 
 #ifdef __COMPILE_TIMERS__
     #include "faust_Timer.h"

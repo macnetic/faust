@@ -1166,7 +1166,7 @@ class Faust:
         else:
             return float(-1)
 
-    def norm(F, ord='fro', axis=None, keepdims=False, **kwargs):
+    def norm(F, ord='fro', axis=None, keepdims=False, **kwargs): #**kwargs):
         """
         Computes the norm of F.
 
@@ -1578,7 +1578,8 @@ def norm(F, ord='fro', **kwargs):
         keepdims = False
         if('axis' in kwargs.keys()): axis = kwargs['axis']
         if('keepdims' in kwargs.keys()): keepdims = kwargs['keepdims']
-        return np.linalg.norm(F, ord, axis=axis, keepdims=keepdims)
+        return np.linalg.norm(F, ord, axis=axis,
+                              keepdims=keepdims)
 
 def dot(A, B):
     """

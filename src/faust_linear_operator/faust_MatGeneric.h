@@ -47,6 +47,8 @@
 #include "faust_MatDense.h"
 #include "matio.h"
 #include "Eigen/Core"
+#include <list>
+#include <utility>
 /**
  * \class MatGeneric faust_MatGeneric.h
  * \brief This MatGeneric class serves as a base class for the derived class Faust::MatDense and Faust::MatSparse .
@@ -201,7 +203,7 @@ namespace Faust
 			virtual Faust::MatGeneric<FPP,DEVICE>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const=0;
 			//! \brief Returns a sub-group of rows of this matrix as the same type of matrix
 			virtual Faust::MatGeneric<FPP,DEVICE>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const=0;
-			virtual list<pair<int,int>> nonzeros_indices() const=0;
+			virtual std::list<std::pair<int,int>> nonzeros_indices() const=0;
 			void set_orthogonal(const bool is_ortho) { this->is_ortho = is_ortho; /* TODO: move def in hpp*/}
 			void set_id(const bool is_identity) { this->is_identity = is_identity; /* TODO: move def in hpp*/}
 

@@ -44,11 +44,6 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-using namespace std;
-
-//modif AL AL
-// modif AL pour ajouter la fonction gemm
-#include "faust_linear_algebra.h"
 
 template<typename FPP>
 const char * Faust::Vect<FPP,Cpu>::m_className = "Faust::Vect<FPP,Cpu>::";
@@ -119,19 +114,19 @@ template<typename FPP>
 void Faust::Vect<FPP,Cpu>::Display() const
 {
     if(size()==0)
-       cout << "empty vector";
+       std::cout << "empty vector";
     for (int i=0 ; i<size() ; i++)
-	    cout << getData()[i] << " " ;
-    cout<<endl<<endl;
+	    std::cout << getData()[i] << " " ;
+    std::cout<<std::endl<<std::endl;
 }
 
 template<typename FPP>
 void Faust::Vect<FPP,Cpu>::print_file(const char* filename)const
 {
-	ofstream fichier;
+	std::ofstream fichier;
 	fichier.open(filename);
 	for (int i=0 ; i<size() ; i++)
-		fichier << setprecision(20) << vec (i) << endl;
+		fichier << std::setprecision(20) << vec (i) << std::endl;
 	fichier.close();
 }
 
@@ -281,7 +276,7 @@ void  Faust::Vect<FPP,Cpu>::multiplyLeft(Faust::MatSparse<FPP,Cpu> const& S,cons
 		        vec = S.mat.transpose() * vec;	
 		#ifdef __COMPILE_TIMERS__
 			t_local_multiplyLeft.stop();
-			//cout <<"0 "<<setprecision(10)<<t_local_multiplyLeft.get_time()<<endl;
+			//std::cout <<"0 "<<setprecision(10)<<t_local_multiplyLeft.get_time()<<std::endl;
 			t_local_multiplyLeft.reset();
 		#endif
 

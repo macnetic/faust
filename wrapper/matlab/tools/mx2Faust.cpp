@@ -51,6 +51,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <complex>
 #include "mx2Faust.h"
 #include "faust_ConstraintGeneric.h"
 #include "faust_ConstraintFPP.h"
@@ -59,7 +60,7 @@
 #include "faust_Params.h"
 
 using namespace Faust;
-
+using namespace std;
 
 
 const string mat_field_type2str(MAT_FIELD_TYPE f)

@@ -286,7 +286,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 	this->facts[this->ite].multiply(L, 'H');
 	L.multiplyRight(this->facts[this->ite]);
 #else
-	Eigen::SparseMatrix<FPP,RowMajor> L_vec_p, L_vec_q;
+	Eigen::SparseMatrix<FPP,Eigen::RowMajor> L_vec_p, L_vec_q;
 	FPP c_qq = *(this->fact_mod_values.end()-1);
 	FPP c_qp = *(this->fact_mod_values.end()-2);
 	FPP c_pq = *(this->fact_mod_values.end()-3);
@@ -357,9 +357,9 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP,RowMajor > & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
+void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP,Eigen::RowMajor > & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
 {
-	Eigen::SparseMatrix<FPP, RowMajor> tmp, tmp2;
+	Eigen::SparseMatrix<FPP, Eigen::RowMajor> tmp, tmp2;
 	/*========== L *= S */
 	//L_vec_p = L.get_col(p), L_vec_q = L.get_col(q);
 	L_vec_p = L.mat.block(0, p, L.getNbRow(), 1);
@@ -382,9 +382,9 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP
 }
 
 template<typename FPP, Device DEVICE, typename FPP2>
-void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP, RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
+void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
 {
-	Eigen::SparseMatrix<FPP, RowMajor> tmp, tmp2, tmp3;
+	Eigen::SparseMatrix<FPP, Eigen::RowMajor> tmp, tmp2, tmp3;
 	/*========== L = S'*L */
 	L_vec_p = L.mat.innerVector(p), L_vec_q = L.mat.innerVector(q);
 //	L_vec_p = L.mat.block(p, 0, 1, L.getNbCol());

@@ -58,7 +58,6 @@ namespace Faust {
 	template<typename FPP, Device DEVICE> class LinearOperator;
 }
 
-using namespace Faust;
 
 /*!
 *  \brief check if the Faust::Transform T has compatible scalar with MATLAB matrix Matlab_Mat (currently real is only compatible with real and complex is only compatible with complex)
@@ -182,7 +181,7 @@ const unsigned int MAT_FIELD_TYPE_LEN = 18; // must be the number of fields in M
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
 
 template<typename SCALAR, typename FPP2>
-const Params<SCALAR,Cpu,FPP2>* mxArray2FaustParams(const mxArray* matlab_params);
+const Faust::Params<SCALAR,Cpu,FPP2>* mxArray2FaustParams(const mxArray* matlab_params);
 
 #include "mx2Faust.hpp"
 
