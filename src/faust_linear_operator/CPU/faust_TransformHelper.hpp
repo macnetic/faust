@@ -70,7 +70,7 @@ namespace Faust {
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), enable_mul_order_opt(false)
+		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), mul_order_opt_mode(0)
 	{
 		this->transform = make_shared<Transform<FPP,Cpu>>();
 	}
@@ -102,7 +102,7 @@ namespace Faust {
 			if(th->is_sliced)
 				copy_slices(th);
 			this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
-			this->enable_mul_order_opt = th->enable_mul_order_opt;
+			this->mul_order_opt_mode = th->mul_order_opt_mode;
 		}
 
 	template<typename FPP>
@@ -114,7 +114,7 @@ namespace Faust {
 			this->is_sliced = th->is_sliced;
 			if(th->is_sliced)
 				copy_slices(th);
-			this->enable_mul_order_opt = th->enable_mul_order_opt;
+			this->mul_order_opt_mode = th->mul_order_opt_mode;
 		}
 
 	template<typename FPP>
@@ -130,7 +130,7 @@ namespace Faust {
 			this->slices[1] = s[1];
 			this->is_sliced = true;
 			eval_sliced_Transform();
-			this->enable_mul_order_opt = th->enable_mul_order_opt;
+			this->mul_order_opt_mode = th->mul_order_opt_mode;
 		}
 
 	template<typename FPP>
@@ -160,7 +160,7 @@ namespace Faust {
 			eval_fancy_idx_Transform();
 			delete[] this->fancy_indices[0];
 			delete[] this->fancy_indices[1];
-			this->enable_mul_order_opt = th->enable_mul_order_opt;
+			this->mul_order_opt_mode = th->mul_order_opt_mode;
 		}
 
 	template<typename FPP>
@@ -193,10 +193,10 @@ namespace Faust {
 			is_transposed ^= transpose;
 			is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
-			if(this->enable_mul_order_opt)
+			if(this->mul_order_opt_mode)
 			{
 				this->transform->data.push_back(&A);
-				Faust::multiply_order_opt(this->transform->data, M);
+				Faust::multiply_order_opt(mul_order_opt_mode, this->transform->data, M);
 				this->transform->data.erase(this->transform->data.end()-1);
 			}
 			else
@@ -207,10 +207,10 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::set_enable_mul_order_opt(const bool enable_mul_order_opt)
+		void TransformHelper<FPP,Cpu>::set_mul_order_opt_mode(const int mul_order_opt_mode)
 		{
-			this->enable_mul_order_opt = enable_mul_order_opt;
-			std::cout << "mul order opt enabled: " << this->enable_mul_order_opt << std::endl;
+			this->mul_order_opt_mode = mul_order_opt_mode;
+			std::cout << "mul order opt mode (0 when disabled): " << this->mul_order_opt_mode << std::endl;
 		}
 
 	template<typename FPP>

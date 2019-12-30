@@ -201,7 +201,7 @@ template<typename FPP,Device DEVICE,typename FPP2>
 void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c_ext_opt()
 {
 //#define mul_3_facts multiply_order_opt
-#define mul_3_facts multiply_order_opt_ext // this one only optimize the product on factor ends but for three factors it doesn't change anything comparing to multiply_order_opt
+#define mul_3_facts multiply_order_opt_all_ends// this one only optimize the product on factor ends but for three factors it doesn't change anything comparing to multiply_order_opt
 	// compute error = m_lambda*L*S*R-data
 	error = data;
 	std::vector<MatDense<FPP,DEVICE>*> facts;

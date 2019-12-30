@@ -42,7 +42,7 @@
 #define __FAUST_LINALGEBRA_HPP
 
 #include <iostream>
-
+#include <stdexcept>
 #include "faust_LinearOperator.h"
 #include "faust_MatGeneric.h"
 #include "faust_MatDense.h"
@@ -733,7 +733,7 @@ FPP Faust::fabs(std::complex<FPP> c)
  *	\note: the std::vector facts is altered after the call! Don't reuse it.
  */
 template<typename FPP, Device DEVICE>
-void Faust::multiply_order_opt_ext(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
+void Faust::multiply_order_opt_all_ends(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
 {
 	Faust::MatDense<FPP, DEVICE> tmpr, tmpl;
 	int nfacts = facts.size();
@@ -772,77 +772,77 @@ void Faust::multiply_order_opt_ext(std::vector<Faust::MatDense<FPP,DEVICE>*>& fa
 	facts.erase(facts.begin(), facts.end());
 }
 
-//template<typename FPP, Device DEVICE>
-//void Faust::multiply_order_opt(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
-//{
-//	std::vector<Faust::MatDense<FPP,DEVICE>*> tmp_facts; //temporary product results
-//	Faust::MatDense<FPP, DEVICE>* tmp;
-//	int nfacts = facts.size();
-//	Faust::MatDense<FPP,DEVICE> *Si, *Sj;
-//	std::vector<int> complexity(nfacts-1);
-//	for(int i = 0; i <nfacts-1; i++)
-//	{
-//		Si = facts[i];
-//		Sj = facts[i+1];
-//		complexity[i] = Si->getNbRow() * Si->getNbCol() * Sj->getNbCol();
-//	}
-//	int idx; // marks the factor to update with a product of contiguous factors
-//	bool multiplying_tmp_factor = false; // allows to avoid to allocate uselessly a tmp factor if Si or Sj are already tmp factors
-//	while(facts.size() > 2)
-//	{
-//		// find the least complex product facts[idx]*facts[idx+1]
-//		idx = distance(complexity.begin(), min_element(complexity.begin(), complexity.end()));
-//		Si = facts[idx];
-//		Sj = facts[idx+1];
-//		for(auto Tit = tmp_facts.begin(); Tit != tmp_facts.end(); Tit++)
-//		{
-//			if(Sj == *Tit)
-//			{// Sj is original fact
-//				multiplying_tmp_factor = true;
-//				tmp = Sj;
-//				break;
-//			}
-//			else if(Si == *Tit)
-//			{
-//				multiplying_tmp_factor = true;
-//				tmp = Si;
-//				break;
-//			}
-//		}
-//		if(! multiplying_tmp_factor)
-//		{
-//			tmp = new Faust::MatDense<FPP, DEVICE>();
-//			tmp_facts.push_back(tmp);
-//		}
-//		//else no need to instantiate a new tmp, erasing Sj which is a tmp
-//		gemm(*Si, *Sj, *tmp, (FPP)1.0, (FPP)0.0, transconj_flags[transconj_flags.size()>idx?idx:0], transconj_flags[transconj_flags.size()>idx+1?idx+1:0]);
-//		facts.erase(facts.begin()+idx+1);
-//		complexity.erase(complexity.begin()+idx); //complexity size == facts size - 1
-//		facts[idx] = tmp;
-//		if(transconj_flags.size() > idx)
-//			transconj_flags[idx] = 'N';
-//		// update complexity around the new factor
-//		if(facts.size() > 2)
-//		{
-//			if(idx > 0)
-//				complexity[idx-1] = facts[idx-1]->getNbRow() * facts[idx-1]->getNbCol() * facts[idx]->getNbCol();
-//			if(idx < facts.size()-1)
-//				complexity[idx] = facts[idx]->getNbRow() * facts[idx]->getNbCol() * facts[idx+1]->getNbCol();
-//		}
-//		multiplying_tmp_factor = false;
-//	}
-//	// last mul
-//	gemm(*facts[0], *facts[1], out, alpha, beta_out, transconj_flags[0], transconj_flags.size()>1?transconj_flags[1]:'N');
-//	facts.erase(facts.begin(), facts.end());
-//	// delete all tmp facts
-//	for(auto Tit = tmp_facts.begin(); Tit != tmp_facts.end(); Tit++)
-//	{
-//		delete *Tit;
-//	}
-//}
+template<typename FPP, Device DEVICE>
+void Faust::multiply_order_opt_all_best(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
+{
+	std::vector<Faust::MatDense<FPP,DEVICE>*> tmp_facts; //temporary product results
+	Faust::MatDense<FPP, DEVICE>* tmp;
+	int nfacts = facts.size();
+	Faust::MatDense<FPP,DEVICE> *Si, *Sj;
+	std::vector<int> complexity(nfacts-1);
+	for(int i = 0; i <nfacts-1; i++)
+	{
+		Si = facts[i];
+		Sj = facts[i+1];
+		complexity[i] = Si->getNbRow() * Si->getNbCol() * Sj->getNbCol();
+	}
+	int idx; // marks the factor to update with a product of contiguous factors
+	bool multiplying_tmp_factor = false; // allows to avoid to allocate uselessly a tmp factor if Si or Sj are already tmp factors
+	while(facts.size() > 2)
+	{
+		// find the least complex product facts[idx]*facts[idx+1]
+		idx = distance(complexity.begin(), min_element(complexity.begin(), complexity.end()));
+		Si = facts[idx];
+		Sj = facts[idx+1];
+		for(auto Tit = tmp_facts.begin(); Tit != tmp_facts.end(); Tit++)
+		{
+			if(Sj == *Tit)
+			{// Sj is original fact
+				multiplying_tmp_factor = true;
+				tmp = Sj;
+				break;
+			}
+			else if(Si == *Tit)
+			{
+				multiplying_tmp_factor = true;
+				tmp = Si;
+				break;
+			}
+		}
+		if(! multiplying_tmp_factor)
+		{
+			tmp = new Faust::MatDense<FPP, DEVICE>();
+			tmp_facts.push_back(tmp);
+		}
+		//else no need to instantiate a new tmp, erasing Sj which is a tmp
+		gemm(*Si, *Sj, *tmp, (FPP)1.0, (FPP)0.0, transconj_flags[transconj_flags.size()>idx?idx:0], transconj_flags[transconj_flags.size()>idx+1?idx+1:0]);
+		facts.erase(facts.begin()+idx+1);
+		complexity.erase(complexity.begin()+idx); //complexity size == facts size - 1
+		facts[idx] = tmp;
+		if(transconj_flags.size() > idx)
+			transconj_flags[idx] = 'N';
+		// update complexity around the new factor
+		if(facts.size() > 2)
+		{
+			if(idx > 0)
+				complexity[idx-1] = facts[idx-1]->getNbRow() * facts[idx-1]->getNbCol() * facts[idx]->getNbCol();
+			if(idx < facts.size()-1)
+				complexity[idx] = facts[idx]->getNbRow() * facts[idx]->getNbCol() * facts[idx+1]->getNbCol();
+		}
+		multiplying_tmp_factor = false;
+	}
+	// last mul
+	gemm(*facts[0], *facts[1], out, alpha, beta_out, transconj_flags[0], transconj_flags.size()>1?transconj_flags[1]:'N');
+	facts.erase(facts.begin(), facts.end());
+	// delete all tmp facts
+	for(auto Tit = tmp_facts.begin(); Tit != tmp_facts.end(); Tit++)
+	{
+		delete *Tit;
+	}
+}
 
 template<typename FPP, Device DEVICE>
-void Faust::multiply_order_opt(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
+void Faust::multiply_order_opt_first_best(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
 {
 	int nfacts = facts.size();
 	Faust::MatDense<FPP,DEVICE> *Si, *Sj, tmp;
@@ -885,7 +885,7 @@ void Faust::multiply_order_opt(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts,
 	}
 	// find the least complex product facts[idx]*facts[idx+1]
 //	idx = distance(complexity.begin(), min_element(complexity.begin(), complexity.end()));
-	std::cout << "idx: " << idx << std::endl;
+//	std::cout << "idx: " << idx << std::endl;
 	Si = facts[idx];
 	Sj = facts[idx+1];
 	gemm(*Si, *Sj, tmp, (FPP)1.0, (FPP)0.0, transconj_flags[transconj_flags.size()>idx?idx:0], transconj_flags[transconj_flags.size()>idx+1?idx+1:0]);
@@ -914,7 +914,7 @@ void Faust::multiply_order_opt(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts,
 }
 
 template<typename FPP, Device DEVICE>
-void Faust::multiply_order_opt(std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
+void Faust::multiply_order_opt(const int mode, std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
 {
 	std::vector<Faust::MatDense<FPP,DEVICE>*> dfacts;
 	std::vector<Faust::MatDense<FPP,DEVICE>*> dfacts_to_del;
@@ -929,7 +929,20 @@ void Faust::multiply_order_opt(std::vector<Faust::MatGeneric<FPP,DEVICE>*>& fact
 		}
 		dfacts.push_back(df);
 	}
-	multiply_order_opt(dfacts, out, alpha, beta_out, transconj_flags);
+	switch(mode)
+	{
+		case 1:
+			Faust::multiply_order_opt_all_ends(dfacts, out, alpha, beta_out, transconj_flags);
+			break;
+		case 2:
+			Faust::multiply_order_opt_first_best(dfacts, out, alpha, beta_out, transconj_flags);
+			break;
+		case 3:
+			Faust::multiply_order_opt_all_best(dfacts, out, alpha, beta_out, transconj_flags);
+			break;
+		default:
+			throw std::out_of_range("optimization asked not known");
+	}
 	// free dense copies
 	for(auto df: dfacts_to_del)
 		delete df;

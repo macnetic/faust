@@ -472,11 +472,11 @@ cdef class FaustCore:
 
         return y
 
-    def set_enable_mul_order_opt(self, enable):
+    def set_mul_order_opt_mode(self, mode):
         if(self._isReal):
-            self.core_faust_dbl.set_enable_mul_order_opt(enable)
+            self.core_faust_dbl.set_mul_order_opt_mode(mode)
         else:
-            self.core_faust_cplx.set_enable_mul_order_opt(enable)
+            self.core_faust_cplx.set_mul_order_opt_mode(mode)
 
 
     # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)
