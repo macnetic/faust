@@ -1713,7 +1713,8 @@ cdef class FaustFact:
                                           M_num_cols, int(J), int(t),
                                           verbosity,
                                           stoppingError,
-                                          errIsRel)
+                                          errIsRel,
+                                          enable_large_Faust)
 
         coreU._isReal = coreV._isReal = True
         #from scipy.sparse import spdiags
