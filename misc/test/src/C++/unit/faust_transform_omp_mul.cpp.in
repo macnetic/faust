@@ -1,0 +1,86 @@
+/*  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167958v1>                       */
+/****************************************************************************/
+#include "faust_TransformHelper.h"
+#include "faust_MatDense.h"
+#include <string>
+#include <sstream>
+#include <chrono>
+
+#include <iostream>
+#include <iomanip>
+
+/** \brief unitary test for testing multiplication by faust									
+*/
+
+typedef @TEST_FPP@ FPP;
+
+
+using namespace Faust;
+
+int main(int argc, char* argv[])
+{
+	if (typeid(FPP) == typeid(double))
+	{
+		cout<<"floating point precision == double"<<endl;
+	}
+
+	if (typeid(FPP) == typeid(float))
+	{
+		cout<<"floating point precision == float"<<endl;
+	}
+
+	//RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true
+	TransformHelper<FPP,Cpu>* th = TransformHelper<FPP,Cpu>::randFaust(DENSE, 50, 50, 256, 256, .5);
+	th->display();
+	MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(256,256);
+	auto start = std::chrono::system_clock::now();
+	auto FM = th->multiply(*M);
+	auto end = std::chrono::system_clock::now();
+	std::chrono::duration<double> diff = end-start;
+	std::cout << "Time "<< diff.count() << " s\n";
+	FM.Display();
+	cout << "FM norm: " << FM.norm() << endl;
+	th->set_mul_order_opt_mode(4);
+	start = std::chrono::system_clock::now();
+	auto FM2 = th->multiply(*M);
+	end = std::chrono::system_clock::now();
+	diff = end-start;
+	std::cout << "Time omp: "<< diff.count() << " s\n";
+	cout << "FM2 norm: " << FM.norm() << endl;
+
+
+	FM2.Display();
+	cout << FM2.norm() << endl;
+	return 0;
+}

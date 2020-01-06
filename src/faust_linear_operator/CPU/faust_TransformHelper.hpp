@@ -193,14 +193,22 @@ namespace Faust {
 			is_transposed ^= transpose;
 			is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
-			if(this->mul_order_opt_mode)
+			switch(this->mul_order_opt_mode)
 			{
-				this->transform->data.push_back(&A);
-				Faust::multiply_order_opt(mul_order_opt_mode, this->transform->data, M);
-				this->transform->data.erase(this->transform->data.end()-1);
+				case 1:
+				case 2:
+				case 3:
+					this->transform->data.push_back(&A);
+					Faust::multiply_order_opt(mul_order_opt_mode, this->transform->data, M);
+					this->transform->data.erase(this->transform->data.end()-1);
+					break;
+				case 4:
+					M = this->transform->multiply_omp(A, isTransposed2char()); 
+					break;
+				default:
+					M = this->transform->multiply(A, isTransposed2char());
+					break;
 			}
-			else
-				M = this->transform->multiply(A, isTransposed2char());
 			is_conjugate ^= conjugate;
 			is_transposed ^= transpose;
 			return M;

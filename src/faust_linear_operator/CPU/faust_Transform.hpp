@@ -1094,8 +1094,90 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDen
 }
 
 
+template<typename FPP>
+Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_omp(const Faust::MatDense<FPP,Cpu> A, const char opThis) const
+{
+	int nth, thid, num_per_th, data_size;
+	Faust::MatDense<FPP,Cpu>* mats[8];
+	Faust::MatGeneric<FPP, Cpu> * data[this->data.size()+1];
+	Faust::MatSparse<FPP, Cpu> * sM;
+	Faust::MatDense<FPP, Cpu> *M;
+	Faust::MatDense<FPP,Cpu>* tmp; // (data[end_id-1]);
+	int i = 0;
+	for(auto ptr: this->data)
+	{
+//		cout << "i=" << i << " data[i]=" << ptr << endl;
+		data[i++] = ptr;
+	}
+	data[i] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
+#pragma omp parallel private(nth, thid, tmp, num_per_th, data_size)
+	{
+		data_size = this->data.size()+1; // data + 1
+		nth	= omp_get_num_threads();
+		num_per_th = data_size;
+		num_per_th = num_per_th%2?num_per_th-1:num_per_th;
+		num_per_th /= nth;
+		num_per_th = num_per_th<2?2:num_per_th;
+//		std::cout << "omp th: " << nth << " num_per_th: " << num_per_th << std::endl;
+		thid = omp_get_thread_num();
+//		std::cout << "num_per_th: " << num_per_th << std::endl;
+		while(num_per_th > 1)
+		{
+			int first_id, end_id, id;
+			first_id = num_per_th*thid;
+			end_id = num_per_th*(thid+1);
+			if(first_id < data_size)
+			{
+				id = 'N' == opThis? end_id-1: first_id;
+				if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[id]))
+					tmp = new Faust::MatDense<FPP,Cpu>(*sM);
+				else
+					tmp = new Faust::MatDense<FPP,Cpu>(*(Faust::MatDense<FPP,Cpu>*)(data[id]));
+				mats[thid] = tmp;
+//				cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "tmp=" << tmp << endl;
+				if(opThis == 'N')
+					for(int i=end_id-2;i>=first_id; i--)
+					{
+//						cout << "mul:" << data[i] << endl;
+						if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i]))
+							sM->multiply(*mats[thid], opThis);
+						else
+							dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[i])->multiply(*mats[thid], opThis);
+					}
+				else
+					for(int i=first_id+1;i < end_id; i++)
+						if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i]))
+							sM->multiply(*mats[thid],opThis);
+						else
+							dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[i])->multiply(*mats[thid], opThis);
+				data[thid] = mats[thid];
+//				mats[thid]->Display();
+//				cout << mats[thid]->norm() << endl;
+//				cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "data[thid]=" << data[thid] << endl;
+				data_size = nth;
+			}
+			if(nth > 1)
+				num_per_th = nth/(nth>>1);
+			else
+				num_per_th = 1;
+			nth >>= 1;
 
-
+#pragma omp barrier
+		}
+		//		if(thid == 0) M = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[0]);
+	}
+	M = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(mats[0]);
+//	cout << M << endl;
+	MatDense<FPP,Cpu> M_;
+	if(! M)
+	{
+		M_ = Faust::MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(mats[0]));
+		M = &M_;
+	}
+	//TODO: delete other thread mats
+	//TODO: return a ptr instead of a copy
+	return *M;
+}
 
 
 

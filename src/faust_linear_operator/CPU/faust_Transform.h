@@ -259,6 +259,7 @@ namespace Faust
 				{
 					return this->multiply(x,'N');
 				}
+				Faust::MatDense<FPP,Cpu> multiply_omp(const Faust::MatDense<FPP,Cpu> A, const char opThis) const;
 
 
 				/*!

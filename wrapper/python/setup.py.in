@@ -24,7 +24,7 @@ if sys.platform == 'win32':
                         include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],
                         library_dirs=[@FAUST_PYTHON_LIB_DIR@],
                         libraries=[ @FAUST_PYTHON_LIBS@],
-                        extra_compile_args = [ "/w", "/EHsc" ],
+                        extra_compile_args = [ "/w", "/EHsc" , "/openmp"],
                         #extra_link_args = [ "-s" ],
                         extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
                        )
@@ -37,8 +37,8 @@ else: # linux and mac
                         include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],
                         library_dirs=[@FAUST_PYTHON_LIB_DIR@],
                         libraries=[@FAUST_PYTHON_LIBS@],
-                        extra_compile_args = [ "-std=c++11", "-O2"],
-                        extra_link_args = [ "-s" ],
+                        extra_compile_args = [ "-std=c++11", "-O2", "-fopenmp"],
+                        extra_link_args = [ "-s" , "-fopenmp"],
                         extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
                        )
 
