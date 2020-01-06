@@ -52,11 +52,10 @@
 #include "faust_SpBlasHandle.h"
 
 
-// modif AL AL
 #include "faust_Transform.h"
-#include "faust_TransformHelper.h"
 #include "matio.h"
 #include <random>
+#include "faust_WHT.h"
 //! \class Faust::MatSparse<FPP,Cpu> faust_MatSparse.h
 //! \brief Class template representing sparse matrix <br>
 //! This class implements sparse matrix multiplication <br>
@@ -77,22 +76,13 @@ template<typename FPP,Device DEVICE> class Transform;
 
 template<Device DEVICE> class SpBlasHandle;
 
-template<typename FPP>
-void Faust::multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
-
-//! modif NB v1102 : comment useless function
-
-template<typename FPP>
-void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
-
-template<typename FPP>
-void Faust::wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
-
 //! \namespace Faust
 //! \brief Faust namespace contains the principal class of the project.
 namespace Faust
 {
 
+
+	template<typename FPP,Device DEVICE> class TransformHelper;
 	template<typename FPP,Device DEVICE> class MatGeneric;
 
 
@@ -104,6 +94,16 @@ namespace Faust
 	template<typename FPP, Device DEVICE, typename FPP2> class GivensFGFTParallel;
 	template<typename FPP, Device DEVICE, typename FPP2> class GivensFGFTComplex;
 	//TODO: simplify/remove the friendship by adding/using a public setter to is_ortho
+	//template<typename FPP> void wht_factors(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
+	template<typename FPP>
+		void multiply(const Transform<FPP,Cpu> & A, const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
+
+	//! modif NB v1102 : comment useless function
+
+	template<typename FPP>
+		void spgemm(const MatSparse<FPP,Cpu> & A,const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB);
+
+
 
 	template<typename FPP>
 		class MatSparse<FPP,Cpu> : public Faust::MatGeneric<FPP,Cpu>
@@ -116,7 +116,7 @@ namespace Faust
 			friend Faust::GivensFGFTComplex<FPP,Cpu, double>;
 			friend Faust::GivensFGFTComplex<FPP,Cpu, float>;
 			friend Faust::TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
-			friend void Faust::wht_factors<>(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
+			friend void Faust::wht_factors<>(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 			friend class MatDense<FPP,Cpu>;
 			//friend void MatDense<FPP,Cpu>::operator+=(const MatSparse<FPP,Cpu>& S);
 
@@ -315,7 +315,7 @@ namespace Faust
 			Faust::MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			Faust::MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
 
-			list<pair<int,int>> nonzeros_indices() const;
+			std::list<std::pair<int,int>> nonzeros_indices() const;
 
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density);
 			//\param : per_row means the density applies for each line rather than globally for the matrix

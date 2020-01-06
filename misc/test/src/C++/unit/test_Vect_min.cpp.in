@@ -5,6 +5,7 @@
 #include <complex>
 
 using namespace Faust;
+using namespace std;
 typedef @TEST_FPP@ FPP;
 
 

@@ -163,11 +163,11 @@ Faust::MatDense<FPP,Cpu> Faust::MatDense<FPP,Cpu>::lower_tri(const bool diag) co
 	else
 		tri.mat = mat.template triangularView<Eigen::StrictlyLower>();
 #ifdef DEBUG_TRI
-	cout << "MatDense::lower_tri(" << diag << ")" << endl;
-	cout << "orig. mat.:" << endl;
-	cout << mat << endl;
-	cout << "tri. mat.:" << endl;
-	cout << tri.mat << endl;
+	std::cout << "MatDense::lower_tri(" << diag << ")" << std::endl;
+	std::cout << "orig. mat.:" << std::endl;
+	std::cout << mat << std::endl;
+	std::cout << "tri. mat.:" << std::endl;
+	std::cout << tri.mat << std::endl;
 #endif
 	return tri;
 }
@@ -181,23 +181,23 @@ Faust::MatDense<FPP,Cpu> Faust::MatDense<FPP,Cpu>::upper_tri(const bool diag) co
 	else
 		tri.mat = mat.template triangularView<Eigen::StrictlyUpper>();
 #ifdef DEBUG_TRI
-	cout << "MatDense::upper_tri(" << diag << ")" << endl;
-	cout << "orig. mat.:" << endl;
-	cout << mat << endl;
-	cout << "tri. mat.:" << endl;
-	cout << tri.mat << endl;
+	std::cout << "MatDense::upper_tri(" << diag << ")" << std::endl;
+	std::cout << "orig. mat.:" << std::endl;
+	std::cout << mat << std::endl;
+	std::cout << "tri. mat.:" << std::endl;
+	std::cout << tri.mat << std::endl;
 #endif
 	return tri;
 }
 
 
 template<typename FPP>
-list<pair<int,int>> Faust::MatDense<FPP,Cpu>::nonzeros_indices() const
+std::list<std::pair<int,int>> Faust::MatDense<FPP,Cpu>::nonzeros_indices() const
 {
-	list<pair<int,int>> nz_inds;
+	std::list<std::pair<int,int>> nz_inds;
 	if(this->is_identity)
-		for(int i=0;i<min(this->dim1, this->dim2);i++)
-			nz_inds.push_back(make_pair(i,i));
+		for(int i=0;i<std::min(this->dim1, this->dim2);i++)
+			nz_inds.push_back(std::make_pair(i,i));
 	else if(! isZeros)
 	{
 		int i,j;
@@ -206,7 +206,7 @@ list<pair<int,int>> Faust::MatDense<FPP,Cpu>::nonzeros_indices() const
 			{
 				j = k/this->dim1;
 				i = k-j*this->dim1;
-				nz_inds.push_back(make_pair(i,j));
+				nz_inds.push_back(std::make_pair(i,j));
 			}
 	}
 	return nz_inds;
@@ -704,11 +704,11 @@ std::string Faust::MatDense<FPP,Cpu>::to_string(const bool transpose /* set to f
 	//using ostringstream because it's easier for concatenation (of complex and any number)
 	std::ostringstream  str;
 
-	str << " (" << (typeid(*getData()) == typeid(complex<double>) || typeid(*getData()) == typeid(complex<float>)?"complex":"real") << ")";
+	str << " (" << (typeid(*getData()) == typeid(std::complex<double>) || typeid(*getData()) == typeid(std::complex<float>)?"complex":"real") << ")";
 	str<<" DENSE, "; //number of trailing spaces matters to align with SPARSE to_string()
 	str << Faust::MatGeneric<FPP,Cpu>::to_string(transpose);
 	if(isZeros)
-		str <<"zeros matrix flag" << endl;
+		str <<"zeros matrix flag" << std::endl;
 	else
 	{
 		if (displaying_small_mat_elts && this->dim1*this->dim2 < 100)
@@ -717,7 +717,7 @@ std::string Faust::MatDense<FPP,Cpu>::to_string(const bool transpose /* set to f
 			{
 				for(int j=0 ; j<this->dim2 ; j++)
 					str << (*this)(i,j) << " " ;
-				str << endl;
+				str << std::endl;
 			}
 		}
 	}
@@ -736,13 +736,13 @@ void Faust::MatDense<FPP,Cpu>::Display() const
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::print_file(const char* filename)const
 {
-	ofstream fichier;
+	std::ofstream fichier;
 	fichier.open(filename);
 	for (int i=0 ; i<this->getNbRow() ; i++)
 	{
 		for (int j=0 ; j<this->getNbCol() ; j++)
-			fichier << setprecision(20) <<mat(i,j) << " ";
-		fichier << endl;
+			fichier << std::setprecision(20) <<mat(i,j) << " ";
+		fichier << std::endl;
 	}
 	fichier.close();
 }
@@ -907,12 +907,12 @@ void Faust::MatDense<FPP,Cpu>::init_from_file(const char* filename)
 	// chacune des autres lignes contient une valeur par ligne
 	// suivant la premiere dimension puis la deuxieme
 
-	ifstream* vec_stream;
-	vec_stream = new ifstream(filename);
+	std::ifstream* vec_stream;
+	vec_stream = new std::ifstream(filename);
 	if (!vec_stream->is_open())
 		handleError(m_className, "init_from_file : unable to open file");
-	istream_iterator<FPP> start(*vec_stream), eos;
-	vector<FPP> vec(start, eos);
+	std::istream_iterator<FPP> start(*vec_stream), eos;
+	std::vector<FPP> vec(start, eos);
 
 	if((vec[0]*vec[1]+2) != vec.size())
 	{
@@ -935,7 +935,7 @@ matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) 
 {
 	matvar_t *var = NULL;
 	size_t dims[2];
-	int opt = typeid(mat(0,0))==typeid(complex<double>(1.0,1.0))?MAT_F_COMPLEX:0;
+	int opt = typeid(mat(0,0))==typeid(std::complex<double>(1.0,1.0))?MAT_F_COMPLEX:0;
 	mat_complex_split_t z = {NULL,NULL};
 	//
 	if(transpose)
@@ -1070,7 +1070,7 @@ Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_cols(faust_unsigned_int*
 }
 
 template<typename FPP>
-Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_cols(vector<int> col_ids) const
+Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_cols(std::vector<int> col_ids) const
 {
 	//TODO: check args
 	int n = col_ids.size();
@@ -1272,29 +1272,29 @@ Faust::Timer Faust::MatDense<FPP,Cpu>::t_power_iteration;
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::print_timers()const
 {
-	cout << "timers in Faust::MatDense :" << endl;
-	cout << "t_constr          = " << t_constr.get_time()          << " s for "<< t_constr.get_nb_call()          << " calls" << endl;
-	cout << "t_get_coeff       = " << t_get_coeff.get_time()       << " s for "<< t_get_coeff.get_nb_call()       << " calls" << endl;
-	cout << "t_get_coeffs      = " << t_get_coeffs.get_time()      << " s for "<< t_get_coeffs.get_nb_call()      << " calls" << endl;
-	cout << "t_set_coeff       = " << t_set_coeff.get_time()       << " s for "<< t_set_coeff.get_nb_call()       << " calls" << endl;
-	cout << "t_set_coeffs      = " << t_set_coeffs.get_time()      << " s for "<< t_set_coeffs.get_nb_call()      << " calls" << endl;
-	cout << "t_set_coeffs2     = " << t_set_coeffs2.get_time()     << " s for "<< t_set_coeffs2.get_nb_call()     << " calls" << endl;
-	cout << "t_resize          = " << t_resize.get_time()          << " s for "<< t_resize.get_nb_call()          << " calls" << endl;
-	cout << "t_check_dim       = " << t_check_dim.get_time()       << " s for "<< t_check_dim.get_nb_call()       << " calls" << endl;
-	cout << "t_max             = " << t_max.get_time()             << " s for "<< t_max.get_nb_call()             << " calls" << endl;
-	cout << "t_transpose       = " << t_transpose.get_time()       << " s for "<< t_transpose.get_nb_call()       << " calls" << endl;
-	cout << "t_mult_right      = " << t_mult_right.get_time()      << " s for "<< t_mult_right.get_nb_call()      << " calls" << endl;
-	cout << "t_mult_left       = " << t_mult_left.get_time()       << " s for "<< t_mult_left.get_nb_call()       << " calls" << endl;
-	cout << "t_scalar_multiply = " << t_scalar_multiply.get_time() << " s for "<< t_scalar_multiply.get_nb_call() << " calls" << endl;
-	cout << "t_add             = " << t_add.get_time()             << " s for "<< t_add.get_nb_call()             << " calls" << endl;
-	cout << "t_sub             = " << t_sub.get_time()             << " s for "<< t_sub.get_nb_call()             << " calls" << endl;
-	cout << "t_print_file      = " << t_print_file.get_time()      << " s for "<< t_print_file.get_nb_call()      << " calls" << endl<<endl;
+	std::cout << "timers in Faust::MatDense :" << std::endl;
+	std::cout << "t_constr          = " << t_constr.get_time()          << " s for "<< t_constr.get_nb_call()          << " calls" << std::endl;
+	std::cout << "t_get_coeff       = " << t_get_coeff.get_time()       << " s for "<< t_get_coeff.get_nb_call()       << " calls" << std::endl;
+	std::cout << "t_get_coeffs      = " << t_get_coeffs.get_time()      << " s for "<< t_get_coeffs.get_nb_call()      << " calls" << std::endl;
+	std::cout << "t_set_coeff       = " << t_set_coeff.get_time()       << " s for "<< t_set_coeff.get_nb_call()       << " calls" << std::endl;
+	std::cout << "t_set_coeffs      = " << t_set_coeffs.get_time()      << " s for "<< t_set_coeffs.get_nb_call()      << " calls" << std::endl;
+	std::cout << "t_set_coeffs2     = " << t_set_coeffs2.get_time()     << " s for "<< t_set_coeffs2.get_nb_call()     << " calls" << std::endl;
+	std::cout << "t_resize          = " << t_resize.get_time()          << " s for "<< t_resize.get_nb_call()          << " calls" << std::endl;
+	std::cout << "t_check_dim       = " << t_check_dim.get_time()       << " s for "<< t_check_dim.get_nb_call()       << " calls" << std::endl;
+	std::cout << "t_max             = " << t_max.get_time()             << " s for "<< t_max.get_nb_call()             << " calls" << std::endl;
+	std::cout << "t_transpose       = " << t_transpose.get_time()       << " s for "<< t_transpose.get_nb_call()       << " calls" << std::endl;
+	std::cout << "t_mult_right      = " << t_mult_right.get_time()      << " s for "<< t_mult_right.get_nb_call()      << " calls" << std::endl;
+	std::cout << "t_mult_left       = " << t_mult_left.get_time()       << " s for "<< t_mult_left.get_nb_call()       << " calls" << std::endl;
+	std::cout << "t_scalar_multiply = " << t_scalar_multiply.get_time() << " s for "<< t_scalar_multiply.get_nb_call() << " calls" << std::endl;
+	std::cout << "t_add             = " << t_add.get_time()             << " s for "<< t_add.get_nb_call()             << " calls" << std::endl;
+	std::cout << "t_sub             = " << t_sub.get_time()             << " s for "<< t_sub.get_nb_call()             << " calls" << std::endl;
+	std::cout << "t_print_file      = " << t_print_file.get_time()      << " s for "<< t_print_file.get_nb_call()      << " calls" << std::endl<<std::endl;
 
 
-	cout << "timers in Faust::MatDense / LinearAlgebra :" << endl;
-	cout << "t_multiply        = " << t_multiply.get_time()        << " s for "<< t_multiply.get_nb_call()        << " calls" << endl;
-	cout << "t_gemm            = " << t_gemm.get_time()            << " s for "<< t_gemm.get_nb_call()            << " calls" << endl;
-	cout << "t_add_ext         = " << t_add_ext.get_time()         << " s for "<< t_add_ext.get_nb_call()         << " calls" << endl<<endl<<endl;
+	std::cout << "timers in Faust::MatDense / LinearAlgebra :" << std::endl;
+	std::cout << "t_multiply        = " << t_multiply.get_time()        << " s for "<< t_multiply.get_nb_call()        << " calls" << std::endl;
+	std::cout << "t_gemm            = " << t_gemm.get_time()            << " s for "<< t_gemm.get_nb_call()            << " calls" << std::endl;
+	std::cout << "t_add_ext         = " << t_add_ext.get_time()         << " s for "<< t_add_ext.get_nb_call()         << " calls" << std::endl<<std::endl<<std::endl;
 }
 #endif
 

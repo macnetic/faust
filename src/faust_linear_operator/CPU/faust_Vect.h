@@ -103,8 +103,8 @@ template<typename FPP>
     class Vect<FPP,Cpu>
     {
         template<class,Device> friend class Vect;
-		friend double Faust::Transform<FPP,Cpu>::normL1(const bool transpose) const;
-		friend Vect<FPP,Cpu> Faust::MatDiag<FPP>::multiply(const Vect<FPP,Cpu> & vec) const;
+		friend double Transform<FPP,Cpu>::normL1(const bool transpose) const;
+		friend Vect<FPP,Cpu> MatDiag<FPP>::multiply(const Vect<FPP,Cpu> & vec) const;
 		friend void  MatDiag<FPP>::multiply(Vect<FPP,Cpu> & vec, char opThis) const;
 
 

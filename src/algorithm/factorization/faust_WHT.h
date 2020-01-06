@@ -4,11 +4,12 @@
 #include <vector>
 
 namespace Faust {
+	template<typename FPP,Device DEVICE> class MatGeneric;
 	/**
 	 * \brief Fast Walsh-Hadamard Transform.
 	 */
 	template<typename FPP>
-	void wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool cloning_fact=true, const bool norma=false);
+	void wht_factors(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool cloning_fact=true, const bool norma=false);
 
 }
 #include "faust_WHT.hpp"

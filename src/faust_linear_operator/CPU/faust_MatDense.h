@@ -408,7 +408,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		Faust::Vect<FPP,Cpu> get_row(faust_unsigned_int id) const;
 		Faust::MatDense<FPP,Cpu>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;
 		Faust::MatDense<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const;
-		Faust::MatDense<FPP,Cpu>* get_cols(vector<int> col_ids) const;
+		Faust::MatDense<FPP,Cpu>* get_cols(std::vector<int> col_ids) const;
 
 		Faust::MatDense<FPP,Cpu>* get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const;
         Faust::MatDense<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int n) const;
@@ -473,7 +473,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		/**
 		 * \brief Returns the nonzeros indices.
 		 */
-		list<pair<int,int>> nonzeros_indices() const;
+		std::list<std::pair<int,int>> nonzeros_indices() const;
 
 		private:
 		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat;

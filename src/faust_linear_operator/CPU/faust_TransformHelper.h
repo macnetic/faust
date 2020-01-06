@@ -47,6 +47,7 @@
 #include "faust_exception.h"
 #include "faust_Transform.h"
 #include "faust_Slice.h"
+#include "faust_MatSparse.h"
 #include <random>
 
 namespace Faust {
@@ -55,7 +56,7 @@ namespace Faust {
 	template<typename FPP,Device DEVICE> class Transform;
 	template<typename FPP,Device DEVICE> class Vect;
 	template<typename FPP,Device DEVICE> class MatDense;
-	template<typename FPP,Device DEVICE> class TransformHelper;
+	template<typename FPP,Device DEVICE> class MatGeneric;
 
 	enum RandFaustType {
 		DENSE,

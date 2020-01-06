@@ -33,10 +33,10 @@ int main(int argc, char* argv[])
 	M_sp1->multiply(*M_sp2, 'N');
 	M2.multiplyLeft(M1);
 	cout << "abs err:" << (M2.norm()-M_sp2->norm()) << endl;
-	assert(Faust::abs(M2.norm()-M_sp2->norm()) < 1.0e-5);
+	assert(M2.norm()-M_sp2->norm() < 1.0e-5);
 	M2*=M2;
 	M_sp2->multiplyRight(*M_sp2);
-	assert(Faust::abs(M2.norm()-M_sp2->norm()) < 1.0e-5);
+	assert(M2.norm()-M_sp2->norm() < 1.0e-5);
 	cout << "abs err2:" << (M2.norm()-M_sp2->norm()) << endl;
 	return 0;
 }

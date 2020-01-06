@@ -3,7 +3,7 @@
 
 namespace Faust {
 	template<typename FPP>
-		void wht_factors(unsigned int n, vector<MatGeneric<FPP,Cpu>*>&  factors, const bool cloning_fact, const bool norma)
+		void wht_factors(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool cloning_fact, const bool norma)
 		{
 			if(n == 0)
 			{
@@ -16,8 +16,8 @@ namespace Faust {
 			{
 				factors.resize(n);
 				unsigned int order = 1ull << n;
-				vector<int> col_ids(order), row_ids(order);
-				vector<FPP> vals(order);
+				std::vector<int> col_ids(order), row_ids(order);
+				std::vector<FPP> vals(order);
 				unsigned int order_over_2 = order >> 1;
 				unsigned int order_times_2 = order << 1;
 				unsigned int i_times_2;
