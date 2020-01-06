@@ -89,7 +89,7 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
 # experimental block end
 
 def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
-          nGivens_per_fac=None, verbosity=0, enable_large_Faust=False):
+          nGivens_per_fac=None, enable_large_Faust=False, **kwargs):
     """
         Performs a singular value decomposition and returns the left and right singular vectors as Faust transforms.
 
@@ -99,21 +99,16 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
             M: a real matrix (np.ndarray or scipy.sparse.csr_matrix).
             nGivens: see fact.eigtj
             tol: see fact.eigtj (the error tolerance is not exactly for
-            the svd).
-            but for the subsequent eigtj calls).
-            order: see fact.eigtj
+            the svd but for the subsequent eigtj calls).
             relerr: see fact.eigtj
             nGivens_per_fac: see fact.eigtj
-            verbosity: see fact.eigtj
 
 
         Returns:
-            The tuple U,S,V: U*numpy.diag(S)*V.H being the approximation of M.
+            The tuple U,S,V: such that U*numpy.diag(S)*V.H is the approximate of M.
                 - (np.array vector) S the singular values in
                 descending order.
-                - (Faust object) U the left-singular transform.
-                - (Faust object) V the right-singular transform.
-
+                - (Faust objects) U,V unitary transforms.
         Example:
             >>> from pyfaust.fact import svdtj
             >>> from numpy.random import rand
@@ -142,8 +137,12 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         To compute a consistent approximation of S we observe that U and V are orthogonal/unitary hence \f$ S  = U^* M V \f$ so we ignore the off-diagonal coefficients of the approximation and take \f$ S = diag(U^* M V)  \approx diag(W_1^* M W_2)\f$
 
         The last step performed by svdtj() is to sort the singular values of S in descending order and build a signed permutation matrix to order the left singular vectors of W1 accordingly. The -1 elements of the signed permutation matrix allow to change the sign of each negative values of S by reporting it on the corresponding left singular vector (\f$ \sigma v_i = (-\sigma_i) (-v_i )\f$).<br/>
-        To sum up W1 is replaced by W1 P and W2 by W2 abs(P) (because W2 also needs to be ordered), with P the signed permutation resulting of the descending sort of S. That new transforms/Fausts W1 and W2 are returned by svdtj along with the ordered S. Note that the permutation factor is not append to the transform W1 (or W2) but multiplied directly to the last factor of W1 (or W2).
-
+        To sum up W1 is replaced by W1 P and W2 by W2 abs(P) (because W2 also
+        needs to be ordered), with P the signed permutation resulting of the
+        descending sort of S. The resulting transforms/Fausts W1 and W2 are
+        returned by svdtj along with the ordered S. Note that the permutation
+        factor P (resp. abs(P)) is fused with the rightmost factor of the Faust
+        object W1 (resp. W2).
 
      See also:
         eigtj
@@ -154,6 +153,12 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
                             " (to define a stopping  criterion)")
         nGivens = 0
     if(nGivens_per_fac == None): nGivens_per_fac = int(M.shape[0]/2)
+    if('verbosity' in kwargs.keys()):
+        verbosity = kwargs['verbosity']
+        if(not isinstance(verbosity, int)): raise TypeError('verbosity must be'
+                                                            ' a int')
+    else:
+        verbosity = 0
 
     if(M.dtype == np.complex):
         if(isinstance(M, np.ndarray)):
@@ -174,32 +179,32 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
 def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
           nGivens_per_fac=None, verbosity=0, enable_large_Faust=False):
     """
-    Performs an approximate eigendecomposition of M and returns the eigenvalues
-    in W along with the corresponding right eigenvectors (as the columns of the Faust object V).
+    Performs an approximate eigendecomposition of M and returns the eigenvalues in W along with the corresponding normalized right eigenvectors (as the columns of the Faust object V).
 
     The output is such that V*numpy.diag(W)*V.H approximates M. V is a product
     of Givens rotations obtained by truncating the Jacobi algorithm.
 
     The trade-off between accuracy and complexity of V can be set through the
-    parameters nGivens and tol that define number of Givens rotations and targeted error.
+    parameters nGivens and tol that define the targeted number of Givens rotations
+    and targeted error.
 
     Args:
         M: (numpy.ndarray or csr_matrix) the matrix to diagonalize. Must be
         real and symmetric, or complex hermitian. Can be in dense or sparse format.
-        nGivens: (int) targeted number of Givens (this argument is optional
+        nGivens: (int) targeted number of Givens rotations (this argument is optional
         only if tol is set).
-        tol: (float) the tolerance error at which the algorithm stops. By default,
-        it's zero for not stopping on an error criterion. Note that the error
-        reaching is not guaranteed (in particular, if the error starts to
-        increase from one iteration to another then the algorithm is stopped).
-        order: (int) order of eigenvalues, default to 'ascend', other values
-        are 'descend' or 'undef'.
-        nGivens_per_fac: (int) the number of Givens rotations per factor of V, must be
-        an integer between 1 to M.shape[0]/2 which is the default value (when
-        nGivens_per_fac == None).
-        relErr: (bool) the type of error used as stopping criterion. The default value
-        is True for relative error, otherwise (False) the absolute error is used.
-        verbosity: (int) the level of verbosity, the greater the value the more
+        tol: (float) the tolerance error at which the algorithm stops. The
+        default value is zero so that stopping is based on reaching the
+        targeted nGivens (this argument is optional only if nGivens is set).
+        order: (int) order of eigenvalues, possible choices are ‘ascend,
+        'descend' or 'undef' (to avoid a sorting operation and save some time).
+        nGivens_per_fac: (int) targeted number of Givens rotations per factor
+        of V. Must be an integer between 1 to floor(M.shape[0]/2) (the default
+        value).
+        relErr: (bool) the type of error used as stopping criterion.  True
+        for the relative error norm(V*D*V'-M, 'fro')/norm(M, 'fro'), False
+        for the absolute error norm(V*D*V'-M, 'fro').
+        verbosity: (int) the level of verbosity. The greater the value the more
         info is displayed. It can be helpful to understand for example why the
         algorithm stopped before reaching the tol error or the number of Givens
         (nGivens).
@@ -213,6 +218,17 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
            - V the Faust object representing the approximate eigenvector
             transform. The column V[:, i] is the eigenvector
             corresponding to the eigenvalue W[i].<br/>
+
+    Remarks:
+        - When  ‘nGivens’ and ‘tol’ are used simultaneously, the number of Givens
+        rotations in V may be smaller than specified by ‘nGivens’ if the error
+        criterion is met first, and the achieved error may be larger than specified
+        if ‘nGivens’ is reached first during the iterations of the truncated Jacobi
+        algorithm.
+        - When nGivens_per_fac > 1, all factors have exactly
+        nGivens_per_fac except the leftmost one which may have fewer if the
+        total number of Givens rotations is not a multiple of
+        nGivens_per_fact
 
     References:
     [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
