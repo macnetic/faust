@@ -211,7 +211,8 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 			add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 				COMMAND   ${MATLAB_ROOT}/bin/mex 
 				ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" 
-					"LDFLAGS=$$LDFLAGS -Wl,-rpath=${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}:${FAUST_INSTALL_LIB}:${PROJECT_BINARY_DIR}" 
+					"LDFLAGS=$$LDFLAGS -fopenmp -Wl,-rpath=${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}:${FAUST_INSTALL_LIB}:${PROJECT_BINARY_DIR}" 
+					"CFLAGS=$$CFLAGS -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fopenmp"
 					"-O" 
 					${CMAKE_CXX_FLAGS_LIST} 
 					${LDD_MEX_FLAGS}
