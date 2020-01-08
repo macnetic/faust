@@ -75,7 +75,7 @@ class Faust:
         """ Creates a Faust from a list of factors or alternatively from a file.
 
             Other easy ways to create a Faust is to call one of the
-            following static methods: pyfaust.rand(),
+            following functions: pyfaust.rand(),
             pyfaust.dft() or pyfaust.wht().
 
         Args:
@@ -120,7 +120,7 @@ class Faust:
             >>> Faust(np.random.rand(10,10)) # creating a Faust with only one
                                              # factor
 
-        <b/> See also Faust.save, rand
+        <b/> See also Faust.save, pyfaust.rand
 
         """
         if("scale" in kwargs.keys()):
@@ -627,6 +627,14 @@ class Faust:
                                                                     np.complex)):
             return F*A
         return F.__matmul__(A)
+
+    def matvec(F, x):
+        """
+        This function implements the scipy.sparse.linalg.LinearOperator.matvec
+        function such that scipy.sparse.linalg.aslinearoperator function works on a
+        Faust object.
+        """
+        return F.dot(x)
 
     def __mul__(F, A):
         """
