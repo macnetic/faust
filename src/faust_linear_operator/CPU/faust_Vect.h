@@ -79,17 +79,17 @@ namespace Faust
 		FPP fabs(std::complex<FPP> c);
 
     template<typename FPP,Device DEVICE>
-    class Vect;
+		class Vect;
 
     template<typename FPP,Device DEVICE>
-    class MatDense;
+		class MatDense;
 
     template<typename FPP,Device DEVICE>
-    class MatSparse;
+		class MatSparse;
 
 
-template<typename FPP>
-    class MatDiag;
+	template<typename FPP>
+		class MatDiag;
 
    // friend function of faust_linear_algebra.h
    template<typename FPP>
@@ -103,9 +103,11 @@ template<typename FPP>
     class Vect<FPP,Cpu>
     {
         template<class,Device> friend class Vect;
-		friend double Transform<FPP,Cpu>::normL1(const bool transpose) const;
-		friend Vect<FPP,Cpu> MatDiag<FPP>::multiply(const Vect<FPP,Cpu> & vec) const;
-		friend void  MatDiag<FPP>::multiply(Vect<FPP,Cpu> & vec, char opThis) const;
+//		friend double Transform<FPP,Cpu>::normL1(const bool transpose) const;
+//		friend Vect<FPP,Cpu> MatDiag<FPP>::multiply(const Vect<FPP,Cpu> & vec) const;
+		friend class Transform<FPP,Cpu>;
+		friend class MatDiag<FPP>;
+//		friend void  MatDiag<FPP>::multiply(Vect<FPP,Cpu> & vec, char opThis) const;
 
 
         public :
