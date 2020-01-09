@@ -8,8 +8,11 @@ classdef ConstraintMat < matfaust.factparams.ConstraintGeneric
 	methods
 		function constraint = ConstraintMat(name, param, varargin)
 			% check param is a mat
-			if(~ ismatrix(param) || ~ isnumeric(param))
+			if(~ ismatrix(param) || ~ isnumeric(param) && ~ islogical(param))
 				error('ConstraintMat must receive a matrix as param argument.')
+			end
+			if(islogical(param))
+				param = real(param)
 			end
 			constraint = constraint@matfaust.factparams.ConstraintGeneric(name, size(param, 1), size(param, 2), param, varargin{:});
 			if(~ isa(constraint.name, 'matfaust.factparams.ConstraintName') || ~ constraint.name.is_mat_constraint())
