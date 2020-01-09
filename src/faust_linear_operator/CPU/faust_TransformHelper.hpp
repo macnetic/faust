@@ -203,7 +203,10 @@ namespace Faust {
 					this->transform->data.erase(this->transform->data.end()-1);
 					break;
 				case 4:
-					M = this->transform->multiply_omp(A, isTransposed2char()); 
+					M = this->transform->multiply_omp(A, isTransposed2char());
+					break;
+				case 5:
+					M = this->transform->multiply_par(A, isTransposed2char());
 					break;
 				default:
 					M = this->transform->multiply(A, isTransposed2char());

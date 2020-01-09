@@ -1093,6 +1093,162 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDen
 
 }
 
+template<typename FPP>
+Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::MatDense<FPP,Cpu> A, const char opThis) const
+{
+	int nth = 2; //TODO: https://en.cppreference.com/w/cpp/thread/thread/hardware_concurrency
+	int barrier_count = 0;
+	int rem_size;
+	Faust::MatDense<FPP, Cpu> *M;
+	std::vector<std::thread*> threads;
+	std::vector<Faust::MatDense<FPP,Cpu>*> mats(nth);
+	std::vector<Faust::MatGeneric<FPP, Cpu>*> data(this->data.size()+1);
+	std::mutex barrier_mutex;
+	std::condition_variable barrier_cv;
+	int data_size = this->data.size()+1; // counting A in addition to Transform factors
+	int num_per_th = data_size;
+	num_per_th /= nth;
+	num_per_th = num_per_th<2?2:num_per_th;
+	// recompute effective needed nth
+	nth = data_size / num_per_th;
+	// compute rem_size: the number of factors to treat afterward
+	rem_size = data_size - nth*num_per_th; // facts of ids data_size-rem_size to data_size-1
+	int i = 0;
+	for(auto ptr: this->data)
+	{
+		cout << "fac i=" << i << ": " << ptr << endl;
+		data[i++] = ptr;
+	}
+	data[i] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
+	cout << "A ptr: " << &A << endl;
+	cout << A.norm() << endl;
+	std::thread *th;
+	for(i=0; i < nth; i++)
+	{
+//		th = new std::thread(&Faust::Transform<FPP,Cpu>::multiply_par_run, nth, i, num_per_th, data_size, opThis, data, mats, threads);
+		th = new std::thread(Faust::multiply_par_run<FPP>, nth, i, num_per_th, data_size, opThis, std::ref(data), std::ref(mats), std::ref(threads), std::ref(barrier_mutex), std::ref(barrier_cv), std::ref(barrier_count));
+		threads.push_back(th);
+	}
+	for(auto t: threads)
+		if(t->get_id() != std::this_thread::get_id() )
+			t->join();
+	M = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(mats[0]);
+	cout << "M:" << M << endl;
+	MatDense<FPP,Cpu> M_;
+	if(! M)
+	{
+		M_ = Faust::MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(mats[0]));
+		M = &M_;
+	}
+	//TODO: delete other thread mats
+	//TODO: return a ptr instead of a copy
+	//TODO: delete threads
+	return *M;
+
+}
+
+template<typename FPP>
+void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, char opThis, std::vector<Faust::MatGeneric<FPP, Cpu>*>& data, std::vector<Faust::MatDense<FPP,Cpu>*>& mats, std::vector<std::thread*>& threads, std::mutex & barrier_mutex, std::condition_variable & barrier_cv, int & barrier_count)
+{
+	Faust::MatSparse<FPP, Cpu> * sM;
+	Faust::MatDense<FPP, Cpu> *M;
+	Faust::MatDense<FPP,Cpu>* tmp; // (data[end_id-1]);
+	//		std::cout << "omp th: " << nth << " num_per_th: " << num_per_th << std::endl;
+	std::cout << "num_per_th: " << num_per_th << std::endl;
+	while(num_per_th > 1)
+	{
+		if(thid < nth)
+		{
+//			{
+//				// build barrier
+//				std::lock_guard<std::mutex> lk4(barrier_mutex);
+//				barrier_count++;
+//				if(barrier_count == nth) barrier_cv.notify_all();
+//			}
+			int first_id, end_id, id;
+			first_id = num_per_th*thid;
+			end_id = num_per_th*(thid+1);
+			id = 'N' == opThis? end_id-1: first_id;
+			cout << "thid=" << thid << " end orig adr.:" << data[id] << endl;
+			if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[id]))
+				tmp = new Faust::MatDense<FPP,Cpu>(*sM);
+			else
+				tmp = new Faust::MatDense<FPP,Cpu>(*(Faust::MatDense<FPP,Cpu>*)(data[id]));
+			mats[thid] = tmp;
+			cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "tmp=" << tmp << endl;
+			cout << "tmp.norm()" << tmp->norm() << endl;
+			if(opThis == 'N')
+				for(int i=end_id-2;i>=first_id; i--)
+				{
+					cout << "mul:" << data[i] << " thid: " << thid << endl;
+					if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i]))
+						sM->multiply(*mats[thid], opThis);
+					else
+						dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[i])->multiply(*mats[thid], opThis);
+				}
+			else
+				for(int i=first_id+1;i < end_id; i++)
+					if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i]))
+						sM->multiply(*mats[thid],opThis);
+					else
+						dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[i])->multiply(*mats[thid], opThis);
+			data[thid] = mats[thid];
+			//				mats[thid]->Display();
+			//				cout << mats[thid]->norm() << endl;
+			cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "data[thid]=" << data[thid] << endl;
+		}
+
+//		//wait until barrier is ready
+//		{
+//			std::lock_guard<std::mutex> lk3(barrier_mutex);
+//			if(barrier_count  < nth)
+//				barrier_cv.wait(lk3, [&barrier_count, &nth]{return barrier_count == nth;});
+//		}
+//
+//
+//		//barrier
+//		{
+//			std::lock_guard<std::mutex> lk(barrier_mutex);
+//			if(thid < nth)
+//			{
+//				// decrement barrier
+//				barrier_count--;
+//				std::cout << "thid: " << thid << " update barrier count: " << barrier_count << std::endl;
+//				if(barrier_count <= 0) barrier_cv.notify_all();
+//			}
+//			else return;
+//		}
+////
+////
+//		{
+////
+//			std::unique_lock<std::mutex> lk2(barrier_mutex);
+//			if(nth > 1)
+//			{
+//				num_per_th = 2;
+//			}
+//			else
+//				num_per_th = 1;
+//
+//			nth >>= 1;
+//			if(barrier_count > 0)
+//			{
+//				cout << "barrier reached thid:" << thid << endl;
+//				cout << "thread " << thid << " is waiting" << endl;
+//				barrier_cv.wait(lk2, [&barrier_count]{return barrier_count <= 0;});
+//			}
+//
+//			cout << "barrier passed by " << thid << endl;
+//		}
+//		for(auto t: threads)
+//			if(t->get_id() != std::this_thread::get_id() )
+//				t->join();
+		cout <<"num_per_th: " <<  num_per_th << " thid:" << thid << endl;
+
+
+	}
+}
+
 
 template<typename FPP>
 Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_omp(const Faust::MatDense<FPP,Cpu> A, const char opThis) const
