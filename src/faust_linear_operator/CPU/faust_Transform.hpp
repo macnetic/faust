@@ -1089,16 +1089,13 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply(const Faust::MatDen
 
 	return mat;
 
-
-
 }
 
 template<typename FPP>
 Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::MatDense<FPP,Cpu> A, const char opThis) const
 {
-	int nth = 2; //TODO: https://en.cppreference.com/w/cpp/thread/thread/hardware_concurrency
-	int barrier_count = 0;
-	int rem_size;
+	int nth = std::thread::hardware_concurrency(); // https://en.cppreference.com/w/cpp/thread/thread/hardware_concurrency
+	int barrier_count = nth;
 	Faust::MatDense<FPP, Cpu> *M;
 	std::vector<std::thread*> threads;
 	std::vector<Faust::MatDense<FPP,Cpu>*> mats(nth);
@@ -1111,8 +1108,10 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::Ma
 	num_per_th = num_per_th<2?2:num_per_th;
 	// recompute effective needed nth
 	nth = data_size / num_per_th;
-	// compute rem_size: the number of factors to treat afterward
-	rem_size = data_size - nth*num_per_th; // facts of ids data_size-rem_size to data_size-1
+	nth = nth%2?nth-1:nth; // nth must be even
+	nth = nth == 0?1:nth;
+	cout << "nth=" << nth << endl;
+	barrier_count = nth;
 	int i = 0;
 	for(auto ptr: this->data)
 	{
@@ -1132,6 +1131,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::Ma
 	for(auto t: threads)
 		if(t->get_id() != std::this_thread::get_id() )
 			t->join();
+
 	M = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(mats[0]);
 	cout << "M:" << M << endl;
 	MatDense<FPP,Cpu> M_;
@@ -1152,35 +1152,34 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 {
 	Faust::MatSparse<FPP, Cpu> * sM;
 	Faust::MatDense<FPP, Cpu> *M;
-	Faust::MatDense<FPP,Cpu>* tmp; // (data[end_id-1]);
-	//		std::cout << "omp th: " << nth << " num_per_th: " << num_per_th << std::endl;
+	Faust::MatDense<FPP,Cpu>* tmp = nullptr, *tmp2 = nullptr; // (data[end_id-1]);
 	std::cout << "num_per_th: " << num_per_th << std::endl;
+	int start_nth = nth;
 	while(num_per_th > 1)
 	{
 		if(thid < nth)
 		{
-//			{
-//				// build barrier
-//				std::lock_guard<std::mutex> lk4(barrier_mutex);
-//				barrier_count++;
-//				if(barrier_count == nth) barrier_cv.notify_all();
-//			}
 			int first_id, end_id, id;
 			first_id = num_per_th*thid;
 			end_id = num_per_th*(thid+1);
+			if(thid == start_nth-1 && end_id < data_size) 
+				end_id = data_size;
+			else
+				end_id = end_id>data_size?data_size:end_id;
 			id = 'N' == opThis? end_id-1: first_id;
-			cout << "thid=" << thid << " end orig adr.:" << data[id] << endl;
+//			cout << "thid=" << thid << " end orig adr.:" << data[id] << endl;
+			if(tmp != nullptr) tmp2 = tmp; //keep track of previous tmp to delete it afterward
 			if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[id]))
 				tmp = new Faust::MatDense<FPP,Cpu>(*sM);
 			else
 				tmp = new Faust::MatDense<FPP,Cpu>(*(Faust::MatDense<FPP,Cpu>*)(data[id]));
 			mats[thid] = tmp;
-			cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "tmp=" << tmp << endl;
-			cout << "tmp.norm()" << tmp->norm() << endl;
+//			cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "tmp=" << tmp << endl;
+//			cout << "tmp.norm()" << tmp->norm() << endl;
 			if(opThis == 'N')
 				for(int i=end_id-2;i>=first_id; i--)
 				{
-					cout << "mul:" << data[i] << " thid: " << thid << endl;
+//					cout << "mul:" << data[i] << " thid: " << thid << endl;
 					if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i]))
 						sM->multiply(*mats[thid], opThis);
 					else
@@ -1196,54 +1195,40 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 			//				mats[thid]->Display();
 			//				cout << mats[thid]->norm() << endl;
 			cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "data[thid]=" << data[thid] << endl;
+			if(tmp2 != nullptr) delete tmp2;
 		}
+		{ // mutex block
+			unique_lock<mutex> l1(barrier_mutex);
+			barrier_count--;
+//			string ite_str = i>=0?string(" (ite = ") + to_string(i) + ") ": ""; 
+			if(barrier_count > 0)
+			{
+				// the threads wait here for the last one to finish its iteration i
+//				std::cout << "thread " << thid /*<< ite_str */ << " is waiting on barrier (" << barrier_count << ")." << std::endl;
+				barrier_cv.wait(l1/*, [&barrier_count, &num_threads]{return barrier_count == num_threads;}*/);
+//				std::cout << "thread " << thid /*<< ite_str */<<" continues." << std::endl;
+			}
+			else {
+				// the last thread to finish the iteration i wakes the other to continue the execution
+//				std::cout << "thread " << thid /*<< ite_str */<< " reinits barrier." << std::endl;
+				barrier_count = start_nth;
+				barrier_cv.notify_all();
+			}
+		} 
 
-//		//wait until barrier is ready
-//		{
-//			std::lock_guard<std::mutex> lk3(barrier_mutex);
-//			if(barrier_count  < nth)
-//				barrier_cv.wait(lk3, [&barrier_count, &nth]{return barrier_count == nth;});
-//		}
-//
-//
-//		//barrier
-//		{
-//			std::lock_guard<std::mutex> lk(barrier_mutex);
-//			if(thid < nth)
-//			{
-//				// decrement barrier
-//				barrier_count--;
-//				std::cout << "thid: " << thid << " update barrier count: " << barrier_count << std::endl;
-//				if(barrier_count <= 0) barrier_cv.notify_all();
-//			}
-//			else return;
-//		}
-////
-////
-//		{
-////
-//			std::unique_lock<std::mutex> lk2(barrier_mutex);
-//			if(nth > 1)
-//			{
-//				num_per_th = 2;
-//			}
-//			else
-//				num_per_th = 1;
-//
-//			nth >>= 1;
-//			if(barrier_count > 0)
-//			{
-//				cout << "barrier reached thid:" << thid << endl;
-//				cout << "thread " << thid << " is waiting" << endl;
-//				barrier_cv.wait(lk2, [&barrier_count]{return barrier_count <= 0;});
-//			}
-//
-//			cout << "barrier passed by " << thid << endl;
-//		}
-//		for(auto t: threads)
-//			if(t->get_id() != std::this_thread::get_id() )
-//				t->join();
-		cout <<"num_per_th: " <<  num_per_th << " thid:" << thid << endl;
+		if(nth > 1)
+		{
+			num_per_th = 2;
+		}
+		else
+			num_per_th = 1;
+
+		nth >>= 1;
+
+		//		for(auto t: threads)
+		//			if(t->get_id() != std::this_thread::get_id() )
+		//				t->join();
+//		cout <<"num_per_th: " <<  num_per_th << " thid:" << thid << endl;
 
 
 	}

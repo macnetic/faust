@@ -218,6 +218,30 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::pruneout(const int nnz_tres, const int npasses, const bool only_forward)
+	{
+		int _npasses = 0;
+		TransformHelper<FPP,Cpu> pth = new TransformHelper<FPP,Cpu>(this->transform->data);
+		MatGeneric<FPP,Cpu>* S_i, *S_j;
+		int nnz_i, nnz_j;
+		while(_npasses < npasses || npasses == -1)
+		{
+			// forward pass
+			for(int i = 0; i < pth->size()-1; i++)
+			{
+				S_i = pth->get_gen_fact(i);
+				S_j = pth->get_gen_fact(i+1);
+				nnz_i = S_i->getNonZeros();
+				if(nnz_i <= nnz_tres)
+				{
+
+				}
+				_npasses++;
+			}
+		}
+	}
+
+	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::set_mul_order_opt_mode(const int mul_order_opt_mode)
 		{
 			this->mul_order_opt_mode = mul_order_opt_mode;
