@@ -118,6 +118,7 @@ template<typename FPP, Device DEVICE> class MatDense;
 template<typename FPP, Device DEVICE> class MatSparse;
 template<typename FPP, Device DEVICE> class Vect;
 template<typename FPP, Device DEVICE> class Transform;
+template<typename FPP, Device DEVICE> class TransformHelper;
 
 //! \fn add
 //! \brief (*this) = (*this) + A
@@ -172,6 +173,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
     {
 
 		friend class MatSparse<FPP,Cpu>;
+		friend Faust::TransformHelper<FPP,Cpu>; // TODO: limit to needed member functions only
 		friend void  MatDiag<FPP>::multiply(MatDense<FPP,Cpu> & M, char opThis) const;
 
 	/// All derived class template of MatDense are considered as friends
@@ -409,6 +411,8 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		Faust::MatDense<FPP,Cpu>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;
 		Faust::MatDense<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const;
 		Faust::MatDense<FPP,Cpu>* get_cols(std::vector<int> col_ids) const;
+		void delete_col(int offset);
+		void delete_row(int offset);
 
 		Faust::MatDense<FPP,Cpu>* get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const;
         Faust::MatDense<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int n) const;

@@ -1,0 +1,105 @@
+/*  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167958v1>                       */
+/****************************************************************************/
+#include "faust_TransformHelper.h"
+#include "faust_MatSparse.h"
+#include <string>
+#include <sstream>
+#include <chrono>
+
+#include <iostream>
+#include <iomanip>
+
+/** \brief unitary test for testing multiplication by faust									
+*/
+
+typedef @TEST_FPP@ FPP;
+
+
+using namespace Faust;
+
+int main(int argc, char* argv[])
+{
+	if (typeid(FPP) == typeid(double))
+	{
+		cout<<"floating point precision == double"<<endl;
+	}
+
+	if (typeid(FPP) == typeid(float))
+	{
+		cout<<"floating point precision == float"<<endl;
+	}
+
+	auto spMat = Faust::MatSparse<FPP,Cpu>::randMat(10,10, .5);
+	spMat->Display();
+	spMat->delete_row(2);
+	spMat->Display();
+	spMat->delete_col(2);
+	spMat->Display();
+//	return 0;
+	auto dsMat = Faust::MatDense<FPP,Cpu>::randMat(10,10, .5);
+	dsMat->Display();
+	dsMat->delete_row(2);
+	dsMat->Display();
+	dsMat->delete_col(2);
+	dsMat->Display();
+//	return 0;
+	TransformHelper<complex<double>,Cpu>* th = TransformHelper<complex<double>,Cpu>::fourierFaust(5, true);
+	auto G = th->slice(0,th->getNbRow(), 5, 25);
+	th->display();
+	cout << "norm:" << th->normFro() << endl;
+	cout << "G = F[:,5:25]: ";
+	G->display();
+	cout << "G norm:" << G->normFro() << endl;
+
+	auto H = G->pruneout(0, 1);
+	cout << "H = pruneout(G, npasses=1):";
+	H->display();
+	cout << "norm:" << H->normFro() << endl;
+
+	auto I = G->pruneout(0, 2);
+	cout << "I = pruneout(G, npasses=2):";
+	I->display();
+	cout << "norm:" << I->normFro() << endl;
+
+	auto J = G->pruneout(0, 1, true);
+	cout << "J = pruneout(G, npasses=1, only_forward=true):";
+	J->display();
+	cout << "norm:" << J->normFro() << endl;
+
+	auto K = G->pruneout(0);
+	cout << "K = pruneout(G, npasses=auto):";
+	K->display();
+	cout << "norm:" << K->normFro() << endl;
+	return 0;
+}

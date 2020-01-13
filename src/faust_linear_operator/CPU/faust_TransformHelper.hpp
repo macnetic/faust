@@ -221,24 +221,119 @@ namespace Faust {
 	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::pruneout(const int nnz_tres, const int npasses, const bool only_forward)
 	{
 		int _npasses = 0;
-		TransformHelper<FPP,Cpu> pth = new TransformHelper<FPP,Cpu>(this->transform->data);
+		TransformHelper<FPP,Cpu> *pth = new TransformHelper<FPP,Cpu>(this->transform->data);
 		MatGeneric<FPP,Cpu>* S_i, *S_j;
-		int nnz_i, nnz_j;
+		MatDense<FPP,Cpu>* tmp_ds;
+		MatSparse<FPP,Cpu>* tmp_sp;
+		int nnz_i;
+		bool factor_touched;
 		while(_npasses < npasses || npasses == -1)
 		{
+			factor_touched = false;
 			// forward pass
 			for(int i = 0; i < pth->size()-1; i++)
 			{
-				S_i = pth->get_gen_fact(i);
-				S_j = pth->get_gen_fact(i+1);
-				nnz_i = S_i->getNonZeros();
-				if(nnz_i <= nnz_tres)
+				S_i = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i));
+				S_j = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i+1));
+				for(int offset = 0; offset<S_i->getNbCol(); offset++)
 				{
+					nnz_i = nnz_tres+1;
+					{
+						if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_i))
+						{
+							//Matrix is read-only because it's RowMajor order
+							Eigen::SparseMatrix<FPP,Eigen::ColMajor> sp_col = tmp_sp->mat.col(offset);
+							nnz_i = sp_col.nonZeros();
+							if(nnz_i <= nnz_tres)
+							{
+
+								//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
+								//								cout << "del col :" << offset << " fac:" << i << endl;
+								tmp_sp->delete_col(offset);
+								factor_touched = true;
+							}
+						}
+						else
+						{
+							tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_i);
+							nnz_i = tmp_ds->mat.col(offset).nonZeros();
+							if(nnz_i <= nnz_tres)
+							{
+								//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
+								//								cout << "del col :" << offset << " fac:" << i << endl;
+								tmp_ds->delete_col(offset);
+								factor_touched = true;
+							}
+						}
+						if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_j))
+							if(nnz_i <= nnz_tres)
+								tmp_sp->delete_row(offset);
+							else
+							{
+								tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_j);
+								if(nnz_i <= nnz_tres)
+									tmp_ds->delete_row(offset);
+							}
+					}
+				}
+			}
+			// backward pass
+
+			if(! only_forward)
+				for(int i = pth->size()-1; i > 0; i--)
+				{
+					S_i = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i-1));
+					S_j = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i));
+					for(int offset = 0; offset<S_j->getNbRow(); offset++)
+					{
+						nnz_i = nnz_tres+1;
+						{
+							if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_j))
+							{
+								Eigen::SparseMatrix<FPP,Eigen::ColMajor> sp_row = tmp_sp->mat.row(offset);
+								nnz_i = sp_row.nonZeros();
+								if(nnz_i <= nnz_tres)
+								{
+									//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
+									//								cout << "del row :" << offset << " fac:" << i<< endl;
+									tmp_sp->delete_row(offset);
+									factor_touched = true;
+								}
+							}
+							else
+							{
+								tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_j);
+								nnz_i = tmp_ds->mat.row(offset).nonZeros();
+								if(nnz_i <= nnz_tres)
+								{
+									//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
+									//								cout << "del row i:" << offset << " fac:" << i << endl;
+									tmp_ds->delete_row(offset);
+									factor_touched = true;
+								}
+							}
+							if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_i))
+							{
+								if(nnz_i <= nnz_tres)
+									tmp_sp->delete_col(offset);
+							}
+							else
+							{
+								tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_i);
+								if(nnz_i <= nnz_tres)
+									tmp_ds->delete_col(offset);
+							}
+
+						}
+					}
 
 				}
-				_npasses++;
-			}
+
+			_npasses++;
+			if(!factor_touched && npasses == -1) break;
 		}
+		pth->transform->update_total_nnz();
+		return pth;
 	}
 
 	template<typename FPP>

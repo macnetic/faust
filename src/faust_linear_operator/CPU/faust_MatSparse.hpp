@@ -1047,5 +1047,29 @@ list<pair<int,int>> Faust::MatSparse<FPP,Cpu>::nonzeros_indices() const
 	return nz_inds;
 }
 
+	template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::delete_col(faust_unsigned_int id)
+{
+	if(id < 0 || id >= this->getNbCol()) throw out_of_range(std::string(m_className)+"::delete_col() index out of bounds");
+	Eigen::SparseMatrix<FPP,Eigen::ColMajor> spMat(this->getNbRow(), this->getNbCol()-1);
+	if(id > 0)
+		spMat.leftCols(id) = this->mat.leftCols(id);
+	if(id < this->getNbCol()-1)
+		spMat.rightCols(this->getNbCol()-id-1) = this->mat.rightCols(this->getNbCol()-id-1);
+	this->mat = spMat;
+	this->update_dim();
+}
 
+	template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::delete_row(faust_unsigned_int id)
+{
+	if(id < 0 || id >= this->getNbRow()) throw out_of_range(std::string(m_className)+"::delete_row() index out of bounds");
+	Eigen::SparseMatrix<FPP,Eigen::RowMajor> spMat(this->getNbRow()-1, this->getNbCol());
+	if(id > 0)
+		spMat.topRows(id) = this->mat.topRows(id);
+	if(id < this->getNbRow()-1)
+		spMat.bottomRows(this->getNbRow()-id-1) = this->mat.bottomRows(this->getNbRow()-id-1);
+	this->mat = spMat;
+	this->update_dim();
+}
 #endif

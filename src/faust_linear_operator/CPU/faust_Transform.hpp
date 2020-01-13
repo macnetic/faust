@@ -336,7 +336,15 @@ void Faust::Transform<FPP,Cpu>::check_factors_validity() const
 }
 
 
-
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::update_total_nnz()
+{
+	this->totalNonZeros = 0;
+	for(auto fac : data)
+	{
+		totalNonZeros += fac->getNonZeros();
+	}
+}
 
 
 template<typename FPP>

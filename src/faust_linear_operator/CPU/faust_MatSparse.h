@@ -311,6 +311,8 @@ namespace Faust
 			Faust::Vect<FPP,Cpu> get_col(faust_unsigned_int id) const;
 			Faust::MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
 			Faust::MatSparse<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
+			void delete_col(faust_unsigned_int id);
+			void delete_row(faust_unsigned_int id);
 
 			Faust::MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			Faust::MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
