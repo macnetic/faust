@@ -1049,7 +1049,7 @@ Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::get_row(faust_unsigned_int id) co
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::delete_col(int id)
 {
-	if(id < 0 || id >= this->getNbCol()) throw out_of_range(std::string(m_className)+"::delete_col() index out of bounds");
+	if(id < 0 || id >= this->getNbCol()) throw std::out_of_range(std::string(m_className)+"::delete_col() index out of bounds");
 	memcpy(getData()+this->getNbRow()*id, getData()+this->getNbRow()*(id+1), this->getNbRow()*(this->getNbCol()-id-1)*sizeof(FPP));
 	this->dim2--;
 }
@@ -1057,7 +1057,7 @@ void Faust::MatDense<FPP,Cpu>::delete_col(int id)
 template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::delete_row(int id)
 {
-	if(id < 0 || id >= this->getNbRow()) throw out_of_range(std::string(m_className)+"::delete_row() index out of bounds");
+	if(id < 0 || id >= this->getNbRow()) throw std::out_of_range(std::string(m_className)+"::delete_row() index out of bounds");
 	Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat(this->getNbRow()-1, this->getNbCol());
 	mat.topRows(id) = this->mat.topRows(id);
 	mat.bottomRows(this->getNbRow()-id-1) = this->mat.bottomRows(this->getNbRow()-id-1);

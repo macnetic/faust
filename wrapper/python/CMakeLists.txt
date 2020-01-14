@@ -68,6 +68,24 @@ endif(BUILD_OPENBLAS)
 # read the license header to insert in top of each pyfaust python file
 file(READ ${FAUST_PYTHON_SRC_DIR}/PYFAUST_LICENSE_HEADER.txt PYFAUST_LICENSE_HEADER)
 
+if(WIN32)
+	set(FAUST_SETUP_PY_CFLAGS "'/w', '/EHsc' ")
+	set(FAUST_SETUP_PY_LFLAGS "")
+else() #UNIX
+	set(FAUST_SETUP_PY_CFLAGS "'-std=c++11', '-O2'")
+	set(FAUST_SETUP_PY_LFLAGS "'-s'")
+endif()
+
+if(BUILD_MULTITHREAD AND NOT APPLE)
+	if(WIN32)
+		set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '/openmp'")
+		set(FAUST_SETUP_PY_LFLAGS "${FAUST_SETUP_PY_LFLAGS}")
+	else()
+		set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-fopenmp'")
+		set(FAUST_SETUP_PY_LFLAGS "${FAUST_SETUP_PY_LFLAGS}, '-fopenmp'")
+	endif()
+endif()
+
 
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)
 configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
@@ -204,6 +222,10 @@ elseif(WIN32)
 					endif()
 					set(PY_STATIC_LIBS "$<TARGET_FILE:${FAUST_TARGET}>;${MATIO_STATIC_LIB_PATH};${PYTHON_STATIC_LIB_PATH}")
 					string(REGEX REPLACE "\n" ";" PY_STATIC_LIBS "${PY_STATIC_LIBS}")
+					set(WIN32_GCC_CFLAGS '"-std=c++11" "-shared" "-DMS_WIN64" "-s" "-O2"')
+					if(BUILD_MULTITHREAD)
+						set(WIN32_GCC_CFLAGS "${WIN32_GCC_CFLAGS} -fopenmp")
+					endif()
 					add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
 						COMMAND   ${CYTHON_EXE}
 						ARGS "--cplus" "-o" "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.cpp"  "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx" 
@@ -214,7 +236,7 @@ elseif(WIN32)
 						COMMAND type
 						ARGS "_FaustCorePy.cpp2" ">" "_FaustCorePy.cpp" 2>NUL
 						COMMAND ${CMAKE_CXX_COMPILER}
-						ARGS "-std=c++11" "-shared" "-DMS_WIN64" "-s" "-O2" "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
+						ARGS ${WIN32_GCC_CFLAGS} "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
 						COMMENT   "Creating pyfaust${PY_VER}")
 				endif()
 			endforeach()

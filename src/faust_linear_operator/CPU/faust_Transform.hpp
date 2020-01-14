@@ -1246,11 +1246,13 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 template<typename FPP>
 Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_omp(const Faust::MatDense<FPP,Cpu> A, const char opThis) const
 {
+
+	Faust::MatDense<FPP, Cpu> *M = nullptr;
+#ifdef _OPENMP_
 	int nth, thid, num_per_th, data_size;
 	Faust::MatDense<FPP,Cpu>* mats[8];
 	Faust::MatGeneric<FPP, Cpu> * data[this->data.size()+1];
 	Faust::MatSparse<FPP, Cpu> * sM;
-	Faust::MatDense<FPP, Cpu> *M;
 	Faust::MatDense<FPP,Cpu>* tmp; // (data[end_id-1]);
 	int i = 0;
 	for(auto ptr: this->data)
@@ -1325,6 +1327,9 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_omp(const Faust::Ma
 	}
 	//TODO: delete other thread mats
 	//TODO: return a ptr instead of a copy
+#else
+	throw runtime_error("It's not possible to call Faust::Transform::multiply_omp because the library hasn't been compiled with OpenMP enabled.");
+#endif
 	return *M;
 }
 

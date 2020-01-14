@@ -45,6 +45,8 @@ if (BUILD_OPENBLAS)
 	include_directories(${OPENBLAS_INC_DIR})
 endif(BUILD_OPENBLAS)
 
+
+
 FILE(COPY ${FAUST_MATLAB_NAMESPACE_SRC_DIR} DESTINATION ${PROJECT_BINARY_DIR}/tmp_gendoc_matfaust)
 
 #message(FATAL_ERROR ${FAUST_MATLAB_MATFAUST_FILE_LIST})
@@ -152,6 +154,7 @@ if(BUILD_OPENBLAS)
 	set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}" "${OPENBLAS_LIB_FILE}")
 endif()
 
+
 if(UNIX)
 	add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS ${MEXFILE_TARGET_LIST} ${FAUST_TARGET} ${FAUST_MEXTOOLS_TARGET} )
 elseif(WIN32)
@@ -208,18 +211,27 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		        ${LDD_MEX_FLAGS}
 		        COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
 		else(APPLE)
+			if(BUILD_MULTITHREAD)
+				set(OPENMP_CFLAG "-fopenmp")
+				set(OPENMP_LFLAG "-fopenmp")
+			endif()
 			add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 				COMMAND   ${MATLAB_ROOT}/bin/mex 
 				ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" 
-					"LDFLAGS=$$LDFLAGS -fopenmp -Wl,-rpath=${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}:${FAUST_INSTALL_LIB}:${PROJECT_BINARY_DIR}" 
-					"CFLAGS=$$CFLAGS -fexceptions -fPIC -fno-omit-frame-pointer -pthread -fopenmp"
+				"LDFLAGS=$$LDFLAGS ${OPENMP_LFLAG} -Wl,-rpath=${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}:${FAUST_INSTALL_LIB}:${PROJECT_BINARY_DIR}" 
+					"CFLAGS=$$CFLAGS ${OPENMP_CFLAG} -fexceptions -fPIC -fno-omit-frame-pointer -pthread "
 					"-O" 
 					${CMAKE_CXX_FLAGS_LIST} 
 					${LDD_MEX_FLAGS}
 				COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
 		endif(APPLE)
 
-	elseif(WIN32)		
+	elseif(WIN32)
+		if(BUILD_MULTITHREAD)
+			set(CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS_LIST}" "-fopenmp")
+			set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}" "-fopenmp")
+		endif()
+
 		#message(STATUS "${MEXOBJ_FILES} ")
 		file(GLOB OBJ_MEXTOOLS_FILES "${FAUST_TMPMEX_DIR}/*.${MEXOBJ_EXT}")
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}

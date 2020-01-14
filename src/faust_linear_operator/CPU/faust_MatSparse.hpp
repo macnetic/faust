@@ -1050,7 +1050,7 @@ list<pair<int,int>> Faust::MatSparse<FPP,Cpu>::nonzeros_indices() const
 	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::delete_col(faust_unsigned_int id)
 {
-	if(id < 0 || id >= this->getNbCol()) throw out_of_range(std::string(m_className)+"::delete_col() index out of bounds");
+	if(id < 0 || id >= this->getNbCol()) throw std::out_of_range(std::string(m_className)+"::delete_col() index out of bounds");
 	Eigen::SparseMatrix<FPP,Eigen::ColMajor> spMat(this->getNbRow(), this->getNbCol()-1);
 	if(id > 0)
 		spMat.leftCols(id) = this->mat.leftCols(id);
@@ -1063,7 +1063,7 @@ void Faust::MatSparse<FPP,Cpu>::delete_col(faust_unsigned_int id)
 	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::delete_row(faust_unsigned_int id)
 {
-	if(id < 0 || id >= this->getNbRow()) throw out_of_range(std::string(m_className)+"::delete_row() index out of bounds");
+	if(id < 0 || id >= this->getNbRow()) throw std::out_of_range(std::string(m_className)+"::delete_row() index out of bounds");
 	Eigen::SparseMatrix<FPP,Eigen::RowMajor> spMat(this->getNbRow()-1, this->getNbCol());
 	if(id > 0)
 		spMat.topRows(id) = this->mat.topRows(id);
