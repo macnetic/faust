@@ -99,6 +99,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP>* transpose();
     FaustCoreCpp<FPP>* conjugate();
     FaustCoreCpp<FPP>* adjoint();
+    FaustCoreCpp<FPP>* zpruneout(const int nnz_tres, const int npasses, const bool only_forward);
     ~FaustCoreCpp();
     static FaustCoreCpp<FPP>* randFaust(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,

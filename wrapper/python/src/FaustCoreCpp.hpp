@@ -414,6 +414,14 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::adjoint()
 }
 
 template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::zpruneout(const int nnz_tres, const int npasses, const bool only_forward)
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->pruneout(nnz_tres, npasses, only_forward);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
+    return core;
+}
+
+template<typename FPP>
 FaustCoreCpp<FPP>::~FaustCoreCpp()
 {
     if(transform) delete transform;

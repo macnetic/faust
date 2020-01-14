@@ -777,6 +777,19 @@ cdef class FaustCore:
         core._isReal = self._isReal
         return core
 
+    def zpruneout(self, nnz_tres, npasses, only_forward):
+        core = FaustCore(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.zpruneout(nnz_tres,
+                                                                npasses,
+                                                                only_forward)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.zpruneout(nnz_tres,
+                                                                  npasses,
+                                                                  only_forward)
+        core._isReal = self._isReal
+        return core
+
     def isReal(self):
         if(self._isReal): return True
         return False

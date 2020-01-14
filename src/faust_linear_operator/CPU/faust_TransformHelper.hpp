@@ -198,7 +198,7 @@ namespace Faust {
 				case 1:
 				case 2:
 				case 3:
-					this->transform->data.push_back(&A);
+					this->transform->data.push_back(const_cast<Faust::MatDense<FPP,Cpu>*>(&A)); // it's ok
 					Faust::multiply_order_opt(mul_order_opt_mode, this->transform->data, M);
 					this->transform->data.erase(this->transform->data.end()-1);
 					break;

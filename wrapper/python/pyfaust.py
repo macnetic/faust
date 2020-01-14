@@ -351,6 +351,26 @@ class Faust:
         """
         return F.getH()
 
+    def pruneout(F, nnz_tres=0, npasses='auto', only_forward=False):
+        """
+        Returns an optimized Faust by removing useless zero rows and columns in as many times as needed.
+
+        """
+        if(npasses == 'auto'):
+            npasses = -1
+        elif(not isinstance(npasses, int)):
+            raise TypeError('npasses must be a int'
+                            ' or \'auto\'')
+        if(not isinstance(only_forward, bool)):
+            raise TypeError('only_forward '
+                            'must be a bool.')
+        if(not isinstance(nnz_tres, int)):
+            raise TypeError('nnz_tres '
+                            'must be a int.')
+        F_prunedout = Faust(core_obj=F.m_faust.zpruneout(nnz_tres, npasses,
+                                                         only_forward))
+        return F_prunedout
+
     def __repr__(F):
         """
         Returns a str object representing the Faust object.

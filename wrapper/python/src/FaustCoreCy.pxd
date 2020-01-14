@@ -90,6 +90,8 @@ cdef extern from "FaustCoreCpp.h" :
         FaustCoreCpp[FPP]* transpose()
         FaustCoreCpp[FPP]* conjugate()
         FaustCoreCpp[FPP]* adjoint()
+        FaustCoreCpp[FPP]* zpruneout(const int nnz_tres, const int npasses,
+                                    const bool only_forward)
         FaustCoreCpp[FPP]* vertcat(FaustCoreCpp[FPP]*)
         FaustCoreCpp[FPP]* horzcat(FaustCoreCpp[FPP]*)
         FaustCoreCpp[FPP]* mul_faust(FaustCoreCpp[FPP]*)
