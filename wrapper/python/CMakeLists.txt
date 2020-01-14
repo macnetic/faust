@@ -222,9 +222,8 @@ elseif(WIN32)
 					endif()
 					set(PY_STATIC_LIBS "$<TARGET_FILE:${FAUST_TARGET}>;${MATIO_STATIC_LIB_PATH};${PYTHON_STATIC_LIB_PATH}")
 					string(REGEX REPLACE "\n" ";" PY_STATIC_LIBS "${PY_STATIC_LIBS}")
-					set(WIN32_GCC_CFLAGS '"-std=c++11" "-shared" "-DMS_WIN64" "-s" "-O2"')
 					if(BUILD_MULTITHREAD)
-						set(WIN32_GCC_CFLAGS "${WIN32_GCC_CFLAGS} -fopenmp")
+						set(WIN32_GCC_OMP "-fopenmp")
 					endif()
 					add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
 						COMMAND   ${CYTHON_EXE}
@@ -236,7 +235,7 @@ elseif(WIN32)
 						COMMAND type
 						ARGS "_FaustCorePy.cpp2" ">" "_FaustCorePy.cpp" 2>NUL
 						COMMAND ${CMAKE_CXX_COMPILER}
-						ARGS ${WIN32_GCC_CFLAGS} "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
+						ARGS "-std=c++11" "-shared" "-DMS_WIN64" "-s" "-O2" "${WIN32_GCC_OMP}" "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
 						COMMENT   "Creating pyfaust${PY_VER}")
 				endif()
 			endforeach()

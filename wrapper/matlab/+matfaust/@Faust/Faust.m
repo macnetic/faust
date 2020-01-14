@@ -724,6 +724,56 @@ classdef Faust
 			end
 		end
 
+		%======================================================================
+		%> @brief Returns a Faust optimized by removing useless zero rows and columns as many times as needed.
+		%>
+		%> @param F: the Faust to optimize.
+		%> @param 'nnz_tres', int: (optional) the treshold of number of nonzeros under what the
+		%>            rows/columns are removed.
+		%> @param 'only_forward', bool: (optional) True for applying only the forward passes of removal.
+		%> @param 'npasses', int: (optional) the number of passes to run, by default it goes until the
+		%>            optimal Faust is obtained.
+		%>
+		%> @retval G The optimized Faust.
+		%======================================================================
+		function G = pruneout(F, varargin)
+			nnz_tres = 0;
+			only_forward = false;
+			npasses = -1;
+			argc = length(varargin);
+			if(argc > 0)
+				for i=1:argc
+					switch(varargin{i})
+						case 'only_forward'
+							if(argc == i || ~ islogical(varargin{i+1}))
+								error('only_forward keyword argument is not followed by a logical')
+							else
+								only_forward = varargin{i+1};
+							end
+						case 'nnz_tres'
+							if(argc == i || ~ isnumeric(varargin{i+1}) || varargin{i+1}-floor(varargin{i+1}) > 0 || varargin{i+1} <0 )
+								error('nnz_tres keyword arg. is not followed by a positive integer')
+							end
+							nnz_tres = varargin{i+1};
+						case 'npasses'
+							if(argc == i ||  ~ isnumeric(varargin{i+1}) || varargin{i+1}-floor(varargin{i+1}) > 0)
+								error('npasses keyword arg. is not followed by an integer')
+							else
+								npasses = varargin{i+1};
+							end
+						otherwise
+							if(isstr(varargin{i}))
+								error([ varargin{i} ' unrecognized argument'])
+							end
+					end
+				end
+			end
+			if(F.isReal)
+				G = matfaust.Faust(F, mexFaustReal('pruneout', F.matrix.objectHandle, nnz_tres, npasses, only_forward));
+			else
+				G = matfaust.Faust(F, mexFaustCplx('pruneout', F.matrix.objectHandle, nnz_tres, npasses, only_forward));
+			end
+		end
 
 		%======================================================================
 		%> @brief The size of F.

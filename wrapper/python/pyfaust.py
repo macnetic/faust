@@ -353,7 +353,18 @@ class Faust:
 
     def pruneout(F, nnz_tres=0, npasses='auto', only_forward=False):
         """
-        Returns an optimized Faust by removing useless zero rows and columns in as many times as needed.
+        Returns a Faust optimized by removing useless zero rows and columns as many times as needed.
+
+        Args:
+            F: the Faust to optimize.
+            nnz_tres: the treshold of number of nonzeros under what the
+            rows/columns are removed.
+            only_forward: True for applying only the forward passes of removal.
+            npasses: the number of passes to run, by default it goes until the
+            optimal Faust is obtained.
+
+        Returns:
+            The optimized Faust.
 
         """
         if(npasses == 'auto'):
