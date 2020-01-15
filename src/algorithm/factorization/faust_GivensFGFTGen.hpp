@@ -606,7 +606,7 @@ const Faust::Vect<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(const 
 
 template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
 template<typename FPP3>
-void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_Dspm(MatSparse<FPP3,DEVICE> & spD, const bool ord /* default to false */)
+void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_Dspm(Faust::MatSparse<FPP3,DEVICE> & spD, const bool ord /* default to false */)
 {
 	const Faust::Vect<FPP,DEVICE>& D_ = this->get_D(ord);
 	vector<int> nat_ord_indices;

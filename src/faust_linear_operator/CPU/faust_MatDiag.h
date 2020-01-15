@@ -38,7 +38,12 @@ namespace Faust
 				isZeros = getNonZeros() == 0;
 			}
 
+#ifdef _MSC_VER
+			MatDiag(faust_unsigned_int nrows, faust_unsigned_int ncols, const FPP* data): MatDiag<FPP>(min(nrows,ncols), data)
+#else
 			MatDiag(faust_unsigned_int nrows, faust_unsigned_int ncols, const FPP* data): MatDiag<FPP>(std::min(nrows,ncols), data)
+#endif
+
 			{
 				this->dim1 = nrows;
 				this->dim2 = ncols;

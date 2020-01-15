@@ -196,7 +196,11 @@ std::list<std::pair<int,int>> Faust::MatDense<FPP,Cpu>::nonzeros_indices() const
 {
 	std::list<std::pair<int,int>> nz_inds;
 	if(this->is_identity)
+#ifdef _MSC_VER
+		for(int i=0;i<min(this->dim1, this->dim2);i++) // VS14 strange issue with std::min //C2589 or C2059
+#else
 		for(int i=0;i<std::min(this->dim1, this->dim2);i++)
+#endif
 			nz_inds.push_back(std::make_pair(i,i));
 	else if(! isZeros)
 	{
@@ -236,7 +240,11 @@ void Faust::MatDense<FPP,Cpu>::setEyes()
 {
 	setZeros();
 	FPP* ptr_data = getData();
+#ifdef _MSC_VER
+	for (int i=0;i<min(this->dim1,this->dim2); i++)
+#else
 	for (int i=0;i<std::min(this->dim1,this->dim2); i++)
+#endif
 		ptr_data[i*this->dim1+i] = FPP(1.0);
 	if (this->dim1 == this->dim2)
 	this->is_identity = true;
