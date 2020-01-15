@@ -182,23 +182,47 @@ class proj_gen(ABC):
         return self.constraint.project(M)
 
 class sp(proj_gen):
+    """
+    Functor that implements the SP projector. A, the projected matrix, is such that \f$ \| A \|_0 = k,  \| A\|_F = 1\f$.
+    """
 
     def __init__(self, shape, k, normalized=True, pos=False):
         """
+
+        Args:
+            k: the number of nonzeros of the projection image.
+            normalized: True to normalize the projection image according to its 2-norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
         """
         self.constraint = ConstraintInt('sp', shape[0], shape[1], k, normalized, pos)
 
 class splin(proj_gen):
-
+    """
+    Functor that implements the SPLIN projector. A, the projected matrix, is defined by \f$ \forall i \in \{0,...,shape[0]-1\} \| \f$ the i-th row \f$ A_{i,*}\f$ is such that \f$ \| A_{i,*}\|_0 = k,  \| A\|_F = 1\f$.
+    """
     def __init__(self, shape, k, normalized=True, pos=False):
         """
+        Args:
+            k: the number of nonzeros of the projection image.
+            normalized: True to normalize the projection image according to its 2-norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
         """
         self.constraint = ConstraintInt('splin', shape[0], shape[1], k, normalized, pos)
 
 class spcol(proj_gen):
-
+    """
+    Functor that implements the SPCOL projector. A, the projected matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \| \f$ the j-th column \f$ \| A_{*,j}\f$ is such that \f$ A_{*,j}\|_0 = k,  \| A\|_F = 1\f$.
+    """
     def __init__(self, shape, k, normalized=True, pos=False):
         """
+
+        Args:
+            S: the support matrix.
+            normalized: True to normalize the projection image according to its 2-norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
         """
         self.constraint = ConstraintInt('spcol', shape[0], shape[1], k, normalized, pos)
 
@@ -206,33 +230,72 @@ class splincol(proj_gen):
 
     def __init__(self, shape, k, normalized=True, pos=False):
         """
+
+        Args:
+            S: the support matrix.
+            normalized: True to normalize the projection image according to its 2-norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
         """
         self.constraint = ConstraintInt('splincol', shape[0], shape[1], k, normalized, pos)
 
 class supp(proj_gen):
-
+    """
+        Functor that implements the SUPP projector. A, the image matrix, is such that np.nonzero(A) == np.nonzero(S).
+    """
     def __init__(self, S, normalized=True, pos=False):
         """
+
+        Args:
+            S: the support matrix.
+            normalized: True to normalize the projection image according to its 2-norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
         self.constraint = ConstraintMat('supp', S, normalized, pos)
 
 class const(proj_gen):
-
+    """
+        Functor that implements the CONST projector. A, the image matrix, is such that A == C.
+    """
     def __init__(self, C, normalized=False):
         """
+
+        Args:
+            C: the constant matrix.
+            normalized: True to normalize the projection image according to its 2-norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
         """
         self.constraint = ConstraintMat('const', C, normalized, pos=False)
 
 class normcol(proj_gen):
-    def __init__(self, shape, normval, normalized=False, pos=False):
+    """
+        Functor that implements the NORMCOL projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \| A_{*,j} \|_2 = s \| \f$.
+
+    """
+    def __init__(self, shape, s, normalized=False, pos=False):
         """
+        Args:
+            s: the column 2-norm.
+            normalized: True to normalize the projection image according to its 2-norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
         """
-        self.constraint = ConstraintReal('normcol', shape[0], shape[1], normval, normalized, pos)
+        self.constraint = ConstraintReal('normcol', shape[0], shape[1], s, normalized, pos)
 
 class normlin(proj_gen):
+    """
+        Functor that implements the NORMLIN projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[0]-1\} \| A_{i,*} \|_2 = s \| \f$.
 
-    def __init__(self, shape, normval, normalized=False, pos=False):
+    """
+
+    def __init__(self, shape, s, normalized=False, pos=False):
         """
+        Args:
+            s: the row 2-norm.
+            normalized: True to normalize the projection image according to its 2-norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
         """
         self.constraint = ConstraintReal('normlin', shape[0], shape[1], normval, normalized, pos)
 
