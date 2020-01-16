@@ -297,7 +297,7 @@ class normlin(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
-        self.constraint = ConstraintReal('normlin', shape[0], shape[1], normval, normalized, pos)
+        self.constraint = ConstraintReal('normlin', shape[0], shape[1], s, normalized, pos)
 
 class ConstraintMat(ConstraintGeneric):
     """
