@@ -214,6 +214,16 @@ FPP Faust::Vect<FPP,Cpu>::mean_relative_error(const Faust::Vect<FPP,Cpu>& v_ref)
    return tmp.mean();
 }
 
+template<typename FPP>
+FPP Faust::Vect<FPP,Cpu>::mean()
+{
+	FPP m = 0;
+	for(int i=0; i < size(); i++)
+		m += getData()[i];
+	m /= size();
+	return m;
+}
+
 
 template<typename FPP>
 template<typename FPP1>
