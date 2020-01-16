@@ -1249,6 +1249,17 @@ Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int
 	}
 	return mat;
 }
+
+template<typename FPP>
+Faust::Vect<FPP,Cpu> Faust::MatDense<FPP, Cpu>::diagonal(int index)
+{
+	FPP data[this->getNbRow()-index];
+	for(int i=0;i < this->getNbRow()-index; i++)
+		data[i] = *(this->getData()+i+(this->getNbRow()*(i+index)));
+	Faust::Vect<FPP,Cpu> diag(this->getNbRow()-index, data);
+	return diag;
+}
+
 #ifdef __COMPILE_TIMERS__
 template<typename FPP>
 Faust::Timer Faust::MatDense<FPP,Cpu>::t_constr;
