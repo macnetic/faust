@@ -19,6 +19,8 @@ classdef ConstraintName
 		% BLKDIAG = 7
 		SUPP = 8
 		NORMLIN = 9
+		TOEPLITZ = 10
+		CIRC = 11
 	end
 	properties(SetAccess = public)
 		name
@@ -30,8 +32,8 @@ classdef ConstraintName
 			if(ischar(name) || iscell(name))
 				name = ConstraintName.str2name_int(name);
 			end
-			if(name > ConstraintName.NORMLIN || name < ConstraintName.SP) %|| name == ConstraintName.BLKDIAG)
-				msg = 'name must be an integer among ConstraintName.SP, ConstraintName.SPCOL, ConstraintName.NORMCOL, ConstraintName.SPLINCOL, ConstraintName.CONST, ConstraintName.SP_POS, ConstraintName.SUPP, ConstraintName.NORMLIN';
+			if(name > ConstraintName.CIRC || name < ConstraintName.SP) %|| name == ConstraintName.BLKDIAG)
+				msg = 'name must be an integer among ConstraintName.SP, ConstraintName.SPCOL, ConstraintName.NORMCOL, ConstraintName.SPLINCOL, ConstraintName.CONST, ConstraintName.SP_POS, ConstraintName.SUPP, ConstraintName.NORMLIN, ConstraintName.TOEPLITZ, ConstraintName.CIRC.';
 				error(msg)
 			end
 			cons_name.name = name;
@@ -52,7 +54,7 @@ classdef ConstraintName
 		end
 
 		function is_mat = is_mat_constraint(obj)
-			is_mat = obj.name == obj.SUPP || obj.name == obj.CONST;
+			is_mat = obj.name == obj.SUPP || obj.name == obj.CONST || obj.name == obj.CIRC || obj.name == obj.TOEPLITZ;
 		end
 
 		function str = conv2str (obj)
@@ -75,6 +77,10 @@ classdef ConstraintName
 					str = 'supp';
 				case obj.CONST;
 					str = 'const';
+				case obj.CIRC
+					str = 'circ';
+				case obj.TOEPLITZ
+					str = 'toeplitz';
 					%case obj.BLKDIAG;
 					%	str = 'blkdiag'
 				otherwise
@@ -108,6 +114,10 @@ classdef ConstraintName
 					id = ConstraintName.SUPP;
 				case 'const'
 					id = ConstraintName.CONST;
+				case 'circ'
+					id = ConstraintName.CIRC
+				case 'toeplitz'
+					id = ConstraintName.TOEPLITZ
 				otherwise
 					error(err_msg)
 			end

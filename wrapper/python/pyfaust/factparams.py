@@ -181,6 +181,47 @@ class proj_gen(ABC):
     def __call__(self, M):
         return self.constraint.project(M)
 
+class toeplitz_proj(proj_gen):
+
+    def __init__(self, shape, normalized=True, pos=False):
+        self.constraint = ConstraintMat('toeplitz', np.empty(shape), normalized, pos)
+
+#    def __call__(self, M):
+#        P = np.empty(M.shape)
+#        for i in range(M.shape[0]):
+#            m = np.mean(np.diag(M,i))
+#            m_ = np.mean(np.diag(M,-i))
+#            dl = len(np.diag(M,i))
+#            I =  list(range(0,dl))
+#            J =  [ i+j for j in range(0,dl) ]
+#            P[I,J] = m
+#            P[J,I] = m_
+#        return P
+
+class circ_proj(proj_gen):
+
+    def __init__(self, shape, normalized=True, pos=False):
+        self.constraint = ConstraintMat('circ', np.empty(shape), normalized, pos)
+
+#    def __call_(self, M):
+#        P = np.empty(M.shape)
+#        for i in range(M.shape[0]):
+#            j = i - M.shape[0]
+#            m = np.mean(np.hstack((np.diag(M,i), np.diag(M,j))))
+#            print("m=", m, "mi=", np.mean(np.diag(M,i)), "mj=",
+#                                             np.mean(np.diag(M,j)), "i=", i,
+#                  "j=", j)
+#            dli = M.shape[0]-i
+#            dlj = M.shape[0]+j
+#            I =  list(range(dli))
+#            J = [ k+i for k in range(dli) ]
+#            P[I,J] = m
+#            I = [ k+-j for k in range(dlj) ]
+#            J = [ k for k in range(dlj) ]
+#            P[I,J] = m
+#        return P
+
+
 class sp(proj_gen):
     """
     Functor that implements the SP projector. A, the projected matrix, is such that \f$ \| A \|_0 = k,  \| A\|_F = 1\f$.
@@ -310,7 +351,7 @@ class ConstraintMat(ConstraintGeneric):
 
         Args:
             name: must be a ConstraintName instance set with a value among
-            SUPP or CONST (cf. ConstraintName) or it can also be one of the
+            SUPP, CONST, TOEPLITZ or CIRC(ULANT) (cf. ConstraintName) or it can also be one of the
             more handy str aliases which are respectively: 'supp' and 'const'.
             num_rows: the number of rows of the constrainted matrix.
             num_cols: the number of columns of the constrained matrix.
@@ -488,6 +529,8 @@ class ConstraintName:
     #BLKDIAG = 7 # ?? Constraint #TODO
     SUPP = 8 # Mat Constraint
     NORMLIN = 9 # Real Constraint
+    TOEPLITZ = 10 # Mat Constraint
+    CIRC = 11 # Mat constraint
 
     def __init__(self, name):
         """
@@ -499,12 +542,14 @@ class ConstraintName:
         """
         if(isinstance(name,str)):
             name = ConstraintName.str2name_int(name)
-        if(not isinstance(name, np.int) or name < ConstraintName.SP or name > ConstraintName.NORMLIN):
+        if(not isinstance(name, np.int) or name < ConstraintName.SP or name >
+           ConstraintName.CIRC):
             raise ValueError("name must be an integer among ConstraintName.SP,"
                              "ConstraintName.SPCOL, ConstraintName.NORMCOL,"
                              "ConstraintName.SPLINCOL, ConstraintName.CONST,"
                              "ConstraintName.SP_POS," # ConstraintName.BLKDIAG,
-                             "ConstraintName.SUPP, ConstraintName.NORMLIN")
+                             "ConstraintName.SUPP, ConstraintName.NORMLIN, "
+                            "ConstraintName.TOEPLITZ, ConstraintName.CIRC")
         self.name = name
 
     def is_int_constraint(self):
@@ -525,7 +570,8 @@ class ConstraintName:
         """
             A delegate for ConstraintGeneric.is_mat_constraint.
         """
-        return self.name in [ConstraintName.SUPP, ConstraintName.CONST ]
+        return self.name in [ConstraintName.SUPP, ConstraintName.CONST,
+                             ConstraintName.CIRC, ConstraintName.TOEPLITZ]
 
     @staticmethod
     def str2name_int(_str):
@@ -555,6 +601,10 @@ class ConstraintName:
             id = ConstraintName.SUPP
         elif(_str == 'const'):
             id = ConstraintName.CONST
+        elif(_str == 'circ'):
+            id = ConstraintName.CIRC
+        elif(_str == 'toeplitz'):
+            id = ConstraintName.TOEPLITZ
         else:
             raise ValueError(err_msg)
         return id

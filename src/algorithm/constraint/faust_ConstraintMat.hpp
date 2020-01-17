@@ -108,6 +108,10 @@ void Faust::ConstraintMat<FPP,DEVICE>::check_constraint_name()const
          break;
       case CONSTRAINT_NAME_SUPP:
          break;
+	  case CONSTRAINT_NAME_CIRC:
+			 break;
+	  case CONSTRAINT_NAME_TOEPLITZ:
+			 break;
       default:
          handleError(m_className," cannot create Faust::ConstraintMat objet from an faust_constraint object with this constraint_name");
          break;
@@ -144,6 +148,11 @@ void Faust::ConstraintMat<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
       case CONSTRAINT_NAME_SUPP:
          Faust::prox_supp(mat,m_parameter, true);
          break;
+	  case CONSTRAINT_NAME_TOEPLITZ:
+		 Faust::prox_toeplitz(mat);
+		 break;
+	  case CONSTRAINT_NAME_CIRC:
+		 Faust::prox_circ(mat);
       default:
          handleError(m_className,"project : invalid constraint_name");
          break;

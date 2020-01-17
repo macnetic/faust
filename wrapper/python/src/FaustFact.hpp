@@ -71,6 +71,16 @@ void prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned lon
 		case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
 			Faust::prox_supp(fmat, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
 			break;
+        case CONSTRAINT_NAME_TOEPLITZ:
+            Faust::prox_toeplitz(fmat); //, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+            memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+            return;
+            break;
+        case CONSTRAINT_NAME_CIRC:
+            Faust::prox_circ(fmat);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+            memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+            return;
+            break;
 		default:
 			throw invalid_argument("PyxConstraintMat::project() inconsistent constraint name");
 	}

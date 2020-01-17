@@ -310,6 +310,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
 					Faust::prox_supp(mat, *mat_param, normalized, pos);
 					break;
+				case CONSTRAINT_NAME_CIRC:
+					Faust::prox_circ(mat);
+					break;
+				case CONSTRAINT_NAME_TOEPLITZ:
+					Faust::prox_toeplitz(mat);
+					break;
+				default:
+					mexErrMsgTxt("Unknown constraint name/type.");
 			}
 			plhs[0] = FaustMat2mxArray(mat);
 			if(mat_param != nullptr)

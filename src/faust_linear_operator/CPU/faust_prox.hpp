@@ -358,7 +358,7 @@ template<typename FPP> void Faust::prox_toeplitz(Faust::MatDense<FPP, Cpu> & M)
 			I.push_back(j);
 			J.push_back(i+j);
 		}
-		for(int k=0;k<M.getNbRow();k++)
+		for(int k=0;k<dl;k++)
 		{
 			*(P.getData()+J[k]*M.getNbRow()+I[k]) = m;
 			*(P.getData()+I[k]*M.getNbRow()+J[k]) = m_;
@@ -367,4 +367,55 @@ template<typename FPP> void Faust::prox_toeplitz(Faust::MatDense<FPP, Cpu> & M)
 	M = P;
 }
 
+template<typename FPP> void Faust::prox_circ(Faust::MatDense<FPP, Cpu> & M)
+{
+//	cout << "Faust::prox_circ" << endl;
+	FPP mi, mj, m;
+	int dli, dlj, j;
+	vector<int> I, J;
+	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
+	for(int i=0;i<M.getNbRow();i++)
+	{
+		j = i - M.getNbRow();
+		dli = M.getNbRow()-i;
+		dlj = M.getNbRow()+j;
+		mi =  M.diagonal(i).mean();
+		if(i == 0)
+			mj = mi;
+		else
+			mj = M.diagonal(j).mean();
+		m = (FPP(dli)*mi+FPP(dlj)*mj)/(FPP(dli)+FPP(dlj));
+//		cout << "m=" << m << "mi=" << mi << "mj=" << mj << "i=" << i << "j=" << j << endl;
+		I.clear();
+		J.clear();
+		//TODO: remove vectors and directly use indices to add elts
+		//edit diag i
+		for(int k=0;k < dli; k++)
+			I.push_back(k);
+		for(int k=i;k<dli+i;k++)
+			J.push_back(k);
+		for(int k = 0; k < dli; k++)
+		{
+			P.getData()[J[k]*M.getNbRow()+I[k]] = m;
+		}
+		//edit diag j
+		I.clear();
+		J.clear();
+		for(int k = -j; k < dlj-j; k++)
+			I.push_back(k);
+		for(int k = 0; k < dlj; k++)
+			J.push_back(k);
+		for(int k = 0; k <dlj; k++)
+		{
+			P.getData()[J[k]*M.getNbRow()+I[k]] = m;
+		}
+	}
+	M = P;
+	for(int i=0;i<M.getNbRow();i++)
+	{
+		for(int j=0;j<M.getNbCol();j++)
+			cout << M(i,j) << " ";
+		cout << endl;
+	}
+}
 #endif

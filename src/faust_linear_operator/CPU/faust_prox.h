@@ -81,6 +81,8 @@ namespace Faust {
 	//    void prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
 	template<typename FPP> void pre_prox_pos(MatDense<FPP,Cpu> & M);
 	template<typename FPP> void prox_toeplitz(Faust::MatDense<FPP, Cpu> & M);
+	template<typename FPP> void prox_circ(Faust::MatDense<FPP, Cpu> & M);
+
 
 }
 

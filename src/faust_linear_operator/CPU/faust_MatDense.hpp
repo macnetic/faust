@@ -1253,10 +1253,14 @@ Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int
 template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::MatDense<FPP, Cpu>::diagonal(int index)
 {
-	FPP data[this->getNbRow()-index];
-	for(int i=0;i < this->getNbRow()-index; i++)
-		data[i] = *(this->getData()+i+(this->getNbRow()*(i+index)));
-	Faust::Vect<FPP,Cpu> diag(this->getNbRow()-index, data);
+	int pos_ind = index<0?-index:index;
+	FPP data[this->getNbRow()-pos_ind];
+	for(int i=0;i < this->getNbRow()-pos_ind; i++)
+		if(index >= 0)
+			data[i] = *(this->getData()+i+(this->getNbRow()*(i+pos_ind)));
+		else
+			data[i] = *(this->getData()+i+pos_ind+this->getNbRow()*i);
+	Faust::Vect<FPP,Cpu> diag(this->getNbRow()-pos_ind, data);
 	return diag;
 }
 
