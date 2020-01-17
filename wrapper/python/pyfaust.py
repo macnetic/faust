@@ -1579,6 +1579,17 @@ class Faust:
         """
         return isinstance(obj, Faust)
 
+    def optimize_storage(F, time=False):
+        """
+        Optimizes a Faust by changing the storage format of each factor according to the chosen criterion (time of Faust-vector multiplication or memory size).
+
+        Args:
+            time: True for choosing the storage format according to Faust-vector
+            multiplication time. False to prefer the memory saving.
+
+        """
+        F_opt = Faust(core_obj=F.m_faust.optimize_storage(time))
+        return F_opt
 
 
 pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__

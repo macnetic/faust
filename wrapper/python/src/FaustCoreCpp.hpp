@@ -346,6 +346,17 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::transpose()
     return core;
 }
 
+    template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::optimize_storage(const bool time)
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->optimize_storage(time);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
+#ifdef FAUST_VERBOSE
+    std::cout << "FaustCoreCpp::optimize_storage() th=" << th << "core=" << core << std::endl;
+#endif
+    return core;
+}
+
 template<typename FPP>
 const bool FaustCoreCpp<FPP>::isTransposed()
 {
