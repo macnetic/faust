@@ -1254,13 +1254,14 @@ template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::MatDense<FPP, Cpu>::diagonal(int index)
 {
 	int pos_ind = index<0?-index:index;
-	FPP data[this->getNbRow()-pos_ind];
+	FPP* data = new FPP[this->getNbRow()-pos_ind]; //use the heap to avoid C2131 (VS14)
 	for(int i=0;i < this->getNbRow()-pos_ind; i++)
 		if(index >= 0)
 			data[i] = *(this->getData()+i+(this->getNbRow()*(i+pos_ind)));
 		else
 			data[i] = *(this->getData()+i+pos_ind+this->getNbRow()*i);
 	Faust::Vect<FPP,Cpu> diag(this->getNbRow()-pos_ind, data);
+	delete[] data;
 	return diag;
 }
 
