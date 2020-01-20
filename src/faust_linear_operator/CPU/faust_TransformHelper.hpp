@@ -452,6 +452,24 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+		faust_unsigned_int TransformHelper<FPP,Cpu>::getNBytes() const
+		{
+			faust_unsigned_int nbytes = 0;
+			for(auto fac : this->transform->data)
+			{
+				if(dynamic_cast<Faust::MatDense<FPP, Cpu>*>(fac))
+					nbytes += fac->getNbCol() * fac->getNbRow();
+				else if (dynamic_cast<Faust::MatSparse<FPP, Cpu>*>(fac))
+					nbytes += 2*fac->getNonZeros()+fac->getNbRow()+1;
+				else if (dynamic_cast<Faust::MatDiag<FPP>*>(fac))
+					nbytes += fac->getNbCol()<fac->getNbRow()?fac->getNbCol():fac->getNbRow();
+				else
+					throw runtime_error("Unknown matrix type.");
+			}
+			return nbytes;
+		}
+
+	template<typename FPP>
 		bool TransformHelper<FPP,Cpu>::isReal() const
 		{
 			return this->transform->isReal();

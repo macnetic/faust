@@ -330,6 +330,12 @@ unsigned int FaustCoreCpp<FPP>::getNbRow() const
 }
 
 template<typename FPP>
+unsigned int FaustCoreCpp<FPP>::getNBytes() const
+{
+    return this->transform->getNBytes();
+}
+
+template<typename FPP>
 unsigned int FaustCoreCpp<FPP>::getNbCol() const
 {
     return this->transform->getNbCol();

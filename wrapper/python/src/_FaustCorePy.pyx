@@ -220,6 +220,13 @@ cdef class FaustCore:
             nbcol = self.core_faust_cplx.getNbCol();
         return (nbrow,nbcol)
 
+    def nbytes(self):
+        if(self._isReal):
+            nbytes = self.core_faust_dbl.getNBytes();
+        else:
+            nbytes = self.core_faust_cplx.getNBytes();
+        return nbytes
+
     def multiply_csr_mat(self, X):
         cdef double [:] x_data1d
         cdef int [:] x_indices

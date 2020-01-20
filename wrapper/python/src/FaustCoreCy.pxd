@@ -56,6 +56,7 @@ cdef extern from "FaustCoreCpp.h" :
         void multiply(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols);
         unsigned int getNbRow() const
         unsigned int getNbCol() const
+        unsigned int getNBytes() const
 #        void setOp(const bool isTransposed,unsigned int& nbRowOp, unsigned int& nbColOp)const;
         unsigned long long nnz() const
         double norm(int ord, double threshold, int max_num_its) const

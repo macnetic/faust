@@ -708,6 +708,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			return;
 		}
 
+		if(!strcmp("optimize_storage", cmd)) { //TODO: verify no arguments passed or 
+			if(nrhs != 3)
+				mexErrMsgTxt("optimize_storage mex error: invalid number of arguments.");
+			bool timeCrit = (bool) mxGetScalar(prhs[2]);
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->optimize_storage(timeCrit);
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+			return;
+		}
+
 		if(! strcmp("pruneout", cmd))
 		{
 			int nnz_tres = 0;

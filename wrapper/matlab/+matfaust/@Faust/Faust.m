@@ -775,6 +775,19 @@ classdef Faust
 			end
 		end
 
+		%=====================================================================
+		%> @brief Optimizes a Faust by changing the storage format of each factor in
+		%> order to optimize the memory size.
+		%>
+		%=====================================================================
+		function OF = optimize_storage(F)
+			if(F.isReal)
+				OF = matfaust.Faust(F, mexFaustReal('optimize_storage', F.matrix.objectHandle, false));
+			else % cplx Faust
+				OF = matfaust.Faust(F, mexFaustCplx('optimize_storage', F.matrix.objectHandle, false));
+			end
+		end
+
 		%======================================================================
 		%> @brief The size of F.
 		%>

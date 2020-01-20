@@ -103,6 +103,7 @@ namespace Faust {
 			void push_back(const MatGeneric<FPP,Cpu>* M, bool optimizedCopy=false);
 			faust_unsigned_int getNbRow() const;
 			faust_unsigned_int getNbCol() const;
+			faust_unsigned_int getNBytes() const;
 			bool isReal() const;
 			faust_unsigned_int get_total_nnz() const;
 			faust_unsigned_int size() const;

@@ -154,6 +154,10 @@ class Faust:
                 raise Exception("Cannot create an empty Faust.")
 
     @property
+    def nbytes(F):
+        return F.m_faust.nbytes()
+
+    @property
     def shape(F):
         """
         Gives the shape of the Faust F.
@@ -1579,16 +1583,12 @@ class Faust:
         """
         return isinstance(obj, Faust)
 
-    def optimize_storage(F, time=False):
+    def optimize_storage(F):
         """
-        Optimizes a Faust by changing the storage format of each factor according to the chosen criterion (time of Faust-vector multiplication or memory size).
-
-        Args:
-            time: True for choosing the storage format according to Faust-vector
-            multiplication time. False to prefer the memory saving.
+        Optimizes a Faust by changing the storage format of each factor in order to optimize the memory size.
 
         """
-        F_opt = Faust(core_obj=F.m_faust.optimize_storage(time))
+        F_opt = Faust(core_obj=F.m_faust.optimize_storage(False))
         return F_opt
 
 
