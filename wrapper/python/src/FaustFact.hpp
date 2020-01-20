@@ -81,6 +81,11 @@ void prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned lon
             memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
             return;
             break;
+        case CONSTRAINT_NAME_HANKEL:
+            Faust::prox_hankel(fmat);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+            memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+            return;
+            break;
 		default:
 			throw invalid_argument("PyxConstraintMat::project() inconsistent constraint name");
 	}

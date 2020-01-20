@@ -221,6 +221,11 @@ class circ_proj(proj_gen):
 #            P[I,J] = m
 #        return P
 
+class hankel_proj(proj_gen):
+
+    def __init__(self, shape, normalized=True, pos=False):
+        self.constraint = ConstraintMat('hankel', np.empty(shape), normalized, pos)
+
 
 class sp(proj_gen):
     """
@@ -531,6 +536,7 @@ class ConstraintName:
     NORMLIN = 9 # Real Constraint
     TOEPLITZ = 10 # Mat Constraint
     CIRC = 11 # Mat constraint
+    HANKEL = 12 # Mat cons.
 
     def __init__(self, name):
         """
@@ -543,7 +549,7 @@ class ConstraintName:
         if(isinstance(name,str)):
             name = ConstraintName.str2name_int(name)
         if(not isinstance(name, np.int) or name < ConstraintName.SP or name >
-           ConstraintName.CIRC):
+           ConstraintName.HANKEL):
             raise ValueError("name must be an integer among ConstraintName.SP,"
                              "ConstraintName.SPCOL, ConstraintName.NORMCOL,"
                              "ConstraintName.SPLINCOL, ConstraintName.CONST,"
@@ -571,7 +577,8 @@ class ConstraintName:
             A delegate for ConstraintGeneric.is_mat_constraint.
         """
         return self.name in [ConstraintName.SUPP, ConstraintName.CONST,
-                             ConstraintName.CIRC, ConstraintName.TOEPLITZ]
+                             ConstraintName.CIRC, ConstraintName.TOEPLITZ,
+                             ConstraintName.HANKEL]
 
     @staticmethod
     def str2name_int(_str):
@@ -605,6 +612,8 @@ class ConstraintName:
             id = ConstraintName.CIRC
         elif(_str == 'toeplitz'):
             id = ConstraintName.TOEPLITZ
+        elif(_str == 'hankel'):
+            id = ConstraintName.HANKEL
         else:
             raise ValueError(err_msg)
         return id

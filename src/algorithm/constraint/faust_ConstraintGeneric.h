@@ -58,7 +58,8 @@ enum faust_constraint_name
    CONSTRAINT_NAME_SUPP, /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
    CONSTRAINT_NAME_NORMLIN,/**< 2nd norm of the lines of matrix A ; REAL  */
    CONSTRAINT_NAME_TOEPLITZ,
-   CONSTRAINT_NAME_CIRC
+   CONSTRAINT_NAME_CIRC,
+   CONSTRAINT_NAME_HANKEL
 };
 
 template<typename FPP,Device DEVICE> class MatDense;
