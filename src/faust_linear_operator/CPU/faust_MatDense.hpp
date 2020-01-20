@@ -1265,6 +1265,25 @@ Faust::Vect<FPP,Cpu> Faust::MatDense<FPP, Cpu>::diagonal(int index)
 	return diag;
 }
 
+template<typename FPP>
+Faust::Vect<FPP,Cpu> Faust::MatDense<FPP, Cpu>::adiagonal(int index)
+{
+	int pos_ind = index<0?-index:index;
+	int size = this->getNbRow()-pos_ind;
+	FPP* data = new FPP[size]; //use the heap to avoid C2131 (VS14)
+	if(index >= 0)
+		for(int i=0;i < this->getNbRow()-index; i++)
+			data[i] = *(this->getData()+i*this->getNbRow()+this->getNbRow()-index-i-1);
+	else
+		for(int i=0; i < this->getNbRow()+index; i++)
+		{
+			data[i] = *(this->getData()+this->getNbRow()-i-1+this->getNbRow()*(i+pos_ind));
+		}
+	Faust::Vect<FPP,Cpu> diag(size, data);
+	delete[] data;
+	return diag;
+}
+
 #ifdef __COMPILE_TIMERS__
 template<typename FPP>
 Faust::Timer Faust::MatDense<FPP,Cpu>::t_constr;

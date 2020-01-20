@@ -475,6 +475,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		Faust::MatDense<FPP,Cpu> upper_tri(const bool diag=true) const;
 
 		Faust::Vect<FPP, Cpu> diagonal(int index);
+		Faust::Vect<FPP, Cpu> adiagonal(int index);
 
 		/**
 		 * \brief Returns the nonzeros indices.

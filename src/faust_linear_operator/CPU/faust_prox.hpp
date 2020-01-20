@@ -339,6 +339,24 @@ void Faust::prox_const(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cp
 //
 //}
 
+template<typename FPP> void Faust::prox_hankel(Faust::MatDense<FPP, Cpu> & M)
+{
+	FPP m, m_;
+	int dl;
+	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
+	for(int i=0;i<M.getNbRow();i++)
+	{
+		m = M.adiagonal(i).mean();
+		m_ = M.adiagonal(-i).mean();
+		dl = M.getNbRow()-i;
+		for(int j=0;j<dl;j++)
+		{
+			*(P.getData()+M.getNbRow()-i-j-1+M.getNbRow()*j) = m_;
+			*(P.getData()+M.getNbRow()-j-1+M.getNbRow()*(j+i)) = m_;
+		}
+	}
+	M = P;
+}
 
 template<typename FPP> void Faust::prox_toeplitz(Faust::MatDense<FPP, Cpu> & M)
 {
