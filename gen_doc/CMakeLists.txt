@@ -15,6 +15,8 @@ if(BUILD_DOCUMENTATION)
 		configure_file(${FAUST_DOC_SRC_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/doc/Doxyfile @ONLY)
 		# ./gen_doc/images/* files is duplicated in doc/html/ to call images documentation in the source code with relative path of image's files, from build directory.
 		configure_file(${FAUST_DOC_SRC_DIR}/py_filterout_namespace.py ${PROJECT_BINARY_DIR}/doc/py_filterout_namespace.py @ONLY)
+        configure_file(${FAUST_DOC_SRC_DIR}/filterout_excluded_classes.py
+            ${PROJECT_BINARY_DIR}/doc/filterout_excluded_classes.py @ONLY)
 		if(UNIX)
 			configure_file(${FAUST_DOC_SRC_DIR}/py_filter.sh.in ${PROJECT_BINARY_DIR}/doc/py_filter @ONLY)
 			configure_file(${FAUST_DOC_SRC_DIR}/doxymatlab/m2cpp.pl ${PROJECT_BINARY_DIR}/doc/m2cpp @ONLY)
