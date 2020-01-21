@@ -173,7 +173,7 @@ elseif(WIN32)
 		endforeach()
 	else() #  ${CMAKE_GENERATOR} MATCHES "MinGW Makefiles"
 		# manually compiling cython extension instead of using setup.py in order to avoid visual studio to meddle in the compilation (we use mingw gcc here)
-		if(CYTHON_EXES_LEN)
+        if(CYTHON_EXES_LEN AND NOT NOPY2)
 			foreach(INDEX RANGE 0 ${CYTHON_EXES_LEN} 1)
 				#message(STATUS "INDEX=${INDEX}")
 				if(${INDEX} LESS ${CYTHON_EXES_LEN})

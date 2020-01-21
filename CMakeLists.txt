@@ -230,6 +230,7 @@ option(REMOTE_DATA_URL "Base URL for getting FAµST data archive (filename exclu
 option(REMOTE_DATA_FILE "Filename of the FAµST data zip archive." "")
 option(NOCPPTESTS "Enabling/Disabling CPP tests (only testing python or matlab wrappers if built)." OFF)
 option(EXPERIMENTAL_PKG "Enabling/Disabling experimental code." OFF)
+option(NOPY2 "Enabling/Disabling python2 support." OFF)
 # experimental code is delimited for example in matlab scripts by comments like "% experimental block start / end"
 #set(BUILD_MULTITHREAD OFF CACHE BOOL "OpenMP Multithreading")
 #set(BUILD_VERBOSE OFF CACHE BOOL "Display useful message for debugging")
