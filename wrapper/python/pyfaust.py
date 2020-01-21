@@ -1591,6 +1591,19 @@ class Faust:
         F_opt = Faust(core_obj=F.m_faust.optimize_storage(False))
         return F_opt
 
+    def optimize(F):
+        """
+        Returns a Faust optimized with pruneout, optimize_storage and configured with the quickest method available to compute a Faust-matrix product.
+
+        NOTE: a small benchmark is launched on the fly. Basically, the methods
+        available differ by the order used to compute the matrix chain
+        multiplication or by the use (or unuse) of threads for the calculation of intermediary
+        matrix products of the Faust.
+
+        """
+        F_opt = Faust(core_obj=F.m_faust.optimize())
+        return F_opt
+
 
 pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__
 

@@ -775,6 +775,16 @@ cdef class FaustCore:
         core._isReal = self._isReal
         return core
 
+    def optimize(self):
+        core = FaustCore(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.optimize()
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.optimize()
+        core._isReal = self._isReal
+        return core
+
+
     def conj(self):
         core = FaustCore(core=True)
         if(self._isReal):

@@ -97,6 +97,8 @@ class FaustCoreCpp
                                   unsigned long int num_cols);
     bool save_mat_file(const char* filepath) const;
     FaustCoreCpp<FPP>* optimize_storage(const bool time=false);
+    FaustCoreCpp<FPP>* optimize();
+
     const bool isTransposed();
     FaustCoreCpp<FPP>* transpose();
     FaustCoreCpp<FPP>* conjugate();
