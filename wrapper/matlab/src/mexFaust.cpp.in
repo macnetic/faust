@@ -717,6 +717,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			return;
 		}
 
+		if(!strcmp("optimize", cmd)) {
+			if(nrhs != 2)
+				mexErrMsgTxt("optimize mex error: invalid number of arguments.");
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->optimize();
+			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
+			return;
+		}
+
 		if(! strcmp("pruneout", cmd))
 		{
 			int nnz_tres = 0;

@@ -787,7 +787,22 @@ classdef Faust
 				OF = matfaust.Faust(F, mexFaustCplx('optimize_storage', F.matrix.objectHandle, false));
 			end
 		end
-
+		%=====================================================================
+		%> @brief Returns a Faust optimized with pruneout, optimize_storage and configured with the quickest method available to compute a Faust-matrix product.
+		%>
+		%> NOTE: this function launches a small benchmark on the fly. Basically, the methods
+		%> available differ by the order used to compute the matrix chain
+		%> multiplication or by the use (or unuse) of threads for the calculation of intermediary
+		%> matrix products of the Faust.
+		%>
+		%=====================================================================
+		function OF = optimize(F)
+			if(F.isReal)
+				OF = matfaust.Faust(F, mexFaustReal('optimize', F.matrix.objectHandle));
+			else % cplx Faust
+				OF = matfaust.Faust(F, mexFaustCplx('optimize', F.matrix.objectHandle));
+			end
+		end
 		%======================================================================
 		%> @brief The size of F.
 		%>
