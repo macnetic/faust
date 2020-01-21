@@ -42,6 +42,7 @@
 #include "faust_FFT.h"
 #include "faust_WHT.h"
 #include "faust_linear_algebra.h"
+#include <chrono>
 
 namespace Faust {
 
@@ -56,7 +57,7 @@ namespace Faust {
 	template<typename FPP>
 		void conjugate(FPP* elts, faust_unsigned_int n)
 		{
-		//nothing to do for real numbers
+			//nothing to do for real numbers
 		}
 
 	template<typename FPP>
@@ -94,74 +95,74 @@ namespace Faust {
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate) : TransformHelper<FPP,Cpu>()
-		{
-			this->transform = th->transform;
-			this->is_transposed = transpose?!th->is_transposed:th->is_transposed;
-			this->is_sliced = th->is_sliced;
-			this->is_fancy_indexed = false;
-			if(th->is_sliced)
-				copy_slices(th);
-			this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
-			this->mul_order_opt_mode = th->mul_order_opt_mode;
-		}
+	{
+		this->transform = th->transform;
+		this->is_transposed = transpose?!th->is_transposed:th->is_transposed;
+		this->is_sliced = th->is_sliced;
+		this->is_fancy_indexed = false;
+		if(th->is_sliced)
+			copy_slices(th);
+		this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
+		this->mul_order_opt_mode = th->mul_order_opt_mode;
+	}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th): TransformHelper<FPP,Cpu>()
-		{
-			this->transform = th->transform;
-			this->is_transposed = th->is_transposed;
-			this->is_conjugate = th->is_conjugate;
-			this->is_sliced = th->is_sliced;
-			if(th->is_sliced)
-				copy_slices(th);
-			this->mul_order_opt_mode = th->mul_order_opt_mode;
-		}
+	{
+		this->transform = th->transform;
+		this->is_transposed = th->is_transposed;
+		this->is_conjugate = th->is_conjugate;
+		this->is_sliced = th->is_sliced;
+		if(th->is_sliced)
+			copy_slices(th);
+		this->mul_order_opt_mode = th->mul_order_opt_mode;
+	}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]): TransformHelper<FPP,Cpu>()
 
-		{
-			this->transform = th->transform; //do not remove this line, necessary for eval_sliced_transform()
-			this->is_transposed = th->is_transposed;
-			this->is_conjugate = th->is_conjugate;
-			if(! (s[0].belong_to(0, th->getNbRow()) || s[1].belong_to(0, th->getNbCol())))
-				handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Slice overflows a Faust dimension.");
-			this->slices[0] = s[0];
-			this->slices[1] = s[1];
-			this->is_sliced = true;
-			eval_sliced_Transform();
-			this->mul_order_opt_mode = th->mul_order_opt_mode;
-		}
+	{
+		this->transform = th->transform; //do not remove this line, necessary for eval_sliced_transform()
+		this->is_transposed = th->is_transposed;
+		this->is_conjugate = th->is_conjugate;
+		if(! (s[0].belong_to(0, th->getNbRow()) || s[1].belong_to(0, th->getNbCol())))
+			handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Slice overflows a Faust dimension.");
+		this->slices[0] = s[0];
+		this->slices[1] = s[1];
+		this->is_sliced = true;
+		eval_sliced_Transform();
+		this->mul_order_opt_mode = th->mul_order_opt_mode;
+	}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols): TransformHelper<FPP,Cpu>()
+	{
+		this->transform = th->transform; //do not remove this line, necessary for eval*()
+		this->is_transposed = th->is_transposed;
+		this->is_conjugate = th->is_conjugate;
+		this->is_sliced = false;
+		//TODO: check indices
+		//				handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Fancy indexing overflows a Faust dimension.");
+		unsigned int id0=0, id1=1;
+		this->fancy_num_cols = num_cols;
+		this->fancy_num_rows = num_rows;
+		if(this->is_transposed)
 		{
-			this->transform = th->transform; //do not remove this line, necessary for eval*()
-			this->is_transposed = th->is_transposed;
-			this->is_conjugate = th->is_conjugate;
-			this->is_sliced = false;
-			//TODO: check indices
-//				handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Fancy indexing overflows a Faust dimension.");
-			unsigned int id0=0, id1=1;
-			this->fancy_num_cols = num_cols;
-			this->fancy_num_rows = num_rows;
-			if(this->is_transposed)
-			{
-				id0 = 1;
-				id1 = 0;
-				this->fancy_num_cols = num_rows;
-				this->fancy_num_rows = num_cols;
-			}
-			this->fancy_indices[id0] = new faust_unsigned_int[num_rows];
-			this->fancy_indices[id1] = new faust_unsigned_int[num_cols];
-			this->is_fancy_indexed= true;
-			memcpy(this->fancy_indices[id0], row_ids, num_rows*sizeof(faust_unsigned_int));
-			memcpy(this->fancy_indices[id1], col_ids, num_cols*sizeof(faust_unsigned_int));
-			eval_fancy_idx_Transform();
-			delete[] this->fancy_indices[0];
-			delete[] this->fancy_indices[1];
-			this->mul_order_opt_mode = th->mul_order_opt_mode;
+			id0 = 1;
+			id1 = 0;
+			this->fancy_num_cols = num_rows;
+			this->fancy_num_rows = num_cols;
 		}
+		this->fancy_indices[id0] = new faust_unsigned_int[num_rows];
+		this->fancy_indices[id1] = new faust_unsigned_int[num_cols];
+		this->is_fancy_indexed= true;
+		memcpy(this->fancy_indices[id0], row_ids, num_rows*sizeof(faust_unsigned_int));
+		memcpy(this->fancy_indices[id1], col_ids, num_cols*sizeof(faust_unsigned_int));
+		eval_fancy_idx_Transform();
+		delete[] this->fancy_indices[0];
+		delete[] this->fancy_indices[1];
+		this->mul_order_opt_mode = th->mul_order_opt_mode;
+	}
 
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> A, const bool transpose /* deft to false */, const bool conjugate)
@@ -218,174 +219,212 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_storage(const bool time /* default true */)
-	{
-		Faust::MatDense<FPP,Cpu> *dfac = nullptr;
-		Faust::MatSparse<FPP,Cpu> *sfac = nullptr;
-		int sparse_weight;
-		std::vector<Faust::MatGeneric<FPP,Cpu>*> opt_factors;
-
-		for(auto fac : this->transform->data)
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_storage(const bool time /* default true */)
 		{
-			if(dfac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(fac))
-				sfac = nullptr;
-			else
-				sfac = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(fac);
+			Faust::MatDense<FPP,Cpu> *dfac = nullptr;
+			Faust::MatSparse<FPP,Cpu> *sfac = nullptr;
+			int sparse_weight;
+			std::vector<Faust::MatGeneric<FPP,Cpu>*> opt_factors;
 
-			if(time)
+			for(auto fac : this->transform->data)
 			{
 				if(dfac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(fac))
-				{
-					opt_factors.push_back(dfac->Clone(true));
-				}
+					sfac = nullptr;
 				else
-				{
-					opt_factors.push_back(sfac->Clone(true));
-				}
-			}
-			else
-			{ // storage size is the main criterion
-				sparse_weight = 2*fac->getNonZeros()+fac->getNbRow()+1;
-				if(sparse_weight < fac->getNbCol()*fac->getNbRow())
-				{
-					// choose CSR format
-					if(dfac)
-						opt_factors.push_back(new Faust::MatSparse<FPP, Cpu>(*dfac));
-					else
-						opt_factors.push_back(new Faust::MatSparse<FPP, Cpu>(*sfac));
-				}
-				else
-				{
-					// choose dense format
-					if(sfac)
-						opt_factors.push_back(new Faust::MatDense<FPP, Cpu>(*sfac));
-					else
-						opt_factors.push_back(new Faust::MatDense<FPP, Cpu>(*dfac));
-				}
-			}
-		}
-		TransformHelper<FPP,Cpu> *pth = new TransformHelper<FPP,Cpu>(opt_factors, 1, false, false, true);
-		return pth;
-	}
+					sfac = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(fac);
 
-	template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::pruneout(const int nnz_tres, const int npasses, const bool only_forward)
-	{
-		int _npasses = 0;
-		TransformHelper<FPP,Cpu> *pth = new TransformHelper<FPP,Cpu>(this->transform->data);
-		MatGeneric<FPP,Cpu>* S_i, *S_j;
-		MatDense<FPP,Cpu>* tmp_ds;
-		MatSparse<FPP,Cpu>* tmp_sp;
-		int nnz_i;
-		bool factor_touched;
-		while(_npasses < npasses || npasses == -1)
-		{
-			factor_touched = false;
-			// forward pass
-			for(int i = 0; i < pth->size()-1; i++)
-			{
-				S_i = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i));
-				S_j = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i+1));
-				for(int offset = 0; offset<S_i->getNbCol(); offset++)
+				if(time)
 				{
-					nnz_i = nnz_tres+1;
+					if(dfac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(fac))
 					{
-						if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_i))
-						{
-							//Matrix is read-only because it's RowMajor order
-							Eigen::SparseMatrix<FPP,Eigen::ColMajor> sp_col = tmp_sp->mat.col(offset);
-							nnz_i = sp_col.nonZeros();
-							if(nnz_i <= nnz_tres)
-							{
-
-								//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
-								//								cout << "del col :" << offset << " fac:" << i << endl;
-								tmp_sp->delete_col(offset);
-								factor_touched = true;
-							}
-						}
+						opt_factors.push_back(dfac->Clone(true));
+					}
+					else
+					{
+						opt_factors.push_back(sfac->Clone(true));
+					}
+				}
+				else
+				{ // storage size is the main criterion
+					sparse_weight = 2*fac->getNonZeros()+fac->getNbRow()+1;
+					if(sparse_weight < fac->getNbCol()*fac->getNbRow())
+					{
+						// choose CSR format
+						if(dfac)
+							opt_factors.push_back(new Faust::MatSparse<FPP, Cpu>(*dfac));
 						else
-						{
-							tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_i);
-							nnz_i = tmp_ds->mat.col(offset).nonZeros();
-							if(nnz_i <= nnz_tres)
-							{
-								//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
-								//								cout << "del col :" << offset << " fac:" << i << endl;
-								tmp_ds->delete_col(offset);
-								factor_touched = true;
-							}
-						}
-						if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_j))
-							if(nnz_i <= nnz_tres)
-								tmp_sp->delete_row(offset);
-							else
-							{
-								tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_j);
-								if(nnz_i <= nnz_tres)
-									tmp_ds->delete_row(offset);
-							}
+							opt_factors.push_back(new Faust::MatSparse<FPP, Cpu>(*sfac));
+					}
+					else
+					{
+						// choose dense format
+						if(sfac)
+							opt_factors.push_back(new Faust::MatDense<FPP, Cpu>(*sfac));
+						else
+							opt_factors.push_back(new Faust::MatDense<FPP, Cpu>(*dfac));
 					}
 				}
 			}
-			// backward pass
+			TransformHelper<FPP,Cpu> *pth = new TransformHelper<FPP,Cpu>(opt_factors, 1, false, false, true);
+			return pth;
+		}
 
-			if(! only_forward)
-				for(int i = pth->size()-1; i > 0; i--)
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize()
+		{
+			Faust::TransformHelper<FPP,Cpu> *th = this->pruneout(/*nnz_tres=*/0), *th2;
+			th2 = th->optimize_storage(false);
+			delete th;
+			th = th2;
+			std::chrono::duration<double> times[5];
+			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(this->getNbCol(),2048);
+			int nmuls = 1, opt_meth=0;
+			int NMETS = 6;
+			for(int i=0; i < NMETS; i++)
+			{
+				if(i == 4) continue; // skipping OMP method temporarily
+				th->set_mul_order_opt_mode(i);
+				auto start = std::chrono::system_clock::now();
+				for(int j=0;j < nmuls; j++)
 				{
-					S_i = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i-1));
-					S_j = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i));
-					for(int offset = 0; offset<S_j->getNbRow(); offset++)
+					auto FM = th->multiply(*M);
+				}
+				auto end = std::chrono::system_clock::now();
+				times[i] = end-start;
+			}
+			for(int i=0; i < NMETS-1; i++)
+			{
+				if(i == 3) continue; // skipping OMP method temporarily
+				opt_meth = times[opt_meth]<times[i+1]?opt_meth:i+1;
+			}
+			th->set_mul_order_opt_mode(opt_meth);
+			return th;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::pruneout(const int nnz_tres, const int npasses, const bool only_forward)
+		{
+			int _npasses = 0;
+			TransformHelper<FPP,Cpu> *pth = new TransformHelper<FPP,Cpu>(this->transform->data);
+			MatGeneric<FPP,Cpu>* S_i, *S_j;
+			MatDense<FPP,Cpu>* tmp_ds;
+			MatSparse<FPP,Cpu>* tmp_sp;
+			int nnz_i;
+			bool factor_touched;
+			while(_npasses < npasses || npasses == -1)
+			{
+				factor_touched = false;
+				// forward pass
+				for(int i = 0; i < pth->size()-1; i++)
+				{
+					S_i = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i));
+					S_j = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i+1));
+					for(int offset = 0; offset<S_i->getNbCol(); offset++)
 					{
 						nnz_i = nnz_tres+1;
 						{
-							if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_j))
-							{
-								Eigen::SparseMatrix<FPP,Eigen::ColMajor> sp_row = tmp_sp->mat.row(offset);
-								nnz_i = sp_row.nonZeros();
-								if(nnz_i <= nnz_tres)
-								{
-									//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
-									//								cout << "del row :" << offset << " fac:" << i<< endl;
-									tmp_sp->delete_row(offset);
-									factor_touched = true;
-								}
-							}
-							else
-							{
-								tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_j);
-								nnz_i = tmp_ds->mat.row(offset).nonZeros();
-								if(nnz_i <= nnz_tres)
-								{
-									//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
-									//								cout << "del row i:" << offset << " fac:" << i << endl;
-									tmp_ds->delete_row(offset);
-									factor_touched = true;
-								}
-							}
 							if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_i))
 							{
+								//Matrix is read-only because it's RowMajor order
+								Eigen::SparseMatrix<FPP,Eigen::ColMajor> sp_col = tmp_sp->mat.col(offset);
+								nnz_i = sp_col.nonZeros();
 								if(nnz_i <= nnz_tres)
+								{
+
+									//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
+									//								cout << "del col :" << offset << " fac:" << i << endl;
 									tmp_sp->delete_col(offset);
+									factor_touched = true;
+								}
 							}
 							else
 							{
 								tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_i);
+								nnz_i = tmp_ds->mat.col(offset).nonZeros();
 								if(nnz_i <= nnz_tres)
+								{
+									//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
+									//								cout << "del col :" << offset << " fac:" << i << endl;
 									tmp_ds->delete_col(offset);
+									factor_touched = true;
+								}
 							}
-
+							if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_j))
+								if(nnz_i <= nnz_tres)
+									tmp_sp->delete_row(offset);
+								else
+								{
+									tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_j);
+									if(nnz_i <= nnz_tres)
+										tmp_ds->delete_row(offset);
+								}
 						}
 					}
-
 				}
+				// backward pass
 
-			_npasses++;
-			if(!factor_touched && npasses == -1) break;
+				if(! only_forward)
+					for(int i = pth->size()-1; i > 0; i--)
+					{
+						S_i = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i-1));
+						S_j = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i));
+						for(int offset = 0; offset<S_j->getNbRow(); offset++)
+						{
+							nnz_i = nnz_tres+1;
+							{
+								if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_j))
+								{
+									Eigen::SparseMatrix<FPP,Eigen::ColMajor> sp_row = tmp_sp->mat.row(offset);
+									nnz_i = sp_row.nonZeros();
+									if(nnz_i <= nnz_tres)
+									{
+										//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
+										//								cout << "del row :" << offset << " fac:" << i<< endl;
+										tmp_sp->delete_row(offset);
+										factor_touched = true;
+									}
+								}
+								else
+								{
+									tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_j);
+									nnz_i = tmp_ds->mat.row(offset).nonZeros();
+									if(nnz_i <= nnz_tres)
+									{
+										//								cout << "nnz_i: " << nnz_i << " i: " << i<< endl;
+										//								cout << "del row i:" << offset << " fac:" << i << endl;
+										tmp_ds->delete_row(offset);
+										factor_touched = true;
+									}
+								}
+								if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_i))
+								{
+									if(nnz_i <= nnz_tres)
+										tmp_sp->delete_col(offset);
+								}
+								else
+								{
+									tmp_ds = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(S_i);
+									if(nnz_i <= nnz_tres)
+										tmp_ds->delete_col(offset);
+								}
+
+							}
+						}
+
+					}
+
+				_npasses++;
+				if(!factor_touched && npasses == -1) break;
+			}
+			pth->transform->update_total_nnz();
+			return pth;
 		}
-		pth->transform->update_total_nnz();
-		return pth;
-	}
+
+	template<typename FPP>
+		int TransformHelper<FPP,Cpu>::get_mul_order_opt_mode() const
+		{
+			return this->mul_order_opt_mode;
+		}
 
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::set_mul_order_opt_mode(const int mul_order_opt_mode)
@@ -393,6 +432,7 @@ namespace Faust {
 			this->mul_order_opt_mode = mul_order_opt_mode;
 			std::cout << "mul order opt mode (0 when disabled): " << this->mul_order_opt_mode << std::endl;
 		}
+
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::multiply(TransformHelper<FPP, Cpu>* th_right)
@@ -652,11 +692,11 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-	void TransformHelper<FPP, Cpu>::copy_slices(TransformHelper<FPP, Cpu> *th, const bool transpose /* default to false */)
-	{
-		this->slices[0].copy(th->slices[0]);
-		this->slices[1].copy(th->slices[1]);
-	}
+		void TransformHelper<FPP, Cpu>::copy_slices(TransformHelper<FPP, Cpu> *th, const bool transpose /* default to false */)
+		{
+			this->slices[0].copy(th->slices[0]);
+			this->slices[1].copy(th->slices[1]);
+		}
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP, Cpu>::slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
@@ -685,98 +725,98 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-	void TransformHelper<FPP, Cpu>::eval_fancy_idx_Transform()
-	{
-		bool cloning_fact = false;
-		faust_unsigned_int size = this->size();
-		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) size);
-		MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
-		gen_fac = this->transform->get_fact(0, cloning_fact);
-		//				first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
-		//		first_sub_fac->Display();
-		first_sub_fac = gen_fac->get_rows(this->fancy_indices[0], this->fancy_num_rows);
-		if(cloning_fact)
-			delete gen_fac;
-		if(size > 1) {
-			gen_fac = this->transform->get_fact(size-1, cloning_fact);
-			//					last_sub_fac = gen_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
-			last_sub_fac = gen_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);	//		std::cout << "---" << std::endl;
-			//		last_sub_fac->Display();
+		void TransformHelper<FPP, Cpu>::eval_fancy_idx_Transform()
+		{
+			bool cloning_fact = false;
+			faust_unsigned_int size = this->size();
+			std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) size);
+			MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
+			gen_fac = this->transform->get_fact(0, cloning_fact);
+			//				first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
+			//		first_sub_fac->Display();
+			first_sub_fac = gen_fac->get_rows(this->fancy_indices[0], this->fancy_num_rows);
 			if(cloning_fact)
 				delete gen_fac;
-			factors.reserve(size);
-			factors.insert(factors.begin(), first_sub_fac);
-			if(size > 2)
-			{
-				auto it = factors.begin();
-				for(faust_unsigned_int i = 1; i < size-1; i++)
+			if(size > 1) {
+				gen_fac = this->transform->get_fact(size-1, cloning_fact);
+				//					last_sub_fac = gen_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
+				last_sub_fac = gen_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);	//		std::cout << "---" << std::endl;
+				//		last_sub_fac->Display();
+				if(cloning_fact)
+					delete gen_fac;
+				factors.reserve(size);
+				factors.insert(factors.begin(), first_sub_fac);
+				if(size > 2)
 				{
-					gen_fac = this->transform->get_fact(i, cloning_fact);
-					factors[i] = gen_fac;
+					auto it = factors.begin();
+					for(faust_unsigned_int i = 1; i < size-1; i++)
+					{
+						gen_fac = this->transform->get_fact(i, cloning_fact);
+						factors[i] = gen_fac;
+					}
 				}
+				factors.insert(factors.begin()+(size-1), last_sub_fac);
+				factors.resize(size);
 			}
-			factors.insert(factors.begin()+(size-1), last_sub_fac);
-			factors.resize(size);
+			else { //only one factor
+				last_sub_fac = first_sub_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);
+				delete first_sub_fac;
+				factors[0] = last_sub_fac;
+				factors.resize(1);
+			}
+			this->transform = make_shared<Transform<FPP, Cpu>>(factors, 1.0, false, cloning_fact);
+			if(cloning_fact) {
+				for(faust_unsigned_int i = 0; i < size; i++)
+					delete factors[i];
+			}
 		}
-		else { //only one factor
-			last_sub_fac = first_sub_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);
-			delete first_sub_fac;
-			factors[0] = last_sub_fac;
-			factors.resize(1);
-		}
-		this->transform = make_shared<Transform<FPP, Cpu>>(factors, 1.0, false, cloning_fact);
-		if(cloning_fact) {
-			for(faust_unsigned_int i = 0; i < size; i++)
-				delete factors[i];
-		}
-	}
 
 	template<typename FPP>
-	void TransformHelper<FPP, Cpu>::eval_sliced_Transform()
-	{
-		bool cloning_fact = true;
-		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) this->size());
-		faust_unsigned_int size = this->size();
-		MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
-		gen_fac = this->transform->get_fact(0, cloning_fact);
-		first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
-		//		first_sub_fac->Display();
-		//
-		if(cloning_fact)
-			delete gen_fac;
-		if(size > 1) {
-			gen_fac = this->transform->get_fact(size-1, cloning_fact);
-			last_sub_fac = gen_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
-			//		std::cout << "---" << std::endl;
-			//		last_sub_fac->Display();
+		void TransformHelper<FPP, Cpu>::eval_sliced_Transform()
+		{
+			bool cloning_fact = true;
+			std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) this->size());
+			faust_unsigned_int size = this->size();
+			MatGeneric<FPP,Cpu>* gen_fac, *first_sub_fac, *last_sub_fac;
+			gen_fac = this->transform->get_fact(0, cloning_fact);
+			first_sub_fac = gen_fac->get_rows(slices[0].start_id, slices[0].end_id-slices[0].start_id);
+			//		first_sub_fac->Display();
+			//
 			if(cloning_fact)
 				delete gen_fac;
-			factors.reserve(size);
-			factors.insert(factors.begin(), first_sub_fac);
-			if(size > 2)
-			{
-				for(faust_unsigned_int i = 1; i < size-1; i++)
+			if(size > 1) {
+				gen_fac = this->transform->get_fact(size-1, cloning_fact);
+				last_sub_fac = gen_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
+				//		std::cout << "---" << std::endl;
+				//		last_sub_fac->Display();
+				if(cloning_fact)
+					delete gen_fac;
+				factors.reserve(size);
+				factors.insert(factors.begin(), first_sub_fac);
+				if(size > 2)
 				{
-					gen_fac = this->transform->get_fact(i, cloning_fact);
-					factors[i] = gen_fac;
-				}
+					for(faust_unsigned_int i = 1; i < size-1; i++)
+					{
+						gen_fac = this->transform->get_fact(i, cloning_fact);
+						factors[i] = gen_fac;
+					}
 
+				}
+				factors.insert(factors.begin()+(size-1), last_sub_fac);
+				factors.resize(size);
 			}
-			factors.insert(factors.begin()+(size-1), last_sub_fac);
-			factors.resize(size);
+			else { //only one factor
+				last_sub_fac = first_sub_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
+				delete first_sub_fac;
+				factors[0] = last_sub_fac;
+				factors.resize(1);
+			}
+			this->transform = make_shared<Transform<FPP,Cpu>>(factors, 1.0, false, cloning_fact);
+			if(cloning_fact) {
+				for(faust_unsigned_int i = 0; i < size; i++)
+					delete factors[i];
+			}
 		}
-		else { //only one factor
-			last_sub_fac = first_sub_fac->get_cols(slices[1].start_id, slices[1].end_id-slices[1].start_id);
-			delete first_sub_fac;
-			factors[0] = last_sub_fac;
-			factors.resize(1);
-		}
-		this->transform = make_shared<Transform<FPP,Cpu>>(factors, 1.0, false, cloning_fact);
-		if(cloning_fact) {
-			for(faust_unsigned_int i = 0; i < size; i++)
-				delete factors[i];
-		}
-	}
 
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product() const {
@@ -795,12 +835,12 @@ namespace Faust {
 			vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
 			int start_id, end_id;
 			this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
-//			cout << "start_id=" << start_id << "end_id=" << end_id << endl;
+			//			cout << "start_id=" << start_id << "end_id=" << end_id << endl;
 			if(start_id < 0)
 				return 1.0;
 			else if(start_id == 0)
 				return this->transform->spectralNorm(nbr_iter_max, threshold, flag);
-//			cout << "optimized norm2" << endl;
+			//			cout << "optimized norm2" << endl;
 			vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
 			TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
 			return t.transform->spectralNorm(nbr_iter_max, threshold, flag);
@@ -837,7 +877,7 @@ namespace Faust {
 
 			if(this->getNbCol() != G->getNbCol()) handleError("TransformHelper::vertcat()","The dimensions must agree.");
 			for(faust_unsigned_int i=0; i < facts.size(); i++){
-//				cout << "factor i=" << i <<  " facts.size()=" << facts.size() << endl;
+				//				cout << "factor i=" << i <<  " facts.size()=" << facts.size() << endl;
 				// F (*this) factor
 				if(i < this->size())
 				{
@@ -948,25 +988,25 @@ namespace Faust {
 				for(faust_unsigned_int j=F_fac->getNbRow()+1;j<F_fac->getNbRow()+G_fac->getNbRow()+1;j++)
 					rowptr[j] += F_fac->getRowPtr()[F_fac->getNbRow()];
 				// concatened Faust factor
-//				cout << "T_fac_nb_rows:" << T_fac_nb_rows << endl;
-//				cout << "T_fac_nb_cols:" << T_fac_nb_cols << endl;
-//				cout << "nnz:" << T_fac_nnz << endl;
-//				cout << "rowptr=";
-//				for(faust_unsigned_int j=0;j<T_fac_nb_rows+1;j++)
-//					cout << rowptr[j] << ",";
-//				cout << endl;
-//				cout << "colind=";
-//				for(faust_unsigned_int j=0;j<T_fac_nnz;j++)
-//					cout << colind[j] << ",";
-//				cout << endl;
-//				cout << "values=";
-//				for(faust_unsigned_int j=0;j<T_fac_nnz;j++)
-//					cout << values[j] << ",";
-//				cout << endl;
+				//				cout << "T_fac_nb_rows:" << T_fac_nb_rows << endl;
+				//				cout << "T_fac_nb_cols:" << T_fac_nb_cols << endl;
+				//				cout << "nnz:" << T_fac_nnz << endl;
+				//				cout << "rowptr=";
+				//				for(faust_unsigned_int j=0;j<T_fac_nb_rows+1;j++)
+				//					cout << rowptr[j] << ",";
+				//				cout << endl;
+				//				cout << "colind=";
+				//				for(faust_unsigned_int j=0;j<T_fac_nnz;j++)
+				//					cout << colind[j] << ",";
+				//				cout << endl;
+				//				cout << "values=";
+				//				for(faust_unsigned_int j=0;j<T_fac_nnz;j++)
+				//					cout << values[j] << ",";
+				//				cout << endl;
 				T_fac = new MatSparse<FPP,Cpu>(T_fac_nnz, T_fac_nb_rows, T_fac_nb_cols, values, rowptr, colind);
-//				cout << "stage 4: ok" << endl;
-//				cout << "T_fac:"<< endl;
-//				T_fac->Display();
+				//				cout << "stage 4: ok" << endl;
+				//				cout << "T_fac:"<< endl;
+				//				T_fac->Display();
 				facts[i] = T_fac;
 				if(F_inter_fac_allocated)
 				{
@@ -983,8 +1023,8 @@ namespace Faust {
 				delete rowptr;
 			}
 			T = new TransformHelper<FPP,Cpu>(facts, 1.0, false, false);
-//			cout << "final stage ok" << endl;
-//			T->display();
+			//			cout << "final stage ok" << endl;
+			//			T->display();
 			//delete last factors (identity for each Faust)
 			if(!F_inter_fac_allocated) delete F_fac;
 			if(!F_inter_fac_allocated) delete G_fac;

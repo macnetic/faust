@@ -1,6 +1,6 @@
 
 if(BUILD_TESTING)
-message(STATUS "CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
+	message(STATUS "TEST CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 
 #${FAUST_EXCEPTION_SRC_DIR}
 include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR} ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR} ${EIGEN_INC_DIR} ${FAUST_UTILS_SRC_DIR})
@@ -156,7 +156,7 @@ endif()
 
 if(NOT NOCPPTESTS)
 	foreach(TEST_FPP float double)
-		foreach(FILE faust_mult faust_mult_cplx test_Vect_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move test_MatDense_min faust_transform_omp_mul faust_pruneout faust_transform_optimize_storage )
+		foreach(FILE faust_mult faust_mult_cplx test_Vect_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move test_MatDense_min faust_transform_omp_mul faust_pruneout faust_transform_optimize_storage faust_transform_optimize)
 			set(TEST_BIN_FILE ${FILE}_${TEST_FPP})
 			set(TEST_FILE_CPP ${TEST_BIN_FILE}.cpp)
 			message(STATUS ${TEST_FILE_CPP})

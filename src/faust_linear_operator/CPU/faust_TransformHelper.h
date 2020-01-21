@@ -96,6 +96,7 @@ namespace Faust {
 //			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 			void set_mul_order_opt_mode(const int mul_order_opt_mode);
+			int get_mul_order_opt_mode() const;
 			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 
 			TransformHelper<FPP, Cpu>* multiply(TransformHelper<FPP, Cpu>*);
@@ -161,6 +162,8 @@ namespace Faust {
 
 			TransformHelper<FPP,Cpu>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
 			TransformHelper<FPP,Cpu>* optimize_storage(const bool time=true);
+			TransformHelper<FPP,Cpu>* optimize();
+
 
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n, const bool norma=true);
