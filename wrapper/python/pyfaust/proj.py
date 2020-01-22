@@ -11,7 +11,9 @@ else:
                  # but not using abstract class in py2.7
 
 class proj_gen(ABC):
-
+    """
+    Parent abstract class of all projector functors.
+    """
     @abstractmethod
     def __init__(self):
         pass
@@ -19,8 +21,10 @@ class proj_gen(ABC):
     def __call__(self, M):
         return self.constraint.project(M)
 
-class toeplitz_proj(proj_gen):
-
+class toeplitz(proj_gen):
+    """
+    Functor that implements the TOEPLITZ projector.
+    """
     def __init__(self, shape, normalized=True, pos=False):
         self.constraint = ConstraintMat('toeplitz', np.empty(shape), normalized, pos)
 
@@ -36,8 +40,10 @@ class toeplitz_proj(proj_gen):
 #            P[J,I] = m_
 #        return P
 
-class circ_proj(proj_gen):
-
+class circ(proj_gen):
+    """
+    Functor that implements the CIRC(ulant) projector.
+    """
     def __init__(self, shape, normalized=True, pos=False):
         self.constraint = ConstraintMat('circ', np.empty(shape), normalized, pos)
 
@@ -59,8 +65,10 @@ class circ_proj(proj_gen):
 #            P[I,J] = m
 #        return P
 
-class hankel_proj(proj_gen):
-
+class hankel(proj_gen):
+    """
+    Functor that implements the HANKEL projector.
+    """
     def __init__(self, shape, normalized=True, pos=False):
         self.constraint = ConstraintMat('hankel', np.empty(shape), normalized, pos)
 
@@ -111,7 +119,11 @@ class spcol(proj_gen):
         self.constraint = ConstraintInt('spcol', shape[0], shape[1], k, normalized, pos)
 
 class splincol(proj_gen):
+    """
+    Functor that implements the SPLINCOL projector.
 
+    It's the union of SPLIN and SPCOL projectors.
+    """
     def __init__(self, shape, k, normalized=True, pos=False):
         """
 
