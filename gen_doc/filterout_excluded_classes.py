@@ -1,3 +1,4 @@
+import shutil
 import sys
 import re
 
@@ -18,13 +19,18 @@ This script intends to filter out the doxygen non-documented classes (set in EXC
 
 in_block_to_del=False
 count_in_block_lines = 0
-for line in sys.stdin:
-    if(in_block_to_del):
-        count_in_block_lines -= 1
-        if(count_in_block_lines <= 0):
-            in_block_to_del = False
-    elif(re.match('.*class &#160.*"bottom"><b>', line)):
-        in_block_to_del=True
-        count_in_block_lines = 2
-    else:
-        print(line, end='')
+for file in sys.argv[1:]:
+    print("filtering file:", file)
+    tmp = open("tmp.html", mode='w')
+    for line in open(file):
+        if(in_block_to_del):
+            count_in_block_lines -= 1
+            if(count_in_block_lines <= 0):
+                in_block_to_del = False
+        elif(re.match('.*class &#160.*"bottom"><b>', line)):
+            in_block_to_del=True
+            count_in_block_lines = 2
+        else:
+            tmp.write(line)
+    tmp.close()
+    shutil.copyfile("tmp.html", file)
