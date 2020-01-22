@@ -1,3 +1,6 @@
+%==================================================
+%> Functor that implements the CONST projector.
+%==================================================
 classdef const < matfaust.factparams.proj_gen
 	properties
 	end

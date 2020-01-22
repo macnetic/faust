@@ -1,5 +1,7 @@
 %==================================================
-%> Functor that implements the SPLINCOL projector.
+%> @brief Functor that implements the SPLINCOL projector.
+%>
+%> It's the union of SPLIN and SPCOL projectors.
 %==================================================
 classdef splincol < matfaust.factparams.proj_gen
 	properties

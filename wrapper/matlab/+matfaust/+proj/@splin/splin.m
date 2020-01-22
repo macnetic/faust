@@ -1,5 +1,5 @@
 %==========================================
-%> Functor that implements the SPLIN projector.
+%> Functor that implements the SPLIN projector. A, the projected matrix, is defined by \f$ \forall i \in \{1,\ldots,shape(1)\} \| \f$ the i-th row \f$ A_{i,*}\f$ is such that \f$ \| A_{i,*}\|_0 = k,  \| A\|_F = 1\f$. 
 %==========================================
 classdef splin < matfaust.factparams.proj_gen
 	properties
