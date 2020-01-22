@@ -51,7 +51,7 @@
 #include "faust_MatGeneric.h"
 #include "faust_exception.h"
 #include <iostream>
-
+#include <utility>
 #ifdef __COMPILE_TIMERS__
     #include "faust_Timer.h"
 #endif
@@ -474,8 +474,12 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		 */
 		Faust::MatDense<FPP,Cpu> upper_tri(const bool diag=true) const;
 
+		std::vector<std::pair<int,int>> get_diag_indices(int index);
+		std::vector<std::pair<int,int>> get_antidiag_indices(int index);
 		Faust::Vect<FPP, Cpu> diagonal(int index);
 		Faust::Vect<FPP, Cpu> adiagonal(int index);
+		Faust::Vect<FPP, Cpu> gen_diagonal(int index, bool diag /* true for diagonal, false for anti-diagonal*/);
+
 
 		/**
 		 * \brief Returns the nonzeros indices.

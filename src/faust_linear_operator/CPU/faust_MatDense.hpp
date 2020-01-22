@@ -1253,35 +1253,80 @@ Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int
 template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::MatDense<FPP, Cpu>::diagonal(int index)
 {
-	int pos_ind = index<0?-index:index;
-	FPP* data = new FPP[this->getNbRow()-pos_ind]; //use the heap to avoid C2131 (VS14)
-	for(int i=0;i < this->getNbRow()-pos_ind; i++)
-		if(index >= 0)
-			data[i] = *(this->getData()+i+(this->getNbRow()*(i+pos_ind)));
-		else
-			data[i] = *(this->getData()+i+pos_ind+this->getNbRow()*i);
-	Faust::Vect<FPP,Cpu> diag(this->getNbRow()-pos_ind, data);
-	delete[] data;
-	return diag;
+	return gen_diagonal(index, true);
 }
 
 template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::MatDense<FPP, Cpu>::adiagonal(int index)
 {
-	int pos_ind = index<0?-index:index;
-	int size = this->getNbRow()-pos_ind;
-	FPP* data = new FPP[size]; //use the heap to avoid C2131 (VS14)
-	if(index >= 0)
-		for(int i=0;i < this->getNbRow()-index; i++)
-			data[i] = *(this->getData()+i*this->getNbRow()+this->getNbRow()-index-i-1);
-	else
-		for(int i=0; i < this->getNbRow()+index; i++)
-		{
-			data[i] = *(this->getData()+this->getNbRow()-i-1+this->getNbRow()*(i+pos_ind));
-		}
-	Faust::Vect<FPP,Cpu> diag(size, data);
+	return gen_diagonal(index, false);
+}
+
+template<typename FPP>
+Faust::Vect<FPP,Cpu> Faust::MatDense<FPP, Cpu>::gen_diagonal(int index, bool is_diag)
+{
+	int i, j, ei = 0;
+	std::vector<std::pair<int,int>> indices = is_diag?this->get_diag_indices(index):this->get_antidiag_indices(index);
+	FPP* data = new FPP[indices.size()];  //use the heap to avoid C2131 (VS14)
+	for(auto ind : indices)
+	{
+		i = ind.first;
+		j = ind.second;
+		data[ei++] = *(this->getData()+i+this->getNbRow()*j);
+	}
+	Faust::Vect<FPP,Cpu> diag(ei, data);
 	delete[] data;
 	return diag;
+}
+
+template<typename FPP>
+std::vector<std::pair<int,int>> Faust::MatDense<FPP, Cpu>::get_diag_indices(int index)
+{
+	if(index > 0 && index > this->getNbCol() || index < 0 and -index > this->getNbRow()) throw std::out_of_range("diagonal index is out of range.");
+	std::vector<std::pair<int, int>> indices;
+	int i, j;
+	if(index >= 0)
+	{
+		i = 0;
+		j = index;
+	}
+	else
+	{
+		i = -index;
+		j = 0;
+	}
+	while(i < this->getNbRow() && j < this->getNbCol())
+	{
+		indices.push_back(std::make_pair(i,j));
+		i++;
+		j++;
+	}
+	return indices;
+}
+
+template<typename FPP>
+std::vector<std::pair<int,int>> Faust::MatDense<FPP, Cpu>::get_antidiag_indices(int index)
+{
+	if(index > 0 && index > this->getNbRow() || index < 0 and -index > this->getNbCol()) throw std::out_of_range("anti-diagonal index is out of range.");
+	std::vector<std::pair<int, int>> indices;
+	int i, j;
+	if(index >= 0)
+	{
+		i = this->getNbRow()-index-1;
+		j = 0;
+	}
+	else
+	{
+		i = this->getNbRow()-1;
+		j = -index;
+	}
+	while(i < this->getNbRow() && j < this->getNbCol())
+	{
+		indices.push_back(std::make_pair(i,j));
+		i--;
+		j++;
+	}
+	return indices;
 }
 
 #ifdef __COMPILE_TIMERS__

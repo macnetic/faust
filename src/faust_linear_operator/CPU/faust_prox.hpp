@@ -341,18 +341,37 @@ void Faust::prox_const(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cp
 
 template<typename FPP> void Faust::prox_hankel(Faust::MatDense<FPP, Cpu> & M)
 {
-	FPP m, m_;
-	int dl;
+//	FPP m, m_;
+//	int dl;
+//	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
+//	for(int i=0;i<M.getNbRow();i++)
+//	{
+//		m = M.adiagonal(i).mean();
+//		m_ = M.adiagonal(-i).mean();
+//		dl = M.getNbRow()-i;
+//		for(int j=0;j<dl;j++)
+//		{
+//			*(P.getData()+M.getNbRow()-i-j-1+M.getNbRow()*j) = m_;
+//			*(P.getData()+M.getNbRow()-j-1+M.getNbRow()*(j+i)) = m_;
+//		}
+//	}
+//	M = P;
+	FPP m;
 	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
+	for(int i=1;i<M.getNbCol();i++)
+	{
+		m = M.adiagonal(-i).mean();
+		for(auto ind: M.get_antidiag_indices(-i))
+		{
+			*(P.getData()+ind.first+M.getNbRow()*ind.second) = m;
+		}
+	}
 	for(int i=0;i<M.getNbRow();i++)
 	{
 		m = M.adiagonal(i).mean();
-		m_ = M.adiagonal(-i).mean();
-		dl = M.getNbRow()-i;
-		for(int j=0;j<dl;j++)
+		for(auto ind: M.get_antidiag_indices(i))
 		{
-			*(P.getData()+M.getNbRow()-i-j-1+M.getNbRow()*j) = m_;
-			*(P.getData()+M.getNbRow()-j-1+M.getNbRow()*(j+i)) = m_;
+			*(P.getData()+ind.first+M.getNbRow()*ind.second) = m;
 		}
 	}
 	M = P;
@@ -360,26 +379,22 @@ template<typename FPP> void Faust::prox_hankel(Faust::MatDense<FPP, Cpu> & M)
 
 template<typename FPP> void Faust::prox_toeplitz(Faust::MatDense<FPP, Cpu> & M)
 {
-	FPP m, m_;
-	int dl;
-	vector<int> I,J;
+	FPP m;
 	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
-	for(int i=0;i<M.getNbRow();i++)
+	for(int i=0;i<M.getNbCol();i++)
 	{
 		m = M.diagonal(i).mean();
-		m_ = M.diagonal(-i).mean();
-		dl = M.getNbRow()-i;
-		I.clear();
-		J.clear();
-		for(int j=0;j<dl;j++)
+		for(auto ind: M.get_diag_indices(i))
 		{
-			I.push_back(j);
-			J.push_back(i+j);
+			*(P.getData()+ind.first+M.getNbRow()*ind.second) = m;
 		}
-		for(int k=0;k<dl;k++)
+	}
+	for(int i=0;i<M.getNbRow();i++)
+	{
+		m = M.diagonal(-i).mean();
+		for(auto ind: M.get_diag_indices(-i))
 		{
-			*(P.getData()+J[k]*M.getNbRow()+I[k]) = m;
-			*(P.getData()+I[k]*M.getNbRow()+J[k]) = m_;
+			*(P.getData()+ind.first+M.getNbRow()*ind.second) = m;
 		}
 	}
 	M = P;
