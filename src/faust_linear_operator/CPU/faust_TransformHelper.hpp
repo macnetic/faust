@@ -204,10 +204,10 @@ namespace Faust {
 					this->transform->data.erase(this->transform->data.end()-1);
 					break;
 				case 4:
-					M = this->transform->multiply_omp(A, isTransposed2char());
+					M = this->transform->multiply_par(A, isTransposed2char());
 					break;
 				case 5:
-					M = this->transform->multiply_par(A, isTransposed2char());
+					M = this->transform->multiply_omp(A, isTransposed2char());
 					break;
 				default:
 					M = this->transform->multiply(A, isTransposed2char());
@@ -279,10 +279,9 @@ namespace Faust {
 			std::chrono::duration<double> times[5];
 			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(this->getNbCol(),2048);
 			int nmuls = 1, opt_meth=0;
-			int NMETS = 6;
+			int NMETS = 5; //skip openmp method (not supported on macOS)
 			for(int i=0; i < NMETS; i++)
 			{
-				if(i == 4) continue; // skipping OMP method temporarily
 				th->set_mul_order_opt_mode(i);
 				auto start = std::chrono::system_clock::now();
 				for(int j=0;j < nmuls; j++)
@@ -294,7 +293,6 @@ namespace Faust {
 			}
 			for(int i=0; i < NMETS-1; i++)
 			{
-				if(i == 3) continue; // skipping OMP method temporarily
 				opt_meth = times[opt_meth]<times[i+1]?opt_meth:i+1;
 			}
 			th->set_mul_order_opt_mode(opt_meth);
