@@ -1,3 +1,6 @@
+%==========================================
+%> Functor that implements the SPLIN projector.
+%==========================================
 classdef splin < matfaust.factparams.proj_gen
 	properties
 	end

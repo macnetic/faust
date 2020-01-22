@@ -787,6 +787,7 @@ classdef Faust
 				OF = matfaust.Faust(F, mexFaustCplx('optimize_storage', F.matrix.objectHandle, false));
 			end
 		end
+
 		%=====================================================================
 		%> @brief Returns a Faust optimized with pruneout, optimize_storage and configured with the quickest method available to compute a Faust-matrix product.
 		%>
