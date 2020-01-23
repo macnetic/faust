@@ -1307,7 +1307,7 @@ std::vector<std::pair<int,int>> Faust::MatDense<FPP, Cpu>::get_diag_indices(int 
 template<typename FPP>
 std::vector<std::pair<int,int>> Faust::MatDense<FPP, Cpu>::get_antidiag_indices(int index)
 {
-	if(index > 0 && index > this->getNbRow() || index < 0 and -index > this->getNbCol()) throw std::out_of_range("anti-diagonal index is out of range.");
+	if(index > 0 && index > this->getNbRow() || index < 0 && -index > this->getNbCol()) throw std::out_of_range("anti-diagonal index is out of range.");
 	std::vector<std::pair<int, int>> indices;
 	int i, j;
 	if(index >= 0)

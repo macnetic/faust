@@ -402,7 +402,7 @@ template<typename FPP> void Faust::prox_toeplitz(Faust::MatDense<FPP, Cpu> & M)
 
 template<typename FPP> void Faust::prox_circ(Faust::MatDense<FPP, Cpu> & M)
 {
-//	cout << "Faust::prox_circ" << endl;
+	if(M.getNbRow() != M.getNbCol()) throw out_of_range("circulant projector applies only on square matrices");
 	FPP mi, mj, m;
 	int dli, dlj, j;
 	vector<int> I, J;
@@ -418,7 +418,6 @@ template<typename FPP> void Faust::prox_circ(Faust::MatDense<FPP, Cpu> & M)
 		else
 			mj = M.diagonal(j).mean();
 		m = (FPP(dli)*mi+FPP(dlj)*mj)/(FPP(dli)+FPP(dlj));
-//		cout << "m=" << m << "mi=" << mi << "mj=" << mj << "i=" << i << "j=" << j << endl;
 		I.clear();
 		J.clear();
 		//TODO: remove vectors and directly use indices to add elts
@@ -444,11 +443,5 @@ template<typename FPP> void Faust::prox_circ(Faust::MatDense<FPP, Cpu> & M)
 		}
 	}
 	M = P;
-	for(int i=0;i<M.getNbRow();i++)
-	{
-		for(int j=0;j<M.getNbCol();j++)
-			cout << M(i,j) << " ";
-		cout << endl;
-	}
 }
 #endif
