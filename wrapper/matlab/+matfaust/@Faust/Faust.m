@@ -797,13 +797,40 @@ classdef Faust
 		%> matrix products of the Faust.
 		%>
 		%=====================================================================
-		function OF = optimize(F)
+		function OF = optimize(F, varargin)
+			len_args = length(varargin);
+			transp = false; % default value
+			if(len_args > 0)
+				if(strcmp(varargin{1}, {'transpose', 'transp'}) &&  len_args > 1 && islogical(varargin{2}))
+					transp = varargin{2};
+				else
+					error('invalid key or value arguments')
+				end
+			end
 			if(F.isReal)
-				OF = matfaust.Faust(F, mexFaustReal('optimize', F.matrix.objectHandle));
+				OF = matfaust.Faust(F, mexFaustReal('optimize', F.matrix.objectHandle, transp));
 			else % cplx Faust
-				OF = matfaust.Faust(F, mexFaustCplx('optimize', F.matrix.objectHandle));
+				OF = matfaust.Faust(F, mexFaustCplx('optimize', F.matrix.objectHandle, transp));
 			end
 		end
+
+		function OF = optimize_mul(F, varargin)
+			len_args = length(varargin);
+			transp = false; % default value
+			if(len_args > 0)
+				if(strcmp(varargin{1}, {'transpose', 'transp'}) &&  len_args > 1 && islogical(varargin{2}))
+					transp = varargin{2};
+				else
+					error('invalid key or value arguments')
+				end
+			end
+			if(F.isReal)
+				mexFaustReal('optimize_mul', F.matrix.objectHandle, transp);
+			else % cplx Faust
+				mexFaustCplx('optimize_mul', F.matrix.objectHandle, transp);
+			end
+		end
+
 		%======================================================================
 		%> @brief The size of F.
 		%>

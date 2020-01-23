@@ -300,7 +300,7 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::optimize_multiply(const bool transp /* deft to false */)
 		{
 			int NMETS = 5; //skip openmp method (not supported on macOS)
-			std::chrono::duration<double> times[NMETS];
+			std::chrono::duration<double> * times = new std::chrono::duration<double>[NMETS]; //use heap because of VS14 (error C3863)
 			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(transp?this->getNbRow():this->getNbCol(), 2048);
 			int nmuls = 1, opt_meth=0;
 			for(int i=0; i < NMETS; i++)
@@ -319,6 +319,7 @@ namespace Faust {
 				opt_meth = times[opt_meth]<times[i+1]?opt_meth:i+1;
 			}
 			this->set_mul_order_opt_mode(opt_meth);
+			delete [] times;
 		}
 
 	template<typename FPP>
