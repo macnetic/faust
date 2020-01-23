@@ -1121,12 +1121,21 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::Ma
 	cout << "nth=" << nth << endl;
 	barrier_count = nth;
 	int i = 0;
+	if(opThis != 'N')
+	{
+		data[0] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
+		i = data_size-1;
+	}
+	else
+		data[data_size-1] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
 	for(auto ptr: this->data)
 	{
 		cout << "fac i=" << i << ": " << ptr << endl;
-		data[i++] = ptr;
+		if(opThis == 'N')
+			data[i++] = ptr;
+		else
+			data[i--] = ptr;
 	}
-	data[i] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
 	cout << "A ptr: " << &A << endl;
 	cout << A.norm() << endl;
 	std::thread *th;

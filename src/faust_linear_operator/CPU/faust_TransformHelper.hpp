@@ -194,14 +194,29 @@ namespace Faust {
 			is_transposed ^= transpose;
 			is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
+			std::vector<Faust::MatGeneric<FPP,Cpu>*> data(this->transform->size()+1);
 			switch(this->mul_order_opt_mode)
 			{
 				case 1:
 				case 2:
 				case 3:
-					this->transform->data.push_back(const_cast<Faust::MatDense<FPP,Cpu>*>(&A)); // it's ok
-					Faust::multiply_order_opt(mul_order_opt_mode, this->transform->data, M);
-					this->transform->data.erase(this->transform->data.end()-1);
+//					this->transform->data.push_back(const_cast<Faust::MatDense<FPP,Cpu>*>(&A)); // it's ok
+					if(transpose)
+					{
+						int i = this->transform->size();
+						for(auto fac: this->transform->data)
+							data[i--] = fac;
+						data[0] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
+					}
+					else
+					{
+						int i = 0;
+						for(auto fac: this->transform->data)
+							data[i++] = fac;
+						data[i] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
+					}
+					Faust::multiply_order_opt(mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), {isTransposed2char()});
+//					this->transform->data.erase(this->transform->data.end()-1);
 					break;
 				case 4:
 					M = this->transform->multiply_par(A, isTransposed2char());
@@ -270,23 +285,31 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize()
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize(const bool transp /* deft to false */)
 		{
 			Faust::TransformHelper<FPP,Cpu> *th = this->pruneout(/*nnz_tres=*/0), *th2;
 			th2 = th->optimize_storage(false);
 			delete th;
 			th = th2;
-			std::chrono::duration<double> times[5];
-			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(this->getNbCol(),2048);
-			int nmuls = 1, opt_meth=0;
+			// choose the quickest method for the Faust-matrix mul
+			th->optimize_multiply(transp);
+			return th;
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::optimize_multiply(const bool transp /* deft to false */)
+		{
 			int NMETS = 5; //skip openmp method (not supported on macOS)
+			std::chrono::duration<double> times[NMETS];
+			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(transp?this->getNbRow():this->getNbCol(), 2048);
+			int nmuls = 1, opt_meth=0;
 			for(int i=0; i < NMETS; i++)
 			{
-				th->set_mul_order_opt_mode(i);
+				this->set_mul_order_opt_mode(i);
 				auto start = std::chrono::system_clock::now();
 				for(int j=0;j < nmuls; j++)
 				{
-					auto FM = th->multiply(*M);
+					auto FM = this->multiply(*M, transp);
 				}
 				auto end = std::chrono::system_clock::now();
 				times[i] = end-start;
@@ -295,8 +318,7 @@ namespace Faust {
 			{
 				opt_meth = times[opt_meth]<times[i+1]?opt_meth:i+1;
 			}
-			th->set_mul_order_opt_mode(opt_meth);
-			return th;
+			this->set_mul_order_opt_mode(opt_meth);
 		}
 
 	template<typename FPP>

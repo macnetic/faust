@@ -162,7 +162,8 @@ namespace Faust {
 
 			TransformHelper<FPP,Cpu>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
 			TransformHelper<FPP,Cpu>* optimize_storage(const bool time=true);
-			TransformHelper<FPP,Cpu>* optimize();
+			TransformHelper<FPP,Cpu>* optimize(const bool transp=false);
+			void optimize_multiply(const bool transp=false);
 
 
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);

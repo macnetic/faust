@@ -62,9 +62,9 @@ int main(int argc, char* argv[])
 	}
 
 	//RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true
-	TransformHelper<FPP,Cpu>* th = TransformHelper<FPP,Cpu>::randFaust(DENSE, 6, 6, 1024, 1024, .5);
+	TransformHelper<FPP,Cpu>* th = TransformHelper<FPP,Cpu>::randFaust(DENSE, 6, 6, 32, 32, .5);
 	th->display();
-	MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(1024,1024);
+	MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(32,32);
 	auto start = std::chrono::system_clock::now();
 	auto FM = th->multiply(*M);
 	auto end = std::chrono::system_clock::now();
@@ -81,6 +81,6 @@ int main(int argc, char* argv[])
 	std::cout << "Time opt.: "<< diff.count() << " s\n";
 	FM3.Display();
 	cout << "FM3 norm: " << FM3.norm() << endl;
-
+    th->optimize_multiply(true);
 	return 0;
 }

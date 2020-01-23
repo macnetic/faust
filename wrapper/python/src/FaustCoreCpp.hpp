@@ -353,9 +353,18 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::transpose()
 }
 
 template<typename FPP>
-FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::optimize()
+void FaustCoreCpp<FPP>::optimize_mul(const bool transp /* deft to false*/)
 {
-    Faust::TransformHelper<FPP,Cpu>* th = this->transform->optimize();
+    this->transform->optimize_multiply(transp);
+#ifdef FAUST_VERBOSE
+    std::cout << "FaustCoreCpp::optimize_mul() th=" << th << "core=" << core << std::endl;
+#endif
+}
+
+template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::optimize(const bool transp /* deft to false*/)
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->optimize(transp);
     FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
 #ifdef FAUST_VERBOSE
     std::cout << "FaustCoreCpp::optimize() th=" << th << "core=" << core << std::endl;
