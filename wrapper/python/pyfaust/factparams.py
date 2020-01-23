@@ -573,9 +573,20 @@ class ParamsHierarchical(ParamsFact):
                  is_fact_side_left=False,
                  is_verbose=False,
                  grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
+        if((isinstance(fact_constraints, list) or isinstance(fact_constraints, tuple))
+           and np.array([isinstance(fact_constraints[i],pyfaust.proj.proj_gen) for i in
+                    range(0,len(fact_constraints))]).all()):
+            # "convert" projs to constraints
+            fact_constraints = [ p.constraint for p in fact_constraints ]
+        if((isinstance(res_constraints, list) or isinstance(res_constraints, tuple))
+           and np.array([isinstance(res_constraints[i],pyfaust.proj.proj_gen) for i in
+                    range(0,len(res_constraints))]).all()):
+            # "convert" projs to constraints
+            res_constraints = [ p.constraint for p in res_constraints ]
         if(not isinstance(fact_constraints, list) and not
            isinstance(fact_constraints, ConstraintList)):
-            raise TypeError('fact_constraints must be a list or a'
+            raise TypeError('fact_constraints must be a list of '
+                            'ConstraintGeneric or pyfaust.proj.proj_gen or a'
                             ' ConstraintList.')
         if(not isinstance(res_constraints, list) and not
            isinstance(res_constraints, ConstraintList)):
@@ -588,6 +599,7 @@ class ParamsHierarchical(ParamsFact):
             constraints = res_constraints + fact_constraints
         else:
             constraints = fact_constraints + res_constraints
+
         stop_crits = [ stop_crit1, stop_crit2 ]
         super(ParamsHierarchical, self).__init__(num_facts,
                                                  is_update_way_R2L,
