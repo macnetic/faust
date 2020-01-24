@@ -1160,7 +1160,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(err, 0.084417, places=5)
 
     def test_splin(self):
-        from pyfaust.factparams import splin
+        from pyfaust.proj import splin
         from random import randint
         from numpy.random import rand
         from numpy import count_nonzero
@@ -1178,7 +1178,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(Mp), 1)
 
     def test_spcol(self):
-        from pyfaust.factparams import spcol
+        from pyfaust.proj import spcol
         from random import randint
         from numpy.random import rand
         from numpy import count_nonzero
@@ -1196,7 +1196,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(Mp), 1)
 
     def test_splincol(self):
-        from pyfaust.factparams import splincol
+        from pyfaust.proj import splincol
         from random import randint
         from numpy.random import rand
         from numpy import count_nonzero
@@ -1212,7 +1212,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(Mp), 1)
 
     def test_sp(self):
-        from pyfaust.factparams import sp
+        from pyfaust.proj import sp
         from random import randint
         from numpy.random import rand
         from numpy import count_nonzero
@@ -1230,7 +1230,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertAlmostEqual(norm(Mp), 1)
 
     def test_supp(self):
-        from pyfaust.factparams import supp
+        from pyfaust.proj import supp
         from numpy.random import rand
         from numpy.random import randn, permutation as randperm
         from numpy.linalg import norm
@@ -1258,7 +1258,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertTrue(np.allclose(pM[pM != 0], M[S != 0]))
 
     def test_const(self):
-        from pyfaust.factparams import const
+        from pyfaust.proj import const
         from numpy.random import rand
         from random import randint
         min_n, min_m = 5, 5
@@ -1271,7 +1271,7 @@ class TestFaustFactory(unittest.TestCase):
         self.assertTrue(np.allclose(C, pM))
 
     def test_normcol(self):
-        from pyfaust.factparams import normcol
+        from pyfaust.proj import normcol
         from numpy.random import rand
         from numpy.random import randn, permutation as randperm
         from numpy.linalg import norm
@@ -1287,7 +1287,7 @@ class TestFaustFactory(unittest.TestCase):
             self.assertAlmostEqual(norm(pM[:,i]), k)
 
     def test_normlin(self):
-        from pyfaust.factparams import normlin
+        from pyfaust.proj import normlin
         from numpy.random import rand
         from numpy.random import randn, permutation as randperm
         from numpy.linalg import norm
