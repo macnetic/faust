@@ -19,6 +19,7 @@
 %> @param 'tol', number see fact.eigtj (NB: as described below, the error tolerance is not exactly for the approximate SVD but for the subsequent eigtj calls).
 %> @param 'relerr', bool see fact.eigtj
 %> @param 'nGivens_per_fac',integer see fact.eigtj
+%> @param 'enable_large_Faust',bool see fact.eigtj
 %>
 %> @retval [U,S,V]: such that U*S*V' is the approximate of M with:
 %>      - S: (sparse real diagonal matrix) the singular values in descendant order.

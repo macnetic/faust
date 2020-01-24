@@ -24,7 +24,8 @@
 %> @param 'tol', number [optional if nGivens is set] the tolerance error at which the algorithm stops. The default value is zero so that stopping is based on reaching the targeted nGivens.
 %> @param 'order', char [optional, default is ‘ascend’] order of eigenvalues, possible choices are ‘ascend, 'descend' or 'undef' (to avoid a sorting operation and save some time).
 %> @param 'nGivens_per_fac', integer [optional, default is <code>floor(size(M, 1)/2)</code>] targeted number of Givens rotations per factor of V. Must be an integer between 1 to <code>floor(size(M, 1)/2)</code>.
-%> @param 'relerr', bool [optional, default is True] the type of error used as stopping criterion. (true) for the relative error norm(V*D*V'-M, 'fro')/norm(M, 'fro'), (false) for the absolute error norm(V*D*V'-M, 'fro').
+%> @param 'relerr', bool [optional, default is true] the type of error used as stopping criterion. (true) for the relative error norm(V*D*V'-M, 'fro')/norm(M, 'fro'), (false) for the absolute error norm(V*D*V'-M, 'fro').
+%> @param 'enable_large_Faust', bool [optional, default is false] if true, it allows to compute a transform that doesn't worth it regarding its complexity relatively to the matrix M. Otherwise, by default, an exception is raised before the algorithm starts.
 %> @param 'verbosity', integer [optional] verbosity level. The greater the value the more info is displayed. It can be helpful to understand for example why the algorithm stopped before reaching the tol error or the number of Givens (nGivens).
 %>
 %>
@@ -45,7 +46,7 @@
 %> % get a Laplacian to diagonalize
 %> load('Laplacian_256_community.mat')
 %> % do it
-%> [Uhat, Dhat] = eigtj(Lap, 'nGivens', size(Lap,1)*100, 'nGivens_per_fac', size(Lap, 1)/2, 'verbosity', 2)
+%> [Uhat, Dhat] = eigtj(Lap, 'nGivens', size(Lap,1)*100, 'nGivens_per_fac', size(Lap, 1)/2, 'verbosity', 2, 'enable_large_Faust', true)
 %> % Uhat is the Fourier matrix/eigenvectors approximation as a Faust (200 factors)
 %> % Dhat the eigenvalues diagonal matrix approx.
 %> % Computing the decomposition of the same matrix but targeting a precise relative error

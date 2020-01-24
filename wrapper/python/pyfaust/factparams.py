@@ -540,6 +540,7 @@ class ParamsFact(ABC):
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
         self.step_size = step_size
+        import pyfaust.proj
         if((isinstance(constraints, list) or isinstance(constraints, tuple))
            and np.array([isinstance(constraints[i],pyfaust.proj.proj_gen) for i in
                     range(0,len(constraints))]).all()):
@@ -578,6 +579,7 @@ class ParamsHierarchical(ParamsFact):
                  is_fact_side_left=False,
                  is_verbose=False,
                  grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
+        import pyfaust.proj
         if((isinstance(fact_constraints, list) or isinstance(fact_constraints, tuple))
            and np.array([isinstance(fact_constraints[i],pyfaust.proj.proj_gen) for i in
                     range(0,len(fact_constraints))]).all()):

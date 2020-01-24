@@ -50,7 +50,7 @@
 %> import matfaust.*
 %> import matfaust.fact.hierarchical
 %> % generate a Hadamard Faust of size 32x32
-%> FH = wh(32);
+%> FH = wht(32);
 %> H = full(FH); % the full matrix version
 %> % factorize it
 %> FH2 = hierarchical(H, 'squaremat');

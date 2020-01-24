@@ -102,6 +102,7 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
             the svd but for the subsequent eigtj calls).
             relerr: see fact.eigtj
             nGivens_per_fac: see fact.eigtj
+            enable_large_Faust: see fact.eigtj
 
 
         Returns:
@@ -208,7 +209,9 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         info is displayed. It can be helpful to understand for example why the
         algorithm stopped before reaching the tol error or the number of Givens
         (nGivens).
-
+        enable_large_Faust: (bool)  if true, it allows to compute a transform
+        that doesn't worth it regarding its complexity compared to the matrix
+        M. Otherwise by default, an exception is raised before the algorithm starts.
 
 
     Returns:
@@ -248,7 +251,7 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         demo_path = sep.join((get_data_dirpath(),'Laplacian_256_community.mat'))
         data_dict = loadmat(demo_path)
         Lap = data_dict['Lap'].astype(np.float)
-        Dhat, Uhat = eigtj(Lap, nGivens=Lap.shape[0]*100)
+        Dhat, Uhat = eigtj(Lap, nGivens=Lap.shape[0]*100, enable_large_Faust=True)
         # Uhat is the Fourier matrix/eigenvectors approximation as a Faust
         # (200 factors)
         # Dhat the eigenvalues diagonal matrix approx.
@@ -260,8 +263,7 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
         # and then asking for an absolute error
         Dhat3, Uhat3 = eigtj(Lap, tol=0.1, relerr=False)
         assert(norm(Lap-Uhat3*np.diag(Dhat3)*Uhat3.H) < .11)
-        # now recompute Uhat2, Dhat2 but asking a descending order of
-        eigenvalues
+        # now recompute Uhat2, Dhat2 but asking a descending order of eigenvalues
         Dhat4, Uhat4 = eigtj(Lap, tol=0.01)
         assert((Dhat4[::-1] == Dhat2[::]).all())
         # and now with no sort
@@ -572,6 +574,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False):
        <b> 3. Simplified Parameters for a Rectangular Matrix Factorization
        (the BSL demo MEG matrix)</b>
        >>> from pyfaust import *
+       >>> from pyfaust.fact import hierarchical
        >>> from scipy.io import loadmat
        >>> from pyfaust.demo import get_data_dirpath
        >>> d = loadmat(get_data_dirpath()+'/matrix_MEG.mat')
