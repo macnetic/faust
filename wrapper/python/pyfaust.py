@@ -155,6 +155,9 @@ class Faust:
 
     @property
     def nbytes(F):
+        """
+        Gives the memory size of the Faust in bytes.
+        """
         return F.m_faust.nbytes()
 
     @property
