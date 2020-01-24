@@ -1118,7 +1118,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::Ma
 	nth = data_size / num_per_th;
 	nth = nth%2?nth-1:nth; // nth must be even
 	nth = nth == 0?1:nth;
-	cout << "nth=" << nth << endl;
+//	cout << "nth=" << nth << endl;
 	barrier_count = nth;
 	int i = 0;
 	if(opThis != 'N')
@@ -1136,8 +1136,8 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::Ma
 		else
 			data[i--] = ptr;
 	}
-	cout << "A ptr: " << &A << endl;
-	cout << A.norm() << endl;
+//	cout << "A ptr: " << &A << endl;
+//	cout << A.norm() << endl;
 	std::thread *th;
 	for(i=0; i < nth; i++)
 	{
@@ -1150,7 +1150,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::Ma
 			t->join();
 
 	M = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(mats[0]);
-	cout << "M:" << M << endl;
+//	cout << "M:" << M << endl;
 	MatDense<FPP,Cpu> M_;
 	if(! M)
 	{
@@ -1170,7 +1170,7 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 	Faust::MatSparse<FPP, Cpu> * sM;
 	Faust::MatDense<FPP, Cpu> *M;
 	Faust::MatDense<FPP,Cpu>* tmp = nullptr, *tmp2 = nullptr; // (data[end_id-1]);
-	std::cout << "num_per_th: " << num_per_th << std::endl;
+//	std::cout << "num_per_th: " << num_per_th << std::endl;
 	int start_nth = nth;
 	while(num_per_th > 1)
 	{
@@ -1211,7 +1211,7 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 			data[thid] = mats[thid];
 			//				mats[thid]->Display();
 			//				cout << mats[thid]->norm() << endl;
-			cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "data[thid]=" << data[thid] << endl;
+//			cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "data[thid]=" << data[thid] << endl;
 			if(tmp2 != nullptr) delete tmp2;
 		}
 		{ // mutex block

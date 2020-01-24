@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 	FM.Display();
 	cout << "FM norm: " << FM.norm() << endl;
 #ifdef __OPENMP__
-	th->set_mul_order_opt_mode(4);
+	th->set_mul_order_opt_mode(5);
 	start = std::chrono::system_clock::now();
 	auto FM2 = th->multiply(*M);
 	end = std::chrono::system_clock::now();
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
 	FM2.Display();
 	cout << "FM2 norm: " << FM.norm() << endl;
 #endif
-	th->set_mul_order_opt_mode(5);
+	th->set_mul_order_opt_mode(4);
 	start = std::chrono::system_clock::now();
 	auto FM3 = th->multiply(*M);
 	end = std::chrono::system_clock::now();
