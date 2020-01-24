@@ -1,7 +1,7 @@
 %> @package matfaust.proj @brief This module provides matrix projectors.
 
 %=========================================================
-%> @brief The parent abstract class to represent projectors.
+%> @brief The parent abstract class to represent projectors (as functors).
 %=========================================================
 classdef (Abstract) proj_gen
 	properties (SetAccess = protected)

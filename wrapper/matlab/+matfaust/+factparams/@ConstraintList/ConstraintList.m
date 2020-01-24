@@ -10,6 +10,7 @@ classdef ConstraintList
 	methods
 		function this = ConstraintList(varargin)
 			import matfaust.factparams.*
+			import matfaust.proj.*
 			tuple_len = 4; % name, value, nrows, ncols
 			i = 1;
 			j = 1; % the number of processed constraints

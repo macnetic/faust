@@ -38,6 +38,13 @@ classdef (Abstract) ParamsFact
 	methods
 		function p = ParamsFact(num_facts, constraints, varargin)
 			import matfaust.factparams.ParamsFact
+			if(iscell(constraints))
+				for i=1:length(constraints)
+					if(isa(constraints{i}, 'matfaust.proj.proj_gen'))
+						constraints{i} = constraints{i}.constraint
+					end
+				end
+			end
 			% set default values
 			is_update_way_R2L = ParamsFact.DEFAULT_IS_UPDATE_WAY_R2L;
 			init_lambda = ParamsFact.DEFAULT_INIT_LAMBDA;

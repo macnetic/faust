@@ -324,7 +324,7 @@ class ConstraintName:
     Example:
         >>> # SPLINCOL Comprehensive Example
         >>> # This constraint doesn't necessarily
-        >>> # lead to a  projected matrix with asked sparsity respected
+        >>> # lead to a  image matrix with asked sparsity respected
         >>> # both for columns and rows
         >>> from numpy.random import rand
         >>> from numpy.linalg import norm
@@ -540,6 +540,11 @@ class ParamsFact(ABC):
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
         self.step_size = step_size
+        if((isinstance(constraints, list) or isinstance(constraints, tuple))
+           and np.array([isinstance(constraints[i],pyfaust.proj.proj_gen) for i in
+                    range(0,len(constraints))]).all()):
+            # "convert" projs to constraints
+            constraints = [ p.constraint for p in constraints ]
         if(isinstance(constraints, ConstraintList)):
             self.constraints = constraints.clist
         else:

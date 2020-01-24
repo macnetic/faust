@@ -17,6 +17,20 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 	methods
 		function p = ParamsHierarchical(fact_constraints, res_constraints, stop_crit1, stop_crit2, varargin)
 			import matfaust.factparams.*
+			if(iscell(fact_constraints))
+				for i=1:length(fact_constraints)
+					if(isa(fact_constraints{i}, 'matfaust.proj.proj_gen'))
+						fact_constraints{i} = fact_constraints{i}.constraint
+					end
+				end
+			end
+			if(iscell(res_constraints))
+				for i=1:length(res_constraints)
+					if(isa(res_constraints{i}, 'matfaust.proj.proj_gen'))
+						res_constraints{i} = res_constraints{i}.constraint
+					end
+				end
+			end
 			if(isa(fact_constraints, 'ConstraintList'))
 				fact_constraints = fact_constraints.clist;
 			end
@@ -24,10 +38,10 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 				res_constraints = res_constraints.clist;
 			end
 			if(~ iscell(fact_constraints))
-				error('fact_constraints (argument 1) must be a cell array')
+				error('fact_constraints (argument 1) must be a cell array of matfaust.factparams.ConstraintGeneric or matfaust.proj.proj_gen.')
 			end
 			if(~ iscell(res_constraints))
-				error('res_constraints (argument 2) must be a cell array')
+				error('res_constraints (argument 2) must be a cell array of matfaust.factparams.ConstraintGeneric or matfaust.proj.proj_gen.')
 			end
 			if(length(fact_constraints) ~= length(res_constraints))
 				error('lengths of fact_constraints and res_constraints must be equal.')

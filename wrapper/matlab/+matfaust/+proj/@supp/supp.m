@@ -1,9 +1,9 @@
 %==================================================
-%> @brief Functor that implements the SUPP projector.
+%> @brief Functor for the the SUPP projector.
 %>
 %> A, the image matrix, is such that nonzeros(A) == nonzeros(S)
 %==================================================
-classdef supp < matfaust.factparams.proj_gen
+classdef supp < matfaust.proj.proj_gen
 	properties
 	end
 	methods

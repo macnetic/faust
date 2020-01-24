@@ -428,6 +428,9 @@ def palm4msa(M, p, ret_lambda=False):
     >>> import numpy as np
     >>> M = np.random.rand(500, 32)
     >>> cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1.0, 32, 32)
+    >>> # or alternatively using pyfaust.proj
+    >>> # from pyfaust.proj import splin, normcol
+    >>> # cons = [ splin((500,32), 5), normcol((32,32), 1.0)]
     >>> stop_crit = StoppingCriterion(num_its=200)
     >>> param = ParamsPalm4MSA(cons, stop_crit)
     >>> F = palm4msa(M, param)
@@ -518,6 +521,9 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False):
         >>> M = np.random.rand(500, 32)
         >>> fact_cons = ConstraintList('splin', 5, 500, 32, 'sp', 96, 32, 32, 'sp', 96, 32, 32)
         >>> res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp', 333, 32, 32)
+        >>> # or alternatively using pyfaust.proj
+        >>> # from pyfaust.proj import *
+        >>> # res_cons = [normcol((32,32), 1), sp((32,32), 666), sp((32,32), 333)]
         >>> stop_crit1 = StoppingCriterion(num_its=200)
         >>> stop_crit2 = StoppingCriterion(num_its=200)
         >>> param = ParamsHierarchical(fact_cons, res_cons, stop_crit1, stop_crit2)

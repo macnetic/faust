@@ -15,6 +15,9 @@
 %>  import matfaust.fact.palm4msa
 %>  M = rand(500, 32);
 %>  cons = ConstraintList('splin', 5, 500, 32, 'normcol', 1, 32, 32);
+%>  % or alternatively, using the projectors
+%>  % import matfaust.proj.*
+%>  % cons = {splin([500,32], 5), normcol([32,32], 1)};
 %>  stop_crit = StoppingCriterion(200);
 %>  params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', false, 'init_lambda', 1.0);
 %>  F = palm4msa(M, params)

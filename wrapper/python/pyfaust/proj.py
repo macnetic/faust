@@ -12,7 +12,7 @@ else:
 
 class proj_gen(ABC):
     """
-    Parent abstract class of all projector functors.
+    The parent abstract class to represent projectors (as functors).
     """
     @abstractmethod
     def __init__(self):
@@ -23,7 +23,7 @@ class proj_gen(ABC):
 
 class toeplitz(proj_gen):
     """
-    Functor that implements the TOEPLITZ projector.
+    Functor for the TOEPLITZ projector.
     """
     def __init__(self, shape, normalized=True, pos=False):
         self.constraint = ConstraintMat('toeplitz', np.empty(shape), normalized, pos)
@@ -42,7 +42,7 @@ class toeplitz(proj_gen):
 
 class circ(proj_gen):
     """
-    Functor that implements the CIRC(ulant) projector.
+    Functor for the CIRC(ulant) projector.
     """
     def __init__(self, shape, normalized=True, pos=False):
         self.constraint = ConstraintMat('circ', np.empty(shape), normalized, pos)
@@ -67,7 +67,7 @@ class circ(proj_gen):
 
 class hankel(proj_gen):
     """
-    Functor that implements the HANKEL projector.
+    Functor for the HANKEL projector.
     """
     def __init__(self, shape, normalized=True, pos=False):
         self.constraint = ConstraintMat('hankel', np.empty(shape), normalized, pos)
@@ -75,7 +75,7 @@ class hankel(proj_gen):
 
 class sp(proj_gen):
     """
-    Functor that implements the SP projector. A, the projected matrix, is such that \f$ \| A \|_0 = k,  \| A\|_F = 1\f$.
+    Functor for the SP projector. A, the image matrix, is such that \f$ \| A \|_0 = k,  \| A\|_F = 1\f$.
     """
 
     def __init__(self, shape, k, normalized=True, pos=False):
@@ -91,7 +91,7 @@ class sp(proj_gen):
 
 class splin(proj_gen):
     """
-    Functor that implements the SPLIN projector. A, the projected matrix, is defined by \f$ \forall i \in \{0,...,shape[0]-1\} \| \f$ the i-th row \f$ A_{i,*}\f$ is such that \f$ \| A_{i,*}\|_0 = k,  \| A\|_F = 1\f$.
+    Functor for the SPLIN projector. A, the image matrix, is defined by \f$ \forall i \in \{0,...,shape[0]-1\} \| \f$ the i-th row \f$ A_{i,*}\f$ is such that \f$ \| A_{i,*}\|_0 = k,  \| A\|_F = 1\f$.
     """
     def __init__(self, shape, k, normalized=True, pos=False):
         """
@@ -105,7 +105,7 @@ class splin(proj_gen):
 
 class spcol(proj_gen):
     """
-    Functor that implements the SPCOL projector. A, the projected matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \| \f$ the j-th column \f$ \| A_{*,j}\f$ is such that \f$ A_{*,j}\|_0 = k,  \| A\|_F = 1\f$.
+    Functor for the SPCOL projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \f$ the j-th column \f$ A_{*,j}\f$ is such that \f$ \| A_{*,j}\|_0 = k,  \| A\|_F = 1\f$.
     """
     def __init__(self, shape, k, normalized=True, pos=False):
         """
@@ -120,7 +120,7 @@ class spcol(proj_gen):
 
 class splincol(proj_gen):
     """
-    Functor that implements the SPLINCOL projector.
+    Functor for the SPLINCOL projector.
 
     It's the union of SPLIN and SPCOL projectors.
     """
@@ -137,7 +137,7 @@ class splincol(proj_gen):
 
 class supp(proj_gen):
     """
-        Functor that implements the SUPP projector. A, the image matrix, is such that np.nonzero(A) == np.nonzero(S).
+        Functor for the SUPP projector. A, the image matrix, is such that np.nonzero(A) == np.nonzero(S).
     """
     def __init__(self, S, normalized=True, pos=False):
         """
@@ -151,7 +151,7 @@ class supp(proj_gen):
 
 class const(proj_gen):
     """
-        Functor that implements the CONST projector. A, the image matrix, is such that A == C.
+        Functor for the CONST projector. A, the image matrix, is such that A == C.
     """
     def __init__(self, C, normalized=False):
         """
@@ -166,7 +166,7 @@ class const(proj_gen):
 
 class normcol(proj_gen):
     """
-        Functor that implements the NORMCOL projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \| A_{*,j} \|_2 = s \| \f$.
+        Functor for the NORMCOL projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \f$ the j-th column \f$ A_{*,j} \f$ is such that \f$\| A_{*,j}\|_2 = s  \f$.
 
     """
     def __init__(self, shape, s, normalized=False, pos=False):
@@ -181,7 +181,7 @@ class normcol(proj_gen):
 
 class normlin(proj_gen):
     """
-        Functor that implements the NORMLIN projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[0]-1\} \| A_{i,*} \|_2 = s \| \f$.
+        Functor for the NORMLIN projector. A, the image matrix, is defined by \f$ \forall i \in \{0,...,shape[0]-1\}\f$ the i-th row \f$ A_{i,*} \f$ is such that \f$ \| A_{i,*} \|_2 = s \f$.
 
     """
 

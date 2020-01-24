@@ -1,7 +1,9 @@
 %==================================================
-%> Functor that implements the NORMLIN projector. A, the image matrix, is defined by \f$ \forall i \in \{1,\ldots,shape(1)\} \| A_{i, *} \|_2 = s \| \f$.
+%> @brief Functor for the NORMLIN projector.
+%>
+%> A, the image matrix, is defined by \f$ \forall i \in \{1,\ldots,shape(1)\} \f$ the i-th row \f$  A_{i,*} \f$ is such that \f$ \| A_{i, *} \|_2 = s \f$.
 %==================================================
-classdef normlin < matfaust.factparams.proj_gen
+classdef normlin < matfaust.proj.proj_gen
 	properties
 	end
 	methods

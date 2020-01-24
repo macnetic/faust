@@ -19,12 +19,15 @@
 %>
 %> @b Example 1: Fully Defined Parameters for a Random Matrix Factorization
 %> @code
-%>  import matfaust.*
 %>  import matfaust.factparams.*
 %>  import matfaust.fact.hierarchical
 %>  M = rand(500, 32);
 %>  fact_cons = ConstraintList('splin', 5, 500, 32, 'sp', 96, 32, 32, 'sp', 96, 32, 32);
 %>  res_cons = ConstraintList('normcol', 1, 32, 32, 'sp', 666, 32, 32, 'sp', 333, 32, 32);
+%> % or alternatively you can use projectors-functors
+%> % import matfaust.proj.*
+%> % fact_cons = {splin([500,32], 5), sp([32,32], 96), sp([32,32], 96)}
+%> % res_cons = {normcol([32,32], 1), sp([32,32], 666), sp([32,32], 333)}
 %>  stop_crit = StoppingCriterion(200);
 %>  stop_crit2 = StoppingCriterion(200);
 %>  params = ParamsHierarchical(fact_cons, res_cons, stop_crit, stop_crit2, 'is_update_way_R2L', false, 'init_lambda', 1.0);
