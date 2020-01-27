@@ -241,6 +241,36 @@ void Faust::prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP2 s, const bool normali
 }
 
 template<typename FPP>
+void Faust::prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int> & m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized /* default to false */, const bool pos)
+{
+//        if(M.shape != self.shape): raise ValueError('The dimension of the '
+//                                                   'projector and matrix must '
+//                                                   'agree.')
+//        M_ = np.zeros(M.shape)
+//        m_ = 0
+//        n_ = 0
+//        for i,(m,n) in enumerate(zip(self.m_vec, self.n_vec)):
+//            print("i=", i, "m=", m, "n=", n)
+//            M_[m_:m,n_:n] = M[m_:m,n_:n]
+//            m_ = m
+//            n_ = n
+//        return M_
+//
+	Faust::MatDense<FPP,Cpu> M_(M.getNbRow(), M.getNbCol());
+	M_.setZeros();
+	faust_unsigned_int m_ = 0, n_ = 0;
+	for(faust_unsigned_int i=0; i< m_vec.size();i++)
+	{
+		Faust::MatDense<FPP,Cpu> block_mat = M.get_block(m_, n_, m_vec[i]-m_, n_vec[i]-n_);
+		M_.set_block(m_, n_, block_mat);
+		m_ = m_vec[i];
+		n_ = n_vec[i];
+	}
+	M = M_;
+}
+
+
+template<typename FPP>
 void
 Faust::pre_prox_pos(MatDense<FPP,Cpu> & M)
 {

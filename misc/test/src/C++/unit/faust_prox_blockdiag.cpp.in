@@ -1,10 +1,12 @@
 /****************************************************************************/
 /*                              Description:                                */
+/* unitary test for testing multiplication by faust with real  scalar       */
+/*                                                                          */
 /*  For more information on the FAuST Project, please visit the website     */
 /*  of the project : <http://faust.inria.fr>                         */
 /*                                                                          */
 /*                              License:                                    */
-/*  Copyright (2019):    Hakim Hadj-Djilani, Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
 /*                      Luc Le Magoarou, Remi Gribonval                     */
 /*                      INRIA Rennes, FRANCE                                */
 /*                      http://www.inria.fr/                                */
@@ -25,7 +27,6 @@
 /*  If not, see <http://www.gnu.org/licenses/>.                             */
 /*                                                                          */
 /*                             Contacts:                                    */
-/*      Hakim H. hakim.hadj-djilani@inria.fr                                */
 /*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
 /*      Adrien Leman    : adrien.leman@inria.fr                             */
 /*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
@@ -38,58 +39,69 @@
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 /****************************************************************************/
-#ifndef FAUST_PROX_H
-#define FAUST_PROX_H
+#include "faust_MatSparse.h"
+#include "faust_HierarchicalFact.h"
+#include "faust_Timer.h"
+#include "faust_Transform.h"
+#include <string>
+#include <sstream>
+#include "faust_BlasHandle.h"
+#include "faust_SpBlasHandle.h"
 
-#include "faust_MatDense.h"
-#include "faust_constant.h"
-#include "faust_exception.h"
-#include "faust_Vect.h"
 
-/** \brief faust_prox.h contains the projection operator: <br>
-*   PALM relies on projections onto the constraint sets for each factor at each iteration, <br>
-*   so the projection operator should be simple and easy to compute.
+#include <iostream>
+#include <iomanip>
+
+/** \brief unitary test for testing multiplication by faust									
 */
-namespace Faust {
 
-	template<typename FPP>
-		bool partial_sort_comp (const std::pair<int, FPP>& pair1, const std::pair<int, FPP>& pair2);
-
-	template<typename FPP>
-		void sort_idx(const std::vector<FPP> &v, std::vector<int>& idx, int s);
-
-	template<typename FPP>
-		void prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
-	template<typename FPP>
-		void prox_sp_pos(Faust::MatDense<FPP, Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false );
-	template<typename FPP>
-		void prox_spcol(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
-	template<typename FPP>
-		void prox_splin(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
-	template<typename FPP>
-		void prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
-	template<typename FPP>
-		void prox_supp(Faust::MatDense<FPP,Cpu> & M, const Faust::MatDense<FPP,Cpu> & supp, const bool normalized=true, const bool pos=false);
-	template<typename FPP>
-		void prox_const(Faust::MatDense<FPP,Cpu> & M, const Faust::MatDense<FPP,Cpu> & supp, const bool normalized=true, const bool pos=false);
-
-	template<typename FPP, typename FPP2>
-		void prox_normcol(Faust::MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized=false, const bool pos=false);
-	template<typename FPP, typename FPP2>
-		void prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized=false, const bool pos=false);
-	//    template<typename FPP>
-	//    void prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
-	template<typename FPP>
-		void prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized = false, const bool pos = false);
-
-	template<typename FPP> void pre_prox_pos(MatDense<FPP,Cpu> & M);
-	template<typename FPP> void prox_hankel(Faust::MatDense<FPP, Cpu> & M);
-	template<typename FPP> void prox_toeplitz(Faust::MatDense<FPP, Cpu> & M);
-	template<typename FPP> void prox_circ(Faust::MatDense<FPP, Cpu> & M);
+typedef @TEST_FPP@ FPP;
 
 
+//using namespace Faust;
+using namespace std;
+
+int main(int argc, char* argv[])
+{
+	if (typeid(FPP) == typeid(double))
+  	{
+		cout<<"floating point precision == double"<<endl;
+  	}
+
+  	if (typeid(FPP) == typeid(float))
+  	{
+		cout<<"floating point precision == float"<<endl;
+  	}
+
+	int dim1 = 38;
+	int dim2 = 42;
+
+	Faust::MatDense<FPP,Cpu> * M = Faust::MatDense<FPP,Cpu>::randMat(dim1, dim2);
+
+	Faust::MatDense<FPP,Cpu> M_copy = *M;
+
+	std::vector<faust_unsigned_int> m_vec = {5u, 12u, 25u, 38u};
+	std::vector<faust_unsigned_int> n_vec = {9u, 18u, 32u, 42u};
+
+	Faust::prox_blockdiag(M_copy, m_vec, n_vec);
+	cout << "====================== M:" << endl;
+	for(faust_unsigned_int i = 0; i < M->getNbRow(); i++)
+	{
+		for(faust_unsigned_int j = 0; j < M->getNbCol(); j++)
+		{
+			printf("%3.2f ", (*M)(i,j));
+		}
+		printf("\n");
+	}
+	cout << "====================== M_:"<< endl;
+	for(faust_unsigned_int i = 0; i < M->getNbRow(); i++)
+	{
+		for(faust_unsigned_int j = 0; j < M->getNbCol(); j++)
+		{
+			printf("%3.2f ", M_copy(i,j));
+			assert(M_copy(i,j) == 0.0 || M_copy(i,j) == (*M)(i,j));
+		}
+		printf("\n");
+	}
+	return 0;
 }
-
-#include "faust_prox.hpp"
-
-#endif

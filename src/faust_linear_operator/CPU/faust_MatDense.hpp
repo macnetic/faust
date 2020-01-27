@@ -1137,6 +1137,23 @@ Faust::MatDense<FPP,Cpu>* Faust::MatDense<FPP,Cpu>::get_rows(faust_unsigned_int*
 }
 
 template<typename FPP>
+Faust::MatDense<FPP,Cpu> Faust::MatDense<FPP,Cpu>::get_block(faust_unsigned_int i, faust_unsigned_int j, faust_unsigned_int nrows, faust_unsigned_int ncols)
+{
+	Faust::MatDense<FPP,Cpu> block_mat(nrows, ncols);
+	block_mat.mat.block(0,0, nrows, ncols) = mat.block(i, j, nrows, ncols);
+	return block_mat;
+}
+
+template<typename FPP>
+void Faust::MatDense<FPP,Cpu>::set_block(faust_unsigned_int i, faust_unsigned_int j, Faust::MatDense<FPP,Cpu> & block_mat)
+{
+	faust_unsigned_int nrows, ncols;
+	nrows = block_mat.getNbRow();
+	ncols = block_mat.getNbCol();
+	mat.block(i, j, nrows, ncols) = block_mat.mat.block(0, 0, nrows, ncols);
+}
+
+template<typename FPP>
 FPP Faust::MatDense<FPP,Cpu>::min_coeff() const
 {
 	return mat.minCoeff();
