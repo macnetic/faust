@@ -1130,7 +1130,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::Ma
 		data[data_size-1] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
 	for(auto ptr: this->data)
 	{
-		cout << "fac i=" << i << ": " << ptr << endl;
+//		cout << "fac i=" << i << ": " << ptr << endl;
 		if(opThis == 'N')
 			data[i++] = ptr;
 		else
@@ -1208,31 +1208,36 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 						sM->multiply(*mats[thid],opThis);
 					else
 						dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[i])->multiply(*mats[thid], opThis);
-			data[thid] = mats[thid];
 			//				mats[thid]->Display();
 			//				cout << mats[thid]->norm() << endl;
 //			cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "data[thid]=" << data[thid] << endl;
 			if(tmp2 != nullptr) delete tmp2;
 		}
-		{ // mutex block
-			unique_lock<mutex> l1(barrier_mutex);
-			barrier_count--;
-//			string ite_str = i>=0?string(" (ite = ") + to_string(i) + ") ": ""; 
-			if(barrier_count > 0)
-			{
-				// the threads wait here for the last one to finish its iteration i
-//				std::cout << "thread " << thid /*<< ite_str */ << " is waiting on barrier (" << barrier_count << ")." << std::endl;
-				barrier_cv.wait(l1/*, [&barrier_count, &num_threads]{return barrier_count == num_threads;}*/);
-//				std::cout << "thread " << thid /*<< ite_str */<<" continues." << std::endl;
-			}
-			else {
-				// the last thread to finish the iteration i wakes the other to continue the execution
-//				std::cout << "thread " << thid /*<< ite_str */<< " reinits barrier." << std::endl;
-				barrier_count = start_nth;
-				barrier_cv.notify_all();
-			}
-		} 
-
+#define barrier() \
+		{ \
+			unique_lock<mutex> l1(barrier_mutex);  /* mutex block */ \
+			barrier_count--;\
+/*			string ite_str = i>=0?string(" (ite = ") + to_string(i) + ") ": "";*/ \
+			if(barrier_count > 0)\
+			{\
+				/*	 the threads wait here for the last one to finish its iteration i*/ \
+/*				std::cout << "thread " << thid << ite_str  << " is waiting on barrier (" << barrier_count << ")." << std::endl;*/ \
+				barrier_cv.wait(l1/*, [&barrier_count, &num_threads]{return barrier_count == num_threads;}*/);\
+/*				std::cout << "thread " << thid << ite_str <<" continues." << std::endl;*/\
+			}\
+			else {\
+				/* the last thread to finish the iteration i wakes the other to continue the execution */ \
+				/*				std::cout << "thread " << thid << ite_str << " reinits barrier." << std::endl;*/\
+				barrier_count = start_nth;\
+				barrier_cv.notify_all();\
+			}\
+		}
+		barrier();
+		if(thid < nth)
+		{
+			data[thid] = mats[thid];
+		}
+		barrier();
 		if(nth > 1)
 		{
 			num_per_th = 2;
