@@ -325,6 +325,8 @@ package_purepy_release_rasp:
               - build/wrapper/python/dist
     except:
         - schedules
+    only:
+        - tags
     tags:
         - arm
 
