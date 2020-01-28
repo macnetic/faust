@@ -56,6 +56,20 @@ bool PyxConstraintGeneric::is_mat_constraint()
 }
 
 template<typename FPP>
+void prox_blockdiag(FPP* mat_data,  unsigned long mat_nrows, unsigned long mat_ncols, unsigned long *m_ptr, unsigned long *n_ptr, unsigned int vec_size, const bool normalized, const bool pos, FPP* mat_out)
+{
+    Faust::MatDense<FPP,Cpu> mat(mat_data, mat_nrows, mat_ncols);
+    std::vector<unsigned long> m_vec, n_vec;
+    for(int i = 0; i < vec_size; i++)
+    {
+        m_vec.push_back(m_ptr[i]);
+        n_vec.push_back(n_ptr[i]);
+    }
+    Faust::prox_blockdiag(mat, m_vec, n_vec, normalized, pos);
+    memcpy(mat_out, mat.getData(), sizeof(FPP) * mat_ncols * mat_nrows);
+}
+
+template<typename FPP>
 void prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out, const bool normalized /* deft to false */, const bool pos /* = false*/)
 {
     Faust::MatDense<FPP, Cpu> fmat(mat_in, num_rows, num_cols);

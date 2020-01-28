@@ -115,6 +115,12 @@ cdef extern from "FaustCoreCpp.h" :
 
 # TODO: all the headers below should be in their own pxd file FaustFact.pxd
 cdef extern from "FaustFact.h":
+    cdef void prox_blockdiag[FPP](FPP* mat_data, unsigned long mat_nrows,
+                                  unsigned long mat_ncols, unsigned long
+                                  *m_ptr, unsigned long* n_ptr, unsigned long
+                                  size, const bool normalized, const bool pos,
+                                  FPP* mat_out);
+
     cdef cppclass PyxConstraintGeneric:
         int name
         unsigned long num_rows
@@ -134,6 +140,7 @@ cdef extern from "FaustFact.h":
 
     void prox_mat[FPP](unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned long num_rows,
                   unsigned long num_cols, FPP* mat_out, const bool normalized, const bool pos)
+
 
     cdef cppclass PyxConstraintScalar[FPP](PyxConstraintGeneric):
         FPP parameter

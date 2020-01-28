@@ -935,6 +935,50 @@ cdef class ConstraintMatCore:
 
         return M_out
 
+def prox_blockdiag(M, block_shapes, normalized, pos):
+    cdef double[:,:] M_view_dbl
+    cdef double[:,:] M_out_view_dbl
+    cdef complex[:,:] M_view_cplx
+    cdef complex[:,:] M_out_view_cplx
+    cdef unsigned long int* m_ptr
+    cdef unsigned long int* n_ptr
+
+    isReal = M.dtype in [ 'float', 'float128',
+                         'float16', 'float32',
+                         'float64', 'double']
+
+    M = np.asfortranarray(M)
+
+    M_out = np.empty(M.shape, dtype=M.dtype, order='F')
+
+    n_ptr = <unsigned long*>PyMem_Malloc(sizeof(unsigned long *)*len(block_shapes))
+    m_ptr = <unsigned long*>PyMem_Malloc(sizeof(unsigned long *)*len(block_shapes))
+
+    for i in range(len(block_shapes)):
+        m_ptr[i] = block_shapes[i][0]
+        n_ptr[i] = block_shapes[i][1]
+
+    check_matrix(isReal, M)
+    # check_matrix(isReal, parameter)
+    if(isReal):
+        M_view_dbl = M
+        M_out_view_dbl = M_out
+        FaustCoreCy.prox_blockdiag[double](&M_view_dbl[0,0], M.shape[0],
+                                           M.shape[1], &m_ptr[0], &n_ptr[0],
+                                          len(block_shapes),normalized, pos,
+                                           &M_out_view_dbl[0,0])
+    else:
+        M_view_cplx = M
+        M_out_view_cplx = M_out
+        FaustCoreCy.prox_blockdiag[complex](&M_view_cplx[0,0], M.shape[0],
+                                           M.shape[1], &m_ptr[0], &n_ptr[0],
+                                          len(block_shapes),normalized, pos,
+                                           &M_out_view_cplx[0,0])
+    PyMem_Free(m_ptr)
+    PyMem_Free(n_ptr)
+
+    return M_out
+
 cdef class ConstraintRealCore:
 
     # no need to create an object, because project() needs to create core object

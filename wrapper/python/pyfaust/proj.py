@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @PYFAUST_LICENSE_HEADER@
 ## @package pyfaust.proj @brief This module provides matrix projectors.
-
+import _FaustCorePy
 from pyfaust.factparams import *
 if sys.version_info > (3,0):
     from abc import ABC, abstractmethod
@@ -382,30 +382,33 @@ class normlin(proj_gen):
 class blockdiag: # (proj_gen):
 
 
-    def __init__(self, shape, m_vec, n_vec):
-        self.m_vec = m_vec
-        self.n_vec = n_vec
+    def __init__(self, shape, block_shapes):
+        self.m_vec = [ sh[0] for sh in block_shapes ]
+        self.n_vec = [ sh[1] for sh in block_shapes ]
         self.shape = shape
-        if(m_vec[-1] != shape[0]): raise ValueError("The last index of (row"
+        self.block_shapes = block_shapes
+        if(self.m_vec[-1] != shape[0]): raise ValueError("The last index of (row"
                                                     " offsets) m_vec"
                                                     " must be equal to"
                                                     " shape[0]")
-        if(n_vec[-1] != shape[1]): raise ValueError("The last index of (column"
+        if(self.n_vec[-1] != shape[1]): raise ValueError("The last index of (column"
                                                     " offsets) n_vec"
                                                     " must be equal to"
                                                     " shape[1]")
 
-    def __call__(self, M):
+    def __call__(self, M, normalized=False, pos=False):
         if(M.shape != self.shape): raise ValueError('The dimension of the '
                                                    'projector and matrix must '
                                                    'agree.')
-        M_ = np.zeros(M.shape)
-        m_ = 0
-        n_ = 0
-        for i,(m,n) in enumerate(zip(self.m_vec, self.n_vec)):
-            print("i=", i, "m=", m, "n=", n)
-            M_[m_:m,n_:n] = M[m_:m,n_:n]
-            m_ = m
-            n_ = n
-        return M_
+        return _FaustCorePy.prox_blockdiag(M, self.block_shapes, normalized,
+                                           pos)
+#        M_ = np.zeros(M.shape)
+#        m_ = 0
+#        n_ = 0
+#        for i,(m,n) in enumerate(zip(self.m_vec, self.n_vec)):
+#            print("i=", i, "m=", m, "n=", n)
+#            M_[m_:m,n_:n] = M[m_:m,n_:n]
+#            m_ = m
+#            n_ = n
+#        return M_
 
