@@ -11,12 +11,12 @@ else:
                  # but not using abstract class in py2.7
 
 ## @package pyfaust.factparams @brief The module for the parametrization of FAuST's algorithms (Palm4MSA and Hierarchical Factorization).
-## <b/> See also: FaustFactory.fact_hierarchical, FaustFactory.fact_palm4msa
+## <b/> See also: pyfaust.fact.hierarchical, pyfaust.fact.palm4msa
 
 """
     This module provides all the classes that represent the input parameters needed
-    by factorization algorithms FaustFactory.fact_palm4msa()
-    FaustFactory.fact_hierarchical()
+    by factorization algorithms pyfaust.fact.palm4msa()
+    pyfaust.fact.hierarchical()
 """
 
 class ConstraintGeneric(ABC):
@@ -29,7 +29,7 @@ class ConstraintGeneric(ABC):
     It's also possible to set a list of constraints with the ConstraintList class.
 
     <b/> See also: ConstraintInt, ConstraintReal, ConstraintMat,
-    FaustFactory.fact_palm4msa, FaustFactory.fact_hierarchical, ParamsPalm4MSA,
+    pyfaust.fact.palm4msa, pyfaust.fact.hierarchical, ParamsPalm4MSA,
     ParamsHierarchical.
 
     Attributes:
@@ -527,6 +527,7 @@ class ParamsFact(ABC):
 
         The class is the base parameters for Palm4MSA and Hierarchical
         factorization but as an abstract class it's not for direct use.
+        The documentation is hence left empty, please refer to the subclasses.
 
     <b/> See also  ParamsHierarchical, ParamsPalm4MSA
     """
@@ -571,7 +572,7 @@ class ParamsHierarchical(ParamsFact):
         same algorithm as child classes.
 
         <b/> See also ParamsHierarchicalSquareMat,
-        ParamsHierarchicalRectMat, FaustFactory.fact_hierarchical
+        ParamsHierarchicalRectMat, pyfaust.fact.hierarchical
     """
     def __init__(self, fact_constraints, res_constraints, stop_crit1,
                  stop_crit2, is_update_way_R2L=False, init_lambda=1.0,
@@ -579,6 +580,44 @@ class ParamsHierarchical(ParamsFact):
                  is_fact_side_left=False,
                  is_verbose=False,
                  grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
+        """
+        Constructor.
+
+        Args:
+            fact_constraints: a ConstraintList object or a list of
+            pyfaust.proj.proj_gen objects to define the constraints of the main
+            factor at each level of the factorization hierarchy (the first one for
+            the first factorization and so on).
+            res_constraints: a ConstraintList object or a list of
+            pyfaust.proj.proj_gen objects to define the constraints to apply to
+            the residual factor at each level of the factorization hierarchy
+            (the first one for the first factorization and so on).
+            stop_crit1: a pyfaust.factparams.StoppingCriterion instance
+            which defines the algorithm stopping criterion for the local
+            optimization of the 2 terms of the last factorization
+            (a main factor and a residual).
+            stop_crit2: a pyfaust.factparams.StoppingCriterion instance
+            which defines the algorithm stopping criterion for the global optimization.
+            is_update_way_R2L: if True pyfaust.fact.palm4msa (called for each
+            optimization stage) will update factors from the right to the left,
+            otherwise it's done in reverse order.
+            init_lambda: the scale scalar initial value for the global
+            optimization (by default the value is one). It applies only to
+            local optimization at each iteration (the global optimization
+            lambda is updated consequently).
+            step_size: the initial step of the PALM descent for both local and
+            global optimization stages.
+            constant_step_size: if True the step_size keeps constant along
+            the algorithm iterations otherwise it is updated before every
+            factor update.
+            is_fact_side_left: if True the leftmost factor is factorized,
+            otherwise it's the rightmost.
+            is_verbose: True to enable the verbose mode.
+            grad_calc_opt_mode: the mode used for computing the PALM gradient. It
+            can be one value among ParamsFact.EXTERNAL_OPT,
+            ParamsFact.INTERNAL_OPT or ParamsFact.DISABLED_OPT. This parameter
+            is experimental, its value shouln't be changed.
+        """
         import pyfaust.proj
         if((isinstance(fact_constraints, list) or isinstance(fact_constraints, tuple))
            and np.array([isinstance(fact_constraints[i],pyfaust.proj.proj_gen) for i in
@@ -652,7 +691,7 @@ class ParamsHierarchicalSquareMat(ParamsHierarchical):
     This type of parameters is typically used for Hadamard matrix
     factorization.
 
-    <b/> See also FaustFactory.fact_hierarchical, pyfaust.demo.hadamard
+    <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.hadamard
     """
     def __init__(self, n):
         d = 2**int(n)
@@ -679,14 +718,28 @@ class ParamsHierarchicalSquareMat(ParamsHierarchical):
 
 class ParamsHierarchicalRectMat(ParamsHierarchical):
     """
-    The simplified parameterization class for factorizing a rectangular matrix with the hierarchical factorization algorithm.
+    The simplified parameterization class for factorizing a rectangular matrix with the hierarchical factorization algorithm (pyfaust.fact.hierarchical).
 
-    <b/> See also FaustFactory.fact_hierarchical, pyfaust.demo.bsl
+    The parameters m and n are the dimensions of the input matrix.
+
+    <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.bsl
     """
 
     DEFAULT_P_CONST_FACT = 1.4
 
     def __init__(self, m, n, j, k, s, rho=0.8, P=None):
+        """
+        Args:
+            m: the number of rows of the input matrix.
+            n: the number of columns of the input matrix.
+            j: the total number of factors.
+            k: the integer sparsity (SP, pyfaust.proj.sp) applied to the
+            leftmost factor of shape (m, n).
+            s: the integer sparsity targeted for all the factors from the
+            second to the (N-1)-th. These factors are square of order n.
+            rho: defines the integer sparsity of the i-th residual (i=0:j-1): ceil(P*rho**i).
+            P: (default value is ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT) defines the integer sparsity of the i-th residual (i=0:j-1): ceil(P*rho**i).
+        """
         from math import ceil
         #test args
         for arg,aname in zip([m, n, j, k, s],["m","n","j","k","s"]):
@@ -749,7 +802,7 @@ class ParamsPalm4MSA(ParamsFact):
     """
         The class is to set input parameters for the Palm4MSA algorithm.
 
-        <b/> See also  FaustFactory.fact_palm4msa
+        <b/> See also pyfaust.fact.palm4msa
     """
 
     def __init__(self, constraints, stop_crit, init_facts=None,
@@ -757,6 +810,32 @@ class ParamsPalm4MSA(ParamsFact):
                  step_size=10.0**-16,
                  constant_step_size=False,
                  is_verbose=False, grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
+        """
+            Constructor.
+
+            Args:
+                constraints: a pyfaust.factparams.ConstraintList or
+                or a Python list of pyfaust.proj.proj_gen. The number of items
+                determines the number of matrix factors.
+                stop_crit: a pyfaust.factparams.StoppingCriterion instance
+                which defines the algorithm stopping criterion.
+                init_facts: if defined, pyfaust.fact.palm4msa will initialize the factors
+                with init_facts (by default, None, implies that the first
+                factor to be updated is initialized to zero and the others to
+                identity. Note that the so called first factor can be the
+                rightmost or the leftmost depending on the is_update_way_R2L argument).
+                is_update_way_R2L: if True pyfaust.fact.palm4msa will update factors from
+                the right to the left, otherwise it's done in reverse order.
+                init_lambda: the scale scalar initial value (by default the
+                value is one).
+                step_size: the initial step of the PALM descent.
+                constant_step_size: if True the step_size keeps constant along
+                the algorithm iterations otherwise it is updated before every
+                factor update.
+                is_verbose: True to enable the verbose mode.
+                grad_calc_opt_mode: the mode used for computing the PALM gradient.
+                It can be one value among ParamsFact.EXTERNAL_OPT, ParamsFact.INTERNAL_OPT or ParamsFact.DISABLED_OPT. This parameter is experimental, its value shouln't be changed.
+        """
         if(not isinstance(constraints, list) and not
            isinstance(constraints, ConstraintList)):
             raise TypeError('constraints argument must be a list or a'
@@ -850,7 +929,7 @@ class ParamsFactFactory:
         ParamsHierarchical instances.
 
         <b/> See also  ParamsHierarchicalRectMat,
-        ParamsHierarchicalSquareMat, FaustFactory.fact_hierarchical()
+        ParamsHierarchicalSquareMat, pyfaust.fact.hierarchical()
     """
     SIMPLIFIED_PARAM_NAMES = [
         [ "squaremat", "hadamard"],

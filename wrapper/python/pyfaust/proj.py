@@ -379,7 +379,7 @@ class normlin(proj_gen):
         """
         self.constraint = ConstraintReal('normlin', shape[0], shape[1], s, normalized, pos)
 
-class blockdiag: # (proj_gen):
+class blockdiag(proj_gen):
 
 
     def __init__(self, shape, block_shapes):

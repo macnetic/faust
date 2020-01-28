@@ -519,7 +519,7 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = *faust_MatDense_gpu.h *faust_MatSparse_gpu.h 
 
-EXCLUDE_SYMBOLS = mtimes_trans subsasgn get_factor_nonopt reshape ABC ParamsPalm4MSAFGFT UpdateCholesky UpdateCholeskyFull UpdateCholeskySparse greed_omp_chol hierarchical_constends palm4msa_constends ConstraintGeneric ConstraintMat ConstraintReal ConstraintName ConstraintInt
+EXCLUDE_SYMBOLS = mtimes_trans subsasgn get_factor_nonopt reshape ABC ParamsPalm4MSAFGFT UpdateCholesky UpdateCholeskyFull UpdateCholeskySparse greed_omp_chol hierarchical_constends palm4msa_constends ConstraintGeneric ConstraintMat ConstraintReal ConstraintName ConstraintInt is_mat_consistent init_facts stop_crit ParamsPalm4MSAFGFT data_num_cols data_num_rows is_fact_side_left stop_crits constant_step_size constraints DISABLED_OPT EXTERNAL_OPT grad_calc_opt_mode init_lambda INTERNAL_OPT is_update_way_R2L is_verbose num_facts step_size
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 

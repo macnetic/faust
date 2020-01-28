@@ -102,7 +102,6 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
             the svd but for the subsequent eigtj calls).
             relerr: see fact.eigtj
             nGivens_per_fac: see fact.eigtj
-            enable_large_Faust: see fact.eigtj
 
 
         Returns:
