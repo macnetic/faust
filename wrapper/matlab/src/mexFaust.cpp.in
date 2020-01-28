@@ -319,12 +319,57 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				case CONSTRAINT_NAME_HANKEL:
 					Faust::prox_hankel(mat);
 					break;
+					break;
 				default:
 					mexErrMsgTxt("Unknown constraint name/type.");
 			}
 			plhs[0] = FaustMat2mxArray(mat);
 			if(mat_param != nullptr)
 				delete mat_param;
+			return;
+		}
+
+		if(!strcmp("prox_blockdiag", cmd))
+		{
+			if(nlhs!=1)
+				mexErrMsgTxt("prox_blockdiag(): 1 output variable is expected.");
+			if(nrhs < 4)
+				mexErrMsgTxt("prox_blockdiag(): wrong number of arguments (must be 4)");
+
+			SCALAR* mat_data = NULL;
+			const mxArray* mxMat_in = prhs[1];
+			const mxArray* mx_m_ptr = prhs[2], *mx_n_ptr = prhs[3];
+			double * m_ptr = NULL, *n_ptr = NULL;
+			size_t nblocks;
+
+			const size_t nrows_mat = mxGetM(mxMat_in);
+			const size_t ncols_mat = mxGetN(mxMat_in);
+			mxArray2Ptr(mxMat_in, mat_data);
+			Faust::MatDense<SCALAR, Cpu> mat(mat_data, nrows_mat, ncols_mat);
+
+			mxArray2Ptr<double>(mx_n_ptr, n_ptr);
+			mxArray2Ptr<double>(mx_m_ptr, m_ptr);
+
+			std::vector<faust_unsigned_int> m_vec;
+			std::vector<faust_unsigned_int> n_vec;
+			bool normalized = (bool) mxGetScalar(prhs[2]);
+			bool pos = (bool) mxGetScalar(prhs[3]);
+
+			nblocks = mxGetM(mx_m_ptr);
+			if(nblocks == 1 && mxGetN(mx_n_ptr) > 1)
+				nblocks = mxGetN(mx_n_ptr);
+			if(mxGetM(mx_m_ptr) != nblocks && mxGetN(mx_n_ptr) != nblocks)
+				mexErrMsgTxt("the number of row and col offsets must agree.");
+
+			for(int i = 0; i < nblocks; i++)
+			{
+				m_vec.push_back((faust_unsigned_int)(m_ptr[i]));
+				n_vec.push_back((faust_unsigned_int)(n_ptr[i]));
+			}
+			// Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int> & m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized /* default to false */, const bool pos
+			//
+			Faust::prox_blockdiag(mat, m_vec, n_vec, normalized, pos);
+			plhs[0] = FaustMat2mxArray(mat);
 			return;
 		}
 
