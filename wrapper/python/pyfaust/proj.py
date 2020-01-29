@@ -29,7 +29,7 @@ class toeplitz(proj_gen):
     >>> from pyfaust.proj import toeplitz
     >>> from numpy.random import rand
     >>> M = rand(5,5)
-    >>> p = toeplitz(M.shape)
+    >>> p = toeplitz(M.shape, normalized=False)
     >>> p(M)
     array([[ 0.38925701,  0.89077942,  0.43467682,  0.68566158,  0.29709396],
            [ 0.62199717,  0.38925701,  0.89077942,  0.43467682, 0.68566158],
@@ -50,7 +50,7 @@ class circ(proj_gen):
         >>> from pyfaust.proj import circ
         >>> from numpy.random import rand
         >>> M = rand(5,5)
-        >>> circ(M.shape)
+        >>> circ(M.shape, normalized=False)
         >>> p = circ(M.shape)
         >>> p(M)
         array([[ 0.58798272,  0.65139062,  0.56169998,  0.4051127 , 0.47563316],
@@ -71,7 +71,7 @@ class hankel(proj_gen):
         >>> from pyfaust.proj import hankel
         >>> from numpy.random import rand
         >>> M = rand(5,5)
-        >>> p = hankel(M.shape)
+        >>> p = hankel(M.shape, normalized=False)
         >>> p(M)
         array([[ 0.00854525,  0.41578004,  0.54722872,  0.31191184, 0.74059554],
                [ 0.41578004,  0.54722872,  0.31191184,  0.74059554, 0.46299776],
@@ -380,28 +380,74 @@ class normlin(proj_gen):
         self.constraint = ConstraintReal('normlin', shape[0], shape[1], s, normalized, pos)
 
 class blockdiag(proj_gen):
+    """
+	Functor for the BLOCKDIAG projector. It sets all values to zero except for the diagonal blocks of the support defined by block_shapes. The i-th diagonal block starts at the row and column indices (block_shapes[i-1][0], block_shapes[i-1][1]) or (0,0) if i == 0 and ends at the row and columns indices (block_shapes[i][0]-1, block_shapes[i][1]-1) or (shape[0], shape[1]) if i == len(block_shapes)-1. 
+
+        Example:
+>>> from pyfaust.proj import blockdiag
+>>> from numpy.random import rand
+>>> M = rand(15,15)
+>>> p = blockdiag(M.shape, [(1,1), (3,3), (6,6), (10,10), (15,15)])
+>>> M_ = p(M)
+>>> for i in range(M.shape[0]):
+	...   for j in range(M.shape[1]):
+	...     print(("%2.1f" % (M_[i,j])), " ", end='')
+	...   print()
+	...
+	0.3  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+	0.0  0.2  0.4  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+	0.0  0.1  0.9  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+	0.0  0.0  0.0  0.7  0.9  0.9  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+	0.0  0.0  0.0  0.8  0.6  0.9  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+	0.0  0.0  0.0  1.0  0.9  0.4  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+	0.0  0.0  0.0  0.0  0.0  0.0  0.9  0.2  0.3  0.9  0.0  0.0  0.0  0.0  0.0
+	0.0  0.0  0.0  0.0  0.0  0.0  0.2  0.4  1.0  0.3  0.0  0.0  0.0  0.0  0.0
+	0.0  0.0  0.0  0.0  0.0  0.0  0.1  0.4  0.9  0.4  0.0  0.0  0.0  0.0  0.0
+	0.0  0.0  0.0  0.0  0.0  0.0  0.5  0.1  0.7  0.8  0.0  0.0  0.0  0.0  0.0
+	0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.9  0.4  0.1  0.3  0.8
+	0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.5  0.6  0.1  0.8  0.6
+	0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.6  0.9  0.1  0.1  0.9
+	0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.9  0.5  0.2  0.1  0.1
+	0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.4  0.1  0.8  0.0  0.4
 
 
-    def __init__(self, shape, block_shapes):
-        self.m_vec = [ sh[0] for sh in block_shapes ]
-        self.n_vec = [ sh[1] for sh in block_shapes ]
-        self.shape = shape
-        self.block_shapes = block_shapes
-        if(self.m_vec[-1] != shape[0]): raise ValueError("The last index of (row"
-                                                    " offsets) m_vec"
+    """
+
+    def __init__(self, shape, block_shapes, normalized=False, pos=False):
+        """
+        Constructor.
+
+        Args:
+            shape: the size of the input matrix.
+            block_shapes: the list of tuples defining the lower right corner of
+            successive diagonal blocks (see class description and example).
+            normalized: True to normalize the projection image matrix.
+            pos: True to ignore negative values (replaced by 0).
+        """
+        self._m_vec = [ sh[0] for sh in block_shapes ]
+        self._n_vec = [ sh[1] for sh in block_shapes ]
+        self._shape = shape
+        self._block_shapes = block_shapes
+        self.normalized = normalized
+        self.pos = pos
+        if(self._m_vec[-1] != shape[0]): raise ValueError("The last index of (row"
+                                                    " offsets) _m_vec"
                                                     " must be equal to"
                                                     " shape[0]")
-        if(self.n_vec[-1] != shape[1]): raise ValueError("The last index of (column"
-                                                    " offsets) n_vec"
+        if(self._n_vec[-1] != shape[1]): raise ValueError("The last index of (column"
+                                                    " offsets) _n_vec"
                                                     " must be equal to"
                                                     " shape[1]")
 
-    def __call__(self, M, normalized=False, pos=False):
-        if(M.shape != self.shape): raise ValueError('The dimension of the '
+    def __call__(self, M):
+        """
+        Implements the functor.
+        """
+        if(M.shape != self._shape): raise ValueError('The dimension of the '
                                                    'projector and matrix must '
                                                    'agree.')
-        return _FaustCorePy.prox_blockdiag(M, self.block_shapes, normalized,
-                                           pos)
+        return _FaustCorePy.prox_blockdiag(M, self._block_shapes, self.normalized,
+                                           self.pos)
 #        M_ = np.zeros(M.shape)
 #        m_ = 0
 #        n_ = 0

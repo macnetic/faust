@@ -86,17 +86,17 @@ void prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned lon
 			Faust::prox_supp(fmat, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
 			break;
         case CONSTRAINT_NAME_TOEPLITZ:
-            Faust::prox_toeplitz(fmat); //, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+            Faust::prox_toeplitz(fmat, normalized, pos); //, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
             memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
             return;
             break;
         case CONSTRAINT_NAME_CIRC:
-            Faust::prox_circ(fmat);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+            Faust::prox_circ(fmat, normalized, pos);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
             memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
             return;
             break;
         case CONSTRAINT_NAME_HANKEL:
-            Faust::prox_hankel(fmat);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+            Faust::prox_hankel(fmat, normalized, pos);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
             memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
             return;
             break;

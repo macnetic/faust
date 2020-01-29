@@ -256,6 +256,7 @@ void Faust::prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsig
 //            n_ = n
 //        return M_
 //
+	if(pos) pre_prox_pos(M);
 	Faust::MatDense<FPP,Cpu> M_(M.getNbRow(), M.getNbCol());
 	M_.setZeros();
 	faust_unsigned_int m_ = 0, n_ = 0;
@@ -267,6 +268,7 @@ void Faust::prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsig
 		n_ = n_vec[i];
 	}
 	M = M_;
+	if(normalized) M.normalize();
 }
 
 
@@ -369,7 +371,7 @@ void Faust::prox_const(Faust::MatDense<FPP,Cpu> & M,const Faust::MatDense<FPP,Cp
 //
 //}
 
-template<typename FPP> void Faust::prox_hankel(Faust::MatDense<FPP, Cpu> & M)
+template<typename FPP> void Faust::prox_hankel(Faust::MatDense<FPP, Cpu> & M, const bool normalized /* default to true*/, const bool pos/* default to false */)
 {
 //	FPP m, m_;
 //	int dl;
@@ -387,6 +389,7 @@ template<typename FPP> void Faust::prox_hankel(Faust::MatDense<FPP, Cpu> & M)
 //	}
 //	M = P;
 	FPP m;
+	if(pos) Faust::pre_prox_pos(M);
 	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
 	for(int i=1;i<M.getNbCol();i++)
 	{
@@ -405,11 +408,13 @@ template<typename FPP> void Faust::prox_hankel(Faust::MatDense<FPP, Cpu> & M)
 		}
 	}
 	M = P;
+	if(normalized) M.normalize();
 }
 
-template<typename FPP> void Faust::prox_toeplitz(Faust::MatDense<FPP, Cpu> & M)
+template<typename FPP> void Faust::prox_toeplitz(Faust::MatDense<FPP, Cpu> & M, const bool normalized /* default to true*/, const bool pos/* default to false */)
 {
 	FPP m;
+	if(pos) Faust::pre_prox_pos(M);
 	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
 	for(int i=0;i<M.getNbCol();i++)
 	{
@@ -428,14 +433,16 @@ template<typename FPP> void Faust::prox_toeplitz(Faust::MatDense<FPP, Cpu> & M)
 		}
 	}
 	M = P;
+	if(normalized) M.normalize();
 }
 
-template<typename FPP> void Faust::prox_circ(Faust::MatDense<FPP, Cpu> & M)
+template<typename FPP> void Faust::prox_circ(Faust::MatDense<FPP, Cpu> & M, const bool normalized /* default to true*/, const bool pos/* default to false */)
 {
 	if(M.getNbRow() != M.getNbCol()) throw out_of_range("circulant projector applies only on square matrices");
 	FPP mi, mj, m;
 	int dli, dlj, j;
 	vector<int> I, J;
+	if(pos) Faust::pre_prox_pos(M);
 	Faust::MatDense<FPP,Cpu> P(M.getNbRow(), M.getNbCol());
 	for(int i=0;i<M.getNbRow();i++)
 	{
@@ -473,5 +480,6 @@ template<typename FPP> void Faust::prox_circ(Faust::MatDense<FPP, Cpu> & M)
 		}
 	}
 	M = P;
+	if(normalized) M.normalize();
 }
 #endif

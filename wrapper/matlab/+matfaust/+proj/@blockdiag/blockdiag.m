@@ -21,6 +21,27 @@
 			proj.n_vec = n_vec;
 			proj.normalized = false;
 			proj.pos = false;
+			if(argc > 0)
+				for i=1:argc
+					switch(varargin{i})
+						case 'normalized'
+							if(argc == i || ~ islogical(varargin{i+1}))
+								error('normalized keyword arg. is not followed by a boolean')
+							end
+							proj.normalized = varargin{i+1};
+						case 'pos'
+							if(argc == i || ~ islogical(varargin{i+1}))
+								error('pos keyword arg. is not followed by a boolean')
+							end
+							proj.pos = varargin{i+1};
+						otherwise
+							if(isstr(varargin{i}))
+								error([ varargin{i} ' unrecognized argument'])
+							end
+					end
+				end
+			end
+
 		end
 
 		function pM = subsref(self, S)
