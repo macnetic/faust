@@ -63,7 +63,7 @@ struct ConstraintType
 	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeSplin;
 	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeSplincol;
 	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeSpPos;
-	typedef const  Faust::ConstraintInt<FPP,DEVICE>   ConstraintTypeBlkdiag;
+	typedef const  Faust::ConstraintMat<FPP,DEVICE>   ConstraintTypeBlkdiag;
 
 };
 

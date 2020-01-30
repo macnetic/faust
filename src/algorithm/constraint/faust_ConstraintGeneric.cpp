@@ -154,6 +154,12 @@ const char* Faust::ConstraintGeneric::get_constraint_name()const
          return "CONSTRAINT_NAME_SUPP";
       case CONSTRAINT_NAME_NORMLIN:
          return "CONSTRAINT_NAME_NORMLIN";
+	  case CONSTRAINT_NAME_CIRC:
+		 return "CONSTRAINT_NAME_CIRC";
+	  case CONSTRAINT_NAME_HANKEL:
+		 return "CONSTRAINT_NAME_HANKEL";
+	  case CONSTRAINT_NAME_TOEPLITZ:
+		 return "CONSTRAINT_NAME_TOEPLITZ";
       default:
          return "unknown constraint name";
    }

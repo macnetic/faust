@@ -438,6 +438,10 @@ class blockdiag(proj_gen):
                                                     " offsets) _n_vec"
                                                     " must be equal to"
                                                     " shape[1]")
+        cons_value = np.asfortranarray(np.array(block_shapes, dtype=float))
+        self.constraint = ConstraintMat('blockdiag', cons_value,
+                                        normalized, pos,
+                                        cons_value.size)
 
     def __call__(self, M):
         """

@@ -897,7 +897,7 @@ cdef class ConstraintIntCore:
 cdef class ConstraintMatCore:
 
     @staticmethod
-    def project(M, name, num_rows, num_cols, parameter, normalized=False,
+    def project(M, name, num_rows, num_cols, parameter, parameter_sz, normalized=False,
                 pos=False):
         cdef double[:,:] M_view_dbl
         cdef double[:,:] M_out_view_dbl
@@ -916,19 +916,22 @@ cdef class ConstraintMatCore:
 
 
         check_matrix(isReal, M)
+        parameter = parameter.astype(M.dtype)
         check_matrix(isReal, parameter)
         if(isReal):
             M_view_dbl = M
             M_out_view_dbl = M_out
             param_view_dbl = parameter
-            FaustCoreCy.prox_mat[double](name, &param_view_dbl[0,0], &M_view_dbl[0,0], num_rows,
+            FaustCoreCy.prox_mat[double](name, &param_view_dbl[0,0],
+                                         parameter_sz, &M_view_dbl[0,0], num_rows,
                                          num_cols,&M_out_view_dbl[0,0],
                                          normalized, pos)
         else:
             M_view_cplx = M
             M_out_view_cplx = M_out
             param_view_cplx = parameter
-            FaustCoreCy.prox_mat[complex](name, &param_view_cplx[0,0], &M_view_cplx[0,0],
+            FaustCoreCy.prox_mat[complex](name, &param_view_cplx[0,0],
+                                          parameter_sz, &M_view_cplx[0,0],
                                           num_rows, num_cols,
                                           &M_out_view_cplx[0,0], normalized,
                                           pos)

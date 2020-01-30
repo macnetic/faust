@@ -177,7 +177,7 @@ class ConstraintMat(ConstraintGeneric):
         This class represents a matrix-based constraint to apply on a matrix.
 
     """
-    def __init__(self, name, cons_value, normalized=None, pos=False):
+    def __init__(self, name, cons_value, normalized=None, pos=False, cons_value_sz=None):
         """
         Constructs a matrix type constraint.
 
@@ -223,8 +223,11 @@ class ConstraintMat(ConstraintGeneric):
                             'argument.')
         self.cons_value = np.asfortranarray(self._cons_value)
         self._cons_value = self.cons_value
+        if(cons_value_sz == None):
+            self._cons_value_sz = self._num_cols*self._num_rows
+        self._cons_value_sz = cons_value_sz
         if(normalized == None):
-            if(self.name.name == ContraintName.CONST):
+            if(self._name.name == ConstraintName.CONST):
                 # for const proj the default is to not normalize
                 self.normalized = False
             else: # self._name.name is 'supp'
@@ -233,6 +236,9 @@ class ConstraintMat(ConstraintGeneric):
             raise TypeError('ConstraintMat first argument must be a '
                             'ConstraintName with a matrix type name '
                             '(name.is_mat_constraint() must return True)')
+        if(self._name.name == ConstraintName.BLKDIAG):
+            self._num_rows = cons_value[-1][0]
+            self._num_cols = cons_value[-1][1]
 
     def project(self, M):
         """
@@ -242,7 +248,25 @@ class ConstraintMat(ConstraintGeneric):
         return _FaustCorePy.ConstraintMatCore.project(M, self._name.name, self._num_rows,
                                                       self._num_cols,
                                                       self._cons_value,
+                                                      self._cons_value_sz,
                                                       self.normalized, self.pos)
+
+#class ConstraintMatBlockdiag(ConstraintGeneric):
+#
+#
+#    def __init__(self, name, cons_value, normalized=None, pos=False):
+#        super(ConstraintMatBlockdiag, self).__init__(name, cons_value._shape[0],
+#                                            cons_value._shape[1],
+#                                            cons_value, normalized, pos)
+#        from pyfaust.proj import blockdiag
+#        if(not isinstance(cons_value, blockdiag)):
+#            raise TypeError("cons_value must be a blockdiag")
+#        self.normalized = normalized
+#        self.pos = pos
+#
+#    def project(self, M):
+#        ConstraintGeneric.project(self, M)
+#        return self.cons_value(M)
 
 
 class ConstraintReal(ConstraintGeneric):
@@ -358,7 +382,7 @@ class ConstraintName:
     SPLINCOL = 4 # Int Constraint
     CONST = 5 # Mat Constraint
     SP_POS = 6 # Int Constraint
-    #BLKDIAG = 7 # ?? Constraint #TODO
+    BLKDIAG = 7 # ?? Constraint #TODO
     SUPP = 8 # Mat Constraint
     NORMLIN = 9 # Real Constraint
     TOEPLITZ = 10 # Mat Constraint
@@ -405,7 +429,7 @@ class ConstraintName:
         """
         return self.name in [ConstraintName.SUPP, ConstraintName.CONST,
                              ConstraintName.CIRC, ConstraintName.TOEPLITZ,
-                             ConstraintName.HANKEL]
+                             ConstraintName.HANKEL, ConstraintName.BLKDIAG]
 
     @staticmethod
     def str2name_int(_str):
@@ -441,6 +465,8 @@ class ConstraintName:
             id = ConstraintName.TOEPLITZ
         elif(_str == 'hankel'):
             id = ConstraintName.HANKEL
+        elif(_str == 'blockdiag'):
+            id = ConstraintName.BLKDIAG
         else:
             raise ValueError(err_msg)
         return id

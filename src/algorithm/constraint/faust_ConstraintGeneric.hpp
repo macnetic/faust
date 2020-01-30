@@ -160,6 +160,10 @@ const char*  Faust::ConstraintGeneric::get_type() const
          else{
 			handleError(m_className,"get_type : unknown type parameter");
 		   }
+	  case CONSTRAINT_NAME_TOEPLITZ:
+	  case CONSTRAINT_NAME_CIRC:
+	  case CONSTRAINT_NAME_HANKEL:
+		 return "FAUST_MAT";
       default:
 			handleError(m_className,"get_type : unknown constraint type ");
    }
@@ -201,6 +205,10 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_int()const
 		case CONSTRAINT_NAME_NORMLIN:
 			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormlin)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
+		case CONSTRAINT_NAME_TOEPLITZ:
+		case CONSTRAINT_NAME_HANKEL:
+		case CONSTRAINT_NAME_CIRC:
+			return false;
 		default:
 			handleError(m_className,"is_constraint_parameter_int : Unknown type of constraint");
 		break;
@@ -243,6 +251,10 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_real()const
 		case CONSTRAINT_NAME_NORMLIN:
 			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormlin)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
+		case CONSTRAINT_NAME_TOEPLITZ:
+		case CONSTRAINT_NAME_HANKEL:
+		case CONSTRAINT_NAME_CIRC:
+			return false;
 		default:
 			handleError(m_className,"is_constraint_parameter_real : Unknown type of constraint");
 		break;
@@ -285,6 +297,10 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_mat()const
 		case CONSTRAINT_NAME_NORMLIN:
 			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeNormlin)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
+		case CONSTRAINT_NAME_TOEPLITZ:
+		case CONSTRAINT_NAME_HANKEL:
+		case CONSTRAINT_NAME_CIRC:
+			return true;
 		default:
 			handleError(m_className,"is_constraint_parameter_mat : Unknown type of constraint");
 		break;

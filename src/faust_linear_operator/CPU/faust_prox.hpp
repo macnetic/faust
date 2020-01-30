@@ -44,7 +44,7 @@
 #include <vector>
 #include <iostream>
 #include <type_traits>
-
+#include <complex>
 
 // const char * interface_prox_name="prox : ";
 
@@ -271,6 +271,25 @@ void Faust::prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsig
 	if(normalized) M.normalize();
 }
 
+template<typename FPP>
+void Faust::prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, Faust::MatDense<FPP,Cpu> mn_vec, const bool normalized /* default to false */, const bool pos)
+{
+	std::vector<faust_unsigned_int> m_vec;
+	std::vector<faust_unsigned_int> n_vec;
+	faust_unsigned_int m, n;
+
+	for(int i=0;i < mn_vec.getNbRow(); i++)
+	{
+		for(int j=0;j < mn_vec.getNbCol(); j++)
+		{
+			m = static_cast<faust_unsigned_int>(std::real(std::complex<Real<FPP>>(mn_vec(i,j))));
+			n = static_cast<faust_unsigned_int>(std::real(std::complex<Real<FPP>>(mn_vec(i,j))));
+			m_vec.push_back(m);
+			n_vec.push_back(m);
+		}
+	}
+	Faust::prox_blockdiag(M, m_vec, n_vec, normalized, pos);
+}
 
 template<typename FPP>
 void

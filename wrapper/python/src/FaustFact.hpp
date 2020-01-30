@@ -49,6 +49,9 @@ bool PyxConstraintGeneric::is_mat_constraint()
         case CONSTRAINT_NAME_CONST:
         case CONSTRAINT_NAME_SUPP:
         case CONSTRAINT_NAME_BLKDIAG:
+        case CONSTRAINT_NAME_TOEPLITZ:
+        case CONSTRAINT_NAME_CIRC:
+        case CONSTRAINT_NAME_HANKEL:
             return true;
         default:
             return false;
@@ -70,7 +73,7 @@ void prox_blockdiag(FPP* mat_data,  unsigned long mat_nrows, unsigned long mat_n
 }
 
 template<typename FPP>
-void prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out, const bool normalized /* deft to false */, const bool pos /* = false*/)
+void prox_mat(unsigned int cons_type, FPP* cons_param, unsigned long cons_param_sz, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out, const bool normalized /* deft to false */, const bool pos /* = false*/)
 {
     Faust::MatDense<FPP, Cpu> fmat(mat_in, num_rows, num_cols);
     switch(static_cast<faust_constraint_name>(cons_type))
@@ -80,7 +83,7 @@ void prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned lon
             Faust::prox_const(fmat, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
 			break;
 		case CONSTRAINT_NAME_BLKDIAG:
-			//not impl. yet in cpp core
+            Faust::prox_blockdiag(fmat, Faust::MatDense<FPP,Cpu>(cons_param, cons_param_sz/2, 2), normalized, pos);
 			break;
 		case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
 			Faust::prox_supp(fmat, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
