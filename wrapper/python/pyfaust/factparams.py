@@ -237,8 +237,8 @@ class ConstraintMat(ConstraintGeneric):
                             'ConstraintName with a matrix type name '
                             '(name.is_mat_constraint() must return True)')
         if(self._name.name == ConstraintName.BLKDIAG):
-            self._num_rows = cons_value[-1][0]
-            self._num_cols = cons_value[-1][1]
+            self._num_rows = int(cons_value[-1][0])
+            self._num_cols = int(cons_value[-1][1])
 
     def project(self, M):
         """
@@ -508,7 +508,13 @@ class ConstraintList(object):
               elif(cname.is_real_constraint()):
                 cons = ConstraintReal(cname, nrows, ncols, cval)
               elif(cname.is_mat_constraint()):
-                cons = ConstraintMat(cname, cval)
+                  if(cname.name == ConstraintName.BLKDIAG):
+                      arr = np.asfortranarray(cval).astype(float)
+                      cons = ConstraintMat(cname,
+                                           arr,
+                                           cons_value_sz=arr.size)
+                  else:
+                      cons = ConstraintMat(cname, cval)
               else:
                 raise Exception(cname +" is not a valid name for a "
                                 "ConstraintGeneric object")

@@ -146,7 +146,8 @@ cdef extern from "FaustFact.h":
         FPP parameter
 
     cdef cppclass PyxConstraintMat[FPP](PyxConstraintGeneric):
-        FPP* parameter # shape = num_rows, num_cols
+        FPP* parameter # shape = num_rows, num_cols (except if BLOCKDIAG constraint)
+        unsigned long parameter_sz
 
     cdef cppclass PyxStoppingCriterion[FPP]:
         bool is_criterion_error

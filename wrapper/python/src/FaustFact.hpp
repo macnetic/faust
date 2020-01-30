@@ -205,7 +205,12 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
             cons_mat = static_cast<PyxConstraintMat<FPP>*>(p->constraints[i]);
             if(p->is_verbose)
                 cout << "constraint[" << i << "]->parameter: " << cons_mat->parameter[0] << endl;
-            tmp_cons = new Faust::ConstraintMat<FPP,Cpu>(static_cast<faust_constraint_name>(p->constraints[i]->name), Faust::MatDense<FPP, Cpu>(cons_mat->parameter, p->constraints[i]->num_rows, p->constraints[i]->num_cols), p->constraints[i]->num_rows, p->constraints[i]->num_cols);
+            Faust::MatDense<FPP, Cpu> P;
+            if(p->constraints[i]->num_rows * p->constraints[i]->num_cols == cons_mat->parameter_sz)
+                P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
+            else
+                P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, cons_mat->parameter_sz/2, 2);
+            tmp_cons = new Faust::ConstraintMat<FPP,Cpu>(static_cast<faust_constraint_name>(p->constraints[i]->name), P, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
             cons.push_back(tmp_cons);
         }
         else

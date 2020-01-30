@@ -157,6 +157,7 @@ void Faust::ConstraintMat<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
 		 break;
 	  case CONSTRAINT_NAME_CIRC:
 		 Faust::prox_circ(mat);
+		 break;
 	  case CONSTRAINT_NAME_HANKEL:
 		 Faust::prox_hankel(mat);
 		 break;

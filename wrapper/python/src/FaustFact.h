@@ -33,6 +33,7 @@ class PyxConstraintMat : public PyxConstraintGeneric
 {
     public:
         FPP* parameter;
+        unsigned long int parameter_sz;
 };
 
 template<typename FPP>
