@@ -20,14 +20,14 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 			if(iscell(fact_constraints))
 				for i=1:length(fact_constraints)
 					if(isa(fact_constraints{i}, 'matfaust.proj.proj_gen'))
-						fact_constraints{i} = fact_constraints{i}.constraint
+						fact_constraints{i} = fact_constraints{i}.constraint;
 					end
 				end
 			end
 			if(iscell(res_constraints))
 				for i=1:length(res_constraints)
 					if(isa(res_constraints{i}, 'matfaust.proj.proj_gen'))
-						res_constraints{i} = res_constraints{i}.constraint
+						res_constraints{i} = res_constraints{i}.constraint;
 					end
 				end
 			end

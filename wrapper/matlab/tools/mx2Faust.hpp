@@ -496,7 +496,7 @@ void setVectorFaustMat(std::vector<Faust::MatDense<FPP,Cpu> > &vecMat,mxArray *C
 template<typename FPP, typename FPP2>
 void getConstraint(std::vector<const Faust::ConstraintGeneric*> & consS,mxArray* mxCons)
 {
-	mwSize bufCharLen,nbRowCons,nbColCons,nb_params;
+	mwSize bufCharLen,nbRowCons,nbColCons,nb_params, param_sz;
 	int status;
 	char * consName;
 	double paramCons;
@@ -504,8 +504,8 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric*> & consS,mxArray*
 	if (!mxIsCell(mxCons))
 		mexErrMsgTxt("tools_mex.h : getConstraint : constraint must be a cell-array. ");
 	nb_params = mxGetNumberOfElements(mxCons);
-	if (nb_params != 4)
-		mexErrMsgTxt("tools_mex.h : getConstraint : size of constraint must be equal to 4. ");
+	if (nb_params < 4 || nb_params > 5)
+		mexErrMsgTxt("mx2Faust.hpp: getConstraint : size of constraint must be 4 or 5. ");
 
 //	mexPrintf("getConstraint() nb_params=%d\n", nb_params);
 	mxConsParams=mxGetCell(mxCons,0);
@@ -528,7 +528,8 @@ void getConstraint(std::vector<const Faust::ConstraintGeneric*> & consS,mxArray*
 
 	int const_type = get_type_constraint(consName);
 	faust_constraint_name consNameType=get_equivalent_constraint(consName);
-
+	if(const_type != 2 && nb_params != 4)
+		mexErrMsgTxt("mx2Faust.hpp: getConstraint for this constraint type (non-matrix) must be 4.");
 	switch(const_type)
 	{
 		case 0:

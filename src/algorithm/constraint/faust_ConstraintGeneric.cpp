@@ -59,7 +59,7 @@ bool is_constraint_name_int(const char * type)
 	is_const_int = ((is_const_int) || ((strcmp(type,"splin") == 0)));
 	is_const_int = ((is_const_int) || ((strcmp(type,"splincol") == 0)));
 	is_const_int = ((is_const_int) || ((strcmp(type,"splin") == 0)));
-	is_const_int = ((is_const_int) || ((strcmp(type,"blkdiag") == 0)));
+//	is_const_int = ((is_const_int) || ((strcmp(type,"blkdiag") == 0)));
 
 
 	return is_const_int;
@@ -73,7 +73,7 @@ bool is_constraint_name_real(const char * type)
 
 bool is_constraint_name_mat(const char * type)
 {
-	return ((strcmp(type,"supp") == 0) || (strcmp(type,"const")==0));
+	return (strcmp(type,"supp") == 0) || (strcmp(type,"const")==0) || ! strcmp(type, "toeplitz") || ! strcmp(type, "circ") || ! strcmp(type, "blockdiag") || !strcmp(type, "blkdiag") || ! strcmp (type, "hankel");
 }
 
 faust_constraint_name get_equivalent_constraint(const char * type)
@@ -93,7 +93,7 @@ faust_constraint_name get_equivalent_constraint(const char * type)
 		return CONSTRAINT_NAME_CONST;
 	if  (!strcmp(type,"sppos"))
 		return CONSTRAINT_NAME_SP_POS;
-	if  (!strcmp(type,"blkdiag"))
+	if  (!strcmp(type,"blkdiag") || !strcmp(type, "blockdiag"))
 		return CONSTRAINT_NAME_BLKDIAG;
 	if  (!strcmp(type,"supp"))
 		return CONSTRAINT_NAME_SUPP;
@@ -110,7 +110,6 @@ int get_type_constraint(const char * type)
 	bool is_const_int = is_constraint_name_int(type);
 	bool is_const_real = is_constraint_name_real(type);
 	bool is_const_mat = is_constraint_name_mat(type);
-
 
 	if (is_const_int)
 		return 0;

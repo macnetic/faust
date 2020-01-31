@@ -319,7 +319,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				case CONSTRAINT_NAME_HANKEL:
 					Faust::prox_hankel(mat, normalized, pos);
 					break;
-					break;
 				default:
 					mexErrMsgTxt("Unknown constraint name/type.");
 			}

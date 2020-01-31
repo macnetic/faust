@@ -61,6 +61,11 @@ classdef (Abstract) ParamsFact
 			if(~ iscell(constraints))
 				error(['matfaust.factparams.ParamsFact constraints argument must be a cell array.'])
 			end
+			for i = 1:length(constraints)
+				if(isa(constraints{i}, 'matfaust.proj.proj_gen'))
+					constraints{i} = constraints{i}.constraint
+				end
+			end
 			for i = 1:length(constraints) %ParamsFact.TODO: check constraints length in sub-class
 				if(~ isa(constraints{i}, 'matfaust.factparams.ConstraintGeneric'))
 					error(['matfaust.factparams.ParamsFact constraints argument must contain matfaust.factparams.ConstraintGeneric objects.'])

@@ -16,7 +16,7 @@ classdef ConstraintName
 		SPLINCOL = 4
 		CONST = 5
 		SP_POS = 6
-		% BLKDIAG = 7
+		BLKDIAG = 7
 		SUPP = 8
 		NORMLIN = 9
 		TOEPLITZ = 10
@@ -55,7 +55,7 @@ classdef ConstraintName
 		end
 
 		function is_mat = is_mat_constraint(obj)
-			is_mat = obj.name == obj.SUPP || obj.name == obj.CONST || obj.name == obj.CIRC || obj.name == obj.TOEPLITZ || obj.name == obj.HANKEL;
+			is_mat = obj.name == obj.SUPP || obj.name == obj.CONST || obj.name == obj.CIRC || obj.name == obj.TOEPLITZ || obj.name == obj.HANKEL || obj.name == obj.BLKDIAG;
 		end
 
 		function str = conv2str (obj)
@@ -84,8 +84,8 @@ classdef ConstraintName
 					str = 'toeplitz';
 				case obj.HANKEL
 					str = 'hankel';
-					%case obj.BLKDIAG;
-					%	str = 'blkdiag'
+				case obj.BLKDIAG;
+					str = 'blockdiag';
 				otherwise
 					error('Unknown name')
 			end
@@ -123,6 +123,8 @@ classdef ConstraintName
 					id = ConstraintName.TOEPLITZ
 				case 'hankel'
 					id = ConstraintName.HANKEL
+				case 'blockdiag'
+					id = ConstraintName.BLKDIAG
 				otherwise
 					error(err_msg)
 			end
