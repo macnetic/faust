@@ -473,11 +473,16 @@ class ConstraintName:
 
 class ConstraintList(object):
     """
-    A helper class for constructing a list of consistent
-    matfaust.proj.proj_gen projectors or ConstraintGeneric objects.
+    A helper class for constructing a list of consistent pyfaust.proj.proj_gen projectors or ConstraintGeneric objects.
 
     NOTE: ConstraintGeneric use is not advised (these objects are not well
     documented). Use rather the projectors functors (from pyfaust.proj module).
+
+
+    Example:
+        >>> from pyfaust.factparams import ConstraintList
+        >>> cons = ConstraintList('splin', 5, 500, 32, 'blockdiag',[(10,10), (32,32)], 32, 32);
+
     """
     def __init__(self, *args):
         # constraint definition tuple
