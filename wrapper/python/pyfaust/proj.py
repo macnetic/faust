@@ -237,11 +237,13 @@ class supp(proj_gen):
 
         Example:
             >>> from pyfaust.proj import supp
-            >>> from numpy.random import rand, zeros
+            >>> from numpy.random import rand
+            >>> from numpy import zeros
             >>> M = rand(5,5)
-            >>> S = zeros(5,5)
+            >>> S = zeros((5,5))
             >>> S[M>.5] = 1
             >>> p = supp(S)
+            >>> M
             array([[ 0.        ,  0.        ,  0.22763947,  0.35813742,
                     0.32570465],
                    [ 0.        ,  0.33306546,  0.        ,  0.        ,

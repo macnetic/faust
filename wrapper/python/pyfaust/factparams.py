@@ -225,7 +225,8 @@ class ConstraintMat(ConstraintGeneric):
         self._cons_value = self.cons_value
         if(cons_value_sz == None):
             self._cons_value_sz = self._num_cols*self._num_rows
-        self._cons_value_sz = cons_value_sz
+        else:
+            self._cons_value_sz = cons_value_sz
         if(normalized == None):
             if(self._name.name == ConstraintName.CONST):
                 # for const proj the default is to not normalize
@@ -250,23 +251,6 @@ class ConstraintMat(ConstraintGeneric):
                                                       self._cons_value,
                                                       self._cons_value_sz,
                                                       self.normalized, self.pos)
-
-#class ConstraintMatBlockdiag(ConstraintGeneric):
-#
-#
-#    def __init__(self, name, cons_value, normalized=None, pos=False):
-#        super(ConstraintMatBlockdiag, self).__init__(name, cons_value._shape[0],
-#                                            cons_value._shape[1],
-#                                            cons_value, normalized, pos)
-#        from pyfaust.proj import blockdiag
-#        if(not isinstance(cons_value, blockdiag)):
-#            raise TypeError("cons_value must be a blockdiag")
-#        self.normalized = normalized
-#        self.pos = pos
-#
-#    def project(self, M):
-#        ConstraintGeneric.project(self, M)
-#        return self.cons_value(M)
 
 
 class ConstraintReal(ConstraintGeneric):
