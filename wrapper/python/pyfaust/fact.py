@@ -492,7 +492,14 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False):
         M: the numpy matrix to factorize.
         p: is a set of factorization parameters. It might be a fully defined instance of parameters (pyfaust.factparams.ParamsHierarchical) or a simplified expression which designates a pre-defined parametrization:
             - 'squaremat' to use pre-defined parameters typically used to factorize a Hadamard square matrix of order a power of two (see pyfaust.demo.hadamard).
-            - ['rectmat', j, k, s] to use pre-defined parameters used for instance in factorization of the MEG matrix which is a rectangular matrix of size m*n such that m < n (see pyfaust.demo.bsl); j is the number of factors, k the sparsity of the main factor's columns, and s the sparsity of rows for all other factors except the residuum (that is the first factor here because the factorization is made toward the left -- is_side_fact_left == true, cf. pyfaust.factparams.ParamsHierarchical).
+            - ['rectmat', j, k, s] to use pre-defined parameters used for
+            instance in factorization of the MEG matrix which is a rectangular
+            matrix of size m*n such that m < n (see pyfaust.demo.bsl); j is the
+            number of factors, k the sparsity of the main factor's columns, and
+            s the sparsity of rows for all other factors except the residuum
+            (that is the first factor here because the factorization is made
+            toward the left -- is_side_fact_left == true, cf.
+            pyfaust.factparams.ParamsHierarchical and pyfaust.factparams.ParamsHierarchicalRectMat).
             <br/>The residuum has a sparsity of P*rho^(num_facts-1). <br/> By default, rho == .8 and P = 1.4. It's possible to set custom values with for example p == ( ['rectmat', j, k, s], {'rho':.4, 'P':.7 }). <br/>The sparsity is here the number of non-zero elements.
 
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
@@ -609,6 +616,8 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False):
        >>> # now verify the s constraint is respected on MEG16 factor 1
        >>> count_nonzero(MEG16.factors(1).toarray())/MEG16.shape[0]
        8.0
+
+       <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat
 
     """
     p = _prepare_hierarchical_fact(M,p, "hierarchical", ret_lambda,
