@@ -209,7 +209,7 @@ package_linux_release:
 package_linux_release_static:
    script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON ..'
         - make
         - cpack -G RPM -C CPackConfig.cmake
         - cpack -G DEB -C CPackConfig.cmake
@@ -281,7 +281,7 @@ package_macos_purepy_rev:
 
 package_linux_purepy_rev:
     extends: .package_purepy_rev
-    variables: {MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a"}
+    variables: {MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON"}
     tags:
         - linux
         - tux_packager
@@ -305,7 +305,7 @@ package_macos_purepy_release:
 
 package_linux_purepy_release:
     extends: .package_purepy_release
-    variables: {MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a"}
+    variables: {MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON"}
     tags:
         - linux
         - tux_packager
@@ -314,7 +314,7 @@ package_purepy_release_rasp:
     variables: {MATIO_STATIC_LIB_PATH: "/opt/local/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/libhdf5.a"}
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DNOPY2=ON ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DNOPY2=ON -DBUILD_MULTITHREAD=ON ..'
         - ln -s /usr/bin/clang gcc
         - export PATH=$PWD:$PATH
         - make
