@@ -7,7 +7,7 @@ classdef normlin < matfaust.proj.proj_gen
 	properties
 	end
 	methods
-		function proj = normcol(shape, normval, varargin)
+		function proj = normlin(shape, normval, varargin)
 			import matfaust.factparams.ConstraintReal
 			proj.constraint = ConstraintReal('normlin', shape(1), shape(2), normval, varargin{:});
 		end

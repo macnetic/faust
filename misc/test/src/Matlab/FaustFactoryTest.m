@@ -309,6 +309,110 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.verifyEqual(norm(fF-fftI), 0, 'AbsTol', 10^-12);
 			this.assertEqual(full(dft(n)), full(normalize(F)), 'AbsTol', 10^-7)
 		end
+
+		function test_sp(this)
+			import matfaust.proj.sp;
+			min_n = 5;
+			min_m = 5;
+			m = randi([min_m 128], 1);
+			n = randi([min_n 128], 1);
+			M = rand(m,n);
+			k = randi([1 m*n], 1);
+			p = sp([m n], k);
+			Mp = p(M);
+			for i=1:n
+				this.verifyLessThanOrEqual(length(nonzeros(Mp(:,i))), k)
+			end
+			this.verifyEqual(norm(Mp, 'fro'), 1, 'AbsTol', 10^-3)
+		end
+
+		function test_splincol(this)
+			import matfaust.proj.splincol
+			min_n = 5;
+			min_m = 5;
+			m = randi([min_m 128], 1);
+			n = randi([min_n 128], 1);
+			k = randi([1 m], 1);
+			M = rand(m,n);
+			p = splincol([m, n], k);
+			Mp = p(M);
+			% TODO: assertion ?
+			this.verifyEqual(norm(Mp, 'fro'), 1, 'AbsTol', 10^-3)
+		end
+
+		function test_spcol(this)
+			import matfaust.proj.spcol
+			min_n = 5;
+			min_m = 5;
+			m = randi([min_m 128], 1);
+			n = randi([min_n 128], 1);
+			M = rand(m,n);
+			k = randi([1 m], 1);
+			p = spcol([m, n], k);
+			Mp = p(M);
+			for i=1:n
+				this.verifyLessThanOrEqual(length(nonzeros(Mp(:,i))), k)
+			end
+			this.verifyEqual(norm(Mp, 'fro'), 1, 'AbsTol', 10^-3)
+		end
+
+		function test_normcol(this)
+			import matfaust.proj.normcol
+			min_n = 5;
+			min_m = 5;
+			m = randi([min_m 128], 1);
+			n = randi([min_n 128], 1);
+			M = rand(m,n);
+			s = rand(1,1)*50;
+			p = normcol([m, n], s);
+			Mp = p(M);
+			for i=1:n
+				this.verifyLessThanOrEqual(norm(Mp(:,i)), s)
+			end
+		end
+
+		function test_normlin(this)
+			import matfaust.proj.normlin
+			min_n = 5;
+			min_m = 5;
+			m = randi([min_m 128], 1);
+			n = randi([min_n 128], 1);
+			M = rand(m,n);
+			s = rand()*50;
+			p = normlin([m, n], s);
+			Mp = p(M);
+			for i=1:m
+				this.verifyLessThanOrEqual(norm(Mp(i,:)), s)
+			end
+		end
+
+		function test_const(this)
+			import matfaust.proj.const
+			min_n = 5;
+			min_m = 5;
+			m = randi([min_m 128], 1);
+			n = randi([min_n 128], 1);
+			M = rand(m,n);
+			C = rand(m,n);
+			s = rand()*50;
+			p = const(C);
+			Mp = p(M);
+			this.verifyEqual(norm(C-Mp)/norm(C), 0)
+		end
+
+		function test_supp(this)
+			import matfaust.proj.supp
+			min_n = 5;
+			min_m = 5;
+			m = randi([min_m 128], 1);
+			n = randi([min_n 128], 1);
+			M = rand(m,n);
+			S = rand(m,n) > .5;
+			p = supp(S, 'normalized', false);
+			Mp = p(M);
+			this.assertTrue(all(all(Mp > 0 == S)))
+			this.assertTrue(all(all(Mp(Mp > 0) == M(Mp > 0))))
+		end
 	end
 
 	methods
