@@ -645,7 +645,8 @@ class Faust:
                         (F.__matmul__(A.imag))*j
             else:
                 return F.m_faust.multiply_csr_mat(A.astype(F.dtype))
-        elif(isinstance(A, scipy.sparse.dia_matrix)):
+        elif(isinstance(A, scipy.sparse.dia_matrix) or
+             isinstance(A, scipy.sparse.csc_matrix)):
             return F.__matmul__(A.tocsr())
         else:
             return F.m_faust.multiply(A)
