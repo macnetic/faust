@@ -668,9 +668,9 @@ FPP Faust::power_iteration(const  Faust::LinearOperator<FPP,Cpu> & A, const faus
    	FPP lambda = 0.0;
    	FPP alpha = 1.0;
 	FPP beta = 0.0;
-	while(Faust::fabs(lambda_old-lambda)> Faust::fabs(threshold) && i<nbr_iter_max)
+	while((Faust::fabs(lambda_old-lambda)> Faust::fabs(threshold) || Faust::fabs(lambda) <= Faust::fabs(threshold)) && i<nbr_iter_max)
 	{
-		i++;
+			i++;
       		lambda_old = lambda;
       		xk_norm = xk;
       		xk_norm.normalize();
