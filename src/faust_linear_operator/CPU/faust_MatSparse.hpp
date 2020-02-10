@@ -489,6 +489,32 @@ void Faust::MatSparse<FPP,Cpu>::check_dim_validity() const
 	}
 }
 
+	template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::setEyes()
+{
+	if(this->getNbRow() == this->getNbCol())
+	{
+		mat.setIdentity();
+		update_dim();
+	}
+	else
+	{
+		int nbRow,nbCol,new_nnz;
+		nbRow = this->getNbRow();
+		nbCol = this->getNbCol();
+		new_nnz = nbRow<nbCol?nbRow:nbCol;
+		typedef Eigen::Triplet<FPP> Tip;
+		std::vector<Tip> tripletList;
+
+		for (int i=0;i<new_nnz;i++)
+			tripletList.push_back(Tip(i,i,FPP(1)));
+
+		mat.setFromTriplets(tripletList.begin(),tripletList.end());
+		mat.makeCompressed();
+		update_dim();
+	}
+	this->set_id(true);
+}
 
 	template<typename FPP>
 void Faust::MatSparse<FPP,Cpu>::transpose()
@@ -1000,27 +1026,8 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_i
 	template<typename FPP>
 Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::eye(faust_unsigned_int num_rows, faust_unsigned_int num_cols)
 {
-	faust_unsigned_int nnz = min(num_rows, num_cols);
-	FPP *values = new FPP[nnz];
-	int *colind = new int[nnz];
-	int *rowptr= new int[num_rows+1];
-	rowptr[0] = 0;
-//	cout << "MatSparse::eye stage 1" << endl;
-	for(faust_unsigned_int i=0;i<nnz;i++)
-	{
-		values[i] = FPP(1);
-		colind[i] = i;
-		rowptr[i+1] = 1+rowptr[i];
-	}
-	if(num_rows > num_cols)
-		for(faust_unsigned_int i=nnz+1;i<num_rows;i++)
-			rowptr[i+1] = rowptr[i];
-//	cout << "MatSparse::eye stage 2" << endl;
-	MatSparse<FPP,Cpu>* eye = new MatSparse(nnz, num_rows, num_cols, values, rowptr, colind);
-	eye->set_id(true);
-	delete[] values;
-	delete[] colind;
-	delete[] rowptr;
+	auto eye = new MatSparse<FPP,Cpu>(num_rows, num_cols);
+	eye->setEyes();
 	return eye;
 }
 

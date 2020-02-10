@@ -181,7 +181,7 @@ namespace Faust
 			void resize(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_);
 			void resize(const faust_unsigned_int dim1_, const faust_unsigned_int dim2_){mat.resize(dim1_,dim2_);update_dim();}
 			void setZeros(){mat.setZero();nnz=0;}
-			void setEyes(){mat.setIdentity();update_dim();}
+			void setEyes();
 			void transpose();
 			void conjugate();
 			typename Eigen::NumTraits<FPP>::Real norm() const {return mat.norm();}
