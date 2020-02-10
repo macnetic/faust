@@ -1335,10 +1335,30 @@ class Faust:
         >>> from pyfaust import rand
         >>> F = rand(2, 100, .5)
         >>> nf = F.numfactors()
+        >>> nf == len(F)
+        True
 
-        <b/> See also Faust.factors
+        <b/> See also Faust.factors, Faust.__len__
         """
         return F.m_faust.get_nb_factors()
+
+    def __len__(F):
+        """
+        Returns the number of factors of F.
+
+        Returns:
+            the number of factors.
+
+        Examples:
+        >>> from pyfaust import rand
+        >>> F = rand(2, 100, .5)
+        >>> nf = F.numfactors()
+        >>> nf == len(F)
+        True
+
+        <b/> See also Faust.factors, Faust.numfactors
+        """
+        return F.numfactors()
 
     def factors(F, indices):
         """
@@ -1401,7 +1421,10 @@ class Faust:
         <b/> See also Faust.factors, Faust.left, Faust.numfactors
         """
         i = F._check_factor_idx(i)
-        return F.factors(range(i,F.numfactors()))
+        rF = Faust(core_obj=F.m_faust.right(i))
+        if(len(rF) == 1):
+            return rF.factors(0)
+        return rF
 
     def left(F, i):
         """
@@ -1414,7 +1437,10 @@ class Faust:
         <b/> See also Faust.factors, Faust.right
         """
         i = F._check_factor_idx(i)
-        return F.factors(range(0, i+1))
+        lF = Faust(core_obj=F.m_faust.left(i))
+        if(len(lF) == 1):
+            return lF.factors(0)
+        return lF
 
     def _check_factor_idx(F, i):
         if(not isinstance(i, (float, int))):

@@ -164,7 +164,16 @@ namespace Faust {
 			TransformHelper<FPP,Cpu>* optimize_storage(const bool time=true);
 			TransformHelper<FPP,Cpu>* optimize(const bool transp=false);
 			void optimize_multiply(const bool transp=false);
+			/**
+			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 
+			  */
+			TransformHelper<FPP,Cpu>* left(const faust_unsigned_int id, const bool copy=false) const;
+			/**
+			  \brief Returns the right hand side factors of this from index id to the size()-1 (as a new TransformHelper obj).
+
+			  */
+			TransformHelper<FPP,Cpu>* right(const faust_unsigned_int id, const bool copy=false) const;
 
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n, const bool norma=true);
@@ -172,8 +181,9 @@ namespace Faust {
 			static TransformHelper<FPP,Cpu>* eyeFaust(unsigned int n, unsigned int m);
 
 			~TransformHelper();
-
 			unsigned long long get_fact_addr(const faust_unsigned_int id) const;
+			/* use carefully */
+			MatGeneric<FPP,Cpu>* get_gen_fact_nonconst(const faust_unsigned_int id) const;
 			private:
 			void copy_slices(TransformHelper<FPP, Cpu>* th, const bool transpose = false);
 			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;

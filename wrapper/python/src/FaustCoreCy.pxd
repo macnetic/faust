@@ -79,6 +79,8 @@ cdef extern from "FaustCoreCpp.h" :
                       const bool transpose) const
         unsigned int get_fact_nnz(const unsigned int i) const
         bool is_fact_sparse(const unsigned int i) const
+        FaustCoreCpp[FPP]* right(const unsigned int) const
+        FaustCoreCpp[FPP]* left(const unsigned int) const
         FaustCoreCpp[FPP]* get_slice(unsigned int, unsigned int, unsigned int,
                                     unsigned int) const
         FaustCoreCpp[FPP]* slice(unsigned int, unsigned int, unsigned int,

@@ -323,6 +323,26 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::left(const faust_unsigned_int id, const bool copy /* default to false */) const
+		{
+			if(id >= this->size()) throw out_of_range("factor id is lower than zero or greater or equal to the size of Transform.");
+			std::vector<Faust::MatGeneric<FPP,Cpu>*> left_factors;
+			for(int i=0; i <= id; i++)
+				left_factors.push_back(const_cast<Faust::MatGeneric<FPP,Cpu>*>(get_gen_fact(i)));
+			return new TransformHelper<FPP,Cpu>(left_factors, FPP(1.0), false, copy, true);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::right(const faust_unsigned_int id, const bool copy /* default to false */) const
+		{
+			if(id >= this->size()) throw out_of_range("factor id is lower than zero or greater or equal to the size of Transform.");
+			std::vector<Faust::MatGeneric<FPP,Cpu>*> right_factors;
+			for(int i=id; i < size(); i++)
+				right_factors.push_back(const_cast<Faust::MatGeneric<FPP,Cpu>*>(get_gen_fact(i)));
+			return new TransformHelper<FPP,Cpu>(right_factors, FPP(1.0), false, copy, true);
+		}
+
+	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::pruneout(const int nnz_tres, const int npasses, const bool only_forward)
 		{
 			int _npasses = 0;
@@ -608,6 +628,12 @@ namespace Faust {
 	//private
 	template<typename FPP>
 		const MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact(const faust_unsigned_int id) const
+		{
+			return this->transform->data[is_transposed?size()-id-1:id];
+		}
+
+	template<typename FPP>
+		MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact_nonconst(const faust_unsigned_int id) const
 		{
 			return this->transform->data[is_transposed?size()-id-1:id];
 		}

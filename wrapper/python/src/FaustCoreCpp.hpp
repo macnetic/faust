@@ -299,6 +299,22 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::slice(unsigned int start_row_id, unsigned 
 }
 
 template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::right(const faust_unsigned_int id) const
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->right(id);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
+    return core;
+}
+
+template<typename FPP>
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::left(const faust_unsigned_int id) const
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->left(id);
+    FaustCoreCpp<FPP>* core = new FaustCoreCpp<FPP>(th);
+    return core;
+}
+
+template<typename FPP>
 FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::fancy_idx(unsigned long int* row_ids, unsigned long int
         num_rows, unsigned long int* col_ids,
         unsigned long int num_cols)

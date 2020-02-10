@@ -701,6 +701,24 @@ cdef class FaustCore:
         core._isReal = self._isReal
         return core
 
+    def left(self, id):
+        core = FaustCore(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.left(id)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.left(id)
+        core._isReal = self._isReal
+        return core
+
+    def right(self, id):
+        core = FaustCore(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.right(id)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.right(id)
+        core._isReal = self._isReal
+        return core
+
     def fancy_idx(self, indices):
         cdef unsigned long int[:] row_indices_view
         cdef unsigned long int[:] col_indices_view

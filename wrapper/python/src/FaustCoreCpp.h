@@ -89,6 +89,8 @@ class FaustCoreCpp
     void get_fact_dense(const unsigned int& i, FPP* elts,
             unsigned int* num_rows, unsigned int* num_cols,
             const bool transpose) const;
+    FaustCoreCpp<FPP>* left(const faust_unsigned_int) const;
+    FaustCoreCpp<FPP>* right(const faust_unsigned_int) const;
     faust_unsigned_int get_fact_nnz(const faust_unsigned_int) const;
     bool is_fact_sparse(const faust_unsigned_int id) const;
     FaustCoreCpp<FPP>* slice(unsigned int, unsigned int, unsigned int, unsigned int);
