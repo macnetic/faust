@@ -5,7 +5,7 @@
 
 import numpy as np, scipy
 from scipy.io import loadmat
-from scipy.sparse import csr_matrix, csc_matrix
+from scipy.sparse import csr_matrix, csc_matrix, dia_matrix
 import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
@@ -126,8 +126,7 @@ class Faust:
         if("scale" in kwargs.keys()):
             # scale hidden argument
             scale = kwargs['scale']
-            if(not (isinstance(scale, float) or isinstance(scale, int) or
-               isinstance(scale, np.complex))):
+            if(not isinstance(scale, (float, int, np.complex))):
                 raise Exception("Scale must be a number.")
         else:
             scale = 1.0
@@ -483,7 +482,7 @@ class Faust:
                  isinstance(G,scipy.sparse.csr_matrix) or
                  isinstance(G,scipy.sparse.csc_matrix)):
                 F = F+Faust(G)
-            elif(isinstance(G,int) or isinstance(G,float) or isinstance(G, np.complex)):
+            elif(isinstance(G,(int, float, np.complex))):
                 if(F.shape[0] <= F.shape[1]):
                     F = F+Faust([np.eye(F.shape[0], F.shape[1]),
                                  np.ones((F.shape[1], 1))*G,
@@ -557,8 +556,7 @@ class Faust:
 
         <b/> See also Faust.__mul__
         """
-        if(isinstance(s, float) or isinstance(s, np.complex) or isinstance(s,
-                                                                           int)):
+        if(isinstance(s, (float, np.complex, int))):
             return F*(1./s)
         else:
             raise Exception("unsupported operand type(s) for /: a Faust can only be "
@@ -632,10 +630,11 @@ class Faust:
                                                           "the two Fausts must "
                                                           "agree.")
             return Faust(core_obj=F.m_faust.multiply(A.m_faust))
-        elif(isinstance(A, float) or isinstance(A, int) or isinstance(A, np.complex)):
+        elif(isinstance(A, (float, int, np.complex))):
             raise ValueError("Scalar operands are not allowed, use '*'"
                              " instead")
-        elif(isinstance(A, np.ndarray) and A.dtype == np.complex):
+        elif(isinstance(A, np.ndarray) and A.dtype == np.complex and F.dtype !=
+            np.complex):
             j = np.complex(0,1)
             return F.m_faust.multiply(A.real).astype(np.complex) + j*F.m_faust.multiply(A.imag)
         elif(isinstance(A, scipy.sparse.csr_matrix)):
@@ -645,12 +644,10 @@ class Faust:
                         (F.__matmul__(A.imag))*j
             else:
                 return F.m_faust.multiply_csr_mat(A.astype(F.dtype))
-        elif(isinstance(A, scipy.sparse.dia_matrix) or
-             isinstance(A, scipy.sparse.csc_matrix)):
+        elif(isinstance(A, (dia_matrix, csc_matrix))):
             return F.__matmul__(A.tocsr())
         else:
             return F.m_faust.multiply(A)
-
 
     def dot(F, A):
         """
@@ -662,8 +659,7 @@ class Faust:
 
         <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
         """
-        if(isinstance(A, float) or isinstance(A, int) or isinstance(A,
-                                                                    np.complex)):
+        if(isinstance(A, (float, int, np.complex))):
             return F*A
         return F.__matmul__(A)
 
@@ -724,30 +720,31 @@ class Faust:
 
         <b/>See also Faust.__init__, Faust.rcg, Faust.__mul__, Faust.__matmul__, Faust.dot
         """
-        if(isinstance(A, float) or isinstance(A, int) or isinstance(A, np.complex)):
+        if(isinstance(A, (float, int, np.complex))):
             return Faust(core_obj=F.m_faust.multiply_scal(A))
         else: # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
-        # (but it will fail)
-            return F.__matmul__(A)
+            try:
+                return F.__matmul__(A)
+            except:
+                raise TypeError("invalid type operand for Faust.__mul__.")
 
     def __rmul__(F, lhs_op):
         """ lhs_op*F
 
         <b/>See also Faust.__mul__
         """
-        if(isinstance(lhs_op,np.ndarray)):
-            if(F.dtype == np.complex or lhs_op.dtype == np.complex):
-                return (F.T.conj()*lhs_op.T.conj()).T.conj()
-            else: # real Faust
-                return (F.T*lhs_op.T).T
+        if(isinstance(lhs_op, (float, int, np.complex))):
+            return Faust(core_obj=F.m_faust.multiply_scal(lhs_op))
         else:
-            # a scalar or something not Faust-mul-compatible
-            return F*lhs_op
+            try:
+                return F.__rmatmul__(lhs_op)
+            except:
+                raise TypeError("invalid type operand for Faust.__rmul__.")
 
     __array_ufunc__ = None # mandatory to override rmatmul
                            # it means Faust doesn't support ufuncs
 
-    def __rmatmul__(F,lhs_op):
+    def __rmatmul__(F, lhs_op):
         """
         Returns lhs_op.__matmul__(F).
 
@@ -762,10 +759,13 @@ class Faust:
 
 
         """
-        if(F.dtype == np.complex or lhs_op.dtype == np.complex):
-            return (F.T.conj()*lhs_op.T.conj()).T.conj()
-        else: # real Faust and real lhs_op
-            return (F.T*lhs_op.T).T
+        if(isinstance(lhs_op, (np.ndarray, csr_matrix, dia_matrix))):
+            if(F.dtype == np.complex or lhs_op.dtype == np.complex):
+                return (F.T.conj().__matmul__(lhs_op.T.conj())).T.conj()
+            else: # real Faust and real lhs_op
+                return (F.T.__matmul__(lhs_op.T)).T
+        else:
+            raise TypeError("invalid type operand for Faust.__matmul__.")
 
     #def concatenate(F, *args, axis=0): # py. 2 doesn't handle this signature
     def concatenate(F, *args, **kwargs):
@@ -874,8 +874,7 @@ class Faust:
 
         C=F
         for G in args:
-           if(isinstance(G, np.ndarray) or isinstance(G, csr_matrix) \
-               or isinstance(G, csc_matrix)):
+           if(isinstance(G, (np.ndarray, csr_matrix, csc_matrix))):
                G = Faust([G])
            if(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
                                                            "Faust with something "
@@ -1940,7 +1939,7 @@ def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
         field = REAL
     else:
         field = COMPLEX
-    if((isinstance(num_factors, list) or isinstance(num_factors, tuple)) and
+    if((isinstance(num_factors,(list, tuple))) and
     len(num_factors) == 2):
         min_num_factors = num_factors[0]
         max_num_factors = num_factors[1]
@@ -1949,11 +1948,10 @@ def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
     else:
         raise ValueError("rand(): num_factors argument must be an "
                          "integer or a list/tuple of 2 integers.")
-    if((isinstance(dim_sizes, list) or isinstance(dim_sizes, tuple)) and
-    len(dim_sizes) == 2):
+    if(isinstance(dim_sizes, (list, tuple)) and len(dim_sizes) == 2):
         min_dim_size = dim_sizes[0]
         max_dim_size = dim_sizes[1]
-    elif(isinstance(dim_sizes, int) or isinstance(dim_sizes, long)):
+    elif(isinstance(dim_sizes, (int, np.long))):
         min_dim_size = max_dim_size = dim_sizes
     else:
         raise ValueError("rand(): dim_sizes argument must be an "
