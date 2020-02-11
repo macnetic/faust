@@ -87,6 +87,8 @@ namespace Faust {
 			TransformHelper();
 			TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right);
 			TransformHelper(TransformHelper<FPP,Cpu>* th);
+			TransformHelper(TransformHelper<FPP,Cpu>& th);
+			void operator=(TransformHelper<FPP,Cpu>& th);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
@@ -95,6 +97,7 @@ namespace Faust {
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose=false, const bool conjugate=false);
 //			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
+			void update_total_nnz();
 			void set_mul_order_opt_mode(const int mul_order_opt_mode);
 			int get_mul_order_opt_mode() const;
 			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);

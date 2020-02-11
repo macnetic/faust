@@ -119,6 +119,24 @@ namespace Faust {
 	}
 
 	template<typename FPP>
+		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>& th): TransformHelper<FPP,Cpu>()
+	{
+		*this = th;
+	}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::operator=(TransformHelper<FPP,Cpu>& th)
+	{
+		this->transform = th.transform;
+		this->is_transposed = th.is_transposed;
+		this->is_conjugate = th.is_conjugate;
+		this->is_sliced = th.is_sliced;
+		if(th.is_sliced)
+			copy_slices(&th);
+		this->mul_order_opt_mode = th.mul_order_opt_mode;
+	}
+
+	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]): TransformHelper<FPP,Cpu>()
 
 	{
@@ -459,6 +477,12 @@ namespace Faust {
 			}
 			pth->transform->update_total_nnz();
 			return pth;
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::update_total_nnz()
+		{
+			this->transform->update_total_nnz();
 		}
 
 	template<typename FPP>

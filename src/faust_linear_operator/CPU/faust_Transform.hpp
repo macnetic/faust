@@ -173,15 +173,8 @@ Faust::Transform<FPP,Cpu>::Transform(const Faust::Transform<FPP,Cpu> & A) :
 	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()),
 	totalNonZeros(A.totalNonZeros), dtor_delete_data(false)
 {
-	//std::cout<<"debut inside copy constructor"<<std::endl;
-	data.resize(A.size());
-	for (int i=0 ; i<data.size() ; i++)
-	{
-		//std::cout<<"iter "<<i<<"/"<<data.size()<<std::endl;
-		data[i]=A.data[i]->Clone();
-		if(!dtor_delete_data) ref_man.acquire(data[i]);
-	}
-	//std::cout<<"fin inside copy constructor"<<std::endl;
+	data.resize(0); // to be sure
+	*this = A; // rely on assignment operator (avoid duplicate)
 #ifdef __COMPILE_TIMERS__
 	this->t_multiply_vector.resize(data.size());
 #endif
@@ -262,10 +255,9 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu>
 		if(!dtor_delete_data) ref_man.acquire(data[i]);
 	}
 }
-
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool transpose_A, const bool conj_A, const Transform<FPP, Cpu>* B, const bool transpose_B, const bool conj_B):
-	data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()), totalNonZeros(0), dtor_delete_data(false)
+    data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()), totalNonZeros(0), dtor_delete_data(false)
 {
 	data.resize(A->size()+B->size());
 	int i = transpose_A?A->size()-1:0;
@@ -651,6 +643,7 @@ Faust::Transform<FPP,Cpu>& Faust::Transform<FPP,Cpu>::operator=(Faust::Transform
 	totalNonZeros = T.totalNonZeros;
 	dtor_delete_data = T.dtor_delete_data;
 	T.data.resize(0);
+	return *this;
 }
 
 	template<typename FPP>
