@@ -144,12 +144,12 @@ namespace Faust
 				bool is_fact_dense(const faust_unsigned_int id) const;
 				faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 				void get_fact(const faust_unsigned_int id,
-						 const int** row_ids,
-						 const int** col_ids,
-						 const FPP** elts,
-						 faust_unsigned_int* size,
-						 faust_unsigned_int* num_rows,
-						 faust_unsigned_int* num_cols) const;
+						const int** row_ids,
+						const int** col_ids,
+						const FPP** elts,
+						faust_unsigned_int* size,
+						faust_unsigned_int* num_rows,
+						faust_unsigned_int* num_cols) const;
 				void get_fact(const faust_unsigned_int id,
 						int* d_outer_count_ptr, int* d_inner_ptr, FPP* d_elts,
 						faust_unsigned_int* nnz,
@@ -287,35 +287,40 @@ namespace Faust
 				Transform<FPP,Cpu>& operator=(Faust::Transform<FPP,Cpu>&& T);
 
 				void operator=(const Transform<FPP,Cpu>&  f);//{data=f.data;totalNonZeros=f.totalNonZeros;}
-				/// add all of the sparse matrices from f.data to this->data
-				void operator*=(const FPP  scalar){scalarMultiply(scalar);};
-				void operator*=(const Transform<FPP,Cpu>&  f){multiply(f);};
+		/// add all of the sparse matrices from f.data to this->data
+		void operator*=(const FPP  scalar){scalarMultiply(scalar);};
+		void operator*=(const Transform<FPP,Cpu>&  f){multiply(f);};
 
+		using transf_iterator = typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::const_iterator;
+
+		transf_iterator begin() const;
+
+		transf_iterator end() const;
 
 #ifdef __COMPILE_TIMERS__
-				void print_timers() const;
+		void print_timers() const;
 #endif
 
 			private:
-				void disable_data_deletion() { this->dtor_delete_data = false; }
-				void enable_data_deletion() { this->dtor_delete_data = true; }
+		void disable_data_deletion() { this->dtor_delete_data = false; }
+		void enable_data_deletion() { this->dtor_delete_data = true; }
 
 			private:
-				long long int totalNonZeros;
-				static const char * m_className;
-				std::vector<Faust::MatGeneric<FPP,Cpu>*> data;
-				bool dtor_delete_data;
-				static RefManager ref_man;
+		long long int totalNonZeros;
+		static const char * m_className;
+		std::vector<Faust::MatGeneric<FPP,Cpu>*> data;
+		bool dtor_delete_data;
+		static RefManager ref_man;
 
 #ifdef __COMPILE_TIMERS__
-				mutable std::vector<Faust::Timer> t_multiply_vector;
+		mutable std::vector<Faust::Timer> t_multiply_vector;
 #endif
 
 
-				// friend function
-				friend Faust::Vect<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
-				friend Faust::MatDense<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
-				friend TransformHelper<FPP,Cpu>;
+		// friend function
+		friend Faust::Vect<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
+		friend Faust::MatDense<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
+		friend TransformHelper<FPP,Cpu>;
 		};
 
 }

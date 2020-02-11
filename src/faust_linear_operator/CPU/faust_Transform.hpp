@@ -259,53 +259,53 @@ template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool transpose_A, const bool conj_A, const Transform<FPP, Cpu>* B, const bool transpose_B, const bool conj_B):
     data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()), totalNonZeros(0), dtor_delete_data(false)
 {
-	data.resize(A->size()+B->size());
-	int i = transpose_A?A->size()-1:0;
-	int j = 0;
-	// verification that mul. is defined between A and B is done afterward by check_factors_validity()
-	bool copying = A->size()>0;
-	//TODO: factorize the two loops
-	while(copying)
-	{
-		data[j] = A->data[i]->Clone(false);
-		if(transpose_A)
-		{
-			data[j]->transpose();
-			i--;
-			copying = i >= 0;
-		}
-		else
-		{
-			i++;
-			copying = i < A->size();
-		}
-		if(conj_A) data[j]->conjugate();
-		totalNonZeros += data[j]->getNonZeros();
-		if(!dtor_delete_data) ref_man.acquire(data[j]);
-		j++;
-	}
-	i = transpose_B?B->size()-1:0;
-	copying = B->size()>0;
-	while(copying)
-	{
-		data[j] = B->data[i]->Clone(false);
-		if(transpose_B)
-		{
-			data[j]->transpose();
-			i--;
-			copying = i >= 0;
-		}
-		else
-		{
-			i++;
-			copying = i < B->size();
-		}
-		if(conj_B) data[j]->conjugate();
-		totalNonZeros += data[j]->getNonZeros();
-		if(!dtor_delete_data) ref_man.acquire(data[j]);
-		j++;
-	}
-	this->check_factors_validity();
+    data.resize(A->size()+B->size());
+    int i = transpose_A?A->size()-1:0;
+    int j = 0;
+    // verification that mul. is defined between A and B is done afterward by check_factors_validity()
+    bool copying = A->size()>0;
+    //TODO: factorize the two loops
+    while(copying)
+    {
+        data[j] = A->data[i]->Clone(false);
+        if(transpose_A)
+        {
+            data[j]->transpose();
+            i--;
+            copying = i >= 0;
+        }
+        else
+        {
+            i++;
+            copying = i < A->size();
+        }
+        if(conj_A) data[j]->conjugate();
+        totalNonZeros += data[j]->getNonZeros();
+        if(!dtor_delete_data) ref_man.acquire(data[j]);
+        j++;
+    }
+    i = transpose_B?B->size()-1:0;
+    copying = B->size()>0;
+    while(copying)
+    {
+        data[j] = B->data[i]->Clone(false);
+        if(transpose_B)
+        {
+            data[j]->transpose();
+            i--;
+            copying = i >= 0;
+        }
+        else
+        {
+            i++;
+            copying = i < B->size();
+        }
+        if(conj_B) data[j]->conjugate();
+        totalNonZeros += data[j]->getNonZeros();
+        if(!dtor_delete_data) ref_man.acquire(data[j]);
+        j++;
+    }
+    this->check_factors_validity();
 }
 
 template<typename FPP>
@@ -1404,6 +1404,17 @@ std::string Faust::Transform<FPP,Cpu>::to_string(const bool transpose /* default
 	return str.str();
 }
 
+template<typename FPP>
+typename Faust::Transform<FPP,Cpu>::transf_iterator Faust::Transform<FPP, Cpu>::begin() const
+{
+	return data.begin();
+}
+
+template<typename FPP>
+typename Faust::Transform<FPP,Cpu>::transf_iterator Faust::Transform<FPP, Cpu>::end() const
+{
+	return data.end();
+}
 
 
 

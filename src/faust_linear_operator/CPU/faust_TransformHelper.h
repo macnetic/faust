@@ -53,6 +53,8 @@
 namespace Faust {
 	using namespace std;
 
+	template<typename FPP>
+		using transf_iterator = typename Transform<FPP,Cpu>::transf_iterator;
 	template<typename FPP,Device DEVICE> class Transform;
 	template<typename FPP,Device DEVICE> class Vect;
 	template<typename FPP,Device DEVICE> class MatDense;
@@ -177,6 +179,10 @@ namespace Faust {
 
 			  */
 			TransformHelper<FPP,Cpu>* right(const faust_unsigned_int id, const bool copy=false) const;
+
+			transf_iterator<FPP> begin() const;
+			transf_iterator<FPP> end() const;
+
 
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n, const bool norma=true);

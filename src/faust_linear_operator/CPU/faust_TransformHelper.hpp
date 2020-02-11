@@ -126,15 +126,15 @@ namespace Faust {
 
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::operator=(TransformHelper<FPP,Cpu>& th)
-	{
-		this->transform = th.transform;
-		this->is_transposed = th.is_transposed;
-		this->is_conjugate = th.is_conjugate;
-		this->is_sliced = th.is_sliced;
-		if(th.is_sliced)
-			copy_slices(&th);
-		this->mul_order_opt_mode = th.mul_order_opt_mode;
-	}
+		{
+			this->transform = th.transform;
+			this->is_transposed = th.is_transposed;
+			this->is_conjugate = th.is_conjugate;
+			this->is_sliced = th.is_sliced;
+			if(th.is_sliced)
+				copy_slices(&th);
+			this->mul_order_opt_mode = th.mul_order_opt_mode;
+		}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]): TransformHelper<FPP,Cpu>()
@@ -218,7 +218,7 @@ namespace Faust {
 				case 1:
 				case 2:
 				case 3:
-//					this->transform->data.push_back(const_cast<Faust::MatDense<FPP,Cpu>*>(&A)); // it's ok
+					//					this->transform->data.push_back(const_cast<Faust::MatDense<FPP,Cpu>*>(&A)); // it's ok
 					if(transpose)
 					{
 						int i = this->transform->size();
@@ -234,7 +234,7 @@ namespace Faust {
 						data[i] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
 					}
 					Faust::multiply_order_opt(mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), {isTransposed2char()});
-//					this->transform->data.erase(this->transform->data.end()-1);
+					//					this->transform->data.erase(this->transform->data.end()-1);
 					break;
 				case 4:
 					M = this->transform->multiply_par(A, isTransposed2char());
@@ -1402,6 +1402,18 @@ namespace Faust {
 				//nothing to do, out of memory, return nullptr
 			}
 			return eyeFaust;
+		}
+
+	template<typename FPP>
+		Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::begin() const
+		{
+			return this->transform->begin();
+		}
+
+	template<typename FPP>
+		Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::end() const
+		{
+			return this->transform->end();
 		}
 
 	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
