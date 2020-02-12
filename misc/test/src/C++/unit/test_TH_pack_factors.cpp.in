@@ -1,0 +1,178 @@
+/****************************************************************************/
+/*                              Description:                                */
+/* unitary test for testing multiplication by faust with real  scalar       */
+/*                                                                          */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.inria.fr>                         		*/
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2020):   Hakim HADJ-DJILANI									*/
+/*  					Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+/****************************************************************************/
+#include "faust_MatDense.h"
+#include "faust_MatSparse.h"
+#include "faust_Transform.h"
+#include "faust_TransformHelper.h"
+#include <string>
+
+
+
+/** unit test for TransformHelper variadic template ctor
+ * The goal is to test that factors are not duplicated in memory and it works when passing anything among a TransformHelper, Transform objects or a vector of MatGeneric<FPP,Cpu*> (anything that supports begin() and end() ops).
+*/
+
+typedef @TEST_FPP@ FPP;
+
+
+using namespace Faust;
+
+int main(int argc, char* argv[])
+{
+	if (typeid(FPP) == typeid(double))
+	{
+		cout<<"floating point precision == double"<<endl;
+	}
+
+	if (typeid(FPP) == typeid(float))
+	{
+		cout<<"floating point precision == float"<<endl;
+	}
+
+	int mat_nrows = 10;
+	int mat_ncols = 10;
+	int n_mats = 5;
+	int n_sparse_mats = 2;
+
+	vector<MatGeneric<FPP,Cpu>*> facts(n_mats);
+
+	for(int i=0;i<n_sparse_mats;i++)
+	{
+		Faust::MatSparse<FPP,Cpu>* mat = Faust::MatSparse<FPP,Cpu>::randMat(mat_nrows, mat_ncols, .5);
+		facts[i] = mat;
+	}
+
+	for(int i=n_sparse_mats;i<n_mats;i++)
+	{
+		MatDense<FPP,Cpu>* mat = MatDense<FPP,Cpu>::randMat(mat_nrows, mat_ncols);
+		facts[i] = mat;
+	}
+
+	TransformHelper<FPP,Cpu> th0(facts, 1.0, false, false, false); // a Faust that uses facts without copy (I want to be sure factors are not altered on the end)
+
+	/************** Test packing to the right */
+	cout << "* testing packing factors on the right (from id 3 included)" << endl;
+	TransformHelper<FPP,Cpu> th(facts, 1.0, false, true, false); //cloning_fact == true to copy facts and not altering it after
+
+	// pre-condition: verify facts is identitical to factors really in th
+	for(int i=0;i<th.size();i++)
+		assert((*(th.begin()+i))->norm() == (*(facts.begin()+i))->norm());
+	assert(th.size() == facts.size());
+
+	// pack factors on the right of factor index 2
+	th.pack_factors(3, PackDir::PACK_RIGHT);
+
+	//test it's done properly
+	//1 number of factors
+	cout << "th new size (after packing at 3 to the right):" << th.size() << endl;
+	assert(th.size() == 4 /* n_mats-(n_mats-3)+1*/);
+	//2 identity of left factors
+	for(int i=0;i<3;i++)
+		assert((*(th.begin()+i))->norm() == (*(facts.begin()+i))->norm());
+	//3 the last factor is equal to the product of previous left factors
+	MatDense<FPP,Cpu> prod_fac3_fac4 = *dynamic_cast<MatDense<FPP,Cpu>*>(facts[3]);
+	prod_fac3_fac4 *= *dynamic_cast<MatDense<FPP,Cpu>*>(facts[4]);
+	Real<FPP> npacked = dynamic_cast<MatDense<FPP,Cpu>*>(*(th.begin()+3))->norm();
+	assert(npacked == prod_fac3_fac4.norm());
+	cout << "OK" << endl;
+
+	/****************************** Test packing to the left **/
+	cout << "* testing packing factors on the left (up to id 3 included)" << endl;
+	TransformHelper<FPP,Cpu> th2(facts, 1.0, false, true, false); //cloning_fact == true to copy facts and not altering it after
+
+	// pre-condition: verify facts is identitical to factors really in th
+	for(int i=0;i<th2.size();i++)
+		assert((*(th2.begin()+i))->norm() == (*(facts.begin()+i))->norm());
+	assert(th2.size() == facts.size());
+
+	// pack factors on the right of factor index 2
+	th2.pack_factors(3, PackDir::PACK_LEFT);
+
+	//test it's done properly
+	//1 number of factors
+	cout << "th2 new size (after packing at 3 to the right):" << th2.size() << endl;
+	assert(th2.size() == 2);
+	//2 identity of right factors
+	for(int i = 0; i < facts.size()-3-1;i++)
+		assert((*(th2.end()-1-i))->norm() == (*(facts.end()-1-i))->norm());
+	//3 the last factor is equal to the product of previous left factors
+	MatDense<FPP,Cpu> prod_fac0to3 = *dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(facts[0]);
+	for(int i=1;i<4;i++)
+		if(i < n_sparse_mats)
+			prod_fac0to3 *= MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(facts[i]));
+		else
+			prod_fac0to3 *= *dynamic_cast<Faust::MatDense<FPP,Cpu>*>(facts[i]);
+	npacked = dynamic_cast<MatDense<FPP,Cpu>*>(*(th2.begin()))->norm();
+	assert(Faust::fabs(npacked-prod_fac0to3.norm()) < 1e-6);
+	cout << "OK" << endl;
+
+	/******************** test packing only one factor (must do nothing) */
+	cout << "* testing packing a single factor (idempotent)" << endl;
+	TransformHelper<FPP,Cpu> th3(facts, 1.0, false, true, false); //cloning_fact == true to copy facts and not altering it after
+
+	th3.pack_factors(0,0);
+	th3.pack_factors(4,4);
+	for(int i=0;i<th3.size();i++)
+		assert((*(th3.begin()+i))->norm() == (*(facts.begin()+i))->norm());
+	assert(th3.size() == facts.size());
+	cout << "OK" << endl;
+	/************************* test packing all */
+	TransformHelper<FPP,Cpu> th4(facts, 1.0, false, true, false); //cloning_fact == true to copy facts and not altering it after
+	cout << "* testing packing all factors" << endl;
+	th4.pack_factors();
+	assert(th4.size() == 1);
+	MatDense<FPP,Cpu> prod_fac = *dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(facts[0]);
+	for(int i=1;i<n_mats;i++)
+		if(i < n_sparse_mats)
+			prod_fac *= MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(facts[i]));
+		else
+			prod_fac *= *dynamic_cast<Faust::MatDense<FPP,Cpu>*>(facts[i]);
+	npacked = dynamic_cast<MatDense<FPP,Cpu>*>(*(th2.begin()))->norm();
+	assert(Faust::fabs(npacked-prod_fac0to3.norm()) < 1e-6);
+	cout << "OK" << endl;
+
+	/****** sanity check on th0 */
+	// factors have to be not altered by all previous packing
+	for(int i=0;i<th0.size();i++)
+		assert((*(th0.begin()+i))->norm() == (*(facts.begin()+i))->norm());
+}

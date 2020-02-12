@@ -1451,6 +1451,49 @@ namespace Faust {
 			return this->transform->end();
 		}
 
+	template<typename FPP>
+		void Faust::TransformHelper<FPP,Cpu>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)
+		{
+			if(start_id < 0 || start_id >= size())
+				throw out_of_range("start_id is out of range.");
+			if(end_id < 0 || end_id >= size())
+				throw out_of_range("end_id is out of range.");
+			if(end_id == start_id)
+				//nothing to do
+				return;
+			// we have to multiply factors from start_id to end_id into one matrix
+			// simple way to do, 1) create a overhead-free TransformHelper with these factors
+			// 2) call get_product() to override the start_id factors with the result on the end
+			// 3) release through ref_man the factors to pack, from start_id to end_id(that's the dirty part to maybe enhance because normally this is the Transform object's responsibility). The packed factor must be acquired too.
+			// 4) erase factors from start_id to end_id
+			// 1)
+			std::vector<Faust::MatGeneric<FPP,Cpu>*> topack_factors(begin()+start_id, begin()+end_id+1);
+			Faust::TransformHelper<FPP,Cpu> t(topack_factors, 1.0, false, false, true);
+			// 2)
+			Faust::MatDense<FPP,Cpu> * packed_fac = new MatDense<FPP,Cpu>(t.get_product());
+			// 3)
+			for(auto f = begin()+start_id; f != begin()+end_id+1; f++)
+				Transform<FPP,Cpu>::ref_man.release(*f);
+			// 4)
+			this->transform->data.erase(this->transform->begin()+start_id, this->transform->begin()+end_id+1);
+			this->transform->data.insert(begin()+start_id,  packed_fac);
+			Transform<FPP,Cpu>::ref_man.acquire(packed_fac);
+		}
+
+	template <typename FPP> void TransformHelper<FPP,Cpu>::pack_factors(const faust_unsigned_int id, const PackDir dir)
+	{
+		if(dir == PACK_RIGHT)
+			pack_factors(id, size()-1);
+		else // dir == PACK_LEFT
+			pack_factors(0, id);
+	}
+
+	template <typename FPP> void TransformHelper<FPP,Cpu>::pack_factors()
+	{
+		//pack all factors in one
+		pack_factors(0, size()-1);
+	}
+
 	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
 	template<typename FPP> std::default_random_engine TransformHelper<FPP,Cpu>::generator(time(NULL));
 }

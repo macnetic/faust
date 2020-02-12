@@ -66,6 +66,11 @@ namespace Faust {
 		MIXED
 	};
 
+	enum PackDir {
+		PACK_LEFT,
+		PACK_RIGHT
+	};
+
 	template<typename FPP>
 		class TransformHelper<FPP,Cpu> {
 			static std::default_random_engine generator;
@@ -188,6 +193,9 @@ namespace Faust {
 			transf_iterator<FPP> begin() const;
 			transf_iterator<FPP> end() const;
 
+			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
+			void pack_factors();
+			void pack_factors(const faust_unsigned_int id, const PackDir dir);
 
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n, const bool norma=true);
