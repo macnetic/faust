@@ -48,7 +48,8 @@
 
 
 
-/** unit test for Transform begin() end end() factor iterators.
+/** unit test for TransformHelper variadic template ctor
+ * The goal is to test that factors are not duplicated in memory and it works when passing anything among a TransformHelper, Transform objects or a vector of MatGeneric<FPP,Cpu*> (anything that supports begin() and end() ops).
 */
 
 typedef @TEST_FPP@ FPP;
@@ -89,40 +90,34 @@ int main(int argc, char* argv[])
 
 	Faust::Transform<FPP,Cpu> t(facts, 1.0, false, false); //don't clone factors
 
-	cout << "Original transform: " << endl;
-	t.Display();
-	cout << "Testing Transform::begin()/end()"<< endl;
-	for(int i=0;i<n_mats;i++)
-	{
-		MatGeneric<FPP,Cpu>* ref_fact = facts[i];
-		MatGeneric<FPP,Cpu>* test_fact2 = *(t.begin()+i);
-		cout << "orig ptr fact[" << i << "]: " << (void*)ref_fact << " the copied one by ctor: "<< test_fact2 << "(equality tested)." << endl;
-		assert(ref_fact == test_fact2);
-	}
-
-	assert(*(t.end()-1) == facts[n_mats-1]);
-
 	TransformHelper<FPP,Cpu> th(t);
-	cout << "Testing TransformHelper::begin()/end()"<< endl;
-	for(int i=0;i<n_mats;i++)
-	{
-		unsigned long long ref_fact = th.get_fact_addr(i);
-		unsigned long long test_fact4 = (unsigned long long)(*(th.begin()+i));
-		cout << "orig ptr fact[" << i << "]: " << (void*)ref_fact << " the copied one by ctor: " << ((void*)test_fact4) << "(equality tested)."<< endl;
-		assert((unsigned long long) ref_fact == test_fact4);
-	}
 
-	assert((unsigned long long)*(th.end()-1) == th.get_fact_addr(n_mats-1));
-	cout << "test foreach on Transform " << endl;
-	for(auto f: t)
+	auto f = {facts[n_mats-1]}; //unfortunately TransformHelper ctor doesn't work directly with facts[n_mats-1]
+	// we have to create the initalizer_list separately and pass it to the ctor after
+	auto Mf = facts[n_mats-1];
+	Faust::TransformHelper<FPP, Cpu> th_(th, t, facts, f);// {facts[n_mats-1]});
+	th_.display();
+	cout << "t=" << endl;
+	t.Display();
+	int i;
+	for(i=0;i<th.size();i++)
 	{
-		cout << (void*)(unsigned long long) f << endl;
+		assert(th.get_fact_addr(i) == th_.get_fact_addr(i));
 	}
-
-	cout << "test foreach on TransformHelper " << endl;
-	for(auto f: t)
+	// testing adding of t factors in th_
+	int j;
+	for(j=i;j<i+t.size();j++)
 	{
-		cout << (void*)(unsigned long long) f << endl;
+		assert((*(t.begin()+j-i)) == facts[j-i]);
+		cout << "orig ptr fact[" << i << "]: " << (void*)*(t.begin()+j-i) << " the copied one by ctor: " << ((void*)*(th_.begin()+j)) << "(equality tested)."<< endl;
+		assert((*(t.begin()+j-i)) == *(th_.begin()+j));
 	}
-
+	// testing adding of facts in th_
+	int k;
+	for(k=j;k<j+t.size();k++)
+	{
+		assert(facts[k-j] == *(th_.begin()+k));
+	}
+	// testing f, last added factor in th_ // Faust::TransformHelper<FPP, Cpu> th_(th, t, facts, f);
+	assert(facts[k-j-1] == *(th_.begin()+k));
 }

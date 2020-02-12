@@ -193,8 +193,12 @@ namespace Faust
 				 * \param optimizedCopy (optional) : boolean to control which type of copy of the fact is made,
 				 if True, the copy is optimized, the dynamic type of the factor can changed
 				 if False, the dynamic type stay the same
-				 (default value false)*/
-				void push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false);
+				 (default value false). This argument is ignored if copying==false.
+
+				 * \param conjugate (optional): to conjugate the factor before pushing (works only if copying==true).
+				 * \param copying (optional): true to duplicate the factor in memory and push the copy. Otherwise the same pointer is pushed.
+				*/
+				void push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false, const bool copying=true);
 
 
 

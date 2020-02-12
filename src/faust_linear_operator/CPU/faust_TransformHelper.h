@@ -95,7 +95,7 @@ namespace Faust {
 			TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			TransformHelper(Transform<FPP,Cpu> &t, const bool moving=false);
-
+			template<typename ...GList> TransformHelper(GList& ... t);
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose=false, const bool conjugate=false);
 //			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
@@ -106,7 +106,12 @@ namespace Faust {
 
 			TransformHelper<FPP, Cpu>* multiply(TransformHelper<FPP, Cpu>*);
 			TransformHelper<FPP, Cpu>* multiply(FPP& scalar);
-			void push_back(const MatGeneric<FPP,Cpu>* M, bool optimizedCopy=false);
+			template<typename Head, typename ... Tail>
+				void push_back_(Head& h, Tail&... t);
+
+			void push_back_();
+			void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=false);
+
 			faust_unsigned_int getNbRow() const;
 			faust_unsigned_int getNbCol() const;
 			faust_unsigned_int getNBytes() const;

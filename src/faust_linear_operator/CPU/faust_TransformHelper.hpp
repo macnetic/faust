@@ -183,6 +183,13 @@ namespace Faust {
 	}
 
 	template<typename FPP>
+		template<typename ... GList>
+		TransformHelper<FPP,Cpu>::TransformHelper(GList& ... t) : TransformHelper<FPP,Cpu>()
+		{
+			this->push_back_(t...);
+		}
+
+	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> A, const bool transpose /* deft to false */, const bool conjugate)
 		{
 			is_transposed ^= transpose;
@@ -526,11 +533,32 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M, bool optimizedCopy /* false by default */)
+		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /* false by default */, const bool copying /* true to default */)
 		{
-			//warning: should not be called after initialization of factors (to respect the immutable property)
-			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after)
-			this->transform->push_back(M, optimizedCopy, is_conjugate); //2nd argument is for opt. (possibly converting dense <-> sparse)
+			//warning: should not be called after initialization of factors (to respect the immutability property)
+			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after or just use it internally -- not py/matfaust)
+			this->transform->push_back(M, optimizedCopy, is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
+		}
+
+	template<typename FPP>
+		template<typename Head, typename ... Tail>
+		void TransformHelper<FPP,Cpu>::push_back_(Head& h, Tail&... t)
+		{
+//			for(auto f: h)
+//				this->push_back(f, false, false);
+			for(auto it=h.begin(); it < h.end(); it++)
+			{
+				auto f = *it;
+				this->push_back(f, false, false);
+			}
+//			this->push_back(h, false, false);
+			this->push_back_(t...);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::push_back_()
+		{
+			// do nothing, here just for empty tail of above function
 		}
 
 	template<typename FPP>

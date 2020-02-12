@@ -255,6 +255,7 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatSparse<FPP,Cpu>
 		if(!dtor_delete_data) ref_man.acquire(data[i]);
 	}
 }
+
 template<typename FPP>
 Faust::Transform<FPP,Cpu>::Transform(const Transform<FPP, Cpu>* A, const bool transpose_A, const bool conj_A, const Transform<FPP, Cpu>* B, const bool transpose_B, const bool conj_B):
     data(std::vector<Faust::MatGeneric<FPP,Cpu>*>()), totalNonZeros(0), dtor_delete_data(false)
@@ -855,7 +856,7 @@ faust_unsigned_int Faust::Transform<FPP,Cpu>::get_fact_nnz(const faust_unsigned_
 }
 
 	template<typename FPP>
-void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,const bool optimizedCopy /*default value = false */, const bool conjugate)
+void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /*default value = false */, const bool conjugate /* default value = false*/, const bool copying /* default to true */)
 {
 	if (size()>0)
 	{
@@ -864,11 +865,20 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M,co
 			handleError(m_className,"push_back : incorrect dimensions");
 		}
 	}
-	Faust::MatGeneric<FPP,Cpu>* M_copy = M->Clone(optimizedCopy);
-	if(conjugate) M_copy->conjugate();
-	data.push_back(M_copy);
-	if(!dtor_delete_data) ref_man.acquire(M_copy);
-	totalNonZeros += M_copy->getNonZeros();
+	Faust::MatGeneric<FPP,Cpu>* M_;
+	if(copying)
+	{
+		M_ = M->Clone(optimizedCopy);
+		if(conjugate) M_->conjugate();
+	}
+	else
+	{
+		if(conjugate || optimizedCopy) throw runtime_error("copying argument mustn't be true if any of optimizedCopy or conjugate is true.");
+		M_ = const_cast<Faust::MatGeneric<FPP,Cpu>*>(M);
+	}
+	data.push_back(M_);
+	if(!dtor_delete_data) ref_man.acquire(M_);
+	totalNonZeros += M_->getNonZeros();
 
 #ifdef __COMPILE_TIMERS__
 	this->t_multiply_vector.push_back(Faust::Timer());
