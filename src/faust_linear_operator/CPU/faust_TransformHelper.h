@@ -110,7 +110,7 @@ namespace Faust {
 				void push_back_(Head& h, Tail&... t);
 
 			void push_back_();
-			void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=false);
+			void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=true);
 
 			faust_unsigned_int getNbRow() const;
 			faust_unsigned_int getNbCol() const;

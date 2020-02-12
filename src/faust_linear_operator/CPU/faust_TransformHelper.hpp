@@ -89,8 +89,15 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right)
 		: TransformHelper<FPP,Cpu>()
 		{
-			this->transform = make_shared<Transform<FPP,Cpu>>(th_left->transform.get(), th_left->is_transposed, th_left->is_conjugate,
-					th_right->transform.get(), th_right->is_transposed, th_right->is_conjugate);
+			bool right_left_transposed = th_left->is_transposed && th_right->is_transposed;
+			bool right_left_conjugate = th_left->is_conjugate && th_right->is_conjugate;
+			this->transform = make_shared<Transform<FPP,Cpu>>(th_left->transform.get(), th_left->is_transposed && ! right_left_transposed, th_left->is_conjugate && ! right_left_conjugate,
+					th_right->transform.get(), th_right->is_transposed && ! right_left_transposed, th_right->is_conjugate && ! right_left_conjugate);
+			// if the both are transposed, the factors won't be transposed in the Transform underlying object,
+			// for optimization just set the transpose flag here
+			this->is_transposed = right_left_transposed;
+			//likewise for the conjugate
+			this->is_conjugate = right_left_conjugate;
 		}
 
 	template<typename FPP>
