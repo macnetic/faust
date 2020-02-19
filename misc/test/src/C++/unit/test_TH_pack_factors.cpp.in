@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 		facts[i] = mat;
 	}
 
-	TransformHelper<FPP,Cpu> th0(facts, 1.0, false, false, false); // a Faust that uses facts without copy (I want to be sure factors are not altered on the end)
+	TransformHelper<FPP,Cpu> th0(facts, 1.0, false, true, false); 
 
 	/************** Test packing to the right */
 	cout << "* testing packing factors on the right (from id 3 included)" << endl;
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
 		assert((*(th2.begin()+i))->norm() == (*(facts.begin()+i))->norm());
 	assert(th2.size() == facts.size());
 
-	// pack factors on the right of factor index 2
+	// pack factors on the left of factor index 4
 	th2.pack_factors(3, PackDir::PACK_LEFT);
 
 	//test it's done properly
@@ -153,7 +153,11 @@ int main(int argc, char* argv[])
 	th3.pack_factors(0,0);
 	th3.pack_factors(4,4);
 	for(int i=0;i<th3.size();i++)
-		assert((*(th3.begin()+i))->norm() == (*(facts.begin()+i))->norm());
+    {
+//        cout << "norm new fact:" << (*(th3.begin()+i))->norm() << " norm old fact:" << (*(facts.begin()+i))->norm() << endl;
+        Real<FPP> dn = Faust::fabs((*(th3.begin()+i))->norm() - (*(facts.begin()+i))->norm());
+		assert(dn <= .0001);
+    }
 	assert(th3.size() == facts.size());
 	cout << "OK" << endl;
 	/************************* test packing all */

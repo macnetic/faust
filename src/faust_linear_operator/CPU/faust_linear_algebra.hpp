@@ -307,7 +307,7 @@ void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> &
 	{
 		if(A.is_id() && alpha == FPP(1.0))
 		{
-			std::cout << "gemv identity opt." << std::endl;
+//			std::cout << "gemv identity opt." << std::endl;
 			memcpy(y.getData(), px->getData(), sizeof(FPP)*nbRowOpA);
 		}
 		else if (typeA == 'N')

@@ -116,13 +116,16 @@ namespace Faust {
 
 			void push_back_();
 			void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=true);
-
+            void pop_back();
+            void pop_front();
+            void push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=true);
 			faust_unsigned_int getNbRow() const;
 			faust_unsigned_int getNbCol() const;
 			faust_unsigned_int getNBytes() const;
 			bool isReal() const;
 			faust_unsigned_int get_total_nnz() const;
 			faust_unsigned_int size() const;
+			void resize(faust_unsigned_int);
 			void display() const;
 			string to_string() const;
 			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
@@ -160,6 +163,7 @@ namespace Faust {
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 			TransformHelper<FPP, Cpu>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			MatDense<FPP,Cpu> get_product() const;
+            void get_product(Faust::MatDense<FPP,Cpu>& prod) const;
 			void save_mat_file(const char* filename) const;
 			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			TransformHelper<FPP,Cpu>* transpose();
@@ -196,7 +200,9 @@ namespace Faust {
 			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
 			void pack_factors();
 			void pack_factors(const faust_unsigned_int id, const PackDir dir);
-
+            /** for testing purpose only (memory leaks enabled) */
+			void disable_dtor() { this->transform->disable_dtor(); }
+            void enable_dtor() { this->transform->enable_dtor(); }
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n, const bool norma=true);
 			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n, const bool norma=true);

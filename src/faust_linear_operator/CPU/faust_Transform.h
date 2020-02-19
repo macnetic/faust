@@ -134,7 +134,8 @@ namespace Faust
 				//template<Device DEVICE> class SpBlasHandle;
 				/** \brief Perform the product of all factorized matrix. */
 				Faust::MatDense<FPP,Cpu> get_product(const char opThis='N', const bool isConj=false)const;
-				Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const;
+				void get_product(Faust::MatDense<FPP,Cpu> &, const char opThis='N', const bool isConj=false)const;
+                Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const;
 
 
 				/** \brief return a copy of the factor of index id
@@ -208,7 +209,12 @@ namespace Faust
 				 if True, the copy is optimized, the dynamic type of the factor can changed
 				 if False, the dynamic type stay the same
 				 (default value false)*/
-				void push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false);
+				void push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false, const bool copying=true);
+                void insert(faust_unsigned_int i, Faust::MatGeneric<FPP,Cpu>* M);
+                void pop_back();
+                void pop_front();
+                void erase(faust_unsigned_int i);
+                void resize(faust_unsigned_int size);
 				//void pop_back(Faust::MatGeneric<FPP,Cpu>* M);
 				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M);
 				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M) const;
@@ -249,11 +255,14 @@ namespace Faust
 #ifdef FAUST_VERBOSE
 					std::cout << "~Transform()" << std::endl;
 #endif
-					for (int i=0;i<data.size();i++)
-						if(this->dtor_delete_data)
-							delete data[i];
-						else
-							ref_man.release(data[i]);
+					if(! this->dtor_disabled)
+					{
+						for (int i=0;i<data.size();i++)
+							if(this->dtor_delete_data)
+								delete data[i];
+							else
+								ref_man.release(data[i]);
+					}
 				}
 
 				/*!
@@ -305,6 +314,10 @@ namespace Faust
 		void print_timers() const;
 #endif
 
+		// should be used very carefully for testing purpose only
+        // (it allows memory leaks)
+		void disable_dtor() { this->dtor_disabled = true; }
+		void enable_dtor() { this->dtor_disabled = false; }
 			private:
 		void disable_data_deletion() { this->dtor_delete_data = false; }
 		void enable_data_deletion() { this->dtor_delete_data = true; }
@@ -314,6 +327,7 @@ namespace Faust
 		static const char * m_className;
 		std::vector<Faust::MatGeneric<FPP,Cpu>*> data;
 		bool dtor_delete_data;
+		bool dtor_disabled;
 		static RefManager ref_man;
 
 #ifdef __COMPILE_TIMERS__

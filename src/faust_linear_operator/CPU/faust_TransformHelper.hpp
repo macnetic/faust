@@ -540,11 +540,31 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::pop_back()
+        {
+            transform->pop_back();
+        }
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::pop_front()
+        {
+            transform->pop_front();
+        }
+
+	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /* false by default */, const bool copying /* true to default */)
 		{
 			//warning: should not be called after initialization of factors (to respect the immutability property)
 			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after or just use it internally -- not py/matfaust)
 			this->transform->push_back(M, optimizedCopy, is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
+		}
+    
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::push_first(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /* false by default */, const bool copying /* true to default */)
+		{
+			//warning: should not be called after initialization of factors (to respect the immutability property)
+			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after or just use it internally -- not py/matfaust)
+			this->transform->push_first(M, optimizedCopy, is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
 		}
 
 	template<typename FPP>
@@ -625,6 +645,12 @@ namespace Faust {
 		faust_unsigned_int TransformHelper<FPP,Cpu>::size() const
 		{
 			return this->transform->size();
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::resize(faust_unsigned_int sz)
+		{
+			return this->transform->resize(sz);
 		}
 
 	template<typename FPP>
@@ -927,6 +953,11 @@ namespace Faust {
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product() const {
 			return this->transform->get_product(isTransposed2char(), is_conjugate);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod) const {
+			this->transform->get_product(prod, isTransposed2char(), is_conjugate);
 		}
 
 	template<typename FPP>
@@ -1458,26 +1489,38 @@ namespace Faust {
 				throw out_of_range("start_id is out of range.");
 			if(end_id < 0 || end_id >= size())
 				throw out_of_range("end_id is out of range.");
+            Faust::MatDense<FPP,Cpu> * packed_fac = nullptr;
 			if(end_id == start_id)
-				//nothing to do
-				return;
-			// we have to multiply factors from start_id to end_id into one matrix
-			// simple way to do, 1) create a overhead-free TransformHelper with these factors
-			// 2) call get_product() to override the start_id factors with the result on the end
-			// 3) release through ref_man the factors to pack, from start_id to end_id(that's the dirty part to maybe enhance because normally this is the Transform object's responsibility). The packed factor must be acquired too.
-			// 4) erase factors from start_id to end_id
-			// 1)
-			std::vector<Faust::MatGeneric<FPP,Cpu>*> topack_factors(begin()+start_id, begin()+end_id+1);
-			Faust::TransformHelper<FPP,Cpu> t(topack_factors, 1.0, false, false, true);
-			// 2)
-			Faust::MatDense<FPP,Cpu> * packed_fac = new MatDense<FPP,Cpu>(t.get_product());
+            {
+                //nothing to do except converting to MatDense if start_id
+                //factor is a MatSparse
+                packed_fac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(*(begin()+start_id));
+                if(packed_fac == nullptr) // factor start_id is not at MatDense, convert it
+                    packed_fac = new MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(*(begin()+start_id)));
+                else
+                    return; //no change
+            }
+            else
+            {
+                // we have to multiply factors from start_id to end_id into one matrix
+                // simple way to do, 1) create a overhead-free TransformHelper with these factors
+                // 2) call get_product() to override the start_id factors with the result on the end
+                // 3) erase factors from start_id to end_id and insert packed factor too to replace them (that's Transform object responsibility).
+                // 1)
+                std::vector<Faust::MatGeneric<FPP,Cpu>*> topack_factors(begin()+start_id, begin()+end_id+1);
+                Faust::TransformHelper<FPP,Cpu> t(topack_factors, 1.0, false, false, true);
+                // 2)
+                packed_fac = new MatDense<FPP,Cpu>(t.get_product());
+            }
 			// 3)
-			for(auto f = begin()+start_id; f != begin()+end_id+1; f++)
-				Transform<FPP,Cpu>::ref_man.release(*f);
-			// 4)
-			this->transform->data.erase(this->transform->begin()+start_id, this->transform->begin()+end_id+1);
-			this->transform->data.insert(begin()+start_id,  packed_fac);
-			Transform<FPP,Cpu>::ref_man.acquire(packed_fac);
+            faust_unsigned_int i = end_id;
+            while(i>=start_id)
+            {
+                this->transform->erase(i);
+                if(i == 0) break;
+                i--;
+            }
+            this->transform->insert(start_id, packed_fac);
 		}
 
 	template <typename FPP> void TransformHelper<FPP,Cpu>::pack_factors(const faust_unsigned_int id, const PackDir dir)

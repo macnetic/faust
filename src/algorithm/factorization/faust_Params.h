@@ -158,7 +158,7 @@ namespace Faust
         public:
         // Required members
         
-	// data is now independant from the params class,
+	// data is now independent from the params class,
         //Faust::MatDense<FPP,DEVICE> data; 
 	faust_unsigned_int m_nbRow; // number of row of the matrix to be factorized
 	faust_unsigned_int m_nbCol; // number of columns of the matrix to be factorized
