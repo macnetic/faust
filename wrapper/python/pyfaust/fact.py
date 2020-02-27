@@ -329,10 +329,14 @@ def _check_fact_mat(funcname, M):
 
 # experimental block start
 def hierarchical_py(A, J, N, res_proxs, fac_proxs, is_update_way_R2L=False,
-                    is_fact_side_left=False, compute_2norm_on_arrays=False):
+                    is_fact_side_left=False, compute_2norm_on_arrays=False,
+                    norm2_max_iter=100, norm2_threshold=1e-6, use_csr=True):
     S = Faust([A])
     l2_ = 1
+    compute_2norm_on_arrays_ = compute_2norm_on_arrays
     for i in range(J-1):
+        if(isinstance(compute_2norm_on_arrays, list)):
+            compute_2norm_on_arrays_ = compute_2norm_on_arrays[i]
         print("hierarchical_py factor", i+1)
         if(is_fact_side_left):
             Si = S.factors(0)
@@ -340,7 +344,9 @@ def hierarchical_py(A, J, N, res_proxs, fac_proxs, is_update_way_R2L=False,
             Si = S.factors(i)
         Si, l_ = palm4msa_py(Si, 2, N, [fac_proxs[i], res_proxs[i]], is_update_way_R2L,
                     S='zero_and_ids', _lambda=1,
-                             compute_2norm_on_arrays=compute_2norm_on_arrays)
+                             compute_2norm_on_arrays=compute_2norm_on_arrays_,
+                             norm2_max_iter=norm2_max_iter,
+                             norm2_threshold=norm2_threshold, use_csr=use_csr)
         l2_ *= l_
         if i > 1:
             S = S.left(i-1)*Si
@@ -353,14 +359,17 @@ def hierarchical_py(A, J, N, res_proxs, fac_proxs, is_update_way_R2L=False,
                                                [*fac_proxs[0:i+1],
                                                 res_proxs[i]]],
                         is_update_way_R2L, S=S, _lambda=l2_,
-                            compute_2norm_on_arrays=compute_2norm_on_arrays)
+                            compute_2norm_on_arrays=compute_2norm_on_arrays_,
+                             norm2_max_iter=norm2_max_iter,
+                             norm2_threshold=norm2_threshold, use_csr=use_csr)
         S = S*1/l2_
     S = S*l2_
     return S
 
 from numpy.linalg import norm
 def palm4msa_py(A, J, N, proxs, is_update_way_R2L=False, S=None, _lambda=1,
-                compute_2norm_on_arrays=False):
+                compute_2norm_on_arrays=False, norm2_max_iter=100,
+                norm2_threshold=1e-6, use_csr=True):
     dims = [(prox.constraint._num_rows, prox.constraint._num_cols) for prox in
             proxs ]
     A_H = A.T.conj()
@@ -405,16 +414,22 @@ def palm4msa_py(A, J, N, proxs, is_update_way_R2L=False, S=None, _lambda=1,
 
             else:
                 c = \
-                        lipschitz_multiplicator*_lambda**2*R.norm(2,max_num_its=1000,
-                                                                  treshold=1e-16)**2 * \
-                        L.norm(2,max_num_its=1000, treshold=1e-16)**2
+                        lipschitz_multiplicator*_lambda**2*R.norm(2, max_num_its=norm2_max_iter,
+                                                                  threshold=norm2_threshold)**2 * \
+                        L.norm(2,max_num_its=norm2_max_iter, threshold=norm2_threshold)**2
             if(np.isnan(c) or c == 0):
                 raise Exception("Failed to compute c (inverse of descent step),"
                                 "it could be because of the Faust 2-norm error,"
                                 "try option compute_2norm_on_arrays=True")
-            S_j = \
-                    proxs[j](S_j-_lambda*(L.H*(_lambda*L*(S_j*R)-A)*R.H)*1/c)
-            #csr_matrix(proxs[j](S_j-_lambda*(L.H*(_lambda*L*(S_j*R)-A)*R.H)*1/c))
+            if(not isinstance(S_j, np.ndarray)): # equiv. to use_csr except
+                                                 # maybe for the first iteration
+                S_j = S_j.toarray()
+            D = S_j-_lambda*(L.H*(_lambda*L*(S_j*R)-A)*R.H)*1/c
+            if(not isinstance(D, np.ndarray)):
+                D = D.toarray()
+            S_j = proxs[j](D)
+            if(use_csr):
+                S_j = csr_matrix(S_j)
             if(S.numfactors() > 2 and j > 0 and j < S.numfactors()-1):
                 S = L*Faust(S_j)*R
             elif(j == 0):
@@ -815,6 +830,9 @@ def palm4msa_constends(M, p, A, B=None, ret_lambda=False):
         return F, _lambda
     else:
         return F
+
+
+
 # experimental block end
 
 # experimental block start
