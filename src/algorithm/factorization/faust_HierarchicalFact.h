@@ -95,6 +95,8 @@ namespace Faust
 
         protected:
           const std::vector< std::vector<const Faust::ConstraintGeneric*>> cons;
+          Real<FPP> norm2_threshold;
+          int norm2_max_iter;
           bool m_isUpdateWayR2L;
           bool m_isFactSideLeft;
           bool m_isVerbose;

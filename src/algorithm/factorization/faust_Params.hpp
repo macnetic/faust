@@ -140,7 +140,9 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
         init_lambda(init_lambda_),
         isConstantStepSize(constant_step_size_),
 		step_size(step_size_),
-		gradCalcOptMode(gradCalcOptMode)
+		gradCalcOptMode(gradCalcOptMode),
+        norm2_threshold(FAUST_PRECISION),
+        norm2_max_iter(FAUST_NORM2_MAX_ITER)
 {
     if (nbFact_ <= 2)
     {
@@ -253,7 +255,9 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
             init_lambda(init_lambda_),
 			isConstantStepSize(constant_step_size_),
 			step_size(step_size_),
-			gradCalcOptMode(gradCalcOptMode)
+			gradCalcOptMode(gradCalcOptMode),
+            norm2_threshold(FAUST_PRECISION),
+            norm2_max_iter(FAUST_NORM2_MAX_ITER)
 
 {
  check_constraint_validity();
@@ -278,7 +282,9 @@ Faust::Params<FPP,DEVICE,FPP2>::Params() : m_nbRow(0),
 	init_lambda(defaultLambda),
 	isConstantStepSize(defaultConstantStepSize),
 	step_size(defaultStepSize),
-	gradCalcOptMode(defaultGradCalcOptMode)
+	gradCalcOptMode(defaultGradCalcOptMode),
+    norm2_threshold(FAUST_PRECISION),
+    norm2_max_iter(FAUST_NORM2_MAX_ITER)
 {}
 
 
@@ -308,6 +314,8 @@ void Faust::Params<FPP,DEVICE,FPP2>::Display() const
 	std::cout<<"stop_crit_2facts : "<<stop_crit_2facts.get_crit()<<std::endl;
 	std::cout<<"stop_crit_global : "<<stop_crit_global.get_crit()<<std::endl;
 	std::cout << "gradCalcOptMode: "<< gradCalcOptMode << std::endl;
+    std::cout << "norm2_threshold:" << norm2_threshold << std::endl;
+    std::cout << "norm2_max_iter:" << norm2_max_iter << std::endl;
 	/*cout<<"INIT_FACTS :"<<endl;
 	for (int L=0;L<init_fact.size();L++)init_fact[L].Display();*/
 

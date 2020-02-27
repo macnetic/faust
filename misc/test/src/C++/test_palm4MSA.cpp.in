@@ -103,6 +103,7 @@ int main()
 	initLambda = (FPP2) init_double_from_matio(configPalm2Filename, "init_lambda");
 	nfacts = init_int_from_matio(configPalm2Filename, "nfacts");
 	niter = init_int_from_matio(configPalm2Filename, "niter");
+	//niter = 2000;
 
 	updateWay = init_bool_from_matio(configPalm2Filename, "update_way");
 	verbose = init_bool_from_matio(configPalm2Filename, "verbose");
@@ -133,9 +134,11 @@ int main()
 	palm2.compute_facts();
     std::vector<Faust::MatDense<FPP,Cpu> >& full_facts = const_cast< std::vector<Faust::MatDense<FPP,Cpu> >&>(palm2.get_facts());
 	FPP2 lambda = palm2.get_lambda();
+	cout << "out lambda: " << lambda << endl;
 	(full_facts[0]) *= FPP(lambda);
 
 	Faust::Transform<FPP, Cpu>* t = new Faust::Transform<FPP, Cpu>(full_facts);
+	t->Display();
 	//relativeError
 	Faust::MatDense<FPP,Cpu> faustProduct;
 	faustProduct=t->get_product();

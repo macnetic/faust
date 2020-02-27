@@ -77,8 +77,8 @@ enum Device
 typedef unsigned long int faust_unsigned_int;
 typedef long int faust_int;
 
-const double FAUST_PRECISION = 0.0001;
-const faust_unsigned_int nbr_iter_norm = 100;
+const double FAUST_PRECISION = 1e-6;
+const faust_unsigned_int FAUST_NORM2_MAX_ITER = 100;
 
 #include "Eigen/Core"
 template<typename FPP>

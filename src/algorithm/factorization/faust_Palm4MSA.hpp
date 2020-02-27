@@ -92,6 +92,8 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,
     verbose(params_.isVerbose),
     isUpdateWayR2L(params_.isUpdateWayR2L),
     isConstantStepSize(params_.isConstantStepSize),
+    norm2_threshold(params_.norm2_threshold),
+    norm2_max_iter(params_.norm2_max_iter),
     isGradComputed(false),
     isProjectionComputed(false),
     isLastFact(false),
@@ -134,6 +136,8 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FP
 	verbose(params_palm_.isVerbose),
 	isUpdateWayR2L(params_palm_.isUpdateWayR2L),
 	isConstantStepSize(params_palm_.isConstantStepSize),
+    norm2_threshold(params_palm_.norm2_threshold),
+    norm2_max_iter(params_palm_.norm2_max_iter),
 	isGradComputed(false),
 	isProjectionComputed(false),
 	isLastFact(false),
@@ -163,7 +167,6 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_facts()
 	{
 		next_step();
 	}
-
 }
 
 template<typename FPP,Device DEVICE,typename FPP2>
@@ -569,11 +572,8 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_c()
    if (!isConstantStepSize)
    {
 		int flag1,flag2;
-
-	   int nbr_iter = 10000;
-	   FPP2 threshold = 1e-16;
-	   FPP2 nL1=LorR.spectralNorm(nbr_iter,threshold,flag1,blas_handle);
-	   FPP2 nR1=RorL[m_indFact].spectralNorm(nbr_iter,threshold,flag2,blas_handle);
+	   FPP2 nL1=LorR.spectralNorm(norm2_max_iter,norm2_threshold,flag1,blas_handle);
+	   FPP2 nR1=RorL[m_indFact].spectralNorm(norm2_max_iter,norm2_threshold,flag2,blas_handle);
 	   c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*m_lambda*m_lambda;
    }
 

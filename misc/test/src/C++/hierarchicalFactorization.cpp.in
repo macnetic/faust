@@ -241,7 +241,7 @@ int main(int argc, char* argv[])
 	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
 	std::cout<<"		"<<relativeError<<std::endl<<std::endl;
 
-
+    hierFactCore.Display();
 	//time comparison between matrix vector product and faust-vector product
 	int niterTimeComp = 10;
 	if (niterTimeComp > 0)

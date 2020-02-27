@@ -105,6 +105,8 @@ namespace Faust
           FPP2 step_size;
           FPP2 init_lambda;
 		  GradientCalcOptMode gradCalcOptMode;
+          Real<FPP> norm2_threshold;
+          unsigned int norm2_max_iter;
 
           void Display() const;
           void init_factors();

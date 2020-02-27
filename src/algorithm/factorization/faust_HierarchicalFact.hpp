@@ -70,6 +70,8 @@ Faust::HierarchicalFact<FPP,DEVICE,FPP2>::HierarchicalFact(const Faust::MatDense
    m_isFactSideLeft(params_.isFactSideLeft),
    m_isVerbose(params_.isVerbose),
    nbFact(params_.m_nbFact-1),
+   norm2_threshold(params_.norm2_threshold),
+   norm2_max_iter(params_.norm2_max_iter),
    palm_2(Palm4MSA<FPP,DEVICE,FPP2>(M,params_, cublasHandle, false)),
    palm_global(new Palm4MSA<FPP,DEVICE,FPP2>(M,params_, cublasHandle, true)),
    cons_tmp_global(vector<const Faust::ConstraintGeneric*>()),

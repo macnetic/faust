@@ -104,13 +104,15 @@ Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm(
             init_lambda(init_lambda_),
 			isConstantStepSize(constant_step_size_),
 			step_size(step_size_),
-			gradCalcOptMode(gradCalcOptMode)
+			gradCalcOptMode(gradCalcOptMode),
+            norm2_max_iter(FAUST_NORM2_MAX_ITER),
+            norm2_threshold(FAUST_PRECISION)
 {
  check_constraint_validity();
 }
 
 template<typename FPP,Device DEVICE,typename FPP2>
-Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm() : data(0,0),nbFact(0),cons(std::vector<const Faust::ConstraintGeneric*>()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize), gradCalcOptMode(Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode) {}
+Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm() : data(0,0),nbFact(0),cons(std::vector<const Faust::ConstraintGeneric*>()),init_lambda(defaultLambda),isConstantStepSize(defaultConstantStepSize),step_size(defaultStepSize), gradCalcOptMode(Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode),  norm2_max_iter(FAUST_NORM2_MAX_ITER), norm2_threshold(FAUST_PRECISION) {}
 
 template<typename FPP,Device DEVICE,typename FPP2>
 void Faust::ParamsPalm<FPP,DEVICE,FPP2>::init_factors()
@@ -163,6 +165,9 @@ void Faust::ParamsPalm<FPP,DEVICE,FPP2>::Display() const
 	std::cout<<"data :  nbRow "<<data.getNbRow()<<" NbCol : "<< data.getNbCol()<<std::endl;
 	std::cout<<"stop_crit : "<<stop_crit.get_crit()<<std::endl;
 	std::cout << "gradCalcOptMode: "<< gradCalcOptMode << std::endl;
+    std::cout << "norm2_threshold:" << norm2_threshold << std::endl;
+    std::cout << "norm2_max_iter:" << norm2_max_iter << std::endl;
+
 	/*cout<<"INIT_FACTS :"<<endl;
 	for (int L=0;L<init_fact.size();L++)init_fact[L].Display();*/
 

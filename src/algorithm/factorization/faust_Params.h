@@ -177,6 +177,8 @@ namespace Faust
         bool isConstantStepSize;
         FPP2 step_size;
 		GradientCalcOptMode gradCalcOptMode;
+        Real<FPP> norm2_threshold;
+        unsigned int norm2_max_iter;
 
         //default value
         static const int defaultNiter1;

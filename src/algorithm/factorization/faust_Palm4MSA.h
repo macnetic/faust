@@ -190,6 +190,8 @@ namespace Faust
           bool isInit; // only used for global factorization (if isGlobal)
           Faust::MatDense<FPP,DEVICE> grad_over_c;
           FPP2 c;
+          Real<FPP> norm2_threshold;
+          int norm2_max_iter;
           Faust::MatDense<FPP,DEVICE> error; // error = lambda*L*S*R - data
           Faust::BlasHandle<DEVICE> blas_handle;
 		  /** is_complex == true if the algorithm is running on a complex matrix (to approximate) */
