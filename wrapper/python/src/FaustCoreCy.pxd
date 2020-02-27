@@ -167,6 +167,8 @@ cdef extern from "FaustFact.h":
         bool is_verbose
         bool constant_step_size
         unsigned int grad_calc_opt_mode
+        int norm2_max_iter
+        double norm2_threshold
 
     cdef cppclass PyxParamsFactPalm4MSA[FPP,FPP2](PyxParamsFact[FPP,FPP2]):
         FPP** init_facts # num_facts elts
@@ -202,6 +204,9 @@ cdef extern from "FaustFact.h":
     cdef FaustCoreCpp[FPP]* fact_hierarchical_fft[FPP,FPP2](FPP*, FPP*, unsigned int, unsigned int,
                                              PyxParamsHierarchicalFactFFT[FPP,FPP2]*,
                                                        FPP*)
+
+    cdef FaustCoreCpp[FPP]* hierarchical2020[FPP](FPP* mat, unsigned int num_rows, unsigned int num_cols, unsigned int nites, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, double* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, bool use_csr, unsigned int norm2_max_iter, double norm2_threshold)
+
 
 cdef extern from "FaustFactGivensFGFT.h":
 

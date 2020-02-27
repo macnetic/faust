@@ -1131,6 +1131,8 @@ cdef class FaustFact:
             cpp_params.init_lambda = p.init_lambda
             cpp_params.step_size = p.step_size
             cpp_params.grad_calc_opt_mode = p.grad_calc_opt_mode
+            cpp_params.norm2_max_iter = int(p.norm2_max_iter)
+            cpp_params.norm2_threshold = p.norm2_threshold
             cpp_params.stop_crit = cpp_stop_crit
             cpp_params.init_facts = <double**> \
                     PyMem_Malloc(sizeof(double*)*p.num_facts)
@@ -1155,6 +1157,8 @@ cdef class FaustFact:
             cpp_params_cplx.init_lambda = p.init_lambda
             cpp_params_cplx.step_size = p.step_size
             cpp_params_cplx.grad_calc_opt_mode = p.grad_calc_opt_mode
+            cpp_params_cplx.norm2_max_iter = int(p.norm2_max_iter)
+            cpp_params_cplx.norm2_threshold = p.norm2_threshold
             cpp_params_cplx.stop_crit = cpp_stop_crit
             cpp_params_cplx.init_facts = <complex**> \
                     PyMem_Malloc(sizeof(complex*)*p.num_facts)
@@ -1353,6 +1357,8 @@ cdef class FaustFact:
         cpp_params.init_lambda = p.init_lambda
         cpp_params.step_size = p.step_size
         cpp_params.grad_calc_opt_mode = p.grad_calc_opt_mode
+        cpp_params.norm2_max_iter = int(p.norm2_max_iter)
+        cpp_params.norm2_threshold = p.norm2_threshold
         cpp_params.stop_crits = cpp_stop_crits
         cpp_params.is_verbose = p.is_verbose
         cpp_params.is_fact_side_left = p.is_fact_side_left
@@ -1489,6 +1495,8 @@ cdef class FaustFact:
         cpp_params_cplx.init_lambda = p.init_lambda
         cpp_params_cplx.step_size = p.step_size
         cpp_params_cplx.grad_calc_opt_mode = p.grad_calc_opt_mode
+        cpp_params_cplx.norm2_max_iter = int(p.norm2_max_iter)
+        cpp_params_cplx.norm2_threshold =  p.norm2_threshold
         cpp_params_cplx.stop_crits = cpp_stop_crits
         cpp_params_cplx.is_verbose = p.is_verbose
         cpp_params_cplx.is_fact_side_left = p.is_fact_side_left
@@ -1977,3 +1985,87 @@ cdef class FaustFact:
                             " enable_large_Faust to True to force the computation).")
         return coreU, S, coreV
 
+    @staticmethod
+    def hierarchical2020(M, nites, constraints, is_update_way_R2L,
+                         is_fact_side_left, use_csr, norm2_threshold,
+                         norm2_max_iter):
+
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+
+        cdef double[:,:] Mview
+
+        # views for lambda
+        cdef double[:] outbufview
+
+        cdef double[:,:] tmp_mat
+
+        cdef PyxConstraintGeneric** cpp_constraints
+
+        # store only lambda as a return from Palm4MSA algo
+        _out_buf = np.array([0], dtype=M.dtype)
+
+        Mview=M
+        outbufview = _out_buf
+
+        num_constraints = len(constraints)
+        num_facts = int(num_constraints/2+1)
+
+        cpp_constraints = \
+        <PyxConstraintGeneric**> \
+        PyMem_Malloc(sizeof(PyxConstraintGeneric*)*num_constraints)
+
+
+        for i in range(0,num_constraints):
+            cons = constraints[i]
+            #print("FaustFact.fact_hierarchical() cons.name =", cons.name)
+            if(cons.is_int_constraint()):
+                #print("FaustFact.fact_hierarchical() Int Constraint")
+                cpp_constraints[i] = <PyxConstraintInt*> PyMem_Malloc(sizeof(PyxConstraintInt))
+                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons._cons_value
+            elif(cons.is_real_constraint()):
+                #print("FaustFact.fact_hierarchical() Real Constraint")
+                cpp_constraints[i] = <PyxConstraintScalar[double]*> \
+                PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
+                (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
+                        cons._cons_value
+            elif(cons.is_mat_constraint()):
+                #print("FaustFact.fact_hierarchical() Matrix Constraint")
+                cpp_constraints[i] = <PyxConstraintMat[double]*> \
+                        PyMem_Malloc(sizeof(PyxConstraintMat[double]))
+                tmp_mat = cons._cons_value
+                (<PyxConstraintMat[double]*>cpp_constraints[i]).parameter =\
+                        &tmp_mat[0,0]
+                (<PyxConstraintMat[double]*>cpp_constraints[i]).parameter_sz =\
+                        cons._cons_value_sz
+
+            else:
+                raise ValueError("Constraint type/name is not recognized.")
+            cpp_constraints[i].name = cons.name
+            cpp_constraints[i].num_rows = cons._num_rows
+            cpp_constraints[i].num_cols = cons._num_cols
+
+        core = FaustCore(core=True)
+        core.core_faust_dbl = \
+                FaustCoreCy.hierarchical2020[double](&Mview[0,0], M_num_rows,
+                                                     M_num_cols,
+                                                     nites,
+                                                     cpp_constraints,
+                                                     num_constraints,
+                                                     num_facts,
+                                                     &outbufview[0],
+                                                     is_update_way_R2L,
+                                                     is_fact_side_left,
+                                                     use_csr,
+                                                     norm2_max_iter,
+                                                     norm2_threshold)
+        core._isReal = True
+
+        for i in range(0,num_constraints):
+            PyMem_Free(cpp_constraints[i])
+        PyMem_Free(cpp_constraints)
+
+        if(core.core_faust_dbl == NULL): raise Exception("hierarchical2020"
+                                                          " has failed.");
+
+        return core, np.real(_out_buf[0])

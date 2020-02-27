@@ -575,6 +575,8 @@ class ParamsFact(ABC):
         self.is_verbose = is_verbose
         self.constant_step_size = constant_step_size
         self.grad_calc_opt_mode = grad_calc_opt_mode
+        self.norm2_max_iter = 0 # None for default value from C++ core
+        self.norm2_threshold = 0
 
     @abstractmethod
     def is_mat_consistent(self, M):

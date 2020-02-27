@@ -442,6 +442,19 @@ def palm4msa_py(A, J, N, proxs, is_update_way_R2L=False, S=None, _lambda=1,
     return S, _lambda
 # experimental block end
 
+# experimental block start
+def hierarchical2020(M, nites, constraints, is_update_way_R2L,
+                     is_fact_side_left, use_csr, norm2_threshold,
+                     norm2_max_iter):
+    core_obj,_lambda = \
+            _FaustCorePy.FaustFact.hierarchical2020(M, nites, constraints, is_update_way_R2L,
+                                                    is_fact_side_left, use_csr, norm2_threshold,
+                                                    norm2_max_iter)
+    F = Faust(core_obj=core_obj)
+    return F, _lambda
+
+# experimental block end
+
 def palm4msa(M, p, ret_lambda=False):
     """
     Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.

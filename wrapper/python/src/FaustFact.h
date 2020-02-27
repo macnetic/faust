@@ -73,6 +73,8 @@ class PyxParamsFact
         bool is_verbose;
         bool constant_step_size;
         unsigned int grad_calc_opt_mode;
+        int norm2_max_iter;
+        double norm2_threshold;
 };
 
 template<typename FPP, typename FPP2 = double>
@@ -132,6 +134,9 @@ FaustCoreCpp<FPP>* fact_hierarchical(FPP* mat, unsigned int num_rows, unsigned i
 
 template<typename FPP, typename FPP2>
 FaustCoreCpp<FPP>* fact_hierarchical_fft(FPP* U, FPP* L, unsigned int num_rows, unsigned int num_cols, PyxParamsHierarchicalFactFFT<FPP, FPP2>* p, FPP* out_lambda_D);
+
+template<typename FPP>
+FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned int num_cols, unsigned int nites, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, double* out_buf, bool is_update_way_R2L, bool is_fact_side_left, bool use_csr, unsigned int norm2_max_iter, double norm2_threshold);
 
 
 #include "FaustFact.hpp"
