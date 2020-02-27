@@ -1,0 +1,207 @@
+/****************************************************************************/
+/*                              Description:                                */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.inria.fr>                         */
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2020):   Hakim H., Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+/****************************************************************************/
+#include "faust_MatSparse.h"
+#include "faust_Timer.h"
+#include "faust_Transform.h"
+#include "faust_TransformHelper.h"
+#include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_core.h"
+#include <string>
+#include <sstream>
+#include "faust_BlasHandle.h"
+#include "faust_SpBlasHandle.h"
+#include "faust_HierarchicalFact.h"
+#include "faust_hierarchical.h"
+#include <iostream>
+#include <iomanip>
+
+/** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
+* An dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
+* \param MatrixFilename :  a .mat (MATLAB file) where the matrix to be factorized is stored (or its transposed (cf. parameter transposeMatrix))
+* \param configFilename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hierFact)
+* \param expectedLambda (optionnal) : compared the expected scalar of the factorisation with the computed one in the precision defined with epsilon
+*\param epsilon (optionnal) : precision for the test of equality (default value 0.0001)
+*\param transposeMatrix (optionnal) : -value 'N' (default value),  the  matrix stored in MatrixFilename is factorized
+				      -value 'T' , the transposed matrix is factorized
+*/
+
+typedef @TEST_FPP@ FPP;
+typedef @TEST_FPP2@ FPP2;
+
+
+void create_matrix(Faust::MatDense<complex<FPP2>,Cpu>& data, Faust::MatDense<complex<FPP2>,Cpu>& idata)
+{
+	idata = data;
+	idata.scalarMultiply(complex<FPP2>(0,1));
+	data += idata;
+}
+
+void create_matrix(Faust::MatDense<FPP2,Cpu>& data, Faust::MatDense<FPP2,Cpu>& idata)
+{
+	//nothing to do
+}
+
+
+int main(int argc, char* argv[])
+{
+    if (typeid(FPP) == typeid(double))
+    {
+        cout<<"floating point precision == double"<<endl;
+    }
+
+    if (typeid(FPP) == typeid(float))
+    {
+        cout<<"floating point precision == float"<<endl;
+    }
+
+
+    //default value
+    string configFilename = "@FAUST_CONFIG_MAT_DIR@/config_hierarchical_fact.mat";
+    string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_hierarchical_fact.mat";
+
+    if (argc >= 3)
+    {
+        MatrixFilename = argv[1];
+        configFilename = argv[2];
+    }
+
+    FPP expectedLambda = 0;
+    if (argc >= 4)
+        expectedLambda = atof(argv[3]);
+
+
+    FPP2 epsilon = 0.0001;
+    if (argc >= 5)
+        epsilon = atof(argv[4]);
+
+    char transposedMatrix='N';
+    if (argc >= 6)
+        transposedMatrix=argv[5][0];
+
+
+    if ((transposedMatrix != 'N') && (transposedMatrix != 'T'))
+    {
+        cerr << "transposedMatrix value is "<<transposedMatrix<< endl;		
+        cerr << "transposedMatrix parameter must be equal to ''N'' or ''T'' " << endl;
+        exit(EXIT_FAILURE);
+    }
+
+
+    size_t ind = configFilename.find_last_of(".");
+
+    if(ind<=0 || ind>= configFilename.size())
+    {
+        cerr << "Le nom du fichier est incorrect" << endl;
+        exit(EXIT_FAILURE);
+    }
+    string configFileExtension(configFilename, ind);
+    if(configFileExtension.compare(".mat") != 0)
+    {
+        cerr << "Le nom du fichier doit se terminer par \".mat\"" << endl;
+        exit(EXIT_FAILURE);
+    }
+    string configFileBodyTmp(configFilename, 0, ind);
+
+
+    string configFileBodyDir, configFileBodyFile;
+
+    ind = configFileBodyTmp.find_last_of("/");
+    if(ind<=0 || ind>= configFileBodyTmp.size())
+    {
+        configFileBodyDir = string("");
+        configFileBodyFile = configFileBodyTmp;
+    }
+    else
+    {
+        configFileBodyDir = string(configFileBodyTmp, 0, ind+1);
+        configFileBodyFile = string(configFileBodyTmp, ind+1);
+    }
+
+
+
+    // useless for CPU but use for compatibility with GPU
+    Faust::BlasHandle<Cpu> blasHandle;
+    Faust::SpBlasHandle<Cpu> spblasHandle;
+
+    // parameter setting
+    Faust::Params<FPP,Cpu,FPP2> params;
+    init_params_from_matiofile<FPP,Cpu,FPP2>(params,configFilename.c_str(),"params");
+    params.Display();
+
+    // matrix to be factorized
+    Faust::MatDense<FPP,Cpu> matrix, imatrix;
+    init_faust_mat_from_matio(matrix,MatrixFilename.c_str(),"matrix");
+    create_matrix(matrix, imatrix);
+
+    // transposed the matrix if needed
+    if (transposedMatrix == 'T')
+        matrix.transpose();
+
+    //algorithm
+    auto cons = params.cons;
+    auto fac_cons = cons[0];
+    auto res_cons = cons[1];
+
+    Real<FPP> lambda;
+    auto th = Faust::hierarchical(matrix, 200, fac_cons, res_cons, lambda, params.isUpdateWayR2L,
+            params.isFactSideLeft, true);
+    cout << "lambda=" << lambda << endl;
+    th->multiply(lambda);
+    th->display();
+    //relativeError
+    Faust::MatDense<FPP,Cpu> faustProduct;
+    faustProduct=th->get_product(); // TransformHelper
+    faustProduct *= FPP(lambda);
+    faustProduct-=matrix;
+    cout << th->normFro() << endl;
+    FPP2 relativeError = Faust::fabs(faustProduct.norm()/matrix.norm());
+
+    std::cout<<std::endl;
+    std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+    std::cout<<"		"<<relativeError<<std::endl<<std::endl;
+
+
+    blasHandle.Destroy();
+    spblasHandle.Destroy();
+
+
+    return 0;
+
+}

@@ -1,0 +1,170 @@
+/****************************************************************************/
+/*                              Description:                                */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.inria.fr>                         */
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2020):   Hakim H., Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+/****************************************************************************/
+#include "faust_MatSparse.h"
+#include "faust_Timer.h"
+#include "faust_Transform.h"
+#include "faust_TransformHelper.h"
+#include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_core.h"
+#include <string>
+#include <sstream>
+#include "faust_BlasHandle.h"
+#include "faust_SpBlasHandle.h"
+#include "faust_HierarchicalFact.h"
+#include "faust_hierarchical.h"
+#include "faust_ConstraintGeneric.h"
+#include "faust_ConstraintInt.h"
+#include <iostream>
+#include <iomanip>
+#include <vector>
+#include <cstdlib>
+/** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
+* An dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
+* \param MatrixFilename :  a .mat (MATLAB file) where the matrix to be factorized is stored (or its transposed (cf. parameter transposeMatrix))
+* \param configFilename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hierFact)
+*\param epsilon (optionnal) : precision for the test of equality (default value 0.0001)
+*\param transposeMatrix (optionnal) : -value 'N' (default value),  the  matrix stored in MatrixFilename is factorized
+				      -value 'T' , the transposed matrix is factorized
+*/
+
+typedef @TEST_FPP@ FPP;
+typedef @TEST_FPP2@ FPP2;
+
+
+
+using namespace Faust;
+using namespace std;
+
+int main(int argc, char* argv[])
+{
+    if (typeid(FPP) == typeid(double))
+    {
+        cout<<"floating point precision == double"<<endl;
+    }
+
+    if (typeid(FPP) == typeid(float))
+    {
+        cout<<"floating point precision == float"<<endl;
+    }
+
+    int dim = 32;
+    if(argc > 1)
+        dim = std::stoi(string(argv[1]));
+    int log2dim = log2(dim);
+    auto wht = TransformHelper<FPP,Cpu>::hadamardFaust(log2dim);
+    auto whtmat = wht->get_product();
+    vector<const Faust::ConstraintGeneric*> fac_cons, res_cons;
+    //algorithm
+    for(int i=0;i<log2dim-1;i++)
+    {
+        auto fcons = new Faust::ConstraintInt<FPP,Cpu>(CONSTRAINT_NAME_SPLINCOL, 2, dim,
+                dim);
+        fac_cons.push_back(fcons);
+        auto rcons = new Faust::ConstraintInt<FPP,Cpu>(CONSTRAINT_NAME_SPLINCOL, dim/(1<<(i+1)), dim, dim);
+        res_cons.push_back(rcons);
+    }
+    FPP lambda;
+    bool isUpdateWayR2L = true, isFactSideLeft = false;
+    StoppingCriterion<Real<FPP>> s1(30);
+    StoppingCriterion<Real<FPP>> s2(30);
+    vector<vector<const Faust::ConstraintGeneric*>> cons;
+    cons.push_back(fac_cons);
+    cons.push_back(res_cons);
+//    for(auto ite=fac_cons.begin();ite != fac_cons.end(); ite++)
+//        cons.push_back(*ite);
+//    for(auto ite=res_cons.begin();ite != res_cons.end(); ite++)
+//        cons.push_back(*ite);
+	// parameter setting
+	Faust::Params<FPP,Cpu,FPP2> params;
+    params.m_nbFact = log2dim;
+    params.m_nbRow = params.m_nbCol = dim;
+    params.isVerbose = false;
+    params.isUpdateWayR2L = isUpdateWayR2L;
+    params.isFactSideLeft = isFactSideLeft;
+    params.cons = cons;
+    params.stop_crit_2facts = s1;
+    params.stop_crit_global = s2;
+    vector<Faust::MatDense<FPP,Cpu>> ini_facs;
+    for(int i=0;i<log2dim;i++)
+        ini_facs.push_back(Faust::MatDense<FPP,Cpu>());
+    params.init_fact = ini_facs;
+    char* str_norm2_threshold = getenv("NORM2_THRESHOLD");
+    char* str_norm2_max_iter = getenv("NORM2_MAX_ITER");
+    if(str_norm2_threshold)
+        params.norm2_threshold = std::atof(str_norm2_threshold);
+    if(str_norm2_max_iter)
+        params.norm2_max_iter = std::atoi(str_norm2_max_iter);
+    params.Display();
+    // useless for CPU but use for compatibility with GPU
+	Faust::BlasHandle<Cpu> blasHandle;
+	Faust::SpBlasHandle<Cpu> spblasHandle;
+
+//    auto th = Faust::hierarchical(whtmat, 30, fac_cons, res_cons, lambda, isUpdateWayR2L,
+//            isFactSideLeft, use_csr);
+    Faust::HierarchicalFact<FPP,Cpu,FPP2> hierFact(whtmat,params, blasHandle, spblasHandle);
+    hierFact.compute_facts();
+
+    Faust::Transform<FPP,Cpu> t;
+    hierFact.get_facts(t);
+	lambda = hierFact.get_lambda();
+
+    auto th = new TransformHelper<FPP,Cpu>(t);
+
+    cout << "lambda=" << lambda << endl;
+//    th = th->multiply(lambda);
+    th->display();
+    //relativeError
+    Faust::MatDense<FPP,Cpu> faustProduct;
+    faustProduct=th->get_product(); // TransformHelper
+    faustProduct *= lambda;
+    faustProduct-=whtmat;
+    cout << th->normFro() << endl;
+    FPP2 relativeError = Faust::fabs(faustProduct.norm()/whtmat.norm());
+
+    std::cout<<std::endl;
+    std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+    std::cout<<"		"<<relativeError<<std::endl<<std::endl;
+
+
+
+
+    return 0;
+
+}

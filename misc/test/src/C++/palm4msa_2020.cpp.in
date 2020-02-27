@@ -1,0 +1,110 @@
+/*  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167958v1>                       */
+/****************************************************************************/
+#include "matio.h"
+#include "faust_palm4msa.h"
+#include <string>
+#include <chrono>
+#include "faust_init_from_matio.h"
+#include "faust_init_from_matio_mat.h"
+
+typedef @TEST_FPP@ FPP;
+
+using namespace Faust;
+using namespace std;
+
+int main(int argc, char* argv[])
+{
+	if (typeid(FPP) == typeid(double))
+	{
+		cout<<"floating point precision == double"<<endl;
+	}
+
+	if (typeid(FPP) == typeid(float))
+	{
+		cout<<"floating point precision == float"<<endl;
+	}
+	Faust::MatDense<FPP,Cpu> data;
+
+	char configPalm2Filename[] = "@FAUST_DATA_MAT_DIR@/config_compared_palm2.mat";
+
+	init_faust_mat_from_matio(data, configPalm2Filename, "data");
+	Faust::ConstraintInt<FPP,Cpu> c1(CONSTRAINT_NAME_SPLIN, 5, 500, 32);
+	Faust::ConstraintFPP<FPP, Cpu, Real<FPP>> c2(CONSTRAINT_NAME_NORMCOL, 1.0, 32, 32);
+	//	vector<MatGeneric<FPP,Cpu>*> facts;
+	TransformHelper<FPP,Cpu> facts;
+	vector<ConstraintGeneric*> constraints{&c1, &c2};
+	Real<FPP> lambda= 1;
+	//	TransformHelper<FPP,Cpu>* th =  TransformHelper<FPP,Cpu>::hadamardFaust(5);
+	//	th->display();
+	//	MatDense<FPP,Cpu> H = th->get_product();
+	//	H.Display();
+	//	palm4msa<FPP,Cpu>(H, constraints, facts, lambda, 30, true);
+//	MatDense<FPP, Cpu>* H = Faust::MatDense<FPP,Cpu>::randMat(500,32);
+//	H->Display();
+	data.Display();
+	bool use_csr = false, is_update_way_R2L = false;
+	int nites = 200;
+	bool compute_2norm_on_array = false;
+	Real<FPP> norm2_threshold = 10e-16;
+	int norm2_max_iter = 1000;
+	if(argc > 1)
+	{
+		cout << "use impl1" << endl;
+		Faust::palm4msa<FPP,Cpu>(data, constraints, facts, lambda, nites, is_update_way_R2L, use_csr, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
+	}
+	else
+	{
+		cout << "use impl2" << endl;
+		Faust::palm4msa2<FPP,Cpu>(data, constraints, facts, lambda, nites, is_update_way_R2L, use_csr, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
+	}
+	//	auto left_th_2 = th->left(2);
+	//	left_th_2->display();
+	//
+	//	auto right_th_2 = th->right(3);
+	//	right_th_2->display();
+	facts.display();
+	cout << "out lambda: " << lambda << endl;
+	Faust::MatDense<FPP,Cpu> faustProduct;
+	faustProduct=facts.get_product();
+	faustProduct *= FPP(lambda);
+	faustProduct-=data;
+	Real<FPP> relativeError = fabs(faustProduct.norm()/data.norm());
+
+	std::cout<<std::endl;
+	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
+	std::cout<< "\t\t" << relativeError<<std::endl<<std::endl;
+
+
+	return 0;
+}
