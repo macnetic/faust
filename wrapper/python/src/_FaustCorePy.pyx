@@ -2009,6 +2009,9 @@ cdef class FaustFact:
         nites = p.stop_crits[0].num_its
         constraints = p.constraints
 
+        if(M.dtype == np.complex):
+            raise TypeError("2020 Hierarchical implementation doesn't support"
+                            " complex matrices.")
         # store only lambda as a return from Palm4MSA algo
         _out_buf = np.array([0], dtype=M.dtype)
 
