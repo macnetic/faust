@@ -1986,10 +1986,7 @@ cdef class FaustFact:
         return coreU, S, coreV
 
     @staticmethod
-    def hierarchical2020(M, nites, constraints, is_update_way_R2L,
-                         is_fact_side_left, use_csr, packing_RL,
-                         norm2_threshold,
-                         norm2_max_iter):
+    def hierarchical2020(M, p):
 
         cdef unsigned int M_num_rows=M.shape[0]
         cdef unsigned int M_num_cols=M.shape[1]
@@ -2002,6 +1999,15 @@ cdef class FaustFact:
         cdef double[:,:] tmp_mat
 
         cdef PyxConstraintGeneric** cpp_constraints
+
+        is_update_way_R2L = p.is_update_way_R2L
+        is_fact_side_left = p.is_fact_side_left
+        use_csr = p.use_csr
+        packing_RL = p.packing_RL
+        norm2_max_iter = p.norm2_max_iter
+        norm2_threshold = p.norm2_threshold
+        nites = p.stop_crits[0].num_its
+        constraints = p.constraints
 
         # store only lambda as a return from Palm4MSA algo
         _out_buf = np.array([0], dtype=M.dtype)

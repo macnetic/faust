@@ -557,7 +557,8 @@ class ParamsFact(ABC):
     EXTERNAL_OPT = 2
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
                  constraints, step_size, constant_step_size,
-                 is_verbose, grad_calc_opt_mode=EXTERNAL_OPT):
+                 is_verbose, use_csr,
+                 packing_RL, grad_calc_opt_mode=EXTERNAL_OPT):
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
@@ -575,8 +576,10 @@ class ParamsFact(ABC):
         self.is_verbose = is_verbose
         self.constant_step_size = constant_step_size
         self.grad_calc_opt_mode = grad_calc_opt_mode
-        self.norm2_max_iter = 0 # None for default value from C++ core
+        self.norm2_max_iter = 0 # 0 for default value from C++ core
         self.norm2_threshold = 0
+        self.use_csr = use_csr
+        self.packing_RL = packing_RL
 
     @abstractmethod
     def is_mat_consistent(self, M):
@@ -602,6 +605,8 @@ class ParamsHierarchical(ParamsFact):
                  step_size=10.0**-16, constant_step_size=False,
                  is_fact_side_left=False,
                  is_verbose=False,
+                 use_csr=True,
+                 packing_RL=True,
                  grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
         """
         Constructor.
@@ -636,6 +641,11 @@ class ParamsHierarchical(ParamsFact):
             is_fact_side_left: if True the leftmost factor is factorized,
             otherwise it's the rightmost.
             is_verbose: True to enable the verbose mode.
+            use_csr: True (by default) to prefer csr_matrix format when
+            updating factors (only available with 2020 backend of
+            pyfaust.fact.hierarchical).
+            packing_RL: True (by default) to pre-compute R and L products
+            (only available with 2020 backend of pyfaust.fact.hierarchical).
             grad_calc_opt_mode: the mode used for computing the PALM gradient. It
             can be one value among ParamsFact.EXTERNAL_OPT,
             ParamsFact.INTERNAL_OPT or ParamsFact.DISABLED_OPT. This parameter
@@ -676,6 +686,8 @@ class ParamsHierarchical(ParamsFact):
                                                  constraints, step_size,
                                                  constant_step_size,
                                                  is_verbose,
+                                                 use_csr,
+                                                 packing_RL,
                                                  grad_calc_opt_mode)
         self.stop_crits = stop_crits
         self.is_fact_side_left = is_fact_side_left
