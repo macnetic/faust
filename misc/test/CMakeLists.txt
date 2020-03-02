@@ -41,8 +41,8 @@ if(BUILD_WRAPPER_MATLAB)
 		#		"@" means "," and "$" means ";"
 		#   2nd arg : the ouputfile that stores all the things that will be display in the matlab command window
 		
-		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_hierarchical_fact'@'config_hierarchical_fact'@9402@1@'MEX')$" "${FAUST_BIN_TEST_OUTPUT_DIR}/MATLAB_FACT_HIER_MEX") 
-		add_test(NAME MATLAB_FACT_HIER_MATLAB COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_hierarchical_fact'@'config_hierarchical_fact'@9402@1@'MATLAB')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_HIER_MATLAB")
+		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_hierarchical_fact'@'config_hierarchical_fact'@9407@1@'MEX')$" "${FAUST_BIN_TEST_OUTPUT_DIR}/MATLAB_FACT_HIER_MEX") 
+		add_test(NAME MATLAB_FACT_HIER_MATLAB COMMAND ${FAUST_SRC_TEST_TOOL_DIR}/windows_test_matlab.bat "addpath('${FAUST_BIN_TEST_BIN_DIR}'@'${FAUST_BIN_TEST_TOOLS_DIR}')$set_path$hier_fact_test('matrix_hierarchical_fact'@'config_hierarchical_fact'@9407@1@'MATLAB')$" "${FAUST_BIN_TEST_BIN_DIR}/MATLAB_FACT_HIER_MATLAB")
 		
 		
 		if(${SLOW_TESTS}) 
@@ -66,10 +66,10 @@ if(BUILD_WRAPPER_MATLAB)
 	
 	
 	else(WIN32 AND NOT UNIX)	
-		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9402,1,'MEX'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
+		add_test(NAME MATLAB_FACT_HIER_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9407.8,'MEX'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
 	
 		
-		add_test(NAME MATLAB_FACT_HIER_MATLAB COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9402,1,'MATLAB'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
+		add_test(NAME MATLAB_FACT_HIER_MATLAB COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_hierarchical_fact','config_hierarchical_fact',9407.8,'MATLAB'); catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)" )
 	
 		if(${SLOW_TESTS})
 			add_test(NAME MATLAB_FACT_MEG_MEX COMMAND matlab -nojvm -r "try;testpass=0;addpath('${FAUST_BIN_TEST_BIN_DIR}','${FAUST_BIN_TEST_TOOLS_DIR}');set_path;hier_fact_test('matrix_MEG','config_MEG',22480,1,'MEX');catch ME ;testpass=-1;disp(getReport(ME)); end ; exit(testpass)")
@@ -281,7 +281,7 @@ if(NOT NOCPPTESTS)
 
 		foreach(TEST_FPP float double)
 			add_test(NAME MATFILE_FACT_HADAMARD_${TEST_FPP} COMMAND  ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_HADAMARD_32.mat	${FAUST_CONFIG_MAT_DIR}/config_HADAMARD_32.mat 5930 30)
-			add_test(NAME MATFILE_FACT_HIER_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_hierarchical_fact.mat	${FAUST_CONFIG_MAT_DIR}/config_hierarchical_fact.mat 9401.5 0.1)
+			add_test(NAME MATFILE_FACT_HIER_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/hierarchicalFactorization_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_hierarchical_fact.mat	${FAUST_CONFIG_MAT_DIR}/config_hierarchical_fact.mat 9407.8 0.1)
 
 			add_test(NAME MATFILE_MULTIPLICATION_MEG_${TEST_FPP} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/faust_multiplication_${TEST_FPP} ${FAUST_DATA_MAT_DIR}/matrix_MEG.mat T ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_6.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_8.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_16.mat ${FAUST_DATA_MAT_DIR}/faust_MEG_rcg_25.mat)
 

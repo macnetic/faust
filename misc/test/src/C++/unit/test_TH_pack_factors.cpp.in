@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 		else
 			prod_fac0to3 *= *dynamic_cast<Faust::MatDense<FPP,Cpu>*>(facts[i]);
 	npacked = dynamic_cast<MatDense<FPP,Cpu>*>(*(th2.begin()))->norm();
-	assert(Faust::fabs(npacked-prod_fac0to3.norm()) < 1e-6);
+	assert(std::isnan(npacked) &&  std::isnan(prod_fac0to3.norm()) || Faust::fabs(npacked-prod_fac0to3.norm()) < 1e-6);
 	cout << "OK" << endl;
 
 	/******************** test packing only one factor (must do nothing) */
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
     {
 //        cout << "norm new fact:" << (*(th3.begin()+i))->norm() << " norm old fact:" << (*(facts.begin()+i))->norm() << endl;
         Real<FPP> dn = Faust::fabs((*(th3.begin()+i))->norm() - (*(facts.begin()+i))->norm());
-		assert(dn <= .0001);
+		assert(std::isnan(dn) || dn <= .0001);
     }
 	assert(th3.size() == facts.size());
 	cout << "OK" << endl;
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
 		else
 			prod_fac *= *dynamic_cast<Faust::MatDense<FPP,Cpu>*>(facts[i]);
 	npacked = dynamic_cast<MatDense<FPP,Cpu>*>(*(th2.begin()))->norm();
-	assert(Faust::fabs(npacked-prod_fac0to3.norm()) < 1e-6);
+	assert(std::isnan(npacked) && std::isnan(prod_fac0to3.norm()) || Faust::fabs(npacked-prod_fac0to3.norm()) < 1e-6);
 	cout << "OK" << endl;
 
 	/****** sanity check on th0 */

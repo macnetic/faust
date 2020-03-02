@@ -849,7 +849,7 @@ class TestFaustFactory(unittest.TestCase):
         print("err: ", norm(E,"fro")/norm(M,"fro"))
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorization.cpp
-        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.268513, places=5)
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.268443, places=5)
 
     def testFactHierarchCplx(self):
         print("Test pyfaust.fact.hierarchicalCplx()")
@@ -885,7 +885,7 @@ class TestFaustFactory(unittest.TestCase):
         print("err: ", norm(E,"fro")/norm(M,"fro"))
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorization.cpp
-        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.272704 , places=4)
+        self.assertAlmostEqual(norm(E,"fro")/norm(M,"fro"), 0.273539 , places=4)
 
     def testFactPalm4MSACplx(self):
         print("Test pyfaust.fact.palm4msaCplx()")
@@ -1191,7 +1191,7 @@ class TestFaustFactory(unittest.TestCase):
         err = norm((F.todense()*D)*F.T.todense()-Lap,"fro")/norm(Lap,"fro")
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorizationFFT.cpp
-        self.assertAlmostEqual(err, 0.084417, places=5)
+        self.assertAlmostEqual(err, 0.08480, places=5)
 
     def test_splin(self):
         from pyfaust.proj import splin
