@@ -121,7 +121,7 @@
 %> 8
 %> <p> @b See @b also matfaust.faust_fact, factparams.ParamsHierarchical, factparams.ParamsHierarchicalSquareMat, factparams.ParamsHierarchicalRectMat
 %==========================================================================================
-function varargout = hierarchical(M, p)
+function varargout = hierarchical(M, p, varargin)
 	import matfaust.Faust
 	import matfaust.factparams.*
 	import matfaust.fact.check_fact_mat
@@ -158,10 +158,23 @@ function varargout = hierarchical(M, p)
 	end
 	% the setters for num_rows/cols verifies consistency with constraints
 	mex_params = struct('nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left, 'update_way', p.is_update_way_R2L, 'verbose', p.is_verbose, 'init_lambda', p.init_lambda);
-	if(isreal(M))
-		[lambda, core_obj] = mexHierarchical_factReal(M, mex_params);
-	else
-		[lambda, core_obj] = mexHierarchical_factCplx(M, mex_params);
+	backend = 2016;
+	nargin = length(varargin);
+	if(nargin > 0)
+		backend = varargin{1};
+	end
+	if(backend == 2016)
+		if(isreal(M))
+			[lambda, core_obj] = mexHierarchical_factReal(M, mex_params);
+		else
+			[lambda, core_obj] = mexHierarchical_factCplx(M, mex_params);
+		end
+	elseif(backend == 2020)
+		if(isreal(M))
+			[lambda, core_obj] = mexHierarchical2020Real(M, mex_params)
+		else
+			error('backend 2020 doesn''t handle yet the complex matrices')
+		end
 	end
 	F = Faust(core_obj, isreal(M));
 	varargout = {F, lambda, p};

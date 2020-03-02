@@ -1,0 +1,136 @@
+/****************************************************************************/
+/*                              Description:                                */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.inria.fr>                         */
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2020):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*		Hakim Hadj-Djilani : hakim.hadj-djilani@inria.fr                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+
+
+#include "mex.h"
+#include "faust_HierarchicalFact.h"
+#include "faust_HierarchicalFactFGFT.h"
+#include "faust_hierarchical.h"
+#include "faust_TransformHelper.h"
+#include "class_handle.hpp"
+#include <vector>
+#include <string>
+#include <algorithm>
+#include "mx2Faust.h"
+#include "faust2Mx.h"
+#include <stdexcept>
+
+typedef @FAUST_SCALAR@ SCALAR;
+typedef @FACT_FPP@ FPP2;
+
+using namespace std;
+
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+#ifdef FAUST_VERBOSE
+	if (typeid(SCALAR) == typeid(float))
+	{
+		std::cout<<"SCALAR == float"<<std::endl;
+
+	}
+
+	if (typeid(SCALAR) == typeid(double))
+	{
+		std::cout<<"SCALAR == double"<<std::endl;
+	}
+	system("sleep 7");
+#endif
+
+	if(nrhs < 2) // matrix + params + (optional use_csr and packing_RL)
+		mexErrMsgTxt("The number of arguments of hierarchical2020 must be 2 at least");
+
+	const mxArray* matlab_matrix = prhs[0];
+	const mxArray* matlab_params = prhs[1];
+	if(!mxIsStruct(matlab_params))
+	{
+		mexErrMsgTxt("Input must be a structure.");
+	}
+
+	// initialization of the matrix that will be factorized
+	Faust::MatDense<SCALAR,Cpu> matrix;
+	mxArray2FaustMat(matlab_matrix,matrix);
+
+	auto *params = mxArray2FaustParams<SCALAR,FPP2>(matlab_params);
+
+	FPP2 lambda;
+	// optional ?
+	bool use_csr = true, packing_RL = true;
+
+	if(nrhs > 2)
+		use_csr = (bool) mxGetScalar(prhs[2]);
+	if(nrhs > 3)
+		packing_RL = (bool) mxGetScalar(prhs[3]);
+
+
+	///////////// HIERARCHICAL LAUNCH ///////////////
+	try{
+		//		std::cout<<"nb_row : "<<nb_row<<std::endl;
+		//		std::cout<<"nb_col : "<<nb_col<<std::endl;
+			//		params.Display();
+
+		//DisplayParams(params);
+		//creation de hierarchical fact
+//		Faust::BlasHandle<Cpu> blas_handle;
+//		Faust::SpBlasHandle<Cpu> spblas_handle;
+
+		auto fac_cons = params->cons[0];
+		auto res_cons = params->cons[1];
+		cout << "calling hierarchical" << endl;
+		auto th = Faust::hierarchical(matrix, params->stop_crit_global.get_crit(), fac_cons, res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, use_csr, packing_RL);
+
+
+		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
+		plhs[0] = FaustMat2mxArray(mat1x1Lambda);
+		plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(th);
+
+
+
+	}
+	 catch (const std::exception& e)
+	{
+		// most likely error: compute_lambda : Xhatt_Xhat_tr is too small or Xt_Xhat.trace is too big so lambda is infinite
+		plhs[1] = nullptr;
+		mexErrMsgTxt(e.what());
+	}
+
+	delete params;
+
+}
+

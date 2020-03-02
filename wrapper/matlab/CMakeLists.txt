@@ -105,6 +105,8 @@ foreach(SCALAR_AND_FSUFFIX double:Real std::complex<double>:Cplx) # TODO: float 
 	if(NOT ${FAUST_SCALAR} MATCHES "complex")
 		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexfgftgivens${FSUFFIX}.cpp @ONLY)
 		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexsvdtj${FSUFFIX}.cpp @ONLY)
+		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical2020.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical2020${FSUFFIX}.cpp @ONLY)
+		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical2020.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical2020${FSUFFIX}.m @ONLY)
 	endif()
 	# copy the *.m for factorization now, because we have the FSUFFIX in hands
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact${FSUFFIX}.m COPYONLY)
