@@ -156,7 +156,7 @@ endif()
 
 if(NOT NOCPPTESTS)
 	foreach(TEST_FPP float double)
-		foreach(FILE faust_mult faust_mult_cplx test_Vect_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move test_TransformHelper_and_Transform_copy_ctor test_TransformHelper_and_Transform_fac_iterato test_TransformHelper_variadic_template_ctor test_MatDense_min test_TH_pack_factors faust_transform_omp_mul faust_pruneout faust_transform_optimize_storage faust_transform_optimize faust_prox_blockdiag)
+		foreach(FILE faust_mult faust_mult_cplx test_Vect_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move test_TransformHelper_and_Transform_fac_iterato test_TransformHelper_variadic_template_ctor test_MatDense_min test_TH_pack_factors faust_transform_omp_mul faust_pruneout faust_transform_optimize_storage faust_transform_optimize faust_prox_blockdiag) # test_TransformHelper_and_Transform_copy_ctor
 			set(TEST_BIN_FILE ${FILE}_${TEST_FPP})
 			set(TEST_FILE_CPP ${TEST_BIN_FILE}.cpp)
 			message(STATUS ${TEST_FILE_CPP})
