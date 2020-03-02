@@ -188,14 +188,14 @@ namespace Faust {
 		delete[] this->fancy_indices[1];
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
 	}
-
+#ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 	template<typename FPP>
 		template<typename ... GList>
 		TransformHelper<FPP,Cpu>::TransformHelper(GList& ... t) : TransformHelper<FPP,Cpu>()
 		{
 			this->push_back_(t...);
 		}
-
+#endif
 	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatSparse<FPP,Cpu> A, const bool transpose /* deft to false */, const bool conjugate)
 		{
