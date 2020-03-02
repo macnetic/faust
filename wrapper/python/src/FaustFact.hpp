@@ -487,7 +487,7 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
 }
 
 template<typename FPP>
-FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned int num_cols, unsigned int nites, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, double* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, bool use_csr, unsigned int norm2_max_iter, double norm2_threshold)
+FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned int num_cols, unsigned int nites, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, double* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, bool use_csr, bool packing_RL, unsigned int norm2_max_iter, double norm2_threshold)
 {
     FaustCoreCpp<FPP>* core = nullptr;
     Faust::MatDense<FPP,Cpu> inMat(mat, num_rows, num_cols);
@@ -554,6 +554,7 @@ FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned in
     {
         th = Faust::hierarchical(inMat, nites, fact_cons, residuum_cons, inout_lambda[0], is_update_way_R2L,
                 is_fact_side_left, use_csr,
+                packing_RL,
                 /* compute_2norm_on_array*/ false,
                 norm2_threshold,
                 norm2_max_iter);

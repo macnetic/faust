@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
 
     Real<FPP> lambda;
     auto th = Faust::hierarchical(matrix, 200, fac_cons, res_cons, lambda, params.isUpdateWayR2L,
-            params.isFactSideLeft, true);
+            params.isFactSideLeft, /*use_csr */ true, /*packing_RL */true);
     cout << "lambda=" << lambda << endl;
     th->multiply(lambda);
     th->display();

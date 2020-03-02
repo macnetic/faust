@@ -1987,7 +1987,8 @@ cdef class FaustFact:
 
     @staticmethod
     def hierarchical2020(M, nites, constraints, is_update_way_R2L,
-                         is_fact_side_left, use_csr, norm2_threshold,
+                         is_fact_side_left, use_csr, packing_RL,
+                         norm2_threshold,
                          norm2_max_iter):
 
         cdef unsigned int M_num_rows=M.shape[0]
@@ -2056,7 +2057,7 @@ cdef class FaustFact:
                                                      &outbufview[0],
                                                      is_update_way_R2L,
                                                      is_fact_side_left,
-                                                     use_csr,
+                                                     use_csr, packing_RL,
                                                      norm2_max_iter,
                                                      norm2_threshold)
         core._isReal = True

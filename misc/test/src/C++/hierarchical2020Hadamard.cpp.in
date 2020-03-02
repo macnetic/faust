@@ -101,19 +101,22 @@ int main(int argc, char* argv[])
         res_cons.push_back(rcons);
     }
     Real<FPP> lambda;
-    bool isUpdateWayR2L = true, isFactSideLeft = false, use_csr = true;
+    bool isUpdateWayR2L = true, isFactSideLeft = false, use_csr = true, packing_RL = false;
     char* str_norm2_threshold = getenv("NORM2_THRESHOLD");
     char* str_norm2_max_iter = getenv("NORM2_MAX_ITER");
+	char* str_packing_RL = getenv("PACKING_RL");
     double norm2_threshold = FAUST_PRECISION;
     double norm2_max_iter = FAUST_NORM2_MAX_ITER;
     if(str_norm2_threshold)
         norm2_threshold = std::atof(str_norm2_threshold);
     if(str_norm2_max_iter)
        norm2_max_iter = std::atoi(str_norm2_max_iter);
+	if(str_packing_RL)
+		packing_RL = std::atoi(str_packing_RL) != 0;
     cout << "norm2_threshold: "<< norm2_threshold << endl;
     cout << "norm2_max_iter:" << norm2_max_iter << endl;
     auto th = Faust::hierarchical(whtmat, 30, fac_cons, res_cons, lambda, isUpdateWayR2L,
-            isFactSideLeft, use_csr,
+            isFactSideLeft, use_csr, packing_RL,
             /* compute_2norm_on_array*/ false,
              norm2_threshold,
              norm2_max_iter);

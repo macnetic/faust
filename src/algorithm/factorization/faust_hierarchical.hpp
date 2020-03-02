@@ -5,7 +5,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
         std::vector<const Faust::ConstraintGeneric*> & res_constraints,
         Real<FPP>& lambda,
         const bool is_update_way_R2L, const bool is_fact_side_left,
-        const bool use_csr,
+        const bool use_csr, const bool packing_RL,
         const bool compute_2norm_on_array,
         const Real<FPP> norm2_threshold,
         const unsigned int norm2_max_iter)
@@ -68,7 +68,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
             tmp_dense = new MatDense<FPP,Cpu>(*tmp_sparse);
         }
         else tmp_sparse = nullptr;
-        Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, nites, is_update_way_R2L , use_csr, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
+        Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, nites, is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
         if(tmp_sparse != nullptr)
             // the Si factor has been converted into a MatDense in the memory
             // storage
@@ -103,7 +103,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
         // global optimization
 //        cout << "S before global opt.:" << endl;
 //        S->display();
-        Faust::palm4msa2(A, glo_cons, *S, glo_lambda, nites, is_update_way_R2L, use_csr, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
+        Faust::palm4msa2(A, glo_cons, *S, glo_lambda, nites, is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
 //        cout << "S after global opt.:" << endl;
 //        S->display();
     }
