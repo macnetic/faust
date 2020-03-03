@@ -549,7 +549,7 @@ FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned in
     if(norm2_max_iter == 0)
         norm2_max_iter = FAUST_NORM2_MAX_ITER;
 
-    Faust::TransformHelper<FPP,Cpu>* th;
+    Faust::TransformHelper<FPP,Cpu>* th, *th_times_lambda;
     try
     {
         th = Faust::hierarchical(inMat, nites, fact_cons, residuum_cons, inout_lambda[0], is_update_way_R2L,
@@ -558,7 +558,9 @@ FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned in
                 /* compute_2norm_on_array*/ false,
                 norm2_threshold,
                 norm2_max_iter);
-
+        th_times_lambda = th->multiply(inout_lambda[0]);
+        delete th;
+        th = th_times_lambda;
     }
     catch(std::logic_error& e)
     {

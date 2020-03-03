@@ -119,6 +119,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		bool compute_2norm_on_arrays = false;
 		auto th = Faust::hierarchical(matrix, params->stop_crit_global.get_crit(), fac_cons, res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->use_csr, params->packing_RL, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter);
 
+		auto th_times_lambda = th->multiply(lambda);
+		delete th;
+		th = th_times_lambda;
+
 
 		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
 		plhs[0] = FaustMat2mxArray(mat1x1Lambda);

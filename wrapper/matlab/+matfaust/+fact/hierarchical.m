@@ -177,7 +177,6 @@ function varargout = hierarchical(M, p, varargin)
 			error('backend 2020 doesn''t handle yet the complex matrices')
 		end
 		F = Faust(core_obj, isreal(M));
-		F = F * lambda; % TODO: should be multiplied before
 	end
 	varargout = {F, lambda, p};
 end

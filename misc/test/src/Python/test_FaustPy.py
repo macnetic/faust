@@ -1191,7 +1191,7 @@ class TestFaustFactory(unittest.TestCase):
         err = norm((F.todense()*D)*F.T.todense()-Lap,"fro")/norm(Lap,"fro")
         # matrix to factorize and reference relative error come from
         # misc/test/src/C++/hierarchicalFactorizationFFT.cpp
-        self.assertAlmostEqual(err, 0.08480, places=5)
+        self.assertAlmostEqual(err, 0.08480, places=4)
 
     def test_splin(self):
         from pyfaust.proj import splin
