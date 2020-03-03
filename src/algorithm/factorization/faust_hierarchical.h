@@ -1,6 +1,6 @@
 #ifndef __FAUST_HIERARCHICAL__
 #define __FAUST_HIERARCHICAL__
-#include "faust_palm4msa.h"
+#include "faust_palm4msa2020.h"
 namespace Faust
 {
 	template<typename FPP, Device DEVICE>

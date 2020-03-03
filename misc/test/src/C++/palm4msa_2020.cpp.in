@@ -32,7 +32,7 @@
 /*  <https://hal.archives-ouvertes.fr/hal-01167958v1>                       */
 /****************************************************************************/
 #include "matio.h"
-#include "faust_palm4msa.h"
+#include "faust_palm4msa2020.h"
 #include <string>
 #include <chrono>
 #include "faust_init_from_matio.h"

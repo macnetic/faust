@@ -49,5 +49,5 @@ namespace Faust
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER);
 
 }
-#include "faust_palm4msa.hpp"
+#include "faust_palm4msa2020.hpp"
 #endif
