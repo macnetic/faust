@@ -21,6 +21,8 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
     std::vector<Faust::ConstraintGeneric*> Si_cons;
     Real<FPP> lambda_ = 1;
     Real<FPP> glo_lambda = 1;
+//	std::cout << "Faust::hierarchical packing_RL =" << packing_RL << " use_csr=" << use_csr << std::endl;
+//	std::cout << "Faust::hierarchical norm2_max_iter=" << norm2_max_iter << " norm2_threshold=" << norm2_threshold << std::endl;
     for(int i=0;i < fac_constraints.size();i++)
     {
         cout << "Faust::hierarchical: " << i+1 << endl;

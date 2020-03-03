@@ -170,13 +170,17 @@ enum MAT_FIELD_TYPE
 	SC_ERROR_TRESHOLD2,
 	SC_MAX_NUM_ITS2,
 	INIT_FACTS,
-	INIT_D //only for FactHierarchicalF(G)FT
-};// if you wan to add a field, dont forget to update mat_field_type2str() and MAT_FIELD_TYPE_LEN
+	INIT_D, //only for FactHierarchicalF(G)FT
+	NORM2_MAX_ITER,
+	NORM2_THRESHOLD,
+	USE_CSR,
+	PACKING_RL
+};// if you want to add a field, dont forget to update mat_field_type2str() and MAT_FIELD_TYPE_LEN
 
 const string mat_field_type2str(MAT_FIELD_TYPE f);
 const MAT_FIELD_TYPE mat_field_str2type(const string& fstr);
 
-const unsigned int MAT_FIELD_TYPE_LEN = 18; // must be the number of fields in MAT_FIELD_TYPE
+const unsigned int MAT_FIELD_TYPE_LEN = 22; // must be the number of fields in MAT_FIELD_TYPE
 
 void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
 

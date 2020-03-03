@@ -104,6 +104,14 @@ const string mat_field_type2str(MAT_FIELD_TYPE f)
 			return "init_facts";
 		case INIT_D:
 			return "init_D";
+		case PACKING_RL:
+			return "packing_RL";
+		case USE_CSR:
+			return "use_csr";
+		case NORM2_MAX_ITER:
+			return "norm2_max_iter";
+		case NORM2_THRESHOLD:
+			return "norm2_threshold";
 	}
 }
 

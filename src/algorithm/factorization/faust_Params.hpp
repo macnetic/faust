@@ -72,7 +72,8 @@ template<typename FPP,Device DEVICE,typename FPP2> const FPP2 Faust::Params<FPP,
 template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultDecreaseSpeed = 1.25;
 template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultResiduumPercent = 1.4;
 template<typename FPP,Device DEVICE,typename FPP2> const Faust::GradientCalcOptMode Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode = INTERNAL_OPT;
-
+template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultUseCSR = true;
+template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultPackingRL = true;
 
 template<typename FPP,Device DEVICE,typename FPP2>
 void Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity()
@@ -142,7 +143,9 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
 		step_size(step_size_),
 		gradCalcOptMode(gradCalcOptMode),
         norm2_threshold(FAUST_PRECISION),
-        norm2_max_iter(FAUST_NORM2_MAX_ITER)
+		norm2_max_iter(FAUST_NORM2_MAX_ITER),
+		packing_RL(defaultPackingRL),
+		use_csr(defaultUseCSR)
 {
     if (nbFact_ <= 2)
     {
@@ -257,8 +260,9 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
 			step_size(step_size_),
 			gradCalcOptMode(gradCalcOptMode),
             norm2_threshold(FAUST_PRECISION),
-            norm2_max_iter(FAUST_NORM2_MAX_ITER)
-
+            norm2_max_iter(FAUST_NORM2_MAX_ITER),
+			packing_RL(defaultPackingRL),
+			use_csr(defaultUseCSR)
 {
  check_constraint_validity();
 }
@@ -284,7 +288,9 @@ Faust::Params<FPP,DEVICE,FPP2>::Params() : m_nbRow(0),
 	step_size(defaultStepSize),
 	gradCalcOptMode(defaultGradCalcOptMode),
     norm2_threshold(FAUST_PRECISION),
-    norm2_max_iter(FAUST_NORM2_MAX_ITER)
+    norm2_max_iter(FAUST_NORM2_MAX_ITER),
+	packing_RL(defaultPackingRL),
+	use_csr(defaultUseCSR)
 {}
 
 

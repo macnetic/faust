@@ -103,7 +103,7 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 				error('M must be a matrix.')
 			else
 				% no need to take care of is_fact_side_left
-				% because data_num_rows and data_num_cols have been infered according to the constraints and is_fact_side_left
+				% because data_num_rows and data_num_cols have been inferred according to the constraints and is_fact_side_left
 				s = size(M);
 				bool = all(s == [this.data_num_rows, this.data_num_cols]);
 			end

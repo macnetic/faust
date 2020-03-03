@@ -779,6 +779,38 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 	{
 		params = new Params<SCALAR,Cpu,FPP2>(nb_row,nb_col,nbFact,consSS,/*std::vector<Faust::MatDense<SCALAR,Cpu> >()*/ init_facts,crit1,crit2,isVerbose,updateway,factside,init_lambda);
 	}
+
+	bool use_csr = Params<SCALAR, Cpu, FPP2>::defaultUseCSR;
+	if(presentFields[USE_CSR])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(USE_CSR).c_str());
+		use_csr = (bool) mxGetScalar(mxCurrentField);
+	}
+
+	bool packing_RL = Params<SCALAR, Cpu, FPP2>::defaultPackingRL;
+	if(presentFields[PACKING_RL])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(PACKING_RL).c_str());
+		packing_RL = (bool) mxGetScalar(mxCurrentField);
+	}
+	FPP2 norm2_threshold =	FAUST_PRECISION;
+	int norm2_max_iter = FAUST_NORM2_MAX_ITER;
+	if(presentFields[NORM2_THRESHOLD])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(NORM2_THRESHOLD).c_str());
+		norm2_threshold = (FPP2) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[FAUST_NORM2_MAX_ITER])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(NORM2_MAX_ITER).c_str());
+		norm2_max_iter = (int) mxGetScalar(mxCurrentField);
+	}
+	if(norm2_max_iter)
+		params->norm2_max_iter = norm2_max_iter;
+	if(norm2_threshold != FPP2(0))
+		params->norm2_threshold = norm2_threshold;
+	params->packing_RL = packing_RL;
+	params->use_csr = use_csr;
 	return params;
 }
 

@@ -13,6 +13,10 @@ classdef (Abstract) ParamsFact
 		constraints
 		is_verbose
 		grad_calc_opt_mode
+		use_csr
+		packing_RL
+		norm2_max_iter
+		norm2_threshold
 	end
 	properties (Constant, SetAccess = protected, Hidden)
 		DEFAULT_STEP_SIZE = 10^-16
@@ -20,6 +24,10 @@ classdef (Abstract) ParamsFact
 		DEFAULT_CONSTANT_STEP_SIZE = false
 		DEFAULT_INIT_LAMBDA = 1.0
 		DEFAULT_IS_UPDATE_WAY_R2L = false
+		DEFAULT_PACKING_RL = true
+		DEFAULT_USE_CSR = true
+		DEFAULT_NORM2_MAX_ITER = 0 % norm2 parameters to 0 in order to use default parameters from C++ core
+		DEFAULT_NORM2_THRESHOLD = 0
 		% constructor opt. arguments indices
 		IDX_IS_UPDATE_WAY_R2L = 1
 		IDX_INIT_LAMBDA = 2
@@ -27,13 +35,17 @@ classdef (Abstract) ParamsFact
 		IDX_CONSTANT_STEP_SIZE = 4
 		IDX_VERBOSITY = 5
 		IDX_GRAD_CALC_OPT_MODE = 6
+		IDX_NORM2_MAX_ITER = 7
+		IDX_NORM2_THRESHOLD = 8
+		IDX_USE_CSR = 9
+		IDX_PACKING_RL = 10
 		% flags to control the optimization of the multiplication L'(LSR)R' in PALM4MSA
 		DISABLED_OPT = 0
 		INTERNAL_OPT = 1
 		EXTERNAL_OPT = 2
 		DEFAULT_OPT = 2
 		% the order of names matters and must respect the indices above
-		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose', 'grad_calc_opt_mode'}
+		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose', 'grad_calc_opt_mode', 'norm2_max_iter', 'norm2_threshold', 'packing_RL', 'use_csr' }
 	end
 	methods
 		function p = ParamsFact(num_facts, constraints, varargin)
@@ -52,6 +64,10 @@ classdef (Abstract) ParamsFact
 			is_verbose = ParamsFact.DEFAULT_VERBOSITY;
 			constant_step_size = ParamsFact.DEFAULT_CONSTANT_STEP_SIZE;
 			grad_calc_opt_mode = ParamsFact.DEFAULT_OPT;
+			norm2_threshold = ParamsFact.DEFAULT_NORM2_THRESHOLD;
+			norm2_max_iter = ParamsFact.DEFAULT_NORM2_MAX_ITER;
+			use_csr = ParamsFact.DEFAULT_USE_CSR;
+			packing_RL = ParamsFact.DEFAULT_PACKING_RL;
 			% check mandatory arguments
 			if(~ isscalar(num_facts) || ~ isreal(num_facts))
 				error('matfaust.factparams.ParamsFact num_facts argument must be an integer.')
@@ -97,7 +113,20 @@ classdef (Abstract) ParamsFact
 			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_GRAD_CALC_OPT_MODE}))
 				grad_calc_opt_mode = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_GRAD_CALC_OPT_MODE});
 			end
+			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_NORM2_MAX_ITER}))
+				norm2_max_iter = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_NORM2_MAX_ITER});
+			end
+			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_NORM2_THRESHOLD}))
+				norm2_threshold = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_NORM2_THRESHOLD});
+			end
+			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_PACKING_RL}))
+				packing_RL = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_PACKING_RL});
+			end
+			if(opt_arg_map.isKey(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_USE_CSR}))
+				use_csr = opt_arg_map(ParamsFact.OPT_ARG_NAMES{ParamsFact.IDX_USE_CSR});
+			end
 			% then check validity of opt args (it's useless for default values but it's not too costfull)
+			% TODO: group argument verifs by type in loops
 			if(~ islogical(is_update_way_R2L))
 				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_IS_UPDATE_WAY_R2L} ,' argument (is_update_way_R2L) must be logical.'])
 			end
@@ -117,6 +146,20 @@ classdef (Abstract) ParamsFact
 			if(~ isscalar(grad_calc_opt_mode) && (grad_calc_opt_mode == ParamsFact.INTERNAL_OPT || grad_calc_opt_mode == ParamsFact.EXTERNAL_OPT || grad_calc_opt_mode == ParamsFact.DISABLED_OPT))
 				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_GRAD_CALC_OPT_MODE},' argument (grad_calc_opt_mode) must be an integer equal to ParamsFact.INTERNAL_OPT, ParamsFact.EXTERNAL_OPT, or ParamsFact.DISABLED_OPT.'])
 			end
+			if(~ islogical(use_csr))
+				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_USE_CSR},' argument must be logical.'])
+			end
+			if(~ islogical(packing_RL))
+				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_PACKING_RL},' argument must be logical.'])
+			end
+			if(~ isscalar(norm2_max_iter) || floor(norm2_max_iter) < norm2_max_iter)
+				norm2_max_iter
+				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_NORM2_MAX_ITER}, ' argument must be a int.'])
+			end
+ 			if(~ isscalar(norm2_threshold))
+				norm2_threshold
+				error(['matfaust.factparams.ParamsFact ', p.OPT_ARG_NAMES{ParamsFact.IDX_NORM2_THRESHOLD}, ' argument must be a real.'])
+			end
 			p.num_facts = num_facts;
 			p.is_update_way_R2L = is_update_way_R2L;
 			p.init_lambda = init_lambda;
@@ -125,6 +168,10 @@ classdef (Abstract) ParamsFact
 			p.is_verbose = is_verbose;
 			p.constant_step_size = constant_step_size;
 			p.grad_calc_opt_mode = grad_calc_opt_mode;
+			p.use_csr = use_csr;
+			p.packing_RL = packing_RL;
+			p.norm2_max_iter = norm2_max_iter;
+			p.norm2_threshold = norm2_threshold;
 		end
 
 		function bool = is_mat_consistent(this, M)

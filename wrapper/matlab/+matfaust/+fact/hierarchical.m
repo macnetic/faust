@@ -157,7 +157,7 @@ function varargout = hierarchical(M, p, varargin)
 		error('M''s number of columns must be consistent with the last residuum constraint defined in p. Likewise its number of rows must be consistent with the first factor constraint defined in p.')
 	end
 	% the setters for num_rows/cols verifies consistency with constraints
-	mex_params = struct('nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left, 'update_way', p.is_update_way_R2L, 'verbose', p.is_verbose, 'init_lambda', p.init_lambda);
+	mex_params = struct('nfacts', p.num_facts, 'cons', {mex_constraints}, 'niter1', p.stop_crits{1}.num_its,'niter2', p.stop_crits{2}.num_its, 'sc_is_criterion_error', p.stop_crits{1}.is_criterion_error, 'sc_error_treshold', p.stop_crits{1}.error_treshold, 'sc_max_num_its', p.stop_crits{1}.max_num_its, 'sc_is_criterion_error2', p.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', p.stop_crits{2}.error_treshold, 'sc_max_num_its2', p.stop_crits{2}.max_num_its, 'nrow', p.data_num_rows, 'ncol', p.data_num_cols, 'fact_side', p.is_fact_side_left, 'update_way', p.is_update_way_R2L, 'verbose', p.is_verbose, 'init_lambda', p.init_lambda, 'use_csr', p.use_csr, 'packing_RL', p.packing_RL, 'norm2_threshold', p.norm2_threshold, 'norm2_max_iter', p.norm2_max_iter);
 	backend = 2016;
 	nargin = length(varargin);
 	if(nargin > 0)
@@ -169,13 +169,15 @@ function varargout = hierarchical(M, p, varargin)
 		else
 			[lambda, core_obj] = mexHierarchical_factCplx(M, mex_params);
 		end
+		F = Faust(core_obj, isreal(M));
 	elseif(backend == 2020)
 		if(isreal(M))
-			[lambda, core_obj] = mexHierarchical2020Real(M, mex_params)
+			[lambda, core_obj] = mexHierarchical2020Real(M, mex_params);
 		else
 			error('backend 2020 doesn''t handle yet the complex matrices')
 		end
+		F = Faust(core_obj, isreal(M));
+		F = F * lambda; % TODO: should be multiplied before
 	end
-	F = Faust(core_obj, isreal(M));
 	varargout = {F, lambda, p};
 end
