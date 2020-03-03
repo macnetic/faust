@@ -525,8 +525,9 @@ namespace Faust {
 			const vector<MatGeneric<FPP,Cpu>*>& vec = transform->data; //TransformHelper is a friend class of Transform // we can access private attribute data
 			//the point here is to minimize the number of copies (with direct access)
 			// the constructor then will copy the factors from the vector
-			Transform<FPP,Cpu>* t = new Transform<FPP,Cpu>(vec, scalar, false, true); //optimizedCopy == false, cloning_fact == true
-			TransformHelper<FPP,Cpu>* th  = new TransformHelper<FPP,Cpu>(*t);
+//			Transform<FPP,Cpu>* t = new Transform<FPP,Cpu>(vec, scalar, false, true); //optimizedCopy == false, cloning_fact == true
+//			TransformHelper<FPP,Cpu>* th  = new TransformHelper<FPP,Cpu>(*t);
+			TransformHelper<FPP,Cpu>* th = new TransformHelper<FPP,Cpu>(vec, scalar, false, false, true);
 			//TODO: refactor the attributes copy ? 
 			th->is_transposed = is_transposed;
 			th->is_conjugate = is_conjugate;
