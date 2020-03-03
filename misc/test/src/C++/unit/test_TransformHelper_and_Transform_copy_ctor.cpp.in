@@ -1,0 +1,144 @@
+/****************************************************************************/
+/*                              Description:                                */
+/* unitary test for testing multiplication by faust with real  scalar       */
+/*                                                                          */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.inria.fr>                         		*/
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2020):   Hakim HADJ-DJILANI									*/
+/*  					Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+/****************************************************************************/
+#include "faust_MatDense.h"
+#include "faust_MatSparse.h"
+#include "faust_Transform.h"
+#include "faust_TransformHelper.h"
+#include <string>
+
+
+
+/** unit test for Transform move ctor and = op. overload.
+ * The goal is to test that factors are not duplicated in memory (like copy ctor and = overload do).
+*/
+
+typedef @TEST_FPP@ FPP;
+
+
+using namespace Faust;
+
+int main(int argc, char* argv[])
+{
+	if (typeid(FPP) == typeid(double))
+	{
+		cout<<"floating point precision == double"<<endl;
+	}
+
+	if (typeid(FPP) == typeid(float))
+	{
+		cout<<"floating point precision == float"<<endl;
+	}
+
+	int mat_nrows = 10;
+	int mat_ncols = 10;
+	int n_mats = 5;
+	int n_sparse_mats = 2;
+
+	vector<MatGeneric<FPP,Cpu>*> facts(n_mats);
+
+	for(int i=0;i<n_sparse_mats;i++)
+	{
+		Faust::MatSparse<FPP,Cpu>* mat = Faust::MatSparse<FPP,Cpu>::randMat(mat_nrows, mat_ncols, .5);
+		facts[i] = mat;
+	}
+
+	for(int i=n_sparse_mats;i<n_mats;i++)
+	{
+		MatDense<FPP,Cpu>* mat = MatDense<FPP,Cpu>::randMat(mat_nrows, mat_ncols);
+		facts[i] = mat;
+	}
+
+	Faust::Transform<FPP,Cpu> t(facts, 1.0, false, false); //don't clone factors
+
+	cout << "Original transform: " << endl;
+	t.Display();
+
+	Faust::Transform<FPP,Cpu> t2 = t, t3(t); //copy constructor is called
+	cout << "1st copy transform (operator=): " << endl;
+	t2.Display();
+
+	for(int i=0;i<n_mats;i++)
+	{
+		MatGeneric<FPP,Cpu>* ref_fact = facts[i];
+		MatGeneric<FPP,Cpu>* test_fact2 = t2.get_fact(i,false);
+		cout << "orig ptr fact[" << i << "]: " << ref_fact << " the copied one by ctor: "<< test_fact2 << "(inequality tested)." << endl;
+		assert(ref_fact != test_fact2);
+	}
+
+	t3 = std::move(t2); //move = operator overload is called
+	cout << "2nd copy transform (ctor): " << endl;
+	t3.Display();
+
+	for(int i=0;i<n_mats;i++)
+	{
+		MatGeneric<FPP,Cpu>* ref_fact = facts[i];
+		MatGeneric<FPP,Cpu>* test_fact3 = t3.get_fact(i,false);
+		cout << "orig ptr fact[" << i << "]: " << ref_fact << " the copied one by ctor: " <<test_fact3 << "(inequality tested)."<< endl;
+
+		assert(ref_fact != test_fact3);
+	}
+
+	cout << "Test copy of a TransformHelper object (ctor): " << endl;
+	TransformHelper<FPP,Cpu> o_th(t3);
+	TransformHelper<FPP,Cpu> th(o_th);
+
+	for(int i=0;i<n_mats;i++)
+	{
+		unsigned long long ref_fact = o_th.get_fact_addr(i);
+		unsigned long long test_fact4 = th.get_fact_addr(i);
+		cout << "orig ptr fact[" << i << "]: " << ref_fact << " the copied one by ctor: " << ((void*)test_fact4) << "(equality tested)."<< endl;
+		assert((unsigned long long) ref_fact == test_fact4);
+	}
+
+	cout << "Test copy of a TransformHelper object (operator=): " << endl;
+	TransformHelper<FPP,Cpu> th2 = th;
+
+	for(int i=0;i<n_mats;i++)
+	{
+		unsigned long long ref_fact = o_th.get_fact_addr(i);
+		unsigned long long test_fact5 = th2.get_fact_addr(i);
+		cout << "orig ptr fact[" << i << "]: " << (void*)ref_fact << " the copied one by ctor: " << ((void*)test_fact5)  << "(equality tested)."<< endl;
+		assert((unsigned long long) ref_fact == test_fact5);
+	}
+	return 0;
+}
