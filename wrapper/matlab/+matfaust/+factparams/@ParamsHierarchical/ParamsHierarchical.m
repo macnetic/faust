@@ -15,6 +15,25 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 		OPT_ARG_NAMES2 = { 'is_fact_side_left' }
 	end
 	methods
+		% =========================================================
+		%>	@brief Constructor.
+		%>
+		%>	@param fact_constraints a ConstraintList object or a list of matfaust.proj.proj_gen objects to define the constraints of the main factor at each level of the factorization hierarchy (the first one for the first factorization and so on).
+		%>	@param res_constraints a ConstraintList object or a list of matfaust.proj.proj_gen objects to define the constraints to apply to the residual factor at each level of the factorization hierarchy (the first one for the first factorization and so on).
+		%>	@param stop_crit1 	a matfaust.factparams.StoppingCriterion instance which defines the algorithm stopping criterion for the local optimization of the 2 terms of the last factorization (a main factor and a residual).
+		%>	@param stop_crit2 a matfaust.factparams.StoppingCriterion instance which defines the algorithm stopping criterion for the global optimization.
+		%>	@param 'is_update_way_R2L', bool 	if true matfaust.fact.palm4msa (called for each optimization stage) will update factors from the right to the left, otherwise it's done in reverse order.
+		%>	@param 'init_lambda', real the scale scalar initial value for the global optimization (by default the value is one). It applies only to local optimization at each iteration (the global optimization lambda is updated consequently). 
+		%>	@param 'step_size', real the initial step of the PALM descent for both local and global optimization stages. 
+		%>	@param 'constant_step_size', bool if true the step_size keeps constant along the algorithm iterations otherwise it is updated before every factor update. 
+		%>	@param 'is_fact_side_left', bool if true the leftmost factor is factorized, otherwise it's the rightmost. 
+		%>	@param 'is_verbose', bool true to enable the verbose mode. 
+		%>	@param 'use_csr', bool true (by default) to prefer compressed sparse row matrix format when updating factors (only available with 2020 backend of matfaust.fact.hierarchical).
+		%>	@param 'packing_RL', bool true (by default) to pre-compute R and L products (only available with 2020 backend of pyfaust.fact.hierarchical).
+		%>	@param 'norm2_max_iter', int maximum number of iterations of power iteration algorithm (default to 100). Used for computing 2-norm.
+		%>	@param 'norm2_threshold', real power iteration algorithm threshold (default to 1e-6). Used for computing 2-norm.
+		%>	@param 'grad_calc_opt_mode', int the mode used for computing the PALM gradient. It can be one value among ParamsFact.EXTERNAL_OPT, ParamsFact.INTERNAL_OPT or ParamsFact.DISABLED_OPT. This parameter is experimental, its value shouln't be changed. 
+		% =========================================================
 		function p = ParamsHierarchical(fact_constraints, res_constraints, stop_crit1, stop_crit2, varargin)
 			import matfaust.factparams.*
 			if(iscell(fact_constraints))

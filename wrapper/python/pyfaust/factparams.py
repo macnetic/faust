@@ -557,8 +557,10 @@ class ParamsFact(ABC):
     EXTERNAL_OPT = 2
     def __init__(self, num_facts, is_update_way_R2L, init_lambda,
                  constraints, step_size, constant_step_size,
-                 is_verbose, use_csr,
-                 packing_RL, grad_calc_opt_mode=EXTERNAL_OPT):
+                 is_verbose, use_csr=True,
+                 packing_RL=True, norm2_max_iter=100,
+                 norm2_threshold=1e-6,
+                 grad_calc_opt_mode=EXTERNAL_OPT):
         self.num_facts = num_facts
         self.is_update_way_R2L = is_update_way_R2L
         self.init_lambda = init_lambda
@@ -576,8 +578,8 @@ class ParamsFact(ABC):
         self.is_verbose = is_verbose
         self.constant_step_size = constant_step_size
         self.grad_calc_opt_mode = grad_calc_opt_mode
-        self.norm2_max_iter = 0 # 0 for default value from C++ core
-        self.norm2_threshold = 0
+        self.norm2_max_iter = norm2_max_iter # 0 for default value from C++ core
+        self.norm2_threshold = norm2_threshold
         self.use_csr = use_csr
         self.packing_RL = packing_RL
 
@@ -607,6 +609,8 @@ class ParamsHierarchical(ParamsFact):
                  is_verbose=False,
                  use_csr=True,
                  packing_RL=True,
+                 norm2_max_iter=100,
+                 norm2_threshold=1e-6,
                  grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
         """
         Constructor.
@@ -646,6 +650,10 @@ class ParamsHierarchical(ParamsFact):
             pyfaust.fact.hierarchical).
             packing_RL: True (by default) to pre-compute R and L products
             (only available with 2020 backend of pyfaust.fact.hierarchical).
+            norm2_max_iter: maximum number of iterations of power iteration
+            algorithm. Used for computing 2-norm.
+            norm2_threshold: power iteration algorithm threshold (default to
+            1e-6). Used for computing 2-norm.
             grad_calc_opt_mode: the mode used for computing the PALM gradient. It
             can be one value among ParamsFact.EXTERNAL_OPT,
             ParamsFact.INTERNAL_OPT or ParamsFact.DISABLED_OPT. This parameter
@@ -688,6 +696,8 @@ class ParamsHierarchical(ParamsFact):
                                                  is_verbose,
                                                  use_csr,
                                                  packing_RL,
+                                                 norm2_max_iter,
+                                                 norm2_threshold,
                                                  grad_calc_opt_mode)
         self.stop_crits = stop_crits
         self.is_fact_side_left = is_fact_side_left

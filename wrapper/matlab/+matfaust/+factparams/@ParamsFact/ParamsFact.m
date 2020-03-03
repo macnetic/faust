@@ -26,7 +26,9 @@ classdef (Abstract) ParamsFact
 		DEFAULT_IS_UPDATE_WAY_R2L = false
 		DEFAULT_PACKING_RL = true
 		DEFAULT_USE_CSR = true
+		%> @note 0 means the default value defined in C++ core (100).
 		DEFAULT_NORM2_MAX_ITER = 0 % norm2 parameters to 0 in order to use default parameters from C++ core
+		%> @note 0 means the default value defined in C++ core (1e-6).
 		DEFAULT_NORM2_THRESHOLD = 0
 		% constructor opt. arguments indices
 		IDX_IS_UPDATE_WAY_R2L = 1

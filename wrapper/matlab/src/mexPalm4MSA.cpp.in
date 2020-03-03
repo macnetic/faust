@@ -272,6 +272,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mxCurrentField = mxGetField(prhs[0], 0, "step_size");
 		step_size = (FPP2) mxGetScalar(mxCurrentField);
 	}
+	FPP2 norm2_threshold =	FAUST_PRECISION;
+	int norm2_max_iter = FAUST_NORM2_MAX_ITER;
+	if(presentFields[14])
+	{
+		mxCurrentField = mxGetField(prhs[0], 0, "norm2_max_iter");
+		norm2_max_iter = (int) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[15])
+	{
+		mxCurrentField = mxGetField(prhs[0], 0, "norm2_threshold");
+		norm2_threshold = (FPP2) mxGetScalar(mxCurrentField);
+	}
 	//compute_lambda
 	// bool compute_lambda = true;
 	// if (presentFields[8])
@@ -293,6 +305,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		//creation de hierarchical fact
 		Faust::ParamsPalm<SCALAR,Cpu, FPP2> params(data,nbFact,consS,init_facts,crit1,isVerbose,updateway,init_lambda, constant_step_size, step_size, grad_calc_opt_mode);
 		if(params.isVerbose) params.Display();
+		cout << "norm2_threshold=" << norm2_threshold << " norm2_max_iter:" << norm2_max_iter << endl;
+		if(norm2_max_iter) params.norm2_max_iter = norm2_max_iter;
+		if(norm2_threshold != FPP2(0)) params.norm2_threshold = norm2_threshold;
 		Faust::BlasHandle<Cpu> blas_handle;
 		Faust::Palm4MSA<SCALAR,Cpu, FPP2> palm(params,blas_handle,false);
 		palm.compute_facts();
@@ -348,8 +363,8 @@ void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFiel
 {
 	////TODO: this function should be modified to be more reliable/simple as the function testCoherence() in mx2Faust.cpp has been modified
 	int nbr_field=mxGetNumberOfFields(params);
-	presentFields.resize(14);
-	presentFields.assign(14,false);
+	presentFields.resize(16);
+	presentFields.assign(16,false);
 	if(nbr_field < 3)
 	{
 		mexErrMsgTxt("The number of field of params must be at least 3 ");
@@ -420,6 +435,10 @@ void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFiel
 		{
 			presentFields[13] = true;
 		}
+		else if(strcmp(fieldName, "norm2_max_iter") == 0)
+			presentFields[14] = true;
+		else if(strcmp(fieldName, "norm2_threshold") == 0)
+			presentFields[15] = true;
 	}
 
 }
