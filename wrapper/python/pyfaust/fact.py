@@ -547,9 +547,9 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016):
             toward the left -- is_side_fact_left == true, cf.
             pyfaust.factparams.ParamsHierarchical and pyfaust.factparams.ParamsHierarchicalRectMat).
             <br/>The residuum has a sparsity of P*rho^(num_facts-1). <br/> By default, rho == .8 and P = 1.4. It's possible to set custom values with for example p == ( ['rectmat', j, k, s], {'rho':.4, 'P':.7 }). <br/>The sparsity is here the number of non-zero elements.
-        backend: the C++ implementation to use (2016 is the default or 2020
-        which should be quicker for certain configurations - e.g. factorizing a
-        Hadamard matrix).
+            backend: the C++ implementation to use: 2016 (the default) or 2020 (2020
+            which should be quicker for certain configurations - e.g. factorizing a
+            Hadamard matrix).
 
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
         ret_params: set to True to ask the function to return the
