@@ -728,7 +728,7 @@ classdef Faust
 		%> @brief Returns a Faust optimized by removing useless zero rows and columns as many times as needed.
 		%>
 		%> @param F: the Faust to optimize.
-		%> @param 'nnz_tres', int: (optional) the treshold of number of nonzeros under what the
+		%> @param 'nnz_tres', int: (optional) the threshold of number of nonzeros under what the
 		%>            rows/columns are removed.
 		%> @param 'only_forward', bool: (optional) True for applying only the forward passes of removal.
 		%> @param 'npasses', int: (optional) the number of passes to run, by default it goes until the
@@ -1409,7 +1409,7 @@ classdef Faust
 		%>
 		%> The norm of F is equal to the norm of full(F).
 		%>
-		%> @warning the computation time can be expected to be of order n*min(size(F)) with n the time for multipliying F by a vector. Nevertheless, the implementation ensures that memory usage remains controlled by avoiding to explicitly compute full(F) (at least for 2-norm).
+		%> @warning the computation time can be expected to be of order n*min(size(F)) with n the time for multiplying F by a vector. Nevertheless, the implementation ensures that memory usage remains controlled by avoiding to explicitly compute full(F) (at least for 2-norm).
 		%>
 		%> @b Usage
 		%>

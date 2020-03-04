@@ -418,7 +418,7 @@ class ConstraintName:
     @staticmethod
     def str2name_int(_str):
         """
-            Converts a str constraint shortname to its integer constant name equivalent.
+            Converts a str constraint short name to its integer constant name equivalent.
 
             For example, str2name_int('sp') returns ConstraintName.SP.
         """
@@ -903,7 +903,9 @@ class ParamsPalm4MSA(ParamsFact):
                 factor update.
                 is_verbose: True to enable the verbose mode.
                 grad_calc_opt_mode: the mode used for computing the PALM gradient.
-                It can be one value among ParamsFact.EXTERNAL_OPT, ParamsFact.INTERNAL_OPT or ParamsFact.DISABLED_OPT. This parameter is experimental, its value shouln't be changed.
+                It can be one value among ParamsFact.EXTERNAL_OPT,
+                ParamsFact.INTERNAL_OPT or ParamsFact.DISABLED_OPT. This
+                parameter is experimental, its value shouldn't be changed.
         """
         if(not isinstance(constraints, list) and not
            isinstance(constraints, ConstraintList)):
@@ -971,7 +973,7 @@ class StoppingCriterion(object):
 
         A stopping criterion can be of two kinds:
             - number of iterations,
-            - error treshold for the approximation of the matrix.
+            - error threshold for the approximation of the matrix.
     """
     def __init__(self, is_criterion_error = False , error_treshold = 0.3,
                  num_its = 500,

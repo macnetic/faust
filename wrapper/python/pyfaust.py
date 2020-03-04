@@ -94,7 +94,7 @@ class Faust:
             *kwargs: internal purpose arguments.
 
         WARNING: filepath and factors arguments are mutually exclusive. If you
-        use filepath you must explicitely set argument with the keyword.
+        use filepath you must explicitly set argument with the keyword.
 
         Examples:
             >>> from pyfaust import Faust
@@ -363,7 +363,7 @@ class Faust:
 
         Args:
             F: the Faust to optimize.
-            nnz_tres: the treshold of number of nonzeros under what the
+            nnz_tres: the threshold of number of nonzeros under what the
             rows/columns are removed.
             only_forward: True for applying only the forward passes of removal.
             npasses: the number of passes to run, by default it goes until the
@@ -1370,7 +1370,7 @@ class Faust:
 
         Returns:
             if indices is a single index: a copy of the i-th factor.
-            Otherwise: a new Faust composed of copies of the contigous factors of F
+            Otherwise: a new Faust composed of copies of the contiguous factors of F
             pointed by indices.
 
             Each copy type is:
