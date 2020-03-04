@@ -800,7 +800,7 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(NORM2_THRESHOLD).c_str());
 		norm2_threshold = (FPP2) mxGetScalar(mxCurrentField);
 	}
-	if(presentFields[FAUST_NORM2_MAX_ITER])
+	if(presentFields[NORM2_MAX_ITER])
 	{
 		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(NORM2_MAX_ITER).c_str());
 		norm2_max_iter = (int) mxGetScalar(mxCurrentField);
