@@ -239,7 +239,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	Faust::MatGeneric<FPP,DEVICE>* cur_fac;
 	Faust::MatSparse<FPP,DEVICE>* scur_fac;
 	Faust::MatDense<FPP,DEVICE>* dcur_fac;
-	const unsigned int nfacts = constraints.size();
+	unsigned int nfacts = constraints.size();
 	std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims;
 	int norm2_flag; // return val
 	for(auto c: constraints)
@@ -277,8 +277,9 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	std::function<bool()> updating_facs;
 	std::function<bool()> is_last_fac_updated;
 	// packed Fausts corresponding to each factor
-	TransformHelper<FPP,Cpu>* pL[nfacts]; // pL[i] is the Faust for all factors to the left of the factor *(S.begin()+i)
-	TransformHelper<FPP,Cpu>* pR[nfacts]; // pR[i] the same for the right of S_i
+	std::vector<TransformHelper<FPP,Cpu>*> pL, pR;
+	pL.resize(nfacts);// pL[i] is the Faust for all factors to the left of the factor *(S.begin()+i)
+	pR.resize(nfacts);// pR[i] the same for the right of S_i
 	for(int i=0;i<nfacts;i++)
 	{
 		pL[i] = new TransformHelper<FPP,Cpu>();
