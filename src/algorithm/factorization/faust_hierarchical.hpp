@@ -1,16 +1,7 @@
 template<typename FPP, Device DEVICE>
-Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>& A,
-//        const int nites,
-		std::vector<StoppingCriterion<Real<FPP>>>& sc,
-        std::vector<const Faust::ConstraintGeneric*> & fac_constraints,
-        std::vector<const Faust::ConstraintGeneric*> & res_constraints,
-        Real<FPP>& lambda,
-        const bool is_update_way_R2L, const bool is_fact_side_left,
-        const bool use_csr, const bool packing_RL,
-        const bool compute_2norm_on_array,
-        const Real<FPP> norm2_threshold,
-        const unsigned int norm2_max_iter, const bool is_verbose,
-		const bool constant_step_size, const Real<FPP> step_size)
+Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>&  A,
+		Params<FPP,DEVICE, Real<FPP>> & p,
+		Real<FPP>& lambda, const bool compute_2norm_on_array)
 {
     auto S = new Faust::TransformHelper<FPP,DEVICE>(); // A is copied
     S->push_back(&A);
@@ -21,10 +12,20 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
     Faust::MatSparse<FPP,DEVICE> * tmp_sparse;
     std::vector<Faust::MatGeneric<FPP,DEVICE>*> Si_vec;
     std::vector<Faust::ConstraintGeneric*> Si_cons;
-    Real<FPP> lambda_ = lambda;
+    Real<FPP> lambda_ = p.init_lambda;
     Real<FPP> glo_lambda = 1;
-	if(sc.size() < 2) throw runtime_error("Faust::hierarchical() needs 2 StoppingCriterion objects (for local and global opt.)");
-	DISPLAY_PARAMS(); //if is_verbose
+	std::vector<const Faust::ConstraintGeneric*> & fac_constraints = p.cons[0];
+	std::vector<const Faust::ConstraintGeneric*> & res_constraints = p.cons[1];
+	//TODO: remove these local variables and use directly p.
+	const bool is_update_way_R2L = p.isUpdateWayR2L;
+	const bool is_fact_side_left = p.isFactSideLeft;
+	const bool use_csr = p.use_csr;
+	const bool packing_RL = p.packing_RL;
+	const Real<FPP> norm2_threshold = p.norm2_threshold;
+	const unsigned int norm2_max_iter = p.norm2_max_iter;
+	const double step_size = p.step_size;
+	const bool constant_step_size = p.isConstantStepSize;
+	if(p.isVerbose) p.Display();
     for(int i=0;i < fac_constraints.size();i++)
     {
         cout << "Faust::hierarchical: " << i+1 << endl;
@@ -72,7 +73,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
             tmp_dense = new MatDense<FPP,Cpu>(*tmp_sparse);
         }
         else tmp_sparse = nullptr;
-		Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, sc[0], is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array,
+		Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, p.stop_crit_2facts, is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array,
 				norm2_threshold, norm2_max_iter, constant_step_size, step_size);
         if(tmp_sparse != nullptr)
             // the Si factor has been converted into a MatDense in the memory
@@ -96,15 +97,37 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
         }
         //TODO: verify if the constraints order doesn't depend on
         //is_fact_side_left
-        std::vector<ConstraintGeneric*> glo_cons;
+        std::vector<Faust::ConstraintGeneric*> glo_cons;
         for(auto ite_cons=fac_constraints.begin(); ite_cons != fac_constraints.begin()+i+1;ite_cons++)
             glo_cons.push_back(const_cast<Faust::ConstraintGeneric*>(*ite_cons));
         glo_cons.push_back(const_cast<Faust::ConstraintGeneric*>(res_constraints[i]));
 
         // global optimization
-        Faust::palm4msa2(A, glo_cons, *S, glo_lambda, sc[1], is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array,
+        Faust::palm4msa2(A, glo_cons, *S, glo_lambda, p.stop_crit_global ,is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array,
 				norm2_threshold, norm2_max_iter, constant_step_size, step_size);
     }
     lambda = glo_lambda;
     return S;
+}
+
+template<typename FPP, Device DEVICE>
+Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>& A,
+//        const int nites,
+		std::vector<StoppingCriterion<Real<FPP>>>& sc,
+        std::vector<const Faust::ConstraintGeneric*> & fac_constraints,
+        std::vector<const Faust::ConstraintGeneric*> & res_constraints,
+        Real<FPP>& lambda,
+        const bool is_update_way_R2L, const bool is_fact_side_left,
+        const bool use_csr, const bool packing_RL,
+        const bool compute_2norm_on_array,
+        const Real<FPP> norm2_threshold,
+        const unsigned int norm2_max_iter, const bool is_verbose,
+		const bool constant_step_size, const Real<FPP> step_size)
+{
+    Faust::Params<FPP,DEVICE,Real<FPP>> p(A.getNbRow(), A.getNbCol(), fac_constraints.size()+1, {fac_constraints, res_constraints}, {}, sc[0], sc[1], is_verbose, is_update_way_R2L, is_fact_side_left, lambda, constant_step_size, step_size);
+	p.use_csr = use_csr;
+	p.packing_RL = packing_RL;
+	p.norm2_threshold = norm2_threshold;
+	p.norm2_max_iter = norm2_max_iter;
+    return Faust::hierarchical(A, p, lambda, compute_2norm_on_array);
 }

@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
     Faust::SpBlasHandle<Cpu> spblasHandle;
 
     // parameter setting
-    Faust::Params<FPP,Cpu,FPP2> params;
+    Faust::Params<FPP,Cpu,Real<FPP>> params;
     init_params_from_matiofile<FPP,Cpu,FPP2>(params,configFilename.c_str(),"params");
 //    params.Display();
 
@@ -180,9 +180,11 @@ int main(int argc, char* argv[])
     auto res_cons = cons[1];
 	vector<Faust::StoppingCriterion<Real<FPP>>> sc = {200,200};
     Real<FPP> lambda;
-    auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params.isUpdateWayR2L,
-            params.isFactSideLeft, /*use_csr */ true, /*packing_RL default to true*/true,
-			/* compute_norms_on_arrays */false, FAUST_PRECISION, FAUST_NORM2_MAX_ITER, /* is_verbose default to false */ true);
+//    auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params.isUpdateWayR2L,
+//            params.isFactSideLeft, /*use_csr */ true, /*packing_RL default to true*/true,
+//			/* compute_norms_on_arrays */false, FAUST_PRECISION, FAUST_NORM2_MAX_ITER, /* is_verbose default to false */ true);
+    params.isVerbose = true;
+    auto th = Faust::hierarchical<FPP,Cpu>(matrix, params, lambda, false);
     cout << "lambda=" << lambda << endl;
     th->multiply(lambda);
     th->display();
