@@ -1,6 +1,7 @@
 template<typename FPP, Device DEVICE>
 Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>& A,
-        const int nites,
+//        const int nites,
+		std::vector<StoppingCriterion<Real<FPP>>>& sc,
         std::vector<const Faust::ConstraintGeneric*> & fac_constraints,
         std::vector<const Faust::ConstraintGeneric*> & res_constraints,
         Real<FPP>& lambda,
@@ -21,6 +22,9 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
     std::vector<Faust::ConstraintGeneric*> Si_cons;
     Real<FPP> lambda_ = 1;
     Real<FPP> glo_lambda = 1;
+	if(sc.size() < 2) throw runtime_error("Faust::hierarchical() needs 2 StoppingCriterion objects (for local and global opt.)");
+//	std::cout << "Faust::hierarchical sc[0] =" << sc[0].get_crit() << std::endl;
+//	std::cout << "Faust::hierarchical sc[1] =" << sc[1].get_crit() << std::endl;
 //	std::cout << "Faust::hierarchical packing_RL =" << packing_RL << " use_csr=" << use_csr << std::endl;
 //	std::cout << "Faust::hierarchical norm2_max_iter=" << norm2_max_iter << " norm2_threshold=" << norm2_threshold << std::endl;
     for(int i=0;i < fac_constraints.size();i++)
@@ -70,7 +74,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
             tmp_dense = new MatDense<FPP,Cpu>(*tmp_sparse);
         }
         else tmp_sparse = nullptr;
-        Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, nites, is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
+        Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, sc[0], is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
         if(tmp_sparse != nullptr)
             // the Si factor has been converted into a MatDense in the memory
             // storage
@@ -105,7 +109,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
         // global optimization
 //        cout << "S before global opt.:" << endl;
 //        S->display();
-        Faust::palm4msa2(A, glo_cons, *S, glo_lambda, nites, is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
+        Faust::palm4msa2(A, glo_cons, *S, glo_lambda, sc[1], is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
 //        cout << "S after global opt.:" << endl;
 //        S->display();
     }

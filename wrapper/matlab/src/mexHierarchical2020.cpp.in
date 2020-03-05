@@ -90,26 +90,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	auto *params = mxArray2FaustParams<SCALAR,FPP2>(matlab_params);
 
 	FPP2 lambda;
-	// optional ?
-//	bool use_csr = true, packing_RL = true;
 
-//	if(nrhs > 2)
-//		use_csr = (bool) mxGetScalar(prhs[2]);
-//	if(nrhs > 3)
-//		packing_RL = (bool) mxGetScalar(prhs[3]);
-
-
-	///////////// HIERARCHICAL LAUNCH ///////////////
 	try{
-		//		std::cout<<"nb_row : "<<nb_row<<std::endl;
-		//		std::cout<<"nb_col : "<<nb_col<<std::endl;
-			//		params.Display();
-
-		//DisplayParams(params);
-		//creation de hierarchical fact
-//		Faust::BlasHandle<Cpu> blas_handle;
-//		Faust::SpBlasHandle<Cpu> spblas_handle;
-
+			//DisplayParams(params);
 		auto fac_cons = params->cons[0];
 		auto res_cons = params->cons[1];
 //		cout << "params->packing_RL=" << params->packing_RL << endl;
@@ -117,7 +100,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //		cout << "params->norm2_max_iter=" << params->norm2_max_iter << endl;
 //		cout << "params->norm2_threshold=" << params->norm2_threshold << endl;
 		bool compute_2norm_on_arrays = false;
-		auto th = Faust::hierarchical(matrix, params->stop_crit_global.get_crit(), fac_cons, res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->use_csr, params->packing_RL, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter);
+		std::vector<Faust::StoppingCriterion<Real<SCALAR>>> sc = {params->stop_crit_2facts.get_crit(), params->stop_crit_global.get_crit()};
+		auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->use_csr, params->packing_RL, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter);
 
 		auto th_times_lambda = th->multiply(lambda);
 		delete th;

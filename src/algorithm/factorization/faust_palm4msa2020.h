@@ -9,6 +9,7 @@
 #include "faust_ConstraintFPP.h"
 #include "faust_ConstraintInt.h"
 #include "faust_ConstraintMat.h"
+#include "faust_StoppingCriterion.h"
 #include <functional>
 
 namespace Faust
@@ -23,7 +24,8 @@ namespace Faust
 				Faust::TransformHelper<FPP,DEVICE>& S,
 				/** lambda output, intialized from outside */
 				FPP& lambda,
-				const unsigned int nites,
+				//const unsigned int nites,
+				const StoppingCriterion<Real<FPP>>& sc,
 				const bool is_update_way_R2L=false,
                 const bool use_csr=true,
 				const bool compute_2norm_on_array=false,
@@ -40,7 +42,8 @@ namespace Faust
 				Faust::TransformHelper<FPP,DEVICE>& S,
 				/** lambda output, intialized from outside */
 				Real<FPP>& lambda,
-				const unsigned int nites,
+				//const unsigned int nites,
+				const StoppingCriterion<Real<FPP>>& sc,
 				const bool is_update_way_R2L=false,
                 const bool use_csr=true,
 				const bool packing_RL=true,

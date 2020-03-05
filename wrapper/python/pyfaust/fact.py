@@ -667,7 +667,6 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016):
        8.0
 
        <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat
-
     """
     p = _prepare_hierarchical_fact(M,p, "hierarchical", ret_lambda,
                               ret_params)

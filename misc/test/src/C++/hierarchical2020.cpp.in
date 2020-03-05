@@ -178,10 +178,10 @@ int main(int argc, char* argv[])
     auto cons = params.cons;
     auto fac_cons = cons[0];
     auto res_cons = cons[1];
-
+	vector<Faust::StoppingCriterion<Real<FPP>>> sc = {200,200};
     Real<FPP> lambda;
-    auto th = Faust::hierarchical(matrix, 200, fac_cons, res_cons, lambda, params.isUpdateWayR2L,
-            params.isFactSideLeft, /*use_csr */ true, /*packing_RL */true);
+    auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params.isUpdateWayR2L,
+            params.isFactSideLeft, /*use_csr */ true, /*packing_RL default to true*/true);
     cout << "lambda=" << lambda << endl;
     th->multiply(lambda);
     th->display();

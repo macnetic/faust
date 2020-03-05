@@ -3,7 +3,8 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		std::vector<Faust::ConstraintGeneric*> & constraints,
 		Faust::TransformHelper<FPP,DEVICE>& S,
 		FPP& lambda,
-		const unsigned int nites,
+		//const unsigned int nites,
+		const StoppingCriterion<Real<FPP>>& sc,
 		const bool is_update_way_R2L,
 		const bool use_csr,
 		const bool compute_2norm_on_array,
@@ -175,7 +176,7 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		tmp *= lambda/c;
 		D -= tmp;
 	};
-	while(i < nites)
+	while(i < sc.get_crit())
 	{
 		//		std::cout << "nfacts:" << nfacts << std::endl;
 		init_fid();
@@ -225,7 +226,8 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		std::vector<Faust::ConstraintGeneric*> & constraints,
 		Faust::TransformHelper<FPP,DEVICE>& S,
 		Real<FPP>& lambda, //TODO: FPP lambda ? is useful to have a complex lamdba ?
-		const unsigned int nites,
+		//const unsigned int nites,
+		const StoppingCriterion<Real<FPP>>& sc,
 		const bool is_update_way_R2L,
 		const bool use_csr,
 		const bool packing_RL,
@@ -350,7 +352,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	Faust::MatDense<FPP,Cpu> D, tmp;
 	Faust::MatDense<FPP,Cpu> * LorR;
 	Faust::MatDense<FPP,Cpu> _LorR;
-	while(i < nites)
+	while(i < sc.get_crit())
 	{
 		//		std::cout << "nfacts:" << nfacts << std::endl;
 

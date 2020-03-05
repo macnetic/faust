@@ -2007,6 +2007,19 @@ cdef class FaustFact:
         norm2_max_iter = p.norm2_max_iter
         norm2_threshold = p.norm2_threshold
         nites = p.stop_crits[0].num_its
+        cdef PyxStoppingCriterion[double]* cpp_stop_crits
+        cpp_stop_crits = <PyxStoppingCriterion[double]*>\
+        PyMem_Malloc(sizeof(PyxStoppingCriterion[double])*2)
+
+        cpp_stop_crits[0].is_criterion_error = p.stop_crits[0].is_criterion_error
+        cpp_stop_crits[0].error_treshold = p.stop_crits[0].error_treshold
+        cpp_stop_crits[0].num_its = p.stop_crits[0].num_its
+        cpp_stop_crits[0].max_num_its = p.stop_crits[0].max_num_its
+        cpp_stop_crits[1].is_criterion_error = p.stop_crits[1].is_criterion_error
+        cpp_stop_crits[1].error_treshold = p.stop_crits[1].error_treshold
+        cpp_stop_crits[1].num_its = p.stop_crits[1].num_its
+        cpp_stop_crits[1].max_num_its = p.stop_crits[1].max_num_its
+
         constraints = p.constraints
 
         if(M.dtype == np.complex):
@@ -2059,7 +2072,8 @@ cdef class FaustFact:
         core.core_faust_dbl = \
                 FaustCoreCy.hierarchical2020[double](&Mview[0,0], M_num_rows,
                                                      M_num_cols,
-                                                     nites,
+                                                     #nites,
+                                                     cpp_stop_crits,
                                                      cpp_constraints,
                                                      num_constraints,
                                                      num_facts,
@@ -2074,7 +2088,7 @@ cdef class FaustFact:
         for i in range(0,num_constraints):
             PyMem_Free(cpp_constraints[i])
         PyMem_Free(cpp_constraints)
-
+        PyMem_Free(cpp_stop_crits)
         if(core.core_faust_dbl == NULL): raise Exception("hierarchical2020"
                                                           " has failed.");
 

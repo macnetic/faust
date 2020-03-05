@@ -207,7 +207,9 @@ cdef extern from "FaustFact.h":
 
     cdef FaustCoreCpp[FPP]* hierarchical2020[FPP](FPP* mat, unsigned int
                                                   num_rows, unsigned int
-                                                  num_cols, unsigned int nites,
+                                                  num_cols, 
+                                                  #unsigned int nites,
+                                                  PyxStoppingCriterion*,
                                                   PyxConstraintGeneric**
                                                   constraints, unsigned int
                                                   num_cons, unsigned int
