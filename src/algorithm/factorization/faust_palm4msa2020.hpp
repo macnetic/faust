@@ -9,7 +9,8 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		const bool use_csr,
 		const bool compute_2norm_on_array,
 		const Real<FPP> norm2_threshold,
-		const unsigned int norm2_max_iter)
+		const unsigned int norm2_max_iter,
+		const bool constant_step_size, const Real<FPP> step_size)
 {
 	if(constraints.size() == 0)
 		throw out_of_range("No constraint passed to palm4msa.");
@@ -67,12 +68,16 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 
 	Faust::MatDense<FPP,Cpu> D, tmp;
 	Faust::TransformHelper<FPP, Cpu> LSR;
+	Real<FPP> c = 1/step_size;
 	// lambda exp to update fact when its id is 0
-	auto update_1stfac = [&A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
+	auto update_1stfac = [&constant_step_size, &c, &A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
 	{
 		auto R = S.right(f_id+1);
-		Real<FPP> nR = R->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
-		Real<FPP> c = lipschitz_multiplicator*lambda*lambda*nR*nR;
+		if(! constant_step_size)
+		{
+			Real<FPP> nR = R->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
+			c = lipschitz_multiplicator*lambda*lambda*nR*nR;
+		}
 //		std::cout << "c=" << c << std::endl;
 		//TODO: check if c is nan
 		Faust::TransformHelper<FPP, Cpu> L;
@@ -107,12 +112,15 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		tmp *= lambda/c;
 		D -= tmp;
 	};
-	auto update_lastfac = [&A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
+	auto update_lastfac = [&constant_step_size, &c, &A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
 	{
 		auto L = S.left(f_id-1);
 		// TODO: factorize with other lambda exp
-		Real<FPP> nL = L->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
-		Real<FPP> c = lipschitz_multiplicator*lambda*lambda*nL*nL;
+		if(! constant_step_size)
+		{
+			Real<FPP> nL = L->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
+			c = lipschitz_multiplicator*lambda*lambda*nL*nL;
+		}
 //		std::cout << "c=" << c << std::endl;
 		//TODO: check if c is nan
 		Faust::TransformHelper<FPP, Cpu> R;
@@ -141,13 +149,16 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		tmp *= lambda/c;
 		D -= tmp;
 	};
-	auto update_interfac = [&A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
+	auto update_interfac = [&constant_step_size, &c, &A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
 	{
 		auto R = S.right(f_id+1);
 		auto L = S.left(f_id-1);
-		Real<FPP> nR = R->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
-		Real<FPP> nL = L->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
-		Real<FPP> c = lipschitz_multiplicator*lambda*lambda*nR*nR*nL*nL;
+		if(! constant_step_size)
+		{
+			Real<FPP> nR = R->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
+			Real<FPP> nL = L->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
+			c = lipschitz_multiplicator*lambda*lambda*nR*nR*nL*nL;
+		}
 		//TODO: check if c is nan
 		scur_fac = nullptr, dcur_fac = nullptr;
 		if(S.is_fact_sparse(f_id))
@@ -233,7 +244,8 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		const bool packing_RL,
 		const bool compute_2norm_on_array,
 		const Real<FPP> norm2_threshold,
-		const unsigned int norm2_max_iter)
+		const unsigned int norm2_max_iter,
+		const bool constant_step_size, const Real<FPP> step_size)
 {
 	if(constraints.size() == 0)
 		throw out_of_range("No constraint passed to palm4msa.");
@@ -352,6 +364,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	Faust::MatDense<FPP,Cpu> D, tmp;
 	Faust::MatDense<FPP,Cpu> * LorR;
 	Faust::MatDense<FPP,Cpu> _LorR;
+	Real<FPP> c = 1/step_size;
 	while(i < sc.get_crit())
 	{
 		//		std::cout << "nfacts:" << nfacts << std::endl;
@@ -362,11 +375,14 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 			//			std::cout << "f_id: " << f_id << std::endl;
 			cur_fac = S.get_gen_fact_nonconst(f_id);
 			Real<FPP> nR=1,nL=1;
-			if(pR[f_id]->size() > 0)
-				nR = pR[f_id]->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
-			if(pL[f_id]->size() > 0)
-				nL = pL[f_id]->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
-			Real<FPP> c = lipschitz_multiplicator*lambda*lambda*nR*nR*nL*nL;
+			if(! constant_step_size)
+			{
+				if(pR[f_id]->size() > 0)
+					nR = pR[f_id]->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
+				if(pL[f_id]->size() > 0)
+					nL = pL[f_id]->spectralNorm(norm2_max_iter, norm2_threshold, norm2_flag);
+				c = lipschitz_multiplicator*lambda*lambda*nR*nR*nL*nL;
+			}
 			auto S_j_vec = {*(S.begin()+f_id)};
 			Faust::TransformHelper<FPP, Cpu> _LSR(*pL[f_id], S_j_vec, *pR[f_id]);
 //			tmp = _LSR.get_product();

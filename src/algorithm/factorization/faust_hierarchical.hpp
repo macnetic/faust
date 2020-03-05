@@ -9,7 +9,8 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
         const bool use_csr, const bool packing_RL,
         const bool compute_2norm_on_array,
         const Real<FPP> norm2_threshold,
-        const unsigned int norm2_max_iter, const bool is_verbose)
+        const unsigned int norm2_max_iter, const bool is_verbose,
+		const bool constant_step_size, const Real<FPP> step_size)
 {
     auto S = new Faust::TransformHelper<FPP,DEVICE>(); // A is copied
     S->push_back(&A);
@@ -23,7 +24,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
     Real<FPP> lambda_ = lambda;
     Real<FPP> glo_lambda = 1;
 	if(sc.size() < 2) throw runtime_error("Faust::hierarchical() needs 2 StoppingCriterion objects (for local and global opt.)");
-	DISPLAY_PARAMS();
+	DISPLAY_PARAMS(); //if is_verbose
     for(int i=0;i < fac_constraints.size();i++)
     {
         cout << "Faust::hierarchical: " << i+1 << endl;
@@ -71,15 +72,15 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
             tmp_dense = new MatDense<FPP,Cpu>(*tmp_sparse);
         }
         else tmp_sparse = nullptr;
-        Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, sc[0], is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
+		Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, sc[0], is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array,
+				norm2_threshold, norm2_max_iter, constant_step_size, step_size);
         if(tmp_sparse != nullptr)
             // the Si factor has been converted into a MatDense in the memory
             // storage
             // delete it // TODO: palm4msa2 should handle this on its own
             delete tmp_dense;
-//        cout << "Local opt. result:" << endl;
-//        Si_th.display();
-        //global optimization
+
+        //prepare global optimization
         glo_lambda *= lambda_;
         if(is_fact_side_left)
         {
@@ -93,22 +94,16 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
             S->push_back(*(Si_th.begin()), false, false);
             S->push_back(*(Si_th.begin()+1), false, false);
         }
-//        cout << "update global faust:" << endl;
-//        S->display();
         //TODO: verify if the constraints order doesn't depend on
         //is_fact_side_left
         std::vector<ConstraintGeneric*> glo_cons;
         for(auto ite_cons=fac_constraints.begin(); ite_cons != fac_constraints.begin()+i+1;ite_cons++)
             glo_cons.push_back(const_cast<Faust::ConstraintGeneric*>(*ite_cons));
         glo_cons.push_back(const_cast<Faust::ConstraintGeneric*>(res_constraints[i]));
-        // TODO: arguments with default values for norm threshold, norm num
-        // iters
+
         // global optimization
-//        cout << "S before global opt.:" << endl;
-//        S->display();
-        Faust::palm4msa2(A, glo_cons, *S, glo_lambda, sc[1], is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
-//        cout << "S after global opt.:" << endl;
-//        S->display();
+        Faust::palm4msa2(A, glo_cons, *S, glo_lambda, sc[1], is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array,
+				norm2_threshold, norm2_max_iter, constant_step_size, step_size);
     }
     lambda = glo_lambda;
     return S;

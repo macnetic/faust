@@ -811,6 +811,21 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 		params->norm2_threshold = norm2_threshold;
 	params->packing_RL = packing_RL;
 	params->use_csr = use_csr;
+	bool constant_step_size = false;
+	if(presentFields[CONSTANT_STEP_SIZE])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(CONSTANT_STEP_SIZE).c_str());
+		constant_step_size = (bool) mxGetScalar(mxCurrentField);
+	}
+	FPP2 step_size = FAUST_PRECISION;
+	if(presentFields[STEP_SIZE])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, mat_field_type2str(STEP_SIZE).c_str());
+		step_size = (FPP2) mxGetScalar(mxCurrentField);
+
+	}
+	params->step_size = step_size;
+	params->isConstantStepSize = constant_step_size;
 	return params;
 }
 

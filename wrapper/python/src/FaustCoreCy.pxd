@@ -220,7 +220,9 @@ cdef extern from "FaustFact.h":
                                                   use_csr, bool packing_RL,
                                                   unsigned int norm2_max_iter,
                                                   double norm2_threshold, bool
-                                                  is_verbose)
+                                                  is_verbose, bool
+                                                  constant_step_size,
+                                                  double step_size)
 
 
 cdef extern from "FaustFactGivensFGFT.h":

@@ -95,13 +95,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			//DisplayParams(params);
 		auto fac_cons = params->cons[0];
 		auto res_cons = params->cons[1];
-//		cout << "params->packing_RL=" << params->packing_RL << endl;
-//		cout << "params->use_csr=" << params->use_csr << endl;
-//		cout << "params->norm2_max_iter=" << params->norm2_max_iter << endl;
-//		cout << "params->norm2_threshold=" << params->norm2_threshold << endl;
 		bool compute_2norm_on_arrays = false;
 		std::vector<Faust::StoppingCriterion<Real<SCALAR>>> sc = {params->stop_crit_2facts.get_crit(), params->stop_crit_global.get_crit()};
-		auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->use_csr, params->packing_RL, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter, params->isVerbose);
+		auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->use_csr, params->packing_RL, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter, params->isVerbose, params->isConstantStepSize, params->step_size);
 
 		auto th_times_lambda = th->multiply(lambda);
 		delete th;

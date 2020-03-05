@@ -487,7 +487,7 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
 }
 
 template<typename FPP>
-FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<double>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, double* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, bool use_csr, bool packing_RL, unsigned int norm2_max_iter, double norm2_threshold, bool is_verbose)
+FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<double>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, double* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, bool use_csr, bool packing_RL, unsigned int norm2_max_iter, double norm2_threshold, bool is_verbose, bool constant_step_size, double step_size)
 {
     FaustCoreCpp<FPP>* core = nullptr;
     Faust::MatDense<FPP,Cpu> inMat(mat, num_rows, num_cols);
@@ -557,7 +557,7 @@ FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned in
                 packing_RL,
                 /* compute_2norm_on_array*/ false,
                 norm2_threshold,
-                norm2_max_iter, is_verbose);
+                norm2_max_iter, is_verbose, constant_step_size, step_size);
         th_times_lambda = th->multiply(inout_lambda[0]);
         delete th;
         th = th_times_lambda;

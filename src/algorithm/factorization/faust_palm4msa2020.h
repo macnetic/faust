@@ -30,7 +30,8 @@ namespace Faust
                 const bool use_csr=true,
 				const bool compute_2norm_on_array=false,
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,
-				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER);
+				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
+				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION);
 
 	template <typename FPP, Device DEVICE>
 		void palm4msa2(
@@ -49,7 +50,8 @@ namespace Faust
 				const bool packing_RL=true,
 				const bool compute_2norm_on_array=false,
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,
-				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER);
+				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
+				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION);
 
 }
 #include "faust_palm4msa2020.hpp"

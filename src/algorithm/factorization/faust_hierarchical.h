@@ -15,7 +15,8 @@ namespace Faust
 			const bool compute_2norm_on_array=false,
 			const Real<FPP> norm2_threshold=FAUST_PRECISION,
 			const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
-			const bool is_verbose=false);
+			const bool is_verbose=false,
+			const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION);
 }
 
 // this macro is only for hierarchical
@@ -34,6 +35,8 @@ if(is_verbose)\
 	std::cout << "norm2_max_iter: " << norm2_max_iter << endl;\
 	std::cout << "packing_RL:" << packing_RL << endl;\
 	std::cout << "use_csr:" << use_csr << endl;\
+	std::cout << "constant_step_size:" << constant_step_size << endl;\
+	std::cout << "step_size:" << step_size << endl;\
 	std::cout << "constraints: " << fac_constraints.size() << endl;\
 	cout << "FACTORS:" << endl;\
 	for(int i=0;i<fac_constraints.size();i++)\

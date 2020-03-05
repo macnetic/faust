@@ -112,6 +112,10 @@ const string mat_field_type2str(MAT_FIELD_TYPE f)
 			return "norm2_max_iter";
 		case NORM2_THRESHOLD:
 			return "norm2_threshold";
+		case CONSTANT_STEP_SIZE:
+			return "constant_step_size";
+		case STEP_SIZE:
+			return "step_size";
 	}
 }
 

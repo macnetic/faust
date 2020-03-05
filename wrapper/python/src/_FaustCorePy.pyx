@@ -2082,7 +2082,9 @@ cdef class FaustFact:
                                                      use_csr, packing_RL,
                                                      norm2_max_iter,
                                                      norm2_threshold,
-                                                     p.is_verbose)
+                                                     p.is_verbose,
+                                                     p.constant_step_size,
+                                                     p.step_size)
         core._isReal = True
 
         for i in range(0,num_constraints):
