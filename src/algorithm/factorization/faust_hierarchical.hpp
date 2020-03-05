@@ -9,7 +9,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
         const bool use_csr, const bool packing_RL,
         const bool compute_2norm_on_array,
         const Real<FPP> norm2_threshold,
-        const unsigned int norm2_max_iter)
+        const unsigned int norm2_max_iter, const bool is_verbose)
 {
     auto S = new Faust::TransformHelper<FPP,DEVICE>(); // A is copied
     S->push_back(&A);
@@ -20,13 +20,10 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
     Faust::MatSparse<FPP,DEVICE> * tmp_sparse;
     std::vector<Faust::MatGeneric<FPP,DEVICE>*> Si_vec;
     std::vector<Faust::ConstraintGeneric*> Si_cons;
-    Real<FPP> lambda_ = 1;
+    Real<FPP> lambda_ = lambda;
     Real<FPP> glo_lambda = 1;
 	if(sc.size() < 2) throw runtime_error("Faust::hierarchical() needs 2 StoppingCriterion objects (for local and global opt.)");
-//	std::cout << "Faust::hierarchical sc[0] =" << sc[0].get_crit() << std::endl;
-//	std::cout << "Faust::hierarchical sc[1] =" << sc[1].get_crit() << std::endl;
-//	std::cout << "Faust::hierarchical packing_RL =" << packing_RL << " use_csr=" << use_csr << std::endl;
-//	std::cout << "Faust::hierarchical norm2_max_iter=" << norm2_max_iter << " norm2_threshold=" << norm2_threshold << std::endl;
+	DISPLAY_PARAMS();
     for(int i=0;i < fac_constraints.size();i++)
     {
         cout << "Faust::hierarchical: " << i+1 << endl;

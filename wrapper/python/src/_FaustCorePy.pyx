@@ -2006,7 +2006,6 @@ cdef class FaustFact:
         packing_RL = p.packing_RL
         norm2_max_iter = p.norm2_max_iter
         norm2_threshold = p.norm2_threshold
-        nites = p.stop_crits[0].num_its
         cdef PyxStoppingCriterion[double]* cpp_stop_crits
         cpp_stop_crits = <PyxStoppingCriterion[double]*>\
         PyMem_Malloc(sizeof(PyxStoppingCriterion[double])*2)
@@ -2027,6 +2026,7 @@ cdef class FaustFact:
                             " complex matrices.")
         # store only lambda as a return from Palm4MSA algo
         _out_buf = np.array([0], dtype=M.dtype)
+        _out_buf[0] = p.init_lambda;
 
         Mview=M
         outbufview = _out_buf
@@ -2072,7 +2072,6 @@ cdef class FaustFact:
         core.core_faust_dbl = \
                 FaustCoreCy.hierarchical2020[double](&Mview[0,0], M_num_rows,
                                                      M_num_cols,
-                                                     #nites,
                                                      cpp_stop_crits,
                                                      cpp_constraints,
                                                      num_constraints,
@@ -2082,7 +2081,8 @@ cdef class FaustFact:
                                                      is_fact_side_left,
                                                      use_csr, packing_RL,
                                                      norm2_max_iter,
-                                                     norm2_threshold)
+                                                     norm2_threshold,
+                                                     p.is_verbose)
         core._isReal = True
 
         for i in range(0,num_constraints):

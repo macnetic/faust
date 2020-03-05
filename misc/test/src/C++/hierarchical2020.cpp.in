@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
     // parameter setting
     Faust::Params<FPP,Cpu,FPP2> params;
     init_params_from_matiofile<FPP,Cpu,FPP2>(params,configFilename.c_str(),"params");
-    params.Display();
+//    params.Display();
 
     // matrix to be factorized
     Faust::MatDense<FPP,Cpu> matrix, imatrix;
@@ -181,7 +181,8 @@ int main(int argc, char* argv[])
 	vector<Faust::StoppingCriterion<Real<FPP>>> sc = {200,200};
     Real<FPP> lambda;
     auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params.isUpdateWayR2L,
-            params.isFactSideLeft, /*use_csr */ true, /*packing_RL default to true*/true);
+            params.isFactSideLeft, /*use_csr */ true, /*packing_RL default to true*/true,
+			/* compute_norms_on_arrays */false, FAUST_PRECISION, FAUST_NORM2_MAX_ITER, /* is_verbose default to false */ true);
     cout << "lambda=" << lambda << endl;
     th->multiply(lambda);
     th->display();
