@@ -110,6 +110,7 @@ namespace Faust {
 	    const faust_unsigned_int get_rows() const {return m_nbRows;}
 	    const faust_unsigned_int get_cols() const {return m_nbCols;}
 
+		virtual void Display() const;
 	    virtual void set_default_parameter()=0;
 	    virtual void check_constraint_name()const=0;
 		template<typename FPP, Device DEVICE>

@@ -147,5 +147,11 @@ void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::project(Faust::MatDense<FPP,DEVICE> 
    }
 
 }
+template<typename FPP,Device DEVICE, typename FPP2>
+void Faust::ConstraintFPP<FPP,DEVICE,FPP2>::Display() const
+{
+	Faust::ConstraintGeneric::Display();
+	std::cout<<" parameter :"<< get_parameter() << std::endl;
+}
 
 #endif

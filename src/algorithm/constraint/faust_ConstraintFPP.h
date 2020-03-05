@@ -97,6 +97,7 @@ namespace Faust
           virtual void set_default_parameter();
           virtual void check_constraint_name()const;
           virtual void project(Faust::MatDense<FPP,DEVICE> & mat)const;
+		  virtual void Display() const;
           ~ConstraintFPP(){};
 
        private:

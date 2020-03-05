@@ -325,3 +325,5 @@ void Faust::ConstraintGeneric::project(Faust::MatDense<FPP, DEVICE>& mat) const 
 	else if(this->is_constraint_parameter_int<FPP,DEVICE,FPP2>())
 		dynamic_cast<const Faust::ConstraintInt<FPP,DEVICE>*>(this)->project(mat);
 }
+
+

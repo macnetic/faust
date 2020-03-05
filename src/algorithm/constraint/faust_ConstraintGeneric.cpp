@@ -164,5 +164,11 @@ const char* Faust::ConstraintGeneric::get_constraint_name()const
    }
 }
 
+void Faust::ConstraintGeneric::Display() const
+{
+	std::cout << this->get_constraint_name();
+	std::cout<<" nb_row: "<< this->get_rows();
+	std::cout<<" nb_col: "<< this->get_cols();
+}
 
 const char * Faust::ConstraintGeneric::m_className="Faust::ConstraintGeneric::";

@@ -176,6 +176,11 @@ void Faust::ConstraintInt<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
    }
 }
 
-
+template<typename FPP,Device DEVICE>
+void Faust::ConstraintInt<FPP,DEVICE>::Display() const
+{
+	Faust::ConstraintGeneric::Display();
+	std::cout<<" parameter :"<< get_parameter() << std::endl;
+}
 
 

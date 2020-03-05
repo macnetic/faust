@@ -342,37 +342,7 @@ void Faust::Params<FPP,DEVICE,FPP2>::Display() const
 				std::cout<<"  RESIDUUMS : "<<std::endl;
 
 		for (unsigned int L=0;L<cons[0].size();L++)
-		{
-
-			//std::string type_cons;
-			//type_cons.resize(0);
-			//type_cons=get_constraint_type((*cons[jl][L]).get_constraint_type());
-			std::cout<<"type_cont : "<<cons[jl][L]->template get_type<FPP,DEVICE,FPP2>()<<" ";
-			std::cout<<(*cons[jl][L]).get_constraint_name();
-			std::cout<<" nb_row :"<<(*cons[jl][L]).get_rows();
-			std::cout<<" nb_col :"<<(*cons[jl][L]).get_cols();
-
-
-			if (cons[jl][L]->template is_constraint_parameter_int<FPP,DEVICE,FPP2>())
-			{
-				Faust::ConstraintInt<FPP,DEVICE>* const_int = (Faust::ConstraintInt<FPP,DEVICE>*)(cons[jl][L]);
-				std::cout<<" parameter :"<<(*const_int).get_parameter()<<std::endl;
-			}
-
-			else if (cons[jl][L]->template is_constraint_parameter_real<FPP,DEVICE,FPP2>())
-			{
-				Faust::ConstraintFPP<FPP,DEVICE,FPP2>* const_real = (Faust::ConstraintFPP<FPP,DEVICE,FPP2>*)(cons[jl][L]);
-				std::cout<<" parameter :"<<(*const_real).get_parameter()<<std::endl;
-			}
-
-			else if (cons[jl][L]->template is_constraint_parameter_mat<FPP,DEVICE,FPP2>())
-			{
-				Faust::ConstraintMat<FPP,DEVICE>* const_mat = (Faust::ConstraintMat<FPP,DEVICE>*)(cons[jl][L]);
-				std::cout<<" parameter :"<<std::endl;
-				(*const_mat).get_parameter().Display();
-			}
-
-		}
+			cons[jl][L]->Display();
 		std::cout<<std::endl<<std::endl;
 	}
 
