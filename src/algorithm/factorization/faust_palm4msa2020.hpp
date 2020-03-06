@@ -18,6 +18,7 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 	Faust::MatGeneric<FPP,DEVICE>* cur_fac;
 	Faust::MatSparse<FPP,DEVICE>* scur_fac;
 	Faust::MatDense<FPP,DEVICE>* dcur_fac;
+	Real<FPP> error = -1; // negative error is ignored
 	const unsigned int nfacts = constraints.size();
 	std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims;
 	int norm2_flag; // return val
@@ -70,7 +71,7 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 	Faust::TransformHelper<FPP, Cpu> LSR;
 	Real<FPP> c = 1/step_size;
 	// lambda exp to update fact when its id is 0
-	auto update_1stfac = [&constant_step_size, &c, &A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
+	auto update_1stfac = [&sc, &error, &constant_step_size, &c, &A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
 	{
 		auto R = S.right(f_id+1);
 		if(! constant_step_size)
@@ -103,6 +104,8 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		_LSR.get_product(tmp);
 		tmp *= lambda;
 		tmp -= A;
+		if(sc.isCriterionErr())
+			error = tmp.norm();
 		//TODO: do something to lighten the double transpose conjugate
 		tmp.conjugate(false);
 		tmp.transpose();
@@ -112,7 +115,7 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		tmp *= lambda/c;
 		D -= tmp;
 	};
-	auto update_lastfac = [&constant_step_size, &c, &A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
+	auto update_lastfac = [&sc, &error, &constant_step_size, &c, &A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
 	{
 		auto L = S.left(f_id-1);
 		// TODO: factorize with other lambda exp
@@ -145,11 +148,13 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		tmp = _LSR.get_product();
 		tmp *= lambda;
 		tmp -= A;
+		if(sc.isCriterionErr())
+			error = tmp.norm();
 		tmp = L->multiply(tmp, /* NO H */ true, true);
 		tmp *= lambda/c;
 		D -= tmp;
 	};
-	auto update_interfac = [&constant_step_size, &c, &A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
+	auto update_interfac = [&sc, &error, &constant_step_size, &c, &A, &D, &tmp, &LSR, &scur_fac, &dcur_fac, &f_id, &S, &lipschitz_multiplicator, &lambda, &norm2_threshold, &norm2_flag, &norm2_max_iter](Faust::MatGeneric<FPP, DEVICE> *cur_fac)
 	{
 		auto R = S.right(f_id+1);
 		auto L = S.left(f_id-1);
@@ -177,6 +182,8 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		tmp = _LSR.get_product();
 		tmp *= lambda;
 		tmp -= A;
+		if(sc.isCriterionErr())
+			error = tmp.norm();
 		//TODO: do something to lighten the double transpose conjugate
 		tmp.conjugate(false);
 		tmp.transpose();
@@ -187,7 +194,7 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		tmp *= lambda/c;
 		D -= tmp;
 	};
-	while(i < sc.get_crit())
+	while(sc.do_continue(i, error))
 	{
 		//		std::cout << "nfacts:" << nfacts << std::endl;
 		init_fid();
@@ -254,6 +261,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	Faust::MatSparse<FPP,DEVICE>* scur_fac;
 	Faust::MatDense<FPP,DEVICE>* dcur_fac;
 	unsigned int nfacts = constraints.size();
+	Real<FPP> error = -1; //negative error is ignored
 	std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims;
 	int norm2_flag; // return val
 	for(auto c: constraints)
@@ -365,7 +373,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	Faust::MatDense<FPP,Cpu> * LorR;
 	Faust::MatDense<FPP,Cpu> _LorR;
 	Real<FPP> c = 1/step_size;
-	while(i < sc.get_crit())
+	while(sc.do_continue(i, error))
 	{
 		//		std::cout << "nfacts:" << nfacts << std::endl;
 
@@ -389,6 +397,8 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 			_LSR.get_product(tmp);
 			tmp *= FPP(lambda);
 			tmp -= A;
+			if(sc.isCriterionErr())
+				error = tmp.norm();
 			FPP alpha_R = 1, alpha_L = 1, beta_R = 0, beta_L = 0; //decl in parent scope
 			if(S.is_fact_sparse(f_id))
 			{

@@ -252,7 +252,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
 
 //    if(p->is_verbose) {
 //        cout << "stop_crit.is_criterion_error: " << p->stop_crit.is_criterion_error << endl;
-//        cout << "stop_crit.error_treshold: " << p->stop_crit.error_treshold << endl;
+//        cout << "stop_crit.error_threshold: " << p->stop_crit.error_threshold << endl;
 //        cout << "stop_crit.num_its: " << p->stop_crit.num_its << endl;
 //        cout << "stop_crit.max_num_its: " << p->stop_crit.max_num_its << endl;
 //    }
@@ -266,7 +266,7 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
     }
     // set all constructor arguments because they could be at non-default
     // values
-    Faust::StoppingCriterion<FPP2> crit(p->stop_crit.num_its, p->stop_crit.is_criterion_error, p->stop_crit.error_treshold, p->stop_crit.max_num_its);
+    Faust::StoppingCriterion<FPP2> crit(p->stop_crit.num_its, p->stop_crit.is_criterion_error, p->stop_crit.error_threshold, p->stop_crit.max_num_its);
 
     if(p_fft = dynamic_cast<PyxParamsFactPalm4MSAFFT<FPP,FPP2>*>(p))
     {
@@ -381,11 +381,11 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
 //        cout << "p->num_cols: " << p->num_cols << endl;
 //        cout << "p->is_fact_side_left: " << p->is_fact_side_left;
 //        cout << "stop_crits[0].is_criterion_error: " << p->stop_crits[0].is_criterion_error << endl;
-//        cout << "stop_crits[0].error_treshold: " << p->stop_crits[0].error_treshold << endl;
+//        cout << "stop_crits[0].error_threshold: " << p->stop_crits[0].error_threshold << endl;
 //        cout << "stop_crits[0].num_its: " << p->stop_crits[0].num_its << endl;
 //        cout << "stop_crits[0].max_num_its: " << p->stop_crits[0].max_num_its << endl;
 //        cout << "stop_crits[1].is_criterion_error: " << p->stop_crits[1].is_criterion_error << endl;
-//        cout << "stop_crits[1].error_treshold: " << p->stop_crits[1].error_treshold << endl;
+//        cout << "stop_crits[1].error_threshold: " << p->stop_crits[1].error_threshold << endl;
 //        cout << "stop_crits[1].num_its: " << p->stop_crits[1].num_its << endl;
 //        cout << "stop_crits[1].max_num_its: " << p->stop_crits[1].max_num_its << endl;
 //        cout << "p->grad_calc_opt_mode: " << p->grad_calc_opt_mode << endl;
@@ -395,8 +395,8 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
 
     // set all constructor arguments because they could be at non-default
     // values
-    Faust::StoppingCriterion<FPP2> crit0(p->stop_crits[0].num_its, p->stop_crits[0].is_criterion_error,p->stop_crits[0].error_treshold, p->stop_crits[0].max_num_its); //2 facts
-    Faust::StoppingCriterion<FPP2> crit1(p->stop_crits[1].num_its, p->stop_crits[1].is_criterion_error, p->stop_crits[1].error_treshold, p->stop_crits[1].max_num_its); //global
+    Faust::StoppingCriterion<FPP2> crit0(p->stop_crits[0].num_its, p->stop_crits[0].is_criterion_error,p->stop_crits[0].error_threshold, p->stop_crits[0].max_num_its); //2 facts
+    Faust::StoppingCriterion<FPP2> crit1(p->stop_crits[1].num_its, p->stop_crits[1].is_criterion_error, p->stop_crits[1].error_threshold, p->stop_crits[1].max_num_its); //global
 
     for(int i=0;i<p->num_facts-1;i++)
         fact_cons.push_back(cons[i]);

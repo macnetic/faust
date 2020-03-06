@@ -124,7 +124,7 @@ namespace Faust
          */
           void init_fact(int nb_facts_);
           virtual void next_step();
-          bool do_continue(){bool cont=stop_crit.do_continue(++m_indIte); if(!cont){m_indIte=-1;isConstraintSet=false;}return cont;} // CAUTION !!! pre-increment of m_indIte: the value in stop_crit.do_continue is m_indIte+1, not m_indIte
+          bool do_continue(); // CAUTION !!! pre-increment of m_indIte: the value in stop_crit.do_continue is m_indIte+1, not m_indIte
           //bool do_continue()const{return stop_crit.do_continue(++m_indIte, error);};
 
           /*!

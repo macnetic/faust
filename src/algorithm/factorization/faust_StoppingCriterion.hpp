@@ -45,6 +45,8 @@
 #include <iostream>
 #include <cstdlib>
 #include "faust_exception.h"
+template<typename T>
+const T Faust::StoppingCriterion<T>::NO_ERROR_PASSED = -10000;
 
 template<typename T>
 const char * Faust::StoppingCriterion<T>::m_className="Faust::StoppingCriterion::";
@@ -74,9 +76,11 @@ void Faust::StoppingCriterion<T>::check_validity()const
 {
    if (isCriterionError)
    {
-      if (errorThreshold>1 || maxIteration < 0)
+      if (/*errorThreshold>1 ||*/ maxIteration < 0)
       {
-        handleError(m_className,"check_validity : errorThreshold must be strictly greater than 1 and maxIteration must be strictly positive");
+		  // allow error above 1 to make possible to set from the wrappers an error that corresponds actually to a relative error but treated here as an absolute error
+//        handleError(m_className,"check_validity : errorThreshold must be strictly lower than 1 and maxIteration must be strictly positive");
+		  handleError(m_className,"check_validity : maxIteration must be strictly positive");
       }
    }
    else if (nb_it < 0)
@@ -85,27 +89,33 @@ void Faust::StoppingCriterion<T>::check_validity()const
    }
 }
 
+
 // current_ite in zero-based indexing
 template<typename T>
-bool Faust::StoppingCriterion<T>::do_continue(int current_ite, T current_error /* = -2.0 */)const
+bool Faust::StoppingCriterion<T>::do_continue(int current_ite, T current_error /* = NO_ERROR_PASSED */)const
 {
 
    if (!isCriterionError) // if criterion is number of iteration, current_error does not matter
       return current_ite<nb_it ? true : false;
-   else if (isCriterionError && current_error != -2.0)
+   else if (isCriterionError && current_error >= 0)
       if (current_error < errorThreshold)
          return false;
       else if (current_ite <  maxIteration) // and current_error >= errorThreshold
          return true;
       else // if current_error >= errorThreshold and current_ite >= maxIteration
       {
-         std::cerr << "warning in Faust::StoppingCriterion<T>::do_continue : number of maximum iterations has been reached and current error is still greater than the threshold" << std::endl;
-         return true;
+         std::cerr << "warning in Faust::StoppingCriterion<T>::do_continue : maximum number of iterations has been reached and current error is still greater than the threshold." << std::endl;
+         return false;
       }
-   else // if criterion is error and current_error has not been initialized
+   else if(current_error == NO_ERROR_PASSED) // if criterion is error and current_error has not been initialized
    {
      handleError(m_className,"check_validity : when stopping criterion is error, the current error needs to be given as second parameter");
    }
+   else{
+	   // isCriterionError is true
+	   // current_error passed is negative (but != NO_ERROR_PASSED), just ignore it
+	   return true;
+	}
 }
 
 template<typename T>

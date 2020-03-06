@@ -57,7 +57,7 @@ class PyxStoppingCriterion
     public:
         bool is_criterion_error;
         int num_its;
-        FPP error_treshold;
+        FPP error_threshold;
         unsigned long max_num_its;
 };
 

@@ -646,6 +646,23 @@ t_local_init_fact.stop();
 #endif
 }
 
+template<typename FPP,Device DEVICE,typename FPP2>
+bool Faust::Palm4MSA<FPP,DEVICE,FPP2>::do_continue()
+{
+	bool cont;
+	FPP2 err = -1;
+	if(m_indIte > 1 && stop_crit.isCriterionErr())
+	//compute error (only if at least one iteration has been executed
+		err = error.norm();
+	cont = stop_crit.do_continue(++m_indIte, err);
+	if(!cont)
+	{
+		m_indIte=-1;
+		isConstraintSet=false;
+	}
+	return cont;
+}
+
 /** \brief
  *
  * \param

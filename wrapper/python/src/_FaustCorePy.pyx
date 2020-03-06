@@ -1082,14 +1082,14 @@ cdef class FaustFact:
         cdef FaustCoreCy.PyxParamsFactPalm4MSA[complex,double]* cpp_params_cplx
         cdef PyxStoppingCriterion[double] cpp_stop_crit
         # template parameter is always double (never complex) because no need
-        # to have a treshold error of complex type (it wouldn't make sense)
+        # to have a threshold error of complex type (it wouldn't make sense)
         cdef PyxConstraintGeneric** cpp_constraints
 
 
-        cpp_stop_crit.is_criterion_error = p.stop_crit.is_criterion_error
-        cpp_stop_crit.error_treshold = p.stop_crit.error_treshold
+        cpp_stop_crit.is_criterion_error = p.stop_crit._is_criterion_error
+        cpp_stop_crit.error_threshold = p.stop_crit.tol
         cpp_stop_crit.num_its = p.stop_crit.num_its
-        cpp_stop_crit.max_num_its = p.stop_crit.max_num_its
+        cpp_stop_crit.max_num_its = p.stop_crit.maxiter
 
         calling_fft_algo = isinstance(init_D, np.ndarray)
 
@@ -1316,20 +1316,20 @@ cdef class FaustFact:
         cdef FaustCoreCy.PyxParamsHierarchicalFact[double,double]* cpp_params
         cdef PyxStoppingCriterion[double]* cpp_stop_crits
         # template parameter is always double (never complex) because no need
-        # to have a treshold error of complex type (it wouldn't make sense)
+        # to have a threshold error of complex type (it wouldn't make sense)
         cdef PyxConstraintGeneric** cpp_constraints
 
         cpp_stop_crits = <PyxStoppingCriterion[double]*>\
         PyMem_Malloc(sizeof(PyxStoppingCriterion[double])*2)
 
-        cpp_stop_crits[0].is_criterion_error = p.stop_crits[0].is_criterion_error
-        cpp_stop_crits[0].error_treshold = p.stop_crits[0].error_treshold
+        cpp_stop_crits[0].is_criterion_error = p.stop_crits[0]._is_criterion_error
+        cpp_stop_crits[0].error_threshold = p.stop_crits[0].tol
         cpp_stop_crits[0].num_its = p.stop_crits[0].num_its
-        cpp_stop_crits[0].max_num_its = p.stop_crits[0].max_num_its
-        cpp_stop_crits[1].is_criterion_error = p.stop_crits[1].is_criterion_error
-        cpp_stop_crits[1].error_treshold = p.stop_crits[1].error_treshold
+        cpp_stop_crits[0].max_num_its = p.stop_crits[0].maxiter
+        cpp_stop_crits[1].is_criterion_error = p.stop_crits[1]._is_criterion_error
+        cpp_stop_crits[1].error_threshold = p.stop_crits[1].tol
         cpp_stop_crits[1].num_its = p.stop_crits[1].num_its
-        cpp_stop_crits[1].max_num_its = p.stop_crits[1].max_num_its
+        cpp_stop_crits[1].max_num_its = p.stop_crits[1].maxiter
 
 
         calling_fft_algo = isinstance(init_D, np.ndarray)
@@ -1453,20 +1453,20 @@ cdef class FaustFact:
         cdef FaustCoreCy.PyxParamsHierarchicalFact[complex,double]* cpp_params_cplx
         cdef PyxStoppingCriterion[double]* cpp_stop_crits
         # template parameter is always double (never complex) because no need
-        # to have a treshold error of complex type (it wouldn't make sense)
+        # to have a threshold error of complex type (it wouldn't make sense)
         cdef PyxConstraintGeneric** cpp_constraints
 
         cpp_stop_crits = <PyxStoppingCriterion[double]*>\
         PyMem_Malloc(sizeof(PyxStoppingCriterion[double])*2)
 
-        cpp_stop_crits[0].is_criterion_error = p.stop_crits[0].is_criterion_error
-        cpp_stop_crits[0].error_treshold = p.stop_crits[0].error_treshold
+        cpp_stop_crits[0].is_criterion_error = p.stop_crits[0]._is_criterion_error
+        cpp_stop_crits[0].error_threshold = p.stop_crits[0].tol
         cpp_stop_crits[0].num_its = p.stop_crits[0].num_its
-        cpp_stop_crits[0].max_num_its = p.stop_crits[0].max_num_its
-        cpp_stop_crits[1].is_criterion_error = p.stop_crits[1].is_criterion_error
-        cpp_stop_crits[1].error_treshold = p.stop_crits[1].error_treshold
+        cpp_stop_crits[0].max_num_its = p.stop_crits[0].maxiter
+        cpp_stop_crits[1].is_criterion_error = p.stop_crits[1]._is_criterion_error
+        cpp_stop_crits[1].error_threshold = p.stop_crits[1].tol
         cpp_stop_crits[1].num_its = p.stop_crits[1].num_its
-        cpp_stop_crits[1].max_num_its = p.stop_crits[1].max_num_its
+        cpp_stop_crits[1].max_num_its = p.stop_crits[1].maxiter
 
 
         calling_fft_algo = isinstance(init_D, np.ndarray)
@@ -2010,14 +2010,14 @@ cdef class FaustFact:
         cpp_stop_crits = <PyxStoppingCriterion[double]*>\
         PyMem_Malloc(sizeof(PyxStoppingCriterion[double])*2)
 
-        cpp_stop_crits[0].is_criterion_error = p.stop_crits[0].is_criterion_error
-        cpp_stop_crits[0].error_treshold = p.stop_crits[0].error_treshold
+        cpp_stop_crits[0].is_criterion_error = p.stop_crits[0]._is_criterion_error
+        cpp_stop_crits[0].error_threshold = p.stop_crits[0].tol
         cpp_stop_crits[0].num_its = p.stop_crits[0].num_its
-        cpp_stop_crits[0].max_num_its = p.stop_crits[0].max_num_its
-        cpp_stop_crits[1].is_criterion_error = p.stop_crits[1].is_criterion_error
-        cpp_stop_crits[1].error_treshold = p.stop_crits[1].error_treshold
+        cpp_stop_crits[0].max_num_its = p.stop_crits[0].maxiter
+        cpp_stop_crits[1].is_criterion_error = p.stop_crits[1]._is_criterion_error
+        cpp_stop_crits[1].error_threshold = p.stop_crits[1].tol
         cpp_stop_crits[1].num_its = p.stop_crits[1].num_its
-        cpp_stop_crits[1].max_num_its = p.stop_crits[1].max_num_its
+        cpp_stop_crits[1].max_num_its = p.stop_crits[1].maxiter
 
         constraints = p.constraints
 

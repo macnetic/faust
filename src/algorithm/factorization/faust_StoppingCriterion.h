@@ -71,7 +71,9 @@ namespace Faust
 
           bool do_continue(int current_ite, T error=-2.0)const;
           int get_crit() const{return nb_it;}
+		  bool isCriterionErr() const {return isCriterionError;}
 		  void Display() const;
+		  static const T NO_ERROR_PASSED;
        private:
           void check_validity()const;
 

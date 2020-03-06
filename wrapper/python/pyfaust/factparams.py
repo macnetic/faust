@@ -975,22 +975,34 @@ class StoppingCriterion(object):
             - number of iterations,
             - error threshold for the approximation of the matrix.
     """
-    def __init__(self, is_criterion_error = False , error_treshold = 0.3,
-                 num_its = 500,
-                 max_num_its = 1000):
-        self.is_criterion_error = is_criterion_error
-        self.error_treshold = error_treshold
+    DEFAULT_MAXITER=10000
+    DEFAULT_TOL=0.3
+    DEFAULT_NUMITS=500
+    def __init__(self, num_its = DEFAULT_NUMITS,
+                 tol = None,
+                 maxiter = DEFAULT_MAXITER,
+                relerr = False, relmat=None):
+        self.tol = tol
+        if(tol != None):
+            self._is_criterion_error = True
+        else:
+            self._is_criterion_error = False
         self.num_its = num_its
-        self.max_num_its = max_num_its
-        #TODO: check_validity() like C++ code does
-        if(is_criterion_error and num_its != 500):
-            raise ValueError("It's forbidden to set a number of iterations as stopping"
-                             " criterion when is_criterion_error == True.")
-        elif(not is_criterion_error and (max_num_its != 1000 or error_treshold
-                                         != 0.3)):
-            raise ValueError("When is_criterion_error == False it's forbidden to use"
-                             " other arguments than num_its argument to define "
-                             "the stopping criterion.")
+        self.maxiter = maxiter
+        if(self._is_criterion_error and num_its != StoppingCriterion.DEFAULT_NUMITS
+           or not self._is_criterion_error and (maxiter !=
+                                          StoppingCriterion.DEFAULT_MAXITER or
+                                          tol != None)):
+            raise ValueError("The choice between tol and num_its arguments is exclusive.")
+        if(relerr and not (isinstance(relmat, np.ndarray) or relmat == None)):
+            raise ValueError("when error is relative (relerr == true) the "
+                             "reference matrix 'relmat' must be specified")
+        self.relerr = relerr
+        if(self.tol == None):
+            self.tol = StoppingCriterion.DEFAULT_TOL
+        else:
+            if(relerr):
+                self.tol *= np.linalg.norm(relmat)
 
 class ParamsFactFactory:
     """
