@@ -12,6 +12,7 @@
 #include "faust_BlasHandle.h"
 #include "faust_ConstraintGeneric.h"
 #include "faust_hierarchical.h" // 2020
+#include "faust_palm4msa2020.h"
 
 using namespace std;
 using namespace Faust;
@@ -552,7 +553,10 @@ FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned in
     Faust::TransformHelper<FPP,Cpu>* th, *th_times_lambda;
     try
     {
-        vector<Faust::StoppingCriterion<Real<FPP>>> sc_ = {sc[0].num_its, sc[1].num_its};
+        Faust::StoppingCriterion<Real<FPP>> sc0(sc[0].num_its, sc[0].is_criterion_error, sc[0].error_threshold, sc[0].max_num_its);
+        Faust::StoppingCriterion<Real<FPP>> sc1(sc[1].num_its, sc[1].is_criterion_error, sc[1].error_threshold, sc[1].max_num_its);
+//        vector<Faust::StoppingCriterion<Real<FPP>>> sc_ = {sc[0].num_its, sc[1].num_its};
+        vector<Faust::StoppingCriterion<Real<FPP>>> sc_ = {sc0, sc1};
         th = Faust::hierarchical(inMat, sc_, fact_cons, residuum_cons, inout_lambda[0], is_update_way_R2L,
                 is_fact_side_left, use_csr,
                 packing_RL,
@@ -578,3 +582,80 @@ FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned in
     return core;
 
 }
+
+template<typename FPP>
+FaustCoreCpp<FPP>* palm4msa2020(FPP* mat, unsigned int num_rows, unsigned int num_cols,  PyxConstraintGeneric** constraints, unsigned int num_cons, double* out_buf, PyxStoppingCriterion<double> sc, bool is_update_way_R2L, bool use_csr, bool packing_RL, unsigned int norm2_max_iter, double norm2_threshold, bool is_verbose, bool constant_step_size, double step_size)
+{
+    vector</*const */Faust::ConstraintGeneric*> fact_cons;
+    Faust::MatDense<FPP,Cpu> inMat(mat, num_rows, num_cols);
+    Faust::ConstraintGeneric* tmp_cons;
+    PyxConstraintInt* cons_int;
+    PyxConstraintScalar<double>* cons_real;
+    PyxConstraintMat<FPP>* cons_mat;
+    FaustCoreCpp<FPP> *core = nullptr;
+    TransformHelper<FPP,Cpu> * th = nullptr, *th_times_lambda = nullptr;
+    for(int i=0; i < num_cons;i++)
+    {
+        // corresponding object
+        if(constraints[i]->is_int_constraint())
+        {
+            cons_int = static_cast<PyxConstraintInt*>(constraints[i]);
+//            if(is_verbose)
+//                cout << "constraint[" << i << "]->parameter: " << cons_int->parameter << endl;
+            tmp_cons = new Faust::ConstraintInt<FPP,Cpu>(static_cast<faust_constraint_name>(constraints[i]->name), cons_int->parameter, constraints[i]->num_rows, constraints[i]->num_cols);
+            fact_cons.push_back(tmp_cons);
+        }
+        else if(constraints[i]->is_real_constraint())
+        {
+            cons_real = static_cast<PyxConstraintScalar<double>*>(constraints[i]);
+//            if(is_verbose)
+//                cout << "constraint[" << i << "]->parameter: " << cons_real->parameter << endl;
+            tmp_cons = new Faust::ConstraintFPP<FPP,Cpu,double>(static_cast<faust_constraint_name>(constraints[i]->name), cons_real->parameter, constraints[i]->num_rows, constraints[i]->num_cols);
+            fact_cons.push_back(tmp_cons);
+        }
+        else if(constraints[i]->is_mat_constraint())
+        {
+            cons_mat = static_cast<PyxConstraintMat<FPP>*>(constraints[i]);
+//            if(is_verbose)
+//                cout << "constraint[" << i << "]->parameter: " << cons_mat->parameter[0] << endl;
+            Faust::MatDense<FPP, Cpu> P;
+            if(constraints[i]->num_rows * constraints[i]->num_cols == cons_mat->parameter_sz)
+                P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, constraints[i]->num_rows, constraints[i]->num_cols);
+            else
+                P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, cons_mat->parameter_sz/2, 2);
+            tmp_cons = new Faust::ConstraintMat<FPP,Cpu>(static_cast<faust_constraint_name>(constraints[i]->name), P, constraints[i]->num_rows, constraints[i]->num_cols);
+            fact_cons.push_back(tmp_cons);
+        }
+        else
+            handleError("FaustFact", "Invalid constraint.");
+    }
+    try
+    {
+        th = new TransformHelper<FPP,Cpu>();
+        Faust::StoppingCriterion<Real<FPP>> sc0(sc.num_its, sc.is_criterion_error, sc.error_threshold, sc.max_num_its);
+        Faust::palm4msa2(inMat, fact_cons, *th, out_buf[0], sc0, is_update_way_R2L,
+                use_csr,
+                packing_RL,
+                /* compute_2norm_on_array*/ false,
+                norm2_threshold,
+                norm2_max_iter, constant_step_size, step_size);
+        th_times_lambda = th->multiply(out_buf[0]);
+        delete th;
+        th = th_times_lambda;
+    }
+    catch(std::logic_error& e)
+    {
+        cerr << e.what() << endl;
+        return core;
+    }
+
+    if(is_verbose) th->display();
+    core = new FaustCoreCpp<FPP>(th);
+
+    for (typename std::vector</*const */Faust::ConstraintGeneric*>::iterator it = fact_cons.begin() ; it != fact_cons.end(); ++it)
+        delete *it;
+
+    return core;
+
+}
+

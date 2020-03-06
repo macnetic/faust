@@ -456,7 +456,7 @@ def hierarchical2020(M, nites, constraints, is_update_way_R2L,
 
 # experimental block end
 
-def palm4msa(M, p, ret_lambda=False):
+def palm4msa(M, p, ret_lambda=False, backend=2016):
     """
     Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
 
@@ -494,7 +494,12 @@ def palm4msa(M, p, ret_lambda=False):
                          "the last residuum constraint defined in p. "
                          "Likewise its number of rows must be consistent "
                          "with the first factor constraint defined in p.")
-    core_obj, _lambda = _FaustCorePy.FaustFact.fact_palm4msa(M, p)
+    if(backend == 2016):
+        core_obj, _lambda = _FaustCorePy.FaustFact.fact_palm4msa(M, p)
+    elif(backend == 2020):
+        core_obj, _lambda = _FaustCorePy.FaustFact.palm4msa2020(M, p)
+    else:
+        raise ValueError("Unknown backend (only 2016 and 2020 are available).")
     F = Faust(core_obj=core_obj)
     if(ret_lambda):
         return F, _lambda
@@ -547,9 +552,9 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016):
             toward the left -- is_side_fact_left == true, cf.
             pyfaust.factparams.ParamsHierarchical and pyfaust.factparams.ParamsHierarchicalRectMat).
             <br/>The residuum has a sparsity of P*rho^(num_facts-1). <br/> By default, rho == .8 and P = 1.4. It's possible to set custom values with for example p == ( ['rectmat', j, k, s], {'rho':.4, 'P':.7 }). <br/>The sparsity is here the number of non-zero elements.
-            backend: the C++ implementation to use: 2016 (the default) or 2020 (2020
-            which should be quicker for certain configurations - e.g. factorizing a
-            Hadamard matrix).
+        backend: the C++ implementation to use (default to 2016, 2020 backend
+        should be quicker for certain configurations - e.g. factorizing a
+        Hadamard matrix).
 
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
         ret_params: set to True to ask the function to return the
@@ -667,13 +672,13 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016):
        8.0
 
        <b/> See also pyfaust.factparams.ParamsHierarchicalRectMat
+
     """
     p = _prepare_hierarchical_fact(M,p, "hierarchical", ret_lambda,
                               ret_params)
     if(backend == 2016):
         core_obj,_lambda = _FaustCorePy.FaustFact.fact_hierarchical(M, p)
     elif(backend == 2020):
-        # TODO: make the difference between num_its for global and local opt
         core_obj, _lambda = _FaustCorePy.FaustFact.hierarchical2020(M, p)
     else:
         raise ValueError("backend must be 2016 or 2020")

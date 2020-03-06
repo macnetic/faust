@@ -1986,6 +1986,93 @@ cdef class FaustFact:
         return coreU, S, coreV
 
     @staticmethod
+    def palm4msa2020(M, p):
+        cdef unsigned int M_num_rows=M.shape[0]
+        cdef unsigned int M_num_cols=M.shape[1]
+
+        cdef double[:,:] Mview
+        cdef double[:,:] tmp_mat
+        # view for lambda
+        cdef double[:] outbufview
+
+        cdef PyxStoppingCriterion[double] cpp_stop_crit
+        # template parameter is always double (never complex) because no need
+        # to have a threshold error of complex type (it wouldn't make sense)
+        cdef PyxConstraintGeneric** cpp_constraints
+
+        if(M.dtype == np.complex):
+            raise TypeError("2020 palm4msa implementation doesn't support"
+                            " complex matrices.")
+
+
+        Mview=M
+        _out_buf = np.array([0], dtype=M.dtype)
+        _out_buf[0] = p.init_lambda;
+        outbufview = _out_buf
+
+        cpp_stop_crit.is_criterion_error = p.stop_crit._is_criterion_error
+        cpp_stop_crit.error_threshold = p.stop_crit.tol
+        cpp_stop_crit.num_its = p.stop_crit.num_its
+        cpp_stop_crit.max_num_its = p.stop_crit.maxiter
+
+        cpp_constraints = \
+        <PyxConstraintGeneric**> \
+        PyMem_Malloc(sizeof(PyxConstraintGeneric*)*len(p.constraints))
+
+        for i in range(0,len(p.constraints)):
+            cons = p.constraints[i]
+            #print("FaustFact.fact_palm4MSA() cons.name =", cons.name)
+            if(cons.is_int_constraint()):
+                #print("FaustFact.fact_palm4MSA() Int Constraint")
+                cpp_constraints[i] = <PyxConstraintInt*> PyMem_Malloc(sizeof(PyxConstraintInt))
+                (<PyxConstraintInt*>cpp_constraints[i]).parameter = cons._cons_value
+            elif(cons.is_real_constraint()):
+                #print("FaustFact.fact_palm4MSA() Real Constraint")
+                cpp_constraints[i] = <PyxConstraintScalar[double]*> \
+                PyMem_Malloc(sizeof(PyxConstraintScalar[double]))
+                (<PyxConstraintScalar[double]*>cpp_constraints[i]).parameter =\
+                        cons._cons_value
+            elif(cons.is_mat_constraint()):
+                #print("FaustFact.fact_palm4MSA() Matrix Constraint")
+                cpp_constraints[i] = <PyxConstraintMat[double]*> \
+                        PyMem_Malloc(sizeof(PyxConstraintMat[double]))
+                tmp_mat = cons._cons_value
+                (<PyxConstraintMat[double]*>cpp_constraints[i]).parameter =\
+                        &tmp_mat[0,0]
+                (<PyxConstraintMat[double]*>cpp_constraints[i]).parameter_sz =\
+                        cons._cons_value_sz
+            else:
+                raise ValueError("Constraint type/name is not recognized.")
+            cpp_constraints[i].name = cons.name
+            cpp_constraints[i].num_rows = cons._num_rows
+            cpp_constraints[i].num_cols = cons._num_cols
+        core = FaustCore(core=True)
+        core.core_faust_dbl = \
+            FaustCoreCy.palm4msa2020[double](&Mview[0,0], M_num_rows,
+                                             M_num_cols,
+                                             cpp_constraints,
+                                             len(p.constraints),
+                                             &outbufview[0],
+                                             cpp_stop_crit,
+                                             p.is_update_way_R2L,
+                                             p.use_csr, p.packing_RL,
+                                             p.norm2_max_iter,
+                                             p.norm2_threshold,
+                                             p.is_verbose,
+                                             p.constant_step_size,
+                                             p.step_size)
+        core._isReal = True
+
+        for i in range(0,len(p.constraints)):
+            PyMem_Free(cpp_constraints[i])
+        PyMem_Free(cpp_constraints)
+
+        if(core.core_faust_dbl == NULL): raise Exception("palm4msa2020"
+                                                          " has failed.");
+
+        return core, np.real(_out_buf[0])
+
+    @staticmethod
     def hierarchical2020(M, p):
 
         cdef unsigned int M_num_rows=M.shape[0]
@@ -1993,7 +2080,7 @@ cdef class FaustFact:
 
         cdef double[:,:] Mview
 
-        # views for lambda
+        # view for lambda
         cdef double[:] outbufview
 
         cdef double[:,:] tmp_mat
