@@ -161,53 +161,54 @@ void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned in
         /* out args */vector<const Faust::ConstraintGeneric*>& cons)
 {
     Faust::ConstraintGeneric* tmp_cons;
-    if(p->is_verbose)
-    {
-        cout << "fact_palm4MSA() mat[0]= " << mat[0] << endl;
-        cout << "p->num_facts: " << p->num_facts << endl;
-        cout << "p->is_update_way_R2L: " << p->is_update_way_R2L << endl;
-        cout << "p->init_lambda: " << p->init_lambda << endl;
-        cout << "p->step_size: " << p->step_size << endl;
-        cout << "p->is_verbose: " << p->is_verbose << endl;
-        cout << "p->constant_step_size: " << p->constant_step_size << endl;
-        cout << "p->grad_calc_opt_mode: " << p->grad_calc_opt_mode << endl; 
-        cout << "p->norm2_max_iter:" << p->norm2_max_iter << "(0 <=> default val.)" << endl;
-        cout << "p->norm2_threshold:" << p->norm2_threshold <<"(0 <=> default val.)"<<  endl;
-    }
+    // the C++ core is responsible to print info in verbose mode
+//    if(p->is_verbose)
+//    {
+//        cout << "fact_palm4MSA() mat[0]= " << mat[0] << endl;
+//        cout << "p->num_facts: " << p->num_facts << endl;
+//        cout << "p->is_update_way_R2L: " << p->is_update_way_R2L << endl;
+//        cout << "p->init_lambda: " << p->init_lambda << endl;
+//        cout << "p->step_size: " << p->step_size << endl;
+//        cout << "p->is_verbose: " << p->is_verbose << endl;
+//        cout << "p->constant_step_size: " << p->constant_step_size << endl;
+//        cout << "p->grad_calc_opt_mode: " << p->grad_calc_opt_mode << endl; 
+//        cout << "p->norm2_max_iter:" << p->norm2_max_iter << "(0 <=> default val.)" << endl;
+//        cout << "p->norm2_threshold:" << p->norm2_threshold <<"(0 <=> default val.)"<<  endl;
+//    }
     PyxConstraintInt* cons_int;
     PyxConstraintScalar<FPP2>* cons_real;
     PyxConstraintMat<FPP>* cons_mat;
     for(int i=0; i < p->num_constraints;i++)
     {
-        if(p->is_verbose) {
-            cout << "constraint[" << i << "]->name: " << p->constraints[i]->name << endl;
-            cout << "constraint[" << i << "]->num_rows: " << p->constraints[i]->num_rows << endl;
-            cout << "constraint[" << i << "]->num_cols: " << p->constraints[i]->num_cols << endl;
-        }
+//        if(p->is_verbose) {
+//            cout << "constraint[" << i << "]->name: " << p->constraints[i]->name << endl;
+//            cout << "constraint[" << i << "]->num_rows: " << p->constraints[i]->num_rows << endl;
+//            cout << "constraint[" << i << "]->num_cols: " << p->constraints[i]->num_cols << endl;
+//        }
         //TODO: make ConstraintGeneric virtual and add a display() function to
         //avoid this mess and also a function to convert to Faust::Constraint*
         // corresponding object
         if(p->constraints[i]->is_int_constraint())
         {
             cons_int = static_cast<PyxConstraintInt*>(p->constraints[i]);
-            if(p->is_verbose)
-                cout << "constraint[" << i << "]->parameter: " << cons_int->parameter << endl;
+//            if(p->is_verbose)
+//                cout << "constraint[" << i << "]->parameter: " << cons_int->parameter << endl;
             tmp_cons = new Faust::ConstraintInt<FPP,Cpu>(static_cast<faust_constraint_name>(p->constraints[i]->name), cons_int->parameter, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
             cons.push_back(tmp_cons);
         }
         else if(p->constraints[i]->is_real_constraint())
         {
             cons_real = static_cast<PyxConstraintScalar<FPP2>*>(p->constraints[i]);
-            if(p->is_verbose)
-                cout << "constraint[" << i << "]->parameter: " << cons_real->parameter << endl;
+//            if(p->is_verbose)
+//                cout << "constraint[" << i << "]->parameter: " << cons_real->parameter << endl;
             tmp_cons = new Faust::ConstraintFPP<FPP,Cpu,FPP2>(static_cast<faust_constraint_name>(p->constraints[i]->name), cons_real->parameter, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
             cons.push_back(tmp_cons);
         }
         else if(p->constraints[i]->is_mat_constraint())
         {
             cons_mat = static_cast<PyxConstraintMat<FPP>*>(p->constraints[i]);
-            if(p->is_verbose)
-                cout << "constraint[" << i << "]->parameter: " << cons_mat->parameter[0] << endl;
+//            if(p->is_verbose)
+//                cout << "constraint[" << i << "]->parameter: " << cons_mat->parameter[0] << endl;
             Faust::MatDense<FPP, Cpu> P;
             if(p->constraints[i]->num_rows * p->constraints[i]->num_cols == cons_mat->parameter_sz)
                 P = Faust::MatDense<FPP, Cpu>(cons_mat->parameter, p->constraints[i]->num_rows, p->constraints[i]->num_cols);
@@ -249,18 +250,18 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
     PyxParamsFactPalm4MSAFFT<FPP,FPP2> *p_fft = nullptr;
     Faust::BlasHandle<Cpu> blasHandle;
 
-    if(p->is_verbose) {
-        cout << "stop_crit.is_criterion_error: " << p->stop_crit.is_criterion_error << endl;
-        cout << "stop_crit.error_treshold: " << p->stop_crit.error_treshold << endl;
-        cout << "stop_crit.num_its: " << p->stop_crit.num_its << endl;
-        cout << "stop_crit.max_num_its: " << p->stop_crit.max_num_its << endl;
-    }
+//    if(p->is_verbose) {
+//        cout << "stop_crit.is_criterion_error: " << p->stop_crit.is_criterion_error << endl;
+//        cout << "stop_crit.error_treshold: " << p->stop_crit.error_treshold << endl;
+//        cout << "stop_crit.num_its: " << p->stop_crit.num_its << endl;
+//        cout << "stop_crit.max_num_its: " << p->stop_crit.max_num_its << endl;
+//    }
     prepare_fact(mat, num_rows, num_cols, p, cons);
     for(int i=0; i < p->num_facts;i++) {
-        if(p->is_verbose)
-        {
-            cout << "init_facts[" << i << "] ele[0][0]: " << p->init_facts[i][0] << " size: " << p->init_fact_sizes[i*2] << "x"<< p->init_fact_sizes[i*2+1] << endl;
-        }
+//        if(p->is_verbose)
+//        {
+//            cout << "init_facts[" << i << "] ele[0][0]: " << p->init_facts[i][0] << " size: " << p->init_fact_sizes[i*2] << "x"<< p->init_fact_sizes[i*2+1] << endl;
+//        }
         initFacts.push_back(Faust::MatDense<FPP, Cpu>(p->init_facts[i], p->init_fact_sizes[i*2], p->init_fact_sizes[i*2+1]));
     }
     // set all constructor arguments because they could be at non-default
@@ -374,22 +375,22 @@ FaustCoreCpp<FPP>* fact_hierarchical_gen(FPP* mat, FPP* mat2, unsigned int num_r
     Faust::SpBlasHandle<Cpu> spblasHandle;
     Faust::MatDense<FPP,Cpu>* inMat2;
 
-    if(p->is_verbose)
-    {
-        cout << "p->num_rows: " << p->num_rows << endl;
-        cout << "p->num_cols: " << p->num_cols << endl;
-        cout << "p->is_fact_side_left: " << p->is_fact_side_left;
-        cout << "stop_crits[0].is_criterion_error: " << p->stop_crits[0].is_criterion_error << endl;
-        cout << "stop_crits[0].error_treshold: " << p->stop_crits[0].error_treshold << endl;
-        cout << "stop_crits[0].num_its: " << p->stop_crits[0].num_its << endl;
-        cout << "stop_crits[0].max_num_its: " << p->stop_crits[0].max_num_its << endl;
-        cout << "stop_crits[1].is_criterion_error: " << p->stop_crits[1].is_criterion_error << endl;
-        cout << "stop_crits[1].error_treshold: " << p->stop_crits[1].error_treshold << endl;
-        cout << "stop_crits[1].num_its: " << p->stop_crits[1].num_its << endl;
-        cout << "stop_crits[1].max_num_its: " << p->stop_crits[1].max_num_its << endl;
-        cout << "p->grad_calc_opt_mode: " << p->grad_calc_opt_mode << endl;
-
-    }
+//    if(p->is_verbose)
+//    {
+//        cout << "p->num_rows: " << p->num_rows << endl;
+//        cout << "p->num_cols: " << p->num_cols << endl;
+//        cout << "p->is_fact_side_left: " << p->is_fact_side_left;
+//        cout << "stop_crits[0].is_criterion_error: " << p->stop_crits[0].is_criterion_error << endl;
+//        cout << "stop_crits[0].error_treshold: " << p->stop_crits[0].error_treshold << endl;
+//        cout << "stop_crits[0].num_its: " << p->stop_crits[0].num_its << endl;
+//        cout << "stop_crits[0].max_num_its: " << p->stop_crits[0].max_num_its << endl;
+//        cout << "stop_crits[1].is_criterion_error: " << p->stop_crits[1].is_criterion_error << endl;
+//        cout << "stop_crits[1].error_treshold: " << p->stop_crits[1].error_treshold << endl;
+//        cout << "stop_crits[1].num_its: " << p->stop_crits[1].num_its << endl;
+//        cout << "stop_crits[1].max_num_its: " << p->stop_crits[1].max_num_its << endl;
+//        cout << "p->grad_calc_opt_mode: " << p->grad_calc_opt_mode << endl;
+//
+//    }
     prepare_fact(mat, num_rows, num_cols, p, cons);
 
     // set all constructor arguments because they could be at non-default
