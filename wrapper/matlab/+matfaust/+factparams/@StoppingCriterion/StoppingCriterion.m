@@ -23,7 +23,7 @@ classdef StoppingCriterion
 			num_its = 500;
 			maxiter = 10000;
 			relerr = false;
-			matrix = []
+			matrix = [];
 			if(nargin < 1)
 				error('matfaust.factparams.StoppingCriterion needs at least one argument.')
 			else
@@ -61,21 +61,21 @@ classdef StoppingCriterion
 								if(nargin == i || ~ isscalar(varargin{i+1}))
 									error('num_its keyword arg. is not followed by a number')
 								else
-									num_its = real(floor((varargin{i+1}))) % real in case of cplx num
+									num_its = real(floor((varargin{i+1}))); % real in case of cplx num
 									is_criterion_error = false;
 								end
 							case 'relerr'
 								if(nargin == i || ~ islogical(varargin{i+1}))
 									error('relerr keyword argument is not followed by a logical')
 								else
-									relerr = varargin{i+1}
+									relerr = varargin{i+1};
 								end
 							case 'relmat'
 								if(nargin == i || ~ ismatrix(varargin{i+1}))
 									error('mat keyword argument is not followed by a matrix')
 								else
-									matrix = varargin{i+1}
-									varargin{i+1} = 0 % erase matrix in args because switch can't evaluate a matrix
+									matrix = varargin{i+1};
+									varargin{i+1} = 0; % erase matrix in args because switch can't evaluate a matrix
 									% so otherwise it would fail the next ite
 								end
 							end
@@ -86,7 +86,7 @@ classdef StoppingCriterion
 							error('when error is relative (relerr == true) the reference matrix ''relmat'' must be specified')
 						end
 						% adjust tol to relerr
-						tol = tol * norm(matrix, 'fro')
+						tol = tol * norm(matrix, 'fro');
 					end
 					stop_crit.is_criterion_error = is_criterion_error;
 					stop_crit.num_its = num_its;

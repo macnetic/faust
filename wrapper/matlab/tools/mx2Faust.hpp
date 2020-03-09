@@ -829,6 +829,219 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 	return params;
 }
 
+template<typename SCALAR, typename FPP2>
+const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* matlab_params, std::vector<bool> & presentFields)
+{
+	Faust::ParamsPalm<SCALAR, Cpu, FPP2>* params = nullptr;
+	mxArray    *mxCurrentField,*mxCurrentCons;
+
+
+	// data initialisation
+	Faust::MatDense<SCALAR,Cpu> data;
+	if (presentFields[0])
+	{
+		mxCurrentField = mxGetField(matlab_params,0,"data");
+
+		mxArray2FaustMat(  mxCurrentField,data ) ;
+		/*mexPrintf("DATA");
+		  for (int i = 0;i<data.getNbRow();i++)
+		  {
+		  for (int j = 0;j<data.getNbCol();j++)
+		  {
+		//bidon = std::snprintf(coeff,10,"%d",A(i,j));
+		mexPrintf("%f ",data(i,j));
+		}
+		mexPrintf("\n")
+		};*/
+	}else
+	{
+		mexErrMsgTxt("params.data must be specified");
+	}
+
+	//nbFact initialisation
+	int nbFact=0;
+	if (presentFields[1])
+	{
+
+		mxCurrentField = mxGetField(matlab_params,0,"nfacts");
+		nbFact =(int)  mxGetScalar(mxCurrentField);
+		//        mexPrintf("NB FACT : %d\n",nbFact);
+	}else
+	{
+		mexErrMsgTxt("params.nfacts must be specified");
+	}
+
+
+
+	//constraints
+	std::vector<const Faust::ConstraintGeneric*> consS;
+	if (presentFields[2])
+	{
+		mwSize nbRowCons,nbColCons;
+		mxCurrentField = mxGetField(matlab_params,0,"cons");
+		if(!mxIsCell(mxCurrentField))
+		{
+			mexErrMsgTxt("cons must be a cell-array");
+		}
+		nbRowCons = mxGetM(mxCurrentField);
+		nbColCons = mxGetN(mxCurrentField);
+
+		if(nbRowCons !=1)
+		{
+
+			mexErrMsgTxt("cons must have 1 rows");
+		}
+		//		mexPrintf("cons nbColCons=%d\n", nbColCons);
+		if(nbColCons != (nbFact))
+		{
+			//mexPrintf("\n cons has %d cols and nbFact = %d\n",nbColCons,nbFact);
+			//mexErrMsgTxt("incoherence between the number of columns of cons and nfacts ");
+		}
+		//mexPrintf("\n cons has %d rows and %d cols \n",nbRowCons,nbColCons);
+		//Faust::ConstraintGeneric * consToAdd;
+
+
+
+		for (mwSize j=0;j<nbColCons;j++)
+		{
+			//                mexPrintf("cons(%d)\n",j);
+			mxCurrentCons=mxGetCell(mxCurrentField,j);
+			getConstraint<SCALAR,FPP2>(consS,mxCurrentCons);
+			//consS.push_back(consToAdd);
+		}
+
+	}else
+	{
+		mexErrMsgTxt("params.cons must be specified");
+	}
+	//    std::cout<<"FINI_CONS"<<std::endl;
+	//niter1
+	//    Faust::StoppingCriterion<SCALAR> crit1;
+	//    if (presentFields[3])
+	//    {
+	//         mxCurrentField = mxGetField(matlab_params,0,"niter");
+	//        int nb_iter1 =(int)  mxGetScalar(mxCurrentField);
+	//        Faust::StoppingCriterion<SCALAR> newCrit1(nb_iter1);
+	//        crit1 = newCrit1;
+	//    }
+	//    mexPrintf("\n crit1 nb_it = %d\n",crit1.get_crit());
+
+	//TODO: replace by default values as constants from StoppingCriterion class
+	bool is_criterion_error = false;
+	int num_its = 500;
+	FPP2 error_treshold = 0.3;
+	int max_num_its = 10000;
+	if(presentFields[3])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "niter");
+		num_its = (int) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[8]){
+		mxCurrentField = mxGetField(matlab_params, 0, "sc_is_criterion_error");
+		is_criterion_error =  (bool) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[9])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "sc_error_treshold");
+		error_treshold = (FPP2) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[10])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "sc_max_num_its");
+		max_num_its = (int) mxGetScalar(mxCurrentField);
+	}
+	Faust::StoppingCriterion<FPP2> crit1(num_its, is_criterion_error, error_treshold, max_num_its);
+	//	crit1.Display();
+	//init_facts
+	std::vector<Faust::MatDense<SCALAR,Cpu> > init_facts;
+	if (presentFields[4])
+	{
+		mxCurrentField = mxGetField(matlab_params,0,"init_facts");
+		//		 std::cout<<"PASSERbeforeInitFact"<<std::endl;
+		setVectorFaustMat(init_facts,mxCurrentField);
+		//		 std::cout<<"PASSERafterInitFact"<<std::endl;
+
+	}else
+	{
+		mexErrMsgTxt("init_facts must be must be specified");
+	}
+
+	//	std::cout<<"PASSER1"<<std::endl;
+	//verbosity
+	bool isVerbose = false;
+	if (presentFields[5])
+	{
+		mxCurrentField = mxGetField(matlab_params,0,"verbose");
+		isVerbose =(bool)  mxGetScalar(mxCurrentField);
+	}
+	//update_way
+	bool updateway = false;
+	if (presentFields[7])
+	{
+		mxCurrentField = mxGetField(matlab_params,0,"update_way");
+		updateway =(bool)  mxGetScalar(mxCurrentField);
+	}
+
+
+	//init_lambda
+	FPP2 init_lambda = 1.0;
+	if (presentFields[6])
+	{
+		mxCurrentField = mxGetField(matlab_params,0,"init_lambda");
+		FPP2* tmp_ptr = &init_lambda;
+		// it works whatever mxCurrentField class is (complex or not)
+		mxArray2Ptr<FPP2>(const_cast<const mxArray*>(mxCurrentField),tmp_ptr);
+		//       init_lambda = (SCALAR) mxGetScalar(mxCurrentField);
+	}
+
+	GradientCalcOptMode grad_calc_opt_mode = Params<SCALAR,Cpu, FPP2>::defaultGradCalcOptMode;
+	if(presentFields[11])
+	{
+		mxCurrentField = mxGetField(matlab_params,0,"grad_calc_opt_mode");
+		grad_calc_opt_mode = static_cast<GradientCalcOptMode>((int)mxGetScalar(mxCurrentField));
+	}
+
+	bool constant_step_size = false;
+	if (presentFields[12])
+	{
+		mxCurrentField = mxGetField(matlab_params,0,"constant_step_size");
+		constant_step_size =(bool)  mxGetScalar(mxCurrentField);
+	}
+	FPP2 step_size = Params<SCALAR,Cpu, FPP2>::defaultStepSize;
+	if(presentFields[13])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "step_size");
+		step_size = (FPP2) mxGetScalar(mxCurrentField);
+	}
+	FPP2 norm2_threshold =	FAUST_PRECISION;
+	int norm2_max_iter = FAUST_NORM2_MAX_ITER;
+	if(presentFields[14])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "norm2_max_iter");
+		norm2_max_iter = (int) mxGetScalar(mxCurrentField);
+	}
+	if(presentFields[15])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "norm2_threshold");
+		norm2_threshold = (FPP2) mxGetScalar(mxCurrentField);
+	}
+	//compute_lambda
+	// bool compute_lambda = true;
+	// if (presentFields[8])
+	// {
+	// mxCurrentField = mxGetField(matlab_params,0,"compute_lambda");
+	// compute_lambda = (bool) mxGetScalar(mxCurrentField);
+	// }
+
+	params = new Faust::ParamsPalm<SCALAR,Cpu, FPP2>(data,nbFact,consS,init_facts,crit1,isVerbose,updateway,init_lambda, constant_step_size, step_size, grad_calc_opt_mode);
+
+	if(norm2_max_iter) params->norm2_max_iter = norm2_max_iter;
+	if(norm2_threshold != FPP2(0)) params->norm2_threshold = norm2_threshold;
+
+
+	return params;
+}
+
 
 
 #endif

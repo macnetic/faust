@@ -147,7 +147,89 @@ void testCoherence(const mxArray* params,std::vector<bool> & presentFields)
 
 }
 
+void testCoherencePALM4MSA(const mxArray* params,std::vector<bool> & presentFields)
+{
+	////TODO: this function should be modified to be more reliable/simple as the function testCoherence() in mx2Faust.cpp has been modified
+	int nbr_field=mxGetNumberOfFields(params);
+	presentFields.resize(16);
+	presentFields.assign(16,false);
+	if(nbr_field < 3)
+	{
+		mexErrMsgTxt("The number of field of params must be at least 3 ");
+	}
 
+
+	for (int i=0;i<nbr_field;i++)
+	{
+		const char * fieldName;
+		fieldName = mxGetFieldNameByNumber(params,i);
+		//        mexPrintf("fieldname %d : %s\n",i,fieldName);
+
+		if (strcmp(fieldName,"data") == 0)
+		{
+			presentFields[0] = true;
+		}
+
+		else if (strcmp(fieldName,"nfacts") == 0)
+		{
+			presentFields[1] = true;
+		}
+		else if (strcmp(fieldName,"cons") == 0)
+		{
+			presentFields[2] = true;
+		}
+		else if (strcmp(fieldName,"niter") == 0)
+		{
+			presentFields[3] = true;
+		}
+		//sc stands for StoppingCriterion
+		else if(!strcmp(fieldName, "sc_is_criterion_error"))
+		{
+			presentFields[8] = true;
+		}
+		else if(!strcmp(fieldName, "sc_error_treshold"))
+		{
+			presentFields[9] = true;
+		}
+		else if(!strcmp(fieldName, "sc_max_num_its"))
+		{
+			presentFields[10] = true;
+		}
+		else if (strcmp(fieldName,"init_facts") == 0)
+		{
+			presentFields[4] = true;
+		}
+		else if (strcmp(fieldName,"verbose") == 0)
+		{
+			presentFields[5] = true;
+		}
+		else if (strcmp(fieldName,"init_lambda") == 0)
+		{
+			presentFields[6] = true;
+		}
+		else if (strcmp(fieldName,"update_way") == 0)
+		{
+			presentFields[7] = true;
+		}
+		else if(strcmp(fieldName, "grad_calc_opt_mode") == 0)
+		{
+			presentFields[11] = true;
+		}
+		else if(strcmp(fieldName, "constant_step_size") == 0)
+		{
+			presentFields[12] = true;
+		}
+		else if(strcmp(fieldName, "step_size") == 0)
+		{
+			presentFields[13] = true;
+		}
+		else if(strcmp(fieldName, "norm2_max_iter") == 0)
+			presentFields[14] = true;
+		else if(strcmp(fieldName, "norm2_threshold") == 0)
+			presentFields[15] = true;
+	}
+
+}
 
 
 // void DisplayParams(const Faust::Params & params)

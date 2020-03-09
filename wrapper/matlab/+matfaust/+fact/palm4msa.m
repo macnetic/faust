@@ -31,7 +31,7 @@
 %>
 %>
 %==========================================================================================
-function  [F,lambda] = palm4msa(M, p)
+function  [F,lambda] = palm4msa(M, p, varargin)
 	import matfaust.Faust
 	import matfaust.fact.check_fact_mat
 	mex_constraints = cell(1, length(p.constraints));
@@ -51,11 +51,35 @@ function  [F,lambda] = palm4msa(M, p)
 		error('M''s number of columns must be consistent with the last residuum constraint defined in p. Likewise its number of rows must be consistent with the first factor constraint defined in p.')
 	end
 	% put mex_constraints in a cell array again because mex eats one level of array
-	mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'init_facts', {p.init_facts}, 'niter', p.stop_crit.num_its, 'sc_is_criterion_error', p.stop_crit.is_criterion_error, 'sc_error_treshold', p.stop_crit.tol, 'sc_max_num_its', p.stop_crit.maxiter, 'update_way', p.is_update_way_R2L, 'grad_calc_opt_mode', p.grad_calc_opt_mode, 'constant_step_size', p.constant_step_size, 'step_size', p.step_size, 'verbose', p.is_verbose, 'norm2_max_iter', p.norm2_max_iter, 'norm2_threshold', p.norm2_threshold);
-	if(isreal(M))
-		[lambda, core_obj] = mexPalm4MSAReal(mex_params);
-	else
-		[lambda, core_obj] = mexPalm4MSACplx(mex_params);
+	mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'init_facts', {p.init_facts}, 'niter', p.stop_crit.num_its, 'sc_is_criterion_error', p.stop_crit.is_criterion_error, 'sc_error_treshold', p.stop_crit.tol, 'sc_max_num_its', p.stop_crit.maxiter, 'update_way', p.is_update_way_R2L, 'grad_calc_opt_mode', p.grad_calc_opt_mode, 'constant_step_size', p.constant_step_size, 'step_size', p.step_size, 'verbose', p.is_verbose, 'norm2_max_iter', p.norm2_max_iter, 'norm2_threshold', p.norm2_threshold, 'init_lambda', p.init_lambda);
+	backend = 2016;
+	nargin = length(varargin);
+	if(nargin > 0)
+		backend = varargin{1};
+		if(strcmp('backend', backend))
+			if(nargin < 2)
+				error('keyword argument ''backend'' must be followed by 2016 or 2020')
+			else
+				backend = varargin{2};
+			end
+		end
+		if(~ (isscalar(backend) && floor(backend) == backend) || backend ~= 2016 && backend ~= 2020)
+			backend
+			error('backend must be a int equal to 2016 or 2020')
+		end
+	end
+	if(backend == 2016)
+		if(isreal(M))
+			[lambda, core_obj] = mexPalm4MSAReal(mex_params);
+		else
+			[lambda, core_obj] = mexPalm4MSACplx(mex_params);
+		end
+	elseif(backend == 2020)
+		if(isreal(M))
+			[lambda, core_obj] = mexPALM4MSA2020Real(mex_params);
+		else
+			error('backend 2020 doesn''t handle yet the complex matrices')
+		end
 	end
 	F = Faust(core_obj, isreal(M));
 end

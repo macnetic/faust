@@ -40,13 +40,14 @@
 #ifndef __FAUST_MX2FAUST_H__
 #define __FAUST_MX2FAUST_H__
 #define __RELEASE_VERSION_DETECTOR__ // avoid mex.h to override the constants below
-#define TARGET_API_VERSION 700 // set target matlab version for compiling to R2017b 
+#define TARGET_API_VERSION 700 // set target matlab version for compiling to R2017b
 // to continue using mxGetImagData which is deprecated since R2018a # https://fr.mathworks.com/help/matlab/apiref/mxgetimagdata.html
 #define MATLAB_TARGET_API_VERSION 700 // consistency expected with the constant above
 #include "mex.h"
 #include <vector>
 #include "faust_constant.h"
 #include "faust_Params.h"
+#include "faust_ParamsPalm.h"
 #include <complex>
 #include <string>
 
@@ -191,6 +192,11 @@ void testCoherence(const mxArray* params,std::vector<bool> & presentFields);
 
 template<typename SCALAR, typename FPP2>
 const Faust::Params<SCALAR,Cpu,FPP2>* mxArray2FaustParams(const mxArray* matlab_params);
+
+void testCoherencePALM4MSA(const mxArray* params,std::vector<bool> & presentFields);
+
+template<typename SCALAR, typename FPP2>
+const Faust::ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* matlab_params, std::vector<bool>& presentFields);
 
 #include "mx2Faust.hpp"
 

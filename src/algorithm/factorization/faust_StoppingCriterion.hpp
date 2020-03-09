@@ -95,26 +95,26 @@ template<typename T>
 bool Faust::StoppingCriterion<T>::do_continue(int current_ite, T current_error /* = NO_ERROR_PASSED */)const
 {
 
-   if (!isCriterionError) // if criterion is number of iteration, current_error does not matter
-      return current_ite<nb_it ? true : false;
-   else if (isCriterionError && current_error >= 0)
-      if (current_error < errorThreshold)
-         return false;
-      else if (current_ite <  maxIteration) // and current_error >= errorThreshold
-         return true;
-      else // if current_error >= errorThreshold and current_ite >= maxIteration
-      {
-         std::cerr << "warning in Faust::StoppingCriterion<T>::do_continue : maximum number of iterations has been reached and current error is still greater than the threshold." << std::endl;
-         return false;
-      }
-   else if(current_error == NO_ERROR_PASSED) // if criterion is error and current_error has not been initialized
-   {
-     handleError(m_className,"check_validity : when stopping criterion is error, the current error needs to be given as second parameter");
-   }
-   else{
-	   // isCriterionError is true
-	   // current_error passed is negative (but != NO_ERROR_PASSED), just ignore it
-	   return true;
+	if (!isCriterionError) // if criterion is number of iteration, current_error does not matter
+		return current_ite<nb_it ? true : false;
+	else if (isCriterionError && current_error >= 0)
+		if (current_error < errorThreshold)
+			return false;
+		else if (current_ite <  maxIteration) // and current_error >= errorThreshold
+			return true;
+		else // if current_error >= errorThreshold and current_ite >= maxIteration
+		{
+			std::cerr << "warning in Faust::StoppingCriterion<T>::do_continue : maximum number of iterations has been reached and current error is still greater than the threshold." << std::endl;
+				return false;
+		}
+	else if(current_error == NO_ERROR_PASSED) // if criterion is error and current_error has not been initialized
+	{
+		handleError(m_className,"check_validity : when stopping criterion is error, the current error needs to be given as second parameter");
+	}
+	else{
+		// isCriterionError is true
+		// current_error passed is negative (but != NO_ERROR_PASSED), just ignore it
+		return true;
 	}
 }
 

@@ -55,7 +55,7 @@ classdef (Abstract) ParamsFact
 			if(iscell(constraints))
 				for i=1:length(constraints)
 					if(isa(constraints{i}, 'matfaust.proj.proj_gen'))
-						constraints{i} = constraints{i}.constraint
+						constraints{i} = constraints{i}.constraint;
 					end
 				end
 			end
@@ -81,7 +81,7 @@ classdef (Abstract) ParamsFact
 			end
 			for i = 1:length(constraints)
 				if(isa(constraints{i}, 'matfaust.proj.proj_gen'))
-					constraints{i} = constraints{i}.constraint
+					constraints{i} = constraints{i}.constraint;
 				end
 			end
 			for i = 1:length(constraints) %ParamsFact.TODO: check constraints length in sub-class
