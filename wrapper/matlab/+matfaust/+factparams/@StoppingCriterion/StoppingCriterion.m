@@ -9,19 +9,77 @@
 % =========================================================
 classdef StoppingCriterion
 	properties (SetAccess = public)
-		is_criterion_error
+		%> see matfaust.factparams.StoppingCriterion
 		num_its
+		%> see matfaust.factparams.StoppingCriterion
 		tol
+		%> see matfaust.factparams.StoppingCriterion
 		maxiter
+		%> see matfaust.factparams.StoppingCriterion
 		relerr
 	end
+	properties(SetAccess = private)
+		is_criterion_error
+	end
+	properties(Constant)
+		DEFAULT_MAXITER = 10000
+		DEFAULT_NUMITS = 500
+		DEFAULT_TOL = .3
+	end
 	methods
+		% =========================================================
+		%>	@brief Displays a StoppingCriterion instance.
+		%>
+		% =========================================================
+		function display(self)
+			if(self.is_criterion_error)
+				printf('tol: %f ', self.tol)
+				printf('relerr: %d', self.relerr)
+				printf('maxiter: %d',self.maxiter)
+			else
+				printf('num_its: %d', self.num_its)
+				printf('maxiter: %d', self.maxiter)
+			end
+		end
+		% =========================================================
+		%>	@brief Constructor.
+		%>
+		%>	@param 'numits', int the fixed number of iterations of the algorithm. By default the value is DEFAULT_NUMITS. If arguments num_its and tol are used together only the last one in the argument list is taken into account.
+		%>	@param 'tol', real error target according to the algorithm is stopped. If arguments num_its and tol are used together only the last one in the argument list is taken into account.
+		%> @param 'maxiter', int the maximum number of iterations to run the algorithm, whatever is the criterion used (tol or num_its).
+		%> @param 'relerr', bool false to define a absolute error with tol, true for a relative error
+		%> (in this case the 'relmat' matrix will be used to convert internally the given 'tol' to the corresponding absolute error).
+		%> @param 'relmat', matrix the matrix against which is defined the relative error. if relerr is True, this argument is mandatory.
+		%>
+		%> @b Example:
+		%> @code
+		%>>> import matfaust.factparams.StoppingCriterion
+		%>>> s = StoppingCriterion(5)
+		%>num_its 5:
+		%>maxiter 10000:
+		%>>> s = StoppingCriterion(.5)
+		%>tol: 0.500000
+		%>relerr: 0
+		%>maxiter: 10000
+		%>>> s = StoppingCriterion('tol', .5)
+		%>tol: 0.500000
+		%>relerr: 0
+		%>maxiter: 10000
+		%>>> s = StoppingCriterion('numits', 5)
+		%>num_its 500:
+		%>maxiter 10000:
+		%>>> s = StoppingCriterion('tol', .2, 'relerr', true, 'relmat', rand(10,10))
+		%>tol: 1.210149
+		%>relerr: 1
+		%>maxiter: 10000
+		%> @endcode
+		% =========================================================
 		function stop_crit = StoppingCriterion(varargin)
 			%set default values
 			is_criterion_error = false;
-			tol = 0.3;
-			num_its = 500;
-			maxiter = 10000;
+			tol = matfaust.factparams.StoppingCriterion.DEFAULT_TOL;
+			num_its = matfaust.factparams.StoppingCriterion.DEFAULT_NUMITS;
+			maxiter = matfaust.factparams.StoppingCriterion.DEFAULT_MAXITER;
 			relerr = false;
 			matrix = [];
 			if(nargin < 1)
