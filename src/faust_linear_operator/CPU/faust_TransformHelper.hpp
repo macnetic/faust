@@ -952,7 +952,14 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product() const {
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product() // const
+		{
+			if(this->mul_order_opt_mode)
+			{
+				MatDense<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
+				Id.setEyes();
+				return this->multiply(Id);
+			}
 			return this->transform->get_product(isTransposed2char(), is_conjugate);
 		}
 

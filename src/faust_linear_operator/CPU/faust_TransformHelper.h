@@ -164,7 +164,7 @@ namespace Faust {
 			TransformHelper<FPP, Cpu>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 			TransformHelper<FPP, Cpu>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
-			MatDense<FPP,Cpu> get_product() const;
+			MatDense<FPP,Cpu> get_product();// const;
             void get_product(Faust::MatDense<FPP,Cpu>& prod) const;
 			void save_mat_file(const char* filename) const;
 			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;

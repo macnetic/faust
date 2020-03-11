@@ -1635,7 +1635,7 @@ class Faust:
         multiplication or by the use (or unuse) of threads for the calculation of intermediary
         matrix products of the Faust.
         """
-        Faust(core_obj=F.m_faust.optimize_mul(transp))
+        F.m_faust.optimize_mul(transp)
 
 pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__
 
