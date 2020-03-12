@@ -324,16 +324,18 @@ namespace Faust {
 			delete th;
 			th = th2;
 			// choose the quickest method for the Faust-matrix mul
-			th->optimize_multiply(transp);
+			th->optimize_multiply(transp, true);
 			return th;
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::optimize_multiply(const bool transp /* deft to false */)
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_multiply(const bool transp /* deft to false */, const bool inplace)
 		{
+			TransformHelper<FPP,Cpu>* t_opt = nullptr;
 			int NMETS = 5; //skip openmp method (not supported on macOS)
 			std::chrono::duration<double> * times = new std::chrono::duration<double>[NMETS]; //use heap because of VS14 (error C3863)
 			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(transp?this->getNbRow():this->getNbCol(), 2048);
+			int old_meth = this->get_mul_order_opt_mode();
 			int nmuls = 1, opt_meth=0;
 			for(int i=0; i < NMETS; i++)
 			{
@@ -350,8 +352,17 @@ namespace Faust {
 			{
 				opt_meth = times[opt_meth]<times[i+1]?opt_meth:i+1;
 			}
-			this->set_mul_order_opt_mode(opt_meth);
+			if(inplace)
+				this->set_mul_order_opt_mode(opt_meth);
+			else
+			{
+				t_opt = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0, false, false, true);
+				t_opt->set_mul_order_opt_mode(opt_meth);
+				// leave the current Faust unchanged
+				this->set_mul_order_opt_mode(old_meth);
+			}
 			delete [] times;
+			return t_opt;
 		}
 
 	template<typename FPP>

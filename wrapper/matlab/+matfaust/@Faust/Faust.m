@@ -815,19 +815,44 @@ classdef Faust
 		end
 
 		function OF = optimize_mul(F, varargin)
-			len_args = length(varargin);
-			transp = false; % default value
-			if(len_args > 0)
-				if(strcmp(varargin{1}, {'transpose', 'transp'}) &&  len_args > 1 && islogical(varargin{2}))
-					transp = varargin{2};
-				else
-					error('invalid key or value arguments')
+			transp = false;
+			inplace = false;
+			argc = length(varargin);
+			if(argc > 0)
+				for i=1:argc
+					switch(varargin{i})
+						case {'transp', 'transpose'}
+							if(argc == i || ~ islogical(varargin{i+1}))
+								error('transp keyword argument is not followed by a logical')
+							else
+								transp = varargin{i+1};
+							end
+						case 'inplace'
+							if(argc == i || ~ islogical(varargin{i+1}))
+								error('inplace keyword argument is not followed by a logical')
+							else
+								inplace = varargin{i+1};
+							end
+						otherwise
+							if(isstr(varargin{i}))
+								error([ varargin{i} ' unrecognized argument'])
+							end
+					end
 				end
 			end
-			if(F.isReal)
-				mexFaustReal('optimize_mul', F.matrix.objectHandle, transp);
-			else % cplx Faust
-				mexFaustCplx('optimize_mul', F.matrix.objectHandle, transp);
+			if(inplace)
+				if(F.isReal)
+					mexFaustReal('optimize_mul', F.matrix.objectHandle, transp, inplace);
+				else % cplx Faust
+					mexFaustCplx('optimize_mul', F.matrix.objectHandle, transp, inplace);
+				end
+				OF = F
+			else
+				if(F.isReal)
+					OF = matfaust.Faust(F, mexFaustReal('optimize_mul', F.matrix.objectHandle, transp, inplace));
+				else % cplx Faust
+					OF = matfaust.Faust(F, mexFaustCplx('optimize_mul', F.matrix.objectHandle, transp, inplace));
+				end
 			end
 		end
 

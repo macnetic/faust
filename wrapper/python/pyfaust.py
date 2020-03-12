@@ -1627,7 +1627,7 @@ class Faust:
         F_opt = Faust(core_obj=F.m_faust.optimize(transp))
         return F_opt
 
-    def optimize_mul(F, transp=False):
+    def optimize_mul(F, transp=False, inplace=False):
         """
         Returns a Faust configured with the quickest Faust-matrix multiplication mode (benchmark ran on the fly).
         NOTE: this function launches a small benchmark on the fly. Basically, the methods
@@ -1635,7 +1635,11 @@ class Faust:
         multiplication or by the use (or unuse) of threads for the calculation of intermediary
         matrix products of the Faust.
         """
-        F.m_faust.optimize_mul(transp)
+        if(inplace):
+            F.m_faust.optimize_mul(transp)
+        else:
+            F_opt = Faust(core_obj=F.m_faust.optimize_mul(transp, inplace))
+            return F_opt
 
 pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__
 
