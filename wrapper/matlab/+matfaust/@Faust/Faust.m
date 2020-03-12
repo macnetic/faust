@@ -779,8 +779,11 @@ classdef Faust
 		%> @brief Optimizes a Faust by changing the storage format of each factor in
 		%> order to optimize the memory size.
 		%>
+		%>@retval OF The optimized Faust.
+		%>
+		%> @b See @b also Faust.optimize
 		%=====================================================================
-		function OF = optimize_storage(F)
+		function OF = optimize_memory(F)
 			if(F.isReal)
 				OF = matfaust.Faust(F, mexFaustReal('optimize_storage', F.matrix.objectHandle, false));
 			else % cplx Faust
@@ -789,13 +792,22 @@ classdef Faust
 		end
 
 		%=====================================================================
-		%> @brief Returns a Faust optimized with pruneout, optimize_storage and configured with the quickest method available to compute a Faust-matrix product.
+		%> @brief Returns a Faust optimized with Faust.pruneout, Faust.optimize_memory and Faust.optimize_time.
 		%>
-		%> NOTE: this function launches a small benchmark on the fly. Basically, the methods
-		%> available differ by the order used to compute the matrix chain
-		%> multiplication or by the use (or unuse) of threads for the calculation of intermediary
-		%> matrix products of the Faust.
+		%> @b Usage <br/>
+		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(F) returns an optimized Faust object.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'transp', @b true) see Faust.optimize_time
 		%>
+		%> @param 'transp', bool (optional) default to false. if true optimize the Faust according to its transpose.
+		%>
+		%> @retval OF The optimized Faust.
+		%>
+		%> @note this function is still experimental, you might use manually
+        %> Faust.optimize_time, Faust.optimize_memory or Faust.pruneout to be
+        %> more specific about the optimization to proceed.
+		%>
+		%>
+		%> @b See @b also Faust.optimize_time, Faust.optimize_memory, Faust.pruneout
 		%=====================================================================
 		function OF = optimize(F, varargin)
 			len_args = length(varargin);
@@ -814,7 +826,28 @@ classdef Faust
 			end
 		end
 
-		function OF = optimize_mul(F, varargin)
+		%===============================
+		%> @brief Returns a Faust configured with the quickest Faust-matrix multiplication mode (benchmark ran on the fly).
+        %> @note this function launches a small benchmark on the fly. Basically, the methods
+        %> available differ by the order used to compute the matrix chain
+        %> multiplication or by the use (or unuse) of threads for the calculation of intermediary
+        %> matrix products of the Faust.
+		%>
+		%>
+		%> @b Usage<br/>
+		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(F) returns a new object with the best product method enabled.<br/>
+		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'inplace', @b true) modify directly F instead of creating a new Faust (i.e. OF references the same object as F).<br/>
+		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'transp', @b true) try to optimize the Faust transpose instead of the Faust itself.
+		%>
+		%> @param F the Faust object.
+		%> @param 'inplace', bool (optional) default to false. If true the current Faust is modified directly.
+		%> @param 'transp', bool (optional) default to false. If true optimize the Faust according to its transpose.
+		%>
+		%> @retval OF The optimized Faust.
+		%>
+		%> @b See @b also Faust.optimize
+		%===============================
+		function OF = optimize_time(F, varargin)
 			transp = false;
 			inplace = false;
 			argc = length(varargin);
@@ -1075,9 +1108,31 @@ classdef Faust
 			end
 		end
 		%================================================================
-		%> Returns the left hand side factors of F from index 1 to i included.
+		%> Returns the left hand side factors of F from index 1 to i included (in 1-base index).
 		%===
+		%> @Example
+		%> @code
+		%> %in a matlab terminal
+		%> >> F = matfaust.rand(5,[5, 10])
 		%>
+		%> F =
+		%>
+		%> Faust size 8x5, density 5.25, nnz_sum 210, 5 factor(s):
+		%> - FACTOR 0 (real) DENSE,  size 8x6, density 0.833333, nnz 40
+		%> - FACTOR 1 (real) DENSE,  size 6x9, density 0.555556, nnz 30
+		%> - FACTOR 2 (real) DENSE,  size 9x10, density 0.5, nnz 45
+		%> - FACTOR 3 (real) DENSE,  size 10x9, density 0.555556, nnz 50
+		%> - FACTOR 4 (real) DENSE,  size 9x5, density 1, nnz 45
+		%> >> LF = left(F, 3)
+		%>
+		%> LF =
+		%>
+		%> Faust size 8x10, density 1.4375, nnz_sum 115, 3 factor(s):
+		%> - FACTOR 0 (real) DENSE,  size 8x6, density 0.833333, nnz 40
+		%> - FACTOR 1 (real) DENSE,  size 6x9, density 0.555556, nnz 30
+		%> - FACTOR 2 (real) DENSE,  size 9x10, density 0.5, nnz 45
+		%>
+		%>@endcode
 		%> <p> @b See @b also Faust.factors, Faust.right
 		%================================================================
 		function lfactors = left(F, i)
@@ -1086,8 +1141,32 @@ classdef Faust
 		end
 
 		%================================================================
-		%> Returns the right hand side factors of F from index i to end.
+		%> Returns the right hand side factors of F from index i to end (in 1-base index).
 		%===
+		%>
+		%> @Example
+		%> @code
+		%> >> F = matfaust.rand(5,[5, 10])
+		%>
+		%> F =
+		%>
+		%> Faust size 7x7, density 4.28571, nnz_sum 210, 5 factor(s):
+		%> - FACTOR 0 (real) SPARSE, size 7x10, density 0.5, nnz 35
+		%> - FACTOR 1 (real) DENSE,  size 10x9, density 0.555556, nnz 50
+		%> - FACTOR 2 (real) SPARSE, size 9x8, density 0.625, nnz 45
+		%> - FACTOR 3 (real) SPARSE, size 8x8, density 0.625, nnz 40
+		%> - FACTOR 4 (real) DENSE,  size 8x7, density 0.714286, nnz 40
+		%> >> RF = right(F, 2)
+		%>
+		%> RF =
+		%>
+		%> Faust size 10x7, density 2.5, nnz_sum 175, 4 factor(s):
+		%> - FACTOR 0 (real) DENSE,  size 10x9, density 0.555556, nnz 50
+		%> - FACTOR 1 (real) SPARSE, size 9x8, density 0.625, nnz 45
+		%> - FACTOR 2 (real) SPARSE, size 8x8, density 0.625, nnz 40
+		%> - FACTOR 3 (real) DENSE,  size 8x7, density 0.714286, nnz 40
+		%>
+		%> @endcode
 		%>
 		%> <p> @b See @b also Faust.factors, Faust.left
 		%================================================================
@@ -2024,6 +2103,8 @@ classdef Faust
 		%>  &nbsp;&nbsp;&nbsp; <b> X = F\ B </b> is the matrix division of full(F) into B, which is roughly the
 		%>          same as Faust.pinv(F)*B.
 		%>
+		%> @warning this functions makes a call to Faust.full.
+		%>
 		%> <p> @b See @b also Faust.pinv, mldivide Matlab built-in.
 		%=====================================================================
 		function X = mldivide(F,B)
@@ -2039,6 +2120,8 @@ classdef Faust
 		%>
 		%>  &nbsp;&nbsp;&nbsp; <b> X = PINV(F) </b> produces the matrix X of the same dimensions as F'
 		%>  so that F*(F'*X')' == full(F) (or approximately).
+		%>
+		%> @warning this functions makes a call to Faust.full.
 		%>
 		%> <p> @b See @b also Faust.mldivide, pinv Matlab built-in.
 		%=====================================================================

@@ -665,9 +665,7 @@ class Faust:
 
     def matvec(F, x):
         """
-        This function implements the scipy.sparse.linalg.LinearOperator.matvec
-        function such that scipy.sparse.linalg.aslinearoperator function works on a
-        Faust object.
+        This function implements the scipy.sparse.linalg.LinearOperator.matvec function such that scipy.sparse.linalg.aslinearoperator function works on a Faust object.
         """
         return F.dot(x)
 
@@ -1212,7 +1210,7 @@ class Faust:
         else:
             return float(-1)
 
-    def norm(F, ord='fro', axis=None, keepdims=False, **kwargs): #**kwargs):
+    def norm(F, ord='fro', **kwargs): #**kwargs):
         """
         Computes the norm of F.
 
@@ -1232,9 +1230,8 @@ class Faust:
             Frobenius norm (by default the Frobenius norm is computed).
             threshold: (optional) power iteration algorithm threshold (default
             to .001). Used only for norm(2).
-            param max_num_its: (optional) maximum number of iterations for
+            max_num_its: (optional) maximum number of iterations for
             power iteration algorithm. Used only for norm(2).
-
 
         Returns:
             the norm (float).
@@ -1269,8 +1266,6 @@ class Faust:
         """
         if(ord not in [1, 2, "fro", np.inf]):
             raise ValueError("ord must have the value 1, 2, 'fro' or numpy.inf.")
-        kwargs['axis'] = axis
-        kwargs['keepdims'] = keepdims
         return F.m_faust.norm(ord, **kwargs)
 
 
@@ -1418,7 +1413,27 @@ class Faust:
             a Faust if the size factor set to be returned is greater than 1, a
             numpy array or matrix otherwise.
 
-        <b/> See also Faust.factors, Faust.left, Faust.numfactors
+        Examples:
+            >>> from pyfaust import rand
+            >>> F = rand(5, [5, 10])
+            >>> RF = F.right(2)
+            >>> print(F)
+            Faust size 10x7, density 2.85714, nnz_sum 200, 5 factor(s):<br/>
+                 FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50<br/>
+                 FACTOR 1 (real) DENSE,  size 10x10, density 0.5, nnz 50<br/>
+                 FACTOR 2 (real) SPARSE, size 10x5, density 1, nnz 50<br/>
+                 FACTOR 3 (real) DENSE,  size 5x5, density 1, nnz 25<br/>
+                 FACTOR 4 (real) SPARSE, size 5x7, density 0.714286, nnz 25<br/>
+            >>> print(RF)
+            Faust size 10x7, density 1.42857, nnz_sum 100, 3 factor(s):<br/>
+                 FACTOR 0 (real) SPARSE, size 10x5, density 1, nnz 50<br/>
+                 FACTOR 1 (real) DENSE,  size 5x5, density 1, nnz 25<br/>
+                 FACTOR 2 (real) SPARSE, size 5x7, density 0.714286, nnz 25<br/>
+
+
+        See also:
+            Faust.factors, Faust.left, Faust.numfactors
+
         """
         i = F._check_factor_idx(i)
         rF = Faust(core_obj=F.m_faust.right(i))
@@ -1434,7 +1449,27 @@ class Faust:
             a Faust if the size of factor set to be returned is greater than 1, a
             numpy array or matrix otherwise.
 
-        <b/> See also Faust.factors, Faust.right
+        Examples:
+            >>> from pyfaust import rand
+            >>> F = rand(5, [5, 10])
+            >>> LF = F.left(3)
+            >>> print(F)
+            Faust size 6x10, density 3.25, nnz_sum 195, 5 factor(s):<br/>
+                FACTOR 0 (real) DENSE,  size 6x8, density 0.625, nnz 30<br/>
+                FACTOR 1 (real) DENSE,  size 8x9, density 0.555556, nnz 40<br/>
+                FACTOR 2 (real) SPARSE, size 9x10, density 0.5, nnz 45<br/>
+                FACTOR 3 (real) DENSE,  size 10x6, density 0.833333, nnz 50<br/>
+                FACTOR 4 (real) DENSE,  size 6x10, density 0.5, nnz 30<br/>
+            >>> print(LF)
+            Faust size 6x6, density 4.58333, nnz_sum 165, 4 factor(s):<br/>
+                FACTOR 0 (real) DENSE,  size 6x8, density 0.625, nnz 30<br/>
+                FACTOR 1 (real) DENSE,  size 8x9, density 0.555556, nnz 40<br/>
+                FACTOR 2 (real) SPARSE, size 9x10, density 0.5, nnz 45<br/>
+                FACTOR 3 (real) DENSE,  size 10x6, density 0.833333, nnz 50<br/>
+
+
+        See also:
+            Faust.factors, Faust.right
         """
         i = F._check_factor_idx(i)
         lF = Faust(core_obj=F.m_faust.left(i))
@@ -1591,8 +1626,12 @@ class Faust:
 
     def pinv(F):
         """
-            Computes the (Moore-Penrose) pseudo-inverse of a Faust full matrix.
+        Computes the (Moore-Penrose) pseudo-inverse of a Faust full matrix.
 
+        Warning: this function makes a call to Faust.toarray().
+
+        Returns:
+            The dense pseudo-inverse matrix.
         """
         from numpy.linalg.linalg import pinv
         return pinv(F.todense())
@@ -1612,31 +1651,61 @@ class Faust:
         """
         return isinstance(obj, Faust)
 
-    def optimize_storage(F):
+    def optimize_memory(F):
         """
         Optimizes a Faust by changing the storage format of each factor in order to optimize the memory size.
 
+        Returns:
+            The optimized Faust.
+
+        <b/> See also Faust.optimize
         """
         F_opt = Faust(core_obj=F.m_faust.optimize_storage(False))
         return F_opt
 
     def optimize(F, transp=False):
         """
-        Returns a Faust optimized with pruneout, optimize_storage and optimize_mul.
+        Returns a Faust optimized with Faust.pruneout, Faust.optimize_memory and Faust.optimize_time.
+
+        Args:
+            transp: True in order to optimize the Faust according to its transpose.
+
+        Returns:
+            The optimized Faust.
+
+        Note: this function is still experimental, you might use manually
+        Faust.optimize_time, Faust.optimize_memory or Faust.pruneout to be
+        more specific about the optimization to proceed.
+
+        <b/> See also Faust.optimize_time, Faust.optimize_memory, Faust.pruneout
         """
         F_opt = Faust(core_obj=F.m_faust.optimize(transp))
         return F_opt
 
-    def optimize_mul(F, transp=False, inplace=False):
+    def optimize_time(F, transp=False, inplace=False):
         """
         Returns a Faust configured with the quickest Faust-matrix multiplication mode (benchmark ran on the fly).
+
         NOTE: this function launches a small benchmark on the fly. Basically, the methods
         available differ by the order used to compute the matrix chain
         multiplication or by the use (or unuse) of threads for the calculation of intermediary
         matrix products of the Faust.
+
+        Args:
+            inplace: to optimize the current Faust directly instead of returning a new
+            Faust with the optimization enabled. If True, F is returned
+            otherwise a new Faust object is returned.
+            transp: True in order to optimize the Faust according to its transpose.
+
+        Returns:
+            The optimized Faust.
+
+        <b/> See also Faust.optimize
+
         """
         if(inplace):
             F.m_faust.optimize_mul(transp)
+            return F
         else:
             F_opt = Faust(core_obj=F.m_faust.optimize_mul(transp, inplace))
             return F_opt
