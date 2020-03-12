@@ -389,7 +389,7 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::pruneout(const int nnz_tres, const int npasses, const bool only_forward)
 		{
 			int _npasses = 0;
-			TransformHelper<FPP,Cpu> *pth = new TransformHelper<FPP,Cpu>(this->transform->data);
+			TransformHelper<FPP,Cpu> *pth = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0);
 			MatGeneric<FPP,Cpu>* S_i, *S_j;
 			MatDense<FPP,Cpu>* tmp_ds;
 			MatSparse<FPP,Cpu>* tmp_sp;
