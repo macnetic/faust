@@ -728,7 +728,7 @@ classdef Faust
 		%> @brief Returns a Faust optimized by removing useless zero rows and columns as many times as needed.
 		%>
 		%> @param F: the Faust to optimize.
-		%> @param 'nnz_tres', int: (optional) the threshold of number of nonzeros under what the
+		%> @param 'thres', int: (optional) the threshold of number of nonzeros under what the
 		%>            rows/columns are removed.
 		%> @param 'only_forward', bool: (optional) True for applying only the forward passes of removal.
 		%> @param 'npasses', int: (optional) the number of passes to run, by default it goes until the
@@ -737,7 +737,7 @@ classdef Faust
 		%> @retval G The optimized Faust.
 		%======================================================================
 		function G = pruneout(F, varargin)
-			nnz_tres = 0;
+			thres = 0;
 			only_forward = false;
 			npasses = -1;
 			argc = length(varargin);
@@ -750,11 +750,11 @@ classdef Faust
 							else
 								only_forward = varargin{i+1};
 							end
-						case 'nnz_tres'
+						case 'thres'
 							if(argc == i || ~ isnumeric(varargin{i+1}) || varargin{i+1}-floor(varargin{i+1}) > 0 || varargin{i+1} <0 )
-								error('nnz_tres keyword arg. is not followed by a positive integer')
+								error('thres keyword arg. is not followed by a positive integer')
 							end
-							nnz_tres = varargin{i+1};
+							thres = varargin{i+1};
 						case 'npasses'
 							if(argc == i ||  ~ isnumeric(varargin{i+1}) || varargin{i+1}-floor(varargin{i+1}) > 0)
 								error('npasses keyword arg. is not followed by an integer')
@@ -769,9 +769,9 @@ classdef Faust
 				end
 			end
 			if(F.isReal)
-				G = matfaust.Faust(F, mexFaustReal('pruneout', F.matrix.objectHandle, nnz_tres, npasses, only_forward));
+				G = matfaust.Faust(F, mexFaustReal('pruneout', F.matrix.objectHandle, thres, npasses, only_forward));
 			else
-				G = matfaust.Faust(F, mexFaustCplx('pruneout', F.matrix.objectHandle, nnz_tres, npasses, only_forward));
+				G = matfaust.Faust(F, mexFaustCplx('pruneout', F.matrix.objectHandle, thres, npasses, only_forward));
 			end
 		end
 
