@@ -56,7 +56,7 @@
 %> % factorize it
 %> FH2 = hierarchical(H, 'squaremat');
 %> % test the relative error
-%> norm(FH-FH2, 'fro')/norm(FH, 'fro') % the result is 1.1015e-16, the factorization is accurate
+%> norm(FH-FH2, 'fro')/norm(FH, 'fro') % the result is about 1e-16, the factorization is accurate
 %>@endcode
 %>FH =
 %>

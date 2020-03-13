@@ -614,7 +614,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016):
         >>> # factorize it
         >>> FH2 = hierarchical(H, 'squaremat');
         >>> # test the relative error
-        >>> (FH-FH2).norm('fro')/FH.norm('fro') # the result is 1.1015e-16, the factorization is accurate
+        >>> (FH-FH2).norm('fro')/FH.norm('fro') # the result is about 1e-16, the factorization is accurate
         >>> FH
         Faust size 32x32, density 0.3125, nnz_sum 320, 5 factor(s):
         - FACTOR 0 (real) SPARSE, size 32x32, density 0.0625, nnz 64
