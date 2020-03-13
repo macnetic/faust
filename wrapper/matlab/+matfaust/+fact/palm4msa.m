@@ -27,7 +27,7 @@
 %>
 %> Faust size 500x32, density 0.22025, nnz_sum 3524, 2 factor(s):
 %> - FACTOR 0 (real) SPARSE, size 500x32, density 0.15625, nnz 2500
-%> - FACTOR 1 (real) SPARSE, size 32x32, density 1, nnz 1024
+%> - FACTOR 1 (real) DENSE, size 32x32, density 1, nnz 1024
 %>
 %>
 %==========================================================================================

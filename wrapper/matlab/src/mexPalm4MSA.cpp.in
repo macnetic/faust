@@ -88,7 +88,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	testCoherencePALM4MSA(prhs[0],presentFields);
 	//     mexPrintf(" NUMBER FIELDS %d\n",presentFields.size());
 	//	///////////// PALM4MSA LAUNCH ///////////////
-	try{
+	try
+	{
 
 		//	// creation des parametres
 		auto params = mxArray2FaustParamsPALM4MSA<SCALAR,FPP2>(prhs[0], presentFields);
@@ -109,23 +110,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		//		 plhs[0]=mxCreateDoubleScalar((FPP2) complex<FPP2>(lambda).real()); //trick to handle compilation with templates
 		//
 		std::vector<Faust::MatDense<SCALAR,Cpu> > facts;
-		std::vector<Faust::MatGeneric<SCALAR, Cpu>*> sp_facts;
+		std::vector<Faust::MatGeneric<SCALAR, Cpu>*> rf_facts;
 		facts=palm.get_facts();
 
+		int sparse_weight;
 		for(typename std::vector<Faust::MatDense<SCALAR, Cpu>>::iterator it = facts.begin(); it != facts.end(); it++)
 		{
-			Faust::MatSparse<SCALAR, Cpu> * M = new Faust::MatSparse<SCALAR, Cpu>(*it);
-			sp_facts.push_back(M);
+			sparse_weight = 2*it->getNonZeros()+it->getNbRow()+1;
+
+			Faust::MatGeneric<SCALAR, Cpu>* M;
+			if(sparse_weight < it->getNbRow()*it->getNbCol())
+				M = new Faust::MatSparse<SCALAR, Cpu>(*it);
+			else
+				M = new Faust::MatDense<SCALAR, Cpu>(*it);
+			rf_facts.push_back(M);
 		}
 
-
-		TransformHelper<SCALAR, Cpu> *F = new TransformHelper<SCALAR, Cpu>(sp_facts, SCALAR(lambda), false, true, /* internal call */ true);
+		TransformHelper<SCALAR, Cpu> *F = new TransformHelper<SCALAR, Cpu>(rf_facts, SCALAR(lambda), false, false, /* internal call */ true);
 		plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(F);
 
-		for(typename std::vector<Faust::MatGeneric<SCALAR,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
-		{
-			delete *it;
-		}
 		delete params;
 	}
 	catch (const std::exception& e)
