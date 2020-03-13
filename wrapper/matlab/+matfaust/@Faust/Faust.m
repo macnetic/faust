@@ -730,14 +730,15 @@ classdef Faust
 		%> @param F: the Faust to optimize.
 		%> @param 'thres', int: (optional) the threshold of number of nonzeros under what the
 		%>            rows/columns are removed.
-		%> @param 'only_forward', bool: (optional) True for applying only the forward passes of removal.
-		%> @param 'npasses', int: (optional) the number of passes to run, by default it goes until the
-		%>            optimal Faust is obtained.
 		%>
 		%> @retval G The optimized Faust.
 		%======================================================================
 		function G = pruneout(F, varargin)
 			thres = 0;
+			% hidden parameters: useless except for debug
+			% @param 'only_forward', bool: (optional) True for applying only the forward passes of removal.
+			% @param 'npasses', int: (optional) the number of passes to run, by default it goes until the
+			%            optimal Faust is obtained.
 			only_forward = false;
 			npasses = -1;
 			argc = length(varargin);

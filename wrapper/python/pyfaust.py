@@ -357,7 +357,7 @@ class Faust:
         """
         return F.getH()
 
-    def pruneout(F, thres=0, npasses='auto', only_forward=False):
+    def pruneout(F, thres=0, **kwargs):
         """
         Returns a Faust optimized by removing useless zero rows and columns as many times as needed.
 
@@ -365,14 +365,22 @@ class Faust:
             F: the Faust to optimize.
             thres: the threshold of number of nonzeros under what the
             rows/columns are removed.
-            only_forward: True for applying only the forward passes of removal.
-            npasses: the number of passes to run, by default it goes until the
-            optimal Faust is obtained.
+
 
         Returns:
             The optimized Faust.
 
         """
+        # hidden parameters (useless unless for debug)
+        #            only_forward: True for applying only the forward passes of removal.
+        #            npasses: the number of passes to run, by default it goes until the
+        #            optimal Faust is obtained.
+        npasses = 'auto'
+        only_forward = False
+        if('npasses' in kwargs):
+            npasses = kwargs['npasses']
+        if('only_forward' in kwargs):
+            only_forward = kwargs['only_forward']
         if(npasses == 'auto'):
             npasses = -1
         elif(not isinstance(npasses, int)):
@@ -384,6 +392,7 @@ class Faust:
         if(not isinstance(thres, int)):
             raise TypeError('thres '
                             'must be a int.')
+        print("only_forward=", only_forward, "npasses=", npasses)
         F_prunedout = Faust(core_obj=F.m_faust.zpruneout(thres, npasses,
                                                          only_forward))
         return F_prunedout

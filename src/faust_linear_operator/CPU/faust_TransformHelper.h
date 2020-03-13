@@ -180,7 +180,10 @@ namespace Faust {
 			double normFro() const;
 			double normInf() const;
 			TransformHelper<FPP,Cpu>* normalize(const int meth = 2/* 1 for 1-norm, 2 for 2-norm, MAX for inf-norm */) const;
-
+			/**
+			 * \param only_forward: True for applying only the forward passes of removal.
+			 * \param npasses: the number of passes to run, by default it goes until the optimal Faust is obtained.
+			 */
 			TransformHelper<FPP,Cpu>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
 			TransformHelper<FPP,Cpu>* optimize_storage(const bool time=true);
 			TransformHelper<FPP,Cpu>* optimize(const bool transp=false);
