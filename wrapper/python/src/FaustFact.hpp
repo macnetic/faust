@@ -305,21 +305,23 @@ FaustCoreCpp<FPP>* fact_palm4MSA_gen(FPP* mat, unsigned int num_rows, unsigned i
     FPP2 lambda = palm->get_lambda();
 
     std::vector<Faust::MatDense<FPP,Cpu> > facts;
-    std::vector<Faust::MatGeneric<FPP, Cpu>*> sp_facts;
+    std::vector<Faust::MatGeneric<FPP, Cpu>*> rf_facts;
     facts=palm->get_facts();
 
-    for(typename std::vector<Faust::MatDense<FPP, Cpu>>::iterator it = facts.begin(); it != facts.end(); it++)
-    {
-        Faust::MatSparse<FPP, Cpu> * M = new Faust::MatSparse<FPP, Cpu>(*it);
-        sp_facts.push_back(M);
-    }
+	int sparse_weight;
+	for(typename std::vector<Faust::MatDense<FPP, Cpu>>::iterator it = facts.begin(); it != facts.end(); it++)
+	{
+		sparse_weight = 2*it->getNonZeros()+it->getNbRow()+1;
+		Faust::MatGeneric<FPP, Cpu>* M;
+		if(sparse_weight < it->getNbRow()*it->getNbCol())
+			M = new Faust::MatSparse<FPP, Cpu>(*it);
+		else
+			M = new Faust::MatDense<FPP, Cpu>(*it);
+		rf_facts.push_back(M);
+	}
 
-    Faust::TransformHelper<FPP, Cpu> *th = new Faust::TransformHelper<FPP,Cpu>(sp_facts, FPP(lambda), false, true, /* internal call */ true);
+    Faust::TransformHelper<FPP, Cpu> *th = new Faust::TransformHelper<FPP,Cpu>(rf_facts, FPP(lambda), false, false, /* internal call */ true);
 
-    for(typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::iterator it = sp_facts.begin(); it != sp_facts.end(); it++)
-    {
-        delete *it;
-    }
     if(p->is_verbose) th->display();
 
     core = new FaustCoreCpp<FPP>(th);
