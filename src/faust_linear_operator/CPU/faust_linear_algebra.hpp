@@ -822,6 +822,7 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatDense<FPP,DEVICE>*
 		if(transconj_flags.size() > idx)
 			transconj_flags[idx] = 'N';
 		// update complexity around the new factor
+
 		if(facts.size() > 2)
 		{
 			if(idx > 0)
@@ -833,6 +834,121 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatDense<FPP,DEVICE>*
 	}
 	// last mul
 	gemm(*facts[0], *facts[1], out, alpha, beta_out, transconj_flags[0], transconj_flags.size()>1?transconj_flags[1]:'N');
+	facts.erase(facts.begin(), facts.end());
+	// delete all tmp facts
+	for(auto Tit = tmp_facts.begin(); Tit != tmp_facts.end(); Tit++)
+	{
+		delete *Tit;
+	}
+}
+
+template<typename FPP, Device DEVICE>
+void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
+{
+	Faust::MatSparse<FPP,Cpu> * tmp_sp1,* tmp_sp2;
+	Faust::MatDense<FPP,Cpu> * tmp_ds1,* tmp_ds2;
+	std::vector<Faust::MatGeneric<FPP,DEVICE>*> tmp_facts; //temporary product results
+	Faust::MatDense<FPP, DEVICE>* tmp;
+	int nfacts = facts.size();
+	Faust::MatGeneric<FPP,DEVICE> *Si, *Sj;
+	std::vector<int> complexity(nfacts-1);
+	auto calc_cost = [](Faust::MatGeneric<FPP,DEVICE> *Si, Faust::MatGeneric<FPP,DEVICE> *Sj)
+	{
+		Faust::MatSparse<FPP,Cpu> * tmp_sp;
+		int complexity;
+		if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si))
+			complexity = Si->getNonZeros() * Sj->getNbCol();
+		else // Si dense
+			if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj))
+				complexity = Si->getNbRow() * Sj->getNonZeros();
+		else // Si and Sj dense
+			complexity = Si->getNbRow() * Si->getNbCol() * Sj->getNbCol();
+		return complexity;
+	};
+	std::string type_err = "Sj shouldn't be anything else than a MatSparse or MatDense.";
+	auto reverse_transp_flag = [](char & flag)
+	{
+		switch(flag)
+		{
+			case 'T':
+			case 'H':
+				return 'N';
+			case 'N':
+				return 'H';
+		}
+	};
+	auto prod_SiSj = [&reverse_transp_flag, &type_err, &tmp_sp1, &tmp_sp2, &tmp_ds1, &tmp_ds2, &transconj_flags](Faust::MatGeneric<FPP,DEVICE> *Si, Faust::MatGeneric<FPP,DEVICE> *Sj, Faust::MatDense<FPP,DEVICE> &tmp, char Si_flag, char Sj_flag, FPP alpha=1.0, FPP beta=0.0)
+	{
+		if(tmp_sp1 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si))
+		{
+			if(tmp_sp2 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj))
+			{
+				Faust::MatDense<FPP,Cpu> tmp_ds2_(*tmp_sp2);
+				return spgemm(*tmp_sp1, tmp_ds2_, tmp, (FPP) alpha, (FPP) beta, Si_flag, Sj_flag);
+			}
+			else if(! (tmp_ds2 = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Sj)))
+				throw std::runtime_error(type_err);
+			spgemm(*tmp_sp1, *tmp_ds2, tmp, (FPP) alpha, (FPP) beta, Si_flag, Sj_flag);
+		}
+		else
+		{
+			// Si is dense
+			tmp_ds1 = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Si);
+			if(tmp_sp2 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj))
+			{
+				// Sj is sparse
+				char Si_flag_inv = reverse_transp_flag(Si_flag);
+				char Sj_flag_inv = reverse_transp_flag(Sj_flag);
+				spgemm(*tmp_sp2, *tmp_ds1, tmp, (FPP) alpha, (FPP) beta, Sj_flag_inv, Si_flag_inv);
+				if(typeid(FPP) == typeid(std::complex<double>) || typeid(FPP) == typeid(std::complex<float>))
+				{
+					tmp.conjugate(false);
+					tmp.transpose();
+				}
+				else
+					tmp.transpose();
+			}
+			else if(! (tmp_ds2 = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Sj)))
+				throw std::runtime_error(type_err);
+			else
+				gemm(*tmp_ds1, *tmp_ds2, tmp, (FPP) alpha, (FPP) beta, Si_flag, Sj_flag);
+		}
+	};
+
+	for(int i = 0; i <nfacts-1; i++)
+	{
+		Si = facts[i];
+		Sj = facts[i+1];
+		complexity[i] = calc_cost(Si, Sj);
+	}
+	int idx; // marks the factor to update with a product of contiguous factors
+	bool multiplying_tmp_factor = false; // allows to avoid to allocate uselessly a tmp factor if Si or Sj are already tmp factors
+	while(facts.size() > 2)
+	{
+		// find the least complex product facts[idx]*facts[idx+1]
+		idx = distance(complexity.begin(), min_element(complexity.begin(), complexity.end()));
+		Si = facts[idx];
+		Sj = facts[idx+1];
+		tmp = new Faust::MatDense<FPP, DEVICE>();
+		tmp_facts.push_back(tmp);
+		prod_SiSj(Si, Sj, *tmp, transconj_flags[transconj_flags.size()>idx?idx:0], transconj_flags[transconj_flags.size()>idx+1?idx+1:0]);
+		facts.erase(facts.begin()+idx+1);
+		complexity.erase(complexity.begin()+idx); //complexity size == facts size - 1
+		facts[idx] = tmp;
+		if(transconj_flags.size() > idx)
+			transconj_flags[idx] = 'N';
+		// update complexity around the new factor
+		if(facts.size() > 2)
+		{
+			if(idx > 0)
+				complexity[idx-1] = calc_cost(facts[idx-1], facts[idx]);
+			if(idx < facts.size()-1)
+				complexity[idx] = calc_cost(facts[idx], facts[idx+1]);
+		}
+		multiplying_tmp_factor = false;
+	}
+	// last mul
+	prod_SiSj(facts[0], facts[1], out, transconj_flags[0], transconj_flags.size()>1?transconj_flags[1]:'N', alpha, beta_out);
 	facts.erase(facts.begin(), facts.end());
 	// delete all tmp facts
 	for(auto Tit = tmp_facts.begin(); Tit != tmp_facts.end(); Tit++)
@@ -917,6 +1033,12 @@ void Faust::multiply_order_opt_first_best(std::vector<Faust::MatDense<FPP,DEVICE
 template<typename FPP, Device DEVICE>
 void Faust::multiply_order_opt(const int mode, std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
 {
+	if(mode == 4)
+	{
+		// no need to copy/convert for this method
+		Faust::multiply_order_opt_all_best(facts, out, alpha, beta_out, transconj_flags);
+		return;
+	}
 	std::vector<Faust::MatDense<FPP,DEVICE>*> dfacts;
 	std::vector<Faust::MatDense<FPP,DEVICE>*> dfacts_to_del;
 	Faust::MatDense<FPP,DEVICE> * df = nullptr;

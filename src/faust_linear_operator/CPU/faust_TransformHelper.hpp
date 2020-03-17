@@ -43,6 +43,7 @@
 #include "faust_WHT.h"
 #include "faust_linear_algebra.h"
 #include <chrono>
+#include <cstdlib>
 
 namespace Faust {
 
@@ -232,6 +233,7 @@ namespace Faust {
 				case 1:
 				case 2:
 				case 3:
+				case 4:
 					//					this->transform->data.push_back(const_cast<Faust::MatDense<FPP,Cpu>*>(&A)); // it's ok
 					if(transpose)
 					{
@@ -250,10 +252,10 @@ namespace Faust {
 					Faust::multiply_order_opt(mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), {isTransposed2char()});
 					//					this->transform->data.erase(this->transform->data.end()-1);
 					break;
-				case 4:
+				case 5:
 					M = this->transform->multiply_par(A, isTransposed2char());
 					break;
-				case 5:
+				case 6:
 					M = this->transform->multiply_omp(A, isTransposed2char());
 					break;
 				default:
@@ -357,6 +359,13 @@ namespace Faust {
 			else
 			{
 				t_opt = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0, false, false, true);
+				cout << "best method measured in time is: " << opt_meth << endl;
+#if DEBUG_OPT_MUL
+				cout << "all times: ";
+				for(int i = 0; i < NMETS; i ++)
+					cout << times[i].count() << " ";
+				cout << endl;
+#endif
 				t_opt->set_mul_order_opt_mode(opt_meth);
 				// leave the current Faust unchanged
 				this->set_mul_order_opt_mode(old_meth);
@@ -520,7 +529,7 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::set_mul_order_opt_mode(const int mul_order_opt_mode)
 		{
 			this->mul_order_opt_mode = mul_order_opt_mode;
-			std::cout << "mul order opt mode (0 when disabled): " << this->mul_order_opt_mode << std::endl;
+			std::cout << "changed mul order opt mode to (0 when disabled): " << this->mul_order_opt_mode << std::endl;
 		}
 
 
@@ -1384,9 +1393,8 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */) {
 			if(!TransformHelper<FPP,Cpu>::seed_init) {
-				srand(time(NULL)); //seed init needed for MatDense rand generation
+				std::srand(std::time(NULL)); //seed init needed for MatDense rand generation
 				TransformHelper<FPP,Cpu>::seed_init = true;
-
 			}
 			// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
 			std::uniform_int_distribution<int> num_fac_distr(min_num_factors, max_num_factors);

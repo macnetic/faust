@@ -1,0 +1,117 @@
+/****************************************************************************/
+/*                              Description:                                */
+/* unitary test for testing multiplication by faust with real  scalar       */
+/*                                                                          */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.inria.fr>                         */
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2020):   Hakim HADJ-DJILANI									*/
+/*  Nicolas Bellot, Adrien Leman, Thomas Gautrais,      					*/
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+/****************************************************************************/
+#include "faust_Timer.h"
+#include <string>
+#include <sstream>
+#include "faust_TransformHelper.h"
+
+#include <iostream>
+#include <iomanip>
+#include <chrono>
+/** \brief unitary test for testing multiplication by faust (method 4 compared to methods 3 and 0)
+*/
+
+typedef @TEST_FPP@ FPP;
+
+
+using namespace Faust;
+using namespace std;
+int main(int argc, char* argv[])
+{
+	if (typeid(FPP) == typeid(double))
+  	{
+		cout<<"floating point precision == double"<<endl;
+  	}
+
+  	if (typeid(FPP) == typeid(float))
+  	{
+		cout<<"floating point precision == float"<<endl;
+  	}
+
+	// static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
+	int min_size = 10;
+	int max_size = 1024;
+	unsigned int min_nfacts = 5;
+	unsigned int max_nfacts = 10;
+	std::srand(std::time(0));
+	max_nfacts = static_cast<unsigned int>(std::rand()*(float)max_nfacts/RAND_MAX)+min_nfacts;
+	RandFaustType rt = MIXED;
+	if(argc > 1)
+		rt = SPARSE;
+	auto F = TransformHelper<FPP,Cpu>::randFaust(rt, min_nfacts, max_nfacts, min_size, max_size, .4f);
+
+	vector<Faust::MatGeneric<FPP,Cpu>*> facts, facts2;
+	for(auto ite=F->begin(); ite != F->end(); ite++)
+	{
+		facts.push_back(*ite);
+		facts2.push_back(*ite);
+	}
+	Faust::MatDense<FPP,Cpu> out, out2;
+	FPP beta = .0;
+	FPP alpha = 1.0;
+	std::chrono::duration<double> t_opt, t_nonopt, t_optdense;
+	auto t_start = std::chrono::system_clock::now();
+	Faust::multiply_order_opt_all_best(facts, out, alpha, beta);
+	t_opt = std::chrono::system_clock::now() - t_start;
+	cout << "out.norm:" << out.norm() << endl;
+	t_start = std::chrono::system_clock::now();
+	auto M = F->get_product();
+	t_nonopt = std::chrono::system_clock::now() - t_start;
+	cout << "F.get_product().norm()" << M.norm() << endl;
+	F->display();
+	auto diff = std::abs(out.norm()-M.norm())/M.norm();
+	cout << "diff=" << diff << endl;
+	t_start = std::chrono::system_clock::now();
+	Faust::multiply_order_opt(/*mode where all facts are converted to dense before computing optimized matrix chain */3, facts2, out2, alpha, beta);
+	t_optdense = std::chrono::system_clock::now()-t_start;
+	cout << "t_opt:" << t_opt.count() << " t_nonopt: " << t_nonopt.count() << " t_optdense:" << t_optdense.count()  << " nfacts:" << F->size()<< ((t_opt.count() < t_optdense.count() && t_opt.count() < t_nonopt.count())?" t_opt is the best conf.":"") << endl;
+	F->display();
+//	cout << "extra test:" << endl;
+//	auto A = Faust::MatDense<FPP,Cpu>::randMat(F->getNbCol(), F->getNbRow());
+//	F->set_mul_order_opt_mode(4);
+//	cout << F->multiply(*A).norm() << endl;
+//	F->set_mul_order_opt_mode(5);
+//	cout << F->multiply(*A).norm() << endl;
+	assert(diff < .002);
+	return 0;
+}
