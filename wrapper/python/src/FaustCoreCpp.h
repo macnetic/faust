@@ -100,7 +100,7 @@ class FaustCoreCpp
     bool save_mat_file(const char* filepath) const;
     FaustCoreCpp<FPP>* optimize_storage(const bool time=false);
     FaustCoreCpp<FPP>* optimize(const bool transp=false);
-    FaustCoreCpp<FPP>* optimize_mul(const bool transp=false, const bool inplace=false);
+    FaustCoreCpp<FPP>* optimize_mul(const bool transp=false, const bool inplace=false, const int nsamples=1);
     const bool isTransposed();
     FaustCoreCpp<FPP>* transpose();
     FaustCoreCpp<FPP>* conjugate();

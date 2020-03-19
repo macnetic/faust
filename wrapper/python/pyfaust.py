@@ -1691,7 +1691,7 @@ class Faust:
         F_opt = Faust(core_obj=F.m_faust.optimize(transp))
         return F_opt
 
-    def optimize_time(F, transp=False, inplace=False):
+    def optimize_time(F, transp=False, inplace=False, nsamples=1):
         """
         Returns a Faust configured with the quickest Faust-matrix multiplication mode (benchmark ran on the fly).
 
@@ -1705,6 +1705,10 @@ class Faust:
             Faust with the optimization enabled. If True, F is returned
             otherwise a new Faust object is returned.
             transp: True in order to optimize the Faust according to its transpose.
+            nsamples: the number of Faust-Dense matrix products
+            calculated in order to measure time taken by each method (it could matter
+            to discriminate methods when the performances are similar). By default,
+            only one product is computed to evaluate the method.
 
         Returns:
             The optimized Faust.
@@ -1713,10 +1717,11 @@ class Faust:
 
         """
         if(inplace):
-            F.m_faust.optimize_mul(transp)
+            F.m_faust.optimize_mul(transp, inplace, nsamples)
             return F
         else:
-            F_opt = Faust(core_obj=F.m_faust.optimize_mul(transp, inplace))
+            F_opt = Faust(core_obj=F.m_faust.optimize_mul(transp, inplace,
+                                                          nsamples))
             return F_opt
 
 pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__

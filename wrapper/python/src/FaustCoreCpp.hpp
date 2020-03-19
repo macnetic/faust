@@ -369,13 +369,13 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::transpose()
 }
 
 template<typename FPP>
-FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::optimize_mul(const bool transp /* deft to false*/, const bool inplace /* default to false */)
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::optimize_mul(const bool transp /* deft to false*/, const bool inplace /* default to false */, const int nsamples /* default to 1*/)
 {
     if(inplace)
-        this->transform->optimize_multiply(transp);
+        this->transform->optimize_multiply(transp, inplace, nsamples);
     else
     {
-        auto th = this->transform->optimize_multiply(transp, inplace);
+        auto th = this->transform->optimize_multiply(transp, inplace, nsamples);
         return new FaustCoreCpp<FPP>(th);
     }
 #ifdef FAUST_VERBOSE

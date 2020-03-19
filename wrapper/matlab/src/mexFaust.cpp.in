@@ -773,13 +773,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		if(!strcmp("optimize_mul", cmd))
 		{
-			if(nrhs != 4)
+			if(nrhs != 5)
 				mexErrMsgTxt("optimize_mul mex error: invalid number of arguments.");
 			if(nlhs != 1 && nlhs != 0)
 				mexErrMsgTxt("optimize_mul mex error: this function doesn't return more than one argument.");
 			bool transp = (bool) mxGetScalar(prhs[2]);
 			bool inplace = (bool) mxGetScalar(prhs[3]);
-			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->optimize_multiply(transp, inplace);
+			int nsamples = (int) mxGetScalar(prhs[4]);
+			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->optimize_multiply(transp, inplace, nsamples);
 			if(inplace /*th == nullptr*/)
 				return;
 			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);

@@ -187,7 +187,7 @@ namespace Faust {
 			TransformHelper<FPP,Cpu>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
 			TransformHelper<FPP,Cpu>* optimize_storage(const bool time=true);
 			TransformHelper<FPP,Cpu>* optimize(const bool transp=false);
-			TransformHelper<FPP,Cpu>* optimize_multiply(const bool transp=false, const bool inplace=false);
+			TransformHelper<FPP,Cpu>* optimize_multiply(const bool transp=false, const bool inplace=false, const int nsamples=1);
 			/**
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 

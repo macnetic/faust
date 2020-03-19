@@ -331,14 +331,17 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_multiply(const bool transp /* deft to false */, const bool inplace)
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_multiply(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
 		{
 			TransformHelper<FPP,Cpu>* t_opt = nullptr;
 			int NMETS = 5; //skip openmp method (not supported on macOS)
 			std::chrono::duration<double> * times = new std::chrono::duration<double>[NMETS]; //use heap because of VS14 (error C3863)
 			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(transp?this->getNbRow():this->getNbCol(), 2048);
 			int old_meth = this->get_mul_order_opt_mode();
-			int nmuls = 1, opt_meth=0;
+			int nmuls = nsamples, opt_meth=0;
+#if DEBUG_OPT_MUL
+			cout << "nsamples used to measure time: " << nmuls << endl;
+#endif
 			for(int i=0; i < NMETS; i++)
 			{
 				this->set_mul_order_opt_mode(i);

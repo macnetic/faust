@@ -802,20 +802,22 @@ cdef class FaustCore:
         core._isReal = self._isReal
         return core
 
-    def optimize_mul(self, transp=False, inplace=False):
+    def optimize_mul(self, transp=False, inplace=False, nsamples=1):
         if(inplace):
             if(self._isReal):
-                self.core_faust_dbl.optimize_mul(transp, inplace)
+                self.core_faust_dbl.optimize_mul(transp, inplace, nsamples)
             else:
-                self.core_faust_cplx.optimize_mul(transp, inplace)
+                self.core_faust_cplx.optimize_mul(transp, inplace, nsamples)
         else:
             core = FaustCore(core=True)
             if(self._isReal):
                 core.core_faust_dbl = self.core_faust_dbl.optimize_mul(transp,
-                                                                      inplace)
+                                                                      inplace,
+                                                                      nsamples)
             else:
                 core.core_faust_cplx = self.core_faust_cplx.optimize_mul(transp,
-                                                                     inplace)
+                                                                         inplace,
+                                                                         nsamples)
             core._isReal = self._isReal
             return core
 

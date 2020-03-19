@@ -804,8 +804,8 @@ classdef Faust
 		%> @retval OF The optimized Faust.
 		%>
 		%> @note this function is still experimental, you might use manually
-        %> Faust.optimize_time, Faust.optimize_memory or Faust.pruneout to be
-        %> more specific about the optimization to proceed.
+		%> Faust.optimize_time, Faust.optimize_memory or Faust.pruneout to be
+		%> more specific about the optimization to proceed.
 		%>
 		%>
 		%> @b See @b also Faust.optimize_time, Faust.optimize_memory, Faust.pruneout
@@ -829,20 +829,26 @@ classdef Faust
 
 		%===============================
 		%> @brief Returns a Faust configured with the quickest Faust-matrix multiplication mode (benchmark ran on the fly).
-        %> @note this function launches a small benchmark on the fly. Basically, the methods
-        %> available differ by the order used to compute the matrix chain
-        %> multiplication or by the use (or unuse) of threads for the calculation of intermediary
-        %> matrix products of the Faust.
+		%> @note this function launches a small benchmark on the fly. Basically, the methods
+		%> available differ by the order used to compute the matrix chain
+		%> multiplication or by the use (or unuse) of threads for the calculation of intermediary
+		%> matrix products of the Faust.
 		%>
 		%>
 		%> @b Usage<br/>
 		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(F) returns a new object with the best product method enabled.<br/>
 		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'inplace', @b true) modify directly F instead of creating a new Faust (i.e. OF references the same object as F).<br/>
-		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'transp', @b true) try to optimize the Faust transpose instead of the Faust itself.
+		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'transp', @b true) try to optimize the Faust transpose instead of the Faust itself. <br/>
+		%> &nbsp;&nbsp;&nbsp; @b OF = @b optimize_time(@b F, @b 'nsamples', @b 10) benchmark product methods by computing 10 product instead of one by default.
 		%>
 		%> @param F the Faust object.
 		%> @param 'inplace', bool (optional) default to false. If true the current Faust is modified directly.
 		%> @param 'transp', bool (optional) default to false. If true optimize the Faust according to its transpose.
+		%> @param 'nsamples', int (optional) default to 1.The number of Faust-Dense matrix products
+		%> calculated in order to measure time taken by each method (it could matter
+		%> to discriminate methods when the performances are similar). By default,
+		%> only one product is computed to evaluate the method.
+ 
 		%>
 		%> @retval OF The optimized Faust.
 		%>
@@ -851,6 +857,7 @@ classdef Faust
 		function OF = optimize_time(F, varargin)
 			transp = false;
 			inplace = false;
+			nsamples = 1;
 			argc = length(varargin);
 			if(argc > 0)
 				for i=1:argc
@@ -867,6 +874,12 @@ classdef Faust
 							else
 								inplace = varargin{i+1};
 							end
+						case 'nsamples'
+							if(argc == i || ~ isscalar(varargin{i+1}) || floor(varargin{i+1}) < varargin{i+1})
+								error('nsamples keyword argument is not followed by an integer')
+							else
+								nsamples = varargin{i+1}
+							end
 						otherwise
 							if(isstr(varargin{i}))
 								error([ varargin{i} ' unrecognized argument'])
@@ -876,16 +889,16 @@ classdef Faust
 			end
 			if(inplace)
 				if(F.isReal)
-					mexFaustReal('optimize_mul', F.matrix.objectHandle, transp, inplace);
+					mexFaustReal('optimize_mul', F.matrix.objectHandle, transp, inplace, nsamples);
 				else % cplx Faust
-					mexFaustCplx('optimize_mul', F.matrix.objectHandle, transp, inplace);
+					mexFaustCplx('optimize_mul', F.matrix.objectHandle, transp, inplace, nsamples);
 				end
 				OF = F
 			else
 				if(F.isReal)
-					OF = matfaust.Faust(F, mexFaustReal('optimize_mul', F.matrix.objectHandle, transp, inplace));
+					OF = matfaust.Faust(F, mexFaustReal('optimize_mul', F.matrix.objectHandle, transp, inplace, nsamples));
 				else % cplx Faust
-					OF = matfaust.Faust(F, mexFaustCplx('optimize_mul', F.matrix.objectHandle, transp, inplace));
+					OF = matfaust.Faust(F, mexFaustCplx('optimize_mul', F.matrix.objectHandle, transp, inplace, nsamples));
 				end
 			end
 		end
