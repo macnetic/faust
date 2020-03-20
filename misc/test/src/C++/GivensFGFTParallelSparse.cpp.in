@@ -26,7 +26,8 @@ int main()
 
 	sLap = Lap;
 	int J = 5472; //TODO: should be retrieved from .mat file (not be a hard-coded value)
-	GivensFGFTParallel<FPP,Cpu, FPP> algo(sLap,J,/*t=*/ Lap.getNbRow()/2);
+	GivensFGFTParallel<FPP,Cpu, FPP> algo(sLap,J,/*t=*/ Lap.getNbRow()/2,
+			/*verbosity */ 0, /* stoppingError */ 0.0, /* errIsRel */ true, /* enable_large_Faust */ true);
 
 	algo.compute_facts();
 

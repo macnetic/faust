@@ -11,6 +11,8 @@
 
 namespace Faust {
 
+	template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+		class GivensFGFTParallelGen;
 
 	template<typename FPP, Device DEVICE, typename FPP2 = float, typename FPP4 = FPP>
 		class GivensFGFTGen {
@@ -29,6 +31,7 @@ namespace Faust {
 			 *    <https://hal.inria.fr/hal-01416110>
 			 *
 			 */
+			friend class Faust::GivensFGFTParallelGen<FPP, DEVICE, FPP2, FPP4>;
 			/** \brief Temporary storage matrix for maximization of L. */
 			//			Faust::MatDense<FPP4,DEVICE> C;
 			/** \brief Column vector for the rowwise minimization of C (i.e. maximization of L). */

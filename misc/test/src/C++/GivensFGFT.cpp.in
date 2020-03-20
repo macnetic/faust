@@ -28,9 +28,8 @@ int main()
 	J = init_int_from_matio(conf_file, "J");
 
 	// Execute the algorithm
-	GivensFGFT<FPP,Cpu,FPP> algo(Lap,J);
+	GivensFGFT<FPP,Cpu,FPP> algo(Lap, J, /*verbosity */ 0, /* stoppingError */ 0.0, /* errIsRel */ true, /* enable_large_Faust */ true);
 	algo.compute_facts();
-
 	// Compare pivot choices along the iterations (between matlab ref and C++ impl.)
 	test_pivot_choices(&algo, conf_file);
 

@@ -26,7 +26,8 @@ int main()
 	init_faust_mat_from_matio(Lap,conf_file, "Lap");
 	J = init_int_from_matio(conf_file, "J");
 
-	GivensFGFTParallelComplex<complex<FPP>,Cpu, FPP> algo(Lap, J,/*t=*/ Lap.getNbRow()/2);
+	GivensFGFTParallelComplex<complex<FPP>,Cpu, FPP> algo(Lap, J,/*t=*/ Lap.getNbRow()/2,
+			/*verbosity */ 0, /* stoppingError */ 0.0, /* errIsRel */ true, /* enable_large_Faust */ true);
 
 	algo.compute_facts();
 
