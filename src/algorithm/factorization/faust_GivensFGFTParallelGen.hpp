@@ -4,12 +4,12 @@
 #include <omp.h>
 #endif
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTParallelGen(int t, Faust::GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg) : t(t), fact_nrots(0), alg(alg)
 {
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::max_L()
 {
 	// 	  matlab ref
@@ -50,7 +50,7 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::max_L()
 #endif
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::update_fact_nz_inds(int p, int q)
 {
 	// matlab ref
@@ -76,7 +76,7 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::update_fact_nz_inds(int p, in
 #endif
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::loop_update_fact()
 {
 	fact_nrots = 0;
@@ -91,7 +91,7 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::loop_update_fact()
 	finish_fact();
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::choose_pivot()
 {
 	// fact_nz_inds is assumed to be sorted in max_L()
@@ -105,7 +105,7 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2, FPP4>::choose_pivot()
 #endif
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 {
 	// L = S'*L*S
@@ -177,7 +177,7 @@ void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::update_L(Faust::MatSparse<FPP,
 #endif
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::finish_fact()
 {
 	int n = alg.Lap.getNbRow();

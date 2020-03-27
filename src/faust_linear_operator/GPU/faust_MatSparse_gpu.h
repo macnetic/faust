@@ -45,8 +45,8 @@
 #include "faust_exception.h"
 #include <vector>
 
-template <typename FPP,Device DEVICE> class Vect;
-template <typename FPP,Device DEVICE> class MatDense;
+template <typename FPP,FDevice DEVICE> class Vect;
+template <typename FPP,FDevice DEVICE> class MatDense;
 #include "faust_cuda.h"
 #ifdef __COMPILE_TIMERS__
   #include "faust_Timer_gpu.h"
@@ -69,8 +69,8 @@ template <typename FPP,Device DEVICE> class MatDense;
 namespace Faust
 {
 
-    template <typename FPP,Device DEVICE> class MatSparse;
-    template <typename FPP,Device DEVICE> class MatDense;
+    template <typename FPP,FDevice DEVICE> class MatSparse;
+    template <typename FPP,FDevice DEVICE> class MatDense;
 
     template <typename FPP> class MatSparse<FPP,Gpu>
     {

@@ -51,14 +51,13 @@
 #include <random>
 
 namespace Faust {
-	using namespace std;
 
 	template<typename FPP>
 		using transf_iterator = typename Transform<FPP,Cpu>::transf_iterator;
-	template<typename FPP,Device DEVICE> class Transform;
-	template<typename FPP,Device DEVICE> class Vect;
-	template<typename FPP,Device DEVICE> class MatDense;
-	template<typename FPP,Device DEVICE> class MatGeneric;
+	template<typename FPP,FDevice DEVICE> class Transform;
+	template<typename FPP,FDevice DEVICE> class Vect;
+	template<typename FPP,FDevice DEVICE> class MatDense;
+	template<typename FPP,FDevice DEVICE> class MatGeneric;
 
 	enum RandFaustType {
 		DENSE,

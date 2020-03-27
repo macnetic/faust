@@ -78,13 +78,13 @@ namespace Faust
 	template<typename FPP>
 		FPP fabs(std::complex<FPP> c);
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,FDevice DEVICE>
 		class Vect;
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,FDevice DEVICE>
 		class MatDense;
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,FDevice DEVICE>
 		class MatSparse;
 
 
@@ -95,14 +95,14 @@ namespace Faust
    template<typename FPP>
    void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
-	template<typename FPP,Device DEVICE> class Transform;
+	template<typename FPP,FDevice DEVICE> class Transform;
 
 
 
     template<typename FPP>
     class Vect<FPP,Cpu>
     {
-        template<class,Device> friend class Vect;
+        template<class,FDevice> friend class Vect;
 //		friend double Transform<FPP,Cpu>::normL1(const bool transpose) const;
 //		friend Vect<FPP,Cpu> MatDiag<FPP>::multiply(const Vect<FPP,Cpu> & vec) const;
 		friend class Transform<FPP,Cpu>;

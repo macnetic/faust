@@ -42,15 +42,15 @@
 #define __FAUST_CONSTRAINT_TYPE_H__
 
 
-template<typename FPP,Device DEVICE> class ConstraintInt;
-template<typename FPP,Device DEVICE,typename FPP2> class ConstraintFPP;
-template<typename FPP,Device DEVICE> class ConstraintMat;
+template<typename FPP,FDevice DEVICE> class ConstraintInt;
+template<typename FPP,FDevice DEVICE,typename FPP2> class ConstraintFPP;
+template<typename FPP,FDevice DEVICE> class ConstraintMat;
 
 
 //! \struct ConstraintType
 //! \brief This structure defined the type of constraint. See following table for more precision about the type of constraint. <br>
  //! <img src="../../doc/html/constraint.png" alt="constraint parameters" width=800px />
-template<typename FPP,Device DEVICE, typename FPP2=double>
+template<typename FPP,FDevice DEVICE, typename FPP2=double>
 struct ConstraintType
 {
 

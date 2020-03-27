@@ -8,7 +8,7 @@ using namespace Faust;
 #endif
 
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::update_D()
 {
 	// D = spdiag(diag(L))
@@ -21,13 +21,13 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::update_D()
 #endif
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::order_D()
 {
 	order_D(1);
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::order_D(const int order /* -1 for descending order, 1 for ascending order */)
 {
 	ordered_D = Faust::Vect<FPP,DEVICE>(D.size());
@@ -54,7 +54,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::order_D(const int order /* -1 for desc
 	D_order_dir = order;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 const vector<int>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_ord_indices()
 {
 	if(! is_D_ordered)
@@ -63,7 +63,7 @@ const vector<int>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_ord_indices()
 }
 
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 {
 	is_D_ordered = false; // facts (re)computed then D must be reordered
@@ -88,7 +88,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 	}
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust /* deft to false */) :
 Lap(*Lap),  D(Lap->getNbRow()), errs(0), coord_choices(0), q_candidates(new int[Lap->getNbRow()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), Lap_squared_fro_norm(0), facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):1 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), last_fact_permuted(false), J(J), dim_size(Lap->getNbRow()), enable_large_Faust(enable_large_Faust)
 {
@@ -108,19 +108,19 @@ Lap(*Lap),  D(Lap->getNbRow()), errs(0), coord_choices(0), q_candidates(new int[
 	memset(this->D.getData(), 0, sizeof(FPP)*dim_size);
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */) :  GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust)
 {
 	L = new MatSparse<FPP4,DEVICE>(Lap);
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(Faust::MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust/* deft to false */) : GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>(&Lap, J, verbosity, stoppingError, errIsRel,  enable_large_Faust)
 {
 	L = new MatDense<FPP4,DEVICE>(Lap);
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 FPP2 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_err(int j) const
 {
 	if(j > 0 && j < errs.size())
@@ -129,13 +129,13 @@ FPP2 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_err(int j) const
 		throw out_of_range("GivensFGFTGen::get_err(j): j is out of range.");
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 const vector<FPP2>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_errs() const
 {
 	return errs;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 const Faust::Vect<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(const bool ord /* default to false */)
 {
 	if(ord)
@@ -147,7 +147,7 @@ const Faust::Vect<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(const 
 	return D;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 const Faust::Vect<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(const int ord /* default to false */)
 {
 	if(ord != 0)
@@ -159,7 +159,7 @@ const Faust::Vect<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(const 
 	return D;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 template<typename FPP3>
 void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_Dspm(Faust::MatSparse<FPP3,DEVICE> & spD, const bool ord /* default to false */)
 {
@@ -174,13 +174,13 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_Dspm(Faust::MatSparse<FPP3,DEVICE>
 	spD = MatSparse<FPP3,DEVICE>(nat_ord_indices, nat_ord_indices, diag_D, nat_ord_indices.size(), nat_ord_indices.size());
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(FPP* diag_data, const bool ord /* default to false */)
 {
 	get_D(diag_data, ord?1:0);
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(FPP* diag_data, const int ord /* default to false */)
 {
 	const Faust::Vect<FPP,DEVICE>& D_ = get_D(ord);
@@ -188,7 +188,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_D(FPP* diag_data, const int ord /*
 	memcpy(diag_data, src_data_ptr, sizeof(FPP)*D_.size());
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 const Faust::MatDense<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_fourier(const bool ord /* default to false */)
 {
 	Faust::MatDense<FPP4,Cpu> fourier(L->getNbRow(), L->getNbCol());
@@ -208,19 +208,19 @@ const Faust::MatDense<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_
 }
 
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 const Faust::MatGeneric<FPP,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_L() const
 {
 	return *L;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 const vector<pair<int,int>>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_coord_choices() const
 {
 	return coord_choices;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_coord_choice(int j, int& p, int& q) const
 {
 	if(j > 0 && j < coord_choices.size())
@@ -232,26 +232,26 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_coord_choice(int j, int& p, int& q
 		throw out_of_range("GivensFGFTGen::get_coord_choice(j,p,q): j is out of range.");
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 const Faust::MatDense<FPP4,DEVICE>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_Lap() const
 {
 	return Lap;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 const vector<Faust::MatSparse<FPP4,DEVICE>>& GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_facts() const
 {
 	return facts;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform(bool ord)
 {
 	return get_transform(ord?1:0);
 }
 
 
-template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 Faust::Transform<FPP4,DEVICE> GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::get_transform(int ord)
 {
 	//TODO: an optimization is possible by changing type of facts to vector<MatGeneric*> it would avoid copying facts into Transform and rather use them directly. It will need a destructor that deletes them eventually if they weren't transfered to a Transform object before.

@@ -55,15 +55,15 @@ namespace Faust
 {
 
 
-    template<typename FPP,Device DEVICE> class MatDense;
-    template<typename FPP,Device DEVICE> class Transform;
-	template<typename FPP, Device DEVICE, typename FPP2> class HierarchicalFactFGFT;
+    template<typename FPP,FDevice DEVICE> class MatDense;
+    template<typename FPP,FDevice DEVICE> class Transform;
+	template<typename FPP, FDevice DEVICE, typename FPP2> class HierarchicalFactFGFT;
 
     class ConstraintGeneric;
-    template<typename FPP,Device DEVICE, typename FPP2> class Params;
-    //template<typename FPP,Device DEVICE> class ParamsPalm;
+    template<typename FPP,FDevice DEVICE, typename FPP2> class Params;
+    //template<typename FPP,FDevice DEVICE> class ParamsPalm;
     template<typename FPP2> class StoppingCriterion;
-    //template<Device DEVICE> class BlasHandle;
+    //template<FDevice DEVICE> class BlasHandle;
 
     /*! \class Palm4MSA
        * \brief template class implementing Palm4MSA (PALM for Multi-layer Sparse Approximation) factorization algorithm
@@ -74,7 +74,7 @@ namespace Faust
        */
 
 
-    template<typename FPP,Device DEVICE,typename FPP2 = double>
+    template<typename FPP,FDevice DEVICE,typename FPP2 = double>
     class Palm4MSA
     {
 //		friend class Faust::HierarchicalFactFGFT<FPP,DEVICE, FPP2>;

@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace Faust {
-	template<typename FPP,Device DEVICE> class MatGeneric;
+	template<typename FPP,FDevice DEVICE> class MatGeneric;
 	/**
 	 * \brief Fast Walsh-Hadamard Transform.
 	 */

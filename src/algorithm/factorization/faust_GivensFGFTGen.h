@@ -11,10 +11,10 @@
 
 namespace Faust {
 
-	template<typename FPP, Device DEVICE, typename FPP2, typename FPP4>
+	template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 		class GivensFGFTParallelGen;
 
-	template<typename FPP, Device DEVICE, typename FPP2 = float, typename FPP4 = FPP>
+	template<typename FPP, FDevice DEVICE, typename FPP2 = float, typename FPP4 = FPP>
 		class GivensFGFTGen {
 			/**
 			 * \class Faust::GivensFGFTGen

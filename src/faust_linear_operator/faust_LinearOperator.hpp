@@ -6,7 +6,7 @@
 #include "faust_exception.h"
 
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 bool Faust::LinearOperator<FPP,DEVICE>::isReal() const
 {
 	bool isReal = (typeid(FPP) == typeid(double));

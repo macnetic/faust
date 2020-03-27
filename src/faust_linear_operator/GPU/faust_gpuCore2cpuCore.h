@@ -45,7 +45,7 @@
 #include "faust_Transform_gpu.h"
 #include "faust_gpu2cpu.h"
 
-template<typename FPP,Device DEVICE> class Transform;
+template<typename FPP,FDevice DEVICE> class Transform;
 
 template<typename FPP, typename FPP1>
 void faust_gpu2cpu(Faust::Transform<FPP,Cpu>& fcore, const Faust::Transform<FPP,Gpu>& cu_fcore);

@@ -14,7 +14,7 @@
 
 namespace Faust
 {
-//	template<typename FPP, Device DEVICE>
+//	template<typename FPP, FDevice DEVICE>
 //		class MatGeneric;
 
 	template<typename FPP>

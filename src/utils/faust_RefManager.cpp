@@ -1,6 +1,7 @@
 #include "faust_RefManager.h"
 #include <exception>
 
+using namespace std;
 void Faust::RefManager::acquire(void* ref)
 {
 #ifdef DEBUG

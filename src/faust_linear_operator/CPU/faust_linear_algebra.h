@@ -50,9 +50,9 @@
 namespace Faust
 {
 
-	template<typename FPP,Device DEVICE> class Vect;
-	template<typename FPP,Device DEVICE> class MatDense;
-	template<typename FPP,Device DEVICE> class MatGeneric;
+	template<typename FPP,FDevice DEVICE> class Vect;
+	template<typename FPP,FDevice DEVICE> class MatDense;
+	template<typename FPP,FDevice DEVICE> class MatGeneric;
 
 	template <typename FPP>
 		void setOp(const Faust::MatDense<FPP,Cpu>& A, const char opA, faust_unsigned_int& opA1, faust_unsigned_int& opA2);
@@ -105,7 +105,7 @@ namespace Faust
 
 	// modif AL AL
 	//modif AL AL
-	template<typename FPP,Device DEVICE> class Transform;
+	template<typename FPP,FDevice DEVICE> class Transform;
 	template<typename FPP>
 		void multiply(const Faust::Transform<FPP,Cpu> & A, const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, char typeA, char typeMult);
 	// modif AL AL
@@ -168,15 +168,15 @@ namespace Faust
 
 	template<typename FPP>
 		FPP fabs(std::complex<FPP> c);
-	template<typename FPP, Device DEVICE>
+	template<typename FPP, FDevice DEVICE>
 		void multiply_order_opt_all_ends(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
-	template<typename FPP, Device DEVICE>
+	template<typename FPP, FDevice DEVICE>
 		void multiply_order_opt_all_best(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
-	template<typename FPP, Device DEVICE>
+	template<typename FPP, FDevice DEVICE>
 		void multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
-	template<typename FPP, Device DEVICE>
+	template<typename FPP, FDevice DEVICE>
 		void multiply_order_opt_first_best(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
-	template<typename FPP, Device DEVICE>
+	template<typename FPP, FDevice DEVICE>
 		void multiply_order_opt(const int mode, std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
 
 }

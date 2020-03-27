@@ -50,7 +50,7 @@
 namespace Faust
 {
 
-    template <Device DEVICE> class SpBlasHandle;
+    template <FDevice DEVICE> class SpBlasHandle;
 
     template <>
     class SpBlasHandle<Gpu>

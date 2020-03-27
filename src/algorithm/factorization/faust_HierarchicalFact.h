@@ -61,16 +61,16 @@ namespace Faust
 {
 
     class ConstraintGeneric;
-    template<typename FPP,Device DEVICE,typename FPP2> class Palm4MSA;
-    template<typename FPP,Device DEVICE> class MatDense;
-    template<typename FPP,Device DEVICE> class MatSparse;
-    template<typename FPP,Device DEVICE> class Transform;
+    template<typename FPP,FDevice DEVICE,typename FPP2> class Palm4MSA;
+    template<typename FPP,FDevice DEVICE> class MatDense;
+    template<typename FPP,FDevice DEVICE> class MatSparse;
+    template<typename FPP,FDevice DEVICE> class Transform;
 
     template<typename FPP2> class StoppingCriterion;
-//    template<Device DEVICE> class BlasHandle;
-//    template<Device DEVICE> class SpBlasHandle;
+//    template<FDevice DEVICE> class BlasHandle;
+//    template<FDevice DEVICE> class SpBlasHandle;
 
-    template<typename FPP,Device DEVICE,typename FPP2 = double>
+    template<typename FPP,FDevice DEVICE,typename FPP2 = double>
     class HierarchicalFact
     {
 

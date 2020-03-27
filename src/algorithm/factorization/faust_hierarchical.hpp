@@ -1,4 +1,4 @@
-template<typename FPP, Device DEVICE>
+template<typename FPP, FDevice DEVICE>
 Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>&  A,
 		Params<FPP,DEVICE, Real<FPP>> & p,
 		Real<FPP>& lambda, const bool compute_2norm_on_array)
@@ -110,7 +110,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
     return S;
 }
 
-template<typename FPP, Device DEVICE>
+template<typename FPP, FDevice DEVICE>
 Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>& A,
 //        const int nites,
 		std::vector<StoppingCriterion<Real<FPP>>>& sc,

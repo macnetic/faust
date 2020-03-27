@@ -70,14 +70,14 @@
 #include "faust_gpuCore2cpuCore.h"
 
 
-//template<typename FPP, Device DEVICE> class MatDense;
-//template <typename FPP,Device DEVICE> class Vect;
+//template<typename FPP, FDevice DEVICE> class MatDense;
+//template <typename FPP,FDevice DEVICE> class Vect;
 
 
 
 #ifdef __COMPILE_SPMAT__
     #include "cusparse.h"
-    template <typename FPP,Device DEVICE> class MatSparse;
+    template <typename FPP,FDevice DEVICE> class MatSparse;
     #include "faust_MatSparse_gpu.h"
 #endif
 
@@ -91,7 +91,7 @@ namespace Faust
 {
 
     // modif AL AL
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,FDevice DEVICE>
     class MatDense;
 
     template <typename FPP> class MatDense<FPP,Gpu>
@@ -301,17 +301,17 @@ namespace Faust
 inline void MatDense<FPP,Gpu>::multiplyRight(const MatDense<FPP>& cu_B, Faust::BlasHandle<Gpu> cublasHandle)
 {gemm(*this, cu_B, *this, 1.0, 0.0, 'N', 'N', cublasHandle);}
 
-template <typename FPP,Device DEVICE>
+template <typename FPP,FDevice DEVICE>
 inline void Faust::MatSparse<FPP,Gpu>::multiplyLeft(const Faust::MatSparse<FPP,Gpu>& cu_A, Faust::BlasHandle<Gpu> cublasHandle)
 {gemm(cu_A, *this, *this, 1.0, 0.0, 'N', 'N', cublasHandle);}
 
 
 #ifdef __COMPILE_SPMAT__
-template <typename FPP,Device DEVICE>
+template <typename FPP,FDevice DEVICE>
    inline void Faust::MatSparse<FPP,Gpu>::multiplyRight(const Faust::MatSparse<FPP,Gpu>& cu_S, Faust::BlasHandle<Gpu> cublasHandle, cusparseHandle_t cusparseHandle)
    {gemm(*this, cu_S, *this, 1.0, 0.0, 'N', 'N', cublasHandle, cusparseHandle);}
 
-template <typename FPP,Device DEVICE>
+template <typename FPP,FDevice DEVICE>
    inline void Faust::MatSparse<FPP,Gpu>::multiplyLeft(const Faust::MatSparse<FPP,Gpu>& cu_S, cusparseHandle_t cusparseHandle)
    {gemm(cu_S, *this, *this, 1.0, 0.0, 'N', 'N', cusparseHandle);}
 #endif

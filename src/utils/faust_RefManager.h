@@ -1,12 +1,11 @@
 #include <map>
 #include <iostream>
-using namespace std;
 
 #ifndef __FAUST_REF_MANAGER__
 #define __FAUST_REF_MANAGER__
 namespace Faust {
 	class RefManager {
-		map<void*,unsigned int> refCounts;
+		std::map<void*,unsigned int> refCounts;
 		void(*cb)(void*);
 
 		public:

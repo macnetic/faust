@@ -44,7 +44,7 @@
 #include "faust_Timer.h"
 
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void Faust::MatGeneric<FPP,DEVICE>::setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const
 {
     if(op == 'N')
@@ -63,7 +63,7 @@ void Faust::MatGeneric<FPP,DEVICE>::setOp(const char op, faust_unsigned_int& nbR
 
 
 
-//template <typename FPP, Device DEVICE>
+//template <typename FPP, FDevice DEVICE>
 template<typename FPP>
 Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,Faust::MatSparse<FPP,Cpu> const & S)
 {
@@ -119,19 +119,19 @@ Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,F
 
 }
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 Faust::MatGeneric<FPP,DEVICE>::~MatGeneric()
 {
 
 }
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void Faust::MatGeneric<FPP,DEVICE>::Display() const
 {
 	std::cout << to_string();
 }
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 std::string Faust::MatGeneric<FPP,DEVICE>::to_string(const bool transpose /* set to false by default */, const bool displaying_small_mat_elts) const
 {
 	std::ostringstream str;

@@ -68,9 +68,9 @@ namespace Faust
 {
 
     class ConstraintGeneric;
-    template<typename FPP,Device DEVICE> class MatDense;
+    template<typename FPP,FDevice DEVICE> class MatDense;
 
-    template<typename FPP,Device DEVICE, typename FPP2 = double>
+    template<typename FPP,FDevice DEVICE, typename FPP2 = double>
     class ConstraintFPP : public Faust::ConstraintGeneric
     {
 

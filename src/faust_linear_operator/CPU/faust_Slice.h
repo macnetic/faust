@@ -1,6 +1,7 @@
+
+#include "faust_constant.h"
 #ifndef __FAUST_SLICE__
 #define __FAUST_SLICE__
-#include "faust_constant.h"
 namespace Faust {
 
 

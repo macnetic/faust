@@ -4,7 +4,7 @@
 #include "faust_Params.h"
 namespace Faust
 {
-	template<typename FPP, Device DEVICE>
+	template<typename FPP, FDevice DEVICE>
 	Faust::TransformHelper<FPP,DEVICE>* hierarchical(const Faust::MatDense<FPP,DEVICE>& A,
 //				const int nites,
 			std::vector<StoppingCriterion<Real<FPP>>>& sc,
@@ -19,7 +19,7 @@ namespace Faust
 			const bool is_verbose=false,
 			const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION);
 
-	template<typename FPP, Device DEVICE>
+	template<typename FPP, FDevice DEVICE>
 		Faust::TransformHelper<FPP,DEVICE>* hierarchical(const Faust::MatDense<FPP,DEVICE>&  A,
 				Faust::Params<FPP,DEVICE, Real<FPP>> &p,
 				Real<FPP>& lambda, const bool compute_2norm_on_array);

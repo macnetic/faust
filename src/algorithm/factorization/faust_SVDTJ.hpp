@@ -7,7 +7,7 @@
 #include <type_traits>
 using namespace Faust;
 
-	template<typename FPP, Device DEVICE, typename FPP2>
+	template<typename FPP, FDevice DEVICE, typename FPP2>
 void Faust::svdtj(MatDense<FPP, DEVICE> & dM, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
 {
 	MatGeneric<FPP,DEVICE>* M;
@@ -23,7 +23,7 @@ void Faust::svdtj(MatDense<FPP, DEVICE> & dM, int J, int t, double tol, unsigned
 	svdtj_core_gen<FPP,DEVICE,double>(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
 }
 
-	template<typename FPP, Device DEVICE, typename FPP2>
+	template<typename FPP, FDevice DEVICE, typename FPP2>
 void Faust::svdtj(MatSparse<FPP, DEVICE> & sM, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
 {
 	MatGeneric<FPP,DEVICE>* M;
@@ -43,7 +43,7 @@ void Faust::svdtj(MatSparse<FPP, DEVICE> & sM, int J, int t, double tol, unsigne
 	svdtj_core_gen<FPP,DEVICE, double>(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
 }
 
-	template<typename FPP, Device DEVICE, typename FPP2>
+	template<typename FPP, FDevice DEVICE, typename FPP2>
 void Faust::svdtj_cplx(MatDense<FPP, DEVICE> & dM, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
 {
 	MatGeneric<FPP,DEVICE>* M;
@@ -61,7 +61,7 @@ void Faust::svdtj_cplx(MatDense<FPP, DEVICE> & dM, int J, int t, double tol, uns
 
 }
 
-	template<typename FPP, Device DEVICE, typename FPP2>
+	template<typename FPP, FDevice DEVICE, typename FPP2>
 void Faust::svdtj_cplx(MatSparse<FPP, DEVICE> & sM, int J, int t, double tol, unsigned int verbosity, bool relErr, int order, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
 {
 	MatGeneric<FPP,DEVICE>* M;
@@ -80,7 +80,7 @@ void Faust::svdtj_cplx(MatSparse<FPP, DEVICE> & sM, int J, int t, double tol, un
 	svdtj_core_gen<FPP,DEVICE,double>(M, dM, dM_M, dMM_, J, t, tol, verbosity, relErr, order, enable_large_Faust, U, V, S_);
 }
 
-template<typename FPP, Device DEVICE, typename FPP2> void instantiate_algos(GivensFGFTGen<Real<FPP>, Cpu, FPP2, FPP>** algoW1, GivensFGFTGen<Real<FPP>, Cpu, FPP2, FPP>** algoW2, Faust::MatDense<FPP,DEVICE> &dM_M, Faust::MatDense<FPP,DEVICE> &dMM_, int J, int t, unsigned int verbosity, FPP2 tol, bool relErr, bool enable_large_Faust);
+template<typename FPP, FDevice DEVICE, typename FPP2> void instantiate_algos(GivensFGFTGen<Real<FPP>, Cpu, FPP2, FPP>** algoW1, GivensFGFTGen<Real<FPP>, Cpu, FPP2, FPP>** algoW2, Faust::MatDense<FPP,DEVICE> &dM_M, Faust::MatDense<FPP,DEVICE> &dMM_, int J, int t, unsigned int verbosity, FPP2 tol, bool relErr, bool enable_large_Faust);
 
 template<>
 void instantiate_algos<complex<double>, Cpu, double>(GivensFGFTGen<Real<complex<double>>, Cpu, double, complex<double>>** algoW1, GivensFGFTGen<Real<complex<double>>, Cpu, double, complex<double>>** algoW2, Faust::MatDense<complex<double>,Cpu> &dM_M, Faust::MatDense<complex<double>,Cpu> &dMM_,int J, int t, unsigned int verbosity, double tol, bool relErr, bool enable_large_Faust)
@@ -114,7 +114,7 @@ void instantiate_algos<double, Cpu, double>(GivensFGFTGen<double, Cpu, double, d
 }
 
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void Faust::svdtj_core_gen(MatGeneric<FPP,DEVICE>* M, MatDense<FPP,DEVICE> &dM, MatDense<FPP,DEVICE> &dM_M, MatDense<FPP,DEVICE> &dMM_, int J, int t, double tol, unsigned int verbosity, bool relErr, int order /* ignored anyway, kept here just in case */, const bool enable_large_Faust, TransformHelper<FPP,DEVICE> ** U, TransformHelper<FPP,DEVICE> **V, Faust::Vect<FPP,DEVICE> ** S_)
 {
 	GivensFGFTGen<Real<FPP>, DEVICE, FPP2, FPP>* algoW1;

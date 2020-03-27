@@ -58,7 +58,7 @@
 
 #ifdef __COMPILE_SPMAT__
     #include "faust_SpBlasHandle_gpu.h"
-    template <typename FPP,Device DEVICE> class MatSparse;
+    template <typename FPP,FDevice DEVICE> class MatSparse;
 #endif
 
 //! \namespace Faust
@@ -66,10 +66,10 @@
 namespace Faust
 {
 
-    template <typename FPP,Device DEVICE> class Vect;
-    template <typename FPP,Device DEVICE> class MatDense;
+    template <typename FPP,FDevice DEVICE> class Vect;
+    template <typename FPP,FDevice DEVICE> class MatDense;
 #ifdef __COMPILE_SPMAT__
-    template <typename FPP,Device DEVICE> class MatSparse;
+    template <typename FPP,FDevice DEVICE> class MatSparse;
 #endif
 
     template <typename FPP> class Vect<FPP,Gpu>

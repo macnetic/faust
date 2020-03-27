@@ -67,7 +67,7 @@
 	typedef double FFPP; ///double precision
 #endif
 
-enum Device
+enum FDevice
 {
    Cpu, /* Central Process Unit */
    Gpu, /* Graphic Process Unit */

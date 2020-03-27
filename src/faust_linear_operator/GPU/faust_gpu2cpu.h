@@ -49,12 +49,12 @@
 
 
 // modif AL AL
-template<typename FPP,Device DEVICE> class MatDense;
-template<typename FPP,Device DEVICE> class Vect;
+template<typename FPP,FDevice DEVICE> class MatDense;
+template<typename FPP,FDevice DEVICE> class Vect;
 
 #ifdef __COMPILE_SPMAT__
-    template<typename FPP,Device DEVICE> class MatSparse;
-    template<typename FPP,Device DEVICE> class Transform;
+    template<typename FPP,FDevice DEVICE> class MatSparse;
+    template<typename FPP,FDevice DEVICE> class Transform;
 #endif
 
 //! \brief faust_gpu2cpu copy an CPU vector/matrix into a GPU vector/matrix depend of the overloading function.

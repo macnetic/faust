@@ -1325,7 +1325,7 @@ namespace Faust {
 			for(int i =0; i < size(); i++)
 				//NOTE: about const cast: no problem, we know we won't write it
 				//NOTE: don't use get_gen_fact() to avoid transpose auto-handling
-				factors.push_back(const_cast<Faust::MatGeneric<FPP, (Device)0u>*>(this->transform->data[i]));
+				factors.push_back(const_cast<Faust::MatGeneric<FPP, (FDevice)0u>*>(this->transform->data[i]));
 #ifdef NON_OPT_FAUST_NORMALIZATION
 			if(this->is_transposed)
 				factors.insert(factors.begin(), norm_diag);

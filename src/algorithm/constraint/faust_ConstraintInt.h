@@ -55,7 +55,7 @@
 #endif
 
 
-template<typename FPP,Device DEVICE> class MatDense;
+template<typename FPP,FDevice DEVICE> class MatDense;
 
 //! \class ConstraintInt
 //! \brief Contains the integer constraint parameters for the hierarchical factorization. <br>
@@ -69,7 +69,7 @@ namespace Faust
 
     class ConstraintGeneric;
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,FDevice DEVICE>
     class ConstraintInt : public Faust::ConstraintGeneric
     {
 

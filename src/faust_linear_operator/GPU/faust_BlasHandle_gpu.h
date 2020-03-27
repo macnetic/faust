@@ -49,7 +49,7 @@
 namespace Faust
 {
 
-    template <Device DEVICE> class BlasHandle;
+    template <FDevice DEVICE> class BlasHandle;
 
 
     template <>

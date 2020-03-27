@@ -1,4 +1,4 @@
-template <typename FPP, Device DEVICE>
+template <typename FPP, FDevice DEVICE>
 void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		std::vector<Faust::ConstraintGeneric*> & constraints,
 		Faust::TransformHelper<FPP,DEVICE>& S,
@@ -239,7 +239,7 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 	}
 }
 
-template <typename FPP, Device DEVICE>
+template <typename FPP, FDevice DEVICE>
 void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		std::vector<Faust::ConstraintGeneric*> & constraints,
 		Faust::TransformHelper<FPP,DEVICE>& S,

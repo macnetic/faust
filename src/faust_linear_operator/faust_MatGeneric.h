@@ -63,10 +63,10 @@ namespace Faust
 {
 
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,FDevice DEVICE>
     class LinearOperator;
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,FDevice DEVICE>
     class MatGeneric : public Faust::LinearOperator<FPP,DEVICE>
 	{
 
@@ -237,7 +237,7 @@ namespace Faust
    //! \tparam S : MatSparse
    //  \return a pointer of MatGeneric
 
-   //template <typename FPP, Device DEVICE>
+   //template <typename FPP, FDevice DEVICE>
    template<typename FPP>
    Faust::MatGeneric<FPP,Cpu>* optimize(Faust::MatDense<FPP,Cpu> const & M,Faust::MatSparse<FPP,Cpu> const & S);
 

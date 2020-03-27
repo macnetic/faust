@@ -63,15 +63,15 @@
 namespace Faust
 {
 
-	template<typename FPP,Device DEVICE> class LinearOperator;
+	template<typename FPP,FDevice DEVICE> class LinearOperator;
 
-	template<typename FPP,Device DEVICE> class Transform;
-	template<typename FPP,Device DEVICE> class Vect;
-	template<typename FPP,Device DEVICE> class MatDense;
-	template<typename FPP,Device DEVICE> class MatSparse;
-	template<Device DEVICE> class BlasHandle;
-	template<Device DEVICE> class SpBlasHandle;
-	template<typename FPP, Device DEVICE> class TransformHelper;
+	template<typename FPP,FDevice DEVICE> class Transform;
+	template<typename FPP,FDevice DEVICE> class Vect;
+	template<typename FPP,FDevice DEVICE> class MatDense;
+	template<typename FPP,FDevice DEVICE> class MatSparse;
+	template<FDevice DEVICE> class BlasHandle;
+	template<FDevice DEVICE> class SpBlasHandle;
+	template<typename FPP, FDevice DEVICE> class TransformHelper;
 
 
 	// forward definition of friend function
@@ -130,8 +130,8 @@ namespace Faust
 				void size(int size_)const{ data.resize(size_);}
 
 
-				//template<Device DEVICE> class BlasHandle;
-				//template<Device DEVICE> class SpBlasHandle;
+				//template<FDevice DEVICE> class BlasHandle;
+				//template<FDevice DEVICE> class SpBlasHandle;
 				/** \brief Perform the product of all factorized matrix. */
 				Faust::MatDense<FPP,Cpu> get_product(const char opThis='N', const bool isConj=false)const;
 				void get_product(Faust::MatDense<FPP,Cpu> &, const char opThis='N', const bool isConj=false)const;
@@ -171,8 +171,8 @@ namespace Faust
 				void print_data_ptrs() const
 				{
 					for(int i=0;i<data.size();i++)
-						cout << data[i] << " ";
-					cout << endl;
+						std::cout << data[i] << " ";
+					std::cout << std::endl;
 				}
 				void init_from_file(const char* filename);
 				/**
@@ -246,7 +246,7 @@ namespace Faust
 				static void delete_fact(void * fact)
 				{
 #ifdef DEBUG
-					cout << "Faust::Transform delete_fact" << endl;
+					std::cout << "Faust::Transform delete_fact" << std::endl;
 #endif
 					delete static_cast<MatGeneric<FPP,Cpu>*>(fact);
 				}

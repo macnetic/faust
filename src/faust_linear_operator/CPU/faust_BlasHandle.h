@@ -46,7 +46,7 @@
 namespace Faust
 {
 
-    template <Device DEVICE> class BlasHandle;
+    template <FDevice DEVICE> class BlasHandle;
 
     //BlasHandle<Cpu> is useless,
     // its unique purpose is for code factorisation with GPU code

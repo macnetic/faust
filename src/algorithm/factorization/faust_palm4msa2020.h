@@ -14,7 +14,7 @@
 
 namespace Faust
 {
-	template <typename FPP, Device DEVICE>
+	template <typename FPP, FDevice DEVICE>
 		void palm4msa(
 				/** input matrix */
 				const Faust::MatDense<FPP,DEVICE>& A,
@@ -33,7 +33,7 @@ namespace Faust
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
 				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION);
 
-	template <typename FPP, Device DEVICE>
+	template <typename FPP, FDevice DEVICE>
 		void palm4msa2(
 				/** input matrix */
 				const Faust::MatDense<FPP,DEVICE>& A,

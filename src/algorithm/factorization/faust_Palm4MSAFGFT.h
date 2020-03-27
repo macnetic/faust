@@ -9,7 +9,7 @@ using namespace Faust;
 
 namespace Faust {
 
-	template<typename FPP, Device DEVICE, typename FPP2 = double>
+	template<typename FPP, FDevice DEVICE, typename FPP2 = double>
 		class Palm4MSAFGFT : public Palm4MSA<FPP, DEVICE, FPP2>
 	{
 		MatSparse<FPP, DEVICE> D;

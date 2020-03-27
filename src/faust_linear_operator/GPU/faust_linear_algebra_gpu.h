@@ -73,10 +73,10 @@ namespace Faust
 {
 
 
-    template<typename FPP,Device DEVICE> class MatDense;
-    template<Device DEVICE> class BlasHandle;
+    template<typename FPP,FDevice DEVICE> class MatDense;
+    template<FDevice DEVICE> class BlasHandle;
 
-    template<typename FPP,Device DEVICE> class Vect;
+    template<typename FPP,FDevice DEVICE> class Vect;
 
 
 
@@ -141,8 +141,8 @@ namespace Faust
 
 #ifdef __COMPILE_SPMAT__
     ///// FUNCTIONS with faust_cu_spmat matrices /////
-    template<typename FPP,Device DEVICE> class MatSparse;
-    template<Device DEVICE> class SpBlasHandle;
+    template<typename FPP,FDevice DEVICE> class MatSparse;
+    template<FDevice DEVICE> class SpBlasHandle;
 
     //! \fn setOp
     //! Performs opA1=nb_rows(cu_S^opA) ; opA2=nb_cols(cu_S^opA)

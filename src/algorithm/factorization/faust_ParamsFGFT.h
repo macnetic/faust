@@ -8,7 +8,7 @@ using namespace Faust;
 
 namespace Faust
 {
-	template<typename FPP, Device DEVICE, typename FPP2 = double>
+	template<typename FPP, FDevice DEVICE, typename FPP2 = double>
 	class ParamsFGFT : public Params<FPP, DEVICE, FPP2>
 	{
 

@@ -721,8 +721,8 @@ FPP Faust::fabs(FPP f)
 template<typename FPP>
 FPP Faust::fabs(std::complex<FPP> c)
 {
-	//rewrite fabs even if c++11 standard provide it
-	//because clang++ from macOS failed to provide fabs(complex) 
+	//rewrite fabs even if c++11 standard provides it
+	//because clang++ from macOS failed to provide fabs(complex)
 	//(gcc-g++ provides it! but we compile with clang on macOS)
 	return sqrt(norm(c));
 }
@@ -732,7 +732,7 @@ FPP Faust::fabs(std::complex<FPP> c)
  *	\brief Multiply all the matrices together (as a product of n factors) with an optimization based on the associativity of the matrix product ; following an order that minimizes the number of scalar operations.
  *	\note: the std::vector facts is altered after the call! Don't reuse it.
  */
-template<typename FPP, Device DEVICE>
+template<typename FPP, FDevice DEVICE>
 void Faust::multiply_order_opt_all_ends(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
 {
 	Faust::MatDense<FPP, DEVICE> tmpr, tmpl;
@@ -772,7 +772,7 @@ void Faust::multiply_order_opt_all_ends(std::vector<Faust::MatDense<FPP,DEVICE>*
 	facts.erase(facts.begin(), facts.end());
 }
 
-template<typename FPP, Device DEVICE>
+template<typename FPP, FDevice DEVICE>
 void Faust::multiply_order_opt_all_best(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
 {
 	std::vector<Faust::MatDense<FPP,DEVICE>*> tmp_facts; //temporary product results
@@ -842,7 +842,7 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatDense<FPP,DEVICE>*
 	}
 }
 
-template<typename FPP, Device DEVICE>
+template<typename FPP, FDevice DEVICE>
 void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
 {
 	Faust::MatSparse<FPP,Cpu> * tmp_sp1,* tmp_sp2;
@@ -957,7 +957,7 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE
 	}
 }
 
-template<typename FPP, Device DEVICE>
+template<typename FPP, FDevice DEVICE>
 void Faust::multiply_order_opt_first_best(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
 {
 	int nfacts = facts.size();
@@ -1030,7 +1030,7 @@ void Faust::multiply_order_opt_first_best(std::vector<Faust::MatDense<FPP,DEVICE
 		gemm(*facts[i], tmp, out, alpha, beta_out, transconj_flags[transconj_flags.size()>i?i:0], 'N');
 }
 
-template<typename FPP, Device DEVICE>
+template<typename FPP, FDevice DEVICE>
 void Faust::multiply_order_opt(const int mode, std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha/* =1.0*/, FPP beta_out/*=.0*/, std::vector<char> transconj_flags /* = {'N'}*/)
 {
 	if(mode == 4)

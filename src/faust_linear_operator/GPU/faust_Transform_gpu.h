@@ -56,10 +56,10 @@ namespace Faust
 {
 
 
-template<typename FPP,Device DEVICE> class MatDense;
-template<typename FPP,Device DEVICE> class MatSparse;
-template<typename FPP,Device DEVICE> class Vect;
-template<typename FPP,Device DEVICE> class Transform;
+template<typename FPP,FDevice DEVICE> class MatDense;
+template<typename FPP,FDevice DEVICE> class MatSparse;
+template<typename FPP,FDevice DEVICE> class Vect;
+template<typename FPP,FDevice DEVICE> class Transform;
 
 
     template<typename FPP>

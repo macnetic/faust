@@ -1,6 +1,6 @@
 using namespace Faust;
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::next_step()
 {
 
@@ -22,7 +22,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::next_step()
 	}
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::choose_pivot()
 {
 //Matlab ref. code:
@@ -38,7 +38,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::choose_pivot()
 #endif
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::max_L()
 {
 	// Matlab ref. code:
@@ -117,7 +117,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::max_L()
 	}
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::calc_theta()
 {
 	FPP phi1, phi2;
@@ -133,7 +133,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::calc_theta()
 #endif
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::check_pivot_image(FPP& c_pp, FPP& c_pq, FPP& c_qp, FPP& c_qq)
 {
 	FPP im_pivot_pq = (conj(c_pp)*(*this->L)(this->p,this->p)+conj(c_qp)*(*this->L)(this->q,this->p))*c_pq +(conj(c_pp)*(*this->L)(this->p,this->q)+conj(c_qp)*(*this->L)(this->q,this->q))*c_qq;
@@ -148,7 +148,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::check_pivot_image(FPP& c_pp, FPP& c_pq,
 	}
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 {
 	// Matlab ref. code:
@@ -226,7 +226,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_fact()
 #endif
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 {
 	// L = S'*L*S
@@ -276,7 +276,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 #endif
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 {
 //#define OPT_UPDATE_SPARSE_L
@@ -299,7 +299,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatSparse<FPP,Cpu> & L)
 #endif
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L()
 {
 	MatSparse<FPP, DEVICE>* sL = dynamic_cast<MatSparse<FPP, DEVICE>*>(this->L);
@@ -307,7 +307,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L()
 	else update_L(*dynamic_cast<MatDense<FPP, DEVICE>*>(this->L));
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
 {
 #define copy_vec2Lrow(vec,rowi) \
@@ -333,7 +333,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Faust::Vect<FPP,DEVICE>&
 	copy_vec2Lrow(tmp, q);
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatDense<FPP,DEVICE> & L)
 {
 	Faust::Vect<FPP,DEVICE> tmp, tmp2;
@@ -356,7 +356,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Faust::Vect<FPP,DEVICE>
 	memcpy(L.getData()+L.getNbRow()*q, tmp.getData(), sizeof(FPP)*L.getNbRow());
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP,Eigen::RowMajor > & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
 {
 	Eigen::SparseMatrix<FPP, Eigen::RowMajor> tmp, tmp2;
@@ -381,7 +381,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_second(Eigen::SparseMatrix<FPP
 	L.mat.col(q) = tmp;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP& c_pp, const FPP& c_pq, const FPP& c_qp, const FPP& c_qq, int p, int q, Faust::MatSparse<FPP,DEVICE> & L)
 {
 	Eigen::SparseMatrix<FPP, Eigen::RowMajor> tmp, tmp2, tmp3;
@@ -407,7 +407,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L_first(Eigen::SparseMatrix<FPP,
 	L.mat.innerVector(q) = tmp;
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_err()
 {
 	// Matlab ref. code:
@@ -444,21 +444,21 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_err()
 	}
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError /* default to 0.0 */, const bool errIsRel, const bool enable_large_Faust) : Faust::GivensFGFTGen<typename FPP::value_type, DEVICE, FPP2, FPP>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), C(Lap.getNbRow(), Lap.getNbCol())
 {
 	//see parent ctor
 	this->C.setZeros();
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 GivensFGFTComplex<FPP,DEVICE,FPP2>::GivensFGFTComplex(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust) : Faust::GivensFGFTGen<typename FPP::value_type, DEVICE, FPP2, FPP>(Lap, J, verbosity, stoppingError, errIsRel, enable_large_Faust), C(Lap.getNbRow(), Lap.getNbCol())
 {
 	// see parent ctor
 	this->C.setZeros();
 }
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 const Faust::MatSparse<FPP,DEVICE> GivensFGFTComplex<FPP,DEVICE,FPP2>::get_Dspm(const bool ord /* default to false*/)
 {
 	MatSparse <FPP,DEVICE> spD;

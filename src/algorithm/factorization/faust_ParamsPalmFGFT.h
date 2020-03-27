@@ -9,7 +9,7 @@ namespace Faust
 {
 
 
-	template<typename FPP, Device DEVICE, typename FPP2 = double>
+	template<typename FPP, FDevice DEVICE, typename FPP2 = double>
 		class ParamsPalmFGFT : public Faust::ParamsPalm<FPP,DEVICE,FPP2>
 	{
 

@@ -51,31 +51,31 @@
 #include "faust_exception.h"
 
 
-template<typename FPP,Device DEVICE> class MatDense;
-template<typename FPP,Device DEVICE,typename FPP2> class ConstraintFPP;
-template<typename FPP,Device DEVICE> class ConstraintMat;
+template<typename FPP,FDevice DEVICE> class MatDense;
+template<typename FPP,FDevice DEVICE,typename FPP2> class ConstraintFPP;
+template<typename FPP,FDevice DEVICE> class ConstraintMat;
 
-template<typename FPP,Device DEVICE,typename FPP2>
+template<typename FPP,FDevice DEVICE,typename FPP2>
 const char * Faust::Params<FPP,DEVICE,FPP2>::m_className = "Faust::Params<FPP,DEVICE,FPP2>::";
 
 
 /// default Values of Faust::Params
-template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultVerbosity = false;
-template<typename FPP,Device DEVICE,typename FPP2> const int Faust::Params<FPP,DEVICE,FPP2>::defaultNiter1 = 500;
-template<typename FPP,Device DEVICE,typename FPP2> const int Faust::Params<FPP,DEVICE,FPP2>::defaultNiter2 = 500;
-template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultFactSideLeft = false;
-template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultUpdateWayR2L = false;
-template<typename FPP,Device DEVICE,typename FPP2> const FPP2 Faust::Params<FPP,DEVICE,FPP2>::defaultLambda = 1.0;
-template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultConstantStepSize = false;
-template<typename FPP,Device DEVICE,typename FPP2> const FPP2 Faust::Params<FPP,DEVICE,FPP2>::defaultStepSize = 1e-16;
+template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultVerbosity = false;
+template<typename FPP,FDevice DEVICE,typename FPP2> const int Faust::Params<FPP,DEVICE,FPP2>::defaultNiter1 = 500;
+template<typename FPP,FDevice DEVICE,typename FPP2> const int Faust::Params<FPP,DEVICE,FPP2>::defaultNiter2 = 500;
+template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultFactSideLeft = false;
+template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultUpdateWayR2L = false;
+template<typename FPP,FDevice DEVICE,typename FPP2> const FPP2 Faust::Params<FPP,DEVICE,FPP2>::defaultLambda = 1.0;
+template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultConstantStepSize = false;
+template<typename FPP,FDevice DEVICE,typename FPP2> const FPP2 Faust::Params<FPP,DEVICE,FPP2>::defaultStepSize = 1e-16;
 
-template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultDecreaseSpeed = 1.25;
-template<typename FPP,Device DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultResiduumPercent = 1.4;
-template<typename FPP,Device DEVICE,typename FPP2> const Faust::GradientCalcOptMode Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode = INTERNAL_OPT;
-template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultUseCSR = true;
-template<typename FPP,Device DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultPackingRL = true;
+template<typename FPP,FDevice DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultDecreaseSpeed = 1.25;
+template<typename FPP,FDevice DEVICE,typename FPP2> const FPP Faust::Params<FPP,DEVICE,FPP2>::defaultResiduumPercent = 1.4;
+template<typename FPP,FDevice DEVICE,typename FPP2> const Faust::GradientCalcOptMode Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode = INTERNAL_OPT;
+template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultUseCSR = true;
+template<typename FPP,FDevice DEVICE,typename FPP2> const bool Faust::Params<FPP,DEVICE,FPP2>::defaultPackingRL = true;
 
-template<typename FPP,Device DEVICE,typename FPP2>
+template<typename FPP,FDevice DEVICE,typename FPP2>
 void Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity()
 {
     if (cons.size() != 2)
@@ -111,7 +111,7 @@ void Faust::Params<FPP,DEVICE,FPP2>::check_constraint_validity()
 
 }
 
-template<typename FPP,Device DEVICE,typename FPP2>
+template<typename FPP,FDevice DEVICE,typename FPP2>
 Faust::Params<FPP,DEVICE,FPP2>::Params(
 	const faust_unsigned_int nbRow_,
         const faust_unsigned_int nbCol_,
@@ -229,7 +229,7 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
 
 
 
-template<typename FPP,Device DEVICE,typename FPP2>
+template<typename FPP,FDevice DEVICE,typename FPP2>
 Faust::Params<FPP,DEVICE,FPP2>::Params(
 	 const faust_unsigned_int nbRow_,
          const faust_unsigned_int nbCol_,
@@ -274,7 +274,7 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
 
 
 
-template<typename FPP,Device DEVICE,typename FPP2>
+template<typename FPP,FDevice DEVICE,typename FPP2>
 Faust::Params<FPP,DEVICE,FPP2>::Params() : m_nbRow(0),
 	m_nbCol(0),
 	m_nbFact(0),
@@ -294,7 +294,7 @@ Faust::Params<FPP,DEVICE,FPP2>::Params() : m_nbRow(0),
 {}
 
 
-template<typename FPP,Device DEVICE,typename FPP2>
+template<typename FPP,FDevice DEVICE,typename FPP2>
 void Faust::Params<FPP,DEVICE,FPP2>::Display() const
 {
 	std::cout<<"NFACTS : "<<m_nbFact<<std::endl;
@@ -348,7 +348,7 @@ void Faust::Params<FPP,DEVICE,FPP2>::Display() const
 
 }
 
-template<typename FPP,Device DEVICE,typename FPP2>
+template<typename FPP,FDevice DEVICE,typename FPP2>
 void Faust::Params<FPP,DEVICE,FPP2>::init_from_file(const char* filename)
 {
 	char dataFilename[100];
@@ -487,7 +487,7 @@ void Faust::Params<FPP,DEVICE,FPP2>::init_from_file(const char* filename)
 
 
 
-template<typename FPP,Device DEVICE,typename FPP2>
+template<typename FPP,FDevice DEVICE,typename FPP2>
 void Faust::Params<FPP,DEVICE,FPP2>::check_bool_validity()
 {
 	if (m_nbFact < 1)

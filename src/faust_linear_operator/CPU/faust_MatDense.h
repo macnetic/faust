@@ -70,10 +70,10 @@
 * \tparam T scalar numeric type, e.g float or double
 */
 
-//template<typename FPP,Device DEVICE> class MatDense;
-//template<typename FPP, Device DEVICE> class MatSparse;
-//template<typename FPP, Device DEVICE> class Vect;
-//template<typename FPP, Device DEVICE> class Transform;
+//template<typename FPP,FDevice DEVICE> class MatDense;
+//template<typename FPP, FDevice DEVICE> class MatSparse;
+//template<typename FPP, FDevice DEVICE> class Vect;
+//template<typename FPP, FDevice DEVICE> class Transform;
 //
 ////! \fn add
 ////! \brief (*this) = (*this) + A
@@ -114,11 +114,11 @@ namespace Faust
 {
 
 
-template<typename FPP, Device DEVICE> class MatDense;
-template<typename FPP, Device DEVICE> class MatSparse;
-template<typename FPP, Device DEVICE> class Vect;
-template<typename FPP, Device DEVICE> class Transform;
-template<typename FPP, Device DEVICE> class TransformHelper;
+template<typename FPP, FDevice DEVICE> class MatDense;
+template<typename FPP, FDevice DEVICE> class MatSparse;
+template<typename FPP, FDevice DEVICE> class Vect;
+template<typename FPP, FDevice DEVICE> class Transform;
+template<typename FPP, FDevice DEVICE> class TransformHelper;
 
 //! \fn add
 //! \brief (*this) = (*this) + A
@@ -155,15 +155,15 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
 
 
-    template<typename FPP, Device DEVICE>
+    template<typename FPP, FDevice DEVICE>
     class MatDense;
 
-    template<typename FPP, Device DEVICE>
+    template<typename FPP, FDevice DEVICE>
     class MatGeneric;
 
-    template<typename FPP, Device DEVICE>
+    template<typename FPP, FDevice DEVICE>
     class Transform;
-    //template<Device DEVICE> class BlasHandle;
+    //template<FDevice DEVICE> class BlasHandle;
 
     template<typename FPP>
     class MatDiag;
@@ -177,7 +177,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		friend void  MatDiag<FPP>::multiply(MatDense<FPP,Cpu> & M, char opThis) const;
 
 	/// All derived class template of MatDense are considered as friends
-        template<class,Device> friend class MatDense;
+        template<class,FDevice> friend class MatDense;
 
         public:
         static const char * name;

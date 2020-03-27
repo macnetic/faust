@@ -1,4 +1,4 @@
-template<typename FPP,Device DEVICE,typename FPP2>
+template<typename FPP,FDevice DEVICE,typename FPP2>
  ParamsPalmFGFT<FPP,DEVICE,FPP2>::ParamsPalmFGFT(const Faust::MatDense<FPP,DEVICE>& data_,
 					const int nbFact_,
 					const std::vector<const Faust::ConstraintGeneric*>& cons_,

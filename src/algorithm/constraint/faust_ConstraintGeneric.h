@@ -62,14 +62,14 @@ enum faust_constraint_name
    CONSTRAINT_NAME_HANKEL
 };
 
-template<typename FPP,Device DEVICE> class MatDense;
+template<typename FPP,FDevice DEVICE> class MatDense;
 
 //! \namespace Faust
 //! \brief Faust namespace contains the principal class of the project.
 namespace Faust {
 
     // modif AL AL
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,FDevice DEVICE>
     class MatDense;
 
 //! \class ConstraintGeneric
@@ -95,15 +95,15 @@ namespace Faust {
 
 
 
-	    template<typename FPP,Device DEVICE, typename FPP2=double>
+	    template<typename FPP,FDevice DEVICE, typename FPP2=double>
 		const char* get_type() const;
 	    const char* get_constraint_name()const;
 	    const faust_constraint_name get_constraint_type() const;
-	    template<typename FPP,Device DEVICE, typename FPP2=double>
+	    template<typename FPP,FDevice DEVICE, typename FPP2=double>
 		bool is_constraint_parameter_int()const;
-	    template<typename FPP,Device DEVICE, typename FPP2=double>
+	    template<typename FPP,FDevice DEVICE, typename FPP2=double>
 		bool is_constraint_parameter_real()const;
-	    template<typename FPP,Device DEVICE, typename FPP2=double>
+	    template<typename FPP,FDevice DEVICE, typename FPP2=double>
 		bool is_constraint_parameter_mat()const;
 
 
@@ -113,9 +113,9 @@ namespace Faust {
 		virtual void Display() const;
 	    virtual void set_default_parameter()=0;
 	    virtual void check_constraint_name()const=0;
-		template<typename FPP, Device DEVICE>
+		template<typename FPP, FDevice DEVICE>
 		/*virtual*/ void project(MatDense<FPP,DEVICE> & mat)const;//=0; //template with (pure) virtual not authorized (otherwise it must be templates from class, not function)
-		template<typename FPP, Device DEVICE, typename FPP2>
+		template<typename FPP, FDevice DEVICE, typename FPP2>
 			/*virtual*/ void project(Faust::MatDense<FPP, DEVICE>&) const /*=0*/;
 	    ~ConstraintGeneric(){};
 

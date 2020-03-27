@@ -69,10 +69,10 @@ namespace Faust
 		EXTERNAL_OPT //the optimization defined externally in faust_linear_algebra must be used
 	};
 
-    template<typename FPP,Device DEVICE> class MatDense;
+    template<typename FPP,FDevice DEVICE> class MatDense;
 
 
-    template<typename FPP,Device DEVICE, typename FPP2 = double>
+    template<typename FPP,FDevice DEVICE, typename FPP2 = double>
     class Params
     {
 

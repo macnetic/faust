@@ -9,7 +9,7 @@
 namespace Faust {
 
 
-	template<typename FPP, Device DEVICE, typename FPP2 = float, typename FPP4 = FPP>
+	template<typename FPP, FDevice DEVICE, typename FPP2 = float, typename FPP4 = FPP>
 		class GivensFGFTParallelGen
 		{
 			/**

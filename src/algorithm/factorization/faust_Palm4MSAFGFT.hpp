@@ -1,18 +1,18 @@
 #include <cstring>
 
-	template <typename FPP, Device DEVICE, typename FPP2>
+	template <typename FPP, FDevice DEVICE, typename FPP2>
 Palm4MSAFGFT<FPP,DEVICE,FPP2>::Palm4MSAFGFT(const ParamsPalmFGFT<FPP, DEVICE, FPP2>& params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(params, blasHandle, isGlobal), D(MatSparse<FPP,Cpu>(params.init_D))
 {
 }
 
-template<typename FPP,Device DEVICE,typename FPP2>
+template<typename FPP,FDevice DEVICE,typename FPP2>
 Palm4MSAFGFT<FPP,DEVICE,FPP2>::Palm4MSAFGFT(const MatDense<FPP,DEVICE>& Lap, const ParamsFGFT<FPP,DEVICE,FPP2> & params, const BlasHandle<DEVICE> blasHandle, const bool isGlobal) : Palm4MSA<FPP,DEVICE,FPP2>(Lap, params, blasHandle, isGlobal), D(MatSparse<FPP,Cpu>(params.init_D))
 {
 }
 
 
 
-template <typename FPP, Device DEVICE, typename FPP2>
+template <typename FPP, FDevice DEVICE, typename FPP2>
 void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 {
 
@@ -147,7 +147,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_grad_over_c()
 }
 
 
-template <typename FPP, Device DEVICE, typename FPP2>
+template <typename FPP, FDevice DEVICE, typename FPP2>
 void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_lambda()
 {
 	// override parent's method
@@ -168,7 +168,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_lambda()
 	// (that's an additional operation in Palm4MSAFGFT)
 }
 
-template <typename FPP, Device DEVICE, typename FPP2>
+template <typename FPP, FDevice DEVICE, typename FPP2>
 void Palm4MSAFGFT<FPP,DEVICE,FPP2>::next_step()
 {
 	Palm4MSA<FPP, Cpu, FPP2>::next_step();
@@ -178,7 +178,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::next_step()
 }
 
 
-template <typename FPP, Device DEVICE, typename FPP2>
+template <typename FPP, FDevice DEVICE, typename FPP2>
 void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_D()
 {
 	// besides to what the parent has done
@@ -189,7 +189,7 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_D()
 		D.getValuePtr()[i] = D.getValuePtr()[i]-D_grad_over_c.getData()[i*D.getNbCol()+i];
 }
 
-template <typename FPP, Device DEVICE, typename FPP2>
+template <typename FPP, FDevice DEVICE, typename FPP2>
 void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
 {
 	// Uhat = lambda*LorR
@@ -204,19 +204,19 @@ void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_D_grad_over_c()
 	gemm(tmp, this->LorR, D_grad_over_c, (FPP) FPP(.5*this->m_lambda/this->c), (FPP) 0., 'N', 'N', this->blas_handle);
 }
 
-template <typename FPP, Device DEVICE, typename FPP2>
+template <typename FPP, FDevice DEVICE, typename FPP2>
 const MatSparse<FPP, DEVICE>& Palm4MSAFGFT<FPP,DEVICE,FPP2>::get_D()
 {
 	return this->D;
 }
 
-template <typename FPP, Device DEVICE, typename FPP2>
+template <typename FPP, FDevice DEVICE, typename FPP2>
 void Palm4MSAFGFT<FPP,DEVICE,FPP2>::get_D(FPP* diag_data)
 {
 	memcpy(diag_data, this->D.getValuePtr(), sizeof(FPP)*this->D.getNbCol());
 }
 
-template <typename FPP, Device DEVICE, typename FPP2>
+template <typename FPP, FDevice DEVICE, typename FPP2>
 void Palm4MSAFGFT<FPP,DEVICE,FPP2>::compute_c()
 {
 	//do nothing because the Palm4MSAFGFT has always a constant step size

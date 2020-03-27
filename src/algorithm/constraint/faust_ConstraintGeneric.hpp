@@ -48,14 +48,14 @@
 #include "faust_ConstraintType.h"
 
 //modif AL AL
-//template<typename FPP,Device DEVICE> class ConstraintInt;
+//template<typename FPP,FDevice DEVICE> class ConstraintInt;
 
-template<typename FPP,Device DEVICE,typename FPP2> class ConstraintFPP;
-template<typename FPP,Device DEVICE> class ConstraintMat;
-template<typename FPP,Device DEVICE,typename FPP2> class faust_ConstraintType;
+template<typename FPP,FDevice DEVICE,typename FPP2> class ConstraintFPP;
+template<typename FPP,FDevice DEVICE> class ConstraintMat;
+template<typename FPP,FDevice DEVICE,typename FPP2> class faust_ConstraintType;
 
 
-template<typename FPP, Device DEVICE, typename FPP2>
+template<typename FPP, FDevice DEVICE, typename FPP2>
 const char*  Faust::ConstraintGeneric::get_type() const
 {
    switch(m_constraintName)
@@ -170,7 +170,7 @@ const char*  Faust::ConstraintGeneric::get_type() const
 }
 
 
-template<typename FPP,Device DEVICE, typename FPP2>
+template<typename FPP,FDevice DEVICE, typename FPP2>
 bool Faust::ConstraintGeneric::is_constraint_parameter_int()const
 {
 	switch(m_constraintName)
@@ -216,7 +216,7 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_int()const
     return false;
 }
 
-template<typename FPP,Device DEVICE, typename FPP2>
+template<typename FPP,FDevice DEVICE, typename FPP2>
 bool Faust::ConstraintGeneric::is_constraint_parameter_real()const
 {
 	switch(m_constraintName)
@@ -262,7 +262,7 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_real()const
         return false;
 }
 
-template<typename FPP,Device DEVICE, typename FPP2>
+template<typename FPP,FDevice DEVICE, typename FPP2>
 bool Faust::ConstraintGeneric::is_constraint_parameter_mat()const
 {
 	switch(m_constraintName)
@@ -308,7 +308,7 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_mat()const
         return false;
 }
 
-template<typename FPP,Device DEVICE, typename FPP2>
+template<typename FPP,FDevice DEVICE, typename FPP2>
 void Faust::ConstraintGeneric::project(Faust::MatDense<FPP, DEVICE>& mat) const {
 	//unfortunately it's not possible to do template with virtual (pure or not) function
 	// (it needs to be a template class with virtual function using template types to be possible)

@@ -362,9 +362,9 @@ void Faust::Transform<FPP,Cpu>::print_file(const char* filename) const
 {
 	if (size() > 0)
 	{
-		ofstream fichier;
+		std::ofstream fichier;
 		fichier.open(filename);
-		fichier<<size()<<endl<<endl;
+		fichier<<size()<<std::endl<<std::endl;
 		fichier.close();
 
 		for (int i=0;i<size();i++)
@@ -893,7 +893,7 @@ void Faust::Transform<FPP,Cpu>::push_back(const Faust::MatGeneric<FPP,Cpu>* M, c
 	}
 	else
 	{
-		if(conjugate || optimizedCopy) throw runtime_error("copying argument mustn't be true if any of optimizedCopy or conjugate is true.");
+		if(conjugate || optimizedCopy) throw std::runtime_error("copying argument mustn't be true if any of optimizedCopy or conjugate is true.");
 		M_ = const_cast<Faust::MatGeneric<FPP,Cpu>*>(M);
 	}
 	data.push_back(M_);
@@ -924,7 +924,7 @@ void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M, 
 	}
 	else
 	{
-		if(conjugate || optimizedCopy) throw runtime_error("copying argument mustn't be true if any of optimizedCopy or conjugate is true.");
+		if(conjugate || optimizedCopy) throw std::runtime_error("copying argument mustn't be true if any of optimizedCopy or conjugate is true.");
 		M_ = const_cast<Faust::MatGeneric<FPP,Cpu>*>(M);
 	}
 	data.insert(data.begin(),M_);
@@ -939,7 +939,7 @@ void Faust::Transform<FPP,Cpu>::push_first(const Faust::MatGeneric<FPP,Cpu>* M, 
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::insert(faust_unsigned_int i, Faust::MatGeneric<FPP,Cpu>* M)
 {
-    if(i > size()) throw out_of_range("Faust::Transform<FPP,Cpu>::insert");
+    if(i > size()) throw std::out_of_range("Faust::Transform<FPP,Cpu>::insert");
 	data.insert(data.begin()+i,M);
 	if(!dtor_delete_data) ref_man.acquire(M);
 	totalNonZeros += M->getNonZeros();
@@ -960,7 +960,7 @@ void Faust::Transform<FPP,Cpu>::pop_front()
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::erase(faust_unsigned_int i)
 {
-    if(i >= size()) throw out_of_range("Faust::Transform<FPP,Cpu>::erase");
+    if(i >= size()) throw std::out_of_range("Faust::Transform<FPP,Cpu>::erase");
     totalNonZeros -= (*(begin()+i))->getNonZeros();
     if(!dtor_delete_data) ref_man.release(*(begin()+i));
     data.erase(begin()+i);
@@ -1036,7 +1036,7 @@ void Faust::Transform<FPP,Cpu>::transpose()
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::conjugate()
 {
-	typename vector<Faust::MatGeneric<FPP,Cpu>*>::iterator it;
+	typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::iterator it;
 	for(it = data.begin(); it != data.end(); it++){
 		it->conjugate();
 	}
@@ -1193,7 +1193,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::Ma
 	nth = data_size / num_per_th;
 	nth = nth%2?nth-1:nth; // nth must be even
 	nth = nth == 0?1:nth;
-//	cout << "nth=" << nth << endl;
+//	std::cout << "nth=" << nth << endl;
 	barrier_count = nth;
 	int i = 0;
 	if(opThis != 'N')
@@ -1205,14 +1205,14 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::Ma
 		data[data_size-1] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
 	for(auto ptr: this->data)
 	{
-//		cout << "fac i=" << i << ": " << ptr << endl;
+//		std::cout << "fac i=" << i << ": " << ptr << endl;
 		if(opThis == 'N')
 			data[i++] = ptr;
 		else
 			data[i--] = ptr;
 	}
-//	cout << "A ptr: " << &A << endl;
-//	cout << A.norm() << endl;
+//	std::cout << "A ptr: " << &A << endl;
+//	std::cout << A.norm() << endl;
 	std::thread *th;
 	for(i=0; i < nth; i++)
 	{
@@ -1225,7 +1225,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_par(const Faust::Ma
 			t->join();
 
 	M = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(mats[0]);
-//	cout << "M:" << M << endl;
+//	std::cout << "M:" << M << endl;
 	MatDense<FPP,Cpu> M_;
 	if(! M)
 	{
@@ -1259,19 +1259,19 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 			else
 				end_id = end_id>data_size?data_size:end_id;
 			id = 'N' == opThis? end_id-1: first_id;
-//			cout << "thid=" << thid << " end orig adr.:" << data[id] << endl;
+//			std::cout << "thid=" << thid << " end orig adr.:" << data[id] << endl;
 			if(tmp != nullptr) tmp2 = tmp; //keep track of previous tmp to delete it afterward
 			if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[id]))
 				tmp = new Faust::MatDense<FPP,Cpu>(*sM);
 			else
 				tmp = new Faust::MatDense<FPP,Cpu>(*(Faust::MatDense<FPP,Cpu>*)(data[id]));
 			mats[thid] = tmp;
-//			cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "tmp=" << tmp << endl;
-//			cout << "tmp.norm()" << tmp->norm() << endl;
+//			std::cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "tmp=" << tmp << endl;
+//			std::cout << "tmp.norm()" << tmp->norm() << endl;
 			if(opThis == 'N')
 				for(int i=end_id-2;i>=first_id; i--)
 				{
-//					cout << "mul:" << data[i] << " thid: " << thid << endl;
+//					std::cout << "mul:" << data[i] << " thid: " << thid << endl;
 					if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i]))
 						sM->multiply(*mats[thid], opThis);
 					else
@@ -1284,13 +1284,13 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 					else
 						dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[i])->multiply(*mats[thid], opThis);
 			//				mats[thid]->Display();
-			//				cout << mats[thid]->norm() << endl;
-//			cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "data[thid]=" << data[thid] << endl;
+			//				std::cout << mats[thid]->norm() << endl;
+//			std::cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "data[thid]=" << data[thid] << endl;
 			if(tmp2 != nullptr) delete tmp2;
 		}
 #define barrier() \
 		{ \
-			unique_lock<mutex> l1(barrier_mutex);  /* mutex block */ \
+			std::unique_lock<std::mutex> l1(barrier_mutex);  /* mutex block */ \
 			barrier_count--;\
 /*			string ite_str = i>=0?string(" (ite = ") + to_string(i) + ") ": "";*/ \
 			if(barrier_count > 0)\
@@ -1325,7 +1325,7 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 		//		for(auto t: threads)
 		//			if(t->get_id() != std::this_thread::get_id() )
 		//				t->join();
-//		cout <<"num_per_th: " <<  num_per_th << " thid:" << thid << endl;
+//		std::cout <<"num_per_th: " <<  num_per_th << " thid:" << thid << endl;
 
 
 	}
@@ -1346,7 +1346,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_omp(const Faust::Ma
 	int i = 0;
 	for(auto ptr: this->data)
 	{
-//		cout << "i=" << i << " data[i]=" << ptr << endl;
+//		std::cout << "i=" << i << " data[i]=" << ptr << endl;
 		data[i++] = ptr;
 	}
 	data[i] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
@@ -1374,11 +1374,11 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_omp(const Faust::Ma
 				else
 					tmp = new Faust::MatDense<FPP,Cpu>(*(Faust::MatDense<FPP,Cpu>*)(data[id]));
 				mats[thid] = tmp;
-//				cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "tmp=" << tmp << endl;
+//				std::cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "tmp=" << tmp << endl;
 				if(opThis == 'N')
 					for(int i=end_id-2;i>=first_id; i--)
 					{
-//						cout << "mul:" << data[i] << endl;
+//						std::cout << "mul:" << data[i] << endl;
 						if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i]))
 							sM->multiply(*mats[thid], opThis);
 						else
@@ -1392,8 +1392,8 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_omp(const Faust::Ma
 							dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[i])->multiply(*mats[thid], opThis);
 				data[thid] = mats[thid];
 //				mats[thid]->Display();
-//				cout << mats[thid]->norm() << endl;
-//				cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "data[thid]=" << data[thid] << endl;
+//				std::cout << mats[thid]->norm() << endl;
+//				std::cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "data[thid]=" << data[thid] << endl;
 				data_size = nth;
 			}
 			if(nth > 1)
@@ -1407,7 +1407,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_omp(const Faust::Ma
 		//		if(thid == 0) M = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[0]);
 	}
 	M = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(mats[0]);
-//	cout << M << endl;
+//	std::cout << M << endl;
 	MatDense<FPP,Cpu> M_;
 	if(! M)
 	{
@@ -1417,7 +1417,7 @@ Faust::MatDense<FPP,Cpu> Faust::Transform<FPP,Cpu>::multiply_omp(const Faust::Ma
 	//TODO: delete other thread mats
 	//TODO: return a ptr instead of a copy
 #else
-	throw runtime_error("It's not possible to call Faust::Transform::multiply_omp because the library hasn't been compiled with OpenMP enabled.");
+	throw std::runtime_error("It's not possible to call Faust::Transform::multiply_omp because the library hasn't been compiled with OpenMP enabled.");
 #endif
 	return *M;
 }
@@ -1523,12 +1523,12 @@ void Faust::Transform<FPP,Cpu>::print_timers() const
 
 		std::cout<<"- FACTOR "<<i<<": TYPE ";
 		if (data[i]->getType() == MatType::Dense)
-			cout<<"dense ";
+			std::cout<<"dense ";
 		else if (data[i]->getType() == Sparse)
-			cout<<"sparse ";
+			std::cout<<"sparse ";
 		else
-			cout<<"unknown ";
-		cout<<", size "<<data[i]->getNbRow()<<"x"<<data[i]->getNbCol()<<" ,nnz "<<nnz<<", density % "<<density<<std::endl;
+			std::cout<<"unknown ";
+		std::cout<<", size "<<data[i]->getNbRow()<<"x"<<data[i]->getNbCol()<<" ,nnz "<<nnz<<", density % "<<density<<std::endl;
 		std::cout<<" TPS "<<current_time<<" ,% "<<100*current_time/sum_tps<< " ,nb_calls  "<<nb_call<<std::endl;
 		std::cout<<" 	, mean "<<current_time/((float) nb_call)<<std::endl;
 	}

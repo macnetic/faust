@@ -45,8 +45,8 @@
 
 
 // modif AL AL
-//template<typename T,Device DEVICE> class MatDense;
-//template<typename FPP,Device DEVICE> class MatDense;
+//template<typename T,FDevice DEVICE> class MatDense;
+//template<typename FPP,FDevice DEVICE> class MatDense;
 
 
 /**
@@ -62,12 +62,12 @@
 namespace Faust
 {
     // modif AL AL
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,FDevice DEVICE>
     class MatDense;
-	template<typename FPP, Device DEVICE>
+	template<typename FPP, FDevice DEVICE>
 		class Vect;
 
-    template<typename FPP,Device DEVICE>
+    template<typename FPP,FDevice DEVICE>
     class LinearOperator
     {
         public:

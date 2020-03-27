@@ -67,14 +67,14 @@
 //template<typename FPP> class MatDiag;
 
 //! Faust::MatSparse class template of sparse matrix
-template<typename FPP,Device DEVICE> class MatSparse;
+template<typename FPP,FDevice DEVICE> class MatSparse;
 
 //! Faust::Vect class template of dense vector
-template<typename FPP,Device DEVICE> class Vect;
+template<typename FPP,FDevice DEVICE> class Vect;
 
-template<typename FPP,Device DEVICE> class Transform;
+template<typename FPP,FDevice DEVICE> class Transform;
 
-template<Device DEVICE> class SpBlasHandle;
+template<FDevice DEVICE> class SpBlasHandle;
 
 //! \namespace Faust
 //! \brief Faust namespace contains the principal class of the project.
@@ -82,17 +82,17 @@ namespace Faust
 {
 
 
-	template<typename FPP,Device DEVICE> class TransformHelper;
-	template<typename FPP,Device DEVICE> class MatGeneric;
+	template<typename FPP,FDevice DEVICE> class TransformHelper;
+	template<typename FPP,FDevice DEVICE> class MatGeneric;
 
 
 	template<typename FPP> class MatDiag;
 
 	//! Faust::MatDense class template of dense matrix
-	template<typename FPP,Device DEVICE> class MatDense;
-	template<typename FPP, Device DEVICE, typename FPP2> class GivensFGFT;
-	template<typename FPP, Device DEVICE, typename FPP2> class GivensFGFTParallel;
-	template<typename FPP, Device DEVICE, typename FPP2> class GivensFGFTComplex;
+	template<typename FPP,FDevice DEVICE> class MatDense;
+	template<typename FPP, FDevice DEVICE, typename FPP2> class GivensFGFT;
+	template<typename FPP, FDevice DEVICE, typename FPP2> class GivensFGFTParallel;
+	template<typename FPP, FDevice DEVICE, typename FPP2> class GivensFGFTComplex;
 	//TODO: simplify/remove the friendship by adding/using a public setter to is_ortho
 	//template<typename FPP> void wht_factors(unsigned int n, std::vector<MatGeneric<FPP,Cpu>*>&  factors, const bool, const bool);
 	template<typename FPP>
