@@ -1,0 +1,57 @@
+#include "faust_torch.h"
+#include "faust_TransformHelper.h"
+#include <chrono>
+
+typedef @TEST_FPP@ FPP;
+using namespace Faust;
+using namespace std;
+using namespace torch;
+
+int main(int argc, char** argv)
+{
+	int min_size = 10;
+	int max_size = 1024;
+	unsigned int min_nfacts = 5;
+	unsigned int max_nfacts = 10;
+	std::chrono::duration<double> time_pure_faust, time_faust_torch, time_faust_torch_without_conversion;
+	std::srand(std::time(0));
+	max_nfacts = static_cast<unsigned int>(std::rand()*(float)max_nfacts/RAND_MAX)+min_nfacts;
+	RandFaustType rt = MIXED;
+	if(argc > 1)
+		rt = SPARSE;
+	auto F = TransformHelper<FPP,Cpu>::randFaust(rt, min_nfacts, max_nfacts, min_size, max_size, .4f);
+	vector<MatGeneric<FPP,Cpu>*> facs;
+	for(auto it = F->begin();it != F->end();it++)
+	{
+		facs.push_back(*it);
+	}
+	vector<Tensor> tl;
+	faust_matvec_to_torch_TensorList(facs, tl);
+	Tensor t = tensor_chain_mul(tl);
+	cout << "torch toarray norm:" << norm(t.flatten()) << endl;
+	cout << "faust toarray norm:" << F->normFro() << endl;
+	Faust::MatDense<FPP,Cpu> out;
+	tensor_chain_mul(facs, out);
+	cout << "faust toarray through tensor_matmul:" <<  out.norm() << endl;
+	auto M = Faust::MatDense<FPP,Cpu>::randMat(F->getNbCol(), F->getNbRow());
+	auto start = std::chrono::system_clock::now();
+	out = F->multiply(*M);
+	auto end = std::chrono::system_clock::now();
+	cout << "norm F*M:" << out.norm() << endl;
+	time_pure_faust = end-start;
+	start = std::chrono::system_clock::now();
+	tensor_chain_mul(facs, out, M);
+	end = std::chrono::system_clock::now();
+	cout << "norm tensor(F)*tensor(M):" <<  out.norm() << endl;
+	time_faust_torch = end-start;
+	start = std::chrono::system_clock::now();
+	Tensor tM;
+	faust_MatDense_to_torch_Tensor(*M, tM);
+	t = tensor_chain_mul(tl, &tM);
+	end = std::chrono::system_clock::now();
+	cout << "norm tensor(F)*tensor(M) (2):" <<  torch::norm(t.flatten()) << endl;
+	time_faust_torch_without_conversion = end-start;
+	cout << "time F*M (pure Faust):" << time_pure_faust.count() << " secs." << endl;
+	cout << "time tensor(F)*tensor(M) (Faust torch):" << time_faust_torch.count() << " secs." << endl;
+	cout << "time tensor(F)*tensor(M) (Faust torch without time to convert to Tensors):" << time_faust_torch_without_conversion.count() << " secs." << endl;
+}
