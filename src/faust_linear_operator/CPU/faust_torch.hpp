@@ -2,13 +2,13 @@ namespace Faust
 {
 
 	template<typename FPP, FDevice D>
-		void faust_MatSparse_to_torch_Tensor(const Faust::MatSparse<FPP,D> & spm, torch::Tensor & t, at::DeviceType dev)
+		void faust_MatSparse_to_torch_Tensor(const Faust::MatSparse<FPP,D> & spm, torch::Tensor & t, at::DeviceType dev, const bool clone)
 		{
-			torch::Tensor values = torch::from_blob(const_cast<FPP*>(spm.getValuePtr()), {spm.getNonZeros()}, torch::TensorOptions().dtype(torch::kFloat64).device(dev)).clone();
+			torch::Tensor values = torch::from_blob(const_cast<FPP*>(spm.getValuePtr()), {spm.getNonZeros()}, torch::TensorOptions().dtype(torch::kFloat64).device(dev));//.clone();
 			//		cout << "tensor values:" << values << endl;
-			torch::Tensor col = torch::from_blob(const_cast<int*>(spm.getInnerIndexPtr()), {spm.getNonZeros()}, torch::TensorOptions().dtype(torch::kI32).device(dev)).clone();
+			torch::Tensor col = torch::from_blob(const_cast<int*>(spm.getInnerIndexPtr()), {spm.getNonZeros()}, torch::TensorOptions().dtype(torch::kI32).device(dev));//.clone();
 			//		cout << "tensor col:" << col << endl;
-			int* rows = new int[spm.getNonZeros()];
+			faust_unsigned_int* rows = new faust_unsigned_int[spm.getNonZeros()];
 			for(int i = 0; i < spm.getNbRow(); i++)
 			{
 				for(int j=spm.getOuterIndexPtr()[i];j < spm.getOuterIndexPtr()[i+1]; j++)
@@ -17,9 +17,15 @@ namespace Faust
 					//				cout << " " << rows[j];
 				}
 			}
-			torch::Tensor row = torch::from_blob(rows, {spm.getNonZeros()}, torch::TensorOptions().dtype(torch::kI32).device(dev)).clone();
-			row = row.to(torch::kI64);
-			col = col.to(torch::kI64);
+			torch::Tensor row = torch::from_blob(rows, {spm.getNonZeros()}, torch::TensorOptions().dtype(torch::kI64).device(dev)).clone(); // clone is mandatory for rows
+			if(clone)
+			{
+//				row = row.clone();
+//				col = col.clone();
+				values = values.clone();
+			}
+//			row = row.to(torch::kI64);
+			col = col.to(torch::kI64); // mandatory conversion because torch forces to use same size types for indices and values (even if indices are integers and values floats)
 			//		cout << "tensor row:" << row << endl;
 			delete [] rows;
 			torch::Tensor indices = at::stack({row, col}, /* dim */ 0);
@@ -28,13 +34,15 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice D>
-		void faust_MatDense_to_torch_Tensor(const Faust::MatDense<FPP,D> & dm, torch::Tensor & t, at::DeviceType dev)
+		void faust_MatDense_to_torch_Tensor(const Faust::MatDense<FPP,D> & dm, torch::Tensor & t, at::DeviceType dev, const bool clone)
 		{
-			t = torch::from_blob(const_cast<FPP*>(dm.getData()), {dm.getNbRow(), dm.getNbCol()},torch::TensorOptions().dtype(torch::kFloat64).device(dev)).clone();
+			t = torch::from_blob(const_cast<FPP*>(dm.getData()), {dm.getNbRow(), dm.getNbCol()},torch::TensorOptions().dtype(torch::kFloat64).device(dev));//.clone();
+			if(clone)
+				t = t.clone();
 		}
 
 	template<typename FPP, FDevice D>
-		void faust_matvec_to_torch_TensorList(const std::vector<Faust::MatGeneric<FPP,D>*> & ml, std::vector<torch::Tensor> &tl, at::DeviceType dev)
+		void faust_matvec_to_torch_TensorList(const std::vector<Faust::MatGeneric<FPP,D>*> & ml, std::vector<torch::Tensor> &tl, at::DeviceType dev, const bool clone)
 		{
 			const Faust::MatSparse<FPP,D> *spm;
 			const Faust::MatDense<FPP,D> *dm;
@@ -42,12 +50,12 @@ namespace Faust
 			for(auto m : ml)
 			{
 				if(spm = dynamic_cast<Faust::MatSparse<FPP,D>*>(m))
-					faust_MatSparse_to_torch_Tensor(*spm, t, dev);
+					faust_MatSparse_to_torch_Tensor(*spm, t, dev, clone);
 				else if(dm = dynamic_cast<Faust::MatDense<FPP,D>*>(m))
-					faust_MatDense_to_torch_Tensor(*dm, t, dev);
+					faust_MatDense_to_torch_Tensor(*dm, t, dev, clone);
 				tl.push_back(t);
 			}
-	}
+		}
 
 	torch::Tensor tensor_chain_mul(const std::vector<torch::Tensor>& ml, const torch::Tensor* op, at::DeviceType dev)
 	{
@@ -83,7 +91,7 @@ namespace Faust
 	}
 
 	template<typename FPP, FDevice D>
-		void tensor_chain_mul(const std::vector<Faust::MatGeneric<FPP,D>*>& ml, Faust::MatDense<FPP,Cpu> & out, const Faust::MatGeneric<FPP,D>* op, const bool on_gpu)
+		void tensor_chain_mul(const std::vector<Faust::MatGeneric<FPP,D>*>& ml, Faust::MatDense<FPP,Cpu> & out, const Faust::MatGeneric<FPP,D>* op, const bool on_gpu, const bool clone)
 		{
 			std::vector<torch::Tensor> tl;
 			faust_matvec_to_torch_TensorList(ml, tl);
@@ -93,9 +101,9 @@ namespace Faust
 			if(op)
 			{
 				if(spm = dynamic_cast<const Faust::MatSparse<FPP,D>*>(op))
-					faust_MatSparse_to_torch_Tensor(*spm, top, on_gpu?at::kCUDA:at::kCPU);
+					faust_MatSparse_to_torch_Tensor(*spm, top, on_gpu?at::kCUDA:at::kCPU, clone);
 				else if(dm = dynamic_cast<const Faust::MatDense<FPP,D>*>(op))
-					faust_MatDense_to_torch_Tensor(*dm, top, on_gpu?at::kCUDA:at::kCPU);
+					faust_MatDense_to_torch_Tensor(*dm, top, on_gpu?at::kCUDA:at::kCPU, clone);
 				tres = tensor_chain_mul(tl, &top, on_gpu?at::kCUDA:at::kCPU);
 			}
 			else

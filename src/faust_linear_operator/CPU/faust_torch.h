@@ -9,31 +9,35 @@ namespace Faust
 	/**
 	 * Converts a Faust::MatDense to a torch::Tensor.
 	 *
-	 * Unfortunately this is not a view but a copy which is not a problem when dev == at::kCUDA.
+	 * \param dev the device at::kCPU or at::kCUDA.
+	 * \param clone true to copy the Faust matrix data to create the tensor, false to use the same data without copying (false by default).
 	 */
 	template<typename FPP, FDevice D>
-		void faust_MatDense_to_torch_Tensor(const Faust::MatDense<FPP,D> & dm, torch::Tensor & t, at::DeviceType dev = at::kCPU);
+		void faust_MatDense_to_torch_Tensor(const Faust::MatDense<FPP,D> & dm, torch::Tensor & t, at::DeviceType dev = at::kCPU, const bool clone = false);
 
 
 	/**
 	 * Converts a Faust::MatSparse to a torch::Tensor.
 	 *
-	 * Unfortunately this is not a view but a copy which is not a problem when dev == at::kCUDA.
+	 *\param dev the device at::kCPU or at::kCUDA.
+	 *\param clone true to copy the Faust matrix data to create the tensor, false to use the same data without copying (false by default).
 	 */
 	template<typename FPP, FDevice D>
-		void faust_MatSparse_to_torch_Tensor(Faust::MatSparse<FPP,D> & spm, torch::Tensor & t, at::DeviceType dev = at::kCPU);
+		void faust_MatSparse_to_torch_Tensor(Faust::MatSparse<FPP,D> & spm, torch::Tensor & t, at::DeviceType dev = at::kCPU,  const bool clone = false);
 
 	/**
 	 * Converts a Faust::MatGeneric vector to a torch::TensorList (vector alias).
 	 *
-	 * Unfortunately this is not a view but a copy which is not a problem when dev == at::kCUDA.
+	 *\param dev the device at::kCPU or at::kCUDA.
+	 * \param clone true to copy the Faust matrices data to create the tensors, false to use the same data without copying (false by default).
 	 */
 	template<typename FPP, FDevice D>
-		void faust_matvec_to_torch_TensorList(const std::vector<Faust::MatGeneric<FPP,D>*> & ml, std::vector<torch::Tensor> &tl, at::DeviceType dev = at::kCPU);
+		void faust_matvec_to_torch_TensorList(const std::vector<Faust::MatGeneric<FPP,D>*> & ml, std::vector<torch::Tensor> &tl, at::DeviceType dev = at::kCPU, const bool clone = false);
 
 	/**
 	 * Computes the tensor chain product of ml and applies it optionally to the tensor op.
 	 *
+	 *\param dev the device at::kCPU or at::kCUDA.
 	 * Returns the result as a Tensor.
 	 */
 	torch::Tensor tensor_chain_mul(const std::vector<torch::Tensor>& ml, const torch::Tensor* op= nullptr, at::DeviceType dev = at::kCPU);
@@ -43,10 +47,12 @@ namespace Faust
 	 *
 	 * This function converts all the matrices to Tensors before and then computes the tensor product.
 	 *
+	 * \param on_gpu true ot use the GPU backend, false for the CPU backend (false by default).
+	 * \param clone true to copy the Faust matrices data to create the tensors, false to use the same data without copying (false by default).
 	 * Returns the result as a Faust::MatDense.
 	 */
 	template<typename FPP, FDevice D>
-		void tensor_chain_mul(const std::vector<Faust::MatGeneric<FPP,D>*>& ml, Faust::MatDense<FPP,Cpu> & out, const Faust::MatGeneric<FPP,D>* op = nullptr, const bool on_gpu = false);
+		void tensor_chain_mul(const std::vector<Faust::MatGeneric<FPP,D>*>& ml, Faust::MatDense<FPP,Cpu> & out, const Faust::MatGeneric<FPP,D>* op = nullptr, const bool on_gpu = false, const bool clone = false);
 }
 #include "faust_torch.hpp"
 #endif
