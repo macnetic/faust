@@ -18,8 +18,22 @@ int main(int argc, char** argv)
 	max_nfacts = static_cast<unsigned int>(std::rand()*(float)max_nfacts/RAND_MAX)+min_nfacts;
 	RandFaustType rt = MIXED;
 	if(argc > 1)
-		rt = SPARSE;
+	{
+		string arg(argv[1]);
+		if(! arg.compare("dense") || ! arg.compare("DENSE"))
+			rt = DENSE;
+		else if(! arg.compare("sparse") || ! arg.compare("SPARSE"))
+			rt = SPARSE;
+		else
+			cerr << "WARNING: invalid argument: must be sparse or dense (switch to mixed types)." << endl;
+	}
+	int nsamples;
+	if(argc > 2)
+	{
+		nsamples = std::atoi(argv[2]);
+	}
 	auto F = TransformHelper<FPP,Cpu>::randFaust(rt, min_nfacts, max_nfacts, min_size, max_size, .4f);
+	F->display();
 	vector<MatGeneric<FPP,Cpu>*> facs;
 	for(auto it = F->begin();it != F->end();it++)
 	{
@@ -34,23 +48,26 @@ int main(int argc, char** argv)
 	tensor_chain_mul(facs, out);
 	cout << "faust toarray through tensor_matmul:" <<  out.norm() << endl;
 	auto M = Faust::MatDense<FPP,Cpu>::randMat(F->getNbCol(), F->getNbRow());
+	/** Measure time of nsamples F*M (pure Faust) */
 	auto start = std::chrono::system_clock::now();
-	out = F->multiply(*M);
+	for(int i=0;i<nsamples;i++) out = F->multiply(*M);
 	auto end = std::chrono::system_clock::now();
-	cout << "norm F*M:" << out.norm() << endl;
 	time_pure_faust = end-start;
+	cout << "norm F*M:" << out.norm() << endl;
+	/** Measure time of nsamples F*M (Faust-torch) */
 	start = std::chrono::system_clock::now();
-	tensor_chain_mul(facs, out, M);
+	for(int i=0;i<nsamples;i++) tensor_chain_mul(facs, out, M);
 	end = std::chrono::system_clock::now();
-	cout << "norm tensor(F)*tensor(M):" <<  out.norm() << endl;
 	time_faust_torch = end-start;
-	start = std::chrono::system_clock::now();
+	cout << "norm tensor(F)*tensor(M):" <<  out.norm() << endl;
+	/** Measure time of nsamples F*M (Faust-torch without accounting matrix-to-tensor conversion time) */
 	Tensor tM;
 	faust_MatDense_to_torch_Tensor(*M, tM);
-	t = tensor_chain_mul(tl, &tM);
+	start = std::chrono::system_clock::now();
+	for(int i=0;i<nsamples;i++) t = tensor_chain_mul(tl, &tM);
 	end = std::chrono::system_clock::now();
-	cout << "norm tensor(F)*tensor(M) (2):" <<  torch::norm(t.flatten()) << endl;
 	time_faust_torch_without_conversion = end-start;
+	cout << "norm tensor(F)*tensor(M) (2):" <<  torch::norm(t.flatten()) << endl;
 	cout << "time F*M (pure Faust):" << time_pure_faust.count() << " secs." << endl;
 	cout << "time tensor(F)*tensor(M) (Faust torch):" << time_faust_torch.count() << " secs." << endl;
 	cout << "time tensor(F)*tensor(M) (Faust torch without time to convert to Tensors):" << time_faust_torch_without_conversion.count() << " secs." << endl;
