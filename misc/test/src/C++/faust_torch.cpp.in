@@ -1,22 +1,104 @@
 #include "faust_torch.h"
 #include "faust_TransformHelper.h"
 #include <chrono>
+#include <valarray>
 
 typedef @TEST_FPP@ FPP;
 using namespace Faust;
 using namespace std;
 using namespace torch;
 
+enum ProdMeth
+{
+	PURE_FAUST,
+	FAUST_TORCH,
+	FAUST_TORCH_CHAIN_OPT,
+	FAUST_TORCH_CONTIGUOUS_DENSE_TO_TORCH,
+	PURE_TORCH,
+	PURE_TORCH_CHAIN_OPT,
+	PURE_TORCH_CONTIGUOUS_DENSE_TO_TORCH
+};
+
+
+vector<double> count(vector<std::chrono::duration<double>> durs)
+{
+	vector<double> counts;
+	for(auto d: durs)
+		counts.push_back(d.count());
+	sort(counts.begin(), counts.end());
+	return counts;
+}
+
+double calc_relerr(Tensor t, MatDense<FPP,Cpu> m)
+{
+	MatDense<FPP,Cpu> aux;
+	torch_Tensor_to_faust_MatDense(t, aux);
+	aux -= m;
+//	Tensor taux;
+//	faust_MatDense_to_torch_Tensor(m, taux);
+//	taux -= t;
+//	cout << "tens reldiff:" << norm(taux.flatten())/norm(t) << endl;
+	return aux.norm()/m.norm();
+}
+
+double calc_relerr(MatDense<FPP,Cpu> m1, MatDense<FPP,Cpu> m2)
+{
+	MatDense<FPP,Cpu> aux = m1;
+	aux -= m2;
+	return aux.norm()/m2.norm();
+}
+
+double tensor_norm(Tensor t)
+{
+	MatDense<FPP,Cpu> aux;
+	torch_Tensor_to_faust_MatDense(t, aux);
+//	cout << torch::norm(t.flatten())<< endl; //can't static_ast c10::Scalar to double
+	return aux.norm(); 
+}
+
+double median_count(vector<double> counts)
+{
+	sort(counts.begin(), counts.end());
+	if(counts.size() ==1)
+		return counts[0];
+	if(counts.size()%2)
+		// odd size
+		return counts[counts.size()/2];
+	else
+		// even size
+		return (counts[counts.size()/2]+counts[counts.size()/2+1])/2;
+}
+
+double sum_count(vector<double> counts)
+{
+	double sum;
+	for(auto c : counts)
+		sum += c;
+	return sum;
+}
+
 int main(int argc, char** argv)
 {
-	int min_size = 10;
+	int min_size = 100;
 	int max_size = 1024;
-	unsigned int min_nfacts = 5;
-	unsigned int max_nfacts = 10;
-	std::chrono::duration<double> time_pure_faust, time_faust_torch, time_faust_torch_without_conversion;
+	unsigned int min_nfacts = 10;
+	unsigned int max_nfacts = 20;
+	size_t nmeths = 7;
+	MatDense<FPP,Cpu> M_from_tensor, Maux;
+	MatDense<FPP,Cpu> out, ref, aux;
+	Tensor t, taux, tref;
+	vector<Tensor> tl;
+	cout << "nmeths: " << nmeths << endl;
+	vector<std::chrono::duration<double>> times[nmeths];
+	vector<double> errors(nmeths), pnorms(nmeths);
+	vector<double> median_times(nmeths);
+	vector<double> cumu_times(nmeths);
+	vector<double> speedups(nmeths);
 	std::srand(std::time(0));
 	max_nfacts = static_cast<unsigned int>(std::rand()*(float)max_nfacts/RAND_MAX)+min_nfacts;
 	RandFaustType rt = MIXED;
+	int nsamples = 1;
+	bool chain_cherry_pick = false;
 	if(argc > 1)
 	{
 		string arg(argv[1]);
@@ -24,51 +106,166 @@ int main(int argc, char** argv)
 			rt = DENSE;
 		else if(! arg.compare("sparse") || ! arg.compare("SPARSE"))
 			rt = SPARSE;
+		else if(! arg.compare("mixed") || ! arg.compare("MIXED"))
+			rt = MIXED;
 		else
-			cerr << "WARNING: invalid argument: must be sparse or dense (switch to mixed types)." << endl;
+			cerr << "WARNING: invalid argument 1: must be sparse, dense or mixed (switch to mixed types)." << endl;
+		if(argc > 2)
+		{
+			nsamples = std::atoi(argv[2]);
+			if(argc > 3)
+			{
+				chain_cherry_pick = static_cast<bool>(std::atoi(argv[3]));
+			}
+		}
 	}
-	int nsamples;
-	if(argc > 2)
+	TransformHelper<FPP,Cpu> *F = TransformHelper<FPP,Cpu>::randFaust(rt, min_nfacts, max_nfacts, min_size, max_size, rt==SPARSE?.1f:1.f);;
+	if(chain_cherry_pick)
 	{
-		nsamples = std::atoi(argv[2]);
+		if(rt == DENSE || rt == MIXED)
+		{
+			auto mat1 = MatDense<FPP,Cpu>::randMat(F->getNbCol(), 2);
+			auto mat3 = MatDense<FPP,Cpu>::randMat(2, F->getNbRow());
+			auto mat2 = MatDense<FPP,Cpu>::randMat(2, 2);
+			auto middle_mats = {mat1, mat2, mat3};
+			F = new TransformHelper<FPP,Cpu>(*F, middle_mats, *F); // memory leak but it's not serious
+		}
+		else 
+		{ // rt == SPARSE
+			//		auto mat1 = Faust::MatSparse<FPP,Cpu>::randMat(F->getNbCol(), 2, .02d);
+			//		auto mat3 = Faust::MatSparse<FPP,Cpu>::randMat(2, F->getNbRow(), .02d);
+			//		auto mat2 = Faust::MatSparse<FPP,Cpu>::randMat(2, 2, 1.d);
+			auto mat1 = new Faust::MatSparse<FPP,Cpu>(*MatDense<FPP,Cpu>::randMat(F->getNbCol(), 2));
+			auto mat3 = new Faust::MatSparse<FPP,Cpu>(*MatDense<FPP,Cpu>::randMat(2, F->getNbRow()));
+			auto mat2 = new Faust::MatSparse<FPP,Cpu>(*MatDense<FPP,Cpu>::randMat(2, 2));
+			auto middle_mats = {mat1, mat2, mat3};
+			F = new TransformHelper<FPP,Cpu>(*F, middle_mats, *F); // memory leak but it's not serious
+		}
 	}
-	auto F = TransformHelper<FPP,Cpu>::randFaust(rt, min_nfacts, max_nfacts, min_size, max_size, .4f);
 	F->display();
 	vector<MatGeneric<FPP,Cpu>*> facs;
 	for(auto it = F->begin();it != F->end();it++)
 	{
 		facs.push_back(*it);
 	}
-	vector<Tensor> tl;
-	faust_matvec_to_torch_TensorList(facs, tl);
-	Tensor t = tensor_chain_mul(tl);
-	cout << "torch toarray norm:" << norm(t.flatten()) << endl;
-	cout << "faust toarray norm:" << F->normFro() << endl;
-	Faust::MatDense<FPP,Cpu> out;
+	/** test Faust to TensorList */
+	faust_matvec_to_torch_TensorList(facs, tl, at::kCPU, /*clone */ false);
+	t = tensor_chain_mul(tl);
+//	t = torch::chain_matmul(tl);
+	torch_Tensor_to_faust_MatDense(t, aux);
+	cout << "torch toarray norm: " << setprecision(15) << norm(t.flatten()) << endl;
+	cout << "faust toarray norm: " << setprecision(15) << F->normFro() << endl;
+	cout << "toarray faust-torch reldiff: " << calc_relerr(t,F->get_product()) << endl; 
+	/** */
 	tensor_chain_mul(facs, out);
-	cout << "faust toarray through tensor_matmul:" <<  out.norm() << endl;
+	cout << "faust toarray through tensor_matmul: " <<  out.norm() << endl;
+//	cout << "t.dtype:" << t.dtype() << endl;
+//	cout << t << endl;
+//	cout << F->get_product().to_string(false, true) << endl;
+	/** test MatDense to torch::Tensor conv. */
 	auto M = Faust::MatDense<FPP,Cpu>::randMat(F->getNbCol(), F->getNbRow());
+	cout << "norm(M): " << M->norm() << endl;
+	faust_MatDense_to_torch_Tensor(*M, taux);
+	cout << "M to tensor error: " << calc_relerr(taux, *M) << endl;
+	int i=0;
+//	for(auto ts : tl)
+//	{
+//		MatDense<FPP,Cpu> * md = dynamic_cast<MatDense<FPP,Cpu>*>(facs[i]);
+//		cout << "fac " << i << " err: " << calc_relerr(ts, *md) << endl;
+////		cout << ts << endl;
+////		cout << md->to_string(false, true) << endl;
+//		i++;
+//	}
+	/** prepare product refs (MatDense and Tensor)*/
+	ref = F->multiply(*M);
+	faust_MatDense_to_torch_Tensor(ref, tref);
 	/** Measure time of nsamples F*M (pure Faust) */
-	auto start = std::chrono::system_clock::now();
-	for(int i=0;i<nsamples;i++) out = F->multiply(*M);
-	auto end = std::chrono::system_clock::now();
-	time_pure_faust = end-start;
-	cout << "norm F*M:" << out.norm() << endl;
+	for(int i=0;i<nsamples;i++) 
+	{
+		auto start = std::chrono::system_clock::now();
+		out = F->multiply(*M);
+		auto end = std::chrono::system_clock::now();
+		times[PURE_FAUST].push_back(end-start);
+	}
+	errors[PURE_FAUST] = 0;
+	pnorms[PURE_FAUST] = ref.norm();
 	/** Measure time of nsamples F*M (Faust-torch) */
-	start = std::chrono::system_clock::now();
-	for(int i=0;i<nsamples;i++) tensor_chain_mul(facs, out, M);
-	end = std::chrono::system_clock::now();
-	time_faust_torch = end-start;
-	cout << "norm tensor(F)*tensor(M):" <<  out.norm() << endl;
+	for(int i=0;i<nsamples;i++) 
+	{
+		auto start = std::chrono::system_clock::now();
+		tensor_chain_mul(facs, out, M, false, /* clone*/ false);
+		auto end = std::chrono::system_clock::now();
+		times[FAUST_TORCH].push_back(end - start);
+	}
+	errors[FAUST_TORCH] = calc_relerr(ref, out);
+	pnorms[FAUST_TORCH] = out.norm();
+	for(int i=0;i<nsamples;i++) 
+	{
+		auto start = std::chrono::system_clock::now();
+		tensor_chain_mul(facs, out, M, /* on_gpu */ false, /* clone */ false, /* chain opt */true);
+		auto end = std::chrono::system_clock::now();
+		times[FAUST_TORCH_CHAIN_OPT].push_back(end - start);
+	}
+	errors[FAUST_TORCH_CHAIN_OPT] = calc_relerr(ref, out);
+	pnorms[FAUST_TORCH_CHAIN_OPT] = out.norm();
+	for(int i=0;i<nsamples;i++) 
+	{
+		auto start = std::chrono::system_clock::now();
+		tensor_chain_mul(facs, out, M, /* on_gpu */ false, /* clone */ false, /* chain opt */false, /* contiguous dense factors computed with torch::chain_matmul */ true);
+		auto end = std::chrono::system_clock::now();
+		times[FAUST_TORCH_CONTIGUOUS_DENSE_TO_TORCH].push_back(end - start);
+	}
+	errors[FAUST_TORCH_CONTIGUOUS_DENSE_TO_TORCH] = calc_relerr(ref, out);
+	pnorms[FAUST_TORCH_CONTIGUOUS_DENSE_TO_TORCH] = out.norm();
 	/** Measure time of nsamples F*M (Faust-torch without accounting matrix-to-tensor conversion time) */
 	Tensor tM;
 	faust_MatDense_to_torch_Tensor(*M, tM);
-	start = std::chrono::system_clock::now();
-	for(int i=0;i<nsamples;i++) t = tensor_chain_mul(tl, &tM);
-	end = std::chrono::system_clock::now();
-	time_faust_torch_without_conversion = end-start;
-	cout << "norm tensor(F)*tensor(M) (2):" <<  torch::norm(t.flatten()) << endl;
-	cout << "time F*M (pure Faust):" << time_pure_faust.count() << " secs." << endl;
-	cout << "time tensor(F)*tensor(M) (Faust torch):" << time_faust_torch.count() << " secs." << endl;
-	cout << "time tensor(F)*tensor(M) (Faust torch without time to convert to Tensors):" << time_faust_torch_without_conversion.count() << " secs." << endl;
+	for(int i=0;i<nsamples;i++) 
+	{
+		auto start = std::chrono::system_clock::now();
+		t = tensor_chain_mul(tl, &tM);
+		auto end = std::chrono::system_clock::now();
+		times[PURE_TORCH].push_back(end - start);
+	}
+	errors[PURE_TORCH] = calc_relerr(t, ref);
+	pnorms[PURE_TORCH] = tensor_norm(t);
+	for(int i=0;i<nsamples;i++)
+	{
+		auto start = std::chrono::system_clock::now();
+		t = tensor_chain_mul_opt(tl, &tM);
+		auto end = std::chrono::system_clock::now();
+		times[PURE_TORCH_CHAIN_OPT].push_back(end - start);
+	}
+	errors[PURE_TORCH_CHAIN_OPT] = calc_relerr(t, ref);
+	pnorms[PURE_TORCH_CHAIN_OPT] = tensor_norm(t);
+	for(int i=0;i<nsamples;i++)
+	{
+		auto start = std::chrono::system_clock::now();
+		t = tensor_chain_mul(tl, &tM, at::kCPU, /* chain opt */false, /* contiguous dense factors computed with torch::chain_matmul */ true);
+		auto end = std::chrono::system_clock::now();
+		times[PURE_TORCH_CONTIGUOUS_DENSE_TO_TORCH].push_back(end - start);
+	}
+	errors[PURE_TORCH_CONTIGUOUS_DENSE_TO_TORCH] = calc_relerr(t, ref);
+	pnorms[PURE_TORCH_CONTIGUOUS_DENSE_TO_TORCH] = tensor_norm(t);
+	for(int i=0; i < median_times.size(); i ++)
+	{
+		median_times[i] = median_count(count(times[i]));
+		if(i == 0)
+			speedups[i] = 1;
+		else
+			speedups[i] = median_times[0]/median_times[i];
+		cumu_times[i] = sum_count(count(times[i]));
+	}
+	cout << "(1) F*M (pure Faust)." << endl;
+	cout << "(2) tensor(F)*tensor(M) (Faust torch)." << endl;
+	cout << "(3) tensor(F)*tensor(M) (Faust torch with chain opt)." << endl;
+	cout << "(4) tensor(F)*tensor(M) (Faust torch using torch::chain_matmul for contiguous dense factors -- always true when the Faust is composed of only dense factors)." << endl;
+	cout << "(5) tensor(F)*tensor(M) (Pure torch)." << endl;
+	cout << "(6) tensor(F)*tensor(M) (Pure torch with chain opt)." << endl;
+	cout << "(7) tensor(F)*tensor(M) (Pure torch using torch::chain_matmul for contiguous dense factors -- always true when the Faust is composed of only dense factors))." << endl;
+	cout << "stats: median time (secs) / speedup / cumutime / errVSFaust / pnorms" << endl;
+	for(int i=0;i<nmeths;i++)
+	{
+		cout << "("<<i+1<<"): " <</* count(time_pure_faust) <<*/ median_times[i] << " / " << speedups[i] << " / " << cumu_times[i] << " / " << errors[i] <<  " / " << pnorms[i] << endl;
+	}
 }
