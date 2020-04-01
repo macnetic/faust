@@ -32,10 +32,10 @@ vector<double> count(vector<std::chrono::duration<double>> durs)
 double calc_relerr(Tensor t, MatDense<FPP,Cpu> m)
 {
 	MatDense<FPP,Cpu> aux;
-	torch_Tensor_to_faust_MatDense(t, aux);
+	convTensorToMatDense(t, aux);
 	aux -= m;
 //	Tensor taux;
-//	faust_MatDense_to_torch_Tensor(m, taux);
+//	convMatDenseToTensor(m, taux);
 //	taux -= t;
 //	cout << "tens reldiff:" << norm(taux.flatten())/norm(t) << endl;
 	return aux.norm()/m.norm();
@@ -51,7 +51,7 @@ double calc_relerr(MatDense<FPP,Cpu> m1, MatDense<FPP,Cpu> m2)
 double tensor_norm(Tensor t)
 {
 	MatDense<FPP,Cpu> aux;
-	torch_Tensor_to_faust_MatDense(t, aux);
+	convTensorToMatDense(t, aux);
 //	cout << torch::norm(t.flatten())<< endl; //can't static_ast c10::Scalar to double
 	return aux.norm(); 
 }
@@ -79,7 +79,7 @@ double sum_count(vector<double> counts)
 
 int main(int argc, char** argv)
 {
-	int min_size = 100;
+	int min_size = 128;
 	int max_size = 1024;
 	unsigned int min_nfacts = 10;
 	unsigned int max_nfacts = 20;
@@ -149,10 +149,12 @@ int main(int argc, char** argv)
 		facs.push_back(*it);
 	}
 	/** test Faust to TensorList */
-	faust_matvec_to_torch_TensorList(facs, tl, at::kCPU, /*clone */ false);
+	convMatGenListToTensorList(facs, tl, at::kCPU, /*clone */ false);
+	cout << "Faust to TensorList:" << endl;
+	display_TensorList(tl);
 	t = tensor_chain_mul(tl);
 //	t = torch::chain_matmul(tl);
-	torch_Tensor_to_faust_MatDense(t, aux);
+	convTensorToMatDense(t, aux);
 	cout << "torch toarray norm: " << setprecision(15) << norm(t.flatten()) << endl;
 	cout << "faust toarray norm: " << setprecision(15) << F->normFro() << endl;
 	cout << "toarray faust-torch reldiff: " << calc_relerr(t,F->get_product()) << endl; 
@@ -165,7 +167,7 @@ int main(int argc, char** argv)
 	/** test MatDense to torch::Tensor conv. */
 	auto M = Faust::MatDense<FPP,Cpu>::randMat(F->getNbCol(), F->getNbRow());
 	cout << "norm(M): " << M->norm() << endl;
-	faust_MatDense_to_torch_Tensor(*M, taux);
+	convMatDenseToTensor(*M, taux);
 	cout << "M to tensor error: " << calc_relerr(taux, *M) << endl;
 	int i=0;
 //	for(auto ts : tl)
@@ -178,7 +180,7 @@ int main(int argc, char** argv)
 //	}
 	/** prepare product refs (MatDense and Tensor)*/
 	ref = F->multiply(*M);
-	faust_MatDense_to_torch_Tensor(ref, tref);
+	convMatDenseToTensor(ref, tref);
 	/** Measure time of nsamples F*M (pure Faust) */
 	for(int i=0;i<nsamples;i++) 
 	{
@@ -189,6 +191,7 @@ int main(int argc, char** argv)
 	}
 	errors[PURE_FAUST] = 0;
 	pnorms[PURE_FAUST] = ref.norm();
+	cout << "(1) done." << endl;
 	/** Measure time of nsamples F*M (Faust-torch) */
 	for(int i=0;i<nsamples;i++) 
 	{
@@ -197,6 +200,7 @@ int main(int argc, char** argv)
 		auto end = std::chrono::system_clock::now();
 		times[FAUST_TORCH].push_back(end - start);
 	}
+	cout << "(2) done." << endl;
 	errors[FAUST_TORCH] = calc_relerr(ref, out);
 	pnorms[FAUST_TORCH] = out.norm();
 	for(int i=0;i<nsamples;i++) 
@@ -206,6 +210,7 @@ int main(int argc, char** argv)
 		auto end = std::chrono::system_clock::now();
 		times[FAUST_TORCH_CHAIN_OPT].push_back(end - start);
 	}
+	cout << "(3) done." << endl;
 	errors[FAUST_TORCH_CHAIN_OPT] = calc_relerr(ref, out);
 	pnorms[FAUST_TORCH_CHAIN_OPT] = out.norm();
 	for(int i=0;i<nsamples;i++) 
@@ -215,11 +220,12 @@ int main(int argc, char** argv)
 		auto end = std::chrono::system_clock::now();
 		times[FAUST_TORCH_CONTIGUOUS_DENSE_TO_TORCH].push_back(end - start);
 	}
+	cout << "(4) done." << endl;
 	errors[FAUST_TORCH_CONTIGUOUS_DENSE_TO_TORCH] = calc_relerr(ref, out);
 	pnorms[FAUST_TORCH_CONTIGUOUS_DENSE_TO_TORCH] = out.norm();
 	/** Measure time of nsamples F*M (Faust-torch without accounting matrix-to-tensor conversion time) */
 	Tensor tM;
-	faust_MatDense_to_torch_Tensor(*M, tM);
+	convMatDenseToTensor(*M, tM);
 	for(int i=0;i<nsamples;i++) 
 	{
 		auto start = std::chrono::system_clock::now();
@@ -227,6 +233,7 @@ int main(int argc, char** argv)
 		auto end = std::chrono::system_clock::now();
 		times[PURE_TORCH].push_back(end - start);
 	}
+	cout << "(5) done." << endl;
 	errors[PURE_TORCH] = calc_relerr(t, ref);
 	pnorms[PURE_TORCH] = tensor_norm(t);
 	for(int i=0;i<nsamples;i++)
@@ -236,6 +243,7 @@ int main(int argc, char** argv)
 		auto end = std::chrono::system_clock::now();
 		times[PURE_TORCH_CHAIN_OPT].push_back(end - start);
 	}
+	cout << "(6) done." << endl;
 	errors[PURE_TORCH_CHAIN_OPT] = calc_relerr(t, ref);
 	pnorms[PURE_TORCH_CHAIN_OPT] = tensor_norm(t);
 	for(int i=0;i<nsamples;i++)
@@ -245,6 +253,7 @@ int main(int argc, char** argv)
 		auto end = std::chrono::system_clock::now();
 		times[PURE_TORCH_CONTIGUOUS_DENSE_TO_TORCH].push_back(end - start);
 	}
+	cout << "(7) done." << endl;
 	errors[PURE_TORCH_CONTIGUOUS_DENSE_TO_TORCH] = calc_relerr(t, ref);
 	pnorms[PURE_TORCH_CONTIGUOUS_DENSE_TO_TORCH] = tensor_norm(t);
 	for(int i=0; i < median_times.size(); i ++)
@@ -266,6 +275,6 @@ int main(int argc, char** argv)
 	cout << "stats: median time (secs) / speedup / cumutime / errVSFaust / pnorms" << endl;
 	for(int i=0;i<nmeths;i++)
 	{
-		cout << "("<<i+1<<"): " <</* count(time_pure_faust) <<*/ median_times[i] << " / " << speedups[i] << " / " << cumu_times[i] << " / " << errors[i] <<  " / " << pnorms[i] << endl;
+		cout << "("<<i+1<<"): " <</* count(time_pure_faust) <<*/ median_times[i] << " / " << setprecision(3) << speedups[i] << " / " << cumu_times[i] << " / " << errors[i] <<  " / " << pnorms[i] << endl;
 	}
 }
