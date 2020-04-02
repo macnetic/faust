@@ -222,12 +222,20 @@ namespace Faust {
 
 
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(MatDense<FPP,Cpu> A, const bool transpose, const bool conjugate)
+		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const MatDense<FPP,Cpu> A, const bool transpose, const bool conjugate)
 		{
 			is_transposed ^= transpose;
 			is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
 			std::vector<Faust::MatGeneric<FPP,Cpu>*> data(this->transform->size()+1);
+#ifdef FAUST_TORCH
+			if(mul_order_opt_mode >= 7 && mul_order_opt_mode <= 9 && !tensor_data.size())
+			{
+				// init tensor data cache
+				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! is_transposed);
+//				display_TensorList(tensor_data);
+			}
+#endif
 			switch(this->mul_order_opt_mode)
 			{
 				case 1:
@@ -258,6 +266,17 @@ namespace Faust {
 				case 6:
 					M = this->transform->multiply_omp(A, isTransposed2char());
 					break;
+#ifdef FAUST_TORCH
+				case 7:
+					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false, /*clone */ false, /* chain_opt */ false, /* contiguous_dense_to_torch */ false, !is_transposed);
+					break;
+				case 8:
+					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false,  /*clone */ false,/* chain_opt */ true, /* contiguous_dense_to_torch */ false, !is_transposed);
+					break;
+				case 9:
+					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false, /*clone */ false, /* chain_opt */ false, /* contiguous_dense_to_torch */ true, !is_transposed);
+					break;
+#endif
 				default:
 					M = this->transform->multiply(A, isTransposed2char());
 					break;
@@ -334,21 +353,40 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_multiply(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
 		{
 			TransformHelper<FPP,Cpu>* t_opt = nullptr;
-			int NMETS = 5; //skip openmp method (not supported on macOS)
+			int NMETS = 10;
 			std::chrono::duration<double> * times = new std::chrono::duration<double>[NMETS]; //use heap because of VS14 (error C3863)
-			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(transp?this->getNbRow():this->getNbCol(), 2048);
+//			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(transp?this->getNbRow():this->getNbCol(), 2048);
 			int old_meth = this->get_mul_order_opt_mode();
 			int nmuls = nsamples, opt_meth=0;
+			std::vector<int> disabled_meths = {5, 6}; //skip openmp method (not supported on macOS)
 #if DEBUG_OPT_MUL
 			cout << "nsamples used to measure time: " << nmuls << endl;
 #endif
+#ifdef FAUST_TORCH
+			if(mul_order_opt_mode >= 7 && mul_order_opt_mode <= 9 && !tensor_data.size())
+			{
+				// init tensor data cache
+				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! is_transposed);
+//				display_TensorList(tensor_data);
+			}
+#else
+			for(int i=7;i<10;i++)
+				disabled_meths.push_back(i);
+#endif
+
 			for(int i=0; i < NMETS; i++)
 			{
+				if(std::find(std::begin(disabled_meths), std::end(disabled_meths), i) != std::end(disabled_meths))
+				{
+					times[i] = std::chrono::duration<double>(numeric_limits<double>::max());
+					continue;
+				}
 				this->set_mul_order_opt_mode(i);
 				auto start = std::chrono::system_clock::now();
 				for(int j=0;j < nmuls; j++)
 				{
-					auto FM = this->multiply(*M, transp);
+					//				auto FM = this->multiply(*M, transp);
+					this->get_product();
 				}
 				auto end = std::chrono::system_clock::now();
 				times[i] = end-start;
@@ -1325,7 +1363,7 @@ namespace Faust {
 			for(int i =0; i < size(); i++)
 				//NOTE: about const cast: no problem, we know we won't write it
 				//NOTE: don't use get_gen_fact() to avoid transpose auto-handling
-				factors.push_back(const_cast<Faust::MatGeneric<FPP, (FDevice)0u>*>(this->transform->data[i]));
+				factors.push_back(const_cast<Faust::MatGeneric<FPP, Cpu>*>(this->transform->data[i]));
 #ifdef NON_OPT_FAUST_NORMALIZATION
 			if(this->is_transposed)
 				factors.insert(factors.begin(), norm_diag);

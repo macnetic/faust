@@ -49,6 +49,11 @@
 #include "faust_Slice.h"
 #include "faust_MatSparse.h"
 #include <random>
+#include <limits>
+#include <algorithm>
+#ifdef FAUST_TORCH
+#include "faust_torch.h"
+#endif
 
 namespace Faust {
 
@@ -85,6 +90,9 @@ namespace Faust {
 			faust_unsigned_int fancy_num_rows;
 			faust_unsigned_int fancy_num_cols;
 			shared_ptr<Transform<FPP,Cpu>> transform;
+#ifdef FAUST_TORCH
+			std::vector<torch::Tensor> tensor_data;
+#endif
 
 			void eval_sliced_Transform();
 			void eval_fancy_idx_Transform();
