@@ -90,7 +90,7 @@ namespace Faust
 	 * Returns the result as a Faust::MatDense.
 	 */
 	template<typename FPP, FDevice D>
-		void tensor_chain_mul(const std::vector<Faust::MatGeneric<FPP,D>*>& ml, Faust::MatDense<FPP,Cpu> & out, const Faust::MatGeneric<FPP,D>* op = nullptr, const bool on_gpu = false, const bool clone = false, const bool chain_opt = false,  const bool contiguous_dense_to_torch = false, const bool transpose = true);
+		void tensor_chain_mul(const std::vector<Faust::MatGeneric<FPP,D>*>& ml, Faust::MatDense<FPP,D> & out, const Faust::MatGeneric<FPP,D>* op = nullptr, const bool on_gpu = false, const bool clone = false, const bool chain_opt = false,  const bool contiguous_dense_to_torch = false, const bool transpose = true);
 
 	/**
 	 * Computes the matrix chain product of tl and applies it optionally to the matrix op if provided.
@@ -106,7 +106,7 @@ namespace Faust
 	 * Returns the result as a Faust::MatDense.
 	 */
 	template<typename FPP, FDevice D>
-		void tensor_chain_mul(const std::vector<torch::Tensor>& tl, Faust::MatDense<FPP,Cpu> & out, const Faust::MatGeneric<FPP,D>* op, const bool on_gpu, const bool clone, const bool chain_opt, const bool contiguous_dense_to_torch, const bool transpose = true);
+		void tensor_chain_mul(const std::vector<torch::Tensor>& tl, Faust::MatDense<FPP,D> & out, const Faust::MatGeneric<FPP,D>* op, const bool on_gpu, const bool clone, const bool chain_opt, const bool contiguous_dense_to_torch, const bool transpose = true);
 
 	/**
 	 * This function display a Tensor list (size and storage format of Tensor-s, DENSE or SPARSE).

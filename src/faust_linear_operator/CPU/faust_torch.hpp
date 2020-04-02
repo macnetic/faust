@@ -34,7 +34,7 @@ namespace Faust
 				//reverse row and col to take the matrix as a transpose mat
 				indices = at::stack({col, row}, /* dim */ 0);
 				t = torch::sparse_coo_tensor(indices, values);
-				t.sparse_resize_({spm.getNbCol(), spm.getNbRow()}, t.sparse_dim(), t.dense_dim());
+				t.sparse_resize_({spm.getNbCol(), spm.getNbRow()}, t.sparse_dim(), t.dense_dim()); // this fixes low level bug (where the number of tensor columns is incorrect by one)
 			}
 			else
 			{
@@ -71,11 +71,11 @@ namespace Faust
 		{
 			if(transpose)
 			{
-				dm = Faust::MatDense<FPP,Cpu>(t.data_ptr<FPP>(), t.size(1), t.size(0));
+				dm = Faust::MatDense<FPP,D>(t.data_ptr<FPP>(), t.size(1), t.size(0));
 			}
 			else
 			{
-				dm = Faust::MatDense<FPP,Cpu>(t.data_ptr<FPP>(), t.size(1), t.size(0));
+				dm = Faust::MatDense<FPP,D>(t.data_ptr<FPP>(), t.size(1), t.size(0));
 				dm.transpose();
 				// need to transpose when transpose is false! conversion from torch row-major order
 				// while Faust is in col-major order (the conversion is equivalent to a transpose)
@@ -168,7 +168,7 @@ namespace Faust
 			dense_contiguous_facts.erase(dense_contiguous_facts.begin(), dense_contiguous_facts.end());
 		}
 		// don't worry assert is enabled only in debug mode (when DEBUG is defined)
-		assert((op != nullptr && op_on_left && res.size(0) == op.size(0)) || ((! op_on_left || op == nullptr) && res.size(0) == tl[0].size(0)) || op == nullptr);
+		assert((op != nullptr && op_on_left && res.size(0) == op->size(0)) || ((! op_on_left || op == nullptr) && res.size(0) == tl[0].size(0)) || op == nullptr);
 		assert(((op == nullptr || op_on_left) && res.size(1) == (*(tl.end()-1)).size(1)) || op != nullptr && res.size(1) == op->size(1));
 		return std::move(res); //explicit move but should work auto because Tensor class overrides move operator= and ctor
 	}
@@ -253,7 +253,7 @@ namespace Faust
 	}
 
 	template<typename FPP, FDevice D>
-		void tensor_chain_mul(const std::vector<Faust::MatGeneric<FPP,D>*>& ml, Faust::MatDense<FPP,Cpu> & out, const Faust::MatGeneric<FPP,D>* op, const bool on_gpu, const bool clone, const bool chain_opt, const bool contiguous_dense_to_torch, const bool transpose /* = true */)
+		void tensor_chain_mul(const std::vector<Faust::MatGeneric<FPP,D>*>& ml, Faust::MatDense<FPP,D> & out, const Faust::MatGeneric<FPP,D>* op, const bool on_gpu, const bool clone, const bool chain_opt, const bool contiguous_dense_to_torch, const bool transpose /* = true */)
 		{
 			std::vector<torch::Tensor> tl;
 			convMatGenListToTensorList(ml, tl, on_gpu?at::kCUDA:at::kCPU, clone, transpose);
@@ -261,7 +261,7 @@ namespace Faust
 		}
 
 	template<typename FPP, FDevice D>
-		void tensor_chain_mul(const std::vector<torch::Tensor>& tl, Faust::MatDense<FPP,Cpu> & out, const Faust::MatGeneric<FPP,D>* op, const bool on_gpu, const bool clone, const bool chain_opt, const bool contiguous_dense_to_torch, const bool transpose /* = true */)
+		void tensor_chain_mul(const std::vector<torch::Tensor>& tl, Faust::MatDense<FPP,D> & out, const Faust::MatGeneric<FPP,D>* op, const bool on_gpu, const bool clone, const bool chain_opt, const bool contiguous_dense_to_torch, const bool transpose /* = true */)
 	{
 		torch::Tensor top, tres;
 		const Faust::MatSparse<FPP,D> *spm;
