@@ -35,19 +35,20 @@ else() # in fact this is only for WIN32 MINGW
 	string(REGEX REPLACE "^lib" "" MATIO_LIB_NAME ${MATIO_LIB_NAME})
 	set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS},'${MATIO_LIB_NAME}'")
 	set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR},'${MATIO_LIB_DIR}'")
+
 endif()
 
 
 
 set(FAUST_PYTHON_INCLUDE_DIR "'${EIGEN_INC_DIR}',
-			'${FAUST_SRC_LINEAR_OPERATOR_DIR}',
-			'${FAUST_PYTHON_SRC_DIR}',
-			'${FAUST_PYTHON_SRC_SRC_DIR}',
-			'${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}',
-			'${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}',
-			'${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}',
-			'${FAUST_UTILS_SRC_DIR}',
-			'${MATIO_INC_DIR}'")
+'${FAUST_SRC_LINEAR_OPERATOR_DIR}',
+'${FAUST_PYTHON_SRC_DIR}',
+'${FAUST_PYTHON_SRC_SRC_DIR}',
+'${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}',
+'${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}',
+'${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}',
+'${FAUST_UTILS_SRC_DIR}',
+'${MATIO_INC_DIR}'")
 
 
 
@@ -72,7 +73,7 @@ if(WIN32)
 	set(FAUST_SETUP_PY_CFLAGS "'/w', '/EHsc' ")
 	set(FAUST_SETUP_PY_LFLAGS "")
 else() #UNIX
-	set(FAUST_SETUP_PY_CFLAGS "'-std=c++11', '-O2'")
+	set(FAUST_SETUP_PY_CFLAGS "'-std=c++11', '-O3'")
 	set(FAUST_SETUP_PY_LFLAGS "'-s'")
 endif()
 
@@ -86,6 +87,14 @@ if(BUILD_MULTITHREAD AND NOT APPLE)
 	endif()
 endif()
 
+# TODO: apart cmake script ?
+if(FAUST_TORCH)
+	set(FAUST_PYTHON_INCLUDE_DIR "${FAUST_PYTHON_INCLUDE_DIR}, '${Torch_DIR}/../../../include', '${Torch_DIR}/../../../include/torch/csrc/api/include'")
+	set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS}, 'torch', 'c10'")
+	set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR}, '${Torch_DIR}/../../../lib'")
+	#variable Torch_DIR is initialized by Torch CMake scripts
+	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-DFAUST_TORCH'")
+endif()
 
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)
 configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup.py @ONLY)
@@ -114,6 +123,13 @@ configure_file(${PROJECT_SOURCE_DIR}/license_zlib.txt ${FAUST_PYTHON_BIN_DIR}/py
 
 message(STATUS "Installing pyfaust.py as pyfaust/__init__.py")
 configure_file(${FAUST_PYTHON_SRC_DIR}/pyfaust.py ${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py @ONLY)
+# filter experimental code out of pyfaust modules
+execute_process(COMMAND
+	python
+	"${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py"
+	${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py
+	${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py
+	"--no-empty")
 FILE(GLOB_RECURSE PYFAUST_FILES RELATIVE ${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_SRC_DIR}/pyfaust/*py)
 foreach(PYFAUST_FILE ${PYFAUST_FILES})
 	message(STATUS "Installing ${PYFAUST_FILE}")
@@ -235,7 +251,7 @@ elseif(WIN32)
 						COMMAND type
 						ARGS "_FaustCorePy.cpp2" ">" "_FaustCorePy.cpp" 2>NUL
 						COMMAND ${CMAKE_CXX_COMPILER}
-						ARGS "-std=c++11" "-shared" "-DMS_WIN64" "-s" "-O2" "${WIN32_GCC_OMP}" "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
+						ARGS "-std=c++11" "-shared" "-DMS_WIN64" "-s" "-O3" "${WIN32_GCC_OMP}" "-o"  "${PY_DYNLIB}" "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.cpp" ${FAUST_PY_CFLAGS} ${PY_STATIC_LIBS}
 						COMMENT   "Creating pyfaust${PY_VER}")
 				endif()
 			endforeach()
