@@ -11,7 +11,7 @@ using namespace torch;
 enum ProdMeth
 {
 	PURE_FAUST,
-	FAUST_TORCH,
+	FAUST_TORCH_, // underscore to avoid conflict with FAUST_CONST compiling constant
 	FAUST_TORCH_CHAIN_OPT,
 	FAUST_TORCH_CONTIGUOUS_DENSE_TO_TORCH,
 	PURE_TORCH,
@@ -198,11 +198,11 @@ int main(int argc, char** argv)
 		auto start = std::chrono::system_clock::now();
 		tensor_chain_mul(facs, out, M, false, /* clone*/ false);
 		auto end = std::chrono::system_clock::now();
-		times[FAUST_TORCH].push_back(end - start);
+		times[FAUST_TORCH_].push_back(end - start);
 	}
 	cout << "(2) done." << endl;
-	errors[FAUST_TORCH] = calc_relerr(ref, out);
-	pnorms[FAUST_TORCH] = out.norm();
+	errors[FAUST_TORCH_] = calc_relerr(ref, out);
+	pnorms[FAUST_TORCH_] = out.norm();
 	for(int i=0;i<nsamples;i++) 
 	{
 		auto start = std::chrono::system_clock::now();

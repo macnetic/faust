@@ -45,7 +45,7 @@ else: # linux and mac
 
 
 setup(
-    name = 'pyfaust',
+    name = 'pyfaust@PYFAUST_PKG_SUFFIX@',
     version = version, # cf. header
     ext_modules = cythonize(PyFaust, compiler_directives={'language_level': sys.version_info.major }),
     packages = [ 'pyfaust' ],

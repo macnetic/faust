@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # @PYFAUST_LICENSE_HEADER@
+# @TORCH_LIBS_LOADING@
 
 ## @package pyfaust @brief @b The @b FAuST @b Python @b Wrapper
 

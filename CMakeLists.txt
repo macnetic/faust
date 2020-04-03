@@ -616,6 +616,15 @@ include(CMake/findExternalLibs.cmake)
 #########################################
 #########################################
 
+if(FAUST_TORCH)
+	find_package(Torch REQUIRED)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS} -DFAUST_TORCH") #-D_GLIBCXX_USE_CXX11_ABI=0")
+	message(STATUS TORCH_LIBRARY=${TORCH_LIBRARY})
+	#message(STATUS "TORCH_CXX_FLAGS=" ${TORCH_CXX_FLAGS)
+	get_filename_component(Torch_DIR ${TORCH_LIBRARY} DIRECTORY)
+	message(STATUS TORCH_DIR=${Torch_DIR})
+endif()
+
 include_directories(BEFORE ${EIGEN_INC_DIR} ${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}  ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR} ${FAUST_UTILS_SRC_DIR})
 ########### add_subdirectory ###############
 if (BUILD_WRAPPER_PYTHON)
@@ -683,19 +692,10 @@ else (BUILD_USE_GPU)
 endif (BUILD_USE_GPU)
 
 if(FAUST_TORCH)
-	find_package(Torch REQUIRED)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS} -DFAUST_TORCH") #-D_GLIBCXX_USE_CXX11_ABI=0")
-	message(STATUS TORCH_LIBRARY=${TORCH_LIBRARY})
-	#message(STATUS "TORCH_CXX_FLAGS=" ${TORCH_CXX_FLAGS})
-	include_directories(${FAUST_TARGET} ${Torch_DIR}/../../../include ${Torch_DIR}/../../../include/torch/csrc/api/include)
-	target_link_libraries(${FAUST_TARGET} "${TORCH_LIBRARY}" ${Torch_DIR}/../../../lib/libc10.so)
-	target_include_directories(${FAUST_TARGET} PUBLIC  ${Torch_DIR}/../../../include ${Torch_DIR}/../../../include/torch/csrc/api/include)
+	include_directories(${FAUST_TARGET} ${Torch_DIR}/../include ${Torch_DIR}/../include/torch/csrc/api/include)
+	target_link_libraries(${FAUST_TARGET} torch c10)
+	target_include_directories(${FAUST_TARGET} PUBLIC  ${Torch_DIR}/../include ${Torch_DIR}/../include/torch/csrc/api/include)
 endif()
-
-#if(FAUST_TORCH)
-#	target_link_libraries(${FAUST_TARGET} "${TORCH_LIBRARY}" ${Torch_DIR}/../../../lib/libc10.so)
-#	target_include_directories(${FAUST_TARGET} PUBLIC  ${Torch_DIR}/../../../include ${Torch_DIR}/../../../include/torch/csrc/api/include)
-#endif()
 
 if (BUILD_WRAPPER_MATLAB)
 	if (UNIX) 

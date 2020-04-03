@@ -197,10 +197,13 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
 
 
+list(APPEND tests hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate GivensFGFT GivensFGFTSparse GivensFGFTParallel GivensFGFTParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op GivensFGFTComplex GivensFGFTComplexSparse GivensFGFTParallelComplex faust_toeplitz faust_circ faust_hankel palm4msa_2020 hierarchical2020 hierarchical2020Hadamard hierarchicalFactorizationHadamard)
+		if(FAUST_TORCH)
+			list(APPEND tests faust_torch)
+		endif()
 
 	foreach(TEST_FPP float double complex<float> complex<double>)	
-		#TODO: add faust_torch only if FAUST_TORCH option is ON
-		foreach(testin faust_torch hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate GivensFGFT GivensFGFTSparse GivensFGFTParallel GivensFGFTParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op GivensFGFTComplex GivensFGFTComplexSparse GivensFGFTParallelComplex faust_toeplitz faust_circ faust_hankel palm4msa_2020 hierarchical2020 hierarchical2020Hadamard hierarchicalFactorizationHadamard )
+		foreach(testin IN LISTS tests)
 			if(${TEST_FPP} MATCHES complex )
 				set(TEST_IS_COMPLEX 1)
 				if(${testin} MATCHES GivensFGFT OR ${testin} MATCHES palm4msa_2020 OR ${testin} MATCHES hierarchical2020 OR ${testin} MATCHES hierarchical2020Hadamard OR ${testin} MATCHES hierarchicalFactorizationHadamard)

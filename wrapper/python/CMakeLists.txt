@@ -69,6 +69,7 @@ endif(BUILD_OPENBLAS)
 # read the license header to insert in top of each pyfaust python file
 file(READ ${FAUST_PYTHON_SRC_DIR}/PYFAUST_LICENSE_HEADER.txt PYFAUST_LICENSE_HEADER)
 
+
 if(WIN32)
 	set(FAUST_SETUP_PY_CFLAGS "'/w', '/EHsc' ")
 	set(FAUST_SETUP_PY_LFLAGS "")
@@ -87,13 +88,16 @@ if(BUILD_MULTITHREAD AND NOT APPLE)
 	endif()
 endif()
 
-# TODO: apart cmake script ?
 if(FAUST_TORCH)
-	set(FAUST_PYTHON_INCLUDE_DIR "${FAUST_PYTHON_INCLUDE_DIR}, '${Torch_DIR}/../../../include', '${Torch_DIR}/../../../include/torch/csrc/api/include'")
+	get_filename_component(Torch_DIR ${TORCH_LIBRARY} DIRECTORY)
+	set(FAUST_PYTHON_INCLUDE_DIR "${FAUST_PYTHON_INCLUDE_DIR}, '${Torch_DIR}/../include', '${Torch_DIR}/../include/torch/csrc/api/include'")
 	set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS}, 'torch', 'c10'")
-	set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR}, '${Torch_DIR}/../../../lib'")
-	#variable Torch_DIR is initialized by Torch CMake scripts
+	set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR}, '${Torch_DIR}'")
+	#variable Torch_DIR is initialized by Torch CMake scripts (or rather from main CMakeLists.txt because torch script needs two executions to set the Torch_DIR...)
 	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-DFAUST_TORCH'")
+	# read the code to load torch libraries in python
+	file(READ ${FAUST_PYTHON_SRC_DIR}/torch_loading.py TORCH_LIBS_LOADING)
+	set(PYFAUST_PKG_SUFFIX "_torch")
 endif()
 
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)

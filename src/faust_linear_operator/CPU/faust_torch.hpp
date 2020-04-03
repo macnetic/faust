@@ -4,12 +4,14 @@ namespace Faust
 	template<typename FPP, FDevice D>
 		void convMatSparseToTensor(const Faust::MatSparse<FPP,D> & spm, torch::Tensor & t, at::DeviceType dev, const bool clone, const bool transpose /* = true*/)
 		{
-			torch::Tensor values = torch::from_blob(const_cast<FPP*>(spm.getValuePtr()), {spm.getNonZeros()}, torch::TensorOptions().dtype(torch::kFloat64).device(dev));//.clone();
+			long long spm_nnz = static_cast<long long>(spm.getNonZeros());
+			long int spm_nrows = spm.getNbRow(), spm_ncols = spm.getNbCol();
+			torch::Tensor values = torch::from_blob(const_cast<FPP*>(spm.getValuePtr()), {spm_nnz}, torch::TensorOptions().dtype(torch::kFloat64).device(dev));//.clone();
 			//		cout << "tensor values:" << values << endl;
-			torch::Tensor col = torch::from_blob(const_cast<int*>(spm.getInnerIndexPtr()), {spm.getNonZeros()}, torch::TensorOptions().dtype(torch::kI32).device(dev));//.clone();
+			torch::Tensor col = torch::from_blob(const_cast<int*>(spm.getInnerIndexPtr()), {spm_nnz}, torch::TensorOptions().dtype(torch::kI32).device(dev));//.clone();
 			//		cout << "tensor col:" << col << endl;
-			faust_unsigned_int* rows = new faust_unsigned_int[spm.getNonZeros()];
-			for(int i = 0; i < spm.getNbRow(); i++)
+			faust_unsigned_int* rows = new faust_unsigned_int[spm_nnz];
+			for(int i = 0; i < spm_nrows; i++)
 			{
 				for(int j=spm.getOuterIndexPtr()[i];j < spm.getOuterIndexPtr()[i+1]; j++)
 				{
@@ -17,7 +19,7 @@ namespace Faust
 					//				cout << " " << rows[j];
 				}
 			}
-			torch::Tensor row = torch::from_blob(rows, {spm.getNonZeros()}, torch::TensorOptions().dtype(torch::kI64).device(dev)).clone(); // clone is mandatory for rows
+			torch::Tensor row = torch::from_blob(rows, {spm_nnz}, torch::TensorOptions().dtype(torch::kI64).device(dev)).clone(); // clone is mandatory for rows
 			if(clone)
 			{
 //				row = row.clone();
@@ -34,23 +36,23 @@ namespace Faust
 				//reverse row and col to take the matrix as a transpose mat
 				indices = at::stack({col, row}, /* dim */ 0);
 				t = torch::sparse_coo_tensor(indices, values);
-				t.sparse_resize_({spm.getNbCol(), spm.getNbRow()}, t.sparse_dim(), t.dense_dim()); // this fixes low level bug (where the number of tensor columns is incorrect by one)
+				t.sparse_resize_({spm_ncols, spm_nrows}, t.sparse_dim(), t.dense_dim()); // this fixes low level bug (where the number of tensor columns is incorrect by one)
 			}
 			else
 			{
 				indices = at::stack({row, col}, /* dim */ 0);
 				t = torch::sparse_coo_tensor(indices, values);
-				t.sparse_resize_({spm.getNbRow(), spm.getNbCol()}, t.sparse_dim(), t.dense_dim());
+				t.sparse_resize_({spm_nrows, spm_ncols}, t.sparse_dim(), t.dense_dim());
 			}
 			//		cout << "tensor size: " << t.size(0) << " x " << t.size(1) << " t is sparse:" << t.is_sparse() << endl;
 			assert(t._nnz() == spm.getNonZeros());
-			assert(t.size(0) == spm.getNbCol() && t.size(1) == spm.getNbRow());
+			assert(t.size(0) == spm_ncols && t.size(1) == spm_nrows);
 		}
 
 	template<typename FPP, FDevice D>
 		void convMatDenseToTensor(const Faust::MatDense<FPP,D> & dm, torch::Tensor & t, at::DeviceType dev, const bool clone, const bool transpose /* = true*/)
 		{
-			uint64_t nrows, ncols;
+			long int nrows, ncols;
 
 			// number of nrows and ncols are inverted because the data is taken as a transpose matrix (Faust::MatDense is column-major order while torch is row-major order)
 			// it saves the need/transpose

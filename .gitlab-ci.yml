@@ -248,7 +248,7 @@ pages:
 .package_purepy: &package_purepy
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG ..'
+        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH ..'
         - make
         - cd wrapper/python
         - python3 setup.py bdist_wheel
@@ -267,6 +267,7 @@ pages:
     before_script:
         - VERSION=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - 'set EXPERIMENTAL_PKG=ON'
+        - 'set FAUST_TORCH=OFF'
     artifacts:
         expire_in: '1 week'
     except:
@@ -299,9 +300,13 @@ package_linux_purepy_rev:
 
 package_macos_purepy_release:
     extends: .package_purepy_release
-    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a"}
+    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a" }
     tags:
         - macos
+
+package_macos_purepy_release_torch_linked:
+    extends: package_macos_purepy_release
+    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", FAUST_TORCH: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch"}
 
 package_linux_purepy_release:
     extends: .package_purepy_release
@@ -309,6 +314,10 @@ package_linux_purepy_release:
     tags:
         - linux
         - tux_packager
+
+package_linux_purepy_release_torch_linked:
+    extends: package_linux_purepy_release
+    variables: {MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", FAUST_TORCH: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch"}
 
 package_purepy_release_rasp:
     variables: {MATIO_STATIC_LIB_PATH: "/opt/local/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/libhdf5.a"}
