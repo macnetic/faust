@@ -1108,17 +1108,18 @@ cdef class FaustFact:
         calling_fft_algo = isinstance(init_D, np.ndarray)
 
         if(not p.init_facts):
+            p.init_facts = [ None for i in range(p.num_facts) ]
             if(p.is_update_way_R2L):
                 zeros_id = p.num_facts-1
             else:
                 zeros_id = 0
-            p.init_facts = [
-                np.zeros([p.constraints[zeros_id]._num_rows,p.constraints[zeros_id]._num_cols]) ]
+            p.init_facts[zeros_id] = \
+                np.zeros([p.constraints[zeros_id]._num_rows,p.constraints[zeros_id]._num_cols])
             if(not isReal):
-                p.init_facts[0] = p.init_facts[0].astype(np.complex)
-            for i in [i for i in range(0,p.num_facts) if i != zeros_id]:
-                p.init_facts += [np.eye(p.constraints[i]._num_rows,
-                                        p.constraints[i]._num_cols)]
+                p.init_facts[zeros_id] = p.init_facts[zeros_id].astype(np.complex)
+            for i in [i for i in range(0, p.num_facts) if i != zeros_id]:
+                p.init_facts[i] = np.eye(p.constraints[i]._num_rows,
+                                        p.constraints[i]._num_cols)
                 if(not isReal):
                     p.init_facts[i] = p.init_facts[i].astype(np.complex)
 
