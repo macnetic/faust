@@ -59,10 +59,10 @@
 #include "faust_ConstraintMat.h"
 
 using namespace std;
-template<typename FPP,Device DEVICE> class ConstraintMat;
-template<typename FPP,Device DEVICE, typename FPP2> class ConstraintFPP;
+template<typename FPP,FDevice DEVICE> class ConstraintMat;
+template<typename FPP,FDevice DEVICE, typename FPP2> class ConstraintFPP;
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void init_params_palm_from_matiofile(Faust::ParamsPalm<FPP,DEVICE>& params,const char* fileName, const char* variableName)
 {
 
@@ -187,7 +187,7 @@ void init_params_palm_from_matiofile(Faust::ParamsPalm<FPP,DEVICE>& params,const
 }
 
 
-template<typename FPP,Device DEVICE, typename FPP2>
+template<typename FPP,FDevice DEVICE, typename FPP2>
 void init_params_from_matiofile(Faust::Params<FPP,DEVICE, FPP2>& params, const char* fileName, const char* variableName)
 {
 	matvar_t* params_var = faust_matio_read_variable(fileName,variableName);
@@ -385,7 +385,7 @@ void init_params_from_matiofile(Faust::Params<FPP,DEVICE, FPP2>& params, const c
 
 
 
-template<typename FPP,Device DEVICE, typename FPP2>
+template<typename FPP,FDevice DEVICE, typename FPP2>
 void add_constraint(std::vector<const Faust::ConstraintGeneric*> & consS,matvar_t* cons_var)
 {
 
@@ -453,7 +453,7 @@ void add_constraint(std::vector<const Faust::ConstraintGeneric*> & consS,matvar_
 
 
 
-template<typename FPP,Device DEVICE, typename FPP2>
+template<typename FPP,FDevice DEVICE, typename FPP2>
 void Display_params(Faust::Params<FPP,DEVICE,FPP2> & params)
 {
 

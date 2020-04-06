@@ -53,7 +53,7 @@
 using namespace std;
 
 ////////////////////////////////////// modif AL
-//template<typename FPP,Device DEVICE>
+//template<typename FPP,FDevice DEVICE>
 template<typename FPP>
 void init_faust_mat_from_matio(Faust::MatDense<FPP,Cpu>& M, const char* fileName, const char* variableName)
 {
@@ -62,7 +62,7 @@ void init_faust_mat_from_matio(Faust::MatDense<FPP,Cpu>& M, const char* fileName
    Mat_VarFree(matvar);
 }
 // For GPU processing, on passe par une matrice dense CPU pour loader une matrice dense GPU car on ne peut pas acceder au data par GPU, (seulement 1er valeur).
-//template<typename FPP,Device DEVICE>
+//template<typename FPP,FDevice DEVICE>
 #ifdef COMPILE_GPU
 template<typename FPP>
 void init_faust_mat_from_matio(Faust::MatDense<FPP,Gpu>& M, const char* fileName, const char* variableName)
@@ -108,7 +108,7 @@ void init_faust_mat_from_matio(Faust::MatDense<FPP,Gpu>& M, const char* fileName
 
 
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void init_faust_spmat_from_matio(Faust::MatSparse<FPP,DEVICE>& S, const char* fileName, const char* variableName)
 {
 
@@ -123,7 +123,7 @@ void init_faust_spmat_from_matio(Faust::MatSparse<FPP,DEVICE>& S, const char* fi
 
 
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void write_faust_spmat_into_matfile(const Faust::MatSparse<FPP,DEVICE>& M, const char* fileName, const char* variableName)
 {
 	mat_t* matfp = Mat_Open(fileName,MAT_ACC_RDWR);
@@ -160,7 +160,7 @@ void write_faust_spmat_into_matfile(const Faust::MatSparse<FPP,DEVICE>& M, const
 
 }
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void write_faust_spmat_list_into_matvar(const std::vector<Faust::MatSparse<FPP,DEVICE> >& M,matvar_t** matvar, const char* variableName)
 {
 	vector< Faust::MatDense<FPP,DEVICE> > list_dense_mat;
@@ -171,7 +171,7 @@ void write_faust_spmat_list_into_matvar(const std::vector<Faust::MatSparse<FPP,D
 
 }
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void write_faust_mat_list_into_matfile(const std::vector< Faust::MatDense<FPP,DEVICE> >& M, const char* fileName, const char* variableName)
 {
 
@@ -210,7 +210,7 @@ void write_faust_mat_list_into_matfile(const std::vector< Faust::MatDense<FPP,DE
 }
 
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void write_faust_mat_list_into_matvar(const std::vector<Faust::MatDense<FPP,DEVICE> >& M,matvar_t** matvar, const char* variableName)
 {
 	int nbr_mat=M.size();
@@ -234,7 +234,7 @@ void write_faust_mat_list_into_matvar(const std::vector<Faust::MatDense<FPP,DEVI
 
 
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void write_faust_mat_into_matvar(const Faust::MatDense<FPP,DEVICE>& M,matvar_t** matvar, const char* variableName)
 {
 
@@ -257,7 +257,7 @@ void write_faust_mat_into_matvar(const Faust::MatDense<FPP,DEVICE>& M,matvar_t**
 
 
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void write_faust_mat_into_matfile(const Faust::MatDense<FPP,DEVICE>& M, const char* fileName, const char* variableName)
 {
 
@@ -297,7 +297,7 @@ void write_faust_mat_into_matfile(const Faust::MatDense<FPP,DEVICE>& M, const ch
 
 
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void init_faust_mat_vector_from_matiofile( vector<Faust::MatDense<FPP,DEVICE> > & vec_M, const char* fileName, const char* variableName)
 {
 
@@ -337,7 +337,7 @@ void init_faust_mat_vector_from_matiofile( vector<Faust::MatDense<FPP,DEVICE> > 
 
 }
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void init_mat_from_matvar(Faust::MatDense<FPP,DEVICE> & M,matvar_t* var)
 {
 	if( var->class_type != MAT_C_DOUBLE
@@ -357,7 +357,7 @@ void init_mat_from_matvar(Faust::MatDense<FPP,DEVICE> & M,matvar_t* var)
 	}
 }
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void init_spmat_from_matvar(Faust::MatSparse<FPP,DEVICE>& S, matvar_t* var)
 {
    mat_sparse_t* mat_sparse = (mat_sparse_t*)var->data;

@@ -2,7 +2,7 @@
 #define OK_ASSERT(msg) \
 	cout << "VALIDATED ASSERTION: " << msg <<endl;
 
-template<typename SCALAR, Device DEVICE, typename SCALAR2>
+template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
 void test_err_against_Laplacian(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or GivensFGFTComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
 {
 	Faust::MatDense<SCALAR,DEVICE> Lap, tmp;
@@ -53,7 +53,7 @@ void test_err_against_Laplacian(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR
 	assert(Faust::fabs(err_lap2-err_lap) < 1e-5);
 }
 
-template<typename SCALAR, Device DEVICE, typename SCALAR2>
+template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
 void test_eigentransform(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or GivensFGFTComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
 {
 	Faust::MatDense<SCALAR,DEVICE> U, tmp;
@@ -100,7 +100,7 @@ void test_eigentransform(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or G
 	OK_ASSERT("Relative error ||Uhat-U||/||U|| is the same as Matlab's (relative precision: " << ERR_OK_TRESHOLD*60 << ").");
 }
 
-template<typename SCALAR, Device DEVICE, typename SCALAR2>
+template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
 void test_pivot_choices(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or GivensFGFTComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file, const float same_pivot_target_rate /* default to .99 */, const int stop_count_ite /*= 57*/)
 {
 	vector<pair<int,int>> coord_choices = algo->get_coord_choices();
@@ -149,7 +149,7 @@ void test_pivot_choices(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or Gi
 	delete []q_choices;
 }
 
-template<typename SCALAR, Device DEVICE, typename SCALAR2>
+template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
 void test_eigenvalues(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or GivensFGFTComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file)
 {
 	SCALAR2 ERR_OK_TRESHOLD = 1e-2;
@@ -202,7 +202,7 @@ void test_eigenvalues(@GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or Give
 }
 
 
-template<typename SCALAR, Device DEVICE, typename SCALAR2>
+template<typename SCALAR, FDevice DEVICE, typename SCALAR2>
 void test_ite_errors(const @GIVENS_CLASS@ /*GivensFGFT<SCALAR,DEVICE,SCALAR2> or GivensFGFTComplex<SCALAR,DEVICE,SCALAR2> */ * algo, const char* conf_file, int ref_ite_period /* default to 0 to use algo ERROR_CALC_PERIOD */)
 {
 	//

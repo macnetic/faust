@@ -77,7 +77,7 @@ void write_faust_core_into_matfile(const Faust::Transform<FPP,Gpu> core, const c
 
 using namespace std;
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void init_faust_core_from_matiofile(Faust::Transform<FPP,DEVICE>& core, const char* fileName, const char* variableName)
 {
 	matvar_t* cell_var = faust_matio_read_variable(fileName, variableName);
@@ -87,7 +87,7 @@ void init_faust_core_from_matiofile(Faust::Transform<FPP,DEVICE>& core, const ch
 	Mat_VarFree(cell_var);
 }
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void init_faust_core_from_matvar(Faust::Transform<FPP,DEVICE>& core, matvar_t* cell_var )
 {
 	if(cell_var->class_type != MAT_C_CELL
@@ -119,7 +119,7 @@ void init_faust_core_from_matvar(Faust::Transform<FPP,DEVICE>& core, matvar_t* c
 
 }
 
-template<typename FPP,Device DEVICE>
+template<typename FPP,FDevice DEVICE>
 void init_faust_data_from_matiofile(vector<Faust::MatDense<FPP,DEVICE> >& full_mat, vector<Faust::Transform<FPP,DEVICE> >& core, const char* fileName, const char* variableName)
 {
 

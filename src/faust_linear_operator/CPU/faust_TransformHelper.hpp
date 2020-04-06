@@ -570,7 +570,10 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::set_mul_order_opt_mode(const int mul_order_opt_mode)
 		{
 			this->mul_order_opt_mode = mul_order_opt_mode;
-			std::cout << "changed mul order opt mode to (0 when disabled): " << this->mul_order_opt_mode << std::endl;
+			std::cout << "changed mul. optimization mode to: " << this->mul_order_opt_mode;
+			if(! this->mul_order_opt_mode)
+				std::cout << " (opt. disabled, default mul.)";
+			std::cout << std::endl;
 		}
 
 

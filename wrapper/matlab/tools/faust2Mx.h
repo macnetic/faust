@@ -48,14 +48,14 @@
 
 namespace Faust {
 	class ConstraintGeneric;
-	template<typename FPP, Device DEVICE> class Vect;
-	template<typename FPP, Device DEVICE, typename FPP2> class Params;
-	template<typename FPP, Device DEVICE> class MatGeneric;
-	template<typename FPP, Device DEVICE> class MatDense;
-	template<typename FPP, Device DEVICE> class MatSparse;
-	template<typename FPP, Device DEVICE> class Transform;
-	template<typename FPP, Device DEVICE> class LinearOperator;
-	template<typename FPP, Device DEVICE> class TransformHelper;
+	template<typename FPP, FDevice DEVICE> class Vect;
+	template<typename FPP, FDevice DEVICE, typename FPP2> class Params;
+	template<typename FPP, FDevice DEVICE> class MatGeneric;
+	template<typename FPP, FDevice DEVICE> class MatDense;
+	template<typename FPP, FDevice DEVICE> class MatSparse;
+	template<typename FPP, FDevice DEVICE> class Transform;
+	template<typename FPP, FDevice DEVICE> class LinearOperator;
+	template<typename FPP, FDevice DEVICE> class TransformHelper;
 }
 
 
