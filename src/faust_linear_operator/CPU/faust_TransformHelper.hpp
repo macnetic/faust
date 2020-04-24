@@ -73,6 +73,9 @@ namespace Faust {
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), mul_order_opt_mode(0)
+#ifdef USE_GPU_MOD
+													  , gpu_faust(nullptr)
+#endif
 	{
 		this->transform = make_shared<Transform<FPP,Cpu>>();
 	}
@@ -236,6 +239,13 @@ namespace Faust {
 //				display_TensorList(tensor_data);
 			}
 #endif
+#ifdef USE_GPU_MOD
+			if(mul_order_opt_mode == 10 && gpu_faust == nullptr)
+			{
+				Faust::FaustGPU<FPP>::init_gpu_mod(); //TODO: function enable_gpu_mod()
+				gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
+			}
+#endif
 			switch(this->mul_order_opt_mode)
 			{
 				case 1:
@@ -275,6 +285,11 @@ namespace Faust {
 					break;
 				case 9:
 					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false, /*clone */ false, /* chain_opt */ false, /* contiguous_dense_to_torch */ true, !is_transposed);
+					break;
+#endif
+#ifdef USE_GPU_MOD
+				case 10:
+					M = gpu_faust->multiply(&A);
 					break;
 #endif
 				default:
@@ -353,7 +368,7 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_multiply(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
 		{
 			TransformHelper<FPP,Cpu>* t_opt = nullptr;
-			int NMETS = 10;
+			int NMETS = 11;
 			std::chrono::duration<double> * times = new std::chrono::duration<double>[NMETS]; //use heap because of VS14 (error C3863)
 //			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(transp?this->getNbRow():this->getNbCol(), 2048);
 			int old_meth = this->get_mul_order_opt_mode();
@@ -373,7 +388,15 @@ namespace Faust {
 			for(int i=7;i<10;i++)
 				disabled_meths.push_back(i);
 #endif
-
+#ifdef USE_GPU_MOD
+			if(gpu_faust == nullptr)
+			{
+				Faust::FaustGPU<FPP>::init_gpu_mod(); //TODO: function enable_gpu_mod()
+				gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
+			}
+#else
+			disabled_meths.push_back(10);
+#endif
 			for(int i=0; i < NMETS; i++)
 			{
 				if(std::find(std::begin(disabled_meths), std::end(disabled_meths), i) != std::end(disabled_meths))

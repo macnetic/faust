@@ -242,6 +242,7 @@ option(NOPY2 "Enabling/Disabling python2 support." OFF)
 #set(BUILD_READ_MAT_FILE OFF CACHE BOOL "Using matio library to read mat files")
 
 option(FAUST_TORCH "Faust torch backend for the Faust-Matrix/Vector product." OFF)
+option(USE_GPU_MOD "Faust cuda backend for the Faust-Matrix/Vector prodduct." OFF)
 
 
 if (BUILD_USE_SINGLEPRECISION)
@@ -625,6 +626,21 @@ if(FAUST_TORCH)
 	message(STATUS TORCH_DIR=${Torch_DIR})
 endif()
 
+if(USE_GPU_MOD)
+	find_package(GPU_MOD REQUIRED)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GPU_MOD_CFLAGS} -I${GPU_MOD_INCLUDE_DIR} -DUSE_GPU_MOD")
+	message(STATUS FaustCuda enabled)
+	set(FAUST_SCALAR_FOR_GM double)
+	set(GM_SCALAR double)
+	set(GM_REINTERPRET_CAST_SCALAR double)
+	configure_file(${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_gen.hpp.in ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_double.hpp)
+	set(FAUST_SCALAR_FOR_GM complex<double>)
+	set(GM_SCALAR cuDoubleComplex)
+	set(GM_REINTERPRET_CAST_SCALAR double)
+	configure_file(${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_gen.hpp.in ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_complexdouble.hpp)
+endif()
+
+
 include_directories(BEFORE ${EIGEN_INC_DIR} ${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}  ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR} ${FAUST_UTILS_SRC_DIR})
 ########### add_subdirectory ###############
 if (BUILD_WRAPPER_PYTHON)
@@ -695,6 +711,12 @@ if(FAUST_TORCH)
 	include_directories(${FAUST_TARGET} ${Torch_DIR}/../include ${Torch_DIR}/../include/torch/csrc/api/include)
 	target_link_libraries(${FAUST_TARGET} torch c10)
 	target_include_directories(${FAUST_TARGET} PUBLIC  ${Torch_DIR}/../include ${Torch_DIR}/../include/torch/csrc/api/include)
+endif()
+
+if(USE_GPU_MOD)
+	include_directories(${FAUST_TARGET} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
+	target_include_directories(${FAUST_TARGET} PUBLIC  ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
+	target_link_libraries(${FAUST_TARGET} ${GPU_MOD_LIBS})
 endif()
 
 if (BUILD_WRAPPER_MATLAB)
@@ -839,17 +861,18 @@ SET(CPACK_STRIP_FILES "")
 #SET(CPACK_SOURCE_IGNORE_FILES "/build/;/CMakeFiles/;/_CPack_Packages/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
 
 IF(WIN32 AND NOT UNIX)
+	# NSIS is used independently (see misc/nsis/faust.nsi)
 	SET(CPACK_GENERATOR "NSIS")
 	IF(CMAKE_CL_64)
 		SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Windows")
-    	SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Windows")
+		SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-x86_64-Windows")
 	ELSE(CMAKE_CL_64)
-    	SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Windows")
-    	SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Windows")
+		SET(CPACK_PACKAGE_FILE_NAME "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Windows")
+		SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "FAUST-binary-${CPACK_PACKAGE_VERSION}-i386-Windows")
   	ENDIF(CMAKE_CL_64)
 	# NSIS not used yet, cause of a bug with suitable ZIP programme
 	# There is a bug in NSI that does not handle full unix paths properly. Make
-	# sure there is at least one set of four (4) backlasshes.
+	# sure there is at least one set of four (4) backslashes.
 	# UPDATE: NSIS is used externally, see misc/nsis/faust.nis
 	# SET(CPACK_PACKAGE_ICON "${CMake_SOURCE_DIR}/Utilities/Release\\\\InstallIcon.bmp")
 	SET(CPACK_NSIS_DISPLAY_NAME "FAUST")

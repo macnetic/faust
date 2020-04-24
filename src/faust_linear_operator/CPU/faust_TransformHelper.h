@@ -54,6 +54,9 @@
 #ifdef FAUST_TORCH
 #include "faust_torch.h"
 #endif
+#ifdef USE_GPU_MOD
+#include "faust_gpu_mod.h"
+#endif
 
 namespace Faust {
 
@@ -92,6 +95,9 @@ namespace Faust {
 			shared_ptr<Transform<FPP,Cpu>> transform;
 #ifdef FAUST_TORCH
 			std::vector<torch::Tensor> tensor_data;
+#endif
+#ifdef USE_GPU_MOD
+			FaustGPU<FPP> *gpu_faust;
 #endif
 
 			void eval_sliced_Transform();

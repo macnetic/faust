@@ -1,0 +1,3 @@
+[submodule "gpu_mod"]
+	path = gpu_mod
+	url = https://gitlab.inria.fr/faustgrp/gpu_mod
