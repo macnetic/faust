@@ -800,10 +800,10 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
                 raise TypeError(aname+" must be an integer.")
         if(not isinstance(rho, float)):
             raise TypeError('rho must be a float')
-        if(not isinstance(rho, float)):
-            raise TypeError('p must be a float')
         if(not P):
             P=ParamsHierarchicalRectMat.DEFAULT_P_CONST_FACT*m**2
+        elif(not isinstance(P, float)):
+            raise TypeError('P must be a float')
         S1_cons = ConstraintInt('spcol', m, n, k)
         S_cons = [S1_cons];
         for i in range(j-2):
@@ -827,7 +827,7 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
         Static member function to create a ParamsHierarchicalRectMat instance by a simplified parametrization expression.
 
         Args:
-            p: a str of the form ['rectmat', j, k, s] to create a parameter
+            p: a list of the form ['rectmat', j, k, s] to create a parameter
             instance with the parameters j, k, s (see the class
             ParamsHierarchicalRectMat.__init__ for
             their definitions).
@@ -869,7 +869,7 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
 
 class ParamsPalm4MSA(ParamsFact):
     """
-        The class is to set input parameters for the Palm4MSA algorithm.
+        The class intents to set input parameters for the Palm4MSA algorithm.
 
         <b/> See also pyfaust.fact.palm4msa
     """

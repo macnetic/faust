@@ -96,8 +96,8 @@ cdef class FaustCore:
                 if(not isinstance(factor, np.ndarray) and
                    not isinstance(factor, sparse.csr.csr_matrix)):
                    #print("FaustCorePy.pyx __cinit__(), factor:",factor)
-                   raise ValueError("Faust factors must be a numpy.ndarray or "
-                                    "a scipy.sparse.csr.csr_matrix")
+                   raise ValueError("Faust factors must be numpy.ndarray or "
+                                    " scipy.sparse.csr.csr_matrix")
                 if(isinstance(factor[0,0], np.complex)):
                     # str(factor.dtype) == complex128/64/complex_
                     self._isReal = False
