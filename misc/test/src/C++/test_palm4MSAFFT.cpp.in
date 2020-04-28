@@ -165,7 +165,7 @@ int main()
 
 	cout << "relative difference between init_D and D (must be small but not zero)" << endl;
 	Faust::MatDense<FPP,Cpu> diff_D = init_D;
-	diff_D -= palm2.get_D();
+	diff_D -= Faust::MatDense<FPP,Cpu>(palm2.get_D());
 	cout << diff_D.norm()/init_D.norm() << endl;
 	cout << "res. D.norm(): " <<  palm2.get_D().norm() << endl;
 	cout << "Faust::Transform result approximating U:" << endl;
