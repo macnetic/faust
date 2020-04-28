@@ -265,11 +265,19 @@ endif(BUILD_WRAPPER_MATLAB)
 
 #PYTHON WRAPPER
 if (BUILD_WRAPPER_PYTHON)
-	foreach(PY_VER RANGE 2 3)
-		if(NOPY2 AND ${PY_VER} MATCHES 2)
-			continue()
+	if(NOPY2)
+		set(PY_VERS 3)
+	else()
+		set(PY_VERS 2;3)
+	endif()
+	foreach(PY_VER IN LISTS PY_VERS)
+		if(NOPY2)
+			# there is only py3 to test on
+			set(PY_INDEX 0)
+		else()
+			# get the index in PYTHON_EXES for the version of python ${PY_VER}
+			math(EXPR PY_INDEX "${PY_VER}-2")
 		endif()
-		math(EXPR PY_INDEX "${PY_VER}-2")
 		list(LENGTH PYTHON_EXES NUM_PY_EXES)
 		if(${NUM_PY_EXES} GREATER ${PY_INDEX})
 			list(GET PYTHON_EXES ${PY_INDEX} PYTHON_EXE)
@@ -283,7 +291,7 @@ if (BUILD_WRAPPER_PYTHON)
 				add_test(NAME PYTHON${PY_VER}_FAUST_UPDATE_CHOL COMMAND ${PYTHON_EXE} ${FAUST_SRC_TEST_SRC_PYTHON_DIR}/test_update_cholesky.py ${FAUST_PYTHON_BIN_DIR}) # second arg. is the FaustPy's dir. to add to PYTHONPATH
 			endif(PYTHON_MODULE_SCIPY)
 		endif()
-	endforeach()	
+	endforeach()
 endif(BUILD_WRAPPER_PYTHON)
 
 if(NOT NOCPPTESTS)
