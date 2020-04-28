@@ -103,6 +103,17 @@ endif()
 if(USE_GPU_MOD)
 	set(FAUST_PYTHON_INCLUDE_DIR "${FAUST_PYTHON_INCLUDE_DIR}, '${GPU_MOD_INCLUDE_DIR}', '${GPU_MOD_INCLUDE_DIR}/../build/'")
 	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-DUSE_GPU_MOD'")
+	#TODO: refplace by a file glob
+	if(APPLE)
+		set(GPU_MOD_LIB libgm.dylib)
+	elseif(UNIX)
+		set(GPU_MOD_LIB libgm.so)
+	elseif(WIN32)
+		set(GPU_MOD_LIB libgm.dll)
+	endif()
+	set(GPU_MOD_LIB_PATH lib/${GPU_MOD_LIB}) # used in setup.py
+	set(GPU_MOD_LIB_PPATH ${FAUST_PYTHON_BIN_DIR}/pyfaust/lib)
+	file(COPY ${GPU_MOD_INCLUDE_DIR}/../build/${GPU_MOD_LIB} DESTINATION ${GPU_MOD_LIB_PPATH})
 endif()
 
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)

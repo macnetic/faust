@@ -627,7 +627,10 @@ if(FAUST_TORCH)
 endif()
 
 if(USE_GPU_MOD)
-	find_package(GPU_MOD REQUIRED)
+	find_package(GPU_MOD) #REQUIRED)
+	if(NOT GPU_MOD_INCLUDE_DIR)
+		set(GPU_MOD_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/gpu_mod/src) # fallback to submodule directory in case find_package didn't work
+	endif()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GPU_MOD_CFLAGS} -I${GPU_MOD_INCLUDE_DIR} -DUSE_GPU_MOD")
 	set(FAUST_SCALAR_FOR_GM double)
 	set(GM_SCALAR double)
@@ -716,6 +719,7 @@ if(USE_GPU_MOD)
 	include_directories(${FAUST_TARGET} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
 	target_include_directories(${FAUST_TARGET} PUBLIC  ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
 	target_link_libraries(${FAUST_TARGET} ${GPU_MOD_LIBS})
+	install(FILES  ${GPU_MOD_INCLUDE_DIR}/../build/libgm.so DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_EXECUTE WORLD_READ)
 endif()
 
 if (BUILD_WRAPPER_MATLAB)
@@ -852,7 +856,7 @@ SET(CPACK_SOURCE_GENERATOR "TGZ")
 ##############################################################################
 # BINARY DISTRIBUTION:
 ##############################################################################
-SET(CPACK_PACKAGE_CONTACT "name@inria.fr")
+SET(CPACK_PACKAGE_CONTACT "remi.gribonval@inria.fr")
 SET(CPACK_INSTALL_CMAKE_PROJECTS "${PROJECT_BINARY_DIR};FAUST;ALL;/")
 
 #SET(CPACK_IGNORE_FILES "/CMake/;/build/;/CMakeFiles/;/_CPack_Packages/;/src/;/bin/make_regression_constants;/install_manifest_/;.*~;/www/;/CVS//;/.svn/;/.git/;.cdtprojects;.project;/.settings/")
