@@ -119,6 +119,8 @@ class FaustCoreCpp
     Faust::TransformHelper<FPP,Cpu> *transform;
 };
 
+void* _enable_gpu_mod(const char* libpath);
+
 #include "FaustCoreCpp.hpp"
 
 #endif

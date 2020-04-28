@@ -113,7 +113,17 @@ if(USE_GPU_MOD)
 	endif()
 	set(GPU_MOD_LIB_PATH lib/${GPU_MOD_LIB}) # used in setup.py
 	set(GPU_MOD_LIB_PPATH ${FAUST_PYTHON_BIN_DIR}/pyfaust/lib)
-	file(COPY ${GPU_MOD_INCLUDE_DIR}/../build/${GPU_MOD_LIB} DESTINATION ${GPU_MOD_LIB_PPATH})
+	if(NOT BUILD_WRAPPER_MATLAB)
+		# we are packaging a pip package or at least using python setup_tools (and not cmake)
+		file(COPY ${GPU_MOD_INCLUDE_DIR}/../build/${GPU_MOD_LIB} DESTINATION ${GPU_MOD_LIB_PPATH})
+	else()
+		# MATLAB wrapper is compiled too, it means we share the libgm between wrappers and have to symlink it pyfaust
+		file(MAKE_DIRECTORY ${GPU_MOD_LIB_PPATH})
+		file(CREATE_LINK ../../../lib/${GPU_MOD_LIB} ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB} RESULT SYMLINK_OK SYMBOLIC)
+		# the relative path we'll be correct in a faust typical system package tree (relatively to CMAKE_INSTALL_PREFIX/python/pyfaust/lib/)
+		message(STATUS SIMLINK ../../../lib/${GPU_MOD_LIB} ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB})
+		install(FILES ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB} DESTINATION ${CMAKE_INSTALL_PYTHON_PREFIX}/pyfaust/lib)
+	endif()
 endif()
 
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)

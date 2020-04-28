@@ -306,3 +306,4 @@ cdef extern from "FaustFactGivensFGFT.h":
                                       unsigned int t, unsigned int verbosity,
                                       const double stoppingError, const bool errIsRel, const bool enable_large_Faust)
 
+    cdef void* _enable_gpu_mod(const char* libpath, const bool silent)

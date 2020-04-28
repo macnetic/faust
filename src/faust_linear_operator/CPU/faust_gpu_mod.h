@@ -27,14 +27,14 @@ namespace Faust
 		MatDense<FPP, Cpu> get_product();
 		MatDense<FPP, Cpu> multiply(const Faust::MatGeneric<FPP,Cpu>*);
 
-		static void* init_gpu_mod(const std::string& libpath = "libgm.so", void* gm_handle = nullptr);
+		static void* init_gpu_mod(const std::string& libpath = "libgm.so", const bool silent = false, void* gm_handle = nullptr);
 		static void check_gpu_mod_loaded();
 	};
 
 	template<typename T>
 		void set_one(T* scal);
 
-	void* enable_gpu_mod(const char* libpath= "libgm.so");
+	void* enable_gpu_mod(const char* libpath= "libgm.so", const bool silent = false);
 
 }
 

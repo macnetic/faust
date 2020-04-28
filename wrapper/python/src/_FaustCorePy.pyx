@@ -149,6 +149,21 @@ cdef class FaustCore:
         #TODO: raise error for undefined object here
 
     @staticmethod
+    def enable_gpu_mod(libpaths=None, backend='cuda', silent=False):
+        cdef char * c_libpath
+        cdef void* gm_handle
+        for libpath in libpaths:
+            blibpath = libpath.encode('utf-8')
+            c_libpath = blibpath
+            #c_libpath = libpath
+            gm_handle = FaustCoreCy._enable_gpu_mod(c_libpath, silent);
+            if(gm_handle == NULL and not silent and libpaths[-1] == libpath):
+                raise Exception("Can't load gpu_mod library, maybe the path is not"
+                                " correct or the backend (cuda) is not installed or"
+                                " configured properly so"
+                                " the libraries are not found.")
+
+    @staticmethod
     def randFaust(t,field,min_num_factors, max_num_factors, min_dim_size,
                    max_dim_size, density=0.1, per_row=True):
         core = FaustCore(core=True)

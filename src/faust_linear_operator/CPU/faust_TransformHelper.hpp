@@ -239,13 +239,7 @@ namespace Faust {
 //				display_TensorList(tensor_data);
 			}
 #endif
-#ifdef USE_GPU_MOD
-			if(mul_order_opt_mode == 10 && gpu_faust == nullptr)
-			{
-				Faust::FaustGPU<FPP>::init_gpu_mod(); //TODO: function enable_gpu_mod()
-				gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
-			}
-#endif
+
 			switch(this->mul_order_opt_mode)
 			{
 				case 1:
@@ -388,13 +382,7 @@ namespace Faust {
 			for(int i=7;i<10;i++)
 				disabled_meths.push_back(i);
 #endif
-#ifdef USE_GPU_MOD
-			if(gpu_faust == nullptr)
-			{
-				Faust::FaustGPU<FPP>::init_gpu_mod(); //TODO: function enable_gpu_mod()
-				gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
-			}
-#else
+#ifndef USE_GPU_MOD
 			disabled_meths.push_back(10);
 #endif
 			for(int i=0; i < NMETS; i++)
@@ -594,6 +582,10 @@ namespace Faust {
 		{
 			this->mul_order_opt_mode = mul_order_opt_mode;
 			std::cout << "changed mul. optimization mode to: " << this->mul_order_opt_mode;
+#ifdef USE_GPU_MOD
+			if(mul_order_opt_mode == 10 && gpu_faust == nullptr)
+				gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
+#endif
 			if(! this->mul_order_opt_mode)
 				std::cout << " (opt. disabled, default mul.)";
 			std::cout << std::endl;
@@ -1042,11 +1034,19 @@ namespace Faust {
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product() // const
 		{
 			if(this->mul_order_opt_mode)
-			{
-				MatDense<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
-				Id.setEyes();
-				return this->multiply(Id);
-			}
+				switch(this->mul_order_opt_mode)
+				{
+#ifdef USE_GPU_MOD
+					case 10:
+						if(nullptr != gpu_faust)
+							return gpu_faust->get_product();
+#endif
+					default:
+						//TODO: avoid to add one factor for all methods if possible
+						MatDense<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
+						Id.setEyes();
+						return this->multiply(Id);
+				}
 			return this->transform->get_product(isTransposed2char(), is_conjugate);
 		}
 

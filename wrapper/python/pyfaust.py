@@ -10,6 +10,7 @@ from scipy.sparse import csr_matrix, csc_matrix, dia_matrix
 import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
+import sys, os
 
 class Faust:
     """<b>FAuST Python wrapper main class</b> for using multi-layer sparse transforms.
@@ -2081,6 +2082,33 @@ def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
         fac_type_map[fac_type], field, min_num_factors, max_num_factors,
         min_dim_size, max_dim_size, density, per_row))
     return rF
+
+def enable_gpu_mod(libpaths=None, backend='cuda', silent=False):
+    """
+    This function loads explicitely the gpu_mod library in memory.
+
+    Normally it's not required to load the library manually, but it could be
+    useful to set a non-default path or to diagnose a loading issue.
+
+    Args:
+        libpath: the absolute or relative path where to find the dynamic
+        library (gm) to load. By default, it's none to auto-find the library
+        (if possible).
+        backend: the GPU backend to use, only cuda is available for now.
+
+    """
+    _FaustCorePy.FaustCore.enable_gpu_mod(libpaths, backend, silent)
+
+# tries to load the libgm library silently,
+# if not enabled at build time it will do nothing
+pyfaust_path = os.path.dirname(pyfaust.__file__)
+if sys.platform == 'linux':
+    enable_gpu_mod([pyfaust_path+"/lib/libgm.so"], silent=True)
+elif sys.platform == 'darwin':
+    enable_gpu_mod([pyfaust_path+"/lib/libgm.dylib"], silent=True)
+elif sys.platform == 'win32':
+    enable_gpu_mod([pyfaust_path+"/lib/libgm.dll"], silent=True)
+
 
 # experimental block start
 import torch

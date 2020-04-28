@@ -486,3 +486,12 @@ FaustCoreCpp<FPP>::~FaustCoreCpp()
     if(transform) delete transform;
 }
 
+void* _enable_gpu_mod(const char* libpath, const bool silent)
+{
+#ifdef USE_GPU_MOD
+    return Faust::enable_gpu_mod(libpath, silent);
+#else
+    return nullptr;
+#endif
+}
+

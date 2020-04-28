@@ -963,10 +963,12 @@ ELSE(WIN32 AND NOT UNIX)
 			file(APPEND ${PROJECT_BINARY_DIR}/postinst "mkdir -p @CMAKE_INSTALL_MATLAB_PREFIX@/data/;python @CMAKE_INSTALL_PYTHON_PREFIX@/pyfaust/datadl.py  @CMAKE_INSTALL_MATLAB_PREFIX@/data/;")
 		endif()
 		#no need to exclude library auto-deps for debian package/ubuntu
-		set(CPACK_RPM_SPEC_MORE_DEFINE "%define __requires_exclude ^libmex[.]so.*|libmat[.]so.*|libmx[.]so.*|libpython.*[.]so.*$ ")
+		#it's only matters for rpm package (for example gpu_mod lib is linked to cusparse and cublas but we don't want to block install with auto-deps to libcusparse/cublas)
+		# so let's ignore these library as deps
+		set(CPACK_RPM_SPEC_MORE_DEFINE "%define __requires_exclude ^libmex[.]so.*|libmat[.]so.*|libmx[.]so.*|libpython.*[.]so.*|libcublas[.]so[.].*|libcusparse[.]so[.].*$ ")
 
 		set(CPACK_RPM_PACKAGE_RELEASE "1")
-		SET(CPACK_RPM_PACKAGE_LICENSE "GNU AFFERO GENERAL PUBLIC LICENSE")
+		SET(CPACK_RPM_PACKAGE_LICENSE "INRIA License (faust.inria.fr)")
 		set(CPACK_RPM_PACKAGE_GROUP "unknown")
 		set(CPACK_RPM_PACKAGE_VENDOR ${CPACK_PACKAGE_VENDOR})
 		set(CPACK_RPM_PACKAGE_URL ${CPACK_PACKAGE_URL} )

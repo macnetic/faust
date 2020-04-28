@@ -16,11 +16,11 @@ void* Faust::FaustGPU<FPP>::dsm_funcs = nullptr;
 void Faust::FaustGPU<FPP>::check_gpu_mod_loaded()
 {
 	if(gm_handle == nullptr)
-		throw std::runtime_error("FaustGPU::init_gpu_mod() must be called before any use of FaustGPU.");
+		throw std::runtime_error("Faust::enable_gpu_mod() must be called before any use of FaustGPU.");
 }
 
 	template <typename FPP>
-void* Faust::FaustGPU<FPP>::init_gpu_mod(const std::string& libpath, void* gm_handle)
+void* Faust::FaustGPU<FPP>::init_gpu_mod(const std::string& libpath, const bool silent, void* gm_handle)
 {
 	if(Faust::FaustGPU<FPP>::gm_handle == nullptr)
 		if(gm_handle == nullptr)
@@ -28,7 +28,8 @@ void* Faust::FaustGPU<FPP>::init_gpu_mod(const std::string& libpath, void* gm_ha
 		else
 			Faust::FaustGPU<FPP>::gm_handle = gm_handle;
 	else
-		std::cerr << "Warning: gm_lib is already loaded (can't reload it)." << endl;
+		if(! silent)
+			std::cerr << "Warning: gm_lib is already loaded (can't reload it)." << endl;
 	return Faust::FaustGPU<FPP>::gm_handle;
 }
 
@@ -48,11 +49,11 @@ namespace Faust
 		}
 }
 
-void* Faust::enable_gpu_mod(const char* libpath) //TODO: add backend argument: cuda (only available for now), opencl
+void* Faust::enable_gpu_mod(const char* libpath, const bool silent) //TODO: add backend argument: cuda (only available for now), opencl
 {
-	void* gm_handle = Faust::FaustGPU<double>::init_gpu_mod(std::string(libpath));
+	void* gm_handle = Faust::FaustGPU<double>::init_gpu_mod(std::string(libpath), silent, nullptr);
 	if(gm_handle != nullptr)
-		Faust::FaustGPU<std::complex<double>>::init_gpu_mod(std::string(libpath), gm_handle);
+		Faust::FaustGPU<std::complex<double>>::init_gpu_mod(std::string(libpath), silent, gm_handle);
 	return gm_handle;
 }
 
