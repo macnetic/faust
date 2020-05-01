@@ -133,6 +133,10 @@ endif()
 #"-I${FAUST_FAUSTCORE_SRC_DIR}" "-I${FAUST_EXCEPTION_SRC_DIR}"
 set(CMAKE_CXX_FLAGS_LIST ${CMAKE_CXX_FLAGS_LIST} "-I${MATIO_INC_DIR}" "-I${MATLAB_INCLUDE_DIR}" "-I${EIGEN_INC_DIR}" "-I${FAUST_SRC_LINEAR_OPERATOR_DIR}" "-I${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}" "-I${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}" "-I${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}" "-I${FAUST_MATLAB_TOOLS_SRC_DIR}" "-I${FAUST_UTILS_SRC_DIR}")
 
+if(USE_GPU_MOD)
+	set(CMAKE_CXX_FLAGS_LIST ${CMAKE_CXX_FLAGS_LIST} -DUSE_GPU_MOD -I${GPU_MOD_INCLUDE_DIR} -I${GPU_MOD_INCLUDE_DIR}/../build/)
+endif()
+
 #if(BUILD_OPENBLAS AND UNIX)
 if(BUILD_OPENBLAS)
 	set(CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS_LIST}" "-I${OPENBLAS_INC_DIR}")
@@ -150,8 +154,11 @@ if(UNIX)
 elseif(WIN32)
 	# MODIF ALALAL
 	#set(LDD_MEX_FLAGS "-L${FAUST_BIN_DIR}" "-l${FAUST_TARGET}")
-       #windows version uses static lib of matio
-       string(REGEX REPLACE "^(.+)/.*$" "\\1/libmatio.a" LDD_MEX_FLAGS "${MATIO_LIB_FILE}")
+	#windows version uses static lib of matio anyway (so replace any dyn. lib found by the static lib)
+       string(REGEX REPLACE "^(.+)/.*$" "\\1/libmatio.lib" LDD_MEX_FLAGS "${MATIO_LIB_FILE}")
+       set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} ${HDF5_STATIC_LIB_PATH} ${Z_STATIC_LIB_PATH})
+       set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} $ENV{WIN_HDF5_OBJS_DIR}/*.obj)
+       set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} $ENV{WIN_SZIP_OBJS_DIR}/*.obj)
 endif()
 
 if(BUILD_OPENBLAS)
@@ -164,7 +171,7 @@ if(UNIX)
 elseif(WIN32)
 	file(GLOB CPP_SRC_FILES "${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp" "${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp"  "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp" "${FAUST_UTILS_SRC_DIR}/*.cpp")
 	string(REGEX REPLACE "([a-zA-Z0-9_/:-]+)\\.cpp(;|$)" "\\1\\2" MEXSRC_FULL "${CPP_SRC_FILES}")
-	
+
 	#message (STATUS "MEXSRC_FULL ------------- ${MEXSRC_FULL}")
 	#message (STATUS "FAUST_TMPMEX_DIR ------------- ${FAUST_TMPMEX_DIR}")
 	#message (STATUS "CPP_SRC_FILES ---------${CPP_SRC_FILES}")
@@ -172,27 +179,35 @@ elseif(WIN32)
 	#string(REGEX REPLACE "[a-zA-Z0-9_/:-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "${FAUST_TMPMEX_DIR}/\\1.${MEXOBJ_EXT}\\2" MEXOBJ_FILES "${CPP_SRC_FILES}")
 	string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "${FAUST_TMPMEX_DIR}/\\1.${MEXOBJ_EXT}\\2" MEXOBJ_FILES "${CPP_SRC_FILES}")
 	#message (STATUS "MEXOBJ_FILES --------- ${MEXOBJ_FILES}")
-	
+
+	set(MEX_OBJS_IN_ONE ${FAUST_TMPMEX_DIR}/mexobj_allinone.obj)
 	add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS MEXFILE_TARGET_LIST_TARGET ) 
 	add_custom_target(MEXFILE_TARGET_LIST_TARGET DEPENDS ${MEXFILE_TARGET_LIST})
-	add_custom_target(MEXOBJ_FILES_TARGET DEPENDS ${MEXOBJ_FILES})
-	add_dependencies(MEXFILE_TARGET_LIST_TARGET MEXOBJ_FILES_TARGET)
-endif()
+	#add_custom_target(MEXOBJ_FILES_TARGET DEPENDS ${MEXOBJ_FILES})
 
-if(WIN32)
-	foreach( mex_src ${MEXSRC_FULL})
-		#modif AL pour gerer les "-" dans le path
-		#string(REGEX REPLACE "[a-zA-Z0-9_/:-.]+/([a-zA-Z0-9_]+)" "\\1" mexsrc_short "${mex_src}")
-		string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)(;|$)" "\\1\\2" mexsrc_short "${mex_src}")
-		#message(STATUS "-------------------------mexsrc_short---${mexsrc_short}")
-		add_custom_command(	OUTPUT ${FAUST_TMPMEX_DIR}/${mexsrc_short}.${MEXOBJ_EXT}
-							COMMAND  ${MATLAB_ROOT}/bin/mex 
-							ARGS "-v" "-c" "-largeArrayDims" ${mex_src}.cpp 
-								${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS}
-								"-outdir" "${FAUST_TMPMEX_DIR}" "OBJEXT=.${MEXOBJ_EXT}"
-							COMMENT "Compiling ${mex_src}.cpp for mex usage")
-	#message (STATUS "${FAUST_TMPMEX_DIR}/${mexsrc_short}.${MEXOBJ_EXT}")
-	endforeach()
+#	foreach( mex_src ${MEXSRC_FULL})
+#		#modif AL pour gerer les "-" dans le path
+#		#string(REGEX REPLACE "[a-zA-Z0-9_/:-.]+/([a-zA-Z0-9_]+)" "\\1" mexsrc_short "${mex_src}")
+#		string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)(;|$)" "\\1\\2" mexsrc_short "${mex_src}")
+#		#message(STATUS "-------------------------mexsrc_short---${mexsrc_short}")
+#		add_custom_command(	OUTPUT ${FAUST_TMPMEX_DIR}/${mexsrc_short}.${MEXOBJ_EXT}
+#							COMMAND  ${MATLAB_ROOT}/bin/mex 
+#							ARGS "-v" "-c" "-largeArrayDims" ${mex_src}.cpp 
+#								${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS}
+#								"-outdir" "${FAUST_TMPMEX_DIR}" "OBJEXT=.${MEXOBJ_EXT}"
+#							COMMENT "Compiling ${mex_src}.cpp for mex usage")
+#	#message (STATUS "${FAUST_TMPMEX_DIR}/${mexsrc_short}.${MEXOBJ_EXT}")
+#	endforeach()
+
+	# dirty trick to force the *.obj compilation before mex shared libs which depend on them
+	add_custom_target(MEX_OBJS_IN_ONE
+	       COMMAND  ${MATLAB_ROOT}/bin/mex  -output ${MEX_OBJS_IN_ONE} "-v" "-c" "-largeArrayDims" ${CPP_SRC_FILES}
+	               ${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS}
+	               "-outdir" "${FAUST_TMPMEX_DIR}" "OBJEXT=.${MEXOBJ_EXT}"
+		       COMMENT "Compiling ${MEX_OBJS_IN_ONE} for mex usage")
+
+	       add_custom_target(MEXOBJ_FILES_TARGET DEPENDS MEX_OBJS_IN_ONE)
+       add_dependencies(MEXFILE_TARGET_LIST_TARGET MEXOBJ_FILES_TARGET)
 endif()
 
 #file(MAKE_DIRECTORY ${FAUST_MATLAB_MEX_INSTALL_DIR})
@@ -241,7 +256,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 					COMMAND   ${MATLAB_ROOT}/bin/mex 
 					ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${OBJ_MEXTOOLS_FILES} ${MEXOBJ_FILES}
-						${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS}
+					${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS} -DNOMINMAX # mex will replace -D by /D if VS is used for building (this constant is to contervene the symbol conflicts between std::min/max and min/max macro from Microsoft
 					DEPENDS ${MEXOBJ_FILES} 
 					COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}"
 		)

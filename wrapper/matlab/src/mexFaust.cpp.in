@@ -79,7 +79,7 @@ using namespace Faust;
 
 void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray **args)
 {
-	size_t MAX_PATH_SIZE=512;
+	const size_t MAX_PATH_SIZE=512;
 	char filepath[MAX_PATH_SIZE];
 	// args[0] must be the filepath
     // args[1] must be the boolean for tranposing or not at write time
@@ -416,7 +416,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			if (nrhs > 3)
 			{
 				double optimizedCopy_inter = mxGetScalar(prhs[3]);
-				if ((optimizedCopy_inter != 1.0) and (optimizedCopy_inter != 0.0))
+				if ((optimizedCopy_inter != 1.0) && (optimizedCopy_inter != 0.0))
 					mexErrMsgTxt("invalid boolean argument.");
 
 				optimizedCopy = (bool) optimizedCopy_inter;

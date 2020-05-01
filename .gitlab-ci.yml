@@ -12,37 +12,37 @@ stages:
         - test
         - package_rev
 
-ctest:
-    <<: *ctest_script
-    variables: {SLOW_TESTS: "OFF"}
-    except:
-        - schedules
-        - tags
-    stage: test
-    tags:
-        - linux
-
-ctest_python:
-    <<: *ctest_script
-    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2 : "ON"} #, GIT_STRATEGY: none}
-    except:
-        - schedules
-        - tags
-    stage: test
-    allow_failure: false
-    tags:
-        - linux
-
-ctest_matlab:
-    <<: *ctest_script
-    variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON"}
-    except:
-        - schedules
-        - tags
-    stage: test
-    tags:
-        - matlab
-
+#ctest:
+#    <<: *ctest_script
+#    variables: {SLOW_TESTS: "OFF"}
+#    except:
+#        - schedules
+#        - tags
+#    stage: test
+#    tags:
+#        - linux
+#
+#ctest_python:
+#    <<: *ctest_script
+#    variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2 : "ON"} #, GIT_STRATEGY: none}
+#    except:
+#        - schedules
+#        - tags
+#    stage: test
+#    allow_failure: false
+#    tags:
+#        - linux
+#
+#ctest_matlab:
+#    <<: *ctest_script
+#    variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON"}
+#    except:
+#        - schedules
+#        - tags
+#    stage: test
+#    tags:
+#        - matlab
+#
 .ctest_nightly: &ctest_nightly_script
     <<: *ctest_script
     variables: {BUILD_WRAPPER_MATLAB: "ON", BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "ON", DONT_PYPLOT_FAUST_TIME: "ON", NOPY2: "ON"}
@@ -68,51 +68,71 @@ ctest_nightly_win7:
     tags:
        - win7
 
-package_macos:
-    stage: package_rev
-    script:
-        - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
-        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$SHA_START -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON ..'
-        - make LANG=en_GB.UTF-8
-        - 'echo $MACOS_PASS | sudo -S make install LANG=en_GB.UTF-8'
-          #- 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
-        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust --version $SHA_START --root /opt/local/faust-$SHA_START --install-location /opt/local/faust-$SHA_START --scripts . ./faust-$SHA_START.pkg
-        - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
-        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
-        - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$SHA_START.pkg ./distribution.plist
-        - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$SHA_START'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
-        - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$SHA_START.pkg
-        - mv ./faust-matio-$SHA_START.pkg ./faust-$SHA_START.pkg
-        # - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$SHA_START.dmg faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
-        #- if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$SHA_START.dmg faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
-        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
-    artifacts:
-        paths:
-            - build/faust-${CI_COMMIT_SHA:0:8}.pkg
-              #- build/faust-${CI_COMMIT_SHA:0:8}.dmg
-        expire_in: '1 week'
-    tags:
-        - macos
-    except:
-        - schedules
-        - tags
+#package_macos:
+#    stage: package_rev
+#    script:
+#        - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
+#        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+#        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$SHA_START -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON ..'
+#        - make LANG=en_GB.UTF-8
+#        - 'echo $MACOS_PASS | sudo -S make install LANG=en_GB.UTF-8'
+#          #- 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
+#        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust --version $SHA_START --root /opt/local/faust-$SHA_START --install-location /opt/local/faust-$SHA_START --scripts . ./faust-$SHA_START.pkg
+#        - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
+#        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
+#        - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$SHA_START.pkg ./distribution.plist
+#        - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$SHA_START'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
+#        - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$SHA_START.pkg
+#        - mv ./faust-matio-$SHA_START.pkg ./faust-$SHA_START.pkg
+#        # - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S mv faust-$SHA_START.dmg faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
+#        #- if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$SHA_START.dmg faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
+#        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$SHA_START.pkg $MACOS_PKG_STORE_PATH; fi
+#    artifacts:
+#        paths:
+#            - build/faust-${CI_COMMIT_SHA:0:8}.pkg
+#              #- build/faust-${CI_COMMIT_SHA:0:8}.dmg
+#        expire_in: '1 week'
+#    tags:
+#        - macos
+#    except:
+#        - schedules
+#        - tags
+
+.win_build_gpu_mod: &win_build_gpu_mod
+    before_script:
+#        - move gpu_mod gpu_mod2 #del /Q /S gpu_mod\* # & rmdir gpu_mod & mkdir gpu_mod
+#        - mkdir gpu_mod
+#        - git submodule sync --recursive
+#        - git submodule update --init --recursive
+        - cd gpu_mod
+        - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
+        - cd build
+        - cmake -G "Visual Studio 14 Win64" ..
+          #- cmake -G "MinGW Makefiles" -DCMAKE_CUDA_COMPILER="E:/NVIDIA GPU Computing Toolkit/CUDA/v9.2/bin/nvcc.exe" .. #-DCUDA_HOST_COMPILER="E:/TDM-GCC-64/bin/g++.exe" .. 
+        - cmake --build . --config %BUILD_CONFIG%
+        - move %BUILD_CONFIG%\gm.dll .
+        - cd ..\..
 
 package_win:
     stage: package_rev
+    variables: {BUILD_CONFIG: "Debug", GIT_SUBMODULE_STRATEGY: recursive}
+    <<: *win_build_gpu_mod
     script:
         - 'set SHA_START=%CI_COMMIT_SHA:~0,8%'
-        - if NOT EXIST build (mkdir build) else rmdir /S /Q build
+        - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
         - cd build
-        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=ON ..'
-        - make
+          #- 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod ..'
+          #- make
+        - 'cmake -G "Visual Studio 14 Win64" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%SHA_START% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH="C:/Users/faust/Downloads/matio-1.5.13/visual_studio/x64/Release/libmatio.lib" -DZ_STATIC_LIB_PATH="C:/Users/faust/Downloads/zlib-1.2.11/contrib/vstudio/vc14/x64/ZlibStatDebug/zlibstat.lib" -DHDF5_STATIC_LIB_PATH="C:/Users/faust/Downloads/hdf5-1.10.3/build/bin/Release/libhdf5.lib" -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod ..'
+        - cmake --build . --config Debug
         - makensis faust.nsi
     artifacts:
         paths:
             - build/faust-%CI_COMMIT_SHA:~0,8%-amd64.exe
         expire_in: '1 week'
     tags:
-        - win7
+        - win10
+          #- win7
     except:
         - schedules
         - tags
@@ -123,67 +143,69 @@ package_win:
    - cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..; make
    - cd ../..
 
-package_linux:
-   <<: *build_gpu_mod
-   stage: package_rev
-   variables: {GIT_SUBMODULE_STRATEGY: recursive} # for checking out gpu_mod
-   script:
-        # build faust
-        - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
-        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
-        - make
-        # generate package via cpack
-        - cpack -G RPM -C CPackConfig.cmake
-        - cpack -G DEB -C CPackConfig.cmake
-        - 'cp faust-$SHA_START* $HOME'
-   artifacts:
-        paths:
-            - build/faust-${CI_COMMIT_SHA:0:8}-x86_64.deb
-            - build/faust-${CI_COMMIT_SHA:0:8}-x86_64.rpm
-        expire_in: '1 week'
-   tags:
-        - linux
-        - matlab
-        - tux_packager
-   except:
-        - schedules
-        - tags
+#package_linux:
+#   <<: *build_gpu_mod
+#   stage: package_rev
+#   variables: {GIT_SUBMODULE_STRATEGY: recursive} # for checking out gpu_mod
+#   script:
+#        # build faust
+#        - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
+#        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+#        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DCPACK_PACKAGE_FILE_NAME=faust-$SHA_START -DCPACK_PACKAGE_VERSION=$SHA_START -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
+#        - make
+#        # generate package via cpack
+#        - cpack -G RPM -C CPackConfig.cmake
+#        - cpack -G DEB -C CPackConfig.cmake
+#        - 'cp faust-$SHA_START* $HOME'
+#   artifacts:
+#        paths:
+#            - build/faust-${CI_COMMIT_SHA:0:8}-x86_64.deb
+#            - build/faust-${CI_COMMIT_SHA:0:8}-x86_64.rpm
+#        expire_in: '1 week'
+#   tags:
+#        - linux
+#        - matlab
+#        - tux_packager
+#   except:
+#        - schedules
+#        - tags
 
           # jobs triggered by git tag can force cpack to use the tag name as version but it's not necessary for MacOSX (not using cpack for that sys.)
           #it's done for linux packages
 
-package_macos_release:
-    script:
-        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..'
-        - make LANG=en_GB.UTF-8
-        - 'echo $MACOS_PASS | sudo -S make install LANG=en_GB.UTF-8'
-        - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust -ov -format UDRW faust-$CI_COMMIT_TAG'
-        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust --install-location /opt/local/faust --scripts . ./faust-$CI_COMMIT_TAG.pkg
-        - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
-        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
-        - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_TAG.pkg ./distribution.plist
-        - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$CI_COMMIT_TAG'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
-        - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$CI_COMMIT_TAG.pkg
-        - mv ./faust-matio-$CI_COMMIT_TAG.pkg ./faust-$CI_COMMIT_TAG.pkg
-          #- if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$CI_COMMIT_TAG.dmg faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
-        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
-    artifacts:
-        paths:
-            - build/faust-${CI_COMMIT_TAG}.pkg
-              #- build/faust-${CI_COMMIT_TAG}.dmg
-        expire_in: '50 yrs'
-    tags:
-        - macos
-    only:
-        - tags
+#package_macos_release:
+#    script:
+#        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+#        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..'
+#        - make LANG=en_GB.UTF-8
+#        - 'echo $MACOS_PASS | sudo -S make install LANG=en_GB.UTF-8'
+#        - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust -ov -format UDRW faust-$CI_COMMIT_TAG'
+#        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust --version $CI_COMMIT_TAG --root /opt/local/faust --install-location /opt/local/faust --scripts . ./faust-$CI_COMMIT_TAG.pkg
+#        - for FILE in $(find /usr/local/lib ! -iname "libmatio*" -maxdepth 1 -mindepth 1); do filter_list+="--filter $(basename $FILE) "; done;
+#        - echo $MACOS_PASS | sudo -S pkgbuild --identifier fr.inria.faust.matio --version 1.5.12 --root /usr/local/lib $filter_list --install-location /usr/local/lib ./matio-bin-1.5.12.pkg
+#        - productbuild --synthesize --package ./matio-bin-1.5.12.pkg --package faust-$CI_COMMIT_TAG.pkg ./distribution.plist
+#        - sed -e 's/\(.*pkg-ref id=.fr.inria.faust".*\)/\1<title>FAµST '$CI_COMMIT_TAG'<\/title><license file="licenses.html"\/><readme file="installer_readme.html"\/>/' distribution.plist > tmp.plist; mv tmp.plist distribution.plist
+#        - productbuild --distribution ./distribution.plist --package-path . --resources doc ./faust-matio-$CI_COMMIT_TAG.pkg
+#        - mv ./faust-matio-$CI_COMMIT_TAG.pkg ./faust-$CI_COMMIT_TAG.pkg
+#          #- if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$CI_COMMIT_TAG.dmg faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
+#        - if [[ -d $MACOS_PKG_STORE_PATH ]]; then echo $MACOS_PASS | sudo -S cp faust-$CI_COMMIT_TAG.pkg $MACOS_PKG_STORE_PATH; fi
+#    artifacts:
+#        paths:
+#            - build/faust-${CI_COMMIT_TAG}.pkg
+#              #- build/faust-${CI_COMMIT_TAG}.dmg
+#        expire_in: '50 yrs'
+#    tags:
+#        - macos
+#    only:
+#        - tags
 
 package_win_release:
+    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive}
+    <<: *win_build_gpu_mod
     script:
-        - if NOT EXIST build (mkdir build) else rmdir /S /Q build
+        - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
         - cd build
-        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" ..'
+        - 'cmake -G "MinGW Makefiles" -DBUILD_WRAPPER_MATLAB=ON -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%CI_COMMIT_TAG% -DBUILD_DOCUMENTATION=ON -DEXCLUDE_FAUST_LIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF -DAPI_DOC_BASE_URL="file:///C:/Program Files/Faust/doc/" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=../gpu_mod ..'
         - make
         - makensis faust.nsi
     artifacts:
@@ -195,172 +217,179 @@ package_win_release:
     only:
         - tags
 
-package_linux_release:
-   <<: *build_gpu_mod
-   script:
-        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
-        - make
-        - cpack -G RPM -C CPackConfig.cmake
-        - cpack -G DEB -C CPackConfig.cmake
-        - 'cp faust-$CI_COMMIT_TAG*rpm faust-$CI_COMMIT_TAG*.deb $HOME'
-   artifacts:
-        paths:
-            - build/faust-$CI_COMMIT_TAG-x86_64.deb
-            - build/faust-$CI_COMMIT_TAG-x86_64.rpm
-        expire_in: '50 yrs'
-   tags:
-        - linux
-        - matlab
-        - tux_packager
-   only:
-        - tags
+#package_linux_release:
+#   <<: *build_gpu_mod
+#   script:
+#        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+#        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
+#        - make
+#        - cpack -G RPM -C CPackConfig.cmake
+#        - cpack -G DEB -C CPackConfig.cmake
+#        - 'cp faust-$CI_COMMIT_TAG*rpm faust-$CI_COMMIT_TAG*.deb $HOME'
+#   artifacts:
+#        paths:
+#            - build/faust-$CI_COMMIT_TAG-x86_64.deb
+#            - build/faust-$CI_COMMIT_TAG-x86_64.rpm
+#        expire_in: '50 yrs'
+#   tags:
+#        - linux
+#        - matlab
+#        - tux_packager
+#   only:
+#        - tags
+#
+#
+#package_linux_release_static:
+#   script:
+#        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+#        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
+#        - make
+#        - cpack -G RPM -C CPackConfig.cmake
+#        - cpack -G DEB -C CPackConfig.cmake
+#        - 'cp faust-$CI_COMMIT_TAG*rpm faust-$CI_COMMIT_TAG*.deb $HOME'
+#   artifacts:
+#        paths:
+#            - build/faust-$CI_COMMIT_TAG-static-x86_64.deb
+#            - build/faust-$CI_COMMIT_TAG-static-x86_64.rpm
+#        expire_in: '50 yrs'
+#   tags:
+#        - linux
+#        - matlab
+#        - tux_packager
+#   only:
+#        - tags
 
 
-package_linux_release_static:
-   script:
-        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
-        - make
-        - cpack -G RPM -C CPackConfig.cmake
-        - cpack -G DEB -C CPackConfig.cmake
-        - 'cp faust-$CI_COMMIT_TAG*rpm faust-$CI_COMMIT_TAG*.deb $HOME'
-   artifacts:
-        paths:
-            - build/faust-$CI_COMMIT_TAG-static-x86_64.deb
-            - build/faust-$CI_COMMIT_TAG-static-x86_64.rpm
-        expire_in: '50 yrs'
-   tags:
-        - linux
-        - matlab
-        - tux_packager
-   only:
-        - tags
 
-
-
-pages:
-    script:
-       - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-       - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DINCLUDE_ALL_SYS_INSTALL_INSTRUCS=ON ..'
-       - make doc
-       - make doc_exclu_class_filtering
-       - mkdir -p ../public/last-doc
-       - cp -Rf doc/html ../public/last-doc/
-    artifacts:
-       paths:
-           - public/
-    tags:
-        - linux
-        - matlab
-    only:
-        - tags
-
-.package_purepy: &package_purepy
-    script:
-        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" -DNOPY2=$NOPY2 -DBUILD_MULTITHREAD=$BUILD_MULTITHREAD -DUSE_GPU_MOD=$USE_GPU_MOD -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH ..'
-        - make
-        - cd wrapper/python
-        - python3 setup.py bdist_wheel
-        - python3 setup.py bdist_egg
-        - if [[ "$NOPY2" != "ON" ]]; then python2 setup.py bdist_wheel; fi
-        - if [[ "$NOPY2" != "ON" ]]; then python2 setup.py bdist_egg; fi
-    artifacts:
-        paths:
-              - build/wrapper/python/dist
-    except:
-        - schedules
-
-.package_purepy_rev:
-    extends: .package_purepy
-    stage: package_rev
-    before_script:
-        - VERSION=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
-        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build ]]; then mkdir build; fi; cd build; fi
-        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..; make; fi
-        - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
-    artifacts:
-        expire_in: '1 week'
-    except:
-        - schedules
-        - tags
-
-package_macos_purepy_rev:
-    extends: .package_purepy_rev
-    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", EXPERIMENTAL_PKG: "ON"}
-    tags:
-        - macos
-
-package_linux_purepy_rev:
-    extends: .package_purepy_rev
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", EXPERIMENTAL_PKG: "ON"}
-    tags:
-        - linux
-        - tux_packager
-
-.package_purepy_release:
-    extends: .package_purepy
-    before_script:
-        - VERSION=$CI_COMMIT_TAG
-        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build ]]; then mkdir build; fi; cd build; fi
-        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..; make; fi
-        - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
-    artifacts:
-        expire_in: '50 yrs'
-    except:
-        - schedules
-    only:
-        - tags
-
-package_macos_purepy_release:
-    extends: .package_purepy_release
-    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a" }
-    tags:
-        - macos
-
-package_macos_purepy_release_torch_linked:
-    extends: package_macos_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", FAUST_TORCH: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch"}
-
-package_linux_purepy_release:
-    extends: .package_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod"}
-    tags:
-        - linux
-        - tux_packager
-
-package_linux_purepy_release_torch_linked:
-    extends: package_linux_purepy_release
-    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod"}
-
-package_purepy_release_rasp:
-    variables: {MATIO_STATIC_LIB_PATH: "/opt/local/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/libhdf5.a"}
-    script:
-        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
-        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DNOPY2=ON -DBUILD_MULTITHREAD=ON ..'
-        - ln -s /usr/bin/clang gcc
-        - export PATH=$PWD:$PATH
-        - make
-        - cd wrapper/python
-        - python3 setup.py bdist_wheel
-    artifacts:
-        paths:
-              - build/wrapper/python/dist
-    except:
-        - schedules
-    only:
-        - tags
-    tags:
-        - arm
+#pages:
+#    script:
+#       - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+#       - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DINCLUDE_ALL_SYS_INSTALL_INSTRUCS=ON ..'
+#       - make doc
+#       - make doc_exclu_class_filtering
+#       - mkdir -p ../public/last-doc
+#       - cp -Rf doc/html ../public/last-doc/
+#    artifacts:
+#       paths:
+#           - public/
+#    tags:
+#        - linux
+#        - matlab
+#    only:
+#        - tags
+#
+#.package_purepy: &package_purepy
+#    script:
+#        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+#        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" -DNOPY2=$NOPY2 -DBUILD_MULTITHREAD=$BUILD_MULTITHREAD -DUSE_GPU_MOD=$USE_GPU_MOD -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH ..'
+#        - make
+#        - cd wrapper/python
+#        - python3 setup.py bdist_wheel
+#        - python3 setup.py bdist_egg
+#        - if [[ "$NOPY2" != "ON" ]]; then python2 setup.py bdist_wheel; fi
+#        - if [[ "$NOPY2" != "ON" ]]; then python2 setup.py bdist_egg; fi
+#    artifacts:
+#        paths:
+#              - build/wrapper/python/dist
+#    except:
+#        - schedules
+#
+#.package_purepy_rev:
+#    extends: .package_purepy
+#    stage: package_rev
+#    before_script:
+#        - VERSION=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
+#        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build ]]; then mkdir build; fi; cd build; fi
+#        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..; make; fi
+#        - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
+#    artifacts:
+#        expire_in: '1 week'
+#    except:
+#        - schedules
+#        - tags
+#
+#package_macos_purepy_rev:
+#    extends: .package_purepy_rev
+#    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", EXPERIMENTAL_PKG: "ON"}
+#    tags:
+#        - macos
+#
+#package_linux_purepy_rev:
+#    extends: .package_purepy_rev
+#    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", EXPERIMENTAL_PKG: "ON"}
+#    tags:
+#        - linux
+#        - tux_packager
+#
+#.package_purepy_release:
+#    extends: .package_purepy
+#    before_script:
+#        - VERSION=$CI_COMMIT_TAG
+#        - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build ]]; then mkdir build; fi; cd build; fi
+#        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..; make; fi
+#        - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
+#    artifacts:
+#        expire_in: '50 yrs'
+#    except:
+#        - schedules
+#    only:
+#        - tags
+#
+#package_macos_purepy_release:
+#    extends: .package_purepy_release
+#    variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a" }
+#    tags:
+#        - macos
+#
+#package_macos_purepy_release_torch_linked:
+#    extends: package_macos_purepy_release
+#    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", FAUST_TORCH: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch"}
+#
+#package_linux_purepy_release:
+#    extends: .package_purepy_release
+#    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod"}
+#    tags:
+#        - linux
+#        - tux_packager
+#
+#package_linux_purepy_release_torch_linked:
+#    extends: package_linux_purepy_release
+#    variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod"}
+#
+#package_purepy_release_rasp:
+#    variables: {MATIO_STATIC_LIB_PATH: "/opt/local/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/libhdf5.a"}
+#    script:
+#        - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
+#        - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DNOPY2=ON -DBUILD_MULTITHREAD=ON ..'
+#        - ln -s /usr/bin/clang gcc
+#        - export PATH=$PWD:$PATH
+#        - make
+#        - cd wrapper/python
+#        - python3 setup.py bdist_wheel
+#    artifacts:
+#        paths:
+#              - build/wrapper/python/dist
+#    except:
+#        - schedules
+#    only:
+#        - tags
+#    tags:
+#        - arm
 
 ########### pip binary packages for windows
 
 .package_win_purepy: &package_win_purepy
     script:
-        - if NOT EXIST build (mkdir build) else rmdir /S /Q build
+        - cd gpu_mod
+        - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
         - cd build
-        - 'cmake -G "Visual Studio 14 2015" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF  -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH="C:/Users/faust/Downloads/matio-1.5.13/visual_studio/x64/Release/libmatio.lib" -DZ_STATIC_LIB_PATH="C:/Users/faust/Downloads/zlib-1.2.11/contrib/vstudio/vc14/x64/ZlibStatDebug/zlibstat.lib" -DHDF5_STATIC_LIB_PATH="C:/Users/faust/Downloads/hdf5-1.10.3/build/bin/Release/libhdf5.lib" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=%EXPERIMENTAL_PKG% ..'
+        - cmake -G "Visual Studio 14 Win64" ..
+        - cmake --build . --config %BUILD_CONFIG%
+        - move %BUILD_CONFIG%\gm.dll .
+        - cd ..\..
+        - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
+        - cd build
+        - 'cmake -G "Visual Studio 14 2015" -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_WRAPPER_PYTHON=ON -DSLOW_TESTS=OFF -DCPACK_PACKAGE_VERSION=%VERSION% -DCMAKE_INSTALL_PREFIX=win_pkg_build -DBUILD_TESTING=OFF  -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH="C:/Users/faust/Downloads/matio-1.5.13/visual_studio/x64/Release/libmatio.lib" -DZ_STATIC_LIB_PATH="C:/Users/faust/Downloads/zlib-1.2.11/contrib/vstudio/vc14/x64/ZlibStatDebug/zlibstat.lib" -DHDF5_STATIC_LIB_PATH="C:/Users/faust/Downloads/hdf5-1.10.3/build/bin/Release/libhdf5.lib" -DREMOTE_DATA_URL="%DURL%" -DREMOTE_DATA_FILE="%DFILE%" -DEXPERIMENTAL_PKG=%EXPERIMENTAL_PKG% -DUSE_GPU_MOD=ON  -DCMAKE_PREFIX_PATH=../gpu_mod ..'
         #- make
         - cmake --build . --target FAUST
         - cd wrapper/python
@@ -380,6 +409,7 @@ package_purepy_release_rasp:
 package_win_purepy_rev:
     extends: .package_win_purepy
     stage: package_rev
+    variables: {BUILD_CONFIG: "Debug", GIT_SUBMODULE_STRATEGY: recursive}
     before_script:
         - 'set VERSION=%CI_COMMIT_SHA:~0,8%'
         - 'set EXPERIMENTAL_PKG=ON'
@@ -391,6 +421,7 @@ package_win_purepy_rev:
 
 package_win_purepy_release:
     extends: .package_win_purepy
+    variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF"}
     before_script:
         - 'set VERSION=%CI_COMMIT_TAG%'
     artifacts:

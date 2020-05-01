@@ -93,6 +93,11 @@ Section "" ; no component so name not needed
   CreateDirectory $INSTDIR\python
   CreateDirectory $INSTDIR\doc\html
 
+  ; install gpu mod lib
+  CreateDirectory $INSTDIR\lib
+  SetOutPath $INSTDIR\lib
+  File @PROJECT_BINARY_DIR@\..\gpu_mod\build\gm.dll
+
   ; install python wrapper
   SetOutPath $INSTDIR\python\pyfaust
   File /r @PROJECT_BINARY_DIR@\wrapper\python\pyfaust\*py

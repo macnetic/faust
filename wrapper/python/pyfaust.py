@@ -2107,7 +2107,7 @@ if sys.platform == 'linux':
 elif sys.platform == 'darwin':
     enable_gpu_mod([pyfaust_path+"/lib/libgm.dylib"], silent=True)
 elif sys.platform == 'win32':
-    enable_gpu_mod([pyfaust_path+"/lib/libgm.dll"], silent=True)
+    enable_gpu_mod([pyfaust_path+"/lib/gm.dll"], silent=True)
 
 
 # experimental block start

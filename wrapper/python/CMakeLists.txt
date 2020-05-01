@@ -109,7 +109,7 @@ if(USE_GPU_MOD)
 	elseif(UNIX)
 		set(GPU_MOD_LIB libgm.so)
 	elseif(WIN32)
-		set(GPU_MOD_LIB libgm.dll)
+		set(GPU_MOD_LIB gm.dll)
 	endif()
 	set(GPU_MOD_LIB_PATH lib/${GPU_MOD_LIB}) # used in setup.py
 	set(GPU_MOD_LIB_PPATH ${FAUST_PYTHON_BIN_DIR}/pyfaust/lib)
