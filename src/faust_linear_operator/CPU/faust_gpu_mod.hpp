@@ -38,13 +38,13 @@ namespace Faust
 	template<>
 		void set_one<double>(double* scal)
 		{
-			*scal = 1.d;
+			*scal = 1.;
 		}
 
 	template<>
 		void set_one<cuDoubleComplex>(cuDoubleComplex* scal)
 		{
-			scal->x = 1.d;
+			scal->x = 1.;
 			scal->y = 0;
 		}
 }
