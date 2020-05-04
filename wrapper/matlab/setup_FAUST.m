@@ -45,7 +45,7 @@ fprintf('Welcome to the Matlab wrapper of the FAuST C++ toolbox.');
 fprintf('FAuST root directory is %s\n',ROOT_DIR);
 fprintf('Adding path %s\n and all its subdirectories ',ROOT_DIR);
 addpath(genpath(ROOT_DIR));
-
+matfaust.enable_gpu_mod()
 
 
 

@@ -2212,3 +2212,14 @@ cdef class FaustFact:
                                                           " has failed.");
 
         return core, np.real(_out_buf[0])
+
+import sys, os, pyfaust
+# tries to load the libgm library silently,
+# if not enabled at build time it will do nothing
+pyfaust_path = os.path.dirname(pyfaust.__file__)
+if sys.platform == 'linux':
+    FaustCore.enable_gpu_mod([pyfaust_path+"/lib/libgm.so"], silent=True)
+elif sys.platform == 'darwin':
+    FaustCore.enable_gpu_mod([pyfaust_path+"/lib/libgm.dylib"], silent=True)
+elif sys.platform == 'win32':
+    FaustCore.enable_gpu_mod([pyfaust_path+"\lib\gm.dll"], silent=True)

@@ -24,7 +24,7 @@ Installation
 Please refer to the document "./gettingStartedFAuST-version2_0.pdf"
 to install the FAUST toolbox.
 The FAUST toolbox has been tested on the following environments:
-- LINUX (fedora 20, 21, 22, 23, 24 - 27 / Ubuntu)
+- LINUX (fedora 24 - 30 / centos 7 / Ubuntu)
 - MACOS X
 - WINDOWS (windows 7)
 

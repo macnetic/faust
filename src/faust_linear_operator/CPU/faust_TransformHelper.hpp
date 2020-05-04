@@ -283,7 +283,8 @@ namespace Faust {
 #endif
 #ifdef USE_GPU_MOD
 				case 10:
-					M = gpu_faust->multiply(&A);
+					if(gpu_faust != nullptr)
+						M = gpu_faust->multiply(&A);
 					break;
 #endif
 				default:
@@ -382,8 +383,18 @@ namespace Faust {
 			for(int i=7;i<10;i++)
 				disabled_meths.push_back(i);
 #endif
-#ifndef USE_GPU_MOD
-			disabled_meths.push_back(10);
+#ifdef USE_GPU_MOD
+			try
+			{
+				Faust::FaustGPU<FPP>::check_gpu_mod_loaded();
+			}
+			catch(std::runtime_error& e)
+			{
+			// test only if enable_gpu_mod was called
+#endif
+				disabled_meths.push_back(10);
+#ifdef USE_GPU_MOD
+			}
 #endif
 			for(int i=0; i < NMETS; i++)
 			{
@@ -580,12 +591,23 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::set_mul_order_opt_mode(const int mul_order_opt_mode)
 		{
-			this->mul_order_opt_mode = mul_order_opt_mode;
-			std::cout << "changed mul. optimization mode to: " << this->mul_order_opt_mode;
 #ifdef USE_GPU_MOD
 			if(mul_order_opt_mode == 10 && gpu_faust == nullptr)
-				gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
+			{
+				try
+				{
+					gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
+				}
+				catch(std::runtime_error & e)
+				{
+					// creation failed, nothing todo (must be because of cuda backend is not installed/found)
+					std::cerr << "error: can't change to GPU method (backend unavailable)." << std::endl;
+					return;
+				}
+			}
 #endif
+			this->mul_order_opt_mode = mul_order_opt_mode;
+			std::cout << "changed mul. optimization mode to: " << this->mul_order_opt_mode;
 			if(! this->mul_order_opt_mode)
 				std::cout << " (opt. disabled, default mul.)";
 			std::cout << std::endl;

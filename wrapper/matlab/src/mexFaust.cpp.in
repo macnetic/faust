@@ -1,8 +1,8 @@
 /****************************************************************************/
 /*                              Description:                                */
-/*    file where the C++ class Faust::Transform is interface with Matlab    */
+/*    file where the C++ class Faust::TransformHelper is interfaced with Matlab    */
 /*   WARNING : this file is configured into two files :                     */
-/* - mexFaustReal.cpp interfaces the class Faust::Transform<double>         */
+/* - mexFaustReal.cpp interfaces the class Faust::TransformHelper<double>         */
 /*     (i.e real scalar Faust)                                              */
 /* - mexFaustCplx.cpp interfaces the                                        */
 /* class Faust::Transform<std::complex<double<>                             */
@@ -15,7 +15,8 @@
 /*  of the project : <http://faust.inria.fr>                         */
 /*                                                                          */
 /*                              License:                                    */
-/*  Copyright (2016):   Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*  Copyright (2020):  	Hakim HADJ-DJILANI                                  */
+/*  			Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
 /*                      Luc Le Magoarou, Remi Gribonval                     */
 /*                      INRIA Rennes, FRANCE                                */
 /*                      http://www.inria.fr/                                */
@@ -48,7 +49,6 @@
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 
-
 #include "mex.h"
 #include "class_handle.hpp"
 #include "faust_Transform.h"
@@ -62,6 +62,27 @@
 #include "faust_constant.h"
 #include "faust_Timer.h"
 #include <complex>
+
+typedef @FAUST_SCALAR@ SCALAR;
+typedef @FAUST_FPP@ FPP;
+
+using namespace Faust;
+
+void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray **args);
+
+template<typename T>
+void fourierFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+
+
+template<typename T>
+void hadamardFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+
+template<typename T>
+void eyeFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+
+
+void* enable_gpu_mod(const char* libpath, const char* backend, const bool silent);
+
 // prhs[0] : name of command :
 //    "delete" to delete the Faust::Transform<SCALAR> object dynamically allocated previously
 //    "multiply" to multiply the Faust::Transform<SCALAR> object by a vector or a matrix
@@ -71,103 +92,6 @@
 // prhs[2] (only necessary if prhs[0] matches "multiply") : vector or matrix A to multiply by the Faust::TransformHelper<SCALAR> object
 
 
-
-typedef @FAUST_SCALAR@ SCALAR;
-typedef @FAUST_FPP@ FPP;
-
-using namespace Faust;
-
-void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray **args)
-{
-	const size_t MAX_PATH_SIZE=512;
-	char filepath[MAX_PATH_SIZE];
-	// args[0] must be the filepath
-    // args[1] must be the boolean for tranposing or not at write time
-	// nargs the number of arguments in args (must be 2)
-    if(nargs != 1){
-            mexErrMsgTxt("The number of arguments for the save function is not valid.");
-            return;
-        }
-        if(mxGetString(args[0], filepath, sizeof(filepath)) || strlen(filepath) == 0){
-            mexErrMsgTxt("The filepath is not valid.");
-            return;
-        }
-        //	printf("save: filepath = %s, nargs = %d\n", filepath, nargs);
-		try
-		{
-			core_ptr->save_mat_file(filepath/*, mxGetScalar(args[1])*/);
-		}
-		catch(exception& e)
-		{
-			mexErrMsgTxt("Failed to save the file.");
-		}
-}
-
-template<typename T>
-void fourierFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{
-	if(nlhs!=1)
-		mexErrMsgTxt("mex dft(): too many left hand side variables.");
-	if(nrhs < 3)
-		mexErrMsgTxt("mex dft(): wrong number of arguments (must be 3)");
-	unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
-	bool norma = (bool) mxGetScalar(prhs[2]);
-
-	//printf("mexFaust.cpp hadamard(): faust creation\n");
-	Faust::TransformHelper<complex<FPP>,Cpu>* F = Faust::TransformHelper<complex<FPP>,Cpu>::fourierFaust(n, norma);
-	//H->display();
-	if(F) //not NULL
-		plhs[0]=convertPtr2Mat<Faust::TransformHelper<complex<FPP>,Cpu> >(F);
-	else {
-		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-		double* ptr_out = (double*) mxGetData(plhs[0]);
-		ptr_out[0]=(double) 0;
-	}
-
-}
-
-template<typename T>
-void hadamardFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{
-	if(nlhs!=1)
-		mexErrMsgTxt("mex wht(): too many left hand side variables.");
-	if(nrhs < 3)
-		mexErrMsgTxt("mex wht(): wrong number of arguments (must be 3)");
-	unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
-	bool norma = (bool) mxGetScalar(prhs[2]);
-
-	//printf("mexFaust.cpp hadamard(): faust creation\n");
-	Faust::TransformHelper<T,Cpu>* H = Faust::TransformHelper<T,Cpu>::hadamardFaust(n, norma);
-	//H->display();
-	if(H) //not NULL
-		plhs[0]=convertPtr2Mat<Faust::TransformHelper<T,Cpu> >(H);
-	else {
-		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-		double* ptr_out = (double*) mxGetData(plhs[0]);
-		ptr_out[0]=(double) 0;
-	}
-
-}
-
-template<typename T>
-void eyeFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-{
-	if(nlhs != 1)
-		mexErrMsgTxt("eye(): too many left hand side variables.");
-	unsigned int n, m;
-	n = mxGetScalar(prhs[1]);
-	m = mxGetScalar(prhs[2]);
-	Faust::TransformHelper<SCALAR,Cpu>* eye = Faust::TransformHelper<SCALAR,Cpu>::eyeFaust(n, m);
-	if(eye) // not NULL
-		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu>>(eye);
-	else
-	{
-		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
-		double* ptr_out = (double*) mxGetData(plhs[0]);
-		ptr_out[0]=(double) 0;
-	}
-	return;
-}
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -370,6 +294,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			//
 			Faust::prox_blockdiag(mat, m_vec, n_vec, normalized, pos);
 			plhs[0] = FaustMat2mxArray(mat);
+			return;
+		}
+
+
+		if (!strcmp("enable_gpu_mod", cmd))
+		{
+			char libpath[1024];
+			char backend[32];
+			bool silent;
+			if(nrhs < 4)
+				mexErrMsgTxt("enable_gpu_mod received a bad number of arguments.");
+
+			mxGetString(prhs[1], libpath, sizeof(libpath));
+			mxGetString(prhs[2], backend, sizeof(backend));
+			silent = (bool) mxGetScalar(prhs[3]);
+			enable_gpu_mod(libpath, backend, silent);
 			return;
 		}
 
@@ -912,11 +852,111 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		}
 
-
 		// Got here, so command not recognized
 		mexErrMsgTxt("Command not recognized.");
 	}catch (const std::exception& e)
 	{
 		mexErrMsgTxt(e.what());
 	}
+}
+
+void save(Faust::TransformHelper<SCALAR,Cpu>* core_ptr, int nargs, const mxArray **args)
+{
+	const size_t MAX_PATH_SIZE=512;
+	char filepath[MAX_PATH_SIZE];
+	// args[0] must be the filepath
+    // args[1] must be the boolean for tranposing or not at write time
+	// nargs the number of arguments in args (must be 2)
+    if(nargs != 1){
+            mexErrMsgTxt("The number of arguments for the save function is not valid.");
+            return;
+        }
+        if(mxGetString(args[0], filepath, sizeof(filepath)) || strlen(filepath) == 0){
+            mexErrMsgTxt("The filepath is not valid.");
+            return;
+        }
+        //	printf("save: filepath = %s, nargs = %d\n", filepath, nargs);
+		try
+		{
+			core_ptr->save_mat_file(filepath/*, mxGetScalar(args[1])*/);
+		}
+		catch(exception& e)
+		{
+			mexErrMsgTxt("Failed to save the file.");
+		}
+}
+
+template<typename T>
+void fourierFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	if(nlhs!=1)
+		mexErrMsgTxt("mex dft(): too many left hand side variables.");
+	if(nrhs < 3)
+		mexErrMsgTxt("mex dft(): wrong number of arguments (must be 3)");
+	unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
+	bool norma = (bool) mxGetScalar(prhs[2]);
+
+	//printf("mexFaust.cpp hadamard(): faust creation\n");
+	Faust::TransformHelper<complex<FPP>,Cpu>* F = Faust::TransformHelper<complex<FPP>,Cpu>::fourierFaust(n, norma);
+	//H->display();
+	if(F) //not NULL
+		plhs[0]=convertPtr2Mat<Faust::TransformHelper<complex<FPP>,Cpu> >(F);
+	else {
+		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+		double* ptr_out = (double*) mxGetData(plhs[0]);
+		ptr_out[0]=(double) 0;
+	}
+
+}
+
+template<typename T>
+void hadamardFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	if(nlhs!=1)
+		mexErrMsgTxt("mex wht(): too many left hand side variables.");
+	if(nrhs < 3)
+		mexErrMsgTxt("mex wht(): wrong number of arguments (must be 3)");
+	unsigned int n  = (unsigned int) mxGetScalar(prhs[1]);
+	bool norma = (bool) mxGetScalar(prhs[2]);
+
+	//printf("mexFaust.cpp hadamard(): faust creation\n");
+	Faust::TransformHelper<T,Cpu>* H = Faust::TransformHelper<T,Cpu>::hadamardFaust(n, norma);
+	//H->display();
+	if(H) //not NULL
+		plhs[0]=convertPtr2Mat<Faust::TransformHelper<T,Cpu> >(H);
+	else {
+		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+		double* ptr_out = (double*) mxGetData(plhs[0]);
+		ptr_out[0]=(double) 0;
+	}
+
+}
+
+template<typename T>
+void eyeFaust(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	if(nlhs != 1)
+		mexErrMsgTxt("eye(): too many left hand side variables.");
+	unsigned int n, m;
+	n = mxGetScalar(prhs[1]);
+	m = mxGetScalar(prhs[2]);
+	Faust::TransformHelper<SCALAR,Cpu>* eye = Faust::TransformHelper<SCALAR,Cpu>::eyeFaust(n, m);
+	if(eye) // not NULL
+		plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu>>(eye);
+	else
+	{
+		plhs[0] = mxCreateDoubleMatrix(1,1,mxREAL);
+		double* ptr_out = (double*) mxGetData(plhs[0]);
+		ptr_out[0]=(double) 0;
+	}
+	return;
+}
+
+void* enable_gpu_mod(const char* libpath, const char* backend, const bool silent)
+{
+#ifdef USE_GPU_MOD
+	return Faust::enable_gpu_mod(libpath, silent);
+#else
+	return nullptr;
+#endif
 }

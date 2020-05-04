@@ -10,7 +10,6 @@ from scipy.sparse import csr_matrix, csc_matrix, dia_matrix
 import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
-import sys, os
 
 class Faust:
     """<b>FAuST Python wrapper main class</b> for using multi-layer sparse transforms.
@@ -2098,17 +2097,6 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False):
 
     """
     _FaustCorePy.FaustCore.enable_gpu_mod(libpaths, backend, silent)
-
-# tries to load the libgm library silently,
-# if not enabled at build time it will do nothing
-pyfaust_path = os.path.dirname(pyfaust.__file__)
-if sys.platform == 'linux':
-    enable_gpu_mod([pyfaust_path+"/lib/libgm.so"], silent=True)
-elif sys.platform == 'darwin':
-    enable_gpu_mod([pyfaust_path+"/lib/libgm.dylib"], silent=True)
-elif sys.platform == 'win32':
-    enable_gpu_mod([pyfaust_path+"/lib/gm.dll"], silent=True)
-
 
 # experimental block start
 import torch

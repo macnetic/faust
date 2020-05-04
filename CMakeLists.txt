@@ -640,6 +640,17 @@ if(USE_GPU_MOD)
 	set(GM_SCALAR cuDoubleComplex)
 	set(GM_REINTERPRET_CAST_SCALAR double)
 	configure_file(${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_gen.hpp.in ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_complexdouble.hpp)
+	# set install relative path of the lib (for each OS)
+	if(APPLE)
+		set(GPU_MOD_LIB libgm.dylib)
+	elseif(UNIX)
+		set(GPU_MOD_LIB libgm.so)
+	elseif(WIN32)
+		set(GPU_MOD_LIB gm.dll)
+	endif()
+	file(TO_NATIVE_PATH lib/${GPU_MOD_LIB} GPU_MOD_LIB_PATH) # used in setup.py
+	file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${GPU_MOD_LIB} GPU_MOD_LIB_INSTALL_PATH) # only for system packages (not for pip package)
+
 endif()
 
 

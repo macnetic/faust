@@ -21,6 +21,7 @@ else
 	if [[ -d "${FAUST_MATLAB_WRAPPER_PATH}" ]]
 	then
 		echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE"
+		echo "matfaust.enable_gpu_mod()" >> "$STARTUP_FILE"
 		RET1=$?
 		RET2=0
 		# try edit startup.m of all users (only when files exist)
@@ -33,7 +34,8 @@ else
 				if [[ -r "$USR_STARTUP_FILE" ]]
 				then
 					grep -i -v faust "$USR_STARTUP_FILE" > "${USR_STARTUP_FILE}.tmp" 2>/dev/null && mv "${USR_STARTUP_FILE}.tmp" "$USR_STARTUP_FILE"
-					echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> $USR_STARTUP_FILE
+					echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$USR_STARTUP_FILE"
+					echo "matfaust.enable_gpu_mod()" >> "$USR_STARTUP_FILE"
 					chown $USER $USR_STARTUP_FILE
 					RET2=$(($?+$RET2))
 				fi
