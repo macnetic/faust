@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: @PYTHON_ENCODING@ -*-
 # @PYFAUST_LICENSE_HEADER@
 # @TORCH_LIBS_LOADING@
 

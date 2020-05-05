@@ -1,3 +1,6 @@
+if(NOT PYTHON_ENCODING)
+	set(PYTHON_ENCODING utf-8)
+endif()
 
 set(FAUST_PYTHON_LIB_DIR "'${FAUST_BIN_DIR}'")
 
@@ -143,26 +146,46 @@ configure_file(${PROJECT_SOURCE_DIR}/license_matio.txt ${FAUST_PYTHON_BIN_DIR}/p
 configure_file(${PROJECT_SOURCE_DIR}/license_hdf5.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust/license_hdf5.txt COPYONLY)
 configure_file(${PROJECT_SOURCE_DIR}/license_zlib.txt ${FAUST_PYTHON_BIN_DIR}/pyfaust/license_zlib.txt COPYONLY)
 
+
+#TODO: externalize this function to use it for matlab filetering too (e.g. in ${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.cmake)
+#TODO: take care that PYTHON_EXES is undefined when BUILD_WRAPPER_PYTHON=OFF
+function(filter_experimental_code PY_INPUT PY_OUTPUT)
+	file(TO_NATIVE_PATH "${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py" FILTER_SCRIPT)
+	file(TO_NATIVE_PATH ${PY_INPUT} PY_TO_FILTER)
+	file(TO_NATIVE_PATH ${PY_OUTPUT} FILTERED_OUT_PY)
+	message(STATUS "Filtering out exp. code from ${PY_TO_FILTER} into ${FILTERED_OUT_PY}")
+	if(NOT EXISTS ${FILTER_SCRIPT})
+		message(FATAL_ERROR "filter script not found (${FILTER_SCRIPT}).")
+	endif()
+	configure_file(${PY_TO_FILTER} ${FILTERED_OUT_PY} @ONLY)
+	list(GET PYTHON_EXES -1 PY_EXE)
+	execute_process(COMMAND
+		${PY_EXE}
+		"${FILTER_SCRIPT}"
+		"${FILTERED_OUT_PY}"
+		"${FILTERED_OUT_PY}"
+		"--no-empty")
+	if(NOT EXISTS ${FILTERED_OUT_PY})
+		message(FATAL_ERROR "Filtering failed.")
+	endif()
+endfunction(filter_experimental_code)
+
 message(STATUS "Installing pyfaust.py as pyfaust/__init__.py")
-configure_file(${FAUST_PYTHON_SRC_DIR}/pyfaust.py ${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py @ONLY)
-# filter experimental code out of pyfaust modules
-execute_process(COMMAND
-	python
-	"${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py"
-	${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py
-	${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py
-	"--no-empty")
+if(EXPERIMENTAL_PKG)
+	configure_file(${FAUST_PYTHON_SRC_DIR}/pyfaust.py ${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py @ONLY)
+else()
+	# filter experimental code out of pyfaust modules
+	filter_experimental_code("${FAUST_PYTHON_SRC_DIR}/pyfaust.py" "${FAUST_PYTHON_BIN_DIR}/pyfaust/__init__.py")
+endif()
+
 FILE(GLOB_RECURSE PYFAUST_FILES RELATIVE ${FAUST_PYTHON_SRC_DIR} ${FAUST_PYTHON_SRC_DIR}/pyfaust/*py)
 foreach(PYFAUST_FILE ${PYFAUST_FILES})
 	message(STATUS "Installing ${PYFAUST_FILE}")
-	configure_file(${FAUST_PYTHON_SRC_DIR}/${PYFAUST_FILE} ${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE} @ONLY)
-	if(NOT EXPERIMENTAL_PKG)
-		# filter experimental code out of pyfaust modules
-		execute_process(COMMAND
-			python
-			"${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py"
-			${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE}
-			${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE} "--no-empty")
+	if(EXPERIMENTAL_PKG)
+		configure_file(${FAUST_PYTHON_SRC_DIR}/${PYFAUST_FILE} ${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE} @ONLY)
+	else()
+		message(STATUS "Filtering exp. code from ${FAUST_PYTHON_SRC_DIR}/${PYFAUST_FILE} into ${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE}")
+		filter_experimental_code("${FAUST_PYTHON_SRC_DIR}/${PYFAUST_FILE}" "${FAUST_PYTHON_BIN_DIR}/${PYFAUST_FILE}")
 	endif()
 endforeach()
 

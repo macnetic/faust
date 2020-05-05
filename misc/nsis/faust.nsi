@@ -138,10 +138,16 @@ Section "" ; no component so name not needed
   FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
   FileClose $1
 
+  ; do the same thing on the copy
   FileOpen $1 "$2\pyfaust\__init__.py" a
   FileSeek $1 0 END
   FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
   FileClose $1
+
+  ; (unfortunately) it happens that NSIS doesn't write in utf-8
+  ; indicates the encoding in python script
+  Exec "powershell (Get-Content  $\"$2\pyfaust\__init__.py$\").Replace($\"utf-8$\", $\"windows-1252$\") > $\"$2\pyfaust\__init__.py$\""
+  Exec "powershell (Get-Content  $\"$INSTDIR\python\pyfaust\__init__.py$\").Replace($\"utf-8$\", $\"windows-1252$\") > $\"$INSTDIR\python\pyfaust\__init__.py$\""
   ; =================================================
 
 

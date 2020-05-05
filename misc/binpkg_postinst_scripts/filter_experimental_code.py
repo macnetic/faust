@@ -6,7 +6,7 @@ EXP_BLOCK_START="^(#|%) experimental block start"
 EXP_BLOCK_END="^(#|%) experimental block end"
 
 out_lines = []
-
+print(sys.argv[0], "executing...")
 # option to not write empty out file
 if("--no-empty" in sys.argv[:]):
     noempty = True
@@ -17,7 +17,13 @@ else:
 if(len(sys.argv) >= 2):
     for script in [sys.argv[1]]:
         in_exp_block = False
-        for line in open(script):
+        if sys.version_info[0] < 3:
+            # python2 doesn't provide encoding argument
+            fd = open(script)
+        else:
+            fd = open(script, encoding='utf-8')
+        print("processing", script)
+        for line in fd:
             if(not in_exp_block and re.match(EXP_BLOCK_START,
                                              line)):
                 in_exp_block = True
@@ -32,7 +38,10 @@ if(len(sys.argv) >= 2):
 
 if(len(sys.argv) >= 3):
     if(not noempty or not re.match('^\s*$',''.join(out_lines))):
-        outf = open(sys.argv[2], 'w')
+        if sys.version_info[0] < 3:
+            outf = open(sys.argv[2], 'w')
+        else:
+            outf = open(sys.argv[2], 'w', encoding='utf-8')
         outf.writelines(out_lines)
         outf.close()
     else:
