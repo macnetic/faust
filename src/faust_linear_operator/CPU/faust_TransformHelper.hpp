@@ -230,7 +230,6 @@ namespace Faust {
 			is_transposed ^= transpose;
 			is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
-			std::vector<Faust::MatGeneric<FPP,Cpu>*> data(this->transform->size()+1);
 #ifdef FAUST_TORCH
 			if(mul_order_opt_mode >= 7 && mul_order_opt_mode <= 9 && !tensor_data.size())
 			{
@@ -246,23 +245,26 @@ namespace Faust {
 				case 2:
 				case 3:
 				case 4:
-					//					this->transform->data.push_back(const_cast<Faust::MatDense<FPP,Cpu>*>(&A)); // it's ok
-					if(transpose)
 					{
-						int i = this->transform->size();
-						for(auto fac: this->transform->data)
-							data[i--] = fac;
-						data[0] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
+						//					this->transform->data.push_back(const_cast<Faust::MatDense<FPP,Cpu>*>(&A)); // it's ok
+						std::vector<Faust::MatGeneric<FPP,Cpu>*> data(this->transform->size()+1);
+						if(transpose)
+						{
+							int i = this->transform->size();
+							for(auto fac: this->transform->data)
+								data[i--] = fac;
+							data[0] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
+						}
+						else
+						{
+							int i = 0;
+							for(auto fac: this->transform->data)
+								data[i++] = fac;
+							data[i] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
+						}
+						Faust::multiply_order_opt(mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), {isTransposed2char()});
+						//					this->transform->data.erase(this->transform->data.end()-1);
 					}
-					else
-					{
-						int i = 0;
-						for(auto fac: this->transform->data)
-							data[i++] = fac;
-						data[i] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
-					}
-					Faust::multiply_order_opt(mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), {isTransposed2char()});
-					//					this->transform->data.erase(this->transform->data.end()-1);
 					break;
 				case 5:
 					M = this->transform->multiply_par(A, isTransposed2char());

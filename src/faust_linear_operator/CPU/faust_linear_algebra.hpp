@@ -988,7 +988,7 @@ void Faust::multiply_order_opt_first_best(std::vector<Faust::MatDense<FPP,DEVICE
 	std::vector<int> complexity(nfacts-1);
 //	int min_cplx = std::numeric_limits<int>::max(); //doesn't work with VS14
 	int min_cplx = 1 << 30;
-	int i, idx, lasti; // idx marks the factor to update with a product of contiguous factors
+	int i, idx = 0, lasti; // idx marks the factor to update with a product of contiguous factors
 	for(int i = 0; i <nfacts-1; i++)
 	{
 		Si = facts[i];
