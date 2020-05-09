@@ -397,8 +397,8 @@ package_purepy_release_rasp:
           # only python3 for windows
           #- 'start %PYTHON2_PATH% setup.py bdist_wheel'
           #- 'start %PYTHON2_PATH% setup.py bdist_egg'
-        - 'call %PYTHON_PATH% setup.py bdist_wheel'
-        - 'call %PYTHON_PATH% setup.py bdist_egg'
+        - 'call "%PYTHON_PATH%" setup.py bdist_wheel'
+        - 'call "%PYTHON_PATH%" setup.py bdist_egg'
     artifacts:
         paths:
             - build\wrapper\python\dist
