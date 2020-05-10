@@ -96,7 +96,7 @@ Section "" ; no component so name not needed
   ; install gpu mod lib
   CreateDirectory $INSTDIR\lib
   SetOutPath $INSTDIR\lib
-  File @PROJECT_BINARY_DIR@\..\gpu_mod\build\gm.dll
+  File @PROJECT_BINARY_DIR@\..\gpu_mod\build\gm.dll ; error if USE_GPU_MOD to OFF
 
   ; install python wrapper
   SetOutPath $INSTDIR\python\pyfaust
@@ -112,7 +112,7 @@ Section "" ; no component so name not needed
 
 
 
-  ; post install pyfaust auto-setup in environment (only works if python is installed in path) 
+  ; post install pyfaust auto-setup in environment (only works if python is installed in path)
   ${StrRep} '$0' $TEMP '\' '\\'
   Exec "python -c $\"import site;dir=site.getsitepackages()[1];f=open('$0\\tmp_site_pkg', 'w');f.write(dir);f.close()$\""
   IfErrors 0 +2
@@ -124,8 +124,11 @@ Section "" ; no component so name not needed
   FileClose $1
   ;MessageBox MB_OK "$2"
 
-  SetOutPath $2\pyfaust 
+  SetOutPath $2\pyfaust
   File /r @PROJECT_BINARY_DIR@\wrapper\python\pyfaust\*py
+  SetOutPath $2\pyfaust\lib
+  File @PROJECT_BINARY_DIR@\..\gpu_mod\build\gm.dll
+  ; CreateShortCut pyfaust @PROJECT_BINARY_DIR@\wrapper\python\pyfaust ; tested and it can't be like a linux symlink
   SetOutPath $2
   File @PROJECT_BINARY_DIR@\wrapper\python\*pyd
   File @PROJECT_BINARY_DIR@\wrapper\python\*pxd
@@ -144,10 +147,6 @@ Section "" ; no component so name not needed
   FileWrite $1 "$\r$\n_NSI_INSTALL_PATH='$INSTDIR'"
   FileClose $1
 
-  ; (unfortunately) it happens that NSIS doesn't write in utf-8
-  ; indicates the encoding in python script
-  Exec "powershell (Get-Content  $\"$2\pyfaust\__init__.py$\").Replace($\"utf-8$\", $\"windows-1252$\") > $\"$2\pyfaust\__init__.py$\""
-  Exec "powershell (Get-Content  $\"$INSTDIR\python\pyfaust\__init__.py$\").Replace($\"utf-8$\", $\"windows-1252$\") > $\"$INSTDIR\python\pyfaust\__init__.py$\""
   ; =================================================
 
 
@@ -162,17 +161,40 @@ Section "" ; no component so name not needed
   IfErrors 0 after_data_dl
   MessageBox MB_OK "Downloading FAuST data with python seems to have failed (or maybe it's already done), now trying with powershell."
   ClearErrors
-  ExecWait "powershell Invoke-WebRequest $\"@REMOTE_DATA_URL@/@REMOTE_DATA_FILE@$\" -O $\"$TEMP\@REMOTE_DATA_FILE@$\"" ; ExecWait because unzipping needs download finished
-  Exec "powershell Expand-Archive -Force $\"$TEMP\@REMOTE_DATA_FILE@$\" '$INSTDIR\matlab\data'" ; output folder data is created auto. ; simple quote used to avoid powershell to think there is two arguments when we meant one argument for the dest. path (double quote doesn't allow that).
+  ExecWait "powershell -WindowStyle Hidden Invoke-WebRequest $\"@REMOTE_DATA_URL@/@REMOTE_DATA_FILE@$\" -O $\"$TEMP\@REMOTE_DATA_FILE@$\"" ; ExecWait because unzipping needs download finished
+  Exec "powershell -WindowStyle Hidden Expand-Archive -Force $\"$TEMP\@REMOTE_DATA_FILE@$\" '$INSTDIR\matlab\data'" ; output folder data is created auto. ; simple quote used to avoid powershell to think there is two arguments when we meant one argument for the dest. path (double quote doesn't allow that).
   IfErrors 0 after_data_dl
   MessageBox MB_OK "Error downloading FAuST data (or maybe it's already done). You'll need to download manually (please check the documentation)." IDOK after_data_dl
 
   after_data_dl:
 
   ; post install matfaust auto-setup
+  ; find matlab in PATH, to get the value of matlabroot and edit the startup.m
+  ExecWait "matlab -nojvm -r $\"fd = fopen('$TEMP\matlabroot','w'); fwrite(fd, matlabroot); fclose(fd); exit $\""
+  ifErrors loc_matlab_man 0
+  ; unfortunately ExecWait is not working, maybe because matlab spawns subprocesses
+  ; so wait manually until the output file exists or a timeout is reached
+  StrCpy $R0 0
+  wait_matlab:
+      ifFileExists "$TEMP\matlabroot" +4
+    sleep 1000
+    IntOp $R0 $R0 + 1
+    StrCmp $R0 60 0 wait_matlab ; sleep 60 secs max
+  ifFileExists "$TEMP\matlabroot" +1 loc_matlab_man
+  FileOpen $1 "$TEMP\matlabroot" r
+  ifErrors loc_matlab_man +1
+  FileRead $1 "$R9"
+  FileClose $1
+  StrCmp $R9 "" loc_matlab_man
+  ifFileExists "$R9" +1 loc_matlab_man
+  Call matlabFoundCb
+  MessageBox MB_OK 'Faust installed in $R9 (matlab was found in PATH environment variable).'
+  goto continue
+
+  loc_matlab_man: ; manually locate matlab
+  ; (in case matlab is not found in PATH) find matlab install parent dir
   !include "FileFunc.nsh" ; for Locate
   !include "WordFunc.nsh" ; for WordFind
-  ; find matlab install parent dir ; TODO: change E:\ to default $PROGRAMFILES64
   ${locate} "$PROGRAMFILES64"  "/L=D /M=MATLAB /G=0 /S=" "matlabInstallDirFoundCb" ; assuming user installed matlab in the default path
   StrCmp $R3 "" 0 init_loop
   ${Locate} "E:\" "/L=D /M=MATLAB /G=0 /S=" "matlabInstallDirFoundCb" ; if not default path, searching in E:\ (VM conf.)
@@ -183,19 +205,20 @@ Section "" ; no component so name not needed
   ; loop into matlab directories (possible to have multiple versions)
   StrCpy $R0 1
   ; https://en.wikipedia.org/wiki/MATLAB#Release_history
-  StrCpy $R1 "R2016a R2016b R2017a R2017b R2018a"
+  StrCpy $R1 "R2016a R2016b R2017a R2017b R2018a R2018b"
   loop:
-	  ${WordFind} $R1 " " +$R0 $R2
-	  IntOp $R0 $R0 + 1
-	  ; MessageBox MB_OK "Version looked for: $R2"
-	  StrCmp $R0 6 continue
-	  StrCpy $R4 ""
-	  ${Locate} $R3 "/L=D /M=$R2 /G=0 /S=" "matlabFoundCb"
-	  StrCmp $R4 "" loop +1
-	  MessageBox MB_OK 'Faust installed for $R4.'
-	  ; MessageBox MB_YESNO 'Do you want to continue searching another version of Matlab to install Faust for ?' IDYES +2
-	  ;goto continue
-	  goto loop
+      ${WordFind} $R1 " " +$R0 $R2
+      IntOp $R0 $R0 + 1
+      StrCmp $R0 8 continue ; it must be the last index + 2 !! e.g. if there are 6 versions to test, it must be 8
+      ;MessageBox MB_OK "Version looked for: $R2 in $R3 (R0=$R0)"
+      StrCpy $R4 ""
+      ${Locate} $R3 "/L=D /M=$R2 /G=0 /S=" "matlabFoundCb"
+      ;MessageBox MB_OK "R4=$R4"
+      StrCmp $R4 "" loop +1
+      MessageBox MB_OK 'Faust installed in $R4.'
+      ; MessageBox MB_YESNO 'Do you want to continue searching another version of Matlab to install Faust for ?' IDYES +2
+      ;goto continue
+      goto loop
 
   goto continue
   ;IfErrors 0 +2
@@ -203,9 +226,9 @@ Section "" ; no component so name not needed
   ;MessageBox MB_OK "$$R0=$R0"
 
   fatal_error:
-  	MessageBox MB_OK "Matlab installation path is not in default $PROGRAMFILES64. You will have to do the Faust setup on your own (you'll see how in the documentation)."
+      MessageBox MB_OK "Matlab installation path is not in default $PROGRAMFILES64. You will have to do the Faust setup on your own (you'll see how in the documentation)."
 
-  continue:	
+  continue:   
 
   ; install the doc
   SetOutPath $INSTDIR\doc\html
@@ -216,29 +239,31 @@ Section "" ; no component so name not needed
 SectionEnd
 
 Function matlabFoundCb
-	StrCpy $R4 $R9
+    StrCpy $R4 $R9
 
-	FileOpen $1 "$R4\toolbox\local\startup.m" a
-	FileSeek $1 0 END ; do not erase start of file (but risk to add Faust path multiple times)
-	FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'));$\r$\nmatfaust.enable_gpu_mod()"
-	FileClose $1
+    FileOpen $1 "$R4\toolbox\local\startup.m" a
+    FileSeek $1 0 END ; do not erase start of file (but risk to add Faust path multiple times)
+    FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'));$\r$\nmatfaust.enable_gpu_mod()"
+    FileClose $1
 
-	FileOpen $1 "$DOCUMENTS\MATLAB\startup.m" w
-	IfErrors done
-	FileSeek $1 0 END
-	FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'));$\r$\nmatfaust.enable_gpu_mod()"
-	FileClose $1
-	done:
+    FileOpen $1 "$DOCUMENTS\MATLAB\startup.m" w
+    IfErrors done
+    FileSeek $1 0 END
+    FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'));$\r$\nmatfaust.enable_gpu_mod()"
+    FileClose $1
+    done:
 
-	;MessageBox MB_OK '$R0$\n$\nFaust bound into $R4.' 
-	;MessageBox MB_YESNO 'Faust installed for $R4. Do you want to continue searching another version of Matlab to install Faust for ?' IDYES +2
-	StrCpy $0 StopLocate
+    ;MessageBox MB_OK '$R0$\n$\nFaust bound into $R4.'
+    ;MessageBox MB_YESNO 'Faust installed for $R4. Do you want to continue searching another version of Matlab to install Faust for ?' IDYES +2
+    StrCpy $0 StopLocate
 
-	Push $0
+    Push $0
 FunctionEnd
 
 Function matlabInstallDirFoundCb
-  	StrCpy $R3 $R9
-	;MessageBox MB_OK 'Matlab install. dir: $R3'
-	Push StopLocate
+      StrCpy $R3 $R9
+    ;MessageBox MB_OK 'Matlab install. dir: $R3'
+    Push StopLocate
 FunctionEnd
+
+
