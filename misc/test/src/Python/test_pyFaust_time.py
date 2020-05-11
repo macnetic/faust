@@ -34,7 +34,7 @@
 ##      Remi Gribonval  : remi.gribonval@inria.fr                           ##
 ##############################################################################
 # test multiplication time
-
+from scipy.sparse import csr_matrix
 import sys
 import os
 if len(sys.argv) != 3 :
@@ -118,7 +118,7 @@ for j in range(nb_dim):
 			list_factor_sp[i]=int_max*sp.random(dim,dim,density=density_per_fact,format='csr',dtype=np.float64)
 		#transforme en entier
 		if result_comparison:
-			list_factor_sp[i]=np.floor(list_factor_sp[i])
+			list_factor_sp[i]=csr_matrix(np.floor(list_factor_sp[i].toarray()))
 		
 		list_factor_dense[i]=list_factor_sp[i].toarray()
 		#print(list_factor_dense[i])
@@ -133,7 +133,7 @@ for j in range(nb_dim):
 	#	print(fact)
 
 
-	F=pyfaust.Faust(list_factor_dense)
+	F=pyfaust.Faust(list_factor_sp)
 	F_dense=F.toarray()
 
 	if(F.shape[0] != dim) or (F.shape[1] != dim):
