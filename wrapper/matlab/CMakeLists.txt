@@ -247,16 +247,25 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 
 	elseif(WIN32)
 		if(BUILD_MULTITHREAD)
-			set(CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS_LIST}" "-fopenmp")
-			set(LDD_MEX_FLAGS "${LDD_MEX_FLAGS}" "-fopenmp")
+			if (${CMAKE_GENERATOR} MATCHES "MinGW Makefiles" )
+				set(OMP_COMPFLAG -fopenmp)
+				set(OMP_LINKFLAG -fopenmp)
+			else()
+				# assume VS is used
+				set(OMP_COMPFLAG /openmp)
+				#set(OMP_LINKFLAG /openmp) # unrecognized by msvc cl (useless, compflag suffices)
+			endif()
 		endif()
 
 		#message(STATUS "${MEXOBJ_FILES} ")
 		file(GLOB OBJ_MEXTOOLS_FILES "${FAUST_TMPMEX_DIR}/*.${MEXOBJ_EXT}")
 		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
-					COMMAND   ${MATLAB_ROOT}/bin/mex 
+					#COMMAND set ARGS CL=/openmp /link /openmp #  doesn't work (https://docs.microsoft.com/en-us/cpp/build/reference/cl-environment-variables?view=vs-2019)
+					#COMMAND echo ARGS CL=%CL%
+					COMMAND ${MATLAB_ROOT}/bin/mex
 					ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${OBJ_MEXTOOLS_FILES} ${MEXOBJ_FILES}
-					${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS} -DNOMINMAX # mex will replace -D by /D if VS is used for building (this constant is to contervene the symbol conflicts between std::min/max and min/max macro from Microsoft
+					${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS} -DNOMINMAX COMPFLAGS="${OMP_COMPFLAG} $COMPFLAGS" LINKFLAGS="${OMP_LINKFLAG} $LINKFLAGS" # mex will replace -D by /D if VS is used for building
+					# (this constant is to contervene the symbol conflicts between std::min/max and min/max macro from Microsoft)
 					DEPENDS ${MEXOBJ_FILES} 
 					COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}"
 		)

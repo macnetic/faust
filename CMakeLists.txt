@@ -547,8 +547,8 @@ if (BUILD_DEBUG OR (CMAKE_BUILD_TYPE MATCHES "Debug") OR  (CMAKE_BUILD_TYPE MATC
 			if (${CMAKE_GENERATOR} MATCHES "MinGW Makefiles" )
 				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp " CACHE STRING "compile flags" FORCE)
 			else()
-				#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
-				message (WARNING "openmp is not activated for visual studio compiler.")
+				# assume VS is used^M
+				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp " CACHE STRING "compile flags" FORCE)
 			endif()
 			set(ENV{__OPENMP__} "TRUE")
 		endif(BUILD_MULTITHREAD)
