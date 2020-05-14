@@ -10,7 +10,7 @@ variables:
 
 stages:
     - test
-    - package_rev
+    - pkg_rev
 
 ctest:
     <<: *ctest_script
@@ -68,8 +68,8 @@ ctest_nightly_win7:
     tags:
         - win7
 
-package_macos:
-    stage: package_rev
+pkg_macos:
+    stage: pkg_rev
     script:
         - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -113,8 +113,8 @@ package_macos:
         - move %BUILD_CONFIG%\gm.dll .
         - cd ..\..
 
-package_win:
-    stage: package_rev
+pkg_win:
+    stage: pkg_rev
     variables: {BUILD_CONFIG: "Debug", GIT_SUBMODULE_STRATEGY: recursive}
     <<: *win_build_gpu_mod
     script:
@@ -143,9 +143,9 @@ package_win:
         - cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..; make
         - cd ../..
 
-package_linux:
+pkg_linux:
     <<: *build_gpu_mod
-    stage: package_rev
+    stage: pkg_rev
     variables: {GIT_SUBMODULE_STRATEGY: recursive} # for checking out gpu_mod
     script:
         # build faust
@@ -173,7 +173,7 @@ package_linux:
           # jobs triggered by git tag can force cpack to use the tag name as version but it's not necessary for MacOSX (not using cpack for that sys.)
           #it's done for linux packages
 
-package_macos_release:
+pkg_macos_release:
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" ..'
@@ -199,7 +199,7 @@ package_macos_release:
     only:
         - tags
 
-package_win_release:
+pkg_win_release:
     variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive}
     <<: *win_build_gpu_mod
     script:
@@ -220,7 +220,7 @@ package_win_release:
     only:
         - tags
 
-package_linux_release:
+pkg_linux_release:
     <<: *build_gpu_mod
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -242,7 +242,7 @@ package_linux_release:
         - tags
 
 
-package_linux_release_static:
+pkg_linux_release_static:
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
@@ -279,7 +279,7 @@ pages:
     only:
         - tags
 
-.package_purepy: &package_purepy
+.pkg_purepy: &pkg_purepy
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=OFF -DBUILD_DOCUMENTATION=ON -DCPACK_PACKAGE_VERSION=$VERSION -DCMAKE_INSTALL_PREFIX=/opt/local/faust-$SHA_START -DBUILD_TESTING=OFF -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=$MATIO_STATIC_LIB_PATH -DZ_STATIC_LIB_PATH=$Z_STATIC_LIB_PATH -DHDF5_STATIC_LIB_PATH=$HDF5_STATIC_LIB_PATH -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" -DNOPY2=$NOPY2 -DBUILD_MULTITHREAD=$BUILD_MULTITHREAD -DUSE_GPU_MOD=$USE_GPU_MOD -DEXPERIMENTAL_PKG=$EXPERIMENTAL_PKG -DFAUST_TORCH=$FAUST_TORCH ..'
@@ -295,9 +295,9 @@ pages:
     except:
         - schedules
 
-.package_purepy_rev:
-    extends: .package_purepy
-    stage: package_rev
+.pkg_purepy_rev:
+    extends: .pkg_purepy
+    stage: pkg_rev
     before_script:
         - VERSION=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build ]]; then mkdir build; fi; cd build; fi
@@ -309,21 +309,21 @@ pages:
         - schedules
         - tags
 
-package_macos_purepy_rev:
-    extends: .package_purepy_rev
+pkg_macos_purepy_rev:
+    extends: .pkg_purepy_rev
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", EXPERIMENTAL_PKG: "ON"}
     tags:
         - macos
 
-package_linux_purepy_rev:
-    extends: .package_purepy_rev
+pkg_linux_purepy_rev:
+    extends: .pkg_purepy_rev
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", EXPERIMENTAL_PKG: "ON"}
     tags:
         - linux
         - tux_packager
 
-.package_purepy_release:
-    extends: .package_purepy
+.pkg_purepy_release:
+    extends: .pkg_purepy
     before_script:
         - VERSION=$CI_COMMIT_TAG
         - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build ]]; then mkdir build; fi; cd build; fi
@@ -336,28 +336,28 @@ package_linux_purepy_rev:
     only:
         - tags
 
-package_macos_purepy_release:
-    extends: .package_purepy_release
+pkg_macos_purepy_release:
+    extends: .pkg_purepy_release
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a"}
     tags:
         - macos
 
-package_macos_purepy_release_torch_linked:
-    extends: package_macos_purepy_release
+pkg_macos_purepy_release_torch_linked:
+    extends: pkg_macos_purepy_release
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", FAUST_TORCH: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch"}
 
-package_linux_purepy_release:
-    extends: .package_purepy_release
+pkg_linux_purepy_release:
+    extends: .pkg_purepy_release
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod"}
     tags:
         - linux
         - tux_packager
 
-package_linux_purepy_release_torch_linked:
-    extends: package_linux_purepy_release
+pkg_linux_purepy_release_torch_linked:
+    extends: pkg_linux_purepy_release
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod"}
 
-package_purepy_release_rasp:
+pkg_purepy_release_rasp:
     variables: {MATIO_STATIC_LIB_PATH: "/opt/local/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/libhdf5.a"}
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -379,7 +379,7 @@ package_purepy_release_rasp:
 
 ########### pip binary packages for windows
 
-.package_win_purepy: &package_win_purepy
+.pkg_win_purepy: &pkg_win_purepy
     script:
         - cd gpu_mod
         - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
@@ -407,9 +407,9 @@ package_purepy_release_rasp:
     except:
         - schedules
 
-package_win_purepy_rev:
-    extends: .package_win_purepy
-    stage: package_rev
+pkg_win_purepy_rev:
+    extends: .pkg_win_purepy
+    stage: pkg_rev
     variables: {BUILD_CONFIG: "Debug", GIT_SUBMODULE_STRATEGY: recursive}
     before_script:
         - 'set VERSION=%CI_COMMIT_SHA:~0,8%'
@@ -420,8 +420,8 @@ package_win_purepy_rev:
         - schedules
         - tags
 
-package_win_purepy_release:
-    extends: .package_win_purepy
+pkg_win_purepy_release:
+    extends: .pkg_win_purepy
     variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive, EXPERIMENTAL_PKG: "OFF"}
     before_script:
         - 'set VERSION=%CI_COMMIT_TAG%'
