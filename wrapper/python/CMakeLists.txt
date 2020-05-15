@@ -81,14 +81,11 @@ else() #UNIX
 	set(FAUST_SETUP_PY_LFLAGS "'-s'")
 endif()
 
-if(BUILD_MULTITHREAD AND NOT APPLE)
-	if(WIN32)
-		set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '/openmp'")
-		set(FAUST_SETUP_PY_LFLAGS "${FAUST_SETUP_PY_LFLAGS}")
-	else()
-		set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-fopenmp'")
-		set(FAUST_SETUP_PY_LFLAGS "${FAUST_SETUP_PY_LFLAGS}, '-fopenmp'")
-	endif()
+if(BUILD_MULTITHREAD)
+	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '${OMP_CXX_FLAGS}'")
+	string(REGEX REPLACE "([^'])[ \t\r\n]([^'])" "\\1','\\2" FAUST_SETUP_PY_CFLAGS ${FAUST_SETUP_PY_CFLAGS})
+	set(FAUST_SETUP_PY_LFLAGS "${FAUST_SETUP_PY_LFLAGS}, '${OMP_CXX_LFLAGS}'")
+	string(REGEX REPLACE "([^'])[ \t\r\n]([^'])" "\\1','\\2" FAUST_SETUP_PY_LFLAGS ${FAUST_SETUP_PY_LFLAGS})
 endif()
 
 if(FAUST_TORCH)
@@ -283,9 +280,6 @@ elseif(WIN32)
 					endif()
 					set(PY_STATIC_LIBS "$<TARGET_FILE:${FAUST_TARGET}>;${MATIO_STATIC_LIB_PATH};${PYTHON_STATIC_LIB_PATH}")
 					string(REGEX REPLACE "\n" ";" PY_STATIC_LIBS "${PY_STATIC_LIBS}")
-					if(BUILD_MULTITHREAD)
-						set(WIN32_GCC_OMP "-fopenmp")
-					endif()
 					add_custom_command(TARGET ${FAUST_PYTHON_TARGET}
 						COMMAND   ${CYTHON_EXE}
 						ARGS "--cplus" "-o" "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.cpp"  "${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx" 
