@@ -23,43 +23,65 @@ foreach(MATLAB_TOOL ${MATLAB_TOOLS})
 	#install(FILES ${FAUST_MATLAB_TOOL_BIN_DIR}/${MATLAB_TOOL}.m DESTINATION ${FAUST_MATLAB_TOOL_INSTALL_DIR} PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
 endforeach()
 
-FILE(COPY ${FAUST_MATLAB_NAMESPACE_SRC_DIR} DESTINATION ${PROJECT_BINARY_DIR}/tmp_gendoc_matfaust)
+#FILE(COPY ${FAUST_MATLAB_NAMESPACE_SRC_DIR} DESTINATION ${PROJECT_BINARY_DIR}/tmp_gendoc_matfaust)
+
 
 #message(FATAL_ERROR ${FAUST_MATLAB_MATFAUST_FILE_LIST})
 foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 	string(REGEX REPLACE "[^+]*\\+matfaust\\/" "" MATFAUST_FILE ${MATFAUST_FILE})
 	get_filename_component(PARENT_DIR ${MATFAUST_FILE} DIRECTORY)
+	get_filename_component(MATFAUST_SHORT_FILE ${MATFAUST_FILE} NAME_WE )
 	file(MAKE_DIRECTORY ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${PARENT_DIR})
-	message(STATUS "Creating folder ${PARENT_DIR}")
+	file(MAKE_DIRECTORY ${FAUST_MATLAB_BIN_DIR}/expfiltered)
+	set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${FAUST_MATLAB_BIN_DIR}/expfiltered" "${FAUST_MATLAB_BIN_DIR}/+matfaust")
+	if(EXPERIMENTAL_PKG)
+		add_custom_command(
+			OUTPUT ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
+			COMMAND ${CMAKE_COMMAND} -E make_directory ${FAUST_MATLAB_BIN_DIR}/expfiltered/${PARENT_DIR}
+			COMMAND
+			${CMAKE_COMMAND} -E copy
+			${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE}
+			${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
+			DEPENDS ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE}
+			COMMENT "Copying matfaust ${MATFAUST_FILE} code including experimental code.")
+	else()
+		add_custom_command(
+			OUTPUT ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
+			COMMAND ${CMAKE_COMMAND} -E echo "mkdir ${FAUST_MATLAB_BIN_DIR}/expfiltered/${PARENT_DIR}"
+			COMMAND ${CMAKE_COMMAND} -E make_directory ${FAUST_MATLAB_BIN_DIR}/expfiltered/${PARENT_DIR}
+			COMMAND python
+			"${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py"
+			${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE}
+			${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE} "--no-empty"
+			DEPENDS ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE}
+			COMMENT "Filtering matfaust ${MATFAUST_FILE} experimental code.")
+	endif()
+	add_custom_target(FILTERING_EXP_CODE_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE})
 	# use script generating inline doc only for real matlab classes
 	if(${MATFAUST_FILE} MATCHES "@")
 		message(STATUS "matfaust class: " ${MATFAUST_FILE})
 		if(WIN32)
-			execute_process(COMMAND git-bash ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} ERROR_QUIET)
-			#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} COPYONLY)
-		else()
-			execute_process(COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} ERROR_QUIET)
-			#TODO: copy if error (fallback solution)
-			#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} COPYONLY)
-		endif()
+			set(SH_CMD git-bash)
+		endif() # on Unix, count on bash that is in PATH
+		add_custom_command(OUTPUT ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
+			COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
+			DEPENDS ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
+			COMMENT "Generating matfaust inline doc for ${MATFAUST_FILE}")
+		#execute_process(COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} ERROR_QUIET)
+		#TODO: copy if error (fallback solution)
+		#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} COPYONLY)
+		add_custom_target(GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE})
 	else()
 		message(STATUS "matfaust function file: " ${MATFAUST_FILE})
 		# just copy the .m
-		configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} @ONLY)
-	endif()
-	if(NOT EXPERIMENTAL_PKG)
-		# filter out experimental code
-		foreach(MATFAUST_DIR ${FAUST_MATLAB_NAMESPACE_BIN_DIR} ${PROJECT_BINARY_DIR}/tmp_gendoc_matfaust/+matfaust)
-			execute_process(COMMAND
-				python
-				"${PROJECT_SOURCE_DIR}/misc/binpkg_postinst_scripts/filter_experimental_code.py"
-				${MATFAUST_DIR}/${MATFAUST_FILE}
-				${MATFAUST_DIR}/${MATFAUST_FILE} "--no-empty")
-		endforeach()
-		# --no-empty deletes emtpy file after filtering
-		# easy way to delete the whole module instead of having to insert deletion tags into each file
-		#FILE(REMOVE_RECURSE "${FAUST_MATLAB_NAMESPACE_BIN_DIR}/+factparams") #TODO: do it in py script directly with a special arg
-		#FILE(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/tmp_gendoc_matfaust/+matfaust/+factparams") #TODO: do it in py script directly with a special arg
+		#TODO: inline doc should be possible for function files too
+		#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} @ONLY)
+		add_custom_command(OUTPUT ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
+			COMMAND python 
+			ARGS -c 'import shutil, os.path, os\;os.path.exists(\"${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}\") and (os.path.exists(\"${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${PARENT_DIR}\") or os.mkdir(\"${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${PARENT_DIR}\")) and shutil.copy(\"${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}\", \"${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}\")'
+			DEPENDS ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
+			COMMENT "Generating matfaust inline doc for ${MATFAUST_FILE} (just copied because it's a function file).")
+		add_custom_target(GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE})
 	endif()
 endforeach()
 
@@ -148,6 +170,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		target_include_directories(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},INTERFACE_INCLUDE_DIRECTORIES>)
 		add_dependencies(${mex_target} ${FAUST_TARGET})
 		add_dependencies(${mex_target} ${FAUST_MEXTOOLS_TARGET})
+		set_property(TARGET ${mex_target} PROPERTY CXX_STANDARD 11) # TODO: variable in main CMakeLists.txt
 		target_compile_definitions(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},COMPILE_DEFINITIONS>)
 		target_compile_options(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},COMPILE_OPTIONS>)
 		target_link_libraries(${mex_target} ${FAUST_TARGET})

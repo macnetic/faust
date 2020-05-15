@@ -10,6 +10,7 @@ function usage {
 }
 
 function usage_exit {
+	[[ $# -gt 1 ]] && echo "error: $2" >&2
         usage
         exit $1
 }
@@ -38,8 +39,9 @@ function parse_doxy_block {
 
 # parse input args
 
-[[ $# -ge 2 && -r "$1" ]] && INPUT_FILE="$1" || usage_exit 1
-[[ -z $(dirname "$2") || -d "$(dirname $2)" ]] && OUTPUT_FILE="$2" || usage_exit 2
+[[ $# -ge 2 ]] && INPUT_FILE="$1" || usage_exit 1
+[[ ! -r $1 ]] && exit 0
+[[ -n "$2" ]] && OUTPUT_FILE="$2" || usage_exit 2 "arg 2 is empty"
 
 # get function names
 FUNCTIONS=$(sed -ne 's/^[[:blank:]]*function[[:blank:]]\{1,\}\([^=]\{1,\}=\)\{0,1\}[[:blank:]]*\([^([:blank:]]\{1,\}\).*$/\2/p' "$INPUT_FILE")
@@ -47,6 +49,7 @@ FUNCTIONS=$(sed -ne 's/^[[:blank:]]*function[[:blank:]]\{1,\}\([^=]\{1,\}=\)\{0,
 [[ -z "${FUNCTIONS}" ]] && echo "ERROR in getting the list of functions in $INPUT_FILE" && exit 3
 
 
+mkdir -p $(dirname "$OUTPUT_FILE")
 cp "$INPUT_FILE" "$OUTPUT_FILE"
 
 [ ! "$?" = 0 ] && echo "ERROR in copying file." >&2 && exit 4
@@ -107,4 +110,5 @@ echo -e "$INLINE_HEADER" | sed 's/^[[:blank:]]\{1,\}//' > ${OUTPUT_FILE}_tmp
 echo -e '\n\n' >> ${OUTPUT_FILE}_tmp
 sed -ne "${HEADER_START_END[0]},${OUT_NUM_LINES}p" $OUTPUT_FILE >> ${OUTPUT_FILE}_tmp
 [ "$?" = 0 ] && mv ${OUTPUT_FILE}_tmp ${OUTPUT_FILE}
-[[ -z "$DEBUG" ]] && rm  ${OUTPUT_FILE}_tmp
+[[ -z "$DEBUG" && -r "${OUTPUT_FILE}_tmp" ]] && rm  ${OUTPUT_FILE}_tmp
+exit 0

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import re, sys
+from os.path import exists
 
 EXP_BLOCK_START="^(#|%) experimental block start"
 EXP_BLOCK_END="^(#|%) experimental block end"
@@ -16,6 +17,9 @@ else:
 
 if(len(sys.argv) >= 2):
     for script in [sys.argv[1]]:
+        if(not exists(script)):
+            print(script, "doesn't exist.")
+            continue
         in_exp_block = False
         if sys.version_info[0] < 3:
             # python2 doesn't provide encoding argument
@@ -45,6 +49,9 @@ if(len(sys.argv) >= 3):
         outf.writelines(out_lines)
         outf.close()
     else:
+        if(not exists(sys.argv[2])):
+            print(sys.argv[2], "doesn't exist.")
+            exit(0)
         print("deleting file:", sys.argv[2])
         # delete the file
         import os
