@@ -77,8 +77,8 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 		#TODO: inline doc should be possible for function files too
 		#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} @ONLY)
 		add_custom_command(OUTPUT ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
-			COMMAND python 
-			ARGS -c 'import shutil, os.path, os\;os.path.exists(\"${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}\") and (os.path.exists(\"${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${PARENT_DIR}\") or os.mkdir(\"${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${PARENT_DIR}\")) and shutil.copy(\"${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}\", \"${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}\")'
+			COMMAND python
+			ARGS ${PROJECT_SOURCE_DIR}/gen_doc/matlab_copy_function_file.py ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
 			DEPENDS ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
 			COMMENT "Generating matfaust inline doc for ${MATFAUST_FILE} (just copied because it's a function file).")
 		add_custom_target(GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE})
@@ -125,6 +125,20 @@ file(GLOB CPP_MEX_FILES "${FAUST_MATLAB_MEX_SRC_DIR}/*.cpp")
 string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
 
 if(WIN32)
+	set(CMAKE_CXX_FLAGS_LIST ${CMAKE_CXX_FLAGS_LIST} "-I${MATIO_INC_DIR}" "-I${MATLAB_INCLUDE_DIR}" "-I${EIGEN_INC_DIR}" "-I${FAUST_SRC_LINEAR_OPERATOR_DIR}" "-I${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}" "-I${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}" "-I${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}" "-I${FAUST_MATLAB_TOOLS_SRC_DIR}" "-I${FAUST_UTILS_SRC_DIR}")
+	
+	if(USE_GPU_MOD)
+	       set(CMAKE_CXX_FLAGS_LIST ${CMAKE_CXX_FLAGS_LIST} -DUSE_GPU_MOD -I${GPU_MOD_INCLUDE_DIR} -I${GPU_MOD_INCLUDE_DIR}/../build/)
+	endif()
+	
+	if(BUILD_OPENBLAS)
+	       set(CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS_LIST}" "-I${OPENBLAS_INC_DIR}")
+	endif()
+
+	if(FAUST_TORCH)
+		set(CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS_LIST}" "-I${Torch_DIR}/../include" "-I${Torch_DIR}/../include/torch/csrc/api/include")
+	endif()
+
 	#windows version uses static lib of matio anyway (so replace any dyn. lib found by the static lib)
 	string(REGEX REPLACE "^(.+)/.*$" "\\1/libmatio.lib" LDD_MEX_FLAGS "${MATIO_LIB_FILE}")
 	set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} ${HDF5_STATIC_LIB_PATH} ${Z_STATIC_LIB_PATH})
@@ -177,7 +191,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		if(USE_MATIO_STATIC_LIBS)
 			target_link_libraries(${mex_target} "${MATIO_STATIC_LIB_PATH}" "${HDF5_STATIC_LIB_PATH}" "${Z_STATIC_LIB_PATH}")
 		else()
-			target_link_libraries(${mex_target} matio)
+			target_link_libraries(${mex_target} ${MATIO_LIB_FILE})
 		endif()
 		#		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
 		#			COMMAND   ${MATLAB_ROOT}/bin/mex
