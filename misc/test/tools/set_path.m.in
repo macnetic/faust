@@ -39,6 +39,10 @@
 
 addpath('@FAUST_DATA_MAT_DIR@');%% access to the data (meg matrix hadamard matrix)
 addpath('@FAUST_CONFIG_MAT_DIR@');%% access to the configuration file (meg matrix hadamard matrix)
-addpath(genpath('@FAUST_MATLAB_BIN_DIR@'));%% access to the matlab wrapper bin directory and all its subdirectories (mex,demo ...)
+addpath('@FAUST_MATLAB_BIN_DIR@');%% avoiding to use genpath because if +matfaust is added to path eye.m, rand.m, version.m etc. will conflict with matlab eye, etc.
+addpath('@FAUST_MATLAB_BIN_DIR@/mex');
+addpath('@FAUST_MATLAB_BIN_DIR@/demo');
+addpath('@FAUST_MATLAB_BIN_DIR@/tools');
+addpath(genpath('@FAUST_MATLAB_BIN_DIR@/old_matlab'));
 
 
