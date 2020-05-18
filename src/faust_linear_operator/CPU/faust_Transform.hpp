@@ -1261,7 +1261,7 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 			id = 'N' == opThis? end_id-1: first_id;
 //			std::cout << "thid=" << thid << " end orig adr.:" << data[id] << endl;
 			if(tmp != nullptr) tmp2 = tmp; //keep track of previous tmp to delete it afterward
-			if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[id]))
+			if((sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[id])))
 				tmp = new Faust::MatDense<FPP,Cpu>(*sM);
 			else
 				tmp = new Faust::MatDense<FPP,Cpu>(*(Faust::MatDense<FPP,Cpu>*)(data[id]));
@@ -1272,14 +1272,14 @@ void Faust::multiply_par_run(int nth, int thid, int num_per_th, int data_size, c
 				for(int i=end_id-2;i>=first_id; i--)
 				{
 //					std::cout << "mul:" << data[i] << " thid: " << thid << endl;
-					if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i]))
+					if((sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i])))
 						sM->multiply(*mats[thid], opThis);
 					else
 						dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[i])->multiply(*mats[thid], opThis);
 				}
 			else
 				for(int i=first_id+1;i < end_id; i++)
-					if(sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i]))
+					if((sM = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(data[i])))
 						sM->multiply(*mats[thid],opThis);
 					else
 						dynamic_cast<Faust::MatDense<FPP,Cpu>*>(data[i])->multiply(*mats[thid], opThis);

@@ -83,7 +83,7 @@ namespace Faust
 			MatGeneric<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			MatGeneric<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
 			MatGeneric<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
-			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{if(i == j) return getData()[i]; return 0;}
+			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{if(i == j) return getData()[i]; else throw std::runtime_error("Faust::MatDiag::operator()(int,int): row and column indices must be equal.");}
 			std::list<std::pair<int,int>> nonzeros_indices() const;
 			//! \brief Returns all the features of the MatDense.
 			std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;

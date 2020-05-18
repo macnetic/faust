@@ -773,7 +773,7 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 		mxCurrentField = mxGetField(matlab_params,0,mat_field_type2str(INIT_D).c_str());
 		mxArray2Ptr<SCALAR>(const_cast<const mxArray*>(mxCurrentField), init_D);
 		params = new ParamsFGFT<SCALAR,Cpu,FPP2>(nb_row,nb_col,nbFact,consSS, init_facts, init_D, crit1,crit2,isVerbose,updateway,factside,init_lambda);
-		delete init_D;
+		delete [] init_D;
 	}
 	else
 	{

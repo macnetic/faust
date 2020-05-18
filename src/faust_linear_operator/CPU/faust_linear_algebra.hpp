@@ -856,10 +856,10 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE
 	{
 		Faust::MatSparse<FPP,Cpu> * tmp_sp;
 		int complexity;
-		if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si))
+		if((tmp_sp = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si)))
 			complexity = Si->getNonZeros() * Sj->getNbCol();
 		else // Si dense
-			if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj))
+			if((tmp_sp = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj)))
 				complexity = Si->getNbRow() * Sj->getNonZeros();
 		else // Si and Sj dense
 			complexity = Si->getNbRow() * Si->getNbCol() * Sj->getNbCol();
@@ -879,9 +879,9 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE
 	};
 	auto prod_SiSj = [&reverse_transp_flag, &type_err, &tmp_sp1, &tmp_sp2, &tmp_ds1, &tmp_ds2, &transconj_flags](Faust::MatGeneric<FPP,DEVICE> *Si, Faust::MatGeneric<FPP,DEVICE> *Sj, Faust::MatDense<FPP,DEVICE> &tmp, char Si_flag, char Sj_flag, FPP alpha=1.0, FPP beta=0.0)
 	{
-		if(tmp_sp1 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si))
+		if((tmp_sp1 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si)))
 		{
-			if(tmp_sp2 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj))
+			if((tmp_sp2 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj)))
 			{
 				Faust::MatDense<FPP,Cpu> tmp_ds2_(*tmp_sp2);
 				return spgemm(*tmp_sp1, tmp_ds2_, tmp, (FPP) alpha, (FPP) beta, Si_flag, Sj_flag);
@@ -894,7 +894,7 @@ void Faust::multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE
 		{
 			// Si is dense
 			tmp_ds1 = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Si);
-			if(tmp_sp2 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj))
+			if((tmp_sp2 = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Sj)))
 			{
 				// Sj is sparse
 				char Si_flag_inv = reverse_transp_flag(Si_flag);
