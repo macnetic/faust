@@ -53,7 +53,8 @@ setup(
     description = 'TODO',
     long_description = 'TODO',
     classifiers = [ 'TODO' ],
-    install_requires = [ 'pygsp', 'scipy', 'numpy', 'matplotlib>=2.0.0' ], #ENOTE: order matters (last pkg installed first)
+    install_requires = [ 'pygsp', 'scipy', 'numpy', 'matplotlib>=2.0.0',
+                        'pathlib'], #ENOTE: order matters (last pkg installed first)
     license = "INRIA",
     package_data = {
         'pyfaust': [ 'data/*.mat', 'license*.txt', '@GPU_MOD_LIB_PATH@']
