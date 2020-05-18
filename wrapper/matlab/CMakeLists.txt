@@ -124,111 +124,55 @@ file(GLOB CPP_MEX_FILES "${FAUST_MATLAB_MEX_SRC_DIR}/*.cpp")
 #string(REGEX REPLACE "[a-zA-Z0-9_/:.]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
 string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "\\1\\2" MEXFILE_TARGET_LIST "${CPP_MEX_FILES}")
 
-if(WIN32)
-	set(CMAKE_CXX_FLAGS_LIST ${CMAKE_CXX_FLAGS_LIST} "-I${MATIO_INC_DIR}" "-I${MATLAB_INCLUDE_DIR}" "-I${EIGEN_INC_DIR}" "-I${FAUST_SRC_LINEAR_OPERATOR_DIR}" "-I${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}" "-I${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}" "-I${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}" "-I${FAUST_MATLAB_TOOLS_SRC_DIR}" "-I${FAUST_UTILS_SRC_DIR}")
-	
-	if(USE_GPU_MOD)
-	       set(CMAKE_CXX_FLAGS_LIST ${CMAKE_CXX_FLAGS_LIST} -DUSE_GPU_MOD -I${GPU_MOD_INCLUDE_DIR} -I${GPU_MOD_INCLUDE_DIR}/../build/)
-	endif()
-	
-	if(BUILD_OPENBLAS)
-	       set(CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS_LIST}" "-I${OPENBLAS_INC_DIR}")
-	endif()
-
-	if(FAUST_TORCH)
-		set(CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS_LIST}" "-I${Torch_DIR}/../include" "-I${Torch_DIR}/../include/torch/csrc/api/include")
-	endif()
-
-	#windows version uses static lib of matio anyway (so replace any dyn. lib found by the static lib)
-	string(REGEX REPLACE "^(.+)/.*$" "\\1/libmatio.lib" LDD_MEX_FLAGS "${MATIO_LIB_FILE}")
-	set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} ${HDF5_STATIC_LIB_PATH} ${Z_STATIC_LIB_PATH})
-	# complete static libs by objects of libs if needed (fallback solution from environment)
-	set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} $ENV{WIN_HDF5_OBJS_DIR}/*.obj)
-	set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} $ENV{WIN_SZIP_OBJS_DIR}/*.obj)
-	file(GLOB CPP_SRC_FILES "${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp" "${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp"  "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp" "${FAUST_UTILS_SRC_DIR}/*.cpp")
-	string(REGEX REPLACE "([a-zA-Z0-9_/:-]+)\\.cpp(;|$)" "\\1\\2" MEXSRC_FULL "${CPP_SRC_FILES}")
-
-	string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "${FAUST_TMPMEX_DIR}/\\1.${MEXOBJ_EXT}\\2" MEXOBJ_FILES "${CPP_SRC_FILES}")
-
-	set(MEX_OBJS_IN_ONE ${FAUST_TMPMEX_DIR}/mexobj_allinone.obj)
-	add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS MEXFILE_TARGET_LIST_TARGET )
-	add_custom_target(MEXFILE_TARGET_LIST_TARGET DEPENDS ${MEXFILE_TARGET_LIST})
-
-	# dirty trick to force the *.obj compilation before mex shared libs which depend on them
-	add_custom_target(MEX_OBJS_IN_ONE
-		COMMAND  ${MATLAB_ROOT}/bin/mex  -output ${MEX_OBJS_IN_ONE} "-v" "-c" "-largeArrayDims" ${CPP_SRC_FILES}
-		${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS}
-		"-outdir" "${FAUST_TMPMEX_DIR}" "OBJEXT=.${MEXOBJ_EXT}"
-		COMMENT "Compiling ${MEX_OBJS_IN_ONE} for mex usage")
-
-	add_custom_target(MEXOBJ_FILES_TARGET DEPENDS MEX_OBJS_IN_ONE)
-	add_dependencies(MEXFILE_TARGET_LIST_TARGET MEXOBJ_FILES_TARGET)
-elseif(UNIX)
-	find_package(Matlab)
-	if(NOT Matlab_FOUND)
-		message(FATAL_ERROR "Matlab not found.")
-	endif()
-
-	add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS ${MEXFILE_TARGET_LIST})
+find_package(Matlab)
+if(NOT Matlab_FOUND)
+	message(FATAL_ERROR "Matlab not found.")
 endif()
+
+add_custom_target(${FAUST_MEX_TARGET} ALL DEPENDS ${MEXFILE_TARGET_LIST})
 
 
 foreach(mex_target ${MEXFILE_TARGET_LIST})
-	if(UNIX)
-		matlab_add_mex(NAME ${mex_target} SHARED SRC "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" R2017b)
-		set_target_properties(${mex_target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${FAUST_MATLAB_MEX_BIN_DIR})
-		target_link_options(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},LINK_OPTIONS>)
-		#target_link_options(${mex_target} PRIVATE ${LDD_MEX_FLAGS})
-		target_link_options(${mex_target} PRIVATE ${OpenMP_CXX_LIBRARIES}) # do nothing if BUILD_MULTITHREAD is OFF
-		target_compile_options(${mex_target} PRIVATE "-v" "-largeArrayDims")
-		target_include_directories(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},INTERFACE_INCLUDE_DIRECTORIES>)
-		add_dependencies(${mex_target} ${FAUST_TARGET})
-		add_dependencies(${mex_target} ${FAUST_MEXTOOLS_TARGET})
-		set_property(TARGET ${mex_target} PROPERTY CXX_STANDARD 11) # TODO: variable in main CMakeLists.txt
-		target_compile_definitions(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},COMPILE_DEFINITIONS>)
-		target_compile_options(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},COMPILE_OPTIONS>)
-		target_link_libraries(${mex_target} ${FAUST_TARGET})
-		if(USE_MATIO_STATIC_LIBS)
-			target_link_libraries(${mex_target} "${MATIO_STATIC_LIB_PATH}" "${HDF5_STATIC_LIB_PATH}" "${Z_STATIC_LIB_PATH}")
-		else()
-			target_link_libraries(${mex_target} ${MATIO_LIB_FILE})
-		endif()
-		#		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
-		#			COMMAND   ${MATLAB_ROOT}/bin/mex
-		#			ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" "-L${MATLAB_ROOT}/bin/${MEX_SUBDIR_LIB}" "-L${FAUST_INSTALL_LIB}" "-L${PROJECT_BINARY_DIR}"
-		#			"LDFLAGS=${OMP_CXX_LFLAGS}"
-		#			VERBATIM ${CMAKE_CXX_FLAGS_LIST}
-		#			VERBATIM ${LDD_MEX_FLAGS}
-		#			"-O"
-		#			COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}")
-	elseif(WIN32)
-		add_custom_target(${mex_target} DEPENDS ${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp ${mex_target}.${MEX_EXT} MEXOBJ_FILES_TARGET )
-		if(BUILD_MULTITHREAD)
-			if (${CMAKE_GENERATOR} MATCHES "MinGW Makefiles" )
-				set(OMP_COMPFLAG -fopenmp)
-				set(OMP_LINKFLAG -fopenmp)
-			else()
-				# assume VS is used
-				set(OMP_COMPFLAG /openmp)
-				#set(OMP_LINKFLAG /openmp) # unrecognized by msvc cl (useless, compflag suffices)
-			endif()
-		endif()
+	matlab_add_mex(NAME ${mex_target} SHARED SRC "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" R2017b)
+	set_target_properties(${mex_target} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${FAUST_MATLAB_MEX_BIN_DIR})
+	target_link_options(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},LINK_OPTIONS>)
+	if(WIN32)
 
-		#message(STATUS "${MEXOBJ_FILES} ")
-		file(GLOB OBJ_MEXTOOLS_FILES "${FAUST_TMPMEX_DIR}/*.${MEXOBJ_EXT}")
-		add_custom_command(OUTPUT ${mex_target}.${MEX_EXT}
-			#COMMAND set ARGS CL=/openmp /link /openmp #  doesn't work (https://docs.microsoft.com/en-us/cpp/build/reference/cl-environment-variables?view=vs-2019)
-			#COMMAND echo ARGS CL=%CL%
-			COMMAND ${MATLAB_ROOT}/bin/mex
-			ARGS "-v" "-largeArrayDims" "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp" ${OBJ_MEXTOOLS_FILES} ${MEXOBJ_FILES}
-			${CMAKE_CXX_FLAGS_LIST} ${LDD_MEX_FLAGS} -DNOMINMAX COMPFLAGS="${OMP_COMPFLAG} $COMPFLAGS" LINKFLAGS="${OMP_LINKFLAG} $LINKFLAGS" # mex will replace -D by /D if VS is used for building
-			# (this constant is to contervene the symbol conflicts between std::min/max and min/max macro from Microsoft)
-			DEPENDS ${MEXOBJ_FILES}
-			COMMENT   "Creating mex function ${mex_target}.${MEX_EXT}"
-			)
-		#message (STATUS "${FAUST_MATLAB_MEX_SRC_DIR}/${mex_target}.cpp")
+		#target_compile_options(${mex_target} PRIVATE "${OMP_CXX_FLAGS}") # not necessary, check the build file generated 
+		# for example wrapper/matlab/mex/mexFaustReal.vcxproj (it should contain a tag OpenMPSupport to True
+		target_compile_options(${mex_target} PRIVATE "/VERBOSE") # doesn't work at least with MSVC
+		#windows version uses static lib of matio anyway (so replace any dyn. lib found by the static lib)
+		#string(REGEX REPLACE "^(.+)/.*$" "\\1/libmatio.lib" LDD_MEX_FLAGS "${MATIO_LIB_FILE}")
+		#set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} ${HDF5_STATIC_LIB_PATH} ${Z_STATIC_LIB_PATH})
+		# complete static libs by objects of libs if needed (fallback solution from environment)
+		#set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} $ENV{WIN_HDF5_OBJS_DIR}/*.obj)
+		#set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} $ENV{WIN_SZIP_OBJS_DIR}/*.obj)
+		#file(GLOB CPP_SRC_FILES "${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp" "${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp"  "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp" "${FAUST_UTILS_SRC_DIR}/*.cpp")
+		#string(REGEX REPLACE "([a-zA-Z0-9_/:-]+)\\.cpp(;|$)" "\\1\\2" MEXSRC_FULL "${CPP_SRC_FILES}")
+
+		#string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "${FAUST_TMPMEX_DIR}/\\1.${MEXOBJ_EXT}\\2" MEXOBJ_FILES "${CPP_SRC_FILES}")
+		#set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS})
+		target_link_options(${mex_target} PRIVATE $ENV{WIN_HDF5_OBJS_DIR}/*.obj  $ENV{WIN_SZIP_OBJS_DIR}/*.obj)
+		target_compile_definitions(${mex_target} PRIVATE NOMINMAX MATLAB_DEFAULT_RELEASE=R2017b)
+
 	else()
-		message(FATAL_ERROR "Unable to compile mex functions for this platform")
+		target_link_options(${mex_target} PRIVATE ${OpenMP_CXX_LIBRARIES}) # do nothing if BUILD_MULTITHREAD is OFF
+	endif()
+	target_include_directories(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},INTERFACE_INCLUDE_DIRECTORIES>)
+	add_dependencies(${mex_target} ${FAUST_TARGET})
+	add_dependencies(${mex_target} ${FAUST_MEXTOOLS_TARGET})
+	set_property(TARGET ${mex_target} PROPERTY CXX_STANDARD 11) # TODO: variable in main CMakeLists.txt
+	target_compile_definitions(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},COMPILE_DEFINITIONS>)
+	target_compile_options(${mex_target} PUBLIC $<TARGET_PROPERTY:${FAUST_TARGET},COMPILE_OPTIONS>)
+	target_link_libraries(${mex_target} ${FAUST_TARGET})
+	if(WIN32)
+		#windows version must use static lib of matio anyway (so replace any dyn. lib found by the static lib)
+		string(REGEX REPLACE "^(.+)/.*$" "\\1/libmatio.lib" LDD_MEX_FLAGS "${MATIO_LIB_FILE}")
+	endif()
+	if(USE_MATIO_STATIC_LIBS OR WIN32)
+		target_link_libraries(${mex_target} "${MATIO_STATIC_LIB_PATH}" "${HDF5_STATIC_LIB_PATH}" "${Z_STATIC_LIB_PATH}")
+	else()
+		target_link_libraries(${mex_target} ${MATIO_LIB_FILE})
 	endif()
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/${mex_target}.m ${FAUST_MATLAB_MEX_BIN_DIR}/${mex_target}.m COPYONLY)
 endforeach()
