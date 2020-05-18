@@ -2138,7 +2138,7 @@ class FaustTorch:
         else:
             raise err
 
-    def __mul__(self, op, optimize_chain=False):
+    def __mul__(self, op=None, optimize_chain=False, allow_none_op=False):
         """
         Multiplies the chain of tensors into a single tensor (matrix product).
 
@@ -2147,19 +2147,42 @@ class FaustTorch:
             res = torch.from_numpy(op)
             if(self.device != None):
                 res.to(self.device)
+            factors = self.factors
+            if(optimize_chain):
+                return self.mul_opt(res)
+        elif(allow_none_op and op == None):
+            factors = self.factors[:]
+            if(factors[-1].is_sparse):
+                factors.append(torch.from_numpy(np.eye(self.factors[-1].size()[1])))
+                if(self.device != None):
+                    factors[-1].to(self.device)
+            res = factors[-1].clone()
+            factors = factors[:-1]
+            if(optimize_chain):
+                tmp = self.factors
+                self.factors = factors
+                res = self.mul_opt(res)
+                self.factors = tmp
+                return res
         else:
             raise TypeError('op must be a np.ndarray')
-        if(optimize_chain):
-            return self.mul_opt(res)
+
         # torch matmul
         #res = self.factors[0]
+
         #for f in self.factors[1:]:
-        for f in reversed(self.factors[:]):
+        for f in reversed(factors[:]):
             if(f.is_sparse):
                 res = torch.sparse.mm(f, res)
             else:
                 res = torch.matmul(f, res)
         return res
+
+    def totensor(self, optimize_chain=False):
+        """
+         See Faust.toarray()
+        """
+        return self.__mul__(allow_none_op=True, optimize_chain=optimize_chain)
 
     def mul_opt(self, op):
         """
@@ -2175,6 +2198,8 @@ class FaustTorch:
             else:
                 b_cost = b.size()[1]
             return a_cost*b_cost
+
+
         factors = self.factors.copy() + [ op ]
         costs = [cost(factors[i], factors[i+1]) for i in range(len(factors)-1)
                  ]
