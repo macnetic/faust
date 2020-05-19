@@ -138,20 +138,11 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 	target_link_options(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},LINK_OPTIONS>)
 	if(WIN32)
 
-		#target_compile_options(${mex_target} PRIVATE "${OMP_CXX_FLAGS}") # not necessary, check the build file generated 
-		# for example wrapper/matlab/mex/mexFaustReal.vcxproj (it should contain a tag OpenMPSupport to True
+		#target_compile_options(${mex_target} PRIVATE "${OMP_CXX_FLAGS}")
+		# previous call is not necessary, to verify, you can check the build file generated for msbuild
+		# for example wrapper/matlab/mex/mexFaustReal.vcxproj (it should contain a tag OpenMPSupport to True)
 		target_compile_options(${mex_target} PRIVATE "/VERBOSE") # doesn't work at least with MSVC
-		#windows version uses static lib of matio anyway (so replace any dyn. lib found by the static lib)
-		#string(REGEX REPLACE "^(.+)/.*$" "\\1/libmatio.lib" LDD_MEX_FLAGS "${MATIO_LIB_FILE}")
-		#set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} ${HDF5_STATIC_LIB_PATH} ${Z_STATIC_LIB_PATH})
-		# complete static libs by objects of libs if needed (fallback solution from environment)
-		#set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} $ENV{WIN_HDF5_OBJS_DIR}/*.obj)
-		#set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS} $ENV{WIN_SZIP_OBJS_DIR}/*.obj)
-		#file(GLOB CPP_SRC_FILES "${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp" "${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp"  "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp" "${FAUST_UTILS_SRC_DIR}/*.cpp")
-		#string(REGEX REPLACE "([a-zA-Z0-9_/:-]+)\\.cpp(;|$)" "\\1\\2" MEXSRC_FULL "${CPP_SRC_FILES}")
-
-		#string(REGEX REPLACE "[a-zA-Z0-9_/:.-]+/([a-zA-Z0-9_]+)\\.cpp(;|$)" "${FAUST_TMPMEX_DIR}/\\1.${MEXOBJ_EXT}\\2" MEXOBJ_FILES "${CPP_SRC_FILES}")
-		#set(LDD_MEX_FLAGS ${LDD_MEX_FLAGS})
+		# complete static libs (linked later) by objects of libs if needed (fallback solution from environment)
 		target_link_options(${mex_target} PRIVATE $ENV{WIN_HDF5_OBJS_DIR}/*.obj  $ENV{WIN_SZIP_OBJS_DIR}/*.obj)
 		target_compile_definitions(${mex_target} PRIVATE NOMINMAX MATLAB_DEFAULT_RELEASE=R2017b)
 
@@ -165,11 +156,8 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 	target_compile_definitions(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},COMPILE_DEFINITIONS>)
 	target_compile_options(${mex_target} PUBLIC $<TARGET_PROPERTY:${FAUST_TARGET},COMPILE_OPTIONS>)
 	target_link_libraries(${mex_target} ${FAUST_TARGET})
-	if(WIN32)
-		#windows version must use static lib of matio anyway (so replace any dyn. lib found by the static lib)
-		string(REGEX REPLACE "^(.+)/.*$" "\\1/libmatio.lib" LDD_MEX_FLAGS "${MATIO_LIB_FILE}")
-	endif()
 	if(USE_MATIO_STATIC_LIBS OR WIN32)
+		# Windows version must use static lib of matio anyway # TODO: FATAL_ERROR if MATIO_STATIC_LIB_PATH is undefined
 		target_link_libraries(${mex_target} "${MATIO_STATIC_LIB_PATH}" "${HDF5_STATIC_LIB_PATH}" "${Z_STATIC_LIB_PATH}")
 	else()
 		target_link_libraries(${mex_target} ${MATIO_LIB_FILE})

@@ -393,7 +393,7 @@ class Faust:
         if(not isinstance(thres, int)):
             raise TypeError('thres '
                             'must be a int.')
-        print("only_forward=", only_forward, "npasses=", npasses)
+        #print("only_forward=", only_forward, "npasses=", npasses)
         F_prunedout = Faust(core_obj=F.m_faust.zpruneout(thres, npasses,
                                                          only_forward))
         return F_prunedout
