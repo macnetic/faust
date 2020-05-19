@@ -1091,6 +1091,8 @@ cdef class FaustFact:
         # if not float nor complex, raise exception
         check_matrix(isReal, M)
 
+        M = np.asfortranarray(M)
+
         cdef unsigned int M_num_rows=M.shape[0]
         cdef unsigned int M_num_cols=M.shape[1]
 
