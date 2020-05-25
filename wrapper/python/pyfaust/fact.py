@@ -54,7 +54,7 @@ def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
             verbosity: see fact.eigtj
 
         Returns:
-            The tuple U,S,V: U*S.todense()*V' being the approximation of M.
+            The tuple U,S,V: U*S.toarray()@V' being the approximation of M.
                 - (sparse diagonal matrix) S the singular values in
                 descending order.
                 - (Faust object) U the left-singular transform.
@@ -461,7 +461,7 @@ def palm4msa(M, p, ret_lambda=False, backend=2016):
     Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
 
     Args:
-        M: the numpy matrix to factorize.
+        M: the numpy array to factorize.
         p: the ParamsPalm4MSA instance to define the algorithm parameters.
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
 
@@ -540,7 +540,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016):
             </code>
 
     Args:
-        M: the numpy matrix to factorize.
+        M: the numpy array to factorize.
         p: is a set of factorization parameters. It might be a fully defined instance of parameters (pyfaust.factparams.ParamsHierarchical) or a simplified expression which designates a pre-defined parametrization:
             - 'squaremat' to use pre-defined parameters typically used to factorize a Hadamard square matrix of order a power of two (see pyfaust.demo.hadamard).
             - ['rectmat', j, k, s] to use pre-defined parameters used for
@@ -922,7 +922,7 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
         Uhat,Dhat = fgft_palm(Lap, U, params, init_D=D)
 
         err_U = (Uhat-U).norm()/norm(U)
-        err_Lap = norm(Uhat.todense()*diag(Dhat)*Uhat.T.todense()-Lap)/norm(Lap)
+        err_Lap = norm(Uhat.toarray()*diag(Dhat)*Uhat.T.toarray()-Lap)/norm(Lap)
         print(norm(diag(Dhat), 2))
 
         print("err_U:", err_U)

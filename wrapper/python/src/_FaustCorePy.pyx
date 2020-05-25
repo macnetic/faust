@@ -403,16 +403,13 @@ cdef class FaustCore:
             return self._horzcat((<FaustCore?>F)._ascomplex())
         return self._horzcat(F)
 
-    # numpy.matrix is always 2-dimensional but C-style (RowMajor)  stored
-    # not Fortran-style (ColMajor) as Faust lib use Fortran-style storage
-
     # Left-Multiplication by a Faust F
     # y=multiply(F,M) is equivalent to y=F*M
     def multiply(self,M):
         if(isinstance(M, FaustCore)):
             return self.multiply_faust(M)
-        if not isinstance(M, (np.ndarray) ):
-            raise ValueError('input M must be a numpy.ndarray or a numpy.matrix')
+        if not isinstance(M, np.ndarray ):
+            raise ValueError('input M must be a numpy.ndarray')
         if(self._isReal):
            M=M.astype(float,'F')
            if not M.dtype=='float':
@@ -2036,6 +2033,7 @@ cdef class FaustFact:
             raise TypeError("2020 palm4msa implementation doesn't support"
                             " complex matrices.")
 
+        M = np.asfortranarray(M)
 
         Mview=M
         _out_buf = np.array([0], dtype=M.dtype)

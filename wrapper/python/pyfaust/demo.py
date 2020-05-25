@@ -141,11 +141,11 @@ class quickstart:
         # transpose a Faust
         A_trans = A.transpose()
 
-        # multiplication a Numpy matrix by a Faust
+        # multiplication a numpy array by a Faust
         x = np.random.randint(int_max, size=(dim2,1))
         y = A * x
 
-        # convert a faust to numpy matrix
+        # convert a faust to numpy array
         A_numpy = A.toarray()
 
         # slicing

@@ -217,9 +217,8 @@ class ConstraintMat(ConstraintGeneric):
         super(ConstraintMat, self).__init__(name, cons_value.shape[0],
                                             cons_value.shape[1],
                                             cons_value, normalized, pos)
-        if(not isinstance(cons_value, np.matrix) and not isinstance(cons_value,
-                                                               np.ndarray)):
-            raise TypeError('ConstraintMat must receive a numpy matrix as cons_value '
+        if(not isinstance(cons_value, np.ndarray)):
+            raise TypeError('ConstraintMat must receive a numpy.ndarray as cons_value '
                             'argument.')
         self.cons_value = np.asfortranarray(self._cons_value)
         self._cons_value = self.cons_value
