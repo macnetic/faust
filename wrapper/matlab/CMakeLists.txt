@@ -27,6 +27,7 @@ endforeach()
 
 
 #message(FATAL_ERROR ${FAUST_MATLAB_MATFAUST_FILE_LIST})
+add_custom_target(PREPARE_MATFAUST_FOR_DOXYDOC ALL)
 foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 	string(REGEX REPLACE "[^+]*\\+matfaust\\/" "" MATFAUST_FILE ${MATFAUST_FILE})
 	get_filename_component(PARENT_DIR ${MATFAUST_FILE} DIRECTORY)
@@ -70,7 +71,6 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 		#execute_process(COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} ERROR_QUIET)
 		#TODO: copy if error (fallback solution)
 		#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} COPYONLY)
-		add_custom_target(GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE})
 	else()
 		message(STATUS "matfaust function file: " ${MATFAUST_FILE})
 		# just copy the .m
@@ -81,8 +81,9 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 			ARGS ${PROJECT_SOURCE_DIR}/gen_doc/matlab_copy_function_file.py ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
 			DEPENDS ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
 			COMMENT "Generating matfaust inline doc for ${MATFAUST_FILE} (just copied because it's a function file).")
-		add_custom_target(GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE})
 	endif()
+	add_custom_target(GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE})
+	add_dependencies(PREPARE_MATFAUST_FOR_DOXYDOC GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE})
 endforeach()
 
 file(GLOB CPP_MEXTOOLS_FILES "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp")
@@ -144,7 +145,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		target_compile_options(${mex_target} PRIVATE "/VERBOSE") # doesn't work at least with MSVC
 		# complete static libs (linked later) by objects of libs if needed (fallback solution from environment)
 		target_link_options(${mex_target} PRIVATE $ENV{WIN_HDF5_OBJS_DIR}/*.obj  $ENV{WIN_SZIP_OBJS_DIR}/*.obj)
-		target_compile_definitions(${mex_target} PRIVATE NOMINMAX MATLAB_DEFAULT_RELEASE=R2017b)
+		target_compile_definitions(${mex_target} PRIVATE NOMINMAX MATLAB_DEFAULT_RELEASE=R2017b) # it seems necessary for windows while R2017b flag of matlab_add_mex is enough for Unix
 
 	else()
 		target_link_options(${mex_target} PRIVATE ${OpenMP_CXX_LIBRARIES}) # do nothing if BUILD_MULTITHREAD is OFF
