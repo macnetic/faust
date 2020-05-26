@@ -54,6 +54,7 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 from scipy import sparse
 from scipy.sparse import csr_matrix, csc_matrix
 from re import match
+import sys, os, pyfaust
 
 cdef class FaustCore:
 
@@ -152,13 +153,25 @@ cdef class FaustCore:
     def enable_gpu_mod(libpaths=None, backend='cuda', silent=False):
         cdef char * c_libpath
         cdef void* gm_handle
+        if libpaths == None:
+            # use default paths
+            pyfaust_path = os.path.dirname(pyfaust.__file__)
+            # don't use os.path.join or os.path.sep because anyway
+            # lib name suffix or prefix depend on OS
+            if sys.platform == 'linux':
+                libpaths = [pyfaust_path+"/lib/libgm.so"]
+            elif sys.platform == 'darwin':
+                libpaths = [pyfaust_path+"/lib/libgm.dylib"]
+            elif sys.platform == 'win32':
+                libpaths = [pyfaust_path+"\lib\gm.dll"]
         for libpath in libpaths:
             blibpath = libpath.encode('utf-8')
             c_libpath = blibpath
             #c_libpath = libpath
             gm_handle = FaustCoreCy._enable_gpu_mod(c_libpath, silent);
             if(gm_handle == NULL and not silent and libpaths[-1] == libpath):
-                raise Exception("Can't load gpu_mod library, maybe the path is not"
+                raise Exception("Can't load gpu_mod library, maybe the path ("
+                                +libpath+") is not"
                                 " correct or the backend (cuda) is not installed or"
                                 " configured properly so"
                                 " the libraries are not found.")
@@ -2216,10 +2229,4 @@ cdef class FaustFact:
 import sys, os, pyfaust
 # tries to load the libgm library silently,
 # if not enabled at build time it will do nothing
-pyfaust_path = os.path.dirname(pyfaust.__file__)
-if sys.platform == 'linux':
-    FaustCore.enable_gpu_mod([pyfaust_path+"/lib/libgm.so"], silent=True)
-elif sys.platform == 'darwin':
-    FaustCore.enable_gpu_mod([pyfaust_path+"/lib/libgm.dylib"], silent=True)
-elif sys.platform == 'win32':
-    FaustCore.enable_gpu_mod([pyfaust_path+"\lib\gm.dll"], silent=True)
+FaustCore.enable_gpu_mod(silent=True)

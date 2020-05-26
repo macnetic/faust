@@ -2096,11 +2096,12 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False):
     useful to set a non-default path or to diagnose a loading issue.
 
     Args:
-        libpath: the absolute or relative path where to find the dynamic
+        libpaths: the absolute or relative paths where to search the dynamic
         library (gm) to load. By default, it's none to auto-find the library
         (if possible).
         backend: the GPU backend to use, only cuda is available for now.
-
+        silent: if True nothing or almost will be displayed on loading (e.g.
+        silent errors), otherwise all messages are visible.
     """
     _FaustCorePy.FaustCore.enable_gpu_mod(libpaths, backend, silent)
 
