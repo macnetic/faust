@@ -124,7 +124,7 @@
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %
 %%
-%> @package matfaust.demo @brief The matfaust demo namespace.
+
 % =====================================================================
 %> The FAuST quickstart script, a good place to look at for a first tour.
 % =====================================================================

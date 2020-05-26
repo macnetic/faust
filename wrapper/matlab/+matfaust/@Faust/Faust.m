@@ -40,7 +40,6 @@
 %	<https://hal.archives-ouvertes.fr/hal-01167948v1>
 %%
 
-%> @package matfaust @brief <b> The FAuST Matlab Wrapper
 
 % ======================================================================
 %> @brief <b>FAuST Matlab wrapper main class</b> for using multi-layer sparse transforms.

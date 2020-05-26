@@ -1,4 +1,5 @@
 %> @package matfaust.fact @brief The matfaust factorization module.
+%> @package matfaust.factparams @brief The module for the parametrization of FAuST's algorithms (Palm4MSA and Hierarchical Factorization)
 %>
 %>
 %>    This module gives access to the main factorization algorithms of
