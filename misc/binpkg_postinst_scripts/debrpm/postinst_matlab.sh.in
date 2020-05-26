@@ -35,7 +35,7 @@ else
 				then
 					grep -i -v faust "$USR_STARTUP_FILE" > "${USR_STARTUP_FILE}.tmp" 2>/dev/null && mv "${USR_STARTUP_FILE}.tmp" "$USR_STARTUP_FILE"
 					echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$USR_STARTUP_FILE"
-					echo "matfaust.enable_gpu_mod()" >> "$USR_STARTUP_FILE"
+					echo "matfaust.enable_gpu_mod('silent', true)" >> "$USR_STARTUP_FILE"
 					chown $USER $USR_STARTUP_FILE
 					RET2=$(($?+$RET2))
 				fi

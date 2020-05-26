@@ -243,13 +243,13 @@ Function matlabFoundCb
 
     FileOpen $1 "$R4\toolbox\local\startup.m" a
     FileSeek $1 0 END ; do not erase start of file (but risk to add Faust path multiple times)
-    FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'));$\r$\nmatfaust.enable_gpu_mod()"
+    FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'));$\r$\nmatfaust.enable_gpu_mod('silent', true)"
     FileClose $1
 
     FileOpen $1 "$DOCUMENTS\MATLAB\startup.m" w
     IfErrors done
     FileSeek $1 0 END
-    FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'));$\r$\nmatfaust.enable_gpu_mod()"
+    FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'));$\r$\nmatfaust.enable_gpu_mod('silent', true)"
     FileClose $1
     done:
 
