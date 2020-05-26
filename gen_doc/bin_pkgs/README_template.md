@@ -8,7 +8,8 @@
 
 [4. Usage](#usage)
 
-## <a name="prerequisites">1. Prerequisites<a/>
+\anchor prerequisites 
+## 1. Prerequisites
 
 ### 1.1 For Python
 
@@ -38,11 +39,13 @@ If you want to use FAµST with Python 3 you must use precisely the @PY3_VER@ ver
 The FAµST wrapper for Matlab has been tested on several Matlab versions starting from version 2016a,b up to version 2018a,b.<br/>
 However it's not totally excluded that FAµST works with older or newer versions.
 
-## <a name="installation"> 2. Installation</a>
+\anchor installation 
+## 2. Installation
 
 @OS_SPECIFIC_INSTALL_GUIDE_INSTRUCS@
 
-## <a name="installation_testing">3. Testing and Troubleshooting<a/>
+\anchor installation_testing 
+## 3. Testing and Troubleshooting
 
 Normally, after installing, nothing is left to do. The installation process should have seamlessly set up the Faust wrappers for Python and Matlab into your environment.
 Nevertheless, it could be useful to check that it really worked and set the environment manually if needed like explained below.
@@ -133,8 +136,8 @@ For that issue look at [Prerequisites](#prerequisites).
 
 OK! You can follow the [quick start usage](#usage) now.
 
-
-## <a name="usage">4. Usage<a/>
+\anchor usage 
+## 4. Usage
 
 ### 4.1 Matlab Wrapper
 
