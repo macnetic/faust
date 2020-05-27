@@ -309,4 +309,27 @@ FPP Faust::Vect<FPP, Cpu>::normL1() const
 		sum += std::abs(vec.data()[j]);
 	return sum;
 }
+
+	template<typename FPP>
+Faust::Vect<FPP, Cpu>* Faust::Vect<FPP, Cpu>::rand(faust_unsigned_int size)
+{
+	Faust::Vect<FPP, Cpu>* v = nullptr;
+	try
+	{
+		v = new Faust::Vect<FPP, Cpu>(size);
+		v->setRand();
+	}
+	catch(std::bad_alloc e)
+	{
+		//		std::cerr << "Out of memory." << std::endl;
+	}
+	return v;
+}
+
+	template<typename FPP>
+void Faust::Vect<FPP, Cpu>::setRand()
+{
+	vec = Eigen::Matrix<FPP, Eigen::Dynamic, 1>::Random(this->size(), 1);
+}
+
 #endif

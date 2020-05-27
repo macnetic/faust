@@ -193,6 +193,8 @@ namespace Faust
         bool equality(Vect<FPP,Cpu> const &x, FPP precision) const;
 		FPP mean();
 
+		static Faust::Vect<FPP, Cpu>* rand(faust_unsigned_int size);
+		void setRand();
 
         // friend algebra
         friend void Faust::gemv<>(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
