@@ -421,7 +421,7 @@ cdef class FaustCore:
     def multiply(self,M):
         if(isinstance(M, FaustCore)):
             return self.multiply_faust(M)
-        if not isinstance(M, np.ndarray ):
+        if not isinstance(M, np.ndarray):
             raise ValueError('input M must be a numpy.ndarray')
         if(self._isReal):
            M=M.astype(float,'F')
@@ -509,6 +509,12 @@ cdef class FaustCore:
             self.core_faust_dbl.set_mul_order_opt_mode(mode)
         else:
             self.core_faust_cplx.set_mul_order_opt_mode(mode)
+
+    def set_Fv_mul_mode(self, mode):
+        if(self._isReal):
+            self.core_faust_dbl.set_Fv_mul_mode(mode)
+        else:
+            self.core_faust_cplx.set_Fv_mul_mode(mode)
 
 
     # print information about the faust (size, number of factor, type of factor (dense/sparse) ...)
@@ -827,20 +833,20 @@ cdef class FaustCore:
         core._isReal = self._isReal
         return core
 
-    def optimize_mul(self, transp=False, inplace=False, nsamples=1):
+    def optimize_time(self, transp=False, inplace=False, nsamples=1):
         if(inplace):
             if(self._isReal):
-                self.core_faust_dbl.optimize_mul(transp, inplace, nsamples)
+                self.core_faust_dbl.optimize_time(transp, inplace, nsamples)
             else:
-                self.core_faust_cplx.optimize_mul(transp, inplace, nsamples)
+                self.core_faust_cplx.optimize_time(transp, inplace, nsamples)
         else:
             core = FaustCore(core=True)
             if(self._isReal):
-                core.core_faust_dbl = self.core_faust_dbl.optimize_mul(transp,
+                core.core_faust_dbl = self.core_faust_dbl.optimize_time(transp,
                                                                       inplace,
                                                                       nsamples)
             else:
-                core.core_faust_cplx = self.core_faust_cplx.optimize_mul(transp,
+                core.core_faust_cplx = self.core_faust_cplx.optimize_time(transp,
                                                                          inplace,
                                                                          nsamples)
             core._isReal = self._isReal

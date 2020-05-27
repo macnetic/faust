@@ -66,7 +66,8 @@ class FaustCoreCpp
     unsigned int getNbCol() const;
     void get_product(FPP* y_data, int y_nrows, int y_ncols);
     void multiply(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols);
-    void set_mul_order_opt_mode(const int enable);
+    void set_mul_order_opt_mode(const int mode);
+    void set_Fv_mul_mode(const int mode);
     void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x/*,bool isTranspose*/)const;
     FaustCoreCpp<FPP>* mul_faust(FaustCoreCpp<FPP>* right);
     FaustCoreCpp<FPP>* vertcat(FaustCoreCpp<FPP>* right);
@@ -100,7 +101,7 @@ class FaustCoreCpp
     bool save_mat_file(const char* filepath) const;
     FaustCoreCpp<FPP>* optimize_storage(const bool time=false);
     FaustCoreCpp<FPP>* optimize(const bool transp=false);
-    FaustCoreCpp<FPP>* optimize_mul(const bool transp=false, const bool inplace=false, const int nsamples=1);
+    FaustCoreCpp<FPP>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
     const bool isTransposed();
     FaustCoreCpp<FPP>* transpose();
     FaustCoreCpp<FPP>* conjugate();

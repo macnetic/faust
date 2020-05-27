@@ -81,6 +81,6 @@ int main(int argc, char* argv[])
 	std::cout << "Time opt.: "<< diff.count() << " s\n";
 	FM3.Display();
 	cout << "FM3 norm: " << FM3.norm() << endl;
-    th->optimize_multiply(true);
+    th->optimize_time(true);
 	return 0;
 }

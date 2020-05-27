@@ -52,6 +52,7 @@ cdef extern from "FaustCoreCpp.h" :
         void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,
                       int nbrow_x, int nbcol_x);#,bool isTranspose*/);
         void set_mul_order_opt_mode(const int mode);
+        void set_Fv_mul_mode(const int mode);
         # Faust-by-csr product -> dense mat
         void multiply(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols);
         unsigned int getNbRow() const
@@ -89,7 +90,7 @@ cdef extern from "FaustCoreCpp.h" :
                                   num_rows, unsigned long int* col_ids,
                                   unsigned long int num_cols)
         bool save_mat_file(const char* filepath) const
-        FaustCoreCpp[FPP]* optimize_mul(const bool transp, const bool inplace,
+        FaustCoreCpp[FPP]* optimize_time(const bool transp, const bool inplace,
                                        const int nsamples)
         FaustCoreCpp[FPP]* optimize(const bool transp)
         FaustCoreCpp[FPP]* optimize_storage(const bool time)

@@ -888,16 +888,16 @@ classdef Faust
 			end
 			if(inplace)
 				if(F.isReal)
-					mexFaustReal('optimize_mul', F.matrix.objectHandle, transp, inplace, nsamples);
+					mexFaustReal('optimize_time', F.matrix.objectHandle, transp, inplace, nsamples);
 				else % cplx Faust
-					mexFaustCplx('optimize_mul', F.matrix.objectHandle, transp, inplace, nsamples);
+					mexFaustCplx('optimize_time', F.matrix.objectHandle, transp, inplace, nsamples);
 				end
 				OF = F
 			else
 				if(F.isReal)
-					OF = matfaust.Faust(F, mexFaustReal('optimize_mul', F.matrix.objectHandle, transp, inplace, nsamples));
+					OF = matfaust.Faust(F, mexFaustReal('optimize_time', F.matrix.objectHandle, transp, inplace, nsamples));
 				else % cplx Faust
-					OF = matfaust.Faust(F, mexFaustCplx('optimize_mul', F.matrix.objectHandle, transp, inplace, nsamples));
+					OF = matfaust.Faust(F, mexFaustCplx('optimize_time', F.matrix.objectHandle, transp, inplace, nsamples));
 				end
 			end
 		end

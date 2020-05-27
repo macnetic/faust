@@ -148,7 +148,6 @@ void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value
         Faust::Vect<FPP,Cpu> X(nbrow_x,value_x);
         Faust::Vect<FPP,Cpu> Y;
 
-
         Y = this->transform->multiply(X);
 
         memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y);
@@ -167,6 +166,12 @@ template<typename FPP>
 void FaustCoreCpp<FPP>::set_mul_order_opt_mode(const int mode)
 {
     this->transform->set_mul_order_opt_mode(mode);
+}
+
+template<typename FPP>
+void FaustCoreCpp<FPP>::set_Fv_mul_mode(const int mode)
+{
+    this->transform->set_Fv_mul_mode(mode);
 }
 
 template<typename FPP>
@@ -369,17 +374,17 @@ FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::transpose()
 }
 
 template<typename FPP>
-FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::optimize_mul(const bool transp /* deft to false*/, const bool inplace /* default to false */, const int nsamples /* default to 1*/)
+FaustCoreCpp<FPP>* FaustCoreCpp<FPP>::optimize_time(const bool transp /* deft to false*/, const bool inplace /* default to false */, const int nsamples /* default to 1*/)
 {
     if(inplace)
-        this->transform->optimize_multiply(transp, inplace, nsamples);
+        this->transform->optimize_time(transp, inplace, nsamples);
     else
     {
-        auto th = this->transform->optimize_multiply(transp, inplace, nsamples);
+        auto th = this->transform->optimize_time(transp, inplace, nsamples);
         return new FaustCoreCpp<FPP>(th);
     }
 #ifdef FAUST_VERBOSE
-    std::cout << "FaustCoreCpp::optimize_mul() th=" << th << "core=" << core << std::endl;
+    std::cout << "FaustCoreCpp::optimize_time() th=" << th << "core=" << core << std::endl;
 #endif
 }
 

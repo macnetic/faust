@@ -1724,10 +1724,10 @@ class Faust:
 
         """
         if(inplace):
-            F.m_faust.optimize_mul(transp, inplace, nsamples)
+            F.m_faust.optimize_time(transp, inplace, nsamples)
             return F
         else:
-            F_opt = Faust(core_obj=F.m_faust.optimize_mul(transp, inplace,
+            F_opt = Faust(core_obj=F.m_faust.optimize_time(transp, inplace,
                                                           nsamples))
             return F_opt
 

@@ -89,6 +89,7 @@ namespace Faust {
 			Slice slices[2];
 			bool is_fancy_indexed;
 			int mul_order_opt_mode;
+			int Fv_mul_mode;
 			faust_unsigned_int * fancy_indices[2];
 			faust_unsigned_int fancy_num_rows;
 			faust_unsigned_int fancy_num_cols;
@@ -121,6 +122,8 @@ namespace Faust {
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 			void update_total_nnz();
 			void set_mul_order_opt_mode(const int mul_order_opt_mode);
+			void set_Fv_mul_mode(const int mode);
+
 			int get_mul_order_opt_mode() const;
 			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 
@@ -200,7 +203,10 @@ namespace Faust {
 			TransformHelper<FPP,Cpu>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
 			TransformHelper<FPP,Cpu>* optimize_storage(const bool time=true);
 			TransformHelper<FPP,Cpu>* optimize(const bool transp=false);
-			TransformHelper<FPP,Cpu>* optimize_multiply(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			TransformHelper<FPP,Cpu>* optimize_multiply(std::function<void()> f, const bool transp=false, const bool inplace=false, const int nsamples=1, const char* op_name="unamed_op");
+			TransformHelper<FPP,Cpu>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			TransformHelper<FPP,Cpu>* optimize_time_full(const bool transp=false, const bool inplace=false, const int nsamples=1);
+			TransformHelper<FPP,Cpu>* optimize_time_Fv(const bool transp=false, const bool inplace=false, const int nsamples=1);
 			/**
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 

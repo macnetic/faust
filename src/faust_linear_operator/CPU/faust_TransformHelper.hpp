@@ -72,7 +72,7 @@ namespace Faust {
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), mul_order_opt_mode(0)
+		TransformHelper<FPP,Cpu>::TransformHelper() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), mul_order_opt_mode(0), Fv_mul_mode(0)
 #ifdef USE_GPU_MOD
 													  , gpu_faust(nullptr)
 #endif
@@ -115,6 +115,7 @@ namespace Faust {
 			copy_slices(th);
 		this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
+		this->Fv_mul_mode = th->Fv_mul_mode;
 	}
 
 	template<typename FPP>
@@ -127,6 +128,7 @@ namespace Faust {
 		if(th->is_sliced)
 			copy_slices(th);
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
+		this->Fv_mul_mode = th->Fv_mul_mode;
 	}
 
 	template<typename FPP>
@@ -145,6 +147,7 @@ namespace Faust {
 			if(th.is_sliced)
 				copy_slices(&th);
 			this->mul_order_opt_mode = th.mul_order_opt_mode;
+			this->Fv_mul_mode = th->Fv_mul_mode;
 		}
 
 	template<typename FPP>
@@ -161,6 +164,7 @@ namespace Faust {
 		this->is_sliced = true;
 		eval_sliced_Transform();
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
+		this->Fv_mul_mode = th->Fv_mul_mode;
 	}
 
 	template<typename FPP>
@@ -191,6 +195,7 @@ namespace Faust {
 		delete[] this->fancy_indices[0];
 		delete[] this->fancy_indices[1];
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
+		this->Fv_mul_mode = th->Fv_mul_mode;
 	}
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 	template<typename FPP>
@@ -215,6 +220,18 @@ namespace Faust {
 	template<typename FPP>
 		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> x, const bool transpose, const bool conjugate)
 		{
+			if(Fv_mul_mode)
+			{
+				//TODO: avoid useless conversion-copy to/from Faust::Vect
+				// a way to do it is to rely directly on Faust-MatDense mul. without doing a particular case of Faust-Vect mul
+				// it would besides simplify the wrapper code
+				int tmp = mul_order_opt_mode;
+				set_mul_order_opt_mode(Fv_mul_mode, true);
+				auto vm = multiply(Faust::MatDense<FPP,Cpu>(x.getData(), this->getNbCol(), 1), transpose, conjugate);
+				set_mul_order_opt_mode(tmp, true);
+				// convert the way around
+				return Faust::Vect<FPP,Cpu>(vm.getNbRow(), vm.getData());
+			}
 			is_transposed ^= transpose;
 			is_conjugate ^= conjugate;
 			Vect<FPP,Cpu> v = this->transform->multiply(x, isTransposed2char());
@@ -352,17 +369,48 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize(const bool transp /* deft to false */)
 		{
+			//TODO: need a nsamples argument to feed optimize_time*
 			Faust::TransformHelper<FPP,Cpu> *th = this->pruneout(/*nnz_tres=*/0), *th2;
 			th2 = th->optimize_storage(false);
 			delete th;
 			th = th2;
-			// choose the quickest method for the Faust-matrix mul
-			th->optimize_multiply(transp, true);
+			th->optimize_time(transp, true);
 			return th;
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_multiply(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_time(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
+		{
+			// choose the quickest method for the Faust "toarray"
+			auto t = this->optimize_time_full(transp, inplace, nsamples);
+			// choose the quickest method for the Faust-vector mul
+			t = t->optimize_time_Fv(transp, inplace, nsamples);
+			return t;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_time_full(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
+		{
+			return this->optimize_multiply([this](){this->get_product();}, transp, inplace, nsamples, "Faust-toarray");
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_time_Fv(const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples)
+		{
+			// generate a random vector
+			Faust::Vect<FPP,Cpu> *v = nullptr;
+			if(transp)
+				v = Faust::Vect<FPP,Cpu>::rand(this->getNbRow());
+			else
+				v = Faust::Vect<FPP,Cpu>::rand(this->getNbCol());
+			return this->optimize_multiply([this, &v, &transp, &inplace, &nsamples]()
+					{
+						this->multiply(*v, transp);
+					}, transp, inplace, nsamples, "Faust-vector mul.");
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_multiply(std::function<void()> f, const bool transp /* deft to false */, const bool inplace, /* deft to 1 */ const int nsamples, const char* op_name)
 		{
 			TransformHelper<FPP,Cpu>* t_opt = nullptr;
 			int NMETS = 11;
@@ -410,7 +458,8 @@ namespace Faust {
 				for(int j=0;j < nmuls; j++)
 				{
 					//				auto FM = this->multiply(*M, transp);
-					this->get_product();
+//					this->get_product();
+					f();
 				}
 				auto end = std::chrono::system_clock::now();
 				times[i] = end-start;
@@ -424,7 +473,7 @@ namespace Faust {
 			else
 			{
 				t_opt = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0, false, false, true);
-				cout << "best method measured in time is: " << opt_meth << endl;
+				cout << "best method measured in time on operation "<< op_name << " is: " << opt_meth << endl;
 #if DEBUG_OPT_MUL
 				cout << "all times: ";
 				for(int i = 0; i < NMETS; i ++)
@@ -591,7 +640,7 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::set_mul_order_opt_mode(const int mul_order_opt_mode)
+		void TransformHelper<FPP,Cpu>::set_mul_order_opt_mode(const int mul_order_opt_mode, const bool silent /* = false */)
 		{
 #ifdef USE_GPU_MOD
 			if(mul_order_opt_mode == 10 && gpu_faust == nullptr)
@@ -609,12 +658,40 @@ namespace Faust {
 			}
 #endif
 			this->mul_order_opt_mode = mul_order_opt_mode;
-			std::cout << "changed mul. optimization mode to: " << this->mul_order_opt_mode;
-			if(! this->mul_order_opt_mode)
+			if(! silent)
+			{
+				std::cout << "changed mul. optimization mode to: " << this->mul_order_opt_mode;
+				if(! this->mul_order_opt_mode)
+					std::cout << " (opt. disabled, default mul.)";
+				std::cout << std::endl;
+			}
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::set_Fv_mul_mode(const int Fv_mul_mode)
+		{
+#ifdef USE_GPU_MOD
+			//TODO: factorize this code with set_mul_order_opt_mode
+			if(Fv_mul_mode == 10 && gpu_faust == nullptr)
+			{
+				try
+				{
+					gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
+				}
+				catch(std::runtime_error & e)
+				{
+					// creation failed, nothing todo (must be because of cuda backend is not installed/found)
+					std::cerr << "error: can't change to GPU method (backend unavailable)." << std::endl;
+					return;
+				}
+			}
+#endif
+			this->Fv_mul_mode = Fv_mul_mode;
+			std::cout << "changed Faust-vector mul. mode to: " << this->Fv_mul_mode;
+			if(! this->Fv_mul_mode)
 				std::cout << " (opt. disabled, default mul.)";
 			std::cout << std::endl;
 		}
-
 
 	template<typename FPP>
 		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::multiply(TransformHelper<FPP, Cpu>* th_right)
