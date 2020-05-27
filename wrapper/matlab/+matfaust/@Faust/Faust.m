@@ -2172,6 +2172,19 @@ classdef Faust
 				cF = matfaust.Faust(facs);
 			end
 		end
+		%================================================================
+		%> Clones the Faust (in a new memory space).
+		%===
+		%>
+		%> @retval Fc: the Faust clone.
+		%================================================================
+		function Fc = clone(F)
+			facs = {};
+			for i=1:numfactors(F)
+				facs = [ facs {factors(F,i)} ];
+			end
+			Fc = Faust(facs);
+		end
 
 	end
 	methods(Access = private)

@@ -1731,6 +1731,15 @@ class Faust:
                                                           nsamples))
             return F_opt
 
+    def clone(self):
+        """
+        Clones the Faust (in a new memory space).
+
+        Returns:
+            The Faust clone.
+        """
+        return Faust([self.factors(i) for i in range(self.numfactors())])
+
 pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__
 
 def version():
