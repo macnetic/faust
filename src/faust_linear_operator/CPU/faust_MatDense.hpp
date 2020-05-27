@@ -941,10 +941,10 @@ this->is_identity = false;
 template<typename FPP>
 matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) const
 {
-	matvar_t *var = NULL;
+	matvar_t *var = nullptr;
 	size_t dims[2];
 	int opt = typeid(mat(0,0))==typeid(std::complex<double>(1.0,1.0))?MAT_F_COMPLEX:0;
-	mat_complex_split_t z = {NULL,NULL};
+	mat_complex_split_t z = {nullptr,nullptr};
 	//
 	if(transpose)
 	{
@@ -953,7 +953,7 @@ matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) 
 		if(!opt){
 			Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_copy(mat.transpose().eval());
 			//		mat_copy.transposeInPlace(); //undoing the transposition
-			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat_copy.data() /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+			var = Mat_VarCreate(nullptr, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat_copy.data() /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
 		}
 		else {
 			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
@@ -967,7 +967,7 @@ matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) 
 			dst_im.transposeInPlace();
 			z.Re = dst_re.data();
 			z.Im = dst_im.data();
-			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+			var = Mat_VarCreate(nullptr, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
 		}
 	}
 	else
@@ -976,7 +976,7 @@ matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) 
 		dims[1] = this->getNbCol();
 		if(!opt) // we use directly the data pointer (col-major order organized)
 			// but without the MAT_F_DONT_COPY_DATA flag, MatIO copies the data internally
-			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat.data(), opt);
+			var = Mat_VarCreate(nullptr, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, (FPP*) mat.data(), opt);
 		else {
 			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_re(mat.rows(), mat.cols());
 			Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> dst_im(mat.rows(), mat.cols());
@@ -987,7 +987,7 @@ matvar_t* Faust::MatDense<FPP, Cpu>::toMatIOVar(bool transpose, bool conjugate) 
 				dst_im = mat.imag().template cast<double>();
 			z.Re = dst_re.data();
 			z.Im = dst_im.data();
-			var = Mat_VarCreate(NULL, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
+			var = Mat_VarCreate(nullptr, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &z /*mat.transpose().eval().data() //  doesn't work so we copy above */, opt);
 		}
 	}
 	return var;
@@ -1213,7 +1213,7 @@ void Faust::MatDense<FPP,Cpu>::abs()
 	template<typename FPP>
 Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols)
 {
-	Faust::MatDense<FPP, Cpu>* mat = NULL;
+	Faust::MatDense<FPP, Cpu>* mat = nullptr;
 	try {
 		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_tmp;
 		mat_tmp = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>::Random(num_rows, num_cols);
@@ -1228,11 +1228,11 @@ Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int
 	template<typename FPP>
 Faust::MatDense<FPP, Cpu>* Faust::MatDense<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, float density)
 {
-	Faust::MatDense<FPP, Cpu>* mat = NULL;
+	Faust::MatDense<FPP, Cpu>* mat = nullptr;
 	try {
 		//TODO: refactor with above randMat()
 		Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic> mat_tmp;
-		std::default_random_engine generator(time(NULL));
+		std::default_random_engine generator(time(nullptr));
 		std::uniform_real_distribution<double> distribution(0, 1);
 		mat_tmp = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic>::Random(num_rows, num_cols);
 		for(int i=0;i<num_rows;i++)
