@@ -24,8 +24,8 @@ namespace Faust
 		FaustGPU(std::vector<Faust::MatGeneric<FPP,Cpu>*>&);
 		~FaustGPU();
 
-		MatDense<FPP, Cpu> get_product();
-		MatDense<FPP, Cpu> multiply(const Faust::MatGeneric<FPP,Cpu>*);
+		MatDense<FPP, Cpu> get_product(const bool transpose = false, const bool conjugate = false);
+		MatDense<FPP, Cpu> multiply(const Faust::MatGeneric<FPP,Cpu>*, const bool transpose = false, const bool conjugate = false );
 
 		static void* init_gpu_mod(const std::string& libpath = "libgm.so", const bool silent = false, void* gm_handle = nullptr);
 		static void check_gpu_mod_loaded();

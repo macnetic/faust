@@ -67,6 +67,21 @@ namespace Faust {
 	template<typename FPP,FDevice DEVICE> class MatDense;
 	template<typename FPP,FDevice DEVICE> class MatGeneric;
 
+	enum FaustMulMode
+	{
+		DEFAULT,
+		ORDER_ALL_ENDS,
+		ORDER_1ST_BEST,
+		ORDER_ALL_BEST_CONVDENSE,
+		ORDER_ALL_BEST_MIXED,
+		PAR_SUBPRODS_CPP,
+		PAR_SUBPRODS_OMP,
+		TORCH_CPU,
+		TORCH_CPU_BEST_ORDER,
+		TORCH_CPU_DENSE_ROW_TO_TORCH,
+		GPU_MOD
+	};
+
 	enum RandFaustType {
 		DENSE,
 		SPARSE,
@@ -121,7 +136,7 @@ namespace Faust {
 //			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 			void update_total_nnz();
-			void set_mul_order_opt_mode(const int mul_order_opt_mode);
+			void set_mul_order_opt_mode(const int mul_order_opt_mode, const bool silent=false);
 			void set_Fv_mul_mode(const int mode);
 
 			int get_mul_order_opt_mode() const;

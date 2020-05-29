@@ -48,13 +48,19 @@ namespace Faust
 		}
 
 	template <>
-		MatDense<@FAUST_SCALAR_FOR_GM@,Cpu> FaustGPU<@FAUST_SCALAR_FOR_GM@>::get_product()
+		MatDense<@FAUST_SCALAR_FOR_GM@,Cpu> FaustGPU<@FAUST_SCALAR_FOR_GM@>::get_product(const bool transpose /* = false */, const bool conjugate /* = false */)
 		{
+			gm_Op op = OP_NOTRANSP;
+			if(transpose)
+				if(conjugate)
+					op = OP_CONJTRANSP;
+				else
+					op = OP_TRANSP;
 			gm_DenseMatFunc_@GM_SCALAR@* dsm_funcs = (gm_DenseMatFunc_@GM_SCALAR@*) this->dsm_funcs;
 			gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
 			@GM_SCALAR@ one;
 			set_one<@GM_SCALAR@>(&one);
-			auto gpu_prod_mat_dense = marr_funcs->chain_matmul(gpu_mat_arr, one, OP_NOTRANSP);
+			auto gpu_prod_mat_dense = marr_funcs->chain_matmul(gpu_mat_arr, one, op);
 			int32_t nrows, ncols;
 			dsm_funcs->info(gpu_prod_mat_dense, &nrows, &ncols);
 			MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> gpu2cpu_mat(nrows, ncols);
@@ -64,7 +70,7 @@ namespace Faust
 		}
 
 	template <>
-		MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> FaustGPU<@FAUST_SCALAR_FOR_GM@>::multiply(const MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>* A)
+		MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> FaustGPU<@FAUST_SCALAR_FOR_GM@>::multiply(const MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>* A, const bool transpose, const bool conjugate)
 		{
 			const MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>* sp_mat;
 			const MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>* ds_mat;
@@ -82,7 +88,9 @@ namespace Faust
 				//		std::cout << "FaustGPU::multiply(MatDense): " << ds_mat->getNbRow() << " " << ds_mat->getNbCol()<< " " << ds_mat->getNonZeros()<< std::endl;
 				marr_funcs->togpu_dsm(gpu_mat_arr, ds_mat->getNbRow(), ds_mat->getNbCol(), (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(const_cast<@FAUST_SCALAR_FOR_GM@*>(ds_mat->getData())));
 			}
+
 			auto M = this->get_product();
+
 			marr_funcs->erase_at(gpu_mat_arr, size);
 			return M;
 		}

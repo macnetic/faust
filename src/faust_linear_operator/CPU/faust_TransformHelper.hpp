@@ -116,6 +116,7 @@ namespace Faust {
 		this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
 		this->Fv_mul_mode = th->Fv_mul_mode;
+		this->gpu_faust = th->gpu_faust;
 	}
 
 	template<typename FPP>
@@ -227,7 +228,7 @@ namespace Faust {
 				// it would besides simplify the wrapper code
 				int tmp = mul_order_opt_mode;
 				set_mul_order_opt_mode(Fv_mul_mode, true);
-				auto vm = multiply(Faust::MatDense<FPP,Cpu>(x.getData(), this->getNbCol(), 1), transpose, conjugate);
+				auto vm = multiply(Faust::MatDense<FPP,Cpu>(x.getData(), x.size(), 1), transpose, conjugate);
 				set_mul_order_opt_mode(tmp, true);
 				// convert the way around
 				return Faust::Vect<FPP,Cpu>(vm.getNbRow(), vm.getData());
@@ -1140,7 +1141,7 @@ namespace Faust {
 #ifdef USE_GPU_MOD
 					case 10:
 						if(nullptr != gpu_faust)
-							return gpu_faust->get_product();
+							return gpu_faust->get_product(is_transposed, is_conjugate);
 #endif
 					default:
 						//TODO: avoid to add one factor for all methods if possible
