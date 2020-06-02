@@ -304,7 +304,7 @@ namespace Faust {
 #ifdef USE_GPU_MOD
 				case 10:
 					if(gpu_faust != nullptr)
-						M = gpu_faust->multiply(&A);
+						M = gpu_faust->multiply(&A, is_transposed, is_conjugate);
 					break;
 #endif
 				default:
