@@ -116,7 +116,9 @@ namespace Faust {
 		this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
 		this->Fv_mul_mode = th->Fv_mul_mode;
+#ifdef USE_GPU_MOD
 		this->gpu_faust = th->gpu_faust;
+#endif
 	}
 
 	template<typename FPP>
@@ -148,7 +150,7 @@ namespace Faust {
 			if(th.is_sliced)
 				copy_slices(&th);
 			this->mul_order_opt_mode = th.mul_order_opt_mode;
-			this->Fv_mul_mode = th->Fv_mul_mode;
+			this->Fv_mul_mode = th.Fv_mul_mode;
 		}
 
 	template<typename FPP>
