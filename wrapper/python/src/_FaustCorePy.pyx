@@ -1337,6 +1337,7 @@ cdef class FaustFact:
                              'float16', 'float32',
                              'float64', 'double']
         # double == float64
+        M = np.asfortranarray(M)
         check_matrix(isReal, M)
         if(isReal):
             return FaustFact.fact_hierarchical_gen_real(M, p, init_D, Lap)
@@ -2136,6 +2137,7 @@ cdef class FaustFact:
 
         cdef PyxConstraintGeneric** cpp_constraints
 
+        M = np.asfortranarray(M)
         is_update_way_R2L = p.is_update_way_R2L
         is_fact_side_left = p.is_fact_side_left
         use_csr = p.use_csr
