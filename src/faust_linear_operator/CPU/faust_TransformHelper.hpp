@@ -472,7 +472,10 @@ namespace Faust {
 				opt_meth = times[opt_meth]<times[i+1]?opt_meth:i+1;
 			}
 			if(inplace)
+			{
 				this->set_mul_order_opt_mode(opt_meth);
+				t_opt = this;
+			}
 			else
 			{
 				t_opt = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0, false, false, true);
