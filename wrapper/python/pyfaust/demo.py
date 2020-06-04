@@ -1034,7 +1034,7 @@ class bsl:
 
     @staticmethod
     def run(input_data_dir=get_data_dirpath(),
-            output_dir=DEFT_RESULTS_DIR):
+            output_dir=DEFT_RESULTS_DIR, on_gpu=False):
         """
         This function performs brain source localization.
 
@@ -1042,6 +1042,10 @@ class bsl:
         It reproduces the source localization experiment of [1].
 
         The results are stored in output_dir+"results_BSL_user.mat".
+
+        Args:
+            on_gpu: if True the demo is ran on GPU (if cuda backend is
+            available).
 
         DURATION:
             Computations should take around 3 minutes.
@@ -1093,6 +1097,8 @@ class bsl:
             MEG_Faust_rcgs.append(MEG_Fausts[-1].rcg())
             # print(MEG_Fausts[-1].shape)
             # input()
+            if(on_gpu):
+              MEG_Fausts[-1].m_faust.set_Fv_mul_mode(10)
             MEGs.append(MEG_Fausts[-1])
 
         M = MEG_matrix.shape[1] # number of points used in the MEG matrix
