@@ -25,7 +25,7 @@ endif()
 # Critical time, which fixe the limit time of the process
 set(TIMEOUT_MEG 8000)
 set(TIMEOUT_MEG_TRANSPOSED 16000)
-set(TIMEOUT_COMP 100)
+set(TIMEOUT_COMP 1000)
 
 
 # MATLAB TEST
