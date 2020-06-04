@@ -958,14 +958,14 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_i
 Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density, bool per_row)
 {
 	std::default_random_engine generator(rand());
-	std::uniform_real_distribution<double> distribution(0, 1);
+	std::uniform_real_distribution<Real<FPP>> distribution(0, 1);
 	typedef Eigen::Triplet<FPP,faust_unsigned_int> T;
 	std::vector<T> tripletList;
 	MatSparse<FPP, Cpu>* fsmat = new MatSparse<FPP,Cpu>();
 	Eigen::SparseMatrix<FPP,Eigen::RowMajor> mat(num_rows, num_cols);
 	FPP rand_number;
 	faust_unsigned_int vec_size, num_vecs, vec_nnz, col_id,row_id, j, k;
-	complex<double> rs;
+	complex<Real<FPP>> rs;
 	std::vector<faust_unsigned_int> id_list;
 	if(per_row)
 	{
@@ -977,7 +977,7 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_i
 		num_vecs = num_cols;
 		vec_size = num_rows;
 	}
-	vec_nnz = density*vec_size;
+	vec_nnz = (faust_unsigned_int) (density*vec_size);
 	try {
 		tripletList.reserve((size_t)(num_vecs*vec_nnz));
 		for(faust_unsigned_int i = 0; i < num_vecs; i++)
@@ -1004,7 +1004,7 @@ Faust::MatSparse<FPP, Cpu>* Faust::MatSparse<FPP, Cpu>::randMat(faust_unsigned_i
 				// remove the used index (don't want to use it twice to set vector)
 				id_list.erase(id_list.begin()+k);
 				// random value
-				rs = complex<double>(distribution(generator), distribution(generator));
+				rs = complex<Real<FPP>>(distribution(generator), distribution(generator));
 				memcpy(&rand_number, &rs, sizeof(FPP));
 				tripletList.push_back(T(row_id, col_id, rand_number));
 				j--;
