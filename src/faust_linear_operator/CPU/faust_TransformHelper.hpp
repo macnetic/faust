@@ -223,20 +223,12 @@ namespace Faust {
 	template<typename FPP>
 		Vect<FPP,Cpu> TransformHelper<FPP,Cpu>::multiply(const Vect<FPP,Cpu> x, const bool transpose, const bool conjugate)
 		{
-			if(Fv_mul_mode)
-			{
-				//TODO: avoid useless conversion-copy to/from Faust::Vect
-				// a way to do it is to rely directly on Faust-MatDense mul. without doing a particular case of Faust-Vect mul
-				// it would besides simplify the wrapper code
-				int tmp = mul_order_opt_mode;
-				set_mul_order_opt_mode(Fv_mul_mode, true);
-				auto vm = multiply(Faust::MatDense<FPP,Cpu>(x.getData(), x.size(), 1), transpose, conjugate);
-				set_mul_order_opt_mode(tmp, true);
-				// convert the way around
-				return Faust::Vect<FPP,Cpu>(vm.getNbRow(), vm.getData());
-			}
 			is_transposed ^= transpose;
 			is_conjugate ^= conjugate;
+#ifdef USE_GPU_MOD
+			if(Fv_mul_mode == 10 && gpu_faust != nullptr)
+					return gpu_faust->multiply(x, is_transposed, is_conjugate);
+#endif
 			Vect<FPP,Cpu> v = this->transform->multiply(x, isTransposed2char());
 			is_transposed ^= transpose;
 			is_conjugate ^= conjugate;
@@ -1586,7 +1578,7 @@ namespace Faust {
 				cout << "TransformHelper<FPP,Cpu>::randFaust() per_row: " <<  per_row << endl;
 #endif
 				if(density == -1.)
-					fact_density = per_row?5.1/num_cols:5.1/num_rows;
+					fact_density = per_row?5./num_cols:5./num_rows;
 				else
 					fact_density = density;
 				switch(t){
