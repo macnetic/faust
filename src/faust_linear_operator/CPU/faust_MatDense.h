@@ -366,6 +366,9 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 		void conjugate();
 		void conjugate(const bool eval);
 
+		//! \brief Replaces the matrix by its transconjugate.
+		void adjoint();
+
         //! \brief Replace this by (this) * A
         void multiplyRight(MatDense<FPP,Cpu> const& A);
 

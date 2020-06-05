@@ -327,7 +327,7 @@ void Faust::MatDense<FPP,Cpu>::transpose()
 		return;
 	}
 
-	mat = mat.transpose().eval();
+	mat = mat.transpose().eval(); // equiv. to transposeInPlace() https://eigen.tuxfamily.org/dox/classEigen_1_1DenseBase.html#ac501bd942994af7a95d95bee7a16ad2a
 	faust_unsigned_int dim1_copy = this->dim1;
 	this->dim1 = this->dim2;
 	this->dim2 = dim1_copy;
@@ -382,6 +382,22 @@ void Faust::MatDense<FPP,Cpu>::conjugate(const bool eval)
 	//t_conjugate.stop(); //TODO
 #endif
 
+}
+
+
+template<typename FPP>
+void Faust::MatDense<FPP,Cpu>::adjoint()
+{
+	if(isZeros)
+	{
+		this->resize(this->dim2, this->dim1);
+		return;
+	}
+
+	mat.adjointInPlace();
+	faust_unsigned_int dim1_copy = this->dim1;
+	this->dim1 = this->dim2;
+	this->dim2 = dim1_copy;
 }
 
 template<typename FPP>
