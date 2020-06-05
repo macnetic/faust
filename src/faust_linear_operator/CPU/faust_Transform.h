@@ -243,14 +243,6 @@ namespace Faust
 				double normFro() const;
 				double normFro(const char opThis, const bool isConj) const;
 
-				static void delete_fact(void * fact)
-				{
-#ifdef DEBUG
-					std::cout << "Faust::Transform delete_fact" << std::endl;
-#endif
-					delete static_cast<MatGeneric<FPP,Cpu>*>(fact);
-				}
-
 				~Transform(){
 #ifdef FAUST_VERBOSE
 					std::cout << "~Transform()" << std::endl;

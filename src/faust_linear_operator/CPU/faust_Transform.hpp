@@ -355,7 +355,14 @@ void Faust::Transform<FPP,Cpu>::update_total_nnz()
 
 
 template<typename FPP>
-Faust::RefManager Faust::Transform<FPP,Cpu>::ref_man(Faust::Transform<FPP,Cpu>::delete_fact);
+//Faust::RefManager Faust::Transform<FPP,Cpu>::ref_man(Faust::Transform<FPP,Cpu>::delete_fact);
+Faust::RefManager Faust::Transform<FPP,Cpu>::ref_man([](void *fact)
+		{
+#ifdef DEBUG
+		std::cout << "Faust::Transform delete_fact" << std::endl;
+#endif
+		delete static_cast<MatGeneric<FPP,Cpu>*>(fact);
+		});
 
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::print_file(const char* filename) const
