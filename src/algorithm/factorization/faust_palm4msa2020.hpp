@@ -25,32 +25,33 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 	for(auto c: constraints)
 		dims.push_back(make_pair(c->get_rows(), c->get_cols()));
 	Faust::MatDense<FPP,DEVICE> A_H = A;
-	A_H.conjugate(false);
-	A_H.transpose();
+	A_H.adjoint();
+//	if(S.size() != nfacts)
+//	{
+////		S = Faust::TransformHelper<FPP,DEVICE>();
+//		//TODO: refactor the id factor gen. into TransformHelper
+//		for(auto fdims : dims)
+//		{
+//			// init all facts as identity matrices
+//			// with proper dimensions
+//			Faust::MatGeneric<FPP,DEVICE>* fact;
+//			if(use_csr)
+//			{
+//				auto sfact = new Faust::MatSparse<FPP,DEVICE>(fdims.first, fdims.second);
+//				sfact->setEyes();
+//				fact = sfact;
+//			}
+//			else
+//			{
+//				auto dfact = new Faust::MatDense<FPP,DEVICE>(fdims.first, fdims.second);
+//				dfact->setEyes();
+//				fact = dfact;
+//			}
+//			S.push_back(fact); //TODO: copying=false
+//		}
+//	}
 	if(S.size() != nfacts)
-	{
-//		S = Faust::TransformHelper<FPP,DEVICE>();
-		//TODO: refactor the id factor gen. into TransformHelper
-		for(auto fdims : dims)
-		{
-			// init all facts as identity matrices
-			// with proper dimensions
-			Faust::MatGeneric<FPP,DEVICE>* fact;
-			if(use_csr)
-			{
-				auto sfact = new Faust::MatSparse<FPP,DEVICE>(fdims.first, fdims.second);
-				sfact->setEyes();
-				fact = sfact;
-			}
-			else
-			{
-				auto dfact = new Faust::MatDense<FPP,DEVICE>(fdims.first, fdims.second);
-				dfact->setEyes();
-				fact = dfact;
-			}
-			S.push_back(fact); //TODO: copying=false
-		}
-	}
+		fill_of_eyes(S, nfacts, use_csr, dims);
 	int i = 0, f_id;
 	std::function<void()> init_fid, next_fid;
 	std::function<bool()> updating_facs;
@@ -107,11 +108,9 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		if(sc.isCriterionErr())
 			error = tmp.norm();
 		//TODO: do something to lighten the double transpose conjugate
-		tmp.conjugate(false);
-		tmp.transpose();
+		tmp.adjoint();
 		tmp = R->multiply(tmp, /* H */ false, false);
-		tmp.conjugate(false);
-		tmp.transpose();
+		tmp.adjoint();
 		tmp *= lambda/c;
 		D -= tmp;
 	};
@@ -185,11 +184,9 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		if(sc.isCriterionErr())
 			error = tmp.norm();
 		//TODO: do something to lighten the double transpose conjugate
-		tmp.conjugate(false);
-		tmp.transpose();
+		tmp.adjoint();
 		tmp = R->multiply(tmp, /* NO H */ false, false);
-		tmp.conjugate(false);
-		tmp.transpose();
+		tmp.adjoint();
 		tmp = L->multiply(tmp, true, true);
 		tmp *= lambda/c;
 		D -= tmp;
@@ -268,32 +265,9 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		dims.push_back(make_pair(c->get_rows(), c->get_cols()));
 	//TODO: make it possible to have a MatSparse A
 	Faust::MatDense<FPP,DEVICE> A_H = A;
-	A_H.conjugate(false);
-	A_H.transpose();
+	A_H.adjoint();
 	if(S.size() != nfacts)
-	{
-//		S = Faust::TransformHelper<FPP,DEVICE>();
-		//TODO: refactor the id factor gen. into TransformHelper
-		for(auto fdims : dims)
-		{
-			// init all facts as identity matrices
-			// with proper dimensions
-			Faust::MatGeneric<FPP,DEVICE>* fact;
-			if(use_csr)
-			{
-				auto sfact = new Faust::MatSparse<FPP,DEVICE>(fdims.first, fdims.second);
-				sfact->setEyes();
-				fact = sfact;
-			}
-			else
-			{
-				auto dfact = new Faust::MatDense<FPP,DEVICE>(fdims.first, fdims.second);
-				dfact->setEyes();
-				fact = dfact;
-			}
-			S.push_back(fact); //TODO: copying=false
-		}
-	}
+		fill_of_eyes(S, nfacts, use_csr, dims);
 	int i = 0, f_id;
 	std::function<void()> init_ite, next_fid;
 	std::function<bool()> updating_facs;
@@ -475,4 +449,34 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		i++;
 	}
 	S.update_total_nnz();
+}
+
+	template <typename FPP, FDevice DEVICE>
+void Faust::fill_of_eyes(
+		Faust::TransformHelper<FPP,DEVICE>& S,
+		const unsigned int nfacts,
+		const bool sparse,
+		const std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims)
+{
+	if(S.size() > 0)
+		throw std::runtime_error("The Faust must be empty for intializing it to eyes factors.");
+	for(auto fdims : dims)
+	{
+		// init all facts as identity matrices
+		// with proper dimensions
+		Faust::MatGeneric<FPP,DEVICE>* fact;
+		if(sparse)
+		{
+			auto sfact = new Faust::MatSparse<FPP,DEVICE>(fdims.first, fdims.second);
+			sfact->setEyes();
+			fact = sfact;
+		}
+		else
+		{
+			auto dfact = new Faust::MatDense<FPP,DEVICE>(fdims.first, fdims.second);
+			dfact->setEyes();
+			fact = dfact;
+		}
+		S.push_back(fact); //TODO: copying=false
+	}
 }

@@ -53,6 +53,21 @@ namespace Faust
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
 				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION);
 
+
+	/**
+	 * \brief Fill S with nfacts eye() matrices.
+	 *
+	 * S must be an empty Faust. If S is already composed of factors an exception is raised.
+	 *
+	 * \param sparse if true eyes are MatSparse, they are MatDense otherwise.
+	 *
+	 */
+	template <typename FPP, FDevice DEVICE>
+		void fill_of_eyes(Faust::TransformHelper<FPP,DEVICE>& S,
+				const unsigned int nfacts,
+				const bool sparse,
+				const std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims);
+	//TODO: maybe move this function in a Faust::utils module (for now it serves only for PALM4MSA)
 }
 #include "faust_palm4msa2020.hpp"
 #endif
