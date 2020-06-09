@@ -31,7 +31,8 @@ namespace Faust
 				const bool compute_2norm_on_array=false,
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
-				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION);
+				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION,
+				const bool on_gpu=false);
 
 	template <typename FPP, FDevice DEVICE>
 		void palm4msa2(
@@ -51,7 +52,8 @@ namespace Faust
 				const bool compute_2norm_on_array=false,
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
-				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION);
+				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION,
+				const bool on_gpu=false);
 
 
 	/**
@@ -66,8 +68,10 @@ namespace Faust
 		void fill_of_eyes(Faust::TransformHelper<FPP,DEVICE>& S,
 				const unsigned int nfacts,
 				const bool sparse,
-				const std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims);
+				const std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims,
+				const bool on_gpu=false);
 	//TODO: maybe move this function in a Faust::utils module (for now it serves only for PALM4MSA)
 }
 #include "faust_palm4msa2020.hpp"
+#include "faust_palm4msa2020_2.hpp"
 #endif

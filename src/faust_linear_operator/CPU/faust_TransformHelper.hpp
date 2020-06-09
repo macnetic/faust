@@ -102,6 +102,14 @@ namespace Faust {
 			this->is_transposed = right_left_transposed;
 			//likewise for the conjugate
 			this->is_conjugate = right_left_conjugate;
+#ifdef USE_GPU_MOD
+			if(th_left->gpu_faust && th_right->gpu_faust)
+			{ // both left and right side Fausts are gpu enabled
+				// this->transform is freshly created, reuse it to create the gpu_faust object
+				this->gpu_faust = new FaustGPU<FPP>(this->transform->data);
+				mul_order_opt_mode = Fv_mul_mode = 10;
+			}
+#endif
 		}
 
 	template<typename FPP>
@@ -132,6 +140,9 @@ namespace Faust {
 			copy_slices(th);
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
 		this->Fv_mul_mode = th->Fv_mul_mode;
+#ifdef USE_GPU_MOD
+		this->gpu_faust = th->gpu_faust;
+#endif
 	}
 
 	template<typename FPP>
@@ -151,6 +162,9 @@ namespace Faust {
 				copy_slices(&th);
 			this->mul_order_opt_mode = th.mul_order_opt_mode;
 			this->Fv_mul_mode = th.Fv_mul_mode;
+#ifdef USE_GPU_MOD
+		this->gpu_faust = th.gpu_faust;
+#endif
 		}
 
 	template<typename FPP>
@@ -168,6 +182,14 @@ namespace Faust {
 		eval_sliced_Transform();
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
 		this->Fv_mul_mode = th->Fv_mul_mode;
+#ifdef USE_GPU_MOD
+			if(th->gpu_faust)
+			{ // both left and right side Fausts are gpu enabled
+				// this->transform is freshly created, reuse it to create the gpu_faust object
+				this->gpu_faust = new FaustGPU<FPP>(this->transform->data);
+				mul_order_opt_mode = Fv_mul_mode = 10;
+			}
+#endif
 	}
 
 	template<typename FPP>
@@ -199,6 +221,14 @@ namespace Faust {
 		delete[] this->fancy_indices[1];
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
 		this->Fv_mul_mode = th->Fv_mul_mode;
+#ifdef USE_GPU_MOD
+			if(th->gpu_faust)
+			{ // both left and right side Fausts are gpu enabled
+				// this->transform is freshly created, reuse it to create the gpu_faust object
+				this->gpu_faust = new FaustGPU<FPP>(this->transform->data);
+				mul_order_opt_mode = Fv_mul_mode = 10;
+			}
+#endif
 	}
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 	template<typename FPP>
@@ -206,6 +236,15 @@ namespace Faust {
 		TransformHelper<FPP,Cpu>::TransformHelper(GList& ... t) : TransformHelper<FPP,Cpu>()
 		{
 			this->push_back_(t...);
+#ifdef USE_GPU_MOD
+			// it's difficult here to test if all t are TransformHelper with a gpu_faust enabled (for example t can also be a vector<MatGeneric>)
+			// so verify directly that cpu matrices copied are loaded in GPU to respect the invariant: a Faust is fully loaded on GPU or is not on GPU at all
+			if(FaustGPU<FPP>::are_cpu_mat_all_known(this->transform->data))
+			{
+				gpu_faust = new FaustGPU<FPP>(this->transform->data);
+				mul_order_opt_mode = Fv_mul_mode = 10;
+			}
+#endif
 		}
 #endif
 	template<typename FPP>
@@ -567,7 +606,6 @@ namespace Faust {
 					}
 				}
 				// backward pass
-
 				if(! only_forward)
 					for(int i = pth->size()-1; i > 0; i--)
 					{
@@ -663,6 +701,7 @@ namespace Faust {
 					std::cout << " (opt. disabled, default mul.)";
 				std::cout << std::endl;
 			}
+
 		}
 
 	template<typename FPP>
@@ -900,6 +939,35 @@ namespace Faust {
 		MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact_nonconst(const faust_unsigned_int id) const
 		{
 			return this->transform->data[is_transposed?size()-id-1:id];
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id)
+		{
+			MatGeneric<FPP,Cpu>& M_ = const_cast<MatGeneric<FPP,Cpu>&>(M);
+			// I promise I won't change M
+			MatSparse<FPP,Cpu> *sp_mat, *sp_fact;
+			MatDense<FPP,Cpu> *ds_mat, *ds_fact;
+			MatGeneric<FPP,Cpu>* fact = get_gen_fact_nonconst(fact_id);
+			if(sp_mat = dynamic_cast<MatSparse<FPP,Cpu>*>(&M_))
+			{
+				if(! (sp_fact = dynamic_cast<MatSparse<FPP,Cpu>*>(fact)))
+					throw std::runtime_error("A sparse factor can't be updated with a dense factor");
+				*sp_fact = *sp_mat;
+			}
+			else if(ds_mat = dynamic_cast<MatDense<FPP,Cpu>*>(&M_))
+			{
+				if(! (ds_fact = dynamic_cast<MatDense<FPP,Cpu>*>(fact)))
+					throw std::runtime_error("A dense factor can't be updated with a dense factor");
+				*ds_fact = *ds_mat;
+			}
+			fact->set_id(M.is_id());
+#if USE_GPU_MOD
+			if(gpu_faust)
+			{
+				gpu_faust->update(fact, fact_id);
+			}
+#endif
 		}
 
 	template<typename FPP>
@@ -1554,6 +1622,10 @@ namespace Faust {
 #ifdef FAUST_VERBOSE
 			cout << "Destroying Faust::TransformHelper object." << endl;
 #endif
+#ifdef USE_GPU_MOD
+			if(gpu_faust != nullptr)
+				delete gpu_faust;
+#endif
 		}
 
 	template<typename FPP>
@@ -1688,10 +1760,14 @@ namespace Faust {
                 //nothing to do except converting to MatDense if start_id
                 //factor is a MatSparse
                 packed_fac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(*(begin()+start_id));
-                if(packed_fac == nullptr) // factor start_id is not at MatDense, convert it
+                if(packed_fac == nullptr) 
+				{// factor start_id is not at MatDense, convert it
                     packed_fac = new MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(*(begin()+start_id)));
+				}
                 else
+				{
                     return; //no change
+				}
             }
             else
             {

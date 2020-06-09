@@ -1,5 +1,6 @@
 #ifndef __FAUST_MAT_DIAG__
 #define __FAUST_MAT_DIAG__
+#include "matio.h"
 #include <Eigen/Core>
 #include "faust_constant.h"
 #include "faust_Vect.h"

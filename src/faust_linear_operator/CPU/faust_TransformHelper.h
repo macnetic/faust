@@ -66,6 +66,8 @@ namespace Faust {
 	template<typename FPP,FDevice DEVICE> class Vect;
 	template<typename FPP,FDevice DEVICE> class MatDense;
 	template<typename FPP,FDevice DEVICE> class MatGeneric;
+	template<typename FPP> class FaustGPU;
+
 
 	enum FaustMulMode
 	{
@@ -236,6 +238,10 @@ namespace Faust {
 			transf_iterator<FPP> begin() const;
 			transf_iterator<FPP> end() const;
 
+#ifdef USE_GPU_MOD
+			FaustGPU<FPP>* get_gpu_faust();
+#endif
+
 			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
 			void pack_factors();
 			void pack_factors(const faust_unsigned_int id, const PackDir dir);
@@ -251,6 +257,7 @@ namespace Faust {
 			unsigned long long get_fact_addr(const faust_unsigned_int id) const;
 			/* use carefully */
 			MatGeneric<FPP,Cpu>* get_gen_fact_nonconst(const faust_unsigned_int id) const;
+			void update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id);
 			private:
 			void copy_slices(TransformHelper<FPP, Cpu>* th, const bool transpose = false);
 			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;

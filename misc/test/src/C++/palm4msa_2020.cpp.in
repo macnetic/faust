@@ -56,8 +56,9 @@ int main(int argc, char* argv[])
 	}
 	Faust::MatDense<FPP,Cpu> data;
 
-	char configPalm2Filename[] = "@FAUST_DATA_MAT_DIR@/config_compared_palm2.mat";
+//	char configPalm2Filename[] = "@FAUST_DATA_MAT_DIR@/config_compared_palm2.mat";
 
+	char configPalm2Filename[] = "config_compared_palm2.mat";
 	init_faust_mat_from_matio(data, configPalm2Filename, "data");
 	Faust::ConstraintInt<FPP,Cpu> c1(CONSTRAINT_NAME_SPLIN, 5, 500, 32);
 	Faust::ConstraintFPP<FPP, Cpu, Real<FPP>> c2(CONSTRAINT_NAME_NORMCOL, 1.0, 32, 32);
@@ -70,25 +71,48 @@ int main(int argc, char* argv[])
 	//	MatDense<FPP,Cpu> H = th->get_product();
 	//	H.Display();
 	//	palm4msa<FPP,Cpu>(H, constraints, facts, lambda, 30, true);
-//	MatDense<FPP, Cpu>* H = Faust::MatDense<FPP,Cpu>::randMat(500,32);
-//	H->Display();
+	//	MatDense<FPP, Cpu>* H = Faust::MatDense<FPP,Cpu>::randMat(500,32);
+	//	H->Display();
 	data.Display();
 	bool use_csr = false, is_update_way_R2L = false;
 	bool packing_RL = true;
+	packing_RL = false;
 	int nites = 200;
 	StoppingCriterion<Real<FPP>> sc(nites);
 	bool compute_2norm_on_array = false;
 	Real<FPP> norm2_threshold = 10e-16;
 	int norm2_max_iter = 1000;
+	int meth = 2;
+	bool on_gpu = false;
 	if(argc > 1)
 	{
+		meth = std::atoi(argv[1]);
+		if(argc > 2)
+			on_gpu = true;
+	}
+	cout << "on_gpu=" << on_gpu << endl;
+#ifdef USE_GPU_MOD
+	if(on_gpu) Faust::enable_gpu_mod();
+#else
+	if(on_gpu)
+	{
+		std::cerr << "The test is not compiled with gpu_mod (USE_GPU_MOD not defined)." << std::endl;
+		exit(2);
+	}
+#endif
+	if(meth == 1)
+	{
 		cout << "use impl1" << endl;
-		Faust::palm4msa<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, use_csr, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
+		Faust::palm4msa<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, use_csr, compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
+	}
+	else if(meth == 2)
+	{
+		cout << "use impl2" << endl;
+		Faust::palm4msa2<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
 	}
 	else
 	{
-		cout << "use impl2" << endl;
-		Faust::palm4msa2<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter);
+		std::cerr << "meth (arg 1) must be 1 or 2." << endl;
 	}
 	//	auto left_th_2 = th->left(2);
 	//	left_th_2->display();
@@ -106,7 +130,6 @@ int main(int argc, char* argv[])
 	std::cout<<std::endl;
 	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
 	std::cout<< "\t\t" << relativeError<<std::endl<<std::endl;
-
 
 	return 0;
 }
