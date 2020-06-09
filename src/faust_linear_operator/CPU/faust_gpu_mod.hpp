@@ -10,7 +10,12 @@ void* Faust::FaustGPU<FPP>::marr_funcs = nullptr;
 template <typename FPP>
 void* Faust::FaustGPU<FPP>::dsm_funcs = nullptr;
 
+template <typename FPP>
+void* Faust::FaustGPU<FPP>::gp_funcs = nullptr;
 
+
+template <typename FPP>
+std::map<void*,void*> Faust::FaustGPU<FPP>::cpu_gpu_map;
 
 	template <typename FPP>
 void Faust::FaustGPU<FPP>::check_gpu_mod_loaded()
@@ -31,6 +36,20 @@ void* Faust::FaustGPU<FPP>::init_gpu_mod(const std::string& libpath, const bool 
 		if(! silent)
 			std::cerr << "Warning: gm_lib is already loaded (can't reload it)." << endl;
 	return Faust::FaustGPU<FPP>::gm_handle;
+}
+
+template<typename FPP>
+bool Faust::FaustGPU<FPP>::is_cpu_mat_known(const Faust::MatGeneric<FPP,Cpu> *m)
+{
+	return cpu_gpu_map.find(const_cast<MatGeneric<FPP,Cpu>*>(m)) != cpu_gpu_map.end();
+}
+
+template<typename FPP>
+bool Faust::FaustGPU<FPP>::are_cpu_mat_all_known(const std::vector<MatGeneric<FPP,Cpu>*> mats)
+{
+	for(auto m: mats)
+		if(! is_cpu_mat_known(m)) return false;
+	return true;
 }
 
 namespace Faust
