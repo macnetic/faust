@@ -34,6 +34,8 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	A_H.adjoint();
 	if(S.size() != nfacts)
 		fill_of_eyes(S, nfacts, use_csr, dims, on_gpu);
+	else if(on_gpu)
+		S.enable_gpu_meth_for_mul();
 	int i = 0, f_id;
 	std::function<void()> init_ite, next_fid;
 	std::function<bool()> updating_facs;

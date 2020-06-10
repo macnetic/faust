@@ -102,7 +102,7 @@ namespace Faust
 				// release all gpu mats
 				for(auto m: cpu_mat_ptrs)
 				{
-					if(ref_man.contains(m)) //TODO: remove when the bug of nonsense factor is corrected
+//					if(ref_man.contains(m)) // useless assuming we release only the acquired factors
 						ref_man.release(m);
 				}
 			}
