@@ -69,6 +69,11 @@ namespace Faust {
 		if(lambda_ != FPP(1.0) && ! internal_call)
 			cerr << "WARNING: the constructor argument for multiplying the Faust by a scalar is DEPRECATED and might not be supported in next versions of FAµST." << endl;
 		this->transform = make_shared<Transform<FPP,Cpu>>(facts, lambda_, optimizedCopy, cloning_fact);
+#ifdef USE_GPU_MOD
+		if(FaustGPU<FPP>::are_cpu_mat_all_known(this->transform->data))
+			//with refman gpu mats will be reused (because already loaded)
+			enable_gpu_meth_for_mul();
+#endif
 	}
 
 	template<typename FPP>
@@ -104,11 +109,7 @@ namespace Faust {
 			this->is_conjugate = right_left_conjugate;
 #ifdef USE_GPU_MOD
 			if(th_left->gpu_faust && th_right->gpu_faust)
-			{ // both left and right side Fausts are gpu enabled
-				// this->transform is freshly created, reuse it to create the gpu_faust object
-				this->gpu_faust = new FaustGPU<FPP>(this->transform->data);
-				mul_order_opt_mode = Fv_mul_mode = 10;
-			}
+				enable_gpu_meth_for_mul();
 #endif
 		}
 
@@ -125,7 +126,8 @@ namespace Faust {
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
 		this->Fv_mul_mode = th->Fv_mul_mode;
 #ifdef USE_GPU_MOD
-		this->gpu_faust = th->gpu_faust;
+		if(th->gpu_faust)
+			this->enable_gpu_mod();
 #endif
 	}
 
@@ -141,7 +143,8 @@ namespace Faust {
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
 		this->Fv_mul_mode = th->Fv_mul_mode;
 #ifdef USE_GPU_MOD
-		this->gpu_faust = th->gpu_faust;
+		if(th->gpu_faust)
+			enable_gpu_meth_for_mul();
 #endif
 	}
 
@@ -163,7 +166,8 @@ namespace Faust {
 			this->mul_order_opt_mode = th.mul_order_opt_mode;
 			this->Fv_mul_mode = th.Fv_mul_mode;
 #ifdef USE_GPU_MOD
-		this->gpu_faust = th.gpu_faust;
+			if(th.gpu_faust)
+				enable_gpu_meth_for_mul();
 #endif
 		}
 
@@ -186,8 +190,7 @@ namespace Faust {
 			if(th->gpu_faust)
 			{ // both left and right side Fausts are gpu enabled
 				// this->transform is freshly created, reuse it to create the gpu_faust object
-				this->gpu_faust = new FaustGPU<FPP>(this->transform->data);
-				mul_order_opt_mode = Fv_mul_mode = 10;
+				enable_gpu_meth_for_mul();
 			}
 #endif
 	}
@@ -223,11 +226,7 @@ namespace Faust {
 		this->Fv_mul_mode = th->Fv_mul_mode;
 #ifdef USE_GPU_MOD
 			if(th->gpu_faust)
-			{ // both left and right side Fausts are gpu enabled
-				// this->transform is freshly created, reuse it to create the gpu_faust object
-				this->gpu_faust = new FaustGPU<FPP>(this->transform->data);
-				mul_order_opt_mode = Fv_mul_mode = 10;
-			}
+				enable_gpu_meth_for_mul();
 #endif
 	}
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
@@ -240,10 +239,7 @@ namespace Faust {
 			// it's difficult here to test if all t are TransformHelper with a gpu_faust enabled (for example t can also be a vector<MatGeneric>)
 			// so verify directly that cpu matrices copied are loaded in GPU to respect the invariant: a Faust is fully loaded on GPU or is not on GPU at all
 			if(FaustGPU<FPP>::are_cpu_mat_all_known(this->transform->data))
-			{
-				gpu_faust = new FaustGPU<FPP>(this->transform->data);
-				mul_order_opt_mode = Fv_mul_mode = 10;
-			}
+				enable_gpu_meth_for_mul();
 #endif
 		}
 #endif
@@ -676,6 +672,13 @@ namespace Faust {
 		}
 
 	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::enable_gpu_meth_for_mul()
+		{
+			set_mul_order_opt_mode(10);
+			set_Fv_mul_mode(10);
+		}
+
+	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::set_mul_order_opt_mode(const int mul_order_opt_mode, const bool silent /* = false */)
 		{
 #ifdef USE_GPU_MOD
@@ -962,6 +965,7 @@ namespace Faust {
 				*ds_fact = *ds_mat;
 			}
 			fact->set_id(M.is_id());
+			update_total_nnz();
 #if USE_GPU_MOD
 			if(gpu_faust)
 			{
@@ -1617,7 +1621,8 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::~TransformHelper() {
+		TransformHelper<FPP,Cpu>::~TransformHelper()
+		{
 			// transform is deleted auto. when no TransformHelper uses it (no more weak refs left)
 #ifdef FAUST_VERBOSE
 			cout << "Destroying Faust::TransformHelper object." << endl;
