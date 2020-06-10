@@ -24,7 +24,7 @@ namespace Faust
 		static void* dsm_funcs;
 		static void* gp_funcs;
 		gm_MatArray_t gpu_mat_arr;
-		std::vector<void*> cpu_mat_ptrs; // addresses stored in gpu_mat_arr
+		std::vector<void*> cpu_mat_ptrs; // cpu mat addresses for which gpu copies are stored in gpu_mat_arr
 		size_t size;
 
 		// this map is used to retrieve a cpu mat addr from a gpu mat addr
