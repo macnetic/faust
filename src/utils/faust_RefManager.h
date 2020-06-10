@@ -13,6 +13,8 @@ namespace Faust {
 
 		void release(void* ref);
 
+		bool contains(void* ref) const;
+
 		void set_free_cb(void (*cb)(void*));
 
 		RefManager();

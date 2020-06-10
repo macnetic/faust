@@ -48,6 +48,12 @@ void Faust::RefManager::set_free_cb(void(*cb)(void*))
 	this->cb = cb;
 }
 
+bool Faust::RefManager::contains(void* ref) const
+{
+
+	return refCounts.find(ref) != refCounts.end();
+}
+
 Faust::RefManager::RefManager()
 {
 }
