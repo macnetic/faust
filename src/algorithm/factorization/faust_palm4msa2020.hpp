@@ -78,7 +78,7 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 			Faust::TransformHelper<FPP, Cpu> _L({dcur_fac}, 1.0, false, false);
 			L = _L;
 		}
-		Faust::TransformHelper<FPP, Cpu> _LSR(&L, R); // L contains cur_fac
+		Faust::TransformHelper<FPP, Cpu> _LSR(L, *R); // L contains cur_fac
 //		LSR = _LSR;
 //		_LSR.multiply(lambda);
 //		tmp = _LSR.get_product();
@@ -123,7 +123,7 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 			Faust::TransformHelper<FPP, Cpu> _R({dcur_fac}, 1.0, false, false);
 			R = _R;
 		}
-		Faust::TransformHelper<FPP, Cpu> _LSR(L, &R); // L contains cur_fac
+		Faust::TransformHelper<FPP, Cpu> _LSR(*L, R); // L contains cur_fac
 //		LSR = _LSR;
 //		_LSR.multiply(lambda);
 		tmp = _LSR.get_product();
@@ -159,7 +159,7 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 			dcur_fac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(cur_fac); // TOFIX: possible it is not Dense... but MatDiag (sanity check on function start)
 			D = *dcur_fac;
 		}
-		Faust::TransformHelper<FPP, Cpu> _LSR(L, R); // L contains cur_fac
+		Faust::TransformHelper<FPP, Cpu> _LSR(*L, *R); // L contains cur_fac
 //		LSR = _LSR;
 //		_LSR.multiply(lambda);
 		tmp = _LSR.get_product();

@@ -201,7 +201,9 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 				S.update(spD, f_id); // update is at higher level than a simple assignment
 			}
 			else
+			{
 				S.update(D, f_id);
+			}
 			next_fid(); //f_id updated to iteration factor index (pL or pR too)
 		}
 		//update lambda

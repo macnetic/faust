@@ -25,7 +25,6 @@ namespace Faust
 		static void* gp_funcs;
 		gm_MatArray_t gpu_mat_arr;
 		std::vector<void*> cpu_mat_ptrs; // cpu mat addresses for which gpu copies are stored in gpu_mat_arr
-		size_t size;
 
 		// this map is used to retrieve a cpu mat addr from a gpu mat addr
 		// this is needed because the RefManager works on cpu mat (to use gpu mat, bijection relationship)
@@ -46,6 +45,13 @@ namespace Faust
 		MatDense<FPP, Cpu> multiply(const Faust::MatGeneric<FPP,Cpu>*, const bool transpose = false, const bool conjugate = false);
 
 		Vect<FPP, Cpu> multiply(const Faust::Vect<FPP,Cpu>&, const bool transpose = false, const bool conjugate = false);
+
+		void pop_front();
+
+		void pop_back();
+		void push_back(MatGeneric<FPP,Cpu>* M);
+
+		void insert(const Faust::MatGeneric<FPP,Cpu>* M, int32_t id);
 
 		/* Update on gpu the copy matrix of M (M must have already been loaded otherwise an exception is raised) */
 		void update(const Faust::MatGeneric<FPP,Cpu>* M, int32_t id);

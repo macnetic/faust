@@ -1,10 +1,12 @@
 template<typename FPP, FDevice DEVICE>
 Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>&  A,
 		Params<FPP,DEVICE, Real<FPP>> & p,
-		Real<FPP>& lambda, const bool compute_2norm_on_array)
+		Real<FPP>& lambda, const bool compute_2norm_on_array,
+		const bool on_gpu)
 {
 	auto S = new Faust::TransformHelper<FPP,DEVICE>(); // A is copied
 	S->push_back(&A);
+	if(on_gpu) S->enable_gpu_meth_for_mul();
 	Faust::MatGeneric<FPP,DEVICE> *Si;
 	const Faust::ConstraintGeneric *fac_cons, *res_cons;
 	int zero_dims[2], id_dims[2];
@@ -82,6 +84,8 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 			Si_vec = {zero_mat, id_mat};
 		Si_cons = { const_cast<Faust::ConstraintGeneric*>(fac_cons), const_cast<Faust::ConstraintGeneric*>(res_cons) };
 		Faust::TransformHelper<FPP,DEVICE> Si_th(Si_vec, 1.0, false, false, true);
+//		Si_th.display();
+//		if(on_gpu) Si_th.enable_gpu_meth_for_mul();
 		lambda_ = 1;
 		tmp_dense = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Si);
 		if(tmp_dense == nullptr)
@@ -91,7 +95,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 		}
 		else tmp_sparse = nullptr;
 		Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, p.stop_crit_2facts, is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array,
-				norm2_threshold, norm2_max_iter, constant_step_size, step_size);
+				norm2_threshold, norm2_max_iter, constant_step_size, step_size, on_gpu);
 		if(tmp_sparse != nullptr)
 			// the Si factor has been converted into a MatDense in the memory
 			// storage
@@ -121,7 +125,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 
 		// global optimization
 		Faust::palm4msa2(A, glo_cons, *S, glo_lambda, p.stop_crit_global ,is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array,
-				norm2_threshold, norm2_max_iter, constant_step_size, step_size);
+				norm2_threshold, norm2_max_iter, constant_step_size, step_size, on_gpu);
 	}
 	lambda = glo_lambda;
 	return S;
@@ -139,12 +143,13 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
         const bool compute_2norm_on_array,
         const Real<FPP> norm2_threshold,
         const unsigned int norm2_max_iter, const bool is_verbose,
-		const bool constant_step_size, const Real<FPP> step_size)
+		const bool constant_step_size, const Real<FPP> step_size,
+		const bool on_gpu)
 {
     Faust::Params<FPP,DEVICE,Real<FPP>> p(A.getNbRow(), A.getNbCol(), fac_constraints.size()+1, {fac_constraints, res_constraints}, {}, sc[0], sc[1], is_verbose, is_update_way_R2L, is_fact_side_left, lambda, constant_step_size, step_size);
 	p.use_csr = use_csr;
 	p.packing_RL = packing_RL;
 	p.norm2_threshold = norm2_threshold;
 	p.norm2_max_iter = norm2_max_iter;
-    return Faust::hierarchical(A, p, lambda, compute_2norm_on_array);
+    return Faust::hierarchical(A, p, lambda, compute_2norm_on_array, on_gpu);
 }

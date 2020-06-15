@@ -127,7 +127,7 @@ namespace Faust {
 		this->Fv_mul_mode = th->Fv_mul_mode;
 #ifdef USE_GPU_MOD
 		if(th->gpu_faust)
-			this->enable_gpu_mod();
+			Faust::enable_gpu_mod();
 #endif
 	}
 
@@ -684,16 +684,16 @@ namespace Faust {
 #ifdef USE_GPU_MOD
 			if(mul_order_opt_mode == 10 && gpu_faust == nullptr)
 			{
-				try
-				{
+//				try
+//				{
 					gpu_faust = new Faust::FaustGPU<FPP>(this->transform->data);
-				}
-				catch(std::runtime_error & e)
-				{
-					// creation failed, nothing todo (must be because of cuda backend is not installed/found)
-					std::cerr << "error: can't change to GPU method (backend unavailable)." << std::endl;
-					return;
-				}
+//				}
+//				catch(std::runtime_error & e)
+//				{
+//					// creation failed, nothing todo (must be because of cuda backend is not installed/found)
+//					std::cerr << "error: can't change to GPU method (backend unavailable)." << std::endl;
+//					return;
+//				}
 			}
 #endif
 			this->mul_order_opt_mode = mul_order_opt_mode;
@@ -764,12 +764,20 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::pop_back()
         {
             transform->pop_back();
+#ifdef USE_GPU_MOD
+			if(gpu_faust)
+				gpu_faust->pop_back();
+#endif
         }
 
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::pop_front()
         {
             transform->pop_front();
+#ifdef USE_GPU_MOD
+			if(gpu_faust)
+				gpu_faust->pop_front();
+#endif
         }
 
 	template<typename FPP>
@@ -778,6 +786,10 @@ namespace Faust {
 			//warning: should not be called after initialization of factors (to respect the immutability property)
 			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after or just use it internally -- not py/matfaust)
 			this->transform->push_back(M, optimizedCopy, is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
+#ifdef USE_GPU_MOD
+			if(gpu_faust)
+				gpu_faust->push_back(const_cast<MatGeneric<FPP,Cpu>*>(M));
+#endif
 		}
     
 	template<typename FPP>
@@ -786,6 +798,10 @@ namespace Faust {
 			//warning: should not be called after initialization of factors (to respect the immutability property)
 			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after or just use it internally -- not py/matfaust)
 			this->transform->push_first(M, optimizedCopy, is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
+#ifdef USE_GPU_MOD
+			if(gpu_faust)
+				gpu_faust->insert(M, 0);
+#endif
 		}
 
 	template<typename FPP>

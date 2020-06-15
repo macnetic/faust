@@ -93,6 +93,89 @@ namespace Faust
 		}
 
 	template <>
+	void FaustGPU<@FAUST_SCALAR_FOR_GM@>::pop_front()
+	{
+		if(cpu_mat_ptrs.size() > 0)
+		{
+			if(use_ref_man)
+				ref_man.release(*(cpu_mat_ptrs.begin()));
+			cpu_mat_ptrs.erase(cpu_mat_ptrs.begin());
+		}
+	}
+
+	template <>
+	void FaustGPU<@FAUST_SCALAR_FOR_GM@>::pop_back()
+	{
+		if(cpu_mat_ptrs.size() > 0)
+		{
+			if(use_ref_man)
+				ref_man.release(*(cpu_mat_ptrs.end()-1));
+			auto marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+			marr_funcs->erase_at(gpu_mat_arr, cpu_mat_ptrs.size()-1, !use_ref_man);
+			cpu_mat_ptrs.erase(cpu_mat_ptrs.end()-1);
+		}
+	}
+
+	template <>
+	void FaustGPU<@FAUST_SCALAR_FOR_GM@>::push_back(MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>* M)
+	{
+//		std::cout << "push_back M=" << M << " size: " << cpu_mat_ptrs.size() << " this:" << this << std::endl;
+		MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>* sp_mat;
+		MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>* ds_mat;
+		void* gpu_ref; //sp or ds mat
+
+		auto dsm_funcs = (gm_DenseMatFunc_@GM_SCALAR@*) this->dsm_funcs;
+		auto marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+		auto gp_funcs = (gm_GenPurposeFunc_@GM_SCALAR@*) this->gp_funcs;
+
+
+		if(use_ref_man && cpu_gpu_map.find(M) != cpu_gpu_map.end())
+		{
+			// already known cpu, gpu mats
+
+			// add the gpu matrix to gpu mat list
+			if(dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M))
+			{
+//				std::cout << "add the gpu dense matrix to gpu mat list" << std::endl;
+				marr_funcs->addgpu_dsm(gpu_mat_arr, cpu_gpu_map[M]);
+			}
+			else
+			{
+//				std::cout << "add the gpu sparse matrix to gpu mat list" << std::endl;
+				// M is sparse
+				marr_funcs->addgpu_spm(gpu_mat_arr, cpu_gpu_map[M]);
+			}
+
+			cpu_mat_ptrs.push_back(M);
+
+			ref_man.acquire(M);
+
+			return;
+		}
+
+		if(sp_mat = dynamic_cast<MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M))
+		{
+
+//			std::cout << "FaustGPU(): " << sp_mat->getNbRow() << " " << sp_mat->getNbCol()<< " " << sp_mat->getNonZeros()<< std::endl;
+			gpu_ref = marr_funcs->togpu_spm(gpu_mat_arr, sp_mat->getNbRow(), sp_mat->getNbCol(), sp_mat->getNonZeros(), sp_mat->getOuterIndexPtr(), sp_mat->getInnerIndexPtr(), (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(sp_mat->getValuePtr()));
+//			std::cout << "after togpu_spm" << std::endl;
+		}
+		else if(ds_mat = dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M))
+		{
+//			std::cout << "FaustGPU(): " << ds_mat->getNbRow() << " " << ds_mat->getNbCol()<< " " << ds_mat->getNonZeros()<< std::endl;
+			gpu_ref = marr_funcs->togpu_dsm(gpu_mat_arr, ds_mat->getNbRow(), ds_mat->getNbCol(), (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(ds_mat->getData()));
+//			std::cout << "after togpu_dsm" << std::endl;
+		}
+
+		cpu_mat_ptrs.push_back(M);
+		if(use_ref_man)
+		{
+			cpu_gpu_map[M] = gpu_ref;
+			ref_man.acquire(M);
+		}
+	}
+
+	template <>
 		FaustGPU<@FAUST_SCALAR_FOR_GM@>::~FaustGPU()
 		{
 			gm_users--;
@@ -131,12 +214,10 @@ namespace Faust
 		{
 			//	std::cout << "FaustGPU<@FAUST_SCALAR_FOR_GM@>::FaustGPU()" << " marr_funcs:" << marr_funcs << std::endl;
 			check_gpu_mod_loaded();
-			MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>* sp_mat;
-			MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>* ds_mat;
+
 			gm_DenseMatFunc_@GM_SCALAR@* dsm_funcs;
 			gm_MatArrayFunc_@GM_SCALAR@* marr_funcs;
 			gm_GenPurposeFunc_@GM_SCALAR@* gp_funcs;
-			void* gpu_ref; //sp or ds mat
 
 			if(this->marr_funcs == nullptr)
 			{
@@ -160,60 +241,25 @@ namespace Faust
 			//	std::cout << "FaustGPU<@FAUST_SCALAR_FOR_GM@>::FaustGPU() factors size: " << factors.size() << " marr_funcs:" << marr_funcs << std::endl;
 			gpu_mat_arr = marr_funcs->create();
 			//	std::cout << "FaustGPU<@FAUST_SCALAR_FOR_GM@>::FaustGPU() factors size: " << factors.size() << std::endl;
-			size = 0;
 			nrows = factors[0]->getNbRow();
 			ncols = (*(factors.end()-1))->getNbCol();
 			for(auto m: factors)
 			{
-
-				if(use_ref_man && cpu_gpu_map.find(m) != cpu_gpu_map.end())
-				{
-					// already known cpu, gpu mats
-
-					// add the gpu matrix to gpu mat list
-					if(dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>*>(m))
-						marr_funcs->addgpu_dsm(gpu_mat_arr, cpu_gpu_map[m]);
-					else
-						// m is sparse
-						marr_funcs->addgpu_spm(gpu_mat_arr, cpu_gpu_map[m]);
-
-					cpu_mat_ptrs.push_back(m);
-
-					ref_man.acquire(m);
-
-					continue;
-				}
-
-				if(sp_mat = dynamic_cast<MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu>*>(m))
-				{
-
-					//			std::cout << "FaustGPU(): " << sp_mat->getNbRow() << " " << sp_mat->getNbCol()<< " " << sp_mat->getNonZeros()<< std::endl;
-					gpu_ref = marr_funcs->togpu_spm(gpu_mat_arr, sp_mat->getNbRow(), sp_mat->getNbCol(), sp_mat->getNonZeros(), sp_mat->getOuterIndexPtr(), sp_mat->getInnerIndexPtr(), (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(sp_mat->getValuePtr()));
-				}
-				else if(ds_mat = dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>*>(m))
-				{
-
-					//			std::cout << "FaustGPU(): " << ds_mat->getNbRow() << " " << ds_mat->getNbCol()<< " " << ds_mat->getNonZeros()<< std::endl;
-					gpu_ref = marr_funcs->togpu_dsm(gpu_mat_arr, ds_mat->getNbRow(), ds_mat->getNbCol(), (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(ds_mat->getData()));
-				}
-				size++;
-
-				cpu_mat_ptrs.push_back(m);
-				if(use_ref_man)
-				{
-					cpu_gpu_map[m] = gpu_ref;
-					ref_man.acquire(m);
-				}
+				push_back(m);
 			}
 		}
 
 	template <>
 	void FaustGPU<@FAUST_SCALAR_FOR_GM@>::update(const Faust::MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>* M, int32_t id)
 	{
+//		std::cout << "update M=" << M << " id=" << id << " this:" << this << std::endl;
 		MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>* M_ = const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M);
 		// I promise I won't touch M_ data!
 		if(M != cpu_mat_ptrs[id])
+		{
+//			std::cout << "M: " << M << ", cpu_mat_ptrs[id]: " << cpu_mat_ptrs[id] << std::endl;
 			throw std::runtime_error("It's not authorized to update from another cpu matrix than the original one.");
+		}
 
 		gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
 		MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>* sp_mat;
@@ -224,15 +270,68 @@ namespace Faust
 		if(sp_mat = dynamic_cast<MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M_))
 		{
 
-			//			std::cout << "FaustGPU::update(): " << sp_mat->getNbRow() << " " << sp_mat->getNbCol()<< " " << sp_mat->getNonZeros()<< std::endl;
+//			std::cout << "FaustGPU::update() sparse: " << sp_mat->getNbRow() << " " << sp_mat->getNbCol()<< " " << sp_mat->getNonZeros()<< std::endl;
 			gpu_ref = marr_funcs->cpu_set_spm_at(gpu_mat_arr, sp_mat->getNbRow(), sp_mat->getNbCol(), sp_mat->getNonZeros(), sp_mat->getOuterIndexPtr(), sp_mat->getInnerIndexPtr(), (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(sp_mat->getValuePtr()), id);
 		}
 		else if(ds_mat = dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M_))
 		{
 
-			//			std::cout << "FaustGPU::update(): " << ds_mat->getNbRow() << " " << ds_mat->getNbCol()<< " " << ds_mat->getNonZeros()<< std::endl;
+//			std::cout << "FaustGPU::update() dense: " << ds_mat->getNbRow() << " " << ds_mat->getNbCol()<< " " << ds_mat->getNonZeros()<< std::endl;
 			gpu_ref =  marr_funcs->cpu_set_dsm_at(gpu_mat_arr, ds_mat->getNbRow(), ds_mat->getNbCol(), (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(ds_mat->getData()), id);
 		}
 		// gpu_ref is not recorded because this is an assignment of data but the pointers don't change
+
+	}
+
+	template <>
+	void FaustGPU<@FAUST_SCALAR_FOR_GM@>::insert(const Faust::MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>* M, int32_t id)
+	{
+		MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>* M_ = const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M);
+		gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+		MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>* sp_mat;
+		MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>* ds_mat;
+		void* gpu_ref;
+
+		if(use_ref_man && cpu_gpu_map.find(M_) != cpu_gpu_map.end())
+		{
+			// already known cpu, gpu mats
+			// add the gpu matrix to gpu mat list
+//			std::cout << "insert at " << id << " the gpu matrix to gpu mat list reused M=" << M << " this:" << this << std::endl;
+			if(dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M_))
+				marr_funcs->insert_dsm(gpu_mat_arr, cpu_gpu_map[M_], id);
+			else
+				// M is sparse
+				marr_funcs->insert_spm(gpu_mat_arr, cpu_gpu_map[M_], id);
+
+			cpu_mat_ptrs.insert(cpu_mat_ptrs.begin()+id,M_);
+
+			ref_man.acquire(M_);
+
+			return;
+		}
+
+		// if the dims are not equal between M_ and the gpu mat, an exception will be raised by gpu_mod
+		if(sp_mat = dynamic_cast<MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M_))
+		{
+
+			gpu_ref = marr_funcs->togpu_insert_spm(gpu_mat_arr, sp_mat->getNbRow(), sp_mat->getNbCol(), sp_mat->getNonZeros(), sp_mat->getOuterIndexPtr(), sp_mat->getInnerIndexPtr(), (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(sp_mat->getValuePtr()), id);
+		}
+		else if(ds_mat = dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M_))
+		{
+
+			gpu_ref =  marr_funcs->togpu_insert_dsm(gpu_mat_arr, ds_mat->getNbRow(), ds_mat->getNbCol(), (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(ds_mat->getData()), id);
+		}
+
+		cpu_mat_ptrs.insert(cpu_mat_ptrs.begin()+id, M_);
+
+
+//		std::cout << "insert at " << id << " the gpu matrix to gpu mat list M=" << M << " this:" << this << std::endl;
+
+		if(use_ref_man)
+		{
+			cpu_gpu_map[M_] = gpu_ref;
+			ref_man.acquire(M_);
+		}
+
 	}
 }

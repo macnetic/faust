@@ -209,7 +209,7 @@ cdef extern from "FaustFact.h":
 
     cdef FaustCoreCpp[FPP]* hierarchical2020[FPP](FPP* mat, unsigned int
                                                   num_rows, unsigned int
-                                                  num_cols, 
+                                                  num_cols,
                                                   #unsigned int nites,
                                                   PyxStoppingCriterion*,
                                                   PyxConstraintGeneric**
@@ -224,23 +224,25 @@ cdef extern from "FaustFact.h":
                                                   double norm2_threshold, bool
                                                   is_verbose, bool
                                                   constant_step_size,
-                                                  double step_size)
+                                                  double step_size,
+                                                  const bool on_gpu)
 
     cdef FaustCoreCpp[FPP]* palm4msa2020[FPP](FPP* mat,
-                                            unsigned int num_rows,
-                                            unsigned int num_cols,
-                                            PyxConstraintGeneric** constraints,
-                                            unsigned int num_cons,
-                                            double* inout_lambda,
-                                            PyxStoppingCriterion sc,
-                                            bool is_update_way_R2L,
-                                            bool use_csr,
-                                            bool packing_RL,
-                                            unsigned int norm2_max_iter,
-                                            double norm2_threshold,
-                                            bool is_verbose,
-                                            bool constant_step_size,
-                                            double step_size)
+                                              unsigned int num_rows,
+                                              unsigned int num_cols,
+                                              PyxConstraintGeneric** constraints,
+                                              unsigned int num_cons,
+                                              double* inout_lambda,
+                                              PyxStoppingCriterion sc,
+                                              bool is_update_way_R2L,
+                                              bool use_csr,
+                                              bool packing_RL,
+                                              unsigned int norm2_max_iter,
+                                              double norm2_threshold,
+                                              bool is_verbose,
+                                              bool constant_step_size,
+                                              double step_size,
+                                              const bool on_gpu)
 
 
 

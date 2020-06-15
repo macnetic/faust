@@ -17,12 +17,15 @@ namespace Faust
 			const Real<FPP> norm2_threshold=FAUST_PRECISION,
 			const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
 			const bool is_verbose=false,
-			const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION);
+			const bool constant_step_size=false,
+			const Real<FPP> step_size=FAUST_PRECISION,
+			const bool on_gpu=false);
 
 	template<typename FPP, FDevice DEVICE>
 		Faust::TransformHelper<FPP,DEVICE>* hierarchical(const Faust::MatDense<FPP,DEVICE>&  A,
 				Faust::Params<FPP,DEVICE, Real<FPP>> &p,
-				Real<FPP>& lambda, const bool compute_2norm_on_array);
+				Real<FPP>& lambda, const bool compute_2norm_on_array,
+				const bool on_gpu=false);
 }
 
 #include "faust_hierarchical.hpp"
