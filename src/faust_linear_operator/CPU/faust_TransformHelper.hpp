@@ -42,6 +42,7 @@
 #include "faust_FFT.h"
 #include "faust_WHT.h"
 #include "faust_linear_algebra.h"
+#include "faust_prod_opt.h"
 #include <chrono>
 #include <cstdlib>
 
@@ -288,10 +289,10 @@ namespace Faust {
 
 			switch(this->mul_order_opt_mode)
 			{
-				case 1:
-				case 2:
-				case 3:
-				case 4:
+				case ORDER_ALL_ENDS:
+				case ORDER_1ST_BEST:
+				case ORDER_ALL_BEST_CONVDENSE:
+				case ORDER_ALL_BEST_MIXED:
 					{
 						//					this->transform->data.push_back(const_cast<Faust::MatDense<FPP,Cpu>*>(&A)); // it's ok
 						std::vector<Faust::MatGeneric<FPP,Cpu>*> data(this->transform->size()+1);
@@ -313,20 +314,20 @@ namespace Faust {
 						//					this->transform->data.erase(this->transform->data.end()-1);
 					}
 					break;
-				case 5:
-					M = this->transform->multiply_par(A, isTransposed2char());
+				case PAR_SUBPRODS_CPP:
+					M = Faust::multiply_par(this->transform->data, A, isTransposed2char());
 					break;
-				case 6:
-					M = this->transform->multiply_omp(A, isTransposed2char());
+				case PAR_SUBPRODS_OMP:
+					M = Faust::multiply_omp(this->transform->data, A, isTransposed2char());
 					break;
 #ifdef FAUST_TORCH
-				case 7:
+				case TORCH_CPU:
 					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false, /*clone */ false, /* chain_opt */ false, /* contiguous_dense_to_torch */ false, !is_transposed);
 					break;
-				case 8:
+				case TORCH_CPU_BEST_ORDER:
 					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false,  /*clone */ false,/* chain_opt */ true, /* contiguous_dense_to_torch */ false, !is_transposed);
 					break;
-				case 9:
+				case TORCH_CPU_DENSE_ROW_TO_TORCH:
 					Faust::tensor_chain_mul(tensor_data, M, &A, /* on_gpu */ false, /*clone */ false, /* chain_opt */ false, /* contiguous_dense_to_torch */ true, !is_transposed);
 					break;
 #endif
@@ -1538,6 +1539,7 @@ namespace Faust {
 			//			last_fact->Display();
 			for(faust_unsigned_int i=0;i<ncols;i++)
 			{
+
 				//TODO: we shouldn't have to const_cast, slice() must be const
 				const TransformHelper<FPP,Cpu> * col = const_cast<TransformHelper<FPP,Cpu> *>(this)->slice(0,nrows, i, i+1);
 				//				cout << "TransformHelper normalize, meth=" << meth << endl;

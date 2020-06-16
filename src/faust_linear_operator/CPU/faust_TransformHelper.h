@@ -68,22 +68,6 @@ namespace Faust {
 	template<typename FPP,FDevice DEVICE> class MatGeneric;
 	template<typename FPP> class FaustGPU;
 
-
-	enum FaustMulMode
-	{
-		DEFAULT,
-		ORDER_ALL_ENDS,
-		ORDER_1ST_BEST,
-		ORDER_ALL_BEST_CONVDENSE,
-		ORDER_ALL_BEST_MIXED,
-		PAR_SUBPRODS_CPP,
-		PAR_SUBPRODS_OMP,
-		TORCH_CPU,
-		TORCH_CPU_BEST_ORDER,
-		TORCH_CPU_DENSE_ROW_TO_TORCH,
-		GPU_MOD
-	};
-
 	enum RandFaustType {
 		DENSE,
 		SPARSE,
@@ -117,7 +101,6 @@ namespace Faust {
 #ifdef USE_GPU_MOD
 			FaustGPU<FPP> *gpu_faust;
 #endif
-
 			void eval_sliced_Transform();
 			void eval_fancy_idx_Transform();
 			public:

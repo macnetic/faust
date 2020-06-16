@@ -55,6 +55,7 @@
 #include "faust_MatDense.h"
 
 #include "faust_linear_algebra.h"
+#include "faust_prod_opt.h"
 #include "faust_prox.h"
 #include "faust_ConstraintType.h"
 #include "faust_exception.h"

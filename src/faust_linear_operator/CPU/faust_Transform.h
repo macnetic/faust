@@ -82,9 +82,6 @@ namespace Faust
 
 
 	template<typename FPP>
-		void multiply_par_run(int nth, int thid, int num_per_th, int data_size, char opThis, std::vector<Faust::MatGeneric<FPP, Cpu>*>& data, std::vector<Faust::MatDense<FPP,Cpu>*>& mats, std::vector<std::thread*>& threads, std::mutex &, std::condition_variable &, int &);
-
-	template<typename FPP>
 		class Transform<FPP,Cpu> : public Faust::LinearOperator<FPP,Cpu>
 		{
 
@@ -271,9 +268,6 @@ namespace Faust
 				{
 					return this->multiply(x,'N');
 				}
-				Faust::MatDense<FPP,Cpu> multiply_omp(const Faust::MatDense<FPP,Cpu> A, const char opThis) const;
-				Faust::MatDense<FPP,Cpu> multiply_par(const Faust::MatDense<FPP,Cpu> A, const char opThis) const;
-
 
 				/*!
 				 * \brief multiplication between with vector x
