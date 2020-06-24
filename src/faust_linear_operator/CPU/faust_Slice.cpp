@@ -15,7 +15,7 @@ namespace Faust {
 		}
 	}
 
-	Slice::Slice(Slice& s)
+	Slice::Slice(const Slice& s)
 	{
 		this->copy(s);
 	}
@@ -35,7 +35,7 @@ namespace Faust {
 		return this->start_id >= s.start_id && this->end_id <= s.end_id;
 	}
 
-	void Slice::copy(Slice& s)
+	void Slice::copy(const Slice& s)
 	{
 		this->start_id = s.start_id;
 		this->end_id = s.end_id;

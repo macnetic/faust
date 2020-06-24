@@ -12,12 +12,12 @@ namespace Faust {
 		faust_unsigned_int end_id;
 
 		Slice(faust_unsigned_int start_id, faust_unsigned_int end_id);
-		Slice(Slice&);
+		Slice(const Slice&);
 		Slice();
 
 		bool belong_to(faust_unsigned_int min_i, faust_unsigned_int max_i);
 		bool belong_to(Slice& s);
-		void copy(Slice& s);
+		void copy(const Slice& s);
 
 		static void swap(Slice& s1, Slice& s2);
 
