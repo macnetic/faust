@@ -96,7 +96,7 @@ namespace Faust {
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right)
+		TransformHelper<FPP,Cpu>::TransformHelper(const TransformHelper<FPP,Cpu>* th_left, const TransformHelper<FPP,Cpu>* th_right)
 		: TransformHelper<FPP,Cpu>()
 		{
 			bool right_left_transposed = th_left->is_transposed && th_right->is_transposed;
@@ -115,7 +115,7 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate) : TransformHelper<FPP,Cpu>()
+		TransformHelper<FPP,Cpu>::TransformHelper(const TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate) : TransformHelper<FPP,Cpu>()
 	{
 		this->transform = th->transform;
 		this->is_transposed = transpose?!th->is_transposed:th->is_transposed;
@@ -735,7 +735,7 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::multiply(TransformHelper<FPP, Cpu>* th_right)
+		TransformHelper<FPP, Cpu>* TransformHelper<FPP,Cpu>::multiply(const TransformHelper<FPP, Cpu>* th_right) const
 		{
 			return new TransformHelper<FPP,Cpu>(this, th_right);
 		}
@@ -1092,7 +1092,7 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP, Cpu>::copy_slices(TransformHelper<FPP, Cpu> *th, const bool transpose /* default to false */)
+		void TransformHelper<FPP, Cpu>::copy_slices(const TransformHelper<FPP, Cpu> *th, const bool transpose /* default to false */)
 		{
 			this->slices[0].copy(th->slices[0]);
 			this->slices[1].copy(th->slices[1]);
@@ -1252,6 +1252,44 @@ namespace Faust {
 	template<typename FPP>
 		double TransformHelper<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
 		{
+#ifdef USE_GPU_MOD
+			if(gpu_faust != nullptr)
+			{
+				bool purely_sparse = true;
+				bool all_squares = true; // it's about factors
+				for(auto f: this->transform->data)
+				{
+					if(dynamic_cast<MatSparse<FPP,Cpu>*>(f) == nullptr)
+						purely_sparse = false;
+					all_squares = all_squares && f->getNbCol() == f->getNbRow();
+				}
+//				std::cout << "purely_sparse=" << purely_sparse << " all_squares=" << all_squares << std::endl;
+				if(purely_sparse && ! all_squares)
+				{
+//					std::cout << "method 1 used for gpu spectral norm" << std::endl;
+					// this method is slower because of the copy on CPU side of the transposed factors to construct FF'
+					TransformHelper<FPP,Cpu> *AtA;
+					TransformHelper<FPP,Cpu>* At = this->adjoint();
+					if(this->getNbCol() < this->getNbRow())
+					{
+						AtA = At->multiply(this);
+					}
+					else
+					{
+						AtA = this->multiply(At);
+					}
+					AtA->enable_gpu_meth_for_mul(); //TODO: it should not be needed if A is already GPU enabled
+					FPP maxAbsValue = std::sqrt(AtA->gpu_faust->power_iteration(nbr_iter_max, threshold, flag));
+					delete AtA;
+				}
+				else
+				{
+//					std::cout << "method 2 used for gpu spectral norm" << std::endl;
+					FPP maxAbsValue = std::sqrt(this->gpu_faust->power_iteration2(nbr_iter_max, threshold, flag));
+					return absValue(maxAbsValue);
+				}
+			}
+#endif
 			vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
 			int start_id, end_id;
 			this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
@@ -1472,7 +1510,7 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::adjoint()
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::adjoint() const
 		{
 			return new TransformHelper<FPP,Cpu>(this, true, true);
 		}

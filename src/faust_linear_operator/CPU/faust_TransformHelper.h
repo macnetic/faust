@@ -106,11 +106,11 @@ namespace Faust {
 			public:
 			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
 			TransformHelper();
-			TransformHelper(TransformHelper<FPP,Cpu>* th_left, TransformHelper<FPP,Cpu>* th_right);
+			TransformHelper(const TransformHelper<FPP,Cpu>* th_left, const TransformHelper<FPP,Cpu>* th_right);
 			TransformHelper(TransformHelper<FPP,Cpu>* th);
 			TransformHelper(TransformHelper<FPP,Cpu>& th);
 			void operator=(TransformHelper<FPP,Cpu>& th);
-			TransformHelper(TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate);
+			TransformHelper(const TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, Slice s[2]);
 			TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			TransformHelper(Transform<FPP,Cpu> &t, const bool moving=false);
@@ -127,7 +127,7 @@ namespace Faust {
 			int get_mul_order_opt_mode() const;
 			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 
-			TransformHelper<FPP, Cpu>* multiply(TransformHelper<FPP, Cpu>*);
+			TransformHelper<FPP, Cpu>* multiply(const TransformHelper<FPP, Cpu>*) const;
 			TransformHelper<FPP, Cpu>* multiply(FPP& scalar);
 			template<typename Head, typename ... Tail>
 				void push_back_(Head& h, Tail&... t);
@@ -186,7 +186,7 @@ namespace Faust {
 			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			TransformHelper<FPP,Cpu>* transpose();
 			TransformHelper<FPP,Cpu>* conjugate();
-			TransformHelper<FPP,Cpu>* adjoint();
+			TransformHelper<FPP,Cpu>* adjoint() const;
 			TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);
 			TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
 			bool isTransposed() const;
@@ -242,7 +242,7 @@ namespace Faust {
 			MatGeneric<FPP,Cpu>* get_gen_fact_nonconst(const faust_unsigned_int id) const;
 			void update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id);
 			private:
-			void copy_slices(TransformHelper<FPP, Cpu>* th, const bool transpose = false);
+			void copy_slices(const TransformHelper<FPP, Cpu>* th, const bool transpose = false);
 			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;
 		};
 }

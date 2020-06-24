@@ -334,4 +334,100 @@ namespace Faust
 		}
 
 	}
+
+	template<>
+		@FAUST_SCALAR_FOR_GM@ FaustGPU<@FAUST_SCALAR_FOR_GM@>::power_iteration(int32_t max_iter, Real<@FAUST_SCALAR_FOR_GM@> threshold, int& flag)
+		{
+			int i = 0;
+			int32_t nrows, ncols, xk_bufsz=0, xk2_bufsz=0; //TODO: remove (just here fore test info of xk)
+			gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+			gm_DenseMatFunc_@GM_SCALAR@* dsm_funcs = (gm_DenseMatFunc_@GM_SCALAR@*) this->dsm_funcs;
+			Faust::Vect<@FAUST_SCALAR_FOR_GM@,Cpu> xk_cpu(this->ncols);
+			xk_cpu.setOnes();
+			for(auto p: cpu_mat_ptrs)
+			{
+				auto mat = static_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>*>(p);
+				if(xk_bufsz < mat->getNbCol()) // xk buf receives the result of F'*xk2
+					xk_bufsz = mat->getNbCol();
+				if(xk2_bufsz < mat->getNbRow()) // xk2 buf receives the result of F*xk
+					xk2_bufsz = mat->getNbRow();
+			}
+			auto xk = dsm_funcs->togpu_bufsz(this->ncols, 1, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(xk_cpu.getData()), xk_bufsz, 1);
+			auto xk_norm = dsm_funcs->togpu_bufsz(this->ncols, 1, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(xk_cpu.getData()), xk_bufsz, 1); // the CPU data is irrelevant for xk_norm but it doesn't matter
+			@FAUST_SCALAR_FOR_GM@ lambda_old = 1.0;
+			@FAUST_SCALAR_FOR_GM@ lambda = 0.0;
+			@FAUST_SCALAR_FOR_GM@ alpha = 1.0;
+			@FAUST_SCALAR_FOR_GM@ beta = 0.0;
+			gm_Op op = OP_NOTRANSP;
+//			if(transpose)
+//				if(conjugate)
+//					op = OP_CONJTRANSP;
+//				else
+//					op = OP_TRANSP;
+			@GM_SCALAR@ one;
+			set_one<@GM_SCALAR@>(&one);
+			while((Faust::fabs(lambda_old-lambda)> Faust::fabs(threshold) || Faust::fabs(lambda) <= Faust::fabs(threshold)) && i < max_iter)
+			{
+				i++;
+				lambda_old = lambda;
+				dsm_funcs->copy(xk, xk_norm);
+				dsm_funcs->normalize(xk_norm);
+				/*xk = */marr_funcs->chain_matmul_by_dsm_into(gpu_mat_arr, one, op, xk_norm, xk);
+				dsm_funcs->info(xk, &nrows, &ncols);
+				dsm_funcs->dot(xk, xk_norm, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&lambda));
+			}
+			flag = (i<max_iter)?i:-1;
+			return lambda;
+		}
+
+	template<>
+		@FAUST_SCALAR_FOR_GM@ FaustGPU<@FAUST_SCALAR_FOR_GM@>::power_iteration2(int32_t max_iter, Real<@FAUST_SCALAR_FOR_GM@> threshold, int& flag)
+		{
+			int i = 0;
+			int32_t nrows, ncols, xk_bufsz=0, xk2_bufsz=0; //TODO: remove (just here fore test info of xk)
+			gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+			gm_DenseMatFunc_@GM_SCALAR@* dsm_funcs = (gm_DenseMatFunc_@GM_SCALAR@*) this->dsm_funcs;
+			//TODO: allow to work with F'F or FF' // up to this we compute only F'F
+			Faust::Vect<@FAUST_SCALAR_FOR_GM@,Cpu> xk_cpu(this->nrows);
+			Faust::Vect<@FAUST_SCALAR_FOR_GM@,Cpu> xk2_cpu(this->ncols);
+			xk_cpu.setOnes();
+			for(auto p: cpu_mat_ptrs)
+			{
+				auto mat = static_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>*>(p);
+				if(xk_bufsz < mat->getNbCol()) // xk buf receives the result of F'*xk2
+					xk_bufsz = mat->getNbCol();
+				if(xk2_bufsz < mat->getNbRow()) // xk2 buf receives the result of F*xk
+					xk2_bufsz = mat->getNbRow();
+			}
+			auto xk = dsm_funcs->togpu_bufsz(this->ncols, 1, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(xk_cpu.getData()), xk_bufsz, 1);
+			auto xk_norm = dsm_funcs->togpu_bufsz(this->ncols, 1, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(xk_cpu.getData()), xk_bufsz, 1); // the CPU data is irrelevant for xk_norm but it doesn't matter
+			auto xk2 = dsm_funcs->togpu_bufsz(this->nrows, 1, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(xk2_cpu.getData()), xk2_bufsz, 1);
+			@FAUST_SCALAR_FOR_GM@ lambda_old = 1.0;
+			@FAUST_SCALAR_FOR_GM@ lambda = 0.0;
+			@FAUST_SCALAR_FOR_GM@ alpha = 1.0;
+			@FAUST_SCALAR_FOR_GM@ beta = 0.0;
+			//TODO: consider the optimal order: FF'*xk or F'F*xk
+			gm_Op op = OP_NOTRANSP;
+			gm_Op op2 = OP_TRANSP; //TODO: complex case //verify if OP_CONJTRANSP is more costful
+//			if(transpose)
+//				if(conjugate)
+//					op = OP_CONJTRANSP;
+//				else
+//					op = OP_TRANSP;
+			@GM_SCALAR@ one;
+			set_one<@GM_SCALAR@>(&one);
+			while((Faust::fabs(lambda_old-lambda)> Faust::fabs(threshold) || Faust::fabs(lambda) <= Faust::fabs(threshold)) && i < max_iter)
+			{
+				i++;
+				lambda_old = lambda;
+				dsm_funcs->copy(xk, xk_norm);
+				dsm_funcs->normalize(xk_norm);
+				marr_funcs->chain_matmul_by_dsm_into(gpu_mat_arr, one, op, xk_norm, xk2);
+				marr_funcs->chain_matmul_by_dsm_into(gpu_mat_arr, one, op2, xk2, xk);
+				dsm_funcs->dot(xk, xk_norm, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&lambda));
+			}
+			flag = (i<max_iter)?i:-1;
+			return lambda;
+		}
+
 }

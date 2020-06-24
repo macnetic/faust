@@ -53,6 +53,14 @@ namespace Faust
 
 		void insert(const Faust::MatGeneric<FPP,Cpu>* M, int32_t id);
 
+		/** TODO: this function should be deleted because it definitely slower than the version 2 */
+		FPP power_iteration(int32_t max_iter, Real<FPP> threshold, int& flag);
+
+		/** This version differs from power_iteration in the way it computes F'Fv in this order F'(Fv)
+		 * so that it doesn't need to load all factors of F'F into GPU memory but only F.
+		 */
+		FPP power_iteration2(int32_t max_iter, Real<FPP> threshold, int& flag);
+
 		/* Update on gpu the copy matrix of M (M must have already been loaded otherwise an exception is raised) */
 		void update(const Faust::MatGeneric<FPP,Cpu>* M, int32_t id);
 
