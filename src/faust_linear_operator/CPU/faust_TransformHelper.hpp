@@ -314,10 +314,10 @@ namespace Faust {
 						//					this->transform->data.erase(this->transform->data.end()-1);
 					}
 					break;
-				case PAR_SUBPRODS_CPP:
+				case CPP_PROD_PAR_REDUC:
 					M = Faust::multiply_par(this->transform->data, A, isTransposed2char());
 					break;
-				case PAR_SUBPRODS_OMP:
+				case OMP_PROD_PAR_REDUC:
 					M = Faust::multiply_omp(this->transform->data, A, isTransposed2char());
 					break;
 #ifdef FAUST_TORCH
@@ -449,7 +449,7 @@ namespace Faust {
 //			MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(transp?this->getNbRow():this->getNbCol(), 2048);
 			int old_meth = this->get_mul_order_opt_mode();
 			int nmuls = nsamples, opt_meth=0;
-			std::vector<int> disabled_meths = {5, 6}; //skip openmp method (not supported on macOS)
+			std::vector<int> disabled_meths = {CPP_PROD_PAR_REDUC, OMP_PROD_PAR_REDUC}; // skip openmp/C++ threads methods because they are unfruitful when Eigen is multithreaded
 #if DEBUG_OPT_MUL
 			cout << "nsamples used to measure time: " << nmuls << endl;
 #endif

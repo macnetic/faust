@@ -36,11 +36,12 @@
 #include <string>
 #include <sstream>
 #include <chrono>
+#include <Eigen/Core>
 
 #include <iostream>
 #include <iomanip>
 
-/** \brief unitary test for testing multiplication by faust									
+/** \brief unitary test for testing multiplication by faust
 */
 
 typedef @TEST_FPP@ FPP;
@@ -58,6 +59,12 @@ int main(int argc, char* argv[])
 	if (typeid(FPP) == typeid(float))
 	{
 		cout<<"floating point precision == float"<<endl;
+	}
+
+	if(argc > 1)
+	{
+		std::cout << "WARNING: Eigen is monothreaded." << std::endl;
+		Eigen::setNbThreads(1);
 	}
 
 	//RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true

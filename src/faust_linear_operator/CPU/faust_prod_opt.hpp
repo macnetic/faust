@@ -346,7 +346,7 @@ template<typename FPP, FDevice DEVICE>
 Faust::MatDense<FPP,DEVICE> Faust::multiply_omp(const std::vector<Faust::MatGeneric<FPP,DEVICE>*> data, const Faust::MatDense<FPP,DEVICE> A, const char opThis)
 {
 	Faust::MatDense<FPP, DEVICE> *M = nullptr;
-#ifdef _OPENMP_
+//#ifdef _OPENMP_
 	int nth, thid, num_per_th, data_size;
 	Faust::MatDense<FPP,DEVICE>* mats[8];
 	Faust::MatGeneric<FPP, DEVICE> * _data[data.size()+1];
@@ -425,9 +425,9 @@ Faust::MatDense<FPP,DEVICE> Faust::multiply_omp(const std::vector<Faust::MatGene
 	}
 	//TODO: delete other thread mats
 	//TODO: return a ptr instead of a copy
-#else
-	throw std::runtime_error("It's not possible to call Faust::Transform::multiply_omp because the library hasn't been compiled with OpenMP enabled.");
-#endif
+//#else
+//	throw std::runtime_error("It's not possible to call Faust::Transform::multiply_omp because the library hasn't been compiled with OpenMP enabled.");
+//#endif
 	return *M;
 }
 
