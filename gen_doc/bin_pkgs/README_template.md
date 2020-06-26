@@ -30,6 +30,9 @@ Note also that you can rely on your system package manager to install the Python
 
 FAµST supports at least Python 2.7.15 and is also compiled for Python @PY3_VER@.
 
+Note that starting from january 2020 python2.7 won't be supported anymore and FAµST newer packages won't deliver any python 2.7 wrapper too.
+Anyway, the python 3 versions are more advanced and it's highly recommended to move to these versions.
+
 If you want to use FAµST with Python 3 you must use precisely the @PY3_VER@ version because the FAµST Python wrapper delivered within the binary package is compiled for that version only.
 
 @note pygsp is an optional python package to install in order to generate graphs and their Laplacians for testing the FGFT/eigen decomposition algorithms.
