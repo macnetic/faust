@@ -41,7 +41,7 @@ template<typename FPP>
 void prox_blockdiag(FPP* mat_data,  unsigned long mat_nrows, unsigned long mat_ncols, unsigned long *m_ptr, unsigned long *n_ptr, unsigned int vec_size, const bool normalized, const bool pos, FPP* mat_out);
 
 template<typename FPP>
-void prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
+int prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
         unsigned long num_cols, FPP* mat_out, const bool normalized=true, const bool pos=false);
 
 template<typename FPP, typename FPP2>

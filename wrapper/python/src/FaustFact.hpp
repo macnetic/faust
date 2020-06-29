@@ -112,31 +112,44 @@ void prox_mat(unsigned int cons_type, FPP* cons_param, unsigned long cons_param_
 }
 
 template<typename FPP>
-void prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
+int prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
         unsigned long num_cols, FPP* mat_out, const bool normalized /* default to true */, const bool pos /* = false*/)
 {
     Faust::MatDense<FPP, Cpu> fmat(mat_in, num_rows, num_cols);
-    switch(static_cast<faust_constraint_name>(cons_type))
+    int ret;
+    try
     {
-        case CONSTRAINT_NAME_SPCOL: /*!< fixed number of non zero elements per column INT (frobenius norm 1) */
-            Faust::prox_spcol(fmat, (faust_unsigned_int) cons_param, normalized, pos);
-            break;
-        case CONSTRAINT_NAME_SPLIN: /*!< fixed number of non zero elements per line INT (frobenius norm 1) */
-            Faust::prox_splin(fmat, (faust_unsigned_int) cons_param, normalized, pos);
-            break;
-        case CONSTRAINT_NAME_SPLINCOL:
-            Faust::prox_splincol(fmat, (faust_unsigned_int) cons_param, normalized, pos);
-            break;
-        case CONSTRAINT_NAME_SP_POS:/**< fixed number of non zeros coefficients: INT (frobenius norm 1) */
-            Faust::prox_sp_pos(fmat, (faust_unsigned_int) cons_param, normalized, pos);
-            break;
-        case CONSTRAINT_NAME_SP:
-            Faust::prox_sp(fmat, (faust_unsigned_int) cons_param, normalized, pos);
-            break;
-        default:
-            throw invalid_argument("PyxConstraintInt::project() inconsistent constraint name");
+        switch(static_cast<faust_constraint_name>(cons_type))
+        {
+            case CONSTRAINT_NAME_SPCOL: /*!< fixed number of non zero elements per column INT (frobenius norm 1) */
+                Faust::prox_spcol(fmat, (faust_unsigned_int) cons_param, normalized, pos);
+                break;
+            case CONSTRAINT_NAME_SPLIN: /*!< fixed number of non zero elements per line INT (frobenius norm 1) */
+                Faust::prox_splin(fmat, (faust_unsigned_int) cons_param, normalized, pos);
+                break;
+            case CONSTRAINT_NAME_SPLINCOL:
+                Faust::prox_splincol(fmat, (faust_unsigned_int) cons_param, normalized, pos);
+                break;
+            case CONSTRAINT_NAME_SP_POS:/**< fixed number of non zeros coefficients: INT (frobenius norm 1) */
+                Faust::prox_sp_pos(fmat, (faust_unsigned_int) cons_param, normalized, pos);
+                break;
+            case CONSTRAINT_NAME_SP:
+                Faust::prox_sp(fmat, (faust_unsigned_int) cons_param, normalized, pos);
+                break;
+            default:
+                throw invalid_argument("PyxConstraintInt::project() inconsistent constraint name");
+        }
+        memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
     }
-    memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+    catch(std::domain_error & e)
+    {
+        ret = -1;
+    }
+    catch(std::invalid_argument & e)
+    {
+        ret = -2;
+    }
+    return ret;
 }
 
 template<typename FPP, typename FPP2>

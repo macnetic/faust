@@ -944,17 +944,19 @@ cdef class ConstraintIntCore:
         if(isReal):
             M_view_dbl = M
             M_out_view_dbl = M_out
-            FaustCoreCy.prox_int[double](name, parameter, &M_view_dbl[0,0], num_rows,
+            ret = FaustCoreCy.prox_int[double](name, parameter, &M_view_dbl[0,0], num_rows,
                                          num_cols,&M_out_view_dbl[0,0],
                                          normalized, pos)
         else:
             M_view_cplx = M
             M_out_view_cplx = M_out
-            FaustCoreCy.prox_int[complex](name, parameter, &M_view_cplx[0,0],
+            ret = FaustCoreCy.prox_int[complex](name, parameter, &M_view_cplx[0,0],
                                           num_rows, num_cols,
                                           &M_out_view_cplx[0,0], normalized,
                                           pos)
 
+        if ret == -1:
+            raise ZeroDivisionError("Can't normalize because norm is zero."); 
         return M_out
 
 cdef class ConstraintMatCore:

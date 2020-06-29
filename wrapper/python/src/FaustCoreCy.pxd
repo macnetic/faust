@@ -136,7 +136,7 @@ cdef extern from "FaustFact.h":
     cdef cppclass PyxConstraintInt(PyxConstraintGeneric):
         unsigned long parameter
 
-    void prox_int[FPP](unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
+    int prox_int[FPP](unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
                   unsigned long num_cols, FPP* mat_out, const bool normalized, const bool pos)
 
     void prox_real[FPP,FPP2](unsigned int cons_type, FPP2 cons_param, FPP* mat_in, unsigned long num_rows,

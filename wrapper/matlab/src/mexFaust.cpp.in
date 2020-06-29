@@ -62,6 +62,7 @@
 #include "faust_constant.h"
 #include "faust_Timer.h"
 #include <complex>
+#include <memory>
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -177,7 +178,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			SCALAR* mat_data = NULL;
 			mxArray2Ptr(mxMat_in, mat_data);
 			Faust::MatDense<SCALAR, Cpu> mat(mat_data, nrows_mat, ncols_mat);
-			Faust::MatDense<SCALAR, Cpu>* mat_param = nullptr;
+			std::unique_ptr<Faust::MatDense<SCALAR, Cpu>> mat_param = nullptr;
 			bool normalized = true, pos = false;
 
 			if(is_param_scalar)
@@ -189,7 +190,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				mxArray2Ptr(prhs[3], mat_data);
 				// constraint matrix has normally same dim as constrainted matrix (TODO: must be checked from matlab code)
 				// it's verified in C++
-				mat_param = new Faust::MatDense<SCALAR, Cpu>(mat_data, nrows_mat, ncols_mat);
+				mat_param = std::unique_ptr<Faust::MatDense<SCALAR, Cpu>>(new Faust::MatDense<SCALAR, Cpu>(mat_data, nrows_mat, ncols_mat));
 			}
 
 			if(nrhs > 4)
@@ -203,53 +204,60 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			}
 
 
-			switch(constraint_type)
+			try
 			{
-				case CONSTRAINT_NAME_SP: /*!< fixed number of non zero elements, INT (frobenius norm 1) */
-					Faust::prox_sp(mat, (faust_unsigned_int) scal_param, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_SPCOL: /*!< fixed number of non zero elements per column INT (frobenius norm 1) */
-					Faust::prox_spcol(mat, (faust_unsigned_int) scal_param, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_SPLIN: /*!< fixed number of non zero elements per line INT (frobenius norm 1) */
-					Faust::prox_splin(mat, (faust_unsigned_int) scal_param, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_SPLINCOL:
-					Faust::prox_splincol(mat, (faust_unsigned_int) scal_param, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_SP_POS:/**< fixed number of non zeros coefficients: INT (frobenius norm 1) */
-					Faust::prox_sp_pos(mat, (faust_unsigned_int) scal_param, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_NORMLIN:/**< 2nd norm of the lines of matrix A ; REAL  */
-					Faust::prox_normlin(mat, scal_param, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_NORMCOL:/*!< 2nd norm of the colons of A REAL */
-					Faust::prox_normcol(mat, scal_param, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_CONST: /**< Matrix equal to A ; MAT */
-					Faust::prox_const(mat, *mat_param, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_BLKDIAG:
-					//not impl. yet in cpp core
-					break;
-				case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
-					Faust::prox_supp(mat, *mat_param, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_CIRC:
-					Faust::prox_circ(mat, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_TOEPLITZ:
-					Faust::prox_toeplitz(mat, normalized, pos);
-					break;
-				case CONSTRAINT_NAME_HANKEL:
-					Faust::prox_hankel(mat, normalized, pos);
-					break;
-				default:
-					mexErrMsgTxt("Unknown constraint name/type.");
+				switch(constraint_type)
+				{
+					case CONSTRAINT_NAME_SP: /*!< fixed number of non zero elements, INT (frobenius norm 1) */
+						Faust::prox_sp(mat, (faust_unsigned_int) scal_param, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_SPCOL: /*!< fixed number of non zero elements per column INT (frobenius norm 1) */
+						Faust::prox_spcol(mat, (faust_unsigned_int) scal_param, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_SPLIN: /*!< fixed number of non zero elements per line INT (frobenius norm 1) */
+						Faust::prox_splin(mat, (faust_unsigned_int) scal_param, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_SPLINCOL:
+						Faust::prox_splincol(mat, (faust_unsigned_int) scal_param, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_SP_POS:/**< fixed number of non zeros coefficients: INT (frobenius norm 1) */
+						Faust::prox_sp_pos(mat, (faust_unsigned_int) scal_param, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_NORMLIN:/**< 2nd norm of the lines of matrix A ; REAL  */
+						Faust::prox_normlin(mat, scal_param, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_NORMCOL:/*!< 2nd norm of the colons of A REAL */
+						Faust::prox_normcol(mat, scal_param, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_CONST: /**< Matrix equal to A ; MAT */
+						Faust::prox_const(mat, *mat_param, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_BLKDIAG:
+						//not impl. yet in cpp core
+						break;
+					case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
+						Faust::prox_supp(mat, *mat_param, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_CIRC:
+						Faust::prox_circ(mat, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_TOEPLITZ:
+						Faust::prox_toeplitz(mat, normalized, pos);
+						break;
+					case CONSTRAINT_NAME_HANKEL:
+						Faust::prox_hankel(mat, normalized, pos);
+						break;
+					default:
+						mexErrMsgTxt("Unknown constraint name/type.");
+				}
+				plhs[0] = FaustMat2mxArray(mat);
 			}
-			plhs[0] = FaustMat2mxArray(mat);
-			if(mat_param != nullptr)
-				delete mat_param;
+			catch(std::domain_error& e)
+			{
+				mexErrMsgTxt("Can't normalize because norm is zero.");
+			}
+			// if(mat_param != nullptr)
+			//	delete mat_param;
 			return;
 		}
 
