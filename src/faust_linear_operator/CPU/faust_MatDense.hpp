@@ -1051,6 +1051,16 @@ Real<FPP> Faust::MatDense<FPP, Cpu>::normL1(const bool transpose /* default fals
 }
 
 template<typename FPP>
+void Faust::MatDense<FPP,Cpu>::normalize()
+{
+	auto n = norm();
+	if(n != FPP(0))
+		scalarMultiply(FPP(1.0/n));
+	else
+		throw std::domain_error("the norm is zero, can't normalize");
+}
+
+template<typename FPP>
 Faust::Vect<FPP,Cpu> Faust::MatDense<FPP,Cpu>::get_col(faust_unsigned_int id) const
 {
 	if(id > this->getNbCol())

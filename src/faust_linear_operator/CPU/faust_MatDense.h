@@ -345,7 +345,7 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
         Real<FPP> norm() const {return mat.norm();}
 
         //!  \brief Normalize the matrix according to its Frobenius norm
-        void normalize() {scalarMultiply(FPP(1.0/norm()));}
+        void normalize();
 
 
         //!	\param nbr_iter_max : maximum number of iteration for the power algo
