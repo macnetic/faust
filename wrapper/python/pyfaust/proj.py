@@ -29,7 +29,7 @@ class toeplitz(proj_gen):
     >>> from pyfaust.proj import toeplitz
     >>> from numpy.random import rand
     >>> M = rand(5,5)
-    >>> p = toeplitz(M.shape, normalized=False)
+    >>> p = toeplitz(M.shape)
     >>> p(M)
     array([[ 0.38925701,  0.89077942,  0.43467682,  0.68566158,  0.29709396],
            [ 0.62199717,  0.38925701,  0.89077942,  0.43467682, 0.68566158],
@@ -38,7 +38,7 @@ class toeplitz(proj_gen):
            [ 0.35021359,  0.65125443,  0.29650327,  0.62199717, 0.38925701]])
 
     """
-    def __init__(self, shape, normalized=True, pos=False):
+    def __init__(self, shape, normalized=False, pos=False):
         self.constraint = ConstraintMat('toeplitz', np.empty(shape), normalized, pos)
 
 class circ(proj_gen):
@@ -50,7 +50,7 @@ class circ(proj_gen):
         >>> from pyfaust.proj import circ
         >>> from numpy.random import rand
         >>> M = rand(5,5)
-        >>> circ(M.shape, normalized=False)
+        >>> circ(M.shape)
         >>> p = circ(M.shape)
         >>> p(M)
         array([[ 0.58798272,  0.65139062,  0.56169998,  0.4051127 , 0.47563316],
@@ -60,7 +60,7 @@ class circ(proj_gen):
                [ 0.65139062,  0.56169998,  0.4051127 ,  0.47563316, 0.58798272]])
 
     """
-    def __init__(self, shape, normalized=True, pos=False):
+    def __init__(self, shape, normalized=False, pos=False):
         self.constraint = ConstraintMat('circ', np.empty(shape), normalized, pos)
 
 class hankel(proj_gen):
@@ -71,7 +71,7 @@ class hankel(proj_gen):
         >>> from pyfaust.proj import hankel
         >>> from numpy.random import rand
         >>> M = rand(5,5)
-        >>> p = hankel(M.shape, normalized=False)
+        >>> p = hankel(M.shape)
         >>> p(M)
         array([[ 0.00854525,  0.41578004,  0.54722872,  0.31191184, 0.74059554],
                [ 0.41578004,  0.54722872,  0.31191184,  0.74059554, 0.46299776],
@@ -80,13 +80,14 @@ class hankel(proj_gen):
                [ 0.74059554,  0.46299776,  0.50574944,  0.4539859 , 0.81595711]])
 
     """
-    def __init__(self, shape, normalized=True, pos=False):
+    def __init__(self, shape, normalized=False, pos=False):
         self.constraint = ConstraintMat('hankel', np.empty(shape), normalized, pos)
 
 
 class sp(proj_gen):
     """
-    Functor for the SP projector. A, the image matrix, is such that \f$ \| A \|_0 = k,  \| A\|_F = 1\f$.
+    Functor for the SP projector. A, the image matrix, is such that \f$ \| A
+    \|_0 = k,  \| A\|_F = 1 (if normalized == True)\f$.
 
 
     Example:
@@ -107,12 +108,12 @@ class sp(proj_gen):
 
     """
 
-    def __init__(self, shape, k, normalized=True, pos=False):
+    def __init__(self, shape, k, normalized=False, pos=False):
         """
 
         Args:
             k: the number of nonzeros of the projection image.
-            normalized: True to normalize the projection image according to its 2-norm.
+            normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
@@ -120,7 +121,9 @@ class sp(proj_gen):
 
 class splin(proj_gen):
     """
-    Functor for the SPLIN projector. A, the image matrix, is defined by \f$ \forall i \in \{0,...,shape[0]-1\} \| \f$ the i-th row \f$ A_{i,*}\f$ is such that \f$ \| A_{i,*}\|_0 = k,  \| A\|_F = 1\f$.
+    Functor for the SPLIN projector. A, the image matrix, is defined by \f$
+    \forall i \in \{0,...,shape[0]-1\} \| \f$ the i-th row \f$ A_{i,*}\f$ is
+    such that \f$ \| A_{i,*}\|_0 = k,  \| A\|_F = 1 (if normalized == True)\f$.
 
 
     Example:
@@ -136,11 +139,11 @@ class splin(proj_gen):
                [ 0.        ,  0.31022779,  0.        ,  0.2479237 , 0.        ]])
 
     """
-    def __init__(self, shape, k, normalized=True, pos=False):
+    def __init__(self, shape, k, normalized=False, pos=False):
         """
         Args:
             k: the number of nonzeros of the projection image.
-            normalized: True to normalize the projection image according to its 2-norm.
+            normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
@@ -148,7 +151,7 @@ class splin(proj_gen):
 
 class spcol(proj_gen):
     """
-    Functor for the SPCOL projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \f$ the j-th column \f$ A_{*,j}\f$ is such that \f$ \| A_{*,j}\|_0 = k,  \| A\|_F = 1\f$.
+    Functor for the SPCOL projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \f$ the j-th column \f$ A_{*,j}\f$ is such that \f$ \| A_{*,j}\|_0 = k,  \| A\|_F = 1 (if normalized == True)\f$.
 
     Example:
         >>> from pyfaust.proj import spcol
@@ -164,12 +167,12 @@ class spcol(proj_gen):
 
 
     """
-    def __init__(self, shape, k, normalized=True, pos=False):
+    def __init__(self, shape, k, normalized=False, pos=False):
         """
 
         Args:
             S: the support matrix.
-            normalized: True to normalize the projection image according to its 2-norm.
+            normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
@@ -185,9 +188,9 @@ class splincol(proj_gen):
         >>> from pyfaust.proj import splincol
         >>> from numpy.random import rand
         >>> M = rand(5,5)
-        >>> p1 = splin(M.shape, 3, normalized=False)
-        >>> p2 = spcol(M.shape, 3, normalized=False)
-        >>> p = splincol(M.shape, 3, normalized=False)
+        >>> p1 = splin(M.shape, 3)
+        >>> p2 = spcol(M.shape, 3)
+        >>> p = splincol(M.shape, 3)
         >>> p1(M)
         array([[ 0.        ,  0.73732727,  0.76317487,  0.        , 0.95740247],
                [ 0.45374662,  0.7458585 ,  0.        ,  0.        , 0.25951363],
@@ -220,12 +223,12 @@ class splincol(proj_gen):
         >>> (p1M+p2M == p(M)).all()
         True
     """
-    def __init__(self, shape, k, normalized=True, pos=False):
+    def __init__(self, shape, k, normalized=False, pos=False):
         """
 
         Args:
             S: the support matrix.
-            normalized: True to normalize the projection image according to its 2-norm.
+            normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
@@ -262,12 +265,12 @@ class supp(proj_gen):
                    [ 0.,  0.,  0.,  1.,  0.]])
 
     """
-    def __init__(self, S, normalized=True, pos=False):
+    def __init__(self, S, normalized=False, pos=False):
         """
 
         Args:
             S: the support matrix.
-            normalized: True to normalize the projection image according to its 2-norm.
+            normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
         """
         self.constraint = ConstraintMat('supp', S, normalized, pos)
@@ -322,7 +325,7 @@ class const(proj_gen):
 
         Args:
             C: the constant matrix.
-            normalized: True to normalize the projection image according to its 2-norm.
+            normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
@@ -333,12 +336,10 @@ class normcol(proj_gen):
         Functor for the NORMCOL projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \f$ the j-th column \f$ A_{*,j} \f$ is such that \f$\| A_{*,j}\|_2 = s  \f$.
 
     """
-    def __init__(self, shape, s, normalized=False, pos=False):
+    def __init__(self, shape, s):
         """
         Args:
             s: the column 2-norm.
-            normalized: True to normalize the projection image according to its 2-norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         Example:
             >>> from pyfaust.proj import normcol
@@ -349,6 +350,8 @@ class normcol(proj_gen):
             >>> norm(p(M)[:,0], 2)
             0.01
         """
+        normalized=False
+        pos=False
         self.constraint = ConstraintReal('normcol', shape[0], shape[1], s, normalized, pos)
 
 class normlin(proj_gen):
@@ -371,14 +374,16 @@ class normlin(proj_gen):
             0.01
     """
 
-    def __init__(self, shape, s, normalized=False, pos=False):
+    def __init__(self, shape, s):
         """
         Args:
             s: the row 2-norm.
-            normalized: True to normalize the projection image according to its 2-norm.
+            normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
+        normalized=False
+        pos=False
         self.constraint = ConstraintReal('normlin', shape[0], shape[1], s, normalized, pos)
 
 class blockdiag(proj_gen):

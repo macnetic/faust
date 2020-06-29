@@ -1,7 +1,7 @@
 %==================================================
 %> @brief Functor for the SP projector.
 %>
-%> A, the image matrix, is such that \f$ \| A \|_0 = k,  \| A\|_F = 1\f$.
+%> A, the image matrix, is such that \f$ \| A \|_0 = k,  \| A\|_F = 1 (if normalized is true).\f$.
 %==================================================
 classdef sp < matfaust.proj.proj_gen
 	properties

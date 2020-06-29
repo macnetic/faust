@@ -189,7 +189,6 @@ void Faust::prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k, cons
 template<typename FPP, typename FPP2>
 void Faust::prox_normcol(Faust::MatDense<FPP,Cpu> & M, FPP2 s, const bool normalized /* default to false */, const bool pos)
 {
-
 	faust_unsigned_int dim1 = M.getNbRow();
 	faust_unsigned_int dim2 = M.getNbCol();
 
@@ -241,7 +240,7 @@ void Faust::prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP2 s, const bool normali
 }
 
 template<typename FPP>
-void Faust::prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int> & m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized /* default to false */, const bool pos)
+void Faust::prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int> & m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized /* default to true */, const bool pos)
 {
 //        if(M.shape != self.shape): raise ValueError('The dimension of the '
 //                                                   'projector and matrix must '

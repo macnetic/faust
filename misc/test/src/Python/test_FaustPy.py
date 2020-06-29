@@ -1240,7 +1240,7 @@ class TestFaustFactory(unittest.TestCase):
         n = randint(min_n, 128)
         M = rand(m,n)
         k = randint(1,n)
-        p = splin((m,n),k)
+        p = splin((m,n),k, normalized=True)
         Mp = p(M)
         for i in range(0,m):
             # np.savez('M.npz', M, Mp, k)
@@ -1258,7 +1258,7 @@ class TestFaustFactory(unittest.TestCase):
         n = randint(min_n, 128)
         M = rand(m,n)
         k = randint(1,m)
-        p = spcol((m,n),k)
+        p = spcol((m,n),k, normalized=True)
         Mp = p(M)
         for i in range(0,n):
             # np.savez('M.npz', M, Mp, k)
@@ -1276,7 +1276,7 @@ class TestFaustFactory(unittest.TestCase):
         n = randint(min_n, 128)
         M = rand(m,n)
         k = randint(1,m)
-        p = splincol((m,n),k)
+        p = splincol((m,n),k, normalized=True)
         Mp = p(M)
         # TODO: define sparsity assertions to verify on Mp
         self.assertAlmostEqual(norm(Mp), 1)
@@ -1292,7 +1292,7 @@ class TestFaustFactory(unittest.TestCase):
         n = randint(min_n, 128)
         M = rand(m,n)
         k = randint(1,m*n)
-        p = sp((m,n),k)
+        p = sp((m,n),k, normalized=True)
         Mp = p(M)
         for i in range(0,n):
             # np.savez('M.npz', M, Mp, k)
@@ -1314,7 +1314,7 @@ class TestFaustFactory(unittest.TestCase):
         nnz_cinds = randperm(n)[:k]
         S = np.zeros((m,n))
         S[nnz_rinds, nnz_cinds] = 1
-        p = supp(S)
+        p = supp(S, normalized=True)
         pM = p(M)
         # same nnz number
         self.assertEqual(np.count_nonzero(pM), np.count_nonzero(S))
@@ -1323,7 +1323,7 @@ class TestFaustFactory(unittest.TestCase):
         # pM normalized (according to fro-norm)
         self.assertAlmostEqual(norm(pM), 1)
         # same projection without normalization
-        p = supp(S, normalized=False)
+        p = supp(S)
         pM = p(M)
         self.assertTrue(np.allclose(pM[pM != 0], M[S != 0]))
 
@@ -1351,7 +1351,7 @@ class TestFaustFactory(unittest.TestCase):
         n = randint(min_n, 128)
         M = rand(m,n)*random()*50
         k = random()*50
-        p = normcol(M.shape,k, normalized=False)
+        p = normcol(M.shape,k)
         pM = p(M)
         for i in range(pM.shape[1]):
             self.assertAlmostEqual(norm(pM[:,i]), k)
@@ -1367,7 +1367,7 @@ class TestFaustFactory(unittest.TestCase):
         n = randint(min_n, 128)
         M = rand(m,n)*random()*50
         k = random()*50
-        p = normlin(M.shape,k, normalized=False)
+        p = normlin(M.shape,k)
         pM = p(M)
         for i in range(pM.shape[0]):
             self.assertAlmostEqual(norm(pM[i,:]), k)

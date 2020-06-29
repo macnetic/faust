@@ -8,7 +8,7 @@ classdef (Abstract) ConstraintGeneric
 		num_cols
 		param % type determined by child classes
 		normalized % flag to normalize or not the projection image afterward
-		default_normalized % flag to determine if the normalized flag has its default value or user customed one
+		default_normalized % flag to determine if the normalized flag has its default value or user customed one (even if these values are equal)
 		pos % flag to set negative matrix elements to zero through the projection
 	end
 	methods
@@ -30,7 +30,7 @@ classdef (Abstract) ConstraintGeneric
 			constraint.param = param;
 			% optional key-value arguments
 			argc = length(varargin);
-			constraint.normalized = true;
+			constraint.normalized = false;
 			constraint.default_normalized = true;
 			constraint.pos = false;
 			if(argc > 0)

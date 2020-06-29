@@ -1,7 +1,7 @@
 %==================================================
 %> @brief Functor for the SPCOL projector.
 %>
-%> A, the image matrix, is defined by \f$ \forall j \in \{1,\ldots,shape(2)\} \f$ the j-th column \f$  A_{*,j} \f$ is such that \f$ \|A_{*,j}\|_0 = k,  \| A\|_F = 1\f$.
+%> A, the image matrix, is defined by \f$ \forall j \in \{1,\ldots,shape(2)\} \f$ the j-th column \f$  A_{*,j} \f$ is such that \f$ \|A_{*,j}\|_0 = k,  \| A\|_F = 1 (if normalized is true)\f$.
 %==================================================
 classdef spcol < matfaust.proj.proj_gen
 	properties

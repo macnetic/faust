@@ -389,7 +389,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			n = randi([min_n 128], 1);
 			M = rand(m,n);
 			k = randi([1 m*n], 1);
-			p = sp([m n], k);
+			p = sp([m n], k, 'normalized', true);
 			Mp = p(M);
 			for i=1:n
 				this.verifyLessThanOrEqual(length(nonzeros(Mp(:,i))), k)
@@ -405,9 +405,9 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			n = randi([min_n 128], 1);
 			k = randi([1 m], 1);
 			M = rand(m,n);
-			p = splincol([m, n], k);
+			p = splincol([m, n], k, 'normalized', true);
 			Mp = p(M);
-			% TODO: assertion ?
+			% TODO: test it is union of splin and spcol
 			this.verifyEqual(norm(Mp, 'fro'), 1, 'AbsTol', 10^-3)
 		end
 
@@ -419,7 +419,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			n = randi([min_n 128], 1);
 			M = rand(m,n);
 			k = randi([1 m], 1);
-			p = spcol([m, n], k);
+			p = spcol([m, n], k, 'normalized', true);
 			Mp = p(M);
 			for i=1:n
 				this.verifyLessThanOrEqual(length(nonzeros(Mp(:,i))), k)
@@ -438,7 +438,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			p = normcol([m, n], s);
 			Mp = p(M);
 			for i=1:n
-				this.verifyLessThanOrEqual(norm(Mp(:,i)), s)
+				this.verifyLessThanOrEqual(norm(Mp(:,i)), s+1e-6)
 			end
 		end
 
@@ -453,7 +453,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			p = normlin([m, n], s);
 			Mp = p(M);
 			for i=1:m
-				this.verifyLessThanOrEqual(norm(Mp(i,:)), s)
+				this.verifyLessThanOrEqual(norm(Mp(i,:)), s+1e-6)
 			end
 		end
 

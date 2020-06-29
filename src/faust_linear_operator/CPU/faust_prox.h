@@ -82,7 +82,7 @@ namespace Faust {
 	template<typename FPP>
 		void prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized = false, const bool pos = false);
 	template<typename FPP>
-		void prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, Faust::MatDense<FPP,Cpu> mn_vec, const bool normalized=false /* default to false */, const bool pos=false);
+	void prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, Faust::MatDense<FPP,Cpu> mn_vec, const bool normalized=true, const bool pos=false);
 
 	template<typename FPP> void pre_prox_pos(MatDense<FPP,Cpu> & M);
 	template<typename FPP> void prox_hankel(Faust::MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
