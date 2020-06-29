@@ -9,6 +9,7 @@ from scipy.io import savemat,loadmat
 from numpy.linalg import norm
 from scipy.sparse import spdiags
 import math
+from os.path import dirname
 
 class TestFaustPy(unittest.TestCase):
 
@@ -796,7 +797,7 @@ class TestFaustFactory(unittest.TestCase):
 #        init_facts.append(np.eye(32))
         #M = np.random.rand(500, 32)
         M = \
-                loadmat(sys.path[0]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
+                loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/config_compared_palm2.mat")['data']
         # default step_size
         cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
         cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32,
@@ -831,7 +832,7 @@ class TestFaustFactory(unittest.TestCase):
 #        init_facts.append(np.eye(32))
         #M = np.random.rand(500, 32)
         M = \
-                loadmat(sys.path[0]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
+                loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/config_compared_palm2.mat")['data']
         # default step_size
         cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
         cons2 = ConstraintReal(ConstraintName(ConstraintName.NORMCOL), 32,
@@ -863,7 +864,7 @@ class TestFaustFactory(unittest.TestCase):
         init_lambda = 1.0
         #M = np.random.rand(500, 32)
         M = \
-        loadmat(sys.path[0]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
+        loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
         # default step_size
         fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
         fact1_cons = ConstraintInt(ConstraintName(ConstraintName.SP), 32, 32, 96)
@@ -897,7 +898,7 @@ class TestFaustFactory(unittest.TestCase):
         init_lambda = 1.0
         #M = np.random.rand(500, 32)
         M = \
-        loadmat(sys.path[0]+"/../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
+        loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/matrix_hierarchical_fact.mat")['matrix']
         M = M + np.complex(0,1)*M
         # default step_size
         fact0_cons = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
@@ -936,7 +937,7 @@ class TestFaustFactory(unittest.TestCase):
 #        init_facts.append(np.eye(32))
         #M = np.random.rand(500, 32)
         M = \
-        loadmat(sys.path[0]+"/../../../misc/data/mat/config_compared_palm2.mat")['data']
+        loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/config_compared_palm2.mat")['data']
         M = M + np.complex(0,1)*M
         # default step_size
         cons1 = ConstraintInt(ConstraintName(ConstraintName.SPLIN), 500, 32, 5)
@@ -990,10 +991,10 @@ class TestFaustFactory(unittest.TestCase):
         print("Test fact.fgft_givens()")
         print(sys.path)
         import pyfaust.fact
-        L = loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        L = loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         J = \
-        int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
+        int(loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
         D, F = pyfaust.fact.fgft_givens(L, J, nGivens_per_fac=1, verbosity=0, enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
@@ -1010,10 +1011,10 @@ class TestFaustFactory(unittest.TestCase):
     def testFGFTGivensParallel(self):
         print("Test pyfaust.fact.fgft_givens() -- parallel")
         from pyfaust.fact import eigtj, fgft_givens
-        L = loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        L = loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         J = \
-                int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
+                int(loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
         t = int(L.shape[0]/2)
         D, F = fgft_givens(L, J, nGivens_per_fac=t, verbosity=0,
                            enable_large_Faust=True)
@@ -1044,10 +1045,10 @@ class TestFaustFactory(unittest.TestCase):
         print(sys.path)
         from scipy.sparse import csr_matrix
         import pyfaust.fact
-        L = loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        L = loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         J = \
-        int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
+        int(loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
         D, F = pyfaust.fact.fgft_givens(csr_matrix(L), J, nGivens_per_fac=0,
                                         verbosity=0,enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
@@ -1066,10 +1067,10 @@ class TestFaustFactory(unittest.TestCase):
         print("Test pyfaust.fact.fgft_givens_sparse() -- parallel")
         from pyfaust.fact import eigtj, fgft_givens
         from scipy.sparse import csr_matrix
-        L = loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        L = loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         J = \
-                int(loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
+                int(loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
         t = int(L.shape[0]/2)
         D, F = fgft_givens(csr_matrix(L), J, nGivens_per_fac=t, verbosity=0, enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
@@ -1103,7 +1104,7 @@ class TestFaustFactory(unittest.TestCase):
         M = M.dot(M.T)
         D,U = eigtj(M, tol=err, relerr=False)
         self.assertAlmostEqual(norm(M-U*np.diag(D)*U.T), err, places=3 )
-        L = loadmat(sys.path[0]+"/../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
+        L = loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         M_cplx = L*np.complex(1,0) + L*np.complex(0,1)
         M_cplx = M_cplx.dot(np.matrix(M_cplx).H)
@@ -1134,14 +1135,14 @@ class TestFaustFactory(unittest.TestCase):
         from pyfaust.factparams import ParamsPalm4MSAFGFT
 
         L = \
-        loadmat(sys.path[0]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['data']
+        loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['data']
         init_D = \
-        loadmat(sys.path[0]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_D']
+        loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_D']
         init_D = copy(diag(init_D))
         init_facts1 = \
-                loadmat(sys.path[0]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_facts1']
+                loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_facts1']
         init_facts2 = \
-                loadmat(sys.path[0]+"/../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_facts2']
+                loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/ref_test_PALM4SMA_FFT2")['p_init_facts2']
         init_facts = [ init_facts1, init_facts2 ]
         L = L.astype(np.float64)
         # other params should be set from file also but do it manually
@@ -1177,13 +1178,13 @@ class TestFaustFactory(unittest.TestCase):
         init_lambda = 1.0
         #M = np.random.rand(500, 32)
         U = \
-        loadmat(sys.path[0]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['U']
+        loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['U']
         Lap = \
-        loadmat(sys.path[0]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['Lap'].astype(np.float)
+        loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['Lap'].astype(np.float)
         init_D = \
-        loadmat(sys.path[0]+"/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['init_D']
+        loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat")['init_D']
         params_struct = \
-        loadmat(sys.path[0]+'/../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat')['params']
+        loadmat(dirname(sys.argv[0])+'/../../../../misc/data/mat/HierarchicalFactFFT_test_U_L_params.mat')['params']
         nfacts = params_struct['nfacts'][0,0][0,0] #useless
         niter1 = params_struct['niter1'][0,0][0,0]
         niter2 = params_struct['niter2'][0,0][0,0]
