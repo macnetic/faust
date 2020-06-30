@@ -38,18 +38,18 @@ class PyxConstraintMat : public PyxConstraintGeneric
 };
 
 template<typename FPP>
-void prox_blockdiag(FPP* mat_data,  unsigned long mat_nrows, unsigned long mat_ncols, unsigned long *m_ptr, unsigned long *n_ptr, unsigned int vec_size, const bool normalized, const bool pos, FPP* mat_out);
+int prox_blockdiag(FPP* mat_data,  unsigned long mat_nrows, unsigned long mat_ncols, unsigned long *m_ptr, unsigned long *n_ptr, unsigned int vec_size, const bool normalized, const bool pos, FPP* mat_out);
 
 template<typename FPP>
 int prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsigned long num_rows,
         unsigned long num_cols, FPP* mat_out, const bool normalized=true, const bool pos=false);
 
 template<typename FPP, typename FPP2>
-void prox_real(unsigned int cons_type, FPP2 cons_param, FPP* mat_in, unsigned long num_rows,
+int prox_real(unsigned int cons_type, FPP2 cons_param, FPP* mat_in, unsigned long num_rows,
         unsigned long num_cols, FPP* mat_out, const bool normalized=false, const bool pos=false);
 
 template<typename FPP>
-void prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out, const bool normalized=false, const bool pos=false);
+int prox_mat(unsigned int cons_type, FPP* cons_param, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out, const bool normalized=false, const bool pos=false);
 
 template<typename FPP>
 class PyxStoppingCriterion

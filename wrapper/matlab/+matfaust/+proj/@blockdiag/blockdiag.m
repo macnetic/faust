@@ -67,7 +67,7 @@
 			elseif(ischar(S.subs) && strcmp('constraint', S.subs))
 				pM = self.constraint;
 			else
-				error('bad use of projector: must be projector(matrix) or projector.constraint.')
+				error('wrong use of projector: must be projector(matrix) or projector.constraint.')
 			end
 		end
 

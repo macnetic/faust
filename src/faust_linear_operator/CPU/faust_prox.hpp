@@ -218,7 +218,7 @@ void Faust::prox_normcol(Faust::MatDense<FPP,Cpu> & M, FPP2 s, const bool normal
 		{
 			memcpy(current_col.getData(),&(M.getData()[j*dim1]),dim1*sizeof(FPP));
 			scalarMultiply = current_col.norm();
-			if (scalarMultiply != 0)
+			if (scalarMultiply != FPP2(0))
 			{
 				scalarMultiply = s/scalarMultiply;
 			}

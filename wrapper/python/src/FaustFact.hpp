@@ -61,8 +61,9 @@ bool PyxConstraintGeneric::is_mat_constraint()
 }
 
 template<typename FPP>
-void prox_blockdiag(FPP* mat_data,  unsigned long mat_nrows, unsigned long mat_ncols, unsigned long *m_ptr, unsigned long *n_ptr, unsigned int vec_size, const bool normalized, const bool pos, FPP* mat_out)
+int prox_blockdiag(FPP* mat_data,  unsigned long mat_nrows, unsigned long mat_ncols, unsigned long *m_ptr, unsigned long *n_ptr, unsigned int vec_size, const bool normalized, const bool pos, FPP* mat_out)
 {
+    int ret = 0;
     Faust::MatDense<FPP,Cpu> mat(mat_data, mat_nrows, mat_ncols);
     std::vector<unsigned long> m_vec, n_vec;
     for(int i = 0; i < vec_size; i++)
@@ -70,45 +71,63 @@ void prox_blockdiag(FPP* mat_data,  unsigned long mat_nrows, unsigned long mat_n
         m_vec.push_back(m_ptr[i]);
         n_vec.push_back(n_ptr[i]);
     }
-    Faust::prox_blockdiag(mat, m_vec, n_vec, normalized, pos);
-    memcpy(mat_out, mat.getData(), sizeof(FPP) * mat_ncols * mat_nrows);
+    try
+    {
+        Faust::prox_blockdiag(mat, m_vec, n_vec, normalized, pos);
+        memcpy(mat_out, mat.getData(), sizeof(FPP) * mat_ncols * mat_nrows);
+    }
+    catch(std::domain_error & e)
+    {
+        ret = -1;
+    }
+    return ret;
 }
 
 template<typename FPP>
-void prox_mat(unsigned int cons_type, FPP* cons_param, unsigned long cons_param_sz, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out, const bool normalized /* deft to false */, const bool pos /* = false*/)
+int prox_mat(unsigned int cons_type, FPP* cons_param, unsigned long cons_param_sz, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out, const bool normalized /* deft to false */, const bool pos /* = false*/)
 {
+    int ret = 0;
     Faust::MatDense<FPP, Cpu> fmat(mat_in, num_rows, num_cols);
-    switch(static_cast<faust_constraint_name>(cons_type))
-	{
-		case CONSTRAINT_NAME_CONST: /**< Matrix equal to A ; MAT */
-			// nothing to do, same mat returned
-            Faust::prox_const(fmat, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
-			break;
-		case CONSTRAINT_NAME_BLKDIAG:
-            Faust::prox_blockdiag(fmat, Faust::MatDense<FPP,Cpu>(cons_param, cons_param_sz/2, 2), normalized, pos);
-			break;
-		case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
-			Faust::prox_supp(fmat, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
-			break;
-        case CONSTRAINT_NAME_TOEPLITZ:
-            Faust::prox_toeplitz(fmat, normalized, pos); //, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
-            memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
-            return;
-            break;
-        case CONSTRAINT_NAME_CIRC:
-            Faust::prox_circ(fmat, normalized, pos);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
-            memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
-            return;
-            break;
-        case CONSTRAINT_NAME_HANKEL:
-            Faust::prox_hankel(fmat, normalized, pos);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
-            memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
-            return;
-            break;
-		default:
-			throw invalid_argument("PyxConstraintMat::project() inconsistent constraint name");
-	}
-    memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+    try
+    {
+        switch(static_cast<faust_constraint_name>(cons_type))
+        {
+            case CONSTRAINT_NAME_CONST: /**< Matrix equal to A ; MAT */
+                // nothing to do, same mat returned
+                Faust::prox_const(fmat, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+                break;
+            case CONSTRAINT_NAME_BLKDIAG:
+                Faust::prox_blockdiag(fmat, Faust::MatDense<FPP,Cpu>(cons_param, cons_param_sz/2, 2), normalized, pos);
+                break;
+            case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
+                Faust::prox_supp(fmat, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+                break;
+            case CONSTRAINT_NAME_TOEPLITZ:
+                Faust::prox_toeplitz(fmat, normalized, pos); //, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+                memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+                return ret;
+            case CONSTRAINT_NAME_CIRC:
+                Faust::prox_circ(fmat, normalized, pos);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+                memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+                return ret;
+            case CONSTRAINT_NAME_HANKEL:
+                Faust::prox_hankel(fmat, normalized, pos);//, Faust::MatDense<FPP,Cpu>(cons_param, num_rows, num_cols), normalized, pos);
+                memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+                return ret;
+            default:
+                throw invalid_argument("PyxConstraintMat::project() inconsistent constraint name");
+        }
+        memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+    }
+    catch(std::domain_error & e)
+    {
+        ret = -1;
+    }
+    catch(std::invalid_argument & e)
+    {
+        ret = -2;
+    }
+    return ret;
 }
 
 template<typename FPP>
@@ -116,7 +135,7 @@ int prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsi
         unsigned long num_cols, FPP* mat_out, const bool normalized /* default to true */, const bool pos /* = false*/)
 {
     Faust::MatDense<FPP, Cpu> fmat(mat_in, num_rows, num_cols);
-    int ret;
+    int ret = 0;
     try
     {
         switch(static_cast<faust_constraint_name>(cons_type))
@@ -153,22 +172,37 @@ int prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsi
 }
 
 template<typename FPP, typename FPP2>
-void prox_real(unsigned int cons_type, FPP2 cons_param, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out, const bool normalized /* default to false */, const bool pos /* = false*/)
+int prox_real(unsigned int cons_type, FPP2 cons_param, FPP* mat_in, unsigned long num_rows, unsigned long num_cols, FPP* mat_out, const bool normalized /* default to false */, const bool pos /* = false*/)
 {
     Faust::MatDense<FPP, Cpu> fmat(mat_in, num_rows, num_cols);
-    switch(static_cast<faust_constraint_name>(cons_type))
-	{
-		case CONSTRAINT_NAME_NORMLIN:/**< 2nd norm of the lines of matrix A ; REAL  */
-			Faust::prox_normlin(fmat, cons_param, normalized, pos);
-			break;
-		case CONSTRAINT_NAME_NORMCOL:/*!< 2nd norm of the columns of A REAL */
-			Faust::prox_normcol(fmat, cons_param, normalized, pos);
-			break;
-		default:
-			throw invalid_argument("PyxConstraintScalar::project() inconsistent constraint name");
-	}
-    memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+    int ret = 0;
+    try
+    {
+        switch(static_cast<faust_constraint_name>(cons_type))
+        {
+            case CONSTRAINT_NAME_NORMLIN:/**< 2nd norm of the lines of matrix A ; REAL  */
+                Faust::prox_normlin(fmat, cons_param, normalized, pos);
+                break;
+            case CONSTRAINT_NAME_NORMCOL:/*!< 2nd norm of the columns of A REAL */
+                Faust::prox_normcol(fmat, cons_param, normalized, pos);
+                break;
+            default:
+                throw invalid_argument("PyxConstraintScalar::project() inconsistent constraint name");
+        }
+        memcpy(mat_out, fmat.getData(), sizeof(FPP)*num_rows*num_cols);
+    }
+    catch(std::domain_error & e)
+    {
+        // normatalization error
+        ret = -1;
+    }
+    catch(std::invalid_argument & e)
+    {
+        ret = -2;
+    }
+    return ret;
 }
+
 
 template<typename FPP, typename FPP2>
 void prepare_fact(const FPP* mat, const unsigned int num_rows, const unsigned int num_cols, const PyxParamsFact<FPP,FPP2>* p,

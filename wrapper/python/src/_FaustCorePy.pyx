@@ -956,7 +956,7 @@ cdef class ConstraintIntCore:
                                           pos)
 
         if ret == -1:
-            raise ZeroDivisionError("Can't normalize because norm is zero."); 
+            raise ZeroDivisionError("Can't normalize because norm is zero.");
         return M_out
 
 cdef class ConstraintMatCore:
@@ -987,7 +987,7 @@ cdef class ConstraintMatCore:
             M_view_dbl = M
             M_out_view_dbl = M_out
             param_view_dbl = parameter
-            FaustCoreCy.prox_mat[double](name, &param_view_dbl[0,0],
+            ret = FaustCoreCy.prox_mat[double](name, &param_view_dbl[0,0],
                                          parameter_sz, &M_view_dbl[0,0], num_rows,
                                          num_cols,&M_out_view_dbl[0,0],
                                          normalized, pos)
@@ -995,12 +995,14 @@ cdef class ConstraintMatCore:
             M_view_cplx = M
             M_out_view_cplx = M_out
             param_view_cplx = parameter
-            FaustCoreCy.prox_mat[complex](name, &param_view_cplx[0,0],
+            ret = FaustCoreCy.prox_mat[complex](name, &param_view_cplx[0,0],
                                           parameter_sz, &M_view_cplx[0,0],
                                           num_rows, num_cols,
                                           &M_out_view_cplx[0,0], normalized,
                                           pos)
 
+        if ret == -1:
+            raise ZeroDivisionError("Can't normalize because norm is zero.");
         return M_out
 
 def prox_blockdiag(M, block_shapes, normalized, pos):
@@ -1031,19 +1033,22 @@ def prox_blockdiag(M, block_shapes, normalized, pos):
     if(isReal):
         M_view_dbl = M
         M_out_view_dbl = M_out
-        FaustCoreCy.prox_blockdiag[double](&M_view_dbl[0,0], M.shape[0],
+        ret = FaustCoreCy.prox_blockdiag[double](&M_view_dbl[0,0], M.shape[0],
                                            M.shape[1], &m_ptr[0], &n_ptr[0],
                                           len(block_shapes),normalized, pos,
                                            &M_out_view_dbl[0,0])
     else:
         M_view_cplx = M
         M_out_view_cplx = M_out
-        FaustCoreCy.prox_blockdiag[complex](&M_view_cplx[0,0], M.shape[0],
+        ret = FaustCoreCy.prox_blockdiag[complex](&M_view_cplx[0,0], M.shape[0],
                                            M.shape[1], &m_ptr[0], &n_ptr[0],
                                           len(block_shapes),normalized, pos,
                                            &M_out_view_cplx[0,0])
     PyMem_Free(m_ptr)
     PyMem_Free(n_ptr)
+
+    if ret == -1:
+        raise ZeroDivisionError("Can't normalize because norm is zero.");
 
     return M_out
 
@@ -1075,16 +1080,19 @@ cdef class ConstraintRealCore:
         if(isReal):
             M_view_dbl = M
             M_out_view_dbl = M_out
-            FaustCoreCy.prox_real[double, double](name, parameter, &M_view_dbl[0,0], num_rows,
+            ret = FaustCoreCy.prox_real[double, double](name, parameter, &M_view_dbl[0,0], num_rows,
                                          num_cols,&M_out_view_dbl[0,0],
                                                   normalized, pos)
         else:
             M_view_cplx = M
             M_out_view_cplx = M_out
-            FaustCoreCy.prox_real[complex, double](name, parameter, &M_view_cplx[0,0],
+            ret = FaustCoreCy.prox_real[complex, double](name, parameter, &M_view_cplx[0,0],
                                           num_rows, num_cols,
                                                    &M_out_view_cplx[0,0],
                                                    normalized, pos)
+
+        if ret == -1:
+            raise ZeroDivisionError("Can't normalize because norm is zero.");
 
         return M_out
 

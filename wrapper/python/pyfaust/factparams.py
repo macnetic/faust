@@ -227,11 +227,7 @@ class ConstraintMat(ConstraintGeneric):
         else:
             self._cons_value_sz = cons_value_sz
         if(normalized == None):
-            if(self._name.name == ConstraintName.CONST):
-                # for const proj the default is to not normalize
-                self.normalized = False
-            else: # self._name.name is 'supp'
-                self.normalized = True
+            self.normalized = False
         if(not isinstance(self._name, ConstraintName) or not self._name.is_mat_constraint()):
             raise TypeError('ConstraintMat first argument must be a '
                             'ConstraintName with a matrix type name '

@@ -13116,14 +13116,9 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Using-The-FA&#181;ST-Projectors-API">Using The FA&#181;ST Projectors API<a class="anchor-link" href="#Using-The-FA&#181;ST-Projectors-API">&#182;</a></h1><p>This notebook put the focus on the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1proj.html"><code>proj</code></a> module of the pyfaust API. This module provides a bunch of projectors which are for instance necessary to implement proximal operators in <a href="https://link.springer.com/article/10.1007/s10107-013-0701-9">PALM</a> algorithms.<br>
-A projector is basically a function defined from a matrix set to another (the image set is defined by a set of constraints to satisfy).<br>
-Each one of these projectors corresponds to a particular kind of constraint which can be of type <code>ConstraintReal</code>, <code>ConstraintInt</code> or <code>ConstraintMat</code>.<br>
-We will not address the constraints in this notebook however there is an important idea to keep in mind: a projector is defined by a specific configuration of one these constraints.<br>
-The reason why the constraints will not be introduced here, is because the use of projectors is quite straightforward and it is advised to use them instead of the <code>ConstraintGen</code> family objects.<br>
-Indeed these projectors matter in the parametrization of the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a686e523273cf3e38b1b614a69f4b48af">PALM4MSA</a> and <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a7ff9e21a4f0b4acd2107629d788c441c">hierarchical factorization</a> algorithms, so let's maintain their configuration as simple as possible by using projectors!</p>
-<p>In the next we shall pass the projectors in review, starting from the integer projectors.
-But first let's explain some generalities about projectors:</p>
+<h1 id="Using-The-FA&#181;ST-Projectors-API">Using The FA&#181;ST Projectors API<a class="anchor-link" href="#Using-The-FA&#181;ST-Projectors-API">&#182;</a></h1><p>This notebook put the focus on the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1proj.html"><code>proj</code></a> module of the pyfaust API. This module provides a bunch of projectors which are for instance necessary to implement proximal operators in <a href="https://link.springer.com/article/10.1007/s10107-013-0701-9">PALM</a> algorithms.</p>
+<p>Indeed these projectors matter in the parametrization of the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a686e523273cf3e38b1b614a69f4b48af">PALM4MSA</a> and <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1fact.html#a7ff9e21a4f0b4acd2107629d788c441c">hierarchical factorization</a> algorithms, so let's maintain their configuration as simple as possible by using projectors!</p>
+<p>First let's explain some generalities about projectors:</p>
 <ul>
 <li>They are all functor objects (objects that you can call as a function).</li>
 <li>They are all types defined by child classes of the parent abstract class <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1proj__gen.html"><code>proj_gen</code></a>.</li>
@@ -13134,7 +13129,7 @@ But first let's explain some generalities about projectors:</p>
 <li>Call this projector (again, as a function) on the matrix you're working on. This step is optional or for test purposes, because generally this is the algorithm implementation which calls the projectors. You just need to feed the algorithms (PALM4MSA for example) with them.</li>
 </ol>
 <p>Let's see how to define and use the projectors in the code. For the brief math definitions, I let you consult this <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/constraint.png">document</a>.
-Remember that the projector API is documented too, you'll find the link for each projector below.</p>
+Remember that the projector API is documented too, you'll find the link for each projector below. Last, if you're looking for a reference about proximal operators here it is: <a href="http://proximity-operator.net/">proximity operators</a>.</p>
 
 </div>
 </div>
@@ -13142,16 +13137,15 @@ Remember that the projector API is documented too, you'll find the link for each
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Integer-projectors">Integer projectors<a class="anchor-link" href="#Integer-projectors">&#182;</a></h2><p>The integer projectors constrains the integer sparsity of the image matrix.</p>
-<h3 id="The-SP-projector">The SP projector<a class="anchor-link" href="#The-SP-projector">&#182;</a></h3>
+<h3 id="The-SP-projector-(projection-onto-matrices-with-a-prescribed-sparsity)">The SP projector (projection onto matrices with a prescribed sparsity)<a class="anchor-link" href="#The-SP-projector-(projection-onto-matrices-with-a-prescribed-sparsity)">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This projector governs the global sparsity of a matrix given an integer k.
-The matrix $ A \in \mathbb{R}^{m \times n }, A = (a_{ij})_{i \in \mathbb{N}^m, j \in \mathbb{N}^n}$ is projected to the matrix $ B = (b_{ij})_{i \in \mathbb{N}^m}$ such that $ k = \#\{b_{ij} = a_{ij} \neq 0 \} $ which implies , if $k &lt; mn$, that some entries of A are kept in B and others are set to zero. The projector keeps the most k significant values (in term of absolute values or magnitude).</p>
+<p>This projector performs projection onto matrices with a prescribed sparsity. It governs the global sparsity of a matrix given an integer k.
+The matrix $ A \in \mathbb{R}^{m \times n }, A = (a_{ij})_{i \in \mathbb{N}^m, j \in \mathbb{N}^n}$ is projected to the closest matrix $ B = (b_{ij})_{i \in \mathbb{N}^m}$ such that $ \|B\|_0 = \#\{(i,j): b_{ij} \neq 0 \} = k$ which implies , if $k &lt; mn$, that some entries of A are kept in B and others are set to zero. The projector keeps the k most significant values (in term of absolute values or magnitude).</p>
 <p>Let's try on an example, here a random matrix.</p>
 
 </div>
@@ -13182,11 +13176,11 @@ The matrix $ A \in \mathbb{R}^{m \times n }, A = (a_{ij})_{i \in \mathbb{N}^m, j
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>A=
- [[91.66943074 56.85320111 15.1596225  62.95903695 51.73138689]
- [36.23875324 39.95111477 58.811887   34.71043505 37.12048345]
- [87.57507049  5.68405771 80.61811583  2.9706063  51.76825164]
- [29.83074066  7.62697131 57.75224433 74.99297781 15.62368174]
- [75.42663927 33.82778716 77.78095529 10.14424076 23.90652659]]
+ [[30.82094441 85.80834986 94.02897384 44.62458731 90.07037367]
+ [40.91109282 20.06498864 31.56979066 47.95276494 47.55411718]
+ [50.11665409 90.20988445 45.63629469 58.05411485 36.16719855]
+ [99.63615973  5.98194944 99.00325301 40.56224339 38.68572257]
+ [20.20176603 23.44729303 80.76874265 22.53798934 98.87065483]]
 </pre>
 </div>
 </div>
@@ -13225,10 +13219,10 @@ The matrix $ A \in \mathbb{R}^{m \times n }, A = (a_{ij})_{i \in \mathbb{N}^m, j
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>B=
- [[91.66943074  0.          0.          0.          0.        ]
+ [[ 0.          0.          0.          0.          0.        ]
  [ 0.          0.          0.          0.          0.        ]
- [87.57507049  0.          0.          0.          0.        ]
  [ 0.          0.          0.          0.          0.        ]
+ [99.63615973  0.         99.00325301  0.          0.        ]
  [ 0.          0.          0.          0.          0.        ]]
 </pre>
 </div>
@@ -13241,12 +13235,295 @@ The matrix $ A \in \mathbb{R}^{m \times n }, A = (a_{ij})_{i \in \mathbb{N}^m, j
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The projector is simply defined by the input matrix shape and the k integer to specify the targeted sparsity.<br>
-As you noticed, the argument <code>normalized</code> is set to <code>False</code> in the projector definition, otherwise the image B would be normalized according to its 2-norm.<br>
-It is also possible to "filter" the negative entries of A by setting the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1sp.html"><code>pos</code></a>  argument of <code>sp</code> to <code>True</code>.</p>
+<p>The projector is simply defined by the input matrix shape and the integer k to specify the targeted sparsity.</p>
+<p><strong>Optional normalization</strong>:<br>
+As you noticed, the argument <code>normalized</code> is set to <code>False</code> in the projector definition, otherwise the image B would be normalized according to its Frobenius norm.<br>
+The next example gives you a concrete view of what happens when <code>normalized</code> is True.</p>
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">norm</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">allclose</span>
+<span class="n">pnorm</span> <span class="o">=</span> <span class="n">sp</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">pnorm</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;B/norm(B) == C: &quot;</span><span class="p">,</span> <span class="n">allclose</span><span class="p">(</span><span class="n">B</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="s1">&#39;fro&#39;</span><span class="p">),</span><span class="n">C</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>B/norm(B) == C:  True
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Sparsity and optional positivity</strong>:<br>
+It is also possible to "filter" the negative entries of A by setting the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1sp.html"><code>pos</code></a>  argument of <code>sp</code> to <code>True</code>.
+You can see the projector as a pipeline, the first stage is to filter out the negative values, then the sp projector is applied and finally the resulting image is normalized if <code>normalized==True</code>.
+The following example shows how the projector operates depending on combinations of <code>pos</code> and <code>normalized</code> values.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">p_pos</span> <span class="o">=</span> <span class="n">sp</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p_pos</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[ 0.          0.          0.          0.          0.        ]
+ [ 0.          0.          0.          0.          0.        ]
+ [ 0.          0.          0.          0.          0.        ]
+ [99.63615973  0.         99.00325301  0.          0.        ]
+ [ 0.          0.          0.          0.          0.        ]]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Well, it's exactly the same as the <code>In [2]</code> output. The reason is quite obvious, it's because A doesn't contain any negative value, so let's try on a copy of A where we set the <code>p_pos(A)</code> nonzeros to negative values.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">nonzero</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">D</span><span class="p">[</span><span class="n">nonzero</span><span class="p">(</span><span class="n">p_pos</span><span class="p">(</span><span class="n">A</span><span class="p">))]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p_pos</span><span class="p">(</span><span class="n">D</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[ 0.          0.         94.02897384  0.          0.        ]
+ [ 0.          0.          0.          0.          0.        ]
+ [ 0.          0.          0.          0.          0.        ]
+ [ 0.          0.          0.          0.          0.        ]
+ [ 0.          0.          0.          0.         98.87065483]]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The entries selected when <code>p_pos(A)</code> is applied are now skipped because they are negative in D, so <code>p_pos(D)</code> selects the new greatest two values of A in term of magnitude.</p>
+<p>What happens now if all values of the matrix are negative ? Let's see it in the next example.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">E</span> <span class="o">=</span> <span class="o">-</span> <span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p_pos</span><span class="p">(</span><span class="n">E</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 0.]]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That should not be surprising that the resulting matrix is a zero matrix, indeed E contains only negative values which are all filtered by setting <code>pos=True</code> in the <code>p_pos</code> definition.<br>
+Let's evacuate another doubt about what happens if there is only one positive value when asking a sparsity of <code>k==2</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">E</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p_pos</span><span class="p">(</span><span class="n">E</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[10.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.]]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The situation is now clear, if there is not enough positive values in the input matrix the projector will return all available positive values along with all other entries set to zero. So be warned that the parameter <code>k</code> is silently not respected when it's not possible.<br>
+A last question remains: what would happen if we normalize the output matrix when <code>pos==True</code> and the input matrix is full of negative values ?<br>
+The response is simple: a division by zero error would be raised because the norm of a zero matrix is zero, hence it's not possible to normalize. See by yourself in the example below.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">p_pos_norm</span> <span class="o">=</span> <span class="n">sp</span><span class="p">(</span><span class="n">E</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">p_pos_norm</span><span class="p">(</span><span class="o">-</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ZeroDivisionError</span>                         Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-8-896ac871fe6e&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> p_pos_norm <span class="ansi-blue-fg">=</span> sp<span class="ansi-blue-fg">(</span>E<span class="ansi-blue-fg">.</span>shape<span class="ansi-blue-fg">,</span> k<span class="ansi-blue-fg">,</span> pos<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">True</span><span class="ansi-blue-fg">,</span> normalized<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">True</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">----&gt; 2</span><span class="ansi-red-fg"> </span>p_pos_norm<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">-</span>A<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/pyfaust/proj.py</span> in <span class="ansi-cyan-fg">__call__</span><span class="ansi-blue-fg">(self, M)</span>
+<span class="ansi-green-intense-fg ansi-bold">     51</span> 
+<span class="ansi-green-intense-fg ansi-bold">     52</span>     <span class="ansi-green-fg">def</span> __call__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> M<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 53</span><span class="ansi-red-fg">         </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>constraint<span class="ansi-blue-fg">.</span>project<span class="ansi-blue-fg">(</span>M<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     54</span> 
+<span class="ansi-green-intense-fg ansi-bold">     55</span> <span class="ansi-green-fg">class</span> toeplitz<span class="ansi-blue-fg">(</span>proj_gen<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/.local/lib/python3.7/site-packages/pyfaust/factparams.py</span> in <span class="ansi-cyan-fg">project</span><span class="ansi-blue-fg">(self, M)</span>
+<span class="ansi-green-intense-fg ansi-bold">    202</span>         return _FaustCorePy.ConstraintIntCore.project(M, self._name.name, self._num_rows,
+<span class="ansi-green-intense-fg ansi-bold">    203</span>                                                       self<span class="ansi-blue-fg">.</span>_num_cols<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>_cons_value<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 204</span><span class="ansi-red-fg">                                                       self.normalized, self.pos)
+</span><span class="ansi-green-intense-fg ansi-bold">    205</span> 
+<span class="ansi-green-intense-fg ansi-bold">    206</span> <span class="ansi-green-fg">class</span> ConstraintMat<span class="ansi-blue-fg">(</span>ConstraintGeneric<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">_FaustCorePy.pyx</span> in <span class="ansi-cyan-fg">_FaustCorePy.ConstraintIntCore.project</span><span class="ansi-blue-fg">()</span>
+
+<span class="ansi-red-fg">ZeroDivisionError</span>: Can&#39;t normalize because norm is zero.</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
@@ -13259,12 +13536,12 @@ Look at the two short examples, just to be sure.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.proj</span> <span class="k">import</span> <span class="n">splin</span><span class="p">,</span> <span class="n">spcol</span>
-<span class="n">pl</span> <span class="o">=</span> <span class="n">splin</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">pc</span> <span class="o">=</span> <span class="n">spcol</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">pl</span> <span class="o">=</span> <span class="n">splin</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="c1"># reminder: k == 2</span>
+<span class="n">pc</span> <span class="o">=</span> <span class="n">spcol</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 <span class="n">B1</span> <span class="o">=</span> <span class="n">pl</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 <span class="n">B2</span> <span class="o">=</span> <span class="n">pc</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;B1=</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">B1</span><span class="p">)</span>
@@ -13286,17 +13563,17 @@ Look at the two short examples, just to be sure.</p>
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>B1=
- [[91.66943074  0.          0.         62.95903695  0.        ]
- [ 0.         39.95111477 58.811887    0.          0.        ]
- [87.57507049  0.         80.61811583  0.          0.        ]
- [ 0.          0.         57.75224433 74.99297781  0.        ]
- [75.42663927  0.         77.78095529  0.          0.        ]]
+ [[ 0.          0.         94.02897384  0.         90.07037367]
+ [ 0.          0.          0.         47.95276494 47.55411718]
+ [ 0.         90.20988445  0.         58.05411485  0.        ]
+ [99.63615973  0.         99.00325301  0.          0.        ]
+ [ 0.          0.         80.76874265  0.         98.87065483]]
 B2=
- [[91.66943074 56.85320111  0.         62.95903695 51.73138689]
- [ 0.         39.95111477  0.          0.          0.        ]
- [87.57507049  0.         80.61811583  0.         51.76825164]
- [ 0.          0.          0.         74.99297781  0.        ]
- [ 0.          0.         77.78095529  0.          0.        ]]
+ [[ 0.         85.80834986 94.02897384  0.         90.07037367]
+ [ 0.          0.          0.         47.95276494  0.        ]
+ [50.11665409 90.20988445  0.         58.05411485  0.        ]
+ [99.63615973  0.         99.00325301  0.          0.        ]
+ [ 0.          0.          0.          0.         98.87065483]]
 </pre>
 </div>
 </div>
@@ -13308,7 +13585,8 @@ Look at the two short examples, just to be sure.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Here again the most significant values are chosen (by rows for splin or by columns for spcol) and the image normalization is disabled.</p>
+<p>Here the k most significant values are chosen (by rows for splin or by columns for spcol) and the image normalization is disabled.<br>
+As for the SP projector, it is possible to incorporate a normalization and/or positivity constraint passing <code>normalized=True</code> and <code>pos=True</code> to the functor constructor.</p>
 
 </div>
 </div>
@@ -13323,18 +13601,18 @@ Look at the two short examples, just to be sure.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The last integer projector is <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1splincol.html"><code>splincol</code></a>. It tries to constrains the sparsity both by columns and by rows and I wrote it tries because there is not always a solution. The use is again the same.</p>
+<p>The projector <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1splincol.html"><code>splincol</code></a> tries to constrain the sparsity both by columns and by rows and I wrote it tries because there is not always a solution. The use is again the same.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.proj</span> <span class="k">import</span> <span class="n">splincol</span>
-<span class="n">plc</span> <span class="o">=</span> <span class="n">splincol</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">plc</span> <span class="o">=</span> <span class="n">splincol</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">plc</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
 </pre></div>
 
@@ -13352,11 +13630,11 @@ Look at the two short examples, just to be sure.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[[91.66943074 56.85320111  0.         62.95903695 51.73138689]
- [ 0.         39.95111477 58.811887    0.          0.        ]
- [87.57507049  0.         80.61811583  0.         51.76825164]
- [ 0.          0.         57.75224433 74.99297781  0.        ]
- [75.42663927  0.         77.78095529  0.          0.        ]]
+<pre>[[ 0.         85.80834986 94.02897384  0.         90.07037367]
+ [ 0.          0.          0.         47.95276494 47.55411718]
+ [50.11665409 90.20988445  0.         58.05411485  0.        ]
+ [99.63615973  0.         99.00325301  0.          0.        ]
+ [ 0.          0.         80.76874265  0.         98.87065483]]
 </pre>
 </div>
 </div>
@@ -13368,7 +13646,7 @@ Look at the two short examples, just to be sure.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The image matrix support is in fact the union set of the supports obtained through <code>splin</code> and <code>spcol</code> projectors</p>
+<p>The image matrix support is in fact the union set of the supports obtained through <code>splin</code> and <code>spcol</code> projectors. You can refer to this <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1splincol.html">documentation page</a> which demonstrates in a example how this union is defined.</p>
 
 </div>
 </div>
@@ -13376,7 +13654,140 @@ Look at the two short examples, just to be sure.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="The-Real-projectors">The Real projectors<a class="anchor-link" href="#The-Real-projectors">&#182;</a></h2><p>The pyfaust.proj modules provides two real constraint based projectors: <code>normlin</code> and <code>normcol</code>. They look like the <code>splin</code> and <code>spcol</code> projectors we've seen before but here the constraint to define the matrix image set is based on the 2-norm of the rows for <code>normlin</code> and that of the columns for <code>normcol</code>.</p>
+<h3 id="The-BLOCKDIAG-projector">The BLOCKDIAG projector<a class="anchor-link" href="#The-BLOCKDIAG-projector">&#182;</a></h3><p>Another matrix projector is the <code>blockdiag</code> projector. As its name suggests it projects onto the closest block-diagonal matrix with a prescribed structure. Contrary to the <code>supp</code> projector (which is presented below), for this kind of projector you don't pass a matrix as a definition but a description of the block-diagonal structure.
+The block-diagonal structure can be defined by the list of the boundaries of the block diagonal submatrices you want to keep from the input matrix into the output matrix.</p>
+<p>An example will show how it works easily:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span> <span class="nn">pyfaust.proj</span> <span class="k">import</span> <span class="n">blockdiag</span>
+<span class="kn">from</span> <span class="nn">pyfaust</span> <span class="k">import</span> <span class="n">Faust</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">pbd</span> <span class="o">=</span> <span class="n">blockdiag</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">13</span><span class="p">)</span> <span class="p">,(</span><span class="n">R</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">R</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+<span class="c1"># show it as a Faust composed of a single factor</span>
+<span class="n">Faust</span><span class="p">([</span><span class="n">pbd</span><span class="p">(</span><span class="n">R</span><span class="p">)])</span><span class="o">.</span><span class="n">imshow</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMoAAAEVCAYAAAChenrmAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDMuMC4zLCBodHRwOi8vbWF0cGxvdGxpYi5vcmcvnQurowAAGOxJREFUeJzt3XmUVdWVx/HvDjMUQwoUAYmgqKgQaCUE1MRAqxCHKFl2NNpOMXFK4pSEtjt0Jqc4dNREdGlaRU0LGo2GBI1BE0eMcR4IKDMyyCAqk1gFtfuPeyu+Ks8pDlTVe1XF77NWrXq1z9v3nnfr7XfvPe8O5u6ISN0+VeoOiDQHKhSRBCoUkQQqFJEEKhSRBCoUkQQqlBIxs45mNs3MPjCzyYk5T5vZaY3cNQlo0oViZgvN7EMzW1/w07se0xtgZk3li6PjgXKgu7t/vXajmV1qZpMaa+ZmtiSwbHduxPlNMbMJdbS3NzM3sw0F/XmnsfqzrVqXugMJjnb3R0vdCQAza+3umxtocrsBbzbg9LbHl9398RLOP2Rvd19S6k58grs32R9gIXBoIP4p4D7gHeB94HFgn4L2jsC1wGLgA+BJoB2wDHBgff7zuXxaPwIWASuBSUCXfDoD8uefnk/rL/m07wbezef9d6BHpP/7AU/kz3sdODKPXwZUAJV5P06tlXdUrfYX8/jTwE+BGcA64E9AeUHeQcDf8vm9AnyxjmW7BPhSIN4auB9YkU/nr2Rv3ur2vwH/XvD32cCj+eNWwA3Aqny5vwrsDZyXv5aP8tfz28B82+fLetdSv++Cy6vUHahHoZwGdM4X8A3ACwXtNwOPAb3yf97BQJvqN36taZ0JvAX0z6f3e+D2WoVye14gHYBvAw/mj1sBw4CyQB/bAguA8fm8D83fJAPy9kuBSXW89k+054UyB9gz789TwKV5W1+y4h2TL5+xwGqyTbttLZRTgbJ82d4E/C2xUI4BngW65H3YD9g5b5sCTKjj9TbpQmnS+yi5B83s/fznQQB3r3L3Se6+zt03AT8BDjCzTmbWiqyIznP35e6+xd2fdvfKyPRPAq5x9wXuvg74L+BEMytcNj92943u/iHZJ2MPsjf8Fnd/wd3XB6Z7EFmxXO3ulZ5tPj4MnFDP5XGru89x943Ab4GhefwUYKq7P5Ivnz+RfaKPrWNafyxYtvcBuPtmd7/D3dfny/anwHAza5/Qt0qyIhmYTcpnuvvKbXx9Mwv6dNU25jaa5rCPcqzX2kfJi+EK4DiyN21V3tSD7J/VFpiXOP3eZJtd1Rbl+TsVxN4ueDwpz7nXzLoAd5F9Utbe1+gNLPb847Jg2n0S+xVTuIO7keyTH7J9nq+b2biC9jZkm2cxR3mtfRQzaw38HPgqHy9bA7oDS7fSt4fJiuRmoE9efOMjHyQx+3kT3EdpDmuUkFOAI4DRQFeyTSTI/qEryLbv9wjkhUa8lpG9yap9Js9f9c+kgje7u1e4+0/cfR+yTbpxZGul0HT7mpnVmvbW3mx19bUub5NtMnYr+Onk7ldv43ROBw4HRpEt24F5vPp1bCDb7Ku2yz87nPmFu/8L8FlgCHB+dfM29qNJaa6F0plsx/Bdsn/aZdUN7r6F7FP/OjPbxcxamdlBZtaGbGfdzWz3gmlNBi4ys35m1jmf1mR3ryLAzEab2aB802wt2RpsS+CpM4DNwPfMrI2ZjSYr7nsTX+MKoF+tQqvLXcA4Mzssf83tzWzUdgyndwY2kS3bTmT7SoVeAY7Lpz+QbDMXADMbYWbD8rXSBrIPnOplswLYnWaquRbK7WSf2MuAmWRvykIXArOAF4E1wOWA5fsgVwDP5dvAw4BfA/eQ7RjPJxtNOp+43sDvyIpkJvAoWbHV4O4fAUeT7eCuBn4JnOjubyW+xnvINgHXmNnft/Zkd19Itnb7b7K14WLge2z7//jWPP8dspG6p2u1X0W2yb4KuAX4TUFbN7IPqffJluUistdN/tzP5ct9yjb2qeSs5ia0iIQ01zWKSFGpUEQSqFBEEqhQmhEzKzezB/IDBxeZ2Yml7tOOojl84Sgfm0g25NqT7Bv5aWb2qrvPLG23Wj6NejUTZtYJeA8YVD3EbGZ3AUvd/eKSdm4HoE2v5mMvYEut72FeJTvwUBqZCqX5KCM7dL3QB2TfpEsjU6E0H+vJjswt1IXsSAJpZCqU5uMtoLWZ7VkQG0J2GI00Mu3MNyP5MVIOfJNs1Osh4ECNejU+rVGal3PJzqxcSXYg5jkqkuLQGkUkgdYoIglUKCIJVCgiCVQoIgmKelBk21YdvEPrrsE2r6goZldEAFjHe6vdfaetPa+ohdKhdVcO7BO6YAlsXri4mF0RAeBRv2/R1p+lTS+RJCoUkQQqFJEEKhSRBCoUkQRFHfXyioro6Ja1Dndlzu2Do9Pr8lyHYLzXlDejOeVTQ1c/zSxcWx6Mr52+SzAOMOakZ4PxafePjOY8c/Y10bbRV34/GO/9h7eDcYDNi+Jt0jC0RhFJoEIRSaBCEUmgQhFJoEIRSVDUMxy7WLl/3v61aPPbUXz4SP9gfENFm2jOpjraKitbBeO73RD/XN20U7tgfM0+4WkBHDLupWjbwy+HRztnHjExmvPAhl7B+FU3HR/NeePai15092HRJ+S0RhFJoEIRSaBCEUmgQhFJoEIRSaBCEUmgGwm1AIPKlwfjc8/bO5qz23Vzo21LDwsP6S6e1DeaM37fPwbjU0bGD2p9qnL/aNvz510djK/YEv86Y8JT44Lx1sM3RnNSaY0ikkCFIpJAhSKSQIUikkCFIpJAo14twGW7/CUYP8H3iuYsHRP/13vFR8H4F/vOi+Zc9Y8xwXjfvvFTrzcM3hRtGzElfEp0640Wzek1qyoYb/deNIX58aYatEYRSaBCEUmgQhFJoEIRSaBCEUmgQhFJoOHhFmDkbeGh1Nm/uzGas/8l50TbLr7w7mD8jrGjojllB3YOxqvab4jmDO0Xv8Lly5v6BePt1sTP9R83YXowfnrX16I5PXeNNtWgNYpIAhWKSAIVikgCFYpIAhWKSAIVikgCXVK1BXhoafjSpEcPDR/RCzB7wh7RtoGXzAnGZ12xezRn38tXBuP+bvzQXevaJdr25pU9gvEtH7SN5nzqo/DnflX78FHFAIvPGq9Lqoo0FBWKSAIVikgCFYpIAhWKSAIdFNkC7P3EN4Lxr/05fqMeDo2fy95tangkdK8L4+e4nzv9kWD8yI7xnCOGHBZt6zyjYzD+/mcrozneLdx26cgHozmnRFtq0hpFJIEKRSSBCkUkgQpFJIEKRSSBCkUkgYaHW4ABp88Kxs94a0Y059CrL4i29bwp/LZYPzr+ubqhKnyf+QF3nxbNYXz88qhzTwqf73/ess9Fc569MXxs46/v+Wq8DzxXR9vHtEYRSaBCEUmgQhFJoEIRSaBCEUmgUa8WYOPYIcF4z1ZPRHO+PyJ8ECPAfocsDcYvuP7saM71PzwhGPdjwjclAuj0Uodo2/CX/y2c86tu0ZzPXxI+CPTJKQdEc3go3lRIaxSRBCoUkQQqFJEEKhSRBCoUkQQqFJEEGh5uAdb3ahWMr6naHM2ZdtzIeNvE9cF4tznx89XL/mNJMN75B+ErPgIsODZ+ldKyO7sH47fdfE0057CnvxuMX3rm5GjOSfHJ1aA1ikgCFYpIAhWKSAIVikgCFYpIAhWKSAIND7cAG0aF7+X+rX6HRHPeOT8+bHt41/CNhGY+Ex42Bqg6vn0wPu+ismjOgJ/F7/8+Ykb4BkSjp10UzVlw7C3B+P6XnBPNgefraPuY1igiCVQoIglUKCIJVCgiCVQoIgk06tUC9Pr02mDchgyM5vR4NX4u+xNrRgTjq66LHxR55cG/DcYv/lP/aM7aIwdH284p/59gfHKP+PnvQ684NxjvNm5ZNIfwBSk/QWsUkQQqFJEEKhSRBCoUkQQqFJEEKhSRBBoebgFWPNM7GD/q1mejOfe9Eh9mbb8wfIOfno/F3y4/KvtKMP6ZgSuiOf2Hvxttm13ZKRj/7qDHozkDDwgPA1848axoTiqtUUQSqFBEEqhQRBKoUEQSqFBEEmjUqwXoOGx1MH5yeXzU66AvhE/3BRh1+Kpg/Esvnh7N6d6uIhhvN2ZRNGfB2PDtrgHGd98vGF89JH7L7S7zwvFBJ4dvLw4wM3zs5SdojSKSQIUikkCFIpJAhSKSQIUikkCFIpLA3OM3c2nwmZmtAuLjhSLFt5u777S1JxW1UESaK216iSRQoYgkUKGIJFChSA1m1t7MZpvZzvnfvzSzb5a6X6WmQtlOZrbQzD40s/UFP71rPeebZvZ4ibq4vc4BHnX3lfnfVwE/MrMd+gBaFUr9HO3uZQU/dVy7s2GF3rgN9GY+C7ir+g93XwLMA45qgGk3WyqURmJmg4EbgC/ka5vVebybmf3GzFbla6X/NDPL2/Y0s7+a2btmttrM7jKzrgXTXGJmPzCz14GNdcQmmNl8M1tnZjPN7Ct5vL2ZvW9m+xRMs5eZbTSz7ma2O9AXeKHWy3kcOLKRFlWzoEJpJO7+OvAd4Kl8bVN9L7gbgY7A7sBo4AzglLzNgEuBXsC++XP+u9akTwC+DHStI/YWcFD+92XA3WbW0903AfcC/16QeyLwiLu/CwwG5rr7llrznAUM2aYF0MKoUOrnwfwT+n0ze3BrTzazNsDXgIvdfZ27zweuBU4GcPe33P0xd6/I9xGuBWrfiPF6d1/i7h/GYu5+r7svd/cqd78bWAhUnyV1B3Bi9Vosn3f1plY3YF2g6+vyth3WDr2D1gCOdfdHt+H5OwOtqHkYzyKgD4CZ7QL8kmxt0Jnsg6z26YZvB6ZbI2ZmpwEXArvloTKgB4C7P2Nmm4GDzew94DPAtPx57+Xzra0z8P5WX10LpjVK46p9fNBKYAsfv4Ehe6MuzR9fCXwEDHb3LsBpZJtjdU2zRizfz7iJbPSqu7t3A2bXms6dZJtfJwP3unv1zVJeA/Yws1a1pr8P8Gr4Je4YVCiNawWwa77JhbtXAvcBl5tZmZn1J/vk/03+/M7ABuADM+sLfH875llGVjirAMu/A6l9R6G7gOPI9k/urA66+0JgMVD7MpKHAA9vR19aDBVKAzKzVvkI18g8NB2YA6wws3fy2LlABbAAeIJsn6H6zfpjYDjwATAVuH9b++Dur5Ftvv0dWE5WJM/Ves5C4HWgwt1n1JrEzeT7TPlr6gPsCfxhW/vSkujo4R2Umd0JzHf3n9SKtwdeBg5x95Vmdj0w091vKUE3mwwVyg4o3495mWxfaHGp+9McaNNrB2NmV5DtmF+uIkmnNYpIAq1RRBLU6wtHMxsLXE/2Jdr/uvvP63p+21YdvEPrrsE2rwhfklOkMa3jvdUp58xvd6HkX0pNBA4DlgDPm9lUd/9HLKdD664c2OekYNvmhdpcluJ71O9LuthJfTa9hpMdQDff3SuAKcAx9ZieSJNVn0LpQ81jjJbksRrM7Ewze8HMXqjYsrEesxMpnfoUSuj6+58YQnP3W9x9mLsPa9uqYz1mJ1I69SmUJWQn+VTbFSjaGX4ixVSfQnke2NPM+ptZW7KTh6Y2TLdEmpbtHvVy981m9h3gEbLh4dvcfWadORUV0dEtax3uypzbB0en1+W5DsF4rylvRnPKp9Y+ee9jC9eWB+Nrp+8SzRlzUviuVtPuHxmMAzxz9jXRttFXhg8Y7v2H0Gkomc2L4m3SMOr1PYq7PwQ81EB9EWmy9M28SAIVikgCFYpIAhWKSIKiHmbfxcr98/avRZvfjuLDR/oH4xsq2kRzNtXRVllZ+9oSmd1uiH+ubtqpXTC+Zp/wtAAOGfdStO3hl8OjnTOPmBjNeWBDr2D8qpuOj+a8ce1FL7p7/Ib3Oa1RRBKoUEQSqFBEEqhQRBKoUEQSqFBEEugi3S3AoPLlwfjc8/aO5ux23dxo29LDwkO6iyf1DcYBxu/7x2B8ysj4Qa1PVe4fbXv+vKuD8RVb4l9nTHhqXDDeenj9TxjUGkUkgQpFJIEKRSSBCkUkgQpFJIFGvVqAy3b5SzB+gu8VzVk6Jv6v94qPgvEv9p0XzbnqH2OC8b5946debxi8Kdo2Ykr4lOjWG0MX/8n0mlUVjLd7L5rC/HhTDVqjiCRQoYgkUKGIJFChiCRQoYgkUKGIJKjvjYQWAuuALcDmlHOPpeGNvC08lDr7dzdGc/a/5Jxo28UX3h2M3zF2VDSn7MDOwXhV+w3RnKH94le4fHlTv2C83Zr4uf7jJkwPxk/v+lo0p+eu0aYaGuJ7lFHuvroBpiPSZGnTSyRBfQvFgT+b2YtmdmboCYU3Eqok/I2vSFNX302vg9x9mZntDEw3s9nu/mThE9z9FuAWyK7rVc/5iZREvdYo7r4s/70SeIDsvo4iLc52F4qZdTKzztWPgcOBNxqqYyJNyXZfUtXMdidbi0C2CXe3u19WV44uqdo4HloavjTp0UPDR/QCzJ6wR7Rt4CVzgvFZV+wezdn38pXBuL8bP3TXunaJtr15ZY9gfMsHbaM5n/oo/Llf1T58VDHA4rPGJ11StT533JoPDNnefJHmRMPDIglUKCIJVCgiCVQoIgl0znwLsPcT3wjGv/bn+I16ODR+Lnu3qeGR0L0ujJ/jfu70R4LxIzvGc44Ycli0rfOMjsH4+5+tjOZ4t3DbpSMfjOacEm2pSWsUkQQqFJEEKhSRBCoUkQQqFJEEKhSRBBoebgEGnD4rGD/jrRnRnEOvviDa1vOm8Nti/ej45+qGqvB95gfcfVo0h/Hxy6POPSl8vv95yz4XzXn2xvCxjb++56vxPvBcHW0f0xpFJIEKRSSBCkUkgQpFJIEKRSSBRr1agI1jwyea9mz1RDTn+yPCBzEC7HfI0mD8guvPjuZc/8MTgnE/Jn6Jqk4vdYi2DX/538I5v+oWzfn8JeGDQJ+cckA0h4fiTYW0RhFJoEIRSaBCEUmgQhFJoEIRSaBCEUmw1eFhM7sNOApY6e6D8lg5cA/QD1gIfM3d67ibtzSm9b1aBeNrqjZHc6YdNzLeNnF9MN5tTvx89bL/WBKMd/5B+IqPAAuOjV+ltOzO7sH4bTdfE8057OnvBuOXnjk5mnNSfHI1pKxRJgFja8UuBh5z9z2Bx/K/RVqsrRZKfhuHNbXCxwB35I/vAI5t4H6JNCnbu4/S092XA+S/d449UTcSkpag0Xfm3f0Wdx/m7sPaED65R6Sp295CWWFmvQDy3+Fr/ou0ENtbKFOBU/PHpwK/b5juiDRNKcPDk4EvAT3MbAnwY+DnwL1mdgawGAgf6ilFsWFU+F7u3+p3SDTnnfPjw7aHdw3fSGjmM+FhY4Cq49sH4/MuKovmDPhZ/P7vI2aEv20YPe2iaM6CY28Jxve/5JxoDjxfR9vHtloo7v71SJNunSU7DH0zL5JAhSKSQIUikkCFIpJA58y3AL0+vTYYtyEDozk9Xo0fJfHEmhHB+Krr4gdFXnnwb4Pxi//UP5qz9sjB0bZzyv8nGJ/cI37++9Arzg3Gu41bFs0hfEHKT9AaRSSBCkUkgQpFJIEKRSSBCkUkgQpFJIGGh1uAFc/0DsaPuvXZaM59r8SHWdsvDN/gp+dj8bfLj8q+Eox/ZuCKaE7/4e9G22ZXdgrGvzvo8WjOwAPCw8AXTjwrmpNKaxSRBCoUkQQqFJEEKhSRBCoUkQQa9WoBOg5bHYyfXB4f9TroC+HTfQFGHb4qGP/Si6dHc7q3qwjG241ZFM1ZMDZ8u2uA8d33C8ZXD4nfcrvLvHB80Mnh24sDzAwfe/kJWqOIJFChiCRQoYgkUKGIJFChiCRQoYgkMPf4zVwafGZmq4Dq8cIeQHhcs3jUB/VhN3ffaWtPKmqh1Jix2QvuHh9IVx/UhyZEm14iCVQoIglKWSjhS48Xl/qQUR+2omT7KCLNiTa9RBKUpFDMbKyZvWlmc82sJLfeNrOFZva6mb1iZi8UaZ63mdlKM3ujIFZuZtPNbE7++9Ml6MNPzGxpvixeMbMjGnH+fc3sr2Y2y8xmmtn5ebyoy2FbFb1QzKwVMBH4MrAv8HUz27fY/ciNcvehRRyWnASMrRW7GHjM3fcEHsv/LnYfAK7Nl8VQd3+oEee/Gfieu+8DjAC+nf//i70ctkkp1ijDgbnuPt/dK4ApZPetb/Hc/UlgTa3wMcAd+eM7gGNL0Ieicffl7v5S/ngdMAvoQ5GXw7YqRaH0Ad4u+HtJHis2B/5sZi+a2ZklmH+1nu6+HLI3EbBzifrxHTN7Ld80K8pmj5n1A/4FeI6msxyCSlEooVPUSjH0dpC770+2CfhtM/tiCfrQVNwE7AEMBZYDief9bT8zKwPuBy5w9/B9K5qQUhTKEqBvwd+7AnXcwKJxuPuy/PdK4AGyTcJSWGFmvQDy3yuL3QF3X+HuW9y9Cvg1jbwszKwNWZH8n7v/Lg+XfDnUpRSF8jywp5n1N7O2wAlk960vGjPrZGadqx8DhwNv1J3VaKYCp+aPTwV+X+wOVL9Bc+NoxGVhZgbcCsxy918UNJV8OdTJ3Yv+AxwBvAXMA35YgvnvDrya/8wsVh+AyWSbNpVka9YzgO5kozxz8t/lJejDXcDrwGtkb9hejTj/g8k2tV8DXsl/jij2ctjWH30zL5JA38yLJFChiCRQoYgkUKGIJFChiCRQoYgkUKGIJFChiCT4f24zxhxKN9tcAAAAAElFTkSuQmCC
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This blockdiag projector above is defined in order to keep three blocks of the input matrix A, from the upper-left to the lower-right: the first block is the singleton block composed only of the entry (0,0), the second block is a bit of the next row starting from entry (1,1) and finishing to the entry (2-1, 13-1) = (1,12) and the final block starts from the element (2,13) to finish on the element (R.shape[0]-1, R.shape[1]-1).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="The-CIRC,-TOEPLITZ-and-HANKEL-projectors">The CIRC, TOEPLITZ and HANKEL projectors<a class="anchor-link" href="#The-CIRC,-TOEPLITZ-and-HANKEL-projectors">&#182;</a></h3><p>These projectors all return the corresponding structured matrix (circ being the short name for circulant).
+For detailed definitions of these kinds of matrices you can refer to wikipedia:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Circulant_matrix">circulant matrix</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Toeplitz_matrix">toeplitz matrix</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Hankel_matrix">hankel matrix</a></li>
+</ul>
+<p>The output matrix coefficients are determined by computing the mean of all the input matrix entries each one replaces in the output matrix.</p>
+<p>In the following example, a Faust is constructed with in first factor a circulant matrix, in second position a toeplitz matrix and at the end a hankel matrix.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.proj</span> <span class="k">import</span> <span class="n">circ</span><span class="p">,</span> <span class="n">toeplitz</span><span class="p">,</span> <span class="n">hankel</span>
+<span class="n">CI</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># circ proj input</span>
+<span class="n">TI</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span> <span class="c1"># toeplitz proj input</span>
+<span class="n">HI</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># hankel proj input</span>
+<span class="n">cp</span> <span class="o">=</span> <span class="n">circ</span><span class="p">(</span><span class="n">CI</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">tp</span> <span class="o">=</span> <span class="n">toeplitz</span><span class="p">(</span><span class="n">TI</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">hp</span> <span class="o">=</span> <span class="n">hankel</span><span class="p">(</span><span class="n">HI</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">Faust</span><span class="p">([</span><span class="n">cp</span><span class="p">(</span><span class="n">CI</span><span class="p">),</span> <span class="n">tp</span><span class="p">(</span><span class="n">TI</span><span class="p">),</span> <span class="n">hp</span><span class="p">(</span><span class="n">HI</span><span class="p">)])</span>
+<span class="n">F</span><span class="o">.</span><span class="n">imshow</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You should recognize clearly the structures of a circulant matrix, a toeplitz matrix and a hankel matrix.</p>
+<p>Note that these projectors are also capable to receive the <code>normalized</code> and <code>pos</code> keyword arguments we've seen before.</p>
+<p>The API documentation will give you other examples:</p>
+<ul>
+<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1circ.html">circ(culant)</a>, </li>
+<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1toeplitz.html">toeplitz</a>, </li>
+<li><a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1hankel.html">hankel</a></li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="The-NORMLIN-and-NORMCOL-projectors">The NORMLIN and NORMCOL projectors<a class="anchor-link" href="#The-NORMLIN-and-NORMCOL-projectors">&#182;</a></h3><p>The <code>pyfaust.proj</code> module provides two projectors, <code>normlin</code> (resp. <code>normcol</code>) that project a matrix onto the closest matrix with rows (resp. columns) of a prescribed 2-norm.</p>
 <p>Let's try them:</p>
 
 </div>
@@ -13384,13 +13795,13 @@ Look at the two short examples, just to be sure.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.proj</span> <span class="k">import</span> <span class="n">normcol</span><span class="p">,</span> <span class="n">normlin</span>
 <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">norm</span>
-<span class="n">pnl</span> <span class="o">=</span> <span class="n">normlin</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">pnc</span> <span class="o">=</span> <span class="n">normcol</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">pnl</span> <span class="o">=</span> <span class="n">normlin</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">pnc</span> <span class="o">=</span> <span class="n">normcol</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">)</span>
 <span class="c1"># let&#39;s verify the norm for one column obtained by normlin</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">pnl</span><span class="p">(</span><span class="n">A</span><span class="p">)[</span><span class="mi">2</span><span class="p">,:]))</span>
 <span class="c1"># and the same for normcol</span>
@@ -13411,8 +13822,8 @@ Look at the two short examples, just to be sure.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.19999999999999998
-0.19999999999999998
+<pre>0.2
+0.20000000000000007
 </pre>
 </div>
 </div>
@@ -13424,29 +13835,71 @@ Look at the two short examples, just to be sure.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="The-Matrix-projectors">The Matrix projectors<a class="anchor-link" href="#The-Matrix-projectors">&#182;</a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>The last kind of projectors to introduce are the matrix projectors. Unlike the previous projectors, they are defined by a matrix or a structure of matrix.
-Let's describe two of them, for the others you can refer to the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust_1_1proj.html">API documentation</a>.</p>
-<h3 id="The-SUPP-projector">The SUPP projector<a class="anchor-link" href="#The-SUPP-projector">&#182;</a></h3><p>The <code>supp</code> projector defines a matrix support for the arbitrary subset of entries you want to keep in a matrix. The others are set to zero.</p>
+<p>Something that is important to notice is the particular case of zero columns or rows. When the NORMLIN (resp. NORMCOL) projector encounters a zero row (resp. a zero column) it simply ignores it.
+Let's try:</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">B</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">B</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pnc</span><span class="p">(</span><span class="n">B</span><span class="p">)[:,</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[0. 0. 0. 0. 0.]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The column 2 is set to zero in B and stays to zero in the projector image matrix.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="The-SUPP-projector">The SUPP projector<a class="anchor-link" href="#The-SUPP-projector">&#182;</a></h3><p>The <code>supp</code> projector projects a matrix onto the closest matrix with a prescribed support. In other words, it preserves the matrix entries lying on this support. The others are set to zero. 
+The support must be defined by a binary matrix (the <code>dtype</code> must be the same as the input matrix though).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.proj</span> <span class="k">import</span> <span class="n">supp</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">eye</span>
 <span class="c1"># keep only the diagonal of A</span>
-<span class="n">ps</span> <span class="o">=</span> <span class="n">supp</span><span class="p">(</span><span class="n">eye</span><span class="p">(</span><span class="o">*</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+<span class="n">ps</span> <span class="o">=</span> <span class="n">supp</span><span class="p">(</span><span class="n">eye</span><span class="p">(</span><span class="o">*</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span> <span class="c1"># by default normalized=False and pos=False</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ps</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
 </pre></div>
 
@@ -13454,88 +13907,12 @@ Let's describe two of them, for the others you can refer to the <a href="https:/
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>[[0.60851013 0.         0.         0.         0.        ]
- [0.         0.26519918 0.         0.         0.        ]
- [0.         0.         0.53515048 0.         0.        ]
- [0.         0.         0.         0.49781029 0.        ]
- [0.         0.         0.         0.         0.15869373]]
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="The-BLOCKDIAG-projector">The BLOCKDIAG projector<a class="anchor-link" href="#The-BLOCKDIAG-projector">&#182;</a></h3><p>Another matrix projector is the <code>blockdiag</code> projector. Contrary to the <code>supp</code> projector, for this kind of projector you don't pass a matrix as a definition but the structure of the image matrix.
-The block-diagonal structure can be defined by the list of the upper-left corners of the block diagonal submatrices you want to keep from the input matrix into the output matrix. The list must be ended by passing the shape of the matrix as a last element.</p>
-<p>An example will show how it works easily:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust.proj</span> <span class="k">import</span> <span class="n">blockdiag</span>
-<span class="n">pbd</span> <span class="o">=</span> <span class="n">blockdiag</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">pbd</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>[[91.66943074  0.          0.          0.          0.        ]
- [ 0.         39.95111477 58.811887   34.71043505 37.12048345]
- [ 0.          5.68405771 80.61811583  2.9706063  51.76825164]
- [ 0.          7.62697131 57.75224433 74.99297781 15.62368174]
- [ 0.         33.82778716 77.78095529 10.14424076 23.90652659]]
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>This blockdiag projector above is defined in order to keep two blocks of the input matrix A, from the upper-left to the lower-right: the first block is the singleton block composed only from the single entry (0,0) and the second block from the next diagonal element to the last diagonal element of A.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>As precised before, there are a few other matrix projectors, I invite you to refer to the documentation which always shows an example : <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1circ.html">circ(culant)</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1hankel.html">hankel</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1const.html">const(ant)</a>, <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1toeplitz.html">toeplitz</a>.</p>
+<h3 id="The-CONST-projector">The CONST projector<a class="anchor-link" href="#The-CONST-projector">&#182;</a></h3><p>This last projector is really simple, it returns a constant matrix whatever is the input matrix. The way it's instantiated is very similar to the SUPP projector.
+Look at its documentation to get an example: <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classpyfaust_1_1proj_1_1const.html">const(ant) projector</a>.</p>
 <hr>
 
 </div>

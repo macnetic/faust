@@ -208,34 +208,34 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			{
 				switch(constraint_type)
 				{
-					case CONSTRAINT_NAME_SP: /*!< fixed number of non zero elements, INT (frobenius norm 1) */
+					case CONSTRAINT_NAME_SP:
 						Faust::prox_sp(mat, (faust_unsigned_int) scal_param, normalized, pos);
 						break;
-					case CONSTRAINT_NAME_SPCOL: /*!< fixed number of non zero elements per column INT (frobenius norm 1) */
+					case CONSTRAINT_NAME_SPCOL:
 						Faust::prox_spcol(mat, (faust_unsigned_int) scal_param, normalized, pos);
 						break;
-					case CONSTRAINT_NAME_SPLIN: /*!< fixed number of non zero elements per line INT (frobenius norm 1) */
+					case CONSTRAINT_NAME_SPLIN:
 						Faust::prox_splin(mat, (faust_unsigned_int) scal_param, normalized, pos);
 						break;
 					case CONSTRAINT_NAME_SPLINCOL:
 						Faust::prox_splincol(mat, (faust_unsigned_int) scal_param, normalized, pos);
 						break;
-					case CONSTRAINT_NAME_SP_POS:/**< fixed number of non zeros coefficients: INT (frobenius norm 1) */
+					case CONSTRAINT_NAME_SP_POS:
 						Faust::prox_sp_pos(mat, (faust_unsigned_int) scal_param, normalized, pos);
 						break;
-					case CONSTRAINT_NAME_NORMLIN:/**< 2nd norm of the lines of matrix A ; REAL  */
+					case CONSTRAINT_NAME_NORMLIN:
 						Faust::prox_normlin(mat, scal_param, normalized, pos);
 						break;
-					case CONSTRAINT_NAME_NORMCOL:/*!< 2nd norm of the colons of A REAL */
+					case CONSTRAINT_NAME_NORMCOL:
 						Faust::prox_normcol(mat, scal_param, normalized, pos);
 						break;
-					case CONSTRAINT_NAME_CONST: /**< Matrix equal to A ; MAT */
+					case CONSTRAINT_NAME_CONST:
 						Faust::prox_const(mat, *mat_param, normalized, pos);
 						break;
 					case CONSTRAINT_NAME_BLKDIAG:
-						//not impl. yet in cpp core
+						//not impl. yet in cpp core (but the prox is)
 						break;
-					case CONSTRAINT_NAME_SUPP: /**< Matrix which support is equal to A ; MAT ; (frobenius norm 1)*/
+					case CONSTRAINT_NAME_SUPP:
 						Faust::prox_supp(mat, *mat_param, normalized, pos);
 						break;
 					case CONSTRAINT_NAME_CIRC:
@@ -300,7 +300,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			}
 			// Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int> & m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized /* default to false */, const bool pos
 			//
-			Faust::prox_blockdiag(mat, m_vec, n_vec, normalized, pos);
+			try
+			{
+				Faust::prox_blockdiag(mat, m_vec, n_vec, normalized, pos);
+			}
+			catch(std::domain_error& e)
+			{
+				mexErrMsgTxt("Can't normalize because norm is zero.");
+			}
+
 			plhs[0] = FaustMat2mxArray(mat);
 			return;
 		}

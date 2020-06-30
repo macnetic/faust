@@ -39,6 +39,13 @@ class toeplitz(proj_gen):
 
     """
     def __init__(self, shape, normalized=False, pos=False):
+        """
+        Args:
+            shape: the size of the input matrix.
+            normalized: True to normalize the projection image according to its Frobenius norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+        """
+
         self.constraint = ConstraintMat('toeplitz', np.empty(shape), normalized, pos)
 
 class circ(proj_gen):
@@ -61,6 +68,14 @@ class circ(proj_gen):
 
     """
     def __init__(self, shape, normalized=False, pos=False):
+        """
+        Args:
+            shape: the size of the input matrix.
+            normalized: True to normalize the projection image according to its Frobenius norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
+
+        """
         self.constraint = ConstraintMat('circ', np.empty(shape), normalized, pos)
 
 class hankel(proj_gen):
@@ -81,6 +96,13 @@ class hankel(proj_gen):
 
     """
     def __init__(self, shape, normalized=False, pos=False):
+        """
+        Args:
+            shape: the size of the input matrix.
+            normalized: True to normalize the projection image according to its Frobenius norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+        """
+
         self.constraint = ConstraintMat('hankel', np.empty(shape), normalized, pos)
 
 
