@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 	std::cout << "Time "<< diff.count() << " s\n";
 	FM.Display();
 	cout << "FM norm: " << FM.norm() << endl;
-	th->set_mul_order_opt_mode(6);
+	th->set_FM_mul_mode(OMP_PROD_PAR_REDUC);
 	start = std::chrono::system_clock::now();
 	auto FM2 = th->multiply(*M);
 	end = std::chrono::system_clock::now();
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 	std::cout << "Time omp: "<< diff.count() << " s\n";
 	FM2.Display();
 	cout << "FM2 norm: " << FM.norm() << endl;
-	th->set_mul_order_opt_mode(5);
+	th->set_FM_mul_mode(CPP_PROD_PAR_REDUC);
 	start = std::chrono::system_clock::now();
 	auto FM3 = th->multiply(*M);
 	end = std::chrono::system_clock::now();

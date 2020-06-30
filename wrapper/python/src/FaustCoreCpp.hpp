@@ -163,9 +163,9 @@ void FaustCoreCpp<FPP>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value
 }
 
 template<typename FPP>
-void FaustCoreCpp<FPP>::set_mul_order_opt_mode(const int mode)
+void FaustCoreCpp<FPP>::set_FM_mul_mode(const int mode)
 {
-    this->transform->set_mul_order_opt_mode(mode);
+    this->transform->set_FM_mul_mode(mode);
 }
 
 template<typename FPP>

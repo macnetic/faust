@@ -121,7 +121,7 @@ namespace Faust {
 //			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 			void update_total_nnz();
-			void set_mul_order_opt_mode(const int mul_order_opt_mode, const bool silent=false);
+			void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=false);
 			void set_Fv_mul_mode(const int mode);
 			void enable_gpu_meth_for_mul();
 			int get_mul_order_opt_mode() const;

@@ -504,11 +504,11 @@ cdef class FaustCore:
 
         return y
 
-    def set_mul_order_opt_mode(self, mode):
+    def set_FM_mul_mode(self, mode):
         if(self._isReal):
-            self.core_faust_dbl.set_mul_order_opt_mode(mode)
+            self.core_faust_dbl.set_FM_mul_mode(mode)
         else:
-            self.core_faust_cplx.set_mul_order_opt_mode(mode)
+            self.core_faust_cplx.set_FM_mul_mode(mode)
 
     def set_Fv_mul_mode(self, mode):
         if(self._isReal):

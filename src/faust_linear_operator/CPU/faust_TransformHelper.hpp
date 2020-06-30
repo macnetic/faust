@@ -262,7 +262,7 @@ namespace Faust {
 			is_transposed ^= transpose;
 			is_conjugate ^= conjugate;
 #ifdef USE_GPU_MOD
-			if(Fv_mul_mode == 10 && gpu_faust != nullptr)
+			if(Fv_mul_mode == GPU_MOD && gpu_faust != nullptr)
 					return gpu_faust->multiply(x, is_transposed, is_conjugate);
 #endif
 			Vect<FPP,Cpu> v = this->transform->multiply(x, isTransposed2char());
@@ -332,7 +332,7 @@ namespace Faust {
 					break;
 #endif
 #ifdef USE_GPU_MOD
-				case 10:
+				case GPU_MOD:
 					if(gpu_faust != nullptr)
 						M = gpu_faust->multiply(&A, is_transposed, is_conjugate);
 					break;
@@ -461,7 +461,7 @@ namespace Faust {
 //				display_TensorList(tensor_data);
 			}
 #else
-			for(int i=7;i<10;i++)
+			for(int i=7;i<GPU_MOD;i++)
 				disabled_meths.push_back(i);
 #endif
 #ifdef USE_GPU_MOD
@@ -473,7 +473,7 @@ namespace Faust {
 			{
 			// test only if enable_gpu_mod was called
 #endif
-				disabled_meths.push_back(10);
+				disabled_meths.push_back(GPU_MOD);
 #ifdef USE_GPU_MOD
 			}
 #endif
@@ -484,7 +484,7 @@ namespace Faust {
 					times[i] = std::chrono::duration<double>(numeric_limits<double>::max());
 					continue;
 				}
-				this->set_mul_order_opt_mode(i);
+				this->set_FM_mul_mode(i);
 				auto start = std::chrono::system_clock::now();
 				for(int j=0;j < nmuls; j++)
 				{
@@ -501,7 +501,7 @@ namespace Faust {
 			}
 			if(inplace)
 			{
-				this->set_mul_order_opt_mode(opt_meth);
+				this->set_FM_mul_mode(opt_meth);
 				t_opt = this;
 			}
 			else
@@ -514,9 +514,9 @@ namespace Faust {
 					cout << times[i].count() << " ";
 				cout << endl;
 #endif
-				t_opt->set_mul_order_opt_mode(opt_meth);
+				t_opt->set_FM_mul_mode(opt_meth);
 				// leave the current Faust unchanged
-				this->set_mul_order_opt_mode(old_meth);
+				this->set_FM_mul_mode(old_meth);
 			}
 			delete [] times;
 			return t_opt;
@@ -675,15 +675,17 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::enable_gpu_meth_for_mul()
 		{
-			set_mul_order_opt_mode(10);
-			set_Fv_mul_mode(10);
+#ifdef USE_GPU_MOD
+			set_FM_mul_mode(GPU_MOD);
+			set_Fv_mul_mode(GPU_MOD);
+#endif
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::set_mul_order_opt_mode(const int mul_order_opt_mode, const bool silent /* = false */)
+		void TransformHelper<FPP,Cpu>::set_FM_mul_mode(const int mul_order_opt_mode, const bool silent /* = false */)
 		{
 #ifdef USE_GPU_MOD
-			if(mul_order_opt_mode == 10 && gpu_faust == nullptr)
+			if(mul_order_opt_mode == GPU_MOD && gpu_faust == nullptr)
 			{
 //				try
 //				{
@@ -712,8 +714,8 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::set_Fv_mul_mode(const int Fv_mul_mode)
 		{
 #ifdef USE_GPU_MOD
-			//TODO: factorize this code with set_mul_order_opt_mode
-			if(Fv_mul_mode == 10 && gpu_faust == nullptr)
+			//TODO: factorize this code with set_FM_mul_mode
+			if(Fv_mul_mode == GPU_MOD && gpu_faust == nullptr)
 			{
 				try
 				{
@@ -1225,7 +1227,7 @@ namespace Faust {
 				switch(this->mul_order_opt_mode)
 				{
 #ifdef USE_GPU_MOD
-					case 10:
+					case GPU_MOD:
 						if(nullptr != gpu_faust)
 							return gpu_faust->get_product(is_transposed, is_conjugate);
 #endif
