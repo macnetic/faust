@@ -20,7 +20,10 @@ else
 	#USR_STARTUP_FILE=$($MATLAB_BIN -nojvm -nodisplay -r "which startup;exit" | tail -n 2 | head -n 1) # useless in root
 	if [[ -d "${FAUST_MATLAB_WRAPPER_PATH}" ]]
 	then
-		echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE"
+		#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE"
+		echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> $STARTUP_FILE
+		echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/mex'])" >> $STARTUP_FILE
+		echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/tools'])" >> $STARTUP_FILE
 		echo "matfaust.enable_gpu_mod()" >> "$STARTUP_FILE"
 		RET1=$?
 		RET2=0
@@ -34,7 +37,10 @@ else
 				if [[ -r "$USR_STARTUP_FILE" ]]
 				then
 					grep -i -v faust "$USR_STARTUP_FILE" > "${USR_STARTUP_FILE}.tmp" 2>/dev/null && mv "${USR_STARTUP_FILE}.tmp" "$USR_STARTUP_FILE"
-					echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$USR_STARTUP_FILE"
+					#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$USR_STARTUP_FILE"
+					echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> $USR_STARTUP_FILE
+					echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/mex'])" >> $USR_STARTUP_FILE
+					echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/tools'])" >> $USR_STARTUP_FILE
 					echo "matfaust.enable_gpu_mod('silent', true)" >> "$USR_STARTUP_FILE"
 					chown $USER $USR_STARTUP_FILE
 					RET2=$(($?+$RET2))

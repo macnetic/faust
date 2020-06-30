@@ -43,8 +43,12 @@ ROOT_DIR=[fileparts(mfilename('fullpath')),filesep];
              
 fprintf('Welcome to the Matlab wrapper of the FAuST C++ toolbox.');
 fprintf('FAuST root directory is %s\n',ROOT_DIR);
-fprintf('Adding path %s\n and all its subdirectories ',ROOT_DIR);
-addpath(genpath(ROOT_DIR));
+fprintf('Adding path %s and subdirectories to matlab path\n',ROOT_DIR);
+%addpath(genpath(ROOT_DIR));
+addpath(ROOT_DIR);%% avoiding to use genpath because if +matfaust is added to path eye.m, rand.m, version.m etc. will conflict with matlab eye, etc.
+addpath([ROOT_DIR '/mex']);
+addpath([ROOT_DIR '/data']);
+addpath([ROOT_DIR '/tools']);
 matfaust.enable_gpu_mod()
 
 
