@@ -22,14 +22,27 @@ namespace Faust
 		static int *gm_users;
 		static void* marr_funcs; //void because we don't know FPP yet and templates aren't available through shared lib interface (extern C, no name mangling)
 		static void* dsm_funcs;
+#ifdef _MSC_VER
+		public: // should not be public but Visual Studio 14 (and only it) can't access private members from lambda exp (error C2248) // cf. ref_man ini.
+				//TODO: set back to private later (mayber with a more recent version)
+#endif
 		static void* gp_funcs;
+#ifdef _MSC_VER
+		private:
+#endif
 		gm_MatArray_t gpu_mat_arr;
 		std::vector<void*> cpu_mat_ptrs; // cpu mat addresses for which gpu copies are stored in gpu_mat_arr
 
 		// this map is used to retrieve a cpu mat addr from a gpu mat addr
 		// this is needed because the RefManager works on cpu mat (to use gpu mat, bijection relationship)
+#ifdef _MSC_VER
+		public: // should not be public but Visual Studio 14 (and only it) can't access private members from lambda exp (error C2248) // cf. ref_man ini.
+		// TODO: set back to private later (mayber with a more recent version)
+#endif
 		static std::map<void*,void*> cpu_gpu_map;
-
+#ifdef _MSC_VER
+		private:
+#endif
 		int32_t nrows;
 		int32_t ncols;
 
