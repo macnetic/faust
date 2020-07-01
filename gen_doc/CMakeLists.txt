@@ -40,7 +40,7 @@ if(BUILD_DOCUMENTATION)
         add_custom_target(doc_exclu_class_filtering ALL ${PY3_EXE}
             ${PROJECT_BINARY_DIR}/doc/filterout_excluded_classes.py ${GLOB_PATTS} DEPENDS doc WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/doc COMMENT "Filter out the non-documented classes")
         if(UNIX AND BUILD_WRAPPER_MATLAB)
-            add_custom_target(filterout_linefeeds ALL find ${PROJECT_BINARY_DIR}/wrapper/matlab/+matfaust/ -name '*.m' -exec sed -i 's/\\f//g' '{}' \\\; DEPENDS doc WORKING_DIRECTORY ${PROJECT_BINARY_DIR} )
+		add_custom_target(filterout_linefeeds ALL find ${PROJECT_BINARY_DIR}/wrapper/matlab/+matfaust/ -name '*.m' -exec sed -i 's/\\f//g' '{}' \\\; DEPENDS doc WORKING_DIRECTORY ${PROJECT_BINARY_DIR} COMMENT "Filtering out the formfeeds characters.")
         endif(UNIX AND BUILD_WRAPPER_MATLAB)
 		#install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/html DESTINATION doc/share/doc)
 		#file(MAKE_DIRECTORY ${FAUST_INSTALL_DOC})
