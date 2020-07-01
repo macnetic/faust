@@ -350,7 +350,7 @@ Faust::MatDense<FPP,DEVICE> Faust::multiply_omp(const std::vector<Faust::MatGene
 				// until this this method is disabled at compilation unless we manually define the constant in CFLAGS (for example).
 	int nth, thid, num_per_th, data_size;
 	Faust::MatDense<FPP,DEVICE>* mats[8];
-	Faust::MatGeneric<FPP, DEVICE> * _data[data.size()+1];
+	std::vector<Faust::MatGeneric<FPP, DEVICE> *> _data(data.size()+1);
 	Faust::MatSparse<FPP, DEVICE> * sM;
 	Faust::MatDense<FPP,DEVICE>* tmp; // (_data[end_id-1]);
 	int i = 0;
