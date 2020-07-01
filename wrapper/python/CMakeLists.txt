@@ -83,6 +83,10 @@ endif()
 
 if(BUILD_MULTITHREAD)
 	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '${OMP_CXX_FLAGS}'")
+	# about msvc/cl.exe: "You may use either a forward slash (/) or a dash (-) to specify a compiler option."
+	# (https://docs.microsoft.com/en-us/cpp/build/reference/compiler-options?view=vs-2015)
+	# cf ./src/faust_linear_operator/CPU/faust_prod_opt.hpp
+	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-D_MUL_OMP_'")
 	string(REGEX REPLACE "([^'])[ \t\r\n]([^'])" "\\1','\\2" FAUST_SETUP_PY_CFLAGS ${FAUST_SETUP_PY_CFLAGS})
 	if(DEFINED OMP_CXX_LFLAGS)
 		set(FAUST_SETUP_PY_LFLAGS "${FAUST_SETUP_PY_LFLAGS}, '${OMP_CXX_LFLAGS}'")

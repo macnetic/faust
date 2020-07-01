@@ -1,5 +1,10 @@
 #ifndef __FAUST_PROD_OPT__
 #define __FAUST_PROD_OPT__
+#ifdef __APPLE__
+#ifdef _MUL_OMP_
+#include "libomp/omp.h"
+#endif
+#endif
 namespace Faust
 {
 	enum FaustMulMode

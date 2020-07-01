@@ -35,7 +35,7 @@ ctest_python:
 
 ctest_matlab:
     <<: *ctest_script
-    variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "ON"}
+    variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "OFF"} # MT OFF because of macOS complicated way to enable OpenMP (but packages are OMP enabled)
     except:
         - schedules
         - tags

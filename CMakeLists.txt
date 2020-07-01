@@ -718,6 +718,10 @@ if(FAUST_TORCH)
 	target_include_directories(${FAUST_TARGET} PUBLIC  ${Torch_DIR}/../include ${Torch_DIR}/../include/torch/csrc/api/include)
 endif()
 
+if(BUILD_MULTITHREAD)
+	target_compile_definitions(${FAUST_TARGET} PUBLIC _MUL_OMP_) #cf. ./src/faust_linear_operator/CPU/faust_prod_opt.hpp
+endif()
+
 if(USE_GPU_MOD)
 	include_directories(${FAUST_TARGET} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
 	target_include_directories(${FAUST_TARGET} PUBLIC  ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)

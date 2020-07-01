@@ -146,10 +146,12 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		# complete static libs (linked later) by objects of libs if needed (fallback solution from environment)
 		target_link_options(${mex_target} PRIVATE $ENV{WIN_HDF5_OBJS_DIR}/*.obj  $ENV{WIN_SZIP_OBJS_DIR}/*.obj)
 		target_compile_definitions(${mex_target} PRIVATE NOMINMAX MATLAB_DEFAULT_RELEASE=R2017b) # it seems necessary for windows while R2017b flag of matlab_add_mex is enough for Unix
-
 	else()
 		target_link_options(${mex_target} PRIVATE ${OpenMP_CXX_LIBRARIES}) # do nothing if BUILD_MULTITHREAD is OFF
 	endif()
+#	if(BUILD_MULTITHREAD)
+#		target_compile_definitions(${mex_target} PRIVATE _MUL_OMP_) # cf. ./src/faust_linear_operator/CPU/faust_prod_opt.hpp
+#	endif()
 	target_include_directories(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},INTERFACE_INCLUDE_DIRECTORIES>)
 	add_dependencies(${mex_target} ${FAUST_TARGET})
 	add_dependencies(${mex_target} ${FAUST_MEXTOOLS_TARGET})
