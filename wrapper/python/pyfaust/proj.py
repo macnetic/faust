@@ -372,6 +372,8 @@ class normcol(proj_gen):
             >>> norm(p(M)[:,0], 2)
             0.01
         """
+        if(s < 0):
+            raise ValueError('A norm can\'t be negative')
         normalized=False
         pos=False
         self.constraint = ConstraintReal('normcol', shape[0], shape[1], s, normalized, pos)
@@ -404,6 +406,8 @@ class normlin(proj_gen):
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
         """
+        if(s < 0):
+            raise ValueError('A norm can\'t be negative')
         normalized=False
         pos=False
         self.constraint = ConstraintReal('normlin', shape[0], shape[1], s, normalized, pos)

@@ -17,6 +17,9 @@ classdef normcol < matfaust.proj.proj_gen
 		%===============================================
 		function proj = normcol(shape, normval)%, varargin)
 			import matfaust.factparams.ConstraintReal
+			if(normval < 0)
+				error('A norm can''t be negative')
+			end
 			proj.constraint = ConstraintReal('normcol', shape(1), shape(2), normval)%, varargin{:});
 		end
 	end
