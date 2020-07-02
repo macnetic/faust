@@ -10,17 +10,34 @@ classdef normlin < matfaust.proj.proj_gen
 		%===============================================
 		%> @b Usage
 		%>
-		%> &nbsp;&nbsp;&nbsp; @b normlin(shape, normval): returns a NORMLIN projector (functor), shape defines the size of the input matrix (e.g. [1, 10]), normval defines the sparsity of the output matrix (the 2-norm of each row).<br/>
+		%> &nbsp;&nbsp;&nbsp; @b normlin(shape, s): returns a NORMLIN projector (functor), shape defines the size of the input matrix (e.g. [1, 10]), s defines the sparsity of the output matrix (the 2-norm of each row).<br/>
 		%>
 		%> @param shape: vector of size 2, to define the size of the input matrix.
-		%> @param normval: the sparsity parameter.
+		%> @param 's', value: (optional) the sparsity parameter, the 2-norm of the row (1 by default).
 		%===============================================
-		function proj = normlin(shape, normval, varargin)
+		function proj = normlin(shape, varargin)
 			import matfaust.factparams.ConstraintReal
-			if(normval < 0)
-				error('A norm can''t be negative')
+			s = 1;
+			if(length(varargin) > 0)
+				if(strcmp(varargin{1}, 's'))
+					disp('s in varargin')
+
+					if(length(varargin) < 2)
+						error('s value is missing')
+					end
+					s = varargin{2};
+					varargin(1:2) = []; % deleting the used cell
+					if(~ isreal(s) || ~ isscalar(s))
+						error('s must be a real scalar')
+					end
+					if(s < 0)
+						error('A norm can''t be negative')
+					end
+				% else % do nothing (ConstraintReal role)
+				end
 			end
-			proj.constraint = ConstraintReal('normlin', shape(1), shape(2), normval, varargin{:});
+
+			proj.constraint = ConstraintReal('normlin', shape(1), shape(2), s, varargin{:});
 		end
 	end
 end

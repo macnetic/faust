@@ -435,7 +435,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			n = randi([min_n 128], 1);
 			M = rand(m,n);
 			s = rand(1,1)*50;
-			p = normcol([m, n], s);
+			p = normcol([m, n], 's', s);
 			Mp = p(M);
 			for i=1:n
 				this.verifyLessThanOrEqual(norm(Mp(:,i)), s+1e-6)
@@ -450,7 +450,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			n = randi([min_n 128], 1);
 			M = rand(m,n);
 			s = rand()*50;
-			p = normlin([m, n], s);
+			p = normlin([m, n], 's', s);
 			Mp = p(M);
 			for i=1:m
 				this.verifyLessThanOrEqual(norm(Mp(i,:)), s+1e-6)

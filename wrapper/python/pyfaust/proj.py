@@ -358,10 +358,11 @@ class normcol(proj_gen):
         Functor for the NORMCOL projector. A, the image matrix, is defined by \f$ \forall j \in \{0,...,shape[1]-1\} \f$ the j-th column \f$ A_{*,j} \f$ is such that \f$\| A_{*,j}\|_2 = s  \f$.
 
     """
-    def __init__(self, shape, s):
+    def __init__(self, shape, s=1):
         """
         Args:
-            s: the column 2-norm.
+            shape: the input matrix shape.
+            s: the column 2-norm (default to 1).
 
         Example:
             >>> from pyfaust.proj import normcol
@@ -398,12 +399,11 @@ class normlin(proj_gen):
             0.01
     """
 
-    def __init__(self, shape, s):
+    def __init__(self, shape, s=1):
         """
         Args:
-            s: the row 2-norm.
-            normalized: True to normalize the projection image according to its Frobenius norm.
-            pos: True to skip negative values (replaced by zero) of the matrix to project.
+            shape: the input matrix shape.
+            s: the row 2-norm (default to 1).
 
         """
         if(s < 0):
