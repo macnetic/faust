@@ -16,11 +16,13 @@
 			m_vec = zeros(1, length(mn_cell));
 			n_vec = zeros(1, length(mn_cell));
 			mn_mat = zeros(length(mn_cell), 2);
-			for i=1:length(mn_cell)
-				m_vec(i) = mn_cell{i}{1};
-				n_vec(i) = mn_cell{i}{2};
-				mn_mat(i,1) = mn_cell{i}{1};
-				mn_mat(i,2) = mn_cell{i}{2};
+			m_vec(1) = mn_cell{1}{1};
+			n_vec(1) = mn_cell{1}{2};
+			for i=2:length(mn_cell)
+				m_vec(i) = mn_cell{i}{1}+m_vec(i-1);
+				n_vec(i) = mn_cell{i}{2}+n_vec(i-1);
+				mn_mat(i,1) = m_vec(i);
+				mn_mat(i,2) = n_vec(i);
 			end
 			proj.m_vec = m_vec;
 			proj.n_vec = n_vec;

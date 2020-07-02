@@ -1372,6 +1372,31 @@ class TestFaustFactory(unittest.TestCase):
         for i in range(pM.shape[0]):
             self.assertAlmostEqual(norm(pM[i,:]), k)
 
+    def test_blockdiag(self):
+        print("test_blockdiag")
+        from pyfaust.proj import blockdiag
+        from numpy.random import rand
+        from numpy.linalg import norm
+        import numpy as np
+        M = rand(15,15)
+        shapes = [(1,1), (2,2), (3,3), (4,4), (5,5)]
+        p = blockdiag(M.shape, shapes)
+        pM = p(M)
+        boundaries = [(1,1), (3,3), (6,6), (10,10), (15,15)]
+        M_blocks = [ M[0:1, 0:1], M[1:3,1:3], M[3:6, 3:6], M[6:10, 6:10],
+                  M[10:15, 10:15] ]
+        pM_blocks = [ pM[0:1, 0:1], pM[1:3,1:3], pM[3:6, 3:6], pM[6:10, 6:10],
+                  pM[10:15, 10:15] ]
+        for i in range(len(M_blocks)):
+            self.assertTrue(np.allclose(M_blocks[i], pM_blocks[i]))
+        self.assertTrue(not np.allclose(M,pM))
+        # TODO: verify the fro norm of pM is equal to the norm of the vector
+        # composed of all entries of the blocks gathered from M directly
+        v = np.zeros((1,)) 
+        for i in range(len(M_blocks)):
+           v = np.concatenate((v, M_blocks[i].flatten()))
+        self.assertAlmostEqual(norm(v), norm(pM))
+
 
 
 if __name__ == "__main__":

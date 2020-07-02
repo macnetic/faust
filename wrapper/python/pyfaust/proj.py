@@ -463,14 +463,14 @@ class blockdiag(proj_gen):
         self._block_shapes = block_shapes
         self.normalized = normalized
         self.pos = pos
-        if(self._m_vec[-1] != shape[0]): raise ValueError("The last index of (row"
-                                                    " offsets) _m_vec"
-                                                    " must be equal to"
-                                                    " shape[0]")
-        if(self._n_vec[-1] != shape[1]): raise ValueError("The last index of (column"
-                                                    " offsets) _n_vec"
-                                                    " must be equal to"
-                                                    " shape[1]")
+#        if(self._m_vec[-1] != shape[0]): raise ValueError("The last index of (row"
+#                                                    " offsets) _m_vec"
+#                                                    " must be equal to"
+#                                                    " shape[0]")
+#        if(self._n_vec[-1] != shape[1]): raise ValueError("The last index of (column"
+#                                                    " offsets) _n_vec"
+#                                                    " must be equal to"
+#                                                    " shape[1]")
         cons_value = np.asfortranarray(np.array(block_shapes, dtype=float))
         self.constraint = ConstraintMat('blockdiag', cons_value,
                                         normalized, pos,

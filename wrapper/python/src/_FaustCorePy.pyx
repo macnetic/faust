@@ -1024,9 +1024,14 @@ def prox_blockdiag(M, block_shapes, normalized, pos):
     n_ptr = <unsigned long*>PyMem_Malloc(sizeof(unsigned long *)*len(block_shapes))
     m_ptr = <unsigned long*>PyMem_Malloc(sizeof(unsigned long *)*len(block_shapes))
 
-    for i in range(len(block_shapes)):
-        m_ptr[i] = block_shapes[i][0]
-        n_ptr[i] = block_shapes[i][1]
+    m_ptr[0] = block_shapes[0][0]
+    n_ptr[0] = block_shapes[0][1]
+    for i in range(1, len(block_shapes)):
+        m_ptr[i] = block_shapes[i][0]+m_ptr[i-1]
+        n_ptr[i] = block_shapes[i][1]+n_ptr[i-1]
+
+    if(m_ptr[len(block_shapes)-1] != M.shape[0] or n_ptr[len(block_shapes)-1] != M.shape[1]):
+        raise ValueError("The sum of block shapes is not equal to the matrix shapes.")
 
     check_matrix(isReal, M)
     # check_matrix(isReal, parameter)
