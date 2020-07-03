@@ -128,5 +128,30 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 			end
 		end
 
+		function mex_params = to_mex_struct(this)
+			mex_constraints = cell(2, this.num_facts-1);
+			%mex_fact_constraints = cell(1, this.num_facts-1)
+			for i=1:this.num_facts-1
+				cur_cell = cell(1, 4);
+				cur_cell{1} = this.constraints{i}.name.conv2str();
+				cur_cell{2} = this.constraints{i}.param;
+				cur_cell{3} = this.constraints{i}.num_rows;
+				cur_cell{4} = this.constraints{i}.num_cols;
+				%mex_fact_constraints{i} = cur_cell;
+				mex_constraints{1,i} = cur_cell;
+			end
+			%mex_residuum_constraints = cell(1, this.num_facts-1)
+			for i=1:this.num_facts-1
+				cur_cell = cell(1, 4);
+				cur_cell{1} = this.constraints{i+this.num_facts-1}.name.conv2str();
+				cur_cell{2} = this.constraints{i+this.num_facts-1}.param;
+				cur_cell{3} = this.constraints{i+this.num_facts-1}.num_rows;
+				cur_cell{4} = this.constraints{i+this.num_facts-1}.num_cols;
+				%mex_residuum_constraints{i} = cur_cell;
+				mex_constraints{2,i} = cur_cell;
+			end
+			mex_params = struct('nfacts', this.num_facts, 'cons', {mex_constraints}, 'niter1', this.stop_crits{1}.num_its,'niter2', this.stop_crits{2}.num_its, 'sc_is_criterion_error', this.stop_crits{1}.is_criterion_error, 'sc_error_treshold', this.stop_crits{1}.tol, 'sc_max_num_its', this.stop_crits{1}.maxiter, 'sc_is_criterion_error2', this.stop_crits{2}.is_criterion_error, 'sc_error_treshold2', this.stop_crits{2}.tol, 'sc_max_num_its2', this.stop_crits{2}.maxiter, 'nrow', this.data_num_rows, 'ncol', this.data_num_cols, 'fact_side', this.is_fact_side_left, 'update_way', this.is_update_way_R2L, 'verbose', this.is_verbose, 'init_lambda', this.init_lambda, 'use_csr', this.use_csr, 'packing_RL', this.packing_RL, 'norm2_threshold', this.norm2_threshold, 'norm2_max_iter', this.norm2_max_iter, 'step_size', this.step_size, 'constant_step_size', this.constant_step_size);
+		end
+
 	end
 end

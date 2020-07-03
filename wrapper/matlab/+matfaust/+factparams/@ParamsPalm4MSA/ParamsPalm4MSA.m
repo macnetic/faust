@@ -66,6 +66,21 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 			end
 			p.stop_crit = stop_crit;
 		end
+
+		function mex_params = to_mex_struct(this, M)
+			mex_constraints = cell(1, length(this.constraints));
+			for i=1:length(this.constraints)
+				cur_cell = cell(1, 4);
+				cur_cell{1} = this.constraints{i}.name.conv2str();
+				cur_cell{2} = this.constraints{i}.param;
+				cur_cell{3} = this.constraints{i}.num_rows;
+				cur_cell{4} = this.constraints{i}.num_cols;
+				mex_constraints{i} = cur_cell;
+			end
+			% put mex_constraints in a cell array again because mex eats one level of array
+			mex_params = struct('data', M, 'nfacts', this.num_facts, 'cons', {mex_constraints}, 'init_facts', {this.init_facts}, 'niter', this.stop_crit.num_its, 'sc_is_criterion_error', this.stop_crit.is_criterion_error, 'sc_error_treshold', this.stop_crit.tol, 'sc_max_num_its', this.stop_crit.maxiter, 'update_way', this.is_update_way_R2L, 'grad_calc_opt_mode', this.grad_calc_opt_mode, 'constant_step_size', this.constant_step_size, 'step_size', this.step_size, 'verbose', this.is_verbose, 'norm2_max_iter', this.norm2_max_iter, 'norm2_threshold', this.norm2_threshold, 'init_lambda', this.init_lambda);
+
+		end
 	end
 	methods
 		function init_facts = get_default_init_facts(p, num_facts)

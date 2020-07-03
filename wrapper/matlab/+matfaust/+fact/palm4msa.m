@@ -34,24 +34,14 @@
 function  [F,lambda] = palm4msa(M, p, varargin)
 	import matfaust.Faust
 	import matfaust.fact.check_fact_mat
-	mex_constraints = cell(1, length(p.constraints));
 	check_fact_mat('matfaust.fact.palm4msa', M)
 	if(~ isa(p ,'matfaust.factparams.ParamsPalm4MSA'))
 		error('p must be a ParamsPalm4MSA object.')
 	end
-	for i=1:length(p.constraints)
-		cur_cell = cell(1, 4);
-		cur_cell{1} = p.constraints{i}.name.conv2str();
-		cur_cell{2} = p.constraints{i}.param;
-		cur_cell{3} = p.constraints{i}.num_rows;
-		cur_cell{4} = p.constraints{i}.num_cols;
-		mex_constraints{i} = cur_cell;
-	end
 	if(~ p.is_mat_consistent(M))
 		error('M''s number of columns must be consistent with the last residuum constraint defined in p. Likewise its number of rows must be consistent with the first factor constraint defined in p.')
 	end
-	% put mex_constraints in a cell array again because mex eats one level of array
-	mex_params = struct('data', M, 'nfacts', p.num_facts, 'cons', {mex_constraints}, 'init_facts', {p.init_facts}, 'niter', p.stop_crit.num_its, 'sc_is_criterion_error', p.stop_crit.is_criterion_error, 'sc_error_treshold', p.stop_crit.tol, 'sc_max_num_its', p.stop_crit.maxiter, 'update_way', p.is_update_way_R2L, 'grad_calc_opt_mode', p.grad_calc_opt_mode, 'constant_step_size', p.constant_step_size, 'step_size', p.step_size, 'verbose', p.is_verbose, 'norm2_max_iter', p.norm2_max_iter, 'norm2_threshold', p.norm2_threshold, 'init_lambda', p.init_lambda);
+	mex_params = p.to_mex_struct(M);
 	backend = 2016;
 	nargin = length(varargin);
 	if(nargin > 0)
