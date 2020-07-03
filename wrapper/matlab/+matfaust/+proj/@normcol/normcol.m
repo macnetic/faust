@@ -14,6 +14,7 @@ classdef normcol < matfaust.proj.proj_gen
 		%>
 		%> @param shape: vector of size 2, to define the size of the input matrix.
 		%> @param 's', value: (optional) the sparsity parameter, the 2-norm of the column (1 by default).
+		%> @retval normcol projector
 		%===============================================
 		function proj = normcol(shape, varargin)
 			import matfaust.factparams.ConstraintReal

@@ -19,6 +19,7 @@ classdef spcol < matfaust.proj.proj_gen
 		%> @param 'normalized', false: (the default) no normalization.
 		%> @param 'pos', true: skips the negative values (replaced by zero) of the input matrix.
 		%> @param 'pos', false: (the default) negative values are not skipped.
+		%> @retval the spcol projector.
 		%===============================================
 		function proj = spcol(shape, k, varargin)
 			import matfaust.factparams.ConstraintInt

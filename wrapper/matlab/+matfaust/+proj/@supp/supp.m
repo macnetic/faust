@@ -18,6 +18,7 @@ classdef supp < matfaust.proj.proj_gen
 		%> @param 'normalized', false: (the default) no normalization.
 		%> @param 'pos', true: skips the negative values (replaced by zero) of the input matrix.
 		%> @param 'pos', false: (the default) negative values are not skipped.
+		%> @retval the supp projector.
 		%===============================================
 		function proj = supp(S, varargin)
 			import matfaust.factparams.ConstraintMat

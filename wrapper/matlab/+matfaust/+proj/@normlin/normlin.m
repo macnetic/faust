@@ -14,6 +14,7 @@ classdef normlin < matfaust.proj.proj_gen
 		%>
 		%> @param shape: vector of size 2, to define the size of the input matrix.
 		%> @param 's', value: (optional) the sparsity parameter, the 2-norm of the row (1 by default).
+		%> @retval normlin projector
 		%===============================================
 		function proj = normlin(shape, varargin)
 			import matfaust.factparams.ConstraintReal
