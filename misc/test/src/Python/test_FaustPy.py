@@ -995,7 +995,7 @@ class TestFaustFactory(unittest.TestCase):
         L = L.astype(np.float64)
         J = \
         int(loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
-        D, F = pyfaust.fact.fgft_givens(L, J, nGivens_per_fac=1, verbosity=0, enable_large_Faust=True)
+        D, F = pyfaust.fact.eigtj(L, J, nGivens_per_fac=1, verbosity=0, enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")
@@ -1010,13 +1010,13 @@ class TestFaustFactory(unittest.TestCase):
 
     def testFGFTGivensParallel(self):
         print("Test pyfaust.fact.fgft_givens() -- parallel")
-        from pyfaust.fact import eigtj, fgft_givens
+        from pyfaust.fact import eigtj
         L = loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         J = \
                 int(loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
         t = int(L.shape[0]/2)
-        D, F = fgft_givens(L, J, nGivens_per_fac=t, verbosity=0,
+        D, F = eigtj(L, J, nGivens_per_fac=t, verbosity=0,
                            enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
@@ -1049,7 +1049,7 @@ class TestFaustFactory(unittest.TestCase):
         L = L.astype(np.float64)
         J = \
         int(loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
-        D, F = pyfaust.fact.fgft_givens(csr_matrix(L), J, nGivens_per_fac=0,
+        D, F = pyfaust.fact.eigtj(csr_matrix(L), J, nGivens_per_fac=0,
                                         verbosity=0,enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
@@ -1065,14 +1065,14 @@ class TestFaustFactory(unittest.TestCase):
 
     def testFGFTGivensParallelSparse(self):
         print("Test pyfaust.fact.fgft_givens_sparse() -- parallel")
-        from pyfaust.fact import eigtj, fgft_givens
+        from pyfaust.fact import eigtj
         from scipy.sparse import csr_matrix
         L = loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['Lap']
         L = L.astype(np.float64)
         J = \
                 int(loadmat(dirname(sys.argv[0])+"/../../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat")['J'])
         t = int(L.shape[0]/2)
-        D, F = fgft_givens(csr_matrix(L), J, nGivens_per_fac=t, verbosity=0, enable_large_Faust=True)
+        D, F = eigtj(csr_matrix(L), J, nGivens_per_fac=t, verbosity=0, enable_large_Faust=True)
         D = spdiags(D, [0], L.shape[0], L.shape[0])
         print("Lap norm:", norm(L, 'fro'))
         err = norm((F*D.todense())*F.T.todense()-L,"fro")/norm(L,"fro")

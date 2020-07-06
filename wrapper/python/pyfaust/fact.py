@@ -277,44 +277,6 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
                                                enable_large_Faust)
     return D, Faust(core_obj=core_obj)
 
-# experimental block start
-def fgft_givens(Lap, nGivens=None, tol=0, order='ascend', relerr=True,
-          nGivens_per_fac=None, verbosity=0, enable_large_Faust=False):
-    """
-    Computes the FGFT of the Laplacian matrix Lap (using fact.eigtj).
-
-    Args:
-        Lap: the Laplacian matrix as a numpy array or csr_matrix. Must be real
-        and symmetric or hermitian if complex.
-        nGivens: see fact.eigtj
-        tol: see fact.eigtj
-        order: see fact.eigtj
-        relerr: see fact.eigtj
-        nGivens_per_fac: see fact.eigtj
-        verbosity: see fact.eigtj
-
-    Returns:
-        The tuple (D, FGFT):
-        - with FGFT being the Faust object representing
-        the Fourier transform and,
-        - (numpy.ndarray) D a vector of the eigenvalues of the Laplacian (in
-        ascending order).
-
-
-    References:
-    [1]   Le Magoarou L., Gribonval R. and Tremblay N., "Approximate fast
-    graph Fourier transforms via multi-layer sparse approximations",
-    IEEE Transactions on Signal and Information Processing
-    over Networks 2018, 4(2), pp 407-420.
-    <https://hal.inria.fr/hal-01416110>
-
-    See also:
-        eigtj, fgft_palm
-    """
-    return eigtj(Lap, nGivens, tol, order, relerr, nGivens_per_fac, verbosity,
-                enable_large_Faust)
-# experimental block end
-
 def _check_fact_mat(funcname, M):
     if(not isinstance(M, np.ndarray)):
         raise Exception(funcname+" 1st argument must be a numpy ndarray.")
