@@ -137,6 +137,8 @@ class Faust:
             if(core_obj):
                 F.m_faust = core_obj
         else:
+            if(isinstance(factors, str) and not filepath):
+                filepath = factors
             if(filepath and isinstance(filepath, str)):
                     contents = loadmat(filepath)
                     factors = contents['faust_factors'][0]
@@ -1738,7 +1740,7 @@ class Faust:
                                                           nsamples))
             return F_opt
 
-    def clone(self):
+    def clone(F):
         """
         Clones the Faust (in a new memory space).
 
