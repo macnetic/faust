@@ -65,7 +65,8 @@ namespace Faust
 			void multiply(MatSparse<FPP,Cpu> & M, char opThis) const { throw std::exception();}
 			void multiplyRight(MatSparse<FPP,Cpu> const & M) { throw std::bad_function_call();}
 			void transpose() { faust_unsigned_int tmp; tmp = this->dim1; this->dim1 = this->dim2; this->dim2 = tmp; }
-			void conjugate() { mat = mat.diagonal().conjugate().asDiagonal(); }
+			void conjugate(const bool eval = true) { mat = mat.diagonal().conjugate().asDiagonal(); }
+			void adjoint() { conjugate(true); transpose(); }
 			faust_unsigned_int getNonZeros() const { return mat.diagonal().nonZeros(); }
 
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;

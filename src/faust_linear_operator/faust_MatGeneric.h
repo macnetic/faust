@@ -129,14 +129,13 @@ namespace Faust
 			//! \brief Replace this by (this) * A
 			virtual void multiplyRight(Faust::MatSparse<FPP, DEVICE> const& M) =0;
 
-
-
-
 			//! \brief transpose the matrix
 			virtual void transpose()=0;
 
 			//! \brief Replaces the matrix by its conjugate.
-			virtual void conjugate()=0;
+			virtual void conjugate(const bool eval=true)=0;
+
+			virtual void adjoint()=0;
 
 			//! \brief return the number of non-zeros element in the matrix
 			virtual faust_unsigned_int getNonZeros()const=0;

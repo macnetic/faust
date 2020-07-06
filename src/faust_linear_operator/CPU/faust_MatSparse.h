@@ -183,7 +183,8 @@ namespace Faust
 			void setZeros(){mat.setZero();nnz=0;}
 			void setEyes();
 			void transpose();
-			void conjugate();
+			void conjugate(const bool eval=true);
+			void adjoint();
 			typename Eigen::NumTraits<FPP>::Real norm() const {return mat.norm();}
 			void operator= (const MatSparse<FPP,Cpu>& M);
 			void operator= (const Faust::MatDense<FPP,Cpu>& Mdense);

@@ -525,9 +525,19 @@ void Faust::MatSparse<FPP,Cpu>::transpose()
 }
 
 	template<typename FPP>
-void Faust::MatSparse<FPP,Cpu>::conjugate()
+void Faust::MatSparse<FPP,Cpu>::conjugate(const bool eval /* = true */)
 {
-	mat = mat.conjugate().eval();
+	if(eval)
+		mat = mat.conjugate().eval();
+	else
+		mat = mat.conjugate();
+}
+
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::adjoint()
+{
+	conjugate(false);
+	transpose();
 }
 
 	template<typename FPP>
