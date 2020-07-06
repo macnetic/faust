@@ -582,7 +582,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(!strcmp("normalize", cmd))
 		{
 			int ord = (int) mxGetScalar(prhs[2]);
-			if(ord == 2) ord = -2; //tmp workaround to the bug in normalization according 2-norm on complex Faust
 			Faust::TransformHelper<SCALAR,Cpu>* th = core_ptr->normalize(ord);
 			plhs[0] = convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(th);
 			return;

@@ -222,6 +222,10 @@ namespace Faust
 				 * \brief Replaces the Faust by its conjugate.
 				 */
 				void conjugate();
+				/**
+				 * \brief Inplace adjoint.
+				 */
+				void adjoint();
 				void updateNonZeros();
 				void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const;
 				/**

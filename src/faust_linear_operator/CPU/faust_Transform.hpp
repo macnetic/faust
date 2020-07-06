@@ -582,7 +582,7 @@ double Faust::Transform<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double th
 		//std::cout<<"copy constructor"<<std::endl;
 		Faust::Transform<FPP,Cpu> AtA((*this)); // modif AL <FPP,Cpu>
 		//std::cout<<"transposition"<<std::endl;
-		AtA.transpose();
+		AtA.adjoint();
 		if (getNbCol() < getNbRow())
 		{
 			AtA.multiply((*this));
@@ -1033,7 +1033,7 @@ M = data[0]->Clone();
 void Faust::Transform<FPP,Cpu>::transpose()
 {
 	int nbFact=size();
-	reverse(data.begin(),data.end());
+	std::reverse(data.begin(),data.end());
 	for (int i=0;i<nbFact;i++)
 	{
 		data[i]->transpose();
@@ -1043,9 +1043,17 @@ void Faust::Transform<FPP,Cpu>::transpose()
 template<typename FPP>
 void Faust::Transform<FPP,Cpu>::conjugate()
 {
-	typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::iterator it;
-	for(it = data.begin(); it != data.end(); it++){
-		it->conjugate();
+	for(auto it = data.begin(); it != data.end(); it++){
+		(*it)->conjugate();
+	}
+}
+
+template<typename FPP>
+void Faust::Transform<FPP,Cpu>::adjoint()
+{
+	std::reverse(data.begin(),data.end());
+	for(auto it = data.begin(); it != data.end(); it++){
+		(*it)->adjoint();
 	}
 }
 
