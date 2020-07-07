@@ -117,7 +117,7 @@ namespace Faust {
 		/*virtual*/ void project(MatDense<FPP,DEVICE> & mat)const;//=0; //template with (pure) virtual not authorized (otherwise it must be templates from class, not function)
 		template<typename FPP, FDevice DEVICE, typename FPP2>
 			/*virtual*/ void project(Faust::MatDense<FPP, DEVICE>&) const /*=0*/;
-	    ~ConstraintGeneric(){};
+	    virtual ~ConstraintGeneric(){};
 
 	protected:
 	    /// type of constraint

@@ -76,6 +76,7 @@ class PyxParamsFact
         unsigned int grad_calc_opt_mode;
         int norm2_max_iter;
         double norm2_threshold;
+        virtual ~PyxParamsFact(){};
 };
 
 template<typename FPP, typename FPP2 = double>
@@ -86,7 +87,7 @@ class PyxParamsFactPalm4MSA : public PyxParamsFact<FPP,FPP2>
         unsigned long* init_fact_sizes;
         PyxStoppingCriterion<FPP2> stop_crit;
         virtual PyxStoppingCriterion<FPP2>& get_stop_crit() {return stop_crit;};
-
+        virtual ~PyxParamsFactPalm4MSA(){};
 };
 
 template<typename FPP, typename FPP2 = double>
@@ -105,6 +106,7 @@ class PyxParamsHierarchicalFact : public PyxParamsFact<FPP,FPP2>
         PyxStoppingCriterion<FPP2>* stop_crits; // must be of size 2
         bool is_fact_side_left;
         virtual const PyxStoppingCriterion<FPP2>* get_stop_crits() {return stop_crits;};
+        virtual ~PyxParamsHierarchicalFact(){}
 };
 
 template<typename FPP, typename FPP2 = double>
