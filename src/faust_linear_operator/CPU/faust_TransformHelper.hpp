@@ -351,19 +351,19 @@ namespace Faust {
 		{
 			Faust::MatDense<FPP,Cpu> *dfac = nullptr;
 			Faust::MatSparse<FPP,Cpu> *sfac = nullptr;
-			int sparse_weight;
+			faust_unsigned_int sparse_weight;
 			std::vector<Faust::MatGeneric<FPP,Cpu>*> opt_factors;
 
 			for(auto fac : this->transform->data)
 			{
-				if(dfac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(fac))
+				if((dfac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(fac)))
 					sfac = nullptr;
 				else
 					sfac = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(fac);
 
 				if(time)
 				{
-					if(dfac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(fac))
+					if((dfac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(fac)))
 					{
 						opt_factors.push_back(dfac->Clone(true));
 					}
@@ -527,7 +527,7 @@ namespace Faust {
 		{
 			if(id >= this->size()) throw out_of_range("factor id is lower than zero or greater or equal to the size of Transform.");
 			std::vector<Faust::MatGeneric<FPP,Cpu>*> left_factors;
-			for(int i=0; i <= id; i++)
+			for(int i=0; (faust_unsigned_int)i <= id; i++)
 				left_factors.push_back(const_cast<Faust::MatGeneric<FPP,Cpu>*>(get_gen_fact(i)));
 			return new TransformHelper<FPP,Cpu>(left_factors, FPP(1.0), false, copy, true);
 		}
@@ -537,7 +537,7 @@ namespace Faust {
 		{
 			if(id >= this->size()) throw out_of_range("factor id is lower than zero or greater or equal to the size of Transform.");
 			std::vector<Faust::MatGeneric<FPP,Cpu>*> right_factors;
-			for(int i=id; i < size(); i++)
+			for(int i=id; (faust_unsigned_int)i < size(); i++)
 				right_factors.push_back(const_cast<Faust::MatGeneric<FPP,Cpu>*>(get_gen_fact(i)));
 			return new TransformHelper<FPP,Cpu>(right_factors, FPP(1.0), false, copy, true);
 		}
@@ -556,7 +556,7 @@ namespace Faust {
 			{
 				factor_touched = false;
 				// forward pass
-				for(int i = 0; i < pth->size()-1; i++)
+				for(int i = 0; (faust_unsigned_int)i < pth->size()-1; i++)
 				{
 					S_i = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i));
 					S_j = const_cast<Faust::MatGeneric<FPP,Cpu>*>(pth->get_gen_fact(i+1));
@@ -564,7 +564,7 @@ namespace Faust {
 					{
 						nnz_i = nnz_tres+1;
 						{
-							if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_i))
+							if((tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_i)))
 							{
 								//Matrix is read-only because it's RowMajor order
 								Eigen::SparseMatrix<FPP,Eigen::ColMajor> sp_col = tmp_sp->mat.col(offset);
@@ -590,7 +590,8 @@ namespace Faust {
 									factor_touched = true;
 								}
 							}
-							if(tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_j))
+							if((tmp_sp = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(S_j)))
+							{
 								if(nnz_i <= nnz_tres)
 									tmp_sp->delete_row(offset);
 								else
@@ -599,6 +600,7 @@ namespace Faust {
 									if(nnz_i <= nnz_tres)
 										tmp_ds->delete_row(offset);
 								}
+							}
 						}
 					}
 				}
@@ -1325,7 +1327,7 @@ namespace Faust {
 			// take the greater number of factors from this and G as the concatened Faust number
 			// of factors
 			std::vector<MatGeneric<FPP,Cpu>*> facts(max(G->size(),this->size())+1);
-			const MatSparse<FPP,Cpu> * F_fac, *G_fac, *tmp_fac;
+			const MatSparse<FPP,Cpu> * F_fac, *G_fac;
 			const MatGeneric<FPP,Cpu> *tmp_fac_gen;
 			MatSparse<FPP,Cpu>* T_fac;
 			faust_unsigned_int T_fac_nnz;
@@ -1342,7 +1344,7 @@ namespace Faust {
 				if(i < this->size())
 				{
 					tmp_fac_gen = get_gen_fact(i); //this->transform->data[i];
-					if(F_inter_fac_allocated = (tmp_fac_gen->getType() == MatType::Dense))
+					if((F_inter_fac_allocated = (tmp_fac_gen->getType() == MatType::Dense)))
 					{
 						F_fac = new MatSparse<FPP,Cpu>(*dynamic_cast<const MatDense<FPP,Cpu>*>(tmp_fac_gen));
 						if(is_transposed) const_cast<MatSparse<FPP,Cpu>*>(F_fac)->transpose();
@@ -1561,10 +1563,8 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), MAX for inf-norm */) const
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const
 		{
-			const int MAX = (1u << 31) - 1;// numeric_limits<int>::max();
-			const MatGeneric<FPP,Cpu>* last_fact = get_gen_fact(this->size()-1);
 			unsigned int ncols = this->getNbCol();
 			unsigned int nrows = this->getNbRow();
 			//2-norm parameters
@@ -1576,7 +1576,7 @@ namespace Faust {
 			FPP norm;
 			vector<int> coords(ncols);
 			TransformHelper<FPP,Cpu>* normalizedTh = nullptr;
-			//			last_fact->Display();
+
 			for(faust_unsigned_int i=0;i<ncols;i++)
 			{
 
@@ -1615,7 +1615,7 @@ namespace Faust {
 					norm_invs, ncols, ncols);
 			//			norm_diag.Display();
 			vector<MatGeneric<FPP,Cpu>*> factors;
-			for(int i =0; i < size(); i++)
+			for(int i =0; (faust_unsigned_int)i < size(); i++)
 				//NOTE: about const cast: no problem, we know we won't write it
 				//NOTE: don't use get_gen_fact() to avoid transpose auto-handling
 				factors.push_back(const_cast<Faust::MatGeneric<FPP, Cpu>*>(this->transform->data[i]));
@@ -1658,7 +1658,7 @@ namespace Faust {
 			else
 			{
 				//factors[size()-1]->multiplyRight(*norm_diag);
-				if(fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[size()-1]))
+				if((fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[size()-1])))
 					scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
 				else
 				{
