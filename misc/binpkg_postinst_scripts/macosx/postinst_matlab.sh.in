@@ -1,10 +1,20 @@
 #!/bin/bash
 
-# find the more recent matlab version installed (sorted by year normally contained in folder name)
-MATLAB_ROOT=$(find /Applications/ -iname "MATLAB*" -maxdepth 1 | tail -n 1)
-if [[ ! "$?" = 0 || ! -d "${MATLAB_ROOT}" ]]
+# find matlab root path from the accessible matlab in the PATH
+MATLAB_BIN=$(which matlab)
+# deduce MATLAB_ROOT
+MATLAB_ROOT=${MATLAB_BIN%%bin/matlab}
+if [[ ! -d "${MATLAB_ROOT}" ]]
 then
-	echo "Can't find Matlab root dir. Add MATLAB_ROOT/bin to the PATH environment variable (of admin. user)." >&2
+	# if which method failed try this
+	# find the more recent matlab version installed (sorted by year normally contained in folder name)
+	MATLAB_ROOT=$(LC_ALL=C find /Applications/ -iname "MATLAB*" -maxdepth 2 | sort | tail -n 1)
+	# find -s is available only on macOS, that's why sort is used
+	# LC_ALL is for avoiding different order depending on the user environment
+fi
+if [[ ! -d "${MATLAB_ROOT}" ]]
+then
+	echo "Can't find Matlab root dir. Add MATLAB_ROOT/bin to the PATH environment variable (of admin. user)." | tee -a /tmp/log_faust_install >&2
 else
 	MATLAB_BIN="${MATLAB_ROOT}/bin/matlab"
 	# set path in system startup script
