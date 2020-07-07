@@ -101,12 +101,12 @@ Faust::ParamsPalm<FPP,DEVICE,FPP2>::ParamsPalm(
             stop_crit(stop_crit_),
             isVerbose(isVerbose_),
             isUpdateWayR2L(isUpdateWayR2L_),
-            init_lambda(init_lambda_),
 			isConstantStepSize(constant_step_size_),
 			step_size(step_size_),
+            init_lambda(init_lambda_),
 			gradCalcOptMode(gradCalcOptMode),
-            norm2_max_iter(FAUST_NORM2_MAX_ITER),
-            norm2_threshold(FAUST_PRECISION)
+            norm2_threshold(FAUST_PRECISION),
+            norm2_max_iter(FAUST_NORM2_MAX_ITER)
 {
  check_constraint_validity();
 }

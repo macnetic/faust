@@ -64,18 +64,18 @@ const char * Faust::HierarchicalFact<FPP,DEVICE,FPP2>::m_className="Faust::Hiera
 
 template<typename FPP,FDevice DEVICE,typename FPP2>
 Faust::HierarchicalFact<FPP,DEVICE,FPP2>::HierarchicalFact(const Faust::MatDense<FPP,DEVICE>& M,const Faust::Params<FPP,DEVICE,FPP2>& params_, Faust::BlasHandle<DEVICE> cublasHandle, Faust::SpBlasHandle<DEVICE> cusparseHandle):
-   m_indFact(0),
    cons(params_.cons),
+   norm2_threshold(params_.norm2_threshold),
+   norm2_max_iter(params_.norm2_max_iter),
    m_isUpdateWayR2L(params_.isUpdateWayR2L),
    m_isFactSideLeft(params_.isFactSideLeft),
    m_isVerbose(params_.isVerbose),
+   m_indFact(0),
    nbFact(params_.m_nbFact-1),
-   norm2_threshold(params_.norm2_threshold),
-   norm2_max_iter(params_.norm2_max_iter),
    palm_2(Palm4MSA<FPP,DEVICE,FPP2>(M,params_, cublasHandle, false)),
    palm_global(new Palm4MSA<FPP,DEVICE,FPP2>(M,params_, cublasHandle, true)),
-   cons_tmp_global(vector<const Faust::ConstraintGeneric*>()),
    default_lambda(params_.init_lambda),
+   cons_tmp_global(vector<const Faust::ConstraintGeneric*>()),
    isFactorizationComputed(false),
    errors(std::vector<std::vector<FPP> >(2,std::vector<FPP >(params_.m_nbFact-1,0.0))),
    cublas_handle(cublasHandle),

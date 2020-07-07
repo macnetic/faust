@@ -5,7 +5,7 @@
 #endif
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
-GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTParallelGen(int t, Faust::GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg) : t(t), fact_nrots(0), alg(alg)
+GivensFGFTParallelGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTParallelGen(int t, Faust::GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg) : alg(alg), t(t), fact_nrots(0) 
 {
 }
 

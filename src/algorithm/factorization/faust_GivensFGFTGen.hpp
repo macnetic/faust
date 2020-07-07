@@ -90,7 +90,7 @@ void GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::compute_facts()
 
 template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 GivensFGFTGen<FPP,DEVICE,FPP2,FPP4>::GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust /* deft to false */) :
-Lap(*Lap),  D(Lap->getNbRow()), errs(0), coord_choices(0), q_candidates(new int[Lap->getNbRow()]), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), Lap_squared_fro_norm(0), facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):1 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), last_fact_permuted(false), J(J), dim_size(Lap->getNbRow()), enable_large_Faust(enable_large_Faust)
+facts(J>0?(J*4<Lap->getNbRow()*Lap->getNbRow()||enable_large_Faust?J:0):1 /* don't allocate if the complexity doesn't worth it and enable_large_Faust is false*/), q_candidates(new int[Lap->getNbRow()]), J(J), D(Lap->getNbRow()), errs(0), coord_choices(0), Lap(*Lap), dim_size(Lap->getNbRow()), Lap_squared_fro_norm(0), last_fact_permuted(false), is_D_ordered(false), verbosity(verbosity), stoppingCritIsError(stoppingError != 0.0), stoppingError(stoppingError), errIsRel(errIsRel), enable_large_Faust(enable_large_Faust)
 {
 	if(Lap->getNbCol() != Lap->getNbRow())
 		handleError("Faust::GivensFGFTComplex", "Laplacian must be a square matrix.");

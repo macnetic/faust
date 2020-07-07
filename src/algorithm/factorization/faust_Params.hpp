@@ -261,8 +261,8 @@ Faust::Params<FPP,DEVICE,FPP2>::Params(
 			gradCalcOptMode(gradCalcOptMode),
             norm2_threshold(FAUST_PRECISION),
             norm2_max_iter(FAUST_NORM2_MAX_ITER),
-			packing_RL(defaultPackingRL),
-			use_csr(defaultUseCSR)
+			use_csr(defaultUseCSR),
+			packing_RL(defaultPackingRL)
 {
  check_constraint_validity();
 }
