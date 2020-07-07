@@ -8,9 +8,12 @@ Alternatively, you can also proceed with the following command in a terminal:
 <pre><code>    $ sudo installer -pkg /path/to/faust-*.pkg -target /
 </code></pre>
 
-<b>WARNING:</b> For the installation process to succeed you should respect the default destination path otherwise the auto-setup script for environment configuration won't work.
-Likewise, if Matlab has not been installed in its default path, then it's most likely the auto-setup script won't find it, see <a href="#installation_testing">below</a> then for troubleshooting.
+<b>WARNING:</b> For the installation process to succeed you should respect the default destination path otherwise the auto-setup script for environment configuration won't work.<br/>
+Likewise, if Matlab has not been installed in its default path, then it's most likely the auto-setup script won't find it, see <a href="#installation_testing">below</a> then for troubleshooting.<br/>
+To avoid this issue you can <i>symlink</i> you matlab path into /Applications (the default path) as it follows:
 
+<pre><code>    $ sudo ln -sf /path/to/matlab/install/MATLAB_R2018b.app /Applications
+</code></pre>
 
 
 After installing the package, you'll need to restart your Matlab or Python session in order to take into account the new configuration of your environment. Of course if you want to use only the Python wrapper you don't need to worry about setting the PATH environment for Matlab and conversely. But note that if later you change your mind and want FAµST for the both languages you'll just need to relaunch the installer.
