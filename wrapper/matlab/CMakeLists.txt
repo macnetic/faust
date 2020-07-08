@@ -58,12 +58,13 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 			COMMENT "Filtering matfaust ${MATFAUST_FILE} experimental code.")
 	endif()
 	add_custom_target(FILTERING_EXP_CODE_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE})
-	# use script generating inline doc only for real matlab classes
+	# use script generating inline doc only for real matlab classes and functions
+	if(WIN32)
+		set(SH_CMD git-bash)
+	endif() # on Unix, count on bash that is in PATH
 	if(${MATFAUST_FILE} MATCHES "@")
 		message(STATUS "matfaust class: " ${MATFAUST_FILE})
-		if(WIN32)
-			set(SH_CMD git-bash)
-		endif() # on Unix, count on bash that is in PATH
+
 		add_custom_command(OUTPUT ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
 			COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
 			DEPENDS ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
@@ -74,13 +75,20 @@ foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 	else()
 		message(STATUS "matfaust function file: " ${MATFAUST_FILE})
 		# just copy the .m
-		#TODO: inline doc should be possible for function files too
+		# generate inline doc for function files too
 		#configure_file(${FAUST_MATLAB_NAMESPACE_SRC_DIR}/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} @ONLY)
+#		add_custom_command(OUTPUT ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
+#			COMMAND python
+#			ARGS ${PROJECT_SOURCE_DIR}/gen_doc/matlab_copy_function_file.py ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
+#			DEPENDS ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
+#			COMMENT "Generating matfaust inline doc for ${MATFAUST_FILE} (just copied because it's a function file).")
 		add_custom_command(OUTPUT ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
-			COMMAND python
-			ARGS ${PROJECT_SOURCE_DIR}/gen_doc/matlab_copy_function_file.py ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE}
+			COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/gen_matlab_inline_doc_from_doxy_blocks.sh ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE} ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} only_func
 			DEPENDS ${FAUST_MATLAB_BIN_DIR}/expfiltered/${MATFAUST_FILE}
-			COMMENT "Generating matfaust inline doc for ${MATFAUST_FILE} (just copied because it's a function file).")
+			COMMENT "Generating matfaust inline doc for ${MATFAUST_FILE}")
+
+		add_custom_target(FILTER_OUT_MATLAB_DOXYBLOCKS_${MATFAUST_SHORT_FILE} ALL
+			COMMAND ${PROJECT_SOURCE_DIR}/gen_doc/filterout_matlab_doxy_blocks.sh ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE} DEPENDS doc COMMENT "Removing doxygen blocks from function file.")
 	endif()
 	add_custom_target(GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE} ALL DEPENDS ${FAUST_MATLAB_NAMESPACE_BIN_DIR}/${MATFAUST_FILE})
 	add_dependencies(PREPARE_MATFAUST_FOR_DOXYDOC GEN_MATFAUST_INLINE_DOC_${MATFAUST_SHORT_FILE})

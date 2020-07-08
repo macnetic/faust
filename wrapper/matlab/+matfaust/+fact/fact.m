@@ -21,5 +21,5 @@
 %>    - The third group of algorithms is for FGFT computing: fact.fgft_palm fact.fgft_givens fact.eigtj
 %>
 %>
-% ======================================================================
+%======================================================================
 

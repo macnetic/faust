@@ -73,7 +73,7 @@
 %> Primarily for convenience and test purposes, a Faust can be converted into
 %> the corresponding full matrix using the function Faust.full.
 %>
-%> \warning using Faust.full is discouraged except for test purposes, as it
+%> @warning using Faust.full is discouraged except for test purposes, as it
 %> loses the main potential interests of the FAuST structure: compressed
 %> memory storage and faster matrix-vector multiplication compared to its
 %> equivalent full matrix representation.

@@ -6,7 +6,7 @@
 
 
 function usage {
-        echo "USAGE: $0 <input_path.m> <output_path.m>"
+        echo "USAGE: $0 <input_path.m> <output_path.m> [only_func]"
 }
 
 function usage_exit {
@@ -32,6 +32,7 @@ function parse_doxy_block {
                                                         s/<[^>]*>//g;
                                                         s/&nbsp;/ /g;
                                                         s/@retval/Returns/g;
+							s/@warning/Warning:/g;
                                                         s/@[^[:blank:]]* \{0,1\}//g;
                                                         s/\\\./\./g
                                                 }"
@@ -43,10 +44,12 @@ function parse_doxy_block {
 [[ ! -r $1 ]] && exit 0
 [[ -n "$2" ]] && OUTPUT_FILE="$2" || usage_exit 2 "arg 2 is empty"
 
+[[ "$3" = only_func ]] && ONLY_FUNC=1
+
 # get function names
 FUNCTIONS=$(sed -ne 's/^[[:blank:]]*function[[:blank:]]\{1,\}\([^=]\{1,\}=\)\{0,1\}[[:blank:]]*\([^([:blank:]]\{1,\}\).*$/\2/p' "$INPUT_FILE")
 
-[[ -z "${FUNCTIONS}" ]] && echo "ERROR in getting the list of functions in $INPUT_FILE" && exit 3
+[[ -z "${FUNCTIONS}" ]] && echo "ERROR in getting the list of functions in $INPUT_FILE" && cp "$INPUT_FILE" "$OUTPUT_FILE" && exit 0 # not taken as an error for the calling script
 
 
 mkdir -p $(dirname "$OUTPUT_FILE")
@@ -89,7 +92,7 @@ do
         # insert parsed block
         FUNC_DEF_LINE=$(sed -ne $FUNC_LINE'p' $OUTPUT_FILE)
 	sed -ne '1,'$FUNC_LINE'p' $OUTPUT_FILE > ${OUTPUT_FILE}_tmp
-            # parse doxy block for inline block
+	# parse doxy block for inline block
         INLINE_BLOCK=$(parse_doxy_block $FUNC "$DOXY_BLOCK" "$FUNC_DEF_LINE")
         echo -e "$INLINE_BLOCK" >> ${OUTPUT_FILE}_tmp
         sed -ne $(($FUNC_LINE+1))','$(wc -l ${OUTPUT_FILE} | awk '{print $1}')'p' $OUTPUT_FILE >> ${OUTPUT_FILE}_tmp
@@ -98,6 +101,7 @@ do
 done
 
 
+[[ "$ONLY_FUNC" = 1 ]] && exit
 
 # filter header for class doc
 HEADER_START_END=($(sed -ne '/^[[:blank:]]*% ==*/=' $OUTPUT_FILE))
