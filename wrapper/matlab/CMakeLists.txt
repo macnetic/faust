@@ -27,6 +27,7 @@ endforeach()
 
 
 #message(FATAL_ERROR ${FAUST_MATLAB_MATFAUST_FILE_LIST})
+configure_file(${FAUST_MATLAB_SRC_DIR}/+matfaust/version.m.conf ${FAUST_MATLAB_SRC_DIR}/+matfaust/version.m @ONLY)
 add_custom_target(PREPARE_MATFAUST_FOR_DOXYDOC ALL)
 foreach(MATFAUST_FILE IN LISTS FAUST_MATLAB_MATFAUST_FILE_LIST)
 	string(REGEX REPLACE "[^+]*\\+matfaust\\/" "" MATFAUST_FILE ${MATFAUST_FILE})
