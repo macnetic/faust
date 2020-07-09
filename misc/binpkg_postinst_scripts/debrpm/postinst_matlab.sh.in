@@ -1,12 +1,27 @@
 #!/bin/bash
 
-function dirname_noerr {
+function dirname_noerr
+{
 	[[ ! "$1" = /* ]] && return
 	dirname "$1" 2>/dev/null
 }
 
+function inject_matlab_code_to_update_path
+{
+	FILE=$1
+	echo "matfaust_path = which('matfaust.version')" >> "$FILE"
+	echo "if(isempty(matfaust_path))" >> "$FILE"
+	echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> "$FILE"
+	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/mex'])" >> "$FILE"
+	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/tools'])" >> "$FILE"
+	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/data'])" >> "$FILE"
+	echo "matfaust.enable_gpu_mod('silent', true)" >> "$FILE"
+	echo end >> "$FILE"
+}
+
 MATLAB_ROOT=$(dirname_noerr $(dirname_noerr $(which matlab 2>/dev/null)))
 [[ ! -d "${MATLAB_ROOT}" ]] && MATLAB_ROOT=$(dirname_noerr $(dirname_noerr $(find /usr/local -maxdepth 10 -type f -name "matlab" | tail -n 1)))
+# find is sorted by default (contrary to macOS that needs find -s predicate)
 [[ ! -d "${MATLAB_ROOT}" ]] && MATLAB_ROOT=$(dirname_noerr $(dirname_noerr $(find /opt/ -maxdepth 10 -type f -name "matlab" | tail -n 1)))
 if [[ ! -d "${MATLAB_ROOT}" || ! -x "${MATLAB_ROOT}/bin/matlab" ]]
 then
@@ -14,22 +29,23 @@ then
 else
 	MATLAB_BIN="${MATLAB_ROOT}/bin/matlab"
 	STARTUP_DIR="${MATLAB_ROOT}/toolbox/local/"
-	STARTUP_FILE=${STARTUP_DIR}/startup.m
+	MATLABRC="${STARTUP_DIR}/matlabrc.m"
+	STARTUP_FILE="${STARTUP_DIR}/startup.m"
 	[[ -r "$STARTUP_FILE" ]] && grep -i -v faust "$STARTUP_FILE" > "${STARTUP_FILE}.tmp" 2>/dev/null && mv "${STARTUP_FILE}.tmp" "$STARTUP_FILE"
 	FAUST_MATLAB_WRAPPER_PATH="@CMAKE_INSTALL_MATLAB_PREFIX@"
 	#USR_STARTUP_FILE=$($MATLAB_BIN -nojvm -nodisplay -r "which startup;exit" | tail -n 2 | head -n 1) # useless in root
 	if [[ -d "${FAUST_MATLAB_WRAPPER_PATH}" ]]
 	then
 		#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE"
-		echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> $STARTUP_FILE
-		echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/mex'])" >> $STARTUP_FILE
-		echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/tools'])" >> $STARTUP_FILE
-		echo "matfaust.enable_gpu_mod()" >> "$STARTUP_FILE"
+		inject_matlab_code_to_update_path "$STARTUP_FILE"
+		# add a line to force startup execution into matlabrc
+		echo "oldpwd = pwd; startup_path = fullfile(matlabroot, 'toolbox', 'local'); cd(startup_path); startup; cd(oldpwd)" >> $MATLABRC
 		RET1=$?
 		RET2=0
 		# try edit startup.m of all users (only when files exist)
 		for USER_DIR in /home/*
 		do
+			USER=${USER_DIR##*/}
 			for USR_STARTUP_FILE in  $USER_DIR/Documents/MATLAB/startup.m $USER_DIR/matlab/startup.m
 			do
 				#if [[ ! "${USR_STARTUP_FILE}" = "${STARTUP_FILE}" ]]
@@ -38,11 +54,8 @@ else
 				then
 					grep -i -v faust "$USR_STARTUP_FILE" > "${USR_STARTUP_FILE}.tmp" 2>/dev/null && mv "${USR_STARTUP_FILE}.tmp" "$USR_STARTUP_FILE"
 					#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$USR_STARTUP_FILE"
-					echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> $USR_STARTUP_FILE
-					echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/mex'])" >> $USR_STARTUP_FILE
-					echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/tools'])" >> $USR_STARTUP_FILE
-					echo "matfaust.enable_gpu_mod('silent', true)" >> "$USR_STARTUP_FILE"
-					chown $USER $USR_STARTUP_FILE
+					inject_matlab_code_to_update_path "$USR_STARTUP_FILE"
+					chown $USER "$USR_STARTUP_FILE"
 					RET2=$(($?+$RET2))
 				fi
 				#fi

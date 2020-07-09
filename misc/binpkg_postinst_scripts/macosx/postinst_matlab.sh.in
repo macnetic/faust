@@ -1,5 +1,18 @@
 #!/bin/bash
 
+function inject_matlab_code_to_update_path
+{
+	FILE=$1
+	echo "matfaust_path = which('matfaust.version')" >> "$FILE"
+	echo "if(isempty(matfaust_path))" >> "$FILE"
+	echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> "$FILE"
+	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/mex'])" >> "$FILE"
+	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/tools'])" >> "$FILE"
+	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/data'])" >> "$FILE"
+	echo "matfaust.enable_gpu_mod('silent', true)" >> "$FILE"
+	echo end >> "$FILE"
+}
+
 # find matlab root path from the accessible matlab in the PATH
 MATLAB_BIN=$(which matlab)
 # deduce MATLAB_ROOT
@@ -9,7 +22,6 @@ then
 	# if which method failed try this
 	# find the more recent matlab version installed (sorted by year normally contained in folder name)
 	MATLAB_ROOT=$(LC_ALL=C find /Applications/ -iname "MATLAB*" -maxdepth 2 | sort | tail -n 1)
-	# find -s is available only on macOS, that's why sort is used
 	# LC_ALL is for avoiding different order depending on the user environment
 fi
 if [[ ! -d "${MATLAB_ROOT}" ]]
@@ -20,29 +32,32 @@ else
 	# set path in system startup script
 	STARTUP_DIR="${MATLAB_ROOT}/toolbox/local/"
 	STARTUP_FILE=${STARTUP_DIR}/startup.m
+	MATLABRC="${STARTUP_DIR}/matlabrc.m"
 	[[ -r "$STARTUP_FILE" ]] && grep -i -v faust "$STARTUP_FILE" > "${STARTUP_FILE}.tmp" && mv "${STARTUP_FILE}.tmp" "$STARTUP_FILE"
 	FAUST_MATLAB_WRAPPER_PATH="@CMAKE_INSTALL_MATLAB_PREFIX@"
 	#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE"
-	echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> $STARTUP_FILE
-	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/mex'])" >> $STARTUP_FILE
-	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/tools'])" >> $STARTUP_FILE
+	inject_matlab_code_to_update_path $STARTUP_FILE
+	# add a line to force startup execution into matlabrc
+	echo "oldpwd = pwd; startup_path = fullfile(matlabroot, 'toolbox', 'local'); cd(startup_path); startup; cd(oldpwd)" >> $MATLABRC
 	# set path in user startup script
 	#USR_STARTUP_FILE="$($MATLAB_BIN -nojvm -nodisplay -r "which startup;exit" | tail -n 2 | head -n 1)" # doesn't work into install script
 	# even if it works in a normal script #TODO: debug
 	# temporary solution (hard-coded paths)
-	for USR_STARTUP_FILE in /Users/$USER/Documents/MATLAB/startup.m /Users/$USER/matlab/startup.m
+	for USR_HOME in /Users/*
 	do
-		#if [[ ! "${USR_STARTUP_FILE}" = "${STARTUP_FILE}" ]]
-		#then
-		if [[ -r "$USR_STARTUP_FILE" ]]
-		then
-			grep -i -v faust "$USR_STARTUP_FILE" > "${USR_STARTUP_FILE}.tmp" && mv "${USR_STARTUP_FILE}.tmp" "$USR_STARTUP_FILE"
-			#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$USR_STARTUP_FILE"
-			echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> $USR_STARTUP_FILE
-			echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/mex'])" >> $USR_STARTUP_FILE
-			echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/tools'])" >> $USR_STARTUP_FILE
-			chown $USER "$USR_STARTUP_FILE"
-		fi
-		#fi
+		USER=${USR_HOME##*/}
+		for USR_STARTUP_FILE in "$USR_HOME"/Documents/MATLAB/startup.m "$USR_HOME"/matlab/startup.m
+		do
+			#if [[ ! "${USR_STARTUP_FILE}" = "${STARTUP_FILE}" ]]
+			#then
+			if [[ -r "$USR_STARTUP_FILE" ]]
+			then
+				grep -i -v faust "$USR_STARTUP_FILE" > "${USR_STARTUP_FILE}.tmp" && mv "${USR_STARTUP_FILE}.tmp" "$USR_STARTUP_FILE"
+				#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$USR_STARTUP_FILE"
+				inject_matlab_code_to_update_path "$USR_STARTUP_FILE"
+				chown $USER "$USR_STARTUP_FILE"
+			fi
+			#fi
+		done
 	done
 fi
