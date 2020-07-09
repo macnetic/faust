@@ -8,15 +8,40 @@ function dirname_noerr
 
 function inject_matlab_code_to_update_path
 {
+	# each line must contains the word faust (for filtering of old install lines)
 	FILE=$1
-	echo "matfaust_path = which('matfaust.version')" >> "$FILE"
+	echo "matfaust_path = which('matfaust.version');" >> "$FILE"
 	echo "if(isempty(matfaust_path))" >> "$FILE"
 	echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> "$FILE"
 	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/mex'])" >> "$FILE"
 	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/tools'])" >> "$FILE"
 	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/data'])" >> "$FILE"
-	echo "matfaust.enable_gpu_mod('silent', true)" >> "$FILE"
-	echo end >> "$FILE"
+	echo "matfaust.enable_gpu_mod('silent', true);end" >> "$FILE"
+}
+
+
+funtion inject_matlab_code_to_update_user_paths
+{
+	# try edit startup.m of all users (only when files exist)
+	for USER_DIR in /home/*
+	do
+		USER=${USER_DIR##*/}
+		for USR_STARTUP_FILE in  $USER_DIR/Documents/MATLAB/startup.m $USER_DIR/matlab/startup.m
+		do
+			#if [[ ! "${USR_STARTUP_FILE}" = "${STARTUP_FILE}" ]]
+			#then
+			if [[ -r "$USR_STARTUP_FILE" ]]
+			then
+				grep -i -v faust "$USR_STARTUP_FILE" > "${USR_STARTUP_FILE}.tmp" 2>/dev/null && mv "${USR_STARTUP_FILE}.tmp" "$USR_STARTUP_FILE"
+				#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$USR_STARTUP_FILE"
+				inject_matlab_code_to_update_path "$USR_STARTUP_FILE"
+				chown $USER "$USR_STARTUP_FILE"
+				RET2=$(($?+$RET2))
+			fi
+			#fi
+		done
+	done
+
 }
 
 MATLAB_ROOT=$(dirname_noerr $(dirname_noerr $(which matlab 2>/dev/null)))
@@ -42,25 +67,8 @@ else
 		echo "oldpwd = pwd; startup_path = fullfile(matlabroot, 'toolbox', 'local'); cd(startup_path); startup; cd(oldpwd)" >> $MATLABRC
 		RET1=$?
 		RET2=0
-		# try edit startup.m of all users (only when files exist)
-		for USER_DIR in /home/*
-		do
-			USER=${USER_DIR##*/}
-			for USR_STARTUP_FILE in  $USER_DIR/Documents/MATLAB/startup.m $USER_DIR/matlab/startup.m
-			do
-				#if [[ ! "${USR_STARTUP_FILE}" = "${STARTUP_FILE}" ]]
-				#then
-				if [[ -r "$USR_STARTUP_FILE" ]]
-				then
-					grep -i -v faust "$USR_STARTUP_FILE" > "${USR_STARTUP_FILE}.tmp" 2>/dev/null && mv "${USR_STARTUP_FILE}.tmp" "$USR_STARTUP_FILE"
-					#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$USR_STARTUP_FILE"
-					inject_matlab_code_to_update_path "$USR_STARTUP_FILE"
-					chown $USER "$USR_STARTUP_FILE"
-					RET2=$(($?+$RET2))
-				fi
-				#fi
-			done
-		done
+		# disable because it's too intrusive and maybe redundant
+		# inject_matlab_code_to_update_user_paths
 		[[ $RET1 = 0 && $RET2 = 0 ]] && echo -e "\033[1mNOTICE\033[0m: Faust matlab setup is complete." || echo "ERROR: something went wrong in matlab startup script editing."
 	else
 		echo "ERROR: Faust matlab wrapper path isn't valid."
