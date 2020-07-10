@@ -57,7 +57,7 @@ Nevertheless, it could be useful to check that it really worked and set the envi
 
 To test whether the FAµST Matlab wrapper auto-setup succeeded at install stage, you can open a terminal and type:
 
-	matlab -nodisplay -nojvm -r "import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', 'complex'); F"
+	matlab -nodisplay -nojvm -r "matfaust.rand(1, 10, .5, 'dense', 'complex')"
 
 Note: if Matlab is not set in your PATH environment variable you need to replace `matlab' with its full path
 	(e.g. on macOS /Applications/Matlab/MATLAB_R2018b.app/bin/matlab)
@@ -66,7 +66,7 @@ It works only if you see an output similar to:
 
 	Faust size 10x10, density 0.50, nnz_sum 50, 1 factor(s):
 	- FACTOR 0 (complex) DENSE, size 10x10, density 0.5, nnz 50
-	>> % other values are possible for density, etc. because of the random generation
+	% other values are possible for density, etc. because of the random generation
 
 Otherwise it didn't work. So here is how to setup the wrapper manually.
 
@@ -78,7 +78,7 @@ Then launch the script that is responsible to add FAµST location in your Matlab
 
 	>> setup_FAUST
 	>> % then test again FAµST
-	>> import matfaust.FaustFactory;F = FaustFactory.rand(1, 10, .5, 'dense', 'complex');disp(F);exit
+	>> matfaust.rand(1, 10, .5, 'dense', 'complex')
 
 For that change to be applied permanently, you need to automatize the `addpath()' call made by setup_FAUST.<br/>
 For that purpose:
@@ -86,11 +86,16 @@ For that purpose:
 <ol>
 <li>Look into your matlab installation directory (e.g. on macOS /Applications/Matlab/MATLAB_R2018b.app/bin/matlab), next:
 <li>Go into the sub-directory toolbox/local
-<li>Edit the file startup.m by adding the follwing line:
+<li>Edit the file startup.m by adding the following lines:
 <pre>
-	addpath(genpath('@FAUST_INSTALL_PATH@/matlab'))
+    oldpwd=pwd;
+    cd @FAUST_INSTALL_PATH@/matlab; % for Windows users this is: C:\Program Files\faust\matlab
+    setup_FAUST
+    cd oldpwd;
 </pre>
 </ol>
+
+Finally type <a href="https://fr.mathworks.com/help/matlab/ref/rehash.html#d120e1067468">`rehash toolbox'</a> in your current matlab terminal and restart Matlab in order to verify the configuration is permanent.
 
 Note: you can also edit a user specific startup.m script instead of system's startup.m. Look the Matlab documentation [here](https://fr.mathworks.com/help/matlab/matlab_env/startup-options.html).
 
