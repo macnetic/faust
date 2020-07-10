@@ -40,6 +40,8 @@ function inject_matlab_code_to_update_user_paths
 
 }
 
+MATLABRC_RUN_STARTUP_CMD="if(exist('@CMAKE_INSTALL_PREFIX@'))oldpwd=pwd;startup_path=fullfile(matlabroot,'toolbox','local');cd(startup_path);startup_found=which('startup');if(isempty(startup_found))rehash('toolbox');startup_found=which('startup');if(isempty(startup_found)) disp('Faust startup code can''t be executed -- script not found. Please consult the online documentation to resolve this issue.');else;startup;end;else;startup;end;cd(oldpwd);end";
+
 # find matlab root path from the accessible matlab in the PATH
 MATLAB_BIN=$(which matlab)
 # deduce MATLAB_ROOT
@@ -60,12 +62,12 @@ else
 	STARTUP_DIR="${MATLAB_ROOT}/toolbox/local/"
 	STARTUP_FILE=${STARTUP_DIR}/startup.m
 	MATLABRC="${STARTUP_DIR}/matlabrc.m"
-	[[ -r "$STARTUP_FILE" ]] && grep -i -v faust "$STARTUP_FILE" > "${STARTUP_FILE}.tmp" && mv "${STARTUP_FILE}.tmp" "$STARTUP_FILE"
+	[[ -r "$STARTUP_FILE" ]] && (grep -i -v faust "$STARTUP_FILE" > "${STARTUP_FILE}.tmp"; mv "${STARTUP_FILE}.tmp" "$STARTUP_FILE")
 	FAUST_MATLAB_WRAPPER_PATH="@CMAKE_INSTALL_MATLAB_PREFIX@"
 	#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE"
 	inject_matlab_code_to_update_path $STARTUP_FILE
 	# add a line to force startup execution into matlabrc
-	echo "oldpwd = pwd; startup_path = fullfile(matlabroot, 'toolbox', 'local'); cd(startup_path); startup; cd(oldpwd)" >> $MATLABRC
-	# disable because it's too intrusive and maybe redundant
-	# inject_matlab_code_to_update_user_paths
+	# except if the line is already in the file
+	[[ -r "$MATLABRC" ]] && grep -q "$MATLABRC_RUN_STARTUP_CMD" "$MATLABRC"  || (echo "$MATLABRC_RUN_STARTUP_CMD" >> $MATLABRC)
+	# inject_matlab_code_to_update_user_paths # disabled because it's too intrusive and maybe redundant
 fi
