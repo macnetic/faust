@@ -191,17 +191,7 @@ int main(int argc, char* argv[])
 
 	vector<Faust::MatSparse<FPP,Cpu> > facts;
 	hierFact.get_facts(facts);
-	FPP lambda = hierFact.get_lambda();
-	if (argc >= 3)
-	{
-		if (Faust::fabs(lambda - expectedLambda) > epsilon)
-		{
-			std::cerr<<"invalid lambda, must be equal to "<<std::setprecision(20)<<std::setprecision(20)<<expectedLambda<<" in the precision of "<<epsilon<<std::endl;
-			std::cerr<<"current value is "<<std::setprecision(20)<<lambda<<std::endl;
-			exit(EXIT_FAILURE);
-		}
 
-	}
 	(facts[0]) *= hierFact.get_lambda();
 	// transform the sparse matrix into generic one
 	std::vector<Faust::MatGeneric<FPP,Cpu> *> list_fact_generic;
@@ -241,7 +231,19 @@ int main(int argc, char* argv[])
 	std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
 	std::cout<<"		"<<relativeError<<std::endl<<std::endl;
 
-    hierFactCore.Display();
+	FPP lambda = hierFact.get_lambda();
+	if (argc >= 3)
+	{
+		if (Faust::fabs(lambda - expectedLambda) > epsilon)
+		{
+			std::cerr<<"invalid lambda, must be equal to "<<std::setprecision(20)<<std::setprecision(20)<<expectedLambda<<" in the precision of "<<epsilon<<std::endl;
+			std::cerr<<"current value is "<<std::setprecision(20)<<lambda<<std::endl;
+			exit(EXIT_FAILURE);
+		}
+
+	}
+
+	hierFactCore.Display();
 	//time comparison between matrix vector product and faust-vector product
 	int niterTimeComp = 10;
 	if (niterTimeComp > 0)
