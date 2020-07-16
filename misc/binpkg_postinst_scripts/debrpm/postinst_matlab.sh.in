@@ -10,6 +10,7 @@ function inject_matlab_code_to_update_path
 {
 	# each line must contains the word faust (for filtering of old install lines)
 	FILE=$1
+	echo "% Edit at your own risk: automatically added by the FAuST installer ${CPACK_PACKAGE_VERSION} to enable access to the FAuST library, https://faust.inria.fr" >> "$FILE"
 	echo "matfaust_path = which('matfaust.version');" >> "$FILE"
 	echo "if(isempty(matfaust_path))" >> "$FILE"
 	echo "addpath('"$FAUST_MATLAB_WRAPPER_PATH"')" >> "$FILE"
@@ -17,10 +18,11 @@ function inject_matlab_code_to_update_path
 	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/tools'])" >> "$FILE"
 	echo "addpath(['"$FAUST_MATLAB_WRAPPER_PATH"' '/data'])" >> "$FILE"
 	echo "matfaust.enable_gpu_mod('silent', true);end" >> "$FILE"
+	echo "% End of code added by the FAuST installer" >> "$FILE"
 	return $?
 }
 
-MATLABRC_RUN_STARTUP_CMD="if(exist('@CMAKE_INSTALL_PREFIX@'))oldpwd=pwd;startup_path=fullfile(matlabroot,'toolbox','local');cd(startup_path);startup_found=which('startup');if(isempty(startup_found))rehash('toolbox');startup_found=which('startup');if(isempty(startup_found)) disp('Faust startup code can''t be executed -- script not found. Please consult the online documentation to resolve this issue.');else;startup;end;else;startup;end;cd(oldpwd);end";
+MATLABRC_RUN_STARTUP_CMD="if(exist('@CMAKE_INSTALL_PREFIX@'))oldpwd=pwd;startup_path=fullfile(matlabroot,'toolbox','local');cd(startup_path);startup_found=which('startup');if(isempty(startup_found))rehash('toolbox');startup_found=which('startup');if(isempty(startup_found)) disp('Faust startup code can''t be executed -- script not found. Please consult the online documentation to resolve this issue.');else;startup;end;else;startup;end;cd(oldpwd);end % Edit at your own risk: automatically added by the FAuST installer to enable access to the FAuST library, https://faust.inria.fr";
 
 funtion inject_matlab_code_to_update_user_paths
 {
