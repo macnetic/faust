@@ -4,6 +4,7 @@
 %>
 %> @param M the dense matrix to factorize.
 %> @param p the ParamsPalm4MSA instance to define the algorithm parameters.
+%> @param 'backend',int (optional) the backend (the C++ implementation) chosen. Must be 2016 (the default) or 2020 (which should be quicker for certain configurations - e.g. factorizing a Hadamard matrix).
 %>
 %> @retval F the Faust object result of the factorization.
 %> @retval [F, lambda] = palm4msa(M, p) to optionally get lambda (scale).
@@ -20,7 +21,7 @@
 %>  % cons = {splin([500,32], 5), normcol([32,32], 1)};
 %>  stop_crit = StoppingCriterion(200);
 %>  params = ParamsPalm4MSA(cons, stop_crit, 'is_update_way_R2L', false, 'init_lambda', 1.0);
-%>  F = palm4msa(M, params)
+%>  F = palm4msa(M, params, 'backend', 2016)
 %> @endcode
 %>
 %> F =
