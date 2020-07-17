@@ -317,8 +317,10 @@ void Faust::Params<FPP,DEVICE,FPP2>::Display() const
 	std::cout<<"ISCONSTANTSTEPSIZE : "<<isConstantStepSize<<std::endl;
 	std::cout<<"step_size : "<<step_size<<std::endl;
 	std::cout<<"Matrix :  nbRow "<<m_nbRow<<" NbCol : "<< m_nbCol<<std::endl;
-	std::cout<<"stop_crit_2facts : "<<stop_crit_2facts.get_crit()<<std::endl;
-	std::cout<<"stop_crit_global : "<<stop_crit_global.get_crit()<<std::endl;
+//	std::cout<<"stop_crit_2facts : "<<stop_crit_2facts.get_crit()<<std::endl;
+	std::cout<<"stop_crit_2facts : "<< std::endl << stop_crit_2facts.to_string() << std::endl;
+//	std::cout<<"stop_crit_global : "<<stop_crit_global.get_crit()<<std::endl;
+	std::cout<<"stop_crit_global : "<< std::endl << stop_crit_global.to_string() <<std::endl;
 	std::cout << "gradCalcOptMode: "<< gradCalcOptMode << std::endl;
     std::cout << "norm2_threshold:" << norm2_threshold << std::endl;
     std::cout << "norm2_max_iter:" << norm2_max_iter << std::endl;

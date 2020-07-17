@@ -163,7 +163,8 @@ void Faust::ParamsPalm<FPP,DEVICE,FPP2>::Display() const
 	std::cout<<"ISCONSTANTSTEPSIZE : "<<isConstantStepSize<<std::endl;
 	std::cout<<"step_size : "<<step_size<<std::endl;
 	std::cout<<"data :  nbRow "<<data.getNbRow()<<" NbCol : "<< data.getNbCol()<<std::endl;
-	std::cout<<"stop_crit : "<<stop_crit.get_crit()<<std::endl;
+//	std::cout<<"stop_crit : "<<stop_crit.get_crit()<<std::endl;
+	std::cout<<"stop_crit : "<< std::endl << stop_crit.to_string() <<std::endl;
 	std::cout << "gradCalcOptMode: "<< gradCalcOptMode << std::endl;
     std::cout << "norm2_threshold:" << norm2_threshold << std::endl;
     std::cout << "norm2_max_iter:" << norm2_max_iter << std::endl;

@@ -73,6 +73,7 @@ namespace Faust
           int get_crit() const{return nb_it;}
 		  bool isCriterionErr() const {return isCriterionError;}
 		  void Display() const;
+		  string to_string() const;
 		  static const T NO_ERROR_PASSED;
        private:
           void check_validity()const;
