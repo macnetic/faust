@@ -788,7 +788,7 @@ class ParamsHierarchical(ParamsFact):
         if(not isinstance(M, np.ndarray)):
             raise ValueError("M must be a numpy ndarray")
         return M.shape[0] == self.data_num_rows and \
-                M.shape[0] == self.data_num_cols
+                M.shape[1] == self.data_num_cols
 
     def __repr__(self):
         """
@@ -947,7 +947,10 @@ class ParamsPalm4MSA(ParamsFact):
                  is_update_way_R2L=False, init_lambda=1.0,
                  step_size=10.0**-16,
                  constant_step_size=False,
-                 is_verbose=False, grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
+                 is_verbose=False,
+                 norm2_max_iter=100,
+                 norm2_threshold=1e-6,
+                 grad_calc_opt_mode=ParamsFact.EXTERNAL_OPT):
         """
             Constructor.
 
@@ -971,6 +974,10 @@ class ParamsPalm4MSA(ParamsFact):
                 the algorithm iterations otherwise it is updated before every
                 factor update.
                 is_verbose: True to enable the verbose mode.
+                norm2_max_iter: maximum number of iterations of power iteration
+                algorithm. Used for computing 2-norm.
+                norm2_threshold: power iteration algorithm threshold (default to
+                1e-6). Used for computing 2-norm.
                 grad_calc_opt_mode: the mode used for computing the PALM gradient.
                 It can be one value among pyfaust.factparams.ParamsFact.EXTERNAL_OPT,
                 pyfaust.factparams.ParamsFact.INTERNAL_OPT or pyfaust.factparams.ParamsFact.DISABLED_OPT. This
