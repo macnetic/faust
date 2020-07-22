@@ -41,9 +41,13 @@ classdef (Abstract) ParamsFact
 		IDX_USE_CSR = 9
 		IDX_PACKING_RL = 10
 		% flags to control the optimization of the multiplication L'(LSR)R' in PALM4MSA
+		%> gradient product optimization is disabled
 		DISABLED_OPT = 0
+		%> gradient product optimization is handled internally
 		INTERNAL_OPT = 1
+		%> gradient product optimization is handled externally
 		EXTERNAL_OPT = 2
+		%> default is EXTERNAL_OPT
 		DEFAULT_OPT = 2
 		% the order of names matters and must respect the indices above
 		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose', 'grad_calc_opt_mode', 'norm2_max_iter', 'norm2_threshold', 'packing_RL', 'use_csr' }

@@ -32,7 +32,7 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 		%>	@param 'packing_RL', bool true (by default) to pre-compute R and L products (only available with 2020 backend of pyfaust.fact.hierarchical).
 		%>	@param 'norm2_max_iter', int maximum number of iterations of power iteration algorithm (default to 100). Used for computing 2-norm.
 		%>	@param 'norm2_threshold', real power iteration algorithm threshold (default to 1e-6). Used for computing 2-norm.
-		%>	@param 'grad_calc_opt_mode', int the mode used for computing the PALM gradient. It can be one value among ParamsFact.EXTERNAL_OPT, ParamsFact.INTERNAL_OPT or ParamsFact.DISABLED_OPT. This parameter is experimental, its value shouln't be changed. 
+		%>	@param 'grad_calc_opt_mode', int the mode used for computing the PALM gradient. It can be one value among matfaust.factparams.ParamsFact.EXTERNAL_OPT, matfaust.factparams.ParamsFact.INTERNAL_OPT or matfaust.factparams.ParamsFact.DISABLED_OPT. This parameter is experimental, its value shouln't be changed. 
 		% =========================================================
 		function p = ParamsHierarchical(fact_constraints, res_constraints, stop_crit1, stop_crit2, varargin)
 			import matfaust.factparams.*
@@ -128,6 +128,13 @@ classdef ParamsHierarchical < matfaust.factparams.ParamsFact
 			end
 		end
 
+		% =========================================================
+		%> @brief This function handles the conversion of the structure instance to the mex format used by wrapper implementation.
+		%>
+		%> @note this function is not intended to be used by users.
+		%>
+		%> @retval The mex structure instance as expected by the mex wrapper used by matfaust.fact.hierarchical.
+		% =========================================================
 		function mex_params = to_mex_struct(this)
 			mex_constraints = cell(2, this.num_facts-1);
 			%mex_fact_constraints = cell(1, this.num_facts-1)

@@ -972,8 +972,8 @@ class ParamsPalm4MSA(ParamsFact):
                 factor update.
                 is_verbose: True to enable the verbose mode.
                 grad_calc_opt_mode: the mode used for computing the PALM gradient.
-                It can be one value among ParamsFact.EXTERNAL_OPT,
-                ParamsFact.INTERNAL_OPT or ParamsFact.DISABLED_OPT. This
+                It can be one value among pyfaust.factparams.ParamsFact.EXTERNAL_OPT,
+                pyfaust.factparams.ParamsFact.INTERNAL_OPT or pyfaust.factparams.ParamsFact.DISABLED_OPT. This
                 parameter is experimental, its value shouldn't be changed.
         """
         if(not isinstance(constraints, list) and not

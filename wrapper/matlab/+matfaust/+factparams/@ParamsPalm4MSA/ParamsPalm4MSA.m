@@ -11,6 +11,23 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 		OPT_ARG_NAMES2 = { 'init_facts' }
 	end
 	methods
+		% =========================================================
+		%>	@brief Constructor.
+		%>
+		%>	@param constraints a ConstraintList object or a cell array of matfaust.proj.proj_gen objects to define the constraints of the factors.
+		%>	@param stop_crit a matfaust.factparams.StoppingCriterion instance which defines the algorithm stopping criterion.
+		%>	@param 'init_facts', cell array of matrices (optional) if defined, matfaust.fact.palm4msa will initialize the factors with init_facts (by default the first factor to be updated is initialized to zero and the others to identity. Note that the so called first factor can be the rightmost or the leftmost depending on the is_update_way_R2L argument).
+		%>	@param 'is_update_way_R2L', bool (optional) if true matfaust.fact.palm4msa will update factors from the right to the left, otherwise it's done in reverse order.
+		%>	@param 'init_lambda', real (optional) the scale scalar initial value (by default the value is one).
+		%>	@param 'step_size', real (optional) the initial step of the PALM descent.
+		%>	@param 'constant_step_size', real if true the step_size keeps constant along the algorithm iterations otherwise it is updated before every factor update.
+		%>	@param 'is_verbose', boo (optional) True to enable the verbose mode.
+		%>	parameter is experimental, its value shouldn't be changed.
+		%>	@param 'norm2_max_iter', real (optional) maximum number of iterations of power iteration algorithm. Used for computing 2-norm.
+		%>	@param 'norm2_threshold', real (optional) power iteration algorithm threshold (default to 1e-6). Used for computing 2-norm.
+		%>	@param 'grad_calc_opt_mode', int (optional) the mode used for computing the PALM gradient. It can be one value among matfaust.factparams.ParamsFact.EXTERNAL_OPT, matfaust.factparams.ParamsFact.INTERNAL_OPT or matfaust.factparams.ParamsFact.DISABLED_OPT. This
+		%>
+		% =========================================================
 		function p = ParamsPalm4MSA(constraints, stop_crit, varargin)
 			import matfaust.factparams.*
 			if(isa(constraints, 'ConstraintList'))
