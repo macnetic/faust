@@ -796,7 +796,8 @@ class ParamsHierarchical(ParamsFact):
         """
         return super(ParamsHierarchical, self).__repr__()+ \
                 "local stopping criterion: "+str(self.stop_crits[0])+"\r\n" \
-                "global stopping criterion"+str(self.stop_crits[1])
+                "global stopping criterion"+str(self.stop_crits[1])+"\r\n" \
+                "is_fact_side_left:"+str(self.is_fact_side_left)
 
 class ParamsHierarchicalSquareMat(ParamsHierarchical):
     """
@@ -828,6 +829,8 @@ class ParamsHierarchicalSquareMat(ParamsHierarchical):
         pot = int(pot)
         return ParamsHierarchicalSquareMat(pot)
 
+    def __repr__(self):
+        return super(ParamsHierarchicalSquareMat, self).__repr__()
 
 
 class ParamsHierarchicalRectMat(ParamsHierarchical):
@@ -935,6 +938,9 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
             raise TypeError('M must be a numpy.ndarray.')
         p = ParamsHierarchicalRectMat(M.shape[0], M.shape[1], *p[1:])
         return p
+
+    def __repr__(self):
+        return super(ParamsHierarchicalRectMat, self).__repr__()
 
 class ParamsPalm4MSA(ParamsFact):
     """
