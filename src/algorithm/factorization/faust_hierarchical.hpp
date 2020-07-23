@@ -52,7 +52,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 			id_dims[0] = res_cons->get_rows();
 			id_dims[1] = res_cons->get_cols();
 		}
-		else //if(! is_update_way_R2L && is_fact_side_left && is_update_way_R2L && ! is_fact_side_left)
+		else //if(! is_update_way_R2L && is_fact_side_left || is_update_way_R2L && ! is_fact_side_left)
 		{
 			zero_dims[0] = res_cons->get_rows();
 			zero_dims[1] = res_cons->get_cols();

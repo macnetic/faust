@@ -15,8 +15,8 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		const bool on_gpu /*=false*/)
 {
 	double norm1, norm2;
-	std::cout << "palm4msa2 "<< std::endl;
-	std::cout << "on_gpu: " << on_gpu << std::endl;
+//	std::cout << "palm4msa2 "<< std::endl;
+//	std::cout << "on_gpu: " << on_gpu << std::endl;
 	if(constraints.size() == 0)
 		throw out_of_range("No constraint passed to palm4msa.");
 	const Real<FPP> lipschitz_multiplicator = 1.001;

@@ -74,20 +74,20 @@ void Faust::prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const boo
 	const faust_unsigned_int dim2 = M.getNbCol();
 	const faust_unsigned_int nb_elt_mat = dim1*dim2;
 	if(pos) Faust::pre_prox_pos(M);
-	if (k<=0)
+	if (k<=0) // it can't be < 0, k is a faust_unsigned_int
 		M.setZeros();
 	else
 	{
 		if (k<nb_elt_mat /* && k < M.getNonZeros()*/)
 		{
-		const std::vector<FPP> vec(M.getData(), M.getData()+nb_elt_mat);
-		std::vector<int> index;
-		Faust::sort_idx(vec, index, k);
-		index.erase(index.begin()+k, index.end());
+			const std::vector<FPP> vec(M.getData(), M.getData()+nb_elt_mat);
+			std::vector<int> index;
+			Faust::sort_idx(vec, index, k);
+			index.erase(index.begin()+k, index.end());
 
-		M.setZeros();
-		for (int i=0 ; i<index.size() ; i++)
-			M.getData()[index[i]] = vec[index[i]];
+			M.setZeros();
+			for (int i=0 ; i<index.size() ; i++)
+				M.getData()[index[i]] = vec[index[i]];
 		}
 
 	}
