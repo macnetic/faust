@@ -12,18 +12,19 @@ namespace Faust {
 
 		while(lower_mask < upper_mask)
 		{
-			for(unsigned int i=0;i<size;i++){
+			for(unsigned int i=0;i<size;i++)
+			{
 				lobit = (v[i] & lower_mask) >>(shift);
 				hibit = (v[i] & upper_mask)>>(n-shift-1);
 				if(lobit > hibit){
-					//lobit == 1, hibit == 0
-					v[i] ^= lower_mask;
-					v[i] |= upper_mask;
+					// swap lobit == 1, hibit == 0
+					v[i] ^= lower_mask; // 1 ^ 1 == 0 == hibit
+					v[i] |= upper_mask; // 0 | 1 == 1 == lobit
 				}
 				else if (lobit < hibit){
 					//swap lobit == 0, hibit == 1
-					v[i] |= lower_mask;
-					v[i] ^= upper_mask;
+					v[i] |= lower_mask; // 0 | 1 == 1 == hibit
+					v[i] ^= upper_mask; // 1 ^ 1 == 0 == lobit
 				}
 			}
 			lower_mask <<= 1;
