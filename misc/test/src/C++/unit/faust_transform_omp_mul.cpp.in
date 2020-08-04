@@ -68,14 +68,14 @@ int main(int argc, char* argv[])
 	}
 
 	//RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true
-	TransformHelper<FPP,Cpu>* th = TransformHelper<FPP,Cpu>::randFaust(DENSE, 17, 17, 2048, 2048, .5);
+	TransformHelper<FPP,Cpu>* th = TransformHelper<FPP,Cpu>::randFaust(DENSE, 12, 12, 2048, 2048, .5);
 	th->display();
 	MatDense<FPP,Cpu>* M = MatDense<FPP,Cpu>::randMat(2048,2048);
 	auto start = std::chrono::system_clock::now();
 	auto FM = th->multiply(*M);
 	auto end = std::chrono::system_clock::now();
 	std::chrono::duration<double> diff = end-start;
-	std::cout << "Time "<< diff.count() << " s\n";
+	std::cout << "Eigen Time "<< diff.count() << " s\n";
 	FM.Display();
 	cout << "FM norm: " << FM.norm() << endl;
 	th->set_FM_mul_mode(OMP_PROD_PAR_REDUC);
@@ -83,15 +83,15 @@ int main(int argc, char* argv[])
 	auto FM2 = th->multiply(*M);
 	end = std::chrono::system_clock::now();
 	diff = end-start;
-	std::cout << "Time omp: "<< diff.count() << " s\n";
+	std::cout << "OMP Time: "<< diff.count() << " s\n";
 	FM2.Display();
-	cout << "FM2 norm: " << FM.norm() << endl;
+	cout << "FM2 norm: " << FM2.norm() << endl;
 	th->set_FM_mul_mode(CPP_PROD_PAR_REDUC);
 	start = std::chrono::system_clock::now();
 	auto FM3 = th->multiply(*M);
 	end = std::chrono::system_clock::now();
 	diff = end-start;
-	std::cout << "Time C++ threads: "<< diff.count() << " s\n";
+	std::cout << "C++ threads Time : "<< diff.count() << " s\n";
 	FM3.Display();
 	cout << "FM3 norm: " << FM3.norm() << endl;
 

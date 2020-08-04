@@ -281,12 +281,12 @@ void Faust::multiply_order_opt_first_best(std::vector<Faust::MatDense<FPP,DEVICE
 	i = idx-1;
 	while(i >= lasti)
 	{
+		// multiply on the left
 		gemm(*facts[i], tmp, tmp, (FPP)1.0, (FPP)0.0, transconj_flags[transconj_flags.size()>i?i:0], 'N');
 		i--;
 	}
 	if(lasti == 0)
 	{
-		// all left factors multiplied
 		// now multiply on the right
 		i = idx+2;
 		while(i < facts.size()-1)
@@ -348,11 +348,12 @@ Faust::MatDense<FPP,DEVICE> Faust::multiply_omp(const std::vector<Faust::MatGene
 	Faust::MatDense<FPP, DEVICE> *M = nullptr;
 #ifdef _MUL_OMP_ //TODO: this compiler constant should be defined auto. when BUILD_MULTITHREADING is ON
 				// until this this method is disabled at compilation unless we manually define the constant in CFLAGS (for example).
-	int nth, thid, num_per_th, data_size;
+	int nth, start_nth, thid, num_per_th, data_size;
 	Faust::MatDense<FPP,DEVICE>* mats[8];
 	std::vector<Faust::MatGeneric<FPP, DEVICE> *> _data(data.size()+1);
 	Faust::MatSparse<FPP, DEVICE> * sM;
 	Faust::MatDense<FPP,DEVICE>* tmp; // (_data[end_id-1]);
+	std::mutex m;
 	int i = 0;
 	for(auto ptr: data)
 	{
@@ -360,10 +361,12 @@ Faust::MatDense<FPP,DEVICE> Faust::multiply_omp(const std::vector<Faust::MatGene
 		_data[i++] = ptr;
 	}
 	_data[i] = const_cast<Faust::MatDense<FPP,DEVICE>*>(&A);
-#pragma omp parallel private(nth, thid, tmp, num_per_th, data_size)
+#pragma omp parallel private(nth, thid, tmp, num_per_th, data_size, start_nth)
 	{
 		data_size = data.size()+1; // _data + 1
-		nth	= omp_get_num_threads();
+		start_nth = omp_get_num_threads()<=data_size>>1?omp_get_num_threads():data_size>>1;
+		// assert start_nth is even ?
+		nth	= start_nth;
 		num_per_th = data_size;
 		num_per_th = num_per_th%2?num_per_th-1:num_per_th;
 		num_per_th /= nth;
@@ -375,20 +378,27 @@ Faust::MatDense<FPP,DEVICE> Faust::multiply_omp(const std::vector<Faust::MatGene
 		{
 			int first_id, end_id, id;
 			first_id = num_per_th*thid;
-			end_id = num_per_th*(thid+1);
+			if(nth == start_nth && thid == nth - 1)
+				end_id = data_size;
+			else
+				end_id = num_per_th*(thid+1);
 			if(first_id < data_size)
 			{
+//				{
+//					std::lock_guard<std::mutex> guard(m);
+//					std::cout << "thread id: " << thid << " first_id: " << first_id << " end_id: " << end_id << std::endl;
+//				}
 				id = 'N' == opThis? end_id-1: first_id;
 				if(sM = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(_data[id]))
 					tmp = new Faust::MatDense<FPP,DEVICE>(*sM);
 				else
 					tmp = new Faust::MatDense<FPP,DEVICE>(*(Faust::MatDense<FPP,DEVICE>*)(_data[id]));
 				mats[thid] = tmp;
-//				std::cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "tmp=" << tmp << endl;
+				//				std::cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "tmp=" << tmp << endl;
 				if(opThis == 'N')
 					for(int i=end_id-2;i>=first_id; i--)
 					{
-//						std::cout << "mul:" << _data[i] << endl;
+						//						std::cout << "mul:" << _data[i] << endl;
 						if(sM = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(_data[i]))
 							sM->multiply(*mats[thid], opThis);
 						else
@@ -401,9 +411,9 @@ Faust::MatDense<FPP,DEVICE> Faust::multiply_omp(const std::vector<Faust::MatGene
 						else
 							dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(_data[i])->multiply(*mats[thid], opThis);
 				_data[thid] = mats[thid];
-//				mats[thid]->Display();
-//				std::cout << mats[thid]->norm() << endl;
-//				std::cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "_data[thid]=" << data[thid] << endl;
+				//				mats[thid]->Display();
+				//				std::cout << mats[thid]->norm() << endl;
+				//				std::cout << "thid=" << thid << "mats[thid]=" << mats[thid] << "_data[thid]=" << data[thid] << endl;
 				data_size = nth;
 			}
 			if(nth > 1)
