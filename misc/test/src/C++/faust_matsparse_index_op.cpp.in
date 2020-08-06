@@ -1,7 +1,7 @@
 #include "faust_MatSparse.h"
 #include <iostream>
 
-/** \brief unitary test for MatDense conjugate
+/** \brief unitary test for MatSparse () overload
 */
 
 typedef @TEST_FPP@ FPP;

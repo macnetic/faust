@@ -51,13 +51,12 @@
 #include <iomanip>
 
 /** \brief Time Measurement between a given matrix and its Faust factorization
-* \param MatrixFilename : a dense ma trix is loaded from this file
+* \param MatrixFilename : a dense matrix is loaded from this file
 * \param transposedMatrix : -value 'N' (default value),  the  matrix stored in MatrixFilename is factorized
-				      -value 'T' , the transposed matrix is factorized 							 *\param FaustFilename : a .mat (MATLAB file) where a Faust representing the dense matrix (or its transposed cf transposeMatrix) 
-		      (you can passed as many FaustFilename as you want  	
-
-
-example : faust_multiplication_@TEST_FPP@ matrix.mat N faust1.mat faust2.mat 
+			    -value 'T' , the transposed matrix is factorized
+* \param FaustFilename : a .mat (MATLAB file) where a Faust representing the dense matrix (or its transposed cf transposeMatrix)
+		      (you can passed as many FaustFilename as you want
+example : faust_multiplication_@TEST_FPP@ matrix.mat N faust1.mat faust2.mat
 
 **/
 
@@ -78,37 +77,37 @@ int main(int argc, char* argv[])
 
 	if (argc <= 2)
 	{
-		cerr << "At least 2 input must be given " << endl;
+		cerr << "At least 2 input arguments must be given " << endl;
 		cerr << "a .mat file storing a matrix and a parameter (value N or T) " << endl;
-		exit(EXIT_FAILURE);	
+		exit(EXIT_FAILURE);
 	}
-	
+
 	// initialisation of the dense matrix
 	std::cout<<"loading dense matrix"<<std::endl;
 	string matDenseFilename = argv[1];
 	Faust::MatDense<FPP,Cpu> M;
 	init_faust_mat_from_matio(M,matDenseFilename.c_str(),"matrix");
-	
+
 
 	char transposedMatrix = argv[2][0];
 	if ((transposedMatrix != 'N') && (transposedMatrix != 'T'))
 	{
-		cerr << "transposedMatrix value is "<<transposedMatrix<< endl;		
+		cerr << "transposedMatrix value is "<<transposedMatrix<< endl;
 		cerr << "transposedMatrix parameter must be equal to N or T " << endl;
 		exit(EXIT_FAILURE);
 	}
-	
+
 	// transposed the matrix if needed
 	if (transposedMatrix == 'T')
 		M.transpose();
-	
 
-	int nbRow=M.getNbRow();	
+
+	int nbRow=M.getNbRow();
 	int nbCol=M.getNbCol();
 
 
 
-	
+
 
 
 	// initialisation of the different Faust
@@ -123,56 +122,56 @@ int main(int argc, char* argv[])
 		std::cout<<"loading faust from "<<faustFilename[i].c_str()<<std::endl;
 		init_faust_core_from_matiofile(listFaust[i],faustFilename[i].c_str(),"facts");
 		if ((listFaust[i].getNbRow() != nbRow) || (listFaust[i].getNbCol() != nbCol))
-		{		
+		{
 			cerr << "imported Faust doesn't have the same size as the Dense matrix it represents" << endl;
 			exit(EXIT_FAILURE);
-		}			
+		}
 	}
-	
+
 
 	/****          MULTIPLICATION     ******/
 	//int nbMultiplication = 10000;
 	int nbMultiplication = 100;
 
 	float percentage = 0;
-	
+
 	Faust::Timer t_dense;
 	std::cout<<std::endl<<" multiplication "<<std::endl;
 	std::vector<Faust::Timer> t_faust;
 	t_faust.resize(nbFaust);
 
 	for (int i=0;i<nbMultiplication;i++)
-	{	
+	{
 		if (float(i)/float(nbMultiplication) > percentage)
-		{	
+		{
 			percentage+=0.1;
 			std::cout<<"%"<<percentage*100<<std::endl;
 		}
-		//std::cout<<i+1<<"/"<<nbMultiplication<<std::endl;	
+		//std::cout<<i+1<<"/"<<nbMultiplication<<std::endl;
 	 	Faust::Vect<FPP,Cpu> x(nbCol);
-		Faust::Vect<FPP,Cpu> y;	 	
+		Faust::Vect<FPP,Cpu> y;
 		for (int k=0;k<nbCol;k++)
 			x[k]=k;
-		
-		
+
+
 		t_dense.start();
 	 	y=M*x;
 		t_dense.stop();
 
-		
+
 		for (int l=0;l<nbFaust;l++)
-		{							
-			t_faust[l].start();			
+		{
+			t_faust[l].start();
 				y=listFaust[l]*x;
 			t_faust[l].stop();
 		}
 
 	}
 
-	std::cout<<std::endl<<"DENSE tps : "<<t_dense.get_time()<<std::endl;	
+	std::cout<<std::endl<<"DENSE tps : "<<t_dense.get_time()<<std::endl;
 
-	
-	
+
+
 	std::cout<<" FAUST : "<<std::endl;
 
 	for (int i=0;i<listFaust.size();i++)
@@ -184,6 +183,6 @@ int main(int argc, char* argv[])
 		#endif
 		std::cout<<std::endl<<std::endl;
 	}
-	
-	
+
+
 }

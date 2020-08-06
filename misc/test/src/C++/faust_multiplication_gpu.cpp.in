@@ -78,22 +78,22 @@ int main(int argc, char* argv[])
 	if (argc <= 1)
 	{
 		cerr << "At least one input file (extension \".mat\") storing a dense matrix must be given" << endl;
-		exit(EXIT_FAILURE);	
+		exit(EXIT_FAILURE);
 	}
-	
+
 	// initialisation of the dense matrix
 	std::cout<<"loading dense matrix"<<std::endl;
 	string matDenseFilename = argv[1];
 	Faust::MatDense<FPP,Gpu> M;
 	init_faust_mat_from_matio(M,matDenseFilename.c_str(),"X_fixed");
-	int nbRow=M.getNbRow();	
+	int nbRow=M.getNbRow();
 	int nbCol=M.getNbCol();
 
 
 	// initialisation of the different Faust
 	// modif AL
 	std::vector<Faust::Transform<FPP,Gpu> > listFaust;
-	//Faust::MatDense<FPP,Gpu> const listFaust;	
+	//Faust::MatDense<FPP,Gpu> const listFaust;
 
 	int nbFaust = argc - 2;
 	std::vector<string> faustFilename(nbFaust);
@@ -105,10 +105,10 @@ int main(int argc, char* argv[])
 		std::cout<<"loading faust from "<<faustFilename[i].c_str()<<std::endl;
 		init_faust_core_from_matiofile(listFaust[i],faustFilename[i].c_str(),"facts");
 		if ((listFaust[i].getNbRow() != nbRow) || (listFaust[i].getNbCol() != nbCol))
-		{		
+		{
 			cerr << "imported Faust doesn't have the same size as the Dense matrix it represents" << endl;
 			exit(EXIT_FAILURE);
-		}			
+		}
 	}
 
 	// initialisation CUDA environment
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 
 	int nbMultiplication = 10000;
 
-	
+
 	//multiplication
 	Faust::Timer_gpu t_dense;
 	std::cout<<std::endl<<" multiplication "<<std::endl;
@@ -131,24 +131,24 @@ int main(int argc, char* argv[])
 	t_faust.resize(nbFaust);
 
 	for (int i=0;i<nbMultiplication;i++)
-	{	
-		//std::cout<<i+1<<"/"<<nbMultiplication<<std::endl;	
+	{
+		//std::cout<<i+1<<"/"<<nbMultiplication<<std::endl;
 	 	Faust::Vect<FPP,Gpu> x(nbCol);
-		Faust::Vect<FPP,Gpu> y;	 
-	
+		Faust::Vect<FPP,Gpu> y;
+
 		//for (int k=0;k<nbCol;k++)
 			//x[k]=k;
 		x.setOnes();
-		
+
 		t_dense.start();
 	 	//y=M*x;
 		Faust::gemv(M,x,y,'N',blasHandle);
 		t_dense.stop();
 
-		
+
 		for (int l=0;l<nbFaust;l++)
-		{							
-			t_faust[l].start();			
+		{
+			t_faust[l].start();
 				//y=listFaust[l]*x;
 				Faust::gemv(listFaust[l],x,y,'N',blasHandle);
 			t_faust[l].stop();
@@ -156,10 +156,10 @@ int main(int argc, char* argv[])
 
 	}
 
-	std::cout<<std::endl<<"DENSE tps : "<<t_dense.get_time()<<std::endl;	
+	std::cout<<std::endl<<"DENSE tps : "<<t_dense.get_time()<<std::endl;
 
-	
-	
+
+
 	std::cout<<" FAUST : "<<std::endl;
 
 	for (int i=0;i<listFaust.size();i++)
@@ -171,6 +171,6 @@ int main(int argc, char* argv[])
 		#endif
 		std::cout<<std::endl<<std::endl;
 	}
-	
-	
+
+
 }
