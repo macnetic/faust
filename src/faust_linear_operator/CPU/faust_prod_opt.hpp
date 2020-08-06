@@ -353,7 +353,7 @@ Faust::MatDense<FPP,DEVICE> Faust::multiply_omp(const std::vector<Faust::MatGene
 	std::vector<Faust::MatGeneric<FPP, DEVICE> *> _data(data.size()+1);
 	Faust::MatSparse<FPP, DEVICE> * sM;
 	Faust::MatDense<FPP,DEVICE>* tmp; // (_data[end_id-1]);
-	std::mutex m;
+//	std::mutex m;
 	int i = 0;
 	for(auto ptr: data)
 	{
