@@ -1256,6 +1256,7 @@ namespace Faust {
 	template<typename FPP>
 		double TransformHelper<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
 		{
+//			std::cout << "TransformHelper<FPP,Cpu>::spectralNorm" << std::endl;
 #ifdef USE_GPU_MOD
 			if(gpu_faust != nullptr)
 			{
@@ -1285,6 +1286,7 @@ namespace Faust {
 					AtA->enable_gpu_meth_for_mul(); //TODO: it should not be needed if A is already GPU enabled
 					FPP maxAbsValue = std::sqrt(AtA->gpu_faust->power_iteration(nbr_iter_max, threshold, flag));
 					delete AtA;
+					return absValue(maxAbsValue);
 				}
 				else
 				{

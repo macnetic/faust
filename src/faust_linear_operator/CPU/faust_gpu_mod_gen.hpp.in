@@ -99,6 +99,8 @@ namespace Faust
 		{
 			if(use_ref_man)
 				ref_man.release(*(cpu_mat_ptrs.begin()));
+			auto marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+			marr_funcs->erase_at(gpu_mat_arr, 0, !use_ref_man);
 			cpu_mat_ptrs.erase(cpu_mat_ptrs.begin());
 		}
 	}
@@ -247,6 +249,7 @@ namespace Faust
 			{
 				push_back(m);
 			}
+//			std::cout << "FaustGPU() factors size, matarray size: " << factors.size() << " " << marr_funcs->size(gpu_mat_arr) << std::endl;
 		}
 
 	template <>
@@ -399,6 +402,10 @@ namespace Faust
 				if(xk2_bufsz < mat->getNbRow()) // xk2 buf receives the result of F*xk
 					xk2_bufsz = mat->getNbRow();
 			}
+			// make sure buffer will be larger enough by setting the lower size buffer to the larger size
+			//TODO: this seems to correct a bug but it should be further investigated
+			if(xk_bufsz > xk2_bufsz) xk2_bufsz = xk_bufsz;
+			else if(xk2_bufsz > xk_bufsz) xk_bufsz = xk2_bufsz;
 			auto xk = dsm_funcs->togpu_bufsz(this->ncols, 1, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(xk_cpu.getData()), xk_bufsz, 1);
 			auto xk_norm = dsm_funcs->togpu_bufsz(this->ncols, 1, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(xk_cpu.getData()), xk_bufsz, 1); // the CPU data is irrelevant for xk_norm but it doesn't matter
 			auto xk2 = dsm_funcs->togpu_bufsz(this->nrows, 1, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(xk2_cpu.getData()), xk2_bufsz, 1);
