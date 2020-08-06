@@ -109,7 +109,9 @@ def svdtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
                 - (np.array vector) S the singular values in
                 descending order.
                 - (Faust objects) U,V unitary transforms.
-        Example:
+
+
+        Examples:
             >>> from pyfaust.fact import svdtj
             >>> from numpy.random import rand
             >>> M = rand(128,128)

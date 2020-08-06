@@ -108,8 +108,7 @@ class hankel(proj_gen):
 
 class sp(proj_gen):
     """
-    Functor for the SP projector. A, the image matrix, is such that \f$ \| A
-    \|_0 = k,  \| A\|_F = 1 (if normalized == True)\f$.
+    Functor for the SP projector. A, the image matrix, is such that \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
 
 
     Example:
@@ -145,7 +144,7 @@ class splin(proj_gen):
     """
     Functor for the SPLIN projector. A, the image matrix, is defined by \f$
     \forall i \in \{0,...,shape[0]-1\} \| \f$ the i-th row \f$ A_{i,*}\f$ is
-    such that \f$ \| A_{i,*}\|_0 = k,  \| A\|_F = 1 (if normalized == True)\f$.
+    such that \f$ \| A_{i,*}\|_0 = k,  \| A\|_F = 1\f$ (if normalized == True).
 
 
     Example:

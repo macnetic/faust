@@ -2291,7 +2291,7 @@ class FaustMulMode:
     ## or the most left pair of matrices (in order to decrease the computation cost).
     ## The computational cost depends on the matrix dimensions.
     ORDER_ALL_ENDS=1
-    ## \brief This method computes the product starting by the pair of matrix whose the computation cost is the smallest.
+    ## \brief This method computes the product starting by the pair of matrices whose the computation cost is the smallest.
     ##
     ## After this first multiplication the rest of the factors are multiplied
     ## on the left side (from the right to the left) and then the right factors are
