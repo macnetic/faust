@@ -234,8 +234,7 @@ void GivensFGFTComplex<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 	//Faust::MatDense<FPP,Cpu> L_copy = L;
 	cout << "L(p,q) before update_L():" << L(this->p,this->q) << endl;
 #endif
-#define OPT_UPDATE_L_CPLX
-#ifndef OPT_UPDATE_L_CPLX
+#ifdef NO_OPT_UPDATE_L_CPLX
 	this->facts[this->ite].multiply(L, 'H');
 	L.multiplyRight(this->facts[this->ite]);
 //	facts[ite].multiply(L, 'N');

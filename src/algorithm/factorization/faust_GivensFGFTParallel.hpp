@@ -82,8 +82,10 @@ template<typename FPP, FDevice DEVICE, typename FPP2>
 void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 {
 	// L = S'*L*S
-//#undef OPT_UPDATE_L
-#ifdef OPT_UPDATE_L
+#ifdef NO_OPT_UPDATE_L
+	this->facts[this->ite].multiply(L, 'T');
+	L.multiplyRight(this->facts[this->ite]);
+#else
 	int choice_id;
 	FPP2 c,s;
 	int p, q, i;
@@ -141,9 +143,6 @@ void GivensFGFTParallel<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 			this->update_L_second(L_vec_p, L_vec_q, c, s, p, q, L);
 		}
 	}
-#else
-	this->facts[this->ite].multiply(L, 'T');
-	L.multiplyRight(this->facts[this->ite]);
 #endif
 }
 

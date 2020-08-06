@@ -197,8 +197,7 @@ void GivensFGFT<FPP,DEVICE,FPP2>::update_L(Faust::MatDense<FPP,Cpu> & L)
 #ifdef DEBUG_GIVENS
 	cout << "L(p,q) before update_L():" << *this->L(p,q) << endl;
 #endif
-#define OPT_UPDATE_L
-#ifndef OPT_UPDATE_L
+#ifdef NO_OPT_UPDATE_L
 	this->facts[this->ite].multiply(L, 'T');
 	L.multiplyRight(this->facts[this->ite]);
 #else

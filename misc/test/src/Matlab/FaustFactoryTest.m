@@ -234,7 +234,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
-			[F,D] = matfaust.fact.fgft_givens(Lap, 'nGivens', J, 'enable_large_Faust', true, 'nGivens_per_fac', 1);%, 0, 'verbosity', 1);
+			[F,D] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'enable_large_Faust', true, 'nGivens_per_fac', 1);%, 0, 'verbosity', 1);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -254,7 +254,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			import matfaust.*
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
-			[F,D] = matfaust.fact.fgft_givens(sparse(Lap), 'nGivens', J, 'enable_large_Faust', true, 'nGivens_per_fac', 1);%, 0, 'verbosity', 1);
+			[F,D] = matfaust.fact.eigtj(sparse(Lap), 'nGivens', J, 'enable_large_Faust', true, 'nGivens_per_fac', 1);%, 0, 'verbosity', 1);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -275,7 +275,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			t = size(Lap,1)/2;
-			[F,D] = matfaust.fact.fgft_givens(Lap, 'nGivens', J, 'nGivens_per_fac', t, 'enable_large_Faust', true); %, 'verbosity', 2);
+			[F,D] = matfaust.fact.eigtj(Lap, 'nGivens', J, 'nGivens_per_fac', t, 'enable_large_Faust', true); %, 'verbosity', 2);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
@@ -296,7 +296,7 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			load([this.faust_paths{1} '../../../misc/data/mat/test_GivensDiag_Lap_U_J.mat'])
 			% Lap and J available
 			t = size(Lap,1)/2;
-			[F,D] = matfaust.fact.fgft_givens(sparse(Lap), 'nGivens', J, 'nGivens_per_fac', t, 'enable_large_Faust', true); %, 'verbosity', 2);
+			[F,D] = matfaust.fact.eigtj(sparse(Lap), 'nGivens', J, 'nGivens_per_fac', t, 'enable_large_Faust', true); %, 'verbosity', 2);
 			this.verifyEqual(size(F), size(Lap))
 			%disp('norm F: ')
 			%norm(F, 'fro')
