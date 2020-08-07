@@ -100,7 +100,7 @@ if(FAUST_TORCH)
 	set(FAUST_PYTHON_LIBS "${FAUST_PYTHON_LIBS}, 'torch', 'c10'")
 	set(FAUST_PYTHON_LIB_DIR "${FAUST_PYTHON_LIB_DIR}, '${Torch_DIR}'")
 	#variable Torch_DIR is initialized by Torch CMake scripts (or rather from main CMakeLists.txt because torch script needs two executions to set the Torch_DIR...)
-	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-DFAUST_TORCH'")
+	set(FAUST_SETUP_PY_CFLAGS "${FAUST_SETUP_PY_CFLAGS}, '-DFAUST_TORCH', '-D_GLIBCXX_USE_CXX11_ABI=1'")
 	# read the code to load torch libraries in python
 	file(READ ${FAUST_PYTHON_SRC_DIR}/torch_loading.py TORCH_LIBS_LOADING)
 	set(PYFAUST_PKG_SUFFIX "_torch")
