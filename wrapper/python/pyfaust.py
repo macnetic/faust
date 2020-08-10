@@ -2159,7 +2159,7 @@ class FaustTorch:
                 else:
                     raise err
                 if(self.device != None):
-                    self.factors[-1].to(device)
+                    self.factors[-1] = self.factors[-1].to(device)
         else:
             raise err
 
@@ -2171,7 +2171,7 @@ class FaustTorch:
         if(isinstance(op, np.ndarray)):
             res = torch.from_numpy(op)
             if(self.device != None):
-                res.to(self.device)
+                res = res.to(self.device)
             factors = self.factors
             if(optimize_chain):
                 return self.mul_opt(res)
@@ -2180,7 +2180,7 @@ class FaustTorch:
             if(factors[-1].is_sparse):
                 factors.append(torch.from_numpy(np.eye(self.factors[-1].size()[1])))
                 if(self.device != None):
-                    factors[-1].to(self.device)
+                    factors[-1] = factors[-1].to(self.device)
             res = factors[-1].clone()
             factors = factors[:-1]
             if(optimize_chain):
