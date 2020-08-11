@@ -155,6 +155,9 @@ int prox_int(unsigned int cons_type, unsigned long cons_param, FPP* mat_in, unsi
             case CONSTRAINT_NAME_SP:
                 Faust::prox_sp(fmat, (faust_unsigned_int) cons_param, normalized, pos);
                 break;
+            case CONSTRAINT_NAME_SKPERM:
+                Faust::prox_skperm(fmat, (faust_unsigned_int) cons_param, normalized, pos);
+                break;
             default:
                 throw invalid_argument("PyxConstraintInt::project() inconsistent constraint name");
         }

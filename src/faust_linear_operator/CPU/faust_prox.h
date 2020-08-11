@@ -45,6 +45,13 @@
 #include "faust_constant.h"
 #include "faust_exception.h"
 #include "faust_Vect.h"
+#include <Eigen/Core>
+#include <queue>
+#include <iostream>
+#include <cassert>
+#include <utility>
+#include <limits>
+#include <cstdlib>
 
 /** \brief faust_prox.h contains the projection operator: <br>
 *   PALM relies on projections onto the constraint sets for each factor at each iteration, <br>
@@ -82,12 +89,14 @@ namespace Faust {
 	template<typename FPP>
 		void prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized = false, const bool pos = false);
 	template<typename FPP>
-	void prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, Faust::MatDense<FPP,Cpu> mn_vec, const bool normalized=true, const bool pos=false);
+		void prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, Faust::MatDense<FPP,Cpu> mn_vec, const bool normalized=true, const bool pos=false);
 
 	template<typename FPP> void pre_prox_pos(MatDense<FPP,Cpu> & M);
 	template<typename FPP> void prox_hankel(Faust::MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
 	template<typename FPP> void prox_toeplitz(Faust::MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
 	template<typename FPP> void prox_circ(Faust::MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
+	template<typename FPP>
+		void prox_skperm(Faust::MatDense<FPP, Cpu> & M,const unsigned int k,  const bool normalized=true, const bool pos=false);
 
 
 }

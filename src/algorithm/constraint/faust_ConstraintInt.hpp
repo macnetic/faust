@@ -65,8 +65,6 @@ Faust::ConstraintInt<FPP,DEVICE>::ConstraintInt(
          nbRows_,
          nbCols_)
 {
-   std::cout<<nbRows_<<std::endl;
-   std::cout<<nbCols_<<std::endl;
    set_default_parameter();
 }
 
@@ -104,16 +102,12 @@ void Faust::ConstraintInt<FPP,DEVICE>::check_constraint_name()const
    switch (this->m_constraintName)
    {
       case CONSTRAINT_NAME_SP:
-         break;
       case CONSTRAINT_NAME_SPCOL:
-         break;
       case CONSTRAINT_NAME_SPLIN:
-         break;
       case CONSTRAINT_NAME_SPLINCOL:
-         break;
       case CONSTRAINT_NAME_SP_POS:
-         break;
-      case CONSTRAINT_NAME_BLKDIAG:
+	  case CONSTRAINT_NAME_BLKDIAG: //TODO: shouldn't it be a matrix constraint?
+	  case CONSTRAINT_NAME_SKPERM:
          break;
       default:
 		handleError(m_className," cannot create Faust::ConstraintInt objet from an faust_constraint object with constraint with constraint_name");
@@ -144,6 +138,9 @@ void Faust::ConstraintInt<FPP,DEVICE>::set_default_parameter()
       case CONSTRAINT_NAME_BLKDIAG:
          m_parameter = 0;
          break;
+      case CONSTRAINT_NAME_SKPERM:
+         m_parameter = 0;
+         break;
       default:
 		handleError(m_className,"set_default_parameter : cannot create Faust::ConstraintInt objet from an faust_constraint object with constraint with this constraint_name");
          break;
@@ -169,6 +166,9 @@ void Faust::ConstraintInt<FPP,DEVICE>::project(Faust::MatDense<FPP,DEVICE> & mat
          break;
       case CONSTRAINT_NAME_SP_POS:
          Faust::prox_sp_pos(mat,m_parameter);
+         break;
+      case CONSTRAINT_NAME_SKPERM:
+         Faust::prox_skperm(mat,m_parameter);
          break;
       default:
 		handleError(m_className,"project : cannot project with this constraint name");

@@ -367,12 +367,13 @@ class ConstraintName:
     SPLINCOL = 4 # Int Constraint
     CONST = 5 # Mat Constraint
     SP_POS = 6 # Int Constraint
-    BLKDIAG = 7 # ?? Constraint #TODO
+    BLKDIAG = 7 # Mat Constraint
     SUPP = 8 # Mat Constraint
     NORMLIN = 9 # Real Constraint
     TOEPLITZ = 10 # Mat Constraint
     CIRC = 11 # Mat constraint
     HANKEL = 12 # Mat cons.
+    SKPERM = 13 # Int constraint
 
     def __init__(self, name):
         """
@@ -384,8 +385,7 @@ class ConstraintName:
         """
         if(isinstance(name,str)):
             name = ConstraintName.str2name_int(name)
-        if(not isinstance(name, np.int) or name < ConstraintName.SP or name >
-           ConstraintName.HANKEL):
+        if(not isinstance(name, np.int) or not ConstraintName._arg_is_int_const(name)):
             raise ValueError("name must be an integer among ConstraintName.SP,"
                              "ConstraintName.SPCOL, ConstraintName.NORMCOL,"
                              "ConstraintName.SPLINCOL, ConstraintName.CONST,"
@@ -394,13 +394,18 @@ class ConstraintName:
                             "ConstraintName.TOEPLITZ, ConstraintName.CIRC")
         self.name = name
 
+    @staticmethod
+    def _arg_is_int_const(name):
+        return name in [ConstraintName.SP, ConstraintName.SPCOL,
+                        ConstraintName.SPLIN, ConstraintName.SPLINCOL,
+                        ConstraintName.SP_POS, ConstraintName.SKPERM]
+
+
     def is_int_constraint(self):
         """
             A delegate for ConstraintGeneric.is_int_constraint.
         """
-        return self.name in [ ConstraintName.SP, ConstraintName.SPCOL,
-                             ConstraintName.SPLIN, ConstraintName.SPLINCOL,
-                             ConstraintName.SP_POS ]
+        return ConstraintName._arg_is_int_const(self.name)
 
     def is_real_constraint(self):
         """
@@ -439,6 +444,8 @@ class ConstraintName:
             _str =  'splincol'
         elif(_id == ConstraintName.SP_POS):
             _str =  'sppos'
+        elif(_id == ConstraintName.SKPERM):
+            _str = 'skperm'
         elif(_id == ConstraintName.NORMCOL):
             _str =  'normcol'
         elif(_id == ConstraintName.NORMLIN):
@@ -479,6 +486,8 @@ class ConstraintName:
             id = ConstraintName.SPLINCOL
         elif(_str == 'sppos'):
             id = ConstraintName.SP_POS
+        elif(_str == 'skperm'):
+            id = ConstraintName.SKPERM
         elif(_str == 'normcol'):
             id = ConstraintName.NORMCOL
         elif(_str == 'normlin'):

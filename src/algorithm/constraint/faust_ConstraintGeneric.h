@@ -59,7 +59,8 @@ enum faust_constraint_name
    CONSTRAINT_NAME_NORMLIN,/**< 2nd norm of the lines of matrix A ; REAL  */
    CONSTRAINT_NAME_TOEPLITZ,
    CONSTRAINT_NAME_CIRC,
-   CONSTRAINT_NAME_HANKEL
+   CONSTRAINT_NAME_HANKEL,
+   CONSTRAINT_NAME_SKPERM
 };
 
 template<typename FPP,FDevice DEVICE> class MatDense;

@@ -248,7 +248,8 @@ class splincol(proj_gen):
         """
 
         Args:
-            S: the support matrix.
+            k: the integer sparsity (number of nonzeros) targeted per-row and
+            per-column.
             normalized: True to normalize the projection image according to its Frobenius norm.
             pos: True to skip negative values (replaced by zero) of the matrix to project.
 
@@ -493,4 +494,22 @@ class blockdiag(proj_gen):
 #            m_ = m
 #            n_ = n
 #        return M_
+
+class skperm(proj_gen):
+    """
+    Functor for the SKPERM projector.
+
+    Example:
+    """
+    def __init__(self, shape, k, normalized=False, pos=False):
+        """
+
+        Args:
+            k: the integer sparsity (number of nonzeros) targeted per-row and
+            per-column.
+            normalized: True to normalize the projection image according to its Frobenius norm.
+            pos: True to skip negative values (replaced by zero) of the matrix to project.
+
+        """
+        self.constraint = ConstraintInt('skperm', shape[0], shape[1], k, normalized, pos)
 
