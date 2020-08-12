@@ -52,6 +52,7 @@
 #include <utility>
 #include <limits>
 #include <cstdlib>
+#include <type_traits>
 
 /** \brief faust_prox.h contains the projection operator: <br>
 *   PALM relies on projections onto the constraint sets for each factor at each iteration, <br>

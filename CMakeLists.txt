@@ -677,7 +677,14 @@ endif()
 ##### Add subdirectory ALGORITHM CPU et GPU version dans le main CmakeLists pour add library avec les cpp et pas que des lib objet 
 #####    --> bug avec ide xcode ################################################################
 #set(SRC_FILES "")
-file(GLOB CPP_FILES "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp" "${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp" "${FAUST_UTILS_SRC_DIR}/*.cpp")
+#file(GLOB CPP_FILES "${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp" "${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp" "${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp" "${FAUST_UTILS_SRC_DIR}/*.cpp")
+file(GLOB_RECURSE CPP_FILES ${FAUST_SRC_DIR}/*.cpp)
+file(GLOB_RECURSE GPU_CPP_FILES ${FAUST_SRC_LINEAR_OPERATOR_DIR}/GPU/*.cpp)
+if(NOT BUILD_USE_GPU)
+	foreach(GPU_CPP_FILE IN LISTS GPU_CPP_FILES)
+		list(REMOVE_ITEM CPP_FILES ${GPU_CPP_FILE})
+	endforeach()
+endif()
 message(STATUS "algorithm cpp files ${CPP_FILES}")
 ### include directory 
 #include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${EIGEN_INC_DIR} ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR} ${FAUST_UTILS_SRC_DIR})
