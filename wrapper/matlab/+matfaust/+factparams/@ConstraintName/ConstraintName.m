@@ -22,6 +22,7 @@ classdef ConstraintName
 		TOEPLITZ = 10
 		CIRC = 11
 		HANKEL = 12
+		SKPERM = 13
 	end
 	properties(SetAccess = public)
 		name
@@ -33,8 +34,8 @@ classdef ConstraintName
 			if(ischar(name) || iscell(name))
 				name = ConstraintName.str2name_int(name);
 			end
-			if(name > ConstraintName.HANKEL || name < ConstraintName.SP) %|| name == ConstraintName.BLKDIAG)
-				msg = 'name must be an integer among ConstraintName.SP, ConstraintName.SPCOL, ConstraintName.NORMCOL, ConstraintName.SPLINCOL, ConstraintName.CONST, ConstraintName.SP_POS, ConstraintName.SUPP, ConstraintName.NORMLIN, ConstraintName.TOEPLITZ, ConstraintName.CIRC.';
+			if(name > ConstraintName.SKPERM || name < ConstraintName.SP) %|| name == ConstraintName.BLKDIAG)
+				msg = 'name must be an integer among ConstraintName.SP, ConstraintName.SPCOL, ConstraintName.NORMCOL, ConstraintName.SPLINCOL, ConstraintName.CONST, ConstraintName.SP_POS, ConstraintName.SUPP, ConstraintName.NORMLIN, ConstraintName.TOEPLITZ, ConstraintName.CIRC, ConstraintName.HANKEL, ConstraintName.SKPERM.';
 				error(msg)
 			end
 			cons_name.name = name;
@@ -46,7 +47,7 @@ classdef ConstraintName
 			% obj has access to static attributes of its class
 			% (doing the same for is_real_constraint(), is_mat_constraint(), conv2str())
 			is_int = obj.name == obj.SP || obj.name == obj.SPLIN || obj.name == obj.SPCOL ...
-				|| obj.name == obj.SP_POS || obj.name == obj.SPLINCOL;
+				|| obj.name == obj.SP_POS || obj.name == obj.SPLINCOL || obj.name == obj.SKPERM;
 			% BLKDIAG is a int constraint according to what faust_ConstraintGeneric.cpp indicates
 		end
 
@@ -68,6 +69,8 @@ classdef ConstraintName
 					str = 'spcol';
 				case obj.SPLINCOL;
 					str = 'splincol';
+				case obj.SKPERM;
+					str = 'skperm';
 				case obj.SP_POS;
 					str = 'sppos';
 				case obj.NORMCOL;
@@ -107,6 +110,8 @@ classdef ConstraintName
 					id = ConstraintName.SPCOL;
 				case 'splincol'
 					id = ConstraintName.SPLINCOL;
+				case 'skperm'
+					id = ConstraintName.SKPERM;
 				case 'sppos'
 					id = ConstraintName.SP_POS;
 				case 'normcol'
