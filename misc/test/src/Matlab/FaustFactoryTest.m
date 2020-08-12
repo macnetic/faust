@@ -484,6 +484,21 @@ classdef FaustFactoryTest < matlab.unittest.TestCase
 			this.assertTrue(all(all(Mp > 0 == S)))
 			this.assertTrue(all(all(Mp(Mp > 0) == M(Mp > 0))))
 		end
+
+		function test_skperm(this)
+			import matfaust.proj.skperm
+			M = [-0.04440802, -0.17569296, -0.02557815, -0.15559154;
+			-0.0083095,  -3.38725936, -0.78484126, -0.4883618;
+			-1.48942563, -1.71787215, -0.84000212, -3.71752454;
+			-0.88957883, -0.19107863, -5.92900636, -6.51064175]
+			p = skperm(size(M), 2)
+			pM_ref = [-0.04440802,0.,-0.02557815,0.;
+			-0.0083095,-3.38725936,0.,0.;
+			0.,-1.71787215,0.,-3.71752454;
+			0.,0.,-5.92900636,-6.51064175]
+			pM = p(M)
+			this.verifyEqual(norm(pM-pM_ref)/norm(pM_ref), 0)
+		end
 	end
 
 	methods

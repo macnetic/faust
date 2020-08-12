@@ -385,13 +385,16 @@ class ConstraintName:
         """
         if(isinstance(name,str)):
             name = ConstraintName.str2name_int(name)
-        if(not isinstance(name, np.int) or not ConstraintName._arg_is_int_const(name)):
-            raise ValueError("name must be an integer among ConstraintName.SP,"
-                             "ConstraintName.SPCOL, ConstraintName.NORMCOL,"
-                             "ConstraintName.SPLINCOL, ConstraintName.CONST,"
-                             "ConstraintName.SP_POS," # ConstraintName.BLKDIAG,
-                             "ConstraintName.SUPP, ConstraintName.NORMLIN, "
-                            "ConstraintName.TOEPLITZ, ConstraintName.CIRC")
+            if(not isinstance(name, np.int) or not
+               ConstraintName._arg_is_int_const(name) \
+               and not ConstraintName._arg_is_real_const(name) \
+               and not ConstraintName._arg_is_mat_const(name)):
+                raise ValueError("name must be an integer among ConstraintName.SP,"
+                                 "ConstraintName.SPCOL, ConstraintName.NORMCOL,"
+                                 "ConstraintName.SPLINCOL, ConstraintName.CONST,"
+                                 "ConstraintName.SP_POS," # ConstraintName.BLKDIAG,
+                                 "ConstraintName.SUPP, ConstraintName.NORMLIN, "
+                                 "ConstraintName.TOEPLITZ, ConstraintName.CIRC")
         self.name = name
 
     @staticmethod
@@ -400,6 +403,15 @@ class ConstraintName:
                         ConstraintName.SPLIN, ConstraintName.SPLINCOL,
                         ConstraintName.SP_POS, ConstraintName.SKPERM]
 
+    @staticmethod
+    def _arg_is_real_const(name):
+        return name in [ConstraintName.NORMCOL, ConstraintName.NORMLIN]
+
+    @staticmethod
+    def _arg_is_mat_const(name):
+        return name in [ConstraintName.SUPP, ConstraintName.CONST,
+                        ConstraintName.CIRC, ConstraintName.TOEPLITZ,
+                        ConstraintName.HANKEL, ConstraintName.BLKDIAG]
 
     def is_int_constraint(self):
         """
@@ -411,15 +423,13 @@ class ConstraintName:
         """
             A delegate for ConstraintGeneric.is_real_constraint.
         """
-        return self.name in [ ConstraintName.NORMCOL, ConstraintName.NORMLIN ]
+        return ConstraintName._arg_is_real_const(self.name)
 
     def is_mat_constraint(self):
         """
             A delegate for ConstraintGeneric.is_mat_constraint.
         """
-        return self.name in [ConstraintName.SUPP, ConstraintName.CONST,
-                             ConstraintName.CIRC, ConstraintName.TOEPLITZ,
-                             ConstraintName.HANKEL, ConstraintName.BLKDIAG]
+        return ConstraintName._arg_is_mat_const(self.name)
 
     def name_str(self):
         return ConstraintName.name_int2str(self.name)

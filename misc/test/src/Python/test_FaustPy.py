@@ -1503,7 +1503,22 @@ class TestFaustFactory(unittest.TestCase):
            v = np.concatenate((v, M_blocks[i].flatten()))
         self.assertAlmostEqual(norm(v), norm(pM))
 
-
+    def test_skperm(self):
+        print("test_skperm")
+        from pyfaust.proj import skperm
+        from numpy import array
+        import numpy as np
+        M = array([[-0.04440802, -0.17569296, -0.02557815, -0.15559154],
+                   [-0.0083095,  -3.38725936, -0.78484126, -0.4883618 ],
+                   [-1.48942563, -1.71787215, -0.84000212, -3.71752454],
+                   [-0.88957883, -0.19107863, -5.92900636, -6.51064175]])
+        k = 2
+        p = skperm(M.shape, k)
+        ref_pM = [[-0.04440802,0.,-0.02557815,0.,],
+                  [-0.0083095,-3.38725936,0.,0.,],
+                  [ 0.,-1.71787215,0.,-3.71752454],
+                  [ 0.,0.,-5.92900636,-6.51064175]]
+        self.assertTrue(np.allclose(p(M), ref_pM))
 
 if __name__ == "__main__":
     if(len(sys.argv)> 1):
