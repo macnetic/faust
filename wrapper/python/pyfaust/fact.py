@@ -242,34 +242,34 @@ def eigtj(M, nGivens=None, tol=0, order='ascend', relerr=True,
     <https://hal.inria.fr/hal-01416110>
 
     Example:
-        import numpy as np
-        from pyfaust.fact import eigtj
-        from scipy.io import loadmat
-        from os.path import sep
-        from pyfaust.demo import get_data_dirpath
-        from numpy.linalg import norm
-        # get a graph Laplacian to diagonalize
-        demo_path = sep.join((get_data_dirpath(),'Laplacian_256_community.mat'))
-        data_dict = loadmat(demo_path)
-        Lap = data_dict['Lap'].astype(np.float)
-        Dhat, Uhat = eigtj(Lap, nGivens=Lap.shape[0]*100, enable_large_Faust=True)
-        # Uhat is the Fourier matrix/eigenvectors approximation as a Faust
-        # (200 factors)
-        # Dhat the eigenvalues diagonal matrix approx.
-        print("err: ", norm(Lap-Uhat*np.diag(Dhat)*Uhat.H)/norm(Lap)) # about 6.5e-3
-        print(Uhat)
-        print(Dhat)
-        Dhat2, Uhat2 = eigtj(Lap, tol=0.01)
-        assert(norm(Lap-Uhat2*np.diag(Dhat2)*Uhat2.H)/norm(Lap) < .011)
-        # and then asking for an absolute error
-        Dhat3, Uhat3 = eigtj(Lap, tol=0.1, relerr=False)
-        assert(norm(Lap-Uhat3*np.diag(Dhat3)*Uhat3.H) < .11)
-        # now recompute Uhat2, Dhat2 but asking a descending order of eigenvalues
-        Dhat4, Uhat4 = eigtj(Lap, tol=0.01)
-        assert((Dhat4[::-1] == Dhat2[::]).all())
-        # and now with no sort
-        Dhat5, Uhat5 = eigtj(Lap, tol=0.01, order='undef')
-        assert((np.sort(Dhat5) == Dhat2).all())
+        >>> import numpy as np
+        >>> from pyfaust.fact import eigtj
+        >>> from scipy.io import loadmat
+        >>> from os.path import sep
+        >>> from pyfaust.demo import get_data_dirpath
+        >>> from numpy.linalg import norm
+        >>> # get a graph Laplacian to diagonalize
+        >>> demo_path = sep.join((get_data_dirpath(),'Laplacian_256_community.mat'))
+        >>> data_dict = loadmat(demo_path)
+        >>> Lap = data_dict['Lap'].astype(np.float)
+        >>> Dhat, Uhat = eigtj(Lap, nGivens=Lap.shape[0]*100, enable_large_Faust=True)
+        >>> # Uhat is the Fourier matrix/eigenvectors approximation as a Faust
+        >>> # (200 factors)
+        >>> # Dhat the eigenvalues diagonal matrix approx.
+        >>> print("err: ", norm(Lap-Uhat*np.diag(Dhat)*Uhat.H)/norm(Lap)) # about 6.5e-3
+        >>> print(Uhat)
+        >>> print(Dhat)
+        >>> Dhat2, Uhat2 = eigtj(Lap, tol=0.01)
+        >>> assert(norm(Lap-Uhat2*np.diag(Dhat2)*Uhat2.H)/norm(Lap) < .011)
+        >>> # and then asking for an absolute error
+        >>> Dhat3, Uhat3 = eigtj(Lap, tol=0.1, relerr=False)
+        >>> assert(norm(Lap-Uhat3*np.diag(Dhat3)*Uhat3.H) < .11)
+        >>> # now recompute Uhat2, Dhat2 but asking a descending order of eigenvalues
+        >>> Dhat4, Uhat4 = eigtj(Lap, tol=0.01)
+        >>> assert((Dhat4[::-1] == Dhat2[::]).all())
+        >>> # and now with no sort
+        >>> Dhat5, Uhat5 = eigtj(Lap, tol=0.01, order='undef')
+        >>> assert((np.sort(Dhat5) == Dhat2).all())
 
     See also:
         svdtj
