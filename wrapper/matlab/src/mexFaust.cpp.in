@@ -870,6 +870,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		}
 
+		if(!strcmp("set_FM_mul_mode", cmd))
+		{
+			const int mode = (int) mxGetScalar(prhs[2]);
+			core_ptr->set_FM_mul_mode(mode);
+			return;
+		}
+
+		if(!strcmp("set_Fv_mul_mode", cmd))
+		{
+			const int mode = (int) mxGetScalar(prhs[2]);
+			core_ptr->set_Fv_mul_mode(mode);
+			return;
+		}
+
 		// Got here, so command not recognized
 		mexErrMsgTxt("Command not recognized.");
 	}catch (const std::exception& e)

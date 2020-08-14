@@ -43,12 +43,12 @@
 %%
 
 classdef FaustCore < handle
-    properties (SetAccess = public, Hidden = false)
-        objectHandle; % Handle to the underlying C++ class instance
-        isRealFlag;
-    end
-    methods
-        %% Constructor - Create a new C++ class instance
+	properties (SetAccess = public, Hidden = false)
+		objectHandle; % Handle to the underlying C++ class instance
+		isRealFlag;
+	end
+	methods
+		%% Constructor - Create a new C++ class instance
 		function this = FaustCore(varargin)
 			if(nargin == 2) && ~iscell(varargin{1}) %&& isa(varargin{1}, 'handle'))
 				%if(~ isvalid(varargin{1}))
@@ -79,19 +79,38 @@ classdef FaustCore < handle
 			end
 		end
 
-        %% Destructor - Destroy the C++ class instance
-        function delete(this)
-            % destructor delete the faust
-            if(isa(this.objectHandle, 'integer'))
-                if (this.isRealFlag)
-                    mexFaustReal('delete', this.objectHandle);
-                else
-                    mexFaustCplx('delete', this.objectHandle);
-                end
-            end
-        end
+		%% Destructor - Destroy the C++ class instance
+		function delete(this)
+			% destructor delete the faust
+			if(isa(this.objectHandle, 'integer'))
+				if (this.isRealFlag)
+					mexFaustReal('delete', this.objectHandle);
+				else
+					mexFaustCplx('delete', this.objectHandle);
+				end
+			end
+		end
 
-    end
+		function set_FM_mul_mode(this, mode)
+			if(isa(this.objectHandle, 'integer'))
+				if (this.isRealFlag)
+					mexFaustReal('set_FM_mul_mode', this.objectHandle, mode);
+				else
+					mexFaustCplx('set_FM_mul_mode', this.objectHandle, mode);
+				end
+			end
+		end
+
+		function set_Fv_mul_mode(this, mode)
+			if(isa(this.objectHandle, 'integer'))
+				if (this.isRealFlag)
+					mexFaustReal('set_Fv_mul_mode', this.objectHandle, mode);
+				else
+					mexFaustCplx('set_Fv_mul_mode', this.objectHandle, mode);
+				end
+			end
+		end
+	end
 
 end
 

@@ -2187,6 +2187,15 @@ classdef Faust
 		end
 
 	end
+	methods(Access = public, Hidden = true)
+		function set_FM_mul_mode(self, mode)
+			set_FM_mul_mode(self.matrix, mode)
+		end
+
+		function set_Fv_mul_mode(self, mode)
+			set_Fv_mul_mode(self.matrix, mode)
+		end
+	end
 	methods(Access = private)
 		%================================================================
 		%> Returns true if i is a valid factor index for the Faust F.
