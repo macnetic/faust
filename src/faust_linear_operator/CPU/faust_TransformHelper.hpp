@@ -374,8 +374,8 @@ namespace Faust {
 				}
 				else
 				{ // storage size is the main criterion
-					sparse_weight = 2*fac->getNonZeros()+fac->getNbRow()+1;
-					if(sparse_weight < fac->getNbCol()*fac->getNbRow())
+					sparse_weight = fac->getNonZeros()*(sizeof(FPP)+sizeof(int))+(fac->getNbRow()+1)*sizeof(int);
+					if(sparse_weight < fac->getNbCol()*fac->getNbRow()*sizeof(FPP))
 					{
 						// choose CSR format
 						if(dfac)
@@ -860,11 +860,11 @@ namespace Faust {
 			for(auto fac : this->transform->data)
 			{
 				if(dynamic_cast<Faust::MatDense<FPP, Cpu>*>(fac))
-					nbytes += fac->getNbCol() * fac->getNbRow();
+					nbytes += fac->getNbCol() * fac->getNbRow() * sizeof(FPP);
 				else if (dynamic_cast<Faust::MatSparse<FPP, Cpu>*>(fac))
-					nbytes += 2*fac->getNonZeros()+fac->getNbRow()+1;
+					nbytes += fac->getNonZeros() * (sizeof(FPP) + sizeof(int)) + (fac->getNbRow() + 1) * sizeof(int); // by default storage index is int
 				else if (dynamic_cast<Faust::MatDiag<FPP>*>(fac))
-					nbytes += fac->getNbCol()<fac->getNbRow()?fac->getNbCol():fac->getNbRow();
+					nbytes += sizeof(FPP) * (fac->getNbCol()<fac->getNbRow()?fac->getNbCol():fac->getNbRow());
 				else
 					throw runtime_error("Unknown matrix type.");
 			}
