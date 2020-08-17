@@ -504,6 +504,8 @@ template<typename FPP> void Faust::prox_circ(Faust::MatDense<FPP, Cpu> & M, cons
 	template<typename FPP>
 void Faust::prox_skperm(Faust::MatDense<FPP, Cpu> & M_, const unsigned int k, const bool normalized /* default to true*/, const bool pos/* default to false */)
 {
+
+	if(pos) Faust::pre_prox_pos(M_);
 	//	template<typename FPP> using DenseMat = Eigen::Matrix<FPP, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 	//	using DenseMatInt = Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 	// use preproc constants instead of nice C++ template aliases because they are only used here and can't be local to a function
@@ -671,5 +673,6 @@ void Faust::prox_skperm(Faust::MatDense<FPP, Cpu> & M_, const unsigned int k, co
 		}
 	}
 	M = (matching.array() > 0).select(M, 0);
+	if(normalized) M_.normalize();
 }
 #endif

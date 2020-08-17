@@ -108,7 +108,9 @@ class hankel(proj_gen):
 
 class sp(proj_gen):
     """
-    Functor for the SP projector. A, the image matrix, is such that \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
+    Functor for the SP projector.
+
+    A, the image matrix, is such that \f$ \| A \|_0 = k,  \| A\|_F = 1 \f$ (if normalized == True).
 
 
     Example:
@@ -142,7 +144,9 @@ class sp(proj_gen):
 
 class splin(proj_gen):
     """
-    Functor for the SPLIN projector. A, the image matrix, is defined by \f$
+    Functor for the SPLIN projector.
+
+    A, the image matrix, is defined by \f$
     \forall i \in \{0,...,shape[0]-1\} \| \f$ the i-th row \f$ A_{i,*}\f$ is
     such that \f$ \| A_{i,*}\|_0 = k,  \| A\|_F = 1\f$ (if normalized == True).
 
@@ -500,9 +504,29 @@ class skperm(proj_gen):
     Functor for the SKPERM projector.
 
     Example:
+	>>> from pyfaust.proj import skperm
+	>>> from numpy.random import rand
+	>>> import numpy as np
+	>>> from numpy import array
+	>>>
+	>>> k = 2
+	>>> if len(sys.argv) > 1:
+	>>>     k = int(sys.argv[1])
+	>>>
+	>>> M = array([[-0.04440802, -0.17569296, -0.02557815, -0.15559154],
+	>>>             [-0.0083095,  -3.38725936, -0.78484126, -0.4883618 ],
+	>>>             [-1.48942563, -1.71787215, -0.84000212, -3.71752454],
+	>>>             [-0.88957883, -0.19107863, -5.92900636, -6.51064175]])
+	>>> p = skperm(M.shape, k)
+	>>> print(p(M))
+	[[-0.04440802  0.         -0.02557815  0.        ]
+	 [-0.0083095  -3.38725936  0.          0.        ]
+	 [ 0.         -1.71787215  0.         -3.71752454]
+	 [ 0.          0.         -5.92900636 -6.51064175]]
     """
     def __init__(self, shape, k, normalized=False, pos=False):
         """
+        Projector constructor.
 
         Args:
             k: the integer sparsity (number of nonzeros) targeted per-row and

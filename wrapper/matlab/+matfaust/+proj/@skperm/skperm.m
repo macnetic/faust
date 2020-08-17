@@ -19,7 +19,7 @@ classdef skperm < matfaust.proj.proj_gen
 		%> @param 'normalized', false: (the default) no normalization.
 		%> @param 'pos', true: skips the negative values (replaced by zero) of the input matrix.
 		%> @param 'pos', false: (the default) negative values are not skipped.
-		%> @retval the skperm projector.
+		%> @retval proj the skperm projector.
 		%===============================================
 		function proj = skperm(shape, k, varargin)
 			import matfaust.factparams.ConstraintInt
