@@ -415,7 +415,7 @@ namespace Faust
 			@FAUST_SCALAR_FOR_GM@ beta = 0.0;
 			//TODO: consider the optimal order: FF'*xk or F'F*xk
 			gm_Op op = OP_NOTRANSP;
-			gm_Op op2 = OP_TRANSP; //TODO: complex case //verify if OP_CONJTRANSP is more costful
+			gm_Op op2 = OP_CONJTRANSP;
 //			if(transpose)
 //				if(conjugate)
 //					op = OP_CONJTRANSP;
