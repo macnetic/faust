@@ -74,6 +74,8 @@ namespace Faust
 		 */
 		FPP power_iteration2(int32_t max_iter, Real<FPP> threshold, int& flag);
 
+		Real<FPP> spectral_norm(int32_t max_iter, Real<FPP> threshold);
+
 		/* Update on gpu the copy matrix of M (M must have already been loaded otherwise an exception is raised) */
 		void update(const Faust::MatGeneric<FPP,Cpu>* M, int32_t id);
 

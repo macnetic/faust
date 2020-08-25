@@ -1259,42 +1259,7 @@ namespace Faust {
 //			std::cout << "TransformHelper<FPP,Cpu>::spectralNorm" << std::endl;
 #ifdef USE_GPU_MOD
 			if(gpu_faust != nullptr)
-			{
-				bool purely_sparse = true;
-				bool all_squares = true; // it's about factors
-				for(auto f: this->transform->data)
-				{
-					if(dynamic_cast<MatSparse<FPP,Cpu>*>(f) == nullptr)
-						purely_sparse = false;
-					all_squares = all_squares && f->getNbCol() == f->getNbRow();
-				}
-//				std::cout << "purely_sparse=" << purely_sparse << " all_squares=" << all_squares << std::endl;
-				if(purely_sparse && ! all_squares)
-				{
-//					std::cout << "method 1 used for gpu spectral norm" << std::endl;
-					// this method is slower because of the copy on CPU side of the transposed factors to construct FF'
-					TransformHelper<FPP,Cpu> *AtA;
-					TransformHelper<FPP,Cpu>* At = this->adjoint();
-					if(this->getNbCol() < this->getNbRow())
-					{
-						AtA = At->multiply(this);
-					}
-					else
-					{
-						AtA = this->multiply(At);
-					}
-					AtA->enable_gpu_meth_for_mul(); //TODO: it should not be needed if A is already GPU enabled
-					FPP maxAbsValue = std::sqrt(AtA->gpu_faust->power_iteration(nbr_iter_max, threshold, flag));
-					delete AtA;
-					return absValue(maxAbsValue);
-				}
-				else
-				{
-//					std::cout << "method 2 used for gpu spectral norm" << std::endl;
-					FPP maxAbsValue = std::sqrt(this->gpu_faust->power_iteration2(nbr_iter_max, threshold, flag));
-					return absValue(maxAbsValue);
-				}
-			}
+				return gpu_faust->spectral_norm(nbr_iter_max, threshold);
 #endif
 			vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
 			int start_id, end_id;
