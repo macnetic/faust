@@ -29,7 +29,7 @@ void* Faust::FaustGPU<FPP>::init_gpu_mod(const std::string& libpath, const bool 
 {
 	if(Faust::FaustGPU<FPP>::gm_handle == nullptr)
 		if(gm_handle == nullptr)
-			Faust::FaustGPU<FPP>::gm_handle = gm_load_lib(libpath.c_str());
+			Faust::FaustGPU<FPP>::gm_handle = gm_load_lib(libpath.c_str(), silent);
 		else
 			Faust::FaustGPU<FPP>::gm_handle = gm_handle;
 	else

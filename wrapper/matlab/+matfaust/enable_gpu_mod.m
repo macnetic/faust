@@ -15,7 +15,7 @@
 function enable_gpu_mod(varargin)
 	% default values
 	backend = 'cuda';
-	silent = false;
+	silent = true;
 	osstr = computer;
 	switch(osstr)
 		case 'PCWIN64'

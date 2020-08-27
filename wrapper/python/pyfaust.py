@@ -2106,7 +2106,7 @@ def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
         min_dim_size, max_dim_size, density, per_row))
     return rF
 
-def enable_gpu_mod(libpaths=None, backend='cuda', silent=False):
+def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
     """
     This function loads explicitely the gpu_mod library in memory.
 
@@ -2121,7 +2121,7 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False):
         silent: if True nothing or almost will be displayed on loading (e.g.
         silent errors), otherwise all messages are visible.
     """
-    _FaustCorePy.FaustCore.enable_gpu_mod(libpaths, backend, silent)
+    _FaustCorePy.FaustCore.enable_gpu_mod(libpaths, backend, silent, fatal)
 
 # experimental block start
 import torch
@@ -2335,4 +2335,3 @@ class FaustMulMode:
     ##
     ## Multiplying from the left to the right or in the way around in order to minimize the cost.
     GPU_MOD=10
-
