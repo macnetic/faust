@@ -606,7 +606,7 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
        >>> from scipy.io import loadmat
        >>> from pyfaust.demo import get_data_dirpath
        >>> d = loadmat(get_data_dirpath()+'/matrix_MEG.mat')
-       >>> MEG = d['matrix']
+       >>> MEG = d['matrix'].T
        >>> num_facts = 9
        >>> k = 10
        >>> s = 8
@@ -961,4 +961,3 @@ def fgft_palm(U, Lap, p, init_D=None, ret_lambda=False, ret_params=False):
         ret_list += [ p ]
     return ret_list
 # experimental block end
-
