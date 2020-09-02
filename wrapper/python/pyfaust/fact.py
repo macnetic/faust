@@ -35,6 +35,7 @@ import pyfaust
 import pyfaust.factparams
 from pyfaust import Faust
 import _FaustCorePy
+import warnings
 
 # experimental block start
 def svdtj2(M, nGivens, tol=0, relerr=True,  nGivens_per_fac=None, verbosity=0,
