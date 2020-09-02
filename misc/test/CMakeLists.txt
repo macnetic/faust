@@ -4,7 +4,7 @@ if(BUILD_TESTING)
 
 #${FAUST_EXCEPTION_SRC_DIR}
 include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR} ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR} ${EIGEN_INC_DIR} ${FAUST_UTILS_SRC_DIR})
-
+include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR})
 if(BUILD_READ_MAT_FILE)
 	include_directories(${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR} ${MATIO_INC_DIR})
 endif(BUILD_READ_MAT_FILE)
@@ -197,17 +197,17 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
 
 
-	list(APPEND tests hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate GivensFGFT GivensFGFTSparse GivensFGFTParallel GivensFGFTParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op GivensFGFTComplex GivensFGFTComplexSparse GivensFGFTParallelComplex faust_toeplitz faust_circ faust_hankel palm4msa_2020 hierarchical2020 hierarchical2020Hadamard hierarchicalFactorizationHadamard)
+	list(APPEND tests hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate GivensFGFT GivensFGFTSparse GivensFGFTParallel GivensFGFTParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op GivensFGFTComplex GivensFGFTComplexSparse GivensFGFTParallelComplex faust_toeplitz faust_circ faust_hankel palm4msa_2020 hierarchical2020 hierarchical2020Hadamard hierarchicalFactorizationHadamard)#MEG_factorization)
 
 	if(FAUST_TORCH)
 		list(APPEND tests faust_torch)
 	endif()
 
 	if(USE_GPU_MOD)
-		list(APPEND tests faust_gpu_mod hierarchical2020_gpu)
+		list(APPEND tests faust_gpu_mod hierarchical2020_gpu test_matdense_gpu_mod)
 	endif()
 
-	foreach(TEST_FPP float double complex<float> complex<double>)	
+	foreach(TEST_FPP float double complex<float> complex<double>)
 		foreach(testin IN LISTS tests)
 			if(${TEST_FPP} MATCHES complex )
 				set(TEST_IS_COMPLEX 1)

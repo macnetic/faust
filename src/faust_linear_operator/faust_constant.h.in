@@ -73,6 +73,7 @@ enum FDevice
 #ifdef __COMPILE_GPU__
    Gpu, /* Graphic Process Unit */
 #endif
+   GPU2
 };
 typedef unsigned long int faust_unsigned_int;
 typedef long int faust_int;

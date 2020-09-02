@@ -1,0 +1,11 @@
+//TODO: move to CPP
+template<>
+Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::MatDense(const @FAUST_SCALAR_FOR_GM@* data, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol)
+{
+	// MatDense from GPU
+
+	if(this->dsm_funcs == nullptr)
+		this->dsm_funcs = new gm_DenseMatFunc_@GM_SCALAR@();
+
+	gpu_mat = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs)->togpu(nbRow, nbCol, const_cast<double*>(data));
+}

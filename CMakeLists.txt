@@ -424,6 +424,10 @@ if (BUILD_USE_GPU)
 	set(FAUST_SRC_TEST_GPU_DIR ${FAUST_MISC_DIR}/test/GPU_test CACHE INTERNAL "")
 	set(FAUST_BIN_TEST_GPU_DIR ${FAUST_BIN_TEST_DIR}/binGPU CACHE INTERNAL "") 
 endif(BUILD_USE_GPU)
+if (USE_GPU_MOD)
+	set(FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR ${FAUST_SRC_LINEAR_OPERATOR_DIR}/GPU2 CACHE INTERNAL "")
+	set(FAUST_BIN_LINEAR_OPERATOR_GPU2_DIR ${FAUST_BIN_LINEAR_OPERATOR_DIR}/GPU2 CACHE INTERNAL "")
+endif(USE_GPU_MOD)
 ##################################################################
 
 ###### DOCUMENTATION DIRECTORIES ######
@@ -615,6 +619,7 @@ if(USE_GPU_MOD)
 	set(GM_SCALAR double)
 	set(GM_REINTERPRET_CAST_SCALAR double)
 	configure_file(${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_gen.hpp.in ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_double.hpp)
+	configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_MatDense_gpu.hpp.in ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_MatDense_gpu_double.hpp)
 	set(FAUST_SCALAR_FOR_GM complex<double>)
 	set(GM_SCALAR cuDoubleComplex)
 	set(GM_REINTERPRET_CAST_SCALAR double)
@@ -629,7 +634,7 @@ if(USE_GPU_MOD)
 	endif()
 	file(TO_NATIVE_PATH lib/${GPU_MOD_LIB} GPU_MOD_LIB_PATH) # used in setup.py
 	file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${GPU_MOD_LIB} GPU_MOD_LIB_INSTALL_PATH) # only for system packages (not for pip package)
-
+	# GPU2
 endif()
 
 
@@ -731,9 +736,14 @@ endif()
 
 if(USE_GPU_MOD)
 	include_directories(${FAUST_TARGET} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
+	include_directories(${FAUST_TARGET} ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR})
 	target_include_directories(${FAUST_TARGET} PUBLIC  ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
 	target_link_libraries(${FAUST_TARGET} ${GPU_MOD_LIBS})
+	if(UNIX)
+		target_link_libraries(${FAUST_TARGET} dl)
+	endif(UNIX)
 	install(FILES  ${GPU_MOD_INCLUDE_DIR}/../build/libgm.so DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_EXECUTE WORLD_READ)
+	include_directories(${FAUST_TARGET} ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR})
 endif()
 
 # In case of GPU, the "CUDA" library libfaust_matrix_cu.a is linked with faust (libfaust_matrix_cu.a is not a OBJECT library) 
