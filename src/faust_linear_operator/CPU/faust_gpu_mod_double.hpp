@@ -13,12 +13,15 @@ namespace Faust
 			marr_funcs = new gm_MatArrayFunc_double(); // on the heap because because it cannot be shared among FaustGPU instances if on the stack
 			dsm_funcs = new gm_DenseMatFunc_double();
 			gp_funcs = new gm_GenPurposeFunc_double();
+			spm_funcs = new gm_SparseMatFunc_double();
 			load_marr_funcs_double(gm_handle, marr_funcs);
 			load_dsm_funcs_double(gm_handle, dsm_funcs);
+			load_spm_funcs_double(gm_handle, static_cast<gm_SparseMatFunc_double*>(spm_funcs));
 			load_gp_funcs_double(gm_handle, gp_funcs);
 			FaustGPU<double>::marr_funcs = marr_funcs;
 			FaustGPU<double>::dsm_funcs = dsm_funcs;
 			FaustGPU<double>::gp_funcs = gp_funcs;
+			FaustGPU<double>::spm_funcs = spm_funcs;
 		}
 
 	}

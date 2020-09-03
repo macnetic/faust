@@ -23,6 +23,7 @@ namespace Faust
 		public:
 		static void* marr_funcs; //void because we don't know FPP yet and templates aren't available through shared lib interface (extern C, no name mangling)
 		static void* dsm_funcs;
+		static void* spm_funcs;
 #ifdef _MSC_VER
 		public: // should not be public but Visual Studio 14 (and only it) can't access private members from lambda exp (error C2248) // cf. ref_man ini.
 				//TODO: set back to private later (mayber with a more recent version)

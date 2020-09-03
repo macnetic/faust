@@ -11,6 +11,9 @@ template <typename FPP>
 void* Faust::FaustGPU<FPP>::dsm_funcs = nullptr;
 
 template <typename FPP>
+void* Faust::FaustGPU<FPP>::spm_funcs = nullptr;
+
+template <typename FPP>
 void* Faust::FaustGPU<FPP>::gp_funcs = nullptr;
 
 

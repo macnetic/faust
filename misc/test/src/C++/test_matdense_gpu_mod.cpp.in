@@ -1,25 +1,47 @@
 #include "faust_constant.h"
 #include "faust_gpu_mod.h"
 #include "faust_MatDense_gpu.h"
+#include "faust_MatSparse.h"
 #include <cstdlib>
+#include <cmath>
+using namespace std;
 using namespace Faust;
 
-int main(int argc, char** argv)
+
+void test_mul_gpu_dense()
 {
 	faust_unsigned_int nrows = 10, ncols = 10;
 	faust_unsigned_int nrows2 = 10, ncols2 = 15;
 	double data[100];
-	Faust::enable_gpu_mod();
 	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(cpu_mat1->getData(), nrows, ncols);
+	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	auto cpu_mat2 = Faust::MatDense<double,Cpu>::randMat(nrows2,ncols2);
-	MatDense<double,GPU2> gpu_mat2(cpu_mat2->getData(), nrows2, ncols2);
+	MatDense<double,GPU2> gpu_mat2(nrows2, ncols2, cpu_mat2->getData());
+	// test MatDense<FPP,GPU2> * MatDense<FPP,GPU2>
 	gpu_mat1.multiply(gpu_mat2);
 	auto cpu_mat1_mat2_test = gpu_mat2.tocpu();
 	auto cpu_mat1_mat2_ref = *cpu_mat2;
 	cpu_mat1->multiply(cpu_mat1_mat2_ref, 'N');
 	auto err_diff = cpu_mat1_mat2_ref;
 	err_diff -= cpu_mat1_mat2_test;
-	cout << "err mul." << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
+	cout << "err mul.: " << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
+	// test MatDense<FPP,GPU2> * MatDense<FPP,Cpu>
+	cpu_mat1_mat2_test = *cpu_mat2;
+	gpu_mat1.multiply(cpu_mat1_mat2_test);
+	err_diff = cpu_mat1_mat2_ref;
+	err_diff -= cpu_mat1_mat2_test;
+	cout << "err mul.: " << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
+	// test MatDense<FPP,GPU2> * MatSparse<FPP,Cpu>
+	Faust::MatSparse<double,Cpu> cpu_mat2_sparse(*cpu_mat2);
+	gpu_mat1.multiply(cpu_mat2_sparse, cpu_mat1_mat2_test);
+	err_diff = cpu_mat1_mat2_ref;
+	err_diff -= cpu_mat1_mat2_test;
+	cout << "err mul.: " << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
+}
+
+int main(int argc, char** argv)
+{
+	Faust::enable_gpu_mod();
+	test_mul_gpu_dense();
 	return EXIT_SUCCESS;
 }
