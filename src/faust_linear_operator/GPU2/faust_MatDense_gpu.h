@@ -19,7 +19,8 @@ namespace Faust
 //				multiply(const MatDense<Cpu,FPP> &other);
 //				multiply(const MatSparse<Cpu,FPP> &other);
 //				multiply(const Vect<Cpu,FPP> &vec);
-//				multiply(const MatDense<GPU2, FPP> &other);
+				void multiply(MatDense<FPP, GPU2> &other, const char op_this='N');
+				MatDense<FPP, Cpu> tocpu();
 			private:
 				static void* dsm_funcs;
 				gm_DenseMat_t gpu_mat;

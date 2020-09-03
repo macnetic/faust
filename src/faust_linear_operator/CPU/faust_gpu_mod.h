@@ -20,6 +20,7 @@ namespace Faust
 		static RefManager ref_man;
 		static void *gm_handle;
 		static int *gm_users;
+		public:
 		static void* marr_funcs; //void because we don't know FPP yet and templates aren't available through shared lib interface (extern C, no name mangling)
 		static void* dsm_funcs;
 #ifdef _MSC_VER
@@ -85,6 +86,7 @@ namespace Faust
 		static bool are_cpu_mat_all_known(const std::vector<MatGeneric<FPP,Cpu>*> mats);
 
 		static void* init_gpu_mod(const std::string& libpath = "libgm.so", const bool silent = false, void* gm_handle = nullptr);
+		static void load_gm_functions();
 		static void check_gpu_mod_loaded();
 	};
 

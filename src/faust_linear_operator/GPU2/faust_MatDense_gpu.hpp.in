@@ -1,11 +1,32 @@
 //TODO: move to CPP
 template<>
-Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::MatDense(const @FAUST_SCALAR_FOR_GM@* data, const faust_unsigned_int nbRow, const faust_unsigned_int nbCol)
+Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::MatDense(const @FAUST_SCALAR_FOR_GM@* data,
+		const faust_unsigned_int nbRow,
+		const faust_unsigned_int nbCol)
 {
-	// MatDense from GPU
-
+	this->dim1 = nbRow;
+	this->dim2 = nbCol;
+	FaustGPU<@FAUST_SCALAR_FOR_GM@>::load_gm_functions();
 	if(this->dsm_funcs == nullptr)
-		this->dsm_funcs = new gm_DenseMatFunc_@GM_SCALAR@();
+		this->dsm_funcs = FaustGPU<@FAUST_SCALAR_FOR_GM@>::dsm_funcs;
+	gpu_mat = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs)->togpu(nbRow, nbCol, const_cast<@FAUST_SCALAR_FOR_GM@*>(data));
+}
 
-	gpu_mat = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs)->togpu(nbRow, nbCol, const_cast<double*>(data));
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &other, const char op_this)
+{
+	// other = this * other
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, other.gpu_mat, other.gpu_mat, OP_NOTRANSP, OP_NOTRANSP);
+	//TODO: update dims (in transpose/adjoint case)
+	other.dim1 = dim1;
+}
+
+template<>
+Faust::MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu()
+{
+	MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> cpu_mat(dim1, dim2);
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->tocpu(gpu_mat, cpu_mat.getData());
+	return cpu_mat; //TODO: move constructor for MatDense<FPP, Cpu>
 }
