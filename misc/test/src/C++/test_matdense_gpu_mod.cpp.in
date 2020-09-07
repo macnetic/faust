@@ -10,32 +10,48 @@ using namespace Faust;
 
 void test_mul_gpu_dense()
 {
-	faust_unsigned_int nrows = 10, ncols = 10;
-	faust_unsigned_int nrows2 = 10, ncols2 = 15;
+	faust_unsigned_int nrows = 90, ncols = 90;
+	faust_unsigned_int nrows2 = 90, ncols2 = 150;
 	double data[100];
 	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
 	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	auto cpu_mat2 = Faust::MatDense<double,Cpu>::randMat(nrows2,ncols2);
 	MatDense<double,GPU2> gpu_mat2(nrows2, ncols2, cpu_mat2->getData());
 	// test MatDense<FPP,GPU2> * MatDense<FPP,GPU2>
+	cout << "Mul. GPUDense*GPUDense in GPUDense" << endl;
 	gpu_mat1.multiply(gpu_mat2);
 	auto cpu_mat1_mat2_test = gpu_mat2.tocpu();
 	auto cpu_mat1_mat2_ref = *cpu_mat2;
 	cpu_mat1->multiply(cpu_mat1_mat2_ref, 'N');
+	cout << "ref norm: " << cpu_mat1_mat2_ref.norm() << endl;
+	cout << "test norm: " << cpu_mat1_mat2_test.norm() << endl;
 	auto err_diff = cpu_mat1_mat2_ref;
 	err_diff -= cpu_mat1_mat2_test;
 	cout << "err mul.: " << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
-	// test MatDense<FPP,GPU2> * MatDense<FPP,Cpu>
+	cout << "Mul. GPUDense*CPUDense in CPUDense" << endl;
 	cpu_mat1_mat2_test = *cpu_mat2;
 	gpu_mat1.multiply(cpu_mat1_mat2_test);
 	err_diff = cpu_mat1_mat2_ref;
 	err_diff -= cpu_mat1_mat2_test;
 	cout << "err mul.: " << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
-	// test MatDense<FPP,GPU2> * MatSparse<FPP,Cpu>
+	cout << "Mul. GPUDense*CPUSparse in CPUDense" << endl;
 	Faust::MatSparse<double,Cpu> cpu_mat2_sparse(*cpu_mat2);
+//	cout << cpu_mat2_sparse.to_string(false, true) << endl;
+//	cout << cpu_mat2->to_string(false, true) << endl;
 	gpu_mat1.multiply(cpu_mat2_sparse, cpu_mat1_mat2_test);
 	err_diff = cpu_mat1_mat2_ref;
 	err_diff -= cpu_mat1_mat2_test;
+	cout << "ref norm: " << cpu_mat1_mat2_ref.norm() << endl;
+	cout << "test norm: " << cpu_mat1_mat2_test.norm() << endl;
+//	cout << cpu_mat1_mat2_ref.to_string(false, true) << endl;
+//	cout << cpu_mat1_mat2_test.to_string(false, true) << endl;
+	cout << "err mul.: " << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
+	cout << "Mul. GPUDense*CPUSparse in GPUDense" << endl;
+	MatDense<double, GPU2> gpu_mat1_mat2_test(nrows, ncols2);
+	gpu_mat1.multiply(cpu_mat2_sparse, gpu_mat1_mat2_test);
+	auto gpu_mat1_mat2_test_to_cpu = gpu_mat1_mat2_test.tocpu();
+	err_diff = gpu_mat1_mat2_test_to_cpu;
+	err_diff -= cpu_mat1_mat2_ref;
 	cout << "err mul.: " << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
 }
 

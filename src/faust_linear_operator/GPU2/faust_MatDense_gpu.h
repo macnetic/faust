@@ -21,6 +21,7 @@ namespace Faust
 				void multiply(MatDense<FPP,Cpu> &other, const char op_this='N');
 //				void multiply(MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
 				void multiply(const MatSparse<FPP, Cpu> &other, MatDense<FPP, Cpu>& output, const char op_this='N');
+				void multiply(const MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
 				MatDense<FPP, Cpu> tocpu();
 				~MatDense<FPP, GPU2>();
 			private:

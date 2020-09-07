@@ -53,11 +53,24 @@ void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const MatSparse<@FAUS
 	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
 	//togpu(int32_t nrows, int32_t ncols, int32_t nnz, int32_t* row_ptr, int32_t* col_inds, @GM_SCALAR@* values)
 	auto other_gpu = spm_funcs->togpu(other.getNbRow(), other.getNbCol(), other.getNonZeros(), (int32_t*) other.getRowPtr(), (int32_t*) other.getColInd(), (double*) other.getValuePtr());
-	MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> output_gpu_mat(getNbRow(), other.getNbCol());
 	// mul_gpu_spm_ext(gm_DenseMat_t, gm_SparseMat_t, gm_DenseMat_t output, gm_Op, gm_Op);
-	dsm_funcs->mul_gpu_spm_ext(gpu_mat, other_gpu, output_gpu_mat.gpu_mat, OP_NOTRANSP, OP_NOTRANSP);
+	auto output_gpu_mat = dsm_funcs->mul_gpu_spm_ext(gpu_mat, other_gpu, nullptr, OP_NOTRANSP, OP_NOTRANSP);
 	output = MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>(getNbRow(), other.getNbCol()); //TODO: manage transpose case
-	dsm_funcs->tocpu(output_gpu_mat.gpu_mat, output.getData());
+	dsm_funcs->tocpu(output_gpu_mat, output.getData());
+	dsm_funcs->free(output_gpu_mat);
+	spm_funcs->free(other_gpu);
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu> &other, MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>& output, const char op_this)
+{
+	auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*) this->dsm_funcs);
+	auto other_gpu = spm_funcs->togpu(other.getNbRow(), other.getNbCol(), other.getNonZeros(), (int32_t*) other.getRowPtr(), (int32_t*) other.getColInd(), (double*) other.getValuePtr());
+	if(output.gpu_mat != nullptr)
+		dsm_funcs->free(output.gpu_mat);
+	output.gpu_mat = dsm_funcs->mul_gpu_spm_ext(gpu_mat, other_gpu, nullptr, OP_NOTRANSP, OP_NOTRANSP);
+	spm_funcs->free(other_gpu);
 }
 
 template<>
