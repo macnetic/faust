@@ -48,6 +48,16 @@ void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(MatDense<@FAUST_SCALA
 }
 
 template<>
+Faust::Vect<@FAUST_SCALAR_FOR_GM@,Cpu> Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const Faust::Vect<@FAUST_SCALAR_FOR_GM@, Cpu> &vec)
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> gpu_vec(vec.size(), 1, vec.getData());
+	Faust::Vect<@FAUST_SCALAR_FOR_GM@, Cpu> out_v(dim2);
+	dsm_funcs->mul_gpu_dsm_tocpu_ext(this->gpu_mat, gpu_vec.gpu_mat, out_v.getData(), OP_NOTRANSP, OP_NOTRANSP);
+	return out_v;
+}
+
+template<>
 void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu> &other, MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>& output, const char op_this)
 {
 	auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
@@ -72,6 +82,13 @@ void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const MatSparse<@FAUS
 		dsm_funcs->free(output.gpu_mat);
 	output.gpu_mat = dsm_funcs->mul_gpu_spm_ext(gpu_mat, other_gpu, nullptr, OP_NOTRANSP, OP_NOTRANSP);
 	spm_funcs->free(other_gpu);
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::scalarMultiply(const @FAUST_SCALAR_FOR_GM@& lambda)
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->mul_scalar(gpu_mat, &lambda);
 }
 
 template<>
@@ -124,4 +141,52 @@ Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>* Faust::MatDense<@FAUST_SCALAR_FOR_G
 	auto clone_mat = new Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>(dim1, dim2, nullptr, /*no_alloc*/true);
 	clone_mat->gpu_mat = gpu_mat;
 	return clone_mat;
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::transpose()
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->transpose(this->gpu_mat);
+	auto tmp = dim1;
+	dim1 = dim2;
+	dim2 = tmp;
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::adjoint()
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->adjoint(this->gpu_mat);
+	auto tmp = dim1;
+	dim1 = dim2;
+	dim2 = tmp;
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::conjugate()
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->conjugate(this->gpu_mat);
+}
+
+template<>
+Real<@FAUST_SCALAR_FOR_GM@> Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::spectralNorm(const faust_unsigned_int nbr_iter_max, const float threshold)
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	return dsm_funcs->norm_spectral(gpu_mat, threshold, nbr_iter_max);
+}
+
+template<>
+Real<@FAUST_SCALAR_FOR_GM@> Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::norm()
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	return dsm_funcs->norm_frob(gpu_mat);
+}
+
+	template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::normalize()
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->normalize(gpu_mat);
 }

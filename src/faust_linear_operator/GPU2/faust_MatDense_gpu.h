@@ -16,17 +16,25 @@ namespace Faust
 			public:
 				MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP* data = nullptr, const bool no_alloc=false);
 
-//				multiply(const Vect<Cpu,FPP> &vec);
+				// vec = this * vec
+				Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu> &vec);
 				void multiply(MatDense<FPP, GPU2> &other, const char op_this='N');
 				void multiply(MatDense<FPP,Cpu> &other, const char op_this='N');
 //				void multiply(MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
 				void multiply(const MatSparse<FPP, Cpu> &other, MatDense<FPP, Cpu>& output, const char op_this='N');
 				void multiply(const MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
+				void scalarMultiply(const FPP& lambda);
 				void resize(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol);
 				void resize(const faust_unsigned_int nbRow){resize(nbRow,nbRow);}
 				void setOnes();
 				void setZeros();
 				void setEyes();
+				void transpose();
+				void conjugate();
+				void adjoint();
+				Real<FPP> spectralNorm(const faust_unsigned_int nbr_iter_max, const float threshold);
+				Real<FPP> norm();
+				void normalize();
 				MatDense<FPP, GPU2>* clone();
 				MatDense<FPP, Cpu> tocpu();
 				~MatDense<FPP, GPU2>();
