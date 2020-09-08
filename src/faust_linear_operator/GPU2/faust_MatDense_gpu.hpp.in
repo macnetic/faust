@@ -3,7 +3,8 @@ template<>
 Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::MatDense(
 		const faust_unsigned_int nbRow,
 		const faust_unsigned_int nbCol,
-		const @FAUST_SCALAR_FOR_GM@* data/*=nullptr*/)
+		const @FAUST_SCALAR_FOR_GM@* data/*=nullptr*/,
+		const bool no_alloc/*= false*/)
 {
 	this->dim1 = nbRow;
 	this->dim2 = nbCol;
@@ -14,7 +15,7 @@ Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::MatDense(
 		this->spm_funcs = FaustGPU<@FAUST_SCALAR_FOR_GM@>::spm_funcs;
 	if(nullptr != data)
 		gpu_mat = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs)->togpu(nbRow, nbCol, const_cast<@FAUST_SCALAR_FOR_GM@*>(data));
-	else
+	else if(! no_alloc)
 		gpu_mat = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs)->create(nbRow, nbCol);
 }
 
@@ -82,4 +83,45 @@ Faust::MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> Faust::MatDense<@FAUST_SCALAR_FOR_GM
 	return cpu_mat; //TODO: move constructor for MatDense<FPP, Cpu>
 }
 
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::resize(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol)
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->resize(gpu_mat, nbRow, nbCol);
+	this->dim1 = nbRow;
+	this->dim2 = nbCol;
+	int32_t new_nrows, new_ncols;
+	dsm_funcs->info(gpu_mat, &new_nrows, &new_ncols);
+	assert(nbRow == new_nrows && new_ncols == nbCol);
+}
 
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::setOnes()
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->setones(gpu_mat);
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::setZeros()
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->setzeros(gpu_mat);
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::setEyes()
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->seteyes(gpu_mat);
+}
+
+template<>
+Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>* Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::clone()
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	auto gpu_mat = dsm_funcs->clone(this->gpu_mat);
+	auto clone_mat = new Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>(dim1, dim2, nullptr, /*no_alloc*/true);
+	clone_mat->gpu_mat = gpu_mat;
+	return clone_mat;
+}

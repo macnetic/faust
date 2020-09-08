@@ -14,7 +14,7 @@ namespace Faust
 		class MatDense<FPP, GPU2> : MatDense<FPP, Cpu>
 		{
 			public:
-				MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP* data = nullptr);
+				MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP* data = nullptr, const bool no_alloc=false);
 
 //				multiply(const Vect<Cpu,FPP> &vec);
 				void multiply(MatDense<FPP, GPU2> &other, const char op_this='N');
@@ -22,6 +22,12 @@ namespace Faust
 //				void multiply(MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
 				void multiply(const MatSparse<FPP, Cpu> &other, MatDense<FPP, Cpu>& output, const char op_this='N');
 				void multiply(const MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
+				void resize(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol);
+				void resize(const faust_unsigned_int nbRow){resize(nbRow,nbRow);}
+				void setOnes();
+				void setZeros();
+				void setEyes();
+				MatDense<FPP, GPU2>* clone();
 				MatDense<FPP, Cpu> tocpu();
 				~MatDense<FPP, GPU2>();
 			private:
