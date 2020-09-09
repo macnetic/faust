@@ -16,6 +16,8 @@ namespace Faust
 			public:
 				MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP* data = nullptr, const bool no_alloc=false);
 
+				void add(MatDense<FPP,Cpu> const& A);
+				void add(MatDense<FPP,GPU2> const& A);
 				// vec = this * vec
 				Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu> &vec);
 				void multiply(MatDense<FPP, GPU2> &other, const char op_this='N');
@@ -32,8 +34,10 @@ namespace Faust
 				void transpose();
 				void conjugate();
 				void adjoint();
+				void abs();
 				Real<FPP> spectralNorm(const faust_unsigned_int nbr_iter_max, const float threshold);
 				Real<FPP> norm();
+				Real<FPP> normL1();
 				void normalize();
 				MatDense<FPP, GPU2>* clone();
 				MatDense<FPP, Cpu> tocpu();
