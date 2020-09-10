@@ -20,14 +20,35 @@ namespace Faust
 				void add(const MatDense<FPP,Cpu> & A);
 				void add(const MatDense<FPP,GPU2> & A);
 				void add(const MatSparse<FPP,Cpu> & A);
+				void operator+=(const MatDense<FPP,GPU2> & A);
+				void operator+=(const MatDense<FPP,Cpu> & A);
+				void operator+=(const MatSparse<FPP,Cpu> & A);
+				//TODO: add(const MatSparse<FPP,GPU2>)
+				void sub(const MatDense<FPP,Cpu> & A);
+				void sub(const MatDense<FPP,GPU2> & A);
+				void sub(const MatSparse<FPP,Cpu> & A);
+				void operator-=(const MatDense<FPP,GPU2> & A);
+				void operator-=(const MatDense<FPP,Cpu> & A);
+				void operator-=(const MatSparse<FPP,Cpu> & A);
+				//TODO: sub(const MatSparse<FPP,GPU2>)
 				//TODO: void add(MatSparse<FPP,GPU2> const& A);
 				// vec = this * vec
 				Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu> &vec);
+				//  other = (*this) * other
 				void multiply(MatDense<FPP, GPU2> &other, const char op_this='N');
+				//  other = (*this) * other
 				void multiply(MatDense<FPP, Cpu> &other, const char op_this='N');
 //				void multiply(MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
 				void multiply(const MatSparse<FPP, Cpu> &other, MatDense<FPP, Cpu>& output, const char op_this='N');
 				void multiply(const MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
+				//! \brief Replace (this) by (this) * A
+				void multiplyRight(const MatDense<FPP, Cpu>& A);
+				void multiplyRight(const MatDense<FPP, GPU2>& A);
+				//! \brief Replace (this) by S * (this)
+				void multiplyLeft(const MatSparse<FPP, Cpu>& S, const char transS='N');
+				void operator*=(const MatDense<FPP, GPU2> &other);
+				void operator*=(const MatDense<FPP, Cpu> &other);
+//				void operator*=(MatSparse<FPP, Cpu> &other);
 				void scalarMultiply(const FPP& lambda);
 				void resize(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol);
 				void resize(const faust_unsigned_int nbRow){resize(nbRow,nbRow);}

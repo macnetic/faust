@@ -124,6 +124,7 @@ void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::setZeros()
 {
 	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
 	dsm_funcs->setzeros(gpu_mat);
+	this->isZeros = true;
 }
 
 template<>
@@ -131,6 +132,7 @@ void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::setEyes()
 {
 	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
 	dsm_funcs->seteyes(gpu_mat);
+	this->is_identity = true;
 }
 
 template<>
@@ -224,4 +226,122 @@ void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::add(MatSparse<@FAUST_SCALAR_F
 {
 	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
 	dsm_funcs->add_cpu_spm(this->gpu_mat, A.getNbRow(), A.getNbCol(), A.getNonZeros(), A.getRowPtr(), A.getColInd(), A.getValuePtr());
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::operator+=(MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu> const& A)
+{
+	this->add(A);
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::operator+=(MatDense<@FAUST_SCALAR_FOR_GM@,Cpu> const& A)
+{
+	this->add(A);
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::operator+=(MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> const& A)
+{
+	this->add(A);
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::sub(MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> const& A)
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->sub_gpu_dsm(this->gpu_mat, A.gpu_mat);
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::sub(MatDense<@FAUST_SCALAR_FOR_GM@,Cpu> const& A)
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->sub_cpu_dsm(gpu_mat, const_cast<@FAUST_SCALAR_FOR_GM@*>(A.getData()), A.getNbRow(), A.getNbCol());
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::sub(MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu> const& A)
+{
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->sub_cpu_spm(this->gpu_mat, A.getNbRow(), A.getNbCol(), A.getNonZeros(), A.getRowPtr(), A.getColInd(), A.getValuePtr());
+}
+
+template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::operator-=(MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu> const& A)
+{
+	this->sub(A);
+}
+
+	template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::operator-=(MatDense<@FAUST_SCALAR_FOR_GM@,Cpu> const& A)
+{
+	this->sub(A);
+}
+
+	template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::operator-=(MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> const& A)
+{
+	this->sub(A);
+}
+
+	template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::multiplyRight(const MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> & A)
+{
+	// other = this * other
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, A.gpu_mat, this->gpu_mat, OP_NOTRANSP, OP_NOTRANSP);
+	Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> new_this(dim1, A.dim2, nullptr);
+	dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, A.gpu_mat, new_this.gpu_mat, OP_NOTRANSP, OP_NOTRANSP);
+	auto tmp = this->gpu_mat;
+	this->gpu_mat = new_this.gpu_mat;
+	new_this.gpu_mat = tmp;
+	this->dim2 = A.dim2;
+}
+
+	template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::multiplyRight(const MatDense<@FAUST_SCALAR_FOR_GM@,Cpu> & A)
+{
+	// this = this * other
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> gpuA(A.getNbRow(), A.getNbCol(), A.getData());
+	Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> new_this(dim1, A.dim2, nullptr);
+	dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, gpuA.gpu_mat, new_this.gpu_mat, OP_NOTRANSP, OP_NOTRANSP);
+	auto tmp = this->gpu_mat;
+	this->gpu_mat = new_this.gpu_mat;
+	new_this.gpu_mat = tmp;
+	this->dim2 = A.dim2;
+}
+
+	template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::operator*=(const MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> & A)
+{
+	this->multiplyRight(A);
+}
+
+	template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::operator*=(const MatDense<@FAUST_SCALAR_FOR_GM@,Cpu> & A)
+{
+	this->multiplyRight(A);
+}
+
+	template<>
+void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::multiplyLeft(const MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu> & S, const char transS/*='N'*/)
+{
+	auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*)this->spm_funcs);
+	auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*)this->dsm_funcs);
+	if(isZeros)
+	{
+		setZeros();
+	}
+	else
+	{
+		auto gpu_S = spm_funcs->togpu(S.getNbRow(), S.getNbCol(), S.getNonZeros(), S.getRowPtr(), S.getColInd(), S.getValuePtr());
+
+		auto gpu_out = spm_funcs->mul_gpu_dsm_ext(gpu_S, this->gpu_mat, nullptr, OP_NOTRANSP, OP_NOTRANSP);
+		dsm_funcs->free(this->gpu_mat);
+		spm_funcs->free(gpu_S);
+		this->gpu_mat = gpu_out;
+		this->dim1 = S.getNbRow();
+	}
 }
