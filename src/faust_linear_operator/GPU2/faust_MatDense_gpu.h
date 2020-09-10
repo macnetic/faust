@@ -16,6 +16,9 @@ namespace Faust
 			public:
 				MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP* data = nullptr, const bool no_alloc=false);
 
+				void operator=(const MatDense<FPP,GPU2> & A);
+				void operator=(const MatDense<FPP,Cpu> & A);
+				void operator=(const MatSparse<FPP,Cpu> & A);
 				// *this = *this + A
 				void add(const MatDense<FPP,Cpu> & A);
 				void add(const MatDense<FPP,GPU2> & A);
