@@ -7,6 +7,14 @@
 using namespace std;
 using namespace Faust;
 
+double calc_err(MatDense<double, GPU2> &gpu_mat, MatDense<double, Cpu> &cpu_mat)
+{
+	auto gpu_mat_to_cpu = gpu_mat.tocpu();
+	auto err_diff = cpu_mat;
+	err_diff -= gpu_mat_to_cpu;
+	auto err = err_diff.norm()/cpu_mat.norm();
+	return err;
+}
 
 void test_mul_gpu_dense()
 {
@@ -277,6 +285,8 @@ void test_abs()
 	cout << "OK" << endl;
 }
 
+
+
 void test_add()
 {
 	cout << "test add" << endl;
@@ -292,6 +302,24 @@ void test_add()
 	err_diff -= gpu_mat1_to_cpu;
 	auto err = err_diff.norm()/cpu_mat1->norm();
 	assert(err < 1e-6);
+	Faust::MatSparse<double, Cpu> *cpu_mat3_sp = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	cpu_mat3_sp->Display();
+	cout << cpu_mat3_sp->to_string(false, true) << endl;
+	assert(calc_err(gpu_mat1, *cpu_mat1) < 1e-6);
+	cout << "--- gpu_mat1 after" << endl;
+	cout << gpu_mat1.tocpu().to_string(false, true) << endl;
+	cout << "--- cpu_mat1 before" << endl;
+	cout << cpu_mat1->to_string(false, true) << endl;
+	cout << "---" << endl;
+	cpu_mat1->add(*cpu_mat3_sp);
+	gpu_mat1.add(*cpu_mat3_sp);
+	cout << "--- cpu_mat1 after" << endl;
+	cout << cpu_mat1->to_string(false, true) << endl;
+	cout << "--- gpu_mat1 after" << endl;
+	cout << gpu_mat1.tocpu().to_string(false, true) << endl;
+	auto err_add_sp = calc_err(gpu_mat1, *cpu_mat1);
+	cout << err_add_sp << endl;
+	assert(err_add_sp < 1e-6);
 	cout << "OK" << endl;
 }
 

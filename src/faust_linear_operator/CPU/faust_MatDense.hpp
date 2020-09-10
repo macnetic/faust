@@ -675,6 +675,24 @@ void Faust::MatDense<FPP,Cpu>::add(Faust::MatDense<FPP,Cpu> const& A)
 }
 
 	template<typename FPP>
+void Faust::MatDense<FPP,Cpu>::add(Faust::MatSparse<FPP,Cpu> const& A)
+{
+#ifdef __COMPILE_TIMERS__
+	t_add.start();
+#endif
+	if ((this->getNbCol() != A.getNbCol()) || (this->getNbRow() != A.getNbRow()))
+	{
+		handleError(m_className, "add : matrix dimension not equal");
+	}
+	mat += A.mat;
+	isZeros = false;
+	this->is_identity = false;
+#ifdef __COMPILE_TIMERS__
+	t_add.stop();
+#endif
+}
+
+	template<typename FPP>
 void Faust::MatDense<FPP,Cpu>::sub(Faust::MatDense<FPP,Cpu> const& A)
 {
 #ifdef __COMPILE_TIMERS__
@@ -735,7 +753,7 @@ std::string Faust::MatDense<FPP,Cpu>::to_string(const bool transpose /* set to f
 		str <<"zeros matrix flag" <<std::endl;
 	else
 	{
-		if (displaying_small_mat_elts && this->dim1*this->dim2 < 100)
+		if (displaying_small_mat_elts && this->dim1*this->dim2 < 1000)
 		{
 			for (int i=0 ; i<this->dim1 ; i++)
 			{

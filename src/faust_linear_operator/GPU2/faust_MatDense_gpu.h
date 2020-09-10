@@ -16,12 +16,15 @@ namespace Faust
 			public:
 				MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP* data = nullptr, const bool no_alloc=false);
 
-				void add(MatDense<FPP,Cpu> const& A);
-				void add(MatDense<FPP,GPU2> const& A);
+				// *this = *this + A
+				void add(const MatDense<FPP,Cpu> & A);
+				void add(const MatDense<FPP,GPU2> & A);
+				void add(const MatSparse<FPP,Cpu> & A);
+				//TODO: void add(MatSparse<FPP,GPU2> const& A);
 				// vec = this * vec
 				Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu> &vec);
 				void multiply(MatDense<FPP, GPU2> &other, const char op_this='N');
-				void multiply(MatDense<FPP,Cpu> &other, const char op_this='N');
+				void multiply(MatDense<FPP, Cpu> &other, const char op_this='N');
 //				void multiply(MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
 				void multiply(const MatSparse<FPP, Cpu> &other, MatDense<FPP, Cpu>& output, const char op_this='N');
 				void multiply(const MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');

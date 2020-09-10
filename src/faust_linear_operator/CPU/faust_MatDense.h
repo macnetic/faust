@@ -383,6 +383,9 @@ void spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> &
 
         //! \brief (*this) = (*this) + A
         void add(MatDense<FPP,Cpu> const& A);
+		//
+        //! \brief (*this) = (*this) + A
+        void add(MatSparse<FPP,Cpu> const& A);
 
         //!  \brief (*this) = (*this) - A
         void sub(MatDense<FPP,Cpu> const& A);
