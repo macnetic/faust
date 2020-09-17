@@ -14,7 +14,12 @@ namespace Faust
 		class MatDense<FPP, GPU2> : MatDense<FPP, Cpu>
 		{
 			public:
-				MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP* data = nullptr, const bool no_alloc=false);
+				MatDense(const faust_unsigned_int nbRow,
+						const faust_unsigned_int nbCol,
+						const FPP* data = nullptr,
+						const bool no_alloc=false,
+						const int32_t dev_id=-1,
+						const void* stream=nullptr);
 
 				void operator=(const MatDense<FPP,GPU2> & A);
 				void operator=(const MatDense<FPP,Cpu> & A);
@@ -66,12 +71,14 @@ namespace Faust
 				Real<FPP> norm();
 				Real<FPP> normL1();
 				void normalize();
-				MatDense<FPP, GPU2>* clone();
-				MatDense<FPP, Cpu> tocpu();
+				MatDense<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr);
+				void move(const int32_t dev_id=-1, const void* stream=nullptr);
+				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr);
 				~MatDense<FPP, GPU2>();
 			private:
 				static void* dsm_funcs;
 				static void* spm_funcs;
+				static void* gp_funcs;
 				gm_DenseMat_t gpu_mat;
 		};
 
@@ -80,6 +87,10 @@ namespace Faust
 
 	template <typename FPP>
 		void* Faust::MatDense<FPP,GPU2>::spm_funcs = nullptr;
+
+	template <typename FPP>
+		void* Faust::MatDense<FPP,GPU2>::gp_funcs = nullptr;
+
 };
 #include "faust_MatDense_gpu_double.hpp"
 #endif
