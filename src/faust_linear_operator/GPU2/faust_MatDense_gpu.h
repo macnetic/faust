@@ -57,6 +57,7 @@ namespace Faust
 				void operator*=(const MatDense<FPP, GPU2> &other);
 				void operator*=(const MatDense<FPP, Cpu> &other);
 //				void operator*=(MatSparse<FPP, Cpu> &other);
+				void operator*=(const FPP& lambda);
 				void scalarMultiply(const FPP& lambda);
 				void resize(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol);
 				void resize(const faust_unsigned_int nbRow){resize(nbRow,nbRow);}

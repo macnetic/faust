@@ -105,6 +105,12 @@ namespace Faust
 		}
 
 	template<>
+		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::operator*=(const @FAUST_SCALAR_FOR_GM@& lambda)
+		{
+			this->scalarMultiply(lambda);
+		}
+
+	template<>
 		Faust::MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(const void* stream/*=nullptr*/)
 		{
 			MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> cpu_mat(dim1, dim2);
