@@ -415,4 +415,22 @@ namespace Faust
 			this->dim1 = A.dim1;
 			this->dim2 = A.dim2;
 		}
+
+	template <>
+		void gemm(const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &A, const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &B, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &C,
+				const @FAUST_SCALAR_FOR_GM@& alpha, const @FAUST_SCALAR_FOR_GM@& beta, const char opA, const char opB)
+		{
+		    gm_Op gop_A = OP_NOTRANSP, gop_B = OP_NOTRANSP;
+		    if(opA == 'T')
+			gop_A = OP_TRANSP;
+		    else if(opA == 'H')
+			gop_A = OP_CONJTRANSP;
+		    if(opB == 'T')
+			gop_B = OP_TRANSP;
+		    else if(opB == 'H')
+			gop_B = OP_CONJTRANSP;
+		    auto dsm_funcs = ((gm_DenseMatFunc_@GM_SCALAR@*) MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::dsm_funcs);
+		    dsm_funcs->gemm(A.gpu_mat, B.gpu_mat, C.gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha), reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta), gop_A, gop_B);
+		}
+
 };

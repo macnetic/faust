@@ -10,9 +10,14 @@ namespace Faust
 	template<typename FPP,FDevice DEVICE>
     class MatDense;
 
+	template <typename FPP>
+	void gemm(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
+
 	template<typename FPP>
 		class MatDense<FPP, GPU2> : MatDense<FPP, Cpu>
 		{
+			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
+
 			public:
 				MatDense(const faust_unsigned_int nbRow,
 						const faust_unsigned_int nbCol,
@@ -82,6 +87,7 @@ namespace Faust
 				static void* gp_funcs;
 				gm_DenseMat_t gpu_mat;
 		};
+
 
 	template <typename FPP>
 		void* Faust::MatDense<FPP,GPU2>::dsm_funcs = nullptr;
