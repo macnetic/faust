@@ -1,0 +1,252 @@
+#include "faust_constant.h"
+#include "faust_gpu_mod.h"
+#include "faust_MatSparse.h"
+#include "faust_MatSparse_gpu.h"
+#include <cstdlib>
+#include <cmath>
+using namespace std;
+using namespace Faust;
+
+
+void test_gpu_norm()
+{
+	cout << "test MatSparse<FPP,GPU2>::norm()" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(
+			nrows,
+			ncols,
+			cpu_sp_mat->getNonZeros(),
+			cpu_sp_mat->getValuePtr(),
+			cpu_sp_mat->getRowPtr(),
+			cpu_sp_mat->getColInd());
+	assert(gpu_sp_mat.norm() == cpu_sp_mat->norm());
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+}
+
+void test_transpose()
+{
+	cout << "test MatSparse<FPP,GPU2>::transpose" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(
+			nrows,
+			ncols,
+			cpu_sp_mat->getNonZeros(),
+			cpu_sp_mat->getValuePtr(),
+			cpu_sp_mat->getRowPtr(),
+			cpu_sp_mat->getColInd());
+	gpu_sp_mat.transpose();
+	cpu_sp_mat->transpose();
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+}
+
+void test_adjoint()
+{
+	cout << "test MatSparse<FPP,GPU2>::adjoint" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(
+			nrows,
+			ncols,
+			cpu_sp_mat->getNonZeros(),
+			cpu_sp_mat->getValuePtr(),
+			cpu_sp_mat->getRowPtr(),
+			cpu_sp_mat->getColInd());
+	gpu_sp_mat.adjoint();
+	cpu_sp_mat->adjoint();
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+}
+
+void test_conjugate()
+{
+	cout << "test MatSparse<FPP,GPU2>::conjugate" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(
+			nrows,
+			ncols,
+			cpu_sp_mat->getNonZeros(),
+			cpu_sp_mat->getValuePtr(),
+			cpu_sp_mat->getRowPtr(),
+			cpu_sp_mat->getColInd());
+	gpu_sp_mat.conjugate();
+	cpu_sp_mat->conjugate();
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+}
+
+void test_gpu_ctor_and_tocpu()
+{
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(
+			nrows,
+			ncols,
+			cpu_sp_mat->getNonZeros(),
+			cpu_sp_mat->getValuePtr(),
+			cpu_sp_mat->getRowPtr(),
+			cpu_sp_mat->getColInd());
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	assert(cpu_sp_mat->norm() == cpu_sp_mat2.norm());
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+}
+
+void test_gpu_ctor_and_tocpu2()
+{
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	assert(cpu_sp_mat->norm() == cpu_sp_mat2.norm());
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+}
+
+void test_copy()
+{
+	cout << "test MatSparse<FPP,GPU2>::copy" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	int32_t nnz2, nrows2, nrows3;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	auto cpu_sp_mat2 = Faust::MatSparse<double, Cpu>::randMat(nrows*2, ncols*2, .2);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat3;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat2(*cpu_sp_mat2);
+	gpu_sp_mat = gpu_sp_mat2;
+	cout << "OK" << endl;
+}
+
+void test_clone()
+{
+	cout << "test MatSparse<FPP,GPU2>::clone" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	Faust::MatSparse<double, GPU2> *gpu_sp_mat2 = gpu_sp_mat.clone();
+	gpu_sp_mat2->tocpu(cpu_sp_mat2);
+	assert(gpu_sp_mat.norm() == gpu_sp_mat2->norm());
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
+	assert(diff_mat.norm() < 1e-3);
+	delete cpu_sp_mat;
+	cout << "OK" << endl;
+}
+
+void test_set_eyes()
+{
+	cout << "test MatSparse<FPP,GPU2>::setEyes" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	cpu_sp_mat->setEyes();
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	gpu_sp_mat.setEyes();
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	assert(gpu_sp_mat.norm() == gpu_sp_mat.norm());
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
+	assert(diff_mat.norm() < 1e-3);
+	delete cpu_sp_mat;
+	cout << "OK" << endl;
+}
+
+void test_set_zeros()
+{
+	cout << "test MatSparse<FPP,GPU2>::setZeros" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	cpu_sp_mat->setZeros();
+	gpu_sp_mat.setZeros();
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	cout << gpu_sp_mat.norm() << endl;
+	assert(gpu_sp_mat.norm() == gpu_sp_mat.norm());
+	assert(gpu_sp_mat.norm() == 0);
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
+	assert(diff_mat.norm() < 1e-3);
+	delete cpu_sp_mat;
+	cout << "OK" << endl;
+}
+
+void test_resize()
+{
+	cout << "test MatSparse<FPP,GPU2>::resize" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(
+			nrows,
+			ncols,
+			cpu_sp_mat->getNonZeros(),
+			cpu_sp_mat->getValuePtr(),
+			cpu_sp_mat->getRowPtr(),
+			cpu_sp_mat->getColInd());
+	auto nnz = 33;
+	auto nnrows = 50;
+	auto nncols = 123;
+	gpu_sp_mat.resize(nnz, nnrows, nncols);
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	assert(cpu_sp_mat2.getNbRow() == nnrows);
+	assert(cpu_sp_mat2.getNbCol() == nncols);
+	assert(cpu_sp_mat2.getNonZeros() == nnz);
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+}
+
+int main()
+{
+	Faust::enable_gpu_mod();
+	test_gpu_norm();
+	test_gpu_ctor_and_tocpu();
+	test_gpu_ctor_and_tocpu2();
+	test_transpose();
+	test_adjoint();
+	test_conjugate();
+	test_resize();
+	test_set_zeros();
+	test_set_eyes();
+	test_clone();
+	test_copy();
+}

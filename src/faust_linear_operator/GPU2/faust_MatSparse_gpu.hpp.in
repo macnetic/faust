@@ -1,0 +1,177 @@
+//TODO: move to cpp.in
+namespace Faust
+{
+
+
+	template<>
+	MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::MatSparse(
+			const faust_unsigned_int nbRow,
+			const faust_unsigned_int nbCol,
+			const int32_t nnz, /*= 0,*/
+			const @FAUST_SCALAR_FOR_GM@* values, /*= nullptr,*/
+			const int32_t* rowptr, /*= nullptr,*/
+			const int32_t* colinds, /*= nullptr,*/
+			const int32_t dev_id,/*=-1,*/
+			const void* stream)/*=nullptr)*/ : nbRow(nbRow), nbCol(nbCol)
+	{
+		FaustGPU<@FAUST_SCALAR_FOR_GM@>::load_gm_functions();
+		if(this->dsm_funcs == nullptr)
+			this->dsm_funcs = FaustGPU<@FAUST_SCALAR_FOR_GM@>::dsm_funcs;
+		if(this->spm_funcs == nullptr)
+			this->spm_funcs = FaustGPU<@FAUST_SCALAR_FOR_GM@>::spm_funcs;
+		if(this->gp_funcs == nullptr)
+			this->gp_funcs = FaustGPU<@FAUST_SCALAR_FOR_GM@>::gp_funcs;
+		auto spm_funcs = (gm_SparseMatFunc_@FAUST_SCALAR_FOR_GM@*) this->spm_funcs;
+		if(values != nullptr)
+		{
+			auto gp_funcs = ((gm_GenPurposeFunc_@GM_SCALAR@*)this->gp_funcs);
+			if(rowptr == nullptr || colinds == nullptr)
+				throw std::runtime_error("All GPU buffers or none must be defined to instantiate a MatSparse<FPP,GPU2>.");
+			auto cur_dev_id = gp_funcs->cur_dev();
+			gp_funcs->set_dev(dev_id);
+			gpu_mat = spm_funcs->togpu_stream(nbRow, nbCol, nnz, rowptr, colinds, values, stream);
+			gp_funcs->set_dev(cur_dev_id);
+			spm_funcs->info(gpu_mat, &this->nbRow, &this->nbCol, /*nnz*/ nullptr); //normally useless, but just in case
+		}
+		else gpu_mat = nullptr;
+	}
+
+	template<>
+		Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::~MatSparse()
+		{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			spm_funcs->free(gpu_mat);
+		}
+
+	// must be after the called ctor and the dtor to avoid an error "specialization after instantiation"
+	template<>
+	MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::MatSparse(
+			const MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>& M,
+			const int32_t dev_id,
+			const void* stream) : MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(M.getNbRow(),
+				M.getNbCol(), M.getNonZeros(), M.getValuePtr(), M.getRowPtr(), M.getColInd(),  dev_id, stream)
+	{
+	}
+
+	template<>
+	MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::MatSparse(
+			const MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>& M,
+			const int32_t dev_id,
+			const void* stream) : MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>(M), dev_id, stream)
+	{
+	}
+
+	template<>
+	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator=(const MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>& mat)
+	{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			spm_funcs->copy(mat.gpu_mat, gpu_mat);
+			nbRow = mat.nbRow;
+			nbCol = mat.nbCol;
+	}
+
+	template<>
+		void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu> & sp_mat)
+		{
+			int32_t nrows, ncols, nnz;
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			spm_funcs->info(gpu_mat, &nrows, &ncols, &nnz);
+			if(sp_mat.getNonZeros() != nnz || sp_mat.getNbRow() != nrows || sp_mat.getNbCol() != ncols)
+			{
+				sp_mat.resize(nnz, nrows, ncols);
+			}
+			spm_funcs->tocpu(gpu_mat, sp_mat.getRowPtr(), sp_mat.getColInd(), sp_mat.getValuePtr());
+		}
+
+	template<>
+		Real<@FAUST_SCALAR_FOR_GM@> Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::norm()
+		{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			return spm_funcs->norm_frob(gpu_mat);
+		}
+
+	template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::transpose()
+		{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+		    spm_funcs->transpose(gpu_mat);
+		}
+
+	template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::adjoint()
+		{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+		    spm_funcs->adjoint(gpu_mat);
+		}
+
+	template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::conjugate()
+		{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+		    spm_funcs->conjugate(gpu_mat);
+		}
+
+	template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::setEyes()
+		{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+		    spm_funcs->set_eyes(gpu_mat);
+		}
+
+	template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::setZeros()
+		{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+		    spm_funcs->set_zeros(gpu_mat);
+		}
+
+	template<>
+		MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>* MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::clone(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/)
+	{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*)this->spm_funcs);
+			auto gp_funcs = ((gm_GenPurposeFunc_@GM_SCALAR@*)this->gp_funcs);
+			auto cur_dev_id = gp_funcs->cur_dev();
+			// change to device where to create the clone
+			gp_funcs->set_dev(dev_id);
+			// use a stream (nullptr means default)
+			spm_funcs->set_stream(this->gpu_mat, stream);
+			auto gpu_mat = spm_funcs->clone(this->gpu_mat);
+			auto clone_mat = new Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(nbRow, nbCol, /*nnz*/ 0, /*values*/ nullptr, /*rowptr */ nullptr, /*colinds*/ nullptr, dev_id, stream);
+			clone_mat->gpu_mat = gpu_mat;
+			// return to previous device
+			gp_funcs->set_dev(cur_dev_id);
+			// disable the stream
+			spm_funcs->set_stream(this->gpu_mat, nullptr);
+			return clone_mat;
+	}
+
+	template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::resize(int32_t nnz, int32_t nrows, int32_t ncols)
+		{
+			nbRow = nrows;
+			nbCol = ncols;
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			spm_funcs->resize(gpu_mat, nnz, nrows, ncols);
+		}
+
+	template<>
+		int32_t Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getNbRow()
+		{
+			return nbRow;
+		}
+	template<>
+		int32_t Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getNbCol()
+		{
+			return nbCol;
+		}
+
+	template<>
+		int32_t Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getNonZeros()
+		{
+			auto spm_funcs = (gm_SparseMatFunc_@FAUST_SCALAR_FOR_GM@*) this->spm_funcs;
+			int32_t nnz;
+			spm_funcs->info(gpu_mat, nullptr, nullptr, &nnz); //TODO gpu_mod: add get_nnz, get_nrows, get_ncols
+		}
+
+
+};
