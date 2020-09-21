@@ -136,6 +136,26 @@ void test_gpu_ctor_and_tocpu2()
 	delete cpu_sp_mat;
 }
 
+void test_eq_operator_rhs_cpu()
+{
+	cout << "test MatSparse<FPP,GPU2>::operator=(MatSparse<FPP,Cpu>" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	auto cpu_sp_mat2 = Faust::MatSparse<double, Cpu>::randMat(nrows+1, ncols+4, .2);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat3;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	gpu_sp_mat = *cpu_sp_mat2;
+	gpu_sp_mat.tocpu(cpu_sp_mat3);
+	assert(gpu_sp_mat.norm() == cpu_sp_mat2->norm());
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat2;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat3);
+	assert(diff_mat.norm() < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+	delete cpu_sp_mat2;
+}
+
 void test_copy()
 {
 	cout << "test MatSparse<FPP,GPU2>::copy" << endl;
@@ -148,6 +168,7 @@ void test_copy()
 	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
 	Faust::MatSparse<double, GPU2> gpu_sp_mat2(*cpu_sp_mat2);
 	gpu_sp_mat = gpu_sp_mat2;
+	assert(std::abs(gpu_sp_mat.norm() - cpu_sp_mat2->norm()) < 1e-3);
 	cout << "OK" << endl;
 }
 
@@ -169,6 +190,24 @@ void test_clone()
 	cout << "OK" << endl;
 }
 
+void test_move()
+{
+	// TODO: really test on several devices if available with a specially created stream
+	cout << "test MatSparse<FPP,GPU2>::move" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	gpu_sp_mat.move(/*dev_id*/-1, /*stream*/ nullptr);
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
+	assert(diff_mat.norm() < 1e-3);
+	delete cpu_sp_mat;
+	cout << "OK" << endl;
+}
+
 void test_set_eyes()
 {
 	cout << "test MatSparse<FPP,GPU2>::setEyes" << endl;
@@ -179,6 +218,26 @@ void test_set_eyes()
 	cpu_sp_mat->setEyes();
 	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
 	gpu_sp_mat.setEyes();
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	assert(gpu_sp_mat.norm() == gpu_sp_mat.norm());
+	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
+	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
+	assert(diff_mat.norm() < 1e-3);
+	delete cpu_sp_mat;
+	cout << "OK" << endl;
+}
+
+void test_set_id()
+{
+	cout << "test MatSparse<FPP,GPU2>::setIdentity" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	cpu_sp_mat->resize(55,55);
+	cpu_sp_mat->setEyes(); // setIdentity not implemented in MatSparse<FPP,Cpu>
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	gpu_sp_mat.setIdentity(55);
 	gpu_sp_mat.tocpu(cpu_sp_mat2);
 	assert(gpu_sp_mat.norm() == gpu_sp_mat.norm());
 	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
@@ -235,12 +294,45 @@ void test_resize()
 	delete cpu_sp_mat;
 }
 
+void test_scal_mul()
+{
+	cout << "test MatSparse<FPP,GPU2>::operator*=(const FPP &scal)" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	double scalar = 55.;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	MatDense<double, Cpu> cpu_ds_mat(*cpu_sp_mat);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	cpu_ds_mat *= scalar;
+	gpu_sp_mat *= scalar;
+	assert(std::abs(gpu_sp_mat.norm() - cpu_ds_mat.norm()) < 1e-3);
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+}
+
+void test_is_equal()
+{
+	cout << "test MatSparse<FPP,GPU2>::operator==(const MatSparse<FPP,GPU2>& mat)" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	auto cpu_sp_mat2 = Faust::MatSparse<double, Cpu>::randMat(nrows+1, ncols+4, .2);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat2(*cpu_sp_mat2);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat3(*cpu_sp_mat2);
+	assert(gpu_sp_mat == gpu_sp_mat);
+	assert(gpu_sp_mat2 == gpu_sp_mat2);
+	assert(gpu_sp_mat3 != gpu_sp_mat2);
+	cout << "OK" << endl;
+}
+
 int main()
 {
 	Faust::enable_gpu_mod();
 	test_gpu_norm();
 	test_gpu_ctor_and_tocpu();
 	test_gpu_ctor_and_tocpu2();
+	test_eq_operator_rhs_cpu();
 	test_transpose();
 	test_adjoint();
 	test_conjugate();
@@ -249,4 +341,8 @@ int main()
 	test_set_eyes();
 	test_clone();
 	test_copy();
+	test_scal_mul();
+	test_set_id();
+	test_move();
+	test_is_equal();
 }

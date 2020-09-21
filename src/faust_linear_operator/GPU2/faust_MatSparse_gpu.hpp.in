@@ -21,9 +21,9 @@ namespace Faust
 			this->spm_funcs = FaustGPU<@FAUST_SCALAR_FOR_GM@>::spm_funcs;
 		if(this->gp_funcs == nullptr)
 			this->gp_funcs = FaustGPU<@FAUST_SCALAR_FOR_GM@>::gp_funcs;
-		auto spm_funcs = (gm_SparseMatFunc_@FAUST_SCALAR_FOR_GM@*) this->spm_funcs;
 		if(values != nullptr)
 		{
+			auto spm_funcs = (gm_SparseMatFunc_@FAUST_SCALAR_FOR_GM@*) this->spm_funcs;
 			auto gp_funcs = ((gm_GenPurposeFunc_@GM_SCALAR@*)this->gp_funcs);
 			if(rowptr == nullptr || colinds == nullptr)
 				throw std::runtime_error("All GPU buffers or none must be defined to instantiate a MatSparse<FPP,GPU2>.");
@@ -31,7 +31,7 @@ namespace Faust
 			gp_funcs->set_dev(dev_id);
 			gpu_mat = spm_funcs->togpu_stream(nbRow, nbCol, nnz, rowptr, colinds, values, stream);
 			gp_funcs->set_dev(cur_dev_id);
-			spm_funcs->info(gpu_mat, &this->nbRow, &this->nbCol, /*nnz*/ nullptr); //normally useless, but just in case
+			spm_funcs->info(gpu_mat, &this->nbRow, &this->nbCol, /*nnz*/ nullptr); //normally useless (bcause dims are already initialized), but init from GPU again just in case of inconsistency that would show up in tests
 		}
 		else gpu_mat = nullptr;
 	}
@@ -39,16 +39,19 @@ namespace Faust
 	template<>
 		Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::~MatSparse()
 		{
-			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
-			spm_funcs->free(gpu_mat);
+			if(gpu_mat != nullptr)
+			{
+				auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+				spm_funcs->free(gpu_mat);
+			}
 		}
 
 	// must be after the called ctor and the dtor to avoid an error "specialization after instantiation"
 	template<>
 	MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::MatSparse(
 			const MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>& M,
-			const int32_t dev_id,
-			const void* stream) : MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(M.getNbRow(),
+			const int32_t dev_id/*=-1*/,
+			const void* stream/*=nullptr*/) : MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(M.getNbRow(),
 				M.getNbCol(), M.getNonZeros(), M.getValuePtr(), M.getRowPtr(), M.getColInd(),  dev_id, stream)
 	{
 	}
@@ -68,6 +71,45 @@ namespace Faust
 			spm_funcs->copy(mat.gpu_mat, gpu_mat);
 			nbRow = mat.nbRow;
 			nbCol = mat.nbCol;
+	}
+
+	template<>
+	bool MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator==(const MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>& mat) const
+	{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			return spm_funcs->is_equal(gpu_mat, mat.gpu_mat);
+	}
+
+	template<>
+	bool MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator!=(const MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>& mat) const
+	{
+		return ! ((*this) == mat);
+	}
+
+	template<>
+	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator*=(const @FAUST_SCALAR_FOR_GM@& scalar)
+	{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			spm_funcs->mul_scalar(gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
+	}
+
+	template<>
+	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator/=(const @FAUST_SCALAR_FOR_GM@& scalar)
+	{
+		*this *= ((@FAUST_SCALAR_FOR_GM@)1)/scalar;
+	}
+
+	template<>
+	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator=(const MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>& mat)
+	{
+		// copy on current device
+		MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2> gmat(mat);
+		auto spm_funcs = (gm_SparseMatFunc_@FAUST_SCALAR_FOR_GM@*) this->spm_funcs;
+		spm_funcs->free(this->gpu_mat);
+		this->gpu_mat = gmat.gpu_mat;
+		this->nbRow = gmat.nbRow;
+		this->nbCol = gmat.nbCol;
+		gmat.gpu_mat = nullptr; // to avoid freeing the new gpu_mat when leaving this scope
 	}
 
 	template<>
@@ -118,6 +160,25 @@ namespace Faust
 		    spm_funcs->set_eyes(gpu_mat);
 		}
 
+
+	template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::resize(int32_t nnz, int32_t nrows, int32_t ncols)
+		{
+			nbRow = nrows;
+			nbCol = ncols;
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			spm_funcs->resize(gpu_mat, nnz, nrows, ncols);
+		}
+
+
+	template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::setIdentity(int32_t dim)
+		{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			resize(dim, dim, dim);
+			setEyes();
+		}
+
 	template<>
 		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::setZeros()
 		{
@@ -146,12 +207,13 @@ namespace Faust
 	}
 
 	template<>
-		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::resize(int32_t nnz, int32_t nrows, int32_t ncols)
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::move(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/)
 		{
-			nbRow = nrows;
-			nbCol = ncols;
-			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
-			spm_funcs->resize(gpu_mat, nnz, nrows, ncols);
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*)this->spm_funcs);
+			//TODO: backup possible pre-existing stream to restore it afterward
+			spm_funcs->set_stream(gpu_mat, stream);
+			spm_funcs->mv_to_gpu(gpu_mat, dev_id);
+			spm_funcs->set_stream(gpu_mat, nullptr);
 		}
 
 	template<>
@@ -159,6 +221,7 @@ namespace Faust
 		{
 			return nbRow;
 		}
+
 	template<>
 		int32_t Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getNbCol()
 		{

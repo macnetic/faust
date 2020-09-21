@@ -41,6 +41,11 @@ namespace Faust
 						const void* stream=nullptr);
 
 				void operator=(const MatSparse<FPP, GPU2>& mat);
+				void operator=(const MatSparse<FPP, Cpu>& mat);
+				void operator*=(const FPP& alpha);
+				void operator/=(const FPP& alpha);
+				bool operator==(const MatSparse<FPP, GPU2>& mat) const;
+				bool operator!=(const MatSparse<FPP, GPU2>& mat) const;
 
 				void tocpu(MatSparse<FPP,Cpu> &sp_mat);
 				Real<FPP> norm();
@@ -50,8 +55,10 @@ namespace Faust
 
 				void resize(int32_t nnz, int32_t nrows, int32_t ncols);
 				void setEyes();
+				void setIdentity(int32_t dim);
 				void setZeros();
 				MatSparse<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr);
+				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				int32_t getNbRow();
 				int32_t getNbCol();
 				int32_t getNonZeros();
