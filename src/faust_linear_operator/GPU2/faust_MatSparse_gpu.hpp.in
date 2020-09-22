@@ -100,6 +100,20 @@ namespace Faust
 	}
 
 	template<>
+	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator+=(const @FAUST_SCALAR_FOR_GM@& scalar)
+	{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			spm_funcs->add_scalar(gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
+	}
+
+	template<>
+	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator-=(const @FAUST_SCALAR_FOR_GM@& scalar)
+	{
+			auto spm_funcs = ((gm_SparseMatFunc_@GM_SCALAR@*) this->spm_funcs);
+			spm_funcs->sub_scalar(gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
+	}
+
+	template<>
 	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator=(const MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>& mat)
 	{
 		// copy on current device

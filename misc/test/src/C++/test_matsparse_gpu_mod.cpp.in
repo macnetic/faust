@@ -310,6 +310,48 @@ void test_scal_mul()
 	delete cpu_sp_mat;
 }
 
+void test_scal_add()
+{
+	cout << "test MatSparse<FPP,GPU2>::operator+=(const FPP &scal)" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	double scalar = 55.;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	MatDense<double, Cpu> cpu_ds_mat(*cpu_sp_mat);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	gpu_sp_mat += scalar;
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	for(int i=0;i<nrows;i++)
+		for(int j=0;j<ncols;j++)
+		{
+			assert(std::abs(cpu_sp_mat2(i,j) - cpu_ds_mat(i,j) - 55 )< 1e-6 || cpu_sp_mat2(i,j) == 0);
+		}
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+}
+
+void test_scal_sub()
+{
+	cout << "test MatSparse<FPP,GPU2>::operator-=(const FPP &scal)" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	double scalar = 55.;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	MatDense<double, Cpu> cpu_ds_mat(*cpu_sp_mat);
+	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	gpu_sp_mat -= scalar;
+	gpu_sp_mat.tocpu(cpu_sp_mat2);
+	for(int i=0;i<nrows;i++)
+		for(int j=0;j<ncols;j++)
+		{
+			assert(std::abs(cpu_sp_mat2(i,j) -  cpu_ds_mat(i,j) + 55)<1e-6|| cpu_sp_mat2(i,j) == 0);
+		}
+	cout << "OK" << endl;
+	delete cpu_sp_mat;
+}
+
 void test_is_equal()
 {
 	cout << "test MatSparse<FPP,GPU2>::operator==(const MatSparse<FPP,GPU2>& mat)" << endl;
@@ -342,6 +384,8 @@ int main()
 	test_clone();
 	test_copy();
 	test_scal_mul();
+	test_scal_add();
+	test_scal_sub();
 	test_set_id();
 	test_move();
 	test_is_equal();

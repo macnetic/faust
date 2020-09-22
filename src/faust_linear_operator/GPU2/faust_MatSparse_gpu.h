@@ -44,6 +44,14 @@ namespace Faust
 				void operator=(const MatSparse<FPP, Cpu>& mat);
 				void operator*=(const FPP& alpha);
 				void operator/=(const FPP& alpha);
+				/**
+				 * Subtracts a scalar value ONLY to nonzeros (zeros stay zeros).
+				 */
+				void operator-=(const FPP& alpha);
+				/**
+				 * Adds a scalar value ONLY to nonzeros (zeros stay zeros).
+				 */
+				void operator+=(const FPP& alpha);
 				bool operator==(const MatSparse<FPP, GPU2>& mat) const;
 				bool operator!=(const MatSparse<FPP, GPU2>& mat) const;
 
