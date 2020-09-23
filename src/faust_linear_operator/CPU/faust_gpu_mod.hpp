@@ -18,6 +18,7 @@ bool Faust::FaustGPU<FPP>::are_cpu_mat_all_known(const std::vector<MatGeneric<FP
 
 namespace Faust
 {
+	//TODO: these functions have to move elsewhere more appropriate or simply disappear
 	template<>
 		void set_one<double>(double* scal)
 		{

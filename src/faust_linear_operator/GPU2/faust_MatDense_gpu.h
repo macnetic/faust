@@ -2,18 +2,17 @@
 #define __FAUST_MATDENSE_GPU2__
 #ifdef USE_GPU_MOD
 #include "faust_MatDense.h"
+#include "faust_MatGeneric_gpu.h"
 #include "faust_gpu_mod_utils.h"
 namespace Faust
 {
-
-	template<typename FPP,FDevice DEVICE>
-    class MatDense;
-
 	template <typename FPP>
 	void gemm(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 
+
+
 	template<typename FPP>
-		class MatDense<FPP, GPU2> : MatDense<FPP, Cpu>
+		class MatDense<FPP, GPU2> : public MatGeneric<FPP,GPU2>
 		{
 			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 
@@ -86,11 +85,14 @@ namespace Faust
 				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr) const;
 				void Display() const;
 				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
+				int32_t getNbRow() const;
+				int32_t getNbCol() const;
 			private:
 				gm_DenseMat_t gpu_mat;
 		};
 
-};
+
+}
 #include "faust_MatDense_gpu_double.hpp"
 #endif
 #endif

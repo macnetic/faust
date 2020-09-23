@@ -61,7 +61,7 @@ namespace Faust
 
 		void insert(const Faust::MatGeneric<FPP,Cpu>* M, int32_t id);
 
-		/** TODO: this function should be deleted because it definitely slower than the version 2 */
+		/** TODO: this function should be deleted because it is definitely slower than the version 2 */
 		FPP power_iteration(int32_t max_iter, Real<FPP> threshold, int& flag);
 
 		/** This version differs from power_iteration in the way it computes F'Fv in this order F'(Fv)

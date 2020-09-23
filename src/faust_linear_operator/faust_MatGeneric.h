@@ -216,6 +216,7 @@ namespace Faust
 			faust_unsigned_int dim2;
 			bool is_ortho;
 			bool is_identity;
+			//TODO: add is_zeros
 
 
 

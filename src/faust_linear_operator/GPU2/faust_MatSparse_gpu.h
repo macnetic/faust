@@ -3,15 +3,12 @@
 #ifdef USE_GPU_MOD
 #include "faust_gpu_mod_utils.h"
 #include "faust_constant.h"
+#include "faust_MatGeneric_gpu.h"
 namespace Faust
 {
 
-	template<typename FPP,FDevice DEVICE>
-    class MatSparse;
-
-
 	template<typename FPP>
-		class MatSparse<FPP, GPU2>
+		class MatSparse<FPP, GPU2> : public MatGeneric<FPP,GPU2>
 		{
 
 			public:
@@ -66,8 +63,8 @@ namespace Faust
 				void setZeros();
 				MatSparse<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr);
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
-				int32_t getNbRow();
-				int32_t getNbCol();
+				int32_t getNbRow() const;
+				int32_t getNbCol() const;
 				int32_t getNonZeros();
 				int32_t getDevice() const;
 				void Display() const;
@@ -75,8 +72,6 @@ namespace Faust
 				~MatSparse();
 
 			private:
-				int32_t nbRow;
-				int32_t nbCol;
 				gm_SparseMat_t gpu_mat;
 		};
 

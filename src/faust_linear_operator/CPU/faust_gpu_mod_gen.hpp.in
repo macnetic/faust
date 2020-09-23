@@ -200,7 +200,7 @@ namespace Faust
 	Faust::RefManager FaustGPU<@FAUST_SCALAR_FOR_GM@>::ref_man([](void *fact)
 		{
 			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
-			//normally cpu_gpu_map must contains a the key fac if ref_man knew it (see ctor)
+			//normally cpu_gpu_map must contain the fact key if ref_man knew it (see ctor)
 			gp_funcs->free_mat(Faust::FaustGPU<@FAUST_SCALAR_FOR_GM@>::cpu_gpu_map[fact]);
 			Faust::FaustGPU<@FAUST_SCALAR_FOR_GM@>::cpu_gpu_map.erase(fact);
 		});
