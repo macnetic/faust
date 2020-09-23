@@ -1,31 +1,6 @@
 #include "faust_TransformHelper.h"
 namespace Faust
 {
-	template <>
-	void FaustGPU<@FAUST_SCALAR_FOR_GM@>::load_gm_functions()
-	{
-		gm_DenseMatFunc_@GM_SCALAR@* dsm_funcs;
-		gm_MatArrayFunc_@GM_SCALAR@* marr_funcs;
-		gm_GenPurposeFunc_@GM_SCALAR@* gp_funcs;
-
-		if(FaustGPU<@FAUST_SCALAR_FOR_GM@>::marr_funcs == nullptr)
-		{
-			marr_funcs = new gm_MatArrayFunc_@GM_SCALAR@(); // on the heap because because it cannot be shared among FaustGPU instances if on the stack
-			dsm_funcs = new gm_DenseMatFunc_@GM_SCALAR@();
-			gp_funcs = new gm_GenPurposeFunc_@GM_SCALAR@();
-			spm_funcs = new gm_SparseMatFunc_@GM_SCALAR@();
-			load_marr_funcs_@GM_SCALAR@(gm_handle, marr_funcs);
-			load_dsm_funcs_@GM_SCALAR@(gm_handle, dsm_funcs);
-			load_spm_funcs_@GM_SCALAR@(gm_handle, static_cast<gm_SparseMatFunc_@GM_SCALAR@*>(spm_funcs));
-			load_gp_funcs_@GM_SCALAR@(gm_handle, gp_funcs);
-			FaustGPU<@FAUST_SCALAR_FOR_GM@>::marr_funcs = marr_funcs;
-			FaustGPU<@FAUST_SCALAR_FOR_GM@>::dsm_funcs = dsm_funcs;
-			FaustGPU<@FAUST_SCALAR_FOR_GM@>::gp_funcs = gp_funcs;
-			FaustGPU<@FAUST_SCALAR_FOR_GM@>::spm_funcs = spm_funcs;
-		}
-
-	}
-
 
 	template <>
 		MatDense<@FAUST_SCALAR_FOR_GM@,Cpu> FaustGPU<@FAUST_SCALAR_FOR_GM@>::get_product(const bool transpose /* = false */, const bool conjugate /* = false */)
@@ -36,8 +11,8 @@ namespace Faust
 					op = OP_CONJTRANSP;
 				else
 					op = OP_TRANSP;
-			gm_DenseMatFunc_@GM_SCALAR@* dsm_funcs = (gm_DenseMatFunc_@GM_SCALAR@*) this->dsm_funcs;
-			gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			@GM_SCALAR@ one;
 			set_one<@GM_SCALAR@>(&one);
 			auto gpu_prod_mat_dense = marr_funcs->chain_matmul(gpu_mat_arr, one, op);
@@ -52,7 +27,7 @@ namespace Faust
 	template <>
 		Vect<@FAUST_SCALAR_FOR_GM@, Cpu> FaustGPU<@FAUST_SCALAR_FOR_GM@>::multiply(const Vect<@FAUST_SCALAR_FOR_GM@,Cpu>& v, const bool transpose, const bool conjugate)
 		{
-			std::cout << "FaustGPU::multiply(Vect)" << std::endl;
+//			std::cout << "FaustGPU::multiply(Vect)" << std::endl;
 			@GM_SCALAR@ one;
 			set_one<@GM_SCALAR@>(&one);
 			int32_t out_size = this->ncols; // default is transpose here
@@ -70,7 +45,7 @@ namespace Faust
 
 			Vect<@FAUST_SCALAR_FOR_GM@, Cpu> out_vec(out_size);
 
-			gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			marr_funcs->chain_matmul_by_cpu_dsm_tocpu(gpu_mat_arr, one, op, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(const_cast<@FAUST_SCALAR_FOR_GM@*>(v.getData())), v.size(), 1, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(out_vec.getData()));
 
 			return out_vec;
@@ -79,7 +54,7 @@ namespace Faust
 	template <>
 		MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> FaustGPU<@FAUST_SCALAR_FOR_GM@>::multiply(const MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>* A, const bool transpose, const bool conjugate)
 		{
-			std::cout << "FaustGPU::multiply(MatGeneric)" << std::endl;
+//			std::cout << "FaustGPU::multiply(MatGeneric)" << std::endl;
 			const MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>* sp_mat;
 			const MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>* ds_mat;
 			int32_t out_nrows;
@@ -100,7 +75,7 @@ namespace Faust
 
 			MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> out_mat(out_nrows, A->getNbCol());
 
-			gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(sp_mat = dynamic_cast<const MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu>*>(A))
 			{
 
@@ -125,7 +100,7 @@ namespace Faust
 		{
 			if(use_ref_man)
 				ref_man.release(*(cpu_mat_ptrs.begin()));
-			auto marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			marr_funcs->erase_at(gpu_mat_arr, 0, !use_ref_man);
 			cpu_mat_ptrs.erase(cpu_mat_ptrs.begin());
 		}
@@ -138,7 +113,8 @@ namespace Faust
 		{
 			if(use_ref_man)
 				ref_man.release(*(cpu_mat_ptrs.end()-1));
-			auto marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+
 			marr_funcs->erase_at(gpu_mat_arr, cpu_mat_ptrs.size()-1, !use_ref_man);
 			cpu_mat_ptrs.erase(cpu_mat_ptrs.end()-1);
 		}
@@ -152,10 +128,9 @@ namespace Faust
 		MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>* ds_mat;
 		void* gpu_ref; //sp or ds mat
 
-		auto dsm_funcs = (gm_DenseMatFunc_@GM_SCALAR@*) this->dsm_funcs;
-		auto marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
-		auto gp_funcs = (gm_GenPurposeFunc_@GM_SCALAR@*) this->gp_funcs;
-
+		auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+		auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+		auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
 
 		if(use_ref_man && cpu_gpu_map.find(M) != cpu_gpu_map.end())
 		{
@@ -206,8 +181,9 @@ namespace Faust
 	template <>
 		FaustGPU<@FAUST_SCALAR_FOR_GM@>::~FaustGPU()
 		{
-			gm_users--;
-			gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+
+
 			if(use_ref_man)
 			{
 				// release all gpu mats
@@ -218,20 +194,12 @@ namespace Faust
 				}
 			}
 			marr_funcs->free(gpu_mat_arr, ! use_ref_man); // delete used mats only if it doesn't use ref_man
-			if(gm_users <= 0)
-			{
-				gm_close_lib(gm_handle);
-				delete (gm_MatArrayFunc_@GM_SCALAR@*) marr_funcs;
-//				gm_GenPurposeFunc_@GM_SCALAR@* marr_funcs = (gm_GenPurposeFunc_@GM_SCALAR@*) this->gp_funcs;
-				delete (gm_DenseMatFunc_@GM_SCALAR@*) dsm_funcs;
-//				delete (gm_GenPurposeFunc_@GM_SCALAR@*) gp_funcs;
-			}
 		}
 
 	template<>
 	Faust::RefManager FaustGPU<@FAUST_SCALAR_FOR_GM@>::ref_man([](void *fact)
 		{
-			gm_GenPurposeFunc_@GM_SCALAR@* gp_funcs = (gm_GenPurposeFunc_@GM_SCALAR@*) Faust::FaustGPU<@FAUST_SCALAR_FOR_GM@>::gp_funcs;
+			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
 			//normally cpu_gpu_map must contains a the key fac if ref_man knew it (see ctor)
 			gp_funcs->free_mat(Faust::FaustGPU<@FAUST_SCALAR_FOR_GM@>::cpu_gpu_map[fact]);
 			Faust::FaustGPU<@FAUST_SCALAR_FOR_GM@>::cpu_gpu_map.erase(fact);
@@ -241,16 +209,12 @@ namespace Faust
 		FaustGPU<@FAUST_SCALAR_FOR_GM@>::FaustGPU(const std::vector<MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>*>& factors) : use_ref_man(true)
 	{
 		//	std::cout << "FaustGPU<@FAUST_SCALAR_FOR_GM@>::FaustGPU()" << " marr_funcs:" << marr_funcs << std::endl;
-		check_gpu_mod_loaded();
-		this->load_gm_functions(); //lazy instantiation
+		GPUModHandler::get_singleton()->check_gpu_mod_loaded();
 
-		gm_DenseMatFunc_@GM_SCALAR@* dsm_funcs = (gm_DenseMatFunc_@GM_SCALAR@*) this->dsm_funcs;
-		gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
-		gm_GenPurposeFunc_@GM_SCALAR@* gp_funcs = (gm_GenPurposeFunc_@GM_SCALAR@*) this->gp_funcs;
-
-		//	std::cout << "FaustGPU<@FAUST_SCALAR_FOR_GM@>::FaustGPU() factors size: " << factors.size() << " marr_funcs:" << marr_funcs << std::endl;
+		auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+		auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+		auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
 		gpu_mat_arr = marr_funcs->create();
-		//	std::cout << "FaustGPU<@FAUST_SCALAR_FOR_GM@>::FaustGPU() factors size: " << factors.size() << std::endl;
 		nrows = factors[0]->getNbRow();
 		ncols = (*(factors.end()-1))->getNbCol();
 		for(auto m: factors)
@@ -273,7 +237,7 @@ namespace Faust
 			throw std::runtime_error("It's not authorized to update from another cpu matrix than the original one.");
 		}
 
-		gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+		auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 		MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>* sp_mat;
 		MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>* ds_mat;
 		void* gpu_ref;
@@ -299,7 +263,7 @@ namespace Faust
 	void FaustGPU<@FAUST_SCALAR_FOR_GM@>::insert(const Faust::MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>* M, int32_t id)
 	{
 		MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>* M_ = const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,Cpu>*>(M);
-		gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+		auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 		MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu>* sp_mat;
 		MatDense<@FAUST_SCALAR_FOR_GM@, Cpu>* ds_mat;
 		void* gpu_ref;
@@ -349,8 +313,8 @@ namespace Faust
 	template<>
 		Real<@FAUST_SCALAR_FOR_GM@> FaustGPU<@FAUST_SCALAR_FOR_GM@>::spectral_norm(int32_t max_iter, Real<@FAUST_SCALAR_FOR_GM@> threshold)
 		{
-			std::cout << "FaustGPU::spectral_norm" << std::endl;
-			gm_MatArrayFunc_@GM_SCALAR@* marr_funcs = (gm_MatArrayFunc_@GM_SCALAR@*) this->marr_funcs;
+//			std::cout << "FaustGPU::spectral_norm" << std::endl;
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			return marr_funcs->spectral_norm(gpu_mat_arr, (float) threshold, max_iter);
 		}
 }

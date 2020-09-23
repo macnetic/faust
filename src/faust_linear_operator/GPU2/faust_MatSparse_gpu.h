@@ -1,8 +1,7 @@
 #ifndef __FAUST_MATSPARSE_GPU2__
 #define __FAUST_MATSPARSE_GPU2__
 #ifdef USE_GPU_MOD
-#define __GM_LOADER__
-#include "gm_interf.h"
+#include "faust_gpu_mod_utils.h"
 #include "faust_constant.h"
 namespace Faust
 {
@@ -70,26 +69,15 @@ namespace Faust
 				int32_t getNbRow();
 				int32_t getNbCol();
 				int32_t getNonZeros();
+//				int32_t getDevice();
 				~MatSparse();
 
 			private:
 				int32_t nbRow;
 				int32_t nbCol;
-				static void* dsm_funcs;
-				static void* spm_funcs;
-				static void* gp_funcs;
 				gm_SparseMat_t gpu_mat;
 		};
 
-
-	template <typename FPP>
-		void* Faust::MatSparse<FPP,GPU2>::dsm_funcs = nullptr;
-
-	template <typename FPP>
-		void* Faust::MatSparse<FPP,GPU2>::spm_funcs = nullptr;
-
-	template <typename FPP>
-		void* Faust::MatSparse<FPP,GPU2>::gp_funcs = nullptr;
 
 };
 #include "faust_MatSparse_gpu_double.hpp"

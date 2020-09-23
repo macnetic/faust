@@ -2,8 +2,7 @@
 #define __FAUST_MATDENSE_GPU2__
 #ifdef USE_GPU_MOD
 #include "faust_MatDense.h"
-#define __GM_LOADER__
-#include "gm_interf.h"
+#include "faust_gpu_mod_utils.h"
 namespace Faust
 {
 
@@ -25,6 +24,8 @@ namespace Faust
 						const bool no_alloc=false,
 						const int32_t dev_id=-1,
 						const void* stream=nullptr);
+
+				MatDense(const MatDense<FPP,Cpu>& mat, const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/);
 
 				void operator=(const MatDense<FPP,GPU2> & A);
 				void operator=(const MatDense<FPP,Cpu> & A);
@@ -82,21 +83,8 @@ namespace Faust
 				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr);
 				~MatDense<FPP, GPU2>();
 			private:
-				static void* dsm_funcs;
-				static void* spm_funcs;
-				static void* gp_funcs;
 				gm_DenseMat_t gpu_mat;
 		};
-
-
-	template <typename FPP>
-		void* Faust::MatDense<FPP,GPU2>::dsm_funcs = nullptr;
-
-	template <typename FPP>
-		void* Faust::MatDense<FPP,GPU2>::spm_funcs = nullptr;
-
-	template <typename FPP>
-		void* Faust::MatDense<FPP,GPU2>::gp_funcs = nullptr;
 
 };
 #include "faust_MatDense_gpu_double.hpp"

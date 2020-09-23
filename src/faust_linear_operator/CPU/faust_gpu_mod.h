@@ -1,8 +1,7 @@
 #ifndef __FAUST_GPU__
 #define __FAUST_GPU__
-#define __GM_LOADER__
 #include "faust_RefManager.h"
-#include "gm_interf.h"
+#include "faust_gpu_mod_utils.h"
 #include <exception>
 #include <iostream>
 #include <vector>
@@ -18,17 +17,11 @@ namespace Faust
 	{
 
 		static RefManager ref_man;
-		static void *gm_handle;
-		static int *gm_users;
 		public:
-		static void* marr_funcs; //void because we don't know FPP yet and templates aren't available through shared lib interface (extern C, no name mangling)
-		static void* dsm_funcs;
-		static void* spm_funcs;
 #ifdef _MSC_VER
 		public: // should not be public but Visual Studio 14 (and only it) can't access private members from lambda exp (error C2248) // cf. ref_man ini.
-				//TODO: set back to private later (mayber with a more recent version)
+				//TODO: set back to private later (maybe with a more recent version)
 #endif
-		static void* gp_funcs;
 #ifdef _MSC_VER
 		private:
 #endif
@@ -86,15 +79,10 @@ namespace Faust
 		/* Returns true if is_cpu_mat_known returns true for each matrix in mats, false otherwise */
 		static bool are_cpu_mat_all_known(const std::vector<MatGeneric<FPP,Cpu>*> mats);
 
-		static void* init_gpu_mod(const std::string& libpath = "libgm.so", const bool silent = false, void* gm_handle = nullptr);
-		static void load_gm_functions();
-		static void check_gpu_mod_loaded();
 	};
 
 	template<typename T>
 		void set_one(T* scal);
-
-	void* enable_gpu_mod(const char* libpath= "libgm.so", const bool silent = false);
 
 }
 
