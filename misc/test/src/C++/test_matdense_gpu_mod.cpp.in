@@ -2,6 +2,8 @@
 #include "faust_gpu_mod.h"
 #include "faust_MatDense_gpu.h"
 #include "faust_MatSparse.h"
+#include "faust_gpu_mod_utils.h"
+#include "faust_cuda_device.h"
 #include <cstdlib>
 #include <cmath>
 using namespace std;
@@ -389,6 +391,45 @@ void test_sub()
 	cout << "OK" << endl;
 }
 
+void test_get_device()
+{
+	cout << "test MatDense<FPP,GPU2>::getDevice" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_ds_mat = Faust::MatDense<double, Cpu>::randMat(nrows, ncols);
+	Faust::MatDense<double, GPU2> gpu_ds_mat(nrows, ncols, cpu_ds_mat->getData());
+	auto dev_id = gpu_ds_mat.getDevice();
+	cout << "device id: " << dev_id << endl;
+	delete cpu_ds_mat;
+}
+
+void test_move()
+{
+	cout << "test MatDense<FPP,GPU2>::move" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_ds_mat = Faust::MatDense<double, Cpu>::randMat(nrows, ncols);
+	Faust::MatDense<double, GPU2> gpu_ds_mat(nrows, ncols, cpu_ds_mat->getData());
+	auto ndevs = Faust::count_devices();
+	cout << "device count: " << ndevs << endl;
+	int32_t dest_dev = -1;
+	if(ndevs > 1)
+	{
+		// use the last device as destination if more than one are available
+		dest_dev = ndevs -1;
+	}
+	gpu_ds_mat.move(/*dev_id*/dest_dev, /*stream*/ nullptr);
+	cout << "gpu_sp_mat.getDevice():" << gpu_ds_mat.getDevice() << endl;
+	assert(dest_dev == -1 || gpu_ds_mat.getDevice() == dest_dev);
+	cout << "new device id: " << gpu_ds_mat.getDevice() << endl;
+	auto gpu_ds_mat_to_cpu = gpu_ds_mat.tocpu();
+	auto err_diff = *cpu_ds_mat;
+	err_diff -= gpu_ds_mat_to_cpu;
+	auto err = err_diff.norm()/cpu_ds_mat->norm();
+	assert(err < 1e-6);
+	delete cpu_ds_mat;
+}
+
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
@@ -409,5 +450,7 @@ int main(int argc, char** argv)
 	test_sub();
 	test_mul_eq_op();
 	test_mul_spm();
+	test_get_device();
+	test_move();
 	return EXIT_SUCCESS;
 }

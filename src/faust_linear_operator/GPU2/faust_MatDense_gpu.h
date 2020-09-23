@@ -78,6 +78,7 @@ namespace Faust
 				Real<FPP> norm();
 				Real<FPP> normL1();
 				void normalize();
+				int32_t getDevice();
 				MatDense<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr);
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr);

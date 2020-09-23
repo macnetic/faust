@@ -434,7 +434,13 @@ namespace Faust
 		    dsm_funcs->gemm(A.gpu_mat, B.gpu_mat, C.gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha), reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta), gop_A, gop_B);
 		}
 
-
+	    template<>
+	    int32_t Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getDevice()
+	    {
+		auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+		int32_t dev_id = dsm_funcs->get_dev(gpu_mat);
+		return dev_id;
+	    }
 
 
 };

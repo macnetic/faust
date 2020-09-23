@@ -692,7 +692,7 @@ if(NOT BUILD_USE_GPU)
 	endforeach()
 endif()
 if(USE_GPU_MOD)
-	list(APPEND CPP_FILES ${FAUST_SRC_LINEAR_OPERATOR_DIR}/GPU2/faust_gpu_mod_utils.cpp)
+	list(APPEND CPP_FILES ${FAUST_SRC_LINEAR_OPERATOR_DIR}/GPU2/faust_cuda_device.cpp ${FAUST_SRC_LINEAR_OPERATOR_DIR}/GPU2/faust_gpu_mod_utils.cpp)
 endif()
 message(STATUS "algorithm cpp files ${CPP_FILES}")
 ### include directory 

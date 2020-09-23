@@ -69,7 +69,7 @@ namespace Faust
 				int32_t getNbRow();
 				int32_t getNbCol();
 				int32_t getNonZeros();
-//				int32_t getDevice();
+				int32_t getDevice();
 				~MatSparse();
 
 			private:

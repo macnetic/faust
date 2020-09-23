@@ -2,6 +2,7 @@
 #include "faust_gpu_mod.h"
 #include "faust_MatSparse.h"
 #include "faust_MatSparse_gpu.h"
+#include "faust_cuda_device.h"
 #include <cstdlib>
 #include <cmath>
 using namespace std;
@@ -192,14 +193,24 @@ void test_clone()
 
 void test_move()
 {
-	// TODO: really test on several devices if available with a specially created stream
+	// TODO: test with a specially created stream
 	cout << "test MatSparse<FPP,GPU2>::move" << endl;
 	auto nrows = 5;
 	auto ncols = 8;
 	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
 	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
 	Faust::MatSparse<double, Cpu> cpu_sp_mat2;
-	gpu_sp_mat.move(/*dev_id*/-1, /*stream*/ nullptr);
+	auto ndevs = Faust::count_devices();
+	cout << "device count: " << ndevs << endl;
+	int32_t dest_dev = -1;
+	if(ndevs > 1)
+	{
+		// use the last device as destination if more than one are available
+		dest_dev = ndevs -1;
+	}
+	gpu_sp_mat.move(/*dev_id*/dest_dev, /*stream*/ nullptr);
+	cout << "gpu_sp_mat.getDevice():" << gpu_sp_mat.getDevice() << endl;
+	assert(dest_dev == -1 || gpu_sp_mat.getDevice() == dest_dev);
 	gpu_sp_mat.tocpu(cpu_sp_mat2);
 	MatDense<double, Cpu> diff_mat = *cpu_sp_mat;
 	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
@@ -368,6 +379,17 @@ void test_is_equal()
 	cout << "OK" << endl;
 }
 
+void test_get_device()
+{
+	cout << "test MatSparse<FPP,GPU2>::getDevice" << endl;
+	auto nrows = 5;
+	auto ncols = 8;
+	auto cpu_sp_mat = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<double, GPU2> gpu_sp_mat(*cpu_sp_mat);
+	auto dev_id = gpu_sp_mat.getDevice();
+	cout << "device id: " << dev_id << endl;
+}
+
 int main()
 {
 	Faust::enable_gpu_mod();
@@ -389,4 +411,5 @@ int main()
 	test_set_id();
 	test_move();
 	test_is_equal();
+	test_get_device();
 }
