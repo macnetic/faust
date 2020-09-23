@@ -54,7 +54,7 @@ namespace Faust
 				bool operator==(const MatSparse<FPP, GPU2>& mat) const;
 				bool operator!=(const MatSparse<FPP, GPU2>& mat) const;
 
-				void tocpu(MatSparse<FPP,Cpu> &sp_mat);
+				void tocpu(MatSparse<FPP,Cpu> &sp_mat) const;
 				Real<FPP> norm();
 				void transpose();
 				void adjoint();
@@ -69,7 +69,9 @@ namespace Faust
 				int32_t getNbRow();
 				int32_t getNbCol();
 				int32_t getNonZeros();
-				int32_t getDevice();
+				int32_t getDevice() const;
+				void Display() const;
+				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 				~MatSparse();
 
 			private:

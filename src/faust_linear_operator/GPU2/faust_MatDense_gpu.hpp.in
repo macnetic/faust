@@ -111,7 +111,7 @@ namespace Faust
 		}
 
 	template<>
-		Faust::MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(const void* stream/*=nullptr*/)
+		Faust::MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(const void* stream/*=nullptr*/) const
 		{
 			MatDense<@FAUST_SCALAR_FOR_GM@, Cpu> cpu_mat(dim1, dim2);
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
@@ -435,7 +435,7 @@ namespace Faust
 		}
 
 	    template<>
-	    int32_t Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getDevice()
+	    int32_t Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getDevice() const
 	    {
 		auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 		int32_t dev_id = dsm_funcs->get_dev(gpu_mat);
@@ -443,4 +443,17 @@ namespace Faust
 	    }
 
 
+
+	    template<>
+		std::string Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::to_string(const bool transpose/*=false*/, const bool displaying_small_mat_elts/*=false*/) const
+		{
+		    //TODO: rely on gpu_mod display function (yet to write)
+		    return "(on GPU device: " + std::to_string(getDevice())+ ") "+tocpu().to_string();
+		}
+
+	    template<>
+		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::Display() const
+		{
+		    std::cout << this->to_string();
+		}
 };

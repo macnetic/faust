@@ -120,7 +120,7 @@ namespace Faust
 	}
 
 	template<>
-		void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu> & sp_mat)
+		void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu> & sp_mat) const
 		{
 			int32_t nrows, ncols, nnz;
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
@@ -244,10 +244,25 @@ namespace Faust
 		}
 
 	template<>
-		int32_t Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getDevice()
+		int32_t Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getDevice() const
 		{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			int32_t dev_id = spm_funcs->get_dev(gpu_mat);
 			return dev_id;
+		}
+
+	    template<>
+		std::string Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::to_string(const bool transpose/*=false*/, const bool displaying_small_mat_elts/*=false*/) const
+		{
+			MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu> sp_mat;
+			tocpu(sp_mat);
+			//TODO: rely on gpu_mod display function (yet to write)
+		    return "(on GPU device: " + std::to_string(getDevice())+ ") "+ sp_mat.to_string();
+		}
+
+	    template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::Display() const
+		{
+		    std::cout << this->to_string();
 		}
 };
