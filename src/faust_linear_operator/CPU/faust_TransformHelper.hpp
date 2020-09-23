@@ -467,7 +467,7 @@ namespace Faust {
 #ifdef USE_GPU_MOD
 			try
 			{
-				Faust::FaustGPU<FPP>::check_gpu_mod_loaded();
+				GPUModHandler::get_singleton()->check_gpu_mod_loaded();
 			}
 			catch(std::runtime_error& e)
 			{
