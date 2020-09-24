@@ -61,7 +61,7 @@ namespace Faust
 				void setEyes();
 				void setIdentity(int32_t dim);
 				void setZeros();
-				MatSparse<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr);
+				MatSparse<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				int32_t getNbRow() const;
 				int32_t getNbCol() const;
@@ -72,6 +72,7 @@ namespace Faust
 				~MatSparse();
 
 			private:
+				void* get_gpu_mat_ptr() const;
 				gm_SparseMat_t gpu_mat;
 		};
 

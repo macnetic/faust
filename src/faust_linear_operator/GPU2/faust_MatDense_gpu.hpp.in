@@ -49,6 +49,13 @@ namespace Faust
 		}
 
 	template<>
+		Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::MatDense() : MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>(0,0,nullptr,true)
+		{
+		}
+
+
+
+	template<>
 		Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::MatDense(
 				const MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>& mat,
 				const int32_t dev_id/*=-1*/,
@@ -182,7 +189,7 @@ namespace Faust
 		}
 
 	template<>
-		Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>* Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::clone(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/)
+		Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>* Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::clone(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/) const
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
@@ -439,11 +446,11 @@ namespace Faust
 
 	    template<>
 	    int32_t Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getDevice() const
-	    {
-		auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-		int32_t dev_id = dsm_funcs->get_dev(gpu_mat);
-		return dev_id;
-	    }
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			int32_t dev_id = dsm_funcs->get_dev(gpu_mat);
+			return dev_id;
+		}
 
 
 
@@ -460,5 +467,9 @@ namespace Faust
 		    std::cout << this->to_string();
 		}
 
-
+	    template<>
+		void* Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::get_gpu_mat_ptr() const
+	    {
+			return this->gpu_mat;
+	    }
 };

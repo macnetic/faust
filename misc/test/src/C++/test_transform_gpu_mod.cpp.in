@@ -1,0 +1,117 @@
+#include <cstdlib>
+#include <vector>
+#include "faust_MatSparse.h"
+#include "faust_MatDense.h"
+#include "faust_MatSparse_gpu.h"
+#include "faust_MatDense_gpu.h"
+#include "faust_Transform_gpu.h"
+#include <iostream>
+
+using namespace Faust;
+using namespace std;
+
+void generate_cpu_gpu_factors(vector<MatGeneric<double,GPU2>*> &gpu_factors,
+		vector<MatGeneric<double,Cpu>*> &cpu_factors)
+{
+	MatDense<double, Cpu>* dmat;
+	Faust::MatSparse<double, Cpu>* spmat;
+	MatGeneric<double, Cpu>* cpu_gen_mat;
+	MatGeneric<double, GPU2>* gpu_gen_mat;
+	int32_t inrows = 140, tmp;
+	int32_t incols = 125;
+	for(int i=0;i<10;i++)
+	{
+
+		if(i%2)
+		{
+			cpu_gen_mat = dmat = MatDense<double,Cpu>::randMat(inrows, incols);
+			gpu_gen_mat = new MatDense<double, GPU2>(*dmat);
+		}
+		else
+		{
+			cpu_gen_mat = spmat = Faust::MatSparse<double,Cpu>::randMat(inrows, incols, .2);
+			gpu_gen_mat = new Faust::MatSparse<double, GPU2>(*spmat);
+		}
+		inrows = incols;
+		incols--;
+		gpu_factors.push_back(gpu_gen_mat);
+		cpu_factors.push_back(cpu_gen_mat);
+	}
+
+}
+
+void test_Transform_ctor()
+{
+	cout << "void test_Transform_ctor()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t(gpu_factors);
+	t.Display();
+	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+}
+
+void test_Transform_push_back()
+{
+	cout << "void test_Transform_push_back()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	Faust::Transform<double, GPU2> t;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	for(auto f: gpu_factors)
+		t.push_back(f);
+	t.Display();
+	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+}
+
+void test_Transform_getDims()
+{
+	cout << "void test_Transform_getDims()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t(gpu_factors);
+	t.Display();
+	assert(cpu_factors[0]->getNbRow() == t.getNbRow() && (*(cpu_factors.end()-1))->getNbCol() == t.getNbCol());
+}
+
+void test_Transform_size()
+{
+	cout << "void test_Transform_getDims()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t(gpu_factors);
+	t.Display();
+	assert(cpu_factors.size() == t.size());
+}
+
+void test_Transform_get_product()
+{
+	cout << "void test_Transform_get_product()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	auto cpu_p = t_cpu.get_product();
+	auto gpu_p = t_gpu.get_product();
+	MatDense<double, Cpu> gpu_p_to_cpu;
+	gpu_p_to_cpu = gpu_p.tocpu();
+	cout << gpu_p_to_cpu.norm() << endl;
+	cout << cpu_p.norm() << endl;
+	auto diff = cpu_p;
+	diff -= gpu_p_to_cpu;
+	assert(diff.norm()/cpu_p.norm() < 1e-6);
+}
+
+int main()
+{
+	Faust::enable_gpu_mod();
+	test_Transform_ctor();
+	test_Transform_push_back();
+	test_Transform_getDims();
+	test_Transform_size();
+	test_Transform_get_product();
+	return EXIT_SUCCESS;
+}

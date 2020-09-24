@@ -1,0 +1,85 @@
+namespace Faust
+{
+
+	template<>
+		int32_t Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::getNbRow() const
+		{
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			if(gpu_mat_arr)
+				return marr_funcs->nrows(gpu_mat_arr);
+			else
+				return -1;
+		}
+
+	template<>
+		int32_t Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::getNbCol() const
+		{
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			if(gpu_mat_arr)
+				return marr_funcs->ncols(gpu_mat_arr);
+			else
+				return -1;
+		}
+
+	template<>
+		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform() : gpu_mat_arr(nullptr)
+		{
+		}
+
+	template<>
+		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::~Transform()
+		{
+
+		}
+
+	template<>
+		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::push_back(const MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>* M, bool copying/*=true*/)
+		{
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			if(gpu_mat_arr == nullptr)
+				gpu_mat_arr = marr_funcs->create();
+			if(copying)
+				marr_funcs->addgpu_anymat(gpu_mat_arr, M->clone()->get_gpu_mat_ptr());
+			else
+				marr_funcs->addgpu_anymat(gpu_mat_arr, M->get_gpu_mat_ptr());
+		}
+
+	template<>
+		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform(const std::vector<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*> &factors) : Transform()
+		{
+			GPUModHandler::get_singleton()->check_gpu_mod_loaded();
+
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
+			gpu_mat_arr = marr_funcs->create();
+			for(auto m: factors)
+			{
+				push_back(m);
+			}
+		}
+
+	template<>
+		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Display() const
+		{
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			marr_funcs->display(gpu_mat_arr);
+		}
+
+	template<>
+		int32_t Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::size() const
+		{
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			return marr_funcs->size(gpu_mat_arr);
+		}
+
+	template<>
+		MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_product() const
+		{
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto gpu_mat = marr_funcs->chain_matmul_one(gpu_mat_arr, OP_NOTRANSP);
+			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> M;
+			M.gpu_mat = gpu_mat;
+			return M;
+		}
+}

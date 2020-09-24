@@ -204,7 +204,7 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 	endif()
 
 	if(USE_GPU_MOD)
-		list(APPEND tests faust_gpu_mod hierarchical2020_gpu test_matdense_gpu_mod test_matsparse_gpu_mod)
+		list(APPEND tests faust_gpu_mod hierarchical2020_gpu test_matdense_gpu_mod test_matsparse_gpu_mod test_transform_gpu_mod)
 	endif()
 
 	foreach(TEST_FPP float double complex<float> complex<double>)

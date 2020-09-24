@@ -204,7 +204,7 @@ namespace Faust
 		}
 
 	template<>
-		MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>* MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::clone(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/)
+		MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>* MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::clone(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/) const
 	{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
@@ -263,5 +263,11 @@ namespace Faust
 		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::Display() const
 		{
 		    std::cout << this->to_string();
+		}
+
+		template<>
+			void* Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::get_gpu_mat_ptr() const
+		{
+			return this->gpu_mat;
 		}
 };

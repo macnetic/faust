@@ -14,6 +14,7 @@ namespace Faust
 	template<typename FPP>
 		class MatDense<FPP, GPU2> : public MatGeneric<FPP,GPU2>
 		{
+			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
 			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 
 			public:
@@ -24,7 +25,8 @@ namespace Faust
 						const int32_t dev_id=-1,
 						const void* stream=nullptr);
 
-				MatDense(const MatDense<FPP,Cpu>& mat, const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/);
+				MatDense();
+				MatDense(const MatDense<FPP,Cpu>& mat, const int32_t dev_id=-1, const void* stream=nullptr);
 
 				~MatDense();
 
@@ -80,7 +82,7 @@ namespace Faust
 				Real<FPP> normL1();
 				void normalize();
 				int32_t getDevice() const;
-				MatDense<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr);
+				MatDense<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr) const;
 				void Display() const;
@@ -89,6 +91,7 @@ namespace Faust
 				int32_t getNbCol() const;
 			private:
 				gm_DenseMat_t gpu_mat;
+				void* get_gpu_mat_ptr() const;
 		};
 
 
