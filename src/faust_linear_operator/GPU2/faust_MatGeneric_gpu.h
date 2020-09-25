@@ -13,6 +13,7 @@ namespace Faust
 		class MatGeneric<FPP, GPU2>
 		{
 			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
+			virtual void set_gpu_mat_ptr(void*)=0;
 			protected:
 				bool is_identity;
 				bool is_zeros;
@@ -21,6 +22,7 @@ namespace Faust
 				virtual int32_t getNbCol() const=0;
 				virtual MatGeneric<FPP,GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const=0;
 				virtual void* get_gpu_mat_ptr() const=0;
+				virtual faust_unsigned_int getNonZeros() const=0;
 				MatGeneric();
 				virtual ~MatGeneric();
 		};

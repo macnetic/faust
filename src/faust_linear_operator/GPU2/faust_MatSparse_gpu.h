@@ -11,6 +11,7 @@ namespace Faust
 		class MatSparse<FPP, GPU2> : public MatGeneric<FPP,GPU2>
 		{
 
+			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
 			public:
 				/** \brief Inits from CPU buffers.
 				 *
@@ -35,6 +36,8 @@ namespace Faust
 				MatSparse(const MatSparse<FPP, GPU2>& mat,
 						const int32_t dev_id=-1,
 						const void* stream=nullptr);
+
+				MatSparse();
 
 				void operator=(const MatSparse<FPP, GPU2>& mat);
 				void operator=(const MatSparse<FPP, Cpu>& mat);
@@ -65,7 +68,7 @@ namespace Faust
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				int32_t getNbRow() const;
 				int32_t getNbCol() const;
-				int32_t getNonZeros();
+				faust_unsigned_int getNonZeros() const;
 				int32_t getDevice() const;
 				void Display() const;
 				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
@@ -73,6 +76,7 @@ namespace Faust
 
 			private:
 				void* get_gpu_mat_ptr() const;
+				void set_gpu_mat_ptr(void*);
 				gm_SparseMat_t gpu_mat;
 		};
 

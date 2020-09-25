@@ -1,22 +1,22 @@
 //TODO: move to CPP
 namespace Faust
 {
-	    template<>
+	template<>
 		int32_t Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getNbRow() const
 		{
-		    int32_t nrows;
-		    auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-		    dsm_funcs->info(gpu_mat, &nrows, nullptr);
-		    return nrows;
+			int32_t nrows;
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->info(gpu_mat, &nrows, nullptr);
+			return nrows;
 		}
 
-	    template<>
+	template<>
 		int32_t Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getNbCol() const
 		{
-		    int32_t ncols;
-		    auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-		    dsm_funcs->info(gpu_mat, nullptr, &ncols);
-		    return ncols;
+			int32_t ncols;
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->info(gpu_mat, nullptr, &ncols);
+			return ncols;
 		}
 
 	template<>
@@ -27,19 +27,19 @@ namespace Faust
 				const bool no_alloc/*= false*/,
 				const int32_t dev_id/*=-1*/,
 				const void* stream/*=nullptr*/) : MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>()
-		{
-			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
-			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-			// create the matrix in the device dev_id memory
-			auto cur_dev_id = gp_funcs->cur_dev();
-			gp_funcs->set_dev(dev_id);
-			if(nullptr != data)
-				// use a stream to copy (if not nullptr)
-				gpu_mat = dsm_funcs->togpu_stream(nbRow, nbCol, const_cast<@FAUST_SCALAR_FOR_GM@*>(data), stream);
-			else if(! no_alloc)
-				gpu_mat = dsm_funcs->create(nbRow, nbCol);
-			gp_funcs->set_dev(cur_dev_id);
-		}
+	{
+		auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
+		auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+		// create the matrix in the device dev_id memory
+		auto cur_dev_id = gp_funcs->cur_dev();
+		gp_funcs->set_dev(dev_id);
+		if(nullptr != data)
+			// use a stream to copy (if not nullptr)
+			gpu_mat = dsm_funcs->togpu_stream(nbRow, nbCol, const_cast<@FAUST_SCALAR_FOR_GM@*>(data), stream);
+		else if(! no_alloc)
+			gpu_mat = dsm_funcs->create(nbRow, nbCol);
+		gp_funcs->set_dev(cur_dev_id);
+	}
 
 	template<>
 		MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::~MatDense()
@@ -50,8 +50,8 @@ namespace Faust
 
 	template<>
 		Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::MatDense() : MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>(0,0,nullptr,true)
-		{
-		}
+	{
+	}
 
 
 
@@ -387,7 +387,7 @@ namespace Faust
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 			if(is_zeros)
 			{
-			    	resize(S.getNbRow(), getNbCol());
+				resize(S.getNbRow(), getNbCol());
 				setZeros();
 			}
 			else
@@ -431,21 +431,21 @@ namespace Faust
 		void gemm(const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &A, const MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &B, MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> &C,
 				const @FAUST_SCALAR_FOR_GM@& alpha, const @FAUST_SCALAR_FOR_GM@& beta, const char opA, const char opB)
 		{
-		    gm_Op gop_A = OP_NOTRANSP, gop_B = OP_NOTRANSP;
-		    if(opA == 'T')
-			gop_A = OP_TRANSP;
-		    else if(opA == 'H')
-			gop_A = OP_CONJTRANSP;
-		    if(opB == 'T')
-			gop_B = OP_TRANSP;
-		    else if(opB == 'H')
-			gop_B = OP_CONJTRANSP;
-		    auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-		    dsm_funcs->gemm(A.gpu_mat, B.gpu_mat, C.gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha), reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta), gop_A, gop_B);
+			gm_Op gop_A = OP_NOTRANSP, gop_B = OP_NOTRANSP;
+			if(opA == 'T')
+				gop_A = OP_TRANSP;
+			else if(opA == 'H')
+				gop_A = OP_CONJTRANSP;
+			if(opB == 'T')
+				gop_B = OP_TRANSP;
+			else if(opB == 'H')
+				gop_B = OP_CONJTRANSP;
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->gemm(A.gpu_mat, B.gpu_mat, C.gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha), reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta), gop_A, gop_B);
 		}
 
-	    template<>
-	    int32_t Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getDevice() const
+	template<>
+		int32_t Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getDevice() const
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 			int32_t dev_id = dsm_funcs->get_dev(gpu_mat);
@@ -454,22 +454,37 @@ namespace Faust
 
 
 
-	    template<>
+	template<>
 		std::string Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::to_string(const bool transpose/*=false*/, const bool displaying_small_mat_elts/*=false*/) const
 		{
-		    //TODO: rely on gpu_mod display function (yet to write)
-		    return "(on GPU device: " + std::to_string(getDevice())+ ") "+tocpu().to_string();
+			//TODO: rely on gpu_mod display function (yet to write)
+			return "(on GPU device: " + std::to_string(getDevice())+ ") "+tocpu().to_string();
 		}
 
-	    template<>
+	template<>
 		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::Display() const
 		{
-		    std::cout << this->to_string();
+			std::cout << this->to_string();
 		}
 
-	    template<>
+	template<>
 		void* Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::get_gpu_mat_ptr() const
-	    {
+		{
 			return this->gpu_mat;
-	    }
+		}
+
+	template<>
+		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::set_gpu_mat_ptr(void* gpu_mat)
+		{
+			this->gpu_mat = gpu_mat;
+		}
+
+	template<>
+		faust_unsigned_int Faust::MatDense<@FAUST_SCALAR_FOR_GM@, GPU2>::getNonZeros() const
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			if(gpu_mat != nullptr)
+				return dsm_funcs->get_nnz(gpu_mat);
+			throw std::runtime_error("gpu_mat is nullptr");
+		}
 };

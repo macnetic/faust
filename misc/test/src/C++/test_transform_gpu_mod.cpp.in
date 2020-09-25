@@ -40,6 +40,19 @@ void generate_cpu_gpu_factors(vector<MatGeneric<double,GPU2>*> &gpu_factors,
 
 }
 
+void assert_gpu_cpu_Transform_almost_eq(const Faust::Transform<double, GPU2> & t_gpu, const Faust::Transform<double, Cpu>& t_cpu)
+{
+	auto cpu_p = t_cpu.get_product();
+	auto gpu_p = t_gpu.get_product();
+	MatDense<double, Cpu> gpu_p_to_cpu;
+	gpu_p_to_cpu = gpu_p.tocpu();
+	cout << gpu_p_to_cpu.norm() << endl;
+	cout << cpu_p.norm() << endl;
+	auto diff = cpu_p;
+	diff -= gpu_p_to_cpu;
+	assert(diff.norm()/cpu_p.norm() < 1e-6);
+}
+
 void test_Transform_ctor()
 {
 	cout << "void test_Transform_ctor()" << endl;
@@ -49,6 +62,7 @@ void test_Transform_ctor()
 	Faust::Transform<double, GPU2> t(gpu_factors);
 	t.Display();
 	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+	cout << "OK" << endl;
 }
 
 void test_Transform_push_back()
@@ -62,6 +76,60 @@ void test_Transform_push_back()
 		t.push_back(f);
 	t.Display();
 	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+	cout << "OK" << endl;
+}
+
+void test_Transform_push_first()
+{
+	cout << "void test_Transform_push_first)" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	Faust::Transform<double, GPU2> t_gpu;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	std::reverse(std::begin(gpu_factors), std::end(gpu_factors));
+	for(auto f: gpu_factors)
+		t_gpu.push_first(f);
+	t_gpu.Display();
+	t_cpu.Display();
+	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+	cout << "OK" << endl;
+}
+
+void test_Transform_pop_front()
+{
+	cout << "void test_Transform_pop_front()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	assert(t_gpu.size() == t_cpu.size());
+	t_cpu.pop_front();
+	t_gpu.pop_front();
+	t_gpu.Display();
+	t_cpu.Display();
+	assert(t_gpu.size() == t_cpu.size());
+	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+	cout << "OK" << endl;
+}
+
+void test_Transform_pop_back()
+{
+	cout << "void test_Transform_pop_back()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	assert(t_gpu.size() == t_cpu.size());
+	t_cpu.pop_back();
+	t_gpu.pop_back();
+	t_gpu.Display();
+	t_cpu.Display();
+	assert(t_gpu.size() == t_cpu.size());
+	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+	cout << "OK" << endl;
 }
 
 void test_Transform_getDims()
@@ -73,17 +141,19 @@ void test_Transform_getDims()
 	Faust::Transform<double, GPU2> t(gpu_factors);
 	t.Display();
 	assert(cpu_factors[0]->getNbRow() == t.getNbRow() && (*(cpu_factors.end()-1))->getNbCol() == t.getNbCol());
+	cout << "OK" << endl;
 }
 
 void test_Transform_size()
 {
-	cout << "void test_Transform_getDims()" << endl;
+	cout << "void test_Transform_size()" << endl;
 	vector<MatGeneric<double,GPU2>*> gpu_factors;
 	vector<MatGeneric<double,Cpu>*> cpu_factors;
 	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
 	Faust::Transform<double, GPU2> t(gpu_factors);
 	t.Display();
 	assert(cpu_factors.size() == t.size());
+	cout << "OK" << endl;
 }
 
 void test_Transform_get_product()
@@ -103,6 +173,163 @@ void test_Transform_get_product()
 	auto diff = cpu_p;
 	diff -= gpu_p_to_cpu;
 	assert(diff.norm()/cpu_p.norm() < 1e-6);
+	cout << "OK" << endl;
+}
+
+void test_Transform_get_total_nnz()
+{
+	cout << "void test_Transform_get_total_nnz()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	auto cpu_nnz = t_cpu.get_total_nnz();
+	auto gpu_nnz = t_gpu.get_total_nnz();
+	cout << "cpu_nnz: " << cpu_nnz << " gpu_nnz: " << gpu_nnz << endl;
+	assert(cpu_nnz == gpu_nnz);
+	cout << "OK" << endl;
+}
+
+void test_Transform_transpose()
+{
+	cout << "void test_Transform_transpose()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	t_gpu.transpose();
+	t_cpu.transpose();
+	t_gpu.Display();
+	t_cpu.Display();
+	//TODO: true test comparing factor sizes and order
+	cout << "OK" << endl;
+}
+
+void test_Transform_scalarMul()
+{
+	cout << "void test_Transform_scalarMul()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	double scalar = 6378.137;
+	t_cpu.scalarMultiply(scalar);
+	t_gpu.scalarMultiply(scalar);
+	assert_gpu_cpu_Transform_almost_eq(t_gpu, t_cpu);
+	cout << "OK" << endl;
+}
+
+void test_Transform_multiply_Transform()
+{
+	cout << "void test_Transform_multiply_Transform()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	vector<MatGeneric<double,GPU2>*> gpu_factors2;
+	vector<MatGeneric<double,Cpu>*> cpu_factors2;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	generate_cpu_gpu_factors(gpu_factors2, cpu_factors2);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu2(gpu_factors2);
+	Faust::Transform<double, Cpu> t_cpu2(cpu_factors2);
+	t_gpu2.transpose();
+	t_cpu2.transpose();
+	t_gpu.multiply(t_gpu2);
+	t_cpu.multiply(t_cpu2);
+	t_gpu.Display();
+	t_cpu.Display();
+	//TODO: true test comparing factor sizes and order
+	assert_gpu_cpu_Transform_almost_eq(t_gpu2, t_cpu2);
+	cout << "OK" << endl;
+}
+
+void test_Transform_multiplyLeft_Transform()
+{
+	cout << "void test_Transform_multiplyLeft_Transform()" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	vector<MatGeneric<double,GPU2>*> gpu_factors2;
+	vector<MatGeneric<double,Cpu>*> cpu_factors2;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	generate_cpu_gpu_factors(gpu_factors2, cpu_factors2);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu2(gpu_factors2);
+	Faust::Transform<double, Cpu> t_cpu2(cpu_factors2);
+	t_gpu2.transpose();
+	t_cpu2.transpose();
+	t_gpu2.multiply(t_gpu);
+	t_cpu2.multiply(t_cpu);
+	t_gpu2.Display();
+	t_cpu2.Display();
+	//TODO: true test comparing factor sizes and order
+	assert_gpu_cpu_Transform_almost_eq(t_gpu2, t_cpu2);
+	cout << "OK" << endl;
+}
+
+void test_Transform_operator_eq()
+{
+	cout << "void test_Transform_operator_eq" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu_copy = t_gpu;
+	assert_gpu_cpu_Transform_almost_eq(t_gpu_copy, t_cpu);
+	cout << "OK" << endl;
+}
+
+void test_Transform_clear()
+{
+	cout << "void test_Transform_clear" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	t_gpu.clear();
+	assert(t_gpu.size() == 0);
+	cout << "OK" << endl;
+}
+
+void test_Transform_spectralNorm()
+{
+	cout << "void test_Transform_spectralNorm" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	int flag1, flag2;
+	assert(abs(t_gpu.spectralNorm(1000,1e-3, flag1)-t_cpu.spectralNorm(1000,1e-3, flag2)) < 1e-6);
+	assert_gpu_cpu_Transform_almost_eq(t_gpu, t_cpu);
+	cout << "OK" << endl;
+}
+
+void test_Transform_get_facts()
+{
+	cout << "void test_Transform_get_facts" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,GPU2>*> gpu_factors2;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	t_gpu.get_facts(gpu_factors2, /*cloning*/ false);
+	assert(gpu_factors2.size() == gpu_factors.size());
+	for(int i=0;i<gpu_factors2.size();i++)
+	{
+		assert(gpu_factors2[i]->get_gpu_mat_ptr() == t_gpu.get_fact(i, false)->get_gpu_mat_ptr());
+	}
+	gpu_factors2.clear();
+	t_gpu.get_facts(gpu_factors2, /*cloning*/ true);
+	Faust::Transform<double, GPU2> t_gpu2(gpu_factors2);
+	assert_gpu_cpu_Transform_almost_eq(t_gpu2, t_cpu);
+	cout << "OK" << endl;
 }
 
 int main()
@@ -113,5 +340,17 @@ int main()
 	test_Transform_getDims();
 	test_Transform_size();
 	test_Transform_get_product();
+	test_Transform_get_total_nnz();
+	test_Transform_push_first();
+	test_Transform_pop_front();
+	test_Transform_pop_back();
+	test_Transform_transpose();
+	test_Transform_scalarMul();
+	test_Transform_multiply_Transform();
+	test_Transform_multiplyLeft_Transform();
+	test_Transform_operator_eq();
+	test_Transform_clear();
+	test_Transform_spectralNorm();
+	test_Transform_get_facts();
 	return EXIT_SUCCESS;
 }

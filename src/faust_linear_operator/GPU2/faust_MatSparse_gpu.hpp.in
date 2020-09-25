@@ -55,6 +55,11 @@ namespace Faust
 			}
 		}
 
+	template<>
+	Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::MatSparse() : MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(0,0)
+	{
+	}
+
 	// must be after the called ctor and the dtor to avoid an error "specialization after instantiation"
 	template<>
 	MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::MatSparse(
@@ -235,11 +240,12 @@ namespace Faust
 
 
 	template<>
-		int32_t Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getNonZeros()
+		faust_unsigned_int Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getNonZeros() const
 		{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			int32_t nnz;
-			spm_funcs->info(gpu_mat, nullptr, nullptr, &nnz); //TODO gpu_mod: add get_nnz, get_nrows, get_ncols
+			if(gpu_mat != nullptr)
+				return spm_funcs->get_nnz(gpu_mat);
+			throw std::runtime_error("gpu_mat is nullptr");
 		}
 
 	template<>
@@ -269,5 +275,11 @@ namespace Faust
 			void* Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::get_gpu_mat_ptr() const
 		{
 			return this->gpu_mat;
+		}
+
+		template<>
+			void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::set_gpu_mat_ptr(void* gpu_mat)
+		{
+			this->gpu_mat = gpu_mat;
 		}
 };

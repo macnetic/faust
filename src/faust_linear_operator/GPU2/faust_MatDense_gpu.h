@@ -89,9 +89,11 @@ namespace Faust
 				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 				int32_t getNbRow() const;
 				int32_t getNbCol() const;
+				faust_unsigned_int getNonZeros() const;
 			private:
 				gm_DenseMat_t gpu_mat;
 				void* get_gpu_mat_ptr() const;
+				void set_gpu_mat_ptr(void*);
 		};
 
 
