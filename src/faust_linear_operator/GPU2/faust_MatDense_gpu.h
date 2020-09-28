@@ -20,7 +20,7 @@ namespace Faust
 			public:
 				MatDense(const faust_unsigned_int nbRow,
 						const faust_unsigned_int nbCol,
-						const FPP* data = nullptr,
+						const FPP* cpu_data = nullptr,
 						const bool no_alloc=false,
 						const int32_t dev_id=-1,
 						const void* stream=nullptr);
@@ -63,6 +63,7 @@ namespace Faust
 				void multiplyRight(const MatDense<FPP, GPU2>& A);
 				//! \brief Replace (this) by S * (this)
 				void multiplyLeft(const MatSparse<FPP, Cpu>& S, const char transS='N');
+				void multiply(const Vect<FPP, GPU2>& vec, Vect<FPP, GPU2>& out_vec) const;
 				void operator*=(const MatDense<FPP, GPU2> &other);
 				void operator*=(const MatDense<FPP, Cpu> &other);
 //				void operator*=(MatSparse<FPP, Cpu> &other);

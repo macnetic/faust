@@ -1,0 +1,18 @@
+#include "faust_Vect_gpu.h"
+#include "faust_gpu_mod_utils.h"
+#include "faust_cuda_device.h"
+#include <cstdlib>
+#include <cmath>
+
+using namespace std;
+using namespace Faust;
+
+int main()
+{
+	Faust::Vect<double, GPU2> v;
+	//TODO: test Vect<double, GPU2>::sum
+	//TODO: test Vect<double, GPU2>::operator*= (elt-wise mul.)
+	//TODO: test Vect<double, GPU2>::operator/= (elt-wise div.)
+	//TODO: test Vect<double, GPU2>::setValues(double)
+	//TODO: test Vect<double, GPU2>::mean_relerr
+}

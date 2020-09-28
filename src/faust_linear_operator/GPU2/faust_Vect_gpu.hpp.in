@@ -1,0 +1,157 @@
+#ifndef _FSFG_
+#define _FSFG_
+typedef @FAUST_SCALAR_FOR_GM@ FSFG;
+#endif
+//TODO: move to cpp.in
+namespace Faust
+{
+
+	template<typename FSFG>
+		Vect<FSFG,GPU2>::Vect():MatDense<FSFG,GPU2>()
+	{
+	}
+
+	template<typename FSFG>
+		Vect<FSFG,GPU2>::Vect(const faust_unsigned_int size,
+				const FSFG* cpu_data,
+				const bool no_alloc,
+				const int32_t dev_id,
+				const void* stream): MatDense<FSFG,GPU2>(size, 1, cpu_data, no_alloc, dev_id, stream)
+	{
+	}
+
+	template<typename FSFG>
+	faust_unsigned_int Vect<FSFG,GPU2>::size() const
+	{
+		return this->getNbRow();
+	}
+
+	template<typename FSFG>
+		void resize(const faust_unsigned_int size)
+		{
+			MatDense<FSFG, GPU2>::resize(size, 1);
+		}
+
+	template<typename FSFG>
+		void Vect<FSFG,GPU2>::operator=(const Vect<FSFG,GPU2> & v)
+		{
+			if(size() == v.size())
+				MatDense<FSFG, GPU2>::operator=(v);
+			else
+				throw std::runtime_error("Dimensions must agree.");
+		}
+
+	template<typename FSFG>
+		void Vect<FSFG,GPU2>::operator=(const Vect<FSFG,Cpu> & v)
+		{
+			if(size() == v.size())
+			{
+				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+				auto gpu_mat = dsm_funcs->togpu(this->getNbRow(), 1, const_cast<@FAUST_SCALAR_FOR_GM@*>(v.getData()));
+				dsm_funcs->free(this->gpu_mat);
+				this->gpu_mat = gpu_mat;
+			}
+			else
+				throw std::runtime_error("Dimensions must agree.");
+		}
+
+	template<typename FSFG>
+		FSFG Vect<FSFG,GPU2>::max()
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			FSFG max_coeff;
+			dsm_funcs->max(this->gpu_mat, &max_coeff);
+			return max_coeff;
+		}
+
+		template<typename FSFG>
+		FSFG Vect<FSFG,GPU2>::min()
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			FSFG min_coeff;
+			dsm_funcs->min(this->gpu_mat, &min_coeff);
+			return min_coeff;
+		}
+
+		template<typename FSFG>
+		FSFG Vect<FSFG,GPU2>::dot(const Vect<FSFG,Cpu> &v)
+		{
+			FSFG alpha;
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->dot(this->gpu_mat, v.gpu_mat, &alpha);
+			return alpha;
+		}
+
+		template<typename FSFG>
+		FSFG Vect<FSFG,GPU2>::sum() const
+		{
+			FSFG s;
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->sum(this->gpu_mat, reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&s));
+			return s;
+		}
+
+		template<typename FSFG>
+			FSFG Vect<FSFG,GPU2>::mean() const
+			{
+				return sum()/size();
+			}
+
+		template<typename FSFG>
+		void Vect<FSFG,GPU2>::operator*=(const Vect<FSFG,GPU2> &v)
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->elt_wise_mul=(this->gpu_mat, v.gpu_mat);
+		}
+
+		template<typename FSFG>
+		void Vect<FSFG,GPU2>::operator/=(const Vect<FSFG,GPU2> &v)
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->elt_wise_div=(this->gpu_mat, v.gpu_mat);
+		}
+
+		template<typename FSFG>
+			void Vect<FSFG,GPU2>::operator==(const Vect<FSFG,GPU2> &v) const
+			{
+				return this->get_gpu_mat_ptr() == v.get_gpu_mat_ptr();
+			}
+
+		template<typename FSFG>
+			void Vect<FSFG,GPU2>::operator!=(const Vect<FSFG,GPU2> &v) const
+			{
+				return ! (*this)==v;
+			}
+
+		template<typename FSFG>
+			Vect<FSFG,Cpu> Vect<FSFG,GPU2>::tocpu(const void* stream/*=nullptr*/) const
+			{
+				auto matvec = MatDense<FSFG,GPU2>::tocpu(stream);
+				return Vect<FSFG, Cpu>(size(), matvec.getData());
+			}
+
+		template<typename FSFG>
+			void Vect<FSFG,GPU2>::Display() const
+			{
+				Vect<FSFG, Cpu> v = tocpu();
+				v.Display();
+			}
+
+		template<typename FSFG>
+			void Vect<FSFG,GPU2>::setValues(const FSFG& val)
+			{
+				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+				dsm_funcs->setval(this->gpu_mat, reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&val));
+			}
+
+		template<typename FSFG>
+			FSFG Vect<FSFG,GPU2>::mean_relative_error(const Vect<FSFG,GPU2>& ref_vec) const
+			{
+
+				FSFG e;
+				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+				dsm_funcs->mean_relerr(this->get_gpu_mat_ptr(), ref_vec->get_gpu_mat_ptr(), reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&e));
+			}
+
+
+}

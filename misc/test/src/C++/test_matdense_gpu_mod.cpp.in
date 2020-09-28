@@ -2,6 +2,7 @@
 #include "faust_gpu_mod.h"
 #include "faust_MatDense_gpu.h"
 #include "faust_MatSparse.h"
+#include "faust_Vect_gpu.h"
 #include "faust_gpu_mod_utils.h"
 #include "faust_cuda_device.h"
 #include <cstdlib>
@@ -323,8 +324,6 @@ void test_abs()
 	cout << "OK" << endl;
 }
 
-
-
 void test_add()
 {
 	cout << "test add" << endl;
@@ -430,6 +429,29 @@ void test_move()
 	delete cpu_ds_mat;
 }
 
+void test_mul_vec()
+{
+	cout << "test MatDense<FPP,GPU2>::multiply(const Vect<FPP,GPU2> &vec, const Vect<FPP,GPU2> out_vec)" << endl;
+	auto size = 14;
+	auto nrows = 22;
+	auto ncols = size;
+	auto vec_mat = MatDense<double, Cpu>::randMat(size, 1);
+	Faust::Vect<double, Cpu> v_cpu(size, vec_mat->getData());
+	Faust::Vect<double, GPU2> v_gpu(size, vec_mat->getData());
+	Faust::Vect<double, GPU2> v_gpu_out(nrows);
+	auto cpu_mat = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
+	MatDense<double,GPU2> gpu_mat(nrows, ncols, cpu_mat->getData());
+	gpu_mat.multiply(v_gpu, v_gpu_out);
+	auto v_gpu_out_cpu = v_gpu_out.tocpu();
+	v_gpu_out_cpu.Display();
+	auto v_cpu_out = cpu_mat->multiply(v_cpu);
+	v_cpu_out.Display();
+	auto diff = v_cpu_out;
+	diff -= v_gpu_out_cpu;
+	auto err = diff.norm()/v_cpu_out.norm();
+	assert(err < 1e-3);
+}
+
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
@@ -452,5 +474,6 @@ int main(int argc, char** argv)
 	test_mul_spm();
 	test_get_device();
 	test_move();
+	test_mul_vec();
 	return EXIT_SUCCESS;
 }
