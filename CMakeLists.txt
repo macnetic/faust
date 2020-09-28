@@ -649,6 +649,12 @@ if(FAUST_TORCH)
 	message(STATUS TORCH_LIBRARY=${TORCH_LIBRARY})
 endif()
 
+# before add Matlab directory, because its includes depend on faust's
+if(USE_GPU_MOD)
+	include_directories(${FAUST_TARGET} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
+	include_directories(${FAUST_TARGET} ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR})
+
+endif()
 
 ########### add_subdirectory ###############
 if (BUILD_WRAPPER_PYTHON)
@@ -744,15 +750,12 @@ if(BUILD_MULTITHREAD)
 endif()
 
 if(USE_GPU_MOD)
-	include_directories(${FAUST_TARGET} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
-	include_directories(${FAUST_TARGET} ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR})
 	target_include_directories(${FAUST_TARGET} PUBLIC  ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
 	target_link_libraries(${FAUST_TARGET} ${GPU_MOD_LIBS})
 	if(UNIX)
 		target_link_libraries(${FAUST_TARGET} dl)
 	endif(UNIX)
 	install(FILES  ${GPU_MOD_INCLUDE_DIR}/../build/libgm.so DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_EXECUTE WORLD_READ)
-	include_directories(${FAUST_TARGET} ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR})
 endif()
 
 # In case of GPU, the "CUDA" library libfaust_matrix_cu.a is linked with faust (libfaust_matrix_cu.a is not a OBJECT library) 
