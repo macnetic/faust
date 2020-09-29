@@ -28,11 +28,11 @@ namespace Faust
 			void operator=(const Vect<FPP,Cpu> &v);
 			void operator*=(const Vect<FPP,GPU2> &v);
 			void operator/=(const Vect<FPP,GPU2> &v);
-			void operator==(const Vect<FPP,GPU2> &v)const;
-			void operator!=(const Vect<FPP,GPU2> &v)const;
+			bool operator==(const Vect<FPP,GPU2> &v)const;
+			bool operator!=(const Vect<FPP,GPU2> &v)const;
 			FPP max();
 			FPP min();
-			FPP dot(const Vect<FPP,Cpu> &v);
+			FPP dot(const Vect<FPP,GPU2> &v);
 			FPP sum() const;
 			FPP mean() const;
 			void Display() const;
@@ -43,5 +43,5 @@ namespace Faust
 			void setEyes() = delete;
 		};
 }
-#include "faust_Vect_gpu_double.hpp"
+
 #endif

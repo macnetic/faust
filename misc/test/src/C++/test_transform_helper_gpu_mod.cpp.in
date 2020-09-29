@@ -1,0 +1,59 @@
+#include <cstdlib>
+#include <iostream>
+#include <vector>
+#include "faust_MatDense.h"
+#include "faust_TransformHelper_gpu.h"
+#include "faust_TransformHelper.h"
+#include "faust_gpu_mod_utils.h"
+
+using namespace Faust;
+using namespace std;
+
+int main()
+{
+	Faust::enable_gpu_mod();
+	TransformHelper<double, GPU2> th;
+	auto cpu_mat1 = MatDense<double,Cpu>::randMat(12,24);
+	auto cpu_mat2 = MatDense<double,Cpu>::randMat(24,32);
+	auto cpu_mat3 = Faust::MatSparse<double,Cpu>::randMat(32, 22, .3);
+	MatDense<double,GPU2> gpu_mat1(*cpu_mat1);
+	MatDense<double,GPU2> gpu_mat2(*cpu_mat2);
+	Faust::MatSparse<double,GPU2> gpu_mat3(*cpu_mat3);
+	vector<MatGeneric<double,GPU2>*> gpu_fact_list = {&gpu_mat1, &gpu_mat2, &gpu_mat3};
+	TransformHelper<double, GPU2> th2(gpu_fact_list);
+	int flag;
+	th2.Display();
+	cout << "gpu norm fro:" << th2.normFro() << endl;
+	cout << "gpu spectral norm fro:" << th2.spectralNorm(100, 1e-3, flag) << endl;
+	vector<MatGeneric<double,Cpu>*> cpu_fact_list = {cpu_mat1, cpu_mat2, cpu_mat3};
+	TransformHelper<double, Cpu> th2_cpu(cpu_fact_list);
+	th2_cpu.display();
+	cout << "cpu norm fro:" <<th2_cpu.normFro() << endl;
+	cout << "cpu spectral norm:" <<th2_cpu.spectralNorm(100,1e-3, flag) << endl;
+	for(int i=0;i<th2.size();i++)
+		cout << " fact "<< i<< " is sparse: " << th2_cpu.is_fact_sparse(i)  << " is dense: " << th2_cpu.is_fact_dense(i) << endl;
+	// test update
+	auto cpu_mat4 = MatDense<double,Cpu>::randMat(24,32);
+	auto cpu_mat5 = Faust::MatSparse<double,Cpu>::randMat(32, 22, .3);
+	MatDense<double,GPU2> gpu_mat4(*cpu_mat4);
+	Faust::MatSparse<double,GPU2> gpu_mat5(*cpu_mat5);
+	th2.update(gpu_mat4, 1);
+	th2.update(gpu_mat5, 2);
+	cout << "norm of updated gpu dmat:" << static_cast<MatDense<double,GPU2>*>(th2.get_gen_fact_nonconst(1))->norm() << endl;
+	cout << "norm of updated gpu smat:" << static_cast<Faust::MatSparse<double,GPU2>*>(th2.get_gen_fact_nonconst(2))->norm() << endl;
+	cout << "norm of gpu source dmat:" << gpu_mat4.norm() << endl;
+	cout << "norm of gpu source smat:" << gpu_mat5.norm() << endl;
+	cout << "norm of cpu source dmat:" << cpu_mat4->norm() << endl;
+	cout << "norm of cpu source smat:" << cpu_mat5->norm() << endl;
+	th2.Display();
+	cout << "============ multiply" << endl;
+	auto cpu_mat6 = Faust::MatDense<double,Cpu>::randMat(22, 32);
+	MatDense<double,GPU2> gpu_mat6(*cpu_mat6);
+	auto M_gpu = th2.multiply(gpu_mat6);
+	auto M_cpu = th2_cpu.multiply(*cpu_mat6);
+	cout << "M_cpu.norm() " << M_cpu.norm() << endl;
+	cout << "M_gpu.norm() " << M_gpu.norm() << endl;
+	return EXIT_FAILURE;
+}
+
+

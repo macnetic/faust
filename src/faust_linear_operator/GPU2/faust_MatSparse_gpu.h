@@ -4,14 +4,20 @@
 #include "faust_gpu_mod_utils.h"
 #include "faust_constant.h"
 #include "faust_MatGeneric_gpu.h"
+#include "faust_MatSparse.h"
 namespace Faust
 {
+	template<typename FPP, FDevice DEVICE>
+		class MatSparse;
+	template<typename FPP, FDevice DEVICE>
+		class MatDense;
 
 	template<typename FPP>
 		class MatSparse<FPP, GPU2> : public MatGeneric<FPP,GPU2>
 		{
 
 			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
+			friend MatDense<FPP,GPU2>;
 			public:
 				/** \brief Inits from CPU buffers.
 				 *
@@ -37,9 +43,14 @@ namespace Faust
 						const int32_t dev_id=-1,
 						const void* stream=nullptr);
 
+				MatSparse(const MatDense<FPP,GPU2>& mat);
+
+				MatSparse(MatSparse<FPP,GPU2> && mat);
+				MatSparse<FPP,GPU2>& operator=(MatSparse<FPP,GPU2> && mat);
+
 				MatSparse();
 
-				void operator=(const MatSparse<FPP, GPU2>& mat);
+				MatSparse<FPP,GPU2>& operator=(const MatSparse<FPP, GPU2>& mat);
 				void operator=(const MatSparse<FPP, Cpu>& mat);
 				void operator*=(const FPP& alpha);
 				void operator/=(const FPP& alpha);
@@ -72,6 +83,7 @@ namespace Faust
 				int32_t getDevice() const;
 				void Display() const;
 				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
+				MatType getType() const;
 				~MatSparse();
 
 			private:
@@ -82,6 +94,6 @@ namespace Faust
 
 
 };
-#include "faust_MatSparse_gpu_double.hpp"
+
 #endif
 #endif

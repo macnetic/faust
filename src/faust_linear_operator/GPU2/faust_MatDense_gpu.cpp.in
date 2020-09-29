@@ -3,6 +3,7 @@
 typedef @FAUST_SCALAR_FOR_GM@ FSFG;
 #endif
 //TODO: move to cpp.in
+#include "faust_MatDense_gpu.h"
 namespace Faust
 {
 	template<>
@@ -42,6 +43,8 @@ namespace Faust
 			gpu_mat = dsm_funcs->togpu_stream(nbRow, nbCol, const_cast<FSFG*>(data), stream);
 		else if(! no_alloc)
 			gpu_mat = dsm_funcs->create(nbRow, nbCol);
+		else
+			gpu_mat = nullptr;
 		gp_funcs->set_dev(cur_dev_id);
 	}
 
@@ -49,7 +52,8 @@ namespace Faust
 		MatDense<FSFG,GPU2>::~MatDense()
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
-			dsm_funcs->free(gpu_mat);
+			if(gpu_mat != nullptr)
+				dsm_funcs->free(gpu_mat);
 		}
 
 	template<>
@@ -64,6 +68,8 @@ namespace Faust
 				const MatDense<FSFG,Cpu>& mat,
 				const int32_t dev_id/*=-1*/,
 				const void* stream/*=nullptr*/) : MatDense<FSFG,GPU2>(mat.getNbRow(), mat.getNbCol(), mat.getData(), /*no_alloc*/ mat.getData() == nullptr, dev_id, stream){}
+
+
 
 	template<>
 		void Faust::MatDense<FSFG,GPU2>::multiply(MatDense<FSFG, GPU2> &other, const char op_this)
@@ -151,12 +157,26 @@ namespace Faust
 		void Faust::MatDense<FSFG,GPU2>::resize(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol)
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
-			dsm_funcs->resize(gpu_mat, getNbRow(), getNbCol());
+			if(gpu_mat != nullptr)
+				dsm_funcs->resize(gpu_mat, getNbRow(), getNbCol());
+			else
+				gpu_mat = dsm_funcs->create(nbRow, nbCol);
 #ifndef NDEBUG
 			int32_t new_nrows, new_ncols;
 			dsm_funcs->info(gpu_mat, &new_nrows, &new_ncols);
 			assert(getNbRow() == new_nrows && new_ncols == getNbCol());
 #endif
+		}
+
+	template<>
+		Faust::MatDense<FSFG,GPU2>::MatDense(const MatSparse<FSFG,GPU2>& mat) : MatDense<FSFG,GPU2>()
+		{
+			if(mat.get_gpu_mat_ptr() != nullptr)
+			{
+				resize(mat.getNbRow(), mat.getNbCol());
+				auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs(FSFG(0));
+				spm_funcs->copy2dense(mat.get_gpu_mat_ptr(), this->gpu_mat);
+			}
 		}
 
 	template<>
@@ -410,8 +430,9 @@ namespace Faust
 		{
 
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
-			auto gpu_mat = dsm_funcs->togpu(getNbRow(), getNbCol(), const_cast<FSFG*>(A.getData()));
-			dsm_funcs->free(this->gpu_mat);
+			auto gpu_mat = dsm_funcs->togpu(A.getNbRow(), A.getNbCol(), const_cast<FSFG*>(A.getData()));
+			if(this->gpu_mat != nullptr)
+				dsm_funcs->free(this->gpu_mat);
 			this->gpu_mat = gpu_mat;
 		}
 
@@ -423,12 +444,17 @@ namespace Faust
 		}
 
 	template<>
-		void Faust::MatDense<FSFG, GPU2>::operator=(const MatDense<FSFG, GPU2>& A)
+		Faust::MatDense<FSFG, GPU2>& Faust::MatDense<FSFG, GPU2>::operator=(const MatDense<FSFG, GPU2>& A)
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
-			auto gpu_mat = dsm_funcs->clone(A.gpu_mat);
-			dsm_funcs->free(this->gpu_mat);
-			this->gpu_mat = gpu_mat;
+			if(A.gpu_mat != nullptr)
+			{
+				resize(A.getNbRow(), A.getNbCol());
+				dsm_funcs->copy(A.gpu_mat, this->gpu_mat);
+			}
+			else
+				this->gpu_mat = nullptr;
+			return *this;
 		}
 
 	template <>
@@ -492,11 +518,48 @@ namespace Faust
 			throw std::runtime_error("gpu_mat is nullptr");
 		}
 
-		template<typename FSFG>
+	template<>
 		void MatDense<FSFG,GPU2>::multiply(const Vect<FSFG, GPU2>& vec, Vect<FSFG, GPU2>& out_vec) const
 		{
 
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, vec.get_gpu_mat_ptr(), out_vec.get_gpu_mat_ptr(), OP_NOTRANSP, OP_NOTRANSP);
 		}
+
+	template<>
+		MatType MatDense<FSFG,GPU2>::getType() const
+		{
+			return Dense;
+		}
+
+	template<>
+		MatDense<FSFG,GPU2>& MatDense<FSFG,GPU2>::operator=(MatDense<FSFG,GPU2>&& mat)
+		{
+			if(this->gpu_mat != nullptr)
+			{
+
+				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
+				dsm_funcs->free(this->gpu_mat);
+			}
+			this->gpu_mat = mat.gpu_mat;
+			mat.gpu_mat = nullptr;
+			return *this;
+		}
+
+	template<>
+		MatDense<FSFG,GPU2>::MatDense(MatDense<FSFG,GPU2>&& mat)
+		{
+			int32_t dev_id = 0;
+			if(this->gpu_mat != nullptr)
+			{
+
+				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
+				dsm_funcs->free(this->gpu_mat);
+			}
+//			dev_id = mat.getDevice();
+//			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
+			this->gpu_mat = mat.gpu_mat;
+			mat.gpu_mat = nullptr;
+		}
+
 };

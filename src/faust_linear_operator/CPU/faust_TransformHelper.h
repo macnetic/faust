@@ -43,6 +43,7 @@
 #define __FAUST_TRANSFORM_HELPER___
 
 #include <memory>
+#include "faust_TransformHelperGen.h"
 #include "faust_RefManager.h"
 #include "faust_exception.h"
 #include "faust_Transform.h"
@@ -62,11 +63,9 @@ namespace Faust {
 
 	template<typename FPP>
 		using transf_iterator = typename Transform<FPP,Cpu>::transf_iterator;
-	template<typename FPP,FDevice DEVICE> class Transform;
-	template<typename FPP,FDevice DEVICE> class Vect;
-	template<typename FPP,FDevice DEVICE> class MatDense;
-	template<typename FPP,FDevice DEVICE> class MatGeneric;
+#ifdef USE_GPU_MOD
 	template<typename FPP> class FaustGPU;
+#endif
 
 	enum RandFaustType {
 		DENSE,
@@ -80,21 +79,12 @@ namespace Faust {
 	};
 
 	template<typename FPP>
-		class TransformHelper<FPP,Cpu> {
+		class TransformHelper<FPP,Cpu> : public TransformHelperGen<FPP,Cpu> {
 			static std::default_random_engine generator;
 			static bool seed_init;
 
-			bool is_transposed;
-			bool is_conjugate;
-			bool is_sliced;
-			Slice slices[2];
-			bool is_fancy_indexed;
 			int mul_order_opt_mode;
 			int Fv_mul_mode;
-			faust_unsigned_int * fancy_indices[2];
-			faust_unsigned_int fancy_num_rows;
-			faust_unsigned_int fancy_num_cols;
-			shared_ptr<Transform<FPP,Cpu>> transform;
 #ifdef FAUST_TORCH
 			std::vector<torch::Tensor> tensor_data;
 #endif
@@ -131,7 +121,7 @@ namespace Faust {
 			TransformHelper<FPP, Cpu>* multiply(FPP& scalar);
 			template<typename Head, typename ... Tail>
 				void push_back_(Head& h, Tail&... t);
-
+//
 			void push_back_();
 			void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=true);
             void pop_back();
@@ -191,7 +181,7 @@ namespace Faust {
 			TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
 			bool isTransposed() const;
 			bool isConjugate() const;
-			const char isTransposed2char() const;
+//			const char isTransposed2char() const;
 			double normL1() const;
 			double normFro() const;
 			double normInf() const;

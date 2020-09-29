@@ -2,6 +2,7 @@
 #include "faust_gpu_mod.h"
 #include "faust_MatDense_gpu.h"
 #include "faust_MatSparse.h"
+#include "faust_MatSparse_gpu.h"
 #include "faust_Vect_gpu.h"
 #include "faust_gpu_mod_utils.h"
 #include "faust_cuda_device.h"
@@ -452,6 +453,17 @@ void test_mul_vec()
 	assert(err < 1e-3);
 }
 
+void test_gpu_matsparse2matdense()
+{
+	cout << "test MatDense<FPP,GPU2>::MatDense<FPP,GPU2>(MatSparse<FPP,GPU2>&)" << endl;
+	auto sM = Faust::MatSparse<double,Cpu>::randMat(22, 33, .2);
+	Faust::MatSparse<double,GPU2> sM_gpu(*sM);
+	MatDense<double,GPU2> dM_gpu(sM_gpu);
+	cout << sM_gpu.norm() << " " << dM_gpu.norm() << endl;
+	assert(abs(sM_gpu.norm()-dM_gpu.norm())< 1e-4);
+	cout << "OK" << endl;
+}
+
 int main(int argc, char** argv)
 {
 	Faust::enable_gpu_mod();
@@ -475,5 +487,6 @@ int main(int argc, char** argv)
 	test_get_device();
 	test_move();
 	test_mul_vec();
+	test_gpu_matsparse2matdense();
 	return EXIT_SUCCESS;
 }

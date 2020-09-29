@@ -3,18 +3,23 @@
 #ifdef USE_GPU_MOD
 #include "faust_MatDense.h"
 #include "faust_MatGeneric_gpu.h"
+#include "faust_Vect_gpu.h"
+#include "faust_MatSparse_gpu.h"
 #include "faust_gpu_mod_utils.h"
+#include <cstdint>
 namespace Faust
 {
 	template <typename FPP>
 	void gemm(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 
 
-
+	template<typename FPP, FDevice DEVICE>
+		class MatDense;
 	template<typename FPP>
 		class MatDense<FPP, GPU2> : public MatGeneric<FPP,GPU2>
 		{
 			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
+			friend MatSparse<FPP,GPU2>;
 			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 
 			public:
@@ -28,9 +33,12 @@ namespace Faust
 				MatDense();
 				MatDense(const MatDense<FPP,Cpu>& mat, const int32_t dev_id=-1, const void* stream=nullptr);
 
+				MatDense(MatDense<FPP,GPU2> && mat);
+				MatDense(const MatSparse<FPP,GPU2> & mat);
 				~MatDense();
 
-				void operator=(const MatDense<FPP,GPU2> & A);
+				MatDense<FPP,GPU2>& operator=(MatDense<FPP,GPU2> && mat);
+				MatDense<FPP,GPU2>& operator=(const MatDense<FPP,GPU2> & A);
 				void operator=(const MatDense<FPP,Cpu> & A);
 				void operator=(const MatSparse<FPP,Cpu> & A);
 				// *this = *this + A
@@ -88,10 +96,11 @@ namespace Faust
 				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr) const;
 				void Display() const;
 				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
+				MatType getType() const;
 				int32_t getNbRow() const;
 				int32_t getNbCol() const;
 				faust_unsigned_int getNonZeros() const;
-			private:
+			protected:
 				gm_DenseMat_t gpu_mat;
 				void* get_gpu_mat_ptr() const;
 				void set_gpu_mat_ptr(void*);
@@ -99,6 +108,6 @@ namespace Faust
 
 
 }
-#include "faust_MatDense_gpu_double.hpp"
+
 #endif
 #endif

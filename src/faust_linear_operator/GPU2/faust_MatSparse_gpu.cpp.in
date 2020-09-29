@@ -1,4 +1,10 @@
 //TODO: move to cpp.in
+#include "faust_MatSparse_gpu.h"
+#include "faust_MatDense_gpu.h"
+#ifndef _FSFG_
+#define _FSFG_
+typedef @FAUST_SCALAR_FOR_GM@ FSFG;
+#endif
 namespace Faust
 {
 	template<>
@@ -79,10 +85,11 @@ namespace Faust
 	}
 
 	template<>
-	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator=(const MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>& mat)
+	MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>& MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator=(const MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>& mat)
 	{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			spm_funcs->copy(mat.gpu_mat, gpu_mat);
+			return *this;
 	}
 
 	template<>
@@ -281,5 +288,51 @@ namespace Faust
 			void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::set_gpu_mat_ptr(void* gpu_mat)
 		{
 			this->gpu_mat = gpu_mat;
+		}
+
+		template<>
+			MatType MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getType() const
+			{
+				return Sparse;
+			}
+
+	template<>
+		MatSparse<FSFG,GPU2>& MatSparse<FSFG,GPU2>::operator=(MatSparse<FSFG,GPU2>&& mat)
+		{
+			if(this->gpu_mat != nullptr)
+			{
+
+				auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs(FSFG(0));
+				spm_funcs->free(this->gpu_mat);
+			}
+			this->gpu_mat = mat.gpu_mat;
+			mat.gpu_mat = nullptr;
+			return *this;
+		}
+
+		template<>
+			MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::MatSparse(const MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>& mat)
+			{
+				//TODO: process the copy totally on gpu side
+				if(mat.get_gpu_mat_ptr() != nullptr)
+				{
+					auto cpu_dmat = mat.tocpu();
+					MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu> cpu_smat(cpu_dmat);
+					MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2> gpu_smat(cpu_smat);
+					*this = std::move(gpu_smat);
+				}
+			}
+
+	template<>
+		MatSparse<FSFG,GPU2>::MatSparse(MatSparse<FSFG,GPU2>&& mat)
+		{
+			if(this->gpu_mat != nullptr)
+			{
+
+				auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs(FSFG(0));
+				spm_funcs->free(this->gpu_mat);
+			}
+			this->gpu_mat = mat.gpu_mat;
+			mat.gpu_mat = nullptr;
 		}
 };
