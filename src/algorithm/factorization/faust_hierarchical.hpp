@@ -91,7 +91,7 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 		if(tmp_dense == nullptr)
 		{
 			tmp_sparse = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(Si);
-			tmp_dense = new MatDense<FPP,Cpu>(*tmp_sparse);
+			tmp_dense = new MatDense<FPP,DEVICE>(*tmp_sparse);
 		}
 		else tmp_sparse = nullptr;
 		Faust::palm4msa2(*tmp_dense, Si_cons, Si_th, lambda_, p.stop_crit_2facts, is_update_way_R2L , use_csr, packing_RL, compute_2norm_on_array,

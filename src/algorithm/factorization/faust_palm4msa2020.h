@@ -4,6 +4,12 @@
 #include "faust_MatDense.h"
 #include "faust_MatSparse.h"
 #include "faust_TransformHelper.h"
+#ifdef USE_GPU_MOD
+#include "faust_MatGeneric_gpu.h"
+#include "faust_MatDense_gpu.h"
+#include "faust_MatSparse_gpu.h"
+#include "faust_TransformHelper_gpu.h"
+#endif
 #include "faust_constant.h"
 #include "faust_ConstraintGeneric.h"
 #include "faust_ConstraintFPP.h"

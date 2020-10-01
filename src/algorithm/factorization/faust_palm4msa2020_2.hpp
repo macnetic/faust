@@ -41,13 +41,13 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	std::function<bool()> updating_facs;
 	std::function<bool()> is_last_fac_updated;
 	// packed Fausts corresponding to each factor
-	std::vector<TransformHelper<FPP,Cpu>*> pL, pR;
+	std::vector<TransformHelper<FPP,DEVICE>*> pL, pR;
 	pL.resize(nfacts);// pL[i] is the Faust for all factors to the left of the factor *(S.begin()+i)
 	pR.resize(nfacts);// pR[i] the same for the right of S_i
 	for(int i=0;i<nfacts;i++)
 	{
-		pL[i] = new TransformHelper<FPP,Cpu>();
-		pR[i] = new TransformHelper<FPP,Cpu>();
+		pL[i] = new TransformHelper<FPP,DEVICE>();
+		pR[i] = new TransformHelper<FPP,DEVICE>();
 	}
 	if(is_update_way_R2L)
 	{
@@ -55,12 +55,12 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		{
 			//pre-compute left products for each Si
 			if(pL[0] != nullptr) delete pL[0];
-			pL[0] = new TransformHelper<FPP,Cpu>(); // empty faust // no factors to the left of *(S.begin())
+			pL[0] = new TransformHelper<FPP,DEVICE>(); // empty faust // no factors to the left of *(S.begin())
 			for(int i=1;i < nfacts; i++)
 			{
 				auto vec_Si_minus_1 = { *(S.begin()+i-1) };
 				if(pL[i] != nullptr) delete pL[i]; //TODO: maybe to replace by a TransformHelper stored in the stack to avoid deleting each time
-				pL[i] = new TransformHelper<FPP,Cpu>(*pL[i-1], vec_Si_minus_1);
+				pL[i] = new TransformHelper<FPP,DEVICE>(*pL[i-1], vec_Si_minus_1);
 				// if the ctor args are GPU-enabled so is pL[i]
 //				if(on_gpu) assert(10 == pL[i]->get_mul_order_opt_mode());
 				if(packing_RL) pL[i]->pack_factors();
@@ -75,7 +75,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 				if(pR[f_id-1] != nullptr)
 					delete pR[f_id-1];
 				auto vec_Sj = { *(S.begin()+f_id) };
-				pR[f_id-1] = new Faust::TransformHelper<FPP,Cpu>(vec_Sj, *pR[f_id]);
+				pR[f_id-1] = new Faust::TransformHelper<FPP,DEVICE>(vec_Sj, *pR[f_id]);
 //				if(on_gpu) assert(10 == pR[f_id-1]->get_mul_order_opt_mode());
 				if(packing_RL) pR[f_id-1]->pack_factors();
 			}
@@ -89,12 +89,12 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		init_ite = [&f_id, &pR, &S, &packing_RL, &on_gpu]()
 		{
 			if(pR[S.size()-1] != nullptr) delete pR[S.size()-1];
-			pR[S.size()-1] = new TransformHelper<FPP,Cpu>(); // empty faust // no factors to the right of *(S.begin()+S.size()]-1)
+			pR[S.size()-1] = new TransformHelper<FPP,DEVICE>(); // empty faust // no factors to the right of *(S.begin()+S.size()]-1)
 			for(int i=S.size()-2;i >= 0; i--)
 			{
 				auto vec_Si_plus_1 = { *(S.begin()+i+1) };
 				if(pR[i] != nullptr) delete pR[i];
-				pR[i] = new TransformHelper<FPP,Cpu>(vec_Si_plus_1, *pR[i+1]);
+				pR[i] = new TransformHelper<FPP,DEVICE>(vec_Si_plus_1, *pR[i+1]);
 //				if(on_gpu) assert(10 == pR[i]->get_mul_order_opt_mode());
 				if(packing_RL) pR[i]->pack_factors();
 			}
@@ -107,7 +107,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 				if(pL[f_id+1] != nullptr)
 					delete pL[f_id+1];
 				auto vec_Sj = { *(S.begin()+f_id) };
-				pL[f_id+1] = new Faust::TransformHelper<FPP,Cpu>(*pL[f_id], vec_Sj);
+				pL[f_id+1] = new Faust::TransformHelper<FPP,DEVICE>(*pL[f_id], vec_Sj);
 //				if(on_gpu) assert(10 == pL[f_id+1]->get_mul_order_opt_mode());
 				if(packing_RL) pL[f_id+1]->pack_factors();
 			}
@@ -116,10 +116,10 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		updating_facs = [&f_id, &nfacts]() {return f_id < nfacts;};
 		is_last_fac_updated = [&f_id, &nfacts]() {return f_id == nfacts-1;};
 	}
-	Faust::MatDense<FPP,Cpu> D, tmp;
-	Faust::MatSparse<FPP,Cpu> spD;
-	Faust::MatDense<FPP,Cpu> * LorR;
-	Faust::MatDense<FPP,Cpu> _LorR;
+	Faust::MatDense<FPP,DEVICE> D, tmp;
+	Faust::MatSparse<FPP,DEVICE> spD;
+	Faust::MatDense<FPP,DEVICE> * LorR;
+	Faust::MatDense<FPP,DEVICE> _LorR;
 	Real<FPP> c = 1/step_size;
 	while(sc.do_continue(i, error))
 	{
@@ -140,7 +140,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 				c = lipschitz_multiplicator*lambda*lambda*nR*nR*nL*nL;
 			}
 			auto S_j_vec = {*(S.begin()+f_id)};
-			Faust::TransformHelper<FPP, Cpu> _LSR(*pL[f_id], S_j_vec, *pR[f_id]);
+			Faust::TransformHelper<FPP, DEVICE> _LSR(*pL[f_id], S_j_vec, *pR[f_id]);
 //			tmp = _LSR.get_product();
 			_LSR.get_product(tmp);
 			tmp *= FPP(lambda);
@@ -150,20 +150,20 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 			FPP alpha_R = 1, alpha_L = 1, beta_R = 0, beta_L = 0; //decl in parent scope
 			if(S.is_fact_sparse(f_id))
 			{
-				scur_fac = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(cur_fac);
+				scur_fac = dynamic_cast<Faust::MatSparse<FPP,DEVICE>*>(cur_fac);
 				D = *scur_fac;
 				dcur_fac = nullptr;
 			}
 			else
 			{
-				dcur_fac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(cur_fac); // TOFIX: possible it is not Dense... but MatDiag (sanity check on function start)
+				dcur_fac = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(cur_fac); // TOFIX: possible it is not Dense... but MatDiag (sanity check on function start)
 				D = *dcur_fac;
 				scur_fac = nullptr;
 			}
 			if(pR[f_id]->size() > 0)
 			{
 				if(packing_RL)
-					LorR = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(pR[f_id]->get_gen_fact_nonconst(0)); //normally pR[f_id] is packed (hence reduced to a single MatDense)
+					LorR = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pR[f_id]->get_gen_fact_nonconst(0)); //normally pR[f_id] is packed (hence reduced to a single MatDense)
 				else
 				{
 					_LorR = pR[f_id]->get_product();
@@ -181,7 +181,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 			if(pL[f_id]->size() > 0)
 			{
 				if(packing_RL)
-					LorR = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(pL[f_id]->get_gen_fact_nonconst(0));
+					LorR = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(pL[f_id]->get_gen_fact_nonconst(0));
 				else
 				{
 					_LorR = pL[f_id]->get_product();
@@ -209,8 +209,8 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		//update lambda
 		//TODO: variable decl in parent scope
 		Faust::MatDense<FPP,DEVICE> A_H_S = S.multiply(A_H);
-		//		auto last_Sfac_vec = { *(S.begin()+nfacts-1), dynamic_cast<Faust::MatGeneric<FPP,Cpu>*>(&A_H)};
-		//		Faust::TransformHelper<FPP,Cpu> A_H_S_(*pL[nfacts-1], last_Sfac_vec);
+		//		auto last_Sfac_vec = { *(S.begin()+nfacts-1), dynamic_cast<Faust::MatGeneric<FPP,DEVICE>*>(&A_H)};
+		//		Faust::TransformHelper<FPP,DEVICE> A_H_S_(*pL[nfacts-1], last_Sfac_vec);
 		//		A_H_S_.disable_dtor();
 		//		Faust::MatDense<FPP,DEVICE> A_H_S = A_H_S_.get_product();
 		Real<FPP> trr = std::real(A_H_S.trace());
