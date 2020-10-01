@@ -34,6 +34,7 @@ namespace Faust
 				MatDense(const MatDense<FPP,Cpu>& mat, const int32_t dev_id=-1, const void* stream=nullptr);
 
 				MatDense(MatDense<FPP,GPU2> && mat);
+				MatDense(const MatDense<FPP,GPU2> & mat);
 				MatDense(const MatSparse<FPP,GPU2> & mat);
 				~MatDense();
 
@@ -91,6 +92,7 @@ namespace Faust
 				Real<FPP> normL1();
 				void normalize();
 				int32_t getDevice() const;
+				FPP trace() const;
 				MatDense<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr) const;

@@ -457,6 +457,12 @@ namespace Faust
 			return *this;
 		}
 
+	template<>
+		MatDense<FSFG,GPU2>::MatDense(const MatDense<FSFG,GPU2>& mat) : MatDense<FSFG,GPU2>()
+		{
+			*this = mat;
+		}
+
 	template <>
 		void gemm(const MatDense<FSFG, GPU2> &A, const MatDense<FSFG, GPU2> &B, MatDense<FSFG, GPU2> &C,
 				const FSFG& alpha, const FSFG& beta, const char opA, const char opB)
@@ -560,6 +566,21 @@ namespace Faust
 //			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
 			this->gpu_mat = mat.gpu_mat;
 			mat.gpu_mat = nullptr;
+		}
+
+	template<>
+		FSFG MatDense<FSFG,GPU2>::trace() const
+		{
+			FSFG tr;
+			if(this->gpu_mat != nullptr)
+			{
+
+				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
+
+				dsm_funcs->trace(this->gpu_mat, reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&tr));
+				return tr;
+			}
+			throw std::runtime_error("gpu_mat is nullptr");
 		}
 
 };
