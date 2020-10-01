@@ -53,6 +53,10 @@
    #include "faust_MatDense.h"
    #include "faust_prox.h"
 #endif
+#if USE_GPU_MOD
+#include "faust_prox_gpu.h"
+#include "faust_MatDense_gpu.h"
+#endif
 
 
 template<typename FPP,FDevice DEVICE> class MatDense;

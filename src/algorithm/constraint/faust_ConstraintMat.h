@@ -51,6 +51,11 @@
    #include "faust_MatDense.h"
    #include "faust_prox.h"
 #endif
+#if USE_GPU_MOD
+#include "faust_prox_gpu.h"
+#include "faust_MatDense_gpu.h"
+#endif
+
 //! \class Faust::ConstraintMat
 //!    \brief Contains the matrix dense constraint parameters for the hierarchical factorization. <br>
 //!    See the parent class Faust::ConstraintGeneric for more detail. <br>
