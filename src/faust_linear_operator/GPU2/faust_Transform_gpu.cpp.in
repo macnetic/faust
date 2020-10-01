@@ -320,6 +320,13 @@ namespace Faust
 		}
 
 	template<>
+		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const @FAUST_SCALAR_FOR_GM@& a)
+		{
+			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			marr_funcs->scalar_mul(this->gpu_mat_arr, reinterpret_cast<const @GM_SCALAR@*>(&a));
+		}
+
+	template<>
 		bool Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::is_fact_sparse(int id) const
 		{
 			return get_fact(id)->getType() == Sparse;
@@ -373,11 +380,33 @@ namespace Faust
 		}
 
 	template<>
+		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator+(int arg)
+		{
+			iterator copy(*this);
+			copy.index = this->index+arg;
+			return copy;
+		}
+
+	template<>
+		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator-(int arg)
+		{
+			iterator copy(*this);
+			copy.index = this->index-arg;
+			return copy;
+		}
+
+	template<>
 		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator++(int)
 		{
 			iterator copy(*this);
 			(*this)++;
 			return copy;
+		}
+
+	template<>
+		bool Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator<(const Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator& it)
+		{
+			return this->index < it.index;
 		}
 
 	template<>
@@ -396,6 +425,7 @@ namespace Faust
 		{
 			return Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator(*this, size());
 		}
+
 
 
 }

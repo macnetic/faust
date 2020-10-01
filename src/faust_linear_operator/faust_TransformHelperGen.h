@@ -11,6 +11,11 @@ namespace Faust
 	template<typename FPP,FDevice DEVICE> class MatDense;
 	template<typename FPP,FDevice DEVICE> class MatGeneric;
 
+	enum PackDir {
+		PACK_LEFT,
+		PACK_RIGHT
+	};
+
 	template<typename FPP, FDevice DEV>
 	class TransformHelperGen
 	{
@@ -23,6 +28,7 @@ namespace Faust
 		virtual void push_back(const MatGeneric<FPP,DEV>* M, const bool optimizedCopy=false, const bool copying=true)=0;
 
 		const char isTransposed2char() const;
+		void enable_gpu_meth_for_mul(){}; //TODO: remove later (it is only a special case of TransformHelper Cpu)
 
 		protected:
 			bool is_transposed;

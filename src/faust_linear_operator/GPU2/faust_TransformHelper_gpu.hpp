@@ -7,6 +7,16 @@ namespace Faust
 	{
 	}
 
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>::TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_/*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact /*= true*/, const bool internal_call/*=false*/) : TransformHelper<FPP,GPU2>()
+		{
+			for(auto f: facts)
+			{
+				this->push_back(f, false, cloning_fact);
+			}
+			this->multiply(lambda_);
+		}
+
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 	template<typename FPP>
 		template<typename ... GList>
@@ -24,7 +34,13 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,GPU2>::Display() const
+		void TransformHelper<FPP,GPU2>::push_first(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy/*=false*/, const bool copying/*=true*/)
+		{
+			return this->transform->push_first(M, copying);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::display() const
 		{
 			this->transform->Display();
 		}
@@ -51,6 +67,11 @@ namespace Faust
 		MatDense<FPP,GPU2> TransformHelper<FPP,GPU2>::get_product()
 		{
 			return this->transform->get_product();
+		}
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::get_product(MatDense<FPP,GPU2>& M)
+		{
+			return this->transform->get_product(M);
 		}
 
 	template<typename FPP>
@@ -110,5 +131,36 @@ namespace Faust
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
 			return M;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::multiply(const FPP& a)
+		{
+			this->transform->multiply(a);
+			return this;
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::pop_front()
+		{
+			return this->transform->pop_back();
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::pop_back()
+		{
+			return this->transform->pop_back();
+		}
+
+	template<typename FPP>
+		typename Transform<FPP,GPU2>::iterator TransformHelper<FPP,GPU2>::begin() const
+		{
+			return this->transform->begin();
+		}
+
+	template<typename FPP>
+		typename Transform<FPP,GPU2>::iterator TransformHelper<FPP,GPU2>::end() const
+		{
+			return this->transform->end();
 		}
 }

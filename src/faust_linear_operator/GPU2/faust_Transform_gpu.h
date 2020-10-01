@@ -44,6 +44,7 @@ namespace Faust
 			MatDense<FPP,GPU2> multiply(const Faust::MatDense<FPP,GPU2> &A, const char opThis);
 			void multiply(const Transform<FPP,GPU2> & A);
 			void multiplyLeft(const Transform<FPP,GPU2> & A);
+			void multiply(const FPP& a);
 			Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag);
 //			using transf_iterator = typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::const_iterator;
 //
@@ -57,8 +58,11 @@ namespace Faust
 					explicit iterator(const Transform<FPP, GPU2>& container, size_t index = 0);
 					MatGeneric<FPP,GPU2>* operator*() const;
 					iterator & operator++();
+					iterator operator+(int);
+					iterator operator-(int);
 					//post-increment op
 					iterator operator++(int);
+					bool operator<(const iterator& it);
 				private:
 					size_t index;
 					const Transform<FPP, GPU2> & container;

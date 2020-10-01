@@ -22,7 +22,7 @@ int main()
 	vector<MatGeneric<double,GPU2>*> gpu_fact_list = {&gpu_mat1, &gpu_mat2, &gpu_mat3};
 	TransformHelper<double, GPU2> th2(gpu_fact_list);
 	int flag;
-	th2.Display();
+	th2.display();
 	cout << "gpu norm fro:" << th2.normFro() << endl;
 	cout << "gpu spectral norm fro:" << th2.spectralNorm(100, 1e-3, flag) << endl;
 	vector<MatGeneric<double,Cpu>*> cpu_fact_list = {cpu_mat1, cpu_mat2, cpu_mat3};
@@ -45,7 +45,7 @@ int main()
 	cout << "norm of gpu source smat:" << gpu_mat5.norm() << endl;
 	cout << "norm of cpu source dmat:" << cpu_mat4->norm() << endl;
 	cout << "norm of cpu source smat:" << cpu_mat5->norm() << endl;
-	th2.Display();
+	th2.display();
 	cout << "============ multiply" << endl;
 	auto cpu_mat6 = Faust::MatDense<double,Cpu>::randMat(22, 32);
 	MatDense<double,GPU2> gpu_mat6(*cpu_mat6);

@@ -73,10 +73,6 @@ namespace Faust {
 		MIXED
 	};
 
-	enum PackDir {
-		PACK_LEFT,
-		PACK_RIGHT
-	};
 
 	template<typename FPP>
 		class TransformHelper<FPP,Cpu> : public TransformHelperGen<FPP,Cpu> {
