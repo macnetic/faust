@@ -89,8 +89,8 @@ namespace Faust
 				void adjoint();
 				void abs();
 				Real<FPP> spectralNorm(const faust_unsigned_int nbr_iter_max, const float threshold);
-				Real<FPP> norm();
-				Real<FPP> normL1();
+				Real<FPP> norm() const;
+				Real<FPP> normL1() const;
 				void normalize();
 				int32_t getDevice() const;
 				FPP trace() const;

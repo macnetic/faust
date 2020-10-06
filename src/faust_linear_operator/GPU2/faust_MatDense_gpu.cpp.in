@@ -143,6 +143,12 @@ namespace Faust
 		}
 
 	template<>
+		Real<FSFG> Faust::MatDense<FSFG,GPU2>::norm() const
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
+			return dsm_funcs->norm_frob(gpu_mat);
+		}
+	template<>
 		Faust::MatDense<FSFG, Cpu> Faust::MatDense<FSFG,GPU2>::tocpu(const void* stream/*=nullptr*/) const
 		{
 			MatDense<FSFG, Cpu> cpu_mat(getNbRow(), getNbCol());
@@ -158,7 +164,7 @@ namespace Faust
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			if(gpu_mat != nullptr)
-				dsm_funcs->resize(gpu_mat, getNbRow(), getNbCol());
+				dsm_funcs->resize(gpu_mat, nbRow, nbCol);
 			else
 				gpu_mat = dsm_funcs->create(nbRow, nbCol);
 #ifndef NDEBUG
@@ -260,12 +266,6 @@ namespace Faust
 			return dsm_funcs->norm_spectral(gpu_mat, threshold, nbr_iter_max);
 		}
 
-	template<>
-		Real<FSFG> Faust::MatDense<FSFG,GPU2>::norm()
-		{
-			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
-			return dsm_funcs->norm_frob(gpu_mat);
-		}
 
 	template<>
 		void Faust::MatDense<FSFG,GPU2>::normalize()
@@ -282,7 +282,7 @@ namespace Faust
 		}
 
 	template<>
-		Real<FSFG> Faust::MatDense<FSFG,GPU2>::normL1()
+		Real<FSFG> Faust::MatDense<FSFG,GPU2>::normL1() const
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			return dsm_funcs->norm_l1(gpu_mat);
@@ -428,7 +428,6 @@ namespace Faust
 	template<>
 		void Faust::MatDense<FSFG, GPU2>::operator=(const MatDense<FSFG, Cpu>& A)
 		{
-
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			auto gpu_mat = dsm_funcs->togpu(A.getNbRow(), A.getNbCol(), const_cast<FSFG*>(A.getData()));
 			if(this->gpu_mat != nullptr)
@@ -453,7 +452,10 @@ namespace Faust
 				dsm_funcs->copy(A.gpu_mat, this->gpu_mat);
 			}
 			else
+			{
+				dsm_funcs->free(gpu_mat);
 				this->gpu_mat = nullptr;
+			}
 			return *this;
 		}
 
