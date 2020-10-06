@@ -35,7 +35,7 @@ namespace Faust
 	 * It's handy to define the same op for all facts[i], as it's the case with the default argument transconj_flags (all factors are multiplied after a non-op.).
 	 */
 	template<typename FPP, FDevice DEVICE>
-		void multiply_order_opt_all_ends(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
+		void multiply_order_opt_all_ends(std::vector<MatDense<FPP,DEVICE>*>& facts, MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
 
 	/**
 	 *
@@ -43,13 +43,13 @@ namespace Faust
 	 *
 	 */
 	template<typename FPP, FDevice DEVICE>
-		void multiply_order_opt_all_best(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
+		void multiply_order_opt_all_best(std::vector<MatDense<FPP,DEVICE>*>& facts, MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
 
 	/**
 	 * This function does the same as multiply_order_opt_all_best except that here facts matrices can be MatDense or MatSparse too. In the latter instead of dimensions this is the nnz that is taken into account to minimize the cost.
 	 */
 	template<typename FPP, FDevice DEVICE>
-		void multiply_order_opt_all_best(std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
+		void multiply_order_opt_all_best(std::vector<MatGeneric<FPP,DEVICE>*>& facts, MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
 
 	/**
 	 * This functions does the same as multiply_order_opt_all_best but contrary to the latter it optimizes the order only for the first multiplication (wherever it is located in the chain matrix). Then it multiplies all matrices on the left and on the right of the chosen "best" position.
@@ -58,14 +58,14 @@ namespace Faust
 	 * It multiplies CD, then A(B(CD)), then (A(B(CD)))E.
 	 */
 	template<typename FPP, FDevice DEVICE>
-		void multiply_order_opt_first_best(std::vector<Faust::MatDense<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
+		void multiply_order_opt_first_best(std::vector<MatDense<FPP,DEVICE>*>& facts, MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
 
 	/**
 	 * This function is a wrapper to other order based optimization methods/functions (declared above).
 	 *
 	 */
 	template<typename FPP, FDevice DEVICE>
-		void multiply_order_opt(const int mode, std::vector<Faust::MatGeneric<FPP,DEVICE>*>& facts, Faust::MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
+		void multiply_order_opt(const int mode, std::vector<MatGeneric<FPP,DEVICE>*>& facts, MatDense<FPP,DEVICE>& out, FPP alpha=1.0, FPP beta_out=.0, std::vector<char> transconj_flags = std::vector<char>({'N'}));
 
 
 	/**
@@ -76,20 +76,20 @@ namespace Faust
 	 * NOTE: this method was for test purpose and it turns out that when Eigen multithread support is enabled there is not point to use this parallel reduction from a performance point of view (the parallelization based on vector dot product when multiplying two matrices is quicker than this parallel reduction).
 	 */
 	template<typename FPP, FDevice DEVICE>
-		Faust::MatDense<FPP,DEVICE> multiply_omp(const std::vector<Faust::MatGeneric<FPP,DEVICE>*> data, const Faust::MatDense<FPP,DEVICE> A, const char opThis);
+		MatDense<FPP,DEVICE> multiply_omp(const std::vector<MatGeneric<FPP,DEVICE>*> data, const MatDense<FPP,DEVICE> A, const char opThis);
 
 	/**
 	 * This function is the run method of thread created by multiply_par declared below.
 	 */
 	template<typename FPP, FDevice DEVICE>
-	void multiply_par_run(int nth, int thid, int num_per_th, int data_size, char opThis, std::vector<Faust::MatGeneric<FPP, DEVICE>*>& data, std::vector<Faust::MatDense<FPP,DEVICE>*>& mats, std::vector<std::thread*>& threads, std::mutex &, std::condition_variable &, int &);
+	void multiply_par_run(int nth, int thid, int num_per_th, int data_size, char opThis, std::vector<MatGeneric<FPP, DEVICE>*>& data, std::vector<MatDense<FPP,DEVICE>*>& mats, std::vector<std::thread*>& threads, std::mutex &, std::condition_variable &, int &);
 
 	/**
 	 * This function is the same as multiply_omp except that it is implemented using C++ threads instead of OpenMP.
 	 * For the same reason as for multiply_omp this method isn't useful (see NOTE in multiply_omp code doc.).
 	 */
 	template<typename FPP, FDevice DEVICE>
-	MatDense<FPP,DEVICE> multiply_par(const std::vector<Faust::MatGeneric<FPP,DEVICE>*>& data, const Faust::MatDense<FPP,DEVICE> A, const char opThis);
+	MatDense<FPP,DEVICE> multiply_par(const std::vector<MatGeneric<FPP,DEVICE>*>& data, const MatDense<FPP,DEVICE> A, const char opThis);
 
 }
 #include "faust_prod_opt.hpp"

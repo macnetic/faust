@@ -209,7 +209,7 @@ FPP Faust::Vect<FPP,Cpu>::mean_relative_error(const Faust::Vect<FPP,Cpu>& v_ref)
 
    Faust::Vect<FPP,Cpu> tmp(size());
    for(int i=0 ; i<size() ; i++)
-      tmp[i] = fabs((vec[i]-v_ref.vec[i])/v_ref.vec[i]);
+      tmp[i] = Faust::fabs((vec[i]-v_ref.vec[i])/v_ref.vec[i]);
 
    return tmp.mean();
 }
@@ -330,6 +330,25 @@ Faust::Vect<FPP, Cpu>* Faust::Vect<FPP, Cpu>::rand(faust_unsigned_int size)
 void Faust::Vect<FPP, Cpu>::setRand()
 {
 	vec = Eigen::Matrix<FPP, Eigen::Dynamic, 1>::Random(this->size(), 1);
+}
+
+template<typename FPP>
+FPP Faust::Vect<FPP, Cpu>::max_coeff(int *index) const
+{
+	FPP max = getData()[0]; //FPP(std::numeric_limits<double>::max());
+	FPP e;
+	*index = 0;
+	//			vec.getData()[i] = Eigen::abs(mat.row(i)).maxCoeff(col_indices+i);
+	for(int j=0;j<this->size(); j++)
+	{
+		e = getData()[j];
+		if(Faust::fabs(e) > Faust::fabs(max))
+		{
+			max = e;
+			*index = j;
+		}
+	}
+	return max;
 }
 
 #endif

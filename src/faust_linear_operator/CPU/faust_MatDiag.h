@@ -78,14 +78,14 @@ namespace Faust
 
 			void operator*=(const FPP alpha);
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &v) const;
-			void faust_gemm(const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const;
+			void faust_gemm(const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const;
 
 
 			MatGeneric<FPP,Cpu>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
 			MatGeneric<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			MatGeneric<FPP,Cpu>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
 			MatGeneric<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
-			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{if(i == j) return getData()[i]; else throw std::runtime_error("Faust::MatDiag::operator()(int,int): row and column indices must be equal.");}
+			const FPP& operator()(faust_unsigned_int i, faust_unsigned_int j)const{if(i == j) return getData()[i]; else throw std::runtime_error("MatDiag::operator()(int,int): row and column indices must be equal.");}
 			std::list<std::pair<int,int>> nonzeros_indices() const;
 			//! \brief Returns all the features of the MatDense.
 			std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;

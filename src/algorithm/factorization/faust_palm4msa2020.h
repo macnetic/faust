@@ -23,11 +23,11 @@ namespace Faust
 	template <typename FPP, FDevice DEVICE>
 		void palm4msa(
 				/** input matrix */
-				const Faust::MatDense<FPP,DEVICE>& A,
+				const MatDense<FPP,DEVICE>& A,
 				/* input constraints */
-				std::vector<Faust::ConstraintGeneric*> & constraints,
+				std::vector<ConstraintGeneric*> & constraints,
 				/** output factors (if not initialized to size nfacts, set to nfacts identities (with constraints dims) */
-				Faust::TransformHelper<FPP,DEVICE>& S,
+				TransformHelper<FPP,DEVICE>& S,
 				/** lambda output, intialized from outside */
 				FPP& lambda,
 				//const unsigned int nites,
@@ -43,11 +43,11 @@ namespace Faust
 	template <typename FPP, FDevice DEVICE>
 		void palm4msa2(
 				/** input matrix */
-				const Faust::MatDense<FPP,DEVICE>& A,
+				const MatDense<FPP,DEVICE>& A,
 				/* input constraints */
-				std::vector<Faust::ConstraintGeneric*> & constraints,
+				std::vector<ConstraintGeneric*> & constraints,
 				/** output factors (if not initialized to size nfacts, set to nfacts identities (with constraints dims) */
-				Faust::TransformHelper<FPP,DEVICE>& S,
+				TransformHelper<FPP,DEVICE>& S,
 				/** lambda output, intialized from outside */
 				Real<FPP>& lambda,
 				//const unsigned int nites,
@@ -71,12 +71,12 @@ namespace Faust
 	 *
 	 */
 	template <typename FPP, FDevice DEVICE>
-		void fill_of_eyes(Faust::TransformHelper<FPP,DEVICE>& S,
+		void fill_of_eyes(TransformHelper<FPP,DEVICE>& S,
 				const unsigned int nfacts,
 				const bool sparse,
 				const std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims,
 				const bool on_gpu=false);
-	//TODO: maybe move this function in a Faust::utils module (for now it serves only for PALM4MSA)
+	//TODO: maybe move this function in a utils module (for now it serves only for PALM4MSA)
 }
 #include "faust_palm4msa2020.hpp"
 #include "faust_palm4msa2020_2.hpp"

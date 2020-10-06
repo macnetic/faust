@@ -10,13 +10,14 @@
 #include <cfloat>
 #include <vector>
 
-namespace Faust {
+namespace Faust
+{
 
 
 	template<typename FPP, FDevice DEVICE, typename FPP2 = float>
 		class GivensFGFT : public GivensFGFTGen<FPP, DEVICE, FPP2> {
 			/**
-			 * \class Faust::GivensFGFT
+			 * \class GivensFGFT
 			 *
 			 * \brief This class implements the Givens FGFT algorithm.
 			 * This algorithm is based on the classical Jacobi eigenvalues algorithm.
@@ -33,9 +34,9 @@ namespace Faust {
 			 *
 			 */
 			/** \brief Temporary storage matrix for maximization of L. */
-			Faust::MatDense<FPP,DEVICE> C;
+			MatDense<FPP,DEVICE> C;
 			/** \brief Column vector for the rowwise minimization of C (i.e. maximization of L). */
-			Faust::Vect<FPP,DEVICE> C_min_row;
+			Vect<FPP,DEVICE> C_min_row;
 			protected:
 				/** \brief Rotation angle theta for the current iteration's Givens matrix. */
 				FPP2 theta;
@@ -56,8 +57,8 @@ namespace Faust {
 				 * \param Lap The Laplacian matrix to approximate/diagonalize.
 				 * \param J The number of iterations, Givens rotations factors.
 				 * */
-				GivensFGFT(Faust::MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
-				GivensFGFT(Faust::MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
+				GivensFGFT(MatSparse<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
+				GivensFGFT(MatDense<FPP,DEVICE>& Lap, int J, unsigned int verbosity = 0, const double stoppingError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
 				/** Destructor */
 				virtual ~GivensFGFT() {/*delete[] q_candidates; delete L;*/};
 
@@ -94,23 +95,23 @@ namespace Faust {
 				 * Computes the first S'*L (only used by update_L() in optimization enabled code).
 				 *
 				 */
-				void update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L);
+				void update_L_first(Vect<FPP,DEVICE>& L_vec_p, Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L);
 
 				/**
 				 * Computes L*S (only used by update_L() in optimization enabled code).
 				 * Must be called after update_L_first() to finish the update of L = S'*L*S.
 				 */
-				void update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L);
+				void update_L_second(Vect<FPP,DEVICE>& L_vec_p, Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L);
 
-				void update_L_first(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L);
-				void update_L_second(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L);
+				void update_L_first(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatSparse<FPP,DEVICE> & L);
+				void update_L_second(Eigen::SparseMatrix<FPP, Eigen::RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, Eigen::RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatSparse<FPP,DEVICE> & L);
 
 				void update_err();
 
 			public:
 
 
-				const Faust::MatSparse<FPP,DEVICE> get_Dspm(const bool ord=false);
+				const MatSparse<FPP,DEVICE> get_Dspm(const bool ord=false);
 
 
 

@@ -83,10 +83,10 @@ namespace Faust
             const faust_unsigned_int nbRow,
             const faust_unsigned_int nbCol, 
             const unsigned int nbFact_,
-            const std::vector<const Faust::ConstraintGeneric*> & cons_,
-            const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-            const Faust::StoppingCriterion<FPP2>& stop_crit_2facts_ = Faust::StoppingCriterion<FPP2>(defaultNiter1),
-            const Faust::StoppingCriterion<FPP2>& stop_crit_global_  = Faust::StoppingCriterion<FPP2>(defaultNiter2),
+            const std::vector<const ConstraintGeneric*> & cons_,
+            const std::vector<MatDense<FPP,DEVICE> >& init_fact_,
+            const StoppingCriterion<FPP2>& stop_crit_2facts_ = StoppingCriterion<FPP2>(defaultNiter1),
+            const StoppingCriterion<FPP2>& stop_crit_global_  = StoppingCriterion<FPP2>(defaultNiter2),
             const FPP residuum_decrease_speed = defaultDecreaseSpeed,
             const FPP residuum_prcent = defaultResiduumPercent,
             const bool isVerbose_ = defaultVerbosity ,
@@ -99,8 +99,8 @@ namespace Faust
 
 
         /*!
-        *   \brief Faust::Params constructor
-        *   \param data : Faust::MatDense<FPP,DEVICE> to hierarchically factorize
+        *   \brief Params constructor
+        *   \param data : MatDense<FPP,DEVICE> to hierarchically factorize
         *   \param nbFact_ : Number of factor used for the decomposition
         *	\param	cons_ : Specifies the constraint sets in which each factor should lie.<br>
                             It should be a std::vector<std::vector> of constraint_generic size 2*(nbFact-1),<br>
@@ -108,8 +108,8 @@ namespace Faust
                                 - cons_[1][j] specifies the constraints for the left factor and<br>
                                 - cons[2][j] for the right factor.<br>
         *   \param	init_fact_ : specifying the initial factors, could be an empty std::vector (not specifying the factors) <br>
-        *	\param stop_crit_2facts : (optional) Faust::StoppingCriterion for each 2 factors factorization step <br>
-        *	\param stop_crit_global : (optional) Faust::StoppingCriterion for the factorization each global factorization step <br>
+        *	\param stop_crit_2facts : (optional) StoppingCriterion for each 2 factors factorization step <br>
+        *	\param stop_crit_global : (optional) StoppingCriterion for the factorization each global factorization step <br>
         *	\param isVerbose : (optional) - if true the function outputs the error at each iteration <br>
                                            - if false, hierarchical_fact run silent mode<br>
                                            (default value is false) <br>
@@ -134,10 +134,10 @@ namespace Faust
             const faust_unsigned_int nbRow_,
             const faust_unsigned_int nbCol_,
             const unsigned int nbFact_,
-            const std::vector<std::vector<const Faust::ConstraintGeneric*>> & cons_,
-            const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-            const Faust::StoppingCriterion<FPP2>& stop_crit_2facts_ = Faust::StoppingCriterion<FPP2>(defaultNiter1),
-            const Faust::StoppingCriterion<FPP2>& stop_crit_global_  = Faust::StoppingCriterion<FPP2>(defaultNiter2),
+            const std::vector<std::vector<const ConstraintGeneric*>> & cons_,
+            const std::vector<MatDense<FPP,DEVICE> >& init_fact_,
+            const StoppingCriterion<FPP2>& stop_crit_2facts_ = StoppingCriterion<FPP2>(defaultNiter1),
+            const StoppingCriterion<FPP2>& stop_crit_global_  = StoppingCriterion<FPP2>(defaultNiter2),
             const bool isVerbose_ = defaultVerbosity ,
             const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
             const bool isFactSideLeft_ = defaultFactSideLeft ,
@@ -159,17 +159,17 @@ namespace Faust
         // Required members
         
 	// data is now independent from the params class,
-        //Faust::MatDense<FPP,DEVICE> data; 
+        //MatDense<FPP,DEVICE> data; 
 	faust_unsigned_int m_nbRow; // number of row of the matrix to be factorized
 	faust_unsigned_int m_nbCol; // number of columns of the matrix to be factorized
 
         faust_unsigned_int m_nbFact; // number of factors
-        std::vector<std::vector<const Faust::ConstraintGeneric*>> cons; // vector of constraints
-        std::vector<Faust::MatDense<FPP,DEVICE> > init_fact;
+        std::vector<std::vector<const ConstraintGeneric*>> cons; // vector of constraints
+        std::vector<MatDense<FPP,DEVICE> > init_fact;
 
         // Optional members (set to default values if not defined)
-        Faust::StoppingCriterion<FPP2> stop_crit_2facts;
-        Faust::StoppingCriterion<FPP2> stop_crit_global;
+        StoppingCriterion<FPP2> stop_crit_2facts;
+        StoppingCriterion<FPP2> stop_crit_global;
         bool isVerbose;
         bool isUpdateWayR2L;
         bool isFactSideLeft;
@@ -201,10 +201,10 @@ namespace Faust
         //const int nb_cols; // number of columns of the last factor
 
         /*const int nb_it;   // number of iterations
-        // if isFaust::StoppingCriterionError then criterion is error else criterion is number of iteration
-        bool  isFaust::StoppingCriterionError;
+        // if isStoppingCriterionError then criterion is error else criterion is number of iteration
+        bool  isStoppingCriterionError;
         const faust_real errorThreshold;
-        // only used as stopping criterion, if isFaust::StoppingCriterionError, when error is still greater than
+        // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than
         int maxIteration;*/
 
         // modif AL AL ???

@@ -77,11 +77,11 @@ namespace Faust
 		virtual	void setOp(const char op, faust_unsigned_int& nbRowOp, faust_unsigned_int& nbColOp)const=0;
 
         /*!
-        *  \brief Transpose the Faust::MatDense
+        *  \brief Transpose the MatDense
         */
         virtual void transpose()=0;
 
-		virtual Faust::Vect<FPP,DEVICE> multiply(const Faust::Vect<FPP,DEVICE> &v) const=0;
+		virtual Vect<FPP,DEVICE> multiply(const Vect<FPP,DEVICE> &v) const=0;
 
         /*! \brief faust_gemm — Performs a matrix calculation of the form alpha . (*this).B +beta.C, with B and C 2 faust_matrix and two real constants you supply. <br>
 
@@ -94,7 +94,7 @@ namespace Faust
         * \param alpha : Template scalar coefficient
         * \param beta : Template scalar coefficient
         */
-        virtual void faust_gemm(const Faust::MatDense<FPP,DEVICE> & B, Faust::MatDense<FPP,DEVICE> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const=0;
+        virtual void faust_gemm(const MatDense<FPP,DEVICE> & B, MatDense<FPP,DEVICE> & C,const FPP & alpha, const FPP & beta, char typeA, char typeB)const=0;
 
 
 	/** \brief 

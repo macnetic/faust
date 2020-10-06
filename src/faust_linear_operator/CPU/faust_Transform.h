@@ -76,17 +76,17 @@ namespace Faust
 
 	// forward definition of friend function
 	template<typename FPP>
-		Faust::Vect<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
+		Vect<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Vect<FPP,Cpu>& v);
 	template<typename FPP>
-		Faust::MatDense<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
+		MatDense<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const MatDense<FPP,Cpu>& M);
 
 
 	template<typename FPP>
-		class Transform<FPP,Cpu> : public Faust::LinearOperator<FPP,Cpu>
+		class Transform<FPP,Cpu> : public LinearOperator<FPP,Cpu>
 		{
 
 			public:
-				void faust_gemm(const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)const;
+				void faust_gemm(const MatDense<FPP,Cpu> & B, MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)const;
 
 				/** \brief Constructor
 				 * \param data : Vector including sparse matrix
@@ -100,7 +100,7 @@ namespace Faust
 				 if True, the copy is optimized, the dynamic type of the factor can changed
 				 if False, the dynamic type stay the same
 				 (default value false)*/
-				Transform(const std::vector<Faust::MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact=true);
+				Transform(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact=true);
 
 				/** \brief Copy constructor. */
 				Transform(const Transform<FPP,Cpu> & A);
@@ -117,11 +117,11 @@ namespace Faust
 
 				/** \brief Constructor
 				 * \param facts : Vector including dense matrix*/
-				Transform(const std::vector<Faust::MatDense<FPP,Cpu> >&facts, const bool optimizedCopy=false);
-				Transform(const std::vector<Faust::MatSparse<FPP,Cpu> >&facts, const bool optimizedCopy=false);
+				Transform(const std::vector<MatDense<FPP,Cpu> >&facts, const bool optimizedCopy=false);
+				Transform(const std::vector<MatSparse<FPP,Cpu> >&facts, const bool optimizedCopy=false);
 
-				//void get_facts(std::vector<Faust::MatSparse<FPP,Cpu> >& sparse_facts)const{sparse_facts = data;}
-				//void get_facts(std::vector<Faust::MatDense<FPP,Cpu> >& facts)const;
+				//void get_facts(std::vector<MatSparse<FPP,Cpu> >& sparse_facts)const{sparse_facts = data;}
+				//void get_facts(std::vector<MatDense<FPP,Cpu> >& facts)const;
 
 				faust_unsigned_int size()const{return data.size();}
 				void size(int size_)const{ data.resize(size_);}
@@ -130,14 +130,14 @@ namespace Faust
 				//template<FDevice DEVICE> class BlasHandle;
 				//template<FDevice DEVICE> class SpBlasHandle;
 				/** \brief Perform the product of all factorized matrix. */
-				Faust::MatDense<FPP,Cpu> get_product(const char opThis='N', const bool isConj=false)const;
-				void get_product(Faust::MatDense<FPP,Cpu> &, const char opThis='N', const bool isConj=false)const;
-                Faust::MatDense<FPP,Cpu> get_product(Faust::BlasHandle<Cpu> blas_handle,Faust::SpBlasHandle<Cpu> spblas_handle)const;
+				MatDense<FPP,Cpu> get_product(const char opThis='N', const bool isConj=false)const;
+				void get_product(MatDense<FPP,Cpu> &, const char opThis='N', const bool isConj=false)const;
+                MatDense<FPP,Cpu> get_product(BlasHandle<Cpu> blas_handle,SpBlasHandle<Cpu> spblas_handle)const;
 
 
 				/** \brief return a copy of the factor of index id
 				//  \warning dynamic memory allocation is made for the return pointer if cloning_fact == true*/
-				Faust::MatGeneric<FPP,Cpu>* get_fact(faust_unsigned_int id, const bool cloning_fact = true) const;
+				MatGeneric<FPP,Cpu>* get_fact(faust_unsigned_int id, const bool cloning_fact = true) const;
 				bool is_fact_sparse(const faust_unsigned_int id) const;
 				bool is_fact_dense(const faust_unsigned_int id) const;
 				faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
@@ -196,7 +196,7 @@ namespace Faust
 				 * \param conjugate (optional): to conjugate the factor before pushing (works only if copying==true).
 				 * \param copying (optional): true to duplicate the factor in memory and push the copy. Otherwise the same pointer is pushed.
 				*/
-				void push_back(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false, const bool copying=true);
+				void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false, const bool copying=true);
 
 
 
@@ -206,15 +206,15 @@ namespace Faust
 				 if True, the copy is optimized, the dynamic type of the factor can changed
 				 if False, the dynamic type stay the same
 				 (default value false)*/
-				void push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false, const bool copying=true);
-                void insert(faust_unsigned_int i, Faust::MatGeneric<FPP,Cpu>* M);
+				void push_first(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool conjugate=false, const bool copying=true);
+                void insert(faust_unsigned_int i, MatGeneric<FPP,Cpu>* M);
                 void pop_back();
                 void pop_front();
                 void erase(faust_unsigned_int i);
                 void resize(faust_unsigned_int size);
-				//void pop_back(Faust::MatGeneric<FPP,Cpu>* M);
-				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M);
-				//void pop_first(Faust::MatGeneric<FPP,Cpu>* M) const;
+				//void pop_back(MatGeneric<FPP,Cpu>* M);
+				//void pop_first(MatGeneric<FPP,Cpu>* M);
+				//void pop_first(MatGeneric<FPP,Cpu>* M) const;
 				void Display(const bool transpose=false, const bool displaying_small_mat_elts=false)const;
 				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false)const;
 				void transpose();
@@ -266,9 +266,9 @@ namespace Faust
 				 *! \tparam  x :  the vector to be multiplied
 				 *! \tparam opThis : character
 				 */
-				Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu> x,const char opThis) const;
+				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x,const char opThis) const;
 
-				Faust::Vect<FPP,Cpu> multiply(const Faust::Vect<FPP,Cpu>& x) const
+				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu>& x) const
 				{
 					return this->multiply(x,'N');
 				}
@@ -281,20 +281,20 @@ namespace Faust
 				 *! \tparam  x :  the vector to be multiplied
 				 *! \tparam opThis : character
 				 */
-				Faust::MatDense<FPP,Cpu> multiply(Faust::MatDense<FPP,Cpu> A,const char opThis='N') const;
+				MatDense<FPP,Cpu> multiply(MatDense<FPP,Cpu> A,const char opThis='N') const;
 
-				Faust::MatSparse<FPP,Cpu> multiply(const Faust::MatSparse<FPP,Cpu> A,const char opThis='N') const;
+				MatSparse<FPP,Cpu> multiply(const MatSparse<FPP,Cpu> A,const char opThis='N') const;
 
 
 				/** \brief Move assign operator overload. Factors are not duplicated in memory but T loses its.*/
-				Transform<FPP,Cpu>& operator=(Faust::Transform<FPP,Cpu>&& T);
+				Transform<FPP,Cpu>& operator=(Transform<FPP,Cpu>&& T);
 
 				void operator=(const Transform<FPP,Cpu>&  f);//{data=f.data;totalNonZeros=f.totalNonZeros;}
 		/// add all of the sparse matrices from f.data to this->data
 		void operator*=(const FPP  scalar){scalarMultiply(scalar);};
 		void operator*=(const Transform<FPP,Cpu>&  f){multiply(f);};
 
-		using transf_iterator = typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::const_iterator;
+		using transf_iterator = typename std::vector<MatGeneric<FPP,Cpu>*>::const_iterator;
 
 		transf_iterator begin() const;
 
@@ -315,19 +315,19 @@ namespace Faust
 			private:
 		long long int totalNonZeros;
 		static const char * m_className;
-		std::vector<Faust::MatGeneric<FPP,Cpu>*> data;
+		std::vector<MatGeneric<FPP,Cpu>*> data;
 		bool dtor_delete_data;
 		bool dtor_disabled;
 		static RefManager ref_man;
 
 #ifdef __COMPILE_TIMERS__
-		mutable std::vector<Faust::Timer> t_multiply_vector;
+		mutable std::vector<Timer> t_multiply_vector;
 #endif
 
 
 		// friend function
-		friend Faust::Vect<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu>& v);
-		friend Faust::MatDense<FPP,Cpu> Faust::operator*<>(const Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu>& M);
+		friend Vect<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const Vect<FPP,Cpu>& v);
+		friend MatDense<FPP,Cpu> operator*<>(const Transform<FPP,Cpu>& f, const MatDense<FPP,Cpu>& M);
 		friend TransformHelper<FPP,Cpu>;
 		};
 

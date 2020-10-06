@@ -63,11 +63,11 @@ enum faust_constraint_name
    CONSTRAINT_NAME_SKPERM
 };
 
-template<typename FPP,FDevice DEVICE> class MatDense;
 
 //! \namespace Faust
 //! \brief Faust namespace contains the principal class of the project.
-namespace Faust {
+namespace Faust
+{
 
     // modif AL AL
     template<typename FPP,FDevice DEVICE>
@@ -117,7 +117,7 @@ namespace Faust {
 		template<typename FPP, FDevice DEVICE>
 		/*virtual*/ void project(MatDense<FPP,DEVICE> & mat)const;//=0; //template with (pure) virtual not authorized (otherwise it must be templates from class, not function)
 		template<typename FPP, FDevice DEVICE, typename FPP2>
-			/*virtual*/ void project(Faust::MatDense<FPP, DEVICE>&) const /*=0*/;
+			/*virtual*/ void project(MatDense<FPP, DEVICE>&) const /*=0*/;
 	    virtual ~ConstraintGeneric(){};
 
 	protected:

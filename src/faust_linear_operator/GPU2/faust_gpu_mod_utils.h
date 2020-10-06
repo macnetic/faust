@@ -62,13 +62,13 @@ namespace Faust
 		void check_gpu_mod_loaded() const;
 
 		// functions to access the good scalar type gpu_mod functions specifiying the type by argument value (templates are not possible here because of the C interface of the library)
-		// functions for sparse matrix (typically used in Faust::MatSparse<FPP,GPU2>)
+		// functions for sparse matrix (typically used in MatSparse<FPP,GPU2>)
 		gm_SparseMatFunc_double* spm_funcs(const double &d) const;
 		gm_SparseMatFunc_float* spm_funcs(const float &d) const;
 		gm_SparseMatFunc_cuComplex* spm_funcs(const complex<float> &c) const;
 		gm_SparseMatFunc_cuDoubleComplex* spm_funcs(const complex<double> &c) const;
 
-		// functions for dense matrix (typically used in Faust::MatDense<FPP,GPU2>)
+		// functions for dense matrix (typically used in MatDense<FPP,GPU2>)
 		gm_DenseMatFunc_double* dsm_funcs(const double &d) const;
 		gm_DenseMatFunc_float* dsm_funcs(const float &d) const;
 		gm_DenseMatFunc_cuComplex* dsm_funcs(const complex<float> &c) const;

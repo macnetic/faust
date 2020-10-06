@@ -6,14 +6,15 @@
 #ifndef __GIVENS_FGFT_PARALLEL__
 #define __GIVENS_FGFT_PARALLEL__
 
-namespace Faust {
+namespace Faust
+{
 
 
 	template<typename FPP, FDevice DEVICE, typename FPP2 = float>
 		class GivensFGFTParallel : public GivensFGFT<FPP,DEVICE,FPP2>, public GivensFGFTParallelGen<FPP, DEVICE, FPP2>
 	{
 		/**
-		 * \class Faust::GivensFGFTParallel
+		 * \class GivensFGFTParallel
 		 *
 		 * \brief This class implements the parallel version of Givens FGFT algorithm.
 		 *
@@ -35,7 +36,7 @@ namespace Faust {
 		 * Computes the coefficients of the last selected rotation matrix to be put later in current iteration factor.
 		 */
 		void update_fact();
-		void update_L(Faust::MatDense<FPP,Cpu> &L);
+		void update_L(MatDense<FPP,Cpu> &L);
 
 		/**
 		 * Function pointer to any step of the algorithm.
@@ -57,8 +58,8 @@ namespace Faust {
 		 * \param stoppingError defines a stopping criterion based on error (absolute relative error).
 		 *
 		 */
-		GivensFGFTParallel(Faust::MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0,  const bool errIsRel = true, const bool enable_large_Faust = false);
-		GivensFGFTParallel(Faust::MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
+		GivensFGFTParallel(MatDense<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0,  const bool errIsRel = true, const bool enable_large_Faust = false);
+		GivensFGFTParallel(MatSparse<FPP,DEVICE>& Lap, int J, int t, unsigned int verbosity = 0, const double stoppingCritIsError = 0.0, const bool errIsRel = true, const bool enable_large_Faust = false);
 
 	};
 

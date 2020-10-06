@@ -28,7 +28,7 @@ namespace Faust
 				void display() const;
 				MatDense<FPP,GPU2> get_product();
 				void get_product(MatDense<FPP,GPU2>& M);
-				MatDense<FPP,GPU2> multiply(const Faust::MatDense<FPP,GPU2> &A, const bool transpose=false, const bool conjugate=false);
+				MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A, const bool transpose=false, const bool conjugate=false);
 				TransformHelper<FPP,GPU2>* multiply(const FPP& a);
 				Real<FPP> normFro() const;
 				faust_unsigned_int size() const;

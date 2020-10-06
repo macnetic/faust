@@ -123,12 +123,12 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 	Real<FPP> c = 1/step_size;
 	while(sc.do_continue(i, error))
 	{
-		//		std::cout << "nfacts:" << nfacts << std::endl;
+//		std::cout << "nfacts:" << nfacts << std::endl;
 
 		init_ite();
 		while(updating_facs())
 		{
-//			std::cout << "f_id: " << f_id << std::endl;
+//			std::cout << "#f_id: " << f_id << std::endl;
 			cur_fac = S.get_gen_fact_nonconst(f_id);
 			Real<FPP> nR=1,nL=1;
 			if(! constant_step_size)
@@ -206,6 +206,7 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 			}
 			next_fid(); //f_id updated to iteration factor index (pL or pR too)
 		}
+
 		//update lambda
 		//TODO: variable decl in parent scope
 		Faust::MatDense<FPP,DEVICE> A_H_S = S.multiply(A_H);

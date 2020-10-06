@@ -93,7 +93,7 @@ namespace Faust
 
    // friend function of faust_linear_algebra.h
    template<typename FPP>
-   void gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
+   void gemv(const MatDense<FPP,Cpu> & A,const Vect<FPP,Cpu> & x,Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
 	template<typename FPP,FDevice DEVICE> class Transform;
 
@@ -143,12 +143,12 @@ namespace Faust
 
         // multiply (*this) =  A * (*this)
         // modif AL AL
-        //void  multiplyLeft(Faust::MatDense<FPP,Cpu> const& A){Faust::gemv(A, *this, *this, 1.0, 0.0, 'N');}
+        //void  multiplyLeft(MatDense<FPP,Cpu> const& A){gemv(A, *this, *this, 1.0, 0.0, 'N');}
         //!  \brief
         //! \brief Vect::multiplyLeft is used to replace this by A * (*this)
         //! \param A is a matrix (dense or sparse).
-        void  multiplyLeft(Faust::MatDense<FPP,Cpu> const& A); //{Faust::gemv(A, *this, *this, 1.0, 0.0, 'N');}
-        void  multiplyLeft(Faust::MatSparse<FPP,Cpu> const& S,const char TransS='N');
+        void  multiplyLeft(MatDense<FPP,Cpu> const& A); //{gemv(A, *this, *this, 1.0, 0.0, 'N');}
+        void  multiplyLeft(MatSparse<FPP,Cpu> const& S,const char TransS='N');
 
         FPP sum()const{return vec.sum();}
         FPP mean()const{return vec.mean();}
@@ -156,22 +156,8 @@ namespace Faust
 //		FPP min_coeff() const {return vec.minCoeff();};
 		FPP min_coeff() const {int index; return this->min_coeff(&index);};
 		FPP min_coeff(int *index) const { int col_index; return vec.minCoeff(index, &col_index); }
-		FPP max_coeff(int *index) const {
-			FPP max = getData()[0]; //FPP(std::numeric_limits<double>::max());
-			FPP e;
-			*index = 0;
-			//			vec.getData()[i] = Eigen::abs(mat.row(i)).maxCoeff(col_indices+i);
-			for(int j=0;j<this->size(); j++)
-			{
-				e = getData()[j];
-				if(Faust::fabs(e) > Faust::fabs(max))
-				{
-					max = e;
-					*index = j;
-				}
-			}
-			return max;
-		}
+		FPP max_coeff(int *index) const;
+
 
         template<typename FPP1>
         void operator=(Vect<FPP1,Cpu> const& y);
@@ -193,11 +179,11 @@ namespace Faust
         bool equality(Vect<FPP,Cpu> const &x, FPP precision) const;
 		FPP mean();
 
-		static Faust::Vect<FPP, Cpu>* rand(faust_unsigned_int size);
+		static Vect<FPP, Cpu>* rand(faust_unsigned_int size);
 		void setRand();
 
         // friend algebra
-        friend void Faust::gemv<>(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> & x,Faust::Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
+        friend void gemv<>(const MatDense<FPP,Cpu> & A,const Vect<FPP,Cpu> & x,Vect<FPP,Cpu> & y,const FPP & alpha, const FPP & beta, char typeA);
 
 
         private:
@@ -207,7 +193,7 @@ namespace Faust
 
         #ifdef __COMPILE_TIMERS__
             public:
-            Faust::Timer t_local_multiplyLeft;
+            Timer t_local_multiplyLeft;
         #endif
 
     };

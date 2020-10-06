@@ -73,17 +73,17 @@ namespace Faust
        public:
 
           ParamsPalm(
-             const Faust::MatDense<FPP,DEVICE>& data_,
+             const MatDense<FPP,DEVICE>& data_,
              const int nbFact_,
-             const std::vector<const Faust::ConstraintGeneric*>& cons_,
-             const std::vector<Faust::MatDense<FPP,DEVICE> >& init_fact_,
-             const Faust::StoppingCriterion<FPP2> & stop_crit_ = Faust::StoppingCriterion<FPP2>(defaultNiter),
+             const std::vector<const ConstraintGeneric*>& cons_,
+             const std::vector<MatDense<FPP,DEVICE> >& init_fact_,
+             const StoppingCriterion<FPP2> & stop_crit_ = StoppingCriterion<FPP2>(defaultNiter),
              const bool isVerbose_ = defaultVerbosity ,
              const bool isUpdateWayR2L_ = defaultUpdateWayR2L ,
              const FPP2 init_lambda_ = defaultLambda,
              const bool constant_step_size_ = defaultConstantStepSize,
              const FPP2 step_size_ = defaultStepSize,
-			 const GradientCalcOptMode gradCalcOptMode = Faust::Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode);
+			 const GradientCalcOptMode gradCalcOptMode = Params<FPP,DEVICE,FPP2>::defaultGradCalcOptMode);
 
           void check_constraint_validity();
            ParamsPalm();
@@ -92,13 +92,13 @@ namespace Faust
 
        public:
           // Required members
-          Faust::MatDense<FPP,DEVICE> data;
+          MatDense<FPP,DEVICE> data;
           int nbFact; // number of factors
-          std::vector<const Faust::ConstraintGeneric*> cons; // vector of constraints
+          std::vector<const ConstraintGeneric*> cons; // vector of constraints
 
           // Optional members (set to default values if not defined)
-          std::vector<Faust::MatDense<FPP,DEVICE> > init_fact;
-          Faust::StoppingCriterion<FPP2> stop_crit;
+          std::vector<MatDense<FPP,DEVICE> > init_fact;
+          StoppingCriterion<FPP2> stop_crit;
           bool isVerbose;
           bool isUpdateWayR2L;
           bool isConstantStepSize;
@@ -121,7 +121,7 @@ namespace Faust
 
 
           /*const int nb_it;   // number of iterations
-          // if isFaust::StoppingCriterionError then criterion is error else criterion is number of iteration
+          // if isStoppingCriterionError then criterion is error else criterion is number of iteration
           bool  isStoppingCriterionError;
           const FPP errorThreshold;
           // only used as stopping criterion, if isStoppingCriterionError, when error is still greater than

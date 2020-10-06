@@ -7,7 +7,8 @@
 
 using namespace Faust;
 
-namespace Faust {
+namespace Faust
+{
 
 	template<typename FPP, FDevice DEVICE, typename FPP2 = double>
 		class Palm4MSAFGFT : public Palm4MSA<FPP, DEVICE, FPP2>

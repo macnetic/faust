@@ -2,7 +2,8 @@
 #include "faust_constant.h"
 #ifndef __FAUST_SLICE__
 #define __FAUST_SLICE__
-namespace Faust {
+namespace Faust
+{
 
 
 	struct Slice

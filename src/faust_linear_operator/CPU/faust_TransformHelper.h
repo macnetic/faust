@@ -59,7 +59,8 @@
 #include "faust_gpu_mod.h"
 #endif
 
-namespace Faust {
+namespace Faust
+{
 
 	template<typename FPP>
 		using transf_iterator = typename Transform<FPP,Cpu>::transf_iterator;
@@ -104,7 +105,7 @@ namespace Faust {
 			template<typename ...GList> TransformHelper(GList& ... t);
 #endif
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose=false, const bool conjugate=false);
-//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
+			//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 			void update_total_nnz();
 			void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=false);
@@ -117,12 +118,12 @@ namespace Faust {
 			TransformHelper<FPP, Cpu>* multiply(FPP& scalar);
 			template<typename Head, typename ... Tail>
 				void push_back_(Head& h, Tail&... t);
-//
+			//
 			void push_back_();
 			void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=true);
-            void pop_back();
-            void pop_front();
-            void push_first(const Faust::MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=true);
+			void pop_back();
+			void pop_front();
+			void push_first(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const bool copying=true);
 			faust_unsigned_int getNbRow() const;
 			faust_unsigned_int getNbCol() const;
 			faust_unsigned_int getNBytes() const;
@@ -145,13 +146,13 @@ namespace Faust {
 					faust_unsigned_int* num_rows,
 					faust_unsigned_int* num_cols) const;
 			void get_fact(const faust_unsigned_int id,
-				int* rowptr,
-				int* col_ids,
-				FPP* elts,
-				faust_unsigned_int* nnz,
-				faust_unsigned_int* num_rows,
-				faust_unsigned_int* num_cols,
-				const bool transpose=false) const;
+					int* rowptr,
+					int* col_ids,
+					FPP* elts,
+					faust_unsigned_int* nnz,
+					faust_unsigned_int* num_rows,
+					faust_unsigned_int* num_cols,
+					const bool transpose=false) const;
 			void get_fact(const faust_unsigned_int id,
 					const FPP** elts,
 					faust_unsigned_int* num_rows,
@@ -167,7 +168,7 @@ namespace Faust {
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 			TransformHelper<FPP, Cpu>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			MatDense<FPP,Cpu> get_product();// const;
-            void get_product(Faust::MatDense<FPP,Cpu>& prod) const;
+			void get_product(MatDense<FPP,Cpu>& prod) const;
 			void save_mat_file(const char* filename) const;
 			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			TransformHelper<FPP,Cpu>* transpose();
@@ -177,7 +178,7 @@ namespace Faust {
 			TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
 			bool isTransposed() const;
 			bool isConjugate() const;
-//			const char isTransposed2char() const;
+			//			const char isTransposed2char() const;
 			double normL1() const;
 			double normFro() const;
 			double normInf() const;
@@ -196,12 +197,12 @@ namespace Faust {
 			/**
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 
-			  */
+*/
 			TransformHelper<FPP,Cpu>* left(const faust_unsigned_int id, const bool copy=false) const;
 			/**
 			  \brief Returns the right hand side factors of this from index id to the size()-1 (as a new TransformHelper obj).
 
-			  */
+*/
 			TransformHelper<FPP,Cpu>* right(const faust_unsigned_int id, const bool copy=false) const;
 
 			transf_iterator<FPP> begin() const;
@@ -214,9 +215,9 @@ namespace Faust {
 			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
 			void pack_factors();
 			void pack_factors(const faust_unsigned_int id, const PackDir dir);
-            /** for testing purpose only (memory leaks enabled) */
+			/** for testing purpose only (memory leaks enabled) */
 			void disable_dtor() { this->transform->disable_dtor(); }
-            void enable_dtor() { this->transform->enable_dtor(); }
+			void enable_dtor() { this->transform->enable_dtor(); }
 			static TransformHelper<FPP,Cpu>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 			static TransformHelper<FPP,Cpu>* hadamardFaust(unsigned int n, const bool norma=true);
 			static TransformHelper<FPP,Cpu>* fourierFaust(unsigned int n, const bool norma=true);

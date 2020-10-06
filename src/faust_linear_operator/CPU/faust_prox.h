@@ -58,7 +58,8 @@
 *   PALM relies on projections onto the constraint sets for each factor at each iteration, <br>
 *   so the projection operator should be simple and easy to compute.
 */
-namespace Faust {
+namespace Faust
+{
 
 	template<typename FPP>
 		bool partial_sort_comp (const std::pair<int, FPP>& pair1, const std::pair<int, FPP>& pair2);
@@ -67,37 +68,37 @@ namespace Faust {
 		void sort_idx(const std::vector<FPP> &v, std::vector<int>& idx, int s);
 
 	template<typename FPP>
-		void prox_sp(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
+		void prox_sp(MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
 	template<typename FPP>
-		void prox_sp_pos(Faust::MatDense<FPP, Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false );
+		void prox_sp_pos(MatDense<FPP, Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false );
 	template<typename FPP>
-		void prox_spcol(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
+		void prox_spcol(MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
 	template<typename FPP>
-		void prox_splin(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
+		void prox_splin(MatDense<FPP,Cpu> & M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
 	template<typename FPP>
-		void prox_splincol(Faust::MatDense<FPP,Cpu> &M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
+		void prox_splincol(MatDense<FPP,Cpu> &M,faust_unsigned_int k, const bool normalized=true, const bool pos=false);
 	template<typename FPP>
-		void prox_supp(Faust::MatDense<FPP,Cpu> & M, const Faust::MatDense<FPP,Cpu> & supp, const bool normalized=true, const bool pos=false);
+		void prox_supp(MatDense<FPP,Cpu> & M, const MatDense<FPP,Cpu> & supp, const bool normalized=true, const bool pos=false);
 	template<typename FPP>
-		void prox_const(Faust::MatDense<FPP,Cpu> & M, const Faust::MatDense<FPP,Cpu> & supp, const bool normalized=true, const bool pos=false);
+		void prox_const(MatDense<FPP,Cpu> & M, const MatDense<FPP,Cpu> & supp, const bool normalized=true, const bool pos=false);
 
 	template<typename FPP, typename FPP2>
-		void prox_normcol(Faust::MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized=false, const bool pos=false);
+		void prox_normcol(MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized=false, const bool pos=false);
 	template<typename FPP, typename FPP2>
-		void prox_normlin(Faust::MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized=false, const bool pos=false);
+		void prox_normlin(MatDense<FPP,Cpu> & M,FPP2 s, const bool normalized=false, const bool pos=false);
 	//    template<typename FPP>
-	//    void prox_blkdiag(Faust::MatDense<FPP,Cpu> & M,faust_unsigned_int k);
+	//    void prox_blkdiag(MatDense<FPP,Cpu> & M,faust_unsigned_int k);
 	template<typename FPP>
-		void prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized = false, const bool pos = false);
+		void prox_blockdiag(MatDense<FPP,Cpu> & M, std::vector<faust_unsigned_int>& m_vec, std::vector<faust_unsigned_int>& n_vec, const bool normalized = false, const bool pos = false);
 	template<typename FPP>
-		void prox_blockdiag(Faust::MatDense<FPP,Cpu> & M, Faust::MatDense<FPP,Cpu> mn_vec, const bool normalized=true, const bool pos=false);
+		void prox_blockdiag(MatDense<FPP,Cpu> & M, MatDense<FPP,Cpu> mn_vec, const bool normalized=true, const bool pos=false);
 
 	template<typename FPP> void pre_prox_pos(MatDense<FPP,Cpu> & M);
-	template<typename FPP> void prox_hankel(Faust::MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
-	template<typename FPP> void prox_toeplitz(Faust::MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
-	template<typename FPP> void prox_circ(Faust::MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
+	template<typename FPP> void prox_hankel(MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
+	template<typename FPP> void prox_toeplitz(MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
+	template<typename FPP> void prox_circ(MatDense<FPP, Cpu> & M, const bool normalized = true, const bool pos = false);
 	template<typename FPP>
-		void prox_skperm(Faust::MatDense<FPP, Cpu> & M,const unsigned int k,  const bool normalized=true, const bool pos=false);
+		void prox_skperm(MatDense<FPP, Cpu> & M,const unsigned int k,  const bool normalized=true, const bool pos=false);
 
 
 }

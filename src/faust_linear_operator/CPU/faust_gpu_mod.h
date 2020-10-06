@@ -44,22 +44,22 @@ namespace Faust
 		bool use_ref_man; // default to true
 
 		public:
-		FaustGPU(const std::vector<Faust::MatGeneric<FPP,Cpu>*>&);
+		FaustGPU(const std::vector<MatGeneric<FPP,Cpu>*>&);
 //		FaustGPU(const Transform<FPP,Cpu>*);
 		~FaustGPU();
 
 
 		MatDense<FPP, Cpu> get_product(const bool transpose = false, const bool conjugate = false);
-		MatDense<FPP, Cpu> multiply(const Faust::MatGeneric<FPP,Cpu>*, const bool transpose = false, const bool conjugate = false);
+		MatDense<FPP, Cpu> multiply(const MatGeneric<FPP,Cpu>*, const bool transpose = false, const bool conjugate = false);
 
-		Vect<FPP, Cpu> multiply(const Faust::Vect<FPP,Cpu>&, const bool transpose = false, const bool conjugate = false);
+		Vect<FPP, Cpu> multiply(const Vect<FPP,Cpu>&, const bool transpose = false, const bool conjugate = false);
 
 		void pop_front();
 
 		void pop_back();
 		void push_back(MatGeneric<FPP,Cpu>* M);
 
-		void insert(const Faust::MatGeneric<FPP,Cpu>* M, int32_t id);
+		void insert(const MatGeneric<FPP,Cpu>* M, int32_t id);
 
 		/** TODO: this function should be deleted because it is definitely slower than the version 2 */
 		FPP power_iteration(int32_t max_iter, Real<FPP> threshold, int& flag);
@@ -72,10 +72,10 @@ namespace Faust
 		Real<FPP> spectral_norm(int32_t max_iter, Real<FPP> threshold);
 
 		/* Update on gpu the copy matrix of M (M must have already been loaded otherwise an exception is raised) */
-		void update(const Faust::MatGeneric<FPP,Cpu>* M, int32_t id);
+		void update(const MatGeneric<FPP,Cpu>* M, int32_t id);
 
 		/* Returns true if the matrix has already been loaded on GPU, false otherwise */
-		static bool is_cpu_mat_known(const Faust::MatGeneric<FPP,Cpu>*);
+		static bool is_cpu_mat_known(const MatGeneric<FPP,Cpu>*);
 		/* Returns true if is_cpu_mat_known returns true for each matrix in mats, false otherwise */
 		static bool are_cpu_mat_all_known(const std::vector<MatGeneric<FPP,Cpu>*> mats);
 

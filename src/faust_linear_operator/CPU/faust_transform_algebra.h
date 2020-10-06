@@ -63,16 +63,16 @@ namespace Faust
 	template<typename FPP>
 	FPP absValue(FPP realScalar){return fabs(realScalar);}
 	
-	// if measure of time is down Faust::Transform<FPP,Cpu> is no longer constant during multiplication because a measure of time is an attribute to the faust::Transform
+	// if measure of time is down Transform<FPP,Cpu> is no longer constant during multiplication because a measure of time is an attribute to the faust::Transform
 	template<typename FPP>
 	#ifdef __COMPILE_TIMERS__
-		Faust::Vect<FPP,Cpu> operator*(Faust::Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu> & v);
+		Vect<FPP,Cpu> operator*(Transform<FPP,Cpu>& f, const Vect<FPP,Cpu> & v);
 	#else		
-		Faust::Vect<FPP,Cpu> operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::Vect<FPP,Cpu> & v);
+		Vect<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const Vect<FPP,Cpu> & v);
 	#endif
 
 	template<typename FPP>
-	Faust::MatDense<FPP,Cpu> operator*(const Faust::Transform<FPP,Cpu>& f, const Faust::MatDense<FPP,Cpu> & M);
+	MatDense<FPP,Cpu> operator*(const Transform<FPP,Cpu>& f, const MatDense<FPP,Cpu> & M);
 
 }
 

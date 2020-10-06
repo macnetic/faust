@@ -48,7 +48,7 @@
 namespace Faust
 {
 
-    /*! \fn Faust::cblas_gemm
+    /*! \fn cblas_gemm
     *   \brief call the function cblas_sgemm or cblas_dgemm, depend to the precision (double or float), from the external library openBLAS    <br>
     * This function is used to multiply the matrices.
     */
@@ -58,7 +58,7 @@ namespace Faust
 // cblas_sgemv(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
 
 
-    /*! \fn Faust::cblas_gemv
+    /*! \fn cblas_gemv
     *   \brief call the function cblas_sgemv or cblas_dgemv, depend to the precision (double or float), from the external library openBLAS    <br>
     * This function is used to multiply the matrices.
     */

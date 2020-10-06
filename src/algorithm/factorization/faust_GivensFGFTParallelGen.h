@@ -6,14 +6,15 @@
 #include "faust_MatSparse.h"
 #include <list>
 #include <functional>
-namespace Faust {
+namespace Faust
+{
 
 
 	template<typename FPP, FDevice DEVICE, typename FPP2 = float, typename FPP4 = FPP>
 		class GivensFGFTParallelGen
 		{
 			/**
-			 * \class Faust::GivensFGFTParallelGen
+			 * \class GivensFGFTParallelGen
 			 *
 			 * \brief This class represents the parallel version of Givens FGFT algorithm (for concrete implementations see subclasses: GivensFGFTParallelComplex and GivensFGFTParallel).
 			 *
@@ -27,7 +28,7 @@ namespace Faust {
 			 *
 			 */
 
-			Faust::GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg;
+			GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg;
 
 			protected:
 				/** Maximum number of rotations per factor
@@ -38,7 +39,7 @@ namespace Faust {
 				unsigned int fact_nrots;
 				// current fact nonzero indices (descendantly sorted according to absolute values in L)
 				list<pair<int,int>> fact_nz_inds;
-				std::function<int(const pair<int, int>& a, const pair<int, int>& b, Faust::MatDense<FPP4,DEVICE>& L_low)> fact_nz_inds_sort_func;
+				std::function<int(const pair<int, int>& a, const pair<int, int>& b, MatDense<FPP4,DEVICE>& L_low)> fact_nz_inds_sort_func;
 
 			public:
 				void max_L();
@@ -64,7 +65,7 @@ namespace Faust {
 		/**
 		 * Computes the coefficients of the last selected rotation matrix to be put later in current iteration factor.
 		 */
-		void update_L(Faust::MatSparse<FPP,Cpu> &L);
+		void update_L(MatSparse<FPP,Cpu> &L);
 
 		/**
 		 * Constructs the current factor after computing all the coefficients (of rotation matrices) in temporary buffers (see update_fact()).
@@ -78,7 +79,7 @@ namespace Faust {
 		 * \param t the maximum number of 2D rotation matrices (Givens matrices) to insert in each factor. The effective number can be less than t if there is not enough pivot candidates left in the matrix L of the current iteration.
 		 * \param algo instance of GivensFGFT or GivensFGFTComplex (subclasses of GivensFGFTGen).
 		 */
-		GivensFGFTParallelGen(int t, Faust::GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg);
+		GivensFGFTParallelGen(int t, GivensFGFTGen<FPP, DEVICE, FPP2, FPP4> & alg);
 	};
 
 #include "faust_GivensFGFTParallelGen.hpp"

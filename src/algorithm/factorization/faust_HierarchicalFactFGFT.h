@@ -34,7 +34,7 @@ namespace Faust
 		void next_step()
 		{
 			this->palm_2.m_lambda = FPP2(1.);
-			Faust::HierarchicalFact<FPP, DEVICE, FPP2>::next_step();
+			HierarchicalFact<FPP, DEVICE, FPP2>::next_step();
 		}
 
 

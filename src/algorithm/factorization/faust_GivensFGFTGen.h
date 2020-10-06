@@ -9,7 +9,8 @@
 #include <cfloat>
 #include <vector>
 
-namespace Faust {
+namespace Faust
+{
 
 	template<typename FPP, FDevice DEVICE, typename FPP2, typename FPP4>
 		class GivensFGFTParallelGen;
@@ -17,7 +18,7 @@ namespace Faust {
 	template<typename FPP, FDevice DEVICE, typename FPP2 = float, typename FPP4 = FPP>
 		class GivensFGFTGen {
 			/**
-			 * \class Faust::GivensFGFTGen
+			 * \class GivensFGFTGen
 			 *
 			 * \brief This class implements the Givens FGFT algorithm.
 			 * This algorithm is based on the classical Jacobi eigenvalues algorithm.
@@ -31,30 +32,30 @@ namespace Faust {
 			 *    <https://hal.inria.fr/hal-01416110>
 			 *
 			 */
-			friend class Faust::GivensFGFTParallelGen<FPP, DEVICE, FPP2, FPP4>;
+			friend class GivensFGFTParallelGen<FPP, DEVICE, FPP2, FPP4>;
 			/** \brief Temporary storage matrix for maximization of L. */
-			//			Faust::MatDense<FPP4,DEVICE> C;
+			//			MatDense<FPP4,DEVICE> C;
 			/** \brief Column vector for the rowwise minimization of C (i.e. maximization of L). */
-			//			Faust::Vect<FPP4,DEVICE> C_min_row;
+			//			Vect<FPP4,DEVICE> C_min_row;
 			protected:
 				/** \brief Fourier matrix/eigenvectors factorization matrices (Givens matrices). */
-				vector<Faust::MatSparse<FPP4,DEVICE>> facts;
+				vector<MatSparse<FPP4,DEVICE>> facts;
 
 				/** \brief L iteration factor:  L_i = S^T L_{i-1} S, initialized from Lap (with S being facts[i]). */
-				Faust::MatGeneric<FPP4, DEVICE>* L;
+				MatGeneric<FPP4, DEVICE>* L;
 				/** \brief Pivot candidates q coordinates. */
 				int* q_candidates;  /* default IndexType for underlying eigen matrix is int. */
 
 				/** \brief The number of targeted transform factors (when only one Givens rotation is stored per factor).*/
 				int J;
 				/** \brief approximate eigenvalues vector. */
-				Faust::Vect<FPP,DEVICE> D;
+				Vect<FPP,DEVICE> D;
 				/** \brief Queue of errors (cf. update_err()). */
 				vector<FPP2> errs;
 				/** \brief Pivot choices (p, q) coordinates. */
 				vector<pair<int,int>> coord_choices;
 				/** \brief Graph Laplacian to diagonalize/approximate. */
-				Faust::MatGeneric<FPP4, DEVICE>& Lap;
+				MatGeneric<FPP4, DEVICE>& Lap;
 				/** \brief Laplacian dimension */
 				unsigned int dim_size;
 				/** \brief Laplacian Frobenius norm */
@@ -82,7 +83,7 @@ namespace Faust {
 				/** \brief True is the last fact (of facts) has been permuted */
 				bool last_fact_permuted;
 				/** \brief Cache for the ordered D. */
-				Faust::Vect<FPP,DEVICE> ordered_D;
+				Vect<FPP,DEVICE> ordered_D;
 				/** \brief true if D has already been ordered (order_D() was called). */
 				bool is_D_ordered;
 				/** \brief 1 if eigenvalues has been ordered in ascending order -1 ortherwise (other values is for undefined order). */
@@ -121,10 +122,10 @@ namespace Faust {
 				 * \param J The number of iterations, Givens rotations factors.
 				 * TODO: complete argument list
 				 * */
-				GivensFGFTGen(Faust::MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
+				GivensFGFTGen(MatGeneric<FPP4,DEVICE>* Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
 
-				GivensFGFTGen(Faust::MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
-				GivensFGFTGen(Faust::MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
+				GivensFGFTGen(MatSparse<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
+				GivensFGFTGen(MatDense<FPP4, DEVICE> & Lap, int J, unsigned int verbosity /* deft val == 0 */, const double stoppingError, const bool errIsRel, const bool enable_large_Faust = false);
 
 				/** Destructor */
 				virtual ~GivensFGFTGen() {delete[] q_candidates; delete L;};
@@ -188,16 +189,16 @@ namespace Faust {
 				 * Computes the first S'*L (only used by update_L() in optimization enabled code).
 				 *
 				 */
-				//				void update_L_first(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L);
+				//				void update_L_first(Vect<FPP,DEVICE>& L_vec_p, Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L);
 
 				/**
 				 * Computes L*S (only used by update_L() in optimization enabled code).
 				 * Must be called after update_L_first() to finish the update of L = S'*L*S.
 				 */
-				//				void update_L_second(Faust::Vect<FPP,DEVICE>& L_vec_p, Faust::Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L);
+				//				void update_L_second(Vect<FPP,DEVICE>& L_vec_p, Vect<FPP,DEVICE>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatDense<FPP,DEVICE> & L);
 
-				//				void update_L_first(Eigen::SparseMatrix<FPP, RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L);
-				//				void update_L_second(Eigen::SparseMatrix<FPP, RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, Faust::MatSparse<FPP,DEVICE> & L);
+				//				void update_L_first(Eigen::SparseMatrix<FPP, RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatSparse<FPP,DEVICE> & L);
+				//				void update_L_second(Eigen::SparseMatrix<FPP, RowMajor> & L_vec_p, Eigen::SparseMatrix<FPP, RowMajor>& L_vec_q, const FPP2& c, const FPP2& s, int p, int q, MatSparse<FPP,DEVICE> & L);
 				/**
 				 * \brief Algo. step 2.5.
 				 *
@@ -250,12 +251,12 @@ namespace Faust {
 				/**
 				 * Returns the diag. vector D in its current status (which is updated at each iteration).
 				 */
-				const Faust::Vect<FPP,DEVICE>& get_D(const bool ord=false);
+				const Vect<FPP,DEVICE>& get_D(const bool ord=false);
 
 				/**
 				 * \param ord 0 (no sort), 1 (ascendant sort), -1 (descendant sort).
 				 */
-				const Faust::Vect<FPP,DEVICE>& get_D(const int ord=0);
+				const Vect<FPP,DEVICE>& get_D(const int ord=0);
 
 				/** \brief Returns the diagonal vector as a sparse matrix.
 				 *
@@ -263,7 +264,7 @@ namespace Faust {
 				 *
 				 **/
 				template<typename FPP3>
-					void get_Dspm(Faust::MatSparse<FPP3,DEVICE>&, const bool ord=false);
+					void get_Dspm(MatSparse<FPP3,DEVICE>&, const bool ord=false);
 
 				/**
 				 * Returns the diagonal by copying it in the buffer diag_data (should be allocated by the callee).
@@ -317,15 +318,15 @@ namespace Faust {
 
 
 				/**
-				 * Returns a Faust::Transform object with copy of facts into it.
+				 * Returns a Transform object with copy of facts into it.
 				 *
 				 * \param ord true to get the Transform's facts ordering the last one columns according to ascendant eigenvalues, false to let facts as they went out from the algorithm (without reordering).
 				 */
-				Faust::Transform<FPP4,DEVICE> get_transform(bool ord);
+				Transform<FPP4,DEVICE> get_transform(bool ord);
 				/**
 				 * \param ord -1 for descending order, 1 for ascending order.
 				 */
-				Faust::Transform<FPP4,DEVICE> get_transform(int ord);
+				Transform<FPP4,DEVICE> get_transform(int ord);
 
 
 		};
