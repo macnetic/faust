@@ -329,14 +329,13 @@ namespace Faust
 	template<>
 		bool Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::is_fact_sparse(int id) const
 		{
-			return get_fact(id)->getType() == Sparse;
-
+			return get_fact(id, /*cloning*/ false)->getType() == Sparse;
 		}
 
 	template<>
 		bool Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::is_fact_dense(int id) const
 		{
-			return get_fact(id)->getType() == Dense;
+			return get_fact(id, /*cloning*/ false)->getType() == Dense;
 		}
 
 	template<>
@@ -399,7 +398,7 @@ namespace Faust
 		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator++(int)
 		{
 			iterator copy(*this);
-			(*this)++;
+			this->index++;
 			return copy;
 		}
 

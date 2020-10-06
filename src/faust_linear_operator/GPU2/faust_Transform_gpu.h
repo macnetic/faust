@@ -41,12 +41,12 @@ namespace Faust
 			void scalarMultiply(const FPP& alpha);
 			MatDense<FPP,GPU2> get_product(const char opThis='N', const bool isConj=false) const;
 			void get_product(MatDense<FPP,GPU2>& M, const char opThis='N', const bool isConj=false) const;
-			MatDense<FPP,GPU2> multiply(const Faust::MatDense<FPP,GPU2> &A, const char opThis);
+			MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A, const char opThis);
 			void multiply(const Transform<FPP,GPU2> & A);
 			void multiplyLeft(const Transform<FPP,GPU2> & A);
 			void multiply(const FPP& a);
 			Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag);
-//			using transf_iterator = typename std::vector<Faust::MatGeneric<FPP,Cpu>*>::const_iterator;
+//			using transf_iterator = typename std::vector<MatGeneric<FPP,Cpu>*>::const_iterator;
 //
 //			transf_iterator begin() const;
 //
