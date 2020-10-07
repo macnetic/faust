@@ -37,18 +37,22 @@ namespace Faust
 			const int32_t dev_id,/*=-1,*/
 			const void* stream)/*=nullptr)*/
 	{
+		auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+		auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
+		auto cur_dev_id = gp_funcs->cur_dev();
+		gp_funcs->set_dev(dev_id);
 		if(values != nullptr)
 		{
-			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
 			if(rowptr == nullptr || colinds == nullptr)
 				throw std::runtime_error("All GPU buffers or none must be defined to instantiate a MatSparse<FPP,GPU2>.");
-			auto cur_dev_id = gp_funcs->cur_dev();
-			gp_funcs->set_dev(dev_id);
 			gpu_mat = spm_funcs->togpu_stream(nbRow, nbCol, nnz, rowptr, colinds, values, stream);
-			gp_funcs->set_dev(cur_dev_id);
 		}
-		else gpu_mat = nullptr;
+		else
+		{ // no values given, set the matrix as a zero matrix
+			gpu_mat = spm_funcs->create_zero(nbRow, nbCol);
+		}
+		//		else gpu_mat = nullptr;
+		gp_funcs->set_dev(cur_dev_id);
 	}
 
 	template<>
@@ -109,7 +113,8 @@ namespace Faust
 	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator*=(const @FAUST_SCALAR_FOR_GM@& scalar)
 	{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			spm_funcs->mul_scalar(gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
+			if(gpu_mat != nullptr)
+				spm_funcs->mul_scalar(gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
 	}
 
 	template<>
@@ -212,7 +217,8 @@ namespace Faust
 		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::setZeros()
 		{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-		    spm_funcs->set_zeros(gpu_mat);
+			if(gpu_mat != nullptr)
+				spm_funcs->set_zeros(gpu_mat);
 		}
 
 	template<>
@@ -311,7 +317,7 @@ namespace Faust
 		}
 
 		template<>
-			MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::MatSparse(const MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>& mat)
+			MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::MatSparse(const MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>& mat) : MatSparse<FSFG, GPU2>()
 			{
 				//TODO: process the copy totally on gpu side
 				if(mat.get_gpu_mat_ptr() != nullptr)
@@ -320,7 +326,14 @@ namespace Faust
 					MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu> cpu_smat(cpu_dmat);
 					MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2> gpu_smat(cpu_smat);
 					*this = std::move(gpu_smat);
+					gpu_smat.gpu_mat = nullptr;
 				}
+			}
+
+		template<>
+			void MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::operator=(const MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>& mat)
+			{
+				*this = std::move(MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>(mat));
 			}
 
 	template<>

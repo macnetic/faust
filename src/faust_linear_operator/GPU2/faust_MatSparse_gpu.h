@@ -52,6 +52,7 @@ namespace Faust
 
 				MatSparse<FPP,GPU2>& operator=(const MatSparse<FPP, GPU2>& mat);
 				void operator=(const MatSparse<FPP, Cpu>& mat);
+				void operator=(const MatDense<FPP, GPU2>& mat);
 				void operator*=(const FPP& alpha);
 				void operator/=(const FPP& alpha);
 				/**

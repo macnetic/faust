@@ -43,6 +43,7 @@ namespace Faust
 				MatDense<FPP,GPU2>& operator=(const MatDense<FPP,GPU2> & A);
 				void operator=(const MatDense<FPP,Cpu> & A);
 				void operator=(const MatSparse<FPP,Cpu> & A);
+				void operator=(const MatSparse<FPP,GPU2> & A);
 				// *this = *this + A
 				void add(const MatDense<FPP,Cpu> & A);
 				void add(const MatDense<FPP,GPU2> & A);

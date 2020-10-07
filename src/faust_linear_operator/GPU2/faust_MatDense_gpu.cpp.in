@@ -175,6 +175,23 @@ namespace Faust
 		}
 
 	template<>
+		Faust::MatDense<FSFG, GPU2>& Faust::MatDense<FSFG, GPU2>::operator=(const MatDense<FSFG, GPU2>& A)
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
+			if(A.gpu_mat != nullptr)
+			{
+				resize(A.getNbRow(), A.getNbCol());
+				dsm_funcs->copy(A.gpu_mat, this->gpu_mat);
+			}
+			else
+			{
+				dsm_funcs->free(gpu_mat);
+				this->gpu_mat = nullptr;
+			}
+			return *this;
+		}
+
+	template<>
 		Faust::MatDense<FSFG,GPU2>::MatDense(const MatSparse<FSFG,GPU2>& mat) : MatDense<FSFG,GPU2>()
 		{
 			if(mat.get_gpu_mat_ptr() != nullptr)
@@ -184,6 +201,13 @@ namespace Faust
 				spm_funcs->copy2dense(mat.get_gpu_mat_ptr(), this->gpu_mat);
 			}
 		}
+
+	template<>
+	void Faust::MatDense<FSFG, GPU2>::operator=(const MatSparse<FSFG,GPU2> & A)
+	{
+		MatDense<FSFG,GPU2> dm(A);
+		*this = dm;
+	}
 
 	template<>
 		void Faust::MatDense<FSFG,GPU2>::setOnes()
@@ -435,6 +459,8 @@ namespace Faust
 			this->gpu_mat = gpu_mat;
 		}
 
+
+
 	template<>
 		void Faust::MatDense<FSFG, GPU2>::operator=(const MatSparse<FSFG, Cpu>& A)
 		{
@@ -442,22 +468,6 @@ namespace Faust
 			*(this) = ds_A;
 		}
 
-	template<>
-		Faust::MatDense<FSFG, GPU2>& Faust::MatDense<FSFG, GPU2>::operator=(const MatDense<FSFG, GPU2>& A)
-		{
-			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
-			if(A.gpu_mat != nullptr)
-			{
-				resize(A.getNbRow(), A.getNbCol());
-				dsm_funcs->copy(A.gpu_mat, this->gpu_mat);
-			}
-			else
-			{
-				dsm_funcs->free(gpu_mat);
-				this->gpu_mat = nullptr;
-			}
-			return *this;
-		}
 
 	template<>
 		MatDense<FSFG,GPU2>::MatDense(const MatDense<FSFG,GPU2>& mat) : MatDense<FSFG,GPU2>()
