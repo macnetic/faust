@@ -178,7 +178,6 @@ namespace Faust
 			TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
 			bool isTransposed() const;
 			bool isConjugate() const;
-			//			const char isTransposed2char() const;
 			double normL1() const;
 			double normFro() const;
 			double normInf() const;
@@ -213,8 +212,7 @@ namespace Faust
 #endif
 
 			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
-			void pack_factors();
-			void pack_factors(const faust_unsigned_int id, const PackDir dir);
+
 			/** for testing purpose only (memory leaks enabled) */
 			void disable_dtor() { this->transform->disable_dtor(); }
 			void enable_dtor() { this->transform->enable_dtor(); }

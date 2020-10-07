@@ -1818,19 +1818,7 @@ namespace Faust {
             this->transform->insert(start_id, packed_fac);
 		}
 
-	template <typename FPP> void TransformHelper<FPP,Cpu>::pack_factors(const faust_unsigned_int id, const PackDir dir)
-	{
-		if(dir == PACK_RIGHT)
-			pack_factors(id, size()-1);
-		else // dir == PACK_LEFT
-			pack_factors(0, id);
-	}
 
-	template <typename FPP> void TransformHelper<FPP,Cpu>::pack_factors()
-	{
-		//pack all factors in one
-		pack_factors(0, size()-1);
-	}
 
 	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
 	template<typename FPP> std::default_random_engine TransformHelper<FPP,Cpu>::generator(time(NULL));

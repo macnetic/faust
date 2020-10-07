@@ -21,8 +21,10 @@ namespace Faust
 			Transform(const Transform<FPP,GPU2>& t);
 			~Transform();
 			void operator=(const Transform<FPP,GPU2>& t);
+			void insert(int32_t id, const MatGeneric<FPP,GPU2>*, bool copying=true);
 			void push_back(const MatGeneric<FPP,GPU2>*, bool copying=true);
 			void push_first(const MatGeneric<FPP,GPU2>*, bool copying=true);
+			void erase(int32_t id);
 			void pop_front();
 			void pop_back();
 			void clear();
