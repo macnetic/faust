@@ -143,7 +143,7 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::pop_front()
 		{
-			return this->transform->pop_back();
+			return this->transform->pop_front();
 		}
 
 	template<typename FPP>
