@@ -457,10 +457,7 @@ void Faust::Transform<FPP,Cpu>::init_from_file(const char* filename)
 	template<typename FPP>
 void Faust::Transform<FPP,Cpu>::updateNonZeros()
 {
-	int totalNonZeros_tmp=0;
-	for (int i=0;i<size();i++)
-		totalNonZeros_tmp+=data[i].getNonZeros();
-	totalNonZeros = totalNonZeros_tmp;
+	this->update_total_nnz();
 }
 
 
@@ -635,7 +632,7 @@ double Faust::Transform<FPP,Cpu>::normFro() const
 }
 
 	template<typename FPP>
-void Faust::Transform<FPP,Cpu>::operator=(const Transform<FPP,Cpu>&  f)
+void Faust::Transform<FPP,Cpu>::clear()
 {
 	for (int i=0;i<size();i++)
 	{
@@ -648,6 +645,13 @@ void Faust::Transform<FPP,Cpu>::operator=(const Transform<FPP,Cpu>&  f)
 	}
 
 	data.resize(0);
+	totalNonZeros = 0;
+}
+	template<typename FPP>
+void Faust::Transform<FPP,Cpu>::operator=(const Transform<FPP,Cpu>&  f)
+{
+
+	this->clear();
 	data.resize(f.size());
 
 	for (int i=0;i<f.size();i++)

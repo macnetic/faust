@@ -182,7 +182,7 @@ namespace Faust
 				long long int get_total_nnz()const{return totalNonZeros;}
 				void update_total_nnz();
 
-				void clear(){data.resize(0);totalNonZeros=0;}
+				void clear();
 
 				/** \brief add M to the end of the Faust F, work as for std::vector::push_back
 				  F={S_0,S_1,S_2,..,S_n} becomes {S_0,S_1,S_2,..,S_n,copy(M)}
