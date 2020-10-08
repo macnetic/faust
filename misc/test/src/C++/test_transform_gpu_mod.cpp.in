@@ -13,6 +13,7 @@ using namespace std;
 void generate_cpu_gpu_factors(vector<MatGeneric<double,GPU2>*> &gpu_factors,
 		vector<MatGeneric<double,Cpu>*> &cpu_factors)
 {
+	cout << "generating factors..." << endl;
 	MatDense<double, Cpu>* dmat;
 	Faust::MatSparse<double, Cpu>* spmat;
 	MatGeneric<double, Cpu>* cpu_gen_mat;
@@ -37,8 +38,15 @@ void generate_cpu_gpu_factors(vector<MatGeneric<double,GPU2>*> &gpu_factors,
 		gpu_factors.push_back(gpu_gen_mat);
 		cpu_factors.push_back(cpu_gen_mat);
 	}
-
+	cout << "factors generated" << endl;
 }
+
+void free_gpu_factors(vector<MatGeneric<double,GPU2>*> &gpu_factors)
+{
+	for(auto f: gpu_factors)
+		delete f;
+}
+
 
 void assert_gpu_cpu_Transform_almost_eq(const Faust::Transform<double, GPU2> & t_gpu, const Faust::Transform<double, Cpu>& t_cpu)
 {
@@ -62,6 +70,7 @@ void test_Transform_ctor()
 	Faust::Transform<double, GPU2> t(gpu_factors);
 	t.Display();
 	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -76,6 +85,7 @@ void test_Transform_push_back()
 		t.push_back(f);
 	t.Display();
 	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -93,6 +103,7 @@ void test_Transform_push_first()
 	t_gpu.Display();
 	t_cpu.Display();
 	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -111,6 +122,7 @@ void test_Transform_pop_front()
 	t_cpu.Display();
 	assert(t_gpu.size() == t_cpu.size());
 	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -129,6 +141,7 @@ void test_Transform_pop_back()
 	t_cpu.Display();
 	assert(t_gpu.size() == t_cpu.size());
 	//TODO: copy back all t factors to CPU RAM and verify equality (test already done in gpu_mod so this todo is not really urgent)
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -141,6 +154,7 @@ void test_Transform_getDims()
 	Faust::Transform<double, GPU2> t(gpu_factors);
 	t.Display();
 	assert(cpu_factors[0]->getNbRow() == t.getNbRow() && (*(cpu_factors.end()-1))->getNbCol() == t.getNbCol());
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -153,6 +167,7 @@ void test_Transform_size()
 	Faust::Transform<double, GPU2> t(gpu_factors);
 	t.Display();
 	assert(cpu_factors.size() == t.size());
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -173,6 +188,7 @@ void test_Transform_get_product()
 	auto diff = cpu_p;
 	diff -= gpu_p_to_cpu;
 	assert(diff.norm()/cpu_p.norm() < 1e-6);
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -188,6 +204,7 @@ void test_Transform_get_total_nnz()
 	auto gpu_nnz = t_gpu.get_total_nnz();
 	cout << "cpu_nnz: " << cpu_nnz << " gpu_nnz: " << gpu_nnz << endl;
 	assert(cpu_nnz == gpu_nnz);
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -204,6 +221,7 @@ void test_Transform_transpose()
 	t_gpu.Display();
 	t_cpu.Display();
 	//TODO: true test comparing factor sizes and order
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -219,6 +237,7 @@ void test_Transform_scalarMul()
 	t_cpu.scalarMultiply(scalar);
 	t_gpu.scalarMultiply(scalar);
 	assert_gpu_cpu_Transform_almost_eq(t_gpu, t_cpu);
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -243,6 +262,8 @@ void test_Transform_multiply_Transform()
 	t_cpu.Display();
 	//TODO: true test comparing factor sizes and order
 	assert_gpu_cpu_Transform_almost_eq(t_gpu2, t_cpu2);
+	free_gpu_factors(gpu_factors);
+	free_gpu_factors(gpu_factors2);
 	cout << "OK" << endl;
 }
 
@@ -267,6 +288,8 @@ void test_Transform_multiplyLeft_Transform()
 	t_cpu2.Display();
 	//TODO: true test comparing factor sizes and order
 	assert_gpu_cpu_Transform_almost_eq(t_gpu2, t_cpu2);
+	free_gpu_factors(gpu_factors);
+	free_gpu_factors(gpu_factors2);
 	cout << "OK" << endl;
 }
 
@@ -280,6 +303,7 @@ void test_Transform_operator_eq()
 	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
 	Faust::Transform<double, GPU2> t_gpu_copy = t_gpu;
 	assert_gpu_cpu_Transform_almost_eq(t_gpu_copy, t_cpu);
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -293,6 +317,7 @@ void test_Transform_clear()
 	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
 	t_gpu.clear();
 	assert(t_gpu.size() == 0);
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -307,6 +332,7 @@ void test_Transform_spectralNorm()
 	int flag1, flag2;
 	assert(abs(t_gpu.spectralNorm(1000,1e-3, flag1)-t_cpu.spectralNorm(1000,1e-3, flag2)) < 1e-6);
 	assert_gpu_cpu_Transform_almost_eq(t_gpu, t_cpu);
+	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
 }
 
@@ -329,6 +355,8 @@ void test_Transform_get_facts()
 	t_gpu.get_facts(gpu_factors2, /*cloning*/ true);
 	Faust::Transform<double, GPU2> t_gpu2(gpu_factors2);
 	assert_gpu_cpu_Transform_almost_eq(t_gpu2, t_cpu);
+	free_gpu_factors(gpu_factors);
+	free_gpu_factors(gpu_factors2);
 	cout << "OK" << endl;
 }
 
