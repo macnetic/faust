@@ -35,7 +35,8 @@ namespace Faust
 			const int32_t* rowptr, /*= nullptr,*/
 			const int32_t* colinds, /*= nullptr,*/
 			const int32_t dev_id,/*=-1,*/
-			const void* stream)/*=nullptr)*/
+			const void* stream,/*=nullptr)*/
+			const bool no_zero/*=false*/)
 	{
 		auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 		auto gp_funcs = GPUModHandler::get_singleton()->gp_funcs();
@@ -47,10 +48,12 @@ namespace Faust
 				throw std::runtime_error("All GPU buffers or none must be defined to instantiate a MatSparse<FPP,GPU2>.");
 			gpu_mat = spm_funcs->togpu_stream(nbRow, nbCol, nnz, rowptr, colinds, values, stream);
 		}
-		else
+		else if(!no_zero)
 		{ // no values given, set the matrix as a zero matrix
 			gpu_mat = spm_funcs->create_zero(nbRow, nbCol);
 		}
+		else
+			gpu_mat = nullptr;
 		//		else gpu_mat = nullptr;
 		gp_funcs->set_dev(cur_dev_id);
 	}
@@ -232,7 +235,7 @@ namespace Faust
 			// use a stream (nullptr means default)
 			spm_funcs->set_stream(this->gpu_mat, stream);
 			auto gpu_mat = spm_funcs->clone(this->gpu_mat);
-			auto clone_mat = new Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(getNbRow(), getNbCol(), /*nnz*/ 0, /*values*/ nullptr, /*rowptr */ nullptr, /*colinds*/ nullptr, dev_id, stream);
+			auto clone_mat = new Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(getNbRow(), getNbCol(), /*nnz*/ 0, /*values*/ nullptr, /*rowptr */ nullptr, /*colinds*/ nullptr, dev_id, stream, true);
 			clone_mat->gpu_mat = gpu_mat;
 			// return to previous device
 			gp_funcs->set_dev(cur_dev_id);

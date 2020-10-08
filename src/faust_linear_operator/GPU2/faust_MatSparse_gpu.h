@@ -29,7 +29,8 @@ namespace Faust
 						const int32_t* rowptr = nullptr,
 						const int32_t* colinds = nullptr,
 						const int32_t dev_id=-1,
-						const void* stream=nullptr);
+						const void* stream=nullptr,
+						const bool nozero=false);
 
 				MatSparse(const MatSparse<FPP, Cpu>& mat,
 						const int32_t dev_id=-1,
