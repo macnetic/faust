@@ -37,7 +37,9 @@
 /*  Topics in Signal Processing, 2016.                                      */
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 /****************************************************************************/
+#include "faust_gpu_mod.h"
 #include "faust_constant.h"
+#include "faust_Params.h"
 #include "faust_MatSparse.h"
 #include "faust_Timer.h"
 #include "faust_Transform.h"
@@ -95,10 +97,12 @@ int main(int argc, char* argv[])
         cout<<"floating point precision == float"<<endl;
     }
 
-
+	Faust::enable_gpu_mod();
     //default value
-    string configFilename = "@FAUST_CONFIG_MAT_DIR@/config_hierarchical_fact.mat";
-    string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_hierarchical_fact.mat";
+//    string configFilename = "@FAUST_CONFIG_MAT_DIR@/config_hierarchical_fact.mat";
+//    string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_hierarchical_fact.mat";
+	string configFilename = "config_hierarchical_fact.mat";
+	string MatrixFilename = "matrix_hierarchical_fact.mat";
 
     if (argc >= 3)
     {
@@ -167,7 +171,8 @@ int main(int argc, char* argv[])
     // parameter setting
 //    Faust::Params<FPP,Cpu,Real<FPP>> params;
 	Faust::Params<FPP,GPU2,Real<FPP>> params;
-    init_params_from_matiofile<FPP,Cpu,FPP2>(params,configFilename.c_str(),"params");
+//    init_params_from_matiofile<FPP,Cpu,FPP2>(params,configFilename.c_str(),"params");
+    init_params_from_matiofile<FPP,GPU2,FPP2>(params,configFilename.c_str(),"params");
 //    params.Display();
 
     // matrix to be factorized
@@ -189,17 +194,20 @@ int main(int argc, char* argv[])
 //            params.isFactSideLeft, /*use_csr */ true, /*packing_RL default to true*/true,
 //			/* compute_norms_on_arrays */false, FAUST_PRECISION, FAUST_NORM2_MAX_ITER, /* is_verbose default to false */ true);
     params.isVerbose = true;
-	Faust::MatDense<FPP,GPU2> gpu_matrix;//(matrix);
+	Faust::MatDense<FPP,GPU2> gpu_matrix = matrix;//(matrix);
 //    auto th = Faust::hierarchical<FPP,Cpu>(matrix, params, lambda, false);
+//	params.use_csr = true; // default to true
+//	params.use_csr = false;
+	params.packing_RL = true;
     auto th = Faust::hierarchical<FPP,GPU2>(gpu_matrix, params, lambda, false);
     cout << "lambda=" << lambda << endl;
     th->multiply(lambda);
     th->display();
     //relativeError
-    Faust::MatDense<FPP,Cpu> faustProduct;
+    Faust::MatDense<FPP,GPU2> faustProduct;
     faustProduct=th->get_product(); // TransformHelper
-    faustProduct *= FPP(lambda);
-    faustProduct-=matrix;
+//    faustProduct *= FPP(lambda);
+    faustProduct-=gpu_matrix;
     cout << th->normFro() << endl;
     FPP2 relativeError = Faust::fabs(faustProduct.norm()/matrix.norm());
 
