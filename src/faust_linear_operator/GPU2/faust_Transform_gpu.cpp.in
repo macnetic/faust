@@ -23,7 +23,7 @@ namespace Faust
 		}
 
 	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform() : gpu_mat_arr(nullptr)
+		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform() : gpu_mat_arr(nullptr), dtor_delete_data(false), dtor_disabled(false), data(std::vector<Faust::MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>())
 	{
 	}
 
@@ -32,23 +32,31 @@ namespace Faust
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(gpu_mat_arr != nullptr)
-				marr_funcs->free(this->gpu_mat_arr, /* del mats*/ true);
+				marr_funcs->free(this->gpu_mat_arr, /* del mats*/ false); // remove gpu mats individually
 			gpu_mat_arr = nullptr;
+			if(! this->dtor_disabled)
+			{
+				for (int i=0;i<data.size();i++)
+					if(this->dtor_delete_data)
+						delete data[i];
+					else
+						ref_man.release(data[i]);
+			}
 		}
 
 	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::push_back(const MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>* M, bool copying/*=true*/)
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto pushed_M = M;
+			if(copying)
+				pushed_M = M->clone();
 			if(gpu_mat_arr == nullptr)
 				gpu_mat_arr = marr_funcs->create();
-			if(copying)
-				marr_funcs->addgpu_anymat(gpu_mat_arr, M->clone()->get_gpu_mat_ptr());
-			else
-				marr_funcs->addgpu_anymat(gpu_mat_arr, M->get_gpu_mat_ptr());
+			marr_funcs->addgpu_anymat(gpu_mat_arr, pushed_M->get_gpu_mat_ptr());
+			data.push_back(const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(pushed_M));
+			if(!dtor_delete_data) ref_man.acquire(const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(pushed_M));
 		}
-
-
 
 	template<>
 		int32_t Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::size() const
@@ -61,26 +69,30 @@ namespace Faust
 	template<>
 		MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>* Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_fact(int32_t id, bool cloning_fact) const
 		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			auto is_sparse = marr_funcs->is_sparse_at(this->gpu_mat_arr, id);
-			MatGeneric<@FAUST_SCALAR_FOR_GM@, GPU2>* M = nullptr;
-			if(is_sparse)
-			{
-				M = new MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>();
-				M->set_gpu_mat_ptr(marr_funcs->get_spm(this->gpu_mat_arr, id));
-			}
-			else
-			{
-				M = new MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>();
-				M->set_gpu_mat_ptr(marr_funcs->get_dsm(this->gpu_mat_arr, id));
-			}
+//			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+//			auto is_sparse = marr_funcs->is_sparse_at(this->gpu_mat_arr, id);
+//			MatGeneric<@FAUST_SCALAR_FOR_GM@, GPU2>* M = nullptr;
+//			if(is_sparse)
+//			{
+//				M = new MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>();
+//				M->set_gpu_mat_ptr(marr_funcs->get_spm(this->gpu_mat_arr, id));
+//			}
+//			else
+//			{
+//				M = new MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>();
+//				M->set_gpu_mat_ptr(marr_funcs->get_dsm(this->gpu_mat_arr, id));
+//			}
+//			if(cloning_fact)
+//			{
+//				auto tmp = M;
+//				M = M->clone();
+//				delete tmp;
+//			}
+//			return M;
 			if(cloning_fact)
-			{
-				auto tmp = M;
-				M = M->clone();
-				delete tmp;
-			}
-			return M;
+				return data[id]->clone();
+			else
+				return data[id];
 		}
 
 	template<>
@@ -104,6 +116,7 @@ namespace Faust
 				auto sM = dynamic_cast<const MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>*>(&M);
 				*sfact = *sM;
 			}
+//			fact->set_id(M.is_id()); //TODO: in MatGeneric<FPP,GPU2> add is_id/set_id
 		}
 
 	template<>
@@ -120,7 +133,17 @@ namespace Faust
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(gpu_mat_arr != nullptr)
-				marr_funcs->free(this->gpu_mat_arr, /* del mats*/ true);
+				marr_funcs->free(this->gpu_mat_arr, /* del mats*/ false);
+			for (int i=0;i<data.size();i++)
+			{
+				if(dtor_delete_data)
+					delete data[i];
+				else
+				{
+					ref_man.release(data[i]);
+				}
+			}
+			data.resize(0);
 			gpu_mat_arr = marr_funcs->create();
 		}
 
@@ -146,10 +169,12 @@ namespace Faust
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(gpu_mat_arr == nullptr)
 				gpu_mat_arr = marr_funcs->create();
+			auto ins_M = const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(M);
 			if(copying)
-				marr_funcs->insert_anymat(gpu_mat_arr, M->clone()->get_gpu_mat_ptr(), id);
-			else
-				marr_funcs->insert_anymat(gpu_mat_arr, M->get_gpu_mat_ptr(), id);
+				ins_M = M->clone();
+			marr_funcs->insert_anymat(gpu_mat_arr, ins_M->get_gpu_mat_ptr(), id);
+			data.insert(data.begin()+id, ins_M);
+			if(!dtor_delete_data) ref_man.acquire(ins_M);
 		}
 
 	template<>
@@ -166,6 +191,8 @@ namespace Faust
 				marr_funcs->remove_mat(gpu_mat_arr, id);
 			else
 				throw std::runtime_error("gpu_mat_arr is nullptr");
+			if(!dtor_delete_data) ref_man.release(*(data.begin()+id));
+			data.erase(data.begin()+id);
 		}
 
 	template<>
@@ -182,16 +209,13 @@ namespace Faust
 				marr_funcs->transpose(gpu_mat_arr);
 			else
 				throw std::runtime_error("gpu_mat_arr is nullptr");
+			std::reverse(data.begin(),data.end());
 		}
 
 	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::pop_back()
 		{
-			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat_arr != nullptr)
-				marr_funcs->remove_mat(gpu_mat_arr, size()-1);
-			else
-				throw std::runtime_error("gpu_mat_arr is nullptr");
+			this->erase(size()-1);
 		}
 
 	template<>
@@ -215,8 +239,6 @@ namespace Faust
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			marr_funcs->display(gpu_mat_arr);
 		}
-
-
 
 	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_product(MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>& M, const char opThis/*='N'*/, const bool isConj/*=false*/) const
@@ -433,6 +455,13 @@ namespace Faust
 			return Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator(*this, size());
 		}
 
-
+	template<>
+	Faust::RefManager Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::ref_man([](void *fact)
+			{
+//#ifdef DEBUG
+			std::cout << "Faust::Transform delete_fact" << std::endl;
+//#endif
+			delete static_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(fact);
+			});
 
 }

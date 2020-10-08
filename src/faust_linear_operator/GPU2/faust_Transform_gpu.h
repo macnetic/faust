@@ -6,6 +6,7 @@
 #include "faust_MatGeneric_gpu.h"
 #include "faust_MatSparse_gpu.h"
 #include "faust_MatDense_gpu.h"
+#include "faust_RefManager.h"
 #include <vector>
 
 namespace Faust
@@ -15,6 +16,11 @@ namespace Faust
 		class Transform<FPP,GPU2>
 		{
 			gm_MatArray_t gpu_mat_arr;
+			std::vector<MatGeneric<FPP,GPU2>*> data; // same factors as in gpu_mat_arr
+													 // just pointer copies
+			bool dtor_delete_data;
+			bool dtor_disabled;
+			static RefManager ref_man;
 			public:
 			Transform();
 			Transform(const std::vector<MatGeneric<FPP,GPU2>*> &factors);
