@@ -156,7 +156,11 @@ endif()
 
 if(NOT NOCPPTESTS)
 	foreach(TEST_FPP float double)
-		foreach(FILE faust_mult2 faust_mult faust_mult_cplx test_Vect_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move test_TransformHelper_and_Transform_copy_ctor test_TransformHelper_and_Transform_fac_iterato test_TransformHelper_variadic_template_ctor test_MatDense_min test_TH_pack_factors faust_transform_omp_mul faust_pruneout faust_transform_optimize_storage faust_transform_optimize faust_prox_blockdiag)
+		foreach(FILE faust_mult2 faust_mult faust_mult_cplx test_Vect_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move test_TransformHelper_and_Transform_copy_ctor test_TransformHelper_and_Transform_fac_iterato test_TransformHelper_variadic_template_ctor test_MatDense_min test_TH_pack_factors faust_transform_omp_mul faust_pruneout faust_transform_optimize_storage faust_transform_optimize faust_prox_blockdiag)	
+			if(USE_GPU_MOD AND ${FILE} MATCHES test_TH_pack_factors|test_TransformHelper_variadic_template_ctor|faust_transform_optimize|test_TransformHelper_and_Transform_fac_iterato|faust_mult2|faust_transform_omp_mul|test_Transform_move|test_TransformHelper_and_Transform_copy_ctor AND ${TEST_FPP} MATCHES float)# gpu_mod handles float but not FaustGPU
+				message(STATUS ${FILE}_${TEST_FPP} " skipped")
+				continue()
+			endif()
 			set(TEST_BIN_FILE ${FILE}_${TEST_FPP})
 			set(TEST_FILE_CPP ${TEST_BIN_FILE}.cpp)
 			message(STATUS ${TEST_FILE_CPP})
@@ -164,6 +168,10 @@ if(NOT NOCPPTESTS)
 
 			# Generation of the binary files in double and float precision
 			add_executable(${TEST_BIN_FILE} ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} ${FAUST_BIN_TEST_SRC_DIR}/)
+			if(BUILD_MULTITHREAD)
+				target_compile_options(${TEST_BIN_FILE} PRIVATE "${OMP_CXX_FLAGS}")
+				target_link_options(${TEST_BIN_FILE} PRIVATE "-fopenmp") # might work only for linux
+			endif()
 			target_link_libraries(${TEST_BIN_FILE} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
 			add_test(NAME UNIT_${TEST_BIN_FILE} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/${TEST_BIN_FILE})
 		endforeach(FILE)
@@ -209,34 +217,44 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 
 	foreach(TEST_FPP float double complex<float> complex<double>)
 		foreach(testin IN LISTS tests)
+
+			if(USE_GPU_MOD AND (${testin} MATCHES gpu|hierarchical2020Hadamard|palm4msa_2020|hierarchical2020|hierarchicalFactorizationHadamard) AND ${TEST_FPP} MATCHES float ) # gpu_mod handles float but not FaustGPU
+				message(STATUS "${testin}_${TEST_FPP} skipped")
+				continue()
+			endif()
 			if(${TEST_FPP} MATCHES complex )
 				set(TEST_IS_COMPLEX 1)
-				if(${testin} MATCHES GivensFGFT OR ${testin} MATCHES palm4msa_2020 OR ${testin} MATCHES hierarchical2020.* OR ${testin} MATCHES hierarchicalFactorizationHadamard)
+				if(${testin} MATCHES GivensFGFT OR ${testin} MATCHES palm4msa_2020 OR ${testin} MATCHES hierarchical2020.* OR ${testin} MATCHES hierarchicalFactorizationHadamard )
 					continue()
 				endif()
 				# GivensFGFT doesn't handle complex matrices
 			else()
 				set(TEST_IS_COMPLEX 0)
 			endif()
-		string(REGEX REPLACE "<|>" "" TEST_FILE_CPP ${TEST_FPP})
+			string(REGEX REPLACE "<|>" "" TEST_FILE_CPP ${TEST_FPP})
 
-		set(TEST_CPP_NAME ${testin}_${TEST_FILE_CPP})
-		set(TEST_FILE_CPP ${TEST_CPP_NAME}.cpp)
-		message(STATUS ${TEST_FILE_CPP})			# copy CPU files cpp.in to the user's ./src/ directory in float et double precision
-		if(TEST_FPP MATCHES float)
-			set(TEST_FPP2 "float")
-		else()
-			set(TEST_FPP2 "double")
-		endif()
-		configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/${testin}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} @ONLY)
+			set(TEST_CPP_NAME ${testin}_${TEST_FILE_CPP})
+			set(TEST_FILE_CPP ${TEST_CPP_NAME}.cpp)
+			message(STATUS ${TEST_FILE_CPP})			# copy CPU files cpp.in to the user's ./src/ directory in float et double precision
+			if(TEST_FPP MATCHES float)
+				set(TEST_FPP2 "float")
+			else()
+				set(TEST_FPP2 "double")
+			endif()
+			configure_file(${FAUST_SRC_TEST_SRC_CPP_DIR}/${testin}.cpp.in ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} @ONLY)
 			# Generation of the binary files in double and float precision
 			add_executable(${TEST_CPP_NAME} ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} ${FAUST_BIN_TEST_SRC_DIR}/ ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
-   	
+
 			if(BUILD_OPENBLAS)
 				target_link_libraries(${TEST_CPP_NAME}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
 			else(BUILD_OPENBLAS)
 				target_link_libraries(${TEST_CPP_NAME}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
 			endif(BUILD_OPENBLAS)	
+			if(USE_GPU_MOD)
+				target_compile_options(${TEST_CPP_NAME} PRIVATE "${OMP_CXX_FLAGS}")
+				target_link_options(${TEST_CPP_NAME} PRIVATE "-fopenmp") # might work only for linux
+			endif()
+
 		endforeach()
 	endforeach()
 

@@ -97,6 +97,9 @@ endforeach()
 
 file(GLOB CPP_MEXTOOLS_FILES "${FAUST_MATLAB_TOOLS_SRC_DIR}/*.cpp")
 include_directories(${FAUST_MATLAB_TOOLS_SRC_DIR} ${MATLAB_INCLUDE_DIR})
+if(USE_GPU_MOD)
+	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR} ${GPU_MOD_INCLUDE_DIR} ${GPU_MOD_INCLUDE_DIR}/../build)
+endif()
 add_library(${FAUST_MEXTOOLS_TARGET} OBJECT ${CPP_MEXTOOLS_FILES})
 
 foreach(SCALAR_AND_FSUFFIX double:Real std::complex<double>:Cplx) # TODO: float and complex<float> versions
@@ -158,9 +161,10 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 	else()
 		target_link_options(${mex_target} PRIVATE ${OpenMP_CXX_LIBRARIES}) # do nothing if BUILD_MULTITHREAD is OFF
 	endif()
-#	if(BUILD_MULTITHREAD)
-#		target_compile_definitions(${mex_target} PRIVATE _MUL_OMP_) # cf. ./src/faust_linear_operator/CPU/faust_prod_opt.hpp
-#	endif()
+	if(BUILD_MULTITHREAD)
+		target_compile_definitions(${mex_target} PRIVATE _MUL_OMP_) # cf. ./src/faust_linear_operator/CPU/faust_prod_opt.hpp
+		target_compile_options(${mex_target} PRIVATE "${OMP_CXX_FLAGS}")
+	endif()
 	target_include_directories(${mex_target} PRIVATE $<TARGET_PROPERTY:${FAUST_TARGET},INTERFACE_INCLUDE_DIRECTORIES>)
 	add_dependencies(${mex_target} ${FAUST_TARGET})
 	add_dependencies(${mex_target} ${FAUST_MEXTOOLS_TARGET})
