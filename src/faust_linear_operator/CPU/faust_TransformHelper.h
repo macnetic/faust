@@ -212,6 +212,7 @@ namespace Faust
 #endif
 
 			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
+			void pack_factors();
 
 			/** for testing purpose only (memory leaks enabled) */
 			void disable_dtor() { this->transform->disable_dtor(); }

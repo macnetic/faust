@@ -1818,6 +1818,11 @@ namespace Faust {
             this->transform->insert(start_id, packed_fac);
 		}
 
+	template <typename FPP>
+		void TransformHelper<FPP,Cpu>::pack_factors()
+	{
+		TransformHelperGen<FPP,Cpu>::pack_factors();
+	}
 
 
 	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;

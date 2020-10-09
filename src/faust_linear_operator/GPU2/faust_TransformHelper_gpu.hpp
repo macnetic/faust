@@ -153,6 +153,12 @@ namespace Faust
 		}
 
     template<typename FPP>
+        void Faust::TransformHelper<FPP,GPU2>::pack_factors()
+		{
+			TransformHelperGen<FPP,Cpu>::pack_factors();
+		}
+
+    template<typename FPP>
         void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)
 		{
 			if(start_id < 0 || start_id >= size())
