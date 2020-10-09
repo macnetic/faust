@@ -188,6 +188,7 @@ void test_clone()
 	diff_mat -= MatDense<double, Cpu>(cpu_sp_mat2);
 	assert(diff_mat.norm() < 1e-3);
 	delete cpu_sp_mat;
+	delete gpu_sp_mat2;
 	cout << "OK" << endl;
 }
 
