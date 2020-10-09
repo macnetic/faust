@@ -1849,9 +1849,9 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>% in a matlab terminal
-		%>>> F = matfaust.rand(5,50);
-		%>>> G = matfaust.rand(6,50);
-		%>>> [F;G] % equiv. to cat(1,F,G)
+		%>  F = matfaust.rand(5,50);
+		%>  G = matfaust.rand(6,50);
+		%>  [F;G] % equiv. to cat(1,F,G)
 		%>
 		%>ans =
 		%>
@@ -1863,7 +1863,7 @@ classdef Faust
 		%>- FACTOR 4 (real) SPARSE, size 100x100, density 0.0476, nnz 476
 		%>- FACTOR 5 (real) SPARSE, size 100x100, density 0.0288, nnz 288
 		%>- FACTOR 6 (real) SPARSE, size 100x50, density 0.02, nnz 100
-		%>>>[F,G] % equiv. to cat(2,F,G)
+		%> [F,G] % equiv. to cat(2,F,G)
 		%>
 		%>ans =
 		%>
@@ -1875,7 +1875,7 @@ classdef Faust
 		%>- FACTOR 4 (real) SPARSE, size 100x100, density 0.0511, nnz 511
 		%>- FACTOR 5 (real) SPARSE, size 100x100, density 0.0466, nnz 466
 		%>- FACTOR 6 (real) SPARSE, size 100x100, density 0.048, nnz 480
-		%>>>[F;rand(100,50)] % vertical concatenation with auto-conversion of the random matrix to a Faust
+		%> [F;rand(100,50)] % vertical concatenation with auto-conversion of the random matrix to a Faust
 		%>
 		%>ans =
 		%>
@@ -1897,18 +1897,18 @@ classdef Faust
 		%>- FACTOR 3 (real) SPARSE, size 100x100, density 0.0282, nnz 282
 		%>- FACTOR 4 (real) SPARSE, size 100x100, density 0.0292, nnz 292
 		%>- FACTOR 5 (real) SPARSE, size 100x50, density 0.02, nnz 100
-		%>>>[F;G;F;G] % it's allowed to concatenate an arbitrary number of Fausts
-		%>>>[F,G,F,G] % as long as the dimensions agree
-		%>>>[F,G;F,G]
+		%> [F;G;F;G] % it's allowed to concatenate an arbitrary number of Fausts
+		%> [F,G,F,G] % as long as the dimensions agree
+		%> [F,G;F,G]
 		%> @endcode
 		%>
 		%> @b Errors
 		%> - The dimensions of F and G don't agree:
 		%>
 		%> @code
-		%>>> F = matfaust.rand(2,51);
-		%>>> G = matfaust.rand(2,25);
-		%>>> [F;G]
+		%>  F = matfaust.rand(2,51);
+		%>  G = matfaust.rand(2,25);
+		%>  [F;G]
 		%>Error using mexFaustReal
 		%>The dimensions of the two Fausts must agree.
 		%>
@@ -1916,9 +1916,9 @@ classdef Faust
 		%> - The DIM argument is different from 1 and 2:
 		%>
 		%> @code
-		%>>> F = matfaust.rand(2,4);
-		%>>> G = matfaust.rand(2,4);
-		%>>> cat(3,F,G)
+		%>  F = matfaust.rand(2,4);
+		%>  G = matfaust.rand(2,4);
+		%>  cat(3,F,G)
 		%>Error using matfaust.Faust/cat
 		%>Wrong first argument: must be an integer between 1 and 2.
 		%> @endcode
