@@ -221,5 +221,13 @@ void Faust::palm4msa2(const Faust::MatDense<FPP,DEVICE>& A,
 		i++;
 	}
 	S.update_total_nnz();
+	// free the latest pR and pL TransformHelpers
+	for(int i=0;i<nfacts;i++)
+	{
+		if(pL[i] != nullptr)
+			delete pL[i];
+		if(pR[i] != nullptr)
+			delete pR[i];
+	}
 }
 

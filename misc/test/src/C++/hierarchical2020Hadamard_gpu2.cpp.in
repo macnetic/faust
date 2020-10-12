@@ -124,8 +124,6 @@ int main(int argc, char* argv[])
     cout << "norm2_threshold: "<< norm2_threshold << endl;
     cout << "norm2_max_iter:" << norm2_max_iter << endl;
 	vector<StoppingCriterion<Real<FPP>>> sc = {30,30};
-//	sc.push_back(30);
-//	sc.push_back(30);
     auto th = Faust::hierarchical(whtmat_gpu, sc, fac_cons, res_cons, lambda, isUpdateWayR2L,
             isFactSideLeft, use_csr, packing_RL,
             /* compute_2norm_on_array*/ false,
@@ -142,6 +140,8 @@ int main(int argc, char* argv[])
     cout << th->normFro() << endl;
     FPP2 relativeError = Faust::fabs(faustProduct.norm()/whtmat_gpu.norm());
 
+	th->display();
+	delete th;
     std::cout<<std::endl;
     std::cout<<"**************** RELATIVE ERROR BETWEEN FAUST AND DATA MATRIX **************** "<<std::endl;
     std::cout<<"		"<<relativeError<<std::endl<<std::endl;
