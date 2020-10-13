@@ -96,21 +96,16 @@ int main(int argc, char* argv[])
     auto whtmat = wht->get_product();
 	Faust::MatDense<FPP,GPU2> whtmat_gpu(whtmat);
     vector<const Faust::ConstraintGeneric*> fac_cons, res_cons;
+	auto constraint_name = CONSTRAINT_NAME_SPLINCOL; // default choice
     //algorithm
-    for(int i=0;i<log2dim-1;i++)
-    {
-        auto cons = new Faust::ConstraintInt<FPP,GPU2>(CONSTRAINT_NAME_SPLINCOL, 2, dim,
-                dim);
-        fac_cons.push_back(cons);
-        auto rcons = new Faust::ConstraintInt<FPP,GPU2>(CONSTRAINT_NAME_SPLINCOL, dim/(1<<(i+1)), dim, dim);
-        res_cons.push_back(rcons);
-    }
+
     Real<FPP> lambda;
     bool isUpdateWayR2L = true, isFactSideLeft = false, use_csr = true, packing_RL = false;
     char* str_use_csr = getenv("USE_CSR");
     char* str_norm2_threshold = getenv("NORM2_THRESHOLD");
     char* str_norm2_max_iter = getenv("NORM2_MAX_ITER");
 	char* str_packing_RL = getenv("PACKING_RL");
+	char* str_constraint_name = getenv("PROX");
     double norm2_threshold = FAUST_PRECISION;
     double norm2_max_iter = FAUST_NORM2_MAX_ITER;
     if(str_norm2_threshold)
@@ -121,9 +116,33 @@ int main(int argc, char* argv[])
 		packing_RL = std::atoi(str_packing_RL) != 0;
 	if(str_use_csr)
 		use_csr = std::atoi(str_use_csr) != 0;
+	if(str_constraint_name)
+	{
+		if(!strcmp(str_constraint_name, "SPLINCOL"))
+			constraint_name = CONSTRAINT_NAME_SPLINCOL;
+		else if(!strcmp(str_constraint_name, "SKPERM"))
+			constraint_name = CONSTRAINT_NAME_SKPERM;
+		else
+		{
+			std::cerr << "The only possible proxs are PROX='SKPERM' or PROX='SPLINCOL'" << std::endl;
+			return EXIT_FAILURE;
+		}
+	}
+	else str_constraint_name = "SPLINCOL";
+    for(int i=0;i<log2dim-1;i++)
+	{
+		auto cons = new Faust::ConstraintInt<FPP,GPU2>(constraint_name, 2, dim,
+				dim);
+		fac_cons.push_back(cons);
+		auto rcons = new Faust::ConstraintInt<FPP,GPU2>(constraint_name, dim/(1<<(i+1)), dim, dim);
+		res_cons.push_back(rcons);
+	}
     cout << "norm2_threshold: "<< norm2_threshold << endl;
-    cout << "norm2_max_iter:" << norm2_max_iter << endl;
-	vector<StoppingCriterion<Real<FPP>>> sc = {30,30};
+    cout << "norm2_max_iter: " << norm2_max_iter << endl;
+	cout << "prox: " << str_constraint_name << endl;
+	cout << "use_csr: " << use_csr << endl;
+	cout << "packing_RL: " << packing_RL << endl;
+	vector<StoppingCriterion<Real<FPP>>> sc = {2,2};
     auto th = Faust::hierarchical(whtmat_gpu, sc, fac_cons, res_cons, lambda, isUpdateWayR2L,
             isFactSideLeft, use_csr, packing_RL,
             /* compute_2norm_on_array*/ false,
