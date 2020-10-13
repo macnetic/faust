@@ -58,7 +58,7 @@
 #include <iomanip>
 #include <vector>
 /** \brief An example of using the hierarchical factorization of a dense matrix. from .mat file.
-* An dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
+* A dense matrix is loaded from "@FAUST_DATA_MAT_DIR@
 * \param MatrixFilename :  a .mat (MATLAB file) where the matrix to be factorized is stored (or its transposed (cf. parameter transposeMatrix))
 * \param configFilename : a .mat (MATLAB file) configuration file which contains the parameter of the hierarchical algorithm (default launch with a predefined configuration called hierFact)
 * \param expectedLambda (optionnal) : compared the expected scalar of the factorisation with the computed one in the precision defined with epsilon

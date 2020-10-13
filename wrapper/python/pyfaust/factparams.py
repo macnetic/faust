@@ -896,7 +896,7 @@ class ParamsHierarchicalRectMat(ParamsHierarchical):
         elif(not isinstance(P, float)):
             raise TypeError('P must be a float')
         S1_cons = ConstraintInt('spcol', m, n, k)
-        S_cons = [S1_cons];
+        S_cons = [S1_cons]
         for i in range(j-2):
             S_cons += [ ConstraintInt('sp', m, m, s*m) ]
 

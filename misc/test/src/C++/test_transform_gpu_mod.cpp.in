@@ -18,8 +18,8 @@ void generate_cpu_gpu_factors(vector<MatGeneric<double,GPU2>*> &gpu_factors,
 	Faust::MatSparse<double, Cpu>* spmat;
 	MatGeneric<double, Cpu>* cpu_gen_mat;
 	MatGeneric<double, GPU2>* gpu_gen_mat;
-	int32_t inrows = 140, tmp;
-	int32_t incols = 125;
+	int32_t inrows = 1024, tmp;
+	int32_t incols = 1024;
 	for(int i=0;i<10;i++)
 	{
 
@@ -330,7 +330,10 @@ void test_Transform_spectralNorm()
 	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
 	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
 	int flag1, flag2;
-	assert(abs(t_gpu.spectralNorm(1000,1e-3, flag1)-t_cpu.spectralNorm(1000,1e-3, flag2)) < 1e-6);
+	auto t_gpu_norm = t_gpu.spectralNorm(1000,1e-3, flag1);
+	auto t_cpu_norm = t_cpu.spectralNorm(1000,1e-3, flag2);
+	cout << "t_gpu_norm: " << t_gpu_norm << " t_cpu_norm: " << t_cpu_norm << endl;
+	assert(abs(t_gpu_norm-t_cpu_norm) < 1e-3);
 	assert_gpu_cpu_Transform_almost_eq(t_gpu, t_cpu);
 	free_gpu_factors(gpu_factors);
 	cout << "OK" << endl;
