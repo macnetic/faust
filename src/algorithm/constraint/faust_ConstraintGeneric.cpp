@@ -60,8 +60,7 @@ bool is_constraint_name_int(const char * type)
 	is_const_int = ((is_const_int) || ((strcmp(type,"splincol") == 0)));
 	is_const_int = ((is_const_int) || ((strcmp(type,"splin") == 0)));
 //	is_const_int = ((is_const_int) || ((strcmp(type,"blkdiag") == 0)));
-
-
+	is_const_int = ((is_const_int) || ((strcmp(type,"skperm") == 0)));
 	return is_const_int;
 }
 
@@ -99,7 +98,8 @@ faust_constraint_name get_equivalent_constraint(const char * type)
 		return CONSTRAINT_NAME_SUPP;
 	if  (!strcmp(type,"normlin"))
 		return CONSTRAINT_NAME_NORMLIN;
-
+	if(!strcmp(type, "skperm"))
+		return CONSTRAINT_NAME_SKPERM;
 
 	handleError("Faust::ConstraintGeneric","get_equivalent_constraint : Unknown type of constraint");
 }
@@ -143,6 +143,8 @@ const char* Faust::ConstraintGeneric::get_constraint_name()const
          return "CONSTRAINT_NAME_NORMCOL";
       case CONSTRAINT_NAME_SPLINCOL:
          return "CONSTRAINT_NAME_SPLINCOL";
+	  case CONSTRAINT_NAME_SKPERM:
+		 return "CONSTRAINST_NAME_SKPERM";
       case CONSTRAINT_NAME_CONST:
          return "CONSTRAINT_NAME_CONST";
       case CONSTRAINT_NAME_SP_POS:

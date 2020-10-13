@@ -190,6 +190,9 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_int()const
 		case CONSTRAINT_NAME_SPLINCOL:
 			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplincol)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
+		case CONSTRAINT_NAME_SKPERM:
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSkperm)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
+		break;
 		case CONSTRAINT_NAME_CONST:
 			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeConst)==typeid(Faust::ConstraintInt<FPP,DEVICE>)?true:false);
 		break;
@@ -236,6 +239,9 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_real()const
 		case CONSTRAINT_NAME_SPLINCOL:
 			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplincol)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
+		case CONSTRAINT_NAME_SKPERM:
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSkperm)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
+		break;
 		case CONSTRAINT_NAME_CONST:
 			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeConst)==typeid(Faust::ConstraintFPP<FPP,DEVICE,FPP2>)?true:false);
 		break;
@@ -281,6 +287,9 @@ bool Faust::ConstraintGeneric::is_constraint_parameter_mat()const
 		break;
 		case CONSTRAINT_NAME_SPLINCOL:
 			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSplincol)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
+		break;
+		case CONSTRAINT_NAME_SKPERM:
+			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeSkperm)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
 		break;
 		case CONSTRAINT_NAME_CONST:
 			return (typeid(typename  ConstraintType<FPP,DEVICE,FPP2>::ConstraintTypeConst)==typeid(Faust::ConstraintMat<FPP,DEVICE>)?true:false);
