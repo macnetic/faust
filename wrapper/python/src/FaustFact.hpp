@@ -20,16 +20,17 @@ using namespace Faust;
 bool PyxConstraintGeneric::is_int_constraint()
 {
     switch(static_cast<faust_constraint_name>(this->name))
-    {
-        case CONSTRAINT_NAME_SP:
-        case CONSTRAINT_NAME_SPCOL:
-        case CONSTRAINT_NAME_SPLIN:
-        case CONSTRAINT_NAME_SPLINCOL:
-        case CONSTRAINT_NAME_SP_POS:
-            return true;
-        default:
-            return false;
-    }
+	{
+		case CONSTRAINT_NAME_SP:
+		case CONSTRAINT_NAME_SPCOL:
+		case CONSTRAINT_NAME_SPLIN:
+		case CONSTRAINT_NAME_SPLINCOL:
+		case CONSTRAINT_NAME_SP_POS:
+		case CONSTRAINT_NAME_SKPERM:
+			return true;
+		default:
+			return false;
+	}
 }
 
 bool PyxConstraintGeneric::is_real_constraint()
