@@ -30,8 +30,8 @@ namespace Faust
 			void operator/=(const Vect<FPP,GPU2> &v);
 			bool operator==(const Vect<FPP,GPU2> &v)const;
 			bool operator!=(const Vect<FPP,GPU2> &v)const;
-			FPP max();
-			FPP min();
+			FPP max_coeff();
+			FPP min_coeff();
 			FPP dot(const Vect<FPP,GPU2> &v);
 			FPP sum() const;
 			FPP mean() const;
