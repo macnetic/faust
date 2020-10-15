@@ -1,5 +1,6 @@
 #ifndef __FAUST_VECT_GPU2__
 #define __FAUST_VECT_GPU2__
+#define NOMINMAX // avoids VS min/max issue with std::min/max.
 #include "faust_MatDense_gpu.h"
 
 namespace Faust

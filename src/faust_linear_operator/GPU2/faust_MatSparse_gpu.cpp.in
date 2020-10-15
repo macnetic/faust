@@ -69,7 +69,7 @@ namespace Faust
 		}
 
 	template<>
-	Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::MatSparse() : MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(0,0)
+	Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::MatSparse() : MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(0,0, /* nnz=*/ 0, /* values=*/ nullptr, /* rowptr=*/nullptr, /*colinds=*/nullptr, /*dev_id=*/-1, /* stream=*/ nullptr, /* nozero=*/false)
 	{
 	}
 

@@ -53,7 +53,9 @@ namespace Faust
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			if(gpu_mat != nullptr)
+			{
 				dsm_funcs->free(gpu_mat);
+			}
 		}
 
 	template<>
@@ -95,7 +97,7 @@ namespace Faust
 		Faust::Vect<FSFG,Cpu> Faust::MatDense<FSFG,GPU2>::multiply(const Faust::Vect<FSFG, Cpu> &vec)
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
-			MatDense<FSFG, GPU2> gpu_vec(vec.size(), 1, vec.getData());
+			MatDense<FSFG, GPU2> gpu_vec(vec.size(), 1, vec.getData(), /* no_alloc */ false, /*dev_id=*/-1, /*stream=*/nullptr); // avoiding ambiguity for the ctor overload choice (gcc warning)
 			Faust::Vect<FSFG, Cpu> out_v(getNbCol());
 			dsm_funcs->mul_gpu_dsm_tocpu_ext(this->gpu_mat, gpu_vec.gpu_mat, out_v.getData(), OP_NOTRANSP, OP_NOTRANSP);
 			return out_v;
@@ -396,7 +398,7 @@ namespace Faust
 			// other = this * other
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, A.gpu_mat, this->gpu_mat, OP_NOTRANSP, OP_NOTRANSP);
-			Faust::MatDense<FSFG,GPU2> new_this(getNbRow(), A.getNbCol(), nullptr);
+			Faust::MatDense<FSFG,GPU2> new_this(getNbRow(), A.getNbCol(), nullptr, /* no_alloc */ false, /*dev_id=*/-1, /*stream=*/nullptr);
 			dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, A.gpu_mat, new_this.gpu_mat, OP_NOTRANSP, OP_NOTRANSP);
 			auto tmp = this->gpu_mat;
 			this->gpu_mat = new_this.gpu_mat;

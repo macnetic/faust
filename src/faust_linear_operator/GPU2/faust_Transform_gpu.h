@@ -76,8 +76,8 @@ namespace Faust
 					const Transform<FPP, GPU2> & container;
 			};
 
-			Transform<FPP,GPU2>::iterator begin() const;
-			Transform<FPP,GPU2>::iterator end() const;
+			typename Transform<FPP,GPU2>::iterator begin() const;
+			typename Transform<FPP,GPU2>::iterator end() const;
 
 		};
 }

@@ -12,7 +12,7 @@ stages:
     - test
     - pkg_rev
 
-.ctest:
+ctest:
     <<: *ctest_script
     variables: {SLOW_TESTS: "OFF", BUILD_MULTITHREAD: "ON"} # the CDashConfScript is able to retrieve OpenMP_gomp_LIBRARY and OpenMP_INC_DIR from environment (it's necessary on macOS, so the runner's env. must be configured)
     except:
@@ -22,7 +22,7 @@ stages:
     tags:
         - linux
 
-.ctest_python:
+ctest_python:
     <<: *ctest_script
     variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON"} #, GIT_STRATEGY: none}
     except:
@@ -33,7 +33,7 @@ stages:
     tags:
         - linux
 
-.ctest_matlab:
+ctest_matlab:
     <<: *ctest_script
     variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "OFF"} # MT OFF because of macOS complicated way to enable OpenMP (but packages are OMP enabled)
     except:
@@ -68,7 +68,7 @@ ctest_nightly_macos:
     tags:
         - win10
 
-.pkg_macos:
+pkg_macos:
     stage: pkg_rev
     script:
         - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
@@ -144,7 +144,7 @@ pkg_win:
         - cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..; make
         - cd ../..
 
-.pkg_linux:
+pkg_linux:
     <<: *build_gpu_mod
     stage: pkg_rev
     variables: {GIT_SUBMODULE_STRATEGY: recursive} # for checking out gpu_mod
@@ -311,13 +311,13 @@ pages:
         - schedules
         - tags
 
-.pkg_macos_purepy_rev:
+pkg_macos_purepy_rev:
     extends: .pkg_purepy_rev
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", EXPERIMENTAL_PKG: "ON", BUILD_MULTITHREAD: "ON", NOPY2: "ON"}
     tags:
         - macos
 
-.pkg_linux_purepy_rev:
+pkg_linux_purepy_rev:
     extends: .pkg_purepy_rev
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "../gpu_mod", EXPERIMENTAL_PKG: "ON"}
     tags:

@@ -3,7 +3,6 @@
 #define _FSFG_
 typedef @FAUST_SCALAR_FOR_GM@ FSFG;
 #endif
-//TODO: move to cpp.in
 namespace Faust
 {
 

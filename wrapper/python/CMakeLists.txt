@@ -15,6 +15,9 @@ if(${USE_MATIO_STATIC_LIBS})
 	else() # WIN32 # intended for Visual Studio!
 		# compile the pyx and all faust .cpp needed (instead to link to faust.lib)
 		set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/*.cpp')+glob('${FAUST_SRC_LINEAR_OPERATOR_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR}/*.cpp')+glob('${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}/*.cpp')+glob('${FAUST_UTILS_SRC_DIR}/*.cpp')")
+		if(USE_GPU_MOD)
+			set(PY_EXT_SOURCES "${PY_EXT_SOURCES}+glob('${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/*.cpp')")
+		endif()
 		# extract the name (without .lib suffix) and the path of each libs:
 		# 1/ matio
 		get_filename_component(MATIO_LIB_DIR ${MATIO_STATIC_LIB_PATH} DIRECTORY)
