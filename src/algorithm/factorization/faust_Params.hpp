@@ -315,6 +315,8 @@ void Faust::Params<FPP,DEVICE,FPP2>::Display() const
 	std::cout<<"INIT_LAMBDA : "<<init_lambda<<std::endl;
 	std::cout<<"ISFACTSIDELEFT : "<<isFactSideLeft<<std::endl;
 	std::cout<<"ISCONSTANTSTEPSIZE : "<<isConstantStepSize<<std::endl;
+	std::cout <<"USE_CSR :" << use_csr << std::endl;
+	std::cout <<"PACKING_RL:" << packing_RL << std::endl;
 	std::cout<<"step_size : "<<step_size<<std::endl;
 	std::cout<<"Matrix :  nbRow "<<m_nbRow<<" NbCol : "<< m_nbCol<<std::endl;
 //	std::cout<<"stop_crit_2facts : "<<stop_crit_2facts.get_crit()<<std::endl;

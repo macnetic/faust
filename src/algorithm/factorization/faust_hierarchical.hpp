@@ -10,9 +10,9 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 	Faust::MatGeneric<FPP,DEVICE> *Si;
 	const Faust::ConstraintGeneric *fac_cons, *res_cons;
 	int zero_dims[2], id_dims[2];
-	Faust::MatGeneric<FPP,DEVICE> *zero_mat, *id_mat;
-	Faust::MatDense<FPP,DEVICE> * tmp_dense;
-	Faust::MatSparse<FPP,DEVICE> * tmp_sparse;
+	Faust::MatGeneric<FPP,DEVICE> *zero_mat = nullptr, *id_mat = nullptr;
+	Faust::MatDense<FPP,DEVICE> * tmp_dense = nullptr;
+	Faust::MatSparse<FPP,DEVICE> * tmp_sparse = nullptr;
 	std::vector<Faust::MatGeneric<FPP,DEVICE>*> Si_vec;
 	std::vector<Faust::ConstraintGeneric*> Si_cons;
 	Real<FPP> lambda_ = p.init_lambda;
@@ -78,14 +78,21 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 			tmp_dense->setEyes();
 			id_mat = tmp_dense;
 		}
+
 		if(is_update_way_R2L)
 			Si_vec = {id_mat, zero_mat};
 		else
 			Si_vec = {zero_mat, id_mat};
-		Si_cons = { const_cast<Faust::ConstraintGeneric*>(fac_cons), const_cast<Faust::ConstraintGeneric*>(res_cons) };
+
+		if(is_fact_side_left)
+			Si_cons = { const_cast<Faust::ConstraintGeneric*>(res_cons), const_cast<Faust::ConstraintGeneric*>(fac_cons) };
+		else
+			Si_cons = { const_cast<Faust::ConstraintGeneric*>(fac_cons), const_cast<Faust::ConstraintGeneric*>(res_cons) };
+
+
 		Faust::TransformHelper<FPP,DEVICE> Si_th(Si_vec, 1.0, false, false, true);
-//		Si_th.display();
-//		if(on_gpu) Si_th.enable_gpu_meth_for_mul();
+		//		Si_th.display();
+		//		if(on_gpu) Si_th.enable_gpu_meth_for_mul();
 		lambda_ = 1;
 		tmp_dense = dynamic_cast<Faust::MatDense<FPP,DEVICE>*>(Si);
 		if(tmp_dense == nullptr)
@@ -120,8 +127,14 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 		//is_fact_side_left
 		std::vector<Faust::ConstraintGeneric*> glo_cons;
 		for(auto ite_cons=fac_constraints.begin(); ite_cons != fac_constraints.begin()+i+1;ite_cons++)
-			glo_cons.push_back(const_cast<Faust::ConstraintGeneric*>(*ite_cons));
-		glo_cons.push_back(const_cast<Faust::ConstraintGeneric*>(res_constraints[i]));
+			if(is_fact_side_left)
+				glo_cons.insert(glo_cons.begin(), const_cast<Faust::ConstraintGeneric*>(*ite_cons));
+			else
+				glo_cons.push_back(const_cast<Faust::ConstraintGeneric*>(*ite_cons));
+			if(is_fact_side_left)
+				glo_cons.insert(glo_cons.begin(), const_cast<Faust::ConstraintGeneric*>(res_constraints[i]));
+			else
+				glo_cons.push_back(const_cast<Faust::ConstraintGeneric*>(res_constraints[i]));
 
 		// global optimization
 		Faust::palm4msa2(A, glo_cons, *S, glo_lambda, p.stop_crit_global ,is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array,
