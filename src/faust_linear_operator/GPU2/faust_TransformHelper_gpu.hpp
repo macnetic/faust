@@ -188,10 +188,10 @@ namespace Faust
 				// 3) erase factors from start_id to end_id and insert packed factor too to replace them (that's Transform object responsibility).
 				// 1)
 				std::vector<Faust::MatGeneric<FPP,GPU2>*> topack_factors;
-				for(int i=0;i < size(); i++)
+				for(int i=start_id;i <= end_id; i++)
 					topack_factors.push_back(get_gen_fact_nonconst(i));
 //				std::vector<Faust::MatGeneric<FPP,GPU2>*> topack_factors(begin()+start_id, begin()+end_id+1);
-				Faust::TransformHelper<FPP,GPU2> t(topack_factors, 1.0, false, false, true);
+				Faust::TransformHelper<FPP,GPU2> t(topack_factors, 1.0, false, false, false);
 				// 2)
 				packed_fac = new MatDense<FPP,GPU2>(t.get_product());
 			}
@@ -203,7 +203,7 @@ namespace Faust
 				if(i == 0) break;
 				i--;
 			}
-			this->transform->insert(start_id, packed_fac);
+			this->transform->insert(start_id, packed_fac, false);
 		}
 
 	template<typename FPP>

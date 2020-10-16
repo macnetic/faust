@@ -1803,7 +1803,7 @@ namespace Faust {
                 // 3) erase factors from start_id to end_id and insert packed factor too to replace them (that's Transform object responsibility).
                 // 1)
                 std::vector<Faust::MatGeneric<FPP,Cpu>*> topack_factors(begin()+start_id, begin()+end_id+1);
-                Faust::TransformHelper<FPP,Cpu> t(topack_factors, 1.0, false, false, true);
+                Faust::TransformHelper<FPP,Cpu> t(topack_factors, 1.0, false, false, false);
                 // 2)
                 packed_fac = new MatDense<FPP,Cpu>(t.get_product());
             }
