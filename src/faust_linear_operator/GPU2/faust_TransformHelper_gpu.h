@@ -22,8 +22,8 @@ namespace Faust
 				void pop_front();
 				void pop_back();
 				void push_first(const MatGeneric<FPP,GPU2>*, const bool optimizedCopy=false, const bool copying=true);
-				faust_unsigned_int getNbRow(){ this->transform->getNbRow();}
-				faust_unsigned_int getNbCol(){ this->transform->getNbCol();}
+				faust_unsigned_int getNbRow(){ return this->transform->getNbRow();}
+				faust_unsigned_int getNbCol(){ return this->transform->getNbCol();}
 				template<typename Head, typename ... Tail>
 					void push_back_(Head& h, Tail&... t);
 				void push_back_();

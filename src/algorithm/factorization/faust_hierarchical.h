@@ -22,7 +22,7 @@ namespace Faust
 			const bool on_gpu=false);
 
 	template<typename FPP, FDevice DEVICE>
-		TransformHelper<FPP,DEVICE>* hierarchical(const MatDense<FPP,DEVICE>&  A,
+		TransformHelper<FPP,DEVICE>* hierarchical(const MatDense<FPP,DEVICE>& A,
 				Params<FPP,DEVICE, Real<FPP>> &p,
 				Real<FPP>& lambda, const bool compute_2norm_on_array,
 				const bool on_gpu=false);

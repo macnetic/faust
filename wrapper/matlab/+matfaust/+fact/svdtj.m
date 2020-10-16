@@ -34,27 +34,27 @@
 %> @endcode
 %>If we call svdtj on the matrix M, it makes two internal calls to eigtj.
 %>
-%>        In Matlab it would be:
-%>        1.  [D1, W1] = eigtj(M*M, varargin)
-%>        2.  [D2, W2] = eigtj(M'*M, varargin)
+%> In Matlab it would be:
+%> 1.  [D1, W1] = eigtj(M*M, varargin)
+%> 2.  [D2, W2] = eigtj(M'*M, varargin)
 %>
-%>        It gives the following equalities (ignoring the fact that eigtj computes approximations):
-%>        \f[
-%>            W_1 D_1 W_1^* = M M^*
-%>        \f]
-%>        \f[
-%>                W_2 D_2 W_2^* = M^* M
-%>        \f]
-%>        But because of the SVD \f$ M = USV^* \f$ we also have:
-%>        \f[MM^* = U S V^* V S U^* = U S^2 U^* = W_1 D_1 W_1^*\f]
-%>        \f[M^* M = V S U^* U S V^* = V S^2 V^* = W_2 D_2  W_2^*\f]
-%>        It allows to identify the left singular vectors of M to W1,
-%>        and likewise the right singular vectors to W2.
+%> It gives the following equalities (ignoring the fact that eigtj computes approximations):
+%> \f[
+%>     W_1 D_1 W_1^* = M M^*
+%> \f]
+%> \f[
+%>    W_2 D_2 W_2^* = M^* M
+%> \f]
+%> But because of the SVD \f$ M = USV^* \f$ we also have:
+%> \f[MM^* = U S V^* V S U^* = U S^2 U^* = W_1 D_1 W_1^*\f]
+%> \f[M^* M = V S U^* U S V^* = V S^2 V^* = W_2 D_2  W_2^*\f]
+%> It allows to identify the left singular vectors of M to W1,
+%> and likewise the right singular vectors to W2.
 %>
-%>        To compute a consistent approximation of S we observe that U and V are orthogonal/unitary hence \f$ S  = U^* M V \f$ so we ignore the off-diagonal coefficients of the approximation and take \f$ S = diag(U^* M V)  \approx diag(W_1^* M W_2)\f$
+%> To compute a consistent approximation of S we observe that U and V are orthogonal/unitary hence \f$ S  = U^* M V \f$ so we ignore the off-diagonal coefficients of the approximation and take \f$ S = diag(U^* M V)  \approx diag(W_1^* M W_2)\f$
 %>
-%>        The last step performed by svdtj() is to sort the singular values of S in descending order and build a signed permutation matrix to order the left singular vectors of W1 accordingly. The -1 elements of the signed permutation matrix allow to change the sign of each negative values of S by reporting it on the corresponding left singular vector (\f$ \sigma v_i = (-\sigma_i) (-v_i )\f$).<br/>
-%>        To sum up W1 is replaced by W1 P and W2 by W2 abs(P) (because W2 also needs to be ordered), with P the signed permutation resulting of the descending sort of S. The resulting transforms/Fausts W1 and W2 are returned by svdtj along with the ordered S. Note that the permutation factor P (resp. abs(P)) is fused with the rightmost factor of the Faust object W1 (resp. W2).
+%> The last step performed by svdtj() is to sort the singular values of S in descending order and build a signed permutation matrix to order the left singular vectors of W1 accordingly. The -1 elements of the signed permutation matrix allow to change the sign of each negative values of S by reporting it on the corresponding left singular vector (\f$ \sigma v_i = (-\sigma_i) (-v_i )\f$).<br/>
+%> To sum up W1 is replaced by W1 P and W2 by W2 abs(P) (because W2 also needs to be ordered), with P the signed permutation resulting of the descending sort of S. The resulting transforms/Fausts W1 and W2 are returned by svdtj along with the ordered S. Note that the permutation factor P (resp. abs(P)) is fused with the rightmost factor of the Faust object W1 (resp. W2).
 %>
 %> <p> @b See @b also fact.eigtj
 %>
