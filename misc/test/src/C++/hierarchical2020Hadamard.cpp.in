@@ -92,7 +92,27 @@ int main(int argc, char* argv[])
     auto whtmat = wht->get_product();
     vector<const Faust::ConstraintGeneric*> fac_cons, res_cons;
     //algorithm
-    for(int i=0;i<log2dim-1;i++)
+
+    Real<FPP> lambda;
+    bool isUpdateWayR2L = true, isFactSideLeft = false, use_csr = true, packing_RL = false;
+    char* str_norm2_threshold = getenv("NORM2_THRESHOLD");
+    char* str_norm2_max_iter = getenv("NORM2_MAX_ITER");
+	char* str_packing_RL = getenv("PACKING_RL");
+	char* str_nfacts = getenv("NFACTS");
+    double norm2_threshold = FAUST_PRECISION;
+    double norm2_max_iter = FAUST_NORM2_MAX_ITER;
+	int nfacts = log2dim;
+    if(str_norm2_threshold)
+        norm2_threshold = std::atof(str_norm2_threshold);
+    if(str_norm2_max_iter)
+       norm2_max_iter = std::atoi(str_norm2_max_iter);
+	if(str_packing_RL)
+		packing_RL = std::atoi(str_packing_RL) != 0;
+	if(str_nfacts)
+		nfacts = std::atoi(str_nfacts);
+	cout << "norm2_threshold: "<< norm2_threshold << endl;
+    cout << "norm2_max_iter:" << norm2_max_iter << endl;
+    for(int i=0;i<nfacts-1;i++)
     {
         auto cons = new Faust::ConstraintInt<FPP,Cpu>(CONSTRAINT_NAME_SPLINCOL, 2, dim,
                 dim);
@@ -100,21 +120,6 @@ int main(int argc, char* argv[])
         auto rcons = new Faust::ConstraintInt<FPP,Cpu>(CONSTRAINT_NAME_SPLINCOL, dim/(1<<(i+1)), dim, dim);
         res_cons.push_back(rcons);
     }
-    Real<FPP> lambda;
-    bool isUpdateWayR2L = true, isFactSideLeft = false, use_csr = true, packing_RL = false;
-    char* str_norm2_threshold = getenv("NORM2_THRESHOLD");
-    char* str_norm2_max_iter = getenv("NORM2_MAX_ITER");
-	char* str_packing_RL = getenv("PACKING_RL");
-    double norm2_threshold = FAUST_PRECISION;
-    double norm2_max_iter = FAUST_NORM2_MAX_ITER;
-    if(str_norm2_threshold)
-        norm2_threshold = std::atof(str_norm2_threshold);
-    if(str_norm2_max_iter)
-       norm2_max_iter = std::atoi(str_norm2_max_iter);
-	if(str_packing_RL)
-		packing_RL = std::atoi(str_packing_RL) != 0;
-    cout << "norm2_threshold: "<< norm2_threshold << endl;
-    cout << "norm2_max_iter:" << norm2_max_iter << endl;
 	vector<StoppingCriterion<Real<FPP>>> sc = {30,30};
 //	sc.push_back(30);
 //	sc.push_back(30);

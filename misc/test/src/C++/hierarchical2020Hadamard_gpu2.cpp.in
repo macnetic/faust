@@ -108,6 +108,8 @@ int main(int argc, char* argv[])
 	char* str_constraint_name = getenv("PROX");
     double norm2_threshold = FAUST_PRECISION;
     double norm2_max_iter = FAUST_NORM2_MAX_ITER;
+	char* str_nfacts = getenv("NFACTS");
+	int nfacts = log2dim;
     if(str_norm2_threshold)
         norm2_threshold = std::atof(str_norm2_threshold);
     if(str_norm2_max_iter)
@@ -116,6 +118,8 @@ int main(int argc, char* argv[])
 		packing_RL = std::atoi(str_packing_RL) != 0;
 	if(str_use_csr)
 		use_csr = std::atoi(str_use_csr) != 0;
+	if(str_nfacts)
+		nfacts = std::atoi(str_nfacts);
 	if(str_constraint_name)
 	{
 		if(!strcmp(str_constraint_name, "SPLINCOL"))
@@ -129,7 +133,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	else str_constraint_name = "SPLINCOL";
-    for(int i=0;i<log2dim-1;i++)
+    for(int i=0;i<nfacts-1;i++)
 	{
 		auto cons = new Faust::ConstraintInt<FPP,GPU2>(constraint_name, 2, dim,
 				dim);
