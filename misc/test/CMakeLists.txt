@@ -156,7 +156,7 @@ endif()
 
 if(NOT NOCPPTESTS)
 	foreach(TEST_FPP float double)
-		foreach(FILE faust_mult2 faust_mult faust_mult_cplx test_Vect_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move test_TransformHelper_and_Transform_copy_ctor test_TransformHelper_and_Transform_fac_iterato test_TransformHelper_variadic_template_ctor test_MatDense_min test_TH_pack_factors faust_transform_omp_mul faust_pruneout faust_transform_optimize_storage faust_transform_optimize faust_prox_blockdiag)	
+		foreach(FILE faust_mult2 faust_mult faust_mult_cplx test_Vect_min test_MatDense_get_row test_MatDense_lower_upper_tri test_MatDense_nonzeros_indices test_Transform_move test_TransformHelper_and_Transform_copy_ctor test_TransformHelper_and_Transform_fac_iterato test_TransformHelper_variadic_template_ctor test_MatDense_min test_TH_pack_factors faust_transform_omp_mul faust_pruneout faust_transform_optimize_storage faust_transform_optimize faust_prox_blockdiag)
 			if(USE_GPU_MOD AND ${FILE} MATCHES test_TH_pack_factors|test_TransformHelper_variadic_template_ctor|faust_transform_optimize|test_TransformHelper_and_Transform_fac_iterato|faust_mult2|faust_transform_omp_mul|test_Transform_move|test_TransformHelper_and_Transform_copy_ctor AND ${TEST_FPP} MATCHES float)# gpu_mod handles float but not FaustGPU
 				message(STATUS ${FILE}_${TEST_FPP} " skipped")
 				continue()
@@ -205,20 +205,20 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 	# faust_multiplication : time comparison between Faust-vector product and Dense matrix-vector product
 
 
-	list(APPEND tests hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate GivensFGFT GivensFGFTSparse GivensFGFTParallel GivensFGFTParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op GivensFGFTComplex GivensFGFTComplexSparse GivensFGFTParallelComplex faust_toeplitz faust_circ faust_hankel palm4msa_2020 hierarchical2020 hierarchical2020Hadamard hierarchicalFactorizationHadamard)#MEG_factorization)
+	list(APPEND tests hierarchicalFactorization hierarchicalFactorizationFFT test_palm4MSA test_palm4MSAFFT faust_multiplication  faust_matdense_conjugate GivensFGFT GivensFGFTSparse GivensFGFTParallel GivensFGFTParallelSparse test_MatDiag faust_matsparse_mul faust_matsparse_index_op GivensFGFTComplex GivensFGFTComplexSparse GivensFGFTParallelComplex faust_toeplitz faust_circ faust_hankel palm4msa_2020 hierarchical2020 hierarchical2020Hadamard hierarchicalFactorizationHadamard)
 
 	if(FAUST_TORCH)
 		list(APPEND tests faust_torch)
 	endif()
 
 	if(USE_GPU_MOD)
-		list(APPEND tests faust_gpu_mod hierarchical2020_gpu test_matdense_gpu_mod test_matsparse_gpu_mod test_transform_gpu_mod test_vect_gpu_mod test_transform_helper_gpu_mod hierarchical2020_gpu2 hierarchical2020Hadamard_gpu2)
+		list(APPEND tests faust_gpu_mod hierarchical2020_gpu test_matdense_gpu_mod test_matsparse_gpu_mod test_transform_gpu_mod test_vect_gpu_mod test_transform_helper_gpu_mod hierarchical2020_gpu2 hierarchical2020Hadamard_gpu2 MEG_factorization)
 	endif()
 
 	foreach(TEST_FPP float double complex<float> complex<double>)
 		foreach(testin IN LISTS tests)
 
-			if(USE_GPU_MOD AND (${testin} MATCHES gpu|hierarchical2020Hadamard|palm4msa_2020|hierarchical2020|hierarchicalFactorizationHadamard) AND ${TEST_FPP} MATCHES float ) # gpu_mod handles float but not FaustGPU
+			if(USE_GPU_MOD AND (${testin} MATCHES gpu|hierarchical2020Hadamard|palm4msa_2020|hierarchical2020|hierarchicalFactorizationHadamard|MEG_factorization) AND ${TEST_FPP} MATCHES float ) # gpu_mod handles float but not FaustGPU
 				message(STATUS "${testin}_${TEST_FPP} skipped")
 				continue()
 			endif()
@@ -386,6 +386,7 @@ if(NOT NOCPPTESTS)
 	endif(BUILD_READ_XML_FILE)
 
 	add_executable(test_RefManager ${FAUST_SRC_TEST_SRC_CPP_DIR}/test_RefManager.cpp ${FAUST_BIN_TEST_SRC_DIR}/)
+
 	target_link_libraries(test_RefManager ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
 	add_test(NAME test_RefManager COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_RefManager)
 

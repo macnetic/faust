@@ -1,0 +1,144 @@
+#include "faust_init_from_matio_params.h"
+#include "faust_init_from_matio_core.h"
+#include "faust_TransformHelper.h"
+#include "faust_HierarchicalFact.h"
+#include "faust_ConstraintInt.h"
+#include "faust_MatDense.h"
+#include "faust_hierarchical.h"
+#ifdef USE_GPU_MOD
+#include"faust_gpu_mod_utils.h"
+#include "faust_gpu_mod.h"
+#endif
+#include <vector>
+#include <cstdlib>
+
+using namespace Faust;
+using namespace std;
+
+#ifdef ON_CPU
+	const FDevice dev = Cpu;
+#else
+	const FDevice dev = GPU2;
+#endif
+
+int main(int argc, const char** argv)
+{
+#if(defined(USE_GPU_MOD))
+	Faust::enable_gpu_mod();
+#endif
+
+	int impl = 2016;
+	bool on_gpu = false;
+	if(argc > 1)
+	{
+		impl = atoi(argv[1]);
+		if(impl != 2016 && impl != 2020)
+		{
+			throw runtime_error("Implementation (1st arg.) must be 2016 or 2020.");
+		}
+		if(argc > 2)
+		{
+			string arg2 = argv[1];
+			on_gpu = true;
+		}
+	}
+	// CONSTRAINT_NAME_SPLINCOL
+	// CONSTRAINT_NAME_SP
+	//	const string MatrixFilename = "@FAUST_DATA_MAT_DIR@/matrix_MEG.mat";
+	const string MatrixFilename = "matrix_MEG.mat";
+	Faust::MatDense<double,Cpu> MEG;
+#if(!defined(ON_CPU) && defined(USE_GPU_MOD))
+	Faust::MatDense<double,GPU2> gpu_MEG;
+#endif
+
+	init_faust_mat_from_matio(MEG, MatrixFilename.c_str(), "matrix");
+	MEG.transpose();
+
+#if(!defined(ON_CPU) && defined(USE_GPU_MOD))
+	if(dev == GPU2)
+		gpu_MEG = MEG;
+#endif
+
+	vector<const Faust::ConstraintGeneric*> fac_constraints;
+	vector<const Faust::ConstraintGeneric*> res_constraints;
+	vector<unsigned int> res_cons_pvals = {58263, 46610, 37288, 29831, 23865, 19092, 15274, 12219};
+	Faust::ConstraintInt<double,dev> cons_i(
+			CONSTRAINT_NAME_SP,
+			1632,
+			204,
+			204);
+	Faust::ConstraintInt<double,dev> cons_1(
+			CONSTRAINT_NAME_SPCOL,
+			10,
+			204,
+			8193);
+
+	fac_constraints.push_back(&cons_1);
+	for(int i=0;i<7;i++)
+		fac_constraints.push_back(&cons_i);
+
+	for(int i=0;i<8;i++)
+	{
+		auto res_cons = new Faust::ConstraintInt<double, dev>(CONSTRAINT_NAME_SP, res_cons_pvals[i], MEG.getNbRow(), MEG.getNbRow());
+		res_constraints.push_back(res_cons);
+	}
+
+	vector<vector<const Faust::ConstraintGeneric*>> constraints = { res_constraints, fac_constraints };
+	Faust::StoppingCriterion<double> loc_opt_stop(10);
+	Faust::StoppingCriterion<double> glob_opt_stop(10);
+	Faust::Params<double, dev> params(MEG.getNbRow(), MEG.getNbCol(), 9, constraints, {}, loc_opt_stop, glob_opt_stop, /*verbosity*/ false, /* isUpdateWayR2L_ */ true, /* isFactSideLeft_ */ true);
+	Faust::BlasHandle<Cpu> cublasHandle;
+	Faust::SpBlasHandle<Cpu> cusparseHandle;
+	double lambda2020;
+
+	char* str_use_csr = getenv("USE_CSR");
+	char* str_packing_RL = getenv("PACKING_RL");
+	char* str_isUpdateWayR2L = getenv("UR2L");
+	char* str_isFactSideLeft = getenv("FSL");
+	params.isUpdateWayR2L = false;
+	params.isFactSideLeft = true;
+	params.packing_RL = true;
+	params.use_csr = true;
+
+	if(str_packing_RL)
+		params.packing_RL = std::atoi(str_packing_RL) != 0;
+	if(str_use_csr)
+		params.use_csr = std::atoi(str_use_csr) != 0;
+	if(str_isUpdateWayR2L)
+		params.isUpdateWayR2L = std::atoi(str_isUpdateWayR2L) != 0;
+	if(str_isFactSideLeft)
+		params.isFactSideLeft = std::atoi(str_isFactSideLeft) != 0;
+
+	params.Display();
+
+	if(impl == 2016 || argc < 2)
+	{
+		//		Faust::HierarchicalFact<double, dev> algo(MEG, params, cublasHandle, cusparseHandle);
+		//		algo.compute_facts();
+	}
+	else if(impl == 2020)
+	{
+		//Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>&  A,
+		//		Params<FPP,DEVICE, Real<FPP>> & p,
+		//		Real<FPP>& lambda, const bool compute_2norm_on_array,
+		//		const bool on_gpu)
+
+#ifdef ON_CPU
+		cout << "on_gpu: " << on_gpu << endl;
+		auto th = Faust::hierarchical<double,Cpu>(MEG, params, lambda2020, false, on_gpu);
+#else
+		cout << "hierarchical on GPU2 MEG" << endl;
+		auto th = Faust::hierarchical<double,GPU2>(gpu_MEG, params, lambda2020, false, on_gpu);
+#endif
+		th->display();
+
+		delete th;
+
+	}
+
+	for(auto c: res_constraints)
+	{
+		delete c;
+	}
+	return EXIT_SUCCESS;
+}
