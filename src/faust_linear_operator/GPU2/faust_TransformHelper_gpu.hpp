@@ -233,4 +233,19 @@ namespace Faust
 			this->Fv_mul_mode = th.Fv_mul_mode;
 		}
 
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::save_mat_file(const char* filename) const
+		{
+			this->transform->save_mat_file(filename, this->is_transposed, this->is_conjugate);
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::tocpu(TransformHelper<FPP,Cpu>& cpu_transf)
+		{
+			auto t = this->transform->tocpu();
+			for(auto fac: t)
+				cpu_transf.push_back(fac, false, false);
+			cpu_transf.display();
+		}
+
 }

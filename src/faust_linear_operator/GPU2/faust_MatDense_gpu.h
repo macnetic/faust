@@ -98,6 +98,7 @@ namespace Faust
 				MatDense<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr) const;
+				void tocpu(MatDense<FPP, Cpu> &cpu_mat, const void* stream=nullptr) const;
 				void Display() const;
 				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 				MatType getType() const;

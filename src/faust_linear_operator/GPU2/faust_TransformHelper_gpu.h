@@ -45,6 +45,8 @@ namespace Faust
 				void operator=(TransformHelper<FPP,GPU2>& th);
 				typename Transform<FPP,GPU2>::iterator begin() const;
 				typename Transform<FPP,GPU2>::iterator end() const;
+				void tocpu(TransformHelper<FPP,Cpu>& cpu_transf);
+				void save_mat_file(const char* filename) const;
 		};
 }
 #include "faust_TransformHelper_gpu.hpp"

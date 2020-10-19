@@ -363,6 +363,22 @@ void test_Transform_get_facts()
 	cout << "OK" << endl;
 }
 
+void test_Transform_tocpu()
+{
+	cout << "void test_Transform_tocpu" << endl;
+	vector<MatGeneric<double,GPU2>*> gpu_factors;
+	vector<MatGeneric<double,Cpu>*> cpu_factors;
+	generate_cpu_gpu_factors(gpu_factors, cpu_factors);
+	Faust::Transform<double, GPU2> t_gpu(gpu_factors);
+	Faust::Transform<double, Cpu> t_cpu(cpu_factors);
+	Faust::Transform<double, Cpu> t_cpu2;
+	t_gpu.tocpu(t_cpu2);
+	cout << "t_cpu.norm(): " << t_cpu.normFro() << endl;
+	cout << "t_cpu2.norm(): " << t_cpu2.normFro() << endl;
+	free_gpu_factors(gpu_factors);
+	cout << "OK" << endl;
+}
+
 int main()
 {
 	Faust::enable_gpu_mod();
@@ -383,5 +399,6 @@ int main()
 	test_Transform_clear();
 	test_Transform_spectralNorm();
 	test_Transform_get_facts();
+	test_Transform_tocpu();
 	return EXIT_SUCCESS;
 }
