@@ -81,6 +81,8 @@ namespace Faust
 #endif
 
 	}
+	template<typename FPP>
+		MatDense<FPP,Cpu>::MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP  *data_): MatDense<FPP,Cpu>(data_, nbRow, nbCol) {}
 
 	template<typename FPP>
 		MatGeneric<FPP,Cpu>* MatDense<FPP,Cpu>::Clone(const bool isOptimize /*default value = false*/) const

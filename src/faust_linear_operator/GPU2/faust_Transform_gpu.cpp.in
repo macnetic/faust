@@ -466,6 +466,7 @@ namespace Faust
 
 
 
+
 	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::tocpu(Transform<@FAUST_SCALAR_FOR_GM@, Cpu>& cpu_transf) const
 		{
@@ -487,17 +488,24 @@ namespace Faust
 					cpu_msparse = new MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu>();
 					cpu_msparse->resize(gpu_msparse->getNonZeros(), gpu_msparse->getNbRow(), gpu_msparse->getNbCol());
 					gpu_msparse->tocpu(*cpu_msparse);
-					auto msparse2dense = new MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>(*cpu_msparse);
-					delete cpu_msparse;
+//					auto msparse2dense = new MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>(*cpu_msparse);
+//					delete cpu_msparse;
 					//TODO: fix the bug and remove the workaround (MatSparse conversion to MatDense)
-					cpu_transf.push_back(msparse2dense, false, false, false);
-//					cpu_transf.push_back(cpu_msparse, false, false, false);
+//					cpu_transf.push_back(msparse2dense, false, false, false);
+					cpu_transf.push_back(cpu_msparse, false, false, false);
 				}
 				else
 					throw std::runtime_error("Invalid matrix pointer");
 			}
 		}
 
+	template<>
+		Transform<@FAUST_SCALAR_FOR_GM@, Cpu> Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::tocpu() const
+		{
+			Transform<@FAUST_SCALAR_FOR_GM@, Cpu> cpu_transf;
+			tocpu(cpu_transf);
+			return cpu_transf;
+		}
 
 	template<>
 		void Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::save_mat_file(const char* filename, const bool transpose, const bool conjugate) const

@@ -154,6 +154,7 @@ namespace Faust
 																										 \tparam nbCol : number of column of the matrix
 																										 */
 			MatDense(const FPP  *data_,const faust_unsigned_int nbRow, const faust_unsigned_int nbCol );
+			MatDense(const faust_unsigned_int nbRow, const faust_unsigned_int nbCol, const FPP  *data_);
 			MatDense() : MatGeneric<FPP,Cpu>(), mat(0,0), isZeros(false) {}
 			/*!
 			 *  \brief Copy Constructor of MatDense

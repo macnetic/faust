@@ -498,7 +498,7 @@ def _palm4msa_fgft(Lap, p, ret_lambda=False):
 # experimental block end
 
 def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
-                 on_gpu=False):
+                 on_gpu=False, full_gpu=True):
     """
     Factorizes the matrix M with Hierarchical Factorization using the parameters set in p.
     @note This function has its shorthand pyfaust.faust_fact(). For
@@ -524,6 +524,10 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         backend: the C++ implementation to use (default to 2016, 2020 backend
         should be quicker for certain configurations - e.g. factorizing a
         Hadamard matrix).
+        on_gpu: if True then the implementation is partially or totally
+        executed on GPU (this option applies only to 2020 backend).
+        full_gpu: if on_gpu is True and this argument too then the algorithm is
+        fully executed on GPU (the resulting Faust is copied to CPU memory).
 
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
         ret_params: set to True to ask the function to return the
@@ -652,7 +656,8 @@ def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
         if on_gpu: warnings.warn("on_gpu is totally experimental, use at your"
                                  " own risk.")
         core_obj, _lambda = _FaustCorePy.FaustFact.hierarchical2020(M, p,
-                                                                    on_gpu)
+                                                                    on_gpu,
+                                                                    full_gpu)
     else:
         raise ValueError("backend must be 2016 or 2020")
     F = Faust(core_obj=core_obj)
