@@ -421,7 +421,7 @@ def hierarchical2020(M, nites, constraints, is_update_way_R2L,
 
 # experimental block end
 
-def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
+def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False, full_gpu=False):
     """
     Factorizes the matrix M with Palm4MSA algorithm using the parameters set in p.
 
@@ -429,6 +429,10 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
         M: the numpy array to factorize.
         p: the ParamsPalm4MSA instance to define the algorithm parameters.
         ret_lambda: set to True to ask the function to return the scale factor (False by default).
+        on_gpu: if True then the implementation is partially or totally
+        executed on GPU (this option applies only to 2020 backend).
+        full_gpu: if on_gpu is True and this argument too then the algorithm is
+        fully executed on GPU (the resulting Faust is copied to CPU memory).
 
     Returns:
         The Faust object resulting of the factorization.
@@ -465,7 +469,8 @@ def palm4msa(M, p, ret_lambda=False, backend=2016, on_gpu=False):
     elif(backend == 2020):
         if on_gpu: warnings.warn("on_gpu is totally experimental, use at your"
                                  " own risk.")
-        core_obj, _lambda = _FaustCorePy.FaustFact.palm4msa2020(M, p, on_gpu)
+        core_obj, _lambda = _FaustCorePy.FaustFact.palm4msa2020(M, p, on_gpu,
+                                                                full_gpu)
     else:
         raise ValueError("Unknown backend (only 2016 and 2020 are available).")
     F = Faust(core_obj=core_obj)

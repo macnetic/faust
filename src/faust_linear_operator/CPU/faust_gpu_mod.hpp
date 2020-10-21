@@ -11,6 +11,7 @@ bool Faust::FaustGPU<FPP>::is_cpu_mat_known(const Faust::MatGeneric<FPP,Cpu> *m)
 template<typename FPP>
 bool Faust::FaustGPU<FPP>::are_cpu_mat_all_known(const std::vector<MatGeneric<FPP,Cpu>*> mats)
 {
+	if(mats.size() == 0) return false;
 	for(auto m: mats)
 		if(! is_cpu_mat_known(m)) return false;
 	return true;

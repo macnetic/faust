@@ -2050,7 +2050,7 @@ cdef class FaustFact:
         return coreU, S, coreV
 
     @staticmethod
-    def palm4msa2020(M, p, on_gpu=False):
+    def palm4msa2020(M, p, on_gpu=False, full_gpu=True):
         cdef unsigned int M_num_rows=M.shape[0]
         cdef unsigned int M_num_cols=M.shape[1]
 
@@ -2125,7 +2125,8 @@ cdef class FaustFact:
                                              p.norm2_threshold,
                                              p.is_verbose,
                                              p.constant_step_size,
-                                             p.step_size, on_gpu)
+                                             p.step_size, on_gpu,
+                                             full_gpu)
         core._isReal = True
 
         for i in range(0,len(p.constraints)):
@@ -2223,40 +2224,23 @@ cdef class FaustFact:
 
         core = FaustCore(core=True)
 
-        if(full_gpu):
-            core.core_faust_dbl = \
-                    FaustCoreCy.hierarchical2020_gpu2[double](&Mview[0,0], M_num_rows,
-                                                         M_num_cols,
-                                                         cpp_stop_crits,
-                                                         cpp_constraints,
-                                                         num_constraints,
-                                                         num_facts,
-                                                         &outbufview[0],
-                                                         is_update_way_R2L,
-                                                         is_fact_side_left,
-                                                         use_csr, packing_RL,
-                                                         norm2_max_iter,
-                                                         norm2_threshold,
-                                                         p.is_verbose,
-                                                         p.constant_step_size,
-                                                         p.step_size)
-        else:
-            core.core_faust_dbl = \
-                    FaustCoreCy.hierarchical2020[double](&Mview[0,0], M_num_rows,
-                                                         M_num_cols,
-                                                         cpp_stop_crits,
-                                                         cpp_constraints,
-                                                         num_constraints,
-                                                         num_facts,
-                                                         &outbufview[0],
-                                                         is_update_way_R2L,
-                                                         is_fact_side_left,
-                                                         use_csr, packing_RL,
-                                                         norm2_max_iter,
-                                                         norm2_threshold,
-                                                         p.is_verbose,
-                                                         p.constant_step_size,
-                                                         p.step_size, on_gpu)
+        core.core_faust_dbl = \
+                FaustCoreCy.hierarchical2020[double](&Mview[0,0], M_num_rows,
+                                                     M_num_cols,
+                                                     cpp_stop_crits,
+                                                     cpp_constraints,
+                                                     num_constraints,
+                                                     num_facts,
+                                                     &outbufview[0],
+                                                     is_update_way_R2L,
+                                                     is_fact_side_left,
+                                                     use_csr, packing_RL,
+                                                     norm2_max_iter,
+                                                     norm2_threshold,
+                                                     p.is_verbose,
+                                                     p.constant_step_size,
+                                                     p.step_size, on_gpu,
+                                                     full_gpu)
         core._isReal = True
 
         for i in range(0,num_constraints):
