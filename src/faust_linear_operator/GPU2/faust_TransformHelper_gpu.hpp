@@ -34,6 +34,26 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy/*=false*/, const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/)
+		{
+
+			MatGeneric<FPP,GPU2>* gpu_M = nullptr;
+			MatDense<FPP,Cpu>* cpu_dM = nullptr;
+			MatSparse<FPP,Cpu>* cpu_sM = nullptr;
+			if(nullptr != (cpu_dM = dynamic_cast<MatDense<FPP,Cpu>*>(M)))
+			{
+				auto gpu_dM = new MatDense<FPP,GPU2>(M->getNbRow(), M->getNbCol(), cpu_dM->getData());
+				gpu_M = gpu_dM;
+			}
+			else if(nullptr != (cpu_sM = dynamic_cast<MatSparse<FPP,Cpu>*>(M)))
+			{
+				auto gpu_sM = new MatSparse<FPP,GPU2>(M.getNbRow(), M.getNbCol(), cpu_sM.getNonZeros(), cpu_sM.getValuePtr(), cpu_sM.getRowPtr(), cpu_sM.getColInd(), dev_id);
+				gpu_M = gpu_sM;
+			}
+			this->transform->push_back(gpu_M, false);
+		}
+
+	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::push_first(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy/*=false*/, const bool copying/*=true*/)
 		{
 			return this->transform->push_first(M, copying);

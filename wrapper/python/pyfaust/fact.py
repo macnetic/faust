@@ -503,7 +503,7 @@ def _palm4msa_fgft(Lap, p, ret_lambda=False):
 # experimental block end
 
 def hierarchical(M, p, ret_lambda=False, ret_params=False, backend=2016,
-                 on_gpu=False, full_gpu=True):
+                 on_gpu=False, full_gpu=False):
     """
     Factorizes the matrix M with Hierarchical Factorization using the parameters set in p.
     @note This function has its shorthand pyfaust.faust_fact(). For

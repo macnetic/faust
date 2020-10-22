@@ -19,6 +19,7 @@ namespace Faust
 				template<typename ...GList> TransformHelper(GList& ... t);
 #endif
 				void push_back(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy=false, const bool copying=true);
+				void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const int32_t dev_id=-1, const void* stream=nullptr);
 				void pop_front();
 				void pop_back();
 				void push_first(const MatGeneric<FPP,GPU2>*, const bool optimizedCopy=false, const bool copying=true);
