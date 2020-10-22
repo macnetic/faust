@@ -47,8 +47,11 @@
 
 #include "faust_MatDense.h"
 #include "faust_TransformHelper.h"
+#ifdef USE_GPU_MOD
+#include "faust_TransformHelper_gpu.h"
+#endif
 
-template<typename FPP>
+template<typename FPP, FDevice DEV=Cpu>
 class FaustCoreCpp
 {
 
@@ -56,7 +59,7 @@ class FaustCoreCpp
 
 
     FaustCoreCpp(): transform(nullptr) {}
-    FaustCoreCpp(Faust::TransformHelper<FPP,Cpu> *th);
+    FaustCoreCpp(Faust::TransformHelper<FPP,DEV> *th);
     void Display() const { transform->display();}
     const char* to_string() const;
     void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol, bool optimizedCopy=false);
@@ -69,11 +72,11 @@ class FaustCoreCpp
     void set_FM_mul_mode(const int mode);
     void set_Fv_mul_mode(const int mode);
     void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x/*,bool isTranspose*/)const;
-    FaustCoreCpp<FPP>* mul_faust(FaustCoreCpp<FPP>* right);
-    FaustCoreCpp<FPP>* vertcat(FaustCoreCpp<FPP>* right);
-    FaustCoreCpp<FPP>* horzcat(FaustCoreCpp<FPP>* right);
-    FaustCoreCpp<FPP>* mul_scal(FPP scal);
-    FaustCoreCpp<FPP>* normalize(int ord) const;
+    FaustCoreCpp<FPP,DEV>* mul_faust(FaustCoreCpp<FPP,DEV>* right);
+    FaustCoreCpp<FPP,DEV>* vertcat(FaustCoreCpp<FPP,DEV>* right);
+    FaustCoreCpp<FPP,DEV>* horzcat(FaustCoreCpp<FPP,DEV>* right);
+    FaustCoreCpp<FPP,DEV>* mul_scal(FPP scal);
+    FaustCoreCpp<FPP,DEV>* normalize(int ord) const;
     unsigned long long nnz()const;
     double norm(int ord, double threshold=.001, int max_num_its=100) const;
     double normFro() const;
@@ -90,34 +93,34 @@ class FaustCoreCpp
     void get_fact_dense(const unsigned int& i, FPP* elts,
             unsigned int* num_rows, unsigned int* num_cols,
             const bool transpose) const;
-    FaustCoreCpp<FPP>* left(const faust_unsigned_int) const;
-    FaustCoreCpp<FPP>* right(const faust_unsigned_int) const;
+    FaustCoreCpp<FPP,DEV>* left(const faust_unsigned_int) const;
+    FaustCoreCpp<FPP,DEV>* right(const faust_unsigned_int) const;
     faust_unsigned_int get_fact_nnz(const faust_unsigned_int) const;
     bool is_fact_sparse(const faust_unsigned_int id) const;
-    FaustCoreCpp<FPP>* slice(unsigned int, unsigned int, unsigned int, unsigned int);
-    FaustCoreCpp<FPP>* fancy_idx(unsigned long int* row_ids, unsigned long int
+    FaustCoreCpp<FPP,DEV>* slice(unsigned int, unsigned int, unsigned int, unsigned int);
+    FaustCoreCpp<FPP,DEV>* fancy_idx(unsigned long int* row_ids, unsigned long int
                                   num_rows, unsigned long int* col_ids,
                                   unsigned long int num_cols);
     bool save_mat_file(const char* filepath) const;
-    FaustCoreCpp<FPP>* optimize_storage(const bool time=false);
-    FaustCoreCpp<FPP>* optimize(const bool transp=false);
-    FaustCoreCpp<FPP>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
+    FaustCoreCpp<FPP,DEV>* optimize_storage(const bool time=false);
+    FaustCoreCpp<FPP,DEV>* optimize(const bool transp=false);
+    FaustCoreCpp<FPP,DEV>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
     const bool isTransposed();
-    FaustCoreCpp<FPP>* transpose();
-    FaustCoreCpp<FPP>* conjugate();
-    FaustCoreCpp<FPP>* adjoint();
-    FaustCoreCpp<FPP>* zpruneout(const int nnz_tres, const int npasses, const bool only_forward);
+    FaustCoreCpp<FPP,DEV>* transpose();
+    FaustCoreCpp<FPP,DEV>* conjugate();
+    FaustCoreCpp<FPP,DEV>* adjoint();
+    FaustCoreCpp<FPP,DEV>* zpruneout(const int nnz_tres, const int npasses, const bool only_forward);
     ~FaustCoreCpp();
-    static FaustCoreCpp<FPP>* randFaust(unsigned int t,
+    static FaustCoreCpp<FPP,DEV>* randFaust(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,
             unsigned int min_dim_size,
             unsigned int max_dim_size, float density, bool per_row);
-    static FaustCoreCpp<FPP>* hadamardFaust(unsigned int n, const bool norma);
-    static FaustCoreCpp<FPP>* fourierFaust(unsigned int n, const bool norma);
-    static FaustCoreCpp<FPP>* eyeFaust(unsigned int n, unsigned int m);
+    static FaustCoreCpp<FPP,DEV>* hadamardFaust(unsigned int n, const bool norma);
+    static FaustCoreCpp<FPP,DEV>* fourierFaust(unsigned int n, const bool norma);
+    static FaustCoreCpp<FPP,DEV>* eyeFaust(unsigned int n, unsigned int m);
 
     private :
-    Faust::TransformHelper<FPP,Cpu> *transform;
+    Faust::TransformHelper<FPP,DEV> *transform;
 };
 
 void* _enable_gpu_mod(const char* libpath);
