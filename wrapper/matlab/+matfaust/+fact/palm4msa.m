@@ -5,6 +5,7 @@
 %> @param M the dense matrix to factorize.
 %> @param p the ParamsPalm4MSA instance to define the algorithm parameters.
 %> @param 'backend',int (optional) the backend (the C++ implementation) chosen. Must be 2016 (the default) or 2020 (which should be quicker for certain configurations - e.g. factorizing a Hadamard matrix).
+%> @param 'gpu', bool (optional) set to true to execute the algorithm using the GPU implementation. This options is only available when backend==2020.
 %>
 %> @retval F the Faust object result of the factorization.
 %> @retval [F, lambda] = palm4msa(M, p) to optionally get lambda (scale).
@@ -45,18 +46,30 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 	mex_params = p.to_mex_struct(M);
 	backend = 2016;
 	nargin = length(varargin);
+	gpu = false;
 	if(nargin > 0)
-		backend = varargin{1};
-		if(strcmp('backend', backend))
-			if(nargin < 2)
-				error('keyword argument ''backend'' must be followed by 2016 or 2020')
-			else
-				backend = varargin{2};
+		for i=1:nargin
+			switch(varargin{i})
+				case 'backend'
+					if(nargin < i+1)
+						error('keyword argument ''backend'' must be followed by 2016 or 2020')
+					else
+						backend = varargin{i+1};
+					end
+				case 'gpu'
+					if(nargin == i || ~ islogical(varargin{i+1}))
+						error('gpu keyword argument is not followed by a logical')
+					else
+						gpu = varargin{i+1};
+					end
 			end
 		end
 		if(~ (isscalar(backend) && floor(backend) == backend) || backend ~= 2016 && backend ~= 2020)
 			backend
 			error('backend must be a int equal to 2016 or 2020')
+		end
+		if(backend ~= 2020 && gpu == true)
+			error('GPU implementation is only available for 2020 backend.')
 		end
 	end
 	if(backend == 2016)
@@ -67,7 +80,11 @@ function  [F,lambda] = palm4msa(M, p, varargin)
 		end
 	elseif(backend == 2020)
 		if(isreal(M))
-			[lambda, core_obj] = mexPALM4MSA2020Real(mex_params);
+			if(gpu)
+				[lambda, core_obj] = mexPALM4MSA2020_gpu2Real(mex_params);
+			else
+				[lambda, core_obj] = mexPALM4MSA2020Real(mex_params);
+			end
 		else
 			error('backend 2020 doesn''t handle yet the complex matrices')
 		end
