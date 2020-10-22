@@ -37,6 +37,7 @@
 #include <chrono>
 #include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
+#include "faust_gpu_mod_utils.h"
 
 typedef @TEST_FPP@ FPP;
 
@@ -45,6 +46,25 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+	int meth = 2;
+	bool on_gpu = false;
+	if(argc > 1)
+	{
+		meth = std::atoi(argv[1]);
+		if(argc > 2)
+			on_gpu = true;
+	}
+	cout << "on_gpu=" << on_gpu << endl;
+
+#ifdef USE_GPU_MOD
+	if(on_gpu) Faust::enable_gpu_mod();
+#else
+	if(on_gpu)
+	{
+		std::cerr << "The test is not compiled with gpu_mod (USE_GPU_MOD not defined)." << std::endl;
+		exit(2);
+	}
+#endif
 	if (typeid(FPP) == typeid(double))
 	{
 		cout<<"floating point precision == double"<<endl;
@@ -56,14 +76,16 @@ int main(int argc, char* argv[])
 	}
 	Faust::MatDense<FPP,Cpu> data;
 
-	char configPalm2Filename[] = "@FAUST_DATA_MAT_DIR@/config_compared_palm2.mat";
+	char configPalm2Filename[] = "config_compared_palm2.mat";
 
 	init_faust_mat_from_matio(data, configPalm2Filename, "data");
 	Faust::ConstraintInt<FPP,Cpu> c1(CONSTRAINT_NAME_SPLIN, 5, 500, 32);
 	Faust::ConstraintFPP<FPP, Cpu, Real<FPP>> c2(CONSTRAINT_NAME_NORMCOL, 1.0, 32, 32);
+	Faust::ConstraintInt<FPP,GPU2> gpu_c1(CONSTRAINT_NAME_SPLIN, 5, 500, 32);
+	Faust::ConstraintFPP<FPP, GPU2, Real<FPP>> gpu_c2(CONSTRAINT_NAME_NORMCOL, 1.0, 32, 32);
+
 	//	vector<MatGeneric<FPP,Cpu>*> facts;
 	TransformHelper<FPP,Cpu> facts;
-	vector<ConstraintGeneric*> constraints{&c1, &c2};
 	Real<FPP> lambda= 1;
 	//	TransformHelper<FPP,Cpu>* th =  TransformHelper<FPP,Cpu>::hadamardFaust(5);
 	//	th->display();
@@ -73,7 +95,7 @@ int main(int argc, char* argv[])
 	//	MatDense<FPP, Cpu>* H = Faust::MatDense<FPP,Cpu>::randMat(500,32);
 	//	H->Display();
 	data.Display();
-	bool use_csr = false, is_update_way_R2L = false;
+	bool use_csr = true, is_update_way_R2L = false;
 	bool packing_RL = true;
 	packing_RL = false;
 	int nites = 200;
@@ -81,24 +103,11 @@ int main(int argc, char* argv[])
 	bool compute_2norm_on_array = false;
 	Real<FPP> norm2_threshold = 10e-16;
 	int norm2_max_iter = 1000;
-	int meth = 2;
-	bool on_gpu = false;
-	if(argc > 1)
-	{
-		meth = std::atoi(argv[1]);
-		if(argc > 2)
-			on_gpu = true;
-	}
-	cout << "on_gpu=" << on_gpu << endl;
-#ifdef USE_GPU_MOD
-	if(on_gpu) Faust::enable_gpu_mod();
-#else
-	if(on_gpu)
-	{
-		std::cerr << "The test is not compiled with gpu_mod (USE_GPU_MOD not defined)." << std::endl;
-		exit(2);
-	}
-#endif
+
+
+	vector<ConstraintGeneric*> constraints{&c1, &c2};
+	vector<ConstraintGeneric*> gpu_constraints{&gpu_c1, &gpu_c2};
+
 	if(meth == 1)
 	{
 		cout << "use impl1" << endl;
@@ -108,6 +117,15 @@ int main(int argc, char* argv[])
 	{
 		cout << "use impl2" << endl;
 		Faust::palm4msa2<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
+	}
+	else if(meth == 3)
+	{
+		cout << "use impl3" << endl;
+		Faust::MatDense<FPP,GPU2> gpu_data(data);
+		TransformHelper<FPP,GPU2> gpu_facts;
+		Faust::palm4msa2<FPP,GPU2>(gpu_data, gpu_constraints, gpu_facts, lambda, sc, is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
+		gpu_facts.display();
+		gpu_facts.tocpu(facts);
 	}
 	else
 	{

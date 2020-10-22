@@ -653,7 +653,6 @@ FaustCoreCpp<FPP>* palm4msa2020_gpu2(FPP* mat, unsigned int num_rows, unsigned i
         cerr << e.what() << endl;
         return core;
     }
-
     if(is_verbose) th->display();
     core = new FaustCoreCpp<FPP>(th);
 
@@ -665,7 +664,7 @@ template<typename FPP>
 FaustCoreCpp<FPP>* palm4msa2020(FPP* mat, unsigned int num_rows, unsigned int num_cols,  PyxConstraintGeneric** constraints, unsigned int num_cons, double* out_buf, PyxStoppingCriterion<double> sc, bool is_update_way_R2L, bool use_csr, bool packing_RL, unsigned int norm2_max_iter, double norm2_threshold, bool is_verbose, bool constant_step_size, double step_size, const bool on_gpu /*= false */, const bool full_gpu /*= false*/)
 {
 #ifdef USE_GPU_MOD
-    if(on_gpu && full_gpu)
+    if(full_gpu)
         return palm4msa2020_gpu2(mat, num_rows, num_cols, constraints, num_cons, out_buf, sc, is_update_way_R2L, use_csr, packing_RL, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
     else
 #endif
@@ -751,7 +750,7 @@ template<typename FPP>
 FaustCoreCpp<FPP>* hierarchical2020(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<double>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, double* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, bool use_csr, bool packing_RL, unsigned int norm2_max_iter, double norm2_threshold, bool is_verbose, bool constant_step_size, double step_size, const bool on_gpu /*= false */, const bool full_gpu /* = false*/)
 {
 #ifdef USE_GPU_MOD
-    if(on_gpu && full_gpu)
+    if(full_gpu)
         return hierarchical2020_gpu2(mat, num_rows, num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, use_csr, packing_RL, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size);
     else
 #endif
@@ -794,7 +793,7 @@ FaustCoreCpp<FPP>* hierarchical2020_gpu2(FPP* mat, unsigned int num_rows, unsign
 		Faust::TransformHelper<FPP,GPU2>* th_times_lambda = th->multiply(inout_lambda[0]);
         // delete th; // th_times_lambda is the same ptr as th
 //        th = th_times_lambda;
-		th->display();
+		if(is_verbose) th->display();
 		cpu_th = new Faust::TransformHelper<FPP,Cpu>();
 		th->tocpu(*cpu_th);
 		delete th;
