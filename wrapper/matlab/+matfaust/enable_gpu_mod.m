@@ -27,6 +27,12 @@ function enable_gpu_mod(varargin)
 		otherwise
 			% not reachable
 	end
+	if(~ exist(libpath))
+		% if filepath doesn't exist, try to find lib in cwd
+		[~, name, ext] = fileparts(libpath);
+		libfile = [name ext];
+		libpath = libfile;
+	end
 	if(nargin > 0)
 		i = 1;
 		while (i <= nargin)
