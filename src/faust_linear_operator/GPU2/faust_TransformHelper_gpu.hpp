@@ -66,6 +66,12 @@ namespace Faust
 		}
 
 	template<typename FPP>
+	string TransformHelper<FPP,GPU2>::to_string() const
+	{
+		throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+	}
+
+	template<typename FPP>
 		template<typename Head, typename ... Tail>
 		void TransformHelper<FPP,GPU2>::push_back_(Head& h, Tail&... t)
 		{
@@ -98,6 +104,18 @@ namespace Faust
 		Real<FPP> TransformHelper<FPP,GPU2>::normFro() const
 		{
 			return this->transform->get_product().norm();
+		}
+
+	template<typename FPP>
+		Real<FPP> TransformHelper<FPP,GPU2>::normL1() const
+		{
+			return this->transform->get_product().normL1();
+		}
+
+	template<typename FPP>
+		Real<FPP> TransformHelper<FPP,GPU2>::normInf() const
+		{
+			return this->transform->normL1(!this->is_transposed);
 		}
 
 	template<typename FPP>
@@ -158,6 +176,24 @@ namespace Faust
 		{
 			this->transform->multiply(a);
 			return this;
+		}
+
+	template<typename FPP>
+		Vect<FPP,GPU2> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,GPU2>& a)
+		{
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::set_FM_mul_mode() const
+		{
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+		}
+
+	template<typename FPP>
+		void TransformHelper<FPP,GPU2>::set_Fv_mul_mode() const
+		{
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
 		}
 
 	template<typename FPP>
@@ -266,6 +302,78 @@ namespace Faust
 			for(auto fac: t)
 				cpu_transf.push_back(fac, false, false);
 			cpu_transf.display();
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::vertcat(const TransformHelper<FPP,GPU2>* G)
+		{
+			//TODO
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::horzcat(const TransformHelper<FPP,GPU2>* G)
+		{
+			//TODO
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		faust_unsigned_int TransformHelper<FPP,GPU2>::get_total_nnz() const
+		{
+			return this->transform.get_total_nnz();
+		}
+
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const
+		{
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		unsigned int TransformHelper<FPP,GPU2>::get_fact_nb_rows(const faust_unsigned_int id) const
+		{
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			return 0;
+		}
+
+	template<typename FPP>
+		unsigned int TransformHelper<FPP,GPU2>::get_fact_nb_cols(const faust_unsigned_int id) const
+		{
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			return 0;
+		}
+
+	template<typename FPP>
+		faust_unsigned_int TransformHelper<FPP,GPU2>::get_fact_nnz(const faust_unsigned_int id) const
+		{
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			return 0;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::transpose()
+		{
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::conjugate()
+		{
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::adjoint()
+		{
+			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
 		}
 
 }

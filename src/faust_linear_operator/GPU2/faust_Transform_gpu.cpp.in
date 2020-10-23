@@ -515,5 +515,13 @@ namespace Faust
 			cpu_transf.save_mat_file(filename, transpose, conjugate);
 		}
 
+	template<>
+		Real<@FAUST_SCALAR_FOR_GM@> Faust::Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::normL1(const bool transpose /* = false */) const
+		{
+			double norm;
+			MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> full = get_product(transpose?'T':'N');
+			norm = std::abs(full.normL1(/*transpose*/)); //transpose not necessary because full is already transposed if needed
+			return norm;
+		}
 
 }

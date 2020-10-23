@@ -54,9 +54,11 @@ namespace Faust
 			void multiplyLeft(const Transform<FPP,GPU2> & A);
 			void multiply(const FPP& a);
 			Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag);
+			Real<FPP> normL1(const bool transpose = false) const;
 			void tocpu(Transform<FPP, Cpu>& cpu_transf) const;
 			Transform<FPP, Cpu> tocpu() const;
 			void save_mat_file(const char* filename, const bool transpose, const bool conjugate) const;
+
 //			using transf_iterator = typename std::vector<MatGeneric<FPP,Cpu>*>::const_iterator;
 //
 //			transf_iterator begin() const;

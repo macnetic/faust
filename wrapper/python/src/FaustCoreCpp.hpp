@@ -56,7 +56,7 @@ FaustCoreCpp<FPP, DEV>::FaustCoreCpp(Faust::TransformHelper<FPP,DEV> *th)
     template<typename FPP, FDevice DEV>
 void FaustCoreCpp<FPP,DEV>::push_back(FPP* valueMat, unsigned int nbrow,unsigned int nbcol, bool optimizedCopy /* false by deft */)
 {
-    Faust::MatDense<FPP,DEV> dense_mat(valueMat,nbrow,nbcol);
+    Faust::MatDense<FPP,DEV> dense_mat(nbrow, nbcol, valueMat);
     // Faust::MatSparse<FPP,DEV> sparse_mat(dense_mat);
     // sparse_mat.Display();
     if(transform == nullptr) transform = new Faust::TransformHelper<FPP,DEV>();
@@ -181,7 +181,8 @@ template<typename FPP, FDevice DEV>
 double FaustCoreCpp<FPP,DEV>::norm(int ord, double threshold, int max_num_its) const
 {
     int flag; //not used yet
-    switch(ord) {
+    switch(ord)
+	{
         case 2:
             return this->transform->spectralNorm(max_num_its, threshold, flag);
         case 1:
@@ -189,6 +190,7 @@ double FaustCoreCpp<FPP,DEV>::norm(int ord, double threshold, int max_num_its) c
         default:
             handleError("FaustCoreCpp", "norm(int ord) unvalid norm order.");
     }
+	//TODO: call normFro and normInf from here (and delete the two functions below)
     return -1;
 }
 
