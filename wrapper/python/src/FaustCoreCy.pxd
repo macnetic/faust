@@ -37,15 +37,14 @@
 ##                                                                          ##
 ##############################################################################
 
-from libcpp cimport bool
+from libcpp cimport bool, complex
 
-cdef extern from "FaustCoreCpp.h" :
-    cdef cppclass FaustCoreCpp[FPP] :
+cdef extern from "FaustCoreCpp.h":
+    cdef cppclass FaustCoreCpp[FPP]:
         FaustCoreCpp()
         void Display() const
         const char* to_string() const
-        void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol,
-                       bool optimizedCopy)
+        void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol, bool optimizedCopy)
         void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows,
                        int ncols, bool optimizedCopy)
         void get_product(FPP* data, int nbrow, int nbcol);
@@ -312,3 +311,12 @@ cdef extern from "FaustFactGivensFGFT.h":
                                       const double stoppingError, const bool errIsRel, const bool enable_large_Faust)
 
     cdef void* _enable_gpu_mod(const char* libpath, const bool silent)
+
+cdef extern from "FaustCoreCpp.h":
+    cdef cppclass FaustCoreCppGPU[FPP](FaustCoreCpp[FPP]):
+#        void push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows,
+#                       int ncols, bool optimizedCopy)
+        void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol, bool optimizedCopy)
+        void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,
+                      int nbrow_x, int nbcol_x);#,bool isTranspose*/);
+

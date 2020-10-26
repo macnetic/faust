@@ -2256,3 +2256,218 @@ import sys, os, pyfaust
 # tries to load the libgm library silently,
 # if not enabled at build time it will do nothing
 FaustCore.enable_gpu_mod(silent=True)
+
+
+
+cdef class FaustCoreGPU:
+    #TODO: refactor with FaustCore using cmake
+    #### ATTRIBUTE ########
+    # classe Cython
+    cdef FaustCoreCy.FaustCoreCppGPU[double]* core_faust_dbl
+    cdef FaustCoreCy.FaustCoreCppGPU[complex]* core_faust_cplx
+    cdef bool _isReal
+    #### CONSTRUCTOR ####
+    #def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
+    def  __cinit__(self,list_factors=None, alpha=1.0, core=False,
+                   optimizedCopy=False):
+        cdef double [:,:] data
+        cdef double [:] data1d #only for csr mat factor
+        cdef int [:] indices # only for csr mat
+        cdef int [:] indptr # only for csr mat
+        cdef complex [:,:] data_cplx
+        cdef complex [:] data1d_cplx #only for csr mat factor
+        cdef unsigned int nbrow
+        cdef unsigned int nbcol
+        optimizedCopy=False # TODO: for the moment the auto-conversion of
+        #  factors (for opt. of mul by vec) is not enabled, re-enable it later
+        # by getting from constructor set by a call from a Faust constructor
+        if(alpha != 1.0):
+            print("WARNING: the constructor argument for multiplying the Faust"
+                  " by a scalar is DEPRECATED and might not be supported in next"
+                  " versions of FAµST.")
+        if(list_factors is not None):
+            if(match('.*int', repr(list_factors[0].dtype))):
+               list_factors[0] = list_factors[0].astype(np.float)
+            list_factors[0] *= alpha
+            self._isReal = True
+            for i,factor in enumerate(list_factors):
+                # Faust uses row-major order for sparse matrices
+                # and col-major order for dense matrices
+                # but libmatio uses col-major order for sparse matrices
+                if(isinstance(factor, sparse.csc.csc_matrix)):
+                    factor = list_factors[i] = factor.tocsr()
+                    #print("FaustCorePy.pyx __cinit__(),toarray() factor:", factor)
+                if(not isinstance(factor, np.ndarray) and
+                   not isinstance(factor, sparse.csr.csr_matrix)):
+                   #print("FaustCorePy.pyx __cinit__(), factor:",factor)
+                   raise ValueError("Faust factors must be numpy.ndarray or "
+                                    " scipy.sparse.csr.csr_matrix")
+                if(isinstance(factor[0,0], np.complex)):
+                    # str(factor.dtype) == complex128/64/complex_
+                    self._isReal = False
+                    break
+            if(self._isReal):
+                self.core_faust_dbl = new FaustCoreCy.FaustCoreCppGPU[double]()
+            else:
+                raise ValueError("complex wrapper is not yet supported.")
+#                self.core_faust_cplx = new FaustCoreCy.FaustCoreCpp[complex,
+#                                                                    gpu]()
+            for factor in list_factors:
+                nbrow=factor.shape[0];
+                nbcol=factor.shape[1];
+                if(self._isReal):
+                   if(isinstance(factor, np.ndarray)):
+                      data=factor.astype(float,'F')
+                      self.core_faust_dbl.push_back(&data[0,0], nbrow, nbcol,
+                                                    optimizedCopy)
+                   else: #csr.csr_matrix
+                      data1d=factor.data.astype(float,'F')
+                      indices=factor.indices.astype(np.int32, 'F')
+                      indptr=factor.indptr.astype(np.int32, 'F')
+                      self.core_faust_dbl.push_back(&data1d[0], &indptr[0],
+                                                    &indices[0], factor.nnz,
+                                                    nbrow, nbcol, optimizedCopy)
+                else:
+                    raise ValueError("complex wrapper is not yet supported.")
+#                    if(isinstance(factor, sparse.csc.csc_matrix)):
+#                        #TODO: understand how is it possible to have a sparse
+#                        # mat here and fix it (because it should have been
+#                        # converted above already)
+#                        factor = list_factors[i] = factor.tocsr()
+#                    #print('FaustCorePy.pyx type factor=',type(factor))
+#                    #print("FaustCorePy.pyx factor=",factor)
+#                    if(isinstance(factor, np.ndarray)):
+#                        data_cplx=factor.astype(np.complex128,'F')
+#                        self.core_faust_cplx.push_back(&data_cplx[0,0], nbrow,
+#                                                       nbcol, optimizedCopy)
+#                    else:
+#                        #print("FaustCore, factor dims:", nbrow, nbcol)
+#                        data1d_cplx = factor.data.astype(np.complex128, 'F')
+#                        indices=factor.indices.astype(np.int32, 'F')
+#                        indptr=factor.indptr.astype(np.int32, 'F')
+#                        self.core_faust_cplx.push_back(&data1d_cplx[0], &indptr[0],
+#                                                    &indices[0], factor.nnz,
+#                                                       nbrow, nbcol,
+#                                                       optimizedCopy)
+        elif(core): # trick to initialize a new FaustCoreCpp from C++ (see
+        # transpose, conj and adjoint)
+            pass
+        #else:
+        #TODO: raise error for undefined object here
+
+    def to_string(self):
+        cdef const char* c_str
+        if(self._isReal):
+            c_str = self.core_faust_dbl.to_string()
+#        else:
+#            c_str = self.core_faust_cplx.to_string()
+        cdef length = strlen(c_str)
+        #printf("%s", c_str[:length])
+        #py_str = str(c_str[:length], 'UTF-8')
+        py_str = c_str[:length].decode('UTF-8', 'ignore')
+        free(<void*>c_str)
+        return py_str
+
+    def display(self):
+        if(self._isReal):
+            self.core_faust_dbl.Display()
+#        else:
+#            self.core_faust_cplx.Display()
+
+    def multiply(self,M):
+#        if(isinstance(M, FaustCore)):
+#            return self.multiply_faust(M)
+        if not isinstance(M, np.ndarray):
+            raise ValueError('input M must be a numpy.ndarray')
+        if(self._isReal):
+           M=M.astype(float,'F')
+           if not M.dtype=='float':
+               raise ValueError('input M must be a double array')
+#        else:
+#           M=M.astype(complex,'F')
+#           if(M.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
+#               raise ValueError('input M must be complex array')
+        #TODO: raise exception if not real nor complex
+        if not M.flags['F_CONTIGUOUS']:
+            raise ValueError('input M must be Fortran contiguous (column major '
+                            'order)')
+
+        ndim_M=M.ndim;
+
+        if (ndim_M > 2) | (ndim_M < 1):
+            raise ValueError('input M invalid number of dimensions')
+        check_matrix(self._isReal, M)
+        ndim_M=M.ndim
+        cdef unsigned int nbrow_x=M.shape[0]
+        cdef unsigned int nbcol_x #can't be assigned because we don't know yet if the input vector is 1D or 2D
+
+        dimThis=self.shape()
+        cdef unsigned int nbRowThis=dimThis[0];
+        cdef unsigned int nbColThis=dimThis[1];
+
+
+        cdef unsigned int nbrow_y=nbRowThis
+        cdef unsigned int nbcol_y
+
+        cdef double[:] xview_1D
+        cdef double[:,:] xview_2D
+        cdef complex[:] xview_1D_cplx
+        cdef complex[:,:] xview_2D_cplx
+
+        if ndim_M == 1:
+            nbcol_x=1
+            if(self._isReal):
+                xview_1D=M
+            else:
+                xview_1D_cplx=M
+        else:
+            nbcol_x=M.shape[1]
+            if(self._isReal):
+                xview_2D=M
+            else:
+                xview_2D_cplx=M
+
+            if (nbrow_x != nbColThis):
+                raise ValueError('y=F*M multiplication with Faust: invalid dimension of the input matrix M');
+
+        #void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x,bool isTranspose);
+        nbcol_y = nbcol_x;
+
+        cdef y
+        cdef double[:,:] yview
+#        cdef complex[:,:] yview_cplx
+        if(self._isReal):
+            y = np.zeros([nbrow_y,nbcol_y], dtype='d',order='F')
+            yview = y
+#        else:
+#            y = np.zeros([nbrow_y, nbcol_y], dtype='complex', order='F')
+#            yview_cplx = y
+#
+        if ndim_M == 1:
+            if(self._isReal):
+                self.core_faust_dbl.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x)
+#            else:
+#                self.core_faust_cplx.multiply(&yview_cplx[0,0], nbrow_y,
+#                                              nbcol_y, &xview_1D_cplx[0],
+#                                              nbrow_x,nbcol_x)
+            y = np.squeeze(y) # we want a single dim. (but we created two
+            # above)
+        else:
+            if(self._isReal):
+                self.core_faust_dbl.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x)
+#            else:
+#                self.core_faust_cplx.multiply(&yview_cplx[0,0],nbrow_y,nbcol_y,&xview_2D_cplx[0,0],nbrow_x,nbcol_x)
+
+        return y
+
+    def shape(self):
+        cdef unsigned int nbrow = 0
+        cdef unsigned int nbcol = 0
+        if(self._isReal):
+            nbrow = self.core_faust_dbl.getNbRow();
+            nbcol = self.core_faust_dbl.getNbCol();
+#        else:
+#            nbrow = self.core_faust_cplx.getNbRow();
+#            nbcol = self.core_faust_cplx.getNbCol();
+        return (nbrow,nbcol)
+

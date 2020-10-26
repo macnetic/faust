@@ -3,19 +3,19 @@ namespace Faust
 	template<typename FPP,FDevice DEVICE> class Transform;
 
 	template<typename FPP>
-	TransformHelper<FPP,GPU2>::TransformHelper() : TransformHelperGen<FPP,GPU2>()
+		TransformHelper<FPP,GPU2>::TransformHelper() : TransformHelperGen<FPP,GPU2>()
 	{
 	}
 
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>::TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_/*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact /*= true*/, const bool internal_call/*=false*/) : TransformHelper<FPP,GPU2>()
+	{
+		for(auto f: facts)
 		{
-			for(auto f: facts)
-			{
-				this->push_back(f, false, cloning_fact);
-			}
-			this->multiply(lambda_);
+			this->push_back(f, false, cloning_fact);
 		}
+		this->multiply(lambda_);
+	}
 
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 	template<typename FPP>
@@ -66,10 +66,10 @@ namespace Faust
 		}
 
 	template<typename FPP>
-	string TransformHelper<FPP,GPU2>::to_string() const
-	{
-		throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
-	}
+		std::string TransformHelper<FPP,GPU2>::to_string() const
+		{
+			return this->transform->to_string(/*this->is_transposed*/);
+		}
 
 	template<typename FPP>
 		template<typename Head, typename ... Tail>
@@ -161,7 +161,7 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		MatDense<FPP,GPU2> TransformHelper<FPP,GPU2>::multiply(const Faust::MatDense<FPP,GPU2> &A, const bool transpose /* deft to false */, const bool conjugate)
+		MatDense<FPP,GPU2> TransformHelper<FPP,GPU2>::multiply(const Faust::MatDense<FPP,GPU2> &A, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
 		{
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
@@ -169,6 +169,27 @@ namespace Faust
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
 			return M;
+		}
+
+	template<typename FPP>
+		MatDense<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::MatDense<FPP,Cpu> &A, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
+		{
+			MatDense<FPP,GPU2> M = this->multiply(MatDense<FPP,GPU2>(A), transpose, conjugate);
+			return M.tocpu();
+		}
+
+	template<typename FPP>
+		Vect<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,Cpu> &A, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
+		{
+//			Vect<FSFG,GPU2>::Vect(const faust_unsigned_int size,
+//					const FSFG* cpu_data,
+//					const bool no_alloc,
+//					const int32_t dev_id,
+//					const void* stream): MatDense<FSFG,GPU2>(size, 1, cpu_data, no_alloc, dev_id, stream)
+
+			Vect<FPP,GPU2> gpu_A(A.size(), A.getData());
+			Vect<FPP,GPU2> v = this->multiply(gpu_A/*, transpose, conjugate*/); //TODO: handle transpose and conjugate
+			return v.tocpu();
 		}
 
 	template<typename FPP>
@@ -181,19 +202,19 @@ namespace Faust
 	template<typename FPP>
 		Vect<FPP,GPU2> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,GPU2>& a)
 		{
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("multiply is yet to implement in Faust C++ core for GPU.");
 		}
 
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::set_FM_mul_mode() const
 		{
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("set_FM_mul_mode is yet to implement in Faust C++ core for GPU.");
 		}
 
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::set_Fv_mul_mode() const
 		{
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("set_Fv_mul_mode is yet to implement in Faust C++ core for GPU.");
 		}
 
 	template<typename FPP>
@@ -214,8 +235,8 @@ namespace Faust
 			TransformHelperGen<FPP,Cpu>::pack_factors();
 		}
 
-    template<typename FPP>
-        void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)
+	template<typename FPP>
+		void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)
 		{
 			if(start_id < 0 || start_id >= size())
 				throw out_of_range("start_id is out of range.");
@@ -246,7 +267,7 @@ namespace Faust
 				std::vector<Faust::MatGeneric<FPP,GPU2>*> topack_factors;
 				for(int i=start_id;i <= end_id; i++)
 					topack_factors.push_back(get_gen_fact_nonconst(i));
-//				std::vector<Faust::MatGeneric<FPP,GPU2>*> topack_factors(begin()+start_id, begin()+end_id+1);
+				//				std::vector<Faust::MatGeneric<FPP,GPU2>*> topack_factors(begin()+start_id, begin()+end_id+1);
 				Faust::TransformHelper<FPP,GPU2> t(topack_factors, 1.0, false, false, false);
 				// 2)
 				packed_fac = new MatDense<FPP,GPU2>(t.get_product());
@@ -308,7 +329,7 @@ namespace Faust
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::vertcat(const TransformHelper<FPP,GPU2>* G)
 		{
 			//TODO
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("vertcat is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
 		}
 
@@ -316,7 +337,7 @@ namespace Faust
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::horzcat(const TransformHelper<FPP,GPU2>* G)
 		{
 			//TODO
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("horzcat is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
 		}
 
@@ -330,50 +351,147 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const
 		{
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("normalize is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
 		}
 
 	template<typename FPP>
 		unsigned int TransformHelper<FPP,GPU2>::get_fact_nb_rows(const faust_unsigned_int id) const
 		{
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("get_fact_nb_rows is yet to implement in Faust C++ core for GPU.");
 			return 0;
 		}
 
 	template<typename FPP>
 		unsigned int TransformHelper<FPP,GPU2>::get_fact_nb_cols(const faust_unsigned_int id) const
 		{
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("get_fact_nb_cols is yet to implement in Faust C++ core for GPU.");
 			return 0;
 		}
 
 	template<typename FPP>
 		faust_unsigned_int TransformHelper<FPP,GPU2>::get_fact_nnz(const faust_unsigned_int id) const
 		{
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("get_fact_nnz is yet to implement in Faust C++ core for GPU.");
 			return 0;
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::transpose()
 		{
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("transpose is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::conjugate()
 		{
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("conjugate is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::adjoint()
 		{
-			throw std::runtime_error("This operation is yet to implement in Faust C++ core for GPU.");
+			throw std::runtime_error("adjoint is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
 		}
 
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::right(const faust_unsigned_int id, const bool copy/*=false*/) const
+		{
+			throw std::runtime_error("right is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::left(const faust_unsigned_int id, const bool copy/*=false*/) const
+		{
+			throw std::runtime_error("left is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP, GPU2>* TransformHelper<FPP, GPU2>::slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
+				faust_unsigned_int start_col_id, faust_unsigned_int end_col_id)
+		{
+			throw std::runtime_error("slice is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP, GPU2>* TransformHelper<FPP,GPU2>::fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
+		{
+			throw std::runtime_error("fancy_index is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		faust_unsigned_int TransformHelper<FPP,GPU2>::getNBytes() const
+		{
+			throw std::runtime_error("getNBytes is yet to implement in Faust C++ core for GPU.");
+			return 0;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::optimize_time(const bool transp/*=false*/, const bool inplace/*=false*/, const int nsamples/*=1*/)
+		{
+			throw std::runtime_error("optimize_time is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::optimize(const bool transp/*=false*/)
+		{
+			throw std::runtime_error("optimize is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::optimize_storage(const bool time/*=true*/)
+		{
+			throw std::runtime_error("optimize_storage is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::hadamardFaust(unsigned int n, const bool norma/*=true*/)
+		{
+			throw std::runtime_error("hadamardFaust is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::fourierFaust(unsigned int n, const bool norma/*=true*/)
+		{
+			throw std::runtime_error("fourierFaust is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::eyeFaust(unsigned int n, unsigned int m)
+		{
+			throw std::runtime_error("eyeFaust is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::pruneout(const int nnz_tres, const int npasses/*=-1*/, const bool only_forward/*=false*/)
+		{
+			throw std::runtime_error("pruneout is yet to implement in Faust C++ core for GPU.");
+			return nullptr;
+		}
+
+	template<typename FPP>
+			void TransformHelper<FPP,GPU2>::get_fact(const faust_unsigned_int id,
+					int* rowptr,
+					int* col_ids,
+					FPP* elts,
+					faust_unsigned_int* nnz,
+					faust_unsigned_int* num_rows,
+					faust_unsigned_int* num_cols,
+					const bool transpose/*=false*/) const
+			{
+				throw std::runtime_error("get_fact is yet to implement in Faust C++ core for GPU.");
+			}
 }

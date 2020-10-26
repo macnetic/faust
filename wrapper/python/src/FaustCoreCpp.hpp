@@ -141,16 +141,16 @@ void FaustCoreCpp<FPP,DEV>::multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* v
     }
     if (nbcol_x == 1)
     {
-        Faust::Vect<FPP,DEV> X(nbrow_x,value_x);
-        Faust::Vect<FPP,DEV> Y;
+        Faust::Vect<FPP,Cpu> X(nbrow_x,value_x);
+        Faust::Vect<FPP,Cpu> Y;
 
         Y = this->transform->multiply(X);
 
         memcpy(value_y,Y.getData(),sizeof(FPP)*nbrow_y);
     }else
     {
-        Faust::MatDense<FPP,DEV> X(value_x,nbrow_x,nbcol_x);
-        Faust::MatDense<FPP,DEV> Y;
+        Faust::MatDense<FPP,Cpu> X(value_x,nbrow_x,nbcol_x);
+        Faust::MatDense<FPP,Cpu> Y;
 
         Y = this->transform->multiply(X);
 
@@ -224,6 +224,8 @@ double FaustCoreCpp<FPP,DEV>::get_nb_factors() const
 template<typename FPP, FDevice DEV>
 const char* FaustCoreCpp<FPP,DEV>::to_string() const
 {
+	//TODO: ideally a pre-allocated str should be passed by the caller (no allocation inside this function)
+	//TODO: until that the caller is responsible to free the returned memory buffer
     std::string str = this->transform->to_string();
     char * c_str = (char*) malloc(str.size()+1);
     memcpy(c_str, str.c_str(), str.size()+1);

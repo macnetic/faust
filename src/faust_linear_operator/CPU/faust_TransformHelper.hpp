@@ -902,7 +902,7 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		string TransformHelper<FPP,Cpu>::to_string() const
+		std::string TransformHelper<FPP,Cpu>::to_string() const
 		{
 			return this->transform->to_string(this->is_transposed);
 		}

@@ -25,6 +25,7 @@ namespace Faust
 				void push_first(const MatGeneric<FPP,GPU2>*, const bool optimizedCopy=false, const bool copying=true);
 				faust_unsigned_int getNbRow(){ return this->transform->getNbRow();}
 				faust_unsigned_int getNbCol(){ return this->transform->getNbCol();}
+				faust_unsigned_int getNBytes() const;
 				unsigned int get_fact_nb_rows(const faust_unsigned_int id) const;
 				unsigned int get_fact_nb_cols(const faust_unsigned_int id) const;
 				template<typename Head, typename ... Tail>
@@ -35,8 +36,10 @@ namespace Faust
 				MatDense<FPP,GPU2> get_product();
 				void get_product(MatDense<FPP,GPU2>& M);
 				MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A, const bool transpose=false, const bool conjugate=false);
+				MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
 				TransformHelper<FPP,GPU2>* multiply(const FPP& a);
 				Vect<FPP,GPU2> multiply(const Faust::Vect<FPP,GPU2>& a);
+				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
 				Real<FPP> normFro() const;
 				Real<FPP> normL1() const;
 				Real<FPP> normInf() const;
@@ -65,6 +68,28 @@ namespace Faust
 				TransformHelper<FPP,GPU2>* transpose();
 				TransformHelper<FPP,GPU2>* conjugate();
 				TransformHelper<FPP,GPU2>* adjoint();
+				TransformHelper<FPP,GPU2>* right(const faust_unsigned_int id, const bool copy=false) const;
+				TransformHelper<FPP,GPU2>* left(const faust_unsigned_int id, const bool copy=false) const;
+				TransformHelper<FPP, GPU2>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
+						faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
+				TransformHelper<FPP, GPU2>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
+
+				TransformHelper<FPP,GPU2>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
+				TransformHelper<FPP,GPU2>* optimize(const bool transp=false);
+				TransformHelper<FPP,GPU2>* optimize_storage(const bool time=true);
+				static TransformHelper<FPP,GPU2>* hadamardFaust(unsigned int n, const bool norma=true);
+				static TransformHelper<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true);
+				static TransformHelper<FPP,GPU2>* eyeFaust(unsigned int n, unsigned int m);
+				TransformHelper<FPP,GPU2>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
+				void get_fact(const faust_unsigned_int id,
+						int* rowptr,
+						int* col_ids,
+						FPP* elts,
+						faust_unsigned_int* nnz,
+						faust_unsigned_int* num_rows,
+						faust_unsigned_int* num_cols,
+						const bool transpose=false) const;
+
 		};
 }
 #include "faust_TransformHelper_gpu.hpp"

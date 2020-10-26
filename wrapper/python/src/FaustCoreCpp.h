@@ -123,6 +123,12 @@ class FaustCoreCpp
     Faust::TransformHelper<FPP,DEV> *transform;
 };
 
+template<typename FPP>
+class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
+{
+
+};
+
 void* _enable_gpu_mod(const char* libpath);
 
 #include "FaustCoreCpp.hpp"

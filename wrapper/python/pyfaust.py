@@ -125,6 +125,8 @@ class Faust:
         <b/> See also Faust.save, pyfaust.rand
 
         """
+        is_on_gpu = False
+        gpu_dev = 0
         if("scale" in kwargs.keys()):
             # scale hidden argument
             scale = kwargs['scale']
@@ -132,6 +134,9 @@ class Faust:
                 raise Exception("Scale must be a number.")
         else:
             scale = 1.0
+        if("gpu" in kwargs.keys()):
+            is_on_gpu = True
+            gpu_dev = gpu
         if("core_obj" in kwargs.keys()):
             core_obj = kwargs['core_obj']
             if(core_obj):
@@ -152,7 +157,10 @@ class Faust:
                 raise Exception("factors must be a non-empty list of/or a numpy.ndarray, "
                                 "scipy.sparse.csr.csr_matrix/csc.csc_matrix.")
             if(factors is not None and len(factors) > 0):
-                F.m_faust = _FaustCorePy.FaustCore(factors, scale);
+                if(is_on_gpu):
+                    F.m_faust = _FaustCorePy.FaustCoreGPU(factors, scale);
+                else:
+                    F.m_faust = _FaustCorePy.FaustCore(factors, scale);
             else:
                 raise Exception("Cannot create an empty Faust.")
 

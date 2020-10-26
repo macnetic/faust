@@ -43,6 +43,7 @@ namespace Faust
 			int32_t getNbRow()const;
 			int32_t getNbCol()const;
 			void Display() const;
+			std::string to_string() const;
 			int32_t size() const;
 			faust_unsigned_int get_total_nnz() const;
 			void update_total_nnz() const;
