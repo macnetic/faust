@@ -119,13 +119,20 @@ class FaustCoreCpp
     static FaustCoreCpp<FPP,DEV>* fourierFaust(unsigned int n, const bool norma);
     static FaustCoreCpp<FPP,DEV>* eyeFaust(unsigned int n, unsigned int m);
 
-    private :
+    protected :
     Faust::TransformHelper<FPP,DEV> *transform;
 };
 
 template<typename FPP>
 class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 {
+	public:
+		FaustCoreCppGPU() {}
+		FaustCoreCppGPU(Faust::TransformHelper<FPP,GPU2> *th);
+		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
+            unsigned int min_num_factors, unsigned int max_num_factors,
+            unsigned int min_dim_size,
+            unsigned int max_dim_size, float density, bool per_row);
 
 };
 

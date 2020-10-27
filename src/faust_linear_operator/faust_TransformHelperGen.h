@@ -17,6 +17,12 @@ namespace Faust
 		PACK_RIGHT
 	};
 
+	enum RandFaustType {
+		DENSE,
+		SPARSE,
+		MIXED
+	};
+
 	template<typename FPP, FDevice DEV>
 	class TransformHelperGen
 	{

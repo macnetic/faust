@@ -136,7 +136,7 @@ class Faust:
             scale = 1.0
         if("gpu" in kwargs.keys()):
             is_on_gpu = True
-            gpu_dev = gpu
+            gpu_dev = kwargs['gpu']
         if("core_obj" in kwargs.keys()):
             core_obj = kwargs['core_obj']
             if(core_obj):
@@ -2007,7 +2007,7 @@ def eye(m,n=None,t='real'):
 #    return Faust(e)
 
 def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
-              field='real', per_row=True):
+              field='real', per_row=True, dev="cpu"):
     """
     Generates a random Faust.
 
@@ -2109,9 +2109,15 @@ def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
         density = -1
     elif(not isinstance(density, np.float)):
         raise ValueError("rand(): density must be a float")
-    rF = Faust(core_obj=_FaustCorePy.FaustCore.randFaust(
-        fac_type_map[fac_type], field, min_num_factors, max_num_factors,
-        min_dim_size, max_dim_size, density, per_row))
+    if dev == "cpu":
+        rF = Faust(core_obj=_FaustCorePy.FaustCore.randFaust(
+            fac_type_map[fac_type], field, min_num_factors, max_num_factors,
+            min_dim_size, max_dim_size, density, per_row))
+    elif dev.startswith("gpu"):
+        rF = Faust(core_obj=_FaustCorePy.FaustCoreGPU.randFaust(
+            fac_type_map[fac_type], field, min_num_factors, max_num_factors,
+            min_dim_size, max_dim_size, density, per_row))
+
     return rF
 
 def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):

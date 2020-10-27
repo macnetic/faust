@@ -90,6 +90,7 @@ namespace Faust
 						faust_unsigned_int* num_cols,
 						const bool transpose=false) const;
 
+				static TransformHelper<FPP,GPU2>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 		};
 }
 #include "faust_TransformHelper_gpu.hpp"

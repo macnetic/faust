@@ -38,16 +38,16 @@ namespace Faust
 		{
 
 			MatGeneric<FPP,GPU2>* gpu_M = nullptr;
-			MatDense<FPP,Cpu>* cpu_dM = nullptr;
-			MatSparse<FPP,Cpu>* cpu_sM = nullptr;
-			if(nullptr != (cpu_dM = dynamic_cast<MatDense<FPP,Cpu>*>(M)))
+			const MatDense<FPP,Cpu>* cpu_dM = nullptr;
+			const MatSparse<FPP,Cpu>* cpu_sM = nullptr;
+			if(nullptr != (cpu_dM = dynamic_cast<const MatDense<FPP,Cpu>*>(M)))
 			{
 				auto gpu_dM = new MatDense<FPP,GPU2>(M->getNbRow(), M->getNbCol(), cpu_dM->getData());
 				gpu_M = gpu_dM;
 			}
-			else if(nullptr != (cpu_sM = dynamic_cast<MatSparse<FPP,Cpu>*>(M)))
+			else if(nullptr != (cpu_sM = dynamic_cast<const MatSparse<FPP,Cpu>*>(M)))
 			{
-				auto gpu_sM = new MatSparse<FPP,GPU2>(M.getNbRow(), M.getNbCol(), cpu_sM.getNonZeros(), cpu_sM.getValuePtr(), cpu_sM.getRowPtr(), cpu_sM.getColInd(), dev_id);
+				auto gpu_sM = new MatSparse<FPP,GPU2>(M->getNbRow(), M->getNbCol(), cpu_sM->getNonZeros(), cpu_sM->getValuePtr(), cpu_sM->getRowPtr(), cpu_sM->getColInd(), dev_id);
 				gpu_M = gpu_sM;
 			}
 			this->transform->push_back(gpu_M, false);
@@ -494,4 +494,17 @@ namespace Faust
 			{
 				throw std::runtime_error("get_fact is yet to implement in Faust C++ core for GPU.");
 			}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row)
+		{
+			auto cpu_faust = TransformHelper<FPP,Cpu>::randFaust(t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+//	TransformHelper<FPP,GPU2>::TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_/*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact /*= true*/, const bool internal_call/*=false*/)
+			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>();
+//		void TransformHelper<FPP,GPU2>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy/*=false*/, const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/)
+			for(auto cpu_fact: *cpu_faust)
+				gpu_faust->push_back(cpu_fact, false, -1/*TODO: replace dev_id by an arg passed to the func */, nullptr);
+
+			return gpu_faust;
+		}
 }

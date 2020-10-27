@@ -319,4 +319,11 @@ cdef extern from "FaustCoreCpp.h":
         void push_back(FPP* valueMat,unsigned int nbrow,unsigned int nbcol, bool optimizedCopy)
         void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,
                       int nbrow_x, int nbcol_x);#,bool isTranspose*/);
+        @staticmethod
+        FaustCoreCppGPU[FPP]* randFaustGPU(unsigned int t,
+                                        unsigned int min_num_factors,
+                                        unsigned int max_num_factors,
+                                        unsigned int min_dim_size,
+                                        unsigned int max_dim_size,
+                                        float density, bool per_row)
 

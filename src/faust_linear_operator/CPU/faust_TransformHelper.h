@@ -68,12 +68,6 @@ namespace Faust
 	template<typename FPP> class FaustGPU;
 #endif
 
-	enum RandFaustType {
-		DENSE,
-		SPARSE,
-		MIXED
-	};
-
 
 	template<typename FPP>
 		class TransformHelper<FPP,Cpu> : public TransformHelperGen<FPP,Cpu> {

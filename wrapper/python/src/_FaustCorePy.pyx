@@ -2264,7 +2264,7 @@ cdef class FaustCoreGPU:
     #### ATTRIBUTE ########
     # classe Cython
     cdef FaustCoreCy.FaustCoreCppGPU[double]* core_faust_dbl
-    cdef FaustCoreCy.FaustCoreCppGPU[complex]* core_faust_cplx
+    #cdef FaustCoreCy.FaustCoreCppGPU[complex]* core_faust_cplx
     cdef bool _isReal
     #### CONSTRUCTOR ####
     #def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
@@ -2470,4 +2470,27 @@ cdef class FaustCoreGPU:
 #            nbrow = self.core_faust_cplx.getNbRow();
 #            nbcol = self.core_faust_cplx.getNbCol();
         return (nbrow,nbcol)
+
+    @staticmethod
+    def randFaust(t,field,min_num_factors, max_num_factors, min_dim_size,
+                   max_dim_size, density=0.1, per_row=True, gpu=0):
+        core = FaustCoreGPU(core=True)
+        if(field == 3):
+            core.core_faust_dbl = \
+            FaustCoreCy.FaustCoreCppGPU[double].randFaustGPU(t,min_num_factors, max_num_factors, min_dim_size,
+                   max_dim_size, density, per_row)
+            core._isReal = True
+            if(core.core_faust_dbl == NULL): raise MemoryError()
+        elif(field == 4):
+            raise ValueError("Complex rand Faust is not yet implemented on "
+                             " GPU.")
+#            core.core_faust_cplx = FaustCoreCy.FaustCoreCpp[complex].randFaust(t,min_num_factors, max_num_factors, min_dim_size,
+#                   max_dim_size, density, per_row)
+#            if(core.core_faust_cplx == NULL): raise MemoryError()
+#            core._isReal = False
+        else:
+            raise ValueError("FaustCorePy.randFaust(): field must be 3 for real or"
+                             " 4 for complex")
+
+        return core
 
