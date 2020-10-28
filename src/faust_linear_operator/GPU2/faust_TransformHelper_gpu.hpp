@@ -355,12 +355,11 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,GPU2>::tocpu(TransformHelper<FPP,Cpu>& cpu_transf)
+		void TransformHelper<FPP,GPU2>::tocpu(TransformHelper<FPP,Cpu>& cpu_transf) const
 		{
 			auto t = this->transform->tocpu();
 			for(auto fac: t)
 				cpu_transf.push_back(fac, false, false);
-			cpu_transf.display();
 		}
 
 	template<typename FPP>
@@ -382,7 +381,7 @@ namespace Faust
 	template<typename FPP>
 		faust_unsigned_int TransformHelper<FPP,GPU2>::get_total_nnz() const
 		{
-			return this->transform.get_total_nnz();
+			return this->transform->get_total_nnz();
 		}
 
 
@@ -391,6 +390,13 @@ namespace Faust
 		{
 			throw std::runtime_error("normalize is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
+//			std::cerr << "Warning: GPU2 normalize is implemented by copying the Faust on CPU RAM and copying them back." << std::endl;
+//			TransformHelper<FPP,Cpu> th;
+//			this->tocpu(th);
+//			auto thn = th.normalize(meth);
+//			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn);
+//			delete thn;
+//			return gpu_thn;
 		}
 
 	template<typename FPP>
@@ -545,6 +551,7 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::hadamardFaust(unsigned int n, const bool norma/*=true*/)
 		{
+			std::cerr << "Warning: GPU2 hadamardFaust is implemented by copying the Faust on CPU RAM and copying them back." << std::endl;
 			auto cpu_faust = TransformHelper<FPP,Cpu>::hadamardFaust(n, norma);
 			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust/*TODO: dev_id and stream ?*/);
 			delete cpu_faust;
@@ -554,6 +561,7 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::eyeFaust(unsigned int n, unsigned int m)
 		{
+			std::cerr << "Warning: GPU2 eyeFaust is implemented by copying the Faust on CPU RAM and copying them back." << std::endl;
 			auto cpu_faust = TransformHelper<FPP,Cpu>::eyeFaust(n, m);
 			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust/*TODO: dev_id and stream ?*/);
 			delete cpu_faust;

@@ -132,6 +132,12 @@ configure_file(${FAUST_PYTHON_SRC_DIR}/setup.py.in ${FAUST_PYTHON_BIN_DIR}/setup
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePy.pyx ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx COPYONLY)
 configure_file(${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCy.pxd ${FAUST_PYTHON_BIN_DIR}/FaustCoreCy.pxd COPYONLY)
 
+if(USE_GPU_MOD)
+	file(READ ${FAUST_PYTHON_SRC_SRC_DIR}/_FaustCorePyGPU.pyx GPU_PYX)
+	file(APPEND ${FAUST_PYTHON_BIN_DIR}/_FaustCorePy.pyx ${GPU_PYX})
+	file(READ ${FAUST_PYTHON_SRC_SRC_DIR}/FaustCoreCyGPU.pxd GPU_PXD)
+	file(APPEND ${FAUST_PYTHON_BIN_DIR}/FaustCoreCy.pxd ${GPU_PXD})
+endif()
 
 if(NOT REMOTE_DATA_URL OR NOT REMOTE_DATA_FILE)
 	# install data files used by pyfaust.demo

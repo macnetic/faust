@@ -123,6 +123,7 @@ class FaustCoreCpp
     Faust::TransformHelper<FPP,DEV> *transform;
 };
 
+#ifdef USE_GPU_MOD
 template<typename FPP>
 class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 {
@@ -131,6 +132,8 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		FaustCoreCppGPU(Faust::TransformHelper<FPP,GPU2> *th);
 		void get_product(FPP* y_data, int y_nrows, int y_ncols);
 		FaustCoreCppGPU<FPP>* mul_faust_gpu(FaustCoreCppGPU<FPP>* right);
+		FaustCoreCppGPU<FPP>* mul_scal_gpu(const FPP& scal);
+		FaustCoreCppGPU<FPP>* normalize_gpu(int ord) const;
 		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
 				unsigned int min_num_factors, unsigned int max_num_factors,
 				unsigned int min_dim_size,
@@ -140,6 +143,7 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		static FaustCoreCppGPU<FPP>* fourierFaustGPU(unsigned int n, const bool norma);
 		static FaustCoreCppGPU<FPP>* eyeFaustGPU(unsigned int n, unsigned int m);
 };
+#endif
 
 void* _enable_gpu_mod(const char* libpath);
 

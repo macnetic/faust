@@ -501,6 +501,7 @@ void* _enable_gpu_mod(const char* libpath, const bool silent)
 #endif
 }
 
+#ifdef USE_GPU_MOD
 template<typename FPP>
   FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::randFaustGPU(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,
@@ -561,4 +562,15 @@ FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::mul_faust_gpu(FaustCoreCppGPU<FPP>* 
     return core;
 }
 
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::mul_scal_gpu(const FPP& scal)
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::mul_scal(scal);
+}
 
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::normalize_gpu(int ord) const
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::normalize(ord);
+}
+#endif
