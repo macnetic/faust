@@ -120,9 +120,11 @@ foreach(SCALAR_AND_FSUFFIX double:Real std::complex<double>:Cplx) # TODO: float 
 		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical2020.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical2020${FSUFFIX}.cpp @ONLY)
 		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical2020.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical2020${FSUFFIX}.m @ONLY)
 		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexPALM4MSA2020.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexPALM4MSA2020${FSUFFIX}.cpp @ONLY)
-		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexPALM4MSA2020_gpu2.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexPALM4MSA2020_gpu2${FSUFFIX}.cpp @ONLY)
 		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexPALM4MSA2020.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexPALM4MSA2020${FSUFFIX}.m @ONLY)
-		configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexPALM4MSA2020_gpu2.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexPALM4MSA2020_gpu2${FSUFFIX}.m @ONLY)
+		if(USE_GPU_MOD)
+			configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexPALM4MSA2020_gpu2.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexPALM4MSA2020_gpu2${FSUFFIX}.cpp @ONLY)
+			configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexPALM4MSA2020_gpu2.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexPALM4MSA2020_gpu2${FSUFFIX}.m @ONLY)
+		endif()
 	endif()
 	# copy the *.m for factorization now, because we have the FSUFFIX in hands
 	configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical_fact${FSUFFIX}.m COPYONLY)
