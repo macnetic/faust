@@ -326,4 +326,10 @@ cdef extern from "FaustCoreCpp.h":
                                         unsigned int min_dim_size,
                                         unsigned int max_dim_size,
                                         float density, bool per_row)
+        @staticmethod
+        FaustCoreCppGPU[FPP]* hadamardFaustGPU(unsigned int n, const bool norma)
+        @staticmethod
+        FaustCoreCppGPU[FPP]* fourierFaustGPU(unsigned int n, const bool norma)
+        @staticmethod
+        FaustCoreCppGPU[FPP]* eyeFaustGPU(unsigned int n, unsigned int m)
 

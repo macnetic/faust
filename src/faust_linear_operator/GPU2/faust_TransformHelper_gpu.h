@@ -15,6 +15,8 @@ namespace Faust
 			public:
 				TransformHelper();
 				TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
+				TransformHelper(const TransformHelper<FPP,Cpu>& cpu_t, int32_t dev_id=-1, void* stream=nullptr);
+
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 				template<typename ...GList> TransformHelper(GList& ... t);
 #endif
@@ -91,6 +93,7 @@ namespace Faust
 						const bool transpose=false) const;
 
 				static TransformHelper<FPP,GPU2>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
+
 		};
 }
 #include "faust_TransformHelper_gpu.hpp"

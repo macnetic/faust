@@ -503,15 +503,44 @@ void* _enable_gpu_mod(const char* libpath, const bool silent)
 template<typename FPP>
   FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::randFaustGPU(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,
-            unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row) {
-      Faust::TransformHelper<FPP,GPU2>* th = Faust::TransformHelper<FPP,GPU2>::randFaust(Faust::RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
-      if(!th) return NULL;
-      FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
-      return core;
-  }
+            unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row)
+{
+	Faust::TransformHelper<FPP,GPU2>* th = Faust::TransformHelper<FPP,GPU2>::randFaust(Faust::RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+	if(!th) return NULL;
+	FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
+	return core;
+}
 
 template<typename FPP>
 FaustCoreCppGPU<FPP>::FaustCoreCppGPU(Faust::TransformHelper<FPP,GPU2> *th)
 {
     this->transform = th;
+}
+
+
+template<typename FPP>
+     FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::hadamardFaustGPU(unsigned int n, const bool norma)
+{
+	Faust::TransformHelper<FPP,GPU2>* th = Faust::TransformHelper<FPP,GPU2>::hadamardFaust(n, norma);
+	if(!th) return NULL;
+	FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
+	return core;
+}
+
+template<typename FPP>
+   FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::fourierFaustGPU(unsigned int n, const bool norma)
+{
+	Faust::TransformHelper<FPP,GPU2>* th = Faust::TransformHelper<FPP,GPU2>::fourierFaust(n, norma);
+	if(!th) return NULL;
+	FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
+	return core;
+}
+
+template<typename FPP>
+    FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::eyeFaustGPU(unsigned int n, unsigned int m)
+{
+	Faust::TransformHelper<FPP,GPU2>* th = Faust::TransformHelper<FPP,GPU2>::eyeFaust(n, m);
+	if(!th) return NULL;
+	FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
+	return core;
 }

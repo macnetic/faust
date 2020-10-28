@@ -2494,3 +2494,47 @@ cdef class FaustCoreGPU:
 
         return core
 
+    @staticmethod
+    def hadamardFaust(n, norma):
+        if(n>31):
+            raise ValueError("Faust doesn't handle a Hadamard of order larger than "
+                             "2**31")
+        core = FaustCoreGPU(core=True)
+        core.core_faust_dbl = \
+        FaustCoreCy.FaustCoreCppGPU[double].hadamardFaustGPU(n, norma)
+        if(core.core_faust_dbl == NULL):
+            raise MemoryError()
+        # hadamard is always a real Faust
+        core._isReal = True
+        return core
+
+    @staticmethod
+    def fourierFaust(n, norma):
+        if(n>31):
+            raise ValueError("Faust doesn't handle a FFT of order larger than "
+                             "2**31")
+        core = FaustCoreGPU(core=True)
+#        core.core_faust_cplx = \
+#                FaustCoreCy.FaustCoreCppGPU[complex].fourierFaust(n, norma)
+
+#        if(core.core_faust_cplx == NULL):
+#            raise MemoryError()
+
+        FaustCoreCy.FaustCoreCppGPU[double].fourierFaustGPU(n, norma)
+        # fourier is always a complex Faust
+        core._isReal = False
+        return core
+
+    @staticmethod
+    def eyeFaust(n, m, t='real'):
+        core = FaustCoreGPU(core=True)
+        if(t == 'real'):
+            core.core_faust_dbl = \
+            FaustCoreCy.FaustCoreCppGPU[double].eyeFaustGPU(n, m)
+            core._isReal = True
+#        elif(t == 'complex'):
+#            core.core_faust_cplx = FaustCoreCy.FaustCoreCppGPU[complex].eyeFaust(n,
+#                                                                             m)
+#            core._isReal = False
+        return core
+

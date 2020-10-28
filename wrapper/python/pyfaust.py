@@ -1885,7 +1885,7 @@ def isFaust(obj):
     """
     return Faust.isFaust(obj)
 
-def wht(n, normed=True):
+def wht(n, normed=True, dev="cpu"):
     """
        Constructs a Faust implementing the Hadamard transform of dimension n.
 
@@ -1922,7 +1922,10 @@ def wht(n, normed=True):
     if(n > 2**log2n): raise ValueError("n must be a power of 2.")
     if(not isinstance(normed, bool)):
         raise TypeError("normed must be True of False.")
-    H = Faust(core_obj=_FaustCorePy.FaustCore.hadamardFaust(log2n, normed))
+    if dev == "cpu":
+        H = Faust(core_obj=_FaustCorePy.FaustCore.hadamardFaust(log2n, normed))
+    elif dev.startswith("gpu"):
+        H = Faust(core_obj=_FaustCorePy.FaustCoreGPU.hadamardFaust(log2n, normed))
     return H
 
 def dft(n, normed=True):
@@ -1969,7 +1972,7 @@ def dft(n, normed=True):
     F = Faust(core_obj=_FaustCorePy.FaustCore.fourierFaust(log2n, normed))
     return F
 
-def eye(m,n=None,t='real'):
+def eye(m,n=None,t='real', dev="cpu"):
     """
         Identity matrix as a Faust object.
 
@@ -1994,7 +1997,10 @@ def eye(m,n=None,t='real'):
     if(t not in ['complex', 'real']):
         raise ValueError("t must be 'real' or 'complex'")
     if(n == None): n = m
-    rF = Faust(core_obj=_FaustCorePy.FaustCore.eyeFaust(m, n, t))
+    if dev == "cpu":
+        rF = Faust(core_obj=_FaustCorePy.FaustCore.eyeFaust(m, n, t))
+    elif dev.startswith("gpu"):
+        rF = Faust(core_obj=_FaustCorePy.FaustCoreGPU.eyeFaust(m, n, t))
     return rF
 #    from scipy.sparse import eye
 #    if(not n):

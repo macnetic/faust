@@ -134,6 +134,9 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
             unsigned int min_dim_size,
             unsigned int max_dim_size, float density, bool per_row);
 
+    static FaustCoreCppGPU<FPP>* hadamardFaustGPU(unsigned int n, const bool norma);
+    static FaustCoreCppGPU<FPP>* fourierFaustGPU(unsigned int n, const bool norma);
+    static FaustCoreCppGPU<FPP>* eyeFaustGPU(unsigned int n, unsigned int m);
 };
 
 void* _enable_gpu_mod(const char* libpath);

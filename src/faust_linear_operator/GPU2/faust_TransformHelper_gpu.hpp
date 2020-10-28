@@ -17,6 +17,13 @@ namespace Faust
 		this->multiply(lambda_);
 	}
 
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>::TransformHelper(const TransformHelper<FPP,Cpu>& cpu_t, int32_t dev_id/*=-1*/, void* stream/*=nullptr*/) : TransformHelper<FPP,GPU2>()
+		{
+			for(auto cpu_fact: cpu_t)
+				this->push_back(cpu_fact, false, dev_id, stream);
+		}
+
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 	template<typename FPP>
 		template<typename ... GList>
@@ -455,23 +462,9 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::hadamardFaust(unsigned int n, const bool norma/*=true*/)
-		{
-			throw std::runtime_error("hadamardFaust is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
-		}
-
-	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::fourierFaust(unsigned int n, const bool norma/*=true*/)
 		{
 			throw std::runtime_error("fourierFaust is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::eyeFaust(unsigned int n, unsigned int m)
-		{
-			throw std::runtime_error("eyeFaust is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
 		}
 
@@ -500,11 +493,31 @@ namespace Faust
 		{
 			auto cpu_faust = TransformHelper<FPP,Cpu>::randFaust(t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
 //	TransformHelper<FPP,GPU2>::TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_/*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact /*= true*/, const bool internal_call/*=false*/)
-			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>();
+			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust/*TODO: dev_id and stream ?*/);
 //		void TransformHelper<FPP,GPU2>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy/*=false*/, const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/)
-			for(auto cpu_fact: *cpu_faust)
-				gpu_faust->push_back(cpu_fact, false, -1/*TODO: replace dev_id by an arg passed to the func */, nullptr);
+//			for(auto cpu_fact: *cpu_faust)
+//				gpu_faust->push_back(cpu_fact, false, -1/*TODO: replace dev_id by an arg passed to the func */, nullptr);
 
+			delete cpu_faust;
 			return gpu_faust;
 		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::hadamardFaust(unsigned int n, const bool norma/*=true*/)
+		{
+			auto cpu_faust = TransformHelper<FPP,Cpu>::hadamardFaust(n, norma);
+			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust/*TODO: dev_id and stream ?*/);
+			delete cpu_faust;
+			return gpu_faust;
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::eyeFaust(unsigned int n, unsigned int m)
+		{
+			auto cpu_faust = TransformHelper<FPP,Cpu>::eyeFaust(n, m);
+			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust/*TODO: dev_id and stream ?*/);
+			delete cpu_faust;
+			return gpu_faust;
+		}
+
 }
