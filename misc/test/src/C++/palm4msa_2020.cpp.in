@@ -37,7 +37,9 @@
 #include <chrono>
 #include "faust_init_from_matio.h"
 #include "faust_init_from_matio_mat.h"
+#ifdef USE_GPU_MOD
 #include "faust_gpu_mod_utils.h"
+#endif
 
 typedef @TEST_FPP@ FPP;
 
@@ -81,8 +83,10 @@ int main(int argc, char* argv[])
 	init_faust_mat_from_matio(data, configPalm2Filename, "data");
 	Faust::ConstraintInt<FPP,Cpu> c1(CONSTRAINT_NAME_SPLIN, 5, 500, 32);
 	Faust::ConstraintFPP<FPP, Cpu, Real<FPP>> c2(CONSTRAINT_NAME_NORMCOL, 1.0, 32, 32);
+#ifdef USE_GPU_MOD
 	Faust::ConstraintInt<FPP,GPU2> gpu_c1(CONSTRAINT_NAME_SPLIN, 5, 500, 32);
 	Faust::ConstraintFPP<FPP, GPU2, Real<FPP>> gpu_c2(CONSTRAINT_NAME_NORMCOL, 1.0, 32, 32);
+#endif
 
 	//	vector<MatGeneric<FPP,Cpu>*> facts;
 	TransformHelper<FPP,Cpu> facts;
@@ -106,7 +110,9 @@ int main(int argc, char* argv[])
 
 
 	vector<ConstraintGeneric*> constraints{&c1, &c2};
+#ifdef USE_GPU_MOD
 	vector<ConstraintGeneric*> gpu_constraints{&gpu_c1, &gpu_c2};
+#endif
 
 	if(meth == 1)
 	{
@@ -118,6 +124,7 @@ int main(int argc, char* argv[])
 		cout << "use impl2" << endl;
 		Faust::palm4msa2<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, use_csr, packing_RL, compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
 	}
+#ifdef USE_GPU_MOD
 	else if(meth == 3)
 	{
 		cout << "use impl3" << endl;
@@ -127,6 +134,7 @@ int main(int argc, char* argv[])
 		gpu_facts.display();
 		gpu_facts.tocpu(facts);
 	}
+#endif
 	else
 	{
 		std::cerr << "meth (arg 1) must be 1 or 2." << endl;
