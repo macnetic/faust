@@ -45,12 +45,22 @@ namespace Faust
 		}
 
 	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::push_back(const MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>* M, bool copying/*=true*/)
+		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::push_back(const MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>* M, bool copying/*=true*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			auto pushed_M = M;
+			auto pushed_M = const_cast<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*>(M);
+			if((transpose || conjugate) && !copying)
+				throw std::runtime_error("Transform<FPP,GPU2>::push_back(): copying argument must be true if any of transpose or conjugate argument is true.");
 			if(copying)
+			{
 				pushed_M = M->clone();
+				if(transpose && conjugate)
+					pushed_M->adjoint();
+				else if(transpose)
+					pushed_M->transpose();
+				else if(conjugate)
+					pushed_M->conjugate();
+			}
 			if(gpu_mat_arr == nullptr)
 				gpu_mat_arr = marr_funcs->create();
 			marr_funcs->addgpu_anymat(gpu_mat_arr, pushed_M->get_gpu_mat_ptr());
@@ -446,6 +456,12 @@ namespace Faust
 		bool Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator<(const Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator& it)
 		{
 			return this->index < it.index;
+		}
+
+	template<>
+		bool Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator!=(const Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator& it)
+		{
+			return this->index != it.index;
 		}
 
 	template<>

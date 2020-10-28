@@ -333,3 +333,4 @@ cdef extern from "FaustCoreCpp.h":
         @staticmethod
         FaustCoreCppGPU[FPP]* eyeFaustGPU(unsigned int n, unsigned int m)
 
+        FaustCoreCppGPU[FPP]* mul_faust_gpu(FaustCoreCppGPU[FPP]*)

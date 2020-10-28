@@ -129,14 +129,16 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 	public:
 		FaustCoreCppGPU() {}
 		FaustCoreCppGPU(Faust::TransformHelper<FPP,GPU2> *th);
+		void get_product(FPP* y_data, int y_nrows, int y_ncols);
+		FaustCoreCppGPU<FPP>* mul_faust_gpu(FaustCoreCppGPU<FPP>* right);
 		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
-            unsigned int min_num_factors, unsigned int max_num_factors,
-            unsigned int min_dim_size,
-            unsigned int max_dim_size, float density, bool per_row);
+				unsigned int min_num_factors, unsigned int max_num_factors,
+				unsigned int min_dim_size,
+				unsigned int max_dim_size, float density, bool per_row);
 
-    static FaustCoreCppGPU<FPP>* hadamardFaustGPU(unsigned int n, const bool norma);
-    static FaustCoreCppGPU<FPP>* fourierFaustGPU(unsigned int n, const bool norma);
-    static FaustCoreCppGPU<FPP>* eyeFaustGPU(unsigned int n, unsigned int m);
+		static FaustCoreCppGPU<FPP>* hadamardFaustGPU(unsigned int n, const bool norma);
+		static FaustCoreCppGPU<FPP>* fourierFaustGPU(unsigned int n, const bool norma);
+		static FaustCoreCppGPU<FPP>* eyeFaustGPU(unsigned int n, unsigned int m);
 };
 
 void* _enable_gpu_mod(const char* libpath);

@@ -32,7 +32,7 @@ namespace Faust
 		template<typename ...GList> TransformHelperGen(GList& ... t);
 #endif
 
-		virtual void push_back(const MatGeneric<FPP,DEV>* M, const bool optimizedCopy=false, const bool copying=true)=0;
+		virtual void push_back(const MatGeneric<FPP,DEV>* M, const bool optimizedCopy=false, const bool copying=true, const bool transpose=false, const bool conjugate=false)=0;
 
 		const char isTransposed2char() const;
 		void enable_gpu_meth_for_mul(){}; //TODO: remove later (it is only a special case of TransformHelper Cpu)

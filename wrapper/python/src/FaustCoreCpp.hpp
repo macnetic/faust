@@ -104,6 +104,7 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::mul_scal(FPP scal)
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
     return core;
 }
+
 template<typename FPP, FDevice DEV>
 void FaustCoreCpp<FPP,DEV>::get_product(FPP* y_data, int y_nrows, int y_ncols)
 {
@@ -544,3 +545,20 @@ template<typename FPP>
 	FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
 	return core;
 }
+
+template<typename FPP>
+void FaustCoreCppGPU<FPP>::get_product(FPP* y_data, int y_nrows, int y_ncols)
+{
+    Faust::MatDense<FPP, Cpu> Y = this->transform->get_product().tocpu();
+    memcpy(y_data, Y.getData(), sizeof(FPP)*y_ncols*y_nrows);
+}
+
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::mul_faust_gpu(FaustCoreCppGPU<FPP>* right)
+{
+    Faust::TransformHelper<FPP,GPU2>* th = this->transform->multiply(right->transform);
+    FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
+    return core;
+}
+
+

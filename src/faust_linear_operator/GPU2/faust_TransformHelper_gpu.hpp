@@ -34,7 +34,7 @@ namespace Faust
 #endif
 
 	template<typename FPP>
-		void TransformHelper<FPP,GPU2>::push_back(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy/*=false*/, const bool copying/*=true*/)
+		void TransformHelper<FPP,GPU2>::push_back(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy/*=false*/, const bool copying/*=true*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			//optimizedCopy is ignored because not handled yet by Transform<FPP,GPU2> // TODO ? (it's not used by wrappers anyway)
 			this->transform->push_back(M, copying);
@@ -165,6 +165,37 @@ namespace Faust
 		void TransformHelper<FPP,GPU2>::update(const MatGeneric<FPP, GPU2>& M,const faust_unsigned_int id)
 		{
 			return this->transform->update(M, id);
+		}
+
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::multiply(const TransformHelper<FPP,GPU2>* right)
+		{
+			bool copying_this = false;
+			bool copying_right = false;
+			bool transconj_diff = this->is_conjugate != right->is_conjugate || this->is_transposed != right->is_transposed;
+			bool out_transp = this->is_transposed, out_conj = this->is_conjugate;
+			bool transp_this = false, transp_right = false, conj_this = false, conj_right = false;
+			if(transconj_diff)
+				if(this->size() < right->size())
+				{
+					copying_this = true;
+					out_transp = right->is_transposed;
+					out_conj = right->is_conjugate;
+					transp_this = this->is_transposed != right->is_transposed;
+					conj_this = this->is_conjugate != right->is_conjugate;
+				}
+				else
+				{
+					copying_right = true;
+					transp_right = this->is_transposed != right->is_transposed;
+					conj_right = this->is_conjugate != right->is_conjugate;
+				}
+			auto mul_faust = new TransformHelper<FPP,GPU2>();
+			for(auto f: *this)
+				mul_faust->push_back(f, /*OptimizedCopy*/ false, copying_this, transp_this, conj_this);
+			for(auto f: *right)
+				mul_faust->push_back(f, /*OptimizedCopy*/ false, copying_right, transp_right, conj_right);
+			return mul_faust;
 		}
 
 	template<typename FPP>
@@ -436,8 +467,17 @@ namespace Faust
 	template<typename FPP>
 		faust_unsigned_int TransformHelper<FPP,GPU2>::getNBytes() const
 		{
-			throw std::runtime_error("getNBytes is yet to implement in Faust C++ core for GPU.");
-			return 0;
+			faust_unsigned_int nbytes = 0;
+			for(auto fac : *this)
+			{
+				if(dynamic_cast<Faust::MatDense<FPP, GPU2>*>(fac))
+					nbytes += fac->getNbCol() * fac->getNbRow() * sizeof(FPP);
+				else if (dynamic_cast<Faust::MatSparse<FPP, GPU2>*>(fac))
+					nbytes += fac->getNonZeros() * (sizeof(FPP) + sizeof(int)) + (fac->getNbRow() + 1) * sizeof(int); // by default storage index is int
+				else
+					throw runtime_error("Unknown matrix type.");
+			}
+			return nbytes;
 		}
 
 	template<typename FPP>

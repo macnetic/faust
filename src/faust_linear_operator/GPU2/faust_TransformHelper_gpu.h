@@ -20,7 +20,7 @@ namespace Faust
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 				template<typename ...GList> TransformHelper(GList& ... t);
 #endif
-				void push_back(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy=false, const bool copying=true);
+				void push_back(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy=false, const bool copying=true, const bool transpose=false, const bool conjugate=false);
 				void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const int32_t dev_id=-1, const void* stream=nullptr);
 				void pop_front();
 				void pop_back();
@@ -40,6 +40,7 @@ namespace Faust
 				MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A, const bool transpose=false, const bool conjugate=false);
 				MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
 				TransformHelper<FPP,GPU2>* multiply(const FPP& a);
+				TransformHelper<FPP,GPU2>* multiply(const TransformHelper<FPP,GPU2>*);
 				Vect<FPP,GPU2> multiply(const Faust::Vect<FPP,GPU2>& a);
 				Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> &x, const bool transpose=false, const bool conjugate=false);
 				Real<FPP> normFro() const;

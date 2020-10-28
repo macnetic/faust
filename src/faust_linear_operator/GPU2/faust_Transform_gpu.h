@@ -28,7 +28,7 @@ namespace Faust
 			~Transform();
 			void operator=(const Transform<FPP,GPU2>& t);
 			void insert(int32_t id, const MatGeneric<FPP,GPU2>*, bool copying=true);
-			void push_back(const MatGeneric<FPP,GPU2>*, bool copying=true);
+			void push_back(const MatGeneric<FPP,GPU2>*, bool copying=true, const bool transpose=false, const bool conjugate=false);
 			void push_first(const MatGeneric<FPP,GPU2>*, bool copying=true);
 			void erase(int32_t id);
 			void pop_front();
@@ -76,6 +76,7 @@ namespace Faust
 					iterator operator-(int);
 					//post-increment op
 					iterator operator++(int);
+					bool operator!=(const iterator& it);
 					bool operator<(const iterator& it);
 				private:
 					size_t index;

@@ -786,10 +786,11 @@ namespace Faust {
         }
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /* false by default */, const bool copying /* true to default */)
+		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /* false by default */, const bool copying /* true to default */, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			//warning: should not be called after initialization of factors (to respect the immutability property)
 			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after or just use it internally -- not py/matfaust)
+			//TODO: transpose and conjugate must be passed to transform and taken into account for the factor (like it's done in GPU2 impl., i.e.: only possible if copying is true too)
 			this->transform->push_back(M, optimizedCopy, this->is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
 #ifdef USE_GPU_MOD
 			if(gpu_faust)

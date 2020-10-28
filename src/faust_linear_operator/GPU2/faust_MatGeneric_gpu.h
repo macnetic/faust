@@ -24,6 +24,9 @@ namespace Faust
 				virtual MatGeneric<FPP,GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const=0;
 				virtual void* get_gpu_mat_ptr() const=0;
 				virtual faust_unsigned_int getNonZeros() const=0;
+				virtual void transpose()=0;
+				virtual void conjugate()=0;
+				virtual void adjoint()=0;
 				MatGeneric();
 				virtual ~MatGeneric();
 		};

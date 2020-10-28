@@ -151,6 +151,7 @@ cdef class FaustCore:
 
     @staticmethod
     def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
+        #TODO: extract out of Faust class
         cdef char * c_libpath
         cdef void* gm_handle
         if libpaths == None:
@@ -2258,7 +2259,9 @@ import sys, os, pyfaust
 FaustCore.enable_gpu_mod(silent=True)
 
 
-
+#TODO: this class should disappear by defining a generic class for both CPU and
+# GPU implementations. The easiest way is to use cmake and one or two variables
+# (class name, etc.) to generate FaustCore and FaustCoreGPU
 cdef class FaustCoreGPU:
     #TODO: refactor with FaustCore using cmake
     #### ATTRIBUTE ########
@@ -2375,8 +2378,8 @@ cdef class FaustCoreGPU:
 #            self.core_faust_cplx.Display()
 
     def multiply(self,M):
-#        if(isinstance(M, FaustCore)):
-#            return self.multiply_faust(M)
+        if(isinstance(M, FaustCoreGPU)):
+            return self.multiply_faust(M)
         if not isinstance(M, np.ndarray):
             raise ValueError('input M must be a numpy.ndarray')
         if(self._isReal):
@@ -2537,4 +2540,89 @@ cdef class FaustCoreGPU:
 #                                                                             m)
 #            core._isReal = False
         return core
+
+    def nbytes(self):
+        if(self._isReal):
+            nbytes = self.core_faust_dbl.getNBytes();
+#        else:
+#            nbytes = self.core_faust_cplx.getNBytes();
+        return nbytes
+
+    def get_product(self):
+        cdef double [:,:] y_data
+        cdef complex [:,:] y_data_cplx
+
+        if(self._isReal):
+            y_arr = np.empty((self.core_faust_dbl.getNbRow(), self.core_faust_dbl.getNbCol()), dtype='d',
+                             order='F')
+            y_data = y_arr
+            self.core_faust_dbl.get_product(&y_data[0,0], y_arr.shape[0],
+                                            y_arr.shape[1])
+#        else:
+#            y_arr = np.empty((self.core_faust_cplx.getNbRow(), self.core_faust_cplx.getNbCol()),
+#                             dtype=np.complex,
+#                             order='F')
+#            y_data_cplx = y_arr
+#            self.core_faust_cplx.get_product(&y_data_cplx[0,0], y_arr.shape[0],
+#                                            y_arr.shape[1])
+        return y_arr
+
+    cdef multiply_faust(self, F):
+        if(isinstance(F, FaustCoreGPU)):
+            core = FaustCoreGPU(core=True)
+            core._isReal = self._isReal
+            if(self._isReal):
+                if(F.isReal()):
+                    core.core_faust_dbl = \
+                            self.core_faust_dbl.mul_faust_gpu((<FaustCoreGPU?>F).core_faust_dbl)
+#                else:
+#                    core = \
+#                   <FaustCoreGPU?> (<FaustCoreGPU?> self._ascomplex()).multiply_faust(F)
+#            else:
+#                if(F.isReal()):
+#                    core.core_faust_cplx = \
+#                             self.core_faust_cplx.mul_faust((<FaustCore?>((<FaustCore?>((<FaustCore?>F)._ascomplex())))).core_faust_cplx)
+#                else:
+#                    core.core_faust_cplx = \
+#                            self.core_faust_cplx.mul_faust((<FaustCore?>F).core_faust_cplx)
+            return core
+        raise ValueError("F must be a Faust object")
+
+#    cdef _ascomplex(self, scalar=1.0):
+#        cplx_facs = [self.get_fact_opt(i).astype(np.complex) for i in \
+#                              range(0,self.get_nb_factors())]
+#        cplx_facs[0] *= scalar # instead of passing the scal to the
+#        # construc. It avoids disp of
+#        # deprecation warning
+#        core = FaustCoreGPU(cplx_facs)#, alpha=scalar)
+#        core._isReal = False
+#        return core
+
+#    def multiply_scal(self, scalar):
+#        core = FaustCoreGPU(core=True)
+#        core._isReal = self._isReal
+#        if(isinstance(scalar, int)):
+#            scalar = float(scalar)
+#        scalar_type_err = TypeError("The mul. scalar must be a real or a"
+#                                    " complex number")
+#        if(self._isReal):
+#            if(isinstance(scalar, float)):
+#                core.core_faust_dbl = \
+#                        self.core_faust_dbl.mul_scal(scalar)
+#            elif(isinstance(scalar, np.complex)):
+#                core = <FaustCore?>self._ascomplex(scalar)
+#                core._isReal = False
+#            else:
+#                raise scalar_type_err
+#        else:
+#            if(isinstance(scalar, np.complex) or isinstance(scalar,
+#                                                            float)):
+#                core.core_faust_cplx = \
+#                        self.core_faust_cplx.mul_scal(scalar)
+#            else:
+#                raise scalar_type_err
+#        return core
+
+    def isReal(self):
+        return self._isReal
 
