@@ -12,6 +12,7 @@
 namespace Faust
 {
 
+	//TODO: a TransformGen class to refactor common code between Transform<FPP,Cpu> and Transform<FPP,GPU2> (similar way to what is done for TransformHelper classes)
 	template<typename FPP>
 		class Transform<FPP,GPU2>
 		{
@@ -36,6 +37,16 @@ namespace Faust
 			void clear();
 			void update(const MatGeneric<FPP, GPU2>& M, const faust_unsigned_int id);
 			MatGeneric<FPP,GPU2>* get_fact(int32_t id, bool cloning_fact=true) const;
+			void get_fact(const faust_unsigned_int &id,
+					FPP* elts,
+					faust_unsigned_int* num_rows,
+					faust_unsigned_int* num_cols,
+					const bool transpose=false) const;
+			void get_fact(const faust_unsigned_int id,
+					int* d_outer_count_ptr, int* d_inner_ptr, FPP* d_elts,
+					faust_unsigned_int* nnz,
+					faust_unsigned_int* num_rows, faust_unsigned_int* num_cols,
+					bool transpose=false) const;
 			void get_facts(std::vector<MatGeneric<FPP,GPU2>*> &factors, bool cloning_facts=true) const;
 			bool is_fact_sparse(int id) const;
 			bool is_fact_dense(int id) const;
@@ -45,6 +56,7 @@ namespace Faust
 			void Display() const;
 			std::string to_string() const;
 			int32_t size() const;
+			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 			faust_unsigned_int get_total_nnz() const;
 			void update_total_nnz() const;
 			void scalarMultiply(const FPP& alpha);

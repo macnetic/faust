@@ -97,6 +97,7 @@ namespace Faust
 				FPP trace() const;
 				MatDense<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
+				void tocpu(FPP* cpu_buffer, const void* stream/*=nullptr*/) const;
 				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr) const;
 				void tocpu(MatDense<FPP, Cpu> &cpu_mat, const void* stream=nullptr) const;
 				void Display() const;

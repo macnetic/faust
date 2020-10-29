@@ -152,17 +152,40 @@ namespace Faust
 	}
 
 	template<>
+		faust_unsigned_int Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getNonZeros() const
+		{
+			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			if(gpu_mat != nullptr)
+				return spm_funcs->get_nnz(gpu_mat);
+			throw std::runtime_error("gpu_mat is nullptr");
+		}
+
+	template<>
+		void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(int* row_ptr, int* col_ind, @FAUST_SCALAR_FOR_GM@* value_ptr, int* nrows/*=nullptr*/, int* ncols/*=nullptr*/, int* nnz/*=nullptr*/) const
+		{
+			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			if(nrows != nullptr)
+				*nrows = getNbRow();
+			if(ncols != nullptr)
+				*ncols = getNbCol();
+			if(nnz != nullptr)
+				*nnz = getNonZeros();
+			spm_funcs->tocpu(gpu_mat, row_ptr, col_ind, value_ptr);
+		}
+
+	template<>
 		void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(MatSparse<@FAUST_SCALAR_FOR_GM@, Cpu> & sp_mat) const
 		{
 			int32_t nrows, ncols, nnz;
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			spm_funcs->info(gpu_mat, &nrows, &ncols, &nnz);
-			if(sp_mat.getNonZeros() != nnz || sp_mat.getNbRow() != nrows || sp_mat.getNbCol() != ncols)
+			if(sp_mat.getNonZeros() != getNonZeros() || sp_mat.getNbRow() != getNbRow() || sp_mat.getNbCol() != getNbCol())
 			{
-				sp_mat.resize(nnz, nrows, ncols);
+				sp_mat.resize(getNonZeros(), getNbRow(), getNbCol());
 			}
-			spm_funcs->tocpu(gpu_mat, sp_mat.getRowPtr(), sp_mat.getColInd(), sp_mat.getValuePtr());
+			tocpu(sp_mat.getRowPtr(), sp_mat.getColInd(), sp_mat.getValuePtr());
 		}
+
+
 
 	template<>
 		Real<@FAUST_SCALAR_FOR_GM@> Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::norm()
@@ -255,14 +278,7 @@ namespace Faust
 		}
 
 
-	template<>
-		faust_unsigned_int Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getNonZeros() const
-		{
-			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat != nullptr)
-				return spm_funcs->get_nnz(gpu_mat);
-			throw std::runtime_error("gpu_mat is nullptr");
-		}
+
 
 	template<>
 		int32_t Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getDevice() const

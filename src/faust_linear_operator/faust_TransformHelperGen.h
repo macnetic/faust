@@ -27,21 +27,53 @@ namespace Faust
 	class TransformHelperGen
 	{
 		public:
-		TransformHelperGen();
+			TransformHelperGen();
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
-		template<typename ...GList> TransformHelperGen(GList& ... t);
+			template<typename ...GList> TransformHelperGen(GList& ... t);
 #endif
 
-		virtual void push_back(const MatGeneric<FPP,DEV>* M, const bool optimizedCopy=false, const bool copying=true, const bool transpose=false, const bool conjugate=false)=0;
+			virtual void push_back(const MatGeneric<FPP,DEV>* M, const bool optimizedCopy=false, const bool copying=true, const bool transpose=false, const bool conjugate=false)=0;
 
-		const char isTransposed2char() const;
-		void enable_gpu_meth_for_mul(){}; //TODO: remove later (it is only a special case of TransformHelper Cpu)
+			const char isTransposed2char() const;
+			bool isTransposed() const;
+			void enable_gpu_meth_for_mul(){}; //TODO: remove later (it is only a special case of TransformHelper Cpu)
 
-		virtual faust_unsigned_int size() const=0;
-		virtual void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)=0;
+			virtual faust_unsigned_int size() const=0;
+			void get_fact(const faust_unsigned_int &id,
+					FPP* elts,
+					faust_unsigned_int* num_rows,
+					faust_unsigned_int* num_cols,
+					const bool transpose = false) const;
+			void get_fact(const faust_unsigned_int id,
+					int* rowptr,
+					int* col_ids,
+					FPP* elts,
+					faust_unsigned_int* nnz,
+					faust_unsigned_int* num_rows,
+					faust_unsigned_int* num_cols,
+					const bool transpose = false) const;
+			unsigned int get_fact_nb_rows(const faust_unsigned_int id) const;
+			unsigned int get_fact_nb_cols(const faust_unsigned_int id) const;
+			unsigned int get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const;
+			virtual const MatGeneric<FPP,DEV>* get_gen_fact(const faust_unsigned_int id) const=0;
+			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
+			bool is_fact_sparse(const faust_unsigned_int id) const;
+			bool is_fact_dense(const faust_unsigned_int id) const;
 
-		void pack_factors(const faust_unsigned_int id, const PackDir dir);
-		void pack_factors();
+			virtual void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)=0;
+
+			void pack_factors(const faust_unsigned_int id, const PackDir dir);
+			void pack_factors();
+			/**
+			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
+
+*/
+			TransformHelper<FPP,DEV>* left(const faust_unsigned_int id, const bool copy=false) const;
+			/**
+			  \brief Returns the right hand side factors of this from index id to the size()-1 (as a new TransformHelper obj).
+
+*/
+			TransformHelper<FPP,DEV>* right(const faust_unsigned_int id, const bool copy=false) const;
 
 		protected:
 			bool is_transposed;

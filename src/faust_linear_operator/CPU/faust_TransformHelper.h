@@ -127,10 +127,6 @@ namespace Faust
 			void resize(faust_unsigned_int);
 			void display() const;
 			string to_string() const;
-			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
-			unsigned int get_fact_nb_rows(const faust_unsigned_int id) const;
-			unsigned int get_fact_nb_cols(const faust_unsigned_int id) const;
-			unsigned int get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const;
 			MatDense<FPP,Cpu> get_fact(faust_unsigned_int id) const;
 			void get_fact(const faust_unsigned_int id,
 					const int** rowptr,
@@ -151,13 +147,11 @@ namespace Faust
 					const FPP** elts,
 					faust_unsigned_int* num_rows,
 					faust_unsigned_int* num_cols) const;
-			void get_fact(const faust_unsigned_int id,
+			void get_fact(const faust_unsigned_int &id,
 					FPP* elts,
 					faust_unsigned_int* num_rows,
 					faust_unsigned_int* num_cols,
 					const bool transpose = false) const;
-			bool is_fact_sparse(const faust_unsigned_int id) const;
-			bool is_fact_dense(const faust_unsigned_int id) const;
 			TransformHelper<FPP, Cpu>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 			TransformHelper<FPP, Cpu>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
@@ -170,7 +164,6 @@ namespace Faust
 			TransformHelper<FPP,Cpu>* adjoint() const;
 			TransformHelper<FPP,Cpu>* vertcat(const TransformHelper<FPP,Cpu>*);
 			TransformHelper<FPP,Cpu>* horzcat(const TransformHelper<FPP,Cpu>*);
-			bool isTransposed() const;
 			bool isConjugate() const;
 			double normL1() const;
 			double normFro() const;
@@ -191,12 +184,12 @@ namespace Faust
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 
 */
-			TransformHelper<FPP,Cpu>* left(const faust_unsigned_int id, const bool copy=false) const;
+//			TransformHelper<FPP,Cpu>* left(const faust_unsigned_int id, const bool copy=false) const;
 			/**
 			  \brief Returns the right hand side factors of this from index id to the size()-1 (as a new TransformHelper obj).
 
 */
-			TransformHelper<FPP,Cpu>* right(const faust_unsigned_int id, const bool copy=false) const;
+//			TransformHelper<FPP,Cpu>* right(const faust_unsigned_int id, const bool copy=false) const;
 
 			transf_iterator<FPP> begin() const;
 			transf_iterator<FPP> end() const;
@@ -225,6 +218,7 @@ namespace Faust
 			void copy_slices(const TransformHelper<FPP, Cpu>* th, const bool transpose = false);
 			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;
 		};
+
 }
 
 #include "faust_TransformHelper.hpp"

@@ -48,19 +48,6 @@
 
 namespace Faust {
 
-	//TODO: move these functions to Faust::utils ?
-	template<typename FPP>
-		void conjugate(complex<FPP>* elts, faust_unsigned_int n)
-		{
-			for(faust_unsigned_int i=0; i< n; i++)
-				elts[i] = complex<FPP>(elts[i].real(), - elts[i].imag());
-		}
-
-	template<typename FPP>
-		void conjugate(FPP* elts, faust_unsigned_int n)
-		{
-			//nothing to do for real numbers
-		}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts,
@@ -522,26 +509,6 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::left(const faust_unsigned_int id, const bool copy /* default to false */) const
-		{
-			if(id >= this->size()) throw out_of_range("factor id is lower than zero or greater or equal to the size of Transform.");
-			std::vector<Faust::MatGeneric<FPP,Cpu>*> left_factors;
-			for(int i=0; (faust_unsigned_int)i <= id; i++)
-				left_factors.push_back(const_cast<Faust::MatGeneric<FPP,Cpu>*>(get_gen_fact(i)));
-			return new TransformHelper<FPP,Cpu>(left_factors, FPP(1.0), false, copy, true);
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::right(const faust_unsigned_int id, const bool copy /* default to false */) const
-		{
-			if(id >= this->size()) throw out_of_range("factor id is lower than zero or greater or equal to the size of Transform.");
-			std::vector<Faust::MatGeneric<FPP,Cpu>*> right_factors;
-			for(int i=id; (faust_unsigned_int)i < size(); i++)
-				right_factors.push_back(const_cast<Faust::MatGeneric<FPP,Cpu>*>(get_gen_fact(i)));
-			return new TransformHelper<FPP,Cpu>(right_factors, FPP(1.0), false, copy, true);
-		}
-
-	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::pruneout(const int nnz_tres, const int npasses, const bool only_forward)
 		{
 			//TODO: refactor into src/algorithm/faust_pruneout.h/hpp in non-member function Faust::pruneout(TransformHelper<FPP,Cpu>& th, const int nnz_tres, const int npasses, const bool only_forward)
@@ -908,51 +875,6 @@ namespace Faust {
 			return this->transform->to_string(this->is_transposed);
 		}
 
-	template<typename FPP>
-		faust_unsigned_int TransformHelper<FPP,Cpu>::get_fact_nnz(const faust_unsigned_int id) const
-		{
-			if(id == 0 || id == this->size()-1)
-				return this->transform->get_fact_nnz(this->is_transposed?size()-id-1:id);
-			else
-				return this->transform->get_fact_nnz(this->is_transposed?size()-id-1:id);
-		}
-
-	template<typename FPP>
-		unsigned int TransformHelper<FPP,Cpu>::get_fact_nb_rows(const faust_unsigned_int id) const
-		{
-			return get_fact_dim_size(id,0);
-		}
-
-	template<typename FPP>
-		unsigned int TransformHelper<FPP,Cpu>::get_fact_nb_cols(const faust_unsigned_int id) const
-		{
-			return get_fact_dim_size(id,1);
-		}
-
-	template<typename FPP>
-		unsigned int TransformHelper<FPP,Cpu>::get_fact_dim_size(const faust_unsigned_int id, unsigned short dim) const
-		{
-			//dim == 0 to get num of cols, >0 otherwise
-			faust_unsigned_int rid; //real id
-			if(this->is_transposed) {
-				rid = size()-id-1;
-				dim = !dim;
-			}
-			else {
-				rid = id;
-				//dim = dim;
-			}
-			Faust::MatGeneric<FPP,Cpu>* mat;
-			if(rid == 0 || rid == this->size()-1)
-				mat = this->transform->get_fact(rid, false);
-			else
-				mat = this->transform->get_fact(rid, false);
-			if(dim)
-				return mat->getNbCol();
-			else
-				return mat->getNbRow();
-		}
-
 	//private
 	template<typename FPP>
 		const MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact(const faust_unsigned_int id) const
@@ -1040,18 +962,6 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
-				FPP* elts,
-				faust_unsigned_int* num_rows,
-				faust_unsigned_int* num_cols,
-				const bool transpose /* default to false */) const
-		{
-			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, this->is_transposed ^ transpose);
-			if(this->is_conjugate)
-				Faust::conjugate(elts,*num_cols*(*num_rows));
-		}
-
-	template<typename FPP>
 		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_fact(faust_unsigned_int id) const
 		{
 			MatDense<FPP,Cpu> dense_factor;
@@ -1083,17 +993,18 @@ namespace Faust {
 			return dense_factor;
 		}
 
+	//TODO: delete this function when the specific bug in FaustCoreCpp (py. wrapper)
+	// will be fixed (normally the parent function def. should be found, but the wrapper compilation fails anyway)
 	template<typename FPP>
-		bool Faust::TransformHelper<FPP,Cpu>::is_fact_sparse(const faust_unsigned_int id) const
+		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int &id,
+				FPP* elts,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols,
+				const bool transpose /* default to false */) const
 		{
-			return this->transform->is_fact_sparse(this->is_transposed?size()-id-1:id);
-		}
-
-
-	template<typename FPP>
-		bool Faust::TransformHelper<FPP,Cpu>::is_fact_dense(const faust_unsigned_int id) const
-		{
-			return this->transform->is_fact_dense(this->is_transposed?size()-id-1:id);
+			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, this->is_transposed ^ transpose);
+			if(this->is_conjugate)
+				Faust::conjugate(elts,*num_cols*(*num_rows));
 		}
 
 	template<typename FPP>
@@ -1487,12 +1398,6 @@ namespace Faust {
 			return new TransformHelper<FPP,Cpu>(this, true, true);
 		}
 
-
-	template<typename FPP>
-		bool TransformHelper<FPP,Cpu>::isTransposed() const
-		{
-			return this->is_transposed;
-		}
 
 	template<typename FPP>
 		bool TransformHelper<FPP,Cpu>::isConjugate() const

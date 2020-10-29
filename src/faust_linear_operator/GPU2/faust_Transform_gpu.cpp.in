@@ -389,6 +389,74 @@ namespace Faust
 		}
 
 	template<>
+		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_fact(const faust_unsigned_int &id,
+				@FAUST_SCALAR_FOR_GM@* elts,
+				faust_unsigned_int* num_rows,
+				faust_unsigned_int* num_cols,
+				const bool transpose /*=false*/) const
+		{
+			if(! is_fact_dense(id))
+				throw std::runtime_error("faust_Transform_gpu: this get_fact function signature is for MatDense only.");
+			auto gen_mat = get_fact(id, /*cloning*/ false);
+			auto dmat = dynamic_cast<MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>*>(gen_mat);
+			@FAUST_SCALAR_FOR_GM@ tmp;
+			*num_cols = gen_mat->getNbCol();
+			*num_rows = gen_mat->getNbRow();
+			/******* failsafe copy **/
+			auto cpu_mdense = new MatDense<@FAUST_SCALAR_FOR_GM@,Cpu>(dmat->getNbRow(), dmat->getNbCol());
+			dmat->tocpu(*cpu_mdense);
+			memcpy(elts, cpu_mdense->getData(),cpu_mdense->getNbCol()*cpu_mdense->getNbRow()*sizeof(@FAUST_SCALAR_FOR_GM@));
+			delete cpu_mdense;
+			/********* efficient copy that should work but doesn't */
+			// TODO: normally it must be possible to copy directly to elts but I noticed a segfault (and I couldn't figure out how to fix it)
+//			dmat->tocpu(elts);
+			/***************************/
+			if(transpose)
+			{
+				// transpose in-place
+				// the matrix is in column-major order
+				for(int j=0;j<*num_cols;j++)
+					for(int i=0; i<*num_rows;i++)
+					{
+						tmp = elts[i**num_cols+j];
+						elts[i**num_cols+j] = elts[j**num_rows+i];
+						elts[j**num_rows+i] = tmp;
+					}
+				// swap num_cols and num_rows
+				// (with only these 2 variables -- F2 arithmetic trick)
+				*num_cols = *num_cols^*num_rows;
+				*num_rows = *num_cols^*num_rows;
+				*num_cols = *num_cols^*num_rows;
+			}
+		}
+
+template<>
+void Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_fact(const faust_unsigned_int id,
+		int* d_outer_count_ptr, int* d_inner_ptr, @FAUST_SCALAR_FOR_GM@* d_elts,
+		faust_unsigned_int* nnz,
+		faust_unsigned_int* num_rows, faust_unsigned_int* num_cols,
+		bool transpose /* default to false */) const
+{
+	if(! is_fact_sparse(id))
+		throw std::runtime_error("faust_Transform_gpu: this get_fact function signature is for MatSparse only.");
+	auto gen_mat = get_fact(id, /*cloning*/ false);
+	auto smat = dynamic_cast<MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>*>(gen_mat);
+	MatSparse<@FAUST_SCALAR_FOR_GM@,Cpu> cpu_smat;
+	if(transpose)
+	{
+		auto t_smat = smat->clone();
+		t_smat->transpose();
+		t_smat->tocpu(d_outer_count_ptr, d_inner_ptr, d_elts, (int32_t*) num_rows, (int32_t*) num_cols, (int32_t*) nnz);
+		delete t_smat;
+	}
+	else
+	{
+		smat->tocpu(d_outer_count_ptr, d_inner_ptr, d_elts, (int32_t*) num_rows, (int32_t*) num_cols, (int32_t*) nnz);
+	}
+}
+
+
+	template<>
 		MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2> &A, const char opThis)
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
@@ -550,4 +618,10 @@ namespace Faust
 			return norm;
 		}
 
+
+	template<>
+		faust_unsigned_int Transform<@FAUST_SCALAR_FOR_GM@, GPU2>::get_fact_nnz(const faust_unsigned_int id) const
+		{
+			return this->get_fact(id, false)->getNonZeros();
+		}
 }

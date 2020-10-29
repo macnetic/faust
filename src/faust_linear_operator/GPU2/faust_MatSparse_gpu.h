@@ -68,6 +68,7 @@ namespace Faust
 				bool operator!=(const MatSparse<FPP, GPU2>& mat) const;
 
 				void tocpu(MatSparse<FPP,Cpu> &sp_mat) const;
+				void tocpu(int* row_ptr, int* col_ind, FPP* value_ptr, int* nrows=nullptr, int* ncols=nullptr, int* nnz=nullptr) const;
 				Real<FPP> norm();
 				void transpose();
 				void adjoint();

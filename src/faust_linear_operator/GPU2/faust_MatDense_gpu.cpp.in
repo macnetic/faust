@@ -152,13 +152,23 @@ namespace Faust
 		}
 
 	template<>
+		void Faust::MatDense<FSFG,GPU2>::tocpu(FSFG* cpu_buffer, const void* stream/*=nullptr*/) const
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
+			dsm_funcs->set_stream(gpu_mat, stream);
+			dsm_funcs->tocpu(gpu_mat, cpu_buffer);
+			dsm_funcs->set_stream(gpu_mat, nullptr);
+		}
+
+	template<>
 		void Faust::MatDense<FSFG,GPU2>::tocpu(MatDense<FSFG, Cpu>& cpu_mat, const void* stream/*=nullptr*/) const
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			cpu_mat.resize(getNbRow(), getNbCol());
-			dsm_funcs->set_stream(gpu_mat, stream);
-			dsm_funcs->tocpu(gpu_mat, cpu_mat.getData());
-			dsm_funcs->set_stream(gpu_mat, nullptr);
+//			dsm_funcs->set_stream(gpu_mat, stream);
+//			dsm_funcs->tocpu(gpu_mat, cpu_mat.getData());
+//			dsm_funcs->set_stream(gpu_mat, nullptr);
+			this->tocpu(cpu_mat.getData(), stream);
 		}
 
 	template<>

@@ -157,7 +157,7 @@ namespace Faust
 						const FPP** elts,
 						faust_unsigned_int* num_rows,
 						faust_unsigned_int* num_cols) const;
-				void get_fact(const faust_unsigned_int id,
+				void get_fact(const faust_unsigned_int &id,
 						FPP* elts,
 						faust_unsigned_int* num_rows,
 						faust_unsigned_int* num_cols,

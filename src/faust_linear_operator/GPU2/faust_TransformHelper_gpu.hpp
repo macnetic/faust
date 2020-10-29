@@ -144,15 +144,9 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		bool TransformHelper<FPP,GPU2>::is_fact_sparse(int id) const
+		const MatGeneric<FPP,GPU2>* TransformHelper<FPP,GPU2>::get_gen_fact(const faust_unsigned_int id) const
 		{
-			return this->transform->is_fact_sparse(id);
-		}
-
-	template<typename FPP>
-		bool TransformHelper<FPP,GPU2>::is_fact_dense(int id) const
-		{
-			return this->transform->is_fact_dense(id);
+			return this->transform->get_fact(id, false);
 		}
 
 	template<typename FPP>
@@ -398,27 +392,12 @@ namespace Faust
 //			delete thn;
 //			return gpu_thn;
 		}
-
-	template<typename FPP>
-		unsigned int TransformHelper<FPP,GPU2>::get_fact_nb_rows(const faust_unsigned_int id) const
-		{
-			throw std::runtime_error("get_fact_nb_rows is yet to implement in Faust C++ core for GPU.");
-			return 0;
-		}
-
-	template<typename FPP>
-		unsigned int TransformHelper<FPP,GPU2>::get_fact_nb_cols(const faust_unsigned_int id) const
-		{
-			throw std::runtime_error("get_fact_nb_cols is yet to implement in Faust C++ core for GPU.");
-			return 0;
-		}
-
-	template<typename FPP>
-		faust_unsigned_int TransformHelper<FPP,GPU2>::get_fact_nnz(const faust_unsigned_int id) const
-		{
-			throw std::runtime_error("get_fact_nnz is yet to implement in Faust C++ core for GPU.");
-			return 0;
-		}
+//
+//	template<typename FPP>
+//		faust_unsigned_int TransformHelper<FPP,GPU2>::get_fact_nnz(const faust_unsigned_int id) const
+//		{
+//			return this->transform->get_fact_nnz();
+//		}
 
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::transpose()
@@ -438,20 +417,6 @@ namespace Faust
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::adjoint()
 		{
 			throw std::runtime_error("adjoint is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::right(const faust_unsigned_int id, const bool copy/*=false*/) const
-		{
-			throw std::runtime_error("right is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::left(const faust_unsigned_int id, const bool copy/*=false*/) const
-		{
-			throw std::runtime_error("left is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
 		}
 
@@ -520,19 +485,6 @@ namespace Faust
 			throw std::runtime_error("pruneout is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
 		}
-
-	template<typename FPP>
-			void TransformHelper<FPP,GPU2>::get_fact(const faust_unsigned_int id,
-					int* rowptr,
-					int* col_ids,
-					FPP* elts,
-					faust_unsigned_int* nnz,
-					faust_unsigned_int* num_rows,
-					faust_unsigned_int* num_cols,
-					const bool transpose/*=false*/) const
-			{
-				throw std::runtime_error("get_fact is yet to implement in Faust C++ core for GPU.");
-			}
 
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row)

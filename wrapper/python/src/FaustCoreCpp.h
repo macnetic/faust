@@ -46,10 +46,10 @@
 #define FAUSTCORECPP_H
 
 #include "faust_MatDense.h"
-#include "faust_TransformHelper.h"
 #ifdef USE_GPU_MOD
 #include "faust_TransformHelper_gpu.h"
 #endif
+#include "faust_TransformHelper.h"
 
 template<typename FPP, FDevice DEV=Cpu>
 class FaustCoreCpp
@@ -134,6 +134,8 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		FaustCoreCppGPU<FPP>* mul_faust_gpu(FaustCoreCppGPU<FPP>* right);
 		FaustCoreCppGPU<FPP>* mul_scal_gpu(const FPP& scal);
 		FaustCoreCppGPU<FPP>* normalize_gpu(int ord) const;
+		FaustCoreCppGPU<FPP>* left_gpu(const faust_unsigned_int) const;
+		FaustCoreCppGPU<FPP>* right_gpu(const faust_unsigned_int) const;
 		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
 				unsigned int min_num_factors, unsigned int max_num_factors,
 				unsigned int min_dim_size,
@@ -148,5 +150,5 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 void* _enable_gpu_mod(const char* libpath);
 
 #include "FaustCoreCpp.hpp"
-
+#include "FaustCoreCppGPU.hpp"
 #endif

@@ -28,8 +28,6 @@ namespace Faust
 				faust_unsigned_int getNbRow(){ return this->transform->getNbRow();}
 				faust_unsigned_int getNbCol(){ return this->transform->getNbCol();}
 				faust_unsigned_int getNBytes() const;
-				unsigned int get_fact_nb_rows(const faust_unsigned_int id) const;
-				unsigned int get_fact_nb_cols(const faust_unsigned_int id) const;
 				template<typename Head, typename ... Tail>
 					void push_back_(Head& h, Tail&... t);
 				void push_back_();
@@ -49,8 +47,7 @@ namespace Faust
 				faust_unsigned_int size() const;
 				void update_total_nnz() const;
 				Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag);
-				bool is_fact_sparse(int id) const;
-				bool is_fact_dense(int id) const;
+				const MatGeneric<FPP,GPU2>* get_gen_fact(const faust_unsigned_int id) const;
 				MatGeneric<FPP,GPU2>* get_gen_fact_nonconst(const faust_unsigned_int id) const;
 				void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
 				void pack_factors();
@@ -65,14 +62,11 @@ namespace Faust
 				void set_FM_mul_mode() const;
 				void set_Fv_mul_mode() const;
 				faust_unsigned_int get_total_nnz() const;
-				faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
-				bool is_fact_sparse(const faust_unsigned_int id) const;
+//				faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 				TransformHelper<FPP,GPU2>* normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const;
 				TransformHelper<FPP,GPU2>* transpose();
 				TransformHelper<FPP,GPU2>* conjugate();
 				TransformHelper<FPP,GPU2>* adjoint();
-				TransformHelper<FPP,GPU2>* right(const faust_unsigned_int id, const bool copy=false) const;
-				TransformHelper<FPP,GPU2>* left(const faust_unsigned_int id, const bool copy=false) const;
 				TransformHelper<FPP, GPU2>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 						faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 				TransformHelper<FPP, GPU2>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
@@ -84,14 +78,6 @@ namespace Faust
 				static TransformHelper<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true);
 				static TransformHelper<FPP,GPU2>* eyeFaust(unsigned int n, unsigned int m);
 				TransformHelper<FPP,GPU2>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
-				void get_fact(const faust_unsigned_int id,
-						int* rowptr,
-						int* col_ids,
-						FPP* elts,
-						faust_unsigned_int* nnz,
-						faust_unsigned_int* num_rows,
-						faust_unsigned_int* num_cols,
-						const bool transpose=false) const;
 
 				static TransformHelper<FPP,GPU2>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 

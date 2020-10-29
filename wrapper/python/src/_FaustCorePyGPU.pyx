@@ -417,3 +417,122 @@ cdef class FaustCoreGPU:
 #            nb_factors = int(self.core_faust_cplx.get_nb_factors())
         return nb_factors
 
+    def get_fact_opt(self, i):
+        if(i >=  self.get_nb_factors() or i < 0):
+            raise ValueError("factor index must be greater or equal 0 and "
+                             "lower than "+str(self.get_nb_factors())+".")
+        cdef fact
+        cdef double[:,:] fact_dbl_view
+        cdef complex[:,:] fact_cplx_view
+        cdef rowptr, col_ids, elts, nnz
+        cdef int[:] rowptr_view, col_ids_view
+        if(self._isReal):
+            dtype = 'd'
+            is_fact_sparse = self.core_faust_dbl.is_fact_sparse(i)
+            is_transposed = self.core_faust_dbl.isTransposed()
+#        else:
+#            dtype = 'complex'
+#            is_fact_sparse = self.core_faust_cplx.is_fact_sparse(i)
+#            is_transposed = self.core_faust_cplx.isTransposed()
+        if(is_fact_sparse):
+            if(self._isReal):
+                # is_transposed = False # uncomment to disable the trick which
+                # uses csc representation instead of csr transpose
+                # to optimize copy
+                nnz = self.core_faust_dbl.get_fact_nnz(i)
+                col_ids = np.ndarray([nnz], dtype=np.int32)
+                elts = np.ndarray([1,nnz], dtype=dtype)
+                col_ids_view = col_ids
+                shape = [self.core_faust_dbl.get_fact_nb_rows(i),
+                 self.core_faust_dbl.get_fact_nb_cols(i)]
+                if(is_transposed):
+                    rowptr_sz = shape[1]+1
+                else:
+                    rowptr_sz = shape[0]+1
+
+                rowptr = np.ndarray([rowptr_sz], dtype=np.int32)
+                rowptr_view = rowptr
+                fact_dbl_view = elts
+    #                print("len(rowptr)=", len(rowptr))
+    #                print("len(col_ids)=", len(col_ids))
+    #                print("len(elts[0]=", len(elts[0,:]))
+                self.core_faust_dbl.get_fact_sparse(i, &rowptr_view[0],
+                                                        &col_ids_view[0],
+                                                        &fact_dbl_view[0,0],
+                                                       is_transposed)
+#            else:
+#                # is_transposed = False # uncomment to disable the trick which
+#                # uses csc representation instead of csr transpose
+#                # to optimize copy
+#                nnz = self.core_faust_cplx.get_fact_nnz(i)
+#                col_ids = np.ndarray([nnz], dtype=np.int32)
+#                elts = np.ndarray([1,nnz], dtype=dtype)
+#                col_ids_view = col_ids
+#                shape = [self.core_faust_cplx.get_fact_nb_rows(i),
+#                 self.core_faust_cplx.get_fact_nb_cols(i)]
+#                if(is_transposed):
+#                    rowptr_sz = shape[1]+1
+#                else:
+#                    rowptr_sz = shape[0]+1
+#
+#                rowptr = np.ndarray([rowptr_sz], dtype=np.int32)
+#                rowptr_view = rowptr
+#                fact_cplx_view = elts
+#                self.core_faust_cplx.get_fact_sparse(i, &rowptr_view[0],
+#                                                     &col_ids_view[0],
+#                                                     &fact_cplx_view[0,0],
+#                                                     is_transposed)
+#                #print("(rowptr)=", (rowptr))
+##                print("(col_ids)=", (col_ids))
+##                print("(elts[0,:]=", (elts))
+            if(is_transposed):
+                fact = csc_matrix((elts[0,:], col_ids, rowptr), shape=shape)
+            else:
+                fact = csr_matrix((elts[0,:], col_ids, rowptr), shape=shape)
+        else: # dense matrix
+            if(is_transposed):
+                order = 'C'
+                # C contiguous repr. (row-major order ) is used to optimized the
+                # request of transpose factor (no need to reorder data as we
+                # should in col-major/Fortran repr.)
+            else:
+                order = 'F'
+            if(self._isReal):
+                fact = np.ndarray([self.core_faust_dbl.get_fact_nb_rows(i),
+                                   self.core_faust_dbl.get_fact_nb_cols(i)], dtype=dtype,
+                                  order=order)
+                fact_dbl_view = fact
+                self.core_faust_dbl.get_fact_dense(i, &fact_dbl_view[0, 0],
+                                               <unsigned int*>NULL,
+                                               <unsigned int*>NULL,
+                                               is_transposed)
+#            else:
+#                fact = np.ndarray([self.core_faust_cplx.get_fact_nb_rows(i),
+#                             self.core_faust_cplx.get_fact_nb_cols(i)], dtype=dtype,
+#                            order=order)
+#                fact_cplx_view = fact
+#                self.core_faust_cplx.get_fact_dense(i, &fact_cplx_view[0, 0],
+#                                                   <unsigned int*>NULL,
+#                                                   <unsigned int*>NULL,
+#                                                   is_transposed)
+
+        return fact
+
+    def left(self, id):
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.left_gpu(id)
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.left(id)
+        core._isReal = self._isReal
+        return core
+
+    def right(self, id):
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.right_gpu(id)
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.right(id)
+        core._isReal = self._isReal
+        return core
+

@@ -43,6 +43,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <complex>
 #include "faust_LinearOperator.h"
 #include "faust_MatGeneric.h"
 #include "faust_MatDense.h"
@@ -727,4 +728,16 @@ FPP Faust::fabs(std::complex<FPP> c)
 	return sqrt(norm(c));
 }
 
+	template<typename FPP>
+void conjugate(std::complex<FPP>* elts, faust_unsigned_int n)
+{
+	for(faust_unsigned_int i=0; i< n; i++)
+		elts[i] = std::complex<FPP>(elts[i].real(), - elts[i].imag());
+}
+
+	template<typename FPP>
+void conjugate(FPP* elts, faust_unsigned_int n)
+{
+	//nothing to do for real numbers
+}
 #endif

@@ -168,6 +168,13 @@ namespace Faust
 
 	template<typename FPP>
 		FPP fabs(std::complex<FPP> c);
+
+	template<typename FPP>
+		void conjugate(std::complex<FPP>* elts, faust_unsigned_int n);
+
+	template<typename FPP>
+		void conjugate(FPP* elts, faust_unsigned_int n);
+
 }
 
 

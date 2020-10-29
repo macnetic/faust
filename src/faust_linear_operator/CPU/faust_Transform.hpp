@@ -839,7 +839,7 @@ void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
 }
 
 template<typename FPP>
-void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+void Faust::Transform<FPP,Cpu>::get_fact(const faust_unsigned_int &id,
 		FPP* elts,
 		faust_unsigned_int* num_rows,
 		faust_unsigned_int* num_cols,
