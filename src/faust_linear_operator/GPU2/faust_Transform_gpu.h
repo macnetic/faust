@@ -53,8 +53,8 @@ namespace Faust
 			void transpose();
 			int32_t getNbRow()const;
 			int32_t getNbCol()const;
-			void Display() const;
-			std::string to_string() const;
+			void Display(bool transpose=false) const;
+			std::string to_string(bool transpose=false) const;
 			int32_t size() const;
 			faust_unsigned_int get_fact_nnz(const faust_unsigned_int id) const;
 			faust_unsigned_int get_total_nnz() const;

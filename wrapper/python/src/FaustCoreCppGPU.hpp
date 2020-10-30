@@ -83,4 +83,28 @@ FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::right_gpu(const faust_unsigned_int i
 	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::right(id);
 }
 
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::transpose_gpu() const
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::transpose();
+}
+
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::conjugate_gpu() const
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::conjugate();
+}
+
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::adjoint_gpu() const
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::adjoint();
+}
+
+    template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::zpruneout_gpu(const int nnz_tres, const int npasses, const bool only_forward)
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::zpruneout(nnz_tres, npasses, only_forward);
+}
+
 #endif

@@ -106,9 +106,9 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* optimize(const bool transp=false);
     FaustCoreCpp<FPP,DEV>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);
     const bool isTransposed();
-    FaustCoreCpp<FPP,DEV>* transpose();
-    FaustCoreCpp<FPP,DEV>* conjugate();
-    FaustCoreCpp<FPP,DEV>* adjoint();
+    FaustCoreCpp<FPP,DEV>* transpose()const;
+    FaustCoreCpp<FPP,DEV>* conjugate()const;
+    FaustCoreCpp<FPP,DEV>* adjoint()const;
     FaustCoreCpp<FPP,DEV>* zpruneout(const int nnz_tres, const int npasses, const bool only_forward);
     ~FaustCoreCpp();
     static FaustCoreCpp<FPP,DEV>* randFaust(unsigned int t,
@@ -136,6 +136,10 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		FaustCoreCppGPU<FPP>* normalize_gpu(int ord) const;
 		FaustCoreCppGPU<FPP>* left_gpu(const faust_unsigned_int) const;
 		FaustCoreCppGPU<FPP>* right_gpu(const faust_unsigned_int) const;
+        FaustCoreCppGPU<FPP>* transpose_gpu() const;
+        FaustCoreCppGPU<FPP>* conjugate_gpu() const;
+        FaustCoreCppGPU<FPP>* adjoint_gpu() const;
+        FaustCoreCppGPU<FPP>* zpruneout_gpu(const int nnz_tres, const int npasses, const bool only_forward);
 		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
 				unsigned int min_num_factors, unsigned int max_num_factors,
 				unsigned int min_dim_size,

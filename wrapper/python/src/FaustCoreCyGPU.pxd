@@ -25,3 +25,9 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCppGPU[FPP]* mul_scal_gpu(const FPP &scal)
         FaustCoreCppGPU[FPP]* left_gpu(const unsigned int) const
         FaustCoreCppGPU[FPP]* right_gpu(const unsigned int) const
+        FaustCoreCppGPU[FPP]* transpose_gpu()
+        FaustCoreCppGPU[FPP]* conjugate_gpu()
+        FaustCoreCppGPU[FPP]* adjoint_gpu()
+        FaustCoreCppGPU[FPP]* zpruneout_gpu(const int nnz_tres, const int npasses,
+                                    const bool only_forward)
+

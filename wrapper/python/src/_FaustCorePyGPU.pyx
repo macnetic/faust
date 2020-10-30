@@ -536,3 +536,43 @@ cdef class FaustCoreGPU:
         core._isReal = self._isReal
         return core
 
+    def transpose(self):
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.transpose_gpu()
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.transpose()
+        core._isReal = self._isReal
+        return core
+
+    def conj(self):
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.conjugate_gpu()
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.conjugate()
+        core._isReal = self._isReal
+        return core
+
+    def zpruneout(self, nnz_tres, npasses, only_forward):
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.zpruneout_gpu(nnz_tres,
+                                                                npasses,
+                                                                only_forward)
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.zpruneout(nnz_tres,
+#                                                                  npasses,
+#                                                                  only_forward)
+        core._isReal = self._isReal
+        return core
+
+    def getH(self):
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.adjoint_gpu()
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.adjoint()
+        core._isReal = self._isReal
+        return core
+

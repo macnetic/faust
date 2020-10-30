@@ -7,6 +7,14 @@ namespace Faust
 	}
 
 	template<typename FPP, FDevice DEV>
+		TransformHelperGen<FPP,DEV>::TransformHelperGen(const TransformHelperGen<FPP,DEV>* th, bool transpose, bool conjugate) : TransformHelperGen<FPP,DEV>()
+	{
+		this->transform = th->transform;
+		this->is_transposed = transpose?!th->is_transposed:th->is_transposed;
+		this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
+    }
+
+	template<typename FPP, FDevice DEV>
 		const char TransformHelperGen<FPP,DEV>::isTransposed2char() const
 		{
 			return this->is_transposed?(this->is_conjugate?'H':'T'):'N';
@@ -137,5 +145,28 @@ namespace Faust
 			for(int i=id; (faust_unsigned_int)i < size(); i++)
 				right_factors.push_back(const_cast<Faust::MatGeneric<FPP,DEV>*>(this->get_gen_fact(i)));
 			return new TransformHelper<FPP,DEV>(right_factors, FPP(1.0), false, copy, true);
+		}
+
+	template<typename FPP, FDevice DEV>
+		faust_unsigned_int TransformHelperGen<FPP,DEV>::getNbRow() const
+		{
+			if(this->is_sliced){
+				faust_unsigned_int id = this->is_transposed?1:0;
+				return	this->slices[id].end_id-this->slices[id].start_id;
+			}
+			else
+				return this->is_transposed?this->transform->getNbCol():this->transform->getNbRow();
+		}
+
+	template<typename FPP, FDevice DEV>
+		faust_unsigned_int TransformHelperGen<FPP,DEV>::getNbCol() const
+		{
+			if(this->is_sliced)
+			{
+				faust_unsigned_int id = this->is_transposed?0:1;
+				return this->slices[id].end_id-this->slices[id].start_id;
+			}
+			else
+				return this->is_transposed?this->transform->getNbRow():this->transform->getNbCol();
 		}
 }

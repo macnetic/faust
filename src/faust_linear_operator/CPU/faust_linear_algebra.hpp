@@ -729,14 +729,14 @@ FPP Faust::fabs(std::complex<FPP> c)
 }
 
 	template<typename FPP>
-void conjugate(std::complex<FPP>* elts, faust_unsigned_int n)
+void Faust::conjugate(std::complex<FPP>* elts, faust_unsigned_int n)
 {
 	for(faust_unsigned_int i=0; i< n; i++)
 		elts[i] = std::complex<FPP>(elts[i].real(), - elts[i].imag());
 }
 
 	template<typename FPP>
-void conjugate(FPP* elts, faust_unsigned_int n)
+void Faust::conjugate(FPP* elts, faust_unsigned_int n)
 {
 	//nothing to do for real numbers
 }

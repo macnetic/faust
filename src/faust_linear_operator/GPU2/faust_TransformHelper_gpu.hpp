@@ -8,6 +8,11 @@ namespace Faust
 	}
 
 	template<typename FPP>
+		TransformHelper<FPP,GPU2>::TransformHelper(const TransformHelper<FPP,GPU2>& th, bool transpose, bool conjugate) : TransformHelperGen<FPP,GPU2>(&th, transpose, conjugate)
+	{
+	}
+
+	template<typename FPP>
 		TransformHelper<FPP,GPU2>::TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_/*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact /*= true*/, const bool internal_call/*=false*/) : TransformHelper<FPP,GPU2>()
 	{
 		for(auto f: facts)
@@ -22,6 +27,9 @@ namespace Faust
 		{
 			for(auto cpu_fact: cpu_t)
 				this->push_back(cpu_fact, false, dev_id, stream);
+            this->is_transposed = cpu_t.is_transposed;
+            this->is_conjugate = cpu_t.is_conjugate;
+            //TODO: slice etc.
 		}
 
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
@@ -69,13 +77,13 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::display() const
 		{
-			this->transform->Display();
+			this->transform->Display(this->is_transposed);
 		}
 
 	template<typename FPP>
 		std::string TransformHelper<FPP,GPU2>::to_string() const
 		{
-			return this->transform->to_string(/*this->is_transposed*/);
+			return this->transform->to_string(this->is_transposed);
 		}
 
 	template<typename FPP>
@@ -99,12 +107,12 @@ namespace Faust
 	template<typename FPP>
 		MatDense<FPP,GPU2> TransformHelper<FPP,GPU2>::get_product()
 		{
-			return this->transform->get_product();
+			return this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
 		}
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::get_product(MatDense<FPP,GPU2>& M)
 		{
-			return this->transform->get_product(M);
+			return this->transform->get_product(M, this->isTransposed2char(), this->is_conjugate);
 		}
 
 	template<typename FPP>
@@ -204,9 +212,13 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::MatDense<FPP,Cpu> &A, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
+		MatDense<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::MatDense<FPP,Cpu> &A, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
+			this->is_transposed ^= transpose;
+			this->is_conjugate ^= conjugate;
 			MatDense<FPP,GPU2> M = this->multiply(MatDense<FPP,GPU2>(A), transpose, conjugate);
+			this->is_conjugate ^= conjugate;
+			this->is_transposed ^= transpose;
 			return M.tocpu();
 		}
 
@@ -351,9 +363,15 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::tocpu(TransformHelper<FPP,Cpu>& cpu_transf) const
 		{
+            //TODO: tocpu support of arguments transpose and conjugate
 			auto t = this->transform->tocpu();
 			for(auto fac: t)
+            {
 				cpu_transf.push_back(fac, false, false);
+            }
+            cpu_transf.is_transposed = this->is_transposed;
+            cpu_transf.is_conjugate = this->is_conjugate;
+            //TODO: slice etc.
 		}
 
 	template<typename FPP>
@@ -384,40 +402,39 @@ namespace Faust
 		{
 			throw std::runtime_error("normalize is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
-//			std::cerr << "Warning: GPU2 normalize is implemented by copying the Faust on CPU RAM and copying them back." << std::endl;
 //			TransformHelper<FPP,Cpu> th;
 //			this->tocpu(th);
-//			auto thn = th.normalize(meth);
-//			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn);
+//            std::cout << "normalize, cpu conv" << std::endl;
+//            th.display();
+//            std::cout << "meth: " << meth << std::endl;
+//			auto thn = th.normalize(meth<0?-meth:meth);
+//            int flag;
+//            std::cout << "thn cpu norm:" << thn->spectralNorm(100, FAUST_PRECISION, flag) << std::endl;
+//			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
 //			delete thn;
 //			return gpu_thn;
 		}
-//
-//	template<typename FPP>
-//		faust_unsigned_int TransformHelper<FPP,GPU2>::get_fact_nnz(const faust_unsigned_int id) const
-//		{
-//			return this->transform->get_fact_nnz();
-//		}
 
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::transpose()
 		{
-			throw std::runtime_error("transpose is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
+
+			auto t = new TransformHelper<FPP,GPU2>(*this, true, false);
+            return t;
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::conjugate()
 		{
-			throw std::runtime_error("conjugate is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
+			auto t = new TransformHelper<FPP,GPU2>(*this, false, true);
+            return t;
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::adjoint()
 		{
-			throw std::runtime_error("adjoint is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
+			auto t = new TransformHelper<FPP,GPU2>(*this, true, true);
+            return t;
 		}
 
 	template<typename FPP>
@@ -482,8 +499,12 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::pruneout(const int nnz_tres, const int npasses/*=-1*/, const bool only_forward/*=false*/)
 		{
-			throw std::runtime_error("pruneout is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
+			TransformHelper<FPP,Cpu> th;
+			this->tocpu(th);
+			auto thn = th.pruneout(nnz_tres, npasses, only_forward);
+			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
+			delete thn;
+			return gpu_thn;
 		}
 
 	template<typename FPP>
@@ -505,7 +526,7 @@ namespace Faust
 		{
 			std::cerr << "Warning: GPU2 hadamardFaust is implemented by copying the Faust on CPU RAM and copying them back." << std::endl;
 			auto cpu_faust = TransformHelper<FPP,Cpu>::hadamardFaust(n, norma);
-			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust/*TODO: dev_id and stream ?*/);
+			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust, -1, nullptr /*TODO: dev_id and stream ?*/);
 			delete cpu_faust;
 			return gpu_faust;
 		}
@@ -515,7 +536,7 @@ namespace Faust
 		{
 			std::cerr << "Warning: GPU2 eyeFaust is implemented by copying the Faust on CPU RAM and copying them back." << std::endl;
 			auto cpu_faust = TransformHelper<FPP,Cpu>::eyeFaust(n, m);
-			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust/*TODO: dev_id and stream ?*/);
+			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust, -1, nullptr /*TODO: dev_id and stream ?*/);
 			delete cpu_faust;
 			return gpu_faust;
 		}

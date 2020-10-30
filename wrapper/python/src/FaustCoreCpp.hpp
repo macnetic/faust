@@ -364,7 +364,7 @@ unsigned int FaustCoreCpp<FPP,DEV>::getNbCol() const
 }
 
     template<typename FPP, FDevice DEV>
-FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::transpose()
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::transpose() const
 {
     Faust::TransformHelper<FPP,DEV>* th = this->transform->transpose();
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
@@ -418,7 +418,7 @@ const bool FaustCoreCpp<FPP,DEV>::isTransposed()
 }
 
     template<typename FPP, FDevice DEV>
-FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::conjugate()
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::conjugate() const
 {
     Faust::TransformHelper<FPP,DEV>* th = this->transform->conjugate();
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
@@ -468,7 +468,7 @@ template<typename FPP, FDevice DEV>
 }
 
 template<typename FPP, FDevice DEV>
-FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::adjoint()
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::adjoint() const
 {
     Faust::TransformHelper<FPP,DEV>* th = this->transform->adjoint();
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);

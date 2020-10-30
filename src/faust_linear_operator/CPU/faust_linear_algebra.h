@@ -44,6 +44,7 @@
 #include "faust_constant.h"
 #include "faust_BlasHandle.h"
 #include "faust_LinearOperator.h"
+#include "faust_MatSparse.h"
 #include <complex>
 #include <string>
 

@@ -244,17 +244,17 @@ namespace Faust
 	}
 
 	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Display() const
+		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Display(bool transpose/*=false*/) const
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			marr_funcs->display(gpu_mat_arr);
+			marr_funcs->display_op(gpu_mat_arr, transpose?OP_TRANSP:OP_NOTRANSP);
 		}
 
 	template<>
-		std::string Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::to_string() const
+		std::string Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::to_string(bool transpose/*=false*/) const
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			const char* cstr = marr_funcs->to_string(gpu_mat_arr);
+			const char* cstr = marr_funcs->to_string_op(gpu_mat_arr, transpose?OP_TRANSP:OP_NOTRANSP);
 			string out_str(cstr);
 			free((void*)cstr);
 			return out_str;
@@ -270,7 +270,7 @@ namespace Faust
 				op = OP_NOTRANSP;
 			else if(opThis == 'T')
 				op = OP_TRANSP;
-			else if(opThis == 'H')
+			else if(opThis == 'H' || opThis == 'T' && isConj)
 				op = OP_CONJTRANSP;
 			else
 				throw std::runtime_error("Invalid opThis");
@@ -279,7 +279,7 @@ namespace Faust
 				dsm_funcs->free(M.gpu_mat);
 			//TODO: rather to delete use a marr_funcs function that allows to pass a pre-allocated output buffer
 			M.gpu_mat = gpu_mat;
-			if(isConj && opThis != 'H') M.conjugate();
+			if(isConj && opThis == 'N') M.conjugate();
 		}
 
 	template<>

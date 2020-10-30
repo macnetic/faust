@@ -16,7 +16,7 @@ namespace Faust
 				TransformHelper();
 				TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
 				TransformHelper(const TransformHelper<FPP,Cpu>& cpu_t, int32_t dev_id=-1, void* stream=nullptr);
-
+                TransformHelper(const TransformHelper<FPP,GPU2>& th, bool transpose, bool conjugate);
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 				template<typename ...GList> TransformHelper(GList& ... t);
 #endif
@@ -25,8 +25,6 @@ namespace Faust
 				void pop_front();
 				void pop_back();
 				void push_first(const MatGeneric<FPP,GPU2>*, const bool optimizedCopy=false, const bool copying=true);
-				faust_unsigned_int getNbRow(){ return this->transform->getNbRow();}
-				faust_unsigned_int getNbCol(){ return this->transform->getNbCol();}
 				faust_unsigned_int getNBytes() const;
 				template<typename Head, typename ... Tail>
 					void push_back_(Head& h, Tail&... t);

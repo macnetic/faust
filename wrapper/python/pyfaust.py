@@ -209,7 +209,7 @@ class Faust:
     @property
     def size(F):
         """
-        Gives the number of elements in the Faust F.
+        Gives the size of the Faust F (that is F.shape[0]*F.shape[1]) .
 
         It's equivalent to numpy.prod(F.shape)).
 
@@ -224,7 +224,8 @@ class Faust:
         Examples:
             >>> from pyfaust import rand
             >>> F = rand(2, 50, field='complex')
-            >>> size = F.size
+            >>> F.size
+            2500
 
         <b/> See also Faust.shape
 

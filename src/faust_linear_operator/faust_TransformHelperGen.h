@@ -26,12 +26,17 @@ namespace Faust
 	template<typename FPP, FDevice DEV>
 	class TransformHelperGen
 	{
+        friend TransformHelper<FPP,GPU2>; // needs to access is_Transposed of TransformHelper<FPP,Cpu>::tocpu
 		public:
 			TransformHelperGen();
+            TransformHelperGen(const TransformHelperGen<FPP,DEV>* th, bool transpose, bool conjugate);
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 			template<typename ...GList> TransformHelperGen(GList& ... t);
 #endif
 
+
+            faust_unsigned_int getNbCol() const;
+            faust_unsigned_int getNbRow() const;
 			virtual void push_back(const MatGeneric<FPP,DEV>* M, const bool optimizedCopy=false, const bool copying=true, const bool transpose=false, const bool conjugate=false)=0;
 
 			const char isTransposed2char() const;

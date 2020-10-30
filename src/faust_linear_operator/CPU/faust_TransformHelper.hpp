@@ -101,15 +101,15 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper(const TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate) : TransformHelper<FPP,Cpu>()
+		TransformHelper<FPP,Cpu>::TransformHelper(const TransformHelper<FPP,Cpu>* th, bool transpose, bool conjugate) : Faust::TransformHelper<FPP,Cpu>()
 	{
 		this->transform = th->transform;
 		this->is_transposed = transpose?!th->is_transposed:th->is_transposed;
+		this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
 		this->is_sliced = th->is_sliced;
 		this->is_fancy_indexed = false;
 		if(th->is_sliced)
 			copy_slices(th);
-		this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
 		this->mul_order_opt_mode = th->mul_order_opt_mode;
 		this->Fv_mul_mode = th->Fv_mul_mode;
 #ifdef USE_GPU_MOD
@@ -626,6 +626,8 @@ namespace Faust {
 				if(!factor_touched && npasses == -1) break;
 			}
 			pth->transform->update_total_nnz();
+            pth->is_transposed = this->is_transposed;
+            pth->is_conjugate = this->is_conjugate;
 			return pth;
 		}
 
@@ -759,6 +761,8 @@ namespace Faust {
 			//this function is here only for python wrapper (TODO: see how to modify that wrapper in order to delete this function after or just use it internally -- not py/matfaust)
 			//TODO: transpose and conjugate must be passed to transform and taken into account for the factor (like it's done in GPU2 impl., i.e.: only possible if copying is true too)
 			this->transform->push_back(M, optimizedCopy, this->is_conjugate, copying); //2nd argument is for opt. (possibly converting dense <-> sparse)
+            if(transpose)
+                get_gen_fact_nonconst(size()-1)->transpose();
 #ifdef USE_GPU_MOD
 			if(gpu_faust)
 				gpu_faust->push_back(const_cast<MatGeneric<FPP,Cpu>*>(M));
@@ -796,29 +800,6 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::push_back_()
 		{
 			// do nothing, here just for empty tail of above function
-		}
-
-	template<typename FPP>
-		faust_unsigned_int TransformHelper<FPP,Cpu>::getNbRow() const
-		{
-			if(this->is_sliced){
-				faust_unsigned_int id = this->is_transposed?1:0;
-				return	this->slices[id].end_id-this->slices[id].start_id;
-			}
-			else
-				return this->is_transposed?this->transform->getNbCol():this->transform->getNbRow();
-		}
-
-	template<typename FPP>
-		faust_unsigned_int TransformHelper<FPP,Cpu>::getNbCol() const
-		{
-			if(this->is_sliced)
-			{
-				faust_unsigned_int id = this->is_transposed?0:1;
-				return this->slices[id].end_id-this->slices[id].start_id;
-			}
-			else
-				return this->is_transposed?this->transform->getNbRow():this->transform->getNbCol();
 		}
 
 	template<typename FPP>
@@ -1437,7 +1418,7 @@ namespace Faust {
 			unsigned int ncols = this->getNbCol();
 			unsigned int nrows = this->getNbRow();
 			//2-norm parameters
-			double precision =  0.001;
+			double precision =  FAUST_PRECISION;
 			faust_unsigned_int nbr_iter_max=100;
 			int flag;
 
