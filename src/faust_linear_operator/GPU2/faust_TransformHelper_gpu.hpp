@@ -375,19 +375,37 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		TransformHelper<FPP,Cpu>* TransformHelper<FPP,GPU2>::tocpu() const
+		{
+			auto cpu_t = new TransformHelper<FPP,Cpu>();
+			tocpu(*cpu_t);
+			return cpu_t;
+		}
+
+	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::vertcat(const TransformHelper<FPP,GPU2>* G)
 		{
-			//TODO
-			throw std::runtime_error("vertcat is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
+			TransformHelper<FPP,Cpu> th;
+			TransformHelper<FPP,Cpu> thG;
+			this->tocpu(th);
+			this->tocpu(thG);
+			auto th_out = th.vertcat(&thG);
+			auto gpu_th_out = new TransformHelper<FPP,GPU2>(*th_out, -1, nullptr);
+			delete th_out;
+			return gpu_th_out;
 		}
 
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::horzcat(const TransformHelper<FPP,GPU2>* G)
 		{
-			//TODO
-			throw std::runtime_error("horzcat is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
+			TransformHelper<FPP,Cpu> th;
+			TransformHelper<FPP,Cpu> thG;
+			this->tocpu(th);
+			this->tocpu(thG);
+			auto th_out = th.horzcat(&thG);
+			auto gpu_th_out = new TransformHelper<FPP,GPU2>(*th_out, -1, nullptr);
+			delete th_out;
+			return gpu_th_out;
 		}
 
 	template<typename FPP>
@@ -507,6 +525,17 @@ namespace Faust
 			return gpu_thn;
 		}
 
+
+	template<typename FPP>
+	TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::clone(int32_t dev_id/*=-1*/, void* stream/*=nullptr*/)
+	{
+		auto clone = new TransformHelper<FPP,GPU2>(this->transform->getData(), /* lambda_ */(FPP)1.0, /*optimizedCopy*/false, /*cloning_fact*/ true, /*internal_call*/ true);
+		clone->is_transposed = this->is_transposed;
+		clone->is_conjugate = this->is_conjugate;
+		//TODO: slice etc
+		return clone;
+	}
+
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row)
 		{
@@ -524,7 +553,7 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::hadamardFaust(unsigned int n, const bool norma/*=true*/)
 		{
-			std::cerr << "Warning: GPU2 hadamardFaust is implemented by copying the Faust on CPU RAM and copying them back." << std::endl;
+//			std::cerr << "Warning: GPU2 hadamardFaust is implemented by copying the Faust on CPU RAM and copying them back." << std::endl;
 			auto cpu_faust = TransformHelper<FPP,Cpu>::hadamardFaust(n, norma);
 			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust, -1, nullptr /*TODO: dev_id and stream ?*/);
 			delete cpu_faust;
@@ -534,7 +563,7 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::eyeFaust(unsigned int n, unsigned int m)
 		{
-			std::cerr << "Warning: GPU2 eyeFaust is implemented by copying the Faust on CPU RAM and copying them back." << std::endl;
+//			std::cerr << "Warning: GPU2 eyeFaust is implemented by copying the Faust on CPU RAM and copying them back." << std::endl;
 			auto cpu_faust = TransformHelper<FPP,Cpu>::eyeFaust(n, m);
 			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust, -1, nullptr /*TODO: dev_id and stream ?*/);
 			delete cpu_faust;

@@ -99,8 +99,8 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCpp[FPP]* adjoint()
         FaustCoreCpp[FPP]* zpruneout(const int nnz_tres, const int npasses,
                                     const bool only_forward)
-        FaustCoreCpp[FPP]* vertcat(FaustCoreCpp[FPP]*)
-        FaustCoreCpp[FPP]* horzcat(FaustCoreCpp[FPP]*)
+        FaustCoreCpp[FPP]* vertcat(FaustCoreCpp[FPP]*) const
+        FaustCoreCpp[FPP]* horzcat(FaustCoreCpp[FPP]*) const
         FaustCoreCpp[FPP]* mul_faust(FaustCoreCpp[FPP]*)
         FaustCoreCpp[FPP]* mul_scal(FPP scal)
         @staticmethod

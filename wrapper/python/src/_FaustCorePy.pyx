@@ -420,7 +420,7 @@ cdef class FaustCore:
     # Left-Multiplication by a Faust F
     # y=multiply(F,M) is equivalent to y=F*M
     def multiply(self,M):
-        if(isinstance(M, FaustCore)):
+        if(isinstance(M, (FaustCore, FaustCoreGPU))):
             return self.multiply_faust(M)
         if not isinstance(M, np.ndarray):
             raise ValueError('input M must be a numpy.ndarray')

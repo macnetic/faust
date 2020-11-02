@@ -82,7 +82,7 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::mul_faust(FaustCoreCpp<FPP,DEV>* r
 }
 
 template<typename FPP, FDevice DEV>
-FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::vertcat(FaustCoreCpp<FPP,DEV>* right)
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::vertcat(FaustCoreCpp<FPP,DEV>* right) const
 {
     Faust::TransformHelper<FPP,DEV>* th = this->transform->vertcat(right->transform);
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
@@ -90,7 +90,7 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::vertcat(FaustCoreCpp<FPP,DEV>* rig
 }
 
 template<typename FPP, FDevice DEV>
-FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::horzcat(FaustCoreCpp<FPP,DEV>* right)
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::horzcat(FaustCoreCpp<FPP,DEV>* right) const
 {
     Faust::TransformHelper<FPP,DEV>* th = this->transform->horzcat(right->transform);
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);

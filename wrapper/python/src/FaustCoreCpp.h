@@ -73,8 +73,8 @@ class FaustCoreCpp
     void set_Fv_mul_mode(const int mode);
     void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x/*,bool isTranspose*/)const;
     FaustCoreCpp<FPP,DEV>* mul_faust(FaustCoreCpp<FPP,DEV>* right);
-    FaustCoreCpp<FPP,DEV>* vertcat(FaustCoreCpp<FPP,DEV>* right);
-    FaustCoreCpp<FPP,DEV>* horzcat(FaustCoreCpp<FPP,DEV>* right);
+    FaustCoreCpp<FPP,DEV>* vertcat(FaustCoreCpp<FPP,DEV>* right) const;
+    FaustCoreCpp<FPP,DEV>* horzcat(FaustCoreCpp<FPP,DEV>* right) const;
     FaustCoreCpp<FPP,DEV>* mul_scal(FPP scal);
     FaustCoreCpp<FPP,DEV>* normalize(int ord) const;
     unsigned long long nnz()const;
@@ -139,7 +139,11 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
         FaustCoreCppGPU<FPP>* transpose_gpu() const;
         FaustCoreCppGPU<FPP>* conjugate_gpu() const;
         FaustCoreCppGPU<FPP>* adjoint_gpu() const;
-        FaustCoreCppGPU<FPP>* zpruneout_gpu(const int nnz_tres, const int npasses, const bool only_forward);
+		FaustCoreCppGPU<FPP>* zpruneout_gpu(const int nnz_tres, const int npasses, const bool only_forward);
+		FaustCoreCppGPU<FPP>* clone_gpu(int dev_id=-1) const;
+		FaustCoreCpp<FPP,Cpu>* clone_cpu() const;
+		FaustCoreCppGPU<FPP>* horzcat_gpu(FaustCoreCppGPU<FPP>* right) const;
+		FaustCoreCppGPU<FPP>* vertcat_gpu(FaustCoreCppGPU<FPP>* right) const;
 		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
 				unsigned int min_num_factors, unsigned int max_num_factors,
 				unsigned int min_dim_size,

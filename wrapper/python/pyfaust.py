@@ -135,8 +135,13 @@ class Faust:
         else:
             scale = 1.0
         if("gpu" in kwargs.keys()):
+            # TODO: deprecated, delete
             is_on_gpu = True
             gpu_dev = kwargs['gpu']
+        if("dev" in kwargs.keys()):
+            dev = kwargs['dev']
+            if dev.startswith('gpu'):
+                is_on_gpu = True
         if("core_obj" in kwargs.keys()):
             core_obj = kwargs['core_obj']
             if(core_obj):
@@ -490,6 +495,12 @@ class Faust:
 
         See also Faust.__sub__
         """
+        dev = 'cpu'
+        if isinstance(F.m_faust, _FaustCorePy.FaustCoreGPU):
+            dev = 'gpu'
+            if isinstance(F.m_faust, _FaustCorePy.FaustCoreGPU):
+                #TODO: debug and enable
+                raise ValueError("add is not supported on GPU")
         for i in range(0,len(args)):
             G = args[i]
             if(isinstance(G,Faust)):
@@ -497,7 +508,7 @@ class Faust:
                     raise Exception('Dimensions must agree')
                 C = F.concatenate(G, axis=1)
                 # Id = np.eye(int(C.shape[1]/2))
-                Fid = eye(int(C.shape[1]/2))
+                Fid = eye(int(C.shape[1]/2), dev=dev)
                 #F = C*Faust(np.concatenate((Id,Id)),axis=0)
                 F = C*Fid.concatenate(Fid,axis=0)
             elif(isinstance(G,np.ndarray) or
@@ -786,7 +797,6 @@ class Faust:
         else:
             raise TypeError("invalid type operand for Faust.__matmul__.")
 
-    #def concatenate(F, *args, axis=0): # py. 2 doesn't handle this signature
     def concatenate(F, *args, **kwargs):
         """
             Concatenates F with len(args) Faust objects, numpy arrays or scipy sparse matrices.
@@ -1749,14 +1759,22 @@ class Faust:
                                                           nsamples))
             return F_opt
 
-    def clone(F):
+    def clone(F, dev='cpu'):
         """
         Clones the Faust (in a new memory space).
+
+        Args:
+            dev: 'cpu' to clone on CPU RAM, 'gpu:id' to clone on the GPU device
+            #id (e.g. gpu:0).
 
         Returns:
             The Faust clone.
         """
-        return Faust([self.factors(i) for i in range(self.numfactors())])
+        if isinstance(F.m_faust, _FaustCorePy.FaustCoreGPU):
+             clone_F = Faust(core_obj=F.m_faust.clone(dev))
+             return clone_F
+        else:
+            return Faust([F.factors(i) for i in range(F.numfactors())], dev=dev)
 
 pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__
 

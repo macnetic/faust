@@ -576,3 +576,66 @@ cdef class FaustCoreGPU:
         core._isReal = self._isReal
         return core
 
+    def clone(self, dev='cpu'):
+        core_gpu = FaustCoreGPU(core=True)
+        core_cpu = FaustCore(core=True)
+        if(dev.startswith('gpu')):
+            if(self._isReal):
+                core_gpu.core_faust_dbl = self.core_faust_dbl.clone_gpu()
+    #        else:
+    #            core_gpu.core_faust_cplx = self.core_faust_cplx.clone_gpu()
+            core_gpu._isReal = self._isReal
+            return core_gpu
+        elif(dev == 'cpu'):
+            if(self._isReal):
+                core_cpu.core_faust_dbl = self.core_faust_dbl.clone_cpu()
+                core_cpu._isReal = self._isReal
+    #        else:
+    #            core_cpu.core_faust_cplx = self.core_faust_cplx.clone_cpu()
+            return core_cpu
+        else:
+            raise ValueError('dev='+str(dev)+' is not a valid device')
+
+    def vertcat(self,F):
+#        if(F.isReal() and not self.isReal()):
+#            return self._vertcat((<FaustCore?>F)._ascomplex())
+        return self._vertcat(F)
+
+    cdef _horzcat(self, F):
+         #TODO: refactor with _vertcat(), maybe by passing func ref to a cat func
+         core = FaustCoreGPU(core=True)
+         #TODO/ F must be a FaustCore
+         if(self._isReal):
+#             if(not F.isReal()):
+#                 self = self._ascomplex()
+#                 core.core_faust_cplx = self.core_faust_cplx.horzcat((<FaustCore?>F).core_faust_cplx)
+#             else:
+            core.core_faust_dbl = \
+            self.core_faust_dbl.horzcat_gpu((<FaustCoreGPU?>F).core_faust_dbl)
+#         else:
+#             core.core_faust_cplx = \
+#                     self.core_faust_cplx.horzcat((<FaustCore?>F).core_faust_cplx)
+         core._isReal = core.core_faust_dbl != NULL
+         return core
+
+    def horzcat(self,F):
+#        if(F.isReal() and not self.isReal()):
+#            return self._horzcat((<FaustCore?>F)._ascomplex())
+        return self._horzcat(F)
+
+    cdef _vertcat(self, F):
+         core = FaustCoreGPU(core=True)
+         #TODO/ F must be a FaustCore
+         if(self._isReal):
+#             if(not F.isReal()):
+#                 self = self._ascomplex()
+#                 core.core_faust_cplx = self.core_faust_cplx.vertcat((<FaustCore?>F).core_faust_cplx)
+#             else:
+            core.core_faust_dbl = \
+            self.core_faust_dbl.vertcat_gpu((<FaustCoreGPU?>F).core_faust_dbl)
+#         else:
+#             core.core_faust_cplx = \
+#                     self.core_faust_cplx.vertcat((<FaustCore?>F).core_faust_cplx)
+         core._isReal = core.core_faust_dbl != NULL
+         return core
+

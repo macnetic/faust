@@ -71,6 +71,7 @@ namespace Faust
 			void tocpu(Transform<FPP, Cpu>& cpu_transf) const;
 			Transform<FPP, Cpu> tocpu() const;
 			void save_mat_file(const char* filename, const bool transpose, const bool conjugate) const;
+			vector<MatGeneric<FPP,GPU2>*> getData() const {return data;} //TODO: delete and make TransformHelper a friend
 
 //			using transf_iterator = typename std::vector<MatGeneric<FPP,Cpu>*>::const_iterator;
 //

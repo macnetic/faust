@@ -31,3 +31,8 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCppGPU[FPP]* zpruneout_gpu(const int nnz_tres, const int npasses,
                                     const bool only_forward)
 
+        FaustCoreCppGPU[FPP]* clone_gpu()
+        FaustCoreCpp[FPP]* clone_cpu()
+        FaustCoreCppGPU[FPP]* vertcat_gpu(FaustCoreCppGPU[FPP]*) const
+        FaustCoreCppGPU[FPP]* horzcat_gpu(FaustCoreCppGPU[FPP]*) const
+

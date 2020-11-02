@@ -107,4 +107,32 @@ FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::zpruneout_gpu(const int nnz_tres, co
 	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::zpruneout(nnz_tres, npasses, only_forward);
 }
 
+    template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::clone_gpu(int dev_id/*=-1*/) const
+{
+    Faust::TransformHelper<FPP,GPU2>* th = this->transform->clone(dev_id);
+    FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
+    return core;
+}
+
+template<typename FPP>
+FaustCoreCpp<FPP,Cpu>* FaustCoreCppGPU<FPP>::clone_cpu() const
+{
+    Faust::TransformHelper<FPP,Cpu>* th = this->transform->tocpu();
+    auto core = new FaustCoreCpp<FPP, Cpu>(th);
+    return core;
+}
+
+
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::horzcat_gpu(FaustCoreCppGPU<FPP>* right) const
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::horzcat(right);
+}
+
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::vertcat_gpu(FaustCoreCppGPU<FPP>* right) const
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::vertcat(right);
+}
 #endif
