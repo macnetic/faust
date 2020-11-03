@@ -80,7 +80,6 @@ namespace Faust
 #ifdef USE_GPU_MOD
 			FaustGPU<FPP> *gpu_faust;
 #endif
-			void eval_sliced_Transform();
 			void eval_fancy_idx_Transform();
 			public:
 			TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
@@ -149,8 +148,6 @@ namespace Faust
 					faust_unsigned_int* num_rows,
 					faust_unsigned_int* num_cols,
 					const bool transpose = false) const;
-			TransformHelper<FPP, Cpu>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
-					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 			TransformHelper<FPP, Cpu>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			MatDense<FPP,Cpu> get_product();// const;
 			void get_product(MatDense<FPP,Cpu>& prod) const;

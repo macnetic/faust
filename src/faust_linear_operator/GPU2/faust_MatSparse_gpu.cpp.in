@@ -367,4 +367,52 @@ namespace Faust
 			this->gpu_mat = mat.gpu_mat;
 			mat.gpu_mat = nullptr;
 		}
+
+	template<>
+		Faust::MatSparse<FSFG,GPU2>* Faust::MatSparse<FSFG,GPU2>::get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const
+		{
+			//TODO: pure GPU impl.
+			MatSparse<FSFG,Cpu> cpu_copy;
+			tocpu(cpu_copy);
+			auto cpu_rows = cpu_copy.get_rows(row_id_start, num_rows);
+			auto gpu_rows = new MatSparse<FSFG,GPU2>(*cpu_rows);
+			delete cpu_rows;
+			return gpu_rows;
+		}
+
+	template<>
+		Faust::MatSparse<FSFG,GPU2>* Faust::MatSparse<FSFG,GPU2>::get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const
+		{
+			//TODO: pure GPU impl.
+			MatSparse<FSFG,Cpu> cpu_copy;
+			tocpu(cpu_copy);
+			auto cpu_rows = cpu_copy.get_rows(row_ids, num_rows);
+			auto gpu_rows = new MatSparse<FSFG,GPU2>(*cpu_rows);
+			delete cpu_rows;
+			return gpu_rows;
+		}
+
+	template<>
+		Faust::MatSparse<FSFG,GPU2>* Faust::MatSparse<FSFG,GPU2>::get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const
+		{
+			//TODO: pure GPU impl.
+			MatSparse<FSFG,Cpu> cpu_copy;
+			tocpu(cpu_copy);
+			auto cpu_cols = cpu_copy.get_cols(col_id_start, num_cols);
+			auto gpu_cols = new MatSparse<FSFG,GPU2>(*cpu_cols);
+			delete cpu_cols;
+			return gpu_cols;
+		}
+
+	template<>
+		Faust::MatSparse<FSFG,GPU2>* Faust::MatSparse<FSFG,GPU2>::get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const
+		{
+			//TODO: pure GPU impl.
+			MatSparse<FSFG,Cpu> cpu_copy;
+			tocpu(cpu_copy);
+			auto cpu_cols = cpu_copy.get_cols(col_ids, num_cols);
+			auto gpu_cols = new MatSparse<FSFG,GPU2>(*cpu_cols);
+			delete cpu_cols;
+			return gpu_cols;
+		}
 };

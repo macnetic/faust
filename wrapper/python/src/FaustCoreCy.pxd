@@ -84,7 +84,7 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCpp[FPP]* get_slice(unsigned int, unsigned int, unsigned int,
                                     unsigned int) const
         FaustCoreCpp[FPP]* slice(unsigned int, unsigned int, unsigned int,
-                                    unsigned int)
+                                    unsigned int) const
         FaustCoreCpp[FPP]* fancy_idx(unsigned long int* row_ids, unsigned long int
                                   num_rows, unsigned long int* col_ids,
                                   unsigned long int num_cols)

@@ -106,6 +106,12 @@ namespace Faust
 				int32_t getNbRow() const;
 				int32_t getNbCol() const;
 				faust_unsigned_int getNonZeros() const;
+				MatDense<FPP,GPU2>* get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const;
+				MatDense<FPP,GPU2>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int n) const;
+				MatDense<FPP,GPU2>* get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const;
+				MatDense<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const;
+
+
 			protected:
 				gm_DenseMat_t gpu_mat;
 				void* get_gpu_mat_ptr() const;

@@ -32,6 +32,12 @@ namespace Faust
             //TODO: slice etc.
 		}
 
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>::TransformHelper(TransformHelper<FPP,GPU2>* th, Slice s[2]): TransformHelper<FPP,GPU2>()
+	{
+		this->init_sliced_transform(th, s);
+	}
+
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 	template<typename FPP>
 		template<typename ... GList>
@@ -40,6 +46,8 @@ namespace Faust
 			this->push_back_(t...);
 		}
 #endif
+
+
 
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::push_back(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy/*=false*/, const bool copying/*=true*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
@@ -447,13 +455,11 @@ namespace Faust
             return t;
 		}
 
-	template<typename FPP>
-		TransformHelper<FPP, GPU2>* TransformHelper<FPP, GPU2>::slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
-				faust_unsigned_int start_col_id, faust_unsigned_int end_col_id)
-		{
-			throw std::runtime_error("slice is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
-		}
+//	template<typename FPP>
+//		TransformHelper<FPP, GPU2>* TransformHelper<FPP, GPU2>::slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
+//				faust_unsigned_int start_col_id, faust_unsigned_int end_col_id)
+//		{
+//		}
 
 	template<typename FPP>
 		TransformHelper<FPP, GPU2>* TransformHelper<FPP,GPU2>::fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)

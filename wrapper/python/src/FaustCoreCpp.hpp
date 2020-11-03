@@ -297,7 +297,7 @@ bool FaustCoreCpp<FPP,DEV>::is_fact_sparse(const faust_unsigned_int id) const
 }
 
 template<typename FPP, FDevice DEV>
-FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::slice(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id)
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::slice(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id) const
 {
     Faust::TransformHelper<FPP,DEV>* th = this->transform->slice(start_row_id, end_row_id, start_col_id, end_col_id);
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);

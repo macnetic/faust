@@ -1159,7 +1159,8 @@ MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_cols(std::vector<int> col_ids) const
 template<typename FPP>
 MatDense<FPP,Cpu>* MatDense<FPP,Cpu>::get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const
 {
-	//TODO: check args
+	if(start_row_id >= this->getNbRow() || start_row_id+num_rows > this->getNbRow())
+		throw std::domain_error("get_rows: arguments out of row indices.");
 	FPP *data = new FPP[this->getNbCol()*num_rows];
 	for(faust_unsigned_int i = 0; i < this->getNbCol(); i++){
 		memcpy(data+i*num_rows, getData()+start_row_id+i*this->getNbRow(), num_rows*sizeof(FPP));

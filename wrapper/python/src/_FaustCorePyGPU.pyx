@@ -651,3 +651,23 @@ cdef class FaustCoreGPU:
         py_str = c_str[:length].decode('UTF-8', 'ignore')
         return py_str
 
+    def slice(self, indices):
+        # TODO: rename this function or cut in two: slice and fancy indexing
+        core = FaustCoreGPU(core=True)
+        start_row_id, end_row_id, start_col_id, end_col_id = (indices[0].start,
+                                                              indices[0].stop,
+                                                              indices[1].start,
+                                                              indices[1].stop)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.slice_gpu(start_row_id,
+                                                            end_row_id,
+                                                            start_col_id,
+                                                            end_col_id)
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.slice_gpu(start_row_id,
+#                                                              end_row_id,
+#                                                              start_col_id,
+#                                                              end_col_id)
+
+        core._isReal = self._isReal
+        return core

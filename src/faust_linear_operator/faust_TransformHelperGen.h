@@ -87,8 +87,12 @@ namespace Faust
 			void copy_state(const TransformHelper<FPP,DEV>& th);
 			int get_mul_order_opt_mode() const;
 			int get_Fv_mul_mode() const;
+			void eval_sliced_Transform();
+			TransformHelper<FPP, DEV>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
+					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 
 		protected:
+			void init_sliced_transform(TransformHelper<FPP,DEV>* th, Slice s[2]);
 			bool is_transposed;
 			bool is_conjugate;
 			bool is_sliced;

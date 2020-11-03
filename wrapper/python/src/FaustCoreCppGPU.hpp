@@ -142,4 +142,10 @@ void  FaustCoreCppGPU<FPP>::device_gpu(char* dev) const
 	//TODO: get the device id
 	std::strncpy(dev, "gpu", 4);
 }
+
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::slice_gpu(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id) const
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::slice(start_row_id, end_row_id, start_col_id, end_col_id);
+}
 #endif

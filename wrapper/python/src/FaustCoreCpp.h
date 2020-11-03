@@ -98,7 +98,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* right(const faust_unsigned_int) const;
     faust_unsigned_int get_fact_nnz(const faust_unsigned_int) const;
     bool is_fact_sparse(const faust_unsigned_int id) const;
-    FaustCoreCpp<FPP,DEV>* slice(unsigned int, unsigned int, unsigned int, unsigned int);
+    FaustCoreCpp<FPP,DEV>* slice(unsigned int, unsigned int, unsigned int, unsigned int) const;
     FaustCoreCpp<FPP,DEV>* fancy_idx(unsigned long int* row_ids, unsigned long int
                                   num_rows, unsigned long int* col_ids,
                                   unsigned long int num_cols);
@@ -146,6 +146,7 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		FaustCoreCpp<FPP,Cpu>* clone_cpu() const;
 		FaustCoreCppGPU<FPP>* horzcat_gpu(FaustCoreCppGPU<FPP>* right) const;
 		FaustCoreCppGPU<FPP>* vertcat_gpu(FaustCoreCppGPU<FPP>* right) const;
+		FaustCoreCppGPU<FPP>* slice_gpu(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id) const;
 		void device_gpu(char* dev) const;
 		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
 				unsigned int min_num_factors, unsigned int max_num_factors,

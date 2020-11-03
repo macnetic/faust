@@ -24,7 +24,7 @@ namespace Faust
 			static RefManager ref_man;
 			public:
 			Transform();
-			Transform(const std::vector<MatGeneric<FPP,GPU2>*> &factors);
+			Transform(const std::vector<MatGeneric<FPP,GPU2>*> &factors, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact=true);
 			Transform(const Transform<FPP,GPU2>& t);
 			~Transform();
 			void operator=(const Transform<FPP,GPU2>& t);

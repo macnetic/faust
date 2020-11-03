@@ -89,6 +89,12 @@ namespace Faust
 				MatType getType() const;
 				~MatSparse();
 
+			MatSparse<FPP,GPU2>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
+			MatSparse<FPP,GPU2>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
+			MatSparse<FPP,GPU2>* get_cols(faust_unsigned_int col_id_start, faust_unsigned_int num_cols) const;
+			MatSparse<FPP,GPU2>* get_cols(faust_unsigned_int* col_ids, faust_unsigned_int num_cols) const;
+
+
 			private:
 				void* get_gpu_mat_ptr() const;
 				void set_gpu_mat_ptr(void*);

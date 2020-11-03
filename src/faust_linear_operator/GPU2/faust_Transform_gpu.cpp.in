@@ -229,8 +229,9 @@ namespace Faust
 		}
 
 	template<>
-		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform(const std::vector<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*> &factors) : Transform()
+		Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::Transform(const std::vector<MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>*> &factors, const @FAUST_SCALAR_FOR_GM@ lambda_ /*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact/*=true*/) : Transform()
 	{
+		//TODO: take optional arguments into account
 		GPUModHandler::get_singleton()->check_gpu_mod_loaded();
 
 		auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));

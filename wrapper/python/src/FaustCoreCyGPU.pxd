@@ -36,4 +36,6 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCppGPU[FPP]* vertcat_gpu(FaustCoreCppGPU[FPP]*) const
         FaustCoreCppGPU[FPP]* horzcat_gpu(FaustCoreCppGPU[FPP]*) const
         void device_gpu(char*) const
+        FaustCoreCppGPU[FPP]* slice_gpu(unsigned int, unsigned int, unsigned int,
+                                    unsigned int) const
 

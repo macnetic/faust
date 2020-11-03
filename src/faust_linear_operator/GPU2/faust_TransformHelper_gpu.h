@@ -14,6 +14,7 @@ namespace Faust
 		{
 			public:
 				TransformHelper();
+				TransformHelper(TransformHelper<FPP,GPU2>* th, Slice s[2]);
 				TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_ = (FPP)1.0, const bool optimizedCopy=false, const bool cloning_fact = true, const bool internal_call=false);
 				TransformHelper(const TransformHelper<FPP,Cpu>& cpu_t, int32_t dev_id=-1, void* stream=nullptr);
                 TransformHelper(const TransformHelper<FPP,GPU2>& th, bool transpose, bool conjugate);
@@ -66,8 +67,8 @@ namespace Faust
 				TransformHelper<FPP,GPU2>* transpose();
 				TransformHelper<FPP,GPU2>* conjugate();
 				TransformHelper<FPP,GPU2>* adjoint();
-				TransformHelper<FPP, GPU2>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
-						faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
+//				TransformHelper<FPP, GPU2>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
+//						faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
 				TransformHelper<FPP, GPU2>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 
 				TransformHelper<FPP,GPU2>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);

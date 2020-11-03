@@ -615,4 +615,47 @@ namespace Faust
 			throw std::runtime_error("gpu_mat is nullptr");
 		}
 
+	template<>
+		MatDense<FSFG,GPU2>* MatDense<FSFG,GPU2>::get_rows(faust_unsigned_int start_row_id, faust_unsigned_int num_rows) const
+		{
+			//TODO: pure GPU impl.
+			auto cpu_mat = tocpu();
+			auto cpu_rows = cpu_mat.get_rows(start_row_id, num_rows);
+			auto gpu_rows = new MatDense<FSFG,GPU2>(*cpu_rows);
+			delete cpu_rows;
+			return gpu_rows;
+		}
+
+	template<>
+		MatDense<FSFG,GPU2>* MatDense<FSFG,GPU2>::get_rows(faust_unsigned_int* row_ids, faust_unsigned_int n) const
+		{
+			//TODO: pure GPU impl.
+			auto cpu_mat = tocpu();
+			auto cpu_rows = cpu_mat.get_rows(row_ids, n);
+			auto gpu_rows = new MatDense<FSFG,GPU2>(*cpu_rows);
+			delete cpu_rows;
+			return gpu_rows;
+		}
+
+	template<>
+		MatDense<FSFG,GPU2>* MatDense<FSFG,GPU2>::get_cols(faust_unsigned_int start_col_id, faust_unsigned_int num_cols) const
+		{
+			//TODO: pure GPU impl.
+			auto cpu_mat = tocpu();
+			auto cpu_cols = cpu_mat.get_cols(start_col_id, num_cols);
+			auto gpu_cols = new MatDense<FSFG,GPU2>(*cpu_cols);
+			delete cpu_cols;
+			return gpu_cols;
+		}
+
+	template<>
+		MatDense<FSFG,GPU2>* MatDense<FSFG,GPU2>::get_cols(faust_unsigned_int* col_ids, faust_unsigned_int n) const
+		{
+			//TODO: pure GPU impl.
+			auto cpu_mat = tocpu();
+			auto cpu_cols = cpu_mat.get_cols(col_ids, n);
+			auto gpu_cols = new MatDense<FSFG,GPU2>(*cpu_cols);
+			delete cpu_cols;
+			return gpu_cols;
+		}
 };
