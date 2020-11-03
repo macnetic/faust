@@ -134,10 +134,6 @@ class Faust:
                 raise Exception("Scale must be a number.")
         else:
             scale = 1.0
-        if("gpu" in kwargs.keys()):
-            # TODO: deprecated, delete
-            is_on_gpu = True
-            gpu_dev = kwargs['gpu']
         if("dev" in kwargs.keys()):
             dev = kwargs['dev']
             if dev.startswith('gpu'):
@@ -236,6 +232,17 @@ class Faust:
 
         """
         return np.prod(F.shape)
+
+    @property
+    def device(self):
+        """
+        Returns the device on which the Faust is located (cpu or gpu).
+        """
+        if(isinstance(self.m_faust, (_FaustCorePy.FaustCoreGPU,
+                      _FaustCorePy.FaustCore))):
+            return self.m_faust.device()
+        else:
+            raise TypeError('This Faust object is invalid.')
 
     def transpose(F):
         """

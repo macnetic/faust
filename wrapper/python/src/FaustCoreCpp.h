@@ -50,6 +50,7 @@
 #include "faust_TransformHelper_gpu.h"
 #endif
 #include "faust_TransformHelper.h"
+#include <cstring>
 
 template<typename FPP, FDevice DEV=Cpu>
 class FaustCoreCpp
@@ -110,6 +111,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* conjugate()const;
     FaustCoreCpp<FPP,DEV>* adjoint()const;
     FaustCoreCpp<FPP,DEV>* zpruneout(const int nnz_tres, const int npasses, const bool only_forward);
+	void device(char* dev) const;
     ~FaustCoreCpp();
     static FaustCoreCpp<FPP,DEV>* randFaust(unsigned int t,
             unsigned int min_num_factors, unsigned int max_num_factors,
@@ -144,6 +146,7 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		FaustCoreCpp<FPP,Cpu>* clone_cpu() const;
 		FaustCoreCppGPU<FPP>* horzcat_gpu(FaustCoreCppGPU<FPP>* right) const;
 		FaustCoreCppGPU<FPP>* vertcat_gpu(FaustCoreCppGPU<FPP>* right) const;
+		void device_gpu(char* dev) const;
 		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
 				unsigned int min_num_factors, unsigned int max_num_factors,
 				unsigned int min_dim_size,

@@ -103,6 +103,7 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCpp[FPP]* horzcat(FaustCoreCpp[FPP]*) const
         FaustCoreCpp[FPP]* mul_faust(FaustCoreCpp[FPP]*)
         FaustCoreCpp[FPP]* mul_scal(FPP scal)
+        void device(char*) const
         @staticmethod
         FaustCoreCpp[FPP]* randFaust(unsigned int t,
                                              unsigned int min_num_factors, unsigned int max_num_factors,

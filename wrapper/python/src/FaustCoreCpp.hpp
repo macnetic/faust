@@ -487,6 +487,12 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::zpruneout(const int nnz_tres, cons
 }
 
 template<typename FPP, FDevice DEV>
+void  FaustCoreCpp<FPP,DEV>::device(char* dev) const
+{
+	std::strncpy(dev, "cpu", 4);
+}
+
+template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>::~FaustCoreCpp()
 {
     if(transform) delete transform;

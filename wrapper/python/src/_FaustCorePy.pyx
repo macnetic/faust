@@ -351,6 +351,17 @@ cdef class FaustCore:
         core._isReal = False
         return core
 
+    def device(self):
+        # always returns cpu but calls the cpp code just in case
+        cdef char c_str[256]
+        if(self._isReal):
+            self.core_faust_dbl.device(c_str)
+        else:
+            self.core_faust_cplx.device(c_str)
+        cdef length = strlen(c_str)
+        py_str = c_str[:length].decode('UTF-8', 'ignore')
+        return py_str
+
     def multiply_scal(self, scalar):
         core = FaustCore(core=True)
         core._isReal = self._isReal

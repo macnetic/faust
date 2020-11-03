@@ -639,3 +639,15 @@ cdef class FaustCoreGPU:
          core._isReal = core.core_faust_dbl != NULL
          return core
 
+    def device(self):
+        cdef char c_str[256]
+        if(self._isReal):
+            self.core_faust_dbl.device_gpu(c_str)
+#        else:
+#            self.core_faust_cplx.device_gpu(c_str)
+        cdef length = strlen(c_str)
+        #printf("%s", c_str[:length])
+        #py_str = str(c_str[:length], 'UTF-8')
+        py_str = c_str[:length].decode('UTF-8', 'ignore')
+        return py_str
+

@@ -35,4 +35,5 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCpp[FPP]* clone_cpu()
         FaustCoreCppGPU[FPP]* vertcat_gpu(FaustCoreCppGPU[FPP]*) const
         FaustCoreCppGPU[FPP]* horzcat_gpu(FaustCoreCppGPU[FPP]*) const
+        void device_gpu(char*) const
 

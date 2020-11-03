@@ -135,4 +135,11 @@ FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::vertcat_gpu(FaustCoreCppGPU<FPP>* ri
 {
 	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::vertcat(right);
 }
+
+template<typename FPP>
+void  FaustCoreCppGPU<FPP>::device_gpu(char* dev) const
+{
+	//TODO: get the device id
+	std::strncpy(dev, "gpu", 4);
+}
 #endif
