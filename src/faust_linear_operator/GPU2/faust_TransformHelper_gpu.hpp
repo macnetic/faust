@@ -343,15 +343,7 @@ namespace Faust
 	template<typename FPP>
 		void TransformHelper<FPP,GPU2>::operator=(TransformHelper<FPP,GPU2>& th)
 		{
-			//TODO: factorize with TranformHelper<FPP,Cpu> into parent class TransformHelperGen.
-			this->transform = th.transform;
-			this->is_transposed = th.is_transposed;
-			this->is_conjugate = th.is_conjugate;
-			this->is_sliced = th.is_sliced;
-			if(th.is_sliced)
-				copy_slices(&th);
-			this->mul_order_opt_mode = th.mul_order_opt_mode;
-			this->Fv_mul_mode = th.Fv_mul_mode;
+			copy_state(th);
 		}
 
 	template<typename FPP>

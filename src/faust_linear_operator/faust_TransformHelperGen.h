@@ -80,6 +80,14 @@ namespace Faust
 */
 			TransformHelper<FPP,DEV>* right(const faust_unsigned_int id, const bool copy=false) const;
 
+			void copy_slices(const TransformHelper<FPP,DEV>* th, const bool transpose = false);
+			void copy_slice_state(const TransformHelper<FPP,DEV>& th);
+			void copy_transconj_state(const TransformHelper<FPP,DEV>& th);
+			virtual void copy_mul_mode_state(const TransformHelper<FPP,DEV>& th);
+			void copy_state(const TransformHelper<FPP,DEV>& th);
+			int get_mul_order_opt_mode() const;
+			int get_Fv_mul_mode() const;
+
 		protected:
 			bool is_transposed;
 			bool is_conjugate;
@@ -90,6 +98,9 @@ namespace Faust
 			faust_unsigned_int fancy_num_rows;
 			faust_unsigned_int fancy_num_cols;
 			std::shared_ptr<Transform<FPP,DEV>> transform;
+			int mul_order_opt_mode;
+			int Fv_mul_mode;
+
 	};
 }
 #include "faust_TransformHelperGen.hpp"

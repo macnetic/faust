@@ -52,7 +52,7 @@ namespace Faust {
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(const std::vector<MatGeneric<FPP,Cpu> *>& facts,
 				const FPP lambda_, const bool optimizedCopy, const bool cloning_fact,
-				const bool internal_call) :TransformHelper<FPP,Cpu>()
+				const bool internal_call) : TransformHelper<FPP,Cpu>()
 	{
 		if(lambda_ != FPP(1.0) && ! internal_call)
 			cerr << "WARNING: the constructor argument for multiplying the Faust by a scalar is DEPRECATED and might not be supported in next versions of FAµST." << endl;
@@ -65,7 +65,7 @@ namespace Faust {
 	}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>::TransformHelper() : TransformHelperGen<FPP,Cpu>(), mul_order_opt_mode(0), Fv_mul_mode(0)
+		TransformHelper<FPP,Cpu>::TransformHelper() : TransformHelperGen<FPP,Cpu>()
 #ifdef USE_GPU_MOD
 													  , gpu_faust(nullptr)
 #endif
@@ -106,33 +106,14 @@ namespace Faust {
 		this->transform = th->transform;
 		this->is_transposed = transpose?!th->is_transposed:th->is_transposed;
 		this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
-		this->is_sliced = th->is_sliced;
-		this->is_fancy_indexed = false;
-		if(th->is_sliced)
-			copy_slices(th);
-		this->mul_order_opt_mode = th->mul_order_opt_mode;
-		this->Fv_mul_mode = th->Fv_mul_mode;
-#ifdef USE_GPU_MOD
-		if(th->gpu_faust)
-			Faust::enable_gpu_mod();
-#endif
+		this->copy_slice_state(*th);
+		copy_mul_mode_state(*th);
 	}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th): TransformHelper<FPP,Cpu>()
 	{
-		this->transform = th->transform;
-		this->is_transposed = th->is_transposed;
-		this->is_conjugate = th->is_conjugate;
-		this->is_sliced = th->is_sliced;
-		if(th->is_sliced)
-			copy_slices(th);
-		this->mul_order_opt_mode = th->mul_order_opt_mode;
-		this->Fv_mul_mode = th->Fv_mul_mode;
-#ifdef USE_GPU_MOD
-		if(th->gpu_faust)
-			enable_gpu_meth_for_mul();
-#endif
+		this->copy_state(*th);
 	}
 
 	template<typename FPP>
@@ -144,18 +125,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::operator=(TransformHelper<FPP,Cpu>& th)
 		{
-			this->transform = th.transform;
-			this->is_transposed = th.is_transposed;
-			this->is_conjugate = th.is_conjugate;
-			this->is_sliced = th.is_sliced;
-			if(th.is_sliced)
-				copy_slices(&th);
-			this->mul_order_opt_mode = th.mul_order_opt_mode;
-			this->Fv_mul_mode = th.Fv_mul_mode;
-#ifdef USE_GPU_MOD
-			if(th.gpu_faust)
-				enable_gpu_meth_for_mul();
-#endif
+			this->copy_state(th);
 		}
 
 	template<typename FPP>
@@ -163,31 +133,21 @@ namespace Faust {
 
 	{
 		this->transform = th->transform; //do not remove this line, necessary for eval_sliced_transform()
-		this->is_transposed = th->is_transposed;
-		this->is_conjugate = th->is_conjugate;
+		this->copy_transconj_state(th);
 		if(! (s[0].belong_to(0, th->getNbRow()) || s[1].belong_to(0, th->getNbCol())))
 			handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Slice overflows a Faust dimension.");
 		this->slices[0] = s[0];
 		this->slices[1] = s[1];
 		this->is_sliced = true;
 		eval_sliced_Transform();
-		this->mul_order_opt_mode = th->mul_order_opt_mode;
-		this->Fv_mul_mode = th->Fv_mul_mode;
-#ifdef USE_GPU_MOD
-			if(th->gpu_faust)
-			{ // both left and right side Fausts are gpu enabled
-				// this->transform is freshly created, reuse it to create the gpu_faust object
-				enable_gpu_meth_for_mul();
-			}
-#endif
+		copy_mul_mode_state(*th);
 	}
 
 	template<typename FPP>
 		TransformHelper<FPP,Cpu>::TransformHelper(TransformHelper<FPP,Cpu>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols): TransformHelper<FPP,Cpu>()
 	{
 		this->transform = th->transform; //do not remove this line, necessary for eval*()
-		this->is_transposed = th->is_transposed;
-		this->is_conjugate = th->is_conjugate;
+		this->copy_transconj_state(th);
 		this->is_sliced = false;
 		//TODO: check indices
 		//				handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Fancy indexing overflows a Faust dimension.");
@@ -209,13 +169,19 @@ namespace Faust {
 		eval_fancy_idx_Transform();
 		delete[] this->fancy_indices[0];
 		delete[] this->fancy_indices[1];
-		this->mul_order_opt_mode = th->mul_order_opt_mode;
-		this->Fv_mul_mode = th->Fv_mul_mode;
+		copy_mul_mode_state(th);
+	}
+
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::copy_mul_mode_state(const TransformHelper<FPP,Cpu>& th)
+		{
+			TransformHelperGen<FPP,Cpu>::copy_mul_mode_state(th);
 #ifdef USE_GPU_MOD
-			if(th->gpu_faust)
+			if(th.gpu_faust)
 				enable_gpu_meth_for_mul();
 #endif
-	}
+		}
+
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 	template<typename FPP>
 		template<typename ... GList>
@@ -248,7 +214,7 @@ namespace Faust {
 			this->is_transposed ^= transpose;
 			this->is_conjugate ^= conjugate;
 #ifdef USE_GPU_MOD
-			if(Fv_mul_mode == GPU_MOD && gpu_faust != nullptr)
+			if(this->Fv_mul_mode == GPU_MOD && gpu_faust != nullptr)
 					return gpu_faust->multiply(x, this->is_transposed, this->is_conjugate);
 #endif
 			Vect<FPP,Cpu> v = this->transform->multiply(x, this->isTransposed2char());
@@ -265,7 +231,7 @@ namespace Faust {
 			this->is_conjugate ^= conjugate;
 			Faust::MatDense<FPP,Cpu> M;
 #ifdef FAUST_TORCH
-			if(mul_order_opt_mode >= 7 && mul_order_opt_mode <= 9 && !tensor_data.size())
+			if(this->mul_order_opt_mode >= 7 && this->mul_order_opt_mode <= 9 && !tensor_data.size())
 			{
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
@@ -296,7 +262,7 @@ namespace Faust {
 								data[i++] = fac;
 							data[i] = const_cast<Faust::MatDense<FPP,Cpu>*>(&A);
 						}
-						Faust::multiply_order_opt(mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), {this->isTransposed2char()});
+						Faust::multiply_order_opt(this->mul_order_opt_mode, data, M, /*alpha */ FPP(1.0), /* beta */ FPP(0.0), {this->isTransposed2char()});
 						//					this->transform->data.erase(this->transform->data.end()-1);
 					}
 					break;
@@ -440,7 +406,7 @@ namespace Faust {
 			cout << "nsamples used to measure time: " << nmuls << endl;
 #endif
 #ifdef FAUST_TORCH
-			if(mul_order_opt_mode >= 7 && mul_order_opt_mode <= 9 && !tensor_data.size())
+			if(this->mul_order_opt_mode >= 7 && this->mul_order_opt_mode <= 9 && !tensor_data.size())
 			{
 				// init tensor data cache
 				convMatGenListToTensorList(this->transform->data, tensor_data, at::kCPU, /* clone */ false, /* transpose */ ! this->is_transposed);
@@ -626,8 +592,7 @@ namespace Faust {
 				if(!factor_touched && npasses == -1) break;
 			}
 			pth->transform->update_total_nnz();
-            pth->is_transposed = this->is_transposed;
-            pth->is_conjugate = this->is_conjugate;
+			pth->copy_transconj_state(*this);
 			return pth;
 		}
 
@@ -635,12 +600,6 @@ namespace Faust {
 		void TransformHelper<FPP,Cpu>::update_total_nnz()
 		{
 			this->transform->update_total_nnz();
-		}
-
-	template<typename FPP>
-		int TransformHelper<FPP,Cpu>::get_mul_order_opt_mode() const
-		{
-			return this->mul_order_opt_mode;
 		}
 
 	template<typename FPP>
@@ -686,7 +645,7 @@ namespace Faust {
 		{
 #ifdef USE_GPU_MOD
 			//TODO: factorize this code with set_FM_mul_mode
-			if(Fv_mul_mode == GPU_MOD && gpu_faust == nullptr)
+			if(this->Fv_mul_mode == GPU_MOD && gpu_faust == nullptr)
 			{
 				try
 				{
@@ -722,15 +681,8 @@ namespace Faust {
 //			Transform<FPP,Cpu>* t = new Transform<FPP,Cpu>(vec, scalar, false, true); //optimizedCopy == false, cloning_fact == true
 //			TransformHelper<FPP,Cpu>* th  = new TransformHelper<FPP,Cpu>(*t);
 			TransformHelper<FPP,Cpu>* th = new TransformHelper<FPP,Cpu>(vec, scalar, false, false, true);
-			//TODO: refactor the attributes copy ? 
-			th->is_transposed = this->is_transposed;
-			th->is_conjugate = this->is_conjugate;
-			th->is_sliced = this->is_sliced;
-			if(this->is_sliced)
-			{
-				th->slices[0] = Slice(this->slices[0]);
-				th->slices[1] = Slice(this->slices[1]);
-			}
+			th->copy_transconj_state(*this);
+			th->copy_slice_state(*this);
 			return th;
 		}
 
@@ -986,13 +938,6 @@ namespace Faust {
 			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, this->is_transposed ^ transpose);
 			if(this->is_conjugate)
 				Faust::conjugate(elts,*num_cols*(*num_rows));
-		}
-
-	template<typename FPP>
-		void TransformHelper<FPP, Cpu>::copy_slices(const TransformHelper<FPP, Cpu> *th, const bool transpose /* default to false */)
-		{
-			this->slices[0].copy(th->slices[0]);
-			this->slices[1].copy(th->slices[1]);
 		}
 
 	template<typename FPP>

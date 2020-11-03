@@ -2,7 +2,8 @@
 namespace Faust
 {
 	template<typename FPP, FDevice DEV>
-		TransformHelperGen<FPP,DEV>::TransformHelperGen() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), transform(std::make_shared<Transform<FPP,DEV>>())
+		TransformHelperGen<FPP,DEV>::TransformHelperGen() : is_transposed(false), is_conjugate(false), is_sliced(false), is_fancy_indexed(false), transform(std::make_shared<Transform<FPP,DEV>>()), mul_order_opt_mode(0), Fv_mul_mode(0)
+
 	{
 	}
 
@@ -169,4 +170,56 @@ namespace Faust
 			else
 				return this->is_transposed?this->transform->getNbRow():this->transform->getNbCol();
 		}
+
+	template<typename FPP, FDevice DEV>
+		void TransformHelperGen<FPP, DEV>::copy_slices(const TransformHelper<FPP, DEV> *th, const bool transpose /* default to false */)
+		{
+			//TODO: transpose is not used, delete it or use it
+			this->slices[0].copy(th->slices[0]);
+			this->slices[1].copy(th->slices[1]);
+		}
+
+	template<typename FPP, FDevice DEV>
+		void TransformHelperGen<FPP,DEV>::copy_slice_state(const TransformHelper<FPP,DEV>& th)
+		{
+			this->is_sliced = th.is_sliced;
+			if(th.is_sliced)
+				copy_slices(&th);
+		}
+
+	template<typename FPP, FDevice DEV>
+		void TransformHelperGen<FPP,DEV>::copy_transconj_state(const TransformHelper<FPP,DEV>& th)
+		{
+			this->is_transposed = th.is_transposed;
+			this->is_conjugate = th.is_conjugate;
+		}
+
+	template<typename FPP, FDevice DEV>
+		void TransformHelperGen<FPP,DEV>::copy_state(const TransformHelper<FPP,DEV>& th)
+		{
+			transform = th.transform;
+			copy_transconj_state(th);
+			copy_slice_state(th);
+			copy_mul_mode_state(th);
+		}
+
+	template<typename FPP, FDevice DEV>
+		void TransformHelperGen<FPP,DEV>::copy_mul_mode_state(const TransformHelper<FPP,DEV>& th)
+		{
+			this->mul_order_opt_mode = th.mul_order_opt_mode;
+			this->Fv_mul_mode = th.Fv_mul_mode;
+		}
+
+	template<typename FPP, FDevice DEV>
+		int TransformHelperGen<FPP,DEV>::get_mul_order_opt_mode() const
+		{
+			return this->mul_order_opt_mode;
+		}
+
+	template<typename FPP, FDevice DEV>
+		int TransformHelperGen<FPP,DEV>::get_Fv_mul_mode() const
+		{
+			return this->Fv_mul_mode;
+		}
+
 }

@@ -74,8 +74,6 @@ namespace Faust
 			static std::default_random_engine generator;
 			static bool seed_init;
 
-			int mul_order_opt_mode;
-			int Fv_mul_mode;
 #ifdef FAUST_TORCH
 			std::vector<torch::Tensor> tensor_data;
 #endif
@@ -98,6 +96,8 @@ namespace Faust
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 			template<typename ...GList> TransformHelper(GList& ... t);
 #endif
+
+			void copy_mul_mode_state(const TransformHelper<FPP,Cpu>& th);
 			Vect<FPP,Cpu> multiply(const Vect<FPP,Cpu> x, const bool transpose=false, const bool conjugate=false);
 			//			MatDense<FPP,Cpu> multiply(const MatDense<FPP,Cpu> A) const;
 			MatDense<FPP, Cpu> multiply(const MatDense<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
@@ -105,7 +105,6 @@ namespace Faust
 			void set_FM_mul_mode(const int mul_order_opt_mode, const bool silent=false);
 			void set_Fv_mul_mode(const int mode);
 			void enable_gpu_meth_for_mul();
-			int get_mul_order_opt_mode() const;
 			MatDense<FPP, Cpu> multiply(const MatSparse<FPP,Cpu> A, const bool transpose=false, const bool conjugate=false);
 
 			TransformHelper<FPP, Cpu>* multiply(const TransformHelper<FPP, Cpu>*) const;
@@ -213,7 +212,6 @@ namespace Faust
 			MatGeneric<FPP,Cpu>* get_gen_fact_nonconst(const faust_unsigned_int id) const;
 			void update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id);
 			private:
-			void copy_slices(const TransformHelper<FPP, Cpu>* th, const bool transpose = false);
 			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;
 		};
 
