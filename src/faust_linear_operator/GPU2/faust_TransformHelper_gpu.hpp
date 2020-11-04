@@ -361,9 +361,9 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void TransformHelper<FPP,GPU2>::save_mat_file(const char* filename) const
+		void TransformHelper<FPP,GPU2>::save_mat_file(const char* filepath) const
 		{
-			this->transform->save_mat_file(filename, this->is_transposed, this->is_conjugate);
+			this->transform->save_mat_file(filepath, this->is_transposed, this->is_conjugate);
 		}
 
 	template<typename FPP>
@@ -560,5 +560,6 @@ namespace Faust
 			delete cpu_faust;
 			return gpu_faust;
 		}
+
 
 }

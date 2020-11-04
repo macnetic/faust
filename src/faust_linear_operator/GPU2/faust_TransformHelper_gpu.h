@@ -57,7 +57,6 @@ namespace Faust
 				typename Transform<FPP,GPU2>::iterator end() const;
 				void tocpu(TransformHelper<FPP,Cpu>& cpu_transf) const;
 				TransformHelper<FPP,Cpu>* tocpu() const;
-				void save_mat_file(const char* filename) const;
 				TransformHelper<FPP,GPU2>* vertcat(const TransformHelper<FPP,GPU2>*);
 				TransformHelper<FPP,GPU2>* horzcat(const TransformHelper<FPP,GPU2>*);
 				void set_FM_mul_mode() const;
@@ -72,6 +71,8 @@ namespace Faust
 				TransformHelper<FPP,GPU2>* optimize(const bool transp=false);
 				TransformHelper<FPP,GPU2>* optimize_storage(const bool time=true);
 				TransformHelper<FPP,GPU2>* clone(int32_t dev_id=-1, void* stream=nullptr);
+
+				void save_mat_file(const char* filepath) const;
 				static TransformHelper<FPP,GPU2>* hadamardFaust(unsigned int n, const bool norma=true);
 				static TransformHelper<FPP,GPU2>* fourierFaust(unsigned int n, const bool norma=true);
 				static TransformHelper<FPP,GPU2>* eyeFaust(unsigned int n, unsigned int m);
