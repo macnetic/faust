@@ -59,7 +59,7 @@ namespace Faust
 		void TransformHelper<FPP,GPU2>::push_back(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy/*=false*/, const bool copying/*=true*/, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			//optimizedCopy is ignored because not handled yet by Transform<FPP,GPU2> // TODO ? (it's not used by wrappers anyway)
-			this->transform->push_back(M, copying);
+			this->transform->push_back(M, copying, transpose, conjugate);
 		}
 
 	template<typename FPP>
@@ -195,31 +195,72 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::multiply(const TransformHelper<FPP,GPU2>* right)
 		{
+			// The goal is to minimize the number of factors copied (but maybe the criterion should be the sum of the size of these factors rather than their number)
+//			std::cout << "===" << this->is_transposed << std::endl;
+//			this->display();
+//			std::cout << "first fact:" << std::endl;
+//			this->get_gen_fact(0)->Display();
+//			std::cout << "===" << right->is_transposed << std::endl;
+//			right->display();
+//			std::cout << "===" << std::endl;
 			bool copying_this = false;
 			bool copying_right = false;
-			bool transconj_diff = this->is_conjugate != right->is_conjugate || this->is_transposed != right->is_transposed;
-			bool out_transp = this->is_transposed, out_conj = this->is_conjugate;
+			bool conj_diff = this->is_conjugate != right->is_conjugate;
+			bool trans_diff = this->is_transposed != right->is_transposed;
+			bool transconj_diff = conj_diff || trans_diff;
+			bool out_transp = false, out_conj = false;
 			bool transp_this = false, transp_right = false, conj_this = false, conj_right = false;
 			if(transconj_diff)
 				if(this->size() < right->size())
 				{
 					copying_this = true;
-					out_transp = right->is_transposed;
-					out_conj = right->is_conjugate;
-					transp_this = this->is_transposed != right->is_transposed;
-					conj_this = this->is_conjugate != right->is_conjugate;
+					out_transp = trans_diff && right->is_transposed;
+					out_conj = conj_diff && right->is_conjugate;
+					transp_this = trans_diff;
+					conj_this = conj_diff;
 				}
 				else
 				{
 					copying_right = true;
-					transp_right = this->is_transposed != right->is_transposed;
-					conj_right = this->is_conjugate != right->is_conjugate;
+					out_transp = trans_diff && this->is_transposed;
+					out_conj = conj_diff && this->is_conjugate;
+					transp_right = trans_diff;
+					conj_right = conj_diff;
 				}
 			auto mul_faust = new TransformHelper<FPP,GPU2>();
-			for(auto f: *this)
-				mul_faust->push_back(f, /*OptimizedCopy*/ false, copying_this, transp_this, conj_this);
-			for(auto f: *right)
-				mul_faust->push_back(f, /*OptimizedCopy*/ false, copying_right, transp_right, conj_right);
+//			std::cout << "transp_this: " << transp_this << " conj_this: " << conj_this << std::endl;
+//			std::cout << "transp_right: " << transp_right << " conj_right: " << conj_right << std::endl;
+//			std::cout << "out_trans: " << out_transp << " out_conj: " << out_conj << std::endl;
+			std::function<void()> push_right_facts = [&out_transp, &transp_right, &mul_faust, &right, &copying_right, &conj_right]()
+			{
+				if(transp_right)
+					for(int i=right->size()-1; i>= 0; i--)
+						mul_faust->push_back(right->get_gen_fact(i), /*OptimizedCopy*/ false, copying_right, /*transp_right*/ true, conj_right);
+				else
+					for(auto f: *right)
+						mul_faust->push_back(f, /*OptimizedCopy*/ false, copying_right, /*transp_right*/ false, conj_right);
+			};
+			std::function<void()> push_this_facts = [&transp_this, &mul_faust, this, &copying_this, &conj_this]()
+			{
+				if(transp_this)
+					for(int i=size()-1; i>= 0; i--)
+						mul_faust->push_back(get_gen_fact(i), /*OptimizedCopy*/ false, copying_this, /*transp_this*/ true, conj_this);
+				else
+					for(auto f: *this)
+						mul_faust->push_back(f, /*OptimizedCopy*/ false, copying_this, /*transp_this*/ false, conj_this);
+			};
+			if(out_transp)
+			{
+				push_right_facts();
+				push_this_facts();
+			}
+			else
+			{
+				push_this_facts();
+				push_right_facts();
+			}
+			mul_faust->is_transposed = out_transp;
+			mul_faust->is_conjugate = out_conj;
 			return mul_faust;
 		}
 

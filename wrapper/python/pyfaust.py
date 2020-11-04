@@ -505,9 +505,6 @@ class Faust:
         dev = 'cpu'
         if isinstance(F.m_faust, _FaustCorePy.FaustCoreGPU):
             dev = 'gpu'
-            if isinstance(F.m_faust, _FaustCorePy.FaustCoreGPU):
-                #TODO: debug and enable
-                raise ValueError("add is not supported on GPU")
         for i in range(0,len(args)):
             G = args[i]
             if(isinstance(G,Faust)):
