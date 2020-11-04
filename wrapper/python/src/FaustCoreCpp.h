@@ -101,7 +101,7 @@ class FaustCoreCpp
     FaustCoreCpp<FPP,DEV>* slice(unsigned int, unsigned int, unsigned int, unsigned int) const;
     FaustCoreCpp<FPP,DEV>* fancy_idx(unsigned long int* row_ids, unsigned long int
                                   num_rows, unsigned long int* col_ids,
-                                  unsigned long int num_cols);
+                                  unsigned long int num_cols) const;
     bool save_mat_file(const char* filepath) const;
     FaustCoreCpp<FPP,DEV>* optimize_storage(const bool time=false);
     FaustCoreCpp<FPP,DEV>* optimize(const bool transp=false);
@@ -147,6 +147,9 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		FaustCoreCppGPU<FPP>* horzcat_gpu(FaustCoreCppGPU<FPP>* right) const;
 		FaustCoreCppGPU<FPP>* vertcat_gpu(FaustCoreCppGPU<FPP>* right) const;
 		FaustCoreCppGPU<FPP>* slice_gpu(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id) const;
+		FaustCoreCppGPU<FPP>* fancy_idx_gpu(unsigned long int* row_ids, unsigned long int
+                                  num_rows, unsigned long int* col_ids,
+                                  unsigned long int num_cols) const;
 		void device_gpu(char* dev) const;
 		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
 				unsigned int min_num_factors, unsigned int max_num_factors,

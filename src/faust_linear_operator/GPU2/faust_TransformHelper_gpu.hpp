@@ -38,6 +38,12 @@ namespace Faust
 		this->init_sliced_transform(th, s);
 	}
 
+	template<typename FPP>
+		TransformHelper<FPP,GPU2>::TransformHelper(TransformHelper<FPP,GPU2>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols): TransformHelper<FPP,GPU2>()
+	{
+		this->init_fancy_idx_transform(th, row_ids, num_rows, col_ids, num_cols);
+	}
+
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 	template<typename FPP>
 		template<typename ... GList>
@@ -453,19 +459,6 @@ namespace Faust
 		{
 			auto t = new TransformHelper<FPP,GPU2>(*this, true, true);
             return t;
-		}
-
-//	template<typename FPP>
-//		TransformHelper<FPP, GPU2>* TransformHelper<FPP, GPU2>::slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
-//				faust_unsigned_int start_col_id, faust_unsigned_int end_col_id)
-//		{
-//		}
-
-	template<typename FPP>
-		TransformHelper<FPP, GPU2>* TransformHelper<FPP,GPU2>::fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
-		{
-			throw std::runtime_error("fancy_index is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
 		}
 
 	template<typename FPP>

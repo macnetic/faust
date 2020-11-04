@@ -148,4 +148,12 @@ FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::slice_gpu(unsigned int start_row_id,
 {
 	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::slice(start_row_id, end_row_id, start_col_id, end_col_id);
 }
+
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::fancy_idx_gpu(unsigned long int* row_ids, unsigned long int
+        num_rows, unsigned long int* col_ids,
+        unsigned long int num_cols) const
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::fancy_idx(row_ids, num_rows, col_ids, num_cols);
+}
 #endif

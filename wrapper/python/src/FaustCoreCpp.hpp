@@ -323,7 +323,7 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::left(const faust_unsigned_int id) 
 template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::fancy_idx(unsigned long int* row_ids, unsigned long int
         num_rows, unsigned long int* col_ids,
-        unsigned long int num_cols)
+        unsigned long int num_cols) const
 {
     Faust::TransformHelper<FPP,DEV>* th = this->transform->fancy_index(row_ids, num_rows, col_ids, num_cols);
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);

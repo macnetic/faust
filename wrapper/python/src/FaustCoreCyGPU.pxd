@@ -38,4 +38,7 @@ cdef extern from "FaustCoreCpp.h":
         void device_gpu(char*) const
         FaustCoreCppGPU[FPP]* slice_gpu(unsigned int, unsigned int, unsigned int,
                                     unsigned int) const
+        FaustCoreCppGPU[FPP]* fancy_idx_gpu(unsigned long int* row_ids, unsigned long int
+                                  num_rows, unsigned long int* col_ids,
+                                  unsigned long int num_cols) const
 

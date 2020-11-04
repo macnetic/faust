@@ -88,10 +88,12 @@ namespace Faust
 			int get_mul_order_opt_mode() const;
 			int get_Fv_mul_mode() const;
 			void eval_sliced_Transform();
+			void eval_fancy_idx_Transform();
 			TransformHelper<FPP, DEV>* slice(faust_unsigned_int start_row_id, faust_unsigned_int end_row_id,
 					faust_unsigned_int start_col_id, faust_unsigned_int end_col_id);
-
+			TransformHelper<FPP, DEV>* fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 		protected:
+			void init_fancy_idx_transform(TransformHelper<FPP,DEV>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols);
 			void init_sliced_transform(TransformHelper<FPP,DEV>* th, Slice s[2]);
 			bool is_transposed;
 			bool is_conjugate;

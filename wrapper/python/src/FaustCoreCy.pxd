@@ -87,7 +87,7 @@ cdef extern from "FaustCoreCpp.h":
                                     unsigned int) const
         FaustCoreCpp[FPP]* fancy_idx(unsigned long int* row_ids, unsigned long int
                                   num_rows, unsigned long int* col_ids,
-                                  unsigned long int num_cols)
+                                  unsigned long int num_cols) const
         bool save_mat_file(const char* filepath) const
         FaustCoreCpp[FPP]* optimize_time(const bool transp, const bool inplace,
                                        const int nsamples)

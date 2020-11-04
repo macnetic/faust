@@ -15,6 +15,36 @@ namespace Faust
 		this->is_conjugate = conjugate?!th->is_conjugate:th->is_conjugate;
     }
 
+
+	template<typename FPP, FDevice DEV>
+	void TransformHelperGen<FPP,DEV>::init_fancy_idx_transform(TransformHelper<FPP,DEV>* th, faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
+	{
+		this->transform = th->transform; //do not remove this line, necessary for eval*()
+		this->copy_transconj_state(*th);
+		this->is_sliced = false;
+		//TODO: check indices
+		//				handleError("Faust::TransformHelper::TransformHelper(TransformHelper,Slice)", "Fancy indexing overflows a Faust dimension.");
+		unsigned int id0=0, id1=1;
+		this->fancy_num_cols = num_cols;
+		this->fancy_num_rows = num_rows;
+		if(this->is_transposed)
+		{
+			id0 = 1;
+			id1 = 0;
+			this->fancy_num_cols = num_rows;
+			this->fancy_num_rows = num_cols;
+		}
+		this->fancy_indices[id0] = new faust_unsigned_int[num_rows];
+		this->fancy_indices[id1] = new faust_unsigned_int[num_cols];
+		this->is_fancy_indexed = true;
+		memcpy(this->fancy_indices[id0], row_ids, num_rows*sizeof(faust_unsigned_int));
+		memcpy(this->fancy_indices[id1], col_ids, num_cols*sizeof(faust_unsigned_int));
+		this->eval_fancy_idx_Transform();
+		delete[] this->fancy_indices[0];
+		delete[] this->fancy_indices[1];
+		copy_mul_mode_state(*th);
+	}
+
 	template<typename FPP, FDevice DEV>
 		void TransformHelperGen<FPP,DEV>::init_sliced_transform(TransformHelper<FPP,DEV>* th, Slice s[2])
 
@@ -311,6 +341,59 @@ namespace Faust
 				s[1] = sc;
 			}
 			return new TransformHelper<FPP, DEV>(dynamic_cast<TransformHelper<FPP, DEV>*>(this), s);
+		}
+
+	template<typename FPP, FDevice DEV>
+		TransformHelper<FPP, DEV>* TransformHelperGen<FPP,DEV>::fancy_index(faust_unsigned_int* row_ids, faust_unsigned_int num_rows, faust_unsigned_int* col_ids, faust_unsigned_int num_cols)
+		{
+			return new TransformHelper<FPP,DEV>(dynamic_cast<TransformHelper<FPP, DEV>*>(this), row_ids, num_rows, col_ids, num_cols);
+		}
+
+	template<typename FPP, FDevice DEV>
+		void TransformHelperGen<FPP, DEV>::eval_fancy_idx_Transform()
+		{
+			bool cloning_fact = false;
+			faust_unsigned_int size = this->size();
+			std::vector<MatGeneric<FPP,DEV>*> factors((size_t) size);
+			MatGeneric<FPP,DEV>* gen_fac, *first_sub_fac, *last_sub_fac;
+			gen_fac = this->transform->get_fact(0, cloning_fact);
+			//				first_sub_fac = gen_fac->get_rows(this->slices[0].start_id, this->slices[0].end_id-this->slices[0].start_id);
+			//		first_sub_fac->Display();
+			first_sub_fac = gen_fac->get_rows(this->fancy_indices[0], this->fancy_num_rows);
+			if(cloning_fact)
+				delete gen_fac;
+			if(size > 1) {
+				gen_fac = this->transform->get_fact(size-1, cloning_fact);
+				//					last_sub_fac = gen_fac->get_cols(this->slices[1].start_id, this->slices[1].end_id-this->slices[1].start_id);
+				last_sub_fac = gen_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);	//		std::cout << "---" << std::endl;
+				//		last_sub_fac->Display();
+				if(cloning_fact)
+					delete gen_fac;
+				factors.reserve(size);
+				factors.insert(factors.begin(), first_sub_fac);
+				if(size > 2)
+				{
+					auto it = factors.begin();
+					for(faust_unsigned_int i = 1; i < size-1; i++)
+					{
+						gen_fac = this->transform->get_fact(i, cloning_fact);
+						factors[i] = gen_fac;
+					}
+				}
+				factors.insert(factors.begin()+(size-1), last_sub_fac);
+				factors.resize(size);
+			}
+			else { //only one factor
+				last_sub_fac = first_sub_fac->get_cols(this->fancy_indices[1], this->fancy_num_cols);
+				delete first_sub_fac;
+				factors[0] = last_sub_fac;
+				factors.resize(1);
+			}
+			this->transform = make_shared<Transform<FPP, DEV>>(factors, 1.0, false, cloning_fact);
+			if(cloning_fact) {
+				for(faust_unsigned_int i = 0; i < size; i++)
+					delete factors[i];
+			}
 		}
 
 }

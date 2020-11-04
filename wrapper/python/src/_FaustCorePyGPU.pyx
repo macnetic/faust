@@ -671,3 +671,44 @@ cdef class FaustCoreGPU:
 
         core._isReal = self._isReal
         return core
+
+    def fancy_idx(self, indices):
+        cdef unsigned long int[:] row_indices_view
+        cdef unsigned long int[:] col_indices_view
+        core = FaustCoreGPU(core=True)
+        # fancy indexing
+        #convert possible slice (on index 0 or 1 of out_indices) to
+        # an array of indices
+        for i in range(0,2):
+            if(isinstance(indices[i], slice)):
+               indices[i] = list(range(indices[i].start, indices[i].stop,
+                                       indices[i].step))
+        # it's possible that on certain architectures unsigned long int is a
+        # 4-bytes integer
+        # TODO: move to a cross-platform size type (like uint32/64_t from stdlib.h)
+        if(sizeof(unsigned long int) == 8):
+            dtype = np.uint64
+        elif(sizeof(unsigned long int) == 4):
+            dtype = np.uint32
+        row_indices = np.array(indices[0], dtype=dtype)
+        col_indices = np.array(indices[1], dtype=dtype)
+        row_indices_view = row_indices
+        col_indices_view = col_indices
+#        print("FaustCorePy.fancy_idx(), row_indices=", row_indices, " size=",
+#              row_indices.size)
+#        print("FaustCorePy.fancy_idx(), col_indices=", col_indices," size=",
+#              col_indices.size)
+        if(self._isReal):
+            core.core_faust_dbl = \
+            self.core_faust_dbl.fancy_idx_gpu(&row_indices_view[0], row_indices.size,
+                                          &col_indices_view[0], col_indices.size)
+#        else:
+#            core.core_faust_cplx = \
+#            self.core_faust_cplx.fancy_idx(&row_indices_view[0],
+#                                           row_indices.size,
+#                                           &col_indices_view[0],
+#                                           col_indices.size)
+#
+        core._isReal = self._isReal
+        return core
+
