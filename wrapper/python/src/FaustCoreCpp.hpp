@@ -67,10 +67,11 @@ template<typename FPP, FDevice DEV>
 void FaustCoreCpp<FPP,DEV>::push_back(FPP* data, int* row_ptr, int* id_col, int nnz, int nrows, int ncols, bool optimizedCopy /* false by deft */)
 {
     //    Faust::MatSparse<FPP,DEV>::MatSparse(const faust_unsigned_int nnz_, const faust_unsigned_int dim1_, const faust_unsigned_int dim2_, const FPP1* value, const int* row_ptr, const int* id_col) :
-      Faust::MatSparse<FPP, DEV> sparse_mat(nnz, nrows, ncols, data, row_ptr, id_col);
+//      Faust::MatSparse<FPP, DEV> sparse_mat(nnz, nrows, ncols, data, row_ptr, id_col);
 //      std::cout << "FaustCoreCpp::push_back()" << nrows << " " << sparse_mat.getNbRow() <<  " " << ncols << " " << sparse_mat.getNbCol() << std::endl;
       if(transform == nullptr) transform = new Faust::TransformHelper<FPP,DEV>();
-      this->transform->push_back(&sparse_mat, optimizedCopy);
+//      this->transform->push_back(&sparse_mat, optimizedCopy);
+      this->transform->push_back(data, row_ptr, id_col, nnz, nrows, ncols, optimizedCopy);
 }
 
 template<typename FPP, FDevice DEV>

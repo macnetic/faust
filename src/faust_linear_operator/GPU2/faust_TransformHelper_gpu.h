@@ -22,6 +22,8 @@ namespace Faust
 #ifndef IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
 				template<typename ...GList> TransformHelper(GList& ... t);
 #endif
+
+				void push_back(const FPP* data, const int* row_ptr, const int* id_col, const int nnz, const int nrows, const int ncols, const bool optimizedCopy=false, const bool transpose=false, const bool conjugate=false);
 				void push_back(const MatGeneric<FPP,GPU2>* M, const bool optimizedCopy=false, const bool copying=true, const bool transpose=false, const bool conjugate=false);
 				void push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy=false, const int32_t dev_id=-1, const void* stream=nullptr);
 				void pop_front();

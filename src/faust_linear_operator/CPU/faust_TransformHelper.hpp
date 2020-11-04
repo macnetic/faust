@@ -675,6 +675,14 @@ namespace Faust {
         }
 
 	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::push_back(const FPP* data, const int* row_ptr, const int* id_col, const int nnz, const int nrows, const int ncols, const bool optimizedCopy /* false by deft */, const bool transpose/*=false*/, const bool conjugate/*=false*/)
+		{
+			auto sparse_mat = new MatSparse<FPP,Cpu>(nnz, nrows, ncols, data, row_ptr, id_col);
+			this->push_back(sparse_mat, optimizedCopy, false, transpose, conjugate);
+			if(optimizedCopy) delete sparse_mat;
+		}
+
+	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::push_back(const MatGeneric<FPP,Cpu>* M, const bool optimizedCopy /* false by default */, const bool copying /* true to default */, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
 			//warning: should not be called after initialization of factors (to respect the immutability property)
