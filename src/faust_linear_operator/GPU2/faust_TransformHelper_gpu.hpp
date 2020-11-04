@@ -15,11 +15,14 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>::TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_/*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact /*= true*/, const bool internal_call/*=false*/) : TransformHelper<FPP,GPU2>()
 	{
-		for(auto f: facts)
+
+		//if lambda is not 1.0 the first factor will be multiplied and so it needs to be copied to preserved the original that could be used elsewhere
+		this->push_back(facts[0], false, cloning_fact || lambda_ != (FPP) 1.0);
+		for(int i=1; i < facts.size(); i++)
 		{
-			this->push_back(f, false, cloning_fact);
+			this->push_back(facts[i], false, cloning_fact);
 		}
-		this->multiply(lambda_);
+		this->transform->multiply(lambda_);
 	}
 
 	template<typename FPP>
@@ -303,8 +306,11 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::multiply(const FPP& a)
 		{
-			this->transform->multiply(a);
-			return this;
+			const vector<MatGeneric<FPP,GPU2>*>& vec = this->transform->data; //TransformHelper is a friend class of Transform // we can access private attribute data
+			TransformHelper<FPP,GPU2>* th = new TransformHelper<FPP,GPU2>(vec, a, false, false, true);
+			th->copy_transconj_state(*this);
+			th->copy_slice_state(*this);
+			return th;
 		}
 
 	template<typename FPP>
