@@ -450,7 +450,7 @@ namespace Faust
 			TransformHelper<FPP,Cpu> th;
 			TransformHelper<FPP,Cpu> thG;
 			this->tocpu(th);
-			this->tocpu(thG);
+			G->tocpu(thG);
 			auto th_out = th.vertcat(&thG);
 			auto gpu_th_out = new TransformHelper<FPP,GPU2>(*th_out, -1, nullptr);
 			delete th_out;
@@ -463,7 +463,7 @@ namespace Faust
 			TransformHelper<FPP,Cpu> th;
 			TransformHelper<FPP,Cpu> thG;
 			this->tocpu(th);
-			this->tocpu(thG);
+			G->tocpu(thG);
 			auto th_out = th.horzcat(&thG);
 			auto gpu_th_out = new TransformHelper<FPP,GPU2>(*th_out, -1, nullptr);
 			delete th_out;
