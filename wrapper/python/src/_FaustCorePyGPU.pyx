@@ -727,3 +727,48 @@ cdef class FaustCoreGPU:
             raise Exception("Failed to save the file: "+filepath)
         PyMem_Free(cfilepath)
 
+    def multiply_csr_mat(self, X):
+        cdef double [:] x_data1d
+        cdef int [:] x_indices
+        cdef int [:] x_indptr
+        cdef complex [:] x_data_cplx
+        cdef double [:,:] y_data
+        cdef complex [:,:] y_data_cplx
+        # X is supposed to be a csr_matrix
+        x_indices = X.indices
+        x_indptr = X.indptr
+        x_nnz = X.nnz
+        nbcol = X.shape[1]
+        e = Exception("Dimensions must agree")
+        if(X.dtype in [ 'float', 'float128',
+                       'float16', 'float32',
+                       'float64', 'double']):
+            x_data1d = X.data
+            nbrow = self.core_faust_dbl.getNbRow()
+            if(self.core_faust_dbl.getNbCol() != X.shape[0]): raise e
+            y_data_arr = np.empty((nbrow,nbcol), dtype=np.double, order='F') # we don't know beforehand Y nnz
+            y_data = y_data_arr
+            if(self._isReal):
+                self.core_faust_dbl.multiply_gpu(&y_data[0,0], nbrow, nbcol,
+                                                 &x_data1d[0], &x_indptr[0],
+                                                 &x_indices[0],
+                                                 x_nnz, X.shape[0], X.shape[1])
+            else:
+                raise("x must be real if Faust is.")
+                # shouldn't happen normally (avoided by calling function)
+#        else:
+#            x_data_cplx = X.data
+#            nbrow = self.core_faust_cplx.getNbRow()
+#            if(self.core_faust_cplx.getNbCol() != X.shape[0]): raise e
+#            y_data_arr = np.empty((nbrow,nbcol), dtype=np.complex, order='F') # we don't know beforehand Y nnz
+#            y_data_cplx = y_data_arr
+#            if(not self._isReal):
+#                self.core_faust_cplx.multiply_gpu(&y_data_cplx[0,0], nbrow, nbcol,
+#                                          &x_data_cplx[0], &x_indptr[0],
+#                                          &x_indices[0],
+#                                          x_nnz, X.shape[0], X.shape[1])
+#            else:
+#                raise("x must be complex if Faust is")
+#                # shouldn't happen normally (avoided by calling function)
+        return y_data_arr
+

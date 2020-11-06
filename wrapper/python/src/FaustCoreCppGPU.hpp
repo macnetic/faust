@@ -156,4 +156,15 @@ FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::fancy_idx_gpu(unsigned long int* row
 {
 	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::fancy_idx(row_ids, num_rows, col_ids, num_cols);
 }
+
+template<typename FPP>
+void FaustCoreCppGPU<FPP>::multiply_gpu(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols)
+{
+    Faust::MatSparse<FPP, GPU2> X(x_nrows, x_ncols, x_nnz, x_data, x_row_ptr, x_id_col);
+    Faust::MatDense<FPP, GPU2> Y;
+    Y = this->transform->multiply(X);
+	Faust::MatDense<FPP, Cpu> Y_cpu;
+	Y.tocpu(Y_cpu);
+    memcpy(y_data, Y_cpu.getData(), sizeof(FPP)*y_ncols*y_nrows);
+}
 #endif

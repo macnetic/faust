@@ -135,6 +135,7 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		void get_product(FPP* y_data, int y_nrows, int y_ncols);
 		FaustCoreCppGPU<FPP>* mul_faust_gpu(FaustCoreCppGPU<FPP>* right);
 		FaustCoreCppGPU<FPP>* mul_scal_gpu(const FPP& scal);
+		void multiply_gpu(FPP* y_data, int y_nrows, int y_ncols, FPP* x_data, int* x_row_ptr, int* x_id_col, int x_nnz, int x_nrows, int x_ncols);
 		FaustCoreCppGPU<FPP>* normalize_gpu(int ord) const;
 		FaustCoreCppGPU<FPP>* left_gpu(const faust_unsigned_int) const;
 		FaustCoreCppGPU<FPP>* right_gpu(const faust_unsigned_int) const;
