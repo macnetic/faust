@@ -98,6 +98,12 @@ namespace Faust
 			}
 
 		template<>
+		void Vect<FSFG,GPU2>::multiplyLeft(MatSparse<FSFG,GPU2> const& S, const char transS)
+		{
+
+		}
+
+		template<>
 		void Vect<FSFG,GPU2>::operator*=(const Vect<FSFG,GPU2> &v)
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
@@ -154,5 +160,20 @@ namespace Faust
 				return e;
 			}
 
+		template<>
+			FSFG Vect<FSFG,GPU2>::operator[](faust_unsigned_int i)
+			{
+				FSFG coeff;
+				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+				dsm_funcs->coeff(this->gpu_mat, i, 0, reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&coeff));
+				return coeff;
+			}
 
+
+		template<>
+			void Vect<FSFG,GPU2>::set_coeff(faust_unsigned_int i, const FSFG& val)
+			{
+				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+				dsm_funcs->set_coeff(this->gpu_mat, i, 0, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&val));
+			}
 }

@@ -230,8 +230,8 @@ namespace Faust
    //  \return a pointer of MatGeneric
 
    //template <typename FPP, FDevice DEVICE>
-   template<typename FPP>
-   Faust::MatGeneric<FPP,Cpu>* optimize(Faust::MatDense<FPP,Cpu> const & M,Faust::MatSparse<FPP,Cpu> const & S);
+   template<typename FPP, FDevice DEV>
+   Faust::MatGeneric<FPP,DEV>* optimize(Faust::MatDense<FPP,DEV> const & M,Faust::MatSparse<FPP,DEV> const & S);
 
 
 }

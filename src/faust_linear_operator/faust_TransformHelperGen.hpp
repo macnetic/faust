@@ -396,4 +396,57 @@ namespace Faust
 			}
 		}
 
+	template<typename FPP, FDevice DEV>
+		TransformHelper<FPP,DEV>* TransformHelperGen<FPP,DEV>::optimize_storage(const bool time/*=true*/)
+		{
+//			throw std::runtime_error("optimize_storage is yet to implement in Faust C++ core for GPU.");
+//			return nullptr;
+			Faust::MatDense<FPP,DEV> *dfac = nullptr;
+			Faust::MatSparse<FPP,DEV> *sfac = nullptr;
+			faust_unsigned_int sparse_weight;
+			std::vector<Faust::MatGeneric<FPP,DEV>*> opt_factors;
+
+			for(auto fac : *(this->transform))
+			{
+				if((dfac = dynamic_cast<Faust::MatDense<FPP,DEV>*>(fac)))
+					sfac = nullptr;
+				else
+					sfac = dynamic_cast<Faust::MatSparse<FPP,DEV>*>(fac);
+
+				if(time)
+				{
+					if((dfac = dynamic_cast<Faust::MatDense<FPP,DEV>*>(fac)))
+					{
+						opt_factors.push_back(dfac->Clone(true));
+					}
+					else
+					{
+						opt_factors.push_back(sfac->Clone(true));
+					}
+				}
+				else
+				{ // storage size is the main criterion
+					sparse_weight = fac->getNonZeros()*(sizeof(FPP)+sizeof(int))+(fac->getNbRow()+1)*sizeof(int);
+					if(sparse_weight < fac->getNbCol()*fac->getNbRow()*sizeof(FPP))
+					{
+						// choose CSR format
+						if(dfac)
+							opt_factors.push_back(new Faust::MatSparse<FPP, DEV>(*dfac));
+						else
+							opt_factors.push_back(new Faust::MatSparse<FPP, DEV>(*sfac));
+					}
+					else
+					{
+						// choose dense format
+						if(sfac)
+							opt_factors.push_back(new Faust::MatDense<FPP, DEV>(*sfac));
+						else
+							opt_factors.push_back(new Faust::MatDense<FPP, DEV>(*dfac));
+					}
+				}
+			}
+			TransformHelper<FPP,DEV> *pth = new TransformHelper<FPP,DEV>(opt_factors, 1, false, false, true);
+			return pth;
+
+		}
 }

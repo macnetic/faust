@@ -195,7 +195,7 @@ namespace Faust
 			faust_unsigned_int getNonZeros()const;
 
 
-			//! \brief compute MatGeneric-vector multiplication
+			//! \brief compute MatDense-vector multiplication
 			//! \param vec : the vector
 			//! \param opThis : character	
 			//! vec = (*this) * vec if opThis='N'

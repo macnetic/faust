@@ -74,23 +74,28 @@ namespace Faust
 
 
 	template<>
-		void Faust::MatDense<FSFG,GPU2>::multiply(MatDense<FSFG, GPU2> &other, const char op_this)
+		void Faust::MatDense<FSFG,GPU2>::multiply(const MatDense<FSFG, GPU2> &other, const char op_this)
 		{
 			// other = this * other
+			gm_Op gop_this;
+			char2gm_Op(op_this, gop_this);
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
-			dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, other.gpu_mat, other.gpu_mat, OP_NOTRANSP, OP_NOTRANSP);
-			//TODO: update dims (in transpose/adjoint case)
+			dsm_funcs->mul_gpu_dsm_ext(this->gpu_mat, other.gpu_mat, other.gpu_mat, gop_this, OP_NOTRANSP);
 		}
 
 	template<>
 		void Faust::MatDense<FSFG,GPU2>::multiply(MatDense<FSFG, Cpu> &other, const char op_this)
 		{
 			// other = this * other
-			//TODO: update dims (in transpose/adjoint case)
+			gm_Op gop_this;
+			char2gm_Op(op_this, gop_this);
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			MatDense<FSFG, GPU2> other_gpu_mat(other.getNbRow(), other.getNbCol(), other.getData());
-			other.resize(this->getNbRow(), other.getNbCol());
-			dsm_funcs->mul_gpu_dsm_tocpu_ext(this->gpu_mat, other_gpu_mat.gpu_mat, other.getData(), OP_NOTRANSP, OP_NOTRANSP);
+			if(gop_this == OP_NOTRANSP)
+				other.resize(this->getNbRow(), other.getNbCol());
+			else
+				other.resize(this->getNbCol(), other.getNbRow());
+			dsm_funcs->mul_gpu_dsm_tocpu_ext(this->gpu_mat, other_gpu_mat.gpu_mat, other.getData(), gop_this, OP_NOTRANSP);
 		}
 
 	template<>
@@ -106,12 +111,14 @@ namespace Faust
 	template<>
 		void Faust::MatDense<FSFG,GPU2>::multiply(const MatSparse<FSFG, Cpu> &other, MatDense<FSFG,Cpu>& output, const char op_this)
 		{
+			gm_Op gop_this;
+			char2gm_Op(op_this, gop_this);
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs(FSFG(0));
 			//togpu(int32_t nrows, int32_t ncols, int32_t nnz, int32_t* row_ptr, int32_t* col_inds, @GM_SCALAR@* values)
 			auto other_gpu = spm_funcs->togpu(other.getNbRow(), other.getNbCol(), other.getNonZeros(), (int32_t*) other.getRowPtr(), (int32_t*) other.getColInd(), (double*) other.getValuePtr());
 			// mul_gpu_spm_ext(gm_DenseMat_t, gm_SparseMat_t, gm_DenseMat_t output, gm_Op, gm_Op);
-			auto output_gpu_mat = dsm_funcs->mul_gpu_spm_ext(gpu_mat, other_gpu, nullptr, OP_NOTRANSP, OP_NOTRANSP);
+			auto output_gpu_mat = dsm_funcs->mul_gpu_spm_ext(gpu_mat, other_gpu, nullptr, gop_this, OP_NOTRANSP);
 			output = MatDense<FSFG, Cpu>(getNbRow(), other.getNbCol()); //TODO: manage transpose case
 			dsm_funcs->tocpu(output_gpu_mat, output.getData());
 			dsm_funcs->free(output_gpu_mat);
@@ -121,12 +128,14 @@ namespace Faust
 	template<>
 		void Faust::MatDense<FSFG,GPU2>::multiply(const MatSparse<FSFG, Cpu> &other, MatDense<FSFG,GPU2>& output, const char op_this)
 		{
+			gm_Op gop_this;
+			char2gm_Op(op_this, gop_this);
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs(FSFG(0));
 			auto other_gpu = spm_funcs->togpu(other.getNbRow(), other.getNbCol(), other.getNonZeros(), (int32_t*) other.getRowPtr(), (int32_t*) other.getColInd(), (double*) other.getValuePtr());
 			if(output.gpu_mat != nullptr)
 				dsm_funcs->free(output.gpu_mat);
-			output.gpu_mat = dsm_funcs->mul_gpu_spm_ext(gpu_mat, other_gpu, nullptr, OP_NOTRANSP, OP_NOTRANSP);
+			output.gpu_mat = dsm_funcs->mul_gpu_spm_ext(gpu_mat, other_gpu, nullptr, gop_this, OP_NOTRANSP);
 			spm_funcs->free(other_gpu);
 		}
 
@@ -261,6 +270,7 @@ namespace Faust
 			dsm_funcs->mv_to_gpu(gpu_mat, dev_id);
 			dsm_funcs->set_stream(gpu_mat, nullptr);
 		}
+
 
 	template<>
 		Faust::MatDense<FSFG,GPU2>* Faust::MatDense<FSFG,GPU2>::clone(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/) const
@@ -499,15 +509,20 @@ namespace Faust
 		void gemm(const MatDense<FSFG, GPU2> &A, const MatDense<FSFG, GPU2> &B, MatDense<FSFG, GPU2> &C,
 				const FSFG& alpha, const FSFG& beta, const char opA, const char opB)
 		{
-			gm_Op gop_A = OP_NOTRANSP, gop_B = OP_NOTRANSP;
-			if(opA == 'T')
-				gop_A = OP_TRANSP;
-			else if(opA == 'H')
-				gop_A = OP_CONJTRANSP;
-			if(opB == 'T')
-				gop_B = OP_TRANSP;
-			else if(opB == 'H')
-				gop_B = OP_CONJTRANSP;
+			gm_Op gop_A, gop_B;
+			char2gm_Op(opA, gop_A);
+			char2gm_Op(opB, gop_B);
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
+			dsm_funcs->gemm(A.gpu_mat, B.gpu_mat, C.gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha), reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta), gop_A, gop_B);
+		}
+
+	template <>
+		void gemv(const MatDense<FSFG, GPU2> &A, const Vect<FSFG, GPU2> &B, Vect<FSFG, GPU2> &C,
+				const FSFG& alpha, const FSFG& beta, const char opA, const char opB/*='N'*/)
+		{
+			gm_Op gop_A, gop_B;
+			char2gm_Op(opA, gop_A);
+			char2gm_Op(opB, gop_B);
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(FSFG(0));
 			dsm_funcs->gemm(A.gpu_mat, B.gpu_mat, C.gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha), reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&beta), gop_A, gop_B);
 		}
@@ -658,4 +673,19 @@ namespace Faust
 			delete cpu_cols;
 			return gpu_cols;
 		}
+
+	template<>
+		MatGeneric<FSFG,GPU2>* MatDense<FSFG,GPU2>::Clone(const bool isOptimize /*default value = false*/) const
+		{
+			if (isOptimize)
+			{
+				MatSparse<FSFG,GPU2> S((*this));
+				return optimize((*this),S);
+			}
+			else
+			{
+				return new MatDense<FSFG,GPU2>((*this));
+			}
+		}
+
 };

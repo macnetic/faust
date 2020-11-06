@@ -174,6 +174,7 @@ namespace Faust
 
         FPP& operator[](faust_unsigned_int i){return vec(i);}
         const FPP& operator[](faust_unsigned_int i)const{return vec(i);}
+		void set_coeff(faust_unsigned_int i, const FPP& val) { (*this)[i] = val;};
 
         const FPP& operator()(faust_unsigned_int i)const{return vec(i);}
         bool equality(Vect<FPP,Cpu> const &x, FPP precision) const;

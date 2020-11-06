@@ -151,6 +151,10 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		FaustCoreCppGPU<FPP>* fancy_idx_gpu(unsigned long int* row_ids, unsigned long int
                                   num_rows, unsigned long int* col_ids,
                                   unsigned long int num_cols) const;
+
+		FaustCoreCppGPU<FPP>* optimize_storage_gpu(const bool time=false);
+		FaustCoreCppGPU<FPP>* optimize_gpu(const bool transp=false);
+		FaustCoreCppGPU<FPP>* optimize_time_gpu(const bool transp=false, const bool inplace=false, const int nsamples=1);
 		void device_gpu(char* dev) const;
 		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
 				unsigned int min_num_factors, unsigned int max_num_factors,

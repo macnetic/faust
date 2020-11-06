@@ -42,4 +42,8 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCppGPU[FPP]* fancy_idx_gpu(unsigned long int* row_ids, unsigned long int
                                   num_rows, unsigned long int* col_ids,
                                   unsigned long int num_cols) const
+        FaustCoreCppGPU[FPP]* optimize_storage_gpu(const bool time)
+        FaustCoreCppGPU[FPP]* optimize_gpu(const bool transp)
+        FaustCoreCppGPU[FPP]* optimize_time_gpu(const bool transp, const bool inplace,
+                                                const int nsamples)
 

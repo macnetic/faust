@@ -64,8 +64,8 @@ void Faust::MatGeneric<FPP,DEVICE>::setOp(const char op, faust_unsigned_int& nbR
 
 
 //template <typename FPP, FDevice DEVICE>
-template<typename FPP>
-Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,Faust::MatSparse<FPP,Cpu> const & S)
+template<typename FPP, FDevice DEV>
+Faust::MatGeneric<FPP,DEV>* Faust::optimize(Faust::MatDense<FPP,DEV> const & M,Faust::MatSparse<FPP,DEV> const & S)
 {
 	//std::cout<<"DEBUT OPTIMIZE "<<std::endl;
 
@@ -73,15 +73,16 @@ Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,F
 	if ( (M.getNbCol() != S.getNbCol()) | (M.getNbRow() != S.getNbRow()) )
 		handleError("Faust::MatGeneric::", " Faust::optimize : matrix M and S have not the same size");
 
-	Faust::Vect<FPP,Cpu> x_dense(M.getNbCol());
+	Faust::Vect<FPP,DEV> x_dense(M.getNbCol());
 
 	for (int i=0;i<M.getNbCol();i++)
 	{
-		x_dense[i]=i*0.005;
+//		x_dense[i]=i*0.005;
+		x_dense.set_coeff(i, i*.005);
 	}
 
-	Faust::Vect<FPP,Cpu> const x(x_dense);
-	Faust::Vect<FPP,Cpu> x_sparse(x_dense);
+	Faust::Vect<FPP,DEV> const x(x_dense);
+	Faust::Vect<FPP,DEV> x_sparse(x_dense);
 
 	int nb_mult=10;
 	Faust::Timer t_dense,t_sparse;
@@ -107,11 +108,11 @@ Faust::MatGeneric<FPP,Cpu>* Faust::optimize(Faust::MatDense<FPP,Cpu> const & M,F
 	if (t_sparse.get_time() <= t_dense.get_time())
 	{
 		//std::cout<<" CHOICE SPARSE "<<t_dense.get_time()<<std::endl;
-		return new MatSparse<FPP,Cpu>(S);
+		return new MatSparse<FPP,DEV>(S);
 	}else
 	{
 		//std::cout<<" CHOICE DENSE "<<t_dense.get_time()<<std::endl;
-		return new MatDense<FPP,Cpu>(M);
+		return new MatDense<FPP,DEV>(M);
 	}
 
 	//std::cout<<"FIN OPTIMIZE "<<t_sparse.get_time()<<std::endl;

@@ -79,6 +79,7 @@ namespace Faust
 				void setIdentity(int32_t dim);
 				void setZeros();
 				MatSparse<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
+				MatGeneric<FPP,GPU2>* Clone(const bool isOptimize=false) const;
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				int32_t getNbRow() const;
 				int32_t getNbCol() const;
@@ -87,6 +88,7 @@ namespace Faust
 				void Display() const;
 				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 				MatType getType() const;
+				void multiply(Vect<FPP,GPU2>& vec, char opThis='N') const;
 				~MatSparse();
 
 			MatSparse<FPP,GPU2>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;

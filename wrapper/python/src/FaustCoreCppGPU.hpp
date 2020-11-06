@@ -167,4 +167,30 @@ void FaustCoreCppGPU<FPP>::multiply_gpu(FPP* y_data, int y_nrows, int y_ncols, F
 	Y.tocpu(Y_cpu);
     memcpy(y_data, Y_cpu.getData(), sizeof(FPP)*y_ncols*y_nrows);
 }
+
+
+    template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::optimize_storage_gpu(const bool time)
+{
+    Faust::TransformHelper<FPP, GPU2>* th = this->transform->optimize_storage(time);
+    FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
+    return core;
+}
+
+	template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::optimize_gpu(const bool transp/*=false*/)
+{
+    Faust::TransformHelper<FPP, GPU2>* th = this->transform->optimize(transp);
+    FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
+    return core;
+}
+
+	template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::optimize_time_gpu(const bool transp/*=false*/, const bool inplace/*=false*/, const int nsamples/*=1*/)
+{
+    Faust::TransformHelper<FPP, GPU2>* th = this->transform->optimize_time(transp, inplace, nsamples);
+    FaustCoreCppGPU<FPP>* core = new FaustCoreCppGPU<FPP>(th);
+    return core;
+}
+
 #endif

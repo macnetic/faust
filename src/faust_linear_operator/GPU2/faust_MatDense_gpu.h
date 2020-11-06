@@ -13,6 +13,9 @@ namespace Faust
 	template <typename FPP>
 	void gemm(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 
+	template <typename FPP>
+	void gemv(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB='N');
+
 
 	template<typename FPP, FDevice DEVICE>
 		class MatDense;
@@ -22,6 +25,8 @@ namespace Faust
 			friend Transform<FPP,GPU2>; // need to access to get_gpu_mat_ptr
 			friend MatSparse<FPP,GPU2>;
 			friend void gemm<>(const MatDense<FPP, GPU2> &A, const MatDense<FPP, GPU2> &B, MatDense<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
+
+			friend void gemv<>(const MatDense<FPP, GPU2> &A, const Vect<FPP, GPU2> &B, Vect<FPP, GPU2> &C, const FPP& alpha, const FPP& beta, const char opA, const char opB);
 
 			public:
 				MatDense(const faust_unsigned_int nbRow,
@@ -63,7 +68,7 @@ namespace Faust
 				// vec = this * vec
 				Vect<FPP, Cpu> multiply(const Vect<FPP, Cpu> &vec);
 				//  other = (*this) * other
-				void multiply(MatDense<FPP, GPU2> &other, const char op_this='N');
+				void multiply(const MatDense<FPP, GPU2> &other, const char op_this='N');
 				//  other = (*this) * other
 				void multiply(MatDense<FPP, Cpu> &other, const char op_this='N');
 //				void multiply(MatSparse<FPP, Cpu> &other, MatDense<FPP, GPU2>& output, const char op_this='N');
@@ -75,6 +80,14 @@ namespace Faust
 				//! \brief Replace (this) by S * (this)
 				void multiplyLeft(const MatSparse<FPP, Cpu>& S, const char transS='N');
 				void multiply(const Vect<FPP, GPU2>& vec, Vect<FPP, GPU2>& out_vec) const;
+				//! \brief compute MatDense-vector multiplication
+				//! \param vec : the vector
+				//! \param opThis : character	
+				//! vec = (*this) * vec if opThis='N'
+				// vec = (*this)' * vec if opThis='T'
+				void multiply(Vect<FPP,GPU2> & vec,const char opThis) const
+				{gemv((*this),vec,vec,(FPP) 1.0, (FPP) 0.0,opThis);}
+
 				void operator*=(const MatDense<FPP, GPU2> &other);
 				void operator*=(const MatDense<FPP, Cpu> &other);
 //				void operator*=(MatSparse<FPP, Cpu> &other);
@@ -96,6 +109,8 @@ namespace Faust
 				int32_t getDevice() const;
 				FPP trace() const;
 				MatDense<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
+
+				MatGeneric<FPP,GPU2>* Clone(const bool isOptimize=false) const;
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				void tocpu(FPP* cpu_buffer, const void* stream/*=nullptr*/) const;
 				MatDense<FPP, Cpu> tocpu(const void* stream=nullptr) const;

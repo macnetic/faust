@@ -772,3 +772,41 @@ cdef class FaustCoreGPU:
 #                # shouldn't happen normally (avoided by calling function)
         return y_data_arr
 
+    def optimize_storage(self, time=False):
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.optimize_storage_gpu(time)
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.optimize_storage_gpu(time)
+        core._isReal = self._isReal
+        return core
+
+    def optimize(self, transp=False):
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.optimize_gpu(transp)
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.optimize_gpu(transp)
+        core._isReal = self._isReal
+        return core
+
+    def optimize_time(self, transp=False, inplace=False, nsamples=1):
+        if(inplace):
+            if(self._isReal):
+                self.core_faust_dbl.optimize_time_gpu(transp, inplace, nsamples)
+#            else:
+#                self.core_faust_cplx.optimize_time(transp, inplace, nsamples)
+        else:
+            core = FaustCoreGPU(core=True)
+            if(self._isReal):
+                core.core_faust_dbl = self.core_faust_dbl.optimize_time_gpu(transp,
+                                                                      inplace,
+                                                                      nsamples)
+#            else:
+#                core.core_faust_cplx = self.core_faust_cplx.optimize_time(transp,
+#                                                                         inplace,
+#                                                                         nsamples)
+            core._isReal = self._isReal
+            return core
+
+

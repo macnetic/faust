@@ -99,6 +99,23 @@ namespace Faust
 			return *this;
 	}
 
+
+	template<>
+		faust_unsigned_int Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getNonZeros() const
+		{
+			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			if(gpu_mat != nullptr)
+				return spm_funcs->get_nnz(gpu_mat);
+			throw std::runtime_error("gpu_mat is nullptr");
+		}
+
+	template<>
+	MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::MatSparse(const MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2> &M, int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/ ) : MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>(M.getNbRow(), M.getNbCol(), M.getNonZeros())
+	{
+		//TODO: use dev_id and stream ?
+		*this = M;
+	}
+
 	template<>
 	bool MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator==(const MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>& mat) const
 	{
@@ -150,15 +167,6 @@ namespace Faust
 		this->gpu_mat = gmat.gpu_mat;
 		gmat.gpu_mat = nullptr; // to avoid freeing the new gpu_mat when leaving this scope
 	}
-
-	template<>
-		faust_unsigned_int Faust::MatSparse<@FAUST_SCALAR_FOR_GM@, GPU2>::getNonZeros() const
-		{
-			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			if(gpu_mat != nullptr)
-				return spm_funcs->get_nnz(gpu_mat);
-			throw std::runtime_error("gpu_mat is nullptr");
-		}
 
 	template<>
 		void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::tocpu(int* row_ptr, int* col_ind, @FAUST_SCALAR_FOR_GM@* value_ptr, int* nrows/*=nullptr*/, int* ncols/*=nullptr*/, int* nnz/*=nullptr*/) const
@@ -245,6 +253,19 @@ namespace Faust
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(gpu_mat != nullptr)
 				spm_funcs->set_zeros(gpu_mat);
+		}
+
+	template<typename FPP>
+		MatGeneric<FPP,GPU2>* MatSparse<FPP,GPU2>::Clone(const bool isOptimize /*default value=false*/) const
+		{
+			if (isOptimize)
+			{
+				Faust::MatDense<FPP,GPU2> M((*this));
+				return optimize(M,(*this));
+			} else
+			{
+				return new Faust::MatSparse<FPP,GPU2>((*this));
+			}
 		}
 
 	template<>
@@ -415,4 +436,17 @@ namespace Faust
 			delete cpu_cols;
 			return gpu_cols;
 		}
+
+	template<>
+		void MatSparse<FSFG, GPU2>::multiply(Vect<FSFG,GPU2>& vec, char opThis/*='N'*/) const
+		{
+			gm_Op gop_this;
+			char2gm_Op(opThis, gop_this);
+			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			auto gpu_dmat = spm_funcs->mul_gpu_dsm_ext(gpu_mat, vec.gpu_mat, nullptr, gop_this, OP_NOTRANSP);
+			dsm_funcs->free(vec.gpu_mat);
+			vec.gpu_mat = gpu_dmat;
+		}
+
 };

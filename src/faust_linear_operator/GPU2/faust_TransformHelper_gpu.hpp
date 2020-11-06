@@ -292,14 +292,12 @@ namespace Faust
 	template<typename FPP>
 		Vect<FPP,Cpu> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,Cpu> &A, const bool transpose /* deft to false */, const bool conjugate/*=false*/)
 		{
-//			Vect<FSFG,GPU2>::Vect(const faust_unsigned_int size,
-//					const FSFG* cpu_data,
-//					const bool no_alloc,
-//					const int32_t dev_id,
-//					const void* stream): MatDense<FSFG,GPU2>(size, 1, cpu_data, no_alloc, dev_id, stream)
-
+			this->is_transposed ^= transpose;
+			this->is_conjugate ^= conjugate;
 			Vect<FPP,GPU2> gpu_A(A.size(), A.getData());
-			Vect<FPP,GPU2> v = this->multiply(gpu_A/*, transpose, conjugate*/); //TODO: handle transpose and conjugate
+			Vect<FPP,GPU2> v = this->multiply(gpu_A , transpose, conjugate); //TODO: handle transpose and conjugate
+			this->is_transposed ^= transpose;
+			this->is_conjugate ^= conjugate;
 			return v.tocpu();
 		}
 
@@ -314,9 +312,14 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		Vect<FPP,GPU2> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,GPU2>& a)
+		Vect<FPP,GPU2> TransformHelper<FPP,GPU2>::multiply(const Faust::Vect<FPP,GPU2>& a, const bool transpose/*=false*/, const bool conjugate/*=false*/)
 		{
-			throw std::runtime_error("multiply is yet to implement in Faust C++ core for GPU.");
+			this->is_transposed ^= transpose;
+			this->is_conjugate ^= conjugate;
+			Vect<FPP,GPU2> v = this->transform->multiply(a, this->isTransposed2char());
+			this->is_transposed ^= transpose;
+			this->is_conjugate ^= conjugate;
+			return v;
 		}
 
 	template<typename FPP>
@@ -532,6 +535,12 @@ namespace Faust
 		{
 			throw std::runtime_error("optimize_time is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
+//			TransformHelper<FPP,Cpu> th;
+//			this->tocpu(th);
+//			auto thn = th.optimize_time(transp, /*inplace*/ true, nsamples);
+//			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
+//			delete thn;
+//			return gpu_thn;
 		}
 
 	template<typename FPP>
@@ -539,13 +548,12 @@ namespace Faust
 		{
 			throw std::runtime_error("optimize is yet to implement in Faust C++ core for GPU.");
 			return nullptr;
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::optimize_storage(const bool time/*=true*/)
-		{
-			throw std::runtime_error("optimize_storage is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
+//			TransformHelper<FPP,Cpu> th;
+//			this->tocpu(th);
+//			auto thn = th.optimize(transp);
+//			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
+//			delete thn;
+//			return gpu_thn;
 		}
 
 	template<typename FPP>

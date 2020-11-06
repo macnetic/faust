@@ -267,57 +267,6 @@ namespace Faust {
 		}
 
 	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize_storage(const bool time /* default true */)
-		{
-			Faust::MatDense<FPP,Cpu> *dfac = nullptr;
-			Faust::MatSparse<FPP,Cpu> *sfac = nullptr;
-			faust_unsigned_int sparse_weight;
-			std::vector<Faust::MatGeneric<FPP,Cpu>*> opt_factors;
-
-			for(auto fac : this->transform->data)
-			{
-				if((dfac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(fac)))
-					sfac = nullptr;
-				else
-					sfac = dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(fac);
-
-				if(time)
-				{
-					if((dfac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(fac)))
-					{
-						opt_factors.push_back(dfac->Clone(true));
-					}
-					else
-					{
-						opt_factors.push_back(sfac->Clone(true));
-					}
-				}
-				else
-				{ // storage size is the main criterion
-					sparse_weight = fac->getNonZeros()*(sizeof(FPP)+sizeof(int))+(fac->getNbRow()+1)*sizeof(int);
-					if(sparse_weight < fac->getNbCol()*fac->getNbRow()*sizeof(FPP))
-					{
-						// choose CSR format
-						if(dfac)
-							opt_factors.push_back(new Faust::MatSparse<FPP, Cpu>(*dfac));
-						else
-							opt_factors.push_back(new Faust::MatSparse<FPP, Cpu>(*sfac));
-					}
-					else
-					{
-						// choose dense format
-						if(sfac)
-							opt_factors.push_back(new Faust::MatDense<FPP, Cpu>(*sfac));
-						else
-							opt_factors.push_back(new Faust::MatDense<FPP, Cpu>(*dfac));
-					}
-				}
-			}
-			TransformHelper<FPP,Cpu> *pth = new TransformHelper<FPP,Cpu>(opt_factors, 1, false, false, true);
-			return pth;
-		}
-
-	template<typename FPP>
 		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::optimize(const bool transp /* deft to false */)
 		{
 			//TODO: need a nsamples argument to feed optimize_time*

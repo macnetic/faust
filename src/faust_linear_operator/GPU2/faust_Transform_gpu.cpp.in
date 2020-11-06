@@ -485,6 +485,16 @@ void Faust::Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::get_fact(const faust_unsigned
 		}
 
 	template<>
+	Vect<@FAUST_SCALAR_FOR_GM@,GPU2> Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const Vect<@FAUST_SCALAR_FOR_GM@,GPU2>& x, const char opThis/*='N'*/)
+	{
+		MatDense<@FAUST_SCALAR_FOR_GM@, GPU2> out = this->multiply((const MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>)x, opThis);
+		Vect<@FAUST_SCALAR_FOR_GM@,GPU2> v_out;
+		v_out.gpu_mat = out.gpu_mat;
+		out.gpu_mat = nullptr; // avoid freeing v_out.gpu_mat when out of scope
+		return v_out;
+	}
+
+	template<>
 		MatGeneric<@FAUST_SCALAR_FOR_GM@,GPU2>* Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::iterator::operator*() const
 		{
 			return container.get_fact(index, /*cloning_fact*/ false);

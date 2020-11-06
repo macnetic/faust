@@ -1,6 +1,10 @@
 #ifndef __FAUST_MATGENERIC_GPU__
 #define __FAUST_MATGENERIC_GPU__
 #include "faust_constant.h"
+#include "faust_Timer.h"
+#include "faust_MatDense_gpu.h"
+#include "faust_MatSparse_gpu.h"
+
 namespace Faust
 {
 	template<typename FPP, FDevice DEVICE> class Transform;
@@ -22,8 +26,10 @@ namespace Faust
 				virtual int32_t getNbRow() const=0;
 				virtual int32_t getNbCol() const=0;
 				virtual MatGeneric<FPP,GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const=0;
+				virtual MatGeneric<FPP,GPU2>* Clone(const bool isOptimize=false) const=0;
 				virtual void* get_gpu_mat_ptr() const=0;
 				virtual faust_unsigned_int getNonZeros() const=0;
+				Real<FPP> density() const{return ((Real<FPP>) this->getNonZeros())/((float)this->getNbCol()*this->getNbRow());}
 				virtual void transpose()=0;
 				virtual void conjugate()=0;
 				virtual void adjoint()=0;
@@ -38,9 +44,14 @@ namespace Faust
 
 			virtual void Display() const=0;
 			MatGeneric();
+
 			virtual ~MatGeneric();
 		};
 
+//	template<typename FPP>
+//	MatGeneric<FPP,GPU2>* optimize(MatDense<FPP,GPU2> const & M, MatSparse<FPP,GPU2> const & S);
+//
+	void char2gm_Op(const char& c, gm_Op & op);
 }
 #include "faust_MatGeneric_gpu.hpp"
 #endif
