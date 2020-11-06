@@ -480,19 +480,13 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const
 		{
-			throw std::runtime_error("normalize is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
-//			TransformHelper<FPP,Cpu> th;
-//			this->tocpu(th);
-//            std::cout << "normalize, cpu conv" << std::endl;
-//            th.display();
-//            std::cout << "meth: " << meth << std::endl;
-//			auto thn = th.normalize(meth<0?-meth:meth);
-//            int flag;
-//            std::cout << "thn cpu norm:" << thn->spectralNorm(100, FAUST_PRECISION, flag) << std::endl;
-//			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
-//			delete thn;
-//			return gpu_thn;
+			TransformHelper<FPP,Cpu> th;
+			this->tocpu(th);
+			auto thn = th.normalize(meth);
+			int flag;
+			auto gpu_thn = new TransformHelper<FPP,GPU2>(*thn, -1, nullptr);
+			delete thn;
+			return gpu_thn;
 		}
 
 	template<typename FPP>
