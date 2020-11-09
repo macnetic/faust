@@ -154,4 +154,16 @@ namespace Faust {
 		return GPUModHandler::get_singleton()->enable_gpu_mod(libpath, silent);
 	}
 
+	void char2gm_Op(const char& c, gm_Op & op)
+	{
+		if(c == 'N')
+			op = OP_NOTRANSP;
+		else if(c == 'T')
+			op = OP_TRANSP;
+		else if(c == 'H')
+			op = OP_CONJTRANSP;
+		else
+			throw std::runtime_error("invalid character to convert to gm_Op");
+	}
+
 }

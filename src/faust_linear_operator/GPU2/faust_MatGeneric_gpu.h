@@ -51,7 +51,6 @@ namespace Faust
 //	template<typename FPP>
 //	MatGeneric<FPP,GPU2>* optimize(MatDense<FPP,GPU2> const & M, MatSparse<FPP,GPU2> const & S);
 //
-	void char2gm_Op(const char& c, gm_Op & op);
 }
 #include "faust_MatGeneric_gpu.hpp"
 #endif

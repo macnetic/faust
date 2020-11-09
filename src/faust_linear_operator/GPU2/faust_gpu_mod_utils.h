@@ -85,6 +85,7 @@ namespace Faust
 
 	// easy access wrapper for the Faust namespace
 	void* enable_gpu_mod(const char* libpath = "libgm.so", const bool silent=false);
+	void char2gm_Op(const char& c, gm_Op & op);
 }
 #define load_all_mat_funcs(type) \
 			marr_funcs_##type = new gm_MatArrayFunc_##type();\
