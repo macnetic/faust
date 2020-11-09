@@ -6,6 +6,8 @@ from setuptools import setup, Extension
 from Cython.Build import cythonize
 import numpy
 import sys
+from os import sep
+from glob import glob
 
 version = '@CPACK_PACKAGE_VERSION@'
 
@@ -14,34 +16,17 @@ if(version == ''):
                     # (not for packaging with a proper version)
                     # it avoids error PEP440
 
-if sys.platform == 'win32':
-    from os import sep
-    from glob import glob
 
-    PyFaust = Extension('_FaustCorePy',
-                        sources = @PY_EXT_SOURCES@,
-                        language = 'c++',
-                        include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],
-                        library_dirs=[@FAUST_PYTHON_LIB_DIR@],
-                        libraries=[ @FAUST_PYTHON_LIBS@],
-                        extra_compile_args = [ @FAUST_SETUP_PY_CFLAGS@ ],
-                        extra_link_args = [ @FAUST_SETUP_PY_LFLAGS@ ],
-                        extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
-                       )
-
-
-else: # linux and mac
-    PyFaust = Extension('_FaustCorePy',
-                        sources = @PY_EXT_SOURCES@,
-                        language = 'c++',
-                        include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],
-                        library_dirs=[@FAUST_PYTHON_LIB_DIR@],
-                        libraries=[@FAUST_PYTHON_LIBS@],
-                        extra_compile_args = [ @FAUST_SETUP_PY_CFLAGS@ ],
-                        extra_link_args = [ @FAUST_SETUP_PY_LFLAGS@ ],
-                        extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
-                       )
-
+PyFaust = Extension('_FaustCorePy',
+                    sources = @PY_EXT_SOURCES@,
+                    language = 'c++',
+                    include_dirs=[@FAUST_PYTHON_INCLUDE_DIR@, numpy.get_include()],
+                    library_dirs=[@FAUST_PYTHON_LIB_DIR@],
+                    libraries=[ @FAUST_PYTHON_LIBS@],
+                    extra_compile_args = [ @FAUST_SETUP_PY_CFLAGS@ ],
+                    extra_link_args = [ @FAUST_SETUP_PY_LFLAGS@ ],
+                    extra_objects = @PYTHON_EXT_EXTRA_OBJECTS@
+                   )
 
 
 setup(
