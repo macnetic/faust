@@ -12,7 +12,7 @@ stages:
     - test
     - pkg_rev
 
-ctest:
+.ctest:
     <<: *ctest_script
     variables: {SLOW_TESTS: "OFF", BUILD_MULTITHREAD: "ON"} # the CDashConfScript is able to retrieve OpenMP_gomp_LIBRARY and OpenMP_INC_DIR from environment (it's necessary on macOS, so the runner's env. must be configured)
     except:
@@ -22,7 +22,7 @@ ctest:
     tags:
         - linux
 
-ctest_python:
+.ctest_python:
     <<: *ctest_script
     variables: {BUILD_WRAPPER_PYTHON: "ON", SLOW_TESTS: "OFF", DONT_PYPLOT_FAUST_TIME: "ON", NOCPPTESTS: "ON", NOPY2: "ON", BUILD_MULTITHREAD: "ON"} #, GIT_STRATEGY: none}
     except:
@@ -33,7 +33,7 @@ ctest_python:
     tags:
         - linux
 
-ctest_matlab:
+.ctest_matlab:
     <<: *ctest_script
     variables: {BUILD_WRAPPER_MATLAB: "ON", SLOW_TESTS: "OFF", NOCPPTESTS: "ON", BUILD_MULTITHREAD: "OFF"} # MT OFF because of macOS complicated way to enable OpenMP (but packages are OMP enabled)
     except:

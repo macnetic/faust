@@ -104,9 +104,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if(params->isVerbose) params->Display();
 		SCALAR lambda = params->init_lambda;
 
-		cout << "mark 1" << endl;
 		TransformHelper<SCALAR, GPU2>* F = new TransformHelper<SCALAR, GPU2>(), *F_lambda = nullptr;
-		cout << "mark 2" << endl;
 
 		//TODO: use_csr, packing_RL to add to ParamsPalm and parsing of matlab_params
 		bool packing_RL = true;
@@ -122,13 +120,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				(dynamic_cast<Faust::ConstraintFPP<SCALAR,GPU2>*>(*(noconst_cons.end()-1)))->Display();
 		}
 
-		cout << "mark 3" << endl;
 		palm4msa2<SCALAR,GPU2>(params->data, noconst_cons, *F, lambda, params->stop_crit, params->isUpdateWayR2L,
 				use_csr, packing_RL, /* compute_2norm_on_array */ false, params->norm2_threshold,
 				params->norm2_max_iter, params->isConstantStepSize, params->step_size);
 
-		cout << "mark 4" << endl;
-		Faust::MatDense<FPP2,GPU2> mat1x1Lambda = Faust::MatDense<FPP2, GPU2>(1, 1, &lambda);
+		Faust::MatDense<FPP2,GPU2> mat1x1Lambda = Faust::MatDense<FPP2, GPU2>(1, 1, &lambda, /* no_alloc*/ false, /*dev_id*/ -1, /*stream*/ nullptr);
 		Faust::MatDense<FPP2,Cpu> cpu_mat1x1Lambda;
 		plhs[0] = FaustMat2mxArray(cpu_mat1x1Lambda);
 		F_lambda = F->multiply(lambda);

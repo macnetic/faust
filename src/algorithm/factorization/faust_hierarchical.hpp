@@ -61,20 +61,20 @@ Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FP
 		}
 		if(use_csr)
 		{
-			tmp_sparse = new Faust::MatSparse<FPP,DEVICE>(zero_dims[0], zero_dims[1]);
+			tmp_sparse = new Faust::MatSparse<FPP,DEVICE>((faust_unsigned_int)zero_dims[0], (faust_unsigned_int)zero_dims[1]);
 			tmp_sparse->setZeros();
 			zero_mat = tmp_sparse;
-			tmp_sparse = new Faust::MatSparse<FPP,DEVICE>(id_dims[0], id_dims[1]);
+			tmp_sparse = new Faust::MatSparse<FPP,DEVICE>((faust_unsigned_int)id_dims[0], (faust_unsigned_int)id_dims[1]);
 			tmp_sparse->setEyes();
 			id_mat = tmp_sparse;
 		}
 		else
 		{
 
-			tmp_dense = new Faust::MatDense<FPP,DEVICE>(zero_dims[0], zero_dims[1]);
+			tmp_dense = new Faust::MatDense<FPP,DEVICE>((faust_unsigned_int)zero_dims[0], (faust_unsigned_int)zero_dims[1]);
 			tmp_dense->setZeros();
 			zero_mat = tmp_dense;
-			tmp_dense = new Faust::MatDense<FPP,DEVICE>(id_dims[0], id_dims[1]);
+			tmp_dense = new Faust::MatDense<FPP,DEVICE>((faust_unsigned_int)id_dims[0], (faust_unsigned_int)id_dims[1]);
 			tmp_dense->setEyes();
 			id_mat = tmp_dense;
 		}
