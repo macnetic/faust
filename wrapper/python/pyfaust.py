@@ -238,11 +238,7 @@ class Faust:
         """
         Returns the device on which the Faust is located (cpu or gpu).
         """
-        if(isinstance(self.m_faust, (_FaustCorePy.FaustCoreGPU,
-                      _FaustCorePy.FaustCore))):
-            return self.m_faust.device()
-        else:
-            raise TypeError('This Faust object is invalid.')
+        return self.m_faust.device()
 
     def transpose(F):
         """
@@ -502,9 +498,7 @@ class Faust:
 
         See also Faust.__sub__
         """
-        dev = 'cpu'
-        if isinstance(F.m_faust, _FaustCorePy.FaustCoreGPU):
-            dev = 'gpu'
+        dev = F.device
         for i in range(0,len(args)):
             G = args[i]
             if(isinstance(G,Faust)):
@@ -1774,7 +1768,7 @@ class Faust:
         Returns:
             The Faust clone.
         """
-        if isinstance(F.m_faust, _FaustCorePy.FaustCoreGPU):
+        if F.device == 'gpu':
              clone_F = Faust(core_obj=F.m_faust.clone(dev))
              return clone_F
         else:
