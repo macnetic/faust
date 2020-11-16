@@ -11,6 +11,7 @@ import _FaustCorePy
 import pyfaust
 import pyfaust.factparams
 import warnings
+import decimal
 
 class Faust:
     """<b>FAuST Python wrapper main class</b> for using multi-layer sparse transforms.
@@ -1580,6 +1581,20 @@ class Faust:
         if(format == "Matlab"):
             F.m_faust.save_mat_file(filepath)
 
+    def astype(F, dtype):
+        #TODO: full list of numpy args or **kw_unknown
+        if(dtype == F.dtype):
+            return F.clone(dev=F.device)
+        elif dtype == np.complex:
+            return F*np.complex(1,0)
+        else:
+            raise ValueError("complex -> float conversion not yet supported.")
+
+    def asarray(F):
+        print('Faust.asarray')
+        #TODO: full list of numpy args or **kw_unknown
+        return F
+
     @property
     def dtype(F):
         """
@@ -1773,6 +1788,77 @@ class Faust:
              return clone_F
         else:
             return Faust([F.factors(i) for i in range(F.numfactors())], dev=dev)
+
+    def average(F, axis=None, weights=None, returned=False):
+        """
+
+        """
+        if axis == None:
+            axis = (0, 1)
+        if not (isinstance(axis, int) or isinstance(axis, tuple) and
+                isinstance(axis[0], int) and isinstance(axis[1], int)):
+            raise TypeError('axis must be int or tuple of ints')
+        if not isinstance(weights, np.ndarray) and weights == None:
+            def_rweights = ones((1, F.shape[0]))
+            def_cweights = ones((F.shape[1], 1))
+            if isinstance(axis, int):
+                if axis == 0:
+                    weights = def_rweights
+                elif axis == 1:
+                    weights = def_cweights
+            elif isinstance(axis, tuple):
+                return F.average(axis=0,
+                                 weights=def_rweights,
+                                 returned=returned).average(axis=1,
+                                                            weights=def_cweights,
+                                                            returned=returned)
+        if not isinstance(weights, np.ndarray):
+            weights = np.array(weights)
+        if weights.shape != F.shape and weights.ndim != 1:
+            raise TypeError("1D weights expected when shapes of a and weights"
+                            " differ.")
+
+        if weights.shape == F.shape:
+            aF = Faust([(weights[:,0].T).reshape(1,F.shape[0])])*F[:,0]
+            for i in range(1,F.shape[1]):
+                aF = pyfaust.hstack((aF, Faust([(weights[:,i].T).reshape(1,
+                                                                         F.shape[0])])*F[:,i]))
+            sum_weights = 1/np.sum(weights, axis=axis)
+            aFw =  aF[:,0]*Faust([sum_weights[0].reshape(1,1)])
+            for i in range(1, sum_weights.shape[0]):
+                aFw = pyfaust.hstack((aFw,
+                                      aF[:,i]*Faust([sum_weights[i].reshape(1,1)])))
+            if(returned):
+                return (aFw, sum_weights)
+            return aFw
+
+        if axis == 1 or isinstance(axis, tuple) and 1 in axis:
+            if weights.shape[0] == F.shape[1]:
+                aF = F*Faust(weights.reshape(weights.size, 1))
+            else:
+                raise ValueError("ValueError: Length of weights not compatible"
+                                 " with specified axis.")
+            sum_weights = np.sum(weights.reshape(weights.size, 1), axis=0)[0]
+
+        if axis == 0 or isinstance(axis, tuple) and 0 in axis:
+            weightsM = weights
+            if weights.ndim == 1:
+                weightsM = weights.reshape(1, weights.size)
+            if weightsM.shape[1] == F.shape[0]:
+                aF = Faust(weightsM)*F
+            else:
+                raise ValueError("ValueError: Length of weights not compatible"
+                                 " with specified axis.")
+            sum_weights = np.sum(weightsM.reshape(1, weights.size),
+                                 axis=1)[0]
+
+        if sum_weights != 0:
+            aF = aF * (1/sum_weights)
+        else:
+            raise decimal.DivisionByZero("Weights sum to zero, can't be normalized")
+        if(returned):
+            return (aF, sum_weights)
+        return aF
 
 pyfaust.Faust.__div__ = pyfaust.Faust.__truediv__
 
