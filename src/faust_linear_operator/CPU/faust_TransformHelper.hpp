@@ -1466,6 +1466,26 @@ namespace Faust {
 	}
 
 
+	template<typename FPP>
+		void TransformHelper<FPP,Cpu>::swap(faust_unsigned_int id1, faust_unsigned_int id2)
+		{
+			// swap two columns id1, id2 of the last factors
+			auto last_fac = this->get_gen_fact(this->size()-1);
+			auto dlast_fac = dynamic_cast<MatGeneric<FPP,Cpu>*>(last_fac);
+			MatSparse<FPP,Cpu>* slast_fac = nullptr;
+			Vect<FPP,Cpu> v = last_fac->get_col(id1);
+			bool fact_is_sparse = dlast_fac == nullptr;
+			if(fact_is_sparse)
+				dlast_fac = new MatDense<FPP,Cpu>(last_fac);
+			memcpy(dlast_fac->getData()+dlast_fac->getNbRow()*id1, dlast_fac->getData()+dlast_fac->getNbRow()*id2, sizeof(FPP)*dlast_fac->getNbRow());
+			memcpy(dlast_fac->getData()+dlast_fac->getNbRow()*id2, v.getData(), sizeof(FPP)*dlast_fac->getNbRow());
+			if(fact_is_sparse)
+			{
+				slast_fac = dynamic_cast<MatSparse<FPP,Cpu>*>(last_fac);
+				*slast_fac = *dlast_fac;
+			}
+		}
+
 	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
 	template<typename FPP> std::default_random_engine TransformHelper<FPP,Cpu>::generator(time(NULL));
 }

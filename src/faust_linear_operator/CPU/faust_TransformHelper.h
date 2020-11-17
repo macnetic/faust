@@ -194,6 +194,8 @@ namespace Faust
 			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
 			void pack_factors();
 
+			void swap(faust_unsigned_int id1, faust_unsigned_int id2);
+
 			/** for testing purpose only (memory leaks enabled) */
 			void disable_dtor() { this->transform->disable_dtor(); }
 			void enable_dtor() { this->transform->enable_dtor(); }
