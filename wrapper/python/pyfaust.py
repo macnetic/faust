@@ -502,19 +502,36 @@ class Faust:
         dev = F.device
         for i in range(0,len(args)):
             G = args[i]
-            if(isinstance(G,Faust)):
-                if(F.shape != G.shape):
+            if isinstance(G,Faust):
+                if G.shape[0] == 1:
+                    if G.shape[1] != F.shape[1]:
+                        raise ValueError("operands could not be broadcast"
+                                         " together with shapes ", F.shape,
+                                         G.shape)
+                    G = pyfaust.vstack(tuple((G for i in range(0, F.shape[0]))))
+                elif G.shape[1] == 1:
+                    if G.shape[0] != F.shape[0]:
+                        raise ValueError("operands could not be broadcast"
+                                         " together with shapes ", F.shape,
+                                         G.shape)
+                    G = pyfaust.hstack(tuple((G for i in range(0,
+                                                               F.shape[1]))))
+                if F.shape != G.shape:
                     raise Exception('Dimensions must agree')
                 C = F.concatenate(G, axis=1)
                 # Id = np.eye(int(C.shape[1]/2))
                 Fid = eye(int(C.shape[1]/2), dev=dev)
                 #F = C*Faust(np.concatenate((Id,Id)),axis=0)
                 F = C*Fid.concatenate(Fid,axis=0)
-            elif(isinstance(G,np.ndarray) or
+            elif (isinstance(G,np.ndarray) or
                  isinstance(G,scipy.sparse.csr_matrix) or
                  isinstance(G,scipy.sparse.csc_matrix)):
-                F = F+Faust(G)
-            elif(isinstance(G,(int, float, np.complex))):
+                if G.ndim == 1:
+                    G = Faust([np.ones((F.shape[0], 1)), G.reshape(1, G.size)])
+                    F = F+G
+                else:
+                    F = F+Faust(G)
+            elif isinstance(G,(int, float, np.complex)):
                 if(F.shape[0] <= F.shape[1]):
                     F = F+Faust([np.eye(F.shape[0], F.shape[1]),
                                  np.ones((F.shape[1], 1))*G,
@@ -1701,6 +1718,16 @@ class Faust:
         """
         return isinstance(obj, Faust)
 
+    def issparse(F):
+        """
+        Returns True if all factors are sparse (csr_matrix format) False otherwise.
+        """
+        issparse = True
+        for f in [F.factors(i) for i in range(0,F.numfactors())]:
+            if not isinstance(f, csr_matrix):
+                return False
+        return issparse
+
     def optimize_memory(F):
         """
         Optimizes a Faust by changing the storage format of each factor in order to optimize the memory size.
@@ -1799,8 +1826,8 @@ class Faust:
                 isinstance(axis[0], int) and isinstance(axis[1], int)):
             raise TypeError('axis must be int or tuple of ints')
         if not isinstance(weights, np.ndarray) and weights == None:
-            def_rweights = ones((1, F.shape[0]))
-            def_cweights = ones((F.shape[1], 1))
+            def_rweights = np.ones(F.shape[0])
+            def_cweights = np.ones(F.shape[1])
             if isinstance(axis, int):
                 if axis == 0:
                     weights = def_rweights
