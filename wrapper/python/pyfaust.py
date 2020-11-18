@@ -508,14 +508,14 @@ class Faust:
                         raise ValueError("operands could not be broadcast"
                                          " together with shapes ", F.shape,
                                          G.shape)
-                    G = pyfaust.vstack(tuple((G for i in range(0, F.shape[0]))))
+
+                        G = Faust(np.ones(F.shape[0], 1)) * G
                 elif G.shape[1] == 1:
                     if G.shape[0] != F.shape[0]:
                         raise ValueError("operands could not be broadcast"
                                          " together with shapes ", F.shape,
                                          G.shape)
-                    G = pyfaust.hstack(tuple((G for i in range(0,
-                                                               F.shape[1]))))
+                        G = G * Faust(np.ones(1, F.shape[1]))
                 if F.shape != G.shape:
                     raise Exception('Dimensions must agree')
                 C = F.concatenate(G, axis=1)
