@@ -1089,4 +1089,54 @@ void Faust::MatSparse<FPP,Cpu>::delete_row(faust_unsigned_int id)
 	this->mat = spMat;
 	this->update_dim();
 }
+
+template<typename FPP>
+Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::swap_matrix(faust_unsigned_int order, faust_unsigned_int id1, faust_unsigned_int id2)
+{
+	unsigned int colids[order];
+	const unsigned int nrows = order;
+	const unsigned int ncols = nrows;
+	unsigned int rowptr[nrows+1];
+	int min_id, max_id;
+	if(id1<id2)
+	{
+		min_id = id1;
+		max_id = id2;
+	}
+	else
+	{
+		min_id = id2;
+		max_id = id1;
+	}
+	std::vector<FPP> values;
+	rowptr[0] = 0;
+	for(int i=0;i<nrows;i++)
+	{
+		values.push_back(FPP(1.));
+		rowptr[i+1] = rowptr[i]+1;
+		colids[i] = i;
+	}
+	rowptr[nrows] = nrows;
+	colids[min_id] = max_id;
+	colids[max_id] = min_id;
+	auto P = new MatSparse<FPP,Cpu>(rowptr, colids, values, nrows, ncols);
+	return P;
+}
+
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::swap_rows(faust_unsigned_int id1, faust_unsigned_int id2)
+{
+	MatDense<FPP,Cpu> dmat(*this);
+	dmat.swap_rows(id1, id2);
+	*this = dmat;
+}
+
+template<typename FPP>
+void Faust::MatSparse<FPP,Cpu>::swap_cols(faust_unsigned_int id1, faust_unsigned_int id2)
+{
+	MatDense<FPP,Cpu> dmat(*this);
+	dmat.swap_cols(id1, id2);
+	*this = dmat;
+}
+
 #endif

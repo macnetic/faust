@@ -411,6 +411,8 @@ namespace Faust
 			void operator/=(FPP lambda){scalarMultiply(1.0/lambda);}
 
 
+			void swap_cols(const faust_unsigned_int id1, const faust_unsigned_int id2);
+			void swap_rows(const faust_unsigned_int id1, const faust_unsigned_int id2);
 
 
 

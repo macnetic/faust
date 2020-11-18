@@ -494,6 +494,38 @@ void  FaustCoreCpp<FPP,DEV>::device(char* dev) const
 }
 
 template<typename FPP, FDevice DEV>
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::swap_cols(const unsigned int id1, const unsigned int id2,
+            const bool permutation, const bool inplace)
+{
+    if(inplace)
+    {
+      this->transform->swap_cols(id1, id2, permutation, inplace);
+      return this;
+    }
+    else
+    {
+        auto th = this->transform->swap_cols(id1, id2, permutation, inplace);
+        return new FaustCoreCpp<FPP,DEV>(th);
+    }
+}
+
+template<typename FPP, FDevice DEV>
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::swap_rows(const unsigned int id1, const unsigned int id2,
+            const bool permutation, const bool inplace)
+{
+    if(inplace)
+    {
+      this->transform->swap_rows(id1, id2, permutation, inplace);
+      return this;
+    }
+    else
+    {
+        auto th = this->transform->swap_rows(id1, id2, permutation, inplace);
+        return new FaustCoreCpp<FPP,DEV>(th);
+    }
+}
+
+template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>::~FaustCoreCpp()
 {
     if(transform) delete transform;

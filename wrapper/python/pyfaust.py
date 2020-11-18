@@ -1728,6 +1728,24 @@ class Faust:
                 return False
         return issparse
 
+    def swap_cols(F, id1, id2, permutation=False, inplace=False):
+        if(inplace):
+            F.m_faust.swap_cols(id1, id2, permutation,
+                                inplace)
+            return F
+        F_swapped = Faust(core_obj=F.m_faust.swap_cols(id1, id2, permutation,
+                                                       inplace))
+        return F_swapped
+
+    def swap_rows(F, id1, id2, permutation=False, inplace=False):
+        if(inplace):
+            F.m_faust.swap_rows(id1, id2, permutation,
+                                inplace)
+            return F
+        F_swapped = Faust(core_obj=F.m_faust.swap_rows(id1, id2, permutation,
+                                                       inplace))
+        return F_swapped
+
     def optimize_memory(F):
         """
         Optimizes a Faust by changing the storage format of each factor in order to optimize the memory size.

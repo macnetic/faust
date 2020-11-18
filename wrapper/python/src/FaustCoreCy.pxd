@@ -89,6 +89,11 @@ cdef extern from "FaustCoreCpp.h":
                                   num_rows, unsigned long int* col_ids,
                                   unsigned long int num_cols) const
         bool save_mat_file(const char* filepath) const
+        FaustCoreCpp[FPP]* swap_cols(const unsigned int id1, const unsigned int id2,
+                                const bool permutation, const bool inplace);
+        FaustCoreCpp[FPP]* swap_rows(const unsigned int id1, const unsigned int id2,
+                                const bool permutation, const bool inplace);
+
         FaustCoreCpp[FPP]* optimize_time(const bool transp, const bool inplace,
                                        const int nsamples)
         FaustCoreCpp[FPP]* optimize(const bool transp)

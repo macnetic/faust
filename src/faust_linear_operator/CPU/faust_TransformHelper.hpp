@@ -724,7 +724,7 @@ namespace Faust {
 	template<typename FPP>
 		void TransformHelper<FPP,Cpu>::display() const
 		{
-			cout << "is_transposed:" << this->is_transposed << std::endl;
+//			cout << "is_transposed:" << this->is_transposed << std::endl;
 			this->transform->Display(this->is_transposed, false);
 		}
 
@@ -736,755 +736,822 @@ namespace Faust {
 
 	//private
 	template<typename FPP>
-		const MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact(const faust_unsigned_int id) const
-		{
-			return this->transform->data[this->is_transposed?size()-id-1:id];
-		}
-
-	template<typename FPP>
-		MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact_nonconst(const faust_unsigned_int id) const
-		{
-			return this->transform->data[this->is_transposed?size()-id-1:id];
-		}
-
-	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id)
-		{
-			MatGeneric<FPP,Cpu>& M_ = const_cast<MatGeneric<FPP,Cpu>&>(M);
-			// I promise I won't change M
-			MatSparse<FPP,Cpu> *sp_mat, *sp_fact;
-			MatDense<FPP,Cpu> *ds_mat, *ds_fact;
-			MatGeneric<FPP,Cpu>* fact = get_gen_fact_nonconst(fact_id);
-			if(sp_mat = dynamic_cast<MatSparse<FPP,Cpu>*>(&M_))
-			{
-				if(! (sp_fact = dynamic_cast<MatSparse<FPP,Cpu>*>(fact)))
-					throw std::runtime_error("A sparse factor can't be updated with a dense factor");
-				*sp_fact = *sp_mat;
-			}
-			else if(ds_mat = dynamic_cast<MatDense<FPP,Cpu>*>(&M_))
-			{
-				if(! (ds_fact = dynamic_cast<MatDense<FPP,Cpu>*>(fact)))
-					throw std::runtime_error("A dense factor can't be updated with a dense factor");
-				*ds_fact = *ds_mat;
-			}
-			fact->set_id(M.is_id());
-			update_total_nnz();
-#if USE_GPU_MOD
-			if(gpu_faust)
-			{
-				gpu_faust->update(fact, fact_id);
-			}
-#endif
-		}
-
-	template<typename FPP>
-		unsigned long long TransformHelper<FPP,Cpu>::get_fact_addr(const faust_unsigned_int id) const
-		{
-			return (unsigned long long) this->transform->data[this->is_transposed?size()-id-1:id];
-		}
-
-	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
-				const int** rowptr,
-				const int** col_ids,
-				const FPP** elts,
-				faust_unsigned_int* nnz,
-				faust_unsigned_int* num_rows,
-				faust_unsigned_int* num_cols) const
-		{
-			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols);
-
-		}
-
-	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
-				int* rowptr,
-				int* col_ids,
-				FPP* elts,
-				faust_unsigned_int* nnz,
-				faust_unsigned_int* num_rows,
-				faust_unsigned_int* num_cols,
-				const bool transpose /* = false*/) const
-		{
-			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols, this->is_transposed ^ transpose);
-			if(this->is_conjugate)
-				Faust::conjugate(elts, *nnz);
-		}
-
-	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
-				const FPP** elts,
-				faust_unsigned_int* num_rows,
-				faust_unsigned_int* num_cols) const
-		{
-			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols);
-		}
-
-	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_fact(faust_unsigned_int id) const
-		{
-			MatDense<FPP,Cpu> dense_factor;
-			MatGeneric<FPP,Cpu>* factor_generic;
-			factor_generic = this->transform->get_fact(this->is_transposed?size()-id-1:id);
-
-			switch (factor_generic->getType())
-			{
-				case MatType::Dense :
-					{
-						MatDense<FPP,Cpu>* factor_dense_ptr = dynamic_cast<MatDense<FPP,Cpu>* > (factor_generic);
-						dense_factor = (*factor_dense_ptr); //copy
-					}
-					break;
-
-				case MatType::Sparse :
-					{
-						MatSparse<FPP,Cpu>* factor_sparse_ptr = dynamic_cast<MatSparse<FPP,Cpu>* > (factor_generic);
-						dense_factor = (*factor_sparse_ptr); //copy
-					}
-					break;
-
-				default:
-					handleError("Faust::TransformHelper", "get_fact : unknown type of the factor matrix");
-			}
-			delete factor_generic;
-			if(this->is_transposed) dense_factor.transpose();
-			if(this->is_conjugate) dense_factor.conjugate();
-			return dense_factor;
-		}
-
-	//TODO: delete this function when the specific bug in FaustCoreCpp (py. wrapper)
-	// will be fixed (normally the parent function def. should be found, but the wrapper compilation fails anyway)
-	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int &id,
-				FPP* elts,
-				faust_unsigned_int* num_rows,
-				faust_unsigned_int* num_cols,
-				const bool transpose /* default to false */) const
-		{
-			this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, this->is_transposed ^ transpose);
-			if(this->is_conjugate)
-				Faust::conjugate(elts,*num_cols*(*num_rows));
-		}
-
-
-
-
-	template<typename FPP>
-		MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product() // const
-		{
-			if(this->mul_order_opt_mode)
-				switch(this->mul_order_opt_mode)
-				{
-#ifdef USE_GPU_MOD
-					case GPU_MOD:
-						if(nullptr != gpu_faust)
-							return gpu_faust->get_product(this->is_transposed, this->is_conjugate);
-#endif
-					default:
-						//TODO: avoid to add one factor for all methods if possible
-						MatDense<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
-						Id.setEyes();
-						return this->multiply(Id);
-				}
-			return this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
-		}
-
-	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod) const {
-			this->transform->get_product(prod, this->isTransposed2char(), this->is_conjugate);
-		}
-
-	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::save_mat_file(const char* filepath) const
-		{
-			this->transform->save_mat_file(filepath, this->is_transposed, this->is_conjugate);
-		}
-
-	template<typename FPP>
-		double TransformHelper<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
-		{
-//			std::cout << "TransformHelper<FPP,Cpu>::spectralNorm" << std::endl;
-#ifdef USE_GPU_MOD
-			if(gpu_faust != nullptr)
-				return gpu_faust->spectral_norm(nbr_iter_max, threshold);
-#endif
-			vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
-			int start_id, end_id;
-			this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
-			//			cout << "start_id=" << start_id << "end_id=" << end_id << endl;
-			if(start_id < 0)
-				return 1.0;
-			else if(start_id == 0)
-				return this->transform->spectralNorm(nbr_iter_max, threshold, flag);
-			//			cout << "optimized norm2" << endl;
-			vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
-			TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
-			return t.transform->spectralNorm(nbr_iter_max, threshold, flag);
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::transpose()
-		{
-			return new TransformHelper<FPP,Cpu>(this, true, false);
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::vertcat(const TransformHelper<FPP,Cpu>* G)
-		{
-			// NOTE: this function is in this class and not in Faust::Transform
-			// because it's simpler to handle the transpose and conjugate cases here
-			// the functions get_gen_fact() and get_fact_nb_cols()/rows are
-			// really helpful for that.
-			//TODO: too big function, refactor
-			//TODO: clean the code
-			TransformHelper<FPP,Cpu>* T = nullptr;
-			// take the greater number of factors from this and G as the concatened Faust number
-			// of factors
-			std::vector<MatGeneric<FPP,Cpu>*> facts(max(G->size(),this->size())+1);
-			const MatSparse<FPP,Cpu> * F_fac, *G_fac;
-			const MatGeneric<FPP,Cpu> *tmp_fac_gen;
-			MatSparse<FPP,Cpu>* T_fac;
-			faust_unsigned_int T_fac_nnz;
-			faust_unsigned_int T_fac_nb_rows, T_fac_nb_cols;
-			bool F_inter_fac_allocated, G_inter_fac_allocated;
-			bool F_last_fac=false, G_last_fac=false;
-			int * colind, *rowptr;
-			FPP* values;
-
-			if(this->getNbCol() != G->getNbCol()) handleError("TransformHelper::vertcat()","The dimensions must agree.");
-			for(faust_unsigned_int i=0; i < facts.size(); i++){
-				//				cout << "factor i=" << i <<  " facts.size()=" << facts.size() << endl;
-				// F (*this) factor
-				if(i < this->size())
-				{
-					tmp_fac_gen = get_gen_fact(i); //this->transform->data[i];
-					if((F_inter_fac_allocated = (tmp_fac_gen->getType() == MatType::Dense)))
-					{
-						F_fac = new MatSparse<FPP,Cpu>(*dynamic_cast<const MatDense<FPP,Cpu>*>(tmp_fac_gen));
-						if(this->is_transposed) const_cast<MatSparse<FPP,Cpu>*>(F_fac)->transpose();
-						if(this->is_conjugate) const_cast<MatSparse<FPP,Cpu>*>(F_fac)->conjugate();
-					}
-					else
-					{
-						F_fac = dynamic_cast<const MatSparse<FPP,Cpu>*>(tmp_fac_gen);
-						if(this->is_transposed || this->is_conjugate)
-						{
-							F_fac = new MatSparse<FPP,Cpu>(F_fac->nnz, F_fac->getNbRow(), F_fac->getNbCol(), F_fac->getValuePtr(), F_fac->getRowPtr(), F_fac->getColInd(), this->is_transposed);
-							if(this->is_conjugate) const_cast<MatSparse<FPP,Cpu>*>(F_fac)->conjugate();
-
-							F_inter_fac_allocated = true;
-						}
-					}
-					T_fac_nnz = F_fac->getNonZeros(); //+G_fac->getNonZeros()
-					T_fac_nb_cols = this->get_fact_nb_cols(i);//F_fac->getNbCol(); //+G_fac part
-					T_fac_nb_rows = this->get_fact_nb_rows(i);//F_fac->getNbRow(); //+G_fac part
-				}
-				else
-				{
-					//fill remaining factors by identity
-					tmp_fac_gen = get_gen_fact(this->size()-1);//this->transform->data[this->size()-1];
-					// number of ones
-					T_fac_nnz = this->get_fact_nb_cols(this->size()-1);//tmp_fac_gen->getNbCol(); //+G_fac->getNonZeros()
-					T_fac_nb_rows = T_fac_nb_cols = T_fac_nnz; //+G_fac part
-					// opt. create the id factor only once
-					if(!F_last_fac)
-					{
-						F_last_fac = true;
-						F_fac = MatSparse<FPP,Cpu>::eye(T_fac_nnz, T_fac_nnz);
-					}
-				}
-				// G factor
-				if(i < G->size())
-				{
-					tmp_fac_gen = G->get_gen_fact(i);//G->transform->data[i];
-					if((G_inter_fac_allocated = (tmp_fac_gen->getType() == MatType::Dense)))
-					{
-						G_fac = new MatSparse<FPP,Cpu>(*dynamic_cast<const MatDense<FPP,Cpu>*>(tmp_fac_gen));
-						if(G->is_transposed) const_cast<MatSparse<FPP,Cpu>*>(G_fac)->transpose();
-						if (G->is_conjugate) const_cast<MatSparse<FPP,Cpu>*>(G_fac)->conjugate();
-
-					}
-					else
-					{
-						G_fac = dynamic_cast<const MatSparse<FPP,Cpu>*>(tmp_fac_gen);
-						if(G->is_transposed || G->is_conjugate)
-						{
-							G_fac = new MatSparse<FPP,Cpu>(G_fac->nnz, G_fac->getNbRow(), G_fac->getNbCol(), G_fac->getValuePtr(), G_fac->getRowPtr(), G_fac->getColInd(), G->is_transposed);
-							if (G->is_conjugate) const_cast<MatSparse<FPP,Cpu>*>(G_fac)->conjugate();
-							G_inter_fac_allocated = true;
-						}
-
-					}
-					T_fac_nnz += G_fac->getNonZeros();
-					T_fac_nb_cols += G->get_fact_nb_cols(i);//G_fac->getNbCol();
-					T_fac_nb_rows += G->get_fact_nb_rows(i);//G_fac->getNbRow();
-				}
-				else
-				{ //G has less or equal factors than F
-
-					//fill remaining factors by identity
-					tmp_fac_gen = G->get_gen_fact(G->size()-1);//G->transform->data[G->size()-1];
-					// number of ones
-					T_fac_nnz += G->get_fact_nb_cols(G->size()-1);//tmp_fac_gen->getNbCol();
-					if(i < facts.size()-1 || !F_last_fac) {
-						T_fac_nb_cols = F_fac->getNbCol()+G->get_fact_nb_cols(G->size()-1);//F_fac->getNbCol()+tmp_fac_gen->getNbCol();
-					}
-					//G_fac will be square id. => nb cols == nb rows
-					T_fac_nb_rows = F_fac->getNbRow()+G->get_fact_nb_cols(G->size()-1);//tmp_fac_gen->getNbCol();
-					// opt. create the id factor only once
-					if(!G_last_fac)
-					{
-						G_last_fac = true;
-						G_fac = MatSparse<FPP,Cpu>::eye(G->get_fact_nb_cols(G->size()-1),G->get_fact_nb_cols(G->size()-1));//(tmp_fac_gen->getNbCol(), tmp_fac_gen->getNbCol());
-					}
-				}
-				values = new FPP[T_fac_nnz];
-				colind = new int[T_fac_nnz];
-				rowptr = new int[T_fac_nb_rows+1];
-				// group the data from F and G
-				memcpy(values, F_fac->getValuePtr(), sizeof(FPP)*F_fac->getNonZeros());
-				memcpy(values+F_fac->getNonZeros(), G_fac->getValuePtr(),
-						sizeof(FPP)*G_fac->getNonZeros());
-				assert(T_fac_nnz == F_fac->getNonZeros()+G_fac->getNonZeros());
-				assert(T_fac_nb_rows == F_fac->getNbRow()+G_fac->getNbRow());
-				/****** col indices ******/
-				// F indices don't change
-				memcpy(colind, F_fac->getColInd(), sizeof(int)*F_fac->getNonZeros());
-				// G indices are shifted by F->getNbCol()
-				memcpy(colind+F_fac->getNonZeros(), G_fac->getColInd(), sizeof(int)*G_fac->getNonZeros());
-				//shift G indices
-				if(i < facts.size()-1)
-					for(faust_unsigned_int j=F_fac->getNonZeros();j<F_fac->getNonZeros()+G_fac->getNonZeros();j++)
-						colind[j] += F_fac->getNbCol();
-				/***** row indices *****/
-				memcpy(rowptr, F_fac->getRowPtr(), sizeof(int)*(F_fac->getNbRow()+1));
-				//ignore first ele == 0 of G_fac->getRowPtr()
-				memcpy(rowptr+F_fac->getNbRow()+1, G_fac->getRowPtr()+1, sizeof(int)*G_fac->getNbRow());
-				// shift number of elements to take account of already added F_fac elts
-				for(faust_unsigned_int j=F_fac->getNbRow()+1;j<F_fac->getNbRow()+G_fac->getNbRow()+1;j++)
-					rowptr[j] += F_fac->getRowPtr()[F_fac->getNbRow()];
-				// concatened Faust factor
-				//				cout << "T_fac_nb_rows:" << T_fac_nb_rows << endl;
-				//				cout << "T_fac_nb_cols:" << T_fac_nb_cols << endl;
-				//				cout << "nnz:" << T_fac_nnz << endl;
-				//				cout << "rowptr=";
-				//				for(faust_unsigned_int j=0;j<T_fac_nb_rows+1;j++)
-				//					cout << rowptr[j] << ",";
-				//				cout << endl;
-				//				cout << "colind=";
-				//				for(faust_unsigned_int j=0;j<T_fac_nnz;j++)
-				//					cout << colind[j] << ",";
-				//				cout << endl;
-				//				cout << "values=";
-				//				for(faust_unsigned_int j=0;j<T_fac_nnz;j++)
-				//					cout << values[j] << ",";
-				//				cout << endl;
-				T_fac = new MatSparse<FPP,Cpu>(T_fac_nnz, T_fac_nb_rows, T_fac_nb_cols, values, rowptr, colind);
-				//				cout << "stage 4: ok" << endl;
-				//				cout << "T_fac:"<< endl;
-				//				T_fac->Display();
-				facts[i] = T_fac;
-				if(F_inter_fac_allocated)
-				{
-					delete F_fac;
-					F_inter_fac_allocated = ! F_inter_fac_allocated;
-				}
-				if(G_inter_fac_allocated)
-				{
-					delete G_fac;
-					G_inter_fac_allocated = ! G_inter_fac_allocated;
-				}
-				delete values;
-				delete colind;
-				delete rowptr;
-			}
-			T = new TransformHelper<FPP,Cpu>(facts, 1.0, false, false);
-			//			cout << "final stage ok" << endl;
-			//			T->display();
-			//delete last factors (identity for each Faust)
-			if(!F_inter_fac_allocated) delete F_fac;
-			if(!F_inter_fac_allocated) delete G_fac;
-			return T;
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::horzcat(const TransformHelper<FPP,Cpu>* G)
-		{
-			TransformHelper<FPP,Cpu> *Ft, *Gt, *C, *Ct;
-			Ft = this->transpose();
-			Gt = const_cast<TransformHelper<FPP,Cpu> *>(G)->transpose(); //no harm
-			C = Ft->vertcat(Gt);
-			Ct = C->transpose();
-			delete Ft;
-			delete Gt;
-			delete C;
-			return Ct;
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::conjugate()
-		{
-			return new TransformHelper<FPP,Cpu>(this, false, true);
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::adjoint() const
-		{
-			return new TransformHelper<FPP,Cpu>(this, true, true);
-		}
-
-
-	template<typename FPP>
-		bool TransformHelper<FPP,Cpu>::isConjugate() const
-		{
-			return this->is_conjugate;
-		}
-
-
-
-	template<typename FPP>
-		double TransformHelper<FPP,Cpu>::normL1() const {
-			return this->transform->normL1(this->is_transposed);
-		}
-
-	template<typename FPP>
-		double TransformHelper<FPP,Cpu>::normInf() const {
-			return this->transform->normL1(!this->is_transposed);
-		}
-
-	template<typename FPP>
-		double TransformHelper<FPP,Cpu>::normFro() const {
-			vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
-			int start_id, end_id;
-			this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
-			if(start_id < 0)
-				return Faust::fabs(MatDense<FPP,Cpu>::eye(this->getNbCol(), this->getNbCol()).norm());
-			else if(start_id == 0)
-				return this->transform->normFro();
-			vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
-			TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
-			return t.transform->normFro();
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const
-		{
-			unsigned int ncols = this->getNbCol();
-			unsigned int nrows = this->getNbRow();
-			//2-norm parameters
-			double precision =  FAUST_PRECISION;
-			faust_unsigned_int nbr_iter_max=100;
-			int flag;
-
-			vector<FPP> norm_invs(ncols);
-			FPP norm;
-			vector<int> coords(ncols);
-			TransformHelper<FPP,Cpu>* normalizedTh = nullptr;
-
-			for(faust_unsigned_int i=0;i<ncols;i++)
-			{
-
-				//TODO: we shouldn't have to const_cast, slice() must be const
-				const TransformHelper<FPP,Cpu> * col = const_cast<TransformHelper<FPP,Cpu> *>(this)->slice(0,nrows, i, i+1);
-				//				cout << "TransformHelper normalize, meth=" << meth << endl;
-				switch(meth)
-				{
-					case 1: //1-norm
-						//						cout << "normalize with 1-norm" << endl;
-						norm = col->normL1();
-						break;
-					case 2: //2-norm
-						//						cout << "normalize with 2-norm" << endl;
-						norm = col->spectralNorm(nbr_iter_max, precision, flag);
-						break;
-					case -2: // fro norm
-						//						cout << "normalize with fro-norm" << endl;
-						norm = col->normFro();
-						break;
-					case -1: //inf norm
-						//						cout << "normalize with inf-norm" << endl;
-						norm = col->normInf();
-						break;
-					default:
-						handleError("Faust::TransformHelper::normalize()", "order for the norm to use is not valid");
-				}
-				if(norm != FPP(0))
-					norm_invs[i] = 1./norm;
-				else
-					norm_invs[i] = 1;
-				coords[i] = i;
-				delete col;
-			}
-			MatSparse<FPP,Cpu>* norm_diag = new MatSparse<FPP,Cpu>(coords, coords,
-					norm_invs, ncols, ncols);
-			//			norm_diag.Display();
-			vector<MatGeneric<FPP,Cpu>*> factors;
-			for(int i =0; (faust_unsigned_int)i < size(); i++)
-				//NOTE: about const cast: no problem, we know we won't write it
-				//NOTE: don't use get_gen_fact() to avoid transpose auto-handling
-				factors.push_back(const_cast<Faust::MatGeneric<FPP, Cpu>*>(this->transform->data[i]));
-#ifdef NON_OPT_FAUST_NORMALIZATION
-			if(this->is_transposed)
-				factors.insert(factors.begin(), norm_diag);
-			else
-				factors.push_back(norm_diag);
-#else
-			MatGeneric<FPP,Cpu>* scaled_f0;
-			MatSparse<FPP, Cpu>* fs;
-			MatDense<FPP,Cpu>* fd;
-
-			if(this->is_transposed)
-			{
-				/** this approach is abandoned because casting approach (as below) is quicker than transposing */
-				// the faust is transposed
-				// that's why we compute (Faust[0]^T*norm_diag)^T
-				// (the Faust structure will transpose this factor again when necessary because of its this->is_transposed flag)
-				//				factors[0]->transpose();
-				//				factors[0]->multiplyRight(*norm_diag);
-				//				factors[0]->transpose();
-				/****************************************/
-				fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[0]);
-				if(!fs)
-				{
-					fd = dynamic_cast<MatDense<FPP,Cpu>*>(factors[0]);
-					scaled_f0 = new MatDense<FPP,Cpu>(*fd);
-					fd = (MatDense<FPP,Cpu>*)scaled_f0; // needed befause there is no prototype of multiply(MatGeneric,...)
-					norm_diag->multiply(*fd, 'N');
-				}
-				else
-				{
-					scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
-					fs = (MatSparse<FPP,Cpu>*) scaled_f0;
-					norm_diag->multiply(*fs, 'N');
-				}
-				factors[0] = scaled_f0;
-			}
-			else
-			{
-				//factors[size()-1]->multiplyRight(*norm_diag);
-				if((fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[size()-1])))
-					scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
-				else
-				{
-					fd = dynamic_cast<MatDense<FPP,Cpu>*>(factors[size()-1]);
-					scaled_f0 = new MatDense<FPP,Cpu>(*fd);
-
-				}
-				scaled_f0->multiplyRight(*norm_diag);
-				factors[size()-1] = scaled_f0;
-			}
-
-			delete norm_diag;
-#endif
-			normalizedTh = new TransformHelper<FPP,Cpu>(factors, FPP(1.0), false, false);
-			normalizedTh->is_transposed = this->is_transposed;
-			//			normalizedTh->display();
-			return normalizedTh;
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>::~TransformHelper()
-		{
-			// transform is deleted auto. when no TransformHelper uses it (no more weak refs left)
-#ifdef FAUST_VERBOSE
-			cout << "Destroying Faust::TransformHelper object." << endl;
-#endif
-#ifdef USE_GPU_MOD
-			if(gpu_faust != nullptr)
-				delete gpu_faust;
-#endif
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */) {
-			if(!TransformHelper<FPP,Cpu>::seed_init) {
-				std::srand(std::time(NULL)); //seed init needed for MatDense rand generation
-				TransformHelper<FPP,Cpu>::seed_init = true;
-			}
-			// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
-			std::uniform_int_distribution<int> num_fac_distr(min_num_factors, max_num_factors);
-			std::uniform_int_distribution<int> dim_distr(min_dim_size, max_dim_size);
-			std::uniform_int_distribution<int> bin_distr(0,1);
-			unsigned int num_factors = num_fac_distr(generator);
-			// create factors randomly respecting the RandFaustType asked and dims interval
-			std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) num_factors);
-			unsigned int num_rows, num_cols = dim_distr(generator);
-			float fact_density;
-			for(unsigned int i=0;i<num_factors;i++) {
-				num_rows = num_cols;
-				num_cols = dim_distr(generator);
-#ifdef FAUST_VERBOSE
-				cout << "TransformHelper<FPP,Cpu>::randFaust() per_row: " <<  per_row << endl;
-#endif
-				if(density == -1.)
-					fact_density = per_row?5./num_cols:5./num_rows;
-				else
-					fact_density = density;
-				switch(t){
-					case DENSE:
-						factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
-						break;
-					case SPARSE:
-						factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
-						break;
-					case MIXED:
-						if(bin_distr(generator))
-							factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
-						else
-							factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
-						break;
-					default:
-						handleError("Faust::TransformHelper", "randFaust(): Unknown RandFaustType");
-						break;
-
-				}
-				if(factors[i] == NULL) return NULL;
-			}
-			TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false,false);
-			return randFaust;
-		}
-
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::hadamardFaust(unsigned int n, const bool norma)
-		{
-			TransformHelper<FPP,Cpu>* hadamardFaust = nullptr;
-			vector<MatGeneric<FPP,Cpu>*> factors;
-			bool cloning_fact = false; // big opt. allowed only because of the RefManager used in Transform class
-			//this opt. avoids to duplicate the same factor
-			try {
-				wht_factors(n, factors, cloning_fact, norma);
-				hadamardFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
-			}
-			catch(std::bad_alloc)
-			{
-				// nothing to do, out of memory return nullptr
-			}
-			return hadamardFaust;
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaust(unsigned int n, const bool norma)
-		{
-
-			vector<MatGeneric<FPP,Cpu>*> factors(n+1);
-			TransformHelper<FPP,Cpu>* fourierFaust = nullptr;
-			try
-			{
-				fft_factors(n, factors);
-				//			for(int i=0;i<n+1;i++)
-				//				factors[i]->Display();
-				float alpha = norma?1/sqrt((double)(1 << n)):1.0;
-				fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
-			}
-			catch(std::bad_alloc e)
-			{
-				//nothing to do, out of memory, return nullptr
-			}
-			return fourierFaust;
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::eyeFaust(unsigned int n, unsigned int m)
-		{
-			vector<MatGeneric<FPP,Cpu>*> factors(1);
-			TransformHelper<FPP,Cpu>* eyeFaust = nullptr;
-			try
-			{
-				MatSparse<FPP,Cpu>* eye = MatSparse<FPP,Cpu>::eye(n, m);
-				factors[0] = eye;
-				eyeFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
-			}
-			catch(std::bad_alloc e)
-			{
-				//nothing to do, out of memory, return nullptr
-			}
-			return eyeFaust;
-		}
-
-	template<typename FPP>
-		Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::begin() const
-		{
-			return this->transform->begin();
-		}
-
-	template<typename FPP>
-		Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::end() const
-		{
-			return this->transform->end();
-		}
-
-	template<typename FPP>
-		void Faust::TransformHelper<FPP,Cpu>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)
-		{
-			if(start_id < 0 || start_id >= size())
-				throw out_of_range("start_id is out of range.");
-			if(end_id < 0 || end_id >= size())
-				throw out_of_range("end_id is out of range.");
-            Faust::MatDense<FPP,Cpu> * packed_fac = nullptr;
-			if(end_id == start_id)
-            {
-                //nothing to do except converting to MatDense if start_id
-                //factor is a MatSparse
-                packed_fac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(*(begin()+start_id));
-                if(packed_fac == nullptr) 
-				{// factor start_id is not at MatDense, convert it
-                    packed_fac = new MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(*(begin()+start_id)));
-				}
-                else
-				{
-                    return; //no change
-				}
-            }
-            else
-            {
-                // we have to multiply factors from start_id to end_id into one matrix
-                // simple way to do, 1) create a overhead-free TransformHelper with these factors
-                // 2) call get_product() to override the start_id factors with the result on the end
-                // 3) erase factors from start_id to end_id and insert packed factor too to replace them (that's Transform object responsibility).
-                // 1)
-                std::vector<Faust::MatGeneric<FPP,Cpu>*> topack_factors(begin()+start_id, begin()+end_id+1);
-                Faust::TransformHelper<FPP,Cpu> t(topack_factors, 1.0, false, false, false);
-                // 2)
-                packed_fac = new MatDense<FPP,Cpu>(t.get_product());
-            }
-			// 3)
-            faust_unsigned_int i = end_id;
-            while(i>=start_id)
-            {
-                this->transform->erase(i);
-                if(i == 0) break;
-                i--;
-            }
-            this->transform->insert(start_id, packed_fac);
-		}
-
-	template <typename FPP>
-		void TransformHelper<FPP,Cpu>::pack_factors()
+	const MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact(const faust_unsigned_int id) const
 	{
-		TransformHelperGen<FPP,Cpu>::pack_factors();
+		return this->transform->data[this->is_transposed?size()-id-1:id];
+	}
+
+template<typename FPP>
+	MatGeneric<FPP,Cpu>* TransformHelper<FPP,Cpu>::get_gen_fact_nonconst(const faust_unsigned_int id) const
+	{
+		return this->transform->data[this->is_transposed?size()-id-1:id];
+	}
+
+template<typename FPP>
+	void TransformHelper<FPP,Cpu>::update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id)
+	{
+		MatGeneric<FPP,Cpu>& M_ = const_cast<MatGeneric<FPP,Cpu>&>(M);
+		// I promise I won't change M
+		MatSparse<FPP,Cpu> *sp_mat, *sp_fact;
+		MatDense<FPP,Cpu> *ds_mat, *ds_fact;
+		MatGeneric<FPP,Cpu>* fact = get_gen_fact_nonconst(fact_id);
+		if(sp_mat = dynamic_cast<MatSparse<FPP,Cpu>*>(&M_))
+		{
+			if(! (sp_fact = dynamic_cast<MatSparse<FPP,Cpu>*>(fact)))
+				throw std::runtime_error("A sparse factor can't be updated with a dense factor");
+			*sp_fact = *sp_mat;
+		}
+		else if(ds_mat = dynamic_cast<MatDense<FPP,Cpu>*>(&M_))
+		{
+			if(! (ds_fact = dynamic_cast<MatDense<FPP,Cpu>*>(fact)))
+				throw std::runtime_error("A dense factor can't be updated with a dense factor");
+			*ds_fact = *ds_mat;
+		}
+		fact->set_id(M.is_id());
+		update_total_nnz();
+#if USE_GPU_MOD
+		if(gpu_faust)
+		{
+			gpu_faust->update(fact, fact_id);
+		}
+#endif
+	}
+
+template<typename FPP>
+	unsigned long long TransformHelper<FPP,Cpu>::get_fact_addr(const faust_unsigned_int id) const
+	{
+		return (unsigned long long) this->transform->data[this->is_transposed?size()-id-1:id];
+	}
+
+template<typename FPP>
+	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+			const int** rowptr,
+			const int** col_ids,
+			const FPP** elts,
+			faust_unsigned_int* nnz,
+			faust_unsigned_int* num_rows,
+			faust_unsigned_int* num_cols) const
+	{
+		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols);
+
+	}
+
+template<typename FPP>
+	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+			int* rowptr,
+			int* col_ids,
+			FPP* elts,
+			faust_unsigned_int* nnz,
+			faust_unsigned_int* num_rows,
+			faust_unsigned_int* num_cols,
+			const bool transpose /* = false*/) const
+	{
+		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, rowptr, col_ids, elts, nnz, num_rows, num_cols, this->is_transposed ^ transpose);
+		if(this->is_conjugate)
+			Faust::conjugate(elts, *nnz);
+	}
+
+template<typename FPP>
+	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int id,
+			const FPP** elts,
+			faust_unsigned_int* num_rows,
+			faust_unsigned_int* num_cols) const
+	{
+		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols);
+	}
+
+template<typename FPP>
+	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_fact(faust_unsigned_int id) const
+	{
+		MatDense<FPP,Cpu> dense_factor;
+		MatGeneric<FPP,Cpu>* factor_generic;
+		factor_generic = this->transform->get_fact(this->is_transposed?size()-id-1:id);
+
+		switch (factor_generic->getType())
+		{
+			case MatType::Dense :
+				{
+					MatDense<FPP,Cpu>* factor_dense_ptr = dynamic_cast<MatDense<FPP,Cpu>* > (factor_generic);
+					dense_factor = (*factor_dense_ptr); //copy
+				}
+				break;
+
+			case MatType::Sparse :
+				{
+					MatSparse<FPP,Cpu>* factor_sparse_ptr = dynamic_cast<MatSparse<FPP,Cpu>* > (factor_generic);
+					dense_factor = (*factor_sparse_ptr); //copy
+				}
+				break;
+
+			default:
+				handleError("Faust::TransformHelper", "get_fact : unknown type of the factor matrix");
+		}
+		delete factor_generic;
+		if(this->is_transposed) dense_factor.transpose();
+		if(this->is_conjugate) dense_factor.conjugate();
+		return dense_factor;
+	}
+
+//TODO: delete this function when the specific bug in FaustCoreCpp (py. wrapper)
+// will be fixed (normally the parent function def. should be found, but the wrapper compilation fails anyway)
+template<typename FPP>
+	void TransformHelper<FPP,Cpu>::get_fact(const faust_unsigned_int &id,
+			FPP* elts,
+			faust_unsigned_int* num_rows,
+			faust_unsigned_int* num_cols,
+			const bool transpose /* default to false */) const
+	{
+		this->transform->get_fact(this->is_transposed?this->size()-id-1:id, elts, num_rows, num_cols, this->is_transposed ^ transpose);
+		if(this->is_conjugate)
+			Faust::conjugate(elts,*num_cols*(*num_rows));
 	}
 
 
-	template<typename FPP>
-		void TransformHelper<FPP,Cpu>::swap(faust_unsigned_int id1, faust_unsigned_int id2)
-		{
-			// swap two columns id1, id2 of the last factors
-			auto last_fac = this->get_gen_fact(this->size()-1);
-			auto dlast_fac = dynamic_cast<MatGeneric<FPP,Cpu>*>(last_fac);
-			MatSparse<FPP,Cpu>* slast_fac = nullptr;
-			Vect<FPP,Cpu> v = last_fac->get_col(id1);
-			bool fact_is_sparse = dlast_fac == nullptr;
-			if(fact_is_sparse)
-				dlast_fac = new MatDense<FPP,Cpu>(last_fac);
-			memcpy(dlast_fac->getData()+dlast_fac->getNbRow()*id1, dlast_fac->getData()+dlast_fac->getNbRow()*id2, sizeof(FPP)*dlast_fac->getNbRow());
-			memcpy(dlast_fac->getData()+dlast_fac->getNbRow()*id2, v.getData(), sizeof(FPP)*dlast_fac->getNbRow());
-			if(fact_is_sparse)
+
+
+template<typename FPP>
+	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product() // const
+	{
+		if(this->mul_order_opt_mode)
+			switch(this->mul_order_opt_mode)
 			{
-				slast_fac = dynamic_cast<MatSparse<FPP,Cpu>*>(last_fac);
-				*slast_fac = *dlast_fac;
+#ifdef USE_GPU_MOD
+				case GPU_MOD:
+					if(nullptr != gpu_faust)
+						return gpu_faust->get_product(this->is_transposed, this->is_conjugate);
+#endif
+				default:
+					//TODO: avoid to add one factor for all methods if possible
+					MatDense<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
+					Id.setEyes();
+					return this->multiply(Id);
+			}
+		return this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
+	}
+
+template<typename FPP>
+	void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod) const {
+		this->transform->get_product(prod, this->isTransposed2char(), this->is_conjugate);
+	}
+
+template<typename FPP>
+	void TransformHelper<FPP,Cpu>::save_mat_file(const char* filepath) const
+	{
+		this->transform->save_mat_file(filepath, this->is_transposed, this->is_conjugate);
+	}
+
+template<typename FPP>
+	double TransformHelper<FPP,Cpu>::spectralNorm(const int nbr_iter_max, double threshold, int &flag) const
+	{
+//			std::cout << "TransformHelper<FPP,Cpu>::spectralNorm" << std::endl;
+#ifdef USE_GPU_MOD
+		if(gpu_faust != nullptr)
+			return gpu_faust->spectral_norm(nbr_iter_max, threshold);
+#endif
+		vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
+		int start_id, end_id;
+		this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
+		//			cout << "start_id=" << start_id << "end_id=" << end_id << endl;
+		if(start_id < 0)
+			return 1.0;
+		else if(start_id == 0)
+			return this->transform->spectralNorm(nbr_iter_max, threshold, flag);
+		//			cout << "optimized norm2" << endl;
+		vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
+		TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
+		return t.transform->spectralNorm(nbr_iter_max, threshold, flag);
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::transpose()
+	{
+		return new TransformHelper<FPP,Cpu>(this, true, false);
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::vertcat(const TransformHelper<FPP,Cpu>* G)
+	{
+		// NOTE: this function is in this class and not in Faust::Transform
+		// because it's simpler to handle the transpose and conjugate cases here
+		// the functions get_gen_fact() and get_fact_nb_cols()/rows are
+		// really helpful for that.
+		//TODO: too big function, refactor
+		//TODO: clean the code
+		TransformHelper<FPP,Cpu>* T = nullptr;
+		// take the greater number of factors from this and G as the concatened Faust number
+		// of factors
+		std::vector<MatGeneric<FPP,Cpu>*> facts(max(G->size(),this->size())+1);
+		const MatSparse<FPP,Cpu> * F_fac, *G_fac;
+		const MatGeneric<FPP,Cpu> *tmp_fac_gen;
+		MatSparse<FPP,Cpu>* T_fac;
+		faust_unsigned_int T_fac_nnz;
+		faust_unsigned_int T_fac_nb_rows, T_fac_nb_cols;
+		bool F_inter_fac_allocated, G_inter_fac_allocated;
+		bool F_last_fac=false, G_last_fac=false;
+		int * colind, *rowptr;
+		FPP* values;
+
+		if(this->getNbCol() != G->getNbCol()) handleError("TransformHelper::vertcat()","The dimensions must agree.");
+		for(faust_unsigned_int i=0; i < facts.size(); i++){
+			//				cout << "factor i=" << i <<  " facts.size()=" << facts.size() << endl;
+			// F (*this) factor
+			if(i < this->size())
+			{
+				tmp_fac_gen = get_gen_fact(i); //this->transform->data[i];
+				if((F_inter_fac_allocated = (tmp_fac_gen->getType() == MatType::Dense)))
+				{
+					F_fac = new MatSparse<FPP,Cpu>(*dynamic_cast<const MatDense<FPP,Cpu>*>(tmp_fac_gen));
+					if(this->is_transposed) const_cast<MatSparse<FPP,Cpu>*>(F_fac)->transpose();
+					if(this->is_conjugate) const_cast<MatSparse<FPP,Cpu>*>(F_fac)->conjugate();
+				}
+				else
+				{
+					F_fac = dynamic_cast<const MatSparse<FPP,Cpu>*>(tmp_fac_gen);
+					if(this->is_transposed || this->is_conjugate)
+					{
+						F_fac = new MatSparse<FPP,Cpu>(F_fac->nnz, F_fac->getNbRow(), F_fac->getNbCol(), F_fac->getValuePtr(), F_fac->getRowPtr(), F_fac->getColInd(), this->is_transposed);
+						if(this->is_conjugate) const_cast<MatSparse<FPP,Cpu>*>(F_fac)->conjugate();
+
+						F_inter_fac_allocated = true;
+					}
+				}
+				T_fac_nnz = F_fac->getNonZeros(); //+G_fac->getNonZeros()
+				T_fac_nb_cols = this->get_fact_nb_cols(i);//F_fac->getNbCol(); //+G_fac part
+				T_fac_nb_rows = this->get_fact_nb_rows(i);//F_fac->getNbRow(); //+G_fac part
+			}
+			else
+			{
+				//fill remaining factors by identity
+				tmp_fac_gen = get_gen_fact(this->size()-1);//this->transform->data[this->size()-1];
+				// number of ones
+				T_fac_nnz = this->get_fact_nb_cols(this->size()-1);//tmp_fac_gen->getNbCol(); //+G_fac->getNonZeros()
+				T_fac_nb_rows = T_fac_nb_cols = T_fac_nnz; //+G_fac part
+				// opt. create the id factor only once
+				if(!F_last_fac)
+				{
+					F_last_fac = true;
+					F_fac = MatSparse<FPP,Cpu>::eye(T_fac_nnz, T_fac_nnz);
+				}
+			}
+			// G factor
+			if(i < G->size())
+			{
+				tmp_fac_gen = G->get_gen_fact(i);//G->transform->data[i];
+				if((G_inter_fac_allocated = (tmp_fac_gen->getType() == MatType::Dense)))
+				{
+					G_fac = new MatSparse<FPP,Cpu>(*dynamic_cast<const MatDense<FPP,Cpu>*>(tmp_fac_gen));
+					if(G->is_transposed) const_cast<MatSparse<FPP,Cpu>*>(G_fac)->transpose();
+					if (G->is_conjugate) const_cast<MatSparse<FPP,Cpu>*>(G_fac)->conjugate();
+
+				}
+				else
+				{
+					G_fac = dynamic_cast<const MatSparse<FPP,Cpu>*>(tmp_fac_gen);
+					if(G->is_transposed || G->is_conjugate)
+					{
+						G_fac = new MatSparse<FPP,Cpu>(G_fac->nnz, G_fac->getNbRow(), G_fac->getNbCol(), G_fac->getValuePtr(), G_fac->getRowPtr(), G_fac->getColInd(), G->is_transposed);
+						if (G->is_conjugate) const_cast<MatSparse<FPP,Cpu>*>(G_fac)->conjugate();
+						G_inter_fac_allocated = true;
+					}
+
+				}
+				T_fac_nnz += G_fac->getNonZeros();
+				T_fac_nb_cols += G->get_fact_nb_cols(i);//G_fac->getNbCol();
+				T_fac_nb_rows += G->get_fact_nb_rows(i);//G_fac->getNbRow();
+			}
+			else
+			{ //G has less or equal factors than F
+
+				//fill remaining factors by identity
+				tmp_fac_gen = G->get_gen_fact(G->size()-1);//G->transform->data[G->size()-1];
+				// number of ones
+				T_fac_nnz += G->get_fact_nb_cols(G->size()-1);//tmp_fac_gen->getNbCol();
+				if(i < facts.size()-1 || !F_last_fac) {
+					T_fac_nb_cols = F_fac->getNbCol()+G->get_fact_nb_cols(G->size()-1);//F_fac->getNbCol()+tmp_fac_gen->getNbCol();
+				}
+				//G_fac will be square id. => nb cols == nb rows
+				T_fac_nb_rows = F_fac->getNbRow()+G->get_fact_nb_cols(G->size()-1);//tmp_fac_gen->getNbCol();
+				// opt. create the id factor only once
+				if(!G_last_fac)
+				{
+					G_last_fac = true;
+					G_fac = MatSparse<FPP,Cpu>::eye(G->get_fact_nb_cols(G->size()-1),G->get_fact_nb_cols(G->size()-1));//(tmp_fac_gen->getNbCol(), tmp_fac_gen->getNbCol());
+				}
+			}
+			values = new FPP[T_fac_nnz];
+			colind = new int[T_fac_nnz];
+			rowptr = new int[T_fac_nb_rows+1];
+			// group the data from F and G
+			memcpy(values, F_fac->getValuePtr(), sizeof(FPP)*F_fac->getNonZeros());
+			memcpy(values+F_fac->getNonZeros(), G_fac->getValuePtr(),
+					sizeof(FPP)*G_fac->getNonZeros());
+			assert(T_fac_nnz == F_fac->getNonZeros()+G_fac->getNonZeros());
+			assert(T_fac_nb_rows == F_fac->getNbRow()+G_fac->getNbRow());
+			/****** col indices ******/
+			// F indices don't change
+			memcpy(colind, F_fac->getColInd(), sizeof(int)*F_fac->getNonZeros());
+			// G indices are shifted by F->getNbCol()
+			memcpy(colind+F_fac->getNonZeros(), G_fac->getColInd(), sizeof(int)*G_fac->getNonZeros());
+			//shift G indices
+			if(i < facts.size()-1)
+				for(faust_unsigned_int j=F_fac->getNonZeros();j<F_fac->getNonZeros()+G_fac->getNonZeros();j++)
+					colind[j] += F_fac->getNbCol();
+			/***** row indices *****/
+			memcpy(rowptr, F_fac->getRowPtr(), sizeof(int)*(F_fac->getNbRow()+1));
+			//ignore first ele == 0 of G_fac->getRowPtr()
+			memcpy(rowptr+F_fac->getNbRow()+1, G_fac->getRowPtr()+1, sizeof(int)*G_fac->getNbRow());
+			// shift number of elements to take account of already added F_fac elts
+			for(faust_unsigned_int j=F_fac->getNbRow()+1;j<F_fac->getNbRow()+G_fac->getNbRow()+1;j++)
+				rowptr[j] += F_fac->getRowPtr()[F_fac->getNbRow()];
+			// concatened Faust factor
+			//				cout << "T_fac_nb_rows:" << T_fac_nb_rows << endl;
+			//				cout << "T_fac_nb_cols:" << T_fac_nb_cols << endl;
+			//				cout << "nnz:" << T_fac_nnz << endl;
+			//				cout << "rowptr=";
+			//				for(faust_unsigned_int j=0;j<T_fac_nb_rows+1;j++)
+			//					cout << rowptr[j] << ",";
+			//				cout << endl;
+			//				cout << "colind=";
+			//				for(faust_unsigned_int j=0;j<T_fac_nnz;j++)
+			//					cout << colind[j] << ",";
+			//				cout << endl;
+			//				cout << "values=";
+			//				for(faust_unsigned_int j=0;j<T_fac_nnz;j++)
+			//					cout << values[j] << ",";
+			//				cout << endl;
+			T_fac = new MatSparse<FPP,Cpu>(T_fac_nnz, T_fac_nb_rows, T_fac_nb_cols, values, rowptr, colind);
+			//				cout << "stage 4: ok" << endl;
+			//				cout << "T_fac:"<< endl;
+			//				T_fac->Display();
+			facts[i] = T_fac;
+			if(F_inter_fac_allocated)
+			{
+				delete F_fac;
+				F_inter_fac_allocated = ! F_inter_fac_allocated;
+			}
+			if(G_inter_fac_allocated)
+			{
+				delete G_fac;
+				G_inter_fac_allocated = ! G_inter_fac_allocated;
+			}
+			delete values;
+			delete colind;
+			delete rowptr;
+		}
+		T = new TransformHelper<FPP,Cpu>(facts, 1.0, false, false);
+		//			cout << "final stage ok" << endl;
+		//			T->display();
+		//delete last factors (identity for each Faust)
+		if(!F_inter_fac_allocated) delete F_fac;
+		if(!F_inter_fac_allocated) delete G_fac;
+		return T;
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::horzcat(const TransformHelper<FPP,Cpu>* G)
+	{
+		TransformHelper<FPP,Cpu> *Ft, *Gt, *C, *Ct;
+		Ft = this->transpose();
+		Gt = const_cast<TransformHelper<FPP,Cpu> *>(G)->transpose(); //no harm
+		C = Ft->vertcat(Gt);
+		Ct = C->transpose();
+		delete Ft;
+		delete Gt;
+		delete C;
+		return Ct;
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::conjugate()
+	{
+		return new TransformHelper<FPP,Cpu>(this, false, true);
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::adjoint() const
+	{
+		return new TransformHelper<FPP,Cpu>(this, true, true);
+	}
+
+
+template<typename FPP>
+	bool TransformHelper<FPP,Cpu>::isConjugate() const
+	{
+		return this->is_conjugate;
+	}
+
+
+
+template<typename FPP>
+	double TransformHelper<FPP,Cpu>::normL1() const {
+		return this->transform->normL1(this->is_transposed);
+	}
+
+template<typename FPP>
+	double TransformHelper<FPP,Cpu>::normInf() const {
+		return this->transform->normL1(!this->is_transposed);
+	}
+
+template<typename FPP>
+	double TransformHelper<FPP,Cpu>::normFro() const {
+		vector <MatGeneric<FPP, Cpu>*>& orig_facts = this->transform->data;
+		int start_id, end_id;
+		this->transform->get_nonortho_interior_prod_ids(start_id, end_id);
+		if(start_id < 0)
+			return Faust::fabs(MatDense<FPP,Cpu>::eye(this->getNbCol(), this->getNbCol()).norm());
+		else if(start_id == 0)
+			return this->transform->normFro();
+		vector<MatGeneric<FPP,Cpu>*> non_ortho_start(orig_facts.begin()+start_id, orig_facts.end());
+		TransformHelper<FPP, Cpu> t(non_ortho_start, 1.0, false, false);
+		return t.transform->normFro();
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::normalize(const int meth /* 1 for 1-norm, 2 for 2-norm (2-norm), -1 for inf-norm */) const
+	{
+		unsigned int ncols = this->getNbCol();
+		unsigned int nrows = this->getNbRow();
+		//2-norm parameters
+		double precision =  FAUST_PRECISION;
+		faust_unsigned_int nbr_iter_max=100;
+		int flag;
+
+		vector<FPP> norm_invs(ncols);
+		FPP norm;
+		vector<int> coords(ncols);
+		TransformHelper<FPP,Cpu>* normalizedTh = nullptr;
+
+		for(faust_unsigned_int i=0;i<ncols;i++)
+		{
+
+			//TODO: we shouldn't have to const_cast, slice() must be const
+			const TransformHelper<FPP,Cpu> * col = const_cast<TransformHelper<FPP,Cpu> *>(this)->slice(0,nrows, i, i+1);
+			//				cout << "TransformHelper normalize, meth=" << meth << endl;
+			switch(meth)
+			{
+				case 1: //1-norm
+					//						cout << "normalize with 1-norm" << endl;
+					norm = col->normL1();
+					break;
+				case 2: //2-norm
+					//						cout << "normalize with 2-norm" << endl;
+					norm = col->spectralNorm(nbr_iter_max, precision, flag);
+					break;
+				case -2: // fro norm
+					//						cout << "normalize with fro-norm" << endl;
+					norm = col->normFro();
+					break;
+				case -1: //inf norm
+					//						cout << "normalize with inf-norm" << endl;
+					norm = col->normInf();
+					break;
+				default:
+					handleError("Faust::TransformHelper::normalize()", "order for the norm to use is not valid");
+			}
+			if(norm != FPP(0))
+				norm_invs[i] = 1./norm;
+			else
+				norm_invs[i] = 1;
+			coords[i] = i;
+			delete col;
+		}
+		MatSparse<FPP,Cpu>* norm_diag = new MatSparse<FPP,Cpu>(coords, coords,
+				norm_invs, ncols, ncols);
+		//			norm_diag.Display();
+		vector<MatGeneric<FPP,Cpu>*> factors;
+		for(int i =0; (faust_unsigned_int)i < size(); i++)
+			//NOTE: about const cast: no problem, we know we won't write it
+			//NOTE: don't use get_gen_fact() to avoid transpose auto-handling
+			factors.push_back(const_cast<Faust::MatGeneric<FPP, Cpu>*>(this->transform->data[i]));
+#ifdef NON_OPT_FAUST_NORMALIZATION
+		if(this->is_transposed)
+			factors.insert(factors.begin(), norm_diag);
+		else
+			factors.push_back(norm_diag);
+#else
+		MatGeneric<FPP,Cpu>* scaled_f0;
+		MatSparse<FPP, Cpu>* fs;
+		MatDense<FPP,Cpu>* fd;
+
+		if(this->is_transposed)
+		{
+			/** this approach is abandoned because casting approach (as below) is quicker than transposing */
+			// the faust is transposed
+			// that's why we compute (Faust[0]^T*norm_diag)^T
+			// (the Faust structure will transpose this factor again when necessary because of its this->is_transposed flag)
+			//				factors[0]->transpose();
+			//				factors[0]->multiplyRight(*norm_diag);
+			//				factors[0]->transpose();
+			/****************************************/
+			fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[0]);
+			if(!fs)
+			{
+				fd = dynamic_cast<MatDense<FPP,Cpu>*>(factors[0]);
+				scaled_f0 = new MatDense<FPP,Cpu>(*fd);
+				fd = (MatDense<FPP,Cpu>*)scaled_f0; // needed befause there is no prototype of multiply(MatGeneric,...)
+				norm_diag->multiply(*fd, 'N');
+			}
+			else
+			{
+				scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
+				fs = (MatSparse<FPP,Cpu>*) scaled_f0;
+				norm_diag->multiply(*fs, 'N');
+			}
+			factors[0] = scaled_f0;
+		}
+		else
+		{
+			//factors[size()-1]->multiplyRight(*norm_diag);
+			if((fs = dynamic_cast<MatSparse<FPP,Cpu>*>(factors[size()-1])))
+				scaled_f0 = new MatSparse<FPP,Cpu>(*fs);
+			else
+			{
+				fd = dynamic_cast<MatDense<FPP,Cpu>*>(factors[size()-1]);
+				scaled_f0 = new MatDense<FPP,Cpu>(*fd);
+
+			}
+			scaled_f0->multiplyRight(*norm_diag);
+			factors[size()-1] = scaled_f0;
+		}
+
+		delete norm_diag;
+#endif
+		normalizedTh = new TransformHelper<FPP,Cpu>(factors, FPP(1.0), false, false);
+		normalizedTh->is_transposed = this->is_transposed;
+		//			normalizedTh->display();
+		return normalizedTh;
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>::~TransformHelper()
+	{
+		// transform is deleted auto. when no TransformHelper uses it (no more weak refs left)
+#ifdef FAUST_VERBOSE
+		cout << "Destroying Faust::TransformHelper object." << endl;
+#endif
+#ifdef USE_GPU_MOD
+		if(gpu_faust != nullptr)
+			delete gpu_faust;
+#endif
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */) {
+		if(!TransformHelper<FPP,Cpu>::seed_init) {
+			std::srand(std::time(NULL)); //seed init needed for MatDense rand generation
+			TransformHelper<FPP,Cpu>::seed_init = true;
+		}
+		// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
+		std::uniform_int_distribution<int> num_fac_distr(min_num_factors, max_num_factors);
+		std::uniform_int_distribution<int> dim_distr(min_dim_size, max_dim_size);
+		std::uniform_int_distribution<int> bin_distr(0,1);
+		unsigned int num_factors = num_fac_distr(generator);
+		// create factors randomly respecting the RandFaustType asked and dims interval
+		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) num_factors);
+		unsigned int num_rows, num_cols = dim_distr(generator);
+		float fact_density;
+		for(unsigned int i=0;i<num_factors;i++) {
+			num_rows = num_cols;
+			num_cols = dim_distr(generator);
+#ifdef FAUST_VERBOSE
+			cout << "TransformHelper<FPP,Cpu>::randFaust() per_row: " <<  per_row << endl;
+#endif
+			if(density == -1.)
+				fact_density = per_row?5./num_cols:5./num_rows;
+			else
+				fact_density = density;
+			switch(t){
+				case DENSE:
+					factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
+					break;
+				case SPARSE:
+					factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
+					break;
+				case MIXED:
+					if(bin_distr(generator))
+						factors[i] = MatDense<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
+					else
+						factors[i] = MatSparse<FPP,Cpu>::randMat(num_rows, num_cols, fact_density, per_row);
+					break;
+				default:
+					handleError("Faust::TransformHelper", "randFaust(): Unknown RandFaustType");
+					break;
+
+			}
+			if(factors[i] == NULL) return NULL;
+		}
+		TransformHelper<FPP,Cpu>* randFaust = new TransformHelper<FPP, Cpu>(factors,1.0,false,false);
+		return randFaust;
+	}
+
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::hadamardFaust(unsigned int n, const bool norma)
+	{
+		TransformHelper<FPP,Cpu>* hadamardFaust = nullptr;
+		vector<MatGeneric<FPP,Cpu>*> factors;
+		bool cloning_fact = false; // big opt. allowed only because of the RefManager used in Transform class
+		//this opt. avoids to duplicate the same factor
+		try {
+			wht_factors(n, factors, cloning_fact, norma);
+			hadamardFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+		}
+		catch(std::bad_alloc)
+		{
+			// nothing to do, out of memory return nullptr
+		}
+		return hadamardFaust;
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::fourierFaust(unsigned int n, const bool norma)
+	{
+
+		vector<MatGeneric<FPP,Cpu>*> factors(n+1);
+		TransformHelper<FPP,Cpu>* fourierFaust = nullptr;
+		try
+		{
+			fft_factors(n, factors);
+			//			for(int i=0;i<n+1;i++)
+			//				factors[i]->Display();
+			float alpha = norma?1/sqrt((double)(1 << n)):1.0;
+			fourierFaust = new TransformHelper<FPP, Cpu>(factors, alpha, false, false, /* internal call */ true);
+		}
+		catch(std::bad_alloc e)
+		{
+			//nothing to do, out of memory, return nullptr
+		}
+		return fourierFaust;
+	}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::eyeFaust(unsigned int n, unsigned int m)
+	{
+		vector<MatGeneric<FPP,Cpu>*> factors(1);
+		TransformHelper<FPP,Cpu>* eyeFaust = nullptr;
+		try
+		{
+			MatSparse<FPP,Cpu>* eye = MatSparse<FPP,Cpu>::eye(n, m);
+			factors[0] = eye;
+			eyeFaust = new TransformHelper<FPP, Cpu>(factors, 1.0, false, false);
+		}
+		catch(std::bad_alloc e)
+		{
+			//nothing to do, out of memory, return nullptr
+		}
+		return eyeFaust;
+	}
+
+template<typename FPP>
+	Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::begin() const
+	{
+		return this->transform->begin();
+	}
+
+template<typename FPP>
+	Faust::transf_iterator<FPP> Faust::TransformHelper<FPP, Cpu>::end() const
+	{
+		return this->transform->end();
+	}
+
+template<typename FPP>
+	void Faust::TransformHelper<FPP,Cpu>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)
+	{
+		if(start_id < 0 || start_id >= size())
+			throw out_of_range("start_id is out of range.");
+		if(end_id < 0 || end_id >= size())
+			throw out_of_range("end_id is out of range.");
+		Faust::MatDense<FPP,Cpu> * packed_fac = nullptr;
+		if(end_id == start_id)
+		{
+			//nothing to do except converting to MatDense if start_id
+			//factor is a MatSparse
+			packed_fac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(*(begin()+start_id));
+			if(packed_fac == nullptr) 
+			{// factor start_id is not at MatDense, convert it
+				packed_fac = new MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(*(begin()+start_id)));
+			}
+			else
+			{
+				return; //no change
 			}
 		}
+		else
+		{
+			// we have to multiply factors from start_id to end_id into one matrix
+			// simple way to do, 1) create a overhead-free TransformHelper with these factors
+			// 2) call get_product() to override the start_id factors with the result on the end
+			// 3) erase factors from start_id to end_id and insert packed factor too to replace them (that's Transform object responsibility).
+			// 1)
+			std::vector<Faust::MatGeneric<FPP,Cpu>*> topack_factors(begin()+start_id, begin()+end_id+1);
+			Faust::TransformHelper<FPP,Cpu> t(topack_factors, 1.0, false, false, false);
+			// 2)
+			packed_fac = new MatDense<FPP,Cpu>(t.get_product());
+		}
+		// 3)
+		faust_unsigned_int i = end_id;
+		while(i>=start_id)
+		{
+			this->transform->erase(i);
+			if(i == 0) break;
+			i--;
+		}
+		this->transform->insert(start_id, packed_fac);
+	}
+
+template <typename FPP>
+	void TransformHelper<FPP,Cpu>::pack_factors()
+{
+	TransformHelperGen<FPP,Cpu>::pack_factors();
+}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::swap_rows(const faust_unsigned_int id1,
+			const faust_unsigned_int id2,
+			const bool permutation/*=false*/,
+			const bool inplace/*=false*/,
+			const bool check_transpose/*=true*/)
+{
+	if(check_transpose && this->is_transposed)
+		return swap_cols(id1, id2, permutation, inplace, false);
+	TransformHelper<FPP,Cpu>* t = nullptr;
+	if(inplace)
+		t = this;
+	else
+	{
+		t = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0,
+				/* optimizedCopy*/ false, /* cloning_fact */ true, /* internal_call*/ true);
+		t->copy_transconj_state(this);
+		t->copy_slice_state(this);
+		t->copy_mul_mode_state(this);
+	}
+	// don't use get_gen_fact_nonconst in case the the TransformHelper is transposed
+	auto last_fac = t->transform->data[0];
+	if(permutation)
+	{
+		auto P = MatSparse<FPP,Cpu>::swap_matrix(last_fac->getNbRow(), id1, id2);
+		t->push_first(P, /*optimizedCopy*/ false, /* copying*/ false);
+	}
+	else
+	{
+		// swap two columns id1, id2 of the last factors
+		auto dlast_fac = dynamic_cast<MatDense<FPP,Cpu>*>(last_fac);
+		if(dlast_fac)
+		{
+			dlast_fac->swap_rows(id1, id2);
+		}
+		else
+		{
+			auto slast_fac = dynamic_cast<MatSparse<FPP,Cpu>*>(last_fac);
+			slast_fac->swap_rows(id1, id2);
+		}
+	}
+	return t;
+}
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::swap_cols(const faust_unsigned_int id1,
+			const faust_unsigned_int id2,
+			const bool permutation/*=false*/,
+			const bool inplace/*=false*/,
+			const bool check_transpose/*=true*/)
+{
+	if(check_transpose && this->is_transposed)
+		return swap_rows(id1, id2, permutation, inplace, false);
+	TransformHelper<FPP,Cpu>* t = nullptr;
+	if(inplace)
+		t = this;
+	else
+	{
+		t = new TransformHelper<FPP,Cpu>(this->transform->data, 1.0,
+				/* optimizedCopy*/ false, /* cloning_fact */ true, /* internal_call*/ true);
+		t->copy_transconj_state(this);
+		t->copy_slice_state(this);
+		t->copy_mul_mode_state(this);
+	}
+	// don't use get_gen_fact_nonconst in case the the TransformHelper is transposed
+	auto last_fac = t->transform->data[size()-1];
+	if(permutation)
+	{
+		auto P = MatSparse<FPP,Cpu>::swap_matrix(last_fac->getNbCol(), id1, id2);
+		t->push_back(P, /*optimizedCopy*/ false, /* copying*/ false, /* transpose */ false, /* conjugate */ false);
+	}
+	else
+	{
+		// swap two columns id1, id2 of the last factors
+		auto dlast_fac = dynamic_cast<MatDense<FPP,Cpu>*>(last_fac);
+		if(dlast_fac)
+		{
+			dlast_fac->swap_cols(id1, id2);
+		}
+		else
+		{
+			auto slast_fac = dynamic_cast<MatSparse<FPP,Cpu>*>(last_fac);
+			slast_fac->swap_cols(id1,id2);
+		}
+	}
+	return t;
+}
 
 	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
 	template<typename FPP> std::default_random_engine TransformHelper<FPP,Cpu>::generator(time(NULL));

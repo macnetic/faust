@@ -317,6 +317,8 @@ namespace Faust
 
 			MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int row_id_start, faust_unsigned_int num_rows) const;
 			MatSparse<FPP,Cpu>* get_rows(faust_unsigned_int* row_ids, faust_unsigned_int num_rows) const;
+			void swap_rows(faust_unsigned_int id1, faust_unsigned_int id2);
+			void swap_cols(faust_unsigned_int id1, faust_unsigned_int id2);
 
 			std::list<std::pair<int,int>> nonzeros_indices() const;
 
@@ -325,6 +327,8 @@ namespace Faust
 			static MatSparse<FPP, Cpu>* randMat(faust_unsigned_int num_rows, faust_unsigned_int num_cols, double density, bool per_row);
 			static MatSparse<FPP, Cpu>* eye(faust_unsigned_int num_rows, faust_unsigned_int num_cols);
 
+			// Permutation matrix set to exchange two rows or columns (depending on the multiplication side)
+			static MatSparse<FPP,Cpu>* swap_matrix(faust_unsigned_int order, faust_unsigned_int id1, faust_unsigned_int id2);
 			//! Destructor
 			~MatSparse(){/*std::cout<<"destructor MatSparse"<<std::endl;*//*this->mat.resize(0,0);*/}
 

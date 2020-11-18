@@ -107,6 +107,7 @@ namespace Faust
 //		friend Vect<FPP,Cpu> MatDiag<FPP>::multiply(const Vect<FPP,Cpu> & vec) const;
 		friend class Transform<FPP,Cpu>;
 		friend class MatDiag<FPP>;
+		friend class MatDense<FPP,Cpu>;
 //		friend void  MatDiag<FPP>::multiply(Vect<FPP,Cpu> & vec, char opThis) const;
 
 

@@ -103,6 +103,11 @@ class FaustCoreCpp
                                   num_rows, unsigned long int* col_ids,
                                   unsigned long int num_cols) const;
     bool save_mat_file(const char* filepath) const;
+    FaustCoreCpp<FPP,DEV>* swap_cols(const unsigned int id1, const unsigned int id2,
+            const bool permutation, const bool inplace);
+    FaustCoreCpp<FPP,DEV>* swap_rows(const unsigned int id1, const unsigned int id2,
+            const bool permutation, const bool inplace);
+
     FaustCoreCpp<FPP,DEV>* optimize_storage(const bool time=false);
     FaustCoreCpp<FPP,DEV>* optimize(const bool transp=false);
     FaustCoreCpp<FPP,DEV>* optimize_time(const bool transp=false, const bool inplace=false, const int nsamples=1);

@@ -1101,6 +1101,24 @@ Vect<FPP,Cpu> MatDense<FPP,Cpu>::get_row(faust_unsigned_int id) const
 	return Vect<FPP,Cpu>(this->getNbCol(),vec.data());
 }
 
+template<typename FPP>
+void MatDense<FPP,Cpu>::swap_cols(const faust_unsigned_int id1, const faust_unsigned_int id2)
+{
+	Vect<FPP,Cpu> v = this->get_col(id1);
+	memcpy(this->getData()+this->getNbRow()*id1, this->getData()+this->getNbRow()*id2, sizeof(FPP)*this->getNbRow());
+	memcpy(this->getData()+this->getNbRow()*id2, v.getData(), sizeof(FPP)*this->getNbRow());
+}
+
+template<typename FPP>
+void MatDense<FPP,Cpu>::swap_rows(const faust_unsigned_int id1, const faust_unsigned_int id2)
+{
+	faust_unsigned_int ncols = this->getNbCol();
+	MatDense<FPP,Cpu> swap_row(1, ncols);
+	swap_row.mat.row(0) = mat.row(id1);
+	mat.row(id1) = mat.row(id2);
+	mat.row(id2) = swap_row.mat.row(0);
+}
+
 	template<typename FPP>
 void MatDense<FPP,Cpu>::delete_col(int id)
 {

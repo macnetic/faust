@@ -827,6 +827,50 @@ cdef class FaustCore:
         core._isReal = self._isReal
         return core
 
+    def swap_cols(self, id1, id2, permutation, inplace):
+        if(inplace):
+            if(self._isReal):
+                self.core_faust_dbl.swap_cols(id1, id2,
+                                              permutation, inplace)
+            else:
+                self.core_faust_cplx.swap_cols(id1, id2,
+                                               permutation,
+                                               inplace)
+
+            return self
+        core = FaustCore(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.swap_cols(id1, id2,
+                                                                permutation, inplace)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.swap_cols(id1, id2,
+                                                                  permutation,
+                                                                  inplace)
+        core._isReal = self._isReal
+        return core
+
+    def swap_rows(self, id1, id2, permutation, inplace):
+        if(inplace):
+            if(self._isReal):
+                self.core_faust_dbl.swap_rows(id1, id2,
+                                              permutation, inplace)
+            else:
+                self.core_faust_cplx.swap_rows(id1, id2,
+                                               permutation,
+                                               inplace)
+
+            return self
+        core = FaustCore(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.swap_rows(id1, id2,
+                                                                permutation, inplace)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.swap_rows(id1, id2,
+                                                                  permutation,
+                                                                  inplace)
+        core._isReal = self._isReal
+        return core
+
     def optimize_storage(self, time=False):
         core = FaustCore(core=True)
         if(self._isReal):

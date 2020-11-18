@@ -194,7 +194,8 @@ namespace Faust
 			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
 			void pack_factors();
 
-			void swap(faust_unsigned_int id1, faust_unsigned_int id2);
+			TransformHelper<FPP,Cpu>* swap_cols(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
+			TransformHelper<FPP,Cpu>* swap_rows(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
 
 			/** for testing purpose only (memory leaks enabled) */
 			void disable_dtor() { this->transform->disable_dtor(); }
