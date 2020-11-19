@@ -631,6 +631,38 @@ class Faust:
         F = F/s
         return F
 
+    def __imatmul__(F, A):
+        """
+        Inplace operator.
+        F = F @ A
+        """
+        F = F@A
+        return F
+
+    def __imul__(F, A):
+        """
+        Inplace operator.
+        F = F * A
+        """
+        F = F*A
+        return F
+
+    def __iadd__(F, A):
+        """
+        Inplace operator.
+        F = F + A
+        """
+        F = F+A
+        return F
+
+    def __isub__(F, A):
+        """
+        Inplace operator.
+        F = F - A
+        """
+        F = F-A
+        return F
+
     def __matmul__(F, A):
         """
         Multiplies F by A which is a dense numpy.matrix/numpy.ndarray or a Faust object.
