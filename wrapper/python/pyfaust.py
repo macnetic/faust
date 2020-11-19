@@ -603,13 +603,33 @@ class Faust:
         Returns:
             the division result as a Faust object.
 
-        <b/> See also Faust.__mul__
+        <b/> See also Faust.__mul__, Faust.__itruediv__
         """
         if(isinstance(s, (float, np.complex, int))):
             return F*(1./s)
         else:
             raise Exception("unsupported operand type(s) for /: a Faust can only be "
                   "divided by a scalar.")
+
+    def __itruediv__(F, s): 
+        """
+        divides F by the scalar s inplace.
+
+        This method overloads the Python function/operator `/=' (whether s is a
+        float or an integer).
+
+        Args:
+        F: the Faust object.
+        s: the scalar to divide the Faust object with.
+
+        Returns:
+            the division result as a Faust object.
+
+        <b/> See also Faust.__mul__, Faust.__truediv__
+
+        """
+        F = F/s
+        return F
 
     def __matmul__(F, A):
         """
@@ -1088,6 +1108,8 @@ class Faust:
         empty_faust_except = Exception("Cannot create empty Faust.")
         idx_error_exception = IndexError("only integers, slices (`:`), ellipsis"
                                      " (`...`), and integer are valid indices")
+        if(isinstance(indices, np.ndarray)):
+            indices = list(indices)
         if(indices == Ellipsis): # F[...]
             out_indices = [slice(0,F.shape[0]), slice(0, F.shape[1])]
         elif(isinstance(indices,int)): # F[i] # a line
@@ -1816,6 +1838,13 @@ class Faust:
             F_opt = Faust(core_obj=F.m_faust.optimize_time(transp, inplace,
                                                           nsamples))
             return F_opt
+
+    def copy(F, dev='cpu'):
+        """
+
+        <b/> See also Faust.clone
+        """
+        return F.clone(dev)
 
     def clone(F, dev='cpu'):
         """
