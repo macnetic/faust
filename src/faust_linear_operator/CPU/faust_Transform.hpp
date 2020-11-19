@@ -187,16 +187,29 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 	dtor_delete_data(false), dtor_disabled(false)
 {
 	data.resize(facts.size());
-	if(data.size() > 0) {
-		if(cloning_fact || lambda_ != FPP(1.0))
+	int min_size_id = 0;
+	if(data.size() > 0)
+	{
+		int min_size_id = 0;
+		if(lambda_ != FPP(1.0))
 		{
-			data[0] = facts[0]->Clone(optimizedCopy);
+			std::vector<int> fact_ids(data.size());
+			std::generate(fact_ids.begin(), fact_ids.end(), [](){static int i = 0; return i++;});
+			std::vector<int>::iterator result = std::min_element(fact_ids.begin(), fact_ids.end(), [&facts](const int &a, const int &b){ return facts[a]->getNBytes() < facts[b]->getNBytes();});
+			min_size_id = std::distance(fact_ids.begin(), result);
+			data[min_size_id] = facts[min_size_id]->Clone(optimizedCopy);
+		}
+		else if(cloning_fact)
+		{
+			data[min_size_id ] = facts[min_size_id ]->Clone(optimizedCopy);
 		}
 		else
-			data[0] = facts[0];
-		totalNonZeros += data[0]->getNonZeros();
-		for (int i=1 ; i<data.size() ; i++)
+			data[min_size_id] = facts[min_size_id];
+		totalNonZeros += data[min_size_id]->getNonZeros();
+		for (int i=0 ; i<data.size() ; i++)
 		{
+			if(i == min_size_id)
+				continue;
 			if(cloning_fact)
 				data[i]=facts[i]->Clone(optimizedCopy);
 			else
@@ -206,9 +219,9 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 		}
 
 		if(lambda_ != FPP(1.0))
-			(*data[0]) *= lambda_;
+			(*data[min_size_id]) *= lambda_;
 
-		if(!dtor_delete_data) ref_man.acquire(data[0]);
+		if(!dtor_delete_data) ref_man.acquire(data[min_size_id]); //min_size_id == 0 if lambda == 1.0
 
 	}
 #ifdef __COMPILE_TIMERS__
