@@ -69,6 +69,7 @@ namespace Faust
 			void adjoint() { conjugate(true); transpose(); }
 			faust_unsigned_int getNonZeros() const { return mat.diagonal().nonZeros(); }
 
+			size_t getNBytes() const;
 			matvar_t* toMatIOVar(bool transpose, bool conjugate) const;
 			Real<FPP> normL1(const bool transpose=false) const;
 			typename Eigen::NumTraits<FPP>::Real norm() const;

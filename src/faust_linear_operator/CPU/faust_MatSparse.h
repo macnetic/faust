@@ -205,6 +205,7 @@ namespace Faust
 			//int getNbRow()const{return this->dim1;}
 			//int getNbCol()const{return this->dim2;}
 			faust_unsigned_int getNonZeros()const{return nnz;}
+			size_t getNBytes() const;
 			bool isCompressedMode()const{return mat.isCompressed();}
 			void makeCompression(){mat.makeCompressed();}
 

@@ -137,6 +137,11 @@ namespace Faust
 		}
 
 
+	template<typename FPP>
+	size_t MatDense<FPP,Cpu>::getNBytes() const
+	{
+		return this->getNbCol()*this->getNbRow()*sizeof(FPP);
+	}
 
 	template<typename FPP>
 		void MatDense<FPP,Cpu>::check_dim_validity()

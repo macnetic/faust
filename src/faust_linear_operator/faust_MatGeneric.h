@@ -140,6 +140,8 @@ namespace Faust
 			//! \brief return the number of non-zeros element in the matrix
 			virtual faust_unsigned_int getNonZeros()const=0;
 
+			virtual size_t getNBytes() const=0;
+
 			//!brief return the percentage of non-zeros coefficient in the matrix,
 			//! \return value between 0 and 1
 			float density() const{return ((float) this->getNonZeros())/((float)this->getNbCol()*this->getNbRow());}

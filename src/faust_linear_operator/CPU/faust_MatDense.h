@@ -454,6 +454,7 @@ namespace Faust
 			Vect<FPP, Cpu> adiagonal(int index);
 			Vect<FPP, Cpu> gen_diagonal(int index, bool diag /* true for diagonal, false for anti-diagonal*/);
 
+			size_t getNBytes() const;
 
 			/**
 			 * \brief Returns the nonzeros indices.
