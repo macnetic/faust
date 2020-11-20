@@ -509,13 +509,13 @@ class Faust:
                                          " together with shapes ", F.shape,
                                          G.shape)
 
-                        G = Faust(np.ones(F.shape[0], 1)) * G
+                    G = Faust(np.ones((F.shape[0], 1))) @ G
                 elif G.shape[1] == 1:
                     if G.shape[0] != F.shape[0]:
                         raise ValueError("operands could not be broadcast"
                                          " together with shapes ", F.shape,
                                          G.shape)
-                        G = G * Faust(np.ones(1, F.shape[1]))
+                    G = G @ Faust(np.ones((1, F.shape[1])))
                 if F.shape != G.shape:
                     raise Exception('Dimensions must agree')
                 C = F.concatenate(G, axis=1)
@@ -526,8 +526,15 @@ class Faust:
             elif (isinstance(G,np.ndarray) or
                  isinstance(G,scipy.sparse.csr_matrix) or
                  isinstance(G,scipy.sparse.csc_matrix)):
+                if(G.size == 1):
+                    if G.dtype == np.complex:
+                        return F*(np.complex(G.squeeze()))
+                    else:
+                        return F*(float(G.squeeze()))
                 if G.ndim == 1:
                     G = Faust([np.ones((F.shape[0], 1)), G.reshape(1, G.size)])
+                    if(F.shape[1] == 1):
+                        F = F@Faust(np.ones((1,F.shape[0])))
                     F = F+G
                 else:
                     F = F+Faust(G)
@@ -605,7 +612,7 @@ class Faust:
 
         <b/> See also Faust.__mul__, Faust.__itruediv__
         """
-        if(isinstance(s, (float, np.complex, int))):
+        if isinstance(s, (float, np.complex, int)) or isinstance(s, np.ndarray):
             return F*(1./s)
         else:
             raise Exception("unsupported operand type(s) for /: a Faust can only be "
@@ -820,24 +827,46 @@ class Faust:
         """
         if(isinstance(A, (float, int, np.complex))):
             return Faust(core_obj=F.m_faust.multiply_scal(A))
-        else: # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
-            try:
-                return F.__matmul__(A)
-            except:
-                raise TypeError("invalid type operand for Faust.__mul__.")
+        elif(isinstance(A, np.ndarray)):
+            if(A.size == 1):
+                if A.dtype == np.complex:
+                    return F*(np.complex(A.squeeze()))
+                else:
+                    return F*(float(A.squeeze()))
+            if A.ndim == 1 and A.size == F.shape[1] \
+            or A.ndim == 2 and A.shape[0] == 1:
+                return F@Faust(np.diag(A.squeeze()))
+        # A is a Faust, a numpy.ndarray (eg. numpy.matrix) or anything
+        warnings.warn("The * is deprecated as a matrix product and will soon"
+                      " be removed")
+        try:
+            return F.__matmul__(A)
+        except:
+            raise TypeError("invalid type operand for Faust.__mul__.")
 
     def __rmul__(F, lhs_op):
         """ lhs_op*F
 
         <b/>See also Faust.__mul__
         """
-        if(isinstance(lhs_op, (float, int, np.complex))):
-            return Faust(core_obj=F.m_faust.multiply_scal(lhs_op))
-        else:
-            try:
-                return F.__rmatmul__(lhs_op)
-            except:
-                raise TypeError("invalid type operand for Faust.__rmul__.")
+        if isinstance(lhs_op, (float, int, np.complex)):
+            return F.__mul__(lhs_op)
+        elif(isinstance(lhs_op, np.ndarray)):
+            #TODO: refactor with __mul__ when * won't longer execute a matmul
+            if(lhs_op.size == 1):
+                if lhs_op.dtype == np.complex:
+                    return F*(np.complex(lhs_op.squeeze()))
+                else:
+                    return F*(float(lhs_op.squeeze()))
+            if lhs_op.ndim == 1 and lhs_op.size == F.shape[1] \
+            or lhs_op.ndim == 2 and lhs_op.shape[0] == 1:
+                return F@Faust(np.diag(lhs_op.squeeze()))
+        warnings.warn("The * is deprecated as a matrix product and will soon"
+                      " be removed")
+        try:
+            return F.__rmatmul__(lhs_op)
+        except:
+            raise TypeError("invalid type operand for Faust.__rmul__.")
 
     __array_ufunc__ = None # mandatory to override rmatmul
                            # it means Faust doesn't support ufuncs
@@ -1159,6 +1188,10 @@ class Faust:
                 out_indices = [0,0]
                 if(isinstance(indices[0], int) and isinstance(indices[1],int)):
                     return F.toarray()[indices[0],indices[1]]
+                if(isinstance(indices[0], np.ndarray)):
+                    indices = (list(indices[0]), indices[1])
+                if(isinstance(indices[1], np.ndarray)):
+                    indices = (indices[0], list(indices[1]))
                 if(indices[0] == Ellipsis):
                     if(indices[1] == Ellipsis):
                         raise IndexError('an index can only have a single ellipsis '
