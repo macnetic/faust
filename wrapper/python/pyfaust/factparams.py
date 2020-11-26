@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # @PYFAUST_LICENSE_HEADER@
 from pyfaust import *
+import numpy as np
 import _FaustCorePy
 import sys
 if sys.version_info > (3,0):
