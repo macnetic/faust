@@ -194,8 +194,9 @@ Faust::Transform<FPP,Cpu>::Transform(const std::vector<Faust::MatGeneric<FPP,Cpu
 		if(lambda_ != FPP(1.0))
 		{
 			std::vector<int> fact_ids(facts.size());
-			std::generate(fact_ids.begin(), fact_ids.end(), [](){static int i = 0; return i++;});
-			std::vector<int>::iterator result = std::min_element(fact_ids.begin(), fact_ids.end(), [&facts](const int &a, const int &b){ return facts[a]->getNBytes() < facts[b]->getNBytes();});
+			int i = -1;
+			std::generate(fact_ids.begin(), fact_ids.end(), [&i](){return ++i;});
+			std::vector<int>::iterator result = std::min_element(fact_ids.begin(), fact_ids.end(), [&facts](const int &a, const int &b){return facts[a]->getNBytes() < facts[b]->getNBytes();});
 			min_size_id = std::distance(fact_ids.begin(), result);
 			data[min_size_id] = facts[min_size_id]->Clone(optimizedCopy);
 		}
