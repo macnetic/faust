@@ -164,6 +164,7 @@ foreach(mex_target ${MEXFILE_TARGET_LIST})
 		target_compile_definitions(${mex_target} PRIVATE NOMINMAX MATLAB_DEFAULT_RELEASE=R2017b) # it seems necessary for windows while R2017b flag of matlab_add_mex is enough for Unix
 	else()
 		target_link_options(${mex_target} PRIVATE ${OpenMP_CXX_LIBRARIES}) # do nothing if BUILD_MULTITHREAD is OFF
+		target_compile_definitions(${mex_target} PRIVATE MATLAB_DEFAULT_RELEASE=R2017b)
 	endif()
 	if(BUILD_MULTITHREAD)
 		target_compile_definitions(${mex_target} PRIVATE _MUL_OMP_) # cf. ./src/faust_linear_operator/CPU/faust_prod_opt.hpp
