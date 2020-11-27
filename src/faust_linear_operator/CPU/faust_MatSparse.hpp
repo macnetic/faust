@@ -1093,10 +1093,10 @@ void Faust::MatSparse<FPP,Cpu>::delete_row(faust_unsigned_int id)
 template<typename FPP>
 Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::swap_matrix(faust_unsigned_int order, faust_unsigned_int id1, faust_unsigned_int id2)
 {
-	unsigned int colids[order];
+	unsigned int *colids = new unsigned int[order]; // MS VS refuses the stack because order is not a constexpr, use the heap
 	const unsigned int nrows = order;
 	const unsigned int ncols = nrows;
-	unsigned int rowptr[nrows+1];
+	unsigned int *rowptr = new unsigned int[nrows+1];
 	int min_id, max_id;
 	if(id1<id2)
 	{
@@ -1120,6 +1120,8 @@ Faust::MatSparse<FPP,Cpu>* Faust::MatSparse<FPP,Cpu>::swap_matrix(faust_unsigned
 	colids[min_id] = max_id;
 	colids[max_id] = min_id;
 	auto P = new MatSparse<FPP,Cpu>(rowptr, colids, values, nrows, ncols);
+	delete [] colids;
+	delete [] rowptr;
 	return P;
 }
 
