@@ -987,7 +987,7 @@ ELSE(WIN32 AND NOT UNIX)
 		#it's only matters for rpm package (for example gpu_mod lib is linked to cusparse and cublas but we don't want to block install with auto-deps to libcusparse/cublas)
 		# so let's ignore these library as deps
 		set(CPACK_RPM_SPEC_MORE_DEFINE "%define __requires_exclude ^libmex[.]so.*|libmat[.]so.*|libmx[.]so.*|libpython.*[.]so.*|libcublas[.]so[.].*|libcusparse[.]so[.].*$ ")
-
+		set(CPACK_RPM_PACKAGE_REQUIRES "python >= 3")
 		set(CPACK_RPM_PACKAGE_RELEASE "1")
 		SET(CPACK_RPM_PACKAGE_LICENSE "INRIA License (faust.inria.fr)")
 		set(CPACK_RPM_PACKAGE_GROUP "unknown")
