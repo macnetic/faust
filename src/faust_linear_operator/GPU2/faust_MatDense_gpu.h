@@ -118,6 +118,7 @@ namespace Faust
 				void Display() const;
 				std::string to_string(const bool transpose=false, const bool displaying_small_mat_elts=false) const;
 				MatType getType() const;
+				size_t getNBytes() const;
 				int32_t getNbRow() const;
 				int32_t getNbCol() const;
 				faust_unsigned_int getNonZeros() const;

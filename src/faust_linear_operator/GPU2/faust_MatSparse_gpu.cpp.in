@@ -449,4 +449,9 @@ namespace Faust
 			vec.gpu_mat = gpu_dmat;
 		}
 
+	template<>
+		size_t Faust::MatSparse<FSFG,GPU2>::getNBytes() const
+		{
+			return this->getNonZeros()*(sizeof(FSFG)+sizeof(int))+(this->getNbRow()+1)*sizeof(int);
+		}
 };

@@ -688,4 +688,10 @@ namespace Faust
 			}
 		}
 
+	template<>
+		size_t MatDense<FSFG,GPU2>::getNBytes() const
+		{
+			return this->getNbCol()*this->getNbRow()*sizeof(FSFG);
+		}
+
 };

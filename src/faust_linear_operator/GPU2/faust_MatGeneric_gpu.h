@@ -22,6 +22,7 @@ namespace Faust
 				bool is_identity;
 				bool is_zeros;
 			public:
+				virtual size_t getNBytes() const=0;
 				virtual MatType getType() const=0;
 				virtual int32_t getNbRow() const=0;
 				virtual int32_t getNbCol() const=0;

@@ -83,6 +83,7 @@ namespace Faust
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);
 				int32_t getNbRow() const;
 				int32_t getNbCol() const;
+				size_t getNBytes() const;
 				faust_unsigned_int getNonZeros() const;
 				int32_t getDevice() const;
 				void Display() const;
