@@ -185,5 +185,5 @@ std::list<std::pair<int,int>> Faust::MatDiag<FPP>::nonzeros_indices() const
 template<typename FPP>
 size_t Faust::MatDiag<FPP>::getNBytes() const
 {
-	sizeof(FPP)*this->dim1*this->dim2;
+	return sizeof(FPP)*this->dim1*this->dim2;
 }

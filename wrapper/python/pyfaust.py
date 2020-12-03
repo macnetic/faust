@@ -657,7 +657,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise Exception("unsupported operand type(s) for /: a Faust can only be "
                   "divided by a scalar.")
 
-    def __itruediv__(F, s): 
+    def __itruediv__(F, s):
         """
         divides F by the scalar s inplace.
 
@@ -679,32 +679,28 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def __imatmul__(F, A):
         """
-        Inplace operator.
-        F = F @ A
+        Inplace operation: F = F @ A
         """
         F = F@A
         return F
 
     def __imul__(F, A):
         """
-        Inplace operator.
-        F = F * A
+        Inplace operation: F = F * A
         """
         F = F*A
         return F
 
     def __iadd__(F, A):
         """
-        Inplace operator.
-        F = F + A
+        Inplace operation: F = F + A
         """
         F = F+A
         return F
 
     def __isub__(F, A):
         """
-        Inplace operator.
-        F = F - A
+        Inplace operation: F = F - A
         """
         F = F-A
         return F
