@@ -1731,8 +1731,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             raise ValueError("complex -> float conversion not yet supported.")
 
     def asarray(F, *args, **kwargs):
-        print('Faust.asarray')
-        #TODO: full list of numpy args or **kw_unknown
         return F
 
     @property
@@ -1966,7 +1964,68 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
 
     def sum(F, axis=None, **kwargs):
-        return F@Faust(np.ones((F.shape[1], 1)))
+        """
+        Sums Faust elements over a given axis.
+
+        Args:
+            axis (optional): None or int  or tuple of ints.
+            Axis or axes along which the the sum is performed
+
+        Returns:
+            The Faust sum.
+
+        Example:
+            >>> from pyfaust import rand as frand
+            >>> F = frand(5,10)
+            >>> F.sum()
+            Faust size 1x10, density 26, nnz_sum 260, 6 factor(s): 
+                - FACTOR 0 (real) DENSE,  size 1x10, density 1, nnz 10
+                - FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 3 (real) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 4 (real) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 5 (real) SPARSE, size 10x10, density 0.5, nnz 50
+
+            >>> F.sum(axis=0).toarray()
+            array([[135.62885806,  86.91727358, 212.40112068, 186.06476227,
+                             68.74097449,  88.63216727,  64.38497784,  58.51572934,
+                             91.05523782, 196.79601819]])
+            >>> F.sum(axis=1)
+            Faust size 10x1, density 26, nnz_sum 260, 6 factor(s): 
+                - FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 3 (real) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 4 (real) SPARSE, size 10x10, density 0.5, nnz 50
+                - FACTOR 5 (real) DENSE,  size 10x1, density 1, nnz 10
+            >>> F.sum(axis=1).toarray()
+            array([[ 78.7358253 ],
+                  [122.06237092],
+                  [171.60995629],
+                  [110.86003948],
+                  [147.82414116],
+                  [100.35211187],
+                  [123.56100581],
+                  [104.49754233],
+                  [ 99.99809178],
+                  [129.63603461]])
+
+        """
+        is_tuple = isinstance(axis, tuple)
+        is_int = isinstance(axis, int)
+        is_tuple_or_int = is_tuple or is_int
+        if not is_tuple_or_int or is_tuple and \
+           (not isinstance(axis[0], int) or not isinstance(axis[1], int)):
+            raise TypeError("axis must be int or tuple of ints")
+        if axis == None or axis == 0 or is_tuple and 0 in axis:
+            F = Faust(np.ones((1, F.shape[0])))@F
+        if axis == 1 or is_tuple and 1 in axis:
+            F = F@Faust(np.ones((F.shape[1], 1)))
+        if is_tuple and len([i for i in axis if i < 0
+                             or i > 1]) or is_int and (axis < 0 or axis > 1):
+            raise ValueError("axis "+str(axis)+" is out of bounds for a Faust "
+                             " (only two dimensions)")
+        return F
 
     def average(F, axis=None, weights=None, returned=False):
         """
