@@ -1850,6 +1850,68 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         return issparse
 
     def swap_cols(F, id1, id2, permutation=False, inplace=False):
+        """
+        Swaps F columns of indices id1 and id2.
+
+        Args:
+            id1: index of the first column of the swap.
+            id2: index of the second column of the swap.
+            permutation: if True then the swap is performed by inserting a permutation
+            matrix to the output Faust. If False, the last matrix
+            in the Faust F sequence is edited to swap the columns.
+            inplace: if True then F is modified instead of returning a new Faust.
+            Otherwise, by default, a new Faust is returned.
+
+        Returns:
+            The column swapped Faust.
+
+		Example:
+			>>> from pyfaust import rand as frand
+			>>> F = frand(5,10)
+			>>> G = F.swap_cols(2,4)
+			>>> G
+			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
+			- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 1 (real) DENSE,  size 10x10, density 0.5, nnz 50
+			- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 3 (real) DENSE,  size 10x10, density 0.5, nnz 50
+			- FACTOR 4 (real) DENSE,  size 10x10, density 0.5, nnz 50
+
+			>>> G[:, 2].toarray() == F[:, 4].toarray()
+			array([[ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True]])
+			>>> G[:, 4].toarray() == F[:, 2].toarray()
+			array([[ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True],
+				   [ True]])
+			>>> H  = F.swap_cols(2,4, permutation=True)
+			>>> H
+			Faust size 10x10, density 2.6, nnz_sum 260, 6 factor(s): 
+			- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 1 (real) DENSE,  size 10x10, density 0.5, nnz 50
+			- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 3 (real) DENSE,  size 10x10, density 0.5, nnz 50
+			- FACTOR 4 (real) DENSE,  size 10x10, density 0.5, nnz 50
+			- FACTOR 5 (real) SPARSE, size 10x10, density 0.1, nnz 10
+
+
+        <b/> See also Faust.swap_rows
+        """
         if(inplace):
             F.m_faust.swap_cols(id1, id2, permutation,
                                 inplace)
@@ -1858,7 +1920,52 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                                        inplace))
         return F_swapped
 
-    def swap_rows(F, id1, id2, permutation=False, inplace=False):
+    def swap_rows(F, id1, id2, permutation=True, inplace=False):
+        """
+        Swaps F rows of indices id1 and id2.
+
+        Args:
+            id1: index of the first row of the swap.
+            id2: index of the second row of the swap.
+            permutation: if True then the swap is performed by inserting a permutation
+            matrix to the output Faust. If False, the last matrix
+            in the Faust F sequence is edited to swap the rows.
+            inplace: if True then F is modified instead of returning a new Faust.
+            Otherwise, by default, a new Faust is returned.
+
+        Returns:
+            The rows swapped Faust.
+
+		Example:
+			>>> from pyfaust import rand as frand
+			>>> F = frand(5,10)
+			>>> G = F.swap_rows(2,4)
+			>>> G
+			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
+			- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 2 (real) DENSE,  size 10x10, density 0.5, nnz 50
+			- FACTOR 3 (real) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 4 (real) DENSE,  size 10x10, density 0.5, nnz 50
+
+			>>> G[2,:].toarray() == F[4,:].toarray()
+			array([[ True,  True,  True,  True,  True,  True,  True,  True,  True,
+					 True]])
+			>>> G[4,:].toarray() == F[2,:].toarray()
+			array([[ True,  True,  True,  True,  True,  True,  True,  True,  True,
+					 True]])
+			>>> H  = F.swap_rows(2,4, permutation=True)
+			>>> H
+			Faust size 10x10, density 2.6, nnz_sum 260, 6 factor(s): 
+			- FACTOR 0 (real) SPARSE, size 10x10, density 0.1, nnz 10
+			- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 3 (real) DENSE,  size 10x10, density 0.5, nnz 50
+			- FACTOR 4 (real) SPARSE, size 10x10, density 0.5, nnz 50
+			- FACTOR 5 (real) DENSE,  size 10x10, density 0.5, nnz 50
+
+        <b/> See also Faust.swap_cols
+        """
         if(inplace):
             F.m_faust.swap_rows(id1, id2, permutation,
                                 inplace)
