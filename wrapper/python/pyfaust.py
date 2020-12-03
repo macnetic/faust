@@ -2029,13 +2029,55 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def average(F, axis=None, weights=None, returned=False):
         """
+        Compute the weighted average of F along the specified axis.
+
+        Args:
+            axis (optional): None or int  or tuple of ints.
+            Axis or axes along which to average the Faust F.
+			The default, axis=None, will average over all of the elements of the input array.
+			If axis is a tuple of ints, averaging is performed on all of the axes specified in the tuple
+			weights: an array of weights associated with the values in F. Each value in F contributes to the average according to its associated weight. The weights array can either be 1-D (in which case its length must be the size of a along the given axis) or of the same shape as a. If weights=None, then all data in F are assumed to have a weight equal to one. The 1-D calculation is:
+
+			avg = sum(F @ weights) / sum(weights)
+
+			The only constraint on weights is that sum(weights) must not be 0.
+
+        Returns:
+            The Faust average.
+
+        Example:
+			>>> from pyfaust import Faust
+			>>> import numpy as np
+			>>> data = np.arange(1, 5)
+			>>> data
+			array([1, 2, 3, 4])
+			>>> F = Faust(data.reshape(1,data.shape[0]))
+			>>> FA = F.average()
+			>>> FA
+			Faust size 1x1, density 9, nnz_sum 9, 3 factor(s): 
+			- FACTOR 0 (real) DENSE,  size 1x1, density 1, nnz 1
+			- FACTOR 1 (real) DENSE,  size 1x4, density 1, nnz 4
+			- FACTOR 2 (real) DENSE,  size 4x1, density 1, nnz 4
+
+			>>> FA.toarray()
+			array([[2.5]])
+			>>> 
+			>>> data2 = np.arange(6).reshape((3,2))
+			>>> F2 = Faust(data2)
+			>>> F2.average(axis=1, weights=[1./4, 3./4]).toarray()
+			array([[0.75],
+				   [2.75],
+				   [4.75]])
 
         """
         if axis == None:
-            axis = (0, 1)
-        if not (isinstance(axis, int) or isinstance(axis, tuple) and
-                isinstance(axis[0], int) and isinstance(axis[1], int)):
-            raise TypeError('axis must be int or tuple of ints')
+            axis = (0,1)
+        is_tuple = isinstance(axis, tuple)
+        is_int = isinstance(axis, int)
+        is_tuple_or_int = is_tuple or is_int
+        if not is_tuple_or_int or is_tuple and \
+           (not isinstance(axis[0], int) or not isinstance(axis[1], int)):
+            raise TypeError("axis must be int or tuple of ints")
         if not isinstance(weights, np.ndarray) and weights == None:
             def_rweights = np.ones(F.shape[0])
             def_cweights = np.ones(F.shape[1])
@@ -2045,11 +2087,16 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 elif axis == 1:
                     weights = def_cweights
             elif isinstance(axis, tuple):
-                return F.average(axis=0,
+                if 0 in axis:
+                    F = F.average(axis=0,
                                  weights=def_rweights,
-                                 returned=returned).average(axis=1,
-                                                            weights=def_cweights,
-                                                            returned=returned)
+                                 returned=returned)
+                if 1 in axis:
+                    F = F.average(axis=1,
+                                  weights=def_cweights,
+                                  returned=returned)
+                return F
+
         if not isinstance(weights, np.ndarray):
             weights = np.array(weights)
         if weights.shape != F.shape and weights.ndim != 1:
@@ -2075,7 +2122,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 aF = F*Faust(weights.reshape(weights.size, 1))
             else:
                 raise ValueError("ValueError: Length of weights not compatible"
-                                 " with specified axis.")
+                                 " with specified axis 1.")
             sum_weights = np.sum(weights.reshape(weights.size, 1), axis=0)[0]
 
         if axis == 0 or isinstance(axis, tuple) and 0 in axis:
@@ -2086,7 +2133,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 aF = Faust(weightsM)*F
             else:
                 raise ValueError("ValueError: Length of weights not compatible"
-                                 " with specified axis.")
+                                 " with axis 0.")
             sum_weights = np.sum(weightsM.reshape(1, weights.size),
                                  axis=1)[0]
 
