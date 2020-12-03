@@ -483,6 +483,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def __str__(F):
         """
+        Converts F to its str representation.
+
+        Returns:
+            The str conversion of F.
+
         """
         return F.__repr__()
 
@@ -1718,6 +1723,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             F.m_faust.save_mat_file(filepath)
 
     def astype(F, dtype):
+        """
+        Convert F to the dtype passed as argument.
+
+        Args:
+            dtype: np.float or np.complex.
+
+        Returns:
+            A Faust copy of F converted to dtype.
+        """
         #TODO: full list of numpy args or **kw_unknown
         if(dtype == F.dtype):
             return F.clone(dev=F.device)
@@ -2053,8 +2067,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Clones the Faust (in a new memory space).
 
         Args:
-            dev: 'cpu' to clone on CPU RAM, 'gpu:id' to clone on the GPU device
-            #id (e.g. gpu:0).
+            dev: 'cpu' to clone on CPU RAM, 'gpu:id' to clone on the GPU device #id (e.g. gpu:0).
 
         Returns:
             The Faust clone.
