@@ -16,13 +16,25 @@ namespace Faust
 		TransformHelper<FPP,GPU2>::TransformHelper(const std::vector<MatGeneric<FPP,GPU2> *>& facts, const FPP lambda_/*= (FPP)1.0*/, const bool optimizedCopy/*=false*/, const bool cloning_fact /*= true*/, const bool internal_call/*=false*/) : TransformHelper<FPP,GPU2>()
 	{
 
-		//if lambda is not 1.0 the first factor will be multiplied and so it needs to be copied to preserved the original that could be used elsewhere
-		this->push_back(facts[0], false, cloning_fact || lambda_ != (FPP) 1.0);
-		for(int i=1; i < facts.size(); i++)
+		//if lambda is not 1.0 a factor will be multiplied and so it needs to be copied to preserve the original that could be used elsewhere
+		// in an optimization purpose, the smallest factor is copied
+		int min_size_id = 0;
+		if(lambda_ != FPP(1.0))
 		{
-			this->push_back(facts[i], false, cloning_fact);
+			std::vector<int> fact_ids(facts.size());
+			int i = -1;
+			std::generate(fact_ids.begin(), fact_ids.end(), [&i](){return ++i;});
+			std::vector<int>::iterator result = std::min_element(fact_ids.begin(), fact_ids.end(), [&facts](const int &a, const int &b){return facts[a]->getNBytes() < facts[b]->getNBytes();});
+			min_size_id = std::distance(fact_ids.begin(), result);
 		}
-		this->transform->multiply(lambda_);
+		for(int i=0; i < facts.size(); i++)
+		{
+			if(i == min_size_id)
+				this->push_back(facts[min_size_id], false, cloning_fact || lambda_ != (FPP) 1.0);
+			else
+				this->push_back(facts[i], false, cloning_fact);
+		}
+		this->transform->multiply(lambda_, min_size_id);
 	}
 
 	template<typename FPP>

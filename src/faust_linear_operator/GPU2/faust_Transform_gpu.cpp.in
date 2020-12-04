@@ -371,10 +371,10 @@ namespace Faust
 		}
 
 	template<>
-		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const @FAUST_SCALAR_FOR_GM@& a)
+		void Transform<@FAUST_SCALAR_FOR_GM@,GPU2>::multiply(const @FAUST_SCALAR_FOR_GM@& a, const int32_t id/*=-1*/)
 		{
 			auto marr_funcs = GPUModHandler::get_singleton()->marr_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			marr_funcs->scalar_mul(this->gpu_mat_arr, reinterpret_cast<const @GM_SCALAR@*>(&a));
+			marr_funcs->scalar_mul_id(this->gpu_mat_arr, reinterpret_cast<const @GM_SCALAR@*>(&a), id);
 		}
 
 	template<>

@@ -65,7 +65,7 @@ namespace Faust
 			MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A, const char opThis);
 			void multiply(const Transform<FPP,GPU2> & A);
 			void multiplyLeft(const Transform<FPP,GPU2> & A);
-			void multiply(const FPP& a);
+			void multiply(const FPP& a, const int32_t id=-1);
 			Vect<FPP,GPU2> multiply(const Vect<FPP,GPU2>& x, const char opThis='N');
 			Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag);
 			Real<FPP> normL1(const bool transpose = false) const;
