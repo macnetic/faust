@@ -2343,7 +2343,7 @@ def pinv(F):
 
 
 @implements(np.concatenate)
-def concatenate(F, axis=0, **kwargs):
+def concatenate(F, *args, axis=0, **kwargs):
     """
     A package function alias for the member function Faust.concatenate.
 
@@ -2357,6 +2357,9 @@ def concatenate(F, axis=0, **kwargs):
         >>> concatenate((F1, F2), axis=0)
 
     """
+    if not isinstance(F, tuple):
+        raise TypeError("first arg must be a tuple")
+    _tuple = F
     if(Faust.isFaust(_tuple[0])):
         return _tuple[0].concatenate(*_tuple[1:], axis=axis)
     else:
