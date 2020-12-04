@@ -180,6 +180,9 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             elif str(ufunc) == "<ufunc 'add'>" and len(inputs) >= 2 and \
                     isFaust(inputs[1]):
                 return inputs[1].__radd__(inputs[0])
+            elif str(ufunc) == "<ufunc 'subtract'>" and len(inputs) >= 2 and \
+                    isFaust(inputs[1]):
+                return inputs[1].__rsub__(inputs[0])
             N = None
             fausts = []
         elif method == 'reduce':
