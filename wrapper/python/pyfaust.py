@@ -171,12 +171,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         if method == '__call__':
-            if ufunc.__eq__("<ufunc 'matmul'>") and len(inputs) >= 2 and \
+            if str(ufunc) == "<ufunc 'matmul'>" and len(inputs) >= 2 and \
                isFaust(inputs[1]):
                 return inputs[1].__rmatmul__(inputs[0])
-            if ufunc.__eq__("<ufunc 'multiply'>") and len(inputs) >= 2 and \
+            elif str(ufunc) == "<ufunc 'multiply'>" and len(inputs) >= 2 and \
                isFaust(inputs[1]):
                 return inputs[1].__rmul__(inputs[0])
+            elif str(ufunc) == "<ufunc 'add'>" and len(inputs) >= 2 and \
+                    isFaust(inputs[1]):
+                return inputs[1].__radd__(inputs[0])
             N = None
             fausts = []
         elif method == 'reduce':
