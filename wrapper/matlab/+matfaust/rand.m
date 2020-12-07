@@ -1,6 +1,8 @@
 %==========================================================================================
 %> @brief Generates a random Faust.
 %>
+%> @warning if this function is imported through 'import matfaust.rand' or 'import matfaust.*' the Matlab builtin function rand will be unreachable (matfaust.rand will be called instead). So it is not advisable to import this function, rather directly call matfaust.rand without any import.
+%>
 %> @b Usage
 %>
 %> &nbsp;&nbsp;&nbsp; @b rand(N,S) with N and S two integers, generates a Faust of N factors. All factors are square matrices of order S. The type of factors (dense or sparse) is a random choice.
