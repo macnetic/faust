@@ -122,6 +122,11 @@ class FaustCoreCpp
             unsigned int min_num_factors, unsigned int max_num_factors,
             unsigned int min_dim_size,
             unsigned int max_dim_size, float density, bool per_row);
+    static FaustCoreCpp<FPP,DEV>* randFaust(int faust_nrows, int faust_ncols,
+            unsigned int t,
+            unsigned int min_num_factors, unsigned int max_num_factors,
+            unsigned int min_dim_size,
+            unsigned int max_dim_size, float density, bool per_row);
     static FaustCoreCpp<FPP,DEV>* hadamardFaust(unsigned int n, const bool norma);
     static FaustCoreCpp<FPP,DEV>* fourierFaust(unsigned int n, const bool norma);
     static FaustCoreCpp<FPP,DEV>* eyeFaust(unsigned int n, unsigned int m);

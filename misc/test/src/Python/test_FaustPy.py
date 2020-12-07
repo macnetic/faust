@@ -481,8 +481,8 @@ class TestFaustPy(unittest.TestCase):
             self.assertAlmostEqual(norm(test_F.toarray()-ref_full_F), 0, places=3)
         print("addition Faust-Faust")
         fausts = \
-        [ frand(5,F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
-         frand(5,F.shape[0], .5,
+        [ frand(F.shape[0], F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
+         frand(F.shape[0],F.shape[0], density=.5,
                            field='complex')*Faust(rand(F.shape[0],F.shape[1]))]
         for i in range(0,len(fausts)):
             F2 = fausts[i]
@@ -507,8 +507,8 @@ class TestFaustPy(unittest.TestCase):
                                    places=3)
         print("substraction Faust-Faust")
         fausts = \
-        [ frand(5,F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
-         frand(5,F.shape[0], .5,
+        [ frand(F.shape[0], F.shape[0])*Faust(rand(F.shape[0],F.shape[1])),
+         frand(F.shape[0], F.shape[0], density=.5,
                            field='complex')*Faust(rand(F.shape[0],F.shape[1]))]
         for i in range(0,len(fausts)):
             F2 = fausts[i]
@@ -562,8 +562,8 @@ class TestFaustPy(unittest.TestCase):
         print("test mul of two Fausts")
         from pyfaust import rand as frand, Faust
         F = self.F
-        r_fausts = [ frand(self.r.randint(1,10), F.shape[1]),
-                    frand(self.r.randint(1,10), F.shape[1], field='complex')]
+        r_fausts = [ frand(F.shape[1], F.shape[1], self.r.randint(1,10)),
+                    frand(F.shape[1], F.shape[1], self.r.randint(1,10), field='complex')]
         for i in range(0,len(r_fausts)):
             rF = r_fausts[i]
             assert(isinstance(rF, Faust))
@@ -607,9 +607,7 @@ class TestFaustPy(unittest.TestCase):
                     field = 'complex'
                 else:
                     field = 'real'
-                G = rand(self.r.randint(1,TestFaustPy.MAX_NUM_FACTORS),
-                                  F.shape[(cat_axis+1)%2],
-                                  field=field)
+                G = rand(F.shape[(cat_axis+1)%2], F.shape[(cat_axis+1)%2], self.r.randint(1,TestFaustPy.MAX_NUM_FACTORS), field=field)
                 # add one random factor to get a random number of rows to test
                 # vertcat and a random number of cols to test horzcat
                 if cat_axis == 0:

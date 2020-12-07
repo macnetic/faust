@@ -178,23 +178,28 @@ cdef class FaustCore:
                                 " the libraries are not found.")
 
     @staticmethod
-    def randFaust(t,field,min_num_factors, max_num_factors, min_dim_size,
+    def randFaust(faust_nrows, faust_ncols, t, field, min_num_factors, max_num_factors, min_dim_size,
                    max_dim_size, density=0.1, per_row=True):
         core = FaustCore(core=True)
-        if(field == 3):
-            core.core_faust_dbl = FaustCoreCy.FaustCoreCpp[double].randFaust(t,min_num_factors, max_num_factors, min_dim_size,
+        if(field == 3): # real
+            core.core_faust_dbl = \
+            FaustCoreCy.FaustCoreCpp[double].randFaust(faust_nrows,
+                                                       faust_ncols,
+                                                       t,min_num_factors, max_num_factors, min_dim_size,
                    max_dim_size, density, per_row)
             core._isReal = True
             if(core.core_faust_dbl == NULL): raise MemoryError()
-        elif(field == 4):
-            core.core_faust_cplx = FaustCoreCy.FaustCoreCpp[complex].randFaust(t,min_num_factors, max_num_factors, min_dim_size,
+        elif(field == 4): # complex
+            core.core_faust_cplx = \
+            FaustCoreCy.FaustCoreCpp[complex].randFaust(faust_nrows,
+                                                        faust_ncols,
+                                                        t,min_num_factors, max_num_factors, min_dim_size,
                    max_dim_size, density, per_row)
             if(core.core_faust_cplx == NULL): raise MemoryError()
             core._isReal = False
         else:
             raise ValueError("FaustCorePy.randFaust(): field must be 3 for real or"
                              " 4 for complex")
-
         return core
 
     @staticmethod

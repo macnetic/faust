@@ -122,16 +122,26 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			if(nrhs < 6)
 				mexErrMsgTxt("rand(): wrong number of arguments (must be 6 to 7)");
 			//printf("mexFaust.cpp rand(): retrieving arguments\n");
-			faust_unsigned_int t = (faust_unsigned_int) mxGetScalar(prhs[1]),
-							   min_num_factors = (faust_unsigned_int) mxGetScalar(prhs[2]),
-							   max_num_factors = (faust_unsigned_int) mxGetScalar(prhs[3]),
-							   min_dim_size = (faust_unsigned_int) mxGetScalar(prhs[4]),
-							   max_dim_size = (faust_unsigned_int) mxGetScalar(prhs[5]);
-			float density = (float) mxGetScalar(prhs[6]);
-			bool per_row = (bool) mxGetScalar(prhs[7]);
+			int num_rows = mxGetScalar(prhs[1]), num_cols =mxGetScalar(prhs[2]);
+			faust_unsigned_int t = (faust_unsigned_int) mxGetScalar(prhs[3]),
+							   min_num_factors = (faust_unsigned_int) mxGetScalar(prhs[4]),
+							   max_num_factors = (faust_unsigned_int) mxGetScalar(prhs[5]),
+							   min_dim_size = (faust_unsigned_int) mxGetScalar(prhs[6]),
+							   max_dim_size = (faust_unsigned_int) mxGetScalar(prhs[7]);
+			float density = (float) mxGetScalar(prhs[8]);
+			bool per_row = (bool) mxGetScalar(prhs[9]);
 
 			//printf("mexFaust.cpp rand(): faust creation\n");
-			Faust::TransformHelper<SCALAR,Cpu>* F = Faust::TransformHelper<SCALAR,Cpu>::randFaust(RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+			Faust::TransformHelper<SCALAR,Cpu>* F = Faust::TransformHelper<SCALAR,Cpu>::randFaust(
+					num_rows,
+					num_cols,
+					RandFaustType(t),
+					min_num_factors,
+					max_num_factors,
+					min_dim_size,
+					max_dim_size,
+					density,
+					per_row);
 
 			if(F) //not NULL
 				plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);

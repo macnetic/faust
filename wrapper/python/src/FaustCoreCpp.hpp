@@ -430,9 +430,23 @@ FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::conjugate() const
 }
 
 template<typename FPP, FDevice DEV>
-  FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::randFaust(unsigned int t,
-            unsigned int min_num_factors, unsigned int max_num_factors,
-            unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row) {
+  FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::randFaust(
+          int faust_nrows,
+          int faust_ncols,
+          unsigned int t,
+          unsigned int min_num_factors, unsigned int max_num_factors,
+          unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row) {
+      Faust::TransformHelper<FPP,DEV>* th = Faust::TransformHelper<FPP,DEV>::randFaust(faust_nrows, faust_ncols, Faust::RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+      if(!th) return NULL;
+      FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
+      return core;
+  }
+
+template<typename FPP, FDevice DEV>
+  FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::randFaust(
+          unsigned int t,
+          unsigned int min_num_factors, unsigned int max_num_factors,
+          unsigned int min_dim_size, unsigned int max_dim_size, float density, bool per_row) {
       Faust::TransformHelper<FPP,DEV>* th = Faust::TransformHelper<FPP,DEV>::randFaust(Faust::RandFaustType(t), min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
       if(!th) return NULL;
       FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);

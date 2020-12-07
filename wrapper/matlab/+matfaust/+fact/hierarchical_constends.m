@@ -13,8 +13,8 @@
 %>     'is_fact_side_left', true, 'is_verbose', false…
 %>     );
 %> M = rand(10,10);
-%> A = matfaust.rand(10,10);
-%> B = matfaust.rand(20, 10);
+%> A = rand(10,10);
+%> B = rand(20, 10);
 %> [F, lamdba, ~] = hierarchical_constends(M, p, A, B)
 %>
 %> assert(norm(A - factors(F,1))/norm(A) <= eps(double(1)))

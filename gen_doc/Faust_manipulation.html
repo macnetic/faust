@@ -13172,12 +13172,12 @@ Its use is straighforward as you can see in the <a href="https://faustgrp.gitlab
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
-- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 3 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 4 (real) SPARSE, size 10x10, density 0.5, nnz 50
+<pre>Faust size 5x10, density 3.2, nnz_sum 160, 5 factor(s): 
+- FACTOR 0 (real) SPARSE, size 5x7, density 0.714286, nnz 25
+- FACTOR 1 (real) SPARSE, size 7x8, density 0.625, nnz 35
+- FACTOR 2 (real) SPARSE, size 8x5, density 1, nnz 40
+- FACTOR 3 (real) SPARSE, size 5x7, density 0.714286, nnz 25
+- FACTOR 4 (real) SPARSE, size 7x10, density 0.5, nnz 35
 
 </pre>
 </div>
@@ -13211,7 +13211,7 @@ Its use is straighforward as you can see in the <a href="https://faustgrp.gitlab
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>(10, 10)</pre>
+<pre>(5, 10)</pre>
 </div>
 
 </div>
@@ -13244,7 +13244,7 @@ Its use is straighforward as you can see in the <a href="https://faustgrp.gitlab
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>100</pre>
+<pre>50</pre>
 </div>
 
 </div>
@@ -13382,8 +13382,8 @@ Most of them are also available independently with specific functions.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;10x10 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
-	with 50 stored elements in Compressed Sparse Row format&gt;</pre>
+<pre>&lt;8x5 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+	with 40 stored elements in Compressed Sparse Row format&gt;</pre>
 </div>
 
 </div>
@@ -13433,9 +13433,9 @@ Most of them are also available independently with specific functions.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 10x10, density 1, nnz_sum 100, 2 factor(s): 
-- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50</pre>
+<pre>Faust size 8x7, density 1.16071, nnz_sum 65, 2 factor(s): 
+- FACTOR 0 (real) SPARSE, size 8x5, density 1, nnz 40
+- FACTOR 1 (real) SPARSE, size 5x7, density 0.714286, nnz 25</pre>
 </div>
 
 </div>
@@ -13479,9 +13479,9 @@ Most of them are also available independently with specific functions.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 10x10, density 1, nnz_sum 100, 2 factor(s): 
-- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50</pre>
+<pre>Faust size 8x7, density 1.16071, nnz_sum 65, 2 factor(s): 
+- FACTOR 0 (real) SPARSE, size 8x5, density 1, nnz 40
+- FACTOR 1 (real) SPARSE, size 5x7, density 0.714286, nnz 25</pre>
 </div>
 
 </div>
@@ -13527,7 +13527,7 @@ How about plotting a Faust in a more graphical fashion ?</p>
 
 
 <div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
+<img src="data:image/png;base64,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
 "
 >
 </div>
@@ -13619,7 +13619,7 @@ Note that you can change the default <a href="https://matplotlib.org/tutorials/c
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>250</pre>
+<pre>160</pre>
 </div>
 
 </div>
@@ -13662,7 +13662,7 @@ Note that you can change the default <a href="https://matplotlib.org/tutorials/c
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>2.5</pre>
+<pre>3.2</pre>
 </div>
 
 </div>
@@ -13695,7 +13695,7 @@ Note that you can change the default <a href="https://matplotlib.org/tutorials/c
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>0.4</pre>
+<pre>0.3125</pre>
 </div>
 
 </div>
@@ -13733,7 +13733,7 @@ Note that you can change the default <a href="https://matplotlib.org/tutorials/c
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
                 <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ntests</span><span class="p">)),</span>
     <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">startd</span><span class="p">,</span> <span class="n">endd</span><span class="p">,</span> <span class="n">ntests</span><span class="p">)):</span>
-    <span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">nfactors</span><span class="p">,</span> <span class="n">dim_sz</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">dim_sz</span><span class="p">,</span> <span class="n">dim_sz</span><span class="p">,</span> <span class="n">nfactors</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">)</span>
     <span class="n">filepath</span> <span class="o">=</span> <span class="s1">&#39;test_faust_size&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.mat&#39;</span>
     <span class="n">F</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
     <span class="n">stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
@@ -14249,7 +14249,7 @@ AElFTkSuQmCC"/></p>
 <div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,[</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">],</span><span class="n">field</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">dim_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">],</span><span class="n">field</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -14281,12 +14281,12 @@ AElFTkSuQmCC"/></p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x11, density 2.0979, nnz_sum 300, 5 factor(s): 
-- FACTOR 0 (complex) SPARSE, size 13x13, density 0.384615, nnz 65
-- FACTOR 1 (complex) SPARSE, size 13x10, density 0.384615, nnz 50
-- FACTOR 2 (complex) SPARSE, size 10x15, density 0.5, nnz 75
-- FACTOR 3 (complex) SPARSE, size 15x11, density 0.333333, nnz 55
-- FACTOR 4 (complex) SPARSE, size 11x11, density 0.454545, nnz 55</pre>
+<pre>Faust size 15x10, density 1.76667, nnz_sum 265, 5 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 15x12, density 0.333333, nnz 60
+- FACTOR 1 (complex) SPARSE, size 12x10, density 0.333333, nnz 40
+- FACTOR 2 (complex) SPARSE, size 10x13, density 0.5, nnz 65
+- FACTOR 3 (complex) SPARSE, size 13x12, density 0.384615, nnz 60
+- FACTOR 4 (complex) SPARSE, size 12x10, density 0.333333, nnz 40</pre>
 </div>
 
 </div>
@@ -14319,12 +14319,12 @@ AElFTkSuQmCC"/></p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 11x13, density 2.0979, nnz_sum 300, 5 factor(s): 
-- FACTOR 0 (complex) SPARSE, size 11x11, density 0.454545, nnz 55
-- FACTOR 1 (complex) SPARSE, size 11x15, density 0.333333, nnz 55
-- FACTOR 2 (complex) SPARSE, size 15x10, density 0.5, nnz 75
-- FACTOR 3 (complex) SPARSE, size 10x13, density 0.384615, nnz 50
-- FACTOR 4 (complex) SPARSE, size 13x13, density 0.384615, nnz 65</pre>
+<pre>Faust size 10x15, density 1.76667, nnz_sum 265, 5 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 10x12, density 0.333333, nnz 40
+- FACTOR 1 (complex) SPARSE, size 12x13, density 0.384615, nnz 60
+- FACTOR 2 (complex) SPARSE, size 13x10, density 0.5, nnz 65
+- FACTOR 3 (complex) SPARSE, size 10x12, density 0.333333, nnz 40
+- FACTOR 4 (complex) SPARSE, size 12x15, density 0.333333, nnz 60</pre>
 </div>
 
 </div>
@@ -14357,12 +14357,12 @@ AElFTkSuQmCC"/></p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 13x11, density 2.0979, nnz_sum 300, 5 factor(s): 
-- FACTOR 0 (complex) SPARSE, size 13x13, density 0.384615, nnz 65
-- FACTOR 1 (complex) SPARSE, size 13x10, density 0.384615, nnz 50
-- FACTOR 2 (complex) SPARSE, size 10x15, density 0.5, nnz 75
-- FACTOR 3 (complex) SPARSE, size 15x11, density 0.333333, nnz 55
-- FACTOR 4 (complex) SPARSE, size 11x11, density 0.454545, nnz 55</pre>
+<pre>Faust size 15x10, density 1.76667, nnz_sum 265, 5 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 15x12, density 0.333333, nnz 60
+- FACTOR 1 (complex) SPARSE, size 12x10, density 0.333333, nnz 40
+- FACTOR 2 (complex) SPARSE, size 10x13, density 0.5, nnz 65
+- FACTOR 3 (complex) SPARSE, size 13x12, density 0.384615, nnz 60
+- FACTOR 4 (complex) SPARSE, size 12x10, density 0.333333, nnz 40</pre>
 </div>
 
 </div>
@@ -14391,8 +14391,8 @@ AElFTkSuQmCC"/></p>
 <div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">G</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="n">G</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">F</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">G</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">G</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">F</span><span class="o">+</span><span class="n">G</span>
 </pre></div>
 
@@ -14406,21 +14406,33 @@ AElFTkSuQmCC"/></p>
 
 <div class="output_area">
 
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/home/hinria/faust2/build/wrapper/python/pyfaust/__init__.py:915: UserWarning: The * is deprecated as a matrix product and will soon be removed
+  warnings.warn(&#34;The * is deprecated as a matrix product and will soon&#34;
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
     <div class="prompt output_prompt">Out[19]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 11x11, density 5.09091, nnz_sum 616, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 11x22, density 0.0909091, nnz 22
-- FACTOR 1 (real) SPARSE, size 22x22, density 0.227273, nnz 110
-- FACTOR 2 (real) SPARSE, size 22x22, density 0.227273, nnz 110
-- FACTOR 3 (real) SPARSE, size 22x22, density 0.227273, nnz 110
-- FACTOR 4 (real) SPARSE, size 22x22, density 0.227273, nnz 110
-- FACTOR 5 (real) SPARSE, size 22x22, density 0.227273, nnz 110
-- FACTOR 6 (real) SPARSE, size 22x22, density 0.0454545, nnz 22
-- FACTOR 7 (real) SPARSE, size 22x11, density 0.0909091, nnz 22</pre>
+<pre>Faust size 10x10, density 5.6, nnz_sum 560, 8 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (real) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 2 (real) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 3 (real) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 4 (real) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 5 (real) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 6 (real) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (real) SPARSE, size 20x10, density 0.1, nnz 20</pre>
 </div>
 
 </div>
@@ -14508,15 +14520,15 @@ AElFTkSuQmCC"/></p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 11x11, density 5.09091, nnz_sum 616, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 11x22, density 0.0909091, nnz 22
-- FACTOR 1 (real) SPARSE, size 22x22, density 0.227273, nnz 110
-- FACTOR 2 (real) SPARSE, size 22x22, density 0.227273, nnz 110
-- FACTOR 3 (real) SPARSE, size 22x22, density 0.227273, nnz 110
-- FACTOR 4 (real) SPARSE, size 22x22, density 0.227273, nnz 110
-- FACTOR 5 (real) SPARSE, size 22x22, density 0.227273, nnz 110
-- FACTOR 6 (real) SPARSE, size 22x22, density 0.0454545, nnz 22
-- FACTOR 7 (real) SPARSE, size 22x11, density 0.0909091, nnz 22</pre>
+<pre>Faust size 10x10, density 5.6, nnz_sum 560, 8 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (real) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 2 (real) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 3 (real) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 4 (real) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 5 (real) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 6 (real) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (real) SPARSE, size 20x10, density 0.1, nnz 20</pre>
 </div>
 
 </div>
@@ -14557,15 +14569,15 @@ AElFTkSuQmCC"/></p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 11x11, density 3.27273, nnz_sum 396, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 11x22, density 0.0909091, nnz 22
-- FACTOR 1 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 2 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 3 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 4 (real) SPARSE, size 22x12, density 0.25, nnz 66
-- FACTOR 5 (real) SPARSE, size 12x22, density 0.25, nnz 66
-- FACTOR 6 (real) SPARSE, size 22x22, density 0.0454545, nnz 22
-- FACTOR 7 (real) SPARSE, size 22x11, density 0.0909091, nnz 22</pre>
+<pre>Faust size 10x10, density 3.6, nnz_sum 360, 8 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 2 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 3 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 4 (real) SPARSE, size 20x11, density 0.272727, nnz 60
+- FACTOR 5 (real) SPARSE, size 11x20, density 0.272727, nnz 60
+- FACTOR 6 (real) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (real) SPARSE, size 20x10, density 0.1, nnz 20</pre>
 </div>
 
 </div>
@@ -14607,15 +14619,15 @@ AElFTkSuQmCC"/></p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 11x11, density 3.27273, nnz_sum 396, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 11x22, density 0.0909091, nnz 22
-- FACTOR 1 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 2 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 3 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 4 (real) SPARSE, size 22x12, density 0.25, nnz 66
-- FACTOR 5 (real) SPARSE, size 12x22, density 0.25, nnz 66
-- FACTOR 6 (real) SPARSE, size 22x22, density 0.0454545, nnz 22
-- FACTOR 7 (real) SPARSE, size 22x11, density 0.0909091, nnz 22</pre>
+<pre>Faust size 10x10, density 3.6, nnz_sum 360, 8 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 2 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 3 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 4 (real) SPARSE, size 20x11, density 0.272727, nnz 60
+- FACTOR 5 (real) SPARSE, size 11x20, density 0.272727, nnz 60
+- FACTOR 6 (real) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (real) SPARSE, size 20x10, density 0.1, nnz 20</pre>
 </div>
 
 </div>
@@ -14648,15 +14660,15 @@ AElFTkSuQmCC"/></p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 11x11, density 3.27273, nnz_sum 396, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 11x22, density 0.0909091, nnz 22
-- FACTOR 1 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 2 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 3 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 4 (real) SPARSE, size 22x12, density 0.25, nnz 66
-- FACTOR 5 (real) SPARSE, size 12x22, density 0.25, nnz 66
-- FACTOR 6 (real) SPARSE, size 22x22, density 0.0454545, nnz 22
-- FACTOR 7 (real) SPARSE, size 22x11, density 0.0909091, nnz 22</pre>
+<pre>Faust size 10x10, density 3.6, nnz_sum 360, 8 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 2 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 3 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 4 (real) SPARSE, size 20x11, density 0.272727, nnz 60
+- FACTOR 5 (real) SPARSE, size 11x20, density 0.272727, nnz 60
+- FACTOR 6 (real) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (real) SPARSE, size 20x10, density 0.1, nnz 20</pre>
 </div>
 
 </div>
@@ -14697,15 +14709,15 @@ AElFTkSuQmCC"/></p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 11x11, density 4.18182, nnz_sum 506, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 11x22, density 0.0909091, nnz 22
-- FACTOR 1 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 2 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 3 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 4 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 5 (real) SPARSE, size 22x22, density 0.363636, nnz 176
-- FACTOR 6 (real) SPARSE, size 22x22, density 0.0454545, nnz 22
-- FACTOR 7 (real) SPARSE, size 22x11, density 0.0909091, nnz 22</pre>
+<pre>Faust size 10x10, density 4.5, nnz_sum 450, 8 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 2 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 3 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 4 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 5 (real) SPARSE, size 20x20, density 0.375, nnz 150
+- FACTOR 6 (real) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (real) SPARSE, size 20x10, density 0.1, nnz 20</pre>
 </div>
 
 </div>
@@ -14738,15 +14750,15 @@ AElFTkSuQmCC"/></p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 11x11, density 4.18182, nnz_sum 506, 8 factor(s): 
-- FACTOR 0 (real) SPARSE, size 11x22, density 0.0909091, nnz 22
-- FACTOR 1 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 2 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 3 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 4 (real) SPARSE, size 22x22, density 0.136364, nnz 66
-- FACTOR 5 (real) SPARSE, size 22x22, density 0.363636, nnz 176
-- FACTOR 6 (real) SPARSE, size 22x22, density 0.0454545, nnz 22
-- FACTOR 7 (real) SPARSE, size 22x11, density 0.0909091, nnz 22</pre>
+<pre>Faust size 10x10, density 4.5, nnz_sum 450, 8 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 2 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 3 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 4 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 5 (real) SPARSE, size 20x20, density 0.375, nnz 150
+- FACTOR 6 (real) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (real) SPARSE, size 20x10, density 0.1, nnz 20</pre>
 </div>
 
 </div>
@@ -14834,7 +14846,7 @@ AElFTkSuQmCC"/></p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>1.3269888237231635e-16</pre>
+<pre>1.2764223345391233e-16</pre>
 </div>
 
 </div>
@@ -14917,12 +14929,12 @@ FG is a Faust too!</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 11x11, density 2.27273, nnz_sum 275, 5 factor(s): 
-- FACTOR 0 (real) SPARSE, size 11x11, density 0.454545, nnz 55
-- FACTOR 1 (real) DENSE,  size 11x11, density 0.454545, nnz 55
-- FACTOR 2 (real) SPARSE, size 11x11, density 0.454545, nnz 55
-- FACTOR 3 (real) SPARSE, size 11x11, density 0.454545, nnz 55
-- FACTOR 4 (real) DENSE,  size 11x11, density 0.454545, nnz 55</pre>
+<pre>Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 3 (real) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 4 (real) SPARSE, size 10x10, density 0.5, nnz 50</pre>
 </div>
 
 </div>
@@ -14965,17 +14977,16 @@ FG is a Faust too!</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([[52.83593293],
-       [48.3834374 ],
-       [67.01264411],
-       [41.49430266],
-       [46.31379495],
-       [44.82316944],
-       [82.54478292],
-       [57.11988741],
-       [71.5352721 ],
-       [47.19348743],
-       [63.57098957]])</pre>
+<pre>array([[ 67.66009668],
+       [ 94.71676745],
+       [ 78.79523802],
+       [102.81010374],
+       [ 57.90399034],
+       [ 64.07135987],
+       [ 73.033353  ],
+       [ 59.10304184],
+       [ 56.41054166],
+       [ 98.90281808]])</pre>
 </div>
 
 </div>
@@ -15015,7 +15026,7 @@ FG is a Faust too!</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>10.9 µs ± 208 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+<pre>11 µs ± 299 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
 </pre>
 </div>
 </div>
@@ -15059,7 +15070,7 @@ FG is a Faust too!</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>1.65 µs ± 38.5 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+<pre>1.51 µs ± 19 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
 </pre>
 </div>
 </div>
@@ -15126,7 +15137,7 @@ FG is a Faust too!</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>0.43999999999999995</pre>
+<pre>0.4</pre>
 </div>
 
 </div>
@@ -15148,7 +15159,7 @@ FG is a Faust too!</p>
 <div class="prompt input_prompt">In&nbsp;[38]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">density</span><span class="o">=.</span><span class="mi">001</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">rand</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">num_factors</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">density</span><span class="o">=.</span><span class="mi">001</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">)</span>
 <span class="n">GD</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
 <span class="n">vec2</span> <span class="o">=</span> <span class="n">nrand</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
 </pre></div>
@@ -15180,7 +15191,7 @@ FG is a Faust too!</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>21.5 µs ± 874 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+<pre>18.9 µs ± 889 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 </pre>
 </div>
 </div>
@@ -15211,7 +15222,7 @@ FG is a Faust too!</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>543 µs ± 18.1 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+<pre>402 µs ± 55.7 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 </pre>
 </div>
 </div>
@@ -15288,7 +15299,7 @@ I hope the example above has finished to convince you.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>3.966789648658195e-16</pre>
+<pre>4.0334009151418005e-16</pre>
 </div>
 
 </div>
@@ -15340,7 +15351,7 @@ I hope the example above has finished to convince you.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>448 µs ± 47.4 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
+<pre>298 µs ± 19 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
 </pre>
 </div>
 </div>
@@ -15371,7 +15382,7 @@ I hope the example above has finished to convince you.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>4.66 ms ± 803 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+<pre>2.13 ms ± 510 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 </pre>
 </div>
 </div>
@@ -15404,7 +15415,7 @@ I hope the example above has finished to convince you.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>1.1227271781271435e-16</pre>
+<pre>1.132888985293611e-16</pre>
 </div>
 
 </div>
@@ -15456,7 +15467,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>144.95193781217765</pre>
+<pre>184.09377494277828</pre>
 </div>
 
 </div>
@@ -15489,7 +15500,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>123.76804811036918</pre>
+<pre>155.62003980586624</pre>
 </div>
 
 </div>
@@ -15522,7 +15533,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>96.58048143205525</pre>
+<pre>123.06386730121004</pre>
 </div>
 
 </div>
@@ -15564,7 +15575,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>144.95193781217765</pre>
+<pre>184.09377494277828</pre>
 </div>
 
 </div>
@@ -15597,7 +15608,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>123.76804811036918</pre>
+<pre>155.62003980586624</pre>
 </div>
 
 </div>
@@ -15630,7 +15641,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>96.58048143205525</pre>
+<pre>123.06386730121004</pre>
 </div>
 
 </div>
@@ -15669,7 +15680,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>813 µs ± 71.2 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<pre>353 µs ± 69.8 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>
@@ -15700,7 +15711,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>677 ms ± 38.4 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<pre>366 ms ± 8.55 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>
@@ -15742,7 +15753,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>0.0005023777042387043</pre>
+<pre>0.0034815437999865333</pre>
 </div>
 
 </div>
@@ -15822,12 +15833,12 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
-- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 3 (real) DENSE,  size 10x10, density 0.5, nnz 50
-- FACTOR 4 (real) DENSE,  size 10x10, density 0.5, nnz 50</pre>
+<pre>Faust size 5x10, density 3, nnz_sum 150, 5 factor(s): 
+- FACTOR 0 (real) SPARSE, size 5x7, density 0.714286, nnz 25
+- FACTOR 1 (real) SPARSE, size 7x8, density 0.625, nnz 35
+- FACTOR 2 (real) SPARSE, size 8x5, density 1, nnz 40
+- FACTOR 3 (real) SPARSE, size 5x6, density 0.666667, nnz 20
+- FACTOR 4 (real) SPARSE, size 6x10, density 0.5, nnz 30</pre>
 </div>
 
 </div>
@@ -15860,12 +15871,12 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
-- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 3 (real) DENSE,  size 10x10, density 0.5, nnz 50
-- FACTOR 4 (real) DENSE,  size 10x10, density 0.5, nnz 50</pre>
+<pre>Faust size 5x10, density 3, nnz_sum 150, 5 factor(s): 
+- FACTOR 0 (real) SPARSE, size 5x7, density 0.714286, nnz 25
+- FACTOR 1 (real) SPARSE, size 7x8, density 0.625, nnz 35
+- FACTOR 2 (real) SPARSE, size 8x5, density 1, nnz 40
+- FACTOR 3 (real) SPARSE, size 5x6, density 0.666667, nnz 20
+- FACTOR 4 (real) SPARSE, size 6x10, density 0.5, nnz 30</pre>
 </div>
 
 </div>
@@ -15898,36 +15909,8 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([[0.00000000e+00, 1.61054243e-02, 0.00000000e+00, 0.00000000e+00,
-        1.77854121e-02, 1.22819498e-02, 0.00000000e+00, 1.67080465e-02,
-        1.18127837e-02, 0.00000000e+00],
-       [2.44147740e-02, 2.35524116e-02, 2.42436483e-02, 7.93252584e-02,
-        0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 3.62898156e-03,
-        0.00000000e+00, 0.00000000e+00],
-       [1.78793596e-02, 0.00000000e+00, 2.02673271e-02, 0.00000000e+00,
-        1.87427240e-02, 0.00000000e+00, 1.55353416e-02, 0.00000000e+00,
-        1.25905062e-02, 0.00000000e+00],
-       [5.19647149e-03, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,
-        1.05671594e-02, 1.15141450e-02, 1.38456003e-02, 1.35835439e-02,
-        0.00000000e+00, 0.00000000e+00],
-       [0.00000000e+00, 1.74833255e-03, 0.00000000e+00, 0.00000000e+00,
-        0.00000000e+00, 0.00000000e+00, 1.45957814e-02, 2.40388397e-02,
-        1.16640837e-02, 4.91717926e-02],
-       [2.32371727e-02, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,
-        0.00000000e+00, 1.73317018e-02, 2.65885827e-03, 1.23042081e-02,
-        0.00000000e+00, 1.71554743e-02],
-       [0.00000000e+00, 1.33994907e-02, 0.00000000e+00, 0.00000000e+00,
-        2.04047613e-02, 1.92816253e-02, 1.45057723e-02, 0.00000000e+00,
-        1.31626833e-02, 0.00000000e+00],
-       [9.15204369e-04, 1.56619136e-02, 0.00000000e+00, 0.00000000e+00,
-        1.44927843e-03, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,
-        1.34190377e-03, 4.30977569e-02],
-       [2.26625534e-02, 1.20692009e-02, 0.00000000e+00, 0.00000000e+00,
-        0.00000000e+00, 1.93516750e-02, 0.00000000e+00, 7.33551942e-03,
-        8.37245414e-03, 0.00000000e+00],
-       [0.00000000e+00, 0.00000000e+00, 2.64645385e-02, 0.00000000e+00,
-        2.72244726e-05, 0.00000000e+00, 1.48317726e-02, 9.16115900e-03,
-        1.65053765e-02, 0.00000000e+00]])</pre>
+<pre>&lt;6x10 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+	with 30 stored elements in Compressed Sparse Row format&gt;</pre>
 </div>
 
 </div>
@@ -15963,7 +15946,7 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>1.4936785978243868e-15</pre>
+<pre>1.305488689067899e-15</pre>
 </div>
 
 </div>
@@ -16023,11 +16006,11 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([[0.6459389 , 0.34624233, 0.49598422, 0.6959293 , 0.695909  ],
-       [0.97946173, 0.23392868, 0.4065783 , 0.94229692, 0.25106433],
-       [0.95581766, 0.87032871, 0.63952659, 0.38441436, 0.93002595],
-       [0.8151769 , 0.38842779, 0.72177129, 0.61232483, 0.14806904],
-       [0.53056458, 0.98877277, 0.70827722, 0.47300438, 0.44200306],
+<pre>array([[0.15353716, 0.77184733, 0.10541078, 0.34865963, 0.82877248],
+       [0.27948904, 0.11482272, 0.20048082, 0.58033679, 0.57909175],
+       [0.31039802, 0.15104033, 0.54714979, 0.36514969, 0.72183118],
+       [0.87335325, 0.58418035, 0.03339577, 0.50604954, 0.65986509],
+       [0.19899648, 0.02119573, 0.52510187, 0.76392894, 0.92575113],
        [1.        , 0.        , 0.        , 0.        , 0.        ],
        [0.        , 1.        , 0.        , 0.        , 0.        ],
        [0.        , 0.        , 1.        , 0.        , 0.        ],
@@ -16066,15 +16049,15 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([[0.6459389 , 0.34624233, 0.49598422, 0.6959293 , 0.695909  ,
+<pre>array([[0.15353716, 0.77184733, 0.10541078, 0.34865963, 0.82877248,
         1.        , 0.        , 0.        , 0.        , 0.        ],
-       [0.97946173, 0.23392868, 0.4065783 , 0.94229692, 0.25106433,
+       [0.27948904, 0.11482272, 0.20048082, 0.58033679, 0.57909175,
         0.        , 1.        , 0.        , 0.        , 0.        ],
-       [0.95581766, 0.87032871, 0.63952659, 0.38441436, 0.93002595,
+       [0.31039802, 0.15104033, 0.54714979, 0.36514969, 0.72183118,
         0.        , 0.        , 1.        , 0.        , 0.        ],
-       [0.8151769 , 0.38842779, 0.72177129, 0.61232483, 0.14806904,
+       [0.87335325, 0.58418035, 0.03339577, 0.50604954, 0.65986509,
         0.        , 0.        , 0.        , 1.        , 0.        ],
-       [0.53056458, 0.98877277, 0.70827722, 0.47300438, 0.44200306,
+       [0.19899648, 0.02119573, 0.52510187, 0.76392894, 0.92575113,
         0.        , 0.        , 0.        , 0.        , 1.        ]])</pre>
 </div>
 
@@ -16116,12 +16099,12 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 20x10, density 2.6, nnz_sum 520, 6 factor(s): 
-- FACTOR 0 (real) SPARSE, size 20x20, density 0.25, nnz 100
-- FACTOR 1 (real) SPARSE, size 20x20, density 0.25, nnz 100
-- FACTOR 2 (real) SPARSE, size 20x20, density 0.25, nnz 100
-- FACTOR 3 (real) SPARSE, size 20x20, density 0.25, nnz 100
-- FACTOR 4 (real) SPARSE, size 20x20, density 0.25, nnz 100
+<pre>Faust size 10x10, density 3.2, nnz_sum 320, 6 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x14, density 0.357143, nnz 50
+- FACTOR 1 (real) SPARSE, size 14x16, density 0.3125, nnz 70
+- FACTOR 2 (real) SPARSE, size 16x10, density 0.5, nnz 80
+- FACTOR 3 (real) SPARSE, size 10x12, density 0.333333, nnz 40
+- FACTOR 4 (real) SPARSE, size 12x20, density 0.25, nnz 60
 - FACTOR 5 (real) SPARSE, size 20x10, density 0.1, nnz 20</pre>
 </div>
 
@@ -16177,16 +16160,6 @@ This function is really close to <code>numpy.linalg.norm</code> function.</p>
        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
         0., 0., 0., 0.],
        [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-        0., 0., 0., 0.],
-       [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-        0., 0., 0., 0.],
-       [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-        0., 0., 0., 0.],
-       [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-        0., 0., 0., 0.],
-       [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-        0., 0., 0., 0.],
-       [0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
         0., 0., 0., 0.]])</pre>
 </div>
 
@@ -16230,16 +16203,16 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 10x70, density 2.72857, nnz_sum 1910, 9 factor(s): 
-- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
-- FACTOR 1 (real) SPARSE, size 20x30, density 0.05, nnz 30
-- FACTOR 2 (real) SPARSE, size 30x40, density 0.0333333, nnz 40
-- FACTOR 3 (real) SPARSE, size 40x70, density 0.025, nnz 70
-- FACTOR 4 (real) SPARSE, size 70x70, density 0.0714286, nnz 350
-- FACTOR 5 (real) SPARSE, size 70x70, density 0.0714286, nnz 350
-- FACTOR 6 (real) SPARSE, size 70x70, density 0.0714286, nnz 350
-- FACTOR 7 (real) SPARSE, size 70x70, density 0.0714286, nnz 350
-- FACTOR 8 (real) SPARSE, size 70x70, density 0.0714286, nnz 350</pre>
+<pre>Faust size 5x70, density 3.22857, nnz_sum 1130, 9 factor(s): 
+- FACTOR 0 (real) SPARSE, size 5x10, density 0.2, nnz 10
+- FACTOR 1 (real) SPARSE, size 10x15, density 0.1, nnz 15
+- FACTOR 2 (real) SPARSE, size 15x20, density 0.0666667, nnz 20
+- FACTOR 3 (real) SPARSE, size 20x35, density 0.05, nnz 35
+- FACTOR 4 (real) SPARSE, size 35x49, density 0.102041, nnz 175
+- FACTOR 5 (real) SPARSE, size 49x56, density 0.0892857, nnz 245
+- FACTOR 6 (real) SPARSE, size 56x35, density 0.142857, nnz 280
+- FACTOR 7 (real) SPARSE, size 35x42, density 0.0952381, nnz 140
+- FACTOR 8 (real) SPARSE, size 42x70, density 0.0714286, nnz 210</pre>
 </div>
 
 </div>
@@ -16297,7 +16270,7 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>0.9216359441207727</pre>
+<pre>12.765346219043149</pre>
 </div>
 
 </div>
@@ -16336,7 +16309,7 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>8.9 µs ± 293 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
+<pre>6.11 µs ± 105 ns per loop (mean ± std. dev. of 7 runs, 100000 loops each)
 </pre>
 </div>
 </div>
@@ -16367,7 +16340,7 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>203 ns ± 11.1 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+<pre>160 ns ± 0.98 ns per loop (mean ± std. dev. of 7 runs, 10000000 loops each)
 </pre>
 </div>
 </div>
@@ -16409,12 +16382,12 @@ Besides, it's possible to concatenate an arbitrary number of Faust objects.</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>Faust size 3x7, density 9.52381, nnz_sum 200, 5 factor(s): 
-- FACTOR 0 (real) SPARSE, size 3x10, density 0.5, nnz 15
-- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
-- FACTOR 3 (real) DENSE,  size 10x10, density 0.5, nnz 50
-- FACTOR 4 (real) DENSE,  size 10x7, density 0.5, nnz 35</pre>
+<pre>Faust size 3x7, density 6.2381, nnz_sum 131, 5 factor(s): 
+- FACTOR 0 (real) SPARSE, size 3x7, density 0.714286, nnz 15
+- FACTOR 1 (real) SPARSE, size 7x8, density 0.625, nnz 35
+- FACTOR 2 (real) SPARSE, size 8x5, density 1, nnz 40
+- FACTOR 3 (real) SPARSE, size 5x6, density 0.666667, nnz 20
+- FACTOR 4 (real) SPARSE, size 6x7, density 0.5, nnz 21</pre>
 </div>
 
 </div>

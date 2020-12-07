@@ -232,7 +232,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(2, 50, field='complex')
+            >>> F = rand(50, 50, field='complex')
             >>> nrows, ncols = F.shape
             >>> nrows = F.shape[0]
             >>> ncols = F.shape[1]
@@ -265,7 +265,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(2, 50, field='complex')
+            >>> F = rand(50, 50, field='complex')
             >>> F.size
             2500
 
@@ -338,7 +338,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(5, 50, field='complex')
+            >>> F = rand(50, 50, field='complex')
             >>> Fc = F.conj()
 
         <b/> See also Faust.transpose, Faust.getH, Faust.H
@@ -361,7 +361,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(5, 50, field='complex')
+            >>> F = rand(50, 50, field='complex')
             >>> Fc = F.conjugate()
 
         <b/> See also Faust.transpose, Faust.getH, Faust.H
@@ -382,7 +382,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(5, 50, field='complex')
+            >>> F = rand(50, 50, field='complex')
             >>> H1 = F.getH()
             >>> H2 = F.transpose()
             >>> H2 = H2.conj()
@@ -408,7 +408,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(5, 50, field='complex')
+            >>> F = rand(50, 50, field='complex')
             >>> H1 = F.H
             >>> H2 = F.transpose()
             >>> H2 = H2.conj()
@@ -474,7 +474,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(2, 50)
+            >>> F = rand(50, 50)
             >>> F.__repr__()
             >>> # the same function is called when typing F in a terminal:
             >>> F
@@ -506,17 +506,15 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand([1, 2], [50, 100], .5)
+            >>> F = rand(50, 100, [1, 2], [50, 100], .5)
             >>> F.display()
-            Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factors:<br/>
-            FACTOR 0 (real) SPARSE, size 98x78, density 0.395081, nnz 3020<br/>
-            FACTOR 1 (real) SPARSE, size 78x82, density 0.390869, nnz 2500<br/>
-
+            Faust size 50x100, density 0.94, nnz_sum 4700, 2 factor(s): <br/>
+            FACTOR 0 (real) SPARSE, size 50x63, density 0.492063, nnz 1550 <br/>
+            FACTOR 1 (real) SPARSE, size 63x100, density 0.5, nnz 3150 <br/>
             >>> F
-            Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factors:<br/>
-            FACTOR 0 (real) SPARSE, size 98x78, density 0.395081, nnz 3020<br/>
-            FACTOR 1 (real) SPARSE, size 78x82, density 0.390869, nnz 2500<br/>
-            <!-- >>> -->
+            Faust size 50x100, density 0.94, nnz_sum 4700, 2 factor(s): <br/>
+            FACTOR 0 (real) SPARSE, size 50x63, density 0.492063, nnz 1550 <br/>
+            FACTOR 1 (real) SPARSE, size 63x100, density 0.5, nnz 3150 <br/>
 
         <b/>See also Faust.nnz_sum, Faust.density, Faust.shape, Faust.factors,
         <b/>Faust.numfactors, Faust.__repr__
@@ -769,11 +767,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Examples:
             >>> from pyfaust import rand
             >>> import numpy as np
-            >>> F = rand(5, [50, 100])
+            >>> F = rand(50, 100)
             >>> A = np.random.rand(F.shape[1], 50)
             >>> B = F@A # == F*A or F.dot(A)
             >>> # is equivalent to B = F.__matmul__(A)
-            >>> G = rand(5, F.shape[1])
+            >>> G = rand(F.shape[1], 5)
             >>> H = F@G
             >>> # H is a Faust because F and G are
 
@@ -858,11 +856,11 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Examples:
             >>> from pyfaust import rand
             >>> import numpy as np
-            >>> F = rand(5, [50, 100])
+            >>> F = rand(50, 100)
             >>> A = np.random.rand(F.shape[1], 10)
             >>> B = F*A
             >>> # is equivalent to B = F.__mul__(A)
-            >>> G = rand(5, F.shape[1])
+            >>> G = rand(F.shape[1], 5)
             >>> H = F*G
             >>> # H is a Faust because F and G are
             >>> ((F*G).toarray() == (F@G).toarray()).all() #@ is not supported in python2
@@ -923,7 +921,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Examples:
             >>> from pyfaust import rand
             >>> import numpy as np
-            >>> F = rand(5, [50, 100])
+            >>> F = rand(50, 100)
             >>> A = np.random.rand(50, F.shape[0])
             >>> B = A@F # == A*F or pyfaust.dot(A,F)
 
@@ -987,8 +985,8 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
             Examples:
                 >>> import pyfaust import rand
-                >>> F = rand(5, 50)
-                >>> G = rand(6, 50)
+                >>> F = rand(50, 50)
+                >>> G = rand(50, 50)
                 >>> F.concatenate(G) # equivalent to F.concatenate(G, 0)
                 Faust size 100x50, density 0.5634, nnz_sum 2817, 7 factor(s)<br/>
                 FACTOR 0 (real) SPARSE, size 100x100, density 0.0473, nnz 47<br/>
@@ -1009,19 +1007,13 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                 FACTOR 6 (real) SPARSE, size 100x100, density 0.0475, nnz 47<br/>
                 >>> from numpy.random import rand
                 >>> F.concatenate(rand(34, 50), axis=0) # The random array is auto-converted to a Faust before the vertical concatenation
-                Faust size 384x50, density 0.677083, nnz_sum 13000, 12 factor(s):<br/>
-                FACTOR 0 (real) SPARSE, size 384x400, density 0.0224609, nnz 3450<br/>
-                FACTOR 1 (real) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
-                FACTOR 2 (real) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
-                FACTOR 3 (real) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
-                FACTOR 4 (real) SPARSE, size 400x400, density 0.01125, nnz 1800<br/>
-                FACTOR 5 (real) SPARSE, size 400x350, density 0.00714286, nnz 1000<br/>
-                FACTOR 6 (real) SPARSE, size 350x300, density 0.00333333, nnz 350<br/>
-                FACTOR 7 (real) SPARSE, size 300x250, density 0.004, nnz 300<br/>
-                FACTOR 8 (real) SPARSE, size 250x200, density 0.005, nnz 250<br/>
-                FACTOR 9 (real) SPARSE, size 200x150, density 0.00666667, nnz 200<br/>
-                FACTOR 10 (real) SPARSE, size 150x100, density 0.01, nnz 150<br/>
-                FACTOR 11 (real) SPARSE, size 100x50, density 0.02, nnz 100<br/>
+                Faust size 84x50, density 0.558333, nnz_sum 2345, 6 factor(s): <br/>
+                FACTOR 0 (real) SPARSE, size 84x91, density 0.0549451, nnz 420<br/>
+                FACTOR 1 (real) SPARSE, size 91x92, density 0.0543478, nnz 455<br/>
+                FACTOR 2 (real) SPARSE, size 92x90, density 0.0555556, nnz 460<br/>
+                FACTOR 3 (real) SPARSE, size 90x92, density 0.0543478, nnz 450<br/>
+                FACTOR 4 (real) SPARSE, size 92x100, density 0.05, nnz 460<br/>
+                FACTOR 5 (real) SPARSE, size 100x50, density 0.02, nnz 100<br/>
                 >>> from scipy.sparse import rand as sprand
                 >>> F.concatenate(sprand(50, 24, format='csr'), axis=1) # The sparse random matrix is auto-converted to a Faust before the horizontal concatenation
                 Faust size 50x74, density 0.412703, nnz_sum 1527, 6 factor(s):<br/>
@@ -1081,13 +1073,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(5, 10**6, .00001, 'sparse')
-               Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factors:<br/>
-                FACTOR 0 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
-                FACTOR 1 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
-                FACTOR 2 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
-                FACTOR 3 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
-                FACTOR 4 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
+            >>> F = rand(10**5, 10**5, 2, 10**5, density=10**-4, fac_type='sparse')
+            >>> F
+            FACTOR 0 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000<br/>
+            FACTOR 1 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000<br/>
             >>> # an attempt to convert F to a dense matrix is most likely to raise a memory error
             >>> # the sparse format is the only way to handle such a large Faust
             >>> F.toarray()
@@ -1123,14 +1112,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(5, 10**6, .00001, 'sparse')
+            >>> F = rand(10**5, 10**5, 2, 10**5, density=10**-4, fac_type='sparse')
             >>> F
-            Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factors:<br/>
-            FACTOR 0 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
-            FACTOR 1 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
-            FACTOR 2 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
-            FACTOR 3 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
-            FACTOR 4 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999<br/>
+            FACTOR 0 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000<br/>
+            FACTOR 1 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000<br/>
             >>> # an attempt to convert F to a dense matrix is most likely to raise a memory error
             >>> # the sparse format is the only way to handle such a large Faust
             >>> F.toarray()
@@ -1182,7 +1167,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             >>> import numpy as np
             >>> from random import randint
 
-            >>> F = rand(5, [50, 100])
+            >>> F = rand(50, 100)
             >>> i1 = randint(1, min(F.shape)-1)
             >>> i2 = randint(1, min(F.shape)-1)
 
@@ -1358,7 +1343,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
         >>> from pyfaust import rand
-        >>> F = rand(5, 50, .5)
+        >>> F = rand(5, 50, density=.5)
         >>> dens = F.density()
 
         <b/> See also Faust.nnz_sum, Faust.rcg, Faust.size, Faust.toarray
@@ -1437,7 +1422,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Examples:
             >>> from pyfaust import rand
             >>> import numpy as np
-            >>> F = rand([1, 2], [50, 100], .5)
+            >>> F = rand(50, 100, [1, 2], density=.5)
             >>> F.norm()
             23.55588891399667
             >>> F.norm(2)
@@ -1511,7 +1496,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
         >>> from pyfaust import rand
-        >>> F = rand(2, 100, .5)
+        >>> F = rand(100,100, 2, density=.5)
         >>> nf = F.numfactors()
         >>> nf == len(F)
         True
@@ -1529,7 +1514,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
         >>> from pyfaust import rand
-        >>> F = rand(2, 100, .5)
+        >>> F = rand(50, 100)
         >>> nf = F.numfactors()
         >>> nf == len(F)
         True
@@ -1564,7 +1549,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(5, [50, 100], .5)
+            >>> F = rand(5, 10)
             >>> f0 = F.factors(0)
             >>> G = F.factors(range(3,5)) # a new Faust composed of the two last factors of F
 
@@ -1598,7 +1583,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(5, [5, 10])
+            >>> F = rand(5, 10, 5)
             >>> RF = F.right(2)
             >>> print(F)
             Faust size 10x7, density 2.85714, nnz_sum 200, 5 factor(s):<br/>
@@ -1634,7 +1619,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(5, [5, 10])
+            >>> F = rand(5, 10, 5)
             >>> LF = F.left(3)
             >>> print(F)
             Faust size 6x10, density 3.25, nnz_sum 195, 5 factor(s):<br/>
@@ -1686,7 +1671,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand(5, [50, 100], .5)
+            >>> F = rand(5, 10)
             >>> f0 = F.factors(0)
 
         <b/> See also Faust.numfactors
@@ -1717,7 +1702,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand, Faust
-            >>> F = rand([2, 3], [10, 20],.5, field='complex')
+            >>> F = rand(5, 10, field='complex')
             >>> F.save("F.mat")
             >>> G = Faust(filepath="F.mat")
 
@@ -1769,10 +1754,10 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Examples:
             >>> from pyfaust import rand
-            >>> F = rand([2, 3], [10, 20],.5, field='complex')
+            >>> F = rand(5, 10, field='complex')
             >>> F.dtype
             dtype('complex128')
-            >>> F = rand([2, 3], [10, 20],.5)
+            >>> F = rand(5, 10)
             >>> F.dtype
             dtype('float64')
 
@@ -1795,7 +1780,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Examples:
         >>> from pyfaust import rand
         >>> import matplotlib.pyplot as plt
-        >>> F = rand([2, 3], [10, 20],.5, field='complex')
+        >>> F = rand(10, 20, density=.5, field='complex')
         >>> F.imshow()
         >>> plt.show()
 
@@ -1883,7 +1868,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
 		Example:
 			>>> from pyfaust import rand as frand
-			>>> F = frand(5,10)
+			>>> F = frand(10, 10)
 			>>> G = F.swap_cols(2,4)
 			>>> G
 			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
@@ -1954,7 +1939,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
 		Example:
 			>>> from pyfaust import rand as frand
-			>>> F = frand(5,10)
+			>>> F = frand(10, 10)
 			>>> G = F.swap_rows(2,4)
 			>>> G
 			Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
@@ -2098,7 +2083,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         Example:
             >>> from pyfaust import rand as frand
-            >>> F = frand(5,10)
+            >>> F = frand(10, 10)
             >>> F.sum()
             Faust size 1x10, density 26, nnz_sum 260, 6 factor(s): 
                 - FACTOR 0 (real) DENSE,  size 1x10, density 1, nnz 10
@@ -2536,22 +2521,31 @@ def eye(m,n=None,t='real', dev="cpu"):
 #        raise ValueError("t must be 'real' or 'complex'")
 #    return Faust(e)
 
-def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
-              field='real', per_row=True, dev="cpu"):
+def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
+         density=None, fac_type="sparse",
+         field='real', per_row=True, dev="cpu"):
     """
     Generates a random Faust.
 
         Args:
+            num_rows: the Faust number of rows.
+            num_cols: the Faust number of columns.
             num_factors: If it's an integer it will be the number of random factors to set in the Faust.
                         If num_factors is a list or tuple of 2 integers then the
                         number of factors will be set randomly between
                         num_factors[0] and num_factors[1] (inclusively).
+                        If num_factors is None then 5 factors are generated.
             dim_sizes: if it's an integer it will be the order of the square
             matrix factors (of size size_dims**2).
                         If it's a list or tuple of 2 integers then the
                         number of rows and columns will
                         be a random number between size_dims[0] and
                         size_dims[1] (inclusively).
+                        Note that the first factor number of rows and the last
+                        factor number of columns are always fixed (they are the
+                        dimension sizes of the Faust: num_rows, num_cols arguments).
+                        if dim_sizes is None then dim_sizes will be [num_rows,
+                        num_cols].
             density: (optional) the approximate density of factors. The
             default value is such that each factor will have 5 non-zero
             elements per row, if per_row is True, or per column otherwise.
@@ -2560,7 +2554,7 @@ def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
             "sparse", "dense" or "mixed" if you want a mix of dense and
             sparse matrices in the generated Faust (choice's done according
             to an uniform distribution).
-                        The default value is "mixed".
+                        The default value is "sparse".
             field: (optional) a str to set the Faust field: 'real' or
             'complex'. By default, the value is 'real'.
             per_row: if True the factor matrix is constructed per row
@@ -2615,6 +2609,8 @@ def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
         field = REAL
     else:
         field = COMPLEX
+    if num_factors == None:
+        num_factors = 5
     if((isinstance(num_factors,(list, tuple))) and
     len(num_factors) == 2):
         min_num_factors = num_factors[0]
@@ -2624,6 +2620,8 @@ def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
     else:
         raise ValueError("rand(): num_factors argument must be an "
                          "integer or a list/tuple of 2 integers.")
+    if dim_sizes == None:
+        dim_sizes = [num_rows, num_cols]
     if(isinstance(dim_sizes, (list, tuple)) and len(dim_sizes) == 2):
         min_dim_size = dim_sizes[0]
         max_dim_size = dim_sizes[1]
@@ -2640,13 +2638,15 @@ def rand(num_factors, dim_sizes, density=None, fac_type="mixed",
     elif(not isinstance(density, np.float)):
         raise ValueError("rand(): density must be a float")
     if dev == "cpu":
-        rF = Faust(core_obj=_FaustCorePy.FaustCore.randFaust(
-            fac_type_map[fac_type], field, min_num_factors, max_num_factors,
-            min_dim_size, max_dim_size, density, per_row))
+        rF = Faust(core_obj=_FaustCorePy.FaustCore.randFaust(num_rows,
+                                                             num_cols,
+                                                             fac_type_map[fac_type], field, min_num_factors, max_num_factors,
+                                                             min_dim_size, max_dim_size, density, per_row))
     elif dev.startswith("gpu"):
-        rF = Faust(core_obj=_FaustCorePy.FaustCoreGPU.randFaust(
-            fac_type_map[fac_type], field, min_num_factors, max_num_factors,
-            min_dim_size, max_dim_size, density, per_row))
+        rF = Faust(core_obj=_FaustCorePy.FaustCoreGPU.randFaust(num_rows,
+                                                                num_cols,
+                                                                fac_type_map[fac_type], field, min_num_factors, max_num_factors,
+                                                                min_dim_size, max_dim_size, density, per_row))
 
     return rF
 
@@ -2821,7 +2821,7 @@ class FaustMulMode:
     Examples:
         >>> from pyfaust import rand as frand
         >>> from numpy.random import rand
-        >>> F = frand(5, [100, 1024])
+        >>> F = frand(100, 100, 5, [100, 1024])
         >>> F.m_faust.set_FM_mul_mode(FaustMulMode.ORDER_ALL_BEST_MIXED) # method used to compute Faust-matrix product or Faust.toarray()
         >>> F.m_faust.set_Fv_mul_mode(FaustMulMode.DEFAULT) # method used to compute Faust-vector product
         >>> F*rand(F.shape[1],1) # Faust-vector mul. using the DEFAULT method

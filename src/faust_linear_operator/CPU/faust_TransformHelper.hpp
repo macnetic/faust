@@ -1296,7 +1296,15 @@ template<typename FPP>
 	}
 
 template<typename FPP>
-	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */) {
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */)
+	{
+		return TransformHelper<FPP,Cpu>::randFaust(-1, -1, t, min_num_factors, max_num_factors, min_dim_size, max_dim_size, density, per_row);
+	}
+
+
+template<typename FPP>
+	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */)
+	{
 		if(!TransformHelper<FPP,Cpu>::seed_init) {
 			std::srand(std::time(NULL)); //seed init needed for MatDense rand generation
 			TransformHelper<FPP,Cpu>::seed_init = true;
@@ -1308,11 +1316,22 @@ template<typename FPP>
 		unsigned int num_factors = num_fac_distr(generator);
 		// create factors randomly respecting the RandFaustType asked and dims interval
 		std::vector<MatGeneric<FPP,Cpu>*> factors((size_t) num_factors);
-		unsigned int num_rows, num_cols = dim_distr(generator);
+		unsigned int num_rows, num_cols;
+		// if faust_nrows < 0 then the number of rows is random between min_dim_size and max_dim_size
+		if(faust_nrows < 0)
+			num_cols = dim_distr(generator);
+		else // fixed number of rows
+			num_cols = faust_nrows;
 		float fact_density;
 		for(unsigned int i=0;i<num_factors;i++) {
 			num_rows = num_cols;
-			num_cols = dim_distr(generator);
+			// last faust factor number of columns is the faust number of columns
+			if(i < num_factors-1 || faust_ncols < 0)
+				// it is random for intermediary factors and also for last factor if faust_ncols < 0
+				num_cols = dim_distr(generator);
+			else
+				// the faust has a fixed number of columns
+				num_cols = faust_ncols;
 #ifdef FAUST_VERBOSE
 			cout << "TransformHelper<FPP,Cpu>::randFaust() per_row: " <<  per_row << endl;
 #endif

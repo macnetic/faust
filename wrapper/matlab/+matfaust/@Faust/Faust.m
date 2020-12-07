@@ -225,10 +225,10 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand([2, 5], [50, 100], .5)
+		%>	F = matfaust.rand(5, 10)
 		%>	delete(F)
-		%>	F = matfaust.rand([2, 5], [50, 100], .5)
-		%>	G = matfaust.rand([2, 5], [50, 100], .5)
+		%>	F = matfaust.rand(5, 10)
+		%>	G = matfaust.rand(5, 10)
 		%>	clear % equivalent to delete(F);delete(G)
 		%> @endcode
 		%>
@@ -395,11 +395,11 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>   F = matfaust.rand([2, 5], [50, 100], .5)
+		%>   F = matfaust.rand(5, 10)
 		%>   A = rand(size(F,2), 50)
 		%>   G = F*A
 		%> % is equivalent to G = mtimes(F, A)
-		%>   G = matfaust.rand(5,size(F, 2))
+		%>   G = matfaust.rand(size(F, 2), 15)
 		%>   H = F*G
 		%> % H is a Faust because F and G are
 		%>   Fs = F*2
@@ -549,13 +549,10 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>   % in a matlab terminal
-		%>   >> F = matfaust.rand(5, 10^6, 10^-5, 'sparse')
-		%>   Faust size 1000000x1000000, density 5e-05, nnz_sum 49999995, 5 factor(s):
-		%>   - FACTOR 0 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999
-		%>   - FACTOR 1 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999
-		%>   - FACTOR 2 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999
-		%>   - FACTOR 3 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999
-		%>   - FACTOR 4 (real) SPARSE, size 1000000x1000000, density 1e-05, nnz 9999999
+		%>   >> F = matfaust.rand(10^5, 10^5, 2, 10^5, 10^-4, 'sparse')
+		%>   Faust size 100000x100000, density 0.00018, nnz_sum 1800000, 2 factor(s):
+		%>   - FACTOR 0 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000
+		%>   - FACTOR 1 (real) SPARSE, size 100000x100000, density 9e-05, nnz 900000
 		%>   >> % an attempt to convert F to a full matrix is most likely to raise a memory error
 		%>   >> % the sparse format is the only way to handle such a large Faust
 		%>   >> full(F)
@@ -661,7 +658,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, 10)
 		%>	F_ctrans = F'
 		%>	F_ctrans2 = ctranspose(F)
 		%>	% F_ctrans == F_ctrans2
@@ -703,7 +700,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, 10)
 		%>	F_conj = conj(F)
 		%> @endcode
 		%>
@@ -920,7 +917,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, 10)
 		%>	[nrows, ncols] = size(F)
 		%>	nrows = size(F, 1)
 		%>	ncols = size(F, 2)
@@ -999,7 +996,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, 10)
 		%>	n = numel(F)
 		%> @endcode
 		%>
@@ -1019,7 +1016,7 @@ classdef Faust
 	 	%> @b Example
 		%> @code
 		%>	% in a matlab terminal
-		%>	>> F = matfaust.rand([4, 5], 3, .9);
+		%>	>> F = matfaust.rand(3, 3);
 		%>	>> full(F)
 		%>	ans =
 		%>
@@ -1086,7 +1083,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex');
+		%>	F = matfaust.rand(5, 10);
 		%>	f1 = factors(F, 1);
 		%>	G = factors(F, 4:5); % a new Faust composed of the two last factors of F
 		%> @endcode
@@ -1126,24 +1123,24 @@ classdef Faust
 		%> @Example
 		%> @code
 		%> %in a matlab terminal
-		%> >> F = matfaust.rand(5,[5, 10])
+		%> >> F = matfaust.rand(8, 5)
 		%>
 		%> F =
 		%>
 		%> Faust size 8x5, density 5.25, nnz_sum 210, 5 factor(s):
-		%> - FACTOR 0 (real) DENSE,  size 8x6, density 0.833333, nnz 40
-		%> - FACTOR 1 (real) DENSE,  size 6x9, density 0.555556, nnz 30
-		%> - FACTOR 2 (real) DENSE,  size 9x10, density 0.5, nnz 45
-		%> - FACTOR 3 (real) DENSE,  size 10x9, density 0.555556, nnz 50
-		%> - FACTOR 4 (real) DENSE,  size 9x5, density 1, nnz 45
+		%> - FACTOR 0 (real) SPARSE,  size 8x6, density 0.833333, nnz 40
+		%> - FACTOR 1 (real) SPARSE,  size 6x9, density 0.555556, nnz 30
+		%> - FACTOR 2 (real) SPARSE,  size 9x10, density 0.5, nnz 45
+		%> - FACTOR 3 (real) SPARSE,  size 10x9, density 0.555556, nnz 50
+		%> - FACTOR 4 (real) SPARSE,  size 9x5, density 1, nnz 45
 		%> >> LF = left(F, 3)
 		%>
 		%> LF =
 		%>
 		%> Faust size 8x10, density 1.4375, nnz_sum 115, 3 factor(s):
-		%> - FACTOR 0 (real) DENSE,  size 8x6, density 0.833333, nnz 40
-		%> - FACTOR 1 (real) DENSE,  size 6x9, density 0.555556, nnz 30
-		%> - FACTOR 2 (real) DENSE,  size 9x10, density 0.5, nnz 45
+		%> - FACTOR 0 (real) SPARSE,  size 8x6, density 0.833333, nnz 40
+		%> - FACTOR 1 (real) SPARSE,  size 6x9, density 0.555556, nnz 30
+		%> - FACTOR 2 (real) SPARSE,  size 9x10, density 0.5, nnz 45
 		%>
 		%>@endcode
 		%> <p> @b See @b also Faust.factors, Faust.right
@@ -1165,19 +1162,19 @@ classdef Faust
 		%>
 		%> Faust size 7x7, density 4.28571, nnz_sum 210, 5 factor(s):
 		%> - FACTOR 0 (real) SPARSE, size 7x10, density 0.5, nnz 35
-		%> - FACTOR 1 (real) DENSE,  size 10x9, density 0.555556, nnz 50
+		%> - FACTOR 1 (real) SPARSE,  size 10x9, density 0.555556, nnz 50
 		%> - FACTOR 2 (real) SPARSE, size 9x8, density 0.625, nnz 45
 		%> - FACTOR 3 (real) SPARSE, size 8x8, density 0.625, nnz 40
-		%> - FACTOR 4 (real) DENSE,  size 8x7, density 0.714286, nnz 40
+		%> - FACTOR 4 (real) SPARSE,  size 8x7, density 0.714286, nnz 40
 		%> >> RF = right(F, 2)
 		%>
 		%> RF =
 		%>
 		%> Faust size 10x7, density 2.5, nnz_sum 175, 4 factor(s):
-		%> - FACTOR 0 (real) DENSE,  size 10x9, density 0.555556, nnz 50
+		%> - FACTOR 0 (real) SPARSE,  size 10x9, density 0.555556, nnz 50
 		%> - FACTOR 1 (real) SPARSE, size 9x8, density 0.625, nnz 45
 		%> - FACTOR 2 (real) SPARSE, size 8x8, density 0.625, nnz 40
-		%> - FACTOR 3 (real) DENSE,  size 8x7, density 0.714286, nnz 40
+		%> - FACTOR 3 (real) SPARSE,  size 8x7, density 0.714286, nnz 40
 		%>
 		%> @endcode
 		%>
@@ -1202,7 +1199,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, 10)
 		%>	f1 = get_factor_nonopt(F, 1)
 		%> @endcode
 		%> <p>@b See @b also Faust.numfactors
@@ -1247,7 +1244,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, 10)
 		%>	nf = numfactors(F)
 		%> @endcode
 		%>
@@ -1284,7 +1281,7 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	import matfaust.*
-		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, 10)
 		%>	save(F, 'F.mat')
 		%>	G = Faust('F.mat')
 		%> @endcode
@@ -1330,7 +1327,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand([2, 5], [50, 100], .5)
+		%>	F = matfaust.rand(50, 100)
 		%>	i = randi(min(size(F)), 1, 2)
 		%>	i1 = i(1);i2 = i(2)
 		%>
@@ -1484,17 +1481,16 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>	% in a matlab terminal
-		%>	>> F = matfaust.rand([1, 2], [50, 100], .5)
+		%>	>> F = matfaust.rand(98, 82)
 		%>	>> disp(F)
-		%>	Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factor(s):
-		%>	- FACTOR 0 (real) SPARSE, size 98x78, density 0.395081, nnz 3020
-		%>	- FACTOR 1 (real) SPARSE, size 78x82, density 0.390869, nnz 2500
+		%>	Faust size 98x82, density 0.115729, nnz_sum 930, 2 factor(s):
+		%>	- FACTOR 0 (real) SPARSE, size 98x88, density 0.0568182, nnz 490
+		%>	- FACTOR 1 (real) SPARSE, size 88x82, density 0.0609756, nnz 440
 		%>
 		%>	>> F
-		%>	Faust size 98x82, density 0.686909, nnz_sum 5520, 2 factor(s):
-		%>	- FACTOR 0 (real) SPARSE, size 98x78, density 0.395081, nnz 3020
-		%>	- FACTOR 1 (real) SPARSE, size 78x82, density 0.390869, nnz 2500
-		%>
+		%>	Faust size 98x82, density 0.115729, nnz_sum 930, 2 factor(s):
+		%>	- FACTOR 0 (real) SPARSE, size 98x88, density 0.0568182, nnz 490
+		%>	- FACTOR 1 (real) SPARSE, size 88x82, density 0.0609756, nnz 440
 		%> @endcode
 		%>
 		%> <p>@b See @b also Faust.nnz_sum, Faust.density, Faust.size, Faust.factors, Faust.numfactors
@@ -1549,19 +1545,19 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%> % in a matlab terminal
-		%> >> F = matfaust.rand([1, 2], [50, 100], .5)
+		%> >> F = matfaust.rand(50, 100, 2, [50, 100], .5)
 		%> >> norm(F)
 		%> ans =
-		%> 7.0151
+		%> 436.4094
 		%> >> norm(F,2)
 		%> ans =
-		%> 7.0151
+		%> 436.4094
 		%> >> norm(F, 'fro')
 		%> ans =
-		%> 30.1014
+		%> 442.3946
 		%> >> norm(F, inf)
 		%> ans =
-		%> 25.9277
+		%> 738.0057
 		%> @endcode
 		%>
 		%======================================================================
@@ -1750,7 +1746,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand([2, 5], [50, 100], .5)
+		%>	F = matfaust.rand(5, 10)
 		%>	dens = density(F)
 		%> @endcode
 		%>
@@ -1849,8 +1845,8 @@ classdef Faust
 		%> @b Example
 		%> @code
 		%>% in a matlab terminal
-		%>  F = matfaust.rand(5,50);
-		%>  G = matfaust.rand(6,50);
+		%>  F = matfaust.rand(50, 50);
+		%>  G = matfaust.rand(50, 50);
 		%>  [F;G] % equiv. to cat(1,F,G)
 		%>
 		%>ans =
@@ -2024,7 +2020,7 @@ classdef Faust
 		%>
 		%> @b Example
 		%> @code
-		%>	F = matfaust.rand(5, [50, 100], .5, 'mixed', 'complex')
+		%>	F = matfaust.rand(5, 10)
 		%>	imagesc(F)
 		%>	print('test_imsc', '-dpng')
 		%>	@endcode
