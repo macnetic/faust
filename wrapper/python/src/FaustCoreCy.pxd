@@ -105,7 +105,9 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCpp[FPP]* zpruneout(const int nnz_tres, const int npasses,
                                     const bool only_forward)
         FaustCoreCpp[FPP]* vertcat(FaustCoreCpp[FPP]*) const
+        FaustCoreCpp[FPP]* vertcatn(FaustCoreCpp[FPP]**, size_t n) const
         FaustCoreCpp[FPP]* horzcat(FaustCoreCpp[FPP]*) const
+        FaustCoreCpp[FPP]* horzcatn(FaustCoreCpp[FPP]**, size_t n) const
         FaustCoreCpp[FPP]* mul_faust(FaustCoreCpp[FPP]*)
         FaustCoreCpp[FPP]* mul_scal(FPP scal)
         void device(char*) const

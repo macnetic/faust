@@ -394,7 +394,6 @@ cdef class FaustCore:
 
     cdef _vertcat(self, F):
          core = FaustCore(core=True)
-         #TODO/ F must be a FaustCore
          if(self._isReal):
              if(not F.isReal()):
                  self = self._ascomplex()
@@ -411,6 +410,7 @@ cdef class FaustCore:
         if(F.isReal() and not self.isReal()):
             return self._vertcat((<FaustCore?>F)._ascomplex())
         return self._vertcat(F)
+
 
     cdef _horzcat(self, F):
          #TODO: refactor with _vertcat(), maybe by passing func ref to a cat func
@@ -432,6 +432,87 @@ cdef class FaustCore:
         if(F.isReal() and not self.isReal()):
             return self._horzcat((<FaustCore?>F)._ascomplex())
         return self._horzcat(F)
+
+    cdef _vertcatn(self, Fs):
+        cdef FaustCoreCy.FaustCoreCpp[double]** _Fs
+        cdef FaustCoreCy.FaustCoreCpp[complex]** _Fs_cplx
+
+        if self.isReal():
+            _Fs = <FaustCoreCy.FaustCoreCpp[double]**> PyMem_Malloc(sizeof(void*) *
+                                                               len(Fs))
+        else:
+            _Fs_cplx = <FaustCoreCy.FaustCoreCpp[complex]**> PyMem_Malloc(sizeof(void*) *
+                                                               len(Fs))
+        for i, F in enumerate(Fs):
+            if F.isReal():
+                _Fs[i] = (<FaustCore?>F).core_faust_dbl
+            else:
+                _Fs_cplx[i] = (<FaustCore?>F).core_faust_cplx
+        core = FaustCore(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.vertcatn(_Fs, len(Fs))
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.vertcatn(_Fs_cplx,
+                                                                 len(Fs))
+        core._isReal = core.core_faust_dbl != NULL
+        return core
+
+    def vertcatn(self, *args):
+        Fs = []
+        i = 0
+        any_complex = not self.isReal()
+        while i < len(args) and not any_complex:
+            any_complex = not args[i].isReal()
+            i+=1
+        for F in args:
+            if F.isReal() and any_complex:
+               F = (<FaustCore?>F)._ascomplex()
+            Fs += [F]
+        if any_complex and self.isReal():
+            self = (<FaustCore?>self)._ascomplex()
+        return self._vertcatn(Fs)
+
+    cdef _horzcatn(self, Fs):
+        cdef FaustCoreCy.FaustCoreCpp[double]** _Fs
+        cdef FaustCoreCy.FaustCoreCpp[complex]** _Fs_cplx
+
+        if self.isReal():
+            _Fs = <FaustCoreCy.FaustCoreCpp[double]**> PyMem_Malloc(sizeof(void*) *
+                                                               len(Fs))
+        else:
+            _Fs_cplx = <FaustCoreCy.FaustCoreCpp[complex]**> PyMem_Malloc(sizeof(void*) *
+                                                               len(Fs))
+        for i, F in enumerate(Fs):
+            if F.isReal():
+                _Fs[i] = (<FaustCore?>F).core_faust_dbl
+            else:
+                _Fs_cplx[i] = (<FaustCore?>F).core_faust_cplx
+        core = FaustCore(core=True)
+        # print("self.isReal():", self.isReal())
+        if self.isReal():
+            core.core_faust_dbl = self.core_faust_dbl.horzcatn(_Fs, len(Fs))
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.horzcatn(_Fs_cplx,
+                                                                 len(Fs))
+        core._isReal = core.core_faust_dbl != NULL
+        return core
+
+    def horzcatn(self, *args):
+        Fs = []
+        i = 0
+        any_complex = not self.isReal()
+        # print("any_complex:", any_complex)
+        while i < len(args) and not any_complex:
+            any_complex = not args[i].isReal()
+            i+=1
+        for F in args:
+            if F.isReal() and any_complex:
+               F = (<FaustCore?>F)._ascomplex()
+            Fs += [F]
+        # print("any_complex:", any_complex)
+        if any_complex and self.isReal():
+            self = (<FaustCore?>self)._ascomplex()
+        return self._horzcatn(Fs)
 
     # Left-Multiplication by a Faust F
     # y=multiply(F,M) is equivalent to y=F*M

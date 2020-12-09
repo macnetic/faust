@@ -52,6 +52,7 @@
 #include <random>
 #include <limits>
 #include <algorithm>
+#include <vector>
 #ifdef FAUST_TORCH
 #include "faust_torch.h"
 #endif
@@ -68,9 +69,16 @@ namespace Faust
 	template<typename FPP> class FaustGPU;
 #endif
 
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* vertcat(const std::vector<TransformHelper<FPP,Cpu>*> & THs);
+
+	template<typename FPP>
+		TransformHelper<FPP,Cpu>* horzcat(const std::vector<TransformHelper<FPP,Cpu>*> & THs);
 
 	template<typename FPP>
 		class TransformHelper<FPP,Cpu> : public TransformHelperGen<FPP,Cpu> {
+
+			friend TransformHelper<FPP,Cpu>* vertcat<FPP>(const std::vector<TransformHelper<FPP,Cpu>*>& THs);
 			static std::default_random_engine generator;
 			static bool seed_init;
 
@@ -213,7 +221,9 @@ namespace Faust
 			void update(const MatGeneric<FPP,Cpu>& M, const faust_unsigned_int fact_id);
 			private:
 			const MatGeneric<FPP,Cpu>* get_gen_fact(const faust_unsigned_int id) const;
+
 		};
+
 
 }
 

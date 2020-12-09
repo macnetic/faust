@@ -1032,25 +1032,36 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         if(axis not in [0,1]):
             raise ValueError("Axis must be 0 or 1.")
 
-
-        C=F
-        for G in args:
-           if(isinstance(G, (np.ndarray, csr_matrix, csc_matrix))):
-               G = Faust([G])
-           if(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
+        for i,G in enumerate(args):
+            if(isinstance(G, (np.ndarray, csr_matrix, csc_matrix))):
+                args[i] = Faust([G])
+            if(not isinstance(G, Faust)): raise ValueError("You can't concatenate a "
                                                            "Faust with something "
                                                            "that is not a Faust, "
                                                            "a numpy array or scipy "
                                                            "sparse matrix.")
-           if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
-              != G.shape[0]): raise ValueError("The dimensions of "
-                                               "the two Fausts must "
-                                               "agree.")
 
-           if(axis==0):
+        if(axis == 0 and F.shape[1] != G.shape[1] or axis == 1 and F.shape[0]
+           != G.shape[0]): raise ValueError("The dimensions of "
+                                            "the two Fausts must "
+                                            "agree.")
+
+        if all([isFaust(G) for G in args]) and not "iterative" in kwargs.keys() or kwargs['iterative']:
+            # use iterative meth.
+            if axis == 0:
+                C = Faust(core_obj=F.m_faust.vertcatn(*[G.m_faust for G in args]))
+            else: # axis == 1
+                C = Faust(core_obj=F.m_faust.horzcatn(*[G.m_faust for G in args]))
+            return C
+
+        # use recursive meth.
+        C=F
+        for G in args:
+           if axis == 0:
                 C = Faust(core_obj=C.m_faust.vertcat(G.m_faust))
-           elif(axis==1):
+           elif axis == 1:
                 C = Faust(core_obj=C.m_faust.horzcat(G.m_faust))
+
         return C
 
     def toarray(F):

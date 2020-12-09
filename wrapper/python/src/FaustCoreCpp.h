@@ -75,7 +75,9 @@ class FaustCoreCpp
     void multiply(FPP* value_y,int nbrow_y,int nbcol_y,FPP* value_x,int nbrow_x,int nbcol_x/*,bool isTranspose*/)const;
     FaustCoreCpp<FPP,DEV>* mul_faust(FaustCoreCpp<FPP,DEV>* right);
     FaustCoreCpp<FPP,DEV>* vertcat(FaustCoreCpp<FPP,DEV>* right) const;
+    FaustCoreCpp<FPP,DEV>* vertcatn(FaustCoreCpp<FPP,DEV>** rights, size_t n) const;
     FaustCoreCpp<FPP,DEV>* horzcat(FaustCoreCpp<FPP,DEV>* right) const;
+    FaustCoreCpp<FPP,DEV>* horzcatn(FaustCoreCpp<FPP,DEV>** rights, size_t n) const;
     FaustCoreCpp<FPP,DEV>* mul_scal(FPP scal);
     FaustCoreCpp<FPP,DEV>* normalize(int ord) const;
     unsigned long long nnz()const;

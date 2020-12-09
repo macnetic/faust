@@ -1305,12 +1305,19 @@ template<typename FPP>
 template<typename FPP>
 	TransformHelper<FPP,Cpu>* TransformHelper<FPP,Cpu>::randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density /* 1.f */, bool per_row /* true */)
 	{
+		unsigned int tmp;
 		if(!TransformHelper<FPP,Cpu>::seed_init) {
 			std::srand(std::time(NULL)); //seed init needed for MatDense rand generation
 			TransformHelper<FPP,Cpu>::seed_init = true;
 		}
 		// pick randomly the number of factors into {min_num_factors, ..., max_num_factors}
 		std::uniform_int_distribution<int> num_fac_distr(min_num_factors, max_num_factors);
+		if(min_dim_size > max_dim_size)
+		{
+			tmp = min_dim_size;
+			min_dim_size = max_dim_size;
+			max_dim_size = tmp;
+		}
 		std::uniform_int_distribution<int> dim_distr(min_dim_size, max_dim_size);
 		std::uniform_int_distribution<int> bin_distr(0,1);
 		unsigned int num_factors = num_fac_distr(generator);
@@ -1574,4 +1581,177 @@ template<typename FPP>
 
 	template<typename FPP> bool TransformHelper<FPP,Cpu>::seed_init = false;
 	template<typename FPP> std::default_random_engine TransformHelper<FPP,Cpu>::generator(time(NULL));
+
+
+	template<typename FPP>
+	TransformHelper<FPP,Cpu>* vertcat(const std::vector<TransformHelper<FPP,Cpu>*> & THs)
+	{
+		TransformHelper<FPP,Cpu>* output = nullptr;
+		// find the maximum size TransformHelper id in THs
+		size_t max_size = 0;
+		for(auto th: THs)
+			if(th->size() > max_size)
+				max_size = th->size();
+//		std::cout << "max num of factors is: " << max_size << endl;
+		std::vector<MatGeneric<FPP,Cpu>*> facts(max_size+1);
+		// list to store if the i-th factor of THs[j] has been copied (converted from MatDense to Matsparse)
+		std::vector<bool> inter_fac_copied(THs.size());
+		inter_fac_copied.assign(THs.size(), false);
+		const MatGeneric<FPP,Cpu> *tmp_fac_gen;
+		// list of diag matrices to form one factor of the concatenated faust
+		std::vector<const MatSparse<FPP,Cpu>*> diag_mats(THs.size());
+		std::vector<const MatSparse<FPP,Cpu>*> eye_mats(THs.size());
+		eye_mats.assign(THs.size(), nullptr);
+		faust_unsigned_int out_fac_nnz, out_fac_nrows, out_fac_ncols;
+		int * out_fac_colind, *out_fac_rowptr;
+		FPP* out_fac_values;
+		MatSparse<FPP, Cpu>* out_fac;
+		size_t out_fact_nnz_offset, out_fact_row_offset, out_fact_col_offset;
+		for(int i=0;i < max_size; i++)
+		{
+			// construct the i-th blockdiag factor of the output concatenation
+			out_fac_nnz = 0;
+			out_fac_nrows = 0;
+			out_fac_ncols = 0;
+			for(int j=0; j < THs.size(); j++)
+			{
+				auto faust = THs[j];
+//				std::cout << "faust:" << faust << std::endl;
+				if(i < faust->size())
+				{
+					tmp_fac_gen = faust->get_gen_fact(i);
+					if((inter_fac_copied[j] = (tmp_fac_gen->getType() == MatType::Dense)))
+					{
+						diag_mats[j] = new MatSparse<FPP,Cpu>(*dynamic_cast<const MatDense<FPP,Cpu>*>(tmp_fac_gen));
+						if(faust->is_transposed) const_cast<MatSparse<FPP,Cpu>*>(diag_mats[j])->transpose();
+						if (faust->is_conjugate) const_cast<MatSparse<FPP,Cpu>*>(diag_mats[j])->conjugate();
+					}
+					else
+					{
+						auto dm = dynamic_cast<const MatSparse<FPP,Cpu>*>(tmp_fac_gen);
+						if(faust->is_transposed || faust->is_conjugate)
+						{
+							dm = new MatSparse<FPP,Cpu>(dm->getNonZeros(), dm->getNbRow(), dm->getNbCol(), dm->getValuePtr(), dm->getRowPtr(), dm->getColInd(), faust->is_transposed);
+							if (faust->is_conjugate) const_cast<MatSparse<FPP,Cpu>*>(dm)->conjugate();
+							inter_fac_copied[j] = true;
+						}
+						diag_mats[j] = dm;
+					}
+					out_fac_nnz += diag_mats[j]->getNonZeros();
+					out_fac_ncols += faust->get_fact_nb_cols(i);
+					out_fac_nrows += faust->get_fact_nb_rows(i);
+				}
+				else
+				{ // faust number of factors is less than max_size
+					//fill remaining factors with identity
+					tmp_fac_gen = faust->get_gen_fact(faust->size()-1);
+					// number of ones
+					auto faust_ncols = faust->get_fact_nb_cols(faust->size()-1);
+					out_fac_nnz += faust_ncols;//tmp_fac_gen->getNbCol();
+					out_fac_ncols += faust_ncols; //F_fac->getNbCol()+tmp_fac_gen->getNbCol();
+					out_fac_nrows += faust_ncols;//tmp_fac_gen->getNbCol();
+					// opt. create the id factor only once
+					if(i == faust->size())
+					{
+						eye_mats[j] = MatSparse<FPP,Cpu>::eye(faust_ncols, faust_ncols);//(tmp_fac_gen->getNbCol(), tmp_fac_gen->getNbCol());
+						//TODO: delete all eye_mats after the main loop
+					}
+					diag_mats[j] = eye_mats[j];
+				}
+			}
+			out_fac_values = new FPP[out_fac_nnz];
+			out_fac_colind = new int[out_fac_nnz];
+			out_fac_rowptr = new int[out_fac_nrows+1];
+			out_fac_rowptr[0] = 0;
+			out_fact_nnz_offset = 0;
+			out_fact_row_offset = 1;
+			out_fact_col_offset = 0;
+			// copy the data from all diag_mats
+			for(int j=0; j < diag_mats.size();j++)
+			{
+//				std::cout << "j: " << j << " " << diag_mats[j]->norm() << std::endl;
+				memcpy(out_fac_values+out_fact_nnz_offset, diag_mats[j]->getValuePtr(), sizeof(FPP)*diag_mats[j]->getNonZeros());
+				memcpy(out_fac_colind+out_fact_nnz_offset, diag_mats[j]->getColInd(), sizeof(int)*diag_mats[j]->getNonZeros());
+				// ignore first element of getRowPtr()
+				memcpy(out_fac_rowptr+out_fact_row_offset, diag_mats[j]->getRowPtr()+1, sizeof(int)*diag_mats[j]->getNbRow());
+				if(j > 0)
+				{
+					out_fact_col_offset += diag_mats[j-1]->getNbCol();
+//					std::cout << "j > 0" << std::endl;
+					// the indices must be shifted by the previous mat num of cols
+					for(auto k = out_fact_nnz_offset; k < diag_mats[j]->getNonZeros()+out_fact_nnz_offset; k++)
+						out_fac_colind[k] += out_fact_col_offset; //out_fac_colind[out_fact_nnz_offset-1]+1;
+					// shift rowptr according to previous diag_mat
+					for(auto k = out_fact_row_offset; k < diag_mats[j]->getNbRow()+out_fact_row_offset;k++)
+						out_fac_rowptr[k] += out_fac_rowptr[out_fact_row_offset-1]; //;diag_mats[j-1]->getRowPtr()[diag_mats[j-1]->getNbRow()];
+				}
+				out_fact_nnz_offset += diag_mats[j]->getNonZeros();
+				out_fact_row_offset += diag_mats[j]->getNbRow();
+//				out_fact_col_offset += THs[j]->get_gen_fact(i)->getNbCol();
+			}
+//			std::cout << "creating out fac i:" << i << std::endl;
+//			std::cout << "out_fac_nrows: " << out_fac_nrows << " out_fac_ncols: " << out_fac_ncols << std::endl;
+			out_fac = new MatSparse<FPP,Cpu>(out_fac_nnz, out_fac_nrows, out_fac_ncols, out_fac_values, out_fac_rowptr, out_fac_colind);
+			facts[i] = out_fac;
+			for(int j=0; j < THs.size(); j++)
+			{
+				if(inter_fac_copied[j])
+				{
+					delete diag_mats[j];
+					inter_fac_copied[j] = false;
+				}
+			}
+			delete[] out_fac_values;
+			delete[] out_fac_rowptr;
+			delete[] out_fac_colind;
+		}
+		// add last factor: stack of id matrices
+//		std::cout << "creating last out fac:" << std::endl;
+//		out_fac_ncols = THs[0]->get_gen_fact(THs[0]->size()-1)->getNbCol();
+		out_fac_ncols = THs[0]->getNbCol(); // all fausts have normally same num of cols
+		out_fac_nrows = out_fac_ncols*THs.size();
+		out_fac_nnz = THs.size()*out_fac_ncols;
+		out_fac_values = new FPP[out_fac_nnz];
+		out_fac_colind = new int[out_fac_nnz];
+		out_fac_rowptr = new int[out_fac_nnz+1];
+		for(int i = 0; i < out_fac_nnz;i++)
+			out_fac_values[i] = 1;
+		for(int i = 0; i < THs.size();i++)
+		{
+			for(int j=0;j < out_fac_ncols;j++)
+			{
+				out_fac_colind[i*out_fac_ncols+j] = j;
+			}
+		}
+		out_fac_rowptr[0] = 0;
+		for(int i = 1; i < out_fac_nnz+1;i++)
+			out_fac_rowptr[i] = out_fac_rowptr[i-1] + 1;
+//		std::cout << "out_fac_nrows, out_fac_ncols:" << out_fac_nrows << " " << out_fac_ncols << std::endl;
+		out_fac = new MatSparse<FPP,Cpu>(out_fac_nnz, out_fac_nrows, out_fac_ncols, out_fac_values, out_fac_rowptr, out_fac_colind);
+		delete[] out_fac_values;
+		delete[] out_fac_colind;
+		delete[] out_fac_rowptr;
+		facts[facts.size()-1] = out_fac;
+		output = new TransformHelper<FPP,Cpu>(facts, 1.0, false, false);
+		for(int j=0;j<THs.size();j++)
+			if(eye_mats[j] != nullptr)
+				delete eye_mats[j];
+		return output;
+	}
+
+		template<typename FPP>
+	TransformHelper<FPP,Cpu>* horzcat(const std::vector<TransformHelper<FPP,Cpu>*> & THs)
+	{
+		TransformHelper<FPP,Cpu> *C, *Ct;
+		std::vector<TransformHelper<FPP,Cpu>*> tTHs;
+		for(auto t: THs)
+			tTHs.push_back(t->transpose());
+		C = vertcat(tTHs);
+		Ct = C->transpose();
+		delete C;
+		for(auto t: tTHs)
+			delete t;
+		return Ct;
+	}
+
 }

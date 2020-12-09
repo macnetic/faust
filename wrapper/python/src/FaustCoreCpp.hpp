@@ -45,6 +45,7 @@
 #include "faust_Transform.h"
 #include <iostream>
 #include <exception>
+#include <vector>
 
 
 template<typename FPP, FDevice DEV>
@@ -86,6 +87,34 @@ template<typename FPP, FDevice DEV>
 FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::vertcat(FaustCoreCpp<FPP,DEV>* right) const
 {
     Faust::TransformHelper<FPP,DEV>* th = this->transform->vertcat(right->transform);
+    FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
+    return core;
+}
+
+template<typename FPP, FDevice DEV>
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::vertcatn(FaustCoreCpp<FPP,DEV>** rights, size_t n) const
+{
+//    Faust::TransformHelper<FPP,DEV>* th = this->transform->vertcat(right->transform);
+    Faust::TransformHelper<FPP,DEV>* th = nullptr;
+    std::vector<Faust::TransformHelper<FPP,DEV>*> ths;
+    ths.push_back(this->transform);
+    for(int i =0; i < n; i++)
+        ths.push_back(rights[i]->transform);
+    th = Faust::vertcat(ths);
+    FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
+    return core;
+}
+
+template<typename FPP, FDevice DEV>
+FaustCoreCpp<FPP,DEV>* FaustCoreCpp<FPP,DEV>::horzcatn(FaustCoreCpp<FPP,DEV>** rights, size_t n) const
+{
+//    Faust::TransformHelper<FPP,DEV>* th = this->transform->vertcat(right->transform);
+    Faust::TransformHelper<FPP,DEV>* th = nullptr;
+    std::vector<Faust::TransformHelper<FPP,DEV>*> ths;
+    ths.push_back(this->transform);
+    for(int i =0; i < n; i++)
+        ths.push_back(rights[i]->transform);
+    th = Faust::horzcat(ths);
     FaustCoreCpp<FPP,DEV>* core = new FaustCoreCpp<FPP,DEV>(th);
     return core;
 }
