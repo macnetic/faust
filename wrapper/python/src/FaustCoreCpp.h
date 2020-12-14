@@ -168,10 +168,16 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		FaustCoreCppGPU<FPP>* optimize_gpu(const bool transp=false);
 		FaustCoreCppGPU<FPP>* optimize_time_gpu(const bool transp=false, const bool inplace=false, const int nsamples=1);
 		void device_gpu(char* dev) const;
-		static FaustCoreCppGPU<FPP>* randFaustGPU(unsigned int t,
+		static FaustCoreCppGPU<FPP>* randFaustGPU(
+                unsigned int t,
 				unsigned int min_num_factors, unsigned int max_num_factors,
 				unsigned int min_dim_size,
 				unsigned int max_dim_size, float density, bool per_row);
+        static FaustCoreCppGPU<FPP>* randFaustGPU(int faust_nrows, int faust_ncols,
+                unsigned int t,
+                unsigned int min_num_factors, unsigned int max_num_factors,
+                unsigned int min_dim_size,
+                unsigned int max_dim_size, float density, bool per_row);
 
 		static FaustCoreCppGPU<FPP>* hadamardFaustGPU(unsigned int n, const bool norma);
 		static FaustCoreCppGPU<FPP>* fourierFaustGPU(unsigned int n, const bool norma);

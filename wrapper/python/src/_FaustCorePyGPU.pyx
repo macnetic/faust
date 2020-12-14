@@ -214,19 +214,24 @@ cdef class FaustCoreGPU:
         return (nbrow,nbcol)
 
     @staticmethod
-    def randFaust(t,field,min_num_factors, max_num_factors, min_dim_size,
+    def randFaust(faust_nrows, faust_ncols, t, field, min_num_factors, max_num_factors, min_dim_size,
                    max_dim_size, density=0.1, per_row=True, gpu=0):
         core = FaustCoreGPU(core=True)
         if(field == 3):
             core.core_faust_dbl = \
-            FaustCoreCy.FaustCoreCppGPU[double].randFaustGPU(t,min_num_factors, max_num_factors, min_dim_size,
+            FaustCoreCy.FaustCoreCppGPU[double].randFaustGPU(faust_nrows,
+                                                             faust_ncols,
+                                                             t, min_num_factors,
+                                                             max_num_factors, min_dim_size,
                    max_dim_size, density, per_row)
             core._isReal = True
             if(core.core_faust_dbl == NULL): raise MemoryError()
         elif(field == 4):
             raise ValueError("Complex rand Faust is not yet implemented on "
                              " GPU.")
-#            core.core_faust_cplx = FaustCoreCy.FaustCoreCpp[complex].randFaust(t,min_num_factors, max_num_factors, min_dim_size,
+#            core.core_faust_cplx =
+#            FaustCoreCy.FaustCoreCpp[complex].randFaust(faust_nrows,
+#            faust_ncols, t, min_num_factors, max_num_factors, min_dim_size,
 #                   max_dim_size, density, per_row)
 #            if(core.core_faust_cplx == NULL): raise MemoryError()
 #            core._isReal = False

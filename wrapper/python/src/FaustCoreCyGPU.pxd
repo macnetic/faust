@@ -9,6 +9,15 @@ cdef extern from "FaustCoreCpp.h":
         FaustCoreCppGPU[FPP]* normalize_gpu(int ord) const
 
         @staticmethod
+        FaustCoreCppGPU[FPP]* randFaustGPU(int faust_nrows, int faust_ncols,
+                                           unsigned int t,
+                                           unsigned int min_num_factors,
+                                           unsigned int max_num_factors,
+                                           unsigned int min_dim_size,
+                                           unsigned int max_dim_size,
+                                           float density, bool per_row)
+
+        @staticmethod
         FaustCoreCppGPU[FPP]* randFaustGPU(unsigned int t,
                                         unsigned int min_num_factors,
                                         unsigned int max_num_factors,

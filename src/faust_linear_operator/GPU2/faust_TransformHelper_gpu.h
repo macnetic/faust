@@ -79,6 +79,7 @@ namespace Faust
 				static TransformHelper<FPP,GPU2>* eyeFaust(unsigned int n, unsigned int m);
 				TransformHelper<FPP,GPU2>* pruneout(const int nnz_tres, const int npasses=-1, const bool only_forward=false);
 
+				static TransformHelper<FPP,GPU2>* randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 				static TransformHelper<FPP,GPU2>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 
 		};
