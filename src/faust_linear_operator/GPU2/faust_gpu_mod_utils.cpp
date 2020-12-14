@@ -57,7 +57,7 @@ namespace Faust {
 	{
 		if(this->gm_handle == nullptr)
 			if(gm_handle == nullptr)
-				this->gm_handle = gm_load_lib(libpath.c_str());
+				this->gm_handle = gm_load_lib(libpath.c_str(), silent);
 			else
 				this->gm_handle = gm_handle;
 		else
