@@ -583,3 +583,11 @@ void* _enable_gpu_mod(const char* libpath, const bool silent)
 #endif
 }
 
+bool _is_gpu_mod_enabled()
+{
+#ifdef USE_GPU_MOD
+    return Faust::is_gpu_mod_enabled();
+#else
+    return false;
+#endif
+}

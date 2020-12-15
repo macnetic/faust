@@ -186,6 +186,7 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 #endif
 
 void* _enable_gpu_mod(const char* libpath);
+bool _is_gpu_mod_enabled();
 
 #include "FaustCoreCpp.hpp"
 #include "FaustCoreCppGPU.hpp"

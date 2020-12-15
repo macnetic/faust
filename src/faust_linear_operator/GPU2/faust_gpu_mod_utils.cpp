@@ -22,14 +22,14 @@ namespace Faust {
 		this->singleton = nullptr;
 	}
 
-	GPUModHandler* GPUModHandler::get_singleton()
+	GPUModHandler* GPUModHandler::get_singleton(const bool silent/*=false*/)
 	{
 		if(GPUModHandler::singleton == nullptr)
 		{
 			GPUModHandler::singleton = new GPUModHandler();
 			// don't warn user at instantiation time about initializing the lib handler
 		}
-		else if(GPUModHandler::singleton->gm_handle == nullptr)
+		else if(GPUModHandler::singleton->gm_handle == nullptr && ! silent)
 		{
 			cerr << "WARNING: you must call enable_gpu_mod() before using GPUModHandler singleton." << endl;
 		}
@@ -82,6 +82,11 @@ namespace Faust {
 	{
 		if(gm_handle == nullptr)
 			throw std::runtime_error("Faust::enable_gpu_mod() must be called before any use of gpu_mod.");
+	}
+
+	bool GPUModHandler::is_gpu_mod_loaded() const
+	{
+		return gm_handle != nullptr && gp_funcs_ != nullptr && gp_funcs_->free_mat != nullptr;
 	}
 
 	gm_SparseMatFunc_double* GPUModHandler::spm_funcs(const double &d) const
@@ -152,6 +157,11 @@ namespace Faust {
 	void* enable_gpu_mod(const char* libpath, const bool silent)
 	{
 		return GPUModHandler::get_singleton()->enable_gpu_mod(libpath, silent);
+	}
+
+	bool is_gpu_mod_enabled()
+	{
+		return GPUModHandler::get_singleton(true)->is_gpu_mod_loaded();
 	}
 
 	void char2gm_Op(const char& c, gm_Op & op)

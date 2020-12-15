@@ -142,6 +142,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
             dev = kwargs['dev']
             if dev.startswith('gpu'):
                 is_on_gpu = True
+            check_dev(dev)
         if("core_obj" in kwargs.keys()):
             core_obj = kwargs['core_obj']
             if(core_obj):
@@ -2077,6 +2078,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         <b/> See also Faust.clone
         """
+        check_dev(dev)
         return F.clone(dev)
 
     def clone(F, dev='cpu'):
@@ -2089,6 +2091,7 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
         Returns:
             The Faust clone.
         """
+        check_dev(dev)
         if F.device == 'gpu':
              clone_F = Faust(core_obj=F.m_faust.clone(dev))
              return clone_F
@@ -2453,6 +2456,7 @@ def wht(n, normed=True, dev="cpu"):
           >>> wht(1024, normed=False).normalize() # which is less optimized though
 
     """
+    check_dev(dev)
     log2n = np.floor(np.log2(n))
     if(n > 2**log2n): raise ValueError("n must be a power of 2.")
     if(not isinstance(normed, bool)):
@@ -2529,6 +2533,7 @@ def eye(m,n=None,t='real', dev="cpu"):
             Faust size 5x4, density 0.2, nnz_sum 4, 1 factor(s):<br/>
             FACTOR 0 (complex) SPARSE, size 5x4, density 0.2, nnz 4<br/>
     """
+    check_dev(dev)
     if(t not in ['complex', 'real']):
         raise ValueError("t must be 'real' or 'complex'")
     if(n == None): n = m
@@ -2607,6 +2612,7 @@ def rand(num_rows, num_cols, num_factors=None, dim_sizes=None,
 
     <b/> See also Faust.__init__
     """
+    check_dev(dev)
     if(field == 'real'):
         is_real = True
     elif(field == 'complex'):
@@ -2691,8 +2697,14 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
         silent: if True nothing or almost will be displayed on loading (e.g.
         silent errors), otherwise all messages are visible.
     """
-    _FaustCorePy.FaustCore.enable_gpu_mod(libpaths, backend, silent, fatal)
+    return _FaustCorePy.FaustCore.enable_gpu_mod(libpaths, backend, silent, fatal)
 
+def is_gpu_mod_enabled():
+    return _FaustCorePy.FaustCore._is_gpu_mod_enabled()
+
+def check_dev(dev):
+    if dev.startswith('gpu') and not is_gpu_mod_enabled():
+        raise Exception('GPU device is not available on your environment.')
 
 # experimental block start
 import torch

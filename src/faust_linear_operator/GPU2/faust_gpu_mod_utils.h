@@ -56,10 +56,11 @@ namespace Faust
 
 		public:
 		~GPUModHandler();
-		static GPUModHandler* get_singleton();
+		static GPUModHandler* get_singleton(const bool silent=false);
 		void* enable_gpu_mod(const string& libpath, bool silent); //TODO: add backend argument: cuda (only available for now), opencl
 		void* enable_gpu_mod(const char* libpath, bool silent); //TODO: delete when python and matlab wrappers will use string
 		void check_gpu_mod_loaded() const;
+		bool is_gpu_mod_loaded() const;
 
 		// functions to access the good scalar type gpu_mod functions specifiying the type by argument value (templates are not possible here because of the C interface of the library)
 		// functions for sparse matrix (typically used in MatSparse<FPP,GPU2>)
@@ -85,6 +86,7 @@ namespace Faust
 
 	// easy access wrapper for the Faust namespace
 	void* enable_gpu_mod(const char* libpath = "libgm.so", const bool silent=true);
+	bool is_gpu_mod_enabled();
 	void char2gm_Op(const char& c, gm_Op & op);
 }
 #define load_all_mat_funcs(type) \
