@@ -547,12 +547,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
 
         See also Faust.__sub__
         """
-        if 'opt' not in kwargs or kwargs['opt']:
-            return F._add_opt(*args)
-        else:
-            return F._add_nonopt(*args)
-
-    def _add_opt(F, *args):
         array_types = (np.ndarray,
                        scipy.sparse.csr_matrix,
                        scipy.sparse.csc_matrix)
@@ -617,59 +611,6 @@ class Faust(numpy.lib.mixins.NDArrayOperatorsMixin):
                                        len(largs)+1)])
         C = F.concatenate(*largs, axis=1)
         F = C@Faust(id_vstack)
-        return F
-
-    def _add_nonopt(F, *args):
-        dev = F.device
-        for i in range(0,len(args)):
-            G = args[i]
-            if isinstance(G,Faust):
-                ve = ValueError("operands could not be broadcast"
-                       " together with shapes ", F.shape,
-                       G.shape)
-                if G.shape[0] == 1:
-                    if G.shape[1] != F.shape[1]:
-                        raise ve
-                    G = Faust(np.ones((F.shape[0], 1))) @ G
-                elif G.shape[1] == 1:
-                    if G.shape[0] != F.shape[0]:
-                        raise ve
-                    G = G @ Faust(np.ones((1, F.shape[1])))
-                if F.shape != G.shape:
-                    raise Exception('Dimensions must agree')
-                C = F.concatenate(G, axis=1)
-                # Id = np.eye(int(C.shape[1]/2))
-                Fid = eye(int(C.shape[1]/2), dev=dev)
-                #F = C*Faust(np.concatenate((Id,Id)),axis=0)
-                F = C@Fid.concatenate(Fid,axis=0)
-            elif isinstance(G,
-                            (np.ndarray,
-                             scipy.sparse.csr_matrix,
-                             scipy.sparse.csc_matrix)):
-                if(G.size == 1):
-                    if G.dtype == np.complex:
-                        F = F+(np.complex(G.squeeze()))
-                    else:
-                        F = F+(float(G.squeeze()))
-                elif G.ndim == 1:
-                    G = Faust([np.ones((F.shape[0], 1)), G.reshape(1, G.size)])
-                    if(F.shape[1] == 1):
-                        F = F@Faust(np.ones((1,F.shape[0])))
-                    F = F+G
-                else:
-                    F = F+Faust(G)
-            elif isinstance(G,(int, float, np.complex)):
-                if(F.shape[0] <= F.shape[1]):
-                    F = F+Faust([np.eye(F.shape[0], F.shape[1]),
-                                 np.ones((F.shape[1], 1))*G,
-                                 np.ones((1, F.shape[1]))])
-                else:
-                    F = F+Faust([np.eye(F.shape[1], F.shape[0]),
-                                 np.ones((F.shape[0], 1))*G,
-                                 np.ones((1, F.shape[0]))]).T
-            else:
-                raise Exception("Cannot add a Faust to something that is not a"
-                                " Faust, a matrix/array or a scalar.")
         return F
 
     def __radd__(F,lhs_op):
