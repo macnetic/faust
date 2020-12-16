@@ -2700,6 +2700,9 @@ def enable_gpu_mod(libpaths=None, backend='cuda', silent=False, fatal=False):
     return _FaustCorePy.FaustCore.enable_gpu_mod(libpaths, backend, silent, fatal)
 
 def is_gpu_mod_enabled():
+    """
+    Returns True if the gpu_mod plug-in has been loaded correctly, false otherwise.
+    """
     return _FaustCorePy.FaustCore._is_gpu_mod_enabled()
 
 def check_dev(dev):
