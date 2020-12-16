@@ -278,6 +278,7 @@ pages:
     tags:
         - linux
         - matlab
+        - pages
     only:
         - tags
 
@@ -306,7 +307,7 @@ pages:
         - echo GPU_MOD_SHA=$GPU_MOD_SHA
         - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build ]]; then mkdir build; fi; cd build; fi
           # don't build the lib if already installed
-        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..;L="/usr/local/lib/libgm-$GPU_MOD_SHA.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make;fi;fi
+        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi
         - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
     artifacts:
         expire_in: '1 week'
@@ -335,7 +336,7 @@ pkg_linux_purepy_rev:
         - echo GPU_MOD_SHA=$GPU_MOD_SHA
         - if [[ -n "$USE_GPU_MOD" ]]; then cd gpu_mod; if [[ ! -d build ]]; then mkdir build; fi; cd build; fi
           # don't build the lib if already installed
-        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..;L="/usr/local/lib/libgm-$GPU_MOD_SHA.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make;fi;fi
+        - if [[ -n "$USE_GPU_MOD" ]]; then cmake -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-9.2 -DCMAKE_CUDA_COMPILER=/usr/local/cuda-9.2/bin/nvcc ..;L=$HOME"/libgm-$GPU_MOD_SHA.so"; echo LIB=$L; if [[ -r "$L" ]]; then cp "$L" ./libgm.so; else make; cp ./libgm.so "$L";fi;fi
         - if [[ -n "$USE_GPU_MOD" ]]; then cd ../..; fi
     artifacts:
         expire_in: '50 yrs'
