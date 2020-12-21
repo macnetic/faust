@@ -801,18 +801,17 @@ template<typename FPP>
 FaustCoreCpp<FPP>* hierarchical2020_gpu2(FPP* mat, unsigned int num_rows, unsigned int num_cols, /* unsigned int nites*/PyxStoppingCriterion<double>* sc, PyxConstraintGeneric** constraints, unsigned int num_cons, unsigned int num_facts, double* inout_lambda, bool is_update_way_R2L, bool is_fact_side_left, bool use_csr, bool packing_RL, unsigned int norm2_max_iter, double norm2_threshold, bool is_verbose, bool constant_step_size, double step_size)
 {
     FaustCoreCpp<FPP>* core = nullptr;
-    Faust::TransformHelper<FPP,Cpu>* cpu_th = nullptr;
+    Faust::TransformHelper<FPP,Cpu>* cpu_th = nullptr, *cpu_th1 = nullptr;
     try
     {
         auto th = hierarchical2020_gen<FPP,GPU2>(mat,num_rows,num_cols, sc, constraints, num_cons, num_facts, inout_lambda, is_update_way_R2L, is_fact_side_left, use_csr, packing_RL, norm2_max_iter, norm2_threshold, is_verbose, constant_step_size, step_size, /* on_gpu*/false);
-	    if(is_verbose) th->display();
-		Faust::TransformHelper<FPP,GPU2>* th_times_lambda = th->multiply(inout_lambda[0]);
-        // delete th; // th_times_lambda is the same ptr as th
-//        th = th_times_lambda;
-		if(is_verbose) th->display();
-		cpu_th = new Faust::TransformHelper<FPP,Cpu>();
-		th->tocpu(*cpu_th);
-		delete th;
+        if(is_verbose) th->display();
+        Faust::TransformHelper<FPP,GPU2>* th_times_lambda = th->multiply(inout_lambda[0]);
+        if(is_verbose) th->display();
+        cpu_th = new Faust::TransformHelper<FPP,Cpu>();
+        th_times_lambda->tocpu(*cpu_th);
+        delete th;
+        delete th_times_lambda;
     }
     catch(std::logic_error& e)
     {
