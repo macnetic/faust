@@ -55,10 +55,11 @@ int main()
 	diagMat.conjugate();
 	display_all_elts(diagMat);
 	cout << "vec mul.:" << endl;
-	FPP vec_data[diagMat.getNbCol()];
+	FPP *vec_data = new FPP[diagMat.getNbCol()];
 	for(int i=0;i<diagMat.getNbCol();i++)
 		vec_data[i] = FPP(i);
 	const Faust::Vect<FPP,Cpu> v(diagMat.getNbCol(), vec_data);
+	delete[] vec_data;
 	Faust::Vect<FPP,Cpu> vr = diagMat.multiply(v);
 	vr.Display();
 	cout << "mat. mul.:" << endl;

@@ -222,10 +222,11 @@ void doit(HierarchicalFact<FPP,Cpu,FPP2>* hierFact, int argc, FPP expectedLambda
 		//relativeError 2
 		Faust::MatDense<FPP,Cpu> lapProduct, lapErr;
 		const Faust::MatDense<FPP,Cpu>& D(hierFactFFT->get_D());
-		FPP testD[Lap.getNbRow()];
+		FPP *testD = new FPP[Lap.getNbRow()];
 		hierFactFFT->get_D(testD);
 		for(int i=0;i<Lap.getNbRow();i++)
 			assert(testD[i] == D(i,i));
+		delete[] testD;
 		lapErr = hierFactCore.get_product();
 		lapProduct = hierFactCore.get_product();
 		lapProduct.transpose();
