@@ -828,13 +828,24 @@ class ParamsHierarchicalSquareMat(ParamsHierarchical):
 
     <b/> See also pyfaust.fact.hierarchical, pyfaust.demo.hadamard
     """
-    def __init__(self, n):
+    def __init__(self, n, proj_name='splincol'):
+        """
+        args:
+            n: the number of output factors (the input matrix to factorize must
+            be of shape (2**n, 2**n)) .
+            proj_name: the type of projector used, must be either
+            'splincol' (default value) or 'skperm'.
+        """
+        if proj_name not in ['skperm', 'splincol']:
+            raise ValueError('cons_name must be either splincol'
+                             ' or skperm')
+        cons_name = ConstraintName.str2name_int(proj_name)
         d = 2**int(n)
         stop_crit = StoppingCriterion(num_its=30)
         super(ParamsHierarchicalSquareMat,
-              self).__init__([ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,2)
+              self).__init__([ConstraintInt(ConstraintName(cons_name),d,d,2)
                                         for i in range(0,n-1)],
-                                        [ConstraintInt(ConstraintName(ConstraintName.SPLINCOL),d,d,int(d/2.**(i+1)))
+                                        [ConstraintInt(ConstraintName(cons_name),d,d,int(d/2.**(i+1)))
                                          for i in range(0,n-1)],
                                         stop_crit, stop_crit,
                                         is_update_way_R2L=True)
