@@ -5,52 +5,51 @@
 %>
 %> @b Usage
 %>
-%> &nbsp;&nbsp;&nbsp; @b rand(M,N) generates a M-by-N Faust object. The numbers of rows and columns of intermediary factors are all randomly chosen between M and N (included). The number of factors is 5. The factors are sparse and real. The nnz per row of factors is 5.
+%> &nbsp;&nbsp;&nbsp; @b rand(@b M,@b N) generates a M-by-N Faust object. The numbers of rows and columns of intermediary factors are all randomly chosen between M and N (included). The number of factors is 5. The factors are sparse and real. The nnz per row of factors is 5.
 %>
-%> &nbsp;&nbsp;&nbsp; @b rand(M, N, NF, S) with NF and S two integers, generates a M-by-N Faust of NF factors. The factor size is S for both dimensions (except the first factor number of rows and the last factor number of columns which are respectively M and N). The factors are sparse and real.
+%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S) with NF and S two integers, generates a M-by-N Faust of NF factors. The factor size is S for both dimensions (except the first factor number of rows and the last factor number of columns which are respectively M and N). The factors are sparse and real.
 %>
-%> &nbsp;&nbsp;&nbsp; @b rand(M, N, [N1, N2], S) same as above except that here the number of factors is randomly chosen between N1 and N2 inclusively.
+%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b 'num_factors', [@b N1, @b N2], @b 'dim_sizes', @b S) same as above except that here the number of factors is randomly chosen between N1 and N2 inclusively.
 %>
-%> &nbsp;&nbsp;&nbsp; @b rand(M, N, [N1, N2], [S1, S2]) or @b rand(M, N, NF, [S1, S2]) same as above except that here the intermediary factor dimension sizes are random; the number of rows and columns are both randomly chosen between S1 and S2 inclusively.
+%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b 'num_factors', [@b N1, N@b 2], [@b S1, @b S2]) or @b rand(@b M, N@b , @b 'num_factors', @b NF, @b 'dim_sizes', [@b S1, @b S2]) same as above except that here the intermediary factor dimension sizes are random; the number of rows and columns are both randomly chosen between S1 and S2 inclusively.
 %>
-%> &nbsp;&nbsp;&nbsp; @b rand(M, N, NF, S, D) or @b rand(M, N, [N1, N2], [S1, S2], D) same as above but specifying D the approximate density of each factor.
+%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S, @b 'density', @b D) or @b rand(@b M, @b N, @b 'num_factors', [@b N1, @b N2], @b 'dim_sizes', [@b S1, @b S2], @b 'density', @b D) same as above but specifying D the approximate density of each factor.
 %>
-%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b NF, @b S, @b {D, @b 'per_row'}) or @b rand(@b M, @b N, [@b N1, @b N2], [@b S1, @b S2], {@b D, @b 'per_row'}) same as above but specifying D, the density of each factor per row ('per_row') or per column ('per_col').
+%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S, @b 'density', @b D, @b 'per_row', @b true}) or @b rand(@b M, @b N, @b 'num_factors', [@b N1, @b N2], @b 'dim_sizes', [@b S1, @b S2], @b 'density',@b D, @b 'per_row', true) same as above but specifying D, the density of each factor per row ('per_row', true) or per column ('per_row', false).
 %>
-%> &nbsp;&nbsp;&nbsp; @b @b rand(@b M, @b N, NF, @b S, @b D, @b 'dense') or @b rand(@b M, @b N, @b [@b  N1, @b N2], [@b S1, @b S2], @b D, @b 'dense') same as above but generating only dense matrices as factors.
+%> &nbsp;&nbsp;&nbsp; @b @b rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S, @b 'density', @b D, @b 'fac_type', @b 'dense') or @b rand(@b M, @b N, @b 'num_factors', @b [@b  N1, @b N2], @b 'dim_sizes', [@b S1, @b S2], @b 'density', @b D, @b 'fac_type', @b 'dense') same as above but generating only dense matrices as factors.
 %>
-%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b NF, @b S, @b D, @b 'mixed') or @b rand(@b M, @b N, [@b N1, @b N2], [@b S1, @b S2], @b D, @b 'sparse') same as above but generating either sparse or dense matrices as factors.
+%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S, @b 'density', @b D, @b 'mixed') or @b rand(@b M, @b N, @b 'num_factors', [@b N1, @b N2], @b 'dim_sizes', [@b S1, @b S2], @b 'density', @b D, @b 'fac_type', @b 'sparse') same as above but generating either sparse or dense matrices as factors.
 %>
-%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b NF, @b S, @b D, @b 'sparse', @b 'complex'), @b rand(@b M, @b N,[@b N1, @b N2], [@b S1, @b S2], @b D, @b 'sparse', @b false), rand(@b M, @b N, @b NF, @b S, @b D, @b 'dense', @b 'complex') or @b rand(@b M, @b N, [@b N1, @b N2], [@b S1, @b S2], @b D, @b 'dense', @b 'complex') same as above but generating a complex Faust, that is, matrices defined over the complex field.
-%>
-%>
+%> &nbsp;&nbsp;&nbsp; @b rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S, @b 'density', @b D, @b 'fac_type', @b 'sparse', @b 'field' , @b 'complex'), @b rand(@b M, @b N, @b 'num_factors', [@b N1, @b N2], @b 'dim_sizes', [@b S1, @b S2], @b 'density', @b D, @b 'fac_type', @b 'sparse', @b 'per_row', @b false), rand(@b M, @b N, @b 'num_factors', @b NF, @b 'dim_sizes', @b S, @b 'density', @b D, @b 'fac_type', @b 'dense', @b 'field' , @b 'complex') or @b rand(@b M, @b N, @b 'num_factors', [@b N1, @b N2], @b 'dim_sizes', [@b S1, @b S2], @b D, @b 'fac_type', @b 'dense', @b 'field', @b 'complex') same as above but generating a complex Faust, that is, matrices defined over the complex field.
 %>
 %>
 %>
 %>
 %>
-%> @param num_rows (arg. 1) The number of rows of the random Faust.
-%> @param num_cols (arg. 2) The number of columns of the random Faust.
-%> @param num_factors (arg. 3, optional) If it's an integer it will be the number of random factors to set in the Faust.
-%>                    If num_factors is a vector of 2 integers then the
+%>
+%>
+%> @param M (arg. 1) The number of rows of the random Faust.
+%> @param N (arg. 2) The number of columns of the random Faust.
+%> @param 'num_factors', NF (optional) If it's an integer it will be the number of random factors to set in the Faust.
+%>                    If NF is a vector of 2 integers then the
 %>                    number of factors will be set randomly between
-%>                    num_factors(1) and num_factors(2) (inclusively).
-%> @param dim_sizes (arg. 4, optional) if it's an integer it will be the order of the square
-%> 					matrix factors (of size size_dims^2).
+%>                    NF(1) and NF(2) (inclusively).
+%> @param 'dim_sizes',S (optional) if it's an integer it will be the order of the square
+%> 					matrix factors (of size S^2).
 %> 					If it's a vector of 2 integers then the
 %> 					number of rows and columns will
 %> 					be a random number between size_dims(1) and
 %> 					size_dims(2) (inclusively).
-%> @param density	(arg. 5, optional) the approximate density of factors generated.
-%> 					It should be a floating point number between 0 and 1.
-%>					This argument can also be a cell array {D, 'per_row'} or {D, 'per_col'} to specify the density per row or per column.
-%>					By default the density is set per row and is such that the Faust's factors will have 5 non-zero elements per row.
-%> @param fac_type	(arg. 6 or 7, optional) the type of factors. Must be
-%>                 	'sparse', 'dense' or 'mixed' if you want a mix of dense and
-%>                  sparse matrices in the generated Faust (choice's done according
-%>                  to an uniform distribution).
-%>                  The default value is 'sparse'.
-%> @param field	(arg. 6 or 7, optional) 'real' or 'complex' to set the Faust field.
+%> @param 'density',D	(optional) the approximate density of generated factors.
+%> 				   D must be a floating point number between 0 and 1.
+%> @param 'per_row',bool (optional) this argument is to specify the density per row or per column.
+%>				    By default the density is set per row and is such that the Faust's factors will have 5 non-zero elements per row.
+%> @param fac_type, str (optional) the type of factors, str must be 'sparse', 'dense' or 'mixed' if you want a mix of dense and
+%>                  		sparse matrices in the generated Faust (choice's done according
+%>                  		to an uniform distribution).
+%>                  		The default value is 'sparse'.
+%> @param 'field', str	(optional) str is either 'real' or 'complex' to set the Faust field.
 %>                  The default value is 'real'.
 %>
 %>
@@ -74,7 +73,7 @@
 %> @b Example @b 2
 %> @code
 %> % in a matlab terminal
-%> >> G = matfaust.rand(10, 10, 2, 10, .5, 'mixed', 'complex')
+%> >> G = matfaust.rand(10, 10, 'num_factors', 2, 'dim_sizes', 10, 'density', .5, 'mixed', 'complex')
 %>
 %> G =
 %>
@@ -85,7 +84,7 @@
 %>
 %> @b Example @b 3
 %> @code
-%> >> H = matfaust.rand(10, 10, [2, 5], [10, 20], .5, 'dense')
+%> >> H = matfaust.rand(10, 10, 'num_factors', [2, 5], 'dim_sizes', [10, 20], 'density', .5, 'fac_type', 'dense')
 %>
 %> H =
 %>
@@ -98,7 +97,7 @@
 %>
 %> <p>@b See @b also Faust.Faust.
 %==========================================================================================
-function F = rand(varargin)
+function F = rand(M, N, varargin)
 	import matfaust.*
 	%> Identifies a complex Faust.
 	COMPLEX=3;
@@ -115,91 +114,97 @@ function F = rand(varargin)
 	if(nargin < 2)
 		error('matfaust.rand(): the number of arguments must be at least 2.')
 	end
-	num_rows = varargin{1};
-	num_cols = varargin{2};
-	field = REAL;
-	fac_type = SPARSE;
+	num_rows = M;
+	num_cols = N;
+	% default values
+	field = 'real';
+	fac_type = 'sparse';
 	per_row = true;
 	density = -1; % default density: 5 elements per row or per column for each factor
-	err_dens_not_num = 'matfaust.rand(): the argument 3 (density) must be a real number in [0;1] or a cell array of length 2 with density at first and ''per_row'' or ''per_col'' char array in second cell.';
 	min_num_factors = 5;
 	max_num_factors = 5;
 	min_dim_size = min(num_rows, num_cols);
 	max_dim_size = max(num_rows, num_cols);
-	if(nargin >= 3)
-		% set num of factors
-		num_factors = varargin{3};
-		if(isscalar(num_factors) && mod(num_factors,1) == 0)
-			min_num_factors = num_factors;
-			max_num_factors = num_factors;
-		elseif(ismatrix(num_factors) && size(num_factors, 1) == 1 && size(num_factors, 2) == 2)
-			min_num_factors = num_factors(1);
-			max_num_factors = num_factors(2);
-		else
-			error('matfaust.rand(): the argument 3 (num_factors) must be an integer or a vector of two integers.')
-		end
-		if(nargin >= 4)
-			% set sizes of factors
-			dim_sizes = varargin{4};
-			if(isscalar(dim_sizes) && mod(dim_sizes, 1) == 0)
-				min_dim_size = dim_sizes;
-				max_dim_size = dim_sizes;
-			elseif(ismatrix(dim_sizes) && size(dim_sizes,1) == 1 && size(dim_sizes,2) == 2)
-				min_dim_size = dim_sizes(1);
-				max_dim_size = dim_sizes(2);
-			else
-				error('matfaust.rand(): the argument 4 (dim_sizes) must be an integer or a vector of two integers.')
+	argc = length(varargin);
+	if(argc > 0)
+		for i=1:2:argc
+			if(argc > i)
+				% next arg (value corresponding to the key varargin{i})
+				tmparg = varargin{i+1};
 			end
-
-			if(nargin >= 5)
-				if(isscalar(varargin{5}) && isreal(varargin{5}))
-					density = varargin{5};
-				elseif(iscell(varargin{5}))
-					density_cell = varargin{5};
-					if(isreal(density_cell{1}))
-						density = density_cell{1};
-						if(length(density_cell) >= 2)
-							if(strcmp(density_cell{2}, 'per_row'))
-								per_row = true;
-							elseif(strcmp(density_cell{2}, 'per_col'))
-								per_row = false;
-							else
-								error('matfaust.rand(): when argument 5 (density) is a cell the first cell element must be a real number into [0;1] and the second a char array ''per_row'' or ''per_row''.')
-							end
-						end
+			switch(varargin{i})
+				case 'num_factors'
+					if(argc == i || ~ ismatrix(tmparg) || numel(tmparg) ~= 1 && any(size(tmparg) ~= [1 2]) || ~ any(isnumeric(tmparg)) || any(tmparg-floor(tmparg)) > 0 || any(tmparg <= 0))
+						error('num_factors keyword argument is not followed by an integer or an array of positive integers')
 					else
-						error(err_dens_not_num)
-					end
-				else
-					error(err_dens_not_num)
-				end
-				if(nargin >= 6)
-					for i=6:nargin
-						% set repr. type of factors ('sparse', 'dense', 'mixed') and field ('real' or 'complex')
-						if(nargin >= i)
-							err_unknown_arg6or5 = ['matfaust.rand(): the argument ' int2str(i) ' (fac_type) must be among a character array among ''sparse'', ''dense'', ''mixed'', ''real'', or ''complex''.'];
-							if(ischar(varargin{i}))
-								if(strcmp(varargin{i}, 'sparse'))
-									fac_type = SPARSE;
-								elseif(strcmp(varargin{i},'dense'))
-									fac_type = DENSE;
-								elseif(strcmp(varargin{i},'mixed'))
-									fac_type = MIXED;
-								elseif(strcmp(varargin{i}, 'real'))
-									field = REAL;
-								elseif(strcmp(varargin{i},'complex'))
-									field = COMPLEX;
-								else
-									error(err_unknown_arg6or5)
-								end
-							else
-								error(err_unknown_arg6or5)
-							end
+						if(isscalar(tmparg))
+							min_num_factors = tmparg;
+							max_num_factors = tmparg;
+						else % matrix
+							min_num_factors = tmparg(1);
+							max_num_factors = tmparg(2);
 						end
 					end
-				end
+				case 'dim_sizes'
+					if(argc == i || ~ ismatrix(tmparg) || numel(tmparg) ~= 1 && any(size(tmparg) ~= [1 2])|| ~ any(isnumeric(tmparg)) || any(tmparg-floor(tmparg)) > 0 || any(tmparg <= 0))
+						error('dim_sizes keyword argument is not followed by an integer or an array of positive integers')
+					else
+						if(isscalar(tmparg))
+							min_dim_size = tmparg;
+							max_dim_size = tmparg;
+						else % matrix
+							min_dim_size = tmparg(1);
+							max_dim_size = tmparg(2);
+						end
+					end
+				case 'density'
+					if(argc == i || ~ isscalar(tmparg) || ~ (tmparg >= 0))
+						error('density keyword argument is not followed by a positive number')
+					else
+						density = tmparg;
+					end
+				case 'fac_type'
+					if(argc == i || ~ strcmp(tmparg, 'dense') && ~ strcmp(tmparg, 'sparse') && ~ strcmp(tmparg, 'mixed'))
+						error('fac_type keyword argument is not followed by a valid value: dense, sparse or mixed.')
+					else
+						fac_type = tmparg;
+					end
+				case 'field'
+					if(argc == i || ~ strcmp(tmparg, 'real') && ~ strcmp(tmparg, 'complex'))
+						error('field keyword argument is not followed by a valid value: real, complex.')
+					else
+						field = tmparg;
+					end
+				case 'per_row'
+					if(argc == i || ~ islogical(tmparg))
+						error('per_row keyword argument is not followed by a logical')
+					else
+						per_row = tmparg;
+					end
+
+				otherwise
+					if((isstr(varargin{i}) || ischar(varargin{i}))  && (~ strcmp(tmparg, 'dense') && ~ strcmp(tmparg, 'sparse') && ~ strcmp(tmparg, 'mixed') && ~ strcmp(tmparg, 'real') && ~ strcmp(tmparg, 'complex')))
+						error([ tmparg ' unrecognized argument'])
+					end
 			end
 		end
+	end
+	% replace char array values integer values (for the C++ backend)
+	if(strcmp(fac_type, 'sparse'))
+		fac_type = SPARSE;
+	elseif(strcmp(fac_type,'dense'))
+		fac_type = DENSE;
+	elseif(strcmp(fac_type,'mixed'))
+		fac_type = MIXED;
+	else
+		error('fac_type has an unknown char array value.')
+	end
+	if(strcmp(field, 'real'))
+		field = REAL;
+	elseif(strcmp(field,'complex'))
+		field = COMPLEX;
+	else
+		error('field has an unknown char array value.')
 	end
 	e = MException('FAUST:OOM', 'Out of Memory');
 	if(field == COMPLEX)
