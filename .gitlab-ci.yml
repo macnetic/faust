@@ -15,6 +15,8 @@ stages:
 ctest:
     <<: *ctest_script
     variables: {SLOW_TESTS: "OFF", BUILD_MULTITHREAD: "ON"} # the CDashConfScript is able to retrieve OpenMP_gomp_LIBRARY and OpenMP_INC_DIR from environment (it's necessary on macOS, so the runner's env. must be configured)
+    script:
+        - if git log --oneline -n 1 --name-status | grep -E '\s+(src/|misc/test/src/C++)'; then ctest -O ctest.log -S ./CDashConfScript.cmake -j4; else echo 'nothing new to test in C++ code'; fi # C++ tests are executed only if something was modified in C++ lib or C++ tests
     except:
         - schedules
         - tags
