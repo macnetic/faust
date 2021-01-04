@@ -98,6 +98,9 @@ pkg_macos:
     except:
         - schedules
         - tags
+    needs:
+        - job: ctest_python
+        - job: ctest_matlab
 
 .win_build_gpu_mod: &win_build_gpu_mod
     before_script:
@@ -137,6 +140,9 @@ pkg_win:
     except:
         - schedules
         - tags
+    needs:
+        - job: ctest_python
+        - job: ctest_matlab
 
 .build_gpu_mod: &build_gpu_mod
     before_script:
@@ -170,6 +176,9 @@ pkg_linux:
     except:
         - schedules
         - tags
+    needs:
+        - job: ctest_python
+        - job: ctest_matlab
 
           # jobs triggered by git tag can force cpack to use the tag name as version but it's not necessary for MacOSX (not using cpack for that sys.)
           #it's done for linux packages
@@ -320,6 +329,9 @@ pkg_macos_purepy_rev:
     variables: {MATIO_STATIC_LIB_PATH: "/usr/local/lib/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/lib/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/lib/libhdf5.a", EXPERIMENTAL_PKG: "ON", BUILD_MULTITHREAD: "ON", NOPY2: "ON"}
     tags:
         - macos
+    needs:
+        - job: ctest_python
+
 
 pkg_linux_purepy_rev:
     extends: .pkg_purepy_rev
@@ -327,6 +339,8 @@ pkg_linux_purepy_rev:
     tags:
         - linux
         - tux_packager
+    needs:
+        - job: ctest_python
 
 .pkg_purepy_release:
     extends: .pkg_purepy
@@ -428,6 +442,8 @@ pkg_win_purepy_rev:
     except:
         - schedules
         - tags
+    needs:
+        - job: ctest_python
 
 pkg_win_purepy_release:
     extends: .pkg_win_purepy
