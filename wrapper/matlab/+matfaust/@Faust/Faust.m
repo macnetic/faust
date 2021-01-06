@@ -1008,6 +1008,20 @@ classdef Faust
 		end
 
 		%======================================================================
+		%> @brief Gives the memory size of the Faust in bytes.
+		%>
+		%>
+		%> @retval n Faust size in bytes.
+		%======================================================================
+		function n = nbytes(F)
+			if (F.isReal)
+				n = mexFaustReal('nbytes',F.matrix.objectHandle);
+			else
+				n = mexFaustCplx('nbytes',F.matrix.objectHandle);
+			end
+		end
+
+		%======================================================================
 		%> @brief The last index when slicing or indexing a Faust.
 		%>
 		%> This function overloads a Matlab built-in function.
