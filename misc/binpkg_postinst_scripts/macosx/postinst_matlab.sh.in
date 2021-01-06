@@ -58,6 +58,8 @@ fi
 if [[ ! -d "${MATLAB_ROOT}" ]]
 then
 	echo "Can't find Matlab root dir. Add MATLAB_ROOT/bin to the PATH environment variable (of admin. user)." | tee -a /tmp/log_faust_install >&2
+	echo "MATLAB_ROOT=${MATLAB_ROOT}" | tee -a /tmp/log_faust_install >&2
+	echo "MATLAB_BIN=${MATLAB_BIN}" | tee -a /tmp/log_faust_install >&2
 else
 	MATLAB_BIN="${MATLAB_ROOT}/bin/matlab"
 	# set path in system startup script
