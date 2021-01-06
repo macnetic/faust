@@ -1,6 +1,6 @@
 
 %================================================================
-%> Returns true if obj is a Faust object, false otherwise.
+%> @brief Returns true if obj is a Faust object, false otherwise.
 %===
 %>
 %> @b Example
