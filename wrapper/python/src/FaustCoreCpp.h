@@ -158,7 +158,9 @@ class FaustCoreCppGPU: public FaustCoreCpp<FPP, GPU2>
 		FaustCoreCppGPU<FPP>* clone_gpu(int dev_id=-1) const;
 		FaustCoreCpp<FPP,Cpu>* clone_cpu() const;
 		FaustCoreCppGPU<FPP>* horzcat_gpu(FaustCoreCppGPU<FPP>* right) const;
+        FaustCoreCppGPU<FPP>* horzcatn_gpu(FaustCoreCppGPU<FPP>** rights, size_t n) const;
 		FaustCoreCppGPU<FPP>* vertcat_gpu(FaustCoreCppGPU<FPP>* right) const;
+        FaustCoreCppGPU<FPP>* vertcatn_gpu(FaustCoreCppGPU<FPP>** rights, size_t n) const;
 		FaustCoreCppGPU<FPP>* slice_gpu(unsigned int start_row_id, unsigned int end_row_id, unsigned int start_col_id, unsigned int end_col_id) const;
 		FaustCoreCppGPU<FPP>* fancy_idx_gpu(unsigned long int* row_ids, unsigned long int
                                   num_rows, unsigned long int* col_ids,

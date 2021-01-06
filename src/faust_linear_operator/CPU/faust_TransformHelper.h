@@ -59,6 +59,7 @@
 #ifdef USE_GPU_MOD
 #include "faust_gpu_mod.h"
 #endif
+#include "faust_TransformHelper_cat.h"
 
 namespace Faust
 {
@@ -69,11 +70,6 @@ namespace Faust
 	template<typename FPP> class FaustGPU;
 #endif
 
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* vertcat(const std::vector<TransformHelper<FPP,Cpu>*> & THs);
-
-	template<typename FPP>
-		TransformHelper<FPP,Cpu>* horzcat(const std::vector<TransformHelper<FPP,Cpu>*> & THs);
 
 	template<typename FPP>
 		class TransformHelper<FPP,Cpu> : public TransformHelperGen<FPP,Cpu> {

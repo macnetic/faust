@@ -644,6 +644,87 @@ cdef class FaustCoreGPU:
          core._isReal = core.core_faust_dbl != NULL
          return core
 
+    cdef _vertcatn(self, Fs):
+        cdef FaustCoreCy.FaustCoreCppGPU[double]** _Fs
+#        cdef FaustCoreCy.FaustCoreCppGPU[complex]** _Fs_cplx
+
+        if self.isReal():
+            _Fs = <FaustCoreCy.FaustCoreCppGPU[double]**> PyMem_Malloc(sizeof(void*) *
+                                                               len(Fs))
+#        else:
+#            _Fs_cplx = <FaustCoreCy.FaustCoreCpp[complex]**> PyMem_Malloc(sizeof(void*) *
+#                                                               len(Fs))
+        for i, F in enumerate(Fs):
+            if F.isReal():
+                _Fs[i] = (<FaustCoreGPU?>F).core_faust_dbl
+#            else:
+#                _Fs_cplx[i] = (<FaustCore?>F).core_faust_cplx
+        core = FaustCoreGPU(core=True)
+        if(self._isReal):
+            core.core_faust_dbl = self.core_faust_dbl.vertcatn_gpu(_Fs, len(Fs))
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.vertcatn_gpu(_Fs_cplx,
+#                                                                 len(Fs))
+        core._isReal = core.core_faust_dbl != NULL
+        return core
+
+    def vertcatn(self, *args):
+        Fs = []
+        i = 0
+        any_complex = not self.isReal()
+        while i < len(args) and not any_complex:
+            any_complex = not args[i].isReal()
+            i+=1
+        for F in args:
+#            if F.isReal() and any_complex:
+#               F = (<FaustCore?>F)._ascomplex()
+            Fs += [F]
+#        if any_complex and self.isReal():
+#            self = (<FaustCore?>self)._ascomplex()
+        return self._vertcatn(Fs)
+
+    cdef _horzcatn(self, Fs):
+        cdef FaustCoreCy.FaustCoreCppGPU[double]** _Fs
+#        cdef FaustCoreCy.FaustCoreCpp[complex]** _Fs_cplx
+
+        if self.isReal():
+            _Fs = <FaustCoreCy.FaustCoreCppGPU[double]**> PyMem_Malloc(sizeof(void*) *
+                                                               len(Fs))
+#        else:
+#            _Fs_cplx = <FaustCoreCy.FaustCoreCpp[complex]**> PyMem_Malloc(sizeof(void*) *
+#                                                               len(Fs))
+        for i, F in enumerate(Fs):
+            if F.isReal():
+                _Fs[i] = (<FaustCoreGPU?>F).core_faust_dbl
+#            else:
+#                _Fs_cplx[i] = (<FaustCore?>F).core_faust_cplx
+        core = FaustCoreGPU(core=True)
+        # print("self.isReal():", self.isReal())
+        if self.isReal():
+            core.core_faust_dbl = self.core_faust_dbl.horzcatn_gpu(_Fs, len(Fs))
+#        else:
+#            core.core_faust_cplx = self.core_faust_cplx.horzcatn_gpu(_Fs_cplx,
+#                                                                 len(Fs))
+        core._isReal = core.core_faust_dbl != NULL
+        return core
+
+    def horzcatn(self, *args):
+        Fs = []
+        i = 0
+        any_complex = not self.isReal()
+        # print("any_complex:", any_complex)
+        while i < len(args) and not any_complex:
+            any_complex = not args[i].isReal()
+            i+=1
+        for F in args:
+#            if F.isReal() and any_complex:
+#               F = (<FaustCore?>F)._ascomplex()
+            Fs += [F]
+        # print("any_complex:", any_complex)
+#        if any_complex and self.isReal():
+#            self = (<FaustCore?>self)._ascomplex()
+        return self._horzcatn(Fs)
+
     def device(self):
         cdef char c_str[256]
         if(self._isReal):

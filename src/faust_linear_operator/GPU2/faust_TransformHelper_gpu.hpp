@@ -459,31 +459,6 @@ namespace Faust
 			return cpu_t;
 		}
 
-	template<typename FPP>
-		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::vertcat(const TransformHelper<FPP,GPU2>* G)
-		{
-			TransformHelper<FPP,Cpu> th;
-			TransformHelper<FPP,Cpu> thG;
-			this->tocpu(th);
-			G->tocpu(thG);
-			auto th_out = th.vertcat(&thG);
-			auto gpu_th_out = new TransformHelper<FPP,GPU2>(*th_out, -1, nullptr);
-			delete th_out;
-			return gpu_th_out;
-		}
-
-	template<typename FPP>
-		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::horzcat(const TransformHelper<FPP,GPU2>* G)
-		{
-			TransformHelper<FPP,Cpu> th;
-			TransformHelper<FPP,Cpu> thG;
-			this->tocpu(th);
-			G->tocpu(thG);
-			auto th_out = th.horzcat(&thG);
-			auto gpu_th_out = new TransformHelper<FPP,GPU2>(*th_out, -1, nullptr);
-			delete th_out;
-			return gpu_th_out;
-		}
 
 	template<typename FPP>
 		faust_unsigned_int TransformHelper<FPP,GPU2>::get_total_nnz() const
@@ -636,4 +611,8 @@ namespace Faust
 			delete cpu_faust;
 			return gpu_faust;
 		}
+
+
 }
+
+#include "faust_TransformHelper_cat_gpu.hpp"

@@ -5,6 +5,7 @@
 //#include "faust_Transform.h"
 #include "faust_TransformHelperGen.h"
 #include <memory>
+#include "faust_TransformHelper_cat_gpu.h"
 namespace Faust
 {
 	template<typename FPP, FDevice DEVICE> class TransformHelper;
@@ -82,7 +83,10 @@ namespace Faust
 				static TransformHelper<FPP,GPU2>* randFaust(int faust_nrows, int faust_ncols, RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 				static TransformHelper<FPP,GPU2>* randFaust(RandFaustType t, unsigned int min_num_factors, unsigned int max_num_factors, unsigned int min_dim_size, unsigned int max_dim_size, float density=.1f, bool per_row=true);
 
+
 		};
+
+
 }
 #include "faust_TransformHelper_gpu.hpp"
 #endif

@@ -151,6 +151,18 @@ FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::vertcat_gpu(FaustCoreCppGPU<FPP>* ri
 }
 
 template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::vertcatn_gpu(FaustCoreCppGPU<FPP>** rights, size_t n) const
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::vertcatn((FaustCoreCpp<FPP, GPU2>**)rights, n);
+}
+
+template<typename FPP>
+FaustCoreCppGPU<FPP>* FaustCoreCppGPU<FPP>::horzcatn_gpu(FaustCoreCppGPU<FPP>** rights, size_t n) const
+{
+	return (FaustCoreCppGPU<FPP>*) FaustCoreCpp<FPP, GPU2>::horzcatn((FaustCoreCpp<FPP, GPU2>**)rights, n);
+}
+
+template<typename FPP>
 void  FaustCoreCppGPU<FPP>::device_gpu(char* dev) const
 {
 	//TODO: get the device id
