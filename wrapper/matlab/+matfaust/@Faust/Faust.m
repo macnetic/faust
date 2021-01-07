@@ -1957,14 +1957,14 @@ classdef Faust
 					end
 					if(C.isReal)
 						if(~ isreal(A))
-							C = complex(C)
+							C = complex(C);
 							C = matfaust.Faust(C, mexFaustCplx(mex_func_name, C.matrix.objectHandle, A.matrix.objectHandle));
 						else
 							C = matfaust.Faust(C, mexFaustReal(mex_func_name, C.matrix.objectHandle, A.matrix.objectHandle));
 						end
 					else
 						if(isreal(A))
-							A = complex(A)
+							A = complex(A);
 						end
 						C = matfaust.Faust(C, mexFaustCplx(mex_func_name, C.matrix.objectHandle, A.matrix.objectHandle));
 					end
