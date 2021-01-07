@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "$0 -- FAµST Matlab wrapper post-install script START" | tee -a /tmp/log_faust_install
+
 function inject_matlab_code_to_update_path
 {
 	# each line must contains the word faust (for filtering of old install lines)
@@ -61,7 +63,9 @@ then
 	echo "MATLAB_ROOT=${MATLAB_ROOT}" | tee -a /tmp/log_faust_install >&2
 	echo "MATLAB_BIN=${MATLAB_BIN}" | tee -a /tmp/log_faust_install >&2
 else
+	echo "MATLAB_ROOT=$MATLAB_ROOT" | tee -a /tmp/log_faust_install
 	MATLAB_BIN="${MATLAB_ROOT}/bin/matlab"
+	echo "MATLAB_BIN=$MATLAB_BIN" | tee -a /tmp/log_faust_install
 	# set path in system startup script
 	STARTUP_DIR="${MATLAB_ROOT}/toolbox/local/"
 	STARTUP_FILE=${STARTUP_DIR}/startup.m
@@ -69,9 +73,13 @@ else
 	[[ -r "$STARTUP_FILE" ]] && (grep -i -v faust "$STARTUP_FILE" > "${STARTUP_FILE}.tmp"; mv "${STARTUP_FILE}.tmp" "$STARTUP_FILE")
 	FAUST_MATLAB_WRAPPER_PATH="@CMAKE_INSTALL_MATLAB_PREFIX@"
 	#echo "addpath(genpath('"$FAUST_MATLAB_WRAPPER_PATH"'))" >> "$STARTUP_FILE"
+	echo "MATLABRC=$MATLABRC" | tee -a /tmp/log_faust_install
+	echo "STARTUP_FILE=$STARTUP_FILE" | tee -a /tmp/log_faust_install
 	inject_matlab_code_to_update_path $STARTUP_FILE
 	# add a line to force startup execution into matlabrc
 	# except if the line is already in the file
 	[[ -r "$MATLABRC" ]] && grep -q "$MATLABRC_RUN_STARTUP_CMD" "$MATLABRC"  || (echo "$MATLABRC_RUN_STARTUP_CMD" >> $MATLABRC)
 	# inject_matlab_code_to_update_user_paths # disabled because it's too intrusive and maybe redundant
 fi
+
+echo "$0 -- FAµST Matlab wrapper post-install script END" | tee -a /tmp/log_faust_install
