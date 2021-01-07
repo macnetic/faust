@@ -1,0 +1,831 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,IE=9,chrome=1"><meta name="generator" content="MATLAB R2018b"><title>Untitled</title><style type="text/css">.rtcContent { padding: 30px; } .S0 { margin: 2px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: normal; text-align: left;  }
+.S1 { margin: 20px 10px 5px 4px; padding: 0px; line-height: 20px; min-height: 0px; white-space: pre-wrap; color: rgb(60, 60, 60); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 20px; font-weight: bold; text-align: left;  }
+.S2 { margin: 15px 10px 5px 4px; padding: 0px; line-height: 18px; min-height: 0px; white-space: pre-wrap; color: rgb(60, 60, 60); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 17px; font-weight: bold; text-align: left;  }
+.S3 { margin: 10px 0px 20px; padding-left: 0px; font-family: Helvetica, Arial, sans-serif; font-size: 14px;  }
+.S4 { margin-left: 56px; line-height: 21px; min-height: 0px; text-align: left; white-space: pre-wrap;  }
+.CodeBlock { background-color: #F7F7F7; margin: 10px 0 10px 0;}
+.S5 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 4px 4px 0px 0px; padding: 6px 45px 4px 13px; line-height: 17.234001159668px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S6 { color: rgb(64, 64, 64); padding: 10px 0px 6px 17px; background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box; font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px; overflow-x: hidden; line-height: 17.234001159668px;  }
+.embeddedOutputsErrorElement {min-height: 18px; max-height: 250px; overflow: auto;}
+.embeddedOutputsErrorElement.inlineElement {}
+.embeddedOutputsErrorElement.rightPaneElement {}
+.embeddedOutputsWarningElement{min-height: 18px; max-height: 250px; overflow: auto;}
+.embeddedOutputsWarningElement.inlineElement {}
+.embeddedOutputsWarningElement.rightPaneElement {}
+.diagnosticMessage-wrapper {font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 12px;}
+.diagnosticMessage-wrapper.diagnosticMessage-warningType {color: rgb(255,100,0);}
+.diagnosticMessage-wrapper.diagnosticMessage-warningType a {color: rgb(255,100,0); text-decoration: underline;}
+.diagnosticMessage-wrapper.diagnosticMessage-errorType {color: rgb(230,0,0);}
+.diagnosticMessage-wrapper.diagnosticMessage-errorType a {color: rgb(230,0,0); text-decoration: underline;}
+.diagnosticMessage-wrapper .diagnosticMessage-messagePart {white-space: pre-wrap;}
+.diagnosticMessage-wrapper .diagnosticMessage-stackPart {white-space: pre;}
+.embeddedOutputsTextElement,.embeddedOutputsVariableStringElement {white-space: pre; word-wrap: initial; min-height: 18px; max-height: 250px; overflow: auto;}
+.textElement,.rtcDataTipElement .textElement {padding-top: 3px;}
+.embeddedOutputsTextElement.inlineElement,.embeddedOutputsVariableStringElement.inlineElement {}
+.inlineElement .textElement {}
+.embeddedOutputsTextElement.rightPaneElement,.embeddedOutputsVariableStringElement.rightPaneElement {min-height: 16px;}
+.rightPaneElement .textElement {padding-top: 2px; padding-left: 9px;}
+.S7 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 0px; padding: 6px 45px 4px 13px; line-height: 17.234001159668px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.variableValue { width: 100% !important; }
+.embeddedOutputsMatrixElement,.eoOutputWrapper .matrixElement {min-height: 18px; box-sizing: border-box;}
+.embeddedOutputsMatrixElement .matrixElement,.eoOutputWrapper .matrixElement,.rtcDataTipElement .matrixElement {position: relative;}
+.matrixElement .variableValue,.rtcDataTipElement .matrixElement .variableValue {white-space: pre; display: inline-block; vertical-align: top; overflow: hidden;}
+.embeddedOutputsMatrixElement.inlineElement {}
+.embeddedOutputsMatrixElement.inlineElement .topHeaderWrapper {display: none;}
+.embeddedOutputsMatrixElement.inlineElement .veTable .body {padding-top: 0 !important; max-height: 100px;}
+.inlineElement .matrixElement {max-height: 300px;}
+.embeddedOutputsMatrixElement.rightPaneElement {}
+.rightPaneElement .matrixElement,.rtcDataTipElement .matrixElement {overflow: hidden; padding-left: 9px;}
+.rightPaneElement .matrixElement {margin-bottom: -1px;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer,.eoOutputWrapper .matrixElement .valueContainer,.rtcDataTipElement .matrixElement .valueContainer {white-space: nowrap; margin-bottom: 3px;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer .horizontalEllipsis.hide,.embeddedOutputsMatrixElement .matrixElement .verticalEllipsis.hide,.eoOutputWrapper .matrixElement .valueContainer .horizontalEllipsis.hide,.eoOutputWrapper .matrixElement .verticalEllipsis.hide,.rtcDataTipElement .matrixElement .valueContainer .horizontalEllipsis.hide,.rtcDataTipElement .matrixElement .verticalEllipsis.hide {display: none;}
+.embeddedOutputsVariableMatrixElement .matrixElement .valueContainer.hideEllipses .verticalEllipsis, .embeddedOutputsVariableMatrixElement .matrixElement .valueContainer.hideEllipses .horizontalEllipsis {display:none;}
+.embeddedOutputsMatrixElement .matrixElement .valueContainer .horizontalEllipsis,.eoOutputWrapper .matrixElement .valueContainer .horizontalEllipsis {margin-bottom: -3px;}
+.eoOutputWrapper .embeddedOutputsVariableMatrixElement .matrixElement .valueContainer {cursor: default !important;}
+.embeddedOutputsVariableElement {white-space: pre-wrap; word-wrap: break-word; min-height: 18px; max-height: 250px; overflow: auto;}
+.variableElement {}
+.embeddedOutputsVariableElement.inlineElement {}
+.inlineElement .variableElement {}
+.embeddedOutputsVariableElement.rightPaneElement {min-height: 16px;}
+.rightPaneElement .variableElement {padding-top: 2px; padding-left: 9px;}
+.variableNameElement {margin-bottom: 3px; display: inline-block;}
+.matrixElement .horizontalEllipsis,.rtcDataTipElement .matrixElement .horizontalEllipsis {display: inline-block; margin-top: 3px; width: 30px; height: 12px; background-repeat: no-repeat; background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAJCAYAAADO1CeCAAAAJUlEQVR42mP4//8/A70xw0i29BUDFPxnAEtTW37wWDqakIa4pQDvOOG89lHX2gAAAABJRU5ErkJggg==");}
+.matrixElement .verticalEllipsis,.textElement .verticalEllipsis,.rtcDataTipElement .matrixElement .verticalEllipsis,.rtcDataTipElement .textElement .verticalEllipsis {margin-left: 35px; width: 12px; height: 30px; background-repeat: no-repeat; background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAZCAYAAAAIcL+IAAAALklEQVR42mP4//8/AzGYgWyFMECMwv8QddRS+P//KyimlmcGUOFoOI6GI/UVAgDnd8Dd4+NCwgAAAABJRU5ErkJggg==");}
+.S8 { margin: 10px 10px 9px 4px; padding: 0px; line-height: 21px; min-height: 0px; white-space: pre-wrap; color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 14px; font-weight: normal; text-align: left;  }
+.S9 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 0px none rgb(0, 0, 0); border-radius: 4px 4px 0px 0px; padding: 6px 45px 0px 13px; line-height: 17.234001159668px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S10 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 0px none rgb(0, 0, 0); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 0px; padding: 0px 45px 4px 13px; line-height: 17.234001159668px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S11 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 0px none rgb(0, 0, 0); border-bottom: 0px none rgb(0, 0, 0); border-radius: 0px; padding: 0px 45px 0px 13px; line-height: 17.234001159668px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S12 { margin: 10px 10px 5px 4px; padding: 0px; line-height: 18px; min-height: 0px; white-space: pre-wrap; color: rgb(60, 60, 60); font-family: Helvetica, Arial, sans-serif; font-style: normal; font-size: 15px; font-weight: bold; text-align: left;  }
+.S13 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 4px; padding: 6px 45px 4px 13px; line-height: 17.234001159668px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S14 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 0px none rgb(0, 0, 0); border-radius: 0px; padding: 6px 45px 0px 13px; line-height: 17.234001159668px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }
+.S15 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 0px 0px 4px 4px; padding: 6px 45px 4px 13px; line-height: 17.234001159668px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, 'Courier New', monospace; font-size: 14px;  }</style></head><body><div class = rtcContent><div  class = 'S0'></div><h2  class = 'S1'><span>How to Manipulate a Faust</span></h2><div  class = 'S0'><span></span></div><div  class = 'S0'><span>This livescript is intended to gently introduce the operations available to manipulate a Faust object. It comes after the first livescript (available </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_creation.mlx"><span>here</span></a><span> for download or </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_creation.html"><span>here</span></a><span> as a web page), so it's assumed you already know how to create a Faust object from one way or another.</span></div><div  class = 'S0'><span>Keep in mind that a full API doc is available </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust.html"><span>here</span></a><span> every time you need details. In particular the Faust class is documented </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html"><span>here</span></a><span>.</span></div><div  class = 'S0'><span style=' font-weight: bold;'>NOTE</span><span>: the livescript is made to be executed sequentially, otherwise, skipping some cells, you would end up on an import error.</span></div><div  class = 'S0'><span></span></div><h3  class = 'S2'><span>Table of Contents:</span></h3><div  class = 'S0'><span></span></div><div  class = 'S0'><span>1. Getting Basic Information about a Faust Object</span></div><div  class = 'S0'><span>1.1 Obtaining Dimension and Scalar Type Information</span></div><div  class = 'S0'><span>1.2 Obtaining Other Faust Specific Information</span></div><div  class = 'S0'><span>1.3 Plotting a Faust</span></div><div  class = 'S0'><span>1.4 About Sparsity!</span></div><div  class = 'S0'><span>2. Faust Algebra and other Operations</span></div><div  class = 'S0'><span>2.1 Transpose, conjugate, transconjugate</span></div><div  class = 'S0'><span>2.2 Add, Subtract and Multiply</span></div><div  class = 'S0'><span>2.3 Faust Multiplication by a Vector or a Matrix</span></div><div  class = 'S0'><span>2.4 Faust Norms</span></div><div  class = 'S0'><span>2.5 Faust Normalizations</span></div><div  class = 'S0'><span>2.6 Faust Concatenation</span></div><div  class = 'S0'><span>2.7 Faust Indexing and Slicing</span></div><div  class = 'S0'><span></span></div><h3  class = 'S2'><span>1. Getting Basic Information about a Faust Object</span></h3><div  class = 'S0'><span></span></div><div  class = 'S0'><span>First of all, given any object, you might ask yourself if it's a Faust or not (typically when you receive an object in a function, matlab being built on dynamic types, you can't say for sure it's a Faust). </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#ac5d5fbe66ef212a1c7043b78504f87fc"><span>Faust.isFaust()</span></a><span> is the function to verify an object is a Faust. Its use is straighforward as you can see in the documentation. Note by the way, that a more accessible alias is available at the package root </span><span style=' font-family: monospace;'>(matfaust.isFaust</span><span>).</span></div><div  class = 'S0'><span></span></div><h3  class = 'S2'><span>1.1 Obtaining Dimension and Scalar Type Information</span></h3><div  class = 'S0'><span></span></div><div  class = 'S0'><span>Firstly, let's list basic Faust informative methods/attributes you're probably used to for matlab matrices:</span></div><ul  class = 'S3'><li  class = 'S4'><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a7146c7de95b35efc570a377765edda27"><span>size</span></a><span>,</span></li><li  class = 'S4'><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#af62f554cd8b491a2c75ee06019f87d8a"><span>numel</span></a><span>,</span></li><li  class = 'S4'><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a7527e1fda21bc1678646a4b40db28eb6"><span>isreal</span></a><span>.</span></li></ul><div  class = 'S0'><span>To keep it really clear, let's show some examples operated on a random Faust.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>F = matfaust.rand(5,10)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="966668C8" data-scroll-top="null" data-scroll-left="null" data-testid="output_0" data-width="926" data-height="104" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">F = </span></div><div>Faust size 5x10, density 3.7, nnz_sum 185, 5 factor(s): 
+- FACTOR 0 (real) SPARSE, size 5x10, density 0.5, nnz 25
+- FACTOR 1 (real) SPARSE, size 10x6, density 0.666667, nnz 40
+- FACTOR 2 (real) SPARSE, size 6x9, density 0.555556, nnz 30
+- FACTOR 3 (real) SPARSE, size 9x9, density 0.555556, nnz 45
+- FACTOR 4 (real) SPARSE, size 9x10, density 0.5, nnz 45</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>size(F)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="253C2C58" data-scroll-top="null" data-scroll-left="null" data-testid="output_1" data-width="926" style="width: 956px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="matrixElement veSpecifier" style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 926px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">ans = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">1×2</span></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:44,&quot;totalColumns&quot;:2,&quot;totalRows&quot;:1,&quot;charsPerColumn&quot;:6}" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="variableValue" style="width: 90px; white-space: pre; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">     5    10
+</div><div class="horizontalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div><div class="verticalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div></div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>numel(F)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 50</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>isreal(F)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="B36889E1" data-scroll-top="null" data-scroll-left="null" data-testid="output_3" data-width="926" data-height="34" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = <span class="headerElement">logical</span></span></div><div>   1
+</div></div></div></div></div></div><div  class = 'S8'><span>If the attributes printed out above seem not clear to you, you're probably not a Matlab user. Anyway you'll find all descriptive informations in the FAµST API documentation (see the links above).</span></div><div  class = 'S0'><span>As a complement, you can also refer to the Matlab API documentation:</span></div><ul  class = 'S3'><li  class = 'S4'><a href = "https://www.mathworks.com/help/matlab/ref/size.html"><span>size</span></a></li><li  class = 'S4'><a href = "https://www.mathworks.com/help/matlab/ref/numel.html"><span>numel</span></a></li><li  class = 'S4'><a href = "https://www.mathworks.com/help/matlab/ref/isreal.html"><span>isreal</span></a></li></ul><div  class = 'S0'><span>About size, it's noteworthy that contrary to what Matlab is capable of on an array, you cannot </span><a href = "https://www.mathworks.com/help/matlab/ref/reshape.html"><span>reshape</span></a><span> a Faust.</span></div><h3  class = 'S2'><span></span></h3><h3  class = 'S2'><span>1.2 Obtaining Other Faust Specific Information</span></h3><div  class = 'S0'><span></span></div><div  class = 'S0'><span>As you've seen in this livescript and the first one, when you print a Faust object, several pieces of information appear. Most of them are also available independently with specific functions.</span></div><div  class = 'S0'><span>For instance, if you want information about factors, nothing is more simple than calling directly the next functions:</span></div><ul  class = 'S3'><li  class = 'S4'><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a5e77419460592366457aa60175472e2e"><span>numfactors()</span></a><span> ; which gives you the number of factors (aka layers) a Faust object is composed of.</span></li><li  class = 'S4'><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a65a84416b4b1fd050654a02232e95d2f"><span>factors()</span></a><span> ; which allows you to copy any of the Faust's factors givens its index.</span></li></ul><div  class = 'S0'><span>Going back to our F object, let's call these functions:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>numfactors(F)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 5</div></div></div></div><div  class = 'S8'><span>For example, try to copy the third factor:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>f3 = factors(F, 3)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="5FE9FC04" data-scroll-top="null" data-scroll-left="null" data-testid="output_5" data-width="926" data-height="440" data-hashorizontaloverflow="false" style="width: 956px; max-height: 451px;"><div class="textElement"><div><span class="variableNameElement">f3 = </span></div><div>   (1,1)       0.4445
+   (2,1)       0.7386
+   (3,1)       0.8996
+   (5,1)       0.7525
+   (6,1)       0.3492
+   (5,2)       0.8700
+   (6,2)       0.0345
+   (1,3)       0.1148
+   (2,3)       0.9154
+   (3,3)       0.1409
+   (5,3)       0.3150
+   (6,3)       0.0677
+   (1,4)       0.0300
+   (2,4)       0.0864
+   (3,4)       0.0184
+   (4,4)       0.8315
+   (1,5)       0.3195
+   (3,5)       0.6342
+   (4,5)       0.5401
+   (5,5)       0.7264
+   (1,6)       0.0206
+   (6,6)       0.4736
+   (2,7)       0.6442
+   (4,7)       0.8710
+   (5,7)       0.2015
+   (2,8)       0.6851
+   (4,8)       0.1751
+   (3,9)       0.5870
+   (4,9)       0.2351
+   (6,9)       0.2876
+</div></div></div></div></div></div><div  class = 'S8'><span>Note that, since Faust 2.3, the function doesn't alterate the factor format. If the Faust object contains a sparse factor then you'll receive a sparse matrix.</span></div><div  class = 'S0'><span>Since Faust 2.3 again, it's possible to retrieve a sub-sequence of Faust factors.</span></div><div  class = 'S0'><span>Go straight to the example, extracting factors from F:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>factors(F, 3:4)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="F02A29A9" data-scroll-top="null" data-scroll-left="null" data-testid="output_6" data-width="926" data-height="62" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 6x9, density 1.38889, nnz_sum 75, 2 factor(s): 
+- FACTOR 0 (real) SPARSE, size 6x9, density 0.555556, nnz 30
+- FACTOR 1 (real) SPARSE, size 9x9, density 0.555556, nnz 45</div></div></div></div></div></div><div  class = 'S8'><span>Hmm... something is different from the previous example. We indeed received a Faust as return type, great! You've just learned another way to create a Faust from another, additionally to what you've seen in the first </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_manipulation.html"><span>livescript</span></a><span>.</span></div><div  class = 'S0'><span>Without this function, you'd surely have written something similar to:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S9'><span style="white-space: pre;"><span>import </span><span style="color: rgb(160, 32, 240);">matfaust.Faust</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>Faust({factors(F, 3), factors(F, 4)})</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="5F503923" data-scroll-top="null" data-scroll-left="null" data-testid="output_7" data-width="926" data-height="62" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 6x9, density 1.38889, nnz_sum 75, 2 factor(s): 
+- FACTOR 0 (real) SPARSE, size 6x9, density 0.555556, nnz 30
+- FACTOR 1 (real) SPARSE, size 9x9, density 0.555556, nnz 45</div></div></div></div></div></div><div  class = 'S8'><span>OK, that's not awful but I let you imagine how much complicated it is with more factors.</span></div><div  class = 'S0'><span></span></div><h3  class = 'S2'><span>1.3 Plotting a Faust</span></h3><div  class = 'S0'><span></span></div><div  class = 'S0'><span>Available soon!</span></div><div  class = 'S0'><span></span></div><h3  class = 'S2'><span>1.4 About Sparsity!</span></h3><div  class = 'S0'><span></span></div><div  class = 'S0'><span>Three functions of the Faust class are here to evaluate the sparsity of a Faust object.</span></div><div  class = 'S0'><span>Let's call the first one:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>nnz_sum(F)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 185</div></div></div></div><div  class = 'S8'><span>I'm sure you guessed exactly what the function returns, if you doubt it, here is the doc: </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a7dc7f3cb86b02b3c2cd725387c34300d"><span>Faust.nnz_sum()</span></a><span>. The smaller </span><span style=' font-family: monospace;'>nnz_sum</span><span>, the sparser the Faust.</span></div><div  class = 'S0'><span>Next comes the function: </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#ac33ff53bbff16f93666acec05031511b"><span>Faust.density()</span></a><span>.</span></div><div  class = 'S0'><span>This function along with its reciprocal </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#aff3261319b63c49d51a699726edc74bc"><span>Faust.rcg()</span></a><span> can give you a big hint on how much your Faust is potentially optimized both for storage and calculation. The sparser the Faust, the larger the Relative Complexity Gain (RCG)!</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>density(F)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 3.7000</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>rcg(F)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 0.2703</div></div></div></div><div  class = 'S8'><span>According to its RCG, this Faust doesn't seem to be of any help for optimization but look at the graphic the next script generates:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S9'><span style="white-space: pre;"><span>nfactors = 3;</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>startd = 0.01;</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>endd = 1;</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>dim_sz = 1000;</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>ntests = 10;</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>sizes = zeros(ntests, 1);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>rcs = zeros(ntests, 1);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>densities = linspace(startd, endd, ntests);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span style="color: rgb(0, 0, 255);">for </span><span>i=1:ntests</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>   d = densities(i);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>   F = matfaust.rand(dim_sz, dim_sz, </span><span style="color: rgb(160, 32, 240);">'num_factors'</span><span>, nfactors, </span><span style="color: rgb(160, 32, 240);">'density'</span><span>, d, </span><span style="color: rgb(160, 32, 240);">'fac_type'</span><span>, </span><span style="color: rgb(160, 32, 240);">'sparse'</span><span>);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>   sizes(i) = nbytes(F);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>   rcs(i) = density(F);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span style="color: rgb(0, 0, 255);">end</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>plot(rcs, sizes)</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>legend(</span><span style="color: rgb(160, 32, 240);">'size'</span><span>)</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>xlabel(</span><span style="color: rgb(160, 32, 240);">'Density'</span><span>)</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>ylabel(</span><span style="color: rgb(160, 32, 240);">'Faust Size (bytes)'</span><span>)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsFigure" uid="234B7E16" data-scroll-top="null" data-scroll-left="null" data-testid="output_11" style="width: 956px;"><div class="figureElement"><div class="figureContainingNode" style="width: 560px; max-width: 100%; display: inline-block;"><div class="GraphicsView" data-dojo-attach-point="graphicsViewNode,backgroundColorNode" id="uniqName_197_0" widgetid="uniqName_197_0" style="width: 100%; height: auto;"><img class="ImageView figureImage" data-dojo-attach-point="imageViewNode" draggable="false" ondragstart="return false;" id="uniqName_197_2" widgetid="uniqName_197_2" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAYAAAAv7h+nAAAgAElEQVR4AezBD3zfBWHn/1c+tW3GY5LMzeiw36yDC2/dco+ctmwk3V1cRaSij8hJogUNYAHB6yM9UkCGtEg7fZyyfrfmwQmbMLxwjxUTTom4Q71bNcwkCC0uDzO3t+F81KRDDP+SutEUbPv79e7BHXOi/G3zTd7PZ3E4IiIiosIURERERFSYgoiIiIgKUxARERFRYQoiIiIiKkxBRERERIUpiIiIiKgwBREREREVpiAiIiKiwhREREREVJiCiIiIiApTEBEREVFhCiIiIiIqTEFEREREhSmIiIiIqDAFERERERWmICIiIqLCFMRR95d/+Zds3bqVrVu3snXrVvbv309EREQ8fwVx1P27f/fvuOSSS+js7GRmZobq6moiIiLi+SuIo+7Vr341r33ta7n99tvp6uqiqqqKiIiIeP4K4pgYHx/nJz/5CfX19URERMQLUxAvm8HBQf7oj/6IZ/vUpz5FR0cH73//+/mbv/kbnnHHHXfwnve8h4iIiHjhCuIlm5mZ4eqrr+ayyy7jqaee4hnf+ta3+Lu/+ztuv/12rr32Wq699lqe8Xd/93e88Y1vJCIiIl64gnhedu3axejoKM/42te+xuTkJEccd9xxnHvuuVx22WU823333ceaNWsoioI3velNPPXUU+zbt48jent7WbRoEREREfHCFcTzsnLlSn74wx8yOjrK1772NV73utdRKpU4YvHixfz2b/829fX1PNvMzAy1tbU841d+5VfYt28fERER8dIUxPN2xhlnsHPnTh577DGampr4RZYsWcKBAwd4xuzsLEuWLCEiIiJemoJ43r7yla+wevVqXvva1zI6Osov8sY3vpH77ruPIx577DGeeOIJfu3Xfo2IiIh4aQrieXnggQf49V//dZqamjjttNN45JFHmJyc5OdZs2YNP/rRj+js7OQDH/gAl19+OUVREBERES9NQXDw4EHWrl2LbZ7LW97yFpqamnjGaaedRqlU4tlaW1u5+uqrecbixYv57Gc/y2c+8xm+/OUvc+aZZxIREREvXUHwn//zf2bfvn0cOnSIV8Iv//Ivs2jRIiIiIuLlUbDAPfDAAzz11FP8m3/zb4iIiIjKULCA/dM//RM333wzXV1d/Dytra1IQhKSkIQkJCEJSUhCEpKQ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kdbWVu6++25OOeUUNm3axBE33ngj7373u/nLv/xLfu/3fo/e3l4CCiIiIhaQvs5GDm9bzeFtqzm8bTWHt63m8LbVHN62msPbVnN422oOb1vN4W2rObxtNYe3rebwttUc3raaw9tWc3jbag5vW83hbas5vG01h7et5vC21RzetprD21ZzeNtqDm9bzeFtqzm8bTWHt63m8LbV9HU28oyuri6+9KUv0dzczMzMDIcPH+YZX/rSl/jHf/xH1q5dyxF/8zd/ww033MCaNWvo6+vjkUceIaAgIiIijqp7772XP/uzP+Oee+7hnnvu4bvf/S5H/OhHP+Kmm27i+uuv5xknnngiH/vYx7j77rvZtm0bb3/72wkoiIiIiKNqyZIlnHXWWaxfv57Fixdz0kknccRtt93Gvn37WLt2LWeffTaPPPIIH/nIR9i2bRsXXHABmzdv5uSTTyagICIiIo6q97znPfzVX/0Vf/qnf8p//+//nerqai644AK++93v8s1vfpM77riDO+64g9e+9rW87nWv46tf/Sq33norAwMD1NTUEFAQERERUWEKIiIiIipMQURExDz2+te/HklIQhKSkIQkJCEJSUhCEpKQhCQkIQlJSEISkpCEJCQhCUlIQhKSkIQkJCEJSUhCEpKQhCQkIQlJSEISkpCEJCQhCUlIQhKSkIQkJPH617+ehaggIiJiHhscHMQ2trGNbWxjG9vYxja2sY1tbGMb29jGNraxjW1sYxvb2MY2trGNbWxjG9vYxja2sY1tbGMb29jGNraxjW1sYxvb2MY2trGNbWxjG9sMDg6yEBVEREREVJiCiIiIiApTEBEREVFhCiIiIiIqTEFEREREhSmIiIiIqDAFERERERWmICIiIqLCFERERERUmIKIiIiIClMQERER81L/6BTff9snmZyeZb4piIiIiHmno3eM7oFxSkOfplRbzXxTEBEREfPGyJ4ZSluGWFazlMnNq1g8O818VBARERHzQvfAOB29Y5TbGii3NTCfFURERERFm5yepblnF3tnDjDctYL2pjrmu4KIiIioWP2jU9RvHaa9qY6+zkZKtdUsBAXz2MGDB7n66qt53/vex/ve9z5s89MuvPBC1q5dy9q1a7n++uuJiIioBJPTs3T0jtE9MM7Epha6W+tZSArmsa9+9assWbKEz3/+85x//vn8yZ/8Cc+2f/9+Dh48yI4dO9ixYwdXXHEFERERc93InhlaenazrGYpk5tXUaqtZqEpmMde//rXc/7553PE8ccfz3HHHcezfe973+OEE05gYGCAwcFBDh06xHORhCQksWHDBiIiIo6F7oFxOnrHKLc1UG5r4Kdt2LABSUhCEvNVwTz2lre8heXLl/OpT32KK6+8knPPPZdne+ihh3jsscdYsmQJX//617nyyit5LraxjW22b99ORETE0TQ5PUtzzy72zhxguGsF7U11/Czbt2/HNraxzXxVMI/t27ePgwcP8tGPfpS77rqLq666ioMHD/KMNWvWcNNNN7FmzRo+/vGP8+1vf5sDBw4QERExl/SPTlG/dZj2pjr6Ohsp1Vaz0BXMY+VymTvvvJMjjjvuOJ5++mkOHTrEwYMHefzxx7n55pvZuXMnR/z4xz/m0KFDLF68mIiIiLlgcnqWjt4xugfGmdjUQndrPfF/FMxjF110Ebfddhvr1q3jnHPOYf369SxevJjvf//7nH766bzzne/kxhtvZP369VxwwQVs2rSJoiiIiIg41kb2zNDSs5tlNUuZ3LyKUm018f8UzGNveMMbuPPOO7nlllv4whe+wHvf+16OaGhoYNeuXZxwwgn09/dzww03cMcdd7B69WoiIiKOte6BcTp6x+jrbKTc1kD8SwURERExJ0xOz1LaMsTemQMMd62geXkN8bMVRERExDFXHpygfusw5bYG+jobKdVWE8+tICIiIo6ZyelZOnrH6B+dYmJTC+1NdcQvVhARERHHRP/oFC09u1lWs5SRrpWUaquJ56cgIiIijrrugXG6B8bp62yk3NZAvDAFERERcdRMTs9S2jLE3pkDDHetoHl5DfHCFURERMRRUR6coH7rMOW2Bvo6GynVVhMvTkFERES8oianZ+noHaN/dIqJTS20N9URL01BREREvGL6R6do6dnNspqljHStpFRbTbx0BREREfGK6B4Yp3tgnL7ORsptDcTLpyAiIiJeVpPTs5S2DLF35gCTm1fRvLyGeHkVRERExMumPDhBS89uym0N9HU2Eq+MgoiIiHjJJqdnae7ZRf/oFMNdK2hvqiNeOQURERHxkvSPTtHSs5v2pjpGulZSqq0mXlkFERER8aJ19I7RPTBOX2cj3a31xNFREBERES/YyJ4ZSluGOGJy8yqal9cQR09BREREvCDlwQk6esco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84Mf/IBvfvObjIyM8Mgjj/CLnHPOORxx8skn88QTT/Bs3/ve9zjhhBMYGBhgcHCQQ4cO8VwkIQlJbNiwgYiIuag8OEFH7xjltgb6OhuJhWfDhg1IQhKSmK8KKsDs7Cy33HILZ5xxBhdeeCE333wzt956K+eddx6///u/z2c+8xn279/PT3vXu95FU1MT+/fv55prrqGzs5Nne+ihh3jsscdYsmQJX//617nyyit5LraxjW22b99ORMRcMjk9S3PPLvpHpxjuWkF7Ux2xMG3fvh3b2MY281XBHPf0009zySWXUF1dzRe/+EX+x//4H3zuc5/jxhtv5HOf+xz/83/+T0qlEhs2bOBHP/oRP+2ee+7hoosuYs2aNZx33nk825o1a7jppptYs2YNH//4x/n2t7/NgQMHiIioJP2jU7T07Ka9qY6RrpWUaquJmO8K5rhXvepV3HrrrZx77rns2bOHc845h0OHDvH+97+ftrY2tmzZwrvf/W7+7M/+jNe+9rU827333svtt9/OZz/7WU477TSecfDgQR5//HFuvvlmdu7cyRE//vGPOXToEIsXLyYiolJ09I7RPTBOX2cj3a31RCwUBXNcVVUVVVVVHNHT08PFF1/M6Ogoxx13HMPDw3znO99h//79HFEUBc/W19fH5OQkF198MR/84Afp7u7miO9///ucfvrpvPOd7+TGG29k/fr1XHDBBWzatImiKIiImOtG9sxQ2jLEEZObV9G8vIaIhaSggjzyyCOceuqp3HfffbztbW+jqqqK448/nieffJKfpVwuc9ddd3Hbbbdx2223US6XOaKhoYFdu3Zxwgkn0N/fzw033MAdd9zB6tWriYiY68qDE3T0jlFua6Cvs5GIhaiggjQ1NXHdddexY8cO3vrWt/KVr3yFRx55hNe85jVERMx3k9OzNPfson90iuGuFbQ31RGxUBVUkMsvv5yTTz6ZT37yk9TX1/PDH/6QG264gaqqKiIi5rP+0SlaenbT3lTHSNdKSrXVRCxkBRXkl37pl/id3/kdvvnNbzI0NMSb3vQmfuM3foOIiPmso3eM7oFx+job6W6tJyKgoILs3LmTTZs2MTU1xYMPPsgDDzzAlVdeSUTEfDSyZ4bSliGW1SxlcvMqmpfXEBH/R0EFuf322+np6eHUU0+lqqqKj3zkIzz00EPMzs4SETGfdA+M09E7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s5m2xhoiIha6LVu2IAlJSGKxKogPxDa2sc0jjzxCLGwDoxM09x5l1YqlHO5aS211FRERi8EjjzyCbWxjm8WqIKLMdA+O0z04Tn9nAz2t9URExMJTEFEmSpPT1N7/HK9PzTDctYam1SuIiIiFqSBYv349O3bsIBavnqFjNPcepae1nv7OBmqrq4iIiIWrIGIRK01O0943xsDoBMNda2hrrCEiIha+gohFamB0gubeo3z+U8s53LWW2uoqIiJicSiIWITa+8boHhynv7OB7vV1RETE4lIQsYgcfm2K2vufY17pnnU0rV5BREQsPgURi0TP0DHa+8boaa2nv7OBiIhYvAoiFrjS5DRNvSMMjE4w3LWGtsYaIiJicSuIWMAGRido7j1KW2MNh7vWUltdRURELH4FEQtUe98Y3YPj9Hc20L2+joiIKB8FEQvM4demqL3/OeaV7llH0+oVREREeSmIWEB6ho7R3jdGT2s9/Z0NREREeSqIWABKk9M09Y4wMDrBcNca2hpriIiI8lUQcZEbGJ2gufcobY01HO5aS211FRERUd4KIi5Spclp2vvG6B4cZ7hrDd3r64iIiJhXEHEROvzaFM29R1m1Yimle9ZRW11FRETEOQURF5nuwXHa+8boaa2np7WeiIiIdyuIuEiUJqdp6h3h9akZhrvW0NZYQ0RExHspiLgIDIxOULd7mLbGGvo7G6itriIiIuL9FER8gkqT07T3jdE9OM6xnc10r68jIiLiFymI+IQcfm2K5t6jrFqxlNI966itriIiIuKDKIj4BHQPjtPeN0ZPaz09rfVERET8MgoiPkalyWmaekd4fWqG4a41tDXWEBER8csqiPiYDIxOULd7mLbGGvo7G6itriIiIuLDKIi4wEqT07T3jdEzdIxjO5vpXl9HRETER1EQcQENjE7Q3HuUVSuWcrhrLbXVVURERHxUBREXSPfgON2D4/R3NtDTWk9ERMT5UhBxnpUmp6m9/zlen5phuGsNTatXEBERcT4VRJxHPUPHqNs9TE9rPf2dDdRWVxEREXG+FUScB6XJadr7xhgYneDYzmbaGmuIiIi4UAoiPqKB0Qmae4+yasVSDnetpba6ioiIiAupIOIj6B4cp3twnP7OBnpa64mIiPg4FER8CKXJaWrvf47Xp2YY7lpD0+oVREREfFwKIn5JPUPHqNs9TE9rPf2d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6NAhtm/fTjm74YYbaGxs5MyZM9x99910dnZS7m644QYaGxs5c+YMd999N52dnbzTG2+8wfHjx6msrOTQoUNs376dcva5z32O1atX8+CDD7J9+3ZuuukmFpOCeE+VlZXMzMxwzvT0NJWVlZSryspKZmZmOGd6eprKykrOaWlp4fHHH6elpYV7772XF198kZmZGSI+qJaWFh5//HFaWlq49957efHFF5mZmaGc/fCHP+T222+npaWFb37zmwT88Ic/5Pbbb6elpYVvfvObvFNLSwuPP/44LS0t3Hvvvbz44ovMzMxQrk6dOsXs7Cx33XUXTz31FH/6p3/K7Owsi0VBvKerrrqKI0eOMO/48eOcPHmSyy+/nHJ11VVXceTIEeYdP36ckydPcvnllzM7O8uJEyfYu3cvBw8eZN7p06eZm5ujoqKCiF9kdnaWEydOsHfvXg4ePMi806dPMzc3R0VFBeXq+eefZ//+/ezZs4cvfelLBDz//PPs37+fPXv28KUvfYlzZmdnOXHiBHv37uXgwYPMO336NHNzc1RUVFCuenp6ePLJJ5m3bNky3n77bebm5lgsCuI9tbS08Oabb9LZ2cnNN9/MnXfeSVEUlKuWlhbefPNNOjs7ufnmm7nzzjspioJXX32VjRs3cv311/PYY49xxx13cOutt7Jz506KoiDiF3n11VfZuHEj119/PY899hh33HEHt956Kzt37qQoCspVf38/pVKJb33rW3zjG9+gu7ubctff30+pVOJb3/oW3/jGN+ju7mbeq6++ysaNG7n++ut57LHHuOOOO7j11lvZuXMnRVFQrm6//XaeeOIJ/vAP/5DNmzdzxx13UFFRwWJREO+poqKCPXv28Oijj/L000+zadMmyllFRQV79uzh0Ucf5emnn2bTpk3Mq6+vZ2RkhJUrVzIwMMADDzzAwMAAGzZsIH5m/fr17Nixg/iZ9evXs2PHDs6pr69nZGSElStXMjAwwAMPPMDAwAAbNmygnPX09PDUU0/xxBNP8MQTT9DT00O56+np4amnnuKJJ57giSeeoKenh3n19fWMjIywcuVKBgYGeOCBBxgYGGDDhg2Us9/6rd/iySef5K/+6q8YGBjga1/7GotJQfxcl156KZdccgnxM5deeimXXHIJ72f58uUsWbKEiA9r+fLlLFmyhIgPa/ny5SxZsoT4meXLl3PJJZew2BRERERELDAFEREREQtMQURERMQCUxARERGxwBRERERELDAFEREf0o9//GOuvvpqvvCFL7Bhwwauu+46/uIv/oJTp05xvoyMjPDtb3+beX/9139NRMS8goiIj+DXfu3XOHToEAcPHuR73/seS5Ys4U/+5E84Xz7zmc+we/du5vX19RERMa8gIuI8Wbp0Kdu3b2dsbIwf//jHDAwMcMMNN7Bp0yb27t3LvBdeeIEHHniAb3/721x77bXcdtttzMzM8D//8z90dnayceNGvvzlL/ODH/yAea+88gq9vb3ceOONvPXWW2zcuJH//M//5M477+TIkSOc82d/9meMjo4SEeWhICLiPPqVX/kVrrzySmzzz//8zwwMDPBP//RPDA0N8fzzz3PmzBmefPJJdu7cyfe//31++tOf8oMf/IAnn3wSSTz77LP09vbS39/PvJmZGf77v/+b/fv3c+mll/Lss8/ym7/5mzQ1NfHkk08y76233mJkZITPfOYzRER5KIiIOM/efvttRkZGuPTSS/n7v/97/u7v/o5LL72UgwcPMu/zn/88K1eu5JJLLqGxsZETJ06wZs0a/vVf/5U///M/p1Qq8Z3vfIefp6WlheHhYd5++20OHjxIS0sLRVEQEeWhICLiPPrf//1f/uM//oPly5dTXV1NTU0NNTU1/O7v/i7XXXcd85YuXcq7ffazn+V73/sev/3bv813v/tdvvKVr/DTn/6U97Ns2TLWrVvHv//7v3PgwAF+//d/n4goHwUREefJW2+9xa5du9iwYQMNDQ2cPn2ar3zlK3z1q1+lVCoxMzPD+9m7dy/PP/88X/3qV3n00Uc5efIkJ06c4J2WLFnC3Nwc5/zBH/wB/f39nD59miuvvJKIKB8FEREfwYkTJ/jCF77AF7/4RTo6OviN3/gNdu/ezbXXXsuqVav4vd/7PTZv3kypVKKpqYn388UvfpFHH32UW265ha997Wtcd9111NTU8E6f+9zn+PKXv8x//dd/Me+zn/0sx44dY9OmTUREeSmIiPiQPvWpT/Hyyy9z6NAhvv/97/PUU0+xbds2li5dyry7776bf/mXf+Fv//Zvefjhh1myZAnXXnstDz30EOds3bqVjo4OrrzySp5++mn+8i//kn/4h3/g3nvvZd7atWt57LHHmPf444/z7LPPcsUVVzBvbm6Ooii4/vrriYjyUhARcQFVVFRQVVXFB7FkyRJ+/dd/nV/91V/lF3nxxRf5oz/6I37nd36H5cuXExHlpSAiYgG68sor+eM//mO2bdtGRJSfgoiIBai6uprGxkaWLFlCRJSfgoiIiIgFpiAiIiJigSmIiIiIWGAKIiIiIhaYgoiIiIgFpiAiIiJigSmIiIiIWGAKIiIiIhaYgoiIiIgFpiAiIiJigSmIiIiIWGAKIiIiIhaYgoiIiIgF5v8A4tt04blIwEIAAAAASUVORK5CYII=" style="width: 100%; height: auto;"></div></div></div></div></div></div></div><div  class = 'S8'><span>Isn't it obvious now that the smaller the density the better?! Indeed, for two Faust objects of the same shape and the same number of factors, a smaller density (linearly) implies a smaller file size for storage. This point applies also to the memory (RAM) space to work on a Faust.</span></div><div  class = 'S0'><span>We'll see later how the computation can benefit of a bigger RCG (or smaller density). But let's point out right now that the sparsity is often a tradeoff with accuracy, as the following plot shows about the truncated SVD of a matrix </span><span style="vertical-align:-5px"><img src="data:image/png;base64,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" width="85" height="19" /></span><span>. Note beforehand that the SVD of M (truncated or not) can be seen as a Faust which approximates M.</span></div><div  class = 'S0'><span></span></div><div  class = 'S0'><img src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAABILUlEQVR42u2dCXgV5dm/i2EVBFGw4EJitUDUfgha1KpBXEDcxX5qtUi1oqBAUKriUsF+4FpF60e1Iu4iVYl1LWpVoLJpBVzKvi/ijp8bi+Lz7+9t3/znTGbOkgRykrnv65oryck5c2Z55n3uebf5gQEAAABAovgBhwAAAAAAAQQAAAAABBAAAAAAEEAAAAAAQAABAAAAAAEEAAAAAAQQAAAAABBAAAAAAEAAAQAAAAABBAAAAAAEEAAAAAAQQAAAAABAAAEAAAAAAQQAAABAAO+//377wQ9+UL4UFBRYmzZt7IwzzrBFixZV+guGDx/u1lcZnn/+eff5KAoLC61v377b/IB169Yt5TgFF21TUgnHT6NGjeyHP/yhHXHEEXb99dfbhx9+mD9B/6/tC8bVP//5T/f38uXLa2ybJkyYYPvss481btzYbd+cOXMiYz4u9oKLzkVt54477rCHH3642te7YcMGd4xuuOGGjO9VPFxwwQW29957u/PSsmVL+8lPfuJee//99917iouLbc8997Tvv/8+dj1dunSxtm3b2nfffWfz589POVf169e3nXfe2bp27WqXXnqp+3918te//tU6d+5s22+/vfs+/V3bOOigg6xnz55k6yx58MEH7c4778zpMz4uH3vssWqLOx/jces85JBD3P87dOiQ9XoPPfRQKy0trbDdUctTTz2V8tnXXnvNzjvvPHc9NGzY0L1n3bp1Fb5j3rx5NmTIENt///2tefPm7vo87LDDKqwvF6644orIbWzRokWF995888128sknW7t27dx74mL/z3/+s51++umu/FH5VFRUZH369LGlS5emvG/jxo22++6721133ZVZAPVzxowZ7mCNHDnSmjRpYrvssot99tln21wAL7744tjPzp4925YsWVIjAvijH/3IHaPwom1KugD6+Jk6dao9+eST7kJSkO+000728ssv58W2avtWr15d/vcTTzzhtl0xXxN89NFH1qBBAzvxxBNt8uTJbvu+/vrryJgPxtuvf/1rt92TJk1KeV3rq+3stddeWyXpZyuAy5Ytc8LXsWNH+9Of/mSvvvqqlZWV2f/8z/84CdRxFrfccotb3yuvvBK5nrffftv9f9iwYSkJa+jQoW4d06ZNs2effdauu+46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7if7xT6xT+wT54p9Yp8AAQQAAAAABBAAAAAAEEAAAAAAQAABAAAAEEDYhowZM8aKioqsUaNG1qVLF5s6dWra9z/55JNWXFxsDRs2dD/LyspS/v/999+7Drht27a1xo0bW7du3ey9997L232655577LDDDrMdd9zRLUcddZTNmjUr5T19+/atMCP8QQcdlLf7dP/990fOYr9hw4Yqnfua3i/FUtR+HXfccXlzrqZMmWInnHCCi39991NPPZXxM5MnT3b7rmOw55572l133VXl67Qm92nixIl29NFHW6tWrWyHHXawgw8+2CZNmpTyHpUR4fP0wx/+MG/36bXXXouMvfnz5+dUPubTPkVdK1r22WefvDlP119/vR144IHWrFkza926tZ188sm2YMGCjJ+rDXkKEMAaZcKECdagQQMbO3aszZs3z0pLS61p06a2cuXKyPdPnz7dCgoK3EWpgk8/69evbzNnzix/z4033ugKfSWBd99918444wx3kX3xxRd5uU9nnXWWS65z5sxx+3TuuedaixYtbM2aNSkF5bHHHmvr1q0rXz799NO8PU8SwObNm6dsr5aqrDMf9kvHPLg/KrAVj9rffDlXL7zwgl199dUu/rNJwsuWLbPtt9/e7buOgY6FjokSWL6cq1z3Sdt300032RtvvGGLFi2yK6+80m3/7NmzU8Ri3333TTlPH330Ud6eJy+ACxcuTNnm7777LqfyMZ/2SU+3CO6LnnSx0047uXOTL+epZ8+e7vrWtT537lw7/vjjrV27dvbVV1/FfqY25ClAAGucrl27Wv/+/VNe69ixow0bNizy/aeffrpLruEL9Mwzzyy/q2rTpo27uDwaii+huvvuu/Nyn8KoQFfB8OCDD6ZIhe48a8t5UoGpY741j1M+nKvRo0e7cxVMBjV9rlIKtiyS8OWXX+72OciFF17oas3y6Vzlsk9RqFbpuuuuSxGLTp061Zrz5AVw/fr1se/JVD7m+3nS++vVq2crVqzIy/MkJJ/aN9V2VvY85EOeAgSwRtm0aZO7SwpXjQ8ePNhKSkoiP7PHHnvYbbfdlvKa/tYdmVi6dKm7OIN3+uKkk06yc845Jy/3KYzuANUk8Oyzz6ZIhQoHNUH8+Mc/tvPPP98+/PDDvD1PEkB9Rudlt912c3fNwXNSHccpH87VfvvtZ/369Ut5rSbPVWWS8OGH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eOGF7veysjK3vq+//poTCQAIIABAdQjgT37yEzv++OPtxhtvtN12280WL15cYfn444/LBVBNxkFGjx7t+gN61JT8+uuv27XXXuvWrdo79e3LRQCfeeYZa9GihX3zzTeuSfr888/nJAIAAggAUB0C6AeB3HffffbSSy+5plf13YsjGwEMohpBSeWtt94auR3HHHOMDRw4MPJzu+66q/uc+hROnz6dkwgACCAAQK4CGDcNzAknnOCESzV3hx12mBO8SZMmORGcNm2aXX311W5QSDYCOHPmTLdevX/lypX2+OOPW8OGDe2FF16IFEANAPnpT3/qvku1jME5CTWwRJ/t2LEjJxAAEEAAgMoIYHAiaDXLaiJo1fwFpUuDOwYNGuRq3xo0aGB77LGHnX322bZq1aqsBHDevHnWs2dPt/5GjRpZ+/bt7c4770zZjqAALly40A4++GBr0qSJ27Zg7ePSpUvda+qbCACAAAIAJAD1I5SsfvDBBxwMAEAAAQDqMpqGRgNPNAn1WWedxQEBAAQQAKCuc//997upZ7p06eL6KwIAIIAAAAAAgAACAAAAAAIIAAAAAAggAAAAACCAAAAAAIAAAgAAAAACCAAAAAAIIAAAAAAggAAAAAAIIAAAAAAggAAAAACAAAIAAAAAAggAAAAACCAAAAAAIIAAAAAAkBf8PwxregtdjfnYAAAAAElFTkSuQmCC" width = "524" height = "425" alt = "" style = "vertical-align: baseline"></img></div><div  class = 'S0'><span>Here is the script to reproduce the last figure with pyfaust: </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/test_svd_rc_vs_err.py"><span>test_svd_rc_vs_err.py</span></a></div><div  class = 'S0'><span></span></div><h3  class = 'S2'><span>2. Faust Algebra and other Operations</span></h3><div  class = 'S0'><span></span></div><div  class = 'S0'><span>In order to write some nice algorithms using Faust objects, you'll have to use the basic "stable" operations a Faust is capable of. Let's make a tour of them.</span></div><div  class = 'S0'><span></span></div><h4  class = 'S12'><span>2.1 Transpose, conjugate, transconjugate</span></h4><div  class = 'S0'><span></span></div><ul  class = 'S3'><li  class = 'S4'><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a029a3db751ae1282eca2af94ce4101ec"><span>Faust.transpose</span></a><span> or </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a029a3db751ae1282eca2af94ce4101ec"><span>.'</span></a></li><li  class = 'S4'><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#aec9036a3d251fd47038a9a338b91502d"><span>Faust.conj</span></a><span>,</span></li><li  class = 'S4'><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a66c1abdcbcfe8505457ce69a7b355716"><span>Faust.ctranspose</span></a><span> or </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a66c1abdcbcfe8505457ce69a7b355716"><span>'</span></a></li></ul><div  class = 'S0'><span>You are probably familiar with .' and ' shorthand operators from Matlab. Well, they are also used in the Faust class.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>G = matfaust.rand(10, 15, </span><span style="color: rgb(160, 32, 240);">'dim_sizes'</span><span>, [10,15], </span><span style="color: rgb(160, 32, 240);">'field'</span><span>, </span><span style="color: rgb(160, 32, 240);">'complex'</span><span>)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="7A9EAF2D" data-scroll-top="null" data-scroll-left="null" data-testid="output_12" data-width="926" data-height="104" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">G = </span></div><div>Faust size 10x15, density 2.16667, nnz_sum 325, 5 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 10x14, density 0.357143, nnz 50
+- FACTOR 1 (complex) SPARSE, size 14x13, density 0.384615, nnz 70
+- FACTOR 2 (complex) SPARSE, size 13x13, density 0.384615, nnz 65
+- FACTOR 3 (complex) SPARSE, size 13x15, density 0.333333, nnz 65
+- FACTOR 4 (complex) SPARSE, size 15x15, density 0.333333, nnz 75</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>G.'</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="90D7DC90" data-scroll-top="null" data-scroll-left="null" data-testid="output_13" data-width="926" data-height="104" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 15x10, density 2.16667, nnz_sum 325, 5 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 15x15, density 0.333333, nnz 75
+- FACTOR 1 (complex) SPARSE, size 15x13, density 0.333333, nnz 65
+- FACTOR 2 (complex) SPARSE, size 13x13, density 0.384615, nnz 65
+- FACTOR 3 (complex) SPARSE, size 13x14, density 0.384615, nnz 70
+- FACTOR 4 (complex) SPARSE, size 14x10, density 0.357143, nnz 50</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>conj(G)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="2EE00C35" data-scroll-top="null" data-scroll-left="null" data-testid="output_14" data-width="926" data-height="104" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 10x15, density 2.16667, nnz_sum 325, 5 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 10x14, density 0.357143, nnz 50
+- FACTOR 1 (complex) SPARSE, size 14x13, density 0.384615, nnz 70
+- FACTOR 2 (complex) SPARSE, size 13x13, density 0.384615, nnz 65
+- FACTOR 3 (complex) SPARSE, size 13x15, density 0.333333, nnz 65
+- FACTOR 4 (complex) SPARSE, size 15x15, density 0.333333, nnz 75</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>G'</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="B3BFA437" data-scroll-top="null" data-scroll-left="null" data-testid="output_15" data-width="926" data-height="104" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 15x10, density 2.16667, nnz_sum 325, 5 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 15x15, density 0.333333, nnz 75
+- FACTOR 1 (complex) SPARSE, size 15x13, density 0.333333, nnz 65
+- FACTOR 2 (complex) SPARSE, size 13x13, density 0.384615, nnz 65
+- FACTOR 3 (complex) SPARSE, size 13x14, density 0.384615, nnz 70
+- FACTOR 4 (complex) SPARSE, size 14x10, density 0.357143, nnz 50</div></div></div></div></div></div><div  class = 'S8'><span>What really matters here is that the results of G.', conj(G) and G' are all Faust objects. Behind the scene, there is just one memory zone allocated to the factors. Strictly speaking they are memory views shared between G, G.' and G'. So don't hesitate to use!</span></div><h4  class = 'S12'><span>2.2 Add, Subtract and Multiply</span></h4><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S9'><span style="white-space: pre;"><span>s = size(G, 1);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>F = matfaust.rand(s, s);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>G = matfaust.rand(s, s, </span><span style="color: rgb(160, 32, 240);">'field'</span><span>, </span><span style="color: rgb(160, 32, 240);">'complex'</span><span>);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>F+G</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="0840809D" data-scroll-top="null" data-scroll-left="null" data-testid="output_16" data-width="926" data-height="146" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 10x10, density 5.6, nnz_sum 560, 8 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (complex) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 2 (complex) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 3 (complex) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 4 (complex) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 5 (complex) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 6 (complex) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (complex) SPARSE, size 20x10, density 0.1, nnz 20</div></div></div></div></div></div><div  class = 'S8'><span>Go ahead and verify it's accurate.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>norm(full(F+G)-(full(F)+full(G)), </span><span style="color: rgb(160, 32, 240);">'fro'</span><span>)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 0</div></div></div></div><div  class = 'S8'><span>Some points are noticeable here:</span></div><ul  class = 'S3'><li  class = 'S4'><span>F is real but G is complex. The Faust API is able to return the proper type for the resulting Faust, that is a complex Faust.</span></li><li  class = 'S4'><span>F+G is composed of 8 factors, however F and G are both 5 factors long. It's due to the way the addition is implemented (Faust concatenation is hiding behind).</span></li></ul><div  class = 'S0'><span>Subtracting is not different:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>F-G</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="C29FC773" data-scroll-top="null" data-scroll-left="null" data-testid="output_18" data-width="926" data-height="146" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 10x10, density 5.6, nnz_sum 560, 8 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (complex) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 2 (complex) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 3 (complex) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 4 (complex) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 5 (complex) SPARSE, size 20x20, density 0.25, nnz 100
+- FACTOR 6 (complex) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (complex) SPARSE, size 20x10, density 0.1, nnz 20</div></div></div></div></div></div><div  class = 'S8'><span>You can also add/subtract scalars to Faust objects.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>F+2</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="D9F87807" data-scroll-top="null" data-scroll-left="null" data-testid="output_19" data-width="926" data-height="146" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 10x10, density 3.6, nnz_sum 360, 8 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 2 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 3 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 4 (real) SPARSE, size 20x11, density 0.272727, nnz 60
+- FACTOR 5 (real) SPARSE, size 11x20, density 0.272727, nnz 60
+- FACTOR 6 (real) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (real) SPARSE, size 20x10, density 0.1, nnz 20</div></div></div></div></div></div><div  class = 'S8'><span>Note that here again </span><span style=' font-family: monospace;'>numfactors(F+2) ~= numfactors(F)</span><span>.</span></div><div  class = 'S0'><span>The FAµST API supports equally the Faust to array addition and subtraction.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>F+full(F)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="B8F7A944" data-scroll-top="null" data-scroll-left="null" data-testid="output_20" data-width="926" data-height="146" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 10x10, density 4.5, nnz_sum 450, 8 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 2 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 3 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 4 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 5 (real) SPARSE, size 20x20, density 0.375, nnz 150
+- FACTOR 6 (real) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (real) SPARSE, size 20x10, density 0.1, nnz 20</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>F-full(F)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="9AECB800" data-scroll-top="null" data-scroll-left="null" data-testid="output_21" data-width="926" data-height="146" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 10x10, density 4.5, nnz_sum 450, 8 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x20, density 0.1, nnz 20
+- FACTOR 1 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 2 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 3 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 4 (real) SPARSE, size 20x20, density 0.15, nnz 60
+- FACTOR 5 (real) SPARSE, size 20x20, density 0.375, nnz 150
+- FACTOR 6 (real) SPARSE, size 20x20, density 0.05, nnz 20
+- FACTOR 7 (real) SPARSE, size 20x10, density 0.1, nnz 20</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>all(all(full(F-full(F)) &lt; eps))</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="E4420FE8" data-scroll-top="null" data-scroll-left="null" data-testid="output_22" data-width="926" data-height="34" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = <span class="headerElement">logical</span></span></div><div>   1
+</div></div></div></div></div></div><div  class = 'S8'><span>Now let's multiply these Fausts!</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>FG = F*G</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="E58E2DE6" data-scroll-top="null" data-scroll-left="null" data-testid="output_23" data-width="926" data-height="174" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">FG = </span></div><div>Faust size 10x10, density 5, nnz_sum 500, 10 factor(s): 
+- FACTOR 0 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 1 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 2 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 3 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 4 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 5 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 6 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 7 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 8 (complex) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 9 (complex) SPARSE, size 10x10, density 0.5, nnz 50</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>norm(full(FG)-full(F)*full(G))/norm(full(F)*full(G))</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 9.0371e-17</div></div></div></div><div  class = 'S8'><span>Faust scalar multiplication is also available and here again the result is a Faust object!</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>F*2</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="A81640D3" data-scroll-top="null" data-scroll-left="null" data-testid="output_25" data-width="926" data-height="104" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 10x10, density 2.5, nnz_sum 250, 5 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 1 (real) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 2 (real) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 3 (real) SPARSE, size 10x10, density 0.5, nnz 50
+- FACTOR 4 (real) SPARSE, size 10x10, density 0.5, nnz 50</div></div></div></div></div></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S13'></div></div></div><h4  class = 'S12'><span>2.3 Faust Multiplication by a Vector or a Matrix</span></h4><div  class = 'S0'><span></span></div><div  class = 'S0'><span>When you multiply a Faust by a vector or a matrix (the number of nrows must match the number of Faust columns), you'll get respectively a vector or a matrix as result.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S9'><span style="white-space: pre;"><span>vec = rand(size(F, 2), 1);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>F*vec</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="4F797A9E" data-scroll-top="null" data-scroll-left="null" data-testid="output_26" data-width="926" style="width: 956px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="matrixElement veSpecifier" style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 926px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">ans = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">10×1</span></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:73,&quot;totalColumns&quot;:1,&quot;totalRows&quot;:10,&quot;charsPerColumn&quot;:10}" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="variableValue" style="width: 75px; white-space: pre; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">   51.3618
+   56.8713
+   22.0841
+   32.4884
+   88.5154
+   47.7793
+   32.8079
+   56.8013
+   37.8312
+   51.6433
+</div><div class="horizontalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div><div class="verticalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div></div></div></div></div></div></div><div  class = 'S8'><span>Let's launch a timer to compare the execution times of Faust-vector multiplication and Faust's dense matrix-vector multiplication.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>F_times_vec = @() F*vec</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="4DCA0829" data-scroll-top="null" data-scroll-left="null" data-testid="output_27" data-width="926" data-height="34" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">F_times_vec = <span class="headerElement">function_handle with value:</span></span></div><div>    @()F*vec
+</div></div></div></div></div><div class="inlineWrapper"><div  class = 'S14'><span style="white-space: pre;"><span>FD = full(F);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>FD_times_vec = @() FD*vec</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="B27D8619" data-scroll-top="null" data-scroll-left="null" data-testid="output_28" data-width="926" data-height="34" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">FD_times_vec = <span class="headerElement">function_handle with value:</span></span></div><div>    @()FD*vec
+</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>timeit(F_times_vec)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 2.0105e-05</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>timeit(FD_times_vec)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsWarningElement" uid="4630EE03" data-scroll-top="null" data-scroll-left="null" data-testid="output_30" data-width="926" data-height="18" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="diagnosticMessage-wrapper diagnosticMessage-warningType"><div class="diagnosticMessage-messagePart">Warning: The measured time for F may be inaccurate because it is running too fast. Try measuring something that takes longer.</div><div class="diagnosticMessage-stackPart"></div></div></div><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 2.0919e-07</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>all(all(F*vec-FD*vec &lt; 1e-7))</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="F0AC2975" data-scroll-top="null" data-scroll-left="null" data-testid="output_32" data-width="926" data-height="34" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = <span class="headerElement">logical</span></span></div><div>   1
+</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>rcg(F)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 0.4000</div></div></div></div><div  class = 'S8'><span>When the RCG is lower than 1 the Faust-vector multiplication is slower. Making a random Faust with a large RCG (small density) shows better results.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>G = matfaust.rand(1024, 1024, </span><span style="color: rgb(160, 32, 240);">'num_factors'</span><span>, 3, </span><span style="color: rgb(160, 32, 240);">'density'</span><span>, .001, </span><span style="color: rgb(160, 32, 240);">'fac_type'</span><span>, </span><span style="color: rgb(160, 32, 240);">'sparse'</span><span>)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="4664C7A3" data-scroll-top="null" data-scroll-left="null" data-testid="output_34" data-width="926" data-height="76" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">G = </span></div><div>Faust size 1024x1024, density 0.00292969, nnz_sum 3072, 3 factor(s): 
+- FACTOR 0 (real) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
+- FACTOR 1 (real) SPARSE, size 1024x1024, density 0.000976562, nnz 1024
+- FACTOR 2 (real) SPARSE, size 1024x1024, density 0.000976562, nnz 1024</div></div></div></div></div><div class="inlineWrapper"><div  class = 'S14'><span style="white-space: pre;"><span>GD = full(G);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>vec2 = rand(1024, 1);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>timeit(@() G*vec2)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 4.9490e-05</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>timeit(@() GD*vec2)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 6.7963e-04</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>rcg(G)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 341.3333</div></div></div></div><div  class = 'S8'><span>It goes without saying that a big RCG gives a big speedup to the Faust-vector multiplication relatively to the corresponding (dense) matrix-vector multiplication. I hope the example above has finished to convince you.</span></div><div  class = 'S0'><span>Just to convince you as well of the Faust-vector multiplication accuracy:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>norm(G*vec2 - GD*vec2)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 4.3060e-16</div></div></div></div><div  class = 'S8'><span>What applies to Faust-vector multiplication remains valid about Faust-matrix multiplication. Take a look:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S9'><span style="white-space: pre;"><span>M = rand(1024,32);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>timeit(@() G*M)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 6.9088e-04</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>timeit(@() GD*M)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 0.0134</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>norm(GD*M-G*M)/norm(GD*M)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 7.2196e-17</div></div></div></div><div  class = 'S8'><span>Well, what do we see? A quicker Faust-matrix multiplication than the matrix-matrix corresponding multiplication, though a good accuracy of the Faust-matrix multiplication is also clearly confirmed.</span></div><div  class = 'S0'><span>These examples are somehow theoretical because we cherry-pick the Faust to ensure that the RCG is good to accelerate the muplication, but at least it shows the potential speedup using Faust objects.</span></div><div  class = 'S0'><span></span></div><h4  class = 'S12'><span>2.4 Faust Norms</span></h4><div  class = 'S0'><span></span></div><div  class = 'S0'><span>The Faust class provides a norm function which handles different types of norms. This function is really close to Matlab </span><a href = "https://www.mathworks.com/help/matlab/ref/norm.htm"><span>norm</span></a><span> function.</span></div><div  class = 'S0'><span>In the following example, three of the four norms available are computed.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>norm(F,1)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 204.5014</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>norm(F, inf)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 219.4268</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>norm(F, </span><span style="color: rgb(160, 32, 240);">'fro'</span><span>)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 142.4657</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>norm(full(F), 1)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 204.5014</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>norm(full(F), inf)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 219.4268</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>norm(full(F), </span><span style="color: rgb(160, 32, 240);">'fro'</span><span>)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 142.4657</div></div></div></div><div  class = 'S8'><span>Perfect! But a last norm is available, this is the Faust's 2-norm. Let's see in the next small benchmark how the Faust 2-norm is being computed faster than the Faust's dense matrix 2-norm.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>timeit(@() norm(G, 2))</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 4.9805e-04</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>timeit(@() norm(GD, 2))</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 2.2828</div></div></div></div><div  class = 'S8'><span>The power-iteration algorithm implemented in the FAµ?ST C++ core is faster on G and the relative error is not bad too. The norm computation is faster as it benefits from faster Faust-vector multiplication.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>err = abs((norm(G, 2)-norm(GD,2))/norm(GD,2))</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>err = 0.0012</div></div></div></div><div  class = 'S8'><span></span></div><h4  class = 'S12'><span>2.5 Faust Normalizations</span></h4><div  class = 'S0'><span></span></div><div  class = 'S0'><span>The FAµST API proposes a group of normalizations. They correspond to the norms available and discussed above.</span></div><div  class = 'S0'><span>It's possible to normalize along columns or rows with any type of these norms.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>F = matfaust.rand(5, 10)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="594C614F" data-scroll-top="null" data-scroll-left="null" data-testid="output_51" data-width="926" data-height="104" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">F = </span></div><div>Faust size 5x10, density 4, nnz_sum 200, 5 factor(s): 
+- FACTOR 0 (real) SPARSE, size 5x8, density 0.625, nnz 25
+- FACTOR 1 (real) SPARSE, size 8x9, density 0.555556, nnz 40
+- FACTOR 2 (real) SPARSE, size 9x10, density 0.5, nnz 45
+- FACTOR 3 (real) SPARSE, size 10x8, density 0.625, nnz 50
+- FACTOR 4 (real) SPARSE, size 8x10, density 0.5, nnz 40</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>NF = normalize(F)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="306E3EB9" data-scroll-top="null" data-scroll-left="null" data-testid="output_52" data-width="926" data-height="104" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">NF = </span></div><div>Faust size 5x10, density 4, nnz_sum 200, 5 factor(s): 
+- FACTOR 0 (real) SPARSE, size 5x8, density 0.625, nnz 25
+- FACTOR 1 (real) SPARSE, size 8x9, density 0.555556, nnz 40
+- FACTOR 2 (real) SPARSE, size 9x10, density 0.5, nnz 45
+- FACTOR 3 (real) SPARSE, size 10x8, density 0.625, nnz 50
+- FACTOR 4 (real) SPARSE, size 8x10, density 0.5, nnz 40</div></div></div></div></div></div><div  class = 'S8'><span>The API doc is </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#abb16b52adc84eadc2835ae0542f75b90"><span>here</span></a><span>.</span></div><div  class = 'S0'><span>What's interesting here is the fact that Faust.normalize returns a Faust object. Combined with slicing (that you will see soon), normalize is useful to write algorithms such as Orthonormal Matching Pursuit (OMP), which require matrices with L2-normalized columns, in a way that makes them able to leverage the acceleration offered by the FAµST API.</span></div><div  class = 'S0'><span>The normalization coded in C++ is memory optimized (it never builds the dense matrix full(F) to compute the norms of the columns/rows). In the same goal the factors composing the Faust object NF are not duplicated in memory from same factors F, they're used as is with an additional factor giving the appropriate scaling.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>factors(NF, 5)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement scrollableOutput" uid="3173D7A8" data-scroll-top="null" data-scroll-left="null" data-testid="output_53" data-width="926" data-height="580" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>   (1,1)       0.0035
+   (3,1)       0.0413
+   (4,1)       0.0459
+   (6,1)       0.0654
+   (2,2)       0.0275
+   (3,2)       0.0233
+   (4,2)       0.0078
+   (5,2)       0.0385
+   (8,2)       0.0429
+   (1,3)       0.0408
+   (2,3)       0.0104
+   (5,3)       0.0382
+   (6,3)       0.0386
+   (8,3)       0.0188
+   (6,4)       0.0692
+   (7,4)       0.0377
+   (8,4)       0.0568
+   (1,5)       0.0192
+   (4,5)       0.0698
+   (6,5)       0.0108
+   (7,5)       0.0730
+   (1,6)       0.0179
+   (2,6)       0.0097
+   (3,6)       0.0256
+   (4,6)       0.0193
+   (5,6)       0.0215
+   (7,6)       0.0255
+   (8,6)       0.0209
+   (5,7)       0.1890
+   (1,8)       0.1062
+   (2,9)       0.0240
+   (3,9)       0.0328
+   (4,9)       0.0376
+   (5,9)       0.0353
+   (6,9)       0.0199
+   (7,9)       0.0063
+   (2,10)      0.0089
+   (3,10)      0.0487
+   (7,10)      0.0482
+   (8,10)      0.0272
+</div></div></div></div></div><div class="inlineWrapper"><div  class = 'S14'></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>cumerr = 0;</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>fullF = full(F);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span style="color: rgb(0, 0, 255);">for </span><span>i=1:size(F,2)</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>        normalized_col = fullF(:,i)/norm(fullF(:,i));</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>	cumerr = cumerr + norm(NF(:,i) - normalized_col, </span><span style="color: rgb(160, 32, 240);">'fro'</span><span>);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span style="color: rgb(0, 0, 255);">end</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>cumerr</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>cumerr = 1.5405e-15</div></div></div></div><div  class = 'S8'><span>And as you see it works!</span></div><div  class = 'S0'><span></span></div><h4  class = 'S12'><span>2.6 Faust Concatenation</span></h4><div  class = 'S0'><span></span></div><div  class = 'S0'><span>You're probably aware of Matlab arrays concatenation otherwise look this example.</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S9'><span style="white-space: pre;"><span>M = rand(5,5);</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>I = eye(5,5);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>[ M; I ]</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="090D4585" data-scroll-top="null" data-scroll-left="null" data-testid="output_55" data-width="926" style="width: 956px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="matrixElement veSpecifier" style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 926px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">ans = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">10×5</span></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:73,&quot;totalColumns&quot;:5,&quot;totalRows&quot;:10,&quot;charsPerColumn&quot;:10}" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="variableValue" style="width: 367px; white-space: pre; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">    0.4646    0.2921    0.8408    0.8864    0.8112
+    0.9722    0.1937    0.0800    0.1349    0.7004
+    0.9748    0.2559    0.1754    0.6393    0.7324
+    0.3829    0.6570    0.0191    0.6451    0.6932
+    0.6989    0.7678    0.1076    0.1505    0.2574
+    1.0000         0         0         0         0
+         0    1.0000         0         0         0
+         0         0    1.0000         0         0
+         0         0         0    1.0000         0
+         0         0         0         0    1.0000
+</div><div class="horizontalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div><div class="verticalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div></div></div></div></div></div><div class="inlineWrapper"><div  class = 'S14'></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span style="color: rgb(34, 139, 34);">% it was vertical concatenation, now let's concatenate horizontally</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>[ M I ]</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="977EBA77" data-scroll-top="null" data-scroll-left="null" data-testid="output_56" data-width="926" style="width: 956px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="matrixElement veSpecifier" style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 926px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">ans = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">5×10</span></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:73,&quot;totalColumns&quot;:10,&quot;totalRows&quot;:5,&quot;charsPerColumn&quot;:10}" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="variableValue" style="width: 732px; white-space: pre; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">    0.4646    0.2921    0.8408    0.8864    0.8112    1.0000         0         0         0         0
+    0.9722    0.1937    0.0800    0.1349    0.7004         0    1.0000         0         0         0
+    0.9748    0.2559    0.1754    0.6393    0.7324         0         0    1.0000         0         0
+    0.3829    0.6570    0.0191    0.6451    0.6932         0         0         0    1.0000         0
+    0.6989    0.7678    0.1076    0.1505    0.2574         0         0         0         0    1.0000
+</div><div class="horizontalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div><div class="verticalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div></div></div></div></div></div></div><div  class = 'S8'><span>I'm sure you guessed that likewise you can concatenate Faust objects. That's right!</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>[ F ; F]</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="F4BC5FB0" data-scroll-top="null" data-scroll-left="null" data-testid="output_57" data-width="926" data-height="118" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 10x10, density 4.2, nnz_sum 420, 6 factor(s): 
+- FACTOR 0 (real) SPARSE, size 10x16, density 0.3125, nnz 50
+- FACTOR 1 (real) SPARSE, size 16x18, density 0.277778, nnz 80
+- FACTOR 2 (real) SPARSE, size 18x20, density 0.25, nnz 90
+- FACTOR 3 (real) SPARSE, size 20x16, density 0.3125, nnz 100
+- FACTOR 4 (real) SPARSE, size 16x20, density 0.25, nnz 80
+- FACTOR 5 (real) SPARSE, size 20x10, density 0.1, nnz 20</div></div></div></div></div><div class="inlineWrapper"><div  class = 'S14'></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>C = [ F F ]</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="1E92197F" data-scroll-top="null" data-scroll-left="null" data-testid="output_58" data-width="926" data-height="118" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">C = </span></div><div>Faust size 5x20, density 4.1, nnz_sum 410, 6 factor(s): 
+- FACTOR 0 (real) SPARSE, size 5x10, density 0.2, nnz 10
+- FACTOR 1 (real) SPARSE, size 10x16, density 0.3125, nnz 50
+- FACTOR 2 (real) SPARSE, size 16x18, density 0.277778, nnz 80
+- FACTOR 3 (real) SPARSE, size 18x20, density 0.25, nnz 90
+- FACTOR 4 (real) SPARSE, size 20x16, density 0.3125, nnz 100
+- FACTOR 5 (real) SPARSE, size 16x20, density 0.25, nnz 80</div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>full(C) - [ full(F) full(F) ]</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="FA1B206B" data-scroll-top="null" data-scroll-left="null" data-testid="output_59" data-width="926" style="width: 956px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="matrixElement veSpecifier" style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 926px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">ans = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">5×20</span></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:44,&quot;totalColumns&quot;:20,&quot;totalRows&quot;:5,&quot;charsPerColumn&quot;:6}" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="variableValue" style="width: 882px; white-space: pre; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0     0
+</div><div class="horizontalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div><div class="verticalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div></div></div></div></div></div></div><div  class = 'S8'><span>The difference of the two concatenations is full of zeros, so of course it works!</span></div><div  class = 'S0'><span>As you noticed the Faust concatenation is stable, you give two Fausts and you get a Faust again. Besides, it's possible to concatenate an arbitrary number of Faust objects.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>[F C C F ]</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="655726DA" data-scroll-top="null" data-scroll-left="null" data-testid="output_60" data-width="926" data-height="160" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 5x60, density 4.25, nnz_sum 1275, 9 factor(s): 
+- FACTOR 0 (real) SPARSE, size 5x10, density 0.2, nnz 10
+- FACTOR 1 (real) SPARSE, size 10x15, density 0.1, nnz 15
+- FACTOR 2 (real) SPARSE, size 15x20, density 0.0666667, nnz 20
+- FACTOR 3 (real) SPARSE, size 20x30, density 0.05, nnz 30
+- FACTOR 4 (real) SPARSE, size 30x48, density 0.104167, nnz 150
+- FACTOR 5 (real) SPARSE, size 48x54, density 0.0925926, nnz 240
+- FACTOR 6 (real) SPARSE, size 54x60, density 0.0833333, nnz 270
+- FACTOR 7 (real) SPARSE, size 60x48, density 0.104167, nnz 300
+- FACTOR 8 (real) SPARSE, size 48x60, density 0.0833333, nnz 240</div></div></div></div></div></div><div  class = 'S8'><span>As an exercise, you can write the factors of the Faust</span><span style=' font-family: monospace;'> [F ; F]</span><span>, F being any Faust.</span></div><div  class = 'S0'><span style=' font-weight: bold;'>Hint</span><span>: the block-diagonal matrices are around here.</span></div><div  class = 'S0'><span></span></div><h4  class = 'S12'><span>2.7 Faust Indexing and Slicing</span></h4><div  class = 'S0'><span></span></div><div  class = 'S0'><span>Sometimes you need to access the dense matrix corresponding to a Faust or an element of it (by the way, note that it's costly).</span></div><div  class = 'S0'><span>Let's access a Faust item:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>F(3, 4)</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 4.4882</div></div></div></div><div  class = 'S8'><span>Why is it costly? Because it essentially converts the Faust to its dense form (modulo some optimizations) to just access one item.</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>timeit(@() F(3, 4))</span></span></div><div  class = 'S6'><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 4.8594e-04</div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>timeit(@() FD(3, 4))</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsWarningElement" uid="FF24A602" data-scroll-top="null" data-scroll-left="null" data-testid="output_63" data-width="926" data-height="18" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="diagnosticMessage-wrapper diagnosticMessage-warningType"><div class="diagnosticMessage-messagePart">Warning: The measured time for F may be inaccurate because it is running too fast. Try measuring something that takes longer.</div><div class="diagnosticMessage-stackPart"></div></div></div><div class='variableElement' style='font-family: Menlo, Monaco, Consolas, &quot;Courier New&quot;, monospace; font-size: 12px; '>ans = 3.5386e-07</div></div></div></div><div  class = 'S8'><span>It's totally the same syntax as Matlab but much slower so use it with care.</span></div><div  class = 'S0'><span>The more advanced slicing operation uses also the same syntax as Matlab:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>F(3:5, 4:10)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="BCB69AEF" data-scroll-top="null" data-scroll-left="null" data-testid="output_65" data-width="926" data-height="104" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span></div><div>Faust size 3x7, density 8.38095, nnz_sum 176, 5 factor(s): 
+- FACTOR 0 (real) SPARSE, size 3x8, density 0.625, nnz 15
+- FACTOR 1 (real) SPARSE, size 8x9, density 0.555556, nnz 40
+- FACTOR 2 (real) SPARSE, size 9x10, density 0.5, nnz 45
+- FACTOR 3 (real) SPARSE, size 10x8, density 0.625, nnz 50
+- FACTOR 4 (real) SPARSE, size 8x7, density 0.464286, nnz 26</div></div></div></div></div></div><div  class = 'S8'><span>Here again, the result is another Faust. But this is not a full copy, it makes profit of memory views implemented behind in C++. Solely the first and last factors of the sliced Faust are new in memory, the others are just referenced from the initial Faust F. So use it with no worry for a Faust with a lot of factors!</span></div><div  class = 'S0'><span>The Matlab indexing by arbitrary vector of integers has also been implemented in the FAµ?ST C++ core, let's try it:</span></div><div class="CodeBlock"><div class="inlineWrapper"><div  class = 'S9'><span style="white-space: pre;"><span>I = [2, 4, 3];</span></span></div></div><div class="inlineWrapper"><div  class = 'S11'><span style="white-space: pre;"><span>FI = F(I,:);</span></span></div></div><div class="inlineWrapper outputs"><div  class = 'S10'><span style="white-space: pre;"><span>matfaust.isFaust(FI)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="100B3F16" data-scroll-top="null" data-scroll-left="null" data-testid="output_66" data-width="926" data-height="34" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = <span class="headerElement">logical</span></span></div><div>   1
+</div></div></div></div></div></div><div  class = 'S8'><span>Again, it's a Faust but is it really working? Verify!</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>FID = full(FI)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="A6572BAA" data-scroll-top="null" data-scroll-left="null" data-testid="output_67" data-width="926" style="width: 956px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="matrixElement veSpecifier" style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 926px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">FID = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">3×10</span></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:73,&quot;totalColumns&quot;:10,&quot;totalRows&quot;:3,&quot;charsPerColumn&quot;:10}" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="variableValue" style="width: 732px; white-space: pre; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">    8.9957   11.7083   14.8396    6.6188    7.8696   23.0172    2.3615    1.9188   10.7625   10.2643
+    4.8183    7.0419    9.1435    3.7627    4.6130   13.9024    1.5176    1.3094    6.0943    5.9542
+    6.0062    8.0569   10.5489    4.4882    5.6134   15.9861    1.8449    1.3966    7.3818    6.8053
+</div><div class="horizontalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div><div class="verticalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div></div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>FD = full(F)</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableMatrixElement" uid="3DAF38DC" data-scroll-top="null" data-scroll-left="null" data-testid="output_68" data-width="926" style="width: 956px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="matrixElement veSpecifier" style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="veVariableName variableNameElement double" style="width: 926px; white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><span style="white-space: normal; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">FD = </span><span class="veVariableValueSummary veMetaSummary" style="white-space: normal; font-style: normal; color: rgb(179, 179, 179); font-size: 12px;">5×10</span></div><div class="valueContainer" data-layout="{&quot;columnWidth&quot;:73,&quot;totalColumns&quot;:10,&quot;totalRows&quot;:5,&quot;charsPerColumn&quot;:10}" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"><div class="variableValue" style="width: 732px; white-space: pre; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;">    6.1737    8.5499   11.1382    4.7044    5.6684   17.0015    1.7882    1.5646    7.5773    7.4382
+    8.9957   11.7083   14.8396    6.6188    7.8696   23.0172    2.3615    1.9188   10.7625   10.2643
+    6.0062    8.0569   10.5489    4.4882    5.6134   15.9861    1.8449    1.3966    7.3818    6.8053
+    4.8183    7.0419    9.1435    3.7627    4.6130   13.9024    1.5176    1.3094    6.0943    5.9542
+    4.8377    6.0456    7.7101    3.4253    4.2102   11.7624    1.3160    0.9319    5.7729    5.0566
+</div><div class="horizontalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div><div class="verticalEllipsis hide" style="white-space: nowrap; font-style: normal; color: rgb(64, 64, 64); font-size: 12px;"></div></div></div></div></div></div><div class="inlineWrapper outputs"><div  class = 'S7'><span style="white-space: pre;"><span>all(all(FID(1, :) == FD(I(1), :) &amp; FID(2, :) == FD(I(2), :) &amp; FID(3, :) == FD(I(3), :)))</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="3E59CE19" data-scroll-top="null" data-scroll-left="null" data-testid="output_69" data-width="926" data-height="34" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = <span class="headerElement">logical</span></span></div><div>   1
+</div></div></div></div></div></div><div  class = 'S8'><span>Yes it is!</span></div><div  class = 'S0'><span></span></div><div  class = 'S0'><span>This is the notebook's end, you have now a global view of what the Faust class is able and what kind of high-level algorithms it is ready for. You might be interested to read other notebooks, just go back to the </span><a href = "https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/index.html"><span>page</span></a><span> where you got this one.</span></div><div  class = 'S0'><span style=' font-weight: bold;'>Note:</span><span> this livescript was executed using the following matfaust version:</span></div><div class="CodeBlock"><div class="inlineWrapper outputs"><div  class = 'S5'><span style="white-space: pre;"><span>matfaust.version()</span></span></div><div  class = 'S6'><div class="inlineElement eoOutputWrapper embeddedOutputsVariableStringElement" uid="B059AC81" data-testid="output_70" data-width="926" data-height="20" data-hashorizontaloverflow="false" style="width: 956px; max-height: 261px;"><div class="textElement"><div><span class="variableNameElement">ans = </span>'2.10.17'</div></div></div></div></div><div class="inlineWrapper"><div  class = 'S15'></div></div></div><div  class = 'S8'><span></span></div><div  class = 'S0'><span></span></div><div  class = 'S0'><span></span></div><div  class = 'S0'><span></span></div><div  class = 'S0'><span></span></div><div  class = 'S0'><span></span></div><div  class = 'S0'></div></div><br>
+<!-- 
+##### SOURCE BEGIN #####
+%% 
+% 
+%% How to Manipulate a Faust
+% 
+% 
+% This livescript is intended to gently introduce the operations available 
+% to manipulate a Faust object. It comes after the first livescript (available 
+% <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_creation.mlx 
+% here> for download or <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_creation.html 
+% here> as a web page), so it's assumed you already know how to create a Faust 
+% object from one way or another.
+% 
+% Keep in mind that a full API doc is available <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacematfaust.html 
+% here> every time you need details. In particular the Faust class is documented 
+% <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html 
+% here>.
+% 
+% *NOTE*: the livescript is made to be executed sequentially, otherwise, 
+% skipping some cells, you would end up on an import error.
+% 
+% 
+%% Table of Contents:
+% 
+% 
+% 1. Getting Basic Information about a Faust Object
+% 
+% 1.1 Obtaining Dimension and Scalar Type Information
+% 
+% 1.2 Obtaining Other Faust Specific Information
+% 
+% 1.3 Plotting a Faust
+% 
+% 1.4 About Sparsity!
+% 
+% 2. Faust Algebra and other Operations
+% 
+% 2.1 Transpose, conjugate, transconjugate
+% 
+% 2.2 Add, Subtract and Multiply
+% 
+% 2.3 Faust Multiplication by a Vector or a Matrix
+% 
+% 2.4 Faust Norms
+% 
+% 2.5 Faust Normalizations
+% 
+% 2.6 Faust Concatenation
+% 
+% 2.7 Faust Indexing and Slicing
+% 
+% 
+%% 1. Getting Basic Information about a Faust Object
+% 
+% 
+% First of all, given any object, you might ask yourself if it's a Faust 
+% or not (typically when you receive an object in a function, matlab being built 
+% on dynamic types, you can't say for sure it's a Faust). <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#ac5d5fbe66ef212a1c7043b78504f87fc 
+% Faust.isFaust()> is the function to verify an object is a Faust. Its use is 
+% straighforward as you can see in the documentation. Note by the way, that a 
+% more accessible alias is available at the package root |(matfaust.isFaust|).
+% 
+% 
+%% 1.1 Obtaining Dimension and Scalar Type Information
+% 
+% 
+% Firstly, let's list basic Faust informative methods/attributes you're probably 
+% used to for matlab matrices:
+% 
+% * <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a7146c7de95b35efc570a377765edda27 
+% size>,
+% * <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#af62f554cd8b491a2c75ee06019f87d8a 
+% numel>,
+% * <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a7527e1fda21bc1678646a4b40db28eb6 
+% isreal>.
+% 
+% To keep it really clear, let's show some examples operated on a random 
+% Faust.
+
+F = matfaust.rand(5,10)
+size(F)
+numel(F)
+isreal(F)
+%% 
+% If the attributes printed out above seem not clear to you, you're probably 
+% not a Matlab user. Anyway you'll find all descriptive informations in the FAµST 
+% API documentation (see the links above).
+% 
+% As a complement, you can also refer to the Matlab API documentation:
+% 
+% * <https://www.mathworks.com/help/matlab/ref/size.html size>
+% * <https://www.mathworks.com/help/matlab/ref/numel.html numel>
+% * <https://www.mathworks.com/help/matlab/ref/isreal.html isreal>
+% 
+% About size, it's noteworthy that contrary to what Matlab is capable of 
+% on an array, you cannot <https://www.mathworks.com/help/matlab/ref/reshape.html 
+% reshape> a Faust.
+%% 
+%% 1.2 Obtaining Other Faust Specific Information
+% 
+% 
+% As you've seen in this livescript and the first one, when you print a Faust 
+% object, several pieces of information appear. Most of them are also available 
+% independently with specific functions.
+% 
+% For instance, if you want information about factors, nothing is more simple 
+% than calling directly the next functions:
+% 
+% * <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a5e77419460592366457aa60175472e2e 
+% numfactors()> ; which gives you the number of factors (aka layers) a Faust object 
+% is composed of.
+% * <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a65a84416b4b1fd050654a02232e95d2f 
+% factors()> ; which allows you to copy any of the Faust's factors givens its 
+% index.
+% 
+% Going back to our F object, let's call these functions:
+
+numfactors(F)
+%% 
+% For example, try to copy the third factor:
+
+f3 = factors(F, 3)
+%% 
+% Note that, since Faust 2.3, the function doesn't alterate the factor format. 
+% If the Faust object contains a sparse factor then you'll receive a sparse matrix.
+% 
+% Since Faust 2.3 again, it's possible to retrieve a sub-sequence of Faust 
+% factors.
+% 
+% Go straight to the example, extracting factors from F:
+
+factors(F, 3:4)
+%% 
+% Hmm... something is different from the previous example. We indeed received 
+% a Faust as return type, great! You've just learned another way to create a Faust 
+% from another, additionally to what you've seen in the first <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/Faust_manipulation.html 
+% livescript>.
+% 
+% Without this function, you'd surely have written something similar to:
+
+import matfaust.Faust
+Faust({factors(F, 3), factors(F, 4)})
+%% 
+% OK, that's not awful but I let you imagine how much complicated it is 
+% with more factors.
+% 
+% 
+%% 1.3 Plotting a Faust
+% 
+% 
+% Available soon!
+% 
+% 
+%% 1.4 About Sparsity!
+% 
+% 
+% Three functions of the Faust class are here to evaluate the sparsity of 
+% a Faust object.
+% 
+% Let's call the first one:
+
+nnz_sum(F)
+%% 
+% I'm sure you guessed exactly what the function returns, if you doubt it, 
+% here is the doc: <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a7dc7f3cb86b02b3c2cd725387c34300d 
+% Faust.nnz_sum()>. The smaller |nnz_sum|, the sparser the Faust.
+% 
+% Next comes the function: <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#ac33ff53bbff16f93666acec05031511b 
+% Faust.density()>.
+% 
+% This function along with its reciprocal <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#aff3261319b63c49d51a699726edc74bc 
+% Faust.rcg()> can give you a big hint on how much your Faust is potentially optimized 
+% both for storage and calculation. The sparser the Faust, the larger the Relative 
+% Complexity Gain (RCG)!
+
+density(F)
+rcg(F)
+%% 
+% According to its RCG, this Faust doesn't seem to be of any help for optimization 
+% but look at the graphic the next script generates:
+
+nfactors = 3;
+startd = 0.01;
+endd = 1;
+dim_sz = 1000;
+ntests = 10;
+sizes = zeros(ntests, 1);
+rcs = zeros(ntests, 1);
+densities = linspace(startd, endd, ntests);
+for i=1:ntests
+   d = densities(i);
+   F = matfaust.rand(dim_sz, dim_sz, 'num_factors', nfactors, 'density', d, 'fac_type', 'sparse');
+   sizes(i) = nbytes(F);
+   rcs(i) = density(F);
+end
+plot(rcs, sizes)
+legend('size')
+xlabel('Density')
+ylabel('Faust Size (bytes)')
+%% 
+% Isn't it obvious now that the smaller the density the better?! Indeed, 
+% for two Faust objects of the same shape and the same number of factors, a smaller 
+% density (linearly) implies a smaller file size for storage. This point applies 
+% also to the memory (RAM) space to work on a Faust.
+% 
+% We'll see later how the computation can benefit of a bigger RCG (or smaller 
+% density). But let's point out right now that the sparsity is often a tradeoff 
+% with accuracy, as the following plot shows about the truncated SVD of a matrix 
+% $M \in {\mathbb R}^{512 \times 512$. Note beforehand that the SVD of M (truncated 
+% or not) can be seen as a Faust which approximates M.
+% 
+% 
+% 
+% 
+% 
+% Here is the script to reproduce the last figure with pyfaust: <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/test_svd_rc_vs_err.py 
+% test_svd_rc_vs_err.py>
+% 
+% 
+%% 2. Faust Algebra and other Operations
+% 
+% 
+% In order to write some nice algorithms using Faust objects, you'll have 
+% to use the basic "stable" operations a Faust is capable of. Let's make a tour 
+% of them.
+% 
+% 
+%% 2.1 Transpose, conjugate, transconjugate
+% 
+% 
+% * <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a029a3db751ae1282eca2af94ce4101ec 
+% Faust.transpose> or <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a029a3db751ae1282eca2af94ce4101ec 
+% .'>
+% * <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#aec9036a3d251fd47038a9a338b91502d 
+% Faust.conj>,
+% * <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a66c1abdcbcfe8505457ce69a7b355716 
+% Faust.ctranspose> or <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#a66c1abdcbcfe8505457ce69a7b355716 
+% '>
+% 
+% You are probably familiar with .' and ' shorthand operators from Matlab. 
+% Well, they are also used in the Faust class.
+
+G = matfaust.rand(10, 15, 'dim_sizes', [10,15], 'field', 'complex')
+G.'
+conj(G)
+G'
+%% 
+% What really matters here is that the results of G.', conj(G) and G' are 
+% all Faust objects. Behind the scene, there is just one memory zone allocated 
+% to the factors. Strictly speaking they are memory views shared between G, G.' 
+% and G'. So don't hesitate to use!
+%% 2.2 Add, Subtract and Multiply
+
+s = size(G, 1);
+F = matfaust.rand(s, s);
+G = matfaust.rand(s, s, 'field', 'complex');
+F+G
+%% 
+% Go ahead and verify it's accurate.
+
+norm(full(F+G)-(full(F)+full(G)), 'fro')
+%% 
+% Some points are noticeable here:
+% 
+% * F is real but G is complex. The Faust API is able to return the proper type 
+% for the resulting Faust, that is a complex Faust.
+% * F+G is composed of 8 factors, however F and G are both 5 factors long. It's 
+% due to the way the addition is implemented (Faust concatenation is hiding behind).
+% 
+% Subtracting is not different:
+
+F-G
+%% 
+% You can also add/subtract scalars to Faust objects.
+
+F+2
+%% 
+% Note that here again |numfactors(F+2) ~= numfactors(F)|.
+% 
+% The FAµST API supports equally the Faust to array addition and subtraction.
+
+F+full(F)
+F-full(F)
+all(all(full(F-full(F)) < eps))
+%% 
+% Now let's multiply these Fausts!
+
+FG = F*G
+norm(full(FG)-full(F)*full(G))/norm(full(F)*full(G))
+%% 
+% Faust scalar multiplication is also available and here again the result 
+% is a Faust object!
+
+F*2
+%%
+
+%% 2.3 Faust Multiplication by a Vector or a Matrix
+% 
+% 
+% When you multiply a Faust by a vector or a matrix (the number of nrows 
+% must match the number of Faust columns), you'll get respectively a vector or 
+% a matrix as result.
+
+vec = rand(size(F, 2), 1);
+F*vec
+%% 
+% Let's launch a timer to compare the execution times of Faust-vector multiplication 
+% and Faust's dense matrix-vector multiplication.
+
+F_times_vec = @() F*vec
+FD = full(F);
+FD_times_vec = @() FD*vec
+timeit(F_times_vec)
+timeit(FD_times_vec)
+all(all(F*vec-FD*vec < 1e-7))
+rcg(F)
+%% 
+% When the RCG is lower than 1 the Faust-vector multiplication is slower. 
+% Making a random Faust with a large RCG (small density) shows better results.
+
+G = matfaust.rand(1024, 1024, 'num_factors', 3, 'density', .001, 'fac_type', 'sparse')
+GD = full(G);
+vec2 = rand(1024, 1);
+timeit(@() G*vec2)
+timeit(@() GD*vec2)
+rcg(G)
+%% 
+% It goes without saying that a big RCG gives a big speedup to the Faust-vector 
+% multiplication relatively to the corresponding (dense) matrix-vector multiplication. 
+% I hope the example above has finished to convince you.
+% 
+% Just to convince you as well of the Faust-vector multiplication accuracy:
+
+norm(G*vec2 - GD*vec2)
+%% 
+% What applies to Faust-vector multiplication remains valid about Faust-matrix 
+% multiplication. Take a look:
+
+M = rand(1024,32);
+timeit(@() G*M)
+timeit(@() GD*M)
+norm(GD*M-G*M)/norm(GD*M)
+%% 
+% Well, what do we see? A quicker Faust-matrix multiplication than the matrix-matrix 
+% corresponding multiplication, though a good accuracy of the Faust-matrix multiplication 
+% is also clearly confirmed.
+% 
+% These examples are somehow theoretical because we cherry-pick the Faust 
+% to ensure that the RCG is good to accelerate the muplication, but at least it 
+% shows the potential speedup using Faust objects.
+% 
+% 
+%% 2.4 Faust Norms
+% 
+% 
+% The Faust class provides a norm function which handles different types 
+% of norms. This function is really close to Matlab <https://www.mathworks.com/help/matlab/ref/norm.htm 
+% norm> function.
+% 
+% In the following example, three of the four norms available are computed.
+
+norm(F,1)
+norm(F, inf)
+norm(F, 'fro')
+norm(full(F), 1)
+norm(full(F), inf)
+norm(full(F), 'fro')
+%% 
+% Perfect! But a last norm is available, this is the Faust's 2-norm. Let's 
+% see in the next small benchmark how the Faust 2-norm is being computed faster 
+% than the Faust's dense matrix 2-norm.
+
+timeit(@() norm(G, 2))
+timeit(@() norm(GD, 2))
+%% 
+% The power-iteration algorithm implemented in the FAµ?ST C++ core is faster 
+% on G and the relative error is not bad too. The norm computation is faster as 
+% it benefits from faster Faust-vector multiplication.
+
+err = abs((norm(G, 2)-norm(GD,2))/norm(GD,2))
+%% 
+% 
+%% 2.5 Faust Normalizations
+% 
+% 
+% The FAµST API proposes a group of normalizations. They correspond to the 
+% norms available and discussed above.
+% 
+% It's possible to normalize along columns or rows with any type of these 
+% norms.
+
+F = matfaust.rand(5, 10)
+NF = normalize(F)
+%% 
+% The API doc is <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/classmatfaust_1_1Faust.html#abb16b52adc84eadc2835ae0542f75b90 
+% here>.
+% 
+% What's interesting here is the fact that Faust.normalize returns a Faust 
+% object. Combined with slicing (that you will see soon), normalize is useful 
+% to write algorithms such as Orthonormal Matching Pursuit (OMP), which require 
+% matrices with L2-normalized columns, in a way that makes them able to leverage 
+% the acceleration offered by the FAµST API.
+% 
+% The normalization coded in C++ is memory optimized (it never builds the 
+% dense matrix full(F) to compute the norms of the columns/rows). In the same 
+% goal the factors composing the Faust object NF are not duplicated in memory 
+% from same factors F, they're used as is with an additional factor giving the 
+% appropriate scaling.
+
+factors(NF, 5)
+
+cumerr = 0;
+fullF = full(F);
+for i=1:size(F,2)
+        normalized_col = fullF(:,i)/norm(fullF(:,i));
+	cumerr = cumerr + norm(NF(:,i) - normalized_col, 'fro');
+end
+cumerr
+%% 
+% And as you see it works!
+% 
+% 
+%% 2.6 Faust Concatenation
+% 
+% 
+% You're probably aware of Matlab arrays concatenation otherwise look this 
+% example.
+
+M = rand(5,5);
+I = eye(5,5);
+[ M; I ]
+
+% it was vertical concatenation, now let's concatenate horizontally
+[ M I ]
+%% 
+% I'm sure you guessed that likewise you can concatenate Faust objects. 
+% That's right!
+
+[ F ; F]
+
+C = [ F F ]
+full(C) - [ full(F) full(F) ]
+%% 
+% The difference of the two concatenations is full of zeros, so of course 
+% it works!
+% 
+% As you noticed the Faust concatenation is stable, you give two Fausts and 
+% you get a Faust again. Besides, it's possible to concatenate an arbitrary number 
+% of Faust objects.
+
+[F C C F ]
+%% 
+% As an exercise, you can write the factors of the Faust| [F ; F]|, F being 
+% any Faust.
+% 
+% *Hint*: the block-diagonal matrices are around here.
+% 
+% 
+%% 2.7 Faust Indexing and Slicing
+% 
+% 
+% Sometimes you need to access the dense matrix corresponding to a Faust 
+% or an element of it (by the way, note that it's costly).
+% 
+% Let's access a Faust item:
+
+F(3, 4)
+%% 
+% Why is it costly? Because it essentially converts the Faust to its dense 
+% form (modulo some optimizations) to just access one item.
+
+timeit(@() F(3, 4))
+timeit(@() FD(3, 4))
+%% 
+% It's totally the same syntax as Matlab but much slower so use it with 
+% care.
+% 
+% The more advanced slicing operation uses also the same syntax as Matlab:
+
+F(3:5, 4:10)
+%% 
+% Here again, the result is another Faust. But this is not a full copy, 
+% it makes profit of memory views implemented behind in C++. Solely the first 
+% and last factors of the sliced Faust are new in memory, the others are just 
+% referenced from the initial Faust F. So use it with no worry for a Faust with 
+% a lot of factors!
+% 
+% The Matlab indexing by arbitrary vector of integers has also been implemented 
+% in the FAµ?ST C++ core, let's try it:
+
+I = [2, 4, 3];
+FI = F(I,:);
+matfaust.isFaust(FI)
+%% 
+% Again, it's a Faust but is it really working? Verify!
+
+FID = full(FI)
+FD = full(F)
+all(all(FID(1, :) == FD(I(1), :) & FID(2, :) == FD(I(2), :) & FID(3, :) == FD(I(3), :)))
+%% 
+% Yes it is!
+% 
+% 
+% 
+% This is the notebook's end, you have now a global view of what the Faust 
+% class is able and what kind of high-level algorithms it is ready for. You might 
+% be interested to read other notebooks, just go back to the <https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/index.html 
+% page> where you got this one.
+% 
+% *Note:* this livescript was executed using the following matfaust version:
+
+matfaust.version()
+
+%% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+%
+##### SOURCE END #####
+--></body></html>

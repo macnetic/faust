@@ -16,5 +16,6 @@ Download all the notebooks (.ipynb) [here](./pyfaust_notebooks.zip).
 Besides, if you're more familiar with Matlab, some livescripts are also available to introduce matfaust.
 
 - [How to Create a Faust](./Faust_creation.mlx.html)
+- [How to Manipulate a Faust](./Faust_manipulation.mlx.html)
 
 Download all the livescripts (.mlx) [here](./matfaust_livescripts.zip).
