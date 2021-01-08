@@ -48,6 +48,22 @@ MATLABRC_RUN_STARTUP_CMD="if(exist('@CMAKE_INSTALL_PREFIX@'))oldpwd=pwd;startup_
 
 # find matlab root path from the accessible matlab in the PATH
 MATLAB_BIN=$(which matlab)
+# in case of symlink resolve the real path
+MATLAB_BIN=$(ls -l ${MATLAB_BIN})
+echo LS_MATLAB_BIN=${MATLAB_BIN} | tee -a /tmp/log_faust_install
+MATLAB_BIN=${MATLAB_BIN##* } # last word of the command #TODO: it doesn't work if space exists in the path
+echo MATLAB_BIN_LAST_WORD=${MATLAB_BIN} | tee -a /tmp/log_faust_install
+if [[ ! ${MATLAB_BIN} = "/"* ]]
+then
+	# not likely to happen but still
+	# get the absolute path
+	MATLAB_BIN="$(dirname $(which matlab))/${MATLAB_BIN}"
+	if [[ ! ${MATLAB_BIN} = "/"* ]]
+	then
+		MATLAB_BIN="$PWD/${MATLAB_BIN}"
+	fi
+fi
+echo MATLAB_BIN=${MATLAB_BIN} | tee -a /tmp/log_faust_install
 # deduce MATLAB_ROOT
 MATLAB_ROOT=${MATLAB_BIN%%bin/matlab}
 if [[ ! -d "${MATLAB_ROOT}" ]]
