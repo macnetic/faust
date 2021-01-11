@@ -934,7 +934,7 @@ ELSE(WIN32 AND NOT UNIX)
 		file(REMOVE ${PROJECT_BINARY_DIR}/postinstall2)
 		# post-install script to download FAµST data from remote site into matlab wrapper data folder
 		if(REMOTE_DATA_URL AND REMOTE_DATA_FILE)
-			file(APPEND ${PROJECT_BINARY_DIR}/postinstall "mkdir -p @CMAKE_INSTALL_MATLAB_PREFIX@/data/;python  @CMAKE_INSTALL_PYTHON_PREFIX@/pyfaust/datadl.py @CMAKE_INSTALL_MATLAB_PREFIX@/data/;")
+			file(APPEND ${PROJECT_BINARY_DIR}/postinstall "mkdir -p @CMAKE_INSTALL_MATLAB_PREFIX@/data/;python  @CMAKE_INSTALL_PYTHON_PREFIX@/pyfaust/datadl.py @CMAKE_INSTALL_MATLAB_PREFIX@/data/ 2>&1 | tee -a /tmp/log_faust_install;")
 		endif()
 	ELSE(APPLE)
 		SET(CPACK_GENERATOR "DEB;RPM")
