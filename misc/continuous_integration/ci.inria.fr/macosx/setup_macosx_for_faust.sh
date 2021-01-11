@@ -51,6 +51,8 @@ mv libtorch /opt/local/
 echo "Please manually install matlab by copying directly the directory from /Volumes/Untitled/ attached to faust2-macos-2019 (advice: use scp)"
 echo "First, a DATA storage volume must be created and attached to the VM instance (use command: diskutil mount)."
 echo "Finally add matlab to the PATH."
+echo "It is also useful to symlink the matlab binary in /usr/bin/ for the root user env. to be OK for installing/testing the pkg (postinstall script needs to find matlab)."
+echo "Other need about matlab OpenMP: you need to copy the library as for example: ciosx:~ ci$ cp /Volumes/Untitled/MATLAB_R2018b.app/sys/os/maci64/libiomp5.dylib /opt/local/lib/libomp/"
 #echo "WARNING: the matlab installer link is likely to fail"
 #wget "https://esd.mathworks.com/R2018b/R2018b/installers/web/matlab_R2018b_maci64.dmg.zip?__gda__=1608282997_72bccb4cda14022857f8691914aea21a&dl_id=aYudAe6N&ext=.zip" || echo "the link failed, please update."
 #mv matlab_R2018b_maci64.dmg.zip\?__gda__\=1608282997_72bccb4cda14022857f8691914aea21a\&dl_id\=aYudAe6N\&ext\=.zip matlab_R2018b_maci64.dmg.zip
