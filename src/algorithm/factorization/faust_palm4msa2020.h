@@ -16,10 +16,12 @@
 #include "faust_ConstraintInt.h"
 #include "faust_ConstraintMat.h"
 #include "faust_StoppingCriterion.h"
+#include "faust_prod_opt.h"
 #include <functional>
 
 namespace Faust
 {
+
 	template <typename FPP, FDevice DEVICE>
 		void palm4msa(
 				/** input matrix */
@@ -38,7 +40,9 @@ namespace Faust
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
 				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION,
-				const bool on_gpu=false);
+				const bool on_gpu=false,
+				const bool is_verbose=false); //TODO: this def of this decl must be updated in faust_palm4msa2020.hpp
+
 
 	template <typename FPP, FDevice DEVICE>
 		void palm4msa2(
@@ -59,8 +63,8 @@ namespace Faust
 				const Real<FPP> norm2_threshold=FAUST_PRECISION,
 				const unsigned int norm2_max_iter=FAUST_NORM2_MAX_ITER,
 				const bool constant_step_size=false, const Real<FPP> step_size=FAUST_PRECISION,
-				const bool on_gpu=false);
-
+				const bool on_gpu=false,
+				const bool is_verbose=false);
 
 	/**
 	 * \brief Fill S with nfacts eye() matrices.
@@ -77,6 +81,15 @@ namespace Faust
 				const std::vector<std::pair<faust_unsigned_int,faust_unsigned_int>> dims,
 				const bool on_gpu=false);
 	//TODO: maybe move this function in a utils module (for now it serves only for PALM4MSA)
+
+	// warning: before calling compute_n_apply_grad*() out must be initialized to S[f_id] : the factor to update
+	// TODO: ideally compute_n_apply_grad1 has no reason to be kept, compute_n_apply_grad2 is faster (but just in case I decided to keep it for a moment)
+	template <typename FPP, FDevice DEVICE>
+		void compute_n_apply_grad1(const int f_id, const MatDense<FPP,DEVICE> &A, TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP>& c, MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, MatDense<FPP,DEVICE> _LorR, MatDense<FPP,DEVICE> *LorR, const int prod_mod, const bool packing_RL);
+
+	template <typename FPP, FDevice DEVICE>
+		void compute_n_apply_grad2(const int f_id, const MatDense<FPP,DEVICE> &A, TransformHelper<FPP,DEVICE>& S, std::vector<TransformHelper<FPP,DEVICE>*> &pL, std::vector<TransformHelper<FPP,DEVICE>*>& pR, const FPP& lambda, const Real<FPP> &c, MatDense<FPP,DEVICE> &out /* D */, const StoppingCriterion<Real<FPP>>& sc, Real<FPP> &error, MatDense<FPP,DEVICE> _LorR, MatDense<FPP,DEVICE> *LorR, const int prod_mod, const bool packing_RL);
+
 }
 #include "faust_palm4msa2020.hpp"
 #include "faust_palm4msa2020_2.hpp"
