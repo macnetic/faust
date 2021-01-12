@@ -2,6 +2,7 @@
 #define __FAUST_TRANSFORM_HELPER_DEVICE__
 #include "faust_Slice.h"
 #include "faust_constant.h"
+#include "faust_prod_opt.h"
 #include <memory>
 
 namespace Faust
@@ -65,10 +66,10 @@ namespace Faust
 			bool is_fact_sparse(const faust_unsigned_int id) const;
 			bool is_fact_dense(const faust_unsigned_int id) const;
 
-			virtual void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)=0;
+			virtual void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT)=0;
 
-			void pack_factors(const faust_unsigned_int id, const PackDir dir);
-			void pack_factors();
+			void pack_factors(const faust_unsigned_int id, const PackDir dir, const int mul_order_opt_mode=DEFAULT);
+			void pack_factors(const int mul_order_opt_mode=DEFAULT);
 			/**
 			  \brief Returns the left hand side factors of this from index 0 to id included (as a new TransformHelper obj).
 

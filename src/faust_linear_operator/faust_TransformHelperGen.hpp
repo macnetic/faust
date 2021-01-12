@@ -73,19 +73,19 @@ namespace Faust
 		}
 
 	template <typename FPP, FDevice DEV>
-		void TransformHelperGen<FPP,DEV>::pack_factors(const faust_unsigned_int id, const PackDir dir)
+		void TransformHelperGen<FPP,DEV>::pack_factors(const faust_unsigned_int id, const PackDir dir, const int mul_order_opt_mode/*=DEFAULT*/)
 		{
 			if(dir == PACK_RIGHT)
-				this->pack_factors(id, size()-1);
+				this->pack_factors(id, size()-1, mul_order_opt_mode);
 			else // dir == PACK_LEFT
-				this->pack_factors(0, id);
+				this->pack_factors(0, id, mul_order_opt_mode);
 		}
 
 	template <typename FPP, FDevice DEV>
-		void TransformHelperGen<FPP,DEV>::pack_factors()
+		void TransformHelperGen<FPP,DEV>::pack_factors(const int mul_order_opt_mode/*=DEFAULT*/)
 		{
 			//pack all factors in one
-			this->pack_factors(0, this->size()-1);
+			this->pack_factors(0, this->size()-1, mul_order_opt_mode);
 		}
 
 	template<typename FPP, FDevice DEV>

@@ -143,12 +143,12 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		MatDense<FPP,GPU2> TransformHelper<FPP,GPU2>::get_product()
+		MatDense<FPP,GPU2> TransformHelper<FPP,GPU2>::get_product(int prod_mod/*=-1*/)
 		{
 			return this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
 		}
 	template<typename FPP>
-		void TransformHelper<FPP,GPU2>::get_product(MatDense<FPP,GPU2>& M)
+		void TransformHelper<FPP,GPU2>::get_product(MatDense<FPP,GPU2>& M, int prod_mod/*=-1*/)
 		{
 			return this->transform->get_product(M, this->isTransposed2char(), this->is_conjugate);
 		}
@@ -359,13 +359,13 @@ namespace Faust
 		}
 
 	template<typename FPP>
-		void Faust::TransformHelper<FPP,GPU2>::pack_factors()
+		void Faust::TransformHelper<FPP,GPU2>::pack_factors(const int mul_order_opt_mode/*=DEFAULT*/)
 		{
-			TransformHelperGen<FPP,Cpu>::pack_factors();
+			TransformHelperGen<FPP,Cpu>::pack_factors(mul_order_opt_mode);
 		}
 
 	template<typename FPP>
-		void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)
+		void Faust::TransformHelper<FPP,GPU2>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id,const int mul_order_opt_mode/*=DEFAULT*/)
 		{
 			if(start_id < 0 || start_id >= size())
 				throw out_of_range("start_id is out of range.");
@@ -398,6 +398,8 @@ namespace Faust
 					topack_factors.push_back(get_gen_fact_nonconst(i));
 				//				std::vector<Faust::MatGeneric<FPP,GPU2>*> topack_factors(begin()+start_id, begin()+end_id+1);
 				Faust::TransformHelper<FPP,GPU2> t(topack_factors, 1.0, false, false, false);
+				//TODO: not yet implemented for GPU2
+//				t.set_FM_mul_mode(mul_order_opt_mode);
 				// 2)
 				packed_fac = new MatDense<FPP,GPU2>(t.get_product());
 			}

@@ -36,8 +36,8 @@ namespace Faust
 				void push_back_();
 				void display() const;
 				std::string to_string() const;
-				MatDense<FPP,GPU2> get_product();
-				void get_product(MatDense<FPP,GPU2>& M);
+				MatDense<FPP,GPU2> get_product(int prod_mod=-1);
+				void get_product(MatDense<FPP,GPU2>& M, int prod_mod=-1);
 				MatDense<FPP,GPU2> multiply(const MatDense<FPP,GPU2> &A, const bool transpose=false, const bool conjugate=false);
 				MatDense<FPP,Cpu> multiply(const Faust::MatDense<FPP,Cpu> &A, const bool transpose=false, const bool conjugate=false);
 				TransformHelper<FPP,GPU2>* multiply(const FPP& a);
@@ -52,8 +52,8 @@ namespace Faust
 				Real<FPP> spectralNorm(int32_t nb_iter_max, float threshold, int& flag);
 				const MatGeneric<FPP,GPU2>* get_gen_fact(const faust_unsigned_int id) const;
 				MatGeneric<FPP,GPU2>* get_gen_fact_nonconst(const faust_unsigned_int id) const;
-				void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
-				void pack_factors();
+				void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
+				void pack_factors(const int mul_order_opt_mode=DEFAULT);
 				void update(const MatGeneric<FPP, GPU2>& M, const faust_unsigned_int id);
 				void operator=(TransformHelper<FPP,GPU2>& th);
 				typename Transform<FPP,GPU2>::iterator begin() const;

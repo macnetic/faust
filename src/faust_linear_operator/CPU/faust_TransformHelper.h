@@ -153,8 +153,8 @@ namespace Faust
 					faust_unsigned_int* num_rows,
 					faust_unsigned_int* num_cols,
 					const bool transpose = false) const;
-			MatDense<FPP,Cpu> get_product();// const;
-			void get_product(MatDense<FPP,Cpu>& prod) const;
+			MatDense<FPP,Cpu> get_product(const int mul_order_opt_mode=DEFAULT);// const;
+			void get_product(MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode=DEFAULT); //const;
 			void save_mat_file(const char* filename) const;
 			double spectralNorm(const int nbr_iter_max, double threshold, int &flag) const;
 			TransformHelper<FPP,Cpu>* transpose();
@@ -195,8 +195,8 @@ namespace Faust
 			FaustGPU<FPP>* get_gpu_faust();
 #endif
 
-			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id);
-			void pack_factors();
+			void pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode=DEFAULT);
+			void pack_factors(const int mul_order_opt_mode=DEFAULT);
 
 			TransformHelper<FPP,Cpu>* swap_cols(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);
 			TransformHelper<FPP,Cpu>* swap_rows(const faust_unsigned_int id1, const faust_unsigned_int id2, const bool permutation=false, const bool inplace=false, const bool check_transpose=true);

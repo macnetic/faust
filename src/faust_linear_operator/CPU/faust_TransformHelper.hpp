@@ -870,28 +870,46 @@ template<typename FPP>
 
 
 template<typename FPP>
-	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product() // const
+	MatDense<FPP,Cpu> TransformHelper<FPP,Cpu>::get_product(const int mul_order_opt_mode/*=DEFAULT*/) // const
 	{
+		int old_FM_mul_mod = -1;
+		MatDense<FPP, Cpu> P;
+		// keep current mul mode to restore it on the function end
+		if(mul_order_opt_mode != this->mul_order_opt_mode)
+		{
+			old_FM_mul_mod = this->mul_order_opt_mode;
+			this->set_FM_mul_mode(mul_order_opt_mode);
+		}
 		if(this->mul_order_opt_mode)
 			switch(this->mul_order_opt_mode)
 			{
 #ifdef USE_GPU_MOD
 				case GPU_MOD:
 					if(nullptr != gpu_faust)
-						return gpu_faust->get_product(this->is_transposed, this->is_conjugate);
+						P = gpu_faust->get_product(this->is_transposed, this->is_conjugate);
 #endif
 				default:
 					//TODO: avoid to add one factor for all methods if possible
 					MatDense<FPP,Cpu> Id(this->getNbCol(), this->getNbCol());
 					Id.setEyes();
-					return this->multiply(Id);
+					P = this->multiply(Id);
 			}
-		return this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
+		else
+			P = this->transform->get_product(this->isTransposed2char(), this->is_conjugate);
+		if(old_FM_mul_mod != - 1)
+		{
+			this->set_FM_mul_mode(old_FM_mul_mod);
+		}
+		return P;
 	}
 
 template<typename FPP>
-	void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod) const {
-		this->transform->get_product(prod, this->isTransposed2char(), this->is_conjugate);
+	void TransformHelper<FPP,Cpu>::get_product(Faust::MatDense<FPP,Cpu>& prod, const int mul_order_opt_mode/*=DEFAULT*/) //const
+	{
+		if(mul_order_opt_mode != DEFAULT)
+			prod = this->get_product(mul_order_opt_mode);
+		else
+			this->transform->get_product(prod, this->isTransposed2char(), this->is_conjugate);
 	}
 
 template<typename FPP>
@@ -1248,7 +1266,7 @@ template<typename FPP>
 	}
 
 template<typename FPP>
-	void Faust::TransformHelper<FPP,Cpu>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id)
+	void Faust::TransformHelper<FPP,Cpu>::pack_factors(faust_unsigned_int start_id, faust_unsigned_int end_id, const int mul_order_opt_mode/*=DEFAULT*/)
 	{
 		if(start_id < 0 || start_id >= size())
 			throw out_of_range("start_id is out of range.");
@@ -1260,7 +1278,7 @@ template<typename FPP>
 			//nothing to do except converting to MatDense if start_id
 			//factor is a MatSparse
 			packed_fac = dynamic_cast<Faust::MatDense<FPP,Cpu>*>(*(begin()+start_id));
-			if(packed_fac == nullptr) 
+			if(packed_fac == nullptr)
 			{// factor start_id is not at MatDense, convert it
 				packed_fac = new MatDense<FPP,Cpu>(*dynamic_cast<Faust::MatSparse<FPP,Cpu>*>(*(begin()+start_id)));
 			}
@@ -1278,6 +1296,7 @@ template<typename FPP>
 			// 1)
 			std::vector<Faust::MatGeneric<FPP,Cpu>*> topack_factors(begin()+start_id, begin()+end_id+1);
 			Faust::TransformHelper<FPP,Cpu> t(topack_factors, 1.0, false, false, false);
+			t.set_FM_mul_mode(mul_order_opt_mode, /*silent*/ false);
 			// 2)
 			packed_fac = new MatDense<FPP,Cpu>(t.get_product());
 		}
@@ -1293,9 +1312,9 @@ template<typename FPP>
 	}
 
 template <typename FPP>
-	void TransformHelper<FPP,Cpu>::pack_factors()
+	void TransformHelper<FPP,Cpu>::pack_factors(const int mul_order_opt_mode/*=DEFAULT*/)
 {
-	TransformHelperGen<FPP,Cpu>::pack_factors();
+	TransformHelperGen<FPP,Cpu>::pack_factors(mul_order_opt_mode/*=DEFAULT*/);
 }
 
 template<typename FPP>
