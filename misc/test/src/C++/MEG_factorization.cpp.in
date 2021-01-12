@@ -1,5 +1,6 @@
 #include "faust_init_from_matio_params.h"
 #include "faust_init_from_matio_core.h"
+#undef _MUL_OMP_ // it fails with this prod opt but it doesn't mean OMP isn't used by Eigen or other
 #include "faust_TransformHelper.h"
 #include "faust_HierarchicalFact.h"
 #include "faust_ConstraintInt.h"
@@ -84,9 +85,16 @@ int main(int argc, const char** argv)
 	}
 
 	vector<vector<const Faust::ConstraintGeneric*>> constraints = { res_constraints, fac_constraints };
-	Faust::StoppingCriterion<double> loc_opt_stop(10);
-	Faust::StoppingCriterion<double> glob_opt_stop(10);
-	Faust::Params<double, dev> params(MEG.getNbRow(), MEG.getNbCol(), 9, constraints, {}, loc_opt_stop, glob_opt_stop, /*verbosity*/ false, /* isUpdateWayR2L_ */ true, /* isFactSideLeft_ */ true);
+	char* str_num_its = getenv("NUM_ITS"); //same for split-in-two-factorization (aka local opt) and all-factors PALM4MSA (aka global opt)
+	int num_its = 1;
+	if(str_num_its)
+	{
+		num_its = std::atoi(str_num_its);
+	}
+	Faust::StoppingCriterion<double> loc_opt_stop(num_its);
+	Faust::StoppingCriterion<double> glob_opt_stop(num_its);
+	Faust::Params<double, dev> params(MEG.getNbRow(), MEG.getNbCol(), 9, constraints, {}, loc_opt_stop, glob_opt_stop, /*verbosity*/ true, /* isUpdateWayR2L_ */ true, /* isFactSideLeft_ */ true, /* init_lambda_ = */1.0, /*constant_step_size_=*/false,
+			/*step_size_=*/1e-16, /*INTERNAL_OPT*/EXTERNAL_OPT);
 	Faust::BlasHandle<Cpu> cublasHandle;
 	Faust::SpBlasHandle<Cpu> cusparseHandle;
 	double lambda2020;
@@ -95,10 +103,11 @@ int main(int argc, const char** argv)
 	char* str_packing_RL = getenv("PACKING_RL");
 	char* str_isUpdateWayR2L = getenv("UR2L");
 	char* str_isFactSideLeft = getenv("FSL");
-	params.isUpdateWayR2L = false;
+	params.isUpdateWayR2L = true;
 	params.isFactSideLeft = true;
 	params.packing_RL = true;
 	params.use_csr = true;
+	params.isVerbose = true;
 
 	if(str_packing_RL)
 		params.packing_RL = std::atoi(str_packing_RL) != 0;
@@ -109,32 +118,40 @@ int main(int argc, const char** argv)
 	if(str_isFactSideLeft)
 		params.isFactSideLeft = std::atoi(str_isFactSideLeft) != 0;
 
+
+
 	params.Display();
 
+#ifndef USE_GPU_MOD
+	// the 2016 impl. is not GPU2 ready
 	if(impl == 2016 || argc < 2)
 	{
-		//		Faust::HierarchicalFact<double, dev> algo(MEG, params, cublasHandle, cusparseHandle);
-		//		algo.compute_facts();
+		Faust::HierarchicalFact<double, dev> algo(MEG, params, cublasHandle, cusparseHandle);
+		algo.compute_facts();
 	}
-	else if(impl == 2020)
-	{
-		//Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>&  A,
-		//		Params<FPP,DEVICE, Real<FPP>> & p,
-		//		Real<FPP>& lambda, const bool compute_2norm_on_array,
-		//		const bool on_gpu)
+	else
+#endif
+		if(impl == 2020)
+		{
+			//Faust::TransformHelper<FPP,DEVICE>* Faust::hierarchical(const Faust::MatDense<FPP,DEVICE>&  A,
+			//		Params<FPP,DEVICE, Real<FPP>> & p,
+			//		Real<FPP>& lambda, const bool compute_2norm_on_array,
+			//		const bool on_gpu)
 
 #ifdef ON_CPU
-		cout << "on_gpu: " << on_gpu << endl;
-		auto th = Faust::hierarchical<double,Cpu>(MEG, params, lambda2020, false, on_gpu);
+			cout << "on_gpu: " << on_gpu << endl;
+			auto th = Faust::hierarchical<double,Cpu>(MEG, params, lambda2020, false, on_gpu);
 #else
-		cout << "hierarchical on GPU2 MEG" << endl;
-		auto th = Faust::hierarchical<double,GPU2>(gpu_MEG, params, lambda2020, false, on_gpu);
+			cout << "hierarchical on GPU2 MEG" << endl;
+			auto th = Faust::hierarchical<double,GPU2>(gpu_MEG, params, lambda2020, false, on_gpu);
 #endif
-		th->display();
+			th->display();
 
-		delete th;
+			delete th;
 
-	}
+		}
+
+	//TODO: errs
 
 	for(auto c: res_constraints)
 	{
