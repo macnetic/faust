@@ -297,7 +297,7 @@ void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> &
 
 	#ifdef __GEMM_WITH_OPENBLAS__
 		CBLAS_TRANSPOSE transA,transB;
-		if (typeA=='T' || typeB == 'H')
+		if (typeA=='T' || typeA == 'H')
 			transA = CblasTrans;
 		else
 			transA = CblasNoTrans;
