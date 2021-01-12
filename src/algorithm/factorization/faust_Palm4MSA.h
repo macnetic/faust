@@ -154,6 +154,10 @@ namespace Faust
 
 
        protected:
+		  std::chrono::time_point<std::chrono::high_resolution_clock> spectral_stop, spectral_start;
+		  std::chrono::duration<double> spectral_duration;
+		  std::chrono::time_point<std::chrono::high_resolution_clock> fgrad_stop, fgrad_start;
+		  std::chrono::duration<double> fgrad_duration;
           // modif AL AL
           Faust::MatDense<FPP,DEVICE> data;
 

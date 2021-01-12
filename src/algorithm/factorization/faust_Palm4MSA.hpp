@@ -119,6 +119,11 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::MatDense<FPP,DEVICE>& M,
 	else
         isCComputed = false;
 
+   if(verbose)
+   {
+	   spectral_duration = std::chrono::duration<double>::zero();
+	   fgrad_duration = std::chrono::duration<double>::zero();
+   }
 }
 
 template<typename FPP,FDevice DEVICE,typename FPP2>
@@ -158,6 +163,11 @@ Faust::Palm4MSA<FPP,DEVICE,FPP2>::Palm4MSA(const Faust::ParamsPalm<FPP,DEVICE,FP
 		isCComputed = false;
 
    check_constraint_validity();
+   if(verbose)
+   {
+	   spectral_duration = std::chrono::duration<double>::zero();
+	   fgrad_duration = std::chrono::duration<double>::zero();
+   }
 }
 
 template<typename FPP,FDevice DEVICE,typename FPP2>
@@ -166,6 +176,13 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_facts()
 	while (do_continue())
 	{
 		next_step();
+	}
+	if(verbose)
+	{
+		std::cout << "palm4msa spectral time=" << spectral_duration.count() << std::endl;
+		std::cout << "palm4msa fgrad time=" << fgrad_duration.count() << std::endl;
+		spectral_duration = std::chrono::duration<double>::zero();
+		fgrad_duration = std::chrono::duration<double>::zero();
 	}
 }
 
@@ -204,7 +221,7 @@ template<typename FPP,FDevice DEVICE,typename FPP2>
 void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c_ext_opt()
 {
 //#define mul_3_facts multiply_order_opt
-#define mul_3_facts multiply_order_opt_all_ends// this one only optimize the product on factor ends but for three factors it doesn't change anything comparing to multiply_order_opt
+#define mul_3_facts multiply_order_opt_all_ends// this one only optimizes the product on factor ends but for three factors it doesn't change anything comparing to multiply_order_opt
 	// compute error = m_lambda*L*S*R-data
 	error = data;
 	std::vector<MatDense<FPP,DEVICE>*> facts;
@@ -227,10 +244,17 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c_ext_opt()
 template<typename FPP,FDevice DEVICE,typename FPP2>
 void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_grad_over_c()
 {
+	if(verbose)
+		fgrad_start = std::chrono::high_resolution_clock::now();
 	if(gradCalcOptMode == EXTERNAL_OPT)
 		compute_grad_over_c_ext_opt();
 	else
 		compute_grad_over_c_int_opt();
+	if(verbose)
+	{
+		fgrad_stop = std::chrono::high_resolution_clock::now();
+		fgrad_duration += fgrad_stop-fgrad_start;
+	}
 }
 
 template<typename FPP,FDevice DEVICE,typename FPP2>
@@ -571,10 +595,16 @@ void Faust::Palm4MSA<FPP,DEVICE,FPP2>::compute_c()
 
    if (!isConstantStepSize)
    {
-		int flag1,flag2;
+	   int flag1,flag2;
+	   if(verbose)
+		   spectral_start = std::chrono::high_resolution_clock::now();
 	   FPP2 nL1=LorR.spectralNorm(norm2_max_iter,norm2_threshold,flag1,blas_handle);
 	   FPP2 nR1=RorL[m_indFact].spectralNorm(norm2_max_iter,norm2_threshold,flag2,blas_handle);
+	   if(verbose)
+		   spectral_stop = std::chrono::high_resolution_clock::now();
 	   c=lipschitz_multiplicator*nR1*nR1*nL1*nL1*m_lambda*m_lambda;
+	   if(verbose)
+		   spectral_duration += spectral_stop-spectral_start;
    }
 
    isCComputed = true;
