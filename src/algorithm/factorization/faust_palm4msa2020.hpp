@@ -11,7 +11,8 @@ void Faust::palm4msa(const Faust::MatDense<FPP,DEVICE>& A,
 		const Real<FPP> norm2_threshold,
 		const unsigned int norm2_max_iter,
 		const bool constant_step_size, const Real<FPP> step_size,
-		const bool on_gpu /*=false*/)
+		const bool on_gpu /*=false*/,
+		const bool is_verbose/*=false*/)
 {
 	if(constraints.size() == 0)
 		throw out_of_range("No constraint passed to palm4msa.");

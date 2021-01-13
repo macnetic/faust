@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
 	if(meth == 1)
 	{
 		cout << "use impl1" << endl;
-		Faust::palm4msa<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, use_csr, compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu);
+		Faust::palm4msa<FPP,Cpu>(data, constraints, facts, lambda, sc, is_update_way_R2L, use_csr, compute_2norm_on_array, norm2_threshold, norm2_max_iter, false, FAUST_PRECISION, on_gpu, true);
 	}
 	else if(meth == 2)
 	{
