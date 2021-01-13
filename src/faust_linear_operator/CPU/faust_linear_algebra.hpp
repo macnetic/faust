@@ -55,13 +55,7 @@
 #endif
 
 
-#ifdef __GEMM_WITH_OPENBLAS__
-	#include "faust_cblas_algebra.h"
-#endif
 
-
-
-	
 template<typename FPP>
 void Faust::spgemm(const Faust::MatSparse<FPP,Cpu> & A,const Faust::MatDense<FPP,Cpu> & B, Faust::MatDense<FPP,Cpu> & C,const FPP & alpha, const FPP & beta, char  typeA, char  typeB)
 {
@@ -294,16 +288,6 @@ void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> &
 
 	y.resize(nbRowOpA);
 
-
-	#ifdef __GEMM_WITH_OPENBLAS__
-		CBLAS_TRANSPOSE transA,transB;
-		if (typeA=='T' || typeA == 'H')
-			transA = CblasTrans;
-		else
-			transA = CblasNoTrans;
-	#endif
-
-	#ifndef __GEMM_WITH_OPENBLAS__
 	if (beta == FPP(0.0))
 	{
 		if(A.is_id() && alpha == FPP(1.0))
@@ -336,10 +320,6 @@ void Faust::gemv(const Faust::MatDense<FPP,Cpu> & A,const Faust::Vect<FPP,Cpu> &
 			y.vec = alpha * A.mat.adjoint() * px->vec + beta * y.vec;
 		}
 	}
-	#else
-
-		Faust::cblas_gemv<FPP>(CblasColMajor,transA,A.getNbRow(),A.getNbCol(),alpha,A.getData(),A.getNbRow(),px->getData(),1,beta,y.getData(),1);
-	#endif
 
 	if  ((&x) == (&y))
 		delete px;
@@ -369,10 +349,6 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 	A.t_gemm.start();
 #endif
 
-#ifdef __GEMM_WITH_OPENBLAS__
-	if(typeA == 'H' || typeB == 'H')
-		handleError("linear_algebra", " gemm: complex adjoint matrix is not yet handled with BLAS.");
-#endif
 	faust_unsigned_int nbRowOpA,nbRowOpB,nbColOpA,nbColOpB;
 
 	if ( ((&(C.mat)) == (&(A.mat))) || ((&(C.mat)) == (&(B.mat))) )
@@ -420,20 +396,6 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
         C.resize(nbRowOpA,nbColOpB);
 
 
-	#ifdef __GEMM_WITH_OPENBLAS__
-		CBLAS_TRANSPOSE transA,transB;
-		if (typeA=='T')
-			transA = CblasTrans;
-		else
-			transA = CblasNoTrans;
-		if (typeB=='T')
-			transB = CblasTrans;
-		else
-			transB = CblasNoTrans;
-	#endif
-
-
-
 	if (beta == FPP(0.0))
 	{
 
@@ -444,9 +406,9 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 			memset(ptr_data_dst, 0, sizeof(FPP) * C.dim1*C.dim2);
 			C.isZeros = true;
 			C.set_id(false);
-			#ifdef __COMPILE_TIMERS__
-				A.t_gemm.stop();
-			#endif
+#ifdef __COMPILE_TIMERS__
+			A.t_gemm.stop();
+#endif
 			return;
 		}
 
@@ -471,39 +433,32 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 		if(B.is_id())
 			N_times_alpha_into_C(A, typeA, alpha, C);
 
-		#ifndef __GEMM_WITH_OPENBLAS__
-		// std::cout<<" A normal Faust::gemm"<<std::endl;
-			if (typeA == 'N')
-			{
-				if (typeB == 'N')
-					C.mat.noalias() = alpha * A.mat * B.mat;
-				else if(typeB == 'T')
-					C.mat.noalias() = alpha * A.mat * B.mat.transpose();
-				else // typeB == 'H' //TODO: check validity of typeA and typeB
-					C.mat.noalias() = alpha * A.mat * B.mat.transpose().conjugate();
-			}else if(typeA == 'T')
-			{
-				if (typeB == 'N')
-					C.mat.noalias() = alpha * A.mat.transpose() * B.mat;
-				else if(typeB == 'T')
-					C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose();
-				else // typeB == 'H' //TODO: check validity of typeA and typeB
-					C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose().conjugate();
-			}
-			else //if(typeA == 'H')
-			{
-				if (typeB == 'N')
-					C.mat.noalias() = alpha * A.mat.transpose().conjugate() * B.mat;
-				else if(typeB == 'T')
-					C.mat.noalias() = alpha * A.mat.transpose().conjugate() * B.mat.transpose();
-				else // typeB == 'H' //TODO: check validity of typeA and typeB
-					C.mat.noalias() = alpha * A.mat.transpose().conjugate() * B.mat.transpose().conjugate();
-			}
-		#else
-			 FPP beta = FPP(0.0);
-			 Faust::cblas_gemm<FPP>(CblasColMajor, transA, transB, (int) C.dim1, (int)  C.dim2, (int) nbColOpA, (FPP) alpha, (FPP*) A.getData(), (int) A.dim1, (FPP*) B.getData(), (int) B.dim1,(FPP) beta, (FPP*) C.getData(),(int) C.dim1);
-
-		#endif
+		if (typeA == 'N')
+		{
+			if (typeB == 'N')
+				C.mat.noalias() = alpha * A.mat * B.mat;
+			else if(typeB == 'T')
+				C.mat.noalias() = alpha * A.mat * B.mat.transpose();
+			else // typeB == 'H' //TODO: check validity of typeA and typeB
+				C.mat.noalias() = alpha * A.mat * B.mat.transpose().conjugate();
+		}else if(typeA == 'T')
+		{
+			if (typeB == 'N')
+				C.mat.noalias() = alpha * A.mat.transpose() * B.mat;
+			else if(typeB == 'T')
+				C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose();
+			else // typeB == 'H' //TODO: check validity of typeA and typeB
+				C.mat.noalias() = alpha * A.mat.transpose() * B.mat.transpose().conjugate();
+		}
+		else //if(typeA == 'H')
+		{
+			if (typeB == 'N')
+				C.mat.noalias() = alpha * A.mat.transpose().conjugate() * B.mat;
+			else if(typeB == 'T')
+				C.mat.noalias() = alpha * A.mat.transpose().conjugate() * B.mat.transpose();
+			else // typeB == 'H' //TODO: check validity of typeA and typeB
+				C.mat.noalias() = alpha * A.mat.transpose().conjugate() * B.mat.transpose().conjugate();
+		}
 
 
 	}else
@@ -513,9 +468,9 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 			C *= beta;
 			C.isZeros = false;
 			C.set_id(false);
-			#ifdef __COMPILE_TIMERS__
-				A.t_gemm.stop();
-			#endif
+#ifdef __COMPILE_TIMERS__
+			A.t_gemm.stop();
+#endif
 			return;
 		}
 
@@ -525,9 +480,9 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 			if(typeB == 'N' && alpha == FPP(1.0))
 			{
 				C += B;
-				#ifdef __COMPILE_TIMERS__
-					A.t_gemm.stop();
-				#endif
+#ifdef __COMPILE_TIMERS__
+				A.t_gemm.stop();
+#endif
 				return;
 			}
 			Faust::MatDense<FPP,Cpu> B_tmp(B);
@@ -543,9 +498,9 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 			C += B_tmp;
 			C.isZeros = false;
 			C.set_id(false);
-			#ifdef __COMPILE_TIMERS__
-				A.t_gemm.stop();
-			#endif
+#ifdef __COMPILE_TIMERS__
+			A.t_gemm.stop();
+#endif
 			return;
 		}
 		if(B.is_id())
@@ -556,9 +511,9 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 				C += A;
 				C.isZeros = false;
 				C.set_id(false);
-				#ifdef __COMPILE_TIMERS__
-					A.t_gemm.stop();
-				#endif
+#ifdef __COMPILE_TIMERS__
+				A.t_gemm.stop();
+#endif
 				return;
 			}
 			Faust::MatDense<FPP,Cpu> A_tmp(A);
@@ -575,33 +530,26 @@ void Faust::gemm_core(const Faust::MatDense<FPP,Cpu> & A,const Faust::MatDense<F
 			C.isZeros = false;
 			C.set_id(false);
 
-			#ifdef __COMPILE_TIMERS__
-				A.t_gemm.stop();
-			#endif
+#ifdef __COMPILE_TIMERS__
+			A.t_gemm.stop();
+#endif
 			return;
 		}
 
 
-		#ifndef __GEMM_WITH_OPENBLAS__
-			if (typeA == 'N')
-			{
-				if (typeB == 'N')
-						C.mat = alpha * A.mat * B.mat + beta * C.mat;
-				else
-					C.mat = alpha * A.mat * B.mat.transpose() + beta * C.mat;
-			}else
-			{
-				if (typeB == 'N')
-					C.mat = alpha * A.mat.transpose() * B.mat + beta * C.mat ;
-				else
-					C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
-			}
-		#else
-			Faust::cblas_gemm<FPP>(CblasColMajor, transA, transB, (int) C.dim1,(int)  C.dim2,(int)  nbColOpA,(FPP) alpha,(FPP*)  A.getData(), (int) A.dim1,(FPP*) B.getData(),(int) B.dim1, (FPP) beta, (FPP*) C.getData(), (int)C.dim1);
-
-
-
-		#endif
+		if (typeA == 'N')
+		{
+			if (typeB == 'N')
+				C.mat = alpha * A.mat * B.mat + beta * C.mat;
+			else
+				C.mat = alpha * A.mat * B.mat.transpose() + beta * C.mat;
+		}else
+		{
+			if (typeB == 'N')
+				C.mat = alpha * A.mat.transpose() * B.mat + beta * C.mat ;
+			else
+				C.mat = alpha * A.mat.transpose() * B.mat.transpose() + beta * C.mat;
+		}
 
 	}
 	C.isZeros = false;

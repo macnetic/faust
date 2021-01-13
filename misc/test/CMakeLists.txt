@@ -9,12 +9,6 @@ if(BUILD_READ_MAT_FILE)
 	include_directories(${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR} ${MATIO_INC_DIR})
 endif(BUILD_READ_MAT_FILE)
 
-#rajout OPENBLAS_INC_DIR pour la compatibilite UBUNTU
-if(BUILD_OPENBLAS)
-	include_directories(${OPENBLAS_INC_DIR})
-endif()
-
-
 ##############################################################################
 # Testing with CTest
 # CTest is a testing tool distributed as a part of CMake.
@@ -172,7 +166,7 @@ if(NOT NOCPPTESTS)
 				target_compile_options(${TEST_BIN_FILE} PRIVATE "${OMP_CXX_FLAGS}")
 				target_link_options(${TEST_BIN_FILE} PRIVATE "-fopenmp") # might work only for linux
 			endif()
-			target_link_libraries(${TEST_BIN_FILE} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+			target_link_libraries(${TEST_BIN_FILE} ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
 			add_test(NAME UNIT_${TEST_BIN_FILE} COMMAND ${FAUST_BIN_TEST_BIN_DIR}/${TEST_BIN_FILE})
 		endforeach(FILE)
 	endforeach(TEST_FPP)
@@ -245,11 +239,8 @@ if(MATIO_LIB_FILE AND MATIO_INC_DIR AND BUILD_READ_MAT_FILE AND NOT NOCPPTESTS) 
 			# Generation of the binary files in double and float precision
 			add_executable(${TEST_CPP_NAME} ${FAUST_BIN_TEST_SRC_DIR}/${TEST_FILE_CPP} ${FAUST_BIN_TEST_SRC_DIR}/ ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio.cpp ${FAUST_CMDLINE_TYPE_FORMAT_MAT_SRC_DIR}/faust_init_from_matio_mat.cpp)
 
-			if(BUILD_OPENBLAS)
-				target_link_libraries(${TEST_CPP_NAME}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
-			else(BUILD_OPENBLAS)
-				target_link_libraries(${TEST_CPP_NAME}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
-			endif(BUILD_OPENBLAS)	
+			target_link_libraries(${TEST_CPP_NAME}  ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE})
+
 			if(USE_GPU_MOD)
 				target_compile_options(${TEST_CPP_NAME} PRIVATE "${OMP_CXX_FLAGS}")
 				target_link_options(${TEST_CPP_NAME} PRIVATE "-fopenmp") # might work only for linux
@@ -387,7 +378,7 @@ if(NOT NOCPPTESTS)
 
 	add_executable(test_RefManager ${FAUST_SRC_TEST_SRC_CPP_DIR}/test_RefManager.cpp ${FAUST_BIN_TEST_SRC_DIR}/)
 
-	target_link_libraries(test_RefManager ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} ${OPENBLAS_LIB_FILE})
+	target_link_libraries(test_RefManager ${FAUST_TARGET} ${MATIO_LIB_FILE} ${HDF5_LIB_FILE} )
 	add_test(NAME test_RefManager COMMAND ${FAUST_BIN_TEST_BIN_DIR}/test_RefManager)
 
 endif(NOT NOCPPTESTS)

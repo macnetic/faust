@@ -10,14 +10,6 @@ if(USE_GPU_MOD)
 endif()
 include_directories(${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR} ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR} ${FAUST_UTILS_SRC_DIR} ${EIGEN_INC_DIR})
 
-if(BUILD_OPENBLAS)
-	#message(STATUS "**********OPENBLAS ACTIF************")
-	#message(STATUS "OPENBLAS_INC_DIR ${OPENBLAS_INC_DIR}")
-	include_directories( ${OPENBLAS_INC_DIR})
-	set(__GEMM_WITH_OPENBLAS__ "1")
-	#message(STATUS "**** OPENBLAS USE *****")
-endif()
-
 if (BUILD_USE_SINGLEPRECISION)
 	set(FAUST_SINGLE "1")
 endif()
@@ -30,7 +22,7 @@ if (BUILD_VERBOSE)
 	set(FAUST_VERBOSE "1")
 endif()
 	
-# permet de definir ou non les variable de compilation __GEMM_WITH_OPENBLAS__ et FAUST_SINGLE
+# permet de definir ou non la variable de compilation FAUST_SINGLE
 configure_file(${FAUST_SRC_LINEAR_OPERATOR_DIR}/faust_constant.h.in ${FAUST_SRC_LINEAR_OPERATOR_DIR}/faust_constant.h @ONLY)
 
 #message(STATUS "AAAAAAAAAAAAAAAAAAAAAAAAAAAA")

@@ -202,7 +202,6 @@ option(BUILD_USE_GPU  "Using both CPU and GPU process" OFF)
 
 option(BUILD_WRAPPER_MATLAB "Enable building Matlab MEX files." OFF)
 
-option(BUILD_OPENBLAS "Using openBLAS for matrix and vector computations" OFF)
 # different type of files 
 option(BUILD_READ_XML_FILE "Using xml configuration to read xml files" OFF)
 option(BUILD_READ_MAT_FILE "Using matio library to read mat files" ON)
@@ -239,7 +238,6 @@ option(PYTHON_ENCODING "The *.py charset for pyfaust/__init__.py (utf-8, windows
 #set(BUILD_DOCUMENTATION OFF CACHE BOOL "Generate html documentation with doxygen")
 #set(BUILD_READ_XML_FILE OFF CACHE BOOL "Using xml configuration to read xml files")
 #set(BUILD_WRAPPER_MATLAB ON CACHE BOOL "Generate Mexfiles")
-#set(BUILD_OPENBLAS OFF CACHE BOOL "Using openBLAS for matrix and vector computations")
 #set(BUILD_READ_MAT_FILE OFF CACHE BOOL "Using matio library to read mat files")
 
 option(FAUST_TORCH "Faust torch backend for the Faust-Matrix/Vector product." OFF)
@@ -248,9 +246,6 @@ option(USE_GPU_MOD "Faust cuda backend for the Faust-Matrix/Vector prodduct." OF
 
 if (BUILD_USE_SINGLEPRECISION)
 	message(STATUS "**********SINGLEPRECISION ACTIF************")
-endif()
-if (BUILD_OPENBLAS)
-	message(STATUS "**********OPENBLAS ACTIF************")
 endif()
 if (BUILD_WRAPPER_MATLAB)
 	message(STATUS "**********MEX ACTIF************")
@@ -708,9 +703,6 @@ if (BUILD_USE_GPU)
 	include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR} ${CUDA_INC_DIR} ${CUDA_RUNTIME_API_INC_DIR} ${CUSPARSE_INC_DIR} ${CUBLAS_V2_INC_DIR})
 	#include_directories(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR})
 endif()
-if(BUILD_OPENBLAS)
-	include_directories(${OPENBLAS_INC_DIR})
-endif()
 ###############################################################################################################
 
 
@@ -764,11 +756,7 @@ if (BUILD_USE_GPU)
 endif(BUILD_USE_GPU)
 
 
-if(BUILD_OPENBLAS)
-	target_link_libraries(${FAUST_TARGET} ${OPENBLAS_LIB_FILE})
-else()
-	target_link_libraries(${FAUST_TARGET} )	
-endif(BUILD_OPENBLAS)
+target_link_libraries(${FAUST_TARGET})
 
 if(CMAKE_BUILD_TYPE MATCHES "Release")
 	install(CODE "file(GLOB TO_STRIP_FILES lib/*.a wrapper/python/*.so wrapper/matlab/mex/*.mexa64 wrapper/matlab/mex/*.mexa32 wrapper/matlab/mex/*.maci wrapper/matlab/mex/*.maci64)

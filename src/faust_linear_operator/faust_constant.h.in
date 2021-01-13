@@ -44,9 +44,6 @@
 
 #define FAUST_VERSION @CPACK_PACKAGE_VERSION@ 
 
-///if defined, compilation with openblas for dense algebra
-#cmakedefine __GEMM_WITH_OPENBLAS__
-
 /*! \brief If defined, faust uses single precision for the the algebra (Faust::MatDense, Faust::MatSparse, Faust::Transform). <br>
 * If not, it's used double precision.
 *\warning Only useful for the mexfunction (MATLAB wrapper) since the Faust::MatDense ... classes are template

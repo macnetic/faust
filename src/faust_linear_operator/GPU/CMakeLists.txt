@@ -28,13 +28,6 @@ add_definitions(-DEIGEN_MPL2_ONLY)
 include_directories( ${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR} ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}  ${EIGEN_INC_DIR} ${CUDA_INC_DIR} ${CUDA_RUNTIME_API_INC_DIR} ${CUSPARSE_INC_DIR} ${CUBLAS_V2_INC_DIR})
 #include_directories( ${FAUST_SRC_LINEAR_OPERATOR_DIR} ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR} ${FAUST_ALGORITHM_CONSTRAINT_SRC_DIR} ${FAUST_ALGORITHM_FACTORIZATION_SRC_DIR}  ${EIGEN_INC_DIR})
 
-#if(BUILD_OPENBLAS)
-#	include_directories( ${OPENBLAS_INC_DIR} )
-#	set(__GEMM_WITH_OPENBLAS__ "1")
-#	#message(STATUS "**** OPENBLAS USE *****")
-#endif()
-
-
 if (BUILD_USE_SINGLEPRECISION)
 	set(FAUST_SINGLE "1")
 endif()
@@ -51,7 +44,7 @@ if (BUILD_USE_GPU)
 	set(__COMPILE_SPMAT__ "1")
 endif()
 
-# permet de definir ou non les variable de compilation __GEMM_WITH_OPENBLAS__ et FAUST_SINGLE
+# permet de definir ou non la variable de compilation FAUST_SINGLE
 configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR}/faust_constant_gpu.h.in ${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR}/faust_constant_gpu.h @ONLY)
 
 
@@ -60,22 +53,8 @@ configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU_DIR}/faust_constant_gpu.h.in ${FA
 
 cuda_add_library(${FAUST_LINEAR_OPERATOR_GPU_TARGET} ${CPP_FILES} ${CU_FILES} )
 
-    
-#if(BUILD_OPENBLAS)
-##	target_link_libraries(${FAUST_MATRIX_CU_TARGET} ${FAUST_EXCEPTION_TARGET} ${OPENBLAS_LIB_FILE})
-#else()
-##	target_link_libraries(${FAUST_MATRIX_CU_TARGET} ${FAUST_EXCEPTION_TARGET})
-#endif()
-
-
 #message(STATUS "AAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 #add_library(${FAUST_MATRIX_CU_TARGET} OBJECT ${CPP_FILES} ${CU_FILES})
-
-#if(BUILD_OPENBLAS)
-#	#target_link_libraries(${FAUST_MATRIX_TARGET} ${FAUST_EXCEPTION_TARGET} ${OPENBLAS_LIB_FILE})
-#else()
-#	#target_link_libraries(${FAUST_MATRIX_TARGET} ${FAUST_EXCEPTION_TARGET})
-#endif()
 
 # Pass options to NVCC
 #set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3 -m64 -Xcompiler -fPIC -use_fast_math  -gencode arch=compute_20,code=sm_20 \

@@ -53,9 +53,6 @@
 #include "faust_exception.h"
 #include "faust_constant.h"
 #include <cassert>
-#ifdef __GEMM_WITH_OPENBLAS__
-#include "faust_cblas_algebra.h"
-#endif
 
 
 namespace Faust
