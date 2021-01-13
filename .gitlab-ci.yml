@@ -84,6 +84,7 @@ pkg_macos:
         - cmake -DBUILD_WRAPPER_MATLAB=ON ..
         - make LANG=en_GB.UTF-8
         # restore clang libomp
+        - echo $MACOS_PASS | sudo -S cp /opt/local/lib/libomp/libomp.dylib /opt/local/lib/libomp/libiomp5.dylib
         - echo $MACOS_PASS | sudo -S mv /opt/local/lib/libomp/libomp.dylib.bak /opt/local/lib/libomp/libomp.dylib
         - 'echo $MACOS_PASS | sudo -S make install LANG=en_GB.UTF-8'
           #- 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$SHA_START-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust-$SHA_START -ov -format UDRW faust-$SHA_START'
@@ -204,6 +205,7 @@ pkg_macos_release:
         - cmake -DBUILD_WRAPPER_MATLAB=ON ..
         - make LANG=en_GB.UTF-8
         # restore clang libomp
+        - echo $MACOS_PASS | sudo -S cp /opt/local/lib/libomp/libomp.dylib /opt/local/lib/libomp/libiomp5.dylib
         - echo $MACOS_PASS | sudo -S mv /opt/local/lib/libomp/libomp.dylib.bak /opt/local/lib/libomp/libomp.dylib
         - 'echo $MACOS_PASS | sudo -S make install LANG=en_GB.UTF-8'
         - 'echo $MACOS_PASS | sudo -S hdiutil create -volname Faust-$CI_COMMIT_TAG-MatlabR2016a-Py2.7 -srcfolder /opt/local/faust -ov -format UDRW faust-$CI_COMMIT_TAG'
