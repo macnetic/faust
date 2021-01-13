@@ -11,7 +11,8 @@ variables:
 
 stages:
     - test
-    - pkg_rev
+    - pkg
+    - pkg_test
 
 ctest:
     <<: *ctest_script
@@ -72,7 +73,7 @@ ctest_nightly_macos:
         - win10
 
 pkg_macos:
-    stage: pkg_rev
+    stage: pkg
     script:
         - SHA_START=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -129,7 +130,7 @@ pkg_macos:
         - cd ..\..
 
 pkg_win:
-    stage: pkg_rev
+    stage: pkg
     variables: {BUILD_CONFIG: "Debug", GIT_SUBMODULE_STRATEGY: recursive}
     <<: *win_build_gpu_mod
     script:
@@ -163,7 +164,7 @@ pkg_win:
 
 pkg_linux:
     <<: *build_gpu_mod
-    stage: pkg_rev
+    stage: pkg
     variables: {GIT_SUBMODULE_STRATEGY: recursive} # for checking out gpu_mod
     script:
         # build faust
@@ -195,6 +196,7 @@ pkg_linux:
           #it's done for linux packages
 
 pkg_macos_release:
+    stage: pkg
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DOpenMP_gomp_LIBRARY=/opt/local/lib/libomp/libgomp.dylib -DBUILD_WRAPPER_PYTHON=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DCMAKE_BUILD_TYPE=Release -DEXCLUDE_FAUST_LIB_INSTALL=ON -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DCMAKE_CXX_COMPILER=/opt/local/bin/clang++-mp-8.0 ..'
@@ -231,6 +233,7 @@ pkg_macos_release:
 
 pkg_win_release:
     variables: {BUILD_CONFIG: "Release", GIT_SUBMODULE_STRATEGY: recursive}
+    stage: pkg
     <<: *win_build_gpu_mod
     script:
         - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
@@ -252,6 +255,7 @@ pkg_win_release:
 
 pkg_linux_release:
     <<: *build_gpu_mod
+    stage: pkg
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON  -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
@@ -273,6 +277,7 @@ pkg_linux_release:
 
 
 pkg_linux_release_static:
+    stage: pkg
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
         - 'cmake -DBUILD_WRAPPER_PYTHON=ON -DBUILD_WRAPPER_MATLAB=ON -DBUILD_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/opt/local/faust -DCPACK_PACKAGE_FILE_NAME=faust-$CI_COMMIT_TAG-static -DCPACK_PACKAGE_VERSION=$CI_COMMIT_TAG -DEXCLUDE_FAUST_LIB_INSTALL=ON -DUSE_MATIO_STATIC_LIBS=ON -DMATIO_STATIC_LIB_PATH=/opt/local/matio-1.5.7/src/.libs/libmatio.a -DZ_STATIC_LIB_PATH=/opt/local/zlib-1.2.11/libz.a -DHDF5_STATIC_LIB_PATH=/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a -DBUILD_TESTING=OFF -DREMOTE_DATA_URL="$DURL" -DREMOTE_DATA_FILE="$DFILE" -DBUILD_MULTITHREAD=ON -DNOPY2=ON -DUSE_GPU_MOD=ON -DCMAKE_PREFIX_PATH=$PWD/../gpu_mod ..'
@@ -328,7 +333,7 @@ pages:
 
 .pkg_purepy_rev:
     extends: .pkg_purepy
-    stage: pkg_rev
+    stage: pkg
     before_script:
         - VERSION=$(echo $CI_COMMIT_SHA | sed -e 's/^\(.\{8\}\).*/\1/')
         - if [[ -n "$USE_GPU_MOD" ]]; then GPU_MOD_SHA=$(git submodule foreach git log --oneline -n1 | sed -e 's/ .*//' | tail -1); fi
@@ -362,6 +367,7 @@ pkg_linux_purepy_rev:
         - job: ctest_python
 
 .pkg_purepy_release:
+    stage: pkg
     extends: .pkg_purepy
     before_script:
         - VERSION=$CI_COMMIT_TAG
@@ -400,6 +406,7 @@ pkg_linux_purepy_release_torch_linked:
     variables: {GIT_SUBMODULE_STRATEGY: recursive, MATIO_STATIC_LIB_PATH: "/opt/local/matio-1.5.7/src/.libs/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/zlib-1.2.11/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/hdf5-1.8.18/src/.libs/libhdf5.a", BUILD_MULTITHREAD: "ON", NOPY2: "ON", FAUST_TORCH: "ON", USE_GPU_MOD: "ON", CMAKE_PREFIX_PATH: "/opt/local/libtorch/share/cmake/Torch;../gpu_mod", EXPERIMENTAL_PKG: "OFF"}
 
 .pkg_purepy_release_rasp:
+    stage: pkg
     variables: {MATIO_STATIC_LIB_PATH: "/opt/local/libmatio.a", Z_STATIC_LIB_PATH: "/opt/local/libz.a", HDF5_STATIC_LIB_PATH: "/opt/local/libhdf5.a"}
     script:
         - if [[ ! -d 'build' ]]; then  mkdir build;fi; cd build
@@ -422,6 +429,7 @@ pkg_linux_purepy_release_torch_linked:
 ########### pip binary packages for windows
 
 .pkg_win_purepy: &pkg_win_purepy
+    stage: pkg
     script:
         - cd gpu_mod
         - if NOT EXIST build (mkdir build) else (rmdir /S /Q build & mkdir build)
@@ -451,7 +459,6 @@ pkg_linux_purepy_release_torch_linked:
 
 pkg_win_purepy_rev:
     extends: .pkg_win_purepy
-    stage: pkg_rev
     variables: {BUILD_CONFIG: "Debug", GIT_SUBMODULE_STRATEGY: recursive}
     before_script:
         - 'set VERSION=%CI_COMMIT_SHA:~0,8%'
@@ -473,3 +480,17 @@ pkg_win_purepy_release:
         expire_in: '50 yrs'
     only:
         - tags
+
+test_macos_pkg_release:
+  stage: pkg_test
+  needs:
+        - job: pkg_macos_release
+          artifacts: true
+  script:
+    - find ./
+    - echo $MACOS_PASS | sudo -S installer -pkg build/faust-$CI_COMMIT_TAG.pkg -target /
+  only:
+    - tags
+  tags:
+    - macos
+    - macos_pkg_tester
