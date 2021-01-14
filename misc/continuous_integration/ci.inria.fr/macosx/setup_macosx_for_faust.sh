@@ -37,6 +37,7 @@ ln -sf /opt/local/bin/clang++-mp-8.0 /opt/local/bin/clang++
 ### 5. Install Python packages and dependencies
 yes | port install graphviz doxygen
 yes | port install python37 py37-pip
+yes | port install jpeg # pillow (indirect denpendency of pyfaust needs this to build)
 port select --set python python37
 port select --set pip pip37
 ln -sf /opt/local/bin/python3.7 /opt/local/bin/python3
