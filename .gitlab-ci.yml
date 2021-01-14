@@ -499,15 +499,15 @@ test_macos_pkg_release:
 .test_unix_purepy_pkg:
   stage: pkg_test
   script:
-    - find ./
-    - python3 -m venv test_pyfaust-$CI_COMMIT_TAG
+    - $JOB_PYTHON -m venv test_pyfaust-$CI_COMMIT_TAG
     - source test_pyfaust-$CI_COMMIT_TAG/bin/activate
     - pip install build/wrapper/python/dist/pyfaust-$CI_COMMIT_TAG-*.whl
-    - python3 -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
+    - $JOB_PYTHON -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"
   only:
     - tags
 
 test_macos_purepy_release:
+  variables: {JOB_PYTHON: 'python3'}
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_macos_purepy_release
@@ -517,9 +517,26 @@ test_macos_purepy_release:
     - macos_pkg_tester
 
 test_nux_purepy_release:
+  variables: {JOB_PYTHON: 'python3'}
   extends: .test_unix_purepy_pkg
   needs:
     - job: pkg_linux_purepy_release
       artifacts: true
   tags:
     - linux
+
+test_win_purepy_pkg:
+  variables: {JOB_PYTHON: 'python'}
+  stage: pkg_test
+  script:
+    - '%JOB_PYTHON% -m venv test_pyfaust-%CI_COMMIT_TAG%'
+    - 'call test_pyfaust-%CI_COMMIT_TAG%\Scripts\activate'
+    - pip install build/wrapper/python/dist/pyfaust-%CI_COMMIT_TAG%-*.whl
+    - '%JOB_PYTHON% -c "import pyfaust; print(pyfaust.version()); print(pyfaust.rand(5,5).toarray());"'
+  needs:
+    - job: pkg_win_purepy_release
+      artifacts: true
+  only:
+    - tags
+  tags:
+    - win10
