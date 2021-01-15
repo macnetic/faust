@@ -245,13 +245,13 @@ Function matlabFoundCb
     FileSeek $1 0 END ; do not erase start of file (but risk to add Faust path multiple times)
     ;FileWrite $1 "$\r$\naddpath(genpath('$INSTDIR\matlab'));$\r$\nmatfaust.enable_gpu_mod('silent', true)"
     FileWrite $1 "matfaust_path = which('matfaust.version');$\r$\nif(isempty(matfaust_path));"
-    FileWrite $1 "$\r$\naddpath('$INSTDIR\matlab');$\r$\naddpath('$INSTDIR\matlab\mex');$\r$\naddpath('$INSTDIR\matlab\tools');$\r$\naddpath('$INSTDIR\matlab\data')$\r$\nmatfaust.enable_gpu_mod('silent', true)"
+    FileWrite $1 "$\r$\naddpath('$INSTDIR\matlab');$\r$\naddpath('$INSTDIR\matlab\mex');$\r$\naddpath('$INSTDIR\matlab\mex\Release');$\r$\naddpath('$INSTDIR\matlab\tools');$\r$\naddpath('$INSTDIR\matlab\data')$\r$\nmatfaust.enable_gpu_mod('silent', true)"
     FileWrite $1 "$\r$\nend"
     FileClose $1
 
     FileOpen $1 "$R4\toolbox\local\matlabrc.m" a
     FileSeek $1 0 END ; do not erase start of file (but risk to add Faust path multiple times)
-    FileWrite $1 "if(exist('$INSTDIR'))oldpwd=pwd;startup_path=fullfile(matlabroot,'toolbox','local');cd(startup_path);startup_found=which('startup');if(isempty(startup_found))rehash toolbox;startup_found=which('startup');if(isempty(startup_found)) disp('Faust startup code can't be executed -- script not found. Please consult the online documentation to resolve this issue.');else;startup;end;else;startup;end;cd(oldpwd);end"
+    FileWrite $1 "if(exist('$INSTDIR'))oldpwd=pwd;startup_path=fullfile(matlabroot,'toolbox','local');cd(startup_path);startup_found=which('startup');if(isempty(startup_found))rehash toolbox;startup_found=which('startup');if(isempty(startup_found)) disp('Faust startup code can''t be executed -- script not found. Please consult the online documentation to resolve this issue.');else;startup;end;else;startup;end;cd(oldpwd);end"
     FileClose $1
 
     # disable because it's redundant
