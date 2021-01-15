@@ -50,7 +50,7 @@ The next is all the same as for python 3, you enter the virtual env.:
 
 \note For Windows users the command is rather:
 
-	C:\> call .\test_pyfaust-3.6\Scripts\activate
+	C:\> call .\test_pyfaust-2.7\Scripts\activate
 
 Install the pip wheel package:
 
