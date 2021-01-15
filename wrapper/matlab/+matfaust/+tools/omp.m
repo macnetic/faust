@@ -1,5 +1,3 @@
-%> @package matfaust.tools @brief The matfaust tools namespace
-
 %===============================================================================
 %>  Runs the greedy OMP algorithm optimized by Cholesky decomposition.
 %===
@@ -27,40 +25,40 @@
 function x = omp(y, D, varargin)
 	argc = length(varargin);
 	% set parameter default values
-	maxiter = length(y)
-	tol = 0
-	relerr = true
-	verbose = false
+	maxiter = length(y);
+	tol = 0;
+	relerr = true;
+	verbose = false;
 	if(argc > 0)
 		for i=1:argc
 			switch(varargin{i})
 				case 'maxiter'
 					if(argc == i || ~ isscalar(varargin{i+1}))
-						error('maxiter keyword arg. is not followed by a number')
+						error('maxiter keyword arg. is not followed by a number');
 					else
-						maxiter = real(floor((varargin{i+1}))) % real in case of cplx num
+						maxiter = real(floor((varargin{i+1}))); % real in case of cplx num
 					end
 				case 'tol'
 					if(argc == i || ~ isscalar(varargin{i+1}))
-						error('tol keyword arg. is not followed by a number')
+						error('tol keyword arg. is not followed by a number');
 					else
-						tol = real(varargin{i+1}) % real in case of cplx num
+						tol = real(varargin{i+1}); % real in case of cplx num
 					end
 				case 'relerr'
 					if(argc == i || ~ islogical(varargin{i+1}))
-						error('relerr keyword argument is not followed by a logical')
+						error('relerr keyword argument is not followed by a logical');
 					else
-						relerr = varargin{i+1}
+						relerr = varargin{i+1};
 					end
 				case 'verbose'
 					if(argc == i || ~ islogical(varargin{i+1}))
-						error('verbose keyword argument is not followed by a logical')
+						error('verbose keyword argument is not followed by a logical');
 					else
-						verbose = varargin{i+1}
+						verbose = varargin{i+1};
 					end
 				otherwise
 					if(isstr(varargin{i}))
-						error([ varargin{i} ' unrecognized argument'])
+						error([ varargin{i} ' unrecognized argument']);
 					end
 			end
 		end
@@ -69,9 +67,9 @@ function x = omp(y, D, varargin)
 		tol
 		if(relerr)
 			if(size(y,1) == 1)
-				y_sqr_norm = y*y'
+				y_sqr_norm = y*y';
 			else
-				y_sqr_norm = y'*y
+				y_sqr_norm = y'*y;
 			end
 			x = greed_omp_chol(y, D, size(D,2), 'stopCrit', 'mse',  'stopTol', tol*y_sqr_norm/length(y), 'verbose', verbose);
 		else % absolute error
@@ -79,6 +77,9 @@ function x = omp(y, D, varargin)
 		end
 	else
 		% maxiter
-		x = greed_omp_chol(y, D, size(D,2), 'stopCrit', 'M', 'stopTol', maxiter, 'verbose', verbose)
+		x = greed_omp_chol(y, D, size(D,2), 'stopCrit', 'M', 'stopTol', maxiter, 'verbose', verbose);
 	end
 end
+%> @package matfaust.tools @brief The matfaust tools namespace
+
+
