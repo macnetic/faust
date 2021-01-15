@@ -2131,7 +2131,7 @@ classdef Faust
 		%> <p> @b See @b also Faust.pinv, mldivide Matlab built-in.
 		%=====================================================================
 		function X = mldivide(F,B)
-			X = mldivide(full(F),B)
+			X = mldivide(full(F),B);
 		end
 
 		%=====================================================================
@@ -2149,7 +2149,7 @@ classdef Faust
 		%> <p> @b See @b also Faust.mldivide, pinv Matlab built-in.
 		%=====================================================================
 		function X = pinv(F)
-			X = pinv(full(F))
+			X = pinv(full(F));
 		end
 
 		%================================================================
