@@ -2078,7 +2078,7 @@ classdef Faust
 			figpos = get(fig, 'Position');
 			aratio = figpos(3)/figpos(4);
 			maxh = 0;
-			for i=1:facs_per_row
+			for i=1:min(facs_per_row, numfacts)
 				fac = facs{i};
 				h = size(fac,1)/sumw*aratio;
 				if(h > maxh)
@@ -2114,7 +2114,7 @@ classdef Faust
 					b = b - maxh - 0.01;
 				end
 			end
-			suptitle(['Factor of the Faust ' name ])
+			suptitle(['Factors of the Faust ' name ])
 		end
 
 		%=====================================================================
