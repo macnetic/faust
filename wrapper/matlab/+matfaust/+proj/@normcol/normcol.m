@@ -18,11 +18,10 @@ classdef normcol < matfaust.proj.proj_gen
 		%===============================================
 		function proj = normcol(shape, varargin)
 			import matfaust.factparams.ConstraintReal
-			% TODO: factorize this sparsing with normlin
+			s = 1;
+			% TODO: factorize this parsing with normlin
 			if(length(varargin) > 0)
 				if(strcmp(varargin{1}, 's'))
-					disp('s in varargin')
-
 					if(length(varargin) < 2)
 						error('s value is missing')
 					end
@@ -37,7 +36,7 @@ classdef normcol < matfaust.proj.proj_gen
 				% else % do nothing (ConstraintReal role)
 				end
 			end
-			proj.constraint = ConstraintReal('normcol', shape(1), shape(2), s)%, varargin{:});
+			proj.constraint = ConstraintReal('normcol', shape(1), shape(2), s); %, varargin{:});
 		end
 	end
 end

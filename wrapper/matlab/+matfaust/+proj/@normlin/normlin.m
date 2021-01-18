@@ -21,8 +21,6 @@ classdef normlin < matfaust.proj.proj_gen
 			s = 1;
 			if(length(varargin) > 0)
 				if(strcmp(varargin{1}, 's'))
-					disp('s in varargin')
-
 					if(length(varargin) < 2)
 						error('s value is missing')
 					end
