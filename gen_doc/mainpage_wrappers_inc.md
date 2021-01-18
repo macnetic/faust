@@ -18,5 +18,6 @@ Besides, if you're more familiar with Matlab, some livescripts are also availabl
 - [How to Create a Faust](./Faust_creation.mlx.html)
 - [How to Manipulate a Faust](./Faust_manipulation.mlx.html)
 - [Using the FAµST API in Algorithms](./Use_of_Faust_objects_in_algorithms.mlx.html)
+- [Using The FAµST Projectors API](./faust_projectors.mlx.html)
 
 Download all the livescripts (.mlx) [here](./matfaust_livescripts.zip).
