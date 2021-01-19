@@ -14261,14 +14261,14 @@ a.anchor-link {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="Using-The-GPU-FA&#181;ST-API">Using The GPU FA&#181;ST API<a class="anchor-link" href="#Using-The-GPU-FA&#181;ST-API">&#182;</a></h1><p>In this notebook we'll see quickly how to leverage the GPU computing power with pyfaust.<br>
 Since pyfaust 2.9.0 the API has been modified to make the GPU available directly from the python wrapper.
-Indeed, a GPU plug-in (aka <code>gpu_mod</code>) has been developed in that purpose.</p>
-<p>The first question you might ask is: does it work on my computer? Here is the answer: the loading of this plug-in is quite transparent, if a NVIDIA GPU is available and CUDA properly installed on your system, you have normally nothing to do except installing pyfaust to get the GPU implementations at your fingertips. We'll see in the end of this notebook how to load manually the plug-in and how to get further information in case of error.</p>
+Indeed, a GPU plug-in (aka <code>gpu_mod</code>) has been developed for this purpose.</p>
+<p>The first question you might ask is: does it work on my computer? Here is the answer: the loading of this plug-in is quite transparent, if an NVIDIA GPU is available and CUDA is properly installed on your system, you have normally nothing to do except installing pyfaust to get the GPU implementations at your fingertips. We'll see at the end of this notebook how to load manually the plug-in and how to get further information in case of an error.</p>
 <p>It is worthy to note two drawbacks about the pyfaust GPU support:</p>
 <ul>
 <li>Mac OS X is not supported because NVIDIA has stopped to support this OS.</li>
 <li>On Windows and Linux, the pyfaust GPU support is currently limited to CUDA 9.2 version.</li>
 </ul>
-<p>In addition to these drawbacks, please notice that the GPU pyfaust support is still considered in beta status as the code is relatively young and still evolving. However the API shouldn't move that much in a near future.</p>
+<p>In addition to these drawbacks, please notice that the GPU pyfaust module is still considered in beta status as the code is relatively young and still evolving. However the API shouldn't evolve that much in a near future.</p>
 
 </div>
 </div>
@@ -14414,7 +14414,7 @@ First of all, creating a Faust using the constructor works seamlessly on GPU, th
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>You can also create a GPU Faust by explicitly copying a CPU Faust to the GPU memory. Actually, at anytime you can copy a CPU Faust to GPU and conversely. The <code>clone()</code> member function is here in that purpose. Below we copy gpuF to CPU and back again to GPU in the new Faust <code>gpuF2</code>.</p>
+<p>You can also create a GPU Faust by explicitly copying a CPU Faust to the GPU memory. Actually, at anytime you can copy a CPU Faust to GPU and conversely. The <code>clone()</code> member function is here precisely for this purpose. Below we copy gpuF to CPU and back again to GPU in the new Faust <code>gpuF2</code>.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14554,6 +14554,8 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
     
     <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
 
+<p>Maybe you noticed the first factor address has changed compared to the first output of gpuF. Indeed when you multiply a Faust by a scalar, its smallest factor in memory is multiplied by the scalar and overwritten (that's why the address changes).</p>
+
 
 
 
@@ -14574,7 +14576,8 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Faust-matrix product (the matrix is copied to GPU then the multiplication is performed on GPU)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Faust-matrix product (the matrix is copied to GPU</span>
+<span class="c1"># then the multiplication is performed on GPU)</span>
 <span class="n">gpuF</span><span class="nd">@rand</span><span class="p">(</span><span class="n">gpuF</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">15</span><span class="p">)</span>
 </pre></div>
 
@@ -14690,8 +14693,8 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Besides, it's important to note that <code>gpuF3</code> factors are not duplicated in memory because they already exist for <code>gpuF</code> and <code>gpuF2</code>, that's an extra optimization: <code>gpuF3</code> is just a memory view of <code>gpuF</code> and <code>gpuF2</code> factors (the same GPU arrays are shared between <code>Faust</code> objects). That works pretty well the same for CPU <code>Faust</code> objects.</p>
-<p>Finally, please notice that CPU Faust objects are not directly interoperable with GPU Fausts objects. You can try, it'll end up on an error.</p>
+<p>Besides, it's important to note that <code>gpuF3</code> factors are not duplicated in memory because they already exist for <code>gpuF</code> and <code>gpuF2</code>, that's an extra optimization: <code>gpuF3</code> is just a memory view of the factors of <code>gpuF</code> and <code>gpuF2</code> (the same GPU arrays are shared between <code>Faust</code> objects). That works pretty well the same for CPU <code>Faust</code> objects.</p>
+<p>Finally, please notice that CPU Faust objects are not directly interoperable with GPU Fausts objects. You can try, it'll end up with an error.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14737,11 +14740,6 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
 
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/local/user/latest_pyfaust/lib/python3.7/site-packages/pyfaust/__init__.py:929: UserWarning: The * is deprecated as a matrix product and will soon be removed
-  warnings.warn(&#34;The * is deprecated as a matrix product and will soon&#34;
-</pre>
-</div>
 </div>
 
 <div class="jp-OutputArea-child">
@@ -14775,8 +14773,8 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Benchmarking-your-GPU-with-pyfaust!">Benchmarking your GPU with pyfaust!<a class="anchor-link" href="#Benchmarking-your-GPU-with-pyfaust!">&#182;</a></h3><p>Of course when we run some code on GPU rather than on CPU, it is clearly to enhance the performances. So let's try your GPU and find out if it is worth it or not compared to your CPU.</p>
-<p>First, measure how much time it takes on CPU to compute a Faust norm and its product:</p>
+<h3 id="Benchmarking-your-GPU-with-pyfaust!">Benchmarking your GPU with pyfaust!<a class="anchor-link" href="#Benchmarking-your-GPU-with-pyfaust!">&#182;</a></h3><p>Of course when we run some code on GPU rather than on CPU, it is clearly to enhance the performance. So let's try your GPU and find out if it is worth it or not compared to your CPU.</p>
+<p>First, measure how much time it takes on CPU to compute a Faust norm and the dense array corresponding to the product of its factors:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
