@@ -14862,12 +14862,8 @@ Again, I can only advise you to read the dedicated notebook about projectors if 
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="2.-The-GFT-Algorithm">2. The GFT Algorithm<a class="anchor-link" href="#2.-The-GFT-Algorithm">&#182;</a></h2><p>Since version 2.4, FAµST is able to compute Fast Graph Fourier Transforms.
-FAµST includes two algorithms with this goal:</p>
-<ul>
-<li>The first one is a variant of the hierarchical algorithm discussed in <a href="#1.-The-Hierarchical-PALM4MSA-Algorithm">1</a>.</li>
-<li>The second one is a truncated version of the Jacobi algorithm for matrix diagonalization.</li>
-</ul>
-<p>The two of them are implemented in C++ and Python wrappers make them available from pyfaust.</p>
+Indeed, FAµST includes the Truncated Jabcobi Algorithm algorithm for this goal. It allows to diagonalize symmetric positive definite matrices.</p>
+<p>It is implemented in C++ and a Python wrapper make it available from pyfaust.</p>
 <p>Here again the theory isn't what matters but feel free to take a look at the following papers:</p>
 <ul>
 <li><p>Le Magoarou L., Gribonval R., Tremblay N., <a href="https://hal.inria.fr/hal-01416110">“Approximate fast graph Fourier transforms via multi-layer sparse approximation“,Transactions on Signal and Information Processing over Networks</a></p>
@@ -15301,7 +15297,7 @@ FAµST includes two algorithms with this goal:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>85.9 µs ± 736 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+<pre>85.6 µs ± 113 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 </pre>
 </div>
 </div>
@@ -15336,7 +15332,7 @@ FAµST includes two algorithms with this goal:</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>9.2 ms ± 1.13 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
+<pre>8.71 ms ± 204 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 </pre>
 </div>
 </div>
@@ -15400,7 +15396,7 @@ Applying the Graph Fourier Transform $\hat U$ on x is faster.</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&#39;2.10.34&#39;</pre>
+<pre>&#39;2.10.37&#39;</pre>
 </div>
 
 </div>
