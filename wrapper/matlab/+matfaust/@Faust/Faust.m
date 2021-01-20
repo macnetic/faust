@@ -2193,7 +2193,7 @@ classdef Faust
 			for i=1:numfactors(F)
 				facs = [ facs {factors(F,i)} ];
 			end
-			Fc = Faust(facs);
+			Fc = matfaust.Faust(facs);
 		end
 
 	end
