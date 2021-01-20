@@ -34,10 +34,19 @@ setup(
     version = version, # cf. header
     ext_modules = cythonize(PyFaust, compiler_directives={'language_level': sys.version_info.major }),
     packages = [ 'pyfaust' ],
-    url = 'http://faust.inria.fr',
-    description = 'TODO',
-    long_description = 'TODO',
-    classifiers = [ 'TODO' ],
+    url = 'https://faust.inria.fr',
+    author = 'INRIA',
+    author_email = 'remi.gribonval@inria.fr',
+    description = 'FAµST python toolbox',
+    long_description = """The FAµST toolbox provides algorithms and data structures to decompose a given dense matrix into a product of sparse matrices in order to reduce its computational complexity (both for storage and manipulation).  FaµST can be used to
+
+        speedup / reduce the memory footprint of iterative algorithms commonly used for solving high dimensional linear inverse problems.
+        learn dictionaries with an intrinsically efficient implementation
+        compute (approximate) fast Fourier transforms on graphs.
+    """,
+    classifiers = [ 'License :: OSI Approved :: BSD License', 
+                   'Programming Language :: Python :: 3',
+                  '@GPU_CUDA_VERSION_PYPI_CLASSIFIER@'],
     install_requires = [ 'pygsp', 'scipy', 'numpy', 'matplotlib>=2.0.0',
                         'pathlib'], #ENOTE: order matters (last pkg installed first)
     license = "3-clause BSD 2.0",

@@ -125,6 +125,7 @@ if(USE_GPU_MOD)
 		message(STATUS SIMLINK ../../../lib/${GPU_MOD_LIB} ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB})
 		install(FILES ${GPU_MOD_LIB_PPATH}/${GPU_MOD_LIB} DESTINATION ${CMAKE_INSTALL_PYTHON_PREFIX}/pyfaust/lib)
 	endif()
+	set(GPU_CUDA_VERSION_PYPI_CLASSIFIER "Environment :: GPU :: NVIDIA CUDA :: 9.2")
 endif()
 
 # configure the setup.py.in into setup.py (equivalent of Makefile for Python)
