@@ -3,7 +3,7 @@
 <head><meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Untitled1</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>using_gpu_pyfaust</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 
 
 
@@ -14268,7 +14268,7 @@ Indeed, a GPU plug-in (aka <code>gpu_mod</code>) has been developed for this pur
 <li>Mac OS X is not supported because NVIDIA has stopped to support this OS.</li>
 <li>On Windows and Linux, the pyfaust GPU support is currently limited to CUDA 9.2 version.</li>
 </ul>
-<p>In addition to these drawbacks, please notice that the GPU pyfaust module is still considered in beta status as the code is relatively young and still evolving. However the API shouldn't evolve that much in a near future.</p>
+<p>In addition to these drawbacks, please notice that the GPU module support is still considered in beta status as the code is relatively young and still evolving. However the API shouldn't change / evolve that much in a near future.</p>
 
 </div>
 </div>
@@ -14310,8 +14310,8 @@ First of all, creating a Faust using the constructor works seamlessly on GPU, th
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0xb24ef80, density 1.000000, nnz 100
-- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0xb24ff40, density 1.000000, nnz 150</pre>
+<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0xb48f640, density 1.000000, nnz 100
+- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0xb4903c0, density 1.000000, nnz 150</pre>
 </div>
 
 </div>
@@ -14366,13 +14366,56 @@ First of all, creating a Faust using the constructor works seamlessly on GPU, th
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>In <code>gpuF</code> the factors are dense matrices but it's totally possible to instantiate sparse matrices on the GPU as you can do on CPU side.</p>
+<p>While for a CPU Faust you'll get:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Faust</span><span class="p">([</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">],</span> <span class="n">dev</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">device</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>&#39;cpu&#39;</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>In <code>gpuF</code> the factors are dense matrices but it's totally possible to instantiate sparse matrices on the GPU as you can do on CPU side.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">Faust</span>
@@ -14395,14 +14438,14 @@ First of all, creating a Faust using the constructor works seamlessly on GPU, th
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[3]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) SPARSE size 10 x 15, addr: 0xb25ede0, density 0.253333, nnz 38
-- GPU FACTOR 1 (real) SPARSE size 15 x 10, addr: 0xb597c10, density 0.053333, nnz 8</pre>
+<pre>- GPU FACTOR 0 (real) SPARSE size 10 x 15, addr: 0xb491560, density 0.253333, nnz 38
+- GPU FACTOR 1 (real) SPARSE size 15 x 10, addr: 0x13803c10, density 0.053333, nnz 8</pre>
 </div>
 
 </div>
@@ -14414,13 +14457,13 @@ First of all, creating a Faust using the constructor works seamlessly on GPU, th
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>You can also create a GPU Faust by explicitly copying a CPU Faust to the GPU memory. Actually, at anytime you can copy a CPU Faust to GPU and conversely. The <code>clone()</code> member function is here precisely for this purpose. Below we copy gpuF to CPU and back again to GPU in the new Faust <code>gpuF2</code>.</p>
+<p>You can also create a GPU Faust by explicitly copying a CPU Faust to the GPU memory. Actually, at anytime you can copy a CPU Faust to GPU and conversely. The <code>clone()</code> member function is here precisely for this purpose. Below we copy <code>gpuF</code> to CPU and back again to GPU in the new Faust <code>gpuF2</code>.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">cpuF</span> <span class="o">=</span> <span class="n">gpuF</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
@@ -14441,14 +14484,14 @@ First of all, creating a Faust using the constructor works seamlessly on GPU, th
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[5]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0xb596da0, density 1.000000, nnz 100
-- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0x144585d0, density 1.000000, nnz 150</pre>
+<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0x13804370, density 1.000000, nnz 100
+- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0x137cdf80, density 1.000000, nnz 150</pre>
 </div>
 
 </div>
@@ -14468,7 +14511,7 @@ Note that the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">rand</span>  <span class="k">as</span> <span class="n">frand</span><span class="p">,</span> <span class="n">eye</span> <span class="k">as</span> <span class="n">feye</span><span class="p">,</span> <span class="n">wht</span>
@@ -14494,25 +14537,25 @@ Note that the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>Random GPU Faust: - GPU FACTOR 0 (real) SPARSE size 10 x 10, addr: 0xb595be0, density 0.500000, nnz 50
-- GPU FACTOR 1 (real) SPARSE size 10 x 10, addr: 0xb24f9a0, density 0.500000, nnz 50
-- GPU FACTOR 2 (real) SPARSE size 10 x 10, addr: 0x27421c0, density 0.500000, nnz 50
-- GPU FACTOR 3 (real) SPARSE size 10 x 10, addr: 0x1446e970, density 0.500000, nnz 50
-- GPU FACTOR 4 (real) SPARSE size 10 x 10, addr: 0x1446f860, density 0.500000, nnz 50
-- GPU FACTOR 5 (real) SPARSE size 10 x 10, addr: 0x14470750, density 0.500000, nnz 50
-- GPU FACTOR 6 (real) SPARSE size 10 x 10, addr: 0x144714e0, density 0.500000, nnz 50
-- GPU FACTOR 7 (real) SPARSE size 10 x 10, addr: 0x144be100, density 0.500000, nnz 50
-- GPU FACTOR 8 (real) SPARSE size 10 x 10, addr: 0x144beff0, density 0.500000, nnz 50
-- GPU FACTOR 9 (real) SPARSE size 10 x 10, addr: 0x144bfee0, density 0.500000, nnz 50
-- GPU FACTOR 10 (real) SPARSE size 10 x 10, addr: 0x144c0dd0, density 0.500000, nnz 50
+<pre>Random GPU Faust: - GPU FACTOR 0 (real) SPARSE size 10 x 10, addr: 0x137cde60, density 0.500000, nnz 50
+- GPU FACTOR 1 (real) SPARSE size 10 x 10, addr: 0x137cf740, density 0.500000, nnz 50
+- GPU FACTOR 2 (real) SPARSE size 10 x 10, addr: 0x137d24d0, density 0.500000, nnz 50
+- GPU FACTOR 3 (real) SPARSE size 10 x 10, addr: 0x137d3380, density 0.500000, nnz 50
+- GPU FACTOR 4 (real) SPARSE size 10 x 10, addr: 0x137d4270, density 0.500000, nnz 50
+- GPU FACTOR 5 (real) SPARSE size 10 x 10, addr: 0x137d5160, density 0.500000, nnz 50
+- GPU FACTOR 6 (real) SPARSE size 10 x 10, addr: 0x137d6050, density 0.500000, nnz 50
+- GPU FACTOR 7 (real) SPARSE size 10 x 10, addr: 0x137d6f40, density 0.500000, nnz 50
+- GPU FACTOR 8 (real) SPARSE size 10 x 10, addr: 0x137d7e30, density 0.500000, nnz 50
+- GPU FACTOR 9 (real) SPARSE size 10 x 10, addr: 0x137d8d20, density 0.500000, nnz 50
+- GPU FACTOR 10 (real) SPARSE size 10 x 10, addr: 0x137d9c10, density 0.500000, nnz 50
 
-Hadamard GPU Faust: - GPU FACTOR 0 (real) SPARSE size 32 x 32, addr: 0x14464ef0, density 0.062500, nnz 64
-- GPU FACTOR 1 (real) SPARSE size 32 x 32, addr: 0x14459e10, density 0.062500, nnz 64
-- GPU FACTOR 2 (real) SPARSE size 32 x 32, addr: 0x1445ae30, density 0.062500, nnz 64
-- GPU FACTOR 3 (real) SPARSE size 32 x 32, addr: 0x2ee8950, density 0.062500, nnz 64
-- GPU FACTOR 4 (real) SPARSE size 32 x 32, addr: 0x144c4de0, density 0.062500, nnz 64
+Hadamard GPU Faust: - GPU FACTOR 0 (real) SPARSE size 32 x 32, addr: 0x137cf660, density 0.062500, nnz 64
+- GPU FACTOR 1 (real) SPARSE size 32 x 32, addr: 0x137cdb10, density 0.062500, nnz 64
+- GPU FACTOR 2 (real) SPARSE size 32 x 32, addr: 0x137cf600, density 0.062500, nnz 64
+- GPU FACTOR 3 (real) SPARSE size 32 x 32, addr: 0x137dd2c0, density 0.062500, nnz 64
+- GPU FACTOR 4 (real) SPARSE size 32 x 32, addr: 0x137ddfc0, density 0.062500, nnz 64
 
-Identity GPU Faust: - GPU FACTOR 0 (real) SPARSE size 16 x 16, addr: 0x144c1450, density 0.062500, nnz 16
+Identity GPU Faust: - GPU FACTOR 0 (real) SPARSE size 16 x 16, addr: 0x137da4a0, density 0.062500, nnz 16
 
 </pre>
 </div>
@@ -14532,53 +14575,11 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Faust-scalar multiplication</span>
 <span class="mi">2</span><span class="o">*</span><span class="n">gpuF</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
-
-<p>Maybe you noticed the first factor address has changed compared to the first output of gpuF. Indeed when you multiply a Faust by a scalar, its smallest factor in memory is multiplied by the scalar and overwritten (that's why the address changes).</p>
-
-
-
-
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0x144584f0, density 1.000000, nnz 100
-- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0xb24ff40, density 1.000000, nnz 150</pre>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Faust-matrix product (the matrix is copied to GPU</span>
-<span class="c1"># then the multiplication is performed on GPU)</span>
-<span class="n">gpuF</span><span class="nd">@rand</span><span class="p">(</span><span class="n">gpuF</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">15</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14600,36 +14601,8 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([[22.21032736, 23.89505892, 21.40600168, 23.66721564, 23.33551288,
-        21.1267886 , 29.76201562, 26.86864136, 23.22333481, 25.26502546,
-        19.2803824 , 27.66811037, 25.9387301 , 28.18106301, 18.84060718],
-       [15.9111032 , 18.85911421, 16.16899586, 18.15933013, 17.23372162,
-        16.49224379, 22.5583411 , 19.96088423, 16.51291501, 18.68251569,
-        14.4830668 , 21.34510129, 19.61990243, 21.05320793, 14.32264507],
-       [18.27843343, 20.26121198, 17.98944108, 19.8807626 , 19.21969233,
-        17.88630366, 24.67508217, 22.48646297, 19.10098676, 20.80980678,
-        16.23243865, 23.2577632 , 21.22288898, 23.55528509, 15.75809666],
-       [23.00680674, 25.26123222, 21.77872389, 24.869523  , 25.01333518,
-        22.7473071 , 31.76066699, 28.94309176, 23.69875046, 26.61347124,
-        20.72219545, 28.09017441, 27.94080104, 29.68113135, 20.42300673],
-       [19.44086276, 22.85573633, 19.65328846, 22.33147791, 21.42591301,
-        20.1534602 , 27.44812266, 25.19552588, 20.36504066, 22.88806986,
-        18.00921016, 25.63267734, 23.72448486, 25.53332101, 17.94692495],
-       [16.98082378, 18.88940841, 16.32989101, 18.57506568, 18.44079671,
-        16.62123069, 23.6554299 , 21.32629232, 17.37512725, 19.68120452,
-        15.34188231, 21.16756335, 20.49374977, 21.96617216, 14.97216889],
-       [25.85348068, 28.75881172, 25.29349644, 27.87614457, 27.46685124,
-        25.62785439, 34.93380607, 31.42693248, 26.63026103, 29.45643341,
-        22.80072218, 32.95404919, 30.81011708, 33.22874836, 22.1807287 ],
-       [21.37946661, 23.3884151 , 20.91662182, 23.25869398, 22.69331967,
-        20.34680386, 29.05295627, 26.60480784, 22.4078621 , 24.41948946,
-        19.02299682, 26.80158621, 24.61593487, 27.43903217, 18.50007788],
-       [19.38706289, 21.05808812, 19.02666143, 20.99766221, 20.48377355,
-        18.52186226, 26.61916867, 23.78449287, 20.66633931, 22.1240315 ,
-        16.58685252, 24.36926732, 23.11407525, 24.95333244, 16.52717747],
-       [23.08356609, 25.4418548 , 22.22448757, 25.20449958, 24.53382052,
-        22.8343099 , 31.35488063, 28.77767792, 24.08553157, 26.62160247,
-        20.72669591, 28.92602224, 27.33626393, 29.56223721, 20.30826448]])</pre>
+<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0x137ce380, density 1.000000, nnz 100
+- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0xb4903c0, density 1.000000, nnz 150</pre>
 </div>
 
 </div>
@@ -14641,7 +14614,7 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>On the contrary, and that matters for optimization, there is no CPU-GPU transfer at all when you create another GPU Faust named for example <code>gpuF2</code> on the GPU and decide to multiply the two of them like this:</p>
+<p>As you see the first factor's address has changed in the result compared to what it was in <code>gpuF</code>. Indeed, when you make a scalar multiplication only one factor is multiplied, the others don't change, they are shared between the Faust being multiplied and the resulting Faust. This is an optimization and to go further in this direction the factor chosen to by multiplied is the smallest in memory (not necessarily the first one).</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14650,10 +14623,9 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">rand</span> <span class="k">as</span> <span class="n">frand</span>
-<span class="n">gpuF2</span> <span class="o">=</span> <span class="n">frand</span><span class="p">(</span><span class="n">gpuF</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">18</span><span class="p">,</span> <span class="n">dev</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
-<span class="n">gpuF3</span> <span class="o">=</span> <span class="n">gpuF</span><span class="nd">@gpuF2</span>
-<span class="n">gpuF3</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Faust-matrix product (the matrix is copied to GPU </span>
+<span class="c1"># then the multiplication is performed on GPU)</span>
+<span class="n">gpuF</span><span class="nd">@rand</span><span class="p">(</span><span class="n">gpuF</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">15</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14675,13 +14647,88 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0xb24ef80, density 1.000000, nnz 100
-- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0xb24ff40, density 1.000000, nnz 150
-- GPU FACTOR 2 (real) SPARSE size 15 x 15, addr: 0x144cc060, density 0.333333, nnz 75
-- GPU FACTOR 3 (real) SPARSE size 15 x 18, addr: 0x144cb720, density 0.277778, nnz 75
-- GPU FACTOR 4 (real) SPARSE size 18 x 17, addr: 0x144cb1c0, density 0.294118, nnz 90
-- GPU FACTOR 5 (real) SPARSE size 17 x 18, addr: 0x144cae10, density 0.277778, nnz 85
-- GPU FACTOR 6 (real) SPARSE size 18 x 18, addr: 0xb258340, density 0.277778, nnz 90</pre>
+<pre>array([[12.85455508, 17.27922173, 17.96267017, 14.21897399, 18.31925306,
+        15.02554268, 16.91733679, 23.09840714, 13.61468904, 13.01537786,
+        21.25102049, 14.52417429, 16.1892926 , 16.46261493, 19.16342541],
+       [18.08051505, 24.86427095, 25.98624127, 20.52699688, 26.08883115,
+        21.52212096, 24.12657093, 32.95852328, 19.3464327 , 18.72800882,
+        30.82980616, 20.71897188, 23.21253159, 23.92149717, 27.6881282 ],
+       [ 9.86835265, 13.74201094, 14.40219578, 11.37739891, 14.19422198,
+        11.82493033, 13.02581251, 18.00899813, 10.42905687, 10.2166238 ,
+        17.18017319, 11.27512396, 12.80235685, 13.02240462, 15.25645078],
+       [16.53551789, 22.16642097, 23.23332603, 18.37041718, 23.56041574,
+        20.03389295, 21.59040732, 30.04863309, 17.39620167, 16.80419878,
+        28.02075287, 18.88214204, 21.16592227, 21.81878918, 25.01607829],
+       [15.04569733, 19.68899839, 21.01127486, 16.31917322, 21.02403138,
+        18.22885488, 19.53171567, 26.76718884, 15.86257388, 15.65092436,
+        25.293682  , 17.44055417, 18.90841738, 19.41824087, 22.55638102],
+       [16.02372538, 21.04200711, 22.47640481, 17.85441968, 22.73955572,
+        18.21539211, 21.43123486, 28.48777113, 17.39328661, 16.85009111,
+        26.62987391, 18.91722528, 19.80288613, 20.99579584, 23.8891957 ],
+       [14.46799077, 19.10231466, 20.24705538, 16.02339422, 20.44179146,
+        17.34877252, 18.53955548, 25.93220904, 15.10332246, 14.57219887,
+        24.37658531, 16.54954955, 18.17179354, 18.58042995, 21.99950794],
+       [18.53219566, 23.8554927 , 25.5306696 , 19.82127291, 25.62347565,
+        22.02650195, 24.03875076, 32.63949697, 19.51223055, 19.22532097,
+        30.70422058, 21.46490916, 22.93651754, 23.84822351, 27.14186392],
+       [16.33932438, 21.42364824, 22.703829  , 18.18699072, 23.04672396,
+        19.16322106, 21.33290334, 29.20809808, 17.26916108, 16.69117344,
+        27.23667735, 18.85179244, 20.18784973, 21.22935102, 24.37125013],
+       [15.14949428, 21.26339732, 22.26686269, 17.90392193, 22.21593015,
+        17.56109762, 20.8731316 , 27.87378114, 16.61087595, 16.27584343,
+        26.3232434 , 17.92274058, 19.66388469, 20.52478117, 23.46587524]])</pre>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>On the contrary, and that matters for optimization, there is no CPU-GPU transfer at all when you create another GPU Faust named for example <code>gpuF2</code> on the GPU and decide to multiply the two of them like this:</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">rand</span> <span class="k">as</span> <span class="n">frand</span>
+<span class="n">gpuF2</span> <span class="o">=</span> <span class="n">frand</span><span class="p">(</span><span class="n">gpuF</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">18</span><span class="p">,</span> <span class="n">dev</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<span class="n">gpuF3</span> <span class="o">=</span> <span class="n">gpuF</span><span class="nd">@gpuF2</span>
+<span class="n">gpuF3</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
+<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0xb48f640, density 1.000000, nnz 100
+- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0xb4903c0, density 1.000000, nnz 150
+- GPU FACTOR 2 (real) SPARSE size 15 x 18, addr: 0x2bfa9f0, density 0.277778, nnz 75
+- GPU FACTOR 3 (real) SPARSE size 18 x 17, addr: 0xb488a20, density 0.294118, nnz 90
+- GPU FACTOR 4 (real) SPARSE size 17 x 16, addr: 0x137e5a80, density 0.312500, nnz 85
+- GPU FACTOR 5 (real) SPARSE size 16 x 18, addr: 0x137e68f0, density 0.277778, nnz 80
+- GPU FACTOR 6 (real) SPARSE size 18 x 18, addr: 0x137e77e0, density 0.277778, nnz 90</pre>
 </div>
 
 </div>
@@ -14700,16 +14747,19 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">cpuF</span> <span class="o">=</span> <span class="n">frand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="n">dev</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
 <span class="n">gpuF</span> <span class="o">=</span> <span class="n">frand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span> <span class="n">dev</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">cpuF</span><span class="o">@</span><span class="n">gpuF</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;A first try to multiply a CPU Faust with a GPU one...&quot;</span><span class="p">)</span>
+    <span class="n">cpuF</span><span class="nd">@gpuF</span>
 <span class="k">except</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;it doesn&#39;t work, you must either convert cpuF to GPU Faust or gpuF to CPU Faust before.&quot;</span><span class="p">)</span>
-<span class="n">cpuF</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span><span class="nd">@gpuF</span> <span class="c1"># this is what you should do</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;it doesn&#39;t work, you must either convert cpuF to a GPU Faust or gpuF to a CPU Faust before.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;A second try using conversion as needed...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cpuF</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span><span class="nd">@gpuF</span><span class="p">)</span> <span class="c1"># this is what you should do</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Now it works!&quot;</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14729,41 +14779,24 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>it doesn&#39;t work, you must either convert cpuF to GPU Faust or gpuF to CPU Faust before.
+<pre>A first try to multiply a CPU Faust with a GPU one...
+it doesn&#39;t work, you must either convert cpuF to a GPU Faust or gpuF to a CPU Faust before.
+A second try using conversion as needed...
+- GPU FACTOR 0 (real) SPARSE size 5 x 5, addr: 0x13658df0, density 1.000000, nnz 25
+- GPU FACTOR 1 (real) SPARSE size 5 x 5, addr: 0x1365a290, density 1.000000, nnz 25
+- GPU FACTOR 2 (real) SPARSE size 5 x 5, addr: 0x1365b220, density 1.000000, nnz 25
+- GPU FACTOR 3 (real) SPARSE size 5 x 5, addr: 0x1365c090, density 1.000000, nnz 25
+- GPU FACTOR 4 (real) SPARSE size 5 x 5, addr: 0x1365cf40, density 1.000000, nnz 25
+- GPU FACTOR 5 (real) SPARSE size 5 x 5, addr: 0x2bfaa50, density 1.000000, nnz 25
+- GPU FACTOR 6 (real) SPARSE size 5 x 5, addr: 0x137e39c0, density 1.000000, nnz 25
+- GPU FACTOR 7 (real) SPARSE size 5 x 5, addr: 0x13654dd0, density 1.000000, nnz 25
+- GPU FACTOR 8 (real) SPARSE size 5 x 5, addr: 0x13655c80, density 1.000000, nnz 25
+- GPU FACTOR 9 (real) SPARSE size 5 x 5, addr: 0x13656b70, density 1.000000, nnz 25
+- GPU FACTOR 10 (real) SPARSE size 5 x 5, addr: 0x13657a60, density 1.000000, nnz 25
+
+Now it works!
 </pre>
 </div>
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
-
-
-
-
-<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) SPARSE size 5 x 5, addr: 0x144d95d0, density 1.000000, nnz 25
-- GPU FACTOR 1 (real) SPARSE size 5 x 5, addr: 0x144daaf0, density 1.000000, nnz 25
-- GPU FACTOR 2 (real) SPARSE size 5 x 5, addr: 0x144dba80, density 1.000000, nnz 25
-- GPU FACTOR 3 (real) SPARSE size 5 x 5, addr: 0x144dc950, density 1.000000, nnz 25
-- GPU FACTOR 4 (real) SPARSE size 5 x 5, addr: 0x144dd800, density 1.000000, nnz 25
-- GPU FACTOR 5 (real) SPARSE size 5 x 5, addr: 0x144cc000, density 1.000000, nnz 25
-- GPU FACTOR 6 (real) SPARSE size 5 x 5, addr: 0x144c9a30, density 1.000000, nnz 25
-- GPU FACTOR 7 (real) SPARSE size 5 x 5, addr: 0x144c9130, density 1.000000, nnz 25
-- GPU FACTOR 8 (real) SPARSE size 5 x 5, addr: 0x144c6890, density 1.000000, nnz 25
-- GPU FACTOR 9 (real) SPARSE size 5 x 5, addr: 0x144d6720, density 1.000000, nnz 25
-- GPU FACTOR 10 (real) SPARSE size 5 x 5, addr: 0x144d7610, density 1.000000, nnz 25</pre>
-</div>
-
 </div>
 
 </div>
@@ -14773,14 +14806,14 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Benchmarking-your-GPU-with-pyfaust!">Benchmarking your GPU with pyfaust!<a class="anchor-link" href="#Benchmarking-your-GPU-with-pyfaust!">&#182;</a></h3><p>Of course when we run some code on GPU rather than on CPU, it is clearly to enhance the performance. So let's try your GPU and find out if it is worth it or not compared to your CPU.</p>
+<h3 id="Benchmarking-your-GPU-with-pyfaust!">Benchmarking your GPU with pyfaust!<a class="anchor-link" href="#Benchmarking-your-GPU-with-pyfaust!">&#182;</a></h3><p>Of course when we run some code on GPU rather than on CPU, it is clearly to enhance the performances. So let's try your GPU and find out if it is worth it or not compared to your CPU.</p>
 <p>First, measure how much time it takes on CPU to compute a Faust norm and the dense array corresponding to the product of its factors:</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">rand</span> <span class="k">as</span> <span class="n">frand</span>
@@ -14806,8 +14839,8 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>180 ms ± 1.99 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-720 ms ± 185 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<pre>174 ms ± 2.37 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+770 ms ± 228 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 </pre>
 </div>
 </div>
@@ -14825,7 +14858,7 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">gpuF</span> <span class="o">=</span> <span class="n">cpuF</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">dev</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
@@ -14850,8 +14883,8 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>55.6 ms ± 42 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-135 ms ± 257 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<pre>55.6 ms ± 13.6 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+134 ms ± 269 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>
@@ -14863,16 +14896,83 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Of course not all GPUs are equal, below are the results I got using a Tesla V100:</p>
+
+<pre><code>6.85 ms ± 9.06 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+6.82 ms ± 90.1 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</code></pre>
+<p>Likewise let's compare the performance obtained for a sparse Faust:</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pyfaust</span> <span class="kn">import</span> <span class="n">rand</span> <span class="k">as</span> <span class="n">frand</span>
+<span class="n">cpuF2</span> <span class="o">=</span> <span class="n">frand</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">num_factors</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fac_type</span><span class="o">=</span><span class="s1">&#39;sparse&#39;</span><span class="p">,</span> <span class="n">density</span><span class="o">=.</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">gpuF2</span> <span class="o">=</span> <span class="n">cpuF2</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">dev</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CPU times:&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> cpuF2.norm(2)
+<span class="o">%</span><span class="k">timeit</span> cpuF2.toarray()
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GPU times:&quot;</span><span class="p">)</span>
+<span class="o">%</span><span class="k">timeit</span> gpuF2.norm(2)
+<span class="o">%</span><span class="k">timeit</span> gpuF2.toarray()
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>CPU times:
+89.5 ms ± 21.7 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+737 ms ± 350 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+GPU times:
+14.8 ms ± 268 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+55.6 ms ± 135 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>On a Tesla V100 it gives these results:</p>
+
+<pre><code>9.86 ms ± 3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+13.8 ms ± 39.4 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</code></pre>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h3 id="Running-some-FA&#181;ST-algorithms-on-GPU">Running some FA&#181;ST algorithms on GPU<a class="anchor-link" href="#Running-some-FA&#181;ST-algorithms-on-GPU">&#182;</a></h3><p>Some of the FAµST algorithms implemented in the C++ core are now also available in pure GPU mode.
 For example, let's compare the factorization times taken by the hierarchical factorization when launched on CPU and GPU.
 When running on GPU, the matrix to factorize is copied in GPU memory and almost all operations executed during the algorithm don't imply the CPU in any manner (the only exception at this stage of development is the proximal operators that only run on CPU).</p>
-<p><strong>Warning</strong>: the computation can last thirty minutes or so.</p>
+<p><strong>Warning: THE COMPUTATION CAN LAST THIRTY MINUTES OR SO ON CPU</strong></p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">factorize_MEG</span><span class="p">(</span><span class="n">dev</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
@@ -14901,7 +15001,7 @@ When running on GPU, the matrix to factorize is copied in GPU memory and almost 
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">gpuMEG16</span><span class="p">,</span> <span class="n">gpu_time</span><span class="p">,</span> <span class="n">gpu_err</span> <span class="o">=</span> <span class="n">factorize_MEG</span><span class="p">(</span><span class="n">dev</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
@@ -14925,8 +15025,8 @@ When running on GPU, the matrix to factorize is copied in GPU memory and almost 
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>It seems  FAµST data is already available locally. To renew the download please empty the directory: /home/user/pyfaust_data
-It seems  FAµST data is already available locally. To renew the download please empty the directory: /home/user/pyfaust_data
+<pre>It seems  FAµST data is already available locally. To renew the download please empty the directory: /home/hhadjdji/pyfaust_data
+It seems  FAµST data is already available locally. To renew the download please empty the directory: /home/hhadjdji/pyfaust_data
 </pre>
 </div>
 </div>
@@ -14938,7 +15038,7 @@ It seems  FAµST data is already available locally. To renew the download please
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/local/user/latest_pyfaust/lib/python3.7/site-packages/pyfaust/fact.py:492: UserWarning: on_gpu is totally experimental, use at your own risk.
+<pre>/local/hhadjdji/latest_pyfaust/lib/python3.7/site-packages/pyfaust/fact.py:492: UserWarning: on_gpu is totally experimental, use at your own risk.
   if on_gpu: warnings.warn(&#34;on_gpu is totally experimental, use at your&#34;
 </pre>
 </div>
@@ -14951,7 +15051,7 @@ It seems  FAµST data is already available locally. To renew the download please
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>GPU time, error: 464.68653631210327 0.12897590240787224
+<pre>GPU time, error: 464.5002317428589 0.12897590240787224
 </pre>
 </div>
 </div>
@@ -14963,7 +15063,7 @@ It seems  FAµST data is already available locally. To renew the download please
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">cpuMEG16</span><span class="p">,</span> <span class="n">cpu_time</span><span class="p">,</span> <span class="n">cpu_err</span> <span class="o">=</span> <span class="n">factorize_MEG</span><span class="p">(</span><span class="n">dev</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
@@ -14987,8 +15087,8 @@ It seems  FAµST data is already available locally. To renew the download please
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>It seems  FAµST data is already available locally. To renew the download please empty the directory: /home/user/pyfaust_data
-CPU time, error: 2231.238716840744 0.12899414269631326
+<pre>It seems  FAµST data is already available locally. To renew the download please empty the directory: /home/hhadjdji/pyfaust_data
+CPU time, error: 2287.328642129898 0.12899414269631326
 </pre>
 </div>
 </div>
@@ -15000,7 +15100,7 @@ CPU time, error: 2231.238716840744 0.12899414269631326
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Depending on you GPU card and CPU the results may vary, so below are showed some results measured on specific hardware.</p>
+<p>Depending on you GPU card and CPU the results may vary, so below are showed some results obtained on specific hardware.</p>
 <table align="left">
     <tr align="center">
         <th>Implementation</th> 
@@ -15032,17 +15132,17 @@ CPU time, error: 2231.238716840744 0.12899414269631326
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h3 id="Manually-loading-the-pyfaust-GPU-plug-in">Manually loading the pyfaust GPU plug-in<a class="anchor-link" href="#Manually-loading-the-pyfaust-GPU-plug-in">&#182;</a></h3><p>If something goes wrong when trying to use the GPU pyfaust extension, here is how to manually load the plug-in and obtain more information.</p>
-<p>The key is the function <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html#aea03fff2525fc834f2a56e63fd30a54f">enable_gpu_mod</a>. This function allows to give another try to gpu_mod loading with the verbose mode enabled.</p>
+<p>The key is the function <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html#aea03fff2525fc834f2a56e63fd30a54f">enable_gpu_mod</a>. This function allows to give another try to <code>gpu_mod</code> loading with the verbose mode enabled.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pyfaust</span>
-<span class="n">pyfaust</span><span class="o">.</span><span class="n">enable_gpu_mod</span><span class="p">(</span><span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">pyfaust</span><span class="o">.</span><span class="n">enable_gpu_mod</span><span class="p">(</span><span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fatal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -15053,8 +15153,29 @@ CPU time, error: 2231.238716840744 0.12899414269631326
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Afterward you can call <code>pyfaust.is_gpu_mod_enabled()</code> to verify it works in your script.</p>
-<hr style="width:50%;text-align:left;margin-left:0">
+<p>Afterward you can call <code>pyfaust.is_gpu_mod_enabled()</code> to verify if it works in your script.</p>
+<p>Below I copy outputs that show what it should look like when it doesn't work:</p>
+<p>1) If you asked fatal error:</p>
+
+<pre><code>python -c "import pyfaust; pyfaust.enable_gpu_mod(silent=False, fatal=True)"
+WARNING: you must call enable_gpu_mod() before using GPUModHandler singleton.
+loading libgm
+libcublas.so.9.2: cannot open shared object file: No such file or directory
+[...]
+Exception: Can't load gpu_mod library, maybe the path (/home/test/venv_pyfaust-2.10.14/lib/python3.7/site-packages/pyfaust/lib/libgm.so) is not correct or the backend (cuda) is not installed or configured properly so the libraries are not found.</code></pre>
+<p>2) If you just want a warning:</p>
+
+<pre><code>python -c "import pyfaust; pyfaust.enable_gpu_mod(silent=False)"
+WARNING: you must call enable_gpu_mod() before using GPUModHandler singleton.
+loading libgm
+libcublas.so.9.2: cannot open shared object file: No such file or directory</code></pre>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<hr>
+
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
@@ -15065,7 +15186,7 @@ CPU time, error: 2231.238716840744 0.12899414269631326
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[18]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pyfaust</span>
@@ -15085,7 +15206,7 @@ CPU time, error: 2231.238716840744 0.12899414269631326
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[16]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[18]:</div>
 
 
 
