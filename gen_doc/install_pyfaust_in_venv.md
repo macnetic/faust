@@ -5,21 +5,25 @@ Python @PY3_VER@
 
 First, you need to create your virtual environment into a directory reserved to pyfaust:
 
-	$ python3 -m venv test_pyfaust-@PY3_VER@
+	$ python3 -m venv test_pyfaust-@CPACK_PACKAGE_VERSION@
 
 Second, you need to enable the virtual environment:
 
-	$ source ./test_pyfaust-@PY3_VER@/bin/activate
+	$ source ./test_pyfaust-@CPACK_PACKAGE_VERSION@/bin/activate
 
 \note For Windows users the command is rather:
 
-	C:\> call .\test_pyfaust-@PY3_VER@\Scripts\activate
+	C:\> call .\test_pyfaust-@CPACK_PACKAGE_VERSION@\Scripts\activate
 
-Then, if all worked correctly you must see the test_pyfaut-@PY3_VER@ prompt of your virtual environment.
+Then, if all worked correctly you must see the test_pyfaut-@CPACK_PACKAGE_VERSION@ prompt of your virtual environment.
 
 It remains now to install pyfaust in this environment.
 
+If you downloaded the ``whl`` package the command is:
 	$ pip install pyfaust-*.whl
+
+Otherwise, a simpler way is to directly install pyfaust from the public PYPI repository:
+	$ pip install pyfaust
 
 All the dependencies will be downloaded and installed by the command above.
 
