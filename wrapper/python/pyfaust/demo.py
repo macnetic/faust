@@ -18,7 +18,7 @@ DEFT_RESULTS_DIR = 'pyfaust_demo_output'
 ## \brief The default figure output directory for the demos.
 DEFT_FIG_DIR = 'pyfaust_demo_figures'
 
-def get_data_dirpath():
+def get_data_dirpath(silent=True):
     """
         Returns the data directory path which varies according to the way pyfaust was installed.
     """
@@ -52,7 +52,7 @@ def get_data_dirpath():
         path = join(expanduser('~'), "pyfaust_data")
         if(not exists(path)):
             mkdir(path)
-        download_uncompress(path)
+        download_uncompress(path, already_downloaded_msg=not silent)
     return path
 
 def runall():
@@ -143,7 +143,7 @@ class quickstart:
 
         # multiplication a numpy array by a Faust
         x = np.random.randint(int_max, size=(dim2,1))
-        y = A * x
+        y = A @ x
 
         # convert a faust to numpy array
         A_numpy = A.toarray()
@@ -170,7 +170,7 @@ class quickstart:
             t_dense += t_elapsed
 
             t_begin = time.time()
-            y_faust=A*x;
+            y_faust=A@x;
             t_elapsed = time.time()-t_begin
             t_faust += t_elapsed
 
@@ -281,7 +281,7 @@ class fft:
             Runs the multiplication benchmark.
         """
         from pyfaust import Faust, dft
-        treshold = 10**-10
+        threshold = 10**-10
 
         print('Speedup Fourier')
         print("===============")
@@ -292,7 +292,7 @@ class fft:
 
         for k in range(0,len(fft._dims)):
             print('\rFFT fft._dims processed: ', fft._dims[0:k+1], end='')
-            F = dft(fft._log2_dims[k])
+            F = dft(fft._dims[k], normed=False)
             fft_mat = F.toarray()#fft(eye(fft._dims[k])) # or TODO: F.toarray() ?
             fft_fausts += [ F ]
             fft_mats += [ fft_mat ]
@@ -320,22 +320,23 @@ class fft:
                ydense = fft_mat.dot(x)
                mult_times[i,k,fft._FFT_FAUST_FULL] = _timer()-t
                t = _timer()
-               yfaust = fft_faust*x
+               yfaust = fft_faust@x
                mult_times[i,k,fft._FFT_FAUST] = _timer()-t
                t = _timer()
                yfft = fft2(x)
                mult_times[i,k,fft._FFT_NATIVE] = _timer()-t
-               if(norm(ydense-yfaust)>treshold):
+               if(norm(ydense-yfaust)>threshold):
                    raise Exception('Multiplication error: larger error than '
-                                   'treshold for ydense.')
+                                   'threshold for ydense.')
 
                from numpy.fft import fft as npfft
-               n1 = norm(npfft(np.eye(fft._dims[k]))-fft_faust.toarray())
-               assert(n1 < treshold)
-               if(norm(yfft-yfaust)/norm(yfft)>treshold):
+               ref_fft = np.eye(fft._dims[k])
+               n1 = norm(npfft(ref_fft)-fft_faust.toarray())/norm(ref_fft)
+               assert(n1 < threshold)
+               if(norm(yfft-yfaust)/norm(yfft)>threshold):
                    print('\nerror:', norm(yfft-yfaust))
                    raise Exception('Multiplication error: larger error than '
-                                   'treshold for yfaust')
+                                   'threshold for yfaust')
 
         print()
 
@@ -433,10 +434,10 @@ class runtimecmp:
 
                         F = fausts[j,k,l]
                         t = _timer()
-                        yfaust = F*x
+                        yfaust = F@x
                         tfaust[i,j,k,l,0] = _timer()-t
                         t = _timer()
-                        yfaust_trans = F.T*x
+                        yfaust_trans = F.T@x
                         tfaust[i,j,k,l,1] = _timer()-t
 
         print()
@@ -621,7 +622,7 @@ class hadamard:
             dense_times[i] = _timer()-t
 
             t = _timer()
-            y_faust = had_faust*x
+            y_faust = had_faust@x
             faust_times[i] = _timer()-t
 
 
@@ -709,7 +710,7 @@ class hadamard:
         """
 		This demo makes some time comparison between (Hadamard matrix)-vector multiplication and (Hadamard factorisation i.e a FAuST)-vector multiplication for Hadamard matrices of different sizes.
         """
-        treshold = 10.**-10
+        threshold = 10.**-10
         print("Speedup Hadamard")
         print("================")
         print("Generating data...")
@@ -743,9 +744,9 @@ class hadamard:
                 yfaust = had_faust*x
                 mult_times[i,k,_HAD_FAUST] = _timer()-t
 
-                if(norm(ydense-yfaust) > treshold):
+                if(norm(ydense-yfaust) > threshold):
                    raise Exception("speedup hadamard: mul. error greater than "
-                                   "treshold")
+                                   "threshold")
 
                 t = _timer()
                 ydense_trans = had_mat.T.dot(x)
@@ -755,7 +756,7 @@ class hadamard:
                 yfaust_trans = had_faust.T*x
                 mult_times[i,k,_HAD_TRANS_FAUST] = _timer()-t
 
-                if(norm(yfaust_trans-ydense_trans) > treshold):
+                if(norm(yfaust_trans-ydense_trans) > threshold):
                    raise Exception("speedup_hadamard: mul. error on transpose "
                                    "faust/mat.")
 
@@ -841,7 +842,7 @@ class hadamard:
         This demo makes some time comparison between the 2-norm of the Hadamard matrix and its Faust representation for differents sizes of the Hadamard matrix.
 
         """
-        treshold = 10.**-10
+        threshold = 10.**-10
         print("2-Norm Hadamard")
         print("================")
         print("Generating data...")
@@ -1033,7 +1034,7 @@ class bsl:
         return gamma
 
     @staticmethod
-    def run(input_data_dir=get_data_dirpath(),
+    def run(input_data_dir=get_data_dirpath(silent=False),
             output_dir=DEFT_RESULTS_DIR, on_gpu=False):
         """
         This function performs brain source localization.
@@ -1198,7 +1199,7 @@ class bsl:
         from scipy.io import loadmat
         if(use_precomputed_data):
             mat_file_entries = \
-            loadmat(os.path.join(get_data_dirpath(),"results_BSL_user.mat"))
+            loadmat(os.path.join(get_data_dirpath(silent=False),"results_BSL_user.mat"))
         else:
             mat_file_entries = loadmat(input_dir+os.sep+'results_BSL_user.mat')
         compute_times = mat_file_entries['compute_Times']
