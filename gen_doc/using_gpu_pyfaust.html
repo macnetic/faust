@@ -14261,8 +14261,8 @@ a.anchor-link {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="Using-The-GPU-FA&#181;ST-API">Using The GPU FA&#181;ST API<a class="anchor-link" href="#Using-The-GPU-FA&#181;ST-API">&#182;</a></h1><p>In this notebook we'll see quickly how to leverage the GPU computing power with pyfaust.<br>
 Since pyfaust 2.9.0 the API has been modified to make the GPU available directly from the python wrapper.
-Indeed, a GPU plug-in (aka <code>gpu_mod</code>) has been developed for this purpose.</p>
-<p>The first question you might ask is: does it work on my computer? Here is the answer: the loading of this plug-in is quite transparent, if an NVIDIA GPU is available and CUDA is properly installed on your system, you have normally nothing to do except installing pyfaust to get the GPU implementations at your fingertips. We'll see at the end of this notebook how to load manually the plug-in and how to get further information in case of an error.</p>
+Indeed, a GPU module (aka <code>gpu_mod</code>) has been developed for this purpose.</p>
+<p>The first question you might ask is: does it work on my computer? Here is the answer: the loading of this module is quite transparent, if an NVIDIA GPU is available and CUDA is properly installed on your system, you have normally nothing to do except installing pyfaust to get the GPU implementations at your fingertips. We'll see at the end of this notebook how to load manually the module and how to get further information in case of an error.</p>
 <p>It is worthy to note two drawbacks about the pyfaust GPU support:</p>
 <ul>
 <li>Mac OS X is not supported because NVIDIA has stopped to support this OS.</li>
@@ -14310,8 +14310,8 @@ First of all, creating a Faust using the constructor works seamlessly on GPU, th
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0xb48f640, density 1.000000, nnz 100
-- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0xb4903c0, density 1.000000, nnz 150</pre>
+<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0x99fbcb0, density 1.000000, nnz 100
+- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0x99fcb50, density 1.000000, nnz 150</pre>
 </div>
 
 </div>
@@ -14444,8 +14444,8 @@ First of all, creating a Faust using the constructor works seamlessly on GPU, th
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) SPARSE size 10 x 15, addr: 0xb491560, density 0.253333, nnz 38
-- GPU FACTOR 1 (real) SPARSE size 15 x 10, addr: 0x13803c10, density 0.053333, nnz 8</pre>
+<pre>- GPU FACTOR 0 (real) SPARSE size 10 x 15, addr: 0x99ee4e0, density 0.253333, nnz 38
+- GPU FACTOR 1 (real) SPARSE size 15 x 10, addr: 0x11a63bc0, density 0.053333, nnz 8</pre>
 </div>
 
 </div>
@@ -14490,8 +14490,8 @@ First of all, creating a Faust using the constructor works seamlessly on GPU, th
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0x13804370, density 1.000000, nnz 100
-- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0x137cdf80, density 1.000000, nnz 150</pre>
+<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0x125d8c50, density 1.000000, nnz 100
+- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0x125d99d0, density 1.000000, nnz 150</pre>
 </div>
 
 </div>
@@ -14537,25 +14537,25 @@ Note that the <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>Random GPU Faust: - GPU FACTOR 0 (real) SPARSE size 10 x 10, addr: 0x137cde60, density 0.500000, nnz 50
-- GPU FACTOR 1 (real) SPARSE size 10 x 10, addr: 0x137cf740, density 0.500000, nnz 50
-- GPU FACTOR 2 (real) SPARSE size 10 x 10, addr: 0x137d24d0, density 0.500000, nnz 50
-- GPU FACTOR 3 (real) SPARSE size 10 x 10, addr: 0x137d3380, density 0.500000, nnz 50
-- GPU FACTOR 4 (real) SPARSE size 10 x 10, addr: 0x137d4270, density 0.500000, nnz 50
-- GPU FACTOR 5 (real) SPARSE size 10 x 10, addr: 0x137d5160, density 0.500000, nnz 50
-- GPU FACTOR 6 (real) SPARSE size 10 x 10, addr: 0x137d6050, density 0.500000, nnz 50
-- GPU FACTOR 7 (real) SPARSE size 10 x 10, addr: 0x137d6f40, density 0.500000, nnz 50
-- GPU FACTOR 8 (real) SPARSE size 10 x 10, addr: 0x137d7e30, density 0.500000, nnz 50
-- GPU FACTOR 9 (real) SPARSE size 10 x 10, addr: 0x137d8d20, density 0.500000, nnz 50
-- GPU FACTOR 10 (real) SPARSE size 10 x 10, addr: 0x137d9c10, density 0.500000, nnz 50
+<pre>Random GPU Faust: - GPU FACTOR 0 (real) SPARSE size 10 x 10, addr: 0x955cbf0, density 0.500000, nnz 50
+- GPU FACTOR 1 (real) SPARSE size 10 x 10, addr: 0x125db870, density 0.500000, nnz 50
+- GPU FACTOR 2 (real) SPARSE size 10 x 10, addr: 0x125de500, density 0.500000, nnz 50
+- GPU FACTOR 3 (real) SPARSE size 10 x 10, addr: 0x125df3b0, density 0.500000, nnz 50
+- GPU FACTOR 4 (real) SPARSE size 10 x 10, addr: 0x125e02a0, density 0.500000, nnz 50
+- GPU FACTOR 5 (real) SPARSE size 10 x 10, addr: 0x125e1190, density 0.500000, nnz 50
+- GPU FACTOR 6 (real) SPARSE size 10 x 10, addr: 0x125e2080, density 0.500000, nnz 50
+- GPU FACTOR 7 (real) SPARSE size 10 x 10, addr: 0x125e2f70, density 0.500000, nnz 50
+- GPU FACTOR 8 (real) SPARSE size 10 x 10, addr: 0x125e3e60, density 0.500000, nnz 50
+- GPU FACTOR 9 (real) SPARSE size 10 x 10, addr: 0x125e4d50, density 0.500000, nnz 50
+- GPU FACTOR 10 (real) SPARSE size 10 x 10, addr: 0x125e5c40, density 0.500000, nnz 50
 
-Hadamard GPU Faust: - GPU FACTOR 0 (real) SPARSE size 32 x 32, addr: 0x137cf660, density 0.062500, nnz 64
-- GPU FACTOR 1 (real) SPARSE size 32 x 32, addr: 0x137cdb10, density 0.062500, nnz 64
-- GPU FACTOR 2 (real) SPARSE size 32 x 32, addr: 0x137cf600, density 0.062500, nnz 64
-- GPU FACTOR 3 (real) SPARSE size 32 x 32, addr: 0x137dd2c0, density 0.062500, nnz 64
-- GPU FACTOR 4 (real) SPARSE size 32 x 32, addr: 0x137ddfc0, density 0.062500, nnz 64
+Hadamard GPU Faust: - GPU FACTOR 0 (real) SPARSE size 32 x 32, addr: 0x125db790, density 0.062500, nnz 64
+- GPU FACTOR 1 (real) SPARSE size 32 x 32, addr: 0x125db730, density 0.062500, nnz 64
+- GPU FACTOR 2 (real) SPARSE size 32 x 32, addr: 0x125e8560, density 0.062500, nnz 64
+- GPU FACTOR 3 (real) SPARSE size 32 x 32, addr: 0x11a4c370, density 0.062500, nnz 64
+- GPU FACTOR 4 (real) SPARSE size 32 x 32, addr: 0x11a4d070, density 0.062500, nnz 64
 
-Identity GPU Faust: - GPU FACTOR 0 (real) SPARSE size 16 x 16, addr: 0x137da4a0, density 0.062500, nnz 16
+Identity GPU Faust: - GPU FACTOR 0 (real) SPARSE size 16 x 16, addr: 0x116c9af0, density 0.062500, nnz 16
 
 </pre>
 </div>
@@ -14601,8 +14601,8 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0x137ce380, density 1.000000, nnz 100
-- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0xb4903c0, density 1.000000, nnz 150</pre>
+<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0x125d9cb0, density 1.000000, nnz 100
+- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0x99fcb50, density 1.000000, nnz 150</pre>
 </div>
 
 </div>
@@ -14614,7 +14614,7 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>As you see the first factor's address has changed in the result compared to what it was in <code>gpuF</code>. Indeed, when you make a scalar multiplication only one factor is multiplied, the others don't change, they are shared between the Faust being multiplied and the resulting Faust. This is an optimization and to go further in this direction the factor chosen to by multiplied is the smallest in memory (not necessarily the first one).</p>
+<p>As you see the first factor's address has changed in the result compared to what it was in <code>gpuF</code>. Indeed, when you make a scalar multiplication only one factor is multiplied, the others don't change, they are shared between the Faust being multiplied and the resulting Faust. This is an optimization and to go further in this direction the factor chosen to be multiplied is the smallest in memory (not necessarily the first one).</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -14647,36 +14647,36 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>array([[12.85455508, 17.27922173, 17.96267017, 14.21897399, 18.31925306,
-        15.02554268, 16.91733679, 23.09840714, 13.61468904, 13.01537786,
-        21.25102049, 14.52417429, 16.1892926 , 16.46261493, 19.16342541],
-       [18.08051505, 24.86427095, 25.98624127, 20.52699688, 26.08883115,
-        21.52212096, 24.12657093, 32.95852328, 19.3464327 , 18.72800882,
-        30.82980616, 20.71897188, 23.21253159, 23.92149717, 27.6881282 ],
-       [ 9.86835265, 13.74201094, 14.40219578, 11.37739891, 14.19422198,
-        11.82493033, 13.02581251, 18.00899813, 10.42905687, 10.2166238 ,
-        17.18017319, 11.27512396, 12.80235685, 13.02240462, 15.25645078],
-       [16.53551789, 22.16642097, 23.23332603, 18.37041718, 23.56041574,
-        20.03389295, 21.59040732, 30.04863309, 17.39620167, 16.80419878,
-        28.02075287, 18.88214204, 21.16592227, 21.81878918, 25.01607829],
-       [15.04569733, 19.68899839, 21.01127486, 16.31917322, 21.02403138,
-        18.22885488, 19.53171567, 26.76718884, 15.86257388, 15.65092436,
-        25.293682  , 17.44055417, 18.90841738, 19.41824087, 22.55638102],
-       [16.02372538, 21.04200711, 22.47640481, 17.85441968, 22.73955572,
-        18.21539211, 21.43123486, 28.48777113, 17.39328661, 16.85009111,
-        26.62987391, 18.91722528, 19.80288613, 20.99579584, 23.8891957 ],
-       [14.46799077, 19.10231466, 20.24705538, 16.02339422, 20.44179146,
-        17.34877252, 18.53955548, 25.93220904, 15.10332246, 14.57219887,
-        24.37658531, 16.54954955, 18.17179354, 18.58042995, 21.99950794],
-       [18.53219566, 23.8554927 , 25.5306696 , 19.82127291, 25.62347565,
-        22.02650195, 24.03875076, 32.63949697, 19.51223055, 19.22532097,
-        30.70422058, 21.46490916, 22.93651754, 23.84822351, 27.14186392],
-       [16.33932438, 21.42364824, 22.703829  , 18.18699072, 23.04672396,
-        19.16322106, 21.33290334, 29.20809808, 17.26916108, 16.69117344,
-        27.23667735, 18.85179244, 20.18784973, 21.22935102, 24.37125013],
-       [15.14949428, 21.26339732, 22.26686269, 17.90392193, 22.21593015,
-        17.56109762, 20.8731316 , 27.87378114, 16.61087595, 16.27584343,
-        26.3232434 , 17.92274058, 19.66388469, 20.52478117, 23.46587524]])</pre>
+<pre>array([[23.37843636, 24.75463737, 22.06660459, 19.95276734, 27.22619391,
+        24.56781277, 30.26826116, 19.31167809, 20.2193572 , 20.32963679,
+        21.48385338, 23.03933635, 28.13049287, 19.82302903, 26.60702154],
+       [21.39123923, 23.78466166, 21.07425252, 19.06551899, 25.73523361,
+        23.14940549, 28.71480803, 18.1850921 , 19.21366396, 19.54786586,
+        20.8786172 , 22.20668262, 26.77235442, 18.98781681, 25.14006384],
+       [16.4732377 , 18.2719942 , 15.89969132, 14.55865886, 19.9288501 ,
+        17.17372517, 22.27918803, 13.98120123, 14.68787738, 15.00413389,
+        15.17219981, 17.32576181, 20.45824204, 14.96315237, 19.92767177],
+       [22.50778318, 24.83305645, 22.0360606 , 20.01852565, 26.99468299,
+        24.06399971, 30.34324391, 19.11183291, 20.45582937, 20.61048274,
+        21.95267058, 23.3706616 , 28.11154532, 20.1526413 , 26.51747379],
+       [23.1261849 , 23.77412091, 22.06038442, 19.92965483, 27.1840777 ,
+        24.08847564, 30.32405471, 19.02914602, 19.68435691, 20.31188417,
+        21.13851479, 22.89012407, 28.05487814, 19.21822248, 26.72536574],
+       [17.00880813, 16.95982667, 15.76890087, 14.26730439, 19.53668727,
+        17.52554144, 21.92931189, 13.81336466, 14.12195277, 14.49134245,
+        15.21231488, 16.26427702, 20.23535579, 13.7950304 , 19.18292747],
+       [ 9.8893196 ,  9.19262881,  8.71931882,  7.87166825, 10.78216492,
+         9.85894124, 11.92517538,  7.56498234,  7.91067845,  7.93186816,
+         8.41855758,  8.69594023, 10.94450741,  7.57206176, 10.48995577],
+       [18.60169241, 20.28287924, 18.47507821, 16.80295462, 22.85476672,
+        19.63371664, 24.89969172, 15.69737976, 16.10194963, 16.91901832,
+        16.96249476, 19.50363443, 23.125006  , 15.89090268, 22.56710524],
+       [23.42607773, 26.51412134, 23.28379999, 20.97516277, 28.57048848,
+        25.22531044, 32.22918197, 20.34661208, 21.30789698, 21.73170408,
+        22.80495448, 24.96840122, 29.9511978 , 21.3255232 , 28.27733464],
+       [18.20886479, 19.17468542, 16.99695211, 15.24534273, 20.94310562,
+        19.16843614, 23.82569991, 15.21285992, 15.31595448, 15.62314166,
+        16.81606317, 17.7428601 , 22.01851875, 15.47854262, 20.63172309]])</pre>
 </div>
 
 </div>
@@ -14722,13 +14722,13 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0xb48f640, density 1.000000, nnz 100
-- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0xb4903c0, density 1.000000, nnz 150
-- GPU FACTOR 2 (real) SPARSE size 15 x 18, addr: 0x2bfa9f0, density 0.277778, nnz 75
-- GPU FACTOR 3 (real) SPARSE size 18 x 17, addr: 0xb488a20, density 0.294118, nnz 90
-- GPU FACTOR 4 (real) SPARSE size 17 x 16, addr: 0x137e5a80, density 0.312500, nnz 85
-- GPU FACTOR 5 (real) SPARSE size 16 x 18, addr: 0x137e68f0, density 0.277778, nnz 80
-- GPU FACTOR 6 (real) SPARSE size 18 x 18, addr: 0x137e77e0, density 0.277778, nnz 90</pre>
+<pre>- GPU FACTOR 0 (real) DENSE size 10 x 10, addr: 0x99fbcb0, density 1.000000, nnz 100
+- GPU FACTOR 1 (real) DENSE size 10 x 15, addr: 0x99fcb50, density 1.000000, nnz 150
+- GPU FACTOR 2 (real) SPARSE size 15 x 18, addr: 0x11a53060, density 0.277778, nnz 75
+- GPU FACTOR 3 (real) SPARSE size 18 x 17, addr: 0x11a507c0, density 0.294118, nnz 90
+- GPU FACTOR 4 (real) SPARSE size 17 x 15, addr: 0x11a55420, density 0.333333, nnz 85
+- GPU FACTOR 5 (real) SPARSE size 15 x 16, addr: 0x11a562d0, density 0.312500, nnz 75
+- GPU FACTOR 6 (real) SPARSE size 16 x 18, addr: 0x11a571c0, density 0.277778, nnz 80</pre>
 </div>
 
 </div>
@@ -14782,17 +14782,17 @@ For example, let's consider Faust-scalar multiplication and Faust-matrix product
 <pre>A first try to multiply a CPU Faust with a GPU one...
 it doesn&#39;t work, you must either convert cpuF to a GPU Faust or gpuF to a CPU Faust before.
 A second try using conversion as needed...
-- GPU FACTOR 0 (real) SPARSE size 5 x 5, addr: 0x13658df0, density 1.000000, nnz 25
-- GPU FACTOR 1 (real) SPARSE size 5 x 5, addr: 0x1365a290, density 1.000000, nnz 25
-- GPU FACTOR 2 (real) SPARSE size 5 x 5, addr: 0x1365b220, density 1.000000, nnz 25
-- GPU FACTOR 3 (real) SPARSE size 5 x 5, addr: 0x1365c090, density 1.000000, nnz 25
-- GPU FACTOR 4 (real) SPARSE size 5 x 5, addr: 0x1365cf40, density 1.000000, nnz 25
-- GPU FACTOR 5 (real) SPARSE size 5 x 5, addr: 0x2bfaa50, density 1.000000, nnz 25
-- GPU FACTOR 6 (real) SPARSE size 5 x 5, addr: 0x137e39c0, density 1.000000, nnz 25
-- GPU FACTOR 7 (real) SPARSE size 5 x 5, addr: 0x13654dd0, density 1.000000, nnz 25
-- GPU FACTOR 8 (real) SPARSE size 5 x 5, addr: 0x13655c80, density 1.000000, nnz 25
-- GPU FACTOR 9 (real) SPARSE size 5 x 5, addr: 0x13656b70, density 1.000000, nnz 25
-- GPU FACTOR 10 (real) SPARSE size 5 x 5, addr: 0x13657a60, density 1.000000, nnz 25
+- GPU FACTOR 0 (real) SPARSE size 5 x 5, addr: 0x11a5f340, density 1.000000, nnz 25
+- GPU FACTOR 1 (real) SPARSE size 5 x 5, addr: 0x11a607e0, density 1.000000, nnz 25
+- GPU FACTOR 2 (real) SPARSE size 5 x 5, addr: 0x11a61790, density 1.000000, nnz 25
+- GPU FACTOR 3 (real) SPARSE size 5 x 5, addr: 0x11a62600, density 1.000000, nnz 25
+- GPU FACTOR 4 (real) SPARSE size 5 x 5, addr: 0x11a631a0, density 1.000000, nnz 25
+- GPU FACTOR 5 (real) SPARSE size 5 x 5, addr: 0x11a533a0, density 1.000000, nnz 25
+- GPU FACTOR 6 (real) SPARSE size 5 x 5, addr: 0x11a5a400, density 1.000000, nnz 25
+- GPU FACTOR 7 (real) SPARSE size 5 x 5, addr: 0x11a5b360, density 1.000000, nnz 25
+- GPU FACTOR 8 (real) SPARSE size 5 x 5, addr: 0x11a5c210, density 1.000000, nnz 25
+- GPU FACTOR 9 (real) SPARSE size 5 x 5, addr: 0x11a5d100, density 1.000000, nnz 25
+- GPU FACTOR 10 (real) SPARSE size 5 x 5, addr: 0x11a5dff0, density 1.000000, nnz 25
 
 Now it works!
 </pre>
@@ -14839,8 +14839,8 @@ Now it works!
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>174 ms ± 2.37 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-770 ms ± 228 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+<pre>177 ms ± 2.6 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+835 ms ± 251 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 </pre>
 </div>
 </div>
@@ -14883,8 +14883,8 @@ Now it works!
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>55.6 ms ± 13.6 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
-134 ms ± 269 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+<pre>55.6 ms ± 18.9 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+135 ms ± 232 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>
@@ -14938,11 +14938,11 @@ Now it works!
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>CPU times:
-89.5 ms ± 21.7 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-737 ms ± 350 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+95.6 ms ± 28.7 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+951 ms ± 516 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 GPU times:
-14.8 ms ± 268 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-55.6 ms ± 135 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+19.3 ms ± 538 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+55.7 ms ± 113 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 </pre>
 </div>
 </div>
@@ -14969,25 +14969,25 @@ When running on GPU, the matrix to factorize is copied in GPU memory and almost 
 <p><strong>Warning: THE COMPUTATION CAN LAST THIRTY MINUTES OR SO ON CPU</strong></p>
 
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">factorize_MEG</span><span class="p">(</span><span class="n">dev</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">loadmat</span>
+<span class="kn">from</span> <span class="nn">pyfaust.demo</span> <span class="kn">import</span> <span class="n">get_data_dirpath</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">loadmat</span><span class="p">(</span><span class="n">get_data_dirpath</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;/matrix_MEG.mat&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">factorize_MEG</span><span class="p">(</span><span class="n">dev</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">pyfaust.fact</span> <span class="kn">import</span> <span class="n">hierarchical</span>
-    <span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">loadmat</span>
-    <span class="kn">from</span> <span class="nn">pyfaust.demo</span> <span class="kn">import</span> <span class="n">get_data_dirpath</span>
     <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
     <span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">norm</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">loadmat</span><span class="p">(</span><span class="n">get_data_dirpath</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;/matrix_MEG.mat&#39;</span><span class="p">)</span>
     <span class="n">MEG</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;matrix&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
     <span class="n">num_facts</span> <span class="o">=</span> <span class="mi">9</span>
     <span class="n">k</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="n">s</span> <span class="o">=</span> <span class="mi">8</span>
     <span class="n">t_start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
-    <span class="n">MEG16</span> <span class="o">=</span> <span class="n">hierarchical</span><span class="p">(</span><span class="n">MEG</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;rectmat&#39;</span><span class="p">,</span> <span class="n">num_facts</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">s</span><span class="p">],</span> <span class="n">backend</span><span class="o">=</span><span class="mi">2020</span><span class="p">,</span> <span class="n">on_gpu</span><span class="o">=</span><span class="n">dev</span><span class="o">==</span><span class="s1">&#39;gpu&#39;</span><span class="p">,</span> <span class="n">full_gpu</span><span class="o">=</span><span class="n">dev</span><span class="o">==</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
+    <span class="n">MEG16</span> <span class="o">=</span> <span class="n">hierarchical</span><span class="p">(</span><span class="n">MEG</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;rectmat&#39;</span><span class="p">,</span> <span class="n">num_facts</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">s</span><span class="p">],</span> <span class="n">backend</span><span class="o">=</span><span class="mi">2020</span><span class="p">,</span> <span class="n">on_gpu</span><span class="o">=</span><span class="n">dev</span><span class="o">==</span><span class="s1">&#39;gpu&#39;</span><span class="p">)</span>
     <span class="n">total_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t_start</span>
     <span class="n">err</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">MEG16</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">-</span><span class="n">MEG</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">MEG</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">MEG16</span><span class="p">,</span> <span class="n">total_time</span><span class="p">,</span> <span class="n">err</span>
@@ -14996,6 +14996,27 @@ When running on GPU, the matrix to factorize is copied in GPU memory and almost 
      </div>
 </div>
 </div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>It seems  FAµST data is already available locally. To renew the download please empty the directory: /home/hhadjdji/pyfaust_data
+</pre>
+</div>
+</div>
+
+</div>
+
 </div>
 
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -15025,33 +15046,7 @@ When running on GPU, the matrix to factorize is copied in GPU memory and almost 
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>It seems  FAµST data is already available locally. To renew the download please empty the directory: /home/hhadjdji/pyfaust_data
-It seems  FAµST data is already available locally. To renew the download please empty the directory: /home/hhadjdji/pyfaust_data
-</pre>
-</div>
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/local/hhadjdji/latest_pyfaust/lib/python3.7/site-packages/pyfaust/fact.py:492: UserWarning: on_gpu is totally experimental, use at your own risk.
-  if on_gpu: warnings.warn(&#34;on_gpu is totally experimental, use at your&#34;
-</pre>
-</div>
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>GPU time, error: 464.5002317428589 0.12897590240787224
+<pre>GPU time, error: 466.35954427719116 0.12897590240787224
 </pre>
 </div>
 </div>
@@ -15087,8 +15082,7 @@ It seems  FAµST data is already available locally. To renew the download please
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>It seems  FAµST data is already available locally. To renew the download please empty the directory: /home/hhadjdji/pyfaust_data
-CPU time, error: 2287.328642129898 0.12899414269631326
+<pre>CPU time, error: 1246.6538138389587 0.12899414269631326
 </pre>
 </div>
 </div>
@@ -15111,7 +15105,7 @@ CPU time, error: 2287.328642129898 0.12899414269631326
     <tr>
         <td>CPU</td>
         <td>Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz</td>
-        <td>2230.77</td>
+        <td>1241.00</td>
         <td>.129</td>
     </tr>
     <tr>
@@ -15131,7 +15125,7 @@ CPU time, error: 2287.328642129898 0.12899414269631326
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Manually-loading-the-pyfaust-GPU-plug-in">Manually loading the pyfaust GPU plug-in<a class="anchor-link" href="#Manually-loading-the-pyfaust-GPU-plug-in">&#182;</a></h3><p>If something goes wrong when trying to use the GPU pyfaust extension, here is how to manually load the plug-in and obtain more information.</p>
+<h3 id="Manually-loading-the-pyfaust-GPU-module">Manually loading the pyfaust GPU module<a class="anchor-link" href="#Manually-loading-the-pyfaust-GPU-module">&#182;</a></h3><p>If something goes wrong when trying to use the GPU pyfaust extension, here is how to manually load the module and obtain more information.</p>
 <p>The key is the function <a href="https://faustgrp.gitlabpages.inria.fr/faust/last-doc/html/namespacepyfaust.html#aea03fff2525fc834f2a56e63fd30a54f">enable_gpu_mod</a>. This function allows to give another try to <code>gpu_mod</code> loading with the verbose mode enabled.</p>
 
 </div>
@@ -15155,7 +15149,7 @@ CPU time, error: 2287.328642129898 0.12899414269631326
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <p>Afterward you can call <code>pyfaust.is_gpu_mod_enabled()</code> to verify if it works in your script.</p>
 <p>Below I copy outputs that show what it should look like when it doesn't work:</p>
-<p>1) If you asked a fatal error:</p>
+<p>1) If you asked a fatal error using <code>enable_gpu_mod(silent=False, fatal=True)</code> an exception will be raised and your code won't be able to continue after this call:</p>
 
 <pre><code>python -c "import pyfaust; pyfaust.enable_gpu_mod(silent=False, fatal=True)"
 WARNING: you must call enable_gpu_mod() before using GPUModHandler singleton.
@@ -15163,7 +15157,7 @@ loading libgm
 libcublas.so.9.2: cannot open shared object file: No such file or directory
 [...]
 Exception: Can't load gpu_mod library, maybe the path (/home/test/venv_pyfaust-2.10.14/lib/python3.7/site-packages/pyfaust/lib/libgm.so) is not correct or the backend (cuda) is not installed or configured properly so the libraries are not found.</code></pre>
-<p>2) If you just want a warning:</p>
+<p>2) If you just want a warning, you must use <code>enable_gpu_mod(silent=False)</code>, the code will continue after with no gpu_mod enabled but you'll get some information about what is going wrong (here the CUDA toolkit version 9.2 is not installed) :</p>
 
 <pre><code>python -c "import pyfaust; pyfaust.enable_gpu_mod(silent=False)"
 WARNING: you must call enable_gpu_mod() before using GPUModHandler singleton.
@@ -15212,7 +15206,7 @@ libcublas.so.9.2: cannot open shared object file: No such file or directory</cod
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&#39;2.10.14&#39;</pre>
+<pre>&#39;2.10.45&#39;</pre>
 </div>
 
 </div>
