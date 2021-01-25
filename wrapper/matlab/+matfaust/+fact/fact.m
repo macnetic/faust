@@ -18,7 +18,8 @@
 %>    It makes iterative use of Palm4MSA to proceed with the factorization of a given
 %>    dense matrix.
 %>
-%>    - The third group of algorithms is for FGFT computing: fact.fgft_palm fact.fgft_givens fact.eigtj
+%    - The third group of algorithms is for approximate eigenvalue decomposition (eigtj) and singular value decomposition (svdtj).
+%>
 %>
 %>
 %======================================================================
