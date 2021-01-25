@@ -13,6 +13,7 @@ stages:
     - test
     - pkg
     - pkg_test
+    - pkg_pub
 
 ctest:
     <<: *ctest_script
@@ -543,3 +544,28 @@ test_win_purepy_pkg:
     - tags
   tags:
     - win10
+
+pypi_pub:
+  stage: pkg_pub
+  script:
+    - python3 -m pip install --user twine
+    - cd build/wrapper/python/dist/
+    - find
+    - NUX_WHL=$(ls *linux*x86_64.whl)
+    - mv $NUX_WHL ${NUX_WHL%-*}-manylinux1_x86_64.whl # proper format for pypi (just linux is not accepted)
+    - TOKEN=$(echo $PYPI_TOKEN | base64 -d)
+    - echo -e "__token__\n$TOKEN" | python3 -m twine upload *.whl
+  needs:
+    - job: pkg_macos_purepy_release
+      artifacts: true
+    - job: pkg_linux_purepy_release
+      artifacts: true
+    - job: pkg_win_purepy_release
+      artifacts: true
+    - job: test_nux_purepy_release
+    - job: test_win_purepy_pkg
+    - job: test_macos_purepy_release
+  only:
+    - tags
+  tags:
+    - linux
