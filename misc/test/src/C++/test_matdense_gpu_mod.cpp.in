@@ -8,10 +8,13 @@
 #include "faust_cuda_device.h"
 #include <cstdlib>
 #include <cmath>
+
+typedef @TEST_FPP@ FPP;
+
 using namespace std;
 using namespace Faust;
 
-double calc_err(MatDense<double, GPU2> &gpu_mat, MatDense<double, Cpu> &cpu_mat)
+double calc_err(MatDense<FPP, GPU2> &gpu_mat, MatDense<FPP, Cpu> &cpu_mat)
 {
 	auto gpu_mat_to_cpu = gpu_mat.tocpu();
 	auto err_diff = cpu_mat;
@@ -26,10 +29,10 @@ void test_mul_gpu_dense()
 {
 	faust_unsigned_int nrows = 1024, ncols = 1024;
 	faust_unsigned_int nrows2 = 1024, ncols2 = 1024;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
-	auto cpu_mat2 = Faust::MatDense<double,Cpu>::randMat(nrows2,ncols2);
-	MatDense<double,GPU2> gpu_mat2(nrows2, ncols2, cpu_mat2->getData());
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto cpu_mat2 = Faust::MatDense<FPP,Cpu>::randMat(nrows2,ncols2);
+	MatDense<FPP,GPU2> gpu_mat2(nrows2, ncols2, cpu_mat2->getData());
 	// test MatDense<FPP,GPU2> * MatDense<FPP,GPU2>
 	cout << "Mul. GPUDense*GPUDense in GPUDense" << endl;
 	gpu_mat1.multiply(gpu_mat2);
@@ -50,7 +53,7 @@ void test_mul_gpu_dense()
 	cout << "err mul.: " << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
 	cout << "OK" << endl;
 	cout << "Mul. GPUDense*CPUSparse in CPUDense" << endl;
-	Faust::MatSparse<double,Cpu> cpu_mat2_sparse(*cpu_mat2);
+	Faust::MatSparse<FPP,Cpu> cpu_mat2_sparse(*cpu_mat2);
 //	cout << cpu_mat2_sparse.to_string(false, true) << endl;
 //	cout << cpu_mat2->to_string(false, true) << endl;
 	gpu_mat1.multiply(cpu_mat2_sparse, cpu_mat1_mat2_test);
@@ -63,7 +66,7 @@ void test_mul_gpu_dense()
 	cout << "err mul.: " << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
 	cout << "OK" << endl;
 	cout << "Mul. GPUDense*CPUSparse in GPUDense" << endl;
-	MatDense<double, GPU2> gpu_mat1_mat2_test(nrows, ncols2);
+	MatDense<FPP, GPU2> gpu_mat1_mat2_test(nrows, ncols2);
 	gpu_mat1.multiply(cpu_mat2_sparse, gpu_mat1_mat2_test);
 	auto gpu_mat1_mat2_test_to_cpu = gpu_mat1_mat2_test.tocpu();
 	err_diff = gpu_mat1_mat2_test_to_cpu;
@@ -71,8 +74,8 @@ void test_mul_gpu_dense()
 	cout << "err mul.: " << err_diff.norm()/cpu_mat1_mat2_ref.norm() << endl;
 	cout << "OK" << endl;
 	cout << "MatDense*cpu_vec" << endl;
-	Faust::Vect<double, Cpu>* vec = Faust::Vect<double,Cpu>::rand(cpu_mat1->getNbCol());
-	Faust::Vect<double, Cpu> vec_copy(*vec);
+	Faust::Vect<FPP, Cpu>* vec = Faust::Vect<FPP,Cpu>::rand(cpu_mat1->getNbCol());
+	Faust::Vect<FPP, Cpu> vec_copy(*vec);
 	cout << vec->norm() << endl;
 	cout << vec_copy.norm() << endl;
 	gpu_mat1.multiply(*vec);
@@ -94,10 +97,10 @@ void test_mul_eq_op()
 	// convert the two cpu mats to gpu mats
 	faust_unsigned_int nrows = 1024, ncols = 1024;
 	faust_unsigned_int nrows2 = 1024, ncols2 = 784;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
-	auto cpu_mat2 = Faust::MatDense<double,Cpu>::randMat(nrows2,ncols2);
-	MatDense<double,GPU2> gpu_mat2(nrows2, ncols2, cpu_mat2->getData());
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto cpu_mat2 = Faust::MatDense<FPP,Cpu>::randMat(nrows2,ncols2);
+	MatDense<FPP,GPU2> gpu_mat2(nrows2, ncols2, cpu_mat2->getData());
 	// test *=
 	*cpu_mat1 *= *cpu_mat2;
 	gpu_mat1 *= *cpu_mat2;
@@ -109,9 +112,9 @@ void test_mul_spm()
 {
 	cout << "test_mul_spm()" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 784;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	Faust::MatSparse<double, Cpu> *cpu_mat2_sp = Faust::MatSparse<double, Cpu>::randMat(ncols, nrows, .2);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	Faust::MatSparse<FPP, Cpu> *cpu_mat2_sp = Faust::MatSparse<FPP, Cpu>::randMat(ncols, nrows, .2);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	gpu_mat1.multiplyLeft(*cpu_mat2_sp);
 	cpu_mat1->multiplyLeft(*cpu_mat2_sp);
 //	cout << gpu_mat1.tocpu().to_string(false, true) << endl;
@@ -125,8 +128,8 @@ void test_resize()
 {
 	cout << "Test resize()" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 784;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	gpu_mat1.resize(45, 12);
 	cout << "OK" << endl;
 }
@@ -135,8 +138,8 @@ void test_setones()
 {
 	cout << "Test setones()" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 784;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols);
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols);
 	gpu_mat1.setOnes();
 	auto gpu_mat1_to_cpu = gpu_mat1.tocpu();
 //	cout << gpu_mat1_to_cpu.to_string(false, true) << endl;
@@ -151,8 +154,8 @@ void test_setzeros()
 {
 	cout << "Test setzeros()" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 784;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols);
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols);
 	gpu_mat1.setZeros();
 	auto gpu_mat1_to_cpu = gpu_mat1.tocpu();
 //	cout << gpu_mat1_to_cpu.to_string(false, true) << endl;
@@ -164,8 +167,8 @@ void test_seteyes()
 {
 	cout << "Test seteyes()" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols);
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols);
 	gpu_mat1.setEyes();
 	auto gpu_mat1_to_cpu = gpu_mat1.tocpu();
 	cout << gpu_mat1_to_cpu.to_string(false, true) << endl;
@@ -180,8 +183,8 @@ void test_clone()
 {
 	cout << "Test clone()" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	auto gpu_mat1_to_cpu = gpu_mat1.tocpu();
 	auto gpu_mat1_clone = gpu_mat1.clone();
 	auto gpu_mat1_clone_to_cpu = gpu_mat1_clone->tocpu();
@@ -198,8 +201,8 @@ void test_transpose()
 {
 	cout << "Test transpose" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 //	cout << cpu_mat1->to_string(false, true) << endl;
 	cpu_mat1->transpose();
 	gpu_mat1.transpose();
@@ -216,8 +219,8 @@ void test_adjoint()
 {
 	cout << "Test adjoint" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 //	cout << cpu_mat1->to_string(false, true) << endl;
 	cpu_mat1->adjoint();
 	gpu_mat1.adjoint();
@@ -234,8 +237,8 @@ void test_conjugate()
 {
 	cout << "Test conjugate" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 //	cout << cpu_mat1->to_string(false, true) << endl;
 	cpu_mat1->conjugate();
 	gpu_mat1.conjugate();
@@ -253,8 +256,8 @@ void test_norm()
 	cout << "test spectral norm" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
 	int flag;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	auto gpu_norm = gpu_mat1.spectralNorm(1000, (float)1e-6);
 	auto cpu_norm = cpu_mat1->spectralNorm(1000, 1e-6, flag);
 //	cout << gpu_norm << endl;
@@ -269,7 +272,7 @@ void test_norm()
 	cout << "test l1 norm" << endl;
 	gpu_norm = gpu_mat1.normL1();
 	cpu_norm = cpu_mat1->normL1();
-//	cout << "gpu: " << gpu_norm << " cpu: " << cpu_norm << endl;
+	cout << "gpu: " << gpu_norm << " cpu: " << cpu_norm << endl;
 	assert(abs(cpu_norm-gpu_norm) < 1e-6);
 	cout << "OK" << endl;
 }
@@ -278,8 +281,8 @@ void test_normalize()
 {
 	cout << "test normalize" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	cpu_mat1->normalize();
 	gpu_mat1.normalize();
 	auto gpu_mat1_to_cpu = gpu_mat1.tocpu();
@@ -294,9 +297,9 @@ void test_scalar_mul()
 {
 	cout << "test scalar mul" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
-	auto lambda = 12.;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	auto lambda = FPP(12.);
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	cpu_mat1->scalarMultiply(lambda);
 	gpu_mat1.scalarMultiply(lambda);
 	auto gpu_mat1_to_cpu = gpu_mat1.tocpu();
@@ -311,10 +314,10 @@ void test_abs()
 	cout << "test abs" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
 	auto lambda = 12.;
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	cpu_mat1->scalarMultiply(-1);
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	cpu_mat1->scalarMultiply(FPP(-1));
 	cout << cpu_mat1->to_string(false, true) << endl;
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	cpu_mat1->abs();
 	gpu_mat1.abs();
 	auto gpu_mat1_to_cpu = gpu_mat1.tocpu();
@@ -331,10 +334,10 @@ void test_add()
 	cout << "test add" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
 	auto lambda = 12.;
-	// test MatDense<double, GPU2> + MatDense<double, Cpu>
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	auto cpu_mat2 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	// test MatDense<FPP, GPU2> + MatDense<FPP, Cpu>
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	auto cpu_mat2 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	cpu_mat1->add(*cpu_mat2);
 	gpu_mat1.add(*cpu_mat2);
 	auto gpu_mat1_to_cpu = gpu_mat1.tocpu();
@@ -342,8 +345,8 @@ void test_add()
 	err_diff -= gpu_mat1_to_cpu;
 	auto err = err_diff.norm()/cpu_mat1->norm();
 	assert(err < 1e-6);
-	// test MatDense<double, GPU2> + MatSparse<double, Cpu>
-	Faust::MatSparse<double, Cpu> *cpu_mat3_sp = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	// test MatDense<FPP, GPU2> + MatSparse<FPP, Cpu>
+	Faust::MatSparse<FPP, Cpu> *cpu_mat3_sp = Faust::MatSparse<FPP, Cpu>::randMat(nrows, ncols, .2);
 //	cpu_mat3_sp->Display();
 //	cout << cpu_mat3_sp->to_string(false, true) << endl;
 	assert(calc_err(gpu_mat1, *cpu_mat1) < 1e-6);
@@ -364,10 +367,10 @@ void test_sub()
 	cout << "test sub" << endl;
 	faust_unsigned_int nrows = 1024, ncols = 1024;
 	auto lambda = 12.;
-	// test MatDense<double, GPU2> + MatDense<double, Cpu>
-	auto cpu_mat1 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	auto cpu_mat2 = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
+	// test MatDense<FPP, GPU2> + MatDense<FPP, Cpu>
+	auto cpu_mat1 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	auto cpu_mat2 = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat1(nrows, ncols, cpu_mat1->getData());
 	cpu_mat1->sub(*cpu_mat2);
 	gpu_mat1.sub(*cpu_mat2);
 	auto gpu_mat1_to_cpu = gpu_mat1.tocpu();
@@ -375,10 +378,10 @@ void test_sub()
 	err_diff -= gpu_mat1_to_cpu;
 	auto err = err_diff.norm()/cpu_mat1->norm();
 	assert(err < 1e-6);
-	// test MatDense<double, GPU2> + MatSparse<double, Cpu>
+	// test MatDense<FPP, GPU2> + MatSparse<FPP, Cpu>
 	return;
 	//TODO: fix below test error
-	Faust::MatSparse<double, Cpu> *cpu_mat3_sp = Faust::MatSparse<double, Cpu>::randMat(nrows, ncols, .2);
+	Faust::MatSparse<FPP, Cpu> *cpu_mat3_sp = Faust::MatSparse<FPP, Cpu>::randMat(nrows, ncols, .2);
 //	cpu_mat3_sp->Display();
 //	cout << cpu_mat3_sp->to_string(false, true) << endl;
 	assert(calc_err(gpu_mat1, *cpu_mat1) < 1e-6);
@@ -399,8 +402,8 @@ void test_get_device()
 	cout << "test MatDense<FPP,GPU2>::getDevice" << endl;
 	auto nrows = 5;
 	auto ncols = 8;
-	auto cpu_ds_mat = Faust::MatDense<double, Cpu>::randMat(nrows, ncols);
-	Faust::MatDense<double, GPU2> gpu_ds_mat(nrows, ncols, cpu_ds_mat->getData());
+	auto cpu_ds_mat = Faust::MatDense<FPP, Cpu>::randMat(nrows, ncols);
+	Faust::MatDense<FPP, GPU2> gpu_ds_mat(nrows, ncols, cpu_ds_mat->getData());
 	auto dev_id = gpu_ds_mat.getDevice();
 	cout << "device id: " << dev_id << endl;
 	delete cpu_ds_mat;
@@ -411,8 +414,8 @@ void test_move()
 	cout << "test MatDense<FPP,GPU2>::move" << endl;
 	auto nrows = 5;
 	auto ncols = 8;
-	auto cpu_ds_mat = Faust::MatDense<double, Cpu>::randMat(nrows, ncols);
-	Faust::MatDense<double, GPU2> gpu_ds_mat(nrows, ncols, cpu_ds_mat->getData());
+	auto cpu_ds_mat = Faust::MatDense<FPP, Cpu>::randMat(nrows, ncols);
+	Faust::MatDense<FPP, GPU2> gpu_ds_mat(nrows, ncols, cpu_ds_mat->getData());
 	auto ndevs = Faust::count_devices();
 	cout << "device count: " << ndevs << endl;
 	int32_t dest_dev = -1;
@@ -439,12 +442,12 @@ void test_mul_vec()
 	auto size = 2048;
 	auto nrows = 1024;
 	auto ncols = size;
-	auto vec_mat = MatDense<double, Cpu>::randMat(size, 1);
-	Faust::Vect<double, Cpu> v_cpu(size, vec_mat->getData());
-	Faust::Vect<double, GPU2> v_gpu(size, vec_mat->getData());
-	Faust::Vect<double, GPU2> v_gpu_out(nrows);
-	auto cpu_mat = Faust::MatDense<double,Cpu>::randMat(nrows,ncols);
-	MatDense<double,GPU2> gpu_mat(nrows, ncols, cpu_mat->getData());
+	auto vec_mat = MatDense<FPP, Cpu>::randMat(size, 1);
+	Faust::Vect<FPP, Cpu> v_cpu(size, vec_mat->getData());
+	Faust::Vect<FPP, GPU2> v_gpu(size, vec_mat->getData());
+	Faust::Vect<FPP, GPU2> v_gpu_out(nrows);
+	auto cpu_mat = Faust::MatDense<FPP,Cpu>::randMat(nrows,ncols);
+	MatDense<FPP,GPU2> gpu_mat(nrows, ncols, cpu_mat->getData());
 	gpu_mat.multiply(v_gpu, v_gpu_out);
 	auto v_gpu_out_cpu = v_gpu_out.tocpu();
 	v_gpu_out_cpu.Display();
@@ -459,9 +462,9 @@ void test_mul_vec()
 void test_gpu_matsparse2matdense()
 {
 	cout << "test MatDense<FPP,GPU2>::MatDense<FPP,GPU2>(MatSparse<FPP,GPU2>&)" << endl;
-	auto sM = Faust::MatSparse<double,Cpu>::randMat(22, 33, .2);
-	Faust::MatSparse<double,GPU2> sM_gpu(*sM);
-	MatDense<double,GPU2> dM_gpu(sM_gpu);
+	auto sM = Faust::MatSparse<FPP,Cpu>::randMat(22, 33, .2);
+	Faust::MatSparse<FPP,GPU2> sM_gpu(*sM);
+	MatDense<FPP,GPU2> dM_gpu(sM_gpu);
 	cout << sM_gpu.norm() << " " << dM_gpu.norm() << endl;
 	assert(abs(sM_gpu.norm()-dM_gpu.norm())< 1e-4);
 	cout << "OK" << endl;

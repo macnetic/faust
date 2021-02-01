@@ -1,13 +1,13 @@
 #ifndef __FAUST_MATDENSE_GPU2__
 #define __FAUST_MATDENSE_GPU2__
 #ifdef USE_GPU_MOD
+#include <complex>
 #include <cstdint>
 #include "faust_MatDense.h"
 #include "faust_MatGeneric_gpu.h"
 #include "faust_Vect_gpu.h"
 #include "faust_MatSparse_gpu.h"
 #include "faust_gpu_mod_utils.h"
-#include <cstdint>
 namespace Faust
 {
 	template <typename FPP>

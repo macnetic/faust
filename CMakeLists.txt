@@ -605,6 +605,7 @@ include(CMake/findExternalLibs.cmake)
 #########################################
 
 if(USE_GPU_MOD)
+	# GPU2
 	find_package(GPU_MOD) #REQUIRED)
 	if(NOT GPU_MOD_INCLUDE_DIR)
 		set(GPU_MOD_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/gpu_mod/src) # fallback to submodule directory in case find_package didn't work
@@ -620,9 +621,14 @@ if(USE_GPU_MOD)
 	configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_Vect_gpu.cpp.in ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_Vect_gpu_double.cpp)
 	#target_sources(${FAUST_TARGET} PUBLIC ${GPU_MOD_CPP_FILES})
 	#list(APPEND CPP_FILES )
-	set(FAUST_SCALAR_FOR_GM complex<double>)
+	set(FAUST_SCALAR_FOR_GM std::complex<double>)
 	set(GM_SCALAR cuDoubleComplex)
 	set(GM_REINTERPRET_CAST_SCALAR double)
+	#configure_file(${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_gen.hpp.in ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_complexdouble.hpp)
+	configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_MatDense_gpu.cpp.in ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_MatDense_gpu_complexdouble.cpp)
+	configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_MatSparse_gpu.cpp.in ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_MatSparse_gpu_complexdouble.cpp)
+	configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_Transform_gpu.cpp.in ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_Transform_gpu_complexdouble.cpp)
+	configure_file(${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_Vect_gpu.cpp.in ${FAUST_SRC_LINEAR_OPERATOR_GPU2_DIR}/faust_Vect_gpu_complexdouble.cpp)
 	configure_file(${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_gen.hpp.in ${FAUST_LINEAR_OPERATOR_CPU_SRC_DIR}/faust_gpu_mod_complexdouble.hpp)
 	# set install relative path of the lib (for each OS)
 	if(APPLE)
@@ -634,7 +640,6 @@ if(USE_GPU_MOD)
 	endif()
 	file(TO_NATIVE_PATH lib/${GPU_MOD_LIB} GPU_MOD_LIB_PATH) # used in setup.py
 	file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${GPU_MOD_LIB} GPU_MOD_LIB_INSTALL_PATH) # only for system packages (not for pip package)
-	# GPU2
 endif()
 
 

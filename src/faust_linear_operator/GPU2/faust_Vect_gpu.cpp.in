@@ -47,7 +47,7 @@ namespace Faust
 			if(size() == v.size())
 			{
 				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-				auto gpu_mat = dsm_funcs->togpu(this->getNbRow(), 1, const_cast<@FAUST_SCALAR_FOR_GM@*>(v.getData()));
+				auto gpu_mat = dsm_funcs->togpu(this->getNbRow(), 1, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(v.getData()));
 				dsm_funcs->free(this->gpu_mat);
 				this->gpu_mat = gpu_mat;
 			}
@@ -60,7 +60,7 @@ namespace Faust
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 			FSFG _max_coeff;
-			dsm_funcs->max(this->gpu_mat, &_max_coeff);
+			dsm_funcs->max(this->gpu_mat, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&_max_coeff));
 			return _max_coeff;
 		}
 
@@ -69,7 +69,7 @@ namespace Faust
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
 			FSFG _min_coeff;
-			dsm_funcs->min(this->gpu_mat, &_min_coeff);
+			dsm_funcs->min(this->gpu_mat, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&_min_coeff));
 			return _min_coeff;
 		}
 
@@ -78,7 +78,7 @@ namespace Faust
 		{
 			FSFG alpha;
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-			dsm_funcs->dot(this->gpu_mat, v.gpu_mat, &alpha);
+			dsm_funcs->dot(this->gpu_mat, v.gpu_mat, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&alpha));
 			return alpha;
 		}
 
@@ -87,14 +87,18 @@ namespace Faust
 		{
 			FSFG s;
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-			dsm_funcs->sum(this->gpu_mat, reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&s));
+			dsm_funcs->sum(this->gpu_mat, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&s));
 			return s;
 		}
 
 		template<>
 			FSFG Vect<FSFG,GPU2>::mean() const
 			{
-				return sum()/size();
+				//				return sum()/size();
+				FSFG m;
+				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+				dsm_funcs->mean(this->gpu_mat, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&m));
+				return m;
 			}
 
 		template<>
@@ -147,7 +151,7 @@ namespace Faust
 			void Vect<FSFG,GPU2>::setValues(const FSFG& val)
 			{
 				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-				dsm_funcs->setval(this->gpu_mat, reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(const_cast<FSFG*>(&val)));
+				dsm_funcs->setval(this->gpu_mat, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(const_cast<FSFG*>(&val)));
 			}
 
 		template<>
@@ -156,7 +160,7 @@ namespace Faust
 
 				FSFG e;
 				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-				dsm_funcs->mean_relerr(this->get_gpu_mat_ptr(), ref_vec.get_gpu_mat_ptr(), reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&e));
+				dsm_funcs->mean_relerr(this->get_gpu_mat_ptr(), ref_vec.get_gpu_mat_ptr(), (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&e));
 				return e;
 			}
 
@@ -165,7 +169,7 @@ namespace Faust
 			{
 				FSFG coeff;
 				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-				dsm_funcs->coeff(this->gpu_mat, i, 0, reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&coeff));
+				dsm_funcs->coeff(this->gpu_mat, i, 0, (@GM_SCALAR@*) reinterpret_cast<@GM_REINTERPRET_CAST_SCALAR@*>(&coeff));
 				return coeff;
 			}
 
@@ -174,6 +178,6 @@ namespace Faust
 			void Vect<FSFG,GPU2>::set_coeff(faust_unsigned_int i, const FSFG& val)
 			{
 				auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
-				dsm_funcs->set_coeff(this->gpu_mat, i, 0, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&val));
+				dsm_funcs->set_coeff(this->gpu_mat, i, 0, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&val));
 			}
 }

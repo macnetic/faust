@@ -46,7 +46,7 @@ namespace Faust
 		{
 			if(rowptr == nullptr || colinds == nullptr)
 				throw std::runtime_error("All GPU buffers or none must be defined to instantiate a MatSparse<FPP,GPU2>.");
-			gpu_mat = spm_funcs->togpu_stream(nbRow, nbCol, nnz, rowptr, colinds, values, stream);
+			gpu_mat = spm_funcs->togpu_stream(nbRow, nbCol, nnz, rowptr, colinds, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(values), stream);
 		}
 		else if(!no_zero)
 		{ // no values given, set the matrix as a zero matrix
@@ -134,7 +134,7 @@ namespace Faust
 	{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
 			if(gpu_mat != nullptr)
-				spm_funcs->mul_scalar(gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
+				spm_funcs->mul_scalar(gpu_mat, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
 	}
 
 	template<>
@@ -147,14 +147,14 @@ namespace Faust
 	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator+=(const @FAUST_SCALAR_FOR_GM@& scalar)
 	{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			spm_funcs->add_scalar(gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
+			spm_funcs->add_scalar(gpu_mat, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
 	}
 
 	template<>
 	void MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::operator-=(const @FAUST_SCALAR_FOR_GM@& scalar)
 	{
 			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
-			spm_funcs->sub_scalar(gpu_mat, reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
+			spm_funcs->sub_scalar(gpu_mat, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(&scalar));
 	}
 
 	template<>
@@ -178,7 +178,7 @@ namespace Faust
 				*ncols = getNbCol();
 			if(nnz != nullptr)
 				*nnz = getNonZeros();
-			spm_funcs->tocpu(gpu_mat, row_ptr, col_ind, value_ptr);
+			spm_funcs->tocpu(gpu_mat, row_ptr, col_ind, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(value_ptr));
 		}
 
 	template<>
