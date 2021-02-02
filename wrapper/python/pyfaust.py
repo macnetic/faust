@@ -2435,6 +2435,7 @@ def wht(n, normed=True, dev="cpu"):
            and a factorization in log2(n) factors.
            normed: default to True to normalize the Hadamard Faust as if you called
            Faust.normalize() and False otherwise.
+           dev: device to create the Faust on.
        Returns:
            The Faust implementing the Hadamard transform of dimension n.
 
@@ -2467,7 +2468,7 @@ def wht(n, normed=True, dev="cpu"):
         H = Faust(core_obj=_FaustCorePy.FaustCoreGPU.hadamardFaust(log2n, normed))
     return H
 
-def dft(n, normed=True):
+def dft(n, normed=True, dev='cpu'):
     """
         Constructs a Faust F such that F.toarray() is the Discrete Fourier Transform square matrix of order n.
 
@@ -2482,6 +2483,7 @@ def dft(n, normed=True):
             factorization in log2(n)+1 factors.
             normed: default to True to normalize the DFT Faust as if you called
             Faust.normalize() and False otherwise.
+            dev: device to create the Faust on.
 
         Returns:
             The Faust implementing the DFT of dimension n.
@@ -2508,7 +2510,10 @@ def dft(n, normed=True):
     if(n > 2**log2n): raise ValueError("n must be a power of 2.")
     if(not isinstance(normed, bool)):
         raise TypeError("normed must be True of False.")
-    F = Faust(core_obj=_FaustCorePy.FaustCore.fourierFaust(log2n, normed))
+    if dev == "cpu":
+        F = Faust(core_obj=_FaustCorePy.FaustCore.fourierFaust(log2n, normed))
+    elif dev.startswith("gpu"):
+        F = Faust(core_obj=_FaustCorePy.FaustCoreGPU.fourierFaust(log2n, normed))
     return F
 
 def eye(m,n=None,t='real', dev="cpu"):

@@ -548,8 +548,10 @@ namespace Faust
 	template<typename FPP>
 		TransformHelper<FPP,GPU2>* TransformHelper<FPP,GPU2>::fourierFaust(unsigned int n, const bool norma/*=true*/)
 		{
-			throw std::runtime_error("fourierFaust is yet to implement in Faust C++ core for GPU.");
-			return nullptr;
+			auto cpu_faust = TransformHelper<FPP,Cpu>::fourierFaust(n, norma);
+			TransformHelper<FPP,GPU2>* gpu_faust = new TransformHelper<FPP,GPU2>(*cpu_faust, -1, nullptr /*TODO: dev_id and stream ?*/);
+			delete cpu_faust;
+			return gpu_faust;
 		}
 
 	template<typename FPP>

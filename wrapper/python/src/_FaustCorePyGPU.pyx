@@ -6,7 +6,7 @@ cdef class FaustCoreGPU:
     #### ATTRIBUTE ########
     # classe Cython
     cdef FaustCoreCy.FaustCoreCppGPU[double]* core_faust_dbl
-    #cdef FaustCoreCy.FaustCoreCppGPU[complex]* core_faust_cplx
+    cdef FaustCoreCy.FaustCoreCppGPU[complex]* core_faust_cplx
     cdef bool _isReal
     #### CONSTRUCTOR ####
     #def __cinit__(self,np.ndarray[double, mode="fortran", ndim=2] mat):
@@ -51,9 +51,7 @@ cdef class FaustCoreGPU:
             if(self._isReal):
                 self.core_faust_dbl = new FaustCoreCy.FaustCoreCppGPU[double]()
             else:
-                raise ValueError("complex wrapper is not yet supported.")
-#                self.core_faust_cplx = new FaustCoreCy.FaustCoreCpp[complex,
-#                                                                    gpu]()
+                self.core_faust_cplx = new FaustCoreCy.FaustCoreCppGPU[complex]()
             for factor in list_factors:
                 nbrow=factor.shape[0];
                 nbcol=factor.shape[1];
@@ -70,27 +68,26 @@ cdef class FaustCoreGPU:
                                                     &indices[0], factor.nnz,
                                                     nbrow, nbcol, optimizedCopy)
                 else:
-                    raise ValueError("complex wrapper is not yet supported.")
-#                    if(isinstance(factor, sparse.csc.csc_matrix)):
-#                        #TODO: understand how is it possible to have a sparse
-#                        # mat here and fix it (because it should have been
-#                        # converted above already)
-#                        factor = list_factors[i] = factor.tocsr()
-#                    #print('FaustCorePy.pyx type factor=',type(factor))
-#                    #print("FaustCorePy.pyx factor=",factor)
-#                    if(isinstance(factor, np.ndarray)):
-#                        data_cplx=factor.astype(np.complex128,'F')
-#                        self.core_faust_cplx.push_back(&data_cplx[0,0], nbrow,
-#                                                       nbcol, optimizedCopy)
-#                    else:
-#                        #print("FaustCore, factor dims:", nbrow, nbcol)
-#                        data1d_cplx = factor.data.astype(np.complex128, 'F')
-#                        indices=factor.indices.astype(np.int32, 'F')
-#                        indptr=factor.indptr.astype(np.int32, 'F')
-#                        self.core_faust_cplx.push_back(&data1d_cplx[0], &indptr[0],
-#                                                    &indices[0], factor.nnz,
-#                                                       nbrow, nbcol,
-#                                                       optimizedCopy)
+                    if(isinstance(factor, sparse.csc.csc_matrix)):
+                        #TODO: understand how is it possible to have a sparse
+                        # mat here and fix it (because it should have been
+                        # converted above already)
+                        factor = list_factors[i] = factor.tocsr()
+                    #print('FaustCorePy.pyx type factor=',type(factor))
+                    #print("FaustCorePy.pyx factor=",factor)
+                    if(isinstance(factor, np.ndarray)):
+                        data_cplx=factor.astype(np.complex128,'F')
+                        self.core_faust_cplx.push_back(&data_cplx[0,0], nbrow,
+                                                       nbcol, optimizedCopy)
+                    else:
+                        #print("FaustCore, factor dims:", nbrow, nbcol)
+                        data1d_cplx = factor.data.astype(np.complex128, 'F')
+                        indices=factor.indices.astype(np.int32, 'F')
+                        indptr=factor.indptr.astype(np.int32, 'F')
+                        self.core_faust_cplx.push_back(&data1d_cplx[0], &indptr[0],
+                                                    &indices[0], factor.nnz,
+                                                       nbrow, nbcol,
+                                                       optimizedCopy)
         elif(core): # trick to initialize a new FaustCoreCpp from C++ (see
         # transpose, conj and adjoint)
             pass
@@ -101,8 +98,8 @@ cdef class FaustCoreGPU:
         cdef const char* c_str
         if(self._isReal):
             c_str = self.core_faust_dbl.to_string()
-#        else:
-#            c_str = self.core_faust_cplx.to_string()
+        else:
+            c_str = self.core_faust_cplx.to_string()
         cdef length = strlen(c_str)
         #printf("%s", c_str[:length])
         #py_str = str(c_str[:length], 'UTF-8')
@@ -113,8 +110,8 @@ cdef class FaustCoreGPU:
     def display(self):
         if(self._isReal):
             self.core_faust_dbl.Display()
-#        else:
-#            self.core_faust_cplx.Display()
+        else:
+            self.core_faust_cplx.Display()
 
     def multiply(self,M):
         if(isinstance(M, FaustCoreGPU)):
@@ -125,10 +122,10 @@ cdef class FaustCoreGPU:
            M=M.astype(float,'F')
            if not M.dtype=='float':
                raise ValueError('input M must be a double array')
-#        else:
-#           M=M.astype(complex,'F')
-#           if(M.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
-#               raise ValueError('input M must be complex array')
+        else:
+           M=M.astype(complex,'F')
+           if(M.dtype not in ['complex', 'complex128', 'complex64'] ): #could fail if complex128 etc.
+               raise ValueError('input M must be complex array')
         #TODO: raise exception if not real nor complex
         if not M.flags['F_CONTIGUOUS']:
             raise ValueError('input M must be Fortran contiguous (column major '
@@ -177,28 +174,28 @@ cdef class FaustCoreGPU:
 
         cdef y
         cdef double[:,:] yview
-#        cdef complex[:,:] yview_cplx
+        cdef complex[:,:] yview_cplx
         if(self._isReal):
             y = np.zeros([nbrow_y,nbcol_y], dtype='d',order='F')
             yview = y
-#        else:
-#            y = np.zeros([nbrow_y, nbcol_y], dtype='complex', order='F')
-#            yview_cplx = y
-#
+        else:
+            y = np.zeros([nbrow_y, nbcol_y], dtype='complex', order='F')
+            yview_cplx = y
+
         if ndim_M == 1:
             if(self._isReal):
                 self.core_faust_dbl.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_1D[0],nbrow_x,nbcol_x)
-#            else:
-#                self.core_faust_cplx.multiply(&yview_cplx[0,0], nbrow_y,
-#                                              nbcol_y, &xview_1D_cplx[0],
-#                                              nbrow_x,nbcol_x)
+            else:
+                self.core_faust_cplx.multiply(&yview_cplx[0,0], nbrow_y,
+                                              nbcol_y, &xview_1D_cplx[0],
+                                              nbrow_x,nbcol_x)
             y = np.squeeze(y) # we want a single dim. (but we created two
             # above)
         else:
             if(self._isReal):
                 self.core_faust_dbl.multiply(&yview[0,0],nbrow_y,nbcol_y,&xview_2D[0,0],nbrow_x,nbcol_x)
-#            else:
-#                self.core_faust_cplx.multiply(&yview_cplx[0,0],nbrow_y,nbcol_y,&xview_2D_cplx[0,0],nbrow_x,nbcol_x)
+            else:
+                self.core_faust_cplx.multiply(&yview_cplx[0,0],nbrow_y,nbcol_y,&xview_2D_cplx[0,0],nbrow_x,nbcol_x)
 
         return y
 
@@ -208,9 +205,9 @@ cdef class FaustCoreGPU:
         if(self._isReal):
             nbrow = self.core_faust_dbl.getNbRow();
             nbcol = self.core_faust_dbl.getNbCol();
-#        else:
-#            nbrow = self.core_faust_cplx.getNbRow();
-#            nbcol = self.core_faust_cplx.getNbCol();
+        else:
+            nbrow = self.core_faust_cplx.getNbRow();
+            nbcol = self.core_faust_cplx.getNbCol();
         return (nbrow,nbcol)
 
     @staticmethod
@@ -219,22 +216,22 @@ cdef class FaustCoreGPU:
         core = FaustCoreGPU(core=True)
         if(field == 3):
             core.core_faust_dbl = \
-            FaustCoreCy.FaustCoreCppGPU[double].randFaustGPU(faust_nrows,
-                                                             faust_ncols,
-                                                             t, min_num_factors,
-                                                             max_num_factors, min_dim_size,
-                   max_dim_size, density, per_row)
+                    FaustCoreCy.FaustCoreCppGPU[double].randFaustGPU(faust_nrows,
+                                                                     faust_ncols,
+                                                                     t, min_num_factors,
+                                                                     max_num_factors, min_dim_size,
+                                                                     max_dim_size, density, per_row)
             core._isReal = True
             if(core.core_faust_dbl == NULL): raise MemoryError()
         elif(field == 4):
-            raise ValueError("Complex rand Faust is not yet implemented on "
-                             " GPU.")
-#            core.core_faust_cplx =
-#            FaustCoreCy.FaustCoreCpp[complex].randFaust(faust_nrows,
-#            faust_ncols, t, min_num_factors, max_num_factors, min_dim_size,
-#                   max_dim_size, density, per_row)
-#            if(core.core_faust_cplx == NULL): raise MemoryError()
-#            core._isReal = False
+            core.core_faust_cplx = \
+                    FaustCoreCy.FaustCoreCppGPU[complex].randFaustGPU(faust_nrows,
+                                                                      faust_ncols,
+                                                                      t, min_num_factors,
+                                                                      max_num_factors, min_dim_size,
+                                                                      max_dim_size, density, per_row)
+            if(core.core_faust_cplx == NULL): raise MemoryError()
+            core._isReal = False
         else:
             raise ValueError("FaustCorePy.randFaust(): field must be 3 for real or"
                              " 4 for complex")
@@ -261,13 +258,12 @@ cdef class FaustCoreGPU:
             raise ValueError("Faust doesn't handle a FFT of order larger than "
                              "2**31")
         core = FaustCoreGPU(core=True)
-#        core.core_faust_cplx = \
-#                FaustCoreCy.FaustCoreCppGPU[complex].fourierFaust(n, norma)
+        core.core_faust_cplx = \
+                FaustCoreCy.FaustCoreCppGPU[complex].fourierFaustGPU(n, norma)
 
-#        if(core.core_faust_cplx == NULL):
-#            raise MemoryError()
+        if(core.core_faust_cplx == NULL):
+            raise MemoryError()
 
-        FaustCoreCy.FaustCoreCppGPU[double].fourierFaustGPU(n, norma)
         # fourier is always a complex Faust
         core._isReal = False
         return core
@@ -279,17 +275,18 @@ cdef class FaustCoreGPU:
             core.core_faust_dbl = \
             FaustCoreCy.FaustCoreCppGPU[double].eyeFaustGPU(n, m)
             core._isReal = True
-#        elif(t == 'complex'):
-#            core.core_faust_cplx = FaustCoreCy.FaustCoreCppGPU[complex].eyeFaust(n,
-#                                                                             m)
-#            core._isReal = False
+        elif(t == 'complex'):
+            core.core_faust_cplx = \
+                    FaustCoreCy.FaustCoreCppGPU[complex].eyeFaustGPU(n,
+                                                                  m)
+            core._isReal = False
         return core
 
     def nbytes(self):
         if(self._isReal):
             nbytes = self.core_faust_dbl.getNBytes();
-#        else:
-#            nbytes = self.core_faust_cplx.getNBytes();
+        else:
+            nbytes = self.core_faust_cplx.getNBytes();
         return nbytes
 
     def get_product(self):
@@ -302,13 +299,13 @@ cdef class FaustCoreGPU:
             y_data = y_arr
             self.core_faust_dbl.get_product(&y_data[0,0], y_arr.shape[0],
                                             y_arr.shape[1])
-#        else:
-#            y_arr = np.empty((self.core_faust_cplx.getNbRow(), self.core_faust_cplx.getNbCol()),
-#                             dtype=np.complex,
-#                             order='F')
-#            y_data_cplx = y_arr
-#            self.core_faust_cplx.get_product(&y_data_cplx[0,0], y_arr.shape[0],
-#                                            y_arr.shape[1])
+        else:
+            y_arr = np.empty((self.core_faust_cplx.getNbRow(), self.core_faust_cplx.getNbCol()),
+                             dtype=np.complex,
+                             order='F')
+            y_data_cplx = y_arr
+            self.core_faust_cplx.get_product(&y_data_cplx[0,0], y_arr.shape[0],
+                                            y_arr.shape[1])
         return y_arr
 
     cdef multiply_faust(self, F):
@@ -319,28 +316,28 @@ cdef class FaustCoreGPU:
                 if(F.isReal()):
                     core.core_faust_dbl = \
                             self.core_faust_dbl.mul_faust_gpu((<FaustCoreGPU?>F).core_faust_dbl)
-#                else:
-#                    core = \
-#                   <FaustCoreGPU?> (<FaustCoreGPU?> self._ascomplex()).multiply_faust(F)
-#            else:
-#                if(F.isReal()):
-#                    core.core_faust_cplx = \
-#                             self.core_faust_cplx.mul_faust((<FaustCore?>((<FaustCore?>((<FaustCore?>F)._ascomplex())))).core_faust_cplx)
-#                else:
-#                    core.core_faust_cplx = \
-#                            self.core_faust_cplx.mul_faust((<FaustCore?>F).core_faust_cplx)
+                else:
+                    core = \
+                   <FaustCoreGPU?> (<FaustCoreGPU?> self._ascomplex()).multiply_faust(F)
+            else:
+                if(F.isReal()):
+                    core.core_faust_cplx = \
+                             self.core_faust_cplx.mul_faust_gpu((<FaustCoreGPU?>((<FaustCoreGPU?>((<FaustCoreGPU?>F)._ascomplex())))).core_faust_cplx)
+                else:
+                    core.core_faust_cplx = \
+                            self.core_faust_cplx.mul_faust_gpu((<FaustCoreGPU?>F).core_faust_cplx)
             return core
         raise ValueError("F must be a Faust object")
 
-#    cdef _ascomplex(self, scalar=1.0):
-#        cplx_facs = [self.get_fact_opt(i).astype(np.complex) for i in \
-#                              range(0,self.get_nb_factors())]
-#        cplx_facs[0] *= scalar # instead of passing the scal to the
-#        # construc. It avoids disp of
-#        # deprecation warning
-#        core = FaustCoreGPU(cplx_facs)#, alpha=scalar)
-#        core._isReal = False
-#        return core
+    cdef _ascomplex(self, scalar=1.0):
+        cplx_facs = [self.get_fact_opt(i).astype(np.complex) for i in \
+                              range(0,self.get_nb_factors())]
+        cplx_facs[0] *= scalar # instead of passing the scal to the
+        # construc. It avoids disp of
+        # deprecation warning
+        core = FaustCoreGPU(cplx_facs)#, alpha=scalar)
+        core._isReal = False
+        return core
 
     def multiply_scal(self, scalar):
         core = FaustCoreGPU(core=True)
@@ -353,18 +350,18 @@ cdef class FaustCoreGPU:
             if(isinstance(scalar, float)):
                 core.core_faust_dbl = \
                         self.core_faust_dbl.mul_scal_gpu(scalar)
-#            elif(isinstance(scalar, np.complex)):
-#                core = <FaustCore?>self._ascomplex(scalar)
-#                core._isReal = False
+            elif(isinstance(scalar, np.complex)):
+                core = <FaustCoreGPU?>self._ascomplex(scalar)
+                core._isReal = False
             else:
                 raise scalar_type_err
-#        else:
-#            if(isinstance(scalar, np.complex) or isinstance(scalar,
-#                                                            float)):
-#                core.core_faust_cplx = \
-#                        self.core_faust_cplx.mul_scal(scalar)
-#            else:
-#                raise scalar_type_err
+        else:
+            if(isinstance(scalar, np.complex) or isinstance(scalar,
+                                                            float)):
+                core.core_faust_cplx = \
+                        self.core_faust_cplx.mul_scal_gpu(scalar)
+            else:
+                raise scalar_type_err
         return core
 
     def isReal(self):
@@ -374,8 +371,8 @@ cdef class FaustCoreGPU:
         cdef unsigned long long nnz = 0
         if(self._isReal):
             nnz = self.core_faust_dbl.nnz()
-#        else:
-#            nnz = self.core_faust_cplx.nnz()
+        else:
+            nnz = self.core_faust_cplx.nnz()
         return nnz
 
     def norm(self, ord, **kwargs):
@@ -396,21 +393,21 @@ cdef class FaustCoreGPU:
                 norm = self.core_faust_dbl.normInf()
             else:
                 norm = self.core_faust_dbl.normFro()
-#        else:
-#            if(isinstance(ord,int)):
-#                norm = self.core_faust_cplx.norm(ord, threshold, max_num_its)
-#            elif(ord == np.inf):
-#                norm = self.core_faust_cplx.normInf()
-#            else:
-#                norm = self.core_faust_cplx.normFro()
+        else:
+            if(isinstance(ord,int)):
+                norm = self.core_faust_cplx.norm(ord, threshold, max_num_its)
+            elif(ord == np.inf):
+                norm = self.core_faust_cplx.normInf()
+            else:
+                norm = self.core_faust_cplx.normFro()
         return norm
 
     def normalize(self, ord):
         core = FaustCoreGPU(core=True)
         if(self._isReal):
             core.core_faust_dbl = self.core_faust_dbl.normalize_gpu(ord)
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.normalize(ord)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.normalize_gpu(ord)
         core._isReal = self._isReal
         return core
 
@@ -418,8 +415,8 @@ cdef class FaustCoreGPU:
         cdef int nb_factors
         if(self._isReal):
             nb_factors = int(self.core_faust_dbl.get_nb_factors())
-#        else:
-#            nb_factors = int(self.core_faust_cplx.get_nb_factors())
+        else:
+            nb_factors = int(self.core_faust_cplx.get_nb_factors())
         return nb_factors
 
     def get_fact_opt(self, i):
@@ -435,10 +432,10 @@ cdef class FaustCoreGPU:
             dtype = 'd'
             is_fact_sparse = self.core_faust_dbl.is_fact_sparse(i)
             is_transposed = self.core_faust_dbl.isTransposed()
-#        else:
-#            dtype = 'complex'
-#            is_fact_sparse = self.core_faust_cplx.is_fact_sparse(i)
-#            is_transposed = self.core_faust_cplx.isTransposed()
+        else:
+            dtype = 'complex'
+            is_fact_sparse = self.core_faust_cplx.is_fact_sparse(i)
+            is_transposed = self.core_faust_cplx.isTransposed()
         if(is_fact_sparse):
             if(self._isReal):
                 # is_transposed = False # uncomment to disable the trick which
@@ -465,31 +462,31 @@ cdef class FaustCoreGPU:
                                                         &col_ids_view[0],
                                                         &fact_dbl_view[0,0],
                                                        is_transposed)
-#            else:
-#                # is_transposed = False # uncomment to disable the trick which
-#                # uses csc representation instead of csr transpose
-#                # to optimize copy
-#                nnz = self.core_faust_cplx.get_fact_nnz(i)
-#                col_ids = np.ndarray([nnz], dtype=np.int32)
-#                elts = np.ndarray([1,nnz], dtype=dtype)
-#                col_ids_view = col_ids
-#                shape = [self.core_faust_cplx.get_fact_nb_rows(i),
-#                 self.core_faust_cplx.get_fact_nb_cols(i)]
-#                if(is_transposed):
-#                    rowptr_sz = shape[1]+1
-#                else:
-#                    rowptr_sz = shape[0]+1
-#
-#                rowptr = np.ndarray([rowptr_sz], dtype=np.int32)
-#                rowptr_view = rowptr
-#                fact_cplx_view = elts
-#                self.core_faust_cplx.get_fact_sparse(i, &rowptr_view[0],
-#                                                     &col_ids_view[0],
-#                                                     &fact_cplx_view[0,0],
-#                                                     is_transposed)
-#                #print("(rowptr)=", (rowptr))
-##                print("(col_ids)=", (col_ids))
-##                print("(elts[0,:]=", (elts))
+            else:
+                # is_transposed = False # uncomment to disable the trick which
+                # uses csc representation instead of csr transpose
+                # to optimize copy
+                nnz = self.core_faust_cplx.get_fact_nnz(i)
+                col_ids = np.ndarray([nnz], dtype=np.int32)
+                elts = np.ndarray([1,nnz], dtype=dtype)
+                col_ids_view = col_ids
+                shape = [self.core_faust_cplx.get_fact_nb_rows(i),
+                 self.core_faust_cplx.get_fact_nb_cols(i)]
+                if(is_transposed):
+                    rowptr_sz = shape[1]+1
+                else:
+                    rowptr_sz = shape[0]+1
+
+                rowptr = np.ndarray([rowptr_sz], dtype=np.int32)
+                rowptr_view = rowptr
+                fact_cplx_view = elts
+                self.core_faust_cplx.get_fact_sparse(i, &rowptr_view[0],
+                                                     &col_ids_view[0],
+                                                     &fact_cplx_view[0,0],
+                                                     is_transposed)
+                #print("(rowptr)=", (rowptr))
+#                print("(col_ids)=", (col_ids))
+#                print("(elts[0,:]=", (elts))
             if(is_transposed):
                 fact = csc_matrix((elts[0,:], col_ids, rowptr), shape=shape)
             else:
@@ -511,15 +508,15 @@ cdef class FaustCoreGPU:
                                                <unsigned int*>NULL,
                                                <unsigned int*>NULL,
                                                is_transposed)
-#            else:
-#                fact = np.ndarray([self.core_faust_cplx.get_fact_nb_rows(i),
-#                             self.core_faust_cplx.get_fact_nb_cols(i)], dtype=dtype,
-#                            order=order)
-#                fact_cplx_view = fact
-#                self.core_faust_cplx.get_fact_dense(i, &fact_cplx_view[0, 0],
-#                                                   <unsigned int*>NULL,
-#                                                   <unsigned int*>NULL,
-#                                                   is_transposed)
+            else:
+                fact = np.ndarray([self.core_faust_cplx.get_fact_nb_rows(i),
+                             self.core_faust_cplx.get_fact_nb_cols(i)], dtype=dtype,
+                            order=order)
+                fact_cplx_view = fact
+                self.core_faust_cplx.get_fact_dense(i, &fact_cplx_view[0, 0],
+                                                   <unsigned int*>NULL,
+                                                   <unsigned int*>NULL,
+                                                   is_transposed)
 
         return fact
 
@@ -527,8 +524,8 @@ cdef class FaustCoreGPU:
         core = FaustCoreGPU(core=True)
         if(self._isReal):
             core.core_faust_dbl = self.core_faust_dbl.left_gpu(id)
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.left(id)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.left_gpu(id)
         core._isReal = self._isReal
         return core
 
@@ -536,8 +533,8 @@ cdef class FaustCoreGPU:
         core = FaustCoreGPU(core=True)
         if(self._isReal):
             core.core_faust_dbl = self.core_faust_dbl.right_gpu(id)
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.right(id)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.right_gpu(id)
         core._isReal = self._isReal
         return core
 
@@ -545,8 +542,8 @@ cdef class FaustCoreGPU:
         core = FaustCoreGPU(core=True)
         if(self._isReal):
             core.core_faust_dbl = self.core_faust_dbl.transpose_gpu()
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.transpose()
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.transpose_gpu()
         core._isReal = self._isReal
         return core
 
@@ -554,8 +551,8 @@ cdef class FaustCoreGPU:
         core = FaustCoreGPU(core=True)
         if(self._isReal):
             core.core_faust_dbl = self.core_faust_dbl.conjugate_gpu()
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.conjugate()
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.conjugate_gpu()
         core._isReal = self._isReal
         return core
 
@@ -565,10 +562,10 @@ cdef class FaustCoreGPU:
             core.core_faust_dbl = self.core_faust_dbl.zpruneout_gpu(nnz_tres,
                                                                 npasses,
                                                                 only_forward)
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.zpruneout(nnz_tres,
-#                                                                  npasses,
-#                                                                  only_forward)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.zpruneout_gpu(nnz_tres,
+                                                                  npasses,
+                                                                  only_forward)
         core._isReal = self._isReal
         return core
 
@@ -576,8 +573,8 @@ cdef class FaustCoreGPU:
         core = FaustCoreGPU(core=True)
         if(self._isReal):
             core.core_faust_dbl = self.core_faust_dbl.adjoint_gpu()
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.adjoint()
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.adjoint_gpu()
         core._isReal = self._isReal
         return core
 
@@ -587,23 +584,23 @@ cdef class FaustCoreGPU:
         if(dev.startswith('gpu')):
             if(self._isReal):
                 core_gpu.core_faust_dbl = self.core_faust_dbl.clone_gpu()
-    #        else:
-    #            core_gpu.core_faust_cplx = self.core_faust_cplx.clone_gpu()
+            else:
+                core_gpu.core_faust_cplx = self.core_faust_cplx.clone_gpu()
             core_gpu._isReal = self._isReal
             return core_gpu
         elif(dev == 'cpu'):
             if(self._isReal):
                 core_cpu.core_faust_dbl = self.core_faust_dbl.clone_cpu()
                 core_cpu._isReal = self._isReal
-    #        else:
-    #            core_cpu.core_faust_cplx = self.core_faust_cplx.clone_cpu()
+            else:
+                core_cpu.core_faust_cplx = self.core_faust_cplx.clone_cpu()
             return core_cpu
         else:
             raise ValueError('dev='+str(dev)+' is not a valid device')
 
     def vertcat(self,F):
-#        if(F.isReal() and not self.isReal()):
-#            return self._vertcat((<FaustCore?>F)._ascomplex())
+        if(F.isReal() and not self.isReal()):
+            return self._vertcat((<FaustCoreGPU?>F)._ascomplex())
         return self._vertcat(F)
 
     cdef _horzcat(self, F):
@@ -611,60 +608,62 @@ cdef class FaustCoreGPU:
          core = FaustCoreGPU(core=True)
          #TODO/ F must be a FaustCore
          if(self._isReal):
-#             if(not F.isReal()):
-#                 self = self._ascomplex()
-#                 core.core_faust_cplx = self.core_faust_cplx.horzcat((<FaustCore?>F).core_faust_cplx)
-#             else:
-            core.core_faust_dbl = \
-            self.core_faust_dbl.horzcat_gpu((<FaustCoreGPU?>F).core_faust_dbl)
-#         else:
-#             core.core_faust_cplx = \
-#                     self.core_faust_cplx.horzcat((<FaustCore?>F).core_faust_cplx)
+             if(not F.isReal()):
+                 self = self._ascomplex()
+                 core.core_faust_cplx = \
+                 self.core_faust_cplx.horzcat_gpu((<FaustCoreGPU?>F).core_faust_cplx)
+             else:
+                 core.core_faust_dbl = \
+                         self.core_faust_dbl.horzcat_gpu((<FaustCoreGPU?>F).core_faust_dbl)
+         else:
+             core.core_faust_cplx = \
+                     self.core_faust_cplx.horzcat_gpu((<FaustCoreGPU?>F).core_faust_cplx)
          core._isReal = core.core_faust_dbl != NULL
          return core
 
     def horzcat(self,F):
-#        if(F.isReal() and not self.isReal()):
-#            return self._horzcat((<FaustCore?>F)._ascomplex())
+        if(F.isReal() and not self.isReal()):
+            return self._horzcat((<FaustCoreGPU?>F)._ascomplex())
         return self._horzcat(F)
 
     cdef _vertcat(self, F):
          core = FaustCoreGPU(core=True)
          #TODO/ F must be a FaustCore
          if(self._isReal):
-#             if(not F.isReal()):
-#                 self = self._ascomplex()
-#                 core.core_faust_cplx = self.core_faust_cplx.vertcat((<FaustCore?>F).core_faust_cplx)
-#             else:
-            core.core_faust_dbl = \
-            self.core_faust_dbl.vertcat_gpu((<FaustCoreGPU?>F).core_faust_dbl)
-#         else:
-#             core.core_faust_cplx = \
-#                     self.core_faust_cplx.vertcat((<FaustCore?>F).core_faust_cplx)
+             if(not F.isReal()):
+                 self = self._ascomplex()
+                 core.core_faust_cplx = \
+                 self.core_faust_cplx.vertcat_gpu((<FaustCoreGPU?>F).core_faust_cplx)
+             else:
+                 core.core_faust_dbl = \
+                         self.core_faust_dbl.vertcat_gpu((<FaustCoreGPU?>F).core_faust_dbl)
+         else:
+             core.core_faust_cplx = \
+                     self.core_faust_cplx.vertcat_gpu((<FaustCoreGPU?>F).core_faust_cplx)
          core._isReal = core.core_faust_dbl != NULL
          return core
 
     cdef _vertcatn(self, Fs):
         cdef FaustCoreCy.FaustCoreCppGPU[double]** _Fs
-#        cdef FaustCoreCy.FaustCoreCppGPU[complex]** _Fs_cplx
+        cdef FaustCoreCy.FaustCoreCppGPU[complex]** _Fs_cplx
 
         if self.isReal():
             _Fs = <FaustCoreCy.FaustCoreCppGPU[double]**> PyMem_Malloc(sizeof(void*) *
                                                                len(Fs))
-#        else:
-#            _Fs_cplx = <FaustCoreCy.FaustCoreCpp[complex]**> PyMem_Malloc(sizeof(void*) *
-#                                                               len(Fs))
+        else:
+            _Fs_cplx = <FaustCoreCy.FaustCoreCppGPU[complex]**> PyMem_Malloc(sizeof(void*) *
+                                                               len(Fs))
         for i, F in enumerate(Fs):
             if F.isReal():
                 _Fs[i] = (<FaustCoreGPU?>F).core_faust_dbl
-#            else:
-#                _Fs_cplx[i] = (<FaustCore?>F).core_faust_cplx
+            else:
+                _Fs_cplx[i] = (<FaustCoreGPU?>F).core_faust_cplx
         core = FaustCoreGPU(core=True)
         if(self._isReal):
             core.core_faust_dbl = self.core_faust_dbl.vertcatn_gpu(_Fs, len(Fs))
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.vertcatn_gpu(_Fs_cplx,
-#                                                                 len(Fs))
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.vertcatn_gpu(_Fs_cplx,
+                                                                 len(Fs))
         core._isReal = core.core_faust_dbl != NULL
         return core
 
@@ -676,35 +675,35 @@ cdef class FaustCoreGPU:
             any_complex = not args[i].isReal()
             i+=1
         for F in args:
-#            if F.isReal() and any_complex:
-#               F = (<FaustCore?>F)._ascomplex()
+            if F.isReal() and any_complex:
+               F = (<FaustCoreGPU?>F)._ascomplex()
             Fs += [F]
-#        if any_complex and self.isReal():
-#            self = (<FaustCore?>self)._ascomplex()
+        if any_complex and self.isReal():
+            self = (<FaustCoreGPU?>self)._ascomplex()
         return self._vertcatn(Fs)
 
     cdef _horzcatn(self, Fs):
         cdef FaustCoreCy.FaustCoreCppGPU[double]** _Fs
-#        cdef FaustCoreCy.FaustCoreCpp[complex]** _Fs_cplx
+        cdef FaustCoreCy.FaustCoreCppGPU[complex]** _Fs_cplx
 
         if self.isReal():
             _Fs = <FaustCoreCy.FaustCoreCppGPU[double]**> PyMem_Malloc(sizeof(void*) *
                                                                len(Fs))
-#        else:
-#            _Fs_cplx = <FaustCoreCy.FaustCoreCpp[complex]**> PyMem_Malloc(sizeof(void*) *
-#                                                               len(Fs))
+        else:
+            _Fs_cplx = <FaustCoreCy.FaustCoreCppGPU[complex]**> PyMem_Malloc(sizeof(void*) *
+                                                               len(Fs))
         for i, F in enumerate(Fs):
             if F.isReal():
                 _Fs[i] = (<FaustCoreGPU?>F).core_faust_dbl
-#            else:
-#                _Fs_cplx[i] = (<FaustCore?>F).core_faust_cplx
+            else:
+                _Fs_cplx[i] = (<FaustCoreGPU?>F).core_faust_cplx
         core = FaustCoreGPU(core=True)
         # print("self.isReal():", self.isReal())
         if self.isReal():
             core.core_faust_dbl = self.core_faust_dbl.horzcatn_gpu(_Fs, len(Fs))
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.horzcatn_gpu(_Fs_cplx,
-#                                                                 len(Fs))
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.horzcatn_gpu(_Fs_cplx,
+                                                                 len(Fs))
         core._isReal = core.core_faust_dbl != NULL
         return core
 
@@ -717,20 +716,20 @@ cdef class FaustCoreGPU:
             any_complex = not args[i].isReal()
             i+=1
         for F in args:
-#            if F.isReal() and any_complex:
-#               F = (<FaustCore?>F)._ascomplex()
+            if F.isReal() and any_complex:
+               F = (<FaustCoreGPU?>F)._ascomplex()
             Fs += [F]
         # print("any_complex:", any_complex)
-#        if any_complex and self.isReal():
-#            self = (<FaustCore?>self)._ascomplex()
+        if any_complex and self.isReal():
+            self = (<FaustCoreGPU?>self)._ascomplex()
         return self._horzcatn(Fs)
 
     def device(self):
         cdef char c_str[256]
         if(self._isReal):
             self.core_faust_dbl.device_gpu(c_str)
-#        else:
-#            self.core_faust_cplx.device_gpu(c_str)
+        else:
+            self.core_faust_cplx.device_gpu(c_str)
         cdef length = strlen(c_str)
         #printf("%s", c_str[:length])
         #py_str = str(c_str[:length], 'UTF-8')
@@ -749,11 +748,11 @@ cdef class FaustCoreGPU:
                                                             end_row_id,
                                                             start_col_id,
                                                             end_col_id)
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.slice_gpu(start_row_id,
-#                                                              end_row_id,
-#                                                              start_col_id,
-#                                                              end_col_id)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.slice_gpu(start_row_id,
+                                                              end_row_id,
+                                                              start_col_id,
+                                                              end_col_id)
 
         core._isReal = self._isReal
         return core
@@ -788,13 +787,13 @@ cdef class FaustCoreGPU:
             core.core_faust_dbl = \
             self.core_faust_dbl.fancy_idx_gpu(&row_indices_view[0], row_indices.size,
                                           &col_indices_view[0], col_indices.size)
-#        else:
-#            core.core_faust_cplx = \
-#            self.core_faust_cplx.fancy_idx(&row_indices_view[0],
-#                                           row_indices.size,
-#                                           &col_indices_view[0],
-#                                           col_indices.size)
-#
+        else:
+            core.core_faust_cplx = \
+            self.core_faust_cplx.fancy_idx_gpu(&row_indices_view[0],
+                                           row_indices.size,
+                                           &col_indices_view[0],
+                                           col_indices.size)
+
         core._isReal = self._isReal
         return core
 
@@ -807,8 +806,8 @@ cdef class FaustCoreGPU:
         cfilepath[i+1] = 0
         if(self._isReal):
             ret = self.core_faust_dbl.save_mat_file(cfilepath)
-#        else:
-#            ret = self.core_faust_cplx.save_mat_file(cfilepath)
+        else:
+            ret = self.core_faust_cplx.save_mat_file(cfilepath)
         if(not ret):
             raise Exception("Failed to save the file: "+filepath)
         PyMem_Free(cfilepath)
@@ -842,28 +841,28 @@ cdef class FaustCoreGPU:
             else:
                 raise("x must be real if Faust is.")
                 # shouldn't happen normally (avoided by calling function)
-#        else:
-#            x_data_cplx = X.data
-#            nbrow = self.core_faust_cplx.getNbRow()
-#            if(self.core_faust_cplx.getNbCol() != X.shape[0]): raise e
-#            y_data_arr = np.empty((nbrow,nbcol), dtype=np.complex, order='F') # we don't know beforehand Y nnz
-#            y_data_cplx = y_data_arr
-#            if(not self._isReal):
-#                self.core_faust_cplx.multiply_gpu(&y_data_cplx[0,0], nbrow, nbcol,
-#                                          &x_data_cplx[0], &x_indptr[0],
-#                                          &x_indices[0],
-#                                          x_nnz, X.shape[0], X.shape[1])
-#            else:
-#                raise("x must be complex if Faust is")
-#                # shouldn't happen normally (avoided by calling function)
+        else:
+            x_data_cplx = X.data
+            nbrow = self.core_faust_cplx.getNbRow()
+            if(self.core_faust_cplx.getNbCol() != X.shape[0]): raise e
+            y_data_arr = np.empty((nbrow,nbcol), dtype=np.complex, order='F') # we don't know beforehand Y nnz
+            y_data_cplx = y_data_arr
+            if(not self._isReal):
+                self.core_faust_cplx.multiply_gpu(&y_data_cplx[0,0], nbrow, nbcol,
+                                          &x_data_cplx[0], &x_indptr[0],
+                                          &x_indices[0],
+                                          x_nnz, X.shape[0], X.shape[1])
+            else:
+                raise("x must be complex if Faust is")
+                # shouldn't happen normally (avoided by calling function)
         return y_data_arr
 
     def optimize_storage(self, time=False):
         core = FaustCoreGPU(core=True)
         if(self._isReal):
             core.core_faust_dbl = self.core_faust_dbl.optimize_storage_gpu(time)
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.optimize_storage_gpu(time)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.optimize_storage_gpu(time)
         core._isReal = self._isReal
         return core
 
@@ -871,8 +870,8 @@ cdef class FaustCoreGPU:
         core = FaustCoreGPU(core=True)
         if(self._isReal):
             core.core_faust_dbl = self.core_faust_dbl.optimize_gpu(transp)
-#        else:
-#            core.core_faust_cplx = self.core_faust_cplx.optimize_gpu(transp)
+        else:
+            core.core_faust_cplx = self.core_faust_cplx.optimize_gpu(transp)
         core._isReal = self._isReal
         return core
 
@@ -880,18 +879,18 @@ cdef class FaustCoreGPU:
         if(inplace):
             if(self._isReal):
                 self.core_faust_dbl.optimize_time_gpu(transp, inplace, nsamples)
-#            else:
-#                self.core_faust_cplx.optimize_time(transp, inplace, nsamples)
+            else:
+                self.core_faust_cplx.optimize_time(transp, inplace, nsamples)
         else:
             core = FaustCoreGPU(core=True)
             if(self._isReal):
                 core.core_faust_dbl = self.core_faust_dbl.optimize_time_gpu(transp,
                                                                       inplace,
                                                                       nsamples)
-#            else:
-#                core.core_faust_cplx = self.core_faust_cplx.optimize_time(transp,
-#                                                                         inplace,
-#                                                                         nsamples)
+            else:
+                core.core_faust_cplx = self.core_faust_cplx.optimize_time_gpu(transp,
+                                                                         inplace,
+                                                                         nsamples)
             core._isReal = self._isReal
             return core
 
