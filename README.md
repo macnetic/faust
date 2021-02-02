@@ -24,9 +24,9 @@ Installation
 Please refer to the document "./gettingStartedFAuST-version2_0.pdf"
 to install the FAUST toolbox.
 The FAUST toolbox has been tested on the following environments:
-- LINUX (fedora 24 - 30 / centos 7 / Ubuntu)
+- LINUX (fedora 24 - 33 / centos 7 / Ubuntu)
 - MACOS X
-- WINDOWS (windows 7)
+- WINDOWS (windows 10)
 
 
 
@@ -63,24 +63,7 @@ Pre-compiled packages from Gitlab Continuous Integration are also available. Exc
 License
 ========
 
-Copyright (2018):          Luc Le Magoarou, Remi Gribonval,
-                      Nicolas Bellot, Adrien Leman, Thomas Gautrais, Hakim Hadj-Djilani
-                                INRIA Rennes, FRANCE
-                                http://www.inria.fr/
-
-The FAuST Toolbox is distributed under the terms of the GNU Affero General
-Public License.
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public
-License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see [licenses](http://www.gnu.org/licenses/).
+Cf. license.txt
 
 ---
 
@@ -89,7 +72,7 @@ Contacts
 
 	Rémi Gribonval: remi.gribonval@inria.fr
 	Hakim: hakim.hadj-djilani@inria.fr
-	
+
 
 Credits
 ========
@@ -98,7 +81,7 @@ Credits
 	Nicolas Bellot
 	Adrien Leman
 	Thomas Gautrais
-	Hakim H.
+	Hakim Hadj-Djilani
 ---
 
 References
