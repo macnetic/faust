@@ -39,6 +39,9 @@
 /*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
 /****************************************************************************/
 #include "faust_prox.h"
+#ifdef USE_GPU_MOD
+#include "faust_prox_gpu.h"
+#endif
 #include "faust_ConstraintInt.h"
 #include <iostream>
 #include <cstdlib>

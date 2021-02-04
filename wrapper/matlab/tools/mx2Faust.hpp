@@ -723,9 +723,7 @@ const Params<SCALAR, Cpu, FPP2>* mxArray2FaustParams(const mxArray* matlab_param
 	if (presentFields[INIT_FACTS])
 	{
 		mxCurrentField = mxGetField(matlab_params,0,mat_field_type2str(INIT_FACTS).c_str());
-		//		 std::cout<<"PASSERbeforeInitFact"<<std::endl;
 		setVectorFaustMat(init_facts,mxCurrentField);
-		//		 std::cout<<"PASSERafterInitFact"<<std::endl;
 
 	}
 	//verbosity
@@ -914,7 +912,6 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 	{
 		mexErrMsgTxt("params.cons must be specified");
 	}
-	//    std::cout<<"FINI_CONS"<<std::endl;
 	//niter1
 	//    Faust::StoppingCriterion<SCALAR> crit1;
 	//    if (presentFields[3])
@@ -957,9 +954,7 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 	if (presentFields[4])
 	{
 		mxCurrentField = mxGetField(matlab_params,0,"init_facts");
-		//		 std::cout<<"PASSERbeforeInitFact"<<std::endl;
 		setVectorFaustMat(init_facts,mxCurrentField);
-		//		 std::cout<<"PASSERafterInitFact"<<std::endl;
 
 	}else
 	{
@@ -1030,13 +1025,11 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 	{
 		mxCurrentField = mxGetField(matlab_params, 0, "use_csr");
 		use_csr = (bool) mxGetScalar(mxCurrentField);
-		std::cout << "mx2Faust use_csr:" << use_csr << std::endl;
 	}
 	if(presentFields[17])
 	{
 		mxCurrentField = mxGetField(matlab_params, 0, "packing_RL");
 		packing_RL = (bool) mxGetScalar(mxCurrentField);
-		std::cout << "mx2Faust packing_RL:" << packing_RL << std::endl;
 	}
 	//compute_lambda
 	// bool compute_lambda = true;

@@ -26,6 +26,9 @@ classdef ParamsPalm4MSA < matfaust.factparams.ParamsFact
 		%>	@param 'norm2_max_iter', real (optional) maximum number of iterations of power iteration algorithm. Used for computing 2-norm.
 		%>	@param 'norm2_threshold', real (optional) power iteration algorithm threshold (default to 1e-6). Used for computing 2-norm.
 		%>	@param 'grad_calc_opt_mode', int (optional) the mode used for computing the PALM gradient. It can be one value among matfaust.factparams.ParamsFact.EXTERNAL_OPT, matfaust.factparams.ParamsFact.INTERNAL_OPT or matfaust.factparams.ParamsFact.DISABLED_OPT. This
+		%>	@param 'use_csr', bool true (by default) to prefer compressed sparse row matrix format when updating factors (only available with 2020 backend of matfaust.fact.palm4msa).
+		%>	@param 'packing_RL', bool true (by default) to pre-compute R and L products (only available with 2020 backend of pyfaust.fact.palm4msa).
+		%>
 		%>
 		% =========================================================
 		function p = ParamsPalm4MSA(constraints, stop_crit, varargin)

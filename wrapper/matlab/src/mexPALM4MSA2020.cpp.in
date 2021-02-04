@@ -104,21 +104,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 		TransformHelper<SCALAR, Cpu>* F = new TransformHelper<SCALAR, Cpu>(), *F_lambda = nullptr;
 
-		//TODO: use_csr, packing_RL to add to ParamsPalm and parsing of matlab_params
-		bool packing_RL = true;
-		bool use_csr = true;
 		//TODO: the constness should be kept
 		std::vector<Faust::ConstraintGeneric*> noconst_cons;
 		for(auto cons: params->cons)
 		{
 			noconst_cons.push_back(const_cast<Faust::ConstraintGeneric*>(cons));
-			if(cons->is_constraint_parameter_int<SCALAR,Cpu>())
-				(dynamic_cast<Faust::ConstraintInt<SCALAR,Cpu>*>(*(noconst_cons.end()-1)))->Display();
-			else if(cons->is_constraint_parameter_real<SCALAR,Cpu>())
-				(dynamic_cast<Faust::ConstraintFPP<SCALAR,Cpu>*>(*(noconst_cons.end()-1)))->Display();
+//			if(cons->is_constraint_parameter_int<SCALAR,Cpu>())
+//				(dynamic_cast<Faust::ConstraintInt<SCALAR,Cpu>*>(*(noconst_cons.end()-1)))->Display();
+//			else if(cons->is_constraint_parameter_real<SCALAR,Cpu>())
+//				(dynamic_cast<Faust::ConstraintFPP<SCALAR,Cpu>*>(*(noconst_cons.end()-1)))->Display();
+//			else if(cons->is_constraint_parameter_mat<SCALAR,Cpu>())
+//				(dynamic_cast<Faust::ConstraintMat<SCALAR,Cpu>*>(*(noconst_cons.end()-1)))->Display();
+//
 		}
 		palm4msa2(params->data, noconst_cons, *F, lambda, params->stop_crit, params->isUpdateWayR2L,
-				use_csr, packing_RL, /* compute_2norm_on_array */ false, params->norm2_threshold,
+				params->use_csr, params->packing_RL, /* compute_2norm_on_array */ false, params->norm2_threshold,
 				params->norm2_max_iter, params->isConstantStepSize, params->step_size);
 		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
 		plhs[0] = FaustMat2mxArray(mat1x1Lambda);

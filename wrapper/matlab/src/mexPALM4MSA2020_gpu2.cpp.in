@@ -59,6 +59,7 @@
 #include "faust_ConstraintGeneric.h"
 #include "faust_ConstraintFPP.h"
 using namespace Faust;
+using namespace std;
 
 void testCoherencePalm4MSA(const mxArray* params,std::vector<bool> & presentFields);
 
@@ -67,7 +68,7 @@ typedef @FACT_FPP@ FPP2;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-	//Faust::enable_gpu_mod();
+	Faust::enable_gpu_mod();
 #ifdef FAUST_VERBOSE
 	if (typeid(SCALAR) == typeid(float))
 	{
@@ -98,39 +99,53 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	//	///////////// PALM4MSA LAUNCH ///////////////
 	try
 	{
-
-		//	// creation des parametres
-		auto params = mxArray2FaustParamsPALM4MSA<SCALAR,FPP2>(prhs[0], presentFields);
+		// creation of parameters
+		auto params = mxArray2FaustParamsPALM4MSA<SCALAR,FPP2>(prhs[0], presentFields); //Cpu world
 		if(params->isVerbose) params->Display();
 		SCALAR lambda = params->init_lambda;
 
 		TransformHelper<SCALAR, GPU2>* F = new TransformHelper<SCALAR, GPU2>(), *F_lambda = nullptr;
-
-		//TODO: use_csr, packing_RL to add to ParamsPalm and parsing of matlab_params
-		bool packing_RL = true;
-		bool use_csr = true;
 		//TODO: the constness should be kept
 		std::vector<Faust::ConstraintGeneric*> noconst_cons;
 		for(auto cons: params->cons)
 		{
-			noconst_cons.push_back(const_cast<Faust::ConstraintGeneric*>(cons));
 			if(cons->is_constraint_parameter_int<SCALAR,GPU2>())
-				(dynamic_cast<Faust::ConstraintInt<SCALAR,GPU2>*>(*(noconst_cons.end()-1)))->Display();
+			{
+				auto c = dynamic_cast<const Faust::ConstraintInt<SCALAR,Cpu>*>(cons);
+				//				c->Display();
+				noconst_cons.push_back(new Faust::ConstraintInt<SCALAR, GPU2>(c->get_constraint_type(), c->get_parameter(), c->get_rows(), c->get_cols()));
+				//				noconst_cons[0]->Display();
+			}
 			else if(cons->is_constraint_parameter_real<SCALAR,GPU2>())
-				(dynamic_cast<Faust::ConstraintFPP<SCALAR,GPU2>*>(*(noconst_cons.end()-1)))->Display();
+			{
+				auto c = dynamic_cast<const Faust::ConstraintFPP<SCALAR,Cpu>*>(cons);
+				//				c->Display();
+				noconst_cons.push_back(new Faust::ConstraintFPP<SCALAR, GPU2>(c->get_constraint_type(), c->get_parameter(), c->get_rows(), c->get_cols()));
+				//				noconst_cons[0]->Display();
+			}
+			else
+			{
+				auto c = dynamic_cast<const Faust::ConstraintMat<SCALAR,Cpu>*>(cons);
+				//				c->Display();
+				noconst_cons.push_back(new Faust::ConstraintMat<SCALAR, GPU2>(c->get_constraint_type(), c->get_parameter(), c->get_rows(), c->get_cols()));
+				//				noconst_cons[0]->Display();
+			}
 		}
 
-		palm4msa2<SCALAR,GPU2>(params->data, noconst_cons, *F, lambda, params->stop_crit, params->isUpdateWayR2L,
-				use_csr, packing_RL, /* compute_2norm_on_array */ false, params->norm2_threshold,
+
+		auto inMat = Faust::MatDense<SCALAR,GPU2>(params->data);
+
+		Faust::palm4msa2<SCALAR,GPU2>(inMat, noconst_cons, *F, lambda, params->stop_crit, params->isUpdateWayR2L,
+				params->use_csr, params->packing_RL, /* compute_2norm_on_array */ false, params->norm2_threshold,
 				params->norm2_max_iter, params->isConstantStepSize, params->step_size);
 
-		Faust::MatDense<FPP2,GPU2> mat1x1Lambda = Faust::MatDense<FPP2, GPU2>(1, 1, &lambda, /* no_alloc*/ false, /*dev_id*/ -1, /*stream*/ nullptr);
-		Faust::MatDense<FPP2,Cpu> cpu_mat1x1Lambda;
-		plhs[0] = FaustMat2mxArray(cpu_mat1x1Lambda);
+		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(1, 1, &lambda);
+		plhs[0] = FaustMat2mxArray(mat1x1Lambda);
 		F_lambda = F->multiply(lambda);
 		delete F;
 		F = F_lambda;
-		plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, GPU2>>(F);
+		auto cpuF = F->tocpu();
+		plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(cpuF);
 		delete params;
 	}
 	catch (const std::exception& e)
