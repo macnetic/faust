@@ -50,7 +50,7 @@ classdef (Abstract) ParamsFact
 		%> default is EXTERNAL_OPT
 		DEFAULT_OPT = 2
 		% the order of names matters and must respect the indices above
-		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose', 'grad_calc_opt_mode', 'norm2_max_iter', 'norm2_threshold', 'packing_RL', 'use_csr' }
+		OPT_ARG_NAMES = {'is_update_way_R2L', 'init_lambda', 'step_size', 'constant_step_size', 'is_verbose', 'grad_calc_opt_mode', 'norm2_max_iter', 'norm2_threshold', 'use_csr', 'packing_RL'}
 	end
 	methods
 		function p = ParamsFact(num_facts, constraints, varargin)

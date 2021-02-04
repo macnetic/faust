@@ -151,8 +151,8 @@ void testCoherencePALM4MSA(const mxArray* params,std::vector<bool> & presentFiel
 {
 	////TODO: this function should be modified to be more reliable/simple as the function testCoherence() in mx2Faust.cpp has been modified
 	int nbr_field=mxGetNumberOfFields(params);
-	presentFields.resize(16);
-	presentFields.assign(16,false);
+	presentFields.resize(18);
+	presentFields.assign(18,false);
 	if(nbr_field < 3)
 	{
 		mexErrMsgTxt("The number of field of params must be at least 3 ");
@@ -227,6 +227,10 @@ void testCoherencePALM4MSA(const mxArray* params,std::vector<bool> & presentFiel
 			presentFields[14] = true;
 		else if(strcmp(fieldName, "norm2_threshold") == 0)
 			presentFields[15] = true;
+		else if(strcmp(fieldName, "use_csr") == 0)
+			presentFields[16] = true;
+		else if(strcmp(fieldName, "packing_RL") == 0)
+			presentFields[17] = true;
 	}
 
 }

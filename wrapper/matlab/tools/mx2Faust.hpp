@@ -966,7 +966,6 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 		mexErrMsgTxt("init_facts must be must be specified");
 	}
 
-	//	std::cout<<"PASSER1"<<std::endl;
 	//verbosity
 	bool isVerbose = false;
 	if (presentFields[5])
@@ -1025,6 +1024,20 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 		mxCurrentField = mxGetField(matlab_params, 0, "norm2_threshold");
 		norm2_threshold = (FPP2) mxGetScalar(mxCurrentField);
 	}
+	bool use_csr = Params<SCALAR, Cpu, FPP2>::defaultUseCSR;
+	bool packing_RL = Params<SCALAR, Cpu, FPP2>::defaultPackingRL;
+	if(presentFields[16])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "use_csr");
+		use_csr = (bool) mxGetScalar(mxCurrentField);
+		std::cout << "mx2Faust use_csr:" << use_csr << std::endl;
+	}
+	if(presentFields[17])
+	{
+		mxCurrentField = mxGetField(matlab_params, 0, "packing_RL");
+		packing_RL = (bool) mxGetScalar(mxCurrentField);
+		std::cout << "mx2Faust packing_RL:" << packing_RL << std::endl;
+	}
 	//compute_lambda
 	// bool compute_lambda = true;
 	// if (presentFields[8])
@@ -1033,11 +1046,22 @@ const ParamsPalm<SCALAR,Cpu,FPP2>* mxArray2FaustParamsPALM4MSA(const mxArray* ma
 	// compute_lambda = (bool) mxGetScalar(mxCurrentField);
 	// }
 
-	params = new Faust::ParamsPalm<SCALAR,Cpu, FPP2>(data,nbFact,consS,init_facts,crit1,isVerbose,updateway,init_lambda, constant_step_size, step_size, grad_calc_opt_mode);
+	params = new Faust::ParamsPalm<SCALAR,Cpu, FPP2>(data,
+														nbFact,
+														consS,
+														init_facts,
+														crit1,
+														isVerbose,
+														updateway,
+														init_lambda,
+														constant_step_size,
+														step_size,
+														grad_calc_opt_mode);
 
 	if(norm2_max_iter) params->norm2_max_iter = norm2_max_iter;
 	if(norm2_threshold != FPP2(0)) params->norm2_threshold = norm2_threshold;
-
+	params->use_csr = use_csr;
+	params->packing_RL = packing_RL;
 
 	return params;
 }

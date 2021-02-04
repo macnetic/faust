@@ -107,6 +107,8 @@ namespace Faust
 		  GradientCalcOptMode gradCalcOptMode;
           Real<FPP> norm2_threshold;
           unsigned int norm2_max_iter;
+		  bool use_csr;
+		  bool packing_RL;
 
           void Display() const;
           void init_factors();

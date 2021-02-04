@@ -67,29 +67,29 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 {
 	if (!M.isReal())
 		mexErrMsgTxt("FaustMat2mxArray : Faust::MatDense must be real");
-	
+
 	mxArray * mxMat;
 	int row,col;
 	row = M.getNbRow();
-        col = M.getNbCol();
-		
-        /*mxMat = mxCreateDoubleMatrix(row,col,mxREAL);
-        double* mxMatdata = mxGetPr(mxMat);
-	
-		if (typeid(double) == typeid(FPP))
-			memcpy(mxMatdata,M.getData(),sizeof(double)*row*col);			
-			
-		else
-		{
-			double*	 mat_ptr = (double *) mxCalloc(row*col,sizeof(double));
-			for (int i=0;i<row*col;i++)
-			{
-				mat_ptr[i] = (double) M.getData()[i];
-			}
-			memcpy(mxMatdata,mat_ptr,sizeof(double)*row*col);
-			mxFree(mat_ptr);
-			
-		}*/
+	col = M.getNbCol();
+
+	/*mxMat = mxCreateDoubleMatrix(row,col,mxREAL);
+	  double* mxMatdata = mxGetPr(mxMat);
+
+	  if (typeid(double) == typeid(FPP))
+	  memcpy(mxMatdata,M.getData(),sizeof(double)*row*col);			
+
+	  else
+	  {
+	  double*	 mat_ptr = (double *) mxCalloc(row*col,sizeof(double));
+	  for (int i=0;i<row*col;i++)
+	  {
+	  mat_ptr[i] = (double) M.getData()[i];
+	  }
+	  memcpy(mxMatdata,mat_ptr,sizeof(double)*row*col);
+	  mxFree(mat_ptr);
+
+	  }*/
 	const mwSize dims[3]={(mwSize)row,(mwSize)col};
 	if(typeid(FPP)==typeid(float))
 	{
@@ -101,13 +101,13 @@ mxArray*  FaustMat2mxArray(const Faust::MatDense<FPP,Cpu>& M)
 	{
 		mexErrMsgTxt("FaustMat2mxArray : unsupported type of float");
 	}
-	
+
 	FPP*    ptr_out = static_cast<FPP*> (mxGetData(mxMat));
-		memcpy(ptr_out, M.getData(),row*col*sizeof(FPP));	
-		
-	
-		return mxMat;
-		
+	memcpy(ptr_out, M.getData(),row*col*sizeof(FPP));	
+
+
+	return mxMat;
+
 }
 
 
