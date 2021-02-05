@@ -158,7 +158,7 @@ template<typename FPP>
 void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 {
 	int  nbRow,nbCol;
-    	if (mxIsEmpty(Mat_array))
+	if (mxIsEmpty(Mat_array))
 	{
 		mexErrMsgTxt("tools_mex.h:mxArray2FaustMat :input matrix is empty.");
 	}
@@ -167,31 +167,26 @@ void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 	{
 		mexErrMsgTxt("tools_mex.h:mxArray2FaustMat :input matrix must be a 2D array.");
 	}
-    const mwSize *dimsMat;
-    dimsMat = mxGetDimensions(Mat_array);
+	const mwSize *dimsMat;
+	dimsMat = mxGetDimensions(Mat_array);
 
 	nbRow = (int) dimsMat[0];
-    nbCol = (int) dimsMat[1];
-    if ((nbRow == 0) || (nbCol == 0))
-        mexErrMsgIdAndTxt("tools_mex.h:mxArray2FaustMat", "empty matrix");
-    if (mxIsSparse(Mat_array))
-    {
-        //mexErrMsgTxt("sparse matrix entry instead of dense matrix");
-        mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
-    }
+	nbCol = (int) dimsMat[1];
+	if ((nbRow == 0) || (nbCol == 0))
+		mexErrMsgIdAndTxt("tools_mex.h:mxArray2FaustMat", "empty matrix");
+	if (mxIsSparse(Mat_array))
+	{
+		//mexErrMsgTxt("sparse matrix entry instead of dense matrix");
+		mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
+	}
 
-    Mat.resize(nbRow,nbCol);
+	Mat.resize(nbRow,nbCol);
 
-    FPP* MatPtr;
-    mxArray2Ptr(Mat_array,MatPtr);			
-    memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(FPP));	
-    		
-    if(MatPtr) {delete [] MatPtr ; MatPtr = NULL;}
+	FPP* MatPtr;
+	mxArray2Ptr(Mat_array,MatPtr);
+	memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(FPP));
 
-
-
-
-
+	if(MatPtr) {delete [] MatPtr ; MatPtr = NULL;}
 }
 
 
@@ -433,31 +428,28 @@ void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cp
 {
 
 	if (mxMat == NULL)
-		mexErrMsgTxt("concatMatGeneric : empty matlab matrix"); 
+		mexErrMsgTxt("concatMatGeneric : empty matlab matrix");
 
-	Faust::MatGeneric<FPP,Cpu> *  M;
-
+	Faust::MatGeneric<FPP,Cpu> *  M = nullptr;
+	Faust::MatDense<FPP,Cpu> *  dM = nullptr;
+	Faust::MatSparse<FPP,Cpu> *  sM = nullptr;
 
 
 
 
 	if (!mxIsSparse(mxMat))
-	{	
-
-		Faust::MatDense<FPP,Cpu> denseM;
-		mxArray2FaustMat(mxMat,denseM);
-		M=denseM.Clone();
-
-	}else
+	{
+		M = dM = new Faust::MatDense<FPP,Cpu>();
+		mxArray2FaustMat(mxMat, *dM);
+	}
+	else
 	{
 
-		Faust::MatSparse<FPP,Cpu> spM;		
-		mxArray2FaustspMat(mxMat,spM);
-		M=spM.Clone();
+		M = sM = new Faust::MatSparse<FPP,Cpu>();
+		mxArray2FaustspMat(mxMat, *sM);
 	}
 
 	list_mat.push_back(M);
-
 
 }
 
