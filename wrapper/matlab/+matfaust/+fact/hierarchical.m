@@ -140,17 +140,28 @@ function varargout = hierarchical(M, p, varargin)
 	backend = 2016;
 	nargin = length(varargin);
 	if(nargin > 0)
-		backend = varargin{1};
-		if(strcmp('backend', backend))
-			if(nargin < 2)
-				error('keyword argument ''backend'' must be followed by 2016 or 2020')
-			else
-				backend = varargin{2};
+		for i=1:nargin
+			switch(varargin{i})
+				case 'backend'
+					if(nargin < i+1)
+						error('keyword argument ''backend'' must be followed by 2016 or 2020')
+					else
+						backend = varargin{i+1};
+					end
+				case 'gpu'
+					if(nargin == i || ~ islogical(varargin{i+1}))
+						error('gpu keyword argument is not followed by a logical')
+					else
+						gpu = varargin{i+1};
+					end
 			end
 		end
 		if(~ (isscalar(backend) && floor(backend) == backend) || backend ~= 2016 && backend ~= 2020)
 			backend
 			error('backend must be a int equal to 2016 or 2020')
+		end
+		if(backend ~= 2020 && gpu == true)
+			error('GPU implementation is only available for 2020 backend.')
 		end
 	end
 	if(backend == 2016)
@@ -162,7 +173,11 @@ function varargout = hierarchical(M, p, varargin)
 		F = Faust(core_obj, isreal(M));
 	elseif(backend == 2020)
 		if(isreal(M))
-			[lambda, core_obj] = mexHierarchical2020Real(M, mex_params);
+			if(gpu)
+				[lambda, core_obj] = mexHierarchical2020_gpu2Real(M, mex_params);
+			else
+				[lambda, core_obj] = mexHierarchical2020Real(M, mex_params);
+			end
 		else
 			error('backend 2020 doesn''t handle yet the complex matrices')
 		end

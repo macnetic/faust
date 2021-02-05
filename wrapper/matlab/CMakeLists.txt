@@ -124,8 +124,11 @@ foreach(SCALAR_AND_FSUFFIX double:Real std::complex<double>:Cplx) # TODO: float 
 		if(USE_GPU_MOD)
 			configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexPALM4MSA2020_gpu2.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexPALM4MSA2020_gpu2${FSUFFIX}.cpp @ONLY)
 			configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexPALM4MSA2020_gpu2.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexPALM4MSA2020_gpu2${FSUFFIX}.m @ONLY)
+			configure_file(${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical2020_gpu2.m.in ${FAUST_MATLAB_DOC_SRC_DIR}/mexHierarchical2020_gpu2${FSUFFIX}.m @ONLY)
+			configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical2020_gpu2.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical2020_gpu2${FSUFFIX}.cpp @ONLY)
 		else()
 			file(REMOVE ${FAUST_MATLAB_MEX_SRC_DIR}/mexPALM4MSA2020_gpu2${FSUFFIX}.cpp)  # delete a possible previous file generated with USE_GPU_MOD = ON (because otherwise it fails the building)
+			file(REMOVE ${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical2020_gpu2${FSUFFIX}.cpp)  # delete a possible previous file generated with USE_GPU_MOD = ON (because otherwise it fails the building)
 		endif()
 	endif()
 	# copy the *.m for factorization now, because we have the FSUFFIX in hands

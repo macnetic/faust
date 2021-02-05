@@ -41,8 +41,6 @@
 
 
 #include "mex.h"
-#include "faust_HierarchicalFact.h"
-#include "faust_HierarchicalFactFGFT.h"
 #include "faust_hierarchical.h"
 #include "faust_TransformHelper.h"
 #include "class_handle.hpp"
@@ -58,8 +56,39 @@ typedef @FACT_FPP@ FPP2;
 
 using namespace std;
 
+void convert_cons_vec_cpu2gpu(vector<const Faust::ConstraintGeneric*>& cpu_cons,
+		vector<const Faust::ConstraintGeneric*>& gpu_cons)
+{
+	for(auto cons: cpu_cons)
+	{
+		if(cons->is_constraint_parameter_int<SCALAR,GPU2>())
+		{
+			auto c = dynamic_cast<const Faust::ConstraintInt<SCALAR,Cpu>*>(cons);
+			gpu_cons.push_back(new Faust::ConstraintInt<SCALAR, GPU2>(c->get_constraint_type(), c->get_parameter(), c->get_rows(), c->get_cols()));
+		}
+		else if(cons->is_constraint_parameter_real<SCALAR,GPU2>())
+		{
+			auto c = dynamic_cast<const Faust::ConstraintFPP<SCALAR,Cpu>*>(cons);
+			gpu_cons.push_back(new Faust::ConstraintFPP<SCALAR, GPU2>(c->get_constraint_type(), c->get_parameter(), c->get_rows(), c->get_cols()));
+		}
+		else if(cons->is_constraint_parameter_mat<SCALAR,GPU2>())
+		{
+			auto c = dynamic_cast<const Faust::ConstraintMat<SCALAR,Cpu>*>(cons);
+			gpu_cons.push_back(new Faust::ConstraintMat<SCALAR, GPU2>(c->get_constraint_type(), c->get_parameter(), c->get_rows(), c->get_cols()));
+		}
+		else
+		{
+			mexErrMsgTxt("Unknown constraint type: only integer, real or matrix constraints are available.");
+		}
+//		(*(gpu_cons.end()-1))->Display();
+	}
+
+//	cout << "gpu cons size:" << gpu_cons.size() << endl;
+}
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+	Faust::enable_gpu_mod();
 #ifdef FAUST_VERBOSE
 	if (typeid(SCALAR) == typeid(float))
 	{
@@ -87,30 +116,34 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// initialization of the matrix that will be factorized
 	Faust::MatDense<SCALAR,Cpu> matrix;
 	mxArray2FaustMat(matlab_matrix,matrix);
+	Faust::MatDense<SCALAR,Cpu> gpu_matrix(matrix);
 
 	auto *params = mxArray2FaustParams<SCALAR,FPP2>(matlab_params);
 
 	FPP2 lambda = params->init_lambda;
 
 	try{
-			//DisplayParams(params);
-		auto fac_cons = params->cons[0];
-		auto res_cons = params->cons[1];
+		auto cpu_fac_cons = params->cons[0];
+		auto cpu_res_cons = params->cons[1];
+		vector<const Faust::ConstraintGeneric*> gpu_fac_cons;
+		vector<const Faust::ConstraintGeneric*> gpu_res_cons;
+		convert_cons_vec_cpu2gpu(cpu_fac_cons, gpu_fac_cons);
+		convert_cons_vec_cpu2gpu(cpu_res_cons, gpu_res_cons);
 		bool compute_2norm_on_arrays = false;
+//		gpu_matrix.Display();
 		std::vector<Faust::StoppingCriterion<Real<SCALAR>>> sc = {params->stop_crit_2facts.get_crit(), params->stop_crit_global.get_crit()};
-		auto th = Faust::hierarchical(matrix, sc, fac_cons, res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->use_csr, params->packing_RL, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter, params->isVerbose, params->isConstantStepSize, params->step_size);
+//		cout << "gpu_fac_cons.size():" << gpu_fac_cons.size() << endl;
+		auto th = Faust::hierarchical<FPP2, GPU2>(gpu_matrix, sc, gpu_fac_cons, gpu_res_cons, lambda, params->isUpdateWayR2L, params->isFactSideLeft, params->use_csr, params->packing_RL, compute_2norm_on_arrays, params->norm2_threshold, params->norm2_max_iter, params->isVerbose, params->isConstantStepSize, params->step_size);
 
 		auto th_times_lambda = th->multiply(lambda);
 		delete th;
 		th = th_times_lambda;
 
+		auto cpuF = th->tocpu();
 
 		Faust::MatDense<FPP2,Cpu> mat1x1Lambda = Faust::MatDense<FPP2, Cpu>(&lambda, 1, 1);
 		plhs[0] = FaustMat2mxArray(mat1x1Lambda);
-		plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(th);
-
-
-
+		plhs[1] = convertPtr2Mat<Faust::TransformHelper<SCALAR, Cpu>>(cpuF);
 	}
 	 catch (const std::exception& e)
 	{
@@ -122,4 +155,3 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	delete params;
 
 }
-
