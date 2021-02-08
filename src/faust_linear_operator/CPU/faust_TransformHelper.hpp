@@ -87,6 +87,12 @@ namespace Faust {
 		{
 			bool right_left_transposed = th_left->is_transposed && th_right->is_transposed;
 			bool right_left_conjugate = th_left->is_conjugate && th_right->is_conjugate;
+			if(right_left_transposed)
+			{
+				auto tmp = th_left;
+				th_left = th_right;
+				th_right = tmp;
+			}
 			this->transform = make_shared<Transform<FPP,Cpu>>(th_left->transform.get(), th_left->is_transposed && ! right_left_transposed, th_left->is_conjugate && ! right_left_conjugate,
 					th_right->transform.get(), th_right->is_transposed && ! right_left_transposed, th_right->is_conjugate && ! right_left_conjugate);
 			// if the both are transposed, the factors won't be transposed in the Transform underlying object,
