@@ -255,6 +255,37 @@ namespace Faust
 				spm_funcs->set_zeros(gpu_mat);
 		}
 
+	template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::set(int32_t nnz, int32_t nrows, int32_t ncols, @FAUST_SCALAR_FOR_GM@* values, int32_t* rowptr, int32_t* colids)
+		{
+			auto spm_funcs = GPUModHandler::get_singleton()->spm_funcs((@FAUST_SCALAR_FOR_GM@)(0));
+			if(gpu_mat != nullptr)
+				spm_funcs->cpu_set(gpu_mat, nnz, nrows, ncols, (@GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(values), rowptr, colids);
+		}
+
+	template<>
+		void Faust::MatSparse<@FAUST_SCALAR_FOR_GM@,GPU2>::set(int32_t nnz, int32_t nrows, int32_t ncols, @FAUST_SCALAR_FOR_GM@* values, size_t* rowptr, size_t* colids)
+		{
+			int32_t* rowptr2 = new int32_t[nrows+1];
+			int32_t* colids2 = new int32_t[nnz];
+			
+			for(int32_t i=0;i < nrows+1; i++)
+			{
+				//TODO: verify if rowptr[i] is not larger than int32_t capability
+				// if not raise an exception
+				rowptr2[i] = (int32_t) rowptr[i];
+			}
+
+			for(int32_t i=0;i < nnz; i++)
+			{
+				//TODO: verify if colids[i] is not larger than int32_t capability
+				colids2[i] = (int32_t) colids[i];
+			}
+			set(nnz, nrows, ncols, values, rowptr2, colids2);
+			delete [] rowptr2;
+			delete [] colids2;
+		}
+
 	template<typename FPP>
 		MatGeneric<FPP,GPU2>* MatSparse<FPP,GPU2>::Clone(const bool isOptimize /*default value=false*/) const
 		{

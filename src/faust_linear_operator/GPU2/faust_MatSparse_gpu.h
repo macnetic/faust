@@ -78,6 +78,8 @@ namespace Faust
 				void setEyes();
 				void setIdentity(int32_t dim);
 				void setZeros();
+				void set(int32_t nnz, int32_t nrows, int32_t ncols, FPP* values, int32_t* rowptr, int32_t* colids);
+				void set(int32_t nnz, int32_t nrows, int32_t ncols, FPP* values, size_t* rowptr, size_t* colids);
 				MatSparse<FPP, GPU2>* clone(const int32_t dev_id=-1, const void* stream=nullptr) const;
 				MatGeneric<FPP,GPU2>* Clone(const bool isOptimize=false) const;
 				void move(const int32_t dev_id=-1, const void* stream=nullptr);

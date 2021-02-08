@@ -257,6 +257,14 @@ namespace Faust
 		}
 
 	template<typename FPP>
+		void MatDense<FPP,Cpu>::setData(const FPP* data, int32_t nrows, int32_t ncols)
+		{
+			if(nrows != this->dim1 || ncols != this->dim2)
+				resize(nrows, ncols);
+			memcpy(getData(), data, sizeof(FPP)*nrows*ncols);
+		}
+
+	template<typename FPP>
 		MatDense<FPP,Cpu> MatDense<FPP,Cpu>::eye(faust_unsigned_int nrows, faust_unsigned_int ncols)
 		{
 			MatDense<FPP,Cpu> mat(nrows, ncols);

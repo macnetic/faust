@@ -98,6 +98,7 @@ namespace Faust
 				void setOnes();
 				void setZeros();
 				void setEyes();
+				void setData(const FPP* data, int32_t nrows, int32_t ncols);
 				void transpose();
 				void conjugate();
 				void adjoint();

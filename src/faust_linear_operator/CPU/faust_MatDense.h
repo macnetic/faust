@@ -290,6 +290,8 @@ namespace Faust
 			FPP* getData(){isZeros=false;this->is_identity=false;return mat.data();}
 			const FPP* getData()const{return mat.data();}
 
+			void setData(const FPP* data, int32_t nrows, int32_t ncols);
+
 			bool isEqual(const MatDense<FPP,Cpu> & B) const;
 			bool isEqual(const MatDense<FPP,Cpu> & B, FPP threshold) const;
 

@@ -257,6 +257,13 @@ namespace Faust
 		}
 
 	template<>
+		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::setData(const @FAUST_SCALAR_FOR_GM@* data, int32_t nrows, int32_t ncols)
+		{
+			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
+			dsm_funcs->cpu_set(gpu_mat, (const @GM_SCALAR@*) reinterpret_cast<const @GM_REINTERPRET_CAST_SCALAR@*>(data), nrows, ncols);
+		}
+
+	template<>
 		void Faust::MatDense<@FAUST_SCALAR_FOR_GM@,GPU2>::move(const int32_t dev_id/*=-1*/, const void* stream/*=nullptr*/)
 		{
 			auto dsm_funcs = GPUModHandler::get_singleton()->dsm_funcs(@FAUST_SCALAR_FOR_GM@(0));
