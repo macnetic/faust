@@ -408,14 +408,18 @@ classdef FaustTest < matlab.unittest.TestCase
 			this.assertLessThan(norm(full(F'*r)-full(F)'*r)/norm(full(F)'*r), eps(1.))
 			this.assertLessThan(norm(full(F.'*r)-full(F).'*r)/norm(full(F).'*r), eps(1.))
 			disp('test mul of two Fausts')
-			r_fausts = {matfaust.rand(randi(100), size(F,2)),
-			matfaust.rand(randi(100), size(F,2), .5, 'complex')};
+			r_fausts = {matfaust.rand(size(F,2), randi(100)),
+			matfaust.rand(size(F,2), randi(100) , 'density', .5, 'field', 'complex')};
 			for ii=1:length(r_fausts)
 				rF = r_fausts{ii};
+				size(F)
+				size(rF)
 				test_rF = full(F*rF);
 				ref_rF = ref_full_faust*full(rF);
 				this.verifyEqual(test_rF, ref_rF, 'RelTol', 10^-3);
 				% transpose prod
+				save(rF, 'rF.mat')
+				save(F, 'F.mat')
 				ttest_rF = full(rF'*F');
 				tref_rF = full(rF)'*ref_full_faust';
 				this.verifyEqual(ttest_rF, tref_rF, 'RelTol', 10^-3);
@@ -460,7 +464,7 @@ classdef FaustTest < matlab.unittest.TestCase
 			end
 			disp('test plus(Faust1,Faust2)')
 			import matfaust.Faust
-			fausts = {matfaust.rand(5,size(F,1))*Faust(rand(size(F,1),size(F,2))), matfaust.rand(5,size(F,1), .5, 'complex')*Faust(rand(size(F,1),size(F,2)))}
+			fausts = {matfaust.rand(size(F,1), size(F,1), 'num_factors', 5)*Faust(rand(size(F,1),size(F,2))), matfaust.rand(size(F,1), size(F,1), 'num_factors', 5, 'density', .5, 'field', 'complex')*Faust(rand(size(F,1),size(F,2)))}
 			for i=1:length(fausts)
 				F2 = fausts{i}
 				this.verifyEqual(full(F+F2),full(F)+full(F2),'RelTol', 10^-2)
@@ -468,19 +472,19 @@ classdef FaustTest < matlab.unittest.TestCase
 		end
 
 		function testminus(this)
-			disp('test substraction of Faust and scalar (complex and real)')
-			scals = [rand(1,1)] %, rand(1,1)+rand(1,1)*j] %TODO: re-enable complex when #72 is solved
+			disp('test subtraction of Faust and scalar (complex and real)')
+			scals = [rand(1,1) , rand(1,1)+rand(1,1)*j]
 			F = this.test_faust;
 			for i=1:size(scals,2)
 				s = scals(i);
-				disp(['test substraction of a Faust and scalar = ' num2str(s)])
+				disp(['test subtraction of a Faust and scalar = ' num2str(s)])
 				full_test_F = full(F-s);
 				ref = full(F)-s;
 				this.verifyEqual(full_test_F, ref, 'RelTol', 10^-2)
 			end
 			disp('test minus(Faust1,Faust2)')
 			import matfaust.Faust
-			fausts = {matfaust.rand(5,size(F,1))*Faust(rand(size(F,1),size(F,2)))} %, matfaust.rand(5,size(F,1), .5, 'complex')*rand(size(F,2),size(F,2))} %TODO: re-enable complex Faust when #72 is solved
+			fausts = {matfaust.rand(size(F,1), size(F,1), 'num_factors', 5)*Faust(rand(size(F,1),size(F,2))), matfaust.rand(size(F,1), size(F,1), 'num_factors', 5, 'density', .5, 'field', 'complex')*rand(size(F,1),size(F,2))}
 			for i=1:length(fausts)
 				F2 = fausts{i}
 				this.verifyEqual(full(F-F2),full(F)-full(F2),'RelTol', 10^-2)
@@ -498,7 +502,7 @@ classdef FaustTest < matlab.unittest.TestCase
 					other_dim = mod(dimcat,2)+1;
 					F = this.test_faust;
 					%=============== test vert (or horz) cat
-					G = matfaust.rand(randi(FaustTest.MAX_NUM_FACTORS), size(F,other_dim));
+					G = matfaust.rand(size(F,other_dim), size(F,other_dim), 'num_factors', randi(FaustTest.MAX_NUM_FACTORS));
 					G_num_factors = numfactors(G);
 					% set a Faust with a random number of rows (or cols) from G
 					H_facs = cell(1,G_num_factors+1);
