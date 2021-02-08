@@ -10,7 +10,7 @@ void new_faust(const mxArray **prhs, const int nrhs, mxArray **plhs, const int n
 	if(!mxIsCell(prhs[1]))
 		mexErrMsgTxt("1st arg input must be a cell-array");
 
-	std::vector<Faust::MatGeneric<SCALAR,Cpu>*> list_factor;
+	std::vector<Faust::MatGeneric<SCALAR, DEV>*> list_factor;
 	mwSize nb_element = mxGetNumberOfElements(prhs[1]);
 
 	if (nb_element != 0)
@@ -20,7 +20,7 @@ void new_faust(const mxArray **prhs, const int nrhs, mxArray **plhs, const int n
 		{
 			mxMat=mxGetCell(prhs[1],i);
 
-			concatMatGeneric<SCALAR>(mxMat,list_factor);
+			concatMatGeneric<SCALAR, DEV>(mxMat,list_factor);
 
 		}
 	}
@@ -46,7 +46,7 @@ void new_faust(const mxArray **prhs, const int nrhs, mxArray **plhs, const int n
 
 	Faust::TransformHelper<SCALAR,DEV>* F = new Faust::TransformHelper<SCALAR,DEV>(list_factor, lambda, optimizedCopy, /* cloning */ false);
 
-	plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,Cpu> >(F);
+	plhs[0]=convertPtr2Mat<Faust::TransformHelper<SCALAR,DEV> >(F);
 
 	return;
 }

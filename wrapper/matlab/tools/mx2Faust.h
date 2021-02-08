@@ -81,10 +81,15 @@ bool isScalarCompatible(const Faust::LinearOperator<FPP,Cpu> & L,const mxArray *
 *  \param Mat_array : pointer to the mxArray* (matlab format) representing a dense matrix 
 *  \tparam Mat : Faust::MatDense<FPP,Cpu>
         */
-template<typename FPP>
-void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat);
-/*template<typename FPP>
-void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<std::complex<FPP>,Cpu> & Mat);*/
+template<typename FPP, FDevice DEV>
+void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,DEV> & Mat);
+
+/*
+ * \brief Just an helper to call mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat).
+ *
+ */
+template<typename FPP, FDevice DEV>
+Faust::MatDense<FPP,DEV>* mxArray2FaustMat(const mxArray* Mat_array);
 
 
 
@@ -93,8 +98,8 @@ void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<std::complex<FPP>
 *  \param spMat_array : pointer to the mxArray* (matlab format) representing a sparse matrix  
 *  \tparam S : Faust::MatSparse<FPP,Cpu>  
         */
-template<typename FPP>
-void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S);
+template<typename FPP, FDevice DEV>
+void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,DEV> & S);
 
 
 /* !
@@ -127,8 +132,8 @@ void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data);
 	*  \tparam list_mat : std::vector of pointer of Faust::MatGeneric<FPP,Cpu>
 	   \warning : dynamic allocation is made so , "delete list_mat[list_mat.size()-1]" must be done	
         */
-template<typename FPP>
-void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cpu> *> &list_mat);
+template<typename FPP, FDevice DEV>
+void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,DEV> *> &list_mat);
 
 
 /*!

@@ -64,6 +64,8 @@
 #include <complex>
 #include <memory>
 #include "new_faust.h"
+#include "faust_disp.h"
+#include "faust_delete.h"
 
 typedef @FAUST_SCALAR@ SCALAR;
 typedef @FAUST_FPP@ FPP;
@@ -355,10 +357,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if (!strcmp("delete", cmd))
 		{
 			// Destroy the C++ object
-			destroyObject<Faust::TransformHelper<SCALAR,Cpu> >(prhs[1]);
-			// Warn if other commands were ignored
-			if (nlhs != 0 || nrhs != 2)
-				mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
+			faust_delete<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 
@@ -461,14 +460,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			return;
 		}
 
-		if (!strcmp("disp",cmd))
+		if (! strcmp("disp",cmd))
 		{
-			if (nlhs != 0 || nrhs != 2)
-				mexErrMsgTxt("disp: Unexpected arguments");
-			//core_ptr->display(); // doesn't work on windows,
-			// matlab terminal doesn't receive the mex lib std output
-			// we must use mexPrintf() to display content
-			mexPrintf(core_ptr->to_string().c_str());
+			faust_disp<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
 			return;
 		}
 

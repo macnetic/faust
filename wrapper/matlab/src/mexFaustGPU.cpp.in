@@ -1,0 +1,116 @@
+/****************************************************************************/
+/*                              Description:                                */
+/*    file where the C++ class Faust::TransformHelper (GPU2) is interfaced with Matlab    */
+/*   WARNING : this file is configured into two files :                     */
+/* - mexFaustReal.cpp interfaces the class Faust::TransformHelper<double>         */
+/*     (i.e real scalar Faust)                                              */
+/* - mexFaustCplx.cpp interfaces the                                        */
+/* class Faust::Transform<std::complex<double<>                             */
+/*  (i.e complex scalar Faust)                                              */
+/* --> these 2 mexfunctions are directly used                               */
+/*                                                                          */
+/* by FaustCore class (tools/FaustCore.m) and Faust.m                       */
+/*                                                                          */
+/*  For more information on the FAuST Project, please visit the website     */
+/*  of the project : <http://faust.inria.fr>                         */
+/*                                                                          */
+/*                              License:                                    */
+/*  Copyright (2021):  	Hakim HADJ-DJILANI                                  */
+/*  			Nicolas Bellot, Adrien Leman, Thomas Gautrais,      */
+/*                      Luc Le Magoarou, Remi Gribonval                     */
+/*                      INRIA Rennes, FRANCE                                */
+/*                      http://www.inria.fr/                                */
+/*                                                                          */
+/*  The FAuST Toolbox is distributed under the terms of the GNU Affero      */
+/*  General Public License.                                                 */
+/*  This program is free software: you can redistribute it and/or modify    */
+/*  it under the terms of the GNU Affero General Public License as          */
+/*  published by the Free Software Foundation.                              */
+/*                                                                          */
+/*  This program is distributed in the hope that it will be useful, but     */
+/*  WITHOUT ANY WARRANTY; without even the implied warranty of              */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    */
+/*  See the GNU Affero General Public License for more details.             */
+/*                                                                          */
+/*  You should have received a copy of the GNU Affero General Public        */
+/*  License along with this program.                                        */
+/*  If not, see <http://www.gnu.org/licenses/>.                             */
+/*                                                                          */
+/*                             Contacts:                                    */
+/*      Nicolas Bellot  : nicolas.bellot@inria.fr                           */
+/*      Adrien Leman    : adrien.leman@inria.fr                             */
+/*      Thomas Gautrais : thomas.gautrais@inria.fr                          */
+/*      Luc Le Magoarou : luc.le-magoarou@inria.fr                          */
+/*      Remi Gribonval  : remi.gribonval@inria.fr                           */
+/*                                                                          */
+/*                              References:                                 */
+/*  [1] Le Magoarou L. and Gribonval R., "Flexible multi-layer sparse       */
+/*  approximations of matrices and applications", Journal of Selected       */
+/*  Topics in Signal Processing, 2016.                                      */
+/*  <https://hal.archives-ouvertes.fr/hal-01167948v1>                       */
+
+#include "mex.h"
+#include "class_handle.hpp"
+#define IGNORE_TRANSFORM_HELPER_VARIADIC_TPL
+#include "mx2Faust.h"
+#include "faust2Mx.h"
+#include "faust_MatDense.h"
+#include "faust_MatSparse.h"
+#include <stdexcept>
+#include "faust_constant.h"
+#include "faust_Timer.h"
+#include <complex>
+#include <memory>
+#include "new_faust.h"
+#include "faust_disp.h"
+#include "faust_delete.h"
+#include "faust_gpu_mod_utils.h"
+#include "faust_TransformHelper_gpu.h"
+
+typedef @FAUST_SCALAR@ SCALAR;
+typedef @FAUST_FPP@ FPP;
+
+using namespace Faust;
+using namespace std;
+
+
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+	Faust::enable_gpu_mod();
+#ifdef FAUST_VERBOSE
+	if (typeid(SCALAR) == typeid(float))
+	{
+		std::cout<<"SCALAR == float"<<std::endl;
+	}
+
+	if (typeid(SCALAR) == typeid(double))
+	{
+		std::cout<<"SCALAR == double"<<std::endl;
+	}
+#endif
+	try
+	{
+		// Get the command string
+		char cmd[256];
+		if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
+			mexErrMsgTxt("First input should be a command string less than 256 characters long.");
+		// Check there is a second input, which should be the class instance handle
+		if (nrhs < 2)
+			mexErrMsgTxt("Second input should be a class instance handle.");
+
+		if (!strcmp("new", cmd))
+			new_faust<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if (! strcmp("disp",cmd))
+			faust_disp<SCALAR,GPU2>(prhs, nrhs, plhs, nlhs);
+		else if (!strcmp("delete", cmd))
+		{
+			faust_delete<SCALAR,Cpu>(prhs, nrhs, plhs, nlhs);
+		}
+
+
+	}
+	catch (const std::exception& e)
+	{
+		mexErrMsgTxt(e.what());
+	}
+}

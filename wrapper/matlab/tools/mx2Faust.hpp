@@ -68,94 +68,8 @@ bool isScalarCompatible(Faust::LinearOperator<FPP,Cpu> & L, const mxArray * Matl
 
 }
 
-
-
-
-
-
-
-/*
-template<typename FPP>
-void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
-{
-
-    int  nbRow,nbCol;
-    
-
-
-
-	
-	if (mxIsEmpty(Mat_array))
-	{
-		mexErrMsgTxt("tools_mex.h:mxArray2FaustMat :input matrix is empty.");
-	}
-	mwSize nb_dim=mxGetNumberOfDimensions(Mat_array);
-	if (nb_dim != 2)
-	{
-		mexErrMsgTxt("tools_mex.h:mxArray2FaustMat :input matrix must be a 2D array.");
-	}
-    const mwSize *dimsMat;
-    dimsMat = mxGetDimensions(Mat_array);
-
-	nbRow = (int) dimsMat[0];
-    nbCol = (int) dimsMat[1];
-    if ((nbRow == 0) || (nbCol == 0))
-        mexErrMsgIdAndTxt("tools_mex.h:mxArray2FaustMat", "empty matrix");
-    if (mxIsSparse(Mat_array))
-    {
-        //mexErrMsgTxt("sparse matrix entry instead of dense matrix");
-        mexErrMsgIdAndTxt("a","a sparse matrix entry instead of dense matrix");
-    }
-
-    //check scalar compayibility 
-    if (!isScalarCompatible(Mat,Mat_array))		
-	mexErrMsgTxt("mxArray2FaustMat scalar type (complex/real) are not compatible");
-	
-	const mxClassID V_CLASS_ID = mxGetClassID(Mat_array);
-	 FPP* MatPtr;
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) == sizeof(FPP))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) == sizeof(FPP))))
-	{
-		MatPtr = (FPP*) mxGetPr(Mat_array);
-	}else
-	{
-		if (V_CLASS_ID == mxDOUBLE_CLASS)
-		{
-			MatPtr = (FPP*) mxCalloc(nbRow*nbCol,sizeof(FPP));
-			double* MatPtrDouble =(double*) mxGetPr(Mat_array);
-			for (int i=0;i<nbRow*nbCol;i++)
-				MatPtr[i] = (FPP) MatPtrDouble[i];
-		}
-		else if (V_CLASS_ID == mxSINGLE_CLASS)
-		{
-			MatPtr = (FPP*) mxCalloc(nbRow*nbCol,sizeof(FPP));
-			float* MatPtrSingle= (float*) (mxGetData(Mat_array));
-			for (int i=0;i<nbRow*nbCol;i++)
-				MatPtr[i] = (FPP) MatPtrSingle[i];
-
-
-		}else
-		{
-		 mexErrMsgTxt("mxArray2FaustMat :input matrix format must be single or double");
-		}
-	}
-
-     Mat.resize(nbRow,nbCol);
-
-    memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(FPP));
-	if (((V_CLASS_ID == mxDOUBLE_CLASS) && (sizeof(double) != sizeof(FPP))) || ((V_CLASS_ID == mxSINGLE_CLASS) && (sizeof(float) != sizeof(FPP))))
-	{
-		mxFree(MatPtr);
-	}
-
-
-
-}*/
-
-
-
-
-template<typename FPP>
-void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
+template<typename FPP, FDevice DEV>
+void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,DEV> & Mat)
 {
 	int  nbRow,nbCol;
 	if (mxIsEmpty(Mat_array))
@@ -184,16 +98,22 @@ void mxArray2FaustMat(const mxArray* Mat_array,Faust::MatDense<FPP,Cpu> & Mat)
 
 	FPP* MatPtr;
 	mxArray2Ptr(Mat_array,MatPtr);
-	memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(FPP));
+//	memcpy(Mat.getData(),MatPtr,nbRow*nbCol*sizeof(FPP));
 
+	Mat.setData(MatPtr, nbRow, nbCol);
 	if(MatPtr) {delete [] MatPtr ; MatPtr = NULL;}
 }
 
+template<typename FPP, FDevice DEV>
+Faust::MatDense<FPP,DEV>* mxArray2FaustMat(const mxArray* Mat_array)
+{
+	Faust::MatDense<FPP,DEV> *M = new Faust::MatDense<FPP,DEV>();
+	mxArray2FaustMat(Mat_array, *M);
+	return M;
+}
 
-
-
-template<typename FPP>
-void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,Cpu> & S)
+template<typename FPP, FDevice DEV>
+void mxArray2FaustspMat(const mxArray* spMat_array,Faust::MatSparse<FPP,DEV> & S)
 {
 
 	if (!mxIsSparse(spMat_array))
@@ -423,29 +343,22 @@ void mxArray2Ptr(const mxArray* mxMat, std::complex<FPP>* & ptr_data)
 
 
 
-template<typename FPP>
-void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,Cpu> *> &list_mat)
+template<typename FPP, FDevice DEV>
+void concatMatGeneric(const mxArray * mxMat,std::vector<Faust::MatGeneric<FPP,DEV> *> &list_mat)
 {
 
 	if (mxMat == NULL)
 		mexErrMsgTxt("concatMatGeneric : empty matlab matrix");
 
-	Faust::MatGeneric<FPP,Cpu> *  M = nullptr;
-	Faust::MatDense<FPP,Cpu> *  dM = nullptr;
-	Faust::MatSparse<FPP,Cpu> *  sM = nullptr;
-
-
-
+	Faust::MatGeneric<FPP,DEV> *  M = nullptr;
+	Faust::MatDense<FPP,DEV> *  dM = nullptr;
+	Faust::MatSparse<FPP,DEV> *  sM = nullptr;
 
 	if (!mxIsSparse(mxMat))
-	{
-		M = dM = new Faust::MatDense<FPP,Cpu>();
-		mxArray2FaustMat(mxMat, *dM);
-	}
+		M = dM = mxArray2FaustMat<FPP, DEV>(mxMat);
 	else
 	{
-
-		M = sM = new Faust::MatSparse<FPP,Cpu>();
+		M = sM = new Faust::MatSparse<FPP,DEV>();
 		mxArray2FaustspMat(mxMat, *sM);
 	}
 

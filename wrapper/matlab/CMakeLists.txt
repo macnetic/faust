@@ -111,6 +111,9 @@ foreach(SCALAR_AND_FSUFFIX double:Real std::complex<double>:Cplx) # TODO: float 
 	set(FAUST_FPP double)
 	set(FACT_FPP double) # TODO: we could allow float also
 	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaust${FSUFFIX}.cpp @ONLY)
+	if(USE_GPU_MOD)
+		configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustGPU.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexFaustGPU${FSUFFIX}.cpp @ONLY)
+	endif()
 	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexPalm4MSA.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexPalm4MSA${FSUFFIX}.cpp @ONLY)
 	configure_file(${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical_fact.cpp.in ${FAUST_MATLAB_MEX_SRC_DIR}/mexHierarchical_fact${FSUFFIX}.cpp @ONLY)
 	# Givens FGFT is only for double and float scalars

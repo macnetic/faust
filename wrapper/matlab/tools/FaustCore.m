@@ -61,19 +61,24 @@ classdef FaustCore < handle
 				this.isRealFlag = varargin{2};
 			elseif(nargin >= 1)
 				factors = varargin{1};
-				isRealFlag = 1;
-				for i=1:length(factors)
-					if (~isreal(factors{i}))
-						isRealFlag = 0;
-						break
-					end
-				end
+				scale = varargin{2};
+				optCopy = varargin{3};
+				isRealFlag = varargin{4};
+				onGPU = ~ strcmp(varargin{5}, 'cpu');
 				% varargin{2} is lambda (optional)
 				% varargin{3} is optimizedCopy boolean (not documented).
-				if (isRealFlag)
-					this.objectHandle = mexFaustReal('new',varargin{:});
+				if(onGPU)
+					if (isRealFlag)
+						this.objectHandle = mexFaustGPUReal('new',varargin{1:3});
+					else
+						this.objectHandle = mexFaustGPUCplx('new',varargin{1:3});
+					end
 				else
-					this.objectHandle = mexFaustCplx('new',varargin{:});
+					if (isRealFlag)
+						this.objectHandle = mexFaustReal('new',varargin{1:3});
+					else
+						this.objectHandle = mexFaustCplx('new',varargin{1:3});
+					end
 				end
 				this.isRealFlag = isRealFlag;
 			end
